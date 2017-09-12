@@ -1,60 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:36154 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751519AbdILV6B (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34049 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751550AbdILV5z (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Sep 2017 17:58:01 -0400
-Received: by mail-pf0-f194.google.com with SMTP id f84so6720261pfj.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Sep 2017 14:58:01 -0700 (PDT)
-Subject: [PATCH v8 12/18] RISC-V: Generic library routines and assembly
-Date: Tue, 12 Sep 2017 14:57:09 -0700
-Message-Id: <20170912215715.4186-13-palmer@dabbelt.com>
+        Tue, 12 Sep 2017 17:57:55 -0400
+Received: by mail-pg0-f67.google.com with SMTP id v82so6746837pgb.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Sep 2017 14:57:54 -0700 (PDT)
+Subject: [PATCH v8 08/18] irqchip: New RISC-V PLIC Driver
+Date: Tue, 12 Sep 2017 14:57:05 -0700
+Message-Id: <20170912215715.4186-9-palmer@dabbelt.com>
 In-Reply-To: <20170912215715.4186-1-palmer@dabbelt.com>
 References: <20170912215715.4186-1-palmer@dabbelt.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 From: Palmer Dabbelt <palmer@dabbelt.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>, dmitriy@oss-tech.org
 Cc: yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, andriy.shevchenko@linux.intel.com, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org, Palmer Dabbelt <palmer@dabbelt.com>
 
-This patch contains code that is more specific to the RISC-V ISA than it
-is to Linux.  It contains string and math operations, C wrappers for
-various assembly instructions, stack walking code, and uaccess.
+This patch adds a driver for the Platform Level Interrupt Controller
+(PLIC) specified as part of the RISC-V supervisor level ISA manual.
+The PLIC connocts global interrupt sources to the local interrupt
+controller on each hart.  A PLIC is present on all RISC-V systems.
 
 Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
 ---
- arch/riscv/include/asm/asm.h            |  76 +++++
- arch/riscv/include/asm/csr.h            | 132 ++++++++
- arch/riscv/include/asm/linkage.h        |  20 ++
- arch/riscv/include/asm/string.h         |  26 ++
- arch/riscv/include/asm/uaccess.h        | 513 ++++++++++++++++++++++++++++++++
- arch/riscv/include/asm/word-at-a-time.h |  55 ++++
- arch/riscv/kernel/stacktrace.c          | 177 +++++++++++
- arch/riscv/lib/memcpy.S                 | 115 +++++++
- arch/riscv/lib/memset.S                 | 120 ++++++++
- arch/riscv/lib/uaccess.S                | 117 ++++++++
- arch/riscv/lib/udivdi3.S                |  38 +++
- 11 files changed, 1389 insertions(+)
- create mode 100644 arch/riscv/include/asm/asm.h
- create mode 100644 arch/riscv/include/asm/csr.h
- create mode 100644 arch/riscv/include/asm/linkage.h
- create mode 100644 arch/riscv/include/asm/string.h
- create mode 100644 arch/riscv/include/asm/uaccess.h
- create mode 100644 arch/riscv/include/asm/word-at-a-time.h
- create mode 100644 arch/riscv/kernel/stacktrace.c
- create mode 100644 arch/riscv/lib/memcpy.S
- create mode 100644 arch/riscv/lib/memset.S
- create mode 100644 arch/riscv/lib/uaccess.S
- create mode 100644 arch/riscv/lib/udivdi3.S
+ drivers/irqchip/Kconfig          |  13 ++
+ drivers/irqchip/Makefile         |   1 +
+ drivers/irqchip/irq-riscv-plic.c | 379 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 393 insertions(+)
+ create mode 100644 drivers/irqchip/irq-riscv-plic.c
 
-diff --git a/arch/riscv/include/asm/asm.h b/arch/riscv/include/asm/asm.h
+diff --git a/drivers/irqchip/Kconfig b/drivers/irqchip/Kconfig
+index 7923d3fa8fae..c23539923c10 100644
+--- a/drivers/irqchip/Kconfig
++++ b/drivers/irqchip/Kconfig
+@@ -307,6 +307,19 @@ config QCOM_IRQ_COMBINER
+ 	  Say yes here to add support for the IRQ combiner devices embedded
+ 	  in Qualcomm Technologies chips.
+ 
++config RISCV_PLIC
++	bool "Platform-Level Interrupt Controller"
++	depends on RISCV
++	default y
++	help
++	   This enables support for the PLIC chip found in standard RISC-V
++	   systems.  The PLIC controls devices interrupts and connects them to
++	   each core's local interrupt controller.  Aside from timer and
++	   software interrupts, all other interrupt sources (MSI, GPIO, etc)
++	   are subordinate to the PLIC.
++
++	   If you don't know what to do here, say Y.
++
+ config RISCV_INTC
+ 	def_bool y if RISCV
+ 	#bool "RISC-V Interrupt Controller"
+diff --git a/drivers/irqchip/Makefile b/drivers/irqchip/Makefile
+index b1aa9114afc4..7880c9cec40e 100644
+--- a/drivers/irqchip/Makefile
++++ b/drivers/irqchip/Makefile
+@@ -78,4 +78,5 @@ obj-$(CONFIG_EZNPS_GIC)			+= irq-eznps.o
+ obj-$(CONFIG_ARCH_ASPEED)		+= irq-aspeed-vic.o irq-aspeed-i2c-ic.o
+ obj-$(CONFIG_STM32_EXTI) 		+= irq-stm32-exti.o
+ obj-$(CONFIG_QCOM_IRQ_COMBINER)		+= qcom-irq-combiner.o
++obj-$(CONFIG_RISCV_PLIC)		+= irq-riscv-plic.o
+ obj-$(CONFIG_RISCV_INTC)		+= irq-riscv-intc.o
+diff --git a/drivers/irqchip/irq-riscv-plic.c b/drivers/irqchip/irq-riscv-plic.c
 new file mode 100644
-index 000000000000..6cbbb6a68d76
+index 000000000000..b5182b43b377
 --- /dev/null
-+++ b/arch/riscv/include/asm/asm.h
-@@ -0,0 +1,76 @@
++++ b/drivers/irqchip/irq-riscv-plic.c
+@@ -0,0 +1,379 @@
 +/*
-+ * Copyright (C) 2015 Regents of the University of California
++ * Copyright (C) 2017 SiFive
 + *
 + *   This program is free software; you can redistribute it and/or
 + *   modify it under the terms of the GNU General Public License
@@ -66,1442 +86,372 @@ index 000000000000..6cbbb6a68d76
 + *   GNU General Public License for more details.
 + */
 +
-+#ifndef _ASM_RISCV_ASM_H
-+#define _ASM_RISCV_ASM_H
-+
-+#ifdef __ASSEMBLY__
-+#define __ASM_STR(x)	x
-+#else
-+#define __ASM_STR(x)	#x
-+#endif
-+
-+#if __riscv_xlen == 64
-+#define __REG_SEL(a, b)	__ASM_STR(a)
-+#elif __riscv_xlen == 32
-+#define __REG_SEL(a, b)	__ASM_STR(b)
-+#else
-+#error "Unexpected __riscv_xlen"
-+#endif
-+
-+#define REG_L		__REG_SEL(ld, lw)
-+#define REG_S		__REG_SEL(sd, sw)
-+#define SZREG		__REG_SEL(8, 4)
-+#define LGREG		__REG_SEL(3, 2)
-+
-+#if __SIZEOF_POINTER__ == 8
-+#ifdef __ASSEMBLY__
-+#define RISCV_PTR		.dword
-+#define RISCV_SZPTR		8
-+#define RISCV_LGPTR		3
-+#else
-+#define RISCV_PTR		".dword"
-+#define RISCV_SZPTR		"8"
-+#define RISCV_LGPTR		"3"
-+#endif
-+#elif __SIZEOF_POINTER__ == 4
-+#ifdef __ASSEMBLY__
-+#define RISCV_PTR		.word
-+#define RISCV_SZPTR		4
-+#define RISCV_LGPTR		2
-+#else
-+#define RISCV_PTR		".word"
-+#define RISCV_SZPTR		"4"
-+#define RISCV_LGPTR		"2"
-+#endif
-+#else
-+#error "Unexpected __SIZEOF_POINTER__"
-+#endif
-+
-+#if (__SIZEOF_INT__ == 4)
-+#define INT		__ASM_STR(.word)
-+#define SZINT		__ASM_STR(4)
-+#define LGINT		__ASM_STR(2)
-+#else
-+#error "Unexpected __SIZEOF_INT__"
-+#endif
-+
-+#if (__SIZEOF_SHORT__ == 2)
-+#define SHORT		__ASM_STR(.half)
-+#define SZSHORT		__ASM_STR(2)
-+#define LGSHORT		__ASM_STR(1)
-+#else
-+#error "Unexpected __SIZEOF_SHORT__"
-+#endif
-+
-+#endif /* _ASM_RISCV_ASM_H */
-diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
-new file mode 100644
-index 000000000000..0d64bc9f4f91
---- /dev/null
-+++ b/arch/riscv/include/asm/csr.h
-@@ -0,0 +1,132 @@
-+/*
-+ * Copyright (C) 2015 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#ifndef _ASM_RISCV_CSR_H
-+#define _ASM_RISCV_CSR_H
-+
-+#include <linux/const.h>
-+
-+/* Status register flags */
-+#define SR_IE   _AC(0x00000002, UL) /* Interrupt Enable */
-+#define SR_PIE  _AC(0x00000020, UL) /* Previous IE */
-+#define SR_PS   _AC(0x00000100, UL) /* Previously Supervisor */
-+#define SR_SUM  _AC(0x00040000, UL) /* Supervisor may access User Memory */
-+
-+#define SR_FS           _AC(0x00006000, UL) /* Floating-point Status */
-+#define SR_FS_OFF       _AC(0x00000000, UL)
-+#define SR_FS_INITIAL   _AC(0x00002000, UL)
-+#define SR_FS_CLEAN     _AC(0x00004000, UL)
-+#define SR_FS_DIRTY     _AC(0x00006000, UL)
-+
-+#define SR_XS           _AC(0x00018000, UL) /* Extension Status */
-+#define SR_XS_OFF       _AC(0x00000000, UL)
-+#define SR_XS_INITIAL   _AC(0x00008000, UL)
-+#define SR_XS_CLEAN     _AC(0x00010000, UL)
-+#define SR_XS_DIRTY     _AC(0x00018000, UL)
-+
-+#ifndef CONFIG_64BIT
-+#define SR_SD   _AC(0x80000000, UL) /* FS/XS dirty */
-+#else
-+#define SR_SD   _AC(0x8000000000000000, UL) /* FS/XS dirty */
-+#endif
-+
-+/* SPTBR flags */
-+#if __riscv_xlen == 32
-+#define SPTBR_PPN     _AC(0x003FFFFF, UL)
-+#define SPTBR_MODE_32 _AC(0x80000000, UL)
-+#define SPTBR_MODE    SPTBR_MODE_32
-+#else
-+#define SPTBR_PPN     _AC(0x00000FFFFFFFFFFF, UL)
-+#define SPTBR_MODE_39 _AC(0x8000000000000000, UL)
-+#define SPTBR_MODE    SPTBR_MODE_39
-+#endif
-+
-+/* Interrupt Enable and Interrupt Pending flags */
-+#define SIE_SSIE _AC(0x00000002, UL) /* Software Interrupt Enable */
-+#define SIE_STIE _AC(0x00000020, UL) /* Timer Interrupt Enable */
-+
-+#define EXC_INST_MISALIGNED     0
-+#define EXC_INST_ACCESS         1
-+#define EXC_BREAKPOINT          3
-+#define EXC_LOAD_ACCESS         5
-+#define EXC_STORE_ACCESS        7
-+#define EXC_SYSCALL             8
-+#define EXC_INST_PAGE_FAULT     12
-+#define EXC_LOAD_PAGE_FAULT     13
-+#define EXC_STORE_PAGE_FAULT    15
-+
-+#ifndef __ASSEMBLY__
-+
-+#define csr_swap(csr, val)					\
-+({								\
-+	unsigned long __v = (unsigned long)(val);		\
-+	__asm__ __volatile__ ("csrrw %0, " #csr ", %1"		\
-+			      : "=r" (__v) : "rK" (__v)		\
-+			      : "memory");			\
-+	__v;							\
-+})
-+
-+#define csr_read(csr)						\
-+({								\
-+	register unsigned long __v;				\
-+	__asm__ __volatile__ ("csrr %0, " #csr			\
-+			      : "=r" (__v) :			\
-+			      : "memory");			\
-+	__v;							\
-+})
-+
-+#define csr_write(csr, val)					\
-+({								\
-+	unsigned long __v = (unsigned long)(val);		\
-+	__asm__ __volatile__ ("csrw " #csr ", %0"		\
-+			      : : "rK" (__v)			\
-+			      : "memory");			\
-+})
-+
-+#define csr_read_set(csr, val)					\
-+({								\
-+	unsigned long __v = (unsigned long)(val);		\
-+	__asm__ __volatile__ ("csrrs %0, " #csr ", %1"		\
-+			      : "=r" (__v) : "rK" (__v)		\
-+			      : "memory");			\
-+	__v;							\
-+})
-+
-+#define csr_set(csr, val)					\
-+({								\
-+	unsigned long __v = (unsigned long)(val);		\
-+	__asm__ __volatile__ ("csrs " #csr ", %0"		\
-+			      : : "rK" (__v)			\
-+			      : "memory");			\
-+})
-+
-+#define csr_read_clear(csr, val)				\
-+({								\
-+	unsigned long __v = (unsigned long)(val);		\
-+	__asm__ __volatile__ ("csrrc %0, " #csr ", %1"		\
-+			      : "=r" (__v) : "rK" (__v)		\
-+			      : "memory");			\
-+	__v;							\
-+})
-+
-+#define csr_clear(csr, val)					\
-+({								\
-+	unsigned long __v = (unsigned long)(val);		\
-+	__asm__ __volatile__ ("csrc " #csr ", %0"		\
-+			      : : "rK" (__v)			\
-+			      : "memory");			\
-+})
-+
-+#endif /* __ASSEMBLY__ */
-+
-+#endif /* _ASM_RISCV_CSR_H */
-diff --git a/arch/riscv/include/asm/linkage.h b/arch/riscv/include/asm/linkage.h
-new file mode 100644
-index 000000000000..b7b304ca89c4
---- /dev/null
-+++ b/arch/riscv/include/asm/linkage.h
-@@ -0,0 +1,20 @@
-+/*
-+ * Copyright (C) 2015 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#ifndef _ASM_RISCV_LINKAGE_H
-+#define _ASM_RISCV_LINKAGE_H
-+
-+#define __ALIGN		.balign 4
-+#define __ALIGN_STR	".balign 4"
-+
-+#endif /* _ASM_RISCV_LINKAGE_H */
-diff --git a/arch/riscv/include/asm/string.h b/arch/riscv/include/asm/string.h
-new file mode 100644
-index 000000000000..9210fcf4ff52
---- /dev/null
-+++ b/arch/riscv/include/asm/string.h
-@@ -0,0 +1,26 @@
-+/*
-+ * Copyright (C) 2013 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#ifndef _ASM_RISCV_STRING_H
-+#define _ASM_RISCV_STRING_H
-+
-+#include <linux/types.h>
-+#include <linux/linkage.h>
-+
-+#define __HAVE_ARCH_MEMSET
-+extern asmlinkage void *memset(void *, int, size_t);
-+
-+#define __HAVE_ARCH_MEMCPY
-+extern asmlinkage void *memcpy(void *, const void *, size_t);
-+
-+#endif /* _ASM_RISCV_STRING_H */
-diff --git a/arch/riscv/include/asm/uaccess.h b/arch/riscv/include/asm/uaccess.h
-new file mode 100644
-index 000000000000..27b90d64814b
---- /dev/null
-+++ b/arch/riscv/include/asm/uaccess.h
-@@ -0,0 +1,513 @@
-+/*
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ *
-+ * This file was copied from include/asm-generic/uaccess.h
-+ */
-+
-+#ifndef _ASM_RISCV_UACCESS_H
-+#define _ASM_RISCV_UACCESS_H
++#include <linux/interrupt.h>
++#include <linux/io.h>
++#include <linux/irq.h>
++#include <linux/irqchip.h>
++#include <linux/irqchip/chained_irq.h>
++#include <linux/irqdomain.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_address.h>
++#include <linux/of_irq.h>
++#include <linux/platform_device.h>
++#include <linux/spinlock.h>
 +
 +/*
-+ * User space memory access functions
++ * From the RISC-V Privlidged Spec v1.10:
++ *
++ * Global interrupt sources are assigned small unsigned integer identifiers,
++ * beginning at the value 1.  An interrupt ID of 0 is reserved to mean “no
++ * interrupt”.  Interrupt identifiers are also used to break ties when two or
++ * more interrupt sources have the same assigned priority. Smaller values of
++ * interrupt ID take precedence over larger values of interrupt ID.
++ *
++ * While the RISC-V supervisor spec doesn't define the maximum number of
++ * devices supported by the PLIC, the largest number supported by devices
++ * marked as 'riscv,plic0' (which is the only device type this driver supports,
++ * and is the only extant PLIC as of now) is 1024.  As mentioned above, device
++ * 0 is defined to be non-existant so this device really only supports 1023
++ * devices.
 + */
-+#include <linux/errno.h>
-+#include <linux/compiler.h>
-+#include <linux/thread_info.h>
-+#include <asm/byteorder.h>
-+#include <asm/asm.h>
-+
-+#define __enable_user_access()							\
-+	__asm__ __volatile__ ("csrs sstatus, %0" : : "r" (SR_SUM) : "memory")
-+#define __disable_user_access()							\
-+	__asm__ __volatile__ ("csrc sstatus, %0" : : "r" (SR_SUM) : "memory")
++#define MAX_DEVICES	1024
++#define MAX_CONTEXTS	15872
 +
 +/*
-+ * The fs value determines whether argument validity checking should be
-+ * performed or not.  If get_fs() == USER_DS, checking is performed, with
-+ * get_fs() == KERNEL_DS, checking is bypassed.
++ * The PLIC consists of memory-mapped control registers, with a memory map as
++ * follows:
 + *
-+ * For historical reasons, these macros are grossly misnamed.
++ * base + 0x000000: Reserved (interrupt source 0 does not exist)
++ * base + 0x000004: Interrupt source 1 priority
++ * base + 0x000008: Interrupt source 2 priority
++ * ...
++ * base + 0x000FFC: Interrupt source 1023 priority
++ * base + 0x001000: Pending 0
++ * base + 0x001FFF: Pending
++ * base + 0x002000: Enable bits for sources 0-31 on context 0
++ * base + 0x002004: Enable bits for sources 32-63 on context 0
++ * ...
++ * base + 0x0020FC: Enable bits for sources 992-1023 on context 0
++ * base + 0x002080: Enable bits for sources 0-31 on context 1
++ * ...
++ * base + 0x002100: Enable bits for sources 0-31 on context 2
++ * ...
++ * base + 0x1F1F80: Enable bits for sources 992-1023 on context 15871
++ * base + 0x1F1F84: Reserved
++ * ...              (higher context IDs would fit here, but wouldn't fit
++ *                   inside the per-context priority vector)
++ * base + 0x1FFFFC: Reserved
++ * base + 0x200000: Priority threshold for context 0
++ * base + 0x200004: Claim/complete for context 0
++ * base + 0x200008: Reserved
++ * ...
++ * base + 0x200FFC: Reserved
++ * base + 0x201000: Priority threshold for context 1
++ * base + 0x201004: Claim/complete for context 1
++ * ...
++ * base + 0xFFE000: Priority threshold for context 15871
++ * base + 0xFFE004: Claim/complete for context 15871
++ * base + 0xFFE008: Reserved
++ * ...
++ * base + 0xFFFFFC: Reserved
 + */
 +
-+#define KERNEL_DS	(~0UL)
-+#define USER_DS		(TASK_SIZE)
-+
-+#define get_ds()	(KERNEL_DS)
-+#define get_fs()	(current_thread_info()->addr_limit)
-+
-+static inline void set_fs(mm_segment_t fs)
-+{
-+	current_thread_info()->addr_limit = fs;
-+}
-+
-+#define segment_eq(a, b) ((a) == (b))
-+
-+#define user_addr_max()	(get_fs())
-+
-+
-+#define VERIFY_READ	0
-+#define VERIFY_WRITE	1
-+
-+/**
-+ * access_ok: - Checks if a user space pointer is valid
-+ * @type: Type of access: %VERIFY_READ or %VERIFY_WRITE.  Note that
-+ *        %VERIFY_WRITE is a superset of %VERIFY_READ - if it is safe
-+ *        to write to a block, it is always safe to read from it.
-+ * @addr: User space pointer to start of block to check
-+ * @size: Size of block to check
-+ *
-+ * Context: User context only.  This function may sleep.
-+ *
-+ * Checks if a pointer to a block of memory in user space is valid.
-+ *
-+ * Returns true (nonzero) if the memory block may be valid, false (zero)
-+ * if it is definitely invalid.
-+ *
-+ * Note that, depending on architecture, this function probably just
-+ * checks that the pointer is in the user space range - after calling
-+ * this function, memory access functions may still return -EFAULT.
-+ */
-+#define access_ok(type, addr, size) ({					\
-+	__chk_user_ptr(addr);						\
-+	likely(__access_ok((unsigned long __force)(addr), (size)));	\
-+})
++/* Each interrupt source has a priority register associated with it. */
++#define PRIORITY_BASE		0
++#define PRIORITY_PER_ID		4
 +
 +/*
-+ * Ensure that the range [addr, addr+size) is within the process's
-+ * address space
++ * Each hart context has a vector of interupt enable bits associated with it.
++ * There's one bit for each interrupt source.
 + */
-+static inline int __access_ok(unsigned long addr, unsigned long size)
-+{
-+	const mm_segment_t fs = get_fs();
-+
-+	return (size <= fs) && (addr <= (fs - size));
-+}
++#define ENABLE_BASE		0x2000
++#define ENABLE_PER_HART		0x80
 +
 +/*
-+ * The exception table consists of pairs of addresses: the first is the
-+ * address of an instruction that is allowed to fault, and the second is
-+ * the address at which the program should continue.  No registers are
-+ * modified, so it is entirely up to the continuation code to figure out
-+ * what to do.
-+ *
-+ * All the routines below use bits of fixup code that are out of line
-+ * with the main instruction path.  This means when everything is well,
-+ * we don't even have to jump over them.  Further, they do not intrude
-+ * on our cache or tlb entries.
++ * Each hart context has a set of control registers associated with it.  Right
++ * now there's only two: a source priority threshold over which the hart will
++ * take an interrupt, and a register to claim interrupts.
 + */
++#define CONTEXT_BASE		0x200000
++#define CONTEXT_PER_HART	0x1000
++#define CONTEXT_THRESHOLD	0
++#define CONTEXT_CLAIM		4
 +
-+struct exception_table_entry {
-+	unsigned long insn, fixup;
++/*
++ * PLIC devices are named like 'riscv,plic0,%llx', this is enough space to
++ * store that name.
++ */
++#define PLIC_DATA_NAME_SIZE 30
++
++struct plic_handler {
++	bool			present;
++	int			contextid;
++	struct plic_data	*data;
 +};
 +
-+extern int fixup_exception(struct pt_regs *state);
++struct plic_data {
++	struct irq_chip		chip;
++	struct irq_domain	*domain;
++	u32			ndev;
++	void __iomem		*reg;
++	int			handlers;
++	struct plic_handler	*handler;
++	char			name[PLIC_DATA_NAME_SIZE];
++	spinlock_t		lock;
++};
 +
-+#if defined(__LITTLE_ENDIAN)
-+#define __MSW	1
-+#define __LSW	0
-+#elif defined(__BIG_ENDIAN)
-+#define __MSW	0
-+#define	__LSW	1
-+#else
-+#error "Unknown endianness"
-+#endif
-+
-+/*
-+ * The "__xxx" versions of the user access functions do not verify the address
-+ * space - it must have been done previously with a separate "access_ok()"
-+ * call.
-+ */
-+
-+#ifdef CONFIG_MMU
-+#define __get_user_asm(insn, x, ptr, err)			\
-+do {								\
-+	uintptr_t __tmp;					\
-+	__typeof__(x) __x;					\
-+	__enable_user_access();					\
-+	__asm__ __volatile__ (					\
-+		"1:\n"						\
-+		"	" insn " %1, %3\n"			\
-+		"2:\n"						\
-+		"	.section .fixup,\"ax\"\n"		\
-+		"	.balign 4\n"				\
-+		"3:\n"						\
-+		"	li %0, %4\n"				\
-+		"	li %1, 0\n"				\
-+		"	jump 2b, %2\n"				\
-+		"	.previous\n"				\
-+		"	.section __ex_table,\"a\"\n"		\
-+		"	.balign " RISCV_SZPTR "\n"			\
-+		"	" RISCV_PTR " 1b, 3b\n"			\
-+		"	.previous"				\
-+		: "+r" (err), "=&r" (__x), "=r" (__tmp)		\
-+		: "m" (*(ptr)), "i" (-EFAULT));			\
-+	__disable_user_access();				\
-+	(x) = __x;						\
-+} while (0)
-+#endif /* CONFIG_MMU */
-+
-+#ifdef CONFIG_64BIT
-+#define __get_user_8(x, ptr, err) \
-+	__get_user_asm("ld", x, ptr, err)
-+#else /* !CONFIG_64BIT */
-+#ifdef CONFIG_MMU
-+#define __get_user_8(x, ptr, err)				\
-+do {								\
-+	u32 __user *__ptr = (u32 __user *)(ptr);		\
-+	u32 __lo, __hi;						\
-+	uintptr_t __tmp;					\
-+	__enable_user_access();					\
-+	__asm__ __volatile__ (					\
-+		"1:\n"						\
-+		"	lw %1, %4\n"				\
-+		"2:\n"						\
-+		"	lw %2, %5\n"				\
-+		"3:\n"						\
-+		"	.section .fixup,\"ax\"\n"		\
-+		"	.balign 4\n"				\
-+		"4:\n"						\
-+		"	li %0, %6\n"				\
-+		"	li %1, 0\n"				\
-+		"	li %2, 0\n"				\
-+		"	jump 3b, %3\n"				\
-+		"	.previous\n"				\
-+		"	.section __ex_table,\"a\"\n"		\
-+		"	.balign " RISCV_SZPTR "\n"			\
-+		"	" RISCV_PTR " 1b, 4b\n"			\
-+		"	" RISCV_PTR " 2b, 4b\n"			\
-+		"	.previous"				\
-+		: "+r" (err), "=&r" (__lo), "=r" (__hi),	\
-+			"=r" (__tmp)				\
-+		: "m" (__ptr[__LSW]), "m" (__ptr[__MSW]),	\
-+			"i" (-EFAULT));				\
-+	__disable_user_access();				\
-+	(x) = (__typeof__(x))((__typeof__((x)-(x)))(		\
-+		(((u64)__hi << 32) | __lo)));			\
-+} while (0)
-+#endif /* CONFIG_MMU */
-+#endif /* CONFIG_64BIT */
-+
-+
-+/**
-+ * __get_user: - Get a simple variable from user space, with less checking.
-+ * @x:   Variable to store result.
-+ * @ptr: Source address, in user space.
-+ *
-+ * Context: User context only.  This function may sleep.
-+ *
-+ * This macro copies a single simple variable from user space to kernel
-+ * space.  It supports simple types like char and int, but not larger
-+ * data types like structures or arrays.
-+ *
-+ * @ptr must have pointer-to-simple-variable type, and the result of
-+ * dereferencing @ptr must be assignable to @x without a cast.
-+ *
-+ * Caller must check the pointer with access_ok() before calling this
-+ * function.
-+ *
-+ * Returns zero on success, or -EFAULT on error.
-+ * On error, the variable @x is set to zero.
-+ */
-+#define __get_user(x, ptr)					\
-+({								\
-+	register long __gu_err = 0;				\
-+	const __typeof__(*(ptr)) __user *__gu_ptr = (ptr);	\
-+	__chk_user_ptr(__gu_ptr);				\
-+	switch (sizeof(*__gu_ptr)) {				\
-+	case 1:							\
-+		__get_user_asm("lb", (x), __gu_ptr, __gu_err);	\
-+		break;						\
-+	case 2:							\
-+		__get_user_asm("lh", (x), __gu_ptr, __gu_err);	\
-+		break;						\
-+	case 4:							\
-+		__get_user_asm("lw", (x), __gu_ptr, __gu_err);	\
-+		break;						\
-+	case 8:							\
-+		__get_user_8((x), __gu_ptr, __gu_err);	\
-+		break;						\
-+	default:						\
-+		BUILD_BUG();					\
-+	}							\
-+	__gu_err;						\
-+})
-+
-+/**
-+ * get_user: - Get a simple variable from user space.
-+ * @x:   Variable to store result.
-+ * @ptr: Source address, in user space.
-+ *
-+ * Context: User context only.  This function may sleep.
-+ *
-+ * This macro copies a single simple variable from user space to kernel
-+ * space.  It supports simple types like char and int, but not larger
-+ * data types like structures or arrays.
-+ *
-+ * @ptr must have pointer-to-simple-variable type, and the result of
-+ * dereferencing @ptr must be assignable to @x without a cast.
-+ *
-+ * Returns zero on success, or -EFAULT on error.
-+ * On error, the variable @x is set to zero.
-+ */
-+#define get_user(x, ptr)					\
-+({								\
-+	const __typeof__(*(ptr)) __user *__p = (ptr);		\
-+	might_fault();						\
-+	access_ok(VERIFY_READ, __p, sizeof(*__p)) ?		\
-+		__get_user((x), __p) :				\
-+		((x) = 0, -EFAULT);				\
-+})
-+
-+
-+#ifdef CONFIG_MMU
-+#define __put_user_asm(insn, x, ptr, err)			\
-+do {								\
-+	uintptr_t __tmp;					\
-+	__typeof__(*(ptr)) __x = x;				\
-+	__enable_user_access();					\
-+	__asm__ __volatile__ (					\
-+		"1:\n"						\
-+		"	" insn " %z3, %2\n"			\
-+		"2:\n"						\
-+		"	.section .fixup,\"ax\"\n"		\
-+		"	.balign 4\n"				\
-+		"3:\n"						\
-+		"	li %0, %4\n"				\
-+		"	jump 2b, %1\n"				\
-+		"	.previous\n"				\
-+		"	.section __ex_table,\"a\"\n"		\
-+		"	.balign " RISCV_SZPTR "\n"			\
-+		"	" RISCV_PTR " 1b, 3b\n"			\
-+		"	.previous"				\
-+		: "+r" (err), "=r" (__tmp), "=m" (*(ptr))	\
-+		: "rJ" (__x), "i" (-EFAULT));			\
-+	__disable_user_access();				\
-+} while (0)
-+#endif /* CONFIG_MMU */
-+
-+
-+#ifdef CONFIG_64BIT
-+#define __put_user_8(x, ptr, err) \
-+	__put_user_asm("sd", x, ptr, err)
-+#else /* !CONFIG_64BIT */
-+#ifdef CONFIG_MMU
-+#define __put_user_8(x, ptr, err)				\
-+do {								\
-+	u32 __user *__ptr = (u32 __user *)(ptr);		\
-+	u64 __x = (__typeof__((x)-(x)))(x);			\
-+	uintptr_t __tmp;					\
-+	__enable_user_access();					\
-+	__asm__ __volatile__ (					\
-+		"1:\n"						\
-+		"	sw %z4, %2\n"				\
-+		"2:\n"						\
-+		"	sw %z5, %3\n"				\
-+		"3:\n"						\
-+		"	.section .fixup,\"ax\"\n"		\
-+		"	.balign 4\n"				\
-+		"4:\n"						\
-+		"	li %0, %6\n"				\
-+		"	jump 2b, %1\n"				\
-+		"	.previous\n"				\
-+		"	.section __ex_table,\"a\"\n"		\
-+		"	.balign " RISCV_SZPTR "\n"			\
-+		"	" RISCV_PTR " 1b, 4b\n"			\
-+		"	" RISCV_PTR " 2b, 4b\n"			\
-+		"	.previous"				\
-+		: "+r" (err), "=r" (__tmp),			\
-+			"=m" (__ptr[__LSW]),			\
-+			"=m" (__ptr[__MSW])			\
-+		: "rJ" (__x), "rJ" (__x >> 32), "i" (-EFAULT));	\
-+	__disable_user_access();				\
-+} while (0)
-+#endif /* CONFIG_MMU */
-+#endif /* CONFIG_64BIT */
-+
-+
-+/**
-+ * __put_user: - Write a simple value into user space, with less checking.
-+ * @x:   Value to copy to user space.
-+ * @ptr: Destination address, in user space.
-+ *
-+ * Context: User context only.  This function may sleep.
-+ *
-+ * This macro copies a single simple value from kernel space to user
-+ * space.  It supports simple types like char and int, but not larger
-+ * data types like structures or arrays.
-+ *
-+ * @ptr must have pointer-to-simple-variable type, and @x must be assignable
-+ * to the result of dereferencing @ptr.
-+ *
-+ * Caller must check the pointer with access_ok() before calling this
-+ * function.
-+ *
-+ * Returns zero on success, or -EFAULT on error.
-+ */
-+#define __put_user(x, ptr)					\
-+({								\
-+	register long __pu_err = 0;				\
-+	__typeof__(*(ptr)) __user *__gu_ptr = (ptr);		\
-+	__chk_user_ptr(__gu_ptr);				\
-+	switch (sizeof(*__gu_ptr)) {				\
-+	case 1:							\
-+		__put_user_asm("sb", (x), __gu_ptr, __pu_err);	\
-+		break;						\
-+	case 2:							\
-+		__put_user_asm("sh", (x), __gu_ptr, __pu_err);	\
-+		break;						\
-+	case 4:							\
-+		__put_user_asm("sw", (x), __gu_ptr, __pu_err);	\
-+		break;						\
-+	case 8:							\
-+		__put_user_8((x), __gu_ptr, __pu_err);	\
-+		break;						\
-+	default:						\
-+		BUILD_BUG();					\
-+	}							\
-+	__pu_err;						\
-+})
-+
-+/**
-+ * put_user: - Write a simple value into user space.
-+ * @x:   Value to copy to user space.
-+ * @ptr: Destination address, in user space.
-+ *
-+ * Context: User context only.  This function may sleep.
-+ *
-+ * This macro copies a single simple value from kernel space to user
-+ * space.  It supports simple types like char and int, but not larger
-+ * data types like structures or arrays.
-+ *
-+ * @ptr must have pointer-to-simple-variable type, and @x must be assignable
-+ * to the result of dereferencing @ptr.
-+ *
-+ * Returns zero on success, or -EFAULT on error.
-+ */
-+#define put_user(x, ptr)					\
-+({								\
-+	__typeof__(*(ptr)) __user *__p = (ptr);			\
-+	might_fault();						\
-+	access_ok(VERIFY_WRITE, __p, sizeof(*__p)) ?		\
-+		__put_user((x), __p) :				\
-+		-EFAULT;					\
-+})
-+
-+
-+extern unsigned long __must_check __copy_user(void __user *to,
-+	const void __user *from, unsigned long n);
-+
-+static inline unsigned long
-+raw_copy_from_user(void *to, const void __user *from, unsigned long n)
++/* Addressing helper functions. */
++static inline
++void __iomem *plic_enable_vector(struct plic_data *data, int contextid)
 +{
-+	return __copy_user(to, from, n);
++	return data->reg + ENABLE_BASE + contextid * ENABLE_PER_HART;
 +}
-+
-+static inline unsigned long
-+raw_copy_to_user(void __user *to, const void *from, unsigned long n)
-+{
-+	return __copy_user(to, from, n);
-+}
-+
-+extern long strncpy_from_user(char *dest, const char __user *src, long count);
-+
-+extern long __must_check strlen_user(const char __user *str);
-+extern long __must_check strnlen_user(const char __user *str, long n);
-+
-+extern
-+unsigned long __must_check __clear_user(void __user *addr, unsigned long n);
 +
 +static inline
-+unsigned long __must_check clear_user(void __user *to, unsigned long n)
++void __iomem *plic_priority(struct plic_data *data, int hwirq)
 +{
-+	might_fault();
-+	return access_ok(VERIFY_WRITE, to, n) ?
-+		__clear_user(to, n) : n;
++	return data->reg + PRIORITY_BASE + hwirq * PRIORITY_PER_ID;
++}
++
++static inline
++void __iomem *plic_hart_threshold(struct plic_data *data, int contextid)
++{
++	return data->reg + CONTEXT_BASE + CONTEXT_PER_HART * contextid + CONTEXT_THRESHOLD;
++}
++
++static inline
++void __iomem *plic_hart_claim(struct plic_data *data, int contextid)
++{
++	return data->reg + CONTEXT_BASE + CONTEXT_PER_HART * contextid + CONTEXT_CLAIM;
 +}
 +
 +/*
-+ * Atomic compare-and-exchange, but with a fixup for userspace faults.  Faults
-+ * will set "err" to -EFAULT, while successful accesses return the previous
-+ * value.
++ * Handling an interrupt is a two-step process: first you claim the interrupt
++ * by reading the claim register, then you complete the interrupt by writing
++ * that source ID back to the same claim register.  This automatically enables
++ * and disables the interrupt, so there's nothing else to do.
 + */
-+#ifdef CONFIG_MMU
-+#define __cmpxchg_user(ptr, old, new, err, size, lrb, scb)	\
-+({								\
-+	__typeof__(ptr) __ptr = (ptr);				\
-+	__typeof__(*(ptr)) __old = (old);			\
-+	__typeof__(*(ptr)) __new = (new);			\
-+	__typeof__(*(ptr)) __ret;				\
-+	__typeof__(err) __err = 0;				\
-+	register unsigned int __rc;				\
-+	__enable_user_access();					\
-+	switch (size) {						\
-+	case 4:							\
-+		__asm__ __volatile__ (				\
-+		"0:\n"						\
-+		"	lr.w" #scb " %[ret], %[ptr]\n"		\
-+		"	bne          %[ret], %z[old], 1f\n"	\
-+		"	sc.w" #lrb " %[rc], %z[new], %[ptr]\n"	\
-+		"	bnez         %[rc], 0b\n"		\
-+		"1:\n"						\
-+		".section .fixup,\"ax\"\n"			\
-+		".balign 4\n"					\
-+		"2:\n"						\
-+		"	li %[err], %[efault]\n"			\
-+		"	jump 1b, %[rc]\n"			\
-+		".previous\n"					\
-+		".section __ex_table,\"a\"\n"			\
-+		".balign " RISCV_SZPTR "\n"			\
-+		"	" RISCV_PTR " 1b, 2b\n"			\
-+		".previous\n"					\
-+			: [ret] "=&r" (__ret),			\
-+			  [rc]  "=&r" (__rc),			\
-+			  [ptr] "+A" (*__ptr),			\
-+			  [err] "=&r" (__err)			\
-+			: [old] "rJ" (__old),			\
-+			  [new] "rJ" (__new),			\
-+			  [efault] "i" (-EFAULT));		\
-+		break;						\
-+	case 8:							\
-+		__asm__ __volatile__ (				\
-+		"0:\n"						\
-+		"	lr.d" #scb " %[ret], %[ptr]\n"		\
-+		"	bne          %[ret], %z[old], 1f\n"	\
-+		"	sc.d" #lrb " %[rc], %z[new], %[ptr]\n"	\
-+		"	bnez         %[rc], 0b\n"		\
-+		"1:\n"						\
-+		".section .fixup,\"ax\"\n"			\
-+		".balign 4\n"					\
-+		"2:\n"						\
-+		"	li %[err], %[efault]\n"			\
-+		"	jump 1b, %[rc]\n"			\
-+		".previous\n"					\
-+		".section __ex_table,\"a\"\n"			\
-+		".balign " RISCV_SZPTR "\n"			\
-+		"	" RISCV_PTR " 1b, 2b\n"			\
-+		".previous\n"					\
-+			: [ret] "=&r" (__ret),			\
-+			  [rc]  "=&r" (__rc),			\
-+			  [ptr] "+A" (*__ptr),			\
-+			  [err] "=&r" (__err)			\
-+			: [old] "rJ" (__old),			\
-+			  [new] "rJ" (__new),			\
-+			  [efault] "i" (-EFAULT));		\
-+		break;						\
-+	default:						\
-+		BUILD_BUG();					\
-+	}							\
-+	__disable_user_access();				\
-+	(err) = __err;						\
-+	__ret;							\
-+})
-+#endif /* CONFIG_MMU */
++static inline
++u32 plic_claim(struct plic_data *data, int contextid)
++{
++	return readl(plic_hart_claim(data, contextid));
++}
 +
-+#endif /* _ASM_RISCV_UACCESS_H */
-diff --git a/arch/riscv/include/asm/word-at-a-time.h b/arch/riscv/include/asm/word-at-a-time.h
-new file mode 100644
-index 000000000000..aa6238791d3e
---- /dev/null
-+++ b/arch/riscv/include/asm/word-at-a-time.h
-@@ -0,0 +1,55 @@
++static inline
++void plic_complete(struct plic_data *data, int contextid, u32 claim)
++{
++	writel(claim, plic_hart_claim(data, contextid));
++}
++
++/* Explicit interrupt masking. */
++static void plic_disable(struct plic_data *data, int contextid, int hwirq)
++{
++	void __iomem *reg = plic_enable_vector(data, contextid) + (hwirq / 32);
++	u32 mask = ~(1 << (hwirq % 32));
++
++	spin_lock(&data->lock);
++	writel(readl(reg) & mask, reg);
++	spin_unlock(&data->lock);
++}
++
++static void plic_enable(struct plic_data *data, int contextid, int hwirq)
++{
++	void __iomem *reg = plic_enable_vector(data, contextid) + (hwirq / 32);
++	u32 bit = 1 << (hwirq % 32);
++
++	spin_lock(&data->lock);
++	writel(readl(reg) | bit, reg);
++	spin_unlock(&data->lock);
++}
++
 +/*
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ * Derived from arch/x86/include/asm/word-at-a-time.h
++ * There is no need to mask/unmask PLIC interrupts
++ * They are "masked" by reading claim and "unmasked" when writing it back.
 + */
++static void plic_irq_mask(struct irq_data *d) { }
++static void plic_irq_unmask(struct irq_data *d) { }
 +
-+#ifndef _ASM_RISCV_WORD_AT_A_TIME_H
-+#define _ASM_RISCV_WORD_AT_A_TIME_H
++static void plic_irq_enable(struct irq_data *d)
++{
++	struct plic_data *data = irq_data_get_irq_chip_data(d);
++	void __iomem *priority = plic_priority(data, d->hwirq);
++	int i;
 +
++	writel(1, priority);
++	for (i = 0; i < data->handlers; ++i)
++		if (data->handler[i].present)
++			plic_enable(data, i, d->hwirq);
++}
 +
-+#include <linux/kernel.h>
++static void plic_irq_disable(struct irq_data *d)
++{
++	struct plic_data *data = irq_data_get_irq_chip_data(d);
++	void __iomem *priority = plic_priority(data, d->hwirq);
++	int i;
 +
-+struct word_at_a_time {
-+	const unsigned long one_bits, high_bits;
++	writel(0, priority);
++	for (i = 0; i < data->handlers; ++i)
++		if (data->handler[i].present)
++			plic_disable(data, i, d->hwirq);
++}
++
++static void plic_irq_eoi(struct irq_data *d)
++{
++	/* FIXME: I can't figure out what's going on here: when I set the PLIC
++	 * driver to use hadle_fasteoi_irq I end up with !handler here.  The
++	 * difference is that here we get an irq_data and use
++	 * common.handler_data, while in the working version we get an
++	 * irq_desc and use irq_common_data.handler_data. */
++	struct plic_handler *handler = d->common->handler_data;
++	BUG_ON(!handler);
++	plic_complete(handler->data, handler->contextid, d->hwirq);
++}
++
++static int plic_irqdomain_map(struct irq_domain *d, unsigned int irq,
++			      irq_hw_number_t hwirq)
++{
++	struct plic_data *data = d->host_data;
++
++	/* FIXME: ... I want to set handle_fasteoi_irq here. */
++	irq_set_chip_and_handler(irq, &data->chip, handle_simple_irq);
++	irq_set_chip_data(irq, data);
++	irq_set_noprobe(irq);
++
++	return 0;
++}
++
++static const struct irq_domain_ops plic_irqdomain_ops = {
++	.map	= plic_irqdomain_map,
++	.xlate	= irq_domain_xlate_onecell,
 +};
 +
-+#define WORD_AT_A_TIME_CONSTANTS { REPEAT_BYTE(0x01), REPEAT_BYTE(0x80) }
-+
-+static inline unsigned long has_zero(unsigned long val,
-+	unsigned long *bits, const struct word_at_a_time *c)
++static void plic_chained_handle_irq(struct irq_desc *desc)
 +{
-+	unsigned long mask = ((val - c->one_bits) & ~val) & c->high_bits;
-+	*bits = mask;
-+	return mask;
-+}
++	struct plic_handler *handler = irq_desc_get_handler_data(desc);
++	struct irq_chip *chip = irq_desc_get_chip(desc);
++	struct irq_domain *domain = handler->data->domain;
++	u32 what;
 +
-+static inline unsigned long prep_zero_mask(unsigned long val,
-+	unsigned long bits, const struct word_at_a_time *c)
-+{
-+	return bits;
-+}
++	chained_irq_enter(chip, desc);
 +
-+static inline unsigned long create_zero_mask(unsigned long bits)
-+{
-+	bits = (bits - 1) & ~bits;
-+	return bits >> 7;
-+}
++	while ((what = plic_claim(handler->data, handler->contextid))) {
++		int irq = irq_find_mapping(domain, what);
 +
-+static inline unsigned long find_zero(unsigned long mask)
-+{
-+	return fls64(mask) >> 3;
-+}
-+
-+/* The mask we created is directly usable as a bytemask */
-+#define zero_bytemask(mask) (mask)
-+
-+#endif /* _ASM_RISCV_WORD_AT_A_TIME_H */
-diff --git a/arch/riscv/kernel/stacktrace.c b/arch/riscv/kernel/stacktrace.c
-new file mode 100644
-index 000000000000..559aae781154
---- /dev/null
-+++ b/arch/riscv/kernel/stacktrace.c
-@@ -0,0 +1,177 @@
-+/*
-+ * Copyright (C) 2008 ARM Limited
-+ * Copyright (C) 2014 Regents of the University of California
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ */
-+
-+#include <linux/export.h>
-+#include <linux/kallsyms.h>
-+#include <linux/sched.h>
-+#include <linux/sched/debug.h>
-+#include <linux/sched/task_stack.h>
-+#include <linux/stacktrace.h>
-+
-+#ifdef CONFIG_FRAME_POINTER
-+
-+struct stackframe {
-+	unsigned long fp;
-+	unsigned long ra;
-+};
-+
-+static void notrace walk_stackframe(struct task_struct *task,
-+	struct pt_regs *regs, bool (*fn)(unsigned long, void *), void *arg)
-+{
-+	unsigned long fp, sp, pc;
-+
-+	if (regs) {
-+		fp = GET_FP(regs);
-+		sp = GET_USP(regs);
-+		pc = GET_IP(regs);
-+	} else if (task == NULL || task == current) {
-+		const register unsigned long current_sp __asm__ ("sp");
-+		fp = (unsigned long)__builtin_frame_address(0);
-+		sp = current_sp;
-+		pc = (unsigned long)walk_stackframe;
-+	} else {
-+		/* task blocked in __switch_to */
-+		fp = task->thread.s[0];
-+		sp = task->thread.sp;
-+		pc = task->thread.ra;
++		if (irq > 0)
++			generic_handle_irq(irq);
++		else
++			handle_bad_irq(desc);
++		plic_complete(handler->data, handler->contextid, what);
 +	}
 +
-+	for (;;) {
-+		unsigned long low, high;
-+		struct stackframe *frame;
-+
-+		if (unlikely(!__kernel_text_address(pc) || fn(pc, arg)))
-+			break;
-+
-+		/* Validate frame pointer */
-+		low = sp + sizeof(struct stackframe);
-+		high = ALIGN(sp, THREAD_SIZE);
-+		if (unlikely(fp < low || fp > high || fp & 0x7))
-+			break;
-+		/* Unwind stack frame */
-+		frame = (struct stackframe *)fp - 1;
-+		sp = fp;
-+		fp = frame->fp;
-+		pc = frame->ra - 0x4;
-+	}
++	chained_irq_exit(chip, desc);
 +}
 +
-+#else /* !CONFIG_FRAME_POINTER */
-+
-+static void notrace walk_stackframe(struct task_struct *task,
-+	struct pt_regs *regs, bool (*fn)(unsigned long, void *), void *arg)
++static int plic_init(struct device_node *node, struct device_node *parent)
 +{
-+	unsigned long sp, pc;
-+	unsigned long *ksp;
++	struct plic_data *data;
++	struct resource resource;
++	int i, ok = 0;
++	int out = -1;
 +
-+	if (regs) {
-+		sp = GET_USP(regs);
-+		pc = GET_IP(regs);
-+	} else if (task == NULL || task == current) {
-+		const register unsigned long current_sp __asm__ ("sp");
-+		sp = current_sp;
-+		pc = (unsigned long)walk_stackframe;
-+	} else {
-+		/* task blocked in __switch_to */
-+		sp = task->thread.sp;
-+		pc = task->thread.ra;
++	data = kzalloc(sizeof(*data), GFP_KERNEL);
++	if (WARN_ON(!data))
++		return -ENOMEM;
++
++	spin_lock_init(&data->lock);
++
++	data->reg = of_iomap(node, 0);
++	if (WARN_ON(!data->reg)) {
++		out = -EIO;
++		goto free_data;
 +	}
 +
-+	if (unlikely(sp & 0x7))
-+		return;
-+
-+	ksp = (unsigned long *)sp;
-+	while (!kstack_end(ksp)) {
-+		if (__kernel_text_address(pc) && unlikely(fn(pc, arg)))
-+			break;
-+		pc = (*ksp++) - 0x4;
-+	}
-+}
-+
-+#endif /* CONFIG_FRAME_POINTER */
-+
-+
-+static bool print_trace_address(unsigned long pc, void *arg)
-+{
-+	print_ip_sym(pc);
-+	return false;
-+}
-+
-+void show_stack(struct task_struct *task, unsigned long *sp)
-+{
-+	pr_cont("Call Trace:\n");
-+	walk_stackframe(task, NULL, print_trace_address, NULL);
-+}
-+
-+
-+static bool save_wchan(unsigned long pc, void *arg)
-+{
-+	if (!in_sched_functions(pc)) {
-+		unsigned long *p = arg;
-+		*p = pc;
-+		return true;
-+	}
-+	return false;
-+}
-+
-+unsigned long get_wchan(struct task_struct *task)
-+{
-+	unsigned long pc = 0;
-+
-+	if (likely(task && task != current && task->state != TASK_RUNNING))
-+		walk_stackframe(task, NULL, save_wchan, &pc);
-+	return pc;
-+}
-+
-+
-+#ifdef CONFIG_STACKTRACE
-+
-+static bool __save_trace(unsigned long pc, void *arg, bool nosched)
-+{
-+	struct stack_trace *trace = arg;
-+
-+	if (unlikely(nosched && in_sched_functions(pc)))
-+		return false;
-+	if (unlikely(trace->skip > 0)) {
-+		trace->skip--;
-+		return false;
++	of_property_read_u32(node, "riscv,ndev", &data->ndev);
++	if (WARN_ON(!data->ndev)) {
++		out = -EINVAL;
++		goto free_reg;
 +	}
 +
-+	trace->entries[trace->nr_entries++] = pc;
-+	return (trace->nr_entries >= trace->max_entries);
++	data->handlers = of_irq_count(node);
++	if (WARN_ON(!data->handlers)) {
++		out = -EINVAL;
++		goto free_reg;
++	}
++
++	data->handler =
++		kcalloc(data->handlers, sizeof(*data->handler), GFP_KERNEL);
++	if (WARN_ON(!data->handler)) {
++		out = -ENOMEM;
++		goto free_reg;
++	}
++
++	data->domain = irq_domain_add_linear(node, data->ndev+1, &plic_irqdomain_ops, data);
++	if (WARN_ON(!data->domain)) {
++		out = -ENOMEM;
++		goto free_handler;
++	}
++
++	of_address_to_resource(node, 0, &resource);
++	snprintf(data->name, sizeof(data->name),
++		 "riscv,plic0,%llx", resource.start);
++	data->chip.name = data->name;
++	data->chip.irq_mask = plic_irq_mask;
++	data->chip.irq_unmask = plic_irq_unmask;
++	data->chip.irq_enable = plic_irq_enable;
++	data->chip.irq_disable = plic_irq_disable;
++	data->chip.irq_eoi = plic_irq_eoi;
++
++	for (i = 0; i < data->handlers; ++i) {
++		struct plic_handler *handler = &data->handler[i];
++		struct of_phandle_args parent;
++		int parent_irq, hwirq;
++
++		handler->present = false;
++
++		if (of_irq_parse_one(node, i, &parent))
++			continue;
++		/* skip context holes */
++		if (parent.args[0] == -1)
++			continue;
++
++		/* skip any contexts that lead to inactive harts */
++		if (of_device_is_compatible(parent.np, "riscv,cpu-intc") &&
++		    parent.np->parent &&
++		    riscv_of_processor_hart(parent.np->parent) < 0)
++			continue;
++
++		parent_irq = irq_create_of_mapping(&parent);
++		if (!parent_irq)
++			continue;
++
++		handler->present = true;
++		handler->contextid = i;
++		handler->data = data;
++		/* hwirq prio must be > this to trigger an interrupt */
++		writel(0, plic_hart_threshold(data, i));
++
++		for (hwirq = 1; hwirq <= data->ndev; ++hwirq)
++			plic_disable(data, i, hwirq);
++		irq_set_chained_handler_and_data(parent_irq, plic_chained_handle_irq, handler);
++		++ok;
++	}
++
++	pr_info("%s: mapped %d interrupts to %d/%d handlers\n",
++	        data->name, data->ndev, ok, data->handlers);
++	WARN_ON(!ok);
++	return 0;
++
++free_handler:
++	kfree(data->handler);
++free_reg:
++	iounmap(data->reg);
++free_data:
++	kfree(data);
++	return out;
 +}
 +
-+static bool save_trace(unsigned long pc, void *arg)
-+{
-+	return __save_trace(pc, arg, false);
-+}
-+
-+/*
-+ * Save stack-backtrace addresses into a stack_trace buffer.
-+ */
-+void save_stack_trace_tsk(struct task_struct *tsk, struct stack_trace *trace)
-+{
-+	walk_stackframe(tsk, NULL, save_trace, trace);
-+	if (trace->nr_entries < trace->max_entries)
-+		trace->entries[trace->nr_entries++] = ULONG_MAX;
-+}
-+EXPORT_SYMBOL_GPL(save_stack_trace_tsk);
-+
-+void save_stack_trace(struct stack_trace *trace)
-+{
-+	save_stack_trace_tsk(NULL, trace);
-+}
-+EXPORT_SYMBOL_GPL(save_stack_trace);
-+
-+#endif /* CONFIG_STACKTRACE */
-diff --git a/arch/riscv/lib/memcpy.S b/arch/riscv/lib/memcpy.S
-new file mode 100644
-index 000000000000..80f9c1a5c598
---- /dev/null
-+++ b/arch/riscv/lib/memcpy.S
-@@ -0,0 +1,115 @@
-+/*
-+ * Copyright (C) 2013 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#include <linux/linkage.h>
-+#include <asm/asm.h>
-+
-+/* void *memcpy(void *, const void *, size_t) */
-+ENTRY(memcpy)
-+	move t6, a0  /* Preserve return value */
-+
-+	/* Defer to byte-oriented copy for small sizes */
-+	sltiu a3, a2, 128
-+	bnez a3, 4f
-+	/* Use word-oriented copy only if low-order bits match */
-+	andi a3, t6, SZREG-1
-+	andi a4, a1, SZREG-1
-+	bne a3, a4, 4f
-+
-+	beqz a3, 2f  /* Skip if already aligned */
-+	/*
-+	 * Round to nearest double word-aligned address
-+	 * greater than or equal to start address
-+	 */
-+	andi a3, a1, ~(SZREG-1)
-+	addi a3, a3, SZREG
-+	/* Handle initial misalignment */
-+	sub a4, a3, a1
-+1:
-+	lb a5, 0(a1)
-+	addi a1, a1, 1
-+	sb a5, 0(t6)
-+	addi t6, t6, 1
-+	bltu a1, a3, 1b
-+	sub a2, a2, a4  /* Update count */
-+
-+2:
-+	andi a4, a2, ~((16*SZREG)-1)
-+	beqz a4, 4f
-+	add a3, a1, a4
-+3:
-+	REG_L a4,       0(a1)
-+	REG_L a5,   SZREG(a1)
-+	REG_L a6, 2*SZREG(a1)
-+	REG_L a7, 3*SZREG(a1)
-+	REG_L t0, 4*SZREG(a1)
-+	REG_L t1, 5*SZREG(a1)
-+	REG_L t2, 6*SZREG(a1)
-+	REG_L t3, 7*SZREG(a1)
-+	REG_L t4, 8*SZREG(a1)
-+	REG_L t5, 9*SZREG(a1)
-+	REG_S a4,       0(t6)
-+	REG_S a5,   SZREG(t6)
-+	REG_S a6, 2*SZREG(t6)
-+	REG_S a7, 3*SZREG(t6)
-+	REG_S t0, 4*SZREG(t6)
-+	REG_S t1, 5*SZREG(t6)
-+	REG_S t2, 6*SZREG(t6)
-+	REG_S t3, 7*SZREG(t6)
-+	REG_S t4, 8*SZREG(t6)
-+	REG_S t5, 9*SZREG(t6)
-+	REG_L a4, 10*SZREG(a1)
-+	REG_L a5, 11*SZREG(a1)
-+	REG_L a6, 12*SZREG(a1)
-+	REG_L a7, 13*SZREG(a1)
-+	REG_L t0, 14*SZREG(a1)
-+	REG_L t1, 15*SZREG(a1)
-+	addi a1, a1, 16*SZREG
-+	REG_S a4, 10*SZREG(t6)
-+	REG_S a5, 11*SZREG(t6)
-+	REG_S a6, 12*SZREG(t6)
-+	REG_S a7, 13*SZREG(t6)
-+	REG_S t0, 14*SZREG(t6)
-+	REG_S t1, 15*SZREG(t6)
-+	addi t6, t6, 16*SZREG
-+	bltu a1, a3, 3b
-+	andi a2, a2, (16*SZREG)-1  /* Update count */
-+
-+4:
-+	/* Handle trailing misalignment */
-+	beqz a2, 6f
-+	add a3, a1, a2
-+
-+	/* Use word-oriented copy if co-aligned to word boundary */
-+	or a5, a1, t6
-+	or a5, a5, a3
-+	andi a5, a5, 3
-+	bnez a5, 5f
-+7:
-+	lw a4, 0(a1)
-+	addi a1, a1, 4
-+	sw a4, 0(t6)
-+	addi t6, t6, 4
-+	bltu a1, a3, 7b
-+
-+	ret
-+
-+5:
-+	lb a4, 0(a1)
-+	addi a1, a1, 1
-+	sb a4, 0(t6)
-+	addi t6, t6, 1
-+	bltu a1, a3, 5b
-+6:
-+	ret
-+END(memcpy)
-diff --git a/arch/riscv/lib/memset.S b/arch/riscv/lib/memset.S
-new file mode 100644
-index 000000000000..a790107cf4c9
---- /dev/null
-+++ b/arch/riscv/lib/memset.S
-@@ -0,0 +1,120 @@
-+/*
-+ * Copyright (C) 2013 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+
-+#include <linux/linkage.h>
-+#include <asm/asm.h>
-+
-+/* void *memset(void *, int, size_t) */
-+ENTRY(memset)
-+	move t0, a0  /* Preserve return value */
-+
-+	/* Defer to byte-oriented fill for small sizes */
-+	sltiu a3, a2, 16
-+	bnez a3, 4f
-+
-+	/*
-+	 * Round to nearest XLEN-aligned address
-+	 * greater than or equal to start address
-+	 */
-+	addi a3, t0, SZREG-1
-+	andi a3, a3, ~(SZREG-1)
-+	beq a3, t0, 2f  /* Skip if already aligned */
-+	/* Handle initial misalignment */
-+	sub a4, a3, t0
-+1:
-+	sb a1, 0(t0)
-+	addi t0, t0, 1
-+	bltu t0, a3, 1b
-+	sub a2, a2, a4  /* Update count */
-+
-+2: /* Duff's device with 32 XLEN stores per iteration */
-+	/* Broadcast value into all bytes */
-+	andi a1, a1, 0xff
-+	slli a3, a1, 8
-+	or a1, a3, a1
-+	slli a3, a1, 16
-+	or a1, a3, a1
-+#ifdef CONFIG_64BIT
-+	slli a3, a1, 32
-+	or a1, a3, a1
-+#endif
-+
-+	/* Calculate end address */
-+	andi a4, a2, ~(SZREG-1)
-+	add a3, t0, a4
-+
-+	andi a4, a4, 31*SZREG  /* Calculate remainder */
-+	beqz a4, 3f            /* Shortcut if no remainder */
-+	neg a4, a4
-+	addi a4, a4, 32*SZREG  /* Calculate initial offset */
-+
-+	/* Adjust start address with offset */
-+	sub t0, t0, a4
-+
-+	/* Jump into loop body */
-+	/* Assumes 32-bit instruction lengths */
-+	la a5, 3f
-+#ifdef CONFIG_64BIT
-+	srli a4, a4, 1
-+#endif
-+	add a5, a5, a4
-+	jr a5
-+3:
-+	REG_S a1,        0(t0)
-+	REG_S a1,    SZREG(t0)
-+	REG_S a1,  2*SZREG(t0)
-+	REG_S a1,  3*SZREG(t0)
-+	REG_S a1,  4*SZREG(t0)
-+	REG_S a1,  5*SZREG(t0)
-+	REG_S a1,  6*SZREG(t0)
-+	REG_S a1,  7*SZREG(t0)
-+	REG_S a1,  8*SZREG(t0)
-+	REG_S a1,  9*SZREG(t0)
-+	REG_S a1, 10*SZREG(t0)
-+	REG_S a1, 11*SZREG(t0)
-+	REG_S a1, 12*SZREG(t0)
-+	REG_S a1, 13*SZREG(t0)
-+	REG_S a1, 14*SZREG(t0)
-+	REG_S a1, 15*SZREG(t0)
-+	REG_S a1, 16*SZREG(t0)
-+	REG_S a1, 17*SZREG(t0)
-+	REG_S a1, 18*SZREG(t0)
-+	REG_S a1, 19*SZREG(t0)
-+	REG_S a1, 20*SZREG(t0)
-+	REG_S a1, 21*SZREG(t0)
-+	REG_S a1, 22*SZREG(t0)
-+	REG_S a1, 23*SZREG(t0)
-+	REG_S a1, 24*SZREG(t0)
-+	REG_S a1, 25*SZREG(t0)
-+	REG_S a1, 26*SZREG(t0)
-+	REG_S a1, 27*SZREG(t0)
-+	REG_S a1, 28*SZREG(t0)
-+	REG_S a1, 29*SZREG(t0)
-+	REG_S a1, 30*SZREG(t0)
-+	REG_S a1, 31*SZREG(t0)
-+	addi t0, t0, 32*SZREG
-+	bltu t0, a3, 3b
-+	andi a2, a2, SZREG-1  /* Update count */
-+
-+4:
-+	/* Handle trailing misalignment */
-+	beqz a2, 6f
-+	add a3, t0, a2
-+5:
-+	sb a1, 0(t0)
-+	addi t0, t0, 1
-+	bltu t0, a3, 5b
-+6:
-+	ret
-+END(memset)
-diff --git a/arch/riscv/lib/uaccess.S b/arch/riscv/lib/uaccess.S
-new file mode 100644
-index 000000000000..58fb2877c865
---- /dev/null
-+++ b/arch/riscv/lib/uaccess.S
-@@ -0,0 +1,117 @@
-+#include <linux/linkage.h>
-+#include <asm/asm.h>
-+#include <asm/csr.h>
-+
-+	.altmacro
-+	.macro fixup op reg addr lbl
-+	LOCAL _epc
-+_epc:
-+	\op \reg, \addr
-+	.section __ex_table,"a"
-+	.balign RISCV_SZPTR
-+	RISCV_PTR _epc, \lbl
-+	.previous
-+	.endm
-+
-+ENTRY(__copy_user)
-+
-+	/* Enable access to user memory */
-+	li t6, SR_SUM
-+	csrs sstatus, t6
-+
-+	add a3, a1, a2
-+	/* Use word-oriented copy only if low-order bits match */
-+	andi t0, a0, SZREG-1
-+	andi t1, a1, SZREG-1
-+	bne t0, t1, 2f
-+
-+	addi t0, a1, SZREG-1
-+	andi t1, a3, ~(SZREG-1)
-+	andi t0, t0, ~(SZREG-1)
-+	/*
-+	 * a3: terminal address of source region
-+	 * t0: lowest XLEN-aligned address in source
-+	 * t1: highest XLEN-aligned address in source
-+	 */
-+	bgeu t0, t1, 2f
-+	bltu a1, t0, 4f
-+1:
-+	fixup REG_L, t2, (a1), 10f
-+	fixup REG_S, t2, (a0), 10f
-+	addi a1, a1, SZREG
-+	addi a0, a0, SZREG
-+	bltu a1, t1, 1b
-+2:
-+	bltu a1, a3, 5f
-+
-+3:
-+	/* Disable access to user memory */
-+	csrc sstatus, t6
-+	li a0, 0
-+	ret
-+4: /* Edge case: unalignment */
-+	fixup lbu, t2, (a1), 10f
-+	fixup sb, t2, (a0), 10f
-+	addi a1, a1, 1
-+	addi a0, a0, 1
-+	bltu a1, t0, 4b
-+	j 1b
-+5: /* Edge case: remainder */
-+	fixup lbu, t2, (a1), 10f
-+	fixup sb, t2, (a0), 10f
-+	addi a1, a1, 1
-+	addi a0, a0, 1
-+	bltu a1, a3, 5b
-+	j 3b
-+ENDPROC(__copy_user)
-+
-+
-+ENTRY(__clear_user)
-+
-+	/* Enable access to user memory */
-+	li t6, SR_SUM
-+	csrs sstatus, t6
-+
-+	add a3, a0, a1
-+	addi t0, a0, SZREG-1
-+	andi t1, a3, ~(SZREG-1)
-+	andi t0, t0, ~(SZREG-1)
-+	/*
-+	 * a3: terminal address of target region
-+	 * t0: lowest doubleword-aligned address in target region
-+	 * t1: highest doubleword-aligned address in target region
-+	 */
-+	bgeu t0, t1, 2f
-+	bltu a0, t0, 4f
-+1:
-+	fixup REG_S, zero, (a0), 10f
-+	addi a0, a0, SZREG
-+	bltu a0, t1, 1b
-+2:
-+	bltu a0, a3, 5f
-+
-+3:
-+	/* Disable access to user memory */
-+	csrc sstatus, t6
-+	li a0, 0
-+	ret
-+4: /* Edge case: unalignment */
-+	fixup sb, zero, (a0), 10f
-+	addi a0, a0, 1
-+	bltu a0, t0, 4b
-+	j 1b
-+5: /* Edge case: remainder */
-+	fixup sb, zero, (a0), 10f
-+	addi a0, a0, 1
-+	bltu a0, a3, 5b
-+	j 3b
-+ENDPROC(__clear_user)
-+
-+	.section .fixup,"ax"
-+	.balign 4
-+10:
-+	/* Disable access to user memory */
-+	csrs sstatus, t6
-+	sub a0, a3, a0
-+	ret
-+	.previous
-diff --git a/arch/riscv/lib/udivdi3.S b/arch/riscv/lib/udivdi3.S
-new file mode 100644
-index 000000000000..cb01ae5b181a
---- /dev/null
-+++ b/arch/riscv/lib/udivdi3.S
-@@ -0,0 +1,38 @@
-+/*
-+ * Copyright (C) 2016-2017 Free Software Foundation, Inc.
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+  .globl __udivdi3
-+__udivdi3:
-+  mv    a2, a1
-+  mv    a1, a0
-+  li    a0, -1
-+  beqz  a2, .L5
-+  li    a3, 1
-+  bgeu  a2, a1, .L2
-+.L1:
-+  blez  a2, .L2
-+  slli  a2, a2, 1
-+  slli  a3, a3, 1
-+  bgtu  a1, a2, .L1
-+.L2:
-+  li    a0, 0
-+.L3:
-+  bltu  a1, a2, .L4
-+  sub   a1, a1, a2
-+  or    a0, a0, a3
-+.L4:
-+  srli  a3, a3, 1
-+  srli  a2, a2, 1
-+  bnez  a3, .L3
-+.L5:
-+  ret
++IRQCHIP_DECLARE(plic0, "riscv,plic0", plic_init);
 -- 
 2.13.5
 
