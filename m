@@ -1,195 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:34955 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751566AbdILV54 (ORCPT
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:34653
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751385AbdILXxM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Sep 2017 17:57:56 -0400
-Received: by mail-pg0-f67.google.com with SMTP id j16so3646566pga.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Sep 2017 14:57:56 -0700 (PDT)
-Subject: [PATCH v8 09/18] tty: New RISC-V SBI console driver
-Date: Tue, 12 Sep 2017 14:57:06 -0700
-Message-Id: <20170912215715.4186-10-palmer@dabbelt.com>
-In-Reply-To: <20170912215715.4186-1-palmer@dabbelt.com>
-References: <20170912215715.4186-1-palmer@dabbelt.com>
-From: Palmer Dabbelt <palmer@dabbelt.com>
+        Tue, 12 Sep 2017 19:53:12 -0400
+From: Shuah Khan <shuahkh@osg.samsung.com>
+Subject: [PATCH 00/11] Kselftest make O=dir work
+Date: Tue, 12 Sep 2017 17:52:53 -0600
+Message-Id: <cover.1505257614.git.shuahkh@osg.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>, dmitriy@oss-tech.org
-Cc: yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, andriy.shevchenko@linux.intel.com, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org, Palmer Dabbelt <palmer@dabbelt.com>
+To: yamada.masahiro@socionext.com, mmarek@suse.com, shuah@kernel.org, tglx@linutronix.de, mingo@redhat.com, peterz@infradead.org, bamvor.zhangjian@linaro.org, emilio.lopez@collabora.co.uk, corbet@lwn.net
+Cc: Shuah Khan <shuahkh@osg.samsung.com>, tytso@mit.edu, ebiederm@xmission.com, Tim.Bird@sony.com, gregkh@linuxfoundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-The RISC-V ISA defines a simple console that is availiable via SBI calls
-on all systems.  This patch adds a driver for this console interface
-that can act as both a target for early printk and as the system
-console.
+During [MAINTAINERS SUMMIT] & [TECH TOPIC] Improve regression tracking
+discussion, it was brought to my attention that kselftest lacks support
+for make O=dir use-case which is used by several developers to relocate
+objects and keep the source tree clean.
 
-Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
----
- arch/riscv/include/asm/hvc_riscv_sbi.h | 25 ++++++++++
- drivers/tty/hvc/Kconfig                | 11 +++++
- drivers/tty/hvc/Makefile               |  1 +
- drivers/tty/hvc/hvc_riscv_sbi.c        | 90 ++++++++++++++++++++++++++++++++++
- 4 files changed, 127 insertions(+)
- create mode 100644 arch/riscv/include/asm/hvc_riscv_sbi.h
- create mode 100644 drivers/tty/hvc/hvc_riscv_sbi.c
+I mentioned in thread that I would take a look at what it takes to support
+it and here is the patch series that does that.
 
-diff --git a/arch/riscv/include/asm/hvc_riscv_sbi.h b/arch/riscv/include/asm/hvc_riscv_sbi.h
-new file mode 100644
-index 000000000000..d4f3cf0c17e9
---- /dev/null
-+++ b/arch/riscv/include/asm/hvc_riscv_sbi.h
-@@ -0,0 +1,25 @@
-+/*
-+ * RISC-V SBI console interface
-+ *
-+ * Copyright (C) 2017 SiFive
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#ifndef _ASM_RISCV_HVC_RISCV_SBI_H
-+#define _ASM_RISCV_HVC_RISCV_SBI_H
-+
-+/*
-+ * We always support CONFIG_EARLY_PRINTK via the SBI console driver because it
-+ * works well enough that there's no penalty to doing so.
-+ */
-+extern struct console riscv_sbi_early_console_dev __initdata;
-+
-+#endif
-diff --git a/drivers/tty/hvc/Kconfig b/drivers/tty/hvc/Kconfig
-index b8d5ea0ae26b..abe331761bdb 100644
---- a/drivers/tty/hvc/Kconfig
-+++ b/drivers/tty/hvc/Kconfig
-@@ -97,6 +97,17 @@ config HVC_BFIN_JTAG
- 	 the HVC driver.  If you don't have JTAG, then you probably don't
- 	 want this option.
- 
-+config HVC_RISCV_SBI
-+	bool "RISC-V SBI console support"
-+	depends on RISCV
-+	select HVC_DRIVER
-+	default y
-+	help
-+	  This enables support for console output via RISC-V SBI calls, which
-+	  is normally used only during boot to output printk.
-+
-+	  If you don't know what do to here, say Y.
-+
- config HVCS
- 	tristate "IBM Hypervisor Virtual Console Server support"
- 	depends on PPC_PSERIES && HVC_CONSOLE
-diff --git a/drivers/tty/hvc/Makefile b/drivers/tty/hvc/Makefile
-index 6a2702be76d1..be497f9312d1 100644
---- a/drivers/tty/hvc/Makefile
-+++ b/drivers/tty/hvc/Makefile
-@@ -11,3 +11,4 @@ obj-$(CONFIG_HVC_IUCV)		+= hvc_iucv.o
- obj-$(CONFIG_HVC_UDBG)		+= hvc_udbg.o
- obj-$(CONFIG_HVC_BFIN_JTAG)	+= hvc_bfin_jtag.o
- obj-$(CONFIG_HVCS)		+= hvcs.o
-+obj-$(CONFIG_HVC_RISCV_SBI)	+= hvc_riscv_sbi.o
-diff --git a/drivers/tty/hvc/hvc_riscv_sbi.c b/drivers/tty/hvc/hvc_riscv_sbi.c
-new file mode 100644
-index 000000000000..2548d658e110
---- /dev/null
-+++ b/drivers/tty/hvc/hvc_riscv_sbi.c
-@@ -0,0 +1,90 @@
-+/*
-+ * RISC-V SBI interface to hvc_console.c
-+ *  based on drivers-tty/hvc/hvc_udbg.c
-+ *
-+ * Copyright (C) 2008 David Gibson, IBM Corporation
-+ * Copyright (C) 2012 Regents of the University of California
-+ * Copyright (C) 2017 SiFive
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#include <linux/console.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/moduleparam.h>
-+#include <linux/types.h>
-+
-+#include <asm/sbi.h>
-+#include <asm/hvc_riscv_sbi.h>
-+
-+#include "hvc_console.h"
-+
-+static int hvc_sbi_tty_put(uint32_t vtermno, const char *buf, int count)
-+{
-+	int i;
-+
-+	for (i = 0; i < count; i++)
-+		sbi_console_putchar(buf[i]);
-+
-+	return i;
-+}
-+
-+static int hvc_sbi_tty_get(uint32_t vtermno, char *buf, int count)
-+{
-+	int i, c;
-+
-+	for (i = 0; i < count; i++) {
-+		if ((c = sbi_console_getchar()) < 0)
-+			break;
-+		buf[i] = c;
-+	}
-+
-+	return i;
-+}
-+
-+static const struct hv_ops hvc_sbi_ops = {
-+	.get_chars = hvc_sbi_tty_get,
-+	.put_chars = hvc_sbi_tty_put,
-+};
-+
-+static int __init hvc_sbi_init(void)
-+{
-+	return PTR_ERR_OR_ZERO(hvc_alloc(0, 0, &hvc_sbi_ops, 16));
-+}
-+device_initcall(hvc_sbi_init);
-+
-+static int __init hvc_sbi_console_init(void)
-+{
-+	hvc_instantiate(0, 0, &hvc_sbi_ops);
-+	add_preferred_console("hvc", 0, NULL);
-+
-+	return 0;
-+}
-+console_initcall(hvc_sbi_console_init);
-+
-+static void sbi_console_write(struct console *co, const char *buf,
-+			      unsigned int n)
-+{
-+	int i;
-+
-+	for (i = 0; i < n; ++i) {
-+		if (buf[i] == '\n')
-+			sbi_console_putchar('\r');
-+		sbi_console_putchar(buf[i]);
-+	}
-+}
-+
-+struct console riscv_sbi_early_console_dev __initdata = {
-+	.name	= "early",
-+	.write	= sbi_console_write,
-+	.flags	= CON_PRINTBUFFER | CON_BOOT | CON_ANYTIME,
-+	.index	= -1
-+};
+This 11 patch series consists of fixes to get "make O=dir kselftest"
+use-case working,  extending the existing KBUILD_OUTPUT support.
+Majority of the changes are made to kselftest common infrastructure.
+Some test make files are changed as needed to address the custom build
+and run_tests.
+
+-- futex has sub-directories which require custom build and run_tests.
+-- sync test needed a few changes to make use of lib.mk as much as possible
+   and still be able to run its custom build sequence.
+
+With this series the following ways to build and run kselftest is possible:
+
+-- Build all and Relocate objects to /tmp/kselftest and run tests:
+   make O=/tmp/kselftest kselftest
+   or
+   make KBUILD_OUTPUT=/tmp/kselftest kselftest
+
+-- Build TARGETS and Relocate objects to /tmp/kselftest and run tests:
+   make O=/tmp/kselftest TARGETS="futex sync size" kselftest
+   or
+   make KBUILD_OUTPUT=/tmp/kselftest TARGETS="futex sync size" kselftest
+
+-- Clean tests:
+   make O=/tmp/kselftest kselftest-clean
+   or
+   make KBUILD_OUTPUT=/tmp/kselftest kselftest-clean
+
+All existing use-cases documented in Documentation/dev-tools/kselftest.rst
+are still supported.
+
+Shuah Khan (11):
+  Makefile: kselftest and kselftest-clean fail for make O=dir case
+  selftests: lib.mk: kselftest and kselftest-clean fail for make O=dir
+    case
+  selftests: Makefile: clear LDFLAGS for make O=dir use-case
+  selftests: lib.mk: fix test executable status check to use full path
+  selftests: watchdog: fix to use TEST_GEN_PROGS and remove clean
+  selftests: lib.mk: add TEST_CUSTOM_PROGS to allow custom test
+    run/install
+  selftests: sync: use TEST_CUSTOM_PROGS instead of TEST_PROGS
+  selftests: sync: kselftest and kselftest-clean fail for make O=dir
+    case
+  selftests: lib.mk: copy test scripts and test files for make O=dir run
+  selftests: futex: copy sub-dir test scripts for make O=dir run
+  selftests: mqueue: Use full path to run tests from Makefile
+
+ Makefile                                  | 13 ++++++---
+ tools/testing/selftests/Makefile          |  4 +++
+ tools/testing/selftests/futex/Makefile    |  5 +++-
+ tools/testing/selftests/lib.mk            | 44 ++++++++++++++++++++++++++-----
+ tools/testing/selftests/mqueue/Makefile   |  4 +--
+ tools/testing/selftests/sync/Makefile     | 24 +++++++++++++----
+ tools/testing/selftests/watchdog/Makefile |  7 +----
+ 7 files changed, 77 insertions(+), 24 deletions(-)
+
 -- 
-2.13.5
+2.11.0
 
