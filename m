@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:35667 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751692AbdILV6I (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:37500 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751678AbdILV6E (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Sep 2017 17:58:08 -0400
-Received: by mail-pf0-f196.google.com with SMTP id i23so1923987pfi.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Sep 2017 14:58:08 -0700 (PDT)
-Subject: [PATCH v8 17/18] RISC-V: User-facing API
-Date: Tue, 12 Sep 2017 14:57:14 -0700
-Message-Id: <20170912215715.4186-18-palmer@dabbelt.com>
+        Tue, 12 Sep 2017 17:58:04 -0400
+Received: by mail-pg0-f65.google.com with SMTP id v5so6733968pgn.4
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Sep 2017 14:58:04 -0700 (PDT)
+Subject: [PATCH v8 15/18] RISC-V: Device, timer, IRQs, and the SBI
+Date: Tue, 12 Sep 2017 14:57:12 -0700
+Message-Id: <20170912215715.4186-16-palmer@dabbelt.com>
 In-Reply-To: <20170912215715.4186-1-palmer@dabbelt.com>
 References: <20170912215715.4186-1-palmer@dabbelt.com>
 From: Palmer Dabbelt <palmer@dabbelt.com>
@@ -17,76 +17,42 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>, dmitriy@oss-tech.org
 Cc: yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, andriy.shevchenko@linux.intel.com, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org, Palmer Dabbelt <palmer@dabbelt.com>
 
-This patch contains code that is in some way visible to the user:
-including via system calls, the VDSO, module loading and signal
-handling.  It also contains some generic code that is ABI visible.
+This patch contains code that interfaces with devices that are mandated
+by the RISC-V supervisor specification and that don't have explicit
+drivers anywhere else in the tree.  This includes the staticly defined
+interrupts, the CSR-mapped timer, and virtualized SBI devices.
 
 Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
 ---
- arch/riscv/include/asm/mmu.h              |  26 +++
- arch/riscv/include/asm/ptrace.h           | 118 ++++++++++++
- arch/riscv/include/asm/syscall.h          | 102 +++++++++++
- arch/riscv/include/asm/unistd.h           |  16 ++
- arch/riscv/include/asm/vdso.h             |  41 +++++
- arch/riscv/include/uapi/asm/Kbuild        |  27 +++
- arch/riscv/include/uapi/asm/auxvec.h      |  24 +++
- arch/riscv/include/uapi/asm/bitsperlong.h |  25 +++
- arch/riscv/include/uapi/asm/byteorder.h   |  23 +++
- arch/riscv/include/uapi/asm/elf.h         |  83 +++++++++
- arch/riscv/include/uapi/asm/hwcap.h       |  36 ++++
- arch/riscv/include/uapi/asm/ptrace.h      |  90 +++++++++
- arch/riscv/include/uapi/asm/sigcontext.h  |  30 +++
- arch/riscv/include/uapi/asm/siginfo.h     |  24 +++
- arch/riscv/include/uapi/asm/ucontext.h    |  35 ++++
- arch/riscv/kernel/cpufeature.c            |  61 +++++++
- arch/riscv/kernel/module.c                | 217 ++++++++++++++++++++++
- arch/riscv/kernel/ptrace.c                | 125 +++++++++++++
- arch/riscv/kernel/riscv_ksyms.c           |  15 ++
- arch/riscv/kernel/signal.c                | 292 ++++++++++++++++++++++++++++++
- arch/riscv/kernel/sys_riscv.c             |  49 +++++
- arch/riscv/kernel/syscall_table.c         |  25 +++
- arch/riscv/kernel/vdso/.gitignore         |   2 +
- arch/riscv/kernel/vdso/Makefile           |  63 +++++++
- arch/riscv/kernel/vdso/rt_sigreturn.S     |  24 +++
- arch/riscv/kernel/vdso/vdso.S             |  27 +++
- arch/riscv/kernel/vdso/vdso.lds.S         |  77 ++++++++
- 27 files changed, 1677 insertions(+)
- create mode 100644 arch/riscv/include/asm/mmu.h
- create mode 100644 arch/riscv/include/asm/ptrace.h
- create mode 100644 arch/riscv/include/asm/syscall.h
- create mode 100644 arch/riscv/include/asm/unistd.h
- create mode 100644 arch/riscv/include/asm/vdso.h
- create mode 100644 arch/riscv/include/uapi/asm/Kbuild
- create mode 100644 arch/riscv/include/uapi/asm/auxvec.h
- create mode 100644 arch/riscv/include/uapi/asm/bitsperlong.h
- create mode 100644 arch/riscv/include/uapi/asm/byteorder.h
- create mode 100644 arch/riscv/include/uapi/asm/elf.h
- create mode 100644 arch/riscv/include/uapi/asm/hwcap.h
- create mode 100644 arch/riscv/include/uapi/asm/ptrace.h
- create mode 100644 arch/riscv/include/uapi/asm/sigcontext.h
- create mode 100644 arch/riscv/include/uapi/asm/siginfo.h
- create mode 100644 arch/riscv/include/uapi/asm/ucontext.h
- create mode 100644 arch/riscv/kernel/cpufeature.c
- create mode 100644 arch/riscv/kernel/module.c
- create mode 100644 arch/riscv/kernel/ptrace.c
- create mode 100644 arch/riscv/kernel/riscv_ksyms.c
- create mode 100644 arch/riscv/kernel/signal.c
- create mode 100644 arch/riscv/kernel/sys_riscv.c
- create mode 100644 arch/riscv/kernel/syscall_table.c
- create mode 100644 arch/riscv/kernel/vdso/.gitignore
- create mode 100644 arch/riscv/kernel/vdso/Makefile
- create mode 100644 arch/riscv/kernel/vdso/rt_sigreturn.S
- create mode 100644 arch/riscv/kernel/vdso/vdso.S
- create mode 100644 arch/riscv/kernel/vdso/vdso.lds.S
+ arch/riscv/include/asm/delay.h       |  28 +++++++++
+ arch/riscv/include/asm/dma-mapping.h |  38 ++++++++++++
+ arch/riscv/include/asm/irq.h         |  28 +++++++++
+ arch/riscv/include/asm/irqflags.h    |  63 ++++++++++++++++++++
+ arch/riscv/include/asm/pci.h         |  48 +++++++++++++++
+ arch/riscv/include/asm/sbi.h         | 100 +++++++++++++++++++++++++++++++
+ arch/riscv/include/asm/timex.h       |  59 +++++++++++++++++++
+ arch/riscv/lib/delay.c               | 110 +++++++++++++++++++++++++++++++++++
+ arch/riscv/mm/ioremap.c              |  92 +++++++++++++++++++++++++++++
+ 9 files changed, 566 insertions(+)
+ create mode 100644 arch/riscv/include/asm/delay.h
+ create mode 100644 arch/riscv/include/asm/dma-mapping.h
+ create mode 100644 arch/riscv/include/asm/irq.h
+ create mode 100644 arch/riscv/include/asm/irqflags.h
+ create mode 100644 arch/riscv/include/asm/pci.h
+ create mode 100644 arch/riscv/include/asm/sbi.h
+ create mode 100644 arch/riscv/include/asm/timex.h
+ create mode 100644 arch/riscv/lib/delay.c
+ create mode 100644 arch/riscv/mm/ioremap.c
 
-diff --git a/arch/riscv/include/asm/mmu.h b/arch/riscv/include/asm/mmu.h
+diff --git a/arch/riscv/include/asm/delay.h b/arch/riscv/include/asm/delay.h
 new file mode 100644
-index 000000000000..66805cba9a27
+index 000000000000..cbb0c9eb96cb
 --- /dev/null
-+++ b/arch/riscv/include/asm/mmu.h
-@@ -0,0 +1,26 @@
++++ b/arch/riscv/include/asm/delay.h
+@@ -0,0 +1,28 @@
 +/*
-+ * Copyright (C) 2012 Regents of the University of California
++ * Copyright (C) 2009 Chen Liqin <liqin.chen@sunplusct.com>
++ * Copyright (C) 2016 Regents of the University of California
 + *
 + *   This program is free software; you can redistribute it and/or
 + *   modify it under the terms of the GNU General Public License
@@ -98,713 +64,29 @@ index 000000000000..66805cba9a27
 + *   GNU General Public License for more details.
 + */
 +
++#ifndef _ASM_RISCV_DELAY_H
++#define _ASM_RISCV_DELAY_H
 +
-+#ifndef _ASM_RISCV_MMU_H
-+#define _ASM_RISCV_MMU_H
++extern unsigned long riscv_timebase;
 +
-+#ifndef __ASSEMBLY__
++#define udelay udelay
++extern void udelay(unsigned long usecs);
 +
-+typedef struct {
-+	void *vdso;
-+} mm_context_t;
++#define ndelay ndelay
++extern void ndelay(unsigned long nsecs);
 +
-+#endif /* __ASSEMBLY__ */
++extern void __delay(unsigned long cycles);
 +
-+#endif /* _ASM_RISCV_MMU_H */
-diff --git a/arch/riscv/include/asm/ptrace.h b/arch/riscv/include/asm/ptrace.h
++#endif /* _ASM_RISCV_DELAY_H */
+diff --git a/arch/riscv/include/asm/dma-mapping.h b/arch/riscv/include/asm/dma-mapping.h
 new file mode 100644
-index 000000000000..93b8956e25e4
+index 000000000000..3eec1000196d
 --- /dev/null
-+++ b/arch/riscv/include/asm/ptrace.h
-@@ -0,0 +1,118 @@
++++ b/arch/riscv/include/asm/dma-mapping.h
+@@ -0,0 +1,38 @@
 +/*
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#ifndef _ASM_RISCV_PTRACE_H
-+#define _ASM_RISCV_PTRACE_H
-+
-+#include <uapi/asm/ptrace.h>
-+#include <asm/csr.h>
-+
-+#ifndef __ASSEMBLY__
-+
-+struct pt_regs {
-+	unsigned long sepc;
-+	unsigned long ra;
-+	unsigned long sp;
-+	unsigned long gp;
-+	unsigned long tp;
-+	unsigned long t0;
-+	unsigned long t1;
-+	unsigned long t2;
-+	unsigned long s0;
-+	unsigned long s1;
-+	unsigned long a0;
-+	unsigned long a1;
-+	unsigned long a2;
-+	unsigned long a3;
-+	unsigned long a4;
-+	unsigned long a5;
-+	unsigned long a6;
-+	unsigned long a7;
-+	unsigned long s2;
-+	unsigned long s3;
-+	unsigned long s4;
-+	unsigned long s5;
-+	unsigned long s6;
-+	unsigned long s7;
-+	unsigned long s8;
-+	unsigned long s9;
-+	unsigned long s10;
-+	unsigned long s11;
-+	unsigned long t3;
-+	unsigned long t4;
-+	unsigned long t5;
-+	unsigned long t6;
-+	/* Supervisor CSRs */
-+	unsigned long sstatus;
-+	unsigned long sbadaddr;
-+	unsigned long scause;
-+        /* a0 value before the syscall */
-+        unsigned long orig_a0;
-+};
-+
-+#ifdef CONFIG_64BIT
-+#define REG_FMT "%016lx"
-+#else
-+#define REG_FMT "%08lx"
-+#endif
-+
-+#define user_mode(regs) (((regs)->sstatus & SR_PS) == 0)
-+
-+
-+/* Helpers for working with the instruction pointer */
-+#define GET_IP(regs) ((regs)->sepc)
-+#define SET_IP(regs, val) (GET_IP(regs) = (val))
-+
-+static inline unsigned long instruction_pointer(struct pt_regs *regs)
-+{
-+	return GET_IP(regs);
-+}
-+static inline void instruction_pointer_set(struct pt_regs *regs,
-+					   unsigned long val)
-+{
-+	SET_IP(regs, val);
-+}
-+
-+#define profile_pc(regs) instruction_pointer(regs)
-+
-+/* Helpers for working with the user stack pointer */
-+#define GET_USP(regs) ((regs)->sp)
-+#define SET_USP(regs, val) (GET_USP(regs) = (val))
-+
-+static inline unsigned long user_stack_pointer(struct pt_regs *regs)
-+{
-+	return GET_USP(regs);
-+}
-+static inline void user_stack_pointer_set(struct pt_regs *regs,
-+					  unsigned long val)
-+{
-+	SET_USP(regs, val);
-+}
-+
-+/* Helpers for working with the frame pointer */
-+#define GET_FP(regs) ((regs)->s0)
-+#define SET_FP(regs, val) (GET_FP(regs) = (val))
-+
-+static inline unsigned long frame_pointer(struct pt_regs *regs)
-+{
-+	return GET_FP(regs);
-+}
-+static inline void frame_pointer_set(struct pt_regs *regs,
-+				     unsigned long val)
-+{
-+	SET_FP(regs, val);
-+}
-+
-+#endif /* __ASSEMBLY__ */
-+
-+#endif /* _ASM_RISCV_PTRACE_H */
-diff --git a/arch/riscv/include/asm/syscall.h b/arch/riscv/include/asm/syscall.h
-new file mode 100644
-index 000000000000..8d25f8904c00
---- /dev/null
-+++ b/arch/riscv/include/asm/syscall.h
-@@ -0,0 +1,102 @@
-+/*
-+ * Copyright (C) 2008-2009 Red Hat, Inc.  All rights reserved.
-+ * Copyright 2010 Tilera Corporation. All Rights Reserved.
-+ * Copyright 2015 Regents of the University of California, Berkeley
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ *
-+ * See asm-generic/syscall.h for descriptions of what we must do here.
-+ */
-+
-+#ifndef _ASM_RISCV_SYSCALL_H
-+#define _ASM_RISCV_SYSCALL_H
-+
-+#include <linux/sched.h>
-+#include <linux/err.h>
-+
-+/* The array of function pointers for syscalls. */
-+extern void *sys_call_table[];
-+
-+/*
-+ * Only the low 32 bits of orig_r0 are meaningful, so we return int.
-+ * This importantly ignores the high bits on 64-bit, so comparisons
-+ * sign-extend the low 32 bits.
-+ */
-+static inline int syscall_get_nr(struct task_struct *task,
-+				 struct pt_regs *regs)
-+{
-+	return regs->a7;
-+}
-+
-+static inline void syscall_set_nr(struct task_struct *task,
-+				  struct pt_regs *regs,
-+				  int sysno)
-+{
-+	regs->a7 = sysno;
-+}
-+
-+static inline void syscall_rollback(struct task_struct *task,
-+				    struct pt_regs *regs)
-+{
-+        regs->a0 = regs->orig_a0;
-+}
-+
-+static inline long syscall_get_error(struct task_struct *task,
-+				     struct pt_regs *regs)
-+{
-+	unsigned long error = regs->a0;
-+
-+	return IS_ERR_VALUE(error) ? error : 0;
-+}
-+
-+static inline long syscall_get_return_value(struct task_struct *task,
-+					    struct pt_regs *regs)
-+{
-+	return regs->a0;
-+}
-+
-+static inline void syscall_set_return_value(struct task_struct *task,
-+					    struct pt_regs *regs,
-+					    int error, long val)
-+{
-+	regs->a0 = (long) error ?: val;
-+}
-+
-+static inline void syscall_get_arguments(struct task_struct *task,
-+					 struct pt_regs *regs,
-+					 unsigned int i, unsigned int n,
-+					 unsigned long *args)
-+{
-+	BUG_ON(i + n > 6);
-+	if (i == 0) {
-+		args[0] = regs->orig_a0;
-+		args++;
-+		i++;
-+		n--;
-+	}
-+	memcpy(args, &regs->a1 + i * sizeof(regs->a1), n * sizeof(args[0]));
-+}
-+
-+static inline void syscall_set_arguments(struct task_struct *task,
-+					 struct pt_regs *regs,
-+					 unsigned int i, unsigned int n,
-+					 const unsigned long *args)
-+{
-+	BUG_ON(i + n > 6);
-+        if (i == 0) {
-+                regs->orig_a0 = args[0];
-+                args++;
-+                i++;
-+                n--;
-+        }
-+	memcpy(&regs->a1 + i * sizeof(regs->a1), args, n * sizeof(regs->a0));
-+}
-+
-+#endif	/* _ASM_RISCV_SYSCALL_H */
-diff --git a/arch/riscv/include/asm/unistd.h b/arch/riscv/include/asm/unistd.h
-new file mode 100644
-index 000000000000..9f250ed007cd
---- /dev/null
-+++ b/arch/riscv/include/asm/unistd.h
-@@ -0,0 +1,16 @@
-+/*
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#define __ARCH_HAVE_MMU
-+#define __ARCH_WANT_SYS_CLONE
-+#include <uapi/asm/unistd.h>
-diff --git a/arch/riscv/include/asm/vdso.h b/arch/riscv/include/asm/vdso.h
-new file mode 100644
-index 000000000000..602f61257553
---- /dev/null
-+++ b/arch/riscv/include/asm/vdso.h
-@@ -0,0 +1,41 @@
-+/*
-+ * Copyright (C) 2012 ARM Limited
-+ * Copyright (C) 2014 Regents of the University of California
-+ * Copyright (C) 2017 SiFive
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef _ASM_RISCV_VDSO_H
-+#define _ASM_RISCV_VDSO_H
-+
-+#include <linux/types.h>
-+
-+struct vdso_data {
-+};
-+
-+/*
-+ * The VDSO symbols are mapped into Linux so we can just use regular symbol
-+ * addressing to get their offsets in userspace.  The symbols are mapped at an
-+ * offset of 0, but since the linker must support setting weak undefined
-+ * symbols to the absolute address 0 it also happens to support other low
-+ * addresses even when the code model suggests those low addresses would not
-+ * otherwise be availiable.
-+ */
-+#define VDSO_SYMBOL(base, name)							\
-+({										\
-+	extern const char __vdso_##name[];					\
-+	(void __user *)((unsigned long)(base) + __vdso_##name);			\
-+})
-+
-+#endif /* _ASM_RISCV_VDSO_H */
-diff --git a/arch/riscv/include/uapi/asm/Kbuild b/arch/riscv/include/uapi/asm/Kbuild
-new file mode 100644
-index 000000000000..5ded96b06352
---- /dev/null
-+++ b/arch/riscv/include/uapi/asm/Kbuild
-@@ -0,0 +1,27 @@
-+# UAPI Header export list
-+include include/uapi/asm-generic/Kbuild.asm
-+
-+generic-y += setup.h
-+generic-y += unistd.h
-+generic-y += errno.h
-+generic-y += fcntl.h
-+generic-y += ioctl.h
-+generic-y += ioctls.h
-+generic-y += ipcbuf.h
-+generic-y += mman.h
-+generic-y += msgbuf.h
-+generic-y += param.h
-+generic-y += poll.h
-+generic-y += posix_types.h
-+generic-y += resource.h
-+generic-y += sembuf.h
-+generic-y += shmbuf.h
-+generic-y += signal.h
-+generic-y += socket.h
-+generic-y += sockios.h
-+generic-y += stat.h
-+generic-y += statfs.h
-+generic-y += swab.h
-+generic-y += termbits.h
-+generic-y += termios.h
-+generic-y += types.h
-diff --git a/arch/riscv/include/uapi/asm/auxvec.h b/arch/riscv/include/uapi/asm/auxvec.h
-new file mode 100644
-index 000000000000..1376515547cd
---- /dev/null
-+++ b/arch/riscv/include/uapi/asm/auxvec.h
-@@ -0,0 +1,24 @@
-+/*
-+ * Copyright (C) 2012 ARM Ltd.
-+ * Copyright (C) 2015 Regents of the University of California
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef _UAPI_ASM_RISCV_AUXVEC_H
-+#define _UAPI_ASM_RISCV_AUXVEC_H
-+
-+/* vDSO location */
-+#define AT_SYSINFO_EHDR 33
-+
-+#endif /* _UAPI_ASM_RISCV_AUXVEC_H */
-diff --git a/arch/riscv/include/uapi/asm/bitsperlong.h b/arch/riscv/include/uapi/asm/bitsperlong.h
-new file mode 100644
-index 000000000000..0b3cb52fd29d
---- /dev/null
-+++ b/arch/riscv/include/uapi/asm/bitsperlong.h
-@@ -0,0 +1,25 @@
-+/*
-+ * Copyright (C) 2012 ARM Ltd.
-+ * Copyright (C) 2015 Regents of the University of California
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef _UAPI_ASM_RISCV_BITSPERLONG_H
-+#define _UAPI_ASM_RISCV_BITSPERLONG_H
-+
-+#define __BITS_PER_LONG (__SIZEOF_POINTER__ * 8)
-+
-+#include <asm-generic/bitsperlong.h>
-+
-+#endif /* _UAPI_ASM_RISCV_BITSPERLONG_H */
-diff --git a/arch/riscv/include/uapi/asm/byteorder.h b/arch/riscv/include/uapi/asm/byteorder.h
-new file mode 100644
-index 000000000000..4ca38af2cd32
---- /dev/null
-+++ b/arch/riscv/include/uapi/asm/byteorder.h
-@@ -0,0 +1,23 @@
-+/*
-+ * Copyright (C) 2012 ARM Ltd.
-+ * Copyright (C) 2015 Regents of the University of California
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef _UAPI_ASM_RISCV_BYTEORDER_H
-+#define _UAPI_ASM_RISCV_BYTEORDER_H
-+
-+#include <linux/byteorder/little_endian.h>
-+
-+#endif /* _UAPI_ASM_RISCV_BYTEORDER_H */
-diff --git a/arch/riscv/include/uapi/asm/elf.h b/arch/riscv/include/uapi/asm/elf.h
-new file mode 100644
-index 000000000000..a510edfa8226
---- /dev/null
-+++ b/arch/riscv/include/uapi/asm/elf.h
-@@ -0,0 +1,83 @@
-+/*
-+ * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
-+ * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ */
-+
-+#ifndef _UAPI_ASM_ELF_H
-+#define _UAPI_ASM_ELF_H
-+
-+#include <asm/ptrace.h>
-+
-+/* ELF register definitions */
-+typedef unsigned long elf_greg_t;
-+typedef struct user_regs_struct elf_gregset_t;
-+#define ELF_NGREG (sizeof(elf_gregset_t) / sizeof(elf_greg_t))
-+
-+typedef union __riscv_fp_state elf_fpregset_t;
-+
-+#define ELF_RISCV_R_SYM(r_info) ((r_info) >> 32)
-+#define ELF_RISCV_R_TYPE(r_info) ((r_info) & 0xffffffff)
-+
-+/*
-+ * RISC-V relocation types
-+ */
-+
-+/* Relocation types used by the dynamic linker */
-+#define R_RISCV_NONE		0
-+#define R_RISCV_32		1
-+#define R_RISCV_64		2
-+#define R_RISCV_RELATIVE	3
-+#define R_RISCV_COPY		4
-+#define R_RISCV_JUMP_SLOT	5
-+#define R_RISCV_TLS_DTPMOD32	6
-+#define R_RISCV_TLS_DTPMOD64	7
-+#define R_RISCV_TLS_DTPREL32	8
-+#define R_RISCV_TLS_DTPREL64	9
-+#define R_RISCV_TLS_TPREL32	10
-+#define R_RISCV_TLS_TPREL64	11
-+
-+/* Relocation types not used by the dynamic linker */
-+#define R_RISCV_BRANCH		16
-+#define R_RISCV_JAL		17
-+#define R_RISCV_CALL		18
-+#define R_RISCV_CALL_PLT	19
-+#define R_RISCV_GOT_HI20	20
-+#define R_RISCV_TLS_GOT_HI20	21
-+#define R_RISCV_TLS_GD_HI20	22
-+#define R_RISCV_PCREL_HI20	23
-+#define R_RISCV_PCREL_LO12_I	24
-+#define R_RISCV_PCREL_LO12_S	25
-+#define R_RISCV_HI20		26
-+#define R_RISCV_LO12_I		27
-+#define R_RISCV_LO12_S		28
-+#define R_RISCV_TPREL_HI20	29
-+#define R_RISCV_TPREL_LO12_I	30
-+#define R_RISCV_TPREL_LO12_S	31
-+#define R_RISCV_TPREL_ADD	32
-+#define R_RISCV_ADD8		33
-+#define R_RISCV_ADD16		34
-+#define R_RISCV_ADD32		35
-+#define R_RISCV_ADD64		36
-+#define R_RISCV_SUB8		37
-+#define R_RISCV_SUB16		38
-+#define R_RISCV_SUB32		39
-+#define R_RISCV_SUB64		40
-+#define R_RISCV_GNU_VTINHERIT	41
-+#define R_RISCV_GNU_VTENTRY	42
-+#define R_RISCV_ALIGN		43
-+#define R_RISCV_RVC_BRANCH	44
-+#define R_RISCV_RVC_JUMP	45
-+#define R_RISCV_LUI		46
-+#define R_RISCV_GPREL_I		47
-+#define R_RISCV_GPREL_S		48
-+#define R_RISCV_TPREL_I		49
-+#define R_RISCV_TPREL_S		50
-+#define R_RISCV_RELAX		51
-+
-+#endif /* _UAPI_ASM_ELF_H */
-diff --git a/arch/riscv/include/uapi/asm/hwcap.h b/arch/riscv/include/uapi/asm/hwcap.h
-new file mode 100644
-index 000000000000..f333221c9ab2
---- /dev/null
-+++ b/arch/riscv/include/uapi/asm/hwcap.h
-@@ -0,0 +1,36 @@
-+/*
-+ * Copied from arch/arm64/include/asm/hwcap.h
-+ *
-+ * Copyright (C) 2012 ARM Ltd.
-+ * Copyright (C) 2017 SiFive
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef __UAPI_ASM_HWCAP_H
-+#define __UAPI_ASM_HWCAP_H
-+
-+/*
-+ * Linux saves the floating-point registers according to the ISA Linux is
-+ * executing on, as opposed to the ISA the user program is compiled for.  This
-+ * is necessary for a handful of esoteric use cases: for example, userpsace
-+ * threading libraries must be able to examine the actual machine state in
-+ * order to fully reconstruct the state of a thread.
-+ */
-+#define COMPAT_HWCAP_ISA_I	(1 << ('I' - 'A'))
-+#define COMPAT_HWCAP_ISA_M	(1 << ('M' - 'A'))
-+#define COMPAT_HWCAP_ISA_A	(1 << ('A' - 'A'))
-+#define COMPAT_HWCAP_ISA_F	(1 << ('F' - 'A'))
-+#define COMPAT_HWCAP_ISA_D	(1 << ('D' - 'A'))
-+#define COMPAT_HWCAP_ISA_C	(1 << ('C' - 'A'))
-+
-+#endif
-diff --git a/arch/riscv/include/uapi/asm/ptrace.h b/arch/riscv/include/uapi/asm/ptrace.h
-new file mode 100644
-index 000000000000..1a9e4cdd37e2
---- /dev/null
-+++ b/arch/riscv/include/uapi/asm/ptrace.h
-@@ -0,0 +1,90 @@
-+/*
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#ifndef _UAPI_ASM_RISCV_PTRACE_H
-+#define _UAPI_ASM_RISCV_PTRACE_H
-+
-+#ifndef __ASSEMBLY__
-+
-+#include <linux/types.h>
-+
-+/*
-+ * User-mode register state for core dumps, ptrace, sigcontext
-+ *
-+ * This decouples struct pt_regs from the userspace ABI.
-+ * struct user_regs_struct must form a prefix of struct pt_regs.
-+ */
-+struct user_regs_struct {
-+	unsigned long pc;
-+	unsigned long ra;
-+	unsigned long sp;
-+	unsigned long gp;
-+	unsigned long tp;
-+	unsigned long t0;
-+	unsigned long t1;
-+	unsigned long t2;
-+	unsigned long s0;
-+	unsigned long s1;
-+	unsigned long a0;
-+	unsigned long a1;
-+	unsigned long a2;
-+	unsigned long a3;
-+	unsigned long a4;
-+	unsigned long a5;
-+	unsigned long a6;
-+	unsigned long a7;
-+	unsigned long s2;
-+	unsigned long s3;
-+	unsigned long s4;
-+	unsigned long s5;
-+	unsigned long s6;
-+	unsigned long s7;
-+	unsigned long s8;
-+	unsigned long s9;
-+	unsigned long s10;
-+	unsigned long s11;
-+	unsigned long t3;
-+	unsigned long t4;
-+	unsigned long t5;
-+	unsigned long t6;
-+};
-+
-+struct __riscv_f_ext_state {
-+	__u32 f[32];
-+	__u32 fcsr;
-+};
-+
-+struct __riscv_d_ext_state {
-+	__u64 f[32];
-+	__u32 fcsr;
-+};
-+
-+struct __riscv_q_ext_state {
-+	__u64 f[64] __attribute__((aligned(16)));
-+	__u32 fcsr;
-+	/*
-+	 * Reserved for expansion of sigcontext structure.  Currently zeroed
-+	 * upon signal, and must be zero upon sigreturn.
-+	 */
-+	__u32 reserved[3];
-+};
-+
-+union __riscv_fp_state {
-+	struct __riscv_f_ext_state f;
-+	struct __riscv_d_ext_state d;
-+	struct __riscv_q_ext_state q;
-+};
-+
-+#endif /* __ASSEMBLY__ */
-+
-+#endif /* _UAPI_ASM_RISCV_PTRACE_H */
-diff --git a/arch/riscv/include/uapi/asm/sigcontext.h b/arch/riscv/include/uapi/asm/sigcontext.h
-new file mode 100644
-index 000000000000..ed7372b277fa
---- /dev/null
-+++ b/arch/riscv/include/uapi/asm/sigcontext.h
-@@ -0,0 +1,30 @@
-+/*
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#ifndef _UAPI_ASM_RISCV_SIGCONTEXT_H
-+#define _UAPI_ASM_RISCV_SIGCONTEXT_H
-+
-+#include <asm/ptrace.h>
-+
-+/*
-+ * Signal context structure
-+ *
-+ * This contains the context saved before a signal handler is invoked;
-+ * it is restored by sys_sigreturn / sys_rt_sigreturn.
-+ */
-+struct sigcontext {
-+	struct user_regs_struct sc_regs;
-+	union __riscv_fp_state sc_fpregs;
-+};
-+
-+#endif /* _UAPI_ASM_RISCV_SIGCONTEXT_H */
-diff --git a/arch/riscv/include/uapi/asm/siginfo.h b/arch/riscv/include/uapi/asm/siginfo.h
-new file mode 100644
-index 000000000000..f96849aac662
---- /dev/null
-+++ b/arch/riscv/include/uapi/asm/siginfo.h
-@@ -0,0 +1,24 @@
-+/*
++ * Copyright (C) 2003-2004 Hewlett-Packard Co
++ *	David Mosberger-Tang <davidm@hpl.hp.com>
 + * Copyright (C) 2012 ARM Ltd.
 + * Copyright (C) 2016 SiFive, Inc.
 + *
@@ -820,805 +102,297 @@ index 000000000000..f96849aac662
 + * You should have received a copy of the GNU General Public License
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
-+#ifndef __ASM_SIGINFO_H
-+#define __ASM_SIGINFO_H
++#ifndef __ASM_RISCV_DMA_MAPPING_H
++#define __ASM_RISCV_DMA_MAPPING_H
 +
-+#define __ARCH_SI_PREAMBLE_SIZE	(__SIZEOF_POINTER__ == 4 ? 12 : 16)
++/* Use ops->dma_mapping_error (if it exists) or assume success */
++// #undef DMA_ERROR_CODE
 +
-+#include <asm-generic/siginfo.h>
++static inline const struct dma_map_ops *get_arch_dma_ops(struct bus_type *bus)
++{
++	return &dma_noop_ops;
++}
 +
-+#endif
-diff --git a/arch/riscv/include/uapi/asm/ucontext.h b/arch/riscv/include/uapi/asm/ucontext.h
++static inline bool dma_capable(struct device *dev, dma_addr_t addr, size_t size)
++{
++	if (!dev->dma_mask)
++		return false;
++
++	return addr + size - 1 <= *dev->dma_mask;
++}
++
++#endif	/* __ASM_RISCV_DMA_MAPPING_H */
+diff --git a/arch/riscv/include/asm/irq.h b/arch/riscv/include/asm/irq.h
 new file mode 100644
-index 000000000000..52eff9febcfd
+index 000000000000..4dee9d4c13c0
 --- /dev/null
-+++ b/arch/riscv/include/uapi/asm/ucontext.h
-@@ -0,0 +1,35 @@
++++ b/arch/riscv/include/asm/irq.h
+@@ -0,0 +1,28 @@
 +/*
-+ * Copyright (C) 2012 ARM Ltd.
-+ * Copyright (C) 2017 SiFive, Inc.
++ * Copyright (C) 2012 Regents of the University of California
++ * Copyright (C) 2017 SiFive
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
 + *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ *
-+ * This file was copied from arch/arm64/include/uapi/asm/ucontext.h
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
 + */
-+#ifndef _UAPI__ASM_UCONTEXT_H
-+#define _UAPI__ASM_UCONTEXT_H
++
++#ifndef _ASM_RISCV_IRQ_H
++#define _ASM_RISCV_IRQ_H
++
++#define NR_IRQS         0
++
++#define INTERRUPT_CAUSE_SOFTWARE    1
++#define INTERRUPT_CAUSE_TIMER       5
++#define INTERRUPT_CAUSE_EXTERNAL    9
++
++void riscv_timer_interrupt(void);
++
++#include <asm-generic/irq.h>
++
++#endif /* _ASM_RISCV_IRQ_H */
+diff --git a/arch/riscv/include/asm/irqflags.h b/arch/riscv/include/asm/irqflags.h
+new file mode 100644
+index 000000000000..6fdc860d7f84
+--- /dev/null
++++ b/arch/riscv/include/asm/irqflags.h
+@@ -0,0 +1,63 @@
++/*
++ * Copyright (C) 2012 Regents of the University of California
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++
++#ifndef _ASM_RISCV_IRQFLAGS_H
++#define _ASM_RISCV_IRQFLAGS_H
++
++#include <asm/processor.h>
++#include <asm/csr.h>
++
++/* read interrupt enabled status */
++static inline unsigned long arch_local_save_flags(void)
++{
++	return csr_read(sstatus);
++}
++
++/* unconditionally enable interrupts */
++static inline void arch_local_irq_enable(void)
++{
++	csr_set(sstatus, SR_IE);
++}
++
++/* unconditionally disable interrupts */
++static inline void arch_local_irq_disable(void)
++{
++	csr_clear(sstatus, SR_IE);
++}
++
++/* get status and disable interrupts */
++static inline unsigned long arch_local_irq_save(void)
++{
++	return csr_read_clear(sstatus, SR_IE);
++}
++
++/* test flags */
++static inline int arch_irqs_disabled_flags(unsigned long flags)
++{
++	return !(flags & SR_IE);
++}
++
++/* test hardware interrupt enable bit */
++static inline int arch_irqs_disabled(void)
++{
++	return arch_irqs_disabled_flags(arch_local_save_flags());
++}
++
++/* set interrupt enabled status */
++static inline void arch_local_irq_restore(unsigned long flags)
++{
++	csr_set(sstatus, flags & SR_IE);
++}
++
++#endif /* _ASM_RISCV_IRQFLAGS_H */
+diff --git a/arch/riscv/include/asm/pci.h b/arch/riscv/include/asm/pci.h
+new file mode 100644
+index 000000000000..285747fa2ef0
+--- /dev/null
++++ b/arch/riscv/include/asm/pci.h
+@@ -0,0 +1,48 @@
++/*
++ * Copyright (C) 2016 SiFive
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++#ifndef __ASM_RISCV_PCI_H
++#define __ASM_RISCV_PCI_H
++
++#include <linux/types.h>
++#include <linux/slab.h>
++#include <linux/dma-mapping.h>
++
++#include <asm/io.h>
++
++#define PCIBIOS_MIN_IO		0
++#define PCIBIOS_MIN_MEM		0
++
++/* RISC-V shim does not initialize PCI bus */
++#define pcibios_assign_all_busses() 1
++
++/* RISC-V TileLink and PCIe share the share address space */
++#define PCI_DMA_BUS_IS_PHYS 1
++
++extern int isa_dma_bridge_buggy;
++
++#ifdef CONFIG_PCI
++static inline int pci_get_legacy_ide_irq(struct pci_dev *dev, int channel)
++{
++	/* no legacy IRQ on risc-v */
++	return -ENODEV;
++}
++
++static inline int pci_proc_domain(struct pci_bus *bus)
++{
++	/* always show the domain in /proc */
++	return 1;
++}
++#endif  /* CONFIG_PCI */
++
++#endif  /* __ASM_PCI_H */
+diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
+new file mode 100644
+index 000000000000..b6bb10b92fe2
+--- /dev/null
++++ b/arch/riscv/include/asm/sbi.h
+@@ -0,0 +1,100 @@
++/*
++ * Copyright (C) 2015 Regents of the University of California
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++#ifndef _ASM_RISCV_SBI_H
++#define _ASM_RISCV_SBI_H
 +
 +#include <linux/types.h>
 +
-+struct ucontext {
-+	unsigned long	  uc_flags;
-+	struct ucontext	 *uc_link;
-+	stack_t		  uc_stack;
-+	sigset_t	  uc_sigmask;
-+	/* glibc uses a 1024-bit sigset_t */
-+	__u8		  __unused[1024 / 8 - sizeof(sigset_t)];
-+	/* last for future expansion */
-+	struct sigcontext uc_mcontext;
-+};
++#define SBI_SET_TIMER 0
++#define SBI_CONSOLE_PUTCHAR 1
++#define SBI_CONSOLE_GETCHAR 2
++#define SBI_CLEAR_IPI 3
++#define SBI_SEND_IPI 4
++#define SBI_REMOTE_FENCE_I 5
++#define SBI_REMOTE_SFENCE_VMA 6
++#define SBI_REMOTE_SFENCE_VMA_ASID 7
++#define SBI_SHUTDOWN 8
 +
-+#endif /* _UAPI__ASM_UCONTEXT_H */
-diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-new file mode 100644
-index 000000000000..17011a870044
---- /dev/null
-+++ b/arch/riscv/kernel/cpufeature.c
-@@ -0,0 +1,61 @@
-+/*
-+ * Copied from arch/arm64/kernel/cpufeature.c
-+ *
-+ * Copyright (C) 2015 ARM Ltd.
-+ * Copyright (C) 2017 SiFive
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
++#define SBI_CALL(which, arg0, arg1, arg2) ({			\
++	register uintptr_t a0 asm ("a0") = (uintptr_t)(arg0);	\
++	register uintptr_t a1 asm ("a1") = (uintptr_t)(arg1);	\
++	register uintptr_t a2 asm ("a2") = (uintptr_t)(arg2);	\
++	register uintptr_t a7 asm ("a7") = (uintptr_t)(which);	\
++	asm volatile ("ecall"					\
++		      : "+r" (a0)				\
++		      : "r" (a1), "r" (a2), "r" (a7)		\
++		      : "memory");				\
++	a0;							\
++})
 +
-+#include <linux/of.h>
-+#include <asm/processor.h>
-+#include <asm/hwcap.h>
++/* Lazy implementations until SBI is finalized */
++#define SBI_CALL_0(which) SBI_CALL(which, 0, 0, 0)
++#define SBI_CALL_1(which, arg0) SBI_CALL(which, arg0, 0, 0)
++#define SBI_CALL_2(which, arg0, arg1) SBI_CALL(which, arg0, arg1, 0)
 +
-+unsigned long elf_hwcap __read_mostly;
-+
-+void riscv_fill_hwcap(void)
++static inline void sbi_console_putchar(int ch)
 +{
-+	struct device_node *node;
-+	const char *isa;
-+	size_t i;
-+	static unsigned long isa2hwcap[256] = {0};
-+
-+	isa2hwcap['i'] = isa2hwcap['I'] = COMPAT_HWCAP_ISA_I;
-+	isa2hwcap['m'] = isa2hwcap['M'] = COMPAT_HWCAP_ISA_M;
-+	isa2hwcap['a'] = isa2hwcap['A'] = COMPAT_HWCAP_ISA_A;
-+	isa2hwcap['f'] = isa2hwcap['F'] = COMPAT_HWCAP_ISA_F;
-+	isa2hwcap['d'] = isa2hwcap['D'] = COMPAT_HWCAP_ISA_D;
-+	isa2hwcap['c'] = isa2hwcap['C'] = COMPAT_HWCAP_ISA_C;
-+
-+	elf_hwcap = 0;
-+
-+	/*
-+	 * We don't support running Linux on hertergenous ISA systems.  For
-+	 * now, we just check the ISA of the first processor.
-+	 */
-+	node = of_find_node_by_type(NULL, "cpu");
-+	if (!node) {
-+		pr_warning("Unable to find \"cpu\" devicetree entry");
-+		return;
-+	}
-+
-+	if (of_property_read_string(node, "riscv,isa", &isa)) {
-+		pr_warning("Unable to find \"riscv,isa\" devicetree entry");
-+		return;
-+	}
-+
-+	for (i = 0; i < strlen(isa); ++i)
-+		elf_hwcap |= isa2hwcap[(unsigned char)(isa[i])];
-+
-+	pr_info("elf_hwcap is 0x%lx", elf_hwcap);
-+}
-diff --git a/arch/riscv/kernel/module.c b/arch/riscv/kernel/module.c
-new file mode 100644
-index 000000000000..e0f05034fc21
---- /dev/null
-+++ b/arch/riscv/kernel/module.c
-@@ -0,0 +1,217 @@
-+/*
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  Copyright (C) 2017 Zihao Yu
-+ */
-+
-+#include <linux/elf.h>
-+#include <linux/err.h>
-+#include <linux/errno.h>
-+#include <linux/moduleloader.h>
-+
-+static int apply_r_riscv_64_rela(struct module *me, u32 *location, Elf_Addr v)
-+{
-+	*(u64 *)location = v;
-+	return 0;
++	SBI_CALL_1(SBI_CONSOLE_PUTCHAR, ch);
 +}
 +
-+static int apply_r_riscv_branch_rela(struct module *me, u32 *location,
-+				     Elf_Addr v)
++static inline int sbi_console_getchar(void)
 +{
-+	s64 offset = (void *)v - (void *)location;
-+	u32 imm12 = (offset & 0x1000) << (31 - 12);
-+	u32 imm11 = (offset & 0x800) >> (11 - 7);
-+	u32 imm10_5 = (offset & 0x7e0) << (30 - 10);
-+	u32 imm4_1 = (offset & 0x1e) << (11 - 4);
-+
-+	*location = (*location & 0x1fff07f) | imm12 | imm11 | imm10_5 | imm4_1;
-+	return 0;
++	return SBI_CALL_0(SBI_CONSOLE_GETCHAR);
 +}
 +
-+static int apply_r_riscv_jal_rela(struct module *me, u32 *location,
-+				  Elf_Addr v)
++static inline void sbi_set_timer(uint64_t stime_value)
 +{
-+	s64 offset = (void *)v - (void *)location;
-+	u32 imm20 = (offset & 0x100000) << (31 - 20);
-+	u32 imm19_12 = (offset & 0xff000);
-+	u32 imm11 = (offset & 0x800) << (20 - 11);
-+	u32 imm10_1 = (offset & 0x7fe) << (30 - 10);
-+
-+	*location = (*location & 0xfff) | imm20 | imm19_12 | imm11 | imm10_1;
-+	return 0;
-+}
-+
-+static int apply_r_riscv_pcrel_hi20_rela(struct module *me, u32 *location,
-+					 Elf_Addr v)
-+{
-+	s64 offset = (void *)v - (void *)location;
-+	s32 hi20;
-+
-+	if (offset != (s32)offset) {
-+		pr_err(
-+		  "%s: target %016llx can not be addressed by the 32-bit offset from PC = %p\n",
-+		  me->name, v, location);
-+		return -EINVAL;
-+	}
-+
-+	hi20 = (offset + 0x800) & 0xfffff000;
-+	*location = (*location & 0xfff) | hi20;
-+	return 0;
-+}
-+
-+static int apply_r_riscv_pcrel_lo12_i_rela(struct module *me, u32 *location,
-+					   Elf_Addr v)
-+{
-+	/*
-+	 * v is the lo12 value to fill. It is calculated before calling this
-+	 * handler.
-+	 */
-+	*location = (*location & 0xfffff) | ((v & 0xfff) << 20);
-+	return 0;
-+}
-+
-+static int apply_r_riscv_pcrel_lo12_s_rela(struct module *me, u32 *location,
-+					   Elf_Addr v)
-+{
-+	/*
-+	 * v is the lo12 value to fill. It is calculated before calling this
-+	 * handler.
-+	 */
-+	u32 imm11_5 = (v & 0xfe0) << (31 - 11);
-+	u32 imm4_0 = (v & 0x1f) << (11 - 4);
-+
-+	*location = (*location & 0x1fff07f) | imm11_5 | imm4_0;
-+	return 0;
-+}
-+
-+static int apply_r_riscv_call_plt_rela(struct module *me, u32 *location,
-+				       Elf_Addr v)
-+{
-+	s64 offset = (void *)v - (void *)location;
-+	s32 fill_v = offset;
-+	u32 hi20, lo12;
-+
-+	if (offset != fill_v) {
-+		pr_err(
-+		  "%s: target %016llx can not be addressed by the 32-bit offset from PC = %p\n",
-+		  me->name, v, location);
-+		return -EINVAL;
-+	}
-+
-+	hi20 = (offset + 0x800) & 0xfffff000;
-+	lo12 = (offset - hi20) & 0xfff;
-+	*location = (*location & 0xfff) | hi20;
-+	*(location + 1) = (*(location + 1) & 0xfffff) | (lo12 << 20);
-+	return 0;
-+}
-+
-+static int apply_r_riscv_relax_rela(struct module *me, u32 *location,
-+				    Elf_Addr v)
-+{
-+	return 0;
-+}
-+
-+static int (*reloc_handlers_rela[]) (struct module *me, u32 *location,
-+				Elf_Addr v) = {
-+	[R_RISCV_64]			= apply_r_riscv_64_rela,
-+	[R_RISCV_BRANCH]		= apply_r_riscv_branch_rela,
-+	[R_RISCV_JAL]			= apply_r_riscv_jal_rela,
-+	[R_RISCV_PCREL_HI20]		= apply_r_riscv_pcrel_hi20_rela,
-+	[R_RISCV_PCREL_LO12_I]		= apply_r_riscv_pcrel_lo12_i_rela,
-+	[R_RISCV_PCREL_LO12_S]		= apply_r_riscv_pcrel_lo12_s_rela,
-+	[R_RISCV_CALL_PLT]		= apply_r_riscv_call_plt_rela,
-+	[R_RISCV_RELAX]			= apply_r_riscv_relax_rela,
-+};
-+
-+int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
-+		       unsigned int symindex, unsigned int relsec,
-+		       struct module *me)
-+{
-+	Elf_Rela *rel = (void *) sechdrs[relsec].sh_addr;
-+	int (*handler)(struct module *me, u32 *location, Elf_Addr v);
-+	Elf_Sym *sym;
-+	u32 *location;
-+	unsigned int i, type;
-+	Elf_Addr v;
-+	int res;
-+
-+	pr_debug("Applying relocate section %u to %u\n", relsec,
-+	       sechdrs[relsec].sh_info);
-+
-+	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
-+		/* This is where to make the change */
-+		location = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
-+			+ rel[i].r_offset;
-+		/* This is the symbol it is referring to */
-+		sym = (Elf_Sym *)sechdrs[symindex].sh_addr
-+			+ ELF_RISCV_R_SYM(rel[i].r_info);
-+		if (IS_ERR_VALUE(sym->st_value)) {
-+			/* Ignore unresolved weak symbol */
-+			if (ELF_ST_BIND(sym->st_info) == STB_WEAK)
-+				continue;
-+			pr_warning("%s: Unknown symbol %s\n",
-+				   me->name, strtab + sym->st_name);
-+			return -ENOENT;
-+		}
-+
-+		type = ELF_RISCV_R_TYPE(rel[i].r_info);
-+
-+		if (type < ARRAY_SIZE(reloc_handlers_rela))
-+			handler = reloc_handlers_rela[type];
-+		else
-+			handler = NULL;
-+
-+		if (!handler) {
-+			pr_err("%s: Unknown relocation type %u\n",
-+			       me->name, type);
-+			return -EINVAL;
-+		}
-+
-+		v = sym->st_value + rel[i].r_addend;
-+
-+		if (type == R_RISCV_PCREL_LO12_I || type == R_RISCV_PCREL_LO12_S) {
-+			unsigned int j;
-+
-+			for (j = 0; j < sechdrs[relsec].sh_size / sizeof(*rel); j++) {
-+				u64 hi20_loc =
-+					sechdrs[sechdrs[relsec].sh_info].sh_addr
-+					+ rel[j].r_offset;
-+				/* Find the corresponding HI20 PC-relative relocation entry */
-+				if (hi20_loc == sym->st_value) {
-+					Elf_Sym *hi20_sym =
-+						(Elf_Sym *)sechdrs[symindex].sh_addr
-+						+ ELF_RISCV_R_SYM(rel[j].r_info);
-+					u64 hi20_sym_val =
-+						hi20_sym->st_value
-+						+ rel[j].r_addend;
-+					/* Calculate lo12 */
-+					s64 offset = hi20_sym_val - hi20_loc;
-+					s32 hi20 = (offset + 0x800) & 0xfffff000;
-+					s32 lo12 = offset - hi20;
-+					v = lo12;
-+					break;
-+				}
-+			}
-+			if (j == sechdrs[relsec].sh_size / sizeof(*rel)) {
-+				pr_err(
-+				  "%s: Can not find HI20 PC-relative relocation information\n",
-+				  me->name);
-+				return -EINVAL;
-+			}
-+		}
-+
-+		res = handler(me, location, v);
-+		if (res)
-+			return res;
-+	}
-+
-+	return 0;
-+}
-diff --git a/arch/riscv/kernel/ptrace.c b/arch/riscv/kernel/ptrace.c
-new file mode 100644
-index 000000000000..ba3e80712797
---- /dev/null
-+++ b/arch/riscv/kernel/ptrace.c
-@@ -0,0 +1,125 @@
-+/*
-+ * Copyright 2010 Tilera Corporation. All Rights Reserved.
-+ * Copyright 2015 Regents of the University of California
-+ * Copyright 2017 SiFive
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ *
-+ * Copied from arch/tile/kernel/ptrace.c
-+ */
-+
-+#include <asm/ptrace.h>
-+#include <asm/syscall.h>
-+#include <asm/thread_info.h>
-+#include <linux/ptrace.h>
-+#include <linux/elf.h>
-+#include <linux/regset.h>
-+#include <linux/sched.h>
-+#include <linux/sched/task_stack.h>
-+#include <linux/tracehook.h>
-+#include <trace/events/syscalls.h>
-+
-+enum riscv_regset {
-+	REGSET_X,
-+};
-+
-+static int riscv_gpr_get(struct task_struct *target,
-+			 const struct user_regset *regset,
-+			 unsigned int pos, unsigned int count,
-+			 void *kbuf, void __user *ubuf)
-+{
-+	struct pt_regs *regs;
-+
-+	regs = task_pt_regs(target);
-+	return user_regset_copyout(&pos, &count, &kbuf, &ubuf, regs, 0, -1);
-+}
-+
-+static int riscv_gpr_set(struct task_struct *target,
-+			 const struct user_regset *regset,
-+			 unsigned int pos, unsigned int count,
-+			 const void *kbuf, const void __user *ubuf)
-+{
-+	int ret;
-+	struct pt_regs *regs;
-+
-+	regs = task_pt_regs(target);
-+	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &regs, 0, -1);
-+	return ret;
-+}
-+
-+
-+static const struct user_regset riscv_user_regset[] = {
-+	[REGSET_X] = {
-+		.core_note_type = NT_PRSTATUS,
-+		.n = ELF_NGREG,
-+		.size = sizeof(elf_greg_t),
-+		.align = sizeof(elf_greg_t),
-+		.get = &riscv_gpr_get,
-+		.set = &riscv_gpr_set,
-+	},
-+};
-+
-+static const struct user_regset_view riscv_user_native_view = {
-+	.name = "riscv",
-+	.e_machine = EM_RISCV,
-+	.regsets = riscv_user_regset,
-+	.n = ARRAY_SIZE(riscv_user_regset),
-+};
-+
-+const struct user_regset_view *task_user_regset_view(struct task_struct *task)
-+{
-+	return &riscv_user_native_view;
-+}
-+
-+void ptrace_disable(struct task_struct *child)
-+{
-+	clear_tsk_thread_flag(child, TIF_SYSCALL_TRACE);
-+}
-+
-+long arch_ptrace(struct task_struct *child, long request,
-+		 unsigned long addr, unsigned long data)
-+{
-+	long ret = -EIO;
-+
-+	switch (request) {
-+	default:
-+		ret = ptrace_request(child, request, addr, data);
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+/*
-+ * Allows PTRACE_SYSCALL to work.  These are called from entry.S in
-+ * {handle,ret_from}_syscall.
-+ */
-+void do_syscall_trace_enter(struct pt_regs *regs)
-+{
-+	if (test_thread_flag(TIF_SYSCALL_TRACE))
-+		if (tracehook_report_syscall_entry(regs))
-+			syscall_set_nr(current, regs, -1);
-+
-+#ifdef CONFIG_HAVE_SYSCALL_TRACEPOINTS
-+	if (test_thread_flag(TIF_SYSCALL_TRACEPOINT))
-+		trace_sys_enter(regs, syscall_get_nr(current, regs));
++#if __riscv_xlen == 32
++	SBI_CALL_2(SBI_SET_TIMER, stime_value, stime_value >> 32);
++#else
++	SBI_CALL_1(SBI_SET_TIMER, stime_value);
 +#endif
 +}
 +
-+void do_syscall_trace_exit(struct pt_regs *regs)
++static inline void sbi_shutdown(void)
 +{
-+	if (test_thread_flag(TIF_SYSCALL_TRACE))
-+		tracehook_report_syscall_exit(regs, 0);
++	SBI_CALL_0(SBI_SHUTDOWN);
++}
 +
-+#ifdef CONFIG_HAVE_SYSCALL_TRACEPOINTS
-+	if (test_thread_flag(TIF_SYSCALL_TRACEPOINT))
-+		trace_sys_exit(regs, regs->regs[0]);
++static inline void sbi_clear_ipi(void)
++{
++	SBI_CALL_0(SBI_CLEAR_IPI);
++}
++
++static inline void sbi_send_ipi(const unsigned long *hart_mask)
++{
++	SBI_CALL_1(SBI_SEND_IPI, hart_mask);
++}
++
++static inline void sbi_remote_fence_i(const unsigned long *hart_mask)
++{
++	SBI_CALL_1(SBI_REMOTE_FENCE_I, hart_mask);
++}
++
++static inline void sbi_remote_sfence_vma(const unsigned long *hart_mask,
++					 unsigned long start,
++					 unsigned long size)
++{
++	SBI_CALL_1(SBI_REMOTE_SFENCE_VMA, hart_mask);
++}
++
++static inline void sbi_remote_sfence_vma_asid(const unsigned long *hart_mask,
++					      unsigned long start,
++					      unsigned long size,
++					      unsigned long asid)
++{
++	SBI_CALL_1(SBI_REMOTE_SFENCE_VMA_ASID, hart_mask);
++}
++
 +#endif
-+}
-diff --git a/arch/riscv/kernel/riscv_ksyms.c b/arch/riscv/kernel/riscv_ksyms.c
+diff --git a/arch/riscv/include/asm/timex.h b/arch/riscv/include/asm/timex.h
 new file mode 100644
-index 000000000000..23cc81ec9e94
+index 000000000000..3df4932d8964
 --- /dev/null
-+++ b/arch/riscv/kernel/riscv_ksyms.c
-@@ -0,0 +1,15 @@
-+/*
-+ * Copyright (C) 2017 Zihao Yu
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <linux/export.h>
-+#include <linux/uaccess.h>
-+
-+/*
-+ * Assembly functions that may be used (directly or indirectly) by modules
-+ */
-+EXPORT_SYMBOL(__copy_user);
-diff --git a/arch/riscv/kernel/signal.c b/arch/riscv/kernel/signal.c
-new file mode 100644
-index 000000000000..718d0c984ef0
---- /dev/null
-+++ b/arch/riscv/kernel/signal.c
-@@ -0,0 +1,292 @@
-+/*
-+ * Copyright (C) 2009 Sunplus Core Technology Co., Ltd.
-+ *  Chen Liqin <liqin.chen@sunplusct.com>
-+ *  Lennox Wu <lennox.wu@sunplusct.com>
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see the file COPYING, or write
-+ * to the Free Software Foundation, Inc.,
-+ */
-+
-+#include <linux/signal.h>
-+#include <linux/uaccess.h>
-+#include <linux/syscalls.h>
-+#include <linux/tracehook.h>
-+#include <linux/linkage.h>
-+
-+#include <asm/ucontext.h>
-+#include <asm/vdso.h>
-+#include <asm/switch_to.h>
-+#include <asm/csr.h>
-+
-+#define DEBUG_SIG 0
-+
-+struct rt_sigframe {
-+	struct siginfo info;
-+	struct ucontext uc;
-+};
-+
-+static long restore_d_state(struct pt_regs *regs,
-+	struct __riscv_d_ext_state __user *state)
-+{
-+	long err;
-+	err = __copy_from_user(&current->thread.fstate, state, sizeof(*state));
-+	if (likely(!err))
-+		fstate_restore(current, regs);
-+	return err;
-+}
-+
-+static long save_d_state(struct pt_regs *regs,
-+	struct __riscv_d_ext_state __user *state)
-+{
-+	fstate_save(current, regs);
-+	return __copy_to_user(state, &current->thread.fstate, sizeof(*state));
-+}
-+
-+static long restore_sigcontext(struct pt_regs *regs,
-+	struct sigcontext __user *sc)
-+{
-+	long err;
-+	size_t i;
-+	/* sc_regs is structured the same as the start of pt_regs */
-+	err = __copy_from_user(regs, &sc->sc_regs, sizeof(sc->sc_regs));
-+	if (unlikely(err))
-+		return err;
-+	/* Restore the floating-point state. */
-+	err = restore_d_state(regs, &sc->sc_fpregs.d);
-+	if (unlikely(err))
-+		return err;
-+	/* We support no other extension state at this time. */
-+	for (i = 0; i < ARRAY_SIZE(sc->sc_fpregs.q.reserved); i++) {
-+		u32 value;
-+		err = __get_user(value, &sc->sc_fpregs.q.reserved[i]);
-+		if (unlikely(err))
-+			break;
-+		if (value != 0)
-+			return -EINVAL;
-+	}
-+	return err;
-+}
-+
-+SYSCALL_DEFINE0(rt_sigreturn)
-+{
-+	struct pt_regs *regs = current_pt_regs();
-+	struct rt_sigframe __user *frame;
-+	struct task_struct *task;
-+	sigset_t set;
-+
-+	/* Always make any pending restarted system calls return -EINTR */
-+	current->restart_block.fn = do_no_restart_syscall;
-+
-+	frame = (struct rt_sigframe __user *)regs->sp;
-+
-+	if (!access_ok(VERIFY_READ, frame, sizeof(*frame)))
-+		goto badframe;
-+
-+	if (__copy_from_user(&set, &frame->uc.uc_sigmask, sizeof(set)))
-+		goto badframe;
-+
-+	set_current_blocked(&set);
-+
-+	if (restore_sigcontext(regs, &frame->uc.uc_mcontext))
-+		goto badframe;
-+
-+	if (restore_altstack(&frame->uc.uc_stack))
-+		goto badframe;
-+
-+	return regs->a0;
-+
-+badframe:
-+	task = current;
-+	if (show_unhandled_signals) {
-+		pr_info_ratelimited(
-+			"%s[%d]: bad frame in %s: frame=%p pc=%p sp=%p\n",
-+			task->comm, task_pid_nr(task), __func__,
-+			frame, (void *)regs->sepc, (void *)regs->sp);
-+	}
-+	force_sig(SIGSEGV, task);
-+	return 0;
-+}
-+
-+static long setup_sigcontext(struct rt_sigframe __user *frame,
-+	struct pt_regs *regs)
-+{
-+	struct sigcontext __user *sc = &frame->uc.uc_mcontext;
-+	long err;
-+	size_t i;
-+	/* sc_regs is structured the same as the start of pt_regs */
-+	err = __copy_to_user(&sc->sc_regs, regs, sizeof(sc->sc_regs));
-+	/* Save the floating-point state. */
-+	err |= save_d_state(regs, &sc->sc_fpregs.d);
-+	/* We support no other extension state at this time. */
-+	for (i = 0; i < ARRAY_SIZE(sc->sc_fpregs.q.reserved); i++)
-+		err |= __put_user(0, &sc->sc_fpregs.q.reserved[i]);
-+	return err;
-+}
-+
-+static inline void __user *get_sigframe(struct ksignal *ksig,
-+	struct pt_regs *regs, size_t framesize)
-+{
-+	unsigned long sp;
-+	/* Default to using normal stack */
-+	sp = regs->sp;
-+
-+	/*
-+	 * If we are on the alternate signal stack and would overflow it, don't.
-+	 * Return an always-bogus address instead so we will die with SIGSEGV.
-+	 */
-+	if (on_sig_stack(sp) && !likely(on_sig_stack(sp - framesize)))
-+		return (void __user __force *)(-1UL);
-+
-+	/* This is the X/Open sanctioned signal stack switching. */
-+	sp = sigsp(sp, ksig) - framesize;
-+
-+	/* Align the stack frame. */
-+	sp &= ~0xfUL;
-+
-+	return (void __user *)sp;
-+}
-+
-+
-+static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
-+	struct pt_regs *regs)
-+{
-+	struct rt_sigframe __user *frame;
-+	long err = 0;
-+
-+	frame = get_sigframe(ksig, regs, sizeof(*frame));
-+	if (!access_ok(VERIFY_WRITE, frame, sizeof(*frame)))
-+		return -EFAULT;
-+
-+	err |= copy_siginfo_to_user(&frame->info, &ksig->info);
-+
-+	/* Create the ucontext. */
-+	err |= __put_user(0, &frame->uc.uc_flags);
-+	err |= __put_user(NULL, &frame->uc.uc_link);
-+	err |= __save_altstack(&frame->uc.uc_stack, regs->sp);
-+	err |= setup_sigcontext(frame, regs);
-+	err |= __copy_to_user(&frame->uc.uc_sigmask, set, sizeof(*set));
-+	if (err)
-+		return -EFAULT;
-+
-+	/* Set up to return from userspace. */
-+	regs->ra = (unsigned long)VDSO_SYMBOL(
-+		current->mm->context.vdso, rt_sigreturn);
-+
-+	/*
-+	 * Set up registers for signal handler.
-+	 * Registers that we don't modify keep the value they had from
-+	 * user-space at the time we took the signal.
-+	 * We always pass siginfo and mcontext, regardless of SA_SIGINFO,
-+	 * since some things rely on this (e.g. glibc's debug/segfault.c).
-+	 */
-+	regs->sepc = (unsigned long)ksig->ka.sa.sa_handler;
-+	regs->sp = (unsigned long)frame;
-+	regs->a0 = ksig->sig;                     /* a0: signal number */
-+	regs->a1 = (unsigned long)(&frame->info); /* a1: siginfo pointer */
-+	regs->a2 = (unsigned long)(&frame->uc);   /* a2: ucontext pointer */
-+
-+#if DEBUG_SIG
-+	pr_info("SIG deliver (%s:%d): sig=%d pc=%p ra=%p sp=%p\n",
-+		current->comm, task_pid_nr(current), ksig->sig,
-+		(void *)regs->sepc, (void *)regs->ra, frame);
-+#endif
-+
-+	return 0;
-+}
-+
-+static void handle_signal(struct ksignal *ksig, struct pt_regs *regs)
-+{
-+	sigset_t *oldset = sigmask_to_save();
-+	int ret;
-+
-+	/* Are we from a system call? */
-+	if (regs->scause == EXC_SYSCALL) {
-+		/* If so, check system call restarting.. */
-+		switch (regs->a0) {
-+		case -ERESTART_RESTARTBLOCK:
-+		case -ERESTARTNOHAND:
-+			regs->a0 = -EINTR;
-+			break;
-+
-+		case -ERESTARTSYS:
-+			if (!(ksig->ka.sa.sa_flags & SA_RESTART)) {
-+				regs->a0 = -EINTR;
-+				break;
-+			}
-+			/* fallthrough */
-+		case -ERESTARTNOINTR:
-+                        regs->a0 = regs->orig_a0;
-+			regs->sepc -= 0x4;
-+			break;
-+		}
-+	}
-+
-+	/* Set up the stack frame */
-+	ret = setup_rt_frame(ksig, oldset, regs);
-+
-+	signal_setup_done(ret, ksig, 0);
-+}
-+
-+static void do_signal(struct pt_regs *regs)
-+{
-+	struct ksignal ksig;
-+
-+	if (get_signal(&ksig)) {
-+		/* Actually deliver the signal */
-+		handle_signal(&ksig, regs);
-+		return;
-+	}
-+
-+	/* Did we come from a system call? */
-+	if (regs->scause == EXC_SYSCALL) {
-+		/* Restart the system call - no handlers present */
-+		switch (regs->a0) {
-+		case -ERESTARTNOHAND:
-+		case -ERESTARTSYS:
-+		case -ERESTARTNOINTR:
-+                        regs->a0 = regs->orig_a0;
-+			regs->sepc -= 0x4;
-+			break;
-+		case -ERESTART_RESTARTBLOCK:
-+                        regs->a0 = regs->orig_a0;
-+			regs->a7 = __NR_restart_syscall;
-+			regs->sepc -= 0x4;
-+			break;
-+		}
-+	}
-+
-+	/*
-+	 * If there is no signal to deliver, we just put the saved
-+	 * sigmask back.
-+	 */
-+	restore_saved_sigmask();
-+}
-+
-+/*
-+ * notification of userspace execution resumption
-+ * - triggered by the _TIF_WORK_MASK flags
-+ */
-+asmlinkage void do_notify_resume(struct pt_regs *regs,
-+	unsigned long thread_info_flags)
-+{
-+	/* Handle pending signal delivery */
-+	if (thread_info_flags & _TIF_SIGPENDING)
-+		do_signal(regs);
-+
-+	if (thread_info_flags & _TIF_NOTIFY_RESUME) {
-+		clear_thread_flag(TIF_NOTIFY_RESUME);
-+		tracehook_notify_resume(regs);
-+	}
-+}
-diff --git a/arch/riscv/kernel/sys_riscv.c b/arch/riscv/kernel/sys_riscv.c
-new file mode 100644
-index 000000000000..4351be7d0533
---- /dev/null
-+++ b/arch/riscv/kernel/sys_riscv.c
-@@ -0,0 +1,49 @@
++++ b/arch/riscv/include/asm/timex.h
+@@ -0,0 +1,59 @@
 +/*
 + * Copyright (C) 2012 Regents of the University of California
-+ * Copyright (C) 2014 Darius Rad <darius@bluespec.com>
-+ * Copyright (C) 2017 SiFive
 + *
 + *   This program is free software; you can redistribute it and/or
 + *   modify it under the terms of the GNU General Public License
@@ -1630,294 +404,266 @@ index 000000000000..4351be7d0533
 + *   GNU General Public License for more details.
 + */
 +
-+#include <linux/syscalls.h>
-+#include <asm/cmpxchg.h>
-+#include <asm/unistd.h>
++#ifndef _ASM_RISCV_TIMEX_H
++#define _ASM_RISCV_TIMEX_H
 +
-+static long riscv_sys_mmap(unsigned long addr, unsigned long len,
-+			   unsigned long prot, unsigned long flags,
-+			   unsigned long fd, off_t offset,
-+			   unsigned long page_shift_offset)
++#include <asm/param.h>
++
++typedef unsigned long cycles_t;
++
++static inline cycles_t get_cycles(void)
 +{
-+	if (unlikely(offset & (~PAGE_MASK >> page_shift_offset)))
-+		return -EINVAL;
-+	return sys_mmap_pgoff(addr, len, prot, flags, fd,
-+			      offset >> (PAGE_SHIFT - page_shift_offset));
++	cycles_t n;
++
++	__asm__ __volatile__ (
++		"rdtime %0"
++		: "=r" (n));
++	return n;
 +}
 +
 +#ifdef CONFIG_64BIT
-+SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
-+	unsigned long, prot, unsigned long, flags,
-+	unsigned long, fd, off_t, offset)
++static inline uint64_t get_cycles64(void)
 +{
-+	return riscv_sys_mmap(addr, len, prot, flags, fd, offset, 0);
++        return get_cycles();
 +}
 +#else
-+SYSCALL_DEFINE6(mmap2, unsigned long, addr, unsigned long, len,
-+	unsigned long, prot, unsigned long, flags,
-+	unsigned long, fd, off_t, offset)
++static inline uint64_t get_cycles64(void)
 +{
-+	/*
-+	 * Note that the shift for mmap2 is constant (12),
-+	 * regardless of PAGE_SIZE
-+	 */
-+	return riscv_sys_mmap(addr, len, prot, flags, fd, offset, 12);
++	u32 lo, hi, tmp;
++	__asm__ __volatile__ (
++		"1:\n"
++		"rdtimeh %0\n"
++		"rdtime %1\n"
++		"rdtimeh %2\n"
++		"bne %0, %2, 1b"
++		: "=&r" (hi), "=&r" (lo), "=&r" (tmp));
++	return ((u64)hi << 32) | lo;
 +}
-+#endif /* !CONFIG_64BIT */
-diff --git a/arch/riscv/kernel/syscall_table.c b/arch/riscv/kernel/syscall_table.c
-new file mode 100644
-index 000000000000..4e30dc5fb593
---- /dev/null
-+++ b/arch/riscv/kernel/syscall_table.c
-@@ -0,0 +1,25 @@
-+/*
-+ * Copyright (C) 2009 Arnd Bergmann <arnd@arndb.de>
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
++#endif
 +
-+#include <linux/linkage.h>
-+#include <linux/syscalls.h>
-+#include <asm-generic/syscalls.h>
++#define ARCH_HAS_READ_CURRENT_TIMER
 +
-+#undef __SYSCALL
-+#define __SYSCALL(nr, call)	[nr] = (call),
-+
-+void *sys_call_table[__NR_syscalls] = {
-+	[0 ... __NR_syscalls - 1] = sys_ni_syscall,
-+#include <asm/unistd.h>
-+};
-diff --git a/arch/riscv/kernel/vdso/.gitignore b/arch/riscv/kernel/vdso/.gitignore
-new file mode 100644
-index 000000000000..97c2d69d0289
---- /dev/null
-+++ b/arch/riscv/kernel/vdso/.gitignore
-@@ -0,0 +1,2 @@
-+vdso.lds
-+*.tmp
-diff --git a/arch/riscv/kernel/vdso/Makefile b/arch/riscv/kernel/vdso/Makefile
-new file mode 100644
-index 000000000000..523d0a8ac8db
---- /dev/null
-+++ b/arch/riscv/kernel/vdso/Makefile
-@@ -0,0 +1,63 @@
-+# Copied from arch/tile/kernel/vdso/Makefile
-+
-+# Symbols present in the vdso
-+vdso-syms = rt_sigreturn
-+
-+# Files to link into the vdso
-+obj-vdso = $(patsubst %, %.o, $(vdso-syms))
-+
-+# Build rules
-+targets := $(obj-vdso) vdso.so vdso.so.dbg vdso.lds vdso-dummy.o
-+obj-vdso := $(addprefix $(obj)/, $(obj-vdso))
-+
-+obj-y += vdso.o vdso-syms.o
-+CPPFLAGS_vdso.lds += -P -C -U$(ARCH)
-+
-+# Disable gcov profiling for VDSO code
-+GCOV_PROFILE := n
-+
-+# Force dependency
-+$(obj)/vdso.o: $(obj)/vdso.so
-+
-+# link rule for the .so file, .lds has to be first
-+SYSCFLAGS_vdso.so.dbg = $(c_flags)
-+$(obj)/vdso.so.dbg: $(src)/vdso.lds $(obj-vdso) FORCE
-+	$(call if_changed,vdsold)
-+
-+# We also create a special relocatable object that should mirror the symbol
-+# table and layout of the linked DSO.  With ld -R we can then refer to
-+# these symbols in the kernel code rather than hand-coded addresses.
-+
-+SYSCFLAGS_vdso.so.dbg = -shared -s -Wl,-soname=linux-vdso.so.1 \
-+                            $(call cc-ldoption, -Wl$(comma)--hash-style=both)
-+$(obj)/vdso-dummy.o: $(src)/vdso.lds $(obj)/rt_sigreturn.o FORCE
-+	$(call if_changed,vdsold)
-+
-+LDFLAGS_vdso-syms.o := -r -R
-+$(obj)/vdso-syms.o: $(obj)/vdso-dummy.o FORCE
-+	$(call if_changed,ld)
-+
-+# strip rule for the .so file
-+$(obj)/%.so: OBJCOPYFLAGS := -S
-+$(obj)/%.so: $(obj)/%.so.dbg FORCE
-+	$(call if_changed,objcopy)
-+
-+# actual build commands
-+# The DSO images are built using a special linker script
-+# Add -lgcc so rv32 gets static muldi3 and lshrdi3 definitions.
-+# Make sure only to export the intended __vdso_xxx symbol offsets.
-+quiet_cmd_vdsold = VDSOLD  $@
-+      cmd_vdsold = $(CC) $(KCFLAGS) -nostdlib $(SYSCFLAGS_$(@F)) \
-+                           -Wl,-T,$(filter-out FORCE,$^) -o $@.tmp -lgcc && \
-+                   $(CROSS_COMPILE)objcopy \
-+                           $(patsubst %, -G __vdso_%, $(vdso-syms)) $@.tmp $@
-+
-+# install commands for the unstripped file
-+quiet_cmd_vdso_install = INSTALL $@
-+      cmd_vdso_install = cp $(obj)/$@.dbg $(MODLIB)/vdso/$@
-+
-+vdso.so: $(obj)/vdso.so.dbg
-+	@mkdir -p $(MODLIB)/vdso
-+	$(call cmd,vdso_install)
-+
-+vdso_install: vdso.so
-diff --git a/arch/riscv/kernel/vdso/rt_sigreturn.S b/arch/riscv/kernel/vdso/rt_sigreturn.S
-new file mode 100644
-index 000000000000..f5aa3d72acfb
---- /dev/null
-+++ b/arch/riscv/kernel/vdso/rt_sigreturn.S
-@@ -0,0 +1,24 @@
-+/*
-+ * Copyright (C) 2014 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#include <linux/linkage.h>
-+#include <asm/unistd.h>
-+
-+	.text
-+ENTRY(__vdso_rt_sigreturn)
-+	.cfi_startproc
-+	.cfi_signal_frame
-+	li a7, __NR_rt_sigreturn
-+	scall
-+	.cfi_endproc
-+ENDPROC(__vdso_rt_sigreturn)
-diff --git a/arch/riscv/kernel/vdso/vdso.S b/arch/riscv/kernel/vdso/vdso.S
-new file mode 100644
-index 000000000000..7055de5f9174
---- /dev/null
-+++ b/arch/riscv/kernel/vdso/vdso.S
-@@ -0,0 +1,27 @@
-+/*
-+ * Copyright (C) 2014 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#include <linux/init.h>
-+#include <linux/linkage.h>
-+#include <asm/page.h>
-+
-+	__PAGE_ALIGNED_DATA
-+
-+	.globl vdso_start, vdso_end
-+	.balign PAGE_SIZE
-+vdso_start:
-+	.incbin "arch/riscv/kernel/vdso/vdso.so"
-+	.balign PAGE_SIZE
-+vdso_end:
-+
-+	.previous
-diff --git a/arch/riscv/kernel/vdso/vdso.lds.S b/arch/riscv/kernel/vdso/vdso.lds.S
-new file mode 100644
-index 000000000000..7142e1aafc30
---- /dev/null
-+++ b/arch/riscv/kernel/vdso/vdso.lds.S
-@@ -0,0 +1,77 @@
-+/*
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+OUTPUT_ARCH(riscv)
-+
-+SECTIONS
++static inline int read_current_timer(unsigned long *timer_val)
 +{
-+	. = SIZEOF_HEADERS;
++	*timer_val = get_cycles();
++	return 0;
++}
 +
-+	.hash		: { *(.hash) }			:text
-+	.gnu.hash	: { *(.gnu.hash) }
-+	.dynsym		: { *(.dynsym) }
-+	.dynstr		: { *(.dynstr) }
-+	.gnu.version	: { *(.gnu.version) }
-+	.gnu.version_d	: { *(.gnu.version_d) }
-+	.gnu.version_r	: { *(.gnu.version_r) }
++#endif /* _ASM_RISCV_TIMEX_H */
+diff --git a/arch/riscv/lib/delay.c b/arch/riscv/lib/delay.c
+new file mode 100644
+index 000000000000..1cc4ac3964b4
+--- /dev/null
++++ b/arch/riscv/lib/delay.c
+@@ -0,0 +1,110 @@
++/*
++ * Copyright (C) 2012 Regents of the University of California
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
 +
-+	.note		: { *(.note.*) }		:text	:note
-+	.dynamic	: { *(.dynamic) }		:text	:dynamic
++#include <linux/delay.h>
++#include <linux/param.h>
++#include <linux/timex.h>
++#include <linux/export.h>
 +
-+	.eh_frame_hdr	: { *(.eh_frame_hdr) }		:text	:eh_frame_hdr
-+	.eh_frame	: { KEEP (*(.eh_frame)) }	:text
++/*
++ * This is copies from arch/arm/include/asm/delay.h
++ *
++ * Loop (or tick) based delay:
++ *
++ * loops = loops_per_jiffy * jiffies_per_sec * delay_us / us_per_sec
++ *
++ * where:
++ *
++ * jiffies_per_sec = HZ
++ * us_per_sec = 1000000
++ *
++ * Therefore the constant part is HZ / 1000000 which is a small
++ * fractional number. To make this usable with integer math, we
++ * scale up this constant by 2^31, perform the actual multiplication,
++ * and scale the result back down by 2^31 with a simple shift:
++ *
++ * loops = (loops_per_jiffy * delay_us * UDELAY_MULT) >> 31
++ *
++ * where:
++ *
++ * UDELAY_MULT = 2^31 * HZ / 1000000
++ *             = (2^31 / 1000000) * HZ
++ *             = 2147.483648 * HZ
++ *             = 2147 * HZ + 483648 * HZ / 1000000
++ *
++ * 31 is the biggest scale shift value that won't overflow 32 bits for
++ * delay_us * UDELAY_MULT assuming HZ <= 1000 and delay_us <= 2000.
++ */
++#define MAX_UDELAY_US	2000
++#define MAX_UDELAY_HZ	1000
++#define UDELAY_MULT	(2147UL * HZ + 483648UL * HZ / 1000000UL)
++#define UDELAY_SHIFT	31
 +
-+	.rodata		: { *(.rodata .rodata.* .gnu.linkonce.r.*) }
++#if HZ > MAX_UDELAY_HZ
++#error "HZ > MAX_UDELAY_HZ"
++#endif
 +
-+	/*
-+	 * This linker script is used both with -r and with -shared.
-+	 * For the layouts to match, we need to skip more than enough
-+	 * space for the dynamic symbol table, etc. If this amount is
-+	 * insufficient, ld -shared will error; simply increase it here.
-+	 */
-+	. = 0x800;
-+	.text		: { *(.text .text.*) }		:text
++/*
++ * RISC-V supports both UDELAY and NDELAY.  This is largely the same as above,
++ * but with different constants.  I added 10 bits to the shift to get this, but
++ * the result is that I need a 64-bit multiply, which is slow on 32-bit
++ * platforms.
++ *
++ * NDELAY_MULT = 2^41 * HZ / 1000000000
++ *             = (2^41 / 1000000000) * HZ
++ *             = 2199.02325555 * HZ
++ *             = 2199 * HZ + 23255550 * HZ / 1000000000
++ *
++ * The maximum here is to avoid 64-bit overflow, but it isn't checked as it
++ * won't happen.
++ */
++#define MAX_NDELAY_NS   (1ULL << 42)
++#define MAX_NDELAY_HZ	MAX_UDELAY_HZ
++#define NDELAY_MULT	((unsigned long long)(2199ULL * HZ + 23255550ULL * HZ / 1000000000ULL))
++#define NDELAY_SHIFT	41
 +
-+	.data		: {
-+		*(.got.plt) *(.got)
-+		*(.data .data.* .gnu.linkonce.d.*)
-+		*(.dynbss)
-+		*(.bss .bss.* .gnu.linkonce.b.*)
++#if HZ > MAX_NDELAY_HZ
++#error "HZ > MAX_NDELAY_HZ"
++#endif
++
++void __delay(unsigned long cycles)
++{
++	u64 t0 = get_cycles();
++
++	while ((unsigned long)(get_cycles() - t0) < cycles)
++		cpu_relax();
++}
++
++void udelay(unsigned long usecs)
++{
++	unsigned long ucycles = usecs * lpj_fine * UDELAY_MULT;
++
++	if (unlikely(usecs > MAX_UDELAY_US)) {
++		__delay((u64)usecs * riscv_timebase / 1000000ULL);
++		return;
 +	}
++
++	__delay(ucycles >> UDELAY_SHIFT);
++}
++EXPORT_SYMBOL(udelay);
++
++void ndelay(unsigned long nsecs)
++{
++	/*
++	 * This doesn't bother checking for overflow, as it won't happen (it's
++	 * an hour) of delay.
++	 */
++	unsigned long long ncycles = nsecs * lpj_fine * NDELAY_MULT;
++	__delay(ncycles >> NDELAY_SHIFT);
++}
++EXPORT_SYMBOL(ndelay);
+diff --git a/arch/riscv/mm/ioremap.c b/arch/riscv/mm/ioremap.c
+new file mode 100644
+index 000000000000..e99194a4077e
+--- /dev/null
++++ b/arch/riscv/mm/ioremap.c
+@@ -0,0 +1,92 @@
++/*
++ * (C) Copyright 1995 1996 Linus Torvalds
++ * (C) Copyright 2012 Regents of the University of California
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++#include <linux/export.h>
++#include <linux/mm.h>
++#include <linux/vmalloc.h>
++#include <linux/io.h>
++
++#include <asm/pgtable.h>
++
++/*
++ * Remap an arbitrary physical address space into the kernel virtual
++ * address space. Needed when the kernel wants to access high addresses
++ * directly.
++ *
++ * NOTE! We need to allow non-page-aligned mappings too: we will obviously
++ * have to convert them into an offset in a page-aligned mapping, but the
++ * caller shouldn't need to know that small detail.
++ */
++static void __iomem *__ioremap_caller(phys_addr_t addr, size_t size,
++	pgprot_t prot, void *caller)
++{
++	phys_addr_t last_addr;
++	unsigned long offset, vaddr;
++	struct vm_struct *area;
++
++	/* Disallow wrap-around or zero size */
++	last_addr = addr + size - 1;
++	if (!size || last_addr < addr)
++		return NULL;
++
++	/* Page-align mappings */
++	offset = addr & (~PAGE_MASK);
++	addr &= PAGE_MASK;
++	size = PAGE_ALIGN(size + offset);
++
++	area = get_vm_area_caller(size, VM_IOREMAP, caller);
++	if (!area)
++		return NULL;
++	vaddr = (unsigned long)area->addr;
++
++	if (ioremap_page_range(vaddr, vaddr + size, addr, prot)) {
++		free_vm_area(area);
++		return NULL;
++	}
++
++	return (void __iomem *)(vaddr + offset);
 +}
 +
 +/*
-+ * We must supply the ELF program headers explicitly to get just one
-+ * PT_LOAD segment, and set the flags explicitly to make segments read-only.
++ * ioremap     -   map bus memory into CPU space
++ * @offset:    bus address of the memory
++ * @size:      size of the resource to map
++ *
++ * ioremap performs a platform specific sequence of operations to
++ * make bus memory CPU accessible via the readb/readw/readl/writeb/
++ * writew/writel functions and the other mmio helpers. The returned
++ * address is not guaranteed to be usable directly as a virtual
++ * address.
++ *
++ * Must be freed with iounmap.
 + */
-+PHDRS
++void __iomem *ioremap(phys_addr_t offset, unsigned long size)
 +{
-+	text		PT_LOAD		FLAGS(5) FILEHDR PHDRS; /* PF_R|PF_X */
-+	dynamic		PT_DYNAMIC	FLAGS(4);		/* PF_R */
-+	note		PT_NOTE		FLAGS(4);		/* PF_R */
-+	eh_frame_hdr	PT_GNU_EH_FRAME;
++	return __ioremap_caller(offset, size, PAGE_KERNEL,
++		__builtin_return_address(0));
 +}
++EXPORT_SYMBOL(ioremap);
 +
-+/*
-+ * This controls what symbols we export from the DSO.
++
++/**
++ * iounmap - Free a IO remapping
++ * @addr: virtual address from ioremap_*
++ *
++ * Caller must ensure there is only one unmapping for the same pointer.
 + */
-+VERSION
++void iounmap(void __iomem *addr)
 +{
-+	LINUX_2.6 {
-+	global:
-+		__vdso_rt_sigreturn;
-+		__vdso_cmpxchg32;
-+		__vdso_cmpxchg64;
-+	local: *;
-+	};
++	vunmap((void *)((unsigned long)addr & PAGE_MASK));
 +}
++EXPORT_SYMBOL(iounmap);
 -- 
 2.13.5
 
