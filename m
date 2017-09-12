@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:34784
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:34733
         "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751733AbdILXx3 (ORCPT
+        with ESMTP id S1751651AbdILXxW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Sep 2017 19:53:29 -0400
+        Tue, 12 Sep 2017 19:53:22 -0400
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH 07/11] selftests: sync: use TEST_CUSTOM_PROGS instead of TEST_PROGS
-Date: Tue, 12 Sep 2017 17:53:00 -0600
-Message-Id: <00e68264b8ea46158a1fb2f09985d6b34595809d.1505257614.git.shuahkh@osg.samsung.com>
+Subject: [PATCH 04/11] selftests: lib.mk: fix test executable status check to use full path
+Date: Tue, 12 Sep 2017 17:52:57 -0600
+Message-Id: <d5a8c0ed220b6d14e46018447f5a57187a1dccfd.1505257614.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1505257614.git.shuahkh@osg.samsung.com>
 References: <cover.1505257614.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1505257614.git.shuahkh@osg.samsung.com>
@@ -17,33 +17,28 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: yamada.masahiro@socionext.com, mmarek@suse.com, shuah@kernel.org, tglx@linutronix.de, mingo@redhat.com, peterz@infradead.org, bamvor.zhangjian@linaro.org, emilio.lopez@collabora.co.uk, corbet@lwn.net
 Cc: Shuah Khan <shuahkh@osg.samsung.com>, tytso@mit.edu, ebiederm@xmission.com, Tim.Bird@sony.com, gregkh@linuxfoundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-lib.mk var TEST_CUSTOM_PROGS is for tests that need custom build
-rules. TEST_PROGS is used for test shell scripts. Fix it to use
-TEST_CUSTOM_PROGS. lib.mk will run and install them.
+Fix test executable status check to use full path for make O=dir case,m
+when tests are relocated to user specified object directory. Without the
+full path, this check fails to find the file and fails the test.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/sync/Makefile | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ tools/testing/selftests/lib.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/sync/Makefile b/tools/testing/selftests/sync/Makefile
-index 4981c6b6d050..43db80b71e80 100644
---- a/tools/testing/selftests/sync/Makefile
-+++ b/tools/testing/selftests/sync/Makefile
-@@ -2,9 +2,11 @@ CFLAGS += -O2 -g -std=gnu89 -pthread -Wall -Wextra
- CFLAGS += -I../../../../usr/include/
- LDFLAGS += -pthread
- 
--TEST_PROGS = sync_test
-+# lib.mk TEST_CUSTOM_PROGS var is for custome tests that need special
-+# build rules. lib.mk will run and install them.
-+TEST_CUSTOM_PROGS = sync_test
- 
--all: $(TEST_PROGS)
-+all: $(TEST_CUSTOM_PROGS)
- 
- include ../lib.mk
- 
+diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
+index e779c8758e15..22032ba802ba 100644
+--- a/tools/testing/selftests/lib.mk
++++ b/tools/testing/selftests/lib.mk
+@@ -21,7 +21,7 @@ define RUN_TESTS
+ 		test_num=`echo $$test_num+1 | bc`;	\
+ 		echo "selftests: $$BASENAME_TEST";	\
+ 		echo "========================================";	\
+-		if [ ! -x $$BASENAME_TEST ]; then	\
++		if [ ! -x $$TEST ]; then	\
+ 			echo "selftests: Warning: file $$BASENAME_TEST is not executable, correct this.";\
+ 			echo "not ok 1..$$test_num selftests: $$BASENAME_TEST [FAIL]"; \
+ 		else					\
 -- 
 2.11.0
 
