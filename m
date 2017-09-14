@@ -1,107 +1,133 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:48087 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751494AbdINLSw (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:63914 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751500AbdINLYJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Sep 2017 07:18:52 -0400
+        Thu, 14 Sep 2017 07:24:09 -0400
+Received: from mail-yw0-f181.google.com (mail-yw0-f181.google.com [209.85.161.181]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id v8EBNorh026177
+        for <linux-kbuild@vger.kernel.org>; Thu, 14 Sep 2017 20:23:51 +0900
+Received: by mail-yw0-f181.google.com with SMTP id w9so28395ywi.11
+        for <linux-kbuild@vger.kernel.org>; Thu, 14 Sep 2017 04:23:51 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAAqcGHmSdO_xorBEUnGiG6VuY4VOQd4jfLzKSNQ=DUb1wK-Nww@mail.gmail.com>
+References: <20170816110855.6021-1-riku.voipio@linaro.org> <CAK7LNASm98uy4vC7c3UxM10fx422jHwg+QUmadcpc+_TvECqew@mail.gmail.com>
+ <CAK7LNARdpaJ6q16_XXqkuAC-fP1X=gZQn3Z31dftab702HcUGw@mail.gmail.com> <CAAqcGHmSdO_xorBEUnGiG6VuY4VOQd4jfLzKSNQ=DUb1wK-Nww@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: (bin)rpm-pkg: fix .version handling
-Date: Thu, 14 Sep 2017 20:17:03 +0900
-Message-Id: <1505387823-2033-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Thu, 14 Sep 2017 20:23:09 +0900
+Message-ID: <CAK7LNAT1B59U6y8Z4uV7F-M4VVkSKgjdPuTgJ+SUTaykdWredw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] scripts/package/Makefile: make revision update a function
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>
 
-The "Release:" field of the spec file is determined based on the
-.version file.
+2017-09-11 19:48 GMT+09:00 Riku Voipio <riku.voipio@linaro.org>:
+> On 8 September 2017 at 18:40, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> 2017-09-08 2:04 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+>>> Hi Riku,
+>>>
+>>>
+>>> 2017-08-16 20:08 GMT+09:00  <riku.voipio@linaro.org>:
+>>>> From: Riku Voipio <riku.voipio@linaro.org>
+>>>>
+>>>> The updated deb-pkg and bindeb-pkg will use the same snippet,
+>>>> so make it reusable.
+>>>>
+>>>> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+>>>> ---
+>>>>  scripts/package/Makefile | 12 +++++++-----
+>>>>  1 file changed, 7 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+>>>> index 71b4a8af9d4d..9867638896ad 100644
+>>>> --- a/scripts/package/Makefile
+>>>> +++ b/scripts/package/Makefile
+>>>> @@ -44,14 +44,18 @@ tar -cz $(RCS_TAR_IGNORE) -f $(2).tar.gz \
+>>>>         $(addprefix $(2)/,$(TAR_CONTENT) $(3)); \
+>>>>  rm -f $(2) $(objtree)/.scmversion
+>>>>
+>>>> +quiet_cmd_updateversion = UPDATEVERSION
+>>>> +      cmd_updateversion = \
+>>>> +       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version; \
+>>>> +       mv -f $(objtree)/.tmp_version $(objtree)/.version
+>>>> +
+>>>>  # rpm-pkg
+>>>>  # ---------------------------------------------------------------------------
+>>>>  rpm-pkg rpm: FORCE
+>>>>         $(MAKE) clean
+>>>>         $(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
+>>>>         $(call cmd,src_tar,$(KERNELPATH),kernel.spec)
+>>>> -       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+>>>> -       mv -f $(objtree)/.tmp_version $(objtree)/.version
+>>>> +       $(call cmd,updateversion)
+>>>>         rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
+>>>>         rm $(KERNELPATH).tar.gz kernel.spec
+>>>>
+>>>> @@ -60,9 +64,7 @@ rpm-pkg rpm: FORCE
+>>>>  binrpm-pkg: FORCE
+>>>>         $(MAKE) KBUILD_SRC=
+>>>>         $(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
+>>>> -       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+>>>> -       mv -f $(objtree)/.tmp_version $(objtree)/.version
+>>>> -
+>>>> +       $(call cmd,updateversion)
+>>>>         rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
+>>>>                 $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
+>>>>         rm binkernel.spec
+>>>
+>>>
+>>>
+>>> scripts/mkversion is pretty small.
+>>> I think scripts/mkversion can also update .version
+>>>
+>>> For example,
+>>>
+>>>
+>>>
+>>>
+>>> if [ ! -f .version ]
+>>> then
+>>>     version=1
+>>> else
+>>>     version=$(expr 0$(cat .version) + 1)
+>>> fi
+>>>
+>>> echo $version > .version
+>>> echo $version
+>>>
+>>>
+>>>
+>>>
+>>> Then, remove the duplicated code from the Makefile.
+>>
+>>
+>>
+>> Sorry, please let me think about this carefully.
+>>
+>> We have simliar code in
+>> scripts/link-vmlinux.sh and scripts/mkversion
+>
+> Oh. Looking deeper, running "make binrpm" twice in a row incrediments
+> the .version with two. I think we can leave updating version to
+> link-mklinux and drop updating .version from
+> scripts/packaging/Makefile. The actual use of mkversion is then to
+> predict the next version, and we can stop using .version directly in
+> builddeb since the build will outdate it.
+>
 
-However, the .version file is not copied to the source tar file.
-So, when we build the kernel from the source package, the UTS_VERSION
-always indicates #1.  This does not match with "rpm -q".
+Even worse, the spec file claims a different number from
+the one embedded in the kernel image
+(for both rpm-pkg and binrpm-pkg).
 
-The kernel UTS_VERSION and "rpm -q" do not agree for binrpm-pkg, either.
-Please note the kernel has already been built before the spec file is
-created.  Currently, mkspec invokes mkversion.  This script returns an
-incremented version.  So, the "Release:" field of the spec file is
-greater than the version in the kernel by one.
+I sent a patch.  Seems working as far as I tested.
 
-For the source package build (where .version file is missing), we can
-give KBUILD_BUILD_VERSION=%{release} to the build command.
 
-For the binary package build, we can simply read out the .version file
-because it contains the version number that was used for building the
-kernel image.
 
-We can remove scripts/mkversion because scripts/package/Makefile need
-not touch the .version file.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- scripts/mkversion        | 6 ------
- scripts/package/Makefile | 5 -----
- scripts/package/mkspec   | 4 ++--
- 3 files changed, 2 insertions(+), 13 deletions(-)
- delete mode 100644 scripts/mkversion
-
-diff --git a/scripts/mkversion b/scripts/mkversion
-deleted file mode 100644
-index c12addc..0000000
---- a/scripts/mkversion
-+++ /dev/null
-@@ -1,6 +0,0 @@
--if [ ! -f .version ]
--then
--    echo 1
--else
--    expr 0`cat .version` + 1
--fi
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 71b4a8a..73f9f31 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -50,8 +50,6 @@ rpm-pkg rpm: FORCE
- 	$(MAKE) clean
- 	$(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
- 	$(call cmd,src_tar,$(KERNELPATH),kernel.spec)
--	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
--	mv -f $(objtree)/.tmp_version $(objtree)/.version
- 	rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
- 	rm $(KERNELPATH).tar.gz kernel.spec
- 
-@@ -60,9 +58,6 @@ rpm-pkg rpm: FORCE
- binrpm-pkg: FORCE
- 	$(MAKE) KBUILD_SRC=
- 	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
--	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
--	mv -f $(objtree)/.tmp_version $(objtree)/.version
--
- 	rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
- 		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
- 	rm binkernel.spec
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index bb43f15..c82ef1b 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -29,7 +29,7 @@ echo "Summary: The Linux Kernel"
- echo "Version: $__KERNELRELEASE"
- # we need to determine the NEXT version number so that uname and
- # rpm -q will agree
--echo "Release: `. $srctree/scripts/mkversion`"
-+echo "Release: $(cat .version)"
- echo "License: GPL"
- echo "Group: System Environment/Kernel"
- echo "Vendor: The Linux Community"
-@@ -77,7 +77,7 @@ fi
- echo "%build"
- 
- if ! $PREBUILT; then
--echo "make clean && make %{?_smp_mflags}"
-+echo "make clean && make %{?_smp_mflags} KBUILD_BUILD_VERSION=%{release}"
- echo ""
- fi
- 
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
