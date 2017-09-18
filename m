@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:57590 "EHLO
+Received: from mail.linuxfoundation.org ([140.211.169.12]:57540 "EHLO
         mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753111AbdIRJYN (ORCPT
+        with ESMTP id S1753079AbdIRJYC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Sep 2017 05:24:13 -0400
-Date: Mon, 18 Sep 2017 11:24:24 +0200
+        Mon, 18 Sep 2017 05:24:02 -0400
+Date: Mon, 18 Sep 2017 11:24:12 +0200
 From: Greg K-H <gregkh@linuxfoundation.org>
 Subject: Re: [PATCH] kbuild: rpm-pkg: delete firmware_install to fix build
  error
-Message-ID: <20170918092424.GB21910@kroah.com>
+Message-ID: <20170918092412.GA21910@kroah.com>
 References: <1505725956-11012-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -35,5 +35,14 @@ On Mon, Sep 18, 2017 at 06:12:36PM +0900, Masahiro Yamada wrote:
 > 
 > Fixes: 5620a0d1aacd ("firmware: delete in-kernel firmware")
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
+>  scripts/package/mkspec | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Nice find, what's the odds the debian package "script" also needs this
+fix?
+
+thanks,
+
+greg k-h
