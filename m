@@ -1,43 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:42365 "EHLO
-        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751280AbdIPVif (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:61348 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752998AbdIRJXd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 16 Sep 2017 17:38:35 -0400
-Subject: Re: [PATCH v8 10/18] RISC-V: Init and Halt Code
-References: <20170912215715.4186-1-palmer@dabbelt.com>
- <20170912215715.4186-11-palmer@dabbelt.com>
- <799b75ef-f512-3182-bc6d-cc79afedf282@linaro.org>
- <98372099-25e1-f340-f204-8e9a10d659f9@oss-tech.org>
- <173e7b29-7a1d-ebe9-cdad-9ff90d3c485f@linaro.org>
-From: Dmitriy Cherkasov <dmitriy@oss-tech.org>
-Message-ID: <e069a544-3087-6493-e2b1-8181abc4c051@oss-tech.org>
-Date: Sat, 16 Sep 2017 14:38:26 -0700
-MIME-Version: 1.0
-In-Reply-To: <173e7b29-7a1d-ebe9-cdad-9ff90d3c485f@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+        Mon, 18 Sep 2017 05:23:33 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: deb-pkg: remove firmware package support
+Date: Mon, 18 Sep 2017 18:22:19 +0900
+Message-Id: <1505726539-30725-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Lezcano <daniel.lezcano@linaro.org>, Palmer Dabbelt <palmer@dabbelt.com>, peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>
-Cc: yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, andriy.shevchenko@linux.intel.com, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org
+To: linux-kbuild@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Markus Trippelsdorf <markus@trippelsdorf.de>, Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-On 09/16/2017 06:28 AM, Daniel Lezcano wrote:
-> On 16/09/2017 08:23, Dmitriy Cherkasov wrote:
->> On 09/13/2017 11:15 AM, Daniel Lezcano wrote:
+Commit 5620a0d1aacd ("firmware: delete in-kernel firmware") deleted
+in-kernel firmware support, including the firmware install command.
 
->>>
->>> Where is get_cycles64() ?
->>
->> This is in asm/timex.h. Should this be split into a separate asm header
->> ala arm64?
-> 
-> No, it is fine but may be it is get_cycles(), no get_cycles64(), right?
-> 
+So, the firmware package does not make sense any more.  Remove it.
 
-get_cycles() returns a 32 or 64-bit value depending on machine register width, 
-using one assembly instruction to retrieve it.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-get_cycles64() always returns a 64-bit value at the expense of a few more 
-instructions on 32-bit systems.
+ scripts/package/builddeb | 22 +---------------------
+ 1 file changed, 1 insertion(+), 21 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index aad6700..0bc8747 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -92,12 +92,10 @@ else
+ fi
+ sourcename=$KDEB_SOURCENAME
+ tmpdir="$objtree/debian/tmp"
+-fwdir="$objtree/debian/fwtmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
+ dbg_dir="$objtree/debian/dbgtmp"
+ packagename=linux-image-$version
+-fwpackagename=linux-firmware-image-$version
+ kernel_headers_packagename=linux-headers-$version
+ libc_headers_packagename=linux-libc-dev
+ dbg_packagename=$packagename-dbg
+@@ -126,10 +124,9 @@ esac
+ BUILD_DEBUG="$(grep -s '^CONFIG_DEBUG_INFO=y' $KCONFIG_CONFIG || true)"
+ 
+ # Setup the directory structure
+-rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" $objtree/debian/files
++rm -rf "$tmpdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" $objtree/debian/files
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p "$tmpdir/lib" "$tmpdir/boot"
+-mkdir -p "$fwdir/lib/firmware/$version/"
+ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
+ 
+ # Build and install the kernel
+@@ -306,7 +303,6 @@ else
+ 	cat <<EOF >> debian/control
+ 
+ Package: $packagename
+-Suggests: $fwpackagename
+ Architecture: any
+ Description: Linux kernel, version $version
+  This package contains the Linux kernel, modules and corresponding other
+@@ -345,22 +341,6 @@ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
+  This is useful for people who need to build external modules
+ EOF
+ 
+-# Do we have firmware? Move it out of the way and build it into a package.
+-if [ -e "$tmpdir/lib/firmware" ]; then
+-	mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
+-	rmdir "$tmpdir/lib/firmware"
+-
+-	cat <<EOF >> debian/control
+-
+-Package: $fwpackagename
+-Architecture: all
+-Description: Linux kernel firmware, version $version
+- This package contains firmware from the Linux kernel, version $version.
+-EOF
+-
+-	create_package "$fwpackagename" "$fwdir"
+-fi
+-
+ cat <<EOF >> debian/control
+ 
+ Package: $libc_headers_packagename
+-- 
+2.7.4
+
