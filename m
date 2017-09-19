@@ -1,85 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:60231
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750964AbdIRXO1 (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:13447 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750973AbdISLiE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Sep 2017 19:14:27 -0400
-Subject: Re: [PATCH 01/11] Makefile: kselftest and kselftest-clean fail for
- make O=dir case
-References: <cover.1505257614.git.shuahkh@osg.samsung.com>
- <be0b069dde5b07b543498e274c3a9cc0c6e817c0.1505257614.git.shuahkh@osg.samsung.com>
-From: Shuah Khan <shuahkh@osg.samsung.com>
-Message-ID: <c5600059-fc62-0ceb-d730-95d94c9a625d@osg.samsung.com>
-Date: Mon, 18 Sep 2017 17:14:24 -0600
+        Tue, 19 Sep 2017 07:38:04 -0400
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: [PATCH] kbuild: comments cleanup in Makefile.lib
+Date: Tue, 19 Sep 2017 19:36:07 +0800
+Message-ID: <1505820967-17302-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <be0b069dde5b07b543498e274c3a9cc0c6e817c0.1505257614.git.shuahkh@osg.samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, mmarek@suse.com
-Cc: shuah@kernel.org, tglx@linutronix.de, mingo@redhat.com, peterz@infradead.org, bamvor.zhangjian@linaro.org, emilio.lopez@collabora.co.uk, corbet@lwn.net, tytso@mit.edu, ebiederm@xmission.com, Tim.Bird@sony.com, gregkh@linuxfoundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, mmarek@suse.com
 
-On 09/12/2017 05:52 PM, Shuah Khan wrote:
-> kselftest and kselftest-clean targets fail when object directory is
-> specified to relocate objects. Fix it so it can find the source tree
-> to build from.
-> 
-> make O=/tmp/kselftest_top kselftest
-> 
-> make[1]: Entering directory '/tmp/kselftest_top'
-> make[2]: Entering directory '/tmp/kselftest_top'
-> make[2]: *** tools/testing/selftests: No such file or directory.  Stop.
-> make[2]: Leaving directory '/tmp/kselftest_top'
-> ./linux-kselftest/Makefile:1185: recipe for target
-> 'kselftest' failed
-> make[1]: *** [kselftest] Error 2
-> make[1]: Leaving directory '/tmp/kselftest_top'
-> Makefile:145: recipe for target 'sub-make' failed
-> make: *** [sub-make] Error 2
-> 
-> Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+It has:
+1. Move comments close to what it want to comment.
+2. Comments cleanup & improvement.
 
-Hi Masahiro/Michal,
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+ scripts/Makefile.lib | 19 ++++++-------------
+ 1 file changed, 6 insertions(+), 13 deletions(-)
 
-Is it okay to take this patch via linux-kselftest git? If you are okay
-with that, please Ack it and I will plan to include this in my update.
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 58c05e5..7de9c08 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -4,8 +4,7 @@ ccflags-y  += $(EXTRA_CFLAGS)
+ cppflags-y += $(EXTRA_CPPFLAGS)
+ ldflags-y  += $(EXTRA_LDFLAGS)
+ 
+-#
+-# flags that take effect in sub directories
++# flags that take effect in current and sub directories
+ export KBUILD_SUBDIR_ASFLAGS := $(KBUILD_SUBDIR_ASFLAGS) $(subdir-asflags-y)
+ export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
+ 
+@@ -14,14 +13,16 @@ export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
+ 
+ # When an object is listed to be built compiled-in and modular,
+ # only build the compiled-in version
+-
+ obj-m := $(filter-out $(obj-y),$(obj-m))
+ 
+ # Libraries are always collected in one lib file.
+ # Filter out objects already built-in
+-
+ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
+ 
++# Determine modorder.
++# Unfortunately, we don't have information about ordering between -y
++# and -m subdirs.  Just put -y's first.
++modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
+ 
+ # Handle objects in subdirs
+ # ---------------------------------------------------------------------------
+@@ -29,12 +30,6 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
+ #   and add the directory to the list of dirs to descend into: $(subdir-y)
+ # o if we encounter foo/ in $(obj-m), remove it from $(obj-m)
+ #   and add the directory to the list of dirs to descend into: $(subdir-m)
+-
+-# Determine modorder.
+-# Unfortunately, we don't have information about ordering between -y
+-# and -m subdirs.  Just put -y's first.
+-modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
+-
+ __subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
+ subdir-y	+= $(__subdir-y)
+ __subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
+@@ -43,10 +38,9 @@ obj-y		:= $(patsubst %/, %/built-in.o, $(obj-y))
+ obj-m		:= $(filter-out %/, $(obj-m))
+ 
+ # Subdirectories we need to descend into
+-
+ subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
+ 
+-# if $(foo-objs) exists, foo.o is a composite object
++# if $(foo-objs) or $(foo-y) or $(foo-m) exists, foo.o is a composite object
+ multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
+ multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))), $(m))))
+ multi-used   := $(multi-used-y) $(multi-used-m)
+@@ -90,7 +84,6 @@ subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
+ obj-dirs	:= $(addprefix $(obj)/,$(obj-dirs))
+ 
+ # These flags are needed for modversions and compiling, so we define them here
+-# already
+ # $(modname_flags) #defines KBUILD_MODNAME as the name of the module it will
+ # end up in (or would, if it gets compiled in)
+ # Note: Files that end up in two or more modules are compiled without the
+-- 
+2.1.0
 
-thanks,
--- Shuah
 
-
-> ---
->  Makefile | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index eccb8d704c23..6a85322d0b3e 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1180,13 +1180,18 @@ headers_check: headers_install
->  # ---------------------------------------------------------------------------
->  # Kernel selftest
->  
-> +PHONY += __kselftest
-> +	kselftest_src := tools/testing/selftests
-> +	ifneq ($(KBUILD_SRC),)
-> +		kselftest_src := $(KBUILD_SRC)/tools/testing/selftests
-> +	endif
->  PHONY += kselftest
-> -kselftest:
-> -	$(Q)$(MAKE) -C tools/testing/selftests run_tests
-> +kselftest: __kselftest
-> +	$(Q)$(MAKE) -C $(kselftest_src) run_tests
->  
->  PHONY += kselftest-clean
-> -kselftest-clean:
-> -	$(Q)$(MAKE) -C tools/testing/selftests clean
-> +kselftest-clean: __kselftest
-> +	$(Q)$(MAKE) -C $(kselftest_src) clean
->  
->  PHONY += kselftest-merge
->  kselftest-merge:
-> 
 
