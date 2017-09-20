@@ -1,114 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:49472
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:49507
         "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750938AbdITRaZ (ORCPT
+        with ESMTP id S1751718AbdITRcw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Sep 2017 13:30:25 -0400
-Subject: Re: [PATCH 01/11] Makefile: kselftest and kselftest-clean fail for
- make O=dir case
-References: <cover.1505257614.git.shuahkh@osg.samsung.com>
- <be0b069dde5b07b543498e274c3a9cc0c6e817c0.1505257614.git.shuahkh@osg.samsung.com>
- <c5600059-fc62-0ceb-d730-95d94c9a625d@osg.samsung.com>
- <CAK7LNAQUMCd8QMn9WfZxPUyy-g1BrWvnKxZVELqZGjtCuVWApQ@mail.gmail.com>
+        Wed, 20 Sep 2017 13:32:52 -0400
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Message-ID: <573c90ca-3b67-92cd-e8d1-470f65127a92@osg.samsung.com>
-Date: Wed, 20 Sep 2017 11:30:09 -0600
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQUMCd8QMn9WfZxPUyy-g1BrWvnKxZVELqZGjtCuVWApQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH v2] Makefile: kselftest and kselftest-clean fail for make O=dir case
+Date: Wed, 20 Sep 2017 11:32:46 -0600
+Message-Id: <20170920173246.11224-1-shuahkh@osg.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>, shuah@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, bamvor.zhangjian@linaro.org, emilio.lopez@collabora.co.uk, Jonathan Corbet <corbet@lwn.net>, tytso@mit.edu, ebiederm@xmission.com, Tim.Bird@sony.com, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kselftest@vger.kernel.org, Shuah Khan <shuahkh@osg.samsung.com>
+To: yamada.masahiro@socionext.com, mmarek@suse.com, shuah@kernel.org, tglx@linutronix.de, mingo@redhat.com, peterz@infradead.org, bamvor.zhangjian@linaro.org, emilio.lopez@collabora.co.uk, corbet@lwn.net
+Cc: Shuah Khan <shuahkh@osg.samsung.com>, tytso@mit.edu, ebiederm@xmission.com, Tim.Bird@sony.com, gregkh@linuxfoundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-On 09/19/2017 09:39 PM, Masahiro Yamada wrote:
-> 2017-09-19 8:14 GMT+09:00 Shuah Khan <shuahkh@osg.samsung.com>:
->> On 09/12/2017 05:52 PM, Shuah Khan wrote:
->>> kselftest and kselftest-clean targets fail when object directory is
->>> specified to relocate objects. Fix it so it can find the source tree
->>> to build from.
->>>
->>> make O=/tmp/kselftest_top kselftest
->>>
->>> make[1]: Entering directory '/tmp/kselftest_top'
->>> make[2]: Entering directory '/tmp/kselftest_top'
->>> make[2]: *** tools/testing/selftests: No such file or directory.  Stop.
->>> make[2]: Leaving directory '/tmp/kselftest_top'
->>> ./linux-kselftest/Makefile:1185: recipe for target
->>> 'kselftest' failed
->>> make[1]: *** [kselftest] Error 2
->>> make[1]: Leaving directory '/tmp/kselftest_top'
->>> Makefile:145: recipe for target 'sub-make' failed
->>> make: *** [sub-make] Error 2
->>>
->>> Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
->>
->> Hi Masahiro/Michal,
->>
->> Is it okay to take this patch via linux-kselftest git? If you are okay
->> with that, please Ack it and I will plan to include this in my update.
->>
->> thanks,
->> -- Shuah
->>
->>
->>> ---
->>>  Makefile | 13 +++++++++----
->>>  1 file changed, 9 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/Makefile b/Makefile
->>> index eccb8d704c23..6a85322d0b3e 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -1180,13 +1180,18 @@ headers_check: headers_install
->>>  # ---------------------------------------------------------------------------
->>>  # Kernel selftest
->>>
->>> +PHONY += __kselftest
->>> +     kselftest_src := tools/testing/selftests
->>> +     ifneq ($(KBUILD_SRC),)
->>> +             kselftest_src := $(KBUILD_SRC)/tools/testing/selftests
->>> +     endif
->>>  PHONY += kselftest
->>> -kselftest:
->>> -     $(Q)$(MAKE) -C tools/testing/selftests run_tests
->>> +kselftest: __kselftest
->>> +     $(Q)$(MAKE) -C $(kselftest_src) run_tests
->>>
->>>  PHONY += kselftest-clean
->>> -kselftest-clean:
->>> -     $(Q)$(MAKE) -C tools/testing/selftests clean
->>> +kselftest-clean: __kselftest
->>> +     $(Q)$(MAKE) -C $(kselftest_src) clean
->>>
->>>  PHONY += kselftest-merge
->>>  kselftest-merge:
->>>
->>
-> 
-> Why don't you simply add $(srctree)/ to tools/testing/selftests?
-> 
-> Like,
-> 
-> PHONY += kselftest
-> kselftest:
->         $(Q)$(MAKE) -C $(srctree)/tools/testing/selftests run_tests
-> 
-> PHONY += kselftest-clean
-> kselftest-clean:
->         $(Q)$(MAKE) -C $(srctree)/tools/testing/selftests clean
-> 
-> 
-> 
+kselftest and kselftest-clean targets fail when object directory is
+specified to relocate objects. Fix it so it can find the source tree
+to build from.
 
-I started with the simpler logic and decided to add explicit check
-for KBUILD_SRC due to isolate some error I was seeing from sub-make.
+make O=/tmp/kselftest_top kselftest
 
-Forgot to go back and revisit the simpler logic. Thanks for catching
-this. I am not seeing any issues with the simplified. Sending v2.
+make[1]: Entering directory '/tmp/kselftest_top'
+make[2]: Entering directory '/tmp/kselftest_top'
+make[2]: *** tools/testing/selftests: No such file or directory.  Stop.
+make[2]: Leaving directory '/tmp/kselftest_top'
+./linux-kselftest/Makefile:1185: recipe for target
+'kselftest' failed
+make[1]: *** [kselftest] Error 2
+make[1]: Leaving directory '/tmp/kselftest_top'
+Makefile:145: recipe for target 'sub-make' failed
+make: *** [sub-make] Error 2
 
-Thanks for the review.
+Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+---
+Changes v1 - V2: Simplify logic - use $(srctree)
 
--- Shuah
+ Makefile | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 64cbc66cebca..7735fc32b24e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1169,14 +1169,13 @@ headers_check: headers_install
+ 
+ # ---------------------------------------------------------------------------
+ # Kernel selftest
+-
+ PHONY += kselftest
+ kselftest:
+-	$(Q)$(MAKE) -C tools/testing/selftests run_tests
++	$(Q)$(MAKE) -C $(srctree)/tools/testing/selftests run_tests
+ 
+ PHONY += kselftest-clean
+ kselftest-clean:
+-	$(Q)$(MAKE) -C tools/testing/selftests clean
++	$(Q)$(MAKE) -C $(srctree)/tools/testing/selftests clean
+ 
+ PHONY += kselftest-merge
+ kselftest-merge:
+-- 
+2.11.0
+
