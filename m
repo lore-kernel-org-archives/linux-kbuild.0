@@ -1,97 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:13447 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750973AbdISLiE (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Sep 2017 07:38:04 -0400
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Subject: [PATCH] kbuild: comments cleanup in Makefile.lib
-Date: Tue, 19 Sep 2017 19:36:07 +0800
-Message-ID: <1505820967-17302-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mx1.redhat.com ([209.132.183.28]:42448 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751523AbdITCff (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 19 Sep 2017 22:35:35 -0400
+From: shuwang@redhat.com
+Subject: [PATCH] kbuild/mkspec: remove firmware from rpm package
+Date: Wed, 20 Sep 2017 10:35:29 +0800
+Message-Id: <20170920023529.10881-1-shuwang@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, mmarek@suse.com
+To: yamada.masahiro@socionext.com, mmarek@suse.com, gregkh@linuxfoundation.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, chuhu@redhat.com, yizhan@redhat.com, Shu Wang <shuwang@redhat.com>
 
-It has:
-1. Move comments close to what it want to comment.
-2. Comments cleanup & improvement.
+From: Shu Wang <shuwang@redhat.com>
 
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+Commit 5620a0d1aacd ("firmware: delete in-kernel firmware") deleted
+in-kernel firmware support, including the firmware install command.
+
+So make binrpm-pkg will failed as no firmware_install make target.
+
+Signed-off-by: Shu Wang <shuwang@redhat.com>
 ---
- scripts/Makefile.lib | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+ scripts/package/mkspec | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 58c05e5..7de9c08 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -4,8 +4,7 @@ ccflags-y  += $(EXTRA_CFLAGS)
- cppflags-y += $(EXTRA_CPPFLAGS)
- ldflags-y  += $(EXTRA_LDFLAGS)
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index bb43f153fd8e..8f34e31d8474 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -88,11 +88,8 @@ echo 'mkdir -p $RPM_BUILD_ROOT/boot/efi $RPM_BUILD_ROOT/lib/modules'
+ echo "%else"
+ echo 'mkdir -p $RPM_BUILD_ROOT/boot $RPM_BUILD_ROOT/lib/modules'
+ echo "%endif"
+-echo 'mkdir -p $RPM_BUILD_ROOT'"/lib/firmware/$KERNELRELEASE"
  
--#
--# flags that take effect in sub directories
-+# flags that take effect in current and sub directories
- export KBUILD_SUBDIR_ASFLAGS := $(KBUILD_SUBDIR_ASFLAGS) $(subdir-asflags-y)
- export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
- 
-@@ -14,14 +13,16 @@ export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
- 
- # When an object is listed to be built compiled-in and modular,
- # only build the compiled-in version
--
- obj-m := $(filter-out $(obj-y),$(obj-m))
- 
- # Libraries are always collected in one lib file.
- # Filter out objects already built-in
--
- lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
- 
-+# Determine modorder.
-+# Unfortunately, we don't have information about ordering between -y
-+# and -m subdirs.  Just put -y's first.
-+modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
- 
- # Handle objects in subdirs
- # ---------------------------------------------------------------------------
-@@ -29,12 +30,6 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
- #   and add the directory to the list of dirs to descend into: $(subdir-y)
- # o if we encounter foo/ in $(obj-m), remove it from $(obj-m)
- #   and add the directory to the list of dirs to descend into: $(subdir-m)
--
--# Determine modorder.
--# Unfortunately, we don't have information about ordering between -y
--# and -m subdirs.  Just put -y's first.
--modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
--
- __subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
- subdir-y	+= $(__subdir-y)
- __subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
-@@ -43,10 +38,9 @@ obj-y		:= $(patsubst %/, %/built-in.o, $(obj-y))
- obj-m		:= $(filter-out %/, $(obj-m))
- 
- # Subdirectories we need to descend into
--
- subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
- 
--# if $(foo-objs) exists, foo.o is a composite object
-+# if $(foo-objs) or $(foo-y) or $(foo-m) exists, foo.o is a composite object
- multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
- multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))), $(m))))
- multi-used   := $(multi-used-y) $(multi-used-m)
-@@ -90,7 +84,6 @@ subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
- obj-dirs	:= $(addprefix $(obj)/,$(obj-dirs))
- 
- # These flags are needed for modversions and compiling, so we define them here
--# already
- # $(modname_flags) #defines KBUILD_MODNAME as the name of the module it will
- # end up in (or would, if it gets compiled in)
- # Note: Files that end up in two or more modules are compiled without the
+ echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} KBUILD_SRC= mod-fw= modules_install'
+-echo 'INSTALL_FW_PATH=$RPM_BUILD_ROOT'"/lib/firmware/$KERNELRELEASE"
+-echo 'make INSTALL_FW_PATH=$INSTALL_FW_PATH' firmware_install
+ echo "%ifarch ia64"
+ echo 'cp $KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/efi/vmlinuz-$KERNELRELEASE"
+ echo 'ln -s '"efi/vmlinuz-$KERNELRELEASE" '$RPM_BUILD_ROOT'"/boot/"
+@@ -154,7 +151,6 @@ echo '%defattr (-, root, root)'
+ echo "/lib/modules/$KERNELRELEASE"
+ echo "%exclude /lib/modules/$KERNELRELEASE/build"
+ echo "%exclude /lib/modules/$KERNELRELEASE/source"
+-echo "/lib/firmware/$KERNELRELEASE"
+ echo "/boot/*"
+ echo ""
+ echo "%files headers"
 -- 
-2.1.0
-
-
+2.13.5
 
