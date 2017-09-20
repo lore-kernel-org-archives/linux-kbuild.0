@@ -1,159 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f43.google.com ([209.85.215.43]:49611 "EHLO
-        mail-lf0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751468AbdITKfa (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:17665 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751873AbdITNBx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Sep 2017 06:35:30 -0400
-Received: by mail-lf0-f43.google.com with SMTP id r17so2265795lff.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Sep 2017 03:35:29 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQtAq3zhP0zY8pW=wdka23UKqJWyqPuXnk0m4LEfT6EKw@mail.gmail.com>
-References: <20170816110855.6021-1-riku.voipio@linaro.org> <20170816110855.6021-2-riku.voipio@linaro.org>
- <CAK7LNAQtAq3zhP0zY8pW=wdka23UKqJWyqPuXnk0m4LEfT6EKw@mail.gmail.com>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Wed, 20 Sep 2017 13:35:27 +0300
-Message-ID: <CAAqcGHk71o00QQEWOg_zObNHmWfB2hR3+fh9K32XEEpe5qsvZg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] scripts/package/builddeb: split generating packaging
- and build
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 20 Sep 2017 09:01:53 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v3] kbuild: (bin)rpm-pkg: fix version number handling
+Date: Wed, 20 Sep 2017 22:01:26 +0900
+Message-Id: <1505912486-30251-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>, Ben Hutchings <ben@decadent.org.uk>, Jim Davis <jim.epost@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-On 20 September 2017 at 12:04, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Hi Riku,
->
->
-> 2017-08-16 20:08 GMT+09:00  <riku.voipio@linaro.org>:
->> From: Riku Voipio <riku.voipio@linaro.org>
->>
->> Move debian/ directory generation out of builddeb to a new script,
->> mkdebian. The package build commands are kept in builddeb, which
->> is now and internal command called from debian/rules.
->>
->> With these changes in place, we can now use dpkg-buildpackage from
->> deb-pkg and bindeb-pkg removing need for handrulled source/changes
->> generation.
->>
->> This patch is based on the criticism of the current state of builddeb
->> discussed on:
->>
->> https://patchwork.kernel.org/patch/9656403/
->>
->> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
->
->
-> Sorry for late reply, and thanks for working on this!
->
-> In my opinion, this seems the right direction.
->
-> A few comments below.
->
-> (Please note I am not a debian developer.
-> If I am suggesting wrong, please correct me.)
->
->
->>  scripts/package/Makefile |  14 ++-
->>  scripts/package/builddeb | 233 +----------------------------------------------
->>  scripts/package/mkdebian | 209 ++++++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 221 insertions(+), 235 deletions(-)
->>  create mode 100755 scripts/package/mkdebian
->>
->> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
->> index 9867638896ad..176158c9b7da 100644
->> --- a/scripts/package/Makefile
->> +++ b/scripts/package/Makefile
->> @@ -92,12 +92,18 @@ quiet_cmd_builddeb = BUILDDEB
->>  deb-pkg: FORCE
->>         $(MAKE) clean
->>         $(call cmd,src_tar,$(KDEB_SOURCENAME))
->> -       $(MAKE) KBUILD_SRC=
->> -       +$(call cmd,builddeb)
->> +       $(call cmd,updateversion)
->> +       mv $(KDEB_SOURCENAME).tar.gz ../$(KDEB_SOURCENAME)_$(KERNELRELEASE).orig.tar.gz
->> +       $(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
->> +       dpkg-buildpackage -r"fakeroot -u" -a$$(cat debian/arch) -i.git
+The "Release:" field of the spec file is determined based on the
+.version file.
 
-> This tries to sign the source package and .changes file by default.
+However, the .version file is not copied to the source tar file.
+So, when we build the kernel from the source package, the UTS_VERSION
+always indicates #1.  This does not match with "rpm -q".
 
-> Maybe, "-us -uc" options reasonable for easier use?
+The kernel UTS_VERSION and "rpm -q" do not agree for binrpm-pkg, either.
+Please note the kernel has already been built before the spec file is
+created.  Currently, mkspec invokes mkversion.  This script returns an
+incremented version.  So, the "Release:" field of the spec file is
+greater than the version in the kernel by one.
 
-I don't really mind signing, but otoh the old targets didn't ask for
-signing so perhaps we should keep the behaviour that way.
+For the source package build (where .version file is missing), we can
+give KBUILD_BUILD_VERSION=%{release} to the build command.
 
->>  bindeb-pkg: FORCE
->> -       $(MAKE) KBUILD_SRC=
->> -       +$(call cmd,builddeb)
->> +       $(call cmd,updateversion)
->> +       $(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
->> +       dpkg-buildpackage -r"fakeroot -u" -a$$(cat debian/arch) -b
->
-> IIUC, the whole of dpkg-buildpackage process is run under "fakeroot -u".
-> Correct?
+For the binary package build, we can simply read out the .version file
+because it contains the version number that was used for building the
+kernel image.
 
-No, dpkg-buildpackage will call -rfakeroot only for binary-arch targets
+We can remove scripts/mkversion because scripts/package/Makefile need
+not touch the .version file.
 
-> It will internally invokes "make intdeb-pkg",
-> then $(call cmd,builddeb) calls "fakeroot -u" recursively,
-> this seems redundant to me.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-it wont, since it's checks if if = 0 - which will be true under. But
-all this can be indeed removed
-if we can call builddeb directly as discussed below.
+Changes in v3:
+  - add ' 2>/dev/null || echo 1' in case .config is missing for rpm-pkg
 
-> Maybe,
->
->      dpkg-buildpackage -r"$(KBUILD_PKG_ROOTCMD)" -a$$(cat debian/arch) -b
->
-> makes more sense?
+Changes in v2:
+  - Remove bogus comment in mkspec
 
->> +
->> +cat <<EOF > debian/rules
->> +#!/usr/bin/make -f
->> +
->> +ifneq (,\$(filter parallel=%,\$(DEB_BUILD_OPTIONS)))
->> +    NUMJOBS = \$(patsubst parallel=%,%,\$(filter parallel=%,\$(DEB_BUILD_OPTIONS)))
->> +    MAKEFLAGS += -j\$(NUMJOBS)
->> +endif
->> +
->> +build:
->> +       \$(MAKE) ARCH=${ARCH}
->> +
->> +binary-arch:
->> +       \$(MAKE) KDEB_VERSION=${version} ARCH=${ARCH} intdeb-pkg
->
->
-> Hmm, instead of recursive make,
-> is it possible to run scripts/package/debuild directly here?
+ scripts/mkversion        | 6 ------
+ scripts/package/Makefile | 5 -----
+ scripts/package/mkspec   | 6 ++----
+ 3 files changed, 2 insertions(+), 15 deletions(-)
+ delete mode 100644 scripts/mkversion
 
-I though it's not possible because I need variables from kernel make.
-Now that I check, I see only  $KCONFIG_CONFIG which I think we can
-assume to be .config. Also some ARCH and SRCARCH variables which are
-hardcoded anyways in mkdebian. I'll try.
+diff --git a/scripts/mkversion b/scripts/mkversion
+deleted file mode 100644
+index c12addc..0000000
+--- a/scripts/mkversion
++++ /dev/null
+@@ -1,6 +0,0 @@
+-if [ ! -f .version ]
+-then
+-    echo 1
+-else
+-    expr 0`cat .version` + 1
+-fi
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 71b4a8a..73f9f31 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -50,8 +50,6 @@ rpm-pkg rpm: FORCE
+ 	$(MAKE) clean
+ 	$(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
+ 	$(call cmd,src_tar,$(KERNELPATH),kernel.spec)
+-	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+-	mv -f $(objtree)/.tmp_version $(objtree)/.version
+ 	rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
+ 	rm $(KERNELPATH).tar.gz kernel.spec
+ 
+@@ -60,9 +58,6 @@ rpm-pkg rpm: FORCE
+ binrpm-pkg: FORCE
+ 	$(MAKE) KBUILD_SRC=
+ 	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
+-	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+-	mv -f $(objtree)/.tmp_version $(objtree)/.version
+-
+ 	rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
+ 		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
+ 	rm binkernel.spec
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index bf3e9ab..f47f17a 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -27,9 +27,7 @@ __KERNELRELEASE=`echo $KERNELRELEASE | sed -e "s/-/_/g"`
+ echo "Name: kernel"
+ echo "Summary: The Linux Kernel"
+ echo "Version: $__KERNELRELEASE"
+-# we need to determine the NEXT version number so that uname and
+-# rpm -q will agree
+-echo "Release: `. $srctree/scripts/mkversion`"
++echo "Release: $(cat .version 2>/dev/null || echo 1)"
+ echo "License: GPL"
+ echo "Group: System Environment/Kernel"
+ echo "Vendor: The Linux Community"
+@@ -77,7 +75,7 @@ fi
+ echo "%build"
+ 
+ if ! $PREBUILT; then
+-echo "make clean && make %{?_smp_mflags}"
++echo "make clean && make %{?_smp_mflags} KBUILD_BUILD_VERSION=%{release}"
+ echo ""
+ fi
+ 
+-- 
+2.7.4
 
->> +
->> +clean:
->> +       rm -rf debian/*tmp debian/files
->> +       mv debian/ debian.backup # debian/ might be cleaned away
->> +       \$(MAKE) clean
->
->
-> The biggest change in the behavior is, "make bindeb-pkg" did not
-> previously "make clean",
-> but now does it.
->
-> If "make bindeb-pkg" is run in a row, all objects are cleaned every time.
->
-> Is it reasonable to skip "$(MAKE) clean" for bindeb-pkg?
-
-dpkg-buildpackage -nc should do that. I'll add it.
-
->
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
