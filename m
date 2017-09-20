@@ -1,58 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:33799 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751884AbdITPza (ORCPT
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:38852 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750938AbdITQib (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Sep 2017 11:55:30 -0400
+        Wed, 20 Sep 2017 12:38:31 -0400
+Received: by mail-wr0-f196.google.com with SMTP id p37so1795889wrb.5
+        for <linux-kbuild@vger.kernel.org>; Wed, 20 Sep 2017 09:38:31 -0700 (PDT)
+Date: Wed, 20 Sep 2017 18:38:26 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH v3 1/1] kconfig: menuconfig make "selected by:" readable
+Message-ID: <20170920163826.GA2717@scaer>
+References: <20170223131008.13705-1-pvorel@suse.cz>
+ <20170403093545.ebn5lawttpfwbpbl@x230>
+ <CAK7LNAQ0Az05tnvxSnMdKZh0U4r-1k7U+PKhmtZ5BGwxCFng5w@mail.gmail.com>
+ <20170920142619.co2d6onsntz2ynjt@x230>
 MIME-Version: 1.0
-In-Reply-To: <1505912486-30251-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1505912486-30251-1-git-send-email-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 21 Sep 2017 00:54:41 +0900
-Message-ID: <CAK7LNASAEwjY6bF8Su5+=uSmsGfks-txxxD1z__RXTKULqyknQ@mail.gmail.com>
-Subject: Re: [PATCH v3] kbuild: (bin)rpm-pkg: fix version number handling
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170920142619.co2d6onsntz2ynjt@x230>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Petr Vorel <petr.vorel@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Petr Vorel <pvorel@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Paul Bolle <pebolle@tiscali.nl>, Michal Marek <mmarek@suse.cz>
 
-2017-09-20 22:01 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> The "Release:" field of the spec file is determined based on the
-> .version file.
->
-> However, the .version file is not copied to the source tar file.
-> So, when we build the kernel from the source package, the UTS_VERSION
-> always indicates #1.  This does not match with "rpm -q".
->
-> The kernel UTS_VERSION and "rpm -q" do not agree for binrpm-pkg, either.
-> Please note the kernel has already been built before the spec file is
-> created.  Currently, mkspec invokes mkversion.  This script returns an
-> incremented version.  So, the "Release:" field of the spec file is
-> greater than the version in the kernel by one.
->
-> For the source package build (where .version file is missing), we can
-> give KBUILD_BUILD_VERSION=%{release} to the build command.
->
-> For the binary package build, we can simply read out the .version file
-> because it contains the version number that was used for building the
-> kernel image.
->
-> We can remove scripts/mkversion because scripts/package/Makefile need
-> not touch the .version file.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
-> Changes in v3:
->   - add ' 2>/dev/null || echo 1' in case .config is missing for rpm-pkg
->
-> Changes in v2:
->   - Remove bogus comment in mkspec
+Petr, All,
 
-Applied to linux-kbuild/fixes.
+On 2017-09-20 16:26 +0200, Petr Vorel spake thusly:
+> > 2017-04-03 18:35 GMT+09:00 Petr Vorel <pvorel@suse.cz>:
+> > Yann E. MORIN is the Kconfig maintainer, but he has been
+> > silent for a few years. I guess Kconfig needs a new maintainer.
+> Well, Yann is still listed in MAINTAINERS file, even he's inactive (according to the date
+> of his git tree).
 
+I already sent a patch relinquishing maintainership a while ago:
+    https://lkml.org/lkml/2017/4/10/1096
+
+Regards,
+Yann E. MORIN.
 
 -- 
-Best Regards
-Masahiro Yamada
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
