@@ -1,54 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.29.96]:52692 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753650AbdIYEeA (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:25556 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S932987AbdIYM0t (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 25 Sep 2017 00:34:00 -0400
-From: Kalle Valo <kvalo@codeaurora.org>
-Subject: Re: [PATCH v4 1/9] brcmsmac: make some local variables 'static const' to reduce stack size
-References: <20170922212930.620249-1-arnd@arndb.de>
-        <20170922212930.620249-2-arnd@arndb.de>
-Date: Mon, 25 Sep 2017 07:33:50 +0300
-In-Reply-To: <20170922212930.620249-2-arnd@arndb.de> (Arnd Bergmann's message
-        of "Fri, 22 Sep 2017 23:29:12 +0200")
-Message-ID: <87h8vr75xt.fsf@kamboji.qca.qualcomm.com>
+        Mon, 25 Sep 2017 08:26:49 -0400
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: [PATCH] kbuild: drop unused symverfile in Makefile.modpost
+Date: Mon, 25 Sep 2017 20:25:10 +0800
+Message-ID: <1506342310-21490-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Arend van Spriel <arend.vanspriel@broadcom.com>, Franky Lin <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>, Chi-Hsien Lin <chi-hsien.lin@cypress.com>, Wright Feng <wright.feng@cypress.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-media@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com, brcm80211-dev-list@cypress.com, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org, Jakub Jelinek <jakub@gcc.gnu.org>, Martin =?utf-8?Q?Li=C5=A1ka?= <marxin@gcc.gnu.org>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, mmarek@suse.com
 
-Arnd Bergmann <arnd@arndb.de> writes:
+Since commit 040fcc819, symverfile has been replaced with kernelsymfile
+and modulesymfile.
 
-> With KASAN and a couple of other patches applied, this driver is one
-> of the few remaining ones that actually use more than 2048 bytes of
-> kernel stack:
->
-> broadcom/brcm80211/brcmsmac/phy/phy_n.c: In function 'wlc_phy_workarounds_nphy_gainctrl':
-> broadcom/brcm80211/brcmsmac/phy/phy_n.c:16065:1: warning: the frame size of 3264 bytes is larger than 2048 bytes [-Wframe-larger-than=]
-> broadcom/brcm80211/brcmsmac/phy/phy_n.c: In function 'wlc_phy_workarounds_nphy':
-> broadcom/brcm80211/brcmsmac/phy/phy_n.c:17138:1: warning: the frame size of 2864 bytes is larger than 2048 bytes [-Wframe-larger-than=]
->
-> Here, I'm reducing the stack size by marking as many local variables as
-> 'static const' as I can without changing the actual code.
->
-> This is the first of three patches to improve the stack usage in this
-> driver. It would be good to have this backported to stabl kernels
-> to get all drivers in 'allmodconfig' below the 2048 byte limit so
-> we can turn on the frame warning again globally, but I realize that
-> the patch is larger than the normal limit for stable backports.
->
-> The other two patches do not need to be backported.
->
-> Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+ scripts/Makefile.modpost | 1 -
+ 1 file changed, 1 deletion(-)
 
-I'll queue this and the two following brcmsmac patches for 4.14.
-
-Also I'll add (only for this patch):
-
-Cc: <stable@vger.kernel.org>
-
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 16923ba..756d14f 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -97,7 +97,6 @@ vmlinux.o: FORCE
+ 	$(call cmd,kernel-mod)
+ 
+ # Declare generated files as targets for modpost
+-$(symverfile):         __modpost ;
+ $(modules:.ko=.mod.c): __modpost ;
+ 
+ 
 -- 
-Kalle Valo
+2.1.0
+
+
+
