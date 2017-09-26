@@ -1,128 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr00094.outbound.protection.outlook.com ([40.107.0.94]:17376
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S936407AbdIZQrA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Sep 2017 12:47:00 -0400
-Subject: Re: [PATCH v4 4/9] em28xx: fix em28xx_dvb_init for KASAN
-References: <20170922212930.620249-1-arnd@arndb.de>
- <20170922212930.620249-5-arnd@arndb.de>
- <063D6719AE5E284EB5DD2968C1650D6DD007F521@AcuExch.aculab.com>
- <CAK8P3a1zxjMsQTBPijCo8FJjEU5aRVTr7n_NZ1YM2UnDPKoRLw@mail.gmail.com>
- <CAK8P3a37Ts5q7BvA2JWse87huyAp+=e18CUXEt8731RrBnB+Ow@mail.gmail.com>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <e7e6418e-4340-5057-aa17-800082aca5fb@virtuozzo.com>
-Date: Tue, 26 Sep 2017 19:49:48 +0300
-MIME-Version: 1.0
-In-Reply-To: <CAK8P3a37Ts5q7BvA2JWse87huyAp+=e18CUXEt8731RrBnB+Ow@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: from mail-pg0-f41.google.com ([74.125.83.41]:51375 "EHLO
+        mail-pg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965039AbdIZRzp (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 26 Sep 2017 13:55:45 -0400
+Received: by mail-pg0-f41.google.com with SMTP id k193so6318660pgc.8
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Sep 2017 10:55:45 -0700 (PDT)
+From: Douglas Anderson <dianders@chromium.org>
+Subject: [RFC PATCH 0/2] kbuild: Cache exploratory calls to the compiler
+Date: Tue, 26 Sep 2017 10:55:06 -0700
+Message-Id: <20170926175508.29950-1-dianders@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, David Laight <David.Laight@aculab.com>
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Arend van Spriel <arend.vanspriel@broadcom.com>, Kalle Valo <kvalo@codeaurora.org>, "David S. Miller" <davem@davemloft.net>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, "brcm80211-dev-list.pdl@broadcom.com" <brcm80211-dev-list.pdl@broadcom.com>, "brcm80211-dev-list@cypress.com" <brcm80211-dev-list@cypress.com>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jakub Jelinek <jakub@gcc.gnu.org>, =?UTF-8?Q?Martin_Li=c5=a1ka?= <marxin@gcc.gnu.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>
+To: yamada.masahiro@socionext.com, mmarek@suse.com
+Cc: groeck@chromium.org, briannorris@chromium.org, Douglas Anderson <dianders@chromium.org>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Matthias Kaehlcke <mka@chromium.org>, Behan Webster <behanw@converseincode.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@kernel.org>
+
+This two-patch series attempts to speed incremental builds of the
+kernel up by a bit.  How much of a speedup you get depends a lot on
+your environment, specifically the speed of your workstation and how
+fast it takes to invoke the compiler.
+
+In the Chrome OS build environment you get a really big win.  For an
+incremental build (via emerge) I measured a speedup from ~1 minute to
+~35 seconds.  ...but Chrome OS calls the compiler through a number of
+wrapper scripts and also calls the kernel make at least twice for an
+emerge (during compile stage and install stage), so it's a bit of a
+worst case.
+
+Perhaps a more realistic measure of the speedup others might see is
+running "time make help > /dev/null" outside of the Chrome OS build
+environment on my system.  When I do this I see that it took more than
+1.0 seconds before and less than 0.2 seconds after.  So presumably
+this has the ability to shave ~0.8 seconds off an incremental build
+for most folks out there.  While 0.8 seconds savings isn't huge, it
+does make incremental builds feel a lot snappier.
+
+Please note that I make no illusions of being a Makefile expert nor do
+I have any belief that I fully understand the Linux kernel build
+system.  Please take this patch series as the start of a discussion
+about whether others feel like this type of speedup is worthwhile and
+how to best accomplish it.  Specific things to note:
+
+- I'm happy to paint the bikeshed any color that maintainers want.  If
+  you'd like the cache named differently, in a slightly different
+  format, or you want me to adjust the spacing / names of Makefile
+  stuff then please just let me know.
+
+- If this is totally the wrong approach and you have a better idea
+  then let me know.  If you want something that's super complicated to
+  explain then feel free to post a replacement patch and I'm happy to
+  test.
+
+- This patch definitely needs extra testing.  I've tested it on a very
+  limited build environment and it seems to be working fine, but I
+  could believe that with some weird compiler options or on certain
+  architectures you might need some extra escaping here and there.
 
 
+Douglas Anderson (2):
+  kbuild: Add a cache for generated variables
+  kbuild: Cache a few more calls to the compiler
 
-On 09/26/2017 09:47 AM, Arnd Bergmann wrote:
-> On Mon, Sep 25, 2017 at 11:32 PM, Arnd Bergmann <arnd@arndb.de> wrote:
->> On Mon, Sep 25, 2017 at 7:41 AM, David Laight <David.Laight@aculab.com> wrote:
->>> From: Arnd Bergmann
->>>> Sent: 22 September 2017 22:29
->>> ...
->>>> It seems that this is triggered in part by using strlcpy(), which the
->>>> compiler doesn't recognize as copying at most 'len' bytes, since strlcpy
->>>> is not part of the C standard.
->>>
->>> Neither is strncpy().
->>>
->>> It'll almost certainly be a marker in a header file somewhere,
->>> so it should be possibly to teach it about other functions.
->>
->> I'm currently travelling and haven't investigated in detail, but from
->> taking a closer look here, I found that the hardened 'strlcpy()'
->> in include/linux/string.h triggers it. There is also a hardened
->> (much shorted) 'strncpy()' that doesn't trigger it in the same file,
->> and having only the extern declaration of strncpy also doesn't.
-> 
-> And a little more experimenting leads to this simple patch that fixes
-> the problem:
-> 
-> --- a/include/linux/string.h
-> +++ b/include/linux/string.h
-> @@ -254,7 +254,7 @@ __FORTIFY_INLINE size_t strlcpy(char *p, const
-> char *q, size_t size)
->         size_t q_size = __builtin_object_size(q, 0);
->         if (p_size == (size_t)-1 && q_size == (size_t)-1)
->                 return __real_strlcpy(p, q, size);
-> -       ret = strlen(q);
-> +       ret = __builtin_strlen(q);
+ Documentation/kbuild/makefiles.txt |  21 ++++++
+ Makefile                           |   9 ++-
+ scripts/Kbuild.include             | 133 +++++++++++++++++++++++++++++++------
+ 3 files changed, 142 insertions(+), 21 deletions(-)
 
-
-I think this is not correct. Fortified strlen called here on purpose. If sizeof q is known at compile time
-and 'q' contains not-null fortified strlen() will panic.
-
-
->         if (size) {
->                 size_t len = (ret >= size) ? size - 1 : ret;
->                 if (__builtin_constant_p(len) && len >= p_size)
-> 
-> The problem is apparently that the fortified strlcpy calls the fortified strlen,
-> which in turn calls strnlen and that ends up calling the extern '__real_strnlen'
-> that gcc cannot reduce to a constant expression for a constant input.
-
-
-Per my observation, it's the code like this:
-	if () 
-		fortify_panic(__func__);
-
-
-somehow prevent gcc to merge several "struct i2c_board_info info;" into one stack slot.
-With the hack bellow, stack usage reduced to ~1,6K:
-
----
- include/linux/string.h | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/include/linux/string.h b/include/linux/string.h
-index 54d21783e18d..9a96ff3ebf94 100644
---- a/include/linux/string.h
-+++ b/include/linux/string.h
-@@ -261,8 +261,6 @@ __FORTIFY_INLINE __kernel_size_t strlen(const char *p)
- 	if (p_size == (size_t)-1)
- 		return __builtin_strlen(p);
- 	ret = strnlen(p, p_size);
--	if (p_size <= ret)
--		fortify_panic(__func__);
- 	return ret;
- }
- 
-@@ -271,8 +269,6 @@ __FORTIFY_INLINE __kernel_size_t strnlen(const char *p, __kernel_size_t maxlen)
- {
- 	size_t p_size = __builtin_object_size(p, 0);
- 	__kernel_size_t ret = __real_strnlen(p, maxlen < p_size ? maxlen : p_size);
--	if (p_size <= ret && maxlen != ret)
--		fortify_panic(__func__);
- 	return ret;
- }
-
-
-
-
-> Not sure if that change is the best fix, but it seems to address the problem in
-> this driver and probably leads to better code in other places as well.
-> 
-
-Probably it would be better to solve this on the strlcpy side, but I haven't found the way to do this right.
-Alternative solutions:
-
- - use memcpy() instead of strlcpy(). All source strings are smaller than I2C_NAME_SIZE, so we could
-   do something like this - memcpy(info.type, "si2168", sizeof("si2168"));
-   Also this should be faster.
-
- - Move code under different "case:" in the switch(dev->model) to the separate function should help as well.
-   But it might be harder to backport into stables.
-
-
+-- 
+2.14.1.821.g8fa685d3b7-goog
 
