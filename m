@@ -1,134 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:32937 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753090AbdI0N0W (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Sep 2017 09:26:22 -0400
+Received: from mga04.intel.com ([192.55.52.120]:55971 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751628AbdI0VG2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 27 Sep 2017 17:06:28 -0400
+Subject: Wrong -dirty suffix set by setlocalversion (was: BUG in git
+ diff-index)
+From: Marc Herbert <Marc.Herbert@intel.com>
+References: <loom.20160331T143733-916@post.gmane.org>
+ <20160331140515.GA31116@sigill.intra.peff.net>
+ <CAJxkE8SVF_ikHqDCh6eHExq=seitHPVpxW2GmPo40jtqWvz1JQ@mail.gmail.com>
+ <20160331142704.GC31116@sigill.intra.peff.net> <56FD7AE8.4090905@nglowry.com>
+ <xmqqwpoil6vt.fsf@gitster.mtv.corp.google.com>
+ <d9b4725b-3204-03af-1bc2-6469bb815c63@intel.com>
+Message-ID: <89d82c84-7a3b-9c4c-679e-a7a723669592@intel.com>
+Date: Wed, 27 Sep 2017 14:06:24 -0700
 MIME-Version: 1.0
-In-Reply-To: <e7e6418e-4340-5057-aa17-800082aca5fb@virtuozzo.com>
-References: <20170922212930.620249-1-arnd@arndb.de> <20170922212930.620249-5-arnd@arndb.de>
- <063D6719AE5E284EB5DD2968C1650D6DD007F521@AcuExch.aculab.com>
- <CAK8P3a1zxjMsQTBPijCo8FJjEU5aRVTr7n_NZ1YM2UnDPKoRLw@mail.gmail.com>
- <CAK8P3a37Ts5q7BvA2JWse87huyAp+=e18CUXEt8731RrBnB+Ow@mail.gmail.com> <e7e6418e-4340-5057-aa17-800082aca5fb@virtuozzo.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 27 Sep 2017 06:26:21 -0700
-Message-ID: <CAK8P3a2C7DBTfQZvRi-QQfrfm1GXktFcXQRmXmzpF4SCa+BADA@mail.gmail.com>
-Subject: Re: [PATCH v4 4/9] em28xx: fix em28xx_dvb_init for KASAN
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <d9b4725b-3204-03af-1bc2-6469bb815c63@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: David Laight <David.Laight@aculab.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Arend van Spriel <arend.vanspriel@broadcom.com>, Kalle Valo <kvalo@codeaurora.org>, "David S. Miller" <davem@davemloft.net>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, "brcm80211-dev-list.pdl@broadcom.com" <brcm80211-dev-list.pdl@broadcom.com>, "brcm80211-dev-list@cypress.com" <brcm80211-dev-list@cypress.com>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jakub Jelinek <jakub@gcc.gnu.org>, =?UTF-8?Q?Martin_Li=C5=A1ka?= <marxin@gcc.gnu.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>
+To: Junio C Hamano <gitster@pobox.com>, Andy Lowry <andy.work@nglowry.com>
+Cc: Jeff King <peff@peff.net>, git <git@vger.kernel.org>, Christian Kujau <lists@nerdbynature.de>, josh@joshtriplett.org, michael.w.mason@intel.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Tue, Sep 26, 2017 at 9:49 AM, Andrey Ryabinin
-<aryabinin@virtuozzo.com> wrote:
->
->
-> On 09/26/2017 09:47 AM, Arnd Bergmann wrote:
->> On Mon, Sep 25, 2017 at 11:32 PM, Arnd Bergmann <arnd@arndb.de> wrote:
++ linux-kbuild list which is not in the output of:
+  ./scripts/get_maintainer.pl -f scripts/setlocalversion 
+... but seems relevant anyway.
 
->> +       ret = __builtin_strlen(q);
->
->
-> I think this is not correct. Fortified strlen called here on purpose. If sizeof q is known at compile time
-> and 'q' contains not-null fortified strlen() will panic.
+On 31/03/16 13:39, Junio C Hamano wrote:
+> Andy Lowry <andy.work@nglowry.com> writes:
+> 
+>> So I think now that the script should do "update-index --refresh"
+>> followed by "diff-index --quiet HEAD". Sound correct?
+> 
+> Yes.  That has always been one of the kosher ways for any script to
+> make sure that the files in the working tree that are tracked have
+> not been modified relative to HEAD (assuming that the index matches
+> HEAD).  
 
-Ok, got it.
+Too bad kernel/scripts/setlocalversion didn't get the memo:
 
->>         if (size) {
->>                 size_t len = (ret >= size) ? size - 1 : ret;
->>                 if (__builtin_constant_p(len) && len >= p_size)
->>
->> The problem is apparently that the fortified strlcpy calls the fortified strlen,
->> which in turn calls strnlen and that ends up calling the extern '__real_strnlen'
->> that gcc cannot reduce to a constant expression for a constant input.
->
->
-> Per my observation, it's the code like this:
->         if ()
->                 fortify_panic(__func__);
->
->
-> somehow prevent gcc to merge several "struct i2c_board_info info;" into one stack slot.
-> With the hack bellow, stack usage reduced to ~1,6K:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cdf2bc632ebc9ef51
+> scripts/setlocalversion on write-protected source tree (2013)
+> I don't see how removing "git update-index" could do any harm.
 
-1.6k is also what I see with my patch, or any other approach I tried
-that changes
-string.h. With the split up em28xx_dvb_init() function (and without
-changes to string.h),
-I got down to a few hundred bytes for the largest handler.
+This causes a spurious "-dirty" suffix when building from a directory copy
+(as Mike learned the hard way)
 
-> ---
->  include/linux/string.h | 4 ----
->  1 file changed, 4 deletions(-)
->
-> diff --git a/include/linux/string.h b/include/linux/string.h
-> index 54d21783e18d..9a96ff3ebf94 100644
-> --- a/include/linux/string.h
-> +++ b/include/linux/string.h
-> @@ -261,8 +261,6 @@ __FORTIFY_INLINE __kernel_size_t strlen(const char *p)
->         if (p_size == (size_t)-1)
->                 return __builtin_strlen(p);
->         ret = strnlen(p, p_size);
-> -       if (p_size <= ret)
-> -               fortify_panic(__func__);
->         return ret;
->  }
->
-> @@ -271,8 +269,6 @@ __FORTIFY_INLINE __kernel_size_t strnlen(const char *p, __kernel_size_t maxlen)
->  {
->         size_t p_size = __builtin_object_size(p, 0);
->         __kernel_size_t ret = __real_strnlen(p, maxlen < p_size ? maxlen : p_size);
-> -       if (p_size <= ret && maxlen != ret)
-> -               fortify_panic(__func__);
->         return ret;
+[...]
 
-I've reduced it further to this change:
-
---- a/include/linux/string.h
-+++ b/include/linux/string.h
-@@ -227,7 +227,7 @@ static inline const char *kbasename(const char *path)
- #define __FORTIFY_INLINE extern __always_inline __attribute__((gnu_inline))
- #define __RENAME(x) __asm__(#x)
-
--void fortify_panic(const char *name) __noreturn __cold;
-+void fortify_panic(const char *name) __cold;
- void __read_overflow(void) __compiletime_error("detected read beyond
-size of object passed as 1st parameter");
- void __read_overflow2(void) __compiletime_error("detected read beyond
-size of object passed as 2nd parameter");
- void __read_overflow3(void) __compiletime_error("detected read beyond
-size of object passed as 3rd parameter");
-
-I don't immediately see why the __noreturn changes the behavior here, any idea?
-
->> Not sure if that change is the best fix, but it seems to address the problem in
->> this driver and probably leads to better code in other places as well.
->>
->
-> Probably it would be better to solve this on the strlcpy side, but I haven't found the way to do this right.
-> Alternative solutions:
->
->  - use memcpy() instead of strlcpy(). All source strings are smaller than I2C_NAME_SIZE, so we could
->    do something like this - memcpy(info.type, "si2168", sizeof("si2168"));
->    Also this should be faster.
-
-This would be very similar to the patch I posted at the start of this
-thread to use strncpy(), right?
-I was hoping that changing strlcpy() here could also improve other
-users that might run into
-the same situation, but stay below the 2048-byte stack frame limit.
-
->  - Move code under different "case:" in the switch(dev->model) to the separate function should help as well.
->    But it might be harder to backport into stables.
-
-Agreed, I posted this in earlier versions of the patch series, see
-https://patchwork.kernel.org/patch/9601025/
-
-The new patch was a result of me trying to come up with a less
-invasive version to
-make it easier to backport, since I would like to backport the last
-patch in the series
-that depends on all the earlier ones.
-
-         Arnd
+https://public-inbox.org/git/1459432667.2124.2.camel@dwim.me 
