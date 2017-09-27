@@ -1,76 +1,134 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-he1eur01on0127.outbound.protection.outlook.com ([104.47.0.127]:54965
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S935225AbdIZThv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Sep 2017 15:37:51 -0400
-Subject: Re: [PATCH v4 9/9] kasan: rework Kconfig settings
-References: <20170922212930.620249-1-arnd@arndb.de>
- <20170922212930.620249-10-arnd@arndb.de>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <aeb9c144-10a6-53c2-89ba-cc7864f254e1@virtuozzo.com>
-Date: Tue, 26 Sep 2017 22:36:38 +0300
+Received: from mail-oi0-f68.google.com ([209.85.218.68]:32937 "EHLO
+        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753090AbdI0N0W (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 27 Sep 2017 09:26:22 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170922212930.620249-10-arnd@arndb.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <e7e6418e-4340-5057-aa17-800082aca5fb@virtuozzo.com>
+References: <20170922212930.620249-1-arnd@arndb.de> <20170922212930.620249-5-arnd@arndb.de>
+ <063D6719AE5E284EB5DD2968C1650D6DD007F521@AcuExch.aculab.com>
+ <CAK8P3a1zxjMsQTBPijCo8FJjEU5aRVTr7n_NZ1YM2UnDPKoRLw@mail.gmail.com>
+ <CAK8P3a37Ts5q7BvA2JWse87huyAp+=e18CUXEt8731RrBnB+Ow@mail.gmail.com> <e7e6418e-4340-5057-aa17-800082aca5fb@virtuozzo.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Wed, 27 Sep 2017 06:26:21 -0700
+Message-ID: <CAK8P3a2C7DBTfQZvRi-QQfrfm1GXktFcXQRmXmzpF4SCa+BADA@mail.gmail.com>
+Subject: Re: [PATCH v4 4/9] em28xx: fix em28xx_dvb_init for KASAN
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Arend van Spriel <arend.vanspriel@broadcom.com>, Kalle Valo <kvalo@codeaurora.org>, "David S. Miller" <davem@davemloft.net>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-media@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com, brcm80211-dev-list@cypress.com, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org, Jakub Jelinek <jakub@gcc.gnu.org>, =?UTF-8?Q?Martin_Li=c5=a1ka?= <marxin@gcc.gnu.org>
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Cc: David Laight <David.Laight@aculab.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Arend van Spriel <arend.vanspriel@broadcom.com>, Kalle Valo <kvalo@codeaurora.org>, "David S. Miller" <davem@davemloft.net>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, "brcm80211-dev-list.pdl@broadcom.com" <brcm80211-dev-list.pdl@broadcom.com>, "brcm80211-dev-list@cypress.com" <brcm80211-dev-list@cypress.com>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jakub Jelinek <jakub@gcc.gnu.org>, =?UTF-8?Q?Martin_Li=C5=A1ka?= <marxin@gcc.gnu.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>
 
-On 09/23/2017 12:29 AM, Arnd Bergmann wrote:
-> We get a lot of very large stack frames using gcc-7.0.1 with the default
-> -fsanitize-address-use-after-scope --param asan-stack=1 options, which
-> can easily cause an overflow of the kernel stack, e.g.
-> 
-> drivers/gpu/drm/i915/gvt/handlers.c:2407:1: error: the frame size of 31216 bytes is larger than 2048 bytes
-> drivers/net/wireless/ralink/rt2x00/rt2800lib.c:5650:1: error: the frame size of 23632 bytes is larger than 2048 bytes
-> drivers/scsi/fnic/fnic_trace.c:451:1: error: the frame size of 5152 bytes is larger than 2048 bytes
-> fs/btrfs/relocation.c:1202:1: error: the frame size of 4256 bytes is larger than 2048 bytes
-> fs/fscache/stats.c:287:1: error: the frame size of 6552 bytes is larger than 2048 bytes
-> lib/atomic64_test.c:250:1: error: the frame size of 12616 bytes is larger than 2048 bytes
-> mm/vmscan.c:1367:1: error: the frame size of 5080 bytes is larger than 2048 bytes
-> net/wireless/nl80211.c:1905:1: error: the frame size of 4232 bytes is larger than 2048 bytes
-> 
-> To reduce this risk, -fsanitize-address-use-after-scope is now split
-> out into a separate CONFIG_KASAN_EXTRA Kconfig option, leading to stack
-> frames that are smaller than 2 kilobytes most of the time on x86_64. An
-> earlier version of this patch also prevented combining KASAN_EXTRA with
-> KASAN_INLINE, but that is no longer necessary with gcc-7.0.1.
-> 
-> A lot of warnings with KASAN_EXTRA go away if we disable KMEMCHECK,
-> as -fsanitize-address-use-after-scope seems to understand the builtin
-> memcpy, but adds checking code around an extern memcpy call. I had to work
-> around a circular dependency, as DEBUG_SLAB/SLUB depended on !KMEMCHECK,
-> while KASAN did it the other way round. Now we handle both the same way
-> and make KASAN and KMEMCHECK mutually exclusive.
-> 
-> All patches to get the frame size below 2048 bytes with CONFIG_KASAN=y
-> and CONFIG_KASAN_EXTRA=n have been submitted along with this patch, so
-> we can bring back that default now. KASAN_EXTRA=y still causes lots of
-> warnings but now defaults to !COMPILE_TEST to disable it in allmodconfig,
-> and it remains disabled in all other defconfigs since it is a new option.
-> I arbitrarily raise the warning limit for KASAN_EXTRA to 3072 to reduce
-> the noise, but an allmodconfig kernel still has around 50 warnings
-> on gcc-7.
-> 
-> I experimented a bit more with smaller stack frames and have another
-> follow-up series that reduces the warning limit for 64-bit architectures
-> to 1280 bytes (without CONFIG_KASAN).
-> 
-> With earlier versions of this patch series, I also had patches to
-> address the warnings we get with KASAN and/or KASAN_EXTRA, using a
-> "noinline_if_stackbloat" annotation. That annotation now got replaced with
-> a gcc-8 bugfix (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81715)
-> and a workaround for older compilers, which means that KASAN_EXTRA is
-> now just as bad as before and will lead to an instant stack overflow in
-> a few extreme cases.
-> 
-> This reverts parts of commit commit 3f181b4 ("lib/Kconfig.debug: disable
-> -Wframe-larger-than warnings with KASAN=y").
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+On Tue, Sep 26, 2017 at 9:49 AM, Andrey Ryabinin
+<aryabinin@virtuozzo.com> wrote:
+>
+>
+> On 09/26/2017 09:47 AM, Arnd Bergmann wrote:
+>> On Mon, Sep 25, 2017 at 11:32 PM, Arnd Bergmann <arnd@arndb.de> wrote:
 
-Acked-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+>> +       ret = __builtin_strlen(q);
+>
+>
+> I think this is not correct. Fortified strlen called here on purpose. If sizeof q is known at compile time
+> and 'q' contains not-null fortified strlen() will panic.
+
+Ok, got it.
+
+>>         if (size) {
+>>                 size_t len = (ret >= size) ? size - 1 : ret;
+>>                 if (__builtin_constant_p(len) && len >= p_size)
+>>
+>> The problem is apparently that the fortified strlcpy calls the fortified strlen,
+>> which in turn calls strnlen and that ends up calling the extern '__real_strnlen'
+>> that gcc cannot reduce to a constant expression for a constant input.
+>
+>
+> Per my observation, it's the code like this:
+>         if ()
+>                 fortify_panic(__func__);
+>
+>
+> somehow prevent gcc to merge several "struct i2c_board_info info;" into one stack slot.
+> With the hack bellow, stack usage reduced to ~1,6K:
+
+1.6k is also what I see with my patch, or any other approach I tried
+that changes
+string.h. With the split up em28xx_dvb_init() function (and without
+changes to string.h),
+I got down to a few hundred bytes for the largest handler.
+
+> ---
+>  include/linux/string.h | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/include/linux/string.h b/include/linux/string.h
+> index 54d21783e18d..9a96ff3ebf94 100644
+> --- a/include/linux/string.h
+> +++ b/include/linux/string.h
+> @@ -261,8 +261,6 @@ __FORTIFY_INLINE __kernel_size_t strlen(const char *p)
+>         if (p_size == (size_t)-1)
+>                 return __builtin_strlen(p);
+>         ret = strnlen(p, p_size);
+> -       if (p_size <= ret)
+> -               fortify_panic(__func__);
+>         return ret;
+>  }
+>
+> @@ -271,8 +269,6 @@ __FORTIFY_INLINE __kernel_size_t strnlen(const char *p, __kernel_size_t maxlen)
+>  {
+>         size_t p_size = __builtin_object_size(p, 0);
+>         __kernel_size_t ret = __real_strnlen(p, maxlen < p_size ? maxlen : p_size);
+> -       if (p_size <= ret && maxlen != ret)
+> -               fortify_panic(__func__);
+>         return ret;
+
+I've reduced it further to this change:
+
+--- a/include/linux/string.h
++++ b/include/linux/string.h
+@@ -227,7 +227,7 @@ static inline const char *kbasename(const char *path)
+ #define __FORTIFY_INLINE extern __always_inline __attribute__((gnu_inline))
+ #define __RENAME(x) __asm__(#x)
+
+-void fortify_panic(const char *name) __noreturn __cold;
++void fortify_panic(const char *name) __cold;
+ void __read_overflow(void) __compiletime_error("detected read beyond
+size of object passed as 1st parameter");
+ void __read_overflow2(void) __compiletime_error("detected read beyond
+size of object passed as 2nd parameter");
+ void __read_overflow3(void) __compiletime_error("detected read beyond
+size of object passed as 3rd parameter");
+
+I don't immediately see why the __noreturn changes the behavior here, any idea?
+
+>> Not sure if that change is the best fix, but it seems to address the problem in
+>> this driver and probably leads to better code in other places as well.
+>>
+>
+> Probably it would be better to solve this on the strlcpy side, but I haven't found the way to do this right.
+> Alternative solutions:
+>
+>  - use memcpy() instead of strlcpy(). All source strings are smaller than I2C_NAME_SIZE, so we could
+>    do something like this - memcpy(info.type, "si2168", sizeof("si2168"));
+>    Also this should be faster.
+
+This would be very similar to the patch I posted at the start of this
+thread to use strncpy(), right?
+I was hoping that changing strlcpy() here could also improve other
+users that might run into
+the same situation, but stay below the 2048-byte stack frame limit.
+
+>  - Move code under different "case:" in the switch(dev->model) to the separate function should help as well.
+>    But it might be harder to backport into stables.
+
+Agreed, I posted this in earlier versions of the patch series, see
+https://patchwork.kernel.org/patch/9601025/
+
+The new patch was a result of me trying to come up with a less
+invasive version to
+make it easier to backport, since I would like to backport the last
+patch in the series
+that depends on all the earlier ones.
+
+         Arnd
