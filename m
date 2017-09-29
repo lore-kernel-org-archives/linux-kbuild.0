@@ -1,62 +1,154 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:53745 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752156AbdI1ObB (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:59076 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750932AbdI2JhJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Sep 2017 10:31:01 -0400
+        Fri, 29 Sep 2017 05:37:09 -0400
+Received: from mail-yw0-f181.google.com (mail-yw0-f181.google.com [209.85.161.181]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id v8T9aqD5026477
+        for <linux-kbuild@vger.kernel.org>; Fri, 29 Sep 2017 18:36:53 +0900
+Received: by mail-yw0-f181.google.com with SMTP id s62so471295ywg.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 29 Sep 2017 02:36:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <2631e8a6-03f2-69ea-d889-afd9a345e7ef@virtuozzo.com>
-References: <20170922212930.620249-1-arnd@arndb.de> <20170922212930.620249-5-arnd@arndb.de>
- <063D6719AE5E284EB5DD2968C1650D6DD007F521@AcuExch.aculab.com>
- <CAK8P3a1zxjMsQTBPijCo8FJjEU5aRVTr7n_NZ1YM2UnDPKoRLw@mail.gmail.com>
- <CAK8P3a37Ts5q7BvA2JWse87huyAp+=e18CUXEt8731RrBnB+Ow@mail.gmail.com>
- <e7e6418e-4340-5057-aa17-800082aca5fb@virtuozzo.com> <CAK8P3a2C7DBTfQZvRi-QQfrfm1GXktFcXQRmXmzpF4SCa+BADA@mail.gmail.com>
- <2631e8a6-03f2-69ea-d889-afd9a345e7ef@virtuozzo.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Thu, 28 Sep 2017 07:30:59 -0700
-Message-ID: <CAK8P3a3BiPh+d4vcb4pbbOsZLegp6YGk+BU3L=71sxatTuk-GQ@mail.gmail.com>
-Subject: Re: [PATCH v4 4/9] em28xx: fix em28xx_dvb_init for KASAN
+In-Reply-To: <1506159583-18894-1-git-send-email-riku.voipio@linaro.org>
+References: <1506159583-18894-1-git-send-email-riku.voipio@linaro.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 29 Sep 2017 18:36:11 +0900
+Message-ID: <CAK7LNASgbbG2XT-Vs5Sx242mJ1-vjA6dEe24dW1mD-hzh8JEbw@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts/package/builddeb: split generating packaging
+ and build
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: David Laight <David.Laight@aculab.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Arend van Spriel <arend.vanspriel@broadcom.com>, Kalle Valo <kvalo@codeaurora.org>, "David S. Miller" <davem@davemloft.net>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, "brcm80211-dev-list.pdl@broadcom.com" <brcm80211-dev-list.pdl@broadcom.com>, "brcm80211-dev-list@cypress.com" <brcm80211-dev-list@cypress.com>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jakub Jelinek <jakub@gcc.gnu.org>, =?UTF-8?Q?Martin_Li=C5=A1ka?= <marxin@gcc.gnu.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>
 
-On Thu, Sep 28, 2017 at 6:09 AM, Andrey Ryabinin
-<aryabinin@virtuozzo.com> wrote:
-> On 09/27/2017 04:26 PM, Arnd Bergmann wrote:
->> On Tue, Sep 26, 2017 at 9:49 AM, Andrey Ryabinin
->> <aryabinin@virtuozzo.com> wrote:
+Hi Riku,
 
->> --- a/include/linux/string.h
->> +++ b/include/linux/string.h
->> @@ -227,7 +227,7 @@ static inline const char *kbasename(const char *path)
->>  #define __FORTIFY_INLINE extern __always_inline __attribute__((gnu_inline))
->>  #define __RENAME(x) __asm__(#x)
->>
->> -void fortify_panic(const char *name) __noreturn __cold;
->> +void fortify_panic(const char *name) __cold;
->>  void __read_overflow(void) __compiletime_error("detected read beyond
->> size of object passed as 1st parameter");
->>  void __read_overflow2(void) __compiletime_error("detected read beyond
->> size of object passed as 2nd parameter");
->>  void __read_overflow3(void) __compiletime_error("detected read beyond
->> size of object passed as 3rd parameter");
->>
->> I don't immediately see why the __noreturn changes the behavior here, any idea?
->>
+
+2017-09-23 18:39 GMT+09:00 Riku Voipio <riku.voipio@linaro.org>:
+> Move debian/ directory generation out of builddeb to a new script,
+> mkdebian. The package build commands are kept in builddeb, which
+> is now and internal command called from debian/rules.
 >
+> With these changes in place, we can now use dpkg-buildpackage from
+> deb-pkg and bindeb-pkg removing need for handrolled source/changes
+> generation.
 >
-> At first I thought that this somehow might be related to __asan_handle_no_return(). GCC calls it
-> before noreturn function. So I made patch to remove generation of these calls (we don't need them in the kernel anyway)
-> but it didn't help. It must be something else than.
+> This patch is based on the criticism of the current state of builddeb
+> discussed on:
+>
+> https://patchwork.kernel.org/patch/9656403/
+>
+> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 
-I made a reduced test case yesterday (see http://paste.ubuntu.com/25628030/),
-and it shows the same behavior with and without the sanitizer, it uses 128
-bytes without the noreturn attribute and 480 bytes when its added, the sanitizer
-adds a factor of 1.5x on top. It's possible that I did something wrong while
-reducing, since the original driver file uses very little stack (a few hundred
-bytes) without -fsanitize=kernel-address, but finding out what happens in
-the reduced case may still help understand the other one.
 
-        Arnd
+Sorry for delay.
+
+When I was testing this patch, I was hit by a problem
+when building the package with a parallel option.
+
+Did you see the problem as below?
+
+
+Please try this:
+
+make defconfig
+make -j8 bindeb-pkg
+
+This stalled on my build machine due to too many jobs.
+
+
+
+As far as I tested,
+the build command in debian/rules
+is invoked with -j without any argument.
+
+"man make" says
+If the  -j  option  is given without an argument, make will not limit
+the number of jobs that can run simultaneously.
+
+
+
+
+
+>
+>  bindeb-pkg: FORCE
+> -       $(MAKE) KBUILD_SRC=
+> -       +$(call cmd,builddeb)
+> +       $(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
+> +       dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) -b -nc -us -uc
+
+
+
+I think -us option is not necessary for bindeb-pkg.
+
+
+
+
+> -}
+> +# Set up variables in case we not called from kernel toplevel Makefile
+> +objtree="${objtree:-.}"
+> +srctree="${srctree:-.}"
+> +MAKE="${MAKE:-make}"
+> +OBJCOPY="${OBJCOPY:-objcopy}"
+> +KCONFIG_CONFIG="${KCONFIG_CONFIG:-.config}"
+
+Hmm, I do not like these.
+Now I understood your intention.
+I prefer "make intdeb-pkg" in v1.
+Sorry, my suggesting was misleading.
+
+
+
+
+> +cat <<EOF > debian/rules
+> +#!/usr/bin/make -f
+> +
+> +ifneq (,\$(filter parallel=%,\$(DEB_BUILD_OPTIONS)))
+> +    NUMJOBS = \$(patsubst parallel=%,%,\$(filter parallel=%,\$(DEB_BUILD_OPTIONS)))
+> +    MAKEFLAGS += -j\$(NUMJOBS)
+> +endif
+> +
+> +build:
+> +       \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} KBUILD_SRC=
+
+The problem is here.
+
+If I invoked "make -j<N> bindeb-pkg",
+I see -j in MAKEFLAGS.   (<N> is missing)
+
+I am not sure if this is a bug of dpkg-buildpackage or not.
+
+
+I found a workaround for this.
+
+In scripts/package/mkdebian:
+
+NUMJOBS := \$(patsubst parallel=%,%,\$(filter parallel=%,\$(DEB_BUILD_OPTIONS)))
+
+build:
+        \$(MAKE) \$(if \$(NUMJOBS),-j\$(NUMJOBS))
+KERNELRELEASE=${version} ARCH=${ARCH} KBUILD_SRC=
+
+
+
+In scripts/package/Makefile:
+
+bindeb-pkg: FORCE
+      $(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
+      dpkg-buildpackage $(filter -j%,$(MAKEFLAGS)) \
+      -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) -b -nc -us -uc
+
+
+This worked for me.
+If you have a better solution, please override it.
+
+
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
