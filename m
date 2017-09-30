@@ -1,56 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:20292 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752571AbdI3AjB (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:25301 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752595AbdI3BKf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 29 Sep 2017 20:39:01 -0400
-MIME-Version: 1.0
-In-Reply-To: <cc4680bb-9e54-d449-606e-a3fa2e7a9763@arm.com>
-References: <cc4680bb-9e54-d449-606e-a3fa2e7a9763@arm.com>
+        Fri, 29 Sep 2017 21:10:35 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 30 Sep 2017 09:37:53 +0900
-Message-ID: <CAK7LNAQh=RDUCsxMfX0QY6w4NyeMdUdgc0GbXDP=SEWDzqKXWQ@mail.gmail.com>
-Subject: Re: Fail to build Linux with O= in master
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 7/9] kbuild: rpm-pkg: fix jobserver unavailable warning
+Date: Sat, 30 Sep 2017 10:10:09 +0900
+Message-Id: <1506733811-24636-7-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1506733811-24636-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1506733811-24636-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Julien Grall <julien.grall@arm.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-2017-09-30 8:59 GMT+09:00 Julien Grall <julien.grall@arm.com>:
-> Hello,
->
-> I have tried to build the latest master and got the following error:
->
-> 42sh> make O=~/works/linux-build/aarch64-4k -C ~/works/linux
-> make: Entering directory '/home/julgra01/works/linux'
-> Makefile:135: *** failed to create output directory "~/works/linux-build/aarch64-4k".  Stop.
-> make: Leaving directory '/home/julgra01/works/linux'
->
-> The bisector found the commit 8e9b466 "kbuild: use $(abspath ...)
-> instead of $(shell cd ... && /bin/pwd)".
->
-> Looking at the code, it seems that it is because the code is
-> now using $(realpath ...). Indeed when I replace ~ by $HOME
-> the kernel is now built.
->
-> I am not a Makefile expert, so I would appreciate if anyone
-> could suggest a patch for this.
->
+If "make rpm-pkg" or "make binrpm-pkg" is run with -j[jobs] option,
+the following warning message is displayed.
 
-Thanks for the report.
+  warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
 
-Which shell are you using?
+Follow the suggestion.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-I use bash and I have no problem.
-If I try dash, indeed, it fails.
+ scripts/package/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I will take a look.
-
-
-
-
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 73f9f31..b559671 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -50,7 +50,7 @@ rpm-pkg rpm: FORCE
+ 	$(MAKE) clean
+ 	$(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
+ 	$(call cmd,src_tar,$(KERNELPATH),kernel.spec)
+-	rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
++	+rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
+ 	rm $(KERNELPATH).tar.gz kernel.spec
+ 
+ # binrpm-pkg
+@@ -58,7 +58,7 @@ rpm-pkg rpm: FORCE
+ binrpm-pkg: FORCE
+ 	$(MAKE) KBUILD_SRC=
+ 	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
+-	rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
++	+rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
+ 		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
+ 	rm binkernel.spec
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
