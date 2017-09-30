@@ -1,52 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:25324 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:25317 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752732AbdI3BKf (ORCPT
+        with ESMTP id S1752728AbdI3BKf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 29 Sep 2017 21:10:35 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/9] kbuild: rpm-pkg: remove ppc64 specific image handling
-Date: Sat, 30 Sep 2017 10:10:03 +0900
-Message-Id: <1506733811-24636-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 9/9] kbuild: rpm-pkg: do not force -jN in submake
+Date: Sat, 30 Sep 2017 10:10:11 +0900
+Message-Id: <1506733811-24636-9-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1506733811-24636-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1506733811-24636-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-This conditional was added by commit 1a0f3d422bb9 ("kbuild: fix
-make rpm for powerpc").  Its git-log explains the default kernel
-image is zImage, but obviously the current arch/powerpc/Makefile
-does not set KBUILD_IMAGE, so the image file is actually vmlinux.
+The spec file always passes %{?_smp_mflags}, but we have two
+problems here.
 
-Moreover, since commit 09549aa1baa9 ("deb-pkg: Remove the KBUILD_IMAGE
-workaround"), all architectures are supposed to set the full path to
-the image in KBUILD_IMAGE.  I see no good reason to differentiate
-ppc64 from others.  Rip off the conditional.
+[1] "make -jN rpm-pkg" emits the following warning message:
+
+    make[2]: warning: -jN forced in submake: disabling jobserver mode.
+
+[2] We can not specify the number of jobs that run in parallel.
+    Whether we give -jN or not from the top Makefile, the spec file
+    always passes ${?_smp_mflags} to the build commands.
+
+${?_smp_mflags} will be useful when we run rpmbuild by hand.  When we
+invoke it from Makefile, -jN is propagated down to submake; it should
+not be overridden because we want to respect the number of jobs given
+by the user.  Set _smp_mflags to empty string in this case.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/package/mkspec | 5 -----
- 1 file changed, 5 deletions(-)
+ scripts/package/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index f47f17a..ef00750 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -92,13 +92,8 @@ echo "%ifarch ia64"
- echo 'cp $KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/efi/vmlinuz-$KERNELRELEASE"
- echo 'ln -s '"efi/vmlinuz-$KERNELRELEASE" '$RPM_BUILD_ROOT'"/boot/"
- echo "%else"
--echo "%ifarch ppc64"
--echo "cp vmlinux arch/powerpc/boot"
--echo "cp arch/powerpc/boot/"'$KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/vmlinuz-$KERNELRELEASE"
--echo "%else"
- echo 'cp $KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/vmlinuz-$KERNELRELEASE"
- echo "%endif"
--echo "%endif"
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 70eea1e..9ed96aef 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -50,7 +50,8 @@ rpm-pkg rpm: FORCE
+ 	$(MAKE) clean
+ 	$(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
+ 	$(call cmd,src_tar,$(KERNELPATH),kernel.spec)
+-	+rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
++	+rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz \
++	--define='_smp_mflags %{nil}'
  
- echo 'make %{?_smp_mflags} INSTALL_HDR_PATH=$RPM_BUILD_ROOT/usr KBUILD_SRC= headers_install'
- echo 'cp System.map $RPM_BUILD_ROOT'"/boot/System.map-$KERNELRELEASE"
+ # binrpm-pkg
+ # ---------------------------------------------------------------------------
 -- 
 2.7.4
 
