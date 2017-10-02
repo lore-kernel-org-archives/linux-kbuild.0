@@ -1,77 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-he1eur01on0118.outbound.protection.outlook.com ([104.47.0.118]:35008
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751036AbdJBOEt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Oct 2017 10:04:49 -0400
-Subject: Re: [PATCH] string.h: work around for increased stack usage
-References: <CAK8P3a0WtHjvo6tOp79U4gKjLSRmVCAmjYU_xTVJfBL1Qe-hdQ@mail.gmail.com>
- <20171002084119.3504771-1-arnd@arndb.de>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <ffac3776-9548-8f21-8953-dbbc3ee25388@virtuozzo.com>
-Date: Mon, 2 Oct 2017 17:07:42 +0300
-MIME-Version: 1.0
-In-Reply-To: <20171002084119.3504771-1-arnd@arndb.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: from mail-pg0-f46.google.com ([74.125.83.46]:52162 "EHLO
+        mail-pg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751357AbdJBTUS (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 2 Oct 2017 15:20:18 -0400
+Received: by mail-pg0-f46.google.com with SMTP id u144so778831pgb.8
+        for <linux-kbuild@vger.kernel.org>; Mon, 02 Oct 2017 12:20:17 -0700 (PDT)
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH 2/3] Makefile: Move stackprotector availability out of Kconfig
+Date: Mon,  2 Oct 2017 12:20:06 -0700
+Message-Id: <1506972007-80614-3-git-send-email-keescook@chromium.org>
+In-Reply-To: <1506972007-80614-1-git-send-email-keescook@chromium.org>
+References: <1506972007-80614-1-git-send-email-keescook@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: David Laight <David.Laight@aculab.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, "David S . Miller" <davem@davemloft.net>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "linux-media @ vger . kernel . org" <linux-media@vger.kernel.org>, "linux-kernel @ vger . kernel . org" <linux-kernel@vger.kernel.org>, "kasan-dev @ googlegroups . com" <kasan-dev@googlegroups.com>, "linux-kbuild @ vger . kernel . org" <linux-kbuild@vger.kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Kees Cook <keescook@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Ingo Molnar <mingo@kernel.org>, Laura Abbott <labbott@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, Al Viro <viro@zeniv.linux.org.uk>, linux-kbuild@vger.kernel.org, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org, kernel-hardening@lists.openwall.com
 
-On 10/02/2017 11:40 AM, Arnd Bergmann wrote:
-> The hardened strlen() function causes rather large stack usage
-> in at least one file in the kernel when CONFIG_KASAN is enabled:
-> 
-> drivers/media/usb/em28xx/em28xx-dvb.c: In function 'em28xx_dvb_init':
-> drivers/media/usb/em28xx/em28xx-dvb.c:2062:1: error: the frame size of 3256 bytes is larger than 204 bytes [-Werror=frame-larger-than=]
-> 
-> Analyzing this problem led to the discovery that gcc fails to
-> merge the stack slots for the i2c_board_info[] structures after
-> we strlcpy() into them, due to the 'noreturn' attribute on the
-> source string length check.
-> 
-> The compiler behavior should get fixed in gcc-8, but for users
-> of existing gcc versions, we can work around it using an empty
-> inline assembly statement before the call to fortify_panic().
-> 
-> The workaround is unfortunately very ugly, and I tried my best
-> to limit it being applied to affected versions of gcc when
-> KASAN is used. Alternative suggestions welcome.
-> 
+Various portions of the kernel, especially per-architecture pieces,
+need to know if the compiler is building it with the stack protector.
+This was done in the arch/Kconfig with 'select', but this doesn't
+allow a way to do auto-detected compiler support. In preparation for
+creating an on-if-available default, move the logic for the definition of
+CONFIG_CC_STACKPROTECTOR into the Makefile.
 
-I don't have a really strong preference, so this approach is fine by me,
-but s/strlcpy/[strncpy|memcpy] approach seems a little better to me, because it's not ugly.
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <mmarek@suse.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: Laura Abbott <labbott@redhat.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ Makefile     | 7 +++++--
+ arch/Kconfig | 8 --------
+ 2 files changed, 5 insertions(+), 10 deletions(-)
 
-This ugly workaround would make more sense if we a had lot of cases like in em28xx_dvb_init().
+diff --git a/Makefile b/Makefile
+index d1119941261c..e122a9cf0399 100644
+--- a/Makefile
++++ b/Makefile
+@@ -688,8 +688,11 @@ else
+   stackp-flag := $(call cc-option, -fno-stack-protector)
+ endif
+ endif
+-# Find arch-specific stack protector compiler sanity-checking script.
+-ifdef CONFIG_CC_STACKPROTECTOR
++ifdef stackp-name
++  # If the stack protector has been selected, inform the rest of the build.
++  KBUILD_CFLAGS += -DCONFIG_CC_STACKPROTECTOR
++  KBUILD_AFLAGS += -DCONFIG_CC_STACKPROTECTOR
++  # Find arch-specific stack protector compiler sanity-checking script.
+   stackp-path := $(srctree)/scripts/gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh
+   stackp-check := $(wildcard $(stackp-path))
+ endif
+diff --git a/arch/Kconfig b/arch/Kconfig
+index 1aafb4efbb51..7007c1bfa79c 100644
+--- a/arch/Kconfig
++++ b/arch/Kconfig
+@@ -523,12 +523,6 @@ config HAVE_CC_STACKPROTECTOR
+ 	  - its compiler supports the -fstack-protector option
+ 	  - it has implemented a stack canary (e.g. __stack_chk_guard)
+ 
+-config CC_STACKPROTECTOR
+-	def_bool n
+-	help
+-	  Set when a stack-protector mode is enabled, so that the build
+-	  can enable kernel-side support for the GCC feature.
+-
+ choice
+ 	prompt "Stack Protector buffer overflow detection"
+ 	depends on HAVE_CC_STACKPROTECTOR
+@@ -549,7 +543,6 @@ config CC_STACKPROTECTOR_NONE
+ 
+ config CC_STACKPROTECTOR_REGULAR
+ 	bool "Regular"
+-	select CC_STACKPROTECTOR
+ 	help
+ 	  Functions will have the stack-protector canary logic added if they
+ 	  have an 8-byte or larger character array on the stack.
+@@ -563,7 +556,6 @@ config CC_STACKPROTECTOR_REGULAR
+ 
+ config CC_STACKPROTECTOR_STRONG
+ 	bool "Strong"
+-	select CC_STACKPROTECTOR
+ 	help
+ 	  Functions will have the stack-protector canary logic added in any
+ 	  of the following conditions:
+-- 
+2.7.4
 
-
-> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82365
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  include/linux/string.h | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/include/linux/string.h b/include/linux/string.h
-> index c7a1132cdc93..1bf5ecdf8e01 100644
-> --- a/include/linux/string.h
-> +++ b/include/linux/string.h
-> @@ -228,6 +228,16 @@ static inline const char *kbasename(const char *path)
->  #define __RENAME(x) __asm__(#x)
->  
->  void fortify_panic(const char *name) __noreturn __cold;
-> +
-> +/* work around GCC PR82365 */
-> +#if defined(CONFIG_KASAN) && !defined(__clang__) && GCC_VERSION <= 80000
-> +#define fortify_panic(x) \
-> +	do { \
-> +		asm volatile(""); \
-> +		fortify_panic(x); \
-> +	} while (0)
-> +#endif
-> +
->  void __read_overflow(void) __compiletime_error("detected read beyond size of object passed as 1st parameter");
->  void __read_overflow2(void) __compiletime_error("detected read beyond size of object passed as 2nd parameter");
->  void __read_overflow3(void) __compiletime_error("detected read beyond size of object passed as 3rd parameter");
-> 
