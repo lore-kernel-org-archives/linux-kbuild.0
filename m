@@ -1,121 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:35760 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750962AbdJBL10 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Oct 2017 07:27:26 -0400
-Subject: Re: [PATCH] kbuild: revert $(realpath ...) to $(shell cd ... &&
- /bin/pwd)
-References: <1506931648-15511-1-git-send-email-yamada.masahiro@socionext.com>
-From: Julien Grall <julien.grall@arm.com>
-Message-ID: <ea8b93e6-2ce3-2c32-fbe3-f6570c523f1b@arm.com>
-Date: Mon, 2 Oct 2017 12:27:22 +0100
+Received: from smtp.codeaurora.org ([198.145.29.96]:48782 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751357AbdJBNxt (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 2 Oct 2017 09:53:49 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1506931648-15511-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Subject: Re: [v4,
+ 1/9] brcmsmac: make some local variables 'static const' to reduce
+ stack size
+From: Kalle Valo <kvalo@codeaurora.org>
+In-Reply-To: <20170922212930.620249-2-arnd@arndb.de>
+References: <20170922212930.620249-2-arnd@arndb.de>
+Message-Id: <20171002135348.7AFA560AFB@smtp.codeaurora.org>
+Date: Mon,  2 Oct 2017 13:53:48 +0000 (UTC)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: linux-pm@vger.kernel.org, Michal Marek <mmarek@suse.com>, David Carrillo-Cisneros <davidcc@google.com>, linux-kernel@vger.kernel.org, Thomas Renninger <trenn@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@kernel.org>, Arnaldo Carvalho de Melo <acme@redhat.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Arend van Spriel <arend.vanspriel@broadcom.com>, Franky Lin <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>, Chi-Hsien Lin <chi-hsien.lin@cypress.com>, Wright Feng <wright.feng@cypress.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-media@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com, brcm80211-dev-list@cypress.com, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org, Jakub Jelinek <jakub@gcc.gnu.org>, =?UTF-8?q?Martin=20Li=C5=A1ka?= <marxin@gcc.gnu.org>
 
-Hello,
+Arnd Bergmann <arnd@arndb.de> wrote:
 
-On 02/10/17 09:07, Masahiro Yamada wrote:
-> I thought commit 8e9b46679923 ("kbuild: use $(abspath ...) instead of
-> $(shell cd ... && /bin/pwd)") was a safe conversion, but it changed
-> the behavior.
+> With KASAN and a couple of other patches applied, this driver is one
+> of the few remaining ones that actually use more than 2048 bytes of
+> kernel stack:
 > 
-> $(abspath ...) / $(realpath ...) does not expand shell special
-> characters, such as '~'.
+> broadcom/brcm80211/brcmsmac/phy/phy_n.c: In function 'wlc_phy_workarounds_nphy_gainctrl':
+> broadcom/brcm80211/brcmsmac/phy/phy_n.c:16065:1: warning: the frame size of 3264 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> broadcom/brcm80211/brcmsmac/phy/phy_n.c: In function 'wlc_phy_workarounds_nphy':
+> broadcom/brcm80211/brcmsmac/phy/phy_n.c:17138:1: warning: the frame size of 2864 bytes is larger than 2048 bytes [-Wframe-larger-than=]
 > 
-> Here is a simple Makefile example:
+> Here, I'm reducing the stack size by marking as many local variables as
+> 'static const' as I can without changing the actual code.
 > 
->    ---------------->8----------------
->    $(info /bin/pwd: $(shell cd ~/; /bin/pwd))
->    $(info abspath: $(abspath ~/))
->    $(info realpath: $(realpath ~/))
->    all:
->            @:
->    ---------------->8----------------
+> This is the first of three patches to improve the stack usage in this
+> driver. It would be good to have this backported to stabl kernels
+> to get all drivers in 'allmodconfig' below the 2048 byte limit so
+> we can turn on the frame warning again globally, but I realize that
+> the patch is larger than the normal limit for stable backports.
 > 
->    $ make
->    /bin/pwd: /home/masahiro
->    abspath: /home/masahiro/workspace/~
->    realpath:
+> The other two patches do not need to be backported.
 > 
-> This can be a real problem if 'make O=~/foo' is invoked from another
-> Makefile or primitive shell like dash.
-> 
-> This commit partially reverts 8e9b46679923.
-> 
-> Fixes: 8e9b46679923 ("kbuild: use $(abspath ...) instead of $(shell cd ... && /bin/pwd)")
-> Reported-by: Julien Grall <julien.grall@arm.com>
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: <stable@vger.kernel.org>
+> Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Tested-by: Julien Grall <julien.grall@arm.com>
+Patch applied to wireless-drivers.git, thanks.
 
-Regards,
-
-> ---
-> 
->   Makefile                       | 4 ++--
->   tools/power/cpupower/Makefile  | 2 +-
->   tools/scripts/Makefile.include | 6 +++---
->   3 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index cf007a3..1b48717 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -130,8 +130,8 @@ endif
->   ifneq ($(KBUILD_OUTPUT),)
->   # check that the output directory actually exists
->   saved-output := $(KBUILD_OUTPUT)
-> -$(shell [ -d $(KBUILD_OUTPUT) ] || mkdir -p $(KBUILD_OUTPUT))
-> -KBUILD_OUTPUT := $(realpath $(KBUILD_OUTPUT))
-> +KBUILD_OUTPUT := $(shell mkdir -p $(KBUILD_OUTPUT) && cd $(KBUILD_OUTPUT) \
-> +								&& /bin/pwd)
->   $(if $(KBUILD_OUTPUT),, \
->        $(error failed to create output directory "$(saved-output)"))
->   
-> diff --git a/tools/power/cpupower/Makefile b/tools/power/cpupower/Makefile
-> index 4c5a481..d6e1c02 100644
-> --- a/tools/power/cpupower/Makefile
-> +++ b/tools/power/cpupower/Makefile
-> @@ -26,7 +26,7 @@ endif
->   
->   ifneq ($(OUTPUT),)
->   # check that the output directory actually exists
-> -OUTDIR := $(realpath $(OUTPUT))
-> +OUTDIR := $(shell cd $(OUTPUT) && /bin/pwd)
->   $(if $(OUTDIR),, $(error output directory "$(OUTPUT)" does not exist))
->   endif
->   
-> diff --git a/tools/scripts/Makefile.include b/tools/scripts/Makefile.include
-> index 9dc8f07..1e8b611 100644
-> --- a/tools/scripts/Makefile.include
-> +++ b/tools/scripts/Makefile.include
-> @@ -1,7 +1,7 @@
->   ifneq ($(O),)
->   ifeq ($(origin O), command line)
-> -	ABSOLUTE_O := $(realpath $(O))
-> -	dummy := $(if $(ABSOLUTE_O),,$(error O=$(O) does not exist))
-> +	dummy := $(if $(shell test -d $(O) || echo $(O)),$(error O=$(O) does not exist),)
-> +	ABSOLUTE_O := $(shell cd $(O) ; pwd)
->   	OUTPUT := $(ABSOLUTE_O)/$(if $(subdir),$(subdir)/)
->   	COMMAND_O := O=$(ABSOLUTE_O)
->   ifeq ($(objtree),)
-> @@ -12,7 +12,7 @@ endif
->   
->   # check that the output directory actually exists
->   ifneq ($(OUTPUT),)
-> -OUTDIR := $(realpath $(OUTPUT))
-> +OUTDIR := $(shell cd $(OUTPUT) && /bin/pwd)
->   $(if $(OUTDIR),, $(error output directory "$(OUTPUT)" does not exist))
->   endif
->   
-> 
+c503dd38f850 brcmsmac: make some local variables 'static const' to reduce stack size
 
 -- 
-Julien Grall
+https://patchwork.kernel.org/patch/9967145/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+
