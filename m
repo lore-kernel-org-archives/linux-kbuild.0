@@ -1,45 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.29.96]:49624 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750957AbdJBNz5 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Oct 2017 09:55:57 -0400
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-he1eur01on0118.outbound.protection.outlook.com ([104.47.0.118]:35008
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751036AbdJBOEt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 2 Oct 2017 10:04:49 -0400
+Subject: Re: [PATCH] string.h: work around for increased stack usage
+References: <CAK8P3a0WtHjvo6tOp79U4gKjLSRmVCAmjYU_xTVJfBL1Qe-hdQ@mail.gmail.com>
+ <20171002084119.3504771-1-arnd@arndb.de>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Message-ID: <ffac3776-9548-8f21-8953-dbbc3ee25388@virtuozzo.com>
+Date: Mon, 2 Oct 2017 17:07:42 +0300
 MIME-Version: 1.0
+In-Reply-To: <20171002084119.3504771-1-arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [v4,2/9] brcmsmac: split up wlc_phy_workarounds_nphy
-From: Kalle Valo <kvalo@codeaurora.org>
-In-Reply-To: <20170922212930.620249-3-arnd@arndb.de>
-References: <20170922212930.620249-3-arnd@arndb.de>
-Message-Id: <20171002135556.82A7D60B7C@smtp.codeaurora.org>
-Date: Mon,  2 Oct 2017 13:55:56 +0000 (UTC)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnd Bergmann <arnd@arndb.de>
-Cc: Arend van Spriel <arend.vanspriel@broadcom.com>, Franky Lin <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>, Chi-Hsien Lin <chi-hsien.lin@cypress.com>, Wright Feng <wright.feng@cypress.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-media@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com, brcm80211-dev-list@cypress.com, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org, Jakub Jelinek <jakub@gcc.gnu.org>, =?UTF-8?q?Martin=20Li=C5=A1ka?= <marxin@gcc.gnu.org>
+Cc: David Laight <David.Laight@aculab.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, "David S . Miller" <davem@davemloft.net>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "linux-media @ vger . kernel . org" <linux-media@vger.kernel.org>, "linux-kernel @ vger . kernel . org" <linux-kernel@vger.kernel.org>, "kasan-dev @ googlegroups . com" <kasan-dev@googlegroups.com>, "linux-kbuild @ vger . kernel . org" <linux-kbuild@vger.kernel.org>
 
-Arnd Bergmann <arnd@arndb.de> wrote:
+On 10/02/2017 11:40 AM, Arnd Bergmann wrote:
+> The hardened strlen() function causes rather large stack usage
+> in at least one file in the kernel when CONFIG_KASAN is enabled:
+> 
+> drivers/media/usb/em28xx/em28xx-dvb.c: In function 'em28xx_dvb_init':
+> drivers/media/usb/em28xx/em28xx-dvb.c:2062:1: error: the frame size of 3256 bytes is larger than 204 bytes [-Werror=frame-larger-than=]
+> 
+> Analyzing this problem led to the discovery that gcc fails to
+> merge the stack slots for the i2c_board_info[] structures after
+> we strlcpy() into them, due to the 'noreturn' attribute on the
+> source string length check.
+> 
+> The compiler behavior should get fixed in gcc-8, but for users
+> of existing gcc versions, we can work around it using an empty
+> inline assembly statement before the call to fortify_panic().
+> 
+> The workaround is unfortunately very ugly, and I tried my best
+> to limit it being applied to affected versions of gcc when
+> KASAN is used. Alternative suggestions welcome.
+> 
 
-> The stack consumption in this driver is still relatively high, with one
-> remaining warning if the warning level is lowered to 1536 bytes:
-> 
-> drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c:17135:1: error: the frame size of 1880 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
-> 
-> The affected function is actually a collection of three separate implementations,
-> and each of them is fairly large by itself. Splitting them up is done easily
-> and improves readability at the same time.
-> 
-> I'm leaving the original indentation to make the review easier.
-> 
-> Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+I don't have a really strong preference, so this approach is fine by me,
+but s/strlcpy/[strncpy|memcpy] approach seems a little better to me, because it's not ugly.
+
+This ugly workaround would make more sense if we a had lot of cases like in em28xx_dvb_init().
+
+
+> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82365
 > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-
-I'll queue this for v4.15. Depends on:
-
-c503dd38f850 brcmsmac: make some local variables 'static const' to reduce stack size
-
--- 
-https://patchwork.kernel.org/patch/9967141/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
-
+> ---
+>  include/linux/string.h | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/include/linux/string.h b/include/linux/string.h
+> index c7a1132cdc93..1bf5ecdf8e01 100644
+> --- a/include/linux/string.h
+> +++ b/include/linux/string.h
+> @@ -228,6 +228,16 @@ static inline const char *kbasename(const char *path)
+>  #define __RENAME(x) __asm__(#x)
+>  
+>  void fortify_panic(const char *name) __noreturn __cold;
+> +
+> +/* work around GCC PR82365 */
+> +#if defined(CONFIG_KASAN) && !defined(__clang__) && GCC_VERSION <= 80000
+> +#define fortify_panic(x) \
+> +	do { \
+> +		asm volatile(""); \
+> +		fortify_panic(x); \
+> +	} while (0)
+> +#endif
+> +
+>  void __read_overflow(void) __compiletime_error("detected read beyond size of object passed as 1st parameter");
+>  void __read_overflow2(void) __compiletime_error("detected read beyond size of object passed as 2nd parameter");
+>  void __read_overflow3(void) __compiletime_error("detected read beyond size of object passed as 3rd parameter");
+> 
