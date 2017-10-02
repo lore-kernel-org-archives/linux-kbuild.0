@@ -1,46 +1,133 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:49797 "EHLO gate.crashing.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752020AbdJAAj1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 30 Sep 2017 20:39:27 -0400
-Date: Sat, 30 Sep 2017 19:38:53 -0500
-From: Segher Boessenkool <segher@kernel.crashing.org>
-Subject: Re: [PATCH] kbuild: clang: remove crufty HOSTCFLAGS
-Message-ID: <20171001003853.GX8421@gate.crashing.org>
-References: <20170926022835.30916-1-nick.desaulniers@gmail.com> <CAK7LNARwbqviGS4THmftO3mCkxpjPmQHxDbFjTsBXptyEG5cMg@mail.gmail.com> <20170930231450.cggvysrt4zedsbkq@lostoracle.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170930231450.cggvysrt4zedsbkq@lostoracle.net>
+Received: from mail-lf0-f43.google.com ([209.85.215.43]:48510 "EHLO
+        mail-lf0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750715AbdJBHVY (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 2 Oct 2017 03:21:24 -0400
+Received: by mail-lf0-f43.google.com with SMTP id q132so4983464lfe.5
+        for <linux-kbuild@vger.kernel.org>; Mon, 02 Oct 2017 00:21:23 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNASgbbG2XT-Vs5Sx242mJ1-vjA6dEe24dW1mD-hzh8JEbw@mail.gmail.com>
+References: <1506159583-18894-1-git-send-email-riku.voipio@linaro.org> <CAK7LNASgbbG2XT-Vs5Sx242mJ1-vjA6dEe24dW1mD-hzh8JEbw@mail.gmail.com>
+From: Riku Voipio <riku.voipio@linaro.org>
+Date: Mon, 2 Oct 2017 10:21:21 +0300
+Message-ID: <CAAqcGHmnKMZcHXt-Uf0ka5rZbELptiSGw8CZ9awmv+RW2E60AA@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts/package/builddeb: split generating packaging
+ and build
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <nick.desaulniers@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Behan Webster <behanw@converseincode.com>, dl9pf@gmx.de, Mark Charlebois <charlebm@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, llvmlinux@lists.linuxfoundation.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>
 
-On Sat, Sep 30, 2017 at 04:14:50PM -0700, Nick Desaulniers wrote:
-> On Thu, Sep 28, 2017 at 07:52:35PM +0900, Masahiro Yamada wrote:
-> > 2017-09-26 11:28 GMT+09:00 Nick Desaulniers <nick.desaulniers@gmail.com>:
-> > >  HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
-> > > +               $(call hostcc-option,-fno-delete-null-pointer-checks) \
-> > >                 -fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
-> > 
-> > You call hostcc-option
-> > before Kbuild.include is included around line 341.
-> > 
-> > So, $(call hostcc-option, ...) returns always an empty string here
-> > whether the compiler supports the option or not.
-> 
-> So calling a yet-to-be defined variable results in an empty string
-> rather than a loud failure?  Chalk that up there with language features
-> no one ever asked for.  That kind of implicit conversion gets languages
-> like JavaScript (with its loose type system, not that C is without its
-> own implicit type conversions/promotions) in a lot of hot water.
+  On 29 September 2017 at 12:36, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> Hi Riku,
+>
+>
+> 2017-09-23 18:39 GMT+09:00 Riku Voipio <riku.voipio@linaro.org>:
+>> Move debian/ directory generation out of builddeb to a new script,
+>> mkdebian. The package build commands are kept in builddeb, which
+>> is now and internal command called from debian/rules.
+>>
+>> With these changes in place, we can now use dpkg-buildpackage from
+>> deb-pkg and bindeb-pkg removing need for handrolled source/changes
+>> generation.
+>>
+>> This patch is based on the criticism of the current state of builddeb
+>> discussed on:
+>>
+>> https://patchwork.kernel.org/patch/9656403/
+>>
+>> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+>
+>
+> Sorry for delay.
+>
+> When I was testing this patch, I was hit by a problem
+> when building the package with a parallel option.
+>
+> Did you see the problem as below?
+>
+>
+> Please try this:
+>
+> make defconfig
+> make -j8 bindeb-pkg
 
-make --warn-undefined-variables
+> This stalled on my build machine due to too many jobs.
 
-(and it warns all over the place during a kernel build -- having undefined
-variables expand to the empty string is a useful feature, too, not just a
-trap for the unwary).
+I couldn't reproduce this. Which versions of dpkg and make do you have
+? I'm using debian stable for testing now, but will try new
+combinations.
 
+> As far as I tested,
+> the build command in debian/rules
+> is invoked with -j without any argument.
 
-Segher
+>>  bindeb-pkg: FORCE
+>> -       $(MAKE) KBUILD_SRC=
+>> -       +$(call cmd,builddeb)
+>> +       $(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
+>> +       dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) -b -nc -us -uc
+>
+>
+>
+> I think -us option is not necessary for bindeb-pkg.
+
+Correct, dropping this.
+
+>
+>
+>
+>> -}
+>> +# Set up variables in case we not called from kernel toplevel Makefile
+>> +objtree="${objtree:-.}"
+>> +srctree="${srctree:-.}"
+>> +MAKE="${MAKE:-make}"
+>> +OBJCOPY="${OBJCOPY:-objcopy}"
+>> +KCONFIG_CONFIG="${KCONFIG_CONFIG:-.config}"
+>
+> Hmm, I do not like these.
+> Now I understood your intention.
+> I prefer "make intdeb-pkg" in v1.
+> Sorry, my suggesting was misleading.
+
+Ok, changing back. I'm still cleaning up the cmd_builddeb so we no
+longer have recursive fakeroot-
+
+>> +cat <<EOF > debian/rules
+>> +#!/usr/bin/make -f
+>> +
+>> +ifneq (,\$(filter parallel=%,\$(DEB_BUILD_OPTIONS)))
+>> +    NUMJOBS = \$(patsubst parallel=%,%,\$(filter parallel=%,\$(DEB_BUILD_OPTIONS)))
+>> +    MAKEFLAGS += -j\$(NUMJOBS)
+>> +endif
+>> +
+>> +build:
+>> +       \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} KBUILD_SRC=
+>
+> The problem is here.
+>
+> If I invoked "make -j<N> bindeb-pkg",
+> I see -j in MAKEFLAGS.   (<N> is missing)
+
+I think MAKEFLAGS is special, it will always show -j without <N> when inspected.
+
+> I am not sure if this is a bug of dpkg-buildpackage or not.
+
+I think the we can live without the parallel= parsing. We'll support
+two usecases:
+1. make -jX bindeb-pkg
+export the MAKEFLAGS down with + and tell dpkg-buildpackage to do
+nothing with -j1
+2. dpkg-buidpackage -jX
+now dpkg-buildpackage will set the MAKEFLAGS and user will get parallel builds
+
+This leaves two unsupported ways
+3. Users who set DEB_BUILD_OPTIONS=parallel=X wont get parallel builds
+4. The new "dpkg-buildpackage -J auto" will also get serial builds
+
+Pre-refactoring, only case #1 worked, so I think this is acceptable.
+
+https://manpages.debian.org/stretch/dpkg-dev/dpkg-buildpackage.1.en.html
