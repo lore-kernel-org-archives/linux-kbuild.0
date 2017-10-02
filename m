@@ -1,94 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f46.google.com ([74.125.83.46]:52162 "EHLO
+Received: from mail-pg0-f46.google.com ([74.125.83.46]:52160 "EHLO
         mail-pg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751357AbdJBTUS (ORCPT
+        with ESMTP id S1751267AbdJBTUQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Oct 2017 15:20:18 -0400
-Received: by mail-pg0-f46.google.com with SMTP id u144so778831pgb.8
-        for <linux-kbuild@vger.kernel.org>; Mon, 02 Oct 2017 12:20:17 -0700 (PDT)
+        Mon, 2 Oct 2017 15:20:16 -0400
+Received: by mail-pg0-f46.google.com with SMTP id u144so778795pgb.8
+        for <linux-kbuild@vger.kernel.org>; Mon, 02 Oct 2017 12:20:15 -0700 (PDT)
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 2/3] Makefile: Move stackprotector availability out of Kconfig
-Date: Mon,  2 Oct 2017 12:20:06 -0700
-Message-Id: <1506972007-80614-3-git-send-email-keescook@chromium.org>
-In-Reply-To: <1506972007-80614-1-git-send-email-keescook@chromium.org>
-References: <1506972007-80614-1-git-send-email-keescook@chromium.org>
+Subject: [PATCH 0/3] Makefile: Introduce CONFIG_CC_STACKPROTECTOR_AUTO
+Date: Mon,  2 Oct 2017 12:20:04 -0700
+Message-Id: <1506972007-80614-1-git-send-email-keescook@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Kees Cook <keescook@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Ingo Molnar <mingo@kernel.org>, Laura Abbott <labbott@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, Al Viro <viro@zeniv.linux.org.uk>, linux-kbuild@vger.kernel.org, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org, kernel-hardening@lists.openwall.com
+Cc: Kees Cook <keescook@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, Ingo Molnar <mingo@kernel.org>, "David S. Miller" <davem@davemloft.net>, Nicholas Piggin <npiggin@gmail.com>, Al Viro <viro@zeniv.linux.org.uk>, Laura Abbott <labbott@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org, kernel-hardening@lists.openwall.com
 
-Various portions of the kernel, especially per-architecture pieces,
-need to know if the compiler is building it with the stack protector.
-This was done in the arch/Kconfig with 'select', but this doesn't
-allow a way to do auto-detected compiler support. In preparation for
-creating an on-if-available default, move the logic for the definition of
-CONFIG_CC_STACKPROTECTOR into the Makefile.
+As described in the final patch:
 
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Ingo Molnar <mingo@kernel.org>
-Cc: Laura Abbott <labbott@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- Makefile     | 7 +++++--
- arch/Kconfig | 8 --------
- 2 files changed, 5 insertions(+), 10 deletions(-)
+Nearly all modern compilers support a stack-protector option, and nearly
+all modern distributions enable the kernel stack-protector, so enabling
+this by default in kernel builds would make sense. However, Kconfig does
+not have knowledge of available compiler features, so it isn't safe to
+force on, as this would unconditionally break builds for the compilers
+or architectures that don't have support. Instead, this introduces a new
+option, CONFIG_CC_STACKPROTECTOR_AUTO, which attempts to discover the best
+possible stack-protector available, and will allow builds to proceed even
+if the compiler doesn't support any stack-protector.
 
-diff --git a/Makefile b/Makefile
-index d1119941261c..e122a9cf0399 100644
---- a/Makefile
-+++ b/Makefile
-@@ -688,8 +688,11 @@ else
-   stackp-flag := $(call cc-option, -fno-stack-protector)
- endif
- endif
--# Find arch-specific stack protector compiler sanity-checking script.
--ifdef CONFIG_CC_STACKPROTECTOR
-+ifdef stackp-name
-+  # If the stack protector has been selected, inform the rest of the build.
-+  KBUILD_CFLAGS += -DCONFIG_CC_STACKPROTECTOR
-+  KBUILD_AFLAGS += -DCONFIG_CC_STACKPROTECTOR
-+  # Find arch-specific stack protector compiler sanity-checking script.
-   stackp-path := $(srctree)/scripts/gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh
-   stackp-check := $(wildcard $(stackp-path))
- endif
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 1aafb4efbb51..7007c1bfa79c 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -523,12 +523,6 @@ config HAVE_CC_STACKPROTECTOR
- 	  - its compiler supports the -fstack-protector option
- 	  - it has implemented a stack canary (e.g. __stack_chk_guard)
- 
--config CC_STACKPROTECTOR
--	def_bool n
--	help
--	  Set when a stack-protector mode is enabled, so that the build
--	  can enable kernel-side support for the GCC feature.
--
- choice
- 	prompt "Stack Protector buffer overflow detection"
- 	depends on HAVE_CC_STACKPROTECTOR
-@@ -549,7 +543,6 @@ config CC_STACKPROTECTOR_NONE
- 
- config CC_STACKPROTECTOR_REGULAR
- 	bool "Regular"
--	select CC_STACKPROTECTOR
- 	help
- 	  Functions will have the stack-protector canary logic added if they
- 	  have an 8-byte or larger character array on the stack.
-@@ -563,7 +556,6 @@ config CC_STACKPROTECTOR_REGULAR
- 
- config CC_STACKPROTECTOR_STRONG
- 	bool "Strong"
--	select CC_STACKPROTECTOR
- 	help
- 	  Functions will have the stack-protector canary logic added in any
- 	  of the following conditions:
--- 
-2.7.4
+This option is made the default so that kernels built with modern
+compilers will be protected-by-default against stack buffer overflows,
+avoiding things like the recent BlueBorne attack. Selection of a specific
+stack-protector option remains available, including disabling it.
+
+
+This has lived over the weekend in 0-day, which noticed that sh needed
+a small fix (which has actually been needed since the addition of the
+_STRONG stack-protector, some time ago).
+
+Thanks,
+
+-Kees
 
