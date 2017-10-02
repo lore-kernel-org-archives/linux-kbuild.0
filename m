@@ -1,133 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f43.google.com ([209.85.215.43]:48510 "EHLO
-        mail-lf0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750715AbdJBHVY (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:49222 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750940AbdJBIIS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Oct 2017 03:21:24 -0400
-Received: by mail-lf0-f43.google.com with SMTP id q132so4983464lfe.5
-        for <linux-kbuild@vger.kernel.org>; Mon, 02 Oct 2017 00:21:23 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNASgbbG2XT-Vs5Sx242mJ1-vjA6dEe24dW1mD-hzh8JEbw@mail.gmail.com>
-References: <1506159583-18894-1-git-send-email-riku.voipio@linaro.org> <CAK7LNASgbbG2XT-Vs5Sx242mJ1-vjA6dEe24dW1mD-hzh8JEbw@mail.gmail.com>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Mon, 2 Oct 2017 10:21:21 +0300
-Message-ID: <CAAqcGHmnKMZcHXt-Uf0ka5rZbELptiSGw8CZ9awmv+RW2E60AA@mail.gmail.com>
-Subject: Re: [PATCH v2] scripts/package/builddeb: split generating packaging
- and build
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 2 Oct 2017 04:08:18 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: revert $(realpath ...) to $(shell cd ... && /bin/pwd)
+Date: Mon,  2 Oct 2017 17:07:28 +0900
+Message-Id: <1506931648-15511-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Julien Grall <julien.grall@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-pm@vger.kernel.org, Michal Marek <mmarek@suse.com>, David Carrillo-Cisneros <davidcc@google.com>, linux-kernel@vger.kernel.org, Thomas Renninger <trenn@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@kernel.org>, Arnaldo Carvalho de Melo <acme@redhat.com>
 
-  On 29 September 2017 at 12:36, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Hi Riku,
->
->
-> 2017-09-23 18:39 GMT+09:00 Riku Voipio <riku.voipio@linaro.org>:
->> Move debian/ directory generation out of builddeb to a new script,
->> mkdebian. The package build commands are kept in builddeb, which
->> is now and internal command called from debian/rules.
->>
->> With these changes in place, we can now use dpkg-buildpackage from
->> deb-pkg and bindeb-pkg removing need for handrolled source/changes
->> generation.
->>
->> This patch is based on the criticism of the current state of builddeb
->> discussed on:
->>
->> https://patchwork.kernel.org/patch/9656403/
->>
->> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
->
->
-> Sorry for delay.
->
-> When I was testing this patch, I was hit by a problem
-> when building the package with a parallel option.
->
-> Did you see the problem as below?
->
->
-> Please try this:
->
-> make defconfig
-> make -j8 bindeb-pkg
+I thought commit 8e9b46679923 ("kbuild: use $(abspath ...) instead of
+$(shell cd ... && /bin/pwd)") was a safe conversion, but it changed
+the behavior.
 
-> This stalled on my build machine due to too many jobs.
+$(abspath ...) / $(realpath ...) does not expand shell special
+characters, such as '~'.
 
-I couldn't reproduce this. Which versions of dpkg and make do you have
-? I'm using debian stable for testing now, but will try new
-combinations.
+Here is a simple Makefile example:
 
-> As far as I tested,
-> the build command in debian/rules
-> is invoked with -j without any argument.
+  ---------------->8----------------
+  $(info /bin/pwd: $(shell cd ~/; /bin/pwd))
+  $(info abspath: $(abspath ~/))
+  $(info realpath: $(realpath ~/))
+  all:
+          @:
+  ---------------->8----------------
 
->>  bindeb-pkg: FORCE
->> -       $(MAKE) KBUILD_SRC=
->> -       +$(call cmd,builddeb)
->> +       $(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
->> +       dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) -b -nc -us -uc
->
->
->
-> I think -us option is not necessary for bindeb-pkg.
+  $ make
+  /bin/pwd: /home/masahiro
+  abspath: /home/masahiro/workspace/~
+  realpath:
 
-Correct, dropping this.
+This can be a real problem if 'make O=~/foo' is invoked from another
+Makefile or primitive shell like dash.
 
->
->
->
->> -}
->> +# Set up variables in case we not called from kernel toplevel Makefile
->> +objtree="${objtree:-.}"
->> +srctree="${srctree:-.}"
->> +MAKE="${MAKE:-make}"
->> +OBJCOPY="${OBJCOPY:-objcopy}"
->> +KCONFIG_CONFIG="${KCONFIG_CONFIG:-.config}"
->
-> Hmm, I do not like these.
-> Now I understood your intention.
-> I prefer "make intdeb-pkg" in v1.
-> Sorry, my suggesting was misleading.
+This commit partially reverts 8e9b46679923.
 
-Ok, changing back. I'm still cleaning up the cmd_builddeb so we no
-longer have recursive fakeroot-
+Fixes: 8e9b46679923 ("kbuild: use $(abspath ...) instead of $(shell cd ... && /bin/pwd)")
+Reported-by: Julien Grall <julien.grall@arm.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
->> +cat <<EOF > debian/rules
->> +#!/usr/bin/make -f
->> +
->> +ifneq (,\$(filter parallel=%,\$(DEB_BUILD_OPTIONS)))
->> +    NUMJOBS = \$(patsubst parallel=%,%,\$(filter parallel=%,\$(DEB_BUILD_OPTIONS)))
->> +    MAKEFLAGS += -j\$(NUMJOBS)
->> +endif
->> +
->> +build:
->> +       \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} KBUILD_SRC=
->
-> The problem is here.
->
-> If I invoked "make -j<N> bindeb-pkg",
-> I see -j in MAKEFLAGS.   (<N> is missing)
+ Makefile                       | 4 ++--
+ tools/power/cpupower/Makefile  | 2 +-
+ tools/scripts/Makefile.include | 6 +++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-I think MAKEFLAGS is special, it will always show -j without <N> when inspected.
+diff --git a/Makefile b/Makefile
+index cf007a3..1b48717 100644
+--- a/Makefile
++++ b/Makefile
+@@ -130,8 +130,8 @@ endif
+ ifneq ($(KBUILD_OUTPUT),)
+ # check that the output directory actually exists
+ saved-output := $(KBUILD_OUTPUT)
+-$(shell [ -d $(KBUILD_OUTPUT) ] || mkdir -p $(KBUILD_OUTPUT))
+-KBUILD_OUTPUT := $(realpath $(KBUILD_OUTPUT))
++KBUILD_OUTPUT := $(shell mkdir -p $(KBUILD_OUTPUT) && cd $(KBUILD_OUTPUT) \
++								&& /bin/pwd)
+ $(if $(KBUILD_OUTPUT),, \
+      $(error failed to create output directory "$(saved-output)"))
+ 
+diff --git a/tools/power/cpupower/Makefile b/tools/power/cpupower/Makefile
+index 4c5a481..d6e1c02 100644
+--- a/tools/power/cpupower/Makefile
++++ b/tools/power/cpupower/Makefile
+@@ -26,7 +26,7 @@ endif
+ 
+ ifneq ($(OUTPUT),)
+ # check that the output directory actually exists
+-OUTDIR := $(realpath $(OUTPUT))
++OUTDIR := $(shell cd $(OUTPUT) && /bin/pwd)
+ $(if $(OUTDIR),, $(error output directory "$(OUTPUT)" does not exist))
+ endif
+ 
+diff --git a/tools/scripts/Makefile.include b/tools/scripts/Makefile.include
+index 9dc8f07..1e8b611 100644
+--- a/tools/scripts/Makefile.include
++++ b/tools/scripts/Makefile.include
+@@ -1,7 +1,7 @@
+ ifneq ($(O),)
+ ifeq ($(origin O), command line)
+-	ABSOLUTE_O := $(realpath $(O))
+-	dummy := $(if $(ABSOLUTE_O),,$(error O=$(O) does not exist))
++	dummy := $(if $(shell test -d $(O) || echo $(O)),$(error O=$(O) does not exist),)
++	ABSOLUTE_O := $(shell cd $(O) ; pwd)
+ 	OUTPUT := $(ABSOLUTE_O)/$(if $(subdir),$(subdir)/)
+ 	COMMAND_O := O=$(ABSOLUTE_O)
+ ifeq ($(objtree),)
+@@ -12,7 +12,7 @@ endif
+ 
+ # check that the output directory actually exists
+ ifneq ($(OUTPUT),)
+-OUTDIR := $(realpath $(OUTPUT))
++OUTDIR := $(shell cd $(OUTPUT) && /bin/pwd)
+ $(if $(OUTDIR),, $(error output directory "$(OUTPUT)" does not exist))
+ endif
+ 
+-- 
+2.7.4
 
-> I am not sure if this is a bug of dpkg-buildpackage or not.
-
-I think the we can live without the parallel= parsing. We'll support
-two usecases:
-1. make -jX bindeb-pkg
-export the MAKEFLAGS down with + and tell dpkg-buildpackage to do
-nothing with -j1
-2. dpkg-buidpackage -jX
-now dpkg-buildpackage will set the MAKEFLAGS and user will get parallel builds
-
-This leaves two unsupported ways
-3. Users who set DEB_BUILD_OPTIONS=parallel=X wont get parallel builds
-4. The new "dpkg-buildpackage -J auto" will also get serial builds
-
-Pre-refactoring, only case #1 worked, so I think this is acceptable.
-
-https://manpages.debian.org/stretch/dpkg-dev/dpkg-buildpackage.1.en.html
