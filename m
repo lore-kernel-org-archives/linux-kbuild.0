@@ -1,68 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f67.google.com ([209.85.218.67]:49276 "EHLO
-        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750943AbdJBIdi (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.24]:53058 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751065AbdJBIl6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Oct 2017 04:33:38 -0400
-MIME-Version: 1.0
-In-Reply-To: <CAK8P3a3BiPh+d4vcb4pbbOsZLegp6YGk+BU3L=71sxatTuk-GQ@mail.gmail.com>
-References: <20170922212930.620249-1-arnd@arndb.de> <20170922212930.620249-5-arnd@arndb.de>
- <063D6719AE5E284EB5DD2968C1650D6DD007F521@AcuExch.aculab.com>
- <CAK8P3a1zxjMsQTBPijCo8FJjEU5aRVTr7n_NZ1YM2UnDPKoRLw@mail.gmail.com>
- <CAK8P3a37Ts5q7BvA2JWse87huyAp+=e18CUXEt8731RrBnB+Ow@mail.gmail.com>
- <e7e6418e-4340-5057-aa17-800082aca5fb@virtuozzo.com> <CAK8P3a2C7DBTfQZvRi-QQfrfm1GXktFcXQRmXmzpF4SCa+BADA@mail.gmail.com>
- <2631e8a6-03f2-69ea-d889-afd9a345e7ef@virtuozzo.com> <CAK8P3a3BiPh+d4vcb4pbbOsZLegp6YGk+BU3L=71sxatTuk-GQ@mail.gmail.com>
+        Mon, 2 Oct 2017 04:41:58 -0400
 From: Arnd Bergmann <arnd@arndb.de>
-Date: Mon, 2 Oct 2017 10:33:37 +0200
-Message-ID: <CAK8P3a0WtHjvo6tOp79U4gKjLSRmVCAmjYU_xTVJfBL1Qe-hdQ@mail.gmail.com>
-Subject: Re: [PATCH v4 4/9] em28xx: fix em28xx_dvb_init for KASAN
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] string.h: work around for increased stack usage
+Date: Mon,  2 Oct 2017 10:40:55 +0200
+Message-Id: <20171002084119.3504771-1-arnd@arndb.de>
+In-Reply-To: <CAK8P3a0WtHjvo6tOp79U4gKjLSRmVCAmjYU_xTVJfBL1Qe-hdQ@mail.gmail.com>
+References: <CAK8P3a0WtHjvo6tOp79U4gKjLSRmVCAmjYU_xTVJfBL1Qe-hdQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: David Laight <David.Laight@aculab.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Arend van Spriel <arend.vanspriel@broadcom.com>, Kalle Valo <kvalo@codeaurora.org>, "David S. Miller" <davem@davemloft.net>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, "brcm80211-dev-list.pdl@broadcom.com" <brcm80211-dev-list.pdl@broadcom.com>, "brcm80211-dev-list@cypress.com" <brcm80211-dev-list@cypress.com>, "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jakub Jelinek <jakub@gcc.gnu.org>, =?UTF-8?Q?Martin_Li=C5=A1ka?= <marxin@gcc.gnu.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>
+Cc: David Laight <David.Laight@aculab.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, "David S . Miller" <davem@davemloft.net>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "linux-media @ vger . kernel . org" <linux-media@vger.kernel.org>, "linux-kernel @ vger . kernel . org" <linux-kernel@vger.kernel.org>, "kasan-dev @ googlegroups . com" <kasan-dev@googlegroups.com>, "linux-kbuild @ vger . kernel . org" <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>
 
-On Thu, Sep 28, 2017 at 4:30 PM, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Thu, Sep 28, 2017 at 6:09 AM, Andrey Ryabinin
-> <aryabinin@virtuozzo.com> wrote:
->> On 09/27/2017 04:26 PM, Arnd Bergmann wrote:
->>> On Tue, Sep 26, 2017 at 9:49 AM, Andrey Ryabinin
->>> <aryabinin@virtuozzo.com> wrote:
->
->>> --- a/include/linux/string.h
->>> +++ b/include/linux/string.h
->>> @@ -227,7 +227,7 @@ static inline const char *kbasename(const char *path)
->>>  #define __FORTIFY_INLINE extern __always_inline __attribute__((gnu_inline))
->>>  #define __RENAME(x) __asm__(#x)
->>>
->>> -void fortify_panic(const char *name) __noreturn __cold;
->>> +void fortify_panic(const char *name) __cold;
->>>  void __read_overflow(void) __compiletime_error("detected read beyond
->>> size of object passed as 1st parameter");
->>>  void __read_overflow2(void) __compiletime_error("detected read beyond
->>> size of object passed as 2nd parameter");
->>>  void __read_overflow3(void) __compiletime_error("detected read beyond
->>> size of object passed as 3rd parameter");
->>>
->>> I don't immediately see why the __noreturn changes the behavior here, any idea?
->>>
->>
->>
->> At first I thought that this somehow might be related to __asan_handle_no_return(). GCC calls it
->> before noreturn function. So I made patch to remove generation of these calls (we don't need them in the kernel anyway)
->> but it didn't help. It must be something else than.
->
-> I made a reduced test case yesterday (see http://paste.ubuntu.com/25628030/),
-> and it shows the same behavior with and without the sanitizer, it uses 128
-> bytes without the noreturn attribute and 480 bytes when its added, the sanitizer
-> adds a factor of 1.5x on top. It's possible that I did something wrong while
-> reducing, since the original driver file uses very little stack (a few hundred
-> bytes) without -fsanitize=kernel-address, but finding out what happens in
-> the reduced case may still help understand the other one.
+The hardened strlen() function causes rather large stack usage
+in at least one file in the kernel when CONFIG_KASAN is enabled:
 
-This is now GCC PR82365, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82365
+drivers/media/usb/em28xx/em28xx-dvb.c: In function 'em28xx_dvb_init':
+drivers/media/usb/em28xx/em28xx-dvb.c:2062:1: error: the frame size of 3256 bytes is larger than 204 bytes [-Werror=frame-larger-than=]
 
-I've come up with a workaround, but I'm not sure if that is any better than the
-alternatives, will send the patch as a follow-up in a bit.
+Analyzing this problem led to the discovery that gcc fails to
+merge the stack slots for the i2c_board_info[] structures after
+we strlcpy() into them, due to the 'noreturn' attribute on the
+source string length check.
 
-     Arnd
+The compiler behavior should get fixed in gcc-8, but for users
+of existing gcc versions, we can work around it using an empty
+inline assembly statement before the call to fortify_panic().
+
+The workaround is unfortunately very ugly, and I tried my best
+to limit it being applied to affected versions of gcc when
+KASAN is used. Alternative suggestions welcome.
+
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82365
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ include/linux/string.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/include/linux/string.h b/include/linux/string.h
+index c7a1132cdc93..1bf5ecdf8e01 100644
+--- a/include/linux/string.h
++++ b/include/linux/string.h
+@@ -228,6 +228,16 @@ static inline const char *kbasename(const char *path)
+ #define __RENAME(x) __asm__(#x)
+ 
+ void fortify_panic(const char *name) __noreturn __cold;
++
++/* work around GCC PR82365 */
++#if defined(CONFIG_KASAN) && !defined(__clang__) && GCC_VERSION <= 80000
++#define fortify_panic(x) \
++	do { \
++		asm volatile(""); \
++		fortify_panic(x); \
++	} while (0)
++#endif
++
+ void __read_overflow(void) __compiletime_error("detected read beyond size of object passed as 1st parameter");
+ void __read_overflow2(void) __compiletime_error("detected read beyond size of object passed as 2nd parameter");
+ void __read_overflow3(void) __compiletime_error("detected read beyond size of object passed as 3rd parameter");
+-- 
+2.9.0
+
