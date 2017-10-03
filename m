@@ -1,128 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f182.google.com ([209.85.192.182]:49330 "EHLO
-        mail-pf0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751255AbdJCUtl (ORCPT
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:48786 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750865AbdJCX0l (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Oct 2017 16:49:41 -0400
-Received: by mail-pf0-f182.google.com with SMTP id l188so5173223pfc.6
-        for <linux-kbuild@vger.kernel.org>; Tue, 03 Oct 2017 13:49:41 -0700 (PDT)
-From: Douglas Anderson <dianders@chromium.org>
-Subject: [RFC PATCH 1/2] kbuild: Pass HOSTCC and similar to tools Makefiles
-Date: Tue,  3 Oct 2017 13:48:38 -0700
-Message-Id: <20171003204839.27551-2-dianders@chromium.org>
-In-Reply-To: <20171003204839.27551-1-dianders@chromium.org>
-References: <20171003204839.27551-1-dianders@chromium.org>
+        Tue, 3 Oct 2017 19:26:41 -0400
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: [PATCH] kconfig: Warn if choice default is not in choice
+Date: Wed,  4 Oct 2017 01:25:46 +0200
+Message-Id: <1507073146-19847-1-git-send-email-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, mmarek@suse.com, acme@redhat.com
-Cc: groeck@chromium.org, Dmitry Torokhov <dmitry.torokhov@gmail.com>, mka@chromium.org, Douglas Anderson <dianders@chromium.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, arnd@arndb.de, Ulf Magnusson <ulfalizer@gmail.com>
 
-The main Linux Makefiles and the tools sub-Makefiles have different
-conventions for passing in CC / CFLAGS.
+This will catch mistakes like in the following real-world example, where
+a "CONFIG_" prefix snuck in, making an undefined symbol the default:
 
-Here's brief summary for the kernel:
-* CC: target C compiler (must be passed as an argument to make to
-  override)
-* HOSTCC: host C compiler (must be passed as an argument to make to
-  override)
-* CFLAGS: ignored (kernel manages its own CFLAGS)
-* KCFLAGS: extra cflags for the target (expected as an env var)
-* HOSTCFLAGS: host C compiler flags (not modifiable by the caller of
-  make)
+	choice
+		prompt "Compiler optimization level"
+		default CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
 
-Here's a brief summary for the tools:
-* CC: host C compiler (must be passed as an argument to make to
-  override)
-* CFLAGS: base arguments for the host C compiler which are added to by
-  sub builds (expected as an env var)
+	config CC_OPTIMIZE_FOR_PERFORMANCE
+		...
 
-When the main kernel Makefile calls into the tools Makefile, it should
-adapt things from its syntax to the tools Makefile syntax.
+	config CC_OPTIMIZE_FOR_SIZE
+		...
 
-If we don't do this, we have a few issues:
-* If someone wants to user another compiler (like clang, maybe) for
-  hostcc then the tools will still be compiled with gcc.
-* If you happen to be building and you left ${CFLAGS} set to something
-  random (maybe it matches ${CC}, the _target_ C compiler, not the
-  _host_ C compiler) then this random value will be used to compile
-  the tools.
+	endchoice
 
-In any case, it seems like it makes sense to pass CC, CFLAGS, and
-similar properly into the tools Makefile.
+This now prints the following warning:
 
-NOTE: in order to do this properly, we need to add some new
-definitions of HOSTAS and HOSTLD into the main kernel Makefile.  If we
-don't do this and someone overrides "AS" or "LD" on the command line
-then those (which were intended for the target) will be used to build
-host side tools.  We also make up some imaginary "HOSTASFLAGS" and
-"HOSTLDFLAGS".  Someone could specify these, but if they don't at
-least these blank variables will properly clobber ASFLAGS and LDFLAGS
-from the kernel.
+	init/Kconfig:1036:warning: choice default symbol 'CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE' is not contained in the choice
 
-This was discovered in the Chrome OS build system where CFLAGS (an
-environment variable) was accidentally left pointing to flags that
-would be an appropriate match to CC.  The kernel didn't use these
-CFLAGS so it was never an issue.  Turning on STACKVALIDATION, however,
-suddenly invoked a tools build that blew up.
+Cases where the default symbol belongs to the wrong choice are also
+detected.
 
-Signed-off-by: Douglas Anderson <dianders@chromium.org>
+(The mistake is harmless here: Since the default symbol is not visible,
+the choice falls back on using the first visible symbol as the default,
+which is CC_OPTIMIZE_FOR_PERFORMANCE, as intended.)
+
+Discovered while playing around with Kconfiglib
+(https://github.com/ulfalizer/Kconfiglib).
+
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
+ scripts/kconfig/menu.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
- Makefile | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index cf007a31d575..0d3af0677d88 100644
---- a/Makefile
-+++ b/Makefile
-@@ -298,7 +298,9 @@ HOST_LFS_CFLAGS := $(shell getconf LFS_CFLAGS)
- HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS)
- HOST_LFS_LIBS := $(shell getconf LFS_LIBS)
- 
-+HOSTAS       = as
- HOSTCC       = gcc
-+HOSTLD       = ld
- HOSTCXX      = g++
- HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
- 		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
-@@ -1616,11 +1618,35 @@ image_name:
- # Clear a bunch of variables before executing the submake
- tools/: FORCE
- 	$(Q)mkdir -p $(objtree)/tools
--	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(abspath $(objtree)) subdir=tools -C $(src)/tools/
-+	$(Q)ASFLAGS="$(HOSTASFLAGS)"\
-+		LDFLAGS="$(HOSTLDFLAGS)" \
-+		CFLAGS="$(HOSTCFLAGS)" \
-+		CXXFLAGS="$(HOSTCXXFLAGS)" \
-+		$(MAKE) \
-+		AS="$(HOSTAS)" \
-+		CC="$(HOSTCC)" \
-+		CXX="$(HOSTCXX)" \
-+		LD="$(HOSTLD)" \
-+		MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" \
-+		O=$(abspath $(objtree)) \
-+		subdir=tools \
-+		-C $(src)/tools/
- 
- tools/%: FORCE
- 	$(Q)mkdir -p $(objtree)/tools
--	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(abspath $(objtree)) subdir=tools -C $(src)/tools/ $*
-+	$(Q)ASFLAGS="$(HOSTASFLAGS)"\
-+		LDFLAGS="$(HOSTLDFLAGS)" \
-+		CFLAGS="$(HOSTCFLAGS)" \
-+		CXXFLAGS="$(HOSTCXXFLAGS)" \
-+		$(MAKE) \
-+		AS="$(HOSTAS)" \
-+		CC="$(HOSTCC)" \
-+		CXX="$(HOSTCXX)" \
-+		LD="$(HOSTLD)" \
-+		MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" \
-+		O=$(abspath $(objtree)) \
-+		subdir=tools \
-+		-C $(src)/tools/ $*
- 
- # Single targets
- # ---------------------------------------------------------------------------
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index e935793..ce88de8 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -252,6 +252,16 @@ static void sym_check_prop(struct symbol *sym)
+ 					    "'%s': number is invalid",
+ 					    sym->name);
+ 			}
++			if (sym_is_choice(sym)) {
++				struct property *choice_prop =
++					sym_get_choice_prop(sym2);
++
++				if (!choice_prop ||
++				    prop_get_symbol(choice_prop) != sym)
++					prop_warn(prop,
++						  "choice default symbol '%s' is not contained in the choice",
++						  sym2->name);
++			}
+ 			break;
+ 		case P_SELECT:
+ 		case P_IMPLY:
 -- 
-2.14.2.920.gcf0c67979c-goog
+2.7.4
 
