@@ -1,58 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f176.google.com ([209.85.192.176]:49398 "EHLO
-        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751273AbdJDWiU (ORCPT
+Received: from mail-pf0-f177.google.com ([209.85.192.177]:56318 "EHLO
+        mail-pf0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751182AbdJDWiQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Oct 2017 18:38:20 -0400
-Received: by mail-pf0-f176.google.com with SMTP id l188so6981355pfc.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Oct 2017 15:38:20 -0700 (PDT)
+        Wed, 4 Oct 2017 18:38:16 -0400
+Received: by mail-pf0-f177.google.com with SMTP id g62so1383670pfk.12
+        for <linux-kbuild@vger.kernel.org>; Wed, 04 Oct 2017 15:38:16 -0700 (PDT)
 From: Douglas Anderson <dianders@chromium.org>
-Subject: [PATCH v2 2/2] kbuild: Cache a few more calls to the compiler
-Date: Wed,  4 Oct 2017 15:37:17 -0700
-Message-Id: <20171004223717.3010-3-dianders@chromium.org>
-In-Reply-To: <20171004223717.3010-1-dianders@chromium.org>
-References: <20171004223717.3010-1-dianders@chromium.org>
+Subject: [PATCH v2 0/2] kbuild: Cache exploratory calls to the compiler
+Date: Wed,  4 Oct 2017 15:37:15 -0700
+Message-Id: <20171004223717.3010-1-dianders@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: yamada.masahiro@socionext.com, mmarek@suse.com
-Cc: groeck@chromium.org, sjg@chromium.org, briannorris@chromium.org, Douglas Anderson <dianders@chromium.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: groeck@chromium.org, sjg@chromium.org, briannorris@chromium.org, Douglas Anderson <dianders@chromium.org>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, James Hogan <james.hogan@imgtec.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>
 
-These are a few stragglers that I left out of the original patch to
-cache calls to the C compiler ("kbuild: Add a cache for generated
-variables") because they bleed out into the main Makefile and thus
-uglify things a little bit.  The idea is the same here, though.
+This two-patch series attempts to speed incremental builds of the
+kernel up by a bit.  How much of a speedup you get depends a lot on
+your environment, specifically the speed of your workstation and how
+fast it takes to invoke the compiler.
 
-Signed-off-by: Douglas Anderson <dianders@chromium.org>
----
+In the Chrome OS build environment you get a really big win.  For an
+incremental build (via emerge) I measured a speedup from ~1 minute to
+~35 seconds.  ...but Chrome OS calls the compiler through a number of
+wrapper scripts and also calls the kernel make at least twice for an
+emerge (during compile stage and install stage), so it's a bit of a
+worst case.
+
+Perhaps a more realistic measure of the speedup others might see is
+running "time make help > /dev/null" outside of the Chrome OS build
+environment on my system.  When I do this I see that it took more than
+1.0 seconds before and less than 0.2 seconds after.  So presumably
+this has the ability to shave ~0.8 seconds off an incremental build
+for most folks out there.  While 0.8 seconds savings isn't huge, it
+does make incremental builds feel a lot snappier.
+
+Caveats from v1 still copied here, though with Masahiro Yamada's
+suggestions from v1 this is starting to feel a little more baked and
+I've even dropped the RFC from it (though extra testing still
+appreciated):
+
+Please note that I make no illusions of being a Makefile expert nor do
+I have any belief that I fully understand the Linux kernel build
+system.  Please take this patch series as the start of a discussion
+about whether others feel like this type of speedup is worthwhile and
+how to best accomplish it.  Specific things to note:
+
+- I'm happy to paint the bikeshed any color that maintainers want.  If
+  you'd like the cache named differently, in a slightly different
+  format, or you want me to adjust the spacing / names of Makefile
+  stuff then please just let me know.
+
+- If this is totally the wrong approach and you have a better idea
+  then let me know.  If you want something that's super complicated to
+  explain then feel free to post a replacement patch and I'm happy to
+  test.
+
+- This patch definitely needs extra testing.  I've tested it on a very
+  limited build environment and it seems to be working fine, but I
+  could believe that with some weird compiler options or on certain
+  architectures you might need some extra escaping here and there.
 
 Changes in v2:
 - Abstract at a different level (like shell-cached) per Masahiro Yamada
+- Include ld-version, which I missed the first time
 
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Douglas Anderson (2):
+  kbuild: Add a cache for generated variables
+  kbuild: Cache a few more calls to the compiler
 
-diff --git a/Makefile b/Makefile
-index d1119941261c..d366bdc3da04 100644
---- a/Makefile
-+++ b/Makefile
-@@ -652,7 +652,7 @@ KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
- KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
- 
- # check for 'asm goto'
--ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
-+ifeq ($(call shell-cached,$(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
- 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
- 	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
- endif
-@@ -788,7 +788,7 @@ KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
- endif
- 
- # arch Makefile may override CC so keep this after arch Makefile is included
--NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
-+NOSTDINC_FLAGS += -nostdinc -isystem $(call shell-cached,$(CC) -print-file-name=include)
- CHECKFLAGS     += $(NOSTDINC_FLAGS)
- 
- # warn about C99 declaration after statement
+ Documentation/kbuild/makefiles.txt | 21 +++++++++
+ Makefile                           |  4 +-
+ scripts/Kbuild.include             | 90 ++++++++++++++++++++++++++++++++------
+ 3 files changed, 99 insertions(+), 16 deletions(-)
+
 -- 
 2.14.2.920.gcf0c67979c-goog
 
