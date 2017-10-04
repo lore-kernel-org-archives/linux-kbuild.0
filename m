@@ -1,25 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f172.google.com ([209.85.216.172]:46701 "EHLO
-        mail-qt0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751113AbdJDDFD (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:16743 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751120AbdJDDVh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Oct 2017 23:05:03 -0400
-Received: by mail-qt0-f172.google.com with SMTP id 6so7700039qtw.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 03 Oct 2017 20:05:03 -0700 (PDT)
+        Tue, 3 Oct 2017 23:21:37 -0400
 MIME-Version: 1.0
 In-Reply-To: <20171003204839.27551-2-dianders@chromium.org>
 References: <20171003204839.27551-1-dianders@chromium.org> <20171003204839.27551-2-dianders@chromium.org>
-From: Guenter Roeck <groeck@google.com>
-Date: Tue, 3 Oct 2017 20:05:00 -0700
-Message-ID: <CABXOdTdrhvnRr+1egVAxtYcVsA0KiJ5MU2RcAVcpuN4oVOD-9g@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 4 Oct 2017 12:20:52 +0900
+Message-ID: <CAK7LNARAVPOQh5SpLGRN5z-me-FhQerP5HVfxstaEaJuinsA7A@mail.gmail.com>
 Subject: Re: [RFC PATCH 1/2] kbuild: Pass HOSTCC and similar to tools Makefiles
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Douglas Anderson <dianders@chromium.org>
-Cc: yamada.masahiro@socionext.com, mmarek@suse.com, acme@redhat.com, Guenter Roeck <groeck@chromium.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, groeck@chromium.org, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, Oct 3, 2017 at 1:48 PM, Douglas Anderson <dianders@chromium.org> wrote:
+2017-10-04 5:48 GMT+09:00 Douglas Anderson <dianders@chromium.org>:
 > The main Linux Makefiles and the tools sub-Makefiles have different
 > conventions for passing in CC / CFLAGS.
 >
@@ -69,22 +67,6 @@ On Tue, Oct 3, 2017 at 1:48 PM, Douglas Anderson <dianders@chromium.org> wrote:
 > suddenly invoked a tools build that blew up.
 >
 > Signed-off-by: Douglas Anderson <dianders@chromium.org>
-
-Still not sure if I'd want to go that far. Just clearing out CFLAGS
-would have fixed my problem, and I start to realize that I am more of
-a minimalist when it comes to kernel changes.
-
-Anyway, not that it means much,
-
-Reviewed-by: Guenter Roeck <groeck@chromium.org>
-Tested-by: Guenter Roeck <groeck@chromium.org>
-
-[ I didn't test all possible flag combinations, only a few of them,
-but I did make sure that "make allmodconfig; CFLAGS=-junk make" no
-longer fails. ]
-
-Guenter
-
 > ---
 >
 >  Makefile | 30 ++++++++++++++++++++++++++++--
@@ -140,8 +122,33 @@ Guenter
 > +               subdir=tools \
 > +               -C $(src)/tools/ $*
 >
->  # Single targets
->  # ---------------------------------------------------------------------------
-> --
-> 2.14.2.920.gcf0c67979c-goog
->
+
+Please do not do this.
+
+
+
+CC:     for building tools that run on the target machine
+HOSTCC: for building tools that run on the build machine
+
+
+IMHO, this should be consistent to avoid confusion.
+
+
+Grepping CROSS_COMPILE under tools/ directory,
+I see many Makefile expect CC for the target system.
+
+For ex, tools/croup/Makefile
+
+CC = $(CROSS_COMPILE)gcc
+
+
+
+Why don't you fix tools/objtool/Makefile ?
+
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
