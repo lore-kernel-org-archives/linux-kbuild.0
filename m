@@ -1,102 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:55985 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751113AbdJDDhg (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:25223 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751527AbdJDD5c (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Oct 2017 23:37:36 -0400
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH] kconfig: Document the 'menu' struct
-Date: Wed,  4 Oct 2017 05:37:12 +0200
-Message-Id: <1507088232-8510-1-git-send-email-ulfalizer@gmail.com>
+        Tue, 3 Oct 2017 23:57:32 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/4] kbuild: replace $(hdr-arch) with $(SRCARCH)
+Date: Wed,  4 Oct 2017 12:56:04 +0900
+Message-Id: <1507089367-10402-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Douglas Anderson <dianders@chromium.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Understanding what it represents helps a lot when reading the code, and
-it's not obvious, so document it.
+Since commit 5e53879008b9 ("sparc,sparc64: unify Makefile"), hdr-arch
+and SRCARCH always match.
 
-The ROOT_MENU flag is only set and tested by the gconf and qconf front
-ends, so leave it undocumented here. The obvious guess for what it means
-is correct.
-
-Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
- scripts/kconfig/expr.h | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
 
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index a73f762..ae7583c 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -166,22 +166,67 @@ struct property {
- 	for (st = sym->prop; st; st = st->next) \
- 		if (st->text)
+ Makefile                     | 21 +++++++++------------
+ scripts/Makefile.headersinst |  2 +-
+ 2 files changed, 10 insertions(+), 13 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index cf007a3..8d900ba 100644
+--- a/Makefile
++++ b/Makefile
+@@ -283,9 +283,6 @@ ifeq ($(ARCH),tilegx)
+        SRCARCH := tile
+ endif
  
-+/*
-+ * Represents a node in the menu tree, as seen in e.g. menuconfig (though used
-+ * for all front ends). Each symbol, menu, etc. defined in the Kconfig files
-+ * gets a node. A symbol defined in multiple locations gets one node at each
-+ * location.
-+ */
- struct menu {
-+	/* The next menu node at the same level */
- 	struct menu *next;
-+
-+	/* The parent menu node, corresponding to e.g. a menu or choice */
- 	struct menu *parent;
-+
-+	/* The first child menu node, for e.g. menus and choices */
- 	struct menu *list;
-+
-+	/*
-+	 * The symbol associated with the menu node. Choices are implemented as
-+	 * a special kind of symbol. NULL for menus, comments, and ifs.
-+	 */
- 	struct symbol *sym;
-+
-+	/*
-+	 * The prompt associated with the node. This holds the prompt for a
-+	 * symbol as well as the text for a menu or comment, along with the
-+	 * type (P_PROMPT, P_MENU, etc.)
-+	 */
- 	struct property *prompt;
-+
-+	/*
-+	 * 'visible if' dependencies. If more than one is given, they will be
-+	 * ANDed together.
-+	 */
- 	struct expr *visibility;
-+
-+	/*
-+	 * Ordinary dependencies from e.g. 'depends on' and 'if', ANDed
-+	 * together
-+	 */
- 	struct expr *dep;
-+
-+	/* MENU_* flags */
- 	unsigned int flags;
-+
-+	/* Any help text associated with the node */
- 	char *help;
-+
-+	/* The location where the menu node appears in the Kconfig files */
- 	struct file *file;
- 	int lineno;
-+
-+	/* For use by front ends that need to store auxiliary data */
- 	void *data;
- };
+-# Where to locate arch specific headers
+-hdr-arch  := $(SRCARCH)
+-
+ KCONFIG_CONFIG	?= .config
+ export KCONFIG_CONFIG
  
-+/*
-+ * Set on a menu node when the corresponding symbol changes state in some way.
-+ * Can be checked by front ends.
-+ */
- #define MENU_CHANGED		0x0001
-+
- #define MENU_ROOT		0x0002
+@@ -378,8 +375,8 @@ CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
  
- struct jump_key {
+ # Use USERINCLUDE when you must reference the UAPI directories only.
+ USERINCLUDE    := \
+-		-I$(srctree)/arch/$(hdr-arch)/include/uapi \
+-		-I$(objtree)/arch/$(hdr-arch)/include/generated/uapi \
++		-I$(srctree)/arch/$(SRCARCH)/include/uapi \
++		-I$(objtree)/arch/$(SRCARCH)/include/generated/uapi \
+ 		-I$(srctree)/include/uapi \
+ 		-I$(objtree)/include/generated/uapi \
+                 -include $(srctree)/include/linux/kconfig.h
+@@ -387,8 +384,8 @@ USERINCLUDE    := \
+ # Use LINUXINCLUDE when you must reference the include/ directory.
+ # Needed to be compatible with the O= option
+ LINUXINCLUDE    := \
+-		-I$(srctree)/arch/$(hdr-arch)/include \
+-		-I$(objtree)/arch/$(hdr-arch)/include/generated \
++		-I$(srctree)/arch/$(SRCARCH)/include \
++		-I$(objtree)/arch/$(SRCARCH)/include/generated \
+ 		$(if $(KBUILD_SRC), -I$(srctree)/include) \
+ 		-I$(objtree)/include \
+ 		$(USERINCLUDE)
+@@ -1134,8 +1131,8 @@ headerdep:
+ #Default location for installed headers
+ export INSTALL_HDR_PATH = $(objtree)/usr
+ 
+-# If we do an all arch process set dst to include/arch-$(hdr-arch)
+-hdr-dst = $(if $(KBUILD_HEADERS), dst=include/arch-$(hdr-arch), dst=include)
++# If we do an all arch process set dst to include/arch-$(SRCARCH)
++hdr-dst = $(if $(KBUILD_HEADERS), dst=include/arch-$(SRCARCH), dst=include)
+ 
+ PHONY += archheaders
+ archheaders:
+@@ -1153,10 +1150,10 @@ headers_install_all:
+ 
+ PHONY += headers_install
+ headers_install: __headers
+-	$(if $(wildcard $(srctree)/arch/$(hdr-arch)/include/uapi/asm/Kbuild),, \
++	$(if $(wildcard $(srctree)/arch/$(SRCARCH)/include/uapi/asm/Kbuild),, \
+ 	  $(error Headers not exportable for the $(SRCARCH) architecture))
+ 	$(Q)$(MAKE) $(hdr-inst)=include/uapi dst=include
+-	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi $(hdr-dst)
++	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi $(hdr-dst)
+ 
+ PHONY += headers_check_all
+ headers_check_all: headers_install_all
+@@ -1165,7 +1162,7 @@ headers_check_all: headers_install_all
+ PHONY += headers_check
+ headers_check: headers_install
+ 	$(Q)$(MAKE) $(hdr-inst)=include/uapi dst=include HDRCHECK=1
+-	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi $(hdr-dst) HDRCHECK=1
++	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi $(hdr-dst) HDRCHECK=1
+ 
+ # ---------------------------------------------------------------------------
+ # Kernel selftest
+diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
+index 343d586..5692d7a 100644
+--- a/scripts/Makefile.headersinst
++++ b/scripts/Makefile.headersinst
+@@ -30,7 +30,7 @@ __headers: $(subdirs)
+ $(subdirs):
+ 	$(Q)$(MAKE) $(hdr-inst)=$(obj)/$@ dst=$(dst)/$@
+ 
+-# Skip header install/check for include/uapi and arch/$(hdr-arch)/include/uapi.
++# Skip header install/check for include/uapi and arch/$(SRCARCH)/include/uapi.
+ # We have only sub-directories there.
+ skip-inst := $(if $(filter %/uapi,$(obj)),1)
+ 
 -- 
 2.7.4
 
