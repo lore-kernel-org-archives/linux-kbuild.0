@@ -1,101 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:53947 "EHLO
-        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752473AbdJDPND (ORCPT
+Received: from mail-wr0-f174.google.com ([209.85.128.174]:51709 "EHLO
+        mail-wr0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751197AbdJDQJx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Oct 2017 11:13:03 -0400
-Date: Wed, 4 Oct 2017 17:13:12 +0200
-From: Greg KH <greg@kroah.com>
-Subject: Re: [kernel-hardening] Re: [PATCH 2/3] Makefile: Move stackprotector
- availability out of Kconfig
-Message-ID: <20171004151312.GA20938@kroah.com>
-References: <1506972007-80614-1-git-send-email-keescook@chromium.org>
- <1506972007-80614-3-git-send-email-keescook@chromium.org>
- <CAK7LNARhoqX0Z--gFEP1xbvcEeg4aDD9rkV0SeUCa3icc1MN8g@mail.gmail.com>
+        Wed, 4 Oct 2017 12:09:53 -0400
+Received: by mail-wr0-f174.google.com with SMTP id j14so9052664wre.8
+        for <linux-kbuild@vger.kernel.org>; Wed, 04 Oct 2017 09:09:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARhoqX0Z--gFEP1xbvcEeg4aDD9rkV0SeUCa3icc1MN8g@mail.gmail.com>
+In-Reply-To: <CABXOdTdJADZ5=sFYsoUdDa519e3SXhTGP-_ZsMhzaT8J_VOD+A@mail.gmail.com>
+References: <20171003204839.27551-1-dianders@chromium.org> <20171003204839.27551-2-dianders@chromium.org>
+ <CAK7LNARAVPOQh5SpLGRN5z-me-FhQerP5HVfxstaEaJuinsA7A@mail.gmail.com> <CABXOdTdJADZ5=sFYsoUdDa519e3SXhTGP-_ZsMhzaT8J_VOD+A@mail.gmail.com>
+From: Doug Anderson <dianders@chromium.org>
+Date: Wed, 4 Oct 2017 09:09:51 -0700
+Message-ID: <CAD=FV=Xr3Ah8BoNkzoHbYD8ovhrRJbf6+2e3ucOa93Q6w+rvbA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] kbuild: Pass HOSTCC and similar to tools Makefiles
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Kees Cook <keescook@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.com>, Ingo Molnar <mingo@kernel.org>, Laura Abbott <labbott@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, Al Viro <viro@zeniv.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-sh@vger.kernel.org, kernel-hardening@lists.openwall.com, Mark Rutland <mark.rutland@arm.com>
+To: Guenter Roeck <groeck@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Michal Marek <mmarek@suse.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Guenter Roeck <groeck@chromium.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Wed, Oct 04, 2017 at 11:33:38PM +0900, Masahiro Yamada wrote:
-> Hi Kees,
-> 
-> 
-> 2017-10-03 4:20 GMT+09:00 Kees Cook <keescook@chromium.org>:
-> > Various portions of the kernel, especially per-architecture pieces,
-> > need to know if the compiler is building it with the stack protector.
-> > This was done in the arch/Kconfig with 'select', but this doesn't
-> > allow a way to do auto-detected compiler support. In preparation for
-> > creating an on-if-available default, move the logic for the definition of
-> > CONFIG_CC_STACKPROTECTOR into the Makefile.
-> >
-> > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > Cc: Michal Marek <mmarek@suse.com>
-> > Cc: Andrew Morton <akpm@linux-foundation.org>
-> > Cc: Ingo Molnar <mingo@kernel.org>
-> > Cc: Laura Abbott <labbott@redhat.com>
-> > Cc: Nicholas Piggin <npiggin@gmail.com>
-> > Cc: Al Viro <viro@zeniv.linux.org.uk>
-> > Cc: linux-kbuild@vger.kernel.org
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
-> > ---
-> >  Makefile     | 7 +++++--
-> >  arch/Kconfig | 8 --------
-> >  2 files changed, 5 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/Makefile b/Makefile
-> > index d1119941261c..e122a9cf0399 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -688,8 +688,11 @@ else
-> >    stackp-flag := $(call cc-option, -fno-stack-protector)
-> >  endif
-> >  endif
-> > -# Find arch-specific stack protector compiler sanity-checking script.
-> > -ifdef CONFIG_CC_STACKPROTECTOR
-> > +ifdef stackp-name
-> > +  # If the stack protector has been selected, inform the rest of the build.
-> > +  KBUILD_CFLAGS += -DCONFIG_CC_STACKPROTECTOR
-> > +  KBUILD_AFLAGS += -DCONFIG_CC_STACKPROTECTOR
-> > +  # Find arch-specific stack protector compiler sanity-checking script.
-> >    stackp-path := $(srctree)/scripts/gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh
-> >    stackp-check := $(wildcard $(stackp-path))
-> >  endif
-> 
-> 
-> I have not tested this series,
-> but I think this commit is bad (with the follow-up patch applied).
-> 
-> 
-> I thought of this scenario:
-> 
-> [1] Kernel is configured with CONFIG_CC_STACKPROTECTOR_AUTO
-> 
-> [2] Kernel is built with a compiler without stack protector support.
-> 
-> [3] CONFIG_CC_STACKPROTECTOR is not defined,
->     so __stack_chk_fail() is not compiled.
-> 
-> [4] Out-of-tree modules are compiled with a compiler with
->     stack protector support.
->     __stack_chk_fail() is inserted to functions of the modules.
+Hi,
 
-We don't ever support the system of loading a module built with anything
-other than the _exact_ same compiler than the kernel was.  So this will
-not happen (well, if someone tries it, they get to keep the pieces their
-kernel image is now in...)
+On Tue, Oct 3, 2017 at 9:07 PM, Guenter Roeck <groeck@google.com> wrote:
+> On Tue, Oct 3, 2017 at 8:20 PM, Masahiro Yamada
+>> CC:     for building tools that run on the target machine
+>> HOSTCC: for building tools that run on the build machine
+>>
+>>
+>> IMHO, this should be consistent to avoid confusion.
+>>
+>>
+>> Grepping CROSS_COMPILE under tools/ directory,
+>> I see many Makefile expect CC for the target system.
+>>
+>> For ex, tools/croup/Makefile
+>>
+>> CC = $(CROSS_COMPILE)gcc
+>>
+>>
+>>
+>> Why don't you fix tools/objtool/Makefile ?
+>>
+>>
+>
+> Interesting question. You are right, most tools are target tools, not
+> host tools. Maybe it _would_ make sense to use HOSTCC/HOSTCFLAGS to
+> build it. Copying Josh for input.
 
-> [5] insmod fails because reference to __stack_chk_fail()
->     can not be resolved.
+Ah, good point.  I'm not terribly familiar with the things under
+tools, so when I saw "objtool" I assumed it was following a standard
+pattern for tools.
 
-Even nicer, we failed "cleanly" :)
+I can submit a patch for objtool's Makefile.  ...or, if it makes more
+sense, I can submit a patch to move "objtool" to the scripts
+directory.  ...or I can butt out of it.  :)  Which would folks prefer?
 
-This isn't a real-world issue, sorry.
-
-thanks,
-
-greg k-h
+-Doug
