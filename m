@@ -1,154 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:16743 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751120AbdJDDVh (ORCPT
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:55985 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751113AbdJDDhg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Oct 2017 23:21:37 -0400
-MIME-Version: 1.0
-In-Reply-To: <20171003204839.27551-2-dianders@chromium.org>
-References: <20171003204839.27551-1-dianders@chromium.org> <20171003204839.27551-2-dianders@chromium.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 4 Oct 2017 12:20:52 +0900
-Message-ID: <CAK7LNARAVPOQh5SpLGRN5z-me-FhQerP5HVfxstaEaJuinsA7A@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/2] kbuild: Pass HOSTCC and similar to tools Makefiles
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 3 Oct 2017 23:37:36 -0400
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: [PATCH] kconfig: Document the 'menu' struct
+Date: Wed,  4 Oct 2017 05:37:12 +0200
+Message-Id: <1507088232-8510-1-git-send-email-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Douglas Anderson <dianders@chromium.org>
-Cc: Michal Marek <mmarek@suse.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, groeck@chromium.org, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
 
-2017-10-04 5:48 GMT+09:00 Douglas Anderson <dianders@chromium.org>:
-> The main Linux Makefiles and the tools sub-Makefiles have different
-> conventions for passing in CC / CFLAGS.
->
-> Here's brief summary for the kernel:
-> * CC: target C compiler (must be passed as an argument to make to
->   override)
-> * HOSTCC: host C compiler (must be passed as an argument to make to
->   override)
-> * CFLAGS: ignored (kernel manages its own CFLAGS)
-> * KCFLAGS: extra cflags for the target (expected as an env var)
-> * HOSTCFLAGS: host C compiler flags (not modifiable by the caller of
->   make)
->
-> Here's a brief summary for the tools:
-> * CC: host C compiler (must be passed as an argument to make to
->   override)
-> * CFLAGS: base arguments for the host C compiler which are added to by
->   sub builds (expected as an env var)
->
-> When the main kernel Makefile calls into the tools Makefile, it should
-> adapt things from its syntax to the tools Makefile syntax.
->
-> If we don't do this, we have a few issues:
-> * If someone wants to user another compiler (like clang, maybe) for
->   hostcc then the tools will still be compiled with gcc.
-> * If you happen to be building and you left ${CFLAGS} set to something
->   random (maybe it matches ${CC}, the _target_ C compiler, not the
->   _host_ C compiler) then this random value will be used to compile
->   the tools.
->
-> In any case, it seems like it makes sense to pass CC, CFLAGS, and
-> similar properly into the tools Makefile.
->
-> NOTE: in order to do this properly, we need to add some new
-> definitions of HOSTAS and HOSTLD into the main kernel Makefile.  If we
-> don't do this and someone overrides "AS" or "LD" on the command line
-> then those (which were intended for the target) will be used to build
-> host side tools.  We also make up some imaginary "HOSTASFLAGS" and
-> "HOSTLDFLAGS".  Someone could specify these, but if they don't at
-> least these blank variables will properly clobber ASFLAGS and LDFLAGS
-> from the kernel.
->
-> This was discovered in the Chrome OS build system where CFLAGS (an
-> environment variable) was accidentally left pointing to flags that
-> would be an appropriate match to CC.  The kernel didn't use these
-> CFLAGS so it was never an issue.  Turning on STACKVALIDATION, however,
-> suddenly invoked a tools build that blew up.
->
-> Signed-off-by: Douglas Anderson <dianders@chromium.org>
-> ---
->
->  Makefile | 30 ++++++++++++++++++++++++++++--
->  1 file changed, 28 insertions(+), 2 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index cf007a31d575..0d3af0677d88 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -298,7 +298,9 @@ HOST_LFS_CFLAGS := $(shell getconf LFS_CFLAGS)
->  HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS)
->  HOST_LFS_LIBS := $(shell getconf LFS_LIBS)
->
-> +HOSTAS       = as
->  HOSTCC       = gcc
-> +HOSTLD       = ld
->  HOSTCXX      = g++
->  HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
->                 -fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
-> @@ -1616,11 +1618,35 @@ image_name:
->  # Clear a bunch of variables before executing the submake
->  tools/: FORCE
->         $(Q)mkdir -p $(objtree)/tools
-> -       $(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(abspath $(objtree)) subdir=tools -C $(src)/tools/
-> +       $(Q)ASFLAGS="$(HOSTASFLAGS)"\
-> +               LDFLAGS="$(HOSTLDFLAGS)" \
-> +               CFLAGS="$(HOSTCFLAGS)" \
-> +               CXXFLAGS="$(HOSTCXXFLAGS)" \
-> +               $(MAKE) \
-> +               AS="$(HOSTAS)" \
-> +               CC="$(HOSTCC)" \
-> +               CXX="$(HOSTCXX)" \
-> +               LD="$(HOSTLD)" \
-> +               MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" \
-> +               O=$(abspath $(objtree)) \
-> +               subdir=tools \
-> +               -C $(src)/tools/
->
->  tools/%: FORCE
->         $(Q)mkdir -p $(objtree)/tools
-> -       $(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(abspath $(objtree)) subdir=tools -C $(src)/tools/ $*
-> +       $(Q)ASFLAGS="$(HOSTASFLAGS)"\
-> +               LDFLAGS="$(HOSTLDFLAGS)" \
-> +               CFLAGS="$(HOSTCFLAGS)" \
-> +               CXXFLAGS="$(HOSTCXXFLAGS)" \
-> +               $(MAKE) \
-> +               AS="$(HOSTAS)" \
-> +               CC="$(HOSTCC)" \
-> +               CXX="$(HOSTCXX)" \
-> +               LD="$(HOSTLD)" \
-> +               MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" \
-> +               O=$(abspath $(objtree)) \
-> +               subdir=tools \
-> +               -C $(src)/tools/ $*
->
+Understanding what it represents helps a lot when reading the code, and
+it's not obvious, so document it.
 
-Please do not do this.
+The ROOT_MENU flag is only set and tested by the gconf and qconf front
+ends, so leave it undocumented here. The obvious guess for what it means
+is correct.
 
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+---
+ scripts/kconfig/expr.h | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-
-CC:     for building tools that run on the target machine
-HOSTCC: for building tools that run on the build machine
-
-
-IMHO, this should be consistent to avoid confusion.
-
-
-Grepping CROSS_COMPILE under tools/ directory,
-I see many Makefile expect CC for the target system.
-
-For ex, tools/croup/Makefile
-
-CC = $(CROSS_COMPILE)gcc
-
-
-
-Why don't you fix tools/objtool/Makefile ?
-
-
-
-
-
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index a73f762..ae7583c 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -166,22 +166,67 @@ struct property {
+ 	for (st = sym->prop; st; st = st->next) \
+ 		if (st->text)
+ 
++/*
++ * Represents a node in the menu tree, as seen in e.g. menuconfig (though used
++ * for all front ends). Each symbol, menu, etc. defined in the Kconfig files
++ * gets a node. A symbol defined in multiple locations gets one node at each
++ * location.
++ */
+ struct menu {
++	/* The next menu node at the same level */
+ 	struct menu *next;
++
++	/* The parent menu node, corresponding to e.g. a menu or choice */
+ 	struct menu *parent;
++
++	/* The first child menu node, for e.g. menus and choices */
+ 	struct menu *list;
++
++	/*
++	 * The symbol associated with the menu node. Choices are implemented as
++	 * a special kind of symbol. NULL for menus, comments, and ifs.
++	 */
+ 	struct symbol *sym;
++
++	/*
++	 * The prompt associated with the node. This holds the prompt for a
++	 * symbol as well as the text for a menu or comment, along with the
++	 * type (P_PROMPT, P_MENU, etc.)
++	 */
+ 	struct property *prompt;
++
++	/*
++	 * 'visible if' dependencies. If more than one is given, they will be
++	 * ANDed together.
++	 */
+ 	struct expr *visibility;
++
++	/*
++	 * Ordinary dependencies from e.g. 'depends on' and 'if', ANDed
++	 * together
++	 */
+ 	struct expr *dep;
++
++	/* MENU_* flags */
+ 	unsigned int flags;
++
++	/* Any help text associated with the node */
+ 	char *help;
++
++	/* The location where the menu node appears in the Kconfig files */
+ 	struct file *file;
+ 	int lineno;
++
++	/* For use by front ends that need to store auxiliary data */
+ 	void *data;
+ };
+ 
++/*
++ * Set on a menu node when the corresponding symbol changes state in some way.
++ * Can be checked by front ends.
++ */
+ #define MENU_CHANGED		0x0001
++
+ #define MENU_ROOT		0x0002
+ 
+ struct jump_key {
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
