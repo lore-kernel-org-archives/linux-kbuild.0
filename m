@@ -1,114 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:20705 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750909AbdJDE7i (ORCPT
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:51782 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751114AbdJDFsc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Oct 2017 00:59:38 -0400
-MIME-Version: 1.0
-In-Reply-To: <1505820967-17302-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-References: <1505820967-17302-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 4 Oct 2017 13:58:37 +0900
-Message-ID: <CAK7LNASc52YJKyowkgy9=82L-SQc3TKUmhaapNcRFoXx81umcA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: comments cleanup in Makefile.lib
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 4 Oct 2017 01:48:32 -0400
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: [PATCH] kconfig: Document the 'symbol' struct
+Date: Wed,  4 Oct 2017 07:48:14 +0200
+Message-Id: <1507096094-14953-1-git-send-email-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>
+To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
 
-Hi Cao,
+Visibility and choices in particular might be a bit tricky to figure
+out.
 
+Also fix existing comment to point out that P_MENU is also used for
+menus.
 
-2017-09-19 20:36 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
-> It has:
-> 1. Move comments close to what it want to comment.
-> 2. Comments cleanup & improvement.
->
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> ---
->  scripts/Makefile.lib | 19 ++++++-------------
->  1 file changed, 6 insertions(+), 13 deletions(-)
->
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 58c05e5..7de9c08 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -4,8 +4,7 @@ ccflags-y  += $(EXTRA_CFLAGS)
->  cppflags-y += $(EXTRA_CPPFLAGS)
->  ldflags-y  += $(EXTRA_LDFLAGS)
->
-> -#
-> -# flags that take effect in sub directories
-> +# flags that take effect in current and sub directories
->  export KBUILD_SUBDIR_ASFLAGS := $(KBUILD_SUBDIR_ASFLAGS) $(subdir-asflags-y)
->  export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
->
-> @@ -14,14 +13,16 @@ export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
->
->  # When an object is listed to be built compiled-in and modular,
->  # only build the compiled-in version
-> -
->  obj-m := $(filter-out $(obj-y),$(obj-m))
->
->  # Libraries are always collected in one lib file.
->  # Filter out objects already built-in
-> -
->  lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
->
-> +# Determine modorder.
-> +# Unfortunately, we don't have information about ordering between -y
-> +# and -m subdirs.  Just put -y's first.
-> +modorder       := $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
->
->  # Handle objects in subdirs
->  # ---------------------------------------------------------------------------
-> @@ -29,12 +30,6 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
->  #   and add the directory to the list of dirs to descend into: $(subdir-y)
->  # o if we encounter foo/ in $(obj-m), remove it from $(obj-m)
->  #   and add the directory to the list of dirs to descend into: $(subdir-m)
-> -
-> -# Determine modorder.
-> -# Unfortunately, we don't have information about ordering between -y
-> -# and -m subdirs.  Just put -y's first.
-> -modorder       := $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
-> -
->  __subdir-y     := $(patsubst %/,%,$(filter %/, $(obj-y)))
->  subdir-y       += $(__subdir-y)
->  __subdir-m     := $(patsubst %/,%,$(filter %/, $(obj-m)))
-> @@ -43,10 +38,9 @@ obj-y                := $(patsubst %/, %/built-in.o, $(obj-y))
->  obj-m          := $(filter-out %/, $(obj-m))
->
->  # Subdirectories we need to descend into
-> -
->  subdir-ym      := $(sort $(subdir-y) $(subdir-m))
->
-> -# if $(foo-objs) exists, foo.o is a composite object
-> +# if $(foo-objs) or $(foo-y) or $(foo-m) exists, foo.o is a composite object
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+---
+ scripts/kconfig/expr.h | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
-
-Nit:
-
-"if $(foo-objs), $(foo-y), or $(foo-m) exists" will be better.
-
-
->  multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
->  multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))), $(m))))
->  multi-used   := $(multi-used-y) $(multi-used-m)
-> @@ -90,7 +84,6 @@ subdir-ym     := $(addprefix $(obj)/,$(subdir-ym))
->  obj-dirs       := $(addprefix $(obj)/,$(obj-dirs))
->
->  # These flags are needed for modversions and compiling, so we define them here
-> -# already
->  # $(modname_flags) #defines KBUILD_MODNAME as the name of the module it will
-
-
-I am not sure if "#defines" is intentional or not.
-I think "#" is unnecessary.
-
-
-
-
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index a73f762..6344067 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -74,17 +74,60 @@ enum {
+ 	S_DEF_COUNT
+ };
+ 
++/*
++ * Represents a configuration symbol.
++ *
++ * Choices are represented as a special kind of symbol and have the
++ * SYMBOL_CHOICE bit set in 'flags'.
++ */
+ struct symbol {
++	/* The next symbol in the same bucket in the symbol hash table */
+ 	struct symbol *next;
++
++	/* The name of the symbol, e.g. "FOO" for 'config FOO' */
+ 	char *name;
++
++	/* S_BOOLEAN, S_TRISTATE, ... */
+ 	enum symbol_type type;
++
++	/*
++	 * The calculated value of the symbol. The SYMBOL_VALID bit is set in
++	 * 'flags' when this is up to date. Note that this value might differ
++	 * from the user value set in e.g. a .config file, due to visibility.
++	 */
+ 	struct symbol_value curr;
++
++	/*
++	 * Values for the symbol provided from outside. def[S_DEF_USER] holds
++	 * the .config value.
++	 */
+ 	struct symbol_value def[S_DEF_COUNT];
++
++	/*
++	 * An upper bound on the tristate value the user can set for the symbol
++	 * if it is a boolean or tristate. Calculated from prompt dependencies,
++	 * which also inherit dependencies from enclosing menus, choices, and
++	 * ifs. If 'n', the user value will be ignored.
++	 *
++	 * Symbols lacking prompts always have visibility 'n'.
++	 */
+ 	tristate visible;
++
++	/* SYMBOL_* flags */
+ 	int flags;
++
++	/* List of properties. See prop_type. */
+ 	struct property *prop;
++
++	/* Dependencies from enclosing menus, choices, and ifs */
+ 	struct expr_value dir_dep;
++
++	/* Reverse dependencies through being selected by other symbols */
+ 	struct expr_value rev_dep;
++
++	/*
++	 * "Weak" reverse dependencies through being implied by other symbols
++	 */
+ 	struct expr_value implied;
+ };
+ 
+@@ -133,7 +176,7 @@ enum prop_type {
+ 	P_UNKNOWN,
+ 	P_PROMPT,   /* prompt "foo prompt" or "BAZ Value" */
+ 	P_COMMENT,  /* text associated with a comment */
+-	P_MENU,     /* prompt associated with a menuconfig option */
++	P_MENU,     /* prompt associated with a menu or menuconfig symbol */
+ 	P_DEFAULT,  /* default y */
+ 	P_CHOICE,   /* choice value */
+ 	P_SELECT,   /* select BAR */
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
