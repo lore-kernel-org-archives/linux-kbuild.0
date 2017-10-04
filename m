@@ -1,137 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f42.google.com ([209.85.215.42]:50122 "EHLO
-        mail-lf0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751114AbdJDKjB (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:25626 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752229AbdJDOek (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Oct 2017 06:39:01 -0400
-Received: by mail-lf0-f42.google.com with SMTP id c82so9044761lfc.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Oct 2017 03:39:00 -0700 (PDT)
+        Wed, 4 Oct 2017 10:34:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNARNU0GYYOU3TkduhTsmgDV+=d84D7AqCcopBw+twyuP7g@mail.gmail.com>
-References: <20171002104339.4349-1-riku.voipio@linaro.org> <CAK7LNARNU0GYYOU3TkduhTsmgDV+=d84D7AqCcopBw+twyuP7g@mail.gmail.com>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Wed, 4 Oct 2017 13:38:58 +0300
-Message-ID: <CAAqcGHkjNLvjz4X00U0edHp9qBh7=WRJdZ-q6uCihCxb2j0hOA@mail.gmail.com>
-Subject: Re: [PATCH v3] scripts/package/builddeb: split generating packaging
- and build
+In-Reply-To: <1506972007-80614-3-git-send-email-keescook@chromium.org>
+References: <1506972007-80614-1-git-send-email-keescook@chromium.org> <1506972007-80614-3-git-send-email-keescook@chromium.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 4 Oct 2017 23:33:38 +0900
+Message-ID: <CAK7LNARhoqX0Z--gFEP1xbvcEeg4aDD9rkV0SeUCa3icc1MN8g@mail.gmail.com>
+Subject: Re: [PATCH 2/3] Makefile: Move stackprotector availability out of Kconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.com>, Ingo Molnar <mingo@kernel.org>, Laura Abbott <labbott@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, Al Viro <viro@zeniv.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-sh@vger.kernel.org, kernel-hardening@lists.openwall.com, Mark Rutland <mark.rutland@arm.com>
 
-On 4 October 2017 at 12:12, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Hi Riku,
+Hi Kees,
 
-> 2017-10-02 19:43 GMT+09:00  <riku.voipio@linaro.org>:
->> From: Riku Voipio <riku.voipio@linaro.org>
->>
->> Move debian/ directory generation out of builddeb to a new script,
->> mkdebian. The package build commands are kept in builddeb, which
->> is now an internal command called from debian/rules.
->>
->> With these changes in place, we can now use dpkg-buildpackage from
->> deb-pkg and bindeb-pkg removing need for handrolled source/changes
->> generation.
->>
->> This patch is based on the criticism of the current state of builddeb
->> discussed on:
->>
->> https://patchwork.kernel.org/patch/9656403/
->>
->> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
->> ---
->> changes since v2:
->> - revert back to intdeb-pkg target
->> - fix parellel builds from deb-pkg targets
 
-> No.  Not fixed.
+2017-10-03 4:20 GMT+09:00 Kees Cook <keescook@chromium.org>:
+> Various portions of the kernel, especially per-architecture pieces,
+> need to know if the compiler is building it with the stack protector.
+> This was done in the arch/Kconfig with 'select', but this doesn't
+> allow a way to do auto-detected compiler support. In preparation for
+> creating an on-if-available default, move the logic for the definition of
+> CONFIG_CC_STACKPROTECTOR into the Makefile.
+>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Michal Marek <mmarek@suse.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Ingo Molnar <mingo@kernel.org>
+> Cc: Laura Abbott <labbott@redhat.com>
+> Cc: Nicholas Piggin <npiggin@gmail.com>
+> Cc: Al Viro <viro@zeniv.linux.org.uk>
+> Cc: linux-kbuild@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  Makefile     | 7 +++++--
+>  arch/Kconfig | 8 --------
+>  2 files changed, 5 insertions(+), 10 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index d1119941261c..e122a9cf0399 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -688,8 +688,11 @@ else
+>    stackp-flag := $(call cc-option, -fno-stack-protector)
+>  endif
+>  endif
+> -# Find arch-specific stack protector compiler sanity-checking script.
+> -ifdef CONFIG_CC_STACKPROTECTOR
+> +ifdef stackp-name
+> +  # If the stack protector has been selected, inform the rest of the build.
+> +  KBUILD_CFLAGS += -DCONFIG_CC_STACKPROTECTOR
+> +  KBUILD_AFLAGS += -DCONFIG_CC_STACKPROTECTOR
+> +  # Find arch-specific stack protector compiler sanity-checking script.
+>    stackp-path := $(srctree)/scripts/gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh
+>    stackp-check := $(wildcard $(stackp-path))
+>  endif
 
-> I see the same problem for bindeb-pkg as in v2.
 
-The parallel build overload? I'm totally puzzled then. Debian is still
-stuck with make 4.1, so I guess there is a change in behaviour on
-later makes.
+I have not tested this series,
+but I think this commit is bad (with the follow-up patch applied).
 
-> "make deb-pkg" gave me tons of warnings, then finally fails to build:
 
-> rm -rf debian/*tmp debian/files
-> mv debian/ debian.backup # debian/ might be cleaned away
-> make clean
-> mv debian.backup debian
->  dpkg-source -i.git -b linux
-> dpkg-source: warning: no source format specified in
-> debian/source/format, see dpkg-source(1)
-> dpkg-source: info: using source format '1.0'
-> dpkg-source: warning: source directory 'linux' is not
-> <sourcepackage>-<upstreamversion> 'linux-4.13.0+-4.13.0+'
-> dpkg-source: warning: .orig directory name linux.orig is not
-> <package>-<upstreamversion> (wanted linux-4.13.0+-4.13.0+.orig)
-> dpkg-source: info: building linux-4.13.0+ using existing
-> linux-4.13.0+_4.13.0+.orig.tar.gz
-> dpkg-source: info: building linux-4.13.0+ in linux-4.13.0+_4.13.0+-7.diff.gz
-> dpkg-source: warning: ignoring deletion of file .scmversion, use
-> --include-removal to override
-> dpkg-source: warning: ignoring deletion of directory drivers/lguest
-> dpkg-source: warning: ignoring deletion of file
-> drivers/video/console/fbcon_rotate.h, use --include-removal to
-> override
-> dpkg-source: warning: ignoring deletion of file
-> drivers/video/console/fbcon.h, use --include-removal to override
-> dpkg-source: warning: ignoring deletion of file
-> drivers/video/console/fbcon_cw.c, use --include-removal to override
-> dpkg-source: warning: ignoring deletion of file
-> drivers/video/console/fbcon_rotate.c, use --include-removal to
-> override
-> dpkg-source: warning: ignoring deletion of file
-> drivers/video/console/fbcon.c, use --include-removal to override
->
->
->   ...
->
->
-> dpkg-source: info: use the '3.0 (quilt)' format to have separate and
-> documented changes to upstream files, see dpkg-source(1)
-> dpkg-source: error: unrepresentable changes to source
->
->
-> Do you have a clue?
+I thought of this scenario:
 
-It looks like making the tarball (or renaming it) failed, and
-dpkg-source picked up and older orig.tar.gz with same name. I think a
-full log would be useful here, because there probably is bug here in
-my patch.
+[1] Kernel is configured with CONFIG_CC_STACKPROTECTOR_AUTO
 
->> +cat <<EOF > debian/rules
->> +#!/usr/bin/make -f
->> +
->> +build:
->> +       \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} KBUILD_SRC=
->> +
->> +binary-arch:
->> +       \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} KBUILD_SRC= intdeb-pkg
->> +
->> +clean:
->> +       rm -rf debian/*tmp debian/files
->> +       mv debian/ debian.backup # debian/ might be cleaned away
->> +       \$(MAKE) clean
->> +       mv debian.backup debian
->
->
-> "mv debian debian.backup" is unnecessary, I think.
->
->
-> I think you saw
->
-> clean-dirs += $(objtree)/debian/
->
-> in scripts/package/Makefile.
+[2] Kernel is built with a compiler without stack protector support.
 
-> Please notice this is cleaned-up by "make mrproper"
-> because Kbuild does not descend under scripts/ for "make clean".
+[3] CONFIG_CC_STACKPROTECTOR is not defined,
+    so __stack_chk_fail() is not compiled.
 
-That is how it was in the old version of builddeb as well. I'll submit
-another patch to remove the mv-in-clean hack.
+[4] Out-of-tree modules are compiled with a compiler with
+    stack protector support.
+    __stack_chk_fail() is inserted to functions of the modules.
 
-Riku
+[5] insmod fails because reference to __stack_chk_fail()
+    can not be resolved.
+
+
+
+
+I think "select CC_STACKPROTECTOR" should be kept in Kconfig.
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
