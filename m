@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:25258 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:25257 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751776AbdJDD5c (ORCPT
+        with ESMTP id S1751731AbdJDD5c (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 3 Oct 2017 23:57:32 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/4] kbuild: move "_all" target out of $(KBUILD_SRC) conditional
-Date: Wed,  4 Oct 2017 12:56:05 +0900
-Message-Id: <1507089367-10402-2-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 3/4] kbuild: re-order the code to not parse unnecessary variables
+Date: Wed,  4 Oct 2017 12:56:06 +0900
+Message-Id: <1507089367-10402-3-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1507089367-10402-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1507089367-10402-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,47 +15,314 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Douglas Anderson <dianders@chromium.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-The first "_all" occurrence around line 120 is only visible when
-KBUILD_SRC is unset.
+The top Makefile is divided into some sections such as mixed targets,
+config targets, build targets, etc.
 
-If O=... is specified, the working directory is relocated, then the
-only second occurrence around line 193 is visible, that is not set
-to PHONY.
+When we build mixed targets, Kbuild just invokes submake to process
+them one by one.  In this case, compiler-related variables like CC,
+KBUILD_CFLAGS, etc. are unneeded.
 
-Move the first one to an always visible place.  This clarifies "_all"
-is our default target and it is always set to PHONY.
+Check what kind of targets we are building first, then parse necessary
+variables for building them.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ Makefile | 233 ++++++++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 118 insertions(+), 115 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 8d900ba..39a7c03 100644
+index 39a7c03..a4fd682 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -10,6 +10,10 @@ NAME = Fearless Coyote
- # Comments in this file are targeted only to the developer, do not
- # expect to learn how to build the kernel reading this file.
- 
-+# That's our default target when none is given on the command line
-+PHONY := _all
-+_all:
-+
- # o Do not use make's built-in rules and variables
- #   (this increases performance and avoids hard-to-debug behaviour);
- # o Look for make include files relative to root of kernel src
-@@ -116,10 +120,6 @@ ifeq ("$(origin O)", "command line")
-   KBUILD_OUTPUT := $(O)
+@@ -186,15 +186,6 @@ ifeq ("$(origin M)", "command line")
+   KBUILD_EXTMOD := $(M)
  endif
  
--# That's our default target when none is given on the command line
--PHONY := _all
--_all:
+-# If building an external module we do not care about the all: rule
+-# but instead _all depend on modules
+-PHONY += all
+-ifeq ($(KBUILD_EXTMOD),)
+-_all: all
+-else
+-_all: modules
+-endif
 -
- # Cancel implicit rules on top Makefile
- $(CURDIR)/Makefile Makefile: ;
+ ifeq ($(KBUILD_SRC),)
+         # building in the source tree
+         srctree := .
+@@ -206,6 +197,9 @@ else
+                 srctree := $(KBUILD_SRC)
+         endif
+ endif
++
++export KBUILD_CHECKSRC KBUILD_EXTMOD KBUILD_SRC
++
+ objtree		:= .
+ src		:= $(srctree)
+ obj		:= $(objtree)
+@@ -214,6 +208,74 @@ VPATH		:= $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
+ 
+ export srctree objtree VPATH
+ 
++# To make sure we do not include .config for any of the *config targets
++# catch them early, and hand them over to scripts/kconfig/Makefile
++# It is allowed to specify more targets when calling make, including
++# mixing *config targets and build targets.
++# For example 'make oldconfig all'.
++# Detect when mixed targets is specified, and make a second invocation
++# of make so .config is not included in this case either (for *config).
++
++version_h := include/generated/uapi/linux/version.h
++old_version_h := include/linux/version.h
++
++no-dot-config-targets := clean mrproper distclean \
++			 cscope gtags TAGS tags help% %docs check% coccicheck \
++			 $(version_h) headers_% archheaders archscripts \
++			 kernelversion %src-pkg
++
++config-targets := 0
++mixed-targets  := 0
++dot-config     := 1
++
++ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
++	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
++		dot-config := 0
++	endif
++endif
++
++ifeq ($(KBUILD_EXTMOD),)
++        ifneq ($(filter config %config,$(MAKECMDGOALS)),)
++                config-targets := 1
++                ifneq ($(words $(MAKECMDGOALS)),1)
++                        mixed-targets := 1
++                endif
++        endif
++endif
++# install and modules_install need also be processed one by one
++ifneq ($(filter install,$(MAKECMDGOALS)),)
++        ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
++	        mixed-targets := 1
++        endif
++endif
++
++ifeq ($(mixed-targets),1)
++# ===========================================================================
++# We're called with mixed targets (*config and build targets).
++# Handle them one by one.
++
++PHONY += $(MAKECMDGOALS) __build_one_by_one
++
++$(filter-out __build_one_by_one, $(MAKECMDGOALS)): __build_one_by_one
++	@:
++
++__build_one_by_one:
++	$(Q)set -e; \
++	for i in $(MAKECMDGOALS); do \
++		$(MAKE) -f $(srctree)/Makefile $$i; \
++	done
++
++else
++
++# We need some generic definitions (do not try to remake the file).
++scripts/Kbuild.include: ;
++include scripts/Kbuild.include
++
++# Read KERNELRELEASE from include/config/kernel.release (if it exists)
++KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
++KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
++export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
++
+ # SUBARCH tells the usermode build what the underlying arch is.  That is set
+ # first, and if a usermode build is happening, the "ARCH=um" on the command
+ # line overrides the setting of ARCH below.  If a native build is happening,
+@@ -308,40 +370,6 @@ HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
+ 		-Wno-missing-field-initializers -fno-delete-null-pointer-checks
+ endif
+ 
+-# Decide whether to build built-in, modular, or both.
+-# Normally, just do built-in.
+-
+-KBUILD_MODULES :=
+-KBUILD_BUILTIN := 1
+-
+-# If we have only "make modules", don't compile built-in objects.
+-# When we're building modules with modversions, we need to consider
+-# the built-in objects during the descend as well, in order to
+-# make sure the checksums are up to date before we record them.
+-
+-ifeq ($(MAKECMDGOALS),modules)
+-  KBUILD_BUILTIN := $(if $(CONFIG_MODVERSIONS),1)
+-endif
+-
+-# If we have "make <whatever> modules", compile modules
+-# in addition to whatever we do anyway.
+-# Just "make" or "make all" shall build modules as well
+-
+-ifneq ($(filter all _all modules,$(MAKECMDGOALS)),)
+-  KBUILD_MODULES := 1
+-endif
+-
+-ifeq ($(MAKECMDGOALS),)
+-  KBUILD_MODULES := 1
+-endif
+-
+-export KBUILD_MODULES KBUILD_BUILTIN
+-export KBUILD_CHECKSRC KBUILD_SRC KBUILD_EXTMOD
+-
+-# We need some generic definitions (do not try to remake the file).
+-scripts/Kbuild.include: ;
+-include scripts/Kbuild.include
+-
+ # Make variables (CC, etc...)
+ AS		= $(CROSS_COMPILE)as
+ LD		= $(CROSS_COMPILE)ld
+@@ -406,11 +434,6 @@ KBUILD_AFLAGS_MODULE  := -DMODULE
+ KBUILD_CFLAGS_MODULE  := -DMODULE
+ KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
+ 
+-# Read KERNELRELEASE from include/config/kernel.release (if it exists)
+-KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+-KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+-
+-export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
+ export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
+@@ -459,73 +482,6 @@ ifneq ($(KBUILD_SRC),)
+ 	    $(srctree) $(objtree) $(VERSION) $(PATCHLEVEL)
+ endif
+ 
+-# Support for using generic headers in asm-generic
+-PHONY += asm-generic uapi-asm-generic
+-asm-generic: uapi-asm-generic
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
+-	            src=asm obj=arch/$(SRCARCH)/include/generated/asm
+-uapi-asm-generic:
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
+-	            src=uapi/asm obj=arch/$(SRCARCH)/include/generated/uapi/asm
+-
+-# To make sure we do not include .config for any of the *config targets
+-# catch them early, and hand them over to scripts/kconfig/Makefile
+-# It is allowed to specify more targets when calling make, including
+-# mixing *config targets and build targets.
+-# For example 'make oldconfig all'.
+-# Detect when mixed targets is specified, and make a second invocation
+-# of make so .config is not included in this case either (for *config).
+-
+-version_h := include/generated/uapi/linux/version.h
+-old_version_h := include/linux/version.h
+-
+-no-dot-config-targets := clean mrproper distclean \
+-			 cscope gtags TAGS tags help% %docs check% coccicheck \
+-			 $(version_h) headers_% archheaders archscripts \
+-			 kernelversion %src-pkg
+-
+-config-targets := 0
+-mixed-targets  := 0
+-dot-config     := 1
+-
+-ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
+-	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
+-		dot-config := 0
+-	endif
+-endif
+-
+-ifeq ($(KBUILD_EXTMOD),)
+-        ifneq ($(filter config %config,$(MAKECMDGOALS)),)
+-                config-targets := 1
+-                ifneq ($(words $(MAKECMDGOALS)),1)
+-                        mixed-targets := 1
+-                endif
+-        endif
+-endif
+-# install and modules_install need also be processed one by one
+-ifneq ($(filter install,$(MAKECMDGOALS)),)
+-        ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
+-	        mixed-targets := 1
+-        endif
+-endif
+-
+-ifeq ($(mixed-targets),1)
+-# ===========================================================================
+-# We're called with mixed targets (*config and build targets).
+-# Handle them one by one.
+-
+-PHONY += $(MAKECMDGOALS) __build_one_by_one
+-
+-$(filter-out __build_one_by_one, $(MAKECMDGOALS)): __build_one_by_one
+-	@:
+-
+-__build_one_by_one:
+-	$(Q)set -e; \
+-	for i in $(MAKECMDGOALS); do \
+-		$(MAKE) -f $(srctree)/Makefile $$i; \
+-	done
+-
+-else
+ ifeq ($(config-targets),1)
+ # ===========================================================================
+ # *config targets only - make sure prerequisites are updated, and descend
+@@ -548,6 +504,44 @@ else
+ # Build targets only - this includes vmlinux, arch specific targets, clean
+ # targets and others. In general all targets except *config targets.
+ 
++# If building an external module we do not care about the all: rule
++# but instead _all depend on modules
++PHONY += all
++ifeq ($(KBUILD_EXTMOD),)
++_all: all
++else
++_all: modules
++endif
++
++# Decide whether to build built-in, modular, or both.
++# Normally, just do built-in.
++
++KBUILD_MODULES :=
++KBUILD_BUILTIN := 1
++
++# If we have only "make modules", don't compile built-in objects.
++# When we're building modules with modversions, we need to consider
++# the built-in objects during the descend as well, in order to
++# make sure the checksums are up to date before we record them.
++
++ifeq ($(MAKECMDGOALS),modules)
++  KBUILD_BUILTIN := $(if $(CONFIG_MODVERSIONS),1)
++endif
++
++# If we have "make <whatever> modules", compile modules
++# in addition to whatever we do anyway.
++# Just "make" or "make all" shall build modules as well
++
++ifneq ($(filter all _all modules,$(MAKECMDGOALS)),)
++  KBUILD_MODULES := 1
++endif
++
++ifeq ($(MAKECMDGOALS),)
++  KBUILD_MODULES := 1
++endif
++
++export KBUILD_MODULES KBUILD_BUILTIN
++
+ ifeq ($(KBUILD_EXTMOD),)
+ # Additional helpers built in scripts/
+ # Carefully list dependencies so we do not try to build scripts twice
+@@ -1063,6 +1057,15 @@ prepare0: archprepare gcc-plugins
+ # All the preparing..
+ prepare: prepare0 prepare-objtool
+ 
++# Support for using generic headers in asm-generic
++PHONY += asm-generic uapi-asm-generic
++asm-generic: uapi-asm-generic
++	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
++	            src=asm obj=arch/$(SRCARCH)/include/generated/asm
++uapi-asm-generic:
++	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
++	            src=uapi/asm obj=arch/$(SRCARCH)/include/generated/uapi/asm
++
+ PHONY += prepare-objtool
+ prepare-objtool: $(objtool_target)
  
 -- 
 2.7.4
