@@ -1,45 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:63614 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751415AbdJEUES (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:36324 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751415AbdJEUF2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Oct 2017 16:04:18 -0400
+        Thu, 5 Oct 2017 16:05:28 -0400
 MIME-Version: 1.0
-In-Reply-To: <1506342310-21490-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-References: <1506342310-21490-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+In-Reply-To: <CAK8P3a2tUFu1HoJ5nGF+tLxb7O1X3KrGe+rZDQYK8ZYmD3KN-A@mail.gmail.com>
+References: <1507074806-21577-1-git-send-email-ulfalizer@gmail.com> <CAK8P3a2tUFu1HoJ5nGF+tLxb7O1X3KrGe+rZDQYK8ZYmD3KN-A@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 6 Oct 2017 05:03:26 +0900
-Message-ID: <CAK7LNAS2zTEvNRC4Wza-2WnL6nN4QRpsui9uGsK8auD9f25E+Q@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: drop unused symverfile in Makefile.modpost
+Date: Fri, 6 Oct 2017 05:04:30 +0900
+Message-ID: <CAK7LNAS9uut+ddo3V02SihjocBP7fM+kYM6SxDtM4hya6CTxPQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Fix optimization level choice default
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Andrew Morton <akpm@linux-foundation.org>, Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Kees Cook <keescook@chromium.org>, Daniel Mack <daniel@zonque.org>
 
-2017-09-25 21:25 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
-> Since commit 040fcc819, symverfile has been replaced with kernelsymfile
-> and modulesymfile.
+2017-10-04 16:27 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> On Wed, Oct 4, 2017 at 1:53 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+>> The choice containing the CC_OPTIMIZE_FOR_PERFORMANCE symbol
+>> accidentally added a "CONFIG_" prefix when trying to make it the
+>> default, selecting an undefined symbol as the default.
+>>
+>> The mistake is harmless here: Since the default symbol is not visible,
+>> the choice falls back on using the visible symbol as the default
+>> instead, which is CC_OPTIMIZE_FOR_PERFORMANCE, as intended.
+>>
+>> A patch that makes Kconfig print a warning in this case has been
+>> submitted separately:
+>> http://www.spinics.net/lists/linux-kbuild/msg15566.html
+>>
+>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 >
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> ---
->  scripts/Makefile.modpost | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> index 16923ba..756d14f 100644
-> --- a/scripts/Makefile.modpost
-> +++ b/scripts/Makefile.modpost
-> @@ -97,7 +97,6 @@ vmlinux.o: FORCE
->         $(call cmd,kernel-mod)
->
->  # Declare generated files as targets for modpost
-> -$(symverfile):         __modpost ;
->  $(modules:.ko=.mod.c): __modpost ;
->
->
+> Acked-by: Arnd Bergmann <arnd@arndb.de>
+> --
+
 
 Applied to linux-kbuild/fixes.  Thanks.
+
 
 -- 
 Best Regards
