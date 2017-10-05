@@ -1,108 +1,178 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:34932 "EHLO
-        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751291AbdJEHws (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:18505 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751239AbdJEIGH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Oct 2017 03:52:48 -0400
-Date: Thu, 5 Oct 2017 09:52:43 +0200
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH v2 0/2] kbuild: Cache exploratory calls to the compiler
-Message-ID: <20171005075243.zchjpo7qd7ueff4h@gmail.com>
-References: <20171004223717.3010-1-dianders@chromium.org>
+        Thu, 5 Oct 2017 04:06:07 -0400
+Received: from mail-qt0-f169.google.com (mail-qt0-f169.google.com [209.85.216.169]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id v9585tPB018752
+        for <linux-kbuild@vger.kernel.org>; Thu, 5 Oct 2017 17:05:55 +0900
+Received: by mail-qt0-f169.google.com with SMTP id q4so23859334qtq.8
+        for <linux-kbuild@vger.kernel.org>; Thu, 05 Oct 2017 01:05:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171004223717.3010-1-dianders@chromium.org>
+In-Reply-To: <CAAqcGHkjNLvjz4X00U0edHp9qBh7=WRJdZ-q6uCihCxb2j0hOA@mail.gmail.com>
+References: <20171002104339.4349-1-riku.voipio@linaro.org> <CAK7LNARNU0GYYOU3TkduhTsmgDV+=d84D7AqCcopBw+twyuP7g@mail.gmail.com>
+ <CAAqcGHkjNLvjz4X00U0edHp9qBh7=WRJdZ-q6uCihCxb2j0hOA@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 5 Oct 2017 17:05:14 +0900
+Message-ID: <CAK7LNAS7TtfB1Ohent-QPkcnncyVd92E=3O2sd4ta8TN38qCUA@mail.gmail.com>
+Subject: Re: [PATCH v3] scripts/package/builddeb: split generating packaging
+ and build
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Douglas Anderson <dianders@chromium.org>
-Cc: yamada.masahiro@socionext.com, mmarek@suse.com, groeck@chromium.org, sjg@chromium.org, briannorris@chromium.org, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, James Hogan <james.hogan@imgtec.com>, Josh Poimboeuf <jpoimboe@redhat.com>
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
+
+Hi Riku,
 
 
-* Douglas Anderson <dianders@chromium.org> wrote:
+2017-10-04 19:38 GMT+09:00 Riku Voipio <riku.voipio@linaro.org>:
+> On 4 October 2017 at 12:12, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> Hi Riku,
+>
+>> 2017-10-02 19:43 GMT+09:00  <riku.voipio@linaro.org>:
+>>> From: Riku Voipio <riku.voipio@linaro.org>
+>>>
+>>> Move debian/ directory generation out of builddeb to a new script,
+>>> mkdebian. The package build commands are kept in builddeb, which
+>>> is now an internal command called from debian/rules.
+>>>
+>>> With these changes in place, we can now use dpkg-buildpackage from
+>>> deb-pkg and bindeb-pkg removing need for handrolled source/changes
+>>> generation.
+>>>
+>>> This patch is based on the criticism of the current state of builddeb
+>>> discussed on:
+>>>
+>>> https://patchwork.kernel.org/patch/9656403/
+>>>
+>>> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+>>> ---
+>>> changes since v2:
+>>> - revert back to intdeb-pkg target
+>>> - fix parellel builds from deb-pkg targets
+>
+>> No.  Not fixed.
+>
+>> I see the same problem for bindeb-pkg as in v2.
+>
+> The parallel build overload?
 
-> This two-patch series attempts to speed incremental builds of the
-> kernel up by a bit.  How much of a speedup you get depends a lot on
-> your environment, specifically the speed of your workstation and how
-> fast it takes to invoke the compiler.
-> 
-> In the Chrome OS build environment you get a really big win.  For an
-> incremental build (via emerge) I measured a speedup from ~1 minute to
-> ~35 seconds.
+Yes.
 
-Very impressive!
+> I'm totally puzzled then. Debian is still
+> stuck with make 4.1, so I guess there is a change in behaviour on
+> later makes.
 
-> [...]  ...but Chrome OS calls the compiler through a number of wrapper scripts 
-> and also calls the kernel make at least twice for an emerge (during compile 
-> stage and install stage), so it's a bit of a worst case.
 
-I don't think that's a worst case: incremental builds are very commonly used 
-during kernel development and kernel testing. (I'd even argue that the performnace 
-of incremental builds is one of the most important features of a build system.)
+Can you test the patch with GNU Make 4.2 or newer?
 
-That it's called twice in the Chrome OS build system does not change the 
-proportion of the speedup.
+You can download tarballs
+https://ftp.gnu.org/gnu/make/
 
-> Perhaps a more realistic measure of the speedup others might see is
-> running "time make help > /dev/null" outside of the Chrome OS build
-> environment on my system.  When I do this I see that it took more than
-> 1.0 seconds before and less than 0.2 seconds after.  So presumably
-> this has the ability to shave ~0.8 seconds off an incremental build
-> for most folks out there.  While 0.8 seconds savings isn't huge, it
-> does make incremental builds feel a lot snappier.
+The build process is pretty easy,
+./configure, make, make install,  as usual.
 
-This is a huge deal!
 
-FWIIW I have tested your patches and they work fine here. Here's the before/after 
-performance testing of various styles of build times of the scheduler.
 
-First the true worst case is a full rebuild:
 
-[ before ]
 
-  triton:~/tip> perf stat --null --repeat 3 --pre "make clean 2>/dev/null 2>&1" make kernel/sched/ >/dev/null
+>> "make deb-pkg" gave me tons of warnings, then finally fails to build:
+>
+>> rm -rf debian/*tmp debian/files
+>> mv debian/ debian.backup # debian/ might be cleaned away
+>> make clean
+>> mv debian.backup debian
+>>  dpkg-source -i.git -b linux
+>> dpkg-source: warning: no source format specified in
+>> debian/source/format, see dpkg-source(1)
+>> dpkg-source: info: using source format '1.0'
+>> dpkg-source: warning: source directory 'linux' is not
+>> <sourcepackage>-<upstreamversion> 'linux-4.13.0+-4.13.0+'
+>> dpkg-source: warning: .orig directory name linux.orig is not
+>> <package>-<upstreamversion> (wanted linux-4.13.0+-4.13.0+.orig)
+>> dpkg-source: info: building linux-4.13.0+ using existing
+>> linux-4.13.0+_4.13.0+.orig.tar.gz
+>> dpkg-source: info: building linux-4.13.0+ in linux-4.13.0+_4.13.0+-7.diff.gz
+>> dpkg-source: warning: ignoring deletion of file .scmversion, use
+>> --include-removal to override
+>> dpkg-source: warning: ignoring deletion of directory drivers/lguest
+>> dpkg-source: warning: ignoring deletion of file
+>> drivers/video/console/fbcon_rotate.h, use --include-removal to
+>> override
+>> dpkg-source: warning: ignoring deletion of file
+>> drivers/video/console/fbcon.h, use --include-removal to override
+>> dpkg-source: warning: ignoring deletion of file
+>> drivers/video/console/fbcon_cw.c, use --include-removal to override
+>> dpkg-source: warning: ignoring deletion of file
+>> drivers/video/console/fbcon_rotate.c, use --include-removal to
+>> override
+>> dpkg-source: warning: ignoring deletion of file
+>> drivers/video/console/fbcon.c, use --include-removal to override
+>>
+>>
+>>   ...
+>>
+>>
+>> dpkg-source: info: use the '3.0 (quilt)' format to have separate and
+>> documented changes to upstream files, see dpkg-source(1)
+>> dpkg-source: error: unrepresentable changes to source
+>>
+>>
+>> Do you have a clue?
+>
+> It looks like making the tarball (or renaming it) failed, and
+> dpkg-source picked up and older orig.tar.gz with same name. I think a
+> full log would be useful here, because there probably is bug here in
+> my patch.
 
- Performance counter stats for 'make kernel/sched/' (3 runs):
+I saw this build failure some times,
+but I cannot reproduce it today.
 
-       4.693974827 seconds time elapsed                                          ( +-  0.05% )
+I have not tracked down the condition it happens under.
 
-[ after ]
+I will save the log if it happens next time.
 
-  triton:~/tip> perf stat --null --repeat 3 --pre "make clean 2>/dev/null 2>&1" make kernel/sched/ >/dev/null
 
- Performance counter stats for 'make kernel/sched/' (3 runs):
 
-       4.391769610 seconds time elapsed                                          ( +-  0.21% )
 
-Still a ~6% speedup which is nice to have.
 
-Then the best case, a fully cached rebuild of a specific subsystem - which I 
-personally do all the time when I don't remember whether I already built the 
-kernel or not:
+>>> +cat <<EOF > debian/rules
+>>> +#!/usr/bin/make -f
+>>> +
+>>> +build:
+>>> +       \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} KBUILD_SRC=
+>>> +
+>>> +binary-arch:
+>>> +       \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} KBUILD_SRC= intdeb-pkg
+>>> +
+>>> +clean:
+>>> +       rm -rf debian/*tmp debian/files
+>>> +       mv debian/ debian.backup # debian/ might be cleaned away
+>>> +       \$(MAKE) clean
+>>> +       mv debian.backup debian
+>>
+>>
+>> "mv debian debian.backup" is unnecessary, I think.
+>>
+>>
+>> I think you saw
+>>
+>> clean-dirs += $(objtree)/debian/
+>>
+>> in scripts/package/Makefile.
+>
+>> Please notice this is cleaned-up by "make mrproper"
+>> because Kbuild does not descend under scripts/ for "make clean".
+>
+> That is how it was in the old version of builddeb as well. I'll submit
+> another patch to remove the mv-in-clean hack.
 
-[ before ]
+Yes, please do so.
 
-triton:~/tip> taskset 1 perf stat --null --pre "sync" --repeat 10 make kernel/sched/ >/dev/null
 
- Performance counter stats for 'make kernel/sched/' (10 runs):
-
-       0.439517157 seconds time elapsed                                          ( +-  0.14% )
-
-[ after ]
-
-  triton:~/tip> taskset 1 perf stat --null --pre "sync" --repeat 10 make kernel/sched/ >/dev/null
-
- Performance counter stats for 'make kernel/sched/' (10 runs):
-
-       0.148483807 seconds time elapsed                                          ( +-  0.57% )
-
-A 300% speedup on my system!
-
-So I wholeheartedly endorse the whole concept of caching build environment 
-invariants:
-
-  Tested-by: Ingo Molnar <mingo@kernel.org>
-
-Thanks,
-
-	Ingo
+-- 
+Best Regards
+Masahiro Yamada
