@@ -1,93 +1,167 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f171.google.com ([209.85.216.171]:43769 "EHLO
-        mail-qt0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751327AbdJEBqE (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:50595 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751223AbdJECg7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Oct 2017 21:46:04 -0400
-Received: by mail-qt0-f171.google.com with SMTP id a43so16865750qta.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Oct 2017 18:46:04 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171004223717.3010-1-dianders@chromium.org>
-References: <20171004223717.3010-1-dianders@chromium.org>
-From: Guenter Roeck <groeck@google.com>
-Date: Wed, 4 Oct 2017 18:46:03 -0700
-Message-ID: <CABXOdTdJ5QW2OZpWRgQ-LpH_fBXyQ2_mQRfSwD+6B6tESG4axA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] kbuild: Cache exploratory calls to the compiler
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 4 Oct 2017 22:36:59 -0400
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: [PATCH] kconfig: Remove menu_end_entry()
+Date: Thu,  5 Oct 2017 04:36:33 +0200
+Message-Id: <1507170993-10458-1-git-send-email-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Douglas Anderson <dianders@chromium.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Guenter Roeck <groeck@chromium.org>, sjg@chromium.org, Brian Norris <briannorris@chromium.org>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, linux-kernel <linux-kernel@vger.kernel.org>, James Hogan <james.hogan@imgtec.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>
+To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
+Cc: mmarek@suse.cz, yamada.m@jp.panasonic.com, lacombar@gmail.com, linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
 
-On Wed, Oct 4, 2017 at 3:37 PM, Douglas Anderson <dianders@chromium.org> wrote:
-> This two-patch series attempts to speed incremental builds of the
-> kernel up by a bit.  How much of a speedup you get depends a lot on
-> your environment, specifically the speed of your workstation and how
-> fast it takes to invoke the compiler.
->
-> In the Chrome OS build environment you get a really big win.  For an
-> incremental build (via emerge) I measured a speedup from ~1 minute to
-> ~35 seconds.  ...but Chrome OS calls the compiler through a number of
-> wrapper scripts and also calls the kernel make at least twice for an
-> emerge (during compile stage and install stage), so it's a bit of a
-> worst case.
->
-> Perhaps a more realistic measure of the speedup others might see is
-> running "time make help > /dev/null" outside of the Chrome OS build
-> environment on my system.  When I do this I see that it took more than
-> 1.0 seconds before and less than 0.2 seconds after.  So presumably
-> this has the ability to shave ~0.8 seconds off an incremental build
-> for most folks out there.  While 0.8 seconds savings isn't huge, it
-> does make incremental builds feel a lot snappier.
->
-> Caveats from v1 still copied here, though with Masahiro Yamada's
-> suggestions from v1 this is starting to feel a little more baked and
-> I've even dropped the RFC from it (though extra testing still
-> appreciated):
->
-> Please note that I make no illusions of being a Makefile expert nor do
-> I have any belief that I fully understand the Linux kernel build
-> system.  Please take this patch series as the start of a discussion
-> about whether others feel like this type of speedup is worthwhile and
-> how to best accomplish it.  Specific things to note:
->
-> - I'm happy to paint the bikeshed any color that maintainers want.  If
->   you'd like the cache named differently, in a slightly different
->   format, or you want me to adjust the spacing / names of Makefile
->   stuff then please just let me know.
->
-> - If this is totally the wrong approach and you have a better idea
->   then let me know.  If you want something that's super complicated to
->   explain then feel free to post a replacement patch and I'm happy to
->   test.
->
-> - This patch definitely needs extra testing.  I've tested it on a very
->   limited build environment and it seems to be working fine, but I
->   could believe that with some weird compiler options or on certain
->   architectures you might need some extra escaping here and there.
->
+menu_end_entry() is empty and completely unused as far as I can tell:
 
-Not being a makefile expert, I can't say anything about the merits of
-this series. However, it does pass a run on my test farm at
-kerneltests.org. So. I'll give it a
+	$ git log -G menu_end_entry --oneline
+	a02f057 [PATCH] kconfig: improve error handling in the parser
+	1da177e Linux-2.6.12-rc2
 
-Tested-by: Guenter Roeck <linux@roeck-us.net>
+Last one is the initial Git commit, where menu_end_entry() is empty as
+well. I couldn't find anything that redefined it on Google either.
 
-Guenter
+It might be a debugging helper for setting a breakpoint after each
+config, menuconfig, and comment is parsed. IMO it hurts more than it
+helps in that case by making the parsing code look more complicated at a
+glance than it really is, and I suspect it doesn't get used much.
 
-> Changes in v2:
-> - Abstract at a different level (like shell-cached) per Masahiro Yamada
-> - Include ld-version, which I missed the first time
->
-> Douglas Anderson (2):
->   kbuild: Add a cache for generated variables
->   kbuild: Cache a few more calls to the compiler
->
->  Documentation/kbuild/makefiles.txt | 21 +++++++++
->  Makefile                           |  4 +-
->  scripts/Kbuild.include             | 90 ++++++++++++++++++++++++++++++++------
->  3 files changed, 99 insertions(+), 16 deletions(-)
->
-> --
-> 2.14.2.920.gcf0c67979c-goog
->
+Tested by running the Kconfiglib test suite, which indirectly verifies
+that the .config files generated by the C implementation for each
+defconfig file in the kernel stays the same.
+
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+---
+ scripts/kconfig/lkc.h               |  1 -
+ scripts/kconfig/menu.c              |  5 -----
+ scripts/kconfig/zconf.tab.c_shipped | 30 ++++++++++--------------------
+ scripts/kconfig/zconf.y             |  6 +-----
+ 4 files changed, 11 insertions(+), 31 deletions(-)
+
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index cdcbe43..16cb62b 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -100,7 +100,6 @@ void menu_warn(struct menu *menu, const char *fmt, ...);
+ struct menu *menu_add_menu(void);
+ void menu_end_menu(void);
+ void menu_add_entry(struct symbol *sym);
+-void menu_end_entry(void);
+ void menu_add_dep(struct expr *dep);
+ void menu_add_visibility(struct expr *dep);
+ struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr *dep);
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index e935793..503f3ae 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -62,13 +62,8 @@ void menu_add_entry(struct symbol *sym)
+ 		menu_add_symbol(P_SYMBOL, sym, NULL);
+ }
+ 
+-void menu_end_entry(void)
+-{
+-}
+-
+ struct menu *menu_add_menu(void)
+ {
+-	menu_end_entry();
+ 	last_entry_ptr = &current_entry->list;
+ 	return current_menu = current_entry;
+ }
+diff --git a/scripts/kconfig/zconf.tab.c_shipped b/scripts/kconfig/zconf.tab.c_shipped
+index a22b285..7938548 100644
+--- a/scripts/kconfig/zconf.tab.c_shipped
++++ b/scripts/kconfig/zconf.tab.c_shipped
+@@ -516,16 +516,16 @@ static const yytype_uint16 yyrline[] =
+        0,   109,   109,   109,   111,   111,   113,   115,   116,   117,
+      118,   119,   120,   124,   128,   128,   128,   128,   128,   128,
+      128,   128,   128,   132,   133,   134,   135,   136,   137,   141,
+-     142,   148,   156,   162,   170,   180,   182,   183,   184,   185,
+-     186,   187,   190,   198,   204,   214,   220,   226,   232,   235,
+-     237,   248,   249,   254,   263,   268,   276,   279,   281,   282,
+-     283,   284,   285,   288,   294,   305,   311,   321,   323,   328,
+-     336,   344,   347,   349,   350,   351,   356,   363,   370,   375,
+-     383,   386,   388,   389,   390,   393,   401,   408,   415,   421,
+-     428,   430,   431,   432,   435,   443,   445,   446,   449,   456,
+-     458,   463,   464,   467,   468,   469,   473,   474,   477,   478,
+-     481,   482,   483,   484,   485,   486,   487,   488,   489,   490,
+-     491,   494,   495,   498,   499
++     142,   148,   156,   161,   169,   178,   180,   181,   182,   183,
++     184,   185,   188,   196,   202,   212,   218,   224,   230,   233,
++     235,   246,   247,   252,   261,   266,   274,   277,   279,   280,
++     281,   282,   283,   286,   292,   303,   309,   319,   321,   326,
++     334,   342,   345,   347,   348,   349,   354,   361,   368,   373,
++     381,   384,   386,   387,   388,   391,   399,   406,   411,   417,
++     424,   426,   427,   428,   431,   439,   441,   442,   445,   452,
++     454,   459,   460,   463,   464,   465,   469,   470,   473,   474,
++     477,   478,   479,   480,   481,   482,   483,   484,   485,   486,
++     487,   490,   491,   494,   495
+ };
+ #endif
+ 
+@@ -1552,7 +1552,6 @@ yyreduce:
+   case 32:
+ 
+     {
+-	menu_end_entry();
+ 	printd(DEBUG_PARSE, "%s:%d:endconfig\n", zconf_curname(), zconf_lineno());
+ }
+ 
+@@ -1576,7 +1575,6 @@ yyreduce:
+ 		current_entry->prompt->type = P_MENU;
+ 	else
+ 		zconfprint("warning: menuconfig statement without prompt");
+-	menu_end_entry();
+ 	printd(DEBUG_PARSE, "%s:%d:endconfig\n", zconf_curname(), zconf_lineno());
+ }
+ 
+@@ -1821,14 +1819,6 @@ yyreduce:
+ 
+     break;
+ 
+-  case 87:
+-
+-    {
+-	menu_end_entry();
+-}
+-
+-    break;
+-
+   case 88:
+ 
+     {
+diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+index c8f396c..3845aa9 100644
+--- a/scripts/kconfig/zconf.y
++++ b/scripts/kconfig/zconf.y
+@@ -155,7 +155,6 @@ config_entry_start: T_CONFIG T_WORD T_EOL
+ 
+ config_stmt: config_entry_start config_option_list
+ {
+-	menu_end_entry();
+ 	printd(DEBUG_PARSE, "%s:%d:endconfig\n", zconf_curname(), zconf_lineno());
+ };
+ 
+@@ -173,7 +172,6 @@ menuconfig_stmt: menuconfig_entry_start config_option_list
+ 		current_entry->prompt->type = P_MENU;
+ 	else
+ 		zconfprint("warning: menuconfig statement without prompt");
+-	menu_end_entry();
+ 	printd(DEBUG_PARSE, "%s:%d:endconfig\n", zconf_curname(), zconf_lineno());
+ };
+ 
+@@ -406,9 +404,7 @@ comment: T_COMMENT prompt T_EOL
+ };
+ 
+ comment_stmt: comment depends_list
+-{
+-	menu_end_entry();
+-};
++;
+ 
+ /* help option */
+ 
+-- 
+2.7.4
+
