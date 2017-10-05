@@ -1,51 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [195.159.176.226] ([195.159.176.226]:33907 "EHLO
-        blaine.gmane.org" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-        with ESMTP id S1751888AbdJESFN (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:63614 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751415AbdJEUES (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Oct 2017 14:05:13 -0400
-Received: from list by blaine.gmane.org with local (Exim 4.84_2)
-        (envelope-from <glkd-linux-kbuild@m.gmane.org>)
-        id 1e0AW7-0008Gc-6m
-        for linux-kbuild@vger.kernel.org; Thu, 05 Oct 2017 20:05:03 +0200
-From: Ritesh Raj Sarraf <rrs@researchut.com>
-Subject: Re: [PATCH v3] scripts/package/builddeb: split generating packaging
- and build
-Date: Thu, 05 Oct 2017 23:30:04 +0545
-Message-ID: <1507225504.8551.11.camel@researchut.com>
-References: <20171002104339.4349-1-riku.voipio@linaro.org>
-         <CAK7LNARNU0GYYOU3TkduhTsmgDV+=d84D7AqCcopBw+twyuP7g@mail.gmail.com>
-         <CAAqcGHkjNLvjz4X00U0edHp9qBh7=WRJdZ-q6uCihCxb2j0hOA@mail.gmail.com>
-Reply-To: rrs@researchut.com
-Mime-Version: 1.0
+        Thu, 5 Oct 2017 16:04:18 -0400
+MIME-Version: 1.0
+In-Reply-To: <1506342310-21490-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+References: <1506342310-21490-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 6 Oct 2017 05:03:26 +0900
+Message-ID: <CAK7LNAS2zTEvNRC4Wza-2WnL6nN4QRpsui9uGsK8auD9f25E+Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: drop unused symverfile in Makefile.modpost
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <CAAqcGHkjNLvjz4X00U0edHp9qBh7=WRJdZ-q6uCihCxb2j0hOA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>
 
-On Wed, 2017-10-04 at 13:38 +0300, Riku Voipio wrote:
-> > I see the same problem for bindeb-pkg as in v2.
-> 
-> The parallel build overload? I'm totally puzzled then. Debian is
-> still
-> stuck with make 4.1, so I guess there is a change in behaviour on
-> later makes.
-> 
-> > "make deb-pkg" gave me tons of warnings, then finally fails to
-> > build:
+2017-09-25 21:25 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+> Since commit 040fcc819, symverfile has been replaced with kernelsymfile
+> and modulesymfile.
+>
+> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> ---
+>  scripts/Makefile.modpost | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+> index 16923ba..756d14f 100644
+> --- a/scripts/Makefile.modpost
+> +++ b/scripts/Makefile.modpost
+> @@ -97,7 +97,6 @@ vmlinux.o: FORCE
+>         $(call cmd,kernel-mod)
+>
+>  # Declare generated files as targets for modpost
+> -$(symverfile):         __modpost ;
+>  $(modules:.ko=.mod.c): __modpost ;
+>
+>
 
-I have seen similar fork bombs when using kernel-package to build the
-kernel. And no, I couldn't much debug back then.
-
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=807574
-
-At that time, realizing that the upstream kernel has a bindeb-pkg
-target, was a big relief.
-
+Applied to linux-kbuild/fixes.  Thanks.
 
 -- 
-Given the large number of mailing lists I follow, I request you to CC
-me in replies for quicker response
-
+Best Regards
+Masahiro Yamada
