@@ -1,64 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:44672 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751966AbdJEUR6 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:35676 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752037AbdJEUUi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Oct 2017 16:17:58 -0400
+        Thu, 5 Oct 2017 16:20:38 -0400
 MIME-Version: 1.0
-In-Reply-To: <ea8b93e6-2ce3-2c32-fbe3-f6570c523f1b@arm.com>
-References: <1506931648-15511-1-git-send-email-yamada.masahiro@socionext.com> <ea8b93e6-2ce3-2c32-fbe3-f6570c523f1b@arm.com>
+In-Reply-To: <1506058274-30516-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1506058274-30516-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 6 Oct 2017 05:17:01 +0900
-Message-ID: <CAK7LNARStcxr=Htuje15+Hh0mZ_km42j8V1LQ=nYyqGKvuKWXA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: revert $(realpath ...) to $(shell cd ... && /bin/pwd)
+Date: Fri, 6 Oct 2017 05:19:30 +0900
+Message-ID: <CAK7LNARmvPj--u9nTj6W7sFRHVKDgVNTtLc4f_vqJd07etJwhA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: link-vmlinux.sh: simplify .version increment
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Julien Grall <julien.grall@arm.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux PM mailing list <linux-pm@vger.kernel.org>, Michal Marek <mmarek@suse.com>, David Carrillo-Cisneros <davidcc@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Renninger <trenn@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@kernel.org>, Arnaldo Carvalho de Melo <acme@redhat.com>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Nicholas Piggin <npiggin@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-10-02 20:27 GMT+09:00 Julien Grall <julien.grall@arm.com>:
-> Hello,
+2017-09-22 14:31 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> Since commit 1f2bfbd00e46 ("kbuild: link of vmlinux moved to a
+> script"), it is easy to increment .version without using a temporary
+> file .old_version.
 >
-> On 02/10/17 09:07, Masahiro Yamada wrote:
->>
->> I thought commit 8e9b46679923 ("kbuild: use $(abspath ...) instead of
->> $(shell cd ... && /bin/pwd)") was a safe conversion, but it changed
->> the behavior.
->>
->> $(abspath ...) / $(realpath ...) does not expand shell special
->> characters, such as '~'.
->>
->> Here is a simple Makefile example:
->>
->>    ---------------->8----------------
->>    $(info /bin/pwd: $(shell cd ~/; /bin/pwd))
->>    $(info abspath: $(abspath ~/))
->>    $(info realpath: $(realpath ~/))
->>    all:
->>            @:
->>    ---------------->8----------------
->>
->>    $ make
->>    /bin/pwd: /home/masahiro
->>    abspath: /home/masahiro/workspace/~
->>    realpath:
->>
->> This can be a real problem if 'make O=~/foo' is invoked from another
->> Makefile or primitive shell like dash.
->>
->> This commit partially reverts 8e9b46679923.
->>
->> Fixes: 8e9b46679923 ("kbuild: use $(abspath ...) instead of $(shell cd ...
->> && /bin/pwd)")
->> Reported-by: Julien Grall <julien.grall@arm.com>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> I do not see anybody who creates .tmp_version any more.  Probably
+> it is a left-over of commit 4e25d8bb9550fb ("[PATCH] kbuild: adjust
+> .version updating").  Just remove it.
 >
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 >
-> Tested-by: Julien Grall <julien.grall@arm.com>
 
 
-Applied to linux-kbuild/fixes.
+Applied to linux-kbuild/kbuild.
+
 
 
 -- 
