@@ -1,40 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:56013 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751255AbdJEDHB (ORCPT
+Received: from mail-ua0-f194.google.com ([209.85.217.194]:32919 "EHLO
+        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751267AbdJEDMR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Oct 2017 23:07:01 -0400
+        Wed, 4 Oct 2017 23:12:17 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAFkk2KRAMu43Y87C+0CrNU3xs63bWuN=+kkVm0wsug95KwOi2A@mail.gmail.com>
+References: <1507073146-19847-1-git-send-email-ulfalizer@gmail.com> <CAFkk2KRAMu43Y87C+0CrNU3xs63bWuN=+kkVm0wsug95KwOi2A@mail.gmail.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH] kconfig: Sync zconf.y with zconf.tab.c_shipped
-Date: Thu,  5 Oct 2017 05:06:48 +0200
-Message-Id: <1507172808-12246-1-git-send-email-ulfalizer@gmail.com>
+Date: Thu, 5 Oct 2017 05:12:15 +0200
+Message-ID: <CAFkk2KSJh6OK+s7oQFVu-QEZn0K_wfXjUNFJqxuCy2H6VXi0wQ@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Warn if choice default is not in choice
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
-Cc: mmarek@suse.com, yamada.masahiro@socionext.com, lacombar@gmail.com, linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Arnaud Lacombe <lacombar@gmail.com>
 
-Looks like a change to a comment in zconf.y was never committed, because
-the updated version only appears it zconf.tab.c_shipped. Update the
-comment in zconf.y to match.
+On Wed, Oct 4, 2017 at 2:10 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> On Wed, Oct 4, 2017 at 1:25 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+>> This will catch mistakes like in the following real-world example, where
+>> a "CONFIG_" prefix snuck in, making an undefined symbol the default:
+>>
+>>         choice
+>>                 prompt "Compiler optimization level"
+>>                 default CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+>>
+>>         config CC_OPTIMIZE_FOR_PERFORMANCE
+>>                 ...
+>>
+>>         config CC_OPTIMIZE_FOR_SIZE
+>>                 ...
+>>
+>>         endchoice
+>>
+>> This now prints the following warning:
+>>
+>>         init/Kconfig:1036:warning: choice default symbol 'CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE' is not contained in the choice
+>>
+>> Cases where the default symbol belongs to the wrong choice are also
+>> detected.
+>>
+>> (The mistake is harmless here: Since the default symbol is not visible,
+>> the choice falls back on using the first visible symbol as the default,
+>> which is CC_OPTIMIZE_FOR_PERFORMANCE, as intended.)
+>>
+>> Discovered while playing around with Kconfiglib
+>> (https://github.com/ulfalizer/Kconfiglib).
+>>
+>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>> ---
+>>  scripts/kconfig/menu.c | 10 ++++++++++
+>>  1 file changed, 10 insertions(+)
+>>
+>> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+>> index e935793..ce88de8 100644
+>> --- a/scripts/kconfig/menu.c
+>> +++ b/scripts/kconfig/menu.c
+>> @@ -252,6 +252,16 @@ static void sym_check_prop(struct symbol *sym)
+>>                                             "'%s': number is invalid",
+>>                                             sym->name);
+>>                         }
+>> +                       if (sym_is_choice(sym)) {
+>> +                               struct property *choice_prop =
+>> +                                       sym_get_choice_prop(sym2);
+>> +
+>> +                               if (!choice_prop ||
+>> +                                   prop_get_symbol(choice_prop) != sym)
+>> +                                       prop_warn(prop,
+>> +                                                 "choice default symbol '%s' is not contained in the choice",
+>> +                                                 sym2->name);
+>> +                       }
+>>                         break;
+>>                 case P_SELECT:
+>>                 case P_IMPLY:
+>> --
+>> 2.7.4
+>>
+>
+> A patch to fix the compiler optimization level choice has been
+> submitted as well:
+> https://lkml.org/lkml/2017/10/3/991
+>
+> Cheers,
+> Ulf
 
-Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
----
- scripts/kconfig/zconf.y | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Adding some CCs just because I forgot. No panic.
 
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index c8f396c..4b2cf41 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -101,7 +101,7 @@ static struct menu *current_menu, *current_entry;
- } if_entry menu_entry choice_entry
- 
- %{
--/* Include zconf_id.c here so it can see the token constants. */
-+/* Include kconf_id.c here so it can see the token constants. */
- #include "kconf_id.c"
- %}
- 
--- 
-2.7.4
-
+Cheers,
+Ulf
