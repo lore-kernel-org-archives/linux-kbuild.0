@@ -1,49 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:43577 "EHLO
-        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751695AbdJEU6t (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:57004 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751869AbdJGARy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Oct 2017 16:58:49 -0400
-Received: by mail-wm0-f47.google.com with SMTP id m72so642906wmc.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Oct 2017 13:58:49 -0700 (PDT)
+        Fri, 6 Oct 2017 20:17:54 -0400
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] Makefile: kselftest: fix grammar typo
+Message-ID: <dbbd3042-18ae-991a-cce7-52933cd61e95@infradead.org>
+Date: Fri, 6 Oct 2017 17:17:52 -0700
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATdp47x3_gyi6pB+NLfoczECULPMkfx2N=eGOWm2DwqdQ@mail.gmail.com>
-References: <20170926175508.29950-1-dianders@chromium.org> <20170926175508.29950-2-dianders@chromium.org>
- <CAK7LNASCy-zMNF1-7gie4NhyKC8xhAtyVHatpQ7JYLUz6UiG0w@mail.gmail.com>
- <CAD=FV=XQfLf+5ZPe4Vfqn1kpdom16YT7Nj=mw2Qydk1hmbL=pg@mail.gmail.com> <CAK7LNATdp47x3_gyi6pB+NLfoczECULPMkfx2N=eGOWm2DwqdQ@mail.gmail.com>
-From: Doug Anderson <dianders@chromium.org>
-Date: Thu, 5 Oct 2017 13:58:47 -0700
-Message-ID: <CAD=FV=VbRbvmqVK7iNG6xx3MD1vsCKRY=tW=K8Q71MoQkCFMOw@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/2] kbuild: Add a cache for generated variables
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>, Guenter Roeck <groeck@chromium.org>, Brian Norris <briannorris@chromium.org>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Matthias Kaehlcke <mka@chromium.org>, Behan Webster <behanw@converseincode.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>, linux-kselftest@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Jiri Kosina <trivial@kernel.org>, "Cc: Shuah Khan" <shuah@kernel.org>
 
-Hi,
+From: Randy Dunlap <rdunlap@infradead.org>
 
-On Thu, Oct 5, 2017 at 12:26 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> As far as I tested, I always see only one space after ":=" in v2.
->
-> I did not consider this deeply,
-> but something is working nicely behind the scene.
+Correct typo in kselftest help text.
 
-Try adding this to the end of the main Makefile:
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc:	Shuah Khan <shuah@kernel.org>
+Cc:	linux-kselftest@vger.kernel.org
+Cc:	Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc:	Jiri Kosina <trivial@kernel.org>
+---
+ Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-+$(info LDFLAGS_BUILD_ID = $(LDFLAGS_BUILD_ID))
-+$(info KBUILD_ARFLAGS = $(KBUILD_ARFLAGS))
-+$(info KBUILD_CFLAGS = $(KBUILD_CFLAGS))
-+$(info KBUILD_AFLAGS = $(KBUILD_AFLAGS))
-+$(info KBUILD_CPPFLAGS = $(KBUILD_CPPFLAGS))
-+$(info REALMODE_CFLAGS = $(REALMODE_CFLAGS))
-+
- endif  # skip-makefile
+--- lnx-414-rc3.orig/Makefile
++++ lnx-414-rc3/Makefile
+@@ -1395,7 +1395,7 @@ help:
+ 	@echo  '                    Build, install, and boot kernel before'
+ 	@echo  '                    running kselftest on it'
+ 	@echo  '  kselftest-clean - Remove all generated kselftest files'
+-	@echo  '  kselftest-merge - Merge all the config dependencies of kselftest to existed'
++	@echo  '  kselftest-merge - Merge all the config dependencies of kselftest to existing'
+ 	@echo  '                    .config.'
+ 	@echo  ''
+ 	@echo 'Userspace tools targets:'
 
-Record what you see.  Then apply my patches and run your build again
-(actually, run it twice and look at the 2nd time, just to be sure).  I
-think you'll see slightly different spacing in the flags for the two
-runs.  I don't think this is terribly important, though.
 
--Doug
