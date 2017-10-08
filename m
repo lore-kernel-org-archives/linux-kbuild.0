@@ -1,49 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:45740 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751228AbdJHRgP (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:52350 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751519AbdJHRgS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Oct 2017 13:36:15 -0400
+        Sun, 8 Oct 2017 13:36:18 -0400
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 0/3] kconfig: Fix expression memory leaks
-Date: Sun,  8 Oct 2017 19:35:43 +0200
-Message-Id: <1507484146-23617-1-git-send-email-ulfalizer@gmail.com>
+Subject: [PATCH 1/3] kconfig: Fix automatic menu creation mem leak
+Date: Sun,  8 Oct 2017 19:35:44 +0200
+Message-Id: <1507484146-23617-2-git-send-email-ulfalizer@gmail.com>
+In-Reply-To: <1507484146-23617-1-git-send-email-ulfalizer@gmail.com>
+References: <1507484146-23617-1-git-send-email-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
 Cc: sam@ravnborg.org, zippel@linux-m68k.org, nicolas.pitre@linaro.org, michal.lkml@markovi.net, dirk@gouders.net, yamada.masahiro@socionext.com, lacombar@gmail.com, walch.martin@web.de, JBeulich@suse.com, linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
 
-Hello,
+expr_trans_compare() always allocates and returns a new expression,
+giving the following leak outline:
 
-This patchset plugs all memory leaks that are due to expressions not being
-freed, when parsing the x86 Kconfigs (and likely the other ARCHes too). 336 KB
-are leaked in total.
+	...
+	*Allocate*
+	basedep = expr_trans_compare(basedep, E_UNEQUAL, &symbol_no);
+	...
+	for (menu = parent->next; menu; menu = menu->next) {
+		...
+		*Copy*
+		dep2 = expr_copy(basedep);
+		...
+		*Free copy*
+		expr_free(dep2);
+	}
+	*basedep lost!*
 
-Together with the memory leaks plugged in the parser in
-https://lkml.org/lkml/2017/10/8/126, this plugs all memory leaks when parsing
-the x86 Kconfigs.
+Fix by freeing 'basedep' after the loop.
 
-As a reminder, the parsers can be rebuilt like this:
+Summary from Valgrind on 'menuconfig' (ARCH=x86) before the fix:
 
-	$ make REGENERATE_PARSERS=1 conf
+	LEAK SUMMARY:
+	   definitely lost: 344,376 bytes in 14,349 blocks
+	   ...
 
-Here's an easy way to run Valgrind on menuconfig (nothing seems to look at
-KERNELVERSION, so just set it to avoid a warning):
+Summary after the fix:
 
-	$ ARCH=x86 SRCARCH=x86 KERNELVERSION=4.14.0-rc2 valgrind --leak-check=full scripts/kconfig/mconf Kconfig
+	LEAK SUMMARY:
+	   definitely lost: 44,448 bytes in 1,852 blocks
+	   ...
 
-Cheers,
-Ulf
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+---
+ scripts/kconfig/menu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Ulf Magnusson (3):
-  kconfig: Fix automatic menu creation mem leak
-  kconfig: Fix expr_free() E_NOT leak
-  kconfig: Fix choice symbol expression leak
-
- scripts/kconfig/expr.c | 2 +-
- scripts/kconfig/menu.c | 5 +++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index e935793..749c2bd 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -372,6 +372,7 @@ void menu_finalize(struct menu *parent)
+ 			menu->parent = parent;
+ 			last_menu = menu;
+ 		}
++		expr_free(basedep);
+ 		if (last_menu) {
+ 			parent->list = parent->next;
+ 			parent->next = last_menu->next;
 -- 
 2.7.4
 
