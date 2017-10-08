@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:52352 "EHLO
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:47314 "EHLO
         mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752085AbdJHRgU (ORCPT
+        with ESMTP id S1751228AbdJHRgT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Oct 2017 13:36:20 -0400
+        Sun, 8 Oct 2017 13:36:19 -0400
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 3/3] kconfig: Fix choice symbol expression leak
-Date: Sun,  8 Oct 2017 19:35:46 +0200
-Message-Id: <1507484146-23617-4-git-send-email-ulfalizer@gmail.com>
+Subject: [PATCH 2/3] kconfig: Fix expr_free() E_NOT leak
+Date: Sun,  8 Oct 2017 19:35:45 +0200
+Message-Id: <1507484146-23617-3-git-send-email-ulfalizer@gmail.com>
 In-Reply-To: <1507484146-23617-1-git-send-email-ulfalizer@gmail.com>
 References: <1507484146-23617-1-git-send-email-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,65 +15,51 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
 Cc: sam@ravnborg.org, zippel@linux-m68k.org, nicolas.pitre@linaro.org, michal.lkml@markovi.net, dirk@gouders.net, yamada.masahiro@socionext.com, lacombar@gmail.com, walch.martin@web.de, JBeulich@suse.com, linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
 
-When propagating dependencies from parents after parsing, an expression
-node is allocated if the parent symbol is a 'choice'. This node was
-never freed.
+Only the E_NOT operand and not the E_NOT node itself was freed, due to
+accidentally returning too early in expr_free(). Outline of leak:
 
-Outline of leak:
-
-	if (sym && sym_is_choice(sym)) {
-		...
-		*Allocate (in this case only)*
-		parentdep = expr_alloc_symbol(sym);
-	} else if (parent->prompt)
-		parentdep = parent->prompt->visible.expr;
-	else
-		parentdep = parent->dep;
-
-	for (menu = parent->list; menu; menu = menu->next) {
-		...
-		*Copy*
-		basedep = expr_alloc_and(expr_copy(parentdep), basedep);
-		...
+	switch (e->type) {
+	...
+	case E_NOT:
+		expr_free(e->left.expr);
+		return;
+	...
 	}
-	*parentdep lost if the parent is a choice!*
+	*Never reached, 'e' leaked*
+	free(e);
 
-Fix by freeing 'parentdep' after the loop if the parent symbol is a
-choice. Note that this only frees the expression node and not the choice
-symbol itself.
+Fix by changing the 'return' to a 'break'.
 
 Summary from Valgrind on 'menuconfig' (ARCH=x86) before the fix:
 
 	LEAK SUMMARY:
-	   definitely lost: 1,608 bytes in 67 blocks
+	   definitely lost: 44,448 bytes in 1,852 blocks
 	   ...
 
 Summary after the fix:
 
 	LEAK SUMMARY:
-	   definitely lost: 0 bytes in 0 blocks
+	   definitely lost: 1,608 bytes in 67 blocks
 	   ...
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
- scripts/kconfig/menu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ scripts/kconfig/expr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 749c2bd..e0badd9 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -344,6 +344,10 @@ void menu_finalize(struct menu *parent)
- 				}
- 			}
- 		}
-+
-+		if (sym && sym_is_choice(sym))
-+			expr_free(parentdep);
-+
- 		for (menu = parent->list; menu; menu = menu->next)
- 			menu_finalize(menu);
- 	} else if (sym) {
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index cbf4996..ed29bad 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -113,7 +113,7 @@ void expr_free(struct expr *e)
+ 		break;
+ 	case E_NOT:
+ 		expr_free(e->left.expr);
+-		return;
++		break;
+ 	case E_EQUAL:
+ 	case E_GEQ:
+ 	case E_GTH:
 -- 
 2.7.4
 
