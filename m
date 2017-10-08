@@ -1,75 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:55321 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753701AbdJHRMR (ORCPT
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:45740 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751228AbdJHRgP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Oct 2017 13:12:17 -0400
+        Sun, 8 Oct 2017 13:36:15 -0400
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 2/6] kconfig: Don't leak 'source' filenames during parsing
-Date: Sun,  8 Oct 2017 19:11:19 +0200
-Message-Id: <1507482683-22651-3-git-send-email-ulfalizer@gmail.com>
-In-Reply-To: <1507482683-22651-1-git-send-email-ulfalizer@gmail.com>
-References: <1507482683-22651-1-git-send-email-ulfalizer@gmail.com>
+Subject: [PATCH 0/3] kconfig: Fix expression memory leaks
+Date: Sun,  8 Oct 2017 19:35:43 +0200
+Message-Id: <1507484146-23617-1-git-send-email-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
 Cc: sam@ravnborg.org, zippel@linux-m68k.org, nicolas.pitre@linaro.org, michal.lkml@markovi.net, dirk@gouders.net, yamada.masahiro@socionext.com, lacombar@gmail.com, walch.martin@web.de, JBeulich@suse.com, linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
 
-The 'source_stmt' nonterminal takes a 'prompt', which consists of either
-a T_WORD or a T_WORD_QUOTE, both of which are always allocated on the
-heap in zconf.l and need to have their associated strings freed. Free
-them.
+Hello,
 
-The existing code already makes sure to always copy the string, but add
-a warning to sym_expand_string_value() to make it clear that the string
-must be copied, just in case.
+This patchset plugs all memory leaks that are due to expressions not being
+freed, when parsing the x86 Kconfigs (and likely the other ARCHes too). 336 KB
+are leaked in total.
 
-Summary from Valgrind on 'menuconfig' (ARCH=x86) before the fix:
+Together with the memory leaks plugged in the parser in
+https://lkml.org/lkml/2017/10/8/126, this plugs all memory leaks when parsing
+the x86 Kconfigs.
 
-	LEAK SUMMARY:
-	   definitely lost: 387,504 bytes in 15,545 blocks
-	   ...
+As a reminder, the parsers can be rebuilt like this:
 
-Summary after the fix:
+	$ make REGENERATE_PARSERS=1 conf
 
-	LEAK SUMMARY:
-	   definitely lost: 344,616 bytes in 14,355 blocks
-	   ...
+Here's an easy way to run Valgrind on menuconfig (nothing seems to look at
+KERNELVERSION, so just set it to avoid a warning):
 
-Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
----
- scripts/kconfig/symbol.c | 5 +++++
- scripts/kconfig/zconf.y  | 1 +
- 2 files changed, 6 insertions(+)
+	$ ARCH=x86 SRCARCH=x86 KERNELVERSION=4.14.0-rc2 valgrind --leak-check=full scripts/kconfig/mconf Kconfig
 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 20136ff..4fb0e43 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -907,6 +907,11 @@ const char *sym_expand_string_value(const char *in)
- 	char *res;
- 	size_t reslen;
- 
-+	/*
-+	 * Note: 'in' might come from a token that's about to be
-+	 * freed, so make sure to always allocate a new string
-+	 */
-+
- 	reslen = strlen(in) + 1;
- 	res = xmalloc(reslen);
- 	res[0] = '\0';
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index f201241..a770117 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -393,6 +393,7 @@ source_stmt: T_SOURCE prompt T_EOL
- {
- 	printd(DEBUG_PARSE, "%s:%d:source %s\n", zconf_curname(), zconf_lineno(), $2);
- 	zconf_nextfile($2);
-+	free($2);
- };
- 
- /* comment entry */
+Cheers,
+Ulf
+
+Ulf Magnusson (3):
+  kconfig: Fix automatic menu creation mem leak
+  kconfig: Fix expr_free() E_NOT leak
+  kconfig: Fix choice symbol expression leak
+
+ scripts/kconfig/expr.c | 2 +-
+ scripts/kconfig/menu.c | 5 +++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
 -- 
 2.7.4
 
