@@ -1,57 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:27343 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750795AbdJIIVj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Oct 2017 04:21:39 -0400
-Date: Mon, 9 Oct 2017 16:20:58 +0800
-From: kbuild test robot <lkp@intel.com>
-Subject: Re: [PATCH v2] kconfig: Remove menu_end_entry()
-Message-ID: <201710091636.WWY1SAQI%fengguang.wu@intel.com>
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:44392 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754212AbdJIO0N (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 9 Oct 2017 10:26:13 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1507500888-6515-1-git-send-email-ulfalizer@gmail.com>
+In-Reply-To: <CAK7LNAQaGd5h5OHe5ArXV=wms07Zpd4OBPLrPYwZ68KpbjeGcQ@mail.gmail.com>
+References: <1505920670-8290-1-git-send-email-yamada.masahiro@socionext.com>
+ <20170927232415.GB5939@codeaurora.org> <CAK7LNAQaGd5h5OHe5ArXV=wms07Zpd4OBPLrPYwZ68KpbjeGcQ@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 9 Oct 2017 23:25:28 +0900
+Message-ID: <CAK7LNARd6ovx=qmny1micPx7BUXf9uL9soES_OcotF-bYCCQWw@mail.gmail.com>
+Subject: Re: [PATCH] hexagon: get rid of #include <generated/compile.h>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: kbuild-all@01.org, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, sam@ravnborg.org, zippel@linux-m68k.org, nicolas.pitre@linaro.org, michal.lkml@markovi.net, dirk@gouders.net, yamada.masahiro@socionext.com, lacombar@gmail.com, JBeulich@suse.com, linux-kernel@vger.kernel.org
+To: Richard Kuo <rkuo@codeaurora.org>
+Cc: linux-hexagon@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Sam Ravnborg <sam@ravnborg.org>, Oleg Nesterov <oleg@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi Ulf,
+2017-10-03 10:26 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> Hi Richard,
+>
+> 2017-09-28 8:24 GMT+09:00 Richard Kuo <rkuo@codeaurora.org>:
+>> On Thu, Sep 21, 2017 at 12:17:50AM +0900, Masahiro Yamada wrote:
+>>> <generated/compile.h> is created (or updated) when Kbuild descends
+>>> into the init/ directory.  In parallel building from a pristine
+>>> source tree, there is no guarantee <generated/compile.h> exists when
+>>> arch/hexagon/kernel/ptrace.c is compiled.
+>>>
+>>> For hexagon architecture, we know UTS_MACHINE is a fixed string
+>>> "hexagon", so let's hard-code it, like many architectures do.
+>>>
+>>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>>> ---
+>>>
+>>>  arch/hexagon/kernel/ptrace.c | 4 +---
+>>>  1 file changed, 1 insertion(+), 3 deletions(-)
+>>>
+>>
+>> Acked-by: Richard Kuo <rkuo@codeaurora.org>
+>>
+>
+> How should this patch be handled?
+>
 
-[auto build test ERROR on linus/master]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+I checked
+git://git.kernel.org/pub/scm/linux/kernel/git/rkuo/linux-hexagon-kernel.git
 
-url:    https://github.com/0day-ci/linux/commits/Ulf-Magnusson/kconfig-Remove-menu_end_entry/20171009-140245
-config: x86_64-rhel
-compiler: gcc-6 (Debian 6.2.0-3) 6.2.0 20160901
-reproduce:
-        # save the attached .config to linux build tree
-        make ARCH=x86_64 
+I could not see any patch applied to the tree since last year.
 
-All errors (new ones prefixed by >>):
+Assuming the tree is unmaintained, I am picking this patch to Kbuild tree.
 
-   scripts/kconfig/zconf.tab.o: In function `zconfparse':
->> zconf.tab.c:(.text+0x9b39): undefined reference to `menu_end_entry'
-   zconf.tab.c:(.text+0xa5a5): undefined reference to `menu_end_entry'
->> collect2: error: ld returned 1 exit status
-   make[2]: *** [scripts/kconfig/conf] Error 1
-   make[2]: Target 'oldconfig' not remade because of errors.
-   make[1]: *** [oldconfig] Error 2
-   make: *** [sub-make] Error 2
---
-   scripts/kconfig/zconf.tab.c: In function 'zconfparse':
-   scripts/kconfig/zconf.tab.c:1555:2: warning: implicit declaration of function 'menu_end_entry' [-Wimplicit-function-declaration]
-     menu_end_entry();
-     ^~~~~~~~~~~~~~
-   scripts/kconfig/zconf.tab.o: In function `zconfparse':
->> zconf.tab.c:(.text+0x9b39): undefined reference to `menu_end_entry'
-   zconf.tab.c:(.text+0xa5a5): undefined reference to `menu_end_entry'
->> collect2: error: ld returned 1 exit status
-   make[2]: *** [scripts/kconfig/conf] Error 1
-   make[2]: Target 'oldnoconfig' not remade because of errors.
-   make[1]: *** [oldnoconfig] Error 2
-   make: *** [sub-make] Error 2
 
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+
+Applied to linux-kbuild/kbuild with Rechard's Acked.
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
