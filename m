@@ -1,70 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:33415 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:33706 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751636AbdJIOgx (ORCPT
+        with ESMTP id S1754539AbdJIOhF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Oct 2017 10:36:53 -0400
+        Mon, 9 Oct 2017 10:37:05 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/3] ARM: add KBUILD_ prefix to CFLAGS_MODULE, LDFLAGS_MODULE
-Date: Mon,  9 Oct 2017 23:35:13 +0900
-Message-Id: <1507559715-30918-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1507559715-30918-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1507559715-30918-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 0/3] ARM, hexagon, c6x: build: fix usage of CFLAGS_MODULE, LDFLAGS_MODULE
+Date: Mon,  9 Oct 2017 23:35:12 +0900
+Message-Id: <1507559715-30918-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-c6x-dev@linux-c6x.org, linux-hexagon@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Salter <msalter@redhat.com>, Aurelien Jacquiot <jacquiot.aurelien@gmail.com>, Richard Kuo <rkuo@codeaurora.org>, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
 
-{CFLAGS,LDFLAGS}_MODULE are supposed to be set by users, not by
-in-kernel makefiles.
+CFLAGS_MODULE, AFLAGS_MODULE, and LDFLAGS_MODULE are supposed
+to be set by users.
 
-Documentation/kbuild/makefiles.txt clearly explains the difference:
+In-kernel Makefile must use KBUILD_ prefixed variables.
 
-  KBUILD_CFLAGS_MODULE   Options for $(CC) when building modules
+This is explained in Documentation/kbuild/{kbuild.txt, makefiles.txt}
 
-      $(KBUILD_CFLAGS_MODULE) is used to add arch-specific options that
-      are used for $(CC).
-      From commandline CFLAGS_MODULE shall be used (see kbuild.txt).
+Most of architectures follow the rule, but I found violations
+in ARM, hexagone, and c6x.
 
-  KBUILD_LDFLAGS_MODULE   Options for $(LD) when linking modules
+Fix them.
 
-      $(KBUILD_LDFLAGS_MODULE) is used to add arch-specific options
-      used when linking modules. This is often a linker script.
-      From commandline LDFLAGS_MODULE shall be used (see kbuild.txt).
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- arch/arm/Makefile | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Masahiro Yamada (3):
+  ARM: add KBUILD_ prefix to CFLAGS_MODULE, LDFLAGS_MODULE
+  hexagon: add KBUILD_ prefix to CFLAGS_MODULE, LDFLAGS_MODULE
+  c6x: add KBUILD_ prefix to CFLAGS_MODULE
 
-diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-index cdb5b55..cafa4d4 100644
---- a/arch/arm/Makefile
-+++ b/arch/arm/Makefile
-@@ -16,11 +16,11 @@ LDFLAGS		:=
- LDFLAGS_vmlinux	:=-p --no-undefined -X --pic-veneer
- ifeq ($(CONFIG_CPU_ENDIAN_BE8),y)
- LDFLAGS_vmlinux	+= --be8
--LDFLAGS_MODULE	+= --be8
-+KBUILD_LDFLAGS_MODULE	+= --be8
- endif
- 
- ifeq ($(CONFIG_ARM_MODULE_PLTS),y)
--LDFLAGS_MODULE	+= -T $(srctree)/arch/arm/kernel/module.lds
-+KBUILD_LDFLAGS_MODULE	+= -T $(srctree)/arch/arm/kernel/module.lds
- endif
- 
- GZFLAGS		:=-9
-@@ -120,7 +120,7 @@ CFLAGS_ISA	:=-mthumb $(AFLAGS_AUTOIT) $(AFLAGS_NOWARN)
- AFLAGS_ISA	:=$(CFLAGS_ISA) -Wa$(comma)-mthumb
- # Work around buggy relocation from gas if requested:
- ifeq ($(CONFIG_THUMB2_AVOID_R_ARM_THM_JUMP11),y)
--CFLAGS_MODULE	+=-fno-optimize-sibling-calls
-+KBUILD_CFLAGS_MODULE	+=-fno-optimize-sibling-calls
- endif
- else
- CFLAGS_ISA	:=$(call cc-option,-marm,)
+ arch/arm/Makefile     | 6 +++---
+ arch/c6x/Makefile     | 2 +-
+ arch/hexagon/Makefile | 6 +++---
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
 -- 
 2.7.4
 
