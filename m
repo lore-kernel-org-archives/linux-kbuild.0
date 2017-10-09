@@ -1,48 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:58364 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754066AbdJIPGx (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:42031 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754324AbdJIQ0g (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Oct 2017 11:06:53 -0400
-Date: Mon, 9 Oct 2017 16:06:47 +0100
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH 1/3] ARM: add KBUILD_ prefix to CFLAGS_MODULE,
- LDFLAGS_MODULE
-Message-ID: <20171009150647.GU20805@n2100.armlinux.org.uk>
-References: <1507559715-30918-1-git-send-email-yamada.masahiro@socionext.com>
- <1507559715-30918-2-git-send-email-yamada.masahiro@socionext.com>
+        Mon, 9 Oct 2017 12:26:36 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1507559715-30918-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <20171002105004.32426-1-jonas.gorski@gmail.com>
+References: <20171002105004.32426-1-jonas.gorski@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 10 Oct 2017 01:25:38 +0900
+Message-ID: <CAK7LNASvdFT8uttzNmiEUVk6rc=M0RC4Z=iOd9XjNnmqaYv7bw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: allow making undefined symbols fatal for external modules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>
 
-On Mon, Oct 09, 2017 at 11:35:13PM +0900, Masahiro Yamada wrote:
-> {CFLAGS,LDFLAGS}_MODULE are supposed to be set by users, not by
-> in-kernel makefiles.
-> 
-> Documentation/kbuild/makefiles.txt clearly explains the difference:
-> 
->   KBUILD_CFLAGS_MODULE   Options for $(CC) when building modules
-> 
->       $(KBUILD_CFLAGS_MODULE) is used to add arch-specific options that
->       are used for $(CC).
->       From commandline CFLAGS_MODULE shall be used (see kbuild.txt).
-> 
->   KBUILD_LDFLAGS_MODULE   Options for $(LD) when linking modules
-> 
->       $(KBUILD_LDFLAGS_MODULE) is used to add arch-specific options
->       used when linking modules. This is often a linker script.
->       From commandline LDFLAGS_MODULE shall be used (see kbuild.txt).
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+2017-10-02 19:50 GMT+09:00 Jonas Gorski <jonas.gorski@gmail.com>:
+> By passing appropriate values in KBUILD_EXTRA_SYMBOLS it is possible to
+> make modpost be able to resolve all symbols for external modules, even
+> between to other external modules.
+>
+> Because of this, it might be desirable to make unresolved symbols an
+> error on external module builds as well, to catch missing exports there
+> as well.
+>
+> So add a new flag KBUILD_MODPOST_ERROR which can be set to enable this
+> behaviour. It has no effect on non external module builds.
+>
+> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> ---
+> The main target is to allow distributions (like LEDE) that make use of
+> kernel backports and other out of tree drivers to be able to catch
+> errors like missing EXPORT_SYMBOLs in the kernel early.
+>
+>  scripts/Makefile.modpost | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+> index 16923ba4b5b1..29f787bf8c3a 100644
+> --- a/scripts/Makefile.modpost
+> +++ b/scripts/Makefile.modpost
+> @@ -34,6 +34,8 @@
+>
+>  # KBUILD_MODPOST_WARN can be set to avoid error out in case of undefined
+>  # symbols in the final module linking stage
+> +# KBUILD_MODPOST_ERROR can be set to error out in case of undefined
+> +# symbols in the final module linking stage for external modules
+>  # KBUILD_MODPOST_NOFINAL can be set to skip the final link of modules.
+>  # This is solely useful to speed up test compiles
+>  PHONY := _modpost
+> @@ -49,6 +51,8 @@ ifneq ($(KBUILD_EXTMOD),)
+>  obj := $(KBUILD_EXTMOD)
+>  src := $(obj)
+>
+> +KBUILD_MODPOST_WARN = $(if $(KBUILD_MODPOST_ERROR),,1)
+> +
+>  # Include the module's Makefile to find KBUILD_EXTRA_SYMBOLS
+>  include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
+>               $(KBUILD_EXTMOD)/Kbuild, $(KBUILD_EXTMOD)/Makefile)
+> @@ -78,7 +82,7 @@ modpost = scripts/mod/modpost                    \
+>   $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
+>   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
+>   $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
+> - $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
+> + $(if $(KBUILD_MODPOST_WARN),-w)
+>
+>  MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
+>
 
-Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
+
+The motivation looks reasonable to me,
+but having both KBUILD_MODPOST_WARN and KBUILD_MODPOST_ERROR
+is a bit confusing, I think.
+
+(Some people may wonder what would happen if both are set...)
+
+
+So, here is my suggestion.
+
+
+We have only KBUILD_MODPOST_WARN.
+
+The default value is 1 for external module building.
+                     0 for kernel building.
+
+
+If you want to change the default behavior,
+you can specify KBUILD_MODPOST_WARN=1 when building kernel,
+or KBUILD_MODPOST_WARN=0 when building external module
+from the command line.
+
+
+Also, you need to update Documentation/kbuild/kbuild.txt
+
+
+
+
 
 -- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+Best Regards
+Masahiro Yamada
