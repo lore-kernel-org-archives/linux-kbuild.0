@@ -1,43 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f195.google.com ([209.85.217.195]:35746 "EHLO
-        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751230AbdJHWZM (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:4207 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1753711AbdJIDoF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Oct 2017 18:25:12 -0400
+        Sun, 8 Oct 2017 23:44:05 -0400
+Subject: Re: [PATCH] kbuild: comments cleanup in Makefile.lib
+References: <1505820967-17302-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+ <CAK7LNASc52YJKyowkgy9=82L-SQc3TKUmhaapNcRFoXx81umcA@mail.gmail.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <59DAF04B.2050601@cn.fujitsu.com>
+Date: Mon, 9 Oct 2017 11:43:07 +0800
 MIME-Version: 1.0
-In-Reply-To: <1507482683-22651-7-git-send-email-ulfalizer@gmail.com>
-References: <1507482683-22651-1-git-send-email-ulfalizer@gmail.com> <1507482683-22651-7-git-send-email-ulfalizer@gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Mon, 9 Oct 2017 00:25:10 +0200
-Message-ID: <CAFkk2KTW2aBQVrSEtH-O_p6DeTZ38=N6BMf0Y1s2w1A0OGi_qw@mail.gmail.com>
-Subject: Re: [PATCH 6/6] kconfig: Regenerate parser
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNASc52YJKyowkgy9=82L-SQc3TKUmhaapNcRFoXx81umcA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
-Cc: sam@ravnborg.org, zippel@linux-m68k.org, Nicolas Pitre <nicolas.pitre@linaro.org>, michal.lkml@markovi.net, dirk@gouders.net, Masahiro Yamada <yamada.masahiro@socionext.com>, Arnaud Lacombe <lacombar@gmail.com>, walch.martin@web.de, Jan Beulich <JBeulich@suse.com>, linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>
 
-On Sun, Oct 8, 2017 at 7:11 PM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> After the parsing memory leak fixes.
->
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->  scripts/kconfig/zconf.tab.c_shipped | 562 +++++++++++++++++++-----------------
->  1 file changed, 294 insertions(+), 268 deletions(-)
->
-> diff --git a/scripts/kconfig/zconf.tab.c_shipped b/scripts/kconfig/zconf.tab.c_shipped
-> index a22b285..d513857 100644
-> --- a/scripts/kconfig/zconf.tab.c_shipped
-> +++ b/scripts/kconfig/zconf.tab.c_shipped
-...
-> --
-> 2.7.4
->
+Masahiro-san,
 
-...though the parser should really be regenerated manually to be sure it matches
-zconf.y:
+On 10/04/2017 12:58 PM, Masahiro Yamada wrote:
+> Hi Cao,
+> 
+> 
+> 2017-09-19 20:36 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+>> It has:
+>> 1. Move comments close to what it want to comment.
+>> 2. Comments cleanup & improvement.
+>>
+>> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 
-        $ make REGENERATE_PARSERS=1 conf
 
-Cheers,
-Ulf
+>>
+>> -# if $(foo-objs) exists, foo.o is a composite object
+>> +# if $(foo-objs) or $(foo-y) or $(foo-m) exists, foo.o is a composite object
+> 
+> 
+> Nit:
+> 
+> "if $(foo-objs), $(foo-y), or $(foo-m) exists" will be better.
+> 
+
+Yes, true.
+
+>>  multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
+>>  multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))), $(m))))
+>>  multi-used   := $(multi-used-y) $(multi-used-m)
+>> @@ -90,7 +84,6 @@ subdir-ym     := $(addprefix $(obj)/,$(subdir-ym))
+>>  obj-dirs       := $(addprefix $(obj)/,$(obj-dirs))
+>>
+>>  # These flags are needed for modversions and compiling, so we define them here
+>> -# already
+>>  # $(modname_flags) #defines KBUILD_MODNAME as the name of the module it will
+> 
+> 
+> I am not sure if "#defines" is intentional or not.
+> I think "#" is unnecessary.
+> 
+
+Yes, agree with you
+
+-- 
+Sincerely,
+Cao jin
+
+
