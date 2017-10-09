@@ -1,99 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:36783 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1753733AbdJIDuP (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Oct 2017 23:50:15 -0400
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Subject: [PATCH v2] kbuild: comments cleanup in Makefile.lib
-Date: Mon, 9 Oct 2017 11:49:11 +0800
-Message-ID: <1507520951-29940-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+Received: from mga05.intel.com ([192.55.52.43]:3130 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751599AbdJIGqI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 9 Oct 2017 02:46:08 -0400
+Date: Mon, 9 Oct 2017 14:45:45 +0800
+From: kbuild test robot <lkp@intel.com>
+Subject: Re: [PATCH v2] kconfig: Remove menu_end_entry()
+Message-ID: <201710091419.TQaGEnZp%fengguang.wu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1507500888-6515-1-git-send-email-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, mmarek@suse.com
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: kbuild-all@01.org, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, sam@ravnborg.org, zippel@linux-m68k.org, nicolas.pitre@linaro.org, michal.lkml@markovi.net, dirk@gouders.net, yamada.masahiro@socionext.com, lacombar@gmail.com, JBeulich@suse.com, linux-kernel@vger.kernel.org
 
-It has:
-1. Move comments close to what it want to comment.
-2. Comments cleanup & improvement.
+Hi Ulf,
 
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+[auto build test ERROR on linus/master]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Ulf-Magnusson/kconfig-Remove-menu_end_entry/20171009-140245
+config: x86_64-randconfig-x018-201741
+compiler: gcc-6 (Debian 6.2.0-3) 6.2.0 20160901
+reproduce:
+        make ARCH=x86_64  randconfig
+        make ARCH=x86_64 
+
+All error/warnings (new ones prefixed by >>):
+
+   scripts/kconfig/zconf.tab.o: In function `zconfparse':
+>> zconf.tab.c:(.text+0x9b39): undefined reference to `menu_end_entry'
+   zconf.tab.c:(.text+0xa5a5): undefined reference to `menu_end_entry'
+   collect2: error: ld returned 1 exit status
+   make[2]: *** [scripts/kconfig/conf] Error 1
+   make[2]: Target 'oldconfig' not remade because of errors.
+   make[1]: *** [oldconfig] Error 2
+   make: *** [sub-make] Error 2
+--
+   scripts/kconfig/zconf.tab.c: In function 'zconfparse':
+>> scripts/kconfig/zconf.tab.c:1555:2: warning: implicit declaration of function 'menu_end_entry' [-Wimplicit-function-declaration]
+     menu_end_entry();
+     ^~~~~~~~~~~~~~
+   scripts/kconfig/zconf.tab.o: In function `zconfparse':
+>> zconf.tab.c:(.text+0x9b39): undefined reference to `menu_end_entry'
+   zconf.tab.c:(.text+0xa5a5): undefined reference to `menu_end_entry'
+   collect2: error: ld returned 1 exit status
+   make[2]: *** [scripts/kconfig/conf] Error 1
+   make[2]: Target 'oldnoconfig' not remade because of errors.
+   make[1]: *** [oldnoconfig] Error 2
+   make: *** [sub-make] Error 2
+
 ---
- scripts/Makefile.lib | 21 +++++++--------------
- 1 file changed, 7 insertions(+), 14 deletions(-)
-
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 5e975fe..580e605 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -4,8 +4,7 @@ ccflags-y  += $(EXTRA_CFLAGS)
- cppflags-y += $(EXTRA_CPPFLAGS)
- ldflags-y  += $(EXTRA_LDFLAGS)
- 
--#
--# flags that take effect in sub directories
-+# flags that take effect in current and sub directories
- export KBUILD_SUBDIR_ASFLAGS := $(KBUILD_SUBDIR_ASFLAGS) $(subdir-asflags-y)
- export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
- 
-@@ -14,14 +13,16 @@ export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
- 
- # When an object is listed to be built compiled-in and modular,
- # only build the compiled-in version
--
- obj-m := $(filter-out $(obj-y),$(obj-m))
- 
- # Libraries are always collected in one lib file.
- # Filter out objects already built-in
--
- lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
- 
-+# Determine modorder.
-+# Unfortunately, we don't have information about ordering between -y
-+# and -m subdirs.  Just put -y's first.
-+modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
- 
- # Handle objects in subdirs
- # ---------------------------------------------------------------------------
-@@ -29,12 +30,6 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
- #   and add the directory to the list of dirs to descend into: $(subdir-y)
- # o if we encounter foo/ in $(obj-m), remove it from $(obj-m)
- #   and add the directory to the list of dirs to descend into: $(subdir-m)
--
--# Determine modorder.
--# Unfortunately, we don't have information about ordering between -y
--# and -m subdirs.  Just put -y's first.
--modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
--
- __subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
- subdir-y	+= $(__subdir-y)
- __subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
-@@ -43,10 +38,9 @@ obj-y		:= $(patsubst %/, %/built-in.o, $(obj-y))
- obj-m		:= $(filter-out %/, $(obj-m))
- 
- # Subdirectories we need to descend into
--
- subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
- 
--# if $(foo-objs) exists, foo.o is a composite object
-+# if $(foo-objs), $(foo-y), or $(foo-m) exists, foo.o is a composite object
- multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
- multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))), $(m))))
- multi-used   := $(multi-used-y) $(multi-used-m)
-@@ -90,8 +84,7 @@ subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
- obj-dirs	:= $(addprefix $(obj)/,$(obj-dirs))
- 
- # These flags are needed for modversions and compiling, so we define them here
--# already
--# $(modname_flags) #defines KBUILD_MODNAME as the name of the module it will
-+# $(modname_flags) defines KBUILD_MODNAME as the name of the module it will
- # end up in (or would, if it gets compiled in)
- # Note: Files that end up in two or more modules are compiled without the
- #       KBUILD_MODNAME definition. The reason is that any made-up name would
--- 
-2.1.0
-
-
-
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
