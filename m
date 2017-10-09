@@ -1,104 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:42031 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754324AbdJIQ0g (ORCPT
+Received: from smtp.codeaurora.org ([198.145.29.96]:60382 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754377AbdJIQbr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Oct 2017 12:26:36 -0400
+        Mon, 9 Oct 2017 12:31:47 -0400
+Date: Mon, 9 Oct 2017 11:31:42 -0500
+From: Richard Kuo <rkuo@codeaurora.org>
+Subject: Re: [PATCH] hexagon: get rid of #include <generated/compile.h>
+Message-ID: <20171009163142.GA19621@codeaurora.org>
+References: <1505920670-8290-1-git-send-email-yamada.masahiro@socionext.com>
+ <20170927232415.GB5939@codeaurora.org>
+ <CAK7LNAQaGd5h5OHe5ArXV=wms07Zpd4OBPLrPYwZ68KpbjeGcQ@mail.gmail.com>
+ <CAK7LNARd6ovx=qmny1micPx7BUXf9uL9soES_OcotF-bYCCQWw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171002105004.32426-1-jonas.gorski@gmail.com>
-References: <20171002105004.32426-1-jonas.gorski@gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 10 Oct 2017 01:25:38 +0900
-Message-ID: <CAK7LNASvdFT8uttzNmiEUVk6rc=M0RC4Z=iOd9XjNnmqaYv7bw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: allow making undefined symbols fatal for external modules
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNARd6ovx=qmny1micPx7BUXf9uL9soES_OcotF-bYCCQWw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-hexagon@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Sam Ravnborg <sam@ravnborg.org>, Oleg Nesterov <oleg@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-10-02 19:50 GMT+09:00 Jonas Gorski <jonas.gorski@gmail.com>:
-> By passing appropriate values in KBUILD_EXTRA_SYMBOLS it is possible to
-> make modpost be able to resolve all symbols for external modules, even
-> between to other external modules.
->
-> Because of this, it might be desirable to make unresolved symbols an
-> error on external module builds as well, to catch missing exports there
-> as well.
->
-> So add a new flag KBUILD_MODPOST_ERROR which can be set to enable this
-> behaviour. It has no effect on non external module builds.
->
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
-> ---
-> The main target is to allow distributions (like LEDE) that make use of
-> kernel backports and other out of tree drivers to be able to catch
-> errors like missing EXPORT_SYMBOLs in the kernel early.
->
->  scripts/Makefile.modpost | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> index 16923ba4b5b1..29f787bf8c3a 100644
-> --- a/scripts/Makefile.modpost
-> +++ b/scripts/Makefile.modpost
-> @@ -34,6 +34,8 @@
->
->  # KBUILD_MODPOST_WARN can be set to avoid error out in case of undefined
->  # symbols in the final module linking stage
-> +# KBUILD_MODPOST_ERROR can be set to error out in case of undefined
-> +# symbols in the final module linking stage for external modules
->  # KBUILD_MODPOST_NOFINAL can be set to skip the final link of modules.
->  # This is solely useful to speed up test compiles
->  PHONY := _modpost
-> @@ -49,6 +51,8 @@ ifneq ($(KBUILD_EXTMOD),)
->  obj := $(KBUILD_EXTMOD)
->  src := $(obj)
->
-> +KBUILD_MODPOST_WARN = $(if $(KBUILD_MODPOST_ERROR),,1)
-> +
->  # Include the module's Makefile to find KBUILD_EXTRA_SYMBOLS
->  include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
->               $(KBUILD_EXTMOD)/Kbuild, $(KBUILD_EXTMOD)/Makefile)
-> @@ -78,7 +82,7 @@ modpost = scripts/mod/modpost                    \
->   $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
->   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
->   $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
-> - $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
-> + $(if $(KBUILD_MODPOST_WARN),-w)
->
->  MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
->
+On Mon, Oct 09, 2017 at 11:25:28PM +0900, Masahiro Yamada wrote:
+> >>
+> >
+> > How should this patch be handled?
+> >
+> 
+> I checked
+> git://git.kernel.org/pub/scm/linux/kernel/git/rkuo/linux-hexagon-kernel.git
+> 
+> I could not see any patch applied to the tree since last year.
+> 
+> Assuming the tree is unmaintained, I am picking this patch to Kbuild tree.
+> 
+> 
+> 
+> Applied to linux-kbuild/kbuild with Rechard's Acked.
+> 
+> 
+> 
+> -- 
+> Best Regards
+> Masahiro Yamada
 
 
-The motivation looks reasonable to me,
-but having both KBUILD_MODPOST_WARN and KBUILD_MODPOST_ERROR
-is a bit confusing, I think.
-
-(Some people may wonder what would happen if both are set...)
+Sorry about that.  For the record I'm fine with these patches going up
+some of the other trees, like trivial or kbuild.  Might go faster that way.
 
 
-So, here is my suggestion.
-
-
-We have only KBUILD_MODPOST_WARN.
-
-The default value is 1 for external module building.
-                     0 for kernel building.
-
-
-If you want to change the default behavior,
-you can specify KBUILD_MODPOST_WARN=1 when building kernel,
-or KBUILD_MODPOST_WARN=0 when building external module
-from the command line.
-
-
-Also, you need to update Documentation/kbuild/kbuild.txt
-
+Thanks,
+Richard Kuo
 
 
 
 
 -- 
-Best Regards
-Masahiro Yamada
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, 
+a Linux Foundation Collaborative Project
