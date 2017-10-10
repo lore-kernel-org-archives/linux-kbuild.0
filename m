@@ -1,72 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:27464 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755826AbdJJAxs (ORCPT
+Received: from mail-vk0-f43.google.com ([209.85.213.43]:48124 "EHLO
+        mail-vk0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751398AbdJJJFT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Oct 2017 20:53:48 -0400
+        Tue, 10 Oct 2017 05:05:19 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAD=FV=VbRbvmqVK7iNG6xx3MD1vsCKRY=tW=K8Q71MoQkCFMOw@mail.gmail.com>
-References: <20170926175508.29950-1-dianders@chromium.org> <20170926175508.29950-2-dianders@chromium.org>
- <CAK7LNASCy-zMNF1-7gie4NhyKC8xhAtyVHatpQ7JYLUz6UiG0w@mail.gmail.com>
- <CAD=FV=XQfLf+5ZPe4Vfqn1kpdom16YT7Nj=mw2Qydk1hmbL=pg@mail.gmail.com>
- <CAK7LNATdp47x3_gyi6pB+NLfoczECULPMkfx2N=eGOWm2DwqdQ@mail.gmail.com> <CAD=FV=VbRbvmqVK7iNG6xx3MD1vsCKRY=tW=K8Q71MoQkCFMOw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 10 Oct 2017 09:52:50 +0900
-Message-ID: <CAK7LNAR0Gpk9U1gaCFn6CiOJUGr5jc+Pcz8vSP9GJRhchjWedQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/2] kbuild: Add a cache for generated variables
+In-Reply-To: <CAK7LNASvdFT8uttzNmiEUVk6rc=M0RC4Z=iOd9XjNnmqaYv7bw@mail.gmail.com>
+References: <20171002105004.32426-1-jonas.gorski@gmail.com> <CAK7LNASvdFT8uttzNmiEUVk6rc=M0RC4Z=iOd9XjNnmqaYv7bw@mail.gmail.com>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Date: Tue, 10 Oct 2017 11:04:57 +0200
+Message-ID: <CAOiHx=nUGDae1eB8aznBvR0Q8adV9s+nejvQ7E82KwPJz=qLcQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: allow making undefined symbols fatal for external modules
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Doug Anderson <dianders@chromium.org>
-Cc: Michal Marek <mmarek@suse.com>, Guenter Roeck <groeck@chromium.org>, Brian Norris <briannorris@chromium.org>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Matthias Kaehlcke <mka@chromium.org>, Behan Webster <behanw@converseincode.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>
 
-2017-10-06 5:58 GMT+09:00 Doug Anderson <dianders@chromium.org>:
-> Hi,
->
-> On Thu, Oct 5, 2017 at 12:26 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> As far as I tested, I always see only one space after ":=" in v2.
+Hi Masahiro,
+
+On 9 October 2017 at 18:25, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> 2017-10-02 19:50 GMT+09:00 Jonas Gorski <jonas.gorski@gmail.com>:
+>> By passing appropriate values in KBUILD_EXTRA_SYMBOLS it is possible to
+>> make modpost be able to resolve all symbols for external modules, even
+>> between to other external modules.
 >>
->> I did not consider this deeply,
->> but something is working nicely behind the scene.
+>> Because of this, it might be desirable to make unresolved symbols an
+>> error on external module builds as well, to catch missing exports there
+>> as well.
+>>
+>> So add a new flag KBUILD_MODPOST_ERROR which can be set to enable this
+>> behaviour. It has no effect on non external module builds.
+>>
+>> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+>> ---
+>> The main target is to allow distributions (like LEDE) that make use of
+>> kernel backports and other out of tree drivers to be able to catch
+>> errors like missing EXPORT_SYMBOLs in the kernel early.
+>>
+>>  scripts/Makefile.modpost | 6 +++++-
+>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+>> index 16923ba4b5b1..29f787bf8c3a 100644
+>> --- a/scripts/Makefile.modpost
+>> +++ b/scripts/Makefile.modpost
+>> @@ -34,6 +34,8 @@
+>>
+>>  # KBUILD_MODPOST_WARN can be set to avoid error out in case of undefined
+>>  # symbols in the final module linking stage
+>> +# KBUILD_MODPOST_ERROR can be set to error out in case of undefined
+>> +# symbols in the final module linking stage for external modules
+>>  # KBUILD_MODPOST_NOFINAL can be set to skip the final link of modules.
+>>  # This is solely useful to speed up test compiles
+>>  PHONY := _modpost
+>> @@ -49,6 +51,8 @@ ifneq ($(KBUILD_EXTMOD),)
+>>  obj := $(KBUILD_EXTMOD)
+>>  src := $(obj)
+>>
+>> +KBUILD_MODPOST_WARN = $(if $(KBUILD_MODPOST_ERROR),,1)
+>> +
+>>  # Include the module's Makefile to find KBUILD_EXTRA_SYMBOLS
+>>  include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
+>>               $(KBUILD_EXTMOD)/Kbuild, $(KBUILD_EXTMOD)/Makefile)
+>> @@ -78,7 +82,7 @@ modpost = scripts/mod/modpost                    \
+>>   $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
+>>   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
+>>   $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
+>> - $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
+>> + $(if $(KBUILD_MODPOST_WARN),-w)
+>>
+>>  MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
+>>
 >
-> Try adding this to the end of the main Makefile:
 >
-> +$(info LDFLAGS_BUILD_ID = $(LDFLAGS_BUILD_ID))
-> +$(info KBUILD_ARFLAGS = $(KBUILD_ARFLAGS))
-> +$(info KBUILD_CFLAGS = $(KBUILD_CFLAGS))
-> +$(info KBUILD_AFLAGS = $(KBUILD_AFLAGS))
-> +$(info KBUILD_CPPFLAGS = $(KBUILD_CPPFLAGS))
-> +$(info REALMODE_CFLAGS = $(REALMODE_CFLAGS))
-> +
->  endif  # skip-makefile
+> The motivation looks reasonable to me,
+> but having both KBUILD_MODPOST_WARN and KBUILD_MODPOST_ERROR
+> is a bit confusing, I think.
 >
-> Record what you see.  Then apply my patches and run your build again
-> (actually, run it twice and look at the 2nd time, just to be sure).  I
-> think you'll see slightly different spacing in the flags for the two
-> runs.  I don't think this is terribly important, though.
+> (Some people may wonder what would happen if both are set...)
 >
+>
+> So, here is my suggestion.
+>
+>
+> We have only KBUILD_MODPOST_WARN.
+>
+> The default value is 1 for external module building.
+>                      0 for kernel building.
+>
+>
+> If you want to change the default behavior,
+> you can specify KBUILD_MODPOST_WARN=1 when building kernel,
+> or KBUILD_MODPOST_WARN=0 when building external module
+> from the command line.
 
-Yes.  I see slight difference
-in the resulted KBUILD_CFLAGS etc.
+Makes sense, I was thinking too complicated.
 
-What I meant is:
+>
+> Also, you need to update Documentation/kbuild/kbuild.txt
 
-In v2, I always see only one space after the assignment operator ":="
-in .cache.mk
-even without $(strip )
+Indeed, I missed that. Will fix in v2.
 
 
-$(call cc-option,-fno-PIE)
-$(call cc-option, -fno-PIE)
-$(call cc-option,                   -fno-PIE)
-
-
-All of the three gave me the same result.
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Regards
+Jonas
