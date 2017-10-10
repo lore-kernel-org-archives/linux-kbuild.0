@@ -1,97 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:18176 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755852AbdJJAYK (ORCPT
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:54950 "EHLO
+        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755719AbdJJA1R (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Oct 2017 20:24:10 -0400
+        Mon, 9 Oct 2017 20:27:17 -0400
+Received: by mail-wm0-f44.google.com with SMTP id i124so702391wmf.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Oct 2017 17:27:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAD=FV=Um_MOaTT=kEvYSA=rTq8w9w39iuKaDgHedSo5ck9JPqw@mail.gmail.com>
+In-Reply-To: <CAK7LNARBy5JSNPZf6k+O6sMA=Wd6-Sd0Hdk1rDvT2AbT22DBWA@mail.gmail.com>
 References: <1507089367-10402-1-git-send-email-yamada.masahiro@socionext.com>
- <1507089367-10402-4-git-send-email-yamada.masahiro@socionext.com> <CAD=FV=Um_MOaTT=kEvYSA=rTq8w9w39iuKaDgHedSo5ck9JPqw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 10 Oct 2017 09:23:25 +0900
-Message-ID: <CAK7LNARBy5JSNPZf6k+O6sMA=Wd6-Sd0Hdk1rDvT2AbT22DBWA@mail.gmail.com>
+ <1507089367-10402-4-git-send-email-yamada.masahiro@socionext.com>
+ <CAD=FV=Um_MOaTT=kEvYSA=rTq8w9w39iuKaDgHedSo5ck9JPqw@mail.gmail.com> <CAK7LNARBy5JSNPZf6k+O6sMA=Wd6-Sd0Hdk1rDvT2AbT22DBWA@mail.gmail.com>
+From: Doug Anderson <dianders@chromium.org>
+Date: Mon, 9 Oct 2017 17:27:14 -0700
+Message-ID: <CAD=FV=U0eHcZ3aZwEN-i5eOQg5gdGcrs+cnC0XEpo1xrfmkKLg@mail.gmail.com>
 Subject: Re: [RFC PATCH 4/4] kbuild: evaluate cc-option and friends only when
  building kernel
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Doug Anderson <dianders@chromium.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-2017-10-10 7:04 GMT+09:00 Doug Anderson <dianders@chromium.org>:
-> Hi,
->
-> On Tue, Oct 3, 2017 at 8:56 PM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
->> index 9ffd3dd..222d0a2 100644
->> --- a/scripts/Kbuild.include
->> +++ b/scripts/Kbuild.include
->> @@ -96,6 +96,13 @@ try-run = $(shell set -e;            \
->>         fi;                             \
->>         rm -f "$$TMP" "$$TMPO")
->>
->> +# hostcc-option
->> +# Usage: cflags-y += $(call hostcc-option,-march=winchip-c6,-march=i586)
->> +hostcc-option = $(call __cc-option, $(HOSTCC),\
->> +       $(HOSTCFLAGS) $(HOST_EXTRACFLAGS),$(1),$(2))
->
-> I believe you've got a bug here.  You're calling "__cc-option" which
-> isn't defined if "need-compiler" is not 1, right?
+Hi,
 
-
-Good catch!
-
-
->> +
->> +ifeq ($(need-compiler),1)
+On Mon, Oct 9, 2017 at 5:23 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> I am still wondering if I should apply this one
+> because your cache approach provides much more benefits.
 >
-> The way this patch works is a bit non-obvious I think.  I wonder if
-> anyone else will be confused like I am...
->
-> Basically if "need-compiler" is not 1 then things like "cc-option"
-> won't be defined at all.  ...but we'll still _call_ them in other
-> Makefiles.  This call of an undefined variable will just evaluate to
-> an empty string.  Thus, for instance:
->
-> CFLAGS_KCOV := $(call cc-option,-fsanitize-coverage=trace-pc,)
->
-> ...will just set CFLAGS_KCOV to the empty string if "need-compiler"
-> isn't 1, right?
+> (that is why I prefixed this 4/4 with RFC.)
 >
 >
-> I guess that's fine, but maybe at least document it somewhere?  IMHO
-> it would be even better if somehow you still defined each of these to
-> something bogus in an else clause, like:
->
-> as-option = --err_noncompile_target
-> as-instr = --err_noncompile_target
-> cc-option = --err_noncompile_target
-> ...
-> ...
->
-> The idea being that if someone accidentally invoked the C compiler (or
-> if there was some other conditional code in the Makefile based on the
-> result of one of these functions) it would be obvious what was going
-> on.
+> Maybe I will send v2, or maybe not.
 
+I'm not sure I have a strong opinion either way.  In general your idea
+makes a lot of sense--no need to do extra work if you don't need to.
+It's all a question of how clean / maintainable it will be I guess.
 
-Make sense.  Thanks for your idea!
-
-
-
-I am still wondering if I should apply this one
-because your cache approach provides much more benefits.
-
-(that is why I prefixed this 4/4 with RFC.)
-
-
-Maybe I will send v2, or maybe not.
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+-Doug
