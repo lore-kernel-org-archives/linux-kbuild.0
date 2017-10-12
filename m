@@ -1,67 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:25465 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:26495 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750722AbdJLJ46 (ORCPT
+        with ESMTP id S1750907AbdJLJ5d (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Oct 2017 05:56:58 -0400
+        Thu, 12 Oct 2017 05:57:33 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] kbuild: redefine __FILE__ as relative path from $(srctree) if possible
-Date: Thu, 12 Oct 2017 18:56:04 +0900
-Message-Id: <1507802164-31614-3-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1507802164-31614-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1507802164-31614-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 0/2] kbuild: use relative path from $(srctree) instead of __FILE__
+Date: Thu, 12 Oct 2017 18:56:02 +0900
+Message-Id: <1507802164-31614-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Joe Perches <joe@perches.com>, Tom Rini <trini@konsulko.com>, Geert Uytterhoeven <geert+renesas@glider.be>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Joe Perches <joe@perches.com>, Tom Rini <trini@konsulko.com>, Geert Uytterhoeven <geert+renesas@glider.be>, Masahiro Yamada <yamada.masahiro@socionext.com>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, James Hogan <jhogan@kernel.org>, linux-kernel@vger.kernel.org, =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>, Michal Marek <michal.lkml@markovi.net>, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>, Mark Charlebois <charlebm@gmail.com>
 
-Since Kbuild runs in the objtree, __FILE__ can be a very long path
-depending of $(srctree).
 
-Commit 9da0763bdd82 ("kbuild: Use relative path when building in a
-subdir of the source tree") made the situation better for cases where
-objtree is a child of srctree.  ($(srctree) is "..")
+Kbuild works in objtree, not in srctree.  So, __FILE__ is prefixed
+with $(srctree)/ for out-of-tree build.
 
-For other cases of out-of-tree build, filenames in WARN_ON() etc. are
-still an absolute path.  It also means the kernel image depends on
-where it was built.
+For example, WARN_ON() will look as follows if you built your kernel
+out of source tree:
 
-Here, the idea is to redefine __FILE__ as the relative path from
-$(srctree), but doing so causes a compiler warning:
-  warning: "__FILE__" redefined [-Wbuiltin-macro-redefined]
+WARNING: CPU: 1 PID: 1 at /path/to/build/directory/arch/arm64/kernel/foo.c:...
 
-The option -Wno-builtin-macro-redefined can suppress it, but it is
-only recognized by GCC 4.4 or newer.  Re-define __FILE__ only when
-possible.
+With this series, it will always look like follows regardless of O= option.
 
-Please note __FILE__ is always an absolute path for external modules.
+WARNING: CPU: 1 PID: 1 at arch/arm64/kernel/foo.c:...
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+If GCC does not support -Wno-builtin-macro-redefined (i.e. gcc version < 4.4),
+the output is prefixed with absolute path.
 
- Makefile | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 2c4a238..a3e8931 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1091,6 +1091,15 @@ ifdef stackp-check
- endif
- 	@:
- 
-+# If possible, redefne __FILE__ as relative path from $(srctree).
-+# $$ is needed to expand the following in submake
-+ifeq ($(call cc-option-yn,-Wno-builtin-macro-redefined),y)
-+KBUILD_CFLAGS   += -Wno-builtin-macro-redefined \
-+		   -D__FILE__=$$(call stringify,$$(src)/$$(notdir $$<))
-+endif
-+# CAUTION: Do not add any reference to KBUILD_CFLAGS below this line.
-+# Any call of cc-option, etc. will fail.
-+
- # Generate some files
- # ---------------------------------------------------------------------------
- 
+
+Masahiro Yamada (2):
+  kbuild: add stringify helper to quote a string passed to C files
+  kbuild: redefine __FILE__ as relative path from $(srctree) if possible
+
+ Makefile               | 9 +++++++++
+ scripts/Kbuild.include | 4 ++++
+ scripts/Makefile.lib   | 2 +-
+ 3 files changed, 14 insertions(+), 1 deletion(-)
+
 -- 
 2.7.4
 
