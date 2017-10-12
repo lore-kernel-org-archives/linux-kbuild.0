@@ -1,72 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:3840 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751302AbdJLF6S (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:49843 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752665AbdJLJYE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Oct 2017 01:58:18 -0400
-Subject: Re: [PATCH] kbuild: remove KBUILD_SUBDIR_ASFLAGS and
- KBUILD_SUBDIR_CCFLAGS
-References: <1507635801-30561-1-git-send-email-yamada.masahiro@socionext.com>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <59DF0446.6000707@cn.fujitsu.com>
-Date: Thu, 12 Oct 2017 13:57:26 +0800
-MIME-Version: 1.0
-In-Reply-To: <1507635801-30561-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+        Thu, 12 Oct 2017 05:24:04 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: do not call cc-option before KBUILD_CFLAGS initialization
+Date: Thu, 12 Oct 2017 18:22:25 +0900
+Message-Id: <1507800145-29563-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
+Some $(call cc-option,...) are invoked very early, even before
+KBUILD_CFLAGS, etc. are initialized.
 
+The returned string from $(call cc-option,...) depends on
+KBUILD_CPPFLAGS, KBUILD_CFLAGS, and GCC_PLUGINS_CFLAGS.
 
-On 10/10/2017 07:43 PM, Masahiro Yamada wrote:
-> Accumulate subdir-{cc,as}flags-y directly to KBUILD_{A,C}FLAGS.
-> Remove KBUILD_SUBDIR_{AS,CC}FLAGS.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
->  scripts/Makefile.lib | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 9bbb019..bc63f17a 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -5,8 +5,8 @@ cppflags-y += $(EXTRA_CPPFLAGS)
->  ldflags-y  += $(EXTRA_LDFLAGS)
->  
->  # flags that take effect in current and sub directories
-> -export KBUILD_SUBDIR_ASFLAGS := $(KBUILD_SUBDIR_ASFLAGS) $(subdir-asflags-y)
-> -export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
-> +KBUILD_AFLAGS += $(subdir-asflags-y)
-> +KBUILD_CFLAGS += $(subdir-ccflags-y)
->  
->  # Figure out what we need to build from the various variables
->  # ===========================================================================
-> @@ -94,10 +94,10 @@ basename_flags = -DKBUILD_BASENAME=$(call name-fix,$(basetarget))
->  modname_flags  = $(if $(filter 1,$(words $(modname))),\
->                   -DKBUILD_MODNAME=$(call name-fix,$(modname)))
->  
-> -orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(KBUILD_SUBDIR_CCFLAGS) \
-> +orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) \
->                   $(ccflags-y) $(CFLAGS_$(basetarget).o)
->  _c_flags       = $(filter-out $(CFLAGS_REMOVE_$(basetarget).o), $(orig_c_flags))
-> -orig_a_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) $(KBUILD_SUBDIR_ASFLAGS) \
-> +orig_a_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) \
->                   $(asflags-y) $(AFLAGS_$(basetarget).o)
->  _a_flags       = $(filter-out $(AFLAGS_REMOVE_$(basetarget).o), $(orig_a_flags))
->  _cpp_flags     = $(KBUILD_CPPFLAGS) $(cppflags-y) $(CPPFLAGS_$(@F))
-> 
+Since they are exported, they are not empty when the top Makefile
+is recursively invoked.
 
-I also think the KBUILD_SUBDIR_{AS,CC}FLAGS is unnecessary when I came
-to this part. So FWIW:
+The recursion occurs in several places.  For example, the top
+Makefile invokes itself for silentoldconfig.  "make tinyconfig",
+"make rpm-pkg" are the cases, too.
 
-Reviewed-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+In those cases, the second call of cc-option from the same line
+runs a different shell command due to non-pristine KBUILD_CFLAGS.
+
+To get the same result all the time, KBUILD_* and GCC_PLUGINS_CFLAGS
+must be initialized before any call of cc-option.  This avoids
+garbage data in the .cache.mk file.
+
+Move all calls of cc-option below the config targets because target
+compiler flags are unnecessary for Kconfig.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Makefile | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index e5c20ee..2c4a238 100644
+--- a/Makefile
++++ b/Makefile
+@@ -392,9 +392,6 @@ LDFLAGS_MODULE  =
+ CFLAGS_KERNEL	=
+ AFLAGS_KERNEL	=
+ LDFLAGS_vmlinux =
+-CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage -fno-tree-loop-im $(call cc-disable-warning,maybe-uninitialized,)
+-CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
+-
+ 
+ # Use USERINCLUDE when you must reference the UAPI directories only.
+ USERINCLUDE    := \
+@@ -413,21 +410,19 @@ LINUXINCLUDE    := \
+ 		-I$(objtree)/include \
+ 		$(USERINCLUDE)
+ 
+-KBUILD_CPPFLAGS := -D__KERNEL__
+-
++KBUILD_AFLAGS   := -D__ASSEMBLY__
+ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+ 		   -fno-strict-aliasing -fno-common -fshort-wchar \
+ 		   -Werror-implicit-function-declaration \
+ 		   -Wno-format-security \
+-		   -std=gnu89 $(call cc-option,-fno-PIE)
+-
+-
++		   -std=gnu89
++KBUILD_CPPFLAGS := -D__KERNEL__
+ KBUILD_AFLAGS_KERNEL :=
+ KBUILD_CFLAGS_KERNEL :=
+-KBUILD_AFLAGS   := -D__ASSEMBLY__ $(call cc-option,-fno-PIE)
+ KBUILD_AFLAGS_MODULE  := -DMODULE
+ KBUILD_CFLAGS_MODULE  := -DMODULE
+ KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
++GCC_PLUGINS_CFLAGS :=
+ 
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
+@@ -435,7 +430,7 @@ export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
+ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+ 
+ export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
+-export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_GCOV CFLAGS_KCOV CFLAGS_KASAN CFLAGS_UBSAN
++export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_KASAN CFLAGS_UBSAN
+ export KBUILD_AFLAGS AFLAGS_KERNEL AFLAGS_MODULE
+ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
+ export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
+@@ -607,6 +602,12 @@ endif
+ # Defaults to vmlinux, but the arch makefile usually adds further targets
+ all: vmlinux
+ 
++KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
++KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
++CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage -fno-tree-loop-im $(call cc-disable-warning,maybe-uninitialized,)
++CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
++export CFLAGS_GCOV CFLAGS_KCOV
++
+ # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
+ # values of the respective KBUILD_* variables
+ ARCH_CPPFLAGS :=
 -- 
-Sincerely,
-Cao jin
-
+2.7.4
 
