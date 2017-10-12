@@ -1,109 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:49843 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752665AbdJLJYE (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:35352 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756573AbdJLJcL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Oct 2017 05:24:04 -0400
+        Thu, 12 Oct 2017 05:32:11 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: do not call cc-option before KBUILD_CFLAGS initialization
-Date: Thu, 12 Oct 2017 18:22:25 +0900
-Message-Id: <1507800145-29563-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: shrink Makefile cache when it exceeds 1000 lines
+Date: Thu, 12 Oct 2017 18:29:29 +0900
+Message-Id: <1507800569-30134-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, linux-kernel@vger.kernel.org, =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>
 
-Some $(call cc-option,...) are invoked very early, even before
-KBUILD_CFLAGS, etc. are initialized.
+The cache files are only cleaned away by "make clean".  If you continue
+incremental builds, the cache files will grow up little by little.
+It is not a big deal in general use cases because $(call cc-option,...)
+in not added/deleted quite often.
 
-The returned string from $(call cc-option,...) depends on
-KBUILD_CPPFLAGS, KBUILD_CFLAGS, and GCC_PLUGINS_CFLAGS.
+However, if you do build-test for various architectures, compilers, and
+kernel configurations, you will end up with huge cache files soon.
 
-Since they are exported, they are not empty when the top Makefile
-is recursively invoked.
-
-The recursion occurs in several places.  For example, the top
-Makefile invokes itself for silentoldconfig.  "make tinyconfig",
-"make rpm-pkg" are the cases, too.
-
-In those cases, the second call of cc-option from the same line
-runs a different shell command due to non-pristine KBUILD_CFLAGS.
-
-To get the same result all the time, KBUILD_* and GCC_PLUGINS_CFLAGS
-must be initialized before any call of cc-option.  This avoids
-garbage data in the .cache.mk file.
-
-Move all calls of cc-option below the config targets because target
-compiler flags are unnecessary for Kconfig.
+The simple idea is to cut down the cache when it exceeds a certain
+limit.  I wrote a simple method to check if nr_cache >= 1000.
+If it is, shrink it by "tail -500".  This is not LRU strategy, but I
+hope it will work well enough.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+If you have a better idea, please suggest it!
 
-diff --git a/Makefile b/Makefile
-index e5c20ee..2c4a238 100644
---- a/Makefile
-+++ b/Makefile
-@@ -392,9 +392,6 @@ LDFLAGS_MODULE  =
- CFLAGS_KERNEL	=
- AFLAGS_KERNEL	=
- LDFLAGS_vmlinux =
--CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage -fno-tree-loop-im $(call cc-disable-warning,maybe-uninitialized,)
--CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
--
+
+ scripts/Kbuild.include | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 4203fff..db81df3 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -99,9 +99,30 @@ cc-cross-prefix =  \
  
- # Use USERINCLUDE when you must reference the UAPI directories only.
- USERINCLUDE    := \
-@@ -413,21 +410,19 @@ LINUXINCLUDE    := \
- 		-I$(objtree)/include \
- 		$(USERINCLUDE)
+ # Include values from last time
+ make-cache := $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/,$(if $(obj),$(obj)/)).cache.mk
+-$(make-cache): ;
+ -include $(make-cache)
  
--KBUILD_CPPFLAGS := -D__KERNEL__
--
-+KBUILD_AFLAGS   := -D__ASSEMBLY__
- KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
- 		   -fno-strict-aliasing -fno-common -fshort-wchar \
- 		   -Werror-implicit-function-declaration \
- 		   -Wno-format-security \
--		   -std=gnu89 $(call cc-option,-fno-PIE)
--
--
-+		   -std=gnu89
-+KBUILD_CPPFLAGS := -D__KERNEL__
- KBUILD_AFLAGS_KERNEL :=
- KBUILD_CFLAGS_KERNEL :=
--KBUILD_AFLAGS   := -D__ASSEMBLY__ $(call cc-option,-fno-PIE)
- KBUILD_AFLAGS_MODULE  := -DMODULE
- KBUILD_CFLAGS_MODULE  := -DMODULE
- KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
-+GCC_PLUGINS_CFLAGS :=
- 
- export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
- export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
-@@ -435,7 +430,7 @@ export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
- export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
- 
- export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
--export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_GCOV CFLAGS_KCOV CFLAGS_KASAN CFLAGS_UBSAN
-+export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_KASAN CFLAGS_UBSAN
- export KBUILD_AFLAGS AFLAGS_KERNEL AFLAGS_MODULE
- export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
- export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
-@@ -607,6 +602,12 @@ endif
- # Defaults to vmlinux, but the arch makefile usually adds further targets
- all: vmlinux
- 
-+KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
-+KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
-+CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage -fno-tree-loop-im $(call cc-disable-warning,maybe-uninitialized,)
-+CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
-+export CFLAGS_GCOV CFLAGS_KCOV
++nr_cache := $(words $(filter __cached_%, $(.VARIABLES)))
 +
- # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
- # values of the respective KBUILD_* variables
- ARCH_CPPFLAGS :=
++# Strip the last digit.  Covert as follows:
++#    0   ->
++#    123 -> 12
++strip_last_digit = $(filter-out $1,$(firstword \
++		$(sort $(foreach i,0 1 2 3 4 5 6 7 8 9,$(patsubst %$i,%,$1)))))
++
++# If cache exceeds 1000 lines, shrink it down to 500.  The Least Recently Added
++# lines are deleted. (not Least Recently Used, unfortunately)
++#
++# Evalucate [ ${nr_cache} -ge 1000 ] without relying on external tools.
++# Check if nr_cache is not empty even after the last three digits are stripped.
++ifneq ($(call strip_last_digit,$(call strip_last_digit,$(call strip_last_digit,$(nr_cache)))),)
++.PHONY: $(make-cache)
++$(make-cache):
++	tail -500 $@ > $@.tmp
++	mv $@.tmp $@
++else
++$(make-cache): ;
++endif
++
+ # Usage: $(call __sanitize-opt,Hello=Hola$(comma)Goodbye Adios)
+ #
+ # Convert all '$', ')', '(', '\', '=', ' ', ',', ':' to '_'
 -- 
 2.7.4
 
