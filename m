@@ -1,55 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:56144 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753140AbdJMXJA (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:25345 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751172AbdJNDRt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:09:00 -0400
-Subject: Re: [PATCH v4 2/2] of: Add unit tests for applying overlays
-References: <1493165394-29367-1-git-send-email-frowand.list@gmail.com>
- <1493165394-29367-3-git-send-email-frowand.list@gmail.com>
- <CAL_JsqKZ5JcunaY9K5MEjyS-sxargKtJq11x+DVMwHs8WrnH+Q@mail.gmail.com>
-From: Frank Rowand <frowand.list@gmail.com>
-Message-ID: <59E1477D.6060700@gmail.com>
-Date: Fri, 13 Oct 2017 16:08:45 -0700
+        Fri, 13 Oct 2017 23:17:49 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAL_JsqKZ5JcunaY9K5MEjyS-sxargKtJq11x+DVMwHs8WrnH+Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1507802164-31614-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1507802164-31614-1-git-send-email-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 14 Oct 2017 12:17:01 +0900
+Message-ID: <CAK7LNARN_Ofzog5J1XWoW3dB6_m2wfVuFPYjvFkfdb0pnBR9gA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] kbuild: use relative path from $(srctree) instead of __FILE__
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>
-Cc: Stephen Boyd <stephen.boyd@linaro.org>, Michal Marek <mmarek@suse.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Joe Perches <joe@perches.com>, Tom Rini <trini@konsulko.com>, Geert Uytterhoeven <geert+renesas@glider.be>, Masahiro Yamada <yamada.masahiro@socionext.com>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, James Hogan <jhogan@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Jan=2DSimon_M=C3=B6ller?= <dl9pf@gmx.de>, Michal Marek <michal.lkml@markovi.net>, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>, Mark Charlebois <charlebm@gmail.com>
 
-Hi Rob,
+2017-10-12 18:56 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+>
+> Kbuild works in objtree, not in srctree.  So, __FILE__ is prefixed
+> with $(srctree)/ for out-of-tree build.
+>
+> For example, WARN_ON() will look as follows if you built your kernel
+> out of source tree:
+>
+> WARNING: CPU: 1 PID: 1 at /path/to/build/directory/arch/arm64/kernel/foo.c:...
+>
+> With this series, it will always look like follows regardless of O= option.
+>
+> WARNING: CPU: 1 PID: 1 at arch/arm64/kernel/foo.c:...
+>
+> If GCC does not support -Wno-builtin-macro-redefined (i.e. gcc version < 4.4),
+> the output is prefixed with absolute path.
+>
 
-On 07/25/17 13:36, Rob Herring wrote:
-> On Tue, Apr 25, 2017 at 7:09 PM,  <frowand.list@gmail.com> wrote:
->> From: Frank Rowand <frank.rowand@sony.com>
->>
->> Existing overlay unit tests examine individual pieces of the overlay
->> code.  The new tests target the entire process of applying an overlay.
->>
->> Signed-off-by: Frank Rowand <frank.rowand@sony.com>
->> ---
-> 
-> [...]
-> 
->> @@ -1261,6 +1263,8 @@ void __init unflatten_device_tree(void)
->>
->>         /* Get pointer to "/chosen" and "/aliases" nodes for use everywhere */
->>         of_alias_scan(early_init_dt_alloc_memory_arch);
->> +
->> +       unittest_unflatten_overlay_base();
-> 
-> This breaks on systems that don't boot with FDT and call
-> unflatten_device_tree, namely x86 and UML (UML needs a few hacks to
-> work) which was a feature of the unittest. Considering applying
-> overlays on x86 is something we'll want to support, the unittest
-> should support that case.
-> 
-> Rob
+I expect to replace __FILE__ with its relative path,
+but actually it replaces __FILE__ with relative path of __BASE_FILE__.
+This will change the behavior in several places.
 
-What is the symptom of the breakage?  Or what is causing breakage?
+I take back this series.
 
--Frank
 
+-- 
+Best Regards
+Masahiro Yamada
