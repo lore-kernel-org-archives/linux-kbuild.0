@@ -1,52 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:57213 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750704AbdJOHsD (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:40806 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750836AbdJOHs5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 15 Oct 2017 03:48:03 -0400
+        Sun, 15 Oct 2017 03:48:57 -0400
 MIME-Version: 1.0
-In-Reply-To: <1507559715-30918-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1507559715-30918-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1507635801-30561-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1507635801-30561-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 15 Oct 2017 16:47:16 +0900
-Message-ID: <CAK7LNATsU=tfgDJ6KjmqK7DwcKRL3DrvOPhP9Umn81zRKEO73g@mail.gmail.com>
-Subject: Re: [PATCH 0/3] ARM, hexagon, c6x: build: fix usage of CFLAGS_MODULE, LDFLAGS_MODULE
+Date: Sun, 15 Oct 2017 16:48:11 +0900
+Message-ID: <CAK7LNARNdwLfhGHJm7=EHbkffv1OGWXFCqADC_RL-sCX96P1PQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: remove KBUILD_SUBDIR_ASFLAGS and KBUILD_SUBDIR_CCFLAGS
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-c6x-dev@linux-c6x.org, linux-hexagon@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Mark Salter <msalter@redhat.com>, Aurelien Jacquiot <jacquiot.aurelien@gmail.com>, Richard Kuo <rkuo@codeaurora.org>, Russell King <linux@armlinux.org.uk>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-10-09 23:35 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> CFLAGS_MODULE, AFLAGS_MODULE, and LDFLAGS_MODULE are supposed
-> to be set by users.
+2017-10-10 20:43 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> Accumulate subdir-{cc,as}flags-y directly to KBUILD_{A,C}FLAGS.
+> Remove KBUILD_SUBDIR_{AS,CC}FLAGS.
 >
-> In-kernel Makefile must use KBUILD_ prefixed variables.
->
-> This is explained in Documentation/kbuild/{kbuild.txt, makefiles.txt}
->
-> Most of architectures follow the rule, but I found violations
-> in ARM, hexagone, and c6x.
->
-> Fix them.
->
->
->
-> Masahiro Yamada (3):
->   ARM: add KBUILD_ prefix to CFLAGS_MODULE, LDFLAGS_MODULE
->   hexagon: add KBUILD_ prefix to CFLAGS_MODULE, LDFLAGS_MODULE
->   c6x: add KBUILD_ prefix to CFLAGS_MODULE
->
->  arch/arm/Makefile     | 6 +++---
->  arch/c6x/Makefile     | 2 +-
->  arch/hexagon/Makefile | 6 +++---
->  3 files changed, 7 insertions(+), 7 deletions(-)
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 >
 
-Series, applied to linux-kbuild/kbuild.
+Applied to linux-kbuild/kbuild.
 
-
-
--- 
 Best Regards
 Masahiro Yamada
