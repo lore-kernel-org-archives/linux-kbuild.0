@@ -1,59 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:57166 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752141AbdJPNfv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Oct 2017 09:35:51 -0400
-Date: Mon, 16 Oct 2017 14:35:31 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 0/4] Cleanup instrumentation avoidance
-Message-ID: <20171016133530.fhspouznccpprjc6@lakrids.cambridge.arm.com>
-References: <20171016132440.38098-1-mark.rutland@arm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171016132440.38098-1-mark.rutland@arm.com>
+Received: from mail-it0-f43.google.com ([209.85.214.43]:52032 "EHLO
+        mail-it0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754565AbdJPRNq (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 16 Oct 2017 13:13:46 -0400
+Received: by mail-it0-f43.google.com with SMTP id o135so2012513itb.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 16 Oct 2017 10:13:45 -0700 (PDT)
+From: Douglas Anderson <dianders@chromium.org>
+Subject: [PATCH v4 2/2] kbuild: Cache a few more calls to the compiler
+Date: Mon, 16 Oct 2017 10:12:46 -0700
+Message-Id: <20171016171246.15712-3-dianders@chromium.org>
+In-Reply-To: <20171016171246.15712-1-dianders@chromium.org>
+References: <20171016171246.15712-1-dianders@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com
-Cc: linux-kernel@vger.kernel.org, adech.fo@gmail.com, aryabinin@virtuozzo.com, catalin.marinas@arm.com, christoffer.dall@linaro.org, dvyukov@google.com, linux-kbuild@vger.kernel.org, will.deacon@arm.com, yamada.masahiro@socionext.com
+To: yamada.masahiro@socionext.com
+Cc: groeck@chromium.org, sjg@chromium.org, briannorris@chromium.org, mingo@kernel.org, Douglas Anderson <dianders@chromium.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Sorry Marc, I somehow typo'd your name when sending this out...
+These are a few stragglers that I left out of the original patch to
+cache calls to the C compiler ("kbuild: Add a cache for generated
+variables") because they bleed out into the main Makefile and thus
+uglify things a little bit.  The idea is the same here, though.
 
-Mark.
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Tested-by: Ingo Molnar <mingo@kernel.org>
+Tested-by: Guenter Roeck <linux@roeck-us.net>
+---
 
-On Mon, Oct 16, 2017 at 02:24:36PM +0100, Mark Rutland wrote:
-> Recently we spotted that some code with special ABI requirements was
-> being instrumented by KCOV [1], and we need to avoid all instrumentation
-> in this case.
-> 
-> While it's possible to disable each instrumentation option manually,
-> this is tedious and error prone as new options are introduced.
-> 
-> This series adds a new CC_INSTRUMENT option which can be used to disable
-> all instrumentation of a given file or directory, and makes use of this
-> throught arm64.
-> 
-> There are other places where this could be used (e.g. the EFI stub), but
-> I've avoided altering those for now in the hope that this can be taken
-> via the arm64 tree.
-> 
-> Thanks,
-> Mark.
-> 
-> [1] http://lists.infradead.org/pipermail/linux-arm-kernel/2017-September/533105.html
-> 
-> Mark Rutland (4):
->   kbuild: allow global override of CC instrumentation
->   arm64: prevent instrumentation of LL/SC atomics
->   kvm/arm64: simplify CC instrumentation opt-out
->   arm64: vdso: remove pointless gcov option
-> 
->  arch/arm64/kernel/vdso/Makefile |  3 ---
->  arch/arm64/kvm/hyp/Makefile     |  5 +----
->  arch/arm64/lib/Makefile         |  1 +
->  scripts/Makefile.lib            | 17 +++++++++++++----
->  4 files changed, 15 insertions(+), 11 deletions(-)
-> 
-> -- 
-> 2.11.0
-> 
+Changes in v4: None
+Changes in v3:
+- Add Tested-by for Ingo and Guenter since v2 and v3 are very similar
+
+Changes in v2:
+- Abstract at a different level (like shell-cached) per Masahiro Yamada
+
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a2d715d7a327..5c82cca84d29 100644
+--- a/Makefile
++++ b/Makefile
+@@ -638,7 +638,7 @@ KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
+ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+ 
+ # check for 'asm goto'
+-ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
++ifeq ($(call shell-cached,$(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
+ 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
+ 	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
+ endif
+@@ -774,7 +774,7 @@ KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
+ endif
+ 
+ # arch Makefile may override CC so keep this after arch Makefile is included
+-NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
++NOSTDINC_FLAGS += -nostdinc -isystem $(call shell-cached,$(CC) -print-file-name=include)
+ CHECKFLAGS     += $(NOSTDINC_FLAGS)
+ 
+ # warn about C99 declaration after statement
+-- 
+2.15.0.rc0.271.g36b669edcc-goog
+
