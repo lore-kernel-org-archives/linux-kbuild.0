@@ -1,64 +1,288 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f43.google.com ([209.85.214.43]:52032 "EHLO
-        mail-it0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754565AbdJPRNq (ORCPT
+Received: from mail-it0-f46.google.com ([209.85.214.46]:43043 "EHLO
+        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753800AbdJPRNp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Oct 2017 13:13:46 -0400
-Received: by mail-it0-f43.google.com with SMTP id o135so2012513itb.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 16 Oct 2017 10:13:45 -0700 (PDT)
+        Mon, 16 Oct 2017 13:13:45 -0400
+Received: by mail-it0-f46.google.com with SMTP id k70so3490742itk.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 16 Oct 2017 10:13:44 -0700 (PDT)
 From: Douglas Anderson <dianders@chromium.org>
-Subject: [PATCH v4 2/2] kbuild: Cache a few more calls to the compiler
-Date: Mon, 16 Oct 2017 10:12:46 -0700
-Message-Id: <20171016171246.15712-3-dianders@chromium.org>
+Subject: [PATCH v4 1/2] kbuild: Add a cache for generated variables
+Date: Mon, 16 Oct 2017 10:12:45 -0700
+Message-Id: <20171016171246.15712-2-dianders@chromium.org>
 In-Reply-To: <20171016171246.15712-1-dianders@chromium.org>
 References: <20171016171246.15712-1-dianders@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: yamada.masahiro@socionext.com
-Cc: groeck@chromium.org, sjg@chromium.org, briannorris@chromium.org, mingo@kernel.org, Douglas Anderson <dianders@chromium.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: groeck@chromium.org, sjg@chromium.org, briannorris@chromium.org, mingo@kernel.org, Douglas Anderson <dianders@chromium.org>, Matthias Kaehlcke <mka@chromium.org>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>
 
-These are a few stragglers that I left out of the original patch to
-cache calls to the C compiler ("kbuild: Add a cache for generated
-variables") because they bleed out into the main Makefile and thus
-uglify things a little bit.  The idea is the same here, though.
+While timing a "no-op" build of the kernel (incrementally building the
+kernel even though nothing changed) in the Chrome OS build system I
+found that it was much slower than I expected.
+
+Digging into things a bit, I found that quite a bit of the time was
+spent invoking the C compiler even though we weren't actually building
+anything.  Currently in the Chrome OS build system the C compiler is
+called through a number of wrappers (one of which is written in
+python!) and can take upwards of 100 ms to invoke even if we're not
+doing anything difficult, so these invocations of the compiler were
+taking a lot of time.  Worse the invocations couldn't seem to take
+advantage of the multiple cores on my system.
+
+Certainly it seems like we could make the compiler invocations in the
+Chrome OS build system faster, but only to a point.  Inherently
+invoking a program as big as a C compiler is a fairly heavy
+operation.  Thus even if we can speed the compiler calls it made sense
+to track down what was happening.
+
+It turned out that all the compiler invocations were coming from
+usages like this in the kernel's Makefile:
+
+KBUILD_CFLAGS += $(call cc-option,-fno-delete-null-pointer-checks,)
+
+Due to the way cc-option and similar statements work the above
+contains an implicit call to the C compiler.  ...and due to the fact
+that we're storing the result in KBUILD_CFLAGS, a simply expanded
+variable, the call will happen every time the Makefile is parsed, even
+if there are no users of KBUILD_CFLAGS.
+
+Rather than redoing this computation every time, it makes a lot of
+sense to cache the result of all of the Makefile's compiler calls just
+like we do when we compile a ".c" file to a ".o" file.  Conceptually
+this is quite a simple idea.  ...and since the calls to invoke the
+compiler and similar tools are centrally located in the Kbuild.include
+file this doesn't even need to be super invasive.
+
+Implementing the cache in a simple-to-use and efficient way is not
+quite as simple as it first sounds, though.  To get maximum speed we
+really want the cache in a format that make can natively understand
+and make doesn't really have an ability to load/parse files. ...but
+make _can_ import other Makefiles, so the solution is to store the
+cache in Makefile format.  This requires coming up with a valid/unique
+Makefile variable name for each value to be cached, but that's
+solvable with some cleverness.
+
+After this change, we'll automatically create a ".cache.mk" file that
+will contain our cached variables.  We'll load this on each invocation
+of make and will avoid recomputing anything that's already in our
+cache.  The cache is stored in a format that it shouldn't need any
+invalidation since anything that might change should affect the "key"
+and any old cached value won't be used.
+
+NOTE: This change requires commit fa9acf703d64 ("kbuild: add forward
+declaration of default target to Makefile.asm-generic") for
+correctness.
 
 Signed-off-by: Douglas Anderson <dianders@chromium.org>
 Tested-by: Ingo Molnar <mingo@kernel.org>
 Tested-by: Guenter Roeck <linux@roeck-us.net>
 ---
 
-Changes in v4: None
+Changes in v4:
+- Add a mkdir
+- Point to forward declaration commit by git hash
+
 Changes in v3:
+- Rule to prevent make from trying to generate the cache
+- Rule to clean .cache.mk
+- No more doc changes
+- Moved cache stuff below cc-cross-prefix
+- Removed duplicate documentation of try-run (oops)
 - Add Tested-by for Ingo and Guenter since v2 and v3 are very similar
 
 Changes in v2:
 - Abstract at a different level (like shell-cached) per Masahiro Yamada
+- Include ld-version, which I missed the first time
 
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ Makefile               |  1 +
+ scripts/Kbuild.include | 90 ++++++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 77 insertions(+), 14 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index a2d715d7a327..5c82cca84d29 100644
+index 04c4191952e0..a2d715d7a327 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -638,7 +638,7 @@ KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
- KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+@@ -1545,6 +1545,7 @@ clean: $(clean-dirs)
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+ 		-o -name '*.symtypes' -o -name 'modules.order' \
+ 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
++		-o -name .cache.mk \
+ 		-o -name '*.c.[012]*.*' \
+ 		-o -name '*.ll' \
+ 		-o -name '*.gcno' \) -type f -print | xargs rm -f
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 9ffd3dda3889..dfadb1c94368 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -8,6 +8,8 @@ squote  := '
+ empty   :=
+ space   := $(empty) $(empty)
+ space_escape := _-_SPACE_-_
++right_paren := )
++left_paren := (
  
- # check for 'asm goto'
--ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
-+ifeq ($(call shell-cached,$(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
- 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
- 	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
- endif
-@@ -774,7 +774,7 @@ KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
- endif
+ ###
+ # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
+@@ -80,6 +82,60 @@ cc-cross-prefix =  \
+ 			echo $(c);                                    \
+ 		fi)))
  
- # arch Makefile may override CC so keep this after arch Makefile is included
--NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
-+NOSTDINC_FLAGS += -nostdinc -isystem $(call shell-cached,$(CC) -print-file-name=include)
- CHECKFLAGS     += $(NOSTDINC_FLAGS)
++# Tools for caching Makefile variables that are "expensive" to compute.
++#
++# Here we want to help deal with variables that take a long time to compute
++# by making it easy to store these variables in a cache.
++#
++# The canonical example here is testing for compiler flags.  On a simple system
++# each call to the compiler takes 10 ms, but on a system with a compiler that's
++# called through various wrappers it can take upwards of 100 ms.  If we have
++# 100 calls to the compiler this can take 1 second (on a simple system) or 10
++# seconds (on a complicated system).
++#
++# The "cache" will be in Makefile syntax and can be directly included.
++# Any time we try to reference a variable that's not in the cache we'll
++# calculate it and store it in the cache for next time.
++
++# Include values from last time
++make-cache := $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/,$(if $(obj),$(obj)/)).cache.mk
++ifeq ($(wildcard $(dir $(make-cache))),)
++$(shell mkdir -p '$(dir $(make-cache))')
++endif
++$(make-cache): ;
++-include $(make-cache)
++
++# Usage: $(call __sanitize-opt,Hello=Hola$(comma)Goodbye Adios)
++#
++# Convert all '$', ')', '(', '\', '=', ' ', ',', ':' to '_'
++__sanitize-opt = $(subst $$,_,$(subst $(right_paren),_,$(subst $(left_paren),_,$(subst \,_,$(subst =,_,$(subst $(space),_,$(subst $(comma),_,$(subst :,_,$(1)))))))))
++
++# Usage:   $(call shell-cached,shell_command)
++# Example: $(call shell-cached,md5sum /usr/bin/gcc)
++#
++# If we've already seen a call to this exact shell command (even in a
++# previous invocation of make!) we'll return the value.  If not, we'll
++# compute it and store the result for future runs.
++#
++# This is a bit of voodoo, but basic explanation is that if the variable
++# was undefined then we'll evaluate the shell command and store the result
++# into the variable.  We'll then store that value in the cache and finally
++# output the value.
++#
++# NOTE: The $$(2) here isn't actually a parameter to __run-and-store.  We
++# happen to know that the caller will have their shell command in $(2) so the
++# result of "call"ing this will produce a reference to that $(2).  The reason
++# for this strangeness is to avoid an extra level of eval (and escaping) of
++# $(2).
++define __run-and-store
++ifeq ($(origin $(1)),undefined)
++  $$(eval $(1) := $$(shell $$(2)))
++  $$(shell echo '$(1) := $$($(1))' >> $(make-cache))
++endif
++endef
++__shell-cached = $(eval $(call __run-and-store,$(1)))$($(1))
++shell-cached = $(call __shell-cached,__cached_$(call __sanitize-opt,$(1)),$(1))
++
+ # output directory for tests below
+ TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
  
- # warn about C99 declaration after statement
+@@ -87,30 +143,36 @@ TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
+ # Usage: option = $(call try-run, $(CC)...-o "$$TMP",option-ok,otherwise)
+ # Exit code chooses option. "$$TMP" serves as a temporary file and is
+ # automatically cleaned up.
+-try-run = $(shell set -e;		\
++__try-run = set -e;			\
+ 	TMP="$(TMPOUT).$$$$.tmp";	\
+ 	TMPO="$(TMPOUT).$$$$.o";	\
+ 	if ($(1)) >/dev/null 2>&1;	\
+ 	then echo "$(2)";		\
+ 	else echo "$(3)";		\
+ 	fi;				\
+-	rm -f "$$TMP" "$$TMPO")
++	rm -f "$$TMP" "$$TMPO"
++
++try-run = $(shell $(__try-run))
++
++# try-run-cached
++# This works like try-run, but the result is cached.
++try-run-cached = $(call shell-cached,$(__try-run))
+ 
+ # as-option
+ # Usage: cflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
+ 
+-as-option = $(call try-run,\
++as-option = $(call try-run-cached,\
+ 	$(CC) $(KBUILD_CFLAGS) $(1) -c -x assembler /dev/null -o "$$TMP",$(1),$(2))
+ 
+ # as-instr
+ # Usage: cflags-y += $(call as-instr,instr,option1,option2)
+ 
+-as-instr = $(call try-run,\
++as-instr = $(call try-run-cached,\
+ 	printf "%b\n" "$(1)" | $(CC) $(KBUILD_AFLAGS) -c -x assembler -o "$$TMP" -,$(2),$(3))
+ 
+ # __cc-option
+ # Usage: MY_CFLAGS += $(call __cc-option,$(CC),$(MY_CFLAGS),-march=winchip-c6,-march=i586)
+-__cc-option = $(call try-run,\
++__cc-option = $(call try-run-cached,\
+ 	$(1) -Werror $(2) $(3) -c -x c /dev/null -o "$$TMP",$(3),$(4))
+ 
+ # Do not attempt to build with gcc plugins during cc-option tests.
+@@ -130,23 +192,23 @@ hostcc-option = $(call __cc-option, $(HOSTCC),\
+ 
+ # cc-option-yn
+ # Usage: flag := $(call cc-option-yn,-march=winchip-c6)
+-cc-option-yn = $(call try-run,\
++cc-option-yn = $(call try-run-cached,\
+ 	$(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
+ 
+ # cc-disable-warning
+ # Usage: cflags-y += $(call cc-disable-warning,unused-but-set-variable)
+-cc-disable-warning = $(call try-run,\
++cc-disable-warning = $(call try-run-cached,\
+ 	$(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
+ 
+ # cc-name
+ # Expands to either gcc or clang
+-cc-name = $(shell $(CC) -v 2>&1 | grep -q "clang version" && echo clang || echo gcc)
++cc-name = $(call shell-cached,$(CC) -v 2>&1 | grep -q "clang version" && echo clang || echo gcc)
+ 
+ # cc-version
+-cc-version = $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-version.sh $(CC))
++cc-version = $(call shell-cached,$(CONFIG_SHELL) $(srctree)/scripts/gcc-version.sh $(CC))
+ 
+ # cc-fullversion
+-cc-fullversion = $(shell $(CONFIG_SHELL) \
++cc-fullversion = $(call shell-cached,$(CONFIG_SHELL) \
+ 	$(srctree)/scripts/gcc-version.sh -p $(CC))
+ 
+ # cc-ifversion
+@@ -159,22 +221,22 @@ cc-if-fullversion = $(shell [ $(cc-fullversion) $(1) $(2) ] && echo $(3) || echo
+ 
+ # cc-ldoption
+ # Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
+-cc-ldoption = $(call try-run,\
++cc-ldoption = $(call try-run-cached,\
+ 	$(CC) $(1) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+ 
+ # ld-option
+ # Usage: LDFLAGS += $(call ld-option, -X)
+-ld-option = $(call try-run,\
++ld-option = $(call try-run-cached,\
+ 	$(CC) -x c /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+ 
+ # ar-option
+ # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
+ # Important: no spaces around options
+-ar-option = $(call try-run, $(AR) rc$(1) "$$TMP",$(1),$(2))
++ar-option = $(call try-run-cached, $(AR) rc$(1) "$$TMP",$(1),$(2))
+ 
+ # ld-version
+ # Note this is mainly for HJ Lu's 3 number binutil versions
+-ld-version = $(shell $(LD) --version | $(srctree)/scripts/ld-version.sh)
++ld-version = $(call shell-cached,$(LD) --version | $(srctree)/scripts/ld-version.sh)
+ 
+ # ld-ifversion
+ # Usage:  $(call ld-ifversion, -ge, 22252, y)
 -- 
 2.15.0.rc0.271.g36b669edcc-goog
 
