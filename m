@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:56968 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753088AbdJPNZF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Oct 2017 09:25:05 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:56948 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753066AbdJPNZB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 16 Oct 2017 09:25:01 -0400
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH 4/4] arm64: vdso: remove pointless gcov option
-Date: Mon, 16 Oct 2017 14:24:40 +0100
-Message-Id: <20171016132440.38098-5-mark.rutland@arm.com>
+Subject: [PATCH 3/4] kvm/arm64: simplify CC instrumentation opt-out
+Date: Mon, 16 Oct 2017 14:24:39 +0100
+Message-Id: <20171016132440.38098-4-mark.rutland@arm.com>
 In-Reply-To: <20171016132440.38098-1-mark.rutland@arm.com>
 References: <20171016132440.38098-1-mark.rutland@arm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,37 +14,32 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org, adech.fo@gmail.com, aryabinin@virtuozzo.com, catalin.marinas@arm.com, christoffer.dall@linaro.org, dvyukov@google.com, linux-kbuild@vger.kernel.org, mark.rutland@arm.com, mark.zyngier@arm.com, mmarek@suse.com, will.deacon@arm.com, yamada.masahiro@socionext.com
 
-The arm64 VDSO Makefile explicitly disables gcov; a practice we seem to
-have inherited from other VDSO Makefiles.
+Now that we can opt out of all instrumentation with a single option,
+make use of this in the KVM hyp code. Hopefully, this will also avoid
+fragility as new options are introduced.
 
-The arm64 VDSO is written entirely in assembly, so this is not
-necessary. Further, if the VDSO were written in C it would be necessary
-to disable all other instrumentation, and this alone would not be
-sufficient.
-
-This patch remosves the redundant GCOV option for now.
-
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Reported-by: Will Deacon <will.deacon@arm.com>
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <mark.zyngier@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
 ---
- arch/arm64/kernel/vdso/Makefile | 3 ---
- 1 file changed, 3 deletions(-)
+ arch/arm64/kvm/hyp/Makefile | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
-index 62c84f7cb01b..350190b749dd 100644
---- a/arch/arm64/kernel/vdso/Makefile
-+++ b/arch/arm64/kernel/vdso/Makefile
-@@ -15,9 +15,6 @@ ccflags-y := -shared -fno-common -fno-builtin
- ccflags-y += -nostdlib -Wl,-soname=linux-vdso.so.1 \
- 		$(call cc-ldoption, -Wl$(comma)--hash-style=sysv)
- 
--# Disable gcov profiling for VDSO code
--GCOV_PROFILE := n
--
- # Workaround for bare-metal (ELF) toolchains that neglect to pass -shared
- # down to collect2, resulting in silent corruption of the vDSO image.
- ccflags-y += -Wl,-shared
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index 14c4e3b14bcb..a8a212eb66f1 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -22,7 +22,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
+ # KVM code is run at a different exception code with a different map, so
+ # compiler instrumentation that inserts callbacks or checks into the code may
+ # cause crashes. Just disable it.
+-GCOV_PROFILE	:= n
+-KASAN_SANITIZE	:= n
+-UBSAN_SANITIZE	:= n
+-KCOV_INSTRUMENT	:= n
++CC_INSTRUMENT	:= n
 -- 
 2.11.0
 
