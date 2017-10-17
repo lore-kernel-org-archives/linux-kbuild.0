@@ -1,59 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f42.google.com ([209.85.213.42]:54349 "EHLO
-        mail-vk0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752193AbdJPRS4 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Oct 2017 13:18:56 -0400
-Received: by mail-vk0-f42.google.com with SMTP id n70so8157904vkf.11
-        for <linux-kbuild@vger.kernel.org>; Mon, 16 Oct 2017 10:18:56 -0700 (PDT)
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:42264 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752442AbdJQKDK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 17 Oct 2017 06:03:10 -0400
+Date: Tue, 17 Oct 2017 11:03:15 +0100
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH 2/4] arm64: prevent instrumentation of LL/SC atomics
+Message-ID: <20171017100315.GA22140@arm.com>
+References: <20171016132440.38098-1-mark.rutland@arm.com>
+ <20171016132440.38098-3-mark.rutland@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAR9=FSZ467W36UCXG+1g4aQJK7bbBZuXDdRQBgV-ae2Ag@mail.gmail.com>
-References: <201710152156.44Cfewnd%fengguang.wu@intel.com> <CAK7LNAR9=FSZ467W36UCXG+1g4aQJK7bbBZuXDdRQBgV-ae2Ag@mail.gmail.com>
-From: Doug Anderson <dianders@chromium.org>
-Date: Mon, 16 Oct 2017 10:18:55 -0700
-Message-ID: <CAD=FV=W8wde+GmwRzNz2OT=aJPgSAr-03MKD92q3iwJK_4jgRg@mail.gmail.com>
-Subject: Re: [kbuild:kbuild 15/16] /bin/sh: 1: cannot create
- arch/arm64/kernel/vdso/.cache.mk: Directory nonexistent
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171016132440.38098-3-mark.rutland@arm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: kbuild test robot <fengguang.wu@intel.com>, "kbuild-all@01.org" <kbuild-all@01.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, adech.fo@gmail.com, aryabinin@virtuozzo.com, catalin.marinas@arm.com, christoffer.dall@linaro.org, dvyukov@google.com, linux-kbuild@vger.kernel.org, mark.zyngier@arm.com, mmarek@suse.com, yamada.masahiro@socionext.com
 
-Hi,
+On Mon, Oct 16, 2017 at 02:24:38PM +0100, Mark Rutland wrote:
+> While we build the LL/SC atomics as a C object file, this does not
+> follow the AAPCS. This does not interoperate with other C code, and can
+> only be called from special wrapper assembly.
+> 
+> Bulding a kernel with CONFIG_KCOV and CONFIG_ARM64_LSE_ATOMICS results
+> in the cmopiler inserting calls to __sanitizer_cov_trace_pc within the
 
-On Sun, Oct 15, 2017 at 8:33 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2017-10-15 22:27 GMT+09:00 kbuild test robot <fengguang.wu@intel.com>:
->> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
->> head:   97ac8fd9fb3552ec629643c9aa130d4712c37106
->> commit: 24e46c15b03d3304691b869cca833e444b53f90b [15/16] kbuild: Add a cache for generated variables
->> config: arm64-defconfig (attached as .config)
->> compiler: aarch64-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
->> reproduce:
->>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->>         chmod +x ~/bin/make.cross
->>         git checkout 24e46c15b03d3304691b869cca833e444b53f90b
->>         # save the attached .config to linux build tree
->>         make.cross ARCH=arm64
->>
->> All errors (new ones prefixed by >>):
->>
->>>> /bin/sh: 1: cannot create arch/arm64/kernel/vdso/.cache.mk: Directory nonexistent
->>
->
->
-> Thanks.
->
-> I will drop the cache patches for now, in order to not disturb linux-next.
->
->
-> We need to insert $(shell mkdir ...) somewhere.
+cmopiler
 
-I believe the v4 series ought to fix this.  I was a little hesitant
-about downloading binaries from a random location on github but I
-tested my change in isolation and believe it will work.
+> LL/SC atomics. As __sanitizer_cov_trace_pc is built per the AAPCS, these
+> calls corrupt register values, resulting in failures at boot time.
+> 
+> Avoid this (and other similar issues) by opting out of all compiler
+> instrumentation. We can opt-in to specific instrumentation in future if
+> we want to.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> ---
+>  arch/arm64/lib/Makefile | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/arm64/lib/Makefile b/arch/arm64/lib/Makefile
+> index a0abc142c92b..af77516f71b2 100644
+> --- a/arch/arm64/lib/Makefile
+> +++ b/arch/arm64/lib/Makefile
+> @@ -17,5 +17,6 @@ CFLAGS_atomic_ll_sc.o	:= -fcall-used-x0 -ffixed-x1 -ffixed-x2		\
+>  		   -fcall-saved-x10 -fcall-saved-x11 -fcall-saved-x12	\
+>  		   -fcall-saved-x13 -fcall-saved-x14 -fcall-saved-x15	\
+>  		   -fcall-saved-x18
+> +CC_INSTRUMENT_atomic_ll_sc.o := n
 
-Thanks!
+Does this mean we can lose the "notrace" definition of __LL_SC_INLINE
+when generating the out-of-line atomics?
 
--Doug
+Will
