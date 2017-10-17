@@ -1,37 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f67.google.com ([209.85.218.67]:48115 "EHLO
-        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753057AbdJQLAu (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Oct 2017 07:00:50 -0400
+Received: from foss.arm.com ([217.140.101.70]:43796 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756066AbdJQLKi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 17 Oct 2017 07:10:38 -0400
+Date: Tue, 17 Oct 2017 12:10:33 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 2/4] arm64: prevent instrumentation of LL/SC atomics
+Message-ID: <20171017111033.zfjr5ap7kbiwfmvm@lakrids.cambridge.arm.com>
+References: <20171016132440.38098-1-mark.rutland@arm.com>
+ <20171016132440.38098-3-mark.rutland@arm.com>
+ <20171017100315.GA22140@arm.com>
+ <20171017105454.drmoezp6yaqmmczg@lakrids.cambridge.arm.com>
+ <20171017105858.GA14051@arm.com>
 MIME-Version: 1.0
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Tue, 17 Oct 2017 13:00:48 +0200
-Message-ID: <CAK8P3a3ppb1hB0rahY+BXNbMzzKq6b0QorjJE8HqaKWcxmW3iQ@mail.gmail.com>
-Subject: more build problems with "Makefile: move stackprotector availability
- out of Kconfig"
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171017105858.GA14051@arm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Mark Brown <broonie@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Will Deacon <will.deacon@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, adech.fo@gmail.com, aryabinin@virtuozzo.com, catalin.marinas@arm.com, christoffer.dall@linaro.org, dvyukov@google.com, linux-kbuild@vger.kernel.org, marc.zyngier@arm.com, yamada.masahiro@socionext.com
 
-Hi Kees,
+On Tue, Oct 17, 2017 at 11:58:58AM +0100, Will Deacon wrote:
+> On Tue, Oct 17, 2017 at 11:54:54AM +0100, Mark Rutland wrote:
+> > On Tue, Oct 17, 2017 at 11:03:15AM +0100, Will Deacon wrote:
+> > > On Mon, Oct 16, 2017 at 02:24:38PM +0100, Mark Rutland wrote:
+> > > > While we build the LL/SC atomics as a C object file, this does not
+> > > > follow the AAPCS. This does not interoperate with other C code, and can
+> > > > only be called from special wrapper assembly.
+> > > > 
+> > > > Bulding a kernel with CONFIG_KCOV and CONFIG_ARM64_LSE_ATOMICS results
+> > > > in the cmopiler inserting calls to __sanitizer_cov_trace_pc within the
+> > > > LL/SC atomics. As __sanitizer_cov_trace_pc is built per the AAPCS, these
+> > > > calls corrupt register values, resulting in failures at boot time.
+> > > > 
+> > > > Avoid this (and other similar issues) by opting out of all compiler
+> > > > instrumentation. We can opt-in to specific instrumentation in future if
+> > > > we want to.
 
-On my test box, current linux-next kernels fail to build due to the
-patch that introduces CONFIG_CC_STACKPROTECTOR_AUTO, with my mainline
-gcc
-builds up to gcc-5.5.0. gcc-6 and higher work fine, as
-scripts/gcc-x86_64-has-stack-protector.sh returns 'y' for those.
+> > > > diff --git a/arch/arm64/lib/Makefile b/arch/arm64/lib/Makefile
+> > > > index a0abc142c92b..af77516f71b2 100644
+> > > > --- a/arch/arm64/lib/Makefile
+> > > > +++ b/arch/arm64/lib/Makefile
+> > > > @@ -17,5 +17,6 @@ CFLAGS_atomic_ll_sc.o	:= -fcall-used-x0 -ffixed-x1 -ffixed-x2		\
+> > > >  		   -fcall-saved-x10 -fcall-saved-x11 -fcall-saved-x12	\
+> > > >  		   -fcall-saved-x13 -fcall-saved-x14 -fcall-saved-x15	\
+> > > >  		   -fcall-saved-x18
+> > > > +CC_INSTRUMENT_atomic_ll_sc.o := n
+> > > 
+> > > Does this mean we can lose the "notrace" definition of __LL_SC_INLINE
+> > > when generating the out-of-line atomics?
+> > 
+> > Unfortunately not.
+> > 
+> > I'd missed -pg, since that isn't handled in scripts/Makefile.lib, and
+> > doesn't seem to have a makefile-level disable.
+> > 
+> > I'll see if that can be remedied.
+> 
+> Thanks. It's a real shame to have a "just use this option to avoid
+> instrumentation" if it doesn't actually catch everything. 
 
-Using the compilers provided by Ubuntu (4.6/4.7/4.8/4.9), everything
-also works as expected, so my interpretation is that mainline gcc did
-not enable the stack protector until gcc-6, while distributions did.
+Agreed; it defeats the purpose of the exercise.
 
-Do you agree with that interpretation?
+> We probably need to think about kprobes too, but not really sure what
+> you can do there on a per-file basis.
 
-If yes, is there anything we can do about it? I can probably rebuild
-my collection of x86 compilers to enable stackprotector if necessary,
-but I wonder how many other people will run into the same problem.
+Ugh; that's a much more painful one, yes. :(
 
-      Arnd
+Does that rely on any compiler options at all? I thought was all a
+runtime thing.
+
+Arguably it is somewhat separate for compiler instrumentation, and it
+might make sense for that to be a separate option.
+
+Thanks,
+Mark.
