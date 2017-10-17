@@ -1,86 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:49740 "EHLO
-        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965237AbdJQPw4 (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:45580 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753169AbdJQRy4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Oct 2017 11:52:56 -0400
+        Tue, 17 Oct 2017 13:54:56 -0400
+Subject: Re: [PATCH] Makefile: add targets for config-help and pkg-help
+References: <20171017151848.3087-1-shuahkh@osg.samsung.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <d531c247-4181-8397-4bd7-a07304aabc26@infradead.org>
+Date: Tue, 17 Oct 2017 10:54:51 -0700
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5j+1+rLA4uOrEv9yc9RE9Rna4QVsNqfg0zTDSMZ6VwGzaw@mail.gmail.com>
-References: <CAK8P3a3ppb1hB0rahY+BXNbMzzKq6b0QorjJE8HqaKWcxmW3iQ@mail.gmail.com>
- <CAK8P3a3OZTvvT1m167Ocajo0yTLbb2q6Jq53tZGWUFuUaboibA@mail.gmail.com>
- <CAGXu5j+jPbMpTyQr8OfgVo3cmM_qk0XNAs+9whQ7DGw1xnBkzw@mail.gmail.com> <CAGXu5j+1+rLA4uOrEv9yc9RE9Rna4QVsNqfg0zTDSMZ6VwGzaw@mail.gmail.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Tue, 17 Oct 2017 17:52:55 +0200
-Message-ID: <CAK8P3a3fHWdgH23LjACzM+htGCY-bHgM5Y6uB8J6K5XgfT8e+g@mail.gmail.com>
-Subject: Re: more build problems with "Makefile: move stackprotector
- availability out of Kconfig"
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20171017151848.3087-1-shuahkh@osg.samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Mark Brown <broonie@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Shuah Khan <shuahkh@osg.samsung.com>, yamada.masahiro@socionext.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
 
-On Tue, Oct 17, 2017 at 5:34 PM, Kees Cook <keescook@chromium.org> wrote:
-> On Tue, Oct 17, 2017 at 8:26 AM, Kees Cook <keescook@chromium.org> wrote:
->> On Tue, Oct 17, 2017 at 8:23 AM, Arnd Bergmann <arnd@arndb.de> wrote:
->>> On Tue, Oct 17, 2017 at 1:00 PM, Arnd Bergmann <arnd@arndb.de> wrote:
->>>> Hi Kees,
->>>>
->>>> On my test box, current linux-next kernels fail to build due to the
->>>> patch that introduces CONFIG_CC_STACKPROTECTOR_AUTO, with my mainline
->>>> gcc
->>>> builds up to gcc-5.5.0. gcc-6 and higher work fine, as
->>>> scripts/gcc-x86_64-has-stack-protector.sh returns 'y' for those.
->>>>
->>>> Using the compilers provided by Ubuntu (4.6/4.7/4.8/4.9), everything
->>>> also works as expected, so my interpretation is that mainline gcc did
->>>> not enable the stack protector until gcc-6, while distributions did.
->>>>
->>>> Do you agree with that interpretation?
->>>
->>> It's probably a little different. I tried bisecting the gcc commit that fixed
->>> the issue for me, and ended up with this commit
->>>
->>> https://gitlab.indel.ch/thirdparty/gcc/commit/c14bac81551d6769741c2b1cc55e04d94fe8d3a7
->>>
->>> that caused the target to change from x86_64-unknown-linux to
->>> x86_64-pc-linux, and apparently caused the compiler bootstrap
->>> to incorrectly identify the capabilities of the assembler. As a result,
->>> the assembler output inside of scripts/gcc-x86_64-has-stack-protector.sh
->>> that should be
->>> [snip]
->>
->> Yeah, %gs: vs __stack_chk_guard global.
->>
->> Do you know which gccs (of the past) had this?
->>
->> akpm's build error is different still, there are no warnings at all
->> and then the build fails with missing __stack_chks. I'm still trying
->> to figure that one out.
->
-> Oh, I think I know what's happening. I'm going to try to simulate this
-> and send another patch for testing...
->
-> (I'm still curious about the compiler versions, since my gcc 4.4.4
-> works fine for stack-protector.)
+On 10/17/17 08:18, Shuah Khan wrote:
+> Change to enable config help and package help from the main make level
+> to make it easier to use. It has become difficult to find config help
+> and pkg help specific output from the "help" information.
+> 
+> Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+> ---
+>  Makefile | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index 46bfb0ed2257..1d6f86df1b6c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1441,6 +1441,13 @@ help:
+>  	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
+>  	@echo  'For further info see the ./README file'
+>  
+> +PHONY += config-help
+> +config-help:
+> +	@$(MAKE) -f $(srctree)/scripts/kconfig/Makefile help
+> +
+> +PHONY += pkg-help
+> +pkg-help:
+> +	@$(MAKE) $(build)=$(package-dir) help
+>  
+>  help-board-dirs := $(addprefix help-,$(board-dirs))
+>  
+> 
 
-I've managed to reduce the change that fixed it to this bit in the
-compiler sources:
+Hi,
 
-index dbfb978..d5bc694 100755
---- a/config.guess
-+++ b/config.guess
-@@ -1021,7 +1021,7 @@ EOF
-        echo ${UNAME_MACHINE}-dec-linux-${LIBC}
-        exit ;;
-     x86_64:Linux:*:*)
--       echo ${UNAME_MACHINE}-unknown-linux-${LIBC}
-+       echo ${UNAME_MACHINE}-pc-linux-${LIBC}
-        exit ;;
-     xtensa*:Linux:*:*)
-        echo ${UNAME_MACHINE}-unknown-linux-${LIBC}
+It now looks like we need these help sub-options listed somewhere,
+like the patch below.
 
-I still don't know why that makes a difference, but all versions
-prior to gcc-6.1 have the problem for me.
 
-      Arnd
+
+Also, it would be very nice if we could use 'make <some>help' without
+running 'make silentoldconfig' and/or expecting a .config file to be present.
+As it is, we get all of this noise before seeing the config-help:
+(but this is a separate issue IMO)
+
+
+rdunlap@midway:lnx-414-rc5> make ARCH=um O=UM64 config-help
+make[1]: Entering directory '/local/lnx/kernel/lnx-414-rc5/UM64'
+  GEN     ./Makefile
+scripts/kconfig/conf  --silentoldconfig arch/x86/um/Kconfig
+***
+*** Configuration file ".config" not found!
+***
+*** Please run some configurator (e.g. "make oldconfig" or
+*** "make menuconfig" or "make xconfig").
+***
+../scripts/kconfig/Makefile:37: recipe for target 'silentoldconfig' failed
+make[3]: *** [silentoldconfig] Error 1
+../Makefile:547: recipe for target 'silentoldconfig' failed
+make[2]: *** [silentoldconfig] Error 2
+  config	  - Update current config utilising a line-oriented program
+  nconfig         - Update current config utilising a ncurses menu based
+                    program
+
+
+
+For your patch:
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+
+If you want to, you can fold the patch below into your patch.
+
+---
+From: Randy Dunlap <rdunlap@infradead.org>
+
+Add info on "make help" sub-targets "make config-help" and
+"make pkg-help".
+
+References to "make dochelp" and "make kselftest-help" etc. can also
+be added.
+
+Or a few lines could be added to the end of the "make help" output,
+but I think that it is too long already.
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+ Makefile |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- lnx-414-rc5.orig/Makefile
++++ lnx-414-rc5/Makefile
+@@ -1359,7 +1359,7 @@ help:
+ 	@echo  '  mrproper	  - Remove all generated files + config + various backup files'
+ 	@echo  '  distclean	  - mrproper + remove editor backup and patch files'
+ 	@echo  ''
+-	@echo  'Configuration targets:'
++	@echo  'Configuration targets:  (or use "make config-help")'
+ 	@$(MAKE) -f $(srctree)/scripts/kconfig/Makefile help
+ 	@echo  ''
+ 	@echo  'Other generic targets:'
+@@ -1406,7 +1406,7 @@ help:
+ 	@echo '  use "make tools/help"'
+ 	@echo '  or  "cd tools; make help"'
+ 	@echo  ''
+-	@echo  'Kernel packaging:'
++	@echo  'Kernel packaging:  (or use "make pkg-help")'
+ 	@$(MAKE) $(build)=$(package-dir) help
+ 	@echo  ''
+ 	@echo  'Documentation targets:'
+
+
