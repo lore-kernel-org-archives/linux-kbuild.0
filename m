@@ -1,52 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:42691 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750979AbdJRQyS (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:24580 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750954AbdJRQzm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Oct 2017 12:54:18 -0400
+        Wed, 18 Oct 2017 12:55:42 -0400
 MIME-Version: 1.0
-In-Reply-To: <1507800145-29563-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1507800145-29563-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1507893929-32573-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1507893929-32573-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 19 Oct 2017 01:53:24 +0900
-Message-ID: <CAK7LNATb66XMABK91ZoEpZSekpcROtPEO+KjSBYZ+OOy7QoHuA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: do not call cc-option before KBUILD_CFLAGS initialization
+Date: Thu, 19 Oct 2017 01:54:56 +0900
+Message-ID: <CAK7LNAS0PxHcrG1Ui+eCoqcUvBpfHAxJ0wG=EvZNUqiHy4TMfQ@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: shrink .cache.mk when it exceeds 1000 lines
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Douglas Anderson <dianders@chromium.org>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>
 
-2017-10-12 18:22 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> Some $(call cc-option,...) are invoked very early, even before
-> KBUILD_CFLAGS, etc. are initialized.
+2017-10-13 20:25 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> The cache files are only cleaned away by "make clean".  If you continue
+> incremental builds, the cache files will grow up little by little.
+> It is not a big deal in general use cases because compiler flags do not
+> change quite often.
 >
-> The returned string from $(call cc-option,...) depends on
-> KBUILD_CPPFLAGS, KBUILD_CFLAGS, and GCC_PLUGINS_CFLAGS.
+> However, if you do build-test for various architectures, compilers, and
+> kernel configurations, you will end up with huge cache files soon.
 >
-> Since they are exported, they are not empty when the top Makefile
-> is recursively invoked.
->
-> The recursion occurs in several places.  For example, the top
-> Makefile invokes itself for silentoldconfig.  "make tinyconfig",
-> "make rpm-pkg" are the cases, too.
->
-> In those cases, the second call of cc-option from the same line
-> runs a different shell command due to non-pristine KBUILD_CFLAGS.
->
-> To get the same result all the time, KBUILD_* and GCC_PLUGINS_CFLAGS
-> must be initialized before any call of cc-option.  This avoids
-> garbage data in the .cache.mk file.
->
-> Move all calls of cc-option below the config targets because target
-> compiler flags are unnecessary for Kconfig.
+> When the cache file exceeds 1000 lines, shrink it down to 500 by "tail".
+> The Least Recently Added lines are cut. (not Least Recently Used)
+> I hope it will work well enough.
 >
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
+>
 
 Applied to linux-kbuild/kbuild.
-
-
 
 -- 
 Best Regards
