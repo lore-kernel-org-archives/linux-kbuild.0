@@ -1,94 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:51885 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750897AbdJXHGj (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:49269 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750921AbdJYFll (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Oct 2017 03:06:39 -0400
-Date: Tue, 24 Oct 2017 09:06:32 +0200
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-        <u.kleine-koenig@pengutronix.de>
-Subject: Re: getconf options
-Message-ID: <20171024070632.wnbfu6vltbr52gpm@pengutronix.de>
-References: <dbf8b816-e1f7-f835-dd32-6b517e87cbc4@foxmail.com>
- <1a4f82d9999041c6a3c5ce9f37805e7f@SOC-EX01V.e01.socionext.com>
- <20171020054710.vfkkfnl3hjqqmlsb@pengutronix.de>
- <1508505607.2721.26.camel@decadent.org.uk>
- <CAK7LNAQZNx39GiKGP8b0Mc0Yj4co9GdcpaxGMEnqFs7meftz1Q@mail.gmail.com>
+        Wed, 25 Oct 2017 01:41:41 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAK7LNAQZNx39GiKGP8b0Mc0Yj4co9GdcpaxGMEnqFs7meftz1Q@mail.gmail.com>
+In-Reply-To: <20171009150523.GT20805@n2100.armlinux.org.uk>
+References: <1507091240-12756-1-git-send-email-yamada.masahiro@socionext.com> <20171009150523.GT20805@n2100.armlinux.org.uk>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 25 Oct 2017 14:40:48 +0900
+Message-ID: <CAK7LNASCQqaBvERg6NXPym62Dyza00TuZVOWtj0YqLDKPT2D5g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix dependency of dtbs targets
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Ben Hutchings <ben@decadent.org.uk>, puck.chen@foxmail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Russell King - ARM Linux <linux@armlinux.org.uk>, Will Deacon <will.deacon@arm.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ley Foon Tan <lftan@altera.com>, nios2-dev@lists.rocketboards.org, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 
-On Tue, Oct 24, 2017 at 01:27:37PM +0900, Masahiro Yamada wrote:
-> 2017-10-20 22:20 GMT+09:00 Ben Hutchings <ben@decadent.org.uk>:
-> > On Fri, 2017-10-20 at 07:47 +0200, Uwe Kleine-König wrote:
-> >> Hello,
-> >>
-> >> On Fri, Oct 20, 2017 at 04:14:44AM +0000, yamada.masahiro@socionext.com wrote:
-> >> > > With commit d7f14c66c273b00aaa626f419d3155773a88d460, I got the follow
-> >> > > warning on macos.
-> >> > >
-> >> > > getconf: no such configuration parameter `LFS_CFLAGS'
-> >> > > getconf: no such configuration parameter `LFS_LDFLAGS'
-> >> > > getconf: no such configuration parameter `LFS_LIBS'
-> >> > > scripts/kconfig/mconf  Kconfig
-> >> > >
-> >> > > $ getconf LFS_CFLAGS
-> >> > > getconf: no such configuration parameter `LFS_CFLAGS'
-> >> > >
-> >> > >
-> >> > > Do you have some idea about this? Are these paremeters default to getconf?
-> >> > >
-> >> > > -Feng
-> >> > >
-> >> >
-> >> >
-> >> > Do you have a clue?
-> >> >
-> >> >
-> >> > Does it make sense to suppress warnings like this?
-> >> >
-> >> > HOST_LFS_CFLAGS := $(shell getconf LFS_CFLAGS 2>/dev/null)
-> >> > HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS 2>/dev/null)
-> >> > HOST_LFS_LIBS := $(shell getconf LFS_LIBS 2>/dev/null)
-> >> >
-> >> >
-> >> > Or, hard-code
-> >> > -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-> >> > as Ben originally suggested?
-> >>
-> >> I'm not a fan of hardcoding these. On 64 bit arch (and I think also a
-> >> few 32 bit archs (x32?)) they are not needed and so IMHO shouldn't be
-> >> added.
-> >
-> > What harm would they do?
-> >
-> > Ben.
-> >
-> >> I think 2>/dev/null is fine.
-> 
-> 
-> If your machine does not recognize "getconf LFS_CFLAGS",
-> but needs LFS flags, it is a problem.
-> 
-> Hard-coding the flags seem more stable to me.
+Hi.
 
-Don't know how real the danger is that $(getconf LFS_CFLAGS) returns
-something that is neither "" nor "-D_LARGEFILE_SOURCE
--D_FILE_OFFSET_BITS=64". Are there platforms that knowingly depend on
-sizeof(off_t) = 4 which break when -D_FILE_OFFSET_BITS=64 is passed?
-When will we depend on -D_FILE_OFFSET_BITS=128? Probably all these are
-not relevant now, still it feels more right to go the 2>/dev/null way
-for me.
 
-Best regards
-Uwe
+2017-10-10 0:05 GMT+09:00 Russell King - ARM Linux <linux@armlinux.org.uk>:
+> On Wed, Oct 04, 2017 at 01:27:20PM +0900, Masahiro Yamada wrote:
+>> The target "dtbs" should depend on "scripts" because it needs to
+>> build dtc.  The "prepare" target is unneeded here.
+>
+> Looks fine for ARM, as the only thing the dtbs should depend on is
+> the kernel configuration (to decide which to build) and DT tooling.
+>
+> Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
+>
+> --
+
+
+I found a potential issue on this
+because the default DTB install path depends on $(KERNELRELEASE).
+
+
+In top-level Makefile:
+export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(KERNELRELEASE)
+
+
+The include/config/kernel.release is created by "prepare3" target.
+
+If the dependency on "parepare" is removed,
+it is possible to run "make dtbs" and "make dtbs_install"
+without creating include/config/kernel.release.
+
+So, the $(KERNELRELEASE) could be empty when installing DTB.
+
+
+Maybe, drop this patch, or reduce the dependency to "parepare3"?
+
+
+
+
+
+
 
 -- 
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Best Regards
+Masahiro Yamada
