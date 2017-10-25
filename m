@@ -1,60 +1,153 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:49269 "EHLO
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:24635 "EHLO
         conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750921AbdJYFll (ORCPT
+        with ESMTP id S1750765AbdJYMWl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 25 Oct 2017 01:41:41 -0400
+        Wed, 25 Oct 2017 08:22:41 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171009150523.GT20805@n2100.armlinux.org.uk>
-References: <1507091240-12756-1-git-send-email-yamada.masahiro@socionext.com> <20171009150523.GT20805@n2100.armlinux.org.uk>
+In-Reply-To: <CAMuHMdW8wT4NufHMS-AHGHf92VS-uBSHh=frTKGU60rHHszMrg@mail.gmail.com>
+References: <1399639944-20551-1-git-send-email-mmarek@suse.cz>
+ <1399639944-20551-4-git-send-email-mmarek@suse.cz> <CAFLxGvyz-aX8rTveo9W3mqsQxPeg8cb7Oq59UiC1kMz4qTiYwg@mail.gmail.com>
+ <538EEA3D.1080105@suse.cz> <538F1B41.3060904@suse.cz> <20140605155614.GA18376@sepie.suse.cz>
+ <CAMuHMdW8wT4NufHMS-AHGHf92VS-uBSHh=frTKGU60rHHszMrg@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 25 Oct 2017 14:40:48 +0900
-Message-ID: <CAK7LNASCQqaBvERg6NXPym62Dyza00TuZVOWtj0YqLDKPT2D5g@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: fix dependency of dtbs targets
+Date: Wed, 25 Oct 2017 21:21:48 +0900
+Message-ID: <CAK7LNAT8xu5UCsC3Y4GAjw6L-AT6O1RiEMM6YQCNVNFrDfh7cg@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] kbuild: Use relative path for $(objtree)
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@armlinux.org.uk>, Will Deacon <will.deacon@arm.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ley Foon Tan <lftan@altera.com>, nios2-dev@lists.rocketboards.org, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Richard Weinberger <richard.weinberger@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>
 
-Hi.
+Hi Geert,
+
+(+CC Michal's new address)
 
 
-2017-10-10 0:05 GMT+09:00 Russell King - ARM Linux <linux@armlinux.org.uk>:
-> On Wed, Oct 04, 2017 at 01:27:20PM +0900, Masahiro Yamada wrote:
->> The target "dtbs" should depend on "scripts" because it needs to
->> build dtc.  The "prepare" target is unneeded here.
+2017-10-16 19:26 GMT+09:00 Geert Uytterhoeven <geert@linux-m68k.org>:
+> Hi Michal,
 >
-> Looks fine for ARM, as the only thing the dtbs should depend on is
-> the kernel configuration (to decide which to build) and DT tooling.
+> On Thu, Jun 5, 2014 at 5:56 PM, Michal Marek <mmarek@suse.cz> wrote:
+>> On Wed, Jun 04, 2014 at 03:12:33PM +0200, Michal Marek wrote:
+>>> On 2014-06-04 11:43, Michal Marek wrote:
+>>> > On 2014-06-04 11:03, Richard Weinberger wrote:
+>>> >> To reproduce run:
+>>> >> make defconfig ARCH=um O=/mnt/o && make linux ARCH=um O=/mnt/
+>>> >>
+>>> >> If there is anything in UML which needs fixing, please tell. :-)
+>>> >
+>>> > I'll have a look, thanks for the report.
+>>>
+>>> Findings so far: For some reason, syscalls_32.h is generated in the
+>>> source tree (which is wrong) and syscalls_64.h is not generated at all.
+>>> Looking further.
+>>
+>> Can you try the below patch? The same pattern is used in the rules for
+>> tools/ and tools/% in the main Makefile, need to look into that as well.
+>> But UML should work now.
+>>
+>> Michal
+>>
+>> From d4bc590f8716f7dde6b7bca319097ac30a8cb0b4 Mon Sep 17 00:00:00 2001
+>> From: Michal Marek <mmarek@suse.cz>
+>> Date: Thu, 5 Jun 2014 17:44:44 +0200
+>> Subject: [PATCH] um: Fix for relative objtree when generating x86 headers
+>>
+>> In an O= build, rely on the generated Makefile to call the main Makefile
+>> properly. When building in the source tree, we do not need to specify
+>> the -C and O= either. This fixes the problem when $(objtree) is a
+>> relative path and the -C changes the directory.
+>>
+>> Reported-by: Richard Weinberger <richard.weinberger@gmail.com>
+>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+>> ---
+>>  arch/um/Makefile | 3 +--
+>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/arch/um/Makefile b/arch/um/Makefile
+>> index 36e658a..e4b1a96 100644
+>> --- a/arch/um/Makefile
+>> +++ b/arch/um/Makefile
+>> @@ -111,8 +111,7 @@ endef
+>>  KBUILD_KCONFIG := $(HOST_DIR)/um/Kconfig
+>>
+>>  archheaders:
+>> -       $(Q)$(MAKE) -C '$(srctree)' KBUILD_SRC= \
+>> -               ARCH=$(HEADER_ARCH) O='$(objtree)' archheaders
+>> +       $(Q)$(MAKE) KBUILD_SRC= ARCH=$(HEADER_ARCH) archheaders
+>>
+>>  archprepare: include/generated/user_constants.h
 >
-> Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
+> This now commit d4bc590f8716f7dd ("um: Fix for relative objtree when
+> generating x86 headers").
 >
-> --
+> When using O=, the build enters an infinite loop on v4.14-rc5.
 
 
-I found a potential issue on this
-because the default DTB install path depends on $(KERNELRELEASE).
+Strange. I can not reproduce this.
+
+For example, the following command works fine for me.
+
+make ARCH=um  O=foo/bar  defconfig all
 
 
-In top-level Makefile:
-export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(KERNELRELEASE)
-
-
-The include/config/kernel.release is created by "prepare3" target.
-
-If the dependency on "parepare" is removed,
-it is possible to run "make dtbs" and "make dtbs_install"
-without creating include/config/kernel.release.
-
-So, the $(KERNELRELEASE) could be empty when installing DTB.
-
-
-Maybe, drop this patch, or reduce the dependency to "parepare3"?
+Could you share the command you input?
 
 
 
-
+> With V=1:
+>
+>     make KBUILD_SRC= ARCH=x86 archheaders
+>     make -C /scratch/geert/linux/linux
+> O=/scratch/geert/build/linux-uml-amd64/. archheaders
+>     make -C /scratch/geert/build/linux-uml-amd64
+> KBUILD_SRC=/scratch/geert/linux/linux \
+>     -f /scratch/geert/linux/linux/Makefile archheaders
+>     make KBUILD_SRC= ARCH=x86 archheaders
+>     make -C /scratch/geert/linux/linux
+> O=/scratch/geert/build/linux-uml-amd64/. archheaders
+>     make -C /scratch/geert/build/linux-uml-amd64
+> KBUILD_SRC=/scratch/geert/linux/linux \
+>     -f /scratch/geert/linux/linux/Makefile archheaders
+>     ...
+>
+> As it's been a (long) while I buily UML, I started a bisect, which pointed to
+> the commit above.
+> The problem actually already happened on commit d4bc590f8716f7dd, so this
+> has been broken since v3.16:
+>
+>     make KBUILD_SRC= ARCH=x86 archheaders
+>     make -C /scratch/geert/linux/linux
+> O=/scratch/geert/build/linux-uml-amd64/. archheaders
+>     make -C /scratch/geert/build/linux-uml-amd64 \
+>     KBUILD_SRC=/scratch/geert/linux/linux \
+>     KBUILD_EXTMOD="" -f /scratch/geert/linux/linux/Makefile \
+>     archheaders
+>     make KBUILD_SRC= ARCH=x86 archheaders
+>     make -C /scratch/geert/linux/linux
+> O=/scratch/geert/build/linux-uml-amd64/. archheaders
+>     make -C /scratch/geert/build/linux-uml-amd64 \
+>     KBUILD_SRC=/scratch/geert/linux/linux \
+>     KBUILD_EXTMOD="" -f /scratch/geert/linux/linux/Makefile \
+>     archheaders
+>     ...
+>
+> Unfortunately reverting that commit doesn't help, as that causes the
+> failure that
+> commit was supposed to fix:
+>
+>     /scratch/geert/linux/linux/arch/x86/um/user-offsets.c:19:29: fatal
+> error: asm/syscalls_64.h: No such file or directory
+>      #include <asm/syscalls_64.h>
+>                                  ^
+>     compilation terminated.
+>     /scratch/geert/linux/linux/scripts/Makefile.build:154: recipe for
+> target 'arch/x86/um/user-offsets.s' failed
+>
+> Do you have any clue? Thanks!
+>
+> Gr{oetje,eeting}s,
 
 
 
