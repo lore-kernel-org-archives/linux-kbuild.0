@@ -1,156 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:24635 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750765AbdJYMWl (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:28637 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751000AbdJZEyn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 25 Oct 2017 08:22:41 -0400
-MIME-Version: 1.0
-In-Reply-To: <CAMuHMdW8wT4NufHMS-AHGHf92VS-uBSHh=frTKGU60rHHszMrg@mail.gmail.com>
-References: <1399639944-20551-1-git-send-email-mmarek@suse.cz>
- <1399639944-20551-4-git-send-email-mmarek@suse.cz> <CAFLxGvyz-aX8rTveo9W3mqsQxPeg8cb7Oq59UiC1kMz4qTiYwg@mail.gmail.com>
- <538EEA3D.1080105@suse.cz> <538F1B41.3060904@suse.cz> <20140605155614.GA18376@sepie.suse.cz>
- <CAMuHMdW8wT4NufHMS-AHGHf92VS-uBSHh=frTKGU60rHHszMrg@mail.gmail.com>
+        Thu, 26 Oct 2017 00:54:43 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 25 Oct 2017 21:21:48 +0900
-Message-ID: <CAK7LNAT8xu5UCsC3Y4GAjw6L-AT6O1RiEMM6YQCNVNFrDfh7cg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/5] kbuild: Use relative path for $(objtree)
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] coccinelle: grep Options and Requires fields more precisely
+Date: Thu, 26 Oct 2017 13:50:38 +0900
+Message-Id: <1508993438-15325-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Richard Weinberger <richard.weinberger@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>
+To: cocci@systeme.lip6.fr, linux-kbuild@vger.kernel.org, Julia Lawall <Julia.Lawall@lip6.fr>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Nicolas Palix <nicolas.palix@imag.fr>, linux-kernel@vger.kernel.org, Gilles Muller <Gilles.Muller@lip6.fr>, Michal Marek <michal.lkml@markovi.net>
 
-Hi Geert,
+Currently, the required version for badzero.cocci is picked up from
+its "Comments:" line since it contains the word "Requires".
 
-(+CC Michal's new address)
+Surprisingly, ld-version.sh can extract the version number from the
+string "Requires Coccinelle version 1.0.0-rc20 or later", but this
+expectation is fragile.  Fix the .cocci file.  I removed "-rc20"
+because ld-version.sh cannot handle it.
 
+Make the coccicheck script to see exact patterns for "Options:" and
+"Requires:" in order to avoid accidental matching to what just happens
+to appear in comment lines.
 
-2017-10-16 19:26 GMT+09:00 Geert Uytterhoeven <geert@linux-m68k.org>:
-> Hi Michal,
->
-> On Thu, Jun 5, 2014 at 5:56 PM, Michal Marek <mmarek@suse.cz> wrote:
->> On Wed, Jun 04, 2014 at 03:12:33PM +0200, Michal Marek wrote:
->>> On 2014-06-04 11:43, Michal Marek wrote:
->>> > On 2014-06-04 11:03, Richard Weinberger wrote:
->>> >> To reproduce run:
->>> >> make defconfig ARCH=um O=/mnt/o && make linux ARCH=um O=/mnt/
->>> >>
->>> >> If there is anything in UML which needs fixing, please tell. :-)
->>> >
->>> > I'll have a look, thanks for the report.
->>>
->>> Findings so far: For some reason, syscalls_32.h is generated in the
->>> source tree (which is wrong) and syscalls_64.h is not generated at all.
->>> Looking further.
->>
->> Can you try the below patch? The same pattern is used in the rules for
->> tools/ and tools/% in the main Makefile, need to look into that as well.
->> But UML should work now.
->>
->> Michal
->>
->> From d4bc590f8716f7dde6b7bca319097ac30a8cb0b4 Mon Sep 17 00:00:00 2001
->> From: Michal Marek <mmarek@suse.cz>
->> Date: Thu, 5 Jun 2014 17:44:44 +0200
->> Subject: [PATCH] um: Fix for relative objtree when generating x86 headers
->>
->> In an O= build, rely on the generated Makefile to call the main Makefile
->> properly. When building in the source tree, we do not need to specify
->> the -C and O= either. This fixes the problem when $(objtree) is a
->> relative path and the -C changes the directory.
->>
->> Reported-by: Richard Weinberger <richard.weinberger@gmail.com>
->> Signed-off-by: Michal Marek <mmarek@suse.cz>
->> ---
->>  arch/um/Makefile | 3 +--
->>  1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/arch/um/Makefile b/arch/um/Makefile
->> index 36e658a..e4b1a96 100644
->> --- a/arch/um/Makefile
->> +++ b/arch/um/Makefile
->> @@ -111,8 +111,7 @@ endef
->>  KBUILD_KCONFIG := $(HOST_DIR)/um/Kconfig
->>
->>  archheaders:
->> -       $(Q)$(MAKE) -C '$(srctree)' KBUILD_SRC= \
->> -               ARCH=$(HEADER_ARCH) O='$(objtree)' archheaders
->> +       $(Q)$(MAKE) KBUILD_SRC= ARCH=$(HEADER_ARCH) archheaders
->>
->>  archprepare: include/generated/user_constants.h
->
-> This now commit d4bc590f8716f7dd ("um: Fix for relative objtree when
-> generating x86 headers").
->
-> When using O=, the build enters an infinite loop on v4.14-rc5.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ scripts/coccicheck                    | 4 ++--
+ scripts/coccinelle/null/badzero.cocci | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Strange. I can not reproduce this.
-
-For example, the following command works fine for me.
-
-make ARCH=um  O=foo/bar  defconfig all
-
-
-Could you share the command you input?
-
-
-
-> With V=1:
->
->     make KBUILD_SRC= ARCH=x86 archheaders
->     make -C /scratch/geert/linux/linux
-> O=/scratch/geert/build/linux-uml-amd64/. archheaders
->     make -C /scratch/geert/build/linux-uml-amd64
-> KBUILD_SRC=/scratch/geert/linux/linux \
->     -f /scratch/geert/linux/linux/Makefile archheaders
->     make KBUILD_SRC= ARCH=x86 archheaders
->     make -C /scratch/geert/linux/linux
-> O=/scratch/geert/build/linux-uml-amd64/. archheaders
->     make -C /scratch/geert/build/linux-uml-amd64
-> KBUILD_SRC=/scratch/geert/linux/linux \
->     -f /scratch/geert/linux/linux/Makefile archheaders
->     ...
->
-> As it's been a (long) while I buily UML, I started a bisect, which pointed to
-> the commit above.
-> The problem actually already happened on commit d4bc590f8716f7dd, so this
-> has been broken since v3.16:
->
->     make KBUILD_SRC= ARCH=x86 archheaders
->     make -C /scratch/geert/linux/linux
-> O=/scratch/geert/build/linux-uml-amd64/. archheaders
->     make -C /scratch/geert/build/linux-uml-amd64 \
->     KBUILD_SRC=/scratch/geert/linux/linux \
->     KBUILD_EXTMOD="" -f /scratch/geert/linux/linux/Makefile \
->     archheaders
->     make KBUILD_SRC= ARCH=x86 archheaders
->     make -C /scratch/geert/linux/linux
-> O=/scratch/geert/build/linux-uml-amd64/. archheaders
->     make -C /scratch/geert/build/linux-uml-amd64 \
->     KBUILD_SRC=/scratch/geert/linux/linux \
->     KBUILD_EXTMOD="" -f /scratch/geert/linux/linux/Makefile \
->     archheaders
->     ...
->
-> Unfortunately reverting that commit doesn't help, as that causes the
-> failure that
-> commit was supposed to fix:
->
->     /scratch/geert/linux/linux/arch/x86/um/user-offsets.c:19:29: fatal
-> error: asm/syscalls_64.h: No such file or directory
->      #include <asm/syscalls_64.h>
->                                  ^
->     compilation terminated.
->     /scratch/geert/linux/linux/scripts/Makefile.build:154: recipe for
-> target 'arch/x86/um/user-offsets.s' failed
->
-> Do you have any clue? Thanks!
->
-> Gr{oetje,eeting}s,
-
-
-
+diff --git a/scripts/coccicheck b/scripts/coccicheck
+index 3e21a1b..1bfa2d2 100755
+--- a/scripts/coccicheck
++++ b/scripts/coccicheck
+@@ -168,8 +168,8 @@ OPTIONS="$OPTIONS $SPFLAGS"
+ coccinelle () {
+     COCCI="$1"
+ 
+-    OPT=`grep "Option" $COCCI | cut -d':' -f2`
+-    REQ=`grep "Requires" $COCCI | cut -d':' -f2 | sed "s| ||"`
++    OPT=`grep "Options:" $COCCI | cut -d':' -f2`
++    REQ=`grep "Requires:" $COCCI | cut -d':' -f2 | sed "s| ||"`
+     REQ_NUM=$(echo $REQ | ${DIR}/scripts/ld-version.sh)
+     if [ "$REQ_NUM" != "0" ] ; then
+ 	    if [ "$SPATCH_VERSION_NUM" -lt "$REQ_NUM" ] ; then
+diff --git a/scripts/coccinelle/null/badzero.cocci b/scripts/coccinelle/null/badzero.cocci
+index 5551da2..f597c80 100644
+--- a/scripts/coccinelle/null/badzero.cocci
++++ b/scripts/coccinelle/null/badzero.cocci
+@@ -10,7 +10,7 @@
+ // Copyright: (C) 2012 Julia Lawall, INRIA/LIP6.  GPLv2.
+ // Copyright: (C) 2012 Gilles Muller, INRIA/LiP6.  GPLv2.
+ // URL: http://coccinelle.lip6.fr/
+-// Comments: Requires Coccinelle version 1.0.0-rc20 or later
++// Requires: 1.0.0
+ // Options:
+ 
+ virtual patch
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
