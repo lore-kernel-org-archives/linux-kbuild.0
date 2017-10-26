@@ -1,68 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zm-mta-out-2.u-ga.fr ([152.77.200.57]:47241 "EHLO
+Received: from zm-mta-out-2.u-ga.fr ([152.77.200.57]:47843 "EHLO
         zm-mta-out-2.u-ga.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751646AbdJZH2b (ORCPT
+        with ESMTP id S1751166AbdJZHdb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Oct 2017 03:28:31 -0400
-Reply-To: nicolas.palix@univ-grenoble-alpes.fr
-Subject: Re: [PATCH] coccinelle: fix verbose message about .cocci file being
- run
-References: <1508993751-17218-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 26 Oct 2017 03:33:31 -0400
+Subject: Re: [PATCH] coccinelle: grep Options and Requires fields more
+ precisely
+References: <1508993438-15325-1-git-send-email-yamada.masahiro@socionext.com>
+ <alpine.DEB.2.20.1710260658330.17107@hadrien>
 From: "Nicolas Palix (LIG)" <Nicolas.Palix@imag.fr>
-Message-ID: <c18712da-6b47-3b13-059d-d49db738e386@imag.fr>
-Date: Thu, 26 Oct 2017 09:22:59 +0200
+Message-ID: <69422e77-ac67-d23f-59e2-c8d0df1819b6@imag.fr>
+Date: Thu, 26 Oct 2017 09:26:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <1508993751-17218-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms050001050609030108040707"
+In-Reply-To: <alpine.DEB.2.20.1710260658330.17107@hadrien>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms060104050906030104030202"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, cocci@systeme.lip6.fr, linux-kbuild@vger.kernel.org, Julia Lawall <Julia.Lawall@lip6.fr>
-Cc: linux-kernel@vger.kernel.org, Gilles Muller <Gilles.Muller@lip6.fr>, Michal Marek <michal.lkml@markovi.net>
+To: Julia Lawall <julia.lawall@lip6.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: cocci@systeme.lip6.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Gilles Muller <Gilles.Muller@lip6.fr>, Michal Marek <michal.lkml@markovi.net>
 
 This is a cryptographically signed message in MIME format.
 
---------------ms050001050609030108040707
+--------------ms060104050906030104030202
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: fr
 Content-Transfer-Encoding: quoted-printable
 
-Le 26/10/17 =C3=A0 06:55, Masahiro Yamada a =C3=A9crit=C2=A0:
-> If you run coccicheck with V=3D1 and COCCI=3D, you will see a strange
-> path to the semantic patch file.  For example, run the following:
+Le 26/10/17 =C3=A0 06:59, Julia Lawall a =C3=A9crit=C2=A0:
 >=20
-> $ make V=3D1 COCCI=3Dscripts/coccinelle/free/kfree.cocci coccicheck
->    [ snip ]
->   The semantic patch that makes this report is available
->   in scriptcoccinelle/free/kfree.cocci.
 >=20
-> Notice "s/" was dropped from "scripts/coccinelle/free/kfree.cocci".
+> On Thu, 26 Oct 2017, Masahiro Yamada wrote:
 >=20
-> When running coccicheck without O=3D, $srctree is expanded to ".", whic=
-h
-> represents one arbitrary character in the regular expression.  Using
-> sed is not a good choice here.  Strip $srctree/ simply without sed.
+>> Currently, the required version for badzero.cocci is picked up from
+>> its "Comments:" line since it contains the word "Requires".
+>>
+>> Surprisingly, ld-version.sh can extract the version number from the
+>> string "Requires Coccinelle version 1.0.0-rc20 or later", but this
+>> expectation is fragile.  Fix the .cocci file.  I removed "-rc20"
+>> because ld-version.sh cannot handle it.
 >=20
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> OK.
+>=20
+>> Make the coccicheck script to see exact patterns for "Options:" and
+>> "Requires:" in order to avoid accidental matching to what just happens=
+
+>> to appear in comment lines.
+>>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>=20
+> Thanks for checking on this!
+>=20
+> Acked-by: Julia Lawall <julia.lawall@lip6.fr>
 Acked-by: Nicolas Palix <nicolas.palix@imag.fr>
-> ---
 >=20
->   scripts/coccicheck | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/scripts/coccicheck b/scripts/coccicheck
-> index 1bfa2d2..9d18662 100755
-> --- a/scripts/coccicheck
-> +++ b/scripts/coccicheck
-> @@ -186,7 +186,7 @@ coccinelle () {
->  =20
->       if [ $VERBOSE -ne 0 -a $ONLINE -eq 0 ] ; then
->  =20
-> -	FILE=3D`echo $COCCI | sed "s|$srctree/||"`
-> +	FILE=3D${COCCI#$srctree/}
->  =20
->   	echo "Processing `basename $COCCI`"
->   	echo "with option(s) \"$OPT\""
->=20
+>> ---
+>>
+>>   scripts/coccicheck                    | 4 ++--
+>>   scripts/coccinelle/null/badzero.cocci | 2 +-
+>>   2 files changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/scripts/coccicheck b/scripts/coccicheck
+>> index 3e21a1b..1bfa2d2 100755
+>> --- a/scripts/coccicheck
+>> +++ b/scripts/coccicheck
+>> @@ -168,8 +168,8 @@ OPTIONS=3D"$OPTIONS $SPFLAGS"
+>>   coccinelle () {
+>>       COCCI=3D"$1"
+>>
+>> -    OPT=3D`grep "Option" $COCCI | cut -d':' -f2`
+>> -    REQ=3D`grep "Requires" $COCCI | cut -d':' -f2 | sed "s| ||"`
+>> +    OPT=3D`grep "Options:" $COCCI | cut -d':' -f2`
+>> +    REQ=3D`grep "Requires:" $COCCI | cut -d':' -f2 | sed "s| ||"`
+>>       REQ_NUM=3D$(echo $REQ | ${DIR}/scripts/ld-version.sh)
+>>       if [ "$REQ_NUM" !=3D "0" ] ; then
+>>   	    if [ "$SPATCH_VERSION_NUM" -lt "$REQ_NUM" ] ; then
+>> diff --git a/scripts/coccinelle/null/badzero.cocci b/scripts/coccinell=
+e/null/badzero.cocci
+>> index 5551da2..f597c80 100644
+>> --- a/scripts/coccinelle/null/badzero.cocci
+>> +++ b/scripts/coccinelle/null/badzero.cocci
+>> @@ -10,7 +10,7 @@
+>>   // Copyright: (C) 2012 Julia Lawall, INRIA/LIP6.  GPLv2.
+>>   // Copyright: (C) 2012 Gilles Muller, INRIA/LiP6.  GPLv2.
+>>   // URL: http://coccinelle.lip6.fr/
+>> -// Comments: Requires Coccinelle version 1.0.0-rc20 or later
+>> +// Requires: 1.0.0
+>>   // Options:
+>>
+>>   virtual patch
+>> --
+>> 2.7.4
+>>
+>>
 
 
 --=20
@@ -70,7 +99,7 @@ Nicolas Palix
 http://lig-membres.imag.fr/palix/
 
 
---------------ms050001050609030108040707
+--------------ms060104050906030104030202
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -119,16 +148,16 @@ DdngikVPugfoUyNWR04J1bD9AVj2tNsZIu5cMgsj6ZISpRYHstB7LBx9Ya1zScctTGAT2fup
 DiiEzqGjJcUSZUMuuvJmIR6v4toqr03yxR90yCn0eiLJOXtHGqOogAaXIGGDHGMS6KIU2hM8
 CTGCAt4wggLaAgEBMDwwNTELMAkGA1UEBhMCRlIxDTALBgNVBAoTBENOUlMxFzAVBgNVBAMT
 DkNOUlMyLVN0YW5kYXJkAgMAsYYwDQYJYIZIAWUDBAIBBQCgggFzMBgGCSqGSIb3DQEJAzEL
-BgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE3MTAyNjA3MjI1OVowLwYJKoZIhvcNAQkE
-MSIEIGnZEqNNa8+3L9/aB+6JI6Z7R1hy6dBSQ9ljZMf5VzNLMEsGCSsGAQQBgjcQBDE+MDww
+BgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE3MTAyNjA3MjYxN1owLwYJKoZIhvcNAQkE
+MSIEIAehnRlh/Pz8hFDpyBOQw13vO+aHvmGMiriEpzW3MItBMEsGCSsGAQQBgjcQBDE+MDww
 NTELMAkGA1UEBhMCRlIxDTALBgNVBAoTBENOUlMxFzAVBgNVBAMTDkNOUlMyLVN0YW5kYXJk
 AgMAsYYwTQYLKoZIhvcNAQkQAgsxPqA8MDUxCzAJBgNVBAYTAkZSMQ0wCwYDVQQKEwRDTlJT
 MRcwFQYDVQQDEw5DTlJTMi1TdGFuZGFyZAIDALGGMGwGCSqGSIb3DQEJDzFfMF0wCwYJYIZI
 AWUDBAEqMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzAOBggqhkiG9w0DAgICAIAwDQYIKoZI
-hvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwICASgwDQYJKoZIhvcNAQEBBQAEggEAFe/I
-J+QAgB+XwPYCFY+A6NWHKcbvLYdW/kIulsRMoXgpIfEROAm68o2CmoAtP/gOJUPTEGaGJ4n3
-LELdk924ay98EVDX99a8TSFm6RYfqtcUWWUdGyHaSfdtfljhssanTCSrr2K80oNcHliP1K5n
-yMC3Ve3lk1fw9q4zj6UtddPErQqVbw7sCl1ppW/dK7lMfx1MlOkEoWBDXItBBOjyRJ+WAzRV
-ZAiOIN8W9IW2HIf4lF4Zn70qZ1l2hNgFWlA4FW31lYpZ3Qb862PUkES5y9RLkBdeTdGoevvT
-D1YqykhNoGZ9hhatPed8WuKlGNpPkdHFq8NUxz15+prNUtZIbQAAAAAAAA==
---------------ms050001050609030108040707--
+hvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwICASgwDQYJKoZIhvcNAQEBBQAEggEAlCap
+5C713Qf4Vimh1WpnSzUvWreX/mOVbrSiUg0lUQD3LEAMKYk+wi6GuPuKOIs8ZIGrnZ1JwDzf
+idMazUbKWlAORiiZIORJC9EKDtjb1o7e9ozbB0t3RUOGbYs0IIBYiaiV0V99AG31pLrjezPA
+9pzFQl9vSvf8wQadt89FpPlF4luhaSADS1e/mRDJ+FDXY0a/b7JHAuYo/rioa9BmvLBU+zFF
+sZs0ScLgGhJd0F1ZsYMEW6WYLQEbt9BmhvOdhXwRzJ/QAwg1RGKJjfUIiVZHmkG38YvEsESN
+QCGGNfY//9z/8x0J3BrfkQiy0UQYdpx1nC3XzWYwjfk1Y3FeIQAAAAAAAA==
+--------------ms060104050906030104030202--
