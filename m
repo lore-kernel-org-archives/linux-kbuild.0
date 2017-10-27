@@ -1,46 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.29.96]:33826 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751599AbdJ0HvK (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:44837 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752692AbdJ0S2q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Oct 2017 03:51:10 -0400
-Content-Type: text/plain; charset="utf-8"
+        Fri, 27 Oct 2017 14:28:46 -0400
+Received: by mail-wm0-f67.google.com with SMTP id n74so2472681wmi.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 27 Oct 2017 11:28:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [v4,2/9] brcmsmac: split up wlc_phy_workarounds_nphy
-From: Kalle Valo <kvalo@codeaurora.org>
-In-Reply-To: <20170922212930.620249-3-arnd@arndb.de>
-References: <20170922212930.620249-3-arnd@arndb.de>
-Message-Id: <20171027075109.6D3CE605A8@smtp.codeaurora.org>
-Date: Fri, 27 Oct 2017 07:51:09 +0000 (UTC)
+In-Reply-To: <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com>
+References: <20171026201744.89744-1-ndesaulniers@google.com> <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Fri, 27 Oct 2017 11:28:43 -0700
+Message-ID: <CAKwvOd=COgOc4MM7Ex1j8d_fXDuW0uUTueUEr-bL7NESB4hrWw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix linker feature test macros when cross
+ compiling with Clang
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Arend van Spriel <arend.vanspriel@broadcom.com>, Franky Lin <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>, Chi-Hsien Lin <chi-hsien.lin@cypress.com>, Wright Feng <wright.feng@cypress.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-media@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com, brcm80211-dev-list@cypress.com, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org, Jakub Jelinek <jakub@gcc.gnu.org>, =?UTF-8?q?Martin=20Li=C5=A1ka?= <marxin@gcc.gnu.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Ingo Molnar <mingo@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Arnd Bergmann <arnd@arndb.de> wrote:
++ linux-kbuild@vger.kernel.org
 
-> The stack consumption in this driver is still relatively high, with one
-> remaining warning if the warning level is lowered to 1536 bytes:
-> 
-> drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c:17135:1: error: the frame size of 1880 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
-> 
-> The affected function is actually a collection of three separate implementations,
-> and each of them is fairly large by itself. Splitting them up is done easily
-> and improves readability at the same time.
-> 
-> I'm leaving the original indentation to make the review easier.
-> 
-> Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+On Fri, Oct 27, 2017 at 4:20 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> I do not like to add $(CLANG_TARGET) to a place for common helpers.
+> Instead of $(CLANG_TARGET), please add
+> $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS)
+> to cc-ldoption and ld-option.
 
-2 patches applied to wireless-drivers-next.git, thanks.
+Thanks for the review.  I agree that sounds like a better option.
 
-0425f079590c brcmsmac: split up wlc_phy_workarounds_nphy
-ad1987d67392 brcmsmac: reindent split functions
+> I have two requests next time:
+>   - please include  linux-kbuild@vger.kernel.org in your To list
 
--- 
-https://patchwork.kernel.org/patch/9967141/
+Sure thing. scripts/get_maintainer.pl does not recommend that list for
+this file; is there a way to explicitly add that list to the
+recommendation for that source file?
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+>   - please base your patch on linux-kbuild/kbuild branch
 
+Will do. Do I need to note it's based off that branch? Otherwise wont
+0-day bot complain that my patch doesn't apply/build on torvalds/linux
+?
