@@ -1,56 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:29183 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751050AbdJ0ENS (ORCPT
+Received: from smtp.codeaurora.org ([198.145.29.96]:33826 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751599AbdJ0HvK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Oct 2017 00:13:18 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] x86/build: beautify build log of syscall headers
-Date: Fri, 27 Oct 2017 13:11:10 +0900
-Message-Id: <1509077470-2735-1-git-send-email-yamada.masahiro@socionext.com>
+        Fri, 27 Oct 2017 03:51:10 -0400
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [v4,2/9] brcmsmac: split up wlc_phy_workarounds_nphy
+From: Kalle Valo <kvalo@codeaurora.org>
+In-Reply-To: <20170922212930.620249-3-arnd@arndb.de>
+References: <20170922212930.620249-3-arnd@arndb.de>
+Message-Id: <20171027075109.6D3CE605A8@smtp.codeaurora.org>
+Date: Fri, 27 Oct 2017 07:51:09 +0000 (UTC)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Arend van Spriel <arend.vanspriel@broadcom.com>, Franky Lin <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>, Chi-Hsien Lin <chi-hsien.lin@cypress.com>, Wright Feng <wright.feng@cypress.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-media@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com, brcm80211-dev-list@cypress.com, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org, Jakub Jelinek <jakub@gcc.gnu.org>, =?UTF-8?q?Martin=20Li=C5=A1ka?= <marxin@gcc.gnu.org>
 
-This makes the build log look nicer.
+Arnd Bergmann <arnd@arndb.de> wrote:
 
-Before:
-  SYSTBL  arch/x86/entry/syscalls/../../include/generated/asm/syscalls_32.h
-  SYSHDR  arch/x86/entry/syscalls/../../include/generated/asm/unistd_32_ia32.h
-  SYSHDR  arch/x86/entry/syscalls/../../include/generated/asm/unistd_64_x32.h
-  SYSTBL  arch/x86/entry/syscalls/../../include/generated/asm/syscalls_64.h
-  SYSHDR  arch/x86/entry/syscalls/../../include/generated/uapi/asm/unistd_32.h
-  SYSHDR  arch/x86/entry/syscalls/../../include/generated/uapi/asm/unistd_64.h
-  SYSHDR  arch/x86/entry/syscalls/../../include/generated/uapi/asm/unistd_x32.h
+> The stack consumption in this driver is still relatively high, with one
+> remaining warning if the warning level is lowered to 1536 bytes:
+> 
+> drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c:17135:1: error: the frame size of 1880 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
+> 
+> The affected function is actually a collection of three separate implementations,
+> and each of them is fairly large by itself. Splitting them up is done easily
+> and improves readability at the same time.
+> 
+> I'm leaving the original indentation to make the review easier.
+> 
+> Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-After:
-  SYSTBL  arch/x86/include/generated/asm/syscalls_32.h
-  SYSHDR  arch/x86/include/generated/asm/unistd_32_ia32.h
-  SYSHDR  arch/x86/include/generated/asm/unistd_64_x32.h
-  SYSTBL  arch/x86/include/generated/asm/syscalls_64.h
-  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_32.h
-  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_64.h
-  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_x32.h
+2 patches applied to wireless-drivers-next.git, thanks.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+0425f079590c brcmsmac: split up wlc_phy_workarounds_nphy
+ad1987d67392 brcmsmac: reindent split functions
 
- arch/x86/entry/syscalls/Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/entry/syscalls/Makefile b/arch/x86/entry/syscalls/Makefile
-index 57aa59f..e34c7a9 100644
---- a/arch/x86/entry/syscalls/Makefile
-+++ b/arch/x86/entry/syscalls/Makefile
-@@ -1,5 +1,5 @@
--out := $(obj)/../../include/generated/asm
--uapi := $(obj)/../../include/generated/uapi/asm
-+out := arch/$(SRCARCH)/include/generated/asm
-+uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- 
- # Create output directory if not already present
- _dummy := $(shell [ -d '$(out)' ] || mkdir -p '$(out)') \
 -- 
-2.7.4
+https://patchwork.kernel.org/patch/9967141/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
