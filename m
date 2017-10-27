@@ -1,112 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:42931 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932135AbdJ0TmA (ORCPT
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:44739 "EHLO
+        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752565AbdJ0UK0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Oct 2017 15:42:00 -0400
-From: Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH] Check all .c files for bad kernel-doc comments
-Date: Fri, 27 Oct 2017 12:41:49 -0700
-Message-Id: <20171027194149.14328-1-willy@infradead.org>
+        Fri, 27 Oct 2017 16:10:26 -0400
+Received: by mail-wr0-f195.google.com with SMTP id z55so7214236wrz.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 27 Oct 2017 13:10:26 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAKwvOd=COgOc4MM7Ex1j8d_fXDuW0uUTueUEr-bL7NESB4hrWw@mail.gmail.com>
+References: <20171026201744.89744-1-ndesaulniers@google.com>
+ <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com> <CAKwvOd=COgOc4MM7Ex1j8d_fXDuW0uUTueUEr-bL7NESB4hrWw@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Fri, 27 Oct 2017 13:10:24 -0700
+Message-ID: <CAKwvOdnjvVQDyQChkg0Td1w7XoMDJiHf07oKMf815dFoMYFEPQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix linker feature test macros when cross
+ compiling with Clang
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
-Cc: Matthew Wilcox <mawilcox@microsoft.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Ingo Molnar <mingo@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Badhri Jagan Sridharan <badhri@google.com>, Todd Kjos <tkjos@google.com>, arve@android.com
 
-From: Matthew Wilcox <mawilcox@microsoft.com>
+On Fri, Oct 27, 2017 at 11:28 AM, Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+> On Fri, Oct 27, 2017 at 4:20 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>>   - please base your patch on linux-kbuild/kbuild branch
+>
+> Will do. Do I need to note it's based off that branch? Otherwise wont
+> 0-day bot complain that my patch doesn't apply/build on torvalds/linux
+> ?
 
-Implement a '-none' output mode for kernel-doc which will only output
-warning messages, and suppresses the warning message about there being
-no kernel-doc in the file.  Add it to the rule to build .o files from .c
-files, so it will check all .c files that have been modified.
-
-Adds about 1300 warnings to my build, but will hopefully discourage
-people from introducing more kerneldoc mistakes.
-
-Signed-off-by: Matthew Wilcox <mawilcox@microsoft.com>
----
- scripts/Makefile.build |  3 +++
- scripts/kernel-doc     | 25 ++++++++++++++++++++++++-
- 2 files changed, 27 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 061d0c3a420a..f0f907af53c7 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -108,6 +108,8 @@ ifneq ($(KBUILD_CHECKSRC),0)
-   endif
- endif
- 
-+cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $< ;
-+
- # Do section mismatch analysis for each module/built-in.o
- ifdef CONFIG_DEBUG_SECTION_MISMATCH
-   cmd_secanalysis = ; scripts/mod/modpost $@
-@@ -291,6 +293,7 @@ define rule_cc_o_c
- 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
- 	$(call cmd_and_fixdep,cc_o_c)					  \
- 	$(cmd_modversions_c)						  \
-+	$(cmd_checkdoc)							  \
- 	$(call echo-cmd,objtool) $(cmd_objtool)				  \
- 	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
- endef
-diff --git a/scripts/kernel-doc b/scripts/kernel-doc
-index 9d3eafea58f0..c69583440a44 100755
---- a/scripts/kernel-doc
-+++ b/scripts/kernel-doc
-@@ -58,6 +58,7 @@ Output format selection (mutually exclusive):
-   -man			Output troff manual page format. This is the default.
-   -rst			Output reStructuredText format.
-   -text			Output plain text format.
-+  -none			Do not output documentation, only warnings.
- 
- Output selection (mutually exclusive):
-   -export		Only output documentation for symbols that have been
-@@ -532,6 +533,8 @@ while ($ARGV[0] =~ m/^-(.*)/) {
- 	$output_mode = "gnome";
- 	@highlights = @highlights_gnome;
- 	$blankline = $blankline_gnome;
-+    } elsif ($cmd eq "-none") {
-+	$output_mode = "none";
-     } elsif ($cmd eq "-module") { # not needed for XML, inherits from calling document
- 	$modulename = shift @ARGV;
-     } elsif ($cmd eq "-function") { # to only output specific functions
-@@ -2117,6 +2120,24 @@ sub output_blockhead_list(%) {
-     }
- }
- 
-+
-+## none mode output functions
-+
-+sub output_function_none(%) {
-+}
-+
-+sub output_enum_none(%) {
-+}
-+
-+sub output_typedef_none(%) {
-+}
-+
-+sub output_struct_none(%) {
-+}
-+
-+sub output_blockhead_none(%) {
-+}
-+
- ##
- # generic output function for all types (function, struct/union, typedef, enum);
- # calls the generated, variable output_ function name based on
-@@ -3136,7 +3157,9 @@ sub process_file($) {
- 	}
-     }
-     if ($initial_section_counter == $section_counter) {
--	print STDERR "${file}:1: warning: no structured comments found\n";
-+	if ($output_mode ne "none") {
-+	    print STDERR "${file}:1: warning: no structured comments found\n";
-+	}
- 	if (($output_selection == OUTPUT_INCLUDE) && ($show_not_found == 1)) {
- 	    print STDERR "    Was looking for '$_'.\n" for keys %function_table;
- 	}
--- 
-2.11.0.301.g722e3be85.dirty
-
+Talked to some teammates about this, sounds like it's not a problem,
+so I'll just send v2 with a note to the reviewer.
