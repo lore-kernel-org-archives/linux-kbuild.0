@@ -1,35 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:44739 "EHLO
-        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752565AbdJ0UK0 (ORCPT
+Received: from mail-io0-f194.google.com ([209.85.223.194]:55219 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751516AbdJ0UNw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Oct 2017 16:10:26 -0400
-Received: by mail-wr0-f195.google.com with SMTP id z55so7214236wrz.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 27 Oct 2017 13:10:26 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAKwvOd=COgOc4MM7Ex1j8d_fXDuW0uUTueUEr-bL7NESB4hrWw@mail.gmail.com>
-References: <20171026201744.89744-1-ndesaulniers@google.com>
- <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com> <CAKwvOd=COgOc4MM7Ex1j8d_fXDuW0uUTueUEr-bL7NESB4hrWw@mail.gmail.com>
+        Fri, 27 Oct 2017 16:13:52 -0400
+Received: by mail-io0-f194.google.com with SMTP id e89so15130215ioi.11
+        for <linux-kbuild@vger.kernel.org>; Fri, 27 Oct 2017 13:13:52 -0700 (PDT)
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Fri, 27 Oct 2017 13:10:24 -0700
-Message-ID: <CAKwvOdnjvVQDyQChkg0Td1w7XoMDJiHf07oKMf815dFoMYFEPQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: fix linker feature test macros when cross
- compiling with Clang
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v2] kbuild: fix linker feature test macros when cross compiling with Clang
+Date: Fri, 27 Oct 2017 13:13:43 -0700
+Message-Id: <20171027201345.87383-1-ndesaulniers@google.com>
+In-Reply-To: <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com>
+References: <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Ingo Molnar <mingo@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Badhri Jagan Sridharan <badhri@google.com>, Todd Kjos <tkjos@google.com>, arve@android.com
+To: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: md@google.com, ghackmann@google.com, pirama@google.com, Nick Desaulniers <ndesaulniers@google.com>, Douglas Anderson <dianders@chromium.org>, Ingo Molnar <mingo@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Mark Charlebois <charlebm@gmail.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, linux-kernel@vger.kernel.org
 
-On Fri, Oct 27, 2017 at 11:28 AM, Nick Desaulniers
-<ndesaulniers@google.com> wrote:
-> On Fri, Oct 27, 2017 at 4:20 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->>   - please base your patch on linux-kbuild/kbuild branch
->
-> Will do. Do I need to note it's based off that branch? Otherwise wont
-> 0-day bot complain that my patch doesn't apply/build on torvalds/linux
-> ?
+I was not seeing my linker flags getting added when using ld-option when
+cross compiling with Clang. Upon investigation, this seems to be due to
+a difference in how GCC vs Clang handle cross compilation.
 
-Talked to some teammates about this, sounds like it's not a problem,
-so I'll just send v2 with a note to the reviewer.
+GCC is configured at build time to support one backend, that is implicit
+when compiling.  Clang is explicit via the use of `-target <triple>` and
+ships with all supported backends by default.
+
+GNU Make feature test macros that compile then link will always fail
+when cross compiling with Clang unless Clang's triple is passed along to
+the compiler. For example:
+
+$ clang -x c /dev/null -c -o temp.o
+$ aarch64-linux-android/bin/ld -E temp.o
+aarch64-linux-android/bin/ld:
+unknown architecture of input file `temp.o' is incompatible with
+aarch64 output
+aarch64-linux-android/bin/ld:
+warning: cannot find entry symbol _start; defaulting to
+0000000000400078
+$ echo $?
+1
+
+$ clang -target aarch64-linux-android- -x c /dev/null -c -o temp.o
+$ aarch64-linux-android/bin/ld -E temp.o
+aarch64-linux-android/bin/ld:
+warning: cannot find entry symbol _start; defaulting to 00000000004002e4
+$ echo $?
+0
+
+This causes conditional checks that invoke $(CC) without the target
+triple, then $(LD) on the result, to always fail.
+
+Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+---
+Changes since v1:
+* base patch off of
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+  kbuild branch, per Masahiro.
+* Use $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) rather than $(CLANG_TRIPLE), per
+  Masahiro.
+
+ scripts/Kbuild.include | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 064f477dfdca..0f09e4508554 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -228,12 +228,13 @@ cc-if-fullversion = $(shell [ $(cc-fullversion) $(1) $(2) ] && echo $(3) || echo
+ # cc-ldoption
+ # Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
+ cc-ldoption = $(call try-run-cached,\
+-	$(CC) $(1) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
++	$(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+ 
+ # ld-option
+ # Usage: LDFLAGS += $(call ld-option, -X)
+ ld-option = $(call try-run-cached,\
+-	$(CC) -x c /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
++	$(CC) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -x c /dev/null -c -o "$$TMPO"; \
++	$(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+ 
+ # ar-option
+ # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
+-- 
+2.15.0.rc2.357.g7e34df9404-goog
+
