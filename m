@@ -1,63 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:18226 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751189AbdJ1PAs (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:52480 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751189AbdJ1PB1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 28 Oct 2017 11:00:48 -0400
+        Sat, 28 Oct 2017 11:01:27 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAKwvOd=COgOc4MM7Ex1j8d_fXDuW0uUTueUEr-bL7NESB4hrWw@mail.gmail.com>
-References: <20171026201744.89744-1-ndesaulniers@google.com>
- <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com> <CAKwvOd=COgOc4MM7Ex1j8d_fXDuW0uUTueUEr-bL7NESB4hrWw@mail.gmail.com>
+In-Reply-To: <20171027201345.87383-1-ndesaulniers@google.com>
+References: <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com>
+ <20171027201345.87383-1-ndesaulniers@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 28 Oct 2017 23:59:59 +0900
-Message-ID: <CAK7LNASOVBaMLTN2wiAQJzD06_HAqSCED4amqU4VXws8ZbOVEA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: fix linker feature test macros when cross
+Date: Sun, 29 Oct 2017 00:00:36 +0900
+Message-ID: <CAK7LNAT56EEHbQguD1pbFiurU9MMa55WAUptX16KWhpOOF_BHg@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: fix linker feature test macros when cross
  compiling with Clang
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Ingo Molnar <mingo@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Douglas Anderson <dianders@chromium.org>, Ingo Molnar <mingo@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Mark Charlebois <charlebm@gmail.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-10-28 3:28 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
-> + linux-kbuild@vger.kernel.org
+2017-10-28 5:13 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+> I was not seeing my linker flags getting added when using ld-option when
+> cross compiling with Clang. Upon investigation, this seems to be due to
+> a difference in how GCC vs Clang handle cross compilation.
 >
-> On Fri, Oct 27, 2017 at 4:20 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> I do not like to add $(CLANG_TARGET) to a place for common helpers.
->> Instead of $(CLANG_TARGET), please add
->> $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS)
->> to cc-ldoption and ld-option.
+> GCC is configured at build time to support one backend, that is implicit
+> when compiling.  Clang is explicit via the use of `-target <triple>` and
+> ships with all supported backends by default.
 >
-> Thanks for the review.  I agree that sounds like a better option.
+> GNU Make feature test macros that compile then link will always fail
+> when cross compiling with Clang unless Clang's triple is passed along to
+> the compiler. For example:
 >
->> I have two requests next time:
->>   - please include  linux-kbuild@vger.kernel.org in your To list
+> $ clang -x c /dev/null -c -o temp.o
+> $ aarch64-linux-android/bin/ld -E temp.o
+> aarch64-linux-android/bin/ld:
+> unknown architecture of input file `temp.o' is incompatible with
+> aarch64 output
+> aarch64-linux-android/bin/ld:
+> warning: cannot find entry symbol _start; defaulting to
+> 0000000000400078
+> $ echo $?
+> 1
 >
-> Sure thing. scripts/get_maintainer.pl does not recommend that list for
-> this file; is there a way to explicitly add that list to the
-> recommendation for that source file?
-
-Ah, I realized MAINTAINERS does not claim the maintainership
-of this file.
-
-There are so many misc scripts
-in scripts/, so I hesitate to add
-scripts/* pattern to MAINTAINERS.
-
-
-
-
->>   - please base your patch on linux-kbuild/kbuild branch
+> $ clang -target aarch64-linux-android- -x c /dev/null -c -o temp.o
+> $ aarch64-linux-android/bin/ld -E temp.o
+> aarch64-linux-android/bin/ld:
+> warning: cannot find entry symbol _start; defaulting to 00000000004002e4
+> $ echo $?
+> 0
 >
-> Will do. Do I need to note it's based off that branch? Otherwise wont
-> 0-day bot complain that my patch doesn't apply/build on torvalds/linux
-> ?
+> This causes conditional checks that invoke $(CC) without the target
+> triple, then $(LD) on the result, to always fail.
+>
+> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
+> Changes since v1:
+> * base patch off of
+>   git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+>   kbuild branch, per Masahiro.
+> * Use $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) rather than $(CLANG_TRIPLE), per
+>   Masahiro.
+>
+>  scripts/Kbuild.include | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index 064f477dfdca..0f09e4508554 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -228,12 +228,13 @@ cc-if-fullversion = $(shell [ $(cc-fullversion) $(1) $(2) ] && echo $(3) || echo
+>  # cc-ldoption
+>  # Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
+>  cc-ldoption = $(call try-run-cached,\
+> -       $(CC) $(1) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+> +       $(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+>
+>  # ld-option
+>  # Usage: LDFLAGS += $(call ld-option, -X)
+>  ld-option = $(call try-run-cached,\
+> -       $(CC) -x c /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+> +       $(CC) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -x c /dev/null -c -o "$$TMPO"; \
+> +       $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+>
+>  # ar-option
+>  # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
+> --
+> 2.15.0.rc2.357.g7e34df9404-goog
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I am not sure in which case the 0-day bot complain about it.
 
-Now, I applied v2.
-If the bot find a problem, it will send us a report.
+Applied to linux-kbuild/kbuild.  Thanks!
 
 
 -- 
