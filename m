@@ -1,102 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:52480 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751189AbdJ1PB1 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:35827 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751189AbdJ1P0j (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 28 Oct 2017 11:01:27 -0400
+        Sat, 28 Oct 2017 11:26:39 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171027201345.87383-1-ndesaulniers@google.com>
-References: <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com>
- <20171027201345.87383-1-ndesaulniers@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 29 Oct 2017 00:00:36 +0900
-Message-ID: <CAK7LNAT56EEHbQguD1pbFiurU9MMa55WAUptX16KWhpOOF_BHg@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: fix linker feature test macros when cross
- compiling with Clang
+Date: Sun, 29 Oct 2017 00:25:52 +0900
+Message-ID: <CAK7LNAR2W9Fppu0Y4iL3iPVGR8L6zN64c0shyX-_A4kERk8jtQ@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v4.14-rc7
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Douglas Anderson <dianders@chromium.org>, Ingo Molnar <mingo@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Mark Charlebois <charlebm@gmail.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-10-28 5:13 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
-> I was not seeing my linker flags getting added when using ld-option when
-> cross compiling with Clang. Upon investigation, this seems to be due to
-> a difference in how GCC vs Clang handle cross compilation.
->
-> GCC is configured at build time to support one backend, that is implicit
-> when compiling.  Clang is explicit via the use of `-target <triple>` and
-> ships with all supported backends by default.
->
-> GNU Make feature test macros that compile then link will always fail
-> when cross compiling with Clang unless Clang's triple is passed along to
-> the compiler. For example:
->
-> $ clang -x c /dev/null -c -o temp.o
-> $ aarch64-linux-android/bin/ld -E temp.o
-> aarch64-linux-android/bin/ld:
-> unknown architecture of input file `temp.o' is incompatible with
-> aarch64 output
-> aarch64-linux-android/bin/ld:
-> warning: cannot find entry symbol _start; defaulting to
-> 0000000000400078
-> $ echo $?
-> 1
->
-> $ clang -target aarch64-linux-android- -x c /dev/null -c -o temp.o
-> $ aarch64-linux-android/bin/ld -E temp.o
-> aarch64-linux-android/bin/ld:
-> warning: cannot find entry symbol _start; defaulting to 00000000004002e4
-> $ echo $?
-> 0
->
-> This causes conditional checks that invoke $(CC) without the target
-> triple, then $(LD) on the result, to always fail.
->
-> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
-> ---
-> Changes since v1:
-> * base patch off of
->   git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
->   kbuild branch, per Masahiro.
-> * Use $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) rather than $(CLANG_TRIPLE), per
->   Masahiro.
->
->  scripts/Kbuild.include | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index 064f477dfdca..0f09e4508554 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -228,12 +228,13 @@ cc-if-fullversion = $(shell [ $(cc-fullversion) $(1) $(2) ] && echo $(3) || echo
->  # cc-ldoption
->  # Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
->  cc-ldoption = $(call try-run-cached,\
-> -       $(CC) $(1) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
-> +       $(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
->
->  # ld-option
->  # Usage: LDFLAGS += $(call ld-option, -X)
->  ld-option = $(call try-run-cached,\
-> -       $(CC) -x c /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
-> +       $(CC) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -x c /dev/null -c -o "$$TMPO"; \
-> +       $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
->
->  # ar-option
->  # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
-> --
-> 2.15.0.rc2.357.g7e34df9404-goog
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Hi Linus,
+
+This is the 2nd round of Kbuild fixes for v4.14.
+Please pull!
 
 
-Applied to linux-kbuild/kbuild.  Thanks!
+The following changes since commit 9e66317d3c92ddaab330c125dfe9d06eee268aff:
+
+  Linux 4.14-rc3 (2017-10-01 14:54:54 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v4.14-2
+
+for you to fetch changes up to bb3f38c3c5b759163e09b9152629cc789731de47:
+
+  kbuild: clang: fix build failures with sparse check (2017-10-24
+10:12:02 +0900)
+
+----------------------------------------------------------------
+Kbuild fixes for v4.14 (2nd)
+
+- fix O= building on dash
+
+- remove unused dependency in Makefile
+
+- fix default of a choice in Kconfig
+
+- fix typos and documentation style
+
+- fix command options unrecognized by sparse
+
+----------------------------------------------------------------
+Cao jin (2):
+      kbuild: drop unused symverfile in Makefile.modpost
+      kbuild doc: a bundle of fixes on makefiles.txt
+
+David Lin (1):
+      kbuild: clang: fix build failures with sparse check
+
+Masahiro Yamada (1):
+      kbuild: revert $(realpath ...) to $(shell cd ... && /bin/pwd)
+
+Randy Dunlap (1):
+      Makefile: kselftest: fix grammar typo
+
+Ulf Magnusson (1):
+      kbuild: Fix optimization level choice default
+
+ Documentation/kbuild/makefiles.txt | 31 +++++++++++++---------
+ Makefile                           | 10 +++----
+ init/Kconfig                       |  2 +-
+ scripts/Makefile.modpost           |  1 -
+ tools/power/cpupower/Makefile      |  2 +-
+ tools/scripts/Makefile.include     |  6 ++---
+ 6 files changed, 28 insertions(+), 24 deletions(-)
 
 
 -- 
