@@ -1,79 +1,294 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:35827 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751189AbdJ1P0j (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 28 Oct 2017 11:26:39 -0400
+Received: from mga05.intel.com ([192.55.52.43]:3442 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751315AbdJ2UhM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 29 Oct 2017 16:37:12 -0400
+Date: Mon, 30 Oct 2017 04:37:02 +0800
+From: kbuild test robot <lkp@intel.com>
+Subject: Re: [PATCH] Check all .c files for bad kernel-doc comments
+Message-ID: <201710300404.iwPDSRVE%fengguang.wu@intel.com>
+References: <20171027194149.14328-1-willy@infradead.org>
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 29 Oct 2017 00:25:52 +0900
-Message-ID: <CAK7LNAR2W9Fppu0Y4iL3iPVGR8L6zN64c0shyX-_A4kERk8jtQ@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v4.14-rc7
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/mixed; boundary="ZPt4rx8FFjLCG7dd"
+Content-Disposition: inline
+In-Reply-To: <20171027194149.14328-1-willy@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-
-Hi Linus,
-
-This is the 2nd round of Kbuild fixes for v4.14.
-Please pull!
+To: Matthew Wilcox <willy@infradead.org>
+Cc: kbuild-all@01.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, Matthew Wilcox <mawilcox@microsoft.com>
 
 
-The following changes since commit 9e66317d3c92ddaab330c125dfe9d06eee268aff:
+--ZPt4rx8FFjLCG7dd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-  Linux 4.14-rc3 (2017-10-01 14:54:54 -0700)
+Hi Matthew,
 
-are available in the git repository at:
+I love your patch! Perhaps something to improve:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v4.14-2
+[auto build test WARNING on linus/master]
+[also build test WARNING on v4.14-rc6 next-20171018]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
-for you to fetch changes up to bb3f38c3c5b759163e09b9152629cc789731de47:
+url:    https://github.com/0day-ci/linux/commits/Matthew-Wilcox/Check-all-c-files-for-bad-kernel-doc-comments/20171030-033926
+config: i386-tinyconfig (attached as .config)
+compiler: gcc-6 (Debian 6.2.0-3) 6.2.0 20160901
+reproduce:
+        # save the attached .config to linux build tree
+        make ARCH=i386 
 
-  kbuild: clang: fix build failures with sparse check (2017-10-24
-10:12:02 +0900)
+All warnings (new ones prefixed by >>):
 
-----------------------------------------------------------------
-Kbuild fixes for v4.14 (2nd)
+>> kernel/fork.c:983: warning: No description found for parameter 'mm'
+>> kernel/fork.c:983: warning: No description found for parameter 'new_exe_file'
+   kernel/fork.c:1007: warning: No description found for parameter 'mm'
+>> kernel/fork.c:1027: warning: No description found for parameter 'task'
+   kernel/fork.c:1052: warning: No description found for parameter 'task'
+--
+>> kernel/cpu.c:53: warning: cannot understand function prototype: 'struct cpuhp_cpu_state '
+>> kernel/cpu.c:108: warning: cannot understand function prototype: 'struct cpuhp_step '
+>> kernel/cpu.c:1608: warning: No description found for parameter 'name'
+--
+>> kernel/notifier.c:77: warning: Excess function parameter 'returns' description in 'notifier_call_chain'
+--
+>> kernel/reboot.c:184: warning: No description found for parameter 'cmd'
+--
+>> mm/oom_kill.c:175: warning: No description found for parameter 'memcg'
+>> mm/oom_kill.c:175: warning: No description found for parameter 'nodemask'
+--
+>> mm/maccess.c:87: warning: No description found for parameter 'unsafe_addr'
+>> mm/maccess.c:87: warning: Excess function parameter 'src' description in 'strncpy_from_unsafe'
+--
+>> mm/swap.c:932: warning: No description found for parameter 'nr_pages'
+>> mm/swap.c:932: warning: Excess function parameter 'nr_entries' description in 'pagevec_lookup_entries'
+>> mm/swap.c:982: warning: Excess function parameter 'nr_pages' description in 'pagevec_lookup_range'
+--
+>> mm/compaction.c:568: warning: No description found for parameter 'cc'
+>> mm/compaction.c:1724: warning: No description found for parameter 'prio'
+>> mm/compaction.c:1724: warning: Excess function parameter 'mode' description in 'try_to_compact_pages'
+--
+>> mm/mlock.c:176: warning: No description found for parameter 'page'
+--
+>> mm/pagewalk.c:286: warning: No description found for parameter 'start'
+>> mm/pagewalk.c:286: warning: No description found for parameter 'end'
+>> mm/pagewalk.c:286: warning: No description found for parameter 'walk'
+--
+>> mm/rmap.c:1175: warning: No description found for parameter 'compound'
+..
 
-- fix O= building on dash
+vim +/mm +983 kernel/fork.c
 
-- remove unused dependency in Makefile
+a1b2289c Sherry Yang           2017-10-03   970  
+90f31d0e Konstantin Khlebnikov 2015-04-16   971  /**
+90f31d0e Konstantin Khlebnikov 2015-04-16   972   * set_mm_exe_file - change a reference to the mm's executable file
+90f31d0e Konstantin Khlebnikov 2015-04-16   973   *
+90f31d0e Konstantin Khlebnikov 2015-04-16   974   * This changes mm's executable file (shown as symlink /proc/[pid]/exe).
+90f31d0e Konstantin Khlebnikov 2015-04-16   975   *
+6e399cd1 Davidlohr Bueso       2015-04-16   976   * Main users are mmput() and sys_execve(). Callers prevent concurrent
+6e399cd1 Davidlohr Bueso       2015-04-16   977   * invocations: in mmput() nobody alive left, in execve task is single
+6e399cd1 Davidlohr Bueso       2015-04-16   978   * threaded. sys_prctl(PR_SET_MM_MAP/EXE_FILE) also needs to set the
+6e399cd1 Davidlohr Bueso       2015-04-16   979   * mm->exe_file, but does so without using set_mm_exe_file() in order
+6e399cd1 Davidlohr Bueso       2015-04-16   980   * to do avoid the need for any locks.
+90f31d0e Konstantin Khlebnikov 2015-04-16   981   */
+38646013 Jiri Slaby            2011-05-26   982  void set_mm_exe_file(struct mm_struct *mm, struct file *new_exe_file)
+38646013 Jiri Slaby            2011-05-26  @983  {
+6e399cd1 Davidlohr Bueso       2015-04-16   984  	struct file *old_exe_file;
+6e399cd1 Davidlohr Bueso       2015-04-16   985  
+6e399cd1 Davidlohr Bueso       2015-04-16   986  	/*
+6e399cd1 Davidlohr Bueso       2015-04-16   987  	 * It is safe to dereference the exe_file without RCU as
+6e399cd1 Davidlohr Bueso       2015-04-16   988  	 * this function is only called if nobody else can access
+6e399cd1 Davidlohr Bueso       2015-04-16   989  	 * this mm -- see comment above for justification.
+6e399cd1 Davidlohr Bueso       2015-04-16   990  	 */
+6e399cd1 Davidlohr Bueso       2015-04-16   991  	old_exe_file = rcu_dereference_raw(mm->exe_file);
+90f31d0e Konstantin Khlebnikov 2015-04-16   992  
+38646013 Jiri Slaby            2011-05-26   993  	if (new_exe_file)
+38646013 Jiri Slaby            2011-05-26   994  		get_file(new_exe_file);
+90f31d0e Konstantin Khlebnikov 2015-04-16   995  	rcu_assign_pointer(mm->exe_file, new_exe_file);
+90f31d0e Konstantin Khlebnikov 2015-04-16   996  	if (old_exe_file)
+90f31d0e Konstantin Khlebnikov 2015-04-16   997  		fput(old_exe_file);
+38646013 Jiri Slaby            2011-05-26   998  }
+38646013 Jiri Slaby            2011-05-26   999  
+90f31d0e Konstantin Khlebnikov 2015-04-16  1000  /**
+90f31d0e Konstantin Khlebnikov 2015-04-16  1001   * get_mm_exe_file - acquire a reference to the mm's executable file
+90f31d0e Konstantin Khlebnikov 2015-04-16  1002   *
+90f31d0e Konstantin Khlebnikov 2015-04-16  1003   * Returns %NULL if mm has no associated executable file.
+90f31d0e Konstantin Khlebnikov 2015-04-16  1004   * User must release file via fput().
+90f31d0e Konstantin Khlebnikov 2015-04-16  1005   */
+38646013 Jiri Slaby            2011-05-26  1006  struct file *get_mm_exe_file(struct mm_struct *mm)
+38646013 Jiri Slaby            2011-05-26  1007  {
+38646013 Jiri Slaby            2011-05-26  1008  	struct file *exe_file;
+38646013 Jiri Slaby            2011-05-26  1009  
+90f31d0e Konstantin Khlebnikov 2015-04-16  1010  	rcu_read_lock();
+90f31d0e Konstantin Khlebnikov 2015-04-16  1011  	exe_file = rcu_dereference(mm->exe_file);
+90f31d0e Konstantin Khlebnikov 2015-04-16  1012  	if (exe_file && !get_file_rcu(exe_file))
+90f31d0e Konstantin Khlebnikov 2015-04-16  1013  		exe_file = NULL;
+90f31d0e Konstantin Khlebnikov 2015-04-16  1014  	rcu_read_unlock();
+38646013 Jiri Slaby            2011-05-26  1015  	return exe_file;
+38646013 Jiri Slaby            2011-05-26  1016  }
+11163348 Davidlohr Bueso       2015-04-16  1017  EXPORT_SYMBOL(get_mm_exe_file);
+38646013 Jiri Slaby            2011-05-26  1018  
+^1da177e Linus Torvalds        2005-04-16  1019  /**
+cd81a917 Mateusz Guzik         2016-08-23  1020   * get_task_exe_file - acquire a reference to the task's executable file
+cd81a917 Mateusz Guzik         2016-08-23  1021   *
+cd81a917 Mateusz Guzik         2016-08-23  1022   * Returns %NULL if task's mm (if any) has no associated executable file or
+cd81a917 Mateusz Guzik         2016-08-23  1023   * this is a kernel thread with borrowed mm (see the comment above get_task_mm).
+cd81a917 Mateusz Guzik         2016-08-23  1024   * User must release file via fput().
+cd81a917 Mateusz Guzik         2016-08-23  1025   */
+cd81a917 Mateusz Guzik         2016-08-23  1026  struct file *get_task_exe_file(struct task_struct *task)
+cd81a917 Mateusz Guzik         2016-08-23 @1027  {
+cd81a917 Mateusz Guzik         2016-08-23  1028  	struct file *exe_file = NULL;
+cd81a917 Mateusz Guzik         2016-08-23  1029  	struct mm_struct *mm;
+cd81a917 Mateusz Guzik         2016-08-23  1030  
+cd81a917 Mateusz Guzik         2016-08-23  1031  	task_lock(task);
+cd81a917 Mateusz Guzik         2016-08-23  1032  	mm = task->mm;
+cd81a917 Mateusz Guzik         2016-08-23  1033  	if (mm) {
+cd81a917 Mateusz Guzik         2016-08-23  1034  		if (!(task->flags & PF_KTHREAD))
+cd81a917 Mateusz Guzik         2016-08-23  1035  			exe_file = get_mm_exe_file(mm);
+cd81a917 Mateusz Guzik         2016-08-23  1036  	}
+cd81a917 Mateusz Guzik         2016-08-23  1037  	task_unlock(task);
+cd81a917 Mateusz Guzik         2016-08-23  1038  	return exe_file;
+cd81a917 Mateusz Guzik         2016-08-23  1039  }
+cd81a917 Mateusz Guzik         2016-08-23  1040  EXPORT_SYMBOL(get_task_exe_file);
+38646013 Jiri Slaby            2011-05-26  1041  
 
-- fix default of a choice in Kconfig
+:::::: The code at line 983 was first introduced by commit
+:::::: 3864601387cf4196371e3c1897fdffa5228296f9 mm: extract exe_file handling from procfs
 
-- fix typos and documentation style
+:::::: TO: Jiri Slaby <jslaby@suse.cz>
+:::::: CC: Linus Torvalds <torvalds@linux-foundation.org>
 
-- fix command options unrecognized by sparse
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
-----------------------------------------------------------------
-Cao jin (2):
-      kbuild: drop unused symverfile in Makefile.modpost
-      kbuild doc: a bundle of fixes on makefiles.txt
+--ZPt4rx8FFjLCG7dd
+Content-Type: application/gzip
+Content-Disposition: attachment; filename=".config.gz"
+Content-Transfer-Encoding: base64
 
-David Lin (1):
-      kbuild: clang: fix build failures with sparse check
+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
 
-Masahiro Yamada (1):
-      kbuild: revert $(realpath ...) to $(shell cd ... && /bin/pwd)
-
-Randy Dunlap (1):
-      Makefile: kselftest: fix grammar typo
-
-Ulf Magnusson (1):
-      kbuild: Fix optimization level choice default
-
- Documentation/kbuild/makefiles.txt | 31 +++++++++++++---------
- Makefile                           | 10 +++----
- init/Kconfig                       |  2 +-
- scripts/Makefile.modpost           |  1 -
- tools/power/cpupower/Makefile      |  2 +-
- tools/scripts/Makefile.include     |  6 ++---
- 6 files changed, 28 insertions(+), 24 deletions(-)
-
-
--- 
-Best Regards
-Masahiro Yamada
+--ZPt4rx8FFjLCG7dd--
