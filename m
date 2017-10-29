@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:3442 "EHLO mga05.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:22324 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751315AbdJ2UhM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 29 Oct 2017 16:37:12 -0400
-Date: Mon, 30 Oct 2017 04:37:02 +0800
+        id S1751587AbdJ2UXM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 29 Oct 2017 16:23:12 -0400
+Date: Mon, 30 Oct 2017 04:22:17 +0800
 From: kbuild test robot <lkp@intel.com>
 Subject: Re: [PATCH] Check all .c files for bad kernel-doc comments
-Message-ID: <201710300404.iwPDSRVE%fengguang.wu@intel.com>
+Message-ID: <201710300443.YSMfb5Mo%fengguang.wu@intel.com>
 References: <20171027194149.14328-1-willy@infradead.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="ZPt4rx8FFjLCG7dd"
+Content-Type: multipart/mixed; boundary="wRRV7LY7NUeQGEoC"
 Content-Disposition: inline
 In-Reply-To: <20171027194149.14328-1-willy@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,7 +18,7 @@ To: Matthew Wilcox <willy@infradead.org>
 Cc: kbuild-all@01.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, Matthew Wilcox <mawilcox@microsoft.com>
 
 
---ZPt4rx8FFjLCG7dd
+--wRRV7LY7NUeQGEoC
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -39,134 +39,202 @@ reproduce:
 
 All warnings (new ones prefixed by >>):
 
->> kernel/fork.c:983: warning: No description found for parameter 'mm'
->> kernel/fork.c:983: warning: No description found for parameter 'new_exe_file'
-   kernel/fork.c:1007: warning: No description found for parameter 'mm'
->> kernel/fork.c:1027: warning: No description found for parameter 'task'
-   kernel/fork.c:1052: warning: No description found for parameter 'task'
+>> fs//attr.c:114: warning: Excess function parameter 'Returns' description in 'inode_newsize_ok'
+>> fs//attr.c:205: warning: No description found for parameter 'attr'
+>> fs//attr.c:205: warning: Excess function parameter 'iattr' description in 'notify_change'
 --
->> kernel/cpu.c:53: warning: cannot understand function prototype: 'struct cpuhp_cpu_state '
->> kernel/cpu.c:108: warning: cannot understand function prototype: 'struct cpuhp_step '
->> kernel/cpu.c:1608: warning: No description found for parameter 'name'
+>> arch/x86/kernel/i8259.c:234: warning: No description found for parameter 'trigger'
 --
->> kernel/notifier.c:77: warning: Excess function parameter 'returns' description in 'notifier_call_chain'
+>> arch/x86/kernel/tsc.c:1163: warning: No description found for parameter 'work'
 --
->> kernel/reboot.c:184: warning: No description found for parameter 'cmd'
+>> arch/x86/mm/pgtable.c:558: warning: No description found for parameter 'reserve'
+>> arch/x86/mm/pgtable.c:595: warning: No description found for parameter 'p4d'
+>> arch/x86/mm/pgtable.c:595: warning: No description found for parameter 'addr'
+>> arch/x86/mm/pgtable.c:595: warning: No description found for parameter 'prot'
+   arch/x86/mm/pgtable.c:605: warning: No description found for parameter 'p4d'
+>> arch/x86/mm/pgtable.c:629: warning: No description found for parameter 'pud'
+   arch/x86/mm/pgtable.c:629: warning: No description found for parameter 'addr'
+   arch/x86/mm/pgtable.c:629: warning: No description found for parameter 'prot'
+>> arch/x86/mm/pgtable.c:654: warning: No description found for parameter 'pmd'
+   arch/x86/mm/pgtable.c:654: warning: No description found for parameter 'addr'
+   arch/x86/mm/pgtable.c:654: warning: No description found for parameter 'prot'
+   arch/x86/mm/pgtable.c:680: warning: No description found for parameter 'pud'
+   arch/x86/mm/pgtable.c:695: warning: No description found for parameter 'pmd'
 --
->> mm/oom_kill.c:175: warning: No description found for parameter 'memcg'
->> mm/oom_kill.c:175: warning: No description found for parameter 'nodemask'
+>> arch/x86/events/intel/pt.c:1064: warning: No description found for parameter 'nr_pages'
+>> arch/x86/events/intel/pt.c:1064: warning: Excess function parameter 'size' description in 'pt_buffer_init_topa'
 --
->> mm/maccess.c:87: warning: No description found for parameter 'unsafe_addr'
->> mm/maccess.c:87: warning: Excess function parameter 'src' description in 'strncpy_from_unsafe'
+>> drivers/base/attribute_container.c:255: warning: No description found for parameter 'fn'
+>> drivers/base/attribute_container.c:369: warning: No description found for parameter 'cont'
+>> drivers/base/attribute_container.c:369: warning: No description found for parameter 'dev'
+>> drivers/base/attribute_container.c:369: warning: No description found for parameter 'classdev'
 --
->> mm/swap.c:932: warning: No description found for parameter 'nr_pages'
->> mm/swap.c:932: warning: Excess function parameter 'nr_entries' description in 'pagevec_lookup_entries'
->> mm/swap.c:982: warning: Excess function parameter 'nr_pages' description in 'pagevec_lookup_range'
+>> kernel//events/core.c:133: warning: No description found for parameter 'cpu'
+>> kernel//events/core.c:9911: warning: No description found for parameter 'flags'
+>> kernel//events/core.c:10350: warning: No description found for parameter 'overflow_handler'
+>> kernel//events/core.c:10350: warning: No description found for parameter 'context'
 --
->> mm/compaction.c:568: warning: No description found for parameter 'cc'
->> mm/compaction.c:1724: warning: No description found for parameter 'prio'
->> mm/compaction.c:1724: warning: Excess function parameter 'mode' description in 'try_to_compact_pages'
+>> kernel//events/hw_breakpoint.c:420: warning: No description found for parameter 'context'
+>> kernel//events/hw_breakpoint.c:434: warning: Excess function parameter 'triggered' description in 'modify_user_hw_breakpoint'
+>> kernel//events/hw_breakpoint.c:434: warning: Excess function parameter 'tsk' description in 'modify_user_hw_breakpoint'
+   kernel//events/hw_breakpoint.c:502: warning: No description found for parameter 'context'
 --
->> mm/mlock.c:176: warning: No description found for parameter 'page'
+>> kernel//irq/devres.c:103: warning: Excess function parameter 'thread_fn' description in 'devm_request_any_context_irq'
 --
->> mm/pagewalk.c:286: warning: No description found for parameter 'start'
->> mm/pagewalk.c:286: warning: No description found for parameter 'end'
->> mm/pagewalk.c:286: warning: No description found for parameter 'walk'
+>> kernel//power/qos.c:476: warning: No description found for parameter 'new_value'
+>> kernel//power/qos.c:476: warning: Excess function parameter 'value' description in 'pm_qos_update_request'
 --
->> mm/rmap.c:1175: warning: No description found for parameter 'compound'
+>> kernel//time/timekeeping.c:370: warning: No description found for parameter 'tkf'
+   kernel//time/timekeeping.c:419: warning: No description found for parameter 'tkf'
+>> kernel//time/timekeeping.c:568: warning: No description found for parameter 'nb'
+   kernel//time/timekeeping.c:587: warning: No description found for parameter 'nb'
+>> kernel//time/timekeeping.c:680: warning: No description found for parameter 'tk'
+>> kernel//time/timekeeping.c:1268: warning: No description found for parameter 'ts'
+>> kernel//time/timekeeping.c:1268: warning: Excess function parameter 'tv' description in 'timekeeping_inject_offset'
+   kernel//time/timekeeping.c:1313: warning: No description found for parameter 'tk'
+>> kernel//time/timekeeping.c:1313: warning: No description found for parameter 'tai_offset'
+>> kernel//time/timekeeping.c:1324: warning: No description found for parameter 'data'
+   kernel//time/timekeeping.c:1449: warning: No description found for parameter 'ts'
+   kernel//time/timekeeping.c:1472: warning: No description found for parameter 'ts'
+   kernel//time/timekeeping.c:1545: warning: No description found for parameter 'tk'
+   kernel//time/timekeeping.c:1963: warning: No description found for parameter 'tk'
+   kernel//time/timekeeping.c:2004: warning: No description found for parameter 'tk'
+>> kernel//time/timekeeping.c:2004: warning: No description found for parameter 'offset'
+>> kernel//time/timekeeping.c:2004: warning: No description found for parameter 'shift'
+>> kernel//time/timekeeping.c:2004: warning: No description found for parameter 'clock_set'
+>> kernel//time/timekeeping.c:2254: warning: No description found for parameter 'txc'
+>> kernel//time/timekeeping.c:2307: warning: No description found for parameter 'phase_ts'
+>> kernel//time/timekeeping.c:2307: warning: No description found for parameter 'raw_ts'
 ..
 
-vim +/mm +983 kernel/fork.c
+vim +114 fs//attr.c
 
-a1b2289c Sherry Yang           2017-10-03   970  
-90f31d0e Konstantin Khlebnikov 2015-04-16   971  /**
-90f31d0e Konstantin Khlebnikov 2015-04-16   972   * set_mm_exe_file - change a reference to the mm's executable file
-90f31d0e Konstantin Khlebnikov 2015-04-16   973   *
-90f31d0e Konstantin Khlebnikov 2015-04-16   974   * This changes mm's executable file (shown as symlink /proc/[pid]/exe).
-90f31d0e Konstantin Khlebnikov 2015-04-16   975   *
-6e399cd1 Davidlohr Bueso       2015-04-16   976   * Main users are mmput() and sys_execve(). Callers prevent concurrent
-6e399cd1 Davidlohr Bueso       2015-04-16   977   * invocations: in mmput() nobody alive left, in execve task is single
-6e399cd1 Davidlohr Bueso       2015-04-16   978   * threaded. sys_prctl(PR_SET_MM_MAP/EXE_FILE) also needs to set the
-6e399cd1 Davidlohr Bueso       2015-04-16   979   * mm->exe_file, but does so without using set_mm_exe_file() in order
-6e399cd1 Davidlohr Bueso       2015-04-16   980   * to do avoid the need for any locks.
-90f31d0e Konstantin Khlebnikov 2015-04-16   981   */
-38646013 Jiri Slaby            2011-05-26   982  void set_mm_exe_file(struct mm_struct *mm, struct file *new_exe_file)
-38646013 Jiri Slaby            2011-05-26  @983  {
-6e399cd1 Davidlohr Bueso       2015-04-16   984  	struct file *old_exe_file;
-6e399cd1 Davidlohr Bueso       2015-04-16   985  
-6e399cd1 Davidlohr Bueso       2015-04-16   986  	/*
-6e399cd1 Davidlohr Bueso       2015-04-16   987  	 * It is safe to dereference the exe_file without RCU as
-6e399cd1 Davidlohr Bueso       2015-04-16   988  	 * this function is only called if nobody else can access
-6e399cd1 Davidlohr Bueso       2015-04-16   989  	 * this mm -- see comment above for justification.
-6e399cd1 Davidlohr Bueso       2015-04-16   990  	 */
-6e399cd1 Davidlohr Bueso       2015-04-16   991  	old_exe_file = rcu_dereference_raw(mm->exe_file);
-90f31d0e Konstantin Khlebnikov 2015-04-16   992  
-38646013 Jiri Slaby            2011-05-26   993  	if (new_exe_file)
-38646013 Jiri Slaby            2011-05-26   994  		get_file(new_exe_file);
-90f31d0e Konstantin Khlebnikov 2015-04-16   995  	rcu_assign_pointer(mm->exe_file, new_exe_file);
-90f31d0e Konstantin Khlebnikov 2015-04-16   996  	if (old_exe_file)
-90f31d0e Konstantin Khlebnikov 2015-04-16   997  		fput(old_exe_file);
-38646013 Jiri Slaby            2011-05-26   998  }
-38646013 Jiri Slaby            2011-05-26   999  
-90f31d0e Konstantin Khlebnikov 2015-04-16  1000  /**
-90f31d0e Konstantin Khlebnikov 2015-04-16  1001   * get_mm_exe_file - acquire a reference to the mm's executable file
-90f31d0e Konstantin Khlebnikov 2015-04-16  1002   *
-90f31d0e Konstantin Khlebnikov 2015-04-16  1003   * Returns %NULL if mm has no associated executable file.
-90f31d0e Konstantin Khlebnikov 2015-04-16  1004   * User must release file via fput().
-90f31d0e Konstantin Khlebnikov 2015-04-16  1005   */
-38646013 Jiri Slaby            2011-05-26  1006  struct file *get_mm_exe_file(struct mm_struct *mm)
-38646013 Jiri Slaby            2011-05-26  1007  {
-38646013 Jiri Slaby            2011-05-26  1008  	struct file *exe_file;
-38646013 Jiri Slaby            2011-05-26  1009  
-90f31d0e Konstantin Khlebnikov 2015-04-16  1010  	rcu_read_lock();
-90f31d0e Konstantin Khlebnikov 2015-04-16  1011  	exe_file = rcu_dereference(mm->exe_file);
-90f31d0e Konstantin Khlebnikov 2015-04-16  1012  	if (exe_file && !get_file_rcu(exe_file))
-90f31d0e Konstantin Khlebnikov 2015-04-16  1013  		exe_file = NULL;
-90f31d0e Konstantin Khlebnikov 2015-04-16  1014  	rcu_read_unlock();
-38646013 Jiri Slaby            2011-05-26  1015  	return exe_file;
-38646013 Jiri Slaby            2011-05-26  1016  }
-11163348 Davidlohr Bueso       2015-04-16  1017  EXPORT_SYMBOL(get_mm_exe_file);
-38646013 Jiri Slaby            2011-05-26  1018  
-^1da177e Linus Torvalds        2005-04-16  1019  /**
-cd81a917 Mateusz Guzik         2016-08-23  1020   * get_task_exe_file - acquire a reference to the task's executable file
-cd81a917 Mateusz Guzik         2016-08-23  1021   *
-cd81a917 Mateusz Guzik         2016-08-23  1022   * Returns %NULL if task's mm (if any) has no associated executable file or
-cd81a917 Mateusz Guzik         2016-08-23  1023   * this is a kernel thread with borrowed mm (see the comment above get_task_mm).
-cd81a917 Mateusz Guzik         2016-08-23  1024   * User must release file via fput().
-cd81a917 Mateusz Guzik         2016-08-23  1025   */
-cd81a917 Mateusz Guzik         2016-08-23  1026  struct file *get_task_exe_file(struct task_struct *task)
-cd81a917 Mateusz Guzik         2016-08-23 @1027  {
-cd81a917 Mateusz Guzik         2016-08-23  1028  	struct file *exe_file = NULL;
-cd81a917 Mateusz Guzik         2016-08-23  1029  	struct mm_struct *mm;
-cd81a917 Mateusz Guzik         2016-08-23  1030  
-cd81a917 Mateusz Guzik         2016-08-23  1031  	task_lock(task);
-cd81a917 Mateusz Guzik         2016-08-23  1032  	mm = task->mm;
-cd81a917 Mateusz Guzik         2016-08-23  1033  	if (mm) {
-cd81a917 Mateusz Guzik         2016-08-23  1034  		if (!(task->flags & PF_KTHREAD))
-cd81a917 Mateusz Guzik         2016-08-23  1035  			exe_file = get_mm_exe_file(mm);
-cd81a917 Mateusz Guzik         2016-08-23  1036  	}
-cd81a917 Mateusz Guzik         2016-08-23  1037  	task_unlock(task);
-cd81a917 Mateusz Guzik         2016-08-23  1038  	return exe_file;
-cd81a917 Mateusz Guzik         2016-08-23  1039  }
-cd81a917 Mateusz Guzik         2016-08-23  1040  EXPORT_SYMBOL(get_task_exe_file);
-38646013 Jiri Slaby            2011-05-26  1041  
+^1da177e4 Linus Torvalds    2005-04-16   97  
+25d9e2d15 npiggin@suse.de   2009-08-21   98  /**
+25d9e2d15 npiggin@suse.de   2009-08-21   99   * inode_newsize_ok - may this inode be truncated to a given size
+25d9e2d15 npiggin@suse.de   2009-08-21  100   * @inode:	the inode to be truncated
+25d9e2d15 npiggin@suse.de   2009-08-21  101   * @offset:	the new size to assign to the inode
+25d9e2d15 npiggin@suse.de   2009-08-21  102   * @Returns:	0 on success, -ve errno on failure
+25d9e2d15 npiggin@suse.de   2009-08-21  103   *
+7bb46a673 npiggin@suse.de   2010-05-27  104   * inode_newsize_ok must be called with i_mutex held.
+7bb46a673 npiggin@suse.de   2010-05-27  105   *
+25d9e2d15 npiggin@suse.de   2009-08-21  106   * inode_newsize_ok will check filesystem limits and ulimits to check that the
+25d9e2d15 npiggin@suse.de   2009-08-21  107   * new inode size is within limits. inode_newsize_ok will also send SIGXFSZ
+25d9e2d15 npiggin@suse.de   2009-08-21  108   * when necessary. Caller must not proceed with inode size change if failure is
+25d9e2d15 npiggin@suse.de   2009-08-21  109   * returned. @inode must be a file (not directory), with appropriate
+25d9e2d15 npiggin@suse.de   2009-08-21  110   * permissions to allow truncate (inode_newsize_ok does NOT check these
+25d9e2d15 npiggin@suse.de   2009-08-21  111   * conditions).
+25d9e2d15 npiggin@suse.de   2009-08-21  112   */
+25d9e2d15 npiggin@suse.de   2009-08-21  113  int inode_newsize_ok(const struct inode *inode, loff_t offset)
+25d9e2d15 npiggin@suse.de   2009-08-21 @114  {
+25d9e2d15 npiggin@suse.de   2009-08-21  115  	if (inode->i_size < offset) {
+25d9e2d15 npiggin@suse.de   2009-08-21  116  		unsigned long limit;
+25d9e2d15 npiggin@suse.de   2009-08-21  117  
+d554ed895 Jiri Slaby        2010-03-05  118  		limit = rlimit(RLIMIT_FSIZE);
+25d9e2d15 npiggin@suse.de   2009-08-21  119  		if (limit != RLIM_INFINITY && offset > limit)
+25d9e2d15 npiggin@suse.de   2009-08-21  120  			goto out_sig;
+25d9e2d15 npiggin@suse.de   2009-08-21  121  		if (offset > inode->i_sb->s_maxbytes)
+25d9e2d15 npiggin@suse.de   2009-08-21  122  			goto out_big;
+25d9e2d15 npiggin@suse.de   2009-08-21  123  	} else {
+25d9e2d15 npiggin@suse.de   2009-08-21  124  		/*
+25d9e2d15 npiggin@suse.de   2009-08-21  125  		 * truncation of in-use swapfiles is disallowed - it would
+25d9e2d15 npiggin@suse.de   2009-08-21  126  		 * cause subsequent swapout to scribble on the now-freed
+25d9e2d15 npiggin@suse.de   2009-08-21  127  		 * blocks.
+25d9e2d15 npiggin@suse.de   2009-08-21  128  		 */
+25d9e2d15 npiggin@suse.de   2009-08-21  129  		if (IS_SWAPFILE(inode))
+25d9e2d15 npiggin@suse.de   2009-08-21  130  			return -ETXTBSY;
+25d9e2d15 npiggin@suse.de   2009-08-21  131  	}
+25d9e2d15 npiggin@suse.de   2009-08-21  132  
+25d9e2d15 npiggin@suse.de   2009-08-21  133  	return 0;
+25d9e2d15 npiggin@suse.de   2009-08-21  134  out_sig:
+25d9e2d15 npiggin@suse.de   2009-08-21  135  	send_sig(SIGXFSZ, current, 0);
+25d9e2d15 npiggin@suse.de   2009-08-21  136  out_big:
+25d9e2d15 npiggin@suse.de   2009-08-21  137  	return -EFBIG;
+25d9e2d15 npiggin@suse.de   2009-08-21  138  }
+25d9e2d15 npiggin@suse.de   2009-08-21  139  EXPORT_SYMBOL(inode_newsize_ok);
+25d9e2d15 npiggin@suse.de   2009-08-21  140  
+7bb46a673 npiggin@suse.de   2010-05-27  141  /**
+6a1a90ad1 Christoph Hellwig 2010-06-04  142   * setattr_copy - copy simple metadata updates into the generic inode
+7bb46a673 npiggin@suse.de   2010-05-27  143   * @inode:	the inode to be updated
+7bb46a673 npiggin@suse.de   2010-05-27  144   * @attr:	the new attributes
+7bb46a673 npiggin@suse.de   2010-05-27  145   *
+6a1a90ad1 Christoph Hellwig 2010-06-04  146   * setattr_copy must be called with i_mutex held.
+7bb46a673 npiggin@suse.de   2010-05-27  147   *
+6a1a90ad1 Christoph Hellwig 2010-06-04  148   * setattr_copy updates the inode's metadata with that specified
+25985edce Lucas De Marchi   2011-03-30  149   * in attr. Noticeably missing is inode size update, which is more complex
+2c27c65ed Christoph Hellwig 2010-06-04  150   * as it requires pagecache updates.
+7bb46a673 npiggin@suse.de   2010-05-27  151   *
+7bb46a673 npiggin@suse.de   2010-05-27  152   * The inode is not marked as dirty after this operation. The rationale is
+7bb46a673 npiggin@suse.de   2010-05-27  153   * that for "simple" filesystems, the struct inode is the inode storage.
+7bb46a673 npiggin@suse.de   2010-05-27  154   * The caller is free to mark the inode dirty afterwards if needed.
+7bb46a673 npiggin@suse.de   2010-05-27  155   */
+6a1a90ad1 Christoph Hellwig 2010-06-04  156  void setattr_copy(struct inode *inode, const struct iattr *attr)
+^1da177e4 Linus Torvalds    2005-04-16  157  {
+^1da177e4 Linus Torvalds    2005-04-16  158  	unsigned int ia_valid = attr->ia_valid;
+4a30131e7 NeilBrown         2006-01-08  159  
+^1da177e4 Linus Torvalds    2005-04-16  160  	if (ia_valid & ATTR_UID)
+^1da177e4 Linus Torvalds    2005-04-16  161  		inode->i_uid = attr->ia_uid;
+^1da177e4 Linus Torvalds    2005-04-16  162  	if (ia_valid & ATTR_GID)
+^1da177e4 Linus Torvalds    2005-04-16  163  		inode->i_gid = attr->ia_gid;
+^1da177e4 Linus Torvalds    2005-04-16  164  	if (ia_valid & ATTR_ATIME)
+^1da177e4 Linus Torvalds    2005-04-16  165  		inode->i_atime = timespec_trunc(attr->ia_atime,
+^1da177e4 Linus Torvalds    2005-04-16  166  						inode->i_sb->s_time_gran);
+^1da177e4 Linus Torvalds    2005-04-16  167  	if (ia_valid & ATTR_MTIME)
+^1da177e4 Linus Torvalds    2005-04-16  168  		inode->i_mtime = timespec_trunc(attr->ia_mtime,
+^1da177e4 Linus Torvalds    2005-04-16  169  						inode->i_sb->s_time_gran);
+^1da177e4 Linus Torvalds    2005-04-16  170  	if (ia_valid & ATTR_CTIME)
+^1da177e4 Linus Torvalds    2005-04-16  171  		inode->i_ctime = timespec_trunc(attr->ia_ctime,
+^1da177e4 Linus Torvalds    2005-04-16  172  						inode->i_sb->s_time_gran);
+^1da177e4 Linus Torvalds    2005-04-16  173  	if (ia_valid & ATTR_MODE) {
+^1da177e4 Linus Torvalds    2005-04-16  174  		umode_t mode = attr->ia_mode;
+^1da177e4 Linus Torvalds    2005-04-16  175  
+7fa294c89 Eric W. Biederman 2012-09-02  176  		if (!in_group_p(inode->i_gid) &&
+23adbe12e Andy Lutomirski   2014-06-10  177  		    !capable_wrt_inode_uidgid(inode, CAP_FSETID))
+^1da177e4 Linus Torvalds    2005-04-16  178  			mode &= ~S_ISGID;
+^1da177e4 Linus Torvalds    2005-04-16  179  		inode->i_mode = mode;
+^1da177e4 Linus Torvalds    2005-04-16  180  	}
+7bb46a673 npiggin@suse.de   2010-05-27  181  }
+6a1a90ad1 Christoph Hellwig 2010-06-04  182  EXPORT_SYMBOL(setattr_copy);
+7bb46a673 npiggin@suse.de   2010-05-27  183  
+27ac0ffea J. Bruce Fields   2011-09-20  184  /**
+27ac0ffea J. Bruce Fields   2011-09-20  185   * notify_change - modify attributes of a filesytem object
+27ac0ffea J. Bruce Fields   2011-09-20  186   * @dentry:	object affected
+27ac0ffea J. Bruce Fields   2011-09-20  187   * @iattr:	new attributes
+27ac0ffea J. Bruce Fields   2011-09-20  188   * @delegated_inode: returns inode, if the inode is delegated
+27ac0ffea J. Bruce Fields   2011-09-20  189   *
+27ac0ffea J. Bruce Fields   2011-09-20  190   * The caller must hold the i_mutex on the affected object.
+27ac0ffea J. Bruce Fields   2011-09-20  191   *
+27ac0ffea J. Bruce Fields   2011-09-20  192   * If notify_change discovers a delegation in need of breaking,
+27ac0ffea J. Bruce Fields   2011-09-20  193   * it will return -EWOULDBLOCK and return a reference to the inode in
+27ac0ffea J. Bruce Fields   2011-09-20  194   * delegated_inode.  The caller should then break the delegation and
+27ac0ffea J. Bruce Fields   2011-09-20  195   * retry.  Because breaking a delegation may take a long time, the
+27ac0ffea J. Bruce Fields   2011-09-20  196   * caller should drop the i_mutex before doing so.
+27ac0ffea J. Bruce Fields   2011-09-20  197   *
+27ac0ffea J. Bruce Fields   2011-09-20  198   * Alternatively, a caller may pass NULL for delegated_inode.  This may
+27ac0ffea J. Bruce Fields   2011-09-20  199   * be appropriate for callers that expect the underlying filesystem not
+27ac0ffea J. Bruce Fields   2011-09-20  200   * to be NFS exported.  Also, passing NULL is fine for callers holding
+27ac0ffea J. Bruce Fields   2011-09-20  201   * the file open for write, as there can be no conflicting delegation in
+27ac0ffea J. Bruce Fields   2011-09-20  202   * that case.
+27ac0ffea J. Bruce Fields   2011-09-20  203   */
+27ac0ffea J. Bruce Fields   2011-09-20  204  int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **delegated_inode)
+^1da177e4 Linus Torvalds    2005-04-16 @205  {
 
-:::::: The code at line 983 was first introduced by commit
-:::::: 3864601387cf4196371e3c1897fdffa5228296f9 mm: extract exe_file handling from procfs
+:::::: The code at line 114 was first introduced by commit
+:::::: 25d9e2d15286281ec834b829a4aaf8969011f1cd truncate: new helpers
 
-:::::: TO: Jiri Slaby <jslaby@suse.cz>
-:::::: CC: Linus Torvalds <torvalds@linux-foundation.org>
+:::::: TO: npiggin@suse.de <npiggin@suse.de>
+:::::: CC: al <al@dizzy.pdmi.ras.ru>
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---ZPt4rx8FFjLCG7dd
+--wRRV7LY7NUeQGEoC
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICJM59lkAAy5jb25maWcAjHxbc+O40fZ9fgVr817sXuyMT+M49ZUvIBAUEZMElwAl2Tcs
+H4sICF0z9lkAAy5jb25maWcAjHxbc+O40fZ9fgVr817sXuyMT+M49ZUvIBAUEZMElwAl2Tcs
 rayZUY0t+dUh2fn3XzdAiqeG8qYqyRjdOPfh6UZTf//b3wN2Ou7el8fNavn29jP4tt6u98vj
 +jX4unlb/78gVEGmTCBCaT4Bc7LZnv76vLl9uA/uPl3ffbr6fb+6D57W++36LeC77dfNtxN0
 3+y2f/s7sHOVRXJa3d9NpAk2h2C7OwaH9fFvdfvi4b66vXn82fm7/UNm2hQlN1JlVSi4CkXR
@@ -291,4 +359,4 @@ L1sFSC9ktCk+11+cL6y806LY9hD+atJLOWsEEhmtDwK5AmltS2pO45StZNQ+scB6blUu6xeg
 5iFeopPU5ed8oPPwiIzrGdFQVjei9XY4nVPUI/+E/jxFKHaecDyKNl1dN2r6AxWoakEt0IXI
 V+n4YiHfoBAjrkpu6FGOmjDF66Xm2mH9QWEjZh0fHkrj/x88Cbpbjl8AAA==
 
---ZPt4rx8FFjLCG7dd--
+--wRRV7LY7NUeQGEoC--
