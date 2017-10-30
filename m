@@ -1,143 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:33626 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750852AbdJ3DlK (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:56587 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751365AbdJ3Gvr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 29 Oct 2017 23:41:10 -0400
+        Mon, 30 Oct 2017 02:51:47 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171027194149.14328-1-willy@infradead.org>
-References: <20171027194149.14328-1-willy@infradead.org>
+In-Reply-To: <CAK7LNAT56EEHbQguD1pbFiurU9MMa55WAUptX16KWhpOOF_BHg@mail.gmail.com>
+References: <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com>
+ <20171027201345.87383-1-ndesaulniers@google.com> <CAK7LNAT56EEHbQguD1pbFiurU9MMa55WAUptX16KWhpOOF_BHg@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 30 Oct 2017 12:40:20 +0900
-Message-ID: <CAK7LNATB+mJgMi4sfxb04zYwE5hfv2zONiBHXXtk7wq=No4DNw@mail.gmail.com>
-Subject: Re: [PATCH] Check all .c files for bad kernel-doc comments
+Date: Mon, 30 Oct 2017 15:50:44 +0900
+Message-ID: <CAK7LNAQuZ3iWB+_RSh5hCTundm4-rfCP2WzmnkdzLNSQYzaG0w@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: fix linker feature test macros when cross
+ compiling with Clang
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Matthew Wilcox <mawilcox@microsoft.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Douglas Anderson <dianders@chromium.org>, Ingo Molnar <mingo@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Mark Charlebois <charlebm@gmail.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi Matthew,
-
-
-2017-10-28 4:41 GMT+09:00 Matthew Wilcox <willy@infradead.org>:
-> From: Matthew Wilcox <mawilcox@microsoft.com>
+2017-10-29 0:00 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> 2017-10-28 5:13 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+>> I was not seeing my linker flags getting added when using ld-option when
+>> cross compiling with Clang. Upon investigation, this seems to be due to
+>> a difference in how GCC vs Clang handle cross compilation.
+>>
+>> GCC is configured at build time to support one backend, that is implicit
+>> when compiling.  Clang is explicit via the use of `-target <triple>` and
+>> ships with all supported backends by default.
+>>
+>> GNU Make feature test macros that compile then link will always fail
+>> when cross compiling with Clang unless Clang's triple is passed along to
+>> the compiler. For example:
+>>
+>> $ clang -x c /dev/null -c -o temp.o
+>> $ aarch64-linux-android/bin/ld -E temp.o
+>> aarch64-linux-android/bin/ld:
+>> unknown architecture of input file `temp.o' is incompatible with
+>> aarch64 output
+>> aarch64-linux-android/bin/ld:
+>> warning: cannot find entry symbol _start; defaulting to
+>> 0000000000400078
+>> $ echo $?
+>> 1
+>>
+>> $ clang -target aarch64-linux-android- -x c /dev/null -c -o temp.o
+>> $ aarch64-linux-android/bin/ld -E temp.o
+>> aarch64-linux-android/bin/ld:
+>> warning: cannot find entry symbol _start; defaulting to 00000000004002e4
+>> $ echo $?
+>> 0
+>>
+>> This causes conditional checks that invoke $(CC) without the target
+>> triple, then $(LD) on the result, to always fail.
+>>
+>> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+>> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+>> ---
+>> Changes since v1:
+>> * base patch off of
+>>   git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+>>   kbuild branch, per Masahiro.
+>> * Use $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) rather than $(CLANG_TRIPLE), per
+>>   Masahiro.
+>>
+>>  scripts/Kbuild.include | 5 +++--
+>>  1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+>> index 064f477dfdca..0f09e4508554 100644
+>> --- a/scripts/Kbuild.include
+>> +++ b/scripts/Kbuild.include
+>> @@ -228,12 +228,13 @@ cc-if-fullversion = $(shell [ $(cc-fullversion) $(1) $(2) ] && echo $(3) || echo
+>>  # cc-ldoption
+>>  # Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
+>>  cc-ldoption = $(call try-run-cached,\
+>> -       $(CC) $(1) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+>> +       $(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+>>
+>>  # ld-option
+>>  # Usage: LDFLAGS += $(call ld-option, -X)
+>>  ld-option = $(call try-run-cached,\
+>> -       $(CC) -x c /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+>> +       $(CC) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -x c /dev/null -c -o "$$TMPO"; \
+>> +       $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+>>
+>>  # ar-option
+>>  # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
+>> --
+>> 2.15.0.rc2.357.g7e34df9404-goog
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-> Implement a '-none' output mode for kernel-doc which will only output
-> warning messages, and suppresses the warning message about there being
-> no kernel-doc in the file.  Add it to the rule to build .o files from .c
-> files, so it will check all .c files that have been modified.
 >
-> Adds about 1300 warnings to my build, but will hopefully discourage
-> people from introducing more kerneldoc mistakes.
-
-
-Basically, I think this is good,
-but it is controversial to sprinkle warnings by default.
-
-Maybe,
-
-ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),)
-cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $< ;
-endif
-
-
-so that this is checked only when W=... is given?
+> Applied to linux-kbuild/kbuild.  Thanks!
 
 
 
+I do not know the cause of the problem reported by the 0-day bot, but
+if the problem happens in the following line,
 
-> Signed-off-by: Matthew Wilcox <mawilcox@microsoft.com>
->
->  scripts/Makefile.build |  3 +++
->  scripts/kernel-doc     | 25 ++++++++++++++++++++++++-
->  2 files changed, 27 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 061d0c3a420a..f0f907af53c7 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -108,6 +108,8 @@ ifneq ($(KBUILD_CHECKSRC),0)
->    endif
->  endif
->
-> +cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $< ;
-> +
->  # Do section mismatch analysis for each module/built-in.o
->  ifdef CONFIG_DEBUG_SECTION_MISMATCH
->    cmd_secanalysis = ; scripts/mod/modpost $@
-> @@ -291,6 +293,7 @@ define rule_cc_o_c
->         $(call echo-cmd,checksrc) $(cmd_checksrc)                         \
->         $(call cmd_and_fixdep,cc_o_c)                                     \
->         $(cmd_modversions_c)                                              \
-> +       $(cmd_checkdoc)                                                   \
->         $(call echo-cmd,objtool) $(cmd_objtool)                           \
->         $(call echo-cmd,record_mcount) $(cmd_record_mcount)
->  endef
-> diff --git a/scripts/kernel-doc b/scripts/kernel-doc
-> index 9d3eafea58f0..c69583440a44 100755
-> --- a/scripts/kernel-doc
-> +++ b/scripts/kernel-doc
-> @@ -58,6 +58,7 @@ Output format selection (mutually exclusive):
->    -man                 Output troff manual page format. This is the default.
->    -rst                 Output reStructuredText format.
->    -text                        Output plain text format.
-> +  -none                        Do not output documentation, only warnings.
->
->  Output selection (mutually exclusive):
->    -export              Only output documentation for symbols that have been
-> @@ -532,6 +533,8 @@ while ($ARGV[0] =~ m/^-(.*)/) {
->         $output_mode = "gnome";
->         @highlights = @highlights_gnome;
->         $blankline = $blankline_gnome;
-> +    } elsif ($cmd eq "-none") {
-> +       $output_mode = "none";
->      } elsif ($cmd eq "-module") { # not needed for XML, inherits from calling document
->         $modulename = shift @ARGV;
->      } elsif ($cmd eq "-function") { # to only output specific functions
-> @@ -2117,6 +2120,24 @@ sub output_blockhead_list(%) {
->      }
->  }
->
-> +
-> +## none mode output functions
-> +
-> +sub output_function_none(%) {
-> +}
-> +
-> +sub output_enum_none(%) {
-> +}
-> +
-> +sub output_typedef_none(%) {
-> +}
-> +
-> +sub output_struct_none(%) {
-> +}
-> +
-> +sub output_blockhead_none(%) {
-> +}
-> +
->  ##
->  # generic output function for all types (function, struct/union, typedef, enum);
->  # calls the generated, variable output_ function name based on
-> @@ -3136,7 +3157,9 @@ sub process_file($) {
->         }
->      }
->      if ($initial_section_counter == $section_counter) {
-> -       print STDERR "${file}:1: warning: no structured comments found\n";
-> +       if ($output_mode ne "none") {
-> +           print STDERR "${file}:1: warning: no structured comments found\n";
-> +       }
->         if (($output_selection == OUTPUT_INCLUDE) && ($show_not_found == 1)) {
->             print STDERR "    Was looking for '$_'.\n" for keys %function_table;
->         }
-> --
-> 2.11.0.301.g722e3be85.dirty
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+ifeq ($(CONFIG_X86_32),y)
+LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
+else
+
+
+
+Does the following solve the issue?    (adding $(LDFLAGS))
+
+ld-option = $(call try-run,\
+        $(CC) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -x c /dev/null -c
+-o "$$TMPO"; \
+        $(LD) $(LDFLAGS) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+
 
 
 
