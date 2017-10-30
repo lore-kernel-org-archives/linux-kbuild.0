@@ -1,72 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:39214 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752449AbdJ3PRy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 30 Oct 2017 11:17:54 -0400
-From: Jani Nikula <jani.nikula@linux.intel.com>
-Subject: Re: [PATCH] Check all .c files for bad kernel-doc comments
-In-Reply-To: <20171030134007.GA2846@bombadil.infradead.org>
-References: <20171027194149.14328-1-willy@infradead.org> <CAK7LNATB+mJgMi4sfxb04zYwE5hfv2zONiBHXXtk7wq=No4DNw@mail.gmail.com> <20171030134007.GA2846@bombadil.infradead.org>
-Date: Mon, 30 Oct 2017 17:19:18 +0200
-Message-ID: <87mv48fytl.fsf@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from conuserg-12.nifty.com ([210.131.2.79]:39862 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751900AbdJ3PfM (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 30 Oct 2017 11:35:12 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 3/3] kbuild: clean up *.dtb and *.dtb.S patterns from top-level Makefile
+Date: Tue, 31 Oct 2017 00:33:47 +0900
+Message-Id: <1509377627-11362-4-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1509377627-11362-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1509377627-11362-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthew Wilcox <willy@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Matthew Wilcox <mawilcox@microsoft.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, devicetree@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Matthias Kaehlcke <mka@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>
 
-On Mon, 30 Oct 2017, Matthew Wilcox <willy@infradead.org> wrote:
-> On Mon, Oct 30, 2017 at 12:40:20PM +0900, Masahiro Yamada wrote:
->> 2017-10-28 4:41 GMT+09:00 Matthew Wilcox <willy@infradead.org>:
->> > Implement a '-none' output mode for kernel-doc which will only output
->> > warning messages, and suppresses the warning message about there being
->> > no kernel-doc in the file.  Add it to the rule to build .o files from .c
->> > files, so it will check all .c files that have been modified.
->> >
->> > Adds about 1300 warnings to my build, but will hopefully discourage
->> > people from introducing more kerneldoc mistakes.
->> 
->> Basically, I think this is good,
->> but it is controversial to sprinkle warnings by default.
->
-> Yes, it is.  I just got three nastygrams from 01.org ;-)
->
-> But if it's not turned on by default, then people aren't going to notice
-> when they introduce new warnings.  I think it needs to be up to someone
-> like Andrew or Linus to decide when to add these warnings by default.
-> Maybe we should do something like you have below for now, then work on
-> cleaning up a few hundred of these warnings, then enable this by default?
->
-> Thanks for looking at this!
->
->> Maybe,
->> 
->> ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),)
->> cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $< ;
->> endif
->> 
->> 
->> so that this is checked only when W=... is given?
+We need to add "clean-files" in Makfiles to clean up DT blobs, but we
+often miss to do so.
 
-Related, there was also a script to do reStructuredText lint style
-checks in addition to the kernel-doc checks using make CHECK and
-C=1. See [1].
+Since there are no source files that end with .dtb or .dtb.S, so we
+can clean-up those files from the top-level Makefile.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-BR,
-Jani.
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-[1] http://mid.mail-archive.com/87h98quc1w.fsf@intel.com
-
-
-
-
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-doc" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+diff --git a/Makefile b/Makefile
+index 63a4c0e..c577c63 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1544,7 +1544,7 @@ clean: $(clean-dirs)
+ 	$(call cmd,rmfiles)
+ 	@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
+ 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+-		-o -name '*.ko.*' \
++		-o -name '*.ko.*' -o -name '*.dtb' -o -name '*.dtb.S' \
+ 		-o -name '*.dwo'  \
+ 		-o -name '*.su'  \
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
 -- 
-Jani Nikula, Intel Open Source Technology Center
+2.7.4
+
