@@ -1,143 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:43415 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752005AbdJ3QNw (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:51247 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932252AbdJ3QdA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 30 Oct 2017 12:13:52 -0400
-Received: by mail-wm0-f65.google.com with SMTP id m72so11070109wmc.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 30 Oct 2017 09:13:51 -0700 (PDT)
+        Mon, 30 Oct 2017 12:33:00 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQKjX1Xp-tuQAY1zofk6Lx7i9ynXMO0yVGJ-f588v47Fw@mail.gmail.com>
-References: <CAK7LNASyP3x8wnvv_Eo_CbHehY5+pPjcpJFAn3fw8NAAi00GQA@mail.gmail.com>
- <20171027201345.87383-1-ndesaulniers@google.com> <CAK7LNAT56EEHbQguD1pbFiurU9MMa55WAUptX16KWhpOOF_BHg@mail.gmail.com>
- <CAK7LNAQuZ3iWB+_RSh5hCTundm4-rfCP2WzmnkdzLNSQYzaG0w@mail.gmail.com> <CAK7LNAQKjX1Xp-tuQAY1zofk6Lx7i9ynXMO0yVGJ-f588v47Fw@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 30 Oct 2017 09:13:49 -0700
-Message-ID: <CAKwvOdn1q=9E+dHH_mX+GNsoVjozfGMjGVULG32935vJgjDyuA@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: fix linker feature test macros when cross
- compiling with Clang
+In-Reply-To: <CAL_Jsq+WU=kYLvfTipEUxEa4BL_57TdHhDitqrgftPFzTa=XCg@mail.gmail.com>
+References: <1509377627-11362-1-git-send-email-yamada.masahiro@socionext.com>
+ <1509377627-11362-4-git-send-email-yamada.masahiro@socionext.com> <CAL_Jsq+WU=kYLvfTipEUxEa4BL_57TdHhDitqrgftPFzTa=XCg@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 31 Oct 2017 01:32:15 +0900
+Message-ID: <CAK7LNAQ-DDSYzf=UBtEJfsZ0fw5-2o=dBM2sywZNJ9NCuGtPKQ@mail.gmail.com>
+Subject: Re: [PATCH 3/3] kbuild: clean up *.dtb and *.dtb.S patterns from
+ top-level Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Douglas Anderson <dianders@chromium.org>, Ingo Molnar <mingo@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Mark Charlebois <charlebm@gmail.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Rob Herring <robh+dt@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>
 
-That's safe to do for now.  Here's the 0-day failure thread:
-https://lists.01.org/pipermail/lkp/2017-October/007427.html  If I can
-sort out the issue, I'll submit a v3.
+Hi Rob,
 
-On Mon, Oct 30, 2017 at 8:46 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2017-10-30 15:50 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->> 2017-10-29 0:00 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->>> 2017-10-28 5:13 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
->>>> I was not seeing my linker flags getting added when using ld-option when
->>>> cross compiling with Clang. Upon investigation, this seems to be due to
->>>> a difference in how GCC vs Clang handle cross compilation.
->>>>
->>>> GCC is configured at build time to support one backend, that is implicit
->>>> when compiling.  Clang is explicit via the use of `-target <triple>` and
->>>> ships with all supported backends by default.
->>>>
->>>> GNU Make feature test macros that compile then link will always fail
->>>> when cross compiling with Clang unless Clang's triple is passed along to
->>>> the compiler. For example:
->>>>
->>>> $ clang -x c /dev/null -c -o temp.o
->>>> $ aarch64-linux-android/bin/ld -E temp.o
->>>> aarch64-linux-android/bin/ld:
->>>> unknown architecture of input file `temp.o' is incompatible with
->>>> aarch64 output
->>>> aarch64-linux-android/bin/ld:
->>>> warning: cannot find entry symbol _start; defaulting to
->>>> 0000000000400078
->>>> $ echo $?
->>>> 1
->>>>
->>>> $ clang -target aarch64-linux-android- -x c /dev/null -c -o temp.o
->>>> $ aarch64-linux-android/bin/ld -E temp.o
->>>> aarch64-linux-android/bin/ld:
->>>> warning: cannot find entry symbol _start; defaulting to 00000000004002e4
->>>> $ echo $?
->>>> 0
->>>>
->>>> This causes conditional checks that invoke $(CC) without the target
->>>> triple, then $(LD) on the result, to always fail.
->>>>
->>>> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->>>> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
->>>> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
->>>> ---
->>>> Changes since v1:
->>>> * base patch off of
->>>>   git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
->>>>   kbuild branch, per Masahiro.
->>>> * Use $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) rather than $(CLANG_TRIPLE), per
->>>>   Masahiro.
->>>>
->>>>  scripts/Kbuild.include | 5 +++--
->>>>  1 file changed, 3 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
->>>> index 064f477dfdca..0f09e4508554 100644
->>>> --- a/scripts/Kbuild.include
->>>> +++ b/scripts/Kbuild.include
->>>> @@ -228,12 +228,13 @@ cc-if-fullversion = $(shell [ $(cc-fullversion) $(1) $(2) ] && echo $(3) || echo
->>>>  # cc-ldoption
->>>>  # Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
->>>>  cc-ldoption = $(call try-run-cached,\
->>>> -       $(CC) $(1) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
->>>> +       $(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
->>>>
->>>>  # ld-option
->>>>  # Usage: LDFLAGS += $(call ld-option, -X)
->>>>  ld-option = $(call try-run-cached,\
->>>> -       $(CC) -x c /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
->>>> +       $(CC) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -x c /dev/null -c -o "$$TMPO"; \
->>>> +       $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
->>>>
->>>>  # ar-option
->>>>  # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
->>>> --
->>>> 2.15.0.rc2.357.g7e34df9404-goog
->>>>
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>>
->>> Applied to linux-kbuild/kbuild.  Thanks!
+2017-10-31 0:53 GMT+09:00 Rob Herring <robh+dt@kernel.org>:
+> On Mon, Oct 30, 2017 at 10:33 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> We need to add "clean-files" in Makfiles to clean up DT blobs, but we
+>> often miss to do so.
 >>
+>> Since there are no source files that end with .dtb or .dtb.S, so we
+>> can clean-up those files from the top-level Makefile.
 >>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> ---
 >>
->> I do not know the cause of the problem reported by the 0-day bot, but
->> if the problem happens in the following line,
+>>  Makefile | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
 >>
->> ifeq ($(CONFIG_X86_32),y)
->> LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
->> else
->>
->>
->>
->> Does the following solve the issue?    (adding $(LDFLAGS))
->>
->> ld-option = $(call try-run,\
->>         $(CC) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -x c /dev/null -c
->> -o "$$TMPO"; \
->>         $(LD) $(LDFLAGS) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
->>
->>
+>> diff --git a/Makefile b/Makefile
+>> index 63a4c0e..c577c63 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -1544,7 +1544,7 @@ clean: $(clean-dirs)
+>>         $(call cmd,rmfiles)
+>>         @find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
+>>                 \( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+>> -               -o -name '*.ko.*' \
+>> +               -o -name '*.ko.*' -o -name '*.dtb' -o -name '*.dtb.S' \
 >
+> With this we can remove all the occurrences in the kernel:
 >
-> I dropped this patch for now.
+> $ git grep 'clean.*dtb'
 >
-> --
-> Best Regards
-> Masahiro Yamada
+> Otherwise, the series looks good to me. I'm happy to apply it if the
+> kbuild folks don't.
+>
+> Rob
+
+Yes, please.  Thanks!
+
 
 
 
 -- 
-Thanks,
-~Nick Desaulniers
+Best Regards
+Masahiro Yamada
