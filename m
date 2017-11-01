@@ -1,39 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:12871 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751969AbdJaILt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 Oct 2017 04:11:49 -0400
-From: Jani Nikula <jani.nikula@linux.intel.com>
-Subject: Re: [PATCH] Check all .c files for bad kernel-doc comments
-In-Reply-To: <20171030205134.GA29718@bombadil.infradead.org>
-References: <20171027194149.14328-1-willy@infradead.org> <CAK7LNATB+mJgMi4sfxb04zYwE5hfv2zONiBHXXtk7wq=No4DNw@mail.gmail.com> <20171030134007.GA2846@bombadil.infradead.org> <87mv48fytl.fsf@intel.com> <20171030205134.GA29718@bombadil.infradead.org>
-Date: Tue, 31 Oct 2017 10:13:10 +0200
-Message-ID: <8760avg2g9.fsf@intel.com>
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:7640 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1754005AbdKABcQ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 31 Oct 2017 21:32:16 -0400
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: [PATCH] kbuild: comments correction & update
+Date: Wed, 1 Nov 2017 09:31:35 +0800
+Message-ID: <20171101013135.3989-1-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Matthew Wilcox <mawilcox@microsoft.com>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net
 
-On Mon, 30 Oct 2017, Matthew Wilcox <willy@infradead.org> wrote:
-> On Mon, Oct 30, 2017 at 05:19:18PM +0200, Jani Nikula wrote:
->> Related, there was also a script to do reStructuredText lint style
->> checks in addition to the kernel-doc checks using make CHECK and
->> C=1. See http://mid.mail-archive.com/87h98quc1w.fsf@intel.com
->
-> I don't really care which patch goes in.  If I understand your python
-> script correctly, it relies on having various python packages installed.
-> Unless we're going to switch kernel-doc over to being written in python,
-> I'd prefer to not require additional dependencies.
+host-cmulti means the composite host program that is compiled/linked
+from several .c file, not .o file, because .o file could also be
+compiled from .cpp file.
 
-I think your patch has a much better chance of getting enabled by
-default in the long run, so I'd prefer that. I've also kind of dropped
-the ball on my script... but thought it might be interesting.
+Bonus: update the stale comment.
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+ scripts/Makefile.host | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-BR,
-Jani.
-
-
+diff --git a/scripts/Makefile.host b/scripts/Makefile.host
+index 9cfd5c84d76f..103a4bec4ba5 100644
+--- a/scripts/Makefile.host
++++ b/scripts/Makefile.host
+@@ -25,11 +25,11 @@ host-cshlib := $(sort $(hostlibs-y) $(hostlibs-m))
+ host-cxxshlib := $(sort $(hostcxxlibs-y) $(hostcxxlibs-m))
+ 
+ # C code
+-# Executables compiled from a single .c file
++# C Executables compiled from a single .c file
+ host-csingle	:= $(foreach m,$(__hostprogs), \
+ 			$(if $($(m)-objs)$($(m)-cxxobjs),,$(m)))
+ 
+-# C executables linked based on several .o files
++# C executables compiled from several .c files, and only .c files
+ host-cmulti	:= $(foreach m,$(__hostprogs),\
+ 		   $(if $($(m)-cxxobjs),,$(if $($(m)-objs),$(m))))
+ 
+@@ -50,7 +50,7 @@ host-cxxshobjs	:= $(sort $(foreach m,$(host-cxxshlib),$($(m:.so=-objs))))
+ 
+ # output directory for programs/.o files
+ # hostprogs-y := tools/build may have been specified.
+-# Retrieve also directory of .o files from prog-objs or prog-cxxobjs notation
++# Retrieve also directory of .o files from host-objs or host-cxxobjs notation
+ host-objdirs := $(dir $(__hostprogs) $(host-cobjs) $(host-cxxobjs))
+ 
+ host-objdirs := $(strip $(sort $(filter-out ./,$(host-objdirs))))
 -- 
-Jani Nikula, Intel Open Source Technology Center
+2.13.6
+
+
+
