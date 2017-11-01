@@ -1,59 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:28188 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1753486AbdKABoz (ORCPT
+Received: from mail-oi0-f68.google.com ([209.85.218.68]:52340 "EHLO
+        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934221AbdKAVpE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 Oct 2017 21:44:55 -0400
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Subject: [PATCH v2] kbuild: comments correction & update on Makefile.host
-Date: Wed, 1 Nov 2017 09:43:14 +0800
-Message-ID: <20171101014314.4575-1-caoj.fnst@cn.fujitsu.com>
+        Wed, 1 Nov 2017 17:45:04 -0400
+Date: Wed, 1 Nov 2017 16:45:02 -0500
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH 3/3] kbuild: clean up *.dtb and *.dtb.S patterns from
+ top-level Makefile
+Message-ID: <20171101214502.vtnelzwb5kjj7eex@rob-hp-laptop>
+References: <1509377627-11362-1-git-send-email-yamada.masahiro@socionext.com>
+ <1509377627-11362-4-git-send-email-yamada.masahiro@socionext.com>
+ <CAL_Jsq+WU=kYLvfTipEUxEa4BL_57TdHhDitqrgftPFzTa=XCg@mail.gmail.com>
+ <CAK7LNAQ-DDSYzf=UBtEJfsZ0fw5-2o=dBM2sywZNJ9NCuGtPKQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAQ-DDSYzf=UBtEJfsZ0fw5-2o=dBM2sywZNJ9NCuGtPKQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>
 
-host-cmulti means the composite host program that is compiled/linked
-from several .c file, not .o file, because .o file could also be
-compiled from .cpp file.
+On Tue, Oct 31, 2017 at 01:32:15AM +0900, Masahiro Yamada wrote:
+> Hi Rob,
+> 
+> 2017-10-31 0:53 GMT+09:00 Rob Herring <robh+dt@kernel.org>:
+> > On Mon, Oct 30, 2017 at 10:33 AM, Masahiro Yamada
+> > <yamada.masahiro@socionext.com> wrote:
+> >> We need to add "clean-files" in Makfiles to clean up DT blobs, but we
+> >> often miss to do so.
+> >>
+> >> Since there are no source files that end with .dtb or .dtb.S, so we
+> >> can clean-up those files from the top-level Makefile.
+> >>
+> >> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> >> ---
+> >>
+> >>  Makefile | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/Makefile b/Makefile
+> >> index 63a4c0e..c577c63 100644
+> >> --- a/Makefile
+> >> +++ b/Makefile
+> >> @@ -1544,7 +1544,7 @@ clean: $(clean-dirs)
+> >>         $(call cmd,rmfiles)
+> >>         @find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
+> >>                 \( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+> >> -               -o -name '*.ko.*' \
+> >> +               -o -name '*.ko.*' -o -name '*.dtb' -o -name '*.dtb.S' \
+> >
+> > With this we can remove all the occurrences in the kernel:
+> >
+> > $ git grep 'clean.*dtb'
+> >
+> > Otherwise, the series looks good to me. I'm happy to apply it if the
+> > kbuild folks don't.
+> >
+> > Rob
+> 
+> Yes, please.  Thanks!
 
-Bonus: update the stale comment.
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
----
- scripts/Makefile.host | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Can you post a follow-up patch removing all the clean-files lines.
 
-diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-index 9cfd5c84d76f..8181df66d764 100644
---- a/scripts/Makefile.host
-+++ b/scripts/Makefile.host
-@@ -25,11 +25,11 @@ host-cshlib := $(sort $(hostlibs-y) $(hostlibs-m))
- host-cxxshlib := $(sort $(hostcxxlibs-y) $(hostcxxlibs-m))
- 
- # C code
--# Executables compiled from a single .c file
-+# C Executables compiled from a single .c file
- host-csingle	:= $(foreach m,$(__hostprogs), \
- 			$(if $($(m)-objs)$($(m)-cxxobjs),,$(m)))
- 
--# C executables linked based on several .o files
-+# C executables compiled from several .c files, and only .c files
- host-cmulti	:= $(foreach m,$(__hostprogs),\
- 		   $(if $($(m)-cxxobjs),,$(if $($(m)-objs),$(m))))
- 
-@@ -50,7 +50,7 @@ host-cxxshobjs	:= $(sort $(foreach m,$(host-cxxshlib),$($(m:.so=-objs))))
- 
- # output directory for programs/.o files
- # hostprogs-y := tools/build may have been specified.
--# Retrieve also directory of .o files from prog-objs or prog-cxxobjs notation
-+# Retrieve also directory of .o files from host-cobjs and host-cxxobjs notation
- host-objdirs := $(dir $(__hostprogs) $(host-cobjs) $(host-cxxobjs))
- 
- host-objdirs := $(strip $(sort $(filter-out ./,$(host-objdirs))))
--- 
-2.13.6
-
-
-
+Rob
