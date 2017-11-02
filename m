@@ -1,38 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot0-f196.google.com ([74.125.82.196]:54770 "EHLO
-        mail-ot0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752237AbdKBJI7 (ORCPT
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:44624 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752237AbdKBJSK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Nov 2017 05:08:59 -0400
+        Thu, 2 Nov 2017 05:18:10 -0400
 MIME-Version: 1.0
-In-Reply-To: <bb7c1a637afa47e8943ce494798f957c@SOC-EX01V.e01.socionext.com>
-References: <1509591085-23940-1-git-send-email-yamada.masahiro@socionext.com>
- <CAK8P3a3FoRJeO=TQGMRf6t4-bP8nP6KUEhkCrHP6L8XaF1Ee7g@mail.gmail.com> <bb7c1a637afa47e8943ce494798f957c@SOC-EX01V.e01.socionext.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Thu, 2 Nov 2017 10:08:58 +0100
-Message-ID: <CAK8P3a0r=un9H8y2AizW3v5KzkTEGgb70hfBx8C88qphDjJksg@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: clean up *.dtb and *.dtb.S patterns from
- top-level Makefile
+In-Reply-To: <1507109635-28977-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1507109635-28977-1-git-send-email-yamada.masahiro@socionext.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 2 Nov 2017 10:18:08 +0100
+Message-ID: <CAMuHMdUKdx_f=kH+xg+BEY7VwiUTczqUWtDHOHK52-cLy741iw@mail.gmail.com>
+Subject: Re: [PATCH] sh: remove pointless select of KBUILD_DEFCONFIG
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: DTML <devicetree@vger.kernel.org>, Rob Herring <robh@kernel.org>, linux-arch <linux-arch@vger.kernel.org>, "open list:RALINK MIPS ARCHITECTURE" <linux-mips@linux-mips.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Russell King - ARM Linux <linux@armlinux.org.uk>, Ralf Baechle <ralf@linux-mips.org>, Pantelis Antoniou <pantelis.antoniou@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Frank Rowand <frowand.list@gmail.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>
+Cc: Linux-sh list <linux-sh@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Thu, Nov 2, 2017 at 9:48 AM,  <yamada.masahiro@socionext.com> wrote:
+Hi Yamada-san,
 
->>       Arnd
+On Wed, Oct 4, 2017 at 11:33 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> KBUILD_DEFCONFIG := shx3_defconfig
 >
-> Yeah, I had also noticed this race problem on parallel building
-> with CONFIG_OF_ALL_DTBS.
+> is never used in a sensible way.  KBUILD_DEFCONFIG specifies the
+> defconfig file used by "make defconfig", but CONFIG_SUPERH32 is
+> never set when building config targets.
 >
-> I was planning to do it
-> when I come up with a clean implementation.
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 >
-> One idea is to handle dtb-y and CONFIG_OF_ALL_DTBS
-> natively in scripts/Makefile.build or somewhere
-> as scripts/Makefile.dtbinst already recognizes dtb-y as a special variable.
+>  arch/sh/Makefile | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/arch/sh/Makefile b/arch/sh/Makefile
+> index 280bbff..c937ec0 100644
+> --- a/arch/sh/Makefile
+> +++ b/arch/sh/Makefile
+> @@ -96,6 +96,7 @@ defaultimage-$(CONFIG_SH_7619_SOLUTION_ENGINE)        := vmlinux
+>  # Set some sensible Kbuild defaults
+>  boot := arch/sh/boot
+>  KBUILD_IMAGE           := $(boot)/$(defaultimage-y)
+> +KBUILD_DEFCONFIG       := cayman_defconfig
 
-Ah, nice, that does sound better, yes.
+cayman_defconfig is a 64-bit defconfig?
+As the big chunk of SH platforms are 32-bit (are there any 64-bit out in
+the wild?), does it make sense to make a 64-bit defconfig the default?
 
-      Arnd
+>  #
+>  # Choosing incompatible machines durings configuration will result in
+> @@ -105,14 +106,12 @@ ifdef CONFIG_SUPERH32
+>  UTS_MACHINE            := sh
+>  BITS                   := 32
+>  LDFLAGS_vmlinux                += -e _stext
+> -KBUILD_DEFCONFIG       := shx3_defconfig
+>  else
+>  UTS_MACHINE            := sh64
+>  BITS                   := 64
+>  LDFLAGS_vmlinux                += --defsym phys_stext=_stext-$(CONFIG_PAGE_OFFSET) \
+>                            --defsym phys_stext_shmedia=phys_stext+1 \
+>                            -e phys_stext_shmedia
+> -KBUILD_DEFCONFIG       := cayman_defconfig
+>  endif
+>
+>  ifdef CONFIG_CPU_LITTLE_ENDIAN
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
