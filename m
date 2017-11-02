@@ -1,77 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:55234 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752777AbdKBRlX (ORCPT
+Received: from mail-io0-f193.google.com ([209.85.223.193]:47852 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S964946AbdKBV2Y (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Nov 2017 13:41:23 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] sh: select KBUILD_DEFCONFIG depending on ARCH
-Date: Fri,  3 Nov 2017 02:40:32 +0900
-Message-Id: <1509644432-21252-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 2 Nov 2017 17:28:24 -0400
+Received: by mail-io0-f193.google.com with SMTP id h70so2097555ioi.4
+        for <linux-kbuild@vger.kernel.org>; Thu, 02 Nov 2017 14:28:24 -0700 (PDT)
+From: Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
+Date: Thu,  2 Nov 2017 14:26:48 -0700
+Message-Id: <20171102212649.108880-1-ndesaulniers@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, linux-sh@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Chris Fries <cfries@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-You can not select KBUILD_DEFCONFIG depending on any CONFIG option
-because include/config/auto.conf is not included when building config
-targets.  So, CONFIG_SUPERH32 is never set during the configuration,
-and cayman_defconfig is chosen.
+From: Chris Fries <cfries@google.com>
 
-This commit provides a sensible way to choose shx3/cayman_defconfig.
+Set the clang KBUILD_CFLAGS up before including arch/ Makefiles,
+so that ld-options (etc.) can work correctly.
 
-arch/sh/Kconfig sets either SUPERH32 or SUPERH64 depending on ARCH
-environment, like follows:
+This fixes errors with clang such as ld-options trying to CC
+against your host architecture, but LD trying to link against
+your target architecture.
 
-  config SUPERH32
-          def_bool ARCH = "sh"
+We didn't notice this problem on Android, because we took the original
+LLVMLinux patch into our 4.4 kernels, which did not have this issue. We
+ran into this taking the proper upstream patch on newer kernel versions.
+The original LLVMLinux patch can be seen at:
 
-          ...
+http://git.linuxfoundation.org/?p=llvmlinux/kernel.git;a=blobdiff;f=Makefile;h=389006c4ef494cda3a1ee52bf355618673ab4f31;hp=e41a3356abee83f08288362950bfceebd25ec3c2;hb=ef9126da11b18ff34eb1f01561f53c378860336c;hpb=f800c25b7a762d445ba1439a2428c8362157eba6
 
-  config SUPERH64
-          def_bool ARCH = "sh64"
+It seems that when the patch was re-upstreamed, a V2 was requested that
+moved the definition of Clang's target triple to be later in the top
+level Makefile than the inclusion of the arch specific Makefile,
+breaking macros like ld-option when cross compiling. V2 was requested
+at:
 
-It should make sense to choose the default defconfig by ARCH,
-like arch/sparc/Makefile.
+https://lkml.org/lkml/2017/4/21/116
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Chris Fries <cfries@google.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
+ Makefile | 64 ++++++++++++++++++++++++++++++++--------------------------------
+ 1 file changed, 32 insertions(+), 32 deletions(-)
 
- arch/sh/Makefile | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/arch/sh/Makefile b/arch/sh/Makefile
-index 280bbff..65300193 100644
---- a/arch/sh/Makefile
-+++ b/arch/sh/Makefile
-@@ -15,6 +15,12 @@ ifneq ($(SUBARCH),$(ARCH))
-   endif
+diff --git a/Makefile b/Makefile
+index 5f91a28a3cea..72ea86157114 100644
+--- a/Makefile
++++ b/Makefile
+@@ -512,6 +512,38 @@ ifneq ($(filter install,$(MAKECMDGOALS)),)
+         endif
  endif
  
-+ifeq ($(ARCH),sh)
-+KBUILD_DEFCONFIG	:= shx3_defconfig
++ifeq ($(cc-name),clang)
++ifneq ($(CROSS_COMPILE),)
++CLANG_TARGET	:= --target=$(notdir $(CROSS_COMPILE:%-=%))
++GCC_TOOLCHAIN	:= $(realpath $(dir $(shell which $(LD)))/..)
++endif
++ifneq ($(GCC_TOOLCHAIN),)
++CLANG_GCC_TC	:= --gcc-toolchain=$(GCC_TOOLCHAIN)
++endif
++KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
++KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
++KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
++KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
++KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
++KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
++KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
++# Quiet clang warning: comparison of unsigned expression < 0 is always false
++KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
++# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
++# source of a reference will be _MergedGlobals and not on of the whitelisted names.
++# See modpost pattern 2
++KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
++KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
++KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
++KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
 +else
-+KBUILD_DEFCONFIG	:= cayman_defconfig
++
++# These warnings generated too much noise in a regular build.
++# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
++KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
++KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
 +endif
 +
- isa-y					:= any
- isa-$(CONFIG_SH_DSP)			:= sh
- isa-$(CONFIG_CPU_SH2)			:= sh2
-@@ -105,14 +111,12 @@ ifdef CONFIG_SUPERH32
- UTS_MACHINE		:= sh
- BITS			:= 32
- LDFLAGS_vmlinux		+= -e _stext
--KBUILD_DEFCONFIG	:= shx3_defconfig
- else
- UTS_MACHINE		:= sh64
- BITS			:= 64
- LDFLAGS_vmlinux		+= --defsym phys_stext=_stext-$(CONFIG_PAGE_OFFSET) \
- 			   --defsym phys_stext_shmedia=phys_stext+1 \
- 			   -e phys_stext_shmedia
--KBUILD_DEFCONFIG	:= cayman_defconfig
+ ifeq ($(mixed-targets),1)
+ # ===========================================================================
+ # We're called with mixed targets (*config and build targets).
+@@ -695,38 +727,6 @@ ifdef CONFIG_CC_STACKPROTECTOR
  endif
+ KBUILD_CFLAGS += $(stackp-flag)
  
- ifdef CONFIG_CPU_LITTLE_ENDIAN
+-ifeq ($(cc-name),clang)
+-ifneq ($(CROSS_COMPILE),)
+-CLANG_TARGET	:= --target=$(notdir $(CROSS_COMPILE:%-=%))
+-GCC_TOOLCHAIN	:= $(realpath $(dir $(shell which $(LD)))/..)
+-endif
+-ifneq ($(GCC_TOOLCHAIN),)
+-CLANG_GCC_TC	:= --gcc-toolchain=$(GCC_TOOLCHAIN)
+-endif
+-KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+-KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+-KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+-KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+-KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+-KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+-KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
+-# Quiet clang warning: comparison of unsigned expression < 0 is always false
+-KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+-# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+-# source of a reference will be _MergedGlobals and not on of the whitelisted names.
+-# See modpost pattern 2
+-KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+-KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+-KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+-KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+-else
+-
+-# These warnings generated too much noise in a regular build.
+-# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+-KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+-KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+-endif
+-
+ ifdef CONFIG_FRAME_POINTER
+ KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
+ else
 -- 
-2.7.4
+2.15.0.403.gc27cc4dac6-goog
 
