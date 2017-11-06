@@ -1,73 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:62536 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751457AbdKFLBl (ORCPT
+Received: from heliosphere.sirena.org.uk ([172.104.155.198]:34966 "EHLO
+        heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751848AbdKFLVs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Nov 2017 06:01:41 -0500
+        Mon, 6 Nov 2017 06:21:48 -0500
+Date: Mon, 6 Nov 2017 11:21:43 +0000
+From: Mark Brown <broonie@kernel.org>
+Subject: Re: linux-next: build warning after merge of the regmap tree
+Message-ID: <20171106112143.ht4cmm2qngdbmmuy@sirena.co.uk>
+References: <20171106115214.19cb007a@canb.auug.org.au>
+ <20171106152157.2ad9a5a9@canb.auug.org.au>
+ <20171106153037.2afa3e7b@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <20171106095139.GG15260@jhogan-linux>
-References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
- <1509859853-27473-2-git-send-email-yamada.masahiro@socionext.com>
- <CAK7LNAQfK_BWQcVW-ScrpAwNAHav3MrrzV-tjn_YUjsuvd7U5A@mail.gmail.com> <20171106095139.GG15260@jhogan-linux>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 6 Nov 2017 20:00:49 +0900
-Message-ID: <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
-Subject: Re: [PATCH 1/2] MIPS: dts: remove bogus bcm96358nb4ser.dtb from dtb-y entry
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="agmybq6rue55gqhj"
+Content-Disposition: inline
+In-Reply-To: <20171106153037.2afa3e7b@canb.auug.org.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <jhogan@kernel.org>
-Cc: Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ralf Baechle <ralf@linux-mips.org>, linux-mips@linux-mips.org, Kevin Cernekee <cernekee@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>
-
-2017-11-06 19:41 GMT+09:00 James Hogan <jhogan@kernel.org>:
-> Hi,
->
-> On Sun, Nov 05, 2017 at 11:11:38PM +0900, Masahiro Yamada wrote:
->> +CC Ralf Baechle <ralf@linux-mips.org>
->> +CC linux-mips@linux-mips.org
->> +CC Kevin Cernekee <cernekee@gmail.com>
->> +CC Florian Fainelli <f.fainelli@gmail.com>
->>
->>
->> I missed to CC MIPS maintainers.
->
-> Yes, please resend the patch so it lands in patchwork.linux-mips.org.
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-remoteproc@vger.kernel.org, Ohad Ben-Cohen <ohad@wizery.com>, Bjorn Andersson <bjorn.andersson@linaro.org>
 
 
-This is a part of clean-up series of DT building.
+--agmybq6rue55gqhj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I want Acked-by from MIPS maintainers
-so that the whole series can go to a different tree.
-(DT or Kbuild).
+On Mon, Nov 06, 2017 at 03:30:37PM +1100, Stephen Rothwell wrote:
+> On Mon, 6 Nov 2017 15:21:57 +1100 Stephen Rothwell <sfr@canb.auug.org.au>=
+ wrote:
+> > On Mon, 6 Nov 2017 11:52:14 +1100 Stephen Rothwell <sfr@canb.auug.org.a=
+u> wrote:
 
+> > > After merging the regmap tree, today's linux-next build
+> > > (arm_multi_v7_defconfig) produced this warning:
 
-Sam addressed more clean-up candidates in MIPS Makefiles
-https://patchwork.kernel.org/patch/10041879/
+Not snipping Kconfig errors for context, looks like Kconfig is exploding...
 
-So, I will probably end up with touching those Makefiles more.
+> > > drivers/gpio/Kconfig:13:error: recursive dependency detected!
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/gpio/Kconfig:13:	symbol GPIOLIB is selected by PINCTRL_SUNXI
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/pinctrl/sunxi/Kconfig:3:	symbol PINCTRL_SUNXI is selected by =
+PINCTRL_SUN6I_A31_R
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/pinctrl/sunxi/Kconfig:21:	symbol PINCTRL_SUN6I_A31_R depends =
+on RESET_CONTROLLER
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/reset/Kconfig:4:	symbol RESET_CONTROLLER is selected by QCOM_=
+SCM
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/firmware/Kconfig:205:	symbol QCOM_SCM is selected by QCOM_ADS=
+P_PIL
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/remoteproc/Kconfig:90:	symbol QCOM_ADSP_PIL depends on QCOM_S=
+MEM
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/soc/qcom/Kconfig:49:	symbol QCOM_SMEM depends on HWSPINLOCK
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/hwspinlock/Kconfig:5:	symbol HWSPINLOCK is selected by REGMAP
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/base/regmap/Kconfig:6:	symbol REGMAP is selected by PINCTRL_S=
+X150X
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/pinctrl/Kconfig:227:	symbol PINCTRL_SX150X is selected by GPI=
+O_SX150X
+> > > For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> > > subsection "Kconfig recursive dependency limitations"
+> > > drivers/gpio/Kconfig:821:	symbol GPIO_SX150X depends on GPIOLIB
+> > > warning: (ARCH_VEXPRESS) selects MFD_VEXPRESS_SYSREG which has unmet =
+direct dependencies (HAS_IOMEM && VEXPRESS_CONFIG && GPIOLIB && !ARCH_USES_=
+GETTIMEOFFSET)
+> > > warning: (ARCH_NOMADIK && ARCH_U8500) selects PINCTRL_NOMADIK which h=
+as unmet direct dependencies (PINCTRL && (ARCH_U8500 || ARCH_NOMADIK) && OF=
+ && GPIOLIB)
+> > > warning: (PINCTRL_AT91 && PINCTRL_AT91PIO4 && PINCTRL_MESON && PINCTR=
+L_OXNAS && PINCTRL_PISTACHIO && PINCTRL_PIC32 && PINCTRL_NOMADIK && PINCTRL=
+_MTK && GPIO_TB10X) selects OF_GPIO which has unmet direct dependencies (GP=
+IOLIB && OF && HAS_IOMEM)
 
-All patches must go to the same tree.
+> > > Maybe introduced by commit
 
+> > >   f25637a6b89e ("regmap: Add a config option for hwspinlock") =20
 
->> 2017-11-05 14:30 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->> > arch/mips/boot/dts/brcm/bcm96358nb4ser.dts does not exist, so
->> > we cannot build bcm96358nb4ser.dtb .
->
-> This appears to be due to the file being renamed in commit 695835511f96
-> ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom").
-> Please can you update the commit message when you resend to mention the
-> cause of the problem.
->
-> You could also add the following if you like while you're at it:
->
-> Fixes: 695835511f96 ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom")
-> Cc: <stable@vger.kernel.org> # 4.9+
->
+> > Things got worse during the day until config started segfaulting, so I
+> > reverted this commit.
 
+> That necessitated me reverting commits
 
-Will do.  Thanks!
+>   8698b9364710 ("regmap: Add hardware spinlock support")
+>   267f3e4f18f1 ("regmap: Also protect hwspinlock in error handling path")
+>   e8419c40a5ad ("regmap: Clean up hwspinlock on regmap exit")
 
+This seems like there's a Kconfig bug, it's claiming HWSPINLOCK is
+selected by regmap but the select is conditional and not actually
+enabled.  You could potentially get a recursive dependency but there
+isn't one right now.  The root issue here is that HWSPINLOCK can be
+built modular which makes it very painful to use from core code.
 
--- 
-Best Regards
-Masahiro Yamada
+--agmybq6rue55gqhj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAloARcQACgkQJNaLcl1U
+h9C48Af8DsmbmPszkoeO3CrbS/ZtAc1XvCpT5THuTsvwwkZBud+FG9MsgfKvCwc1
+G2Nb2+Nqt45pUyGlHmv15OspgCTChJfuCecMCOXT/aZP/LLLhv2K1IIZR0yRCQVI
+/xJ4VijaGivf/OxvGT29Zpvz8o5If6XKbgQjpndg197BQJWsZRzVYQGupB1D5zVJ
+CmMcB8bzxogon9y+rfXoYwfjbNw9CA30hk2inBjPXed/LkVpx7De4P8qMwKIXt+8
+mkWA7U83xJ+ldBsurAgDyy++VnRBa/n8fauFcl5sub8VmImFlbI2dVV1zJQ4fZ/M
+Q4k0QT9ryC5J52upUIF5fgKEweDCCw==
+=feuq
+-----END PGP SIGNATURE-----
+
+--agmybq6rue55gqhj--
