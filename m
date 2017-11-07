@@ -1,106 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:24637 "EHLO
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:34470 "EHLO
         conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932814AbdKGA2R (ORCPT
+        with ESMTP id S1754292AbdKGDlt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Nov 2017 19:28:17 -0500
+        Mon, 6 Nov 2017 22:41:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <69422e77-ac67-d23f-59e2-c8d0df1819b6@imag.fr>
-References: <1508993438-15325-1-git-send-email-yamada.masahiro@socionext.com>
- <alpine.DEB.2.20.1710260658330.17107@hadrien> <69422e77-ac67-d23f-59e2-c8d0df1819b6@imag.fr>
+In-Reply-To: <20171106184756.24404-1-ndesaulniers@google.com>
+References: <CAKwvOdmhuaLC6=vG2DMFAbhfXoUr74_aemM2DK7me6pQ0obW4g@mail.gmail.com>
+ <20171106184756.24404-1-ndesaulniers@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 7 Nov 2017 09:27:23 +0900
-Message-ID: <CAK7LNAQ9iXf1D3SWvX=GVWbEiwazDtsTBBaEhOO44PDRc5JqZw@mail.gmail.com>
-Subject: Re: [PATCH] coccinelle: grep Options and Requires fields more precisely
+Date: Tue, 7 Nov 2017 12:41:00 +0900
+Message-ID: <CAK7LNATKn+8g=6QWoK3HXb9dk35myNq=xt0vnrHamckhDAhtLA@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: fix linker feature test macros when cross
+ compiling with Clang
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Nicolas Palix (LIG)" <Nicolas.Palix@imag.fr>
-Cc: Julia Lawall <julia.lawall@lip6.fr>, cocci@systeme.lip6.fr, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Gilles Muller <Gilles.Muller@lip6.fr>, Michal Marek <michal.lkml@markovi.net>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Douglas Anderson <dianders@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Mark Charlebois <charlebm@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-10-26 16:26 GMT+09:00 Nicolas Palix (LIG) <Nicolas.Palix@imag.fr>:
-> Le 26/10/17 =C3=A0 06:59, Julia Lawall a =C3=A9crit :
->>
->>
->>
->> On Thu, 26 Oct 2017, Masahiro Yamada wrote:
->>
->>> Currently, the required version for badzero.cocci is picked up from
->>> its "Comments:" line since it contains the word "Requires".
->>>
->>> Surprisingly, ld-version.sh can extract the version number from the
->>> string "Requires Coccinelle version 1.0.0-rc20 or later", but this
->>> expectation is fragile.  Fix the .cocci file.  I removed "-rc20"
->>> because ld-version.sh cannot handle it.
->>
->>
->> OK.
->>
->>> Make the coccicheck script to see exact patterns for "Options:" and
->>> "Requires:" in order to avoid accidental matching to what just happens
->>> to appear in comment lines.
->>>
->>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->>
->>
->> Thanks for checking on this!
->>
->> Acked-by: Julia Lawall <julia.lawall@lip6.fr>
+2017-11-07 3:47 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+> I was not seeing my linker flags getting added when using ld-option when
+> cross compiling with Clang. Upon investigation, this seems to be due to
+> a difference in how GCC vs Clang handle cross compilation.
 >
-> Acked-by: Nicolas Palix <nicolas.palix@imag.fr>
+> GCC is configured at build time to support one backend, that is implicit
+> when compiling.  Clang is explicit via the use of `-target <triple>` and
+> ships with all supported backends by default.
 >
->>
->>> ---
->>>
->>>   scripts/coccicheck                    | 4 ++--
->>>   scripts/coccinelle/null/badzero.cocci | 2 +-
->>>   2 files changed, 3 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/scripts/coccicheck b/scripts/coccicheck
->>> index 3e21a1b..1bfa2d2 100755
->>> --- a/scripts/coccicheck
->>> +++ b/scripts/coccicheck
->>> @@ -168,8 +168,8 @@ OPTIONS=3D"$OPTIONS $SPFLAGS"
->>>   coccinelle () {
->>>       COCCI=3D"$1"
->>>
->>> -    OPT=3D`grep "Option" $COCCI | cut -d':' -f2`
->>> -    REQ=3D`grep "Requires" $COCCI | cut -d':' -f2 | sed "s| ||"`
->>> +    OPT=3D`grep "Options:" $COCCI | cut -d':' -f2`
->>> +    REQ=3D`grep "Requires:" $COCCI | cut -d':' -f2 | sed "s| ||"`
->>>       REQ_NUM=3D$(echo $REQ | ${DIR}/scripts/ld-version.sh)
->>>       if [ "$REQ_NUM" !=3D "0" ] ; then
->>>             if [ "$SPATCH_VERSION_NUM" -lt "$REQ_NUM" ] ; then
->>> diff --git a/scripts/coccinelle/null/badzero.cocci
->>> b/scripts/coccinelle/null/badzero.cocci
->>> index 5551da2..f597c80 100644
->>> --- a/scripts/coccinelle/null/badzero.cocci
->>> +++ b/scripts/coccinelle/null/badzero.cocci
->>> @@ -10,7 +10,7 @@
->>>   // Copyright: (C) 2012 Julia Lawall, INRIA/LIP6.  GPLv2.
->>>   // Copyright: (C) 2012 Gilles Muller, INRIA/LiP6.  GPLv2.
->>>   // URL: http://coccinelle.lip6.fr/
->>> -// Comments: Requires Coccinelle version 1.0.0-rc20 or later
->>> +// Requires: 1.0.0
->>>   // Options:
->>>
->>>   virtual patch
->>> --
->>> 2.7.4
->>>
->>>
+> GNU Make feature test macros that compile then link will always fail
+> when cross compiling with Clang unless Clang's triple is passed along to
+> the compiler. For example:
 >
+> $ clang -x c /dev/null -c -o temp.o
+> $ aarch64-linux-android/bin/ld -E temp.o
+> aarch64-linux-android/bin/ld:
+> unknown architecture of input file `temp.o' is incompatible with
+> aarch64 output
+> aarch64-linux-android/bin/ld:
+> warning: cannot find entry symbol _start; defaulting to
+> 0000000000400078
+> $ echo $?
+> 1
 >
-> --
-> Nicolas Palix
-> http://lig-membres.imag.fr/palix/
+> $ clang -target aarch64-linux-android- -x c /dev/null -c -o temp.o
+> $ aarch64-linux-android/bin/ld -E temp.o
+> aarch64-linux-android/bin/ld:
+> warning: cannot find entry symbol _start; defaulting to 00000000004002e4
+> $ echo $?
+> 0
 >
+> This causes conditional checks that invoke $(CC) without the target
+> triple, then $(LD) on the result, to always fail.
+>
+> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
+> Changes since v2:
+> * Add LDFLAGS to ld-option, as per Masahiro, and spotted by 0-day bot:
+>   https://lists.01.org/pipermail/lkp/2017-October/007427.html
+>
+>  scripts/Kbuild.include | 5 +++--
 
 
-Applied to linux-kbuild/misc.
+Applied to linux-kbuild/kbuild.
 
 
---=20
+-- 
 Best Regards
 Masahiro Yamada
