@@ -1,72 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:34470 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754292AbdKGDlt (ORCPT
+Received: from mail-pg0-f51.google.com ([74.125.83.51]:49314 "EHLO
+        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753864AbdKGGBP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Nov 2017 22:41:49 -0500
+        Tue, 7 Nov 2017 01:01:15 -0500
+Received: by mail-pg0-f51.google.com with SMTP id g6so10205515pgn.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 06 Nov 2017 22:01:14 -0800 (PST)
+Date: Mon, 6 Nov 2017 22:01:11 -0800
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+Subject: Re: linux-next: build warning after merge of the regmap tree
+Message-ID: <20171107060111.GV28761@minitux>
+References: <20171106115214.19cb007a@canb.auug.org.au>
+ <20171106152157.2ad9a5a9@canb.auug.org.au>
+ <20171106153037.2afa3e7b@canb.auug.org.au>
+ <20171106112143.ht4cmm2qngdbmmuy@sirena.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20171106184756.24404-1-ndesaulniers@google.com>
-References: <CAKwvOdmhuaLC6=vG2DMFAbhfXoUr74_aemM2DK7me6pQ0obW4g@mail.gmail.com>
- <20171106184756.24404-1-ndesaulniers@google.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 7 Nov 2017 12:41:00 +0900
-Message-ID: <CAK7LNATKn+8g=6QWoK3HXb9dk35myNq=xt0vnrHamckhDAhtLA@mail.gmail.com>
-Subject: Re: [PATCH v3] kbuild: fix linker feature test macros when cross
- compiling with Clang
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171106112143.ht4cmm2qngdbmmuy@sirena.co.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Douglas Anderson <dianders@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Mark Charlebois <charlebm@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Linux-Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-remoteproc@vger.kernel.org, Ohad Ben-Cohen <ohad@wizery.com>
 
-2017-11-07 3:47 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
-> I was not seeing my linker flags getting added when using ld-option when
-> cross compiling with Clang. Upon investigation, this seems to be due to
-> a difference in how GCC vs Clang handle cross compilation.
->
-> GCC is configured at build time to support one backend, that is implicit
-> when compiling.  Clang is explicit via the use of `-target <triple>` and
-> ships with all supported backends by default.
->
-> GNU Make feature test macros that compile then link will always fail
-> when cross compiling with Clang unless Clang's triple is passed along to
-> the compiler. For example:
->
-> $ clang -x c /dev/null -c -o temp.o
-> $ aarch64-linux-android/bin/ld -E temp.o
-> aarch64-linux-android/bin/ld:
-> unknown architecture of input file `temp.o' is incompatible with
-> aarch64 output
-> aarch64-linux-android/bin/ld:
-> warning: cannot find entry symbol _start; defaulting to
-> 0000000000400078
-> $ echo $?
-> 1
->
-> $ clang -target aarch64-linux-android- -x c /dev/null -c -o temp.o
-> $ aarch64-linux-android/bin/ld -E temp.o
-> aarch64-linux-android/bin/ld:
-> warning: cannot find entry symbol _start; defaulting to 00000000004002e4
-> $ echo $?
-> 0
->
-> This causes conditional checks that invoke $(CC) without the target
-> triple, then $(LD) on the result, to always fail.
->
-> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
-> ---
-> Changes since v2:
-> * Add LDFLAGS to ld-option, as per Masahiro, and spotted by 0-day bot:
->   https://lists.01.org/pipermail/lkp/2017-October/007427.html
->
->  scripts/Kbuild.include | 5 +++--
+On Mon 06 Nov 03:21 PST 2017, Mark Brown wrote:
 
+> On Mon, Nov 06, 2017 at 03:30:37PM +1100, Stephen Rothwell wrote:
+> > On Mon, 6 Nov 2017 15:21:57 +1100 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> > > On Mon, 6 Nov 2017 11:52:14 +1100 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> 
+> > > > After merging the regmap tree, today's linux-next build
+> > > > (arm_multi_v7_defconfig) produced this warning:
+> 
+[..]
+> isn't one right now.  The root issue here is that HWSPINLOCK can be
+> built modular which makes it very painful to use from core code.
 
-Applied to linux-kbuild/kbuild.
+I've picked Baolin's patch for making the hwspinlock core bool.
+Hopefully this help avoid this issue. Looks like I missed today's
+linux-next though.
 
-
--- 
-Best Regards
-Masahiro Yamada
+Regards,
+Bjorn
