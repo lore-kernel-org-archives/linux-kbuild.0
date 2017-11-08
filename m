@@ -1,57 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:11644 "EHLO
-        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751674AbdKHNNU (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Nov 2017 08:13:20 -0500
-Date: Wed, 8 Nov 2017 21:12:50 +0800 (CST)
-From: Julia Lawall <julia.lawall@lip6.fr>
-Subject: Re: [PATCH] coccinelle: fix verbose message about .cocci file being
- run
-In-Reply-To: <CAK7LNARMTun58pa1Ew32SvQjR_u1Hg8mE-tDR_qqvztcx_Wnfg@mail.gmail.com>
-Message-ID: <alpine.DEB.2.20.1711082112400.2708@hadrien>
-References: <1508993751-17218-1-git-send-email-yamada.masahiro@socionext.com> <c18712da-6b47-3b13-059d-d49db738e386@imag.fr> <CAK7LNARMTun58pa1Ew32SvQjR_u1Hg8mE-tDR_qqvztcx_Wnfg@mail.gmail.com>
+Received: from mail.kernel.org ([198.145.29.99]:33042 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752150AbdKHQqd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 8 Nov 2017 11:46:33 -0500
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323329-284676870-1510146798=:2708"
+In-Reply-To: <1509591085-23940-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1509591085-23940-1-git-send-email-yamada.masahiro@socionext.com>
+From: Rob Herring <robh@kernel.org>
+Date: Wed, 8 Nov 2017 10:46:10 -0600
+Message-ID: <CAL_JsqKLbDWcwcgotnQAO2FeFp55SZRd0z9r2Dr0ZsK0LKZMLw@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: clean up *.dtb and *.dtb.S patterns from
+ top-level Makefile
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: nicolas.palix@univ-grenoble-alpes.fr, cocci@systeme.lip6.fr, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Julia Lawall <Julia.Lawall@lip6.fr>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Gilles Muller <Gilles.Muller@lip6.fr>, Michal Marek <michal.lkml@markovi.net>
+Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Linux-MIPS <linux-mips@linux-mips.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Russell King <linux@armlinux.org.uk>, Ralf Baechle <ralf@linux-mips.org>, Pantelis Antoniou <pantelis.antoniou@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Frank Rowand <frowand.list@gmail.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
---8323329-284676870-1510146798=:2708
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-
-
-
-On Tue, 7 Nov 2017, Masahiro Yamada wrote:
-
-> 2017-10-26 16:22 GMT+09:00 Nicolas Palix (LIG) <Nicolas.Palix@imag.fr>:
-> > Le 26/10/17 à 06:55, Masahiro Yamada a écrit :
-> >>
-> >> If you run coccicheck with V=1 and COCCI=, you will see a strange
-> >> path to the semantic patch file.  For example, run the following:
-> >>
-> >> $ make V=1 COCCI=scripts/coccinelle/free/kfree.cocci coccicheck
-> >>    [ snip ]
-> >>   The semantic patch that makes this report is available
-> >>   in scriptcoccinelle/free/kfree.cocci.
-> >>
-> >> Notice "s/" was dropped from "scripts/coccinelle/free/kfree.cocci".
-> >>
-> >> When running coccicheck without O=, $srctree is expanded to ".", which
-> >> represents one arbitrary character in the regular expression.  Using
-> >> sed is not a good choice here.  Strip $srctree/ simply without sed.
-> >>
-> >> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> >
-> > Acked-by: Nicolas Palix <nicolas.palix@imag.fr>
-> >>
-> >> ---
+On Wed, Nov 1, 2017 at 9:51 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> We need to add "clean-files" in Makfiles to clean up DT blobs, but we
+> often miss to do so.
 >
-> Applied to linux-kbuild/misc.
+> Since there are no source files that end with .dtb or .dtb.S, so we
+> can clean-up those files from the top-level Makefile.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
+> Changes in v2:
+>   - Remove clean-files
 
-Thanks!
+Applied this and the 2 prerequisite patches.
 
-julia
---8323329-284676870-1510146798=:2708--
+>
+>  Documentation/kbuild/makefiles.txt               | 1 -
+>  Makefile                                         | 2 +-
+>  arch/arc/boot/dts/Makefile                       | 1 -
+>  arch/arm/boot/dts/Makefile                       | 1 -
+>  arch/arm64/boot/dts/actions/Makefile             | 1 -
+>  arch/arm64/boot/dts/al/Makefile                  | 1 -
+>  arch/arm64/boot/dts/allwinner/Makefile           | 1 -
+>  arch/arm64/boot/dts/altera/Makefile              | 1 -
+>  arch/arm64/boot/dts/amd/Makefile                 | 1 -
+>  arch/arm64/boot/dts/amlogic/Makefile             | 1 -
+>  arch/arm64/boot/dts/apm/Makefile                 | 1 -
+>  arch/arm64/boot/dts/arm/Makefile                 | 1 -
+>  arch/arm64/boot/dts/broadcom/Makefile            | 1 -
+>  arch/arm64/boot/dts/broadcom/northstar2/Makefile | 1 -
+>  arch/arm64/boot/dts/broadcom/stingray/Makefile   | 1 -
+>  arch/arm64/boot/dts/cavium/Makefile              | 1 -
+>  arch/arm64/boot/dts/exynos/Makefile              | 1 -
+>  arch/arm64/boot/dts/freescale/Makefile           | 1 -
+>  arch/arm64/boot/dts/hisilicon/Makefile           | 1 -
+>  arch/arm64/boot/dts/lg/Makefile                  | 1 -
+>  arch/arm64/boot/dts/marvell/Makefile             | 1 -
+>  arch/arm64/boot/dts/mediatek/Makefile            | 1 -
+>  arch/arm64/boot/dts/nvidia/Makefile              | 1 -
+>  arch/arm64/boot/dts/qcom/Makefile                | 1 -
+>  arch/arm64/boot/dts/realtek/Makefile             | 1 -
+>  arch/arm64/boot/dts/renesas/Makefile             | 1 -
+>  arch/arm64/boot/dts/rockchip/Makefile            | 1 -
+>  arch/arm64/boot/dts/socionext/Makefile           | 1 -
+>  arch/arm64/boot/dts/sprd/Makefile                | 1 -
+>  arch/arm64/boot/dts/xilinx/Makefile              | 1 -
+>  arch/arm64/boot/dts/zte/Makefile                 | 1 -
+>  arch/c6x/boot/dts/Makefile                       | 2 --
+>  arch/cris/boot/dts/Makefile                      | 2 --
+>  arch/h8300/boot/dts/Makefile                     | 1 -
+>  arch/metag/boot/dts/Makefile                     | 1 -
+>  arch/microblaze/boot/Makefile                    | 2 +-
+>  arch/mips/boot/dts/Makefile                      | 1 -
+>  arch/mips/boot/dts/brcm/Makefile                 | 1 -
+>  arch/mips/boot/dts/cavium-octeon/Makefile        | 1 -
+>  arch/mips/boot/dts/img/Makefile                  | 1 -
+>  arch/mips/boot/dts/ingenic/Makefile              | 1 -
+>  arch/mips/boot/dts/lantiq/Makefile               | 1 -
+>  arch/mips/boot/dts/mti/Makefile                  | 1 -
+>  arch/mips/boot/dts/netlogic/Makefile             | 1 -
+>  arch/mips/boot/dts/ni/Makefile                   | 1 -
+>  arch/mips/boot/dts/pic32/Makefile                | 1 -
+>  arch/mips/boot/dts/qca/Makefile                  | 1 -
+>  arch/mips/boot/dts/ralink/Makefile               | 1 -
+>  arch/mips/boot/dts/xilfpga/Makefile              | 1 -
+>  arch/nios2/boot/Makefile                         | 2 --
+>  arch/openrisc/boot/dts/Makefile                  | 2 --
+>  arch/powerpc/boot/Makefile                       | 2 +-
+>  arch/sh/boot/dts/Makefile                        | 2 --
+>  arch/xtensa/boot/dts/Makefile                    | 2 --
+>  54 files changed, 3 insertions(+), 60 deletions(-)
