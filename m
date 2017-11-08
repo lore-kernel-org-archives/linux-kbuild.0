@@ -1,91 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:33042 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:33772 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752150AbdKHQqd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Nov 2017 11:46:33 -0500
+        id S1752256AbdKHQv5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 8 Nov 2017 11:51:57 -0500
 MIME-Version: 1.0
-In-Reply-To: <1509591085-23940-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1509591085-23940-1-git-send-email-yamada.masahiro@socionext.com>
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 8 Nov 2017 10:46:10 -0600
-Message-ID: <CAL_JsqKLbDWcwcgotnQAO2FeFp55SZRd0z9r2Dr0ZsK0LKZMLw@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: clean up *.dtb and *.dtb.S patterns from
- top-level Makefile
+In-Reply-To: <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
+References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
+ <1509859853-27473-2-git-send-email-yamada.masahiro@socionext.com>
+ <CAK7LNAQfK_BWQcVW-ScrpAwNAHav3MrrzV-tjn_YUjsuvd7U5A@mail.gmail.com>
+ <20171106095139.GG15260@jhogan-linux> <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Wed, 8 Nov 2017 10:51:35 -0600
+Message-ID: <CAL_JsqJ8taCKnr_79UumiH2GFYq-fMzzkYm2iYevTOgUUWuzvg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] MIPS: dts: remove bogus bcm96358nb4ser.dtb from dtb-y entry
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Linux-MIPS <linux-mips@linux-mips.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Russell King <linux@armlinux.org.uk>, Ralf Baechle <ralf@linux-mips.org>, Pantelis Antoniou <pantelis.antoniou@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Frank Rowand <frowand.list@gmail.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: James Hogan <jhogan@kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ralf Baechle <ralf@linux-mips.org>, Linux-MIPS <linux-mips@linux-mips.org>, Kevin Cernekee <cernekee@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>
 
-On Wed, Nov 1, 2017 at 9:51 PM, Masahiro Yamada
+On Mon, Nov 6, 2017 at 5:00 AM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> We need to add "clean-files" in Makfiles to clean up DT blobs, but we
-> often miss to do so.
+> 2017-11-06 19:41 GMT+09:00 James Hogan <jhogan@kernel.org>:
+>> Hi,
+>>
+>> On Sun, Nov 05, 2017 at 11:11:38PM +0900, Masahiro Yamada wrote:
+>>> +CC Ralf Baechle <ralf@linux-mips.org>
+>>> +CC linux-mips@linux-mips.org
+>>> +CC Kevin Cernekee <cernekee@gmail.com>
+>>> +CC Florian Fainelli <f.fainelli@gmail.com>
+>>>
+>>>
+>>> I missed to CC MIPS maintainers.
+>>
+>> Yes, please resend the patch so it lands in patchwork.linux-mips.org.
 >
-> Since there are no source files that end with .dtb or .dtb.S, so we
-> can clean-up those files from the top-level Makefile.
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+> This is a part of clean-up series of DT building.
 >
-> Changes in v2:
->   - Remove clean-files
+> I want Acked-by from MIPS maintainers
+> so that the whole series can go to a different tree.
+> (DT or Kbuild).
+>
+>
+> Sam addressed more clean-up candidates in MIPS Makefiles
+> https://patchwork.kernel.org/patch/10041879/
+>
+> So, I will probably end up with touching those Makefiles more.
+>
+> All patches must go to the same tree.
+>
+>
+>>> 2017-11-05 14:30 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+>>> > arch/mips/boot/dts/brcm/bcm96358nb4ser.dts does not exist, so
+>>> > we cannot build bcm96358nb4ser.dtb .
+>>
+>> This appears to be due to the file being renamed in commit 695835511f96
+>> ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom").
+>> Please can you update the commit message when you resend to mention the
+>> cause of the problem.
+>>
+>> You could also add the following if you like while you're at it:
+>>
+>> Fixes: 695835511f96 ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom")
+>> Cc: <stable@vger.kernel.org> # 4.9+
 
-Applied this and the 2 prerequisite patches.
+I think this one can be applied independently and we'd want it to if
+we tag for stable. So I think it can go thru the MIPS tree.
 
->
->  Documentation/kbuild/makefiles.txt               | 1 -
->  Makefile                                         | 2 +-
->  arch/arc/boot/dts/Makefile                       | 1 -
->  arch/arm/boot/dts/Makefile                       | 1 -
->  arch/arm64/boot/dts/actions/Makefile             | 1 -
->  arch/arm64/boot/dts/al/Makefile                  | 1 -
->  arch/arm64/boot/dts/allwinner/Makefile           | 1 -
->  arch/arm64/boot/dts/altera/Makefile              | 1 -
->  arch/arm64/boot/dts/amd/Makefile                 | 1 -
->  arch/arm64/boot/dts/amlogic/Makefile             | 1 -
->  arch/arm64/boot/dts/apm/Makefile                 | 1 -
->  arch/arm64/boot/dts/arm/Makefile                 | 1 -
->  arch/arm64/boot/dts/broadcom/Makefile            | 1 -
->  arch/arm64/boot/dts/broadcom/northstar2/Makefile | 1 -
->  arch/arm64/boot/dts/broadcom/stingray/Makefile   | 1 -
->  arch/arm64/boot/dts/cavium/Makefile              | 1 -
->  arch/arm64/boot/dts/exynos/Makefile              | 1 -
->  arch/arm64/boot/dts/freescale/Makefile           | 1 -
->  arch/arm64/boot/dts/hisilicon/Makefile           | 1 -
->  arch/arm64/boot/dts/lg/Makefile                  | 1 -
->  arch/arm64/boot/dts/marvell/Makefile             | 1 -
->  arch/arm64/boot/dts/mediatek/Makefile            | 1 -
->  arch/arm64/boot/dts/nvidia/Makefile              | 1 -
->  arch/arm64/boot/dts/qcom/Makefile                | 1 -
->  arch/arm64/boot/dts/realtek/Makefile             | 1 -
->  arch/arm64/boot/dts/renesas/Makefile             | 1 -
->  arch/arm64/boot/dts/rockchip/Makefile            | 1 -
->  arch/arm64/boot/dts/socionext/Makefile           | 1 -
->  arch/arm64/boot/dts/sprd/Makefile                | 1 -
->  arch/arm64/boot/dts/xilinx/Makefile              | 1 -
->  arch/arm64/boot/dts/zte/Makefile                 | 1 -
->  arch/c6x/boot/dts/Makefile                       | 2 --
->  arch/cris/boot/dts/Makefile                      | 2 --
->  arch/h8300/boot/dts/Makefile                     | 1 -
->  arch/metag/boot/dts/Makefile                     | 1 -
->  arch/microblaze/boot/Makefile                    | 2 +-
->  arch/mips/boot/dts/Makefile                      | 1 -
->  arch/mips/boot/dts/brcm/Makefile                 | 1 -
->  arch/mips/boot/dts/cavium-octeon/Makefile        | 1 -
->  arch/mips/boot/dts/img/Makefile                  | 1 -
->  arch/mips/boot/dts/ingenic/Makefile              | 1 -
->  arch/mips/boot/dts/lantiq/Makefile               | 1 -
->  arch/mips/boot/dts/mti/Makefile                  | 1 -
->  arch/mips/boot/dts/netlogic/Makefile             | 1 -
->  arch/mips/boot/dts/ni/Makefile                   | 1 -
->  arch/mips/boot/dts/pic32/Makefile                | 1 -
->  arch/mips/boot/dts/qca/Makefile                  | 1 -
->  arch/mips/boot/dts/ralink/Makefile               | 1 -
->  arch/mips/boot/dts/xilfpga/Makefile              | 1 -
->  arch/nios2/boot/Makefile                         | 2 --
->  arch/openrisc/boot/dts/Makefile                  | 2 --
->  arch/powerpc/boot/Makefile                       | 2 +-
->  arch/sh/boot/dts/Makefile                        | 2 --
->  arch/xtensa/boot/dts/Makefile                    | 2 --
->  54 files changed, 3 insertions(+), 60 deletions(-)
+Rob
