@@ -1,52 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:38376 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752143AbdKHRXa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Nov 2017 12:23:30 -0500
+Received: from mail-ot0-f193.google.com ([74.125.82.193]:54453 "EHLO
+        mail-ot0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751716AbdKHTnS (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 8 Nov 2017 14:43:18 -0500
+Received: by mail-ot0-f193.google.com with SMTP id w8so3300469otw.11
+        for <linux-kbuild@vger.kernel.org>; Wed, 08 Nov 2017 11:43:18 -0800 (PST)
+Subject: Re: [PATCH v2 0/3] Makefile: Introduce CONFIG_CC_STACKPROTECTOR_AUTO
+References: <1510076320-69931-1-git-send-email-keescook@chromium.org>
+From: Laura Abbott <labbott@redhat.com>
+Message-ID: <1a23e5eb-66d7-2e86-e918-fd5eabb4c014@redhat.com>
+Date: Wed, 8 Nov 2017 11:43:14 -0800
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a17uK02gvY=iQhnGq7OooV4JzxLpAV5V5eES3bEutm6aA@mail.gmail.com>
-References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
- <1509859853-27473-3-git-send-email-yamada.masahiro@socionext.com> <CAK8P3a17uK02gvY=iQhnGq7OooV4JzxLpAV5V5eES3bEutm6aA@mail.gmail.com>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Wed, 8 Nov 2017 11:23:08 -0600
-Message-ID: <CAL_Jsq+3oZyz23MeocEZTvh8CbdHJuudcSbWnZbuuM=kLebQEg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: handle dtb-y and CONFIG_OF_ALL_DTBS natively
- in Makefile.lib
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1510076320-69931-1-git-send-email-keescook@chromium.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, DTML <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>
+To: Kees Cook <keescook@chromium.org>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Arnd Bergmann <arnd@arndb.de>, Josh Triplett <josh@joshtriplett.org>, Nicholas Piggin <npiggin@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, Nov 5, 2017 at 7:49 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Sun, Nov 5, 2017 at 6:30 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> If CONFIG_OF_ALL_DTBS is enabled, "make ARCH=arm64 dtbs" compiles each
->> DTB twice; one from arch/arm64/boot/dts/*/Makefile and the other from
->> the dtb-$(CONFIG_OF_ALL_DTBS) line in arch/arm64/boot/dts/Makefile.
->> It could be a race problem when building DTBS in parallel.
->>
->> Another minor issue is CONFIG_OF_ALL_DTBS covers only *.dts in vendor
->> sub-directories, so this broke when Broadcom added one more hierarchy
->> in arch/arm64/boot/dts/broadcom/<soc>/.
->>
->> One idea to fix the issues in a clean way is to move DTB handling
->> to Kbuild core scripts.  Makefile.dtbinst already recognizes dtb-y
->> natively, so it should not hurt to do so.
->>
->> Add $(dtb-y) to extra-y, and $(dtb-) as well if CONFIG_OF_ALL_DTBS is
->> enabled.  All clutter things in Makefiles go away.
->>
->> As a bonus clean-up, I also removed dts-dirs.  Just use subdir-y
->> directly to traverse sub-directories.
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->
-> Nice, that's much better than the hack I had.
->
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
+On 11/07/2017 09:38 AM, Kees Cook wrote:
+> As described in the final patch:
+> 
+> Nearly all modern compilers support a stack-protector option, and nearly
+> all modern distributions enable the kernel stack-protector, so enabling
+> this by default in kernel builds would make sense. However, Kconfig does
+> not have knowledge of available compiler features, so it isn't safe to
+> force on, as this would unconditionally break builds for the compilers
+> or architectures that don't have support. Instead, this introduces a new
+> option, CONFIG_CC_STACKPROTECTOR_AUTO, which attempts to discover the best
+> possible stack-protector available, and will allow builds to proceed even
+> if the compiler doesn't support any stack-protector.
+> 
+> This option is made the default so that kernels built with modern
+> compilers will be protected-by-default against stack buffer overflows,
+> avoiding things like the recent BlueBorne attack. Selection of a specific
+> stack-protector option remains available, including disabling it.
+> 
+> 
+> This has lived over the last several days without any unfixed 0day failures.
+> 
+> v2:
+> - under ..._AUTO, warn and continue on _all_ stack protector failure cases
+> - fix 32-bit boot regression due to lazy gz.
+> - set CONFIG_CC_STACKPROTECTOR_NONE for tiny.config.
+> 
+> Thanks,
+> 
+> -Kees
+> 
 
-I applied this, but it has a few conflicts with SPDX tags from Greg
-and some board additions in arm-soc. Please take a look.
+This passed a test build on all Fedora arches, including s390 and ppc.
+On x86 it picks up the strong option correctly.
 
-Rob
+You're welcome to add
+
+Tested-by: Laura Abbott <labbott@redhat.com>
+
+Thanks,
+Laura
