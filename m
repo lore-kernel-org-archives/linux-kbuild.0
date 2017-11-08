@@ -1,71 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:33772 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:38376 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752256AbdKHQv5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Nov 2017 11:51:57 -0500
+        id S1752143AbdKHRXa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 8 Nov 2017 12:23:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
+In-Reply-To: <CAK8P3a17uK02gvY=iQhnGq7OooV4JzxLpAV5V5eES3bEutm6aA@mail.gmail.com>
 References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
- <1509859853-27473-2-git-send-email-yamada.masahiro@socionext.com>
- <CAK7LNAQfK_BWQcVW-ScrpAwNAHav3MrrzV-tjn_YUjsuvd7U5A@mail.gmail.com>
- <20171106095139.GG15260@jhogan-linux> <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
+ <1509859853-27473-3-git-send-email-yamada.masahiro@socionext.com> <CAK8P3a17uK02gvY=iQhnGq7OooV4JzxLpAV5V5eES3bEutm6aA@mail.gmail.com>
 From: Rob Herring <robh+dt@kernel.org>
-Date: Wed, 8 Nov 2017 10:51:35 -0600
-Message-ID: <CAL_JsqJ8taCKnr_79UumiH2GFYq-fMzzkYm2iYevTOgUUWuzvg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] MIPS: dts: remove bogus bcm96358nb4ser.dtb from dtb-y entry
+Date: Wed, 8 Nov 2017 11:23:08 -0600
+Message-ID: <CAL_Jsq+3oZyz23MeocEZTvh8CbdHJuudcSbWnZbuuM=kLebQEg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: handle dtb-y and CONFIG_OF_ALL_DTBS natively
+ in Makefile.lib
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: James Hogan <jhogan@kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ralf Baechle <ralf@linux-mips.org>, Linux-MIPS <linux-mips@linux-mips.org>, Kevin Cernekee <cernekee@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, DTML <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>
 
-On Mon, Nov 6, 2017 at 5:00 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2017-11-06 19:41 GMT+09:00 James Hogan <jhogan@kernel.org>:
->> Hi,
+On Sun, Nov 5, 2017 at 7:49 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> On Sun, Nov 5, 2017 at 6:30 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> If CONFIG_OF_ALL_DTBS is enabled, "make ARCH=arm64 dtbs" compiles each
+>> DTB twice; one from arch/arm64/boot/dts/*/Makefile and the other from
+>> the dtb-$(CONFIG_OF_ALL_DTBS) line in arch/arm64/boot/dts/Makefile.
+>> It could be a race problem when building DTBS in parallel.
 >>
->> On Sun, Nov 05, 2017 at 11:11:38PM +0900, Masahiro Yamada wrote:
->>> +CC Ralf Baechle <ralf@linux-mips.org>
->>> +CC linux-mips@linux-mips.org
->>> +CC Kevin Cernekee <cernekee@gmail.com>
->>> +CC Florian Fainelli <f.fainelli@gmail.com>
->>>
->>>
->>> I missed to CC MIPS maintainers.
+>> Another minor issue is CONFIG_OF_ALL_DTBS covers only *.dts in vendor
+>> sub-directories, so this broke when Broadcom added one more hierarchy
+>> in arch/arm64/boot/dts/broadcom/<soc>/.
 >>
->> Yes, please resend the patch so it lands in patchwork.linux-mips.org.
->
->
-> This is a part of clean-up series of DT building.
->
-> I want Acked-by from MIPS maintainers
-> so that the whole series can go to a different tree.
-> (DT or Kbuild).
->
->
-> Sam addressed more clean-up candidates in MIPS Makefiles
-> https://patchwork.kernel.org/patch/10041879/
->
-> So, I will probably end up with touching those Makefiles more.
->
-> All patches must go to the same tree.
->
->
->>> 2017-11-05 14:30 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->>> > arch/mips/boot/dts/brcm/bcm96358nb4ser.dts does not exist, so
->>> > we cannot build bcm96358nb4ser.dtb .
+>> One idea to fix the issues in a clean way is to move DTB handling
+>> to Kbuild core scripts.  Makefile.dtbinst already recognizes dtb-y
+>> natively, so it should not hurt to do so.
 >>
->> This appears to be due to the file being renamed in commit 695835511f96
->> ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom").
->> Please can you update the commit message when you resend to mention the
->> cause of the problem.
+>> Add $(dtb-y) to extra-y, and $(dtb-) as well if CONFIG_OF_ALL_DTBS is
+>> enabled.  All clutter things in Makefiles go away.
 >>
->> You could also add the following if you like while you're at it:
+>> As a bonus clean-up, I also removed dts-dirs.  Just use subdir-y
+>> directly to traverse sub-directories.
 >>
->> Fixes: 695835511f96 ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom")
->> Cc: <stable@vger.kernel.org> # 4.9+
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>
+> Nice, that's much better than the hack I had.
+>
+> Acked-by: Arnd Bergmann <arnd@arndb.de>
 
-I think this one can be applied independently and we'd want it to if
-we tag for stable. So I think it can go thru the MIPS tree.
+I applied this, but it has a few conflicts with SPDX tags from Greg
+and some board additions in arm-soc. Please take a look.
 
 Rob
