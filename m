@@ -1,82 +1,139 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:62685 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751495AbdKIEQj (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:27981 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751885AbdKIEb5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Nov 2017 23:16:39 -0500
+        Wed, 8 Nov 2017 23:31:57 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAKwvOdn4EWb_T6QgcYmEN1JKvVzC6otJ=g+2OUa8Chtq7aY1mw@mail.gmail.com>
-References: <20171102212649.108880-1-ndesaulniers@google.com>
- <CAK7LNASEWrkV5m6xxXqY6Gq84XZ1oGK86CmE+=k6Pfei=RmnuQ@mail.gmail.com> <CAKwvOdn4EWb_T6QgcYmEN1JKvVzC6otJ=g+2OUa8Chtq7aY1mw@mail.gmail.com>
+In-Reply-To: <20171107194614.89371-1-ndesaulniers@google.com>
+References: <CAKwvOdn4EWb_T6QgcYmEN1JKvVzC6otJ=g+2OUa8Chtq7aY1mw@mail.gmail.com>
+ <20171107194614.89371-1-ndesaulniers@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 9 Nov 2017 13:15:48 +0900
-Message-ID: <CAK7LNATLG6TXTMNLwZ5ww31OtZc4m8auW=r7hYbn=UM+hz9PDw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
+Date: Thu, 9 Nov 2017 13:31:08 +0900
+Message-ID: <CAK7LNAS90eS+5m2LG_XYAva2Hy2usTX-=HuD6JwMny77V==jWw@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nick Desaulniers <ndesaulniers@google.com>
 Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?Q?Jan=2DSimon_M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Chris Fries <cfries@google.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-11-08 2:37 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
-> On Sat, Nov 4, 2017 at 8:06 PM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> ld-option is only used for arch/{arm64,powerpc}/Makefile
->>
->> arch/arm64/Makefile:  ifeq ($(call ld-option, --fix-cortex-a53-843419),)
->> arch/powerpc/Makefile:LDFLAGS_vmlinux += $(call
->> ld-option,--orphan-handling=warn)
->>
->> I think this patch makes sense when it comes along with
->> https://patchwork.kernel.org/patch/10030581/
+Hi Nick
+
+2017-11-08 4:46 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+> From: Chris Fries <cfries@google.com>
 >
-> Good point.
+> Set the clang KBUILD_CFLAGS up before including arch/ Makefiles,
+> so that ld-options (etc.) can work correctly.
 >
->> but, it is now being blocked by 0-day bot
->> due to a x86 problem.
->
-> Looks like that is now resolved (unless 0-day bot strikes again).
->
->> The location of CLANG_GCC_TC define
->> only matters after your patch is applied, right?
->
-> By "your patch" referring to the 0-day bot thread, yes.
->
->> Did my request for v2 break anything?
->
-> Nothing immediately obvious, and no regressions.  It just made this
-> patch necessary (along with my previous one) for correctly cross
-> compiling with clang for arm64 and powerpc as you point out.
->
->> One more thing: this patch does not apply to kbuild tree.
->
-> I absolutely will rebase it on your tree and send a v2.  Just to help
-> me understand the contribution model better: none of my other patches
-> have yet been requested against any trees other than Linus'.  Is this
-> because of where we are in the release cycle, or that a lot of kbuild
-> code has changed, or what?
+> This fixes errors with clang such as ld-options trying to CC
+> against your host architecture, but LD trying to link against
+> your target architecture.
+
+OK.
+Your previous patch was applied (and we have not received 0-day report so far),
+so this makes sense now.
 
 
-Generally speaking,
-a preferred way is to base patches on the subsystem tree.
 
-Kernel developers are supposed to do their development on linux-next,
-but, in reality, many people work on Linus' tree since it is more stable and
-git history is fast-forward.
 
-In many cases, patches based on Linus' tree can apply to sub-systems as well.
+> We didn't notice this problem on Android, because we took the original
+> LLVMLinux patch into our 4.4 kernels, which did not have this issue. We
+> ran into this taking the proper upstream patch on newer kernel versions.
+> The original LLVMLinux patch can be seen at:
+>
+> http://git.linuxfoundation.org/?p=llvmlinux/kernel.git;a=blobdiff;f=Makefile;h=389006c4ef494cda3a1ee52bf355618673ab4f31;hp=e41a3356abee83f08288362950bfceebd25ec3c2;hb=ef9126da11b18ff34eb1f01561f53c378860336c;hpb=f800c25b7a762d445ba1439a2428c8362157eba6
+>
+> It seems that when the patch was re-upstreamed, a V2 was requested that
+> moved the definition of Clang's target triple to be later in the top
+> level Makefile than the inclusion of the arch specific Makefile,
+> breaking macros like ld-option when cross compiling. V2 was requested
+> at:
+>
+> https://lkml.org/lkml/2017/4/21/116
 
-I am happy to fix-up a conflict locally
-as long as it is trivial, and there is no other reason for re-spin.
+IMO, this description is not helpful in any way in upstream.
 
-Unfortunately, Kbuild tree changed the top-level Makefile a lot in
-this development cycle.
+Moreover,
+785f11aa595bc3d4e74096cbd598ada54ecc0d81
+did not break anything.   It sound unfair to me.
 
-If your patch does not apply cleanly, I do not know which context you
-are moving the code to.
-Also, I found suspicious description in the commit log.
 
-That's why.
+
+
+
+
+> diff --git a/Makefile b/Makefile
+> index a7476e6934f1..d349734c7ef7 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -472,6 +472,38 @@ ifneq ($(KBUILD_SRC),)
+>             $(srctree) $(objtree) $(VERSION) $(PATCHLEVEL)
+>  endif
+>
+> +ifeq ($(cc-name),clang)
+> +ifneq ($(CROSS_COMPILE),)
+> +CLANG_TARGET   := -target $(notdir $(CROSS_COMPILE:%-=%))
+> +GCC_TOOLCHAIN  := $(realpath $(dir $(shell which $(LD)))/..)
+> +endif
+> +ifneq ($(GCC_TOOLCHAIN),)
+> +CLANG_GCC_TC   := -gcc-toolchain $(GCC_TOOLCHAIN)
+> +endif
+> +KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+> +KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+> +KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
+> +# Quiet clang warning: comparison of unsigned expression < 0 is always false
+> +KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+> +# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+> +# source of a reference will be _MergedGlobals and not on of the whitelisted names.
+> +# See modpost pattern 2
+> +KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+> +KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+> +KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+> +KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+> +else
+> +
+> +# These warnings generated too much noise in a regular build.
+> +# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+> +endif
+> +
+
+
+Could you move this a bit later, please?
+
+
+
+# These warnings generated too much noise in a regular build.
+# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+endif
+
+  << INSERT HERE >>
+
+# The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
+# values of the respective KBUILD_* variables
+ARCH_CPPFLAGS :=
+ARCH_AFLAGS :=
+ARCH_CFLAGS :=
+include arch/$(SRCARCH)/Makefile
+
+
+
+
+
+
+arch/$(SRCARCH)/Makefile is included for config targets
+for KBUILD_DEFCONFIG, but no reason to compute compiler flags.
+I want to cut unnecessary cc-option parsing.
+
+
 
 
 -- 
