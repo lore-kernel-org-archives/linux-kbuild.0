@@ -1,141 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:27981 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751885AbdKIEb5 (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:53562 "EHLO
+        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751065AbdKIFff (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Nov 2017 23:31:57 -0500
+        Thu, 9 Nov 2017 00:35:35 -0500
+Date: Thu, 9 Nov 2017 06:35:29 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/2] kbuild: create built-in.o automatically if parent
+ directory wants it
+Message-ID: <20171109053529.GA12717@ravnborg.org>
+References: <1510072307-16819-1-git-send-email-yamada.masahiro@socionext.com>
+ <1510072307-16819-2-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-In-Reply-To: <20171107194614.89371-1-ndesaulniers@google.com>
-References: <CAKwvOdn4EWb_T6QgcYmEN1JKvVzC6otJ=g+2OUa8Chtq7aY1mw@mail.gmail.com>
- <20171107194614.89371-1-ndesaulniers@google.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 9 Nov 2017 13:31:08 +0900
-Message-ID: <CAK7LNAS90eS+5m2LG_XYAva2Hy2usTX-=HuD6JwMny77V==jWw@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1510072307-16819-2-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?Q?Jan=2DSimon_M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Chris Fries <cfries@google.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, devicetree@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Michal Marek <mmarek@suse.com>
 
-Hi Nick
+Hi Masahiro.
 
-2017-11-08 4:46 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
-> From: Chris Fries <cfries@google.com>
->
-> Set the clang KBUILD_CFLAGS up before including arch/ Makefiles,
-> so that ld-options (etc.) can work correctly.
->
-> This fixes errors with clang such as ld-options trying to CC
-> against your host architecture, but LD trying to link against
-> your target architecture.
+Thanks for picking this up.
 
-OK.
-Your previous patch was applied (and we have not received 0-day report so far),
-so this makes sense now.
-
-
-
-
-> We didn't notice this problem on Android, because we took the original
-> LLVMLinux patch into our 4.4 kernels, which did not have this issue. We
-> ran into this taking the proper upstream patch on newer kernel versions.
-> The original LLVMLinux patch can be seen at:
->
-> http://git.linuxfoundation.org/?p=llvmlinux/kernel.git;a=blobdiff;f=Makefile;h=389006c4ef494cda3a1ee52bf355618673ab4f31;hp=e41a3356abee83f08288362950bfceebd25ec3c2;hb=ef9126da11b18ff34eb1f01561f53c378860336c;hpb=f800c25b7a762d445ba1439a2428c8362157eba6
->
-> It seems that when the patch was re-upstreamed, a V2 was requested that
-> moved the definition of Clang's target triple to be later in the top
-> level Makefile than the inclusion of the arch specific Makefile,
-> breaking macros like ld-option when cross compiling. V2 was requested
-> at:
->
-> https://lkml.org/lkml/2017/4/21/116
-
-IMO, this description is not helpful in any way in upstream.
-
-Moreover,
-785f11aa595bc3d4e74096cbd598ada54ecc0d81
-did not break anything.   It sound unfair to me.
-
-
-
-
-
-
+> A key point is, the parent Makefile knows whether built-in.o is needed
+> or not.  If a subdirectory needs to create built-in.o, its parent can
+> tell the fact when Kbuild descends into it.
+Good observation!
+> 
 > diff --git a/Makefile b/Makefile
-> index a7476e6934f1..d349734c7ef7 100644
+> index 008a4e5..cc0b618 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -472,6 +472,38 @@ ifneq ($(KBUILD_SRC),)
->             $(srctree) $(objtree) $(VERSION) $(PATCHLEVEL)
->  endif
->
-> +ifeq ($(cc-name),clang)
-> +ifneq ($(CROSS_COMPILE),)
-> +CLANG_TARGET   := -target $(notdir $(CROSS_COMPILE:%-=%))
-> +GCC_TOOLCHAIN  := $(realpath $(dir $(shell which $(LD)))/..)
-> +endif
-> +ifneq ($(GCC_TOOLCHAIN),)
-> +CLANG_GCC_TC   := -gcc-toolchain $(GCC_TOOLCHAIN)
-> +endif
-> +KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
-> +KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
-> +KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
-> +# Quiet clang warning: comparison of unsigned expression < 0 is always false
-> +KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
-> +# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
-> +# source of a reference will be _MergedGlobals and not on of the whitelisted names.
-> +# See modpost pattern 2
-> +KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
-> +KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-> +KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
-> +KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
-> +else
-> +
-> +# These warnings generated too much noise in a regular build.
-> +# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
-> +endif
-> +
+> @@ -1003,7 +1003,7 @@ $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
+>  
+>  PHONY += $(vmlinux-dirs)
+>  $(vmlinux-dirs): prepare scripts
+> -	$(Q)$(MAKE) $(build)=$@
+> +	$(Q)$(MAKE) $(build)=$@ need-builtin=1
 
+The need-bultin may also be required for the shortcuts
+that allows one to use:
 
-Could you move this a bit later, please?
+	make <dir>/
 
+    example:
 
+	make net/
 
-# These warnings generated too much noise in a regular build.
-# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
-KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
-KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
-endif
+And maybe selftest, documentation shortcuts too?
+Other than that - looks good.
 
-  << INSERT HERE >>
+Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
 
-# The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
-# values of the respective KBUILD_* variables
-ARCH_CPPFLAGS :=
-ARCH_AFLAGS :=
-ARCH_CFLAGS :=
-include arch/$(SRCARCH)/Makefile
+	Sam
 
-
-
-
-
-
-arch/$(SRCARCH)/Makefile is included for config targets
-for KBUILD_DEFCONFIG, but no reason to compute compiler flags.
-I want to cut unnecessary cc-option parsing.
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
