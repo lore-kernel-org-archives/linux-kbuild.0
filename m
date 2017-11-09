@@ -1,90 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f196.google.com ([209.85.217.196]:50383 "EHLO
-        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753007AbdKIQhV (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:55558 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752943AbdKIQvn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Nov 2017 11:37:21 -0500
+        Thu, 9 Nov 2017 11:51:43 -0500
+Received: by mail-lf0-f65.google.com with SMTP id e143so7966786lfg.12
+        for <linux-kbuild@vger.kernel.org>; Thu, 09 Nov 2017 08:51:42 -0800 (PST)
 MIME-Version: 1.0
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 9 Nov 2017 17:37:19 +0100
-Message-ID: <CAFkk2KTTLZHRjy7mnLwgLW+2XN1uXSJ6o-87x0-Uaqcz3J+x8A@mail.gmail.com>
-Subject: [ANNOUNCE] Kconfiglib 2: An improved, more general redesign
+In-Reply-To: <CAK7LNAS90eS+5m2LG_XYAva2Hy2usTX-=HuD6JwMny77V==jWw@mail.gmail.com>
+References: <CAKwvOdn4EWb_T6QgcYmEN1JKvVzC6otJ=g+2OUa8Chtq7aY1mw@mail.gmail.com>
+ <20171107194614.89371-1-ndesaulniers@google.com> <CAK7LNAS90eS+5m2LG_XYAva2Hy2usTX-=HuD6JwMny77V==jWw@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Thu, 9 Nov 2017 08:51:40 -0800
+Message-ID: <CAKwvOdnsmx43ocFqCLc5ymWkMP8mfju7w0TNbnKmzcbTn3=MAg@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, corbet@lwn.net, Simon Glass <sjg@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, bruce.ashfield@windriver.com, Samuel Martin <s.martin49@gmail.com>, ivan@espressif.com, dirk@gouders.net, yann.morin.1998@free.fr, randy.dunlap@oracle.com, mmarek@suse.cz, ziegler@cs.fau.de, dl@cs.fau.de, rothberg@cs.fau.de, soos.mate@gmail.com, bergert@chalmers.se, kconfig-sat@googlegroups.com, mikew@google.com, akpm@linux-foundation.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?Q?Jan=2DSimon_M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Chris Fries <cfries@google.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hello,
+On Wed, Nov 8, 2017 at 8:31 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> 2017-11-08 4:46 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+>> We didn't notice this problem on Android, because we took the original
+>> LLVMLinux patch into our 4.4 kernels, which did not have this issue. We
+>> ran into this taking the proper upstream patch on newer kernel versions.
+>> The original LLVMLinux patch can be seen at:
+>>
+>> http://git.linuxfoundation.org/?p=llvmlinux/kernel.git;a=blobdiff;f=Makefile;h=389006c4ef494cda3a1ee52bf355618673ab4f31;hp=e41a3356abee83f08288362950bfceebd25ec3c2;hb=ef9126da11b18ff34eb1f01561f53c378860336c;hpb=f800c25b7a762d445ba1439a2428c8362157eba6
+>>
+>> It seems that when the patch was re-upstreamed, a V2 was requested that
+>> moved the definition of Clang's target triple to be later in the top
+>> level Makefile than the inclusion of the arch specific Makefile,
+>> breaking macros like ld-option when cross compiling. V2 was requested
+>> at:
+>>
+>> https://lkml.org/lkml/2017/4/21/116
+>
+> IMO, this description is not helpful in any way in upstream.
+>
+> Moreover,
+> 785f11aa595bc3d4e74096cbd598ada54ecc0d81
+> did not break anything.   It sound unfair to me.
 
-A new, much-improved version 2 of Kconfiglib
-(https://github.com/ulfalizer/Kconfiglib) is out.
+Ok, I will cut that part description on v3.
 
-I got tired of some old interface and design mistakes while working on adding
-implicit menu support, and decided to redo things the right way.
+>> diff --git a/Makefile b/Makefile
+>> index a7476e6934f1..d349734c7ef7 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -472,6 +472,38 @@ ifneq ($(KBUILD_SRC),)
+>>             $(srctree) $(objtree) $(VERSION) $(PATCHLEVEL)
+>>  endif
+>>
+>> +ifeq ($(cc-name),clang)
+>> +ifneq ($(CROSS_COMPILE),)
+>> +CLANG_TARGET   := -target $(notdir $(CROSS_COMPILE:%-=%))
+>> +GCC_TOOLCHAIN  := $(realpath $(dir $(shell which $(LD)))/..)
+>> +endif
+>> +ifneq ($(GCC_TOOLCHAIN),)
+>> +CLANG_GCC_TC   := -gcc-toolchain $(GCC_TOOLCHAIN)
+>> +endif
+>> +KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+>> +KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+>> +KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+>> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+>> +KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+>> +KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+>> +KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
+>> +# Quiet clang warning: comparison of unsigned expression < 0 is always false
+>> +KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+>> +# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+>> +# source of a reference will be _MergedGlobals and not on of the whitelisted names.
+>> +# See modpost pattern 2
+>> +KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+>> +KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+>> +KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+>> +KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+>> +else
+>> +
+>> +# These warnings generated too much noise in a regular build.
+>> +# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+>> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+>> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+>> +endif
+>> +
+>
+>
+> Could you move this a bit later, please?
+>
+>
+>
+> # These warnings generated too much noise in a regular build.
+> # Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+> KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+> KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+> endif
+>
+>   << INSERT HERE >>
+>
+> # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
+> # values of the respective KBUILD_* variables
+> ARCH_CPPFLAGS :=
+> ARCH_AFLAGS :=
+> ARCH_CFLAGS :=
+> include arch/$(SRCARCH)/Makefile
+>
+>
+>
+>
+>
+>
+> arch/$(SRCARCH)/Makefile is included for config targets
+> for KBUILD_DEFCONFIG, but no reason to compute compiler flags.
+> I want to cut unnecessary cc-option parsing.
 
-For a summary of changes, see kconfiglib-2-changes.txt
-(https://github.com/ulfalizer/Kconfiglib/blob/master/kconfiglib-2-changes.txt).
-Highlights include direct access to the menu tree (including implicit menus)
-and direct access to symbol properties and their conditions. Expressions can be
-inspected directly and use a simple tuple-based format. The API has gotten more
-general and less clunky to use.
-
-See the kconfiglib.py module docstring (at the top of kconfiglib.py) for an
-introduction to some Kconfig/Kconfiglib concepts. Maybe some of it would be
-nice to have in kconfig-language.txt as well.
-
-It's now pretty easy to implement menuconfig-like functionality on top of
-Kconfiglib, like in the the following example/proof-of-concept
-(examples/menuconfig.py):
-
-
-  ======== Example Kconfig configuration ========
-
-  [*] Enable loadable module support (MODULES)
-      Bool and tristate symbols
-          [*] Bool symbol (BOOL)
-                  [ ] Dependent bool symbol (BOOL_DEP)
-                  < > Dependent tristate symbol (TRI_DEP)
-                  [ ] First prompt (TWO_MENU_NODES)
-          < > Tristate symbol (TRI)
-          [ ] Second prompt (TWO_MENU_NODES)
-              *** These are selected by TRI_DEP ***
-          < > Tristate selected by TRI_DEP (SELECTED_BY_TRI_DEP)
-          < > Tristate implied by TRI_DEP (IMPLIED_BY_TRI_DEP)
-      String, int, and hex symbols
-          (foo) String symbol (STRING)
-          (747) Int symbol (INT)
-          (0xABC) Hex symbol (HEX)
-      Various choices
-          -*- Bool choice (BOOL_CHOICE)
-                  --> Bool choice sym 1 (BOOL_CHOICE_SYM_1)
-                      Bool choice sym 2 (BOOL_CHOICE_SYM_2)
-          {M} Tristate choice (TRI_CHOICE)
-                  < > Tristate choice sym 1 (TRI_CHOICE_SYM_1)
-                  < > Tristate choice sym 2 (TRI_CHOICE_SYM_2)
-          [ ] Optional bool choice (OPT_BOOL_CHOICE)
-
-  Enter a symbol/choice name, "load_config", or "write_config" (or
-press CTRL+D to exit): BOOL
-  Value for BOOL (available: n, y): n
-  ...
-
-
-Printing Kconfig objects now produces reparsable Kconfig output:
-
-  >>> print(kconf.syms["MODULES"])
-  menuconfig MODULES
-          bool
-          prompt "Enable loadable module support"
-          option modules
-          help
-            Kernel modules are small pieces of compiled code which can
-            be inserted in the running kernel, rather than being
-            permanently built into the kernel.  You use the "modprobe"
-            tool to add (and sometimes remove) them.  If you say Y here,
-            many parts of the kernel can be built as modules (by
-            ...
-
-
-Cheers,
-Ulf
+With the new try-run-cached macros, if the arch/$(SRCARCH)/Makefile
+gets included twice, with the compiler flags not set correctly for
+clang to cross compile, and the results are cached, wont they be wrong
+the second time the arch specific Makefile is included?
