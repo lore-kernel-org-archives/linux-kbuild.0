@@ -1,115 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:36996 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752510AbdKIAjI (ORCPT
+Received: from mail-it0-f66.google.com ([209.85.214.66]:52926 "EHLO
+        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753312AbdKIBMd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Nov 2017 19:39:08 -0500
+        Wed, 8 Nov 2017 20:12:33 -0500
+Received: by mail-it0-f66.google.com with SMTP id j140so8791482itj.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 08 Nov 2017 17:12:33 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATZ9O4cCpxLrG3MJoKYF+RnURkY4-tY2MdiZb90eGPtQg@mail.gmail.com>
-References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
- <1509859853-27473-2-git-send-email-yamada.masahiro@socionext.com>
- <CAK7LNAQfK_BWQcVW-ScrpAwNAHav3MrrzV-tjn_YUjsuvd7U5A@mail.gmail.com>
- <20171106095139.GG15260@jhogan-linux> <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
- <CAL_JsqJ8taCKnr_79UumiH2GFYq-fMzzkYm2iYevTOgUUWuzvg@mail.gmail.com> <CAK7LNATZ9O4cCpxLrG3MJoKYF+RnURkY4-tY2MdiZb90eGPtQg@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 9 Nov 2017 09:38:22 +0900
-Message-ID: <CAK7LNARzRUA6ZGQUiebZ+nmLBSAVdYONsozHBf0VQb83KqSx1g@mail.gmail.com>
-Subject: Re: [PATCH 1/2] MIPS: dts: remove bogus bcm96358nb4ser.dtb from dtb-y entry
+In-Reply-To: <1a23e5eb-66d7-2e86-e918-fd5eabb4c014@redhat.com>
+References: <1510076320-69931-1-git-send-email-keescook@chromium.org> <1a23e5eb-66d7-2e86-e918-fd5eabb4c014@redhat.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 8 Nov 2017 17:12:31 -0800
+Message-ID: <CAGXu5jKfFPmYeToO9tO6g_j9yAHs5WXmnzidUFnzJAHVsDQ-sQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] Makefile: Introduce CONFIG_CC_STACKPROTECTOR_AUTO
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>
-Cc: James Hogan <jhogan@kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ralf Baechle <ralf@linux-mips.org>, Linux-MIPS <linux-mips@linux-mips.org>, Kevin Cernekee <cernekee@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>
+To: Laura Abbott <labbott@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Arnd Bergmann <arnd@arndb.de>, Josh Triplett <josh@joshtriplett.org>, Nicholas Piggin <npiggin@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-2017-11-09 9:11 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> 2017-11-09 1:51 GMT+09:00 Rob Herring <robh+dt@kernel.org>:
->> On Mon, Nov 6, 2017 at 5:00 AM, Masahiro Yamada
->> <yamada.masahiro@socionext.com> wrote:
->>> 2017-11-06 19:41 GMT+09:00 James Hogan <jhogan@kernel.org>:
->>>> Hi,
->>>>
->>>> On Sun, Nov 05, 2017 at 11:11:38PM +0900, Masahiro Yamada wrote:
->>>>> +CC Ralf Baechle <ralf@linux-mips.org>
->>>>> +CC linux-mips@linux-mips.org
->>>>> +CC Kevin Cernekee <cernekee@gmail.com>
->>>>> +CC Florian Fainelli <f.fainelli@gmail.com>
->>>>>
->>>>>
->>>>> I missed to CC MIPS maintainers.
->>>>
->>>> Yes, please resend the patch so it lands in patchwork.linux-mips.org.
->>>
->>>
->>> This is a part of clean-up series of DT building.
->>>
->>> I want Acked-by from MIPS maintainers
->>> so that the whole series can go to a different tree.
->>> (DT or Kbuild).
->>>
->>>
->>> Sam addressed more clean-up candidates in MIPS Makefiles
->>> https://patchwork.kernel.org/patch/10041879/
->>>
->>> So, I will probably end up with touching those Makefiles more.
->>>
->>> All patches must go to the same tree.
->>>
->>>
->>>>> 2017-11-05 14:30 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->>>>> > arch/mips/boot/dts/brcm/bcm96358nb4ser.dts does not exist, so
->>>>> > we cannot build bcm96358nb4ser.dtb .
->>>>
->>>> This appears to be due to the file being renamed in commit 695835511f96
->>>> ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom").
->>>> Please can you update the commit message when you resend to mention the
->>>> cause of the problem.
->>>>
->>>> You could also add the following if you like while you're at it:
->>>>
->>>> Fixes: 695835511f96 ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom")
->>>> Cc: <stable@vger.kernel.org> # 4.9+
+On Wed, Nov 8, 2017 at 11:43 AM, Laura Abbott <labbott@redhat.com> wrote:
+> On 11/07/2017 09:38 AM, Kees Cook wrote:
 >>
->> I think this one can be applied independently and we'd want it to if
->> we tag for stable. So I think it can go thru the MIPS tree.
+>> As described in the final patch:
+>>
+>> Nearly all modern compilers support a stack-protector option, and nearly
+>> all modern distributions enable the kernel stack-protector, so enabling
+>> this by default in kernel builds would make sense. However, Kconfig does
+>> not have knowledge of available compiler features, so it isn't safe to
+>> force on, as this would unconditionally break builds for the compilers
+>> or architectures that don't have support. Instead, this introduces a new
+>> option, CONFIG_CC_STACKPROTECTOR_AUTO, which attempts to discover the best
+>> possible stack-protector available, and will allow builds to proceed even
+>> if the compiler doesn't support any stack-protector.
+>>
+>> This option is made the default so that kernels built with modern
+>> compilers will be protected-by-default against stack buffer overflows,
+>> avoiding things like the recent BlueBorne attack. Selection of a specific
+>> stack-protector option remains available, including disabling it.
+>>
+>>
+>> This has lived over the last several days without any unfixed 0day
+>> failures.
+>>
+>> v2:
+>> - under ..._AUTO, warn and continue on _all_ stack protector failure cases
+>> - fix 32-bit boot regression due to lazy gz.
+>> - set CONFIG_CC_STACKPROTECTOR_NONE for tiny.config.
+>>
+>> Thanks,
+>>
+>> -Kees
 >>
 >
+> This passed a test build on all Fedora arches, including s390 and ppc.
+> On x86 it picks up the strong option correctly.
 >
-> As I said to MIPS folks, this patch must go before 2/2.
+> You're welcome to add
 >
-> You picked up only 2/2, so your dt/kbuild branch is broken.
->
->
-> make ARCH=mips allyesconfig
-> && make ARCH=mips CROSS_COMPILE=mips-linux- dtbs
->
->
-> will produce the following error.
->
->
-> make[2]: *** No rule to make target
-> 'arch/mips/boot/dts/brcm/bcm96358nb4ser.dtb', needed by '__build'.
-> Stop.
-> scripts/Makefile.build:570: recipe for target 'arch/mips/boot/dts/brcm' failed
-> make[1]: *** [arch/mips/boot/dts/brcm] Error 2
-> arch/mips/Makefile:413: recipe for target 'dtbs' failed
-> make: *** [dtbs] Error 2
->
+> Tested-by: Laura Abbott <labbott@redhat.com>
 
+Awesome, thanks for testing!
 
-Looking into it, probably
-bmips_dtb_defconfig was already broken regardless my patches.
-
-But, I am not comfortable with breaking all{yes,mod}config
-because they are often used for build test.
-
-
-I hope you can apply this in the order as I sent,
-with the following tag.
-
-Fixes: 695835511f96 ("MIPS: BMIPS: rename bcm96358nb4ser to
-bcm6358-neufbox4-sercom")
-Cc: <stable@vger.kernel.org> # 4.9+
+-Kees
 
 -- 
-Best Regards
-Masahiro Yamada
+Kees Cook
+Pixel Security
