@@ -1,82 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 19pmail.ess.barracuda.com ([64.235.150.245]:56927 "EHLO
-        19pmail.ess.barracuda.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753103AbdKIIMN (ORCPT
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:57067 "EHLO
+        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754198AbdKIMTE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Nov 2017 03:12:13 -0500
-Date: Thu, 9 Nov 2017 08:06:02 +0000
-From: James Hogan <james.hogan@mips.com>
-Subject: Re: [PATCH 1/2] MIPS: dts: remove bogus bcm96358nb4ser.dtb from
- dtb-y entry
-Message-ID: <20171109080601.GS15260@jhogan-linux>
-References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
- <1509859853-27473-2-git-send-email-yamada.masahiro@socionext.com>
- <CAK7LNAQfK_BWQcVW-ScrpAwNAHav3MrrzV-tjn_YUjsuvd7U5A@mail.gmail.com>
- <20171106095139.GG15260@jhogan-linux>
- <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
+        Thu, 9 Nov 2017 07:19:04 -0500
+Received: by mail-qk0-f196.google.com with SMTP id 2so6547504qkg.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 09 Nov 2017 04:19:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="cYG5ZC/RuVsIq1ir"
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
+In-Reply-To: <CAAG0J98rRS+Sw8k_87gmTqYdNWByk=9zWVbWnC348vd63H4N9w@mail.gmail.com>
+References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
+ <1509859853-27473-3-git-send-email-yamada.masahiro@socionext.com> <CAAG0J98rRS+Sw8k_87gmTqYdNWByk=9zWVbWnC348vd63H4N9w@mail.gmail.com>
+From: James Hogan <james@albanarts.com>
+Date: Thu, 9 Nov 2017 12:19:02 +0000
+Message-ID: <CAAG0J99envT6gtM6tHdTvetrHr0itX1dexkuWSU=u1c5UTLE1A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: handle dtb-y and CONFIG_OF_ALL_DTBS natively
+ in Makefile.lib
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ralf Baechle <ralf@linux-mips.org>, linux-mips@linux-mips.org, Kevin Cernekee <cernekee@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>
+Cc: Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>, David Daney <david.daney@cavium.com>, James Hogan <james.hogan@mips.com>, linux-next@vger.kernel.org
 
---cYG5ZC/RuVsIq1ir
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+(resend using a working From address)
 
-On Mon, Nov 06, 2017 at 08:00:49PM +0900, Masahiro Yamada wrote:
-> 2017-11-06 19:41 GMT+09:00 James Hogan <jhogan@kernel.org>:
-> > Hi,
-> >
-> > On Sun, Nov 05, 2017 at 11:11:38PM +0900, Masahiro Yamada wrote:
-> >> +CC Ralf Baechle <ralf@linux-mips.org>
-> >> +CC linux-mips@linux-mips.org
-> >> +CC Kevin Cernekee <cernekee@gmail.com>
-> >> +CC Florian Fainelli <f.fainelli@gmail.com>
-> >>
-> >>
-> >> I missed to CC MIPS maintainers.
-> >
-> > Yes, please resend the patch so it lands in patchwork.linux-mips.org.
->=20
->=20
-> This is a part of clean-up series of DT building.
->=20
-> I want Acked-by from MIPS maintainers
-> so that the whole series can go to a different tree.
-> (DT or Kbuild).
+<yamada.masahiro@socionext.com> wrote:
+> If CONFIG_OF_ALL_DTBS is enabled, "make ARCH=arm64 dtbs" compiles each
+> DTB twice; one from arch/arm64/boot/dts/*/Makefile and the other from
+> the dtb-$(CONFIG_OF_ALL_DTBS) line in arch/arm64/boot/dts/Makefile.
+> It could be a race problem when building DTBS in parallel.
+>
+> Another minor issue is CONFIG_OF_ALL_DTBS covers only *.dts in vendor
+> sub-directories, so this broke when Broadcom added one more hierarchy
+> in arch/arm64/boot/dts/broadcom/<soc>/.
+>
+> One idea to fix the issues in a clean way is to move DTB handling
+> to Kbuild core scripts.  Makefile.dtbinst already recognizes dtb-y
+> natively, so it should not hurt to do so.
+>
+> Add $(dtb-y) to extra-y, and $(dtb-) as well if CONFIG_OF_ALL_DTBS is
+> enabled.  All clutter things in Makefiles go away.
+>
+> As a bonus clean-up, I also removed dts-dirs.  Just use subdir-y
+> directly to traverse sub-directories.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Well FWIW, as acting MIPS maintainer right now:
+ ...
 
-Acked-by: James Hogan <jhogan@kernel.org>
+> diff --git a/arch/mips/boot/dts/Makefile b/arch/mips/boot/dts/Makefile
+> index 7891ffa..b2b0d88 100644
+> --- a/arch/mips/boot/dts/Makefile
+> +++ b/arch/mips/boot/dts/Makefile
+> @@ -1,20 +1,14 @@
+> -dts-dirs       += brcm
+> -dts-dirs       += cavium-octeon
+> -dts-dirs       += img
+> -dts-dirs       += ingenic
+> -dts-dirs       += lantiq
+> -dts-dirs       += mti
+> -dts-dirs       += netlogic
+> -dts-dirs       += ni
+> -dts-dirs       += pic32
+> -dts-dirs       += qca
+> -dts-dirs       += ralink
+> -dts-dirs       += xilfpga
+> +subdir-y       += brcm
+> +subdir-y       += cavium-octeon
+> +subdir-y       += img
+> +subdir-y       += ingenic
+> +subdir-y       += lantiq
+> +subdir-y       += mti
+> +subdir-y       += netlogic
+> +subdir-y       += ni
+> +subdir-y       += pic32
+> +subdir-y       += qca
+> +subdir-y       += ralink
+> +subdir-y       += xilfpga
+>
+> -obj-y          := $(addsuffix /, $(dts-dirs))
+> -
+> -dtstree                := $(srctree)/$(src)
+> -dtb-$(CONFIG_OF_ALL_DTBS) := $(patsubst $(dtstree)/%.dts,%.dtb, $(foreach d,$(dts-dirs), $(wildcard $(dtstree)/$(d)/*.dts)))
+> -
+> -always         := $(dtb-y)
+> -subdir-y       := $(dts-dirs)
+> +obj-$(BUILTIN_DTB)     := $(addsuffix /, $(subdir-y))
 
-Cheers
+I wonder if that should be CONFIG_BUILTIN_DTB?
+
+This is causing failures in linux-next with MIPS
+cavium_octeon_defconfig like below, and changing this line to
+CONFIG_BUILTIN_DTB seems to fix it.
+
+arch/mips/cavium-octeon/setup.o: In function `__octeon_is_model_runtime__':
+/work/mips/linux/main/./arch/mips/include/asm/octeon/octeon-model.h:368:
+undefined reference to `__dtb_octeon_3xxx_begin'
+arch/mips/cavium-octeon/setup.o: In function `device_tree_init':
+/work/mips/linux/main/arch/mips/cavium-octeon/setup.c:1188: undefined
+reference to `__dtb_octeon_3xxx_begin'
+/work/mips/linux/main/arch/mips/cavium-octeon/setup.c:1184: undefined
+reference to `__dtb_octeon_68xx_begin'
+/work/mips/linux/main/arch/mips/cavium-octeon/setup.c:1184: undefined
+reference to `__dtb_octeon_68xx_begin'
+
+Thanks
 James
 
---cYG5ZC/RuVsIq1ir
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEd80NauSabkiESfLYbAtpk944dnoFAloEDGkACgkQbAtpk944
-dnqtMQ/9EkU6LBbjrqwXDF9JqmxGykox4YXqoZwkvmKBG2aDeaqvh9MhpDEZSQmC
-EIBwQH5Yej7SRh4XxSgTOwfKdKHKOqPj4ExPK+X5pO5hlg5A2cZAzAjsSrsTRAgM
-B4J4yX3jPCS1LHbkXaEvzXZOJWMbCcpTmbkavHTGDfxDAnLh1ZecC8Otn75be3cF
-rz8Nji/xXzlKws2GvQm/4UGAsqKTrcMFTRWqaQW3eDw3w09T10HyxFejx9X9dA/Z
-YRXSTPNCSJ5Vt/UzJ8Chqp6/898VyUKj1mjmttudNiHSSnyrBQM4fu72NqVEbYnS
-2GzG5VIr+uXkmpgfsZpjsxYTupNI9vmoEjF+wOnzuVkip9NIHirYQkr5snImjrx1
-0zWn3dskm3Jh33tYDEVY2RYyt4jVvOxgHc+p/MY4TIB1wVVvZ9JCE8XskhF42g7X
-1eXn92wVj+Yzcx/mp2haFiQ54LNP6ADbXbtgHvkYMiMpkfoAk7Um1Pg1TAdHC7pZ
-ii1rg67UqB18YIiojXYn27HUuFpaoBhyfraGYuW++yt2rFWRzVsm7//dZclO+Vrr
-emwzWSAogXkFrVuD1tlfAHRrpice0QSh+VJoqAp+N/gTTgQONU5LZ/B+cTEsSP8i
-janm5/1JBMVbHlbd0WNwvrfwfGuzVJvMzrW1r3lECGSDPlkPrzU=
-=wanZ
------END PGP SIGNATURE-----
-
---cYG5ZC/RuVsIq1ir--
+-- 
+James Hogan
