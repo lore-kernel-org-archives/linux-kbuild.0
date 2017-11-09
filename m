@@ -1,40 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.17.22]:54195 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753058AbdKHVKQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Nov 2017 16:10:16 -0500
-From: Heinrich Schuchardt <xypron.glpk@gmx.de>
-Subject: [PATCH 1/1] kconfig/symbol.c: use correct pointer type argument for sizeof
-Date: Wed,  8 Nov 2017 22:09:59 +0100
-Message-Id: <20171108210959.16470-1-xypron.glpk@gmx.de>
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:54149 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751969AbdKIAMf (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 8 Nov 2017 19:12:35 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAL_JsqJ8taCKnr_79UumiH2GFYq-fMzzkYm2iYevTOgUUWuzvg@mail.gmail.com>
+References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
+ <1509859853-27473-2-git-send-email-yamada.masahiro@socionext.com>
+ <CAK7LNAQfK_BWQcVW-ScrpAwNAHav3MrrzV-tjn_YUjsuvd7U5A@mail.gmail.com>
+ <20171106095139.GG15260@jhogan-linux> <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
+ <CAL_JsqJ8taCKnr_79UumiH2GFYq-fMzzkYm2iYevTOgUUWuzvg@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 9 Nov 2017 09:11:41 +0900
+Message-ID: <CAK7LNATZ9O4cCpxLrG3MJoKYF+RnURkY4-tY2MdiZb90eGPtQg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] MIPS: dts: remove bogus bcm96358nb4ser.dtb from dtb-y entry
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E . MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>
+To: Rob Herring <robh+dt@kernel.org>
+Cc: James Hogan <jhogan@kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ralf Baechle <ralf@linux-mips.org>, Linux-MIPS <linux-mips@linux-mips.org>, Kevin Cernekee <cernekee@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>
 
-sym_arr is of type struct symbol **.
-So in malloc we need sizeof(struct symbol *).
+2017-11-09 1:51 GMT+09:00 Rob Herring <robh+dt@kernel.org>:
+> On Mon, Nov 6, 2017 at 5:00 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> 2017-11-06 19:41 GMT+09:00 James Hogan <jhogan@kernel.org>:
+>>> Hi,
+>>>
+>>> On Sun, Nov 05, 2017 at 11:11:38PM +0900, Masahiro Yamada wrote:
+>>>> +CC Ralf Baechle <ralf@linux-mips.org>
+>>>> +CC linux-mips@linux-mips.org
+>>>> +CC Kevin Cernekee <cernekee@gmail.com>
+>>>> +CC Florian Fainelli <f.fainelli@gmail.com>
+>>>>
+>>>>
+>>>> I missed to CC MIPS maintainers.
+>>>
+>>> Yes, please resend the patch so it lands in patchwork.linux-mips.org.
+>>
+>>
+>> This is a part of clean-up series of DT building.
+>>
+>> I want Acked-by from MIPS maintainers
+>> so that the whole series can go to a different tree.
+>> (DT or Kbuild).
+>>
+>>
+>> Sam addressed more clean-up candidates in MIPS Makefiles
+>> https://patchwork.kernel.org/patch/10041879/
+>>
+>> So, I will probably end up with touching those Makefiles more.
+>>
+>> All patches must go to the same tree.
+>>
+>>
+>>>> 2017-11-05 14:30 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+>>>> > arch/mips/boot/dts/brcm/bcm96358nb4ser.dts does not exist, so
+>>>> > we cannot build bcm96358nb4ser.dtb .
+>>>
+>>> This appears to be due to the file being renamed in commit 695835511f96
+>>> ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom").
+>>> Please can you update the commit message when you resend to mention the
+>>> cause of the problem.
+>>>
+>>> You could also add the following if you like while you're at it:
+>>>
+>>> Fixes: 695835511f96 ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom")
+>>> Cc: <stable@vger.kernel.org> # 4.9+
+>
+> I think this one can be applied independently and we'd want it to if
+> we tag for stable. So I think it can go thru the MIPS tree.
+>
 
-The problem was indicated by coccinelle.
 
-Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
----
- scripts/kconfig/symbol.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+As I said to MIPS folks, this patch must go before 2/2.
 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 20136ffefb23..3c8bd9bb4267 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -1061,7 +1061,7 @@ struct symbol **sym_re_search(const char *pattern)
- 	}
- 	if (sym_match_arr) {
- 		qsort(sym_match_arr, cnt, sizeof(struct sym_match), sym_rel_comp);
--		sym_arr = malloc((cnt+1) * sizeof(struct symbol));
-+		sym_arr = malloc((cnt+1) * sizeof(struct symbol *));
- 		if (!sym_arr)
- 			goto sym_re_search_free;
- 		for (i = 0; i < cnt; i++)
+You picked up only 2/2, so your dt/kbuild branch is broken.
+
+
+make ARCH=mips allyesconfig
+&& make ARCH=mips CROSS_COMPILE=mips-linux- dtbs
+
+
+will produce the following error.
+
+
+make[2]: *** No rule to make target
+'arch/mips/boot/dts/brcm/bcm96358nb4ser.dtb', needed by '__build'.
+Stop.
+scripts/Makefile.build:570: recipe for target 'arch/mips/boot/dts/brcm' failed
+make[1]: *** [arch/mips/boot/dts/brcm] Error 2
+arch/mips/Makefile:413: recipe for target 'dtbs' failed
+make: *** [dtbs] Error 2
+
+
 -- 
-2.14.2
-
+Best Regards
+Masahiro Yamada
