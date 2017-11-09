@@ -1,108 +1,117 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:41736 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:57774 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754671AbdKIUfA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Nov 2017 15:35:00 -0500
+        id S1751537AbdKIXGr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 9 Nov 2017 18:06:47 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAT-3yBTFqnFECbGzSHRUiaG38b0BG3_3ouRAZRTF+iiDQ@mail.gmail.com>
+In-Reply-To: <CAK7LNARzRUA6ZGQUiebZ+nmLBSAVdYONsozHBf0VQb83KqSx1g@mail.gmail.com>
 References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
- <1509859853-27473-3-git-send-email-yamada.masahiro@socionext.com>
- <CAAG0J98rRS+Sw8k_87gmTqYdNWByk=9zWVbWnC348vd63H4N9w@mail.gmail.com>
- <CAAG0J99envT6gtM6tHdTvetrHr0itX1dexkuWSU=u1c5UTLE1A@mail.gmail.com> <CAK7LNAT-3yBTFqnFECbGzSHRUiaG38b0BG3_3ouRAZRTF+iiDQ@mail.gmail.com>
+ <1509859853-27473-2-git-send-email-yamada.masahiro@socionext.com>
+ <CAK7LNAQfK_BWQcVW-ScrpAwNAHav3MrrzV-tjn_YUjsuvd7U5A@mail.gmail.com>
+ <20171106095139.GG15260@jhogan-linux> <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
+ <CAL_JsqJ8taCKnr_79UumiH2GFYq-fMzzkYm2iYevTOgUUWuzvg@mail.gmail.com>
+ <CAK7LNATZ9O4cCpxLrG3MJoKYF+RnURkY4-tY2MdiZb90eGPtQg@mail.gmail.com> <CAK7LNARzRUA6ZGQUiebZ+nmLBSAVdYONsozHBf0VQb83KqSx1g@mail.gmail.com>
 From: Rob Herring <robh+dt@kernel.org>
-Date: Thu, 9 Nov 2017 14:34:38 -0600
-Message-ID: <CAL_JsqLJZ3D8MXooiS+RFC1jJTCf7L6epwXUgovMAtH5Logwqg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: handle dtb-y and CONFIG_OF_ALL_DTBS natively
- in Makefile.lib
+Date: Thu, 9 Nov 2017 17:06:25 -0600
+Message-ID: <CAL_JsqJF=AV_m7DJyc4GGX0xrbvn+yJ05Oy8EWoM+FO8qr=k2g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] MIPS: dts: remove bogus bcm96358nb4ser.dtb from dtb-y entry
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: James Hogan <james@albanarts.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>, David Daney <david.daney@cavium.com>, James Hogan <james.hogan@mips.com>, Linux-Next Mailing List <linux-next@vger.kernel.org>
+Cc: James Hogan <jhogan@kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ralf Baechle <ralf@linux-mips.org>, Linux-MIPS <linux-mips@linux-mips.org>, Kevin Cernekee <cernekee@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>
 
-On Thu, Nov 9, 2017 at 6:23 AM, Masahiro Yamada
+On Wed, Nov 8, 2017 at 6:38 PM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> Hi James,
+> 2017-11-09 9:11 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+>> 2017-11-09 1:51 GMT+09:00 Rob Herring <robh+dt@kernel.org>:
+>>> On Mon, Nov 6, 2017 at 5:00 AM, Masahiro Yamada
+>>> <yamada.masahiro@socionext.com> wrote:
+>>>> 2017-11-06 19:41 GMT+09:00 James Hogan <jhogan@kernel.org>:
+>>>>> Hi,
+>>>>>
+>>>>> On Sun, Nov 05, 2017 at 11:11:38PM +0900, Masahiro Yamada wrote:
+>>>>>> +CC Ralf Baechle <ralf@linux-mips.org>
+>>>>>> +CC linux-mips@linux-mips.org
+>>>>>> +CC Kevin Cernekee <cernekee@gmail.com>
+>>>>>> +CC Florian Fainelli <f.fainelli@gmail.com>
+>>>>>>
+>>>>>>
+>>>>>> I missed to CC MIPS maintainers.
+>>>>>
+>>>>> Yes, please resend the patch so it lands in patchwork.linux-mips.org.
+>>>>
+>>>>
+>>>> This is a part of clean-up series of DT building.
+>>>>
+>>>> I want Acked-by from MIPS maintainers
+>>>> so that the whole series can go to a different tree.
+>>>> (DT or Kbuild).
+>>>>
+>>>>
+>>>> Sam addressed more clean-up candidates in MIPS Makefiles
+>>>> https://patchwork.kernel.org/patch/10041879/
+>>>>
+>>>> So, I will probably end up with touching those Makefiles more.
+>>>>
+>>>> All patches must go to the same tree.
+>>>>
+>>>>
+>>>>>> 2017-11-05 14:30 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+>>>>>> > arch/mips/boot/dts/brcm/bcm96358nb4ser.dts does not exist, so
+>>>>>> > we cannot build bcm96358nb4ser.dtb .
+>>>>>
+>>>>> This appears to be due to the file being renamed in commit 695835511f96
+>>>>> ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom").
+>>>>> Please can you update the commit message when you resend to mention the
+>>>>> cause of the problem.
+>>>>>
+>>>>> You could also add the following if you like while you're at it:
+>>>>>
+>>>>> Fixes: 695835511f96 ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom")
+>>>>> Cc: <stable@vger.kernel.org> # 4.9+
+>>>
+>>> I think this one can be applied independently and we'd want it to if
+>>> we tag for stable. So I think it can go thru the MIPS tree.
+>>>
+>>
+>>
+>> As I said to MIPS folks, this patch must go before 2/2.
+>>
+>> You picked up only 2/2, so your dt/kbuild branch is broken.
+>>
+>>
+>> make ARCH=mips allyesconfig
+>> && make ARCH=mips CROSS_COMPILE=mips-linux- dtbs
+>>
+>>
+>> will produce the following error.
+>>
+>>
+>> make[2]: *** No rule to make target
+>> 'arch/mips/boot/dts/brcm/bcm96358nb4ser.dtb', needed by '__build'.
+>> Stop.
+>> scripts/Makefile.build:570: recipe for target 'arch/mips/boot/dts/brcm' failed
+>> make[1]: *** [arch/mips/boot/dts/brcm] Error 2
+>> arch/mips/Makefile:413: recipe for target 'dtbs' failed
+>> make: *** [dtbs] Error 2
+>>
 >
 >
-> 2017-11-09 21:19 GMT+09:00 James Hogan <james@albanarts.com>:
->> (resend using a working From address)
->>
->> <yamada.masahiro@socionext.com> wrote:
->>> If CONFIG_OF_ALL_DTBS is enabled, "make ARCH=arm64 dtbs" compiles each
->>> DTB twice; one from arch/arm64/boot/dts/*/Makefile and the other from
->>> the dtb-$(CONFIG_OF_ALL_DTBS) line in arch/arm64/boot/dts/Makefile.
->>> It could be a race problem when building DTBS in parallel.
->>>
->>> Another minor issue is CONFIG_OF_ALL_DTBS covers only *.dts in vendor
->>> sub-directories, so this broke when Broadcom added one more hierarchy
->>> in arch/arm64/boot/dts/broadcom/<soc>/.
->>>
->>> One idea to fix the issues in a clean way is to move DTB handling
->>> to Kbuild core scripts.  Makefile.dtbinst already recognizes dtb-y
->>> natively, so it should not hurt to do so.
->>>
->>> Add $(dtb-y) to extra-y, and $(dtb-) as well if CONFIG_OF_ALL_DTBS is
->>> enabled.  All clutter things in Makefiles go away.
->>>
->>> As a bonus clean-up, I also removed dts-dirs.  Just use subdir-y
->>> directly to traverse sub-directories.
->>>
->>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->>
->>  ...
->>
->>> diff --git a/arch/mips/boot/dts/Makefile b/arch/mips/boot/dts/Makefile
->>> index 7891ffa..b2b0d88 100644
->>> --- a/arch/mips/boot/dts/Makefile
->>> +++ b/arch/mips/boot/dts/Makefile
->>> @@ -1,20 +1,14 @@
->>> -dts-dirs       += brcm
->>> -dts-dirs       += cavium-octeon
->>> -dts-dirs       += img
->>> -dts-dirs       += ingenic
->>> -dts-dirs       += lantiq
->>> -dts-dirs       += mti
->>> -dts-dirs       += netlogic
->>> -dts-dirs       += ni
->>> -dts-dirs       += pic32
->>> -dts-dirs       += qca
->>> -dts-dirs       += ralink
->>> -dts-dirs       += xilfpga
->>> +subdir-y       += brcm
->>> +subdir-y       += cavium-octeon
->>> +subdir-y       += img
->>> +subdir-y       += ingenic
->>> +subdir-y       += lantiq
->>> +subdir-y       += mti
->>> +subdir-y       += netlogic
->>> +subdir-y       += ni
->>> +subdir-y       += pic32
->>> +subdir-y       += qca
->>> +subdir-y       += ralink
->>> +subdir-y       += xilfpga
->>>
->>> -obj-y          := $(addsuffix /, $(dts-dirs))
->>> -
->>> -dtstree                := $(srctree)/$(src)
->>> -dtb-$(CONFIG_OF_ALL_DTBS) := $(patsubst $(dtstree)/%.dts,%.dtb, $(foreach d,$(dts-dirs), $(wildcard $(dtstree)/$(d)/*.dts)))
->>> -
->>> -always         := $(dtb-y)
->>> -subdir-y       := $(dts-dirs)
->>> +obj-$(BUILTIN_DTB)     := $(addsuffix /, $(subdir-y))
->>
->> I wonder if that should be CONFIG_BUILTIN_DTB?
->>
->> This is causing failures in linux-next with MIPS
->> cavium_octeon_defconfig like below, and changing this line to
->> CONFIG_BUILTIN_DTB seems to fix it.
+> Looking into it, probably
+> bmips_dtb_defconfig was already broken regardless my patches.
 >
-> Good catch!
+> But, I am not comfortable with breaking all{yes,mod}config
+> because they are often used for build test.
 >
 >
-> Rob,
-> Can you fix it to CONFIG_BUILTIN_DTB?
+> I hope you can apply this in the order as I sent,
+> with the following tag.
+>
+> Fixes: 695835511f96 ("MIPS: BMIPS: rename bcm96358nb4ser to
+> bcm6358-neufbox4-sercom")
+> Cc: <stable@vger.kernel.org> # 4.9+
 
-Fixed.
+Okay, now applied.
 
 Rob
