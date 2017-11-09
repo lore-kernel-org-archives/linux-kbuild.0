@@ -1,95 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:52531 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752869AbdKIQ6L (ORCPT
+Received: from mail-vk0-f66.google.com ([209.85.213.66]:56538 "EHLO
+        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751012AbdKIR7K (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Nov 2017 11:58:11 -0500
-Received: by mail-lf0-f65.google.com with SMTP id b190so8000253lfg.9
-        for <linux-kbuild@vger.kernel.org>; Thu, 09 Nov 2017 08:58:10 -0800 (PST)
+        Thu, 9 Nov 2017 12:59:10 -0500
+Received: by mail-vk0-f66.google.com with SMTP id g11so4510023vkd.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 09 Nov 2017 09:59:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATLG6TXTMNLwZ5ww31OtZc4m8auW=r7hYbn=UM+hz9PDw@mail.gmail.com>
-References: <20171102212649.108880-1-ndesaulniers@google.com>
- <CAK7LNASEWrkV5m6xxXqY6Gq84XZ1oGK86CmE+=k6Pfei=RmnuQ@mail.gmail.com>
- <CAKwvOdn4EWb_T6QgcYmEN1JKvVzC6otJ=g+2OUa8Chtq7aY1mw@mail.gmail.com> <CAK7LNATLG6TXTMNLwZ5ww31OtZc4m8auW=r7hYbn=UM+hz9PDw@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Thu, 9 Nov 2017 08:58:08 -0800
-Message-ID: <CAKwvOdny7CQMqUuaFtxishQkZZ7rWbExe7h2HNebgP4q-Myvpw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
+In-Reply-To: <1510242077-8122-2-git-send-email-yamada.masahiro@socionext.com>
+References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com> <1510242077-8122-2-git-send-email-yamada.masahiro@socionext.com>
+From: Doug Anderson <dianders@chromium.org>
+Date: Thu, 9 Nov 2017 09:59:08 -0800
+Message-ID: <CAD=FV=VQ2YoWd0ARSk6z03zFzKmem6VbJ4r5T0aoGh7kGhwaDw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] kbuild: create directory for make cache only when necessary
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?Q?Jan=2DSimon_M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Chris Fries <cfries@google.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, Nov 8, 2017 at 8:15 PM, Masahiro Yamada
+Hi,
+
+On Thu, Nov 9, 2017 at 7:41 AM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> 2017-11-08 2:37 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
->> On Sat, Nov 4, 2017 at 8:06 PM, Masahiro Yamada
->> <yamada.masahiro@socionext.com> wrote:
->>> ld-option is only used for arch/{arm64,powerpc}/Makefile
->>>
->>> arch/arm64/Makefile:  ifeq ($(call ld-option, --fix-cortex-a53-843419),)
->>> arch/powerpc/Makefile:LDFLAGS_vmlinux += $(call
->>> ld-option,--orphan-handling=warn)
->>>
->>> I think this patch makes sense when it comes along with
->>> https://patchwork.kernel.org/patch/10030581/
->>
->> Good point.
->>
->>> but, it is now being blocked by 0-day bot
->>> due to a x86 problem.
->>
->> Looks like that is now resolved (unless 0-day bot strikes again).
->>
->>> The location of CLANG_GCC_TC define
->>> only matters after your patch is applied, right?
->>
->> By "your patch" referring to the 0-day bot thread, yes.
->>
->>> Did my request for v2 break anything?
->>
->> Nothing immediately obvious, and no regressions.  It just made this
->> patch necessary (along with my previous one) for correctly cross
->> compiling with clang for arm64 and powerpc as you point out.
->>
->>> One more thing: this patch does not apply to kbuild tree.
->>
->> I absolutely will rebase it on your tree and send a v2.  Just to help
->> me understand the contribution model better: none of my other patches
->> have yet been requested against any trees other than Linus'.  Is this
->> because of where we are in the release cycle, or that a lot of kbuild
->> code has changed, or what?
+> Currently, the existence of $(dir $(make-cache)) is always checked,
+> and created if it is missing.
 >
+> We can avoid unnecessary system calls by some tricks.
 >
-> Generally speaking,
-> a preferred way is to base patches on the subsystem tree.
+> [1] If KBUILD_SRC is unset, we are building in the source tree.
+>     The output directory checks can be entirely skipped.
+> [2] If at least one cache data is found, it means the cache file
+>     was included.  Obiously its directory exists.  Skip "mkdir -p".
+> [3] If Makefile does not contain any call of __run-and-store, it will
+>     not create a cache file.  No need to create its directory.
+> [4] The "mkdir -p" should be only invoked by the first call of
+>     __run-and-store
 >
-> Kernel developers are supposed to do their development on linux-next,
-> but, in reality, many people work on Linus' tree since it is more stable and
-> git history is fast-forward.
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 >
-> In many cases, patches based on Linus' tree can apply to sub-systems as well.
+>  scripts/Kbuild.include | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
 >
-> I am happy to fix-up a conflict locally
-> as long as it is trivial, and there is no other reason for re-spin.
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index be1c9d6..4fb1be1 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -99,18 +99,19 @@ cc-cross-prefix =  \
 >
-> Unfortunately, Kbuild tree changed the top-level Makefile a lot in
-> this development cycle.
+>  # Include values from last time
+>  make-cache := $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/,$(if $(obj),$(obj)/)).cache.mk
+> -ifeq ($(wildcard $(dir $(make-cache))),)
+> -$(shell mkdir -p '$(dir $(make-cache))')
+> -endif
+>  $(make-cache): ;
+>  -include $(make-cache)
 >
-> If your patch does not apply cleanly, I do not know which context you
-> are moving the code to.
-> Also, I found suspicious description in the commit log.
+> +cached-data := $(filter __cached_%, $(.VARIABLES))
+> +
+>  # If cache exceeds 1000 lines, shrink it down to 500.
+> -ifneq ($(word 1000,$(filter __cached_%, $(.VARIABLES))),)
+> +ifneq ($(word 1000,$(cached-data)),)
+>  $(shell tail -n 500 $(make-cache) > $(make-cache).tmp; \
+>         mv $(make-cache).tmp $(make-cache))
+>  endif
 >
-> That's why.
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+> +cache-dir := $(if $(KBUILD_SRC),$(if $(cache-data),,$(dir $(make-cache))))
 
-Great, thanks for taking time to explain that, I appreciate it.
+It wouldn't hurt to add a comment that cache-dir will be blank if we
+don't need to make the cache dir and will contain a directory path
+only if the dir doesn't exist.  Without a comment it could take
+someone quite a while to realize that...
 
--- 
-Thanks,
-~Nick Desaulniers
+> +
+>  # Usage: $(call __sanitize-opt,Hello=Hola$(comma)Goodbye Adios)
+>  #
+>  # Convert all '$', ')', '(', '\', '=', ' ', ',', ':' to '_'
+> @@ -136,6 +137,10 @@ __sanitize-opt = $(subst $$,_,$(subst $(right_paren),_,$(subst $(left_paren),_,$
+>  define __run-and-store
+>  ifeq ($(origin $(1)),undefined)
+>    $$(eval $(1) := $$(shell $$(2)))
+> +ifneq ($(cache-dir),)
+> +  $$(shell mkdir -p $(cache-dir))
+
+I _think_ you want some single quotes in there.  AKA:
+
+$$(shell mkdir -p '$(cache-dir)')
+
+That at least matches what the "old" code used to do.  Specifically if
+'cache-dir' happens to have a space in it then it won't work right
+without the single quotes.  There may be other symbols that your shell
+might interpret in interesting ways, too.
+
+NOTE: I have no idea if the kernel Makefiles work if paths like
+KBUILD_SRC have spaces in them to begin with, but it seems wise to add
+the quotes here anyway.
+
+ALSO NOTE: I think you could still confuse the kernel Makefiles if
+somehow you had a single quote in your path somehow.  I assume we
+don't care?
+
+
+> +  $$(eval cache-dir :=)
+> +endif
+>    $$(shell echo '$(1) := $$($(1))' >> $(make-cache))
+>  endif
+>  endef
+
+Other than the single quote problem and the suggested comment, this
+seems like a sane optimization to me.  Feel free to add my Reviewed-by
+once those fixes are in place.
+
+-Doug
