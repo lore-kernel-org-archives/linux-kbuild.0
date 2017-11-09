@@ -1,89 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:23929 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:25679 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750777AbdKIPm5 (ORCPT
+        with ESMTP id S1750740AbdKIPo3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Nov 2017 10:42:57 -0500
+        Thu, 9 Nov 2017 10:44:29 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/4] kbuild: remove redundant $(wildcard ...) for cmd_files calculation
-Date: Fri, 10 Nov 2017 00:41:15 +0900
-Message-Id: <1510242077-8122-3-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 0/4] kbuild: optimize output directory creation
+Date: Fri, 10 Nov 2017 00:41:13 +0900
+Message-Id: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@amacapital.net>, Ingo Molnar <mingo@redhat.com>
 
-I do not why $(wildcard ...) needs to be called twice for computing
-cmd_files.  Remove the first one.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+I looked into the build scripts, focusing on "mkdir" optimization.
 
- Makefile                     | 3 +--
- scripts/Makefile.build       | 3 +--
- scripts/Makefile.headersinst | 3 +--
- scripts/Makefile.modpost     | 3 +--
- 4 files changed, 4 insertions(+), 8 deletions(-)
+With this series, I succeeded in speeding up the incremental build
+with O= option.
 
-diff --git a/Makefile b/Makefile
-index a7476e6..58dd245 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1693,8 +1693,7 @@ cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
- 
- # read all saved command lines
- 
--targets := $(wildcard $(sort $(targets)))
--cmd_files := $(wildcard .*.cmd $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
-+cmd_files := $(wildcard .*.cmd $(foreach f,$(sort $(targets)),$(dir $(f)).$(notdir $(f)).cmd))
- 
- ifneq ($(cmd_files),)
-   $(cmd_files): ;	# Do not try to update included dependency files
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 061d0c3..62d5314 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -583,8 +583,7 @@ FORCE:
- # optimization, we don't need to read them if the target does not
- # exist, we will rebuild anyway in that case.
- 
--targets := $(wildcard $(sort $(targets)))
--cmd_files := $(wildcard $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
-+cmd_files := $(wildcard $(foreach f,$(sort $(targets)),$(dir $(f)).$(notdir $(f)).cmd))
- 
- ifneq ($(cmd_files),)
-   include $(cmd_files)
-diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-index 5692d7a..2aa9181 100644
---- a/scripts/Makefile.headersinst
-+++ b/scripts/Makefile.headersinst
-@@ -114,9 +114,8 @@ $(check-file): scripts/headers_check.pl $(output-files) FORCE
- 
- endif
- 
--targets := $(wildcard $(sort $(targets)))
- cmd_files := $(wildcard \
--             $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
-+             $(foreach f,$(sort $$(targets)),$(dir $(f)).$(notdir $(f)).cmd))
- 
- ifneq ($(cmd_files),)
- 	include $(cmd_files)
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 16923ba..cf125c1 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -143,8 +143,7 @@ FORCE:
- # optimization, we don't need to read them if the target does not
- # exist, we will rebuild anyway in that case.
- 
--targets := $(wildcard $(sort $(targets)))
--cmd_files := $(wildcard $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
-+cmd_files := $(wildcard $(foreach f,$(sort $(targets)),$(dir $(f)).$(notdir $(f)).cmd))
- 
- ifneq ($(cmd_files),)
-   include $(cmd_files)
+The following is the result of "time make O=foo",
+where "foo" is the output directory that has already been built.
+
+Before:
+
+real	0m8.322s
+user	0m4.324s
+sys	0m1.220s
+
+After:
+
+real	0m6.989s
+user	0m4.168s
+sys	0m1.080s
+
+3/4 gave the biggest impact.
+
+
+
+Masahiro Yamada (4):
+  kbuild: create directory for make cache only when necessary
+  kbuild: remove redundant $(wildcard ...) for cmd_files calculation
+  kbuild: create object directories simpler and faster
+  kbuild: optimize object directory creation for incremental build
+
+ Makefile                     |  3 +--
+ arch/x86/entry/vdso/Makefile |  4 ----
+ scripts/Kbuild.include       | 13 +++++++++----
+ scripts/Makefile.build       | 23 ++++++++++++-----------
+ scripts/Makefile.headersinst |  3 +--
+ scripts/Makefile.host        | 11 -----------
+ scripts/Makefile.lib         |  5 -----
+ scripts/Makefile.modpost     |  3 +--
+ 8 files changed, 24 insertions(+), 41 deletions(-)
+
 -- 
 2.7.4
 
