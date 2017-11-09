@@ -1,127 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:28524 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754178AbdKIMYP (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:23901 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750740AbdKIPm4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Nov 2017 07:24:15 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAAG0J99envT6gtM6tHdTvetrHr0itX1dexkuWSU=u1c5UTLE1A@mail.gmail.com>
-References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
- <1509859853-27473-3-git-send-email-yamada.masahiro@socionext.com>
- <CAAG0J98rRS+Sw8k_87gmTqYdNWByk=9zWVbWnC348vd63H4N9w@mail.gmail.com> <CAAG0J99envT6gtM6tHdTvetrHr0itX1dexkuWSU=u1c5UTLE1A@mail.gmail.com>
+        Thu, 9 Nov 2017 10:42:56 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 9 Nov 2017 21:23:14 +0900
-Message-ID: <CAK7LNAT-3yBTFqnFECbGzSHRUiaG38b0BG3_3ouRAZRTF+iiDQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: handle dtb-y and CONFIG_OF_ALL_DTBS natively
- in Makefile.lib
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 1/4] kbuild: create directory for make cache only when necessary
+Date: Fri, 10 Nov 2017 00:41:14 +0900
+Message-Id: <1510242077-8122-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james@albanarts.com>, Rob Herring <robh+dt@kernel.org>
-Cc: devicetree@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>, David Daney <david.daney@cavium.com>, James Hogan <james.hogan@mips.com>, Linux-Next Mailing List <linux-next@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Hi James,
+Currently, the existence of $(dir $(make-cache)) is always checked,
+and created if it is missing.
 
+We can avoid unnecessary system calls by some tricks.
 
-2017-11-09 21:19 GMT+09:00 James Hogan <james@albanarts.com>:
-> (resend using a working From address)
->
-> <yamada.masahiro@socionext.com> wrote:
->> If CONFIG_OF_ALL_DTBS is enabled, "make ARCH=arm64 dtbs" compiles each
->> DTB twice; one from arch/arm64/boot/dts/*/Makefile and the other from
->> the dtb-$(CONFIG_OF_ALL_DTBS) line in arch/arm64/boot/dts/Makefile.
->> It could be a race problem when building DTBS in parallel.
->>
->> Another minor issue is CONFIG_OF_ALL_DTBS covers only *.dts in vendor
->> sub-directories, so this broke when Broadcom added one more hierarchy
->> in arch/arm64/boot/dts/broadcom/<soc>/.
->>
->> One idea to fix the issues in a clean way is to move DTB handling
->> to Kbuild core scripts.  Makefile.dtbinst already recognizes dtb-y
->> natively, so it should not hurt to do so.
->>
->> Add $(dtb-y) to extra-y, and $(dtb-) as well if CONFIG_OF_ALL_DTBS is
->> enabled.  All clutter things in Makefiles go away.
->>
->> As a bonus clean-up, I also removed dts-dirs.  Just use subdir-y
->> directly to traverse sub-directories.
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->
->  ...
->
->> diff --git a/arch/mips/boot/dts/Makefile b/arch/mips/boot/dts/Makefile
->> index 7891ffa..b2b0d88 100644
->> --- a/arch/mips/boot/dts/Makefile
->> +++ b/arch/mips/boot/dts/Makefile
->> @@ -1,20 +1,14 @@
->> -dts-dirs       += brcm
->> -dts-dirs       += cavium-octeon
->> -dts-dirs       += img
->> -dts-dirs       += ingenic
->> -dts-dirs       += lantiq
->> -dts-dirs       += mti
->> -dts-dirs       += netlogic
->> -dts-dirs       += ni
->> -dts-dirs       += pic32
->> -dts-dirs       += qca
->> -dts-dirs       += ralink
->> -dts-dirs       += xilfpga
->> +subdir-y       += brcm
->> +subdir-y       += cavium-octeon
->> +subdir-y       += img
->> +subdir-y       += ingenic
->> +subdir-y       += lantiq
->> +subdir-y       += mti
->> +subdir-y       += netlogic
->> +subdir-y       += ni
->> +subdir-y       += pic32
->> +subdir-y       += qca
->> +subdir-y       += ralink
->> +subdir-y       += xilfpga
->>
->> -obj-y          := $(addsuffix /, $(dts-dirs))
->> -
->> -dtstree                := $(srctree)/$(src)
->> -dtb-$(CONFIG_OF_ALL_DTBS) := $(patsubst $(dtstree)/%.dts,%.dtb, $(foreach d,$(dts-dirs), $(wildcard $(dtstree)/$(d)/*.dts)))
->> -
->> -always         := $(dtb-y)
->> -subdir-y       := $(dts-dirs)
->> +obj-$(BUILTIN_DTB)     := $(addsuffix /, $(subdir-y))
->
-> I wonder if that should be CONFIG_BUILTIN_DTB?
->
-> This is causing failures in linux-next with MIPS
-> cavium_octeon_defconfig like below, and changing this line to
-> CONFIG_BUILTIN_DTB seems to fix it.
+[1] If KBUILD_SRC is unset, we are building in the source tree.
+    The output directory checks can be entirely skipped.
+[2] If at least one cache data is found, it means the cache file
+    was included.  Obiously its directory exists.  Skip "mkdir -p".
+[3] If Makefile does not contain any call of __run-and-store, it will
+    not create a cache file.  No need to create its directory.
+[4] The "mkdir -p" should be only invoked by the first call of
+    __run-and-store
 
-Good catch!
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ scripts/Kbuild.include | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-Rob,
-Can you fix it to CONFIG_BUILTIN_DTB?
-
-Thanks!
-
-
-
-> arch/mips/cavium-octeon/setup.o: In function `__octeon_is_model_runtime__':
-> /work/mips/linux/main/./arch/mips/include/asm/octeon/octeon-model.h:368:
-> undefined reference to `__dtb_octeon_3xxx_begin'
-> arch/mips/cavium-octeon/setup.o: In function `device_tree_init':
-> /work/mips/linux/main/arch/mips/cavium-octeon/setup.c:1188: undefined
-> reference to `__dtb_octeon_3xxx_begin'
-> /work/mips/linux/main/arch/mips/cavium-octeon/setup.c:1184: undefined
-> reference to `__dtb_octeon_68xx_begin'
-> /work/mips/linux/main/arch/mips/cavium-octeon/setup.c:1184: undefined
-> reference to `__dtb_octeon_68xx_begin'
->
-> Thanks
-> James
->
->
-
-
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index be1c9d6..4fb1be1 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -99,18 +99,19 @@ cc-cross-prefix =  \
+ 
+ # Include values from last time
+ make-cache := $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/,$(if $(obj),$(obj)/)).cache.mk
+-ifeq ($(wildcard $(dir $(make-cache))),)
+-$(shell mkdir -p '$(dir $(make-cache))')
+-endif
+ $(make-cache): ;
+ -include $(make-cache)
+ 
++cached-data := $(filter __cached_%, $(.VARIABLES))
++
+ # If cache exceeds 1000 lines, shrink it down to 500.
+-ifneq ($(word 1000,$(filter __cached_%, $(.VARIABLES))),)
++ifneq ($(word 1000,$(cached-data)),)
+ $(shell tail -n 500 $(make-cache) > $(make-cache).tmp; \
+ 	mv $(make-cache).tmp $(make-cache))
+ endif
+ 
++cache-dir := $(if $(KBUILD_SRC),$(if $(cache-data),,$(dir $(make-cache))))
++
+ # Usage: $(call __sanitize-opt,Hello=Hola$(comma)Goodbye Adios)
+ #
+ # Convert all '$', ')', '(', '\', '=', ' ', ',', ':' to '_'
+@@ -136,6 +137,10 @@ __sanitize-opt = $(subst $$,_,$(subst $(right_paren),_,$(subst $(left_paren),_,$
+ define __run-and-store
+ ifeq ($(origin $(1)),undefined)
+   $$(eval $(1) := $$(shell $$(2)))
++ifneq ($(cache-dir),)
++  $$(shell mkdir -p $(cache-dir))
++  $$(eval cache-dir :=)
++endif
+   $$(shell echo '$(1) := $$($(1))' >> $(make-cache))
+ endif
+ endef
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
