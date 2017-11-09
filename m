@@ -1,91 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:32217 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751190AbdKIFxu (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:16903 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751225AbdKIHCa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Nov 2017 00:53:50 -0500
-MIME-Version: 1.0
-In-Reply-To: <20171109053529.GA12717@ravnborg.org>
-References: <1510072307-16819-1-git-send-email-yamada.masahiro@socionext.com>
- <1510072307-16819-2-git-send-email-yamada.masahiro@socionext.com> <20171109053529.GA12717@ravnborg.org>
+        Thu, 9 Nov 2017 02:02:30 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 9 Nov 2017 14:53:04 +0900
-Message-ID: <CAK7LNARyrgRBYOW7NGURnVUhhArL3C46UWiSosveM9KGmvEY4Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: create built-in.o automatically if parent
- directory wants it
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v2] coccinelle: fix parallel build with CHECK=scripts/coccicheck
+Date: Thu,  9 Nov 2017 16:00:50 +0900
+Message-Id: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, devicetree@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Linux-MIPS <linux-mips@linux-mips.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Michal Marek <mmarek@suse.com>
+To: linux-kbuild@vger.kernel.org
+Cc: cocci@systeme.lip6.fr, Julia Lawall <Julia.Lawall@lip6.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
 
-Hi Sam,
+The command "make -j8 C=1 CHECK=scripts/coccicheck" produces lots of
+"coccicheck failed" error messages.
 
-Thanks for your review.
+I do not know the coccinelle internals, but I guess --jobs does not
+work well if spatch is invoked from Make running in parallel.
+Disable --jobs in this case.
 
-2017-11-09 14:35 GMT+09:00 Sam Ravnborg <sam@ravnborg.org>:
-> Hi Masahiro.
->
-> Thanks for picking this up.
->
->> A key point is, the parent Makefile knows whether built-in.o is needed
->> or not.  If a subdirectory needs to create built-in.o, its parent can
->> tell the fact when Kbuild descends into it.
-> Good observation!
->>
->> diff --git a/Makefile b/Makefile
->> index 008a4e5..cc0b618 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -1003,7 +1003,7 @@ $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
->>
->>  PHONY += $(vmlinux-dirs)
->>  $(vmlinux-dirs): prepare scripts
->> -     $(Q)$(MAKE) $(build)=$@
->> +     $(Q)$(MAKE) $(build)=$@ need-builtin=1
->
-> The need-bultin may also be required for the shortcuts
-> that allows one to use:
->
->         make <dir>/
->
->     example:
->
->         make net/
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+Changes in v2:
+  - Grep '-j' instead of '--jobserver-auth'.
+    '--jobserver-*' is not a stable option flag.
+    Make 4.2 change '--jobserver-fds' into '--jobserver-auth'
+  - Add -q option to grep
 
-I do not want to add need-builtin=1 for single targets.
+ scripts/coccicheck | 3 +++
+ 1 file changed, 3 insertions(+)
 
-
-make scripts/
-would create false scripts/built-in.o
-This is odd.
-
-I wrote the solution in the commit log:
-  $(obj-y) should be still checked to support the single target "%/".
-
-
-If net/Makefile contains at least one obj-y,
-"make net/" will create built-in.o
-
-
-
-
-
-> And maybe selftest, documentation shortcuts too?
-> Other than that - looks good.
->
-> Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
->
->         Sam
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/scripts/coccicheck b/scripts/coccicheck
+index 040a8b1..8bab11e 100755
+--- a/scripts/coccicheck
++++ b/scripts/coccicheck
+@@ -70,6 +70,9 @@ if [ "$C" = "1" -o "$C" = "2" ]; then
+     # Take only the last argument, which is the C file to test
+     shift $(( $# - 1 ))
+     OPTIONS="$COCCIINCLUDE $1"
++
++    # --jobs does not work if Make is running in parallel
++    echo $MAKEFLAGS | grep -q -E '(^| )-j' && USE_JOBS="no"
+ else
+     ONLINE=0
+     if [ "$KBUILD_EXTMOD" = "" ] ; then
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
