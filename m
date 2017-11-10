@@ -1,73 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:38303 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752405AbdKJK6Y (ORCPT
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:20574
+        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752241AbdKJPmc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Nov 2017 05:58:24 -0500
-Subject: Re: [PATCH 4/4] kbuild: optimize object directory creation for
- incremental build
-References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
- <1510242077-8122-5-git-send-email-yamada.masahiro@socionext.com>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <83744f82-8800-7c67-df58-e8925c8d50a3@cn.fujitsu.com>
-Date: Fri, 10 Nov 2017 18:58:26 +0800
+        Fri, 10 Nov 2017 10:42:32 -0500
+Date: Fri, 10 Nov 2017 16:42:25 +0100 (CET)
+From: Julia Lawall <julia.lawall@lip6.fr>
+Subject: Re: [PATCH v2] coccinelle: fix parallel build with
+ CHECK=scripts/coccicheck
+In-Reply-To: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com>
+Message-ID: <alpine.DEB.2.20.1711101634225.3187@hadrien>
+References: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-In-Reply-To: <1510242077-8122-5-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, cocci@systeme.lip6.fr, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
 
-Masahiro-san
 
-On 11/09/2017 11:41 PM, Masahiro Yamada wrote:
-> The previous commit largely optimized the object directory creation.
-> We can optimize it more for incremental build.
-> 
-> There are already *.cmd files in the output directory.  The existing
-> *.cmd files have been picked up by $(wildcard ...).  Obviously,
-> directories containing them exist too, so we can skip "mkdir -p".
-> 
-> With this, Kbuild runs almost zero "mkdir -p" in incremental building.
-> 
+
+On Thu, 9 Nov 2017, Masahiro Yamada wrote:
+
+> The command "make -j8 C=1 CHECK=scripts/coccicheck" produces lots of
+> "coccicheck failed" error messages.
+
+The question is where parallelism should be specified.  Currently, make
+coccicheck picks up the number of cores on the machine and passes that to
+Coccinelle.
+
+OPTIONS="$OPTIONS --jobs $NPROC --chunksize 1"
+
+On my 80 core machine with hyperthreading, this runs 160 jobs in parallel,
+while in practice that degrades the performance as compared to 40 or 80
+cores.
+
+On the other hand, if we use the make command line argument (-j), then we
+will only get parallelism up to the number of semantic patches.  Since
+some finish quickly, there will be a lot of wasted cycles.
+
+The best would be that the user knows what works well for his machine, and
+specifies it on the command line, and then that value gets propagated to
+Coccinelle, eg so that -j8 would cause not 8 semantic patches to run in
+parallel but instead would cause Coccinelle to run one semantic patch on 8
+files in parallel.  But I don't know if that can be done.
+
+julia
+
+>
+> I do not know the coccinelle internals, but I guess --jobs does not
+> work well if spatch is invoked from Make running in parallel.
+> Disable --jobs in this case.
+>
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
-> 
->  scripts/Makefile.build | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 89ac180..90ea7a5 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -583,8 +583,13 @@ endif
->  ifneq ($(KBUILD_SRC),)
->  # Create directories for object files if directory does not exist
->  obj-dirs := $(sort $(obj) $(patsubst %/,%, $(dir $(targets))))
-> +# If cmd_files exist, their directories apparently exist.  Skip mkdir.
-> +exist-dirs := $(sort $(patsubst %/,%, $(dir $(cmd_files))))
-> +obj-dirs := $(strip $(filter-out . $(exist-dirs), $(obj-dirs)))
-
-First I am not sure if the dot "." here is necessary, because I guess
-kbuild always descend into subdir do recursive make, so, very
-$(cmd_files) should have at least 1 level dir.
-
-Second, Assuming that "." probably exists, would it be "./"? because it
-is what "dir" function returns.
-
--- 
-Sincerely,
-Cao jin
-
-> +ifneq ($(obj-dirs),)
->  $(shell mkdir -p $(obj-dirs))
->  endif
-> +endif
->  
-
-
-
-
+>
+> Changes in v2:
+>   - Grep '-j' instead of '--jobserver-auth'.
+>     '--jobserver-*' is not a stable option flag.
+>     Make 4.2 change '--jobserver-fds' into '--jobserver-auth'
+>   - Add -q option to grep
+>
+>  scripts/coccicheck | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/scripts/coccicheck b/scripts/coccicheck
+> index 040a8b1..8bab11e 100755
+> --- a/scripts/coccicheck
+> +++ b/scripts/coccicheck
+> @@ -70,6 +70,9 @@ if [ "$C" = "1" -o "$C" = "2" ]; then
+>      # Take only the last argument, which is the C file to test
+>      shift $(( $# - 1 ))
+>      OPTIONS="$COCCIINCLUDE $1"
+> +
+> +    # --jobs does not work if Make is running in parallel
+> +    echo $MAKEFLAGS | grep -q -E '(^| )-j' && USE_JOBS="no"
+>  else
+>      ONLINE=0
+>      if [ "$KBUILD_EXTMOD" = "" ] ; then
+> --
+> 2.7.4
+>
+>
