@@ -1,84 +1,125 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:20574
-        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752241AbdKJPmc (ORCPT
+Received: from mail-vk0-f51.google.com ([209.85.213.51]:52707 "EHLO
+        mail-vk0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752625AbdKJRek (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Nov 2017 10:42:32 -0500
-Date: Fri, 10 Nov 2017 16:42:25 +0100 (CET)
-From: Julia Lawall <julia.lawall@lip6.fr>
-Subject: Re: [PATCH v2] coccinelle: fix parallel build with
- CHECK=scripts/coccicheck
-In-Reply-To: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com>
-Message-ID: <alpine.DEB.2.20.1711101634225.3187@hadrien>
-References: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com>
+        Fri, 10 Nov 2017 12:34:40 -0500
+Received: by mail-vk0-f51.google.com with SMTP id i133so6549336vke.9
+        for <linux-kbuild@vger.kernel.org>; Fri, 10 Nov 2017 09:34:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAK7LNATxOq+_a3GdiJFu2HWrs5oykzPr3LsXNAoDYHR_uaeNYA@mail.gmail.com>
+References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
+ <1510242077-8122-2-git-send-email-yamada.masahiro@socionext.com>
+ <CAD=FV=VQ2YoWd0ARSk6z03zFzKmem6VbJ4r5T0aoGh7kGhwaDw@mail.gmail.com> <CAK7LNATxOq+_a3GdiJFu2HWrs5oykzPr3LsXNAoDYHR_uaeNYA@mail.gmail.com>
+From: Doug Anderson <dianders@chromium.org>
+Date: Fri, 10 Nov 2017 09:34:38 -0800
+Message-ID: <CAD=FV=VrNhPHYycU0onm01y8Rv0tHscHYdExH_5VK2OquBjc0g@mail.gmail.com>
+Subject: Re: [PATCH 1/4] kbuild: create directory for make cache only when necessary
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, cocci@systeme.lip6.fr, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>
 
+Hi,
 
-
-On Thu, 9 Nov 2017, Masahiro Yamada wrote:
-
-> The command "make -j8 C=1 CHECK=scripts/coccicheck" produces lots of
-> "coccicheck failed" error messages.
-
-The question is where parallelism should be specified.  Currently, make
-coccicheck picks up the number of cores on the machine and passes that to
-Coccinelle.
-
-OPTIONS="$OPTIONS --jobs $NPROC --chunksize 1"
-
-On my 80 core machine with hyperthreading, this runs 160 jobs in parallel,
-while in practice that degrades the performance as compared to 40 or 80
-cores.
-
-On the other hand, if we use the make command line argument (-j), then we
-will only get parallelism up to the number of semantic patches.  Since
-some finish quickly, there will be a lot of wasted cycles.
-
-The best would be that the user knows what works well for his machine, and
-specifies it on the command line, and then that value gets propagated to
-Coccinelle, eg so that -j8 would cause not 8 semantic patches to run in
-parallel but instead would cause Coccinelle to run one semantic patch on 8
-files in parallel.  But I don't know if that can be done.
-
-julia
-
->
-> I do not know the coccinelle internals, but I guess --jobs does not
-> work well if spatch is invoked from Make running in parallel.
-> Disable --jobs in this case.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
-> Changes in v2:
->   - Grep '-j' instead of '--jobserver-auth'.
->     '--jobserver-*' is not a stable option flag.
->     Make 4.2 change '--jobserver-fds' into '--jobserver-auth'
->   - Add -q option to grep
->
->  scripts/coccicheck | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/scripts/coccicheck b/scripts/coccicheck
-> index 040a8b1..8bab11e 100755
-> --- a/scripts/coccicheck
-> +++ b/scripts/coccicheck
-> @@ -70,6 +70,9 @@ if [ "$C" = "1" -o "$C" = "2" ]; then
->      # Take only the last argument, which is the C file to test
->      shift $(( $# - 1 ))
->      OPTIONS="$COCCIINCLUDE $1"
-> +
-> +    # --jobs does not work if Make is running in parallel
-> +    echo $MAKEFLAGS | grep -q -E '(^| )-j' && USE_JOBS="no"
->  else
->      ONLINE=0
->      if [ "$KBUILD_EXTMOD" = "" ] ; then
-> --
-> 2.7.4
+On Thu, Nov 9, 2017 at 8:12 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>>> +cache-dir := $(if $(KBUILD_SRC),$(if $(cache-data),,$(dir $(make-cache))))
+>>
+>> It wouldn't hurt to add a comment that cache-dir will be blank if we
+>> don't need to make the cache dir and will contain a directory path
+>> only if the dir doesn't exist.  Without a comment it could take
+>> someone quite a while to realize that...
 >
 >
+> You are right. This is confusing.
+>
+>
+> Another idea is use a boolean flag.
+>
+>
+> For example, like follows:
+>
+>
+> create-cache-dir := $(if $(KBUILD_SRC),$(if $(cache-data),,1)))
+>
+>
+>  define __run-and-store
+>  ifeq ($(origin $(1)),undefined)
+>    $$(eval $(1) := $$(shell $$(2)))
+>  ifeq ($(create-cache-dir),1)
+>   $$(shell mkdir -p $(dir $(make-cache)))
+>   $$(eval create-cache-dir :=)
+>  endif
+>    $$(shell echo '$(1) := $$($(1))' >> $(make-cache))
+>  endif
+>  endef
+>
+>
+>
+> Perhaps, this is clearer and self-documenting.
+
+Yes, that would be self-documenting enough for me.
+
+
+>>> +
+>>>  # Usage: $(call __sanitize-opt,Hello=Hola$(comma)Goodbye Adios)
+>>>  #
+>>>  # Convert all '$', ')', '(', '\', '=', ' ', ',', ':' to '_'
+>>> @@ -136,6 +137,10 @@ __sanitize-opt = $(subst $$,_,$(subst $(right_paren),_,$(subst $(left_paren),_,$
+>>>  define __run-and-store
+>>>  ifeq ($(origin $(1)),undefined)
+>>>    $$(eval $(1) := $$(shell $$(2)))
+>>> +ifneq ($(cache-dir),)
+>>> +  $$(shell mkdir -p $(cache-dir))
+>>
+>> I _think_ you want some single quotes in there.  AKA:
+>>
+>> $$(shell mkdir -p '$(cache-dir)')
+>>
+>> That at least matches what the "old" code used to do.  Specifically if
+>> 'cache-dir' happens to have a space in it then it won't work right
+>> without the single quotes.  There may be other symbols that your shell
+>> might interpret in interesting ways, too.
+>
+>
+> Kbuild always runs in the output directory.
+>
+> So, 'cache-dir' is always a relative path from the top of kernel directory
+> whether O= option is given or not.
+>
+>
+> For kernel source, I do not see any file path containing spaces.
+>
+> Just in case, I renamed a directory and tested, but
+> something strange happened in silentoldconfig, it would not work.
+>
+>
+> Insane people may want to use a file path with spaces
+> for external modules.
+>
+> I tested,
+>
+>      obj-m  := fo o/
+>
+> but, this would not work either.
+>
+>
+> It will be difficult to make it work
+> because $(sort ...) is used in several places
+> in core makefiles.
+>
+>
+> So, my conclusion is, it does not work.
+
+OK.  This doesn't surprise me, but I'd never though through all the
+cases.  Thanks for checking!
+
+Even so, if it's all the same to you I'd get a warm fuzzy if the
+single quotes were there.  It shouldn't hurt to have them and it seems
+like it lessens the chances of problems in the future.  ...but I won't
+make a big stink about it and I'll leave it to your discretion.
+
+
+-Doug
