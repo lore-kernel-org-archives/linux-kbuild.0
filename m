@@ -1,69 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:55100 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750793AbdKJG0o (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:59658 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750756AbdKJHfR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Nov 2017 01:26:44 -0500
-Date: Fri, 10 Nov 2017 07:26:40 +0100
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH 3/4] kbuild: create object directories simpler and faster
-Message-ID: <20171110062640.kjqpo4houbybzjex@gmail.com>
-References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
- <1510242077-8122-4-git-send-email-yamada.masahiro@socionext.com>
+        Fri, 10 Nov 2017 02:35:17 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: [PATCH RFC] kbuild: fixes in Makefile.lib
+Date: Fri, 10 Nov 2017 15:35:04 +0800
+Message-ID: <20171110073504.13836-1-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1510242077-8122-4-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@amacapital.net>, Ingo Molnar <mingo@redhat.com>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+
+commit
+
+  cf4f21938e13e ("kbuild: Allow to specify composite modules with modname-m")
+
+add modname-m support, but miss to update the corresponding multi-objs-m
+defination.
+
+commit 551559e13af1c ("kbuild: implement modules.order") miss to filter
+the subdir listed in obj-m. Except that the subdirs are totally identical
+between obj-y and obj-m, or else I think it will miss something.
+
+But until now, no one has complaining about it, so I guess it just no
+one has triggerred it.
+
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+I found these 2 points which I think might be wrong during code
+inspection, but until now, they seems didn't do anything bad, so I am not
+sure this is a problem:)
+
+ scripts/Makefile.lib | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 580e605118e4..3209f303213b 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -22,7 +22,7 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
+ # Determine modorder.
+ # Unfortunately, we don't have information about ordering between -y
+ # and -m subdirs.  Just put -y's first.
+-modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
++modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y) $(obj-m) $(obj-m:.o=.ko))
+ 
+ # Handle objects in subdirs
+ # ---------------------------------------------------------------------------
+@@ -49,7 +49,7 @@ single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
+ # Build list of the parts of our composite objects, our composite
+ # objects depend on those (obviously)
+ multi-objs-y := $(foreach m, $(multi-used-y), $($(m:.o=-objs)) $($(m:.o=-y)))
+-multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)))
++multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))
+ multi-objs   := $(multi-objs-y) $(multi-objs-m)
+ 
+ # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
+-- 
+2.13.6
 
 
-* Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-> For the out-of-tree build, scripts/Makefile.build creates output
-> directories, but this operation is not efficient.
-> 
-> scripts/Makefile.lib calculates obj-dirs as follows:
-> 
->   obj-dirs := $(dir $(multi-objs) $(obj-y))
-> 
-> Please notice $(sort ...) is not used here.  Usually the resulted
-> obj-dirs is as many "./" as objects.
-> 
-> For those duplicated paths, the following command is invoked.
-> 
->   _dummy := $(foreach d,$(obj-dirs), $(shell [ -d $(d) ] || mkdir -p $(d)))
-> 
-> Then, the costly shell command is run over and over again.
-> 
-> I see many points for optimization:
-> 
-> [1] Use $(sort ...) to cut down duplicated paths before passing them
->     to system call
-> [2] Use single $(shell ...) instead of repeating it with $(foreach ...)
->     This will reduce forking.
-> [3] We can calculate obj-dirs more simply.  Most of objects are already
->     accumulated in $(targets).  So, $(dir $(targets)) is fine and more
->     comprehensive.
-> 
-> I also removed bad code in arch/x86/entry/vdso/Makefile.  This is now
-> really unnecessary.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
->  arch/x86/entry/vdso/Makefile |  4 ----
->  scripts/Makefile.build       | 15 ++++++---------
->  scripts/Makefile.host        | 11 -----------
->  scripts/Makefile.lib         |  5 -----
->  4 files changed, 6 insertions(+), 29 deletions(-)
-
-I love not just the speedup, but the diffstat as well ;-)
-
-Acked-by: Ingo Molnar <mingo@kernel.org>
-
-Thanks,
-
-	Ingo
