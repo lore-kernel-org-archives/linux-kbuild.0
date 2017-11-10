@@ -1,117 +1,160 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:57774 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751537AbdKIXGr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Nov 2017 18:06:47 -0500
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:61186 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755664AbdKJCwv (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 9 Nov 2017 21:52:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNARzRUA6ZGQUiebZ+nmLBSAVdYONsozHBf0VQb83KqSx1g@mail.gmail.com>
-References: <1509859853-27473-1-git-send-email-yamada.masahiro@socionext.com>
- <1509859853-27473-2-git-send-email-yamada.masahiro@socionext.com>
- <CAK7LNAQfK_BWQcVW-ScrpAwNAHav3MrrzV-tjn_YUjsuvd7U5A@mail.gmail.com>
- <20171106095139.GG15260@jhogan-linux> <CAK7LNAQ_bugEP8hHKmCif5QCz2=Pw_GpXzYz4zJeXO0HXaT_ag@mail.gmail.com>
- <CAL_JsqJ8taCKnr_79UumiH2GFYq-fMzzkYm2iYevTOgUUWuzvg@mail.gmail.com>
- <CAK7LNATZ9O4cCpxLrG3MJoKYF+RnURkY4-tY2MdiZb90eGPtQg@mail.gmail.com> <CAK7LNARzRUA6ZGQUiebZ+nmLBSAVdYONsozHBf0VQb83KqSx1g@mail.gmail.com>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Thu, 9 Nov 2017 17:06:25 -0600
-Message-ID: <CAL_JsqJF=AV_m7DJyc4GGX0xrbvn+yJ05Oy8EWoM+FO8qr=k2g@mail.gmail.com>
-Subject: Re: [PATCH 1/2] MIPS: dts: remove bogus bcm96358nb4ser.dtb from dtb-y entry
+In-Reply-To: <CAKwvOdnsmx43ocFqCLc5ymWkMP8mfju7w0TNbnKmzcbTn3=MAg@mail.gmail.com>
+References: <CAKwvOdn4EWb_T6QgcYmEN1JKvVzC6otJ=g+2OUa8Chtq7aY1mw@mail.gmail.com>
+ <20171107194614.89371-1-ndesaulniers@google.com> <CAK7LNAS90eS+5m2LG_XYAva2Hy2usTX-=HuD6JwMny77V==jWw@mail.gmail.com>
+ <CAKwvOdnsmx43ocFqCLc5ymWkMP8mfju7w0TNbnKmzcbTn3=MAg@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 10 Nov 2017 11:52:01 +0900
+Message-ID: <CAK7LNAS1NaqPRhK6FOXN=YTMhLagpSrR2=tXn-uWZbpzr=NeoQ@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: James Hogan <jhogan@kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ralf Baechle <ralf@linux-mips.org>, Linux-MIPS <linux-mips@linux-mips.org>, Kevin Cernekee <cernekee@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?Q?Jan=2DSimon_M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Chris Fries <cfries@google.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Nov 8, 2017 at 6:38 PM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2017-11-09 9:11 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->> 2017-11-09 1:51 GMT+09:00 Rob Herring <robh+dt@kernel.org>:
->>> On Mon, Nov 6, 2017 at 5:00 AM, Masahiro Yamada
->>> <yamada.masahiro@socionext.com> wrote:
->>>> 2017-11-06 19:41 GMT+09:00 James Hogan <jhogan@kernel.org>:
->>>>> Hi,
->>>>>
->>>>> On Sun, Nov 05, 2017 at 11:11:38PM +0900, Masahiro Yamada wrote:
->>>>>> +CC Ralf Baechle <ralf@linux-mips.org>
->>>>>> +CC linux-mips@linux-mips.org
->>>>>> +CC Kevin Cernekee <cernekee@gmail.com>
->>>>>> +CC Florian Fainelli <f.fainelli@gmail.com>
->>>>>>
->>>>>>
->>>>>> I missed to CC MIPS maintainers.
->>>>>
->>>>> Yes, please resend the patch so it lands in patchwork.linux-mips.org.
->>>>
->>>>
->>>> This is a part of clean-up series of DT building.
->>>>
->>>> I want Acked-by from MIPS maintainers
->>>> so that the whole series can go to a different tree.
->>>> (DT or Kbuild).
->>>>
->>>>
->>>> Sam addressed more clean-up candidates in MIPS Makefiles
->>>> https://patchwork.kernel.org/patch/10041879/
->>>>
->>>> So, I will probably end up with touching those Makefiles more.
->>>>
->>>> All patches must go to the same tree.
->>>>
->>>>
->>>>>> 2017-11-05 14:30 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->>>>>> > arch/mips/boot/dts/brcm/bcm96358nb4ser.dts does not exist, so
->>>>>> > we cannot build bcm96358nb4ser.dtb .
->>>>>
->>>>> This appears to be due to the file being renamed in commit 695835511f96
->>>>> ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom").
->>>>> Please can you update the commit message when you resend to mention the
->>>>> cause of the problem.
->>>>>
->>>>> You could also add the following if you like while you're at it:
->>>>>
->>>>> Fixes: 695835511f96 ("MIPS: BMIPS: rename bcm96358nb4ser to bcm6358-neufbox4-sercom")
->>>>> Cc: <stable@vger.kernel.org> # 4.9+
+Hi Nick,
+
+
+2017-11-10 1:51 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+> On Wed, Nov 8, 2017 at 8:31 PM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> 2017-11-08 4:46 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+>>> We didn't notice this problem on Android, because we took the original
+>>> LLVMLinux patch into our 4.4 kernels, which did not have this issue. We
+>>> ran into this taking the proper upstream patch on newer kernel versions.
+>>> The original LLVMLinux patch can be seen at:
 >>>
->>> I think this one can be applied independently and we'd want it to if
->>> we tag for stable. So I think it can go thru the MIPS tree.
+>>> http://git.linuxfoundation.org/?p=llvmlinux/kernel.git;a=blobdiff;f=Makefile;h=389006c4ef494cda3a1ee52bf355618673ab4f31;hp=e41a3356abee83f08288362950bfceebd25ec3c2;hb=ef9126da11b18ff34eb1f01561f53c378860336c;hpb=f800c25b7a762d445ba1439a2428c8362157eba6
 >>>
+>>> It seems that when the patch was re-upstreamed, a V2 was requested that
+>>> moved the definition of Clang's target triple to be later in the top
+>>> level Makefile than the inclusion of the arch specific Makefile,
+>>> breaking macros like ld-option when cross compiling. V2 was requested
+>>> at:
+>>>
+>>> https://lkml.org/lkml/2017/4/21/116
 >>
+>> IMO, this description is not helpful in any way in upstream.
 >>
->> As I said to MIPS folks, this patch must go before 2/2.
->>
->> You picked up only 2/2, so your dt/kbuild branch is broken.
->>
->>
->> make ARCH=mips allyesconfig
->> && make ARCH=mips CROSS_COMPILE=mips-linux- dtbs
->>
->>
->> will produce the following error.
->>
->>
->> make[2]: *** No rule to make target
->> 'arch/mips/boot/dts/brcm/bcm96358nb4ser.dtb', needed by '__build'.
->> Stop.
->> scripts/Makefile.build:570: recipe for target 'arch/mips/boot/dts/brcm' failed
->> make[1]: *** [arch/mips/boot/dts/brcm] Error 2
->> arch/mips/Makefile:413: recipe for target 'dtbs' failed
->> make: *** [dtbs] Error 2
->>
+>> Moreover,
+>> 785f11aa595bc3d4e74096cbd598ada54ecc0d81
+>> did not break anything.   It sound unfair to me.
 >
+> Ok, I will cut that part description on v3.
 >
-> Looking into it, probably
-> bmips_dtb_defconfig was already broken regardless my patches.
+>>> diff --git a/Makefile b/Makefile
+>>> index a7476e6934f1..d349734c7ef7 100644
+>>> --- a/Makefile
+>>> +++ b/Makefile
+>>> @@ -472,6 +472,38 @@ ifneq ($(KBUILD_SRC),)
+>>>             $(srctree) $(objtree) $(VERSION) $(PATCHLEVEL)
+>>>  endif
+>>>
+>>> +ifeq ($(cc-name),clang)
+>>> +ifneq ($(CROSS_COMPILE),)
+>>> +CLANG_TARGET   := -target $(notdir $(CROSS_COMPILE:%-=%))
+>>> +GCC_TOOLCHAIN  := $(realpath $(dir $(shell which $(LD)))/..)
+>>> +endif
+>>> +ifneq ($(GCC_TOOLCHAIN),)
+>>> +CLANG_GCC_TC   := -gcc-toolchain $(GCC_TOOLCHAIN)
+>>> +endif
+>>> +KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+>>> +KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+>>> +KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+>>> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+>>> +KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+>>> +KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+>>> +KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
+>>> +# Quiet clang warning: comparison of unsigned expression < 0 is always false
+>>> +KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+>>> +# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+>>> +# source of a reference will be _MergedGlobals and not on of the whitelisted names.
+>>> +# See modpost pattern 2
+>>> +KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+>>> +KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+>>> +KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+>>> +KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+>>> +else
+>>> +
+>>> +# These warnings generated too much noise in a regular build.
+>>> +# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+>>> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+>>> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+>>> +endif
+>>> +
+>>
+>>
+>> Could you move this a bit later, please?
+>>
+>>
+>>
+>> # These warnings generated too much noise in a regular build.
+>> # Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+>> KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+>> KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+>> endif
+>>
+>>   << INSERT HERE >>
+>>
+>> # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
+>> # values of the respective KBUILD_* variables
+>> ARCH_CPPFLAGS :=
+>> ARCH_AFLAGS :=
+>> ARCH_CFLAGS :=
+>> include arch/$(SRCARCH)/Makefile
+>>
+>>
+>>
+>>
+>>
+>>
+>> arch/$(SRCARCH)/Makefile is included for config targets
+>> for KBUILD_DEFCONFIG, but no reason to compute compiler flags.
+>> I want to cut unnecessary cc-option parsing.
 >
-> But, I am not comfortable with breaking all{yes,mod}config
-> because they are often used for build test.
->
->
-> I hope you can apply this in the order as I sent,
-> with the following tag.
->
-> Fixes: 695835511f96 ("MIPS: BMIPS: rename bcm96358nb4ser to
-> bcm6358-neufbox4-sercom")
-> Cc: <stable@vger.kernel.org> # 4.9+
+> With the new try-run-cached macros, if the arch/$(SRCARCH)/Makefile
+> gets included twice, with the compiler flags not set correctly for
+> clang to cross compile, and the results are cached, wont they be wrong
+> the second time the arch specific Makefile is included?
+> --
 
-Okay, now applied.
+Good point.
 
-Rob
+The cached data from arch/$(SRCARCH)/Makefile for configuration
+is not used for the second run.
+That means some garbage data in the cache file, but less than 10, I think.
+
+You do not need to give CC or CROSS_COMPILE for kernel configuration
+in the first place.
+
+So,
+   make ARCH=arm64 defconfig
+   make ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu-
+
+should be fine.
+
+Even if we place lots of clang's cc-option earlier,
+users may not give the same CC for configuration and building.
+
+
+I think more optimized way is to skip computing cc-option for
+"make *config", "make clean" etc.
+
+I tried to do that.
+https://patchwork.kernel.org/patch/9983827/
+
+
+I decided to take time for cleaner implementation,
+but that is what I'd like to achieve in the future.
+
+
+-- 
+Best Regards
+Masahiro Yamada
