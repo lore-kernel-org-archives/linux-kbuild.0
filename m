@@ -1,125 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f51.google.com ([209.85.213.51]:52707 "EHLO
-        mail-vk0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752625AbdKJRek (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Nov 2017 12:34:40 -0500
-Received: by mail-vk0-f51.google.com with SMTP id i133so6549336vke.9
-        for <linux-kbuild@vger.kernel.org>; Fri, 10 Nov 2017 09:34:40 -0800 (PST)
+Received: from mout.web.de ([212.227.15.4]:63568 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753400AbdKJScU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 10 Nov 2017 13:32:20 -0500
+Subject: Re: [PATCH 00/10] scripts/basic: Fine-tuning for seven function
+ implementations
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+References: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
+Message-ID: <9fcfb92e-2362-7111-e68f-5f6de02648e3@users.sourceforge.net>
+Date: Fri, 10 Nov 2017 19:32:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATxOq+_a3GdiJFu2HWrs5oykzPr3LsXNAoDYHR_uaeNYA@mail.gmail.com>
-References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
- <1510242077-8122-2-git-send-email-yamada.masahiro@socionext.com>
- <CAD=FV=VQ2YoWd0ARSk6z03zFzKmem6VbJ4r5T0aoGh7kGhwaDw@mail.gmail.com> <CAK7LNATxOq+_a3GdiJFu2HWrs5oykzPr3LsXNAoDYHR_uaeNYA@mail.gmail.com>
-From: Doug Anderson <dianders@chromium.org>
-Date: Fri, 10 Nov 2017 09:34:38 -0800
-Message-ID: <CAD=FV=VrNhPHYycU0onm01y8Rv0tHscHYdExH_5VK2OquBjc0g@mail.gmail.com>
-Subject: Re: [PATCH 1/4] kbuild: create directory for make cache only when necessary
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>
+To: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org, Jim Davis <jim.epost@gmail.com>
 
-Hi,
+> Date: Fri, 28 Oct 2016 10:18:10 +0200
+> 
+> Some update suggestions were taken into account
+> from static source code analysis.
+> 
+> Markus Elfring (10):
+>   bin2c: Complete error handling in main()
+>   fixdep: Complete error handling in print_deps()
+>   fixdep: Use the symbol "MAP_FAILED" in print_deps()
+>   fixdep: Fix error log output in print_deps()
+>   fixdep: Complete error handling in parse_dep_file()
+>   fixdep: Complete error handling in do_config_file()
+>   fixdep: Fix error log output in do_config_file()
+>   fixdep: Complete error handling in print_config()
+>   fixdep: Complete error handling in print_cmdline()
+>   fixdep: Combine two fprintf() calls into one fputs() call in usage()
+> 
+>  scripts/basic/bin2c.c  |  26 ++++++----
+>  scripts/basic/fixdep.c | 131 +++++++++++++++++++++++++++++++++----------------
+>  2 files changed, 105 insertions(+), 52 deletions(-)
 
-On Thu, Nov 9, 2017 at 8:12 PM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->>> +cache-dir := $(if $(KBUILD_SRC),$(if $(cache-data),,$(dir $(make-cache))))
->>
->> It wouldn't hurt to add a comment that cache-dir will be blank if we
->> don't need to make the cache dir and will contain a directory path
->> only if the dir doesn't exist.  Without a comment it could take
->> someone quite a while to realize that...
->
->
-> You are right. This is confusing.
->
->
-> Another idea is use a boolean flag.
->
->
-> For example, like follows:
->
->
-> create-cache-dir := $(if $(KBUILD_SRC),$(if $(cache-data),,1)))
->
->
->  define __run-and-store
->  ifeq ($(origin $(1)),undefined)
->    $$(eval $(1) := $$(shell $$(2)))
->  ifeq ($(create-cache-dir),1)
->   $$(shell mkdir -p $(dir $(make-cache)))
->   $$(eval create-cache-dir :=)
->  endif
->    $$(shell echo '$(1) := $$($(1))' >> $(make-cache))
->  endif
->  endef
->
->
->
-> Perhaps, this is clearer and self-documenting.
+Are these update suggestions worth for another look?
+https://lkml.org/lkml/2016/10/28/138
 
-Yes, that would be self-documenting enough for me.
-
-
->>> +
->>>  # Usage: $(call __sanitize-opt,Hello=Hola$(comma)Goodbye Adios)
->>>  #
->>>  # Convert all '$', ')', '(', '\', '=', ' ', ',', ':' to '_'
->>> @@ -136,6 +137,10 @@ __sanitize-opt = $(subst $$,_,$(subst $(right_paren),_,$(subst $(left_paren),_,$
->>>  define __run-and-store
->>>  ifeq ($(origin $(1)),undefined)
->>>    $$(eval $(1) := $$(shell $$(2)))
->>> +ifneq ($(cache-dir),)
->>> +  $$(shell mkdir -p $(cache-dir))
->>
->> I _think_ you want some single quotes in there.  AKA:
->>
->> $$(shell mkdir -p '$(cache-dir)')
->>
->> That at least matches what the "old" code used to do.  Specifically if
->> 'cache-dir' happens to have a space in it then it won't work right
->> without the single quotes.  There may be other symbols that your shell
->> might interpret in interesting ways, too.
->
->
-> Kbuild always runs in the output directory.
->
-> So, 'cache-dir' is always a relative path from the top of kernel directory
-> whether O= option is given or not.
->
->
-> For kernel source, I do not see any file path containing spaces.
->
-> Just in case, I renamed a directory and tested, but
-> something strange happened in silentoldconfig, it would not work.
->
->
-> Insane people may want to use a file path with spaces
-> for external modules.
->
-> I tested,
->
->      obj-m  := fo o/
->
-> but, this would not work either.
->
->
-> It will be difficult to make it work
-> because $(sort ...) is used in several places
-> in core makefiles.
->
->
-> So, my conclusion is, it does not work.
-
-OK.  This doesn't surprise me, but I'd never though through all the
-cases.  Thanks for checking!
-
-Even so, if it's all the same to you I'd get a warm fuzzy if the
-single quotes were there.  It shouldn't hurt to have them and it seems
-like it lessens the chances of problems in the future.  ...but I won't
-make a big stink about it and I'll leave it to your discretion.
-
-
--Doug
+Regards,
+Markus
