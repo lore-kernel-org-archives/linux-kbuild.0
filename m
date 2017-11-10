@@ -1,47 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:61090 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751292AbdKJJWK (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:38303 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752405AbdKJK6Y (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Nov 2017 04:22:10 -0500
-MIME-Version: 1.0
-In-Reply-To: <f036cb4e-d8e3-28d9-966e-14d6eb3599cf@cn.fujitsu.com>
+        Fri, 10 Nov 2017 05:58:24 -0500
+Subject: Re: [PATCH 4/4] kbuild: optimize object directory creation for
+ incremental build
 References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
- <1510242077-8122-4-git-send-email-yamada.masahiro@socionext.com> <f036cb4e-d8e3-28d9-966e-14d6eb3599cf@cn.fujitsu.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 10 Nov 2017 18:21:20 +0900
-Message-ID: <CAK7LNARs0_DFH5RO=Q8Gsn8xagO+7dPJ8217d56DAgSw5GYHsg@mail.gmail.com>
-Subject: Re: [PATCH 3/4] kbuild: create object directories simpler and faster
-Content-Type: text/plain; charset="UTF-8"
+ <1510242077-8122-5-git-send-email-yamada.masahiro@socionext.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <83744f82-8800-7c67-df58-e8925c8d50a3@cn.fujitsu.com>
+Date: Fri, 10 Nov 2017 18:58:26 +0800
+MIME-Version: 1.0
+In-Reply-To: <1510242077-8122-5-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@amacapital.net>, Ingo Molnar <mingo@redhat.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>
 
-Hi Cao,
+Masahiro-san
 
+On 11/09/2017 11:41 PM, Masahiro Yamada wrote:
+> The previous commit largely optimized the object directory creation.
+> We can optimize it more for incremental build.
+> 
+> There are already *.cmd files in the output directory.  The existing
+> *.cmd files have been picked up by $(wildcard ...).  Obviously,
+> directories containing them exist too, so we can skip "mkdir -p".
+> 
+> With this, Kbuild runs almost zero "mkdir -p" in incremental building.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
+>  scripts/Makefile.build | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 89ac180..90ea7a5 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -583,8 +583,13 @@ endif
+>  ifneq ($(KBUILD_SRC),)
+>  # Create directories for object files if directory does not exist
+>  obj-dirs := $(sort $(obj) $(patsubst %/,%, $(dir $(targets))))
+> +# If cmd_files exist, their directories apparently exist.  Skip mkdir.
+> +exist-dirs := $(sort $(patsubst %/,%, $(dir $(cmd_files))))
+> +obj-dirs := $(strip $(filter-out . $(exist-dirs), $(obj-dirs)))
 
-2017-11-10 17:45 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+First I am not sure if the dot "." here is necessary, because I guess
+kbuild always descend into subdir do recursive make, so, very
+$(cmd_files) should have at least 1 level dir.
 
->> +ifneq ($(KBUILD_SRC),)
->> +# Create directories for object files if directory does not exist
->> +obj-dirs := $(sort $(obj) $(patsubst %/,%, $(dir $(targets))))
->> +$(shell mkdir -p $(obj-dirs))
->> +endif
->> +
->
-> I just take a quick glance: is "$(obj)" here necessary? I think all
-> $(targets) are under directory $(obj) when we descend into $(obj) to
-> recursive make, if I don't miss anything.
-
-Good catch!
-
-I agree that $(obj) is unnecessary.
-I will remove it if I see no problem in testing.
-
-Thanks!
-
+Second, Assuming that "." probably exists, would it be "./"? because it
+is what "dir" function returns.
 
 -- 
-Best Regards
-Masahiro Yamada
+Sincerely,
+Cao jin
+
+> +ifneq ($(obj-dirs),)
+>  $(shell mkdir -p $(obj-dirs))
+>  endif
+> +endif
+>  
+
+
+
+
