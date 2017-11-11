@@ -1,76 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f194.google.com ([209.85.217.194]:46509 "EHLO
-        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753647AbdKJSqz (ORCPT
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:16505
+        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751299AbdKKHa6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Nov 2017 13:46:55 -0500
-Received: by mail-ua0-f194.google.com with SMTP id w47so3873698uah.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 10 Nov 2017 10:46:54 -0800 (PST)
+        Sat, 11 Nov 2017 02:30:58 -0500
+Date: Sat, 11 Nov 2017 08:30:37 +0100 (CET)
+From: Julia Lawall <julia.lawall@lip6.fr>
+Subject: Re: [Cocci] [PATCH v2] coccinelle: fix parallel build with
+ CHECK=scripts/coccicheck
+In-Reply-To: <alpine.DEB.2.20.1711101634225.3187@hadrien>
+Message-ID: <alpine.DEB.2.20.1711110826330.2161@hadrien>
+References: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com> <alpine.DEB.2.20.1711101634225.3187@hadrien>
 MIME-Version: 1.0
-In-Reply-To: <1510242077-8122-4-git-send-email-yamada.masahiro@socionext.com>
-References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com> <1510242077-8122-4-git-send-email-yamada.masahiro@socionext.com>
-From: Doug Anderson <dianders@chromium.org>
-Date: Fri, 10 Nov 2017 10:46:53 -0800
-Message-ID: <CAD=FV=VTc25vp94=1+oB+rabaX3uGCQXsGJ6jf7LGdVd79sn0g@mail.gmail.com>
-Subject: Re: [PATCH 3/4] kbuild: create object directories simpler and faster
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@amacapital.net>, Ingo Molnar <mingo@redhat.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, Nicolas Palix <nicolas.palix@imag.fr>, linux-kernel@vger.kernel.org, cocci@systeme.lip6.fr
 
-Hi,
 
-On Thu, Nov 9, 2017 at 7:41 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> For the out-of-tree build, scripts/Makefile.build creates output
-> directories, but this operation is not efficient.
->
-> scripts/Makefile.lib calculates obj-dirs as follows:
->
->   obj-dirs := $(dir $(multi-objs) $(obj-y))
->
-> Please notice $(sort ...) is not used here.  Usually the resulted
-> obj-dirs is as many "./" as objects.
->
-> For those duplicated paths, the following command is invoked.
->
->   _dummy := $(foreach d,$(obj-dirs), $(shell [ -d $(d) ] || mkdir -p $(d)))
->
-> Then, the costly shell command is run over and over again.
->
-> I see many points for optimization:
->
-> [1] Use $(sort ...) to cut down duplicated paths before passing them
->     to system call
-> [2] Use single $(shell ...) instead of repeating it with $(foreach ...)
->     This will reduce forking.
-> [3] We can calculate obj-dirs more simply.  Most of objects are already
->     accumulated in $(targets).  So, $(dir $(targets)) is fine and more
->     comprehensive.
->
-> I also removed bad code in arch/x86/entry/vdso/Makefile.  This is now
-> really unnecessary.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
->  arch/x86/entry/vdso/Makefile |  4 ----
->  scripts/Makefile.build       | 15 ++++++---------
->  scripts/Makefile.host        | 11 -----------
->  scripts/Makefile.lib         |  5 -----
->  4 files changed, 6 insertions(+), 29 deletions(-)
 
-I don't think I'm familiar enough with the full kbuild system to add a
-reviewed-by tag, but I looked this over and it seems like a nice idea
-to me.
+On Fri, 10 Nov 2017, Julia Lawall wrote:
 
-I tested this on my own machine which does do out of tree build and it
-did provide a speedup.  I didn't run a ton of measurements, but it
-appeared to save something like .5 seconds on a full "no-op" emerge
-for me (bringing it down from ~28.5 seconds to 28 seconds).  Things
-also seem to be working for me with this patch, though I'm only
-testing on my own workstation and not across any time of farm.  In any
-case:
+>
+>
+> On Thu, 9 Nov 2017, Masahiro Yamada wrote:
+>
+> > The command "make -j8 C=1 CHECK=scripts/coccicheck" produces lots of
+> > "coccicheck failed" error messages.
+>
+> The question is where parallelism should be specified.  Currently, make
+> coccicheck picks up the number of cores on the machine and passes that to
+> Coccinelle.
+>
+> OPTIONS="$OPTIONS --jobs $NPROC --chunksize 1"
+>
+> On my 80 core machine with hyperthreading, this runs 160 jobs in parallel,
+> while in practice that degrades the performance as compared to 40 or 80
+> cores.
+>
+> On the other hand, if we use the make command line argument (-j), then we
+> will only get parallelism up to the number of semantic patches.  Since
+> some finish quickly, there will be a lot of wasted cycles.
+>
+> The best would be that the user knows what works well for his machine, and
+> specifies it on the command line, and then that value gets propagated to
+> Coccinelle, eg so that -j8 would cause not 8 semantic patches to run in
+> parallel but instead would cause Coccinelle to run one semantic patch on 8
+> files in parallel.  But I don't know if that can be done.
 
-Tested-by: Douglas Anderson <dianders@chromium.org>
+Sorry for these fairly nonsensical comments.  make -j is going to consider
+every file, then parse and run every semantic patch on that file.  If the
+parallelism is pushed down into Coccinelle, each semantic patch will be
+parsed only once, and then Coccinelle will choose the files for which it
+is relevant.  If indexing is used (idutils, glimpse), then for semantic
+patches that focus on specific keywords, Coccinelle will efficiently
+ignore files that are not relevant.  I don't think there would be many
+cases where make -j would win.  Perhaps it would be possible to detect
+its used and abort with an appopriate message?
+
+julia
+
+
+>
+> julia
+>
+> >
+> > I do not know the coccinelle internals, but I guess --jobs does not
+> > work well if spatch is invoked from Make running in parallel.
+> > Disable --jobs in this case.
+> >
+> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > ---
+> >
+> > Changes in v2:
+> >   - Grep '-j' instead of '--jobserver-auth'.
+> >     '--jobserver-*' is not a stable option flag.
+> >     Make 4.2 change '--jobserver-fds' into '--jobserver-auth'
+> >   - Add -q option to grep
+> >
+> >  scripts/coccicheck | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/scripts/coccicheck b/scripts/coccicheck
+> > index 040a8b1..8bab11e 100755
+> > --- a/scripts/coccicheck
+> > +++ b/scripts/coccicheck
+> > @@ -70,6 +70,9 @@ if [ "$C" = "1" -o "$C" = "2" ]; then
+> >      # Take only the last argument, which is the C file to test
+> >      shift $(( $# - 1 ))
+> >      OPTIONS="$COCCIINCLUDE $1"
+> > +
+> > +    # --jobs does not work if Make is running in parallel
+> > +    echo $MAKEFLAGS | grep -q -E '(^| )-j' && USE_JOBS="no"
+> >  else
+> >      ONLINE=0
+> >      if [ "$KBUILD_EXTMOD" = "" ] ; then
+> > --
+> > 2.7.4
+> >
+> >
+> _______________________________________________
+> Cocci mailing list
+> Cocci@systeme.lip6.fr
+> https://systeme.lip6.fr/mailman/listinfo/cocci
+>
