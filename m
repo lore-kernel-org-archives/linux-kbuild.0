@@ -1,115 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:30023 "EHLO
-        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753805AbdKMQpH (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:53687 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752962AbdKMPZq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Nov 2017 11:45:07 -0500
-Date: Mon, 13 Nov 2017 17:45:00 +0100 (CET)
-From: Julia Lawall <julia.lawall@lip6.fr>
-Subject: Re: [PATCH v2] coccinelle: fix parallel build with
- CHECK=scripts/coccicheck
-In-Reply-To: <CAK7LNASpxfq6Vg42rogQg1bixNL15O=8152=KJEnKQA=Ez6Dxw@mail.gmail.com>
-Message-ID: <alpine.DEB.2.20.1711131744290.20292@hadrien>
-References: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com> <alpine.DEB.2.20.1711131628370.20333@hadrien> <CAK7LNASpxfq6Vg42rogQg1bixNL15O=8152=KJEnKQA=Ez6Dxw@mail.gmail.com>
+        Mon, 13 Nov 2017 10:25:46 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <878tfftiit.fsf@turtle.gmx.de>
+References: <878tfftiit.fsf@turtle.gmx.de>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 14 Nov 2017 00:25:00 +0900
+Message-ID: <CAK7LNATSVtZDTOEsCNtvhn2ifjrz4-+5Okq7SYpPC_CDvhLA_g@mail.gmail.com>
+Subject: Re: [PATCH] builddeb: Pass the kernel:debarch substvar to dpkg-genchanges
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, cocci@systeme.lip6.fr, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Sven Joachim <svenjoac@gmx.de>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+
+2017-11-10 3:27 GMT+09:00 Sven Joachim <svenjoac@gmx.de>:
+> At the end of "make bindeb-pkg" I noticed the following warning:
+>
+> dpkg-genchanges: warning: unknown substitution variable ${kernel:debarch}
+>
+> It turns out that since dpkg version 1.19.0 dpkg-genchanges honors
+> substitution variables in the Description field, while earlier
+> versions silently left them alone, see https://bugs.debian.org/856547.
+>
+> The result is an incomplete description of the linux-headers package
+> in the generated .changes file.  Fix it by passing the kernel:debarch
+> substitution variable to dpkg-genchanges.
+>
+> Signed-off-by: Sven Joachim <svenjoac@gmx.de>
+> ---
+
+Applied to linux-kbuild/misc.  Thanks!
 
 
 
-On Tue, 14 Nov 2017, Masahiro Yamada wrote:
 
-> Hi Julia,
->
->
-> 2017-11-14 0:30 GMT+09:00 Julia Lawall <julia.lawall@lip6.fr>:
-> >
-> >
-> > On Thu, 9 Nov 2017, Masahiro Yamada wrote:
-> >
-> >> The command "make -j8 C=1 CHECK=scripts/coccicheck" produces lots of
-> >> "coccicheck failed" error messages.
-> >>
-> >> I do not know the coccinelle internals, but I guess --jobs does not
-> >> work well if spatch is invoked from Make running in parallel.
-> >> Disable --jobs in this case.
-> >
-> > Why is this change under:
-> >
-> > if [ "$C" = "1" -o "$C" = "2" ];
-> >
-> > The coccicheck failed messages come also if one runs Coccinelle on the
-> > entire kernel.
->
-> As far as I tested, "coccicheck failed" error only happens
-> when ONLINE=1.
->
->
-> make -j8 C=1 CHECK=scripts/coccicheck  COCCI=scripts/coccinelle/misc/bugon.cocci
->
-> emits lots of errors.
->
->
-> make -j8 coccicheck  COCCI=scripts/coccinelle/misc/bugon.cocci
->
-> is fine.
->
->
-> Have you tested it?
-> Do you mean you got a different result from mine?
-
-I agree with your results, with respect to the number of errors.
-
-julia
-
->
->
->
-> > julia
-> >
-> >
-> >>
-> >> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> >> ---
-> >>
-> >> Changes in v2:
-> >>   - Grep '-j' instead of '--jobserver-auth'.
-> >>     '--jobserver-*' is not a stable option flag.
-> >>     Make 4.2 change '--jobserver-fds' into '--jobserver-auth'
-> >>   - Add -q option to grep
-> >>
-> >>  scripts/coccicheck | 3 +++
-> >>  1 file changed, 3 insertions(+)
-> >>
-> >> diff --git a/scripts/coccicheck b/scripts/coccicheck
-> >> index 040a8b1..8bab11e 100755
-> >> --- a/scripts/coccicheck
-> >> +++ b/scripts/coccicheck
-> >> @@ -70,6 +70,9 @@ if [ "$C" = "1" -o "$C" = "2" ]; then
-> >>      # Take only the last argument, which is the C file to test
-> >>      shift $(( $# - 1 ))
-> >>      OPTIONS="$COCCIINCLUDE $1"
-> >> +
-> >> +    # --jobs does not work if Make is running in parallel
-> >> +    echo $MAKEFLAGS | grep -q -E '(^| )-j' && USE_JOBS="no"
-> >>  else
-> >>      ONLINE=0
-> >>      if [ "$KBUILD_EXTMOD" = "" ] ; then
-> >> --
-> >> 2.7.4
-> >>
-> >>
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
->
+-- 
+Best Regards
+Masahiro Yamada
