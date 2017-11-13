@@ -1,43 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:17266 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754248AbdKMSw3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Nov 2017 13:52:29 -0500
-Date: Mon, 13 Nov 2017 10:52:27 -0800
-From: Andi Kleen <ak@linux.intel.com>
-Subject: Re: CONFIG_DEBUG_INFO_SPLIT impacts on faddr2line
-Message-ID: <20171113185227.GM8522@tassilo.jf.intel.com>
-References: <20171107102156.3fgxt6y6v5y2kqnf@wfg-t540p.sh.intel.com>
- <CA+55aFwqxZiN_XrZqvbtCsc8W=w895RaB1sjuVP1aTj8JStxzg@mail.gmail.com>
- <20171108094832.qxvkawpw2snpcbvh@wfg-t540p.sh.intel.com>
- <CA+55aFwK7935r325nmR-eQvanVCN3A+v3wEQHsW4NpSeBsybeA@mail.gmail.com>
- <20171108171230.ccf7lwutjysk26fc@wfg-t540p.sh.intel.com>
- <CA+55aFx0O+NTbBjavPm_jPucqHdXFYPmUya4kw=ps7LSqTFd5w@mail.gmail.com>
- <20171113011338.3qmnp64pttyscuus@wfg-t540p.sh.intel.com>
+Received: from webbox1416.server-home.net ([77.236.96.61]:40182 "EHLO
+        webbox1416.server-home.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753738AbdKMNf6 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 13 Nov 2017 08:35:58 -0500
+From: Alexander Stein <alexander.stein@systec-electronic.com>
+Subject: tools/iio: build race condition
+Date: Mon, 13 Nov 2017 14:28:23 +0100
+Message-ID: <1677426.KFAAP6tCV8@ws-stein>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171113011338.3qmnp64pttyscuus@wfg-t540p.sh.intel.com>
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fengguang Wu <fengguang.wu@intel.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Jeff Kirsher <jeffrey.t.kirsher@intel.com>, Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, intel-wired-lan@lists.osuosl.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Dirk Gouders <dirk@gouders.net>, linux-kbuild@vger.kernel.org, lkp@intel.com, "Zhang, Rui" <rui.zhang@intel.com>, "Lu, Aaron" <aaron.lu@intel.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-> > It's the "CONFIG_DEBUG_INFO_SPLIT" thing that makes faddr2line unable
-> > to see the inlining information,
-> > 
-> > Using OPTIMIZE_INLINING is fine.
-> 
-> Good to know that!
+Hi,
 
-It works for me. Perhaps your binutils is too old? It was
-added at some point. Can you try upgrading?
+I tried to compile the new v4.14 kernel and hit a race condition in the build system of tools/iio.
+Here is my output (sorry for German strings, I wasn't able to reproduce with LANG=C):
+> {master linux} % make O=build_x86/ -j9 tools/iio
+> make[1]: Verzeichnis „/home/alex/Dokumente/repo/linux/build_x86“ wird betreten
+>   DESCEND  iio
+> mkdir -p /home/alex/Dokumente/repo/linux/build_x86/tools/iio/include/linux/iio 2>&1 || true
+> ln -sf /home/alex/Dokumente/repo/linux/tools/iio/../../include/uapi/linux/iio/events.h /home/alex/Dokumente/repo/linux/build_x86/tools/iio/include/linux/iio
+> ln -sf /home/alex/Dokumente/repo/linux/tools/iio/../../include/uapi/linux/iio/types.h /home/alex/Dokumente/repo/linux/build_x86/tools/iio/include/linux/iio
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/lsiio.o
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_event_monitor.o
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_utils.o
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_utils.o
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_generic_buffer.o
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_utils.o
+>   LD       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_event_monitor-in.o
+>   LD       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/lsiio-in.o
+> /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_utils.o: file not recognized: File truncated
+> make[4]: *** [/home/alex/Dokumente/repo/linux/tools/build/Makefile.build:145: /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_event_monitor-in.o] Fehler 1
+> /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_utils.o: file not recognized: File truncated
+> make[3]: *** [Makefile:45: /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_event_monitor-in.o] Fehler 2
+> make[3]: *** Es wird auf noch nicht beendete Prozesse gewartet....
+> make[4]: *** [/home/alex/Dokumente/repo/linux/tools/build/Makefile.build:145: /home/alex/Dokumente/repo/linux/build_x86/tools/iio/lsiio-in.o] Fehler 1
+> make[3]: *** [Makefile:39: /home/alex/Dokumente/repo/linux/build_x86/tools/iio/lsiio-in.o] Fehler 2
+>   LD       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_generic_buffer-in.o
+> make[2]: *** [Makefile:62: iio] Fehler 2
+> make[1]: *** [/home/alex/Dokumente/repo/linux/Makefile:1628: tools/iio] Fehler 2
+> make[1]: Verzeichnis „/home/alex/Dokumente/repo/linux/build_x86“ wird verlassen
+> make: *** [Makefile:146: sub-make] Fehler 2
 
-% ./linux/scripts/faddr2line obj/vmlinux schedule+10
-schedule+10/0x80:
-schedule at arch/x86/include/asm/current.h:15
+This is my log using LANG=C:
+> {master linux} % git describe
+> v4.14-3-gd893dbcff8e3
+> {master linux} % rm -fr build_x86/tools/
+> {master linux} % LANG=C make O=build_x86/ -j9 tools/iio
+> make[1]: Entering directory '/home/alex/Dokumente/repo/linux/build_x86'
+>   DESCEND  iio
+> mkdir -p /home/alex/Dokumente/repo/linux/build_x86/tools/iio/include/linux/iio 2>&1 || true
+> ln -sf /home/alex/Dokumente/repo/linux/tools/iio/../../include/uapi/linux/iio/events.h /home/alex/Dokumente/repo/linux/build_x86/tools/iio/include/linux/iio
+> ln -sf /home/alex/Dokumente/repo/linux/tools/iio/../../include/uapi/linux/iio/types.h /home/alex/Dokumente/repo/linux/build_x86/tools/iio/include/linux/iio
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_event_monitor.o
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_utils.o
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/lsiio.o
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_utils.o
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_generic_buffer.o
+>   CC       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_utils.o
+>   LD       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_event_monitor-in.o
+>   LINK     /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_event_monitor
+>   LD       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/lsiio-in.o
+>   LD       /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_generic_buffer-in.o
+>   LINK     /home/alex/Dokumente/repo/linux/build_x86/tools/iio/lsiio
+>   LINK     /home/alex/Dokumente/repo/linux/build_x86/tools/iio/iio_generic_buffer
+> make[1]: Leaving directory '/home/alex/Dokumente/repo/linux/build_x86'
 
-% addr2line --version
-GNU addr2line version 2.27-24.fc26
+In both cases tools/iio/iio_utils.o is compiled thrice. Depending on the exact timing you might get a truncated file.
+I suspect the following commit: 18956cf2d78a ("iio: tools: move to tools buildsystem", 2017-07-29)
+as iio_utils.o is referenced in all 3 tools.
 
--Andi
+Best regards,
+Alexander
+
