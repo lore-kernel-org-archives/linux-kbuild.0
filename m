@@ -1,58 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:31835 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751682AbdKMIto (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:40692 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751377AbdKMJDB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Nov 2017 03:49:44 -0500
+        Mon, 13 Nov 2017 04:03:01 -0500
+Subject: Re: [PATCH RFC] kbuild: fixes in Makefile.lib
+References: <20171110073504.13836-1-caoj.fnst@cn.fujitsu.com>
+ <CAK7LNARtLpJKHJ3-izJ3AWi7uFJfsQWpdw+=7NkFE7hnsnm_8A@mail.gmail.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <0f8b66f6-636f-d359-0e5d-95067abf028f@cn.fujitsu.com>
+Date: Mon, 13 Nov 2017 17:03:09 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNARs0_DFH5RO=Q8Gsn8xagO+7dPJ8217d56DAgSw5GYHsg@mail.gmail.com>
-References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
- <1510242077-8122-4-git-send-email-yamada.masahiro@socionext.com>
- <f036cb4e-d8e3-28d9-966e-14d6eb3599cf@cn.fujitsu.com> <CAK7LNARs0_DFH5RO=Q8Gsn8xagO+7dPJ8217d56DAgSw5GYHsg@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 13 Nov 2017 17:48:55 +0900
-Message-ID: <CAK7LNASeMMxcXymwDVo1zGjyAOC+iEAvcZcVscyuESe2Yqm4NA@mail.gmail.com>
-Subject: Re: [PATCH 3/4] kbuild: create object directories simpler and faster
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNARtLpJKHJ3-izJ3AWi7uFJfsQWpdw+=7NkFE7hnsnm_8A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Andy Lutomirski <luto@amacapital.net>, Ingo Molnar <mingo@redhat.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-2017-11-10 18:21 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+On 11/13/2017 12:17 PM, Masahiro Yamada wrote:
 > Hi Cao,
->
->
-> 2017-11-10 17:45 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
->
->>> +ifneq ($(KBUILD_SRC),)
->>> +# Create directories for object files if directory does not exist
->>> +obj-dirs := $(sort $(obj) $(patsubst %/,%, $(dir $(targets))))
->>> +$(shell mkdir -p $(obj-dirs))
->>> +endif
->>> +
+> 
+> 
+
+>>  scripts/Makefile.lib | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
 >>
->> I just take a quick glance: is "$(obj)" here necessary? I think all
->> $(targets) are under directory $(obj) when we descend into $(obj) to
->> recursive make, if I don't miss anything.
->
-> Good catch!
->
-> I agree that $(obj) is unnecessary.
-> I will remove it if I see no problem in testing.
->
-> Thanks!
+>> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+>> index 580e605118e4..3209f303213b 100644
+>> --- a/scripts/Makefile.lib
+>> +++ b/scripts/Makefile.lib
+>> @@ -22,7 +22,7 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
+>>  # Determine modorder.
+>>  # Unfortunately, we don't have information about ordering between -y
+>>  # and -m subdirs.  Just put -y's first.
+>> -modorder       := $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
+>> +modorder       := $(patsubst %/,%/modules.order, $(filter %/, $(obj-y) $(obj-m) $(obj-m:.o=.ko))
+> 
+> 
+> This change caused build error.
+> 
+> scripts/Makefile.lib:25: *** unterminated call to function 'patsubst':
+> missing ')'.  Stop.
+> 
+> 
+> And, this change is not necessary.
+> 
+> $(filter %/, $(obj-m)) is a subset of $(obj-m:.o=.ko)
+> 
 
-I take back this comment.
+Ah huh! Yes
 
-I was testing it, and in fact
-Kbuild failed to create modules.order
-due to missing $(obj) directory.
+> 
+>>  # Handle objects in subdirs
+>>  # ---------------------------------------------------------------------------
+>> @@ -49,7 +49,7 @@ single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
+>>  # Build list of the parts of our composite objects, our composite
+>>  # objects depend on those (obviously)
+>>  multi-objs-y := $(foreach m, $(multi-used-y), $($(m:.o=-objs)) $($(m:.o=-y)))
+>> -multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)))
+>> +multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))
+>>  multi-objs   := $(multi-objs-y) $(multi-objs-m)
+>>
+>>  # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
+> 
+> 
+> This is also build error.
+> 
+> scripts/Makefile.lib:52: *** unterminated call to function 'foreach':
+> missing ')'.  Stop.
+> 
+> 
+> Please test your patch before submitting.
+> 
+
+Sorry for my mistake，I missed to test the patch this time incredibly:(
 
 
+> Assuming the build error will be fixed, this change is correct.
+> 
+> 
+> 
+> 
+> Also, modname-multi should be fixed.
+> 
+> modname-multi = $(sort $(foreach m,$(multi-used),\
+>                 $(if $(filter $(subst $(obj)/,,$*.o), $($(m:.o=-objs))
+> $($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=))))
+> 
 
+Yes, I also noticed here, but fail to remember it:(
 
+Thanks very much, Masahiro-san!
 
 -- 
-Best Regards
-Masahiro Yamada
+Sincerely,
+Cao jin
+
+
