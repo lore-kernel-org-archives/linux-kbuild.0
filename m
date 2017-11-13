@@ -1,40 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:53687 "EHLO
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:55271 "EHLO
         conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752962AbdKMPZq (ORCPT
+        with ESMTP id S1752758AbdKMP1q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Nov 2017 10:25:46 -0500
+        Mon, 13 Nov 2017 10:27:46 -0500
 MIME-Version: 1.0
-In-Reply-To: <878tfftiit.fsf@turtle.gmx.de>
-References: <878tfftiit.fsf@turtle.gmx.de>
+In-Reply-To: <1509644432-21252-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1509644432-21252-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 14 Nov 2017 00:25:00 +0900
-Message-ID: <CAK7LNATSVtZDTOEsCNtvhn2ifjrz4-+5Okq7SYpPC_CDvhLA_g@mail.gmail.com>
-Subject: Re: [PATCH] builddeb: Pass the kernel:debarch substvar to dpkg-genchanges
+Date: Tue, 14 Nov 2017 00:26:52 +0900
+Message-ID: <CAK7LNATw7iTKy2VLUd0toiKO7q8SuCTVRdSkhceANHuTPj93hw@mail.gmail.com>
+Subject: Re: [PATCH] sh: select KBUILD_DEFCONFIG depending on ARCH
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sven Joachim <svenjoac@gmx.de>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, Linux-sh list <linux-sh@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-11-10 3:27 GMT+09:00 Sven Joachim <svenjoac@gmx.de>:
-> At the end of "make bindeb-pkg" I noticed the following warning:
+2017-11-03 2:40 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> You can not select KBUILD_DEFCONFIG depending on any CONFIG option
+> because include/config/auto.conf is not included when building config
+> targets.  So, CONFIG_SUPERH32 is never set during the configuration,
+> and cayman_defconfig is chosen.
 >
-> dpkg-genchanges: warning: unknown substitution variable ${kernel:debarch}
+> This commit provides a sensible way to choose shx3/cayman_defconfig.
 >
-> It turns out that since dpkg version 1.19.0 dpkg-genchanges honors
-> substitution variables in the Description field, while earlier
-> versions silently left them alone, see https://bugs.debian.org/856547.
+> arch/sh/Kconfig sets either SUPERH32 or SUPERH64 depending on ARCH
+> environment, like follows:
 >
-> The result is an incomplete description of the linux-headers package
-> in the generated .changes file.  Fix it by passing the kernel:debarch
-> substitution variable to dpkg-genchanges.
+>   config SUPERH32
+>           def_bool ARCH = "sh"
 >
-> Signed-off-by: Sven Joachim <svenjoac@gmx.de>
+>           ...
+>
+>   config SUPERH64
+>           def_bool ARCH = "sh64"
+>
+> It should make sense to choose the default defconfig by ARCH,
+> like arch/sparc/Makefile.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+
+Applied to linux-kbuild/kbuild.
+
+
 > ---
-
-Applied to linux-kbuild/misc.  Thanks!
-
+>
+>  arch/sh/Makefile | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/sh/Makefile b/arch/sh/Makefile
+> index 280bbff..65300193 100644
+> --- a/arch/sh/Makefile
+> +++ b/arch/sh/Makefile
+> @@ -15,6 +15,12 @@ ifneq ($(SUBARCH),$(ARCH))
+>    endif
+>  endif
+>
+> +ifeq ($(ARCH),sh)
+> +KBUILD_DEFCONFIG       := shx3_defconfig
+> +else
+> +KBUILD_DEFCONFIG       := cayman_defconfig
+> +endif
+> +
+>  isa-y                                  := any
+>  isa-$(CONFIG_SH_DSP)                   := sh
+>  isa-$(CONFIG_CPU_SH2)                  := sh2
+> @@ -105,14 +111,12 @@ ifdef CONFIG_SUPERH32
+>  UTS_MACHINE            := sh
+>  BITS                   := 32
+>  LDFLAGS_vmlinux                += -e _stext
+> -KBUILD_DEFCONFIG       := shx3_defconfig
+>  else
+>  UTS_MACHINE            := sh64
+>  BITS                   := 64
+>  LDFLAGS_vmlinux                += --defsym phys_stext=_stext-$(CONFIG_PAGE_OFFSET) \
+>                            --defsym phys_stext_shmedia=phys_stext+1 \
+>                            -e phys_stext_shmedia
+> -KBUILD_DEFCONFIG       := cayman_defconfig
+>  endif
+>
+>  ifdef CONFIG_CPU_LITTLE_ENDIAN
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
