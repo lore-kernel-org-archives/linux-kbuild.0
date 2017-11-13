@@ -1,104 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:24305 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753596AbdKMQeC (ORCPT
+Received: from mail-ot0-f178.google.com ([74.125.82.178]:55170 "EHLO
+        mail-ot0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753414AbdKMUOM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Nov 2017 11:34:02 -0500
+        Mon, 13 Nov 2017 15:14:12 -0500
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.20.1711131628370.20333@hadrien>
-References: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com> <alpine.DEB.2.20.1711131628370.20333@hadrien>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 14 Nov 2017 01:32:58 +0900
-Message-ID: <CAK7LNASpxfq6Vg42rogQg1bixNL15O=8152=KJEnKQA=Ez6Dxw@mail.gmail.com>
-Subject: Re: [PATCH v2] coccinelle: fix parallel build with CHECK=scripts/coccicheck
+In-Reply-To: <20171113201013.GO8522@tassilo.jf.intel.com>
+References: <20171107102156.3fgxt6y6v5y2kqnf@wfg-t540p.sh.intel.com>
+ <CA+55aFwqxZiN_XrZqvbtCsc8W=w895RaB1sjuVP1aTj8JStxzg@mail.gmail.com>
+ <20171108094832.qxvkawpw2snpcbvh@wfg-t540p.sh.intel.com> <CA+55aFwK7935r325nmR-eQvanVCN3A+v3wEQHsW4NpSeBsybeA@mail.gmail.com>
+ <20171108171230.ccf7lwutjysk26fc@wfg-t540p.sh.intel.com> <CA+55aFx0O+NTbBjavPm_jPucqHdXFYPmUya4kw=ps7LSqTFd5w@mail.gmail.com>
+ <20171113011338.3qmnp64pttyscuus@wfg-t540p.sh.intel.com> <20171113185227.GM8522@tassilo.jf.intel.com>
+ <CA+55aFzbQBPOwah9gQPHR9WL+zZBOXnHsP6GKmC=QE7qOn+psw@mail.gmail.com> <20171113201013.GO8522@tassilo.jf.intel.com>
+From: "H.J. Lu" <hjl.tools@gmail.com>
+Date: Mon, 13 Nov 2017 12:14:11 -0800
+Message-ID: <CAMe9rOoeV-Y3gYAEpPXOQuRxxNq2GP-Zwm0Q+sohRduRyXUv7g@mail.gmail.com>
+Subject: Re: CONFIG_DEBUG_INFO_SPLIT impacts on faddr2line
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Julia Lawall <julia.lawall@lip6.fr>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, cocci@systeme.lip6.fr, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Andi Kleen <ak@linux.intel.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Fengguang Wu <fengguang.wu@intel.com>, Jeff Kirsher <jeffrey.t.kirsher@intel.com>, Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, intel-wired-lan@lists.osuosl.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Dirk Gouders <dirk@gouders.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kbuild test robot <lkp@intel.com>, "Zhang, Rui" <rui.zhang@intel.com>, "Lu, Aaron" <aaron.lu@intel.com>
 
-Hi Julia,
-
-
-2017-11-14 0:30 GMT+09:00 Julia Lawall <julia.lawall@lip6.fr>:
+On Mon, Nov 13, 2017 at 12:10 PM, Andi Kleen <ak@linux.intel.com> wrote:
+>> Put another way: the CONFIG_DEBUG_INFO_SPLIT option is useless. Yes,
+>> it saves time and disk space, but does so at the expense of making all
+>> the debug information unavailable to basic tools.
 >
+> You're right. It works for line information, but strangely not for
+> inlines. I assume it can be fixed.
 >
-> On Thu, 9 Nov 2017, Masahiro Yamada wrote:
->
->> The command "make -j8 C=1 CHECK=scripts/coccicheck" produces lots of
->> "coccicheck failed" error messages.
->>
->> I do not know the coccinelle internals, but I guess --jobs does not
->> work well if spatch is invoked from Make running in parallel.
->> Disable --jobs in this case.
->
-> Why is this change under:
->
-> if [ "$C" = "1" -o "$C" = "2" ];
->
-> The coccicheck failed messages come also if one runs Coccinelle on the
-> entire kernel.
 
-As far as I tested, "coccicheck failed" error only happens
-when ONLINE=1.
-
-
-make -j8 C=1 CHECK=scripts/coccicheck  COCCI=scripts/coccinelle/misc/bugon.cocci
-
-emits lots of errors.
-
-
-make -j8 coccicheck  COCCI=scripts/coccinelle/misc/bugon.cocci
-
-is fine.
-
-
-Have you tested it?
-Do you mean you got a different result from mine?
-
-
-
-> julia
->
->
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->>
->> Changes in v2:
->>   - Grep '-j' instead of '--jobserver-auth'.
->>     '--jobserver-*' is not a stable option flag.
->>     Make 4.2 change '--jobserver-fds' into '--jobserver-auth'
->>   - Add -q option to grep
->>
->>  scripts/coccicheck | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/scripts/coccicheck b/scripts/coccicheck
->> index 040a8b1..8bab11e 100755
->> --- a/scripts/coccicheck
->> +++ b/scripts/coccicheck
->> @@ -70,6 +70,9 @@ if [ "$C" = "1" -o "$C" = "2" ]; then
->>      # Take only the last argument, which is the C file to test
->>      shift $(( $# - 1 ))
->>      OPTIONS="$COCCIINCLUDE $1"
->> +
->> +    # --jobs does not work if Make is running in parallel
->> +    echo $MAKEFLAGS | grep -q -E '(^| )-j' && USE_JOBS="no"
->>  else
->>      ONLINE=0
->>      if [ "$KBUILD_EXTMOD" = "" ] ; then
->> --
->> 2.7.4
->>
->>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+Is there a binutils bug report for this?
 
 
 -- 
-Best Regards
-Masahiro Yamada
+H.J.
