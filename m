@@ -1,131 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:61948 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751343AbdKMESP (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:44290 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751377AbdKMHZg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 12 Nov 2017 23:18:15 -0500
+        Mon, 13 Nov 2017 02:25:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171110073504.13836-1-caoj.fnst@cn.fujitsu.com>
-References: <20171110073504.13836-1-caoj.fnst@cn.fujitsu.com>
+In-Reply-To: <83744f82-8800-7c67-df58-e8925c8d50a3@cn.fujitsu.com>
+References: <1510242077-8122-1-git-send-email-yamada.masahiro@socionext.com>
+ <1510242077-8122-5-git-send-email-yamada.masahiro@socionext.com> <83744f82-8800-7c67-df58-e8925c8d50a3@cn.fujitsu.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 13 Nov 2017 13:17:31 +0900
-Message-ID: <CAK7LNARtLpJKHJ3-izJ3AWi7uFJfsQWpdw+=7NkFE7hnsnm_8A@mail.gmail.com>
-Subject: Re: [PATCH RFC] kbuild: fixes in Makefile.lib
+Date: Mon, 13 Nov 2017 16:24:36 +0900
+Message-ID: <CAK7LNAT7_nJUOUkrjwwacR_j4m0AJTvdhFZWbD51RXTH8GpRmw@mail.gmail.com>
+Subject: Re: [PATCH 4/4] kbuild: optimize object directory creation for
+ incremental build
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Douglas Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>
 
 Hi Cao,
 
 
-2017-11-10 16:35 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
-> commit
+2017-11-10 19:58 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+> Masahiro-san
 >
->   cf4f21938e13e ("kbuild: Allow to specify composite modules with modname-m")
+> On 11/09/2017 11:41 PM, Masahiro Yamada wrote:
+>> The previous commit largely optimized the object directory creation.
+>> We can optimize it more for incremental build.
+>>
+>> There are already *.cmd files in the output directory.  The existing
+>> *.cmd files have been picked up by $(wildcard ...).  Obviously,
+>> directories containing them exist too, so we can skip "mkdir -p".
+>>
+>> With this, Kbuild runs almost zero "mkdir -p" in incremental building.
+>>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> ---
+>>
+>>  scripts/Makefile.build | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+>> index 89ac180..90ea7a5 100644
+>> --- a/scripts/Makefile.build
+>> +++ b/scripts/Makefile.build
+>> @@ -583,8 +583,13 @@ endif
+>>  ifneq ($(KBUILD_SRC),)
+>>  # Create directories for object files if directory does not exist
+>>  obj-dirs := $(sort $(obj) $(patsubst %/,%, $(dir $(targets))))
+>> +# If cmd_files exist, their directories apparently exist.  Skip mkdir.
+>> +exist-dirs := $(sort $(patsubst %/,%, $(dir $(cmd_files))))
+>> +obj-dirs := $(strip $(filter-out . $(exist-dirs), $(obj-dirs)))
 >
-> add modname-m support, but miss to update the corresponding multi-objs-m
-> defination.
+> First I am not sure if the dot "." here is necessary, because I guess
+> kbuild always descend into subdir do recursive make, so, very
+> $(cmd_files) should have at least 1 level dir.
 
 
-Commit cf4f21938e13 ("kbuild: Allow to specify composite modules
-with modname-m") added modname-m support, but missed to update the
-corresponding multi-objs-m definition.
+The top level Makefile descends into ./Kbuild
 
- - fix Commit ID style
- - Use past tense (added, missed)
- - Fix a typo (defination -> definition)
+prepare0: archprepare gcc-plugins
+        $(Q)$(MAKE) $(build)=.
 
-
-
+So, it is possible to have 0 level dir.
 
 
 
-> commit 551559e13af1c ("kbuild: implement modules.order") miss to filter
-> the subdir listed in obj-m. Except that the subdirs are totally identical
-> between obj-y and obj-m, or else I think it will miss something.
-
-modules.order is correct as-is
-unless I am missing something.
 
 
-> But until now, no one has complaining about it, so I guess it just no
-> one has triggerred it.
+
+> Second, Assuming that "." probably exists,
+
+Right "." always exists.  That's way I filtered it out.
+
+
+> would it be "./"? because it
+> is what "dir" function returns.
+
+No.
+You missed  $(patsubst %/,%, ...)
+
+
+Having said that, "." generally comes from phony targets
+and I think I can fix it in a more correct way.
+I will remove "." from v2.
+
+
+> --
+> Sincerely,
+> Cao jin
 >
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> ---
-> I found these 2 points which I think might be wrong during code
-> inspection, but until now, they seems didn't do anything bad, so I am not
-> sure this is a problem:)
+>> +ifneq ($(obj-dirs),)
+>>  $(shell mkdir -p $(obj-dirs))
+>>  endif
+>> +endif
+>>
 >
->  scripts/Makefile.lib | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 580e605118e4..3209f303213b 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -22,7 +22,7 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
->  # Determine modorder.
->  # Unfortunately, we don't have information about ordering between -y
->  # and -m subdirs.  Just put -y's first.
-> -modorder       := $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
-> +modorder       := $(patsubst %/,%/modules.order, $(filter %/, $(obj-y) $(obj-m) $(obj-m:.o=.ko))
-
-
-This change caused build error.
-
-scripts/Makefile.lib:25: *** unterminated call to function 'patsubst':
-missing ')'.  Stop.
-
-
-And, this change is not necessary.
-
-$(filter %/, $(obj-m)) is a subset of $(obj-m:.o=.ko)
-
-
-
-
-
-
->  # Handle objects in subdirs
->  # ---------------------------------------------------------------------------
-> @@ -49,7 +49,7 @@ single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
->  # Build list of the parts of our composite objects, our composite
->  # objects depend on those (obviously)
->  multi-objs-y := $(foreach m, $(multi-used-y), $($(m:.o=-objs)) $($(m:.o=-y)))
-> -multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)))
-> +multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))
->  multi-objs   := $(multi-objs-y) $(multi-objs-m)
 >
->  # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
-
-
-This is also build error.
-
-scripts/Makefile.lib:52: *** unterminated call to function 'foreach':
-missing ')'.  Stop.
-
-
-Please test your patch before submitting.
-
-
-Assuming the build error will be fixed, this change is correct.
-
-
-
-
-Also, modname-multi should be fixed.
-
-modname-multi = $(sort $(foreach m,$(multi-used),\
-                $(if $(filter $(subst $(obj)/,,$*.o), $($(m:.o=-objs))
-$($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=))))
-
-
-
-Thanks.
-
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
