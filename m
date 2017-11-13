@@ -1,72 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:65373
-        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751303AbdKMPac (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Nov 2017 10:30:32 -0500
-Date: Mon, 13 Nov 2017 16:30:25 +0100 (CET)
-From: Julia Lawall <julia.lawall@lip6.fr>
-Subject: Re: [PATCH v2] coccinelle: fix parallel build with
- CHECK=scripts/coccicheck
-In-Reply-To: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com>
-Message-ID: <alpine.DEB.2.20.1711131628370.20333@hadrien>
-References: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from mga06.intel.com ([134.134.136.31]:17266 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754248AbdKMSw3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 13 Nov 2017 13:52:29 -0500
+Date: Mon, 13 Nov 2017 10:52:27 -0800
+From: Andi Kleen <ak@linux.intel.com>
+Subject: Re: CONFIG_DEBUG_INFO_SPLIT impacts on faddr2line
+Message-ID: <20171113185227.GM8522@tassilo.jf.intel.com>
+References: <20171107102156.3fgxt6y6v5y2kqnf@wfg-t540p.sh.intel.com>
+ <CA+55aFwqxZiN_XrZqvbtCsc8W=w895RaB1sjuVP1aTj8JStxzg@mail.gmail.com>
+ <20171108094832.qxvkawpw2snpcbvh@wfg-t540p.sh.intel.com>
+ <CA+55aFwK7935r325nmR-eQvanVCN3A+v3wEQHsW4NpSeBsybeA@mail.gmail.com>
+ <20171108171230.ccf7lwutjysk26fc@wfg-t540p.sh.intel.com>
+ <CA+55aFx0O+NTbBjavPm_jPucqHdXFYPmUya4kw=ps7LSqTFd5w@mail.gmail.com>
+ <20171113011338.3qmnp64pttyscuus@wfg-t540p.sh.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171113011338.3qmnp64pttyscuus@wfg-t540p.sh.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, cocci@systeme.lip6.fr, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
+To: Fengguang Wu <fengguang.wu@intel.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Jeff Kirsher <jeffrey.t.kirsher@intel.com>, Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, intel-wired-lan@lists.osuosl.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Dirk Gouders <dirk@gouders.net>, linux-kbuild@vger.kernel.org, lkp@intel.com, "Zhang, Rui" <rui.zhang@intel.com>, "Lu, Aaron" <aaron.lu@intel.com>
 
+> > It's the "CONFIG_DEBUG_INFO_SPLIT" thing that makes faddr2line unable
+> > to see the inlining information,
+> > 
+> > Using OPTIMIZE_INLINING is fine.
+> 
+> Good to know that!
 
+It works for me. Perhaps your binutils is too old? It was
+added at some point. Can you try upgrading?
 
-On Thu, 9 Nov 2017, Masahiro Yamada wrote:
+% ./linux/scripts/faddr2line obj/vmlinux schedule+10
+schedule+10/0x80:
+schedule at arch/x86/include/asm/current.h:15
 
-> The command "make -j8 C=1 CHECK=scripts/coccicheck" produces lots of
-> "coccicheck failed" error messages.
->
-> I do not know the coccinelle internals, but I guess --jobs does not
-> work well if spatch is invoked from Make running in parallel.
-> Disable --jobs in this case.
+% addr2line --version
+GNU addr2line version 2.27-24.fc26
 
-Why is this change under:
-
-if [ "$C" = "1" -o "$C" = "2" ];
-
-The coccicheck failed messages come also if one runs Coccinelle on the
-entire kernel.
-
-julia
-
-
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
-> Changes in v2:
->   - Grep '-j' instead of '--jobserver-auth'.
->     '--jobserver-*' is not a stable option flag.
->     Make 4.2 change '--jobserver-fds' into '--jobserver-auth'
->   - Add -q option to grep
->
->  scripts/coccicheck | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/scripts/coccicheck b/scripts/coccicheck
-> index 040a8b1..8bab11e 100755
-> --- a/scripts/coccicheck
-> +++ b/scripts/coccicheck
-> @@ -70,6 +70,9 @@ if [ "$C" = "1" -o "$C" = "2" ]; then
->      # Take only the last argument, which is the C file to test
->      shift $(( $# - 1 ))
->      OPTIONS="$COCCIINCLUDE $1"
-> +
-> +    # --jobs does not work if Make is running in parallel
-> +    echo $MAKEFLAGS | grep -q -E '(^| )-j' && USE_JOBS="no"
->  else
->      ONLINE=0
->      if [ "$KBUILD_EXTMOD" = "" ] ; then
-> --
-> 2.7.4
->
->
+-Andi
