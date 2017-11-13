@@ -1,38 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:47831 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751720AbdKMKla (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:17693 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751759AbdKMKmA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Nov 2017 05:41:30 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] selinux: remove unnecessary assignment to subdir-
-Date: Mon, 13 Nov 2017 19:40:40 +0900
-Message-Id: <1510569641-28179-1-git-send-email-yamada.masahiro@socionext.com>
+        Mon, 13 Nov 2017 05:42:00 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: [PATCH] kbuild: fixes in Makefile.lib
+Date: Mon, 13 Nov 2017 18:41:59 +0800
+Message-ID: <20171113104159.30409-1-caoj.fnst@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Eric Paris <eparis@parisplace.org>, selinux@tycho.nsa.gov, linux-kernel@vger.kernel.org, Stephen Smalley <sds@tycho.nsa.gov>, Paul Moore <paul@paul-moore.com>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net
 
-Makefile.clean descends into $(subdir-y).  Dummy assignment to subdir-
-is meaningless.
+Commit cf4f21938e13 ("kbuild: Allow to specify composite modules
+with modname-m") added modname-m support, but missed to update the
+corresponding multi-objs-m & modname-multi definition.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 ---
+Addressed the all comments of Masahiro-san from RFC version, and TESTed it.
 
-I will pick this up for kbuild tree
-since this is very trivial from the build system point of view.
+ scripts/Makefile.lib | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
- scripts/selinux/Makefile | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/scripts/selinux/Makefile b/scripts/selinux/Makefile
-index e8049da..b3048b8 100644
---- a/scripts/selinux/Makefile
-+++ b/scripts/selinux/Makefile
-@@ -1,2 +1 @@
- subdir-y := mdp genheaders
--subdir-	+= mdp genheaders
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 580e605118e4..a9d54b1fa017 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -49,7 +49,7 @@ single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
+ # Build list of the parts of our composite objects, our composite
+ # objects depend on those (obviously)
+ multi-objs-y := $(foreach m, $(multi-used-y), $($(m:.o=-objs)) $($(m:.o=-y)))
+-multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)))
++multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)))
+ multi-objs   := $(multi-objs-y) $(multi-objs-m)
+ 
+ # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
+@@ -174,7 +174,7 @@ dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
+ 
+ # Finds the multi-part object the current object will be linked into
+ modname-multi = $(sort $(foreach m,$(multi-used),\
+-		$(if $(filter $(subst $(obj)/,,$*.o), $($(m:.o=-objs)) $($(m:.o=-y))),$(m:.o=))))
++		$(if $(filter $(subst $(obj)/,,$*.o), $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=))))
+ 
+ # Useful for describing the dependency of composite objects
+ # Usage:
 -- 
-2.7.4
+2.13.6
+
+
 
