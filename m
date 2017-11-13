@@ -1,102 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:40692 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751377AbdKMJDB (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:40662 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752334AbdKMKbg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Nov 2017 04:03:01 -0500
-Subject: Re: [PATCH RFC] kbuild: fixes in Makefile.lib
-References: <20171110073504.13836-1-caoj.fnst@cn.fujitsu.com>
- <CAK7LNARtLpJKHJ3-izJ3AWi7uFJfsQWpdw+=7NkFE7hnsnm_8A@mail.gmail.com>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <0f8b66f6-636f-d359-0e5d-95067abf028f@cn.fujitsu.com>
-Date: Mon, 13 Nov 2017 17:03:09 +0800
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNARtLpJKHJ3-izJ3AWi7uFJfsQWpdw+=7NkFE7hnsnm_8A@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        Mon, 13 Nov 2017 05:31:36 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v2 2/6] kbuild: remove redundant $(wildcard ...) for cmd_files calculation
+Date: Mon, 13 Nov 2017 19:29:35 +0900
+Message-Id: <1510568979-24440-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1510568979-24440-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1510568979-24440-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: linux-kbuild@vger.kernel.org
+Cc: Douglas Anderson <dianders@chromium.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-On 11/13/2017 12:17 PM, Masahiro Yamada wrote:
-> Hi Cao,
-> 
-> 
+I do not see any reason why $(wildcard ...) needs to be called twice
+for computing cmd_files.  Remove the first one.
 
->>  scripts/Makefile.lib | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
->> index 580e605118e4..3209f303213b 100644
->> --- a/scripts/Makefile.lib
->> +++ b/scripts/Makefile.lib
->> @@ -22,7 +22,7 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
->>  # Determine modorder.
->>  # Unfortunately, we don't have information about ordering between -y
->>  # and -m subdirs.  Just put -y's first.
->> -modorder       := $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
->> +modorder       := $(patsubst %/,%/modules.order, $(filter %/, $(obj-y) $(obj-m) $(obj-m:.o=.ko))
-> 
-> 
-> This change caused build error.
-> 
-> scripts/Makefile.lib:25: *** unterminated call to function 'patsubst':
-> missing ')'.  Stop.
-> 
-> 
-> And, this change is not necessary.
-> 
-> $(filter %/, $(obj-m)) is a subset of $(obj-m:.o=.ko)
-> 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Ah huh! Yes
+Changes in v2:
+  - Fix "$$" in scripts/Makefile.headersinst per Douglas
 
-> 
->>  # Handle objects in subdirs
->>  # ---------------------------------------------------------------------------
->> @@ -49,7 +49,7 @@ single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
->>  # Build list of the parts of our composite objects, our composite
->>  # objects depend on those (obviously)
->>  multi-objs-y := $(foreach m, $(multi-used-y), $($(m:.o=-objs)) $($(m:.o=-y)))
->> -multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)))
->> +multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))
->>  multi-objs   := $(multi-objs-y) $(multi-objs-m)
->>
->>  # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
-> 
-> 
-> This is also build error.
-> 
-> scripts/Makefile.lib:52: *** unterminated call to function 'foreach':
-> missing ')'.  Stop.
-> 
-> 
-> Please test your patch before submitting.
-> 
+ Makefile                     | 3 +--
+ scripts/Makefile.build       | 3 +--
+ scripts/Makefile.headersinst | 3 +--
+ scripts/Makefile.modpost     | 3 +--
+ 4 files changed, 4 insertions(+), 8 deletions(-)
 
-Sorry for my mistake，I missed to test the patch this time incredibly:(
-
-
-> Assuming the build error will be fixed, this change is correct.
-> 
-> 
-> 
-> 
-> Also, modname-multi should be fixed.
-> 
-> modname-multi = $(sort $(foreach m,$(multi-used),\
->                 $(if $(filter $(subst $(obj)/,,$*.o), $($(m:.o=-objs))
-> $($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=))))
-> 
-
-Yes, I also noticed here, but fail to remember it:(
-
-Thanks very much, Masahiro-san!
-
+diff --git a/Makefile b/Makefile
+index a7476e6..58dd245 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1693,8 +1693,7 @@ cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
+ 
+ # read all saved command lines
+ 
+-targets := $(wildcard $(sort $(targets)))
+-cmd_files := $(wildcard .*.cmd $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
++cmd_files := $(wildcard .*.cmd $(foreach f,$(sort $(targets)),$(dir $(f)).$(notdir $(f)).cmd))
+ 
+ ifneq ($(cmd_files),)
+   $(cmd_files): ;	# Do not try to update included dependency files
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 061d0c3..62d5314 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -583,8 +583,7 @@ FORCE:
+ # optimization, we don't need to read them if the target does not
+ # exist, we will rebuild anyway in that case.
+ 
+-targets := $(wildcard $(sort $(targets)))
+-cmd_files := $(wildcard $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
++cmd_files := $(wildcard $(foreach f,$(sort $(targets)),$(dir $(f)).$(notdir $(f)).cmd))
+ 
+ ifneq ($(cmd_files),)
+   include $(cmd_files)
+diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
+index 5692d7a..c6fb2b7 100644
+--- a/scripts/Makefile.headersinst
++++ b/scripts/Makefile.headersinst
+@@ -114,9 +114,8 @@ $(check-file): scripts/headers_check.pl $(output-files) FORCE
+ 
+ endif
+ 
+-targets := $(wildcard $(sort $(targets)))
+ cmd_files := $(wildcard \
+-             $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
++             $(foreach f,$(sort $(targets)),$(dir $(f)).$(notdir $(f)).cmd))
+ 
+ ifneq ($(cmd_files),)
+ 	include $(cmd_files)
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 16923ba..cf125c1 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -143,8 +143,7 @@ FORCE:
+ # optimization, we don't need to read them if the target does not
+ # exist, we will rebuild anyway in that case.
+ 
+-targets := $(wildcard $(sort $(targets)))
+-cmd_files := $(wildcard $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
++cmd_files := $(wildcard $(foreach f,$(sort $(targets)),$(dir $(f)).$(notdir $(f)).cmd))
+ 
+ ifneq ($(cmd_files),)
+   include $(cmd_files)
 -- 
-Sincerely,
-Cao jin
-
+2.7.4
 
