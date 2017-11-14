@@ -1,68 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:31396 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751887AbdKNKMc (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:62113 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753932AbdKNKce (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Nov 2017 05:12:32 -0500
+        Tue, 14 Nov 2017 05:32:34 -0500
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.20.1711141003410.2874@hadrien>
-References: <CAK7LNATW91vf5Sa-vvJ7rLRNt+KRKPB=E5H_EOtOUgCB4WYmUA@mail.gmail.com>
- <alpine.DEB.2.20.1711141003410.2874@hadrien>
+In-Reply-To: <20171101014314.4575-1-caoj.fnst@cn.fujitsu.com>
+References: <20171101014314.4575-1-caoj.fnst@cn.fujitsu.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 14 Nov 2017 19:11:34 +0900
-Message-ID: <CAK7LNATw25OPNe_oqQNCmF=Uaw1Enjx9YRRBEHsZcAgupgHc8w@mail.gmail.com>
-Subject: Re: Coccinelle: badzero.cocci failure
+Date: Tue, 14 Nov 2017 19:31:36 +0900
+Message-ID: <CAK7LNARLhuk0=rgKjEDsO1gkrH-hLJaTyvZEHYm1-rCF_g0b3w@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: comments correction & update on Makefile.host
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Julia Lawall <julia.lawall@lip6.fr>
-Cc: cocci@systeme.lip6.fr, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-Hi Julia,
+Hi Cao,
 
-
-2017-11-14 18:07 GMT+09:00 Julia Lawall <julia.lawall@lip6.fr>:
->> coccicheck failed
->> $ cat cocci-debug.txt
->> /home/masahiro/bin/spatch -D report --no-show-diff --very-quiet
->> --cocci-file scripts/coccinelle/null/badzero.cocci --dir . -I
->> ./arch/x86/include -I ./arch/x86/include/generated -I ./include -I
->> ./arch/x86/include/uapi -I ./arch/x86/include/generated/uapi -I
->> ./include/uapi -I ./include/generated/uapi --include
->> ./include/linux/kconfig.h --jobs 8 --chunksize 1
->> Fatal error: exception
->> Yes_prepare_ocamlcocci.LinkFailure("/tmp/ocaml_cocci_18c9f9.cmxs")
+2017-11-01 10:43 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+> host-cmulti means the composite host program that is compiled/linked
+> from several .c file, not .o file, because .o file could also be
+> compiled from .cpp file.
 >
-> Does your Coccinelle support OCaml?  I'm not sure what is the proper way to
-> check for this, but in my coccinelle/config.log file I have
+> Bonus: update the stale comment.
+> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> ---
+>  scripts/Makefile.host | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> FEATURE_OCAML='1'
-
-
-Yes.  I also see this line in my config.log
-
-
-> spatch --version gives:
+> diff --git a/scripts/Makefile.host b/scripts/Makefile.host
+> index 9cfd5c84d76f..8181df66d764 100644
+> --- a/scripts/Makefile.host
+> +++ b/scripts/Makefile.host
+> @@ -25,11 +25,11 @@ host-cshlib := $(sort $(hostlibs-y) $(hostlibs-m))
+>  host-cxxshlib := $(sort $(hostcxxlibs-y) $(hostcxxlibs-m))
 >
-> spatch version 1.0.6-00147-g19f9421 compiled with OCaml version 4.02.3
-> Flags passed to the configure script: [none]
-> Python scripting support: yes
-> Syntax of regular expresssions: Str
-
-My version output looks like follows:
-
-$ spatch --version
-spatch version 1.0.6-00345-g2ca0bef compiled with OCaml version 4.02.3
-Flags passed to the configure script: --prefix=/home/masahiro
-Python scripting support: yes
-Syntax of regular expresssions: PCRE
+>  # C code
+> -# Executables compiled from a single .c file
+> +# C Executables compiled from a single .c file
 
 
-> I'm not sure why it doesn't give feedback on whether OCaml scripting is
-> supported.  I will check on this.
+Is anything wrong with the current comment?
+
+
+>  host-csingle   := $(foreach m,$(__hostprogs), \
+>                         $(if $($(m)-objs)$($(m)-cxxobjs),,$(m)))
 >
+> -# C executables linked based on several .o files
+> +# C executables compiled from several .c files, and only .c files
 
-Thanks!
+Your comment is even clearer, but
+I think the current comment is also true, at least.
+
+host-cmulti is liked from .o files
+after each was compiled from .c
+
+
+>  host-cmulti    := $(foreach m,$(__hostprogs),\
+>                    $(if $($(m)-cxxobjs),,$(if $($(m)-objs),$(m))))
+>
+> @@ -50,7 +50,7 @@ host-cxxshobjs        := $(sort $(foreach m,$(host-cxxshlib),$($(m:.so=-objs))))
+>
+>  # output directory for programs/.o files
+>  # hostprogs-y := tools/build may have been specified.
+> -# Retrieve also directory of .o files from prog-objs or prog-cxxobjs notation
+> +# Retrieve also directory of .o files from host-cobjs and host-cxxobjs notation
+>  host-objdirs := $(dir $(__hostprogs) $(host-cobjs) $(host-cxxobjs))
+>
+>  host-objdirs := $(strip $(sort $(filter-out ./,$(host-objdirs))))
+> --
+
+I am removing all host-objdirs stuff.
+I do not need this hunk.
 
 
 -- 
