@@ -1,107 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:48060 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754207AbdKNLja (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:19197 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752284AbdKNLxR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Nov 2017 06:39:30 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4] coccinelle: fix parallel build with CHECK=scripts/coccicheck
-Date: Tue, 14 Nov 2017 20:38:07 +0900
-Message-Id: <1510659487-16361-1-git-send-email-yamada.masahiro@socionext.com>
+        Tue, 14 Nov 2017 06:53:17 -0500
+Subject: Re: [PATCH v2] kbuild: comments correction & update on Makefile.host
+References: <20171101014314.4575-1-caoj.fnst@cn.fujitsu.com>
+ <CAK7LNARLhuk0=rgKjEDsO1gkrH-hLJaTyvZEHYm1-rCF_g0b3w@mail.gmail.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <35acd1fe-29ff-10c4-3e3d-0cb7ae901175@cn.fujitsu.com>
+Date: Tue, 14 Nov 2017 19:53:26 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNARLhuk0=rgKjEDsO1gkrH-hLJaTyvZEHYm1-rCF_g0b3w@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: cocci@systeme.lip6.fr, Julia Lawall <Julia.Lawall@lip6.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-The command "make -j8 C=1 CHECK=scripts/coccicheck COCCI=..." produces
-lots of "coccicheck failed" error messages.
+Masahiro-san,
 
-Julia Lawall explained the Coccinelle behavior as follows:
-"The problem on the Coccinelle side is that it uses a subdirectory
-with the name of the semantic patch to store standard output and
-standard error for the different threads.  I didn't want to use a
-name with the pid, so that one could easily find this information
-while Coccinelle is running.  Normally the subdirectory is cleaned
-up when Coccinelle completes, so there is only one of them at a time.
-Maybe it is best to just add the pid.  There is the risk that these
-subdirectories will accumulate if Coccinelle crashes in a way such
-that they don't get cleaned up, but Coccinelle could print a warning
-if it detects this case, rather than failing."
+On 11/14/2017 06:31 PM, Masahiro Yamada wrote:
+> Hi Cao,
+> 
+> 2017-11-01 10:43 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+>>
+>>  # C code
+>> -# Executables compiled from a single .c file
+>> +# C Executables compiled from a single .c file
+> 
+> 
+> Is anything wrong with the current comment?
+> 
 
-When scripts/coccicheck is used as CHECK tool and -j option is given
-to Make, the whole of build process runs in parallel.  So, multiple
-processes try to get access to the same subdirectory.
+Nothing wrong here, just make it looks the same style as its peer below.
 
-I notice spatch creates the subdirectory only when it runs in parallel
-(i.e. --jobs <N> is given and <N> is greater than 1).
+>>  host-csingle   := $(foreach m,$(__hostprogs), \
+>>                         $(if $($(m)-objs)$($(m)-cxxobjs),,$(m)))
+>>
+>> -# C executables linked based on several .o files
+>> +# C executables compiled from several .c files, and only .c files
+> 
+> Your comment is even clearer, but
+> I think the current comment is also true, at least.
+> 
 
-Setting NPROC=1 is a reasonable solution; spatch does not create the
-subdirectory.  Besides, ONLINE=1 mode takes a single file input for
-each spatch invocation, so there is no reason to parallelize it in
-the first place.
+Yes, just make it more clearer and looks the same style as its peer above.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+> host-cmulti is liked from .o files
+> after each was compiled from .c
+> 
+> 
 
-Changes in v4:
-  - Remove unnecessary comments.  One line comment will be enough.
+>>  # output directory for programs/.o files
+>>  # hostprogs-y := tools/build may have been specified.
+>> -# Retrieve also directory of .o files from prog-objs or prog-cxxobjs notation
+>> +# Retrieve also directory of .o files from host-cobjs and host-cxxobjs notation
+>>  host-objdirs := $(dir $(__hostprogs) $(host-cobjs) $(host-cxxobjs))
+>>
+>>  host-objdirs := $(strip $(sort $(filter-out ./,$(host-objdirs))))
+>> --
+> 
+> I am removing all host-objdirs stuff.
+> I do not need this hunk.
+> 
 
-Changes in v3:
-  - Set NPROC=1 because this is a more sensible solution
-    given that there is no reason to run coccinelle in parallel
-    for ONLINE=1 mode.
-  - Move J= option handling to a proper place.
-  - Add more detailed explanation
+I forget your patches, sorry for the noise here.
 
-Changes in v2:
-  - Grep '-j' instead of '--jobserver-auth'.
-    '--jobserver-*' is not a stable option flag.
-    Make 4.2 change '--jobserver-fds' into '--jobserver-auth'
-  - Add -q option to grep
-
- scripts/coccicheck | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
-
-diff --git a/scripts/coccicheck b/scripts/coccicheck
-index 040a8b1..fefda40 100755
---- a/scripts/coccicheck
-+++ b/scripts/coccicheck
-@@ -30,12 +30,6 @@ else
- 	VERBOSE=0
- fi
- 
--if [ -z "$J" ]; then
--	NPROC=$(getconf _NPROCESSORS_ONLN)
--else
--	NPROC="$J"
--fi
--
- FLAGS="--very-quiet"
- 
- # You can use SPFLAGS to append extra arguments to coccicheck or override any
-@@ -70,6 +64,9 @@ if [ "$C" = "1" -o "$C" = "2" ]; then
-     # Take only the last argument, which is the C file to test
-     shift $(( $# - 1 ))
-     OPTIONS="$COCCIINCLUDE $1"
-+
-+    # No need to parallelize Coccinelle since this mode takes one input file.
-+    NPROC=1
- else
-     ONLINE=0
-     if [ "$KBUILD_EXTMOD" = "" ] ; then
-@@ -77,6 +74,12 @@ else
-     else
-         OPTIONS="--dir $KBUILD_EXTMOD $COCCIINCLUDE"
-     fi
-+
-+    if [ -z "$J" ]; then
-+        NPROC=$(getconf _NPROCESSORS_ONLN)
-+    else
-+        NPROC="$J"
-+    fi
- fi
- 
- if [ "$KBUILD_EXTMOD" != "" ] ; then
 -- 
-2.7.4
+Sincerely,
+Cao jin
+
 
