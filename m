@@ -1,81 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:62113 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753932AbdKNKce (ORCPT
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:33661
+        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751887AbdKNLJg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Nov 2017 05:32:34 -0500
+        Tue, 14 Nov 2017 06:09:36 -0500
+Date: Tue, 14 Nov 2017 12:09:29 +0100 (CET)
+From: Julia Lawall <julia.lawall@lip6.fr>
+Subject: Re: [PATCH v3] coccinelle: fix parallel build with
+ CHECK=scripts/coccicheck
+In-Reply-To: <CAK7LNAQ11bf1+=AYVsGfZ+vs-1P0fGCm-2y-qjgKi=KK7-+iSA@mail.gmail.com>
+Message-ID: <alpine.DEB.2.20.1711141208200.2874@hadrien>
+References: <1510650290-3363-1-git-send-email-yamada.masahiro@socionext.com> <alpine.DEB.2.20.1711141047350.2874@hadrien> <CAK7LNAQ11bf1+=AYVsGfZ+vs-1P0fGCm-2y-qjgKi=KK7-+iSA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171101014314.4575-1-caoj.fnst@cn.fujitsu.com>
-References: <20171101014314.4575-1-caoj.fnst@cn.fujitsu.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 14 Nov 2017 19:31:36 +0900
-Message-ID: <CAK7LNARLhuk0=rgKjEDsO1gkrH-hLJaTyvZEHYm1-rCF_g0b3w@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: comments correction & update on Makefile.host
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, cocci@systeme.lip6.fr, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-Hi Cao,
 
-2017-11-01 10:43 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
-> host-cmulti means the composite host program that is compiled/linked
-> from several .c file, not .o file, because .o file could also be
-> compiled from .cpp file.
+
+On Tue, 14 Nov 2017, Masahiro Yamada wrote:
+
+> Hi Julia,
 >
-> Bonus: update the stale comment.
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> ---
->  scripts/Makefile.host | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-> index 9cfd5c84d76f..8181df66d764 100644
-> --- a/scripts/Makefile.host
-> +++ b/scripts/Makefile.host
-> @@ -25,11 +25,11 @@ host-cshlib := $(sort $(hostlibs-y) $(hostlibs-m))
->  host-cxxshlib := $(sort $(hostcxxlibs-y) $(hostcxxlibs-m))
+> 2017-11-14 18:49 GMT+09:00 Julia Lawall <julia.lawall@lip6.fr>:
+> >> +
+> >> +    # If -j option is given to Make, scripts/coccicheck runs in parallel.
+> >> +    # If coccinelle also runs in parallel, it fails because multiple processes
+> >> +    # try to get access to the same subdirectory that stores stdout/stderr.
+> >> +    # No need to parallelize coccinelle in this case - this mode takes only
+> >> +    # one file input.
+> >> +    NPROC=1
+> >
+> > Since I am also changing Coccinelle to avoid the problem, maybe it would
+> > be better to just remove the explanation sentence (If coccinelle also runs
+> > in parallel,...).
+> >
+> > julia
 >
->  # C code
-> -# Executables compiled from a single .c file
-> +# C Executables compiled from a single .c file
-
-
-Is anything wrong with the current comment?
-
-
->  host-csingle   := $(foreach m,$(__hostprogs), \
->                         $(if $($(m)-objs)$($(m)-cxxobjs),,$(m)))
+> OK.  Which lines are unneeded?
 >
-> -# C executables linked based on several .o files
-> +# C executables compiled from several .c files, and only .c files
+> Is it OK to remove all the comments, then just add "NPROC=1"?
 
-Your comment is even clearer, but
-I think the current comment is also true, at least.
+How about keeping "# No need to parallelize coccinelle in this case - this
+mode takes only one file input."?
 
-host-cmulti is liked from .o files
-after each was compiled from .c
+But if you think it is obvious, it would be ok to remove it also.  Someone
+can always do git blame and read the commit message if they have
+questions.
 
-
->  host-cmulti    := $(foreach m,$(__hostprogs),\
->                    $(if $($(m)-cxxobjs),,$(if $($(m)-objs),$(m))))
->
-> @@ -50,7 +50,7 @@ host-cxxshobjs        := $(sort $(foreach m,$(host-cxxshlib),$($(m:.so=-objs))))
->
->  # output directory for programs/.o files
->  # hostprogs-y := tools/build may have been specified.
-> -# Retrieve also directory of .o files from prog-objs or prog-cxxobjs notation
-> +# Retrieve also directory of .o files from host-cobjs and host-cxxobjs notation
->  host-objdirs := $(dir $(__hostprogs) $(host-cobjs) $(host-cxxobjs))
->
->  host-objdirs := $(strip $(sort $(filter-out ./,$(host-objdirs))))
-> --
-
-I am removing all host-objdirs stuff.
-I do not need this hunk.
-
-
--- 
-Best Regards
-Masahiro Yamada
+julia
