@@ -1,53 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:62821 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752516AbdKNINn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Nov 2017 03:13:43 -0500
-Date: Tue, 14 Nov 2017 16:13:36 +0800
-From: Fengguang Wu <fengguang.wu@intel.com>
-Subject: Re: CONFIG_DEBUG_INFO_SPLIT impacts on faddr2line
-Message-ID: <20171114081336.e32bqhcu3eu4yl23@wfg-t540p.sh.intel.com>
-References: <20171107102156.3fgxt6y6v5y2kqnf@wfg-t540p.sh.intel.com>
- <CA+55aFwqxZiN_XrZqvbtCsc8W=w895RaB1sjuVP1aTj8JStxzg@mail.gmail.com>
- <20171108094832.qxvkawpw2snpcbvh@wfg-t540p.sh.intel.com>
- <CA+55aFwK7935r325nmR-eQvanVCN3A+v3wEQHsW4NpSeBsybeA@mail.gmail.com>
- <20171108171230.ccf7lwutjysk26fc@wfg-t540p.sh.intel.com>
- <CA+55aFx0O+NTbBjavPm_jPucqHdXFYPmUya4kw=ps7LSqTFd5w@mail.gmail.com>
- <20171113011338.3qmnp64pttyscuus@wfg-t540p.sh.intel.com>
- <20171113185227.GM8522@tassilo.jf.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20171113185227.GM8522@tassilo.jf.intel.com>
+Received: from conuserg-11.nifty.com ([210.131.2.78]:27582 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751790AbdKNJHm (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 14 Nov 2017 04:07:42 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v3] coccinelle: fix parallel build with CHECK=scripts/coccicheck
+Date: Tue, 14 Nov 2017 18:04:49 +0900
+Message-Id: <1510650290-3363-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <ak@linux.intel.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Jeff Kirsher <jeffrey.t.kirsher@intel.com>, Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, intel-wired-lan@lists.osuosl.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Dirk Gouders <dirk@gouders.net>, linux-kbuild@vger.kernel.org, "Zhang, Rui" <rui.zhang@intel.com>, "Lu, Aaron" <aaron.lu@intel.com>, "H.J. Lu" <hjl.tools@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: cocci@systeme.lip6.fr, Julia Lawall <Julia.Lawall@lip6.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
 
-Hi Andi,
+The command "make -j8 C=1 CHECK=scripts/coccicheck COCCI=..." produces
+lots of "coccicheck failed" error messages.
 
-On Mon, Nov 13, 2017 at 10:52:27AM -0800, Andi Kleen wrote:
->> > It's the "CONFIG_DEBUG_INFO_SPLIT" thing that makes faddr2line unable
->> > to see the inlining information,
->> >
->> > Using OPTIMIZE_INLINING is fine.
->>
->> Good to know that!
->
->It works for me. Perhaps your binutils is too old? It was
->added at some point. Can you try upgrading?
->
->% ./linux/scripts/faddr2line obj/vmlinux schedule+10
->schedule+10/0x80:
->schedule at arch/x86/include/asm/current.h:15
->
->% addr2line --version
->GNU addr2line version 2.27-24.fc26
+Julia Lawall explained the coccinelle behavior as follows:
+"The problem on the Coccinelle side is that it uses a subdirectory
+with the name of the semantic patch to store standard output and
+standard error for the different threads.  I didn't want to use a
+name with the pid, so that one could easily find this information
+while Coccinelle is running.  Normally the subdirectory is cleaned
+up when Coccinelle completes, so there is only one of them at a time.
+Maybe it is best to just add the pid.  There is the risk that these
+subdirectories will accumulate if Coccinelle crashes in a way such
+that they don't get cleaned up, but Coccinelle could print a warning
+if it detects this case, rather than failing."
 
-I use debian and tried addr2line in 2 systems:
+When scripts/coccicheck is used as CHECK tool and -j option is given
+to Make, the whole of build process runs in parallel.  So, multiple
+processes try to get access to the same subdirectory.
 
-GNU addr2line (GNU Binutils for Debian) 2.28
-GNU addr2line (GNU Binutils for Debian) 2.29.1
+I notice spatch creates the subdirectory only when it runs in parallel
+(i.e. --jobs <N> is given and <N> is greater than 1).
 
-Regards,
-Fengguang
+Setting NPROC=1 is a sensible solution; spatch does not create the
+subdirectory.  Besides, ONLINE=1 mode takes a single file input for
+each spatch invocation, so there is no reason to parallelize it in
+the first place.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+Changes in v3:
+  - Set NPROC=1 because this is a more sensible solution
+    given that there is no reason to run coccinelle in parallel
+    for ONLINE=1 mode.
+  - Move J= option handling to a proper place.
+  - Add more detailed explanation
+
+Changes in v2:
+  - Grep '-j' instead of '--jobserver-auth'.
+    '--jobserver-*' is not a stable option flag.
+    Make 4.2 change '--jobserver-fds' into '--jobserver-auth'
+  - Add -q option to grep
+
+ scripts/coccicheck | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/scripts/coccicheck b/scripts/coccicheck
+index 040a8b1..7da82a1 100755
+--- a/scripts/coccicheck
++++ b/scripts/coccicheck
+@@ -30,12 +30,6 @@ else
+ 	VERBOSE=0
+ fi
+ 
+-if [ -z "$J" ]; then
+-	NPROC=$(getconf _NPROCESSORS_ONLN)
+-else
+-	NPROC="$J"
+-fi
+-
+ FLAGS="--very-quiet"
+ 
+ # You can use SPFLAGS to append extra arguments to coccicheck or override any
+@@ -70,6 +64,13 @@ if [ "$C" = "1" -o "$C" = "2" ]; then
+     # Take only the last argument, which is the C file to test
+     shift $(( $# - 1 ))
+     OPTIONS="$COCCIINCLUDE $1"
++
++    # If -j option is given to Make, scripts/coccicheck runs in parallel.
++    # If coccinelle also runs in parallel, it fails because multiple processes
++    # try to get access to the same subdirectory that stores stdout/stderr.
++    # No need to parallelize coccinelle in this case - this mode takes only
++    # one file input.
++    NPROC=1
+ else
+     ONLINE=0
+     if [ "$KBUILD_EXTMOD" = "" ] ; then
+@@ -77,6 +78,12 @@ else
+     else
+         OPTIONS="--dir $KBUILD_EXTMOD $COCCIINCLUDE"
+     fi
++
++    if [ -z "$J" ]; then
++        NPROC=$(getconf _NPROCESSORS_ONLN)
++    else
++        NPROC="$J"
++    fi
+ fi
+ 
+ if [ "$KBUILD_EXTMOD" != "" ] ; then
+-- 
+2.7.4
+
