@@ -1,90 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:50508 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751391AbdKNIKp (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Nov 2017 03:10:45 -0500
+Received: from mga02.intel.com ([134.134.136.20]:62821 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752516AbdKNINn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 14 Nov 2017 03:13:43 -0500
+Date: Tue, 14 Nov 2017 16:13:36 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: Re: CONFIG_DEBUG_INFO_SPLIT impacts on faddr2line
+Message-ID: <20171114081336.e32bqhcu3eu4yl23@wfg-t540p.sh.intel.com>
+References: <20171107102156.3fgxt6y6v5y2kqnf@wfg-t540p.sh.intel.com>
+ <CA+55aFwqxZiN_XrZqvbtCsc8W=w895RaB1sjuVP1aTj8JStxzg@mail.gmail.com>
+ <20171108094832.qxvkawpw2snpcbvh@wfg-t540p.sh.intel.com>
+ <CA+55aFwK7935r325nmR-eQvanVCN3A+v3wEQHsW4NpSeBsybeA@mail.gmail.com>
+ <20171108171230.ccf7lwutjysk26fc@wfg-t540p.sh.intel.com>
+ <CA+55aFx0O+NTbBjavPm_jPucqHdXFYPmUya4kw=ps7LSqTFd5w@mail.gmail.com>
+ <20171113011338.3qmnp64pttyscuus@wfg-t540p.sh.intel.com>
+ <20171113185227.GM8522@tassilo.jf.intel.com>
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 14 Nov 2017 17:09:51 +0900
-Message-ID: <CAK7LNATW91vf5Sa-vvJ7rLRNt+KRKPB=E5H_EOtOUgCB4WYmUA@mail.gmail.com>
-Subject: Coccinelle: badzero.cocci failure
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20171113185227.GM8522@tassilo.jf.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: cocci@systeme.lip6.fr
-Cc: Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Julia Lawall <Julia.Lawall@lip6.fr>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Andi Kleen <ak@linux.intel.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Jeff Kirsher <jeffrey.t.kirsher@intel.com>, Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, intel-wired-lan@lists.osuosl.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Dirk Gouders <dirk@gouders.net>, linux-kbuild@vger.kernel.org, "Zhang, Rui" <rui.zhang@intel.com>, "Lu, Aaron" <aaron.lu@intel.com>, "H.J. Lu" <hjl.tools@gmail.com>
 
-Hi Coccinelle developers,
+Hi Andi,
 
+On Mon, Nov 13, 2017 at 10:52:27AM -0800, Andi Kleen wrote:
+>> > It's the "CONFIG_DEBUG_INFO_SPLIT" thing that makes faddr2line unable
+>> > to see the inlining information,
+>> >
+>> > Using OPTIMIZE_INLINING is fine.
+>>
+>> Good to know that!
+>
+>It works for me. Perhaps your binutils is too old? It was
+>added at some point. Can you try upgrading?
+>
+>% ./linux/scripts/faddr2line obj/vmlinux schedule+10
+>schedule+10/0x80:
+>schedule at arch/x86/include/asm/current.h:15
+>
+>% addr2line --version
+>GNU addr2line version 2.27-24.fc26
 
-When I was working on my patch, I was hit by another issue.
+I use debian and tried addr2line in 2 systems:
 
-badzero.cocci failed on all modes.
+GNU addr2line (GNU Binutils for Debian) 2.28
+GNU addr2line (GNU Binutils for Debian) 2.29.1
 
-
-Can you take a look at it, please?
-
-
-
-I tried to use DEBUG_FILE and dump the log,
-but I could not get a clue of the cause of the failure.
-
-My spatch version is:
-spatch version 1.0.6-00345-g2ca0bef compiled with OCaml version 4.02.3
-
-
-
-
-The following is the result on my PC:
-
-
-$ make  coccicheck  COCCI=scripts/coccinelle/null/badzero.cocci  MODE=report
-
-Please check for false positives in the output before submitting a patch.
-When using "patch" mode, carefully review the patch before submitting it.
-
-coccicheck failed
-$ make  coccicheck  COCCI=scripts/coccinelle/null/badzero.cocci  MODE=patch
-
-Please check for false positives in the output before submitting a patch.
-When using "patch" mode, carefully review the patch before submitting it.
-
-coccicheck failed
-$ make  coccicheck  COCCI=scripts/coccinelle/null/badzero.cocci  MODE=context
-
-Please check for false positives in the output before submitting a patch.
-When using "patch" mode, carefully review the patch before submitting it.
-
-coccicheck failed
-$ make  coccicheck  COCCI=scripts/coccinelle/null/badzero.cocci  MODE=org
-
-Please check for false positives in the output before submitting a patch.
-When using "patch" mode, carefully review the patch before submitting it.
-
-coccicheck failed
-$ make  coccicheck  COCCI=scripts/coccinelle/null/badzero.cocci
-MODE=report  DEBUG_FILE=cocci-debug.txt
-
-Please check for false positives in the output before submitting a patch.
-When using "patch" mode, carefully review the patch before submitting it.
-
-coccicheck failed
-$ cat cocci-debug.txt
-/home/masahiro/bin/spatch -D report --no-show-diff --very-quiet
---cocci-file scripts/coccinelle/null/badzero.cocci --dir . -I
-./arch/x86/include -I ./arch/x86/include/generated -I ./include -I
-./arch/x86/include/uapi -I ./arch/x86/include/generated/uapi -I
-./include/uapi -I ./include/generated/uapi --include
-./include/linux/kconfig.h --jobs 8 --chunksize 1
-Fatal error: exception
-Yes_prepare_ocamlcocci.LinkFailure("/tmp/ocaml_cocci_18c9f9.cmxs")
-
-
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Regards,
+Fengguang
