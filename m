@@ -1,51 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:2528 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751151AbdKMXvm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Nov 2017 18:51:42 -0500
-Date: Mon, 13 Nov 2017 15:51:40 -0800
-From: Andi Kleen <ak@linux.intel.com>
-Subject: Re: CONFIG_DEBUG_INFO_SPLIT impacts on faddr2line
-Message-ID: <20171113235140.GR8522@tassilo.jf.intel.com>
-References: <CA+55aFwK7935r325nmR-eQvanVCN3A+v3wEQHsW4NpSeBsybeA@mail.gmail.com>
- <20171108171230.ccf7lwutjysk26fc@wfg-t540p.sh.intel.com>
- <CA+55aFx0O+NTbBjavPm_jPucqHdXFYPmUya4kw=ps7LSqTFd5w@mail.gmail.com>
- <20171113011338.3qmnp64pttyscuus@wfg-t540p.sh.intel.com>
- <20171113185227.GM8522@tassilo.jf.intel.com>
- <CA+55aFzbQBPOwah9gQPHR9WL+zZBOXnHsP6GKmC=QE7qOn+psw@mail.gmail.com>
- <20171113201013.GO8522@tassilo.jf.intel.com>
- <CA+55aFzFUuCniKCutTVNchuhY-bkB=3JkPv46rYwpx1Q0_5n0w@mail.gmail.com>
- <20171113214148.GP8522@tassilo.jf.intel.com>
- <CA+55aFzEb1qp872nO4Y20cY9WHdek2MC=7XX1xNcN8q1WvTOaw@mail.gmail.com>
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:36321 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750888AbdKNDwT (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 13 Nov 2017 22:52:19 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+55aFzEb1qp872nO4Y20cY9WHdek2MC=7XX1xNcN8q1WvTOaw@mail.gmail.com>
+In-Reply-To: <alpine.DEB.2.20.1711131744290.20292@hadrien>
+References: <1510210850-28866-1-git-send-email-yamada.masahiro@socionext.com>
+ <alpine.DEB.2.20.1711131628370.20333@hadrien> <CAK7LNASpxfq6Vg42rogQg1bixNL15O=8152=KJEnKQA=Ez6Dxw@mail.gmail.com>
+ <alpine.DEB.2.20.1711131744290.20292@hadrien>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 14 Nov 2017 12:51:15 +0900
+Message-ID: <CAK7LNAQS02azxxMZqTYvsuixOjWVeur1RGLJNmSBHsDkZ=mjbw@mail.gmail.com>
+Subject: Re: [PATCH v2] coccinelle: fix parallel build with CHECK=scripts/coccicheck
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Fengguang Wu <fengguang.wu@intel.com>, Jeff Kirsher <jeffrey.t.kirsher@intel.com>, Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, intel-wired-lan@lists.osuosl.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Dirk Gouders <dirk@gouders.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kbuild test robot <lkp@intel.com>, "Zhang, Rui" <rui.zhang@intel.com>, "Lu, Aaron" <aaron.lu@intel.com>, "H.J. Lu" <hjl.tools@gmail.com>
+To: Julia Lawall <julia.lawall@lip6.fr>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, cocci@systeme.lip6.fr, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-> I wonder if there is some way to use the split format for the
-> intermediate files, but then for the very final link bring them all in
-> and make the end result be a traditional single binary. I'm not
-> talking the separate "dwp" package that packs multiple dwo files into
-> one, but to actually link them all in at the one.
-> 
-> Sure, it would lose some of the advantage, but I think a large portion
-> of the -gsplit-dwarf advantage is about the intermediate state. No?
+Hi Julia,
 
-Not sure it's worth to do complicated workarounds. I assume
-it will be not that difficult to fix binutils (after all
-gdb works), and disabling the option is a reasonable workaround.
+2017-11-14 1:45 GMT+09:00 Julia Lawall <julia.lawall@lip6.fr>:
+>
+>
+> On Tue, 14 Nov 2017, Masahiro Yamada wrote:
+>
+>> Hi Julia,
+>>
+>>
+>> 2017-11-14 0:30 GMT+09:00 Julia Lawall <julia.lawall@lip6.fr>:
+>> >
+>> >
+>> > On Thu, 9 Nov 2017, Masahiro Yamada wrote:
+>> >
+>> >> The command "make -j8 C=1 CHECK=scripts/coccicheck" produces lots of
+>> >> "coccicheck failed" error messages.
+>> >>
+>> >> I do not know the coccinelle internals, but I guess --jobs does not
+>> >> work well if spatch is invoked from Make running in parallel.
+>> >> Disable --jobs in this case.
+>> >
+>> > Why is this change under:
+>> >
+>> > if [ "$C" = "1" -o "$C" = "2" ];
+>> >
+>> > The coccicheck failed messages come also if one runs Coccinelle on the
+>> > entire kernel.
+>>
+>> As far as I tested, "coccicheck failed" error only happens
+>> when ONLINE=1.
+>>
+>>
+>> make -j8 C=1 CHECK=scripts/coccicheck  COCCI=scripts/coccinelle/misc/bugon.cocci
+>>
+>> emits lots of errors.
+>>
+>>
+>> make -j8 coccicheck  COCCI=scripts/coccinelle/misc/bugon.cocci
+>>
+>> is fine.
+>>
+>>
+>> Have you tested it?
+>> Do you mean you got a different result from mine?
+>
+> I agree with your results, with respect to the number of errors.
+>
+> julia
+>
 
-> 
-> I tried to google for it, but couldn't find anything. But apparently
-> elfutils doesn't support dwo files either. It seems mainly the linker
-> and gdb itself that supports it.
+So, what shall we do?
 
-The original design document is
+If you do not like to fix it (or you can fix coccinelle itself),
+I can take back this patch.
 
-https://gcc.gnu.org/wiki/DebugFission
+I am not a coccinelle developer, so
+setting USE_JOBS="no" is the best I can do.
 
--Andi
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
