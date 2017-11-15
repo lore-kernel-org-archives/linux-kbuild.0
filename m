@@ -1,93 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:30344
-        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751617AbdKOIhM (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:20858 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756973AbdKOJTG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Nov 2017 03:37:12 -0500
-Date: Wed, 15 Nov 2017 09:37:04 +0100 (CET)
-From: Julia Lawall <julia.lawall@lip6.fr>
-Subject: Re: Coccinelle: badzero.cocci failure
-In-Reply-To: <CAK7LNAR=Un8B4e9-H7hOA+u=PH985xc1NBHRXoXQrSCs5hK7dQ@mail.gmail.com>
-Message-ID: <alpine.DEB.2.20.1711150935470.3647@hadrien>
-References: <CAK7LNATW91vf5Sa-vvJ7rLRNt+KRKPB=E5H_EOtOUgCB4WYmUA@mail.gmail.com> <alpine.DEB.2.20.1711141003410.2874@hadrien> <CAK7LNATw25OPNe_oqQNCmF=Uaw1Enjx9YRRBEHsZcAgupgHc8w@mail.gmail.com> <alpine.DEB.2.20.1711150721060.2147@hadrien>
- <CAK7LNAR=Un8B4e9-H7hOA+u=PH985xc1NBHRXoXQrSCs5hK7dQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323329-120972166-1510735025=:3647"
+        Wed, 15 Nov 2017 04:19:06 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: package: use --transform option to prefix paths in tar
+Date: Wed, 15 Nov 2017 18:17:07 +0900
+Message-Id: <1510737427-12510-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: cocci@systeme.lip6.fr, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
---8323329-120972166-1510735025=:3647
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+For rpm-pkg and deb-pkg, a source tar file is created.  All paths in
+the archive must be prefixed with the base name of the tar.  That
+means, everything is contained in the directory when you extract it.
 
-> > Can you try the following semantic patch (called eg nothing.cocci):
-> >
-> > @script:ocaml@
-> > @@
-> >
-> > ()
-> >
-> > on any .c file, ie
-> >
-> > spatch --sp-file nothing.cocci test.c
-> >
->
->
-> Thanks for the simple test semantic patch!
->
->
->
-> I noticed  1.0.4 is OK,
-> but 1.0.5 is NG
->
-> I guess this is a problem on Coccinelle side.
->
->
-> I git-bisect:ed and the first bad commit bad was:
->
->
-> commit cd539cd12ad0674d5a8f4c33f6c21ae00aec8e57
-> Author: Sébastien Hinderer <Sebastien.Hinderer@inria.fr>
-> Date:   Tue Mar 15 12:06:00 2016 +0100
->
->     Get rid of the --enable-release configure option.
->
->
->
->
-> $ spatch --version
-> spatch byte-code version 1.0.4-00212-g8238ba5 compiled with OCaml version 4.02.3
-> Flags passed to the configure script: --prefix=/home/masahiro
-> Python scripting support: yes
-> Syntax of regular expresssions: PCRE
-> $ spatch  --sp-file nothing.cocci kernel/kmod.c
-> init_defs_builtins: /home/masahiro/lib/coccinelle/standard.h
-> Using native version of ocamlc/ocamlopt/ocamldep
-> ocamlc.opt -c /tmp/ocaml_cocci_23600a.cmo -g -I /usr/lib/ocaml  -I
-> /home/masahiro/lib/coccinelle/ocaml /tmp/ocaml_cocci_23600a.ml
-> Compilation OK!
-> Loading ML code of the SP...
-> HANDLING: kernel/kmod.c
-> $ spatch --version
-> spatch native version 1.0.4-00213-gcd539cd compiled with OCaml version 4.02.3
-> Flags passed to the configure script: --prefix=/home/masahiro
-> Python scripting support: yes
-> Syntax of regular expresssions: PCRE
-> $ spatch  --sp-file nothing.cocci kernel/kmod.c
-> init_defs_builtins: /home/masahiro/lib/coccinelle/standard.h
-> Using native version of ocamlc/ocamlopt/ocamldep
-> ocamlopt.opt -shared -o /tmp/ocaml_cocci_fdd282.cmxs -g -I
-> /usr/lib/ocaml  -I /home/masahiro/lib/coccinelle/ocaml
-> /tmp/ocaml_cocci_fdd282.ml
-> Compilation OK!
-> Loading ML code of the SP...
-> implementation mismatch on Iteration
-> Fatal error: exception
-> Yes_prepare_ocamlcocci.LinkFailure("/tmp/ocaml_cocci_fdd282.cmxs")
+Currently, scripts/package/Makefile uses a symlink for that, and
+removes it after the tar is created.
 
-Thanks for the feedback.  I will try to find out more about this.
+If you terminate the build during the tar creation, the symlink is
+left over.  Then, at the next package build, you will see a warning
+like follows:
 
-julia
---8323329-120972166-1510735025=:3647--
+  ln: '.' and 'kernel-4.14.0+/.' are the same file
+
+It is possible to fix it by adding -n (--no-dereference) option to
+the "ln" command, but a cleaner way is to use --transform option
+of "tar" command.  This option is GNU extension, but it should not
+hurt to use it in the Linux build system.
+
+The 'S' flag is needed to exclude symlinks from the path fixup.
+Without it, symlinks in the kernel are broken.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ scripts/package/Makefile | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 9ed96aef..c30bcf8 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -39,10 +39,9 @@ if test "$(objtree)" != "$(srctree)"; then \
+ 	false; \
+ fi ; \
+ $(srctree)/scripts/setlocalversion --save-scmversion; \
+-ln -sf $(srctree) $(2); \
+ tar -cz $(RCS_TAR_IGNORE) -f $(2).tar.gz \
+-	$(addprefix $(2)/,$(TAR_CONTENT) $(3)); \
+-rm -f $(2) $(objtree)/.scmversion
++	--transform 's:^:$(2)/:S' $(TAR_CONTENT) $(3); \
++rm -f $(objtree)/.scmversion
+ 
+ # rpm-pkg
+ # ---------------------------------------------------------------------------
+-- 
+2.7.4
+
