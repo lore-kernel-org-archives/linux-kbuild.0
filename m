@@ -1,127 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:41730 "EHLO
+Received: from mail-it0-f68.google.com ([209.85.214.68]:39543 "EHLO
         mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934331AbdKOUmo (ORCPT
+        with ESMTP id S1758960AbdKOVep (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Nov 2017 15:42:44 -0500
-Received: by mail-it0-f68.google.com with SMTP id x28so3291853ita.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 15 Nov 2017 12:42:44 -0800 (PST)
-From: Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v3] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
-Date: Wed, 15 Nov 2017 12:42:30 -0800
-Message-Id: <20171115204231.34914-1-ndesaulniers@google.com>
-In-Reply-To: <CAK7LNAS1NaqPRhK6FOXN=YTMhLagpSrR2=tXn-uWZbpzr=NeoQ@mail.gmail.com>
-References: <CAK7LNAS1NaqPRhK6FOXN=YTMhLagpSrR2=tXn-uWZbpzr=NeoQ@mail.gmail.com>
+        Wed, 15 Nov 2017 16:34:45 -0500
+Received: by mail-it0-f68.google.com with SMTP id y15so3481649ita.4
+        for <linux-kbuild@vger.kernel.org>; Wed, 15 Nov 2017 13:34:42 -0800 (PST)
+From: Sami Tolvanen <samitolvanen@google.com>
+Subject: [PATCH v2 01/18] kbuild: add ld-name macro and support for GNU gold
+Date: Wed, 15 Nov 2017 13:34:11 -0800
+Message-Id: <20171115213428.22559-2-samitolvanen@google.com>
+In-Reply-To: <20171115213428.22559-1-samitolvanen@google.com>
+References: <20171115213428.22559-1-samitolvanen@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Douglas Anderson <dianders@chromium.org>, Chris Fries <cfries@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
+Cc: Sami Tolvanen <samitolvanen@google.com>
 
-From: Chris Fries <cfries@google.com>
+GNU gold may require different flags than GNU ld. Add a macro for
+detecting the linker and conditionally add gold specific flags from
+LDFLAGS_GOLD.
 
-Set the clang KBUILD_CFLAGS up before including arch/ Makefiles,
-so that ld-options (etc.) can work correctly.
-
-This fixes errors with clang such as ld-options trying to CC
-against your host architecture, but LD trying to link against
-your target architecture.
-
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
-Signed-off-by: Chris Fries <cfries@google.com>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Tested-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 ---
-Changes since v2:
-* Move clang block lower in Makefile, so as not to run it when running
-  configuration, per Masahiro.
-* Remove paragraphs from commit message, per Masahiro.
-* Add Masahiro to Suggested-by line in commit message.
-
- Makefile | 64 ++++++++++++++++++++++++++++++++--------------------------------
- 1 file changed, 32 insertions(+), 32 deletions(-)
+ Makefile               | 5 +++++
+ scripts/Kbuild.include | 4 ++++
+ 2 files changed, 9 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index a7476e6934f1..b3352becc7df 100644
+index 763ab35df12a..f976af9525bf 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -608,6 +608,38 @@ CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage -fno-tree-loop-im $(call cc-disabl
- CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
- export CFLAGS_GCOV CFLAGS_KCOV
+@@ -827,6 +827,11 @@ include scripts/Makefile.kasan
+ include scripts/Makefile.extrawarn
+ include scripts/Makefile.ubsan
  
-+ifeq ($(cc-name),clang)
-+ifneq ($(CROSS_COMPILE),)
-+CLANG_TARGET	:= -target $(notdir $(CROSS_COMPILE:%-=%))
-+GCC_TOOLCHAIN	:= $(realpath $(dir $(shell which $(LD)))/..)
-+endif
-+ifneq ($(GCC_TOOLCHAIN),)
-+CLANG_GCC_TC	:= -gcc-toolchain $(GCC_TOOLCHAIN)
-+endif
-+KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
-+KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
-+KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-+KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
-+KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
-+KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
-+KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
-+# Quiet clang warning: comparison of unsigned expression < 0 is always false
-+KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
-+# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
-+# source of a reference will be _MergedGlobals and not on of the whitelisted names.
-+# See modpost pattern 2
-+KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
-+KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-+KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
-+KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
-+else
-+
-+# These warnings generated too much noise in a regular build.
-+# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
-+KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
-+KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
++# Add any flags specific to ld.gold
++ifeq ($(ld-name),gold)
++LDFLAGS		+= $(LDFLAGS_GOLD)
 +endif
 +
- # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
- # values of the respective KBUILD_* variables
- ARCH_CPPFLAGS :=
-@@ -682,38 +714,6 @@ ifdef CONFIG_CC_STACKPROTECTOR
- endif
- KBUILD_CFLAGS += $(stackp-flag)
+ # Add any arch overrides and user supplied CPPFLAGS, AFLAGS and CFLAGS as the
+ # last assignments
+ KBUILD_CPPFLAGS += $(ARCH_CPPFLAGS) $(KCPPFLAGS)
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 9ffd3dda3889..584d6cecd7c0 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -172,6 +172,10 @@ ld-option = $(call try-run,\
+ # Important: no spaces around options
+ ar-option = $(call try-run, $(AR) rc$(1) "$$TMP",$(1),$(2))
  
--ifeq ($(cc-name),clang)
--ifneq ($(CROSS_COMPILE),)
--CLANG_TARGET	:= -target $(notdir $(CROSS_COMPILE:%-=%))
--GCC_TOOLCHAIN	:= $(realpath $(dir $(shell which $(LD)))/..)
--endif
--ifneq ($(GCC_TOOLCHAIN),)
--CLANG_GCC_TC	:= -gcc-toolchain $(GCC_TOOLCHAIN)
--endif
--KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
--KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
--KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
--KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
--KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
--KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
--KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
--# Quiet clang warning: comparison of unsigned expression < 0 is always false
--KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
--# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
--# source of a reference will be _MergedGlobals and not on of the whitelisted names.
--# See modpost pattern 2
--KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
--KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
--KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
--KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
--else
--
--# These warnings generated too much noise in a regular build.
--# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
--KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
--KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
--endif
--
- ifdef CONFIG_FRAME_POINTER
- KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
- else
++# ld-name
++# Expands to either bfd or gold
++ld-name = $(shell $(LD) -v 2>&1 | grep -q "GNU gold" && echo gold || echo bfd)
++
+ # ld-version
+ # Note this is mainly for HJ Lu's 3 number binutil versions
+ ld-version = $(shell $(LD) --version | $(srctree)/scripts/ld-version.sh)
 -- 
 2.15.0.448.gf294e3d99a-goog
 
