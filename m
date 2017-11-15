@@ -1,64 +1,174 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:25523 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752787AbdKOJUw (ORCPT
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:36287 "EHLO
+        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752522AbdKOO4t (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Nov 2017 04:20:52 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: rpm: prompt to use "rpm-pkg" if "rpm" target is used
-Date: Wed, 15 Nov 2017 18:19:20 +0900
-Message-Id: <1510737560-12643-1-git-send-email-yamada.masahiro@socionext.com>
+        Wed, 15 Nov 2017 09:56:49 -0500
+Date: Wed, 15 Nov 2017 15:56:46 +0100 (CET)
+From: Thierry Martinez <thierry.martinez@inria.fr>
+Message-ID: <276207557.16617848.1510757806971.JavaMail.zimbra@inria.fr>
+In-Reply-To: <CAK7LNAR=Un8B4e9-H7hOA+u=PH985xc1NBHRXoXQrSCs5hK7dQ@mail.gmail.com>
+References: <CAK7LNATW91vf5Sa-vvJ7rLRNt+KRKPB=E5H_EOtOUgCB4WYmUA@mail.gmail.com> <alpine.DEB.2.20.1711141003410.2874@hadrien> <CAK7LNATw25OPNe_oqQNCmF=Uaw1Enjx9YRRBEHsZcAgupgHc8w@mail.gmail.com> <alpine.DEB.2.20.1711150721060.2147@hadrien> <CAK7LNAR=Un8B4e9-H7hOA+u=PH985xc1NBHRXoXQrSCs5hK7dQ@mail.gmail.com>
+Subject: Re: [Cocci] Coccinelle: badzero.cocci failure
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Julia Lawall <julia.lawall@lip6.fr>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, cocci@systeme.lip6.fr
 
-The "rpm" has been kept for backward compatibility since pre-git era.
-I am planning to remove it after the Linux 4.18 release.  Annouce the
-end of the support, prompting to use "rpm-pkg" instead.
+Hi, Masahiro.
 
-If you use "rpm", it will work like "rpm-pkg", but warning messages
-will be displayed as follows:
+Masahiro:
+> Fatal error: exception
+> Yes_prepare_ocamlcocci.LinkFailure("/tmp/ocaml_cocci_fdd282.cmxs")
 
-  WARNING: "rpm" target will be removed after Linux 4.18
-           Please use "rpm-pkg" instead.
+If you can rerun your test with coccinelle GitHub master, the
+LinkFailure exception will now be more verbose, in order to understand
+the problem.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+I suspect a mismatch between the version of OCaml you use to compile
+coccinelle, and the version of OCaml that coccinelle uses to compile
+OCaml scripts in rules.
 
- Makefile                 | 5 +++--
- scripts/package/Makefile | 2 +-
- 2 files changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 37aafbd..c01763e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1336,8 +1336,9 @@ package-dir	:= scripts/package
- 	$(Q)$(MAKE) $(build)=$(package-dir) $@
- %pkg: include/config/kernel.release FORCE
- 	$(Q)$(MAKE) $(build)=$(package-dir) $@
--rpm: include/config/kernel.release FORCE
--	$(Q)$(MAKE) $(build)=$(package-dir) $@
-+rpm: rpm-pkg
-+	@echo "  WARNING: \"rpm\" target will be removed after Linux 4.18"
-+	@echo "           Please use \"rpm-pkg\" instead."
- 
- 
- # Brief documentation of the typical targets used
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index c30bcf8..c235349 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -45,7 +45,7 @@ rm -f $(objtree)/.scmversion
- 
- # rpm-pkg
- # ---------------------------------------------------------------------------
--rpm-pkg rpm: FORCE
-+rpm-pkg: FORCE
- 	$(MAKE) clean
- 	$(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
- 	$(call cmd,src_tar,$(KERNELPATH),kernel.spec)
+Thank you for helping us investigating this.
+Best regards.
 -- 
-2.7.4
+Thierry Martinez.
 
+----- Original Message -----
+> From: "Masahiro Yamada" <yamada.masahiro@socionext.com>
+> To: "Julia Lawall" <julia.lawall@lip6.fr>
+> Cc: "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>, "Linux Kbuild mailing list"
+> <linux-kbuild@vger.kernel.org>, "Nicolas Palix" <nicolas.palix@imag.fr>, cocci@systeme.lip6.fr
+> Sent: Wednesday, November 15, 2017 9:23:11 AM
+> Subject: Re: [Cocci] Coccinelle: badzero.cocci failure
+> 
+> Hi Julia,
+> 
+> 
+> 2017-11-15 15:22 GMT+09:00 Julia Lawall <julia.lawall@lip6.fr>:
+> >
+> >
+> > On Tue, 14 Nov 2017, Masahiro Yamada wrote:
+> >
+> >> Hi Julia,
+> >>
+> >>
+> >> 2017-11-14 18:07 GMT+09:00 Julia Lawall <julia.lawall@lip6.fr>:
+> >> >> coccicheck failed
+> >> >> $ cat cocci-debug.txt
+> >> >> /home/masahiro/bin/spatch -D report --no-show-diff --very-quiet
+> >> >> --cocci-file scripts/coccinelle/null/badzero.cocci --dir . -I
+> >> >> ./arch/x86/include -I ./arch/x86/include/generated -I ./include -I
+> >> >> ./arch/x86/include/uapi -I ./arch/x86/include/generated/uapi -I
+> >> >> ./include/uapi -I ./include/generated/uapi --include
+> >> >> ./include/linux/kconfig.h --jobs 8 --chunksize 1
+> >> >> Fatal error: exception
+> >> >> Yes_prepare_ocamlcocci.LinkFailure("/tmp/ocaml_cocci_18c9f9.cmxs")
+> >> >
+> >> > Does your Coccinelle support OCaml?  I'm not sure what is the proper way
+> >> > to
+> >> > check for this, but in my coccinelle/config.log file I have
+> >> >
+> >> > FEATURE_OCAML='1'
+> >>
+> >>
+> >> Yes.  I also see this line in my config.log
+> >>
+> >>
+> >> > spatch --version gives:
+> >> >
+> >> > spatch version 1.0.6-00147-g19f9421 compiled with OCaml version 4.02.3
+> >> > Flags passed to the configure script: [none]
+> >> > Python scripting support: yes
+> >> > Syntax of regular expresssions: Str
+> >>
+> >> My version output looks like follows:
+> >>
+> >> $ spatch --version
+> >> spatch version 1.0.6-00345-g2ca0bef compiled with OCaml version 4.02.3
+> >> Flags passed to the configure script: --prefix=/home/masahiro
+> >> Python scripting support: yes
+> >> Syntax of regular expresssions: PCRE
+> >>
+> >>
+> >> > I'm not sure why it doesn't give feedback on whether OCaml scripting is
+> >> > supported.  I will check on this.
+> >
+> > Can you try the following semantic patch (called eg nothing.cocci):
+> >
+> > @script:ocaml@
+> > @@
+> >
+> > ()
+> >
+> > on any .c file, ie
+> >
+> > spatch --sp-file nothing.cocci test.c
+> >
+> 
+> 
+> Thanks for the simple test semantic patch!
+> 
+> 
+> 
+> I noticed  1.0.4 is OK,
+> but 1.0.5 is NG
+> 
+> I guess this is a problem on Coccinelle side.
+> 
+> 
+> I git-bisect:ed and the first bad commit bad was:
+> 
+> 
+> commit cd539cd12ad0674d5a8f4c33f6c21ae00aec8e57
+> Author: Sébastien Hinderer <Sebastien.Hinderer@inria.fr>
+> Date:   Tue Mar 15 12:06:00 2016 +0100
+> 
+>     Get rid of the --enable-release configure option.
+> 
+> 
+> 
+> 
+> $ spatch --version
+> spatch byte-code version 1.0.4-00212-g8238ba5 compiled with OCaml version
+> 4.02.3
+> Flags passed to the configure script: --prefix=/home/masahiro
+> Python scripting support: yes
+> Syntax of regular expresssions: PCRE
+> $ spatch  --sp-file nothing.cocci kernel/kmod.c
+> init_defs_builtins: /home/masahiro/lib/coccinelle/standard.h
+> Using native version of ocamlc/ocamlopt/ocamldep
+> ocamlc.opt -c /tmp/ocaml_cocci_23600a.cmo -g -I /usr/lib/ocaml  -I
+> /home/masahiro/lib/coccinelle/ocaml /tmp/ocaml_cocci_23600a.ml
+> Compilation OK!
+> Loading ML code of the SP...
+> HANDLING: kernel/kmod.c
+> $ spatch --version
+> spatch native version 1.0.4-00213-gcd539cd compiled with OCaml version 4.02.3
+> Flags passed to the configure script: --prefix=/home/masahiro
+> Python scripting support: yes
+> Syntax of regular expresssions: PCRE
+> $ spatch  --sp-file nothing.cocci kernel/kmod.c
+> init_defs_builtins: /home/masahiro/lib/coccinelle/standard.h
+> Using native version of ocamlc/ocamlopt/ocamldep
+> ocamlopt.opt -shared -o /tmp/ocaml_cocci_fdd282.cmxs -g -I
+> /usr/lib/ocaml  -I /home/masahiro/lib/coccinelle/ocaml
+> /tmp/ocaml_cocci_fdd282.ml
+> Compilation OK!
+> Loading ML code of the SP...
+> implementation mismatch on Iteration
+> Fatal error: exception
+> Yes_prepare_ocamlcocci.LinkFailure("/tmp/ocaml_cocci_fdd282.cmxs")
+> 
+> 
+> --
+> Best Regards
+> Masahiro Yamada
+> _______________________________________________
+> Cocci mailing list
+> Cocci@systeme.lip6.fr
+> https://systeme.lip6.fr/mailman/listinfo/cocci
+> 
