@@ -1,55 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:46241 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965374AbdKPWZr (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:45200 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965521AbdKPWyj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 17:25:47 -0500
-Received: by mail-it0-f68.google.com with SMTP id r127so1861230itb.5
-        for <linux-kbuild@vger.kernel.org>; Thu, 16 Nov 2017 14:25:47 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu_3R4SUC2hCUtEX_4ut9admtrBZS-S-mzQnQsoJoHPcBw@mail.gmail.com>
+        Thu, 16 Nov 2017 17:54:39 -0500
+Date: Thu, 16 Nov 2017 22:54:34 +0000
+From: Alex Matveev <alxmtvv@gmail.com>
+Subject: Re: [PATCH v2 11/18] arm64: make mrs_s and msr_s macros work with
+ LTO
+Message-ID: <20171116225434.691af6cf@delmar.localdomain>
+In-Reply-To: <20171116212920.wixsxoccznyef4aq@yury-thinkpad>
 References: <20171115213428.22559-1-samitolvanen@google.com>
- <20171115213428.22559-9-samitolvanen@google.com> <CAKv+Gu-wYwBMV7tdb+Kax_cyPsmAB2R2ZVwJuNi9qM0kaYAs=Q@mail.gmail.com>
- <20171116114406.GB9361@arm.com> <20171116163132.GC94341@samitolvanen.mtv.corp.google.com>
- <CAKv+Gu8yPSwZep-S_ke_P5BiZ3o72R=ykhixoXcyGUHa1ZxGGw@mail.gmail.com>
- <20171116213702.GA10616@samitolvanen.mtv.corp.google.com> <CAKv+Gu_3R4SUC2hCUtEX_4ut9admtrBZS-S-mzQnQsoJoHPcBw@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Thu, 16 Nov 2017 22:25:46 +0000
-Message-ID: <CAKv+Gu8uWq+T2AJQvBqwb-hMeZgFJQUQozsr4Ufwwp2hheRXcQ@mail.gmail.com>
-Subject: Re: [PATCH v2 08/18] arm64: don't disable ADR_PREL_PG_HI21* with ARM64_ERRATUM_843419
-Content-Type: text/plain; charset="UTF-8"
+        <20171115213428.22559-12-samitolvanen@google.com>
+        <20171116115433.GG9361@arm.com>
+        <20171116130742.wijnukjetoupi4hc@yury-thinkpad>
+        <c0c19191-e090-4768-3c46-b813713d2908@arm.com>
+        <20171116212920.wixsxoccznyef4aq@yury-thinkpad>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, Andi Kleen <ak@linux.intel.com>, Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Alex Matveev <alxmtvv@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>
+To: Yury Norov <ynorov@caviumnetworks.com>
+Cc: Robin Murphy <robin.murphy@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, Andi Kleen <ak@linux.intel.com>, Kees Cook <keescook@chromium.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org, Greg Hackmann <ghackmann@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Sami Tolvanen <samitolvanen@google.com>, Matthias Kaehlcke <mka@chromium.org>, linux-arm-kernel@lists.infradead.org, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>
 
-On 16 November 2017 at 22:14, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> On 16 November 2017 at 21:37, Sami Tolvanen <samitolvanen@google.com> wrote:
->> On Thu, Nov 16, 2017 at 04:34:03PM +0000, Ard Biesheuvel wrote:
->>> You still have not explained to us how GOLD avoids the erratum.
->>
->> Sorry, I didn't realize you were asking that. If gold spots erratum
->> sequences, looks like it creates stubs to break them up:
->>
->>   https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=gold/aarch64.cc#l8396
->>
->> It also attempts to optimize the code by replacing adrps in these
->> sequences with adr where possible, but otherwise doesn't appear to
->> touch them:
->>
->>   https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=gold/aarch64.cc#l2053
->>
->
-> OK, so my concern here is that this code probably only operates on
-> fully linked binaries, and not partially linked object files like
-> kernel modules. The same applies to ld.bfd, which is why we need to
-> use the large module
+On Fri, 17 Nov 2017 00:29:20 +0300
+Yury Norov <ynorov@caviumnetworks.com> wrote:
 
-*model* not module
+> On Thu, Nov 16, 2017 at 01:55:31PM +0000, Robin Murphy wrote:
+> > Given that this whole mrs_s infrastructure is a workaround for older
+> > assemblers which don't support the "S<op0>_<op1>_<Cn>_<Cm>_<op2>"
+> > syntax for arbitrary unnamed system registers (which IIRC was a
+> > fairly late addition to the architecture), the only way it could be
+> > "fixed" on the toolchain side is by removing all those older
+> > toolchains from existence. Good luck with that ;)
+> > 
+> > In *theory*, it might be possible to do something similar to what
+> > we do with CONFIG_BROKEN_GAS_INST to detect offending assemblers
+> > and only define and use these macros when necessary (hopefully
+> > Clang and other LTO-capable toolchains do accept the proper
+> > syntax), but I've no idea how invasive or difficult that might turn
+> > out to be.  
+> 
+> Thank you Robin. The "S<op0>_<op1>_<Cn>_<Cm>_<op2>" is the feature I
+> was looking for. I'm not going to remove old toolchain from every user
+> machine - I believe if I do, I'll be put into jail finally. :)
+> 
+> But I think we should use this syntax for {read,write}_sysreg_s
+> and other functions if assembler supports it. The existing mrs_s/msr_s
+> machinery will be deprecated then, and it will be generally good.
 
-> instead of a code model that may emit adrp
-> instructions..
->
-> What is preventing us from using the large model with clang? I know it
-> uses movk/movz pairs rather than literals, but this shouldn't matter
-> for modules, given that we support static ELF relocations.
+Well, "S<op>_..." is how registers were accessed before implementation
+of mrs_s/msr_s - here's the patch from mid-2014 by Catalin Marinas:
+
+commit 72c583951526
+Author: Catalin Marinas <catalin.marinas@arm.com>
+Date:   Thu Jul 24 14:14:42 2014 +0100
+
+    arm64: gicv3: Allow GICv3 compilation with older binutils
+    
+    GICv3 introduces new system registers accessible with the full
+    msr/mrs syntax (e.g. mrs x0, Sop0_op1_CRm_CRn_op2). However, only
+    recent binutils understand the new syntax. This patch introduces
+    msr_s/mrs_s assembly macros which generate the equivalent
+    instructions above and converts the existing GICv3 code (both
+    drivers/irqchip/ and arch/arm64/kernel/).
+
+The question is - is it OK to drop compatibility with old versions of
+binutils (which were already "older" back in 2014)? It's not my call to
+make. If yes, then it should be possible to make this change more
+aesthetic by reverting to "S<op>" (however, it will affect more places
+as now some users of register definitions expect them to be numbers, not
+"S<op>" strings).
+
+Going the way of CONFIG_BROKEN_GAS_INST and selecting between "S<op>"
+and mrs_s/msr_s is also possible, but then we'd have to keep both
+mechanisms around. I'm not quite sure what that would give us.
+
+Regards,
+Alex
