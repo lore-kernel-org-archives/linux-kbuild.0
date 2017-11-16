@@ -1,60 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:37479 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933477AbdKPHsa (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 02:48:30 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: define KBUILD_MODNAME even if multiple modules share objects
-Date: Thu, 16 Nov 2017 16:46:36 +0900
-Message-Id: <1510818396-17443-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from mx.socionext.com ([202.248.49.38]:25659 "EHLO mx.socionext.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751205AbdKPH7u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 16 Nov 2017 02:59:50 -0500
+From: <yamada.masahiro@socionext.com>
+Subject: RE: [kbuild:kbuild 28/31] include/linux/dynamic_debug.h:76:14: error:
+ 'KBUILD_MODNAME' undeclared
+Date: Thu, 16 Nov 2017 07:59:47 +0000
+Message-ID: <bc7d9e6d2541494685beac1b4916d9fa@SOC-EX01V.e01.socionext.com>
+References: <201711161323.scU2nJRf%fengguang.wu@intel.com>
+In-Reply-To: <201711161323.scU2nJRf%fengguang.wu@intel.com>
+Content-Language: ja-JP
+Content-Type: text/plain; charset="iso-2022-jp"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Cao jin <caoj.fnst@cn.fujitsu.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
+To: fengguang.wu@intel.com, caoj.fnst@cn.fujitsu.com
+Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org
 
-Currently, KBUILD_MODNAME is defined only when $(modname) contains
-just one word.  If an object is shared between multiple modules,
-undefined KBUILD_MODNAME causes a build error.
-
-A simple test case is as follows:
-
-  obj-m += foo.o
-  obj-m += bar.o
-  foo-objs := foo-bar-common.o foo-main.o
-  bar-objs := foo-bar-common.o bar-main.o
-
-In this case, we do not know what to define for KBUILD_MODNAME when
-compiling foo-bar-common.o ("foo" or "bar" ?), so one reasonable
-solution is let it fall back to $(basetarget) (= "foo-bar-common").
-
-It would be better to avoid such a design where possible, but we
-already have such a case, for example,
-drivers/net/ethernet/cavium/liquidio/Makefile
-
-I slightly refactored implementation; we can check $(word 2, $(modname))
-instead of $(filter 1,$(words $(modname))).
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- scripts/Makefile.lib | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 5fbc46d..9f9a7df 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -86,8 +86,7 @@ subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
- #       differ in different configs.
- name-fix = $(squote)$(quote)$(subst $(comma),_,$(subst -,_,$1))$(quote)$(squote)
- basename_flags = -DKBUILD_BASENAME=$(call name-fix,$(basetarget))
--modname_flags  = $(if $(filter 1,$(words $(modname))),\
--                 -DKBUILD_MODNAME=$(call name-fix,$(modname)))
-+modname_flags  = -DKBUILD_MODNAME=$(call name-fix,$(if $(word 2,$(modname)),$(basetarget),$(modname)))
- 
- orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) \
-                  $(ccflags-y) $(CFLAGS_$(basetarget).o)
--- 
-2.7.4
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbToga2J1aWxkIHRlc3Qgcm9i
+b3QgW21haWx0bzpmZW5nZ3Vhbmcud3VAaW50ZWwuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgTm92
+ZW1iZXIgMTYsIDIwMTcgMjoyOSBQTQ0KPiBUbzogQ2FvIGppbiA8Y2Fvai5mbnN0QGNuLmZ1aml0
+c3UuY29tPg0KPiBDYzoga2J1aWxkLWFsbEAwMS5vcmc7IGxpbnV4LWtidWlsZEB2Z2VyLmtlcm5l
+bC5vcmc7IFlhbWFkYSwgTWFzYWhpcm8vDQo+IBskQjszRUQbKEIgGyRCPz85MBsoQiA8eWFtYWRh
+Lm1hc2FoaXJvQHNvY2lvbmV4dC5jb20+DQo+IFN1YmplY3Q6IFtrYnVpbGQ6a2J1aWxkIDI4LzMx
+XSBpbmNsdWRlL2xpbnV4L2R5bmFtaWNfZGVidWcuaDo3NjoxNDoNCj4gZXJyb3I6ICdLQlVJTERf
+TU9ETkFNRScgdW5kZWNsYXJlZA0KPiANCj4gdHJlZToNCj4gaHR0cHM6Ly9naXQua2VybmVsLm9y
+Zy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvbWFzYWhpcm95L2xpbnV4LWtidWlsZA0KPiAuZ2l0
+IGtidWlsZA0KPiBoZWFkOiAgIGVhMTVjOGNkMzYwMTY0MGUyMDI4MjhlM2I1NjM2NTNhOGIzYzc2
+Y2QNCj4gY29tbWl0OiAxYWMwNDA4YmJiM2Y0N2VmMjQxMTk3NmZiZDJiZjc1OGQ3NDdiYmVlIFsy
+OC8zMV0ga2J1aWxkOiBmaXgNCj4gbW9kbmFtZSBmb3IgY29tcG9zaXRlIG1vZHVsZXMNCj4gY29u
+ZmlnOiB4ODZfNjQtYWxsbW9kY29uZmlnIChhdHRhY2hlZCBhcyAuY29uZmlnKQ0KPiBjb21waWxl
+cjogZ2NjLTYgKERlYmlhbiA2LjQuMC05KSA2LjQuMCAyMDE3MTAyNg0KPiByZXByb2R1Y2U6DQo+
+ICAgICAgICAgZ2l0IGNoZWNrb3V0IDFhYzA0MDhiYmIzZjQ3ZWYyNDExOTc2ZmJkMmJmNzU4ZDc0
+N2JiZWUNCj4gICAgICAgICAjIHNhdmUgdGhlIGF0dGFjaGVkIC5jb25maWcgdG8gbGludXggYnVp
+bGQgdHJlZQ0KPiAgICAgICAgIG1ha2UgQVJDSD14ODZfNjQNCj4gDQo+IEFsbCBlcnJvci93YXJu
+aW5ncyAobmV3IG9uZXMgcHJlZml4ZWQgYnkgPj4pOg0KPiANCj4gICAgSW4gZmlsZSBpbmNsdWRl
+ZCBmcm9tIGluY2x1ZGUvbGludXgvcHJpbnRrLmg6MzI5OjAsDQo+ICAgICAgICAgICAgICAgICAg
+ICAgZnJvbSBpbmNsdWRlL2xpbnV4L2tlcm5lbC5oOjEzLA0KPiAgICAgICAgICAgICAgICAgICAg
+IGZyb20gaW5jbHVkZS9saW51eC9saXN0Lmg6OCwNCj4gICAgICAgICAgICAgICAgICAgICBmcm9t
+IGluY2x1ZGUvbGludXgvdGltZXIuaDo0LA0KPiAgICAgICAgICAgICAgICAgICAgIGZyb20gaW5j
+bHVkZS9saW51eC9uZXRkZXZpY2UuaDoyOCwNCj4gICAgICAgICAgICAgICAgICAgICBmcm9tDQo+
+IGRyaXZlcnMvbmV0L2V0aGVybmV0L2Nhdml1bS9saXF1aWRpby9saW9fZXRodG9vbC5jOjE4Og0K
+PiAgICBkcml2ZXJzL25ldC9ldGhlcm5ldC9jYXZpdW0vbGlxdWlkaW8vb2N0ZW9uX21haW4uaDog
+SW4gZnVuY3Rpb24NCj4gJ29jdGVvbl91bm1hcF9wY2lfYmFyeCc6DQo+ID4+IGluY2x1ZGUvbGlu
+dXgvZHluYW1pY19kZWJ1Zy5oOjc2OjE0OiBlcnJvcjogJ0tCVUlMRF9NT0ROQU1FJw0KPiB1bmRl
+Y2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikNCj4gICAgICAgLm1vZG5hbWUgPSBL
+QlVJTERfTU9ETkFNRSwgICBcDQo+ICAgICAgICAgICAgICAgICAgXg0KPiAgICBpbmNsdWRlL2xp
+bnV4L2R5bmFtaWNfZGVidWcuaDo5ODoyOiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8NCj4g
+J0RFRklORV9EWU5BTUlDX0RFQlVHX01FVEFEQVRBX0tFWScNCj4gICAgICBERUZJTkVfRFlOQU1J
+Q19ERUJVR19NRVRBREFUQV9LRVkobmFtZSwgZm10LCAua2V5LmRkX2tleV9mYWxzZSwgXA0KPiAg
+ICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KPiAgICBpbmNsdWRlL2xpbnV4
+L2R5bmFtaWNfZGVidWcuaDoxMzI6Mjogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvDQoNCltz
+bmlwIGxvdHMgb2YgZXJyb3JzXQ0KPiANCj4gLS0tDQo+IDAtREFZIGtlcm5lbCB0ZXN0IGluZnJh
+c3RydWN0dXJlICAgICAgICAgICAgICAgIE9wZW4gU291cmNlIFRlY2hub2xvZ3kNCj4gQ2VudGVy
+DQo+IGh0dHBzOi8vbGlzdHMuMDEub3JnL3BpcGVybWFpbC9rYnVpbGQtYWxsICAgICAgICAgICAg
+ICAgICAgIEludGVsDQo+IENvcnBvcmF0aW9uDQoNCg0KT0suDQpMb29rcyBsaWtlIHRoaXMgcG90
+ZW50aWFsIGlzc3VlIGhhcyBiZWVuIGhpZGRlbi4NCg0KSSBwbGFuIHRvIGluc2VydCB0aGUgZm9s
+bG93aW5nIHBhdGNoIGJlZm9yZSBDYW8ncyBvbmU6DQpodHRwczovL3BhdGNod29yay5rZXJuZWwu
+b3JnL3BhdGNoLzEwMDYwODI1Lw0KDQpXZSBzaG91bGQgYmV0dGVyIHRvIHRha2UgdGltZSBmb3Ig
+dGVzdGluZyBieSAwZGF5IGJvdCwgdGhvdWdoLg0KDQo=
