@@ -1,100 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:57110 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1757937AbdKPJqf (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 04:46:35 -0500
-Subject: Re: [kbuild:kbuild 28/31] include/linux/dynamic_debug.h:76:14: error:
- 'KBUILD_MODNAME' undeclared
-References: <201711161323.scU2nJRf%fengguang.wu@intel.com>
- <bc7d9e6d2541494685beac1b4916d9fa@SOC-EX01V.e01.socionext.com>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <19de6cd8-a2c2-885a-557e-121fed8b8931@cn.fujitsu.com>
-Date: Thu, 16 Nov 2017 17:46:03 +0800
+Received: from mail-sn1nam01on0044.outbound.protection.outlook.com ([104.47.32.44]:52633
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1758221AbdKPKzx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 16 Nov 2017 05:55:53 -0500
+Date: Thu, 16 Nov 2017 13:55:41 +0300
+From: Yury Norov <ynorov@caviumnetworks.com>
+Subject: Re: [PATCH v2 05/18] arm64: fix -m for GNU gold
+Message-ID: <20171116105541.fqf3zgrqnbug7deq@yury-thinkpad>
+References: <20171115213428.22559-1-samitolvanen@google.com>
+ <20171115213428.22559-6-samitolvanen@google.com>
 MIME-Version: 1.0
-In-Reply-To: <bc7d9e6d2541494685beac1b4916d9fa@SOC-EX01V.e01.socionext.com>
-Content-Type: text/plain; charset="iso-2022-jp"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171115213428.22559-6-samitolvanen@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com
-Cc: fengguang.wu@intel.com, kbuild-all@01.org, linux-kbuild@vger.kernel.org
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Matthias Kaehlcke <mka@chromium.org>
 
+On Wed, Nov 15, 2017 at 01:34:15PM -0800, Sami Tolvanen wrote:
+> GNU gold supports different emulations than bfd. Use aarch64_elf64_*_vec
+> instead of aarch64linux.
+> 
+> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 
+Acked-by: Yury Norov <ynorov@caviumnetworks.com>
 
-On 11/16/2017 03:59 PM, yamada.masahiro@socionext.com wrote:
+> ---
+>  arch/arm64/Makefile | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> 
->> -----Original Message-----
->> From: kbuild test robot [mailto:fengguang.wu@intel.com]
->> Sent: Thursday, November 16, 2017 2:29 PM
->> To: Cao jin <caoj.fnst@cn.fujitsu.com>
->> Cc: kbuild-all@01.org; linux-kbuild@vger.kernel.org; Yamada, Masahiro/
->> 山田 真弘 <yamada.masahiro@socionext.com>
->> Subject: [kbuild:kbuild 28/31] include/linux/dynamic_debug.h:76:14:
->> error: 'KBUILD_MODNAME' undeclared
->>
->> tree:
->> https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild
->> .git kbuild
->> head:   ea15c8cd3601640e202828e3b563653a8b3c76cd
->> commit: 1ac0408bbb3f47ef2411976fbd2bf758d747bbee [28/31] kbuild: fix
->> modname for composite modules
->> config: x86_64-allmodconfig (attached as .config)
->> compiler: gcc-6 (Debian 6.4.0-9) 6.4.0 20171026
->> reproduce:
->>         git checkout 1ac0408bbb3f47ef2411976fbd2bf758d747bbee
->>         # save the attached .config to linux build tree
->>         make ARCH=x86_64
->>
->> All error/warnings (new ones prefixed by >>):
->>
->>    In file included from include/linux/printk.h:329:0,
->>                     from include/linux/kernel.h:13,
->>                     from include/linux/list.h:8,
->>                     from include/linux/timer.h:4,
->>                     from include/linux/netdevice.h:28,
->>                     from
->> drivers/net/ethernet/cavium/liquidio/lio_ethtool.c:18:
->>    drivers/net/ethernet/cavium/liquidio/octeon_main.h: In function
->> 'octeon_unmap_pci_barx':
->>>> include/linux/dynamic_debug.h:76:14: error: 'KBUILD_MODNAME'
->> undeclared (first use in this function)
->>       .modname = KBUILD_MODNAME,   \
->>                  ^
->>    include/linux/dynamic_debug.h:98:2: note: in expansion of macro
->> 'DEFINE_DYNAMIC_DEBUG_METADATA_KEY'
->>      DEFINE_DYNAMIC_DEBUG_METADATA_KEY(name, fmt, .key.dd_key_false, \
->>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>    include/linux/dynamic_debug.h:132:2: note: in expansion of macro
-> 
-> [snip lots of errors]
->>
->> ---
->> 0-DAY kernel test infrastructure                Open Source Technology
->> Center
->> https://lists.01.org/pipermail/kbuild-all                   Intel
->> Corporation
-> 
-> 
-> OK.
-> Looks like this potential issue has been hidden.
-> 
-> I plan to insert the following patch before Cao's one:
-> https://patchwork.kernel.org/patch/10060825/
-> 
-> We should better to take time for testing by 0day bot, though.
-> 
-> 
-
-It is weird that I didn't receive the Original Message From: kbuild test
-robot.
-
-Thanks for fixing it, Masahiro-san, I will take a look.
-
--- 
-Sincerely,
-Cao jin
-
-
+> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+> index ecd5ed11c764..6059c8169513 100644
+> --- a/arch/arm64/Makefile
+> +++ b/arch/arm64/Makefile
+> @@ -70,14 +70,22 @@ KBUILD_CPPFLAGS	+= -mbig-endian
+>  CHECKFLAGS	+= -D__AARCH64EB__
+>  AS		+= -EB
+>  LD		+= -EB
+> +ifeq ($(ld-name),gold)
+> +LDFLAGS		+= -maarch64_elf64_be_vec
+> +else
+>  LDFLAGS		+= -maarch64linuxb
+> +endif
+>  UTS_MACHINE	:= aarch64_be
+>  else
+>  KBUILD_CPPFLAGS	+= -mlittle-endian
+>  CHECKFLAGS	+= -D__AARCH64EL__
+>  AS		+= -EL
+>  LD		+= -EL
+> +ifeq ($(ld-name),gold)
+> +LDFLAGS		+= -maarch64_elf64_le_vec
+> +else
+>  LDFLAGS		+= -maarch64linux
+> +endif
+>  UTS_MACHINE	:= aarch64
+>  endif
+>  
+> -- 
+> 2.15.0.448.gf294e3d99a-goog
