@@ -1,53 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0049.outbound.protection.outlook.com ([104.47.32.49]:23872
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-bl2nam02on0049.outbound.protection.outlook.com ([104.47.38.49]:55552
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933004AbdKPUxW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 15:53:22 -0500
-Date: Thu, 16 Nov 2017 23:53:00 +0300
+        id S934084AbdKPV3m (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 16 Nov 2017 16:29:42 -0500
+Date: Fri, 17 Nov 2017 00:29:20 +0300
 From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH v2 00/18] Add support for clang LTO
-Message-ID: <20171116205300.5p3vjjqouw3prr3t@yury-thinkpad>
+Subject: Re: [PATCH v2 11/18] arm64: make mrs_s and msr_s macros work with LTO
+Message-ID: <20171116212920.wixsxoccznyef4aq@yury-thinkpad>
 References: <20171115213428.22559-1-samitolvanen@google.com>
+ <20171115213428.22559-12-samitolvanen@google.com>
+ <20171116115433.GG9361@arm.com>
+ <20171116130742.wijnukjetoupi4hc@yury-thinkpad>
+ <c0c19191-e090-4768-3c46-b813713d2908@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171115213428.22559-1-samitolvanen@google.com>
+In-Reply-To: <c0c19191-e090-4768-3c46-b813713d2908@arm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Matthias Kaehlcke <mka@chromium.org>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, Andi Kleen <ak@linux.intel.com>, Kees Cook <keescook@chromium.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org, Greg Hackmann <ghackmann@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Sami Tolvanen <samitolvanen@google.com>, Alex Matveev <alxmtvv@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, linux-arm-kernel@lists.infradead.org, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>
 
-On Wed, Nov 15, 2017 at 01:34:10PM -0800, Sami Tolvanen wrote:
-> This series adds build system support for compiling the kernel with clang
-> Link Time Optimization (LTO), using GNU gold with the LLVMgold plug-in
-> for linking. Some background for clang's LTO support is available here:
+On Thu, Nov 16, 2017 at 01:55:31PM +0000, Robin Murphy wrote:
+> On 16/11/17 13:07, Yury Norov wrote:
+> > On Thu, Nov 16, 2017 at 11:54:33AM +0000, Will Deacon wrote:
+> > > On Wed, Nov 15, 2017 at 01:34:21PM -0800, Sami Tolvanen wrote:
+> > > > From: Alex Matveev <alxmtvv@gmail.com>
+> > > > 
+> > > > Use UNDEFINE_MRS_S and UNDEFINE_MSR_S to define corresponding macros
+> > > > in-place and workaround gcc and clang limitations on redefining macros
+> > > > across different assembler blocks.
+> > > 
+> > > What limitations? Can you elaborate please? Is this a fix?
+> > 
+> > Hi Will,
+> > 
+> > Regarding GCC.
+> > 
+> > When it joins preprocessed source files into single asm file,
+> > mrs_s/msr_s becomes either not declared or declared multiple times.
+> > 
+> > ./ccuFb68h.s:33120: Error: Macro `mrs_s' was already defined
+> > ./ccuFb68h.s:33124: Error: Macro `msr_s' was already defined
+> > 
+> > I'm not sure that GCC works correctly in this case, and I sent the
+> > email to Linaro toolchain group to clarify it. See below.
+> > 
+> > Yury
+> > 
+> > [...]
+> > 
+> > Links:
+> > My unfinished branch:
+> > https://github.com/norov/linux/tree/lto
+> > Andi Kleen tree:
+> > https://github.com/andikleen/linux-misc/tree/lto-411-1
+> > Sami Tolvanen's recent work for clang:
+> > https://lkml.org/lkml/2017/11/3/606
+> > 
+> > Question we have for now:
+> > There's mrs_s/msr_s macro that doesn't work with LTO - linker
+> > complains very loudly that macro is either not declared, or declared
+> > multiple times. (To reproduce - try to build my kernel branch w/o last
+> > patch).
+> > 
+> > The same (?) problem is observed with clang, and people there
+> > considered it as feature, not a bug.
+> > 
+> > https://bugs.llvm.org/show_bug.cgi?id=19749
+> > 
+> > We have the fix for both clang and gcc, but it looks hacky. Maybe it
+> > worth to fix mrs/msr issue on toolchain side?
 > 
->   https://llvm.org/docs/LinkTimeOptimization.html
+> Given that this whole mrs_s infrastructure is a workaround for older
+> assemblers which don't support the "S<op0>_<op1>_<Cn>_<Cm>_<op2>" syntax for
+> arbitrary unnamed system registers (which IIRC was a fairly late addition to
+> the architecture), the only way it could be "fixed" on the toolchain side is
+> by removing all those older toolchains from existence. Good luck with that
+> ;)
 > 
-> With -flto, clang produces LLVM bitcode instead of object files, and
-> the compilation to native code happens at link time. In addition, clang
-> cannot use an external assembler for inline assembly when LTO is enabled,
-> which causes further compatibility issues.
-> 
-> The patches in this series remove intermediate linking steps when LTO is
-> used, postpone processing done on object files until after the LTO link
-> step, add workarounds for GNU gold incompatibilities, and address inline
-> assembly incompatibilities for arm64.
-> 
-> These changes allow arm64 defconfig to be compiled with LTO, but other
-> architectures are not enabled until compatibility issues have been
-> addressed. In particular, x86 inline assembly doesn't currently compile
-> with clang's integrated assembler due to this LLVM bug:
-> 
->   https://bugs.llvm.org/show_bug.cgi?id=24487
-> 
-> Due to recent bug fixes in the toolchain, it's recommended to use clang
-> 5.0 or later, and GNU gold from binutils 2.27 or later, although older
-> versions may also work depending on your kernel configuration.
+> In *theory*, it might be possible to do something similar to what we do with
+> CONFIG_BROKEN_GAS_INST to detect offending assemblers and only define and
+> use these macros when necessary (hopefully Clang and other LTO-capable
+> toolchains do accept the proper syntax), but I've no idea how invasive or
+> difficult that might turn out to be.
 
-So, you don't guarantee that kernel will work with old compiler and
-toolchain? If so, I would suggest you to add the patch that checks
-their versions and disables LTO if needed.
+Thank you Robin. The "S<op0>_<op1>_<Cn>_<Cm>_<op2>" is the feature I
+was looking for. I'm not going to remove old toolchain from every user
+machine - I believe if I do, I'll be put into jail finally. :)
+
+But I think we should use this syntax for {read,write}_sysreg_s
+and other functions if assembler supports it. The existing mrs_s/msr_s
+machinery will be deprecated then, and it will be generally good.
+
+Sami told that LTO doesn't work with old toolchains, so I think that
+it would be OK to disable LTO for old assemblers that doesn't support
+all necessary features. Anyway, this is not blocking issue because we
+have patch that workarounds it (again).
 
 Yury
