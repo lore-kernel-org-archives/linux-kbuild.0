@@ -1,33 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:39807 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752929AbdKPAwv (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:52182 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933190AbdKPCUF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Nov 2017 19:52:51 -0500
+        Wed, 15 Nov 2017 21:20:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <1510652841-6779-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1510652841-6779-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <CAK7LNASGr2O3wxt_9J-zjvttpc0joztmdT7NFZ5MK7NWEOp5gw@mail.gmail.com>
+References: <CAK7LNATW91vf5Sa-vvJ7rLRNt+KRKPB=E5H_EOtOUgCB4WYmUA@mail.gmail.com>
+ <alpine.DEB.2.20.1711141003410.2874@hadrien> <CAK7LNATw25OPNe_oqQNCmF=Uaw1Enjx9YRRBEHsZcAgupgHc8w@mail.gmail.com>
+ <alpine.DEB.2.20.1711150721060.2147@hadrien> <CAK7LNAR=Un8B4e9-H7hOA+u=PH985xc1NBHRXoXQrSCs5hK7dQ@mail.gmail.com>
+ <276207557.16617848.1510757806971.JavaMail.zimbra@inria.fr> <CAK7LNASGr2O3wxt_9J-zjvttpc0joztmdT7NFZ5MK7NWEOp5gw@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 16 Nov 2017 09:52:00 +0900
-Message-ID: <CAK7LNAQp41EVrMqWkyXK0twjDDGoQ787euHrt2pW7Kh3EUNK=w@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: move coccicheck help in scripts/Makefile.help to
- top Makefile
+Date: Thu, 16 Nov 2017 11:19:20 +0900
+Message-ID: <CAK7LNAQ_MVM=QmE-jO+KLFe5oFq9ss+VitRX9WKcUN=_mPJHBg@mail.gmail.com>
+Subject: Re: [Cocci] Coccinelle: badzero.cocci failure
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: cocci@systeme.lip6.fr, Julia Lawall <Julia.Lawall@lip6.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Thierry Martinez <thierry.martinez@inria.fr>
+Cc: Julia Lawall <julia.lawall@lip6.fr>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, cocci@systeme.lip6.fr
 
-2017-11-14 18:47 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> I do not think it is helpful to have a separate file just for the
-> coccicheck help message.  Merge scripts/Makefile.help into the
-> top-level Makefile.
+Hi Thierry,
+
+
+2017-11-16 0:49 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> Hi Thierry,
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+> 2017-11-15 23:56 GMT+09:00 Thierry Martinez <thierry.martinez@inria.fr>:
+>> Hi, Masahiro.
+>>
+>> Masahiro:
+>>> Fatal error: exception
+>>> Yes_prepare_ocamlcocci.LinkFailure("/tmp/ocaml_cocci_fdd282.cmxs")
+>>
+>> If you can rerun your test with coccinelle GitHub master, the
+>> LinkFailure exception will now be more verbose, in order to understand
+>> the problem.
+>>
+>> I suspect a mismatch between the version of OCaml you use to compile
+>> coccinelle, and the version of OCaml that coccinelle uses to compile
+>> OCaml scripts in rules.
+>>
+>
+> Now I am out of the office
+> and working from home.
+> badzero.cocci works fine on my PC at home.
+>
+> I suspect the difference of installed packages.
+>
+>
+> I will try the latest commit in the GitHub
+> tomorrow at the office.
+>
 >
 
-Applied to linux-kbuild/kbuild.
+I tested the latest coccinelle
+on my PC at office.
+
+The result is as follows:
+
+
+$ spatch --version
+spatch version 1.0.6-00359-g1a8f958 compiled with OCaml version 4.02.3
+Flags passed to the configure script: --prefix=/home/masahiro
+OCaml scripting support: yes
+Python scripting support: yes
+Syntax of regular expresssions: PCRE
+$ spatch --sp-file nothing.cocci kernel/kmod.c
+init_defs_builtins: /home/masahiro/bin/../lib/coccinelle/standard.h
+Using native version of ocamlc/ocamlopt/ocamldep
+ocamlopt.opt -shared -o /tmp/ocaml_cocci_d59676.cmxs -g -I
+/usr/lib/ocaml  -I /home/masahiro/bin/../lib/coccinelle/ocaml
+/tmp/ocaml_cocci_d59676.ml
+Compilation OK!
+Loading ML code of the SP...
+implementation mismatch on Coccilib
+Fatal error: exception
+Yes_prepare_ocamlcocci.LinkFailure("/tmp/ocaml_cocci_d59676.cmxs",
+"implementation mismatch on Coccilib")
+
+
+
+
+I use Ubuntu 16.04 LTS
+
+$ cat  /etc/lsb-release
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=16.04
+DISTRIB_CODENAME=xenial
+DISTRIB_DESCRIPTION="Ubuntu 16.04.2 LTS"
+
+
+I checked install.txt
+and I confirmed all of the following packages are installed on my PC.
+
+On Debian/Ubuntu, install the following packages
+ - pkg-config (optional, but strongly recommended)
+ - ocaml-native-compilers (or alternatively ocaml)
+ - ocaml-findlib
+ - menhir and libmenhir-ocaml-dev (optional, bundled)
+ - libpcre-ocaml-dev (optional, bundled)
+ - texlive-fonts-extra (for the documentation)
+
+
+
 
 -- 
 Best Regards
