@@ -1,52 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:50362 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1759726AbdKPL6D (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 06:58:03 -0500
-Date: Thu, 16 Nov 2017 11:58:11 +0000
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v2 18/18] arm64: select ARCH_SUPPORTS_LTO_CLANG
-Message-ID: <20171116115810.GH9361@arm.com>
+Received: from mail-bn3nam01on0051.outbound.protection.outlook.com ([104.47.33.51]:19253
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S964872AbdKPNH4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 16 Nov 2017 08:07:56 -0500
+Date: Thu, 16 Nov 2017 16:07:42 +0300
+From: Yury Norov <ynorov@caviumnetworks.com>
+Subject: Re: [PATCH v2 11/18] arm64: make mrs_s and msr_s macros work with LTO
+Message-ID: <20171116130742.wijnukjetoupi4hc@yury-thinkpad>
 References: <20171115213428.22559-1-samitolvanen@google.com>
- <20171115213428.22559-19-samitolvanen@google.com>
+ <20171115213428.22559-12-samitolvanen@google.com>
+ <20171116115433.GG9361@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171115213428.22559-19-samitolvanen@google.com>
+In-Reply-To: <20171116115433.GG9361@arm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, peterz@infradead.org, paulmck@linux.vnet.ibm.com
+To: Will Deacon <will.deacon@arm.com>
+Cc: Sami Tolvanen <samitolvanen@google.com>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Matthias Kaehlcke <mka@chromium.org>
 
-Hi Sami,
-
-On Wed, Nov 15, 2017 at 01:34:28PM -0800, Sami Tolvanen wrote:
-> Allow CONFIG_LTO_CLANG to be enabled for the architecture.
+On Thu, Nov 16, 2017 at 11:54:33AM +0000, Will Deacon wrote:
+> On Wed, Nov 15, 2017 at 01:34:21PM -0800, Sami Tolvanen wrote:
+> > From: Alex Matveev <alxmtvv@gmail.com>
+> > 
+> > Use UNDEFINE_MRS_S and UNDEFINE_MSR_S to define corresponding macros
+> > in-place and workaround gcc and clang limitations on redefining macros
+> > across different assembler blocks.
 > 
-> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-> ---
->  arch/arm64/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 3a70f763e18a..58504327b9f6 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -40,6 +40,7 @@ config ARM64
->  	select ARCH_INLINE_WRITE_UNLOCK_IRQRESTORE if !PREEMPT
->  	select ARCH_USE_CMPXCHG_LOCKREF
->  	select ARCH_USE_QUEUED_RWLOCKS
-> +	select ARCH_SUPPORTS_LTO_CLANG
+> What limitations? Can you elaborate please? Is this a fix?
 
-I'll be honest with you: I'm absolutely terrified about enabling this.
-How much testing has this seen?
+Hi Will,
 
-The main thing that worries me is that this gives the toolchain a lot
-more freedom to break dependency ordering with RCU, leading to subtle
-concurrency issues that would actually break on arm64. Specifically,
-I'm worried about value analysis that could potentially convert an
-address dependency into a control dependency. Right now, the C standard
-isn't on our side here and we're relying on the compiler not doing this
-kind of thing. Can we continue to rely on that in the face of LTO?
+Regarding GCC.
 
-Will
+When it joins preprocessed source files into single asm file,
+mrs_s/msr_s becomes either not declared or declared multiple times.
+
+./ccuFb68h.s:33120: Error: Macro `mrs_s' was already defined
+./ccuFb68h.s:33124: Error: Macro `msr_s' was already defined
+
+I'm not sure that GCC works correctly in this case, and I sent the
+email to Linaro toolchain group to clarify it. See below.
+
+Yury
+
+[...]
+
+Links:
+My unfinished branch:
+https://github.com/norov/linux/tree/lto
+Andi Kleen tree:
+https://github.com/andikleen/linux-misc/tree/lto-411-1
+Sami Tolvanen's recent work for clang:
+https://lkml.org/lkml/2017/11/3/606
+
+Question we have for now:
+There's mrs_s/msr_s macro that doesn't work with LTO - linker
+complains very loudly that macro is either not declared, or declared
+multiple times. (To reproduce - try to build my kernel branch w/o last
+patch).
+
+The same (?) problem is observed with clang, and people there
+considered it as feature, not a bug.
+
+https://bugs.llvm.org/show_bug.cgi?id=19749
+
+We have the fix for both clang and gcc, but it looks hacky. Maybe it
+worth to fix mrs/msr issue on toolchain side?
