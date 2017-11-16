@@ -1,40 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:35348 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932459AbdKPQ7k (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:50888 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S936145AbdKPRCf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 11:59:40 -0500
-Date: Thu, 16 Nov 2017 17:59:22 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v2 18/18] arm64: select ARCH_SUPPORTS_LTO_CLANG
-Message-ID: <20171116165922.llrojrvomuihabrt@hirez.programming.kicks-ass.net>
-References: <20171115213428.22559-1-samitolvanen@google.com>
- <20171115213428.22559-19-samitolvanen@google.com>
- <20171116115810.GH9361@arm.com>
- <20171116161731.GA94341@samitolvanen.mtv.corp.google.com>
- <20171116163054.kcsdsomr7u2mqql2@hirez.programming.kicks-ass.net>
- <CAKwvOdkV_g0XAbGM+nF2zt=2+tHLLcj=pbSxRDd2HMbrtU3cZg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdkV_g0XAbGM+nF2zt=2+tHLLcj=pbSxRDd2HMbrtU3cZg@mail.gmail.com>
+        Thu, 16 Nov 2017 12:02:35 -0500
+From: Knut Omang <knut.omang@oracle.com>
+Subject: [PATCH 0/7] Support for automatic checkpatch running in the kernel
+Date: Thu, 16 Nov 2017 18:01:40 +0100
+Message-Id: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Sami Tolvanen <samitolvanen@google.com>, Will Deacon <will.deacon@arm.com>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, paulmck@linux.vnet.ibm.com
+To: linux-kernel@vger.kernel.org
+Cc: Knut Omang <knut.omang@oracle.com>, =?UTF-8?q?=C3=85smund=20=C3=98stvold?= <asmund.ostvold@oracle.com>, =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>, John Haxby <john.haxby@oracle.com>, Kees Cook <keescook@chromium.org>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 
-On Thu, Nov 16, 2017 at 08:50:41AM -0800, Nick Desaulniers wrote:
-> On Thu, Nov 16, 2017 at 8:30 AM, Peter Zijlstra <peterz@infradead.org> wrote:
-> 
-> > Ideally we'd get the toolchain people to commit to supporting the kernel
-> > memory model along side the C11 one. That would help a ton.
-> 
-> Does anyone from the kernel side participate in the C standardization process?
+This patch series implements features to facilitate running checkpatch on the
+entire kernel as part of automatic testing.
 
-Yes, Paul McKenney and Will Deacon. Doesn't mean these two can still be
-reconciled though. From what I understand C11 (and onwards) are
-incompatible with the kernel model on a number of subtle points.
+This is done by by adding a few small features to checkpatch and put these
+features to use to implement support for a new Makefile environment variable
+P={1,2} following the pattern of sparse and the C={1,2} variable.  The basic
+functionality + docs are in patch #1-4.
 
-Not to mention that there's people in the C11 process that strongly
-argue for stuff that would break every single multi-threaded program
-written since the 70s, which would include pretty much all OS kernels.
+It also fixes a minor issue with "checkpatch --fix-inplace" found during testing
+(patch #5).
+
+The most important checkpatch feature added is the --ignore-cfg feature, which
+takes a file argument and parses that file according to this minimal language:
+
+       # comments
+       line_len <n>
+       except checkpatch_type [files ...]
+       pervasive checkpatch_type1 [checkpatch_type2 ...]
+
+With "make P=2" checkpatch is called with "--file" and "--ignore_cfg
+checkpatch.cfg" which causes it to look for a file named 'checkpatch.cfg' in the
+same directory as the source file. If that file exists, checkpatch will be run
+with an implicit --strict and with the @ignore list expanded with content from
+the configuration file.  If it does not exist, make will simply silently ignore
+the file.
+
+Patches #6-7 enhances this behaviour to also scan the directories above a file
+until a match for the --file parameter is found.
+
+The idea is that the community can work to add checkpatch.cfg files to
+directories, serving both as documentation and as a way for subsystem
+maintainers to enforce policies and individual tastes as well as TODOs and/or
+priorities, to make it easier for newcomers to contribute in this area. By
+ignoring directories without such files, automation can start right away as it
+is trivially possible to run errorless with P=2 for the entire kernel.
+
+The patches includes a documentation file with some more details.
+
+This patch set has evolved from an earlier implementation I made that was just a
+wrapper script around checkpatch. That version have been used for a number of
+years on a driver project I worked on where we had automatic checkin regression
+testing. I extended that to also run checkpatch to avoid having to clean up
+frequent unintended whitespace changes and style violations from others...
+
+I have also tested this version on some directories I am familiar with.  The
+result of that work is available in two patch sets of 10 and 11 patches, but we
+agreed that it would be better to post them as separate patch sets later.
+
+Those patch sets illustrates how I picture the "flow" from just "reining in" the
+checkpatch detections to actually fixing classes of checkpatch issues one by
+one, while updating the checkpatch.cfg file(s) to have 0 errors or warnings at
+any commit boundary.
+
+The combined set is available here:
+
+   git://github.com/knuto/linux.git  branch checkpatch
+
+Comments and suggestions appreciated!
+
+Thanks,
+Knut
+
+Knut Omang (7):
+  checkpatch: Implement new --ignore-cfg parameter
+  kbuild: Add P= command line flag to run checkpatch
+  checkpatch: Add a few convenience options to disable/modify features
+  Documentation: Add documentation for the new P= Makefile option
+  checkpatch: Improve --fix-inplace for TABSTOP
+  checkpatch: Make --ignore-cfg look recursively for the file
+  Documentation: Update checkpatch --ignore-cfg description
+
+ Documentation/dev-tools/index.rst          |   1 +-
+ Documentation/dev-tools/run-checkpatch.rst | 109 ++++++++++++++++++++++-
+ Makefile                                   |  20 +++-
+ scripts/Makefile.build                     |  13 +++-
+ scripts/checkpatch.pl                      | 108 +++++++++++++++++++++-
+ 5 files changed, 249 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/dev-tools/run-checkpatch.rst
+
+base-commit: bebc6082da0a9f5d47a1ea2edc099bf671058bd4
+-- 
+git-series 0.9.1
