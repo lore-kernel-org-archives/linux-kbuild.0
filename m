@@ -1,48 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:39217 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934311AbdKPURJ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 15:17:09 -0500
-Received: by mail-io0-f193.google.com with SMTP id x63so6492731ioe.6
-        for <linux-kbuild@vger.kernel.org>; Thu, 16 Nov 2017 12:17:09 -0800 (PST)
-Date: Thu, 16 Nov 2017 12:17:01 -0800
-From: Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH v2 18/18] arm64: select ARCH_SUPPORTS_LTO_CLANG
-Message-ID: <20171116201701.GA143965@samitolvanen.mtv.corp.google.com>
-References: <20171116163054.kcsdsomr7u2mqql2@hirez.programming.kicks-ass.net>
- <CAKwvOdkV_g0XAbGM+nF2zt=2+tHLLcj=pbSxRDd2HMbrtU3cZg@mail.gmail.com>
- <20171116165922.llrojrvomuihabrt@hirez.programming.kicks-ass.net>
- <CAKwvOd=k=iVQvWmzP1E3XHUCYLoJgx+F9zoPuE+R2oaw_ePUVA@mail.gmail.com>
- <20171116173417.nqsh5dpu65uj7b5s@hirez.programming.kicks-ass.net>
- <20171116174830.GX3624@linux.vnet.ibm.com>
- <CAKwvOdkDz1yRo=Skt_mWxs0uucK+adXx8kFQksMbTE3ofnpUMQ@mail.gmail.com>
- <20171116183950.GA3624@linux.vnet.ibm.com>
- <20171116184508.GC21898@arm.com>
- <20171116191307.GC3624@linux.vnet.ibm.com>
+Received: from mail-sn1nam01on0049.outbound.protection.outlook.com ([104.47.32.49]:23872
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933004AbdKPUxW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 16 Nov 2017 15:53:22 -0500
+Date: Thu, 16 Nov 2017 23:53:00 +0300
+From: Yury Norov <ynorov@caviumnetworks.com>
+Subject: Re: [PATCH v2 00/18] Add support for clang LTO
+Message-ID: <20171116205300.5p3vjjqouw3prr3t@yury-thinkpad>
+References: <20171115213428.22559-1-samitolvanen@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171116191307.GC3624@linux.vnet.ibm.com>
+In-Reply-To: <20171115213428.22559-1-samitolvanen@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
-Cc: Will Deacon <will.deacon@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Peter Zijlstra <peterz@infradead.org>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Alexander Potapenko <glider@google.com>, Stephen Hines <srhines@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Manoj Gupta <manojgupta@google.com>
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Matthias Kaehlcke <mka@chromium.org>
 
-On Thu, Nov 16, 2017 at 11:13:07AM -0800, Paul E. McKenney wrote:
-> Ah, if "this patch set" meant "adding LTO", I stand corrected and I
-> apologize for my confusion.
+On Wed, Nov 15, 2017 at 01:34:10PM -0800, Sami Tolvanen wrote:
+> This series adds build system support for compiling the kernel with clang
+> Link Time Optimization (LTO), using GNU gold with the LLVMgold plug-in
+> for linking. Some background for clang's LTO support is available here:
+> 
+>   https://llvm.org/docs/LinkTimeOptimization.html
+> 
+> With -flto, clang produces LLVM bitcode instead of object files, and
+> the compilation to native code happens at link time. In addition, clang
+> cannot use an external assembler for inline assembly when LTO is enabled,
+> which causes further compatibility issues.
+> 
+> The patches in this series remove intermediate linking steps when LTO is
+> used, postpone processing done on object files until after the LTO link
+> step, add workarounds for GNU gold incompatibilities, and address inline
+> assembly incompatibilities for arm64.
+> 
+> These changes allow arm64 defconfig to be compiled with LTO, but other
+> architectures are not enabled until compatibility issues have been
+> addressed. In particular, x86 inline assembly doesn't currently compile
+> with clang's integrated assembler due to this LLVM bug:
+> 
+>   https://bugs.llvm.org/show_bug.cgi?id=24487
+> 
+> Due to recent bug fixes in the toolchain, it's recommended to use clang
+> 5.0 or later, and GNU gold from binutils 2.27 or later, although older
+> versions may also work depending on your kernel configuration.
 
-Again, I'm not proposing for LTO to be enabled by default. These patches
-just make it possible to enable it. Are you saying the possibility
-that a future compiler update breaks something is a blocker even for
-experimental features?
+So, you don't guarantee that kernel will work with old compiler and
+toolchain? If so, I would suggest you to add the patch that checks
+their versions and disables LTO if needed.
 
-> I agree that we need LTO/PGO to be housebroken from an LKMM viewpoint
-> before it is enabled.
-
-Can you elaborate what's needed from clang before this can move
-forward? For example, if you have specific test cases in mind, we can
-always work on including them in the LLVM test suite.
-
-Sami
+Yury
