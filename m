@@ -1,63 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx.socionext.com ([202.248.49.38]:25659 "EHLO mx.socionext.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751205AbdKPH7u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 02:59:50 -0500
-From: <yamada.masahiro@socionext.com>
-Subject: RE: [kbuild:kbuild 28/31] include/linux/dynamic_debug.h:76:14: error:
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:57110 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1757937AbdKPJqf (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 16 Nov 2017 04:46:35 -0500
+Subject: Re: [kbuild:kbuild 28/31] include/linux/dynamic_debug.h:76:14: error:
  'KBUILD_MODNAME' undeclared
-Date: Thu, 16 Nov 2017 07:59:47 +0000
-Message-ID: <bc7d9e6d2541494685beac1b4916d9fa@SOC-EX01V.e01.socionext.com>
 References: <201711161323.scU2nJRf%fengguang.wu@intel.com>
-In-Reply-To: <201711161323.scU2nJRf%fengguang.wu@intel.com>
-Content-Language: ja-JP
-Content-Type: text/plain; charset="iso-2022-jp"
-Content-Transfer-Encoding: base64
+ <bc7d9e6d2541494685beac1b4916d9fa@SOC-EX01V.e01.socionext.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <19de6cd8-a2c2-885a-557e-121fed8b8931@cn.fujitsu.com>
+Date: Thu, 16 Nov 2017 17:46:03 +0800
 MIME-Version: 1.0
+In-Reply-To: <bc7d9e6d2541494685beac1b4916d9fa@SOC-EX01V.e01.socionext.com>
+Content-Type: text/plain; charset="iso-2022-jp"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: fengguang.wu@intel.com, caoj.fnst@cn.fujitsu.com
-Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org
+To: yamada.masahiro@socionext.com
+Cc: fengguang.wu@intel.com, kbuild-all@01.org, linux-kbuild@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbToga2J1aWxkIHRlc3Qgcm9i
-b3QgW21haWx0bzpmZW5nZ3Vhbmcud3VAaW50ZWwuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgTm92
-ZW1iZXIgMTYsIDIwMTcgMjoyOSBQTQ0KPiBUbzogQ2FvIGppbiA8Y2Fvai5mbnN0QGNuLmZ1aml0
-c3UuY29tPg0KPiBDYzoga2J1aWxkLWFsbEAwMS5vcmc7IGxpbnV4LWtidWlsZEB2Z2VyLmtlcm5l
-bC5vcmc7IFlhbWFkYSwgTWFzYWhpcm8vDQo+IBskQjszRUQbKEIgGyRCPz85MBsoQiA8eWFtYWRh
-Lm1hc2FoaXJvQHNvY2lvbmV4dC5jb20+DQo+IFN1YmplY3Q6IFtrYnVpbGQ6a2J1aWxkIDI4LzMx
-XSBpbmNsdWRlL2xpbnV4L2R5bmFtaWNfZGVidWcuaDo3NjoxNDoNCj4gZXJyb3I6ICdLQlVJTERf
-TU9ETkFNRScgdW5kZWNsYXJlZA0KPiANCj4gdHJlZToNCj4gaHR0cHM6Ly9naXQua2VybmVsLm9y
-Zy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvbWFzYWhpcm95L2xpbnV4LWtidWlsZA0KPiAuZ2l0
-IGtidWlsZA0KPiBoZWFkOiAgIGVhMTVjOGNkMzYwMTY0MGUyMDI4MjhlM2I1NjM2NTNhOGIzYzc2
-Y2QNCj4gY29tbWl0OiAxYWMwNDA4YmJiM2Y0N2VmMjQxMTk3NmZiZDJiZjc1OGQ3NDdiYmVlIFsy
-OC8zMV0ga2J1aWxkOiBmaXgNCj4gbW9kbmFtZSBmb3IgY29tcG9zaXRlIG1vZHVsZXMNCj4gY29u
-ZmlnOiB4ODZfNjQtYWxsbW9kY29uZmlnIChhdHRhY2hlZCBhcyAuY29uZmlnKQ0KPiBjb21waWxl
-cjogZ2NjLTYgKERlYmlhbiA2LjQuMC05KSA2LjQuMCAyMDE3MTAyNg0KPiByZXByb2R1Y2U6DQo+
-ICAgICAgICAgZ2l0IGNoZWNrb3V0IDFhYzA0MDhiYmIzZjQ3ZWYyNDExOTc2ZmJkMmJmNzU4ZDc0
-N2JiZWUNCj4gICAgICAgICAjIHNhdmUgdGhlIGF0dGFjaGVkIC5jb25maWcgdG8gbGludXggYnVp
-bGQgdHJlZQ0KPiAgICAgICAgIG1ha2UgQVJDSD14ODZfNjQNCj4gDQo+IEFsbCBlcnJvci93YXJu
-aW5ncyAobmV3IG9uZXMgcHJlZml4ZWQgYnkgPj4pOg0KPiANCj4gICAgSW4gZmlsZSBpbmNsdWRl
-ZCBmcm9tIGluY2x1ZGUvbGludXgvcHJpbnRrLmg6MzI5OjAsDQo+ICAgICAgICAgICAgICAgICAg
-ICAgZnJvbSBpbmNsdWRlL2xpbnV4L2tlcm5lbC5oOjEzLA0KPiAgICAgICAgICAgICAgICAgICAg
-IGZyb20gaW5jbHVkZS9saW51eC9saXN0Lmg6OCwNCj4gICAgICAgICAgICAgICAgICAgICBmcm9t
-IGluY2x1ZGUvbGludXgvdGltZXIuaDo0LA0KPiAgICAgICAgICAgICAgICAgICAgIGZyb20gaW5j
-bHVkZS9saW51eC9uZXRkZXZpY2UuaDoyOCwNCj4gICAgICAgICAgICAgICAgICAgICBmcm9tDQo+
-IGRyaXZlcnMvbmV0L2V0aGVybmV0L2Nhdml1bS9saXF1aWRpby9saW9fZXRodG9vbC5jOjE4Og0K
-PiAgICBkcml2ZXJzL25ldC9ldGhlcm5ldC9jYXZpdW0vbGlxdWlkaW8vb2N0ZW9uX21haW4uaDog
-SW4gZnVuY3Rpb24NCj4gJ29jdGVvbl91bm1hcF9wY2lfYmFyeCc6DQo+ID4+IGluY2x1ZGUvbGlu
-dXgvZHluYW1pY19kZWJ1Zy5oOjc2OjE0OiBlcnJvcjogJ0tCVUlMRF9NT0ROQU1FJw0KPiB1bmRl
-Y2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikNCj4gICAgICAgLm1vZG5hbWUgPSBL
-QlVJTERfTU9ETkFNRSwgICBcDQo+ICAgICAgICAgICAgICAgICAgXg0KPiAgICBpbmNsdWRlL2xp
-bnV4L2R5bmFtaWNfZGVidWcuaDo5ODoyOiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8NCj4g
-J0RFRklORV9EWU5BTUlDX0RFQlVHX01FVEFEQVRBX0tFWScNCj4gICAgICBERUZJTkVfRFlOQU1J
-Q19ERUJVR19NRVRBREFUQV9LRVkobmFtZSwgZm10LCAua2V5LmRkX2tleV9mYWxzZSwgXA0KPiAg
-ICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KPiAgICBpbmNsdWRlL2xpbnV4
-L2R5bmFtaWNfZGVidWcuaDoxMzI6Mjogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvDQoNCltz
-bmlwIGxvdHMgb2YgZXJyb3JzXQ0KPiANCj4gLS0tDQo+IDAtREFZIGtlcm5lbCB0ZXN0IGluZnJh
-c3RydWN0dXJlICAgICAgICAgICAgICAgIE9wZW4gU291cmNlIFRlY2hub2xvZ3kNCj4gQ2VudGVy
-DQo+IGh0dHBzOi8vbGlzdHMuMDEub3JnL3BpcGVybWFpbC9rYnVpbGQtYWxsICAgICAgICAgICAg
-ICAgICAgIEludGVsDQo+IENvcnBvcmF0aW9uDQoNCg0KT0suDQpMb29rcyBsaWtlIHRoaXMgcG90
-ZW50aWFsIGlzc3VlIGhhcyBiZWVuIGhpZGRlbi4NCg0KSSBwbGFuIHRvIGluc2VydCB0aGUgZm9s
-bG93aW5nIHBhdGNoIGJlZm9yZSBDYW8ncyBvbmU6DQpodHRwczovL3BhdGNod29yay5rZXJuZWwu
-b3JnL3BhdGNoLzEwMDYwODI1Lw0KDQpXZSBzaG91bGQgYmV0dGVyIHRvIHRha2UgdGltZSBmb3Ig
-dGVzdGluZyBieSAwZGF5IGJvdCwgdGhvdWdoLg0KDQo=
+
+
+On 11/16/2017 03:59 PM, yamada.masahiro@socionext.com wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: kbuild test robot [mailto:fengguang.wu@intel.com]
+>> Sent: Thursday, November 16, 2017 2:29 PM
+>> To: Cao jin <caoj.fnst@cn.fujitsu.com>
+>> Cc: kbuild-all@01.org; linux-kbuild@vger.kernel.org; Yamada, Masahiro/
+>> 山田 真弘 <yamada.masahiro@socionext.com>
+>> Subject: [kbuild:kbuild 28/31] include/linux/dynamic_debug.h:76:14:
+>> error: 'KBUILD_MODNAME' undeclared
+>>
+>> tree:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild
+>> .git kbuild
+>> head:   ea15c8cd3601640e202828e3b563653a8b3c76cd
+>> commit: 1ac0408bbb3f47ef2411976fbd2bf758d747bbee [28/31] kbuild: fix
+>> modname for composite modules
+>> config: x86_64-allmodconfig (attached as .config)
+>> compiler: gcc-6 (Debian 6.4.0-9) 6.4.0 20171026
+>> reproduce:
+>>         git checkout 1ac0408bbb3f47ef2411976fbd2bf758d747bbee
+>>         # save the attached .config to linux build tree
+>>         make ARCH=x86_64
+>>
+>> All error/warnings (new ones prefixed by >>):
+>>
+>>    In file included from include/linux/printk.h:329:0,
+>>                     from include/linux/kernel.h:13,
+>>                     from include/linux/list.h:8,
+>>                     from include/linux/timer.h:4,
+>>                     from include/linux/netdevice.h:28,
+>>                     from
+>> drivers/net/ethernet/cavium/liquidio/lio_ethtool.c:18:
+>>    drivers/net/ethernet/cavium/liquidio/octeon_main.h: In function
+>> 'octeon_unmap_pci_barx':
+>>>> include/linux/dynamic_debug.h:76:14: error: 'KBUILD_MODNAME'
+>> undeclared (first use in this function)
+>>       .modname = KBUILD_MODNAME,   \
+>>                  ^
+>>    include/linux/dynamic_debug.h:98:2: note: in expansion of macro
+>> 'DEFINE_DYNAMIC_DEBUG_METADATA_KEY'
+>>      DEFINE_DYNAMIC_DEBUG_METADATA_KEY(name, fmt, .key.dd_key_false, \
+>>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>    include/linux/dynamic_debug.h:132:2: note: in expansion of macro
+> 
+> [snip lots of errors]
+>>
+>> ---
+>> 0-DAY kernel test infrastructure                Open Source Technology
+>> Center
+>> https://lists.01.org/pipermail/kbuild-all                   Intel
+>> Corporation
+> 
+> 
+> OK.
+> Looks like this potential issue has been hidden.
+> 
+> I plan to insert the following patch before Cao's one:
+> https://patchwork.kernel.org/patch/10060825/
+> 
+> We should better to take time for testing by 0day bot, though.
+> 
+> 
+
+It is weird that I didn't receive the Original Message From: kbuild test
+robot.
+
+Thanks for fixing it, Masahiro-san, I will take a look.
+
+-- 
+Sincerely,
+Cao jin
+
+
