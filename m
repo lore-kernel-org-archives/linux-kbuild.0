@@ -1,97 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:50888 "EHLO
+Received: from aserp1040.oracle.com ([141.146.126.69]:50863 "EHLO
         aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936145AbdKPRCf (ORCPT
+        with ESMTP id S936142AbdKPRCb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 12:02:35 -0500
+        Thu, 16 Nov 2017 12:02:31 -0500
 From: Knut Omang <knut.omang@oracle.com>
-Subject: [PATCH 0/7] Support for automatic checkpatch running in the kernel
-Date: Thu, 16 Nov 2017 18:01:40 +0100
-Message-Id: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
+Subject: [PATCH 2/7] kbuild: Add P= command line flag to run checkpatch
+Date: Thu, 16 Nov 2017 18:01:42 +0100
+Message-Id: <716fa938a4ab0ad66490b72e2ed750cd6583728f.1510840787.git-series.knut.omang@oracle.com>
+MIME-Version: 1.0
+In-Reply-To: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
+References: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: Knut Omang <knut.omang@oracle.com>, =?UTF-8?q?=C3=85smund=20=C3=98stvold?= <asmund.ostvold@oracle.com>, =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>, John Haxby <john.haxby@oracle.com>, Kees Cook <keescook@chromium.org>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+Cc: Knut Omang <knut.omang@oracle.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
 
-This patch series implements features to facilitate running checkpatch on the
-entire kernel as part of automatic testing.
+Add interpretation of a new environment variable P={1,2} in spirit of the
+C= option, but executing checkpatch instead of sparse.
 
-This is done by by adding a few small features to checkpatch and put these
-features to use to implement support for a new Makefile environment variable
-P={1,2} following the pattern of sparse and the C={1,2} variable.  The basic
-functionality + docs are in patch #1-4.
+Signed-off-by: Knut Omang <knut.omang@oracle.com>
+Reviewed-by: Håkon Bugge <haakon.bugge@oracle.com>
+Acked-by: Åsmund Østvold <asmund.ostvold@oracle.com>
+---
+ Makefile               | 20 +++++++++++++++++++-
+ scripts/Makefile.build | 13 +++++++++++++
+ 2 files changed, 32 insertions(+), 1 deletion(-)
 
-It also fixes a minor issue with "checkpatch --fix-inplace" found during testing
-(patch #5).
-
-The most important checkpatch feature added is the --ignore-cfg feature, which
-takes a file argument and parses that file according to this minimal language:
-
-       # comments
-       line_len <n>
-       except checkpatch_type [files ...]
-       pervasive checkpatch_type1 [checkpatch_type2 ...]
-
-With "make P=2" checkpatch is called with "--file" and "--ignore_cfg
-checkpatch.cfg" which causes it to look for a file named 'checkpatch.cfg' in the
-same directory as the source file. If that file exists, checkpatch will be run
-with an implicit --strict and with the @ignore list expanded with content from
-the configuration file.  If it does not exist, make will simply silently ignore
-the file.
-
-Patches #6-7 enhances this behaviour to also scan the directories above a file
-until a match for the --file parameter is found.
-
-The idea is that the community can work to add checkpatch.cfg files to
-directories, serving both as documentation and as a way for subsystem
-maintainers to enforce policies and individual tastes as well as TODOs and/or
-priorities, to make it easier for newcomers to contribute in this area. By
-ignoring directories without such files, automation can start right away as it
-is trivially possible to run errorless with P=2 for the entire kernel.
-
-The patches includes a documentation file with some more details.
-
-This patch set has evolved from an earlier implementation I made that was just a
-wrapper script around checkpatch. That version have been used for a number of
-years on a driver project I worked on where we had automatic checkin regression
-testing. I extended that to also run checkpatch to avoid having to clean up
-frequent unintended whitespace changes and style violations from others...
-
-I have also tested this version on some directories I am familiar with.  The
-result of that work is available in two patch sets of 10 and 11 patches, but we
-agreed that it would be better to post them as separate patch sets later.
-
-Those patch sets illustrates how I picture the "flow" from just "reining in" the
-checkpatch detections to actually fixing classes of checkpatch issues one by
-one, while updating the checkpatch.cfg file(s) to have 0 errors or warnings at
-any commit boundary.
-
-The combined set is available here:
-
-   git://github.com/knuto/linux.git  branch checkpatch
-
-Comments and suggestions appreciated!
-
-Thanks,
-Knut
-
-Knut Omang (7):
-  checkpatch: Implement new --ignore-cfg parameter
-  kbuild: Add P= command line flag to run checkpatch
-  checkpatch: Add a few convenience options to disable/modify features
-  Documentation: Add documentation for the new P= Makefile option
-  checkpatch: Improve --fix-inplace for TABSTOP
-  checkpatch: Make --ignore-cfg look recursively for the file
-  Documentation: Update checkpatch --ignore-cfg description
-
- Documentation/dev-tools/index.rst          |   1 +-
- Documentation/dev-tools/run-checkpatch.rst | 109 ++++++++++++++++++++++-
- Makefile                                   |  20 +++-
- scripts/Makefile.build                     |  13 +++-
- scripts/checkpatch.pl                      | 108 +++++++++++++++++++++-
- 5 files changed, 249 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/dev-tools/run-checkpatch.rst
-
-base-commit: bebc6082da0a9f5d47a1ea2edc099bf671058bd4
+diff --git a/Makefile b/Makefile
+index ccd9818..eb4bca9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -176,6 +176,20 @@ ifndef KBUILD_CHECKSRC
+   KBUILD_CHECKSRC = 0
+ endif
+ 
++# Run scripts/checkpatch.pl with --ignore-cfg checkpatch.cfg
++#
++# Use 'make P=1' to enable checking of only re-compiled files.
++# Use 'make P=2' to enable checking of *all* source files, regardless
++#
++# See the file "Documentation/dev-tools/run-checkpatch.rst" for more details,
++#
++ifeq ("$(origin P)", "command line")
++  KBUILD_CHECKPATCH = $(P)
++endif
++ifndef KBUILD_CHECKPATCH
++  KBUILD_CHECKPATCH = 0
++endif
++
+ # Use make M=dir to specify directory of external module to build
+ # Old syntax make ... SUBDIRS=$PWD is still supported
+ # Setting the environment variable KBUILD_EXTMOD take precedence
+@@ -340,7 +354,7 @@ ifeq ($(MAKECMDGOALS),)
+ endif
+ 
+ export KBUILD_MODULES KBUILD_BUILTIN
+-export KBUILD_CHECKSRC KBUILD_SRC KBUILD_EXTMOD
++export KBUILD_CHECKSRC KBUILD_CHECKPATCH KBUILD_SRC KBUILD_EXTMOD
+ 
+ # We need some generic definitions (do not try to remake the file).
+ scripts/Kbuild.include: ;
+@@ -363,9 +377,12 @@ DEPMOD		= /sbin/depmod
+ PERL		= perl
+ PYTHON		= python
+ CHECK		= sparse
++CHECKP		= scripts/checkpatch.pl
+ 
+ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
+ 		  -Wbitwise -Wno-return-void $(CF)
++CHECKPFLAGS    := --quiet --show-types --emacs \
++		  --ignore-cfg checkpatch.cfg --file $(PF)
+ NOSTDINC_FLAGS  =
+ CFLAGS_MODULE   =
+ AFLAGS_MODULE   =
+@@ -419,6 +436,7 @@ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
+ export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
+ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
++export CHECKP CHECKPFLAGS
+ 
+ export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
+ export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_GCOV CFLAGS_KCOV CFLAGS_KASAN CFLAGS_UBSAN
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index bb831d4..cfc540a 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -109,6 +109,17 @@ ifneq ($(KBUILD_CHECKSRC),0)
+   endif
+ endif
+ 
++# Run per-directory/per-file specific checkpatch testing:
++ifneq ($(KBUILD_CHECKPATCH),0)
++  ifeq ($(KBUILD_CHECKPATCH),2)
++    quiet_cmd_force_checkpatch = CHECKP   $<
++          cmd_force_checkpatch = $(srctree)/$(CHECKP) $(POPTS) $< $(CHECKPFLAGS) ;
++  else
++      quiet_cmd_checkpatch     = CHECKP   $<
++            cmd_checkpatch     = $(srctree)/$(CHECKP) $(POPTS) $< $(CHECKPFLAGS) ;
++  endif
++endif
++
+ # Do section mismatch analysis for each module/built-in.o
+ ifdef CONFIG_DEBUG_SECTION_MISMATCH
+   cmd_secanalysis = ; scripts/mod/modpost $@
+@@ -290,6 +301,7 @@ objtool_dep = $(objtool_obj)					\
+ 
+ define rule_cc_o_c
+ 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
++	$(call echo-cmd,checkpatch) $(cmd_checkpatch)			  \
+ 	$(call cmd_and_fixdep,cc_o_c)					  \
+ 	$(cmd_modversions_c)						  \
+ 	$(call echo-cmd,objtool) $(cmd_objtool)				  \
+@@ -312,6 +324,7 @@ endif
+ # Built-in and composite module parts
+ $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
+ 	$(call cmd,force_checksrc)
++	$(call cmd,force_checkpatch)
+ 	$(call if_changed_rule,cc_o_c)
+ 
+ # Single-part modules are special since we need to mark them in $(MODVERDIR)
 -- 
 git-series 0.9.1
