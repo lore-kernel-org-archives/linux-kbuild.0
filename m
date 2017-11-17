@@ -1,104 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:56379 "EHLO
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:24741 "EHLO
         heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S933291AbdKQGnQ (ORCPT
+        with ESMTP id S1751599AbdKQHVK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Nov 2017 01:43:16 -0500
-Subject: Re: [kbuild:kbuild 28/31] include/linux/dynamic_debug.h:76:14: error:
- 'KBUILD_MODNAME' undeclared
-References: <201711161323.scU2nJRf%fengguang.wu@intel.com>
- <bc7d9e6d2541494685beac1b4916d9fa@SOC-EX01V.e01.socionext.com>
+        Fri, 17 Nov 2017 02:21:10 -0500
+Subject: Re: [PATCH] kbuild: define KBUILD_MODNAME even if multiple modules
+ share objects
+References: <1510818396-17443-1-git-send-email-yamada.masahiro@socionext.com>
 From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <d2901f65-2557-453e-d201-fefa62dc2e65@cn.fujitsu.com>
-Date: Fri, 17 Nov 2017 14:42:41 +0800
+Message-ID: <5952fd94-d3a9-620f-2326-74f16fbe029c@cn.fujitsu.com>
+Date: Fri, 17 Nov 2017 15:20:29 +0800
 MIME-Version: 1.0
-In-Reply-To: <bc7d9e6d2541494685beac1b4916d9fa@SOC-EX01V.e01.socionext.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1510818396-17443-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, fengguang.wu@intel.com
-Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
 
 
-On 11/16/2017 03:59 PM, yamada.masahiro@socionext.com wrote:
+On 11/16/2017 03:46 PM, Masahiro Yamada wrote:
+> Currently, KBUILD_MODNAME is defined only when $(modname) contains
+> just one word.  If an object is shared between multiple modules,
+> undefined KBUILD_MODNAME causes a build error.
 > 
+> A simple test case is as follows:
 > 
->> -----Original Message-----
->> From: kbuild test robot [mailto:fengguang.wu@intel.com]
->> Sent: Thursday, November 16, 2017 2:29 PM
->> To: Cao jin <caoj.fnst@cn.fujitsu.com>
->> Cc: kbuild-all@01.org; linux-kbuild@vger.kernel.org; Yamada, Masahiro/
->> 山田 真弘 <yamada.masahiro@socionext.com>
->> Subject: [kbuild:kbuild 28/31] include/linux/dynamic_debug.h:76:14:
->> error: 'KBUILD_MODNAME' undeclared
->>
->> tree:
->> https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild
->> .git kbuild
->> head:   ea15c8cd3601640e202828e3b563653a8b3c76cd
->> commit: 1ac0408bbb3f47ef2411976fbd2bf758d747bbee [28/31] kbuild: fix
->> modname for composite modules
->> config: x86_64-allmodconfig (attached as .config)
->> compiler: gcc-6 (Debian 6.4.0-9) 6.4.0 20171026
->> reproduce:
->>         git checkout 1ac0408bbb3f47ef2411976fbd2bf758d747bbee
->>         # save the attached .config to linux build tree
->>         make ARCH=x86_64
->>
->> All error/warnings (new ones prefixed by >>):
->>
->>    In file included from include/linux/printk.h:329:0,
->>                     from include/linux/kernel.h:13,
->>                     from include/linux/list.h:8,
->>                     from include/linux/timer.h:4,
->>                     from include/linux/netdevice.h:28,
->>                     from
->> drivers/net/ethernet/cavium/liquidio/lio_ethtool.c:18:
->>    drivers/net/ethernet/cavium/liquidio/octeon_main.h: In function
->> 'octeon_unmap_pci_barx':
->>>> include/linux/dynamic_debug.h:76:14: error: 'KBUILD_MODNAME'
->> undeclared (first use in this function)
->>       .modname = KBUILD_MODNAME,   \
->>                  ^
->>    include/linux/dynamic_debug.h:98:2: note: in expansion of macro
->> 'DEFINE_DYNAMIC_DEBUG_METADATA_KEY'
->>      DEFINE_DYNAMIC_DEBUG_METADATA_KEY(name, fmt, .key.dd_key_false, \
->>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>    include/linux/dynamic_debug.h:132:2: note: in expansion of macro
+>   obj-m += foo.o
+>   obj-m += bar.o
+>   foo-objs := foo-bar-common.o foo-main.o
+>   bar-objs := foo-bar-common.o bar-main.o
 > 
-> [snip lots of errors]
->>
->> ---
->> 0-DAY kernel test infrastructure                Open Source Technology
->> Center
->> https://lists.01.org/pipermail/kbuild-all                   Intel
->> Corporation
+> In this case, we do not know what to define for KBUILD_MODNAME when
+> compiling foo-bar-common.o ("foo" or "bar" ?), so one reasonable
+> solution is let it fall back to $(basetarget) (= "foo-bar-common").
 > 
+> It would be better to avoid such a design where possible, but we
+> already have such a case, for example,
+> drivers/net/ethernet/cavium/liquidio/Makefile
 > 
-> OK.
-> Looks like this potential issue has been hidden.
+> I slightly refactored implementation; we can check $(word 2, $(modname))
+> instead of $(filter 1,$(words $(modname))).
 > 
-> I plan to insert the following patch before Cao's one:
-> https://patchwork.kernel.org/patch/10060825/
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 > 
-> We should better to take time for testing by 0day bot, though.
+>  scripts/Makefile.lib | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 5fbc46d..9f9a7df 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -86,8 +86,7 @@ subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
+>  #       differ in different configs.
+>  name-fix = $(squote)$(quote)$(subst $(comma),_,$(subst -,_,$1))$(quote)$(squote)
+>  basename_flags = -DKBUILD_BASENAME=$(call name-fix,$(basetarget))
+> -modname_flags  = $(if $(filter 1,$(words $(modname))),\
+> -                 -DKBUILD_MODNAME=$(call name-fix,$(modname)))
+> +modname_flags  = -DKBUILD_MODNAME=$(call name-fix,$(if $(word 2,$(modname)),$(basetarget),$(modname)))
+>  
+>  orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) \
+>                   $(ccflags-y) $(CFLAGS_$(basetarget).o)
 > 
 
-It took me a while to figure out why the build is ok before my patch.
+I like this style of the refactor, because it is a bit more readable
+according to human mind,  and it also behave the same as before in the
+case drivers/net/ethernet/cavium/liquidio/Makefile: modname =
+$(basetarget). So:
 
-before my patch, the liquidio-m belongs to $(real-objs-m), so there is:
-
-    modname = $(basetarget)
-
-after my patch, liquidio-m belongs to $(multi-objs-m), so there is:
-
-    modname = $(modname-multi)
-
-And, these files both belong to liquidio-m & liquidio_vf-m, so
-modname-multi has 2 words, and so modname is null, and build fail.
+Tested-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+Reviewed-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 
 -- 
 Sincerely,
