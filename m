@@ -1,40 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f194.google.com ([209.85.223.194]:41566 "EHLO
-        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750741AbdKPXuY (ORCPT
+Received: from mail-qt0-f193.google.com ([209.85.216.193]:41983 "EHLO
+        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754272AbdKQBGl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 18:50:24 -0500
-Received: by mail-io0-f194.google.com with SMTP id g73so7021917ioj.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 16 Nov 2017 15:50:24 -0800 (PST)
-Date: Thu, 16 Nov 2017 15:50:19 -0800
-From: Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH v2 08/18] arm64: don't disable ADR_PREL_PG_HI21* with
- ARM64_ERRATUM_843419
-Message-ID: <20171116235019.GA55530@samitolvanen.mtv.corp.google.com>
-References: <20171115213428.22559-1-samitolvanen@google.com>
- <20171115213428.22559-9-samitolvanen@google.com>
- <CAKv+Gu-wYwBMV7tdb+Kax_cyPsmAB2R2ZVwJuNi9qM0kaYAs=Q@mail.gmail.com>
- <20171116114406.GB9361@arm.com>
- <20171116163132.GC94341@samitolvanen.mtv.corp.google.com>
- <CAKv+Gu8yPSwZep-S_ke_P5BiZ3o72R=ykhixoXcyGUHa1ZxGGw@mail.gmail.com>
- <20171116213702.GA10616@samitolvanen.mtv.corp.google.com>
- <CAKv+Gu_3R4SUC2hCUtEX_4ut9admtrBZS-S-mzQnQsoJoHPcBw@mail.gmail.com>
- <20171116230939.GA38360@samitolvanen.mtv.corp.google.com>
- <CAKv+Gu9pROJ_T5twJtVn2itzav4x5fypyJWsBr5YbjWUTMFokg@mail.gmail.com>
+        Thu, 16 Nov 2017 20:06:41 -0500
+Received: by mail-qt0-f193.google.com with SMTP id e19so2307817qte.8
+        for <linux-kbuild@vger.kernel.org>; Thu, 16 Nov 2017 17:06:41 -0800 (PST)
+Date: Thu, 16 Nov 2017 20:06:39 -0500 (EST)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: [PATCH] kconfig: fix relational operators for bool and tristate
+ symbols
+Message-ID: <nycvar.YSQ.7.76.1711161956590.20817@knanqh.ubzr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu9pROJ_T5twJtVn2itzav4x5fypyJWsBr5YbjWUTMFokg@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, Andi Kleen <ak@linux.intel.com>, Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Alex Matveev <alxmtvv@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jan Beulich <JBeulich@suse.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Nov 16, 2017 at 11:20:40PM +0000, Ard Biesheuvel wrote:
-> So at which point is the IR in a partially linked object file
-> converted into executable code?
+Since commit 31847b67bec0 ("kconfig: allow use of relations other than
+(in)equality") it is possible to use relational operators in Kconfig
+statements. However, those operators give unexpected results when
+applied to bool/tristate values:
 
-At the final module link step (cmd_ld_ko_o) in scripts/Makefile.modpost,
-added in patch 12.
+	(n < y) = y (correct)
+	(m < y) = y (correct)
+	(n < m) = n (wrong)
 
-Sami
+This happens because relational operators process bool and tristate
+symbols as strings and m sorts before n. It makes little sense to do a
+lexicographical compare on bool and tristate values though.
+
+Documentation/kbuild/kconfig-language.txt states that expression can have
+a value of 'n', 'm' or 'y' (or 0, 1, 2 respectively for calculations).
+Let's make it so for relational comparisons with bool/tristate
+expressions as well and document them. If at least one symbol is an
+actual string then the lexicographical compare works just as before.
+
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
+
+diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+index 262722d886..c4a293a03c 100644
+--- a/Documentation/kbuild/kconfig-language.txt
++++ b/Documentation/kbuild/kconfig-language.txt
+@@ -200,10 +200,14 @@ module state. Dependency expressions have the following syntax:
+ <expr> ::= <symbol>                             (1)
+            <symbol> '=' <symbol>                (2)
+            <symbol> '!=' <symbol>               (3)
+-           '(' <expr> ')'                       (4)
+-           '!' <expr>                           (5)
+-           <expr> '&&' <expr>                   (6)
+-           <expr> '||' <expr>                   (7)
++           <symbol1> '<' <symbol2>              (4)
++           <symbol1> '>' <symbol2>              (4)
++           <symbol1> '<=' <symbol2>             (4)
++           <symbol1> '>=' <symbol2>             (4)
++           '(' <expr> ')'                       (5)
++           '!' <expr>                           (6)
++           <expr> '&&' <expr>                   (7)
++           <expr> '||' <expr>                   (8)
+ 
+ Expressions are listed in decreasing order of precedence. 
+ 
+@@ -214,10 +218,13 @@ Expressions are listed in decreasing order of precedence.
+     otherwise 'n'.
+ (3) If the values of both symbols are equal, it returns 'n',
+     otherwise 'y'.
+-(4) Returns the value of the expression. Used to override precedence.
+-(5) Returns the result of (2-/expr/).
+-(6) Returns the result of min(/expr/, /expr/).
+-(7) Returns the result of max(/expr/, /expr/).
++(4) If value of <symbol1> is respectively lower, greater, lower-or-equal,
++    or greater-or-equal than value of <symbol2>, it returns 'y',
++    otherwise 'n'.
++(5) Returns the value of the expression. Used to override precedence.
++(6) Returns the result of (2-/expr/).
++(7) Returns the result of min(/expr/, /expr/).
++(8) Returns the result of max(/expr/, /expr/).
+ 
+ An expression can have a value of 'n', 'm' or 'y' (or 0, 1, 2
+ respectively for calculations). A menu entry becomes visible when its
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index cbf4996dd9..8cee597d33 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -893,7 +893,10 @@ static enum string_value_kind expr_parse_string(const char *str,
+ 	switch (type) {
+ 	case S_BOOLEAN:
+ 	case S_TRISTATE:
+-		return k_string;
++		val->s = !strcmp(str, "n") ? 0 :
++			 !strcmp(str, "m") ? 1 :
++			 !strcmp(str, "y") ? 2 : -1;
++		return k_signed;
+ 	case S_INT:
+ 		val->s = strtoll(str, &tail, 10);
+ 		kind = k_signed;
