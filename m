@@ -1,67 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:23190 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932630AbdKQErc (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:56379 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S933291AbdKQGnQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 23:47:32 -0500
-Message-ID: <1510894030.3063.41.camel@oracle.com>
-Subject: Re: [PATCH 0/7] Support for automatic checkpatch running in the
- kernel
-From: Knut Omang <knut.omang@oracle.com>
-Date: Fri, 17 Nov 2017 05:47:10 +0100
-In-Reply-To: <CAGXu5j+j0TZ+QUMf09eifTwOwmgA=3AbA3e2PJQehKF61hMcRA@mail.gmail.com>
-References: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
-         <CAGXu5j+j0TZ+QUMf09eifTwOwmgA=3AbA3e2PJQehKF61hMcRA@mail.gmail.com>
+        Fri, 17 Nov 2017 01:43:16 -0500
+Subject: Re: [kbuild:kbuild 28/31] include/linux/dynamic_debug.h:76:14: error:
+ 'KBUILD_MODNAME' undeclared
+References: <201711161323.scU2nJRf%fengguang.wu@intel.com>
+ <bc7d9e6d2541494685beac1b4916d9fa@SOC-EX01V.e01.socionext.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <d2901f65-2557-453e-d201-fefa62dc2e65@cn.fujitsu.com>
+Date: Fri, 17 Nov 2017 14:42:41 +0800
+MIME-Version: 1.0
+In-Reply-To: <bc7d9e6d2541494685beac1b4916d9fa@SOC-EX01V.e01.socionext.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8BIT
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, =?ISO-8859-1?Q?=C5smund_=D8stvold?= <asmund.ostvold@oracle.com>, =?ISO-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>, John Haxby <john.haxby@oracle.com>, linux-doc@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, Joe Perches <joe@perches.com>
+To: yamada.masahiro@socionext.com, fengguang.wu@intel.com
+Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org
 
-On Thu, 2017-11-16 at 14:57 -0800, Kees Cook wrote:
-> On Thu, Nov 16, 2017 at 9:01 AM, Knut Omang <knut.omang@oracle.com> wrote:
-> > The most important checkpatch feature added is the --ignore-cfg feature, which
-> > takes a file argument and parses that file according to this minimal language:
-> >
-> >        # comments
-> >        line_len <n>
-> >        except checkpatch_type [files ...]
-> >        pervasive checkpatch_type1 [checkpatch_type2 ...]
-> >
-> > With "make P=2" checkpatch is called with "--file" and "--ignore_cfg
-> > checkpatch.cfg" which causes it to look for a file named 'checkpatch.cfg' in the
-> > same directory as the source file. If that file exists, checkpatch will be run
-> > with an implicit --strict and with the @ignore list expanded with content from
-> > the configuration file.  If it does not exist, make will simply silently ignore
-> > the file.
+
+
+On 11/16/2017 03:59 PM, yamada.masahiro@socionext.com wrote:
 > 
-> Will these configurations be cascading? (For example, all of net/ uses
-> a different comment style, so having that recorded in a single file
-> would be nice.)
+> 
+>> -----Original Message-----
+>> From: kbuild test robot [mailto:fengguang.wu@intel.com]
+>> Sent: Thursday, November 16, 2017 2:29 PM
+>> To: Cao jin <caoj.fnst@cn.fujitsu.com>
+>> Cc: kbuild-all@01.org; linux-kbuild@vger.kernel.org; Yamada, Masahiro/
+>> 山田 真弘 <yamada.masahiro@socionext.com>
+>> Subject: [kbuild:kbuild 28/31] include/linux/dynamic_debug.h:76:14:
+>> error: 'KBUILD_MODNAME' undeclared
+>>
+>> tree:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild
+>> .git kbuild
+>> head:   ea15c8cd3601640e202828e3b563653a8b3c76cd
+>> commit: 1ac0408bbb3f47ef2411976fbd2bf758d747bbee [28/31] kbuild: fix
+>> modname for composite modules
+>> config: x86_64-allmodconfig (attached as .config)
+>> compiler: gcc-6 (Debian 6.4.0-9) 6.4.0 20171026
+>> reproduce:
+>>         git checkout 1ac0408bbb3f47ef2411976fbd2bf758d747bbee
+>>         # save the attached .config to linux build tree
+>>         make ARCH=x86_64
+>>
+>> All error/warnings (new ones prefixed by >>):
+>>
+>>    In file included from include/linux/printk.h:329:0,
+>>                     from include/linux/kernel.h:13,
+>>                     from include/linux/list.h:8,
+>>                     from include/linux/timer.h:4,
+>>                     from include/linux/netdevice.h:28,
+>>                     from
+>> drivers/net/ethernet/cavium/liquidio/lio_ethtool.c:18:
+>>    drivers/net/ethernet/cavium/liquidio/octeon_main.h: In function
+>> 'octeon_unmap_pci_barx':
+>>>> include/linux/dynamic_debug.h:76:14: error: 'KBUILD_MODNAME'
+>> undeclared (first use in this function)
+>>       .modname = KBUILD_MODNAME,   \
+>>                  ^
+>>    include/linux/dynamic_debug.h:98:2: note: in expansion of macro
+>> 'DEFINE_DYNAMIC_DEBUG_METADATA_KEY'
+>>      DEFINE_DYNAMIC_DEBUG_METADATA_KEY(name, fmt, .key.dd_key_false, \
+>>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>    include/linux/dynamic_debug.h:132:2: note: in expansion of macro
+> 
+> [snip lots of errors]
+>>
+>> ---
+>> 0-DAY kernel test infrastructure                Open Source Technology
+>> Center
+>> https://lists.01.org/pipermail/kbuild-all                   Intel
+>> Corporation
+> 
+> 
+> OK.
+> Looks like this potential issue has been hidden.
+> 
+> I plan to insert the following patch before Cao's one:
+> https://patchwork.kernel.org/patch/10060825/
+> 
+> We should better to take time for testing by 0day bot, though.
+> 
 
-Good point, the net/ use case is certainly something I have been thinking about.
-I didn't want to make it too complex in the first set, so I let patch 1-4
-implement the basics with one file per directory and nothing across directories.
+It took me a while to figure out why the build is ok before my patch.
 
-Patch 6 and 7 in this set extends this to "fallback", which (with the net/ case in mind)
-should allow a single file under net/ to cover the whole subsystem for all subtrees that
-don't have their own checkpatch.cfg, but will be overridden by files in subdirectories.
+before my patch, the liquidio-m belongs to $(real-objs-m), so there is:
 
-So from a documentation point of view this could be done with the set as it is,
-with people just copying the "pervasive" and "line_len" commands from
-a "global" net/checkpatch.cfg setup down into the subtrees as they start dealing with 
-exceptions.
+    modname = $(basetarget)
 
-If we want something more automatic, it can certainly be extended, 
-this would just require checkpatch to parse all the upwards checkpatch.cfg files for each
-source file instead just taking the first found, which is what patch 6 implements.
+after my patch, liquidio-m belongs to $(multi-objs-m), so there is:
 
-Also the command language in the config files is rather limited, maybe other commands
-maybe with more checkpatch additions would be useful to handle such scenarios..
+    modname = $(modname-multi)
 
-Let me know what you think..
+And, these files both belong to liquidio-m & liquidio_vf-m, so
+modname-multi has 2 words, and so modname is null, and build fail.
 
-Thanks,
-Knut
+-- 
+Sincerely,
+Cao jin
+
+
