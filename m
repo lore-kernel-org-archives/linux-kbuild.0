@@ -1,24 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:64263 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751863AbdKQRXg (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:23438 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751863AbdKQRe1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Nov 2017 12:23:36 -0500
+        Fri, 17 Nov 2017 12:34:27 -0500
 MIME-Version: 1.0
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 18 Nov 2017 02:22:43 +0900
-Message-ID: <CAK7LNAThpT3_kEpR=m=pXh9YV27bgaytER33JadjxvaWJGWKWw@mail.gmail.com>
-Subject: [GIT PULL 1/2] Kbuild updates for v4.15
+Date: Sat, 18 Nov 2017 02:33:25 +0900
+Message-ID: <CAK7LNAQGnPkrk43Gdbzy47zzCbONKmbA2Hbh=agGzn-z150fiQ@mail.gmail.com>
+Subject: [GIT PULL 2/2] Kbuild misc updates for v4.15
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
 Hi Linus,
 
-Here are Kbuild updates for v4.15.  Please pull!
-
+Here are some updates of misc scripts for v4.15.  Please pull!
 
 
 The following changes since commit 9e66317d3c92ddaab330c125dfe9d06eee268aff:
@@ -28,102 +27,68 @@ The following changes since commit 9e66317d3c92ddaab330c125dfe9d06eee268aff:
 are available in the git repository at:
 
   git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-v4.15
+tags/kbuild-misc-v4.15
 
-for you to fetch changes up to 7f855fc805cd9c29867aed56cc20f818b36a7b7b:
+for you to fetch changes up to e9e716ff2d4d8618aefac55691a4c4483abecc37:
 
-  kbuild: move coccicheck help from scripts/Makefile.help to top
-Makefile (2017-11-17 00:33:09 +0900)
-
-----------------------------------------------------------------
-Kbuild updates for v4.15
-
-One of the most remarkable improvements in this cycle is, Kbuild is
-now able to cache the result of shell commands.  Some variables are
-expensive to compute, for example, $(call cc-option,...) invokes the
-compiler.  It is not efficient to redo this computation every time,
-even when we are not actually building anything.  Kbuild creates a
-hidden file ".cache.mk" that contains invoked shell commands and
-their results.  The speed-up should be noticeable.
-
-Summary:
-
-- Fix arch build issues (hexagon, sh)
-
-- Clean up various Makefiles and scripts
-
-- Fix wrong usage of {CFLAGS,LDFLAGS}_MODULE in arch Makefiles
-
-- Cache variables that are expensive to compute
-
-- Improve cc-ldopton and ld-option for Clang
-
-- Optimize output directory creation
+  docs: dev-tools: coccinelle: delete out of date wiki reference
+(2017-11-16 08:56:43 +0900)
 
 ----------------------------------------------------------------
-Cao jin (4):
-      kbuild: comments cleanup in Makefile.lib
-      arm/kbuild: replace {C, LD}FLAGS_MODULE with KBUILD_{C, LD}FLAGS_MODULE
-      c6x/kbuild: replace CFLAGS_MODULE with KBUILD_CFLAGS_MODULE
-      hexagon/kbuild: replace CFLAGS_MODULE with KBUILD_CFLAGS_MODULE
+Kbuild misc updates for v4.15
 
-Douglas Anderson (2):
-      kbuild: Add a cache for generated variables
-      kbuild: Cache a few more calls to the compiler
+- Clean up and fix RPM package build
 
-Masahiro Yamada (22):
-      hexagon: get rid of #include <generated/compile.h>
-      kbuild: link-vmlinux.sh: simplify .version increment
-      kbuild: mkcompile_h: do not create .version
-      kbuild: replace $(hdr-arch) with $(SRCARCH)
-      kbuild: move "_all" target out of $(KBUILD_SRC) conditional
-      kbuild: re-order the code to not parse unnecessary variables
-      kbuild: remove KBUILD_SUBDIR_ASFLAGS and KBUILD_SUBDIR_CCFLAGS
-      kbuild: add forward declaration of default target to Makefile.asm-generic
-      kbuild: do not call cc-option before KBUILD_CFLAGS initialization
-      kbuild: shrink .cache.mk when it exceeds 1000 lines
-      sh: select KBUILD_DEFCONFIG depending on ARCH
-      kbuild: create directory for make cache only when necessary
-      kbuild: remove redundant $(wildcard ...) for cmd_files calculation
-      kbuild: filter-out PHONY targets from "targets"
-      kbuild: create object directories simpler and faster
-      kbuild: optimize object directory creation for incremental build
-      kbuild: remove redundant mkdir from ./Kbuild
-      kbuild: specify FORCE in Makefile.headersinst as .PHONY target
-      selinux: remove unnecessary assignment to subdir-
-      frv: .gitignore: ignore vmlinux.lds
-      sh: decompressor: add shipped files to .gitignore
-      kbuild: move coccicheck help from scripts/Makefile.help to top Makefile
+- Fix a warning in DEB package build
 
-Nick Desaulniers (2):
-      kbuild: clang: remove crufty HOSTCFLAGS
-      kbuild: fix linker feature test macros when cross compiling with Clang
+- Improve coccicheck script
 
- Kbuild                             |   2 -
- Makefile                           | 300 ++++++++++++++--------------
- arch/arm/Makefile                  |   6 +-
- arch/c6x/Makefile                  |   2 +-
- arch/frv/kernel/.gitignore         |   1 +
- arch/hexagon/Makefile              |   6 +-
- arch/hexagon/kernel/ptrace.c       |   4 +-
- arch/sh/Makefile                   |   8 +-
- arch/sh/boot/compressed/.gitignore |   5 +
- arch/x86/entry/vdso/Makefile       |   4 -
- scripts/Kbuild.include             | 106 ++++++++--
- scripts/Makefile.asm-generic       |   3 +
- scripts/Makefile.build             |  25 +--
- scripts/Makefile.headersinst       |  10 +-
- scripts/Makefile.help              |   3 -
- scripts/Makefile.host              |  12 --
- scripts/Makefile.lib               |  34 +---
- scripts/Makefile.modpost           |   3 +-
- scripts/link-vmlinux.sh            |  15 +-
- scripts/mkcompile_h                |   7 +-
- scripts/selinux/Makefile           |   1 -
- 21 files changed, 297 insertions(+), 260 deletions(-)
- create mode 100644 arch/frv/kernel/.gitignore
- delete mode 100644 scripts/Makefile.help
+- Improve some semantic patches
 
+----------------------------------------------------------------
+Julia Lawall (7):
+      Coccinelle: setup_timer: improve messages from setup_timer
+      coccinelle: api: detect identical chip data arrays
+      Coccinelle: make DEBUG_FILE option more useful
+      Coccinelle: use false positive annotation
+      coccinelle: use exists to improve efficiency
+      coccinelle: orplus: reorganize to improve performance
+      docs: dev-tools: coccinelle: delete out of date wiki reference
+
+Kees Cook (1):
+      coccinelle: Improve setup_timer.cocci matching
+
+Masahiro Yamada (11):
+      kbuild: rpm-pkg: remove ppc64 specific image handling
+      kbuild: rpm-pkg: install vmlinux.bz2 unconditionally
+      kbuild: rpm-pkg: clean up mkspec
+      kbuild: rpm-pkg: refactor mkspec with here doc
+      kbuild: rpm-pkg: fix build error when CONFIG_MODULES is disabled
+      kbuild: rpm-pkg: replace $RPM_BUILD_ROOT with %{buildroot}
+      kbuild: rpm-pkg: fix jobserver unavailable warning
+      kbuild: rpm-pkg: keep spec file until make mrproper
+      kbuild: rpm-pkg: do not force -jN in submake
+      coccinelle: grep Options and Requires fields more precisely
+      coccinelle: fix verbose message about .cocci file being run
+
+Sven Joachim (1):
+      builddeb: Pass the kernel:debarch substvar to dpkg-genchanges
+
+ .gitignore                                           |   5 +
+ Documentation/dev-tools/coccinelle.rst               |   3 -
+ scripts/coccicheck                                   |  26 ++-
+ scripts/coccinelle/api/check_bq27xxx_data.cocci      | 161 +++++++++++++
+ scripts/coccinelle/api/setup_timer.cocci             | 144 +++++++++---
+ scripts/coccinelle/iterators/list_entry_update.cocci |   2 +-
+ scripts/coccinelle/misc/ifcol.cocci                  |   8 +-
+ scripts/coccinelle/misc/orplus.cocci                 |  43 ++--
+ scripts/coccinelle/null/badzero.cocci                |   2 +-
+ scripts/package/Makefile                             |   9 +-
+ scripts/package/builddeb                             |   4 +-
+ scripts/package/mkspec                               | 269
+++++++++++------------
+ 12 files changed, 457 insertions(+), 219 deletions(-)
+ create mode 100644 scripts/coccinelle/api/check_bq27xxx_data.cocci
 
 -- 
 Best Regards
