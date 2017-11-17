@@ -1,95 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:23438 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751863AbdKQRe1 (ORCPT
+Received: from mail-io0-f182.google.com ([209.85.223.182]:42520 "EHLO
+        mail-io0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756444AbdKQSuA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Nov 2017 12:34:27 -0500
+        Fri, 17 Nov 2017 13:50:00 -0500
+Received: by mail-io0-f182.google.com with SMTP id u42so9715386ioi.9
+        for <linux-kbuild@vger.kernel.org>; Fri, 17 Nov 2017 10:50:00 -0800 (PST)
+Date: Fri, 17 Nov 2017 10:49:55 -0800
+From: Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: [PATCH v2 08/18] arm64: don't disable ADR_PREL_PG_HI21* with
+ ARM64_ERRATUM_843419
+Message-ID: <20171117184955.GA39391@samitolvanen.mtv.corp.google.com>
+References: <CAKv+Gu-wYwBMV7tdb+Kax_cyPsmAB2R2ZVwJuNi9qM0kaYAs=Q@mail.gmail.com>
+ <20171116114406.GB9361@arm.com>
+ <20171116163132.GC94341@samitolvanen.mtv.corp.google.com>
+ <CAKv+Gu8yPSwZep-S_ke_P5BiZ3o72R=ykhixoXcyGUHa1ZxGGw@mail.gmail.com>
+ <20171116213702.GA10616@samitolvanen.mtv.corp.google.com>
+ <CAKv+Gu_3R4SUC2hCUtEX_4ut9admtrBZS-S-mzQnQsoJoHPcBw@mail.gmail.com>
+ <20171116230939.GA38360@samitolvanen.mtv.corp.google.com>
+ <CAKv+Gu9pROJ_T5twJtVn2itzav4x5fypyJWsBr5YbjWUTMFokg@mail.gmail.com>
+ <20171116235019.GA55530@samitolvanen.mtv.corp.google.com>
+ <CAKv+Gu_A9khxGbMoBX+r=d2XeKpKfLP9cxW0a1E2wGV8az91_w@mail.gmail.com>
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 18 Nov 2017 02:33:25 +0900
-Message-ID: <CAK7LNAQGnPkrk43Gdbzy47zzCbONKmbA2Hbh=agGzn-z150fiQ@mail.gmail.com>
-Subject: [GIT PULL 2/2] Kbuild misc updates for v4.15
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu_A9khxGbMoBX+r=d2XeKpKfLP9cxW0a1E2wGV8az91_w@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, Andi Kleen <ak@linux.intel.com>, Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Alex Matveev <alxmtvv@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>
 
-Hi Linus,
+On Fri, Nov 17, 2017 at 09:54:48AM +0000, Ard Biesheuvel wrote:
+> OK, so all IR objects are converted into a single .o file
+> encapsulating the module image. Does this give the same benefits as
+> LTO linking IR objects to a fully linked executable?
 
-Here are some updates of misc scripts for v4.15.  Please pull!
+Yes, it does.
 
+> Even if it does, partial linking is not something the toolchain
+> people are usually crazy about, so it would be nice to have some
+> confirmation that this is a usage model that is fully supported.
 
-The following changes since commit 9e66317d3c92ddaab330c125dfe9d06eee268aff:
+I confirmed with our LLVM developers that while this is less common,
+it's fully supported.
 
-  Linux 4.14-rc3 (2017-10-01 14:54:54 -0700)
+I will also drop this patch in v3 as passing code model to LLVMgold
+fixes the issue with LTO.
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-misc-v4.15
-
-for you to fetch changes up to e9e716ff2d4d8618aefac55691a4c4483abecc37:
-
-  docs: dev-tools: coccinelle: delete out of date wiki reference
-(2017-11-16 08:56:43 +0900)
-
-----------------------------------------------------------------
-Kbuild misc updates for v4.15
-
-- Clean up and fix RPM package build
-
-- Fix a warning in DEB package build
-
-- Improve coccicheck script
-
-- Improve some semantic patches
-
-----------------------------------------------------------------
-Julia Lawall (7):
-      Coccinelle: setup_timer: improve messages from setup_timer
-      coccinelle: api: detect identical chip data arrays
-      Coccinelle: make DEBUG_FILE option more useful
-      Coccinelle: use false positive annotation
-      coccinelle: use exists to improve efficiency
-      coccinelle: orplus: reorganize to improve performance
-      docs: dev-tools: coccinelle: delete out of date wiki reference
-
-Kees Cook (1):
-      coccinelle: Improve setup_timer.cocci matching
-
-Masahiro Yamada (11):
-      kbuild: rpm-pkg: remove ppc64 specific image handling
-      kbuild: rpm-pkg: install vmlinux.bz2 unconditionally
-      kbuild: rpm-pkg: clean up mkspec
-      kbuild: rpm-pkg: refactor mkspec with here doc
-      kbuild: rpm-pkg: fix build error when CONFIG_MODULES is disabled
-      kbuild: rpm-pkg: replace $RPM_BUILD_ROOT with %{buildroot}
-      kbuild: rpm-pkg: fix jobserver unavailable warning
-      kbuild: rpm-pkg: keep spec file until make mrproper
-      kbuild: rpm-pkg: do not force -jN in submake
-      coccinelle: grep Options and Requires fields more precisely
-      coccinelle: fix verbose message about .cocci file being run
-
-Sven Joachim (1):
-      builddeb: Pass the kernel:debarch substvar to dpkg-genchanges
-
- .gitignore                                           |   5 +
- Documentation/dev-tools/coccinelle.rst               |   3 -
- scripts/coccicheck                                   |  26 ++-
- scripts/coccinelle/api/check_bq27xxx_data.cocci      | 161 +++++++++++++
- scripts/coccinelle/api/setup_timer.cocci             | 144 +++++++++---
- scripts/coccinelle/iterators/list_entry_update.cocci |   2 +-
- scripts/coccinelle/misc/ifcol.cocci                  |   8 +-
- scripts/coccinelle/misc/orplus.cocci                 |  43 ++--
- scripts/coccinelle/null/badzero.cocci                |   2 +-
- scripts/package/Makefile                             |   9 +-
- scripts/package/builddeb                             |   4 +-
- scripts/package/mkspec                               | 269
-++++++++++------------
- 12 files changed, 457 insertions(+), 219 deletions(-)
- create mode 100644 scripts/coccinelle/api/check_bq27xxx_data.cocci
-
--- 
-Best Regards
-Masahiro Yamada
+Sami
