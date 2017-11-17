@@ -1,98 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f193.google.com ([209.85.216.193]:41983 "EHLO
-        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754272AbdKQBGl (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:23190 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932630AbdKQErc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Nov 2017 20:06:41 -0500
-Received: by mail-qt0-f193.google.com with SMTP id e19so2307817qte.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 16 Nov 2017 17:06:41 -0800 (PST)
-Date: Thu, 16 Nov 2017 20:06:39 -0500 (EST)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH] kconfig: fix relational operators for bool and tristate
- symbols
-Message-ID: <nycvar.YSQ.7.76.1711161956590.20817@knanqh.ubzr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        Thu, 16 Nov 2017 23:47:32 -0500
+Message-ID: <1510894030.3063.41.camel@oracle.com>
+Subject: Re: [PATCH 0/7] Support for automatic checkpatch running in the
+ kernel
+From: Knut Omang <knut.omang@oracle.com>
+Date: Fri, 17 Nov 2017 05:47:10 +0100
+In-Reply-To: <CAGXu5j+j0TZ+QUMf09eifTwOwmgA=3AbA3e2PJQehKF61hMcRA@mail.gmail.com>
+References: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
+         <CAGXu5j+j0TZ+QUMf09eifTwOwmgA=3AbA3e2PJQehKF61hMcRA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jan Beulich <JBeulich@suse.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, =?ISO-8859-1?Q?=C5smund_=D8stvold?= <asmund.ostvold@oracle.com>, =?ISO-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>, John Haxby <john.haxby@oracle.com>, linux-doc@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, Joe Perches <joe@perches.com>
 
-Since commit 31847b67bec0 ("kconfig: allow use of relations other than
-(in)equality") it is possible to use relational operators in Kconfig
-statements. However, those operators give unexpected results when
-applied to bool/tristate values:
+On Thu, 2017-11-16 at 14:57 -0800, Kees Cook wrote:
+> On Thu, Nov 16, 2017 at 9:01 AM, Knut Omang <knut.omang@oracle.com> wrote:
+> > The most important checkpatch feature added is the --ignore-cfg feature, which
+> > takes a file argument and parses that file according to this minimal language:
+> >
+> >        # comments
+> >        line_len <n>
+> >        except checkpatch_type [files ...]
+> >        pervasive checkpatch_type1 [checkpatch_type2 ...]
+> >
+> > With "make P=2" checkpatch is called with "--file" and "--ignore_cfg
+> > checkpatch.cfg" which causes it to look for a file named 'checkpatch.cfg' in the
+> > same directory as the source file. If that file exists, checkpatch will be run
+> > with an implicit --strict and with the @ignore list expanded with content from
+> > the configuration file.  If it does not exist, make will simply silently ignore
+> > the file.
+> 
+> Will these configurations be cascading? (For example, all of net/ uses
+> a different comment style, so having that recorded in a single file
+> would be nice.)
 
-	(n < y) = y (correct)
-	(m < y) = y (correct)
-	(n < m) = n (wrong)
+Good point, the net/ use case is certainly something I have been thinking about.
+I didn't want to make it too complex in the first set, so I let patch 1-4
+implement the basics with one file per directory and nothing across directories.
 
-This happens because relational operators process bool and tristate
-symbols as strings and m sorts before n. It makes little sense to do a
-lexicographical compare on bool and tristate values though.
+Patch 6 and 7 in this set extends this to "fallback", which (with the net/ case in mind)
+should allow a single file under net/ to cover the whole subsystem for all subtrees that
+don't have their own checkpatch.cfg, but will be overridden by files in subdirectories.
 
-Documentation/kbuild/kconfig-language.txt states that expression can have
-a value of 'n', 'm' or 'y' (or 0, 1, 2 respectively for calculations).
-Let's make it so for relational comparisons with bool/tristate
-expressions as well and document them. If at least one symbol is an
-actual string then the lexicographical compare works just as before.
+So from a documentation point of view this could be done with the set as it is,
+with people just copying the "pervasive" and "line_len" commands from
+a "global" net/checkpatch.cfg setup down into the subtrees as they start dealing with 
+exceptions.
 
-Signed-off-by: Nicolas Pitre <nico@linaro.org>
+If we want something more automatic, it can certainly be extended, 
+this would just require checkpatch to parse all the upwards checkpatch.cfg files for each
+source file instead just taking the first found, which is what patch 6 implements.
 
-diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-index 262722d886..c4a293a03c 100644
---- a/Documentation/kbuild/kconfig-language.txt
-+++ b/Documentation/kbuild/kconfig-language.txt
-@@ -200,10 +200,14 @@ module state. Dependency expressions have the following syntax:
- <expr> ::= <symbol>                             (1)
-            <symbol> '=' <symbol>                (2)
-            <symbol> '!=' <symbol>               (3)
--           '(' <expr> ')'                       (4)
--           '!' <expr>                           (5)
--           <expr> '&&' <expr>                   (6)
--           <expr> '||' <expr>                   (7)
-+           <symbol1> '<' <symbol2>              (4)
-+           <symbol1> '>' <symbol2>              (4)
-+           <symbol1> '<=' <symbol2>             (4)
-+           <symbol1> '>=' <symbol2>             (4)
-+           '(' <expr> ')'                       (5)
-+           '!' <expr>                           (6)
-+           <expr> '&&' <expr>                   (7)
-+           <expr> '||' <expr>                   (8)
- 
- Expressions are listed in decreasing order of precedence. 
- 
-@@ -214,10 +218,13 @@ Expressions are listed in decreasing order of precedence.
-     otherwise 'n'.
- (3) If the values of both symbols are equal, it returns 'n',
-     otherwise 'y'.
--(4) Returns the value of the expression. Used to override precedence.
--(5) Returns the result of (2-/expr/).
--(6) Returns the result of min(/expr/, /expr/).
--(7) Returns the result of max(/expr/, /expr/).
-+(4) If value of <symbol1> is respectively lower, greater, lower-or-equal,
-+    or greater-or-equal than value of <symbol2>, it returns 'y',
-+    otherwise 'n'.
-+(5) Returns the value of the expression. Used to override precedence.
-+(6) Returns the result of (2-/expr/).
-+(7) Returns the result of min(/expr/, /expr/).
-+(8) Returns the result of max(/expr/, /expr/).
- 
- An expression can have a value of 'n', 'm' or 'y' (or 0, 1, 2
- respectively for calculations). A menu entry becomes visible when its
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index cbf4996dd9..8cee597d33 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -893,7 +893,10 @@ static enum string_value_kind expr_parse_string(const char *str,
- 	switch (type) {
- 	case S_BOOLEAN:
- 	case S_TRISTATE:
--		return k_string;
-+		val->s = !strcmp(str, "n") ? 0 :
-+			 !strcmp(str, "m") ? 1 :
-+			 !strcmp(str, "y") ? 2 : -1;
-+		return k_signed;
- 	case S_INT:
- 		val->s = strtoll(str, &tail, 10);
- 		kind = k_signed;
+Also the command language in the config files is rather limited, maybe other commands
+maybe with more checkpatch additions would be useful to handle such scenarios..
+
+Let me know what you think..
+
+Thanks,
+Knut
