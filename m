@@ -1,110 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:58123 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933100AbdKRCgp (ORCPT
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:46814 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757577AbdKRDWC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Nov 2017 21:36:45 -0500
-Received: from mail-yw0-f170.google.com (mail-yw0-f170.google.com [209.85.161.170]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id vAI2aVj0019993
-        for <linux-kbuild@vger.kernel.org>; Sat, 18 Nov 2017 11:36:32 +0900
-Received: by mail-yw0-f170.google.com with SMTP id x20so2377903ywg.4
-        for <linux-kbuild@vger.kernel.org>; Fri, 17 Nov 2017 18:36:32 -0800 (PST)
+        Fri, 17 Nov 2017 22:22:02 -0500
+Date: Sat, 18 Nov 2017 13:21:39 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [v2,12/18] kbuild: add support for clang LTO
+Message-ID: <20171118132139.58ac5e4c@roar.ozlabs.ibm.com>
+In-Reply-To: <20171115213428.22559-13-samitolvanen@google.com>
+References: <20171115213428.22559-13-samitolvanen@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20171105094416.12220-1-bjorn.forsman@gmail.com>
-References: <20171105094416.12220-1-bjorn.forsman@gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 18 Nov 2017 11:35:50 +0900
-Message-ID: <CAK7LNASacfBcCEdkygt6gwRgZww+mG+tmWeKM_WmMe4OM6sG5Q@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: /bin/pwd -> pwd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
 
-2017-11-05 18:44 GMT+09:00 Bj=C3=B8rn Forsman <bjorn.forsman@gmail.com>:
-> Most places use pwd and rely on $PATH lookup. Moving the remaining
-> absolute path /bin/pwd users over for consistency.
->
-> Also, a reason for doing /bin/pwd -> pwd instead of the other way around
-> is because I believe build systems should make little assumptions on
-> host filesystem layout. Case in point, we do this kind of patching
-> already in NixOS.
->
-> Ref. commit 028568d84da3cfca49f5f846eeeef01441d70451
-> ("kbuild: revert $(realpath ...) to $(shell cd ... && /bin/pwd)").
->
-> Signed-off-by: Bj=C3=B8rn Forsman <bjorn.forsman@gmail.com>
-> ---
->  Documentation/ia64/xen.txt     | 2 +-
->  Makefile                       | 2 +-
->  tools/power/cpupower/Makefile  | 2 +-
->  tools/scripts/Makefile.include | 2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/Documentation/ia64/xen.txt b/Documentation/ia64/xen.txt
-> index c61a99f7c8bb..a12c74ce2773 100644
-> --- a/Documentation/ia64/xen.txt
-> +++ b/Documentation/ia64/xen.txt
-> @@ -41,7 +41,7 @@ Getting and Building Xen and Dom0
->
->   5. make initrd for Dom0/DomU
->      # make -C linux-2.6.18-xen.hg ARCH=3Dia64 modules_install \
-> -      O=3D$(/bin/pwd)/build-linux-2.6.18-xen_ia64
-> +      O=3D$(pwd)/build-linux-2.6.18-xen_ia64
->      # mkinitrd -f /boot/efi/efi/redhat/initrd-2.6.18.8-xen.img \
->        2.6.18.8-xen --builtin mptspi --builtin mptbase \
->        --builtin mptscsih --builtin uhci-hcd --builtin ohci-hcd \
-> diff --git a/Makefile b/Makefile
-> index 3a8868ee967e..a3eed17080b0 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -132,7 +132,7 @@ ifneq ($(KBUILD_OUTPUT),)
->  # check that the output directory actually exists
->  saved-output :=3D $(KBUILD_OUTPUT)
->  KBUILD_OUTPUT :=3D $(shell mkdir -p $(KBUILD_OUTPUT) && cd $(KBUILD_OUTP=
-UT) \
-> -                                                               && /bin/p=
-wd)
-> +                                                               && pwd)
->  $(if $(KBUILD_OUTPUT),, \
->       $(error failed to create output directory "$(saved-output)"))
->
-> diff --git a/tools/power/cpupower/Makefile b/tools/power/cpupower/Makefil=
-e
-> index d6e1c02ddcfe..c76b971d0423 100644
-> --- a/tools/power/cpupower/Makefile
-> +++ b/tools/power/cpupower/Makefile
-> @@ -26,7 +26,7 @@ endif
->
->  ifneq ($(OUTPUT),)
->  # check that the output directory actually exists
-> -OUTDIR :=3D $(shell cd $(OUTPUT) && /bin/pwd)
-> +OUTDIR :=3D $(shell cd $(OUTPUT) && pwd)
->  $(if $(OUTDIR),, $(error output directory "$(OUTPUT)" does not exist))
->  endif
->
-> diff --git a/tools/scripts/Makefile.include b/tools/scripts/Makefile.incl=
-ude
-> index 654efd9768fd..3fab179b1aba 100644
-> --- a/tools/scripts/Makefile.include
-> +++ b/tools/scripts/Makefile.include
-> @@ -13,7 +13,7 @@ endif
->
->  # check that the output directory actually exists
->  ifneq ($(OUTPUT),)
-> -OUTDIR :=3D $(shell cd $(OUTPUT) && /bin/pwd)
-> +OUTDIR :=3D $(shell cd $(OUTPUT) && pwd)
->  $(if $(OUTDIR),, $(error output directory "$(OUTPUT)" does not exist))
->  endif
+On Wed, 15 Nov 2017 13:34:22 -0800
+Sami Tolvanen <samitolvanen@google.com> wrote:
 
+> This change adds the configuration option CONFIG_LTO_CLANG, and
+> build system support for clang's Link Time Optimization (LTO). In
+> preparation for LTO support for other compilers, potentially common
+> parts of the changes are gated behind CONFIG_LTO instead.
+> 
+> With -flto, instead of object files, clang produces LLVM bitcode,
+> which is compiled into a native object at link time, allowing the
+> final binary to be optimized globally. For more details, see:
+> 
+>   https://llvm.org/docs/LinkTimeOptimization.html
+> 
+> While the kernel normally uses GNU ld for linking, LLVM supports LTO
+> only with lld or GNU gold linkers. This patch set assumes gold will
+> be used with the LLVMgold plug-in to perform the LTO link step. Due
+> to potential incompatibilities with GNU ld, this change also adds
+> LDFINAL_vmlinux for using a different linker for the vmlinux_link
+> step, and defaults to using GNU ld.
+> 
+> Assuming LLVMgold.so is in LD_LIBRARY_PATH and CONFIG_LTO_CLANG has
+> been selected, an LTO kernel can be built simply by running make
+> CC=clang. Recommended versions are >= 5.0 for clang, and >= 2.27 for
+> binutils.
 
-Applied to linux-kbuild/kbuild.  Thanks!
+Do you have any kind of numbers for this, out of curiosity? Binary
+size, performance, build time?
 
-I will try my best to push this in the current MW.
+Also
 
+> @@ -585,6 +585,7 @@ config CC_STACKPROTECTOR_STRONG
+>  endchoice
+>  
+>  config THIN_ARCHIVES
+> +	depends on !LTO_CLANG
+>  	def_bool y
+>  	help
+>  	  Select this if the architecture wants to use thin archives
 
---=20
-Best Regards
-Masahiro Yamada
+Why is this needed? It would have been nice to get rid of the
+!THIN_ARCHIVES option if you can make the patches work with the
+thin archives paths.
+
+Thanks,
+Nick
