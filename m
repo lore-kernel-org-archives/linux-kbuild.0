@@ -1,31 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:18236 "EHLO
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:18801 "EHLO
         conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S937526AbdKREJM (ORCPT
+        with ESMTP id S937552AbdKREJs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Nov 2017 23:09:12 -0500
+        Fri, 17 Nov 2017 23:09:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <1510072307-16819-3-git-send-email-yamada.masahiro@socionext.com>
-References: <1510072307-16819-1-git-send-email-yamada.masahiro@socionext.com> <1510072307-16819-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <20171115204231.34914-1-ndesaulniers@google.com>
+References: <CAK7LNAS1NaqPRhK6FOXN=YTMhLagpSrR2=tXn-uWZbpzr=NeoQ@mail.gmail.com>
+ <20171115204231.34914-1-ndesaulniers@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 18 Nov 2017 13:08:27 +0900
-Message-ID: <CAK7LNATMJMr-DSP=aukpbuOffBFwY-hP6a4NJenrCcivt5HmMw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: remove all dummy assignments to obj-
+Date: Sat, 18 Nov 2017 13:09:05 +0900
+Message-ID: <CAK7LNAQNEHRapzFem3nr7=EWJPYvZby9K7vem-R99ijYNoguEg@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, devicetree@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Linux-MIPS <linux-mips@linux-mips.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ralf Baechle <ralf@linux-mips.org>, Alexei Starovoitov <ast@kernel.org>, netdev@vger.kernel.org, Russell King <linux@armlinux.org.uk>, Daniel Borkmann <daniel@iogearbox.net>, Sam Ravnborg <sam@ravnborg.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?Q?Jan=2DSimon_M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Douglas Anderson <dianders@chromium.org>, Chris Fries <cfries@google.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-11-08 1:31 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> Now kbuild core scripts create empty built-in.o where necessary.
-> Remove "obj- := dummy.o" tricks.
+2017-11-16 5:42 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+> From: Chris Fries <cfries@google.com>
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Set the clang KBUILD_CFLAGS up before including arch/ Makefiles,
+> so that ld-options (etc.) can work correctly.
+>
+> This fixes errors with clang such as ld-options trying to CC
+> against your host architecture, but LD trying to link against
+> your target architecture.
+>
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> Signed-off-by: Chris Fries <cfries@google.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Tested-by: Matthias Kaehlcke <mka@chromium.org>
 > ---
->
 
-Applied to linux-kbuild/kbuild.
+Applied to linux-kbuild/kbuild.  Thanks!
 
 -- 
 Best Regards
