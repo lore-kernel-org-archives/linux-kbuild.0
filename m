@@ -1,66 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:46814 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757577AbdKRDWC (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:18684 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S937504AbdKREHe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Nov 2017 22:22:02 -0500
-Date: Sat, 18 Nov 2017 13:21:39 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [v2,12/18] kbuild: add support for clang LTO
-Message-ID: <20171118132139.58ac5e4c@roar.ozlabs.ibm.com>
-In-Reply-To: <20171115213428.22559-13-samitolvanen@google.com>
-References: <20171115213428.22559-13-samitolvanen@google.com>
+        Fri, 17 Nov 2017 23:07:34 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1510072307-16819-2-git-send-email-yamada.masahiro@socionext.com>
+References: <1510072307-16819-1-git-send-email-yamada.masahiro@socionext.com> <1510072307-16819-2-git-send-email-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 18 Nov 2017 13:06:24 +0900
+Message-ID: <CAK7LNASt+4oNw3niSOcM=++Z8D0CF5jy8z1d2oz7Lp=CT2b6tg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: create built-in.o automatically if parent
+ directory wants it
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, devicetree@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Linux-MIPS <linux-mips@linux-mips.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
 
-On Wed, 15 Nov 2017 13:34:22 -0800
-Sami Tolvanen <samitolvanen@google.com> wrote:
+2017-11-08 1:31 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> "obj-y += foo/" syntax requires Kbuild to visit the "foo" subdirectory
+> and link built-in.o from that directory.  This means foo/Makefile is
+> responsible for creating built-in.o even if there is no object to
+> link (in this case, built-in.o is an empty archive).
+>
+> We have had several fixups like commit 4b024242e8a4 ("kbuild: Fix
+> linking error built-in.o no such file or directory"), then ended up
+> with a complex condition as follows:
+>
+>   ifneq ($(strip $(obj-y) $(obj-m) $(obj-) $(subdir-m) $(lib-target)),)
+>   builtin-target := $(obj)/built-in.o
+>   endif
+>
+> We still have more cases not covered by the above, so we need to add
+>   obj- := dummy.o
+> in several places just for creating empty built-in.o.
+>
+> A key point is, the parent Makefile knows whether built-in.o is needed
+> or not.  If a subdirectory needs to create built-in.o, its parent can
+> tell the fact when Kbuild descends into it.
+>
+> If non-empty $(need-builtin) flag is passed from the parent, built-in.o
+> should be created.  $(obj-y) should be still checked to support the
+> single target "%/".  All of ugly tricks will go away.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
 
-> This change adds the configuration option CONFIG_LTO_CLANG, and
-> build system support for clang's Link Time Optimization (LTO). In
-> preparation for LTO support for other compilers, potentially common
-> parts of the changes are gated behind CONFIG_LTO instead.
-> 
-> With -flto, instead of object files, clang produces LLVM bitcode,
-> which is compiled into a native object at link time, allowing the
-> final binary to be optimized globally. For more details, see:
-> 
->   https://llvm.org/docs/LinkTimeOptimization.html
-> 
-> While the kernel normally uses GNU ld for linking, LLVM supports LTO
-> only with lld or GNU gold linkers. This patch set assumes gold will
-> be used with the LLVMgold plug-in to perform the LTO link step. Due
-> to potential incompatibilities with GNU ld, this change also adds
-> LDFINAL_vmlinux for using a different linker for the vmlinux_link
-> step, and defaults to using GNU ld.
-> 
-> Assuming LLVMgold.so is in LD_LIBRARY_PATH and CONFIG_LTO_CLANG has
-> been selected, an LTO kernel can be built simply by running make
-> CC=clang. Recommended versions are >= 5.0 for clang, and >= 2.27 for
-> binutils.
+Applied to linux-kbuild/kbuild.
 
-Do you have any kind of numbers for this, out of curiosity? Binary
-size, performance, build time?
 
-Also
 
-> @@ -585,6 +585,7 @@ config CC_STACKPROTECTOR_STRONG
->  endchoice
->  
->  config THIN_ARCHIVES
-> +	depends on !LTO_CLANG
->  	def_bool y
->  	help
->  	  Select this if the architecture wants to use thin archives
-
-Why is this needed? It would have been nice to get rid of the
-!THIN_ARCHIVES option if you can make the patches work with the
-thin archives paths.
-
-Thanks,
-Nick
+-- 
+Best Regards
+Masahiro Yamada
