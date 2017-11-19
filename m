@@ -1,55 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:2245 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1424157AbdKRLX5 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:18014 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750817AbdKSMVd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 Nov 2017 06:23:57 -0500
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Subject: [PATCH RFC] kbuild: improvement in Makefile.modbuiltin
-Date: Sat, 18 Nov 2017 19:23:13 +0800
-Message-ID: <20171118112313.13557-1-caoj.fnst@cn.fujitsu.com>
+        Sun, 19 Nov 2017 07:21:33 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CA+55aFy4y+-WM=fh4nhvTqTk0nF_c1525CLGCu44Q7rpbBRDZg@mail.gmail.com>
+References: <CAK7LNAThpT3_kEpR=m=pXh9YV27bgaytER33JadjxvaWJGWKWw@mail.gmail.com>
+ <CA+55aFy4y+-WM=fh4nhvTqTk0nF_c1525CLGCu44Q7rpbBRDZg@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 19 Nov 2017 21:20:45 +0900
+Message-ID: <CAK7LNAQphNVdHz02fZBzZ17xbSzve8Pn5yONdDzT9VYoVdK6iQ@mail.gmail.com>
+Subject: Re: [GIT PULL 1/2] Kbuild updates for v4.15
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Drop unnecessary "__subdir-Y" and `cat /dev/null`
+Hi Linus,
 
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
----
-Don't know why they exist, but a simple build is fine without them
-in my test
 
- scripts/Makefile.modbuiltin | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+2017-11-18 10:51 GMT+09:00 Linus Torvalds <torvalds@linux-foundation.org>:
+> On Fri, Nov 17, 2017 at 9:22 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>>
+>> Here are Kbuild updates for v4.15.  Please pull!
+>
+> Mind checking that I got the CFLAGS_KCOV behavior right. The conflict
+> looked pretty simple, but somebody should check the ordering of the
+>
+>    export CFLAGS_KCOV
+>
+> vs the actual setting (that is now in scripts/Makefile.kcov.
+>
+> It probably doesn't matter, but our makefiles are black magic.
+>
+>               Linus
 
-diff --git a/scripts/Makefile.modbuiltin b/scripts/Makefile.modbuiltin
-index a763b4775d06..cbb1e3dc1ef9 100644
---- a/scripts/Makefile.modbuiltin
-+++ b/scripts/Makefile.modbuiltin
-@@ -26,8 +26,7 @@ kbuild-file := $(if $(wildcard $(kbuild-dir)/Kbuild),$(kbuild-dir)/Kbuild,$(kbui
- include $(kbuild-file)
- 
- include scripts/Makefile.lib
--__subdir-Y     := $(patsubst %/,%,$(filter %/, $(obj-Y)))
--subdir-Y       += $(__subdir-Y)
-+subdir-Y       := $(patsubst %/,%,$(filter %/, $(obj-Y)))
- subdir-ym      := $(sort $(subdir-y) $(subdir-Y) $(subdir-m))
- subdir-ym      := $(addprefix $(obj)/,$(subdir-ym))
- obj-Y          := $(addprefix $(obj)/,$(obj-Y))
-@@ -41,7 +40,7 @@ __modbuiltin: $(modbuiltin-target) $(subdir-ym)
- 
- $(modbuiltin-target): $(subdir-ym) FORCE
- 	$(Q)(for m in $(modbuiltin-mods); do echo kernel/$$m; done;	\
--	cat /dev/null $(modbuiltin-subdirs)) > $@
-+	cat $(modbuiltin-subdirs)) > $@
- 
- PHONY += FORCE
- 
+
+Strictly speaking, there is a case where the placement of "export"
+make a difference.
+
+
+-----(example1)-----
+BAR := bar
+
+FOO += $(BAR)
+export FOO
+
+BAR := bar2
+---------------------
+
+
+-----(example2)-----
+BAR := bar
+
+export FOO
+FOO += $(BAR)
+
+BAR := bar2
+---------------------
+
+
+In example1, the exported value for FOO is "bar2"
+whereas, in example2, "bar".
+
+The difference probably comes "export" implies
+":=" flavor initialization if not explicitly initialized yet.
+To avoid confusion, we should explicitly use either ":=" or "=", though.
+
+
+Talking about the kcov case, CFLAGS_KCOV is initialized by ":="
+in scripts/Malefile.kcov, so it should work as we expect.
+
+(In my personal preference, I'd like collect
+the kcov stuff into scripts/Makefile.kcof, but
+it is just a matter of slight taste.)
+
+
+
 -- 
-2.13.6
-
-
-
+Best Regards
+Masahiro Yamada
