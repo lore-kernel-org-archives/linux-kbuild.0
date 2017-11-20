@@ -1,46 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f194.google.com ([209.85.223.194]:34362 "EHLO
-        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751245AbdKTPZc (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:18579 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751301AbdKTPtd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Nov 2017 10:25:32 -0500
-Received: by mail-io0-f194.google.com with SMTP id q101so16081548ioi.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 20 Nov 2017 07:25:32 -0800 (PST)
+        Mon, 20 Nov 2017 10:49:33 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171120152014.hftuded4zxwn2r7m@lakrids.cambridge.arm.com>
-References: <20171115213428.22559-1-samitolvanen@google.com>
- <20171115213428.22559-17-samitolvanen@google.com> <20171120152014.hftuded4zxwn2r7m@lakrids.cambridge.arm.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Mon, 20 Nov 2017 15:25:31 +0000
-Message-ID: <CAKv+Gu-hnoeLqNsHbrLXv3xu7qsYB6REiwMtQYW_0CPwZ7jF4g@mail.gmail.com>
-Subject: Re: [PATCH v2 16/18] arm64: crypto: disable LTO for aes-ce-cipher.c
+In-Reply-To: <CA+55aFz5DjiY=c-aaO5bApmKhyZ-rSWAY7ufR7R=brdcnuRzsA@mail.gmail.com>
+References: <CAK7LNAThpT3_kEpR=m=pXh9YV27bgaytER33JadjxvaWJGWKWw@mail.gmail.com>
+ <CA+55aFzo2sdQseGj1UM-tYnov25ThwRwN3YSOAu44f63JRZuPQ@mail.gmail.com>
+ <CAK7LNARsSNGv4S4OMCjhYkLnE4B+V2OiyxudRsPk2fFCEJ+Oyg@mail.gmail.com> <CA+55aFz5DjiY=c-aaO5bApmKhyZ-rSWAY7ufR7R=brdcnuRzsA@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 21 Nov 2017 00:48:32 +0900
+Message-ID: <CAK7LNATe7K3A+sYDfsoqLnFq6-fu0=meG_77Fc8HQ5BzkBA2GQ@mail.gmail.com>
+Subject: Re: [GIT PULL 1/2] Kbuild updates for v4.15
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Sami Tolvanen <samitolvanen@google.com>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 20 November 2017 at 15:20, Mark Rutland <mark.rutland@arm.com> wrote:
-> On Wed, Nov 15, 2017 at 01:34:26PM -0800, Sami Tolvanen wrote:
->> CONFIG_LTO_CLANG requires the use of clang's integrated assembler, which
->> doesn't understand the inline assembly in aes-ce-cipher.c. Disable LTO for
->> the file to work around the issue.
->
-> Could you elaborate on what the integrated asembler doesn't like?
->
-> It's not entirely clear at a glance, as the asm in that file doesn't
-> seem to do anything that obscure.
->
+Hi Linus,
 
-Actually, it just occurred to me that this code does not adhere 100%
-to the kernel mode neon rules, by putting kernel_neon_begin/end and
-the code itself into the same source file. At the time, it seemed
-harmless, given that these functions are only exposed via function
-pointers and never called locally, and the compiler cannot really
-reorder the function calls with the asm block. However, under LTO this
-all changes, and it is no longer guaranteed that the NEON registers
-are only touched between the kernel mode neon begin/end calls.
 
-So the correct way to fix this would be to move the asm into its own
-.S file, and call it from between the kernel_mode_neon_begin/end
-calls. That should also fix your compat issue.
+2017-11-20 3:02 GMT+09:00 Linus Torvalds <torvalds@linux-foundation.org>:
+> On Sun, Nov 19, 2017 at 2:40 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>>>
+>>> FWIW, I still think we should probably make the compiler versions etc
+>>> available to the configuration management rather than necessarily
+>>> cache them.
+>>
+>> Do you mean something like this?
+>>
+>> https://lkml.org/lkml/2016/12/9/577
+>
+> Yes. With the important part not being so much that particular syntax,
+> but the concept of "get some config options from automation".
+>
+> And the most obvious thing to do would be to just initialize a "bool"
+> variable by running a script where the end result is either success or
+> failure.
+>
+> Now, the actual example:
+>
+>    config COMPILER_SUPPORTS_XYZ
+>        bool
+>        option shell="gcc -XYZ"
+>
+> is obviously too simplified to be realistic, because it would have to
+> account for the actual compiler setup, so what you really need is not
+> "just execute a shell command" but the equivalent of the Makefile
+> "cc-option" function. Aes, for "known buggy versions" you might want
+> to also get the actual compiler version into a config option.
+>
+>
+>
+> Even if "cc-option" is the _only_ thing you can do (and not some kind
+> of "generic shell escape"), I think that would be very useful.
+> Wouldn't it be nice to be able to have all those Makefile things as
+> Kcconfig scripts - and be able to very naturally take them into
+> account when offering people some Kconfig options?
+>
+> So you could do all the logic of not only testing what flags the
+> compiler supports, but then use the Kconfig language to _combine_ that
+> knowledge with the build options. Both in the sense of "this kernel
+> config option depends on the compiler supporting flag XYZ" but also in
+> the sense of "the use flag ABC depends on not only compiler support,
+> but also on whether the kernel was configured for profiling" or
+> whatever.
+>
+> Then the actual Makefile parts would be things like
+>
+>     CFLAGS-$(CONFIG_CC_SPLIT_DWARF) += -gsplit_dwarf
+>
+> because the Kconfig phase would already have all the logic for whether
+> (a) gcc actually supports -gsplit-dwarf at all and (b) whether the
+> user actually asked for split debug info.
+>
+> And we'd not have the performance issues that made that whole caching
+> thing be an issue, because the actual gcc support testing would only
+> happen at Kconfig time.
+>
+> .. it would also make the caching rules be obvious. It's just a "if
+> you upgraded or changed compilers enough to be noticeable, re-do your
+> config ('make oldconfig')".
+>
+>                Linus
+
+OK, probably this is the right direction.
+
+Embedded folks need to agree to give CROSS_COMPILE to the Kconfig phase.
+
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
