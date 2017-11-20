@@ -1,70 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:11808 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751021AbdKTLut (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Nov 2017 06:50:49 -0500
-Subject: Re: [PATCH RFC] kbuild: improvement in Makefile.modbuiltin
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-References: <20171118112313.13557-1-caoj.fnst@cn.fujitsu.com>
-Message-ID: <c0dc5fb3-acad-6bfb-0af2-f8a8e085aec0@cn.fujitsu.com>
-Date: Mon, 20 Nov 2017 19:50:20 +0800
+Received: from foss.arm.com ([217.140.101.70]:58218 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751124AbdKTOlw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 20 Nov 2017 09:41:52 -0500
+Date: Mon, 20 Nov 2017 14:41:47 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2 06/18] arm64: kvm: use -fno-jump-tables with clang
+Message-ID: <20171120144147.7iawjcw644zc4xes@lakrids.cambridge.arm.com>
+References: <20171115213428.22559-1-samitolvanen@google.com>
+ <20171115213428.22559-7-samitolvanen@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20171118112313.13557-1-caoj.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171115213428.22559-7-samitolvanen@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
 
+On Wed, Nov 15, 2017 at 01:34:16PM -0800, Sami Tolvanen wrote:
+> Use -fno-jump-tables to make sure clang doesn't generate branches
+> to EL1 virtual addresses.
 
+Are there any other reasons that clang might generate absolute
+references/relocations?
 
-On 11/18/2017 07:23 PM, Cao jin wrote:
-> Drop unnecessary "__subdir-Y" and `cat /dev/null`
-> 
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+It would be nice if there was the option to disable that more generally,
+rather than disabling individual optimizations. Is there any PIC/PIE
+option that we could use?
+
+We might need something simnilar for GCC, even if we're not seeing
+problems today.
+
+Thanks,
+Mark.
+
+> Suggested-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
+> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 > ---
-> Don't know why they exist, but a simple build is fine without them
-> in my test
+>  arch/arm64/kvm/hyp/Makefile | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
->  scripts/Makefile.modbuiltin | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index f04400d494b7..19fa1c6b6b69 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -5,6 +5,10 @@
+>  
+>  ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING
+>  
+> +ifeq ($(cc-name),clang)
+> +ccflags-y += -fno-jump-tables
+> +endif
+> +
+>  KVM=../../../../virt/kvm
+>  
+>  obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v2-sr.o
+> -- 
+> 2.15.0.448.gf294e3d99a-goog
 > 
-> diff --git a/scripts/Makefile.modbuiltin b/scripts/Makefile.modbuiltin
-> index a763b4775d06..cbb1e3dc1ef9 100644
-> --- a/scripts/Makefile.modbuiltin
-> +++ b/scripts/Makefile.modbuiltin
-> @@ -26,8 +26,7 @@ kbuild-file := $(if $(wildcard $(kbuild-dir)/Kbuild),$(kbuild-dir)/Kbuild,$(kbui
->  include $(kbuild-file)
->  
->  include scripts/Makefile.lib
-> -__subdir-Y     := $(patsubst %/,%,$(filter %/, $(obj-Y)))
-> -subdir-Y       += $(__subdir-Y)
-> +subdir-Y       := $(patsubst %/,%,$(filter %/, $(obj-Y)))
->  subdir-ym      := $(sort $(subdir-y) $(subdir-Y) $(subdir-m))
->  subdir-ym      := $(addprefix $(obj)/,$(subdir-ym))
->  obj-Y          := $(addprefix $(obj)/,$(obj-Y))
-> @@ -41,7 +40,7 @@ __modbuiltin: $(modbuiltin-target) $(subdir-ym)
->  
->  $(modbuiltin-target): $(subdir-ym) FORCE
->  	$(Q)(for m in $(modbuiltin-mods); do echo kernel/$$m; done;	\
-> -	cat /dev/null $(modbuiltin-subdirs)) > $@
-> +	cat $(modbuiltin-subdirs)) > $@
->  
-
-I take this patch back, this change does has something wrong in the
-test. I guess I didn't test it in a pure clean source that day.
-
-Sorry for the noise.
-
->  PHONY += FORCE
->  
-> 
-
--- 
-Sincerely,
-Cao jin
-
-
