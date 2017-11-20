@@ -1,80 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:23278 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751301AbdKTPzK (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:41287 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751350AbdKTQTp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Nov 2017 10:55:10 -0500
+        Mon, 20 Nov 2017 11:19:45 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171119222703.GA12824@amd>
-References: <20171119222703.GA12824@amd>
+In-Reply-To: <716fa938a4ab0ad66490b72e2ed750cd6583728f.1510840787.git-series.knut.omang@oracle.com>
+References: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
+ <716fa938a4ab0ad66490b72e2ed750cd6583728f.1510840787.git-series.knut.omang@oracle.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 21 Nov 2017 00:54:16 +0900
-Message-ID: <CAK7LNARWMpxxC9hT8f7rGj5McjdNU1GXfjML9NbWFTCGyQ++dg@mail.gmail.com>
-Subject: Re: v4.15-rc0 perl locale warnings
+Date: Tue, 21 Nov 2017 01:18:47 +0900
+Message-ID: <CAK7LNASBKPMG5eZ2yXPL_xOYUjr+0J56YMC5VRsE6o=xqz=DzA@mail.gmail.com>
+Subject: Re: [PATCH 2/7] kbuild: Add P= command line flag to run checkpatch
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pavel Machek <pavel@ucw.cz>
-Cc: kernel list <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Knut Omang <knut.omang@oracle.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2017-11-20 7:27 GMT+09:00 Pavel Machek <pavel@ucw.cz>:
-> Hi!
+2017-11-17 2:01 GMT+09:00 Knut Omang <knut.omang@oracle.com>:
+> Add interpretation of a new environment variable P=3D{1,2} in spirit of t=
+he
+> C=3D option, but executing checkpatch instead of sparse.
 >
-> I'm getting quite a lot of perl warnings in v4.15-rc0.
+> Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> Reviewed-by: H=C3=A5kon Bugge <haakon.bugge@oracle.com>
+> Acked-by: =C3=85smund =C3=98stvold <asmund.ostvold@oracle.com>
+> ---
+>  Makefile               | 20 +++++++++++++++++++-
+>  scripts/Makefile.build | 13 +++++++++++++
+>  2 files changed, 32 insertions(+), 1 deletion(-)
 >
-> Any ideas what is going on there?
-
-Sorry, I have no idea.
-
-
-What I can tell is, the Kbuild pull requests in this MW
-did not touch any perl scripts.
-
-
-
+> diff --git a/Makefile b/Makefile
+> index ccd9818..eb4bca9 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -176,6 +176,20 @@ ifndef KBUILD_CHECKSRC
+>    KBUILD_CHECKSRC =3D 0
+>  endif
 >
->                                                                         Pavel
->
->   CC      arch/arm/boot/compressed/fdt_rw.o
->   perl: warning: Setting locale failed.
->   perl: warning: Please check that your locale settings:
->         LANGUAGE = "en_US:en",
->                  LC_ALL = (unset),
->                         LC_COLLATE = "C",
->                                    LC_NUMERIC = "C",
->                                               LANG = "en_US.UTF-8"
->                                                   are supported and
->   installed on your system.
->   perl: warning: Falling back to the standard locale ("C").
->     CC      arch/arm/boot/compressed/fdt_ro.o
->     perl: warning: Setting locale failed.
->     perl: warning: Please check that your locale settings:
->           LANGUAGE = "en_US:en",
->                    LC_ALL = (unset),
->                           LC_COLLATE = "C",
->                                      LC_NUMERIC = "C",
->                                                 LANG = "en_US.UTF-8"
->                                                     are supported and
->   installed on your system.
->   perl: warning: Falling back to the standard locale ("C").
->     CC      arch/arm/boot/compressed/fdt_wip.o
->     perl: warning: Setting locale failed.
->     perl: warning: Please check that your locale settings:
->           LANGUAGE = "en_US:en",
->                    LC_ALL = (unset),
->                           LC_COLLATE = "C",
->                                      LC_NUMERIC = "C",
->                                                 LANG = "en_US.UTF-8"
->                                                     are supported and
->   installed on your system.
->   perl: warning: Falling back to the standard locale ("C").
->
-> --
-> (english) http://www.livejournal.com/~pavelmachek
-> (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+> +# Run scripts/checkpatch.pl with --ignore-cfg checkpatch.cfg
+> +#
+> +# Use 'make P=3D1' to enable checking of only re-compiled files.
+> +# Use 'make P=3D2' to enable checking of *all* source files, regardless
+> +#
+> +# See the file "Documentation/dev-tools/run-checkpatch.rst" for more det=
+ails,
+> +#
+> +ifeq ("$(origin P)", "command line")
+> +  KBUILD_CHECKPATCH =3D $(P)
+> +endif
+> +ifndef KBUILD_CHECKPATCH
+> +  KBUILD_CHECKPATCH =3D 0
+> +endif
+
+
+I am unhappy about adding a new interface
+for each checker.
+
+The default of CHECK is "sparse", but
+users can override it to use another checker.
 
 
 
--- 
+As Decumentation/dev-tools/coccinelle.rst says,
+if you want to use coccinelle as a checker,
+
+make C=3D1 CHECK=3D"scripts/coccicheck"
+
+
+Recently, I saw a patch to use scripts/kernel-doc as a checker.
+https://patchwork.kernel.org/patch/10030521/
+
+
+
+If I accept your patch,
+we would end up with
+
+KBUILD_CHECKPATCH,
+KBUILD_CHECKCOCCI
+KBUILD_CHECKDOC,
+...
+
+
+This is ugly.
+
+
+
+--=20
 Best Regards
 Masahiro Yamada
