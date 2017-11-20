@@ -1,93 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:41287 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751350AbdKTQTp (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Nov 2017 11:19:45 -0500
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60862 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751881AbdKTSF4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 20 Nov 2017 13:05:56 -0500
+Date: Mon, 20 Nov 2017 18:05:55 +0000
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v2 18/18] arm64: select ARCH_SUPPORTS_LTO_CLANG
+Message-ID: <20171120180554.GM32488@arm.com>
+References: <CAKwvOdkV_g0XAbGM+nF2zt=2+tHLLcj=pbSxRDd2HMbrtU3cZg@mail.gmail.com>
+ <20171116165922.llrojrvomuihabrt@hirez.programming.kicks-ass.net>
+ <CAKwvOd=k=iVQvWmzP1E3XHUCYLoJgx+F9zoPuE+R2oaw_ePUVA@mail.gmail.com>
+ <20171116173417.nqsh5dpu65uj7b5s@hirez.programming.kicks-ass.net>
+ <20171116174830.GX3624@linux.vnet.ibm.com>
+ <CAKwvOdkDz1yRo=Skt_mWxs0uucK+adXx8kFQksMbTE3ofnpUMQ@mail.gmail.com>
+ <20171116183950.GA3624@linux.vnet.ibm.com>
+ <20171116184508.GC21898@arm.com>
+ <20171116191307.GC3624@linux.vnet.ibm.com>
+ <20171116201701.GA143965@samitolvanen.mtv.corp.google.com>
 MIME-Version: 1.0
-In-Reply-To: <716fa938a4ab0ad66490b72e2ed750cd6583728f.1510840787.git-series.knut.omang@oracle.com>
-References: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
- <716fa938a4ab0ad66490b72e2ed750cd6583728f.1510840787.git-series.knut.omang@oracle.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 21 Nov 2017 01:18:47 +0900
-Message-ID: <CAK7LNASBKPMG5eZ2yXPL_xOYUjr+0J56YMC5VRsE6o=xqz=DzA@mail.gmail.com>
-Subject: Re: [PATCH 2/7] kbuild: Add P= command line flag to run checkpatch
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171116201701.GA143965@samitolvanen.mtv.corp.google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Knut Omang <knut.omang@oracle.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Nick Desaulniers <ndesaulniers@google.com>, Peter Zijlstra <peterz@infradead.org>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Alexander Potapenko <glider@google.com>, Stephen Hines <srhines@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Manoj Gupta <manojgupta@google.com>
 
-2017-11-17 2:01 GMT+09:00 Knut Omang <knut.omang@oracle.com>:
-> Add interpretation of a new environment variable P=3D{1,2} in spirit of t=
-he
-> C=3D option, but executing checkpatch instead of sparse.
->
-> Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> Reviewed-by: H=C3=A5kon Bugge <haakon.bugge@oracle.com>
-> Acked-by: =C3=85smund =C3=98stvold <asmund.ostvold@oracle.com>
-> ---
->  Makefile               | 20 +++++++++++++++++++-
->  scripts/Makefile.build | 13 +++++++++++++
->  2 files changed, 32 insertions(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index ccd9818..eb4bca9 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -176,6 +176,20 @@ ifndef KBUILD_CHECKSRC
->    KBUILD_CHECKSRC =3D 0
->  endif
->
-> +# Run scripts/checkpatch.pl with --ignore-cfg checkpatch.cfg
-> +#
-> +# Use 'make P=3D1' to enable checking of only re-compiled files.
-> +# Use 'make P=3D2' to enable checking of *all* source files, regardless
-> +#
-> +# See the file "Documentation/dev-tools/run-checkpatch.rst" for more det=
-ails,
-> +#
-> +ifeq ("$(origin P)", "command line")
-> +  KBUILD_CHECKPATCH =3D $(P)
-> +endif
-> +ifndef KBUILD_CHECKPATCH
-> +  KBUILD_CHECKPATCH =3D 0
-> +endif
+Hi Sami,
 
+On Thu, Nov 16, 2017 at 12:17:01PM -0800, Sami Tolvanen wrote:
+> On Thu, Nov 16, 2017 at 11:13:07AM -0800, Paul E. McKenney wrote:
+> > Ah, if "this patch set" meant "adding LTO", I stand corrected and I
+> > apologize for my confusion.
+> 
+> Again, I'm not proposing for LTO to be enabled by default. These patches
+> just make it possible to enable it. Are you saying the possibility
+> that a future compiler update breaks something is a blocker even for
+> experimental features?
 
-I am unhappy about adding a new interface
-for each checker.
+My opinion here is that it's a blocker for LTO on arm64, as the symptoms
+aren't different to building with a compiler that has subtle code generation
+issues. If you *really* want to support LTO, we could consider giving
+acquire semantics to READ_ONCE for LTO builds, but that means trading
+RCU read-side performance for whatever gains are provided by LTO.
 
-The default of CHECK is "sparse", but
-users can override it to use another checker.
+Please don't confuse this with a reluctance to support clang; I'm keen to
+see that supported, so let's focus on that for the moment (although I don't
+see a good reason to support old clang builds with known issues).
 
+> > I agree that we need LTO/PGO to be housebroken from an LKMM viewpoint
+> > before it is enabled.
+> 
+> Can you elaborate what's needed from clang before this can move
+> forward? For example, if you have specific test cases in mind, we can
+> always work on including them in the LLVM test suite.
 
+This is a thorny issue, but RCU (specifically rcu_dereference but probably
+also some READ_ONCEs) relies on being able to utilise syntactic dependency
+chains to order local accesses to shared variables. Paul has spent a
+fair amount of time working to define these dependency chains here:
 
-As Decumentation/dev-tools/coccinelle.rst says,
-if you want to use coccinelle as a checker,
+  https://wg21.link/P0190
 
-make C=3D1 CHECK=3D"scripts/coccicheck"
+Although the current direction of the C++ committee is to prefer
+that dependencies are explicitly "marked", this is not deemed to be
+acceptable for the kernel (in other words, everything is always considered
+"marked").
 
+If a compiler is capable of breaking unmarked dependency chains, then we
+will run into subtle concurrency issues on arm64 because the hardware is
+also capable of reordering independent accesses. My understanding is that
+LTO makes these sort of optimisations far more likely because whole-program
+analysis can enable value prediction, which can convert address dependencies
+into control dependcies; the latter not ordering reads on arm64.
 
-Recently, I saw a patch to use scripts/kernel-doc as a checker.
-https://patchwork.kernel.org/patch/10030521/
-
-
-
-If I accept your patch,
-we would end up with
-
-KBUILD_CHECKPATCH,
-KBUILD_CHECKCOCCI
-KBUILD_CHECKDOC,
-...
-
-
-This is ugly.
-
-
-
---=20
-Best Regards
-Masahiro Yamada
+Will
