@@ -1,77 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60862 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751881AbdKTSF4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Nov 2017 13:05:56 -0500
-Date: Mon, 20 Nov 2017 18:05:55 +0000
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v2 18/18] arm64: select ARCH_SUPPORTS_LTO_CLANG
-Message-ID: <20171120180554.GM32488@arm.com>
-References: <CAKwvOdkV_g0XAbGM+nF2zt=2+tHLLcj=pbSxRDd2HMbrtU3cZg@mail.gmail.com>
- <20171116165922.llrojrvomuihabrt@hirez.programming.kicks-ass.net>
- <CAKwvOd=k=iVQvWmzP1E3XHUCYLoJgx+F9zoPuE+R2oaw_ePUVA@mail.gmail.com>
- <20171116173417.nqsh5dpu65uj7b5s@hirez.programming.kicks-ass.net>
- <20171116174830.GX3624@linux.vnet.ibm.com>
- <CAKwvOdkDz1yRo=Skt_mWxs0uucK+adXx8kFQksMbTE3ofnpUMQ@mail.gmail.com>
- <20171116183950.GA3624@linux.vnet.ibm.com>
- <20171116184508.GC21898@arm.com>
- <20171116191307.GC3624@linux.vnet.ibm.com>
- <20171116201701.GA143965@samitolvanen.mtv.corp.google.com>
+Received: from bombadil.infradead.org ([65.50.211.133]:54207 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751945AbdKTSkm (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 20 Nov 2017 13:40:42 -0500
+Date: Mon, 20 Nov 2017 10:40:40 -0800
+From: Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH] Check all .c files for bad kernel-doc comments
+Message-ID: <20171120184040.GA21971@bombadil.infradead.org>
+References: <20171027194149.14328-1-willy@infradead.org>
+ <CAK7LNATB+mJgMi4sfxb04zYwE5hfv2zONiBHXXtk7wq=No4DNw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171116201701.GA143965@samitolvanen.mtv.corp.google.com>
+In-Reply-To: <CAK7LNATB+mJgMi4sfxb04zYwE5hfv2zONiBHXXtk7wq=No4DNw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Nick Desaulniers <ndesaulniers@google.com>, Peter Zijlstra <peterz@infradead.org>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Alexander Potapenko <glider@google.com>, Stephen Hines <srhines@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Manoj Gupta <manojgupta@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Matthew Wilcox <mawilcox@microsoft.com>, Jani Nikula <jani.nikula@linux.intel.com>
 
-Hi Sami,
-
-On Thu, Nov 16, 2017 at 12:17:01PM -0800, Sami Tolvanen wrote:
-> On Thu, Nov 16, 2017 at 11:13:07AM -0800, Paul E. McKenney wrote:
-> > Ah, if "this patch set" meant "adding LTO", I stand corrected and I
-> > apologize for my confusion.
+On Mon, Oct 30, 2017 at 12:40:20PM +0900, Masahiro Yamada wrote:
+> 2017-10-28 4:41 GMT+09:00 Matthew Wilcox <willy@infradead.org>:
+> > From: Matthew Wilcox <mawilcox@microsoft.com>
+> >
+> > Implement a '-none' output mode for kernel-doc which will only output
+> > warning messages, and suppresses the warning message about there being
+> > no kernel-doc in the file.  Add it to the rule to build .o files from .c
+> > files, so it will check all .c files that have been modified.
+> >
+> > Adds about 1300 warnings to my build, but will hopefully discourage
+> > people from introducing more kerneldoc mistakes.
 > 
-> Again, I'm not proposing for LTO to be enabled by default. These patches
-> just make it possible to enable it. Are you saying the possibility
-> that a future compiler update breaks something is a blocker even for
-> experimental features?
-
-My opinion here is that it's a blocker for LTO on arm64, as the symptoms
-aren't different to building with a compiler that has subtle code generation
-issues. If you *really* want to support LTO, we could consider giving
-acquire semantics to READ_ONCE for LTO builds, but that means trading
-RCU read-side performance for whatever gains are provided by LTO.
-
-Please don't confuse this with a reluctance to support clang; I'm keen to
-see that supported, so let's focus on that for the moment (although I don't
-see a good reason to support old clang builds with known issues).
-
-> > I agree that we need LTO/PGO to be housebroken from an LKMM viewpoint
-> > before it is enabled.
+> Basically, I think this is good,
+> but it is controversial to sprinkle warnings by default.
 > 
-> Can you elaborate what's needed from clang before this can move
-> forward? For example, if you have specific test cases in mind, we can
-> always work on including them in the LLVM test suite.
+> Maybe,
+> 
+> ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),)
+> cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $< ;
+> endif
 
-This is a thorny issue, but RCU (specifically rcu_dereference but probably
-also some READ_ONCEs) relies on being able to utilise syntactic dependency
-chains to order local accesses to shared variables. Paul has spent a
-fair amount of time working to define these dependency chains here:
+Thanks!  v2 below.  Jon, could you apply?
 
-  https://wg21.link/P0190
+---- 8< ----
 
-Although the current direction of the C++ committee is to prefer
-that dependencies are explicitly "marked", this is not deemed to be
-acceptable for the kernel (in other words, everything is always considered
-"marked").
 
-If a compiler is capable of breaking unmarked dependency chains, then we
-will run into subtle concurrency issues on arm64 because the hardware is
-also capable of reordering independent accesses. My understanding is that
-LTO makes these sort of optimisations far more likely because whole-program
-analysis can enable value prediction, which can convert address dependencies
-into control dependcies; the latter not ordering reads on arm64.
+From 17d8fec833ac3cd52da412fe686911e10f77057c Mon Sep 17 00:00:00 2001
+From: Matthew Wilcox <mawilcox@microsoft.com>
+Date: Fri, 27 Oct 2017 14:24:55 -0400
+Subject: [PATCH] Add optional check for bad kernel-doc comments
 
-Will
+Implement a '-none' output mode for kernel-doc which will only output
+warning messages, and suppresses the warning message about there being
+no kernel-doc in the file.
+
+If the build has requested additional warnings, automatically check all
+.c files.  This patch does not check .h files.  Enabling the warning
+by default would add about 1300 warnings, so it's default off for now.
+People who care can use this to check they didn't break the docs and
+maybe we'll get all the warnings fixed and be able to enable this check
+by default in the future.
+
+Signed-off-by: Matthew Wilcox <mawilcox@microsoft.com>
+---
+ scripts/Makefile.build |  5 +++++
+ scripts/kernel-doc     | 25 ++++++++++++++++++++++++-
+ 2 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 061d0c3a420a..3fa7bd067557 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -108,6 +108,10 @@ ifneq ($(KBUILD_CHECKSRC),0)
+   endif
+ endif
+ 
++ifneq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),)
++  cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $< ;
++endif
++
+ # Do section mismatch analysis for each module/built-in.o
+ ifdef CONFIG_DEBUG_SECTION_MISMATCH
+   cmd_secanalysis = ; scripts/mod/modpost $@
+@@ -291,6 +295,7 @@ define rule_cc_o_c
+ 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
+ 	$(call cmd_and_fixdep,cc_o_c)					  \
+ 	$(cmd_modversions_c)						  \
++	$(cmd_checkdoc)							  \
+ 	$(call echo-cmd,objtool) $(cmd_objtool)				  \
+ 	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
+ endef
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index 9d3eafea58f0..c69583440a44 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -58,6 +58,7 @@ Output format selection (mutually exclusive):
+   -man			Output troff manual page format. This is the default.
+   -rst			Output reStructuredText format.
+   -text			Output plain text format.
++  -none			Do not output documentation, only warnings.
+ 
+ Output selection (mutually exclusive):
+   -export		Only output documentation for symbols that have been
+@@ -532,6 +533,8 @@ while ($ARGV[0] =~ m/^-(.*)/) {
+ 	$output_mode = "gnome";
+ 	@highlights = @highlights_gnome;
+ 	$blankline = $blankline_gnome;
++    } elsif ($cmd eq "-none") {
++	$output_mode = "none";
+     } elsif ($cmd eq "-module") { # not needed for XML, inherits from calling document
+ 	$modulename = shift @ARGV;
+     } elsif ($cmd eq "-function") { # to only output specific functions
+@@ -2117,6 +2120,24 @@ sub output_blockhead_list(%) {
+     }
+ }
+ 
++
++## none mode output functions
++
++sub output_function_none(%) {
++}
++
++sub output_enum_none(%) {
++}
++
++sub output_typedef_none(%) {
++}
++
++sub output_struct_none(%) {
++}
++
++sub output_blockhead_none(%) {
++}
++
+ ##
+ # generic output function for all types (function, struct/union, typedef, enum);
+ # calls the generated, variable output_ function name based on
+@@ -3136,7 +3157,9 @@ sub process_file($) {
+ 	}
+     }
+     if ($initial_section_counter == $section_counter) {
+-	print STDERR "${file}:1: warning: no structured comments found\n";
++	if ($output_mode ne "none") {
++	    print STDERR "${file}:1: warning: no structured comments found\n";
++	}
+ 	if (($output_selection == OUTPUT_INCLUDE) && ($show_not_found == 1)) {
+ 	    print STDERR "    Was looking for '$_'.\n" for keys %function_table;
+ 	}
+-- 
+2.11.0.301.g722e3be85.dirty
+
