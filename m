@@ -1,39 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:41393 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752028AbdKTTdE (ORCPT
+Received: from mail-it0-f53.google.com ([209.85.214.53]:45458 "EHLO
+        mail-it0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752148AbdKTTsg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Nov 2017 14:33:04 -0500
-Date: Mon, 20 Nov 2017 20:32:56 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v2 18/18] arm64: select ARCH_SUPPORTS_LTO_CLANG
-Message-ID: <20171120193256.e6fnn2arwqc5wqkp@hirez.programming.kicks-ass.net>
-References: <20171116165922.llrojrvomuihabrt@hirez.programming.kicks-ass.net>
- <CAKwvOd=k=iVQvWmzP1E3XHUCYLoJgx+F9zoPuE+R2oaw_ePUVA@mail.gmail.com>
- <20171116173417.nqsh5dpu65uj7b5s@hirez.programming.kicks-ass.net>
- <20171116174830.GX3624@linux.vnet.ibm.com>
- <CAKwvOdkDz1yRo=Skt_mWxs0uucK+adXx8kFQksMbTE3ofnpUMQ@mail.gmail.com>
- <20171116183950.GA3624@linux.vnet.ibm.com>
- <20171116184508.GC21898@arm.com>
- <20171116191307.GC3624@linux.vnet.ibm.com>
- <20171116201701.GA143965@samitolvanen.mtv.corp.google.com>
- <20171120180554.GM32488@arm.com>
+        Mon, 20 Nov 2017 14:48:36 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171120180554.GM32488@arm.com>
+In-Reply-To: <CAK7LNASBKPMG5eZ2yXPL_xOYUjr+0J56YMC5VRsE6o=xqz=DzA@mail.gmail.com>
+References: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
+ <716fa938a4ab0ad66490b72e2ed750cd6583728f.1510840787.git-series.knut.omang@oracle.com>
+ <CAK7LNASBKPMG5eZ2yXPL_xOYUjr+0J56YMC5VRsE6o=xqz=DzA@mail.gmail.com>
+From: Jim Davis <jim.epost@gmail.com>
+Date: Mon, 20 Nov 2017 12:48:35 -0700
+Message-ID: <CA+r1ZhgPUJ_WtCM=RgiPSrSvGrp7FMni2db6S9am5-LN_vhRdg@mail.gmail.com>
+Subject: Re: [PATCH 2/7] kbuild: Add P= command line flag to run checkpatch
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Will Deacon <will.deacon@arm.com>
-Cc: Sami Tolvanen <samitolvanen@google.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Nick Desaulniers <ndesaulniers@google.com>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Alexander Potapenko <glider@google.com>, Stephen Hines <srhines@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Manoj Gupta <manojgupta@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Knut Omang <knut.omang@oracle.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mon, Nov 20, 2017 at 06:05:55PM +0000, Will Deacon wrote:
-> Although the current direction of the C++ committee is to prefer
-> that dependencies are explicitly "marked", this is not deemed to be
-> acceptable for the kernel (in other words, everything is always considered
-> "marked").
+On Mon, Nov 20, 2017 at 9:18 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 
-Yeah, that is an attitude not compatible with existing code. Much like
-the proposal to allow temporary/wide stores on everything not explicitly
-declared atomic. Such stuff instantly breaks all extant code that does
-multi-threading with no recourse.
+>
+> I am unhappy about adding a new interface
+> for each checker.
+>
+> The default of CHECK is "sparse", but
+> users can override it to use another checker.
+>
+>
+>
+> As Decumentation/dev-tools/coccinelle.rst says,
+> if you want to use coccinelle as a checker,
+>
+> make C=1 CHECK="scripts/coccicheck"
+>
+
+I'd be nice if people could just specify CHECK and CHECKFLAGS to run
+their favorite checker, but currently CHECKFLAGS seems hardwired for
+running sparse.  So something liike
+
+make C=1 CHECK="scripts/checkpatch.pl" CHECKFLAGS="--quiet --file"
+
+fails when checkpatch is passed lots of arguments like -D__linux__
+-Dlinux -D__STDC__ .  A little shell wrapper to grab the last argument
+in that long list is a workaround, but perhaps CHECKFLAGS should be
+made less sparse-specific?
+
+-- 
+Jim
