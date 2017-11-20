@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:60364 "EHLO
+Received: from bombadil.infradead.org ([65.50.211.133]:40856 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751253AbdKTWjr (ORCPT
+        with ESMTP id S1751483AbdKTWjt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Nov 2017 17:39:47 -0500
+        Mon, 20 Nov 2017 17:39:49 -0500
 From: Darren Hart <dvhart@infradead.org>
-Subject: [PATCH 1/2] Documentation/kbuild: Add guidance for the use of default
-Date: Mon, 20 Nov 2017 14:39:33 -0800
-Message-Id: <575ec3811e20371ab691cfb9611c31be48e5cc90.1511217248.git.dvhart@infradead.org>
+Subject: [PATCH 2/2] Documentation/process: Add CONFIG default value to submit-checklist
+Date: Mon, 20 Nov 2017 14:39:34 -0800
+Message-Id: <359bf77e70babec97628725ca98cffe1b0ac6792.1511217248.git.dvhart@infradead.org>
 In-Reply-To: <cover.1511217248.git.dvhart@infradead.org>
 References: <cover.1511217248.git.dvhart@infradead.org>
 In-Reply-To: <cover.1511217248.git.dvhart@infradead.org>
@@ -19,15 +19,9 @@ Cc: "Darren Hart (VMware)" <dvhart@infradead.org>, "Yann E. MORIN" <yann.morin.1
 
 From: "Darren Hart (VMware)" <dvhart@infradead.org>
 
-Document the preference [1] for new CONFIG options to "default n" (or
-not use default at all) in order to minimizes changes to the config,
-especially to avoid "make oldconfig" growing unnecessarily from release
-to release.
-
-Document the exceptions where it is acceptable to use "default y/m" for
-new CONFIG options.
-
-1. https://lkml.org/lkml/2017/11/18/257
+Add default value review to the submit checklist, referring to the
+preference for "default n" from the previous patch added to
+Documentation/kbuild/kconfig-language.txt.
 
 Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
@@ -37,41 +31,24 @@ Cc: linux-kbuild@vger.kernel.org
 Cc: linux-doc@vger.kernel.org
 Signed-off-by: Darren Hart (VMware) <dvhart@infradead.org>
 ---
- Documentation/kbuild/kconfig-language.txt | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ Documentation/process/submit-checklist.rst | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-index 262722d..688e41e 100644
---- a/Documentation/kbuild/kconfig-language.txt
-+++ b/Documentation/kbuild/kconfig-language.txt
-@@ -77,6 +77,27 @@ applicable everywhere (see syntax).
-   Optionally, dependencies only for this default value can be added with
-   "if".
+diff --git a/Documentation/process/submit-checklist.rst b/Documentation/process/submit-checklist.rst
+index a0d9d34..7d04ab3 100644
+--- a/Documentation/process/submit-checklist.rst
++++ b/Documentation/process/submit-checklist.rst
+@@ -37,7 +37,9 @@ and elsewhere regarding submitting Linux kernel patches.
+    You should be able to justify all violations that remain in
+    your patch.
  
-+ The default value deliberately defaults to 'n' in order to avoid bloating the
-+ build. With few exceptions, new config options should not change this. The
-+ intent is for "make oldconfig" to add as little as possible to the config from
-+ release to release.
-+
-+ Note:
-+	Things that merit "default y/m" include:
-+
-+	a) A new Kconfig option for something that used to always be built
-+	   should be "default y".
-+
-+	b) A new gatekeeping Kconfig option that hides/shows other Kconfig
-+	   options (but does not generate any code of its own), should be
-+	   "default y" so people will see those other options.
-+
-+	c) Sub-driver behavior or similar options for a driver that is
-+	   "default n". This allows you to provide sane defaults.
-+
-+	d) Hardware or infrastructure that everybody expects, such as CONFIG_NET
-+	   or CONFIG_BLOCK. These are rare exceptions.
-+
- - type definition + default value:
- 	"def_bool"/"def_tristate" <expr> ["if" <expr>]
-   This is a shorthand notation for a type definition plus a value.
+-6) Any new or modified ``CONFIG`` options don't muck up the config menu.
++6) Any new or modified ``CONFIG`` options do not muck up the config menu and
++  default to off unless they meet the exception criteria documented in
++  ``Documentation/kbuild/kconfig-language.txt`` Menu attributes: default value.
+ 
+ 7) All new ``Kconfig`` options have help text.
+ 
 -- 
 2.9.4
 
