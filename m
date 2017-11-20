@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:58678 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752463AbdKTTZn (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:50524 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752315AbdKTT2e (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Nov 2017 14:25:43 -0500
-Date: Mon, 20 Nov 2017 20:25:31 +0100
+        Mon, 20 Nov 2017 14:28:34 -0500
+Date: Mon, 20 Nov 2017 20:28:06 +0100
 From: Peter Zijlstra <peterz@infradead.org>
 Subject: Re: [PATCH v2 18/18] arm64: select ARCH_SUPPORTS_LTO_CLANG
-Message-ID: <20171120192531.53z66fhwg4rdjgdc@hirez.programming.kicks-ass.net>
+Message-ID: <20171120192806.xrbewr6mcffu3i3x@hirez.programming.kicks-ass.net>
 References: <20171116165922.llrojrvomuihabrt@hirez.programming.kicks-ass.net>
  <CAKwvOd=k=iVQvWmzP1E3XHUCYLoJgx+F9zoPuE+R2oaw_ePUVA@mail.gmail.com>
  <20171116173417.nqsh5dpu65uj7b5s@hirez.programming.kicks-ass.net>
@@ -28,10 +28,15 @@ To: Will Deacon <will.deacon@arm.com>
 Cc: Sami Tolvanen <samitolvanen@google.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Nick Desaulniers <ndesaulniers@google.com>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Alexander Potapenko <glider@google.com>, Stephen Hines <srhines@google.com>, Pirama Arumuga Nainar <pirama@google.com>, Manoj Gupta <manojgupta@google.com>
 
 On Mon, Nov 20, 2017 at 06:05:55PM +0000, Will Deacon wrote:
-> Please don't confuse this with a reluctance to support clang; I'm keen to
-> see that supported, 
+> This is a thorny issue, but RCU (specifically rcu_dereference but probably
+> also some READ_ONCEs) relies on being able to utilise syntactic dependency
+> chains to order local accesses to shared variables.
 
-As an aside; as long as clang doesn't do asm-goto and asm-flag-output
-(as examples of features that clang lacks and developers have at times
-stated they would never support) I can't take them serious as a target
-compiler.
+Well, we used to have READ_ONCE() and smp_read_barrier_depends(), but
+we recently munged them together, in the process getting rid of
+lockless_dereference().
+
+So for sure, READ_ONCE() must be able to do the address dependency
+thing, otherwise tons of code comes apart.
+
+
