@@ -1,74 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f178.google.com ([209.85.223.178]:43246 "EHLO
-        mail-io0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751863AbdKUAAv (ORCPT
+Received: from mail-pf0-f171.google.com ([209.85.192.171]:39310 "EHLO
+        mail-pf0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751701AbdKUBCK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Nov 2017 19:00:51 -0500
+        Mon, 20 Nov 2017 20:02:10 -0500
+Date: Tue, 21 Nov 2017 11:01:52 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [v2,12/18] kbuild: add support for clang LTO
+Message-ID: <20171121110152.23fb751a@roar.ozlabs.ibm.com>
+In-Reply-To: <20171120202152.GA89108@samitolvanen.mtv.corp.google.com>
+References: <20171115213428.22559-13-samitolvanen@google.com>
+        <20171118132139.58ac5e4c@roar.ozlabs.ibm.com>
+        <20171120202152.GA89108@samitolvanen.mtv.corp.google.com>
 MIME-Version: 1.0
-In-Reply-To: <20171120212251.k4uvdstfhg6qtrag@ltop.local>
-References: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
- <716fa938a4ab0ad66490b72e2ed750cd6583728f.1510840787.git-series.knut.omang@oracle.com>
- <CAK7LNASBKPMG5eZ2yXPL_xOYUjr+0J56YMC5VRsE6o=xqz=DzA@mail.gmail.com>
- <CA+r1ZhgPUJ_WtCM=RgiPSrSvGrp7FMni2db6S9am5-LN_vhRdg@mail.gmail.com>
- <20171120200827.726yhebihjhrhted@ltop.local> <1511212212.4822.66.camel@oracle.com>
- <20171120212251.k4uvdstfhg6qtrag@ltop.local>
-From: Jim Davis <jim.epost@gmail.com>
-Date: Mon, 20 Nov 2017 17:00:48 -0700
-Message-ID: <CA+r1Zhj295pmVTmh_TVMuy37qRQ7Q6Mxipk7vhyAVkuXFBU8uw@mail.gmail.com>
-Subject: Re: [PATCH 2/7] kbuild: Add P= command line flag to run checkpatch
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Cc: Knut Omang <knut.omang@oracle.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
 
-On Mon, Nov 20, 2017 at 2:22 PM, Luc Van Oostenryck
-<luc.vanoostenryck@gmail.com> wrote:
+On Mon, 20 Nov 2017 12:21:52 -0800
+Sami Tolvanen <samitolvanen@google.com> wrote:
 
-> Should it be possible to somehow keep the distinction between
-> the flags coming from KBUILD_CFLAGS and the pure CHECKFLAGS?
+> On Sat, Nov 18, 2017 at 01:21:39PM +1000, Nicholas Piggin wrote:
+> > Do you have any kind of numbers for this, out of curiosity? Binary
+> > size, performance, build time?  
+> 
+> I don't have performance numbers to share. Are there any specific
+> benchmarks you'd be interested in seeing? Build time typically
+> increases with LTO and in my experience, binary size tends to increase
+> by ~10-15% as well.
 
-Well, the practical problem seems to be that $(CHECK) is called in
-scripts/Makefile.build with both $(CHECKFLAGS) and $(c_flags) as
-arguments, regardless of what $(CHECK) is.  That can be hacked around
-with something inelegant like
+By deduction, then you must see some performance improvement? :) 
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index bb831d49bcfd..102194f9afb9 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -98,14 +98,20 @@ __build: $(if $(KBUILD_BUILTIN),$(builtin-target)
-$(lib-target) $(extra-y)) \
-         $(subdir-ym) $(always)
-        @:
+I just wonder are you doing this because there is some worthwhile
+performance gain? Or to enable more testing and development of LTO?
+Any clues for why a user would want to enable it.
 
--# Linus' kernel sanity checking tool
-+# Linus' kernel sanity checking tool, or $CHECK program of choice
-+ifneq ($(KBUILD_CHECKSRC),)
-+  add_to_checkflags =
-+  ifeq ($(CHECK),sparse)
-+    add_to_checkflags = $(c_flags)
-+  endif
-+endif
- ifneq ($(KBUILD_CHECKSRC),0)
-   ifeq ($(KBUILD_CHECKSRC),2)
-     quiet_cmd_force_checksrc = CHECK   $<
--          cmd_force_checksrc = $(CHECK) $(CHECKFLAGS) $(c_flags) $< ;
-+          cmd_force_checksrc = $(CHECK) $(CHECKFLAGS) $(add_to_checkflags) $< ;
-   else
-       quiet_cmd_checksrc     = CHECK   $<
--            cmd_checksrc     = $(CHECK) $(CHECKFLAGS) $(c_flags) $< ;
-+            cmd_checksrc     = $(CHECK) $(CHECKFLAGS) $(add_to_checkflags) $< ;
-   endif
- endif
+> 
+> > Why is this needed? It would have been nice to get rid of the
+> > !THIN_ARCHIVES option if you can make the patches work with the thin
+> > archives paths.  
+> 
+> I believe LLVMgold doesn't know how to deal with an archive of LLVM IR
+> files, but I can certainly use thin archives as an index and extract
+> the path names for linking. I'll look into it.
 
-and then if I run scripts/checkpatch.pl as $CHECK and pass --quiet
---file as before it works -- until checkpatch returns with a non-zero
-exit code, which causes the Makefile to bail at that point.
+Thanks, if you could. Possibly file a request with LLVMgold too, it
+seems to be that toolchain support for archives is quite strong, so it
+will be good to keep pushing for that.
 
-So maybe a wrapper script, with an exit 0 fixup to keep on keeping on
-in case of checkpatch warnings or errors, would be better after all.
-
-
--- 
-Jim
+Thanks,
+Nick
