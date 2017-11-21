@@ -1,100 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:44387 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751189AbdKUIKt (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Nov 2017 03:10:49 -0500
-Message-ID: <1511251834.4822.113.camel@oracle.com>
-Subject: Re: [PATCH 2/7] kbuild: Add P= command line flag to run checkpatch
-From: Knut Omang <knut.omang@oracle.com>
-Date: Tue, 21 Nov 2017 09:10:34 +0100
-In-Reply-To: <CA+r1Zhj295pmVTmh_TVMuy37qRQ7Q6Mxipk7vhyAVkuXFBU8uw@mail.gmail.com>
-References: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
-         <716fa938a4ab0ad66490b72e2ed750cd6583728f.1510840787.git-series.knut.omang@oracle.com>
-         <CAK7LNASBKPMG5eZ2yXPL_xOYUjr+0J56YMC5VRsE6o=xqz=DzA@mail.gmail.com>
-         <CA+r1ZhgPUJ_WtCM=RgiPSrSvGrp7FMni2db6S9am5-LN_vhRdg@mail.gmail.com>
-         <20171120200827.726yhebihjhrhted@ltop.local>
-         <1511212212.4822.66.camel@oracle.com>
-         <20171120212251.k4uvdstfhg6qtrag@ltop.local>
-         <CA+r1Zhj295pmVTmh_TVMuy37qRQ7Q6Mxipk7vhyAVkuXFBU8uw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:38732 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751570AbdKULPM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 21 Nov 2017 06:15:12 -0500
+Date: Tue, 21 Nov 2017 11:15:06 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2 09/18] arm64: explicitly pass
+ --no-fix-cortex-a53-843419 to GNU gold
+Message-ID: <20171121111506.qmlhtupzyrvfpgjl@lakrids.cambridge.arm.com>
+References: <20171115213428.22559-1-samitolvanen@google.com>
+ <20171115213428.22559-10-samitolvanen@google.com>
+ <20171116114722.GD9361@arm.com>
+ <20171116163549.GD94341@samitolvanen.mtv.corp.google.com>
+ <20171120144720.bf27bpuwq4huhkdp@lakrids.cambridge.arm.com>
+ <20171120203549.GB89108@samitolvanen.mtv.corp.google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171120203549.GB89108@samitolvanen.mtv.corp.google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Davis <jim.epost@gmail.com>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: Will Deacon <will.deacon@arm.com>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
 
-On Mon, 2017-11-20 at 17:00 -0700, Jim Davis wrote:
-> On Mon, Nov 20, 2017 at 2:22 PM, Luc Van Oostenryck
-> <luc.vanoostenryck@gmail.com> wrote:
+On Mon, Nov 20, 2017 at 12:35:49PM -0800, Sami Tolvanen wrote:
+> On Mon, Nov 20, 2017 at 02:47:20PM +0000, Mark Rutland wrote:
+> > However, we could instead check ld-version, produce a warning, and
+> > abort the build in such cases.
 > 
-> > Should it be possible to somehow keep the distinction between
-> > the flags coming from KBUILD_CFLAGS and the pure CHECKFLAGS?
-> 
-> Well, the practical problem seems to be that $(CHECK) is called in
-> scripts/Makefile.build with both $(CHECKFLAGS) and $(c_flags) as
-> arguments, regardless of what $(CHECK) is.  That can be hacked around
-> with something inelegant like
-> 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index bb831d49bcfd..102194f9afb9 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -98,14 +98,20 @@ __build: $(if $(KBUILD_BUILTIN),$(builtin-target)
-> $(lib-target) $(extra-y)) \
->          $(subdir-ym) $(always)
->         @:
-> 
-> -# Linus' kernel sanity checking tool
-> +# Linus' kernel sanity checking tool, or $CHECK program of choice
-> +ifneq ($(KBUILD_CHECKSRC),)
-> +  add_to_checkflags =
-> +  ifeq ($(CHECK),sparse)
-> +    add_to_checkflags = $(c_flags)
-> +  endif
-> +endif
->  ifneq ($(KBUILD_CHECKSRC),0)
->    ifeq ($(KBUILD_CHECKSRC),2)
->      quiet_cmd_force_checksrc = CHECK   $<
-> -          cmd_force_checksrc = $(CHECK) $(CHECKFLAGS) $(c_flags) $< ;
-> +          cmd_force_checksrc = $(CHECK) $(CHECKFLAGS) $(add_to_checkflags) $<
-> ;
->    else
->        quiet_cmd_checksrc     = CHECK   $<
-> -            cmd_checksrc     = $(CHECK) $(CHECKFLAGS) $(c_flags) $< ;
-> +            cmd_checksrc     = $(CHECK) $(CHECKFLAGS) $(add_to_checkflags) $<
-> ;
->    endif
->  endif
-> 
-> and then if I run scripts/checkpatch.pl as $CHECK and pass --quiet
-> --file as before it works -- until checkpatch returns with a non-zero
-> exit code, which causes the Makefile to bail at that point.
+> I believe the version number of gold didn't change in binutils 2.28.1,
+> where this was fixed, but we could certainly warn about older versions
+> of gold.
 
-yes, in an earlier version, I added a --no-errors flag to checkpatch to handle
-that, but based on feedback this version promotes make -k instead. It seems
-however that that only holds to the next linker step. It is useful to be able to
-select whether checkpatch should cause make to stop or not. While fixing issues,
-failure is a better strategy while to assess the state or generate a report, a
-return 0 behavior is better.
+If that's the case, can we mandate gold version > 2.28.1?
 
-> So maybe a wrapper script, with an exit 0 fixup to keep on keeping on
-> in case of checkpatch warnings or errors, would be better after all.
+The latest version seems to be 2.29.1, so there's at least one
+(hopefully) working release.
 
-I can prepare a v2 based on the wrapper script I have already.
-
-In that version, all added functionality was implemented in the wrapper
-(including the configuration file parsing) 
-
-Would you like to keep the checkpatch changes in some form, or would you rather
-see everything happening in the wrapper?
-
-A 3rd possibility that strikes me is that maybe what's needed is a general
-checker runner that can also take care of running other checks, running multiple
-checks, and maybe also handling temporary or decided suppression of sparse
-errors in a similar fashion as I implemented for checkpatch errors. But maybe
-that can be left to a later change set..
+That might rule out a few working gold binaries, but it would save on
+unwelcome surprises.
 
 Thanks,
-Knut
+Mark.
