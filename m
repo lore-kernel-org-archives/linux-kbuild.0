@@ -1,41 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:51278 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752991AbdKWOVH (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:34272 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752695AbdKWOiW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 23 Nov 2017 09:21:07 -0500
-MIME-Version: 1.0
-In-Reply-To: <1510737560-12643-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1510737560-12643-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 23 Nov 2017 09:38:22 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 23 Nov 2017 23:20:02 +0900
-Message-ID: <CAK7LNATygeZJBSYCsYA+T-q+DpsHTomehmWT9L9gfgGORhoOVg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: rpm: prompt to use "rpm-pkg" if "rpm" target is used
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kbuild: drop $(extra-y) from real-objs-y
+Date: Thu, 23 Nov 2017 23:37:53 +0900
+Message-Id: <1511447873-18688-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-2017-11-15 18:19 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> The "rpm" has been kept for backward compatibility since pre-git era.
-> I am planning to remove it after the Linux 4.18 release.  Annouce the
-> end of the support, prompting to use "rpm-pkg" instead.
->
-> If you use "rpm", it will work like "rpm-pkg", but warning messages
-> will be displayed as follows:
->
->   WARNING: "rpm" target will be removed after Linux 4.18
->            Please use "rpm-pkg" instead.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
+$(real-objs-y) in only used in scripts/Makefile.build to form
+"targets", but $(extra-y) is added to "targets" in another line.
+We do not need to add $(extra-y) twice.
 
-Applied to linux-kbuild.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ scripts/Makefile.lib | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 08eb40a..1ca4dcd 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -57,7 +57,7 @@ multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)))
+ subdir-obj-y := $(filter %/built-in.o, $(obj-y))
+ 
+ # Replace multi-part objects by their individual parts, look at local dir only
+-real-objs-y := $(foreach m, $(filter-out $(subdir-obj-y), $(obj-y)), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m))) $(extra-y)
++real-objs-y := $(foreach m, $(filter-out $(subdir-obj-y), $(obj-y)), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
+ real-objs-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)),$(m)))
+ 
+ # DTB
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
