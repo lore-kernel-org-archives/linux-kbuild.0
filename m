@@ -1,46 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0074.hostedemail.com ([216.40.44.74]:34798 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751309AbdKUUNH (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:59004 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752148AbdKWEY5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Nov 2017 15:13:07 -0500
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave01.hostedemail.com (Postfix) with ESMTP id 110451813BCCB
-        for <linux-kbuild@vger.kernel.org>; Tue, 21 Nov 2017 20:03:10 +0000 (UTC)
-Message-ID: <1511294584.6989.34.camel@perches.com>
-Subject: Re: [PATCH 2/7] kbuild: Add P= command line flag to run checkpatch
-From: Joe Perches <joe@perches.com>
-Date: Tue, 21 Nov 2017 12:03:04 -0800
-In-Reply-To: <CA+r1ZhhoadjbLyr2mf9Z-9BPE9K4wjpfmDEv2iOO6Oh0CxV2Xg@mail.gmail.com>
-References: <cover.3dd1d0c1f15a7a7c418f20ebafc9719afc1c2704.1510840787.git-series.knut.omang@oracle.com>
-         <716fa938a4ab0ad66490b72e2ed750cd6583728f.1510840787.git-series.knut.omang@oracle.com>
-         <CAK7LNASBKPMG5eZ2yXPL_xOYUjr+0J56YMC5VRsE6o=xqz=DzA@mail.gmail.com>
-         <CA+r1ZhgPUJ_WtCM=RgiPSrSvGrp7FMni2db6S9am5-LN_vhRdg@mail.gmail.com>
-         <20171120200827.726yhebihjhrhted@ltop.local>
-         <1511212212.4822.66.camel@oracle.com>
-         <20171120212251.k4uvdstfhg6qtrag@ltop.local>
-         <CA+r1Zhj295pmVTmh_TVMuy37qRQ7Q6Mxipk7vhyAVkuXFBU8uw@mail.gmail.com>
-         <1511251834.4822.113.camel@oracle.com>
-         <CA+r1ZhhoadjbLyr2mf9Z-9BPE9K4wjpfmDEv2iOO6Oh0CxV2Xg@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Wed, 22 Nov 2017 23:24:57 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNAQNEHRapzFem3nr7=EWJPYvZby9K7vem-R99ijYNoguEg@mail.gmail.com>
+References: <CAK7LNAS1NaqPRhK6FOXN=YTMhLagpSrR2=tXn-uWZbpzr=NeoQ@mail.gmail.com>
+ <20171115204231.34914-1-ndesaulniers@google.com> <CAK7LNAQNEHRapzFem3nr7=EWJPYvZby9K7vem-R99ijYNoguEg@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 23 Nov 2017 13:24:09 +0900
+Message-ID: <CAK7LNASGYZfQFkM3yMRQaHLUwW5Lhp8CxHGX0bJ9sVja0f=n+A@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Davis <jim.epost@gmail.com>, Knut Omang <knut.omang@oracle.com>
-Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andy Whitcroft <apw@canonical.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?Q?Jan=2DSimon_M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Douglas Anderson <dianders@chromium.org>, Chris Fries <cfries@google.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, 2017-11-21 at 12:48 -0700, Jim Davis wrote:
-> On Tue, Nov 21, 2017 at 1:10 AM, Knut Omang <knut.omang@oracle.com> wrote:
-> 
-> > Would you like to keep the checkpatch changes in some form, or would you rather
-> > see everything happening in the wrapper?
-> 
-> I don't have a strong preference one way or another, but keeping
-> everything in a wrapper script might be easier if only because you
-> wouldn't need to get signoffs from whoever maintains checkpatch too.
+Hi.
 
-Keeping everything in a wrapper script would also allow
-any arbitrary checker to be run with minimal changes to
-the Makefile/build subsystem.
+2017-11-18 13:09 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> 2017-11-16 5:42 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+>> From: Chris Fries <cfries@google.com>
+>>
+>> Set the clang KBUILD_CFLAGS up before including arch/ Makefiles,
+>> so that ld-options (etc.) can work correctly.
+>>
+>> This fixes errors with clang such as ld-options trying to CC
+>> against your host architecture, but LD trying to link against
+>> your target architecture.
+>>
+>> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+>> Signed-off-by: Chris Fries <cfries@google.com>
+>> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+>> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> Tested-by: Matthias Kaehlcke <mka@chromium.org>
+>> ---
+>
+> Applied to linux-kbuild/kbuild.  Thanks!
+>
+> --
+> Best Regards
+> Masahiro Yamada
 
+After more thought, I picked up your v2.
+(clang variables before kernel configuration)
+
+Linus suggests to move compiler flag testing to Kconfig.
+To do it, we need to feed target CC information to Kconfig.
+
+Sorry for spending your time.
+
+
+-- 
+Best Regards
+Masahiro Yamada
