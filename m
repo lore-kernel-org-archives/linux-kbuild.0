@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:65529 "EHLO mga05.intel.com"
+Received: from mga05.intel.com ([192.55.52.43]:14694 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752729AbdK0Vec (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S1752759AbdK0Vec (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 27 Nov 2017 16:34:32 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 07/21] x86: Make exception handler functions visible
-Date: Mon, 27 Nov 2017 13:34:09 -0800
-Message-Id: <20171127213423.27218-8-andi@firstfloor.org>
+Subject: [PATCH 08/21] x86/idt: Make const __initconst
+Date: Mon, 27 Nov 2017 13:34:10 -0800
+Message-Id: <20171127213423.27218-9-andi@firstfloor.org>
 In-Reply-To: <20171127213423.27218-1-andi@firstfloor.org>
 References: <20171127213423.27218-1-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,98 +16,77 @@ Cc: x86@kernel.org, samitolvanen@google.com, alxmtvv@gmail.com, linux-kbuild@vge
 
 From: Andi Kleen <ak@linux.intel.com>
 
-Make the C exception handler functions that are directly called through
-exception tables visible. LTO needs to know they are accessed from assembler.
+const variables must use __initconst, not __initdata. Fix this up
+for the new IDT tables recently added, which got it consistently wrong.
+
+Fixes a whole range of commits between
+16bc18d895ce x86/idt: Move 32-bit idt_descr to C code
+and
+dc20b2d52653 x86/idt: Move interrupt gate initialization to IDT code
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/x86/mm/extable.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ arch/x86/kernel/idt.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/mm/extable.c b/arch/x86/mm/extable.c
-index 3321b446b66c..abe60607e8b9 100644
---- a/arch/x86/mm/extable.c
-+++ b/arch/x86/mm/extable.c
-@@ -20,7 +20,7 @@ ex_fixup_handler(const struct exception_table_entry *x)
- 	return (ex_handler_t)((unsigned long)&x->handler + x->handler);
- }
- 
--bool ex_handler_default(const struct exception_table_entry *fixup,
-+__visible bool ex_handler_default(const struct exception_table_entry *fixup,
- 		       struct pt_regs *regs, int trapnr)
- {
- 	regs->ip = ex_fixup_addr(fixup);
-@@ -28,7 +28,7 @@ bool ex_handler_default(const struct exception_table_entry *fixup,
- }
- EXPORT_SYMBOL(ex_handler_default);
- 
--bool ex_handler_fault(const struct exception_table_entry *fixup,
-+__visible bool ex_handler_fault(const struct exception_table_entry *fixup,
- 		     struct pt_regs *regs, int trapnr)
- {
- 	regs->ip = ex_fixup_addr(fixup);
-@@ -41,7 +41,7 @@ EXPORT_SYMBOL_GPL(ex_handler_fault);
-  * Handler for UD0 exception following a failed test against the
-  * result of a refcount inc/dec/add/sub.
+diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
+index d985cef3984f..56d99be3706a 100644
+--- a/arch/x86/kernel/idt.c
++++ b/arch/x86/kernel/idt.c
+@@ -56,7 +56,7 @@ struct idt_data {
+  * Early traps running on the DEFAULT_STACK because the other interrupt
+  * stacks work only after cpu_init().
   */
--bool ex_handler_refcount(const struct exception_table_entry *fixup,
-+__visible bool ex_handler_refcount(const struct exception_table_entry *fixup,
- 			 struct pt_regs *regs, int trapnr)
- {
- 	/* First unconditionally saturate the refcount. */
-@@ -94,6 +94,7 @@ EXPORT_SYMBOL_GPL(ex_handler_refcount);
-  * of vulnerability by restoring from the initial state (essentially, zeroing
-  * out all the FPU registers) if we can't restore from the task's FPU state.
+-static const __initdata struct idt_data early_idts[] = {
++static const __initconst struct idt_data early_idts[] = {
+ 	INTG(X86_TRAP_DB,		debug),
+ 	SYSG(X86_TRAP_BP,		int3),
+ #ifdef CONFIG_X86_32
+@@ -70,7 +70,7 @@ static const __initdata struct idt_data early_idts[] = {
+  * the traps which use them are reinitialized with IST after cpu_init() has
+  * set up TSS.
   */
-+__visible
- bool ex_handler_fprestore(const struct exception_table_entry *fixup,
- 			  struct pt_regs *regs, int trapnr)
- {
-@@ -107,7 +108,7 @@ bool ex_handler_fprestore(const struct exception_table_entry *fixup,
- }
- EXPORT_SYMBOL_GPL(ex_handler_fprestore);
+-static const __initdata struct idt_data def_idts[] = {
++static const __initconst struct idt_data def_idts[] = {
+ 	INTG(X86_TRAP_DE,		divide_error),
+ 	INTG(X86_TRAP_NMI,		nmi),
+ 	INTG(X86_TRAP_BR,		bounds),
+@@ -108,7 +108,7 @@ static const __initdata struct idt_data def_idts[] = {
+ /*
+  * The APIC and SMP idt entries
+  */
+-static const __initdata struct idt_data apic_idts[] = {
++static const __initconst struct idt_data apic_idts[] = {
+ #ifdef CONFIG_SMP
+ 	INTG(RESCHEDULE_VECTOR,		reschedule_interrupt),
+ 	INTG(CALL_FUNCTION_VECTOR,	call_function_interrupt),
+@@ -150,7 +150,7 @@ static const __initdata struct idt_data apic_idts[] = {
+  * Early traps running on the DEFAULT_STACK because the other interrupt
+  * stacks work only after cpu_init().
+  */
+-static const __initdata struct idt_data early_pf_idts[] = {
++static const __initconst struct idt_data early_pf_idts[] = {
+ 	INTG(X86_TRAP_PF,		page_fault),
+ };
  
--bool ex_handler_ext(const struct exception_table_entry *fixup,
-+__visible bool ex_handler_ext(const struct exception_table_entry *fixup,
- 		   struct pt_regs *regs, int trapnr)
- {
- 	/* Special hack for uaccess_err */
-@@ -117,7 +118,7 @@ bool ex_handler_ext(const struct exception_table_entry *fixup,
- }
- EXPORT_SYMBOL(ex_handler_ext);
- 
--bool ex_handler_rdmsr_unsafe(const struct exception_table_entry *fixup,
-+__visible bool ex_handler_rdmsr_unsafe(const struct exception_table_entry *fixup,
- 			     struct pt_regs *regs, int trapnr)
- {
- 	if (pr_warn_once("unchecked MSR access error: RDMSR from 0x%x at rIP: 0x%lx (%pF)\n",
-@@ -132,7 +133,7 @@ bool ex_handler_rdmsr_unsafe(const struct exception_table_entry *fixup,
- }
- EXPORT_SYMBOL(ex_handler_rdmsr_unsafe);
- 
--bool ex_handler_wrmsr_unsafe(const struct exception_table_entry *fixup,
-+__visible bool ex_handler_wrmsr_unsafe(const struct exception_table_entry *fixup,
- 			     struct pt_regs *regs, int trapnr)
- {
- 	if (pr_warn_once("unchecked MSR access error: WRMSR to 0x%x (tried to write 0x%08x%08x) at rIP: 0x%lx (%pF)\n",
-@@ -146,7 +147,7 @@ bool ex_handler_wrmsr_unsafe(const struct exception_table_entry *fixup,
- }
- EXPORT_SYMBOL(ex_handler_wrmsr_unsafe);
- 
--bool ex_handler_clear_fs(const struct exception_table_entry *fixup,
-+__visible bool ex_handler_clear_fs(const struct exception_table_entry *fixup,
- 			 struct pt_regs *regs, int trapnr)
- {
- 	if (static_cpu_has(X86_BUG_NULL_SEG))
-@@ -156,7 +157,7 @@ bool ex_handler_clear_fs(const struct exception_table_entry *fixup,
- }
- EXPORT_SYMBOL(ex_handler_clear_fs);
- 
--bool ex_has_fault_handler(unsigned long ip)
-+__visible bool ex_has_fault_handler(unsigned long ip)
- {
- 	const struct exception_table_entry *e;
- 	ex_handler_t handler;
+@@ -158,7 +158,7 @@ static const __initdata struct idt_data early_pf_idts[] = {
+  * Override for the debug_idt. Same as the default, but with interrupt
+  * stack set to DEFAULT_STACK (0). Required for NMI trap handling.
+  */
+-static const __initdata struct idt_data dbg_idts[] = {
++static const __initconst struct idt_data dbg_idts[] = {
+ 	INTG(X86_TRAP_DB,	debug),
+ 	INTG(X86_TRAP_BP,	int3),
+ };
+@@ -180,7 +180,7 @@ gate_desc debug_idt_table[IDT_ENTRIES] __page_aligned_bss;
+  * The exceptions which use Interrupt stacks. They are setup after
+  * cpu_init() when the TSS has been initialized.
+  */
+-static const __initdata struct idt_data ist_idts[] = {
++static const __initconst struct idt_data ist_idts[] = {
+ 	ISTG(X86_TRAP_DB,	debug,		DEBUG_STACK),
+ 	ISTG(X86_TRAP_NMI,	nmi,		NMI_STACK),
+ 	SISTG(X86_TRAP_BP,	int3,		DEBUG_STACK),
 -- 
 2.13.6
 
