@@ -1,74 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f193.google.com ([209.85.220.193]:42806 "EHLO
-        mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751138AbdK0Iaw (ORCPT
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:33523 "EHLO
+        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751277AbdK0JqX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Nov 2017 03:30:52 -0500
+        Mon, 27 Nov 2017 04:46:23 -0500
+Date: Mon, 27 Nov 2017 10:46:20 +0100
+From: Pavel Machek <pavel@ucw.cz>
+Subject: [PATCH] fix perl locale warnings in arch/arm/boot/
+Message-ID: <20171127094620.GA18072@amd>
+References: <20171119222703.GA12824@amd>
+ <CAK7LNARWMpxxC9hT8f7rGj5McjdNU1GXfjML9NbWFTCGyQ++dg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAT9opHCYFfccD6EOPZVznY0aQ7dOYVkupaTesEvzs7bKA@mail.gmail.com>
-References: <CAK7LNAT9opHCYFfccD6EOPZVznY0aQ7dOYVkupaTesEvzs7bKA@mail.gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 27 Nov 2017 09:30:50 +0100
-Message-ID: <CAMuHMdWO0D9jLi=6m6W1bQuTQURjFnZo9PM2-CtfhYxvZajjiw@mail.gmail.com>
-Subject: Re: [GIT PULL] Kbuild updates for v4.15 (2nd round)
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="pf9I7BMVVzbSWLtt"
+Content-Disposition: inline
+In-Reply-To: <CAK7LNARWMpxxC9hT8f7rGj5McjdNU1GXfjML9NbWFTCGyQ++dg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Chris Fries <cfries@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, rmk+kernel@armlinux.org.uk, tony@atomide.com, j-keerthy@ti.com, linux-arm-kernel@lists.infradead.org
+Cc: kernel list <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi Chris, Yamada-san,
 
-On Fri, Nov 24, 2017 at 5:58 PM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Please pull a little more Kbuild updates for v4.15.
-> The reason for lateness is I hesitated to put some patches
-> in the last week pull requests due to big conflicts.
-> Also, I applied some fixes and trivial enough ones.
-> I hope you will pull this.
->
->
->
-> The following changes since commit 2ce079f04d5914dae14fdc8618f804cc0d2a1b8f:
->
->   Merge tag 'kbuild-misc-v4.15' of
-> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild
-> (2017-11-17 17:51:33 -0800)
->
-> are available in the git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-> tags/kbuild-v4.15-2
->
-> for you to fetch changes up to 10aaa3b7e95b9649fd658ac7e9075093316425d8:
->
->   kbuild: drop $(extra-y) from real-objs-y (2017-11-23 23:29:26 +0900)
->
-> ----------------------------------------------------------------
-> Kbuild updates for v4.15 (2nd)
+--pf9I7BMVVzbSWLtt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Chris Fries (1):
->       kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
 
-This broke cross-compilation using a cross-compiler that supports less
-compiler options than the host compiler. E.g.:
+Commit 429f7a062e3b5cf6fcf01eb00600cee5fe4d751f introduced perl into
+arch/arm/boot/compressed/Makefile, which unfortunately leads to locale
+warnings.
 
-    cc1: error: unrecognized command line option "-Wno-unused-but-set-variable"
+Fix it by setting default locale.
 
-Reverting commit ae6b289a37890909 ("kbuild: Set KBUILD_CFLAGS before incl.
-arch Makefile", which was in linux-next since next-20171124) fixes that.
+Signed-off-by: Pavel Machek <pavel@ucw.cz>
 
-BTW, this gets broken regularly, cfr. e.g. commits a1c48bb160f8368e ("Makefile:
-Fix unrecognized cross-compiler command line options") and bef5b54bd7bf8117
-("Fix MIPS cross-compile problem").
+diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/M=
+akefile
+index 45a6b9b..4656e98 100644
+--- a/arch/arm/boot/compressed/Makefile
++++ b/arch/arm/boot/compressed/Makefile
+@@ -118,7 +118,7 @@ asflags-y :=3D -DZIMAGE
+=20
+ # Supply kernel BSS size to the decompressor via a linker symbol.
+ KBSS_SZ =3D $(shell $(CROSS_COMPILE)nm $(obj)/../../../../vmlinux | \
+-		perl -e 'while (<>) { \
++		LC_ALL=3DC perl -e 'while (<>) { \
+ 			$$bss_start=3Dhex($$1) if /^([[:xdigit:]]+) B __bss_start$$/; \
+ 			$$bss_end=3Dhex($$1) if /^([[:xdigit:]]+) B __bss_stop$$/; \
+ 		}; printf "%d\n", $$bss_end - $$bss_start;')
 
-Gr{oetje,eeting}s,
 
-                        Geert
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+--pf9I7BMVVzbSWLtt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlob3uwACgkQMOfwapXb+vI80QCePWXnvR7vzWcSWqEENk/2+MDY
+1RMAn2dgbJ5YbbbtBiE0vE8MUhH2hreo
+=fgQv
+-----END PGP SIGNATURE-----
+
+--pf9I7BMVVzbSWLtt--
