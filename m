@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:46347 "EHLO mga06.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:55058 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752499AbdK0Vec (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S1752715AbdK0Vec (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 27 Nov 2017 16:34:32 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 15/21] lto, x86, mm: Disable vmalloc BUILD_BUG_ON for LTO
-Date: Mon, 27 Nov 2017 13:34:17 -0800
-Message-Id: <20171127213423.27218-16-andi@firstfloor.org>
+Subject: [PATCH 16/21] lto: Add __noreorder and mark initcalls __noreorder
+Date: Mon, 27 Nov 2017 13:34:18 -0800
+Message-Id: <20171127213423.27218-17-andi@firstfloor.org>
 In-Reply-To: <20171127213423.27218-1-andi@firstfloor.org>
 References: <20171127213423.27218-1-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,29 +16,66 @@ Cc: x86@kernel.org, samitolvanen@google.com, alxmtvv@gmail.com, linux-kbuild@vge
 
 From: Andi Kleen <ak@linux.intel.com>
 
-On 32bit builds this BUILD_BUG_ON often fires with LTO for unknown
-reasons. As far as I can tell it's a false positive. So disable
-it for LTO.
+gcc 5 has a new no_reorder attribute that prevents top level
+reordering only for that symbol.
+
+Kernels don't like any reordering of initcalls between files, as several
+initcalls depend on each other. LTO previously needed to use
+-fno-toplevel-reordering to prevent boot failures.
+
+Add a __noreorder wrapper for the no_reorder attribute and use
+it for initcalls.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/x86/mm/init_32.c | 2 ++
- 1 file changed, 2 insertions(+)
+ include/linux/compiler-gcc.h   | 5 +++++
+ include/linux/compiler_types.h | 3 +++
+ include/linux/init.h           | 2 +-
+ 3 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/mm/init_32.c b/arch/x86/mm/init_32.c
-index 8a64a6f2848d..8187d8ee98ee 100644
---- a/arch/x86/mm/init_32.c
-+++ b/arch/x86/mm/init_32.c
-@@ -808,7 +808,9 @@ void __init mem_init(void)
- 	BUILD_BUG_ON(VMALLOC_END			> PKMAP_BASE);
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index 2272ded07496..0d562baeb379 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -324,6 +324,11 @@
+ #define __no_sanitize_address
  #endif
- #define high_memory (-128UL << 20)
-+#ifndef CONFIG_LTO
- 	BUILD_BUG_ON(VMALLOC_START			>= VMALLOC_END);
-+#endif
- #undef high_memory
- #undef __FIXADDR_TOP
  
++#if __GNUC__ >= 5
++/* Avoid reordering a top level statement */
++#define __noreorder    __attribute__((no_reorder))
++#endif
++
+ /*
+  * A trick to suppress uninitialized variable warning without generating any
+  * code
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index 6b79a9bba9a7..fe4604603f5e 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -260,6 +260,9 @@ struct ftrace_likely_data {
+ #define __assume_aligned(a, ...)
+ #endif
+ 
++#ifndef __noreorder
++#define __noreorder
++#endif
+ 
+ /* Are two types/vars the same type (ignoring qualifiers)? */
+ #ifndef __same_type
+diff --git a/include/linux/init.h b/include/linux/init.h
+index ea1b31101d9e..abf1980367b7 100644
+--- a/include/linux/init.h
++++ b/include/linux/init.h
+@@ -161,7 +161,7 @@ extern bool initcall_debug;
+  */
+ 
+ #define __define_initcall(fn, id) \
+-	static initcall_t __initcall_##fn##id __used \
++	static initcall_t __initcall_##fn##id __used __noreorder \
+ 	__attribute__((__section__(".initcall" #id ".init"))) = fn;
+ 
+ /*
 -- 
 2.13.6
 
