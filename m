@@ -1,168 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:65529 "EHLO mga05.intel.com"
+Received: from mga05.intel.com ([192.55.52.43]:53518 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752849AbdK0Veg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S1752854AbdK0Veg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 27 Nov 2017 16:34:36 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 06/21] x86/syscalls: Make x86 syscalls use real prototypes
-Date: Mon, 27 Nov 2017 13:34:08 -0800
-Message-Id: <20171127213423.27218-7-andi@firstfloor.org>
+Subject: [PATCH 10/21] Fix read buffer overflow in delta-ipc
+Date: Mon, 27 Nov 2017 13:34:12 -0800
+Message-Id: <20171127213423.27218-11-andi@firstfloor.org>
 In-Reply-To: <20171127213423.27218-1-andi@firstfloor.org>
 References: <20171127213423.27218-1-andi@firstfloor.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, samitolvanen@google.com, alxmtvv@gmail.com, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+Cc: x86@kernel.org, samitolvanen@google.com, alxmtvv@gmail.com, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, hugues.fruchet@st.com, mchehab@s-opensource.com
 
 From: Andi Kleen <ak@linux.intel.com>
 
-LTO complains very loudly that the x86 syscalls use their own different
-prototypes. Switch it to use the real prototypes instead. This requires
-adding a few extra prototypes to asm/syscalls.h.
+The single caller passes a string to delta_ipc_open, which copies with a
+fixed size larger than the string. So it copies some random data after
+the original string the ro segment.
 
-This is a generic cleanup, useful even without LTO.
+If the string was at the end of a page it may fault.
 
+Just copy the string with a normal strcpy after clearing the field.
+
+Found by a LTO build (which errors out)
+because the compiler inlines the functions and can resolve
+the string sizes and triggers the compile time checks in memcpy.
+
+In function ‘memcpy’,
+    inlined from ‘delta_ipc_open.constprop’ at linux/drivers/media/platform/sti/delta/delta-ipc.c:178:0,
+    inlined from ‘delta_mjpeg_ipc_open’ at linux/drivers/media/platform/sti/delta/delta-mjpeg-dec.c:227:0,
+    inlined from ‘delta_mjpeg_decode’ at linux/drivers/media/platform/sti/delta/delta-mjpeg-dec.c:403:0:
+/home/andi/lsrc/linux/include/linux/string.h:337:0: error: call to ‘__read_overflow2’ declared with attribute error: detected read beyond size of object passed as 2nd parameter
+    __read_overflow2();
+
+Cc: hugues.fruchet@st.com
+Cc: mchehab@s-opensource.com
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/x86/entry/syscall_32.c     | 13 +++++--------
- arch/x86/entry/syscall_64.c     | 13 +++++--------
- arch/x86/include/asm/syscalls.h | 42 ++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 47 insertions(+), 21 deletions(-)
+ arch/x86/platform/intel-mid/device_libs/platform_bt.c | 2 +-
+ certs/blacklist_nohashes.c                            | 2 +-
+ drivers/media/platform/sti/delta/delta-ipc.c          | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/entry/syscall_32.c b/arch/x86/entry/syscall_32.c
-index 95c294963612..f7ffd4b100fd 100644
---- a/arch/x86/entry/syscall_32.c
-+++ b/arch/x86/entry/syscall_32.c
-@@ -6,20 +6,17 @@
- #include <linux/cache.h>
- #include <asm/asm-offsets.h>
- #include <asm/syscall.h>
-+#include <linux/syscalls.h>
-+#include <asm/syscalls.h>
-+#include <asm/sys_ia32.h>
+diff --git a/arch/x86/platform/intel-mid/device_libs/platform_bt.c b/arch/x86/platform/intel-mid/device_libs/platform_bt.c
+index dc036e511f48..2b5d86ce24c2 100644
+--- a/arch/x86/platform/intel-mid/device_libs/platform_bt.c
++++ b/arch/x86/platform/intel-mid/device_libs/platform_bt.c
+@@ -60,7 +60,7 @@ static int __init tng_bt_sfi_setup(struct bt_sfi_data *ddata)
+ 	return 0;
+ }
  
--#define __SYSCALL_I386(nr, sym, qual) extern asmlinkage long sym(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long) ;
--#include <asm/syscalls_32.h>
--#undef __SYSCALL_I386
--
--#define __SYSCALL_I386(nr, sym, qual) [nr] = sym,
--
--extern asmlinkage long sys_ni_syscall(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long);
-+#define __SYSCALL_I386(nr, sym, qual) [nr] = (sys_call_ptr_t)sym,
- 
- __visible const sys_call_ptr_t ia32_sys_call_table[__NR_syscall_compat_max+1] = {
- 	/*
- 	 * Smells like a compiler bug -- it doesn't work
- 	 * when the & below is removed.
- 	 */
--	[0 ... __NR_syscall_compat_max] = &sys_ni_syscall,
-+	[0 ... __NR_syscall_compat_max] = (sys_call_ptr_t)&sys_ni_syscall,
- #include <asm/syscalls_32.h>
+-static const struct bt_sfi_data tng_bt_sfi_data __initdata = {
++static const struct bt_sfi_data tng_bt_sfi_data __initconst = {
+ 	.setup	= tng_bt_sfi_setup,
  };
-diff --git a/arch/x86/entry/syscall_64.c b/arch/x86/entry/syscall_64.c
-index 9c09775e589d..1ccf4cd300a6 100644
---- a/arch/x86/entry/syscall_64.c
-+++ b/arch/x86/entry/syscall_64.c
-@@ -4,25 +4,22 @@
- #include <linux/linkage.h>
- #include <linux/sys.h>
- #include <linux/cache.h>
-+#include <linux/syscalls.h>
-+#include <linux/compat.h>
- #include <asm/asm-offsets.h>
- #include <asm/syscall.h>
-+#include <asm/syscalls.h>
  
- #define __SYSCALL_64_QUAL_(sym) sym
- #define __SYSCALL_64_QUAL_ptregs(sym) ptregs_##sym
+diff --git a/certs/blacklist_nohashes.c b/certs/blacklist_nohashes.c
+index 73fd99098ad7..753b703ef0ef 100644
+--- a/certs/blacklist_nohashes.c
++++ b/certs/blacklist_nohashes.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #include "blacklist.h"
  
--#define __SYSCALL_64(nr, sym, qual) extern asmlinkage long __SYSCALL_64_QUAL_##qual(sym)(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long);
--#include <asm/syscalls_64.h>
--#undef __SYSCALL_64
--
--#define __SYSCALL_64(nr, sym, qual) [nr] = __SYSCALL_64_QUAL_##qual(sym),
--
--extern long sys_ni_syscall(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long);
-+#define __SYSCALL_64(nr, sym, qual) [nr] = (sys_call_ptr_t)__SYSCALL_64_QUAL_##qual(sym),
- 
- asmlinkage const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {
- 	/*
- 	 * Smells like a compiler bug -- it doesn't work
- 	 * when the & below is removed.
- 	 */
--	[0 ... __NR_syscall_max] = &sys_ni_syscall,
-+	[0 ... __NR_syscall_max] = (sys_call_ptr_t)&sys_ni_syscall,
- #include <asm/syscalls_64.h>
+-const char __initdata *const blacklist_hashes[] = {
++const char __initconst *const blacklist_hashes[] = {
+ 	NULL
  };
-diff --git a/arch/x86/include/asm/syscalls.h b/arch/x86/include/asm/syscalls.h
-index bad25bb80679..76bf99c8b151 100644
---- a/arch/x86/include/asm/syscalls.h
-+++ b/arch/x86/include/asm/syscalls.h
-@@ -14,6 +14,7 @@
- #include <linux/linkage.h>
- #include <linux/signal.h>
- #include <linux/types.h>
-+#include <linux/compat.h>
+diff --git a/drivers/media/platform/sti/delta/delta-ipc.c b/drivers/media/platform/sti/delta/delta-ipc.c
+index 41e4a4c259b3..b6c256e3ceb6 100644
+--- a/drivers/media/platform/sti/delta/delta-ipc.c
++++ b/drivers/media/platform/sti/delta/delta-ipc.c
+@@ -175,8 +175,8 @@ int delta_ipc_open(struct delta_ctx *pctx, const char *name,
+ 	msg.ipc_buf_size = ipc_buf_size;
+ 	msg.ipc_buf_paddr = ctx->ipc_buf->paddr;
  
- /* Common in X86_32 and X86_64 */
- /* kernel/ioport.c */
-@@ -30,6 +31,8 @@ asmlinkage long sys_rt_sigreturn(void);
- asmlinkage long sys_set_thread_area(struct user_desc __user *);
- asmlinkage long sys_get_thread_area(struct user_desc __user *);
+-	memcpy(msg.name, name, sizeof(msg.name));
+-	msg.name[sizeof(msg.name) - 1] = 0;
++	memset(msg.name, 0, sizeof(msg.name));
++	strcpy(msg.name, name);
  
-+asmlinkage long sys_arch_prctl(int, unsigned long);
-+
- /* X86_32 only */
- #ifdef CONFIG_X86_32
- 
-@@ -43,13 +46,42 @@ asmlinkage long sys_vm86(unsigned long, unsigned long);
- 
- #else /* CONFIG_X86_32 */
- 
--/* X86_64 only */
--/* kernel/process_64.c */
--asmlinkage long sys_arch_prctl(int, unsigned long);
--
- /* kernel/sys_x86_64.c */
- asmlinkage long sys_mmap(unsigned long, unsigned long, unsigned long,
- 			 unsigned long, unsigned long, unsigned long);
- 
--#endif /* CONFIG_X86_32 */
-+asmlinkage long ptregs_sys_rt_sigreturn(struct pt_regs *regs);
-+asmlinkage long ptregs_sys_fork(struct pt_regs *regs);
-+asmlinkage long ptregs_sys_vfork(struct pt_regs *regs);
-+asmlinkage long ptregs_sys_execve(const char __user *filename,
-+		const char __user *const __user *argv,
-+		const char __user *const __user *envp);
-+asmlinkage long ptregs_sys_iopl(unsigned int);
-+asmlinkage long ptregs_sys_execveat(int dfd, const char __user *filename,
-+			const char __user *const __user *argv,
-+			const char __user *const __user *envp, int flags);
-+asmlinkage long ptregs_sys_clone(unsigned long, unsigned long, int __user *,
-+	       int __user *, unsigned long);
-+
-+#ifdef CONFIG_COMPAT
-+asmlinkage long compat_sys_preadv64v2(unsigned long fd,
-+	       const struct compat_iovec __user *vec,
-+	       unsigned long vlen, loff_t pos, int flags);
-+asmlinkage long ptregs_compat_sys_execve(unsigned long dfd,
-+		 const char __user *filename,
-+		 const compat_uptr_t __user *argv,
-+		 const compat_uptr_t __user *envp);
-+asmlinkage long ptregs_compat_sys_execveat(int dfd, const char __user *filename,
-+		     const compat_uptr_t __user *argv,
-+		     const compat_uptr_t __user *envp, int flags);
-+asmlinkage long compat_sys_old_getrlimit(unsigned int resource,
-+	struct compat_rlimit __user *rlim);
-+asmlinkage long stub32_clone(unsigned, unsigned, int __user *,
-+	       compat_uptr_t __user *, unsigned);
-+#endif
-+
-+asmlinkage long sys32_x32_rt_sigreturn(void);
-+
-+
-+#endif /* !CONFIG_X86_32 */
- #endif /* _ASM_X86_SYSCALLS_H */
+ 	msg.param_size = param->size;
+ 	memcpy(ctx->ipc_buf->vaddr, param->data, msg.param_size);
 -- 
 2.13.6
 
