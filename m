@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:14694 "EHLO mga05.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:30248 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752311AbdK0Veb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S1752275AbdK0Veb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 27 Nov 2017 16:34:31 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 05/21] x86/kvm: Make steal_time visible
-Date: Mon, 27 Nov 2017 13:34:07 -0800
-Message-Id: <20171127213423.27218-6-andi@firstfloor.org>
+Subject: [PATCH 21/21] x86: Enable Link Time Optimization
+Date: Mon, 27 Nov 2017 13:34:23 -0800
+Message-Id: <20171127213423.27218-22-andi@firstfloor.org>
 In-Reply-To: <20171127213423.27218-1-andi@firstfloor.org>
 References: <20171127213423.27218-1-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,27 +16,32 @@ Cc: x86@kernel.org, samitolvanen@google.com, alxmtvv@gmail.com, linux-kbuild@vge
 
 From: Andi Kleen <ak@linux.intel.com>
 
-This per cpu variable is accessed from assembler code, so needs
-to be visible.
+LTO is opt-in per architecture because it usually needs some
+fixes.
+
+LTO needs THIN_ARCHIVES because standard binutils doesn't like mixing
+assembler and LTO code with ld -r.
+
+Enable LTO and THIN_ARCHIVES for x86
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/x86/kernel/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index b40ffbf156c1..8484e3e41d36 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -76,7 +76,7 @@ static int parse_no_kvmclock_vsyscall(char *arg)
- early_param("no-kvmclock-vsyscall", parse_no_kvmclock_vsyscall);
- 
- static DEFINE_PER_CPU_DECRYPTED(struct kvm_vcpu_pv_apf_data, apf_reason) __aligned(64);
--static DEFINE_PER_CPU_DECRYPTED(struct kvm_steal_time, steal_time) __aligned(64);
-+DEFINE_PER_CPU_DECRYPTED(struct kvm_steal_time, steal_time) __aligned(64) __visible;
- static int has_steal_clock = 0;
- 
- /*
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 8eed3f94bfc7..92650726f908 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -122,6 +122,8 @@ config X86
+ 	select HAVE_ARCH_VMAP_STACK		if X86_64
+ 	select HAVE_ARCH_WITHIN_STACK_FRAMES
+ 	select HAVE_CC_STACKPROTECTOR
++	select THIN_ARCHIVES			if LTO
++	select ARCH_SUPPORTS_LTO
+ 	select HAVE_CMPXCHG_DOUBLE
+ 	select HAVE_CMPXCHG_LOCAL
+ 	select HAVE_CONTEXT_TRACKING		if X86_64
 -- 
 2.13.6
 
