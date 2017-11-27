@@ -1,120 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:57119 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751292AbdK0LHk (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:55727 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751857AbdK0MPv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Nov 2017 06:07:40 -0500
-From: Paolo Pisati <paolo.pisati@canonical.com>
-Subject: [PATCH v3] scripts/package: snap-pkg target
-Date: Mon, 27 Nov 2017 12:07:34 +0100
-Message-Id: <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
-In-Reply-To: <20171114123834.xsjiy2ynvott4gae@brain>
-References: <20171114123834.xsjiy2ynvott4gae@brain>
+        Mon, 27 Nov 2017 07:15:51 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: move cc-option and cc-disable-warning after incl. arch Makefile
+Date: Mon, 27 Nov 2017 21:15:13 +0900
+Message-Id: <1511784913-3396-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?q?Vin=C3=ADcius=20Tinti?= <viniciustinti@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Following in footsteps of other targets like 'deb-pkg, 'rpm-pkg' and 'tar-pkg',
-this patch adds a 'snap-pkg' target for the creation of a Linux kernel snap
-package using the kbuild infrastructure.
+Geert reported commit ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before
+incl. arch Makefile") broke cross-compilation using a cross-compiler
+that supports less compiler options than the host compiler.
 
-A snap, in its general form, is a self contained, sandboxed, universal package
-and it is intended to work across multiple distributions and/or devices. A snap
-package is distributed as a single compressed squashfs filesystem.
+For example,
 
-A kernel snap is a snap package carrying the Linux kernel, kernel modules,
-accessory files (DTBs, System.map, etc) and a manifesto file.  The purpose of a
-kernel snap is to carry the Linux kernel during the creation of a system image,
-eg. Ubuntu Core, and its subsequent upgrades.
+  cc1: error: unrecognized command line option "-Wno-unused-but-set-variable"
 
-For more information on snap packages: https://snapcraft.io/docs/
+This problem happens on architectures that setup CROSS_COMPILE in their
+arch/*/Makefile.
 
-Signed-off-by: Paolo Pisati <paolo.pisati@canonical.com>
+Move the cc-option and cc-disable-warning back to the original position,
+but keep the Clang target options.
+
+Fixes: ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before incl. arch Makefile")
+Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
-Changes since v2:
- - use a tarball to instead of cloning the src tree via git
- - set 'kernel-with-firmware: false' to accomodate for
-   'firmware_install' removal
 
-Changes since v1:
- - slightly improve the messaging
----
- .gitignore                         |  5 +++++
- scripts/package/Makefile           | 16 ++++++++++++++++
- scripts/package/snapcraft.template | 14 ++++++++++++++
- 3 files changed, 35 insertions(+)
- create mode 100644 scripts/package/snapcraft.template
+ Makefile | 43 +++++++++++++++++++++++--------------------
+ 1 file changed, 23 insertions(+), 20 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index f6050b8..705e099 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -66,6 +66,11 @@ modules.builtin
- /debian/
+diff --git a/Makefile b/Makefile
+index aa67428..ac2d4e1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -484,26 +484,6 @@ CLANG_GCC_TC	:= --gcc-toolchain=$(GCC_TOOLCHAIN)
+ endif
+ KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+ KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+-KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+-KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+-KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+-KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+-KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
+-# Quiet clang warning: comparison of unsigned expression < 0 is always false
+-KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+-# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+-# source of a reference will be _MergedGlobals and not on of the whitelisted names.
+-# See modpost pattern 2
+-KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+-KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+-KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+-KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+-else
+-
+-# These warnings generated too much noise in a regular build.
+-# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+-KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+-KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+ endif
  
- #
-+# Snap directory (make snap-pkg)
-+#
-+/snap/
+ ifeq ($(config-targets),1)
+@@ -715,6 +695,29 @@ ifdef CONFIG_CC_STACKPROTECTOR
+ endif
+ KBUILD_CFLAGS += $(stackp-flag)
+ 
++ifeq ($(cc-name),clang)
++KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
++KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
++KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
++KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
++KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
++# Quiet clang warning: comparison of unsigned expression < 0 is always false
++KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
++# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
++# source of a reference will be _MergedGlobals and not on of the whitelisted names.
++# See modpost pattern 2
++KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
++KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
++KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
++KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
++else
 +
-+#
- # tar directory (make tar*-pkg)
- #
- /tar-install/
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 9ed96aef..5996300 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -95,6 +95,21 @@ bindeb-pkg: FORCE
- 
- clean-dirs += $(objtree)/debian/
- 
-+# snap-pkg
-+# ---------------------------------------------------------------------------
-+snap-pkg: FORCE
-+	rm -rf $(objtree)/snap
-+	mkdir $(objtree)/snap
-+	$(MAKE) clean
-+	$(call cmd,src_tar,$(KERNELPATH))
-+	sed "s@KERNELRELEASE@$(KERNELRELEASE)@; \
-+		s@SRCTREE@$(shell realpath $(KERNELPATH).tar.gz)@" \
-+		$(srctree)/scripts/package/snapcraft.template > \
-+		$(objtree)/snap/snapcraft.yaml
-+	cd $(objtree)/snap && \
-+	snapcraft --target-arch=$(UTS_MACHINE)
++# These warnings generated too much noise in a regular build.
++# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
++KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
++KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
++endif
 +
-+clean-dirs += $(objtree)/snap/
- 
- # tarball targets
- # ---------------------------------------------------------------------------
-@@ -139,6 +154,7 @@ help: FORCE
- 	@echo '  binrpm-pkg          - Build only the binary kernel RPM package'
- 	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
- 	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
-+	@echo '  snap-pkg            - Build only the binary kernel snap package (will connect to external hosts)'
- 	@echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
- 	@echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
- 	@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
-diff --git a/scripts/package/snapcraft.template b/scripts/package/snapcraft.template
-new file mode 100644
-index 0000000..626d278e
---- /dev/null
-+++ b/scripts/package/snapcraft.template
-@@ -0,0 +1,14 @@
-+name: kernel
-+version: KERNELRELEASE
-+summary: Linux kernel
-+description: The upstream Linux kernel
-+grade: stable
-+confinement: strict
-+type: kernel
-+
-+parts:
-+  kernel:
-+    plugin: kernel
-+    source: SRCTREE
-+    source-type: tar
-+    kernel-with-firmware: false
+ ifdef CONFIG_FRAME_POINTER
+ KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
+ else
 -- 
 2.7.4
 
