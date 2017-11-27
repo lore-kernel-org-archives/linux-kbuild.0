@@ -1,101 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:55727 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751857AbdK0MPv (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:20469 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751935AbdK0MRw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Nov 2017 07:15:51 -0500
+        Mon, 27 Nov 2017 07:17:52 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAMuHMdWO0D9jLi=6m6W1bQuTQURjFnZo9PM2-CtfhYxvZajjiw@mail.gmail.com>
+References: <CAK7LNAT9opHCYFfccD6EOPZVznY0aQ7dOYVkupaTesEvzs7bKA@mail.gmail.com>
+ <CAMuHMdWO0D9jLi=6m6W1bQuTQURjFnZo9PM2-CtfhYxvZajjiw@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: move cc-option and cc-disable-warning after incl. arch Makefile
-Date: Mon, 27 Nov 2017 21:15:13 +0900
-Message-Id: <1511784913-3396-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Mon, 27 Nov 2017 21:17:00 +0900
+Message-ID: <CAK7LNAQLarR5CmdzwFEnTYj+BgHu8dq2UafRR-set+GjfHGkgw@mail.gmail.com>
+Subject: Re: [GIT PULL] Kbuild updates for v4.15 (2nd round)
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Chris Fries <cfries@google.com>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Geert reported commit ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before
-incl. arch Makefile") broke cross-compilation using a cross-compiler
-that supports less compiler options than the host compiler.
+Hi Geert,
 
-For example,
+2017-11-27 17:30 GMT+09:00 Geert Uytterhoeven <geert@linux-m68k.org>:
+> Hi Chris, Yamada-san,
+>
+> On Fri, Nov 24, 2017 at 5:58 PM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> Please pull a little more Kbuild updates for v4.15.
+>> The reason for lateness is I hesitated to put some patches
+>> in the last week pull requests due to big conflicts.
+>> Also, I applied some fixes and trivial enough ones.
+>> I hope you will pull this.
+>>
+>>
+>>
+>> The following changes since commit 2ce079f04d5914dae14fdc8618f804cc0d2a1b8f:
+>>
+>>   Merge tag 'kbuild-misc-v4.15' of
+>> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild
+>> (2017-11-17 17:51:33 -0800)
+>>
+>> are available in the git repository at:
+>>
+>>   git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+>> tags/kbuild-v4.15-2
+>>
+>> for you to fetch changes up to 10aaa3b7e95b9649fd658ac7e9075093316425d8:
+>>
+>>   kbuild: drop $(extra-y) from real-objs-y (2017-11-23 23:29:26 +0900)
+>>
+>> ----------------------------------------------------------------
+>> Kbuild updates for v4.15 (2nd)
+>
+>> Chris Fries (1):
+>>       kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
+>
+> This broke cross-compilation using a cross-compiler that supports less
+> compiler options than the host compiler. E.g.:
+>
+>     cc1: error: unrecognized command line option "-Wno-unused-but-set-variable"
+>
+> Reverting commit ae6b289a37890909 ("kbuild: Set KBUILD_CFLAGS before incl.
+> arch Makefile", which was in linux-next since next-20171124) fixes that.
+>
+> BTW, this gets broken regularly, cfr. e.g. commits a1c48bb160f8368e ("Makefile:
+> Fix unrecognized cross-compiler command line options") and bef5b54bd7bf8117
+> ("Fix MIPS cross-compile problem").
+>
 
-  cc1: error: unrecognized command line option "-Wno-unused-but-set-variable"
+Oh, thanks for the report.
 
-This problem happens on architectures that setup CROSS_COMPILE in their
-arch/*/Makefile.
+I do not want to revert it, but how about this?
 
-Move the cc-option and cc-disable-warning back to the original position,
-but keep the Clang target options.
+https://patchwork.kernel.org/patch/10076723/
 
-Fixes: ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before incl. arch Makefile")
-Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- Makefile | 43 +++++++++++++++++++++++--------------------
- 1 file changed, 23 insertions(+), 20 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index aa67428..ac2d4e1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -484,26 +484,6 @@ CLANG_GCC_TC	:= --gcc-toolchain=$(GCC_TOOLCHAIN)
- endif
- KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
- KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
--KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
--KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
--KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
--KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
--KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
--# Quiet clang warning: comparison of unsigned expression < 0 is always false
--KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
--# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
--# source of a reference will be _MergedGlobals and not on of the whitelisted names.
--# See modpost pattern 2
--KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
--KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
--KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
--KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
--else
--
--# These warnings generated too much noise in a regular build.
--# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
--KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
--KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
- endif
- 
- ifeq ($(config-targets),1)
-@@ -715,6 +695,29 @@ ifdef CONFIG_CC_STACKPROTECTOR
- endif
- KBUILD_CFLAGS += $(stackp-flag)
- 
-+ifeq ($(cc-name),clang)
-+KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-+KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
-+KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
-+KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
-+KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
-+# Quiet clang warning: comparison of unsigned expression < 0 is always false
-+KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
-+# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
-+# source of a reference will be _MergedGlobals and not on of the whitelisted names.
-+# See modpost pattern 2
-+KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
-+KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-+KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
-+KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
-+else
-+
-+# These warnings generated too much noise in a regular build.
-+# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
-+KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
-+KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
-+endif
-+
- ifdef CONFIG_FRAME_POINTER
- KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
- else
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
