@@ -1,71 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:33523 "EHLO
-        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751277AbdK0JqX (ORCPT
+Received: from youngberry.canonical.com ([91.189.89.112]:56776 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752101AbdK0KqN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Nov 2017 04:46:23 -0500
-Date: Mon, 27 Nov 2017 10:46:20 +0100
-From: Pavel Machek <pavel@ucw.cz>
-Subject: [PATCH] fix perl locale warnings in arch/arm/boot/
-Message-ID: <20171127094620.GA18072@amd>
-References: <20171119222703.GA12824@amd>
- <CAK7LNARWMpxxC9hT8f7rGj5McjdNU1GXfjML9NbWFTCGyQ++dg@mail.gmail.com>
+        Mon, 27 Nov 2017 05:46:13 -0500
+Received: from mail-ot0-f197.google.com ([74.125.82.197])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <paolo.pisati@canonical.com>)
+        id 1eJGvT-00067x-An
+        for linux-kbuild@vger.kernel.org; Mon, 27 Nov 2017 10:46:11 +0000
+Received: by mail-ot0-f197.google.com with SMTP id z30so15704344otd.9
+        for <linux-kbuild@vger.kernel.org>; Mon, 27 Nov 2017 02:46:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="pf9I7BMVVzbSWLtt"
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARWMpxxC9hT8f7rGj5McjdNU1GXfjML9NbWFTCGyQ++dg@mail.gmail.com>
+In-Reply-To: <CAK7LNAS0ieC+e0v+Gq-84_bJk-vZL2QHpRAjVePiPUEsVsJJ6g@mail.gmail.com>
+References: <1505211091-19295-1-git-send-email-paolo.pisati@canonical.com> <CAK7LNAS0ieC+e0v+Gq-84_bJk-vZL2QHpRAjVePiPUEsVsJJ6g@mail.gmail.com>
+From: Paolo Pisati <paolo.pisati@canonical.com>
+Date: Mon, 27 Nov 2017 11:46:09 +0100
+Message-ID: <CAMsH0TT2nPnT885GqcrK2aoHtXTBqCmDSkL=ZLkfumzonFCbJA@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts/package: snap-pkg target
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, rmk+kernel@armlinux.org.uk, tony@atomide.com, j-keerthy@ti.com, linux-arm-kernel@lists.infradead.org
-Cc: kernel list <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <mmarek@suse.com>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
+On Wed, Sep 20, 2017 at 11:28 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>> @@ -0,0 +1,14 @@
+>> +name: kernel
+>> +version: KERNELRELEASE
+>> +summary: Linux kernel
+>> +description: The upstream Linux kernel
+>> +grade: stable
+>> +confinement: strict
+>> +type: kernel
+>> +
+>> +parts:
+>> +  kernel:
+>> +    plugin: kernel
+>> +    source: SRCTREE
+>> +    source-type: git
+>> +    kconfigfile: SRCTREE/.config
+>
+>
+> Other targets such as rpm-pkg and deb-pkg
+> work without relying on git.
+>
+> However, snap-pkg every time does "git clone", so
+> changes added to the source tree, but not committed yet,
+> are not reflected to the package.
+>
+> Is it possible to work with a tarball,
+> like other targets do?
 
---pf9I7BMVVzbSWLtt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for your feedback Yamada-san.
 
-
-Commit 429f7a062e3b5cf6fcf01eb00600cee5fe4d751f introduced perl into
-arch/arm/boot/compressed/Makefile, which unfortunately leads to locale
-warnings.
-
-Fix it by setting default locale.
-
-Signed-off-by: Pavel Machek <pavel@ucw.cz>
-
-diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/M=
-akefile
-index 45a6b9b..4656e98 100644
---- a/arch/arm/boot/compressed/Makefile
-+++ b/arch/arm/boot/compressed/Makefile
-@@ -118,7 +118,7 @@ asflags-y :=3D -DZIMAGE
-=20
- # Supply kernel BSS size to the decompressor via a linker symbol.
- KBSS_SZ =3D $(shell $(CROSS_COMPILE)nm $(obj)/../../../../vmlinux | \
--		perl -e 'while (<>) { \
-+		LC_ALL=3DC perl -e 'while (<>) { \
- 			$$bss_start=3Dhex($$1) if /^([[:xdigit:]]+) B __bss_start$$/; \
- 			$$bss_end=3Dhex($$1) if /^([[:xdigit:]]+) B __bss_stop$$/; \
- 		}; printf "%d\n", $$bss_end - $$bss_start;')
-
-
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
-
---pf9I7BMVVzbSWLtt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAlob3uwACgkQMOfwapXb+vI80QCePWXnvR7vzWcSWqEENk/2+MDY
-1RMAn2dgbJ5YbbbtBiE0vE8MUhH2hreo
-=fgQv
------END PGP SIGNATURE-----
-
---pf9I7BMVVzbSWLtt--
+Yes, switching to a tarball is doable and i'll send a v3 with that change.
+-- 
+bye,
+p.
