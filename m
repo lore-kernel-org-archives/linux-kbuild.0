@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:14694 "EHLO mga05.intel.com"
+Received: from mga05.intel.com ([192.55.52.43]:65529 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752708AbdK0Veb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S1752486AbdK0Veb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 27 Nov 2017 16:34:31 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 18/21] lto, crypto: Disable LTO for camelia glue
-Date: Mon, 27 Nov 2017 13:34:20 -0800
-Message-Id: <20171127213423.27218-19-andi@firstfloor.org>
+Subject: [PATCH 09/21] lto: Use C version for SYSCALL_ALIAS
+Date: Mon, 27 Nov 2017 13:34:11 -0800
+Message-Id: <20171127213423.27218-10-andi@firstfloor.org>
 In-Reply-To: <20171127213423.27218-1-andi@firstfloor.org>
 References: <20171127213423.27218-1-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,41 +16,45 @@ Cc: x86@kernel.org, samitolvanen@google.com, alxmtvv@gmail.com, linux-kbuild@vge
 
 From: Andi Kleen <ak@linux.intel.com>
 
-The camelia assembler glue functions don't like LTO
-and cause missing symbols. Just disable LTO for them.
-I tried to add some visibles, but it's good enough
-and this works fine.
+LTO doesn't like the assembler aliasing used for SYSCALL_ALIAS.
+Replace it with C aliasing. Also mark the only user visible.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/x86/crypto/Makefile | 1 +
- crypto/Makefile          | 1 +
- 2 files changed, 2 insertions(+)
+ include/linux/linkage.h   | 6 ++----
+ kernel/time/posix-stubs.c | 2 +-
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 5f07333bb224..9dd30dd062f1 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -64,6 +64,7 @@ serpent-sse2-i586-y := serpent-sse2-i586-asm_32.o serpent_sse2_glue.o
+diff --git a/include/linux/linkage.h b/include/linux/linkage.h
+index f68db9e450eb..24fb6468b1a5 100644
+--- a/include/linux/linkage.h
++++ b/include/linux/linkage.h
+@@ -30,10 +30,8 @@
+ #endif
  
- aes-x86_64-y := aes-x86_64-asm_64.o aes_glue.o
- des3_ede-x86_64-y := des3_ede-asm_64.o des3_ede_glue.o
-+CFLAGS_camellia_glue.o += $(DISABLE_LTO)
- camellia-x86_64-y := camellia-x86_64-asm_64.o camellia_glue.o
- blowfish-x86_64-y := blowfish-x86_64-asm_64.o blowfish_glue.o
- twofish-x86_64-y := twofish-x86_64-asm_64.o twofish_glue.o
-diff --git a/crypto/Makefile b/crypto/Makefile
-index d674884b2d51..86ae10bb468b 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -101,6 +101,7 @@ CFLAGS_serpent_generic.o := $(call cc-option,-fsched-pressure)  # https://gcc.gn
- obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
- obj-$(CONFIG_CRYPTO_AES_TI) += aes_ti.o
- obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
-+CFLAGS_cast_common.o += $(DISABLE_LTO)
- obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
- obj-$(CONFIG_CRYPTO_CAST5) += cast5_generic.o
- obj-$(CONFIG_CRYPTO_CAST6) += cast6_generic.o
+ #ifndef SYSCALL_ALIAS
+-#define SYSCALL_ALIAS(alias, name) asm(			\
+-	".globl " VMLINUX_SYMBOL_STR(alias) "\n\t"	\
+-	".set   " VMLINUX_SYMBOL_STR(alias) ","		\
+-		  VMLINUX_SYMBOL_STR(name))
++#define SYSCALL_ALIAS(a, name) \
++	__visible typeof(a) a __attribute__((alias(__stringify(name))))
+ #endif
+ 
+ #define __page_aligned_data	__section(.data..page_aligned) __aligned(PAGE_SIZE)
+diff --git a/kernel/time/posix-stubs.c b/kernel/time/posix-stubs.c
+index b258bee13b02..5e36cb75f3be 100644
+--- a/kernel/time/posix-stubs.c
++++ b/kernel/time/posix-stubs.c
+@@ -19,7 +19,7 @@
+ #include <linux/posix-timers.h>
+ #include <linux/compat.h>
+ 
+-asmlinkage long sys_ni_posix_timers(void)
++__visible asmlinkage long sys_ni_posix_timers(void)
+ {
+ 	pr_err_once("process %d (%s) attempted a POSIX timer syscall "
+ 		    "while CONFIG_POSIX_TIMERS is not set\n",
 -- 
 2.13.6
 
