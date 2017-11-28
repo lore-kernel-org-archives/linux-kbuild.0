@@ -1,56 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:59524 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751648AbdK1RO1 (ORCPT
+Received: from mail-lf0-f53.google.com ([209.85.215.53]:36501 "EHLO
+        mail-lf0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752260AbdK1SSm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Nov 2017 12:14:27 -0500
-Received: from mail-ot0-f197.google.com ([74.125.82.197])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <paolo.pisati@canonical.com>)
-        id 1eJjSk-0008GX-3e
-        for linux-kbuild@vger.kernel.org; Tue, 28 Nov 2017 17:14:26 +0000
-Received: by mail-ot0-f197.google.com with SMTP id g98so259886otg.11
-        for <linux-kbuild@vger.kernel.org>; Tue, 28 Nov 2017 09:14:26 -0800 (PST)
+        Tue, 28 Nov 2017 13:18:42 -0500
+Received: by mail-lf0-f53.google.com with SMTP id f20so881243lfe.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 Nov 2017 10:18:41 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
-References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
- <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
-From: Paolo Pisati <paolo.pisati@canonical.com>
-Date: Tue, 28 Nov 2017 18:14:24 +0100
-Message-ID: <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
-Subject: Re: [PATCH v3] scripts/package: snap-pkg target
+In-Reply-To: <CAK7LNASGYZfQFkM3yMRQaHLUwW5Lhp8CxHGX0bJ9sVja0f=n+A@mail.gmail.com>
+References: <CAK7LNAS1NaqPRhK6FOXN=YTMhLagpSrR2=tXn-uWZbpzr=NeoQ@mail.gmail.com>
+ <20171115204231.34914-1-ndesaulniers@google.com> <CAK7LNAQNEHRapzFem3nr7=EWJPYvZby9K7vem-R99ijYNoguEg@mail.gmail.com>
+ <CAK7LNASGYZfQFkM3yMRQaHLUwW5Lhp8CxHGX0bJ9sVja0f=n+A@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Tue, 28 Nov 2017 10:18:38 -0800
+Message-ID: <CAKwvOdmcthyd1KbxRr54QztBcmeZ7JA=M_7N1xfmVurVOG=77w@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Davis <jim.epost@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?Q?Jan=2DSimon_M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Douglas Anderson <dianders@chromium.org>, Chris Fries <cfries@google.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-mips@linux-mips.org, linux-arm-kernel@lists.infradead.org, linux-hexagon@vger.kernel.org, openrisc@lists.librecores.org
 
-On Mon, Nov 27, 2017 at 7:33 PM, Jim Davis <jim.epost@gmail.com> wrote:
+Hi Masahiro,
+
+Thanks for merging Chris' patch, and sorry for taking so long to respond.
+
+On Wed, Nov 22, 2017 at 8:24 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> Linus suggests to move compiler flag testing to Kconfig.
+
+Do you have an LKML link for context?
+
+On Wed, Nov 15, 2017 at 6:32 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> BTW, I notice another issue.
 >
-> With this patch applied to the 4.14 kernel source, and running make
-> snap-pkg on a Ubuntu 16.04 VM with the latest 16.04 kernel config
-> file, I ran into
+> If we move clang settings before including arch Makefile,
+> "ifneq ($(CROSS_COMPILE),)" comes early.
 >
-> Traceback (most recent call last):
->   File "/usr/lib/python3.5/shutil.py", line 538, in move
->     os.rename(src, real_dst)
-> FileNotFoundError: [Errno 2] No such file or directory:
-> '/home/jim/linux/snap/parts/kernel/install/lib/firmware' ->
-> '/home/jim/linux/snap/parts/kernel/install/firmware'
+> Some arch Makefiles (arch/mips/Makefile, arch/blackfin/Makefile, etc.)
+> set CROSS_COMPILE there if CROSS_COMPILE is not given.
 >
-> What did I miss?
+> Then, we have a conflict between two requirements among arch.
+>
+> [1] arm64, powerpc use ld-option in their Makefile.
+>     So, clang flags must be set before inc. arch Makefile.
+> [2] mips, blackfin, etc. may set CROSS_COMPILE in their Makefile.
+>     So, we want to reference CROSS_COMPILE only after inc. arch Makefile
+>
+> I have no idea how to solve it.
+>
+> At this moment, I guess clang is intended to support
+> only limited architectures.
+>
+> It might be OK to be compromised here.
 
-You need a recent version of snapcraft, i landed a fix for that last week.
+I definitely find it curious that certain arch's define CROSS_COMPILE
+themselves.  The benefit is one less argument to supply at compile
+time, but it assumes that the toolchain always has a certain prefix.
+This makes sense to me when cross compiling, but seems odd when
+compiling natively on that arch as the host and target.  Maybe those
+arch's use that convention, or simply are always cross compiled for?
 
-$ snap install --classic --edge snapcraft
+Taking a survey of all arch's currently in the kernel via `cd arch; ag
+CROSS_COMPILE` and quickly eyeballing the result:
 
-or refresh it, in case you already installed via snaps:
+m68k if not set
+arc if not set
+openrisc for some configs (openrisc/configs/or1ksim_defconfig,
+openrisc/configs/simple_smp_defconfig)
+blackfin if not set
+hexagon for some configs (hexagon/configs/comet_defconfig)
+parisc if not set
+sh if not set
+xtensa if not set
+score always
+arm for some configs (arm/configs/lpc18xx_defconfig)
+h8300 if not set
+mips if not set (and explicitly emptied for some configs,
+mips/configs/nlm_xlr_defconfig )
+unicore32 if not set
+tile if not set
 
-$ snap refresh --edge snapcraft
+The * if not set (or not being on the list) seems correct, as the top
+level Makefile will handle this correctly.  Setting it for some
+configs seems curious (not necessarily wrong?), emptying it/always
+setting it via config sounds wrong to me, but maybe those hosts don't
+have toolchains and must always be cross compiled for?
 
-and then 'make snap-pkg' again.
-Beware of $PATH in case you have the snap and deb version installed.
--- 
-bye,
-p.
+For reference, this file in LLVM source defines the supported backend
+targets: https://llvm.org/doxygen/Triple_8h_source.html
+
+Either way, it sounds like we're all set here, I guess I'm just
+curious about the LKML link/context and why some configs set
+CROSS_COMPILE themselves?
