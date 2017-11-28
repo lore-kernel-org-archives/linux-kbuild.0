@@ -1,35 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([193.170.194.197]:56006 "EHLO
-        one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932071AbdK1Quw (ORCPT
+Received: from youngberry.canonical.com ([91.189.89.112]:59524 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751648AbdK1RO1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Nov 2017 11:50:52 -0500
-Date: Tue, 28 Nov 2017 08:50:50 -0800
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 02/21] afs: Fix const confusion in AFS
-Message-ID: <20171128165050.GX2482@two.firstfloor.org>
-References: <20171127213423.27218-3-andi@firstfloor.org>
- <20171127213423.27218-1-andi@firstfloor.org>
- <11150.1511885078@warthog.procyon.org.uk>
+        Tue, 28 Nov 2017 12:14:27 -0500
+Received: from mail-ot0-f197.google.com ([74.125.82.197])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <paolo.pisati@canonical.com>)
+        id 1eJjSk-0008GX-3e
+        for linux-kbuild@vger.kernel.org; Tue, 28 Nov 2017 17:14:26 +0000
+Received: by mail-ot0-f197.google.com with SMTP id g98so259886otg.11
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 Nov 2017 09:14:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <11150.1511885078@warthog.procyon.org.uk>
+In-Reply-To: <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
+References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
+ <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
+From: Paolo Pisati <paolo.pisati@canonical.com>
+Date: Tue, 28 Nov 2017 18:14:24 +0100
+Message-ID: <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
+Subject: Re: [PATCH v3] scripts/package: snap-pkg target
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, x86@kernel.org, samitolvanen@google.com, alxmtvv@gmail.com, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+To: Jim Davis <jim.epost@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
 
-On Tue, Nov 28, 2017 at 04:04:38PM +0000, David Howells wrote:
-> Andi Kleen <andi@firstfloor.org> wrote:
-> 
-> > A trace point string cannot be const because the underlying special
-> > section is not marked const. An LTO build complains about the
-> > section attribute mismatch. Fix it by not marking the trace point
-> > string in afs const.
-> 
-> Do you want this to go through my tree?
+On Mon, Nov 27, 2017 at 7:33 PM, Jim Davis <jim.epost@gmail.com> wrote:
+>
+> With this patch applied to the 4.14 kernel source, and running make
+> snap-pkg on a Ubuntu 16.04 VM with the latest 16.04 kernel config
+> file, I ran into
+>
+> Traceback (most recent call last):
+>   File "/usr/lib/python3.5/shutil.py", line 538, in move
+>     os.rename(src, real_dst)
+> FileNotFoundError: [Errno 2] No such file or directory:
+> '/home/jim/linux/snap/parts/kernel/install/lib/firmware' ->
+> '/home/jim/linux/snap/parts/kernel/install/firmware'
+>
+> What did I miss?
 
-Yes please.
+You need a recent version of snapcraft, i landed a fix for that last week.
 
--Andi
+$ snap install --classic --edge snapcraft
+
+or refresh it, in case you already installed via snaps:
+
+$ snap refresh --edge snapcraft
+
+and then 'make snap-pkg' again.
+Beware of $PATH in case you have the snap and deb version installed.
+-- 
+bye,
+p.
