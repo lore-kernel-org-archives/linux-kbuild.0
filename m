@@ -1,68 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f67.google.com ([209.85.214.67]:32984 "EHLO
-        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752209AbdK2VvQ (ORCPT
+Received: from mail-io0-f177.google.com ([209.85.223.177]:41658 "EHLO
+        mail-io0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751607AbdK2VvK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 29 Nov 2017 16:51:16 -0500
-Received: by mail-it0-f67.google.com with SMTP id o130so27588690itg.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 13:51:16 -0800 (PST)
+        Wed, 29 Nov 2017 16:51:10 -0500
+Received: by mail-io0-f177.google.com with SMTP id g1so5297276ioc.8
+        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 13:51:10 -0800 (PST)
 From: Paul Lawrence <paullawrence@google.com>
-Subject: [PATCH v2 2/5] kasan: Add tests for alloca poisonong
-Date: Wed, 29 Nov 2017 13:50:47 -0800
-Message-Id: <20171129215050.158653-3-paullawrence@google.com>
-In-Reply-To: <20171129215050.158653-1-paullawrence@google.com>
-References: <20171129215050.158653-1-paullawrence@google.com>
+Subject: [PATCH v2 0/5] kasan: support alloca, LLVM
+Date: Wed, 29 Nov 2017 13:50:45 -0800
+Message-Id: <20171129215050.158653-1-paullawrence@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
 Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Paul Lawrence <paullawrence@google.com>
 
-Signed-off-by: Greg Hackmann <ghackmann@google.com>
-Signed-off-by: Paul Lawrence <paullawrence@google.com>
+Adding kasan alloca support using clang
+Also adding support for clang, since needed for this feature
+gcc has kasan alloca support, but only post 7.2
 
- lib/test_kasan.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+[Patch v2 1/5] kasan: support alloca() poisoning
+  Tests moved to patch 2/5
+  __asan_alloca_unpoison():
+    Use precalculated rounded-up-size
+    Warning added if bottom is not aligned as expected
+    Parameter check added to make sure gcc builds don't fail
+    Now unpoisons partial chunks
+  get_shadow_bug_type():
+    Missing break added
 
-diff --git a/lib/test_kasan.c b/lib/test_kasan.c
-index ef1a3ac1397e..2724f86c4cef 100644
---- a/lib/test_kasan.c
-+++ b/lib/test_kasan.c
-@@ -472,6 +472,26 @@ static noinline void __init use_after_scope_test(void)
- 	p[1023] = 1;
- }
- 
-+static noinline void __init kasan_alloca_oob_left(void)
-+{
-+	volatile int i = 10;
-+	char alloca_array[i];
-+	char *p = alloca_array - 1;
-+
-+	pr_info("out-of-bounds to left on alloca\n");
-+	*(volatile char *)p;
-+}
-+
-+static noinline void __init kasan_alloca_oob_right(void)
-+{
-+	volatile int i = 10;
-+	char alloca_array[i];
-+	char *p = alloca_array + i;
-+
-+	pr_info("out-of-bounds to right on alloca\n");
-+	*(volatile char *)p;
-+}
-+
- static int __init kmalloc_tests_init(void)
- {
- 	/*
-@@ -502,6 +522,8 @@ static int __init kmalloc_tests_init(void)
- 	memcg_accounted_kmem_cache();
- 	kasan_stack_oob();
- 	kasan_global_oob();
-+	kasan_alloca_oob_left();
-+	kasan_alloca_oob_right();
- 	ksize_unpoisons_memory();
- 	copy_user_test();
- 	use_after_scope_test();
--- 
+[PATCH v2 2/5] kasan: Add tests for alloca poisonong
+  Tests moved here
+  kasan_alloca_oob_right():
+    No longer rounding up
+
+[PATCH v2 3/5] kasan: added functions for unpoisoning stack variables
+  No change from v1. clang builds need f8
+
+[PATCH v2 4/5] kasan: support LLVM-style asan parameters
+  Rejigged whole file. Old approach would not work except with ToT gcc
+  or clang. All parameters would be rejected if one was not known.
+  Also if both were empty, CFLAGS_KASAN would be " " which mostly
+  disabled kasan on older compilers.
+  Added support for gcc, tested on ToT compiler
+
+[PATCH v2 5/5] kasan: add compiler support for clang
+  Made comments single line
+
+Paul Lawrence (5):
+  kasan: support alloca() poisoning
+  kasan: Add tests for alloca poisonong
+  kasan: added functions for unpoisoning stack variables
+  kasan: support LLVM-style asan parameters
+  kasan: add compiler support for clang
+
+ include/linux/compiler-clang.h |  8 +++++++
+ lib/test_kasan.c               | 22 ++++++++++++++++++++
+ mm/kasan/kasan.c               | 47 ++++++++++++++++++++++++++++++++++++++++++
+ mm/kasan/kasan.h               |  8 +++++++
+ mm/kasan/report.c              |  4 ++++
+ scripts/Makefile.kasan         | 39 ++++++++++++++++++++++++-----------
+ 6 files changed, 116 insertions(+), 12 deletions(-)
+
+--
 2.15.0.531.g2ccb3012c9-goog
 
