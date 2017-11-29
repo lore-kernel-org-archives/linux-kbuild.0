@@ -1,75 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:61643 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751241AbdK2Hdu (ORCPT
+Received: from mail-it0-f67.google.com ([209.85.214.67]:38598 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932266AbdK2MPP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 29 Nov 2017 02:33:50 -0500
+        Wed, 29 Nov 2017 07:15:15 -0500
+Received: by mail-it0-f67.google.com with SMTP id r6so3834756itr.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 04:15:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CA+r1ZhgFQS6EEzazw0YZXhYqm+WN3mp69mGyaeNpX36WZLABrA@mail.gmail.com>
-References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
- <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
- <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com> <CA+r1ZhgFQS6EEzazw0YZXhYqm+WN3mp69mGyaeNpX36WZLABrA@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 29 Nov 2017 16:33:03 +0900
-Message-ID: <CAK7LNARNfOzuR72U6Co0GYt7=7V4u8TmTUQAsB8R7H_5QYQ_5A@mail.gmail.com>
-Subject: Re: [PATCH v3] scripts/package: snap-pkg target
+In-Reply-To: <20171129000011.55235-4-samitolvanen@google.com>
+References: <20171129000011.55235-1-samitolvanen@google.com> <20171129000011.55235-4-samitolvanen@google.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Wed, 29 Nov 2017 12:15:14 +0000
+Message-ID: <CAKv+Gu99XM5jLcOTkqPJPj5oZnUCNv2c7C=5X2hFCM4-4_gwNg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] arm64: use -mno-implicit-float instead of -mgeneral-regs-only
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Davis <jim.epost@gmail.com>, Paolo Pisati <paolo.pisati@canonical.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
 
-2017-11-29 4:35 GMT+09:00 Jim Davis <jim.epost@gmail.com>:
-> On Tue, Nov 28, 2017 at 10:14 AM, Paolo Pisati
-> <paolo.pisati@canonical.com> wrote:
->> On Mon, Nov 27, 2017 at 7:33 PM, Jim Davis <jim.epost@gmail.com> wrote:
->>>
->>> With this patch applied to the 4.14 kernel source, and running make
->>> snap-pkg on a Ubuntu 16.04 VM with the latest 16.04 kernel config
->>> file, I ran into
->>>
->>> Traceback (most recent call last):
->>>   File "/usr/lib/python3.5/shutil.py", line 538, in move
->>>     os.rename(src, real_dst)
->>> FileNotFoundError: [Errno 2] No such file or directory:
->>> '/home/jim/linux/snap/parts/kernel/install/lib/firmware' ->
->>> '/home/jim/linux/snap/parts/kernel/install/firmware'
->>>
->>> What did I miss?
->>
->> You need a recent version of snapcraft, i landed a fix for that last week.
->>
->> $ snap install --classic --edge snapcraft
->>
->> or refresh it, in case you already installed via snaps:
->>
->> $ snap refresh --edge snapcraft
->>
->> and then 'make snap-pkg' again.
->> Beware of $PATH in case you have the snap and deb version installed.
+On 29 November 2017 at 00:00, Sami Tolvanen <samitolvanen@google.com> wrote:
+> From: Greg Hackmann <ghackmann@google.com>
 >
-> Ok, after updating and setting ~/snapcraft/bin/snapcraft ahead of
-> /usr/bin in my $PATH, the build completed.   Oddly both
-> /usr/bin/snapcraft --version and ~/snapcraft/bin/snapcraft --version
-> return 2.34, though the build failed with /usr/bin/snapcraft.
+> LLVM bug 30792 causes clang's AArch64 backend to crash compiling
+> arch/arm64/crypto/aes-ce-cipher.c.  Replacing -mgeneral-regs-only with
+> -mno-implicit-float is the suggested workaround.
 >
+
+Do we still need these patches now that the AES code has been fixed?
+
+> Signed-off-by: Greg Hackmann <ghackmann@google.com>
+> Cc: Matthias Kaehlcke <mka@chromium.org>
+> [added clang-ifversion to enable the workaround only for clang <6.0]
+> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+> ---
+>  arch/arm64/Makefile | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+> index b35788c909f1..d2efb5a0212f 100644
+> --- a/arch/arm64/Makefile
+> +++ b/arch/arm64/Makefile
+> @@ -49,7 +49,10 @@ $(warning Detected assembler with broken .inst; disassembly will be unreliable)
+>    endif
+>  endif
+>
+> -KBUILD_CFLAGS  += -mgeneral-regs-only $(lseinstr) $(brokengasinst)
+> +# This is a workaround for https://bugs.llvm.org/show_bug.cgi?id=30792.
+> +KBUILD_CFLAGS  += $(call clang-ifversion, -lt, 0600, -mno-implicit-float, -mgeneral-regs-only)
+> +
+> +KBUILD_CFLAGS  += $(lseinstr) $(brokengasinst)
+>  KBUILD_CFLAGS  += -fno-asynchronous-unwind-tables
+>  KBUILD_CFLAGS  += $(call cc-option, -mpc-relative-literal-loads)
+>  KBUILD_AFLAGS  += $(lseinstr) $(brokengasinst)
 > --
-> Jim
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Worked for me too,
-after updating snapcraft.
-
-
-Is it really impossible to check the snapcraft version?
-What is the minimum version?   2.35 ?
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+> 2.15.0.417.g466bffb3ac-goog
+>
