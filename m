@@ -1,46 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f195.google.com ([209.85.223.195]:45946 "EHLO
-        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752083AbdK2XaN (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:33462 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752448AbdK2Xot (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 29 Nov 2017 18:30:13 -0500
-Received: by mail-io0-f195.google.com with SMTP id e204so5547545iof.12
-        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 15:30:13 -0800 (PST)
-Date: Wed, 29 Nov 2017 15:30:08 -0800
+        Wed, 29 Nov 2017 18:44:49 -0500
+Received: by mail-pg0-f65.google.com with SMTP id g7so2216222pgs.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 15:44:49 -0800 (PST)
 From: Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [v2,12/18] kbuild: add support for clang LTO
-Message-ID: <20171129233008.GB138088@samitolvanen.mtv.corp.google.com>
-References: <20171115213428.22559-13-samitolvanen@google.com>
- <20171118132139.58ac5e4c@roar.ozlabs.ibm.com>
- <20171120202152.GA89108@samitolvanen.mtv.corp.google.com>
- <20171121110152.23fb751a@roar.ozlabs.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171121110152.23fb751a@roar.ozlabs.ibm.com>
+Subject: [PATCH 0/7] Add support for GNU gold
+Date: Wed, 29 Nov 2017 15:44:35 -0800
+Message-Id: <20171129234442.655-1-samitolvanen@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
+To: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Nicholas Piggin <npiggin@gmail.com>
+Cc: Sami Tolvanen <samitolvanen@google.com>
 
-On Tue, Nov 21, 2017 at 11:01:52AM +1000, Nicholas Piggin wrote:
-> I just wonder are you doing this because there is some worthwhile
-> performance gain? Or to enable more testing and development of LTO?
-> Any clues for why a user would want to enable it.
+These patches add macros for detecting the linker name and version,
+and apply fixes and workarounds needed to link the arm64 kernel with
+GNU gold.
 
-I'm primarily interested in CFI, which with clang requires LTO; not
-for the optimizations, but for source visibility. We do expect to see
-performance improvements with LTO though, especially if combined with
-PGO.
+Sami Tolvanen (7):
+  kbuild: add ld-name macro and support for GNU gold
+  kbuild: add ld-if-name-version and linker-specific macros
+  kbuild: fix LD_DEAD_CODE_DATA_ELIMINATION with GNU gold
+  arm64: fix -m for GNU gold
+  arm64: keep .altinstructions and .altinstr_replacement
+  arm64: explicitly pass --no-fix-cortex-a53-843419 to GNU gold
+  arm64: add a workaround for GNU gold with ARM64_MODULE_PLTS
 
-> Thanks, if you could. Possibly file a request with LLVMgold too, it
-> seems to be that toolchain support for archives is quite strong, so it
-> will be good to keep pushing for that.
+ Makefile                          |  5 +++++
+ arch/arm64/Makefile               | 17 +++++++++++++++++
+ arch/arm64/kernel/module.lds      |  4 ++--
+ arch/arm64/kernel/vmlinux.lds.S   |  4 ++--
+ include/asm-generic/vmlinux.lds.h |  8 ++++----
+ scripts/Kbuild.include            | 16 ++++++++++++++++
+ 6 files changed, 46 insertions(+), 8 deletions(-)
 
-It turns out LLVMgold is fine with mixed IR/object archives, but we need
-to use llvm-ar to generate symbol tables for them, and there are some
-compatibility issues with objdump that I had to work around. I'll send
-v3 for review once I receive some feedback for the clang/gold patches we
-need first.
+-- 
+2.15.0.531.g2ccb3012c9-goog
 
-Sami
