@@ -1,41 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:33462 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752448AbdK2Xot (ORCPT
+Received: from mail-pl0-f68.google.com ([209.85.160.68]:34021 "EHLO
+        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752708AbdK2Xoy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 29 Nov 2017 18:44:49 -0500
-Received: by mail-pg0-f65.google.com with SMTP id g7so2216222pgs.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 15:44:49 -0800 (PST)
+        Wed, 29 Nov 2017 18:44:54 -0500
+Received: by mail-pl0-f68.google.com with SMTP id d21so3069562pll.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 15:44:53 -0800 (PST)
 From: Sami Tolvanen <samitolvanen@google.com>
-Subject: [PATCH 0/7] Add support for GNU gold
-Date: Wed, 29 Nov 2017 15:44:35 -0800
-Message-Id: <20171129234442.655-1-samitolvanen@google.com>
+Subject: [PATCH 1/7] kbuild: add ld-name macro and support for GNU gold
+Date: Wed, 29 Nov 2017 15:44:36 -0800
+Message-Id: <20171129234442.655-2-samitolvanen@google.com>
+In-Reply-To: <20171129234442.655-1-samitolvanen@google.com>
+References: <20171129234442.655-1-samitolvanen@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Nicholas Piggin <npiggin@gmail.com>
 Cc: Sami Tolvanen <samitolvanen@google.com>
 
-These patches add macros for detecting the linker name and version,
-and apply fixes and workarounds needed to link the arm64 kernel with
-GNU gold.
+GNU gold may require different flags than GNU ld. Add a macro for
+detecting the linker and conditionally add gold specific flags from
+LDFLAGS_GOLD.
 
-Sami Tolvanen (7):
-  kbuild: add ld-name macro and support for GNU gold
-  kbuild: add ld-if-name-version and linker-specific macros
-  kbuild: fix LD_DEAD_CODE_DATA_ELIMINATION with GNU gold
-  arm64: fix -m for GNU gold
-  arm64: keep .altinstructions and .altinstr_replacement
-  arm64: explicitly pass --no-fix-cortex-a53-843419 to GNU gold
-  arm64: add a workaround for GNU gold with ARM64_MODULE_PLTS
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+ Makefile               | 5 +++++
+ scripts/Kbuild.include | 4 ++++
+ 2 files changed, 9 insertions(+)
 
- Makefile                          |  5 +++++
- arch/arm64/Makefile               | 17 +++++++++++++++++
- arch/arm64/kernel/module.lds      |  4 ++--
- arch/arm64/kernel/vmlinux.lds.S   |  4 ++--
- include/asm-generic/vmlinux.lds.h |  8 ++++----
- scripts/Kbuild.include            | 16 ++++++++++++++++
- 6 files changed, 46 insertions(+), 8 deletions(-)
-
+diff --git a/Makefile b/Makefile
+index f761bf475ba5..a16c98d6e3ba 100644
+--- a/Makefile
++++ b/Makefile
+@@ -814,6 +814,11 @@ include scripts/Makefile.kasan
+ include scripts/Makefile.extrawarn
+ include scripts/Makefile.ubsan
+ 
++# Add any flags specific to ld.gold
++ifeq ($(ld-name),gold)
++LDFLAGS		+= $(LDFLAGS_GOLD)
++endif
++
+ # Add any arch overrides and user supplied CPPFLAGS, AFLAGS and CFLAGS as the
+ # last assignments
+ KBUILD_CPPFLAGS += $(ARCH_CPPFLAGS) $(KCPPFLAGS)
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index b6d7d347b203..a7c7843c2cf1 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -277,6 +277,10 @@ ld-option = $(call try-run-cached,\
+ # Important: no spaces around options
+ ar-option = $(call try-run-cached, $(AR) rc$(1) "$$TMP",$(1),$(2))
+ 
++# ld-name
++# Expands to either bfd or gold
++ld-name = $(shell $(LD) -v 2>&1 | grep -q "GNU gold" && echo gold || echo bfd)
++
+ # ld-version
+ # Note this is mainly for HJ Lu's 3 number binutil versions
+ ld-version = $(call shell-cached,$(LD) --version | $(srctree)/scripts/ld-version.sh)
 -- 
 2.15.0.531.g2ccb3012c9-goog
 
