@@ -1,70 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f195.google.com ([209.85.223.195]:39094 "EHLO
-        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753039AbdK2AAY (ORCPT
+Received: from mail-it0-f65.google.com ([209.85.214.65]:37634 "EHLO
+        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751496AbdK2AAW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Nov 2017 19:00:24 -0500
-Received: by mail-io0-f195.google.com with SMTP id h12so1826610iof.6
-        for <linux-kbuild@vger.kernel.org>; Tue, 28 Nov 2017 16:00:24 -0800 (PST)
+        Tue, 28 Nov 2017 19:00:22 -0500
+Received: by mail-it0-f65.google.com with SMTP id d137so1982330itc.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 Nov 2017 16:00:21 -0800 (PST)
 From: Sami Tolvanen <samitolvanen@google.com>
-Subject: [PATCH 1/3] kbuild: add clang-version.sh
-Date: Tue, 28 Nov 2017 16:00:09 -0800
-Message-Id: <20171129000011.55235-2-samitolvanen@google.com>
-In-Reply-To: <20171129000011.55235-1-samitolvanen@google.com>
-References: <20171129000011.55235-1-samitolvanen@google.com>
+Subject: [PATCH 0/3] Add version macros for clang and fix arm64 for clang <6.0
+Date: Tue, 28 Nov 2017 16:00:08 -0800
+Message-Id: <20171129000011.55235-1-samitolvanen@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
 Cc: Sami Tolvanen <samitolvanen@google.com>
 
-Based on gcc-version.sh, clang-version.sh prints out the correct
-version of clang.
+In order to build an arm64 kernel with clang <6.0, we need to work
+around LLVM bug 30792 by using -mno-implicit-float instead of
+-mgeneral-regs-only.
 
-Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
----
+This patch set adds macros for checking clang version, and enable the
+workaround only for affected compiler versions.
+
+Greg Hackmann (1):
+  arm64: use -mno-implicit-float instead of -mgeneral-regs-only
+
+Sami Tolvanen (2):
+  kbuild: add clang-version.sh
+  kbuild: add cc-if-name-version and compiler-specific variants
+
+ arch/arm64/Makefile      |  5 ++++-
+ scripts/Kbuild.include   | 31 +++++++++++++++++++++++++++++++
  scripts/clang-version.sh | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ 3 files changed, 68 insertions(+), 1 deletion(-)
  create mode 100755 scripts/clang-version.sh
 
-diff --git a/scripts/clang-version.sh b/scripts/clang-version.sh
-new file mode 100755
-index 000000000000..5f14ddc54032
---- /dev/null
-+++ b/scripts/clang-version.sh
-@@ -0,0 +1,33 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# clang-version [-p] clang-command
-+#
-+# Prints the compiler version of `command' in a canonical 4-digit form
-+# such as `0500' for clang-5.0 etc.
-+#
-+# With the -p option, prints the patchlevel as well, for example `050001' for
-+# clang-5.0.1 etc.
-+#
-+
-+if [ "$1" = "-p" ] ; then
-+	with_patchlevel=1;
-+	shift;
-+fi
-+
-+compiler="$*"
-+
-+if [ ${#compiler} -eq 0 ]; then
-+	echo "Error: No compiler specified."
-+	printf "Usage:\n\t$0 <clang-command>\n"
-+	exit 1
-+fi
-+
-+MAJOR=$(echo __clang_major__ | $compiler -E -x c - | tail -n 1)
-+MINOR=$(echo __clang_minor__ | $compiler -E -x c - | tail -n 1)
-+if [ "x$with_patchlevel" != "x" ] ; then
-+	PATCHLEVEL=$(echo __clang_patchlevel__ | $compiler -E -x c - | tail -n 1)
-+	printf "%02d%02d%02d\\n" $MAJOR $MINOR $PATCHLEVEL
-+else
-+	printf "%02d%02d\\n" $MAJOR $MINOR
-+fi
 -- 
 2.15.0.417.g466bffb3ac-goog
 
