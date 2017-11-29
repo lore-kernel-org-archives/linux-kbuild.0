@@ -1,55 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f181.google.com ([209.85.223.181]:44091 "EHLO
-        mail-io0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932198AbdK1Tf7 (ORCPT
+Received: from mail-io0-f194.google.com ([209.85.223.194]:45189 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753068AbdK2AAZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Nov 2017 14:35:59 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
-References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
- <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com> <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
-From: Jim Davis <jim.epost@gmail.com>
-Date: Tue, 28 Nov 2017 12:35:57 -0700
-Message-ID: <CA+r1ZhgFQS6EEzazw0YZXhYqm+WN3mp69mGyaeNpX36WZLABrA@mail.gmail.com>
-Subject: Re: [PATCH v3] scripts/package: snap-pkg target
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 28 Nov 2017 19:00:25 -0500
+Received: by mail-io0-f194.google.com with SMTP id e204so1803631iof.12
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 Nov 2017 16:00:24 -0800 (PST)
+From: Sami Tolvanen <samitolvanen@google.com>
+Subject: [PATCH 2/3] kbuild: add cc-if-name-version and compiler-specific variants
+Date: Tue, 28 Nov 2017 16:00:10 -0800
+Message-Id: <20171129000011.55235-3-samitolvanen@google.com>
+In-Reply-To: <20171129000011.55235-1-samitolvanen@google.com>
+References: <20171129000011.55235-1-samitolvanen@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paolo Pisati <paolo.pisati@canonical.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
+To: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
+Cc: Sami Tolvanen <samitolvanen@google.com>
 
-On Tue, Nov 28, 2017 at 10:14 AM, Paolo Pisati
-<paolo.pisati@canonical.com> wrote:
-> On Mon, Nov 27, 2017 at 7:33 PM, Jim Davis <jim.epost@gmail.com> wrote:
->>
->> With this patch applied to the 4.14 kernel source, and running make
->> snap-pkg on a Ubuntu 16.04 VM with the latest 16.04 kernel config
->> file, I ran into
->>
->> Traceback (most recent call last):
->>   File "/usr/lib/python3.5/shutil.py", line 538, in move
->>     os.rename(src, real_dst)
->> FileNotFoundError: [Errno 2] No such file or directory:
->> '/home/jim/linux/snap/parts/kernel/install/lib/firmware' ->
->> '/home/jim/linux/snap/parts/kernel/install/firmware'
->>
->> What did I miss?
->
-> You need a recent version of snapcraft, i landed a fix for that last week.
->
-> $ snap install --classic --edge snapcraft
->
-> or refresh it, in case you already installed via snaps:
->
-> $ snap refresh --edge snapcraft
->
-> and then 'make snap-pkg' again.
-> Beware of $PATH in case you have the snap and deb version installed.
+This change adds macros for testing both compiler name and
+version. Current cc-version, cc-ifversion etc. macros that test
+gcc version are left unchanged to prevent compatibility issues
+with existing tests.
 
-Ok, after updating and setting ~/snapcraft/bin/snapcraft ahead of
-/usr/bin in my $PATH, the build completed.   Oddly both
-/usr/bin/snapcraft --version and ~/snapcraft/bin/snapcraft --version
-return 2.34, though the build failed with /usr/bin/snapcraft.
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+---
+ scripts/Kbuild.include | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 065324a8046f..b6d7d347b203 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -215,6 +215,37 @@ cc-disable-warning = $(call try-run-cached,\
+ # Expands to either gcc or clang
+ cc-name = $(call shell-cached,$(CC) -v 2>&1 | grep -q "clang version" && echo clang || echo gcc)
+ 
++# __cc-version
++# Returns compiler version
++__cc-version = $(shell $(CONFIG_SHELL) $(srctree)/scripts/$(cc-name)-version.sh $(CC))
++
++# __cc-fullversion
++# Returns full compiler version
++__cc-fullversion = $(shell $(CONFIG_SHELL) \
++	$(srctree)/scripts/$(cc-name)-version.sh -p $(CC))
++
++# cc-if-name-version
++# Matches compiler name and version
++# Usage:  EXTRA_CFLAGS += $(call cc-if-name-version, gcc, -lt, 0402, -O1)
++cc-if-name-version = $(shell [ $(cc-name) == $(1) ] && [ $(__cc-version) $(2) $(3) ] && echo $(4) || echo $(5))
++
++# cc-if-name-fullversion
++# Matches compiler name and full version
++# Usage:  EXTRA_CFLAGS += $(call cc-if-name-fullversion, gcc, -lt, 040502, -O1)
++cc-if-name-fullversion = $(shell [ $(cc-name) == $(1) ] && [ $(__cc-fullversion) $(2) $(3) ] && echo $(4) || echo $(5))
++
++# gcc-ifversion
++gcc-ifversion = $(call cc-if-name-version, gcc, $(1), $(2), $(3), $(4))
++
++# gcc-if-fullversion
++gcc-if-fullversion = (call cc-if-name-fullversion, gcc, $(1), $(2), $(3), $(4))
++
++# clang-ifversion
++clang-ifversion =  $(call cc-if-name-version, clang, $(1), $(2), $(3), $(4))
++
++# clang-if-fullversion
++clang-if-fullversion = (call cc-if-name-fullversion, clang, $(1), $(2), $(3), $(4))
++
+ # cc-version
+ cc-version = $(call shell-cached,$(CONFIG_SHELL) $(srctree)/scripts/gcc-version.sh $(CC))
+ 
 -- 
-Jim
+2.15.0.417.g466bffb3ac-goog
+
