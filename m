@@ -1,40 +1,125 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:37634 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751496AbdK2AAW (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:18005 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751833AbdK2Ckw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Nov 2017 19:00:22 -0500
-Received: by mail-it0-f65.google.com with SMTP id d137so1982330itc.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 28 Nov 2017 16:00:21 -0800 (PST)
-From: Sami Tolvanen <samitolvanen@google.com>
-Subject: [PATCH 0/3] Add version macros for clang and fix arm64 for clang <6.0
-Date: Tue, 28 Nov 2017 16:00:08 -0800
-Message-Id: <20171129000011.55235-1-samitolvanen@google.com>
+        Tue, 28 Nov 2017 21:40:52 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAKwvOdmcthyd1KbxRr54QztBcmeZ7JA=M_7N1xfmVurVOG=77w@mail.gmail.com>
+References: <CAK7LNAS1NaqPRhK6FOXN=YTMhLagpSrR2=tXn-uWZbpzr=NeoQ@mail.gmail.com>
+ <20171115204231.34914-1-ndesaulniers@google.com> <CAK7LNAQNEHRapzFem3nr7=EWJPYvZby9K7vem-R99ijYNoguEg@mail.gmail.com>
+ <CAK7LNASGYZfQFkM3yMRQaHLUwW5Lhp8CxHGX0bJ9sVja0f=n+A@mail.gmail.com> <CAKwvOdmcthyd1KbxRr54QztBcmeZ7JA=M_7N1xfmVurVOG=77w@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 29 Nov 2017 11:39:59 +0900
+Message-ID: <CAK7LNATx=3k3o+hEpa2k3f67MfsEnWAyWsBSkKmPYQTUK9RYmg@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: Set KBUILD_CFLAGS before incl. arch Makefile
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
-Cc: Sami Tolvanen <samitolvanen@google.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Behan Webster <behanw@converseincode.com>, =?UTF-8?Q?Jan=2DSimon_M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, Greg Hackmann <ghackmann@google.com>, Matthias Kaehlcke <mka@chromium.org>, Douglas Anderson <dianders@chromium.org>, Chris Fries <cfries@google.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux-MIPS <linux-mips@linux-mips.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-hexagon@vger.kernel.org, openrisc@lists.librecores.org
 
-In order to build an arm64 kernel with clang <6.0, we need to work
-around LLVM bug 30792 by using -mno-implicit-float instead of
--mgeneral-regs-only.
+Hi Nick,
 
-This patch set adds macros for checking clang version, and enable the
-workaround only for affected compiler versions.
+2017-11-29 3:18 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+> Hi Masahiro,
+>
+> Thanks for merging Chris' patch, and sorry for taking so long to respond.
+>
+> On Wed, Nov 22, 2017 at 8:24 PM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> Linus suggests to move compiler flag testing to Kconfig.
+>
+> Do you have an LKML link for context?
 
-Greg Hackmann (1):
-  arm64: use -mno-implicit-float instead of -mgeneral-regs-only
 
-Sami Tolvanen (2):
-  kbuild: add clang-version.sh
-  kbuild: add cc-if-name-version and compiler-specific variants
+https://lkml.org/lkml/2017/11/19/291
 
- arch/arm64/Makefile      |  5 ++++-
- scripts/Kbuild.include   | 31 +++++++++++++++++++++++++++++++
- scripts/clang-version.sh | 33 +++++++++++++++++++++++++++++++++
- 3 files changed, 68 insertions(+), 1 deletion(-)
- create mode 100755 scripts/clang-version.sh
+
+
+> On Wed, Nov 15, 2017 at 6:32 PM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> BTW, I notice another issue.
+>>
+>> If we move clang settings before including arch Makefile,
+>> "ifneq ($(CROSS_COMPILE),)" comes early.
+>>
+>> Some arch Makefiles (arch/mips/Makefile, arch/blackfin/Makefile, etc.)
+>> set CROSS_COMPILE there if CROSS_COMPILE is not given.
+>>
+>> Then, we have a conflict between two requirements among arch.
+>>
+>> [1] arm64, powerpc use ld-option in their Makefile.
+>>     So, clang flags must be set before inc. arch Makefile.
+>> [2] mips, blackfin, etc. may set CROSS_COMPILE in their Makefile.
+>>     So, we want to reference CROSS_COMPILE only after inc. arch Makefile
+>>
+>> I have no idea how to solve it.
+>>
+>> At this moment, I guess clang is intended to support
+>> only limited architectures.
+>>
+>> It might be OK to be compromised here.
+>
+> I definitely find it curious that certain arch's define CROSS_COMPILE
+> themselves.  The benefit is one less argument to supply at compile
+> time, but it assumes that the toolchain always has a certain prefix.
+> This makes sense to me when cross compiling, but seems odd when
+> compiling natively on that arch as the host and target.  Maybe those
+> arch's use that convention, or simply are always cross compiled for?
+>
+> Taking a survey of all arch's currently in the kernel via `cd arch; ag
+> CROSS_COMPILE` and quickly eyeballing the result:
+>
+> m68k if not set
+> arc if not set
+> openrisc for some configs (openrisc/configs/or1ksim_defconfig,
+> openrisc/configs/simple_smp_defconfig)
+> blackfin if not set
+> hexagon for some configs (hexagon/configs/comet_defconfig)
+> parisc if not set
+> sh if not set
+> xtensa if not set
+> score always
+> arm for some configs (arm/configs/lpc18xx_defconfig)
+> h8300 if not set
+> mips if not set (and explicitly emptied for some configs,
+> mips/configs/nlm_xlr_defconfig )
+> unicore32 if not set
+> tile if not set
+>
+> The * if not set (or not being on the list) seems correct, as the top
+> level Makefile will handle this correctly.  Setting it for some
+> configs seems curious (not necessarily wrong?),
+
+Perhaps, the maintainer of those platforms may want to save
+one command-line argument at compile time.
+
+> emptying it/always
+> setting it via config sounds wrong to me,
+
+arch/mips/configs/nlm_xlr_defconfig explicitly empties it.
+It is just redundant because CONFIG_CROSS_COMPILE=""
+is the default in Kconfig.
+Not necessarily wrong, I think.
+
+
+> but maybe those hosts don't
+> have toolchains and must always be cross compiled for?
+>
+> For reference, this file in LLVM source defines the supported backend
+> targets: https://llvm.org/doxygen/Triple_8h_source.html
+>
+> Either way, it sounds like we're all set here, I guess I'm just
+> curious about the LKML link/context and why some configs set
+> CROSS_COMPILE themselves?
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
 
 -- 
-2.15.0.417.g466bffb3ac-goog
-
+Best Regards
+Masahiro Yamada
