@@ -1,67 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f177.google.com ([209.85.223.177]:41658 "EHLO
-        mail-io0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751607AbdK2VvK (ORCPT
+Received: from mail-io0-f175.google.com ([209.85.223.175]:43266 "EHLO
+        mail-io0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752275AbdK2XJ4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 29 Nov 2017 16:51:10 -0500
-Received: by mail-io0-f177.google.com with SMTP id g1so5297276ioc.8
-        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 13:51:10 -0800 (PST)
-From: Paul Lawrence <paullawrence@google.com>
-Subject: [PATCH v2 0/5] kasan: support alloca, LLVM
-Date: Wed, 29 Nov 2017 13:50:45 -0800
-Message-Id: <20171129215050.158653-1-paullawrence@google.com>
+        Wed, 29 Nov 2017 18:09:56 -0500
+Received: by mail-io0-f175.google.com with SMTP id s37so5508069ioe.10
+        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 15:09:56 -0800 (PST)
+Date: Wed, 29 Nov 2017 15:09:52 -0800
+From: Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: Link time optimization for LTO/x86
+Message-ID: <20171129230952.GA138088@samitolvanen.mtv.corp.google.com>
+References: <20171127213423.27218-1-andi@firstfloor.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171127213423.27218-1-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Paul Lawrence <paullawrence@google.com>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, alxmtvv@gmail.com, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, akpm@linux-foundation.org
 
-Adding kasan alloca support using clang
-Also adding support for clang, since needed for this feature
-gcc has kasan alloca support, but only post 7.2
+Hi Andi,
 
-[Patch v2 1/5] kasan: support alloca() poisoning
-  Tests moved to patch 2/5
-  __asan_alloca_unpoison():
-    Use precalculated rounded-up-size
-    Warning added if bottom is not aligned as expected
-    Parameter check added to make sure gcc builds don't fail
-    Now unpoisons partial chunks
-  get_shadow_bug_type():
-    Missing break added
+On Mon, Nov 27, 2017 at 01:34:02PM -0800, Andi Kleen wrote:
+> This is an updated version of my older LTO patchkit for gcc/x86
+> This version doesn't need special binutils, but requires gcc 5+.
+> It also is compatible with near all options (except MODVERSIONS)
 
-[PATCH v2 2/5] kasan: Add tests for alloca poisonong
-  Tests moved here
-  kasan_alloca_oob_right():
-    No longer rounding up
+Would you mind changing the config option prefix to LTO_GCC, for
+example? It looks like there are a few places where gcc LTO needs
+to be disabled, but clang LTO works fine, and vice versa.
 
-[PATCH v2 3/5] kasan: added functions for unpoisoning stack variables
-  No change from v1. clang builds need f8
+My earlier clang LTO patches also had a solution for MODVERSIONS,
+which might work with gcc as well.
 
-[PATCH v2 4/5] kasan: support LLVM-style asan parameters
-  Rejigged whole file. Old approach would not work except with ToT gcc
-  or clang. All parameters would be rejected if one was not known.
-  Also if both were empty, CFLAGS_KASAN would be " " which mostly
-  disabled kasan on older compilers.
-  Added support for gcc, tested on ToT compiler
-
-[PATCH v2 5/5] kasan: add compiler support for clang
-  Made comments single line
-
-Paul Lawrence (5):
-  kasan: support alloca() poisoning
-  kasan: Add tests for alloca poisonong
-  kasan: added functions for unpoisoning stack variables
-  kasan: support LLVM-style asan parameters
-  kasan: add compiler support for clang
-
- include/linux/compiler-clang.h |  8 +++++++
- lib/test_kasan.c               | 22 ++++++++++++++++++++
- mm/kasan/kasan.c               | 47 ++++++++++++++++++++++++++++++++++++++++++
- mm/kasan/kasan.h               |  8 +++++++
- mm/kasan/report.c              |  4 ++++
- scripts/Makefile.kasan         | 39 ++++++++++++++++++++++++-----------
- 6 files changed, 116 insertions(+), 12 deletions(-)
-
---
-2.15.0.531.g2ccb3012c9-goog
-
+Sami
