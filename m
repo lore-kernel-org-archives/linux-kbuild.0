@@ -1,37 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f175.google.com ([209.85.223.175]:43266 "EHLO
-        mail-io0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752275AbdK2XJ4 (ORCPT
+Received: from mail-io0-f195.google.com ([209.85.223.195]:45946 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752083AbdK2XaN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 29 Nov 2017 18:09:56 -0500
-Received: by mail-io0-f175.google.com with SMTP id s37so5508069ioe.10
-        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 15:09:56 -0800 (PST)
-Date: Wed, 29 Nov 2017 15:09:52 -0800
+        Wed, 29 Nov 2017 18:30:13 -0500
+Received: by mail-io0-f195.google.com with SMTP id e204so5547545iof.12
+        for <linux-kbuild@vger.kernel.org>; Wed, 29 Nov 2017 15:30:13 -0800 (PST)
+Date: Wed, 29 Nov 2017 15:30:08 -0800
 From: Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: Link time optimization for LTO/x86
-Message-ID: <20171129230952.GA138088@samitolvanen.mtv.corp.google.com>
-References: <20171127213423.27218-1-andi@firstfloor.org>
+Subject: Re: [v2,12/18] kbuild: add support for clang LTO
+Message-ID: <20171129233008.GB138088@samitolvanen.mtv.corp.google.com>
+References: <20171115213428.22559-13-samitolvanen@google.com>
+ <20171118132139.58ac5e4c@roar.ozlabs.ibm.com>
+ <20171120202152.GA89108@samitolvanen.mtv.corp.google.com>
+ <20171121110152.23fb751a@roar.ozlabs.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171127213423.27218-1-andi@firstfloor.org>
+In-Reply-To: <20171121110152.23fb751a@roar.ozlabs.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, alxmtvv@gmail.com, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, akpm@linux-foundation.org
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
 
-Hi Andi,
+On Tue, Nov 21, 2017 at 11:01:52AM +1000, Nicholas Piggin wrote:
+> I just wonder are you doing this because there is some worthwhile
+> performance gain? Or to enable more testing and development of LTO?
+> Any clues for why a user would want to enable it.
 
-On Mon, Nov 27, 2017 at 01:34:02PM -0800, Andi Kleen wrote:
-> This is an updated version of my older LTO patchkit for gcc/x86
-> This version doesn't need special binutils, but requires gcc 5+.
-> It also is compatible with near all options (except MODVERSIONS)
+I'm primarily interested in CFI, which with clang requires LTO; not
+for the optimizations, but for source visibility. We do expect to see
+performance improvements with LTO though, especially if combined with
+PGO.
 
-Would you mind changing the config option prefix to LTO_GCC, for
-example? It looks like there are a few places where gcc LTO needs
-to be disabled, but clang LTO works fine, and vice versa.
+> Thanks, if you could. Possibly file a request with LLVMgold too, it
+> seems to be that toolchain support for archives is quite strong, so it
+> will be good to keep pushing for that.
 
-My earlier clang LTO patches also had a solution for MODVERSIONS,
-which might work with gcc as well.
+It turns out LLVMgold is fine with mixed IR/object archives, but we need
+to use llvm-ar to generate symbol tables for them, and there are some
+compatibility issues with objdump that I had to work around. I'll send
+v3 for review once I receive some feedback for the clang/gold patches we
+need first.
 
 Sami
