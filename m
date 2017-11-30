@@ -1,47 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f53.google.com ([209.85.214.53]:42852 "EHLO
-        mail-it0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751410AbdK3XPX (ORCPT
+Received: from mail-io0-f194.google.com ([209.85.223.194]:32845 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750898AbdK3Xie (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Nov 2017 18:15:23 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com>
-References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
- <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
- <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
- <CA+r1ZhgFQS6EEzazw0YZXhYqm+WN3mp69mGyaeNpX36WZLABrA@mail.gmail.com>
- <CAK7LNARNfOzuR72U6Co0GYt7=7V4u8TmTUQAsB8R7H_5QYQ_5A@mail.gmail.com> <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com>
-From: Jim Davis <jim.epost@gmail.com>
-Date: Thu, 30 Nov 2017 16:15:22 -0700
-Message-ID: <CA+r1Zhj6H8+g_F+caPvWrCouPk-Cib62wACG+uH=s3_Ato_qhQ@mail.gmail.com>
-Subject: Re: [PATCH v3] scripts/package: snap-pkg target
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 30 Nov 2017 18:38:34 -0500
+Received: by mail-io0-f194.google.com with SMTP id t196so9435675iof.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 30 Nov 2017 15:38:34 -0800 (PST)
+From: Sami Tolvanen <samitolvanen@google.com>
+Subject: [PATCH v2 0/2] Add version macros for clang
+Date: Thu, 30 Nov 2017 15:38:25 -0800
+Message-Id: <20171130233827.130069-1-samitolvanen@google.com>
+In-Reply-To: <20171129000011.55235-1-samitolvanen@google.com>
+References: <20171129000011.55235-1-samitolvanen@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paolo Pisati <paolo.pisati@canonical.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
+To: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Nicholas Piggin <npiggin@gmail.com>
+Cc: Sami Tolvanen <samitolvanen@google.com>
 
-On Wed, Nov 29, 2017 at 10:05 AM, Paolo Pisati
-<paolo.pisati@canonical.com> wrote:
-> On Wed, Nov 29, 2017 at 8:33 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->>
->> Worked for me too,
->> after updating snapcraft.
->>
->>
->> Is it really impossible to check the snapcraft version?
->> What is the minimum version?   2.35 ?
->
-> The minimum version is 2.35+ - what is about to become 2.36 anytime soon now.
+This patch set adds macros for checking clang version.
 
-If I run /snap/bin/snapcraft --version now on that Ubuntu 16.04 VM I
-am getting 2.36+git2.ae61453.
+Changes from v1:
+  - fixed a comment in clang-version.sh
+  - renamed macros to __cc-ifversion and __cc-if-fullversion
+  - fixed a bug with non-bash shells
+  - dropped the arm64 patch as unnecessary
 
-I noticed that if I tried to make snap-pkg with the O=/some/dir option
-the tar step failed but the rest of the build continued, and seems to
-have finished successfully.  Should the snap-pkg target stop after a
-tar failure?
+Sami Tolvanen (2):
+  kbuild: add clang-version.sh
+  kbuild: add __cc-ifversion and compiler-specific variants
+
+ scripts/Kbuild.include   | 41 ++++++++++++++++++++++++++++++++++-------
+ scripts/clang-version.sh | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+), 7 deletions(-)
+ create mode 100755 scripts/clang-version.sh
 
 -- 
-Jim
+2.15.0.531.g2ccb3012c9-goog
+
