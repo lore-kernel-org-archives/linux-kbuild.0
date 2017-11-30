@@ -1,57 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-db5eur01on0134.outbound.protection.outlook.com ([104.47.2.134]:26016
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752523AbdK3Qln (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Nov 2017 11:41:43 -0500
-Subject: Re: [PATCH v2 5/5] kasan: add compiler support for clang
-References: <20171129215050.158653-1-paullawrence@google.com>
- <20171129215050.158653-6-paullawrence@google.com>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <8b1a30b7-9c16-ac0a-3cc1-6fb70247add0@virtuozzo.com>
-Date: Thu, 30 Nov 2017 19:45:10 +0300
+Received: from mail-it0-f43.google.com ([209.85.214.43]:36385 "EHLO
+        mail-it0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753900AbdK3RuZ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 30 Nov 2017 12:50:25 -0500
+Received: by mail-it0-f43.google.com with SMTP id d16so9409366itj.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 30 Nov 2017 09:50:25 -0800 (PST)
+Date: Thu, 30 Nov 2017 09:50:21 -0800
+From: Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: [PATCH 6/7] arm64: explicitly pass --no-fix-cortex-a53-843419 to
+ GNU gold
+Message-ID: <20171130175021.GD90451@samitolvanen.mtv.corp.google.com>
+References: <20171129234442.655-1-samitolvanen@google.com>
+ <20171129234442.655-7-samitolvanen@google.com>
+ <CAKwvOdnhdHKvkLsG+3D5KDJ+jzXeWFPd9X+eDphA4xf5NZoDnQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171129215050.158653-6-paullawrence@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKwvOdnhdHKvkLsG+3D5KDJ+jzXeWFPd9X+eDphA4xf5NZoDnQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Lawrence <paullawrence@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Nicholas Piggin <npiggin@gmail.com>
 
-
-
-On 11/30/2017 12:50 AM, Paul Lawrence wrote:
-> For now we can hard-code ASAN ABI level 5, since historical clang builds
-> can't build the kernel anyway.  We also need to emulate gcc's
-> __SANITIZE_ADDRESS__ flag, or memset() calls won't be instrumented.
+On Wed, Nov 29, 2017 at 04:30:33PM -0800, Nick Desaulniers wrote:
+> Rather than:
 > 
-> Signed-off-by: Greg Hackmann <ghackmann@google.com>
-> Signed-off-by: Paul Lawrence <paullawrence@google.com>
+> if CONFIG_ARM64_ERRATUM_843419 == y:
+>   ...
+> if CONFIG_ARM64_ERRATUM_843419 == '':
+>   ...
 > 
-> ---
->  include/linux/compiler-clang.h | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> could this be:
 > 
-> diff --git a/include/linux/compiler-clang.h b/include/linux/compiler-clang.h
-> index 3b609edffa8f..d02a4df3f473 100644
-> --- a/include/linux/compiler-clang.h
-> +++ b/include/linux/compiler-clang.h
-> @@ -19,3 +19,11 @@
->  
->  #define randomized_struct_fields_start	struct {
->  #define randomized_struct_fields_end	};
-> +
-> +/* all clang versions usable with the kernel support KASAN ABI version 5 */
-> +#define KASAN_ABI_VERSION 5
-> +
+> if CONFIG_ARM64_ERRATUM_843419 == y:
+>   ...
+> else
+>   ...
+> 
+> ?
 
-This patch should be earlier in this series. Patch 4/5 breaks clang-built kernel, because
-we start using globals instrumentation with wrong KASAN_ABI_VERSION.
+Sure. I'll clean this up in v2.
 
-> +/* emulate gcc's __SANITIZE_ADDRESS__ flag */
-> +#if __has_feature(address_sanitizer)
-> +#define __SANITIZE_ADDRESS__
-> +#endif
-> 
+Sami
