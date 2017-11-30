@@ -1,33 +1,139 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:40222 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752129AbdK3CKo (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:44372 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750769AbdK3I1L (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 29 Nov 2017 21:10:44 -0500
-Date: Thu, 30 Nov 2017 12:10:29 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 3/7] kbuild: fix LD_DEAD_CODE_DATA_ELIMINATION with GNU
- gold
-Message-ID: <20171130121029.3647ea43@roar.ozlabs.ibm.com>
-In-Reply-To: <20171129234442.655-4-samitolvanen@google.com>
-References: <20171129234442.655-1-samitolvanen@google.com>
-        <20171129234442.655-4-samitolvanen@google.com>
+        Thu, 30 Nov 2017 03:27:11 -0500
+Received: by mail-pl0-f67.google.com with SMTP id x22so3808668pln.11
+        for <linux-kbuild@vger.kernel.org>; Thu, 30 Nov 2017 00:27:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20171129215050.158653-2-paullawrence@google.com>
+References: <20171129215050.158653-1-paullawrence@google.com> <20171129215050.158653-2-paullawrence@google.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Thu, 30 Nov 2017 09:26:50 +0100
+Message-ID: <CACT4Y+YOZPW3R2_bOU2ueNGaVMQm+1JfBDGVRKuaVSgR36zkGw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] kasan: support alloca() poisoning
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
+To: Paul Lawrence <paullawrence@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, Linux-MM <linux-mm@kvack.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
 
-On Wed, 29 Nov 2017 15:44:38 -0800
-Sami Tolvanen <samitolvanen@google.com> wrote:
+/\/\/\/\/\/\On Wed, Nov 29, 2017 at 10:50 PM, Paul Lawrence
+<paullawrence@google.com> wrote:
+> clang's AddressSanitizer implementation adds redzones on either side of
+> alloca()ed buffers.  These redzones are 32-byte aligned and at least 32
+> bytes long.
+>
+> __asan_alloca_poison() is passed the size and address of the allocated
+> buffer, *excluding* the redzones on either side.  The left redzone will
+> always be to the immediate left of this buffer; but AddressSanitizer may
+> need to add padding between the end of the buffer and the right redzone.
+> If there are any 8-byte chunks inside this padding, we should poison
+> those too.
+>
+> __asan_allocas_unpoison() is just passed the top and bottom of the
+> dynamic stack area, so unpoisoning is simpler.
+>
+> Signed-off-by: Greg Hackmann <ghackmann@google.com>
+> Signed-off-by: Paul Lawrence <paullawrence@google.com>
+>
+>  mm/kasan/kasan.c  | 32 ++++++++++++++++++++++++++++++++
+>  mm/kasan/kasan.h  |  8 ++++++++
+>  mm/kasan/report.c |  4 ++++
+>  3 files changed, 44 insertions(+)
+>
+> diff --git a/mm/kasan/kasan.c b/mm/kasan/kasan.c
+> index 405bba487df5..f86f862f41f8 100644
+> --- a/mm/kasan/kasan.c
+> +++ b/mm/kasan/kasan.c
+> @@ -736,6 +736,38 @@ void __asan_unpoison_stack_memory(const void *addr, size_t size)
+>  }
+>  EXPORT_SYMBOL(__asan_unpoison_stack_memory);
+>
+> +/* Emitted by compiler to poison alloca()ed objects. */
+> +void __asan_alloca_poison(unsigned long addr, size_t size)
+> +{
+> +       size_t rounded_up_size = round_up(size, KASAN_SHADOW_SCALE_SIZE);
+> +       size_t padding_size = round_up(size, KASAN_ALLOCA_REDZONE_SIZE) -
+> +                       rounded_up_size;
+> +
+> +       const void *left_redzone = (const void *)(addr -
+> +                       KASAN_ALLOCA_REDZONE_SIZE);
+> +       const void *right_redzone = (const void *)(addr + rounded_up_size);
+> +
+> +       WARN_ON(!IS_ALIGNED(addr, KASAN_ALLOCA_REDZONE_SIZE));
+> +
+> +       kasan_unpoison_shadow((const void *)addr, size);
 
-> Don't remove .head.text or .exitcall.exit when linking with --gc-sections,
-> and include .init.text.* in .init.text and .init.rodata.* in .init.rodata.
-> 
-> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+/\/\/\/\/\/\
 
-Fine by me, if you consider my other comments.
+Why do we need this? Stack must be clean. Compiler instrumentation
+does not clear shadow for objects in function prologue, if stack is
+dirty KASAN would explode.
 
-Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+
+> +       kasan_poison_shadow(left_redzone, KASAN_ALLOCA_REDZONE_SIZE,
+> +                       KASAN_ALLOCA_LEFT);
+> +       kasan_poison_shadow(right_redzone,
+> +                       padding_size + KASAN_ALLOCA_REDZONE_SIZE,
+> +                       KASAN_ALLOCA_RIGHT);
+
+We also need to poison [size, rounded_up_size) with partial value if
+the range is not empty. I.e. we can poison exactly, say, 3 bytes
+there.
+
+
+> +}
+> +EXPORT_SYMBOL(__asan_alloca_poison);
+> +
+> +/* Emitted by compiler to unpoison alloca()ed areas when the stack unwinds. */
+> +void __asan_allocas_unpoison(const void *stack_top, const void *stack_bottom)
+> +{
+> +       if (unlikely(!stack_top || stack_top > stack_bottom))
+> +               return;
+> +
+> +       kasan_unpoison_shadow(stack_top, stack_bottom - stack_top);
+> +}
+> +EXPORT_SYMBOL(__asan_allocas_unpoison);
+> +
+>  #ifdef CONFIG_MEMORY_HOTPLUG
+>  static int __meminit kasan_mem_notifier(struct notifier_block *nb,
+>                         unsigned long action, void *data)
+> diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
+> index c70851a9a6a4..7c0bcd1f4c0d 100644
+> --- a/mm/kasan/kasan.h
+> +++ b/mm/kasan/kasan.h
+> @@ -24,6 +24,14 @@
+>  #define KASAN_STACK_PARTIAL     0xF4
+>  #define KASAN_USE_AFTER_SCOPE   0xF8
+>
+> +/*
+> + * alloca redzone shadow values
+> + */
+> +#define KASAN_ALLOCA_LEFT      0xCA
+> +#define KASAN_ALLOCA_RIGHT     0xCB
+> +
+> +#define KASAN_ALLOCA_REDZONE_SIZE      32
+> +
+>  /* Don't break randconfig/all*config builds */
+>  #ifndef KASAN_ABI_VERSION
+>  #define KASAN_ABI_VERSION 1
+> diff --git a/mm/kasan/report.c b/mm/kasan/report.c
+> index 6bcfb01ba038..25419d426426 100644
+> --- a/mm/kasan/report.c
+> +++ b/mm/kasan/report.c
+> @@ -102,6 +102,10 @@ static const char *get_shadow_bug_type(struct kasan_access_info *info)
+>         case KASAN_USE_AFTER_SCOPE:
+>                 bug_type = "use-after-scope";
+>                 break;
+> +       case KASAN_ALLOCA_LEFT:
+> +       case KASAN_ALLOCA_RIGHT:
+> +               bug_type = "alloca-out-of-bounds";
+> +               break;
+>         }
+>
+>         return bug_type;
+> --
+> 2.15.0.531.g2ccb3012c9-goog
+>
