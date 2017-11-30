@@ -1,105 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr40121.outbound.protection.outlook.com ([40.107.4.121]:12903
-        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750742AbdK3Qd1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Nov 2017 11:33:27 -0500
-Subject: Re: [PATCH v2 4/5] kasan: support LLVM-style asan parameters
-References: <20171129215050.158653-1-paullawrence@google.com>
- <20171129215050.158653-5-paullawrence@google.com>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <7e9f3194-17c1-9dc5-9392-748801c831bd@virtuozzo.com>
-Date: Thu, 30 Nov 2017 19:36:54 +0300
+Received: from mail-io0-f196.google.com ([209.85.223.196]:39509 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753885AbdK3Rsj (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 30 Nov 2017 12:48:39 -0500
+Received: by mail-io0-f196.google.com with SMTP id h12so8400914iof.6
+        for <linux-kbuild@vger.kernel.org>; Thu, 30 Nov 2017 09:48:39 -0800 (PST)
+Date: Thu, 30 Nov 2017 09:48:34 -0800
+From: Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: [PATCH 5/7] arm64: keep .altinstructions and
+ .altinstr_replacement
+Message-ID: <20171130174834.GC90451@samitolvanen.mtv.corp.google.com>
+References: <20171129234442.655-1-samitolvanen@google.com>
+ <20171129234442.655-6-samitolvanen@google.com>
+ <CAKwvOd=PcTVZaMCtY7Wy-OEi7Dd1M4hVz8mpJCQR3M+dVROdmg@mail.gmail.com>
+ <20171130115827.709f1818@roar.ozlabs.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20171129215050.158653-5-paullawrence@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171130115827.709f1818@roar.ozlabs.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Lawrence <paullawrence@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
 
-On 11/30/2017 12:50 AM, Paul Lawrence wrote:
-> Use cc-option to figure out whether the compiler's sanitizer uses
-> LLVM-style parameters ("-mllvm -asan-foo=bar") or GCC-style parameters
-> ("--param asan-foo=bar").
-> 
-> Signed-off-by: Greg Hackmann <ghackmann@google.com>
-> Signed-off-by: Paul Lawrence <paullawrence@google.com>
-> 
-> ---
->  scripts/Makefile.kasan | 39 +++++++++++++++++++++++++++------------
->  1 file changed, 27 insertions(+), 12 deletions(-)
-> 
+On Thu, Nov 30, 2017 at 11:58:27AM +1000, Nicholas Piggin wrote:
+> So yes please if it's not too much trouble, could you remove
+> the "gold" name from the generic patch and put it at the front
+> of the series with this arm64 patch.
 
-It looks rather messy. Try the following patch.
-Note, that I didn't add asan-instrument-allocas=1 because it has nothing to do
-with LLVM-style params support.
-asan-instrument-allocas should probably be in the patch that adds alloca() support.
+Sure, I'll do this in v2.
 
+> Possibly then you could also do a 3rd patch to allow arm64 to
+> select it if it's working with gcc?
 
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH] kasan/Makefile: Support LLVM style asan parameters.
+These patches only fix the issues I ran into with clang and gold
+when testing on a single device.  I feel like more testing would
+be needed before enabling this by default for arm64.
 
-LLVM doesn't understand GCC-style paramters ("--param asan-foo=bar"),
-thus we currently we don't use inline/globals/stack instrumentation
-when building the kernel with clang.
-
-Add support for LLVM-style parameters ("-mllvm -asan-foo=bar") to
-enable all KASAN features.
-
-Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
----
- scripts/Makefile.kasan | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
-
-diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
-index 1ce7115aa499..2af5977c394d 100644
---- a/scripts/Makefile.kasan
-+++ b/scripts/Makefile.kasan
-@@ -10,10 +10,7 @@ KASAN_SHADOW_OFFSET ?= $(CONFIG_KASAN_SHADOW_OFFSET)
- 
- CFLAGS_KASAN_MINIMAL := -fsanitize=kernel-address
- 
--CFLAGS_KASAN := $(call cc-option, -fsanitize=kernel-address \
--		-fasan-shadow-offset=$(KASAN_SHADOW_OFFSET) \
--		--param asan-stack=1 --param asan-globals=1 \
--		--param asan-instrumentation-with-call-threshold=$(call_threshold))
-+cc-param = $(call cc-option, --param $(1)) $(call cc-option, -mllvm -$(1))
- 
- ifeq ($(call cc-option, $(CFLAGS_KASAN_MINIMAL) -Werror),)
-    ifneq ($(CONFIG_COMPILE_TEST),y)
-@@ -21,13 +18,23 @@ ifeq ($(call cc-option, $(CFLAGS_KASAN_MINIMAL) -Werror),)
-             -fsanitize=kernel-address is not supported by compiler)
-    endif
- else
--    ifeq ($(CFLAGS_KASAN),)
--        ifneq ($(CONFIG_COMPILE_TEST),y)
--            $(warning CONFIG_KASAN: compiler does not support all options.\
--                Trying minimal configuration)
--        endif
--        CFLAGS_KASAN := $(CFLAGS_KASAN_MINIMAL)
--    endif
-+   # -fasan-shadow-offset fails without -fsanitize
-+   CFLAGS_KASAN_SHADOW := $(call cc-option, -fsanitize=kernel-address \
-+			-fasan-shadow-offset=$(KASAN_SHADOW_OFFSET), \
-+			$(call cc-option, -fsanitize=kernel-address \
-+			-mllvm -asan-mapping-offset=$(KASAN_SHADOW_OFFSET)))
-+
-+   ifeq ($(CFLAGS_KASAN_SHADOW),)
-+      CFLAGS_KASAN := $(CFLAGS_KASAN_MINIMAL)
-+   else
-+      # Now add all the compiler specific options that are valid standalone
-+      CFLAGS_KASAN := $(CFLAGS_KASAN_SHADOW) \
-+	$(call cc-param,asan-globals=1) \
-+	$(call cc-param,asan-instrumentation-with-call-threshold=$(call_threshold)) \
-+	$(call cc-param,asan-stack=1) \
-+	$(call cc-param,asan-use-after-scope=1)
-+   endif
-+
- endif
- 
- CFLAGS_KASAN += $(call cc-option, -fsanitize-address-use-after-scope)
--- 
-2.13.6
+Sami
