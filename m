@@ -1,32 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:37605 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750885AbdK3RjD (ORCPT
+Received: from mail-it0-f53.google.com ([209.85.214.53]:42852 "EHLO
+        mail-it0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751410AbdK3XPX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Nov 2017 12:39:03 -0500
-Received: by mail-it0-f65.google.com with SMTP id d137so9367531itc.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 30 Nov 2017 09:39:03 -0800 (PST)
-Date: Thu, 30 Nov 2017 09:38:59 -0800
-From: Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH 1/7] kbuild: add ld-name macro and support for GNU gold
-Message-ID: <20171130173859.GB90451@samitolvanen.mtv.corp.google.com>
-References: <20171129234442.655-1-samitolvanen@google.com>
- <20171129234442.655-2-samitolvanen@google.com>
- <CAKwvOdme29UPfaV1CCbMXRM=LzZJ-asytEjGm_F7ARN0WrMsEg@mail.gmail.com>
+        Thu, 30 Nov 2017 18:15:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdme29UPfaV1CCbMXRM=LzZJ-asytEjGm_F7ARN0WrMsEg@mail.gmail.com>
+In-Reply-To: <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com>
+References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
+ <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
+ <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
+ <CA+r1ZhgFQS6EEzazw0YZXhYqm+WN3mp69mGyaeNpX36WZLABrA@mail.gmail.com>
+ <CAK7LNARNfOzuR72U6Co0GYt7=7V4u8TmTUQAsB8R7H_5QYQ_5A@mail.gmail.com> <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com>
+From: Jim Davis <jim.epost@gmail.com>
+Date: Thu, 30 Nov 2017 16:15:22 -0700
+Message-ID: <CA+r1Zhj6H8+g_F+caPvWrCouPk-Cib62wACG+uH=s3_Ato_qhQ@mail.gmail.com>
+Subject: Re: [PATCH v3] scripts/package: snap-pkg target
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Nicholas Piggin <npiggin@gmail.com>
+To: Paolo Pisati <paolo.pisati@canonical.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
 
-On Wed, Nov 29, 2017 at 04:32:52PM -0800, Nick Desaulniers wrote:
-> Right, but you're still only ever using one linker per build, correct?
+On Wed, Nov 29, 2017 at 10:05 AM, Paolo Pisati
+<paolo.pisati@canonical.com> wrote:
+> On Wed, Nov 29, 2017 at 8:33 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>>
+>> Worked for me too,
+>> after updating snapcraft.
+>>
+>>
+>> Is it really impossible to check the snapcraft version?
+>> What is the minimum version?   2.35 ?
+>
+> The minimum version is 2.35+ - what is about to become 2.36 anytime soon now.
 
-Correct. LDFLAGS_GOLD makes it move convenient to add gold specific flags
-without explicit $(ld-name) checks everywhere, but I'm fine with removing
-it in v2.
+If I run /snap/bin/snapcraft --version now on that Ubuntu 16.04 VM I
+am getting 2.36+git2.ae61453.
 
-Sami
+I noticed that if I tried to make snap-pkg with the O=/some/dir option
+the tar step failed but the rest of the build continued, and seems to
+have finished successfully.  Should the snap-pkg target stop after a
+tar failure?
+
+-- 
+Jim
