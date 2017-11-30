@@ -1,52 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:38111 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750877AbdK3Jbn (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:29381 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751065AbdK3MKJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Nov 2017 04:31:43 -0500
-Received: by mail-it0-f68.google.com with SMTP id r6so7686592itr.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 30 Nov 2017 01:31:43 -0800 (PST)
+        Thu, 30 Nov 2017 07:10:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171129234442.655-8-samitolvanen@google.com>
-References: <20171129234442.655-1-samitolvanen@google.com> <20171129234442.655-8-samitolvanen@google.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Thu, 30 Nov 2017 09:31:42 +0000
-Message-ID: <CAKv+Gu_j7wnJcVmB0sHqiehK-fv4EGV2MXTJM4PTGpMY-P7MVQ@mail.gmail.com>
-Subject: Re: [PATCH 7/7] arm64: add a workaround for GNU gold with ARM64_MODULE_PLTS
+In-Reply-To: <CAKwvOdndEfdXuRCeSsr04pAt0d0tE_z72DUYc2Z9LCnXAQc4Hw@mail.gmail.com>
+References: <20171129000011.55235-1-samitolvanen@google.com>
+ <20171129000011.55235-2-samitolvanen@google.com> <CAKwvOdndEfdXuRCeSsr04pAt0d0tE_z72DUYc2Z9LCnXAQc4Hw@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 30 Nov 2017 21:09:21 +0900
+Message-ID: <CAK7LNATDYV0p8KvA6dL+7or3osNNBBwO2CjUaFz2UV_2iOYADQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] kbuild: add clang-version.sh
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Nicholas Piggin <npiggin@gmail.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Sami Tolvanen <samitolvanen@google.com>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
 
-On 29 November 2017 at 23:44, Sami Tolvanen <samitolvanen@google.com> wrote:
-> All current versions of GNU gold crash when linking kernel modules
-> with ARM64_MODULE_PLTS due to a known bug:
+2017-11-30 2:39 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+> +# clang-version [-p] clang-command
+> +#
+> +# Prints the compiler version of `command' in a canonical 4-digit form
 >
->   https://sourceware.org/bugzilla/show_bug.cgi?id=14592
->
-> To work around the problem, this change removes NOLOAD from .plt
-> and .init.plt.
->
-> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+> small nit: `command` should be `clang-command`, but its just a comment
+> (maybe the maintainer can make that change when/if applying).
 
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-> ---
->  arch/arm64/kernel/module.lds | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+I would be happy to fix it up locally if there were no other issue.
+
+
+> The conditional at the end to see if $with_patchlevel using "x" is
+> odd, but this is what scripts/gcc-version.sh does and this patch does
+> work as expected.
 >
-> diff --git a/arch/arm64/kernel/module.lds b/arch/arm64/kernel/module.lds
-> index f7c9781a9d48..eacb5c67f61e 100644
-> --- a/arch/arm64/kernel/module.lds
-> +++ b/arch/arm64/kernel/module.lds
-> @@ -1,4 +1,4 @@
->  SECTIONS {
-> -       .plt (NOLOAD) : { BYTE(0) }
-> -       .init.plt (NOLOAD) : { BYTE(0) }
-> +       .plt : { BYTE(0) }
-> +       .init.plt : { BYTE(0) }
->  }
+> Tested-by: Nick Desaulniers <ndesaulniers@google.com>
 > --
-> 2.15.0.531.g2ccb3012c9-goog
->
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
