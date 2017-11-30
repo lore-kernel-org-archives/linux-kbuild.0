@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f66.google.com ([209.85.214.66]:39621 "EHLO
-        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751862AbdK3XjS (ORCPT
+Received: from mail-it0-f67.google.com ([209.85.214.67]:42625 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750890AbdK3XjN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Nov 2017 18:39:18 -0500
-Received: by mail-it0-f66.google.com with SMTP id 68so504400ite.4
-        for <linux-kbuild@vger.kernel.org>; Thu, 30 Nov 2017 15:39:17 -0800 (PST)
+        Thu, 30 Nov 2017 18:39:13 -0500
+Received: by mail-it0-f67.google.com with SMTP id p139so522505itb.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 30 Nov 2017 15:39:13 -0800 (PST)
 From: Sami Tolvanen <samitolvanen@google.com>
-Subject: [PATCH v2 5/7] arm64: fix -m for GNU gold
-Date: Thu, 30 Nov 2017 15:39:03 -0800
-Message-Id: <20171130233905.130602-6-samitolvanen@google.com>
+Subject: [PATCH v2 2/7] arm64: keep .altinstructions and .altinstr_replacement
+Date: Thu, 30 Nov 2017 15:39:00 -0800
+Message-Id: <20171130233905.130602-3-samitolvanen@google.com>
 In-Reply-To: <20171130233905.130602-1-samitolvanen@google.com>
 References: <20171129234442.655-1-samitolvanen@google.com>
  <20171130233905.130602-1-samitolvanen@google.com>
@@ -18,42 +18,33 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Nick Desaulniers <ndesaulniers@google.com>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Nicholas Piggin <npiggin@gmail.com>
 Cc: Sami Tolvanen <samitolvanen@google.com>
 
-GNU gold supports different emulations than bfd. Use aarch64_elf64_*_vec
-instead of aarch64linux.
+Make sure the linker doesn't remove .altinstructions or
+.altinstr_replacement when CONFIG_LD_DEAD_CODE_DATA_ELIMINATION is
+enabled.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-Acked-by: Yury Norov <ynorov@caviumnetworks.com>
 ---
- arch/arm64/Makefile | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/kernel/vmlinux.lds.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index b35788c909f1..82a0df6e865e 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -64,14 +64,22 @@ KBUILD_CPPFLAGS	+= -mbig-endian
- CHECKFLAGS	+= -D__AARCH64EB__
- AS		+= -EB
- LD		+= -EB
-+ifeq ($(ld-name),gold)
-+LDFLAGS		+= -maarch64_elf64_be_vec
-+else
- LDFLAGS		+= -maarch64linuxb
-+endif
- UTS_MACHINE	:= aarch64_be
- else
- KBUILD_CPPFLAGS	+= -mlittle-endian
- CHECKFLAGS	+= -D__AARCH64EL__
- AS		+= -EL
- LD		+= -EL
-+ifeq ($(ld-name),gold)
-+LDFLAGS		+= -maarch64_elf64_le_vec
-+else
- LDFLAGS		+= -maarch64linux
-+endif
- UTS_MACHINE	:= aarch64
- endif
+diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
+index 7da3e5c366a0..15479995869c 100644
+--- a/arch/arm64/kernel/vmlinux.lds.S
++++ b/arch/arm64/kernel/vmlinux.lds.S
+@@ -138,11 +138,11 @@ SECTIONS
+ 	. = ALIGN(4);
+ 	.altinstructions : {
+ 		__alt_instructions = .;
+-		*(.altinstructions)
++		KEEP(*(.altinstructions))
+ 		__alt_instructions_end = .;
+ 	}
+ 	.altinstr_replacement : {
+-		*(.altinstr_replacement)
++		KEEP(*(.altinstr_replacement))
+ 	}
  
+ 	. = ALIGN(PAGE_SIZE);
 -- 
 2.15.0.531.g2ccb3012c9-goog
 
