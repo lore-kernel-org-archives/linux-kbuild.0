@@ -1,100 +1,138 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:44471 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751308AbdLASs7 (ORCPT
+Received: from mail-io0-f193.google.com ([209.85.223.193]:46872 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751604AbdLAVhD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Dec 2017 13:48:59 -0500
-Message-ID: <1512154058.2811.4.camel@decadent.org.uk>
-Subject: Re: [PATCH] builddeb: introduce variables for control-file
- customization
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Fri, 01 Dec 2017 18:47:38 +0000
-In-Reply-To: <20171201193433.68b25efe@md1em3qc>
-References: <20171127161345.17880-1-henning.schild@siemens.com>
-         <1512147072.2785.20.camel@decadent.org.uk>
-         <20171201193433.68b25efe@md1em3qc>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-S0VUkgi89eQlzdFBUbGo"
-Mime-Version: 1.0
+        Fri, 1 Dec 2017 16:37:03 -0500
+Received: by mail-io0-f193.google.com with SMTP id x129so12726927iod.13
+        for <linux-kbuild@vger.kernel.org>; Fri, 01 Dec 2017 13:37:03 -0800 (PST)
+From: Paul Lawrence <paullawrence@google.com>
+Subject: [PATCH v3 3/5] kasan: support alloca() poisoning
+Date: Fri,  1 Dec 2017 13:36:41 -0800
+Message-Id: <20171201213643.2506-4-paullawrence@google.com>
+In-Reply-To: <20171201213643.2506-1-paullawrence@google.com>
+References: <20171201213643.2506-1-paullawrence@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Henning Schild <henning.schild@siemens.com>
-Cc: linux-kernel@vger.kernel.org, Ben Hutchings <ben.hutchings@codethink.co.uk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, Konrad Schwarz <konrad.schwarz@siemens.com>
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Paul Lawrence <paullawrence@google.com>
 
+clang's AddressSanitizer implementation adds redzones on either side of
+alloca()ed buffers.  These redzones are 32-byte aligned and at least 32
+bytes long.
 
---=-S0VUkgi89eQlzdFBUbGo
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+__asan_alloca_poison() is passed the size and address of the allocated
+buffer, *excluding* the redzones on either side.  The left redzone will
+always be to the immediate left of this buffer; but AddressSanitizer may
+need to add padding between the end of the buffer and the right redzone.
+If there are any 8-byte chunks inside this padding, we should poison
+those too.
 
-On Fri, 2017-12-01 at 19:34 +0100, Henning Schild wrote:
-> Am Fri, 1 Dec 2017 16:51:12 +0000
-> schrieb Ben Hutchings <ben@decadent.org.uk>:
->=20
-> > On Fri, 2017-12-01 at 15:56 +0000, Henning Schild wrote:
-> > > The debian packages coming out of "make *deb-pkg" lack some critical
-> > > information in the control-files e.g. the "Depends:" field. If one
-> > > tries to install a fresh system with such a "linux-image"
-> > > debootstrap or multistrap might try to install the kernel before
-> > > its deps and the package hooks will fail. =20
-> >=20
-> > I assume you're talking about those hook scripts being run while the
-> > packages they belong to are only unpacked?  I hadn't thought about
-> > this issue, but it seems to me that those hook scripts generally
-> > ought to be fixed to handle this case properly.  Most of the packages
-> > installing hook scripts for kernel packages are not going to be
-> > dependencies of linux-image packages, so it will never be safe for
-> > them to assume their package has been fully installed.
->=20
-> Yes these hook scripts fail when installing the kernel on another
-> system. Indeed we seem to have a case where packages installed on the
-> build-machine cause install-time deps for the package.
+__asan_allocas_unpoison() is just passed the top and bottom of the
+dynamic stack area, so unpoisoning is simpler.
 
-Can you give an example?  I don't see how that would happen.
+Signed-off-by: Greg Hackmann <ghackmann@google.com>
+Signed-off-by: Paul Lawrence <paullawrence@google.com>
+---
+ mm/kasan/kasan.c       | 34 ++++++++++++++++++++++++++++++++++
+ mm/kasan/kasan.h       |  8 ++++++++
+ mm/kasan/report.c      |  4 ++++
+ scripts/Makefile.kasan |  3 ++-
+ 4 files changed, 48 insertions(+), 1 deletion(-)
 
-> In my case the build-machine is pretty minimal but i still want some of
-> that i.e. initramfs.
->=20
-> > > Different debian-based distros use different values for the missing
-> > > fields. And the values differ between distro versions as well. So
-> > > hardcoding of e.g. "Depends" is not possible. =20
-> >=20
-> > The dependencies also depend on the kernel configuration.  (And a
-> > custom kernel built with 'make deb-pkg' often won't have any
-> > dependencies outside of essential packages.)
->=20
-> In fact it does not have any at the moment, there is no essential. Or
-> maybe that is hidden in debian-magic.
-[...]
+diff --git a/mm/kasan/kasan.c b/mm/kasan/kasan.c
+index 405bba487df5..d96b36088b2f 100644
+--- a/mm/kasan/kasan.c
++++ b/mm/kasan/kasan.c
+@@ -736,6 +736,40 @@ void __asan_unpoison_stack_memory(const void *addr, size_t size)
+ }
+ EXPORT_SYMBOL(__asan_unpoison_stack_memory);
+ 
++/* Emitted by compiler to poison alloca()ed objects. */
++void __asan_alloca_poison(unsigned long addr, size_t size)
++{
++	size_t rounded_up_size = round_up(size, KASAN_SHADOW_SCALE_SIZE);
++	size_t padding_size = round_up(size, KASAN_ALLOCA_REDZONE_SIZE) -
++			rounded_up_size;
++	size_t rounded_down_size = round_down(size, KASAN_SHADOW_SCALE_SIZE);
++
++	const void *left_redzone = (const void *)(addr -
++			KASAN_ALLOCA_REDZONE_SIZE);
++	const void *right_redzone = (const void *)(addr + rounded_up_size);
++
++	WARN_ON(!IS_ALIGNED(addr, KASAN_ALLOCA_REDZONE_SIZE));
++
++	kasan_unpoison_shadow((const void *)(addr + rounded_down_size),
++			      size - rounded_down_size);
++	kasan_poison_shadow(left_redzone, KASAN_ALLOCA_REDZONE_SIZE,
++			KASAN_ALLOCA_LEFT);
++	kasan_poison_shadow(right_redzone,
++			padding_size + KASAN_ALLOCA_REDZONE_SIZE,
++			KASAN_ALLOCA_RIGHT);
++}
++EXPORT_SYMBOL(__asan_alloca_poison);
++
++/* Emitted by compiler to unpoison alloca()ed areas when the stack unwinds. */
++void __asan_allocas_unpoison(const void *stack_top, const void *stack_bottom)
++{
++	if (unlikely(!stack_top || stack_top > stack_bottom))
++		return;
++
++	kasan_unpoison_shadow(stack_top, stack_bottom - stack_top);
++}
++EXPORT_SYMBOL(__asan_allocas_unpoison);
++
+ #ifdef CONFIG_MEMORY_HOTPLUG
+ static int __meminit kasan_mem_notifier(struct notifier_block *nb,
+ 			unsigned long action, void *data)
+diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
+index c70851a9a6a4..7c0bcd1f4c0d 100644
+--- a/mm/kasan/kasan.h
++++ b/mm/kasan/kasan.h
+@@ -24,6 +24,14 @@
+ #define KASAN_STACK_PARTIAL     0xF4
+ #define KASAN_USE_AFTER_SCOPE   0xF8
+ 
++/*
++ * alloca redzone shadow values
++ */
++#define KASAN_ALLOCA_LEFT	0xCA
++#define KASAN_ALLOCA_RIGHT	0xCB
++
++#define KASAN_ALLOCA_REDZONE_SIZE	32
++
+ /* Don't break randconfig/all*config builds */
+ #ifndef KASAN_ABI_VERSION
+ #define KASAN_ABI_VERSION 1
+diff --git a/mm/kasan/report.c b/mm/kasan/report.c
+index 410c8235e671..eff12e040498 100644
+--- a/mm/kasan/report.c
++++ b/mm/kasan/report.c
+@@ -102,6 +102,10 @@ static const char *get_shadow_bug_type(struct kasan_access_info *info)
+ 	case KASAN_USE_AFTER_SCOPE:
+ 		bug_type = "use-after-scope";
+ 		break;
++	case KASAN_ALLOCA_LEFT:
++	case KASAN_ALLOCA_RIGHT:
++		bug_type = "alloca-out-of-bounds";
++		break;
+ 	}
+ 
+ 	return bug_type;
+diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+index 7c00be9216f4..b4983cf8a9d4 100644
+--- a/scripts/Makefile.kasan
++++ b/scripts/Makefile.kasan
+@@ -32,7 +32,8 @@ else
+ 	$(call cc-param,asan-globals=1) \
+ 	$(call cc-param,asan-instrumentation-with-call-threshold=$(call_threshold)) \
+ 	$(call cc-param,asan-stack=1) \
+-	$(call cc-param,asan-use-after-scope=1)
++	$(call cc-param,asan-use-after-scope=1) \
++	$(call cc-param,asan-instrument-allocas=1)
+    endif
+ 
+ endif
+-- 
+2.15.0.531.g2ccb3012c9-goog
 
-Essential packages are always installed, which means there is no need
-to declare a dependency on them (in fact it is discouraged):
-https://www.debian.org/doc/debian-policy/#dependencies
-
-Ben.
-
---=20
-Ben Hutchings
-When in doubt, use brute force. - Ken Thompson
-
---=-S0VUkgi89eQlzdFBUbGo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAloho8oACgkQ57/I7JWG
-EQllHxAAiCwOyUoU9rIR8eTcLImpn3TfjVRrX/MiHGnQ/cXr1ScIalE7JTBsWzBY
-GJhIjca1fFa2bdrf5KjqeARg4+C1vmmzwbhUsHwtjVWDqua17RrQnFgsIFQqiwyD
-9ANFqBfAl7nACR+9W+/6AJDb7K8hQuxQxkruQsDF3i7w0Kvf3yHfeWByJmv8/mCl
-2Wxl3NKQTFTsWcunTBZKvEgUCjeY5lvV3CdfT7w7C+IEt9icnBmMUUbzk5tGPlFL
-ig7dR54BQaX+6f0jiXQNh/n59dFxEvLf0l8Y7nlyueF0EjQYKy5rgRnLyVERcjQv
-DRzQ624n9k1m0b/LdVkGjSAcnp9VW2Xs0oy/gwMsRJvxQhSiLIoUhsETGwzohBCZ
-ySJPIbGTqgO0xIUDtIeUdc3eQ+4LcoDxLu4V9y6bdEFHo6TjcWWnaiS0m7fmziAD
-bopnUgqIP8hxR+b/XN2tTfQJoUJNGkINdmtA87UtyiCKn9Bc/BDdf5IG9QLNVUIt
-R7GRFgEUnOl21e8MEiFh5GHuJLJp1LglGrrcOw61gm4nLVWWQ62WeSYbPJK3qRdE
-Q5VeLFv/swzEBqRfR+H2ZdKhI3QSgSdWy2g4DYF8FCiCIwOYm7ZqphmLELOWkfOS
-u44CmXK8lY4y26R36QDQF/lJbSkzLFmtWJ+oif0519InEV6H0gc=
-=UvEY
------END PGP SIGNATURE-----
-
---=-S0VUkgi89eQlzdFBUbGo--
