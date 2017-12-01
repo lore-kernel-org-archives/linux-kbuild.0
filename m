@@ -1,39 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:42977 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751125AbdLAAgm (ORCPT
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:38124 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751661AbdLAMDe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Nov 2017 19:36:42 -0500
-Date: Fri, 1 Dec 2017 10:36:21 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 5/7] arm64: keep .altinstructions and
- .altinstr_replacement
-Message-ID: <20171201103621.366e797d@roar.ozlabs.ibm.com>
-In-Reply-To: <CAKwvOdn9TEO3G9+7DsQ+mR-nf=50Moydfvft=h_RketDZ2iODA@mail.gmail.com>
-References: <20171129234442.655-1-samitolvanen@google.com>
-        <20171129234442.655-6-samitolvanen@google.com>
-        <CAKwvOd=PcTVZaMCtY7Wy-OEi7Dd1M4hVz8mpJCQR3M+dVROdmg@mail.gmail.com>
-        <20171130115827.709f1818@roar.ozlabs.ibm.com>
-        <CAKwvOdn9TEO3G9+7DsQ+mR-nf=50Moydfvft=h_RketDZ2iODA@mail.gmail.com>
+        Fri, 1 Dec 2017 07:03:34 -0500
+Received: by mail-lf0-f67.google.com with SMTP id e137so11462983lfg.5
+        for <linux-kbuild@vger.kernel.org>; Fri, 01 Dec 2017 04:03:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com>
+References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
+ <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
+ <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
+ <CA+r1ZhgFQS6EEzazw0YZXhYqm+WN3mp69mGyaeNpX36WZLABrA@mail.gmail.com>
+ <CAK7LNARNfOzuR72U6Co0GYt7=7V4u8TmTUQAsB8R7H_5QYQ_5A@mail.gmail.com> <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com>
+From: Riku Voipio <riku.voipio@linaro.org>
+Date: Fri, 1 Dec 2017 14:03:31 +0200
+Message-ID: <CAAqcGHmG7jNvWXbG7_FTpLb4FrD5BjDfzzQMXqu7s9hvwnXUYw@mail.gmail.com>
+Subject: Re: [PATCH v3] scripts/package: snap-pkg target
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Sami Tolvanen <samitolvanen@google.com>, Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>
+To: Paolo Pisati <paolo.pisati@canonical.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Jim Davis <jim.epost@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
 
-On Thu, 30 Nov 2017 09:00:35 -0800
-Nick Desaulniers <ndesaulniers@google.com> wrote:
+On 29 November 2017 at 19:05, Paolo Pisati <paolo.pisati@canonical.com> wrote:
+> On Wed, Nov 29, 2017 at 8:33 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>>
+>> Worked for me too,
+>> after updating snapcraft.
+>>
+>>
+>> Is it really impossible to check the snapcraft version?
+>> What is the minimum version?   2.35 ?
+>
+> The minimum version is 2.35+ - what is about to become 2.36 anytime soon now.
 
-> On Wed, Nov 29, 2017 at 5:58 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
-> > (Comparing `readelf -S` before/after is a way to spot bugs.)  
-> 
-> Do you have a script that can be used to diff 2 `readelf -S`, look for
-> missing references, and report an error? Might be easier to rerun that
-> every so often and see what's missing.
+Since you are already patching snapcraft for this, why not embed the
+whole support in snapcraft? Eg something like snapcraft --kernel
+/path/to/kernel
 
-I don't, I was just doing it by hand.
+The key advantage you'll get is being able to support old kernel versions too.
 
-Thanks,
-Nick
+Riku
