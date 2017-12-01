@@ -1,24 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f45.google.com ([209.85.215.45]:46511 "EHLO
-        mail-lf0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750890AbdLAAND (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Nov 2017 19:13:03 -0500
-Received: by mail-lf0-f45.google.com with SMTP id r143so9851290lfe.13
-        for <linux-kbuild@vger.kernel.org>; Thu, 30 Nov 2017 16:13:03 -0800 (PST)
+Received: from mail.kernel.org ([198.145.29.99]:44280 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751077AbdLAAWg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 30 Nov 2017 19:22:36 -0500
+Date: Thu, 30 Nov 2017 19:22:33 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH 11/21] trace: Use -mcount-record for dynamic ftrace
+Message-ID: <20171130192233.181dad47@gandalf.local.home>
+In-Reply-To: <20171127213423.27218-12-andi@firstfloor.org>
+References: <20171127213423.27218-1-andi@firstfloor.org>
+        <20171127213423.27218-12-andi@firstfloor.org>
 MIME-Version: 1.0
-In-Reply-To: <20171130233905.130602-7-samitolvanen@google.com>
-References: <20171129234442.655-1-samitolvanen@google.com> <20171130233905.130602-1-samitolvanen@google.com>
- <20171130233905.130602-7-samitolvanen@google.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Thu, 30 Nov 2017 16:13:00 -0800
-Message-ID: <CAKwvOd=_VK6RJUdT0MbcgpLSVZAPi+38LujmP=Ce6D4YqU_pAA@mail.gmail.com>
-Subject: Re: [PATCH v2 6/7] arm64: explicitly pass --no-fix-cortex-a53-843419
- to GNU gold
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: Alex Matveev <alxmtvv@gmail.com>, Andi Kleen <ak@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Hackmann <ghackmann@google.com>, Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Yury Norov <ynorov@caviumnetworks.com>, Matthias Kaehlcke <mka@chromium.org>, Nicholas Piggin <npiggin@gmail.com>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, samitolvanen@google.com, alxmtvv@gmail.com, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
 
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+On Mon, 27 Nov 2017 13:34:13 -0800
+Andi Kleen <andi@firstfloor.org> wrote:
+
+> From: Andi Kleen <ak@linux.intel.com>
+> 
+> gcc 5 supports a new -mcount-record option to generate ftrace
+> tables directly. This avoids the need to run record_mcount
+> manually.
+> 
+> Use this option when available.
+> 
+> So far doesn't use -mcount-nop, which also exists now.
+> 
+> This is needed to make ftrace work with LTO because the
+> normal record-mcount script doesn't run over the link
+> time output.
+> 
+> It should also improve build times slightly in the general
+> case.
+> 
+> Cc: rostedt@goodmis.org
+> Signed-off-by: Andi Kleen <ak@linux.intel.com>
+> ---
+
+Hi Andi,
+
+Thanks for sending this. I'm currently trying to catch up on all the
+changes that need to get into 4.15 and will be doing a bit of
+traveling.
+
+I plan on looking at this in a week or two, and add it to the 4.16
+queue.
+
+-- Steve
