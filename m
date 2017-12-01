@@ -1,45 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:38124 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751661AbdLAMDe (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:43761 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750768AbdLAQwe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Dec 2017 07:03:34 -0500
-Received: by mail-lf0-f67.google.com with SMTP id e137so11462983lfg.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 01 Dec 2017 04:03:33 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com>
-References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
- <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
- <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
- <CA+r1ZhgFQS6EEzazw0YZXhYqm+WN3mp69mGyaeNpX36WZLABrA@mail.gmail.com>
- <CAK7LNARNfOzuR72U6Co0GYt7=7V4u8TmTUQAsB8R7H_5QYQ_5A@mail.gmail.com> <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Fri, 1 Dec 2017 14:03:31 +0200
-Message-ID: <CAAqcGHmG7jNvWXbG7_FTpLb4FrD5BjDfzzQMXqu7s9hvwnXUYw@mail.gmail.com>
-Subject: Re: [PATCH v3] scripts/package: snap-pkg target
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 1 Dec 2017 11:52:34 -0500
+Message-ID: <1512147072.2785.20.camel@decadent.org.uk>
+Subject: Re: [PATCH] builddeb: introduce variables for control-file
+ customization
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Fri, 01 Dec 2017 16:51:12 +0000
+In-Reply-To: <20171127161345.17880-1-henning.schild@siemens.com>
+References: <20171127161345.17880-1-henning.schild@siemens.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-yO7GDevilESxvTsoInc8"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paolo Pisati <paolo.pisati@canonical.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Jim Davis <jim.epost@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
+To: Henning Schild <henning.schild@siemens.com>, linux-kernel@vger.kernel.org
+Cc: Ben Hutchings <ben.hutchings@codethink.co.uk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, Konrad Schwarz <konrad.schwarz@siemens.com>
 
-On 29 November 2017 at 19:05, Paolo Pisati <paolo.pisati@canonical.com> wrote:
-> On Wed, Nov 29, 2017 at 8:33 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->>
->> Worked for me too,
->> after updating snapcraft.
->>
->>
->> Is it really impossible to check the snapcraft version?
->> What is the minimum version?   2.35 ?
->
-> The minimum version is 2.35+ - what is about to become 2.36 anytime soon now.
 
-Since you are already patching snapcraft for this, why not embed the
-whole support in snapcraft? Eg something like snapcraft --kernel
-/path/to/kernel
+--=-yO7GDevilESxvTsoInc8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The key advantage you'll get is being able to support old kernel versions too.
+On Fri, 2017-12-01 at 15:56 +0000, Henning Schild wrote:
+> The debian packages coming out of "make *deb-pkg" lack some critical
+> information in the control-files e.g. the "Depends:" field. If one
+> tries to install a fresh system with such a "linux-image" debootstrap or
+> multistrap might try to install the kernel before its deps and the
+> package hooks will fail.
 
-Riku
+I assume you're talking about those hook scripts being run while the
+packages they belong to are only unpacked?  I hadn't thought about this
+issue, but it seems to me that those hook scripts generally ought to be
+fixed to handle this case properly.  Most of the packages installing
+hook scripts for kernel packages are not going to be dependencies of
+linux-image packages, so it will never be safe for them to assume their
+package has been fully installed.
+
+> Different debian-based distros use different values for the missing
+> fields. And the values differ between distro versions as well. So
+> hardcoding of e.g. "Depends" is not possible.
+
+The dependencies also depend on the kernel configuration.  (And a
+custom kernel built with 'make deb-pkg' often won't have any
+dependencies outside of essential packages.)
+
+> This patch introduces an option variable for every debian package built
+> by builddeb. That allows advanced users to pass additional arguments to
+> "dpkg-gencontrol" e.g. to set "Depends". All the new variables are
+> optional.
+
+This customisation mechanism seems too powerful to be maintainable.=20
+There is a high risk that it would conflict with later improvements to
+builddeb, either resulting in regressions or blocking those
+improvements from being made.
+
+> for example:
+> make \
+> 	KDEB_OPTS_IMAGE=3D\
+> "-DDepends=3D'initramfs-tools | linux-initramfs-tool, kmod, linux-base'" =
+\
+[...]
+
+The maintainer scripts generated by builddeb currently don't run depmod
+or any of the script in linux-base.  So this seems like a bad example.=20
+However, the dependency on initramfs-tools is an important one that
+can't simply be inferred from the kernel configuration.
+
+So I would support adding a means to append to the Depends field
+specifically.  Appending to the Breaks field may also be useful, as new
+kernel versions may break specific utilities or user-space drivers.
+
+Ben.
+
+--=20
+Ben Hutchings
+When in doubt, use brute force. - Ken Thompson
+
+
+--=-yO7GDevilESxvTsoInc8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAlohiIAACgkQ57/I7JWG
+EQkFARAAsSagPk4c2kyB+PCBFhpteRswl0Gvy4M4xJT8bmlg1y1PQotYVkTJZE6u
+oem/SSEufduQUuu4CxyaMWuvha9iy4mTUZp5LOdoDhw0Z9t5OozvhrOy35/bQo8f
+XVTqEnl9p51cyYTDfvvAsuxuFgni+qRKCG/7R4t/q3VjmW/NWPv2tLq94KA5m4zS
+CQscdJz6Ch6eP1cYwsGMDKJKtwGOoJn9Kiiph4FdTFvIRQK9YZnpVuBgokuTWsA/
+5OXQtqsxv4fwDXNFF/cobLwaSdKVekT2Vx17AWIrP5OxJyRc8Nub5w/KoAAP+UH5
+/3FMapfFHmsTg65Lf7DVly2k0MURaW7ei7K2wcRjevXeIsA3qLT/2wb4QwGgGLzd
+ZKFMyrJIq8NLOGTRcDrDacAIguB+mts5gdzI/hThcvKnlVQF+F49uyqeTwXLLOcj
+4lRirOxnYq+cehh4qLTMqVtWXkL5Vs0K+I8DB/LYdG8nAYomxZc6+k8njeAwPRBO
+BT7OP6d7VI26a0Auz4hiWx+4BpdbSQCh/SdCL/I6CjkRSoWJ8wENtqiU0RanRTI7
+3xZ4pzjx47WP3huwyXqHXxcjTv6cWD+8ZLWT5R/49PXgS9xCvx0mH/5IjHnxnhLf
+EPiysaqp4k1tNJm/jAeDT8QtWvJmdEIfLma7GH793zzjrTJHy1o=
+=6HdX
+-----END PGP SIGNATURE-----
+
+--=-yO7GDevilESxvTsoInc8--
