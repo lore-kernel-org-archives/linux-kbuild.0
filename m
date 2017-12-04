@@ -1,70 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-he1eur01on0118.outbound.protection.outlook.com ([104.47.0.118]:15072
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+Received: from mail-eopbgr10109.outbound.protection.outlook.com ([40.107.1.109]:56889
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752908AbdLDQvp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Dec 2017 11:51:45 -0500
-Subject: Re: [PATCH v3 2/5] kasan/Makefile: Support LLVM style asan
- parameters.
+        id S1752877AbdLDQwR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 4 Dec 2017 11:52:17 -0500
+Subject: Re: [PATCH v3 3/5] kasan: support alloca() poisoning
 References: <20171201213643.2506-1-paullawrence@google.com>
- <20171201213643.2506-3-paullawrence@google.com>
- <33f13b1a-494c-67d5-a470-294867c06f9a@virtuozzo.com>
- <CAL=UVf7LO5BDWVEeLXLkrLDBxwV0aO2sLv_htkpcL_Gp7sT07Q@mail.gmail.com>
+ <20171201213643.2506-4-paullawrence@google.com>
+ <20171204164240.GA24425@infradead.org>
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <2da6480e-08ff-2444-7abf-2964de53e7ff@virtuozzo.com>
-Date: Mon, 4 Dec 2017 19:55:15 +0300
+Message-ID: <fb09a40f-1fae-ce4c-9d7c-a13c284b19e9@virtuozzo.com>
+Date: Mon, 4 Dec 2017 19:55:37 +0300
 MIME-Version: 1.0
-In-Reply-To: <CAL=UVf7LO5BDWVEeLXLkrLDBxwV0aO2sLv_htkpcL_Gp7sT07Q@mail.gmail.com>
+In-Reply-To: <20171204164240.GA24425@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Lawrence <paullawrence@google.com>
+To: Christoph Hellwig <hch@infradead.org>, Paul Lawrence <paullawrence@google.com>
 Cc: Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
 
-On 12/04/2017 07:20 PM, Paul Lawrence wrote:
 
+
+On 12/04/2017 07:42 PM, Christoph Hellwig wrote:
+> I don't think we are using alloca in kernel mode code, and we shouldn't.
+> What do I miss?  Is this hidden support for on-stack VLAs?  I thought
+> we'd get rid of them as well.
 > 
->     > +   # -fasan-shadow-offset fails without -fsanitize
->     > +   CFLAGS_KASAN_SHADOW := $(call cc-option, -fsanitize=kernel-address \
->     > +                     -fasan-shadow-offset=$(KASAN_SHADOW_OFFSET), \
->     > +                     $(call cc-option, -fsanitize=kernel-address \
->     > +                     -mllvm -asan-mapping-offset=$(KASAN_SHADOW_OFFSET)))
->     > +
->     > +   ifeq ("$(CFLAGS_KASAN_SHADOW)"," ")
-> 
->     This not how it was in my original patch. Why you changed this?
->     Condition is always false now, so it breaks kasan with 4.9.x gcc.
-> 
-> 
-> ​I had the opposite problem - CFLAGS_KASAN_SHADOW is always at least a space, and the
-> original condition would always be false, which is why I changed it.​ On investigation, I found 
-> that if the line was split it would always be a space - $(false,whatever,empty-string) would be
-> truly empty, but if the line was split after the second comma it would be one space. Is this a
-> difference in our make systems?
 
-I dunno, but it could be.
-Anyways, does the fixup bellow works for you?
-
----
- scripts/Makefile.kasan | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
-index 7c00be9216f4..d5a1a4b6d079 100644
---- a/scripts/Makefile.kasan
-+++ b/scripts/Makefile.kasan
-@@ -24,7 +24,7 @@ else
- 			$(call cc-option, -fsanitize=kernel-address \
- 			-mllvm -asan-mapping-offset=$(KASAN_SHADOW_OFFSET)))
- 
--   ifeq ("$(CFLAGS_KASAN_SHADOW)"," ")
-+   ifeq ($(strip $(CFLAGS_KASAN_SHADOW)),)
-       CFLAGS_KASAN := $(CFLAGS_KASAN_MINIMAL)
-    else
-       # Now add all the compiler specific options that are valid standalone
--- 
-2.13.6
-
-
+Yes, this is for on-stack VLA. Last time I checked, we still had a few.
