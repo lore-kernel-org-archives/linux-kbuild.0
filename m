@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:39303 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751200AbdLDTRo (ORCPT
+Received: from mail-it0-f66.google.com ([209.85.214.66]:43480 "EHLO
+        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752099AbdLDTRt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Dec 2017 14:17:44 -0500
-Received: by mail-it0-f68.google.com with SMTP id 68so9305187ite.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 04 Dec 2017 11:17:44 -0800 (PST)
+        Mon, 4 Dec 2017 14:17:49 -0500
+Received: by mail-it0-f66.google.com with SMTP id u62so15468564ita.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 04 Dec 2017 11:17:49 -0800 (PST)
 From: Paul Lawrence <paullawrence@google.com>
-Subject: [PATCH v4 1/5] kasan: add compiler support for clang
-Date: Mon,  4 Dec 2017 11:17:31 -0800
-Message-Id: <20171204191735.132544-2-paullawrence@google.com>
+Subject: [PATCH v4 4/5] kasan: Add tests for alloca poisoning
+Date: Mon,  4 Dec 2017 11:17:34 -0800
+Message-Id: <20171204191735.132544-5-paullawrence@google.com>
 In-Reply-To: <20171204191735.132544-1-paullawrence@google.com>
 References: <20171204191735.132544-1-paullawrence@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,32 +17,52 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Paul Lawrence <paullawrence@google.com>
 
-For now we can hard-code ASAN ABI level 5, since historical clang builds
-can't build the kernel anyway.  We also need to emulate gcc's
-__SANITIZE_ADDRESS__ flag, or memset() calls won't be instrumented.
-
 Signed-off-by: Greg Hackmann <ghackmann@google.com>
 Signed-off-by: Paul Lawrence <paullawrence@google.com>
 ---
- include/linux/compiler-clang.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ lib/test_kasan.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/include/linux/compiler-clang.h b/include/linux/compiler-clang.h
-index 3b609edffa8f..d02a4df3f473 100644
---- a/include/linux/compiler-clang.h
-+++ b/include/linux/compiler-clang.h
-@@ -19,3 +19,11 @@
+diff --git a/lib/test_kasan.c b/lib/test_kasan.c
+index ef1a3ac1397e..2724f86c4cef 100644
+--- a/lib/test_kasan.c
++++ b/lib/test_kasan.c
+@@ -472,6 +472,26 @@ static noinline void __init use_after_scope_test(void)
+ 	p[1023] = 1;
+ }
  
- #define randomized_struct_fields_start	struct {
- #define randomized_struct_fields_end	};
++static noinline void __init kasan_alloca_oob_left(void)
++{
++	volatile int i = 10;
++	char alloca_array[i];
++	char *p = alloca_array - 1;
 +
-+/* all clang versions usable with the kernel support KASAN ABI version 5 */
-+#define KASAN_ABI_VERSION 5
++	pr_info("out-of-bounds to left on alloca\n");
++	*(volatile char *)p;
++}
 +
-+/* emulate gcc's __SANITIZE_ADDRESS__ flag */
-+#if __has_feature(address_sanitizer)
-+#define __SANITIZE_ADDRESS__
-+#endif
++static noinline void __init kasan_alloca_oob_right(void)
++{
++	volatile int i = 10;
++	char alloca_array[i];
++	char *p = alloca_array + i;
++
++	pr_info("out-of-bounds to right on alloca\n");
++	*(volatile char *)p;
++}
++
+ static int __init kmalloc_tests_init(void)
+ {
+ 	/*
+@@ -502,6 +522,8 @@ static int __init kmalloc_tests_init(void)
+ 	memcg_accounted_kmem_cache();
+ 	kasan_stack_oob();
+ 	kasan_global_oob();
++	kasan_alloca_oob_left();
++	kasan_alloca_oob_right();
+ 	ksize_unpoisons_memory();
+ 	copy_user_test();
+ 	use_after_scope_test();
 -- 
 2.15.0.531.g2ccb3012c9-goog
 
