@@ -1,99 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from goliath.siemens.de ([192.35.17.28]:40377 "EHLO
-        goliath.siemens.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751286AbdLDQtm (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Dec 2017 11:49:42 -0500
-Date: Mon, 4 Dec 2017 17:50:08 +0100
-From: Henning Schild <henning.schild@siemens.com>
-Subject: Re: [PATCH v2] scripts: builddeb: allow customization of "Depends:"
- fields
-Message-ID: <20171204175008.5e7c4acd@md1em3qc>
-In-Reply-To: <20171204164808.25492-1-henning.schild@siemens.com>
-References: <20171127161345.17880-1-henning.schild@siemens.com>
-        <20171204164808.25492-1-henning.schild@siemens.com>
+Received: from mail-he1eur01on0118.outbound.protection.outlook.com ([104.47.0.118]:15072
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752908AbdLDQvp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 4 Dec 2017 11:51:45 -0500
+Subject: Re: [PATCH v3 2/5] kasan/Makefile: Support LLVM style asan
+ parameters.
+References: <20171201213643.2506-1-paullawrence@google.com>
+ <20171201213643.2506-3-paullawrence@google.com>
+ <33f13b1a-494c-67d5-a470-294867c06f9a@virtuozzo.com>
+ <CAL=UVf7LO5BDWVEeLXLkrLDBxwV0aO2sLv_htkpcL_Gp7sT07Q@mail.gmail.com>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Message-ID: <2da6480e-08ff-2444-7abf-2964de53e7ff@virtuozzo.com>
+Date: Mon, 4 Dec 2017 19:55:15 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAL=UVf7LO5BDWVEeLXLkrLDBxwV0aO2sLv_htkpcL_Gp7sT07Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Konrad Schwarz <konrad.schwarz@siemens.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jim Davis <jim.epost@gmail.com>
+To: Paul Lawrence <paullawrence@google.com>
+Cc: Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
 
-Hi,
+On 12/04/2017 07:20 PM, Paul Lawrence wrote:
 
-this is a simpler version that allows just the customization of
-"Depends:", as requested by Ben.
-
-It addresses the security issues Jim mentioned by not using eval
-anymore.
-
-Henning
-
-Am Mon, 4 Dec 2017 17:48:08 +0100
-schrieb Henning Schild <henning.schild@siemens.com>:
-
-> The debian packages coming out of "make *deb-pkg" lack the "Depends:"
-> field. If one tries to install a fresh system with such a
-> "linux-image" debootstrap or multistrap might try to install the
-> kernel before its deps and the package hooks will fail.
 > 
-> Different debian-based distros use different values for the missing
-> fields. And the values differ between distro versions as well. So
-> hardcoding is not possible.
+>     > +   # -fasan-shadow-offset fails without -fsanitize
+>     > +   CFLAGS_KASAN_SHADOW := $(call cc-option, -fsanitize=kernel-address \
+>     > +                     -fasan-shadow-offset=$(KASAN_SHADOW_OFFSET), \
+>     > +                     $(call cc-option, -fsanitize=kernel-address \
+>     > +                     -mllvm -asan-mapping-offset=$(KASAN_SHADOW_OFFSET)))
+>     > +
+>     > +   ifeq ("$(CFLAGS_KASAN_SHADOW)"," ")
 > 
-> This patch introduces an option variable for every debian package
-> built by builddeb. That allows advanced users to specify additional
-> dependencies for all packages. All the new variables are optional.
+>     This not how it was in my original patch. Why you changed this?
+>     Condition is always false now, so it breaks kasan with 4.9.x gcc.
 > 
-> Signed-off-by: Henning Schild <henning.schild@siemens.com>
-> ---
->  scripts/package/builddeb | 5 +++++
->  1 file changed, 5 insertions(+)
 > 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index b4f0f2b3f8d2..079bd4c4aea9 100755
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -288,6 +288,7 @@ if [ "$ARCH" = "um" ]; then
->  
->  Package: $packagename
->  Architecture: any
-> +Depends: $KDEB_DEP_IMAGE
->  Description: User Mode Linux kernel, version $version
->   User-mode Linux is a port of the Linux kernel to its own system call
->   interface.  It provides a kind of virtual machine, which runs Linux
-> @@ -304,6 +305,7 @@ else
->  
->  Package: $packagename
->  Architecture: any
-> +Depends: $KDEB_DEP_IMAGE
->  Description: Linux kernel, version $version
->   This package contains the Linux kernel, modules and corresponding
-> other files, version: $version.
-> @@ -335,6 +337,7 @@ cat <<EOF >> debian/control
->  
->  Package: $kernel_headers_packagename
->  Architecture: any
-> +Depends: $KDEB_DEP_IMAGE_HEADERS
->  Description: Linux kernel headers for $KERNELRELEASE on
-> \${kernel:debarch} This package provides kernel header files for
-> $KERNELRELEASE on \${kernel:debarch} .
-> @@ -347,6 +350,7 @@ Package: $libc_headers_packagename
->  Section: devel
->  Provides: linux-kernel-headers
->  Architecture: any
-> +Depends: $KDEB_DEP_LIBC_HEADERS
->  Description: Linux support headers for userspace development
->   This package provides userspaces headers from the Linux kernel.
-> These headers are used by the installed headers for GNU glibc and
-> other system libraries. @@ -375,6 +379,7 @@ if [ -n "$BUILD_DEBUG"
-> ] ; then 
->  Package: $dbg_packagename
->  Section: debug
-> +Depends: $KDEB_DEP_IMAGE_DBG
->  Architecture: any
->  Description: Linux kernel debugging symbols for $version
->   This package will come in handy if you need to debug the kernel. It
-> provides
+> ​I had the opposite problem - CFLAGS_KASAN_SHADOW is always at least a space, and the
+> original condition would always be false, which is why I changed it.​ On investigation, I found 
+> that if the line was split it would always be a space - $(false,whatever,empty-string) would be
+> truly empty, but if the line was split after the second comma it would be one space. Is this a
+> difference in our make systems?
+
+I dunno, but it could be.
+Anyways, does the fixup bellow works for you?
+
+---
+ scripts/Makefile.kasan | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+index 7c00be9216f4..d5a1a4b6d079 100644
+--- a/scripts/Makefile.kasan
++++ b/scripts/Makefile.kasan
+@@ -24,7 +24,7 @@ else
+ 			$(call cc-option, -fsanitize=kernel-address \
+ 			-mllvm -asan-mapping-offset=$(KASAN_SHADOW_OFFSET)))
+ 
+-   ifeq ("$(CFLAGS_KASAN_SHADOW)"," ")
++   ifeq ($(strip $(CFLAGS_KASAN_SHADOW)),)
+       CFLAGS_KASAN := $(CFLAGS_KASAN_MINIMAL)
+    else
+       # Now add all the compiler specific options that are valid standalone
+-- 
+2.13.6
+
 
