@@ -1,25 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:34994 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752674AbdLDQmn (ORCPT
+Received: from goliath.siemens.de ([192.35.17.28]:39282 "EHLO
+        goliath.siemens.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751066AbdLDQrr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Dec 2017 11:42:43 -0500
-Date: Mon, 4 Dec 2017 08:42:40 -0800
-From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v3 3/5] kasan: support alloca() poisoning
-Message-ID: <20171204164240.GA24425@infradead.org>
-References: <20171201213643.2506-1-paullawrence@google.com>
- <20171201213643.2506-4-paullawrence@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171201213643.2506-4-paullawrence@google.com>
+        Mon, 4 Dec 2017 11:47:47 -0500
+From: Henning Schild <henning.schild@siemens.com>
+Subject: [PATCH v2] scripts: builddeb: allow customization of "Depends:" fields
+Date: Mon,  4 Dec 2017 17:48:08 +0100
+Message-Id: <20171204164808.25492-1-henning.schild@siemens.com>
+In-Reply-To: <20171127161345.17880-1-henning.schild@siemens.com>
+References: <20171127161345.17880-1-henning.schild@siemens.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Lawrence <paullawrence@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
+To: Ben Hutchings <ben@decadent.org.uk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Konrad Schwarz <konrad.schwarz@siemens.com>, Henning Schild <henning.schild@siemens.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jim Davis <jim.epost@gmail.com>
 
-I don't think we are using alloca in kernel mode code, and we shouldn't.
-What do I miss?  Is this hidden support for on-stack VLAs?  I thought
-we'd get rid of them as well.
+The debian packages coming out of "make *deb-pkg" lack the "Depends:"
+field. If one tries to install a fresh system with such a "linux-image"
+debootstrap or multistrap might try to install the kernel before its
+deps and the package hooks will fail.
+
+Different debian-based distros use different values for the missing
+fields. And the values differ between distro versions as well. So
+hardcoding is not possible.
+
+This patch introduces an option variable for every debian package built
+by builddeb. That allows advanced users to specify additional
+dependencies for all packages. All the new variables are optional.
+
+Signed-off-by: Henning Schild <henning.schild@siemens.com>
+---
+ scripts/package/builddeb | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index b4f0f2b3f8d2..079bd4c4aea9 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -288,6 +288,7 @@ if [ "$ARCH" = "um" ]; then
+ 
+ Package: $packagename
+ Architecture: any
++Depends: $KDEB_DEP_IMAGE
+ Description: User Mode Linux kernel, version $version
+  User-mode Linux is a port of the Linux kernel to its own system call
+  interface.  It provides a kind of virtual machine, which runs Linux
+@@ -304,6 +305,7 @@ else
+ 
+ Package: $packagename
+ Architecture: any
++Depends: $KDEB_DEP_IMAGE
+ Description: Linux kernel, version $version
+  This package contains the Linux kernel, modules and corresponding other
+  files, version: $version.
+@@ -335,6 +337,7 @@ cat <<EOF >> debian/control
+ 
+ Package: $kernel_headers_packagename
+ Architecture: any
++Depends: $KDEB_DEP_IMAGE_HEADERS
+ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
+  This package provides kernel header files for $KERNELRELEASE on \${kernel:debarch}
+  .
+@@ -347,6 +350,7 @@ Package: $libc_headers_packagename
+ Section: devel
+ Provides: linux-kernel-headers
+ Architecture: any
++Depends: $KDEB_DEP_LIBC_HEADERS
+ Description: Linux support headers for userspace development
+  This package provides userspaces headers from the Linux kernel.  These headers
+  are used by the installed headers for GNU glibc and other system libraries.
+@@ -375,6 +379,7 @@ if [ -n "$BUILD_DEBUG" ] ; then
+ 
+ Package: $dbg_packagename
+ Section: debug
++Depends: $KDEB_DEP_IMAGE_DBG
+ Architecture: any
+ Description: Linux kernel debugging symbols for $version
+  This package will come in handy if you need to debug the kernel. It provides
+-- 
+2.13.6
 
