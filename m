@@ -1,74 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr20110.outbound.protection.outlook.com ([40.107.2.110]:54284
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753144AbdLDRF6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Dec 2017 12:05:58 -0500
-Subject: Re: [PATCH v3 3/5] kasan: support alloca() poisoning
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-References: <20171201213643.2506-1-paullawrence@google.com>
- <20171201213643.2506-4-paullawrence@google.com>
- <20171204164240.GA24425@infradead.org>
- <fb09a40f-1fae-ce4c-9d7c-a13c284b19e9@virtuozzo.com>
-Message-ID: <e85d8503-b149-b90f-7737-684e8122d95b@virtuozzo.com>
-Date: Mon, 4 Dec 2017 20:09:25 +0300
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:45876 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751754AbdLDReF (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 4 Dec 2017 12:34:05 -0500
+Received: by mail-lf0-f65.google.com with SMTP id f13so20039088lff.12
+        for <linux-kbuild@vger.kernel.org>; Mon, 04 Dec 2017 09:34:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <fb09a40f-1fae-ce4c-9d7c-a13c284b19e9@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20171116225434.691af6cf@delmar.localdomain>
+References: <20171115213428.22559-1-samitolvanen@google.com>
+ <20171115213428.22559-12-samitolvanen@google.com> <20171116115433.GG9361@arm.com>
+ <20171116130742.wijnukjetoupi4hc@yury-thinkpad> <c0c19191-e090-4768-3c46-b813713d2908@arm.com>
+ <20171116212920.wixsxoccznyef4aq@yury-thinkpad> <20171116225434.691af6cf@delmar.localdomain>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 4 Dec 2017 09:34:02 -0800
+Message-ID: <CAKwvOd=c1cWS+2Lq27DXhy3hs1WvXLcSF3zMRszoGamXTtsnfA@mail.gmail.com>
+Subject: Re: [PATCH v2 11/18] arm64: make mrs_s and msr_s macros work with LTO
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@infradead.org>, Paul Lawrence <paullawrence@google.com>
-Cc: Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
+To: Alex Matveev <alxmtvv@gmail.com>
+Cc: Yury Norov <ynorov@caviumnetworks.com>, Robin Murphy <robin.murphy@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, Andi Kleen <ak@linux.intel.com>, Kees Cook <keescook@chromium.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Sami Tolvanen <samitolvanen@google.com>, Matthias Kaehlcke <mka@chromium.org>, linux-arm-kernel@lists.infradead.org, Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>
 
+On Thu, Nov 16, 2017 at 2:54 PM, Alex Matveev <alxmtvv@gmail.com> wrote:
+> On Fri, 17 Nov 2017 00:29:20 +0300
+> Yury Norov <ynorov@caviumnetworks.com> wrote:
+>
+>> On Thu, Nov 16, 2017 at 01:55:31PM +0000, Robin Murphy wrote:
+>> > Given that this whole mrs_s infrastructure is a workaround for older
+>> > assemblers which don't support the "S<op0>_<op1>_<Cn>_<Cm>_<op2>"
+>> > syntax for arbitrary unnamed system registers (which IIRC was a
+>> > fairly late addition to the architecture), the only way it could be
+>> > "fixed" on the toolchain side is by removing all those older
+>> > toolchains from existence. Good luck with that ;)
+> commit 72c583951526
+> Author: Catalin Marinas <catalin.marinas@arm.com>
+> Date:   Thu Jul 24 14:14:42 2014 +0100
+>
+>     arm64: gicv3: Allow GICv3 compilation with older binutils
+>
+>     GICv3 introduces new system registers accessible with the full
+>     msr/mrs syntax (e.g. mrs x0, Sop0_op1_CRm_CRn_op2). However, only
+>     recent binutils understand the new syntax. This patch introduces
+>     msr_s/mrs_s assembly macros which generate the equivalent
+>     instructions above and converts the existing GICv3 code (both
+>     drivers/irqchip/ and arch/arm64/kernel/).
+>
+> The question is - is it OK to drop compatibility with old versions of
+> binutils (which were already "older" back in 2014)? It's not my call to
+> make. If yes, then it should be possible to make this change more
+> aesthetic by reverting to "S<op>" (however, it will affect more places
+> as now some users of register definitions expect them to be numbers, not
+> "S<op>" strings).
 
-
-On 12/04/2017 07:55 PM, Andrey Ryabinin wrote:
-> 
-> 
-> On 12/04/2017 07:42 PM, Christoph Hellwig wrote:
->> I don't think we are using alloca in kernel mode code, and we shouldn't.
->> What do I miss?  Is this hidden support for on-stack VLAs?  I thought
->> we'd get rid of them as well.
->>
-> 
-> Yes, this is for on-stack VLA. Last time I checked, we still had a few.
-> 
-
-E.g. building with -Wvla:
-
-
-/home/andrew/linux/sound/core/pcm_native.c: In function ‘constrain_params_by_rules’:
-/home/andrew/linux/sound/core/pcm_native.c:326:2: warning: ISO C90 forbids variable length array ‘rstamps’ [-Wvla]
-  unsigned int rstamps[constrs->rules_num];
-  ^~~~~~~~
-In file included from /home/andrew/linux/crypto/cbc.c:14:0:
-/home/andrew/linux/include/crypto/cbc.h: In function ‘crypto_cbc_decrypt_inplace’:
-/home/andrew/linux/include/crypto/cbc.h:116:2: warning: ISO C90 forbids variable length array ‘last_iv’ [-Wvla]
-  u8 last_iv[bsize];
-  ^~
-/home/andrew/linux/crypto/pcbc.c: In function ‘crypto_pcbc_encrypt_inplace’:
-/home/andrew/linux/crypto/pcbc.c:75:2: warning: ISO C90 forbids variable length array ‘tmpbuf’ [-Wvla]
-  u8 tmpbuf[bsize];
-  ^~
-/home/andrew/linux/crypto/pcbc.c: In function ‘crypto_pcbc_decrypt_inplace’:
-/home/andrew/linux/crypto/pcbc.c:147:2: warning: ISO C90 forbids variable length array ‘tmpbuf’ [-Wvla]
-  u8 tmpbuf[bsize] __aligned(__alignof__(u32));
-  ^~
-/home/andrew/linux/crypto/cts.c: In function ‘cts_cbc_encrypt’:
-/home/andrew/linux/crypto/cts.c:107:2: warning: ISO C90 forbids variable length array ‘d’ [-Wvla]
-  u8 d[bsize * 2] __aligned(__alignof__(u32));
-  ^~
-/home/andrew/linux/crypto/cts.c: In function ‘cts_cbc_decrypt’:
-/home/andrew/linux/crypto/cts.c:186:2: warning: ISO C90 forbids variable length array ‘d’ [-Wvla]
-  u8 d[bsize * 2] __aligned(__alignof__(u32));
-  ^~
-/home/andrew/linux/crypto/ctr.c: In function ‘crypto_ctr_crypt_final’:
-/home/andrew/linux/crypto/ctr.c:61:2: warning: ISO C90 forbids variable length array ‘tmp’ [-Wvla]
-  u8 tmp[bsize + alignmask];
-  ^~
-/home/andrew/linux/crypto/ctr.c: In function ‘crypto_ctr_crypt_inplace’:
-/home/andrew/linux/crypto/ctr.c:109:2: warning: ISO C90 forbids variable length array ‘tmp’ [-Wvla]
-  u8 tmp[bsize + alignmask];
-
+I don't think we found a resolution to the compatibility question
+posed.  Given that the affected file is only in use for arm64, I think
+the arm64 maintainers should make the call.  I encourage them to drop
+support for old toolchains; the use of ld-version macros can help warn
+users using old toolchains on newer kernel versions.
