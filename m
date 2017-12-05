@@ -1,52 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f42.google.com ([209.85.214.42]:38430 "EHLO
-        mail-it0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751066AbdLEVXs (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.13]:61517 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751937AbdLEVxS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Dec 2017 16:23:48 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAMsH0TSaQ02dZOWSPj88tkC5G4bWe7hOOeOgUVOCasz4GRyRbQ@mail.gmail.com>
-References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
- <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
- <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
- <CA+r1ZhgFQS6EEzazw0YZXhYqm+WN3mp69mGyaeNpX36WZLABrA@mail.gmail.com>
- <CAK7LNARNfOzuR72U6Co0GYt7=7V4u8TmTUQAsB8R7H_5QYQ_5A@mail.gmail.com>
- <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com>
- <CA+r1Zhj6H8+g_F+caPvWrCouPk-Cib62wACG+uH=s3_Ato_qhQ@mail.gmail.com> <CAMsH0TSaQ02dZOWSPj88tkC5G4bWe7hOOeOgUVOCasz4GRyRbQ@mail.gmail.com>
-From: Jim Davis <jim.epost@gmail.com>
-Date: Tue, 5 Dec 2017 14:23:46 -0700
-Message-ID: <CA+r1ZhjW+OeTnCkffjMfoORx63h8PTNW91HVyvbqVWCpud0UiQ@mail.gmail.com>
-Subject: Re: [PATCH v3] scripts/package: snap-pkg target
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 5 Dec 2017 16:53:18 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] string.h: work around for increased stack usage
+Date: Tue,  5 Dec 2017 22:51:19 +0100
+Message-Id: <20171205215143.3085755-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paolo Pisati <paolo.pisati@canonical.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Kees Cook <keescook@chromium.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org, kasan-dev@googlegroups.com, Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, stable@vger.kernel.org, Daniel Micay <danielmicay@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Martin Wilck <mwilck@suse.com>, Dan Williams <dan.j.williams@intel.com>, linux-kernel@vger.kernel.org
 
-On Tue, Dec 5, 2017 at 4:43 AM, Paolo Pisati <paolo.pisati@canonical.com> wrote:
+The hardened strlen() function causes rather large stack usage in at
+least one file in the kernel, in particular when CONFIG_KASAN is enabled:
 
->> I noticed that if I tried to make snap-pkg with the O=/some/dir option
->> the tar step failed but the rest of the build continued, and seems to
->> have finished successfully.  Should the snap-pkg target stop after a
->> tar failure?
->
-> That is weird, how did you do that?
+drivers/media/usb/em28xx/em28xx-dvb.c: In function 'em28xx_dvb_init':
+drivers/media/usb/em28xx/em28xx-dvb.c:2062:1: error: the frame size of 3256 bytes is larger than 204 bytes [-Werror=frame-larger-than=]
 
-make O=/some/dir defconfig (or your-config-of-choice)
-make O=/some/dir snap-pkg
+Analyzing this problem led to the discovery that gcc fails to merge the
+stack slots for the i2c_board_info[] structures after we strlcpy() into
+them, due to the 'noreturn' attribute on the source string length check.
 
-The snap-pkg target is calling the src_tar command, which bails when
-$(objtree) isn't $(srctree).
+I reported this as a gcc bug, but it is unlikely to get fixed for gcc-8,
+since it is relatively easy to work around, and it gets triggered rarely.
+An earlier workaround I did added an empty inline assembly statement
+before the call to fortify_panic(), which works surprisingly well,
+but is really ugly and unintuitive.
 
-Is $(objtree) = $(srctree) a necessary restriction with snap builds?
-It's a restriction for rpm builds for some reason or another, but I
-thought that was just a peculiarity of the rpm build process.  If the
-snap's tarball could be built without using src_tar, like the buildtar
-script does, then Bob's your uncle.
+This is a new approach to the same problem, this time addressing it by
+not calling the 'extern __real_strnlen()' function for string constants
+where __builtin_strlen() is a compile-time constant and therefore known
+to be safe. We do this by checking if the last character in the string
+is a compile-time constant '\0'. If it is, we can assume that
+strlen() of the string is also constant. As a side-effect, this should
+also improve the object code output for any other call of strlen()
+on a string constant.
 
-Though if the source tree is an essential part of the snap build then
-perhaps the build should just exit if the tarball can't be generated
-for whatever reason, including users doing weird things :)
+Cc: stable@vger.kernel.org
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82365
+Link: https://patchwork.kernel.org/patch/9980413/
+Link: https://patchwork.kernel.org/patch/9974047/
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+v3: don't use an asm barrier but use a constant string change.
 
+Aside from two other patches for drivers/media that I sent last week,
+this should fix all stack frames above 2KB, once all three are merged,
+I'll send the patch to re-enable the warning.
+---
+ include/linux/string.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/string.h b/include/linux/string.h
+index 410ecf17de3c..e5cc3f27f6e0 100644
+--- a/include/linux/string.h
++++ b/include/linux/string.h
+@@ -259,7 +259,8 @@ __FORTIFY_INLINE __kernel_size_t strlen(const char *p)
+ {
+ 	__kernel_size_t ret;
+ 	size_t p_size = __builtin_object_size(p, 0);
+-	if (p_size == (size_t)-1)
++	if (p_size == (size_t)-1 ||
++	    (__builtin_constant_p(p[p_size - 1]) && p[p_size - 1] == '\0'))
+ 		return __builtin_strlen(p);
+ 	ret = strnlen(p, p_size);
+ 	if (p_size <= ret)
 -- 
-Jim
+2.9.0
+
