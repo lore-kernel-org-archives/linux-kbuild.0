@@ -1,103 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.134]:52496 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752151AbdLEQHe (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Dec 2017 11:07:34 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 2/2] [RFC] disable -Wattribute-alias warning for SYSCALL_DEFINEx()
-Date: Tue,  5 Dec 2017 17:06:31 +0100
-Message-Id: <20171205160651.2920270-1-arnd@arndb.de>
-In-Reply-To: <20171205153259.2522368-1-arnd@arndb.de>
-References: <20171205153259.2522368-1-arnd@arndb.de>
+Received: from mail-he1eur01on0131.outbound.protection.outlook.com ([104.47.0.131]:17082
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752520AbdLEQcX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 5 Dec 2017 11:32:23 -0500
+Subject: Re: [PATCH v4 1/5] kasan: add compiler support for clang
+References: <20171204191735.132544-1-paullawrence@google.com>
+ <20171204191735.132544-2-paullawrence@google.com>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Message-ID: <5e96ec6f-214a-b623-eb1e-c50d91ba4819@virtuozzo.com>
+Date: Tue, 5 Dec 2017 19:35:51 +0300
+MIME-Version: 1.0
+In-Reply-To: <20171204191735.132544-2-paullawrence@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Douglas Anderson <dianders@chromium.org>, Al Viro <viro@zeniv.linux.org.uk>, Heiko Carstens <heiko.carstens@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Deepa Dinamani <deepa.kernel@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Frederic Weisbecker <fweisbec@gmail.com>, Stephan Mueller <smueller@chronox.de>, "David S. Miller" <davem@davemloft.net>, Yonghong Song <yhs@fb.com>, Thomas Garnier <thgarnie@google.com>, David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org
+To: Paul Lawrence <paullawrence@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
 
-gcc-8 warns for every single definition of a system call entry
-point, e.g.:
 
-include/linux/compat.h:56:18: error: 'compat_sys_rt_sigprocmask' alias between functions of incompatible types 'long int(int,  compat_sigset_t *, compat_sigset_t *, compat_size_t)' {aka 'long int(int,  struct <anonymous> *, struct <anonymous> *, unsigned int)'} and 'long int(long int,  long int,  long int,  long int)' [-Werror=attribute-alias]
-  asmlinkage long compat_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))\
-                  ^~~~~~~~~~
-include/linux/compat.h:45:2: note: in expansion of macro 'COMPAT_SYSCALL_DEFINEx'
-  COMPAT_SYSCALL_DEFINEx(4, _##name, __VA_ARGS__)
-  ^~~~~~~~~~~~~~~~~~~~~~
-kernel/signal.c:2601:1: note: in expansion of macro 'COMPAT_SYSCALL_DEFINE4'
- COMPAT_SYSCALL_DEFINE4(rt_sigprocmask, int, how, compat_sigset_t __user *, nset,
- ^~~~~~~~~~~~~~~~~~~~~~
-include/linux/compat.h:60:18: note: aliased declaration here
-  asmlinkage long compat_SyS##name(__MAP(x,__SC_LONG,__VA_ARGS__))\
-                  ^~~~~~~~~~
 
-The new warning seems reasonable in principle, but it doesn't
-help us here, since we rely on the type mismatch to sanitize the
-system call arguments. After I reported this as GCC PR82435, a new
--Wno-attribute-alias option was added that could be used to turn the
-warning off globally on the command line, but I'd prefer to do it a
-little more fine-grained.
+On 12/04/2017 10:17 PM, Paul Lawrence wrote:
+> For now we can hard-code ASAN ABI level 5, since historical clang builds
+> can't build the kernel anyway.  We also need to emulate gcc's
+> __SANITIZE_ADDRESS__ flag, or memset() calls won't be instrumented.
+> 
+> Signed-off-by: Greg Hackmann <ghackmann@google.com>
+> Signed-off-by: Paul Lawrence <paullawrence@google.com>
+> ---
 
-Interestingly, turning a warning off and on again inside of
-a single macro doesn't always work, in this case I had to add
-an extra statement inbetween and decided to copy the __SC_TEST
-one from the native syscall to the compat syscall macro.  See
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83256 for more details
-about this.
-
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82435
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- include/linux/compat.h   | 7 ++++++-
- include/linux/syscalls.h | 3 +++
- 2 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/compat.h b/include/linux/compat.h
-index 1165036d091f..27b4a429df77 100644
---- a/include/linux/compat.h
-+++ b/include/linux/compat.h
-@@ -49,14 +49,19 @@
- 	COMPAT_SYSCALL_DEFINEx(6, _##name, __VA_ARGS__)
- 
- #define COMPAT_SYSCALL_DEFINEx(x, name, ...)				\
-+	__diag_push();							\
-+	__diag_ignore(GCC_8, "-Wattribute-alias");			\
- 	asmlinkage long compat_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))\
- 		__attribute__((alias(__stringify(compat_SyS##name))));  \
- 	static inline long C_SYSC##name(__MAP(x,__SC_DECL,__VA_ARGS__));\
- 	asmlinkage long compat_SyS##name(__MAP(x,__SC_LONG,__VA_ARGS__));\
- 	asmlinkage long compat_SyS##name(__MAP(x,__SC_LONG,__VA_ARGS__))\
- 	{								\
--		return C_SYSC##name(__MAP(x,__SC_DELOUSE,__VA_ARGS__));	\
-+		long ret = C_SYSC##name(__MAP(x,__SC_DELOUSE,__VA_ARGS__));\
-+		__MAP(x,__SC_TEST,__VA_ARGS__);				\
-+		return ret;						\
- 	}								\
-+	__diag_pop();							\
- 	static inline long C_SYSC##name(__MAP(x,__SC_DECL,__VA_ARGS__))
- 
- #ifdef CONFIG_COMPAT
-diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index 4df16a70b0d7..dcf6ceabda44 100644
---- a/include/linux/syscalls.h
-+++ b/include/linux/syscalls.h
-@@ -208,6 +208,8 @@ static inline int is_syscall_trace_event(struct trace_event_call *tp_event)
- 
- #define __PROTECT(...) asmlinkage_protect(__VA_ARGS__)
- #define __SYSCALL_DEFINEx(x, name, ...)					\
-+	__diag_push();							\
-+	__diag_ignore(GCC_8, "-Wattribute-alias");			\
- 	asmlinkage long sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))	\
- 		__attribute__((alias(__stringify(SyS##name))));		\
- 	static inline long SYSC##name(__MAP(x,__SC_DECL,__VA_ARGS__));	\
-@@ -219,6 +221,7 @@ static inline int is_syscall_trace_event(struct trace_event_call *tp_event)
- 		__PROTECT(x, ret,__MAP(x,__SC_ARGS,__VA_ARGS__));	\
- 		return ret;						\
- 	}								\
-+	__diag_pop();							\
- 	static inline long SYSC##name(__MAP(x,__SC_DECL,__VA_ARGS__))
- 
- /*
--- 
-2.9.0
-
+Acked-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
