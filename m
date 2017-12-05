@@ -1,174 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.24]:63860 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.134]:52496 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752754AbdLEPdi (ORCPT
+        with ESMTP id S1752151AbdLEQHe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Dec 2017 10:33:38 -0500
+        Tue, 5 Dec 2017 11:07:34 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 1/2] [RFC] kbuild: add macro for controlling warnings to linux/compiler.h
-Date: Tue,  5 Dec 2017 16:32:30 +0100
-Message-Id: <20171205153259.2522368-1-arnd@arndb.de>
+Subject: [PATCH 2/2] [RFC] disable -Wattribute-alias warning for SYSCALL_DEFINEx()
+Date: Tue,  5 Dec 2017 17:06:31 +0100
+Message-Id: <20171205160651.2920270-1-arnd@arndb.de>
+In-Reply-To: <20171205153259.2522368-1-arnd@arndb.de>
+References: <20171205153259.2522368-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Douglas Anderson <dianders@chromium.org>, Al Viro <viro@zeniv.linux.org.uk>, Heiko Carstens <heiko.carstens@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Gideon Israel Dsouza <gidisrael@gmail.com>, linux-kernel@vger.kernel.org
+Cc: Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Douglas Anderson <dianders@chromium.org>, Al Viro <viro@zeniv.linux.org.uk>, Heiko Carstens <heiko.carstens@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Deepa Dinamani <deepa.kernel@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Frederic Weisbecker <fweisbec@gmail.com>, Stephan Mueller <smueller@chronox.de>, "David S. Miller" <davem@davemloft.net>, Yonghong Song <yhs@fb.com>, Thomas Garnier <thgarnie@google.com>, David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org
 
-I have occasionally run into a situation where it would make sense to
-control a compiler warning from a source file rather than doing so from
-a Makefile using the $(cc-disable-warning, ...) or $(cc-option, ...)
-helpers.
+gcc-8 warns for every single definition of a system call entry
+point, e.g.:
 
-The approach here is similar to what glibc uses, using __diag() and
-related macros to encapsulate a _Pragma("GCC diagnostic ...") statement
-that gets turned into the respective "#pragma GCC diagnostic ..." by
-the preprocessor when the macro gets expanded.
+include/linux/compat.h:56:18: error: 'compat_sys_rt_sigprocmask' alias between functions of incompatible types 'long int(int,  compat_sigset_t *, compat_sigset_t *, compat_size_t)' {aka 'long int(int,  struct <anonymous> *, struct <anonymous> *, unsigned int)'} and 'long int(long int,  long int,  long int,  long int)' [-Werror=attribute-alias]
+  asmlinkage long compat_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))\
+                  ^~~~~~~~~~
+include/linux/compat.h:45:2: note: in expansion of macro 'COMPAT_SYSCALL_DEFINEx'
+  COMPAT_SYSCALL_DEFINEx(4, _##name, __VA_ARGS__)
+  ^~~~~~~~~~~~~~~~~~~~~~
+kernel/signal.c:2601:1: note: in expansion of macro 'COMPAT_SYSCALL_DEFINE4'
+ COMPAT_SYSCALL_DEFINE4(rt_sigprocmask, int, how, compat_sigset_t __user *, nset,
+ ^~~~~~~~~~~~~~~~~~~~~~
+include/linux/compat.h:60:18: note: aliased declaration here
+  asmlinkage long compat_SyS##name(__MAP(x,__SC_LONG,__VA_ARGS__))\
+                  ^~~~~~~~~~
 
-Like glibc, I also have an argument to pass the affected compiler
-version, but decided to actually evaluate that one. For now, this
-supports GCC_4_6, GCC_4_7, GCC_4_8, GCC_4_9, GCC_5, GCC_6, GCC_7,
-GCC_8 and GCC_9. Adding support for CLANG_5 and other interesting
-versions is straightforward here. GNU compilers starting with gcc-4.2
-could support it in principle, but "#pragma GCC diagnostic push"
-was only added in gcc-4.6, so it seems simpler to not deal with those
-at all. The same versions show a large number of warnings already,
-so it seems easier to just leave it at that and not do a more
-fine-grained control for them.
+The new warning seems reasonable in principle, but it doesn't
+help us here, since we rely on the type mismatch to sanitize the
+system call arguments. After I reported this as GCC PR82435, a new
+-Wno-attribute-alias option was added that could be used to turn the
+warning off globally on the command line, but I'd prefer to do it a
+little more fine-grained.
 
-The use cases I found so far include:
+Interestingly, turning a warning off and on again inside of
+a single macro doesn't always work, in this case I had to add
+an extra statement inbetween and decided to copy the __SC_TEST
+one from the native syscall to the compat syscall macro.  See
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83256 for more details
+about this.
 
-- turning off the gcc-8 -Wattribute-alias warning inside of the
-  SYSCALL_DEFINEx() macro without having to do it globally.
-
-- Reducing the build time for a simple re-make after a change,
-  once we move the warnings from ./Makefile and
-  ./scripts/Makefile.extrawarn into linux/compiler.h
-
-- More control over the warnings based on other configurations,
-  using preprocessor syntax instead of Makefile syntax. This should make
-  it easier for the average developer to understand and change things.
-
-- Adding an easy way to turn the W=1 option on unconditionally
-  for a subdirectory or a specific file. This has been requested
-  by several developers in the past that want to have their subsystems
-  W=1 clean.
-
-- Integrating clang better into the build systems. Clang supports
-  more warnings than GCC, and we probably want to classify them
-  as default, W=1, W=2 etc, but there are cases in which the
-  warnings should be classified differently due to excessive false
-  positives from one or the other compiler.
-
-- Adding a way to turn the default warnings into errors (e.g. using
-  a new "make E=0" tag) while not also turning the W=1 warnings into
-  errors.
-
-This patch for now just adds the minimal infrastructure in order to
-do the first of the list above. As the #pragma GCC diagnostic
-takes precedence over command line options, the next step would be
-to convert a lot of the individual Makefiles that set nonstandard
-options to use __diag() instead.
-
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82435
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
-I'm marking this RFC for now, as I'd like to get consensus about
-whether we want to go down this particular route first, and maybe
-if someone can come up with better naming for the macros.
----
- include/linux/compiler-gcc.h   | 64 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/compiler_types.h | 10 +++++++
- 2 files changed, 74 insertions(+)
+ include/linux/compat.h   | 7 ++++++-
+ include/linux/syscalls.h | 3 +++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index 2272ded07496..5d595cfdb2c4 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -329,3 +329,67 @@
-  * code
-  */
- #define uninitialized_var(x) x = x
-+
-+/*
-+ * turn individual warnings and errors on and off locally, depending
-+ * on version.
-+ */
-+#if GCC_VERSION >= 40600
-+#define __diag_str1(s) #s
-+#define __diag_str(s) __diag_str1(s)
-+#define __diag(s) _Pragma(__diag_str(GCC diagnostic s))
-+
-+/* compilers before gcc-4.6 do not understand "#pragma GCC diagnostic push" */
-+#define __diag_GCC_4_6(s) __diag(s)
-+#else
-+#define __diag(s)
-+#define __diag_GCC_4_6(s)
-+#endif
-+
-+#if GCC_VERSION >= 40700
-+#define __diag_GCC_4_7(s) __diag(s)
-+#else
-+#define __diag_GCC_4_7(s)
-+#endif
-+
-+#if GCC_VERSION >= 40800
-+#define __diag_GCC_4_8(s) __diag(s)
-+#else
-+#define __diag_GCC_4_8(s)
-+#endif
-+
-+#if GCC_VERSION >= 40900
-+#define __diag_GCC_4_9(s) __diag(s)
-+#else
-+#define __diag_GCC_4_9(s)
-+#endif
-+
-+#if GCC_VERSION >= 50000
-+#define __diag_GCC_5(s) __diag(s)
-+#else
-+#define __diag_GCC_5(s)
-+#endif
-+
-+#if GCC_VERSION >= 60000
-+#define __diag_GCC_6(s) __diag(s)
-+#else
-+#define __diag_GCC_6(s)
-+#endif
-+
-+#if GCC_VERSION >= 70000
-+#define __diag_GCC_7(s) __diag(s)
-+#else
-+#define __diag_GCC_7(s)
-+#endif
-+
-+#if GCC_VERSION >= 80000
-+#define __diag_GCC_8(s) __diag(s)
-+#else
-+#define __diag_GCC_8(s)
-+#endif
-+
-+#if GCC_VERSION >= 90000
-+#define __diag_GCC_9(s) __diag(s)
-+#else
-+#define __diag_GCC_9(s)
-+#endif
-diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-index 6b79a9bba9a7..7e7664d57adb 100644
---- a/include/linux/compiler_types.h
-+++ b/include/linux/compiler_types.h
-@@ -271,4 +271,14 @@ struct ftrace_likely_data {
- # define __native_word(t) (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
- #endif
+diff --git a/include/linux/compat.h b/include/linux/compat.h
+index 1165036d091f..27b4a429df77 100644
+--- a/include/linux/compat.h
++++ b/include/linux/compat.h
+@@ -49,14 +49,19 @@
+ 	COMPAT_SYSCALL_DEFINEx(6, _##name, __VA_ARGS__)
  
-+#ifndef __diag
-+#define __diag(string)
-+#endif
-+
-+#define __diag_push()			__diag(push)
-+#define __diag_ignore(version, option)	__diag_ ## version (ignored option)
-+#define __diag_warn(version, option)	__diag_ ## version (warning option)
-+#define __diag_error(version, option)	__diag_ ## version (error   option)
-+#define __diag_pop()			__diag(pop)
-+
- #endif /* __LINUX_COMPILER_TYPES_H */
+ #define COMPAT_SYSCALL_DEFINEx(x, name, ...)				\
++	__diag_push();							\
++	__diag_ignore(GCC_8, "-Wattribute-alias");			\
+ 	asmlinkage long compat_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))\
+ 		__attribute__((alias(__stringify(compat_SyS##name))));  \
+ 	static inline long C_SYSC##name(__MAP(x,__SC_DECL,__VA_ARGS__));\
+ 	asmlinkage long compat_SyS##name(__MAP(x,__SC_LONG,__VA_ARGS__));\
+ 	asmlinkage long compat_SyS##name(__MAP(x,__SC_LONG,__VA_ARGS__))\
+ 	{								\
+-		return C_SYSC##name(__MAP(x,__SC_DELOUSE,__VA_ARGS__));	\
++		long ret = C_SYSC##name(__MAP(x,__SC_DELOUSE,__VA_ARGS__));\
++		__MAP(x,__SC_TEST,__VA_ARGS__);				\
++		return ret;						\
+ 	}								\
++	__diag_pop();							\
+ 	static inline long C_SYSC##name(__MAP(x,__SC_DECL,__VA_ARGS__))
+ 
+ #ifdef CONFIG_COMPAT
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index 4df16a70b0d7..dcf6ceabda44 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -208,6 +208,8 @@ static inline int is_syscall_trace_event(struct trace_event_call *tp_event)
+ 
+ #define __PROTECT(...) asmlinkage_protect(__VA_ARGS__)
+ #define __SYSCALL_DEFINEx(x, name, ...)					\
++	__diag_push();							\
++	__diag_ignore(GCC_8, "-Wattribute-alias");			\
+ 	asmlinkage long sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))	\
+ 		__attribute__((alias(__stringify(SyS##name))));		\
+ 	static inline long SYSC##name(__MAP(x,__SC_DECL,__VA_ARGS__));	\
+@@ -219,6 +221,7 @@ static inline int is_syscall_trace_event(struct trace_event_call *tp_event)
+ 		__PROTECT(x, ret,__MAP(x,__SC_ARGS,__VA_ARGS__));	\
+ 		return ret;						\
+ 	}								\
++	__diag_pop();							\
+ 	static inline long SYSC##name(__MAP(x,__SC_DECL,__VA_ARGS__))
+ 
+ /*
 -- 
 2.9.0
 
