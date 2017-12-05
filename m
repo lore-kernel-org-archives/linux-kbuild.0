@@ -1,85 +1,174 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:38367 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751269AbdLELn0 (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.24]:63860 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752754AbdLEPdi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Dec 2017 06:43:26 -0500
-Received: from mail-ot0-f200.google.com ([74.125.82.200])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <paolo.pisati@canonical.com>)
-        id 1eMBdF-0008Q5-Ur
-        for linux-kbuild@vger.kernel.org; Tue, 05 Dec 2017 11:43:26 +0000
-Received: by mail-ot0-f200.google.com with SMTP id n64so11147108ota.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 05 Dec 2017 03:43:25 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CA+r1Zhj6H8+g_F+caPvWrCouPk-Cib62wACG+uH=s3_Ato_qhQ@mail.gmail.com>
-References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
- <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
- <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
- <CA+r1ZhgFQS6EEzazw0YZXhYqm+WN3mp69mGyaeNpX36WZLABrA@mail.gmail.com>
- <CAK7LNARNfOzuR72U6Co0GYt7=7V4u8TmTUQAsB8R7H_5QYQ_5A@mail.gmail.com>
- <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com> <CA+r1Zhj6H8+g_F+caPvWrCouPk-Cib62wACG+uH=s3_Ato_qhQ@mail.gmail.com>
-From: Paolo Pisati <paolo.pisati@canonical.com>
-Date: Tue, 5 Dec 2017 12:43:24 +0100
-Message-ID: <CAMsH0TSaQ02dZOWSPj88tkC5G4bWe7hOOeOgUVOCasz4GRyRbQ@mail.gmail.com>
-Subject: Re: [PATCH v3] scripts/package: snap-pkg target
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+        Tue, 5 Dec 2017 10:33:38 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 1/2] [RFC] kbuild: add macro for controlling warnings to linux/compiler.h
+Date: Tue,  5 Dec 2017 16:32:30 +0100
+Message-Id: <20171205153259.2522368-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Davis <jim.epost@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Douglas Anderson <dianders@chromium.org>, Al Viro <viro@zeniv.linux.org.uk>, Heiko Carstens <heiko.carstens@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Gideon Israel Dsouza <gidisrael@gmail.com>, linux-kernel@vger.kernel.org
 
-On Fri, Dec 1, 2017 at 12:15 AM, Jim Davis <jim.epost@gmail.com> wrote:
->
-> If I run /snap/bin/snapcraft --version now on that Ubuntu 16.04 VM I
-> am getting 2.36+git2.ae61453.
+I have occasionally run into a situation where it would make sense to
+control a compiler warning from a source file rather than doing so from
+a Makefile using the $(cc-disable-warning, ...) or $(cc-option, ...)
+helpers.
 
-Yep, the edge channel follows the bleeding edge:
+The approach here is similar to what glibc uses, using __diag() and
+related macros to encapsulate a _Pragma("GCC diagnostic ...") statement
+that gets turned into the respective "#pragma GCC diagnostic ..." by
+the preprocessor when the macro gets expanded.
 
-$ snap info snapcraft
-...
-channels:
-  stable:    2.35                (794) 53MB classic
-  candidate: ↑
-  beta:      2.36.1              (876) 53MB classic
-  edge:      2.36.1+git6.3524514 (895) 53MB classic
+Like glibc, I also have an argument to pass the affected compiler
+version, but decided to actually evaluate that one. For now, this
+supports GCC_4_6, GCC_4_7, GCC_4_8, GCC_4_9, GCC_5, GCC_6, GCC_7,
+GCC_8 and GCC_9. Adding support for CLANG_5 and other interesting
+versions is straightforward here. GNU compilers starting with gcc-4.2
+could support it in principle, but "#pragma GCC diagnostic push"
+was only added in gcc-4.6, so it seems simpler to not deal with those
+at all. The same versions show a large number of warnings already,
+so it seems easier to just leave it at that and not do a more
+fine-grained control for them.
 
-you better switch to beta (and then stable when 2.36.1 gets promoted there):
+The use cases I found so far include:
 
-$ snap refresh --beta snapcraft
+- turning off the gcc-8 -Wattribute-alias warning inside of the
+  SYSCALL_DEFINEx() macro without having to do it globally.
 
-> I noticed that if I tried to make snap-pkg with the O=/some/dir option
-> the tar step failed but the rest of the build continued, and seems to
-> have finished successfully.  Should the snap-pkg target stop after a
-> tar failure?
+- Reducing the build time for a simple re-make after a change,
+  once we move the warnings from ./Makefile and
+  ./scripts/Makefile.extrawarn into linux/compiler.h
 
-That is weird, how did you do that?
+- More control over the warnings based on other configurations,
+  using preprocessor syntax instead of Makefile syntax. This should make
+  it easier for the average developer to understand and change things.
 
-My experience with the O=... option (that mimicks the other rpm-pkg
-and deb-pkg targets) is that, you first create the dir, copy there the
-.config and it builds fine:
+- Adding an easy way to turn the W=1 option on unconditionally
+  for a subdirectory or a specific file. This has been requested
+  by several developers in the past that want to have their subsystems
+  W=1 clean.
 
-~/linux $ mke defconfig
-...
-~/linux $ mkdir /tmp/foobar
-~/linux $ mv .config /tmp/foobar
-~/linux $ git clean -ffdx
-~/linux $ make O=/tmp/foobar snap-pkg
-...
-Snapped kernel_4.14.0+_amd64.snap
-~/linux $ ls -la /tmp/foobar/snap/
--rw-r--r-- 1 flag flag 14114816 dic  5 12:41 kernel_4.14.0+_amd64.snap
-drwxrwxr-x 3 flag flag     4096 dic  5 12:38 parts
-drwxrwxr-x 4 flag flag     4096 dic  5 12:41 prime
-drwxrwxr-x 3 flag flag     4096 dic  5 12:38 snap
--rw-rw-r-- 1 flag flag      274 dic  5 12:38 snapcraft.yaml
-drwxrwxr-x 3 flag flag     4096 dic  5 12:41 stage
+- Integrating clang better into the build systems. Clang supports
+  more warnings than GCC, and we probably want to classify them
+  as default, W=1, W=2 etc, but there are cases in which the
+  warnings should be classified differently due to excessive false
+  positives from one or the other compiler.
 
+- Adding a way to turn the default warnings into errors (e.g. using
+  a new "make E=0" tag) while not also turning the W=1 warnings into
+  errors.
 
+This patch for now just adds the minimal infrastructure in order to
+do the first of the list above. As the #pragma GCC diagnostic
+takes precedence over command line options, the next step would be
+to convert a lot of the individual Makefiles that set nonstandard
+options to use __diag() instead.
 
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+I'm marking this RFC for now, as I'd like to get consensus about
+whether we want to go down this particular route first, and maybe
+if someone can come up with better naming for the macros.
+---
+ include/linux/compiler-gcc.h   | 64 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/compiler_types.h | 10 +++++++
+ 2 files changed, 74 insertions(+)
 
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index 2272ded07496..5d595cfdb2c4 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -329,3 +329,67 @@
+  * code
+  */
+ #define uninitialized_var(x) x = x
++
++/*
++ * turn individual warnings and errors on and off locally, depending
++ * on version.
++ */
++#if GCC_VERSION >= 40600
++#define __diag_str1(s) #s
++#define __diag_str(s) __diag_str1(s)
++#define __diag(s) _Pragma(__diag_str(GCC diagnostic s))
++
++/* compilers before gcc-4.6 do not understand "#pragma GCC diagnostic push" */
++#define __diag_GCC_4_6(s) __diag(s)
++#else
++#define __diag(s)
++#define __diag_GCC_4_6(s)
++#endif
++
++#if GCC_VERSION >= 40700
++#define __diag_GCC_4_7(s) __diag(s)
++#else
++#define __diag_GCC_4_7(s)
++#endif
++
++#if GCC_VERSION >= 40800
++#define __diag_GCC_4_8(s) __diag(s)
++#else
++#define __diag_GCC_4_8(s)
++#endif
++
++#if GCC_VERSION >= 40900
++#define __diag_GCC_4_9(s) __diag(s)
++#else
++#define __diag_GCC_4_9(s)
++#endif
++
++#if GCC_VERSION >= 50000
++#define __diag_GCC_5(s) __diag(s)
++#else
++#define __diag_GCC_5(s)
++#endif
++
++#if GCC_VERSION >= 60000
++#define __diag_GCC_6(s) __diag(s)
++#else
++#define __diag_GCC_6(s)
++#endif
++
++#if GCC_VERSION >= 70000
++#define __diag_GCC_7(s) __diag(s)
++#else
++#define __diag_GCC_7(s)
++#endif
++
++#if GCC_VERSION >= 80000
++#define __diag_GCC_8(s) __diag(s)
++#else
++#define __diag_GCC_8(s)
++#endif
++
++#if GCC_VERSION >= 90000
++#define __diag_GCC_9(s) __diag(s)
++#else
++#define __diag_GCC_9(s)
++#endif
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index 6b79a9bba9a7..7e7664d57adb 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -271,4 +271,14 @@ struct ftrace_likely_data {
+ # define __native_word(t) (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+ #endif
+ 
++#ifndef __diag
++#define __diag(string)
++#endif
++
++#define __diag_push()			__diag(push)
++#define __diag_ignore(version, option)	__diag_ ## version (ignored option)
++#define __diag_warn(version, option)	__diag_ ## version (warning option)
++#define __diag_error(version, option)	__diag_ ## version (error   option)
++#define __diag_pop()			__diag(pop)
++
+ #endif /* __LINUX_COMPILER_TYPES_H */
 -- 
-bye,
-p.
+2.9.0
+
