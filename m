@@ -1,43 +1,196 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-he1eur01on0132.outbound.protection.outlook.com ([104.47.0.132]:36202
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751325AbdLEQeD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Dec 2017 11:34:03 -0500
-Subject: Re: [PATCH v4 5/5] kasan: added functions for unpoisoning stack
- variables
-References: <20171204191735.132544-1-paullawrence@google.com>
- <20171204191735.132544-6-paullawrence@google.com>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <f324833c-bf22-2548-98e3-764fbd2d49b0@virtuozzo.com>
-Date: Tue, 5 Dec 2017 19:37:31 +0300
+Received: from mail-vk0-f65.google.com ([209.85.213.65]:43492 "EHLO
+        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751156AbdLETZP (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 5 Dec 2017 14:25:15 -0500
+Received: by mail-vk0-f65.google.com with SMTP id u84so1014219vke.10
+        for <linux-kbuild@vger.kernel.org>; Tue, 05 Dec 2017 11:25:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171204191735.132544-6-paullawrence@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20171205153259.2522368-1-arnd@arndb.de>
+References: <20171205153259.2522368-1-arnd@arndb.de>
+From: Kees Cook <keescook@chromium.org>
+Date: Tue, 5 Dec 2017 11:25:13 -0800
+Message-ID: <CAGXu5j+fG=A5KRDEH3aawbcEyf+fYNwOKS6x08SHDhEhfMP9RA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] [RFC] kbuild: add macro for controlling warnings to linux/compiler.h
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Lawrence <paullawrence@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Douglas Anderson <dianders@chromium.org>, Al Viro <viro@zeniv.linux.org.uk>, Heiko Carstens <heiko.carstens@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Matthias Kaehlcke <mka@chromium.org>, Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Gideon Israel Dsouza <gidisrael@gmail.com>, LKML <linux-kernel@vger.kernel.org>
 
-
-
-On 12/04/2017 10:17 PM, Paul Lawrence wrote:
-> From: Alexander Potapenko <glider@google.com>
-> 
-> As a code-size optimization, LLVM builds since r279383 may
-> bulk-manipulate the shadow region when (un)poisoning large memory
-> blocks.  This requires new callbacks that simply do an uninstrumented
-> memset().
-> 
-> This fixes linking the Clang-built kernel when using KASAN.
-> 
-> Signed-off-by: Alexander Potapenko <glider@google.com>
-> [ghackmann@google.com: fix memset() parameters, and tweak
->  commit message to describe new callbacks]
-> Signed-off-by: Greg Hackmann <ghackmann@google.com>
-> Signed-off-by: Paul Lawrence <paullawrence@google.com>
+On Tue, Dec 5, 2017 at 7:32 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> I have occasionally run into a situation where it would make sense to
+> control a compiler warning from a source file rather than doing so from
+> a Makefile using the $(cc-disable-warning, ...) or $(cc-option, ...)
+> helpers.
+>
+> The approach here is similar to what glibc uses, using __diag() and
+> related macros to encapsulate a _Pragma("GCC diagnostic ...") statement
+> that gets turned into the respective "#pragma GCC diagnostic ..." by
+> the preprocessor when the macro gets expanded.
+>
+> Like glibc, I also have an argument to pass the affected compiler
+> version, but decided to actually evaluate that one. For now, this
+> supports GCC_4_6, GCC_4_7, GCC_4_8, GCC_4_9, GCC_5, GCC_6, GCC_7,
+> GCC_8 and GCC_9. Adding support for CLANG_5 and other interesting
+> versions is straightforward here. GNU compilers starting with gcc-4.2
+> could support it in principle, but "#pragma GCC diagnostic push"
+> was only added in gcc-4.6, so it seems simpler to not deal with those
+> at all. The same versions show a large number of warnings already,
+> so it seems easier to just leave it at that and not do a more
+> fine-grained control for them.
+>
+> The use cases I found so far include:
+>
+> - turning off the gcc-8 -Wattribute-alias warning inside of the
+>   SYSCALL_DEFINEx() macro without having to do it globally.
+>
+> - Reducing the build time for a simple re-make after a change,
+>   once we move the warnings from ./Makefile and
+>   ./scripts/Makefile.extrawarn into linux/compiler.h
+>
+> - More control over the warnings based on other configurations,
+>   using preprocessor syntax instead of Makefile syntax. This should make
+>   it easier for the average developer to understand and change things.
+>
+> - Adding an easy way to turn the W=1 option on unconditionally
+>   for a subdirectory or a specific file. This has been requested
+>   by several developers in the past that want to have their subsystems
+>   W=1 clean.
+>
+> - Integrating clang better into the build systems. Clang supports
+>   more warnings than GCC, and we probably want to classify them
+>   as default, W=1, W=2 etc, but there are cases in which the
+>   warnings should be classified differently due to excessive false
+>   positives from one or the other compiler.
+>
+> - Adding a way to turn the default warnings into errors (e.g. using
+>   a new "make E=0" tag) while not also turning the W=1 warnings into
+>   errors.
+>
+> This patch for now just adds the minimal infrastructure in order to
+> do the first of the list above. As the #pragma GCC diagnostic
+> takes precedence over command line options, the next step would be
+> to convert a lot of the individual Makefiles that set nonstandard
+> options to use __diag() instead.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
+> I'm marking this RFC for now, as I'd like to get consensus about
+> whether we want to go down this particular route first, and maybe
+> if someone can come up with better naming for the macros.
 
-Acked-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+I like this. I wonder if it would be a good idea to add an additional
+argument that forces documentation of the reason for adding a diag
+marking? Something like:
+
+__diag_warn(GCC_7, vla, "No VLAs should be used in this code");
+
+-Kees
+
+> ---
+>  include/linux/compiler-gcc.h   | 64 ++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/compiler_types.h | 10 +++++++
+>  2 files changed, 74 insertions(+)
+>
+> diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+> index 2272ded07496..5d595cfdb2c4 100644
+> --- a/include/linux/compiler-gcc.h
+> +++ b/include/linux/compiler-gcc.h
+> @@ -329,3 +329,67 @@
+>   * code
+>   */
+>  #define uninitialized_var(x) x = x
+> +
+> +/*
+> + * turn individual warnings and errors on and off locally, depending
+> + * on version.
+> + */
+> +#if GCC_VERSION >= 40600
+> +#define __diag_str1(s) #s
+> +#define __diag_str(s) __diag_str1(s)
+> +#define __diag(s) _Pragma(__diag_str(GCC diagnostic s))
+> +
+> +/* compilers before gcc-4.6 do not understand "#pragma GCC diagnostic push" */
+> +#define __diag_GCC_4_6(s) __diag(s)
+> +#else
+> +#define __diag(s)
+> +#define __diag_GCC_4_6(s)
+> +#endif
+> +
+> +#if GCC_VERSION >= 40700
+> +#define __diag_GCC_4_7(s) __diag(s)
+> +#else
+> +#define __diag_GCC_4_7(s)
+> +#endif
+> +
+> +#if GCC_VERSION >= 40800
+> +#define __diag_GCC_4_8(s) __diag(s)
+> +#else
+> +#define __diag_GCC_4_8(s)
+> +#endif
+> +
+> +#if GCC_VERSION >= 40900
+> +#define __diag_GCC_4_9(s) __diag(s)
+> +#else
+> +#define __diag_GCC_4_9(s)
+> +#endif
+> +
+> +#if GCC_VERSION >= 50000
+> +#define __diag_GCC_5(s) __diag(s)
+> +#else
+> +#define __diag_GCC_5(s)
+> +#endif
+> +
+> +#if GCC_VERSION >= 60000
+> +#define __diag_GCC_6(s) __diag(s)
+> +#else
+> +#define __diag_GCC_6(s)
+> +#endif
+> +
+> +#if GCC_VERSION >= 70000
+> +#define __diag_GCC_7(s) __diag(s)
+> +#else
+> +#define __diag_GCC_7(s)
+> +#endif
+> +
+> +#if GCC_VERSION >= 80000
+> +#define __diag_GCC_8(s) __diag(s)
+> +#else
+> +#define __diag_GCC_8(s)
+> +#endif
+> +
+> +#if GCC_VERSION >= 90000
+> +#define __diag_GCC_9(s) __diag(s)
+> +#else
+> +#define __diag_GCC_9(s)
+> +#endif
+> diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+> index 6b79a9bba9a7..7e7664d57adb 100644
+> --- a/include/linux/compiler_types.h
+> +++ b/include/linux/compiler_types.h
+> @@ -271,4 +271,14 @@ struct ftrace_likely_data {
+>  # define __native_word(t) (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+>  #endif
+>
+> +#ifndef __diag
+> +#define __diag(string)
+> +#endif
+> +
+> +#define __diag_push()                  __diag(push)
+> +#define __diag_ignore(version, option) __diag_ ## version (ignored option)
+> +#define __diag_warn(version, option)   __diag_ ## version (warning option)
+> +#define __diag_error(version, option)  __diag_ ## version (error   option)
+> +#define __diag_pop()                   __diag(pop)
+> +
+>  #endif /* __LINUX_COMPILER_TYPES_H */
+> --
+> 2.9.0
+>
+
+
+
+-- 
+Kees Cook
+Pixel Security
