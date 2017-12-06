@@ -1,90 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:28101 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754965AbdLFKhk (ORCPT
+Received: from mail-qt0-f195.google.com ([209.85.216.195]:45489 "EHLO
+        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751757AbdLFPkJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Dec 2017 05:37:40 -0500
+        Wed, 6 Dec 2017 10:40:09 -0500
+Received: by mail-qt0-f195.google.com with SMTP id g10so9802286qtj.12
+        for <linux-kbuild@vger.kernel.org>; Wed, 06 Dec 2017 07:40:08 -0800 (PST)
+Date: Wed, 6 Dec 2017 10:40:06 -0500 (EST)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH] kconfig: fix relational operators for bool and tristate
+ symbols
+In-Reply-To: <nycvar.YSQ.7.76.1711161956590.20817@knanqh.ubzr>
+Message-ID: <nycvar.YSQ.7.76.1712061039080.1626@knanqh.ubzr>
+References: <nycvar.YSQ.7.76.1711161956590.20817@knanqh.ubzr>
 MIME-Version: 1.0
-In-Reply-To: <CA+r1ZhjW+OeTnCkffjMfoORx63h8PTNW91HVyvbqVWCpud0UiQ@mail.gmail.com>
-References: <20171114123834.xsjiy2ynvott4gae@brain> <1511780854-7213-1-git-send-email-paolo.pisati@canonical.com>
- <CA+r1ZhjYJ0AgwMSp2aA73VHH14W93sEQOeJvtT=YJSzC5V3LfA@mail.gmail.com>
- <CAMsH0TRjz3DCPXab6c5m20yr9+diQ0sBgcS3ELcmWn-3Wz2TVQ@mail.gmail.com>
- <CA+r1ZhgFQS6EEzazw0YZXhYqm+WN3mp69mGyaeNpX36WZLABrA@mail.gmail.com>
- <CAK7LNARNfOzuR72U6Co0GYt7=7V4u8TmTUQAsB8R7H_5QYQ_5A@mail.gmail.com>
- <CAMsH0TRSnWvR8pH-3ksBsb-WPMuq-PpFT+W6PdBX=xd-HhyZ4g@mail.gmail.com>
- <CA+r1Zhj6H8+g_F+caPvWrCouPk-Cib62wACG+uH=s3_Ato_qhQ@mail.gmail.com>
- <CAMsH0TSaQ02dZOWSPj88tkC5G4bWe7hOOeOgUVOCasz4GRyRbQ@mail.gmail.com> <CA+r1ZhjW+OeTnCkffjMfoORx63h8PTNW91HVyvbqVWCpud0UiQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 6 Dec 2017 19:36:45 +0900
-Message-ID: <CAK7LNAToQjqUoA17jwvQzFzyijOP9HNGz8js3GREKTHd2NyyTw@mail.gmail.com>
-Subject: Re: [PATCH v3] scripts/package: snap-pkg target
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Davis <jim.epost@gmail.com>
-Cc: Paolo Pisati <paolo.pisati@canonical.com>, Michal Marek <michal.lkml@markovi.net>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
-
-2017-12-06 6:23 GMT+09:00 Jim Davis <jim.epost@gmail.com>:
-> On Tue, Dec 5, 2017 at 4:43 AM, Paolo Pisati <paolo.pisati@canonical.com> wrote:
->
->>> I noticed that if I tried to make snap-pkg with the O=/some/dir option
->>> the tar step failed but the rest of the build continued, and seems to
->>> have finished successfully.  Should the snap-pkg target stop after a
->>> tar failure?
->>
->> That is weird, how did you do that?
->
-> make O=/some/dir defconfig (or your-config-of-choice)
-> make O=/some/dir snap-pkg
->
-> The snap-pkg target is calling the src_tar command, which bails when
-> $(objtree) isn't $(srctree).
->
-> Is $(objtree) = $(srctree) a necessary restriction with snap builds?
-> It's a restriction for rpm builds for some reason or another,
-
-Rather, restriction for our build system.
-
-Working directory is changed at the top Makefile if O= is given.
-This option is propagated to sub-make.
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jan Beulich <JBeulich@suse.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 
-> but I
-> thought that was just a peculiarity of the rpm build process.  If the
-> snap's tarball could be built without using src_tar, like the buildtar
-> script does, then Bob's your uncle.
+Ping.
 
-Probably, you must reset O=, KBUILD_OUTPUT, KBUILD_SRC, etc.
-before calling rpmbuild, snapcraft, etc.
+On Thu, 16 Nov 2017, Nicolas Pitre wrote:
 
-This is not a peculiarity of rpmbuild or snapcraft.
-
-I guess things are not so simple as they look at a glance.
-
-
-
-> Though if the source tree is an essential part of the snap build then
-> perhaps the build should just exit if the tarball can't be generated
-> for whatever reason, including users doing weird things :)
->
-
-I agree, but this is not a problem specific to snap-pkg,
-so Paolo's work will not be blocked.
-
-I sent this patch:
-https://patchwork.kernel.org/patch/10095377/
-
-
-
-Just one question to Paolo:
-
-  If some change like firmware removal happens in the future,
-  patching for snapcraft is necessary?
-    (i.e. users are required to upgrade snapcraft from --edge ?)
-
-I guess the answer is yes, because "plugin: kernel" needs to know
-the kernel-build system internal.
-
--- 
-Best Regards
-Masahiro Yamada
+> Since commit 31847b67bec0 ("kconfig: allow use of relations other than
+> (in)equality") it is possible to use relational operators in Kconfig
+> statements. However, those operators give unexpected results when
+> applied to bool/tristate values:
+> 
+> 	(n < y) = y (correct)
+> 	(m < y) = y (correct)
+> 	(n < m) = n (wrong)
+> 
+> This happens because relational operators process bool and tristate
+> symbols as strings and m sorts before n. It makes little sense to do a
+> lexicographical compare on bool and tristate values though.
+> 
+> Documentation/kbuild/kconfig-language.txt states that expression can have
+> a value of 'n', 'm' or 'y' (or 0, 1, 2 respectively for calculations).
+> Let's make it so for relational comparisons with bool/tristate
+> expressions as well and document them. If at least one symbol is an
+> actual string then the lexicographical compare works just as before.
+> 
+> Signed-off-by: Nicolas Pitre <nico@linaro.org>
+> 
+> diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+> index 262722d886..c4a293a03c 100644
+> --- a/Documentation/kbuild/kconfig-language.txt
+> +++ b/Documentation/kbuild/kconfig-language.txt
+> @@ -200,10 +200,14 @@ module state. Dependency expressions have the following syntax:
+>  <expr> ::= <symbol>                             (1)
+>             <symbol> '=' <symbol>                (2)
+>             <symbol> '!=' <symbol>               (3)
+> -           '(' <expr> ')'                       (4)
+> -           '!' <expr>                           (5)
+> -           <expr> '&&' <expr>                   (6)
+> -           <expr> '||' <expr>                   (7)
+> +           <symbol1> '<' <symbol2>              (4)
+> +           <symbol1> '>' <symbol2>              (4)
+> +           <symbol1> '<=' <symbol2>             (4)
+> +           <symbol1> '>=' <symbol2>             (4)
+> +           '(' <expr> ')'                       (5)
+> +           '!' <expr>                           (6)
+> +           <expr> '&&' <expr>                   (7)
+> +           <expr> '||' <expr>                   (8)
+>  
+>  Expressions are listed in decreasing order of precedence. 
+>  
+> @@ -214,10 +218,13 @@ Expressions are listed in decreasing order of precedence.
+>      otherwise 'n'.
+>  (3) If the values of both symbols are equal, it returns 'n',
+>      otherwise 'y'.
+> -(4) Returns the value of the expression. Used to override precedence.
+> -(5) Returns the result of (2-/expr/).
+> -(6) Returns the result of min(/expr/, /expr/).
+> -(7) Returns the result of max(/expr/, /expr/).
+> +(4) If value of <symbol1> is respectively lower, greater, lower-or-equal,
+> +    or greater-or-equal than value of <symbol2>, it returns 'y',
+> +    otherwise 'n'.
+> +(5) Returns the value of the expression. Used to override precedence.
+> +(6) Returns the result of (2-/expr/).
+> +(7) Returns the result of min(/expr/, /expr/).
+> +(8) Returns the result of max(/expr/, /expr/).
+>  
+>  An expression can have a value of 'n', 'm' or 'y' (or 0, 1, 2
+>  respectively for calculations). A menu entry becomes visible when its
+> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+> index cbf4996dd9..8cee597d33 100644
+> --- a/scripts/kconfig/expr.c
+> +++ b/scripts/kconfig/expr.c
+> @@ -893,7 +893,10 @@ static enum string_value_kind expr_parse_string(const char *str,
+>  	switch (type) {
+>  	case S_BOOLEAN:
+>  	case S_TRISTATE:
+> -		return k_string;
+> +		val->s = !strcmp(str, "n") ? 0 :
+> +			 !strcmp(str, "m") ? 1 :
+> +			 !strcmp(str, "y") ? 2 : -1;
+> +		return k_signed;
+>  	case S_INT:
+>  		val->s = strtoll(str, &tail, 10);
+>  		kind = k_signed;
+> 
