@@ -1,69 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:52388 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752686AbdLGPE2 (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:52950 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753431AbdLGOvT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Dec 2017 10:04:28 -0500
+        Thu, 7 Dec 2017 09:51:19 -0500
 MIME-Version: 1.0
-In-Reply-To: <1441199479-12576-1-git-send-email-ulfalizer.lkml@gmail.com>
-References: <1441199479-12576-1-git-send-email-ulfalizer.lkml@gmail.com>
+In-Reply-To: <1507073146-19847-1-git-send-email-ulfalizer@gmail.com>
+References: <1507073146-19847-1-git-send-email-ulfalizer@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 8 Dec 2017 00:03:33 +0900
-Message-ID: <CAK7LNAQKve7Uha3_3hMNiMP8VMyJz9A7iXKj06MJWC8dxXvkQw@mail.gmail.com>
-Subject: Re: [PATCH] Makefile: .PHONY is not a variable, but PHONY is
+Date: Thu, 7 Dec 2017 23:50:24 +0900
+Message-ID: <CAK7LNATTvbR=5+QLFxUFJwQpvr3rAHWNkmZj7inzu=Ps6pudaQ@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Warn if choice default is not in choice
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: ulfalizer.lkml@gmail.com, Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jiri Kosina <trivial@kernel.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>
 
-Hi Ulf,
-
-
-
-
-2015-09-02 22:11 GMT+09:00  <ulfalizer.lkml@gmail.com>:
-> From: Ulf Magnusson <ulfalizer@gmail.com>
+2017-10-04 8:25 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> This will catch mistakes like in the following real-world example, where
+> a "CONFIG_" prefix snuck in, making an undefined symbol the default:
 >
-> .PHONY is a target, not a variable.
+>         choice
+>                 prompt "Compiler optimization level"
+>                 default CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+>
+>         config CC_OPTIMIZE_FOR_PERFORMANCE
+>                 ...
+>
+>         config CC_OPTIMIZE_FOR_SIZE
+>                 ...
+>
+>         endchoice
+>
+> This now prints the following warning:
+>
+>         init/Kconfig:1036:warning: choice default symbol 'CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE' is not contained in the choice
+>
+> Cases where the default symbol belongs to the wrong choice are also
+> detected.
+>
+> (The mistake is harmless here: Since the default symbol is not visible,
+> the choice falls back on using the first visible symbol as the default,
+> which is CC_OPTIMIZE_FOR_PERFORMANCE, as intended.)
+>
+> Discovered while playing around with Kconfiglib
+> (https://github.com/ulfalizer/Kconfiglib).
 >
 > Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 > ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index 24c9e3d..4835d24 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1609,6 +1609,6 @@ endif     # skip-makefile
->  PHONY += FORCE
->  FORCE:
->
-> -# Declare the contents of the .PHONY variable as phony.  We keep that
-> +# Declare the contents of the PHONY variable as phony.  We keep that
->  # information in a variable so we can use it in if_changed and friends.
->  .PHONY: $(PHONY)
-> --
 
-
-I found this patch by chance.
-
-
-Can you fix other files in scripts/ as well?
-
-I see the same pattern in
-
-Makefile.build
-Makefile.clean
-Makefile.modbuiltin
-Makefile.modinst
-Makefile.modpost
-Makefile.modsign
-
-Then, I will apply it quickly.
-
-
+Applied to linux-kbuild/kconfig.
+Thanks!
 
 -- 
 Best Regards
