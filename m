@@ -1,114 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f66.google.com ([209.85.213.66]:34143 "EHLO
-        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751800AbdLHJZs (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:35549 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751073AbdLIQDt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Dec 2017 04:25:48 -0500
-Received: by mail-vk0-f66.google.com with SMTP id j126so6591293vke.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 08 Dec 2017 01:25:48 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20171204191735.132544-3-paullawrence@google.com>
-References: <20171204191735.132544-1-paullawrence@google.com> <20171204191735.132544-3-paullawrence@google.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Fri, 8 Dec 2017 10:25:46 +0100
-Message-ID: <CAG_fn=Xgx+bL85nENTL5K9z=5NBmERub=YEYwkpTYFVphLhPFg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/5] kasan/Makefile: Support LLVM style asan parameters.
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Sat, 9 Dec 2017 11:03:49 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/3] kbuild: add LEX and YACC variables
+Date: Sun, 10 Dec 2017 01:02:28 +0900
+Message-Id: <1512835350-8646-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1512835350-8646-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1512835350-8646-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Lawrence <paullawrence@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, LKML <linux-kernel@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Mon, Dec 4, 2017 at 8:17 PM, Paul Lawrence <paullawrence@google.com> wro=
-te:
-> From: Andrey Ryabinin <aryabinin@virtuozzo.com>
->
-> LLVM doesn't understand GCC-style paramters ("--param asan-foo=3Dbar"),
-> thus we currently we don't use inline/globals/stack instrumentation
-> when building the kernel with clang.
->
-> Add support for LLVM-style parameters ("-mllvm -asan-foo=3Dbar") to
-> enable all KASAN features.
->
-> Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-> Signed-off-by: Paul Lawrence <paullawrence@google.com>
-> ---
->  scripts/Makefile.kasan | 29 ++++++++++++++++++-----------
->  1 file changed, 18 insertions(+), 11 deletions(-)
->
-> diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
-> index 1ce7115aa499..d5a1a4b6d079 100644
-> --- a/scripts/Makefile.kasan
-> +++ b/scripts/Makefile.kasan
-> @@ -10,10 +10,7 @@ KASAN_SHADOW_OFFSET ?=3D $(CONFIG_KASAN_SHADOW_OFFSET)
->
->  CFLAGS_KASAN_MINIMAL :=3D -fsanitize=3Dkernel-address
->
-> -CFLAGS_KASAN :=3D $(call cc-option, -fsanitize=3Dkernel-address \
-> -               -fasan-shadow-offset=3D$(KASAN_SHADOW_OFFSET) \
-> -               --param asan-stack=3D1 --param asan-globals=3D1 \
-> -               --param asan-instrumentation-with-call-threshold=3D$(call=
-_threshold))
-> +cc-param =3D $(call cc-option, -mllvm -$(1), $(call cc-option, --param $=
-(1)))
->
->  ifeq ($(call cc-option, $(CFLAGS_KASAN_MINIMAL) -Werror),)
->     ifneq ($(CONFIG_COMPILE_TEST),y)
-> @@ -21,13 +18,23 @@ ifeq ($(call cc-option, $(CFLAGS_KASAN_MINIMAL) -Werr=
-or),)
->              -fsanitize=3Dkernel-address is not supported by compiler)
->     endif
->  else
-> -    ifeq ($(CFLAGS_KASAN),)
-> -        ifneq ($(CONFIG_COMPILE_TEST),y)
-> -            $(warning CONFIG_KASAN: compiler does not support all option=
-s.\
-> -                Trying minimal configuration)
-> -        endif
-> -        CFLAGS_KASAN :=3D $(CFLAGS_KASAN_MINIMAL)
-> -    endif
-> +   # -fasan-shadow-offset fails without -fsanitize
-Would be nice to have a comment here explaining that
--fasan-shadow-offset is a GCC flag whereas -asan-mapping-offset is an
-LLVM one.
-> +   CFLAGS_KASAN_SHADOW :=3D $(call cc-option, -fsanitize=3Dkernel-addres=
-s \
-> +                       -fasan-shadow-offset=3D$(KASAN_SHADOW_OFFSET), \
-> +                       $(call cc-option, -fsanitize=3Dkernel-address \
-> +                       -mllvm -asan-mapping-offset=3D$(KASAN_SHADOW_OFFS=
-ET)))
-> +
-> +   ifeq ($(strip $(CFLAGS_KASAN_SHADOW)),)
-> +      CFLAGS_KASAN :=3D $(CFLAGS_KASAN_MINIMAL)
-> +   else
-> +      # Now add all the compiler specific options that are valid standal=
-one
-> +      CFLAGS_KASAN :=3D $(CFLAGS_KASAN_SHADOW) \
-> +       $(call cc-param,asan-globals=3D1) \
-> +       $(call cc-param,asan-instrumentation-with-call-threshold=3D$(call=
-_threshold)) \
-> +       $(call cc-param,asan-stack=3D1) \
-> +       $(call cc-param,asan-use-after-scope=3D1)
-> +   endif
-> +
->  endif
->
->  CFLAGS_KASAN +=3D $(call cc-option, -fsanitize-address-use-after-scope)
-> --
-> 2.15.0.531.g2ccb3012c9-goog
->
-Reviewed-by: Alexander Potapenko <glider@google.com>
+Allow users to use their favorite lexer / parser generators.
+This is useful for me to test various flex and bison versions.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
---=20
-Alexander Potapenko
-Software Engineer
+ Makefile             | 4 +++-
+ scripts/Makefile.lib | 4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-Google Germany GmbH
-Erika-Mann-Stra=C3=9Fe, 33
-80636 M=C3=BCnchen
+diff --git a/Makefile b/Makefile
+index c988e46..83209d6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -377,6 +377,8 @@ NM		= $(CROSS_COMPILE)nm
+ STRIP		= $(CROSS_COMPILE)strip
+ OBJCOPY		= $(CROSS_COMPILE)objcopy
+ OBJDUMP		= $(CROSS_COMPILE)objdump
++LEX		= flex
++YACC		= bison
+ AWK		= awk
+ GENKSYMS	= scripts/genksyms/genksyms
+ INSTALLKERNEL  := installkernel
+@@ -428,7 +430,7 @@ GCC_PLUGINS_CFLAGS :=
+ 
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
+-export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
++export MAKE LEX YACC AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
+ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+ 
+ export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 1ca4dcd..ee528e3 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -193,7 +193,7 @@ ifdef REGENERATE_PARSERS
+ LEX_PREFIX = $(if $(LEX_PREFIX_${baseprereq}),$(LEX_PREFIX_${baseprereq}),yy)
+ 
+ quiet_cmd_flex = LEX     $@
+-      cmd_flex = flex -o$@ -L -P $(LEX_PREFIX) $<
++      cmd_flex = $(LEX) -o$@ -L -P $(LEX_PREFIX) $<
+ 
+ .PRECIOUS: $(src)/%.lex.c_shipped
+ $(src)/%.lex.c_shipped: $(src)/%.l
+@@ -204,7 +204,7 @@ $(src)/%.lex.c_shipped: $(src)/%.l
+ YACC_PREFIX = $(if $(YACC_PREFIX_${baseprereq}),$(YACC_PREFIX_${baseprereq}),yy)
+ 
+ quiet_cmd_bison = YACC    $@
+-      cmd_bison = bison -o$@ -t -l -p $(YACC_PREFIX) $<
++      cmd_bison = $(YACC) -o$@ -t -l -p $(YACC_PREFIX) $<
+ 
+ .PRECIOUS: $(src)/%.tab.c_shipped
+ $(src)/%.tab.c_shipped: $(src)/%.y
+-- 
+2.7.4
 
-Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Halimah DeLaine Prado
-Registergericht und -nummer: Hamburg, HRB 86891
-Sitz der Gesellschaft: Hamburg
