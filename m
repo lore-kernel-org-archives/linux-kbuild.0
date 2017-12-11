@@ -1,57 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:43389 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751003AbdLJF33 (ORCPT
+Received: from mail-ot0-f195.google.com ([74.125.82.195]:35817 "EHLO
+        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752433AbdLKKRR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 10 Dec 2017 00:29:29 -0500
+        Mon, 11 Dec 2017 05:17:17 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdXHHFvPJyhJ37Xss_aBEY7kJVC8GxEqGNJyYW4wwhRgMQ@mail.gmail.com>
-References: <1511784913-3396-1-git-send-email-yamada.masahiro@socionext.com> <CAMuHMdXHHFvPJyhJ37Xss_aBEY7kJVC8GxEqGNJyYW4wwhRgMQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 10 Dec 2017 14:28:43 +0900
-Message-ID: <CAK7LNAQFDfGDy6q+ycY2C+FYtdUdgfGrUurEuV=FKOpbSJmPcQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: move cc-option and cc-disable-warning after incl.
- arch Makefile
+In-Reply-To: <20171106184756.24404-1-ndesaulniers@google.com>
+References: <CAKwvOdmhuaLC6=vG2DMFAbhfXoUr74_aemM2DK7me6pQ0obW4g@mail.gmail.com>
+ <20171106184756.24404-1-ndesaulniers@google.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Mon, 11 Dec 2017 11:17:16 +0100
+Message-ID: <CAK8P3a1zKD1VyG+hz13=2Ht9Q=zACiavoz54QdJpvZvz30SFrQ@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: fix linker feature test macros when cross
+ compiling with Clang
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, pirama@google.com, Matthias Kaehlcke <mka@chromium.org>, Ingo Molnar <mingo@kernel.org>, Douglas Anderson <dianders@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Mark Charlebois <charlebm@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-11-27 21:25 GMT+09:00 Geert Uytterhoeven <geert@linux-m68k.org>:
-> Hi Yamada-san,
+On Mon, Nov 6, 2017 at 7:47 PM, Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+> I was not seeing my linker flags getting added when using ld-option when
+> cross compiling with Clang. Upon investigation, this seems to be due to
+> a difference in how GCC vs Clang handle cross compilation.
 >
-> On Mon, Nov 27, 2017 at 1:15 PM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> Geert reported commit ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before
->> incl. arch Makefile") broke cross-compilation using a cross-compiler
->> that supports less compiler options than the host compiler.
->>
->> For example,
->>
->>   cc1: error: unrecognized command line option "-Wno-unused-but-set-variable"
->>
->> This problem happens on architectures that setup CROSS_COMPILE in their
->> arch/*/Makefile.
->>
->> Move the cc-option and cc-disable-warning back to the original position,
->> but keep the Clang target options.
->>
->> Fixes: ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before incl. arch Makefile")
->> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> GCC is configured at build time to support one backend, that is implicit
+> when compiling.  Clang is explicit via the use of `-target <triple>` and
+> ships with all supported backends by default.
 >
-> Thanks for the quick response!
+> GNU Make feature test macros that compile then link will always fail
+> when cross compiling with Clang unless Clang's triple is passed along to
+> the compiler. For example:
 >
-> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> $ clang -x c /dev/null -c -o temp.o
+> $ aarch64-linux-android/bin/ld -E temp.o
+> aarch64-linux-android/bin/ld:
+> unknown architecture of input file `temp.o' is incompatible with
+> aarch64 output
+> aarch64-linux-android/bin/ld:
+> warning: cannot find entry symbol _start; defaulting to
+> 0000000000400078
+> $ echo $?
+> 1
 >
-> Gr{oetje,eeting}s,
+> $ clang -target aarch64-linux-android- -x c /dev/null -c -o temp.o
+> $ aarch64-linux-android/bin/ld -E temp.o
+> aarch64-linux-android/bin/ld:
+> warning: cannot find entry symbol _start; defaulting to 00000000004002e4
+> $ echo $?
+> 0
 >
->                         Geert
+> This causes conditional checks that invoke $(CC) without the target
+> triple, then $(LD) on the result, to always fail.
+>
+> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 
+After this patch, I get the following warning in arm64 kernel builds
+with CONFIG_ARM64_ERRATUM_843419:
 
-Applied to linux-kbuild/fixes.
+arch/arm64/Makefile:27: ld does not support --fix-cortex-a53-843419;
+kernel may be susceptible to erratum
 
--- 
-Best Regards
-Masahiro Yamada
+This only happens on the first build though, when the cached variable
+is being set. On the second build we get the contents from the cache
+and the warning disappears.
+
+I've tried debugging it further but did not get anywhere with that.
+
+        Arnd
