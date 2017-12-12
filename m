@@ -1,28 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ms.lwn.net ([45.79.88.28]:55894 "EHLO ms.lwn.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750759AbdLKWGx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Dec 2017 17:06:53 -0500
-Date: Mon, 11 Dec 2017 15:06:51 -0700
-From: Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH 0/2] Documentation: Add guidance on CONFIG default value
-Message-ID: <20171211150651.2dcff225@lwn.net>
-In-Reply-To: <cover.1511217248.git.dvhart@infradead.org>
-References: <cover.1511217248.git.dvhart@infradead.org>
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:24525 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752405AbdLLO7W (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 12 Dec 2017 09:59:22 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1507172808-12246-1-git-send-email-ulfalizer@gmail.com>
+References: <1507172808-12246-1-git-send-email-ulfalizer@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 12 Dec 2017 23:58:16 +0900
+Message-ID: <CAK7LNAT2_Su7=ADrVUsZ0EgTsyh_3QT=nWZV9E5DyFHFDhegbQ@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Sync zconf.y with zconf.tab.c_shipped
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Darren Hart <dvhart@infradead.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, 20 Nov 2017 14:39:32 -0800
-Darren Hart <dvhart@infradead.org> wrote:
+2017-10-05 12:06 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> Looks like a change to a comment in zconf.y was never committed, because
+> the updated version only appears it zconf.tab.c_shipped. Update the
+> comment in zconf.y to match.
+>
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> ---
+>  scripts/kconfig/zconf.y | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+> index c8f396c..4b2cf41 100644
+> --- a/scripts/kconfig/zconf.y
+> +++ b/scripts/kconfig/zconf.y
+> @@ -101,7 +101,7 @@ static struct menu *current_menu, *current_entry;
+>  } if_entry menu_entry choice_entry
+>
+>  %{
+> -/* Include zconf_id.c here so it can see the token constants. */
+> +/* Include kconf_id.c here so it can see the token constants. */
+>  #include "kconf_id.c"
+>  %}
 
-> Document the preference for "default n" in kconfig-language.txt, and reference
-> that in the submit-checklist.rst.
 
-I've (finally) applied the pair to the docs tree, thanks.
+Applied to linux-kbuild/kconfig.
+Thanks!
 
-jon
+BTW, I do not know the historical reason
+why zconf instead of kconf in the first place...
+
+
+-- 
+Best Regards
+Masahiro Yamada
