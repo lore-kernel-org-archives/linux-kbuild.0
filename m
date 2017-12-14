@@ -1,64 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:52278 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753744AbdLMVbk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Dec 2017 16:31:40 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNASCQqaBvERg6NXPym62Dyza00TuZVOWtj0YqLDKPT2D5g@mail.gmail.com>
-References: <1507091240-12756-1-git-send-email-yamada.masahiro@socionext.com>
- <20171009150523.GT20805@n2100.armlinux.org.uk> <CAK7LNASCQqaBvERg6NXPym62Dyza00TuZVOWtj0YqLDKPT2D5g@mail.gmail.com>
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 13 Dec 2017 15:31:18 -0600
-Message-ID: <CAL_Jsq+E-fH1mN8Cxu8=8-wRZ+edF0YK5wCrKavY3frp1opbZA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: fix dependency of dtbs targets
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:39014 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752625AbdLNPMv (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 14 Dec 2017 10:12:51 -0500
+From: Andre Heider <a.heider@gmail.com>
+Subject: [PATCH] of: build dbts with symbols when CONFIG_OF_OVERLAY is set
+Date: Thu, 14 Dec 2017 16:12:40 +0100
+Message-Id: <20171214151240.14555-1-a.heider@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Russell King - ARM Linux <linux@armlinux.org.uk>, Will Deacon <will.deacon@arm.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ley Foon Tan <lftan@altera.com>, nios2-dev@lists.rocketboards.org, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Rob Herring <robh+dt@kernel.org>, Frank Rowand <frowand.list@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-On Wed, Oct 25, 2017 at 12:40 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Hi.
->
->
-> 2017-10-10 0:05 GMT+09:00 Russell King - ARM Linux <linux@armlinux.org.uk>:
->> On Wed, Oct 04, 2017 at 01:27:20PM +0900, Masahiro Yamada wrote:
->>> The target "dtbs" should depend on "scripts" because it needs to
->>> build dtc.  The "prepare" target is unneeded here.
->>
->> Looks fine for ARM, as the only thing the dtbs should depend on is
->> the kernel configuration (to decide which to build) and DT tooling.
->>
->> Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
->>
->> --
->
->
-> I found a potential issue on this
-> because the default DTB install path depends on $(KERNELRELEASE).
->
->
-> In top-level Makefile:
-> export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(KERNELRELEASE)
->
->
-> The include/config/kernel.release is created by "prepare3" target.
->
-> If the dependency on "parepare" is removed,
-> it is possible to run "make dtbs" and "make dtbs_install"
-> without creating include/config/kernel.release.
->
-> So, the $(KERNELRELEASE) could be empty when installing DTB.
->
->
-> Maybe, drop this patch, or reduce the dependency to "parepare3"?
+The overlay feature requires the base dtb to be built with symbols, so
+lets build the dtbs with symbols when overlay support was explicitly
+enabled.
 
-I was doing some work to get dtb builds to work without depending on
-$arch cross compiler and this patch fixes some of the issues. The
-dtbs_install target has the prepare dependency, so that should be
-sufficient and your patch should be fine. BTW, Based on prior
-discussion on "ARM: kbuild: Fix forced rebuild after 'make dtbs'"
-thread, prepare should not be needed just for $(KERNELRELEASE).
+With CONFIG_OF_ALL_DTBS on ARCH=arm the 989 dtb files grow about ~38% on
+average.
 
-Rob
+Totals in bytes with the 3 biggest ones:
+
+Before:
+	90471	arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
+	90521	arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
+	92639	arch/arm/boot/dts/dra7-evm.dtb
+	25731296	total
+
+After:
+	133203	arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
+	133237	arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
+	134545	arch/arm/boot/dts/dra7-evm.dtb
+	35464440	total
+
+Signed-off-by: Andre Heider <a.heider@gmail.com>
+---
+
+Hi,
+
+while playing around with overlays I noticed that I needed to rebuilt
+my distro's device trees because they didn't come with symbols.
+
+Is that for a reason, maybe the not so minor increase in size?
+
+Thanks,
+Andre
+
+ drivers/of/unittest-data/Makefile | 7 -------
+ scripts/Makefile.lib              | 5 +++++
+ 2 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/of/unittest-data/Makefile b/drivers/of/unittest-data/Makefile
+index 32389acfa616..b65061013512 100644
+--- a/drivers/of/unittest-data/Makefile
++++ b/drivers/of/unittest-data/Makefile
+@@ -15,13 +15,6 @@ targets += overlay.dtb overlay.dtb.S
+ targets += overlay_bad_phandle.dtb overlay_bad_phandle.dtb.S
+ targets += overlay_bad_symbol.dtb overlay_bad_symbol.dtb.S
+ targets += overlay_base.dtb overlay_base.dtb.S
+-
+-# enable creation of __symbols__ node
+-DTC_FLAGS_overlay := -@
+-DTC_FLAGS_overlay_bad_phandle := -@
+-DTC_FLAGS_overlay_bad_symbol := -@
+-DTC_FLAGS_overlay_base := -@
+-
+ endif
+ 
+ .PRECIOUS: \
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 1ca4dcd2d500..c7ba4aa8a07a 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -278,6 +278,11 @@ DTC_FLAGS += -Wnode_name_chars_strict \
+ 	-Wproperty_name_chars_strict
+ endif
+ 
++ifeq ($(CONFIG_OF_OVERLAY),y)
++# enable creation of __symbols__ node
++DTC_FLAGS += -@
++endif
++
+ DTC_FLAGS += $(DTC_FLAGS_$(basetarget))
+ 
+ # Generate an assembly file to wrap the output of the device tree compiler
+-- 
+2.15.1
+
