@@ -1,90 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:39014 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752625AbdLNPMv (ORCPT
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:41173 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752045AbdLNT4m (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Dec 2017 10:12:51 -0500
-From: Andre Heider <a.heider@gmail.com>
-Subject: [PATCH] of: build dbts with symbols when CONFIG_OF_OVERLAY is set
-Date: Thu, 14 Dec 2017 16:12:40 +0100
-Message-Id: <20171214151240.14555-1-a.heider@gmail.com>
+        Thu, 14 Dec 2017 14:56:42 -0500
+From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] fixdep: free memory on second error path of do_config_file
+Date: Thu, 14 Dec 2017 20:54:10 +0100
+Message-Id: <1513281250-9186-2-git-send-email-lukas.bulwahn@gmail.com>
+In-Reply-To: <1513281250-9186-1-git-send-email-lukas.bulwahn@gmail.com>
+References: <1513281250-9186-1-git-send-email-lukas.bulwahn@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>, Frank Rowand <frowand.list@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: linux-kbuild@vger.kernel.org
+Cc: Alexey Dobriyan <adobriyan@gmail.com>, lukas.bulwahn@gmail.com, sil2review@lists.osadl.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The overlay feature requires the base dtb to be built with symbols, so
-lets build the dtbs with symbols when overlay support was explicitly
-enabled.
+Commit dee81e988674 ("fixdep: faster CONFIG_ search") introduces the memory
+leak when `map = mmap(...)` was replaced with `map = malloc(...)` and
+`read(fd, map, ...)`. It introduces a new second error path, which does not
+free the allocated memory for `map`. We now correct that behavior and free
+`map` before the do_config_file() function returns.
 
-With CONFIG_OF_ALL_DTBS on ARCH=arm the 989 dtb files grow about ~38% on
-average.
+Facebook's static analysis tool Infer (http://fbinfer.com) found this
+memory leak:
 
-Totals in bytes with the 3 biggest ones:
+  scripts/basic/fixdep.c:297: error: MEMORY_LEAK
+    memory dynamically allocated by call to `malloc()` at line 290, \
+    column 8 is not reachable after line 297, column 3.
 
-Before:
-	90471	arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
-	90521	arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
-	92639	arch/arm/boot/dts/dra7-evm.dtb
-	25731296	total
+Fixes: dee81e988674 ("fixdep: faster CONFIG_ search")
 
-After:
-	133203	arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
-	133237	arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
-	134545	arch/arm/boot/dts/dra7-evm.dtb
-	35464440	total
-
-Signed-off-by: Andre Heider <a.heider@gmail.com>
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
 ---
+ scripts/basic/fixdep.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Hi,
-
-while playing around with overlays I noticed that I needed to rebuilt
-my distro's device trees because they didn't come with symbols.
-
-Is that for a reason, maybe the not so minor increase in size?
-
-Thanks,
-Andre
-
- drivers/of/unittest-data/Makefile | 7 -------
- scripts/Makefile.lib              | 5 +++++
- 2 files changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/of/unittest-data/Makefile b/drivers/of/unittest-data/Makefile
-index 32389acfa616..b65061013512 100644
---- a/drivers/of/unittest-data/Makefile
-+++ b/drivers/of/unittest-data/Makefile
-@@ -15,13 +15,6 @@ targets += overlay.dtb overlay.dtb.S
- targets += overlay_bad_phandle.dtb overlay_bad_phandle.dtb.S
- targets += overlay_bad_symbol.dtb overlay_bad_symbol.dtb.S
- targets += overlay_base.dtb overlay_base.dtb.S
--
--# enable creation of __symbols__ node
--DTC_FLAGS_overlay := -@
--DTC_FLAGS_overlay_bad_phandle := -@
--DTC_FLAGS_overlay_bad_symbol := -@
--DTC_FLAGS_overlay_base := -@
--
- endif
- 
- .PRECIOUS: \
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 1ca4dcd2d500..c7ba4aa8a07a 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -278,6 +278,11 @@ DTC_FLAGS += -Wnode_name_chars_strict \
- 	-Wproperty_name_chars_strict
- endif
- 
-+ifeq ($(CONFIG_OF_OVERLAY),y)
-+# enable creation of __symbols__ node
-+DTC_FLAGS += -@
-+endif
-+
- DTC_FLAGS += $(DTC_FLAGS_$(basetarget))
- 
- # Generate an assembly file to wrap the output of the device tree compiler
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index bbf62cb..131c450 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -296,6 +296,7 @@ static void do_config_file(const char *filename)
+ 	if (read(fd, map, st.st_size) != st.st_size) {
+ 		perror("fixdep: read");
+ 		close(fd);
++		free(map);
+ 		return;
+ 	}
+ 	map[st.st_size] = '\0';
 -- 
-2.15.1
+2.7.4
 
