@@ -1,52 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:52360 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754416AbdLNX2N (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:25634 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754272AbdLNXzJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Dec 2017 18:28:13 -0500
+        Thu, 14 Dec 2017 18:55:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <1507204875-5021-1-git-send-email-ulfalizer@gmail.com>
-References: <1507204875-5021-1-git-send-email-ulfalizer@gmail.com>
+In-Reply-To: <1512835350-8646-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1512835350-8646-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 15 Dec 2017 08:27:27 +0900
-Message-ID: <CAK7LNAS9DNWkjo5PpqoMW1b_iJtMFrp+7Kp4Ycu05Po=idUS_w@mail.gmail.com>
-Subject: Re: [PATCH 0/3] kconfig: Make 'm' safe before modules symbol is defined
+Date: Fri, 15 Dec 2017 08:54:20 +0900
+Message-ID: <CAK7LNAROtWVcpwpaKYAyr=jpPrOu3iMHVCJcVN+4SVp6ZtEd5g@mail.gmail.com>
+Subject: Re: [PATCH 0/3] kbuild,kconfig: generate lexer/parser C files instead
+ of copying _shipped files
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, zippel@linux-m68k.org, Nicolas Pitre <nicolas.pitre@linaro.org>, Michal Marek <mmarek@suse.com>, dirk@gouders.net, Arnaud Lacombe <lacombar@gmail.com>, Jan Beulich <JBeulich@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Kate Stewart <kstewart@linuxfoundation.org>, Markus Heiser <markus.heiser@darmarit.de>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Borislav Petkov <bp@suse.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, SeongJae Park <sj38.park@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Philippe Ombredanne <pombredanne@nexb.com>, Max Filippov <jcmvbkbc@gmail.com>
 
-2017-10-05 21:01 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> Hello,
+2017-12-10 1:02 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> In Linux build system convention, pre-generated files are version-
+> controlled with a "_shipped" suffix.  During the kernel building,
+> they are simply shipped (copied) removing the suffix.
 >
-> This patchset fixes a segfault that occurs if 'm' appears in certain
-> expressions before the modules symbol is defined. The problem is that m is
-> rewritten to m && <modules symbol> already during parsing. Doing it in
-> menu_finalize(), which runs after parsing, fixes the problem.
+> From users' point of view, this approach can reduce external tool
+> dependency for the kernel build,
 >
-> To aid the review and people trying to understand menu_finalize() in the future
-> (including me), it also renames menu_check_dep() to rewrite_m() and adds
-> comments to clarify the existing expression rewriting and dependency
-> propagation logic.
+> From developers point of view, it is tedious to manually regenerate
+> such artifacts.  In fact, we see several patches to regenerate
+> _shipped files.  They are noise commits.
 >
-> The changes have been tested for regressions using zconfdump(), Kconfiglib, and
-> Valgrind.
+> When we update a *.y or *.l file, it would be better to update the
+> corresponding _shipped file in the same commit, but it is painful.
+> If you use a different version of flex/bison, it will produce lots of
+> irrelevant diffs.
 >
-> Cheers,
-> Ulf
+> We could update _shipped files after adding various changes to the
+> real sources, but it is not very nice for a git-bisect'ability.
+> In case of a problem, "git bisect" would point to the commit updating
+> _shipped files, but the root cause would be in another commit that
+> has changed the corresponding .l or .y files.
 >
-> Ulf Magnusson (3):
->   kconfig: Rename menu_check_dep() to rewrite_m()
->   kconfig: Clarify expression rewriting
->   kconfig: Clean up modules handling and fix crash
+> Some months ago, I sent RFC patches to run flex, bison, and gperf
+> during the build.
+> https://lkml.org/lkml/2017/8/19/49
 >
->  scripts/kconfig/menu.c | 74 ++++++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 66 insertions(+), 8 deletions(-)
+> Basically Linus agreed this, but he found a problem in gperf, then
+> use of gperf in kernel was removed.
+>
+> It took some months for me to come back.  This time, I installed various
+> versions of flex/bison on my machine, and tested them more carefully.
+>
+> My current motivation is in Kconfig.
+> There are several Kconfig patches touching *.y and *.l
+> (and Linus suggested another improvement for Kconfig)
+> so I want to remove zconf.lex.c_shipped and zconf.tab.c_shipped now.
+> Kconfig has no problem for this switch.
+>
+> dtc and genksyms will be taken care of later because
+> both of them are having shift/reduce conflicts now.
+> The ambiguous grammar in dtc has been fixed in upstream, but not
+> reflected to kernel yet.  We can proceed migration in sub-system base.
+>
+>
+> Masahiro Yamada (3):
+>   kbuild: add LEX and YACC variables
+>   kbuild: prepare to remove C files pre-generated by flex and bison
+>   kconfig: generate lexer and parser during build instead of shipping
 >
 
+I did not get any problem report from the 0-day bot.
+I assume flex and bison are installed on their machines.
 
-Series, applied to linux-kbuild/kconfig.  Thanks!
+
+Fixed a typo pointed out by Randy,
+then applied to linux-kbuild/kconfig.
+
+
 
 -- 
 Best Regards
