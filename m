@@ -1,40 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:42900 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755534AbdLOTG1 (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:38312 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755834AbdLOT70 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Dec 2017 14:06:27 -0500
-Date: Fri, 15 Dec 2017 20:06:28 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 1/2] kconfig: use bool instead of boolean for type
- definition attributes, again
-Message-ID: <20171215190628.GA16565@kroah.com>
-References: <1513352282-4437-1-git-send-email-yamada.masahiro@socionext.com>
+        Fri, 15 Dec 2017 14:59:26 -0500
+Date: Fri, 15 Dec 2017 20:50:59 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 0/3] kbuild,kconfig: generate lexer/parser C files
+ instead of copying _shipped files
+Message-ID: <20171215195059.GA10168@ravnborg.org>
+References: <1512835350-8646-1-git-send-email-yamada.masahiro@socionext.com>
+ <CAK7LNAROtWVcpwpaKYAyr=jpPrOu3iMHVCJcVN+4SVp6ZtEd5g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1513352282-4437-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <CAK7LNAROtWVcpwpaKYAyr=jpPrOu3iMHVCJcVN+4SVp6ZtEd5g@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, devel@driverdev.osuosl.org, linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, Matt Fleming <matt@codeblueprint.co.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Kate Stewart <kstewart@linuxfoundation.org>, Markus Heiser <markus.heiser@darmarit.de>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Borislav Petkov <bp@suse.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, SeongJae Park <sj38.park@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Philippe Ombredanne <pombredanne@nexb.com>, Max Filippov <jcmvbkbc@gmail.com>
 
-On Sat, Dec 16, 2017 at 12:38:01AM +0900, Masahiro Yamada wrote:
-> Commit 6341e62b212a ("kconfig: use bool instead of boolean for type
-> definition attributes") did treewide replacement of 'boolean', and
-> also mentioned the keyword 'boolean' would be dropped later on.
-> 
-> Some years have passed, but it has not happened yet.  Meanwhile, some
-> new instances have come up.
-> 
-> I am really going to drop this keyword.  I need to do the replacement
-> once again.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
->  drivers/firmware/efi/Kconfig    | 2 +-
->  drivers/staging/rtlwifi/Kconfig | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+Hi Masahiro.
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > In Linux build system convention, pre-generated files are version-
+> > controlled with a "_shipped" suffix.  During the kernel building,
+> > they are simply shipped (copied) removing the suffix.
+> >
+> > From users' point of view, this approach can reduce external tool
+> > dependency for the kernel build,
+> >
+> > From developers point of view, it is tedious to manually regenerate
+> > such artifacts.  In fact, we see several patches to regenerate
+> > _shipped files.  They are noise commits.
+...
+
+Nice cleanup we should have does years ago.
+When we introduced this we did this to minimize the time
+it took to configure a clean kernel - as one of the reasons.
+Since then the average computer has been significantly faster
+so the time to run flex/bison is not an issue anymore.
+
+	Sam
