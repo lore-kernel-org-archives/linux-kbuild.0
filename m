@@ -1,60 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:50087 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932244AbdLOPkO (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Dec 2017 10:40:14 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/2] kconfig: use bool instead of boolean for type definition attributes, again
-Date: Sat, 16 Dec 2017 00:38:01 +0900
-Message-Id: <1513352282-4437-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from mx2.suse.de ([195.135.220.15]:43343 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755428AbdLOR2M (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 15 Dec 2017 12:28:12 -0500
+Date: Fri, 15 Dec 2017 18:28:10 +0100
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: Re: [PATCH] kconfig: display recursive dependency resolution hint
+ just once
+Message-ID: <20171215172810.GB729@wotan.suse.de>
+References: <1513351722-14196-1-git-send-email-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1513351722-14196-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, devel@driverdev.osuosl.org, linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, Matt Fleming <matt@codeblueprint.co.uk>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org
 
-Commit 6341e62b212a ("kconfig: use bool instead of boolean for type
-definition attributes") did treewide replacement of 'boolean', and
-also mentioned the keyword 'boolean' would be dropped later on.
+On Sat, Dec 16, 2017 at 12:28:42AM +0900, Masahiro Yamada wrote:
+> Commit 1c199f2878f6 ("kbuild: document recursive dependency limitation
+> / resolution") probably intended to show a hint along with "recursive
+> dependency detected!" error, but it missed to add {...} guard, and the
+> hint is displayed in every loop of the dep_stack traverse, annoyingly.
+> 
+> This error was detected by GCC's -Wmisleading-indentation when switching
+> to build-time generation of lexer/parser.
+> 
+> scripts/kconfig/symbol.c: In function ‘sym_check_print_recursive’:
+> scripts/kconfig/symbol.c:1150:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+>    if (stack->sym == last_sym)
+>    ^~
+> scripts/kconfig/symbol.c:1153:4: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+>     fprintf(stderr, "For a resolution refer to Documentation/kbuild/kconfig-language.txt\n");
+>     ^~~~~~~
+> 
+> I could simply add {...} to surround the three fprintf(), but I rather
+> chose to move the hint after the loop to make the whole message readable.
+> 
+> Fixes: 1c199f2878f6 ("kbuild: document recursive dependency limitation / resolution"
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Some years have passed, but it has not happened yet.  Meanwhile, some
-new instances have come up.
+Acked-by: Luis R. Rodriguez <mcgrof@kernel.org>
 
-I am really going to drop this keyword.  I need to do the replacement
-once again.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- drivers/firmware/efi/Kconfig    | 2 +-
- drivers/staging/rtlwifi/Kconfig | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/firmware/efi/Kconfig b/drivers/firmware/efi/Kconfig
-index 2b4c39f..3abdda1 100644
---- a/drivers/firmware/efi/Kconfig
-+++ b/drivers/firmware/efi/Kconfig
-@@ -113,7 +113,7 @@ config EFI_CAPSULE_LOADER
- 	  Most users should say N.
- 
- config EFI_CAPSULE_QUIRK_QUARK_CSH
--	boolean "Add support for Quark capsules with non-standard headers"
-+	bool "Add support for Quark capsules with non-standard headers"
- 	depends on X86 && !64BIT
- 	select EFI_CAPSULE_LOADER
- 	default y
-diff --git a/drivers/staging/rtlwifi/Kconfig b/drivers/staging/rtlwifi/Kconfig
-index cb3a29a..12cf467 100644
---- a/drivers/staging/rtlwifi/Kconfig
-+++ b/drivers/staging/rtlwifi/Kconfig
-@@ -17,6 +17,6 @@ config RTLPHYDM_ST
- 	default m
- 
- config RTLWIFI_DEBUG_ST
--	boolean
-+	bool
- 	depends on R8822BE
- 	default y
--- 
-2.7.4
-
+  Luis
