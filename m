@@ -1,82 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:33988 "EHLO
-        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755530AbdLOUQl (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:36032 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755650AbdLOVG6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Dec 2017 15:16:41 -0500
-Date: Fri, 15 Dec 2017 21:16:39 +0100
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH] fix perl locale warnings in arch/arm/boot/
-Message-ID: <20171215201639.GA32042@amd>
-References: <20171119222703.GA12824@amd>
- <CAK7LNARWMpxxC9hT8f7rGj5McjdNU1GXfjML9NbWFTCGyQ++dg@mail.gmail.com>
- <20171127094620.GA18072@amd>
+        Fri, 15 Dec 2017 16:06:58 -0500
+Subject: Re: [PATCH] of: build dbts with symbols when CONFIG_OF_OVERLAY is set
+References: <20171214151240.14555-1-a.heider@gmail.com>
+From: Frank Rowand <frowand.list@gmail.com>
+Message-ID: <aada8c54-2c26-bf37-8782-4edc43195daf@gmail.com>
+Date: Fri, 15 Dec 2017 13:06:56 -0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="LZvS9be/3tNcYl/X"
-Content-Disposition: inline
-In-Reply-To: <20171127094620.GA18072@amd>
+In-Reply-To: <20171214151240.14555-1-a.heider@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, rmk+kernel@armlinux.org.uk, tony@atomide.com, j-keerthy@ti.com, linux-arm-kernel@lists.infradead.org, arnd@arndb.de, Linus Torvalds <torvalds@linux-foundation.org>, olof@lixom.net, arm@kernel.org, Andrew Morton <akpm@osdl.org>, linux@armlinux.org.uk
-Cc: kernel list <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Andre Heider <a.heider@gmail.com>, Rob Herring <robh+dt@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+
+On 12/14/17 07:12, Andre Heider wrote:
+> The overlay feature requires the base dtb to be built with symbols, so
+> lets build the dtbs with symbols when overlay support was explicitly
+> enabled.
+> 
+> With CONFIG_OF_ALL_DTBS on ARCH=arm the 989 dtb files grow about ~38% on
+> average.
+> 
+> Totals in bytes with the 3 biggest ones:
+> 
+> Before:
+> 	90471	arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
+> 	90521	arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
+> 	92639	arch/arm/boot/dts/dra7-evm.dtb
+> 	25731296	total
+> 
+> After:
+> 	133203	arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
+> 	133237	arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
+> 	134545	arch/arm/boot/dts/dra7-evm.dtb
+> 	35464440	total
+> 
+> Signed-off-by: Andre Heider <a.heider@gmail.com>
+> ---
+> 
+> Hi,
+> 
+> while playing around with overlays I noticed that I needed to rebuilt
+> my distro's device trees because they didn't come with symbols.
+> 
+> Is that for a reason, maybe the not so minor increase in size?
+
+Yes, size is the issue.
 
 
---LZvS9be/3tNcYl/X
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> 
+> Thanks,
+> Andre
+> 
+>  drivers/of/unittest-data/Makefile | 7 -------
+>  scripts/Makefile.lib              | 5 +++++
+>  2 files changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/of/unittest-data/Makefile b/drivers/of/unittest-data/Makefile
+> index 32389acfa616..b65061013512 100644
+> --- a/drivers/of/unittest-data/Makefile
+> +++ b/drivers/of/unittest-data/Makefile
+> @@ -15,13 +15,6 @@ targets += overlay.dtb overlay.dtb.S
+>  targets += overlay_bad_phandle.dtb overlay_bad_phandle.dtb.S
+>  targets += overlay_bad_symbol.dtb overlay_bad_symbol.dtb.S
+>  targets += overlay_base.dtb overlay_base.dtb.S
+> -
+> -# enable creation of __symbols__ node
+> -DTC_FLAGS_overlay := -@
+> -DTC_FLAGS_overlay_bad_phandle := -@
+> -DTC_FLAGS_overlay_bad_symbol := -@
+> -DTC_FLAGS_overlay_base := -@
+> -
+>  endif
+>  
+>  .PRECIOUS: \
 
-On Mon 2017-11-27 10:46:20, Pavel Machek wrote:
->=20
-> Commit 429f7a062e3b5cf6fcf01eb00600cee5fe4d751f introduced perl into
-> arch/arm/boot/compressed/Makefile, which unfortunately leads to locale
-> warnings.
->=20
-> Fix it by setting default locale.
->=20
-> Signed-off-by: Pavel Machek <pavel@ucw.cz>
-
-RMK apparently can't be bothered to fix the stuff he broke. Can
-someone take the patch? Arm-soc? Linus? Andrew?=20
-
-Thanks,
-								Pavel
-
-> diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed=
-/Makefile
-> index 45a6b9b..4656e98 100644
-> --- a/arch/arm/boot/compressed/Makefile
-> +++ b/arch/arm/boot/compressed/Makefile
-> @@ -118,7 +118,7 @@ asflags-y :=3D -DZIMAGE
-> =20
->  # Supply kernel BSS size to the decompressor via a linker symbol.
->  KBSS_SZ =3D $(shell $(CROSS_COMPILE)nm $(obj)/../../../../vmlinux | \
-> -		perl -e 'while (<>) { \
-> +		LC_ALL=3DC perl -e 'while (<>) { \
->  			$$bss_start=3Dhex($$1) if /^([[:xdigit:]]+) B __bss_start$$/; \
->  			$$bss_end=3Dhex($$1) if /^([[:xdigit:]]+) B __bss_stop$$/; \
->  		}; printf "%d\n", $$bss_end - $$bss_start;')
->=20
->=20
+No.  The unittests require these to be set unconditionally.
 
 
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 1ca4dcd2d500..c7ba4aa8a07a 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -278,6 +278,11 @@ DTC_FLAGS += -Wnode_name_chars_strict \
+>  	-Wproperty_name_chars_strict
+>  endif
+>  
+> +ifeq ($(CONFIG_OF_OVERLAY),y)
+> +# enable creation of __symbols__ node
+> +DTC_FLAGS += -@
+> +endif
+> +
+>  DTC_FLAGS += $(DTC_FLAGS_$(basetarget))
+>  
+>  # Generate an assembly file to wrap the output of the device tree compiler
+> 
 
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
+Not needed.  Instead set DTC_FLAGS in the make command.  For example:
 
---LZvS9be/3tNcYl/X
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+   DTC_FLAGS=-@ make qcom-apq8074-dragonboard.dtb
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+There are a few architecture Makefiles that need to be fixed to not unconditionally
+set DTC_FLAGS.
 
-iEYEARECAAYFAlo0LacACgkQMOfwapXb+vJnOQCfe5si+9TJ1IZAsiq02yPF/M7x
-5VQAn2WmOB/KpCAsZwAhj6y5qg52M7P+
-=T1J7
------END PGP SIGNATURE-----
-
---LZvS9be/3tNcYl/X--
+-Frank
