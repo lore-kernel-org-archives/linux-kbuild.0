@@ -1,80 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 178.115.242.59.static.drei.at ([178.115.242.59]:59151 "EHLO
-        mail.osadl.at" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-        with ESMTP id S1753312AbdLOIXX (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:62822 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932072AbdLOPax (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Dec 2017 03:23:23 -0500
-Date: Fri, 15 Dec 2017 08:23:16 +0000
-From: Nicholas Mc Guire <der.herr@hofr.at>
-Subject: Re: [SIL2review] [PATCH] fixdep: free memory on second error path of
- do_config_file
-Message-ID: <20171215082316.GB26962@osadl.at>
-References: <1513281250-9186-1-git-send-email-lukas.bulwahn@gmail.com>
- <1513281250-9186-2-git-send-email-lukas.bulwahn@gmail.com>
+        Fri, 15 Dec 2017 10:30:53 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kconfig: display recursive dependency resolution hint just once
+Date: Sat, 16 Dec 2017 00:28:42 +0900
+Message-Id: <1513351722-14196-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1513281250-9186-2-git-send-email-lukas.bulwahn@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, sil2review@lists.osadl.org, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Alexey Dobriyan <adobriyan@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org
 
-On Thu, Dec 14, 2017 at 08:54:10PM +0100, Lukas Bulwahn wrote:
-> Commit dee81e988674 ("fixdep: faster CONFIG_ search") introduces the memory
-> leak when `map = mmap(...)` was replaced with `map = malloc(...)` and
-> `read(fd, map, ...)`. It introduces a new second error path, which does not
-> free the allocated memory for `map`. We now correct that behavior and free
-> `map` before the do_config_file() function returns.
-> 
-> Facebook's static analysis tool Infer (http://fbinfer.com) found this
-> memory leak:
-> 
->   scripts/basic/fixdep.c:297: error: MEMORY_LEAK
->     memory dynamically allocated by call to `malloc()` at line 290, \
->     column 8 is not reachable after line 297, column 3.
-> 
-> Fixes: dee81e988674 ("fixdep: faster CONFIG_ search")
-> 
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Reviewed-by: Nicholas Mc Guire <der.herr@hofr.at>
+Commit 1c199f2878f6 ("kbuild: document recursive dependency limitation
+/ resolution") probably intended to show a hint along with "recursive
+dependency detected!" error, but it missed to add {...} guard, and the
+hint is displayed in every loop of the dep_stack traverse, annoyingly.
 
-> ---
->  scripts/basic/fixdep.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-> index bbf62cb..131c450 100644
-> --- a/scripts/basic/fixdep.c
-> +++ b/scripts/basic/fixdep.c
-> @@ -296,6 +296,7 @@ static void do_config_file(const char *filename)
->  	if (read(fd, map, st.st_size) != st.st_size) {
->  		perror("fixdep: read");
->  		close(fd);
-> +		free(map);
+This error was detected by GCC's -Wmisleading-indentation when switching
+to build-time generation of lexer/parser.
 
- This looks reasonable but actually it is not clear why do_config_file()
-should return at all if read fails as the read error would go unnoticed
-in the current code and allow the build to continue. so this probably
-should be an exit(2) here and not a return which would then take care
-of the free() anyway.
+scripts/kconfig/symbol.c: In function ‘sym_check_print_recursive’:
+scripts/kconfig/symbol.c:1150:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   if (stack->sym == last_sym)
+   ^~
+scripts/kconfig/symbol.c:1153:4: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+    fprintf(stderr, "For a resolution refer to Documentation/kbuild/kconfig-language.txt\n");
+    ^~~~~~~
 
- Atleast I do not see the rational to allow continuation if the read 
-failed as the file should not be empty nor a mismatch with st.st_size
-expected. If it were due to a EINTR then it still should terminate as
-EINTR was not handled and we thus could miss a valid dependency.
+I could simply add {...} to surround the three fprintf(), but I rather
+chose to move the hint after the loop to make the whole message readable.
 
- Note: this probably also should be applied to the if (!map) condition
-before as well, as at that point it is known that map > 0 and a malloc()
-failure would allow skipping parse_config_file() for a valid config.
+Fixes: 1c199f2878f6 ("kbuild: document recursive dependency limitation / resolution"
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
->  		return;
->  	}
->  	map[st.st_size] = '\0';
-> -- 
-> 2.7.4
-> 
-> _______________________________________________
-> SIL2review mailing list
-> SIL2review@lists.osadl.org
-> https://lists.osadl.org/mailman/listinfo/sil2review
+ scripts/kconfig/symbol.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 3c8bd9b..35e0937 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -1150,8 +1150,7 @@ static void sym_check_print_recursive(struct symbol *last_sym)
+ 		if (stack->sym == last_sym)
+ 			fprintf(stderr, "%s:%d:error: recursive dependency detected!\n",
+ 				prop->file->name, prop->lineno);
+-			fprintf(stderr, "For a resolution refer to Documentation/kbuild/kconfig-language.txt\n");
+-			fprintf(stderr, "subsection \"Kconfig recursive dependency limitations\"\n");
++
+ 		if (stack->expr) {
+ 			fprintf(stderr, "%s:%d:\tsymbol %s %s value contains %s\n",
+ 				prop->file->name, prop->lineno,
+@@ -1181,6 +1180,11 @@ static void sym_check_print_recursive(struct symbol *last_sym)
+ 		}
+ 	}
+ 
++	fprintf(stderr,
++		"For a resolution refer to Documentation/kbuild/kconfig-language.txt\n"
++		"subsection \"Kconfig recursive dependency limitations\"\n"
++		"\n");
++
+ 	if (check_top == &cv_stack)
+ 		dep_stack_remove();
+ }
+-- 
+2.7.4
+
