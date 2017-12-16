@@ -1,61 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp2130.oracle.com ([156.151.31.86]:43644 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756608AbdLPRM4 (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:46768 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752165AbdLPRZh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 16 Dec 2017 12:12:56 -0500
-Message-ID: <1513444305.31439.37.camel@oracle.com>
-Subject: Re: [PATCH v2 0/5] Support for generalized use of make C={1,2} via
- a wrapper program
-From: Knut Omang <knut.omang@oracle.com>
-Date: Sat, 16 Dec 2017 18:11:45 +0100
-In-Reply-To: <1513443601.4647.36.camel@perches.com>
-References: <cover.630ac8faeeda67bf7a778c158174422042942d08.1513430008.git-series.knut.omang@oracle.com>
-         <1513437684.4647.30.camel@perches.com>
-         <1513441634.31439.34.camel@oracle.com>
-         <1513443601.4647.36.camel@perches.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+        Sat, 16 Dec 2017 12:25:37 -0500
+Subject: Re: [PATCH] of: build dbts with symbols when CONFIG_OF_OVERLAY is set
+References: <20171214151240.14555-1-a.heider@gmail.com>
+ <aada8c54-2c26-bf37-8782-4edc43195daf@gmail.com>
+From: Andre Heider <a.heider@gmail.com>
+Message-ID: <05291157-a1dc-db84-e453-c43945c1da07@gmail.com>
+Date: Sat, 16 Dec 2017 18:25:33 +0100
+MIME-Version: 1.0
+In-Reply-To: <aada8c54-2c26-bf37-8782-4edc43195daf@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>, linux-kernel@vger.kernel.org
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, Jonathan Corbet <corbet@lwn.net>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, Matthew Wilcox <willy@infradead.org>, cocci@systeme.lip6.fr, rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org, Doug Ledford <dledford@redhat.com>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, Shuah Khan <shuah@kernel.org>, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
+To: Frank Rowand <frowand.list@gmail.com>, Rob Herring <robh+dt@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-On Sat, 2017-12-16 at 09:00 -0800, Joe Perches wrote:
-> On Sat, 2017-12-16 at 17:27 +0100, Knut Omang wrote:
-> > On Sat, 2017-12-16 at 07:21 -0800, Joe Perches wrote:
-> > > On Sat, 2017-12-16 at 15:42 +0100, Knut Omang wrote:
-> > > > This patch series implements features to make it easier to run checkers on the
-> > > > entire kernel as part of automatic and developer testing.
-> > > 
-> > > This seems like a useful and reasonable series, thanks.
-> > 
-> > thanks, appreciated,
-> > 
-> > > Do please take Julia's grammar updates.
-> > 
-> > will do,
-> > 
-> > > How is this series to be applied?
-> > 
-> > I am open for suggestions.
-> > 
-> > Let's leave patch #3 out for now.
-> > 
-> > It's safe to apply #1 (and #2) alone.
+Hi Frank,
+
+On 15/12/17 22:06, Frank Rowand wrote:
+> On 12/14/17 07:12, Andre Heider wrote:
+>> The overlay feature requires the base dtb to be built with symbols, so
+>> lets build the dtbs with symbols when overlay support was explicitly
+>> enabled.
+>>
+>> With CONFIG_OF_ALL_DTBS on ARCH=arm the 989 dtb files grow about ~38% on
+>> average.
+>>
+>> Totals in bytes with the 3 biggest ones:
+>>
+>> Before:
+>> 	90471	arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
+>> 	90521	arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
+>> 	92639	arch/arm/boot/dts/dra7-evm.dtb
+>> 	25731296	total
+>>
+>> After:
+>> 	133203	arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
+>> 	133237	arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
+>> 	134545	arch/arm/boot/dts/dra7-evm.dtb
+>> 	35464440	total
+>>
+>> Signed-off-by: Andre Heider <a.heider@gmail.com>
+>> ---
+>>
+>> Hi,
+>>
+>> while playing around with overlays I noticed that I needed to rebuilt
+>> my distro's device trees because they didn't come with symbols.
+>>
+>> Is that for a reason, maybe the not so minor increase in size?
 > 
-> I'd just as soon combine patch #1 and an updated 
-> patch #2 into a single patch and get that applied
-> sooner than later.
-
-Ok, will do that.
-
-> > They don't break anything by getting into the RDMA or RDS subsystem 
-> > without patch #1, alternatively they can go together with the set of cleanup patches I
-> > have prepared for each of RDMA and RDS after #1 is in.
+> Yes, size is the issue.
 > 
-> right.
+> 
+>>
+>> Thanks,
+>> Andre
+>>
+>>   drivers/of/unittest-data/Makefile | 7 -------
+>>   scripts/Makefile.lib              | 5 +++++
+>>   2 files changed, 5 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/drivers/of/unittest-data/Makefile b/drivers/of/unittest-data/Makefile
+>> index 32389acfa616..b65061013512 100644
+>> --- a/drivers/of/unittest-data/Makefile
+>> +++ b/drivers/of/unittest-data/Makefile
+>> @@ -15,13 +15,6 @@ targets += overlay.dtb overlay.dtb.S
+>>   targets += overlay_bad_phandle.dtb overlay_bad_phandle.dtb.S
+>>   targets += overlay_bad_symbol.dtb overlay_bad_symbol.dtb.S
+>>   targets += overlay_base.dtb overlay_base.dtb.S
+>> -
+>> -# enable creation of __symbols__ node
+>> -DTC_FLAGS_overlay := -@
+>> -DTC_FLAGS_overlay_bad_phandle := -@
+>> -DTC_FLAGS_overlay_bad_symbol := -@
+>> -DTC_FLAGS_overlay_base := -@
+>> -
+>>   endif
+>>   
+>>   .PRECIOUS: \
+> 
+> No.  The unittests require these to be set unconditionally.
+> 
+> 
+>> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+>> index 1ca4dcd2d500..c7ba4aa8a07a 100644
+>> --- a/scripts/Makefile.lib
+>> +++ b/scripts/Makefile.lib
+>> @@ -278,6 +278,11 @@ DTC_FLAGS += -Wnode_name_chars_strict \
+>>   	-Wproperty_name_chars_strict
+>>   endif
+>>   
+>> +ifeq ($(CONFIG_OF_OVERLAY),y)
+>> +# enable creation of __symbols__ node
+>> +DTC_FLAGS += -@
+>> +endif
+>> +
+>>   DTC_FLAGS += $(DTC_FLAGS_$(basetarget))
+>>   
+>>   # Generate an assembly file to wrap the output of the device tree compiler
+>>
+> 
+> Not needed.  Instead set DTC_FLAGS in the make command.  For example:
+> 
+>     DTC_FLAGS=-@ make qcom-apq8074-dragonboard.dtb
+> 
+> There are a few architecture Makefiles that need to be fixed to not unconditionally
+> set DTC_FLAGS.
+
+Rebuilding the dts files manually with symbols isn't the problem. The 
+idea was to enable it with a switch which distros simply can flip.
+
+Passing DTC_FLAGS to `make` would work too I guess, but on multi 
+platform builds that's still the same issue if there're boards which 
+can't handle that because of the size increase.
+
+Would a solution which enables symbols per family work?
+E.g. CONFIG_MACH_SUN7I chooses to use -@ because it can handle it.
 
 Thanks,
-Knut
+Andre
