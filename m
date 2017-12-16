@@ -1,97 +1,997 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:23151 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756638AbdLPDGt (ORCPT
+Received: from userp2130.oracle.com ([156.151.31.86]:35868 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753577AbdLPOnc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Dec 2017 22:06:49 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAL_Jsq+E-fH1mN8Cxu8=8-wRZ+edF0YK5wCrKavY3frp1opbZA@mail.gmail.com>
-References: <1507091240-12756-1-git-send-email-yamada.masahiro@socionext.com>
- <20171009150523.GT20805@n2100.armlinux.org.uk> <CAK7LNASCQqaBvERg6NXPym62Dyza00TuZVOWtj0YqLDKPT2D5g@mail.gmail.com>
- <CAL_Jsq+E-fH1mN8Cxu8=8-wRZ+edF0YK5wCrKavY3frp1opbZA@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 16 Dec 2017 12:05:49 +0900
-Message-ID: <CAK7LNAQXEG2MOaPT+aq9gxhY_cqPEu1a0p0O_HekVzUC1uAj+g@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: fix dependency of dtbs targets
-Content-Type: text/plain; charset="UTF-8"
+        Sat, 16 Dec 2017 09:43:32 -0500
+From: Knut Omang <knut.omang@oracle.com>
+Subject: [PATCH v2 1/5] runchecks: Generalize make C={1,2} to support multiple checkers
+Date: Sat, 16 Dec 2017 15:42:26 +0100
+Message-Id: <08a659d5068d053f72a999308b60bfd8997342cf.1513430008.git-series.knut.omang@oracle.com>
+In-Reply-To: <cover.630ac8faeeda67bf7a778c158174422042942d08.1513430008.git-series.knut.omang@oracle.com>
+References: <cover.630ac8faeeda67bf7a778c158174422042942d08.1513430008.git-series.knut.omang@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Russell King - ARM Linux <linux@armlinux.org.uk>, Will Deacon <will.deacon@arm.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ley Foon Tan <lftan@altera.com>, nios2-dev@lists.rocketboards.org, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Knut Omang <knut.omang@oracle.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-2017-12-14 6:31 GMT+09:00 Rob Herring <robh@kernel.org>:
-> On Wed, Oct 25, 2017 at 12:40 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> Hi.
->>
->>
->> 2017-10-10 0:05 GMT+09:00 Russell King - ARM Linux <linux@armlinux.org.uk>:
->>> On Wed, Oct 04, 2017 at 01:27:20PM +0900, Masahiro Yamada wrote:
->>>> The target "dtbs" should depend on "scripts" because it needs to
->>>> build dtc.  The "prepare" target is unneeded here.
->>>
->>> Looks fine for ARM, as the only thing the dtbs should depend on is
->>> the kernel configuration (to decide which to build) and DT tooling.
->>>
->>> Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
->>>
->>> --
->>
->>
->> I found a potential issue on this
->> because the default DTB install path depends on $(KERNELRELEASE).
->>
->>
->> In top-level Makefile:
->> export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(KERNELRELEASE)
->>
->>
->> The include/config/kernel.release is created by "prepare3" target.
->>
->> If the dependency on "parepare" is removed,
->> it is possible to run "make dtbs" and "make dtbs_install"
->> without creating include/config/kernel.release.
->>
->> So, the $(KERNELRELEASE) could be empty when installing DTB.
->>
->>
->> Maybe, drop this patch, or reduce the dependency to "parepare3"?
->
-> I was doing some work to get dtb builds to work without depending on
-> $arch cross compiler and this patch fixes some of the issues. The
-> dtbs_install target has the prepare dependency,
+Add scripts/runchecks which has generic support for running
+checker tools in a convenient and user friendly way that
+the author hopes can contribute to rein in issues detected
+by these tools in a manageable and convenient way.
 
-Which line?
+scripts/runchecks provides the following basic functionality:
 
-I checked arch/{arm,arm64,mips}/Makefile, but I did not see any
-dependency.
+* Makes it possible to selectively suppress output from individual
+  checks on a per file or per subsystem basis.
+* Unifies output and suppression input from different tools
+  by providing a single unified syntax for the underlying tools
+  in the style of "scripts/checkpatch.pl --show-types".
+* Allows selective run of one, or more (or all) configured tools
+  for each file.
 
+In the Makefile system, the sparse specific setup has been replaced
+by setup for runchecks.
 
-> so that should be
-> sufficient and your patch should be fine.
+This version of runchecks together with a "global" configuration
+file in "scripts/runchecks.cfg" supports sparse, checkpatch and checkdoc,
+a trivial abstraction above a call to 'kernel-doc -none'.
+It also supports forwarding calls to coccicheck for coccinelle support
+but this is not quite as worked through as the three other checkers,
+mainly because of lack of error data as all checks pass by default
+right now.
 
-Generally, adding dependencies to install targets is dangerous
-because install targets are often invoked in root privilege.
+The code is designed to be easily extensible to support more checkers
+as they emerge, and some generic checker support is even available
+just via simple additions to "scripts/runchecks.cfg".
 
-This is stated by, for example,
-commit 19514fc665ffbce624785f76ee7ad0ea6378a527
+Signed-off-by: Knut Omang <knut.omang@oracle.com>
+---
+ Makefile                   |  23 +-
+ scripts/Makefile.build     |   4 +-
+ scripts/runchecks          | 734 ++++++++++++++++++++++++++++++++++++++-
+ scripts/runchecks.cfg      |  63 +++-
+ scripts/runchecks_help.txt |  43 ++-
+ 5 files changed, 857 insertions(+), 10 deletions(-)
+ create mode 100755 scripts/runchecks
+ create mode 100644 scripts/runchecks.cfg
+ create mode 100644 scripts/runchecks_help.txt
 
-
-
-> BTW, Based on prior
-> discussion on "ARM: kbuild: Fix forced rebuild after 'make dtbs'"
-> thread, prepare should not be needed just for $(KERNELRELEASE).
->
-> Rob
-
-No.
-If "prepare" target is dropped, you can run dtbs_install
-without include/config/kenrel.release
-
-
-
-
-
+diff --git a/Makefile b/Makefile
+index c988e46..791e8df 100644
+--- a/Makefile
++++ b/Makefile
+@@ -159,14 +159,22 @@ ifeq ($(skip-makefile),)
+ # so that IDEs/editors are able to understand relative filenames.
+ MAKEFLAGS += --no-print-directory
+ 
+-# Call a source code checker (by default, "sparse") as part of the
+-# C compilation.
++# Do source code checking as part of the C compilation.
++#
+ #
+ # Use 'make C=1' to enable checking of only re-compiled files.
+ # Use 'make C=2' to enable checking of *all* source files, regardless
+ # of whether they are re-compiled or not.
+ #
+-# See the file "Documentation/dev-tools/sparse.rst" for more details,
++# Source code checking is done via the runchecks script, which
++# has knowledge of each individual cheker and how it wants to be called,
++# as well as options for rules as to which checks that are applicable
++# to different parts of the kernel, at source file granularity.
++#
++# Several types of checking is available, and custom checkers can also
++# be added.
++#
++# See the file "Documentation/dev-tools/runchecks.rst" for more details,
+ # including where to get the "sparse" utility.
+ 
+ ifeq ("$(origin C)", "command line")
+@@ -383,10 +391,9 @@ INSTALLKERNEL  := installkernel
+ DEPMOD		= /sbin/depmod
+ PERL		= perl
+ PYTHON		= python
+-CHECK		= sparse
+ 
+-CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
+-		  -Wbitwise -Wno-return-void $(CF)
++CHECK		= $(srctree)/scripts/runchecks
++CHECKFLAGS      =
+ NOSTDINC_FLAGS  =
+ CFLAGS_MODULE   =
+ AFLAGS_MODULE   =
+@@ -429,7 +436,7 @@ GCC_PLUGINS_CFLAGS :=
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
+ export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
+-export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
++export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECK_CFLAGS CHECKFLAGS
+ 
+ export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
+ export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_KASAN CFLAGS_UBSAN
+@@ -778,7 +785,7 @@ endif
+ 
+ # arch Makefile may override CC so keep this after arch Makefile is included
+ NOSTDINC_FLAGS += -nostdinc -isystem $(call shell-cached,$(CC) -print-file-name=include)
+-CHECKFLAGS     += $(NOSTDINC_FLAGS)
++CHECK_CFLAGS     += $(NOSTDINC_FLAGS)
+ 
+ # warn about C99 declaration after statement
+ KBUILD_CFLAGS += $(call cc-option,-Wdeclaration-after-statement,)
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index cb8997e..13325b3 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -93,10 +93,10 @@ __build: $(if $(KBUILD_BUILTIN),$(builtin-target) $(lib-target) $(extra-y)) \
+ ifneq ($(KBUILD_CHECKSRC),0)
+   ifeq ($(KBUILD_CHECKSRC),2)
+     quiet_cmd_force_checksrc = CHECK   $<
+-          cmd_force_checksrc = $(CHECK) $(CHECKFLAGS) $(c_flags) $< ;
++          cmd_force_checksrc = $(CHECK) $(CF) $< -- $(CHECKFLAGS) $(c_flags);
+   else
+       quiet_cmd_checksrc     = CHECK   $<
+-            cmd_checksrc     = $(CHECK) $(CHECKFLAGS) $(c_flags) $< ;
++            cmd_checksrc     = $(CHECK) $(CF) $< -- $(CHECKFLAGS) $(c_flags);
+   endif
+ endif
+ 
+diff --git a/scripts/runchecks b/scripts/runchecks
+new file mode 100755
+index 0000000..4dd2969
+--- /dev/null
++++ b/scripts/runchecks
+@@ -0,0 +1,734 @@
++#!/usr/bin/python
++
++# SPDX-License-Identifier: GPL-2.0
++#
++# Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
++#    Author: Knut Omang <knut.omang@oracle.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License version 2
++# as published by the Free Software Foundation.
++
++# The program implements a generic and extensible code checker runner
++# that supports running various checker tools from the kernel Makefile
++# or standalone, with options for selectively suppressing individual
++# checks on a per file or per check basis.
++#
++# The program has some generic support for checkers, but to implement
++# support for a new checker to the full extent, it might be necessary to
++#   1) subclass the Checker class in this file with checker specific processing.
++#   2) add typedef definitions in runchecks.cfg in this directory
++#
++# This version of runchecks has full support for the following tools:
++#   sparse:      installed separately
++#   checkpatch:  checkpatch.pl
++#   checkdoc:    kernel-doc -none
++#
++# See file "Documentation/dev-tools/runchecks.rst" for more details
++#
++
++import sys, os, subprocess, fcntl, select, re
++from os.path import dirname, basename
++
++class CheckError(Exception):
++    def __init__(self, value):
++        self.value = value
++    def __str__(self):
++        return self.value
++
++def usage():
++    manual = os.path.join(srctree, "scripts/runchecks_help.txt")
++    f = open(manual, "r")
++    for line in f:
++        sys.stdout.write(line)
++    f.close()
++    print ""
++    print "Configured checkers:"
++    for (c, v) in checker_types.iteritems():
++        enabled = "[default disabled]"
++        for c_en in config.checkers:
++            if c_en.name == c:
++                enabled = ""
++                break
++        print "  %-20s %s" % (c, enabled)
++    exit(1)
++
++
++# A small configuration file parser:
++#
++class Config:
++    def __init__(self, srctree, workdir, filename):
++        self.path = []
++        self.relpath = {}
++        relpath = ""
++
++        # Look for a global config file in the scripts directory:
++        file = os.path.join(srctree, "scripts/%s" % filename)
++        if os.path.exists(file):
++            self.path.append(file)
++            self.relpath[file] = relpath
++
++        while not ignore_config:
++            self.file = os.path.join(workdir,filename)
++            if os.path.exists(self.file):
++                self.path.append(self.file)
++                self.relpath[self.file] = relpath
++            if len(workdir) <= len(srctree):
++                break
++            relpath = "%s/%s" % (basename(workdir), relpath)
++            workdir = dirname(workdir)
++
++        self.checkers = []
++        self.cur_chk = None
++        self.color = False
++        self.list_only = False
++
++        self.command = {
++            "checker"	: self.checker,
++            "addflags"	: self.addflags,
++            "run"	: self.runlist,
++            "except"	: self.exception,
++            "pervasive" : self.pervasive,
++            "cflags"	: self.cflags,
++            "typedef"	: self.typedef
++        }
++
++        if verbose:
++            print "  ** runchecks: config path: %s" % self.path
++        for f in self.path:
++            self.ParseConfig(f)
++
++    def checker(self, argv):
++        try:
++            self.cur_chk = checker_types[argv[0]]
++        except KeyError:
++            if len(argv) < 2:
++                d1 = "generic checker configurations!"
++                raise CheckError("%s:%d: use 'checker %s command' for %s" % \
++                                 (self.file, self.lineno, argv[0], d1))
++
++            AddChecker(Checker(argv[0], argv[1], srctree, workdir))
++            self.cur_chk = checker_types[argv[0]]
++
++    def addflags(self, argv):
++        self.cur_chk.addflags(argv)
++
++    def exception(self, argv):
++        type = argv[0]
++        if self.cur_chk:
++            relpath = self.relpath[self.file]
++            self.cur_chk.exception(type, relpath, argv[1:])
++        else:
++            raise CheckError("%s:%d: checker has not been set" % (self.file, self.lineno))
++
++    def pervasive(self, argv):
++        self.cur_chk.pervasive(argv)
++
++    def runlist(self, argv):
++        try:
++            for c in argv:
++                self.checkers.append(checker_types[c])
++        except KeyError, k:
++            if str(k) == "'all'":
++                self.checkers = checker_types.values()
++            else:
++                available = "\n  -- avaliable checkers are: %s" % ",".join(checker_types.keys())
++                raise CheckError("Checker %s not found - not configured?%s" % (str(k), available))
++
++    def cflags(self, argv):
++        self.cur_chk.cflags = True
++
++    def typedef(self, argv):
++        self.cur_chk.typedef(argv)
++
++    # Parse one configuration file in the configuration file list:
++    #
++    def ParseConfig(self, file):
++        f = open(file, 'r')
++        self.file = file
++        self.lineno = 0
++        for line in f:
++            self.lineno = self.lineno + 1
++            token = line.split()
++            if len(token) < 1:
++                continue
++            if token[0][0] == '#':
++                continue
++            try:
++                self.command[token[0]](token[1:])
++            except KeyError:
++                if not self.cur_chk:
++                    raise CheckError("%s:%s: checker has not been set" % (self.file, self.lineno))
++                self.cur_chk.ParseOptional(token[0], token[1:])
++            except AttributeError:
++                if not self.cur_chk:
++                    raise CheckError("%s:%s: checker has not been set" % (self.file, self.lineno))
++
++        f.close()
++        self.cur_chk = None
++
++    # Option forwarding to checkers
++    # and optional selection of which checkers to run:
++    def ProcessOpts(self, opts):
++        for opt in opts:
++            if opt == "--color":
++                self.color = True
++                continue
++            elif opt == "--list":
++                self.list_only = True
++                continue
++            elif opt == "--help":
++                usage_only = True
++
++            fw = re.match("^--to-(\w+):(.*)$", opt)
++            if fw:
++                try:
++                    cname = fw.group(1)
++                    checker = checker_types[cname]
++                except:
++                    raise CheckError("Unknown checker '%s' specified in option '%s'" % (cname, opt))
++                newargs = fw.group(2).split(',')
++                checker.cmdvec += newargs
++                if verbose:
++                    print "Added extra args for %s: %s" % (cname, newargs)
++                continue
++
++            runopt = re.match("^--run:(.*)$", opt)
++            if runopt:
++                clist = runopt.group(1).split(",")
++                # Command line override: reset list of checkers
++                self.checkers = []
++                self.runlist(clist)
++                continue
++
++            if len(self.checkers) == 1:
++                # If only one checker enabled, just pass everything we don't know about through:
++                self.checkers[0].cmdvec.append(opt)
++            else:
++                raise CheckError("Unknown option '%s'" % opt)
++
++    # We always expect at least one config file that sets up the active checkers:
++    #
++    def HasPathConfig(self):
++        return len(self.path) > 1
++
++
++# The base class for checkers:
++# For specific support a particular checker, implement a subclass of this:
++#
++class Checker:
++    def __init__(self, name, cmd, srctree, workdir, ofilter = None, efilter = None):
++        self.name = name
++        self.srctree = srctree
++	self.workdir = workdir
++	self.efilter = efilter
++        if ofilter:
++            self.ofilter = ofilter
++        else:
++            self.ofilter = self.suppress
++        self.strout = ""
++        self.strerr = ""
++        self.cflags = False
++        if cmd[0:7] == "scripts":
++            cmd = os.path.join(self.srctree, cmd)
++        self.cmd = cmd
++        self.cmdvec = cmd.split()
++        self.pervasive_opts = [] # "global" ignore list
++        self.exceptions = []     # exception list for this file
++        self.file_except = []    # Aggregated list of check types to ignore for this file
++        self.re_except_def = {}  # check_type -> <regex to match it in stderr>
++        self.doc = {}		 # Used when parsing documentation: check type -> doc string
++        self.cont = []
++        self.last_ignore = False
++        self.unclassified = 0	 # With RegexFilter: Number of "red" lines not classified
++
++    def filter_env(self, dict):
++        return dict
++
++    def readline(self, is_stdout, fd):
++        tmp_str = ""
++        try:
++            s = os.read(fd, 1000)
++            while s != '':
++                tmp_str += s
++                s = os.read(fd, 1)
++        except OSError:
++            None
++
++        if is_stdout:
++            self.strout += tmp_str
++            tmp_str = self.strout
++        else:
++            self.strerr += tmp_str
++            tmp_str = self.strerr
++
++        inx = tmp_str.find('\n') + 1
++        if inx != 0:
++            t = tmp_str[:inx]
++            if is_stdout:
++                self.strout = tmp_str[inx:]
++            else:
++                self.strerr = tmp_str[inx:]
++        else:
++            return ''
++        return t
++
++    def SetNonblocking(self, fd):
++        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
++        try:
++            fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NDELAY)
++        except AttributeError:
++            fcntl.fcntl(fd, fcntl.F_SETFL, fl | fcntl.FNDELAY)
++
++    def Run(self, file, verbose):
++        cmdvec = self.cmdvec
++        if self.cflags:
++            cmdvec += c_argv
++        if not force:
++            self.file_except = set(self.exceptions + self.pervasive_opts)
++        self.Postprocess()
++        if not file:
++            raise CheckError("error: missing file parameter")
++        cmdvec.append(file)
++        if debug:
++            print "  ** running %s: %s" % (self.name, " ".join(cmdvec))
++        elif verbose:
++            print "  -- checker %s --" % self.name
++        try:
++            ret = self.RunCommand(cmdvec, self.ofilter, self.efilter)
++        except OSError, e:
++            if re.match(".*No such file or directory", str(e)):
++                if len(config.checkers) == 1:
++                    raise CheckError("Failed to run checker %s: %s: %s" % (self.name, self.cmd, str(e)))
++                if verbose:
++                    print "  ** %s does not exist - ignoring %s **" % (self.name, self.cmd)
++                return 0
++        ret = self.PostRun(ret)
++        return ret
++
++    def RunCommand(self, cmdvec, ofilter, efilter):
++	my_env = self.filter_env(os.environ)
++        child = subprocess.Popen(cmdvec, shell = False, \
++                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=".", env=my_env)
++        sout = child.stdout
++        serr = child.stderr
++        ofd = sout.fileno()
++        efd = serr.fileno()
++        oeof = False
++        eeof = False
++        check_errors = []
++        self.SetNonblocking(ofd)
++        self.SetNonblocking(efd)
++        while True:
++            ready = select.select([ofd,efd],[],[],0.1)
++            if ofd in ready[0]:
++                if child.poll() != None:
++                    oeof = True
++                oline = self.readline(True, ofd)
++                while oline != '':
++                    if ofilter:
++                        ofilter(oline, verbose)
++                    else:
++                        sys.stdout.write(oline)
++                    oline = self.readline(True, ofd)
++            if efd in ready[0]:
++                if child.poll() != None:
++                    eeof = True
++                eline = self.readline(False, efd)
++                while eline != '':
++                    if efilter:
++                        check_err = efilter(eline, verbose)
++                        if check_err != None:
++                                check_errors.append(check_err)
++                    else:
++                        sys.stderr.write(eline)
++                    eline = self.readline(False, efd)
++            if oeof and eeof:
++                break
++        serr.close()
++        sout.close()
++        retcode = child.wait()
++        if check_errors != []:
++            estr = "".join(check_errors)
++            if estr != "":
++                sys.stderr.write(estr)
++                if not retcode:
++                    retcode = 131
++            else:
++                if verbose:
++                    print "%s  ** %d suppressed errors/warnings from %s%s" % (BLUE, len(check_errors), self.name, ENDCOLOR)
++                retcode = 0
++        return retcode
++
++    def ParseOptional(self, cmd, argv):
++        raise CheckError("Undefined command '%s' for checker '%s'" % (cmd, self.name))
++
++    # Called as final step before running the checker:
++    def Postprocess(self):
++        # Do nothing - just for redefinition in subclasses
++        return
++
++    # Called as a post processing step after running the checker:
++    # Input parameter is return value from Run()
++    def PostRun(self, retval):
++        # Do nothing - just for redefinition in subclasses
++        return retval
++
++    # Default standard output filter:
++    def suppress(self, line, verbose):
++        if verbose:
++            sys.stdout.write(line)
++
++    # A matching filter for stderr:
++    def RegexFilter(self, line, verbose):
++        if self.cont:
++            m = re.match(self.cont[0], line)
++            self.cont = self.cont[1:]
++            if m:
++                if self.last_ignore:
++                    return ""
++                else:
++                    return line
++
++        for t, regex in self.re_except_def.iteritems():
++            r = "^(.*:\d+:)\s(\w+:)\s(%s.*)$" % regex[0]
++            m = re.match(r, line)
++            if m:
++                if len(regex) > 1:
++                    self.cont = regex[1:]
++                if t in self.file_except:
++                    self.last_ignore = True
++                    return ""
++                else:
++                    self.last_ignore = False
++                    return "%s%s %s:%s%s%s: %s %s\n" % (BROWN, m.group(1), self.name.upper(), BLUE, t, ENDCOLOR, m.group(2), m.group(3))
++        self.unclassified = self.unclassified + 1
++        return RED + line + ENDCOLOR
++
++    def ListTypes(self):
++        if len(self.re_except_def) > 0:
++            print BLUE + BOLD + "  Check types declared for %s in runchecks configuration%s" % (self.name, ENDCOLOR)
++        for t, regex in self.re_except_def.iteritems():
++            print "\t%-22s %s" % (t, "\\n".join(regex))
++        if len(self.re_except_def) > 0:
++            print ""
++        return 0
++
++    def addflags(self, argv):
++        self.cmdvec += argv
++
++    def exception(self, type, relpath, argv):
++        for f in argv:
++            if f == ("%s%s" % (relpath, bfile)):
++                self.exceptions.append(type)
++
++    def pervasive(self, argv):
++        self.pervasive_opts += argv
++
++    def typedef(self, argv):
++        exp = " ".join(argv[1:])
++        elist = exp.split("\\n")
++        self.re_except_def[argv[0]] = elist
++
++
++# Individual checker implementations:
++#
++
++# checkpatch
++class CheckpatchRunner(Checker):
++    def __init__(self, srctree, workdir):
++        Checker.__init__(self, "checkpatch", "scripts/checkpatch.pl", srctree, workdir)
++        self.cmdvec.append("--file")
++        self.line_len = 0
++        # checkpatch sends all it's warning and error output to stdout,
++        # redirect and do limited filtering:
++        self.ofilter = self.out_filter
++
++    def ParseOptional(self, cmd, argv):
++        if cmd == "line_len":
++            self.line_len = int(argv[0])
++        else:
++            Checker.ParseOptional(self, cmd, argv)
++
++    def Postprocess(self):
++        if config.color:
++            self.cmdvec.append("--color=always")
++        if self.line_len:
++            self.cmdvec.append("--max-line-length=%d" % self.line_len)
++        if self.file_except:
++            self.cmdvec.append("--ignore=%s" % ",".join(self.file_except))
++
++    # Extracting a condensed doc of types to filter on:
++    def man_filter(self, line, verbose):
++        t = line.split()
++        if len(t) > 1 and t[1] != "Message":
++            sys.stdout.write("\t%s\n" % t[1])
++
++    def out_filter(self, line, verbose):
++        # --terse produces this message even with no errors,
++        #  suppress unless run with -v:
++        if not verbose and re.match("^total: 0 errors, 0 warnings, 0 checks,", line):
++            return
++        sys.write.stderr(line)
++
++    def ListTypes(self):
++        print BLUE + BOLD + "  Supported check types for checkpatch" + ENDCOLOR
++        # Parse help output:
++        cmdvec = ["%s/scripts/checkpatch.pl" % self.srctree, "--list-types"]
++        self.RunCommand(cmdvec, self.man_filter, None)
++        print ""
++        return 0
++
++# sparse
++class SparseRunner(Checker):
++    def __init__(self, srctree, workdir):
++        Checker.__init__(self, "sparse", "sparse", srctree, workdir)
++        self.efilter = self.RegexFilter
++
++    def sparse_name(self, rs_type):
++        l_name = rs_type.lower()
++        s_name = ""
++        for c in l_name:
++            if c == '_':
++                s_name += '-'
++            else:
++                s_name += c
++        return s_name
++
++    def runchecks_name(self, sparse_type):
++        u_name = sparse_type.upper()
++        rc_name =""
++        for c in u_name:
++            if c == '-':
++                rc_name += '_'
++            else:
++                rc_name += c
++        return rc_name
++
++    def Postprocess(self):
++        if self.file_except:
++            for e in self.file_except:
++                self.cmdvec.append("-Wno-%s" % self.sparse_name(e))
++
++    # Extracting a condensed doc of types to filter on:
++    def man_filter(self, line, verbose):
++        if self.doc_next:
++            doc = line.strip()
++            self.doc[self.doc_next] = doc
++            self.doc_next = False
++            return
++        match = re.search("^\s+-W([\w-]+)\s*$", line)
++        if match:
++            name = match.group(1)
++            if re.match("sparse-", name):
++                return
++            rs_type = self.runchecks_name(name)
++            self.doc_next = rs_type
++
++    def ListTypes(self):
++        # Parse manual output:
++        cmdvec = ["man", "sparse"]
++        self.doc_next = False
++        ret = self.RunCommand(cmdvec, self.man_filter, None)
++        if ret:
++            return ret
++        print BLUE + BOLD + "\n  Types derived from sparse from documentation in manpage" + ENDCOLOR
++        for t, doc in self.doc.iteritems():
++            print "\t%-22s %s" % (t, doc)
++            try:
++                regex = self.re_except_def[t]
++                print "\t%-22s %s" % ("", GREEN + "\\n".join(regex) + ENDCOLOR)
++            except:
++                print "\t%-22s %s" % ("", RED + "(regex match (typedef) missing)" + ENDCOLOR)
++        print BLUE + BOLD + "\n  Types for sparse only declared for runchecks or not documented in manpage" + ENDCOLOR
++        for t, regex in self.re_except_def.iteritems():
++            try:
++                self.doc[t]
++            except:
++                print "\t%-22s %s" % (t, GREEN + "\\n".join(regex) + ENDCOLOR)
++        print ""
++        return 0
++
++# checkdoc
++class CheckdocRunner(Checker):
++    def __init__(self, srctree, workdir):
++        Checker.__init__(self, "checkdoc", "scripts/kernel-doc", srctree, workdir)
++        self.cmdvec.append("-none")
++        self.efilter = self.RegexFilter
++
++# coccicheck (coccinelle) (WIP)
++class CoccicheckRunner(Checker):
++    def __init__(self, srctree, workdir):
++        Checker.__init__(self, "coccicheck", "scripts/coccicheck", srctree, workdir)
++        self.debug_file = None
++        self.efilter = self.CoccicheckFilter
++
++    def filter_env(self, dict):
++        newdict = os.environ
++        # If debug file is not set by the user, override it and present the output on stderr:
++        try:
++            df = newdict["DEBUG_FILE"]
++        except:
++            print "*** debug_file!"
++            self.debug_file = '/tmp/cocci_%s.log' % os.getpid()
++            newdict["DEBUG_FILE"] = self.debug_file
++        return newdict
++
++    def CoccicheckFilter(self, line, verbose):
++        self.unclassified = self.unclassified + 1
++        if re.match(".*spatch -D report", line):
++            if verbose:
++                sys.stdout.write(line)
++        else:
++            return RED + line + ENDCOLOR
++
++    def PostRun(self, retval):
++        if not self.debug_file:
++            return retval
++        f = open(self.debug_file)
++        for line in f:
++            line = self.CoccicheckFilter(line, verbose)
++            if line:
++                sys.stderr.write(line)
++        f.close()
++        if self.debug_file:
++            os.remove(self.debug_file)
++        if retval == 0:
++            reval = ret
++        return retval
++
++checker_types = {}
++
++def AddChecker(checker):
++    checker_types[checker.name] = checker
++
++#
++# Start main program:
++#
++program = os.path.realpath(sys.argv[0])
++progname = basename(program)
++scriptsdir = dirname(program)
++srctree = dirname(scriptsdir)
++force = False
++ignore_config = False
++verbose = False
++debug = False
++error = True
++error_on_red = False
++usage_only = False
++argv = []
++c_argv = []
++fw_opts = []
++workdir = os.getcwd()
++optarg = False
++argc = 0
++
++AddChecker(CheckpatchRunner(srctree, workdir))
++AddChecker(SparseRunner(srctree, workdir))
++AddChecker(CheckdocRunner(srctree, workdir))
++AddChecker(CoccicheckRunner(srctree, workdir))
++
++for arg in sys.argv[1:]:
++    argc = argc + 1
++
++    if arg == "--":
++        argc = argc + 1
++        c_argv = sys.argv[argc:]
++        break;
++    elif arg == "-f":
++        force = True
++    elif arg == "-n":
++        ignore_config = True
++        force = True
++    elif arg == "-w":
++        error = False
++    elif arg == "-t":
++        error_on_red = True
++        error = False
++    elif arg == "-d":
++        debug = True
++    elif arg == "-v":
++        verbose = True
++    elif arg == "-h":
++        usage_only = True
++    else:
++        opt = re.match("^-.*$", arg)
++        if opt:
++            # Delay processing of these until we know the configuration:
++            fw_opts.append(opt.group(0))
++        else:
++            argv.append(arg)
++
++if not verbose:
++    try:
++        verb = int(os.environ["V"])
++        if verb != 0:
++            verbose = True
++    except KeyError:
++        verbose = False
++
++if not os.path.exists(os.path.join(srctree, "MAINTAINERS")):
++    srctree = None
++
++try:
++    file = argv[0]
++    bfile = basename(file)
++    workdir = dirname(file)
++except:
++    bfile = None
++    file = None
++
++unclassified = 0
++
++if debug:
++    print "Kernel root:\t%s\nFile:\t\t%s\nWorkdir:\t%s" % \
++        (srctree, bfile, workdir)
++    print "C args:\t\t%s\nargv:\t\t%s\n" % (" ".join(c_argv), " ".join(argv))
++
++try:
++    config = Config(srctree, workdir, "runchecks.cfg")
++    config.ProcessOpts(fw_opts)
++
++    if usage_only:
++        usage()
++    if not config.HasPathConfig() and not config.list_only and not force:
++        if verbose:
++            print "  ** %s: No configuration found - skip checks for %s" % (progname, file)
++        exit(0)
++
++    if config.color:
++        GREEN = '\033[32m'
++        RED = '\033[91m'
++        BROWN = '\033[33m'
++        BLUE = '\033[34m'
++        BOLD = '\033[1m'
++        ENDCOLOR = '\033[0m'
++    else:
++        BOLD = ''
++        GREEN = ''
++        RED = ''
++        BROWN = ''
++        BLUE = ''
++        ENDCOLOR = ''
++
++    ret = 0
++    for checker in config.checkers:
++        if config.list_only:
++            ret = checker.ListTypes()
++        else:
++            ret = checker.Run(file, verbose)
++            unclassified += checker.unclassified
++        if ret and error:
++            break
++
++    if not error and not (error_on_red and unclassified > 0):
++        ret = 0
++except CheckError, e:
++    print "  ** %s: %s" % (progname, str(e))
++    ret = 22
++except KeyboardInterrupt:
++    if verbose:
++        print "  ** %s: Interrupted by user" % progname
++    ret = 4
++
++exit(ret)
+diff --git a/scripts/runchecks.cfg b/scripts/runchecks.cfg
+new file mode 100644
+index 0000000..c0b12cf
+--- /dev/null
++++ b/scripts/runchecks.cfg
+@@ -0,0 +1,63 @@
++checker checkpatch
++addflags  --quiet --show-types --strict --emacs
++line_len 110
++
++checker sparse
++addflags -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ -Wsparse-all
++cflags
++
++#	Name		Regular expression for matching in checker output
++typedef DECL		symbol '.*' was not declared. Should it be static\?
++typedef SHADOW		symbol '\w+' shadows an earlier one\n.*originally declared here
++typedef TYPESIGN	incorrect type in argument \d+ \(different signedness\)\n.*expected\n.*got
++typedef RETURN_VOID	returning void-valued expression
++typedef SIZEOF_BOOL	expression using sizeof bool
++typedef CONTEXT		context imbalance in '.*'
++typedef MEMCPY_MAX_COUNT \w+ with byte count of
++typedef CAST_TO_AS	cast adds address space to expression
++typedef ADDRESS_SPACE	incorrect type in .* \(different address spaces\)\n.*expected\n.*got
++typedef PTR_INHERIT	incorrect type in .* \(different base types\)\n.*expected\n.*got
++typedef PTR_SUBTRACTION_BLOWS potentially expensive pointer subtraction
++typedef VLA		Variable length array is used
++typedef OVERFLOW	constant [x\dA-F]+ is so big it is \w+
++typedef TAUTOLOGICAL_COMPARE self-comparison always evaluates to (true|false)
++typedef NON_POINTER_NULL Using plain integer as NULL pointer
++typedef BOOL_CAST_RESTRICTED restricted \w+ degrades to integer
++typedef TYPESIGN	incorrect type in .* \(different signedness\)\n.*expected\n.*got
++typedef FUNCTION_REDECL symbol '.*' redeclared with different type \(originally declared at
++typedef COND_ADDRESS_ARRAY the address of an array will always evaluate as true
++typedef BITWISE 	cast (to|from) restricted
++
++# Type names invented here - not maskable from sparse?
++typedef NO_DEREF	dereference of noderef expression
++typedef ARG_TYPE_MOD	incorrect type in .* \(different modifiers\)\n.*expected\n.*got
++typedef ARG_TYPE_COMP	incorrect type in .* \(incompatible .*\(.*\)\)\n.*expected\n.*got
++typedef ARG_AS_COMP	incompatible types in comparison expression \(different address spaces\)
++typedef CMP_TYPE	incompatible types in comparison expression \(different base types\)
++typedef SPARSE_OFF	"Sparse checking disabled for this file"
++typedef CAST_TRUNC	cast truncates bits from constant value
++typedef CAST_FROM_AS	cast removes address space of expression
++typedef EXT_LINK_DEF	function '\w+' with external linkage has definition
++typedef FUNC_ARITH	arithmetics on pointers to functions
++typedef CALL_NO_TYPE	call with no type!
++typedef FUNC_SUB	subtraction of functions\? Share your drugs
++typedef STRING_CONCAT	trying to concatenate \d+-character string \(\d+ bytes max\)
++typedef INARG_DIRECTIVE directive in argument list
++typedef NONSCALAR_CAST  cast (to|from) non-scalar
++
++checker checkdoc
++typedef PARAM_DESC	No description found for parameter
++typedef X_PARAM    	Excess function parameter
++typedef X_STRUCT	Excess struct member
++typedef FUN_PROTO    	cannot understand function prototype
++typedef DOC_FORMAT   	Incorrect use of kernel-doc format
++typedef BAD_LINE	bad line
++typedef AMBIGUOUS	Cannot understand.*\n on line
++typedef BOGUS_STRUCT	Cannot parse struct or union
++typedef DUPL_SEC	duplicate section name
++
++checker coccicheck
++cflags
++
++run sparse checkpatch checkdoc
++#run all
+diff --git a/scripts/runchecks_help.txt b/scripts/runchecks_help.txt
+new file mode 100644
+index 0000000..aa3b69a
+--- /dev/null
++++ b/scripts/runchecks_help.txt
+@@ -0,0 +1,43 @@
++Usage: runchecks  [<options>] c_file [-- <c_parameters>]
++  - run code checkers in a conformant way.
++
++Options:
++  -h|--help	List this text
++  --list	List the different configured checkers and the list of interpreted check
++  		types for each of them.
++  --		Separator between parameters to runchecks and compiler parameters to be
++		passed directly to the checkers.
++  --run:[checker1[,checker2..]|all]
++  		Override the default set of checkers to be run for each source file. By
++		default the checkers to run will be the intersection of the checkers
++		configured by ``run`` commands in the configuration file and the
++		checkers that is actually available on the machine. Use 'all'
++		to run all the configured checkers.
++  --color	Use coloring in the error and warning output. In this mode
++		output from checkers that are supported by typedefs but not
++		captured by any such will be highlighted in red to make it
++		easy to detect that a typedef rule is missing. See -t below.
++  -f		Force mode: force runchecks to run a full run in directories/trees
++		where runchecks does not find a	runchecks.cfg file. The default
++		behaviour is to skip running checkers in directories/trees
++		where no matching runchecks.cfg file is found either in the
++		source file directory or above.
++  -n		Ignore all runchecks.cfg files except the one in scripts,
++		which are used for basic runchecks configuration. This allows
++		an easy way to run a "bare" version of checking where all
++		issues are reported, even those intended to be suppressed.
++		Implicitly enables force mode.
++  -w		Behave as if 0 on exit from all checkers. Normally
++		runchecks will fail on the first checker to produce errors or
++		warnings, in fact anything that produces not suppressed
++		output on stderr. This is to make it easy to work interactively,
++		avoiding overlooking anything, but sometimes it is useful to
++		be able to produce a full report of status.
++  -t		Typedef setup mode: For checkers where runchecks enable typedefs:
++  		Behaves as -w except for stderr output that is not captured
++		by any typedefs. This is a convenience mode while
++		fixing/improving typedef setup. Use with --color to get red
++		output for the statements to capture with new typedefs.
++  -v		Verbose output. Also enabled if called from make with V=1,
++		but it is useful to be able to only enable verbose mode for runchecks.
++  -d		Debugging output - more verbose.
 -- 
-Best Regards
-Masahiro Yamada
+git-series 0.9.1
