@@ -1,127 +1,163 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:46768 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752165AbdLPRZh (ORCPT
+Received: from mail-pl0-f65.google.com ([209.85.160.65]:38790 "EHLO
+        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757092AbdLPRrt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 16 Dec 2017 12:25:37 -0500
-Subject: Re: [PATCH] of: build dbts with symbols when CONFIG_OF_OVERLAY is set
-References: <20171214151240.14555-1-a.heider@gmail.com>
- <aada8c54-2c26-bf37-8782-4edc43195daf@gmail.com>
-From: Andre Heider <a.heider@gmail.com>
-Message-ID: <05291157-a1dc-db84-e453-c43945c1da07@gmail.com>
-Date: Sat, 16 Dec 2017 18:25:33 +0100
+        Sat, 16 Dec 2017 12:47:49 -0500
+Received: by mail-pl0-f65.google.com with SMTP id s10so2331077plj.5
+        for <linux-kbuild@vger.kernel.org>; Sat, 16 Dec 2017 09:47:48 -0800 (PST)
+Date: Sat, 16 Dec 2017 09:47:45 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+Subject: Re: [PATCH v2 0/5] Support for generalized use of make C={1,2} via
+ a wrapper program
+Message-ID: <20171216094745.5e41ac51@xeon-e3>
+In-Reply-To: <cover.630ac8faeeda67bf7a778c158174422042942d08.1513430008.git-series.knut.omang@oracle.com>
+References: <cover.630ac8faeeda67bf7a778c158174422042942d08.1513430008.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <aada8c54-2c26-bf37-8782-4edc43195daf@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frank Rowand <frowand.list@gmail.com>, Rob Herring <robh+dt@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Knut Omang <knut.omang@oracle.com>
+Cc: linux-kernel@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, Jonathan Corbet <corbet@lwn.net>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, Matthew Wilcox <willy@infradead.org>, cocci@systeme.lip6.fr, rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org, Doug Ledford <dledford@redhat.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, Shuah Khan <shuah@kernel.org>, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Julia Lawall <Julia.Lawall@lip6.fr>, John Haxby <john.haxby@oracle.com>, =?UTF-8?B?w4VzbXVuZCDDmHN0dm9sZA==?= <asmund.ostvold@oracle.com>, Jason Gunthorpe <jgg@ziepe.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org, Gilles Muller <Gilles.Muller@lip6.fr>, "David S. Miller" <davem@davemloft.net>, Joe Perches <joe@perches.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, =?UTF-8?B?SMOla29u?= Bugge <haakon.bugge@oracle.com>, Andy Whitcroft <apw@canonical.com>, "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>
 
-Hi Frank,
+On Sat, 16 Dec 2017 15:42:25 +0100
+Knut Omang <knut.omang@oracle.com> wrote:
 
-On 15/12/17 22:06, Frank Rowand wrote:
-> On 12/14/17 07:12, Andre Heider wrote:
->> The overlay feature requires the base dtb to be built with symbols, so
->> lets build the dtbs with symbols when overlay support was explicitly
->> enabled.
->>
->> With CONFIG_OF_ALL_DTBS on ARCH=arm the 989 dtb files grow about ~38% on
->> average.
->>
->> Totals in bytes with the 3 biggest ones:
->>
->> Before:
->> 	90471	arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
->> 	90521	arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
->> 	92639	arch/arm/boot/dts/dra7-evm.dtb
->> 	25731296	total
->>
->> After:
->> 	133203	arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
->> 	133237	arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
->> 	134545	arch/arm/boot/dts/dra7-evm.dtb
->> 	35464440	total
->>
->> Signed-off-by: Andre Heider <a.heider@gmail.com>
->> ---
->>
->> Hi,
->>
->> while playing around with overlays I noticed that I needed to rebuilt
->> my distro's device trees because they didn't come with symbols.
->>
->> Is that for a reason, maybe the not so minor increase in size?
+> This patch series implements features to make it easier to run checkers on the
+> entire kernel as part of automatic and developer testing.
 > 
-> Yes, size is the issue.
+> This is done by replacing the sparse specific setup for the C={1,2} variable
+> in the makefiles with setup for running scripts/runchecks, a new program that
+> can run any number of different "checkers". The behaviour of runchecks is
+> defined by simple "global" configuration in scripts/runchecks.cfg which can be
+> extended by local configuration applying to individual files, directories or
+> subtrees in the source.
 > 
+> It also fixes a minor issue with "checkpatch --fix-inplace" found during testing
+> (patch #3).
 > 
->>
->> Thanks,
->> Andre
->>
->>   drivers/of/unittest-data/Makefile | 7 -------
->>   scripts/Makefile.lib              | 5 +++++
->>   2 files changed, 5 insertions(+), 7 deletions(-)
->>
->> diff --git a/drivers/of/unittest-data/Makefile b/drivers/of/unittest-data/Makefile
->> index 32389acfa616..b65061013512 100644
->> --- a/drivers/of/unittest-data/Makefile
->> +++ b/drivers/of/unittest-data/Makefile
->> @@ -15,13 +15,6 @@ targets += overlay.dtb overlay.dtb.S
->>   targets += overlay_bad_phandle.dtb overlay_bad_phandle.dtb.S
->>   targets += overlay_bad_symbol.dtb overlay_bad_symbol.dtb.S
->>   targets += overlay_base.dtb overlay_base.dtb.S
->> -
->> -# enable creation of __symbols__ node
->> -DTC_FLAGS_overlay := -@
->> -DTC_FLAGS_overlay_bad_phandle := -@
->> -DTC_FLAGS_overlay_bad_symbol := -@
->> -DTC_FLAGS_overlay_base := -@
->> -
->>   endif
->>   
->>   .PRECIOUS: \
+> The runchecks.cfg files are parsed according to this minimal language:
 > 
-> No.  The unittests require these to be set unconditionally.
+>        # comments
+>        # "Global configuration in scripts/runchecks.cfg:
+>        checker <name>
+>        typedef NAME regex
+>        run <list of checkers or "all"
 > 
+>        # "local" configuration:
+>        line_len <n>
+>        except checkpatch_type [files ...]
+>        pervasive checkpatch_type1 [checkpatch_type2 ...]
 > 
->> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
->> index 1ca4dcd2d500..c7ba4aa8a07a 100644
->> --- a/scripts/Makefile.lib
->> +++ b/scripts/Makefile.lib
->> @@ -278,6 +278,11 @@ DTC_FLAGS += -Wnode_name_chars_strict \
->>   	-Wproperty_name_chars_strict
->>   endif
->>   
->> +ifeq ($(CONFIG_OF_OVERLAY),y)
->> +# enable creation of __symbols__ node
->> +DTC_FLAGS += -@
->> +endif
->> +
->>   DTC_FLAGS += $(DTC_FLAGS_$(basetarget))
->>   
->>   # Generate an assembly file to wrap the output of the device tree compiler
->>
+> With "make C=2" runchecks first parse the file scripts/runchecks.cfg, then
+> look for a file named 'runchecks.cfg' in the same directory as the source file.
+> If that file exists, it will be parsed and it's local configuration applied to
+> allow suppression on a per checker, per check and per file basis.
+> If a "local" configuration does not exist, either in the source directory or
+> above, make will simply silently ignore the file.
 > 
-> Not needed.  Instead set DTC_FLAGS in the make command.  For example:
+> The idea is that the community can work to add runchecks.cfg files to
+> directories, serving both as documentation and as a way for subsystem
+> maintainers to enforce policies and individual tastes as well as TODOs and/or
+> priorities, to make it easier for newcomers to contribute in this area. By
+> ignoring directories/subtrees without such files, automation can start right
+> away as it is trivially possible to run errorless with C=2 for the entire
+> kernel.
 > 
->     DTC_FLAGS=-@ make qcom-apq8074-dragonboard.dtb
+> For the checker maintainers this should be a benefit as well: new
+> or improved checks would generate new errors/warnings. With automatic testing
+> for the checkers, these new checks would generate error reports and cause
+> builds to fail. Adding the new check a 'pervasive' option at the top level or
+> even for specific files, marked with a "new check - please consider fixing" comment
+> or similar would make those builds pass while documenting and making the new check
+> more visible.
 > 
-> There are a few architecture Makefiles that need to be fixed to not unconditionally
-> set DTC_FLAGS.
+> The patches includes a documentation file with some more details.
+> 
+> This patch set has evolved from an earlier shell script implementation I made
+> as only a wrapper script around checkpatch. That version have been used for a
+> number of years on a driver project I worked on where we had automatic checkin
+> regression testing. I extended that to also run checkpatch to avoid having to
+> clean up frequent unintended whitespace changes and style violations from others...
+> 
+> I have also tested this version on some directories I am familiar with.  The
+> result of that work is available in two patch sets of 10 and 11 patches, but we
+> agreed that it would be better to post them as separate patch sets later.
+> 
+> Those patch sets illustrates how I picture the "flow" from just "reining in" the
+> checkpatch detections to actually fixing classes of checkpatch issues one by
+> one, while updating the checkpatch.cfg file(s) to have 0 errors or warnings at
+> any commit boundary.
+> 
+> The combined set is available here:
+> 
+>    git://github.com/knuto/linux.git  branch runchecks
+> 
+> I only include version 0 of runchecks.cfg in the two directories I
+> worked on here as the final two patches. These files both documents where
+> the issues are in those two directories, and can be used by the maintainer
+> to indicate to potential helpers what to focus on as I have tried to
+> illustrate by means of comments.
+> 
+> Changes from v1:
+> -----------------
+> Based on feedback, the implementation is completely rewritten and extended.
+> Instead of patches to checkpatch, and a sole checkpatch focus, it is now a
+> generic solution implemented in python, for any type of checkers, extendable
+> through some basic generic functionality, and for special needs by subclassing
+> the Checker class in the implementation.
+> 
+> This implementation fully supports checkpatch, sparse and
+> checkdoc == kernel-doc -none, and also has been tested with coccicheck.
+> To facilitate the same mechanism of using check types to filter what
+> checks to be suppressed, I introduced the concept of "typedefs" which allows
+> runchecks to effectively augment the check type space of the checker in cases
+> where types either are not available at all (checkdoc) or where only a few
+> can be filtered out (sparse)
+> 
+> With this in place it also became trivial to make the look and feel similar
+> for sparse and checkdoc as for checkpatch, with some optional color support
+> too, to make fixing issues in the code, the goal of this whole exercise,
+> much more pleasant IMHO :-)
+> 
+> Thanks,
+> Knut
+> 
+> Knut Omang (5):
+>   runchecks: Generalize make C={1,2} to support multiple checkers
+>   Documentation: Add doc for runchecks, a checker runner
+>   checkpatch: Improve --fix-inplace for TABSTOP
+>   rds: Add runchecks.cfg for net/rds
+>   RDMA/core: Add runchecks.cfg for drivers/infiniband/core
+> 
+>  Documentation/dev-tools/coccinelle.rst |  12 +-
+>  Documentation/dev-tools/index.rst      |   1 +-
+>  Documentation/dev-tools/runchecks.rst  | 215 ++++++++-
+>  Documentation/dev-tools/sparse.rst     |  30 +-
+>  Documentation/kbuild/kbuild.txt        |   9 +-
+>  Makefile                               |  23 +-
+>  drivers/infiniband/core/runchecks.cfg  |  83 +++-
+>  net/rds/runchecks.cfg                  |  76 +++-
+>  scripts/Makefile.build                 |   4 +-
+>  scripts/checkpatch.pl                  |   2 +-
+>  scripts/runchecks                      | 734 ++++++++++++++++++++++++++-
+>  scripts/runchecks.cfg                  |  63 ++-
+>  scripts/runchecks_help.txt             |  43 ++-
+>  13 files changed, 1274 insertions(+), 21 deletions(-)
+>  create mode 100644 Documentation/dev-tools/runchecks.rst
+>  create mode 100644 drivers/infiniband/core/runchecks.cfg
+>  create mode 100644 net/rds/runchecks.cfg
+>  create mode 100755 scripts/runchecks
+>  create mode 100644 scripts/runchecks.cfg
+>  create mode 100644 scripts/runchecks_help.txt
+> 
+> base-commit: ae64f9bd1d3621b5e60d7363bc20afb46aede215
 
-Rebuilding the dts files manually with symbols isn't the problem. The 
-idea was to enable it with a switch which distros simply can flip.
+I like the ability to add more checkers and keep then in the main
+upstream tree. But adding overrides for specific subsystems goes against
+the policy that all subsystems should be treated equally.
 
-Passing DTC_FLAGS to `make` would work too I guess, but on multi 
-platform builds that's still the same issue if there're boards which 
-can't handle that because of the size increase.
-
-Would a solution which enables symbols per family work?
-E.g. CONFIG_MACH_SUN7I chooses to use -@ because it can handle it.
-
-Thanks,
-Andre
+There was discussion at Kernel Summit about how the different
+subsystems already have different rules. This appears to be a
+way to make that worse.
