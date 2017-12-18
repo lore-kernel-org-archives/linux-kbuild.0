@@ -1,99 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp2130.oracle.com ([156.151.31.86]:55804 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750841AbdLRNmh (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:65518 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751217AbdLRN7g (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Dec 2017 08:42:37 -0500
-Message-ID: <1513604483.22938.65.camel@oracle.com>
-Subject: Re: [PATCH v2 0/5] Support for generalized use of make C={1,2} via
- a wrapper program
-From: Knut Omang <knut.omang@oracle.com>
-Date: Mon, 18 Dec 2017 14:41:23 +0100
-In-Reply-To: <20171218050043.GA1307@ziepe.ca>
-References: <cover.630ac8faeeda67bf7a778c158174422042942d08.1513430008.git-series.knut.omang@oracle.com>
-         <20171216094745.5e41ac51@xeon-e3> <1513476850.31439.108.camel@oracle.com>
-         <20171218050043.GA1307@ziepe.ca>
+        Mon, 18 Dec 2017 08:59:36 -0500
+MIME-Version: 1.0
+In-Reply-To: <20171215082316.GB26962@osadl.at>
+References: <1513281250-9186-1-git-send-email-lukas.bulwahn@gmail.com>
+ <1513281250-9186-2-git-send-email-lukas.bulwahn@gmail.com> <20171215082316.GB26962@osadl.at>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 18 Dec 2017 22:58:49 +0900
+Message-ID: <CAK7LNAQY74x_c+1VBrjwR_1UvC42Fkr4CuFm7kJrr8c3+qZ5Lw@mail.gmail.com>
+Subject: Re: [SIL2review] [PATCH] fixdep: free memory on second error path of do_config_file
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, linux-kernel@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, Jonathan Corbet <corbet@lwn.net>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, Matthew Wilcox <willy@infradead.org>, cocci@systeme.lip6.fr, rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org, Doug Ledford <dledford@redhat.com>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, Shuah Khan <shuah@kernel.org>, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Julia Lawall <Julia.Lawall@lip6.fr>, John Haxby <john.haxby@oracle.com>, =?ISO-8859-1?Q?=C5smund_=D8stvold?= <asmund.ostvold@oracle.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org, Gilles Muller <Gilles.Muller@lip6.fr>, "David S. Miller" <davem@davemloft.net>, Joe Perches <joe@perches.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, =?ISO-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>, Andy Whitcroft <apw@canonical.com>, "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>
+To: Nicholas Mc Guire <der.herr@hofr.at>
+Cc: Lukas Bulwahn <lukas.bulwahn@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, sil2review@lists.osadl.org, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Alexey Dobriyan <adobriyan@gmail.com>
 
-On Sun, 2017-12-17 at 22:00 -0700, Jason Gunthorpe wrote:
-> On Sun, Dec 17, 2017 at 03:14:10AM +0100, Knut Omang wrote:
-> 
-> > > I like the ability to add more checkers and keep then in the main
-> > > upstream tree. But adding overrides for specific subsystems goes against
-> > > the policy that all subsystems should be treated equally.
-> > 
-> > This is a tool to enable automated testing for as many checks as
-> > possible, as soon as possible. Like any tool, it can be misused, but
-> > that's IMHO an orthogonal problem that I think the maintainers will
-> > be more than capable of preventing.
-> > 
-> > Think of this as a tightening screw: We eliminate errors class by
-> > class or file by file, and in the same commit narrows in the list of
-> > exceptions. That way we can fix issues piece by piece while avoiding
-> > a lot of regressions in already clean parts.
-> 
-> Since you used drivers/infiniband as an example for this script..
-> 
-> I will say I agree with this idea.
+2017-12-15 17:23 GMT+09:00 Nicholas Mc Guire <der.herr@hofr.at>:
+> On Thu, Dec 14, 2017 at 08:54:10PM +0100, Lukas Bulwahn wrote:
+>> Commit dee81e988674 ("fixdep: faster CONFIG_ search") introduces the memory
+>> leak when `map = mmap(...)` was replaced with `map = malloc(...)` and
+>> `read(fd, map, ...)`. It introduces a new second error path, which does not
+>> free the allocated memory for `map`. We now correct that behavior and free
+>> `map` before the do_config_file() function returns.
+>>
+>> Facebook's static analysis tool Infer (http://fbinfer.com) found this
+>> memory leak:
+>>
+>>   scripts/basic/fixdep.c:297: error: MEMORY_LEAK
+>>     memory dynamically allocated by call to `malloc()` at line 290, \
+>>     column 8 is not reachable after line 297, column 3.
+>>
+>> Fixes: dee81e988674 ("fixdep: faster CONFIG_ search")
+>>
+>> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+> Reviewed-by: Nicholas Mc Guire <der.herr@hofr.at>
+>
+>> ---
+>>  scripts/basic/fixdep.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+>> index bbf62cb..131c450 100644
+>> --- a/scripts/basic/fixdep.c
+>> +++ b/scripts/basic/fixdep.c
+>> @@ -296,6 +296,7 @@ static void do_config_file(const char *filename)
+>>       if (read(fd, map, st.st_size) != st.st_size) {
+>>               perror("fixdep: read");
+>>               close(fd);
+>> +             free(map);
+>
+>  This looks reasonable but actually it is not clear why do_config_file()
+> should return at all if read fails as the read error would go unnoticed
+> in the current code and allow the build to continue. so this probably
+> should be an exit(2) here and not a return which would then take care
+> of the free() anyway.
 
-> It is not that we *want* infiniband to be different from the rest of
-> the kernel, it is that we have this historical situation where we
-> don't have a code base that already passes the various static checker
-> things.
+I agree.
 
-I poked around trying make M= in different parts of the kernel to get some 
-"mileage" and to get as much examples as possible, and it appears most of 
-the kernel has issues of sorts. Also Joe and others keep adding more checks 
-as well, and we'd want that process to coexist with the need for automatic 
-regression testing in this area.
+This should be exit(2).
 
-> I would like it very much if I could run 'make static checker' and see
-> no warnings. 
+You can also remove close() as well since
+the operation system will close it anyway.
 
-which is just what is the result with 'make C=2 M=drivers/infiniband/core' 
-and the patches #1 and #5 in this set in case not everyone got the point,
 
-> This helps me know that I when I accept patches I am not
-> introducing new problems to code that has already been cleaned up.
-> 
-> Today when we run checkers we get so many warnings it is too hard to
-> make any sense of it.
-> 
-> Being able to say File X is now clean for check XYZ seems very useful
-> and may motivate people to clean up the files they actualy care
-> about...
-> 
-> > > There was discussion at Kernel Summit about how the different
-> > > subsystems already have different rules. This appears to be a way
-> > > to make that worse.
-> > 
-> > IMHO this is a tool that should help maintainers implement the
-> > policies they desire.  But the tool itself does not dictate any
-> > such.
-> 
-> Yes, again, in infiniband we like to see checkpatch be good for new
-> submission, even if that clashes with surrounding code. For instance
-> we have a mixture of sizeof foo and sizeof(foo) styles in the same
-> file/function now.
 
-That's one of the fixes that the excellent --fix-inplace handles so 
-one of my patches here
+>  Atleast I do not see the rational to allow continuation if the read
+> failed as the file should not be empty nor a mismatch with st.st_size
+> expected. If it were due to a EINTR then it still should terminate as
+> EINTR was not handled and we thus could miss a valid dependency.
+>
+>  Note: this probably also should be applied to the if (!map) condition
+> before as well, as at that point it is known that map > 0 and a malloc()
+> failure would allow skipping parse_config_file() for a valid config.
 
-https://github.com/torvalds/linux/compare/master...knuto:runchecks
+I agree.  We should change this too.
 
-fixes those in drivers/infiniband/core.
 
-> I certainly don't want to tell people they need to follow some
-> different style from 10 years ago when they send patches.
-> 
 
-Thanks,
-Knut
-
-> Jason
+-- 
+Best Regards
+Masahiro Yamada
