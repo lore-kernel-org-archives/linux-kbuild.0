@@ -1,102 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:20003 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752847AbdLRPc6 (ORCPT
+Received: from aserp2130.oracle.com ([141.146.126.79]:33952 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933687AbdLRQrq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Dec 2017 10:32:58 -0500
-MIME-Version: 1.0
-In-Reply-To: <c871326fca27c1b8fd81f838a604c634@codeaurora.org>
-References: <56cef2a644acc458b9457e3147abc4c0@codeaurora.org>
- <20171207062602.GA12561@kroah.com> <c871326fca27c1b8fd81f838a604c634@codeaurora.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 19 Dec 2017 00:32:14 +0900
-Message-ID: <CAK7LNAQAtPQOXPKyhrs4w7cLXoO5vpM9_Yi_=_G0gNYmNNv_FA@mail.gmail.com>
-Subject: Re: unused-variable warning is getting disabled with clang
+        Mon, 18 Dec 2017 11:47:46 -0500
+Message-ID: <1513615286.31439.178.camel@oracle.com>
+Subject: Re: [PATCH v2 0/5] Support for generalized use of make C={1,2} via
+ a wrapper program
+From: Knut Omang <knut.omang@oracle.com>
+Date: Mon, 18 Dec 2017 17:41:26 +0100
+In-Reply-To: <1513611003.31581.71.camel@perches.com>
+References: <cover.630ac8faeeda67bf7a778c158174422042942d08.1513430008.git-series.knut.omang@oracle.com>
+         <20171216094745.5e41ac51@xeon-e3> <1513476850.31439.108.camel@oracle.com>
+         <20171218050043.GA1307@ziepe.ca> <1513576817.31581.58.camel@perches.com>
+         <1513602315.22938.49.camel@oracle.com>
+         <1513611003.31581.71.camel@perches.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sodagudi Prasad <psodagud@codeaurora.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Michal Marek <mmarek@suse.com>, Greg Hackmann <ghackmann@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Joe Perches <joe@perches.com>, Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, linux-kernel@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, Jonathan Corbet <corbet@lwn.net>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, Matthew Wilcox <willy@infradead.org>, cocci@systeme.lip6.fr, rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org, Doug Ledford <dledford@redhat.com>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, Shuah Khan <shuah@kernel.org>, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Julia Lawall <Julia.Lawall@lip6.fr>, John Haxby <john.haxby@oracle.com>, =?ISO-8859-1?Q?=C5smund_=D8stvold?= <asmund.ostvold@oracle.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org, Gilles Muller <Gilles.Muller@lip6.fr>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, =?ISO-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>, Andy Whitcroft <apw@canonical.com>, "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>
 
-2017-12-08 11:16 GMT+09:00 Sodagudi Prasad <psodagud@codeaurora.org>:
-> On 2017-12-06 22:26, Greg Kroah-Hartman wrote:
->>
->> On Wed, Dec 06, 2017 at 01:24:51PM -0800, Sodagudi Prasad wrote:
->>>
->>>
->>> Hi All,
->>>
->>> When kernel compiled with clang, following line is disabling the
->>> unused-variable warning. This is not the case with gcc.
->>> KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
->>>
->>> Are there any specific reasons for disabling unused-variable with clang?
->>
->>
->> Try it and see why it is disabled :)
->
->
-> Hi Greg,
->
-> When I have enabled -Wunused-variable warnings with clang, observed both
-> -Wunused-variable and -Wunused-const-variable as expected.
-> It looks that, -Wunused-const-variable warnings are disabled explicitly with
-> GCC as well.
-> commit -  c9c6837d39311b0c - "kbuild: move -Wunused-const-variable to W=1
-> warning level"
->
-> I could see following warnings along with couple of -Wunused-variables
-> warnings with downstream code.
-> arch/arm64/crypto/sha1-ce-glue.c:118:1: warning: unused variable
-> 'cpu_feature_match_SHA1' [-Wunused-const-variable]
-> include/linux/cpufeature.h:48:33: note: expanded from macro
-> 'module_cpu_feature_match'
-> arch/arm64/crypto/sha2-ce-glue.c:148:1: warning: unused variable
-> 'cpu_feature_match_SHA2' [-Wunused-const-variable]
-> arch/arm64/crypto/ghash-ce-glue.c:597:33: warning: unused variable
-> 'ghash_cpu_feature' [-Wunused-const-variable]
-> arch/arm64/crypto/aes-ce-cipher.c:280:1: warning: unused variable
-> 'cpu_feature_match_AES' [-Wunused-const-variable]
-> arch/arm64/crypto/aes-glue.c:674:1: warning: unused variable
-> 'cpu_feature_match_AES' [-Wunused-const-variable]
-> kernel/trace/ftrace.c:1092:27: warning: unused variable 'ftrace_swapper_pid'
-> [-Wunused-const-variable]
-> drivers/usb/host/ehci-platform.c:406:36: warning: unused variable
-> 'ehci_acpi_match' [-Wunused-const-variable]
-> drivers/usb/host/xhci-plat.c:416:36: warning: unused variable
-> 'usb_xhci_acpi_match' [-Wunused-const-variable]
->
-> So I have made following change and I will share patch for the same.
->
-> diff --git a/Makefile b/Makefile
-> index 4e6da2f..8a6c14e 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -711,7 +711,7 @@ endif
->  KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) -meabi gnu
->  KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
->  KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
->  KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
->  KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
->  KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
->
-> Please let me know if you have any concerns with this approach to identify
-> all unused local variables.
->
-> -Thanks, Prasad
+On Mon, 2017-12-18 at 07:30 -0800, Joe Perches wrote:
+> On Mon, 2017-12-18 at 14:05 +0100, Knut Omang wrote:
+> > > Here is a list of the checkpatch messages for drivers/infiniband
+> > > sorted by type.
+> > > 
+> > > Many of these might be corrected by using
+> > > 
+> > > $ ./scripts/checkpatch.pl -f --fix-inplace --types=<TYPE> \
+> > >   $(git ls-files drivers/infiniband/)
+> > 
+> > Yes, and I already did that work piece by piece for individual types,
+> > just to test the runchecks tool, and want to post that set once the 
+> > runchecks script and Makefile changes itself are in,
+> 
+> I think those are independent of any runcheck tool changes and
+> could be posted now.  In general, don't keep patches in a local
+> tree waiting on some other unrelated patch.
 
-This approach seems good, but
-KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
-will be common for GCC and Clang.
+It becomes related in that the runchecks.cfg file is updated 
+in all the patches to keep 'make C=2' run with 0 errors while 
+enabling more checks. I think they serve well as examples of 
+how a workflow with runchecks could be.
 
+> Just fyi:
+> 
+> There is a script that helps automate checkpatch "by-type" conversions
+> with compilation, .o difference checking, and git commit editing.
+> 
+> https://lkml.org/lkml/2014/7/11/794
 
-Please move it out of  "ifeq ... else .. endif"
+oh - good to know - seems it would have been a good help
+during my little exercise..
 
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Thanks,
+Knut
