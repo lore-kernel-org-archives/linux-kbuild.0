@@ -1,150 +1,179 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:34837 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750813AbdLRLIX (ORCPT
+Received: from userp2130.oracle.com ([156.151.31.86]:37000 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752603AbdLRNHz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Dec 2017 06:08:23 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQT-e+wbcNCy6F0KvEfUnGpHs_p8+ybQ=yor+mAXoaDFQ@mail.gmail.com>
-References: <20171205153259.2522368-1-arnd@arndb.de> <CAK7LNAQT-e+wbcNCy6F0KvEfUnGpHs_p8+ybQ=yor+mAXoaDFQ@mail.gmail.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Mon, 18 Dec 2017 12:08:22 +0100
-Message-ID: <CAK8P3a3g3c_AJ6hEFQ3BYa=3cF97FFNN-EeTzWBwD=30EGe4eg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] [RFC] kbuild: add macro for controlling warnings to linux/compiler.h
+        Mon, 18 Dec 2017 08:07:55 -0500
+Message-ID: <1513602315.22938.49.camel@oracle.com>
+Subject: Re: [PATCH v2 0/5] Support for generalized use of make C={1,2} via
+ a wrapper program
+From: Knut Omang <knut.omang@oracle.com>
+Date: Mon, 18 Dec 2017 14:05:15 +0100
+In-Reply-To: <1513576817.31581.58.camel@perches.com>
+References: <cover.630ac8faeeda67bf7a778c158174422042942d08.1513430008.git-series.knut.omang@oracle.com>
+         <20171216094745.5e41ac51@xeon-e3> <1513476850.31439.108.camel@oracle.com>
+         <20171218050043.GA1307@ziepe.ca> <1513576817.31581.58.camel@perches.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Douglas Anderson <dianders@chromium.org>, Al Viro <viro@zeniv.linux.org.uk>, Heiko Carstens <heiko.carstens@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Matthias Kaehlcke <mka@chromium.org>, Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Gideon Israel Dsouza <gidisrael@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Joe Perches <joe@perches.com>, Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, linux-kernel@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, Jonathan Corbet <corbet@lwn.net>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, Matthew Wilcox <willy@infradead.org>, cocci@systeme.lip6.fr, rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org, Doug Ledford <dledford@redhat.com>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, Shuah Khan <shuah@kernel.org>, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Julia Lawall <Julia.Lawall@lip6.fr>, John Haxby <john.haxby@oracle.com>, =?ISO-8859-1?Q?=C5smund_=D8stvold?= <asmund.ostvold@oracle.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org, Gilles Muller <Gilles.Muller@lip6.fr>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, =?ISO-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>, Andy Whitcroft <apw@canonical.com>, "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>
 
-On Mon, Dec 18, 2017 at 10:48 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2017-12-06 0:32 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
->> I have occasionally run into a situation where it would make sense to
->> control a compiler warning from a source file rather than doing so from
->> a Makefile using the $(cc-disable-warning, ...) or $(cc-option, ...)
->> helpers.
->>
->> The approach here is similar to what glibc uses, using __diag() and
->> related macros to encapsulate a _Pragma("GCC diagnostic ...") statement
->> that gets turned into the respective "#pragma GCC diagnostic ..." by
->> the preprocessor when the macro gets expanded.
->>
->> Like glibc, I also have an argument to pass the affected compiler
->> version, but decided to actually evaluate that one. For now, this
->> supports GCC_4_6, GCC_4_7, GCC_4_8, GCC_4_9, GCC_5, GCC_6, GCC_7,
->> GCC_8 and GCC_9. Adding support for CLANG_5 and other interesting
->> versions is straightforward here. GNU compilers starting with gcc-4.2
->> could support it in principle, but "#pragma GCC diagnostic push"
->> was only added in gcc-4.6, so it seems simpler to not deal with those
->> at all. The same versions show a large number of warnings already,
->> so it seems easier to just leave it at that and not do a more
->> fine-grained control for them.
->>
->> The use cases I found so far include:
->>
->> - turning off the gcc-8 -Wattribute-alias warning inside of the
->>   SYSCALL_DEFINEx() macro without having to do it globally.
->>
->> - Reducing the build time for a simple re-make after a change,
->>   once we move the warnings from ./Makefile and
->>   ./scripts/Makefile.extrawarn into linux/compiler.h
->
-> Do you mean, list default warnings in linux/compiler.h
->
-> like
->
-> __diag_ignore(GCC_*, "-Wunused-but-set-variable");
-> __diag_ignore(GCC_*, "-Wunused-const-variable");
->
-> instead of
->
-> KBUILD_CFLAGS +=3D $(call cc-disable-warning, unused-but-set-variable)
-> KBUILD_CFLAGS +=3D $(call cc-disable-warning, unused-const-variable)
->
-> Is this what you mean?
+On Sun, 2017-12-17 at 22:00 -0800, Joe Perches wrote:
+> On Sun, 2017-12-17 at 22:00 -0700, Jason Gunthorpe wrote:
+> > On Sun, Dec 17, 2017 at 03:14:10AM +0100, Knut Omang wrote:
+> > 
+> > > > I like the ability to add more checkers and keep then in the main
+> > > > upstream tree. But adding overrides for specific subsystems goes against
+> > > > the policy that all subsystems should be treated equally.
+> > > 
+> > > This is a tool to enable automated testing for as many checks as
+> > > possible, as soon as possible. Like any tool, it can be misused, but
+> > > that's IMHO an orthogonal problem that I think the maintainers will
+> > > be more than capable of preventing.
+> > > 
+> > > Think of this as a tightening screw: We eliminate errors class by
+> > > class or file by file, and in the same commit narrows in the list of
+> > > exceptions. That way we can fix issues piece by piece while avoiding
+> > > a lot of regressions in already clean parts.
+> > 
+> > Since you used drivers/infiniband as an example for this script..
+> > 
+> > I will say I agree with this idea.
+> > 
+> > It is not that we *want* infiniband to be different from the rest of
+> > the kernel, it is that we have this historical situation where we
+> > don't have a code base that already passes the various static checker
+> > things.
+> > 
+> > I would like it very much if I could run 'make static checker' and see
+> > no warnings. This helps me know that I when I accept patches I am not
+> > introducing new problems to code that has already been cleaned up.
+> > 
+> > Today when we run checkers we get so many warnings it is too hard to
+> > make any sense of it.
+> 
+> Here is a list of the checkpatch messages for drivers/infiniband
+> sorted by type.
+> 
+> Many of these might be corrected by using
+> 
+> $ ./scripts/checkpatch.pl -f --fix-inplace --types=<TYPE> \
+>   $(git ls-files drivers/infiniband/)
 
-In principle yes, though my plan was a bit more sophisticated than this:
-I want to make those definitions specific to both the W=3D level and the co=
-mpiler
-version, so you can say things like
+Yes, and I already did that work piece by piece for individual types,
+just to test the runchecks tool, and want to post that set once the 
+runchecks script and Makefile changes itself are in,
 
-KBUILD_WARN(0, GCC_4_6, "-Wall")
-KBUILD_WARN(0, CLANG5, "-Wall")
+see:
 
-KBUILD_WARN(1, GCC_4_6, "-Wextra")
-KBUILD_WARN(1, CLANG5, "-Wextra")
+https://github.com/torvalds/linux/compare/master...knuto:runchecks
 
-KBUILD_WARN(2, CLANG5, "-Wmost")
+What I personally like about this approach is that with the runchecks.cfg file
+one can focus easily on one or two check types at a time, create a commit out of that
+and at the same time "tighten" runchecks.cfg - changes in that file then serves as 
+documentation for what got changed and use maintainers can use comments to indicate 
+why the remaining exceptions are still there - and there's a one-stop for anyone 
+wanting to contribute to checkpatch/sparse/doc fixes.
 
-KBUILD_WARN(3, CLANG5, "-Weverything")
+And it will be possible to run bisect with make C=2 and always have 0 errors.
 
-With the above, "make W=3D12 E=3D01" should would lead to
--Wall and -Wextra warnings to become errors on all compilers,
-but also enable -Wmost as warnings rather than errors on clang.
-
-> I wonder if we should for all files to include <linux/compiler.h>...
-
-I assumed we already did that, but maybe I was wrong here. I see
-that we include include/linux/kconfig.h everywhere, but I don't see
-that for compiler.h. This would obviously be a requirement to do first.
-
->> This patch for now just adds the minimal infrastructure in order to
->> do the first of the list above. As the #pragma GCC diagnostic
->> takes precedence over command line options, the next step would be
->> to convert a lot of the individual Makefiles that set nonstandard
->> options to use __diag() instead.
->
->
-> GCC manual says:
->   Note that not all diagnostics are modifiable; at the moment only warnin=
-gs
->   (normally controlled by =E2=80=98-W=E2=80=A6=E2=80=99) can be controlle=
-d, and not all of them.
->
-> https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html#Diagnostic-Pra=
-gmas
->
->
-> Actually, my compiler does not react
-> to __diag_*(GCC_*, "-Wunused-but-set-variable") at all.
->
-> Is it possible to replace command line flags?
-
-My interpretation was that everything that had a -W option could be control=
-led
-with a pragma as well. While we can turn any warning into an error, we cann=
-ot
-turn most errors into warnings.
-
-When I experimented with this a couple of months ago, I also saw that
-"gcc -Q --help=3Dwarnings" reports some warnings that are language
-specific, and it refuses to enable e.g. a fortran specific warning when
-building a C file.
-
-> For linux/compiler-intel.h case,
-> these macros are not defined at all,
-> so __diag_ignore(GCC_*, ...) will cause compile error.
-
-Right, that would need to be fixed. I think it's ok to just ignore all
-those statements and just continue with the default warnings.
-
-> Clang includes linux/compiler-gcc.h as well,
-> so it should be OK.
->
-> Interestingly, clang also defines GCC version,
-> but I have no idea the correspondence between
-> gcc version vs. clang version.
-
-I tried clang-3.9 and clang-5, both of which report compatibility with
-gcc-4.2.1. It seems that for the most part, clang tries to implement
-the  gcc warning options, but there are always some it does not have.
-I can probably come up with a list of warning options that all
-supported versions of either gcc or clang understand, and have
-those set independent of the version, but for all others require
-listing the specific version that introduces it. In some cases a
-warning gets introduced in one version but isn't actually usable
-until a later version.
-
-       Arnd
+Thanks,
+Knut
+> 
+>    5243 CHECK:CAMELCASE
+>    4487 WARNING:LONG_LINE
+>    1755 CHECK:PARENTHESIS_ALIGNMENT
+>    1664 CHECK:SPACING
+>     910 WARNING:FUNCTION_ARGUMENTS
+>     742 CHECK:OPEN_ENDED_LINE
+>     685 CHECK:BRACES
+>     643 CHECK:UNNECESSARY_PARENTHESES
+>     478 WARNING:SIZEOF_PARENTHESIS
+>     361 WARNING:UNSPECIFIED_INT
+>     342 WARNING:LONG_LINE_COMMENT
+>     338 ERROR:SPACING
+>     338 CHECK:LINE_SPACING
+>     306 WARNING:SPLIT_STRING
+>     278 WARNING:SPACING
+>     242 WARNING:SYMBOLIC_PERMS
+>     194 WARNING:BLOCK_COMMENT_STYLE
+>     175 CHECK:BIT_MACRO
+>     158 WARNING:SPACE_BEFORE_TAB
+>     154 WARNING:LINE_SPACING
+>     139 CHECK:MACRO_ARG_REUSE
+>     133 CHECK:UNCOMMENTED_DEFINITION
+>     122 CHECK:AVOID_BUG
+>     103 CHECK:COMPARISON_TO_NULL
+>     101 WARNING:ENOSYS
+>      89 WARNING:BRACES
+>      78 WARNING:PREFER_PR_LEVEL
+>      74 WARNING:MULTILINE_DEREFERENCE
+>      59 CHECK:TYPO_SPELLING
+>      52 WARNING:EMBEDDED_FUNCTION_NAME
+>      52 CHECK:MULTIPLE_ASSIGNMENTS
+>      50 CHECK:PREFER_KERNEL_TYPES
+>      45 WARNING:RETURN_VOID
+>      39 WARNING:UNNECESSARY_ELSE
+>      38 ERROR:POINTER_LOCATION
+>      37 WARNING:ALLOC_WITH_MULTIPLY
+>      36 CHECK:ALLOC_SIZEOF_STRUCT
+>      35 CHECK:AVOID_EXTERNS
+>      34 WARNING:PRINTK_WITHOUT_KERN_LEVEL
+>      33 ERROR:CODE_INDENT
+>      32 WARNING:PREFER_PACKED
+>      32 CHECK:LOGICAL_CONTINUATIONS
+>      29 WARNING:MEMORY_BARRIER
+>      29 WARNING:LEADING_SPACE
+>      28 WARNING:DEEP_INDENTATION
+>      27 CHECK:USLEEP_RANGE
+>      23 WARNING:SUSPECT_CODE_INDENT
+>      23 ERROR:TRAILING_STATEMENTS
+>      21 WARNING:LONG_LINE_STRING
+>      20 WARNING:CONSIDER_KSTRTO
+>      18 WARNING:CONSTANT_COMPARISON
+>      18 ERROR:OPEN_BRACE
+>      15 WARNING:QUOTED_WHITESPACE_BEFORE_NEWLINE
+>      14 WARNING:VOLATILE
+>      14 ERROR:SWITCH_CASE_INDENT_LEVEL
+>      11 WARNING:OOM_MESSAGE
+>      11 WARNING:INCLUDE_LINUX
+>      10 WARNING:SSCANF_TO_KSTRTO
+>      10 WARNING:INDENTED_LABEL
+>       9 ERROR:GLOBAL_INITIALISERS
+>       9 ERROR:COMPLEX_MACRO
+>       9 ERROR:ASSIGN_IN_IF
+>       8 WARNING:UNNECESSARY_BREAK
+>       6 WARNING:PRINTF_L
+>       6 WARNING:MISORDERED_TYPE
+>       6 ERROR:INITIALISED_STATIC
+>       5 WARNING:TABSTOP
+>       5 WARNING:SINGLE_STATEMENT_DO_WHILE_MACRO
+>       5 WARNING:NAKED_SSCANF
+>       4 WARNING:NEEDLESS_IF
+>       4 ERROR:RETURN_PARENTHESES
+>       4 CHECK:BOOL_COMPARISON
+>       3 WARNING:TRAILING_SEMICOLON
+>       3 WARNING:STATIC_CONST_CHAR_ARRAY
+>       3 ERROR:TRAILING_WHITESPACE
+>       2 WARNING:UNNECESSARY_PARENTHESES
+>       2 WARNING:MISSING_SPACE
+>       2 WARNING:LOGGING_CONTINUATION
+>       2 CHECK:ARCH_DEFINES
+>       1 WARNING:TYPECAST_INT_CONSTANT
+>       1 WARNING:PREFER_DEV_LEVEL
+>       1 WARNING:NR_CPUS
+>       1 WARNING:NEW_TYPEDEFS
+>       1 WARNING:MINMAX
+>       1 WARNING:MACRO_WITH_FLOW_CONTROL
+>       1 WARNING:LINE_CONTINUATIONS
+>       1 WARNING:DO_WHILE_MACRO_WITH_TRAILING_SEMICOLON
+>       1 WARNING:DEFAULT_NO_BREAK
+>       1 WARNING:CONST_STRUCT
+>       1 WARNING:CONSIDER_COMPLETION
+>       1 ERROR:WHILE_AFTER_BRACE
+>       1 ERROR:ELSE_AFTER_BRACE
+>       1 CHECK:REDUNDANT_CODE
+> 
