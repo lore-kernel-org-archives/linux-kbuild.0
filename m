@@ -1,158 +1,254 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0211.hostedemail.com ([216.40.44.211]:37575 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750761AbdLRGAZ (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:35049 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758327AbdLRJta (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Dec 2017 01:00:25 -0500
-Message-ID: <1513576817.31581.58.camel@perches.com>
-Subject: Re: [PATCH v2 0/5] Support for generalized use of make C={1,2} via
- a wrapper program
-From: Joe Perches <joe@perches.com>
-Date: Sun, 17 Dec 2017 22:00:17 -0800
-In-Reply-To: <20171218050043.GA1307@ziepe.ca>
-References: <cover.630ac8faeeda67bf7a778c158174422042942d08.1513430008.git-series.knut.omang@oracle.com>
-         <20171216094745.5e41ac51@xeon-e3> <1513476850.31439.108.camel@oracle.com>
-         <20171218050043.GA1307@ziepe.ca>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Mon, 18 Dec 2017 04:49:30 -0500
+MIME-Version: 1.0
+In-Reply-To: <20171205153259.2522368-1-arnd@arndb.de>
+References: <20171205153259.2522368-1-arnd@arndb.de>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 18 Dec 2017 18:48:37 +0900
+Message-ID: <CAK7LNAQT-e+wbcNCy6F0KvEfUnGpHs_p8+ybQ=yor+mAXoaDFQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] [RFC] kbuild: add macro for controlling warnings to linux/compiler.h
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>, Knut Omang <knut.omang@oracle.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, linux-kernel@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, Jonathan Corbet <corbet@lwn.net>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, Matthew Wilcox <willy@infradead.org>, cocci@systeme.lip6.fr, rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org, Doug Ledford <dledford@redhat.com>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, Shuah Khan <shuah@kernel.org>, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Julia Lawall <Julia.Lawall@lip6.fr>, John Haxby <john.haxby@oracle.com>, =?ISO-8859-1?Q?=C5smund_=D8stvold?= <asmund.ostvold@oracle.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org, Gilles Muller <Gilles.Muller@lip6.fr>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, =?ISO-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>, Andy Whitcroft <apw@canonical.com>, "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Douglas Anderson <dianders@chromium.org>, Al Viro <viro@zeniv.linux.org.uk>, Heiko Carstens <heiko.carstens@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Matthias Kaehlcke <mka@chromium.org>, Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Gideon Israel Dsouza <gidisrael@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Sun, 2017-12-17 at 22:00 -0700, Jason Gunthorpe wrote:
-> On Sun, Dec 17, 2017 at 03:14:10AM +0100, Knut Omang wrote:
-> 
-> > > I like the ability to add more checkers and keep then in the main
-> > > upstream tree. But adding overrides for specific subsystems goes against
-> > > the policy that all subsystems should be treated equally.
-> > 
-> > This is a tool to enable automated testing for as many checks as
-> > possible, as soon as possible. Like any tool, it can be misused, but
-> > that's IMHO an orthogonal problem that I think the maintainers will
-> > be more than capable of preventing.
-> > 
-> > Think of this as a tightening screw: We eliminate errors class by
-> > class or file by file, and in the same commit narrows in the list of
-> > exceptions. That way we can fix issues piece by piece while avoiding
-> > a lot of regressions in already clean parts.
-> 
-> Since you used drivers/infiniband as an example for this script..
-> 
-> I will say I agree with this idea.
-> 
-> It is not that we *want* infiniband to be different from the rest of
-> the kernel, it is that we have this historical situation where we
-> don't have a code base that already passes the various static checker
-> things.
-> 
-> I would like it very much if I could run 'make static checker' and see
-> no warnings. This helps me know that I when I accept patches I am not
-> introducing new problems to code that has already been cleaned up.
-> 
-> Today when we run checkers we get so many warnings it is too hard to
-> make any sense of it.
+Hi Arnd,
 
-Here is a list of the checkpatch messages for drivers/infiniband
-sorted by type.
 
-Many of these might be corrected by using
+2017-12-06 0:32 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> I have occasionally run into a situation where it would make sense to
+> control a compiler warning from a source file rather than doing so from
+> a Makefile using the $(cc-disable-warning, ...) or $(cc-option, ...)
+> helpers.
+>
+> The approach here is similar to what glibc uses, using __diag() and
+> related macros to encapsulate a _Pragma("GCC diagnostic ...") statement
+> that gets turned into the respective "#pragma GCC diagnostic ..." by
+> the preprocessor when the macro gets expanded.
+>
+> Like glibc, I also have an argument to pass the affected compiler
+> version, but decided to actually evaluate that one. For now, this
+> supports GCC_4_6, GCC_4_7, GCC_4_8, GCC_4_9, GCC_5, GCC_6, GCC_7,
+> GCC_8 and GCC_9. Adding support for CLANG_5 and other interesting
+> versions is straightforward here. GNU compilers starting with gcc-4.2
+> could support it in principle, but "#pragma GCC diagnostic push"
+> was only added in gcc-4.6, so it seems simpler to not deal with those
+> at all. The same versions show a large number of warnings already,
+> so it seems easier to just leave it at that and not do a more
+> fine-grained control for them.
+>
+> The use cases I found so far include:
+>
+> - turning off the gcc-8 -Wattribute-alias warning inside of the
+>   SYSCALL_DEFINEx() macro without having to do it globally.
+>
+> - Reducing the build time for a simple re-make after a change,
+>   once we move the warnings from ./Makefile and
+>   ./scripts/Makefile.extrawarn into linux/compiler.h
 
-$ ./scripts/checkpatch.pl -f --fix-inplace --types=<TYPE> \
-  $(git ls-files drivers/infiniband/)
+Do you mean, list default warnings in linux/compiler.h
 
-   5243 CHECK:CAMELCASE
-   4487 WARNING:LONG_LINE
-   1755 CHECK:PARENTHESIS_ALIGNMENT
-   1664 CHECK:SPACING
-    910 WARNING:FUNCTION_ARGUMENTS
-    742 CHECK:OPEN_ENDED_LINE
-    685 CHECK:BRACES
-    643 CHECK:UNNECESSARY_PARENTHESES
-    478 WARNING:SIZEOF_PARENTHESIS
-    361 WARNING:UNSPECIFIED_INT
-    342 WARNING:LONG_LINE_COMMENT
-    338 ERROR:SPACING
-    338 CHECK:LINE_SPACING
-    306 WARNING:SPLIT_STRING
-    278 WARNING:SPACING
-    242 WARNING:SYMBOLIC_PERMS
-    194 WARNING:BLOCK_COMMENT_STYLE
-    175 CHECK:BIT_MACRO
-    158 WARNING:SPACE_BEFORE_TAB
-    154 WARNING:LINE_SPACING
-    139 CHECK:MACRO_ARG_REUSE
-    133 CHECK:UNCOMMENTED_DEFINITION
-    122 CHECK:AVOID_BUG
-    103 CHECK:COMPARISON_TO_NULL
-    101 WARNING:ENOSYS
-     89 WARNING:BRACES
-     78 WARNING:PREFER_PR_LEVEL
-     74 WARNING:MULTILINE_DEREFERENCE
-     59 CHECK:TYPO_SPELLING
-     52 WARNING:EMBEDDED_FUNCTION_NAME
-     52 CHECK:MULTIPLE_ASSIGNMENTS
-     50 CHECK:PREFER_KERNEL_TYPES
-     45 WARNING:RETURN_VOID
-     39 WARNING:UNNECESSARY_ELSE
-     38 ERROR:POINTER_LOCATION
-     37 WARNING:ALLOC_WITH_MULTIPLY
-     36 CHECK:ALLOC_SIZEOF_STRUCT
-     35 CHECK:AVOID_EXTERNS
-     34 WARNING:PRINTK_WITHOUT_KERN_LEVEL
-     33 ERROR:CODE_INDENT
-     32 WARNING:PREFER_PACKED
-     32 CHECK:LOGICAL_CONTINUATIONS
-     29 WARNING:MEMORY_BARRIER
-     29 WARNING:LEADING_SPACE
-     28 WARNING:DEEP_INDENTATION
-     27 CHECK:USLEEP_RANGE
-     23 WARNING:SUSPECT_CODE_INDENT
-     23 ERROR:TRAILING_STATEMENTS
-     21 WARNING:LONG_LINE_STRING
-     20 WARNING:CONSIDER_KSTRTO
-     18 WARNING:CONSTANT_COMPARISON
-     18 ERROR:OPEN_BRACE
-     15 WARNING:QUOTED_WHITESPACE_BEFORE_NEWLINE
-     14 WARNING:VOLATILE
-     14 ERROR:SWITCH_CASE_INDENT_LEVEL
-     11 WARNING:OOM_MESSAGE
-     11 WARNING:INCLUDE_LINUX
-     10 WARNING:SSCANF_TO_KSTRTO
-     10 WARNING:INDENTED_LABEL
-      9 ERROR:GLOBAL_INITIALISERS
-      9 ERROR:COMPLEX_MACRO
-      9 ERROR:ASSIGN_IN_IF
-      8 WARNING:UNNECESSARY_BREAK
-      6 WARNING:PRINTF_L
-      6 WARNING:MISORDERED_TYPE
-      6 ERROR:INITIALISED_STATIC
-      5 WARNING:TABSTOP
-      5 WARNING:SINGLE_STATEMENT_DO_WHILE_MACRO
-      5 WARNING:NAKED_SSCANF
-      4 WARNING:NEEDLESS_IF
-      4 ERROR:RETURN_PARENTHESES
-      4 CHECK:BOOL_COMPARISON
-      3 WARNING:TRAILING_SEMICOLON
-      3 WARNING:STATIC_CONST_CHAR_ARRAY
-      3 ERROR:TRAILING_WHITESPACE
-      2 WARNING:UNNECESSARY_PARENTHESES
-      2 WARNING:MISSING_SPACE
-      2 WARNING:LOGGING_CONTINUATION
-      2 CHECK:ARCH_DEFINES
-      1 WARNING:TYPECAST_INT_CONSTANT
-      1 WARNING:PREFER_DEV_LEVEL
-      1 WARNING:NR_CPUS
-      1 WARNING:NEW_TYPEDEFS
-      1 WARNING:MINMAX
-      1 WARNING:MACRO_WITH_FLOW_CONTROL
-      1 WARNING:LINE_CONTINUATIONS
-      1 WARNING:DO_WHILE_MACRO_WITH_TRAILING_SEMICOLON
-      1 WARNING:DEFAULT_NO_BREAK
-      1 WARNING:CONST_STRUCT
-      1 WARNING:CONSIDER_COMPLETION
-      1 ERROR:WHILE_AFTER_BRACE
-      1 ERROR:ELSE_AFTER_BRACE
-      1 CHECK:REDUNDANT_CODE
+like
 
+__diag_ignore(GCC_*, "-Wunused-but-set-variable");
+__diag_ignore(GCC_*, "-Wunused-const-variable");
+
+instead of
+
+KBUILD_CFLAGS +=3D $(call cc-disable-warning, unused-but-set-variable)
+KBUILD_CFLAGS +=3D $(call cc-disable-warning, unused-const-variable)
+
+Is this what you mean?
+
+
+I wonder if we should for all files to include <linux/compiler.h>...
+
+
+
+> - More control over the warnings based on other configurations,
+>   using preprocessor syntax instead of Makefile syntax. This should make
+>   it easier for the average developer to understand and change things.
+>
+> - Adding an easy way to turn the W=3D1 option on unconditionally
+>   for a subdirectory or a specific file. This has been requested
+>   by several developers in the past that want to have their subsystems
+>   W=3D1 clean.
+>
+> - Integrating clang better into the build systems. Clang supports
+>   more warnings than GCC, and we probably want to classify them
+>   as default, W=3D1, W=3D2 etc, but there are cases in which the
+>   warnings should be classified differently due to excessive false
+>   positives from one or the other compiler.
+>
+> - Adding a way to turn the default warnings into errors (e.g. using
+>   a new "make E=3D0" tag) while not also turning the W=3D1 warnings into
+>   errors.
+>
+> This patch for now just adds the minimal infrastructure in order to
+> do the first of the list above. As the #pragma GCC diagnostic
+> takes precedence over command line options, the next step would be
+> to convert a lot of the individual Makefiles that set nonstandard
+> options to use __diag() instead.
+
+
+GCC manual says:
+  Note that not all diagnostics are modifiable; at the moment only warnings
+  (normally controlled by =E2=80=98-W=E2=80=A6=E2=80=99) can be controlled,=
+ and not all of them.
+
+https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html#Diagnostic-Pragm=
+as
+
+
+Actually, my compiler does not react
+to __diag_*(GCC_*, "-Wunused-but-set-variable") at all.
+
+Is it possible to replace command line flags?
+
+
+
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> I'm marking this RFC for now, as I'd like to get consensus about
+> whether we want to go down this particular route first, and maybe
+> if someone can come up with better naming for the macros.
+> ---
+>  include/linux/compiler-gcc.h   | 64 ++++++++++++++++++++++++++++++++++++=
+++++++
+>  include/linux/compiler_types.h | 10 +++++++
+>  2 files changed, 74 insertions(+)
+>
+> diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+> index 2272ded07496..5d595cfdb2c4 100644
+> --- a/include/linux/compiler-gcc.h
+> +++ b/include/linux/compiler-gcc.h
+> @@ -329,3 +329,67 @@
+>   * code
+>   */
+>  #define uninitialized_var(x) x =3D x
+> +
+> +/*
+> + * turn individual warnings and errors on and off locally, depending
+> + * on version.
+> + */
+> +#if GCC_VERSION >=3D 40600
+> +#define __diag_str1(s) #s
+> +#define __diag_str(s) __diag_str1(s)
+> +#define __diag(s) _Pragma(__diag_str(GCC diagnostic s))
+> +
+> +/* compilers before gcc-4.6 do not understand "#pragma GCC diagnostic pu=
+sh" */
+> +#define __diag_GCC_4_6(s) __diag(s)
+> +#else
+> +#define __diag(s)
+> +#define __diag_GCC_4_6(s)
+> +#endif
+> +
+> +#if GCC_VERSION >=3D 40700
+> +#define __diag_GCC_4_7(s) __diag(s)
+> +#else
+> +#define __diag_GCC_4_7(s)
+> +#endif
+> +
+> +#if GCC_VERSION >=3D 40800
+> +#define __diag_GCC_4_8(s) __diag(s)
+> +#else
+> +#define __diag_GCC_4_8(s)
+> +#endif
+> +
+> +#if GCC_VERSION >=3D 40900
+> +#define __diag_GCC_4_9(s) __diag(s)
+> +#else
+> +#define __diag_GCC_4_9(s)
+> +#endif
+> +
+> +#if GCC_VERSION >=3D 50000
+> +#define __diag_GCC_5(s) __diag(s)
+> +#else
+> +#define __diag_GCC_5(s)
+> +#endif
+> +
+> +#if GCC_VERSION >=3D 60000
+> +#define __diag_GCC_6(s) __diag(s)
+> +#else
+> +#define __diag_GCC_6(s)
+> +#endif
+> +
+> +#if GCC_VERSION >=3D 70000
+> +#define __diag_GCC_7(s) __diag(s)
+> +#else
+> +#define __diag_GCC_7(s)
+> +#endif
+> +
+> +#if GCC_VERSION >=3D 80000
+> +#define __diag_GCC_8(s) __diag(s)
+> +#else
+> +#define __diag_GCC_8(s)
+> +#endif
+> +
+> +#if GCC_VERSION >=3D 90000
+> +#define __diag_GCC_9(s) __diag(s)
+> +#else
+> +#define __diag_GCC_9(s)
+> +#endif
+
+
+For linux/compiler-intel.h case,
+these macros are not defined at all,
+so __diag_ignore(GCC_*, ...) will cause compile error.
+
+Clang includes linux/compiler-gcc.h as well,
+so it should be OK.
+
+Interestingly, clang also defines GCC version,
+but I have no idea the correspondence between
+gcc version vs. clang version.
+
+
+
+
+> diff --git a/include/linux/compiler_types.h b/include/linux/compiler_type=
+s.h
+> index 6b79a9bba9a7..7e7664d57adb 100644
+> --- a/include/linux/compiler_types.h
+> +++ b/include/linux/compiler_types.h
+> @@ -271,4 +271,14 @@ struct ftrace_likely_data {
+>  # define __native_word(t) (sizeof(t) =3D=3D sizeof(char) || sizeof(t) =
+=3D=3D sizeof(short) || sizeof(t) =3D=3D sizeof(int) || sizeof(t) =3D=3D si=
+zeof(long))
+>  #endif
+>
+> +#ifndef __diag
+> +#define __diag(string)
+> +#endif
+> +
+> +#define __diag_push()                  __diag(push)
+> +#define __diag_ignore(version, option) __diag_ ## version (ignored optio=
+n)
+> +#define __diag_warn(version, option)   __diag_ ## version (warning optio=
+n)
+> +#define __diag_error(version, option)  __diag_ ## version (error   optio=
+n)
+> +#define __diag_pop()                   __diag(pop)
+> +
+>  #endif /* __LINUX_COMPILER_TYPES_H */
+> --
+> 2.9.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" i=
+n
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
