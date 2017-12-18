@@ -1,99 +1,133 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53068 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934949AbdLRTYk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Dec 2017 14:24:40 -0500
-Date: Mon, 18 Dec 2017 21:24:36 +0200
-From: Leon Romanovsky <leon@kernel.org>
-Subject: Re: [PATCH v2 0/5] Support for generalized use of make C={1,2} via a
- wrapper program
-Message-ID: <20171218192436.GF18894@mtr-leonro.local>
-References: <cover.630ac8faeeda67bf7a778c158174422042942d08.1513430008.git-series.knut.omang@oracle.com>
- <20171216094745.5e41ac51@xeon-e3>
- <1513476850.31439.108.camel@oracle.com>
- <20171218050043.GA1307@ziepe.ca>
- <1513576817.31581.58.camel@perches.com>
- <20171218174604.GA19056@ziepe.ca>
- <1513619815.2798.2.camel@wdc.com>
- <1513622390.31439.239.camel@oracle.com>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:44437 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935382AbdLRWK6 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Dec 2017 17:10:58 -0500
+Subject: Re: [PATCH] of: build dbts with symbols when CONFIG_OF_OVERLAY is set
+References: <20171214151240.14555-1-a.heider@gmail.com>
+ <aada8c54-2c26-bf37-8782-4edc43195daf@gmail.com>
+ <05291157-a1dc-db84-e453-c43945c1da07@gmail.com>
+From: Frank Rowand <frowand.list@gmail.com>
+Message-ID: <0468b711-ba39-98d8-5bbe-0246a98db863@gmail.com>
+Date: Mon, 18 Dec 2017 14:10:55 -0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ytoMbUMiTKPMT3hY"
-Content-Disposition: inline
-In-Reply-To: <1513622390.31439.239.camel@oracle.com>
+In-Reply-To: <05291157-a1dc-db84-e453-c43945c1da07@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Knut Omang <knut.omang@oracle.com>
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>, "joe@perches.com" <joe@perches.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "corbet@lwn.net" <corbet@lwn.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "keescook@chromium.org" <keescook@chromium.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "willy@infradead.org" <willy@infradead.org>, "nicolas.palix@imag.fr" <nicolas.palix@imag.fr>, "asmund.ostvold@oracle.com" <asmund.ostvold@oracle.com>, "john.haxby@oracle.com" <john.haxby@oracle.com>, "alexander.levin@verizon.com" <alexander.levin@verizon.com>, "mchehab@kernel.org" <mchehab@kernel.org>, "haakon.bugge@oracle.com" <haakon.bugge@oracle.com>, "michal.lkml@markovi.net" <michal.lkml@markovi.net>, "Gilles.Muller@lip6.fr" <Gilles.Muller@lip6.fr>, "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>, "mic@digikod.net" <mic@digikod.net>, "shuah@kernel.org" <shuah@kernel.org>, "paulmck@linux.vnet.ibm.com" <paulmck@linux.vnet.ibm.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>, "Julia.Lawall@lip6.fr" <Julia.Lawall@lip6.fr>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, "stephen@networkplumber.org" <stephen@networkplumber.org>, "cocci@systeme.lip6.fr" <cocci@systeme.lip6.fr>, "dledford@redhat.com" <dledford@redhat.com>, "santosh.shilimkar@oracle.com" <santosh.shilimkar@oracle.com>, "apw@canonical.com" <apw@canonical.com>
+To: Andre Heider <a.heider@gmail.com>, Rob Herring <robh+dt@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
+On 12/16/17 09:25, Andre Heider wrote:
+> Hi Frank,
+> 
+> On 15/12/17 22:06, Frank Rowand wrote:
+>> On 12/14/17 07:12, Andre Heider wrote:
+>>> The overlay feature requires the base dtb to be built with symbols, so
+>>> lets build the dtbs with symbols when overlay support was explicitly
+>>> enabled.
+>>>
+>>> With CONFIG_OF_ALL_DTBS on ARCH=arm the 989 dtb files grow about ~38% on
+>>> average.
+>>>
+>>> Totals in bytes with the 3 biggest ones:
+>>>
+>>> Before:
+>>>     90471    arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
+>>>     90521    arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
+>>>     92639    arch/arm/boot/dts/dra7-evm.dtb
+>>>     25731296    total
+>>>
+>>> After:
+>>>     133203    arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
+>>>     133237    arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
+>>>     134545    arch/arm/boot/dts/dra7-evm.dtb
+>>>     35464440    total
+>>>
+>>> Signed-off-by: Andre Heider <a.heider@gmail.com>
+>>> ---
+>>>
+>>> Hi,
+>>>
+>>> while playing around with overlays I noticed that I needed to rebuilt
+>>> my distro's device trees because they didn't come with symbols.
+>>>
+>>> Is that for a reason, maybe the not so minor increase in size?
+>>
+>> Yes, size is the issue.
+>>
+>>
+>>>
+>>> Thanks,
+>>> Andre
+>>>
+>>>   drivers/of/unittest-data/Makefile | 7 -------
+>>>   scripts/Makefile.lib              | 5 +++++
+>>>   2 files changed, 5 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/drivers/of/unittest-data/Makefile b/drivers/of/unittest-data/Makefile
+>>> index 32389acfa616..b65061013512 100644
+>>> --- a/drivers/of/unittest-data/Makefile
+>>> +++ b/drivers/of/unittest-data/Makefile
+>>> @@ -15,13 +15,6 @@ targets += overlay.dtb overlay.dtb.S
+>>>   targets += overlay_bad_phandle.dtb overlay_bad_phandle.dtb.S
+>>>   targets += overlay_bad_symbol.dtb overlay_bad_symbol.dtb.S
+>>>   targets += overlay_base.dtb overlay_base.dtb.S
+>>> -
+>>> -# enable creation of __symbols__ node
+>>> -DTC_FLAGS_overlay := -@
+>>> -DTC_FLAGS_overlay_bad_phandle := -@
+>>> -DTC_FLAGS_overlay_bad_symbol := -@
+>>> -DTC_FLAGS_overlay_base := -@
+>>> -
+>>>   endif
+>>>     .PRECIOUS: \
+>>
+>> No.  The unittests require these to be set unconditionally.
+>>
+>>
+>>> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+>>> index 1ca4dcd2d500..c7ba4aa8a07a 100644
+>>> --- a/scripts/Makefile.lib
+>>> +++ b/scripts/Makefile.lib
+>>> @@ -278,6 +278,11 @@ DTC_FLAGS += -Wnode_name_chars_strict \
+>>>       -Wproperty_name_chars_strict
+>>>   endif
+>>>   +ifeq ($(CONFIG_OF_OVERLAY),y)
+>>> +# enable creation of __symbols__ node
+>>> +DTC_FLAGS += -@
+>>> +endif
+>>> +
+>>>   DTC_FLAGS += $(DTC_FLAGS_$(basetarget))
+>>>     # Generate an assembly file to wrap the output of the device tree compiler
+>>>
+>>
+>> Not needed.  Instead set DTC_FLAGS in the make command.  For example:
+>>
+>>     DTC_FLAGS=-@ make qcom-apq8074-dragonboard.dtb
+>>
+>> There are a few architecture Makefiles that need to be fixed to not unconditionally
+>> set DTC_FLAGS.
+> 
+> Rebuilding the dts files manually with symbols isn't the problem. The
+> idea was to enable it with a switch which distros simply can flip.
+> 
+> Passing DTC_FLAGS to `make` would work too I guess, but on multi
+> platform builds that's still the same issue if there're boards which
+> can't handle that because of the size increase.
+> 
+> Would a solution which enables symbols per family work? E.g.
+> CONFIG_MACH_SUN7I chooses to use -@ because it can handle it.
+> 
+> Thanks,
+> Andre
 
---ytoMbUMiTKPMT3hY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Making it easy for distros to increase the size of .dtb files is
+not the correct answer.  We are trying to decrease the footprint
+of devicetree, not increase it.
 
-On Mon, Dec 18, 2017 at 07:39:50PM +0100, Knut Omang wrote:
-> On Mon, 2017-12-18 at 17:56 +0000, Bart Van Assche wrote:
-> > On Mon, 2017-12-18 at 10:46 -0700, Jason Gunthorpe wrote:
-> > > On Sun, Dec 17, 2017 at 10:00:17PM -0800, Joe Perches wrote:
-> > >
-> > > > > Today when we run checkers we get so many warnings it is too hard to
-> > > > > make any sense of it.
-> > > >
-> > > > Here is a list of the checkpatch messages for drivers/infiniband
-> > > > sorted by type.
-> > > >
-> > > > Many of these might be corrected by using
-> > > >
-> > > > $ ./scripts/checkpatch.pl -f --fix-inplace --types=<TYPE> \
-> > > >   $(git ls-files drivers/infiniband/)
-> > >
-> > > How many of these do you think it is worth to fix?
-> > >
-> > > We do get a steady trickle of changes in this topic every cycle.
-> > >
-> > > Is it better to just do a big number of them all at once? Do you have
-> > > an idea how disruptive this kind of work is to the whole patch flow
-> > > eg new patches no longer applying to for-next, backports no longer
-> > > applying, merge conflicts?
-> >
-> > In my opinion patches that only change the coding style and do not change any
-> > functionality are annoying. Before posting a patch that fixes a bug the change
-> > history (git log -p) has to be cheched to figure out which patch introduced
-> > the bug. Patches that only change coding style pollute the change history.
->
-> I agree with you - the problem is that style issues should not have existed.
-> But when they do it becomes a problem to remove them and a problem to
-> keep them - for instance us who try to be compliant by having style helpers
-> in our editor, we end up having to manually revert old style mistakes back in
-> to avoid making unrelated whitespace changes or similar.
+-Frank
 
-If the checkpatch.pl complains about coding style for the new patch in
-newly added code, I'm asking from the author to prepare cleanup patch so
-it will be applied before actual patch.
-
-In case, complains are for code which patch are not touching, I'm
-submitting it as is.
-
-Thanks
-
---ytoMbUMiTKPMT3hY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEkhr/r4Op1/04yqaB5GN7iDZyWKcFAlo4FfMACgkQ5GN7iDZy
-WKeZbA/+M78g8C0fiVZcdr0khjWthv6ReuG6QjJ8sc81w9zj16tXO2yJa/6A+R+7
-VeneSLf7FfsAAOKaJQf85QW7tv9uzSZ5Zdf599xGZcm7RcRAC5BAqjRoVnRYUa0W
-s+dFbJzzBlGZqT2WTOIi7qpx5WxLuoZq5dVtnMzM9/ITCM/q446ZR6Bj8fviFrFA
-iYf125p+zG6Vdi0qcT91KnsXaWPNMPOsM4iHu+1T2uhiWtuAog/HkN1Xhgzhz1Pi
-VxCYSznadcoHIGa4FcoeJOk2Z3FMgsWKhUVgPwJU3toITCSKOupNfY2p4Lacw1eI
-WUaRBVGRp3iWleHVkxr6LqxwBGM1XD6Cw4pRibFKjej2QIpCr5Mc/MEJY4U3JdSU
-M/OKJ2CQp9oeDE/1VFfDSiRhTGurIQKrG7eglnbYqjQZlw1gqd1WcrPgK8BCNHq0
-5Q5R60fTWYx8RxM3JwLI73kbKK22S0D7F7aaE3EN67OVwxD0PViqFNOyII/sBM4N
-7vy2M3mWy2epM0afZM2mSNXHfY2YrlgX5t+mOaBXG1NxEtX7S047Ra8XULOhngCC
-PzXNPDoSZ0EAIgWb7JDkdUoO4E2p290A4TGFcMJLVfwgmpuWb59aD0TZyizJWfVt
-GZSFAp4XU8M818l/GQQfIAZPu7oBNq+muZVchDgBvcuYN2NMxyc=
-=mfcT
------END PGP SIGNATURE-----
-
---ytoMbUMiTKPMT3hY--
