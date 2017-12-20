@@ -1,71 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f66.google.com ([209.85.213.66]:41040 "EHLO
-        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755755AbdLTRLt (ORCPT
+Received: from us01smtprelay-2.synopsys.com ([198.182.60.111]:43465 "EHLO
+        smtprelay.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755904AbdLTSwo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:11:49 -0500
-Received: by mail-vk0-f66.google.com with SMTP id v70so6174522vkd.8
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Dec 2017 09:11:49 -0800 (PST)
+        Wed, 20 Dec 2017 13:52:44 -0500
+From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+Subject: Re: [PATCH] bug.h: Work around GCC PR82365 in BUG()
+References: <20171219114112.939391-1-arnd@arndb.de>
+ <8e42a1de-f619-7a4e-6d58-f90f53f5f38f@synopsys.com>
+ <CAK8P3a2fXQHCN7gqNL9j7AeZqy7NXAMW1bqyFJs3G1M_M4BQ4A@mail.gmail.com>
+ <f31caa9b-89f0-4168-04bf-14a98595865e@synopsys.com>
+ <CAK8P3a25RgC0qPCrGfutSnLHr77NqK74dW2g0m7fcMnm5Ou8yg@mail.gmail.com>
+Message-ID: <27bfdc23-1774-cf07-dab4-ab253a41d2f7@synopsys.com>
+Date: Wed, 20 Dec 2017 10:52:27 -0800
 MIME-Version: 1.0
-In-Reply-To: <9b9d3322-9028-8100-225a-dd50f70de9be@intel.com>
-References: <20171016171246.15712-1-dianders@chromium.org> <20171016171246.15712-3-dianders@chromium.org>
- <9b9d3322-9028-8100-225a-dd50f70de9be@intel.com>
-From: Doug Anderson <dianders@chromium.org>
-Date: Wed, 20 Dec 2017 09:11:47 -0800
-Message-ID: <CAD=FV=UeWFRsVadUfc+74EvYGNfQ4OnRDnC_CxZ9RvnbFA=0QA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] kbuild: Cache a few more calls to the compiler
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK8P3a25RgC0qPCrGfutSnLHr77NqK74dW2g0m7fcMnm5Ou8yg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Guenter Roeck <groeck@chromium.org>, Simon Glass <sjg@chromium.org>, Brian Norris <briannorris@chromium.org>, Ingo Molnar <mingo@kernel.org>, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Mikael Starvik <starvik@axis.com>, Jesper Nilsson <jesper.nilsson@axis.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, "David S. Miller" <davem@davemloft.net>, Christopher Li <sparse@chrisli.org>, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Will Deacon <will.deacon@arm.com>, "Steven Rostedt (VMware)" <rostedt@goodmis.org>, Mark Rutland <mark.rutland@arm.com>, arcml <linux-snps-arc@lists.infradead.org>
 
-Hi,
+On 12/20/2017 01:01 AM, Arnd Bergmann wrote:
+> On Tue, Dec 19, 2017 at 11:38 PM, Vineet Gupta
+> <Vineet.Gupta1@synopsys.com> wrote:
+>> On 12/19/2017 12:13 PM, Arnd Bergmann wrote:
+>>>
+>>>
+>>>> I suppose BUG() implies "dead end" like semantics - which ARC was lacking
+>>>> before ?
+>>>
+>>> Correct. Using __builtin_trap() here avoids the 'control reaches end of
+>>> non-void
+>>> function' warnings, but then makes us run into the stack size problem that
+>>> I work around with the barrier_before_unreachable().
+>>>
+>>> It would be good if you could give this a quick test to see if you get
+>>> sensible
+>>> output from the __builtin_trap();
+>>
+>>
+>> It does, added a BUG() arbit, hits an abort()
+>>
+>> ...
+>> ISA Extn    : atomic ll64 unalign (not used)
+>>          : mpy[opt 9] div_rem norm barrel-shift swap minmax swape
+>> BPU        : partial match, cache:2048, Predict Table:16384
+>> BUG: failure at ../arch/arc/mm/tlb.c:827/arc_mmu_init()!
+>>
+>>
+>> Tested-by: Vineet Gupta <vgupta@synopsys.com>
+> 
+> I meant whether it prints the right registers and stack trace, but I
+> assume you tested that and just did not list it above.
 
-On Tue, Dec 19, 2017 at 5:18 PM, Dave Hansen <dave.hansen@intel.com> wrote:
-> I'm seeing some build breakage that I bisected to commit 4e56207130eda:
->
->>   CC      kernel/bounds.s
->> In file included from /home/davehans/linux.git/include/asm-generic/bug.h:15:0,
->>                  from /home/davehans/linux.git/arch/x86/include/asm/bug.h:81,
->>                  from /home/davehans/linux.git/include/linux/bug.h:4,
->>                  from /home/davehans/linux.git/include/linux/page-flags.h:9,
->>                  from /home/davehans/linux.git/kernel/bounds.c:9:
->> /home/davehans/linux.git/include/linux/kernel.h:5:20: fatal error: stdarg.h: No such file or directory
->>  #include <stdarg.h>
->>                     ^
->> compilation terminated.
->
-> It's odd because I'm pretty sure I've done 4.15-rc compiles on this
-> system before without issues.  I suspect something in my config
-> (attached) is triggering this.
->
-> Does this look familiar to anyone?
->
-> gcc -v
-> Using built-in specs.
-> COLLECT_GCC=/usr/bin/gcc
-> COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-redhat-linux/6.4.1/lto-wrapper
-> Target: x86_64-redhat-linux
-> Configured with: ../configure --enable-bootstrap
-> --enable-languages=c,c++,objc,obj-c++,fortran,ada,go,lto --prefix=/usr
-> --mandir=/usr/share/man --infodir=/usr/share/info
-> --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-shared
-> --enable-threads=posix --enable-checking=release --enable-multilib
-> --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions
-> --enable-gnu-unique-object --enable-linker-build-id
-> --with-linker-hash-style=gnu --enable-plugin --enable-initfini-array
-> --disable-libgcj --with-isl --enable-libmpx
-> --enable-gnu-indirect-function --with-tune=generic --with-arch_32=i686
-> --build=x86_64-redhat-linux
-> Thread model: posix
-> gcc version 6.4.1 20170727 (Red Hat 6.4.1-1) (GCC)
+Sorry, I didn't realize we are missing the stack trace now which you removed from 
+the patch - why ? Did u intend to reduce inline generated code for the stack dump 
+calls - which sounds like a great idea. But it would only work for the synchronous 
+abort() but not when builtin translates to actual trap inducing instruction.
 
-Yes, it appears to be related to upgrading your compiler without doing
-a "make clean".  Discussion can be found at
-<https://lkml.org/lkml/2017/12/16/315>, or search for the subject
+> Hmm, so with the new definition of abort(),
+> 
+> +__weak void abort(void)
+> +{
+> +   BUG();
+> +
+> +   /* if that doesn't kill us, halt */
+> +   panic("Oops failed to kill thread");
+> +}
+> 
+> won't that run into an endless recursion? Or do you then override abort()
+> for ARC?
 
-  [BUG] Build error for 4.15-rc3 kernel caused by patch "kbuild: Add a
-cache for generated variables"
+Indeed so. I didn't run into this in my testing as my for-curr has an ARC specific 
+version (predating Sudip's generic version- because of build failures in our 
+internal regression jobs etc). That version only calls panic.
 
--Doug
+abort() is only likely to be called due to __builtin_trap() for arches where gcc 
+doesn't have a target specific defn of it. And thus adding the call from BUG() 
+will cause the recursion as you found out with Sudip's generic version and thus 
+needs a fixup.
+
+
+Thx,
+-Vineet
