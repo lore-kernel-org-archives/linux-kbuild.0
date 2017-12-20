@@ -1,75 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:33801 "EHLO
-        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756078AbdLTU10 (ORCPT
+Received: from smtprelay.synopsys.com ([198.182.60.111]:45274 "EHLO
+        smtprelay.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754428AbdLTU3S (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Dec 2017 15:27:26 -0500
-From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH] fixdep: exit with error code in error branches of do_config_file()
-Date: Wed, 20 Dec 2017 21:27:02 +0100
-Message-Id: <1513801623-19069-1-git-send-email-lukas.bulwahn@gmail.com>
+        Wed, 20 Dec 2017 15:29:18 -0500
+Subject: Re: [PATCH] bug.h: Work around GCC PR82365 in BUG()
+References: <20171219114112.939391-1-arnd@arndb.de>
+ <8e42a1de-f619-7a4e-6d58-f90f53f5f38f@synopsys.com>
+ <CAK8P3a2fXQHCN7gqNL9j7AeZqy7NXAMW1bqyFJs3G1M_M4BQ4A@mail.gmail.com>
+ <f31caa9b-89f0-4168-04bf-14a98595865e@synopsys.com>
+ <CAK8P3a25RgC0qPCrGfutSnLHr77NqK74dW2g0m7fcMnm5Ou8yg@mail.gmail.com>
+ <27bfdc23-1774-cf07-dab4-ab253a41d2f7@synopsys.com>
+ <CAK8P3a0UKLJkmU_zVDyODMZR0G47i=zscNpgGZO4LryvmdUt6Q@mail.gmail.com>
+From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+Message-ID: <861992dd-a28d-0f8c-572f-4194d15238df@synopsys.com>
+Date: Wed, 20 Dec 2017 12:29:02 -0800
+MIME-Version: 1.0
+In-Reply-To: <CAK8P3a0UKLJkmU_zVDyODMZR0G47i=zscNpgGZO4LryvmdUt6Q@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: lukas.bulwahn@gmail.com, Nicholas Mc Guire <der.herr@hofr.at>, sil2review@lists.osadl.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Mikael Starvik <starvik@axis.com>, Jesper Nilsson <jesper.nilsson@axis.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, "David S. Miller" <davem@davemloft.net>, Christopher Li <sparse@chrisli.org>, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Will Deacon <will.deacon@arm.com>, "Steven Rostedt (VMware)" <rostedt@goodmis.org>, Mark Rutland <mark.rutland@arm.com>, arcml <linux-snps-arc@lists.infradead.org>
 
-do_config_file() should exit with an error code, and not return if it fails
-as then the error in do_config_file() would go unnoticed in the current
-code and allow the build to continue. The exit with error code will make
-the build fail in those very exceptional cases. If this occurs, this
-actually indicates a deeper problem in the execution of the kernel build
-process.
+On 12/20/2017 12:12 PM, Arnd Bergmann wrote:
+>> Sorry, I didn't realize we are missing the stack trace now which you removed
+>> from the patch - why ? Did u intend to reduce inline generated code for the
+>> stack dump calls - which sounds like a great idea. But it would only work
+>> for the synchronous abort() but not when builtin translates to actual trap
+>> inducing instruction.
+> 
+> I assumed that the trap instruction would trigger the register and
+> stack dump, as it does on all other architectures.
 
-Now, that the function exists, we do not explicitly free memory and close
-the file handlers in do_config_file(), as this is covered by exit().
+Only if __builtin_trap() translated to that instruction. Otherwise we need to do 
+this inside abort()
 
-This issue in the fixdep script was present already before its initial
-import into the git repository in 2005 (Linux-2.6.12-rc2). Hence, the Fixes
-tag would be imprecise and we do not include a Fixes tag to this commit.
+> The most common
+> way this is handled is to have one instruction that is known to trap,
+> and use that to trigger a BUG(), and have __builtin_trap() issue
+> that instruction as well.
 
-This issue was identified during the review of a previous patch that
-intended to address a memory leak detected by a static analysis tool.
+Good point. So we'll need ARC specific abort anyways.
 
-Link: https://lkml.org/lkml/2017/12/14/736
 
-Suggested-by: Nicholas Mc Guire <der.herr@hofr.at>
-Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
----
-compile tested on top of next-20171220 with clang and gcc
+> You might also want to implement CONFIG_DEBUG_BUGVERBOSE
+> support to attach further data to it.
 
- scripts/basic/fixdep.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+OK I'll take a look !
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index bbf62cb..4274610 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -284,19 +284,18 @@ static void do_config_file(const char *filename)
- 		exit(2);
- 	}
- 	if (st.st_size == 0) {
--		close(fd);
--		return;
-+		fprintf(stderr, "fixdep: error empty file config file: ");
-+		perror(filename);
-+		exit(2);
- 	}
- 	map = malloc(st.st_size + 1);
- 	if (!map) {
- 		perror("fixdep: malloc");
--		close(fd);
--		return;
-+		exit(2);
- 	}
- 	if (read(fd, map, st.st_size) != st.st_size) {
- 		perror("fixdep: read");
--		close(fd);
--		return;
-+		exit(2);
- 	}
- 	map[st.st_size] = '\0';
- 	close(fd);
--- 
-2.7.4
+> How about overriding abort() with the same instruction that
+> __builtin_trap() inserts on newer compilers then? That should
+> make the behavior consistent.
 
+Yeah this is a great point ! Will do
+
+thx,
+-Vineet
