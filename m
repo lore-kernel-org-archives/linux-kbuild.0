@@ -1,150 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:35996 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751384AbdLTIIL (ORCPT
+Received: from mail-ot0-f193.google.com ([74.125.82.193]:33538 "EHLO
+        mail-ot0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752128AbdLTJBb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Dec 2017 03:08:11 -0500
-Subject: Re: [PATCH] of: build dbts with symbols when CONFIG_OF_OVERLAY is set
-References: <20171214151240.14555-1-a.heider@gmail.com>
- <aada8c54-2c26-bf37-8782-4edc43195daf@gmail.com>
- <05291157-a1dc-db84-e453-c43945c1da07@gmail.com>
- <0468b711-ba39-98d8-5bbe-0246a98db863@gmail.com>
-From: Andre Heider <a.heider@gmail.com>
-Message-ID: <bfbfc41c-46a3-5c19-bae8-1f87f64d564b@gmail.com>
-Date: Wed, 20 Dec 2017 09:08:07 +0100
+        Wed, 20 Dec 2017 04:01:31 -0500
 MIME-Version: 1.0
-In-Reply-To: <0468b711-ba39-98d8-5bbe-0246a98db863@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <f31caa9b-89f0-4168-04bf-14a98595865e@synopsys.com>
+References: <20171219114112.939391-1-arnd@arndb.de> <8e42a1de-f619-7a4e-6d58-f90f53f5f38f@synopsys.com>
+ <CAK8P3a2fXQHCN7gqNL9j7AeZqy7NXAMW1bqyFJs3G1M_M4BQ4A@mail.gmail.com> <f31caa9b-89f0-4168-04bf-14a98595865e@synopsys.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Wed, 20 Dec 2017 10:01:27 +0100
+Message-ID: <CAK8P3a25RgC0qPCrGfutSnLHr77NqK74dW2g0m7fcMnm5Ou8yg@mail.gmail.com>
+Subject: Re: [PATCH] bug.h: Work around GCC PR82365 in BUG()
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frank Rowand <frowand.list@gmail.com>, Rob Herring <robh+dt@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
+To: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Mikael Starvik <starvik@axis.com>, Jesper Nilsson <jesper.nilsson@axis.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, "David S. Miller" <davem@davemloft.net>, Christopher Li <sparse@chrisli.org>, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Will Deacon <will.deacon@arm.com>, "Steven Rostedt (VMware)" <rostedt@goodmis.org>, Mark Rutland <mark.rutland@arm.com>, "linux-snps-arc@lists.infradead.org" <linux-snps-arc@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-cris-kernel@axis.com" <linux-cris-kernel@axis.com>, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>, "linux-m68k@lists.linux-m68k.org" <linux-m68k@lists.linux-m68k.org>, "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>, "linux-sparse@vger.kernel.org" <linux-sparse@vger.kernel.org>
 
-On 18/12/17 23:10, Frank Rowand wrote:
-> On 12/16/17 09:25, Andre Heider wrote:
->> Hi Frank,
+On Tue, Dec 19, 2017 at 11:38 PM, Vineet Gupta
+<Vineet.Gupta1@synopsys.com> wrote:
+> On 12/19/2017 12:13 PM, Arnd Bergmann wrote:
 >>
->> On 15/12/17 22:06, Frank Rowand wrote:
->>> On 12/14/17 07:12, Andre Heider wrote:
->>>> The overlay feature requires the base dtb to be built with symbols, so
->>>> lets build the dtbs with symbols when overlay support was explicitly
->>>> enabled.
->>>>
->>>> With CONFIG_OF_ALL_DTBS on ARCH=arm the 989 dtb files grow about ~38% on
->>>> average.
->>>>
->>>> Totals in bytes with the 3 biggest ones:
->>>>
->>>> Before:
->>>>      90471    arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
->>>>      90521    arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
->>>>      92639    arch/arm/boot/dts/dra7-evm.dtb
->>>>      25731296    total
->>>>
->>>> After:
->>>>      133203    arch/arm/boot/dts/am57xx-beagle-x15-revc.dtb
->>>>      133237    arch/arm/boot/dts/am57xx-beagle-x15-revb1.dtb
->>>>      134545    arch/arm/boot/dts/dra7-evm.dtb
->>>>      35464440    total
->>>>
->>>> Signed-off-by: Andre Heider <a.heider@gmail.com>
->>>> ---
->>>>
->>>> Hi,
->>>>
->>>> while playing around with overlays I noticed that I needed to rebuilt
->>>> my distro's device trees because they didn't come with symbols.
->>>>
->>>> Is that for a reason, maybe the not so minor increase in size?
->>>
->>> Yes, size is the issue.
->>>
->>>
->>>>
->>>> Thanks,
->>>> Andre
->>>>
->>>>    drivers/of/unittest-data/Makefile | 7 -------
->>>>    scripts/Makefile.lib              | 5 +++++
->>>>    2 files changed, 5 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/drivers/of/unittest-data/Makefile b/drivers/of/unittest-data/Makefile
->>>> index 32389acfa616..b65061013512 100644
->>>> --- a/drivers/of/unittest-data/Makefile
->>>> +++ b/drivers/of/unittest-data/Makefile
->>>> @@ -15,13 +15,6 @@ targets += overlay.dtb overlay.dtb.S
->>>>    targets += overlay_bad_phandle.dtb overlay_bad_phandle.dtb.S
->>>>    targets += overlay_bad_symbol.dtb overlay_bad_symbol.dtb.S
->>>>    targets += overlay_base.dtb overlay_base.dtb.S
->>>> -
->>>> -# enable creation of __symbols__ node
->>>> -DTC_FLAGS_overlay := -@
->>>> -DTC_FLAGS_overlay_bad_phandle := -@
->>>> -DTC_FLAGS_overlay_bad_symbol := -@
->>>> -DTC_FLAGS_overlay_base := -@
->>>> -
->>>>    endif
->>>>      .PRECIOUS: \
->>>
->>> No.  The unittests require these to be set unconditionally.
->>>
->>>
->>>> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
->>>> index 1ca4dcd2d500..c7ba4aa8a07a 100644
->>>> --- a/scripts/Makefile.lib
->>>> +++ b/scripts/Makefile.lib
->>>> @@ -278,6 +278,11 @@ DTC_FLAGS += -Wnode_name_chars_strict \
->>>>        -Wproperty_name_chars_strict
->>>>    endif
->>>>    +ifeq ($(CONFIG_OF_OVERLAY),y)
->>>> +# enable creation of __symbols__ node
->>>> +DTC_FLAGS += -@
->>>> +endif
->>>> +
->>>>    DTC_FLAGS += $(DTC_FLAGS_$(basetarget))
->>>>      # Generate an assembly file to wrap the output of the device tree compiler
->>>>
->>>
->>> Not needed.  Instead set DTC_FLAGS in the make command.  For example:
->>>
->>>      DTC_FLAGS=-@ make qcom-apq8074-dragonboard.dtb
->>>
->>> There are a few architecture Makefiles that need to be fixed to not unconditionally
->>> set DTC_FLAGS.
 >>
->> Rebuilding the dts files manually with symbols isn't the problem. The
->> idea was to enable it with a switch which distros simply can flip.
+>>> I suppose BUG() implies "dead end" like semantics - which ARC was lacking
+>>> before ?
 >>
->> Passing DTC_FLAGS to `make` would work too I guess, but on multi
->> platform builds that's still the same issue if there're boards which
->> can't handle that because of the size increase.
+>> Correct. Using __builtin_trap() here avoids the 'control reaches end of
+>> non-void
+>> function' warnings, but then makes us run into the stack size problem that
+>> I work around with the barrier_before_unreachable().
 >>
->> Would a solution which enables symbols per family work? E.g.
->> CONFIG_MACH_SUN7I chooses to use -@ because it can handle it.
->>
->> Thanks,
->> Andre
-> 
-> Making it easy for distros to increase the size of .dtb files is
-> not the correct answer.  We are trying to decrease the footprint
-> of devicetree, not increase it.
+>> It would be good if you could give this a quick test to see if you get
+>> sensible
+>> output from the __builtin_trap();
+>
+>
+> It does, added a BUG() arbit, hits an abort()
+>
+> ...
+> ISA Extn    : atomic ll64 unalign (not used)
+>         : mpy[opt 9] div_rem norm barrel-shift swap minmax swape
+> BPU        : partial match, cache:2048, Predict Table:16384
+> BUG: failure at ../arch/arc/mm/tlb.c:827/arc_mmu_init()!
+>
+>
+> Tested-by: Vineet Gupta <vgupta@synopsys.com>
 
-I'm not sure I follow. If it's not acceptable to increase the size, 
-why's there overlay support in the first place?
+I meant whether it prints the right registers and stack trace, but I
+assume you tested that and just did not list it above.
 
-There're distros/downstreams that support overlays today, like armbian, 
-beaglebone and rpi. All carrying their own patches to enable symbols [1] 
-[2] [3] and I'm sure others will follow. Why can't there be some sort of 
-switch for those to build their dtbs with symbols?
+> FWIW newer ARC gcc actually implements the builtin so we get a trap 5
+> instruction now, vs., abort() calls before.
+>
+> BTW I missed reading the hunk of your changelog where this addresses the
+> long standing mystery with ARC builds and numerous -Wreturn-type warnings. I
+> always wondered why they were not fixed upstream already, being too lazy to
+> investigate myself, and turns out this was due to this BUG() thingy. phew !
 
-Regards,
-Andre
+Hmm, so with the new definition of abort(),
 
-[1] 
-https://github.com/armbian/build/blob/master/patch/kernel/sunxi-next/add-overlay-compilation-support.patch#L98
-[2] 
-https://github.com/beagleboard/linux/commit/ed6b9450c2a2ec21149f14ff24770b69888abda6
-[3] 
-https://github.com/raspberrypi/linux/blob/rpi-4.15.y/arch/arm/boot/dts/Makefile#L1124
++__weak void abort(void)
++{
++   BUG();
++
++   /* if that doesn't kill us, halt */
++   panic("Oops failed to kill thread");
++}
+
+won't that run into an endless recursion? Or do you then override abort()
+for ARC?
+
+         Arnd
