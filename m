@@ -1,80 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:40964 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752433AbdLUTKs (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:36652 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933431AbdLVI7Y (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 Dec 2017 14:10:48 -0500
-From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH v2] fixdep: exit with error code in error branches of do_config_file()
-Date: Thu, 21 Dec 2017 20:10:29 +0100
-Message-Id: <1513883429-9527-1-git-send-email-lukas.bulwahn@gmail.com>
-In-Reply-To: <1513801623-19069-1-git-send-email-lukas.bulwahn@gmail.com>
-References: <1513801623-19069-1-git-send-email-lukas.bulwahn@gmail.com>
+        Fri, 22 Dec 2017 03:59:24 -0500
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.14 029/159] x86/build: Beautify build log of syscall headers
+Date: Fri, 22 Dec 2017 09:45:14 +0100
+Message-Id: <20171222084625.346548415@linuxfoundation.org>
+In-Reply-To: <20171222084623.668990192@linuxfoundation.org>
+References: <20171222084623.668990192@linuxfoundation.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: lukas.bulwahn@gmail.com, Nicholas Mc Guire <der.herr@hofr.at>, sil2review@lists.osadl.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Thomas Gleixner <tglx@linutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@kernel.org>
 
-do_config_file() should exit with an error code, and not return if it fails
-as then the error in do_config_file() would go unnoticed in the current
-code and allow the build to continue. The exit with error code will make
-the build fail in those very exceptional cases. If this occurs, this
-actually indicates a deeper problem in the execution of the kernel build
-process.
+4.14-stable review patch.  If anyone has any objections, please let me know.
 
-Now, that the function exists, we do not explicitly free memory and close
-the file handlers in do_config_file(), as this is covered by exit().
+------------------
 
-This issue in the fixdep script was introduced with its initial
-implementation back in 2002 by the original author Kai Germaschewski with
-this commit 04bd72170653 ("kbuild: Make dependencies at compile time").
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-This issue was identified during the review of a previous patch that
-intended to address a memory leak detected by a static analysis tool.
+commit af8e947079a7dab0480b5d6db6b093fd04b86fc9 upstream.
 
-Link: https://lkml.org/lkml/2017/12/14/736
+This makes the build log look nicer.
 
-Fixes: 04bd72170653 ("kbuild: Make dependencies at compile time")
-Suggested-by: Nicholas Mc Guire <der.herr@hofr.at>
-Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Before:
+  SYSTBL  arch/x86/entry/syscalls/../../include/generated/asm/syscalls_32.h
+  SYSHDR  arch/x86/entry/syscalls/../../include/generated/asm/unistd_32_ia32.h
+  SYSHDR  arch/x86/entry/syscalls/../../include/generated/asm/unistd_64_x32.h
+  SYSTBL  arch/x86/entry/syscalls/../../include/generated/asm/syscalls_64.h
+  SYSHDR  arch/x86/entry/syscalls/../../include/generated/uapi/asm/unistd_32.h
+  SYSHDR  arch/x86/entry/syscalls/../../include/generated/uapi/asm/unistd_64.h
+  SYSHDR  arch/x86/entry/syscalls/../../include/generated/uapi/asm/unistd_x32.h
+
+After:
+  SYSTBL  arch/x86/include/generated/asm/syscalls_32.h
+  SYSHDR  arch/x86/include/generated/asm/unistd_32_ia32.h
+  SYSHDR  arch/x86/include/generated/asm/unistd_64_x32.h
+  SYSTBL  arch/x86/include/generated/asm/syscalls_64.h
+  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_32.h
+  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_64.h
+  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_x32.h
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Acked-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: linux-kbuild@vger.kernel.org
+Link: http://lkml.kernel.org/r/1509077470-2735-1-git-send-email-yamada.masahiro@socionext.com
+Signed-off-by: Ingo Molnar <mingo@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
 ---
-compile tested on top of next-20171220 with clang and gcc
-Change in v2:
-  - no code change; only include proper Fixes tag and explain it
+ arch/x86/entry/syscalls/Makefile |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- scripts/basic/fixdep.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+--- a/arch/x86/entry/syscalls/Makefile
++++ b/arch/x86/entry/syscalls/Makefile
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+-out := $(obj)/../../include/generated/asm
+-uapi := $(obj)/../../include/generated/uapi/asm
++out := arch/$(SRCARCH)/include/generated/asm
++uapi := arch/$(SRCARCH)/include/generated/uapi/asm
+ 
+ # Create output directory if not already present
+ _dummy := $(shell [ -d '$(out)' ] || mkdir -p '$(out)') \
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index bbf62cb..4274610 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -284,19 +284,18 @@ static void do_config_file(const char *filename)
- 		exit(2);
- 	}
- 	if (st.st_size == 0) {
--		close(fd);
--		return;
-+		fprintf(stderr, "fixdep: error empty file config file: ");
-+		perror(filename);
-+		exit(2);
- 	}
- 	map = malloc(st.st_size + 1);
- 	if (!map) {
- 		perror("fixdep: malloc");
--		close(fd);
--		return;
-+		exit(2);
- 	}
- 	if (read(fd, map, st.st_size) != st.st_size) {
- 		perror("fixdep: read");
--		close(fd);
--		return;
-+		exit(2);
- 	}
- 	map[st.st_size] = '\0';
- 	close(fd);
--- 
-2.7.4
 
