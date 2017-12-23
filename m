@@ -1,58 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:42177 "EHLO
-        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750842AbdLWKOw (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 23 Dec 2017 05:14:52 -0500
-MIME-Version: 1.0
-In-Reply-To: <20171222144113.6bbc49b753a1c7f2329d59e0@linux-foundation.org>
-References: <20171221134744.2295529-1-arnd@arndb.de> <20171222144113.6bbc49b753a1c7f2329d59e0@linux-foundation.org>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Sat, 23 Dec 2017 11:14:51 +0100
-Message-ID: <CAK8P3a0fLdLH6uKHUG946pPCFGBcL8LZEvEuGLqW3wghkVWO7w@mail.gmail.com>
+Received: from mail-eopbgr60111.outbound.protection.outlook.com ([40.107.6.111]:10909
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750810AbdLWMqA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 23 Dec 2017 07:46:00 -0500
 Subject: Re: [PATCH] [v4] kasan: rework Kconfig settings
-Content-Type: text/plain; charset="UTF-8"
+References: <20171221134744.2295529-1-arnd@arndb.de>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Message-ID: <49320810-9beb-28ac-5786-8548a4ac132a@virtuozzo.com>
+Date: Sat, 23 Dec 2017 15:42:36 +0300
+MIME-Version: 1.0
+In-Reply-To: <20171221134744.2295529-1-arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: "# 3.4.x" <stable@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, kasan-dev <kasan-dev@googlegroups.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Ingo Molnar <mingo@kernel.org>, Byungchul Park <byungchul.park@lge.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>
+Cc: stable@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Ingo Molnar <mingo@kernel.org>, Byungchul Park <byungchul.park@lge.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Dec 22, 2017 at 11:41 PM, Andrew Morton
-<akpm@linux-foundation.org> wrote:
-> On Thu, 21 Dec 2017 14:46:39 +0100 Arnd Bergmann <arnd@arndb.de> wrote:
 
-> Cc:stable is tricky.  Apart from the ordering/scheduling issue,
-> 16c3ada89cff doesn't have a cc:stable tag so merging this patch into
-> stable will cause the abovementioned warning.
->
-> Do we really need to backport this?
 
-I think we do: without this patch, enabling KASAN will lead to
-unavoidable kernel
-stack overflow in certain device drivers when built with gcc-7 or higher on
-linux-4.10+ or any version that contains a backport of commit c5caf21ab0cf8.
-Most people are probably still on older compilers, but it will get
-worse over time
-as they upgrade their distros.
+On 12/21/2017 04:46 PM, Arnd Bergmann wrote:
+> We get a lot of very large stack frames using gcc-7.0.1 with the default
+> -fsanitize-address-use-after-scope --param asan-stack=1 options, which
+> can easily cause an overflow of the kernel stack, e.g.
+> 
+> drivers/gpu/drm/i915/gvt/handlers.c:2434:1: warning: the frame size of 46176 bytes is larger than 3072 bytes
+> drivers/net/wireless/ralink/rt2x00/rt2800lib.c:5650:1: warning: the frame size of 23632 bytes is larger than 3072 bytes
+> lib/atomic64_test.c:250:1: warning: the frame size of 11200 bytes is larger than 3072 bytes
+> drivers/gpu/drm/i915/gvt/handlers.c:2621:1: warning: the frame size of 9208 bytes is larger than 3072 bytes
+> drivers/media/dvb-frontends/stv090x.c:3431:1: warning: the frame size of 6816 bytes is larger than 3072 bytes
+> fs/fscache/stats.c:287:1: warning: the frame size of 6536 bytes is larger than 3072 bytes
+> 
+> To reduce this risk, -fsanitize-address-use-after-scope is now split
+> out into a separate CONFIG_KASAN_EXTRA Kconfig option, leading to stack
+> frames that are smaller than 2 kilobytes most of the time on x86_64. An
+> earlier version of this patch also prevented combining KASAN_EXTRA with
+> KASAN_INLINE, but that is no longer necessary with gcc-7.0.1.
+> 
+> All patches to get the frame size below 2048 bytes with CONFIG_KASAN=y and
+> CONFIG_KASAN_EXTRA=n have been merged by maintainers now, so we can bring
+> back that default now. KASAN_EXTRA=y still causes lots of warnings but now
+> defaults to !COMPILE_TEST to disable it in allmodconfig, and it remains
+> disabled in all other defconfigs since it is a new option.  I arbitrarily
+> raise the warning limit for KASAN_EXTRA to 3072 to reduce the noise,
+> but an allmodconfig kernel still has around 50 warnings on gcc-7.
+> 
+> I experimented a bit more with smaller stack frames and have another
+> follow-up series that reduces the warning limit for 64-bit architectures
+> to 1280 bytes (without CONFIG_KASAN).
+> 
+> With earlier versions of this patch series, I also had patches to
+> address the warnings we get with KASAN and/or KASAN_EXTRA, using a
+> "noinline_if_stackbloat" annotation. That annotation now got replaced with
+> a gcc-8 bugfix (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81715)
+> and a workaround for older compilers, which means that KASAN_EXTRA is
+> now just as bad as before and will lead to an instant stack overflow in
+> a few extreme cases.
+> 
+> This reverts parts of commit commit 3f181b4 ("lib/Kconfig.debug: disable
+> -Wframe-larger-than warnings with KASAN=y").
+> Two patches in linux-next should be merged first to avoid introducing
+> warnings in an allmodconfig build:
+> 3cd890dbe2a4 ("media: dvb-frontends: fix i2c access helpers for KASAN")
+> 16c3ada89cff ("media: r820t: fix r820t_write_reg for KASAN")
+> 
+> Cc: stable@vger.kernel.org
+> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
+> Cc: Alexander Potapenko <glider@google.com>
+> Cc: Dmitry Vyukov <dvyukov@google.com>
+> Cc: kasan-dev@googlegroups.com
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
 
-The warnings we get on kernels older than this should all be for code that uses
-dangerously large stack frames, though most of them do not cause an actual
-stack overflow by themselves.The asan-stack option was added in linux-4.0,
-and commit 3f181b4d8652 ("lib/Kconfig.debug: disable -Wframe-larger-than
-warnings with KASAN=y") effectively turned off the warning for allmodconfig
-kernels, so I would like to see this fix backported to any kernels
-later than 4.0.
-
-I have done dozens of fixes for individual functions with stack frames larger
-than 2048 bytes with asan-stack, and I plan to make sure that all those fixes
-make it into the stable kernels as well (most are already there).
-
-Part of the complication here is that asan-stack (from 4.0) was originally
-assumed to always require much larger stacks, but that turned out to be
-a combination of multiple gcc bugs that we have now worked around and
-fixed, but sanitize-address-use-after-scope (from v4.10) has a much higher
-inherent stack usage and also suffers from at least three other problems
-that we have analyzed but not yet fixed upstream, each of them makes
-the stack usage more severe than it should be.
-
-        Arnd
+Acked-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
