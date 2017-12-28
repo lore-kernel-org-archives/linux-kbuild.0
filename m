@@ -1,95 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:35064 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750931AbdL0Mj5 (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:34096 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750780AbdL1T32 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Dec 2017 07:39:57 -0500
-From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Date: Wed, 27 Dec 2017 13:39:54 +0100 (CET)
-Subject: Re: [SIL2review] [PATCH] fixdep: free memory on second error path
- of do_config_file
-In-Reply-To: <CAK7LNAQY74x_c+1VBrjwR_1UvC42Fkr4CuFm7kJrr8c3+qZ5Lw@mail.gmail.com>
-Message-ID: <alpine.DEB.2.20.1712210808110.20260@hsp>
-References: <1513281250-9186-1-git-send-email-lukas.bulwahn@gmail.com> <1513281250-9186-2-git-send-email-lukas.bulwahn@gmail.com> <20171215082316.GB26962@osadl.at> <CAK7LNAQY74x_c+1VBrjwR_1UvC42Fkr4CuFm7kJrr8c3+qZ5Lw@mail.gmail.com>
+        Thu, 28 Dec 2017 14:29:28 -0500
+Subject: Re: [Regression 4.15] Can't kill CONFIG_UNWINDER_ORC with fire or
+ plague.
+References: <20171226043003.GB10431@windriver.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <d053e6df-ed00-2a02-eb27-4287b7549276@infradead.org>
+Date: Thu, 28 Dec 2017 11:29:26 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+In-Reply-To: <20171226043003.GB10431@windriver.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nicholas Mc Guire <der.herr@hofr.at>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, sil2review@lists.osadl.org, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Alexey Dobriyan <adobriyan@gmail.com>
+To: Paul Gortmaker <paul.gortmaker@windriver.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+
+On 12/25/2017 08:30 PM, Paul Gortmaker wrote:
+> There is a regression new to 4.15 that happens in a rather common
+> workflow which results in the frustrating situation where the user has
+> clearly disabled UNWINDER_ORC in their ".config" file, and yet they
+> still get the immediate false error saying they need libelf-dev since
+> "CONFIG_UNWINDER_ORC=y" is still set, and hence they can not build.
+> 
+> The regression requires UNWINDER_ORC=y (now the default in commit
+> fc72ae40e303) followed by the user subsequently disabling it, which is
+> common if the user doesn't have libelf-dev and doesn't care about ORC.
+> 
+> This happens because the recently added test in the top level Makefile
+> assumes that ,config data will be mapped into include/config/auto.conf
+> either by the end user running "make oldconfig" or the Makefile itself
+> detecting that "silentoldconfig" should be run.  As the simple
+> reproducer below shows, this clearly does not happen as expected.
+> 
+> Note that the test for CONFIG_STACK_VALIDATION and libelf-dev in the
+> same place in the Makefile is broken in the same way, but since it is a
+> warning and not an error, nobody cared about the bogus false positives.
+
+Yeah, that's odd.
+
+> Since there is no way I'm going to debug Makefile stuff on Christmas
+> Day, I figured that I should at least report it intstead.  The work
+> around is to save your .config and run a "make distclean" or manually
+> clobber the stale include/config/auto.conf or similar.  But a frustrated
+> user wouldn't know that w/o the root cause...
+> 
+
+I have tried to reproduce this multiple times but cannot do so.
+It remains with:
+
+> grep UNWINDER .config
+# CONFIG_UNWINDER_ORC is not set
+CONFIG_UNWINDER_FRAME_POINTER=y
+
+> 
+>     --------------------- reproducer ------------------------
+> 
+> paul@gw:~/git/linux-head$ git describe 
+> v4.15-rc5
+> paul@gw:~/git/linux-head$ make distclean 
+> paul@gw:~/git/linux-head$ make defconfig
+>   HOSTCC  scripts/basic/fixdep
+>   HOSTCC  scripts/kconfig/conf.o
+>   SHIPPED scripts/kconfig/zconf.tab.c
+>   SHIPPED scripts/kconfig/zconf.lex.c
+>   HOSTCC  scripts/kconfig/zconf.tab.o
+>   HOSTLD  scripts/kconfig/conf
+> *** Default configuration is based on 'x86_64_defconfig'
+> #
+> # configuration written to .config
+> #
+> paul@gw:~/git/linux-head$ make
+> scripts/kconfig/conf  --silentoldconfig Kconfig
+> Makefile:926: *** "Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, please install libelf-dev, libelf-devel or elfutils-libelf-devel".  Stop.
+> paul@gw:~/git/linux-head$ vi .config  # disable ORC in favour of FRAME_POINTER
+> paul@gw:~/git/linux-head$ make oldconfig
+> scripts/kconfig/conf  --oldconfig Kconfig
+> #
+> # configuration written to .config
+> #
+> paul@gw:~/git/linux-head$ grep UNWINDER .config
+> # CONFIG_UNWINDER_ORC is not set
+> CONFIG_UNWINDER_FRAME_POINTER=y
+> paul@gw:~/git/linux-head$ make
+> Makefile:926: *** "Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, please install libelf-dev, libelf-devel or elfutils-libelf-devel".  Stop.
+> paul@gw:~/git/linux-head$ ls -l .config include/config/auto.conf
+> -rw-rw-r-- 1 paul paul 115953 Dec 25 22:48 .config
+> -rw-rw-r-- 1 paul paul  33069 Dec 25 22:46 include/config/auto.conf
+> paul@gw:~/git/linux-head$ grep UNWINDER include/config/auto.conf
+> CONFIG_UNWINDER_ORC=y
+> paul@gw:~/git/linux-head$ 
+> 
+>     --------------------- reproducer ------------------------
 
 
-On Mon, 18 Dec 2017, Masahiro Yamada wrote:
-
-> 2017-12-15 17:23 GMT+09:00 Nicholas Mc Guire <der.herr@hofr.at>:
->> On Thu, Dec 14, 2017 at 08:54:10PM +0100, Lukas Bulwahn wrote:
->>> Commit dee81e988674 ("fixdep: faster CONFIG_ search") introduces the memory
->>> leak when `map = mmap(...)` was replaced with `map = malloc(...)` and
->>> `read(fd, map, ...)`. It introduces a new second error path, which does not
->>> free the allocated memory for `map`. We now correct that behavior and free
->>> `map` before the do_config_file() function returns.
->>>
->>> Facebook's static analysis tool Infer (http://fbinfer.com) found this
->>> memory leak:
->>>
->>>   scripts/basic/fixdep.c:297: error: MEMORY_LEAK
->>>     memory dynamically allocated by call to `malloc()` at line 290, \
->>>     column 8 is not reachable after line 297, column 3.
->>>
->>> Fixes: dee81e988674 ("fixdep: faster CONFIG_ search")
->>>
->>> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
->> Reviewed-by: Nicholas Mc Guire <der.herr@hofr.at>
->>
->>> ---
->>>  scripts/basic/fixdep.c | 1 +
->>>  1 file changed, 1 insertion(+)
->>>
->>> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
->>> index bbf62cb..131c450 100644
->>> --- a/scripts/basic/fixdep.c
->>> +++ b/scripts/basic/fixdep.c
->>> @@ -296,6 +296,7 @@ static void do_config_file(const char *filename)
->>>       if (read(fd, map, st.st_size) != st.st_size) {
->>>               perror("fixdep: read");
->>>               close(fd);
->>> +             free(map);
->>
->>  This looks reasonable but actually it is not clear why do_config_file()
->> should return at all if read fails as the read error would go unnoticed
->> in the current code and allow the build to continue. so this probably
->> should be an exit(2) here and not a return which would then take care
->> of the free() anyway.
->
-> I agree.
->
-> This should be exit(2).
->
-> You can also remove close() as well since
-> the operation system will close it anyway.
->
->
->
->>  Atleast I do not see the rational to allow continuation if the read
->> failed as the file should not be empty nor a mismatch with st.st_size
->> expected. If it were due to a EINTR then it still should terminate as
->> EINTR was not handled and we thus could miss a valid dependency.
->>
->>  Note: this probably also should be applied to the if (!map) condition
->> before as well, as at that point it is known that map > 0 and a malloc()
->> failure would allow skipping parse_config_file() for a valid config.
->
-> I agree.  We should change this too.
->
-
-I created a new patch with your requested changes, but I did not consider 
-it a second version of this patch by the time of writing. You can find the 
-new patch at:
-
-v1: https://patchwork.kernel.org/patch/10126547/
-v2: https://patchwork.kernel.org/patch/10128297/
-
-This patch here is now superseded by the new patch. So, this patch here 
-can be abandoned.
-
-Lukas
+-- 
+~Randy
