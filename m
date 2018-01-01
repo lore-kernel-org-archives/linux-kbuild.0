@@ -1,35 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:38327 "EHLO
-        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751059AbeAAJzf (ORCPT
+Received: from mail.wsb.wroclaw.pl ([95.143.242.162]:43283 "EHLO
+        wsbmail01.wsb.wroclaw.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751130AbeAARKX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 1 Jan 2018 04:55:35 -0500
-Date: Mon, 1 Jan 2018 10:55:30 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH v2] fixdep: exit with error code in error branches of
- do_config_file()
-Message-ID: <20180101095530.GA6547@ravnborg.org>
-References: <1513801623-19069-1-git-send-email-lukas.bulwahn@gmail.com>
- <1513883429-9527-1-git-send-email-lukas.bulwahn@gmail.com>
- <CAK7LNAROjcbES8-debAnzVz1EV1Ar+RLW8phF5+bQxpHQUODKQ@mail.gmail.com>
- <20171231154548.GA27372@osadl.at>
- <CAK7LNAS_U4_ugOSnohJL3rpepRpQ17C3OT4K5ohkAYMKc9wGgg@mail.gmail.com>
- <20180101093121.GA7228@osadl.at>
+        Mon, 1 Jan 2018 12:10:23 -0500
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180101093121.GA7228@osadl.at>
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: =?utf-8?q?Spende_von_=E2=82=AC_3=2E400=2E000=2C00_EUR?=
+From: foundation@gmail.com
+Date: Mon, 01 Jan 2018 19:09:09 +0200
+Reply-To: roycockrumpovertyfoundation@gmail.com
+Message-Id: <20180101173011.ED5AB2708172@wsbmail01.wsb.wroclaw.pl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Mc Guire <der.herr@hofr.at>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, sil2review@lists.osadl.org, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Recipients <foundation@gmail.com>
 
-> >
-> And would that file be acceptable if it were actually empty
-
-There have been cases with empty files in the source tree.
-And it is not the job of fixdep to do anything special about them.
-fixdep shall do what it is requested to do, and not more than
-that.
-
-	Sam
+Hallo, ich Roy Cockrum, 58, aus Knoxville, Tennessee Vereinigte Staaten von Amerika, du hast eine Wohltätigkeitsspende von € 3.400.000,00 EUR, ich gewann die America Lotterie in Amerika im Wert von $ 259,9 Millionen, und ich gebe einen Teil davon Zu fünf glücklichen Leuten und Wohltätigkeitshäusern in Gelübde, um die Armut vor dieser Welt zu beseitigen, ich kämpfe gegen die Armut. Kontaktieren Sie mich für weitere Details: roycockrumpovertyfoundation@gmail.com
