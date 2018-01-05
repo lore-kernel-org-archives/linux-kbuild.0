@@ -1,97 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp2120.oracle.com ([156.151.31.85]:51352 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752166AbeAETmt (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Jan 2018 14:42:49 -0500
-Message-ID: <1515181301.31439.724.camel@oracle.com>
-Subject: Re: [PATCH v3 1/1] runchecks: Generalize make C={1,2} to support
- multiple checkers
-From: Knut Omang <knut.omang@oracle.com>
-Date: Fri, 05 Jan 2018 20:41:41 +0100
-In-Reply-To: <20180105160816.2e940aac@vento.lan>
-References: <cover.5b56d020b8e826a7da33b1823c059acd0c123f8b.1515072782.git-series.knut.omang@oracle.com>
-         <5f292b7effba0efcf4855bff83b7b9313ac45895.1515072782.git-series.knut.omang@oracle.com>
-         <874lo1aait.fsf@intel.com> <1515096931.31439.647.camel@oracle.com>
-         <20180105160816.2e940aac@vento.lan>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Received: from mga01.intel.com ([192.55.52.88]:47227 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753021AbeAEWVP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 5 Jan 2018 17:21:15 -0500
+From: Marc Herbert <Marc.Herbert@intel.com>
+Subject: Re: [PATCH] Remove silentoldconfig from "make help"; fix
+ kconfig/conf's help
+References: <20171219012656.23728-1-marc.herbert@intel.com>
+ <CAK7LNAR8HedCgZAk1fY9rA8HERh5weQCjWXkP2SXuhzRRWVhVQ@mail.gmail.com>
+Message-ID: <070e7d03-b1a7-430f-709b-bb5fe9e2a0a3@intel.com>
+Date: Fri, 5 Jan 2018 14:21:14 -0800
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNAR8HedCgZAk1fY9rA8HERh5weQCjWXkP2SXuhzRRWVhVQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab@kernel.org>
-Cc: Jani Nikula <jani.nikula@linux.intel.com>, linux-kernel@vger.kernel.org, Nicolas Palix <nicolas.palix@imag.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, John Haxby <john.haxby@oracle.com>, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Gilles Muller <Gilles.Muller@lip6.fr>, Michal Marek <michal.lkml@markovi.net>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Julia Lawall <Julia.Lawall@lip6.fr>, =?ISO-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>, =?ISO-8859-1?Q?=C5smund_=D8stvold?= <asmund.ostvold@oracle.com>, Matthew Wilcox <willy@infradead.org>, "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>, cocci@systeme.lip6.fr, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Thiago Macieira <thiago.macieira@intel.com>, Josh Triplett <josh@joshtriplett.org>, Guenter Roeck <groeck@google.com>, Wayne Boyer <wayne.boyer@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Fri, 2018-01-05 at 16:08 -0200, Mauro Carvalho Chehab wrote:
-> Em Thu, 04 Jan 2018 21:15:31 +0100
-> Knut Omang <knut.omang@oracle.com> escreveu:
+On 04/01/2018 09:21, Masahiro Yamada wrote:
+> (+CC Michal's new address)
 > 
-> > > I'm surprised the commit message and the provided documentation say
-> > > nothing about using CHECK=foo on the command line. That already supports
-> > > arbitrary checkers.   
-> > 
-> > The problem, highlighted by Jim Davis in
-> > 
-> > https://lkml.org/lkml/2017/11/20/638
-> > 
-> > is that the current solution isn't flexible enough - that discussion 
-> > is what lead me to this reimplementation of what I originally intended 
-> > to be a checkpatch only solution.
-> > 
-> > > How does this relate to that? Is this supposed to be
-> > > a complete replacement? Or what?  
-> > 
-> > It has evolved into a complete replacement of the intention of CHECK.
-> > 
-> > > 'make help' also references $CHECK, and this patch doesn't update the
-> > > help text.  
-> > 
-> > I realize now that this needs to be handled in some way due to the way I split the 
-> > arguments with '--' - the intention was to keep it for bw compatibility.
-> > 
-> > It would be good to know if people rely on using CHECK with C={1,2} for 
-> > anything beside the checkers supported by runchecks today
+> 2017-12-19 10:26 GMT+09:00 Marc Herbert <marc.herbert@intel.com>:
+>> As explained by Michal Marek at https://lkml.org/lkml/2011/8/31/189
+>> silentoldconfig has become a misnomer. It has become an internal
+>> interface and "oldconfig" is just as silent now.
 > 
-> I do. Here, I use:
 > 
-> $ make ARCH=i386  CF=-D__CHECK_ENDIAN__ CONFIG_DEBUG_SECTION_MISMATCH=y C=1 W=1
-> CHECK='compile_checks' M=drivers/media
-> 
-> Where "compile_checks" is actually a small script that calls both
-> smatch and sparse:
-> 
-> 	#!/bin/bash
-> 	/devel/smatch/smatch -p=kernel $@
+> Hmm, I'd like to be sure about your intention.
 
-I suppose you here refer to this:
-https://blogs.oracle.com/linuxkernel/smatch-static-analysis-tool-overview,-by-dan-carpenter
+My main intention is to stop advertising the now internal silentoldconfig
+target in the user interface. A secondary goal is to provide an accurate
+background information in the commit message.
 
-Good idea! I'll have a look at how that plays with this.
+> "oldconfig" is not silent.  (nor is silentoldconfig).
+> When it finds a new symbol, it will show a dialog
+> to ask users to input a value.
+>
+> "olddefconfig" is really silent
+> because it automatically sets new symbols to default.
 
-> 	/devel/sparse/sparse $@
-> 
-> So, I'm not sure why we need something else. 
+I think "silent" is typically missing well-defined semantics (another appeal
+to remove "silentoldconfig" from the user interface...) and I'm not sure
+"silent" ever meant "non-interactive" as you just described here. I think
+silent just meant "quiet(er)" here.
 
-The core functionality is the selective suppression logic and output unification
-which makes checking with automated build tools more flexible and 
-applicable right away (not when every warning from every checker is fixed...)
+This commit message was purely based on Michal's message that I'm
+referencing. He wrote there: "... nowadays oldconfig is silent as well"
 
-> That said, I didn't look
-> on its code, but looking on its diffstat:
-> 
->  Makefile                               |  23 +-
->  scripts/Makefile.build                 |   4 +-
->  scripts/runchecks                      | 734 ++++++++++++++++++++++++++-
->  scripts/runchecks.cfg                  |  63 ++-
->  scripts/runchecks_help.txt             |  43 ++-
-> 
-> Using a 734 lines python program just to do an exec on an external checker
-> seems too much!
+I can change that part of the commit message to:
 
-Sure, if that was the case I would be the first to agree :-)
+| As explained by Michal Marek at https://lkml.org/lkml/2011/8/31/189
+| silentoldconfig has become a misnomer. It has become an internal
+| interface and "oldconfig" is just as QUIET now.
 
-Thanks,
-Knut
+... or to anything else you prefer.
 
-> Thanks,
-> Mauro
+
+> If you drop silentoldconfig help,
+> the "Same as silentoldconfig" is not sensible.
+> You need to update this line, too.
+
+> I think "Same as oldconfig but ..." will be OK.
+
+Agreed, thank you! I will also search for other occurrences.
+
+
+> What do you mean by "oldconfig used to be more verbose" ?
+> Did oldconfig change its behavior?
+>
+> Unless I am missing something, the current behavior of "oldconfig" has
+> been the same at least since the beginning of the git era.
+
+Again that's what Michal's message claimed in 2011. I don't know to which
+even older era he was referring to.
+
+It was already quite time consuming to understand and verify the subtle
+nuances of the current state (which luckily still matches what Michal
+reported 7 years ago), so for the even older past I just deferred to Michal.
+
+Now I just checked out v2.6.12-rc2 (2005) and it looks like Michal was
+right: oldconfig was much more verbose then; it was dumping the entire
+.config file on stdout.
+
+If you prefer I can keep referring to Michal's message but without
+paraphrasing it at all; sticking to the description of the current
+behaviours and not mentioning any possible past behaviour and saving all of
+us the time spent doing archeology. Just let me know, thx!
+
+-- 
+Marc
