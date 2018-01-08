@@ -1,75 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f193.google.com ([209.85.128.193]:35433 "EHLO
-        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932202AbeAHKEb (ORCPT
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:35686 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751865AbeAHKRW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Jan 2018 05:04:31 -0500
+        Mon, 8 Jan 2018 05:17:22 -0500
 From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH v3] fixdep: exit with error code in error branches of do_config_file()
-Date: Mon,  8 Jan 2018 11:04:01 +0100
-Message-Id: <1515405841-2041-1-git-send-email-lukas.bulwahn@gmail.com>
-In-Reply-To: <1513883429-9527-1-git-send-email-lukas.bulwahn@gmail.com>
-References: <1513883429-9527-1-git-send-email-lukas.bulwahn@gmail.com>
+Date: Mon, 8 Jan 2018 11:17:10 +0100 (CET)
+Subject: Re: [PATCH v2] fixdep: exit with error code in error branches of
+ do_config_file()
+In-Reply-To: <CAK7LNAROjcbES8-debAnzVz1EV1Ar+RLW8phF5+bQxpHQUODKQ@mail.gmail.com>
+Message-ID: <alpine.DEB.2.20.1801081109210.3323@hsp>
+References: <1513801623-19069-1-git-send-email-lukas.bulwahn@gmail.com> <1513883429-9527-1-git-send-email-lukas.bulwahn@gmail.com> <CAK7LNAROjcbES8-debAnzVz1EV1Ar+RLW8phF5+bQxpHQUODKQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: lukas.bulwahn@gmail.com, Nicholas Mc Guire <der.herr@hofr.at>, sil2review@lists.osadl.org, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Lukas Bulwahn <lukas.bulwahn@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nicholas Mc Guire <der.herr@hofr.at>, sil2review@lists.osadl.org, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-do_config_file() should exit with an error code on internal run-time
-errors, and not return if it fails as then the error in do_config_file()
-would go unnoticed in the current code and allow the build to continue.
-The exit with error code will make the build fail in those very
-exceptional cases. If this occurs, this actually indicates a deeper
-problem in the execution of the kernel build process.
 
-Now, in these error cases, we do not explicitly free memory and close
-the file handlers in do_config_file(), as this is covered by exit().
+On Sun, 31 Dec 2017, Masahiro Yamada wrote:
 
-This issue in the fixdep script was introduced with its initial
-implementation back in 2002 by the original author Kai Germaschewski with
-this commit 04bd72170653 ("kbuild: Make dependencies at compile time")
-in the linux history git tree, i.e.,
-git://git.kernel.org/pub/scm/linux/kernel/git/history/history.git.
+> 2017-12-22 4:10 GMT+09:00 Lukas Bulwahn <lukas.bulwahn@gmail.com>:
+>> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+>> index bbf62cb..4274610 100644
+>> --- a/scripts/basic/fixdep.c
+>> +++ b/scripts/basic/fixdep.c
+>> @@ -284,19 +284,18 @@ static void do_config_file(const char *filename)
+>>                 exit(2);
+>>         }
+>>         if (st.st_size == 0) {
+>> -               close(fd);
+>> -               return;
+>> +               fprintf(stderr, "fixdep: error empty file config file: ");
+>> +               perror(filename);
+>> +               exit(2);
+>>         }
+>
+> No.  This is correct as-is.
+>
+> do_config_file() does not parse .cmd files
+> but parse source files (.c .h .S etc.)
+>
+> Having an empty source file is rare, but possible.
+>
+>
 
-This issue was identified during the review of a previous patch that
-intended to address a memory leak detected by a static analysis tool.
+Now that I looked at the code for creating the v3 patch, I am confused 
+about the error messages in scripts/basic/fixdep.c, lines 275 - 285, in 
+do_config_file():
 
-Link: https://lkml.org/lkml/2017/12/14/736
+         fd = open(filename, O_RDONLY);
+         if (fd < 0) {
+                 fprintf(stderr, "fixdep: error opening config file: ");
+                 perror(filename);
+                 exit(2);
+         }
+         if (fstat(fd, &st) < 0) {
+                 fprintf(stderr, "fixdep: error fstat'ing config file: ");
+                 perror(filename);
+                 exit(2);
+         }
 
-Suggested-by: Nicholas Mc Guire <der.herr@hofr.at>
-Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
----
-compile tested on top of next-20180108 with clang and gcc
-Changes in v2:
-  - no code change; only include proper Fixes tag and explain it
-Changes in v3:
-  - Clarify history commit reference and dropped Fixes tag
-  - Do not error on empty files (reverts one hunk of v2)
+These error messages suggest that filename (and the file handler fd) 
+refers to a config file, but you say that filename and fd refer to source 
+files.
 
- scripts/basic/fixdep.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Looking at parse_dep_file() and how it invokes do_config_file(), I think 
+you are right that it does refer to source files.
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index bbf62cb..86a61d6 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -290,13 +290,11 @@ static void do_config_file(const char *filename)
- 	map = malloc(st.st_size + 1);
- 	if (!map) {
- 		perror("fixdep: malloc");
--		close(fd);
--		return;
-+		exit(2);
- 	}
- 	if (read(fd, map, st.st_size) != st.st_size) {
- 		perror("fixdep: read");
--		close(fd);
--		return;
-+		exit(2);
- 	}
- 	map[st.st_size] = '\0';
- 	close(fd);
--- 
-2.5.5
+If you confirm that this is correct, I would change `config file` to 
+`source file` in the error messages of do_config_file().
 
+What is best to do here, provide a separate patch or add it to the 
+existing patch?
+
+Lukas
