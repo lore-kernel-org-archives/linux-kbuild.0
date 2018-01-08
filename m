@@ -1,78 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:35686 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751865AbeAHKRW (ORCPT
+Received: from heliosphere.sirena.org.uk ([172.104.155.198]:39454 "EHLO
+        heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756871AbeAHLWp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Jan 2018 05:17:22 -0500
-From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Date: Mon, 8 Jan 2018 11:17:10 +0100 (CET)
-Subject: Re: [PATCH v2] fixdep: exit with error code in error branches of
- do_config_file()
-In-Reply-To: <CAK7LNAROjcbES8-debAnzVz1EV1Ar+RLW8phF5+bQxpHQUODKQ@mail.gmail.com>
-Message-ID: <alpine.DEB.2.20.1801081109210.3323@hsp>
-References: <1513801623-19069-1-git-send-email-lukas.bulwahn@gmail.com> <1513883429-9527-1-git-send-email-lukas.bulwahn@gmail.com> <CAK7LNAROjcbES8-debAnzVz1EV1Ar+RLW8phF5+bQxpHQUODKQ@mail.gmail.com>
+        Mon, 8 Jan 2018 06:22:45 -0500
+Date: Mon, 8 Jan 2018 11:22:01 +0000
+From: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v2] tools: fix cross-compile var clobbering
+Message-ID: <20180108112201.GB11698@sirena.org.uk>
+References: <20180106201601.11074-1-martin@martingkelly.com>
+ <20180107214028.23771-1-martin@martingkelly.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="24zk1gE8NUlDmwG9"
+Content-Disposition: inline
+In-Reply-To: <20180107214028.23771-1-martin@martingkelly.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Lukas Bulwahn <lukas.bulwahn@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nicholas Mc Guire <der.herr@hofr.at>, sil2review@lists.osadl.org, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Martin Kelly <martin@martingkelly.com>
+Cc: linux-kbuild@vger.kernel.org, Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>, Johannes Weiner <hannes@cmpxchg.org>, Linus Walleij <linus.walleij@linaro.org>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Stephen Hemminger <sthemmin@microsoft.com>, Jonathan Cameron <jic23@kernel.org>, Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>, Richard Purdie <rpurdie@rpsys.net>, Jacek Anaszewski <jacek.anaszewski@gmail.com>, Pavel Machek <pavel@ucw.cz>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Robert Moore <robert.moore@intel.com>, Lv Zheng <lv.zheng@intel.com>, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Valentina Manea <valentina.manea.m@gmail.com>, Shuah Khan <shuahkh@osg.samsung.com>, Shuah Khan <shuah@kernel.org>, Mario Limonciello <mario.limonciello@dell.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
 
 
-On Sun, 31 Dec 2017, Masahiro Yamada wrote:
+--24zk1gE8NUlDmwG9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 2017-12-22 4:10 GMT+09:00 Lukas Bulwahn <lukas.bulwahn@gmail.com>:
->> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
->> index bbf62cb..4274610 100644
->> --- a/scripts/basic/fixdep.c
->> +++ b/scripts/basic/fixdep.c
->> @@ -284,19 +284,18 @@ static void do_config_file(const char *filename)
->>                 exit(2);
->>         }
->>         if (st.st_size == 0) {
->> -               close(fd);
->> -               return;
->> +               fprintf(stderr, "fixdep: error empty file config file: ");
->> +               perror(filename);
->> +               exit(2);
->>         }
->
-> No.  This is correct as-is.
->
-> do_config_file() does not parse .cmd files
-> but parse source files (.c .h .S etc.)
->
-> Having an empty source file is rare, but possible.
->
->
+On Sun, Jan 07, 2018 at 01:40:28PM -0800, Martin Kelly wrote:
+> From: Martin Kelly <martin@martingkelly.com>
+>=20
+> Currently a number of Makefiles break when used with toolchains that pass
+> extra flags in CC and other cross-compile related variables (such as
+> --sysroot). Thus we get this error when we use a toolchain that puts
+> --sysroot in the CC var:
 
-Now that I looked at the code for creating the v3 patch, I am confused 
-about the error messages in scripts/basic/fixdep.c, lines 275 - 285, in 
-do_config_file():
+Acked-by: Mark Brown <broonie@kernel.org>
 
-         fd = open(filename, O_RDONLY);
-         if (fd < 0) {
-                 fprintf(stderr, "fixdep: error opening config file: ");
-                 perror(filename);
-                 exit(2);
-         }
-         if (fstat(fd, &st) < 0) {
-                 fprintf(stderr, "fixdep: error fstat'ing config file: ");
-                 perror(filename);
-                 exit(2);
-         }
+--24zk1gE8NUlDmwG9
+Content-Type: application/pgp-signature; name="signature.asc"
 
-These error messages suggest that filename (and the file handler fd) 
-refers to a config file, but you say that filename and fd refer to source 
-files.
+-----BEGIN PGP SIGNATURE-----
 
-Looking at parse_dep_file() and how it invokes do_config_file(), I think 
-you are right that it does refer to source files.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAlpTVFgACgkQJNaLcl1U
+h9ADmgf/WmuvV5JevHZich7pRhl2G4aaGMSDCSbP8nPy0+qKSM2MrU1OV9P8YfPi
+4Z2QFM+ceOJ3K9MnaR0JDDU63W4tsHRXovo9UoqNpmquhW5DN8NFBjPrQ9Flni8f
+0rjA6er7InJw96mYMubjSWJiXYCYkZwcUIZ3p3ucsF46SH9VcaNWubHa3Vh1z+jh
+A12e1AZA9Vbiz86y6iUN1HY8JM3SbZ7mEQ7NnDnzhtdlLzj1sWhq9IsjOpGCu+NE
+7U6+87skSmCpi6AqKbrnnpizMPcS1zL0daJOu7BnkvxmGrjqpaq+AgEFliNYQXoD
+6lzXMbYVbPeLFefKSBHU7Ab1v++Mhg==
+=o63r
+-----END PGP SIGNATURE-----
 
-If you confirm that this is correct, I would change `config file` to 
-`source file` in the error messages of do_config_file().
-
-What is best to do here, provide a separate patch or add it to the 
-existing patch?
-
-Lukas
+--24zk1gE8NUlDmwG9--
