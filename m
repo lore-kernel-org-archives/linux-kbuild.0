@@ -1,99 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp2120.oracle.com ([141.146.126.78]:43932 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756014AbeAHLj2 (ORCPT
+Received: from userp2130.oracle.com ([156.151.31.86]:49676 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932136AbeAHLqk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Jan 2018 06:39:28 -0500
-Date: Mon, 8 Jan 2018 14:39:12 +0300
+        Mon, 8 Jan 2018 06:46:40 -0500
+Date: Mon, 8 Jan 2018 14:45:53 +0300
 From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH 1/1] tools: fix cross-compile var export
-Message-ID: <20180108113912.3eqyooxlpuqwr4zc@mwanda>
-References: <20171223210641.24588-1-martin@martingkelly.com>
- <20171223210641.24588-2-martin@martingkelly.com>
- <2512a330-1d30-d977-c635-233492da903a@martingkelly.com>
- <011d91f4-5410-eac4-ebbb-7777fbd6519a@martingkelly.com>
+Subject: Re: [PATCH] tools: fix cross-compile var export
+Message-ID: <20180108114553.37buovfs7qimokzq@mwanda>
+References: <20180106201601.11074-1-martin@martingkelly.com>
+ <20180107161140.GM6273@windriver.com>
+ <549cf839-9ae7-78ce-58df-3d84fc7b3d05@martingkelly.com>
+ <c021c0f9-4504-6323-98ed-455a196463fc@martingkelly.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <011d91f4-5410-eac4-ebbb-7777fbd6519a@martingkelly.com>
+In-Reply-To: <c021c0f9-4504-6323-98ed-455a196463fc@martingkelly.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Martin Kelly <martin@martingkelly.com>
-Cc: kernel-janitors@vger.kernel.org, Alexey Dobriyan <adobriyan@gmail.com>, linux-kbuild@vger.kernel.org
+Cc: Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-embedded@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>, Matt Mackall <mpm@selenic.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Sat, Jan 06, 2018 at 12:17:40PM -0800, Martin Kelly wrote:
-> On 12/23/2017 02:16 PM, Martin Kelly wrote:
-> > On 12/23/2017 01:06 PM, Martin Kelly wrote:
-> > > From: Martin Kelly <martin@martingkelly.com>
-> > > 
-> > > Currently in a number of Makefiles, we clobber the CC, LD, and/or
-> > > STRIP env vars
-> > > when cross-compiling, which breaks any additional flags that might
-> > > be set (such
-> > > as sysroot). This easily shows up by using, for instance, a Yocto SDK.
-> > > 
-> > > Fix this by more carefully overriding the flags in the way that the perf
-> > > Makefile does.
-> > > 
-> > > This patch does not fix cross-compile for all the tools (some have
-> > > other bugs),
-> > > but it does appear to fix it for these:
-> > > 
-> > > - cgroup
-> > > - freefall
-> > > - gpio
-> > > - hv
-> > > - iio
-> > > - leds
-> > > - spi
-> > > - vm
-> > > - wmi
-> > > 
-> > > Signed-off-by: Martin Kelly <martin@martingkelly.com>
-> > > ---
-> > >   tools/cgroup/Makefile            |  1 -
-> > >   tools/gpio/Makefile              |  2 --
-> > >   tools/hv/Makefile                |  1 -
-> > >   tools/iio/Makefile               |  2 --
-> > >   tools/laptop/freefall/Makefile   |  1 -
-> > >   tools/leds/Makefile              |  1 -
-> > >   tools/perf/Makefile.perf         |  6 ------
-> > >   tools/power/acpi/Makefile.config |  3 ---
-> > >   tools/scripts/Makefile.include   | 18 ++++++++++++++++++
-> > >   tools/spi/Makefile               |  2 --
-> > >   tools/usb/Makefile               |  1 -
-> > >   tools/vm/Makefile                |  1 -
-> > >   tools/wmi/Makefile               |  1 -
-> > >   13 files changed, 18 insertions(+), 22 deletions(-)
-> > > 
+On Sun, Jan 07, 2018 at 10:51:21AM -0800, Martin Kelly wrote:
+> Urg, I accidentally sent to kernel-kbuild instead of linux-kbuild, changed
+> now. It appears that past changes to tools/scripts/Makefile.include have
+> been handled by linux-kbuild and often Masahiro Yamada.
+> 
+> Perhaps the best sequence here is to send a patch to kbuild adding the
+> call-override function and calls to it to the main common Makefile. Then I
+> can send individual subsystem patches dropping the individual CC = lines and
+> similar. It will be 13 patches instead of 1 but will eventually result in
+> the same thing.
+> 
+> Paul, any thoughts?
+> 
 
-Hi Martin,
-
-This stuff needs to be broken up into one patch per directory and sent
-to the individual maintainers.
-
-Unfortunately, a lot of people haven't filled out MAINTAINERS properly
-for their tools/ directory so get_maintainer.pl doesn't always select
-the correct mailing list.  Keeping track of the tools/ director is
-actually a good task for kernel-janitors btw.
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 042400542c55..14d93b30aeeb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3625,6 +3625,7 @@ S:        Maintained
- F:     Documentation/cgroup*
- F:     include/linux/cgroup*
- F:     kernel/cgroup*
-+F:     tools/cgroup/
- 
- CONTROL GROUP - CPUSET
- M:     Li Zefan <lizefan@huawei.com>
-
-So you might need to manually check MAINTAINERS to find the correct
-list.
+That sounds good.
 
 regards,
 dan carpenter
-
