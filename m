@@ -1,105 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp2130.oracle.com ([156.151.31.86]:53042 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932633AbeAHTX6 (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:64276 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750788AbeAII0x (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Jan 2018 14:23:58 -0500
-Date: Mon, 8 Jan 2018 22:23:44 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH 1/1] tools: fix cross-compile var export
-Message-ID: <20180108192343.ws5miawbslafclzw@mwanda>
-References: <20171223210641.24588-1-martin@martingkelly.com>
- <20171223210641.24588-2-martin@martingkelly.com>
- <2512a330-1d30-d977-c635-233492da903a@martingkelly.com>
- <011d91f4-5410-eac4-ebbb-7777fbd6519a@martingkelly.com>
- <20180108113912.3eqyooxlpuqwr4zc@mwanda>
- <287b0a7d-1c4d-0faa-eafb-5d17d0d9063b@martingkelly.com>
+        Tue, 9 Jan 2018 03:26:53 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <287b0a7d-1c4d-0faa-eafb-5d17d0d9063b@martingkelly.com>
+In-Reply-To: <1515405841-2041-1-git-send-email-lukas.bulwahn@gmail.com>
+References: <1513883429-9527-1-git-send-email-lukas.bulwahn@gmail.com> <1515405841-2041-1-git-send-email-lukas.bulwahn@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 9 Jan 2018 17:26:00 +0900
+Message-ID: <CAK7LNATXxndz6P1QXnzZA-MUDR1pzT_hMCJJQBaTwfjfHz5HkA@mail.gmail.com>
+Subject: Re: [PATCH v3] fixdep: exit with error code in error branches of do_config_file()
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Martin Kelly <martin@martingkelly.com>
-Cc: kernel-janitors@vger.kernel.org, Alexey Dobriyan <adobriyan@gmail.com>, linux-kbuild@vger.kernel.org, Paul Gortmaker <paul.gortmaker@windriver.com>
+To: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nicholas Mc Guire <der.herr@hofr.at>, sil2review@lists.osadl.org, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Jan 08, 2018 at 09:24:42AM -0800, Martin Kelly wrote:
-> On 01/08/2018 03:39 AM, Dan Carpenter wrote:
-> > On Sat, Jan 06, 2018 at 12:17:40PM -0800, Martin Kelly wrote:
-> > > On 12/23/2017 02:16 PM, Martin Kelly wrote:
-> > > > On 12/23/2017 01:06 PM, Martin Kelly wrote:
-> > > > > From: Martin Kelly <martin@martingkelly.com>
-> > > > > 
-> > > > > Currently in a number of Makefiles, we clobber the CC, LD, and/or
-> > > > > STRIP env vars
-> > > > > when cross-compiling, which breaks any additional flags that might
-> > > > > be set (such
-> > > > > as sysroot). This easily shows up by using, for instance, a Yocto SDK.
-> > > > > 
-> > > > > Fix this by more carefully overriding the flags in the way that the perf
-> > > > > Makefile does.
-> > > > > 
-> > > > > This patch does not fix cross-compile for all the tools (some have
-> > > > > other bugs),
-> > > > > but it does appear to fix it for these:
-> > > > > 
-> > > > > - cgroup
-> > > > > - freefall
-> > > > > - gpio
-> > > > > - hv
-> > > > > - iio
-> > > > > - leds
-> > > > > - spi
-> > > > > - vm
-> > > > > - wmi
-> > > > > 
-> > > > > Signed-off-by: Martin Kelly <martin@martingkelly.com>
-> > > > > ---
-> > > > >    tools/cgroup/Makefile            |  1 -
-> > > > >    tools/gpio/Makefile              |  2 --
-> > > > >    tools/hv/Makefile                |  1 -
-> > > > >    tools/iio/Makefile               |  2 --
-> > > > >    tools/laptop/freefall/Makefile   |  1 -
-> > > > >    tools/leds/Makefile              |  1 -
-> > > > >    tools/perf/Makefile.perf         |  6 ------
-> > > > >    tools/power/acpi/Makefile.config |  3 ---
-> > > > >    tools/scripts/Makefile.include   | 18 ++++++++++++++++++
-> > > > >    tools/spi/Makefile               |  2 --
-> > > > >    tools/usb/Makefile               |  1 -
-> > > > >    tools/vm/Makefile                |  1 -
-> > > > >    tools/wmi/Makefile               |  1 -
-> > > > >    13 files changed, 18 insertions(+), 22 deletions(-)
-> > > > > 
-> > 
-> > Hi Martin,
-> > 
-> > This stuff needs to be broken up into one patch per directory and sent
-> > to the individual maintainers.
-> > 
-> > Unfortunately, a lot of people haven't filled out MAINTAINERS properly
-> > for their tools/ directory so get_maintainer.pl doesn't always select
-> > the correct mailing list.  Keeping track of the tools/ director is
-> > actually a good task for kernel-janitors btw.
-> > 
-> 
-> Hi Dan,
-> 
-> I'm very confused at this point, as I am hearing different things from
-> different people. This patch is a bit unique in that it spans multiple
-> subsystems but is a single, logical bugfix (see
-> https://marc.info/?l=linux-kernel&m=151534992512934&w=2 for details). This
-> means that to follow the one-patch-per-logical change rule, I have to break
-> the patch-for-subsystem-X-goes-to-maintainer-of-subsystem-X rule, and vice
-> versa.
-> 
-> Given that this is a single logical change, Paul Gortmaker suggested that I
-> CC each maintainer and try to get Andrew Morton to pick it up:
-> 
+2018-01-08 19:04 GMT+09:00 Lukas Bulwahn <lukas.bulwahn@gmail.com>:
+> do_config_file() should exit with an error code on internal run-time
+> errors, and not return if it fails as then the error in do_config_file()
+> would go unnoticed in the current code and allow the build to continue.
+> The exit with error code will make the build fail in those very
+> exceptional cases. If this occurs, this actually indicates a deeper
+> problem in the execution of the kernel build process.
+>
+> Now, in these error cases, we do not explicitly free memory and close
+> the file handlers in do_config_file(), as this is covered by exit().
+>
+> This issue in the fixdep script was introduced with its initial
+> implementation back in 2002 by the original author Kai Germaschewski with
+> this commit 04bd72170653 ("kbuild: Make dependencies at compile time")
+> in the linux history git tree, i.e.,
+> git://git.kernel.org/pub/scm/linux/kernel/git/history/history.git.
+>
+> This issue was identified during the review of a previous patch that
+> intended to address a memory leak detected by a static analysis tool.
+>
+> Link: https://lkml.org/lkml/2017/12/14/736
+>
+> Suggested-by: Nicholas Mc Guire <der.herr@hofr.at>
+> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+> ---
+> compile tested on top of next-20180108 with clang and gcc
+> Changes in v2:
+>   - no code change; only include proper Fixes tag and explain it
+> Changes in v3:
+>   - Clarify history commit reference and dropped Fixes tag
+>   - Do not error on empty files (reverts one hunk of v2)
+>
+>  scripts/basic/fixdep.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+> index bbf62cb..86a61d6 100644
+> --- a/scripts/basic/fixdep.c
+> +++ b/scripts/basic/fixdep.c
+> @@ -290,13 +290,11 @@ static void do_config_file(const char *filename)
+>         map = malloc(st.st_size + 1);
+>         if (!map) {
+>                 perror("fixdep: malloc");
+> -               close(fd);
+> -               return;
+> +               exit(2);
+>         }
+>         if (read(fd, map, st.st_size) != st.st_size) {
+>                 perror("fixdep: read");
+> -               close(fd);
+> -               return;
+> +               exit(2);
+>         }
+>         map[st.st_size] = '\0';
+>         close(fd);
+> --
+> 2.5.5
+>
 
-That's actually a good idea.  Do it that way.
-
-regards,
-dan carpenter
+Applied to linux-kbuild/kbuid. Thanks!
 
 
+
+-- 
+Best Regards
+Masahiro Yamada
