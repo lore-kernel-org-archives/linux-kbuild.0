@@ -1,86 +1,155 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:64276 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750788AbeAII0x (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:27301 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750985AbeAIIb7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Jan 2018 03:26:53 -0500
-MIME-Version: 1.0
-In-Reply-To: <1515405841-2041-1-git-send-email-lukas.bulwahn@gmail.com>
-References: <1513883429-9527-1-git-send-email-lukas.bulwahn@gmail.com> <1515405841-2041-1-git-send-email-lukas.bulwahn@gmail.com>
+        Tue, 9 Jan 2018 03:31:59 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 9 Jan 2018 17:26:00 +0900
-Message-ID: <CAK7LNATXxndz6P1QXnzZA-MUDR1pzT_hMCJJQBaTwfjfHz5HkA@mail.gmail.com>
-Subject: Re: [PATCH v3] fixdep: exit with error code in error branches of do_config_file()
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 5/6] fixdep: refactor parse_dep_file()
+Date: Tue,  9 Jan 2018 17:30:49 +0900
+Message-Id: <1515486650-1141-5-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1515486650-1141-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1515486650-1141-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nicholas Mc Guire <der.herr@hofr.at>, sil2review@lists.osadl.org, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-2018-01-08 19:04 GMT+09:00 Lukas Bulwahn <lukas.bulwahn@gmail.com>:
-> do_config_file() should exit with an error code on internal run-time
-> errors, and not return if it fails as then the error in do_config_file()
-> would go unnoticed in the current code and allow the build to continue.
-> The exit with error code will make the build fail in those very
-> exceptional cases. If this occurs, this actually indicates a deeper
-> problem in the execution of the kernel build process.
->
-> Now, in these error cases, we do not explicitly free memory and close
-> the file handlers in do_config_file(), as this is covered by exit().
->
-> This issue in the fixdep script was introduced with its initial
-> implementation back in 2002 by the original author Kai Germaschewski with
-> this commit 04bd72170653 ("kbuild: Make dependencies at compile time")
-> in the linux history git tree, i.e.,
-> git://git.kernel.org/pub/scm/linux/kernel/git/history/history.git.
->
-> This issue was identified during the review of a previous patch that
-> intended to address a memory leak detected by a static analysis tool.
->
-> Link: https://lkml.org/lkml/2017/12/14/736
->
-> Suggested-by: Nicholas Mc Guire <der.herr@hofr.at>
-> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-> ---
-> compile tested on top of next-20180108 with clang and gcc
-> Changes in v2:
->   - no code change; only include proper Fixes tag and explain it
-> Changes in v3:
->   - Clarify history commit reference and dropped Fixes tag
->   - Do not error on empty files (reverts one hunk of v2)
->
->  scripts/basic/fixdep.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-> index bbf62cb..86a61d6 100644
-> --- a/scripts/basic/fixdep.c
-> +++ b/scripts/basic/fixdep.c
-> @@ -290,13 +290,11 @@ static void do_config_file(const char *filename)
->         map = malloc(st.st_size + 1);
->         if (!map) {
->                 perror("fixdep: malloc");
-> -               close(fd);
-> -               return;
-> +               exit(2);
->         }
->         if (read(fd, map, st.st_size) != st.st_size) {
->                 perror("fixdep: read");
-> -               close(fd);
-> -               return;
-> +               exit(2);
->         }
->         map[st.st_size] = '\0';
->         close(fd);
-> --
-> 2.5.5
->
+parse_dep_file() has too much indentation, and puts the code far to
+the right.  This commit refactors the code and reduces the one level
+of indentation.
 
-Applied to linux-kbuild/kbuid. Thanks!
+strrcmp() computes 'slen' by itself, but the caller already knows the
+length of the token, so 'slen' can be passed via function argument.
+With this, we can swap the order of strrcmp() and "*p = \0;"
 
+Also, strrcmp() is an ambiguous function name.  Flip the logic and
+rename it to str_ends_with().
 
+I added a new helper is_ignored_file() - this returns 1 if the token
+represents a file that should be ignored.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ scripts/basic/fixdep.c | 80 +++++++++++++++++++++++++-------------------------
+ 1 file changed, 40 insertions(+), 40 deletions(-)
+
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index bb6d2da..3881bf1 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -250,15 +250,14 @@ static void parse_config_file(const char *p)
+ }
+ 
+ /* test if s ends in sub */
+-static int strrcmp(const char *s, const char *sub)
++static int str_ends_with(const char *s, int slen, const char *sub)
+ {
+-	int slen = strlen(s);
+ 	int sublen = strlen(sub);
+ 
+ 	if (sublen > slen)
+-		return 1;
++		return 0;
+ 
+-	return memcmp(s + slen - sublen, sub, sublen);
++	return !memcmp(s + slen - sublen, sub, sublen);
+ }
+ 
+ static void *load_file(const char *filename)
+@@ -293,6 +292,16 @@ static void *load_file(const char *filename)
+ 	return buf;
+ }
+ 
++/* Ignore certain dependencies */
++static int is_ignored_file(const char *s, int len)
++{
++	return str_ends_with(s, len, "include/generated/autoconf.h") ||
++	       str_ends_with(s, len, "include/generated/autoksyms.h") ||
++	       str_ends_with(s, len, "arch/um/include/uml-config.h") ||
++	       str_ends_with(s, len, "include/linux/kconfig.h") ||
++	       str_ends_with(s, len, ".ver");
++}
++
+ /*
+  * Important: The below generated source_foo.o and deps_foo.o variable
+  * assignments are parsed not only by make, but also by the rather simple
+@@ -325,47 +334,38 @@ static void parse_dep_file(char *m, const char *target, int insert_extra_deps)
+ 		if (is_target) {
+ 			/* The /next/ file is the first dependency */
+ 			is_first_dep = 1;
+-		} else {
++		} else if (!is_ignored_file(m, p - m)) {
+ 			*p = '\0';
+ 
+-			/* Ignore certain dependencies */
+-			if (strrcmp(m, "include/generated/autoconf.h") &&
+-			    strrcmp(m, "include/generated/autoksyms.h") &&
+-			    strrcmp(m, "arch/um/include/uml-config.h") &&
+-			    strrcmp(m, "include/linux/kconfig.h") &&
+-			    strrcmp(m, ".ver")) {
++			/*
++			 * Do not list the source file as dependency, so that
++			 * kbuild is not confused if a .c file is rewritten
++			 * into .S or vice versa. Storing it in source_* is
++			 * needed for modpost to compute srcversions.
++			 */
++			if (is_first_dep) {
+ 				/*
+-				 * Do not list the source file as dependency,
+-				 * so that kbuild is not confused if a .c file
+-				 * is rewritten into .S or vice versa. Storing
+-				 * it in source_* is needed for modpost to
+-				 * compute srcversions.
++				 * If processing the concatenation of multiple
++				 * dependency files, only process the first
++				 * target name, which will be the original
++				 * source name, and ignore any other target
++				 * names, which will be intermediate temporary
++				 * files.
+ 				 */
+-				if (is_first_dep) {
+-					/*
+-					 * If processing the concatenation of
+-					 * multiple dependency files, only
+-					 * process the first target name, which
+-					 * will be the original source name,
+-					 * and ignore any other target names,
+-					 * which will be intermediate temporary
+-					 * files.
+-					 */
+-					if (!saw_any_target) {
+-						saw_any_target = 1;
+-						printf("source_%s := %s\n\n",
+-							target, m);
+-						printf("deps_%s := \\\n",
+-							target);
+-					}
+-					is_first_dep = 0;
+-				} else
+-					printf("  %s \\\n", m);
+-
+-				buf = load_file(m);
+-				parse_config_file(buf);
+-				free(buf);
++				if (!saw_any_target) {
++					saw_any_target = 1;
++					printf("source_%s := %s\n\n",
++					       target, m);
++					printf("deps_%s := \\\n", target);
++				}
++				is_first_dep = 0;
++			} else {
++				printf("  %s \\\n", m);
+ 			}
++
++			buf = load_file(m);
++			parse_config_file(buf);
++			free(buf);
+ 		}
+ 
+ 		if (is_last)
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
