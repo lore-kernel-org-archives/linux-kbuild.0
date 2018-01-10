@@ -1,74 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:57466 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754256AbeAJQNN (ORCPT
+Received: from mail-qt0-f196.google.com ([209.85.216.196]:37431 "EHLO
+        mail-qt0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754164AbeAJQVw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Jan 2018 11:13:13 -0500
+        Wed, 10 Jan 2018 11:21:52 -0500
 MIME-Version: 1.0
-In-Reply-To: <1507482683-22651-6-git-send-email-ulfalizer@gmail.com>
-References: <1507482683-22651-1-git-send-email-ulfalizer@gmail.com> <1507482683-22651-6-git-send-email-ulfalizer@gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 11 Jan 2018 01:12:18 +0900
-Message-ID: <CAK7LNAQnQesyV9Vgs-xiW=dFWhbSwPE0YdmtA-HPQ4HHFM579Q@mail.gmail.com>
-Subject: Re: [PATCH 5/6] kconfig: Don't leak help strings during parsing
+In-Reply-To: <CAK7LNAQFDfGDy6q+ycY2C+FYtdUdgfGrUurEuV=FKOpbSJmPcQ@mail.gmail.com>
+References: <1511784913-3396-1-git-send-email-yamada.masahiro@socionext.com>
+ <CAMuHMdXHHFvPJyhJ37Xss_aBEY7kJVC8GxEqGNJyYW4wwhRgMQ@mail.gmail.com> <CAK7LNAQFDfGDy6q+ycY2C+FYtdUdgfGrUurEuV=FKOpbSJmPcQ@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 10 Jan 2018 17:21:51 +0100
+Message-ID: <CAMuHMdW4ZHdbM590NoxczgtkrozYwdffs-PdTkE51Fe4driq8Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: move cc-option and cc-disable-warning after incl.
+ arch Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, zippel@linux-m68k.org, Nicolas Pitre <nicolas.pitre@linaro.org>, Michal Marek <michal.lkml@markovi.net>, dirk@gouders.net, Arnaud Lacombe <lacombar@gmail.com>, walch.martin@web.de, Jan Beulich <JBeulich@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-2017-10-09 2:11 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> This is just for completeness to get rid of the last memory leak
-> currently generated during parsing for ARCH=x86. The symbol
-> DVB_NETUP_UNIDVB in drivers/media/pci/netup_unidvb/Kconfig currently has
-> two help strings, and we leak the first one.
+Hi Yamada-san,
 
-Looks like it was fixed by
-561b29e4ec8d0aac7e094f70d649ee4abccdda03
-
-
-
-> Summary from Valgrind on 'menuconfig' (ARCH=x86) before the fix:
+On Sun, Dec 10, 2017 at 6:28 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> 2017-11-27 21:25 GMT+09:00 Geert Uytterhoeven <geert@linux-m68k.org>:
+>> On Mon, Nov 27, 2017 at 1:15 PM, Masahiro Yamada
+>> <yamada.masahiro@socionext.com> wrote:
+>>> Geert reported commit ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before
+>>> incl. arch Makefile") broke cross-compilation using a cross-compiler
+>>> that supports less compiler options than the host compiler.
+>>>
+>>> For example,
+>>>
+>>>   cc1: error: unrecognized command line option "-Wno-unused-but-set-variable"
+>>>
+>>> This problem happens on architectures that setup CROSS_COMPILE in their
+>>> arch/*/Makefile.
+>>>
+>>> Move the cc-option and cc-disable-warning back to the original position,
+>>> but keep the Clang target options.
+>>>
+>>> Fixes: ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before incl. arch Makefile")
+>>> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>>
+>> Thanks for the quick response!
+>>
+>> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
 >
->         LEAK SUMMARY:
->            definitely lost: 344,440 bytes in 14,350 blocks
->            ...
->
-> Summary after the fix:
->
->         LEAK SUMMARY:
->            definitely lost: 344,376 bytes in 14,349 blocks
->            ...
->
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->  scripts/kconfig/zconf.y | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-> index 468ab03..3c9f436 100644
-> --- a/scripts/kconfig/zconf.y
-> +++ b/scripts/kconfig/zconf.y
-> @@ -435,6 +435,9 @@ help_start: T_HELP T_EOL
->
->  help: help_start T_HELPTEXT
->  {
-> +       if (current_entry->help)
-> +               /* Weird menu node with two help strings */
-> +               free(current_entry->help);
->         current_entry->help = $2;
->  };
+> Applied to linux-kbuild/fixes.
 
+Any chance this will be fixed in v4.15?
+It fixes a regression introduced in v4.15-rc1.
 
-I applied this, but maybe is it better to warning message?
-         zconfprint("warning: ...")  or zconf_error()?
+Thanks again!
 
+Gr{oetje,eeting}s,
 
-If you send v2, I will replace this.
+                        Geert
 
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-
-
--- 
-Best Regards
-Masahiro Yamada
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
