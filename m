@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:40551 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755525AbeAJQN2 (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:57466 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754256AbeAJQNN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Jan 2018 11:13:28 -0500
+        Wed, 10 Jan 2018 11:13:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <1507482683-22651-1-git-send-email-ulfalizer@gmail.com>
-References: <1507482683-22651-1-git-send-email-ulfalizer@gmail.com>
+In-Reply-To: <1507482683-22651-6-git-send-email-ulfalizer@gmail.com>
+References: <1507482683-22651-1-git-send-email-ulfalizer@gmail.com> <1507482683-22651-6-git-send-email-ulfalizer@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 11 Jan 2018 01:12:42 +0900
-Message-ID: <CAK7LNARr9JJLKwDe-j_VjHPYhwf3Li0wDx+-rw38Bj3fR2p2UA@mail.gmail.com>
-Subject: Re: [PATCH 0/6] kconfig: Fix memory leaks during parsing
+Date: Thu, 11 Jan 2018 01:12:18 +0900
+Message-ID: <CAK7LNAQnQesyV9Vgs-xiW=dFWhbSwPE0YdmtA-HPQ4HHFM579Q@mail.gmail.com>
+Subject: Re: [PATCH 5/6] kconfig: Don't leak help strings during parsing
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -18,50 +18,55 @@ To: Ulf Magnusson <ulfalizer@gmail.com>
 Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, zippel@linux-m68k.org, Nicolas Pitre <nicolas.pitre@linaro.org>, Michal Marek <michal.lkml@markovi.net>, dirk@gouders.net, Arnaud Lacombe <lacombar@gmail.com>, walch.martin@web.de, Jan Beulich <JBeulich@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
 2017-10-09 2:11 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> Hello,
->
-> This patchset plugs all memory leaks that occur in the parser (zconf.y) while
-> parsing the x86 Kconfigs (and likely the other ARCHes too). I noticed that
-> Kconfig is pretty leaky while working on the fix for 'm' before MODULES
-> (http://www.spinics.net/lists/linux-kbuild/msg15606.html).
->
-> The biggest culprit is all symbol names being leaked outside of expressions:
-> 316 KB leaked. 'source' filenames being leaked adds another 41 KB. The other
-> leaks are minor (< 1 KB each). The fixes can be applied independently.
->
-> This is mostly just to get a clean slate with Valgrind, but also cleans up the
-> code a bit as a side effect. Any performance difference (plus or minus) seems
-> to be in the noise.
->
-> Tested with the Kconfiglib test suite, which indirectly verifies that Kconfig
-> still generates the same .config for alldefconfig, allnoconfig, allyesconfig,
-> and all defconfigs, for all architectures. I also tested that menuconfig gets
-> the right main menu text with and without a 'mainmenu' statement.
->
-> As a reminder, the parsers can be rebuilt like this:
->
->         $ make REGENERATE_PARSERS=1 conf
->
-> Here's an easy way to run Valgrind on menuconfig (nothing seems to look at
-> KERNELVERSION, so just set it to avoid a warning):
->
->         $ ARCH=x86 SRCARCH=x86 KERNELVERSION=4.14.0-rc2 valgrind --leak-check=full scripts/kconfig/mconf Kconfig
->
-> Cheers,
-> Ulf
->
-> Ulf Magnusson (6):
->   kconfig: Don't leak symbol names during parsing
->   kconfig: Don't leak 'source' filenames during parsing
->   kconfig: Don't leak 'option' arguments during parsing
->   Kconfig: Don't leak main menus during parsing
->   kconfig: Don't leak help strings during parsing
->   kconfig: Regenerate parser
+> This is just for completeness to get rid of the last memory leak
+> currently generated during parsing for ARCH=x86. The symbol
+> DVB_NETUP_UNIDVB in drivers/media/pci/netup_unidvb/Kconfig currently has
+> two help strings, and we leak the first one.
+
+Looks like it was fixed by
+561b29e4ec8d0aac7e094f70d649ee4abccdda03
 
 
-I applied 1-5.
 
-I left some comments on 5.
+> Summary from Valgrind on 'menuconfig' (ARCH=x86) before the fix:
+>
+>         LEAK SUMMARY:
+>            definitely lost: 344,440 bytes in 14,350 blocks
+>            ...
+>
+> Summary after the fix:
+>
+>         LEAK SUMMARY:
+>            definitely lost: 344,376 bytes in 14,349 blocks
+>            ...
+>
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> ---
+>  scripts/kconfig/zconf.y | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+> index 468ab03..3c9f436 100644
+> --- a/scripts/kconfig/zconf.y
+> +++ b/scripts/kconfig/zconf.y
+> @@ -435,6 +435,9 @@ help_start: T_HELP T_EOL
+>
+>  help: help_start T_HELPTEXT
+>  {
+> +       if (current_entry->help)
+> +               /* Weird menu node with two help strings */
+> +               free(current_entry->help);
+>         current_entry->help = $2;
+>  };
+
+
+I applied this, but maybe is it better to warning message?
+         zconfprint("warning: ...")  or zconf_error()?
+
+
+If you send v2, I will replace this.
+
+
 
 
 -- 
