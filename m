@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:60595 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:60734 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934059AbeAKNG1 (ORCPT
+        with ESMTP id S932665AbeAKNGc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Jan 2018 08:06:27 -0500
+        Thu, 11 Jan 2018 08:06:32 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 5/7] fixdep: move global variables to local variables of main()
-Date: Thu, 11 Jan 2018 22:05:44 +0900
-Message-Id: <1515675946-7514-5-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 4/7] fixdep: remove unneeded memcpy() in parse_dep_file()
+Date: Thu, 11 Jan 2018 22:05:43 +0900
+Message-Id: <1515675946-7514-4-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1515675946-7514-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1515675946-7514-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,120 +15,83 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-I do not mind global variables where they are useful enough.  In this
-case, I do not see a good reason to use global variables since they
-are just referenced in shallow places.  It is easy to pass them via
-function arguments.
+Each token in the depfile is copied to the temporary buffer 's' to
+terminate the token with zero.  We do not need to do this any more
+because the parsed buffer is now writable.  Insert '\0' directly in
+the buffer without calling memcpy().
 
-I squashed print_cmdline() into main() since it is just one line code.
+<limits.h> is no longer necessary. (It was needed for PATH_MAX).
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-Changes in v2:
-  - Squash print_cmdline() into main()
+Changes in v2: None
 
- scripts/basic/fixdep.c | 42 ++++++++++++++++--------------------------
- 1 file changed, 16 insertions(+), 26 deletions(-)
+ scripts/basic/fixdep.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
 diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index dfba77b..d33b5a4 100644
+index 9f9238e..dfba77b 100644
 --- a/scripts/basic/fixdep.c
 +++ b/scripts/basic/fixdep.c
-@@ -111,11 +111,6 @@
+@@ -109,7 +109,6 @@
+ #include <string.h>
+ #include <stdlib.h>
  #include <stdio.h>
+-#include <limits.h>
  #include <ctype.h>
  
--int insert_extra_deps;
--char *target;
--char *depfile;
--char *cmdline;
--
- static void usage(void)
- {
- 	fprintf(stderr, "Usage: fixdep [-e] <depfile> <target> <cmdline>\n");
-@@ -124,14 +119,6 @@ static void usage(void)
- }
- 
- /*
-- * Print out the commandline prefixed with cmd_<target filename> :=
-- */
--static void print_cmdline(void)
--{
--	printf("cmd_%s := %s\n\n", target, cmdline);
--}
--
--/*
-  * Print out a dependency path from a symbol name
-  */
- static void print_config(const char *m, int slen)
-@@ -152,16 +139,16 @@ static void print_config(const char *m, int slen)
- 
- static void do_extra_deps(void)
- {
--	if (insert_extra_deps) {
--		char buf[80];
--		while(fgets(buf, sizeof(buf), stdin)) {
--			int len = strlen(buf);
--			if (len < 2 || buf[len-1] != '\n') {
--				fprintf(stderr, "fixdep: bad data on stdin\n");
--				exit(1);
--			}
--			print_config(buf, len-1);
-+	char buf[80];
-+
-+	while (fgets(buf, sizeof(buf), stdin)) {
-+		int len = strlen(buf);
-+
-+		if (len < 2 || buf[len - 1] != '\n') {
-+			fprintf(stderr, "fixdep: bad data on stdin\n");
-+			exit(1);
- 		}
-+		print_config(buf, len - 1);
- 	}
- }
- 
-@@ -300,7 +287,7 @@ static void *read_file(const char *filename)
-  * assignments are parsed not only by make, but also by the rather simple
-  * parser in scripts/mod/sumversion.c.
-  */
--static void parse_dep_file(char *m)
-+static void parse_dep_file(char *m, const char *target, int insert_extra_deps)
+ int insert_extra_deps;
+@@ -304,7 +303,6 @@ static void *read_file(const char *filename)
+ static void parse_dep_file(char *m)
  {
  	char *p;
+-	char s[PATH_MAX];
  	int is_last, is_target;
-@@ -385,7 +372,8 @@ static void parse_dep_file(char *m)
- 		exit(1);
- 	}
+ 	int saw_any_target = 0;
+ 	int is_first_dep = 0;
+@@ -330,16 +328,14 @@ static void parse_dep_file(char *m)
+ 			/* The /next/ file is the first dependency */
+ 			is_first_dep = 1;
+ 		} else {
+-			/* Save this token/filename */
+-			memcpy(s, m, p-m);
+-			s[p - m] = 0;
++			*p = '\0';
  
--	do_extra_deps();
-+	if (insert_extra_deps)
-+		do_extra_deps();
+ 			/* Ignore certain dependencies */
+-			if (strrcmp(s, "include/generated/autoconf.h") &&
+-			    strrcmp(s, "include/generated/autoksyms.h") &&
+-			    strrcmp(s, "arch/um/include/uml-config.h") &&
+-			    strrcmp(s, "include/linux/kconfig.h") &&
+-			    strrcmp(s, ".ver")) {
++			if (strrcmp(m, "include/generated/autoconf.h") &&
++			    strrcmp(m, "include/generated/autoksyms.h") &&
++			    strrcmp(m, "arch/um/include/uml-config.h") &&
++			    strrcmp(m, "include/linux/kconfig.h") &&
++			    strrcmp(m, ".ver")) {
+ 				/*
+ 				 * Do not list the source file as dependency,
+ 				 * so that kbuild is not confused if a .c file
+@@ -360,15 +356,15 @@ static void parse_dep_file(char *m)
+ 					if (!saw_any_target) {
+ 						saw_any_target = 1;
+ 						printf("source_%s := %s\n\n",
+-							target, s);
++							target, m);
+ 						printf("deps_%s := \\\n",
+ 							target);
+ 					}
+ 					is_first_dep = 0;
+ 				} else
+-					printf("  %s \\\n", s);
++					printf("  %s \\\n", m);
  
- 	printf("\n%s: $(deps_%s)\n\n", target, target);
- 	printf("$(deps_%s):\n", target);
-@@ -393,6 +381,8 @@ static void parse_dep_file(char *m)
- 
- int main(int argc, char *argv[])
- {
-+	const char *depfile, *target, *cmdline;
-+	int insert_extra_deps = 0;
- 	void *buf;
- 
- 	if (argc == 5 && !strcmp(argv[1], "-e")) {
-@@ -405,10 +395,10 @@ int main(int argc, char *argv[])
- 	target = argv[2];
- 	cmdline = argv[3];
- 
--	print_cmdline();
-+	printf("cmd_%s := %s\n\n", target, cmdline);
- 
- 	buf = read_file(depfile);
--	parse_dep_file(buf);
-+	parse_dep_file(buf, target, insert_extra_deps);
- 	free(buf);
- 
- 	return 0;
+-				buf = read_file(s);
++				buf = read_file(m);
+ 				parse_config_file(buf);
+ 				free(buf);
+ 			}
 -- 
 2.7.4
 
