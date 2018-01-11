@@ -1,68 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:50930 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965762AbeAJQkD (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Jan 2018 11:40:03 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3772 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753909AbeAKJQb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 11 Jan 2018 04:16:31 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+Subject: [PATCH] Kbuild: suppress packed-not-aligned warning for default setting only
+Date: Thu, 11 Jan 2018 17:22:29 +0800
+Message-ID: <1515662549-58933-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdW4ZHdbM590NoxczgtkrozYwdffs-PdTkE51Fe4driq8Q@mail.gmail.com>
-References: <1511784913-3396-1-git-send-email-yamada.masahiro@socionext.com>
- <CAMuHMdXHHFvPJyhJ37Xss_aBEY7kJVC8GxEqGNJyYW4wwhRgMQ@mail.gmail.com>
- <CAK7LNAQFDfGDy6q+ycY2C+FYtdUdgfGrUurEuV=FKOpbSJmPcQ@mail.gmail.com> <CAMuHMdW4ZHdbM590NoxczgtkrozYwdffs-PdTkE51Fe4driq8Q@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 11 Jan 2018 01:39:11 +0900
-Message-ID: <CAK7LNATs0F7q=bfCEwt7OTc=g07rEZ0MHSbsfMfFotT+sM5WJw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: move cc-option and cc-disable-warning after incl.
- arch Makefile
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, arnd@arndb.de, wangxiongfeng2@huawei.com
 
-2018-01-11 1:21 GMT+09:00 Geert Uytterhoeven <geert@linux-m68k.org>:
-> Hi Yamada-san,
->
-> On Sun, Dec 10, 2017 at 6:28 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> 2017-11-27 21:25 GMT+09:00 Geert Uytterhoeven <geert@linux-m68k.org>:
->>> On Mon, Nov 27, 2017 at 1:15 PM, Masahiro Yamada
->>> <yamada.masahiro@socionext.com> wrote:
->>>> Geert reported commit ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before
->>>> incl. arch Makefile") broke cross-compilation using a cross-compiler
->>>> that supports less compiler options than the host compiler.
->>>>
->>>> For example,
->>>>
->>>>   cc1: error: unrecognized command line option "-Wno-unused-but-set-variable"
->>>>
->>>> This problem happens on architectures that setup CROSS_COMPILE in their
->>>> arch/*/Makefile.
->>>>
->>>> Move the cc-option and cc-disable-warning back to the original position,
->>>> but keep the Clang target options.
->>>>
->>>> Fixes: ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before incl. arch Makefile")
->>>> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
->>>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->>>
->>> Thanks for the quick response!
->>>
->>> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
->>
->> Applied to linux-kbuild/fixes.
->
-> Any chance this will be fixed in v4.15?
-> It fixes a regression introduced in v4.15-rc1.
->
+From: Xiongfeng Wang <xiongfeng.wang@linaro.org>
 
-Yes, of course.
+gcc-8 reports many -Wpacked-not-aligned warnings. The below are some
+examples.
 
-I have queued up just two patches to the fixes branch.
-I am expecting a little more fixes for make-cache issues,
-but otherwise, I will send a pull request in a few days.
+./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
+ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
+ } __attribute__ ((packed));
 
+./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
+ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
+ } __attribute__ ((packed));
 
+./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
+ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
+ } __attribute__ ((packed));
+
+This patch suppress this kind of warnings for default setting.
+
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+---
+ scripts/Makefile.extrawarn | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index c6ebf42..8d53570 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -11,6 +11,8 @@
+ # are not supported by all versions of the compiler
+ # ==========================================================================
+ 
++KBUILD_CFLAGS += $(call cc-disable-warning, packed-not-aligned)
++
+ ifeq ("$(origin W)", "command line")
+   export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
+ endif
+@@ -26,6 +28,7 @@ warning-1 += -Wold-style-definition
+ warning-1 += $(call cc-option, -Wmissing-include-dirs)
+ warning-1 += $(call cc-option, -Wunused-but-set-variable)
+ warning-1 += $(call cc-option, -Wunused-const-variable)
++warning-1 += $(call cc-option, -Wpacked-not-aligned)
+ warning-1 += $(call cc-disable-warning, missing-field-initializers)
+ warning-1 += $(call cc-disable-warning, sign-compare)
+ 
 -- 
-Best Regards
-Masahiro Yamada
+1.8.3.1
+
