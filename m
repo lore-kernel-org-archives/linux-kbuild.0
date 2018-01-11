@@ -1,58 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:21223 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754029AbeAKNj4 (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:30727 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932197AbeAKP3d (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Jan 2018 08:39:56 -0500
+        Thu, 11 Jan 2018 10:29:33 -0500
+MIME-Version: 1.0
+In-Reply-To: <1507484146-23617-1-git-send-email-ulfalizer@gmail.com>
+References: <1507484146-23617-1-git-send-email-ulfalizer@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 3/3] kconfig: make conf_unsaved a local variable of conf_read()
-Date: Thu, 11 Jan 2018 22:39:41 +0900
-Message-Id: <1515677981-21952-3-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1515677981-21952-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1515677981-21952-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Fri, 12 Jan 2018 00:28:46 +0900
+Message-ID: <CAK7LNAR2zQM46WscNG+4L2UO9yZ1mButRFtYF=RHu649b05EUA@mail.gmail.com>
+Subject: Re: [PATCH 0/3] kconfig: Fix expression memory leaks
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, zippel@linux-m68k.org, Nicolas Pitre <nicolas.pitre@linaro.org>, Michal Marek <michal.lkml@markovi.net>, dirk@gouders.net, Arnaud Lacombe <lacombar@gmail.com>, walch.martin@web.de, Jan Beulich <JBeulich@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-conf_unsaved is initialized by conf_read_simple(), but it is possible
-to move it to conf_read() so that it can be a local variable.
+2017-10-09 2:35 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> Hello,
+>
+> This patchset plugs all memory leaks that are due to expressions not being
+> freed, when parsing the x86 Kconfigs (and likely the other ARCHes too). 336 KB
+> are leaked in total.
+>
+> Together with the memory leaks plugged in the parser in
+> https://lkml.org/lkml/2017/10/8/126, this plugs all memory leaks when parsing
+> the x86 Kconfigs.
+>
+> As a reminder, the parsers can be rebuilt like this:
+>
+>         $ make REGENERATE_PARSERS=1 conf
+>
+> Here's an easy way to run Valgrind on menuconfig (nothing seems to look at
+> KERNELVERSION, so just set it to avoid a warning):
+>
+>         $ ARCH=x86 SRCARCH=x86 KERNELVERSION=4.14.0-rc2 valgrind --leak-check=full scripts/kconfig/mconf Kconfig
+>
+> Cheers,
+> Ulf
+>
+> Ulf Magnusson (3):
+>   kconfig: Fix automatic menu creation mem leak
+>   kconfig: Fix expr_free() E_NOT leak
+>   kconfig: Fix choice symbol expression leak
+>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Applied to linux-kbuild/kconfig.  Thanks!
 
- scripts/kconfig/confdata.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index bc83965..dfccaab 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -28,7 +28,7 @@ static void conf_message(const char *fmt, ...)
- 	__attribute__ ((format (printf, 1, 2)));
- 
- static const char *conf_filename;
--static int conf_lineno, conf_warnings, conf_unsaved;
-+static int conf_lineno, conf_warnings;
- 
- const char conf_defname[] = "arch/$ARCH/defconfig";
- 
-@@ -290,7 +290,6 @@ int conf_read_simple(const char *name, int def)
- 	conf_filename = name;
- 	conf_lineno = 0;
- 	conf_warnings = 0;
--	conf_unsaved = 0;
- 
- 	def_flags = SYMBOL_DEF << def;
- 	for_all_symbols(i, sym) {
-@@ -409,6 +408,7 @@ int conf_read_simple(const char *name, int def)
- int conf_read(const char *name)
- {
- 	struct symbol *sym;
-+	int conf_unsaved = 0;
- 	int i;
- 
- 	sym_set_change_count(0);
+
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
