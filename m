@@ -1,56 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f195.google.com ([209.85.217.195]:39988 "EHLO
-        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932740AbeALLXx (ORCPT
+Received: from mail-ua0-f196.google.com ([209.85.217.196]:35356 "EHLO
+        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933341AbeALM0h (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 12 Jan 2018 06:23:53 -0500
+        Fri, 12 Jan 2018 07:26:37 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAT2_Su7=ADrVUsZ0EgTsyh_3QT=nWZV9E5DyFHFDhegbQ@mail.gmail.com>
-References: <1507172808-12246-1-git-send-email-ulfalizer@gmail.com> <CAK7LNAT2_Su7=ADrVUsZ0EgTsyh_3QT=nWZV9E5DyFHFDhegbQ@mail.gmail.com>
+In-Reply-To: <1515567374-12722-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1515567374-12722-1-git-send-email-yamada.masahiro@socionext.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Fri, 12 Jan 2018 12:23:52 +0100
-Message-ID: <CAFkk2KSZgjuNxq1keqbJtHsWF_c=opkBmu+_NyVUAnsHcTrM3Q@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Sync zconf.y with zconf.tab.c_shipped
+Date: Fri, 12 Jan 2018 13:26:36 +0100
+Message-ID: <CAFkk2KQmj5hMhVytCU3pd5YJ2sPZxx7Y2HH8OLiiKL3Z_ZKiDg@mail.gmail.com>
+Subject: Re: [PATCH 1/6] kconfig: do not call check_conf() for olddefconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Marc Herbert <marc.herbert@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Dec 12, 2017 at 3:58 PM, Masahiro Yamada
+On Wed, Jan 10, 2018 at 7:56 AM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> 2017-10-05 12:06 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->> Looks like a change to a comment in zconf.y was never committed, because
->> the updated version only appears it zconf.tab.c_shipped. Update the
->> comment in zconf.y to match.
->>
->> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->> ---
->>  scripts/kconfig/zconf.y | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
->> index c8f396c..4b2cf41 100644
->> --- a/scripts/kconfig/zconf.y
->> +++ b/scripts/kconfig/zconf.y
->> @@ -101,7 +101,7 @@ static struct menu *current_menu, *current_entry;
->>  } if_entry menu_entry choice_entry
->>
->>  %{
->> -/* Include zconf_id.c here so it can see the token constants. */
->> +/* Include kconf_id.c here so it can see the token constants. */
->>  #include "kconf_id.c"
->>  %}
+> check_conf() traverses the menu tree, but it is completely no-op for
+> olddefconfig because the following if-else block does nothing.
 >
+>     if (input_mode == listnewconfig) {
+>             ...
+>     } else if (input_mode != olddefconfig) {
+>             ...
+>     }
 >
-> Applied to linux-kbuild/kconfig.
-> Thanks!
+> As the help message says, olddefconfig automatically sets new symbols
+> to their default value.  There is no room for manual intervention.
+> So, calling check_conf() for olddefconfig is odd in the first place.
+> Rather, olddefconfig belongs to the group of alldefconfig and defconfig.
 >
-> BTW, I do not know the historical reason
-> why zconf instead of kconf in the first place...
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
+>  scripts/kconfig/conf.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> index 866369f..52cbe5d 100644
+> --- a/scripts/kconfig/conf.c
+> +++ b/scripts/kconfig/conf.c
+> @@ -434,7 +434,7 @@ static void check_conf(struct menu *menu)
+>                                 if (sym->name && !sym_is_choice_value(sym)) {
+>                                         printf("%s%s\n", CONFIG_, sym->name);
+>                                 }
+> -                       } else if (input_mode != olddefconfig) {
+> +                       } else {
+>                                 if (!conf_cnt++)
+>                                         printf(_("*\n* Restart config...\n*\n"));
+>                                 rootEntry = menu_get_parent_menu(menu);
+> @@ -674,15 +674,15 @@ int main(int ac, char **av)
+>                 /* fall through */
+>         case oldconfig:
+>         case listnewconfig:
+> -       case olddefconfig:
+>         case silentoldconfig:
+>                 /* Update until a loop caused no more changes */
+>                 do {
+>                         conf_cnt = 0;
+>                         check_conf(&rootmenu);
+> -               } while (conf_cnt &&
+> -                        (input_mode != listnewconfig &&
+> -                         input_mode != olddefconfig));
+> +               } while (conf_cnt && input_mode != listnewconfig);
+> +               break;
+> +       case olddefconfig:
+> +       default:
+>                 break;
+>         }
+>
+> --
+> 2.7.4
+>
 
-I have no idea either. kconfig.{l,y} and kconfig_*() would be a lot
-less confusing.
+Acked-by: Ulf Magnusson <ulfalizer@gmail.com>
 
 Cheers,
 Ulf
