@@ -1,192 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:55781 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932169AbeALA7d (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:40278 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932489AbeALGsJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Jan 2018 19:59:33 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/2] kconfig: use default 'yy' prefix for lexer and parser
-Date: Fri, 12 Jan 2018 09:58:20 +0900
-Message-Id: <1515718701-4552-1-git-send-email-yamada.masahiro@socionext.com>
+        Fri, 12 Jan 2018 01:48:09 -0500
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: [PATCH] kconfig: Warn if there is more than one help text
+Date: Fri, 12 Jan 2018 07:47:47 +0100
+Message-Id: <20180112064747.22854-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, sam@ravnborg.org, linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
 
-Flex and Bison provide an option to change the prefix of globally-
-visible symbols.  This is useful to link multiple lexers and/or
-parsers into the same executable.  However, Kconfig (and any other
-host programs in kernel) uses a single lexer and parser.  I do not
-see a good reason to change the default 'yy' prefix.
+Avoids mistakes like in the following real-world example, where only the
+final help string ("Say Y...") was used. This particular example was
+fixed in commit 561b29e4ec8d ("media: fix media Kconfig help syntax
+issues").
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+  config DVB_NETUP_UNIDVB
+  	...
+	select DVB_CXD2841ER if MEDIA_SUBDRV_AUTOSELECT
+  	---help---
+  	  Support for NetUP PCI express Universal DVB card.
+       help
+  	Say Y when you want to support NetUP Dual Universal DVB card
+        ...
+
+This now prints the following warning:
+
+  drivers/media/pci/netup_unidvb:13: warning: 'DVB_NETUP_UNIDVB' defined with more than one help text -- only the last one will be used
+
+Also free() any extra help strings.
+
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
+ scripts/kconfig/zconf.y | 5 +++++
+ 1 file changed, 5 insertions(+)
 
- scripts/kconfig/Makefile |  3 ---
- scripts/kconfig/zconf.l  | 16 ++++++++--------
- scripts/kconfig/zconf.y  | 22 +++++++++++-----------
- 3 files changed, 19 insertions(+), 22 deletions(-)
-
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 61cdc5e..2ad1cf5 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -211,9 +211,6 @@ HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTCC)
- HOSTCFLAGS_zconf.lex.o	:= -I$(src)
- HOSTCFLAGS_zconf.tab.o	:= -I$(src)
- 
--LEX_PREFIX_zconf	:= zconf
--YACC_PREFIX_zconf	:= zconf
--
- HOSTLOADLIBES_qconf	= $(KC_QT_LIBS)
- HOSTCXXFLAGS_qconf.o	= $(KC_QT_CFLAGS)
- 
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index c410d25..07e074d 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -106,11 +106,11 @@ n	[A-Za-z0-9_-]
- 		current_pos.file = current_file;
- 		current_pos.lineno = current_file->lineno;
- 		if (id && id->flags & TF_COMMAND) {
--			zconflval.id = id;
-+			yylval.id = id;
- 			return id->token;
- 		}
- 		alloc_string(yytext, yyleng);
--		zconflval.string = text;
-+		yylval.string = text;
- 		return T_WORD;
- 	}
- 	.	warn_ignored_character(*yytext);
-@@ -142,11 +142,11 @@ n	[A-Za-z0-9_-]
- 	({n}|[/.])+	{
- 		const struct kconf_id *id = kconf_id_lookup(yytext, yyleng);
- 		if (id && id->flags & TF_PARAM) {
--			zconflval.id = id;
-+			yylval.id = id;
- 			return id->token;
- 		}
- 		alloc_string(yytext, yyleng);
--		zconflval.string = text;
-+		yylval.string = text;
- 		return T_WORD;
- 	}
- 	#.*	/* comment */
-@@ -161,7 +161,7 @@ n	[A-Za-z0-9_-]
- <STRING>{
- 	[^'"\\\n]+/\n	{
- 		append_string(yytext, yyleng);
--		zconflval.string = text;
-+		yylval.string = text;
- 		return T_WORD_QUOTE;
- 	}
- 	[^'"\\\n]+	{
-@@ -169,7 +169,7 @@ n	[A-Za-z0-9_-]
- 	}
- 	\\.?/\n	{
- 		append_string(yytext + 1, yyleng - 1);
--		zconflval.string = text;
-+		yylval.string = text;
- 		return T_WORD_QUOTE;
- 	}
- 	\\.?	{
-@@ -178,7 +178,7 @@ n	[A-Za-z0-9_-]
- 	\'|\"	{
- 		if (str == yytext[0]) {
- 			BEGIN(PARAM);
--			zconflval.string = text;
-+			yylval.string = text;
- 			return T_WORD_QUOTE;
- 		} else
- 			append_string(yytext, 1);
-@@ -261,7 +261,7 @@ void zconf_starthelp(void)
- 
- static void zconf_endhelp(void)
- {
--	zconflval.string = text;
-+	yylval.string = text;
- 	BEGIN(INITIAL);
- }
- 
 diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 600deb1..dd0c09d 100644
+index c1e4e82f56b5..06ef304ee325 100644
 --- a/scripts/kconfig/zconf.y
 +++ b/scripts/kconfig/zconf.y
-@@ -20,10 +20,10 @@
+@@ -435,6 +435,11 @@ help_start: T_HELP T_EOL
  
- int cdebug = PRINTD;
- 
--extern int zconflex(void);
-+int yylex(void);
-+static void yyerror(const char *err);
- static void zconfprint(const char *err, ...);
- static void zconf_error(const char *err, ...);
--static void zconferror(const char *err);
- static bool zconf_endtoken(const struct kconf_id *id, int starttoken, int endtoken);
- 
- struct symbol *symbol_hash[SYMBOL_HASHSIZE];
-@@ -529,9 +529,9 @@ void conf_parse(const char *name)
- 	_menu_init();
- 
- 	if (getenv("ZCONF_DEBUG"))
--		zconfdebug = 1;
--	zconfparse();
--	if (zconfnerrs)
-+		yydebug = 1;
-+	yyparse();
-+	if (yynerrs)
- 		exit(1);
- 	if (!modules_sym)
- 		modules_sym = sym_find( "n" );
-@@ -544,9 +544,9 @@ void conf_parse(const char *name)
- 	menu_finalize(&rootmenu);
- 	for_all_symbols(i, sym) {
- 		if (sym_check_deps(sym))
--			zconfnerrs++;
-+			yynerrs++;
- 	}
--	if (zconfnerrs)
-+	if (yynerrs)
- 		exit(1);
- 	sym_set_change_count(1);
- }
-@@ -571,7 +571,7 @@ static bool zconf_endtoken(const struct kconf_id *id, int starttoken, int endtok
- 	if (id->token != endtoken) {
- 		zconf_error("unexpected '%s' within %s block",
- 			id->name, zconf_tokenname(starttoken));
--		zconfnerrs++;
-+		yynerrs++;
- 		return false;
- 	}
- 	if (current_menu->file != current_file) {
-@@ -580,7 +580,7 @@ static bool zconf_endtoken(const struct kconf_id *id, int starttoken, int endtok
- 		fprintf(stderr, "%s:%d: location of the '%s'\n",
- 			current_menu->file->name, current_menu->lineno,
- 			zconf_tokenname(starttoken));
--		zconfnerrs++;
-+		yynerrs++;
- 		return false;
- 	}
- 	return true;
-@@ -601,7 +601,7 @@ static void zconf_error(const char *err, ...)
+ help: help_start T_HELPTEXT
  {
- 	va_list ap;
++	if (current_entry->help) {
++		free(current_entry->help);
++		zconfprint("warning: '%s' defined with more than one help text -- only the last one will be used",
++			   current_entry->sym->name ?: "<choice>");
++	}
+ 	current_entry->help = $2;
+ };
  
--	zconfnerrs++;
-+	yynerrs++;
- 	fprintf(stderr, "%s:%d: ", zconf_curname(), zconf_lineno());
- 	va_start(ap, err);
- 	vfprintf(stderr, err, ap);
-@@ -609,7 +609,7 @@ static void zconf_error(const char *err, ...)
- 	fprintf(stderr, "\n");
- }
- 
--static void zconferror(const char *err)
-+static void yyerror(const char *err)
- {
- 	fprintf(stderr, "%s:%d: %s\n", zconf_curname(), zconf_lineno() + 1, err);
- }
 -- 
-2.7.4
+2.14.1
 
