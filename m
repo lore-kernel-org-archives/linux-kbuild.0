@@ -1,66 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:33332 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932740AbeALLFQ (ORCPT
+Received: from mail-ua0-f195.google.com ([209.85.217.195]:39988 "EHLO
+        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932740AbeALLXx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 12 Jan 2018 06:05:16 -0500
+        Fri, 12 Jan 2018 06:23:53 -0500
 MIME-Version: 1.0
-In-Reply-To: <1515718701-4552-2-git-send-email-yamada.masahiro@socionext.com>
-References: <1515718701-4552-1-git-send-email-yamada.masahiro@socionext.com> <1515718701-4552-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <CAK7LNAT2_Su7=ADrVUsZ0EgTsyh_3QT=nWZV9E5DyFHFDhegbQ@mail.gmail.com>
+References: <1507172808-12246-1-git-send-email-ulfalizer@gmail.com> <CAK7LNAT2_Su7=ADrVUsZ0EgTsyh_3QT=nWZV9E5DyFHFDhegbQ@mail.gmail.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Fri, 12 Jan 2018 12:05:15 +0100
-Message-ID: <CAFkk2KS8GqCmXNxvSbTULQNuZK-PTN4fX=vyCY4TBgTMOOXaVw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: remove unnecessary LEX_PREFIX and YACC_PREFIX
+Date: Fri, 12 Jan 2018 12:23:52 +0100
+Message-ID: <CAFkk2KSZgjuNxq1keqbJtHsWF_c=opkBmu+_NyVUAnsHcTrM3Q@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Sync zconf.y with zconf.tab.c_shipped
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Jan 12, 2018 at 1:58 AM, Masahiro Yamada
+On Tue, Dec 12, 2017 at 3:58 PM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> Kconfig was the only user of these.  With Kconfig converted to use
-> the default 'yy' prefix, we do not need them any more.
+> 2017-10-05 12:06 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+>> Looks like a change to a comment in zconf.y was never committed, because
+>> the updated version only appears it zconf.tab.c_shipped. Update the
+>> comment in zconf.y to match.
+>>
+>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>> ---
+>>  scripts/kconfig/zconf.y | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+>> index c8f396c..4b2cf41 100644
+>> --- a/scripts/kconfig/zconf.y
+>> +++ b/scripts/kconfig/zconf.y
+>> @@ -101,7 +101,7 @@ static struct menu *current_menu, *current_entry;
+>>  } if_entry menu_entry choice_entry
+>>
+>>  %{
+>> -/* Include zconf_id.c here so it can see the token constants. */
+>> +/* Include kconf_id.c here so it can see the token constants. */
+>>  #include "kconf_id.c"
+>>  %}
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
 >
->  scripts/Makefile.lib | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
+> Applied to linux-kbuild/kconfig.
+> Thanks!
 >
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 0f9ef3f..5ff2761 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -188,10 +188,8 @@ endef
->
->  # LEX
->  # ---------------------------------------------------------------------------
-> -LEX_PREFIX = $(if $(LEX_PREFIX_${baseprereq}),$(LEX_PREFIX_${baseprereq}),yy)
-> -
->  quiet_cmd_flex = LEX     $@
-> -      cmd_flex = $(LEX) -o$@ -L -P $(LEX_PREFIX) $<
-> +      cmd_flex = $(LEX) -o$@ -L $<
->
->  ifdef REGENERATE_PARSERS
->  .PRECIOUS: $(src)/%.lex.c_shipped
-> @@ -205,10 +203,8 @@ $(filter %.lex.c,$(targets)): $(obj)/%.lex.c: $(src)/%.l FORCE
->
->  # YACC
->  # ---------------------------------------------------------------------------
-> -YACC_PREFIX = $(if $(YACC_PREFIX_${baseprereq}),$(YACC_PREFIX_${baseprereq}),yy)
-> -
->  quiet_cmd_bison = YACC    $@
-> -      cmd_bison = $(YACC) -o$@ -t -l -p $(YACC_PREFIX) $<
-> +      cmd_bison = $(YACC) -o$@ -t -l $<
->
->  ifdef REGENERATE_PARSERS
->  .PRECIOUS: $(src)/%.tab.c_shipped
-> --
-> 2.7.4
->
+> BTW, I do not know the historical reason
+> why zconf instead of kconf in the first place...
 
-Acked-by: Ulf Magnusson <ulfalizer@gmail.com>
+I have no idea either. kconfig.{l,y} and kconfig_*() would be a lot
+less confusing.
 
 Cheers,
 Ulf
