@@ -1,88 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:42722 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964953AbeALQtm (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:34157 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965081AbeALTjC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 12 Jan 2018 11:49:42 -0500
+        Fri, 12 Jan 2018 14:39:02 -0500
+Date: Fri, 12 Jan 2018 20:38:57 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kconfig: Sync zconf.y with zconf.tab.c_shipped
+Message-ID: <20180112193857.GA426@ravnborg.org>
+References: <1507172808-12246-1-git-send-email-ulfalizer@gmail.com>
+ <CAK7LNAT2_Su7=ADrVUsZ0EgTsyh_3QT=nWZV9E5DyFHFDhegbQ@mail.gmail.com>
+ <CAFkk2KSZgjuNxq1keqbJtHsWF_c=opkBmu+_NyVUAnsHcTrM3Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KQmj5hMhVytCU3pd5YJ2sPZxx7Y2HH8OLiiKL3Z_ZKiDg@mail.gmail.com>
-References: <1515567374-12722-1-git-send-email-yamada.masahiro@socionext.com> <CAFkk2KQmj5hMhVytCU3pd5YJ2sPZxx7Y2HH8OLiiKL3Z_ZKiDg@mail.gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Fri, 12 Jan 2018 17:49:40 +0100
-Message-ID: <CAFkk2KQ63jJVWLYTJpKfXJLfHrbp6k=5ToSHfqE1M+nxDNG4Sw@mail.gmail.com>
-Subject: Re: [PATCH 1/6] kconfig: do not call check_conf() for olddefconfig
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFkk2KSZgjuNxq1keqbJtHsWF_c=opkBmu+_NyVUAnsHcTrM3Q@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Marc Herbert <marc.herbert@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Jan 12, 2018 at 1:26 PM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> On Wed, Jan 10, 2018 at 7:56 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> check_conf() traverses the menu tree, but it is completely no-op for
->> olddefconfig because the following if-else block does nothing.
->>
->>     if (input_mode == listnewconfig) {
->>             ...
->>     } else if (input_mode != olddefconfig) {
->>             ...
->>     }
->>
->> As the help message says, olddefconfig automatically sets new symbols
->> to their default value.  There is no room for manual intervention.
->> So, calling check_conf() for olddefconfig is odd in the first place.
->> Rather, olddefconfig belongs to the group of alldefconfig and defconfig.
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->>
->>  scripts/kconfig/conf.c | 10 +++++-----
->>  1 file changed, 5 insertions(+), 5 deletions(-)
->>
->> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
->> index 866369f..52cbe5d 100644
->> --- a/scripts/kconfig/conf.c
->> +++ b/scripts/kconfig/conf.c
->> @@ -434,7 +434,7 @@ static void check_conf(struct menu *menu)
->>                                 if (sym->name && !sym_is_choice_value(sym)) {
->>                                         printf("%s%s\n", CONFIG_, sym->name);
->>                                 }
->> -                       } else if (input_mode != olddefconfig) {
->> +                       } else {
->>                                 if (!conf_cnt++)
->>                                         printf(_("*\n* Restart config...\n*\n"));
->>                                 rootEntry = menu_get_parent_menu(menu);
->> @@ -674,15 +674,15 @@ int main(int ac, char **av)
->>                 /* fall through */
->>         case oldconfig:
->>         case listnewconfig:
->> -       case olddefconfig:
->>         case silentoldconfig:
->>                 /* Update until a loop caused no more changes */
->>                 do {
->>                         conf_cnt = 0;
->>                         check_conf(&rootmenu);
->> -               } while (conf_cnt &&
->> -                        (input_mode != listnewconfig &&
->> -                         input_mode != olddefconfig));
->> +               } while (conf_cnt && input_mode != listnewconfig);
->> +               break;
->> +       case olddefconfig:
->> +       default:
->>                 break;
->>         }
->>
->> --
->> 2.7.4
->>
->
-> Acked-by: Ulf Magnusson <ulfalizer@gmail.com>
->
-> Cheers,
-> Ulf
+Hi Ulf, Masahiro
 
-Should have been Reviewed-by, obviously. Sorry about that. :)
+> >
+> > BTW, I do not know the historical reason
+> > why zconf instead of kconf in the first place...
+> 
+> I have no idea either. kconfig.{l,y} and kconfig_*() would be a lot
+> less confusing.
 
-Cheers,
-Ulf
+zconf was the name originally invented by Roman Zippel.
+kconfig had the name "lc" in the original submission,
+but was later renamed to kconfig.
+And if memory serves me correct the original codebase used zconf.
+
+The use of Kconfig for the files was first introduced here:
+https://sourceforge.net/p/kbuild/mailman/message/8519479/
+This was before lc aka kconfig was included in the kernel.
+
+This was all in a period after the huge CML2 flamewars
+which some oldies may remember.
+
+Surfing dwom memory lane was fun - lot of mails.
+
+This was also back when Keith Ownes attempt for a new generation
+kbuild was rejected and Kai Germaschewski migrated the
+old build system to something that was good and reliable.
+
+Fun times indeed :-)
+For some of the involved this was not fun at all - investing a lot
+of time and then see it rejected is never fun.
+
+	Sam
