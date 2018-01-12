@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f67.google.com ([209.85.213.67]:39491 "EHLO
-        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964812AbeALO2m (ORCPT
+Received: from mail-ua0-f194.google.com ([209.85.217.194]:36925 "EHLO
+        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933757AbeALOiY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 12 Jan 2018 09:28:42 -0500
+        Fri, 12 Jan 2018 09:38:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <1515567374-12722-3-git-send-email-yamada.masahiro@socionext.com>
-References: <1515567374-12722-1-git-send-email-yamada.masahiro@socionext.com> <1515567374-12722-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1515567374-12722-4-git-send-email-yamada.masahiro@socionext.com>
+References: <1515567374-12722-1-git-send-email-yamada.masahiro@socionext.com> <1515567374-12722-4-git-send-email-yamada.masahiro@socionext.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Fri, 12 Jan 2018 15:28:41 +0100
-Message-ID: <CAFkk2KQbnrdmFq=WxeUD2MeevX9zan4az9xthLeoqGJLe5MZhA@mail.gmail.com>
-Subject: Re: [PATCH 3/6] kconfig: do not call conf_set_all_new_symbols() for (all)defconfig
+Date: Fri, 12 Jan 2018 15:38:22 +0100
+Message-ID: <CAFkk2KTnmx0c-R8M9YEHvpCF4GDDgVc=5i1iwB8VXsz5T6nLrw@mail.gmail.com>
+Subject: Re: [PATCH 4/6] kconfig: remove unneeded input_mode test in conf()
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -19,71 +19,36 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@
 
 On Wed, Jan 10, 2018 at 7:56 AM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> (all)defconfig does not need to call conf_set_all_new_symbols() because
-> conf_write() calculates all symbols based on their default unless they
-> have been user-defined.
->
-> conf_set_all_new_symbols(def_default) is no-op except for "choice".
-> It calls sym_cal_value() for "choice", but the SYMBOL_VALID is cleared
-> by set_all_choice_values() later on.  So, conf_write() will re-calculate
-> it, which is just a wasteful computation.  The only difference I see
-> is SYMBOL_DEF_USER flag for "choice", but it gives no difference to the
-> resulted .config file.
->
-> I confirmed this change still produced the same .config for all ARCH.
->
-> I also moved savedefconfig to collect the no-op cases at the end of
-> the switch statement.
+> conf() is never called for listnewconfig / olddefconfig.
 >
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
 >
->  scripts/kconfig/conf.c | 11 +++--------
->  1 file changed, 3 insertions(+), 8 deletions(-)
+>  scripts/kconfig/conf.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 >
 > diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-> index 52cbe5d..8364811 100644
+> index 8364811..693cd5f 100644
 > --- a/scripts/kconfig/conf.c
 > +++ b/scripts/kconfig/conf.c
-> @@ -655,18 +655,10 @@ int main(int ac, char **av)
->         case allmodconfig:
->                 conf_set_all_new_symbols(def_mod);
->                 break;
-> -       case alldefconfig:
-> -               conf_set_all_new_symbols(def_default);
-> -               break;
->         case randconfig:
->                 /* Really nothing to do in this loop */
->                 while (conf_set_all_new_symbols(def_random)) ;
->                 break;
-> -       case defconfig:
-> -               conf_set_all_new_symbols(def_default);
-> -               break;
-> -       case savedefconfig:
-> -               break;
->         case oldaskconfig:
->                 rootEntry = &rootmenu;
->                 conf(&rootmenu);
-> @@ -681,7 +673,10 @@ int main(int ac, char **av)
->                         check_conf(&rootmenu);
->                 } while (conf_cnt && input_mode != listnewconfig);
->                 break;
-> +       case alldefconfig:
-> +       case defconfig:
->         case olddefconfig:
-> +       case savedefconfig:
->         default:
->                 break;
->         }
+> @@ -368,9 +368,7 @@ static void conf(struct menu *menu)
+>
+>                 switch (prop->type) {
+>                 case P_MENU:
+> -                       if ((input_mode == silentoldconfig ||
+> -                            input_mode == listnewconfig ||
+> -                            input_mode == olddefconfig) &&
+> +                       if (input_mode == silentoldconfig &&
+>                             rootEntry != menu) {
+>                                 check_conf(menu);
+>                                 return;
 > --
 > 2.7.4
 >
 
-Another side effect of conf_set_all_new_symbols(def_default) is that
-SYMBOL_NEED_SET_CHOICE_VALUES is set on all choice values. Might want
-to check fbe98bb9ed3d ("kconfig: Fix defconfig when one choice menu
-selects options that another choice menu depends on") to make sure
-nothing breaks related to that.
+LGTM
+
+Acked-by: Ulf Magnusson <ulfalizer@gmail.com>
 
 Cheers,
 Ulf
