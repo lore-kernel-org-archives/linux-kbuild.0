@@ -1,68 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f196.google.com ([209.85.217.196]:41426 "EHLO
-        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965425AbeAMJcM (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:18638 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754891AbeAMNG0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 13 Jan 2018 04:32:12 -0500
+        Sat, 13 Jan 2018 08:06:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180112193857.GA426@ravnborg.org>
-References: <1507172808-12246-1-git-send-email-ulfalizer@gmail.com>
- <CAK7LNAT2_Su7=ADrVUsZ0EgTsyh_3QT=nWZV9E5DyFHFDhegbQ@mail.gmail.com>
- <CAFkk2KSZgjuNxq1keqbJtHsWF_c=opkBmu+_NyVUAnsHcTrM3Q@mail.gmail.com> <20180112193857.GA426@ravnborg.org>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Sat, 13 Jan 2018 10:32:11 +0100
-Message-ID: <CAFkk2KR=N+9rGbVjMwksi7fYeE1KzzDZQz9zA34PbDXVAkwwtw@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Sync zconf.y with zconf.tab.c_shipped
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 13 Jan 2018 22:05:39 +0900
+Message-ID: <CAK7LNAQN2sCLNVqOo2_6Aei226+rmm7qGmb9q7gGteRN8rsiqQ@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v4.15-rc8
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
 
-On Fri, Jan 12, 2018 at 8:38 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> Hi Ulf, Masahiro
->
->> >
->> > BTW, I do not know the historical reason
->> > why zconf instead of kconf in the first place...
->>
->> I have no idea either. kconfig.{l,y} and kconfig_*() would be a lot
->> less confusing.
->
-> zconf was the name originally invented by Roman Zippel.
-> kconfig had the name "lc" in the original submission,
-> but was later renamed to kconfig.
-> And if memory serves me correct the original codebase used zconf.
->
-> The use of Kconfig for the files was first introduced here:
-> https://sourceforge.net/p/kbuild/mailman/message/8519479/
-> This was before lc aka kconfig was included in the kernel.
->
-> This was all in a period after the huge CML2 flamewars
-> which some oldies may remember.
->
-> Surfing dwom memory lane was fun - lot of mails.
->
-> This was also back when Keith Ownes attempt for a new generation
-> kbuild was rejected and Kai Germaschewski migrated the
-> old build system to something that was good and reliable.
->
-> Fun times indeed :-)
-> For some of the involved this was not fun at all - investing a lot
-> of time and then see it rejected is never fun.
->
->         Sam
+Hi Linus,
 
-Thanks for the history lesson.
+Here are some Kbuild fixes for v4.15.
+Please pull!
 
-Had heard of the CML2 drama. Bit of a second-system effect going on
-there I think.
 
-Python all the way back in 2002 was unexpected. Can see why people
-might have been opposed to that.
+The following changes since commit ae64f9bd1d3621b5e60d7363bc20afb46aede215:
 
-History aside, I'm all for renaming some things if anyone steps up.
-Explicit naming goes a long way for me.
+  Linux 4.15-rc2 (2017-12-03 11:01:47 -0500)
 
-Cheers,
-Ulf
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v4.15
+
+for you to fetch changes up to 36c1681678b507346e7397a235a7303dad665fc3:
+
+  genksyms: drop *.hash.c from .gitignore (2018-01-13 21:50:13 +0900)
+
+----------------------------------------------------------------
+Kbuild fixes for v4.15
+
+- fix cross-compilation for architectures that setup CROSS_COMPILE
+  in their arch Makefile
+
+- fix Kconfig rational operators for bool / tristate
+
+- drop a gperf-generated file from .gitignore
+
+----------------------------------------------------------------
+Masahiro Yamada (2):
+      kbuild: move cc-option and cc-disable-warning after incl. arch Makefile
+      genksyms: drop *.hash.c from .gitignore
+
+Nicolas Pitre (1):
+      kconfig: fix relational operators for bool and tristate symbols
+
+ Documentation/kbuild/kconfig-language.txt | 23 ++++++++++------
+ Makefile                                  | 43 ++++++++++++++++--------------
+ scripts/genksyms/.gitignore               |  1 -
+ scripts/kconfig/expr.c                    |  5 +++-
+ 4 files changed, 42 insertions(+), 30 deletions(-)
+
+
+-- 
+Best Regards
+Masahiro Yamada
