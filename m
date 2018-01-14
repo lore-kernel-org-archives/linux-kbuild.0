@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:34998 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751060AbeANLhj (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:38689 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751085AbeANLin (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 14 Jan 2018 06:37:39 -0500
+        Sun, 14 Jan 2018 06:38:43 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
 Subject: [PATCH 1/2] kconfig: Document 'if' flattening logic
-Date: Sun, 14 Jan 2018 12:33:44 +0100
-Message-Id: <20180114113345.18623-2-ulfalizer@gmail.com>
+Date: Sun, 14 Jan 2018 12:38:19 +0100
+Message-Id: <20180114113820.19017-1-ulfalizer@gmail.com>
 In-Reply-To: <20180114113345.18623-1-ulfalizer@gmail.com>
 References: <20180114113345.18623-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
