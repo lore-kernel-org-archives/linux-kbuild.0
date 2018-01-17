@@ -1,45 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46018 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750861AbeAPUo7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Jan 2018 15:44:59 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 98787369B7
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jan 2018 20:44:59 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-120-72.rdu2.redhat.com [10.10.120.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 246575C1AB
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jan 2018 20:44:58 +0000 (UTC)
-From: Yaakov Selkowitz <yselkowi@redhat.com>
-Subject: [PATCH] kconfig: fix make xconfig when gettext is missing
-Date: Tue, 16 Jan 2018 14:44:45 -0600
-Message-Id: <20180116204445.21096-1-yselkowi@redhat.com>
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:64820 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753741AbeAQQMw (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 17 Jan 2018 11:12:52 -0500
+MIME-Version: 1.0
+In-Reply-To: <1515662549-58933-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1515662549-58933-1-git-send-email-wangxiongfeng2@huawei.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 18 Jan 2018 01:12:02 +0900
+Message-ID: <CAK7LNAQNHtvQMaOxR2BMn21RtfE9pKc+g5MnGaRO=q8RK1tuWg@mail.gmail.com>
+Subject: Re: [PATCH] Kbuild: suppress packed-not-aligned warning for default
+ setting only
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>
 
-The C-based config programs are properly guarded from a missing (or,
-currently, external) libintl.h by the HOST_EXTRACFLAGS check, but
-this does not help the C++-based qconf.
+2018-01-11 18:22 GMT+09:00 Xiongfeng Wang <wangxiongfeng2@huawei.com>:
+> From: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+>
+> gcc-8 reports many -Wpacked-not-aligned warnings. The below are some
+> examples.
+>
+> ./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
+> ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
+>  } __attribute__ ((packed));
+>
+> ./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
+> ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
+>  } __attribute__ ((packed));
+>
+> ./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
+> ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
+>  } __attribute__ ((packed));
+>
+> This patch suppress this kind of warnings for default setting.
+>
+> Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+> ---
+>  scripts/Makefile.extrawarn | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+> index c6ebf42..8d53570 100644
+> --- a/scripts/Makefile.extrawarn
+> +++ b/scripts/Makefile.extrawarn
+> @@ -11,6 +11,8 @@
+>  # are not supported by all versions of the compiler
+>  # ==========================================================================
+>
+> +KBUILD_CFLAGS += $(call cc-disable-warning, packed-not-aligned)
+> +
 
-Signed-off-by: Yaakov Selkowitz <yselkowi@redhat.com>
----
- scripts/kconfig/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+I moved this to else case of  KBUILD_ENABLE_EXTRA_GCC_CHECKS
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 297c1bf35140..f4c2a22d993b 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -205,6 +205,7 @@ always := dochecklxdialog
- 
- # Add environment specific flags
- HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTCC) $(HOSTCFLAGS))
-+HOST_EXTRACXXFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTCXX) $(HOSTCXXFLAGS))
- 
- # generated files seem to need this to find local include files
- HOSTCFLAGS_zconf.lex.o	:= -I$(src)
+Please let me know if you see a problem.
+
+
+
+
 -- 
-2.15.1
-
+Best Regards
+Masahiro Yamada
