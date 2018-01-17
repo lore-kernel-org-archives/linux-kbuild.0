@@ -1,69 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot0-f195.google.com ([74.125.82.195]:43244 "EHLO
-        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753225AbeAQTkk (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:46981 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752250AbeAQVhR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jan 2018 14:40:40 -0500
+        Wed, 17 Jan 2018 16:37:17 -0500
+Subject: Re: [PATCH v4 1/1] kconfig: menuconfig make "Selected by:" and
+ "Depends on:" readable
+References: <20180115230930.8723-1-petr.vorel@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <c4d969b6-201f-7321-d108-9bae82e7fc22@infradead.org>
+Date: Wed, 17 Jan 2018 13:37:11 -0800
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQNHtvQMaOxR2BMn21RtfE9pKc+g5MnGaRO=q8RK1tuWg@mail.gmail.com>
-References: <1515662549-58933-1-git-send-email-wangxiongfeng2@huawei.com> <CAK7LNAQNHtvQMaOxR2BMn21RtfE9pKc+g5MnGaRO=q8RK1tuWg@mail.gmail.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 17 Jan 2018 20:40:37 +0100
-Message-ID: <CAK8P3a3YNGqHXxWNHVnKbPuUeWMBMNTRApDc0YLqrOymTQQtCA@mail.gmail.com>
-Subject: Re: [PATCH] Kbuild: suppress packed-not-aligned warning for default
- setting only
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20180115230930.8723-1-petr.vorel@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Xiongfeng Wang <wangxiongfeng2@huawei.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Petr Vorel <petr.vorel@gmail.com>, linux-kbuild@vger.kernel.org
+Cc: Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-On Wed, Jan 17, 2018 at 5:12 PM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2018-01-11 18:22 GMT+09:00 Xiongfeng Wang <wangxiongfeng2@huawei.com>:
->> From: Xiongfeng Wang <xiongfeng.wang@linaro.org>
->>
->> gcc-8 reports many -Wpacked-not-aligned warnings. The below are some
->> examples.
->>
->> ./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
->> ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
->>  } __attribute__ ((packed));
->>
->> ./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
->> ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
->>  } __attribute__ ((packed));
->>
->> ./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
->> ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
->>  } __attribute__ ((packed));
->>
->> This patch suppress this kind of warnings for default setting.
->>
->> Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
->> ---
->>  scripts/Makefile.extrawarn | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
->> index c6ebf42..8d53570 100644
->> --- a/scripts/Makefile.extrawarn
->> +++ b/scripts/Makefile.extrawarn
->> @@ -11,6 +11,8 @@
->>  # are not supported by all versions of the compiler
->>  # ==========================================================================
->>
->> +KBUILD_CFLAGS += $(call cc-disable-warning, packed-not-aligned)
->> +
->
-> I moved this to else case of  KBUILD_ENABLE_EXTRA_GCC_CHECKS
->
-> Please let me know if you see a problem.
+On 01/15/18 15:09, Petr Vorel wrote:
+> rev_dep expressions can get rather unwieldy, especially if a symbol is
+> selected by more than a handful of other symbols. I.e. it's possible to
+> have near endless expressions like:
+>    A && B && !C || D || F && (G || H) || [...]
+> 
+> Chop these expressions into actually readable chunks:
+>    - A && B && !C
+>    - D
+>    - F && (G || H)
+>    - [...]
+> 
+> I.e. transform the top level OR tokens into newlines and prepend each
+> line with a minus. This makes the "Selected by:" blurb much easier to
+> read. For consistency the same is done for "Depends on:" although the
+> problem isn't that bad for it. This is done only if there is more than
+> one top level OR.
+> 
+> This also prevents trimming too long lines.
+> 
+> Based on idea from Paul Bolle.
+> 
+> Reported-by: Paul Bolle <pebolle@tiscali.nl>
+> Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
+> ---
+> Tested on search USB and General setup -> Kernel compression mode (Gzip) -> Help.
+> 
+> Changes v3->v4:
+> * Add split also for "Depends on:". This is done for consistency (reported
+>   by Masahiro Yamada). I didn't consider other symbols which call expr_gstr_print()
+>   as reasonable candidates (i.e. "Implies:" and "Range : ").
+> * Add new line and hyphen only when there are more top level OR than one.
+> ---
+>  scripts/kconfig/expr.c | 16 +++++++++++++---
+>  scripts/kconfig/menu.c |  4 ++++
+>  2 files changed, 17 insertions(+), 3 deletions(-)
+> 
 
-It means we get the warning for any argument to W=, not just W=1, but
-that's probably fine. I'd like to one day clean up the clang warnings
-and those that we disable unconditionally in the top-level Makefile
-so that each warning gets enabled at a specific level. For the time
-being, I'm happy with the packed-not-aligned disabled by default.
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
 
-       Arnd
+Thanks.
+
+
+-- 
+~Randy
