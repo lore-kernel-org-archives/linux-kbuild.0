@@ -1,74 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:51376 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752840AbeARBmD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jan 2018 20:42:03 -0500
-From: Marc Herbert <marc.herbert@intel.com>
-Subject: [PATCH v2] Remove silentoldconfig from "make help"; fix kconfig/conf's help
-Date: Wed, 17 Jan 2018 17:41:37 -0800
-Message-Id: <20180118014137.28313-1-marc.herbert@intel.com>
-In-Reply-To: <20171219012656.23728-1-marc.herbert@intel.com>
-References: <20171219012656.23728-1-marc.herbert@intel.com>
+Received: from conuserg-09.nifty.com ([210.131.2.76]:57098 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752689AbeARDdH (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 17 Jan 2018 22:33:07 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: fix W= option checks for extra DTC warnings
+Date: Thu, 18 Jan 2018 12:31:46 +0900
+Message-Id: <1516246306-12851-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Michal Marek <michal.lkml@markovi.net>, Wayne Boyer <wayne.boyer@intel.com>, Marc Herbert <marc.herbert@intel.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, Arnd Bergmann <arnd@arndb.de>, devicetree@vger.kernel.org, Rob Herring <robh@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-As explained by Michal Marek at https://lkml.org/lkml/2011/8/31/189
-silentoldconfig has become a misnomer. It has become an internal interface
-so remove it from "make help" to stop confusing people trying to use it as
-seen for instance at https://chromium-review.googlesource.com/835632
+Kbuild supports 3 levels of extra warnings, and multiple levels can
+be combined, like W=12, W=123.  It was added by commit a6de553da01c
+("kbuild: Allow to combine multiple W= levels").
 
-On the other hand, correct and expand its description in the help of
-scripts/kconfig/conf.c
+From the log of commit 8654cb8d0371 ("dtc: update warning settings
+for new bus and node/property name checks"), I assume:
 
-Signed-off-by: Marc Herbert <marc.herbert@intel.com>
+ - unit_address_vs_reg, simple_bus_reg, etc. belong to level 1
+ - node_name_chars_strict, property_name_chars_strict belong to level 2
+
+However, the level 1 warnings are displayed by any argument to W=.
+On the other hand, the level 2 warnings are displayed by W=2, but
+not by W=12, or W=123.
+
+Use $(findstring ...) like scripts/Makefile.extrawarn.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
-v2: rewordings (Masahiro)
 
- scripts/kconfig/Makefile | 5 ++---
- scripts/kconfig/conf.c   | 5 +++--
- 2 files changed, 5 insertions(+), 5 deletions(-)
+Side Notes for possible additional works:
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 297c1bf35140..ac4bda790922 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -142,7 +142,6 @@ help:
- 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
- 	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
- 	@echo  '  localyesconfig  - Update current config converting local mods to core'
--	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
- 	@echo  '  defconfig	  - New config with default from ARCH supplied defconfig'
- 	@echo  '  savedefconfig   - Save current config as ./defconfig (minimal config)'
- 	@echo  '  allnoconfig	  - New config where all options are answered with no'
-@@ -151,8 +150,8 @@ help:
- 	@echo  '  alldefconfig    - New config with all symbols set to default'
- 	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  listnewconfig   - List new options'
--	@echo  '  olddefconfig	  - Same as silentoldconfig but sets new symbols to their'
--	@echo  '                    default value'
-+	@echo  '  olddefconfig	  - Same as oldconfig but sets new symbols to their'
-+	@echo  '                    default value without prompting'
- 	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
- 	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
- 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 866369f10ff8..303fbe2ffa04 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -477,8 +477,9 @@ static void conf_usage(const char *progname)
- 	printf("  --listnewconfig         List new options\n");
- 	printf("  --oldaskconfig          Start a new configuration using a line-oriented program\n");
- 	printf("  --oldconfig             Update a configuration using a provided .config as base\n");
--	printf("  --silentoldconfig       Same as oldconfig, but quietly, additionally update deps\n");
--	printf("  --olddefconfig          Same as silentoldconfig but sets new symbols to their default value\n");
-+	printf("  --silentoldconfig       Similar to oldconfig but generates configuration in\n"
-+	       "                          include/{generated/,config/} (oldconfig used to be more verbose)\n");
-+	printf("  --olddefconfig          Same as oldconfig but sets new symbols to their default value\n");
- 	printf("  --oldnoconfig           An alias of olddefconfig\n");
- 	printf("  --defconfig <file>      New config with default defined in <file>\n");
- 	printf("  --savedefconfig <file>  Save the minimal current configuration to <file>\n");
+ [1] I implemented DTC extra warnings differently in U-Boot:
+
+    https://github.com/u-boot/u-boot/blob/v2018.01/scripts/Makefile.extrawarn#L64
+
+    Better to collect extra warning stuff into scripts/Makefile.extrawarn ?
+
+ [2] KBUILD_ENABLE_EXTRA_GCC_CHECKS is getting a historical misnomer
+     because we use it for Clang and DTC too.
+
+     Better to rename?  (keeping backward-compatibility for a while)?
+
+
+ scripts/Makefile.lib | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 1ca4dcd..7dee1da 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -264,7 +264,7 @@ cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -n -f -9 > $@) || \
+ DTC ?= $(objtree)/scripts/dtc/dtc
+ 
+ # Disable noisy checks by default
+-ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),)
++ifeq ($(findstring 1,$(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
+ DTC_FLAGS += -Wno-unit_address_vs_reg \
+ 	-Wno-simple_bus_reg \
+ 	-Wno-unit_address_format \
+@@ -273,7 +273,7 @@ DTC_FLAGS += -Wno-unit_address_vs_reg \
+ 	-Wno-pci_device_reg
+ endif
+ 
+-ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),2)
++ifneq ($(findstring 2,$(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
+ DTC_FLAGS += -Wnode_name_chars_strict \
+ 	-Wproperty_name_chars_strict
+ endif
 -- 
-2.13.6
+2.7.4
 
