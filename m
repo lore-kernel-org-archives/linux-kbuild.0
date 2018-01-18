@@ -1,58 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:56880 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755690AbeARNvE (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:38945 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756245AbeARNzz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Jan 2018 08:51:04 -0500
+        Thu, 18 Jan 2018 08:55:55 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180114095620.12088-1-ulfalizer@gmail.com>
-References: <20180114095620.12088-1-ulfalizer@gmail.com>
+In-Reply-To: <20180114113820.19017-2-ulfalizer@gmail.com>
+References: <20180114113345.18623-1-ulfalizer@gmail.com> <20180114113820.19017-1-ulfalizer@gmail.com>
+ <20180114113820.19017-2-ulfalizer@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 18 Jan 2018 22:50:11 +0900
-Message-ID: <CAK7LNATyu22dUa1Y2Yif4e7wyngTZ8D0HGtHH6wzx59f2OL5NA@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Document SYMBOL_OPTIONAL logic
+Date: Thu, 18 Jan 2018 22:54:58 +0900
+Message-ID: <CAK7LNATr0RyqfHz6tRLnbiLGcGMXzvTZBFvqmUX6J12KcV4KGA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kconfig: Improve auto. menu documentation accuracy
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Ulf Magnusson <ulfalizer@gmail.com>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-01-14 18:56 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> Not obvious, especially if you don't already know how choices are
-> implemented.
+2018-01-14 20:38 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> An 'if', 'menu', or 'choice' that depends on a preceding symbol will
+> also generate a submenu.
 >
-> No functional changes. Only comments added.
+> No functional changes. Only comments updated.
 >
 > Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 > ---
->  scripts/kconfig/menu.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  scripts/kconfig/menu.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 >
 > diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index 92d3f06cd8a2..372eb5d9fef3 100644
+> index 1f7bcceacde3..86031dc36f7d 100644
 > --- a/scripts/kconfig/menu.c
 > +++ b/scripts/kconfig/menu.c
-> @@ -548,6 +548,15 @@ void menu_finalize(struct menu *parent)
->                 sym->flags |= SYMBOL_WARNED;
->         }
->
-> +       /*
-> +        * For non-optional choices, add a reverse dependency (corresponding to
-> +        * a select) of '<visibility> && m'. This prevents the user from
-> +        * setting the choice mode to 'n' when the choice is visible.
-> +        *
-> +        * This would also work for non-choice symbols, but only non-optional
-> +        * choices clear SYMBOL_OPTIONAL as of writing. Choices are implemented
-> +        * as a type of symbol.
-> +        */
->         if (sym && !sym_is_optional(sym) && parent->prompt) {
->                 sym->rev_dep.expr = expr_alloc_or(sym->rev_dep.expr,
->                                 expr_alloc_and(parent->prompt->visible.expr,
+> @@ -414,9 +414,10 @@ void menu_finalize(struct menu *parent)
+>                         menu_finalize(menu);
+>         } else if (sym) {
+>                 /*
+> -                * Automatic submenu creation. If sym, A, B, C, ..., are
+> -                * consecutive symbols and A, B, C, ... all depend on sym, the
+> -                * following menu structure will be created:
+> +                * Automatic submenu creation. If sym is a symbol and A, B, C,
+> +                * ... are consecutive items (symbols, menus, ifs, etc.) that
+> +                * all depend on sym, then the following menu structure is
+> +                * created:
+>                  *
+>                  *      sym
+>                  *       +-A
+> @@ -425,7 +426,7 @@ void menu_finalize(struct menu *parent)
+>                  *       ...
+>                  *
+>                  * This also works recursively, giving the following structure
+> -                * if B depends on A:
+> +                * if A is a symbol and B depends on A:
+>                  *
+>                  *      sym
+>                  *       +-A
 > --
+> 2.14.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-Applied to linux-kbuild/kconfig.  Thanks!
+I squashed this into the previous patch:
+https://patchwork.kernel.org/patch/9991939/
 
+Thanks!
 
 
 -- 
