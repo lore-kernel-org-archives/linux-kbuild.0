@@ -1,76 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:57098 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752689AbeARDdH (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:54648 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753054AbeARDeL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jan 2018 22:33:07 -0500
+        Wed, 17 Jan 2018 22:34:11 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAK8P3a3YNGqHXxWNHVnKbPuUeWMBMNTRApDc0YLqrOymTQQtCA@mail.gmail.com>
+References: <1515662549-58933-1-git-send-email-wangxiongfeng2@huawei.com>
+ <CAK7LNAQNHtvQMaOxR2BMn21RtfE9pKc+g5MnGaRO=q8RK1tuWg@mail.gmail.com> <CAK8P3a3YNGqHXxWNHVnKbPuUeWMBMNTRApDc0YLqrOymTQQtCA@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: fix W= option checks for extra DTC warnings
-Date: Thu, 18 Jan 2018 12:31:46 +0900
-Message-Id: <1516246306-12851-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Thu, 18 Jan 2018 12:33:12 +0900
+Message-ID: <CAK7LNARW2MhicQ7YPrRrJjfxburMXNyF69H1O2mgt6SFWEHexA@mail.gmail.com>
+Subject: Re: [PATCH] Kbuild: suppress packed-not-aligned warning for default
+ setting only
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org, Arnd Bergmann <arnd@arndb.de>, devicetree@vger.kernel.org, Rob Herring <robh@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Xiongfeng Wang <wangxiongfeng2@huawei.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Kbuild supports 3 levels of extra warnings, and multiple levels can
-be combined, like W=12, W=123.  It was added by commit a6de553da01c
-("kbuild: Allow to combine multiple W= levels").
+Hi Arnd,
 
-From the log of commit 8654cb8d0371 ("dtc: update warning settings
-for new bus and node/property name checks"), I assume:
+2018-01-18 4:40 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> On Wed, Jan 17, 2018 at 5:12 PM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> 2018-01-11 18:22 GMT+09:00 Xiongfeng Wang <wangxiongfeng2@huawei.com>:
+>>> From: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+>>>
+>>> gcc-8 reports many -Wpacked-not-aligned warnings. The below are some
+>>> examples.
+>>>
+>>> ./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
+>>> ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
+>>>  } __attribute__ ((packed));
+>>>
+>>> ./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
+>>> ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
+>>>  } __attribute__ ((packed));
+>>>
+>>> ./include/linux/ceph/msgr.h:67:1: warning: alignment 1 of 'struct
+>>> ceph_entity_addr' is less than 8 [-Wpacked-not-aligned]
+>>>  } __attribute__ ((packed));
+>>>
+>>> This patch suppress this kind of warnings for default setting.
+>>>
+>>> Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+>>> ---
+>>>  scripts/Makefile.extrawarn | 3 +++
+>>>  1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+>>> index c6ebf42..8d53570 100644
+>>> --- a/scripts/Makefile.extrawarn
+>>> +++ b/scripts/Makefile.extrawarn
+>>> @@ -11,6 +11,8 @@
+>>>  # are not supported by all versions of the compiler
+>>>  # ==========================================================================
+>>>
+>>> +KBUILD_CFLAGS += $(call cc-disable-warning, packed-not-aligned)
+>>> +
+>>
+>> I moved this to else case of  KBUILD_ENABLE_EXTRA_GCC_CHECKS
+>>
+>> Please let me know if you see a problem.
+>
+> It means we get the warning for any argument to W=, not just W=1, but
+> that's probably fine.
 
- - unit_address_vs_reg, simple_bus_reg, etc. belong to level 1
- - node_name_chars_strict, property_name_chars_strict belong to level 2
+Oops, you are right.
 
-However, the level 1 warnings are displayed by any argument to W=.
-On the other hand, the level 2 warnings are displayed by W=2, but
-not by W=12, or W=123.
+I retrace it.
 
-Use $(findstring ...) like scripts/Makefile.extrawarn.
+> I'd like to one day clean up the clang warnings
+> and those that we disable unconditionally in the top-level Makefile
+> so that each warning gets enabled at a specific level.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Yup.
 
-Side Notes for possible additional works:
-
- [1] I implemented DTC extra warnings differently in U-Boot:
-
-    https://github.com/u-boot/u-boot/blob/v2018.01/scripts/Makefile.extrawarn#L64
-
-    Better to collect extra warning stuff into scripts/Makefile.extrawarn ?
-
- [2] KBUILD_ENABLE_EXTRA_GCC_CHECKS is getting a historical misnomer
-     because we use it for Clang and DTC too.
-
-     Better to rename?  (keeping backward-compatibility for a while)?
+As a loosely related item,
+I see some confusion for DTC extra warning checks.
+I have sent a patch.
 
 
- scripts/Makefile.lib | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> For the time
+> being, I'm happy with the packed-not-aligned disabled by default.
+>
+>        Arnd
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 1ca4dcd..7dee1da 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -264,7 +264,7 @@ cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -n -f -9 > $@) || \
- DTC ?= $(objtree)/scripts/dtc/dtc
- 
- # Disable noisy checks by default
--ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),)
-+ifeq ($(findstring 1,$(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
- DTC_FLAGS += -Wno-unit_address_vs_reg \
- 	-Wno-simple_bus_reg \
- 	-Wno-unit_address_format \
-@@ -273,7 +273,7 @@ DTC_FLAGS += -Wno-unit_address_vs_reg \
- 	-Wno-pci_device_reg
- endif
- 
--ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),2)
-+ifneq ($(findstring 2,$(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
- DTC_FLAGS += -Wnode_name_chars_strict \
- 	-Wproperty_name_chars_strict
- endif
+
+Anyway, I picked the original patch.
+You may move it to the top-level Makefile when you work on it.
+
+
+
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
