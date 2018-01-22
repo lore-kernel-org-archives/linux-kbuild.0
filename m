@@ -1,91 +1,131 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.redfish-solutions.com ([66.232.79.143]:36488 "EHLO
-        mail.redfish-solutions.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750746AbeAVFDa (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:49223 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751054AbeAVPFQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 22 Jan 2018 00:03:30 -0500
-From: "Philip Prindeville" <philipp@redfish-solutions.com>
-Subject: [PATCH v1 1/1] kconfig: double up dollar signs in strings
-Date: Sun, 21 Jan 2018 21:58:21 -0700
-Message-Id: <1516597101-30637-1-git-send-email-philipp@redfish-solutions.com>
+        Mon, 22 Jan 2018 10:05:16 -0500
+Received: from mail-ua0-f174.google.com (mail-ua0-f174.google.com [209.85.217.174]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id w0MF53E6009559
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Jan 2018 00:05:04 +0900
+Received: by mail-ua0-f174.google.com with SMTP id i15so6012453uak.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 22 Jan 2018 07:05:03 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180115230930.8723-1-petr.vorel@gmail.com>
+References: <20180115230930.8723-1-petr.vorel@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 23 Jan 2018 00:04:22 +0900
+Message-ID: <CAK7LNAStFqZ6F5HS-yXMCAJ3sgM4fkfvFg887Mkr-SBRZnQ13g@mail.gmail.com>
+Subject: Re: [PATCH v4 1/1] kconfig: menuconfig make "Selected by:" and
+ "Depends on:" readable
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Philip Prindeville <philipp@redfish-solutions.com>
+To: Petr Vorel <petr.vorel@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Paul Bolle <pebolle@tiscali.nl>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>
 
-From: Philip Prindeville <philipp@redfish-solutions.com>
+2018-01-16 8:09 GMT+09:00 Petr Vorel <petr.vorel@gmail.com>:
+> rev_dep expressions can get rather unwieldy, especially if a symbol is
+> selected by more than a handful of other symbols. I.e. it's possible to
+> have near endless expressions like:
+>    A && B && !C || D || F && (G || H) || [...]
+>
+> Chop these expressions into actually readable chunks:
+>    - A && B && !C
+>    - D
+>    - F && (G || H)
+>    - [...]
+>
+> I.e. transform the top level OR tokens into newlines and prepend each
+> line with a minus. This makes the "Selected by:" blurb much easier to
+> read. For consistency the same is done for "Depends on:" although the
+> problem isn't that bad for it. This is done only if there is more than
+> one top level OR.
+>
+> This also prevents trimming too long lines.
+>
+> Based on idea from Paul Bolle.
+>
+> Reported-by: Paul Bolle <pebolle@tiscali.nl>
+> Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
+> ---
+> Tested on search USB and General setup -> Kernel compression mode (Gzip) -> Help.
+>
+> Changes v3->v4:
+> * Add split also for "Depends on:". This is done for consistency (reported
+>   by Masahiro Yamada). I didn't consider other symbols which call expr_gstr_print()
+>   as reasonable candidates (i.e. "Implies:" and "Range : ").
+> * Add new line and hyphen only when there are more top level OR than one.
+> ---
 
-Since kconfig reads and writes makefiles, reflect that dollars need
-to be doubled up in make syntax so that they're not interpolated.
 
-Example: if we have a CONFIG_VAR of type string that we want to have
-the value of "abc$def" then it must be written to the file .config
-file as:
 
-CONFIG_VAR="abc$$def"
+How much did you check the call graph of expr_print()?
+This function is called from various places.
 
-to avoid the $d from being interpolated as the $(d).
+Probably, the format will be broken here are there.
 
-Signed-off-by: Philip Prindeville <philipp@redfish-solutions.com>
----
- scripts/kconfig/confdata.c | 6 +++++-
- scripts/kconfig/symbol.c   | 9 ++++++---
- 2 files changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 87f723804079ed3b6c1fbb0d1470f717582c4a28..e45f23dd04a7ceede2533d80d3ec8fc993685112 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -155,11 +155,15 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
- 	case S_STRING:
- 		if (*p++ != '"')
- 			break;
--		for (p2 = p; (p2 = strpbrk(p2, "\"\\")); p2++) {
-+		for (p2 = p; (p2 = strpbrk(p2, "\"\\$")); p2++) {
- 			if (*p2 == '"') {
- 				*p2 = 0;
- 				break;
- 			}
-+			else if (*p2 == '$' && p2[1] != '$') {
-+				conf_warning("invalid string found");
-+				break;
-+			}
- 			memmove(p2, p2 + 1, strlen(p2));
- 		}
- 		if (!p2) {
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 7caabdb51c647e12e35b500bdebd262ba1545eb0..2458da4e2b203e5213e4ea0cb380f8f88af566ab 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -923,7 +923,7 @@ const char *sym_escape_string_value(const char *in)
- 
- 	p = in;
- 	for (;;) {
--		l = strcspn(p, "\"\\");
-+		l = strcspn(p, "\"\\$");
- 		p += l;
- 
- 		if (p[0] == '\0')
-@@ -940,14 +940,17 @@ const char *sym_escape_string_value(const char *in)
- 
- 	p = in;
- 	for (;;) {
--		l = strcspn(p, "\"\\");
-+		l = strcspn(p, "\"\\$");
- 		strncat(res, p, l);
- 		p += l;
- 
- 		if (p[0] == '\0')
- 			break;
- 
--		strcat(res, "\\");
-+		if (p[0] == '$')
-+			strcat(res, "$");
-+		else
-+			strcat(res, "\\");
- 		strncat(res, p++, 1);
- 	}
- 
+For example, here is an example of breakage.
+
+-----------------(test case)-------------
+config FOO
+       bool
+       default y
+       select BAR
+
+config BAR
+       bool "foo"
+       depends on BAZ || QUX
+-----------------(test case end)----------
+
+
+
+
+Without your patch,
+
+$ make alldefconfig
+scripts/kconfig/conf  --alldefconfig Kconfig
+warning: (FOO) selects BAR which has unmet direct dependencies (BAZ || QUX)
+#
+# configuration written to .config
+#
+
+
+Then, with your patch,
+
+$ make alldefconfig
+scripts/kconfig/conf  --alldefconfig Kconfig
+warning: (FOO) selects BAR which has unmet direct dependencies (BAZ
+  - QUX)
+#
+# configuration written to .config
+#
+
+
+
+
+One more thing.
+This patch improves the readability of "selected by" and "implied by",
+but it is questionable for "depends on".
+
+
+  Depends on:
+  - BAR [=y]
+  - BAZ [=y]
+
+... means "depends on BAR && BAZ",
+but it might be confusing with
+
+   depends on BAR
+   depends on BAZ
+
+... which is equivalent to "depends on BAR || BAZ".
+
+
+
+The idea seems useful, but I want to see this only where appropriate.
+
+
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
