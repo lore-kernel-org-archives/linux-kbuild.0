@@ -1,82 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:42759 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751391AbeAYNJY (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:23522 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751391AbeAYNQl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Jan 2018 08:09:24 -0500
+        Thu, 25 Jan 2018 08:16:41 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180122134607.00d77101@cakuba.netronome.com>
-References: <20180122134607.00d77101@cakuba.netronome.com>
+In-Reply-To: <20180125014119.31219-1-jakub.kicinski@netronome.com>
+References: <20180125014119.31219-1-jakub.kicinski@netronome.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 25 Jan 2018 22:08:34 +0900
-Message-ID: <CAK7LNAT9_fB_NaZzT3fLsaoJhMmKeb3=m98w_=oLGN3Y9uSz=w@mail.gmail.com>
-Subject: Re: Mutli-directory module Makefiles
+Date: Thu, 25 Jan 2018 22:15:47 +0900
+Message-ID: <CAK7LNARzBkLWFYEvVrXvT+YrivKuVGraKWTexVWyqTxxFWPG+A@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: make Makefile|Kbuild in each directory optional
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jakub Kicinski <kubakici@wp.pl>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Jakub Kicinski <jakub.kicinski@netronome.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, oss-drivers@netronome.com
 
-2018-01-23 6:46 GMT+09:00 Jakub Kicinski <kubakici@wp.pl>:
-> Hi!
+2018-01-25 10:41 GMT+09:00 Jakub Kicinski <jakub.kicinski@netronome.com>:
+> It is useful to be able to build single object files, e.g.:
+> $ make net/sched/cls_flower.o W=1 C=2
 >
-> in drivers/net/ethernet/netronome/nfp there is a module which is built
-> from C sources in 4 directories.  What is the best way to handle that?
+> Currently kbuild does a hard include of a Kbuild or Makefile
+> for directory where that object would reside.  Kbuild doesn't
+> cater too well to multi-directory drivers, meaning such drivers
+> will usually only use a single central Makefile.  This in turn
+> means it will be impossible to build most of object files
+> individually for such drivers.
 >
-> Currently we just add all the objects in one Makefile:
+> Make the include of $dir/{Makefile,Kbuild} optional.
 >
-> nfp-objs := \
->             nfpcore/nfp6000_pcie.o \
->             nfpcore/nfp_cppcore.o \
-> etc.
+> Signed-off-by: Jakub Kicinski <jakub.kicinski@netronome.com>
+> Reviewed-by: Dirk van der Merwe <dirk.vandermerwe@netronome.com>
+> ---
+> I must admit I have no idea whose tree I should send this to :(
+> Could it go via net-next if no one on linux-kbuild objects?
+
+This should be taken care of by linux-kbuild (and me).
+
+For your specific problem, please fix netronome/nfp/Makefile
 
 
-I recommend you to refactor the Makefile,
-adding Makefiles into nfpcore, nic, flower, bpf sub-directories.
+I'd like to take my time to think about this patch.
 
-
-Also, ifeq is ugly,
-can you rewrite like follows?
-
-
-nfp-$(CONFIG_NFP_APP_FLOWER)    += flower/
-nfp-$(CONFIG_BPF_SYSCALL)       += bpf/
-nfp-$(CONFIG_NFP_DEBUG)         += nfp_net_debugfs.o
-
-
+The single target is a bit compromised implementation
+(it cannot handle subdir-ccflags-y correctly, for example)
+I wonder if we should do this just for single target...
 
 
 
-> However, this makes it impossible to build a single object in subdirs:
->
-> $ make drivers/net/ethernet/netronome/nfp/nfpcore/nfp_cppcore.o
-> scripts/Makefile.build:45: drivers/net/ethernet/netronome/nfp/nfpcore/Makefile: No such file or directory
-> make[2]: *** No rule to make target 'drivers/net/ethernet/netronome/nfp/nfpcore/Makefile'. Stop.
->
-> Documentation/kbuild/modules.txt also contains an unclear remark that
-> this is not recommended (or is it about the use of $(src)?):
->
-> --- 4.3 Several Subdirectories
->         ...
->         To build the module complex.ko, we then need the following
->         kbuild file:
->
->                 --> filename: Kbuild
->                 obj-m := complex.o
->                 complex-y := src/complex_main.o
->                 complex-y += src/hal/hardwareif.o
->
->                 ccflags-y := -I$(src)/include
->                 ccflags-y += -I$(src)/src/hal/include
->
->         As you can see, kbuild knows how to handle object files located
->         in other directories. The trick is to specify the directory
->         relative to the kbuild file's location. **That being said, this
->         is NOT recommended practice.**
->
-> Making the include optional would work:
+
+
+>  scripts/Makefile.build | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 47cddf32aeba..178864f877d5 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
 > @@ -42,7 +42,7 @@ save-cflags := $(CFLAGS)
 >  # The filename Kbuild has precedence over Makefile
 >  kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
@@ -86,9 +67,9 @@ nfp-$(CONFIG_NFP_DEBUG)         += nfp_net_debugfs.o
 >
 >  # If the save-* variables changed error out
 >  ifeq ($(KBUILD_NOPEDANTIC),)
+> --
+> 2.15.1
 >
-> Or we could create empty Makefiles in subdirectories...  Is there a
-> better way of handling this?  Which is preferred?
 
 
 
