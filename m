@@ -1,56 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.wp.pl ([212.77.101.9]:23128 "EHLO mx3.wp.pl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751200AbeAYTru (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Jan 2018 14:47:50 -0500
-Date: Thu, 25 Jan 2018 11:47:40 -0800
-From: Jakub Kicinski <kubakici@wp.pl>
+Received: from asavdk4.altibox.net ([109.247.116.15]:50262 "EHLO
+        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750838AbeAYUmV (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 25 Jan 2018 15:42:21 -0500
+Date: Thu, 25 Jan 2018 21:42:17 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: Mutli-directory module Makefiles
-Message-ID: <20180125114740.076b7583@cakuba.netronome.com>
-In-Reply-To: <CAK7LNAT9_fB_NaZzT3fLsaoJhMmKeb3=m98w_=oLGN3Y9uSz=w@mail.gmail.com>
+Message-ID: <20180125204217.GA14181@ravnborg.org>
 References: <20180122134607.00d77101@cakuba.netronome.com>
-        <CAK7LNAT9_fB_NaZzT3fLsaoJhMmKeb3=m98w_=oLGN3Y9uSz=w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180122134607.00d77101@cakuba.netronome.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Jakub Kicinski <kubakici@wp.pl>
+Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
-On Thu, 25 Jan 2018 22:08:34 +0900, Masahiro Yamada wrote:
-> 2018-01-23 6:46 GMT+09:00 Jakub Kicinski <kubakici@wp.pl>:
-> > Hi!
-> >
-> > in drivers/net/ethernet/netronome/nfp there is a module which is built
-> > from C sources in 4 directories.  What is the best way to handle that?
-> >
-> > Currently we just add all the objects in one Makefile:
-> >
-> > nfp-objs := \
-> >             nfpcore/nfp6000_pcie.o \
-> >             nfpcore/nfp_cppcore.o \
-> > etc.  
-> 
-> 
-> I recommend you to refactor the Makefile,
-> adding Makefiles into nfpcore, nic, flower, bpf sub-directories.
-> 
-> 
-> Also, ifeq is ugly,
-> can you rewrite like follows?
-> 
-> 
-> nfp-$(CONFIG_NFP_APP_FLOWER)    += flower/
-> nfp-$(CONFIG_BPF_SYSCALL)       += bpf/
-> nfp-$(CONFIG_NFP_DEBUG)         += nfp_net_debugfs.o
+Hi Jakub.
 
-I tried that, but what do I build inside the directories?  I tried
-adding the objects to nfp-objs, building a lib.a, or trying to build a
-separate object, but it's either ignored or dependency is not obeyed
-and nfp.o complains that the subdirectory object doesn't exist yet
-when the build of subdirectory finishes later :(
+On Mon, Jan 22, 2018 at 01:46:07PM -0800, Jakub Kicinski wrote:
+> Hi!
+> 
+> in drivers/net/ethernet/netronome/nfp there is a module which is built
+> from C sources in 4 directories.  What is the best way to handle that?
 
-Sorry for not spotting your response earlier!  It went into Spam for
-some reason :S
+Move all .c files to th same directory - like done for almost
+all other drives.
+In this case we have a directory: drivers/net/ethernet/netronome
+which is just an indirection to nfp/
+and nfp/ contains a structure with 25 .c files in subdirs.
 
+With some careful renaming everything could reside in
+one dir without loosing any structure.
+And then the driver starts to look a bit
+more like any other driver in the kernel.
+
+And as an added benefit some of the other goodies like
+building single files just works.
+
+	Sam
