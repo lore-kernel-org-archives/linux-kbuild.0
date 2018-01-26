@@ -1,45 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot0-f179.google.com ([74.125.82.179]:47054 "EHLO
-        mail-ot0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751896AbeAZHWu (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 26 Jan 2018 02:22:50 -0500
-Received: by mail-ot0-f179.google.com with SMTP id t35so9355937otd.13
-        for <linux-kbuild@vger.kernel.org>; Thu, 25 Jan 2018 23:22:50 -0800 (PST)
-MIME-Version: 1.0
-Reply-To: klaus.peterschuster@outlook.de
-From: Peter Schuster <femi.ageuh@gmail.com>
-Date: Fri, 26 Jan 2018 08:22:47 +0100
-Message-ID: <CACKcKZ-YTVoO8xO=VcRR-F_91T=fQ=MZa2wBTk_EaRT7GRz52Q@mail.gmail.com>
-Subject: =?UTF-8?Q?Darlehen_Geld_f=C3=BCr_Einzelpersonen_und_Fachleute_in_w?=
-        =?UTF-8?Q?eniger_als_72_Stunden?=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Received: from mga07.intel.com ([134.134.136.100]:44774 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751321AbeAZW70 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 26 Jan 2018 17:59:26 -0500
+From: Marc Herbert <marc.herbert@intel.com>
+Subject: [PATCH v3] Remove silentoldconfig from help and docs; fix kconfig/conf's help
+Date: Fri, 26 Jan 2018 14:59:00 -0800
+Message-Id: <20180126225900.32206-1-marc.herbert@intel.com>
+In-Reply-To: <20171219012656.23728-1-marc.herbert@intel.com>
+References: <20171219012656.23728-1-marc.herbert@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Michal Marek <michal.lkml@markovi.net>, Wayne Boyer <wayne.boyer@intel.com>, Marc Herbert <marc.herbert@intel.com>
 
-Hallo,
+As explained by Michal Marek at https://lkml.org/lkml/2011/8/31/189
+silentoldconfig has become a misnomer. It has become an internal interface
+so remove it from "make help" and Documentation/ to stop confusing people
+using it as seen for instance at
+https://chromium-review.googlesource.com/835632 Don't remove it from
+kconfig/Makefile yet not to break any (other) tool using it.
 
-Sind Sie in einer schwierigen Situation, f=C3=BCr die Sie sich f=C3=BCr ein
-Darlehen suchen? Ben=C3=B6tigen Sie eine Finanzierung, um eine Schuld zu
-begleichen oder eine Aktivit=C3=A4t zu finanzieren? Haben Sie einen
-Verbraucherkredit, eine Hypothek, einen pers=C3=B6nlichen Kredit, eine
-Hypothek, Investition Darlehen, Schuldenkonsolidierung Darlehen oder
-andere braucht?
+On the other hand, correct and expand its description in the help of
+the (internal) scripts/kconfig/conf.c
 
-Ich bin ein einzelner Investor. I zur Verf=C3=BCgung stellen die Kredit
-kurz-, mittel- und langfristige. Ihr Finanzierungsbedingungen sind
-sehr einfach und meine Zinssatz betr=C3=A4gt 3% pro Jahr.
+Signed-off-by: Marc Herbert <marc.herbert@intel.com>
+---
+v2: rewordings (Masahiro)
+v3: remove from Documentation/ too. Add warning comments in source.
 
-F=C3=BCr alle Anfragen, bleibe ich zur Verf=C3=BCgung, um Ihre Fragen zu be=
-antworten.
+ Documentation/admin-guide/README.rst | 5 -----
+ scripts/kconfig/Makefile             | 7 ++++---
+ scripts/kconfig/conf.c               | 6 ++++--
+ 3 files changed, 8 insertions(+), 10 deletions(-)
 
-Danke, dass Sie mir per E-Mail an Sie von  :   klaus.peterschuster@outlook.=
-de
+diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
+index 63066db39910..af5a437198d0 100644
+--- a/Documentation/admin-guide/README.rst
++++ b/Documentation/admin-guide/README.rst
+@@ -170,11 +170,6 @@ Configuring the kernel
+                         your existing ./.config file and asking about
+                         new config symbols.
+ 
+-     "make silentoldconfig"
+-                        Like above, but avoids cluttering the screen
+-                        with questions already answered.
+-                        Additionally updates the dependencies.
+-
+      "make olddefconfig"
+                         Like above, but sets new symbols to their default
+                         values without prompting.
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index df6469fd3dcc..a460f9f7b733 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -34,6 +34,8 @@ config: $(obj)/conf
+ nconfig: $(obj)/nconf
+ 	$< $(silent) $(Kconfig)
+ 
++# This has become an internal implementation detail and is now deprecated
++# for external use.
+ silentoldconfig: $(obj)/conf
+ 	$(Q)mkdir -p include/config include/generated
+ 	$(Q)test -e include/generated/autoksyms.h || \
+@@ -142,7 +144,6 @@ help:
+ 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
+ 	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
+ 	@echo  '  localyesconfig  - Update current config converting local mods to core'
+-	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
+ 	@echo  '  defconfig	  - New config with default from ARCH supplied defconfig'
+ 	@echo  '  savedefconfig   - Save current config as ./defconfig (minimal config)'
+ 	@echo  '  allnoconfig	  - New config where all options are answered with no'
+@@ -151,8 +152,8 @@ help:
+ 	@echo  '  alldefconfig    - New config with all symbols set to default'
+ 	@echo  '  randconfig	  - New config with random answer to all options'
+ 	@echo  '  listnewconfig   - List new options'
+-	@echo  '  olddefconfig	  - Same as silentoldconfig but sets new symbols to their'
+-	@echo  '                    default value'
++	@echo  '  olddefconfig	  - Same as oldconfig but sets new symbols to their'
++	@echo  '                    default value without prompting'
+ 	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
+ 	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
+ 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index a8a97efd3dfc..a309ccec1000 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -457,6 +457,7 @@ static void check_conf(struct menu *menu)
+ static struct option long_opts[] = {
+ 	{"oldaskconfig",    no_argument,       NULL, oldaskconfig},
+ 	{"oldconfig",       no_argument,       NULL, oldconfig},
++	/* Has become a misnomer, "syncconfig" would be more accurate */
+ 	{"silentoldconfig", no_argument,       NULL, silentoldconfig},
+ 	{"defconfig",       optional_argument, NULL, defconfig},
+ 	{"savedefconfig",   required_argument, NULL, savedefconfig},
+@@ -484,8 +485,9 @@ static void conf_usage(const char *progname)
+ 	printf("  --listnewconfig         List new options\n");
+ 	printf("  --oldaskconfig          Start a new configuration using a line-oriented program\n");
+ 	printf("  --oldconfig             Update a configuration using a provided .config as base\n");
+-	printf("  --silentoldconfig       Same as oldconfig, but quietly, additionally update deps\n");
+-	printf("  --olddefconfig          Same as silentoldconfig but sets new symbols to their default value\n");
++	printf("  --silentoldconfig       Similar to oldconfig but generates configuration in\n"
++	       "                          include/{generated/,config/} (oldconfig used to be more verbose)\n");
++	printf("  --olddefconfig          Same as oldconfig but sets new symbols to their default value\n");
+ 	printf("  --oldnoconfig           An alias of olddefconfig\n");
+ 	printf("  --defconfig <file>      New config with default defined in <file>\n");
+ 	printf("  --savedefconfig <file>  Save the minimal current configuration to <file>\n");
+-- 
+2.13.6
 
-Mit freundlichen Gr=C3=BC=C3=9Fen.
-
-Peter Schuster
-
-Financial Bank
-https://firstfinancialsa.com/de
