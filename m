@@ -1,111 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:44774 "EHLO mga07.intel.com"
+Received: from mga05.intel.com ([192.55.52.43]:46776 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751321AbeAZW70 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 26 Jan 2018 17:59:26 -0500
-From: Marc Herbert <marc.herbert@intel.com>
-Subject: [PATCH v3] Remove silentoldconfig from help and docs; fix kconfig/conf's help
-Date: Fri, 26 Jan 2018 14:59:00 -0800
-Message-Id: <20180126225900.32206-1-marc.herbert@intel.com>
-In-Reply-To: <20171219012656.23728-1-marc.herbert@intel.com>
+        id S1751450AbeAZXAp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 26 Jan 2018 18:00:45 -0500
+Subject: Re: [PATCH] Remove silentoldconfig from "make help"; fix
+ kconfig/conf's help
 References: <20171219012656.23728-1-marc.herbert@intel.com>
+ <CAK7LNAR8HedCgZAk1fY9rA8HERh5weQCjWXkP2SXuhzRRWVhVQ@mail.gmail.com>
+ <070e7d03-b1a7-430f-709b-bb5fe9e2a0a3@intel.com>
+ <CAK7LNASR8Qmo85FGr0wW-4t2_uTmDZVSituLLuRm73_+Qqstmw@mail.gmail.com>
+ <f7008e72-e762-a86d-8a39-415eae55dae9@intel.com>
+ <CAK7LNAQA8gB1iijS5uoVFdVc-UoyyAQN+N8GvXpw9aR7Jp8dyA@mail.gmail.com>
+From: Marc Herbert <Marc.Herbert@intel.com>
+Message-ID: <594ca2cb-5a21-2bba-4132-73d42f3a909a@intel.com>
+Date: Fri, 26 Jan 2018 15:00:44 -0800
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNAQA8gB1iijS5uoVFdVc-UoyyAQN+N8GvXpw9aR7Jp8dyA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Michal Marek <michal.lkml@markovi.net>, Wayne Boyer <wayne.boyer@intel.com>, Marc Herbert <marc.herbert@intel.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Thiago Macieira <thiago.macieira@intel.com>, Josh Triplett <josh@joshtriplett.org>, Guenter Roeck <groeck@google.com>, Wayne Boyer <wayne.boyer@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>
 
-As explained by Michal Marek at https://lkml.org/lkml/2011/8/31/189
-silentoldconfig has become a misnomer. It has become an internal interface
-so remove it from "make help" and Documentation/ to stop confusing people
-using it as seen for instance at
-https://chromium-review.googlesource.com/835632 Don't remove it from
-kconfig/Makefile yet not to break any (other) tool using it.
+Masahiro,
 
-On the other hand, correct and expand its description in the help of
-the (internal) scripts/kconfig/conf.c
+On 17/01/2018 20:31, Masahiro Yamada wrote: 
 
-Signed-off-by: Marc Herbert <marc.herbert@intel.com>
----
-v2: rewordings (Masahiro)
-v3: remove from Documentation/ too. Add warning comments in source.
+> Sorry for my late reply.
 
- Documentation/admin-guide/README.rst | 5 -----
- scripts/kconfig/Makefile             | 7 ++++---
- scripts/kconfig/conf.c               | 6 ++++--
- 3 files changed, 8 insertions(+), 10 deletions(-)
+I think we're even now :-)
 
-diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
-index 63066db39910..af5a437198d0 100644
---- a/Documentation/admin-guide/README.rst
-+++ b/Documentation/admin-guide/README.rst
-@@ -170,11 +170,6 @@ Configuring the kernel
-                         your existing ./.config file and asking about
-                         new config symbols.
+>> I'd like to keep that sentence because it's there to explain the legacy and
+>> confusing "--silentoldconfig" name which unfortunately still sticks out in
+>> the *current* conf.c interface.
+>>
+>> +       printf("  --silentoldconfig       Similar to oldconfig but generates configuration in\n"
+>> +              "                          include/{generated/,config/} (oldconfig used to be more verbose)\n");
+>>
+>> The purpose of this sentence is to warn people that: "silentoldconfig is
+>> just archeology, so you can safely ignore it" and save them time.
+>>
+>> The alternative I considered was to entirely remove "silentconfig" not just
+>> from the Makefile's help but from the conf.c help too.
  
--     "make silentoldconfig"
--                        Like above, but avoids cluttering the screen
--                        with questions already answered.
--                        Additionally updates the dependencies.
--
-      "make olddefconfig"
-                         Like above, but sets new symbols to their default
-                         values without prompting.
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index df6469fd3dcc..a460f9f7b733 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -34,6 +34,8 @@ config: $(obj)/conf
- nconfig: $(obj)/nconf
- 	$< $(silent) $(Kconfig)
- 
-+# This has become an internal implementation detail and is now deprecated
-+# for external use.
- silentoldconfig: $(obj)/conf
- 	$(Q)mkdir -p include/config include/generated
- 	$(Q)test -e include/generated/autoksyms.h || \
-@@ -142,7 +144,6 @@ help:
- 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
- 	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
- 	@echo  '  localyesconfig  - Update current config converting local mods to core'
--	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
- 	@echo  '  defconfig	  - New config with default from ARCH supplied defconfig'
- 	@echo  '  savedefconfig   - Save current config as ./defconfig (minimal config)'
- 	@echo  '  allnoconfig	  - New config where all options are answered with no'
-@@ -151,8 +152,8 @@ help:
- 	@echo  '  alldefconfig    - New config with all symbols set to default'
- 	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  listnewconfig   - List new options'
--	@echo  '  olddefconfig	  - Same as silentoldconfig but sets new symbols to their'
--	@echo  '                    default value'
-+	@echo  '  olddefconfig	  - Same as oldconfig but sets new symbols to their'
-+	@echo  '                    default value without prompting'
- 	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
- 	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
- 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index a8a97efd3dfc..a309ccec1000 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -457,6 +457,7 @@ static void check_conf(struct menu *menu)
- static struct option long_opts[] = {
- 	{"oldaskconfig",    no_argument,       NULL, oldaskconfig},
- 	{"oldconfig",       no_argument,       NULL, oldconfig},
-+	/* Has become a misnomer, "syncconfig" would be more accurate */
- 	{"silentoldconfig", no_argument,       NULL, silentoldconfig},
- 	{"defconfig",       optional_argument, NULL, defconfig},
- 	{"savedefconfig",   required_argument, NULL, savedefconfig},
-@@ -484,8 +485,9 @@ static void conf_usage(const char *progname)
- 	printf("  --listnewconfig         List new options\n");
- 	printf("  --oldaskconfig          Start a new configuration using a line-oriented program\n");
- 	printf("  --oldconfig             Update a configuration using a provided .config as base\n");
--	printf("  --silentoldconfig       Same as oldconfig, but quietly, additionally update deps\n");
--	printf("  --olddefconfig          Same as silentoldconfig but sets new symbols to their default value\n");
-+	printf("  --silentoldconfig       Similar to oldconfig but generates configuration in\n"
-+	       "                          include/{generated/,config/} (oldconfig used to be more verbose)\n");
-+	printf("  --olddefconfig          Same as oldconfig but sets new symbols to their default value\n");
- 	printf("  --oldnoconfig           An alias of olddefconfig\n");
- 	printf("  --defconfig <file>      New config with default defined in <file>\n");
- 	printf("  --savedefconfig <file>  Save the minimal current configuration to <file>\n");
+> 
+> Another possibility might be to rename 'silentoldconfig'.
+> instead of explaining the background in the help message.
+> [...]
+> It is difficult to suggest a clear name,
+> but 'syncconfig' is the one I came up with.
+> 
+> Please suggest if you have a better idea.
+
+Look like a good idea and name to me but... for a different, bigger
+and later commit.
+
+> Commit fb16d8912db5268f29706010ecafff74b971c58d
+> renamed oldnoconfig to olddefconfig...
+
+... but it didn't remove any "now internal API" from "make help". Instead it
+changed the name of an external and preserved "API".
+
+> If we worry about the compatibility just in case,
+> we can keep 'silentoldconfig' as an alias as well.
+
+Yes - but later?
+
+In the meantime I found another instance of silentoldconfig in
+Documentation/admin-guide/; posting v3 with that removed too.
+I'm also adding some deprecation comments in the source.
+
 -- 
-2.13.6
-
+Marc
