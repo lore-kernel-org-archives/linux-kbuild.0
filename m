@@ -1,68 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:34672 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752575AbeA0W2x (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:64693 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751588AbeA1BXO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Jan 2018 17:28:53 -0500
+        Sat, 27 Jan 2018 20:23:14 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180125114740.076b7583@cakuba.netronome.com>
-References: <20180122134607.00d77101@cakuba.netronome.com> <CAK7LNAT9_fB_NaZzT3fLsaoJhMmKeb3=m98w_=oLGN3Y9uSz=w@mail.gmail.com>
- <20180125114740.076b7583@cakuba.netronome.com>
+In-Reply-To: <CAFkk2KTPkHiw5VVO55+9wJq_f-psn11=Cu0VA-qsHnDEVJsPtw@mail.gmail.com>
+References: <1516248823-22790-1-git-send-email-yamada.masahiro@socionext.com> <CAFkk2KTPkHiw5VVO55+9wJq_f-psn11=Cu0VA-qsHnDEVJsPtw@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 28 Jan 2018 07:28:04 +0900
-Message-ID: <CAK7LNASkApBQS+AwJpQvQuCuAnfjHrfC3NCNc83Ntu=k8A0pWQ@mail.gmail.com>
-Subject: Re: Mutli-directory module Makefiles
+Date: Sun, 28 Jan 2018 10:22:25 +0900
+Message-ID: <CAK7LNAQ5HoMG9Kqs+k4LCSHmHJYrf6pX_2tRi-X=3MeeCuTm7g@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: announce removal of oldnoconfig if used
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jakub Kicinski <kubakici@wp.pl>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Marc Herbert <marc.herbert@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-01-26 4:47 GMT+09:00 Jakub Kicinski <kubakici@wp.pl>:
-> On Thu, 25 Jan 2018 22:08:34 +0900, Masahiro Yamada wrote:
->> 2018-01-23 6:46 GMT+09:00 Jakub Kicinski <kubakici@wp.pl>:
->> > Hi!
->> >
->> > in drivers/net/ethernet/netronome/nfp there is a module which is built
->> > from C sources in 4 directories.  What is the best way to handle that?
->> >
->> > Currently we just add all the objects in one Makefile:
->> >
->> > nfp-objs := \
->> >             nfpcore/nfp6000_pcie.o \
->> >             nfpcore/nfp_cppcore.o \
->> > etc.
+2018-01-18 20:56 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> On Thu, Jan 18, 2018 at 5:13 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> The 'oldnoconfig' is really confusing due to its counter-intuitive name.
+>> It was renamed by commit fb16d8912db5 ("kconfig: replace 'oldnoconfig'
+>> with 'olddefconfig', and keep the old name as an alias").
 >>
+>> The 'oldnoconfig' has been kept as an alias for enough period of time,
+>> and finally I am planning to remove it.  Meanwhile, the following
+>> message will be displayed if oldnoconfig is used.
 >>
->> I recommend you to refactor the Makefile,
->> adding Makefiles into nfpcore, nic, flower, bpf sub-directories.
+>>     WARNING: "oldnoconfig" target will be removed after Linux 4.19
+>>               Please use "olddefconfig" instead.
 >>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> ---
 >>
->> Also, ifeq is ugly,
->> can you rewrite like follows?
+>>  scripts/kconfig/Makefile | 2 ++
+>>  1 file changed, 2 insertions(+)
 >>
+>> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+>> index 61cdc5e..9a349bd 100644
+>> --- a/scripts/kconfig/Makefile
+>> +++ b/scripts/kconfig/Makefile
+>> @@ -92,6 +92,8 @@ PHONY += oldnoconfig savedefconfig defconfig
+>>  # on its behavior (sets new symbols to their default value but not 'n') with the
+>>  # counter-intuitive name.
+>>  oldnoconfig: olddefconfig
+>> +       @echo "  WARNING: \"oldnoconfig\" target will be removed after Linux 4.19"
+>> +       @echo "            Please use \"olddefconfig\" instead."
 >>
->> nfp-$(CONFIG_NFP_APP_FLOWER)    += flower/
->> nfp-$(CONFIG_BPF_SYSCALL)       += bpf/
->> nfp-$(CONFIG_NFP_DEBUG)         += nfp_net_debugfs.o
+>>  savedefconfig: $(obj)/conf
+>>         $< $(silent) --$@=defconfig $(Kconfig)
+>> --
+>> 2.7.4
+>>
 >
-> I tried that, but what do I build inside the directories?  I tried
-> adding the objects to nfp-objs, building a lib.a, or trying to build a
-> separate object, but it's either ignored or dependency is not obeyed
-> and nfp.o complains that the subdirectory object doesn't exist yet
-> when the build of subdirectory finishes later :(
+> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 >
-> Sorry for not spotting your response earlier!  It went into Spam for
-> some reason :S
->
+> Maybe it could be extended to "Please use \"olddefconfig\" instead,
+> which is an alias", to make it extra clear.
 
-Sorry, I was misunderstanding.
-
-The notation I suggested
-is not supported for composite objects (like nfp-objs, nfp-y).
-
-The only solution is to move all files to the same directory,
-as Sam pointed out.
+I did so, and applied to linux-kbuild/kconfig.
+Thanks!
 
 
 
