@@ -1,69 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:64693 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751588AbeA1BXO (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:51503 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751251AbeA1BXy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Jan 2018 20:23:14 -0500
+        Sat, 27 Jan 2018 20:23:54 -0500
+Received: from mail-ua0-f181.google.com (mail-ua0-f181.google.com [209.85.217.181]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id w0S1NoB0032136
+        for <linux-kbuild@vger.kernel.org>; Sun, 28 Jan 2018 10:23:51 +0900
+Received: by mail-ua0-f181.google.com with SMTP id f5so2596279ual.8
+        for <linux-kbuild@vger.kernel.org>; Sat, 27 Jan 2018 17:23:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KTPkHiw5VVO55+9wJq_f-psn11=Cu0VA-qsHnDEVJsPtw@mail.gmail.com>
-References: <1516248823-22790-1-git-send-email-yamada.masahiro@socionext.com> <CAFkk2KTPkHiw5VVO55+9wJq_f-psn11=Cu0VA-qsHnDEVJsPtw@mail.gmail.com>
+In-Reply-To: <20180125094635.456-1-petr.vorel@gmail.com>
+References: <20180125094635.456-1-petr.vorel@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 28 Jan 2018 10:22:25 +0900
-Message-ID: <CAK7LNAQ5HoMG9Kqs+k4LCSHmHJYrf6pX_2tRi-X=3MeeCuTm7g@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: announce removal of oldnoconfig if used
+Date: Sun, 28 Jan 2018 10:23:09 +0900
+Message-ID: <CAK7LNAQpx5Sw-X7wF5vnPXKFO9RhUen5s07isERFpq5Mq2GPOw@mail.gmail.com>
+Subject: Re: [PATCH v6 1/1] kconfig: make "Selected by:" and "Implied by:" readable
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Marc Herbert <marc.herbert@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Petr Vorel <petr.vorel@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>
 
-2018-01-18 20:56 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> On Thu, Jan 18, 2018 at 5:13 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> The 'oldnoconfig' is really confusing due to its counter-intuitive name.
->> It was renamed by commit fb16d8912db5 ("kconfig: replace 'oldnoconfig'
->> with 'olddefconfig', and keep the old name as an alias").
->>
->> The 'oldnoconfig' has been kept as an alias for enough period of time,
->> and finally I am planning to remove it.  Meanwhile, the following
->> message will be displayed if oldnoconfig is used.
->>
->>     WARNING: "oldnoconfig" target will be removed after Linux 4.19
->>               Please use "olddefconfig" instead.
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->>
->>  scripts/kconfig/Makefile | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
->> index 61cdc5e..9a349bd 100644
->> --- a/scripts/kconfig/Makefile
->> +++ b/scripts/kconfig/Makefile
->> @@ -92,6 +92,8 @@ PHONY += oldnoconfig savedefconfig defconfig
->>  # on its behavior (sets new symbols to their default value but not 'n') with the
->>  # counter-intuitive name.
->>  oldnoconfig: olddefconfig
->> +       @echo "  WARNING: \"oldnoconfig\" target will be removed after Linux 4.19"
->> +       @echo "            Please use \"olddefconfig\" instead."
->>
->>  savedefconfig: $(obj)/conf
->>         $< $(silent) --$@=defconfig $(Kconfig)
->> --
->> 2.7.4
->>
+2018-01-25 18:46 GMT+09:00 Petr Vorel <petr.vorel@gmail.com>:
+> Reverse dependency expressions can get rather unwieldy, especially if
+> a symbol is selected by more than a handful of other symbols. I.e. it's
+> possible to have near endless expressions like:
+>    A && B && !C || D || F && (G || H) || [...]
 >
-> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+> Chop these expressions into actually readable chunks:
+>    - A && B && !C
+>    - D
+>    - F && (G || H)
+>    - [...]
 >
-> Maybe it could be extended to "Please use \"olddefconfig\" instead,
-> which is an alias", to make it extra clear.
+> I.e. transform the top level OR tokens into newlines and prepend each
+> line with a minus. This makes the "Selected by:" and "Implied by:" blurb
+> much easier to read. This is done only if there is more than one top
+> level OR. "Depends on:" and "Range :" were deliberately left as they are.
+>
+> Based on idea from Paul Bolle.
+>
+> Reported-by: Paul Bolle <pebolle@tiscali.nl>
+> Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
+> ---
 
-I did so, and applied to linux-kbuild/kconfig.
-Thanks!
-
-
-
+Applied to linux-kbuild/kconfig. Thanks!
 
 -- 
 Best Regards
