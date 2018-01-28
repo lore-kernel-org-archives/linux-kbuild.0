@@ -1,29 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:47843 "EHLO gate.crashing.org"
+Received: from mga17.intel.com ([192.55.52.151]:24872 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751733AbeA1QW7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Jan 2018 11:22:59 -0500
-Date: Sun, 28 Jan 2018 10:22:39 -0600
-From: Segher Boessenkool <segher@kernel.crashing.org>
-Subject: Re: [PATCH] kbuild: clang: Disable -Wunused-const-variable warnings
-Message-ID: <20180128162239.GZ21977@gate.crashing.org>
-References: <CAK7LNAQAtPQOXPKyhrs4w7cLXoO5vpM9_Yi_=_G0gNYmNNv_FA@mail.gmail.com> <1517014786-30685-1-git-send-email-psodagud@codeaurora.org>
-Mime-Version: 1.0
+        id S1751955AbeA1Sdp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 28 Jan 2018 13:33:45 -0500
+Date: Sun, 28 Jan 2018 10:33:35 -0800
+From: Andi Kleen <ak@linux.intel.com>
+Subject: Re: [PATCH 20/21] Kbuild, lto: Add Link Time Optimization support
+Message-ID: <20180128183335.GR26209@tassilo.jf.intel.com>
+References: <20171127213423.27218-1-andi@firstfloor.org>
+ <20171127213423.27218-21-andi@firstfloor.org>
+ <CAK8P3a3RQhiEkh6uUjdX-juXggNdZxvxRPJbE6M3e6Dy-ycGxw@mail.gmail.com>
+ <20180127005554.GM26209@tassilo.jf.intel.com>
+ <CAK8P3a2koJV=ncMa=5fkQXV=Jj6CnScy-nN2gsfHiAeeePsHPA@mail.gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1517014786-30685-1-git-send-email-psodagud@codeaurora.org>
+In-Reply-To: <CAK8P3a2koJV=ncMa=5fkQXV=Jj6CnScy-nN2gsfHiAeeePsHPA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Prasad Sodagudi <psodagud@codeaurora.org>
-Cc: gregkh@linuxfoundation.org, mmarek@suse.com, ghackmann@google.com, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Andi Kleen <andi@firstfloor.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>, samitolvanen@google.com, alxmtvv@gmail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Andrew Morton <akpm@linux-foundation.org>
 
-On Fri, Jan 26, 2018 at 04:59:46PM -0800, Prasad Sodagudi wrote:
-> Disable -Wunused-const-variable warnings instead of
-> disabling -Wunused-variable warnings, So that in both
-> clang and GCC -Wunused-const-variable gets disabled.
+> 
+> kallsyms failure: relative symbol value 0xffffffff81000000 out of
+> range in relative mode
+> 
+> I seem to get that all the time here, and have also disabled it for now,
+> but it sounds important (and breaks the build).
 
-Why would you disable -Wunused-const-variable on GCC?  You do not
-explain why.
+Need to take a look at it. 
 
+I had some patches that completely revamped kallsyms as part of the single
+pass linking, but I dropped them again because they still had too many 
+issues.
 
-Segher
+-Andi
