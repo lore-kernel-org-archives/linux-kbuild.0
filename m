@@ -1,162 +1,128 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.redfish-solutions.com ([66.232.79.143]:39186 "EHLO
-        mail.redfish-solutions.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752432AbeA1TVf (ORCPT
+Received: from mail-pf0-f174.google.com ([209.85.192.174]:41433 "EHLO
+        mail-pf0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932751AbeA1W6V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Jan 2018 14:21:35 -0500
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH v1 1/1] kconfig: double up dollar signs in strings
-From: Philip Prindeville <philipp_subx@redfish-solutions.com>
-In-Reply-To: <CAK7LNASfxqz3h6eS8gf0XrWg5pTkaixKiyi+svPM3Wuqu8QG6g@mail.gmail.com>
-Date: Sun, 28 Jan 2018 12:21:29 -0700
-Content-Transfer-Encoding: 8BIT
-Message-Id: <A2CC712A-47AA-4997-926D-422B91BF2D05@redfish-solutions.com>
-References: <1516597101-30637-1-git-send-email-philipp@redfish-solutions.com>
- <CAK7LNASfxqz3h6eS8gf0XrWg5pTkaixKiyi+svPM3Wuqu8QG6g@mail.gmail.com>
+        Sun, 28 Jan 2018 17:58:21 -0500
+Received: by mail-pf0-f174.google.com with SMTP id c6so3231721pfi.8
+        for <linux-kbuild@vger.kernel.org>; Sun, 28 Jan 2018 14:58:21 -0800 (PST)
+Received: from localhost ([2601:647:5100:1da4::70af])
+        by smtp.gmail.com with ESMTPSA id v4sm15645153pgq.23.2018.01.28.14.58.19
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sun, 28 Jan 2018 14:58:19 -0800 (PST)
+From: Michael Forney <mforney@mforney.org>
+Subject: [PATCH] kbuild: Improve portability of some sed invocations
+Date: Sun, 28 Jan 2018 14:56:51 -0800
+Message-Id: <20180128225651.1134-1-mforney@mforney.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
 
-Inline
+From: Michael Forney <forney@google.com>
 
-> On Jan 28, 2018, at 4:11 AM, Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-> 
-> 2018-01-22 13:58 GMT+09:00 Philip Prindeville <philipp@redfish-solutions.com>:
->> From: Philip Prindeville <philipp@redfish-solutions.com>
->> 
->> Since kconfig reads and writes makefiles, reflect that dollars need
->> to be doubled up in make syntax so that they're not interpolated.
->> 
->> Example: if we have a CONFIG_VAR of type string that we want to have
->> the value of "abc$def" then it must be written to the file .config
->> file as:
->> 
->> CONFIG_VAR="abc$$def"
->> 
->> to avoid the $d from being interpolated as the $(d).
->> 
->> Signed-off-by: Philip Prindeville <philipp@redfish-solutions.com>
-> 
-> 
-> Question:
-> If you want to interpolate $d, how can you do that?
-> Is it possible to make CONFIG_VAR="abc${d}ef” ?
+* Use BREs where EREs aren't necessary.
+* Pass -E instead of -r to use EREs. This will be standardized in the
+  next POSIX revision[0]. GNU sed supports this since 4.2 (May 2009),
+  and busybox since 1.22.0 (Jan 2014).
+* Use a literal <tab> instead of \t in bracket expressions. In bracket
+  expressions, POSIX says that <backslash> loses its special meaning, so
+  a conforming implementation cannot expand \t to <tab>[1].
+* In BREs, use interval expressions (\{n,m\}) instead of non-standard
+  features like \+ and \?.
+* Use a loop instead of -s flag.
 
+There are still plenty of other cases of non-standard sed invocations
+(use of ERE features in BREs, in-place editing), but this fixes some
+core ones.
 
-That would be an entirely new requirement of Kbuild, then.
+[0] http://austingroupbugs.net/view.php?id=528
+[1] http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_03_05
+---
+ scripts/Kbuild.include        |  2 +-
+ scripts/Makefile.build        |  2 +-
+ scripts/adjust_autoksyms.sh   |  4 +++-
+ scripts/gen_initramfs_list.sh |  2 +-
+ scripts/headers_install.sh    | 10 +++++-----
+ 5 files changed, 11 insertions(+), 9 deletions(-)
 
-No type that we enter manually has any form of interpretation or interpolation: not string, not bool, not hex, and not int…  These values are always literals.
-
-If there’s to be interpolation, then this would be done in the Makefile itself as:
-
-$(LEFT_PART)$($(MIDDLE_VAR_NAME))$(RIGHT_PART)
-
-where MIDDLE_VAR_NAME:=d or some other similar construct.
-
-That would be done in the Makefile which includes the .config, not the .config itself.  Witness:
-
-obj-$(CONFIG_BONDING) += bonding/
-
-in drivers/net/Makefile —- this is how (and more importantly WHERE) we handle interpolation.
-
-
-> 
-> Currently,
-> User input: abc$$def    ->  Output: CONFIG_FOO="abc$$def"
-> 
-> User input: abc${d}ef   ->  Output: CONFIG_FOO="abc${d}ef"
-> 
-> Both are possible by inputting the string verbatim.
-
-
-Then that would be the result of abusing Kbuild.  The values that we enter are meant to be literal values.  Not macros to be interpolated.
-
-Otherwise, we’d have to do all sorts of type checking like (a) is $(d) defined? (b) is $(d) also of type STRING? etc.  Way out of scope of the current language definition.
-
-
-> 
-> With your patch, the conversion is forced as follows:
-> 
-> User Input: abc$def         ->   Output:  CONFIG_FOO="abc$$def
-> 
-> So, having a single $ is banned.
-> 
-> 
-> I am wondering what value is added by this patch…
-
-
-It (a) prevents the user who is potentially naive user (who is oblivious about Makefile syntax and the fact that dollars need to be doubled up) from accidentally entering a single one where two would [currently] be required… (we do, after all, handle backslash, quote, and dquote without requiring the user to be aware of their special properties… why be inconsistent?) and (b) it provides additional error checking and safety by affirming that a STRING really is a literal value and not a MACRO open to some forms of interpolation but not others.
-
-I guess the question boils down to:  should the casual Kbuild user have to be familiar with the intricacies of Makefile syntax?  I don’t think so.  The whole point of Kbuild is to provide a layer of abstraction so that he doesn’t need to
-hand-edit Makefiles.  This fix just makes that abstraction more complete.
-
--Philip
-
-
-> 
-> 
->> scripts/kconfig/confdata.c | 6 +++++-
->> scripts/kconfig/symbol.c   | 9 ++++++---
->> 2 files changed, 11 insertions(+), 4 deletions(-)
->> 
->> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
->> index 87f723804079ed3b6c1fbb0d1470f717582c4a28..e45f23dd04a7ceede2533d80d3ec8fc993685112 100644
->> --- a/scripts/kconfig/confdata.c
->> +++ b/scripts/kconfig/confdata.c
->> @@ -155,11 +155,15 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
->>        case S_STRING:
->>                if (*p++ != '"')
->>                        break;
->> -               for (p2 = p; (p2 = strpbrk(p2, "\"\\")); p2++) {
->> +               for (p2 = p; (p2 = strpbrk(p2, "\"\\$")); p2++) {
->>                        if (*p2 == '"') {
->>                                *p2 = 0;
->>                                break;
->>                        }
->> +                       else if (*p2 == '$' && p2[1] != '$') {
->> +                               conf_warning("invalid string found");
->> +                               break;
->> +                       }
->>                        memmove(p2, p2 + 1, strlen(p2));
->>                }
->>                if (!p2) {
->> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
->> index 7caabdb51c647e12e35b500bdebd262ba1545eb0..2458da4e2b203e5213e4ea0cb380f8f88af566ab 100644
->> --- a/scripts/kconfig/symbol.c
->> +++ b/scripts/kconfig/symbol.c
->> @@ -923,7 +923,7 @@ const char *sym_escape_string_value(const char *in)
->> 
->>        p = in;
->>        for (;;) {
->> -               l = strcspn(p, "\"\\");
->> +               l = strcspn(p, "\"\\$");
->>                p += l;
->> 
->>                if (p[0] == '\0')
->> @@ -940,14 +940,17 @@ const char *sym_escape_string_value(const char *in)
->> 
->>        p = in;
->>        for (;;) {
->> -               l = strcspn(p, "\"\\");
->> +               l = strcspn(p, "\"\\$");
->>                strncat(res, p, l);
->>                p += l;
->> 
->>                if (p[0] == '\0')
->>                        break;
->> 
->> -               strcat(res, "\\");
->> +               if (p[0] == '$')
->> +                       strcat(res, "$");
->> +               else
->> +                       strcat(res, "\\");
->>                strncat(res, p++, 1);
->>        }
->> 
->> --
->> 2.7.4
->> 
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 065324a8046f..34cbd81024b0 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -368,7 +368,7 @@ ksym_dep_filter =                                                            \
+ 	    $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;        \
+ 	  boot*|build*|cpp_its_S|*cpp_lds_S|dtc|host*|vdso*) : ;;            \
+ 	  *) echo "Don't know how to preprocess $(1)" >&2; false ;;          \
+-	esac | tr ";" "\n" | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
++	esac | tr ";" "\n" | sed -n 's/^.*=== __KSYM_\(.*\) ===.*$$/KSYM_\1/p'
+ 
+ cmd_and_fixdep =                                                             \
+ 	$(echo-cmd) $(cmd_$(1));                                             \
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index cb8997ed0149..524000a4ccda 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -300,7 +300,7 @@ endef
+ 
+ # List module undefined symbols (or empty line if not enabled)
+ ifdef CONFIG_TRIM_UNUSED_KSYMS
+-cmd_undef_syms = $(NM) $@ | sed -n 's/^ \+U //p' | xargs echo
++cmd_undef_syms = $(NM) $@ | sed -n 's/^  *U //p' | xargs echo
+ else
+ cmd_undef_syms = echo
+ endif
+diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+index 513da1a4a2da..a162258ab606 100755
+--- a/scripts/adjust_autoksyms.sh
++++ b/scripts/adjust_autoksyms.sh
+@@ -60,7 +60,9 @@ cat > "$new_ksyms_file" << EOT
+ 
+ EOT
+ [ "$(ls -A "$MODVERDIR")" ] &&
+-sed -ns -e '3{s/ /\n/g;/^$/!p;}' "$MODVERDIR"/*.mod | sort -u |
++for mod in "$MODVERDIR"/*.mod; do
++	sed -n -e '3{s/ /\n/g;/^$/!p;}' "$mod"
++done | sort -u |
+ while read sym; do
+ 	if [ -n "$CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX" ]; then
+ 		sym="${sym#_}"
+diff --git a/scripts/gen_initramfs_list.sh b/scripts/gen_initramfs_list.sh
+index 86a3c0e5cfbc..10e528b3a08f 100755
+--- a/scripts/gen_initramfs_list.sh
++++ b/scripts/gen_initramfs_list.sh
+@@ -194,7 +194,7 @@ input_file() {
+ 	source="$1"
+ 	if [ -f "$1" ]; then
+ 		${dep_list}header "$1"
+-		is_cpio="$(echo "$1" | sed 's/^.*\.cpio\(\..*\)\?/cpio/')"
++		is_cpio="$(echo "$1" | sed 's/^.*\.cpio\(\..*\)\{0,1\}/cpio/')"
+ 		if [ $2 -eq 0 -a ${is_cpio} = "cpio" ]; then
+ 			cpio_file=$1
+ 			echo "$1" | grep -q '^.*\.cpio\..*' && is_cpio_compressed="compressed"
+diff --git a/scripts/headers_install.sh b/scripts/headers_install.sh
+index a18bca720995..7328394cf9e8 100755
+--- a/scripts/headers_install.sh
++++ b/scripts/headers_install.sh
+@@ -31,13 +31,13 @@ trap 'rm -f "$OUTDIR/$FILE" "$OUTDIR/$FILE.sed"' EXIT
+ for i in "$@"
+ do
+ 	FILE="$(basename "$i")"
+-	sed -r \
+-		-e 's/([ \t(])(__user|__force|__iomem)[ \t]/\1/g' \
+-		-e 's/__attribute_const__([ \t]|$)/\1/g' \
++	sed -E \
++		-e 's/([ 	(])(__user|__force|__iomem)[ 	]/\1/g' \
++		-e 's/__attribute_const__([ 	]|$)/\1/g' \
+ 		-e 's@^#include <linux/compiler(|_types).h>@@' \
+ 		-e 's/(^|[^a-zA-Z0-9])__packed([^a-zA-Z0-9_]|$)/\1__attribute__((packed))\2/g' \
+-		-e 's/(^|[ \t(])(inline|asm|volatile)([ \t(]|$)/\1__\2__\3/g' \
+-		-e 's@#(ifndef|define|endif[ \t]*/[*])[ \t]*_UAPI@#\1 @' \
++		-e 's/(^|[ 	(])(inline|asm|volatile)([ 	(]|$)/\1__\2__\3/g' \
++		-e 's@#(ifndef|define|endif[ 	]*/[*])[ 	]*_UAPI@#\1 @' \
+ 		"$SRCDIR/$i" > "$OUTDIR/$FILE.sed" || exit 1
+ 	scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__ "$OUTDIR/$FILE.sed" \
+ 		> "$OUTDIR/$FILE"
+-- 
+2.15.1
 
