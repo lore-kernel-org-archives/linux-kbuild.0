@@ -1,64 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb2-smtp-cloud9.xs4all.net ([194.109.24.26]:45162 "EHLO
-        lb2-smtp-cloud9.xs4all.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751766AbeA3Se6 (ORCPT
+Received: from mail-lf0-f44.google.com ([209.85.215.44]:40501 "EHLO
+        mail-lf0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752511AbeA3TGZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Jan 2018 13:34:58 -0500
-Message-ID: <1517337292.2230.15.camel@tiscali.nl>
-Subject: Re: [PATCH] kconfig: Warn if help text is blank
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Tue, 30 Jan 2018 19:34:52 +0100
-In-Reply-To: <20180130181853.32512-1-ulfalizer@gmail.com>
-References: <20180130181853.32512-1-ulfalizer@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Tue, 30 Jan 2018 14:06:25 -0500
+Received: by mail-lf0-f44.google.com with SMTP id h92so16964940lfi.7
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Jan 2018 11:06:25 -0800 (PST)
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: [PATCH 00/10] Remove empty help texts from Kconfig files
+Date: Tue, 30 Jan 2018 20:05:22 +0100
+Message-Id: <20180130190555.6577-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: yamada.masahiro@socionext.com, mcgrof@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, mcgrof@kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
 
-On Tue, 2018-01-30 at 19:18 +0100, Ulf Magnusson wrote:
-> Print a warning if a 'help' token is given but the help text is blank.
-> Personal pet peeve.
-> 
-> Example warnings:
-> 
-> 	net/sched/Kconfig:860: warning: 'NET_IFE_SKBMARK' defined with blank help text
-> 	net/sched/Kconfig:865: warning: 'NET_IFE_SKBPRIO' defined with blank help text
-> 	net/sched/Kconfig:870: warning: 'NET_IFE_SKBTCINDEX' defined with blank help text
-> 	drivers/video/fbdev/Kconfig:1159: warning: 'FB_I810_I2C' defined with blank help text
-> 	drivers/mmc/host/Kconfig:877: warning: 'MMC_TOSHIBA_PCI' defined with blank help text
-> 	drivers/staging/rtl8192u/Kconfig:8: warning: 'RTL8192U' defined with blank help text
-> 	drivers/staging/rtl8192e/rtl8192e/Kconfig:9: warning: 'RTL8192E' defined with blank help text
-> 	lib/Kconfig.debug:354: warning: 'ARCH_WANT_FRAME_POINTERS' defined with blank help text
-> 
-> A separate patchset will be sent to fix all current instances of blank
-> help texts for all arches. I added the same warning to Kconfiglib.
+This is preparation for adding the warning in
+https://lkml.org/lkml/2018/1/30/516 ("kconfig: Warn if help text is blank")
 
-If you do this it would be better to first fix or remove those help texts, and
-only then add this warning. Ie, add the warning in the last patch of a cleanup
-series.
+Empty help texts are probably either a typo, a Kconfig misunderstanding, or
+some kind of half-committing to adding a help text (in which case a TODO
+comment would be clearer, if the help text really can't be added right away).
+Best to flag them, IMO.
 
-> --- a/scripts/kconfig/zconf.y
-> +++ b/scripts/kconfig/zconf.y
-> @@ -436,6 +436,12 @@ help: help_start T_HELPTEXT
->  		zconfprint("warning: '%s' defined with more than one help text -- only the last one will be used",
->  			   current_entry->sym->name ?: "<choice>");
->  	}
-> +
-> +	/* Is the help text empty or all whitespace? */
-> +	if ($2[strspn($2, " \f\n\r\t\v")] == '\0')
-> +		zconfprint("warning: '%s' defined with blank help text",
-> +			   current_entry->sym->name ?: "<choice>");
-> +
+Ulf Magnusson (10):
+  net/sched: kconfig: Remove empty help texts
+  video: fbdev: kconfig: Remove empty help text
+  mmc: kconfig: Remove empty help text
+  Staging: rtl8192u: kconfig: Remove empty help text
+  Staging: rtl8192e: kconfig: Remove empty help text
+  lib/Kconfig.debug: Remove empty help text
+  MIPS: BCM63XX: kconfig: Remove empty help text
+  MIPS: kconfig: Remove empty help text
+  arm: vt8500: kconfig: Remove empty help text
+  nios2: kconfig: Remove empty help text
 
-Does this go to stderr?
+ arch/arm/mach-vt8500/Kconfig              | 1 -
+ arch/mips/Kconfig                         | 1 -
+ arch/mips/bcm63xx/boards/Kconfig          | 1 -
+ arch/nios2/Kconfig                        | 1 -
+ drivers/mmc/host/Kconfig                  | 1 -
+ drivers/staging/rtl8192e/rtl8192e/Kconfig | 1 -
+ drivers/staging/rtl8192u/Kconfig          | 1 -
+ drivers/video/fbdev/Kconfig               | 1 -
+ lib/Kconfig.debug                         | 1 -
+ net/sched/Kconfig                         | 3 ---
+ 10 files changed, 12 deletions(-)
 
-Another fix would be to ignore empty help texts and not render them at all. Is
-that possible?
+-- 
+2.14.1
 
-Thanks,
-
-
-Paul Bolle
