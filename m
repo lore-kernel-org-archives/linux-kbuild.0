@@ -1,52 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f44.google.com ([209.85.215.44]:40501 "EHLO
-        mail-lf0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752511AbeA3TGZ (ORCPT
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:46649 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752511AbeA3TGt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Jan 2018 14:06:25 -0500
-Received: by mail-lf0-f44.google.com with SMTP id h92so16964940lfi.7
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Jan 2018 11:06:25 -0800 (PST)
+        Tue, 30 Jan 2018 14:06:49 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 00/10] Remove empty help texts from Kconfig files
-Date: Tue, 30 Jan 2018 20:05:22 +0100
-Message-Id: <20180130190555.6577-1-ulfalizer@gmail.com>
+Subject: [PATCH 01/10] net/sched: kconfig: Remove empty help texts
+Date: Tue, 30 Jan 2018 20:05:23 +0100
+Message-Id: <20180130190555.6577-2-ulfalizer@gmail.com>
+In-Reply-To: <20180130190555.6577-1-ulfalizer@gmail.com>
+References: <20180130190555.6577-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, mcgrof@kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
+Cc: yamada.masahiro@socionext.com, mcgrof@kernel.org, Ulf Magnusson <ulfalizer@gmail.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-This is preparation for adding the warning in
-https://lkml.org/lkml/2018/1/30/516 ("kconfig: Warn if help text is blank")
+In preparation for adding a warning ("kconfig: Warn if help text is
+blank"): https://lkml.org/lkml/2018/1/30/516
 
-Empty help texts are probably either a typo, a Kconfig misunderstanding, or
-some kind of half-committing to adding a help text (in which case a TODO
-comment would be clearer, if the help text really can't be added right away).
-Best to flag them, IMO.
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+---
+ net/sched/Kconfig | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Ulf Magnusson (10):
-  net/sched: kconfig: Remove empty help texts
-  video: fbdev: kconfig: Remove empty help text
-  mmc: kconfig: Remove empty help text
-  Staging: rtl8192u: kconfig: Remove empty help text
-  Staging: rtl8192e: kconfig: Remove empty help text
-  lib/Kconfig.debug: Remove empty help text
-  MIPS: BCM63XX: kconfig: Remove empty help text
-  MIPS: kconfig: Remove empty help text
-  arm: vt8500: kconfig: Remove empty help text
-  nios2: kconfig: Remove empty help text
-
- arch/arm/mach-vt8500/Kconfig              | 1 -
- arch/mips/Kconfig                         | 1 -
- arch/mips/bcm63xx/boards/Kconfig          | 1 -
- arch/nios2/Kconfig                        | 1 -
- drivers/mmc/host/Kconfig                  | 1 -
- drivers/staging/rtl8192e/rtl8192e/Kconfig | 1 -
- drivers/staging/rtl8192u/Kconfig          | 1 -
- drivers/video/fbdev/Kconfig               | 1 -
- lib/Kconfig.debug                         | 1 -
- net/sched/Kconfig                         | 3 ---
- 10 files changed, 12 deletions(-)
-
+diff --git a/net/sched/Kconfig b/net/sched/Kconfig
+index c03d86a7775e..f24a6ae6819a 100644
+--- a/net/sched/Kconfig
++++ b/net/sched/Kconfig
+@@ -857,17 +857,14 @@ config NET_ACT_TUNNEL_KEY
+ config NET_IFE_SKBMARK
+         tristate "Support to encoding decoding skb mark on IFE action"
+         depends on NET_ACT_IFE
+-        ---help---
+ 
+ config NET_IFE_SKBPRIO
+         tristate "Support to encoding decoding skb prio on IFE action"
+         depends on NET_ACT_IFE
+-        ---help---
+ 
+ config NET_IFE_SKBTCINDEX
+         tristate "Support to encoding decoding skb tcindex on IFE action"
+         depends on NET_ACT_IFE
+-        ---help---
+ 
+ config NET_CLS_IND
+ 	bool "Incoming device classification"
 -- 
 2.14.1
 
