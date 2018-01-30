@@ -1,40 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:44936 "EHLO
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:44896 "EHLO
         mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753521AbeA3TZJ (ORCPT
+        with ESMTP id S1752562AbeA3TY7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Jan 2018 14:25:09 -0500
+        Tue, 30 Jan 2018 14:24:59 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH v2 10/10] nios2: kconfig: Remove empty help text
-Date: Tue, 30 Jan 2018 20:23:05 +0100
-Message-Id: <20180130192349.8420-11-ulfalizer@gmail.com>
+Subject: [PATCH v2 07/10] MIPS: BCM63XX: kconfig: Remove empty help text
+Date: Tue, 30 Jan 2018 20:23:02 +0100
+Message-Id: <20180130192349.8420-8-ulfalizer@gmail.com>
 In-Reply-To: <20180130192349.8420-1-ulfalizer@gmail.com>
 References: <20180130192349.8420-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, mcgrof@kernel.org, Ulf Magnusson <ulfalizer@gmail.com>, Ley Foon Tan <lftan@altera.com>, nios2-dev@lists.rocketboards.org
+Cc: linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, mcgrof@kernel.org, Ulf Magnusson <ulfalizer@gmail.com>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, bcm-kernel-feedback-list@broadcom.com, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>, linux-mips@linux-mips.org, linux-arm-kernel@lists.infradead.org
 
 In preparation for adding a warning ("kconfig: Warn if help text is
 blank"): https://lkml.org/lkml/2018/1/30/516
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
- arch/nios2/Kconfig | 1 -
+ arch/mips/bcm63xx/boards/Kconfig | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/arch/nios2/Kconfig b/arch/nios2/Kconfig
-index 60fae03dac79..3d4ec88f1db1 100644
---- a/arch/nios2/Kconfig
-+++ b/arch/nios2/Kconfig
-@@ -152,7 +152,6 @@ menu "Advanced setup"
+diff --git a/arch/mips/bcm63xx/boards/Kconfig b/arch/mips/bcm63xx/boards/Kconfig
+index 6ff0a7481081..f60d96610ace 100644
+--- a/arch/mips/bcm63xx/boards/Kconfig
++++ b/arch/mips/bcm63xx/boards/Kconfig
+@@ -7,6 +7,5 @@ choice
+ config BOARD_BCM963XX
+        bool "Generic Broadcom 963xx boards"
+ 	select SSB
+-       help
  
- config ADVANCED_OPTIONS
- 	bool "Prompt for advanced kernel configuration options"
--	help
- 
- comment "Default settings for advanced configuration options are used"
- 	depends on !ADVANCED_OPTIONS
+ endchoice
 -- 
 2.14.1
 
