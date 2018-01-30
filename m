@@ -1,40 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:40448 "EHLO
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:44854 "EHLO
         mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752112AbeA3THq (ORCPT
+        with ESMTP id S1752112AbeA3THg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Jan 2018 14:07:46 -0500
+        Tue, 30 Jan 2018 14:07:36 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 08/10] MIPS: kconfig: Remove empty help text
-Date: Tue, 30 Jan 2018 20:05:30 +0100
-Message-Id: <20180130190555.6577-9-ulfalizer@gmail.com>
+Subject: [PATCH 06/10] lib/Kconfig.debug: Remove empty help text
+Date: Tue, 30 Jan 2018 20:05:28 +0100
+Message-Id: <20180130190555.6577-7-ulfalizer@gmail.com>
 In-Reply-To: <20180130190555.6577-1-ulfalizer@gmail.com>
 References: <20180130190555.6577-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, mcgrof@kernel.org, Ulf Magnusson <ulfalizer@gmail.com>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, linux-mips@linux-mips.org, linux-kernel@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, mcgrof@kernel.org, Ulf Magnusson <ulfalizer@gmail.com>, Ingo Molnar <mingo@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Byungchul Park <byungchul.park@lge.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Randy Dunlap <rdunlap@infradead.org>, Nicholas Piggin <npiggin@gmail.com>, Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org
 
 In preparation for adding a warning ("kconfig: Warn if help text is
 blank"): https://lkml.org/lkml/2018/1/30/516
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
- arch/mips/Kconfig | 1 -
+ lib/Kconfig.debug | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
-index ab98569994f0..57cd591e7b28 100644
---- a/arch/mips/Kconfig
-+++ b/arch/mips/Kconfig
-@@ -2326,7 +2326,6 @@ config MIPS_VPE_LOADER_TOM
- config MIPS_VPE_APSP_API
- 	bool "Enable support for AP/SP API (RTLX)"
- 	depends on MIPS_VPE_LOADER
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index b66c264d4194..6088408ef26c 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -351,7 +351,6 @@ config SECTION_MISMATCH_WARN_ONLY
+ #
+ config ARCH_WANT_FRAME_POINTERS
+ 	bool
 -	help
  
- config MIPS_VPE_APSP_API_CMP
- 	bool
+ config FRAME_POINTER
+ 	bool "Compile the kernel with frame pointers"
 -- 
 2.14.1
 
