@@ -1,48 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:59615 "EHLO gate.crashing.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751833AbeA2X5Y (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jan 2018 18:57:24 -0500
-Date: Mon, 29 Jan 2018 17:57:09 -0600
-From: Segher Boessenkool <segher@kernel.crashing.org>
-Subject: Re: [PATCH] kbuild: clang: Disable -Wunused-const-variable warnings
-Message-ID: <20180129235708.GG21977@gate.crashing.org>
-References: <fd6fdda6c0080e72598eabd2c88d7df6@codeaurora.org> <1517245680-3361-1-git-send-email-psodagud@codeaurora.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1517245680-3361-1-git-send-email-psodagud@codeaurora.org>
+Received: from mail-ot0-f193.google.com ([74.125.82.193]:34677 "EHLO
+        mail-ot0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751576AbeA3IBO (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 30 Jan 2018 03:01:14 -0500
+Received: by mail-ot0-f193.google.com with SMTP id x15so9140865ote.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Jan 2018 00:01:14 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180128225838.1275-1-mforney@mforney.org>
+References: <20180128225838.1275-1-mforney@mforney.org>
+From: Michael Forney <mforney@mforney.org>
+Date: Tue, 30 Jan 2018 00:01:13 -0800
+Message-ID: <CAGw6cBuHm+D1pdzZFmOrWjPaspE6CTS_-gG6zLFJLLU-aS4nxA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Use ls(1) instead of stat(1) to obtain file size
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Prasad Sodagudi <psodagud@codeaurora.org>
-Cc: gregkh@linuxfoundation.org, ghackmann@google.com, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-Hi Prasad,
+On 2018-01-28, Michael Forney <mforney@mforney.org> wrote:
+> From: Michael Forney <forney@google.com>
+>
+> stat(1) is not standardized and different implementations have their own
+> (conflicting) flags for querying the size of a file.
+>
+> ls(1) provides the same information (value of st.st_size) in the 5th
+> column,
+> except when the file is a character or block device.
 
-On Mon, Jan 29, 2018 at 09:08:00AM -0800, Prasad Sodagudi wrote:
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -698,7 +698,6 @@ KBUILD_CFLAGS += $(stackp-flag)
->  
->  ifeq ($(cc-name),clang)
->  KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
->  KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
->  KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
->  KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
-> @@ -716,9 +715,9 @@ else
->  # These warnings generated too much noise in a regular build.
->  # Use make W=1 to enable them (see scripts/Makefile.extrawarn)
->  KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
->  endif
->  
-> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
->  ifdef CONFIG_FRAME_POINTER
->  KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
->  else
+Forgot to add
 
-Ah, much more obvious now, thanks :-)
+Signed-off-by: Michael Forney <forney@google.com>
 
-
-Segher
+> ---
+>  scripts/Makefile.lib    | 3 ++-
+>  scripts/link-vmlinux.sh | 6 ++++--
+>  2 files changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 7dee1da83e2a..24566d1c10d2 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -319,7 +319,8 @@ dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
+>  size_append = printf $(shell						\
+>  dec_size=0;								\
+>  for F in $1; do								\
+> -	fsize=$$(stat -c "%s" $$F);					\
+> +	set -- $$(ls -dn $$F);						\
+> +	fsize=$$5;							\
+>  	dec_size=$$(expr $$dec_size + $$fsize);				\
+>  done;									\
+>  printf "%08x\n" $$dec_size |						\
+> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+> index c0d129d7f430..4a5737647a79 100755
+> --- a/scripts/link-vmlinux.sh
+> +++ b/scripts/link-vmlinux.sh
+> @@ -296,8 +296,10 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
+>  	kallsyms .tmp_vmlinux2 .tmp_kallsyms2.o
+>
+>  	# step 3
+> -	size1=$(stat -c "%s" .tmp_kallsyms1.o)
+> -	size2=$(stat -c "%s" .tmp_kallsyms2.o)
+> +	set -- $(ls -dn .tmp_kallsyms1.o)
+> +	size1=$5
+> +	set -- $(ls -dn .tmp_kallsyms2.o)
+> +	size2=$5
+>
+>  	if [ $size1 -ne $size2 ] || [ -n "${KALLSYMS_EXTRA_PASS}" ]; then
+>  		kallsymso=.tmp_kallsyms3.o
+> --
+> 2.15.1
+>
+>
