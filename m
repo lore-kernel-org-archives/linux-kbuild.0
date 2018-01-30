@@ -1,49 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb1-smtp-cloud9.xs4all.net ([194.109.24.22]:43807 "EHLO
-        lb1-smtp-cloud9.xs4all.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752298AbeA3UbN (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:60221 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752083AbeA3VAr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Jan 2018 15:31:13 -0500
-Message-ID: <1517344262.2230.27.camel@tiscali.nl>
-Subject: Re: [PATCH] kconfig: Warn if help text is blank
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Tue, 30 Jan 2018 21:31:02 +0100
-In-Reply-To: <CAFkk2KSUpEvCCt0fUzCN+r7Lz9CuyN3jKV6atpPR92zPRK4f-w@mail.gmail.com>
-References: <20180130181853.32512-1-ulfalizer@gmail.com>
-         <1517337292.2230.15.camel@tiscali.nl>
-         <CAFkk2KSUpEvCCt0fUzCN+r7Lz9CuyN3jKV6atpPR92zPRK4f-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+        Tue, 30 Jan 2018 16:00:47 -0500
+Subject: Re: [PATCH v2 00/10] Remove empty help texts from Kconfig files
+References: <20180130192349.8420-1-ulfalizer@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <9cbe668e-fe6b-d525-176d-a1e07541f789@infradead.org>
+Date: Tue, 30 Jan 2018 13:00:45 -0800
+MIME-Version: 1.0
+In-Reply-To: <20180130192349.8420-1-ulfalizer@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, mcgrof@kernel.org
 
-On Tue, 2018-01-30 at 20:33 +0100, Ulf Magnusson wrote:
-> I agree that this shouldn't go in until/unless a significant portion
-> of those empty help texts get removed first.
+On 01/30/2018 11:22 AM, Ulf Magnusson wrote:
+> Empty help texts are probably either a typo, a Kconfig misunderstanding, or
+> some kind of half-committing to adding a help text (in which case a TODO
+> comment would be clearer, if the help text really can't be added right away).
+> Best to flag them, IMO.
+> 
+> Changes since v1:
+> 
+> Forgot to send the cover letter to linux-kbuild.
 
-Not a significant portion, but all, I'd say.
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
 
-> The patchset that removes the empty help texts is at
-> https://lkml.org/lkml/2018/1/30/574. I could make another one if you'd
-> prefer that.
+Thanks.
 
-I'm fine with anything that doesn't add warnings just to appease pet peeves.
+> Ulf Magnusson (10):
+>   net/sched: kconfig: Remove empty help texts
+>   video: fbdev: kconfig: Remove empty help text
+>   mmc: kconfig: Remove empty help text
+>   Staging: rtl8192u: kconfig: Remove empty help text
+>   Staging: rtl8192e: kconfig: Remove empty help text
+>   lib/Kconfig.debug: Remove empty help text
+>   MIPS: BCM63XX: kconfig: Remove empty help text
+>   MIPS: kconfig: Remove empty help text
+>   arm: vt8500: kconfig: Remove empty help text
+>   nios2: kconfig: Remove empty help text
+> 
+>  arch/arm/mach-vt8500/Kconfig              | 1 -
+>  arch/mips/Kconfig                         | 1 -
+>  arch/mips/bcm63xx/boards/Kconfig          | 1 -
+>  arch/nios2/Kconfig                        | 1 -
+>  drivers/mmc/host/Kconfig                  | 1 -
+>  drivers/staging/rtl8192e/rtl8192e/Kconfig | 1 -
+>  drivers/staging/rtl8192u/Kconfig          | 1 -
+>  drivers/video/fbdev/Kconfig               | 1 -
+>  lib/Kconfig.debug                         | 1 -
+>  net/sched/Kconfig                         | 3 ---
+>  10 files changed, 12 deletions(-)
+> 
 
-> I haven't even checked how they are rendered to be honest. I was more
-> concerned with the Kconfig mess.
 
-Well, if you could make empty help texts disappear somehow (either during the
-Kconfig parse phase - which requires a jump into the yacc horror - or during
-the rendering phase) that would be much better than adding a warning for
-something that you yourself described as a pet peeve.
-
-And after that's done you're free to send cleanup patches for this whenever
-you feel like doing so.
-
-Thanks,
-
-
-Paul Bolle
+-- 
+~Randy
