@@ -1,19 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:38463 "EHLO
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:40313 "EHLO
         mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753740AbeAaJfq (ORCPT
+        with ESMTP id S1753765AbeAaJfx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Jan 2018 04:35:46 -0500
+        Wed, 31 Jan 2018 04:35:53 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 05/11] Staging: rtl8192e: kconfig: Remove blank help text
-Date: Wed, 31 Jan 2018 10:34:24 +0100
-Message-Id: <20180131093434.20050-6-ulfalizer@gmail.com>
+Subject: [PATCH 06/11] lib/Kconfig.debug: Remove blank help text
+Date: Wed, 31 Jan 2018 10:34:25 +0100
+Message-Id: <20180131093434.20050-7-ulfalizer@gmail.com>
 In-Reply-To: <20180131093434.20050-1-ulfalizer@gmail.com>
 References: <20180131093434.20050-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, mcgrof@kernel.org, rdunlap@infradead.org, dan.carpenter@oracle.com, pebolle@tiscali.nl, Ulf Magnusson <ulfalizer@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, devel@driverdev.osuosl.org
+Cc: linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, mcgrof@kernel.org, rdunlap@infradead.org, dan.carpenter@oracle.com, pebolle@tiscali.nl, Ulf Magnusson <ulfalizer@gmail.com>, Ingo Molnar <mingo@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Byungchul Park <byungchul.park@lge.com>, Peter Zijlstra <peterz@infradead.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, Theodore Ts'o <tytso@mit.edu>
 
 Blank help texts are probably either a typo, a Kconfig misunderstanding,
 or some kind of half-committing to adding a help text (in which case a
@@ -24,18 +24,21 @@ Best to remove them, IMO.
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
- drivers/staging/rtl8192e/rtl8192e/Kconfig | 1 -
+ lib/Kconfig.debug | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/drivers/staging/rtl8192e/rtl8192e/Kconfig b/drivers/staging/rtl8192e/rtl8192e/Kconfig
-index 282e293da18f..7ac42a590e21 100644
---- a/drivers/staging/rtl8192e/rtl8192e/Kconfig
-+++ b/drivers/staging/rtl8192e/rtl8192e/Kconfig
-@@ -6,4 +6,3 @@ config RTL8192E
- 	select WEXT_PRIV
- 	select CRYPTO
- 	select FW_LOADER
--	---help---
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index b66c264d4194..6088408ef26c 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -351,7 +351,6 @@ config SECTION_MISMATCH_WARN_ONLY
+ #
+ config ARCH_WANT_FRAME_POINTERS
+ 	bool
+-	help
+ 
+ config FRAME_POINTER
+ 	bool "Compile the kernel with frame pointers"
 -- 
 2.14.1
 
