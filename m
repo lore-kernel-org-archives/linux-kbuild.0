@@ -1,66 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp2120.oracle.com ([141.146.126.78]:56046 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751454AbeAaKjm (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:20651 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753356AbeAaP2d (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Jan 2018 05:39:42 -0500
-Date: Wed, 31 Jan 2018 13:39:21 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH 05/10] Staging: rtl8192e: kconfig: Remove empty help text
-Message-ID: <20180131103921.7wgqc45htzndli2l@mwanda>
-References: <20180130190555.6577-1-ulfalizer@gmail.com>
- <20180130190555.6577-6-ulfalizer@gmail.com>
- <20180131080622.z6yf2h27m4ea3fkx@mwanda>
- <CAFkk2KS0KQtnVB42tg1M3d1hR+APT7H99dZuzMPoCO63emO3hg@mail.gmail.com>
- <20180131084620.kkok5rpfbqakhyps@mwanda>
- <CAFkk2KTWkSh0zzK5aXx+FtH1RHBKkwSGr=-Ri1U9d=KbUGXSDA@mail.gmail.com>
+        Wed, 31 Jan 2018 10:28:33 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFkk2KTWkSh0zzK5aXx+FtH1RHBKkwSGr=-Ri1U9d=KbUGXSDA@mail.gmail.com>
+In-Reply-To: <20180131093434.20050-1-ulfalizer@gmail.com>
+References: <20180131093434.20050-1-ulfalizer@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 1 Feb 2018 00:27:37 +0900
+Message-ID: <CAK7LNAQYT2DuGkP1s+BP8OHChgqE_o6vCwhkU0ZEsFzveb-Bhg@mail.gmail.com>
+Subject: Re: [PATCH 00/11] Remove blank help texts from Kconfig files and add warning
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: devel@driverdev.osuosl.org, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dan Carpenter <dan.carpenter@oracle.com>, Paul Bolle <pebolle@tiscali.nl>
 
-On Wed, Jan 31, 2018 at 10:52:08AM +0100, Ulf Magnusson wrote:
-> On Wed, Jan 31, 2018 at 9:46 AM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> > On Wed, Jan 31, 2018 at 09:41:24AM +0100, Ulf Magnusson wrote:
-> >> On Wed, Jan 31, 2018 at 9:06 AM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> >> > On Tue, Jan 30, 2018 at 08:05:27PM +0100, Ulf Magnusson wrote:
-> >> >> In preparation for adding a warning ("kconfig: Warn if help text is
-> >> >> blank"): https://lkml.org/lkml/2018/1/30/516
-> >> >>
-> >> >
-> >> > Please don't start the boddy of the email in the middle of a sentence.
-> >> >
-> >> > It looks like this:
-> >> >
-> >> > https://marc.info/?l=linux-driver-devel&m=151733925532413&w=2
-> >> >
-> >> > Notice how the subject is up above the From, Date, and Message-id email
-> >> > headers?  It's totally disconnected from the body of the email.
-> >> >
-> >> > regards,
-> >> > dan carpenter
-> >>
-> >> The 'this is in...' was implied. I'll try to be less of a sloppy bastard.
-> >>
-> >
-> > I do feel that patch descriptions should say what the patch does as well
-> > as why.  Right now the subject says what but I normally read either the
-> > body or the subject but not both.
-> >
-> > regards,
-> > dan carpenter
-> >
-> 
-> I fleshed out the individual commit messages and rolled a new
-> patchset, which adds the warning at the end:
-> https://lkml.org/lkml/2018/1/31/137
+2018-01-31 18:34 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> This patchset first removes all blank help texts from Kconfig files for all
+> arches, and then makes Kconfig print a warning for blank help texts.
+>
+> All patches can be applied independently, but to avoid warning spam, the blank
+> help texts ought to be removed before the warning is added.
+>
+> Ulf Magnusson (11):
+>   net/sched: kconfig: Remove blank help texts
+>   video: fbdev: kconfig: Remove blank help text
+>   mmc: kconfig: Remove blank help text
+>   Staging: rtl8192u: kconfig: Remove blank help text
+>   Staging: rtl8192e: kconfig: Remove blank help text
+>   lib/Kconfig.debug: Remove blank help text
+>   MIPS: BCM63XX: kconfig: Remove blank help text
+>   MIPS: kconfig: Remove blank help text
+>   arm: vt8500: kconfig: Remove blank help text
+>   nios2: kconfig: Remove blank help text
+>   kconfig: Warn if help text is blank
 
-Thanks!
 
-regards,
-dan carpenter
+Whole of the series, applied to linux-kbuild/kconfig.  Thanks!
 
+
+
+>  arch/arm/mach-vt8500/Kconfig              | 1 -
+>  arch/mips/Kconfig                         | 1 -
+>  arch/mips/bcm63xx/boards/Kconfig          | 1 -
+>  arch/nios2/Kconfig                        | 1 -
+>  drivers/mmc/host/Kconfig                  | 1 -
+>  drivers/staging/rtl8192e/rtl8192e/Kconfig | 1 -
+>  drivers/staging/rtl8192u/Kconfig          | 1 -
+>  drivers/video/fbdev/Kconfig               | 1 -
+>  lib/Kconfig.debug                         | 1 -
+>  net/sched/Kconfig                         | 3 ---
+>  scripts/kconfig/zconf.y                   | 6 ++++++
+>  11 files changed, 6 insertions(+), 12 deletions(-)
+>
+> --
+> 2.14.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
