@@ -1,50 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([184.105.139.130]:45218 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932087AbeAaPna (ORCPT
+Received: from mail-ua0-f196.google.com ([209.85.217.196]:35346 "EHLO
+        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753121AbeAaR2p (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Jan 2018 10:43:30 -0500
-Date: Wed, 31 Jan 2018 10:43:28 -0500 (EST)
-Message-Id: <20180131.104328.1248759408605241628.davem@davemloft.net>
+        Wed, 31 Jan 2018 12:28:45 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180131.104328.1248759408605241628.davem@davemloft.net>
+References: <20180130190555.6577-2-ulfalizer@gmail.com> <20180131.103221.1934691300422846830.davem@davemloft.net>
+ <CAK7LNATA-5mjztcPed43ERLd3AvOh7Lg6yGmH4iqKhKMVP324A@mail.gmail.com> <20180131.104328.1248759408605241628.davem@davemloft.net>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Wed, 31 Jan 2018 18:28:44 +0100
+Message-ID: <CAFkk2KSC=ZLU0N3MMG2_EVBqoYxLn2TEeRapBDLHjiX043GPMg@mail.gmail.com>
 Subject: Re: [PATCH 01/10] net/sched: kconfig: Remove empty help texts
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <CAK7LNATA-5mjztcPed43ERLd3AvOh7Lg6yGmH4iqKhKMVP324A@mail.gmail.com>
-References: <20180130190555.6577-2-ulfalizer@gmail.com>
-        <20180131.103221.1934691300422846830.davem@davemloft.net>
-        <CAK7LNATA-5mjztcPed43ERLd3AvOh7Lg6yGmH4iqKhKMVP324A@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com
-Cc: ulfalizer@gmail.com, linux-kbuild@vger.kernel.org, mcgrof@kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: David Miller <davem@davemloft.net>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 1 Feb 2018 00:37:27 +0900
-
-> 2018-02-01 0:32 GMT+09:00 David Miller <davem@davemloft.net>:
->> From: Ulf Magnusson <ulfalizer@gmail.com>
->> Date: Tue, 30 Jan 2018 20:05:23 +0100
->>
->>> In preparation for adding a warning ("kconfig: Warn if help text is
->>> blank"): https://lkml.org/lkml/2018/1/30/516
+On Wed, Jan 31, 2018 at 4:43 PM, David Miller <davem@davemloft.net> wrote:
+> From: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Date: Thu, 1 Feb 2018 00:37:27 +0900
+>
+>> 2018-02-01 0:32 GMT+09:00 David Miller <davem@davemloft.net>:
+>>> From: Ulf Magnusson <ulfalizer@gmail.com>
+>>> Date: Tue, 30 Jan 2018 20:05:23 +0100
 >>>
->>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>>>> In preparation for adding a warning ("kconfig: Warn if help text is
+>>>> blank"): https://lkml.org/lkml/2018/1/30/516
+>>>>
+>>>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>>>
+>>> Applied.
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >>
->> Applied.
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> I had applied the whole series into linux-kbuild.
-> 
-> 
-> Do you want to apply it to your tree?
+>>
+>> I had applied the whole series into linux-kbuild.
+>>
+>>
+>> Do you want to apply it to your tree?
+>
+> I already did :-)
+>
+> It won't cause any problems for it to be in both of our trees so let's
+> just leave it this way.
 
-I already did :-)
+Yeah, sorry about that mess. I had assumed this would require
+coordination from more people. :)
 
-It won't cause any problems for it to be in both of our trees so let's
-just leave it this way.
+Masahiro: Thanks for merging it so quickly!
+
+Cheers,
+Ulf
