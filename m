@@ -1,83 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:39013 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751783AbeBAQ4T (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:38118 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751800AbeBAQ7Y (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Feb 2018 11:56:19 -0500
+        Thu, 1 Feb 2018 11:59:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <3132455.r9uCTL3ZTk@amdc3058>
-References: <20180131093434.20050-1-ulfalizer@gmail.com> <CGME20180131093527epcas2p3978f33b8407c31bd95e01bca682346da@epcas2p3.samsung.com>
- <20180131093434.20050-3-ulfalizer@gmail.com> <3132455.r9uCTL3ZTk@amdc3058>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 1 Feb 2018 17:56:18 +0100
-Message-ID: <CAFkk2KQxPnwMKmvhCoKQ0BBciTc5JKqjJqHGHAMR5uHF0w13sg@mail.gmail.com>
-Subject: Re: [PATCH 02/11] video: fbdev: kconfig: Remove blank help text
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 2 Feb 2018 01:58:29 +0900
+Message-ID: <CAK7LNAQC+qjdcDSkmWoD7h=WV7e_yYRES-Tf+Az4CpxONPomyA@mail.gmail.com>
+Subject: [GIT PULL 2/3] Kbuild misc updates for v4.16
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dan Carpenter <dan.carpenter@oracle.com>, Paul Bolle <pebolle@tiscali.nl>, Arnd Bergmann <arnd@arndb.de>, Michal Simek <michal.simek@xilinx.com>, Hans de Goede <j.w.r.degoede@gmail.com>, dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Thu, Feb 1, 2018 at 4:52 PM, Bartlomiej Zolnierkiewicz
-<b.zolnierkie@samsung.com> wrote:
->
-> Hi,
->
-> On Wednesday, January 31, 2018 10:34:21 AM Ulf Magnusson wrote:
->> Blank help texts are probably either a typo, a Kconfig misunderstanding,
->> or some kind of half-committing to adding a help text (in which case a
->> TODO comment would be clearer, if the help text really can't be added
->> right away).
->>
->> Best to remove them, IMO.
->
-> How about actually adding some meaningful help texts instead
-> (as a general rule each user visible option should have valid
-> help text)?
->
->> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->> ---
->>  drivers/video/fbdev/Kconfig | 1 -
->>  1 file changed, 1 deletion(-)
->>
->> diff --git a/drivers/video/fbdev/Kconfig b/drivers/video/fbdev/Kconfig
->> index 6962b4583fd7..11e699f1062b 100644
->> --- a/drivers/video/fbdev/Kconfig
->> +++ b/drivers/video/fbdev/Kconfig
->> @@ -1156,7 +1156,6 @@ config FB_I810_I2C
->>       bool "Enable DDC Support"
->>       depends on FB_I810 && FB_I810_GTF
->>       select FB_DDC
->> -     help
->
-> Please add a missing help text instead (take a look at FB_SAVAGE_I2C
-> config option to see how a valid help text entry should look like).
+Hi Linus,
 
-The FB_I810_I2C option was added in 74f6ae84b23 ("[PATCH] i810fb: Add
-i2c/DDC support"). What do you think about adding this bit from the
-commit message as the help text?
+Here are some updates of misc scripts for v4.16.  Please pull!
 
-  Add DDC/I2C support for i810fb.  This will allow the driver to get display
-  information, especially for monitors with fickle timings.
 
-I'm not familiar with this code, so I don't want to do too much
-guessing myself. :)
 
->
-> In the longer term we should consider removing *_I2C config options
-> and just make the main config options always enable I2C subsystem
-> directly if needed/useful (some fbdev drivers are doing it this way
-> already).
->
->>  config FB_LE80578
->>       tristate "Intel LE80578 (Vermilion) support"
->
-> Best regards,
-> --
-> Bartlomiej Zolnierkiewicz
-> Samsung R&D Institute Poland
-> Samsung Electronics
->
+The following changes since commit ae64f9bd1d3621b5e60d7363bc20afb46aede215=
+:
 
-Cheers,
-Ulf
+  Linux 4.15-rc2 (2017-12-03 11:01:47 -0500)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-misc-v4.16
+
+for you to fetch changes up to 1640eea35e8dcf0cb437f03c56868a97d0666df3:
+
+  Coccinelle: coccicheck: fix typo (2018-02-02 00:21:47 +0900)
+
+----------------------------------------------------------------
+Kbuild misc updates for v4.16
+
+- Add snap-pkg target to create Linux kernel snap package
+
+- Make out-of-tree creation of source packages fail correctly
+
+- Improve and fix several semantic patches
+
+----------------------------------------------------------------
+Himanshu Jha (4):
+      Coccinelle: kzalloc-simple: Add all zero allocating functions
+      Coccinelle: alloc_cast: Add more memory allocating functions to the l=
+ist
+      Coccinelle: ifnullfree: Trim the warning reported in report mode
+      Coccinelle: kzalloc-simple: Rename kzalloc-simple to zalloc-simple
+
+Julia Lawall (2):
+      Coccinelle: memdup: drop spurious line
+      Coccinelle: coccicheck: fix typo
+
+J=C3=A9r=C3=A9my Lefaure (1):
+      Coccinelle: array_size: report even if include is missing
+
+Masahiro Yamada (1):
+      kbuild: pkg: make out-of-tree rpm/deb-pkg build immediately fail
+
+Paolo Pisati (1):
+      scripts/package: snap-pkg target
+
+ .gitignore                                      |   5 +
+ scripts/coccicheck                              |   2 +-
+ scripts/coccinelle/api/alloc/alloc_cast.cocci   |  92 +++-
+ .../coccinelle/api/alloc/kzalloc-simple.cocci   |  86 ----
+ .../coccinelle/api/alloc/zalloc-simple.cocci    | 448 +++++++++++++++++++
+ scripts/coccinelle/api/memdup.cocci             |   1 -
+ scripts/coccinelle/free/ifnullfree.cocci        |   2 +-
+ scripts/coccinelle/misc/array_size.cocci        |   4 +-
+ scripts/package/Makefile                        |  26 +-
+ scripts/package/snapcraft.template              |  14 +
+ 10 files changed, 565 insertions(+), 115 deletions(-)
+ delete mode 100644 scripts/coccinelle/api/alloc/kzalloc-simple.cocci
+ create mode 100644 scripts/coccinelle/api/alloc/zalloc-simple.cocci
+ create mode 100644 scripts/package/snapcraft.template
+
+
+--=20
+Best Regards
+Masahiro Yamada
