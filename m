@@ -1,55 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:35932 "EHLO
-        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753958AbeBBTtH (ORCPT
+Received: from mail-qt0-f193.google.com ([209.85.216.193]:34782 "EHLO
+        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751964AbeBBUig (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Feb 2018 14:49:07 -0500
-Received: by mail-qt0-f195.google.com with SMTP id z11so32383442qtm.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Feb 2018 11:49:06 -0800 (PST)
-Date: Fri, 2 Feb 2018 14:49:05 -0500 (EST)
+        Fri, 2 Feb 2018 15:38:36 -0500
+Received: by mail-qt0-f193.google.com with SMTP id a27so32575499qtd.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Feb 2018 12:38:36 -0800 (PST)
+Date: Fri, 2 Feb 2018 15:38:34 -0500 (EST)
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH 3/7] [HACK] x86: crypto: fix link error with LTO
-In-Reply-To: <20180202162104.2300532-3-arnd@arndb.de>
-Message-ID: <nycvar.YSQ.7.76.1802021414270.1842@knanqh.ubzr>
-References: <20180202161550.2106846-1-arnd@arndb.de> <20180202162104.2300532-3-arnd@arndb.de>
+Subject: Re: [PATCH 7/7] Kbuild: lto: pass -m32/-m64 to to LDFINAL
+In-Reply-To: <CAK8P3a3dgFjXP3wub+J5-_67MS2Mm_twktD=cyoY2pPro+AWzQ@mail.gmail.com>
+Message-ID: <nycvar.YSQ.7.76.1802021523390.1842@knanqh.ubzr>
+References: <20180202161550.2106846-1-arnd@arndb.de> <20180202162104.2300532-7-arnd@arndb.de> <nycvar.YSQ.7.76.1802021336090.1842@knanqh.ubzr> <CAK8P3a3dgFjXP3wub+J5-_67MS2Mm_twktD=cyoY2pPro+AWzQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnd Bergmann <arnd@arndb.de>
-Cc: Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Andi Kleen <ak@linux.intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
 On Fri, 2 Feb 2018, Arnd Bergmann wrote:
 
-> crypto_it_tab and the other symbols like it are defined in
-> crypto/aes_generic.c and exported for loadable modules. When
-> building with LTO and CONFIG_TRIM_UNUSED_KSYMS, the exports
-> are eliminated, since kbuild fails to take the users in
-> the arch/x86/crypto/aes-i586-asm_32.S assembler file into
-> account.
+> Do you have a git tree with other changes for LTO on ARM? I'd
+> like to try that as well.
+
+I currently have only 2 other patches.
+
+You need commit 75fea300d73a that just hit mainline (you may cherry-pick 
+it easily if necessary).
+
+Then the following:
+
+----- >8
+Subject: [PATCH] HACK: enable LTO on ARM
+
+Without the ${KBUILD_VMLINUX_LIBS} move the build fails with missing
+memcpy all over the place. Didn't figure it out yet.
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 4382315005..84450843ed 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -17,6 +17,7 @@ config ARM
+ 	select ARCH_OPTIONAL_KERNEL_RWX if ARCH_HAS_STRICT_KERNEL_RWX
+ 	select ARCH_OPTIONAL_KERNEL_RWX_DEFAULT if CPU_V7
+ 	select ARCH_SUPPORTS_ATOMIC_RMW
++	select ARCH_SUPPORTS_LTO
+ 	select ARCH_USE_BUILTIN_BSWAP
+ 	select ARCH_USE_CMPXCHG_LOCKREF
+ 	select ARCH_WANT_IPC_PARSE_VERSION
+@@ -101,6 +102,7 @@ config ARM
+ 	select PERF_USE_VMALLOC
+ 	select RTC_LIB
+ 	select SYS_SUPPORTS_APM_EMULATION
++	select THIN_ARCHIVES if LTO
+ 	# Above selects are sorted alphabetically; please add new ones
+ 	# according to that.  Thanks.
+ 	help
+diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
+index 45a6b9b7af..39ac0a9639 100644
+--- a/arch/arm/boot/compressed/Makefile
++++ b/arch/arm/boot/compressed/Makefile
+@@ -97,7 +97,7 @@ targets       := vmlinux vmlinux.lds piggy_data piggy.o \
+ clean-files += piggy_data lib1funcs.S ashldi3.S bswapsdi2.S \
+ 		$(libfdt) $(libfdt_hdrs) hyp-stub.S
+ 
+-KBUILD_CFLAGS += -DDISABLE_BRANCH_PROFILING
++KBUILD_CFLAGS += -DDISABLE_BRANCH_PROFILING $(DISABLE_LTO)
+ 
+ ifeq ($(CONFIG_FUNCTION_TRACER),y)
+ ORIG_CFLAGS := $(KBUILD_CFLAGS)
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 964b2ee855..0774a87788 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -99,9 +99,9 @@ vmlinux_link()
+ 		if [ -n "${CONFIG_THIN_ARCHIVES}" ]; then
+ 			objects="--whole-archive			\
+ 				built-in.o				\
++				${KBUILD_VMLINUX_LIBS}			\
+ 				--no-whole-archive			\
+ 				--start-group				\
+-				${KBUILD_VMLINUX_LIBS}			\
+ 				--end-group				\
+ 				${1}"
+ 		else
+
+
+
+
+
+
 > 
-> This adds an ugly workaround by adding a reference to each symbol
-> into aes_glue.c, which gets linked together with the assembler
-> file.
+>        Arnd
 > 
-> We obviously want to fix the CONFIG_TRIM_UNUSED_KSYMS logic
-> to do the right thing here instead, but I couldn't come up
-> with a good fix, so I use this instead to get a clean build
-> for testing.
-
-Could you give me the .config you used for this? So far I can't 
-reproduce, and guessing with LTO takes lots of time.
-
-> This fix only works most of the time, but I still ran into
-> some cases where combining an .S with a .c file did not
-> produce the correct .ko file, as the lto linker apparently
-> did not expect that kind of input. 'nm' on the file after
-> 'ld -r' showed only the contents of the assembler file, and
-> after the lto-ld stage, only the contents of the .c file
-> are there.
-
-'ld -r' does not support mixed (LTO and non-LTO) objects.
-
-
-Nicolas
-
