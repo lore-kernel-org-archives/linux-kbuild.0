@@ -1,87 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:38118 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751800AbeBAQ7Y (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Feb 2018 11:59:24 -0500
-MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 2 Feb 2018 01:58:29 +0900
-Message-ID: <CAK7LNAQC+qjdcDSkmWoD7h=WV7e_yYRES-Tf+Az4CpxONPomyA@mail.gmail.com>
-Subject: [GIT PULL 2/3] Kbuild misc updates for v4.16
+Received: from mga11.intel.com ([192.55.52.93]:5846 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751579AbeBBB20 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 1 Feb 2018 20:28:26 -0500
+Message-ID: <1517563701.2668.1.camel@intel.com>
+Subject: Re: [PATCH 10/11] nios2: kconfig: Remove blank help text
+From: Ley Foon Tan <ley.foon.tan@intel.com>
+Date: Fri, 02 Feb 2018 17:28:21 +0800
+In-Reply-To: <20180131093434.20050-11-ulfalizer@gmail.com>
+References: <20180131093434.20050-1-ulfalizer@gmail.com>
+         <20180131093434.20050-11-ulfalizer@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8BIT
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Ulf Magnusson <ulfalizer@gmail.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, mcgrof@kernel.org, rdunlap@infradead.org, dan.carpenter@oracle.com, pebolle@tiscali.nl, Ley Foon Tan <lftan@altera.com>, nios2-dev@lists.rocketboards.org
 
-Hi Linus,
+On Wed, 2018-01-31 at 10:34 +0100, Ulf Magnusson wrote:
+> Blank help texts are probably either a typo, a Kconfig
+> misunderstanding,
+> or some kind of half-committing to adding a help text (in which case
+> a
+> TODO comment would be clearer, if the help text really can't be added
+> right away).
+> 
+> Best to remove them, IMO.
+> 
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> ---
+>  arch/nios2/Kconfig | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/arch/nios2/Kconfig b/arch/nios2/Kconfig
+> index 60fae03dac79..3d4ec88f1db1 100644
+> --- a/arch/nios2/Kconfig
+> +++ b/arch/nios2/Kconfig
+> @@ -152,7 +152,6 @@ menu "Advanced setup"
+> 
+>  config ADVANCED_OPTIONS
+>         bool "Prompt for advanced kernel configuration options"
+> -       help
+> 
+>  comment "Default settings for advanced configuration options are
+> used"
+>         depends on !ADVANCED_OPTIONS
+> --
+> 2.14.1
+> 
 
-Here are some updates of misc scripts for v4.16.  Please pull!
-
-
-
-The following changes since commit ae64f9bd1d3621b5e60d7363bc20afb46aede215=
-:
-
-  Linux 4.15-rc2 (2017-12-03 11:01:47 -0500)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-misc-v4.16
-
-for you to fetch changes up to 1640eea35e8dcf0cb437f03c56868a97d0666df3:
-
-  Coccinelle: coccicheck: fix typo (2018-02-02 00:21:47 +0900)
-
-----------------------------------------------------------------
-Kbuild misc updates for v4.16
-
-- Add snap-pkg target to create Linux kernel snap package
-
-- Make out-of-tree creation of source packages fail correctly
-
-- Improve and fix several semantic patches
-
-----------------------------------------------------------------
-Himanshu Jha (4):
-      Coccinelle: kzalloc-simple: Add all zero allocating functions
-      Coccinelle: alloc_cast: Add more memory allocating functions to the l=
-ist
-      Coccinelle: ifnullfree: Trim the warning reported in report mode
-      Coccinelle: kzalloc-simple: Rename kzalloc-simple to zalloc-simple
-
-Julia Lawall (2):
-      Coccinelle: memdup: drop spurious line
-      Coccinelle: coccicheck: fix typo
-
-J=C3=A9r=C3=A9my Lefaure (1):
-      Coccinelle: array_size: report even if include is missing
-
-Masahiro Yamada (1):
-      kbuild: pkg: make out-of-tree rpm/deb-pkg build immediately fail
-
-Paolo Pisati (1):
-      scripts/package: snap-pkg target
-
- .gitignore                                      |   5 +
- scripts/coccicheck                              |   2 +-
- scripts/coccinelle/api/alloc/alloc_cast.cocci   |  92 +++-
- .../coccinelle/api/alloc/kzalloc-simple.cocci   |  86 ----
- .../coccinelle/api/alloc/zalloc-simple.cocci    | 448 +++++++++++++++++++
- scripts/coccinelle/api/memdup.cocci             |   1 -
- scripts/coccinelle/free/ifnullfree.cocci        |   2 +-
- scripts/coccinelle/misc/array_size.cocci        |   4 +-
- scripts/package/Makefile                        |  26 +-
- scripts/package/snapcraft.template              |  14 +
- 10 files changed, 565 insertions(+), 115 deletions(-)
- delete mode 100644 scripts/coccinelle/api/alloc/kzalloc-simple.cocci
- create mode 100644 scripts/coccinelle/api/alloc/zalloc-simple.cocci
- create mode 100644 scripts/package/snapcraft.template
-
-
---=20
-Best Regards
-Masahiro Yamada
+Acked-by: Ley Foon Tan <ley.foon.tan@intel.com>
