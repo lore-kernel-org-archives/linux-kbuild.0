@@ -1,50 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot0-f194.google.com ([74.125.82.194]:42804 "EHLO
-        mail-ot0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751589AbeBBUS6 (ORCPT
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:37022 "EHLO
+        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754894AbeBBSlW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Feb 2018 15:18:58 -0500
-MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1802021336090.1842@knanqh.ubzr>
-References: <20180202161550.2106846-1-arnd@arndb.de> <20180202162104.2300532-7-arnd@arndb.de>
- <nycvar.YSQ.7.76.1802021336090.1842@knanqh.ubzr>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Fri, 2 Feb 2018 21:18:57 +0100
-Message-ID: <CAK8P3a3dgFjXP3wub+J5-_67MS2Mm_twktD=cyoY2pPro+AWzQ@mail.gmail.com>
+        Fri, 2 Feb 2018 13:41:22 -0500
+Received: by mail-qk0-f196.google.com with SMTP id y80so25124697qkb.4
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Feb 2018 10:41:22 -0800 (PST)
+Date: Fri, 2 Feb 2018 13:41:20 -0500 (EST)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
 Subject: Re: [PATCH 7/7] Kbuild: lto: pass -m32/-m64 to to LDFINAL
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20180202162104.2300532-7-arnd@arndb.de>
+Message-ID: <nycvar.YSQ.7.76.1802021336090.1842@knanqh.ubzr>
+References: <20180202161550.2106846-1-arnd@arndb.de> <20180202162104.2300532-7-arnd@arndb.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Andi Kleen <ak@linux.intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Feb 2, 2018 at 7:41 PM, Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
-> On Fri, 2 Feb 2018, Arnd Bergmann wrote:
->
->> Building randconfig kernels with a biarch compiler fails with LTO
->> when the final link uses a different target architecture compared
->> to the earlier compilation stages.
->>
->> Setting -m32 or -m64 in ${LDFINAL} solves this problem, though my
->> feeling is that there is a better way to do this. There might also
->> be other from KBUILD_CFLAGS that we may need in LDFINAL.
->
-> On ARM I had the same problem as it requires explicit arch flags. I
-> therefore used this patch:
+On Fri, 2 Feb 2018, Arnd Bergmann wrote:
 
-> -exec $CC $ARGS
-> +case "${KBUILD_VERBOSE}" in
-> +*1*)
-> +       set -x
-> +       ;;
-> +esac
-> +
-> +exec $CC $KBUILD_CFLAGS $ARGS
+> Building randconfig kernels with a biarch compiler fails with LTO
+> when the final link uses a different target architecture compared
+> to the earlier compilation stages.
+> 
+> Setting -m32 or -m64 in ${LDFINAL} solves this problem, though my
+> feeling is that there is a better way to do this. There might also
+> be other from KBUILD_CFLAGS that we may need in LDFINAL.
 
-Ah, right, that's much simpler. I'll put that in my test tree now and
-will see if it works on x86.
+On ARM I had the same problem as it requires explicit arch flags. I 
+therefore used this patch:
 
-Do you have a git tree with other changes for LTO on ARM? I'd
-like to try that as well.
+----- >8
+Subject: [PATCH] LTO: scripts/gcc-ld: LTO on ARM needs arch specific gcc flags
 
-       Arnd
+Otherwise the final link where code generation happens produces code
+for the wrong ISA when the default CPU configured into gcc is not the
+one we need.
+
+Also display the actual command when invoked with "make V=1".
+
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
+
+diff --git a/scripts/gcc-ld b/scripts/gcc-ld
+index d95dd0be38..fa53be2a34 100755
+--- a/scripts/gcc-ld
++++ b/scripts/gcc-ld
+@@ -27,4 +27,10 @@ while [ "$1" != "" ] ; do
+ 	shift
+ done
+ 
+-exec $CC $ARGS
++case "${KBUILD_VERBOSE}" in
++*1*)
++	set -x
++	;;
++esac
++
++exec $CC $KBUILD_CFLAGS $ARGS
