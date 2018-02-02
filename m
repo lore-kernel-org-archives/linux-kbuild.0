@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:51339 "EHLO
+Received: from mout.kundenserver.de ([217.72.192.73]:49733 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751711AbeBBQVW (ORCPT
+        with ESMTP id S1752105AbeBBQVW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 2 Feb 2018 11:21:22 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 3/7] [HACK] x86: crypto: fix link error with LTO
-Date: Fri,  2 Feb 2018 17:21:00 +0100
-Message-Id: <20180202162104.2300532-3-arnd@arndb.de>
+Subject: [PATCH 4/7] [HACK] lto: shut up some warnings
+Date: Fri,  2 Feb 2018 17:21:01 +0100
+Message-Id: <20180202162104.2300532-4-arnd@arndb.de>
 In-Reply-To: <20180202161550.2106846-1-arnd@arndb.de>
 References: <20180202161550.2106846-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,51 +15,67 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andi Kleen <ak@linux.intel.com>
 Cc: Nicolas Pitre <nico@linaro.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
 
-crypto_it_tab and the other symbols like it are defined in
-crypto/aes_generic.c and exported for loadable modules. When
-building with LTO and CONFIG_TRIM_UNUSED_KSYMS, the exports
-are eliminated, since kbuild fails to take the users in
-the arch/x86/crypto/aes-i586-asm_32.S assembler file into
-account.
+Building with LTO currently causes some annoying warnings:
 
-This adds an ugly workaround by adding a reference to each symbol
-into aes_glue.c, which gets linked together with the assembler
-file.
+WARNING: modpost: missing MODULE_LICENSE() in drivers/vhost/vhost_scsi.o
+see include/linux/module.h for more information
+kallsyms failure: relative symbol value 0xffffffff81000000 out of range in relative mode
 
-We obviously want to fix the CONFIG_TRIM_UNUSED_KSYMS logic
-to do the right thing here instead, but I couldn't come up
-with a good fix, so I use this instead to get a clean build
-for testing.
-
-This fix only works most of the time, but I still ran into
-some cases where combining an .S with a .c file did not
-produce the correct .ko file, as the lto linker apparently
-did not expect that kind of input. 'nm' on the file after
-'ld -r' showed only the contents of the assembler file, and
-after the lto-ld stage, only the contents of the .c file
-are there.
+The modpost warning is a false-positive, the other one is so far
+unknown. Both need a proper fix.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/x86/crypto/aes_glue.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ scripts/kallsyms.c    | 2 +-
+ scripts/mod/modpost.c | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/crypto/aes_glue.c b/arch/x86/crypto/aes_glue.c
-index e26984f7ab8d..6da3e3c34a77 100644
---- a/arch/x86/crypto/aes_glue.c
-+++ b/arch/x86/crypto/aes_glue.c
-@@ -53,6 +53,11 @@ static struct crypto_alg aes_alg = {
- 
- static int __init aes_init(void)
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 9ee9bf7fd1a2..e13227898d0b 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -395,7 +395,7 @@ static void write_src(void)
+ 				offset = relative_base - table[i].addr - 1;
+ 				overflow = (offset < INT_MIN || offset >= 0);
+ 			}
+-			if (overflow) {
++			if (0 && overflow) {
+ 				fprintf(stderr, "kallsyms failure: "
+ 					"%s symbol value %#llx out of range in relative mode\n",
+ 					symbol_absolute(&table[i]) ? "absolute" : "relative",
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 49dfcd556c78..87c4404dad48 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -867,6 +867,7 @@ static const char *const section_white_list[] =
+ static void check_section(const char *modname, struct elf_info *elf,
+ 			  Elf_Shdr *sechdr)
  {
-+	/* ugly hack to force a link time dependency */
-+	if (&crypto_it_tab == &crypto_ft_tab ||
-+	    &crypto_fl_tab == &crypto_il_tab)
-+		return 0;
-+
- 	return crypto_register_alg(&aes_alg);
++#if 0
+ 	const char *sec = sech_name(elf, sechdr);
+ 
+ 	if (sechdr->sh_type == SHT_PROGBITS &&
+@@ -878,6 +879,7 @@ static void check_section(const char *modname, struct elf_info *elf,
+ 		     "section definitions for use in .S files.\n\n",
+ 		     modname, sec);
+ 	}
++#endif
  }
  
+ 
+@@ -1963,10 +1965,12 @@ static void read_symbols(char *modname)
+ 	}
+ 
+ 	license = get_modinfo(info.modinfo, info.modinfo_len, "license");
++#if 0
+ 	if (!license && !is_vmlinux(modname))
+ 		warn("modpost: missing MODULE_LICENSE() in %s\n"
+ 		     "see include/linux/module.h for "
+ 		     "more information\n", modname);
++#endif
+ 	while (license) {
+ 		if (license_is_gpl_compatible(license))
+ 			mod->gpl_compatible = 1;
 -- 
 2.9.0
 
