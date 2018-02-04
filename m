@@ -1,47 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:40028 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751797AbeBDVuL (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:55105 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751789AbeBDV5y (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 4 Feb 2018 16:50:11 -0500
-Received: by mail-wm0-f66.google.com with SMTP id v123so22262211wmd.5
-        for <linux-kbuild@vger.kernel.org>; Sun, 04 Feb 2018 13:50:10 -0800 (PST)
+        Sun, 4 Feb 2018 16:57:54 -0500
+Received: by mail-wm0-f65.google.com with SMTP id i186so22554364wmi.4
+        for <linux-kbuild@vger.kernel.org>; Sun, 04 Feb 2018 13:57:53 -0800 (PST)
 From: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Date: Sun, 4 Feb 2018 22:49:53 +0100
+Date: Sun, 4 Feb 2018 22:57:51 +0100
 Subject: Re: [PATCH] kconfig: Minimize 'Selected by' and 'Implied by'
-Message-ID: <20180204214953.GA2905@example.com>
+Message-ID: <20180204215751.GB2905@example.com>
 References: <20180204113712.8983-1-rosca.eugeniu@gmail.com>
- <CAFkk2KQmROW-Z--qwvxWQrsohBSsnk_EhqZixOWFXUxeBj=tkQ@mail.gmail.com>
+ <20180204155053.GA32437@x230>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFkk2KQmROW-Z--qwvxWQrsohBSsnk_EhqZixOWFXUxeBj=tkQ@mail.gmail.com>
+In-Reply-To: <20180204155053.GA32437@x230>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Eugeniu Rosca <roscaeugeniu@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Petr Vorel <petr.vorel@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Eugeniu Rosca <rosca.eugeniu@gmail.com>
+To: Petr Vorel <petr.vorel@gmail.com>
+Cc: Eugeniu Rosca <roscaeugeniu@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ulf Magnusson <ulfalizer@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, linux-kbuild@vger.kernel.org, Eugeniu Rosca <rosca.eugeniu@gmail.com>
 
-Hi Ulf,
+Hello Petr,
 
-On Sun, Feb 04, 2018 at 03:46:00PM +0100, Ulf Magnusson wrote:
-> On Sun, Feb 4, 2018 at 12:37 PM, Eugeniu Rosca <roscaeugeniu@gmail.com> wrote:
+On Sun, Feb 04, 2018 at 04:50:54PM +0100, Petr Vorel wrote:
+> Hi Eugeniu,
+> 
 > > From: Eugeniu Rosca <erosca@de.adit-jv.com>
-> >
+> 
 > > Commit 1ccb27143360 ("kconfig: make "Selected by:" and "Implied by:"
 > > readable") made an incredible improvement in how reverse dependencies
 > > are perceived by the user, by breaking down the single (often
 > > interminable) expression string into small readable chunks.
-> >
+> 
 > > Even so, what happens in practice when reading the reverse
 > > dependencies is that 80-90% of the OR sub-expressions simply don't
 > > matter, since they evaluate to [=n].
-> >
+> 
 > > Assuming commit 617aebe6a97e ("Merge tag 'usercopy-v4.16-rc1' of
 > > git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux"), ARCH=arm64
 > > and vanilla arm64 defconfig, here is the top 30 of CONFIG options with
 > > the highest amount of OR sub-expressions that make up the final
 > > "{Selected,Implied} by" reverse dependency expression.
-> >
+> 
 > > | Config                        | Revdep all | Revdep ![=n] |
 > > |-------------------------------|------------|--------------|
 > > | REGMAP_I2C                    | 212        | 9            |
@@ -74,114 +75,69 @@ On Sun, Feb 04, 2018 at 03:46:00PM +0100, Ulf Magnusson wrote:
 > > | SND_SOC_GENERIC_DMAENGINE_PCM | 41         | 3            |
 > > | CRYPTO_SHA1                   | 37         | 2            |
 > > | REGMAP                        | 36         | 4            |
-> >
+> 
 > > The story behind the above is that we still need to visually
 > > review/evaluate 212 expressions which *potentially* select REGMAP_I2C
 > > in order to identify the expressions which *actually* select
 > > REGMAP_I2C, for a particular ARCH and for a particular defconfig used.
-> >
+> 
 > > This patch attempts to bring at user's fingertips those reverse
 > > dependencies that actually participate in selection of given symbol
 > > filtering out the rest of them.
-> >
+> 
 > > Signed-off-by: Eugeniu Rosca <erosca@de.adit-jv.com>
 > > ---
 > >  scripts/kconfig/expr.c | 24 +++++++++++++++++-------
 > >  1 file changed, 17 insertions(+), 7 deletions(-)
-> >
+> 
 > > diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
 > > index 2ba332b3fed7..147b2d8a8f3e 100644
 > > --- a/scripts/kconfig/expr.c
 > > +++ b/scripts/kconfig/expr.c
 > > @@ -1234,14 +1234,24 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
-> >                 fn(data, e->right.sym, e->right.sym->name);
-> >                 break;
-> >         case E_OR:
-> > -               if (revdep && e->left.expr->type != E_OR)
-> > -                       fn(data, NULL, "\n  - ");
-> > -               __expr_print(e->left.expr, fn, data, E_OR, revdep);
-> > -               if (revdep)
-> > -                       fn(data, NULL, "\n  - ");
-> > -               else
-> > +               if (revdep) {
-> > +                       struct expr *left = e->left.expr;
-> > +                       struct expr *right = e->right.expr;
+> >  		fn(data, e->right.sym, e->right.sym->name);
+> >  		break;
+> >  	case E_OR:
+> > -		if (revdep && e->left.expr->type != E_OR)
+> > -			fn(data, NULL, "\n  - ");
+> > -		__expr_print(e->left.expr, fn, data, E_OR, revdep);
+> > -		if (revdep)
+> > -			fn(data, NULL, "\n  - ");
+> > -		else
+> > +		if (revdep) {
+> > +			struct expr *left = e->left.expr;
+> > +			struct expr *right = e->right.expr;
 > > +
-> > +                       if (expr_calc_value(left) != no) {
-> > +                               if (left->type != E_OR)
-> > +                                       fn(data, NULL, "\n  - ");
-> > +                               __expr_print(left, fn, data, E_OR, revdep);
-> > +                       }
-> > +                       if (expr_calc_value(right) != no) {
-> > +                               fn(data, NULL, "\n  - ");
-> > +                               __expr_print(right, fn, data, E_OR, revdep);
-> > +                       }
-> > +               } else {
-> > +                       __expr_print(e->left.expr, fn, data, E_OR, revdep);
-> >                         fn(data, NULL, " || ");
-> > -               __expr_print(e->right.expr, fn, data, E_OR, revdep);
-> > +                       __expr_print(e->right.expr, fn, data, E_OR, revdep);
-> > +               }
-> >                 break;
-> >         case E_AND:
-> >                 expr_print(e->left.expr, fn, data, E_AND);
-> > --
-> > 2.16.1
-> >
+> > +			if (expr_calc_value(left) != no) {
+> > +				if (left->type != E_OR)
+> > +					fn(data, NULL, "\n  - ");
+> > +				__expr_print(left, fn, data, E_OR, revdep);
+> > +			}
+> > +			if (expr_calc_value(right) != no) {
+> > +				fn(data, NULL, "\n  - ");
+> > +				__expr_print(right, fn, data, E_OR, revdep);
+> > +			}
+> > +		} else {
+> > +			__expr_print(e->left.expr, fn, data, E_OR, revdep);
+> >  			fn(data, NULL, " || ");
+> > -		__expr_print(e->right.expr, fn, data, E_OR, revdep);
+> > +			__expr_print(e->right.expr, fn, data, E_OR, revdep);
+> > +		}
+> >  		break;
+> >  	case E_AND:
+> >  		expr_print(e->left.expr, fn, data, E_AND);
 > 
-> Hello,
+> Thanks for trying to improve my change.
 > 
-> One downside to this is that people might expect e.g. the '?'
-> menuconfig screen to list all the selecting symbols and use it as a
-> reference.
+> Applying your patch, running
+> $ ARCH=arm64 make defconfig && ARCH=arm64 make menuconfig
+> and searching for USB prints "Selected by:" with nothing actually selected.
 
-Agreed. See my proposals below.
+I think the behavior is correct. All expressions that select USB
+translate/evaluate to =n. CONFIG_USB is enabled in the arm64 defconfig.
 
-> The best solution IMO would be to have a separate "Currently selected
-> by:" section on that screen, listing just the non-n selects. The
-> simpler next best thing would be to just replace the "Selected by:"
-> heading with "Currently selected by:", to make it clear that it
-> includes just the active selects.
+> Kind regards,
+> Petr
 
-One certain thing is that with below two categories, some reverse
-dependencies would be printed twice:
-- "Currently selected by" - showing non-n expressions.
-- "Selected by"           - showing both non-n and n expressions.
-
-To avoid the duplicates, I would think about (naming could be improved):
-- "Actively selected by"   or "Currently selected by"
-- "Inactively selected by" or "Passively selected by"
-- "Actively implied by"    or "Currently implied by"
-- "Inactively implied by"  or "Passively implied by"
-
-I do believe that before proceeding with any further alternative
-implementations, we better first agree that the above way to print the
-reverse dependencies is fine for everybody.
-
-> For the most-selected symbols you listed, most of them end up as "m"
-> on my system by the way, because they come from drivers compiled in as
-> modules. "n" is the minority. Might want to check that most of the
-> ones with a million selects aren't like that, because it might not be
-> that hard to see what's going on for those anyway.
-
-Replying specifically to your `it might not be that hard to see what's
-going on for those anyway`, I do believe that for certain configs
-it is a pain to visually identify the meaningful (i.e.
-non-n) reverse dependencies when there are tens or hundreds of them.
-Getting this information directly from Kbuild (instead of computing it
-externally, either by hand or scripted) was my main motivation and
-driving factor behind sharing the patch.
-
-> I used a similar approach in
-> https://github.com/ulfalizer/Kconfiglib/blob/master/kconfiglib.py#L3022
-> by the way. I was always a bit worried that all the expression
-> simplification shenanigans going on in the C implementation might mess
-> with an approach like that, but it seems fine in practice. :)
-
-Can't wait to put my hands on Kconfiglib. Thanks for sharing!
-
-> Cheers,
-> Ulf
-
-Best regards,
+Thanks,
 Eugeniu.
