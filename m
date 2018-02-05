@@ -1,24 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:42198 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752556AbeBEBZW (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:39226 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752408AbeBEBYQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 4 Feb 2018 20:25:22 -0500
+        Sun, 4 Feb 2018 20:24:16 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 17/20] media: sec: Remove PLAT_S5P dependency
-Date: Mon,  5 Feb 2018 02:21:29 +0100
-Message-Id: <20180205012146.23981-18-ulfalizer@gmail.com>
+Subject: [PATCH 07/20] riscv: Remove ARCH_WANT_OPTIONAL_GPIOLIB select
+Date: Mon,  5 Feb 2018 02:21:19 +0100
+Message-Id: <20180205012146.23981-8-ulfalizer@gmail.com>
 In-Reply-To: <20180205012146.23981-1-ulfalizer@gmail.com>
 References: <20180205012146.23981-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Hans Verkuil <hans.verkuil@cisco.com>, Hugues Fruchet <hugues.fruchet@st.com>, Stanimir Varbanov <stanimir.varbanov@linaro.org>, Peter Griffin <peter.griffin@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Benjamin Gaignard <benjamin.gaignard@linaro.org>, Ramesh Shanmugasundaram <ramesh.shanmugasundaram@bp.renesas.com>, linux-media@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Palmer Dabbelt <palmer@sifive.com>, Albert Ou <albert@sifive.com>, linux-riscv@lists.infradead.org
 
-The PLAT_S5P symbol was removed in commit d78c16ccde96 ("ARM: SAMSUNG:
-Remove remaining legacy code").
+The ARCH_WANT_OPTIONAL_GPIOLIB symbol was removed in commit 65053e1a7743
+("gpio: delete ARCH_[WANTS_OPTIONAL|REQUIRE]_GPIOLIB"). GPIOLIB should
+just be selected explicitly if needed.
 
-Remove the PLAT_S5P dependency from VIDEO_SAMSUNG_S5P_CEC.
+Remove the ARCH_WANT_OPTIONAL_GPIOLIB select from RISCV.
+
+See commit 0145071b3314 ("x86: Do away with
+ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") and commit da9a1c6767 ("arm64: do
+away with ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") as well.
 
 Discovered with the
 https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
@@ -26,22 +31,21 @@ script.
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
- drivers/media/platform/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/riscv/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/media/platform/Kconfig b/drivers/media/platform/Kconfig
-index 614fbef08ddc..8b4cd02e2938 100644
---- a/drivers/media/platform/Kconfig
-+++ b/drivers/media/platform/Kconfig
-@@ -582,7 +582,7 @@ config CEC_GPIO
- 
- config VIDEO_SAMSUNG_S5P_CEC
-        tristate "Samsung S5P CEC driver"
--       depends on PLAT_S5P || ARCH_EXYNOS || COMPILE_TEST
-+       depends on ARCH_EXYNOS || COMPILE_TEST
-        select CEC_CORE
-        select CEC_NOTIFIER
-        ---help---
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index ff69c77b9e78..716e90e60e5c 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -19,7 +19,6 @@ config RISCV
+ 	select GENERIC_STRNLEN_USER
+ 	select GENERIC_SMP_IDLE_THREAD
+ 	select GENERIC_ATOMIC64 if !64BIT || !RISCV_ISA_A
+-	select ARCH_WANT_OPTIONAL_GPIOLIB
+ 	select HAVE_MEMBLOCK
+ 	select HAVE_MEMBLOCK_NODE_MAP
+ 	select HAVE_DMA_API_DEBUG
 -- 
 2.14.1
 
