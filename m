@@ -1,37 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.18]:43157 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752253AbeBEKqt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Feb 2018 05:46:49 -0500
-Date: Mon, 5 Feb 2018 11:45:39 +0100
-From: Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
-Subject: Re: [PATCH 06/20] riscv: Remove ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE
- select
-Message-ID: <20180205104539.iod5anzzl3axlfbh@latitude>
+Received: from mail.free-electrons.com ([62.4.15.54]:55388 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752612AbeBENql (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 5 Feb 2018 08:46:41 -0500
+Date: Mon, 5 Feb 2018 14:46:38 +0100
+From: Maxime Ripard <maxime.ripard@bootlin.com>
+Subject: Re: [PATCH 09/20] clk: sunxi-ng: Remove SUNXI_CCU_* selects
+Message-ID: <20180205134638.ugngvfmdixnpxihk@flea>
 References: <20180205012146.23981-1-ulfalizer@gmail.com>
- <20180205012146.23981-7-ulfalizer@gmail.com>
+ <20180205012146.23981-10-ulfalizer@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="vrtyjdsgeszxgxij"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="qibptpmrcb5iyvxp"
 Content-Disposition: inline
-In-Reply-To: <20180205012146.23981-7-ulfalizer@gmail.com>
+In-Reply-To: <20180205012146.23981-10-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: linux-kernel@vger.kernel.org, robh@kernel.org, linux-kbuild@vger.kernel.org, tony@atomide.com, vgupta@synopsys.com, linus.walleij@linaro.org, Palmer Dabbelt <palmer@sifive.com>, sboyd@codeaurora.org, mina86@mina86.com, tfiga@chromium.org, paulus@ozlabs.org, yamada.masahiro@socionext.com, paul.burton@mips.com, npiggin@gmail.com, Albert Ou <albert@sifive.com>, will.deacon@arm.com, linux-riscv@lists.infradead.org, egtvedt@samfundet.no, mgorman@techsingularity.net, hch@lst.de, m.szyprowski@samsung.com
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Chen-Yu Tsai <wens@csie.org>, Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org
 
 
---vrtyjdsgeszxgxij
-Content-Type: text/plain; charset=utf-8
+--qibptpmrcb5iyvxp
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 05, 2018 at 02:21:18AM +0100, Ulf Magnusson wrote:
-> The ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE symbol was removed in
-> commit 51a021244b9d ("atomic64: no need for
-> CONFIG_ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE").
+Hi Ulf,
+
+On Mon, Feb 05, 2018 at 02:21:21AM +0100, Ulf Magnusson wrote:
+> The selected symbols were removed in commit 06e226c7fb23 ("clk:
+> sunxi-ng: Move all clock types to a library").
 >=20
-> Remove the ARCH_HAS_ATOMIC64_DEC_IS_POSITIVE select from RISCV.
+> Remove the selects from SUN4I_A10_CCU.
 >=20
 > Discovered with the
 > https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefin=
@@ -39,47 +40,36 @@ ed.py
 > script.
 >=20
 > Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->  arch/riscv/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
 
-Looks good.
+This has already been submitted by Corentin:
+https://patchwork.kernel.org/patch/10175435/
 
-Reviewed-by: Jonathan Neusch=C3=A4fer <j.neuschaefer@gmx.net>
+Thanks!
+Maxime
 
->=20
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index b6722c246d9c..ff69c77b9e78 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -8,7 +8,6 @@ config RISCV
->  	select OF
->  	select OF_EARLY_FLATTREE
->  	select OF_IRQ
-> -	select ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE
->  	select ARCH_WANT_FRAME_POINTERS
->  	select CLONE_BACKWARDS
->  	select COMMON_CLK
+--=20
+Maxime Ripard, Bootlin (formerly Free Electrons)
+Embedded Linux and Kernel engineering
+http://bootlin.com
 
---vrtyjdsgeszxgxij
+--qibptpmrcb5iyvxp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQIcBAABAgAGBQJaeDXKAAoJEAgwRJqO81/bUwoP/0qILyd+UJyYbCilYtjkWYhk
-Yr4m0DkVOB95w38CY4H9yMUHPBOC0c1+hjNnxNioFfcO+9yFTmvk1XYKtDqEosze
-NnOu1DAgnqygv/dUhT181YaJX6UxNZnn2iBhg2s9V86RtMa9YLhU0NiQCaMJgxoL
-uUlzS7sC94dgIS1jTGoA+I5AS93vB6Jvv3hB2CJ9vWlFpXa/ZZljKf/yFzb4KJPA
-w7wlno4ZyqjaNVTGmwgrXIYf3u+pFV/oyKzm6T7p2K/2fxPbGBA+hFUPj13svlrj
-cdz9+k85HntVkCA8nDW3JhAaGCZ1585VeZknWNzCq/JdhVa+vHBbWxIjYHmIWKF1
-xAnIgO6WaV1hIWOyY2y+svPB4k/r0QOYYbSDFpPAkw6gRW67l1Os/xZocPZWEsUn
-YYW1wP1u8ElLjg5xq3bkNee7SkHDsIhiWeJ5JbIxhYvQ2k/GVqE10gVEIcqc4JOC
-eDrOh/27aJmarhWXToP7gh2hLEngNCIxa8Q+RSas9g7csmj5Z/wG5lDAYgWk4cn3
-XkyEEff/+64sfz96Cw9SrYCfh4JF8qSs5tayHEZJl8noZmYTUjVuMCSNuWl7NPZ8
-wURnAYSkcmM/+YOPaevfeM8xndkno9U9VdYiVjPHB6UYWxU9tEAdIoO9KPRb0lvu
-saidDobTPbKald+IBF6N
-=FD86
+iQIzBAABCAAdFiEE0VqZU19dR2zEVaqr0rTAlCFNr3QFAlp4YD4ACgkQ0rTAlCFN
+r3QtyA/9Fm+szM2mf5g406tyFmVHFdbHaTDP5jD54fhjBPPK1Jg0uw8Ig9dpFOe5
+m4Bcq7rPAMfjAYHOAd+FCv7P0oT4/K7n3NQ/9I7e1WqMNAKzqNyN/WcloDjFS/gK
+lhxPPorybKvvChE2ZddU9w5oC4AETILJ5B+gveN2IsTO3YDJv2Ufly8YmS4+OyO9
+AtNh84XQ1lTen1W9HvS9S3hCJwXHYMq1cMoVS83azCMMBBM38D5DOoeMaJID2kR8
+N8LHkVxrtYMB7tE9mjTRRHDWqIxRQww0B+/5qUcFN513NgQxsOcSmIJp9xu9N4qw
+Ypk74ydvysGOylvBmn69tdW5Q4BYY9w0HEPBxNwbEVrsr4Ez8Ij8aKY4YD2uPm0S
+5svM5KJBA1vXi244n4689MnC+EYdrGwzDtYK0H1F1p24yRAtdXRgDxVHoz+9A10L
+dvMVCeSsqBm+WQlXnCiIItbLHRyAYeuxsV75ANnQDiqNN1GsDvsYMLcSXjXBgPhp
+vyDMkzgCYQwDvDCQ0sdIPg5niDiKONdIGWyADPNiy7s/It2hT0dGofezV/yC8Odl
+uX8pV4yvd8rdBTNSS566kjYaqyTUyPegwov651837ZzxOZwyVBEM/GYOt90po6Se
+79uIi7P/koSCTRbe9zEFrUkcdh9hGR2h9Uxvho0kjjhxXYCPB+s=
+=vQgV
 -----END PGP SIGNATURE-----
 
---vrtyjdsgeszxgxij--
+--qibptpmrcb5iyvxp--
