@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f194.google.com ([209.85.217.194]:38786 "EHLO
-        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751774AbeBEXiw (ORCPT
+Received: from mail-vk0-f66.google.com ([209.85.213.66]:33626 "EHLO
+        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750862AbeBEXtN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Feb 2018 18:38:52 -0500
+        Mon, 5 Feb 2018 18:49:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <CACRpkdY-3ab=o0TpURqa-MyTMJOd86SWqBaD4n7+KGYhgbYjzg@mail.gmail.com>
+In-Reply-To: <CAFkk2KQzCE5KrUvyvL0Va+KT0O4BvT3PQAT2ZP4u3SGYUWcp2g@mail.gmail.com>
 References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-8-ulfalizer@gmail.com>
- <CACRpkdY-3ab=o0TpURqa-MyTMJOd86SWqBaD4n7+KGYhgbYjzg@mail.gmail.com>
+ <CACRpkdY-3ab=o0TpURqa-MyTMJOd86SWqBaD4n7+KGYhgbYjzg@mail.gmail.com> <CAFkk2KQzCE5KrUvyvL0Va+KT0O4BvT3PQAT2ZP4u3SGYUWcp2g@mail.gmail.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Tue, 6 Feb 2018 00:38:51 +0100
-Message-ID: <CAFkk2KQzCE5KrUvyvL0Va+KT0O4BvT3PQAT2ZP4u3SGYUWcp2g@mail.gmail.com>
+Date: Tue, 6 Feb 2018 00:49:11 +0100
+Message-ID: <CAFkk2KR5YyziwO8V9LeRh4yxVAakm+U2sej2nDCH_cxfLcZ2rA@mail.gmail.com>
 Subject: Re: [PATCH 07/20] riscv: Remove ARCH_WANT_OPTIONAL_GPIOLIB select
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,34 +18,42 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Walleij <linus.walleij@linaro.org>
 Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Egtvedt <egtvedt@samfundet.no>, Vineet Gupta <vgupta@synopsys.com>, mgorman@techsingularity.net, Christoph Hellwig <hch@lst.de>, mina86@mina86.com, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, Paul Mackerras <paulus@ozlabs.org>, Will Deacon <will.deacon@arm.com>, ext Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Palmer Dabbelt <palmer@sifive.com>, Albert Ou <albert@sifive.com>, linux-riscv@lists.infradead.org
 
-On Tue, Feb 6, 2018 at 12:25 AM, Linus Walleij <linus.walleij@linaro.org> wrote:
-> On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+On Tue, Feb 6, 2018 at 12:38 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> On Tue, Feb 6, 2018 at 12:25 AM, Linus Walleij <linus.walleij@linaro.org> wrote:
+>> On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+>>
+>>> The ARCH_WANT_OPTIONAL_GPIOLIB symbol was removed in commit 65053e1a7743
+>>> ("gpio: delete ARCH_[WANTS_OPTIONAL|REQUIRE]_GPIOLIB"). GPIOLIB should
+>>> just be selected explicitly if needed.
+>>>
+>>> Remove the ARCH_WANT_OPTIONAL_GPIOLIB select from RISCV.
+>>>
+>>> See commit 0145071b3314 ("x86: Do away with
+>>> ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") and commit da9a1c6767 ("arm64: do
+>>> away with ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") as well.
+>>>
+>>> Discovered with the
+>>> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+>>> script.
+>>>
+>>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>>
+>> This should probaly be replaced with
+>> select GPIOLIB
+>>
+>> Yours,
+>> Linus Walleij
 >
->> The ARCH_WANT_OPTIONAL_GPIOLIB symbol was removed in commit 65053e1a7743
->> ("gpio: delete ARCH_[WANTS_OPTIONAL|REQUIRE]_GPIOLIB"). GPIOLIB should
->> just be selected explicitly if needed.
->>
->> Remove the ARCH_WANT_OPTIONAL_GPIOLIB select from RISCV.
->>
->> See commit 0145071b3314 ("x86: Do away with
->> ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") and commit da9a1c6767 ("arm64: do
->> away with ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") as well.
->>
->> Discovered with the
->> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
->> script.
->>
->> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> That'd make more sense if GPIOLIB is actually used. The select has
+> been a no-op since mid-2016 at least, but maybe something else selects
+> GPIOLIB.
 >
-> This should probaly be replaced with
-> select GPIOLIB
->
-> Yours,
-> Linus Walleij
+> Cheers,
+> Ulf
 
-That'd make more sense if GPIOLIB is actually used. The select has
-been a no-op since mid-2016 at least, but maybe something else selects
-GPIOLIB.
+Just replace it with your own patch once you've figured out the proper
+fix. More efficient than having a middle man making (sometimes poor)
+guesses.
 
 Cheers,
 Ulf
