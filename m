@@ -1,25 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:35700 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752422AbeBEBYo (ORCPT
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:33781 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752476AbeBEBZK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 4 Feb 2018 20:24:44 -0500
+        Sun, 4 Feb 2018 20:25:10 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 11/20] usb: gadget: udc: Remove USB_GADGET_DUALSPEED select
-Date: Mon,  5 Feb 2018 02:21:23 +0100
-Message-Id: <20180205012146.23981-12-ulfalizer@gmail.com>
+Subject: [PATCH 15/20] phy: Remove SOC_EXYNOS4212 dep. from PHY_EXYNOS4X12_USB
+Date: Mon,  5 Feb 2018 02:21:27 +0100
+Message-Id: <20180205012146.23981-16-ulfalizer@gmail.com>
 In-Reply-To: <20180205012146.23981-1-ulfalizer@gmail.com>
 References: <20180205012146.23981-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Felipe Balbi <balbi@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Raviteja Garimella <raviteja.garimella@broadcom.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Randy Dunlap <rdunlap@infradead.org>, yuan linyu <Linyu.Yuan@alcatel-sbell.com.cn>, Cristian Birsan <cristian.birsan@microchip.com>, linux-usb@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Kishon Vijay Abraham I <kishon@ti.com>, Heiko Stuebner <heiko@sntech.de>, Vivek Gautam <vivek.gautam@codeaurora.org>, Krzysztof Kozlowski <krzk@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>
 
-USB_GADGET_DUALSPEED was removed by commit 85b8614d7223 ("usb: gadget:
-get rid of USB_GADGET_{DUAL,SUPER}SPEED"), but the USB_SNP_UDC_PLAT
-symbol still selects it.
+Exynos4212 support was removed by commit bca9085e0ae9 ("ARM: dts:
+exynos: remove Exynos4212 support (dead code)").
 
-Remove the USB_GADGET_DUALSPEED select from USB_SNP_UDC_PLAT.
+Remove the SOC_EXYNOS4212 dependency from PHY_EXYNOS4X12_USB.
 
 Discovered with the
 https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
@@ -27,21 +26,22 @@ script.
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
- drivers/usb/gadget/udc/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/phy/samsung/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/usb/gadget/udc/Kconfig b/drivers/usb/gadget/udc/Kconfig
-index 1e9567091d86..0875d38476ee 100644
---- a/drivers/usb/gadget/udc/Kconfig
-+++ b/drivers/usb/gadget/udc/Kconfig
-@@ -274,7 +274,6 @@ config USB_SNP_UDC_PLAT
- 	tristate "Synopsys USB 2.0 Device controller"
- 	depends on USB_GADGET && OF && HAS_DMA
- 	depends on EXTCON || EXTCON=n
--	select USB_GADGET_DUALSPEED
- 	select USB_SNP_CORE
- 	default ARCH_BCM_IPROC
- 	help
+diff --git a/drivers/phy/samsung/Kconfig b/drivers/phy/samsung/Kconfig
+index b7e0645a7bd9..2a5d33cb0e7e 100644
+--- a/drivers/phy/samsung/Kconfig
++++ b/drivers/phy/samsung/Kconfig
+@@ -49,7 +49,7 @@ config PHY_EXYNOS4210_USB2
+ config PHY_EXYNOS4X12_USB2
+ 	bool
+ 	depends on PHY_SAMSUNG_USB2
+-	default SOC_EXYNOS3250 || SOC_EXYNOS4212 || SOC_EXYNOS4412
++	default SOC_EXYNOS3250 || SOC_EXYNOS4412
+ 
+ config PHY_EXYNOS5250_USB2
+ 	bool
 -- 
 2.14.1
 
