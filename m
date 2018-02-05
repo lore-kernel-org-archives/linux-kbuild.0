@@ -1,54 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp2120.oracle.com ([141.146.126.78]:53434 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750910AbeBEGmo (ORCPT
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55218 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1750943AbeBEG5C (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Feb 2018 01:42:44 -0500
-Message-ID: <1517812899.3118.372.camel@oracle.com>
-Subject: Re: [PATCH v4 1/1] runchecks: Generalize make C={1,2} to support
- multiple checkers
-From: Knut Omang <knut.omang@oracle.com>
-Date: Mon, 05 Feb 2018 07:41:39 +0100
-In-Reply-To: <c271ba8f99393585d69db71f40db3c01c44769e4.1516356501.git-series.knut.omang@oracle.com>
-References: <cover.a7e2d48abd08947a9bb46ef5d18a8f33066cc40d.1516356501.git-series.knut.omang@oracle.com>
-         <c271ba8f99393585d69db71f40db3c01c44769e4.1516356501.git-series.knut.omang@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Mon, 5 Feb 2018 01:57:02 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w156s0Hh125478
+        for <linux-kbuild@vger.kernel.org>; Mon, 5 Feb 2018 01:57:02 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2fxfy4vqxs-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Feb 2018 01:57:01 -0500
+Received: from localhost
+        by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-kbuild@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
+        Mon, 5 Feb 2018 06:57:00 -0000
+Date: Mon, 5 Feb 2018 07:56:51 +0100
+From: Heiko Carstens <heiko.carstens@de.ibm.com>
+Subject: Re: [PATCH 08/20] s390/kconfig: Remove
+ ARCH_WANTS_PROT_NUMA_PROT_NONE select
+References: <20180205012146.23981-1-ulfalizer@gmail.com>
+ <20180205012146.23981-9-ulfalizer@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180205012146.23981-9-ulfalizer@gmail.com>
+Message-Id: <20180205065651.GA4415@osiris>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, =?ISO-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Gilles Muller <Gilles.Muller@lip6.fr>, Tom Saeger <tom.saeger@oracle.com>, Michal Marek <michal.lkml@markovi.net>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Julia Lawall <Julia.Lawall@lip6.fr>, John Haxby <john.haxby@oracle.com>, =?ISO-8859-1?Q?=C5smund_=D8stvold?= <asmund.ostvold@oracle.com>, Matthew Wilcox <willy@infradead.org>, "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>, cocci@systeme.lip6.fr, Andrew Morton <akpm@linux-foundation.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Martin Schwidefsky <schwidefsky@de.ibm.com>, linux-s390@vger.kernel.org
 
-On Fri, 2018-01-19 at 11:14 +0100, Knut Omang wrote:
-> Add scripts/runchecks which has generic support for running
-> checker tools in a convenient and user friendly way that
-> the author hopes can contribute to rein in issues detected
-> by these tools in a manageable and convenient way.
+On Mon, Feb 05, 2018 at 02:21:20AM +0100, Ulf Magnusson wrote:
+> The ARCH_WANTS_PROT_NUMA_PROT_NONE symbol was removed by
+> commit 6a33979d5bd7 ("mm: remove misleading ARCH_USES_NUMA_PROT_NONE"),
+> but S390 still selects it.
 > 
-> scripts/runchecks provides the following basic functionality:
+> Remove the ARCH_WANTS_PROT_NUMA_PROT_NONE select from the S390 symbol.
 > 
-> * Makes it possible to selectively suppress output from individual
->   checks on a per file or per subsystem basis.
-> * Unifies output and suppression input from different tools
->   by providing a single unified syntax and presentation for the
->   underlying tools in the style of "scripts/checkpatch.pl --show-types".
-> * Allows selective run of one, or more (or all) configured tools
->   for each file.
+> Discovered with the
+> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+> script.
 > 
-> In the Makefile system, the sparse specific setup has been replaced
-> by setup for runchecks.
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> ---
+>  arch/s390/Kconfig | 1 -
+>  1 file changed, 1 deletion(-)
 
-Hi all,
-
-- Anything more I can/need to do to bring this forward?
-- Any quiet concerns?
-
-I realize it is a subsystem crossing change, and a lot going on elsewhere, 
-nevertheless I believe this is a time saver in the slightly longer run,
-as it allows automation of checking, even without a "perfect"
-code base to begin with.
-
-Thanks,
-Knut
+Applied, thanks!
 
