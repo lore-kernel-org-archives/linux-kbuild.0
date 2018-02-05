@@ -1,24 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:44438 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752523AbeBEBYa (ORCPT
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:44450 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752556AbeBEBYh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 4 Feb 2018 20:24:30 -0500
+        Sun, 4 Feb 2018 20:24:37 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 09/20] clk: sunxi-ng: Remove SUNXI_CCU_* selects
-Date: Mon,  5 Feb 2018 02:21:21 +0100
-Message-Id: <20180205012146.23981-10-ulfalizer@gmail.com>
+Subject: [PATCH 10/20] lib/Kconfig: Remove leftover select of GENERIC_IO
+Date: Mon,  5 Feb 2018 02:21:22 +0100
+Message-Id: <20180205012146.23981-11-ulfalizer@gmail.com>
 In-Reply-To: <20180205012146.23981-1-ulfalizer@gmail.com>
 References: <20180205012146.23981-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Maxime Ripard <maxime.ripard@free-electrons.com>, Chen-Yu Tsai <wens@csie.org>, Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Andrew Morton <akpm@linux-foundation.org>, Nick Terrell <terrelln@fb.com>, Dan Williams <dan.j.williams@intel.com>, "David S. Miller" <davem@davemloft.net>, Matthew Wilcox <mawilcox@microsoft.com>, Palmer Dabbelt <palmer@dabbelt.com>, Dave Airlie <airlied@redhat.com>, Jeremy Kerr <jk@ozlabs.org>, Bart Van Assche <bart.vanassche@wdc.com>, Robin Murphy <robin.murphy@arm.com>
 
-The selected symbols were removed in commit 06e226c7fb23 ("clk:
-sunxi-ng: Move all clock types to a library").
+GENERIC_IO was removed by commit 9de8da47742b ("kconfig: kill off
+GENERIC_IO option"), but HAS_IOMEM still selects it.
 
-Remove the selects from SUN4I_A10_CCU.
+Remove the select of GENERIC_IO from HAS_IOMEM.
 
 Discovered with the
 https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
@@ -26,27 +26,21 @@ script.
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
- drivers/clk/sunxi-ng/Kconfig | 7 -------
- 1 file changed, 7 deletions(-)
+ lib/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/clk/sunxi-ng/Kconfig b/drivers/clk/sunxi-ng/Kconfig
-index 6427d0ebe2de..33168f94ee39 100644
---- a/drivers/clk/sunxi-ng/Kconfig
-+++ b/drivers/clk/sunxi-ng/Kconfig
-@@ -13,13 +13,6 @@ config SUN50I_A64_CCU
+diff --git a/lib/Kconfig b/lib/Kconfig
+index e96089499371..8ce8bcad6eff 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -396,7 +396,6 @@ config ASSOCIATIVE_ARRAY
+ config HAS_IOMEM
+ 	bool
+ 	depends on !NO_IOMEM
+-	select GENERIC_IO
+ 	default y
  
- config SUN4I_A10_CCU
- 	bool "Support for the Allwinner A10/A20 CCU"
--	select SUNXI_CCU_DIV
--	select SUNXI_CCU_MULT
--	select SUNXI_CCU_NK
--	select SUNXI_CCU_NKM
--	select SUNXI_CCU_NM
--	select SUNXI_CCU_MP
--	select SUNXI_CCU_PHASE
- 	default MACH_SUN4I
- 	default MACH_SUN7I
- 	depends on MACH_SUN4I || MACH_SUN7I || COMPILE_TEST
+ config HAS_IOPORT_MAP
 -- 
 2.14.1
 
