@@ -1,37 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:42228 "EHLO mail.kernel.org"
+Received: from mout.gmx.net ([212.227.15.18]:43157 "EHLO mout.gmx.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750943AbeBEIAS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Feb 2018 03:00:18 -0500
+        id S1752253AbeBEKqt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 5 Feb 2018 05:46:49 -0500
+Date: Mon, 5 Feb 2018 11:45:39 +0100
+From: Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
+Subject: Re: [PATCH 06/20] riscv: Remove ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE
+ select
+Message-ID: <20180205104539.iod5anzzl3axlfbh@latitude>
+References: <20180205012146.23981-1-ulfalizer@gmail.com>
+ <20180205012146.23981-7-ulfalizer@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180205012146.23981-16-ulfalizer@gmail.com>
-References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-16-ulfalizer@gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Mon, 5 Feb 2018 09:00:15 +0100
-Message-ID: <CAJKOXPecaWOgThH6YJ6bNG7u=OZtM+61QyVWD_JyV=8EkHf-gw@mail.gmail.com>
-Subject: Re: [PATCH 15/20] phy: Remove SOC_EXYNOS4212 dep. from PHY_EXYNOS4X12_USB
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="vrtyjdsgeszxgxij"
+Content-Disposition: inline
+In-Reply-To: <20180205012146.23981-7-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Kishon Vijay Abraham I <kishon@ti.com>, Heiko Stuebner <heiko@sntech.de>, Vivek Gautam <vivek.gautam@codeaurora.org>, Viresh Kumar <viresh.kumar@linaro.org>
+Cc: linux-kernel@vger.kernel.org, robh@kernel.org, linux-kbuild@vger.kernel.org, tony@atomide.com, vgupta@synopsys.com, linus.walleij@linaro.org, Palmer Dabbelt <palmer@sifive.com>, sboyd@codeaurora.org, mina86@mina86.com, tfiga@chromium.org, paulus@ozlabs.org, yamada.masahiro@socionext.com, paul.burton@mips.com, npiggin@gmail.com, Albert Ou <albert@sifive.com>, will.deacon@arm.com, linux-riscv@lists.infradead.org, egtvedt@samfundet.no, mgorman@techsingularity.net, hch@lst.de, m.szyprowski@samsung.com
 
-On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> Exynos4212 support was removed by commit bca9085e0ae9 ("ARM: dts:
-> exynos: remove Exynos4212 support (dead code)").
->
-> Remove the SOC_EXYNOS4212 dependency from PHY_EXYNOS4X12_USB.
->
+
+--vrtyjdsgeszxgxij
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Feb 05, 2018 at 02:21:18AM +0100, Ulf Magnusson wrote:
+> The ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE symbol was removed in
+> commit 51a021244b9d ("atomic64: no need for
+> CONFIG_ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE").
+>=20
+> Remove the ARCH_HAS_ATOMIC64_DEC_IS_POSITIVE select from RISCV.
+>=20
 > Discovered with the
-> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefin=
+ed.py
 > script.
->
+>=20
 > Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 > ---
->  drivers/phy/samsung/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/riscv/Kconfig | 1 -
+>  1 file changed, 1 deletion(-)
 
-Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
+Looks good.
 
-Best regards,
-Krzysztof
+Reviewed-by: Jonathan Neusch=C3=A4fer <j.neuschaefer@gmx.net>
+
+>=20
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index b6722c246d9c..ff69c77b9e78 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -8,7 +8,6 @@ config RISCV
+>  	select OF
+>  	select OF_EARLY_FLATTREE
+>  	select OF_IRQ
+> -	select ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE
+>  	select ARCH_WANT_FRAME_POINTERS
+>  	select CLONE_BACKWARDS
+>  	select COMMON_CLK
+
+--vrtyjdsgeszxgxij
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAABAgAGBQJaeDXKAAoJEAgwRJqO81/bUwoP/0qILyd+UJyYbCilYtjkWYhk
+Yr4m0DkVOB95w38CY4H9yMUHPBOC0c1+hjNnxNioFfcO+9yFTmvk1XYKtDqEosze
+NnOu1DAgnqygv/dUhT181YaJX6UxNZnn2iBhg2s9V86RtMa9YLhU0NiQCaMJgxoL
+uUlzS7sC94dgIS1jTGoA+I5AS93vB6Jvv3hB2CJ9vWlFpXa/ZZljKf/yFzb4KJPA
+w7wlno4ZyqjaNVTGmwgrXIYf3u+pFV/oyKzm6T7p2K/2fxPbGBA+hFUPj13svlrj
+cdz9+k85HntVkCA8nDW3JhAaGCZ1585VeZknWNzCq/JdhVa+vHBbWxIjYHmIWKF1
+xAnIgO6WaV1hIWOyY2y+svPB4k/r0QOYYbSDFpPAkw6gRW67l1Os/xZocPZWEsUn
+YYW1wP1u8ElLjg5xq3bkNee7SkHDsIhiWeJ5JbIxhYvQ2k/GVqE10gVEIcqc4JOC
+eDrOh/27aJmarhWXToP7gh2hLEngNCIxa8Q+RSas9g7csmj5Z/wG5lDAYgWk4cn3
+XkyEEff/+64sfz96Cw9SrYCfh4JF8qSs5tayHEZJl8noZmYTUjVuMCSNuWl7NPZ8
+wURnAYSkcmM/+YOPaevfeM8xndkno9U9VdYiVjPHB6UYWxU9tEAdIoO9KPRb0lvu
+saidDobTPbKald+IBF6N
+=FD86
+-----END PGP SIGNATURE-----
+
+--vrtyjdsgeszxgxij--
