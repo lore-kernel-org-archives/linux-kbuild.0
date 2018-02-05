@@ -1,24 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:46449 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752408AbeBEBXt (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:45604 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752422AbeBEBYV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 4 Feb 2018 20:23:49 -0500
+        Sun, 4 Feb 2018 20:24:21 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 05/20] rtc: at32ap700x: Remove PLATFORM_AT32AP dependency
-Date: Mon,  5 Feb 2018 02:21:17 +0100
-Message-Id: <20180205012146.23981-6-ulfalizer@gmail.com>
+Subject: [PATCH 08/20] s390/kconfig: Remove ARCH_WANTS_PROT_NUMA_PROT_NONE select
+Date: Mon,  5 Feb 2018 02:21:20 +0100
+Message-Id: <20180205012146.23981-9-ulfalizer@gmail.com>
 In-Reply-To: <20180205012146.23981-1-ulfalizer@gmail.com>
 References: <20180205012146.23981-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Alessandro Zummo <a.zummo@towertech.it>, Alexandre Belloni <alexandre.belloni@free-electrons.com>, linux-rtc@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-s390@vger.kernel.org
 
-The PLATFORM_AT32AP symbol went away when AVR32 was removed in
-commit 26202873bb51 ("avr32: remove support for AVR32 architecture").
+The ARCH_WANTS_PROT_NUMA_PROT_NONE symbol was removed by
+commit 6a33979d5bd7 ("mm: remove misleading ARCH_USES_NUMA_PROT_NONE"),
+but S390 still selects it.
 
-Remove the RTC_DRV_AT32AP700X dependency from RTC_DRV_AT32AP700X.
+Remove the ARCH_WANTS_PROT_NUMA_PROT_NONE select from the S390 symbol.
 
 Discovered with the
 https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
@@ -26,22 +27,21 @@ script.
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
- drivers/rtc/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/s390/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
-index b71cc7b5fbc9..1f5f3bd82ab6 100644
---- a/drivers/rtc/Kconfig
-+++ b/drivers/rtc/Kconfig
-@@ -1404,7 +1404,7 @@ config RTC_DRV_PL031
- 
- config RTC_DRV_AT32AP700X
- 	tristate "AT32AP700X series RTC"
--	depends on PLATFORM_AT32AP || COMPILE_TEST
-+	depends on COMPILE_TEST
- 	help
- 	  Driver for the internal RTC (Realtime Clock) on Atmel AVR32
- 	  AT32AP700x family processors.
+diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+index 0105ce28e246..bb090b7992e4 100644
+--- a/arch/s390/Kconfig
++++ b/arch/s390/Kconfig
+@@ -112,7 +112,6 @@ config S390
+ 	select ARCH_USE_BUILTIN_BSWAP
+ 	select ARCH_USE_CMPXCHG_LOCKREF
+ 	select ARCH_WANTS_DYNAMIC_TASK_STRUCT
+-	select ARCH_WANTS_PROT_NUMA_PROT_NONE
+ 	select ARCH_WANTS_UBSAN_NO_NULL
+ 	select ARCH_WANT_IPC_PARSE_VERSION
+ 	select BUILDTIME_EXTABLE_SORT
 -- 
 2.14.1
 
