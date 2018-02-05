@@ -1,49 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f196.google.com ([209.85.217.196]:39943 "EHLO
-        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752199AbeBEE7A (ORCPT
+Received: from aserp2120.oracle.com ([141.146.126.78]:53434 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750910AbeBEGmo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 4 Feb 2018 23:59:00 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180205044821.3zvs7cfhdr3eu2qa@oak.ozlabs.ibm.com>
-References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-3-ulfalizer@gmail.com>
- <20180205044821.3zvs7cfhdr3eu2qa@oak.ozlabs.ibm.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Mon, 5 Feb 2018 05:58:59 +0100
-Message-ID: <CAFkk2KRQRx9kQLk1eCgLzogern240FOKW=OEJAFPNUAgtf4fEg@mail.gmail.com>
-Subject: Re: [PATCH 02/20] KVM: PPC: Book3S PR: Fix broken select due to misspelling
+        Mon, 5 Feb 2018 01:42:44 -0500
+Message-ID: <1517812899.3118.372.camel@oracle.com>
+Subject: Re: [PATCH v4 1/1] runchecks: Generalize make C={1,2} to support
+ multiple checkers
+From: Knut Omang <knut.omang@oracle.com>
+Date: Mon, 05 Feb 2018 07:41:39 +0100
+In-Reply-To: <c271ba8f99393585d69db71f40db3c01c44769e4.1516356501.git-series.knut.omang@oracle.com>
+References: <cover.a7e2d48abd08947a9bb46ef5d18a8f33066cc40d.1516356501.git-series.knut.omang@oracle.com>
+         <c271ba8f99393585d69db71f40db3c01c44769e4.1516356501.git-series.knut.omang@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Mackerras <paulus@ozlabs.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, will.deacon@arm.com, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: linux-kernel@vger.kernel.org
+Cc: Mauro Carvalho Chehab <mchehab@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, =?ISO-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Gilles Muller <Gilles.Muller@lip6.fr>, Tom Saeger <tom.saeger@oracle.com>, Michal Marek <michal.lkml@markovi.net>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Julia Lawall <Julia.Lawall@lip6.fr>, John Haxby <john.haxby@oracle.com>, =?ISO-8859-1?Q?=C5smund_=D8stvold?= <asmund.ostvold@oracle.com>, Matthew Wilcox <willy@infradead.org>, "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>, cocci@systeme.lip6.fr, Andrew Morton <akpm@linux-foundation.org>
 
-On Mon, Feb 5, 2018 at 5:48 AM, Paul Mackerras <paulus@ozlabs.org> wrote:
-> On Mon, Feb 05, 2018 at 02:21:14AM +0100, Ulf Magnusson wrote:
->> Commit 76d837a4c0f9 ("KVM: PPC: Book3S PR: Don't include SPAPR TCE code
->> on non-pseries platforms") added a reference to the globally undefined
->> symbol PPC_SERIES. Looking at the rest of the commit, PPC_PSERIES was
->> probably intended.
->>
->> Change PPC_SERIES to PPC_PSERIES.
->>
->> Discovered with the
->> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
->> script.
->>
->> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->
-> Acked-by: Paul Mackerras <paulus@ozlabs.org>
->
-> Which tree is this series going into?
->
-> Paul.
+On Fri, 2018-01-19 at 11:14 +0100, Knut Omang wrote:
+> Add scripts/runchecks which has generic support for running
+> checker tools in a convenient and user friendly way that
+> the author hopes can contribute to rein in issues detected
+> by these tools in a manageable and convenient way.
+> 
+> scripts/runchecks provides the following basic functionality:
+> 
+> * Makes it possible to selectively suppress output from individual
+>   checks on a per file or per subsystem basis.
+> * Unifies output and suppression input from different tools
+>   by providing a single unified syntax and presentation for the
+>   underlying tools in the style of "scripts/checkpatch.pl --show-types".
+> * Allows selective run of one, or more (or all) configured tools
+>   for each file.
+> 
+> In the Makefile system, the sparse specific setup has been replaced
+> by setup for runchecks.
 
-I didn't have a particular one in mind. I imagined people would pick
-up individual patches into the trees that make the most sense. It was
-easiest to do the undefined symbol removal as a kernel-wide batch job.
+Hi all,
 
-All patches are against linux-next.
+- Anything more I can/need to do to bring this forward?
+- Any quiet concerns?
 
-Cheers,
-Ulf
+I realize it is a subsystem crossing change, and a lot going on elsewhere, 
+nevertheless I believe this is a time saver in the slightly longer run,
+as it allows automation of checking, even without a "perfect"
+code base to begin with.
+
+Thanks,
+Knut
+
