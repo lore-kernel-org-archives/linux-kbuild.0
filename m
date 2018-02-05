@@ -1,58 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f196.google.com ([209.85.217.196]:42024 "EHLO
-        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751982AbeBECDa (ORCPT
+Received: from mail-ua0-f195.google.com ([209.85.217.195]:46329 "EHLO
+        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752050AbeBECIZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 4 Feb 2018 21:03:30 -0500
+        Sun, 4 Feb 2018 21:08:25 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180205012146.23981-21-ulfalizer@gmail.com>
-References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-21-ulfalizer@gmail.com>
+In-Reply-To: <20180205012146.23981-1-ulfalizer@gmail.com>
+References: <20180205012146.23981-1-ulfalizer@gmail.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Mon, 5 Feb 2018 03:03:29 +0100
-Message-ID: <CAFkk2KRNMKEoArwi9XQryEDe-VMbbL0WySXh_ydLKchke6XQcw@mail.gmail.com>
-Subject: Re: [PATCH 20/20] x86/PCI: VMD: Fix malformed default
+Date: Mon, 5 Feb 2018 03:08:24 +0100
+Message-ID: <CAFkk2KRafUf3ki2R7B1pE_wzYkYn-OdeqLnvL0kScSxdzDMEXw@mail.gmail.com>
+Subject: Re: [PATCH 00/20] Remove references to undefined symbols and fix two
+ potential bugs
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ley Foon Tan <lftan@altera.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ulf Magnusson <ulfalizer@gmail.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, perex@perex.cz, tiwai@suse.com, robert.jarzmik@free.fr, broonie@kernel.org, alsa-devel@alsa-project.org
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ulf Magnusson <ulfalizer@gmail.com>, Palmer Dabbelt <palmer@sifive.com>, Albert Ou <albert@sifive.com>, linux-riscv@lists.infradead.org
 
 On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> 'default N' should be 'default n', though they happen to have the same
-> effect here, due to undefined symbols (N in this case) evaluating to n
-> in a tristate sense.
+> Hello,
 >
-> Remove the default from VMD instead of changing it. bool and tristate
-> symbols implicitly default to n.
->
-> Discovered with the
+> This patchset fixes most references to globally undefined symbols in Kconfig
+> files, as reported by the
 > https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
-> script.
+> script. I will send emails in reply to the patchset for some cases where I'm
+> not sure what the proper fix is.
 >
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->  drivers/pci/host/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
+> All of the fixes are independent. I just created a patchset to track them more
+> easily.
 >
-> diff --git a/drivers/pci/host/Kconfig b/drivers/pci/host/Kconfig
-> index a4ed7484d127..dc8a2a175f19 100644
-> --- a/drivers/pci/host/Kconfig
-> +++ b/drivers/pci/host/Kconfig
-> @@ -215,7 +215,6 @@ config PCIE_TANGO_SMP8759
->  config VMD
->         depends on PCI_MSI && X86_64 && SRCU
->         tristate "Intel Volume Management Device Driver"
-> -       default N
->         ---help---
->           Adds support for the Intel Volume Management Device (VMD). VMD is a
->           secondary PCI host bridge that allows PCI Express root ports,
+> Summary of changes:
+>
+>  - Commits 1 and 2 fix what looks like potential bugs: A broken (intended)
+>    select of PL310_ERRATA_753970 for ARM/mvebu, and a misspelled dependency on
+>    PPC_PSERIES in KVM/PPC.
+>
+>  - Commits 3-5 remove leftover AVR32 stuff.
+>
+>  - Commits 6 and 7 remove some selects of removed symbols from riscv.
+>
+>  - Commits 8-17 remove various references to removed symbols.
+>
+>  - Commits 18-20 fix some (harmless) malformed defaults.
+>
+> Ulf Magnusson (20):
+>   ARM: mvebu: Fix broken PL310_ERRATA_753970 selects
+>   KVM: PPC: Book3S PR: Fix broken select due to misspelling
+>   kconfig: Remove leftover references to AVR32 symbol
+>   misc: atmel: Remove CPU_AT32AP700X (AVR32) reference
+>   rtc: at32ap700x: Remove PLATFORM_AT32AP dependency
+>   riscv: Remove ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE select
+>   riscv: Remove ARCH_WANT_OPTIONAL_GPIOLIB select
+>   s390/kconfig: Remove ARCH_WANTS_PROT_NUMA_PROT_NONE select
+>   clk: sunxi-ng: Remove SUNXI_CCU_* selects
+>   lib/Kconfig: Remove leftover select of GENERIC_IO
+>   usb: gadget: udc: Remove USB_GADGET_DUALSPEED select
+>   ARM: debug: Remove ARCH_MSM dep. from UNCOMPRESS_INCLUDE
+>   ore: Remove PNFS_OBJLAYOUT dependency
+>   iio: gyro: mpu3050: Remove INPUT_MPU3050 dep. from I2C
+>   phy: Remove SOC_EXYNOS4212 dep. from PHY_EXYNOS4X12_USB
+>   auxdisplay: img-ascii-lcd: Remove MIPS_SEAD3 dep.
+>   media: sec: Remove PLAT_S5P dependency
+>   iwlwifi: fix malformed CONFIG_IWLWIFI_PCIE_RTPM default
+>   ARC: Fix malformed ARC_EMUL_UNALIGNED default
+>   x86/PCI: VMD: Fix malformed default
+>
+>  arch/arc/Kconfig                           |  1 -
+>  arch/arm/Kconfig.debug                     |  2 +-
+>  arch/arm/mach-mvebu/Kconfig                |  4 ++--
+>  arch/powerpc/kvm/Kconfig                   |  2 +-
+>  arch/riscv/Kconfig                         |  2 --
+>  arch/s390/Kconfig                          |  1 -
+>  drivers/auxdisplay/Kconfig                 |  2 +-
+>  drivers/clk/sunxi-ng/Kconfig               |  7 -------
+>  drivers/cpufreq/Kconfig                    | 10 ----------
+>  drivers/iio/gyro/Kconfig                   |  1 -
+>  drivers/media/platform/Kconfig             |  2 +-
+>  drivers/misc/Kconfig                       |  1 -
+>  drivers/net/wireless/intel/iwlwifi/Kconfig |  1 -
+>  drivers/pci/host/Kconfig                   |  1 -
+>  drivers/phy/samsung/Kconfig                |  2 +-
+>  drivers/pwm/Kconfig                        |  2 +-
+>  drivers/rtc/Kconfig                        |  2 +-
+>  drivers/spi/Kconfig                        |  2 +-
+>  drivers/usb/gadget/udc/Kconfig             |  1 -
+>  drivers/video/console/Kconfig              |  2 +-
+>  fs/exofs/Kconfig.ore                       |  2 +-
+>  lib/Kconfig                                |  1 -
+>  22 files changed, 12 insertions(+), 39 deletions(-)
+>
 > --
 > 2.14.1
 >
 
-The PCIE_ALTERA symbol in this file also depends on the globally
-undefined symbol OF_PCI, which was removed in 4670d610d592 ("PCI: Move
-OF-related PCI functions into PCI core").
+The symbol AC97_BUS_NEW in sound/ac97/Kconfig selects the globally
+undefined symbol AC97.
+
+It doesn't seem to simply be a misspelling of AC97_BUS, because then
+the dependencies of AC97_BUS_COMPAT would be impossible to satisfy.
 
 Cheers,
 Ulf
