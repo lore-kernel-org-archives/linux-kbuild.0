@@ -1,52 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:47743 "EHLO ozlabs.org"
+Received: from mail.kernel.org ([198.145.29.99]:42228 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750949AbeBEH4U (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Feb 2018 02:56:20 -0500
-Date: Mon, 5 Feb 2018 18:56:15 +1100
-From: Paul Mackerras <paulus@ozlabs.org>
-Subject: Re: [PATCH 02/20] KVM: PPC: Book3S PR: Fix broken select due to
- misspelling
-Message-ID: <20180205075615.GA24826@fergus.ozlabs.ibm.com>
-References: <20180205012146.23981-1-ulfalizer@gmail.com>
- <20180205012146.23981-3-ulfalizer@gmail.com>
- <20180205044821.3zvs7cfhdr3eu2qa@oak.ozlabs.ibm.com>
- <CAFkk2KRQRx9kQLk1eCgLzogern240FOKW=OEJAFPNUAgtf4fEg@mail.gmail.com>
+        id S1750943AbeBEIAS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 5 Feb 2018 03:00:18 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFkk2KRQRx9kQLk1eCgLzogern240FOKW=OEJAFPNUAgtf4fEg@mail.gmail.com>
+In-Reply-To: <20180205012146.23981-16-ulfalizer@gmail.com>
+References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-16-ulfalizer@gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Date: Mon, 5 Feb 2018 09:00:15 +0100
+Message-ID: <CAJKOXPecaWOgThH6YJ6bNG7u=OZtM+61QyVWD_JyV=8EkHf-gw@mail.gmail.com>
+Subject: Re: [PATCH 15/20] phy: Remove SOC_EXYNOS4212 dep. from PHY_EXYNOS4X12_USB
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, will.deacon@arm.com, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Kishon Vijay Abraham I <kishon@ti.com>, Heiko Stuebner <heiko@sntech.de>, Vivek Gautam <vivek.gautam@codeaurora.org>, Viresh Kumar <viresh.kumar@linaro.org>
 
-On Mon, Feb 05, 2018 at 05:58:59AM +0100, Ulf Magnusson wrote:
-> On Mon, Feb 5, 2018 at 5:48 AM, Paul Mackerras <paulus@ozlabs.org> wrote:
-> > On Mon, Feb 05, 2018 at 02:21:14AM +0100, Ulf Magnusson wrote:
-> >> Commit 76d837a4c0f9 ("KVM: PPC: Book3S PR: Don't include SPAPR TCE code
-> >> on non-pseries platforms") added a reference to the globally undefined
-> >> symbol PPC_SERIES. Looking at the rest of the commit, PPC_PSERIES was
-> >> probably intended.
-> >>
-> >> Change PPC_SERIES to PPC_PSERIES.
-> >>
-> >> Discovered with the
-> >> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
-> >> script.
-> >>
-> >> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> >
-> > Acked-by: Paul Mackerras <paulus@ozlabs.org>
-> >
-> > Which tree is this series going into?
-> >
-> > Paul.
-> 
-> I didn't have a particular one in mind. I imagined people would pick
-> up individual patches into the trees that make the most sense. It was
-> easiest to do the undefined symbol removal as a kernel-wide batch job.
+On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> Exynos4212 support was removed by commit bca9085e0ae9 ("ARM: dts:
+> exynos: remove Exynos4212 support (dead code)").
+>
+> Remove the SOC_EXYNOS4212 dependency from PHY_EXYNOS4X12_USB.
+>
+> Discovered with the
+> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+> script.
+>
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> ---
+>  drivers/phy/samsung/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-OK, I'll take this one then.
+Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
 
-Paul.
+Best regards,
+Krzysztof
