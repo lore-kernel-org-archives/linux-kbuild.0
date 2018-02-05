@@ -1,73 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:36324 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751414AbeBEUbG (ORCPT
+Received: from mail-io0-f194.google.com ([209.85.223.194]:39077 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750862AbeBEXZs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Feb 2018 15:31:06 -0500
+        Mon, 5 Feb 2018 18:25:48 -0500
+Received: by mail-io0-f194.google.com with SMTP id b198so515569iof.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Feb 2018 15:25:48 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180205140134.GN3404@piout.net>
-References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-6-ulfalizer@gmail.com>
- <CAFkk2KRmK=fw=WYwr3eC8RJh7nxsUvC=uUnz7UCni72H9sHv4g@mail.gmail.com> <20180205140134.GN3404@piout.net>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Mon, 5 Feb 2018 21:31:04 +0100
-Message-ID: <CAFkk2KRt0wWY0Q6S-R-wKa6iKrmnmj6HRfDmDrHu942joEPpRg@mail.gmail.com>
-Subject: Re: [PATCH 05/20] rtc: at32ap700x: Remove PLATFORM_AT32AP dependency
+In-Reply-To: <20180205012146.23981-8-ulfalizer@gmail.com>
+References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-8-ulfalizer@gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 6 Feb 2018 00:25:47 +0100
+Message-ID: <CACRpkdY-3ab=o0TpURqa-MyTMJOd86SWqBaD4n7+KGYhgbYjzg@mail.gmail.com>
+Subject: Re: [PATCH 07/20] riscv: Remove ARCH_WANT_OPTIONAL_GPIOLIB select
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexandre Belloni <alexandre.belloni@free-electrons.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, Paul Mackerras <paulus@ozlabs.org>, will.deacon@arm.com, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Alessandro Zummo <a.zummo@towertech.it>, linux-rtc@vger.kernel.org
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Egtvedt <egtvedt@samfundet.no>, Vineet Gupta <vgupta@synopsys.com>, mgorman@techsingularity.net, Christoph Hellwig <hch@lst.de>, mina86@mina86.com, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, paulus@ozlabs.org, Will Deacon <will.deacon@arm.com>, ext Tony Lindgren <tony@atomide.com>, npiggin@gmail.com, Masahiro Yamada <yamada.masahiro@socionext.com>, Palmer Dabbelt <palmer@sifive.com>, Albert Ou <albert@sifive.com>, linux-riscv@lists.infradead.org
 
-On Mon, Feb 5, 2018 at 3:01 PM, Alexandre Belloni
-<alexandre.belloni@free-electrons.com> wrote:
-> Hi,
->
-> On 05/02/2018 at 02:42:38 +0100, Ulf Magnusson wrote:
->> On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
->> > The PLATFORM_AT32AP symbol went away when AVR32 was removed in
->> > commit 26202873bb51 ("avr32: remove support for AVR32 architecture").
->> >
->> > Remove the RTC_DRV_AT32AP700X dependency from RTC_DRV_AT32AP700X.
->> >
->> > Discovered with the
->> > https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
->> > script.
->> >
->> > Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->> > ---
->> >  drivers/rtc/Kconfig | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> >
->> > diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
->> > index b71cc7b5fbc9..1f5f3bd82ab6 100644
->> > --- a/drivers/rtc/Kconfig
->> > +++ b/drivers/rtc/Kconfig
->> > @@ -1404,7 +1404,7 @@ config RTC_DRV_PL031
->> >
->> >  config RTC_DRV_AT32AP700X
->> >         tristate "AT32AP700X series RTC"
->> > -       depends on PLATFORM_AT32AP || COMPILE_TEST
->> > +       depends on COMPILE_TEST
->> >         help
->> >           Driver for the internal RTC (Realtime Clock) on Atmel AVR32
->> >           AT32AP700x family processors.
->> > --
->> > 2.14.1
->> >
->>
->> RTC_DRV_AT32AP700X could probably be removed along with
->> ./drivers/rtc/rtc-at32ap700x.c as well.
->>
->
-> Note that the driver is already removed in Linus' tree.
->
->
-> --
-> Alexandre Belloni, Bootlin (formerly Free Electrons)
-> Embedded Linux and Kernel engineering
-> http://bootlin.com
+On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
 
-That got rid of the config symbol too. This patch is moot then.
+> The ARCH_WANT_OPTIONAL_GPIOLIB symbol was removed in commit 65053e1a7743
+> ("gpio: delete ARCH_[WANTS_OPTIONAL|REQUIRE]_GPIOLIB"). GPIOLIB should
+> just be selected explicitly if needed.
+>
+> Remove the ARCH_WANT_OPTIONAL_GPIOLIB select from RISCV.
+>
+> See commit 0145071b3314 ("x86: Do away with
+> ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") and commit da9a1c6767 ("arm64: do
+> away with ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") as well.
+>
+> Discovered with the
+> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+> script.
+>
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 
-Cheers,
-Ulf
+This should probaly be replaced with
+select GPIOLIB
+
+Yours,
+Linus Walleij
