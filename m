@@ -1,24 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:33781 "EHLO
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:43878 "EHLO
         mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752476AbeBEBZK (ORCPT
+        with ESMTP id S1752650AbeBEBZO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 4 Feb 2018 20:25:10 -0500
+        Sun, 4 Feb 2018 20:25:14 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 15/20] phy: Remove SOC_EXYNOS4212 dep. from PHY_EXYNOS4X12_USB
-Date: Mon,  5 Feb 2018 02:21:27 +0100
-Message-Id: <20180205012146.23981-16-ulfalizer@gmail.com>
+Subject: [PATCH 16/20] auxdisplay: img-ascii-lcd: Remove MIPS_SEAD3 dep.
+Date: Mon,  5 Feb 2018 02:21:28 +0100
+Message-Id: <20180205012146.23981-17-ulfalizer@gmail.com>
 In-Reply-To: <20180205012146.23981-1-ulfalizer@gmail.com>
 References: <20180205012146.23981-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Kishon Vijay Abraham I <kishon@ti.com>, Heiko Stuebner <heiko@sntech.de>, Vivek Gautam <vivek.gautam@codeaurora.org>, Krzysztof Kozlowski <krzk@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>
+Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Miguel Ojeda Sandonis <miguel.ojeda.sandonis@gmail.com>
 
-Exynos4212 support was removed by commit bca9085e0ae9 ("ARM: dts:
-exynos: remove Exynos4212 support (dead code)").
+The MIPS_SEAD3 symbol was removed in commit 64601cb1343f ("leds: Remove SEAD-3
+driver").
 
-Remove the SOC_EXYNOS4212 dependency from PHY_EXYNOS4X12_USB.
+Remove the MIPS_SEAD3 dependency from IMG_ASCII_LCD.
 
 Discovered with the
 https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
@@ -26,22 +26,22 @@ script.
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
- drivers/phy/samsung/Kconfig | 2 +-
+ drivers/auxdisplay/Kconfig | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/phy/samsung/Kconfig b/drivers/phy/samsung/Kconfig
-index b7e0645a7bd9..2a5d33cb0e7e 100644
---- a/drivers/phy/samsung/Kconfig
-+++ b/drivers/phy/samsung/Kconfig
-@@ -49,7 +49,7 @@ config PHY_EXYNOS4210_USB2
- config PHY_EXYNOS4X12_USB2
- 	bool
- 	depends on PHY_SAMSUNG_USB2
--	default SOC_EXYNOS3250 || SOC_EXYNOS4212 || SOC_EXYNOS4412
-+	default SOC_EXYNOS3250 || SOC_EXYNOS4412
- 
- config PHY_EXYNOS5250_USB2
- 	bool
+diff --git a/drivers/auxdisplay/Kconfig b/drivers/auxdisplay/Kconfig
+index 2c2ed9cf8796..3cba78d36eec 100644
+--- a/drivers/auxdisplay/Kconfig
++++ b/drivers/auxdisplay/Kconfig
+@@ -137,7 +137,7 @@ config CFAG12864B_RATE
+ config IMG_ASCII_LCD
+ 	tristate "Imagination Technologies ASCII LCD Display"
+ 	depends on HAS_IOMEM
+-	default y if MIPS_MALTA || MIPS_SEAD3
++	default y if MIPS_MALTA
+ 	select SYSCON
+ 	help
+ 	  Enable this to support the simple ASCII LCD displays found on
 -- 
 2.14.1
 
