@@ -1,205 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f67.google.com ([209.85.213.67]:34029 "EHLO
-        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751797AbeBDWMD (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:42980 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751979AbeBEBWz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 4 Feb 2018 17:12:03 -0500
-Received: by mail-vk0-f67.google.com with SMTP id f186so16590950vkc.1
-        for <linux-kbuild@vger.kernel.org>; Sun, 04 Feb 2018 14:12:03 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180204214953.GA2905@example.com>
-References: <20180204113712.8983-1-rosca.eugeniu@gmail.com>
- <CAFkk2KQmROW-Z--qwvxWQrsohBSsnk_EhqZixOWFXUxeBj=tkQ@mail.gmail.com> <20180204214953.GA2905@example.com>
+        Sun, 4 Feb 2018 20:22:55 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Sun, 4 Feb 2018 23:12:01 +0100
-Message-ID: <CAFkk2KR9JDTxtD7=HVzP4eS2hh6xFNd-AkPi7_cDSgjc8k4u4A@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Minimize 'Selected by' and 'Implied by'
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 00/20] Remove references to undefined symbols and fix two potential bugs
+Date: Mon,  5 Feb 2018 02:21:12 +0100
+Message-Id: <20180205012146.23981-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Petr Vorel <petr.vorel@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Eugeniu Rosca <rosca.eugeniu@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Palmer Dabbelt <palmer@sifive.com>, Albert Ou <albert@sifive.com>, linux-riscv@lists.infradead.org
 
-On Sun, Feb 4, 2018 at 10:49 PM, Eugeniu Rosca <roscaeugeniu@gmail.com> wrote:
-> Hi Ulf,
->
-> On Sun, Feb 04, 2018 at 03:46:00PM +0100, Ulf Magnusson wrote:
->> On Sun, Feb 4, 2018 at 12:37 PM, Eugeniu Rosca <roscaeugeniu@gmail.com> wrote:
->> > From: Eugeniu Rosca <erosca@de.adit-jv.com>
->> >
->> > Commit 1ccb27143360 ("kconfig: make "Selected by:" and "Implied by:"
->> > readable") made an incredible improvement in how reverse dependencies
->> > are perceived by the user, by breaking down the single (often
->> > interminable) expression string into small readable chunks.
->> >
->> > Even so, what happens in practice when reading the reverse
->> > dependencies is that 80-90% of the OR sub-expressions simply don't
->> > matter, since they evaluate to [=n].
->> >
->> > Assuming commit 617aebe6a97e ("Merge tag 'usercopy-v4.16-rc1' of
->> > git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux"), ARCH=arm64
->> > and vanilla arm64 defconfig, here is the top 30 of CONFIG options with
->> > the highest amount of OR sub-expressions that make up the final
->> > "{Selected,Implied} by" reverse dependency expression.
->> >
->> > | Config                        | Revdep all | Revdep ![=n] |
->> > |-------------------------------|------------|--------------|
->> > | REGMAP_I2C                    | 212        | 9            |
->> > | CRC32                         | 167        | 25           |
->> > | FW_LOADER                     | 128        | 5            |
->> > | MFD_CORE                      | 124        | 9            |
->> > | FB_CFB_IMAGEBLIT              | 114        | 2            |
->> > | FB_CFB_COPYAREA               | 111        | 2            |
->> > | FB_CFB_FILLRECT               | 110        | 2            |
->> > | SND_PCM                       | 103        | 2            |
->> > | CRYPTO_HASH                   | 87         | 19           |
->> > | WATCHDOG_CORE                 | 86         | 6            |
->> > | IRQ_DOMAIN                    | 75         | 19           |
->> > | SERIAL_CORE                   | 75         | 9            |
->> > | PHYLIB                        | 74         | 16           |
->> > | REGMAP_MMIO                   | 72         | 15           |
->> > | GENERIC_PHY                   | 67         | 20           |
->> > | DMA_ENGINE                    | 66         | 11           |
->> > | SERIAL_CORE_CONSOLE           | 64         | 9            |
->> > | CRYPTO_BLKCIPHER              | 64         | 13           |
->> > | PINMUX                        | 60         | 17           |
->> > | CRYPTO                        | 59         | 10           |
->> > | MII                           | 58         | 8            |
->> > | GPIOLIB_IRQCHIP               | 58         | 9            |
->> > | MFD_SYSCON                    | 58         | 15           |
->> > | VIDEOBUF2_DMA_CONTIG          | 46         | 4            |
->> > | REGMAP_IRQ                    | 45         | 6            |
->> > | REGMAP_SPI                    | 44         | 2            |
->> > | CLKSRC_MMIO                   | 42         | 5            |
->> > | SND_SOC_GENERIC_DMAENGINE_PCM | 41         | 3            |
->> > | CRYPTO_SHA1                   | 37         | 2            |
->> > | REGMAP                        | 36         | 4            |
->> >
->> > The story behind the above is that we still need to visually
->> > review/evaluate 212 expressions which *potentially* select REGMAP_I2C
->> > in order to identify the expressions which *actually* select
->> > REGMAP_I2C, for a particular ARCH and for a particular defconfig used.
->> >
->> > This patch attempts to bring at user's fingertips those reverse
->> > dependencies that actually participate in selection of given symbol
->> > filtering out the rest of them.
->> >
->> > Signed-off-by: Eugeniu Rosca <erosca@de.adit-jv.com>
->> > ---
->> >  scripts/kconfig/expr.c | 24 +++++++++++++++++-------
->> >  1 file changed, 17 insertions(+), 7 deletions(-)
->> >
->> > diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
->> > index 2ba332b3fed7..147b2d8a8f3e 100644
->> > --- a/scripts/kconfig/expr.c
->> > +++ b/scripts/kconfig/expr.c
->> > @@ -1234,14 +1234,24 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
->> >                 fn(data, e->right.sym, e->right.sym->name);
->> >                 break;
->> >         case E_OR:
->> > -               if (revdep && e->left.expr->type != E_OR)
->> > -                       fn(data, NULL, "\n  - ");
->> > -               __expr_print(e->left.expr, fn, data, E_OR, revdep);
->> > -               if (revdep)
->> > -                       fn(data, NULL, "\n  - ");
->> > -               else
->> > +               if (revdep) {
->> > +                       struct expr *left = e->left.expr;
->> > +                       struct expr *right = e->right.expr;
->> > +
->> > +                       if (expr_calc_value(left) != no) {
->> > +                               if (left->type != E_OR)
->> > +                                       fn(data, NULL, "\n  - ");
->> > +                               __expr_print(left, fn, data, E_OR, revdep);
->> > +                       }
->> > +                       if (expr_calc_value(right) != no) {
->> > +                               fn(data, NULL, "\n  - ");
->> > +                               __expr_print(right, fn, data, E_OR, revdep);
->> > +                       }
->> > +               } else {
->> > +                       __expr_print(e->left.expr, fn, data, E_OR, revdep);
->> >                         fn(data, NULL, " || ");
->> > -               __expr_print(e->right.expr, fn, data, E_OR, revdep);
->> > +                       __expr_print(e->right.expr, fn, data, E_OR, revdep);
->> > +               }
->> >                 break;
->> >         case E_AND:
->> >                 expr_print(e->left.expr, fn, data, E_AND);
->> > --
->> > 2.16.1
->> >
->>
->> Hello,
->>
->> One downside to this is that people might expect e.g. the '?'
->> menuconfig screen to list all the selecting symbols and use it as a
->> reference.
->
-> Agreed. See my proposals below.
->
->> The best solution IMO would be to have a separate "Currently selected
->> by:" section on that screen, listing just the non-n selects. The
->> simpler next best thing would be to just replace the "Selected by:"
->> heading with "Currently selected by:", to make it clear that it
->> includes just the active selects.
->
-> One certain thing is that with below two categories, some reverse
-> dependencies would be printed twice:
-> - "Currently selected by" - showing non-n expressions.
-> - "Selected by"           - showing both non-n and n expressions.
->
-> To avoid the duplicates, I would think about (naming could be improved):
-> - "Actively selected by"   or "Currently selected by"
-> - "Inactively selected by" or "Passively selected by"
-> - "Actively implied by"    or "Currently implied by"
-> - "Inactively implied by"  or "Passively implied by"
->
-> I do believe that before proceeding with any further alternative
-> implementations, we better first agree that the above way to print the
-> reverse dependencies is fine for everybody.
->
+Hello,
 
-Looks good to me. Could go with something like "Current active (m/y)
-selects" and "Current inactive (n) selects" maybe, to make it super
-clear.
+This patchset fixes most references to globally undefined symbols in Kconfig
+files, as reported by the
+https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+script. I will send emails in reply to the patchset for some cases where I'm
+not sure what the proper fix is.
 
->> For the most-selected symbols you listed, most of them end up as "m"
->> on my system by the way, because they come from drivers compiled in as
->> modules. "n" is the minority. Might want to check that most of the
->> ones with a million selects aren't like that, because it might not be
->> that hard to see what's going on for those anyway.
->
-> Replying specifically to your `it might not be that hard to see what's
-> going on for those anyway`, I do believe that for certain configs
-> it is a pain to visually identify the meaningful (i.e.
-> non-n) reverse dependencies when there are tens or hundreds of them.
-> Getting this information directly from Kbuild (instead of computing it
-> externally, either by hand or scripted) was my main motivation and
-> driving factor behind sharing the patch.
+All of the fixes are independent. I just created a patchset to track them more
+easily.
 
-Consider that a before-coffee comment. It's clearly pretty helpful
-even for those "obvious" cases. I had missed those ARM stats. :)
+Summary of changes:
 
->
->> I used a similar approach in
->> https://github.com/ulfalizer/Kconfiglib/blob/master/kconfiglib.py#L3022
->> by the way. I was always a bit worried that all the expression
->> simplification shenanigans going on in the C implementation might mess
->> with an approach like that, but it seems fine in practice. :)
->
-> Can't wait to put my hands on Kconfiglib. Thanks for sharing!
->
+ - Commits 1 and 2 fix what looks like potential bugs: A broken (intended)
+   select of PL310_ERRATA_753970 for ARM/mvebu, and a misspelled dependency on
+   PPC_PSERIES in KVM/PPC.
 
-Might gain some features that make it viable as a full C
-implementation replacement soon, if some stuff pans out. It's always
-been more of an auxiliary library. Apparently the C implementation is
-a bit of a PITA on Windows.
+ - Commits 3-5 remove leftover AVR32 stuff.
 
->> Cheers,
->> Ulf
->
-> Best regards,
-> Eugeniu.
+ - Commits 6 and 7 remove some selects of removed symbols from riscv.
 
-Cheers,
-Ulf
+ - Commits 8-17 remove various references to removed symbols.
+
+ - Commits 18-20 fix some (harmless) malformed defaults.
+
+Ulf Magnusson (20):
+  ARM: mvebu: Fix broken PL310_ERRATA_753970 selects
+  KVM: PPC: Book3S PR: Fix broken select due to misspelling
+  kconfig: Remove leftover references to AVR32 symbol
+  misc: atmel: Remove CPU_AT32AP700X (AVR32) reference
+  rtc: at32ap700x: Remove PLATFORM_AT32AP dependency
+  riscv: Remove ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE select
+  riscv: Remove ARCH_WANT_OPTIONAL_GPIOLIB select
+  s390/kconfig: Remove ARCH_WANTS_PROT_NUMA_PROT_NONE select
+  clk: sunxi-ng: Remove SUNXI_CCU_* selects
+  lib/Kconfig: Remove leftover select of GENERIC_IO
+  usb: gadget: udc: Remove USB_GADGET_DUALSPEED select
+  ARM: debug: Remove ARCH_MSM dep. from UNCOMPRESS_INCLUDE
+  ore: Remove PNFS_OBJLAYOUT dependency
+  iio: gyro: mpu3050: Remove INPUT_MPU3050 dep. from I2C
+  phy: Remove SOC_EXYNOS4212 dep. from PHY_EXYNOS4X12_USB
+  auxdisplay: img-ascii-lcd: Remove MIPS_SEAD3 dep.
+  media: sec: Remove PLAT_S5P dependency
+  iwlwifi: fix malformed CONFIG_IWLWIFI_PCIE_RTPM default
+  ARC: Fix malformed ARC_EMUL_UNALIGNED default
+  x86/PCI: VMD: Fix malformed default
+
+ arch/arc/Kconfig                           |  1 -
+ arch/arm/Kconfig.debug                     |  2 +-
+ arch/arm/mach-mvebu/Kconfig                |  4 ++--
+ arch/powerpc/kvm/Kconfig                   |  2 +-
+ arch/riscv/Kconfig                         |  2 --
+ arch/s390/Kconfig                          |  1 -
+ drivers/auxdisplay/Kconfig                 |  2 +-
+ drivers/clk/sunxi-ng/Kconfig               |  7 -------
+ drivers/cpufreq/Kconfig                    | 10 ----------
+ drivers/iio/gyro/Kconfig                   |  1 -
+ drivers/media/platform/Kconfig             |  2 +-
+ drivers/misc/Kconfig                       |  1 -
+ drivers/net/wireless/intel/iwlwifi/Kconfig |  1 -
+ drivers/pci/host/Kconfig                   |  1 -
+ drivers/phy/samsung/Kconfig                |  2 +-
+ drivers/pwm/Kconfig                        |  2 +-
+ drivers/rtc/Kconfig                        |  2 +-
+ drivers/spi/Kconfig                        |  2 +-
+ drivers/usb/gadget/udc/Kconfig             |  1 -
+ drivers/video/console/Kconfig              |  2 +-
+ fs/exofs/Kconfig.ore                       |  2 +-
+ lib/Kconfig                                |  1 -
+ 22 files changed, 12 insertions(+), 39 deletions(-)
+
+-- 
+2.14.1
+
