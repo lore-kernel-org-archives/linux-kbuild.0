@@ -1,75 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:55388 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:55741 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752612AbeBENql (ORCPT
+        with ESMTP id S1752461AbeBEOBj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Feb 2018 08:46:41 -0500
-Date: Mon, 5 Feb 2018 14:46:38 +0100
-From: Maxime Ripard <maxime.ripard@bootlin.com>
-Subject: Re: [PATCH 09/20] clk: sunxi-ng: Remove SUNXI_CCU_* selects
-Message-ID: <20180205134638.ugngvfmdixnpxihk@flea>
+        Mon, 5 Feb 2018 09:01:39 -0500
+Date: Mon, 5 Feb 2018 15:01:34 +0100
+From: Alexandre Belloni <alexandre.belloni@free-electrons.com>
+Subject: Re: [PATCH 05/20] rtc: at32ap700x: Remove PLATFORM_AT32AP dependency
+Message-ID: <20180205140134.GN3404@piout.net>
 References: <20180205012146.23981-1-ulfalizer@gmail.com>
- <20180205012146.23981-10-ulfalizer@gmail.com>
+ <20180205012146.23981-6-ulfalizer@gmail.com>
+ <CAFkk2KRmK=fw=WYwr3eC8RJh7nxsUvC=uUnz7UCni72H9sHv4g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="qibptpmrcb5iyvxp"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180205012146.23981-10-ulfalizer@gmail.com>
+In-Reply-To: <CAFkk2KRmK=fw=WYwr3eC8RJh7nxsUvC=uUnz7UCni72H9sHv4g@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Chen-Yu Tsai <wens@csie.org>, Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Alessandro Zummo <a.zummo@towertech.it>, linux-rtc@vger.kernel.org
+
+Hi,
+
+On 05/02/2018 at 02:42:38 +0100, Ulf Magnusson wrote:
+> On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> > The PLATFORM_AT32AP symbol went away when AVR32 was removed in
+> > commit 26202873bb51 ("avr32: remove support for AVR32 architecture").
+> >
+> > Remove the RTC_DRV_AT32AP700X dependency from RTC_DRV_AT32AP700X.
+> >
+> > Discovered with the
+> > https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+> > script.
+> >
+> > Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> > ---
+> >  drivers/rtc/Kconfig | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
+> > index b71cc7b5fbc9..1f5f3bd82ab6 100644
+> > --- a/drivers/rtc/Kconfig
+> > +++ b/drivers/rtc/Kconfig
+> > @@ -1404,7 +1404,7 @@ config RTC_DRV_PL031
+> >
+> >  config RTC_DRV_AT32AP700X
+> >         tristate "AT32AP700X series RTC"
+> > -       depends on PLATFORM_AT32AP || COMPILE_TEST
+> > +       depends on COMPILE_TEST
+> >         help
+> >           Driver for the internal RTC (Realtime Clock) on Atmel AVR32
+> >           AT32AP700x family processors.
+> > --
+> > 2.14.1
+> >
+> 
+> RTC_DRV_AT32AP700X could probably be removed along with
+> ./drivers/rtc/rtc-at32ap700x.c as well.
+> 
+
+Note that the driver is already removed in Linus' tree.
 
 
---qibptpmrcb5iyvxp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi Ulf,
-
-On Mon, Feb 05, 2018 at 02:21:21AM +0100, Ulf Magnusson wrote:
-> The selected symbols were removed in commit 06e226c7fb23 ("clk:
-> sunxi-ng: Move all clock types to a library").
->=20
-> Remove the selects from SUN4I_A10_CCU.
->=20
-> Discovered with the
-> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefin=
-ed.py
-> script.
->=20
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-
-This has already been submitted by Corentin:
-https://patchwork.kernel.org/patch/10175435/
-
-Thanks!
-Maxime
-
---=20
-Maxime Ripard, Bootlin (formerly Free Electrons)
+-- 
+Alexandre Belloni, Bootlin (formerly Free Electrons)
 Embedded Linux and Kernel engineering
 http://bootlin.com
-
---qibptpmrcb5iyvxp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEE0VqZU19dR2zEVaqr0rTAlCFNr3QFAlp4YD4ACgkQ0rTAlCFN
-r3QtyA/9Fm+szM2mf5g406tyFmVHFdbHaTDP5jD54fhjBPPK1Jg0uw8Ig9dpFOe5
-m4Bcq7rPAMfjAYHOAd+FCv7P0oT4/K7n3NQ/9I7e1WqMNAKzqNyN/WcloDjFS/gK
-lhxPPorybKvvChE2ZddU9w5oC4AETILJ5B+gveN2IsTO3YDJv2Ufly8YmS4+OyO9
-AtNh84XQ1lTen1W9HvS9S3hCJwXHYMq1cMoVS83azCMMBBM38D5DOoeMaJID2kR8
-N8LHkVxrtYMB7tE9mjTRRHDWqIxRQww0B+/5qUcFN513NgQxsOcSmIJp9xu9N4qw
-Ypk74ydvysGOylvBmn69tdW5Q4BYY9w0HEPBxNwbEVrsr4Ez8Ij8aKY4YD2uPm0S
-5svM5KJBA1vXi244n4689MnC+EYdrGwzDtYK0H1F1p24yRAtdXRgDxVHoz+9A10L
-dvMVCeSsqBm+WQlXnCiIItbLHRyAYeuxsV75ANnQDiqNN1GsDvsYMLcSXjXBgPhp
-vyDMkzgCYQwDvDCQ0sdIPg5niDiKONdIGWyADPNiy7s/It2hT0dGofezV/yC8Odl
-uX8pV4yvd8rdBTNSS566kjYaqyTUyPegwov651837ZzxOZwyVBEM/GYOt90po6Se
-79uIi7P/koSCTRbe9zEFrUkcdh9hGR2h9Uxvho0kjjhxXYCPB+s=
-=vQgV
------END PGP SIGNATURE-----
-
---qibptpmrcb5iyvxp--
