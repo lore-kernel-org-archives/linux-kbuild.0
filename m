@@ -1,63 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f194.google.com ([209.85.217.194]:36562 "EHLO
-        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753267AbeBFWRG (ORCPT
+Received: from smtp.codeaurora.org ([198.145.29.96]:57552 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753346AbeBFXrA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Feb 2018 17:17:06 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180206191126.GB98765@bhelgaas-glaptop.roam.corp.google.com>
-References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-21-ulfalizer@gmail.com>
- <20180206191126.GB98765@bhelgaas-glaptop.roam.corp.google.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Tue, 6 Feb 2018 23:17:05 +0100
-Message-ID: <CAFkk2KTUGG9-VZcJpvD_qkE3+AMy2XZOvU4=UEWp4arrzRWw+Q@mail.gmail.com>
-Subject: Re: [PATCH 20/20] x86/PCI: VMD: Fix malformed default
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 6 Feb 2018 18:47:00 -0500
+From: Prasad Sodagudi <psodagud@codeaurora.org>
+Subject: [PATCH] kbuild: clang: disable unused variable warnings only when constant
+Date: Tue,  6 Feb 2018 15:46:51 -0800
+Message-Id: <1517960811-21674-1-git-send-email-psodagud@codeaurora.org>
+In-Reply-To: <CAK7LNAQ1d5t5-UHsF1ZJ9tNLpGgbMGnDoHdht9=wNy5kLDVyxw@mail.gmail.com>
+References: <CAK7LNAQ1d5t5-UHsF1ZJ9tNLpGgbMGnDoHdht9=wNy5kLDVyxw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, Vineet Gupta <vgupta@synopsys.com>, mgorman@techsingularity.net, Christoph Hellwig <hch@lst.de>, mina86@mina86.com, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, Paul Mackerras <paulus@ozlabs.org>, Will Deacon <will.deacon@arm.com>, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
+To: yamada.masahiro@socionext.com
+Cc: gregkh@linuxfoundation.org, segher@kernel.crashing.org, ghackmann@google.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Prasad Sodagudi <psodagud@codeaurora.org>
 
-On Tue, Feb 6, 2018 at 8:11 PM, Bjorn Helgaas <helgaas@kernel.org> wrote:
->> x86/PCI: VMD: Fix malformed default
->
-> In the title, please include a clue about what default you're talking
-> about, e.g., mention Kconfig somehow.
->
-> On Mon, Feb 05, 2018 at 02:21:32AM +0100, Ulf Magnusson wrote:
->> 'default N' should be 'default n', though they happen to have the same
->> effect here, due to undefined symbols (N in this case) evaluating to n
->> in a tristate sense.
->>
->> Remove the default from VMD instead of changing it. bool and tristate
->> symbols implicitly default to n.
->>
->> Discovered with the
->> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
->> script.
->>
->> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->> ---
->>  drivers/pci/host/Kconfig | 1 -
->>  1 file changed, 1 deletion(-)
->>
->> diff --git a/drivers/pci/host/Kconfig b/drivers/pci/host/Kconfig
->> index a4ed7484d127..dc8a2a175f19 100644
->> --- a/drivers/pci/host/Kconfig
->> +++ b/drivers/pci/host/Kconfig
->> @@ -215,7 +215,6 @@ config PCIE_TANGO_SMP8759
->>  config VMD
->>       depends on PCI_MSI && X86_64 && SRCU
->>       tristate "Intel Volume Management Device Driver"
->> -     default N
->>       ---help---
->>         Adds support for the Intel Volume Management Device (VMD). VMD is a
->>         secondary PCI host bridge that allows PCI Express root ports,
->> --
->> 2.14.1
->>
+Currently, GCC disables -Wunused-const-variable, but not
+-Wunused-variable, so warns unused variables if they are
+non-constant.
 
-Typoed the --in-reply-to. v2 is at https://lkml.org/lkml/2018/2/6/770
+While, Clang does not warn unused variables at all regardless of
+the const qualifier because -Wno-unused-const-variable is implied
+by the stronger option -Wno-unused-variable.
 
-Cheers,
-Ulf
+Disable -Wunused-const-variable instead of -Wunused-variable so that
+GCC and Clang work in the same way.
+
+Signed-off-by: Prasad Sodagudi <psodagud@codeaurora.org>
+Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+ Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 11aff0f..ca0a571 100644
+--- a/Makefile
++++ b/Makefile
+@@ -700,7 +700,6 @@ KBUILD_CFLAGS += $(stackp-flag)
+ 
+ ifeq ($(cc-name),clang)
+ KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+-KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+ KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+ KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+ KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
+@@ -718,9 +717,9 @@ else
+ # These warnings generated too much noise in a regular build.
+ # Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+-KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+ endif
+ 
++KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+ ifdef CONFIG_FRAME_POINTER
+ KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
+ else
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,\na Linux Foundation Collaborative Project
+
