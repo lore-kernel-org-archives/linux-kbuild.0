@@ -1,352 +1,179 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:40952 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:41230 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752507AbeBFAia (ORCPT
+        with ESMTP id S1752523AbeBFAij (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Feb 2018 19:38:30 -0500
+        Mon, 5 Feb 2018 19:38:39 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 07/14] kconfig: test: add framework for Kconfig unit-tests
-Date: Tue,  6 Feb 2018 09:34:47 +0900
-Message-Id: <1517877294-4826-8-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 00/14] Add Kconfig unit tests
+Date: Tue,  6 Feb 2018 09:34:40 +0900
+Message-Id: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Yaakov Selkowitz <yselkowi@redhat.com>, Marc Herbert <marc.herbert@intel.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@suse.de>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Heinrich Schuchardt <xypron.glpk@gmx.de>, Yaakov Selkowitz <yselkowi@redhat.com>, linux-ia64@vger.kernel.org, Fenghua Yu <fenghua.yu@intel.com>, Marc Herbert <marc.herbert@intel.com>
 
-I admit various parts in Kconfig are cryptic and need refactoring,
-but at the same time, I fear regressions.
+I am applying various patches to Kconfig these days.
 
-There are several subtle corner cases where it is difficult to notice
-breakage.  It is time to add unit-tests.
+However, I fear regressions.  I have been thinking of unit-tests.
 
-Here is a simple framework based on pytest.  The conftest.py provides
-a fixture useful to run commands such as 'oldaskconfig' etc. and
-to compare the resulted .config, stdout, stderr with expectations.
+There are various cryptic parts in Kconfig and corner cases where
+it is difficult to notice breakage.  If unit-tests cover those,
+I will be able to apply changes more confidently.
 
-How to add test cases?
-----------------------
+So, here is the trial.
 
-For each test case, you should create a subdirectory under
-scripts/kconfig/tests/ (so test cases are seperated from each other).
-Every test case directory must contain the following files:
+After fixing some problems, I will add a basic test framework.
+This is based on pytest.  Also, this is written in Python 3.
+Python 2 will return in 2020.  So, I believe new python tools should be
+written in Python 3.
 
- - __init__.py: describes test functions
- - Kconfig: the top level Kconfig file for this test
+This is my Python 3 and pytest versions.
 
-To do a useful job, test cases generally need additional data like
-input .config and information about expected results.
+$ python3 --version
+Python 3.5.2
+$ python3 -m pytest --version
+This is pytest version 3.4.0, imported from /home/masahiro/.local/lib/python3.5/site-packages/pytest.py
 
-How to run tests?
------------------
+If I use old pytest version, some parts did not work as expected.
+If this does not work for you, please consider using newer pytest.
 
-You need python3 and pytest.  Then, run "make testconfig".
-O= option is supported.  If V=1 is given, details logs during tests
-are displayed.
+I will brush up the code more and add more test cases to do a better job.
+Before proceeding more, I'd like to get consensus for this approach.
+If you have an idea for better implementation, comments are appreciated.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+How to use?
+-----------
 
- scripts/kconfig/Makefile          |   8 ++
- scripts/kconfig/tests/conftest.py | 255 ++++++++++++++++++++++++++++++++++++++
- scripts/kconfig/tests/pytest.ini  |   6 +
- 3 files changed, 269 insertions(+)
+Please make sure Python3 and pytest for Python3 is installed on your system.
+
+Then, run "make testconfig"
+
+The result looks like as follows:
+
+masahiro@grover:~/workspace/linux-yamada$ make testconfig
+  HOSTCC  scripts/kconfig/conf.o
+  HOSTCC  scripts/kconfig/zconf.tab.o
+  HOSTLD  scripts/kconfig/conf
+python3 -B -m pytest ./scripts/kconfig/tests \
+-o cache_dir=/home/masahiro/workspace/linux-yamada/scripts/kconfig/tests/.cache \
+
+==================================================== test session starts =====================================================
+platform linux -- Python 3.5.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0 -- /usr/bin/python3
+cachedir: scripts/kconfig/tests/.cache
+rootdir: /home/masahiro/workspace/linux-yamada/scripts/kconfig/tests, inifile: pytest.ini
+collected 12 items
+
+scripts/kconfig/tests/auto_submenu_creation/__init__.py::test PASSED                                                   [  8%]
+scripts/kconfig/tests/choice/__init__.py::test_oldask0 PASSED                                                          [ 16%]
+scripts/kconfig/tests/choice/__init__.py::test_oldask1 PASSED                                                          [ 25%]
+scripts/kconfig/tests/choice/__init__.py::test_allyes PASSED                                                           [ 33%]
+scripts/kconfig/tests/choice/__init__.py::test_allmod PASSED                                                           [ 41%]
+scripts/kconfig/tests/choice/__init__.py::test_allno PASSED                                                            [ 50%]
+scripts/kconfig/tests/choice/__init__.py::test_alldef PASSED                                                           [ 58%]
+scripts/kconfig/tests/choice_value_with_m_dep/__init__.py::test PASSED                                                 [ 66%]
+scripts/kconfig/tests/err_recursive_inc/__init__.py::test PASSED                                                       [ 75%]
+scripts/kconfig/tests/new_choice_with_dep/__init__.py::test PASSED                                                     [ 83%]
+scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py::test PASSED                                                   [ 91%]
+scripts/kconfig/tests/warn_recursive_dep/__init__.py::test PASSED                                                      [100%]
+
+================================================= 12 passed in 0.08 seconds ==================================================
+
+
+
+Masahiro Yamada (14):
+  kconfig: send error messages to stderr
+  kconfig: do not write choice values when their dependency becomes n
+  kconfig: show '?' prompt even if no help text is available
+  kconfig: print additional new line for choice for redirection
+  kconfig: remove 'config*' pattern from .gitignnore
+  kbuild: define PYTHON2 and PYTHON3 variables instead of PYTHON
+  kconfig: test: add framework for Kconfig unit-tests
+  kconfig: test: add basic 'choice' tests
+  kconfig: test: test automatic submenu creation
+  kconfig: test: check if new symbols in choice are asked
+  kconfig: test: check .config sanity for choice values with unmet dep
+  kconfig: test: check visibility of tristate choice values in y choice
+  kconfig: test: check if recursive dependencies are detected
+  kconfig: test: check if recursive inclusion is detected
+
+ Makefile                                           |   5 +-
+ arch/ia64/Makefile                                 |   2 +-
+ scripts/kconfig/.gitignore                         |   1 -
+ scripts/kconfig/Makefile                           |   8 +
+ scripts/kconfig/conf.c                             |  29 +--
+ scripts/kconfig/symbol.c                           |   4 +-
+ .../kconfig/tests/auto_submenu_creation/Kconfig    |  50 ++++
+ .../tests/auto_submenu_creation/__init__.py        |  12 +
+ .../tests/auto_submenu_creation/expected_stdout    |  10 +
+ scripts/kconfig/tests/choice/Kconfig               |  54 +++++
+ scripts/kconfig/tests/choice/__init__.py           |  37 +++
+ .../kconfig/tests/choice/alldef_expected_config    |   5 +
+ .../kconfig/tests/choice/allmod_expected_config    |   9 +
+ scripts/kconfig/tests/choice/allno_expected_config |   5 +
+ .../kconfig/tests/choice/allyes_expected_config    |   9 +
+ .../kconfig/tests/choice/oldask0_expected_stdout   |  10 +
+ scripts/kconfig/tests/choice/oldask1_config        |   2 +
+ .../kconfig/tests/choice/oldask1_expected_stdout   |  15 ++
+ .../kconfig/tests/choice_value_with_m_dep/Kconfig  |  20 ++
+ .../tests/choice_value_with_m_dep/__init__.py      |  15 ++
+ .../kconfig/tests/choice_value_with_m_dep/config   |   2 +
+ .../tests/choice_value_with_m_dep/expected_config  |   3 +
+ .../tests/choice_value_with_m_dep/expected_stdout  |   4 +
+ scripts/kconfig/tests/conftest.py                  | 255 +++++++++++++++++++++
+ scripts/kconfig/tests/err_recursive_inc/Kconfig    |   1 +
+ .../kconfig/tests/err_recursive_inc/Kconfig.inc    |   1 +
+ .../kconfig/tests/err_recursive_inc/__init__.py    |  10 +
+ .../tests/err_recursive_inc/expected_stderr        |   4 +
+ scripts/kconfig/tests/new_choice_with_dep/Kconfig  |  37 +++
+ .../kconfig/tests/new_choice_with_dep/__init__.py  |  14 ++
+ scripts/kconfig/tests/new_choice_with_dep/config   |   3 +
+ .../tests/new_choice_with_dep/expected_stdout      |  10 +
+ .../kconfig/tests/no_write_if_dep_unmet/Kconfig    |  14 ++
+ .../tests/no_write_if_dep_unmet/__init__.py        |  17 ++
+ scripts/kconfig/tests/no_write_if_dep_unmet/config |   1 +
+ .../tests/no_write_if_dep_unmet/expected_config    |   5 +
+ scripts/kconfig/tests/pytest.ini                   |   6 +
+ scripts/kconfig/tests/warn_recursive_dep/Kconfig   |  62 +++++
+ .../kconfig/tests/warn_recursive_dep/__init__.py   |  10 +
+ .../tests/warn_recursive_dep/expected_stderr       |  33 +++
+ scripts/kconfig/zconf.l                            |  27 ++-
+ 41 files changed, 789 insertions(+), 32 deletions(-)
+ create mode 100644 scripts/kconfig/tests/auto_submenu_creation/Kconfig
+ create mode 100644 scripts/kconfig/tests/auto_submenu_creation/__init__.py
+ create mode 100644 scripts/kconfig/tests/auto_submenu_creation/expected_stdout
+ create mode 100644 scripts/kconfig/tests/choice/Kconfig
+ create mode 100644 scripts/kconfig/tests/choice/__init__.py
+ create mode 100644 scripts/kconfig/tests/choice/alldef_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/allmod_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/allno_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/allyes_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/oldask0_expected_stdout
+ create mode 100644 scripts/kconfig/tests/choice/oldask1_config
+ create mode 100644 scripts/kconfig/tests/choice/oldask1_expected_stdout
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/Kconfig
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/__init__.py
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/config
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/expected_config
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout
  create mode 100644 scripts/kconfig/tests/conftest.py
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig.inc
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/__init__.py
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/expected_stderr
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/Kconfig
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/__init__.py
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/config
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/expected_stdout
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/config
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
  create mode 100644 scripts/kconfig/tests/pytest.ini
+ create mode 100644 scripts/kconfig/tests/warn_recursive_dep/Kconfig
+ create mode 100644 scripts/kconfig/tests/warn_recursive_dep/__init__.py
+ create mode 100644 scripts/kconfig/tests/warn_recursive_dep/expected_stderr
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index cb3ec53..c5d1d1a 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -135,6 +135,14 @@ PHONY += tinyconfig
- tinyconfig:
- 	$(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig tiny.config
- 
-+# CHECK: -o cache_dir=<path> working?
-+PHONY += testconfig
-+testconfig: $(obj)/conf
-+	$(PYTHON3) -B -m pytest $(srctree)/$(src)/tests \
-+	-o cache_dir=$(abspath $(obj)/tests/.cache) \
-+	$(if $(findstring 1,$(KBUILD_VERBOSE)),--capture=no)
-+clean-dirs += tests/.cache
-+
- # Help text used by make help
- help:
- 	@echo  '  config	  - Update current config utilising a line-oriented program'
-diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
-new file mode 100644
-index 0000000..f0f3237
---- /dev/null
-+++ b/scripts/kconfig/tests/conftest.py
-@@ -0,0 +1,255 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright (C) 2018 Masahiro Yamada <yamada.masahiro@socionext.com>
-+#
-+
-+import os
-+import pytest
-+import shutil
-+import subprocess
-+import tempfile
-+
-+conf_path = os.path.abspath(os.path.join('scripts', 'kconfig', 'conf'))
-+
-+class Conf:
-+
-+    def __init__(self, request):
-+        """Create a new Conf object, which is a scripts/kconfig/conf
-+        runner and result checker.
-+
-+        Arguments:
-+        request - object to introspect the requesting test module
-+        """
-+
-+        # the directory of the test being run
-+        self.test_dir = os.path.dirname(str(request.fspath))
-+
-+    def __run_conf(self, mode, dot_config=None, out_file='.config',
-+                   interactive=False, in_keys=None, extra_env={}):
-+        """Run scripts/kconfig/conf
-+
-+        mode: input mode option (--oldaskconfig, --defconfig=<file> etc.)
-+        dot_config: the .config file for input.
-+        out_file: file name to contain the output config data.
-+        interactive: flag to specify the interactive mode.
-+        in_keys: key inputs for interactive modes.
-+        extra_env: additional environment.
-+        """
-+
-+        command = [conf_path, mode, 'Kconfig']
-+
-+        # Override 'srctree' environment to make the test as the top directory
-+        extra_env['srctree'] = self.test_dir
-+
-+        # scripts/kconfig/conf is run in a temporary directory.
-+        # This directory is automatically removed when done.
-+        with tempfile.TemporaryDirectory() as temp_dir:
-+
-+            # if .config is given, copy it to the working directory
-+            if dot_config:
-+                shutil.copyfile(os.path.join(self.test_dir, dot_config),
-+                                os.path.join(temp_dir, '.config'))
-+
-+            ps = subprocess.Popen(command,
-+                                  stdin=subprocess.PIPE,
-+                                  stdout=subprocess.PIPE,
-+                                  stderr=subprocess.PIPE,
-+                                  cwd=temp_dir,
-+                                  env=dict(os.environ, **extra_env))
-+
-+            # If user key input is specified, feed it into stdin.
-+            if in_keys:
-+                ps.stdin.write(in_keys.encode('utf-8'))
-+
-+            while ps.poll() == None:
-+                # For interactive modes such as 'make config', 'make oldconfig',
-+                # send 'Enter' key until the program finishes.
-+                if interactive:
-+                    ps.stdin.write(b'\n')
-+
-+            self.retcode = ps.returncode
-+            self.stdout = ps.stdout.read().decode()
-+            self.stderr = ps.stderr.read().decode()
-+
-+            # Retrieve the resulted config data only when .config is supposed
-+            # to exist.  If the command fails, the .config does not exist.
-+            # 'make listnewconfig' does not produce .config in the first place.
-+            if self.retcode == 0 and out_file:
-+                with open(os.path.join(temp_dir, out_file)) as f:
-+                    self.config = f.read()
-+            else:
-+                self.config = None
-+
-+        # Logging:
-+        # Pytest captures the following information by default.  In failure
-+        # of tests, the captured log will be displayed.  This will be useful to
-+        # figure out what has happened.
-+
-+        print("command: {}\n".format(' '.join(command)))
-+        print("retcode: {}\n".format(self.retcode))
-+
-+        if dot_config:
-+            print("input .config:".format(dot_config))
-+
-+        print("stdout:")
-+        print(self.stdout)
-+        print("stderr:")
-+        print(self.stderr)
-+
-+        if self.config is not None:
-+            print("output of {}:".format(out_file))
-+            print(self.config)
-+
-+        return self.retcode
-+
-+    def oldaskconfig(self, dot_config=None, in_keys=None):
-+        """Run oldaskconfig (make config)
-+
-+        dot_config: the .config file for input (optional).
-+        in_key: key inputs (optional).
-+        """
-+        return self.__run_conf('--oldaskconfig', dot_config=dot_config,
-+                             interactive=True, in_keys=in_keys)
-+
-+    def oldconfig(self, dot_config=None, in_keys=None):
-+        """Run oldconfig
-+
-+        dot_config: the .config file for input (optional).
-+        in_key: key inputs (optional).
-+        """
-+        return self.__run_conf('--oldconfig', dot_config=dot_config,
-+                             interactive=True, in_keys=in_keys)
-+
-+    def defconfig(self, defconfig):
-+        """Run defconfig
-+
-+        defconfig: the defconfig file for input.
-+        """
-+        defconfig_path = os.path.join(self.test_dir, defconfig)
-+        return self.__run_conf('--defconfig={}'.format(defconfig_path))
-+
-+    def olddefconfig(self, dot_config=None):
-+        """Run olddefconfig
-+
-+        dot_config: the .config file for input (optional).
-+        """
-+        return self.__run_conf('--olddefconfig', dot_config=dot_config)
-+
-+    def __allconfig(self, foo, all_config):
-+        """Run all*config
-+
-+        all_config: fragment config file for KCONFIG_ALLCONFIG (optional).
-+        """
-+        if all_config:
-+            all_config_path = os.path.join(self.test_dir, all_config)
-+            extra_env = {'KCONFIG_ALLCONFIG': all_config_path}
-+        else:
-+            extra_env = {}
-+
-+        return self.__run_conf('--all{}config'.format(foo), extra_env=extra_env)
-+
-+    def allyesconfig(self, all_config=None):
-+        """Run allyesconfig
-+        """
-+        return self.__allconfig('yes', all_config)
-+
-+    def allmodconfig(self, all_config=None):
-+        """Run allmodconfig
-+        """
-+        return self.__allconfig('mod', all_config)
-+
-+    def allnoconfig(self, all_config=None):
-+        """Run allnoconfig
-+        """
-+        return self.__allconfig('no', all_config)
-+
-+    def alldefconfig(self, all_config=None):
-+        """Run alldefconfig
-+        """
-+        return self.__allconfig('def', all_config)
-+
-+    def savedefconfig(self, dot_config):
-+        """Run savedefconfig
-+        """
-+        return self.__run_conf('--savedefconfig', out_file='defconfig')
-+
-+    def listnewconfig(self, dot_config=None):
-+        """Run listnewconfig
-+        """
-+        return self.__run_conf('--listnewconfig', dot_config=dot_config,
-+                               out_file=None)
-+
-+    # checkers
-+    def __read_and_compare(self, compare, expected):
-+        """Compare the result with expectation.
-+
-+        Arguments:
-+        compare: function to compare the result with expectation
-+        expected: file that contains the expected data
-+        """
-+        with open(os.path.join(self.test_dir, expected)) as f:
-+            expected_data = f.read()
-+        print(expected_data)
-+        return compare(self, expected_data)
-+
-+    def __contains(self, attr, expected):
-+        print("{0} is expected to contain '{1}':".format(attr, expected))
-+        return self.__read_and_compare(lambda s, e: getattr(s, attr).find(e) >= 0,
-+                                       expected)
-+
-+    def __matches(self, attr, expected):
-+        print("{0} is expected to match '{1}':".format(attr, expected))
-+        return self.__read_and_compare(lambda s, e: getattr(s, attr) == e,
-+                                       expected)
-+
-+    def config_contains(self, expected):
-+        """Check if resulted configuration contains expected data.
-+
-+        Arguments:
-+        expected: file that contains the expected data.
-+        """
-+        return self.__contains('config', expected)
-+
-+    def config_matches(self, expected):
-+        """Check if resulted configuration exactly matches expected data.
-+
-+        Arguments:
-+        expected: file that contains the expected data.
-+        """
-+        return self.__matches('config', expected)
-+
-+    def stdout_contains(self, expected):
-+        """Check if resulted stdout contains expected data.
-+
-+        Arguments:
-+        expected: file that contains the expected data.
-+        """
-+        return self.__contains('stdout', expected)
-+
-+    def stdout_matches(self, cmp_file):
-+        """Check if resulted stdout exactly matches expected data.
-+
-+        Arguments:
-+        expected: file that contains the expected data.
-+        """
-+        return self.__matches('stdout', expected)
-+
-+    def stderr_contains(self, expected):
-+        """Check if resulted stderr contains expected data.
-+
-+        Arguments:
-+        expected: file that contains the expected data.
-+        """
-+        return self.__contains('stderr', expected)
-+
-+    def stderr_matches(self, cmp_file):
-+        """Check if resulted stderr exactly matches expected data.
-+
-+        Arguments:
-+        expected: file that contains the expected data.
-+        """
-+        return self.__matches('stderr', expected)
-+
-+@pytest.fixture(scope="module")
-+def conf(request):
-+    return Conf(request)
-diff --git a/scripts/kconfig/tests/pytest.ini b/scripts/kconfig/tests/pytest.ini
-new file mode 100644
-index 0000000..07b94e0
---- /dev/null
-+++ b/scripts/kconfig/tests/pytest.ini
-@@ -0,0 +1,6 @@
-+[pytest]
-+addopts = --verbose
-+# Pytest requires that test files have unique names, because pytest imports
-+# them as top-level modules.  It is silly to prefix or suffix a test file with
-+# the directory name that contains it.  Use __init__.py for all test files.
-+python_files = __init__.py
 -- 
 2.7.4
 
