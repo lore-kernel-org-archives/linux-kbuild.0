@@ -1,50 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f67.google.com ([209.85.218.67]:35206 "EHLO
-        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752388AbeBFJNq (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:51482 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752183AbeBFJew (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Feb 2018 04:13:46 -0500
-Received: by mail-oi0-f67.google.com with SMTP id e15so827474oiy.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 06 Feb 2018 01:13:46 -0800 (PST)
+        Tue, 6 Feb 2018 04:34:52 -0500
+Date: Tue, 6 Feb 2018 01:34:50 -0800
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 06/14] kbuild: define PYTHON2 and PYTHON3 variables
+ instead of PYTHON
+Message-ID: <20180206093450.GB31558@kroah.com>
+References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
+ <1517877294-4826-7-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNARURw7O5qrAvEvy6SEiDtPKzb=6HtZo84ANLqUCHFHmrw@mail.gmail.com>
-References: <20180128225838.1275-1-mforney@mforney.org> <CAGw6cBuHm+D1pdzZFmOrWjPaspE6CTS_-gG6zLFJLLU-aS4nxA@mail.gmail.com>
- <CAK7LNARURw7O5qrAvEvy6SEiDtPKzb=6HtZo84ANLqUCHFHmrw@mail.gmail.com>
-From: Michael Forney <mforney@mforney.org>
-Date: Tue, 6 Feb 2018 01:13:45 -0800
-Message-ID: <CAGw6cBvju1xb5q9ax=GWKeda+CYjztK371gJYETN9YC_Vs+Pww@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Use ls(1) instead of stat(1) to obtain file size
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1517877294-4826-7-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Tony Luck <tony.luck@intel.com>, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, Fenghua Yu <fenghua.yu@intel.com>
 
-On 2018-02-06, Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-> I sometimes see patches that address portability.
-> But, the resulted code is generally ugly.
-> (I would not say this is too ugly in this case.)
->
->
-> Also, I see some more instances.
-> If 'stat' is a problem,
-> do you have an idea for alternative of "stat -c %Y"?
+On Tue, Feb 06, 2018 at 09:34:46AM +0900, Masahiro Yamada wrote:
+> The variable 'PYTHON' allows users to specify a proper executable
+> name in case the default 'python' does not work.  However, this does
+> not address the case where both Python 2 and Python 3 scripts are
+> used in one system.
+> 
+> PEP 394 (https://www.python.org/dev/peps/pep-0394/) provides a
+> convention for Python scripts portability.  Here is a quotation:
+> 
+>   In order to tolerate differences across platforms, all new code
+>   that needs to invoke the Python interpreter should not specify
+>   'python', but rather should specify either 'python2' or 'python3'.
+>   This distinction should be made in shebangs, when invoking from a
+>   shell script, when invoking via the system() call, or when invoking
+>   in any other context.
+> 
+> arch/ia64/scripts/unwcheck.py is apparently written in Python 2, so
+> it should be invoked by 'python2'.
+> 
+> It is legitimate to use 'python' for scripts compatible with both
+> Python 2 and Python 3, but this is rare (at least I do not see the
+> case in kernel tree).  You do not need to make efforts to write your
+> scripts in that way.  Anyway, Python 2 will retire in 2020.
+> 
+> This commit is needed for my new scripts written in Python 3.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
+>  Makefile           | 5 +++--
+>  arch/ia64/Makefile | 2 +-
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 11aff0f..c4e935c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -384,7 +384,8 @@ GENKSYMS	= scripts/genksyms/genksyms
+>  INSTALLKERNEL  := installkernel
+>  DEPMOD		= /sbin/depmod
+>  PERL		= perl
+> -PYTHON		= python
+> +PYTHON2		= python2
+> +PYTHON3		= python3
 
-I'm not aware of a portable alternative for that. However, it is only
-used in a single place for backing up uImage and System.map. If the
-`stat -c %Y` command produces no stdout, it uses the .old extension
-instead which seems like reasonable fallback behavior.
+Is this going to break any systems that were previous setting PYTHON?
 
-> $ git grep 'stat -c'
-> Documentation/acpi/ssdt-overlays.txt:dd if=$tmp
-> of="$EFIVARFS/$name-$guid" bs=$(stat -c %s $tmp)
-> arch/arm/boot/deflate_xip_data.sh:file_end=$(stat -c "%s" "$XIPIMAGE")
-> arch/blackfin/boot/install.sh:  local stamp=$(stat -c %Y ${file}
-> 2>/dev/null)
-> arch/powerpc/boot/wrapper:strip_size=$(stat -c %s $vmz.$$)
-> tools/testing/selftests/efivarfs/efivarfs.sh:   if [ $(stat -c %s
-> $file) -ne 5 ]; then
+I like this change, and feel it is the correct thing to do, but having a
+"fallback" might be needed here.
 
-Would you like me to include those other instances of `stat -c %s` in
-this patch? I left them out for now because I wasn't sure if they
-needed to be sent to various other maintainers as separate patches.
+Could you do what the perf makefile does and do something like:
+	override PYTHON := $(call get-executable-or-default,PYTHON,$(PYTHON2))
+or is it really not an issue as only ia64 seems to care about this?
+
+thanks,
+
+greg k-h
