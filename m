@@ -1,74 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f195.google.com ([209.85.223.195]:40342 "EHLO
-        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752207AbeBFJth (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:56453 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752256AbeBFJ50 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Feb 2018 04:49:37 -0500
-Received: by mail-io0-f195.google.com with SMTP id t22so1851196ioa.7
-        for <linux-kbuild@vger.kernel.org>; Tue, 06 Feb 2018 01:49:36 -0800 (PST)
+        Tue, 6 Feb 2018 04:57:26 -0500
+Received: from mail-ua0-f171.google.com (mail-ua0-f171.google.com [209.85.217.171]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id w169vBwl022195
+        for <linux-kbuild@vger.kernel.org>; Tue, 6 Feb 2018 18:57:12 +0900
+Received: by mail-ua0-f171.google.com with SMTP id f5so786960ual.8
+        for <linux-kbuild@vger.kernel.org>; Tue, 06 Feb 2018 01:57:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KR5YyziwO8V9LeRh4yxVAakm+U2sej2nDCH_cxfLcZ2rA@mail.gmail.com>
-References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-8-ulfalizer@gmail.com>
- <CACRpkdY-3ab=o0TpURqa-MyTMJOd86SWqBaD4n7+KGYhgbYjzg@mail.gmail.com>
- <CAFkk2KQzCE5KrUvyvL0Va+KT0O4BvT3PQAT2ZP4u3SGYUWcp2g@mail.gmail.com> <CAFkk2KR5YyziwO8V9LeRh4yxVAakm+U2sej2nDCH_cxfLcZ2rA@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 6 Feb 2018 10:49:35 +0100
-Message-ID: <CACRpkdZB6nQfA8+opcBhHfXX=XeKW8nTmdxtrijZRuwb6KtqGA@mail.gmail.com>
-Subject: Re: [PATCH 07/20] riscv: Remove ARCH_WANT_OPTIONAL_GPIOLIB select
+In-Reply-To: <CAGw6cBvju1xb5q9ax=GWKeda+CYjztK371gJYETN9YC_Vs+Pww@mail.gmail.com>
+References: <20180128225838.1275-1-mforney@mforney.org> <CAGw6cBuHm+D1pdzZFmOrWjPaspE6CTS_-gG6zLFJLLU-aS4nxA@mail.gmail.com>
+ <CAK7LNARURw7O5qrAvEvy6SEiDtPKzb=6HtZo84ANLqUCHFHmrw@mail.gmail.com> <CAGw6cBvju1xb5q9ax=GWKeda+CYjztK371gJYETN9YC_Vs+Pww@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 6 Feb 2018 18:56:30 +0900
+Message-ID: <CAK7LNASPtFvZZBokDi2tRniGawVT=f_Atrsv3qzJV22S7rm8Yg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Use ls(1) instead of stat(1) to obtain file size
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Egtvedt <egtvedt@samfundet.no>, Vineet Gupta <vgupta@synopsys.com>, mgorman@techsingularity.net, Christoph Hellwig <hch@lst.de>, mina86@mina86.com, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, Paul Mackerras <paulus@ozlabs.org>, Will Deacon <will.deacon@arm.com>, ext Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Palmer Dabbelt <palmer@sifive.com>, Albert Ou <albert@sifive.com>, linux-riscv@lists.infradead.org
+To: Michael Forney <mforney@mforney.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, Feb 6, 2018 at 12:49 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> On Tue, Feb 6, 2018 at 12:38 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
->> On Tue, Feb 6, 2018 at 12:25 AM, Linus Walleij <linus.walleij@linaro.org> wrote:
->>> On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
->>>
->>>> The ARCH_WANT_OPTIONAL_GPIOLIB symbol was removed in commit 65053e1a7743
->>>> ("gpio: delete ARCH_[WANTS_OPTIONAL|REQUIRE]_GPIOLIB"). GPIOLIB should
->>>> just be selected explicitly if needed.
->>>>
->>>> Remove the ARCH_WANT_OPTIONAL_GPIOLIB select from RISCV.
->>>>
->>>> See commit 0145071b3314 ("x86: Do away with
->>>> ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") and commit da9a1c6767 ("arm64: do
->>>> away with ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") as well.
->>>>
->>>> Discovered with the
->>>> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
->>>> script.
->>>>
->>>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->>>
->>> This should probaly be replaced with
->>> select GPIOLIB
->>>
->>> Yours,
->>> Linus Walleij
+2018-02-06 18:13 GMT+09:00 Michael Forney <mforney@mforney.org>:
+> On 2018-02-06, Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+>> I sometimes see patches that address portability.
+>> But, the resulted code is generally ugly.
+>> (I would not say this is too ugly in this case.)
 >>
->> That'd make more sense if GPIOLIB is actually used. The select has
->> been a no-op since mid-2016 at least, but maybe something else selects
->> GPIOLIB.
 >>
->> Cheers,
->> Ulf
+>> Also, I see some more instances.
+>> If 'stat' is a problem,
+>> do you have an idea for alternative of "stat -c %Y"?
 >
-> Just replace it with your own patch once you've figured out the proper
-> fix. More efficient than having a middle man making (sometimes poor)
-> guesses.
+> I'm not aware of a portable alternative for that. However, it is only
+> used in a single place for backing up uImage and System.map. If the
+> `stat -c %Y` command produces no stdout, it uses the .old extension
+> instead which seems like reasonable fallback behavior.
 
-I think it's just a side effect of the new RISCV arch being developed
-outside of the mainline kernel. And they may have had a gpio driver
-outside of the mainline as well.
+Ah, right.
 
-Normally we don't encourage out-of-tree development, but new archs
-are a bit of an exception since they have to be merged as a big
-piece of upfront code at some point...
 
-Anyways, if they don't have any GPIO in their machine yet, let's
-let the RISCV maintainers apply this.
+>> $ git grep 'stat -c'
+>> Documentation/acpi/ssdt-overlays.txt:dd if=$tmp
+>> of="$EFIVARFS/$name-$guid" bs=$(stat -c %s $tmp)
+>> arch/arm/boot/deflate_xip_data.sh:file_end=$(stat -c "%s" "$XIPIMAGE")
+>> arch/blackfin/boot/install.sh:  local stamp=$(stat -c %Y ${file}
+>> 2>/dev/null)
+>> arch/powerpc/boot/wrapper:strip_size=$(stat -c %s $vmz.$$)
+>> tools/testing/selftests/efivarfs/efivarfs.sh:   if [ $(stat -c %s
+>> $file) -ne 5 ]; then
+>
+> Would you like me to include those other instances of `stat -c %s` in
+> this patch? I left them out for now because I wasn't sure if they
+> needed to be sent to various other maintainers as separate patches.
 
-Yours,
-Linus Walleij
+I want all instances written in the same way
+once we make a decision.
+
+BTW, is the output format of ls(1) standardized?
+I am not familiar with this area.
+
+
+Also, I am not a big fan of the mysterious two lines code.
+(We will have some more if we fix the rest of the instances)
+
+
+Perhaps, put
+set -- $(ls -dn $1)
+echo $5
+
+into "scripts/file-size.sh"  (any other suitable file name is OK)
+then, call it like this?
+
+   size1=$($CONFIG_SHELL $srctree/scripts/file-size.sh .tmp_kallsyms1.o)
+   size2=$($CONFIG_SHELL $srctree/scripts/file-size.sh .tmp_kallsyms2.o)
+
+
+Is this less uglier?
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
