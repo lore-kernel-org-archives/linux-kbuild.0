@@ -1,147 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:45106 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751835AbeBFIZY (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:65032 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752283AbeBFIkM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Feb 2018 03:25:24 -0500
-Received: from mail-vk0-f42.google.com (mail-vk0-f42.google.com [209.85.213.42]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id w168P6JD008614
-        for <linux-kbuild@vger.kernel.org>; Tue, 6 Feb 2018 17:25:06 +0900
-Received: by mail-vk0-f42.google.com with SMTP id j204so600863vke.12
-        for <linux-kbuild@vger.kernel.org>; Tue, 06 Feb 2018 00:25:06 -0800 (PST)
+        Tue, 6 Feb 2018 03:40:12 -0500
+Received: from mail-vk0-f53.google.com (mail-vk0-f53.google.com [209.85.213.53]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id w168e9SL020765
+        for <linux-kbuild@vger.kernel.org>; Tue, 6 Feb 2018 17:40:10 +0900
+Received: by mail-vk0-f53.google.com with SMTP id h69so634303vke.7
+        for <linux-kbuild@vger.kernel.org>; Tue, 06 Feb 2018 00:40:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180128225651.1134-1-mforney@mforney.org>
-References: <20180128225651.1134-1-mforney@mforney.org>
+In-Reply-To: <CAGw6cBuHm+D1pdzZFmOrWjPaspE6CTS_-gG6zLFJLLU-aS4nxA@mail.gmail.com>
+References: <20180128225838.1275-1-mforney@mforney.org> <CAGw6cBuHm+D1pdzZFmOrWjPaspE6CTS_-gG6zLFJLLU-aS4nxA@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 6 Feb 2018 17:24:25 +0900
-Message-ID: <CAK7LNATPwA1uyqPbACtV5_9DFjGOv7gsZ=4i4-VtsPR2Wx_qLA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Improve portability of some sed invocations
+Date: Tue, 6 Feb 2018 17:39:28 +0900
+Message-ID: <CAK7LNARURw7O5qrAvEvy6SEiDtPKzb=6HtZo84ANLqUCHFHmrw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Use ls(1) instead of stat(1) to obtain file size
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michael Forney <mforney@mforney.org>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-01-29 7:56 GMT+09:00 Michael Forney <mforney@mforney.org>:
-> From: Michael Forney <forney@google.com>
+2018-01-30 17:01 GMT+09:00 Michael Forney <mforney@mforney.org>:
+> On 2018-01-28, Michael Forney <mforney@mforney.org> wrote:
+>> From: Michael Forney <forney@google.com>
+>>
+>> stat(1) is not standardized and different implementations have their own
+>> (conflicting) flags for querying the size of a file.
+>>
+>> ls(1) provides the same information (value of st.st_size) in the 5th
+>> column,
+>> except when the file is a character or block device.
 >
-> * Use BREs where EREs aren't necessary.
-> * Pass -E instead of -r to use EREs. This will be standardized in the
->   next POSIX revision[0]. GNU sed supports this since 4.2 (May 2009),
->   and busybox since 1.22.0 (Jan 2014).
-> * Use a literal <tab> instead of \t in bracket expressions. In bracket
->   expressions, POSIX says that <backslash> loses its special meaning, so
->   a conforming implementation cannot expand \t to <tab>[1].
-> * In BREs, use interval expressions (\{n,m\}) instead of non-standard
->   features like \+ and \?.
-> * Use a loop instead of -s flag.
+> Forgot to add
 >
-> There are still plenty of other cases of non-standard sed invocations
-> (use of ERE features in BREs, in-place editing), but this fixes some
-> core ones.
+> Signed-off-by: Michael Forney <forney@google.com>
 >
-> [0] http://austingroupbugs.net/view.php?id=528
-> [1] http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_03_05
-> ---
->  scripts/Kbuild.include        |  2 +-
->  scripts/Makefile.build        |  2 +-
->  scripts/adjust_autoksyms.sh   |  4 +++-
->  scripts/gen_initramfs_list.sh |  2 +-
->  scripts/headers_install.sh    | 10 +++++-----
->  5 files changed, 11 insertions(+), 9 deletions(-)
->
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index 065324a8046f..34cbd81024b0 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -368,7 +368,7 @@ ksym_dep_filter =                                                            \
->             $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;        \
->           boot*|build*|cpp_its_S|*cpp_lds_S|dtc|host*|vdso*) : ;;            \
->           *) echo "Don't know how to preprocess $(1)" >&2; false ;;          \
-> -       esac | tr ";" "\n" | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
-> +       esac | tr ";" "\n" | sed -n 's/^.*=== __KSYM_\(.*\) ===.*$$/KSYM_\1/p'
->
->  cmd_and_fixdep =                                                             \
->         $(echo-cmd) $(cmd_$(1));                                             \
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index cb8997ed0149..524000a4ccda 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -300,7 +300,7 @@ endef
->
->  # List module undefined symbols (or empty line if not enabled)
->  ifdef CONFIG_TRIM_UNUSED_KSYMS
-> -cmd_undef_syms = $(NM) $@ | sed -n 's/^ \+U //p' | xargs echo
-> +cmd_undef_syms = $(NM) $@ | sed -n 's/^  *U //p' | xargs echo
->  else
->  cmd_undef_syms = echo
->  endif
-> diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
-> index 513da1a4a2da..a162258ab606 100755
-> --- a/scripts/adjust_autoksyms.sh
-> +++ b/scripts/adjust_autoksyms.sh
-> @@ -60,7 +60,9 @@ cat > "$new_ksyms_file" << EOT
->
->  EOT
->  [ "$(ls -A "$MODVERDIR")" ] &&
-> -sed -ns -e '3{s/ /\n/g;/^$/!p;}' "$MODVERDIR"/*.mod | sort -u |
-> +for mod in "$MODVERDIR"/*.mod; do
-> +       sed -n -e '3{s/ /\n/g;/^$/!p;}' "$mod"
-> +done | sort -u |
->  while read sym; do
->         if [ -n "$CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX" ]; then
->                 sym="${sym#_}"
-> diff --git a/scripts/gen_initramfs_list.sh b/scripts/gen_initramfs_list.sh
-> index 86a3c0e5cfbc..10e528b3a08f 100755
-> --- a/scripts/gen_initramfs_list.sh
-> +++ b/scripts/gen_initramfs_list.sh
-> @@ -194,7 +194,7 @@ input_file() {
->         source="$1"
->         if [ -f "$1" ]; then
->                 ${dep_list}header "$1"
-> -               is_cpio="$(echo "$1" | sed 's/^.*\.cpio\(\..*\)\?/cpio/')"
-> +               is_cpio="$(echo "$1" | sed 's/^.*\.cpio\(\..*\)\{0,1\}/cpio/')"
->                 if [ $2 -eq 0 -a ${is_cpio} = "cpio" ]; then
->                         cpio_file=$1
->                         echo "$1" | grep -q '^.*\.cpio\..*' && is_cpio_compressed="compressed"
-> diff --git a/scripts/headers_install.sh b/scripts/headers_install.sh
-> index a18bca720995..7328394cf9e8 100755
-> --- a/scripts/headers_install.sh
-> +++ b/scripts/headers_install.sh
-> @@ -31,13 +31,13 @@ trap 'rm -f "$OUTDIR/$FILE" "$OUTDIR/$FILE.sed"' EXIT
->  for i in "$@"
->  do
->         FILE="$(basename "$i")"
-> -       sed -r \
-> -               -e 's/([ \t(])(__user|__force|__iomem)[ \t]/\1/g' \
-> -               -e 's/__attribute_const__([ \t]|$)/\1/g' \
-> +       sed -E \
-> +               -e 's/([        (])(__user|__force|__iomem)[    ]/\1/g' \
-> +               -e 's/__attribute_const__([     ]|$)/\1/g' \
+>> ---
+>>  scripts/Makefile.lib    | 3 ++-
+>>  scripts/link-vmlinux.sh | 6 ++++--
+>>  2 files changed, 6 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+>> index 7dee1da83e2a..24566d1c10d2 100644
+>> --- a/scripts/Makefile.lib
+>> +++ b/scripts/Makefile.lib
+>> @@ -319,7 +319,8 @@ dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
+>>  size_append = printf $(shell                                         \
+>>  dec_size=0;                                                          \
+>>  for F in $1; do                                                              \
+>> -     fsize=$$(stat -c "%s" $$F);                                     \
+>> +     set -- $$(ls -dn $$F);                                          \
+>> +     fsize=$$5;                                                      \
+>>       dec_size=$$(expr $$dec_size + $$fsize);                         \
+>>  done;                                                                        \
+>>  printf "%08x\n" $$dec_size |                                         \
 
 
-I am afraid this is unreadable.
+I sometimes see patches that address portability.
+But, the resulted code is generally ugly.
+(I would not say this is too ugly in this case.)
 
-Does [[:SPACE:]] work?
+
+Also, I see some more instances.
+If 'stat' is a problem,
+do you have an idea for alternative of "stat -c %Y"?
+
+$ git grep 'stat -c'
+Documentation/acpi/ssdt-overlays.txt:dd if=$tmp
+of="$EFIVARFS/$name-$guid" bs=$(stat -c %s $tmp)
+arch/arm/boot/deflate_xip_data.sh:file_end=$(stat -c "%s" "$XIPIMAGE")
+arch/blackfin/boot/install.sh:  local stamp=$(stat -c %Y ${file} 2>/dev/null)
+arch/powerpc/boot/wrapper:strip_size=$(stat -c %s $vmz.$$)
+tools/testing/selftests/efivarfs/efivarfs.sh:   if [ $(stat -c %s
+$file) -ne 5 ]; then
 
 
 
->                 -e 's@^#include <linux/compiler(|_types).h>@@' \
->                 -e 's/(^|[^a-zA-Z0-9])__packed([^a-zA-Z0-9_]|$)/\1__attribute__((packed))\2/g' \
-> -               -e 's/(^|[ \t(])(inline|asm|volatile)([ \t(]|$)/\1__\2__\3/g' \
-> -               -e 's@#(ifndef|define|endif[ \t]*/[*])[ \t]*_UAPI@#\1 @' \
-> +               -e 's/(^|[      (])(inline|asm|volatile)([      (]|$)/\1__\2__\3/g' \
-> +               -e 's@#(ifndef|define|endif[    ]*/[*])[        ]*_UAPI@#\1 @' \
->                 "$SRCDIR/$i" > "$OUTDIR/$FILE.sed" || exit 1
->         scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__ "$OUTDIR/$FILE.sed" \
->                 > "$OUTDIR/$FILE"
-> --
-> 2.15.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+>> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+>> index c0d129d7f430..4a5737647a79 100755
+>> --- a/scripts/link-vmlinux.sh
+>> +++ b/scripts/link-vmlinux.sh
+>> @@ -296,8 +296,10 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
+>>       kallsyms .tmp_vmlinux2 .tmp_kallsyms2.o
+>>
+>>       # step 3
+>> -     size1=$(stat -c "%s" .tmp_kallsyms1.o)
+>> -     size2=$(stat -c "%s" .tmp_kallsyms2.o)
+>> +     set -- $(ls -dn .tmp_kallsyms1.o)
+>> +     size1=$5
+>> +     set -- $(ls -dn .tmp_kallsyms2.o)
+>> +     size2=$5
+>>
+>>       if [ $size1 -ne $size2 ] || [ -n "${KALLSYMS_EXTRA_PASS}" ]; then
+>>               kallsymso=.tmp_kallsyms3.o
+>> --
+>> 2.15.1
+>>
+>>
+
+
+
+
 
 
 
