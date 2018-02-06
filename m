@@ -1,82 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f52.google.com ([209.85.160.52]:44510 "EHLO
-        mail-pl0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752403AbeBFMAk (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:47182 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752791AbeBFNKT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Feb 2018 07:00:40 -0500
-Received: by mail-pl0-f52.google.com with SMTP id f8so1089990plk.11
-        for <linux-kbuild@vger.kernel.org>; Tue, 06 Feb 2018 04:00:39 -0800 (PST)
-Date: Tue, 6 Feb 2018 13:00:33 +0100
-From: Petr Vorel <petr.vorel@gmail.com>
-Subject: Re: [PATCH] kconfig: Minimize 'Selected by' and 'Implied by'
-Message-ID: <20180206120032.v52k4xm7oyono3yg@dell5510>
-Reply-To: Petr Vorel <petr.vorel@gmail.com>
-References: <20180204113712.8983-1-rosca.eugeniu@gmail.com>
- <CAFkk2KQmROW-Z--qwvxWQrsohBSsnk_EhqZixOWFXUxeBj=tkQ@mail.gmail.com>
- <20180204214953.GA2905@example.com>
- <CAFkk2KR9JDTxtD7=HVzP4eS2hh6xFNd-AkPi7_cDSgjc8k4u4A@mail.gmail.com>
- <CAK7LNATnROTM1bECz4fk=e7B0ioWKWmL+pz_MUh9j2tc3eZwzg@mail.gmail.com>
+        Tue, 6 Feb 2018 08:10:19 -0500
+Date: Tue, 6 Feb 2018 05:10:17 -0800
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 06/14] kbuild: define PYTHON2 and PYTHON3 variables
+ instead of PYTHON
+Message-ID: <20180206131017.GF31804@kroah.com>
+References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
+ <1517877294-4826-7-git-send-email-yamada.masahiro@socionext.com>
+ <20180206093450.GB31558@kroah.com>
+ <CAK7LNAS_29myncTw+6u7fH9BgjzZJfXSN1CJjOjK-qXjPRQ8hQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK7LNATnROTM1bECz4fk=e7B0ioWKWmL+pz_MUh9j2tc3eZwzg@mail.gmail.com>
+In-Reply-To: <CAK7LNAS_29myncTw+6u7fH9BgjzZJfXSN1CJjOjK-qXjPRQ8hQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Eugeniu Rosca <roscaeugeniu@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Eugeniu Rosca <rosca.eugeniu@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Tony Luck <tony.luck@intel.com>, linux-ia64@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Fenghua Yu <fenghua.yu@intel.com>
 
-Hi,
+On Tue, Feb 06, 2018 at 07:44:22PM +0900, Masahiro Yamada wrote:
+> 2018-02-06 18:34 GMT+09:00 Greg Kroah-Hartman <gregkh@linuxfoundation.org>:
+> > On Tue, Feb 06, 2018 at 09:34:46AM +0900, Masahiro Yamada wrote:
+> >> The variable 'PYTHON' allows users to specify a proper executable
+> >> name in case the default 'python' does not work.  However, this does
+> >> not address the case where both Python 2 and Python 3 scripts are
+> >> used in one system.
+> >>
+> >> PEP 394 (https://www.python.org/dev/peps/pep-0394/) provides a
+> >> convention for Python scripts portability.  Here is a quotation:
+> >>
+> >>   In order to tolerate differences across platforms, all new code
+> >>   that needs to invoke the Python interpreter should not specify
+> >>   'python', but rather should specify either 'python2' or 'python3'.
+> >>   This distinction should be made in shebangs, when invoking from a
+> >>   shell script, when invoking via the system() call, or when invoking
+> >>   in any other context.
+> >>
+> >> arch/ia64/scripts/unwcheck.py is apparently written in Python 2, so
+> >> it should be invoked by 'python2'.
+> >>
+> >> It is legitimate to use 'python' for scripts compatible with both
+> >> Python 2 and Python 3, but this is rare (at least I do not see the
+> >> case in kernel tree).  You do not need to make efforts to write your
+> >> scripts in that way.  Anyway, Python 2 will retire in 2020.
+> >>
+> >> This commit is needed for my new scripts written in Python 3.
+> >>
+> >> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> >> ---
+> >>
+> >>  Makefile           | 5 +++--
+> >>  arch/ia64/Makefile | 2 +-
+> >>  2 files changed, 4 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/Makefile b/Makefile
+> >> index 11aff0f..c4e935c 100644
+> >> --- a/Makefile
+> >> +++ b/Makefile
+> >> @@ -384,7 +384,8 @@ GENKSYMS  = scripts/genksyms/genksyms
+> >>  INSTALLKERNEL  := installkernel
+> >>  DEPMOD               = /sbin/depmod
+> >>  PERL         = perl
+> >> -PYTHON               = python
+> >> +PYTHON2              = python2
+> >> +PYTHON3              = python3
+> >
+> > Is this going to break any systems that were previous setting PYTHON?
+> >
+> > I like this change, and feel it is the correct thing to do, but having a
+> > "fallback" might be needed here.
+> >
+> > Could you do what the perf makefile does and do something like:
+> >         override PYTHON := $(call get-executable-or-default,PYTHON,$(PYTHON2))
+> > or is it really not an issue as only ia64 seems to care about this?
+> >
+> 
+> As far as I see, ia64 is the only instance that has used this ever.
+> 
+> (the perf Makefile defines PYTHON by itself, so should not be a problem.)
+> 
+> 
+> If people expect the backward-compatibility for this, I can do like follows:
+> 
+> # backward compatibility for 'PYTHON'
+> PYTHON2  := $(if $(PYTHON), $(PYTHON), python2)
 
-> Another possibility?
+That's true, and who knows if python3 is running on ia64 :)
 
+> Another (unlikely) possible breakage is
+> 'python2' may not be installed on users' system.
+> 
+> I believe this is rare, but if needed, I could do like follows
+> at the cost of ugliness.
+> 
+> 
+> PYTHON2 := $(if $(PYTHON), $(PYTHON), \
+>         $(shell python2 --version 2>/dev/null && echo python2 || echo python))
 
-> Add [ ]: for each line to show the expression value.
-> (but blank for 'n' for readability)
+Ick, I guess that might work.  Try getting your patch set into the 0-day
+system to see how it handles things.  I know it builds for ia64.
 
+But this is a real tiny question overall, and should not derail this
+patchset at all :)
 
->  Symbol: REGMAP_I2C [=y]
->  Type  : tristate
->    Defined at drivers/base/regmap/Kconfig:19
->    Depends on: I2C [=y]
->    Selected by:
->     [y]: EEPROM_AT24 [=y] && I2C [=y] && SYSFS [=y]
->     [ ]: NET_DSA_SMSC_LAN9303_I2C [=n] && NETDEVICES [=y] &&
-> HAVE_NET_DSA [=y] && NET_DSA [=n] && I2C [=y]
->     [ ]: KEYBOARD_CAP11XX [=n] && !UML && INPUT [=y] && INPUT_KEYBOARD
-> [=y] && OF [=y] && I2C [=y]
->     [ ]: TOUCHSCREEN_AD7879_I2C [=n] && !UML && INPUT [=y] &&
-> INPUT_TOUCHSCREEN [=n] && TOUCHSCREEN_AD7879 [=n] &&
->     [ ]: TOUCHSCREEN_TSC2004 [=n] && !UML && INPUT [=y] &&
-> INPUT_TOUCHSCREEN [=n] && I2C [=y]
->     [ ]: INPUT_DRV260X_HAPTICS [=n] && !UML && INPUT_MISC [=y] &&
-> INPUT [=y] && I2C [=y] && (GPIOLIB [=y] || COMPI
->     [ ]: INPUT_DRV2665_HAPTICS [=n] && !UML && INPUT_MISC [=y] &&
-> INPUT [=y] && I2C [=y]
->     [ ]: INPUT_DRV2667_HAPTICS [=n] && !UML && INPUT_MISC [=y] &&
-> INPUT [=y] && I2C [=y]
->     [ ]: SERIAL_SC16IS7XX_I2C [=n] && TTY [=y] && HAS_IOMEM [=y] &&
-> SERIAL_SC16IS7XX [=n] && I2C [=y]
->     [ ]: I2C_MUX_LTC4306 [=n] && I2C [=y] && I2C_MUX [=y]
->     [ ]: PINCTRL_MCP23S08 [=n] && PINCTRL [=y] && (SPI_MASTER [=y] ||
-> I2C [=y]) && (I2C [=y] || I2C [=y]=n) && I2C
->     [ ]: GPIO_TS4900 [=n] && GPIOLIB [=y] && I2C [=y] && (SOC_IMX6 ||
-> COMPILE_TEST [=n])
->     [ ]: BATTERY_MAX17042 [=n] && POWER_SUPPLY [=y] && I2C [=y]
->     [ ]: CHARGER_BQ25890 [=n] && POWER_SUPPLY [=y] && I2C [=y] &&
-> (GPIOLIB [=y] || COMPILE_TEST [=n])
->     [ ]: CHARGER_SMB347 [=n] && POWER_SUPPLY [=y] && I2C [=y]
->     [ ]: CHARGER_RT9455 [=n] && POWER_SUPPLY [=y] && I2C [=y] &&
-> (GPIOLIB [=y] || COMPILE_TEST [=n])
->     [y]: SENSORS_LTC2945 [=y] && HWMON [=y] && I2C [=y]
->               ...
+thanks,
 
-
-This looks best variant to me.
-
-
-> Best Regards
-> Masahiro Yamada
-
-
-Kind regards,
-Petr
+greg k-h
