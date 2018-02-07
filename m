@@ -1,190 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:38983 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750729AbeBGW4Q (ORCPT
+Received: from mail-ua0-f193.google.com ([209.85.217.193]:38863 "EHLO
+        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750729AbeBGXTQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Feb 2018 17:56:16 -0500
-Date: Wed, 7 Feb 2018 23:55:51 +0100
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: Re: [PATCH 02/14] kconfig: do not write choice values when their
- dependency becomes n
-Message-ID: <20180207225551.imdp6gqbdwzyvhwm@huvuddator>
-References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
- <1517877294-4826-3-git-send-email-yamada.masahiro@socionext.com>
+        Wed, 7 Feb 2018 18:19:16 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1517877294-4826-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <20180206093803.GC31558@kroah.com>
+References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com> <20180206093803.GC31558@kroah.com>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Thu, 8 Feb 2018 00:19:14 +0100
+Message-ID: <CAFkk2KSdg0+AdnncRuwUNeHHoXv7zsdrrZEsMgq0esvAU5U7Eg@mail.gmail.com>
+Subject: Re: [PATCH 00/14] Add Kconfig unit tests
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, "Luis R. Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@suse.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Heinrich Schuchardt <xypron.glpk@gmx.de>, Yaakov Selkowitz <yselkowi@redhat.com>, linux-ia64@vger.kernel.org, Fenghua Yu <fenghua.yu@intel.com>, Marc Herbert <marc.herbert@intel.com>
 
-On Tue, Feb 06, 2018 at 09:34:42AM +0900, Masahiro Yamada wrote:
-> "# CONFIG_... is not set" for choice values are wrongly written into
-> the .config file if they are once visible, then become invisible later.
-> 
->   Test case
->   ---------
-> 
-> ---------------------------(Kconfig)----------------------------
-> config A
-> 	bool "A"
-> 
-> choice
-> 	prompt "Choice ?"
-> 	depends on A
-> 
-> config CHOICE_B
-> 	bool "Choice B"
-> 
-> config CHOICE_C
-> 	bool "Choice C"
-> 
-> endchoice
-> ----------------------------------------------------------------
-> 
-> ---------------------------(.config)----------------------------
-> CONFIG_A=y
-> ----------------------------------------------------------------
-> 
-> With the Kconfig and .config above,
-> 
->   $ make config
->   scripts/kconfig/conf  --oldaskconfig Kconfig
->   *
->   * Linux Kernel Configuration
->   *
->   A (A) [Y/n] n
->   #
->   # configuration written to .config
->   #
->   $ cat .config
->   #
->   # Automatically generated file; DO NOT EDIT.
->   # Linux Kernel Configuration
->   #
->   # CONFIG_A is not set
->   # CONFIG_CHOICE_B is not set
->   # CONFIG_CHOICE_C is not set
-> 
-> Here,
-> 
->   # CONFIG_CHOICE_B is not set
->   # CONFIG_CHOICE_C is not set
-> 
-> should not be written into the .config file because their dependency
-> "depends on A" is unmet.
-> 
-> Currently, there is no code that clears SYMBOL_WRITE of choice values.
-> 
-> Clear SYMBOL_WRITE for all symbols in sym_calc_value(), then set it
-> again after calculating visibility.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
->  scripts/kconfig/symbol.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index c9123ed..5d6f6b1 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -371,8 +371,7 @@ void sym_calc_value(struct symbol *sym)
->  		sym->curr.tri = no;
->  		return;
->  	}
-> -	if (!sym_is_choice_value(sym))
-> -		sym->flags &= ~SYMBOL_WRITE;
-> +	sym->flags &= ~SYMBOL_WRITE;
->  
->  	sym_calc_visibility(sym);
->  
-> @@ -385,6 +384,7 @@ void sym_calc_value(struct symbol *sym)
->  		if (sym_is_choice_value(sym) && sym->visible == yes) {
->  			prop = sym_get_choice_prop(sym);
->  			newval.tri = (prop_get_symbol(prop)->curr.val == sym) ? yes : no;
-> +			sym->flags |= SYMBOL_WRITE;
->  		} else {
->  			if (sym->visible != no) {
->  				/* if the symbol is visible use the user value
-> -- 
-> 2.7.4
-> 
+On Tue, Feb 6, 2018 at 10:38 AM, Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+> On Tue, Feb 06, 2018 at 09:34:40AM +0900, Masahiro Yamada wrote:
+>> I am applying various patches to Kconfig these days.
+>>
+>> However, I fear regressions.  I have been thinking of unit-tests.
+>>
+>> There are various cryptic parts in Kconfig and corner cases where
+>> it is difficult to notice breakage.  If unit-tests cover those,
+>> I will be able to apply changes more confidently.
+>>
+>> So, here is the trial.
+>>
+>> After fixing some problems, I will add a basic test framework.
+>> This is based on pytest.  Also, this is written in Python 3.
+>> Python 2 will return in 2020.  So, I believe new python tools should be
+>> written in Python 3.
+>>
+>> This is my Python 3 and pytest versions.
+>>
+>> $ python3 --version
+>> Python 3.5.2
+>> $ python3 -m pytest --version
+>> This is pytest version 3.4.0, imported from /home/masahiro/.local/lib/python3.5/site-packages/pytest.py
+>>
+>> If I use old pytest version, some parts did not work as expected.
+>> If this does not work for you, please consider using newer pytest.
+>>
+>> I will brush up the code more and add more test cases to do a better job.
+>> Before proceeding more, I'd like to get consensus for this approach.
+>> If you have an idea for better implementation, comments are appreciated.
+>
+> Personally I think this is great stuff.  I too have never wanted to
+> touch Kconfig stuff due to the complexity, and having unit tests like
+> this is a great idea to help ensure that things do not break.
+>
+> Your first 5 patches should be queued up for the next merge window, no
+> problem (see my comments on the 6th).  As for the rest, I don't have any
+> objection to them, and using python3 over python2 is a good idea.  And
+> anyone who wants to do Kconfig work can easily install the needed
+> packages, it's not required by any "normal" kernel developer.
+>
+> Anyway, nice job, it's great to see this happening, no objection from me
+> at all!
+>
+> greg k-h
 
-Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+Yeah, breaking Kconfig is a sure way to feel the wrath.
 
-There's a possible simplification here:
+The only reason I feel somewhat confident modifying Kconfig is that
+the Kconfiglib test suite happens to work as a regression test for the
+C implementation as well. It compares the .config files produced by
+the two implementations for all defconfig files and for
+all{no,yes,def}config, for all ARCHes, meaning any changes to the
+output of the C tools get flagged as well (with a diff).
 
-All defined symbols, regardless of type, and regardless of whether
-they're choice value symbols or not, always get written out if they have
-non-n visibility. Therefore, the sym->visible != no check for
-SYMBOL_WRITE can be moved to before the symbol type check, which gets
-rid of two SYMBOL_WRITE assignments and makes it clear that the logic is
-the same for all paths.
+Having some "native" tests is great as well. I'm a big fan of
+automatic testing. :)
 
-This is safe for symbols defined without a type (S_UNKNOWN) too, because
-conf_write() skips those (plus they already generate a warning).
+In case you want to run the Kconfiglib test suite at any point, here's
+how to do it (in the kernel root):
 
-This matches how I do it in the tri_value() function in Kconfiglib:
-https://github.com/ulfalizer/Kconfiglib/blob/master/kconfiglib.py#L2574.
-SYMBOL_WRITE corresponds to _write_to_conf.
+        $ git clone git://github.com/ulfalizer/Kconfiglib.git
+        $ git am Kconfiglib/makefile.patch
+        $ python Kconfiglib/testsuite.py speedy
 
-I've included a patch below. I tested it with the Kconfiglib test suite,
-which verifies that the C implementation still generates the same
-.config file for all defconfig files as well as for
-all{no,yes,def}config, for all ARCHes.
-
-(The Kconfiglib test suite runs scripts/kconfig/conf and compares its
-output against it, which means it doubles as a regression test for the C
-tools.)
-
-
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index c9123ed2b791..13f7fdfe328d 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -371,11 +371,13 @@ void sym_calc_value(struct symbol *sym)
- 		sym->curr.tri = no;
- 		return;
- 	}
--	if (!sym_is_choice_value(sym))
--		sym->flags &= ~SYMBOL_WRITE;
-+	sym->flags &= ~SYMBOL_WRITE;
- 
- 	sym_calc_visibility(sym);
- 
-+	if (sym->visible != no)
-+		sym->flags |= SYMBOL_WRITE;
-+
- 	/* set default if recursively called */
- 	sym->curr = newval;
- 
-@@ -390,7 +392,6 @@ void sym_calc_value(struct symbol *sym)
- 				/* if the symbol is visible use the user value
- 				 * if available, otherwise try the default value
- 				 */
--				sym->flags |= SYMBOL_WRITE;
- 				if (sym_has_value(sym)) {
- 					newval.tri = EXPR_AND(sym->def[S_DEF_USER].tri,
- 							      sym->visible);
-@@ -433,12 +434,9 @@ void sym_calc_value(struct symbol *sym)
- 	case S_STRING:
- 	case S_HEX:
- 	case S_INT:
--		if (sym->visible != no) {
--			sym->flags |= SYMBOL_WRITE;
--			if (sym_has_value(sym)) {
--				newval.val = sym->def[S_DEF_USER].val;
--				break;
--			}
-+		if (sym->visible != no && sym_has_value(sym)) {
-+			newval.val = sym->def[S_DEF_USER].val;
-+			break;
- 		}
- 		prop = sym_get_default_prop(sym);
- 		if (prop) {
--- 
-2.14.1
-
+Cheers,
+Ulf
