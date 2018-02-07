@@ -1,87 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f193.google.com ([209.85.217.193]:38863 "EHLO
-        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750729AbeBGXTQ (ORCPT
+Received: from mail-ua0-f194.google.com ([209.85.217.194]:44423 "EHLO
+        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750745AbeBGXek (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Feb 2018 18:19:16 -0500
+        Wed, 7 Feb 2018 18:34:40 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180206093803.GC31558@kroah.com>
-References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com> <20180206093803.GC31558@kroah.com>
+In-Reply-To: <1517877294-4826-5-git-send-email-yamada.masahiro@socionext.com>
+References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com> <1517877294-4826-5-git-send-email-yamada.masahiro@socionext.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 8 Feb 2018 00:19:14 +0100
-Message-ID: <CAFkk2KSdg0+AdnncRuwUNeHHoXv7zsdrrZEsMgq0esvAU5U7Eg@mail.gmail.com>
-Subject: Re: [PATCH 00/14] Add Kconfig unit tests
+Date: Thu, 8 Feb 2018 00:34:38 +0100
+Message-ID: <CAFkk2KSA6L_Ti_rFN9waJWZvntNT6qnvW1bzcbAbfnHpZM_wyw@mail.gmail.com>
+Subject: Re: [PATCH 04/14] kconfig: print additional new line for choice for redirection
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@suse.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Heinrich Schuchardt <xypron.glpk@gmx.de>, Yaakov Selkowitz <yselkowi@redhat.com>, linux-ia64@vger.kernel.org, Fenghua Yu <fenghua.yu@intel.com>, Marc Herbert <marc.herbert@intel.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Marc Herbert <marc.herbert@intel.com>
 
-On Tue, Feb 6, 2018 at 10:38 AM, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
-> On Tue, Feb 06, 2018 at 09:34:40AM +0900, Masahiro Yamada wrote:
->> I am applying various patches to Kconfig these days.
->>
->> However, I fear regressions.  I have been thinking of unit-tests.
->>
->> There are various cryptic parts in Kconfig and corner cases where
->> it is difficult to notice breakage.  If unit-tests cover those,
->> I will be able to apply changes more confidently.
->>
->> So, here is the trial.
->>
->> After fixing some problems, I will add a basic test framework.
->> This is based on pytest.  Also, this is written in Python 3.
->> Python 2 will return in 2020.  So, I believe new python tools should be
->> written in Python 3.
->>
->> This is my Python 3 and pytest versions.
->>
->> $ python3 --version
->> Python 3.5.2
->> $ python3 -m pytest --version
->> This is pytest version 3.4.0, imported from /home/masahiro/.local/lib/python3.5/site-packages/pytest.py
->>
->> If I use old pytest version, some parts did not work as expected.
->> If this does not work for you, please consider using newer pytest.
->>
->> I will brush up the code more and add more test cases to do a better job.
->> Before proceeding more, I'd like to get consensus for this approach.
->> If you have an idea for better implementation, comments are appreciated.
+On Tue, Feb 6, 2018 at 1:34 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> If stdout is redirected to a file, prompts look differently due to
+> missing new lines.
 >
-> Personally I think this is great stuff.  I too have never wanted to
-> touch Kconfig stuff due to the complexity, and having unit tests like
-> this is a great idea to help ensure that things do not break.
+> Currently, conf_askvalue() takes care of this by putting additional
+> new line, but conf_choice() does not.  Do likewise so that prompts
+> after 'choice' look properly.
 >
-> Your first 5 patches should be queued up for the next merge window, no
-> problem (see my comments on the 6th).  As for the rest, I don't have any
-> objection to them, and using python3 over python2 is a good idea.  And
-> anyone who wants to do Kconfig work can easily install the needed
-> packages, it's not required by any "normal" kernel developer.
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 >
-> Anyway, nice job, it's great to see this happening, no objection from me
-> at all!
+>  scripts/kconfig/conf.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >
-> greg k-h
+> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> index d346642..6ce06c8 100644
+> --- a/scripts/kconfig/conf.c
+> +++ b/scripts/kconfig/conf.c
+> @@ -317,6 +317,8 @@ static int conf_choice(struct menu *menu)
+>                 case oldaskconfig:
+>                         fflush(stdout);
+>                         xfgets(line, sizeof(line), stdin);
+> +                       if (!tty_stdio)
+> +                               printf("\n");
+>                         strip(line);
+>                         if (line[0] == '?') {
+>                                 print_help(menu);
+> --
+> 2.7.4
+>
 
-Yeah, breaking Kconfig is a sure way to feel the wrath.
+Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 
-The only reason I feel somewhat confident modifying Kconfig is that
-the Kconfiglib test suite happens to work as a regression test for the
-C implementation as well. It compares the .config files produced by
-the two implementations for all defconfig files and for
-all{no,yes,def}config, for all ARCHes, meaning any changes to the
-output of the C tools get flagged as well (with a diff).
-
-Having some "native" tests is great as well. I'm a big fan of
-automatic testing. :)
-
-In case you want to run the Kconfiglib test suite at any point, here's
-how to do it (in the kernel root):
-
-        $ git clone git://github.com/ulfalizer/Kconfiglib.git
-        $ git am Kconfiglib/makefile.patch
-        $ python Kconfiglib/testsuite.py speedy
+Maybe this could be moved into the xfgets() function as well.
 
 Cheers,
 Ulf
