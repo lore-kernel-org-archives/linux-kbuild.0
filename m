@@ -1,16 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f196.google.com ([209.85.217.196]:41371 "EHLO
-        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750736AbeBHAJK (ORCPT
+Received: from mail-vk0-f66.google.com ([209.85.213.66]:37733 "EHLO
+        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751123AbeBHALE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Feb 2018 19:09:10 -0500
+        Wed, 7 Feb 2018 19:11:04 -0500
 MIME-Version: 1.0
-In-Reply-To: <1517877294-4826-11-git-send-email-yamada.masahiro@socionext.com>
-References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com> <1517877294-4826-11-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1517877294-4826-12-git-send-email-yamada.masahiro@socionext.com>
+References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com> <1517877294-4826-12-git-send-email-yamada.masahiro@socionext.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 8 Feb 2018 01:09:09 +0100
-Message-ID: <CAFkk2KSnXQXjPRStKUk7QCoGuXGrD3HqMUfL9aurkia3_3kYEA@mail.gmail.com>
-Subject: Re: [PATCH 10/14] kconfig: test: check if new symbols in choice are asked
+Date: Thu, 8 Feb 2018 01:11:02 +0100
+Message-ID: <CAFkk2KT9buoga9RbwQJpXdmE1tYLwha6vAT70KCbjPZb1PVm8A@mail.gmail.com>
+Subject: Re: [PATCH 11/14] kconfig: test: check .config sanity for choice
+ values with unmet dep
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -19,118 +20,94 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman
 
 On Tue, Feb 6, 2018 at 1:34 AM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> If new choice values are added with new dependency, and they become
-> visible during user configuration, oldconfig should recognize them
-> as (NEW), and ask the user for choice.
+> I fixed a problem where "# CONFIG_..." for choice values are wrongly
+> written into the .config file when they are once visible, then become
+> invisible later.
 >
-> This issue was fixed by commit 5d09598d488f ("kconfig: fix new choices
-> being skipped upon config update").
->
-> This is a subtle corner case.  Add a test case to avoid breakage.
+> Add a test for this subtle case.
 >
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
 >
->  scripts/kconfig/tests/new_choice_with_dep/Kconfig  | 37 ++++++++++++++++++++++
->  .../kconfig/tests/new_choice_with_dep/__init__.py  | 14 ++++++++
->  scripts/kconfig/tests/new_choice_with_dep/config   |  3 ++
->  .../tests/new_choice_with_dep/expected_stdout      | 10 ++++++
->  4 files changed, 64 insertions(+)
->  create mode 100644 scripts/kconfig/tests/new_choice_with_dep/Kconfig
->  create mode 100644 scripts/kconfig/tests/new_choice_with_dep/__init__.py
->  create mode 100644 scripts/kconfig/tests/new_choice_with_dep/config
->  create mode 100644 scripts/kconfig/tests/new_choice_with_dep/expected_stdout
+>  scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig     | 14 ++++++++++++++
+>  scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py | 17 +++++++++++++++++
+>  scripts/kconfig/tests/no_write_if_dep_unmet/config      |  1 +
+>  .../kconfig/tests/no_write_if_dep_unmet/expected_config |  5 +++++
+>  4 files changed, 37 insertions(+)
+>  create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig
+>  create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py
+>  create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/config
+>  create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
 >
-> diff --git a/scripts/kconfig/tests/new_choice_with_dep/Kconfig b/scripts/kconfig/tests/new_choice_with_dep/Kconfig
+> diff --git a/scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig b/scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig
 > new file mode 100644
-> index 0000000..53ef1b8
+> index 0000000..c00b8fe
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/new_choice_with_dep/Kconfig
-> @@ -0,0 +1,37 @@
+> +++ b/scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig
+> @@ -0,0 +1,14 @@
 > +config A
 > +       bool "A"
-> +       help
-> +         This is a new symbol.
 > +
 > +choice
 > +       prompt "Choice ?"
 > +       depends on A
-> +       help
-> +         "depends on A" has been newly added.
 > +
 > +config CHOICE_B
 > +       bool "Choice B"
 > +
 > +config CHOICE_C
 > +       bool "Choice C"
-> +       help
-> +         This is a new symbol, so should be asked.
 > +
 > +endchoice
-> +
-> +choice
-> +       prompt "Choice2 ?"
-> +
-> +config CHOICE_D
-> +       bool "Choice D"
-> +
-> +config CHOICE_E
-> +       bool "Choice E"
-> +
-> +config CHOICE_F
-> +       bool "Choice F"
-> +       depends on A
-> +       help
-> +         This is a new symbol, so should be asked.
-> +
-> +endchoice
-> diff --git a/scripts/kconfig/tests/new_choice_with_dep/__init__.py b/scripts/kconfig/tests/new_choice_with_dep/__init__.py
+> diff --git a/scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py b/scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py
 > new file mode 100644
-> index 0000000..4306ccf
+> index 0000000..d096622
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/new_choice_with_dep/__init__.py
-> @@ -0,0 +1,14 @@
+> +++ b/scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py
+> @@ -0,0 +1,17 @@
 > +"""
-> +Ask new choice values when they become visible
-> +==============================================
+> +Do not write choice values to .config if the dependency is unmet
+> +================================================================
 > +
-> +If new choice values are added with new dependency, and they become
-> +visible during user configuration, oldconfig should recognize them
-> +as (NEW), and ask the user for choice.
+> +"# CONFIG_... is not set" should not be written into the .config file
+> +for symbols with unmet dependency.
 > +
-> +Related Linux commit: 5d09598d488f081e3be23f885ed65cbbe2d073b5
+> +This was not working correctly for choice values because choice needs
+> +a bit different symbol computation.
+> +
+> +This checks that no unneeded "# COFIG_... is not set" is contained in
+> +the .config file.
 > +"""
 > +
 > +def test(conf):
-> +    assert conf.oldconfig('config', 'y') == 0
-> +    assert conf.stdout_contains('expected_stdout')
-> diff --git a/scripts/kconfig/tests/new_choice_with_dep/config b/scripts/kconfig/tests/new_choice_with_dep/config
+> +    assert conf.oldaskconfig('config', 'n') == 0
+> +    assert conf.config_matches('expected_config')
+> diff --git a/scripts/kconfig/tests/no_write_if_dep_unmet/config b/scripts/kconfig/tests/no_write_if_dep_unmet/config
 > new file mode 100644
-> index 0000000..47ef95d
+> index 0000000..abd280e
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/new_choice_with_dep/config
-> @@ -0,0 +1,3 @@
-> +CONFIG_CHOICE_B=y
-> +# CONFIG_CHOICE_D is not set
-> +CONFIG_CHOICE_E=y
-> diff --git a/scripts/kconfig/tests/new_choice_with_dep/expected_stdout b/scripts/kconfig/tests/new_choice_with_dep/expected_stdout
+> +++ b/scripts/kconfig/tests/no_write_if_dep_unmet/config
+> @@ -0,0 +1 @@
+> +CONFIG_A=y
+> diff --git a/scripts/kconfig/tests/no_write_if_dep_unmet/expected_config b/scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
 > new file mode 100644
-> index 0000000..358d5cf
+> index 0000000..0d15e41
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/new_choice_with_dep/expected_stdout
-> @@ -0,0 +1,10 @@
-> +A (A) [N/y/?] (NEW)
-> +  Choice ?
-> +  > 1. Choice B (CHOICE_B)
-> +    2. Choice C (CHOICE_C) (NEW)
-> +  choice[1-2?]:
-> +Choice2 ?
-> +  1. Choice D (CHOICE_D)
-> +> 2. Choice E (CHOICE_E)
-> +  3. Choice F (CHOICE_F) (NEW)
-> +choice[1-3?]:
+> +++ b/scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
+> @@ -0,0 +1,5 @@
+> +#
+> +# Automatically generated file; DO NOT EDIT.
+> +# Linux Kernel Configuration
+> +#
+> +# CONFIG_A is not set
 > --
 > 2.7.4
 >
 
 Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+
+This indirectly tests that choices specified without a type get the
+type of the first choice value specified with a type too.
+
+Cheers,
+Ulf
