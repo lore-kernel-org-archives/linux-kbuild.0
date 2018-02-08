@@ -1,58 +1,154 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:39918 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752215AbeBHSeU (ORCPT
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:43116 "EHLO
+        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752018AbeBHSgH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Feb 2018 13:34:20 -0500
-Received: by mail-pf0-f194.google.com with SMTP id l9so2066645pfi.6
-        for <linux-kbuild@vger.kernel.org>; Thu, 08 Feb 2018 10:34:20 -0800 (PST)
-Date: Thu, 08 Feb 2018 10:34:19 -0800 (PST)
-Subject: Re: [PATCH 07/20] riscv: Remove ARCH_WANT_OPTIONAL_GPIOLIB select
-In-Reply-To: <20180205012146.23981-8-ulfalizer@gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-dc5e58a4-aab6-4d59-bb59-5a5ff20db392@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Thu, 8 Feb 2018 13:36:07 -0500
+Received: by mail-vk0-f67.google.com with SMTP id x203so3340039vkx.10
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Feb 2018 10:36:06 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1518106752-29228-8-git-send-email-yamada.masahiro@socionext.com>
+References: <1518106752-29228-1-git-send-email-yamada.masahiro@socionext.com> <1518106752-29228-8-git-send-email-yamada.masahiro@socionext.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Fri, 9 Feb 2018 05:30:46 +1100
+Message-ID: <CAGXu5jJ02qRCcqTK_M9sFtekizz+0WoHBCBKF_mh-A870eg6eg@mail.gmail.com>
+Subject: Re: [RFC PATCH 7/7] Test stackprotector options in Kconfig to kill CC_STACKPROTECTOR_AUTO
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, Christoph Hellwig <hch@lst.de>, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, Will Deacon <will.deacon@arm.com>, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, ulfalizer@gmail.com, albert@sifive.com, linux-riscv@lists.infradead.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, LKML <linux-kernel@vger.kernel.org>
 
-On Sun, 04 Feb 2018 17:21:19 PST (-0800), ulfalizer@gmail.com wrote:
-> The ARCH_WANT_OPTIONAL_GPIOLIB symbol was removed in commit 65053e1a7743
-> ("gpio: delete ARCH_[WANTS_OPTIONAL|REQUIRE]_GPIOLIB"). GPIOLIB should
-> just be selected explicitly if needed.
+On Fri, Feb 9, 2018 at 3:19 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> Add CC_HAS_STACKPROTECTOR(_STRONG) and proper dependency.
 >
-> Remove the ARCH_WANT_OPTIONAL_GPIOLIB select from RISCV.
->
-> See commit 0145071b3314 ("x86: Do away with
-> ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") and commit da9a1c6767 ("arm64: do
-> away with ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") as well.
->
-> Discovered with the
-> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
-> script.
->
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->  arch/riscv/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index ff69c77b9e78..716e90e60e5c 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -19,7 +19,6 @@ config RISCV
->  	select GENERIC_STRNLEN_USER
->  	select GENERIC_SMP_IDLE_THREAD
->  	select GENERIC_ATOMIC64 if !64BIT || !RISCV_ISA_A
-> -	select ARCH_WANT_OPTIONAL_GPIOLIB
->  	select HAVE_MEMBLOCK
->  	select HAVE_MEMBLOCK_NODE_MAP
->  	select HAVE_DMA_API_DEBUG
+> I re-arranged the choice values, _STRONG, _REGULAR, _NONE in this order
+> because the default of choice is the first visible symbol.
+> [...]
+> +# is this necessary?
+> +#ifeq ($(CONFIG_CC_STACKPROTECTOR_NONE),y)
+> +#KBUILD_CFLAGS += -fno-stack-protector
+> +#endif
 
-Thanks!
+Yes, and also in the case of a broken stack protector, because some
+compilers enable stack protector by default, so if we've selected it
+to be NONE or detected it as broken, we need to force it off in the
+compiler.
 
-(If you want these through my tree, just say something.)
+> +# TODO: run scripts/gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh from Kconfig
 
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+FWIW, this is the part that I got stuck on.
+gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh depends on the KBUILD
+flags that got built up and detected up to this point in the Makefile,
+so I couldn't find a way to run it out of Kconfig since it didn't know
+what the KBUILD flags were yet.
+
+> +
+>  ifeq ($(cc-name),clang)
+>  KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+>  KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+> diff --git a/arch/Kconfig b/arch/Kconfig
+> index 76c0b54..50723d8 100644
+> --- a/arch/Kconfig
+> +++ b/arch/Kconfig
+> @@ -538,10 +538,20 @@ config HAVE_CC_STACKPROTECTOR
+>           - its compiler supports the -fstack-protector option
+>           - it has implemented a stack canary (e.g. __stack_chk_guard)
+>
+> +config CC_HAS_STACKPROTECTOR
+> +       bool
+> +       option shell="$CC -Werror -fstack-protector -c -x c /dev/null"
+> +
+> +config CC_HAS_STACKPROTECTOR_STRONG
+> +       bool
+> +       option shell="$CC -Werror -fstack-protector-strong -c -x c /dev/null"
+
+I'm nervous we'll get tripped up here, since $CC may not include the
+right $(KBUILD_CPPFLAGS) and $(CC_OPTION_CFLAGS) as in cc-option, both
+of which are calculated during the Makefile run. But maybe it won't be
+a problem in actual use.
+
+> +
+> +config CC_STACKPROTECTOR
+> +       bool
+> +
+>  choice
+>         prompt "Stack Protector buffer overflow detection"
+>         depends on HAVE_CC_STACKPROTECTOR
+> -       default CC_STACKPROTECTOR_AUTO
+>         help
+>           This option turns on the "stack-protector" GCC feature. This
+>           feature puts, at the beginning of functions, a canary value on
+> @@ -551,26 +561,10 @@ choice
+>           overwrite the canary, which gets detected and the attack is then
+>           neutralized via a kernel panic.
+>
+> -config CC_STACKPROTECTOR_NONE
+> -       bool "None"
+> -       help
+> -         Disable "stack-protector" GCC feature.
+> -
+> -config CC_STACKPROTECTOR_REGULAR
+> -       bool "Regular"
+> -       help
+> -         Functions will have the stack-protector canary logic added if they
+> -         have an 8-byte or larger character array on the stack.
+> -
+> -         This feature requires gcc version 4.2 or above, or a distribution
+> -         gcc with the feature backported ("-fstack-protector").
+> -
+> -         On an x86 "defconfig" build, this feature adds canary checks to
+> -         about 3% of all kernel functions, which increases kernel code size
+> -         by about 0.3%.
+> -
+>  config CC_STACKPROTECTOR_STRONG
+>         bool "Strong"
+> +       depends on CC_HAS_STACKPROTECTOR_STRONG
+> +       select CC_STACKPROTECTOR
+>         help
+>           Functions will have the stack-protector canary logic added in any
+>           of the following conditions:
+> @@ -588,11 +582,25 @@ config CC_STACKPROTECTOR_STRONG
+>           about 20% of all kernel functions, which increases the kernel code
+>           size by about 2%.
+>
+> -config CC_STACKPROTECTOR_AUTO
+> -       bool "Automatic"
+> +config CC_STACKPROTECTOR_REGULAR
+> +       bool "Regular"
+> +       depends on CC_HAS_STACKPROTECTOR
+> +       select CC_STACKPROTECTOR
+> +       help
+> +         Functions will have the stack-protector canary logic added if they
+> +         have an 8-byte or larger character array on the stack.
+> +
+> +         This feature requires gcc version 4.2 or above, or a distribution
+> +         gcc with the feature backported ("-fstack-protector").
+> +
+> +         On an x86 "defconfig" build, this feature adds canary checks to
+> +         about 3% of all kernel functions, which increases kernel code size
+> +         by about 0.3%.
+> +
+> +config CC_STACKPROTECTOR_NONE
+> +       bool "None"
+>         help
+> -         If the compiler supports it, the best available stack-protector
+> -         option will be chosen.
+> +         Disable "stack-protector" GCC feature.
+>
+>  endchoice
+
+I continue to love the idea, but we can't know a given ssp option is
+_working_ until we run the test script, which may depend on compiler
+flags. Regardless, I'll give this series a try and see if I can fix
+anything I trip over. I've got a lot of notes on testing after getting
+..._AUTO working. Whatever happens, I hugely prefer having the
+automatic selection possible in the Kconfig! Thanks for working on
+this! :)
+
+-Kees
+
+-- 
+Kees Cook
+Pixel Security
