@@ -1,50 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:40935 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751317AbeBHWyv (ORCPT
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:41803 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752302AbeBHW4L (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Feb 2018 17:54:51 -0500
-Date: Thu, 8 Feb 2018 23:54:46 +0100
+        Thu, 8 Feb 2018 17:56:11 -0500
+Date: Thu, 8 Feb 2018 23:56:07 +0100
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH] riscv: kconfig: Remove RISCV_IRQ_INTC select
-Message-ID: <20180208225446.rj7ioyeikaqfm2jc@huvuddator>
-References: <CAFkk2KSUeepo0mSKeV9r2uMO1=euVV2L6QpsMAO0Ew6znG+BRQ@mail.gmail.com>
- <mhng-300ca2ca-2316-487a-aaa8-9e61b5b67b30@palmer-si-x1c4>
+Subject: Re: [PATCH 07/20] riscv: Remove ARCH_WANT_OPTIONAL_GPIOLIB select
+Message-ID: <20180208225606.slie77gk7nnmzh6y@huvuddator>
+References: <20180205012146.23981-8-ulfalizer@gmail.com>
+ <mhng-dc5e58a4-aab6-4d59-bb59-5a5ff20db392@palmer-si-x1c4>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <mhng-300ca2ca-2316-487a-aaa8-9e61b5b67b30@palmer-si-x1c4>
+In-Reply-To: <mhng-dc5e58a4-aab6-4d59-bb59-5a5ff20db392@palmer-si-x1c4>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Palmer Dabbelt <palmer@sifive.com>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, Christoph Hellwig <hch@lst.de>, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, Will Deacon <will.deacon@arm.com>, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, albert@sifive.com, linux-riscv@lists.infradead.org
 
-The RISCV_IRQ_INTC configuration symbol is undefined, but RISCV selects
-it. Quoting Palmer Dabbelt:
+On Thu, Feb 08, 2018 at 10:34:19AM -0800, Palmer Dabbelt wrote:
+> On Sun, 04 Feb 2018 17:21:19 PST (-0800), ulfalizer@gmail.com wrote:
+> > The ARCH_WANT_OPTIONAL_GPIOLIB symbol was removed in commit 65053e1a7743
+> > ("gpio: delete ARCH_[WANTS_OPTIONAL|REQUIRE]_GPIOLIB"). GPIOLIB should
+> > just be selected explicitly if needed.
+> > 
+> > Remove the ARCH_WANT_OPTIONAL_GPIOLIB select from RISCV.
+> > 
+> > See commit 0145071b3314 ("x86: Do away with
+> > ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") and commit da9a1c6767 ("arm64: do
+> > away with ARCH_[WANT_OPTIONAL|REQUIRE]_GPIOLIB") as well.
+> > 
+> > Discovered with the
+> > https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+> > script.
+> > 
+> > Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> > ---
+> >  arch/riscv/Kconfig | 1 -
+> >  1 file changed, 1 deletion(-)
+> > 
+> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > index ff69c77b9e78..716e90e60e5c 100644
+> > --- a/arch/riscv/Kconfig
+> > +++ b/arch/riscv/Kconfig
+> > @@ -19,7 +19,6 @@ config RISCV
+> >  	select GENERIC_STRNLEN_USER
+> >  	select GENERIC_SMP_IDLE_THREAD
+> >  	select GENERIC_ATOMIC64 if !64BIT || !RISCV_ISA_A
+> > -	select ARCH_WANT_OPTIONAL_GPIOLIB
+> >  	select HAVE_MEMBLOCK
+> >  	select HAVE_MEMBLOCK_NODE_MAP
+> >  	select HAVE_DMA_API_DEBUG
+> 
+> Thanks!
+> 
+> (If you want these through my tree, just say something.)
 
-	It looks like this slipped through, the symbol has been renamed
-	RISCV_INTC.
+I didn't have a particular tree in mind for these patches, so feel free
+to take it.
 
-No RISCV_INTC configuration symbol has been merged either. Just remove
-the RISCV_IRQ_INTC select for now.
+> 
+> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 
-Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
----
- arch/riscv/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index b6722c246d9c..2be44b6651c5 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -34,7 +34,6 @@ config RISCV
- 	select HAVE_ARCH_TRACEHOOK
- 	select MODULES_USE_ELF_RELA if MODULES
- 	select THREAD_INFO_IN_TASK
--	select RISCV_IRQ_INTC
- 	select RISCV_TIMER
- 
- config MMU
--- 
-2.14.1
-
+Cheers,
+Ulf
