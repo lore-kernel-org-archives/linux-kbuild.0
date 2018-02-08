@@ -1,171 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f196.google.com ([209.85.217.196]:44886 "EHLO
-        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752135AbeBHVVe (ORCPT
+Received: from mail-vk0-f66.google.com ([209.85.213.66]:46452 "EHLO
+        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752028AbeBHWKC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Feb 2018 16:21:34 -0500
+        Thu, 8 Feb 2018 17:10:02 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KRQLOZGUQxZHzS=dCb8bnWGB5Bs0y288_c7NNrAjNquzQ@mail.gmail.com>
-References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
- <1517877294-4826-3-git-send-email-yamada.masahiro@socionext.com>
- <20180207225551.imdp6gqbdwzyvhwm@huvuddator> <CAK7LNARVT6cHhFCAGrwL=qEqqSBmJU-pwq02R9M0VSfCiF_RsQ@mail.gmail.com>
- <CAFkk2KRQLOZGUQxZHzS=dCb8bnWGB5Bs0y288_c7NNrAjNquzQ@mail.gmail.com>
+In-Reply-To: <mhng-2395f66f-11f6-4209-86b2-71482e5cf52b@palmer-si-x1c4>
+References: <20180205012146.23981-7-ulfalizer@gmail.com> <mhng-2395f66f-11f6-4209-86b2-71482e5cf52b@palmer-si-x1c4>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 8 Feb 2018 22:21:33 +0100
-Message-ID: <CAFkk2KR9Xyhz=Qdsggc2majvi0QnQhiXSXG+OgHPg7VYdx_2_Q@mail.gmail.com>
-Subject: Re: [PATCH 02/14] kconfig: do not write choice values when their
- dependency becomes n
+Date: Thu, 8 Feb 2018 23:10:01 +0100
+Message-ID: <CAFkk2KQwjf0SRgNEmufKBU3FPozZYt1cNqNeAu6KT7jCXDH6QA@mail.gmail.com>
+Subject: Re: [PATCH 06/20] riscv: Remove ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE select
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Heinrich Schuchardt <xypron.glpk@gmx.de>
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, Vineet Gupta <vgupta@synopsys.com>, mgorman@techsingularity.net, Christoph Hellwig <hch@lst.de>, mina86@mina86.com, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, Paul Mackerras <paulus@ozlabs.org>, Will Deacon <will.deacon@arm.com>, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Albert Ou <albert@sifive.com>, linux-riscv@lists.infradead.org
 
-On Thu, Feb 8, 2018 at 3:46 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> On Thu, Feb 8, 2018 at 3:42 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> 2018-02-08 7:55 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->>> On Tue, Feb 06, 2018 at 09:34:42AM +0900, Masahiro Yamada wrote:
->>>> "# CONFIG_... is not set" for choice values are wrongly written into
->>>> the .config file if they are once visible, then become invisible later.
->>>>
->>>>   Test case
->>>>   ---------
->>>>
->>>> ---------------------------(Kconfig)----------------------------
->>>> config A
->>>>       bool "A"
->>>>
->>>> choice
->>>>       prompt "Choice ?"
->>>>       depends on A
->>>>
->>>> config CHOICE_B
->>>>       bool "Choice B"
->>>>
->>>> config CHOICE_C
->>>>       bool "Choice C"
->>>>
->>>> endchoice
->>>> ----------------------------------------------------------------
->>>>
->>>> ---------------------------(.config)----------------------------
->>>> CONFIG_A=y
->>>> ----------------------------------------------------------------
->>>>
->>>> With the Kconfig and .config above,
->>>>
->>>>   $ make config
->>>>   scripts/kconfig/conf  --oldaskconfig Kconfig
->>>>   *
->>>>   * Linux Kernel Configuration
->>>>   *
->>>>   A (A) [Y/n] n
->>>>   #
->>>>   # configuration written to .config
->>>>   #
->>>>   $ cat .config
->>>>   #
->>>>   # Automatically generated file; DO NOT EDIT.
->>>>   # Linux Kernel Configuration
->>>>   #
->>>>   # CONFIG_A is not set
->>>>   # CONFIG_CHOICE_B is not set
->>>>   # CONFIG_CHOICE_C is not set
->>>>
->>>> Here,
->>>>
->>>>   # CONFIG_CHOICE_B is not set
->>>>   # CONFIG_CHOICE_C is not set
->>>>
->>>> should not be written into the .config file because their dependency
->>>> "depends on A" is unmet.
->>>>
->>>> Currently, there is no code that clears SYMBOL_WRITE of choice values.
->>>>
->>>> Clear SYMBOL_WRITE for all symbols in sym_calc_value(), then set it
->>>> again after calculating visibility.
->>>>
->>>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->>>> ---
->>>
->>>>  scripts/kconfig/symbol.c | 4 ++--
->>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
->>>> index c9123ed..5d6f6b1 100644
->>>> --- a/scripts/kconfig/symbol.c
->>>> +++ b/scripts/kconfig/symbol.c
->>>> @@ -371,8 +371,7 @@ void sym_calc_value(struct symbol *sym)
->>>>               sym->curr.tri = no;
->>>>               return;
->>>>       }
->>>> -     if (!sym_is_choice_value(sym))
->>>> -             sym->flags &= ~SYMBOL_WRITE;
->>>> +     sym->flags &= ~SYMBOL_WRITE;
->>>>
->>>>       sym_calc_visibility(sym);
->>>>
->>>> @@ -385,6 +384,7 @@ void sym_calc_value(struct symbol *sym)
->>>>               if (sym_is_choice_value(sym) && sym->visible == yes) {
->>>>                       prop = sym_get_choice_prop(sym);
->>>>                       newval.tri = (prop_get_symbol(prop)->curr.val == sym) ? yes : no;
->>>> +                     sym->flags |= SYMBOL_WRITE;
->>>>               } else {
->>>>                       if (sym->visible != no) {
->>>>                               /* if the symbol is visible use the user value
->>>> --
->>>> 2.7.4
->>>>
->>>
->>> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
->>>
->>> There's a possible simplification here:
->>>
->>> All defined symbols, regardless of type, and regardless of whether
->>> they're choice value symbols or not, always get written out if they have
->>> non-n visibility. Therefore, the sym->visible != no check for
->>> SYMBOL_WRITE can be moved to before the symbol type check, which gets
->>> rid of two SYMBOL_WRITE assignments and makes it clear that the logic is
->>> the same for all paths.
->>>
->>> This is safe for symbols defined without a type (S_UNKNOWN) too, because
->>> conf_write() skips those (plus they already generate a warning).
->>>
->>> This matches how I do it in the tri_value() function in Kconfiglib:
->>> https://github.com/ulfalizer/Kconfiglib/blob/master/kconfiglib.py#L2574.
->>> SYMBOL_WRITE corresponds to _write_to_conf.
->>>
->>> I've included a patch below. I tested it with the Kconfiglib test suite,
->>> which verifies that the C implementation still generates the same
->>> .config file for all defconfig files as well as for
->>> all{no,yes,def}config, for all ARCHes.
->>>
->>> (The Kconfiglib test suite runs scripts/kconfig/conf and compares its
->>> output against it, which means it doubles as a regression test for the C
->>> tools.)
+On Thu, Feb 8, 2018 at 7:34 PM, Palmer Dabbelt <palmer@sifive.com> wrote:
+> On Sun, 04 Feb 2018 17:21:18 PST (-0800), ulfalizer@gmail.com wrote:
 >>
->> Thank you for this.  This is simpler, and please let me take it.
+>> The ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE symbol was removed in
+>> commit 51a021244b9d ("atomic64: no need for
+>> CONFIG_ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE").
 >>
->
-> Could just mod the existing patch. Saves the hassle of creating a new one. :)
->
->> I confirmed the same results were produced.
+>> Remove the ARCH_HAS_ATOMIC64_DEC_IS_POSITIVE select from RISCV.
 >>
->> --
->> Best Regards
->> Masahiro Yamada
+>> Discovered with the
+>>
+>> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+>> script.
+>>
+>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>> ---
+>>  arch/riscv/Kconfig | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+>> index b6722c246d9c..ff69c77b9e78 100644
+>> --- a/arch/riscv/Kconfig
+>> +++ b/arch/riscv/Kconfig
+>> @@ -8,7 +8,6 @@ config RISCV
+>>         select OF
+>>         select OF_EARLY_FLATTREE
+>>         select OF_IRQ
+>> -       select ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE
+>>         select ARCH_WANT_FRAME_POINTERS
+>>         select CLONE_BACKWARDS
+>>         select COMMON_CLK
 >
-> Cheers,
-> Ulf
+>
+> Thanks!
+>
+> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 
-I might've misunderstood.
-
-Should I prepare a separate patch that adds the simplification,
-assuming your patch? I'm fine with whatever approach.
-
-Could always say "includes a simplification suggested by..." if you go
-with a single patch and want to give credit (which isn't required).
+I didn't have a particular tree in mind for these patches by the way,
+so feel free to pull it in yourselves.
 
 Cheers,
 Ulf
