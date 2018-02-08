@@ -1,114 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f194.google.com ([209.85.217.194]:45771 "EHLO
-        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750766AbeBHHFk (ORCPT
+Received: from mail-qt0-f195.google.com ([209.85.216.195]:39599 "EHLO
+        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751079AbeBHPhP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Feb 2018 02:05:40 -0500
+        Thu, 8 Feb 2018 10:37:15 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KSstFf2+w2gbm0AGk+Kdy2Kcxhdq74rv7djGOYqdm1+Zw@mail.gmail.com>
-References: <1518069400-7037-1-git-send-email-yamada.masahiro@socionext.com>
- <1518069400-7037-2-git-send-email-yamada.masahiro@socionext.com>
- <CAFkk2KQC6GbfkXETFdKEhy-rTfuuH7zeuXvezGzwMy_=2V03Dg@mail.gmail.com> <CAFkk2KSstFf2+w2gbm0AGk+Kdy2Kcxhdq74rv7djGOYqdm1+Zw@mail.gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 8 Feb 2018 08:05:39 +0100
-Message-ID: <CAFkk2KTWw80Fp_79i1PC5JAJyjtKVzxMyXRC0amHB8Up0F_23A@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kconfig: echo stdin to stdout if either is redirected
+In-Reply-To: <20180205012146.23981-17-ulfalizer@gmail.com>
+References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-17-ulfalizer@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Thu, 8 Feb 2018 16:37:14 +0100
+Message-ID: <CANiq72kaCDcUHFuJ0P4CA-0KGgg+a8T+66p0aPwatAjfvDB8bA@mail.gmail.com>
+Subject: Re: [PATCH 16/20] auxdisplay: img-ascii-lcd: Remove MIPS_SEAD3 dep.
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Marc Herbert <marc.herbert@intel.com>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, Linus Walleij <linus.walleij@linaro.org>, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com
 
-On Thu, Feb 8, 2018 at 7:51 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> On Thu, Feb 8, 2018 at 7:35 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
->> On Thu, Feb 8, 2018 at 6:56 AM, Masahiro Yamada
->> <yamada.masahiro@socionext.com> wrote:
->>> If stdio is not tty, conf_askvalue() puts additional new line to
->>> prevent prompts are all concatenated into a single line.  This care
->>> is missing in conf_choice(), so a 'choice' prompt and the next prompt
->>> are shown in the same line.
->>>
->>> Move the code into xfgets() to take care of all cases.  To improve
->>> this more, echo stdin to stdout.  This clarifies what keys were input
->>> from stdio and the stdout looks like as if it were from tty.
->>>
->>> I removed the isatty(2) check since stderr is unrelated here.
->>>
->>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->>> ---
->>>
->>>  scripts/kconfig/conf.c | 7 ++++---
->>>  1 file changed, 4 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
->>> index 358e2e4..c5318d3 100644
->>> --- a/scripts/kconfig/conf.c
->>> +++ b/scripts/kconfig/conf.c
->>> @@ -76,6 +76,9 @@ static void xfgets(char *str, int size, FILE *in)
->>>  {
->>>         if (!fgets(str, size, in))
->>>                 fprintf(stderr, "\nError in reading or end of file.\n");
->>> +
->>> +       if (!tty_stdio)
->>> +               printf("%s", str);
->>>  }
->>>
->>>  static int conf_askvalue(struct symbol *sym, const char *def)
->>> @@ -106,8 +109,6 @@ static int conf_askvalue(struct symbol *sym, const char *def)
->>>         case oldaskconfig:
->>>                 fflush(stdout);
->>>                 xfgets(line, sizeof(line), stdin);
->>> -               if (!tty_stdio)
->>> -                       printf("\n");
->>>                 return 1;
->>>         default:
->>>                 break;
->>> @@ -495,7 +496,7 @@ int main(int ac, char **av)
->>>         bindtextdomain(PACKAGE, LOCALEDIR);
->>>         textdomain(PACKAGE);
->>>
->>> -       tty_stdio = isatty(0) && isatty(1) && isatty(2);
->>> +       tty_stdio = isatty(0) && isatty(1);
->>>
->>>         while ((opt = getopt_long(ac, av, "s", long_opts, NULL)) != -1) {
->>>                 if (opt == 's') {
->>> --
->>> 2.7.4
->>>
->>
->> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
->>
->> Might be some case I'm not thinking of, but wouldn't it make sense to
->> just check isatty(1) as well? If stdout is a regular file, it seems
->> it'd be nice to have the input appear there, regardless of where stdin
->> is from.
->>
->> Maybe the tty_stdio variable could be removed then as well, replaced
->> with just 'if (!isatty(1))'.
->>
->> Cheers,
->> Ulf
+On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> The MIPS_SEAD3 symbol was removed in commit 64601cb1343f ("leds: Remove SEAD-3
+> driver").
+
+Commit 64601cb1343f did not remove the MIPS_SEAD3 symbol, it seemed to
+a few months before, in 3f5f0a4475e1 ("MIPS: generic: Convert SEAD-3
+to a generic board"). Can you please amend the description?
+
+Thanks!
+Miguel
+
 >
-> Hmm... if stdout is a tty and stdin isn't, this would prevent the
-> input from showing up on the terminal though, so I guess it makes
-> sense. That case seems more important than the weird
-> stdin=tty/stdout=file case.
+> Remove the MIPS_SEAD3 dependency from IMG_ASCII_LCD.
 >
-> Tricky stuff. :)
+> Discovered with the
+> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+> script.
 >
-> Cheers,
-> Ulf
-
-Oh... and that one's already taken care of too, reading closer.
-
-stdin | stdout | wants stdin written to stdout
-------+--------+-------------------------------------
-tty   | tty    | no (already echoed by tty)
-tty   | file   | yes (echoed by tty, written to file)
-file  | tty    | yes (not echoed by tty)
-file  | file   | yes
-
-So !(tty(0) && tty(1)) makes sense. Excuse the rambling...
-
-Cheers,
-Ulf
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> ---
+>  drivers/auxdisplay/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/auxdisplay/Kconfig b/drivers/auxdisplay/Kconfig
+> index 2c2ed9cf8796..3cba78d36eec 100644
+> --- a/drivers/auxdisplay/Kconfig
+> +++ b/drivers/auxdisplay/Kconfig
+> @@ -137,7 +137,7 @@ config CFAG12864B_RATE
+>  config IMG_ASCII_LCD
+>         tristate "Imagination Technologies ASCII LCD Display"
+>         depends on HAS_IOMEM
+> -       default y if MIPS_MALTA || MIPS_SEAD3
+> +       default y if MIPS_MALTA
+>         select SYSCON
+>         help
+>           Enable this to support the simple ASCII LCD displays found on
+> --
+> 2.14.1
+>
