@@ -1,358 +1,140 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f54.google.com ([209.85.213.54]:34253 "EHLO
-        mail-vk0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750987AbeBHAf7 (ORCPT
+Received: from us01smtprelay-2.synopsys.com ([198.182.47.9]:33818 "EHLO
+        smtprelay.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750767AbeBHAvw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Feb 2018 19:35:59 -0500
+        Wed, 7 Feb 2018 19:51:52 -0500
+Subject: Re: [PATCH] bug.h: Work around GCC PR82365 in BUG()
+References: <20171219114112.939391-1-arnd@arndb.de>
+ <8e42a1de-f619-7a4e-6d58-f90f53f5f38f@synopsys.com>
+ <CAK8P3a2fXQHCN7gqNL9j7AeZqy7NXAMW1bqyFJs3G1M_M4BQ4A@mail.gmail.com>
+ <f31caa9b-89f0-4168-04bf-14a98595865e@synopsys.com>
+ <CAK8P3a25RgC0qPCrGfutSnLHr77NqK74dW2g0m7fcMnm5Ou8yg@mail.gmail.com>
+ <27bfdc23-1774-cf07-dab4-ab253a41d2f7@synopsys.com>
+ <CAK8P3a0UKLJkmU_zVDyODMZR0G47i=zscNpgGZO4LryvmdUt6Q@mail.gmail.com>
+ <861992dd-a28d-0f8c-572f-4194d15238df@synopsys.com>
+ <20180207160138.0705eeca67d8cc4d6309381c@linux-foundation.org>
+From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+Message-ID: <bee6cae0-6371-d185-dffb-ff7e9a4a8a1d@synopsys.com>
+Date: Wed, 7 Feb 2018 16:51:35 -0800
 MIME-Version: 1.0
-In-Reply-To: <1517877294-4826-8-git-send-email-yamada.masahiro@socionext.com>
-References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com> <1517877294-4826-8-git-send-email-yamada.masahiro@socionext.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 8 Feb 2018 01:35:57 +0100
-Message-ID: <CAFkk2KQZUJjaXm-U840gQpGV5vidNeYo0w7D872cEyLXcT9nMw@mail.gmail.com>
-Subject: Re: [PATCH 07/14] kconfig: test: add framework for Kconfig unit-tests
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20180207160138.0705eeca67d8cc4d6309381c@linux-foundation.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Borislav Petkov <bp@suse.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Yaakov Selkowitz <yselkowi@redhat.com>, Marc Herbert <marc.herbert@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Mikael Starvik <starvik@axis.com>, Jesper Nilsson <jesper.nilsson@axis.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, "David S. Miller" <davem@davemloft.net>, Christopher Li <sparse@chrisli.org>, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Will Deacon <will.deacon@arm.com>, "Steven Rostedt (VMware)" <rostedt@goodmis.org>, Mark Rutland <mark.rutland@arm.com>, arcml <linux-snps-arc@lists.infradead.org>
 
-On Tue, Feb 6, 2018 at 1:34 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> I admit various parts in Kconfig are cryptic and need refactoring,
-> but at the same time, I fear regressions.
->
-> There are several subtle corner cases where it is difficult to notice
-> breakage.  It is time to add unit-tests.
->
-> Here is a simple framework based on pytest.  The conftest.py provides
-> a fixture useful to run commands such as 'oldaskconfig' etc. and
-> to compare the resulted .config, stdout, stderr with expectations.
->
-> How to add test cases?
-> ----------------------
->
-> For each test case, you should create a subdirectory under
-> scripts/kconfig/tests/ (so test cases are seperated from each other).
-> Every test case directory must contain the following files:
->
->  - __init__.py: describes test functions
->  - Kconfig: the top level Kconfig file for this test
->
-> To do a useful job, test cases generally need additional data like
-> input .config and information about expected results.
->
-> How to run tests?
-> -----------------
->
-> You need python3 and pytest.  Then, run "make testconfig".
-> O= option is supported.  If V=1 is given, details logs during tests
-> are displayed.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
->  scripts/kconfig/Makefile          |   8 ++
->  scripts/kconfig/tests/conftest.py | 255 ++++++++++++++++++++++++++++++++++++++
->  scripts/kconfig/tests/pytest.ini  |   6 +
->  3 files changed, 269 insertions(+)
->  create mode 100644 scripts/kconfig/tests/conftest.py
->  create mode 100644 scripts/kconfig/tests/pytest.ini
->
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index cb3ec53..c5d1d1a 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -135,6 +135,14 @@ PHONY += tinyconfig
->  tinyconfig:
->         $(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig tiny.config
->
-> +# CHECK: -o cache_dir=<path> working?
-> +PHONY += testconfig
-> +testconfig: $(obj)/conf
-> +       $(PYTHON3) -B -m pytest $(srctree)/$(src)/tests \
-> +       -o cache_dir=$(abspath $(obj)/tests/.cache) \
-> +       $(if $(findstring 1,$(KBUILD_VERBOSE)),--capture=no)
-> +clean-dirs += tests/.cache
-> +
->  # Help text used by make help
->  help:
->         @echo  '  config          - Update current config utilising a line-oriented program'
-> diff --git a/scripts/kconfig/tests/conftest.py b/scripts/kconfig/tests/conftest.py
-> new file mode 100644
-> index 0000000..f0f3237
-> --- /dev/null
-> +++ b/scripts/kconfig/tests/conftest.py
-> @@ -0,0 +1,255 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Copyright (C) 2018 Masahiro Yamada <yamada.masahiro@socionext.com>
-> +#
-> +
-> +import os
-> +import pytest
-> +import shutil
-> +import subprocess
-> +import tempfile
-> +
-> +conf_path = os.path.abspath(os.path.join('scripts', 'kconfig', 'conf'))
-> +
-> +class Conf:
-> +
-> +    def __init__(self, request):
-> +        """Create a new Conf object, which is a scripts/kconfig/conf
-> +        runner and result checker.
-> +
-> +        Arguments:
-> +        request - object to introspect the requesting test module
-> +        """
-> +
-> +        # the directory of the test being run
-> +        self.test_dir = os.path.dirname(str(request.fspath))
-> +
-> +    def __run_conf(self, mode, dot_config=None, out_file='.config',
-> +                   interactive=False, in_keys=None, extra_env={}):
-> +        """Run scripts/kconfig/conf
-> +
-> +        mode: input mode option (--oldaskconfig, --defconfig=<file> etc.)
-> +        dot_config: the .config file for input.
-> +        out_file: file name to contain the output config data.
-> +        interactive: flag to specify the interactive mode.
-> +        in_keys: key inputs for interactive modes.
-> +        extra_env: additional environment.
-> +        """
-> +
-> +        command = [conf_path, mode, 'Kconfig']
-> +
-> +        # Override 'srctree' environment to make the test as the top directory
-> +        extra_env['srctree'] = self.test_dir
-> +
-> +        # scripts/kconfig/conf is run in a temporary directory.
-> +        # This directory is automatically removed when done.
-> +        with tempfile.TemporaryDirectory() as temp_dir:
-> +
-> +            # if .config is given, copy it to the working directory
-> +            if dot_config:
-> +                shutil.copyfile(os.path.join(self.test_dir, dot_config),
-> +                                os.path.join(temp_dir, '.config'))
-> +
-> +            ps = subprocess.Popen(command,
-> +                                  stdin=subprocess.PIPE,
-> +                                  stdout=subprocess.PIPE,
-> +                                  stderr=subprocess.PIPE,
-> +                                  cwd=temp_dir,
-> +                                  env=dict(os.environ, **extra_env))
-> +
-> +            # If user key input is specified, feed it into stdin.
-> +            if in_keys:
-> +                ps.stdin.write(in_keys.encode('utf-8'))
-> +
-> +            while ps.poll() == None:
-> +                # For interactive modes such as 'make config', 'make oldconfig',
-> +                # send 'Enter' key until the program finishes.
-> +                if interactive:
-> +                    ps.stdin.write(b'\n')
-> +
-> +            self.retcode = ps.returncode
-> +            self.stdout = ps.stdout.read().decode()
-> +            self.stderr = ps.stderr.read().decode()
-> +
-> +            # Retrieve the resulted config data only when .config is supposed
-> +            # to exist.  If the command fails, the .config does not exist.
-> +            # 'make listnewconfig' does not produce .config in the first place.
-> +            if self.retcode == 0 and out_file:
-> +                with open(os.path.join(temp_dir, out_file)) as f:
-> +                    self.config = f.read()
-> +            else:
-> +                self.config = None
-> +
-> +        # Logging:
-> +        # Pytest captures the following information by default.  In failure
-> +        # of tests, the captured log will be displayed.  This will be useful to
-> +        # figure out what has happened.
-> +
-> +        print("command: {}\n".format(' '.join(command)))
-> +        print("retcode: {}\n".format(self.retcode))
-> +
-> +        if dot_config:
-> +            print("input .config:".format(dot_config))
-> +
-> +        print("stdout:")
-> +        print(self.stdout)
-> +        print("stderr:")
-> +        print(self.stderr)
-> +
-> +        if self.config is not None:
-> +            print("output of {}:".format(out_file))
-> +            print(self.config)
-> +
-> +        return self.retcode
-> +
-> +    def oldaskconfig(self, dot_config=None, in_keys=None):
-> +        """Run oldaskconfig (make config)
-> +
-> +        dot_config: the .config file for input (optional).
-> +        in_key: key inputs (optional).
-> +        """
-> +        return self.__run_conf('--oldaskconfig', dot_config=dot_config,
-> +                             interactive=True, in_keys=in_keys)
-> +
-> +    def oldconfig(self, dot_config=None, in_keys=None):
-> +        """Run oldconfig
-> +
-> +        dot_config: the .config file for input (optional).
-> +        in_key: key inputs (optional).
-> +        """
-> +        return self.__run_conf('--oldconfig', dot_config=dot_config,
-> +                             interactive=True, in_keys=in_keys)
-> +
-> +    def defconfig(self, defconfig):
-> +        """Run defconfig
-> +
-> +        defconfig: the defconfig file for input.
-> +        """
-> +        defconfig_path = os.path.join(self.test_dir, defconfig)
-> +        return self.__run_conf('--defconfig={}'.format(defconfig_path))
-> +
-> +    def olddefconfig(self, dot_config=None):
-> +        """Run olddefconfig
-> +
-> +        dot_config: the .config file for input (optional).
-> +        """
-> +        return self.__run_conf('--olddefconfig', dot_config=dot_config)
-> +
-> +    def __allconfig(self, foo, all_config):
-> +        """Run all*config
-> +
-> +        all_config: fragment config file for KCONFIG_ALLCONFIG (optional).
-> +        """
-> +        if all_config:
-> +            all_config_path = os.path.join(self.test_dir, all_config)
-> +            extra_env = {'KCONFIG_ALLCONFIG': all_config_path}
-> +        else:
-> +            extra_env = {}
-> +
-> +        return self.__run_conf('--all{}config'.format(foo), extra_env=extra_env)
-> +
-> +    def allyesconfig(self, all_config=None):
-> +        """Run allyesconfig
-> +        """
-> +        return self.__allconfig('yes', all_config)
-> +
-> +    def allmodconfig(self, all_config=None):
-> +        """Run allmodconfig
-> +        """
-> +        return self.__allconfig('mod', all_config)
-> +
-> +    def allnoconfig(self, all_config=None):
-> +        """Run allnoconfig
-> +        """
-> +        return self.__allconfig('no', all_config)
-> +
-> +    def alldefconfig(self, all_config=None):
-> +        """Run alldefconfig
-> +        """
-> +        return self.__allconfig('def', all_config)
-> +
-> +    def savedefconfig(self, dot_config):
-> +        """Run savedefconfig
-> +        """
-> +        return self.__run_conf('--savedefconfig', out_file='defconfig')
-> +
-> +    def listnewconfig(self, dot_config=None):
-> +        """Run listnewconfig
-> +        """
-> +        return self.__run_conf('--listnewconfig', dot_config=dot_config,
-> +                               out_file=None)
-> +
-> +    # checkers
-> +    def __read_and_compare(self, compare, expected):
-> +        """Compare the result with expectation.
-> +
-> +        Arguments:
-> +        compare: function to compare the result with expectation
-> +        expected: file that contains the expected data
-> +        """
-> +        with open(os.path.join(self.test_dir, expected)) as f:
-> +            expected_data = f.read()
-> +        print(expected_data)
-> +        return compare(self, expected_data)
-> +
-> +    def __contains(self, attr, expected):
-> +        print("{0} is expected to contain '{1}':".format(attr, expected))
-> +        return self.__read_and_compare(lambda s, e: getattr(s, attr).find(e) >= 0,
-> +                                       expected)
-> +
-> +    def __matches(self, attr, expected):
-> +        print("{0} is expected to match '{1}':".format(attr, expected))
-> +        return self.__read_and_compare(lambda s, e: getattr(s, attr) == e,
-> +                                       expected)
-> +
-> +    def config_contains(self, expected):
-> +        """Check if resulted configuration contains expected data.
-> +
-> +        Arguments:
-> +        expected: file that contains the expected data.
-> +        """
-> +        return self.__contains('config', expected)
-> +
-> +    def config_matches(self, expected):
-> +        """Check if resulted configuration exactly matches expected data.
-> +
-> +        Arguments:
-> +        expected: file that contains the expected data.
-> +        """
-> +        return self.__matches('config', expected)
-> +
-> +    def stdout_contains(self, expected):
-> +        """Check if resulted stdout contains expected data.
-> +
-> +        Arguments:
-> +        expected: file that contains the expected data.
-> +        """
-> +        return self.__contains('stdout', expected)
-> +
-> +    def stdout_matches(self, cmp_file):
-> +        """Check if resulted stdout exactly matches expected data.
-> +
-> +        Arguments:
-> +        expected: file that contains the expected data.
-> +        """
-> +        return self.__matches('stdout', expected)
-> +
-> +    def stderr_contains(self, expected):
-> +        """Check if resulted stderr contains expected data.
-> +
-> +        Arguments:
-> +        expected: file that contains the expected data.
-> +        """
-> +        return self.__contains('stderr', expected)
-> +
-> +    def stderr_matches(self, cmp_file):
-> +        """Check if resulted stderr exactly matches expected data.
-> +
-> +        Arguments:
-> +        expected: file that contains the expected data.
-> +        """
-> +        return self.__matches('stderr', expected)
-> +
-> +@pytest.fixture(scope="module")
-> +def conf(request):
-> +    return Conf(request)
-> diff --git a/scripts/kconfig/tests/pytest.ini b/scripts/kconfig/tests/pytest.ini
-> new file mode 100644
-> index 0000000..07b94e0
-> --- /dev/null
-> +++ b/scripts/kconfig/tests/pytest.ini
-> @@ -0,0 +1,6 @@
-> +[pytest]
-> +addopts = --verbose
-> +# Pytest requires that test files have unique names, because pytest imports
-> +# them as top-level modules.  It is silly to prefix or suffix a test file with
-> +# the directory name that contains it.  Use __init__.py for all test files.
-> +python_files = __init__.py
-> --
-> 2.7.4
->
+On 02/07/2018 04:01 PM, Andrew Morton wrote:
+> On Wed, 20 Dec 2017 12:29:02 -0800 Vineet Gupta <Vineet.Gupta1@synopsys.com> wrote:
+> 
+>> On 12/20/2017 12:12 PM, Arnd Bergmann wrote:
+>>>> Sorry, I didn't realize we are missing the stack trace now which you removed
+>>>> from the patch - why ? Did u intend to reduce inline generated code for the
+>>>> stack dump calls - which sounds like a great idea. But it would only work
+>>>> for the synchronous abort() but not when builtin translates to actual trap
+>>>> inducing instruction.
+>>>
+>>> I assumed that the trap instruction would trigger the register and
+>>> stack dump, as it does on all other architectures.
+>>
+>> Only if __builtin_trap() translated to that instruction. Otherwise we need to do
+>> this inside abort()
+>>
+>>> The most common
+>>> way this is handled is to have one instruction that is known to trap,
+>>> and use that to trigger a BUG(), and have __builtin_trap() issue
+>>> that instruction as well.
+>>
+>> Good point. So we'll need ARC specific abort anyways.
+>>
+>>
+>>> You might also want to implement CONFIG_DEBUG_BUGVERBOSE
+>>> support to attach further data to it.
+>>
+>> OK I'll take a look !
+>>
+>>> How about overriding abort() with the same instruction that
+>>> __builtin_trap() inserts on newer compilers then? That should
+>>> make the behavior consistent.
+>>
+>> Yeah this is a great point ! Will do
+> 
+> Didn't do ;)
 
-Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+Actually I did :-)
+
+The discussion above digressed from original intent of the patch and instead 
+veered of into need for handling __builtin_trap() for ARC and a fallback abort() 
+with same semantics etc which I'd agreed to do above. They are upstream
+
+2017-12-08 af1be2e21203 ARC: handle gcc generated __builtin_trap for older compiler
+2017-12-20 f5a16b93e629 ARC: handle gcc generated __builtin_trap()
+
+However we missed this large stack issue and the -Werror=return-type warning for ARC.
+
+Let me check the patch again and get back here !
+
+> 
+> Is Arnd's patch good to merge or do we need a fixup?
+> 
+> 
+> From: Arnd Bergmann <arnd@arndb.de>
+> Subject: bug.h: work around GCC PR82365 in BUG()
+> 
+> Looking at functions with large stack frames across all architectures led
+> me discovering that BUG() suffers from the same problem as
+> fortify_panic(), which I've added a workaround for already.  In short,
+> variables that go out of scope by calling a noreturn function or
+> __builtin_unreachable() keep using stack space in functions afterwards.
+> 
+> A workaround that was identified is to insert an empty assembler statement
+> just before calling the function that doesn't return.  I'm adding a macro
+> "barrier_before_unreachable()" to document this, and insert calls to that
+> in all instances of BUG() that currently suffer from this problem.
+> 
+> The files that saw the largest change from this had these frame sizes
+> before, and much less with my patch:
+> 
+> fs/ext4/inode.c:82:1: warning: the frame size of 1672 bytes is larger than 800 bytes [-Wframe-larger-than=]
+> fs/ext4/namei.c:434:1: warning: the frame size of 904 bytes is larger than 800 bytes [-Wframe-larger-than=]
+
+[...]
+
+> In case of ARC and CRIS, it turns out that the BUG() implementation
+> actually does return (or at least the compiler thinks it does), resulting
+> in lots of warnings about uninitialized variable use and leaving noreturn
+> functions, such as:
+> 
+> block/cfq-iosched.c: In function 'cfq_async_queue_prio':
+> block/cfq-iosched.c:3804:1: error: control reaches end of non-void function [-Werror=return-type]
+> include/linux/dmaengine.h: In function 'dma_maxpq':
+> include/linux/dmaengine.h:1123:1: error: control reaches end of non-void function [-Werror=return-type]
+> 
+> This makes them call __builtin_trap() instead, which should normally dump
+> the stack and kill the current process, like some of the other
+> architectures already do.
+> 
+> I tried adding barrier_before_unreachable() to panic() and fortify_panic()
+> as well, but that had very little effect, so I'm not submitting that
+> patch.
+
+[...]
+
+> 
+> diff -puN arch/arc/include/asm/bug.h~bugh-work-around-gcc-pr82365-in-bug arch/arc/include/asm/bug.h
+> --- a/arch/arc/include/asm/bug.h~bugh-work-around-gcc-pr82365-in-bug
+> +++ a/arch/arc/include/asm/bug.h
+> @@ -23,7 +23,8 @@ void die(const char *str, struct pt_regs
+>   
+>   #define BUG()	do {								\
+>   	pr_warn("BUG: failure at %s:%d/%s()!\n", __FILE__, __LINE__, __func__); \
+> -	dump_stack();								\
+> +	barrier_before_unreachable();						\
+> +	__builtin_trap();							\
+>   } while (0)
+
+> 
+
