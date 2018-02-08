@@ -1,25 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:45614 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750766AbeBHGy4 (ORCPT
+Received: from mail-ua0-f194.google.com ([209.85.217.194]:45771 "EHLO
+        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750766AbeBHHFk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Feb 2018 01:54:56 -0500
+        Thu, 8 Feb 2018 02:05:40 -0500
 MIME-Version: 1.0
 In-Reply-To: <CAFkk2KSstFf2+w2gbm0AGk+Kdy2Kcxhdq74rv7djGOYqdm1+Zw@mail.gmail.com>
 References: <1518069400-7037-1-git-send-email-yamada.masahiro@socionext.com>
  <1518069400-7037-2-git-send-email-yamada.masahiro@socionext.com>
  <CAFkk2KQC6GbfkXETFdKEhy-rTfuuH7zeuXvezGzwMy_=2V03Dg@mail.gmail.com> <CAFkk2KSstFf2+w2gbm0AGk+Kdy2Kcxhdq74rv7djGOYqdm1+Zw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 8 Feb 2018 15:53:57 +0900
-Message-ID: <CAK7LNATY-BkaMHc5M0N398_Qtq5h-6tnCTdT_2MwMUfowb=Orw@mail.gmail.com>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Thu, 8 Feb 2018 08:05:39 +0100
+Message-ID: <CAFkk2KTWw80Fp_79i1PC5JAJyjtKVzxMyXRC0amHB8Up0F_23A@mail.gmail.com>
 Subject: Re: [PATCH 2/2] kconfig: echo stdin to stdout if either is redirected
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Marc Herbert <marc.herbert@intel.com>
 
-2018-02-08 15:51 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+On Thu, Feb 8, 2018 at 7:51 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
 > On Thu, Feb 8, 2018 at 7:35 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
 >> On Thu, Feb 8, 2018 at 6:56 AM, Masahiro Yamada
 >> <yamada.masahiro@socionext.com> wrote:
@@ -91,29 +91,24 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@
 >
 > Hmm... if stdout is a tty and stdin isn't, this would prevent the
 > input from showing up on the terminal though, so I guess it makes
-> sense.
-
-Yes.  I want to address this case too.
-
-Anyway, thank you for checking the details!
-
-
-
-
-> That case seems more important than the weird
+> sense. That case seems more important than the weird
 > stdin=tty/stdout=file case.
 >
 > Tricky stuff. :)
 >
 > Cheers,
 > Ulf
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
+Oh... and that one's already taken care of too, reading closer.
 
+stdin | stdout | wants stdin written to stdout
+------+--------+-------------------------------------
+tty   | tty    | no (already echoed by tty)
+tty   | file   | yes (echoed by tty, written to file)
+file  | tty    | yes (not echoed by tty)
+file  | file   | yes
 
--- 
-Best Regards
-Masahiro Yamada
+So !(tty(0) && tty(1)) makes sense. Excuse the rambling...
+
+Cheers,
+Ulf
