@@ -1,17 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f68.google.com ([209.85.213.68]:33507 "EHLO
-        mail-vk0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750729AbeBHANK (ORCPT
+Received: from mail-vk0-f65.google.com ([209.85.213.65]:43584 "EHLO
+        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750745AbeBHAP5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Feb 2018 19:13:10 -0500
+        Wed, 7 Feb 2018 19:15:57 -0500
 MIME-Version: 1.0
-In-Reply-To: <1517877294-4826-13-git-send-email-yamada.masahiro@socionext.com>
-References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com> <1517877294-4826-13-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1517877294-4826-14-git-send-email-yamada.masahiro@socionext.com>
+References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com> <1517877294-4826-14-git-send-email-yamada.masahiro@socionext.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 8 Feb 2018 01:13:09 +0100
-Message-ID: <CAFkk2KQG6Na0ONRbmsmC01Bz7VjDAKs4TLTH9pK7hPe4c5StXQ@mail.gmail.com>
-Subject: Re: [PATCH 12/14] kconfig: test: check visibility of tristate choice
- values in y choice
+Date: Thu, 8 Feb 2018 01:15:56 +0100
+Message-ID: <CAFkk2KQv3oXWVdvyH9EPhmCiOEX1Ab++wvcsd+=gP-8RvTua+g@mail.gmail.com>
+Subject: Re: [PATCH 13/14] kconfig: test: check if recursive dependencies are detected
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -20,116 +19,150 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman
 
 On Tue, Feb 6, 2018 at 1:34 AM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> If tristate choice values depend on symbols set to 'm', they should be
-> hidden when the choice containing them is changed from 'm' to 'y'
-> (i.e. exclusive choice).
->
-> This issue was fixed by commit fa64e5f6a35e ("kconfig/symbol.c: handle
-> choice_values that depend on 'm' symbols").
->
-> Add a test case to avoid regression.
->
-> For the input in this unit test, there is a room for argument if
-> "# CONFIG_CHOICE1 is not set" should be written to the .config file.
->
-> After commit fa64e5f6a35e, this line was written to the .config file.
->
-> Then, it is not written after my fix "kconfig: do not write choice
-> values when their dependency becomes n".
->
-> In this test, "# CONFIG_CHOICE1 is not set" is don't care.
+> Recursive dependency should be detected and warned.  Test this.
 >
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
 >
->  .../kconfig/tests/choice_value_with_m_dep/Kconfig    | 20 ++++++++++++++++++++
->  .../tests/choice_value_with_m_dep/__init__.py        | 15 +++++++++++++++
->  scripts/kconfig/tests/choice_value_with_m_dep/config |  2 ++
->  .../tests/choice_value_with_m_dep/expected_config    |  3 +++
->  .../tests/choice_value_with_m_dep/expected_stdout    |  4 ++++
->  5 files changed, 44 insertions(+)
->  create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/Kconfig
->  create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/__init__.py
->  create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/config
->  create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/expected_config
->  create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout
+>  scripts/kconfig/tests/warn_recursive_dep/Kconfig   | 62 ++++++++++++++++++++++
+>  .../kconfig/tests/warn_recursive_dep/__init__.py   | 10 ++++
+>  .../tests/warn_recursive_dep/expected_stderr       | 33 ++++++++++++
+>  3 files changed, 105 insertions(+)
+>  create mode 100644 scripts/kconfig/tests/warn_recursive_dep/Kconfig
+>  create mode 100644 scripts/kconfig/tests/warn_recursive_dep/__init__.py
+>  create mode 100644 scripts/kconfig/tests/warn_recursive_dep/expected_stderr
 >
-> diff --git a/scripts/kconfig/tests/choice_value_with_m_dep/Kconfig b/scripts/kconfig/tests/choice_value_with_m_dep/Kconfig
+> diff --git a/scripts/kconfig/tests/warn_recursive_dep/Kconfig b/scripts/kconfig/tests/warn_recursive_dep/Kconfig
 > new file mode 100644
-> index 0000000..dbc49e2
+> index 0000000..9ab2474
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/choice_value_with_m_dep/Kconfig
-> @@ -0,0 +1,20 @@
-> +config MODULES
+> +++ b/scripts/kconfig/tests/warn_recursive_dep/Kconfig
+> @@ -0,0 +1,62 @@
+> +# depends on itself
+> +
+> +config A
+> +       bool "A"
+> +       depends on A
+> +
+> +# select itself
+> +
+> +config B
 > +       bool
-> +       default y
-> +       option modules
+> +       select B
 > +
-> +config DEP
-> +       tristate
-> +       default m
+> +# depends on each other
 > +
-> +choice
-> +       prompt "Tristate Choice"
+> +config C1
+> +       bool "C1
+
+Missing end quote here. Noticed because the output contains
+"Kconfig:16:warning: multi-line strings not supported". :)
+
+> +       depends on C2
 > +
-> +config CHOICE0
-> +       tristate "Choice 0"
+> +config C2
+> +       bool "C2"
+> +       depends on C1
 > +
-> +config CHOICE1
-> +       tristate "Choice 1"
-> +       depends on DEP
+> +# depends on and select
 > +
-> +endchoice
-> diff --git a/scripts/kconfig/tests/choice_value_with_m_dep/__init__.py b/scripts/kconfig/tests/choice_value_with_m_dep/__init__.py
+> +config D1
+> +       bool "D1"
+> +       depends on D2
+> +       select D2
+> +
+> +config D2
+> +       bool
+> +
+> +# depends on and imply
+> +# This is not recursive dependency
+> +
+> +config E1
+> +       bool "E1"
+> +       depends on E2
+> +       imply E2
+> +
+> +config E2
+> +       bool "E2"
+> +
+> +# property
+> +
+> +config F1
+> +       bool "F1"
+> +       default F2
+> +
+> +config F2
+> +       bool "F2"
+> +       depends on F1
+> +
+> +# menu
+> +
+> +menu "menu depending on its content"
+> +       depends on G
+> +
+> +config G
+> +       bool "G"
+> +
+> +endmenu
+> diff --git a/scripts/kconfig/tests/warn_recursive_dep/__init__.py b/scripts/kconfig/tests/warn_recursive_dep/__init__.py
 > new file mode 100644
-> index 0000000..ec71777
+> index 0000000..cdf2c13
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/choice_value_with_m_dep/__init__.py
-> @@ -0,0 +1,15 @@
+> +++ b/scripts/kconfig/tests/warn_recursive_dep/__init__.py
+> @@ -0,0 +1,10 @@
 > +"""
-> +Hide tristate choice values with mod dependency in y choice
-> +===========================================================
+> +Warn recursive inclusion
+> +========================
 > +
-> +If tristate choice values depend on symbols set to 'm', they should be
-> +hidden when the choice containing them is changed from 'm' to 'y'
-> +(i.e. exclusive choice).
-> +
-> +Related Linux commit: fa64e5f6a35efd5e77d639125d973077ca506074
+> +Recursive dependency should be warned.
 > +"""
 > +
 > +def test(conf):
-> +    assert conf.oldaskconfig('config', 'y') == 0
-> +    assert conf.config_contains('expected_config')
-> +    assert conf.stdout_contains('expected_stdout')
-> diff --git a/scripts/kconfig/tests/choice_value_with_m_dep/config b/scripts/kconfig/tests/choice_value_with_m_dep/config
+> +    assert conf.oldaskconfig() == 0
+> +    assert conf.stderr_contains('expected_stderr')
+> diff --git a/scripts/kconfig/tests/warn_recursive_dep/expected_stderr b/scripts/kconfig/tests/warn_recursive_dep/expected_stderr
 > new file mode 100644
-> index 0000000..3a126b7
+> index 0000000..ea47cae
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/choice_value_with_m_dep/config
-> @@ -0,0 +1,2 @@
-> +CONFIG_CHOICE0=m
-> +CONFIG_CHOICE1=m
-> diff --git a/scripts/kconfig/tests/choice_value_with_m_dep/expected_config b/scripts/kconfig/tests/choice_value_with_m_dep/expected_config
-> new file mode 100644
-> index 0000000..4d07b44
-> --- /dev/null
-> +++ b/scripts/kconfig/tests/choice_value_with_m_dep/expected_config
-> @@ -0,0 +1,3 @@
-> +CONFIG_MODULES=y
-> +CONFIG_DEP=m
-> +CONFIG_CHOICE0=y
-> diff --git a/scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout b/scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout
-> new file mode 100644
-> index 0000000..5eac85d
-> --- /dev/null
-> +++ b/scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout
-> @@ -0,0 +1,4 @@
-> +Tristate Choice [M/y/?]
-> +Tristate Choice
-> +> 1. Choice 0 (CHOICE0)
-> +choice[1]: 1
+> +++ b/scripts/kconfig/tests/warn_recursive_dep/expected_stderr
+> @@ -0,0 +1,33 @@
+> +Kconfig:16:warning: multi-line strings not supported
+> +Kconfig:9:error: recursive dependency detected!
+> +Kconfig:9:     symbol B is selected by B
+> +For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> +subsection "Kconfig recursive dependency limitations"
+> +
+> +Kconfig:3:error: recursive dependency detected!
+> +Kconfig:3:     symbol A depends on A
+> +For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> +subsection "Kconfig recursive dependency limitations"
+> +
+> +Kconfig:15:error: recursive dependency detected!
+> +Kconfig:15:    symbol C1 depends on C2
+> +Kconfig:19:    symbol C2 depends on C1
+> +For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> +subsection "Kconfig recursive dependency limitations"
+> +
+> +Kconfig:30:error: recursive dependency detected!
+> +Kconfig:30:    symbol D2 is selected by D1
+> +Kconfig:25:    symbol D1 depends on D2
+> +For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> +subsection "Kconfig recursive dependency limitations"
+> +
+> +Kconfig:59:error: recursive dependency detected!
+> +Kconfig:59:    symbol G depends on G
+> +For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> +subsection "Kconfig recursive dependency limitations"
+> +
+> +Kconfig:50:error: recursive dependency detected!
+> +Kconfig:50:    symbol F2 depends on F1
+> +Kconfig:48:    symbol F1 default value contains F2
+> +For a resolution refer to Documentation/kbuild/kconfig-language.txt
+> +subsection "Kconfig recursive dependency limitations"
 > --
 > 2.7.4
 >
+
+Besides the missing end quote:
 
 Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
