@@ -1,100 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:58455 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:58454 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750951AbeBHF6E (ORCPT
+        with ESMTP id S1750954AbeBHF6E (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 8 Feb 2018 00:58:04 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/2] kconfig: remove check_stdin()
-Date: Thu,  8 Feb 2018 14:56:39 +0900
-Message-Id: <1518069400-7037-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 2/2] kconfig: echo stdin to stdout if either is redirected
+Date: Thu,  8 Feb 2018 14:56:40 +0900
+Message-Id: <1518069400-7037-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1518069400-7037-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1518069400-7037-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Marc Herbert <marc.herbert@intel.com>
 
-Except silentoldconfig, valid_stdin is 1, so check_stdin() is no-op.
+If stdio is not tty, conf_askvalue() puts additional new line to
+prevent prompts are all concatenated into a single line.  This care
+is missing in conf_choice(), so a 'choice' prompt and the next prompt
+are shown in the same line.
 
-oldconfig and silentoldconfig work almost in the same way except that
-the latter generates additional files.  Both ask users for input for
-new symbols.
+Move the code into xfgets() to take care of all cases.  To improve
+this more, echo stdin to stdout.  This clarifies what keys were input
+from stdio and the stdout looks like as if it were from tty.
 
-I do not know why only silentoldconfig requires stdio be tty.
-
-  $ rm -f .config; touch .config
-  $ yes "" | make oldconfig > stdout
-  $ rm -f .config; touch .config
-  $ yes "" | make silentoldconfig > stdout
-  make[1]: *** [silentoldconfig] Error 1
-  make: *** [silentoldconfig] Error 2
-  $ tail -n 4 stdout
-  Console input/output is redirected. Run 'make oldconfig' to update configuration.
-
-  scripts/kconfig/Makefile:40: recipe for target 'silentoldconfig' failed
-  Makefile:507: recipe for target 'silentoldconfig' failed
-
-Redirection is useful, for example, for testing where we want to give
-particular key inputs from a test file, then check the result.
+I removed the isatty(2) check since stderr is unrelated here.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/kconfig/conf.c | 14 --------------
- 1 file changed, 14 deletions(-)
+ scripts/kconfig/conf.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 307bc3f..358e2e4 100644
+index 358e2e4..c5318d3 100644
 --- a/scripts/kconfig/conf.c
 +++ b/scripts/kconfig/conf.c
-@@ -39,7 +39,6 @@ static enum input_mode input_mode = oldaskconfig;
- 
- static int indent = 1;
- static int tty_stdio;
--static int valid_stdin = 1;
- static int sync_kconfig;
- static int conf_cnt;
- static char line[PATH_MAX];
-@@ -72,16 +71,6 @@ static void strip(char *str)
- 		*p-- = 0;
+@@ -76,6 +76,9 @@ static void xfgets(char *str, int size, FILE *in)
+ {
+ 	if (!fgets(str, size, in))
+ 		fprintf(stderr, "\nError in reading or end of file.\n");
++
++	if (!tty_stdio)
++		printf("%s", str);
  }
  
--static void check_stdin(void)
--{
--	if (!valid_stdin) {
--		printf(_("aborted!\n\n"));
--		printf(_("Console input/output is redirected. "));
--		printf(_("Run 'make oldconfig' to update configuration.\n\n"));
--		exit(1);
--	}
--}
--
- /* Helper function to facilitate fgets() by Jean Sacren. */
- static void xfgets(char *str, int size, FILE *in)
- {
-@@ -113,7 +102,6 @@ static int conf_askvalue(struct symbol *sym, const char *def)
- 			printf("%s\n", def);
- 			return 0;
- 		}
--		check_stdin();
- 		/* fall through */
+ static int conf_askvalue(struct symbol *sym, const char *def)
+@@ -106,8 +109,6 @@ static int conf_askvalue(struct symbol *sym, const char *def)
  	case oldaskconfig:
  		fflush(stdout);
-@@ -315,7 +303,6 @@ static int conf_choice(struct menu *menu)
- 				printf("%d\n", cnt);
- 				break;
- 			}
--			check_stdin();
- 			/* fall through */
- 		case oldaskconfig:
- 			fflush(stdout);
-@@ -650,7 +637,6 @@ int main(int ac, char **av)
- 				return 1;
- 			}
- 		}
--		valid_stdin = tty_stdio;
- 	}
+ 		xfgets(line, sizeof(line), stdin);
+-		if (!tty_stdio)
+-			printf("\n");
+ 		return 1;
+ 	default:
+ 		break;
+@@ -495,7 +496,7 @@ int main(int ac, char **av)
+ 	bindtextdomain(PACKAGE, LOCALEDIR);
+ 	textdomain(PACKAGE);
  
- 	switch (input_mode) {
+-	tty_stdio = isatty(0) && isatty(1) && isatty(2);
++	tty_stdio = isatty(0) && isatty(1);
+ 
+ 	while ((opt = getopt_long(ac, av, "s", long_opts, NULL)) != -1) {
+ 		if (opt == 's') {
 -- 
 2.7.4
 
