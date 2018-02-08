@@ -1,69 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:58454 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750954AbeBHF6E (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:37646 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750766AbeBHGBp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Feb 2018 00:58:04 -0500
+        Thu, 8 Feb 2018 01:01:45 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAFkk2KSA6L_Ti_rFN9waJWZvntNT6qnvW1bzcbAbfnHpZM_wyw@mail.gmail.com>
+References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
+ <1517877294-4826-5-git-send-email-yamada.masahiro@socionext.com> <CAFkk2KSA6L_Ti_rFN9waJWZvntNT6qnvW1bzcbAbfnHpZM_wyw@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] kconfig: echo stdin to stdout if either is redirected
-Date: Thu,  8 Feb 2018 14:56:40 +0900
-Message-Id: <1518069400-7037-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1518069400-7037-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1518069400-7037-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Thu, 8 Feb 2018 15:00:56 +0900
+Message-ID: <CAK7LNATE-8V=00-6g2AM6ymXR5mkc_GkL=Y-YU=raZhSG8MP1Q@mail.gmail.com>
+Subject: Re: [PATCH 04/14] kconfig: print additional new line for choice for redirection
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Marc Herbert <marc.herbert@intel.com>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Marc Herbert <marc.herbert@intel.com>
 
-If stdio is not tty, conf_askvalue() puts additional new line to
-prevent prompts are all concatenated into a single line.  This care
-is missing in conf_choice(), so a 'choice' prompt and the next prompt
-are shown in the same line.
+2018-02-08 8:34 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> On Tue, Feb 6, 2018 at 1:34 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> If stdout is redirected to a file, prompts look differently due to
+>> missing new lines.
+>>
+>> Currently, conf_askvalue() takes care of this by putting additional
+>> new line, but conf_choice() does not.  Do likewise so that prompts
+>> after 'choice' look properly.
+>>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> ---
+>>
+>>  scripts/kconfig/conf.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+>> index d346642..6ce06c8 100644
+>> --- a/scripts/kconfig/conf.c
+>> +++ b/scripts/kconfig/conf.c
+>> @@ -317,6 +317,8 @@ static int conf_choice(struct menu *menu)
+>>                 case oldaskconfig:
+>>                         fflush(stdout);
+>>                         xfgets(line, sizeof(line), stdin);
+>> +                       if (!tty_stdio)
+>> +                               printf("\n");
+>>                         strip(line);
+>>                         if (line[0] == '?') {
+>>                                 print_help(menu);
+>> --
+>> 2.7.4
+>>
+>
+> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+>
+> Maybe this could be moved into the xfgets() function as well.
+>
 
-Move the code into xfgets() to take care of all cases.  To improve
-this more, echo stdin to stdout.  This clarifies what keys were input
-from stdio and the stdout looks like as if it were from tty.
+Thanks for your comment!
+Yes, it is better to move this into xfgets().
 
-I removed the isatty(2) check since stderr is unrelated here.
+I improve this a bit more so that the redirected stdout
+contains not only '\n' but also input keys.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+https://patchwork.kernel.org/patch/10206611/
 
- scripts/kconfig/conf.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 358e2e4..c5318d3 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -76,6 +76,9 @@ static void xfgets(char *str, int size, FILE *in)
- {
- 	if (!fgets(str, size, in))
- 		fprintf(stderr, "\nError in reading or end of file.\n");
-+
-+	if (!tty_stdio)
-+		printf("%s", str);
- }
- 
- static int conf_askvalue(struct symbol *sym, const char *def)
-@@ -106,8 +109,6 @@ static int conf_askvalue(struct symbol *sym, const char *def)
- 	case oldaskconfig:
- 		fflush(stdout);
- 		xfgets(line, sizeof(line), stdin);
--		if (!tty_stdio)
--			printf("\n");
- 		return 1;
- 	default:
- 		break;
-@@ -495,7 +496,7 @@ int main(int ac, char **av)
- 	bindtextdomain(PACKAGE, LOCALEDIR);
- 	textdomain(PACKAGE);
- 
--	tty_stdio = isatty(0) && isatty(1) && isatty(2);
-+	tty_stdio = isatty(0) && isatty(1);
- 
- 	while ((opt = getopt_long(ac, av, "s", long_opts, NULL)) != -1) {
- 		if (opt == 's') {
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
