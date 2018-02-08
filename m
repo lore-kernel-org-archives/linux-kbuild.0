@@ -1,219 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f193.google.com ([209.85.217.193]:42567 "EHLO
-        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751123AbeBHCCh (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:25482 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751700AbeBHCnZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Feb 2018 21:02:37 -0500
+        Wed, 7 Feb 2018 21:43:25 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNASr5yJ8HY8vRye12UyV7rcx_N=4Abz8fz9AQDh4y8TsYg@mail.gmail.com>
+In-Reply-To: <20180207225551.imdp6gqbdwzyvhwm@huvuddator>
 References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
- <1517877294-4826-2-git-send-email-yamada.masahiro@socionext.com>
- <CAFkk2KQNQV2GAXW+hyMvE+J5mMp+5g3SuYdcGA-JjGk5fE=VUA@mail.gmail.com> <CAK7LNASr5yJ8HY8vRye12UyV7rcx_N=4Abz8fz9AQDh4y8TsYg@mail.gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 8 Feb 2018 03:02:36 +0100
-Message-ID: <CAFkk2KQ4K8k3HBpadC0nSq4eM8gt9ZNhGBetAcofMeY32opTCQ@mail.gmail.com>
-Subject: Re: [PATCH 01/14] kconfig: send error messages to stderr
+ <1517877294-4826-3-git-send-email-yamada.masahiro@socionext.com> <20180207225551.imdp6gqbdwzyvhwm@huvuddator>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 8 Feb 2018 11:42:19 +0900
+Message-ID: <CAK7LNARVT6cHhFCAGrwL=qEqqSBmJU-pwq02R9M0VSfCiF_RsQ@mail.gmail.com>
+Subject: Re: [PATCH 02/14] kconfig: do not write choice values when their
+ dependency becomes n
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Marc Herbert <marc.herbert@intel.com>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Heinrich Schuchardt <xypron.glpk@gmx.de>
 
-On Thu, Feb 8, 2018 at 2:49 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2018-02-08 5:24 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->> On Tue, Feb 6, 2018 at 1:34 AM, Masahiro Yamada
->> <yamada.masahiro@socionext.com> wrote:
->>> These messages should be directed to stderr.
->>>
->>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->>> ---
->>>
->>>  scripts/kconfig/conf.c  | 18 +++++++++++-------
->>>  scripts/kconfig/zconf.l | 27 +++++++++++++++------------
->>>  2 files changed, 26 insertions(+), 19 deletions(-)
->>>
->>> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
->>> index 307bc3f..90a76aa2 100644
->>> --- a/scripts/kconfig/conf.c
->>> +++ b/scripts/kconfig/conf.c
->>> @@ -75,9 +75,11 @@ static void strip(char *str)
->>>  static void check_stdin(void)
->>>  {
->>>         if (!valid_stdin) {
->>> -               printf(_("aborted!\n\n"));
->>> -               printf(_("Console input/output is redirected. "));
->>> -               printf(_("Run 'make oldconfig' to update configuration.\n\n"));
->>> +               fprintf(stderr,
->>> +                       _("Aborted!\n"
->>> +                         "Console input/output is redirected.\n"
->>> +                         "Run 'make oldconfig' to update configuration.\n\n")
->>> +                       );
+2018-02-08 7:55 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> On Tue, Feb 06, 2018 at 09:34:42AM +0900, Masahiro Yamada wrote:
+>> "# CONFIG_... is not set" for choice values are wrongly written into
+>> the .config file if they are once visible, then become invisible later.
 >>
->> This could use fputs() too, moving the stderr to the last argument.
->
->
-> In general, I am not keen on replacement of (f)printf with (f)puts.
->
-> If '%' does not appear in the format literal, compiler will automatically
-> replace the function call with a faster one.
->
-> My compiler replaced both fprintf(stderr, "blah\n") and fputs("blah\n", stderr)
-> with fwrite.
->
-> At this moment, right, the compiler cannot optimize it
-> because it never knows the result of _(...).
->
-> If we rip off the gettext things, it will be optimized.
-
-No problem with me. Just some personal OCD. :)
-
->
->
->
->> I think the _() thingies around the strings are for gettext
->> (https://www.gnu.org/software/gettext/manual/html_node/Mark-Keywords.html).
->> This would break it if there are existing translations, since the
->> msgids change.
->
-> Right.  I will keep  inside _(...) as-is just in case
-> to not break gettext.
->
->
->
->
->> More practically, I doubt anyone is translating these tools. IMO we
->> should remove the gettext stuff unless we find traces of translations.
->
-> I agree.  Probably, it should not hurt to eliminate gettext,
-> but out of scope of this series.
-
-Yeah, out of scope.
-
->
->
->>>                 exit(1);
->>>         }
->>>  }
->>> @@ -565,7 +567,7 @@ int main(int ac, char **av)
->>>                 }
->>>         }
->>>         if (ac == optind) {
->>> -               printf(_("%s: Kconfig file missing\n"), av[0]);
->>> +               fprintf(stderr, _("%s: Kconfig file missing\n"), av[0]);
->>>                 conf_usage(progname);
->>>                 exit(1);
->>>         }
->>> @@ -590,9 +592,11 @@ int main(int ac, char **av)
->>>                 if (!defconfig_file)
->>>                         defconfig_file = conf_get_default_confname();
->>>                 if (conf_read(defconfig_file)) {
->>> -                       printf(_("***\n"
->>> -                               "*** Can't find default configuration \"%s\"!\n"
->>> -                               "***\n"), defconfig_file);
->>> +                       fprintf(stderr,
->>> +                               _("***\n"
->>> +                                 "*** Can't find default configuration \"%s\"!\n"
->>> +                                 "***\n"),
->>> +                               defconfig_file);
->>>                         exit(1);
->>>                 }
->>>                 break;
->>> diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
->>> index 07e074d..0ba4900 100644
->>> --- a/scripts/kconfig/zconf.l
->>> +++ b/scripts/kconfig/zconf.l
->>> @@ -184,7 +184,9 @@ n   [A-Za-z0-9_-]
->>>                         append_string(yytext, 1);
->>>         }
->>>         \n      {
->>> -               printf("%s:%d:warning: multi-line strings not supported\n", zconf_curname(), zconf_lineno());
->>> +               fprintf(stderr,
->>> +                       "%s:%d:warning: multi-line strings not supported\n",
->>> +                       zconf_curname(), zconf_lineno());
+>>   Test case
+>>   ---------
 >>
->> Whether stuff is translated seems inconsistent too.
->
->
-> Right.  Many people change the same tool, it is difficult to
-> keep the consistency.
->
->
->
->
->>>                 current_file->lineno++;
->>>                 BEGIN(INITIAL);
->>>                 return T_EOL;
->>> @@ -294,7 +296,7 @@ void zconf_initscan(const char *name)
->>>  {
->>>         yyin = zconf_fopen(name);
->>>         if (!yyin) {
->>> -               printf("can't find file %s\n", name);
->>> +               fprintf(stderr, "can't find file %s\n", name);
->>>                 exit(1);
->>>         }
->>>
->>> @@ -315,8 +317,8 @@ void zconf_nextfile(const char *name)
->>>         current_buf->state = YY_CURRENT_BUFFER;
->>>         yyin = zconf_fopen(file->name);
->>>         if (!yyin) {
->>> -               printf("%s:%d: can't open file \"%s\"\n",
->>> -                   zconf_curname(), zconf_lineno(), file->name);
->>> +               fprintf(stderr, "%s:%d: can't open file \"%s\"\n",
->>> +                       zconf_curname(), zconf_lineno(), file->name);
->>>                 exit(1);
->>>         }
->>>         yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
->>> @@ -325,20 +327,21 @@ void zconf_nextfile(const char *name)
->>>
->>>         for (iter = current_file->parent; iter; iter = iter->parent ) {
->>>                 if (!strcmp(current_file->name,iter->name) ) {
->>> -                       printf("%s:%d: recursive inclusion detected. "
->>> -                              "Inclusion path:\n  current file : '%s'\n",
->>> -                              zconf_curname(), zconf_lineno(),
->>> -                              zconf_curname());
->>> +                       fprintf(stderr,
->>> +                               "%s:%d: recursive inclusion detected. "
->>> +                               "Inclusion path:\n  current file : '%s'\n",
->>> +                               zconf_curname(), zconf_lineno(),
->>> +                               zconf_curname());
->>>                         iter = current_file->parent;
->>>                         while (iter && \
->>>                                strcmp(iter->name,current_file->name)) {
->>> -                               printf("  included from: '%s:%d'\n",
->>> -                                      iter->name, iter->lineno-1);
->>> +                               fprintf(stderr, "  included from: '%s:%d'\n",
->>> +                                       iter->name, iter->lineno-1);
->>>                                 iter = iter->parent;
->>>                         }
->>>                         if (iter)
->>> -                               printf("  included from: '%s:%d'\n",
->>> -                                      iter->name, iter->lineno+1);
->>> +                               fprintf(stderr, "  included from: '%s:%d'\n",
->>> +                                       iter->name, iter->lineno+1);
->>>                         exit(1);
->>>                 }
->>>         }
->>> --
->>> 2.7.4
->>>
+>> ---------------------------(Kconfig)----------------------------
+>> config A
+>>       bool "A"
 >>
->> The unrelated gettext stuff aside:
+>> choice
+>>       prompt "Choice ?"
+>>       depends on A
 >>
->> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+>> config CHOICE_B
+>>       bool "Choice B"
 >>
->> Cheers,
->> Ulf
+>> config CHOICE_C
+>>       bool "Choice C"
+>>
+>> endchoice
+>> ----------------------------------------------------------------
+>>
+>> ---------------------------(.config)----------------------------
+>> CONFIG_A=y
+>> ----------------------------------------------------------------
+>>
+>> With the Kconfig and .config above,
+>>
+>>   $ make config
+>>   scripts/kconfig/conf  --oldaskconfig Kconfig
+>>   *
+>>   * Linux Kernel Configuration
+>>   *
+>>   A (A) [Y/n] n
+>>   #
+>>   # configuration written to .config
+>>   #
+>>   $ cat .config
+>>   #
+>>   # Automatically generated file; DO NOT EDIT.
+>>   # Linux Kernel Configuration
+>>   #
+>>   # CONFIG_A is not set
+>>   # CONFIG_CHOICE_B is not set
+>>   # CONFIG_CHOICE_C is not set
+>>
+>> Here,
+>>
+>>   # CONFIG_CHOICE_B is not set
+>>   # CONFIG_CHOICE_C is not set
+>>
+>> should not be written into the .config file because their dependency
+>> "depends on A" is unmet.
+>>
+>> Currently, there is no code that clears SYMBOL_WRITE of choice values.
+>>
+>> Clear SYMBOL_WRITE for all symbols in sym_calc_value(), then set it
+>> again after calculating visibility.
+>>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> ---
+>
+>>  scripts/kconfig/symbol.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+>> index c9123ed..5d6f6b1 100644
+>> --- a/scripts/kconfig/symbol.c
+>> +++ b/scripts/kconfig/symbol.c
+>> @@ -371,8 +371,7 @@ void sym_calc_value(struct symbol *sym)
+>>               sym->curr.tri = no;
+>>               return;
+>>       }
+>> -     if (!sym_is_choice_value(sym))
+>> -             sym->flags &= ~SYMBOL_WRITE;
+>> +     sym->flags &= ~SYMBOL_WRITE;
+>>
+>>       sym_calc_visibility(sym);
+>>
+>> @@ -385,6 +384,7 @@ void sym_calc_value(struct symbol *sym)
+>>               if (sym_is_choice_value(sym) && sym->visible == yes) {
+>>                       prop = sym_get_choice_prop(sym);
+>>                       newval.tri = (prop_get_symbol(prop)->curr.val == sym) ? yes : no;
+>> +                     sym->flags |= SYMBOL_WRITE;
+>>               } else {
+>>                       if (sym->visible != no) {
+>>                               /* if the symbol is visible use the user value
 >> --
->> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> 2.7.4
+>>
 >
+> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 >
+> There's a possible simplification here:
 >
-> --
-> Best Regards
-> Masahiro Yamada
+> All defined symbols, regardless of type, and regardless of whether
+> they're choice value symbols or not, always get written out if they have
+> non-n visibility. Therefore, the sym->visible != no check for
+> SYMBOL_WRITE can be moved to before the symbol type check, which gets
+> rid of two SYMBOL_WRITE assignments and makes it clear that the logic is
+> the same for all paths.
+>
+> This is safe for symbols defined without a type (S_UNKNOWN) too, because
+> conf_write() skips those (plus they already generate a warning).
+>
+> This matches how I do it in the tri_value() function in Kconfiglib:
+> https://github.com/ulfalizer/Kconfiglib/blob/master/kconfiglib.py#L2574.
+> SYMBOL_WRITE corresponds to _write_to_conf.
+>
+> I've included a patch below. I tested it with the Kconfiglib test suite,
+> which verifies that the C implementation still generates the same
+> .config file for all defconfig files as well as for
+> all{no,yes,def}config, for all ARCHes.
+>
+> (The Kconfiglib test suite runs scripts/kconfig/conf and compares its
+> output against it, which means it doubles as a regression test for the C
+> tools.)
 
-Cheers,
-Ulf
+Thank you for this.  This is simpler, and please let me take it.
+
+I confirmed the same results were produced.
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
