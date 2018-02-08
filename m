@@ -1,58 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:39599 "EHLO
-        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751079AbeBHPhP (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:19339 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752135AbeBHQVg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Feb 2018 10:37:15 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180205012146.23981-17-ulfalizer@gmail.com>
-References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-17-ulfalizer@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 8 Feb 2018 16:37:14 +0100
-Message-ID: <CANiq72kaCDcUHFuJ0P4CA-0KGgg+a8T+66p0aPwatAjfvDB8bA@mail.gmail.com>
-Subject: Re: [PATCH 16/20] auxdisplay: img-ascii-lcd: Remove MIPS_SEAD3 dep.
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 8 Feb 2018 11:21:36 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [RFC PATCH 3/7] kconfig: remove const qualifier from sym_expand_string_value()
+Date: Fri,  9 Feb 2018 01:19:08 +0900
+Message-Id: <1518106752-29228-4-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1518106752-29228-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1518106752-29228-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, Linus Walleij <linus.walleij@linaro.org>, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com
+To: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390@vger.kernel.org, Jiri Kosina <jkosina@suse.cz>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Mon, Feb 5, 2018 at 2:21 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> The MIPS_SEAD3 symbol was removed in commit 64601cb1343f ("leds: Remove SEAD-3
-> driver").
+This function returns realloc'ed memory, so the returned pointer
+must be passed to free() when done.  Change the return value type
+to save casting.
 
-Commit 64601cb1343f did not remove the MIPS_SEAD3 symbol, it seemed to
-a few months before, in 3f5f0a4475e1 ("MIPS: generic: Convert SEAD-3
-to a generic board"). Can you please amend the description?
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Thanks!
-Miguel
+ scripts/kconfig/lkc_proto.h | 2 +-
+ scripts/kconfig/symbol.c    | 2 +-
+ scripts/kconfig/util.c      | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
->
-> Remove the MIPS_SEAD3 dependency from IMG_ASCII_LCD.
->
-> Discovered with the
-> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
-> script.
->
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->  drivers/auxdisplay/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/auxdisplay/Kconfig b/drivers/auxdisplay/Kconfig
-> index 2c2ed9cf8796..3cba78d36eec 100644
-> --- a/drivers/auxdisplay/Kconfig
-> +++ b/drivers/auxdisplay/Kconfig
-> @@ -137,7 +137,7 @@ config CFAG12864B_RATE
->  config IMG_ASCII_LCD
->         tristate "Imagination Technologies ASCII LCD Display"
->         depends on HAS_IOMEM
-> -       default y if MIPS_MALTA || MIPS_SEAD3
-> +       default y if MIPS_MALTA
->         select SYSCON
->         help
->           Enable this to support the simple ASCII LCD displays found on
-> --
-> 2.14.1
->
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index 5d86e2d..9dc8abf 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -31,7 +31,7 @@ extern struct symbol * symbol_hash[SYMBOL_HASHSIZE];
+ 
+ struct symbol * sym_lookup(const char *name, int flags);
+ struct symbol * sym_find(const char *name);
+-const char * sym_expand_string_value(const char *in);
++char *sym_expand_string_value(const char *in);
+ const char * sym_escape_string_value(const char *in);
+ struct symbol ** sym_re_search(const char *pattern);
+ const char * sym_type_name(enum symbol_type type);
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index bc3ec6a..893eae6 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -901,7 +901,7 @@ struct symbol *sym_find(const char *name)
+  * name to be expanded shall be prefixed by a '$'. Unknown symbol expands to
+  * the empty string.
+  */
+-const char *sym_expand_string_value(const char *in)
++char *sym_expand_string_value(const char *in)
+ {
+ 	const char *src;
+ 	char *res;
+diff --git a/scripts/kconfig/util.c b/scripts/kconfig/util.c
+index 01ead28..befaec9 100644
+--- a/scripts/kconfig/util.c
++++ b/scripts/kconfig/util.c
+@@ -14,11 +14,11 @@
+ struct file *file_lookup(const char *name)
+ {
+ 	struct file *file;
+-	const char *file_name = sym_expand_string_value(name);
++	char *file_name = sym_expand_string_value(name);
+ 
+ 	for (file = file_list; file; file = file->next) {
+ 		if (!strcmp(name, file->name)) {
+-			free((void *)file_name);
++			free(file_name);
+ 			return file;
+ 		}
+ 	}
+-- 
+2.7.4
+
