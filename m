@@ -1,72 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f196.google.com ([209.85.220.196]:41774 "EHLO
-        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752059AbeBHRfb (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:26000 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751984AbeBHRkU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Feb 2018 12:35:31 -0500
-Received: by mail-qk0-f196.google.com with SMTP id p23so6630664qke.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 08 Feb 2018 09:35:31 -0800 (PST)
+        Thu, 8 Feb 2018 12:40:20 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180205012146.23981-17-ulfalizer@gmail.com>
-References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-17-ulfalizer@gmail.com>
-From: James Hogan <james@albanarts.com>
-Date: Thu, 8 Feb 2018 17:35:30 +0000
-Message-ID: <CAAG0J98pFG=XFYAzQJ2+hROWWF1C=g-jePk6wh2EXsxX51TGVQ@mail.gmail.com>
-Subject: Re: [PATCH 16/20] auxdisplay: img-ascii-lcd: Remove MIPS_SEAD3 dep.
+In-Reply-To: <CA+55aFxpxAGkCTvugOAXp+izb8O1C5YD+ExMQ27uYVU3-97P1A@mail.gmail.com>
+References: <1518106752-29228-1-git-send-email-yamada.masahiro@socionext.com> <CA+55aFxpxAGkCTvugOAXp+izb8O1C5YD+ExMQ27uYVU3-97P1A@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 9 Feb 2018 02:39:30 +0900
+Message-ID: <CAK7LNAT6K6B=SXKdEwhgY8sBvdTAE-=BxjSm2z31qLsG6XoehQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/7] Kconfig: add new special property shell= to test
+ compiler options in Kconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, Linus Walleij <linus.walleij@linaro.org>, Vineet Gupta <vgupta@synopsys.com>, Mel Gorman <mgorman@techsingularity.net>, hch@lst.de, mina86@mina86.com, robh@kernel.org, Stephen Boyd <sboyd@codeaurora.org>, paulus@ozlabs.org, Will Deacon <will.deacon@arm.com>, tony@atomide.com, npiggin@gmail.com, Masahiro Yamada <yamada.masahiro@socionext.com>, Miguel Ojeda Sandonis <miguel.ojeda.sandonis@gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 5 February 2018 at 01:21, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> The MIPS_SEAD3 symbol was removed in commit 64601cb1343f ("leds: Remove SEAD-3
-> driver").
+Hi Linus,
+
+2018-02-09 2:19 GMT+09:00 Linus Torvalds <torvalds@linux-foundation.org>:
+> On Thu, Feb 8, 2018 at 8:19 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> This was prompted by the email from Linus today's morning.
 >
-> Remove the MIPS_SEAD3 dependency from IMG_ASCII_LCD.
-
-Its not a dependency, just a default (presumably so that existing
-kernel configs get updated automatically).
-
-Note that sead3 now uses MIPS_GENERIC (or more specifically
-CONFIG_LEGACY_BOARD_SEAD3), but this driver is enabled in the config
-snippets, e.g.:
-arch/mips/configs/generic/board-sead-3.config
-arch/mips/configs/generic/board-boston.config
-
-so indeed there is no real need to replace MIPS_SEAD3 with anything here.
-
-Cheers
-James
-
+> Thanks.
 >
-> Discovered with the
-> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
-> script.
+>> I implmented this in a rush today, so there are still many TODOs,
+>> but I put it here to start discussion.
+>>
+>> I think it is working, but as you notice, it is tedious to repeat something
+>> like follows:
+>>
+>> config CC_HAS_STACKPROTECTOR
+>>         bool
+>>         option shell="$CC -Werror -fstack-protector -c -x c /dev/null"
 >
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->  drivers/auxdisplay/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Yeah.
 >
-> diff --git a/drivers/auxdisplay/Kconfig b/drivers/auxdisplay/Kconfig
-> index 2c2ed9cf8796..3cba78d36eec 100644
-> --- a/drivers/auxdisplay/Kconfig
-> +++ b/drivers/auxdisplay/Kconfig
-> @@ -137,7 +137,7 @@ config CFAG12864B_RATE
->  config IMG_ASCII_LCD
->         tristate "Imagination Technologies ASCII LCD Display"
->         depends on HAS_IOMEM
-> -       default y if MIPS_MALTA || MIPS_SEAD3
-> +       default y if MIPS_MALTA
->         select SYSCON
->         help
->           Enable this to support the simple ASCII LCD displays found on
-> --
-> 2.14.1
+> I do think we want to have the "shell" thing as a generic escape for
+> other things too, but *realistically*, the primary target for this is
+> compiler flags, and I think we should target that specifically with a
+> shorthand.
 >
+> Doing some statistics, and looking for
+>
+>     flag = $(call xyz ...)
+>
+> patterns in our makefiles (ignoring single uses), it really is
+> cc-option that dominates:
+>
+>       2  name-fix
+>       2  try-run
+>       3  __cc-option
+>       3  grep-libs
+>       3  strip-libs
+>       4  flags
+>       4  get-executable
+>       4  ld-option
+>       4  logo-cfiles
+>       5  as-option
+>       5  cc-cross-prefix
+>       6  cc-ldoption
+>       6  cc-supports
+>       7  cc-option-yn
+>       7  tune
+>       9  cc-ifversion
+>      30  as-instr
+>      48  cc-disable-warning
+>     239  cc-option
+>
+> so I think that's the one that we want to special-case.
+>
+> If we then have a _usable_ - but perhaps not wonderful "shell" escape
+> to do any random thing (including scripts etc), that will take care of
+> the rest, but cc-option is so common that I think it's worth making a
+> special Kconfig syntax for them. For all I know, the others aren't
+> even worth Kconfig options at all.
+>
+>> I was thinking of something like follows:
+>>
+>> config CC_STACKPROTECTOR
+>>           bool
+>>           option shell="$(CC_OPTION -fstack-protector)"
+>
+> I think we should go even further, and just make it be
+>
+> config CC_STACKPROTECTOR
+>           bool
+>           option cc_option="-fstack-protector"
+>
+> and actually have the Kconfig language itself have this special-cased.
+>
+> And obviously that "option cc_option" would be *implemented* as just
+> "option shell", with just some stupid string substitution. So it
+> really would be purely a shorthand for readability.
+>
+> What do you think?
+
+
+OK, I will try this way.
+
+
+
+> And btw, the patches look nice. What I like in particular is that they
+> don't even seem to add a lot of lines: the new shell option code is
+> almost balanced out by the Kconfig script simplifications. And maybe
+> it's just that I read C a lot better than I read GNU Makefile magic,
+> but I think it's more understandable too.
+
+
+I am glad you like it.  :)
 
 
 
 -- 
-James Hogan
+Best Regards
+Masahiro Yamada
