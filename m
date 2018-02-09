@@ -1,111 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49268 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751151AbeBIQM5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Feb 2018 11:12:57 -0500
-From: James Hogan <jhogan@kernel.org>
-Subject: [PATCH 3/3] MIPS: Expand help text to list generic defconfigs
-Date: Fri,  9 Feb 2018 16:11:58 +0000
-Message-Id: <7a6cf6748383b693f5e50dbfe9f1660f0908da67.1518192692.git-series.jhogan@kernel.org>
-In-Reply-To: <cover.e6abe4a455cad25b6663ceb7da02aee67a3be269.1518192692.git-series.jhogan@kernel.org>
-References: <cover.e6abe4a455cad25b6663ceb7da02aee67a3be269.1518192692.git-series.jhogan@kernel.org>
-In-Reply-To: <cover.e6abe4a455cad25b6663ceb7da02aee67a3be269.1518192692.git-series.jhogan@kernel.org>
-References: <cover.e6abe4a455cad25b6663ceb7da02aee67a3be269.1518192692.git-series.jhogan@kernel.org>
+Received: from mail-ua0-f194.google.com ([209.85.217.194]:35254 "EHLO
+        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750853AbeBIUq4 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 9 Feb 2018 15:46:56 -0500
+Received: by mail-ua0-f194.google.com with SMTP id n1so5987169uaa.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 09 Feb 2018 12:46:56 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180209124607.akjhncb5sempjqcn@huvuddator>
+References: <1518106752-29228-1-git-send-email-yamada.masahiro@socionext.com>
+ <1518106752-29228-5-git-send-email-yamada.masahiro@socionext.com>
+ <20180209053038.pscoijvowmyudyzf@huvuddator> <CAK7LNATRxYCx9sE1haw815votyA5K8GQrMPPh0Q+n3kYa=JsgA@mail.gmail.com>
+ <20180209124607.akjhncb5sempjqcn@huvuddator>
+From: Kees Cook <keescook@chromium.org>
+Date: Fri, 9 Feb 2018 12:46:54 -0800
+Message-ID: <CAGXu5j+hv6G3m+fgr7ibXAnoE-2GsxtXoqr0pd5AaaNdFVQxYg@mail.gmail.com>
+Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell=
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-mips@linux-mips.org
-Cc: James Hogan <jhogan@kernel.org>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@mips.com>, Matt Redfearn <matt.redfearn@mips.com>, linux-kbuild@vger.kernel.org
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Expand the MIPS Makefile help text to list generic board names, generic
-defconfigs, and legacy defconfigs which have been converted to generic
-and are still usable.
+On Fri, Feb 9, 2018 at 4:46 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> One thing that makes Kconfig confusing (though it works well enough in
+> practice) is that .config files both record user selections (the saved
+> configuration) and serve as a configuration output format for make.
+>
+> It becomes easier to think about .config files once you realize that
+> assignments to promptless symbols never have an effect on Kconfig
+> itself: They're just configuration output, intermixed with the saved
+> user selections.
+>
+> Assume 'option env' symbols got written out for example:
+>
+>         - For a non-user-assignable symbol, the entry in the .config
+>           file is just configuration output and ignored by Kconfig,
+>           which will fetch the value from the environment instead.
+>
+>         - For an assignable 'option env' symbol, the entry in the
+>           .config file is a saved user selection (as well as
+>           configuration output), and will be respected by Kconfig.
 
-Here's a snippet of the new "make ARCH=mips help" output:
-  ...
-  If you are targeting a system supported by generic kernels you may
-  configure the kernel for a given architecture target like so:
+In the stack-protector case, this becomes quite important, since the
+goal is to record the user's selection regardless of compiler
+capability. For example, if someone selects _REGULAR, it shouldn't
+"upgrade" to _STRONG. (Similarly for _NONE.) Having _AUTO provides a
+way to pick "best possible for this compiler", though. If a user had
+previously selected _STRONG but they're doing builds with an older
+compiler (or a misconfigured newer compiler) without support, the goal
+is to _fail_ to build, not silently select _REGULAR.
 
-  {micro32,32,64}{r1,r2,r6}{el,}_defconfig <BOARDS="list of boards">
+So, in this case, what's gained is the logic for _AUTO, and the logic
+to not show, say, _STRONG when it's not available in the compiler. But
+we must still fail to build if _STRONG was in the .config. It can't
+silently rewrite it to _REGULAR because the compiler support for
+_STRONG regressed.
 
-  Where BOARDS is some subset of the following:
-    boston
-    ni169445
-    ranchu
-    sead-3
-    xilfpga
+-Kees
 
-  Specifically the following generic default configurations are
-  supported:
-
-  32r1_defconfig           - Build generic kernel for MIPS32 r1
-  32r1el_defconfig         - Build generic kernel for MIPS32 r1 little endian
-  32r2_defconfig           - Build generic kernel for MIPS32 r2
-  32r2el_defconfig         - Build generic kernel for MIPS32 r2 little endian
-  32r6_defconfig           - Build generic kernel for MIPS32 r6
-  32r6el_defconfig         - Build generic kernel for MIPS32 r6 little endian
-  64r1_defconfig           - Build generic kernel for MIPS64 r1
-  64r1el_defconfig         - Build generic kernel for MIPS64 r1 little endian
-  64r2_defconfig           - Build generic kernel for MIPS64 r2
-  64r2el_defconfig         - Build generic kernel for MIPS64 r2 little endian
-  64r6_defconfig           - Build generic kernel for MIPS64 r6
-  64r6el_defconfig         - Build generic kernel for MIPS64 r6 little endian
-  micro32r2_defconfig      - Build generic kernel for microMIPS32 r2
-  micro32r2el_defconfig    - Build generic kernel for microMIPS32 r2 little endian
-
-  The following legacy default configurations have been converted to
-  generic and can still be used:
-
-  sead3_defconfig          - Build 32r2el_defconfig BOARDS=sead-3
-  sead3micro_defconfig     - Build micro32r2el_defconfig BOARDS=sead-3
-  xilfpga_defconfig        - Build 32r2el_defconfig BOARDS=xilfpga
-  ...
-
-Signed-off-by: James Hogan <jhogan@kernel.org>
-Cc: Ralf Baechle <ralf@linux-mips.org>
-Cc: Paul Burton <paul.burton@mips.com>
-Cc: Matt Redfearn <matt.redfearn@mips.com>
-Cc: linux-mips@linux-mips.org
-Cc: linux-kbuild@vger.kernel.org
----
- arch/mips/Makefile | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
-
-diff --git a/arch/mips/Makefile b/arch/mips/Makefile
-index 9ba487c1c4d2..e7a9ec56aa51 100644
---- a/arch/mips/Makefile
-+++ b/arch/mips/Makefile
-@@ -476,6 +476,21 @@ define archhelp
- 	echo
- 	echo '  {micro32,32,64}{r1,r2,r6}{el,}_defconfig <BOARDS="list of boards">'
- 	echo
-+	echo '  Where BOARDS is some subset of the following:'
-+	for board in $(sort $(BOARDS)); do echo "    $${board}"; done
-+	echo
-+	echo '  Specifically the following generic default configurations are'
-+	echo '  supported:'
-+	echo
-+	$(foreach cfg,$(generic_defconfigs),
-+	  printf "  %-24s - Build generic kernel for $(call describe_generic_defconfig,$(cfg))\n" $(cfg);)
-+	echo
-+	echo '  The following legacy default configurations have been converted to'
-+	echo '  generic and can still be used:'
-+	echo
-+	$(foreach cfg,$(sort $(legacy_defconfigs)),
-+	  printf "  %-24s - Build $($(cfg)-y)\n" $(cfg);)
-+	echo
- 	echo '  Otherwise, the following default configurations are available:'
- endef
- 
-@@ -510,6 +525,10 @@ endef
- $(eval $(call gen_generic_defconfigs,32 64,r1 r2 r6,eb el))
- $(eval $(call gen_generic_defconfigs,micro32,r2,eb el))
- 
-+define describe_generic_defconfig
-+$(subst 32r,MIPS32 r,$(subst 64r,MIPS64 r,$(subst el, little endian,$(patsubst %_defconfig,%,$(1)))))
-+endef
-+
- .PHONY: $(generic_defconfigs)
- $(generic_defconfigs):
- 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh \
 -- 
-git-series 0.9.1
+Kees Cook
+Pixel Security
