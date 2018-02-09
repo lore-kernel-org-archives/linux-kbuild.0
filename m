@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49246 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:49268 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751151AbeBIQMz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Feb 2018 11:12:55 -0500
+        id S1751151AbeBIQM5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 9 Feb 2018 11:12:57 -0500
 From: James Hogan <jhogan@kernel.org>
-Subject: [PATCH 2/3] MIPS: Add generic list_* Makefile targets
-Date: Fri,  9 Feb 2018 16:11:57 +0000
-Message-Id: <04370c02b170604b3edde66cdf087bc82710a07f.1518192692.git-series.jhogan@kernel.org>
+Subject: [PATCH 3/3] MIPS: Expand help text to list generic defconfigs
+Date: Fri,  9 Feb 2018 16:11:58 +0000
+Message-Id: <7a6cf6748383b693f5e50dbfe9f1660f0908da67.1518192692.git-series.jhogan@kernel.org>
 In-Reply-To: <cover.e6abe4a455cad25b6663ceb7da02aee67a3be269.1518192692.git-series.jhogan@kernel.org>
 References: <cover.e6abe4a455cad25b6663ceb7da02aee67a3be269.1518192692.git-series.jhogan@kernel.org>
 In-Reply-To: <cover.e6abe4a455cad25b6663ceb7da02aee67a3be269.1518192692.git-series.jhogan@kernel.org>
@@ -14,119 +14,98 @@ References: <cover.e6abe4a455cad25b6663ceb7da02aee67a3be269.1518192692.git-serie
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-mips@linux-mips.org
-Cc: James Hogan <jhogan@kernel.org>, Ralf Baechle <ralf@linux-mips.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Paul Burton <paul.burton@mips.com>, Matt Redfearn <matt.redfearn@mips.com>, linux-kbuild@vger.kernel.org
+Cc: James Hogan <jhogan@kernel.org>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@mips.com>, Matt Redfearn <matt.redfearn@mips.com>, linux-kbuild@vger.kernel.org
 
-Add MIPS specific Makefile targets for listing generic defconfigs
-(list_generic_defconfigs), generic board types (list_generic_boards),
-and legacy defconfigs which have been converted to generic
-(list_legacy_defconfigs).
+Expand the MIPS Makefile help text to list generic board names, generic
+defconfigs, and legacy defconfigs which have been converted to generic
+and are still usable.
 
-This is useful for quick reference and for buildbots to be able to
-automatically build all supported default configurations without parsing
-of the generic_defconfig error output.
+Here's a snippet of the new "make ARCH=mips help" output:
+  ...
+  If you are targeting a system supported by generic kernels you may
+  configure the kernel for a given architecture target like so:
 
-In order for these to work without .config being updated or
-CROSS_COMPILE being needed, list_%s is added to no-dot-config-targets in
-the main Makefile.
+  {micro32,32,64}{r1,r2,r6}{el,}_defconfig <BOARDS="list of boards">
+
+  Where BOARDS is some subset of the following:
+    boston
+    ni169445
+    ranchu
+    sead-3
+    xilfpga
+
+  Specifically the following generic default configurations are
+  supported:
+
+  32r1_defconfig           - Build generic kernel for MIPS32 r1
+  32r1el_defconfig         - Build generic kernel for MIPS32 r1 little endian
+  32r2_defconfig           - Build generic kernel for MIPS32 r2
+  32r2el_defconfig         - Build generic kernel for MIPS32 r2 little endian
+  32r6_defconfig           - Build generic kernel for MIPS32 r6
+  32r6el_defconfig         - Build generic kernel for MIPS32 r6 little endian
+  64r1_defconfig           - Build generic kernel for MIPS64 r1
+  64r1el_defconfig         - Build generic kernel for MIPS64 r1 little endian
+  64r2_defconfig           - Build generic kernel for MIPS64 r2
+  64r2el_defconfig         - Build generic kernel for MIPS64 r2 little endian
+  64r6_defconfig           - Build generic kernel for MIPS64 r6
+  64r6el_defconfig         - Build generic kernel for MIPS64 r6 little endian
+  micro32r2_defconfig      - Build generic kernel for microMIPS32 r2
+  micro32r2el_defconfig    - Build generic kernel for microMIPS32 r2 little endian
+
+  The following legacy default configurations have been converted to
+  generic and can still be used:
+
+  sead3_defconfig          - Build 32r2el_defconfig BOARDS=sead-3
+  sead3micro_defconfig     - Build micro32r2el_defconfig BOARDS=sead-3
+  xilfpga_defconfig        - Build 32r2el_defconfig BOARDS=xilfpga
+  ...
 
 Signed-off-by: James Hogan <jhogan@kernel.org>
 Cc: Ralf Baechle <ralf@linux-mips.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
 Cc: Paul Burton <paul.burton@mips.com>
 Cc: Matt Redfearn <matt.redfearn@mips.com>
 Cc: linux-mips@linux-mips.org
 Cc: linux-kbuild@vger.kernel.org
 ---
- Makefile           |  2 +-
- arch/mips/Makefile | 51 ++++++++++++++++++++++++++++++-----------------
- 2 files changed, 34 insertions(+), 19 deletions(-)
+ arch/mips/Makefile | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 3f4d157add54..635015848a2c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -223,7 +223,7 @@ old_version_h := include/linux/version.h
- no-dot-config-targets := clean mrproper distclean \
- 			 cscope gtags TAGS tags help% %docs check% coccicheck \
- 			 $(version_h) headers_% archheaders archscripts \
--			 kernelversion %src-pkg
-+			 kernelversion %src-pkg list_%s
- 
- config-targets := 0
- mixed-targets  := 0
 diff --git a/arch/mips/Makefile b/arch/mips/Makefile
-index 6f368b5cdf29..9ba487c1c4d2 100644
+index 9ba487c1c4d2..e7a9ec56aa51 100644
 --- a/arch/mips/Makefile
 +++ b/arch/mips/Makefile
-@@ -447,24 +447,27 @@ archclean:
- 	$(Q)$(MAKE) $(clean)=arch/mips/lasat
- 
- define archhelp
--	echo '  install              - install kernel into $(INSTALL_PATH)'
--	echo '  vmlinux.ecoff        - ECOFF boot image'
--	echo '  vmlinux.bin          - Raw binary boot image'
--	echo '  vmlinux.srec         - SREC boot image'
--	echo '  vmlinux.32           - 64-bit boot image wrapped in 32bits (IP22/IP32)'
--	echo '  vmlinuz              - Compressed boot(zboot) image'
--	echo '  vmlinuz.ecoff        - ECOFF zboot image'
--	echo '  vmlinuz.bin          - Raw binary zboot image'
--	echo '  vmlinuz.srec         - SREC zboot image'
--	echo '  uImage               - U-Boot image'
--	echo '  uImage.bin           - U-Boot image (uncompressed)'
--	echo '  uImage.bz2           - U-Boot image (bz2)'
--	echo '  uImage.gz            - U-Boot image (gzip)'
--	echo '  uImage.lzma          - U-Boot image (lzma)'
--	echo '  uImage.lzo           - U-Boot image (lzo)'
--	echo '  uzImage.bin          - U-Boot image (self-extracting)'
--	echo '  dtbs                 - Device-tree blobs for enabled boards'
--	echo '  dtbs_install         - Install dtbs to $(INSTALL_DTBS_PATH)'
-+	echo '  install                 - install kernel into $(INSTALL_PATH)'
-+	echo '  vmlinux.ecoff           - ECOFF boot image'
-+	echo '  vmlinux.bin             - Raw binary boot image'
-+	echo '  vmlinux.srec            - SREC boot image'
-+	echo '  vmlinux.32              - 64-bit boot image wrapped in 32bits (IP22/IP32)'
-+	echo '  vmlinuz                 - Compressed boot(zboot) image'
-+	echo '  vmlinuz.ecoff           - ECOFF zboot image'
-+	echo '  vmlinuz.bin             - Raw binary zboot image'
-+	echo '  vmlinuz.srec            - SREC zboot image'
-+	echo '  uImage                  - U-Boot image'
-+	echo '  uImage.bin              - U-Boot image (uncompressed)'
-+	echo '  uImage.bz2              - U-Boot image (bz2)'
-+	echo '  uImage.gz               - U-Boot image (gzip)'
-+	echo '  uImage.lzma             - U-Boot image (lzma)'
-+	echo '  uImage.lzo              - U-Boot image (lzo)'
-+	echo '  uzImage.bin             - U-Boot image (self-extracting)'
-+	echo '  dtbs                    - Device-tree blobs for enabled boards'
-+	echo '  dtbs_install            - Install dtbs to $(INSTALL_DTBS_PATH)'
-+	echo '  list_generic_defconfigs - List available generic defconfigs'
-+	echo '  list_generic_boards     - List available generic boards'
-+	echo '  list_legacy_defconfigs  - List available legacy defconfigs'
+@@ -476,6 +476,21 @@ define archhelp
  	echo
- 	echo '  These will be default as appropriate for a configured platform.'
+ 	echo '  {micro32,32,64}{r1,r2,r6}{el,}_defconfig <BOARDS="list of boards">'
  	echo
-@@ -538,6 +541,14 @@ generic_defconfig:
- 	$(Q)echo
- 	$(Q)false
++	echo '  Where BOARDS is some subset of the following:'
++	for board in $(sort $(BOARDS)); do echo "    $${board}"; done
++	echo
++	echo '  Specifically the following generic default configurations are'
++	echo '  supported:'
++	echo
++	$(foreach cfg,$(generic_defconfigs),
++	  printf "  %-24s - Build generic kernel for $(call describe_generic_defconfig,$(cfg))\n" $(cfg);)
++	echo
++	echo '  The following legacy default configurations have been converted to'
++	echo '  generic and can still be used:'
++	echo
++	$(foreach cfg,$(sort $(legacy_defconfigs)),
++	  printf "  %-24s - Build $($(cfg)-y)\n" $(cfg);)
++	echo
+ 	echo '  Otherwise, the following default configurations are available:'
+ endef
  
-+.PHONY: list_generic_defconfigs
-+list_generic_defconfigs:
-+	$(Q)for cfg in $(generic_defconfigs); do echo "$${cfg}"; done
+@@ -510,6 +525,10 @@ endef
+ $(eval $(call gen_generic_defconfigs,32 64,r1 r2 r6,eb el))
+ $(eval $(call gen_generic_defconfigs,micro32,r2,eb el))
+ 
++define describe_generic_defconfig
++$(subst 32r,MIPS32 r,$(subst 64r,MIPS64 r,$(subst el, little endian,$(patsubst %_defconfig,%,$(1)))))
++endef
 +
-+.PHONY: list_generic_boards
-+list_generic_boards:
-+	$(Q)for board in $(sort $(BOARDS)); do echo "$${board}"; done
-+
- #
- # Legacy defconfig compatibility - these targets used to be real defconfigs but
- # now that the boards have been converted to use the generic kernel they are
-@@ -555,3 +566,7 @@ xilfpga_defconfig-y		:= 32r2el_defconfig BOARDS=xilfpga
- .PHONY: $(legacy_defconfigs)
- $(legacy_defconfigs):
- 	$(Q)$(MAKE) -f $(srctree)/Makefile $($@-y)
-+
-+.PHONY: list_legacy_defconfigs
-+list_legacy_defconfigs:
-+	$(Q)for cfg in $(sort $(legacy_defconfigs)); do echo "$${cfg}"; done
+ .PHONY: $(generic_defconfigs)
+ $(generic_defconfigs):
+ 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh \
 -- 
 git-series 0.9.1
