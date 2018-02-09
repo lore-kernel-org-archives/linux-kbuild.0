@@ -1,58 +1,203 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:45576 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752239AbeBHXUh (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:20097 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752192AbeBIEOv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Feb 2018 18:20:37 -0500
-Date: Fri, 9 Feb 2018 00:20:21 +0100
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: Re: [PATCH] ALSA: ac97: kconfig: Remove select of undefined symbol
- AC97
-Message-ID: <20180208232021.ygw24klb7co6shrm@huvuddator>
-References: <20180205012146.23981-1-ulfalizer@gmail.com>
- <CAFkk2KRafUf3ki2R7B1pE_wzYkYn-OdeqLnvL0kScSxdzDMEXw@mail.gmail.com>
- <87lgg587ys.fsf@belgarion.home>
- <20180208231536.xnlrldm4to4pfv57@huvuddator>
+        Thu, 8 Feb 2018 23:14:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180208231536.xnlrldm4to4pfv57@huvuddator>
+In-Reply-To: <CAGXu5jJ02qRCcqTK_M9sFtekizz+0WoHBCBKF_mh-A870eg6eg@mail.gmail.com>
+References: <1518106752-29228-1-git-send-email-yamada.masahiro@socionext.com>
+ <1518106752-29228-8-git-send-email-yamada.masahiro@socionext.com> <CAGXu5jJ02qRCcqTK_M9sFtekizz+0WoHBCBKF_mh-A870eg6eg@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 9 Feb 2018 13:13:43 +0900
+Message-ID: <CAK7LNAQiY7rixHGbuLynRFKUeCDon4dMS+LdxSD4o2SbSp7Kbg@mail.gmail.com>
+Subject: Re: [RFC PATCH 7/7] Test stackprotector options in Kconfig to kill CC_STACKPROTECTOR_AUTO
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robert Jarzmik <robert.jarzmik@free.fr>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, perex@perex.cz, tiwai@suse.com, broonie@kernel.org, alsa-devel@alsa-project.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Palmer Dabbelt <palmer@sifive.com>, Albert Ou <albert@sifive.com>, linux-riscv@lists.infradead.org
+To: Kees Cook <keescook@chromium.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, LKML <linux-kernel@vger.kernel.org>
 
-On Fri, Feb 09, 2018 at 12:15:36AM +0100, Ulf Magnusson wrote:
-> The AC97_BUS_NEW Kconfig symbol selects the globally undefined symbol
-> AC97.
-> 
-> Robert Jarzmik confirmed in https://lkml.org/lkml/2018/2/7/96 that the
-> select was put in by mistake and can be safely removed, with no other
-> changes required. Remove it.
-> 
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->  sound/ac97/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/sound/ac97/Kconfig b/sound/ac97/Kconfig
-> index f8a64e15e5bf..baa5f8ef89d2 100644
-> --- a/sound/ac97/Kconfig
-> +++ b/sound/ac97/Kconfig
-> @@ -5,7 +5,6 @@
->  
->  config AC97_BUS_NEW
->  	tristate
-> -	select AC97
->  	help
->  	  This is the new AC97 bus type, successor of AC97_BUS. The ported
->  	  drivers which benefit from the AC97 automatic probing should "select"
-> -- 
-> 2.14.1
-> 
+2018-02-09 3:30 GMT+09:00 Kees Cook <keescook@chromium.org>:
+> On Fri, Feb 9, 2018 at 3:19 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> Add CC_HAS_STACKPROTECTOR(_STRONG) and proper dependency.
+>>
+>> I re-arranged the choice values, _STRONG, _REGULAR, _NONE in this order
+>> because the default of choice is the first visible symbol.
+>> [...]
+>> +# is this necessary?
+>> +#ifeq ($(CONFIG_CC_STACKPROTECTOR_NONE),y)
+>> +#KBUILD_CFLAGS += -fno-stack-protector
+>> +#endif
+>
+> Yes, and also in the case of a broken stack protector, because some
+> compilers enable stack protector by default, so if we've selected it
+> to be NONE or detected it as broken, we need to force it off in the
+> compiler.
+>
+>> +# TODO: run scripts/gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh from Kconfig
+>
+> FWIW, this is the part that I got stuck on.
+> gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh depends on the KBUILD
+> flags that got built up and detected up to this point in the Makefile,
+> so I couldn't find a way to run it out of Kconfig since it didn't know
+> what the KBUILD flags were yet.
 
-I didn't have a particular tree in mind for this patchset by the way.
-Feel free to take the patch in wherever it makes sense.
 
-Cheers,
-Ulf
+SRCARCH is fixed when loading Kconfig files.
+
+BITS is derived from CONFIG_64BIT.
+
+config 64BIT
+        bool "64-bit kernel" if ARCH = "x86"
+        default ARCH != "i386"
+        ---help---
+          Say yes to build a 64-bit kernel - formerly known as x86_64
+          Say no to build a 32-bit kernel - formerly known as i386
+
+
+This is a more difficult part because users can toggle this option
+from menuconfig, etc.
+
+If this option is changed, the compiler options must be re-computed,
+i.e. system() must be called again.
+
+This is missing in my first draft.
+
+I have not checked how slow it is.
+
+
+
+
+>> +
+>>  ifeq ($(cc-name),clang)
+>>  KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+>>  KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+>> diff --git a/arch/Kconfig b/arch/Kconfig
+>> index 76c0b54..50723d8 100644
+>> --- a/arch/Kconfig
+>> +++ b/arch/Kconfig
+>> @@ -538,10 +538,20 @@ config HAVE_CC_STACKPROTECTOR
+>>           - its compiler supports the -fstack-protector option
+>>           - it has implemented a stack canary (e.g. __stack_chk_guard)
+>>
+>> +config CC_HAS_STACKPROTECTOR
+>> +       bool
+>> +       option shell="$CC -Werror -fstack-protector -c -x c /dev/null"
+>> +
+>> +config CC_HAS_STACKPROTECTOR_STRONG
+>> +       bool
+>> +       option shell="$CC -Werror -fstack-protector-strong -c -x c /dev/null"
+>
+> I'm nervous we'll get tripped up here, since $CC may not include the
+> right $(KBUILD_CPPFLAGS) and $(CC_OPTION_CFLAGS) as in cc-option, both
+> of which are calculated during the Makefile run. But maybe it won't be
+> a problem in actual use.
+
+
+Right, I had noticed this is a problem, but not implemented yet.
+
+At least, some basic compiler options must be imported into Kconfig.
+
+Especially this is a problem for clang.
+One clang executable is built with lots of
+architecture back-ends.
+So,
+CLANG_TARGET    := --target=$(notdir $(CROSS_COMPILE:%-=%))
+etc. is mandatory.
+
+
+If I remember correctly, there existed some options
+that depend on others.
+
+I am not sure about the stackprotector case.
+
+
+
+>> +
+>> +config CC_STACKPROTECTOR
+>> +       bool
+>> +
+>>  choice
+>>         prompt "Stack Protector buffer overflow detection"
+>>         depends on HAVE_CC_STACKPROTECTOR
+>> -       default CC_STACKPROTECTOR_AUTO
+>>         help
+>>           This option turns on the "stack-protector" GCC feature. This
+>>           feature puts, at the beginning of functions, a canary value on
+>> @@ -551,26 +561,10 @@ choice
+>>           overwrite the canary, which gets detected and the attack is then
+>>           neutralized via a kernel panic.
+>>
+>> -config CC_STACKPROTECTOR_NONE
+>> -       bool "None"
+>> -       help
+>> -         Disable "stack-protector" GCC feature.
+>> -
+>> -config CC_STACKPROTECTOR_REGULAR
+>> -       bool "Regular"
+>> -       help
+>> -         Functions will have the stack-protector canary logic added if they
+>> -         have an 8-byte or larger character array on the stack.
+>> -
+>> -         This feature requires gcc version 4.2 or above, or a distribution
+>> -         gcc with the feature backported ("-fstack-protector").
+>> -
+>> -         On an x86 "defconfig" build, this feature adds canary checks to
+>> -         about 3% of all kernel functions, which increases kernel code size
+>> -         by about 0.3%.
+>> -
+>>  config CC_STACKPROTECTOR_STRONG
+>>         bool "Strong"
+>> +       depends on CC_HAS_STACKPROTECTOR_STRONG
+>> +       select CC_STACKPROTECTOR
+>>         help
+>>           Functions will have the stack-protector canary logic added in any
+>>           of the following conditions:
+>> @@ -588,11 +582,25 @@ config CC_STACKPROTECTOR_STRONG
+>>           about 20% of all kernel functions, which increases the kernel code
+>>           size by about 2%.
+>>
+>> -config CC_STACKPROTECTOR_AUTO
+>> -       bool "Automatic"
+>> +config CC_STACKPROTECTOR_REGULAR
+>> +       bool "Regular"
+>> +       depends on CC_HAS_STACKPROTECTOR
+>> +       select CC_STACKPROTECTOR
+>> +       help
+>> +         Functions will have the stack-protector canary logic added if they
+>> +         have an 8-byte or larger character array on the stack.
+>> +
+>> +         This feature requires gcc version 4.2 or above, or a distribution
+>> +         gcc with the feature backported ("-fstack-protector").
+>> +
+>> +         On an x86 "defconfig" build, this feature adds canary checks to
+>> +         about 3% of all kernel functions, which increases kernel code size
+>> +         by about 0.3%.
+>> +
+>> +config CC_STACKPROTECTOR_NONE
+>> +       bool "None"
+>>         help
+>> -         If the compiler supports it, the best available stack-protector
+>> -         option will be chosen.
+>> +         Disable "stack-protector" GCC feature.
+>>
+>>  endchoice
+>
+> I continue to love the idea, but we can't know a given ssp option is
+> _working_ until we run the test script, which may depend on compiler
+> flags. Regardless, I'll give this series a try and see if I can fix
+> anything I trip over. I've got a lot of notes on testing after getting
+> ..._AUTO working. Whatever happens, I hugely prefer having the
+> automatic selection possible in the Kconfig! Thanks for working on
+> this! :)
+
+Yes, your help is appreciated.
+We will find more TODO items during trial and error.  :)
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
