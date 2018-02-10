@@ -1,64 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f194.google.com ([209.85.217.194]:35254 "EHLO
-        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750853AbeBIUq4 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:55303 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750993AbeBJDDm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Feb 2018 15:46:56 -0500
-Received: by mail-ua0-f194.google.com with SMTP id n1so5987169uaa.2
-        for <linux-kbuild@vger.kernel.org>; Fri, 09 Feb 2018 12:46:56 -0800 (PST)
+        Fri, 9 Feb 2018 22:03:42 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180209124607.akjhncb5sempjqcn@huvuddator>
-References: <1518106752-29228-1-git-send-email-yamada.masahiro@socionext.com>
- <1518106752-29228-5-git-send-email-yamada.masahiro@socionext.com>
- <20180209053038.pscoijvowmyudyzf@huvuddator> <CAK7LNATRxYCx9sE1haw815votyA5K8GQrMPPh0Q+n3kYa=JsgA@mail.gmail.com>
- <20180209124607.akjhncb5sempjqcn@huvuddator>
-From: Kees Cook <keescook@chromium.org>
-Date: Fri, 9 Feb 2018 12:46:54 -0800
-Message-ID: <CAGXu5j+hv6G3m+fgr7ibXAnoE-2GsxtXoqr0pd5AaaNdFVQxYg@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell=
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 10 Feb 2018 12:02:58 +0900
+Message-ID: <CAK7LNARpX7HWB0Wj-_rMXFogFtUamWTWEr3ypb6v-s99pr5UNw@mail.gmail.com>
+Subject: [GIT PULL] Kbuild updates for v4.16 (2nd round)
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, masahiroy@kernel.org
 
-On Fri, Feb 9, 2018 at 4:46 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> One thing that makes Kconfig confusing (though it works well enough in
-> practice) is that .config files both record user selections (the saved
-> configuration) and serve as a configuration output format for make.
->
-> It becomes easier to think about .config files once you realize that
-> assignments to promptless symbols never have an effect on Kconfig
-> itself: They're just configuration output, intermixed with the saved
-> user selections.
->
-> Assume 'option env' symbols got written out for example:
->
->         - For a non-user-assignable symbol, the entry in the .config
->           file is just configuration output and ignored by Kconfig,
->           which will fetch the value from the environment instead.
->
->         - For an assignable 'option env' symbol, the entry in the
->           .config file is a saved user selection (as well as
->           configuration output), and will be respected by Kconfig.
+Hi Linus,
 
-In the stack-protector case, this becomes quite important, since the
-goal is to record the user's selection regardless of compiler
-capability. For example, if someone selects _REGULAR, it shouldn't
-"upgrade" to _STRONG. (Similarly for _NONE.) Having _AUTO provides a
-way to pick "best possible for this compiler", though. If a user had
-previously selected _STRONG but they're doing builds with an older
-compiler (or a misconfigured newer compiler) without support, the goal
-is to _fail_ to build, not silently select _REGULAR.
+Here are a little more Kbuild updates (including Kconfig changes).
+Please pull!
 
-So, in this case, what's gained is the logic for _AUTO, and the logic
-to not show, say, _STRONG when it's not available in the compiler. But
-we must still fail to build if _STRONG was in the .config. It can't
-silently rewrite it to _REGULAR because the compiler support for
-_STRONG regressed.
 
--Kees
+The following changes since commit 4bf772b14675411a69b3c807f73006de0fe4b649:
+
+  Merge tag 'drm-for-v4.16' of
+git://people.freedesktop.org/~airlied/linux (2018-02-01 17:48:47
+-0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-v4.16-2
+
+for you to fetch changes up to 523ca58b7db2e30e3c185a7927dd80a30c1bc743:
+
+  kconfig: remove const qualifier from sym_expand_string_value()
+(2018-02-10 11:31:49 +0900)
+
+----------------------------------------------------------------
+Kbuild updates for v4.16 (2nd)
+
+Makefile changes:
+- enable unused-variable warning that was wrongly disabled for clang
+
+Kconfig changes:
+- warn blank 'help' and fix existing instances
+- fix 'choice' behavior to not write out invisible symbols
+- fix misc weirdness
+
+Coccinell changes:
+- fix false positive of free after managed memory alloc detection
+- improve performance of NULL dereference detection
+
+----------------------------------------------------------------
+Julia Lawall (2):
+      coccinelle: devm_free: reduce false positives
+      coccinelle: deref_null: avoid useless computation
+
+Masahiro Yamada (8):
+      kconfig: do not write choice values when their dependency becomes n
+      kconfig: show '?' prompt even if no help text is available
+      kconfig: remove 'config*' pattern from .gitignnore
+      kconfig: remove check_stdin()
+      kconfig: echo stdin to stdout if either is redirected
+      kconfig: send error messages to stderr
+      kconfig: add xrealloc() helper
+      kconfig: remove const qualifier from sym_expand_string_value()
+
+Sodagudi Prasad (1):
+      kbuild: clang: disable unused variable warnings only when constant
+
+Ulf Magnusson (10):
+      video: fbdev: kconfig: Remove blank help text
+      mmc: kconfig: Remove blank help text
+      Staging: rtl8192u: kconfig: Remove blank help text
+      Staging: rtl8192e: kconfig: Remove blank help text
+      lib/Kconfig.debug: Remove blank help text
+      MIPS: BCM63XX: kconfig: Remove blank help text
+      MIPS: kconfig: Remove blank help text
+      arm: vt8500: kconfig: Remove blank help text
+      nios2: kconfig: Remove blank help text
+      kconfig: Warn if help text is blank
+
+ Makefile                                  |  3 +-
+ arch/arm/mach-vt8500/Kconfig              |  1 -
+ arch/mips/Kconfig                         |  1 -
+ arch/mips/bcm63xx/boards/Kconfig          |  1 -
+ arch/nios2/Kconfig                        |  1 -
+ drivers/mmc/host/Kconfig                  |  1 -
+ drivers/staging/rtl8192e/rtl8192e/Kconfig |  1 -
+ drivers/staging/rtl8192u/Kconfig          |  1 -
+ drivers/video/fbdev/Kconfig               |  1 -
+ lib/Kconfig.debug                         |  1 -
+ scripts/coccinelle/free/devm_free.cocci   | 55
++++++++++++++++++++++++++++++++++-
+ scripts/coccinelle/null/deref_null.cocci  |  6 ++--
+ scripts/kconfig/.gitignore                |  1 -
+ scripts/kconfig/conf.c                    | 40 ++++++++-----------------
+ scripts/kconfig/confdata.c                |  2 +-
+ scripts/kconfig/expr.c                    |  4 +--
+ scripts/kconfig/lkc.h                     |  1 +
+ scripts/kconfig/lkc_proto.h               |  2 +-
+ scripts/kconfig/nconf.gui.c               |  3 +-
+ scripts/kconfig/symbol.c                  | 22 +++++++-------
+ scripts/kconfig/util.c                    | 15 ++++++++--
+ scripts/kconfig/zconf.l                   | 29 ++++++++++--------
+ scripts/kconfig/zconf.y                   |  6 ++++
+ 23 files changed, 121 insertions(+), 77 deletions(-)
+
 
 -- 
-Kees Cook
-Pixel Security
+Best Regards
+Masahiro Yamada
