@@ -1,88 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:45415 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751145AbeBJOTl (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:43630 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751049AbeBJOZQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 10 Feb 2018 09:19:41 -0500
-Date: Sat, 10 Feb 2018 15:19:36 +0100
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: Re: [PATCH 16/20] auxdisplay: img-ascii-lcd: Remove MIPS_SEAD3 dep.
-Message-ID: <20180210141936.mi2mo4c45nfzw34a@huvuddator>
-References: <20180205012146.23981-1-ulfalizer@gmail.com>
- <20180205012146.23981-17-ulfalizer@gmail.com>
- <CAAG0J98pFG=XFYAzQJ2+hROWWF1C=g-jePk6wh2EXsxX51TGVQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAAG0J98pFG=XFYAzQJ2+hROWWF1C=g-jePk6wh2EXsxX51TGVQ@mail.gmail.com>
+        Sat, 10 Feb 2018 09:25:16 -0500
+Received: by mail-pg0-f66.google.com with SMTP id f6so5220194pgs.10
+        for <linux-kbuild@vger.kernel.org>; Sat, 10 Feb 2018 06:25:16 -0800 (PST)
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: [PATCH 0/2] remove the last of incremental linking
+Date: Sun, 11 Feb 2018 00:25:02 +1000
+Message-Id: <20180210142504.29890-1-npiggin@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james@albanarts.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, Linus Walleij <linus.walleij@linaro.org>, Vineet Gupta <vgupta@synopsys.com>, Mel Gorman <mgorman@techsingularity.net>, hch@lst.de, mina86@mina86.com, robh@kernel.org, Stephen Boyd <sboyd@codeaurora.org>, paulus@ozlabs.org, Will Deacon <will.deacon@arm.com>, tony@atomide.com, npiggin@gmail.com, Masahiro Yamada <yamada.masahiro@socionext.com>, Miguel Ojeda Sandonis <miguel.ojeda.sandonis@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 
-On Thu, Feb 08, 2018 at 05:35:30PM +0000, James Hogan wrote:
-> On 5 February 2018 at 01:21, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> > The MIPS_SEAD3 symbol was removed in commit 64601cb1343f ("leds: Remove SEAD-3
-> > driver").
-> >
-> > Remove the MIPS_SEAD3 dependency from IMG_ASCII_LCD.
-> 
-> Its not a dependency, just a default (presumably so that existing
-> kernel configs get updated automatically).
+I don't think there is any point to keeping around the deprecated
+incremental linking option for too long. So I propose to remove it.
 
-Note that it appears in the default's condition rather than as part of
-the default value.
+After that is removed, I wonder what people think of changing from
+built-in.o to built-in.a?
 
-Undefined Kconfig symbols always evaluate to n in a tristate state,
-regardless of whether they're given a user value in a .config file or
-not, so this is a no-op as far as Kconfig in concerned.
+Thanks,
+Nick
 
-The motivation in the original commit message was a bit lackluster
-though. I've submitted a v2.
+Nicholas Piggin (2):
+  kbuild: remove incremental linking option
+  kbuild: rename built-in.o to built-in.a
 
-> 
-> Note that sead3 now uses MIPS_GENERIC (or more specifically
-> CONFIG_LEGACY_BOARD_SEAD3), but this driver is enabled in the config
-> snippets, e.g.:
-> arch/mips/configs/generic/board-sead-3.config
-> arch/mips/configs/generic/board-boston.config
-> 
-> so indeed there is no real need to replace MIPS_SEAD3 with anything here.
-> 
-> Cheers
-> James
-> 
-> >
-> > Discovered with the
-> > https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
-> > script.
-> >
-> > Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> > ---
-> >  drivers/auxdisplay/Kconfig | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/auxdisplay/Kconfig b/drivers/auxdisplay/Kconfig
-> > index 2c2ed9cf8796..3cba78d36eec 100644
-> > --- a/drivers/auxdisplay/Kconfig
-> > +++ b/drivers/auxdisplay/Kconfig
-> > @@ -137,7 +137,7 @@ config CFAG12864B_RATE
-> >  config IMG_ASCII_LCD
-> >         tristate "Imagination Technologies ASCII LCD Display"
-> >         depends on HAS_IOMEM
-> > -       default y if MIPS_MALTA || MIPS_SEAD3
-> > +       default y if MIPS_MALTA
-> >         select SYSCON
-> >         help
-> >           Enable this to support the simple ASCII LCD displays found on
-> > --
-> > 2.14.1
-> >
-> 
-> 
-> 
-> -- 
-> James Hogan
+ Documentation/kbuild/makefiles.txt | 22 ++++++---
+ Documentation/process/changes.rst  |  2 +-
+ Makefile                           | 14 +++---
+ arch/Kconfig                       |  6 ---
+ arch/blackfin/kernel/bfin_ksyms.c  |  2 +-
+ arch/powerpc/kernel/Makefile       |  2 +-
+ drivers/s390/Makefile              |  2 +-
+ lib/Kconfig.debug                  |  4 +-
+ scripts/Makefile.build             | 38 ++++++---------
+ scripts/Makefile.lib               |  6 +--
+ scripts/link-vmlinux.sh            | 99 ++++++++++++++------------------------
+ scripts/namespace.pl               |  2 +-
+ usr/initramfs_data.S               |  2 +-
+ 13 files changed, 82 insertions(+), 119 deletions(-)
 
-Cheers,
-Ulf
+-- 
+2.15.1
+
