@@ -1,75 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f44.google.com ([209.85.214.44]:37316 "EHLO
-        mail-it0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752224AbeBKH2s (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:47569 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752038AbeBKIli (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Feb 2018 02:28:48 -0500
-MIME-Version: 1.0
-In-Reply-To: <CA+55aFxdx3FYE6YGifRR=BSG9QzXwgThj5z7RmV5P5+RpNXSiQ@mail.gmail.com>
-References: <1518106752-29228-1-git-send-email-yamada.masahiro@socionext.com>
- <1518106752-29228-5-git-send-email-yamada.masahiro@socionext.com>
- <20180209053038.pscoijvowmyudyzf@huvuddator> <CAK7LNATRxYCx9sE1haw815votyA5K8GQrMPPh0Q+n3kYa=JsgA@mail.gmail.com>
- <20180209124607.akjhncb5sempjqcn@huvuddator> <CAGXu5j+hv6G3m+fgr7ibXAnoE-2GsxtXoqr0pd5AaaNdFVQxYg@mail.gmail.com>
- <20180210054843.z3g7wvcmlccvww3h@huvuddator> <CAK7LNARHmAF2SxBcc1aUEH5MMzUo_furLevqy7QzGxqNRHYiyQ@mail.gmail.com>
- <20180210074924.3nhxsza5zdbaahxx@huvuddator> <20180210080556.mycqsjhxbaguwhay@huvuddator>
- <20180210085519.737ckf4bcl57h4g2@huvuddator> <CAGXu5jKQgxxC2RQL0dxLKFVED2v-LiWKjtXY3DDpfwAXbnxM4Q@mail.gmail.com>
- <CA+55aFz-SJ970iqDsR8-Ke4z6WvB4n9RXAeen8pG=+YJWubETw@mail.gmail.com>
- <CAGXu5jLo0iuMsH89vj3nr8sv+1YvXfXgoPeBdxHwZm5i=DWoOA@mail.gmail.com> <CA+55aFxdx3FYE6YGifRR=BSG9QzXwgThj5z7RmV5P5+RpNXSiQ@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 10 Feb 2018 23:28:45 -0800
-Message-ID: <CA+55aFyPyYyG-riaBQU5cGp_sC=r8mf9Mg6L=DUEH6EyQfWYwA@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell=
-Content-Type: text/plain; charset="UTF-8"
+        Sun, 11 Feb 2018 03:41:38 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: process mixture of clean/build targets one by one
+Date: Sun, 11 Feb 2018 17:40:29 +0900
+Message-Id: <1518338429-5587-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Meyer <thomas@m3y3r.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Sat, Feb 10, 2018 at 8:46 PM, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> Argh. I wanted to get rid of all that entirely, and simplify this all.
-> The mentioned script (and bugzilla) was from 2006, I assumed this was
-> all historical.
->
-> But if it has broken again since, I guess we need to have a silly script. Grr.
+I sometimes receive a question why "make -j<N> clean all" does not
+work.  It is actually possible to make it work by handling targets
+one by one.
 
-Ok, so this really ended up bothering me.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-I was hoping to really just unify all the stupid compiler flag testing
-in just the Kconfig files and hoping we could really just use
+ Makefile | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-    config CC_xyz
-        bool
-        option cc_option "-fwhatever-xyz"
+diff --git a/Makefile b/Makefile
+index cd9145c..31d138e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -220,7 +220,8 @@ export srctree objtree VPATH
+ version_h := include/generated/uapi/linux/version.h
+ old_version_h := include/linux/version.h
+ 
+-no-dot-config-targets := clean mrproper distclean \
++clean-targets := %clean mrproper cleandocs
++no-dot-config-targets := $(clean-targets) \
+ 			 cscope gtags TAGS tags help% %docs check% coccicheck \
+ 			 $(version_h) headers_% archheaders archscripts \
+ 			 kernelversion %src-pkg
+@@ -243,6 +244,14 @@ ifeq ($(KBUILD_EXTMOD),)
+                 endif
+         endif
+ endif
++
++# For "make -j clean all", "make -j mrproper defconfig all", etc.
++ifneq ($(filter $(clean-targets),$(MAKECMDGOALS)),)
++        ifneq ($(filter-out $(clean-targets),$(MAKECMDGOALS)),)
++                mixed-targets := 1
++        endif
++endif
++
+ # install and modules_install need also be processed one by one
+ ifneq ($(filter install,$(MAKECMDGOALS)),)
+         ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
+-- 
+2.7.4
 
-to set them, and then build Kconfig rules from that:
-
-    config USE_xyz
-        bool "Some question that needs xyz"
-        depends on CC_xyz
-
-and have a nice simple
-
-    ccflags-$(CONFIG_USE_xyz) += -fwhataver-xyz
-
-in the Makefiles.
-
-And one thought I had was "hey, if we need a script for
--fstack-protector, maybe we can simply standardize on _everything_
-using a script".
-
-But doing the stats, we test about two _hundred_  different compiler
-options, and it really looks like -fstack-protector is the _only_ one
-that uses a dedicated script. Everything else is just using the "see
-if the compiler accepts the flag". So no, we wouldn't want to
-standardize around a script.
-
-We do have a script for some other build options related to gcc
-breakage, but not command line flags per se: both 'asm goto' and for
-gcc version generation. And gcc plugin compatibility checking.
-
-Oh well. It looks like we really have to have those nasty exceptions
-from the normal rules.
-
-                 Linus
