@@ -1,73 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:40775 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752374AbeBKENc (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:21666 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752915AbeBKEix (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 10 Feb 2018 23:13:32 -0500
-Received: by mail-vk0-f65.google.com with SMTP id h69so7094705vke.7
-        for <linux-kbuild@vger.kernel.org>; Sat, 10 Feb 2018 20:13:32 -0800 (PST)
+        Sat, 10 Feb 2018 23:38:53 -0500
+Received: from mail-ua0-f175.google.com (mail-ua0-f175.google.com [209.85.217.175]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id w1B4cjtT032697
+        for <linux-kbuild@vger.kernel.org>; Sun, 11 Feb 2018 13:38:46 +0900
+Received: by mail-ua0-f175.google.com with SMTP id y17so5844912uaa.13
+        for <linux-kbuild@vger.kernel.org>; Sat, 10 Feb 2018 20:38:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CA+55aFz-SJ970iqDsR8-Ke4z6WvB4n9RXAeen8pG=+YJWubETw@mail.gmail.com>
-References: <1518106752-29228-1-git-send-email-yamada.masahiro@socionext.com>
- <1518106752-29228-5-git-send-email-yamada.masahiro@socionext.com>
- <20180209053038.pscoijvowmyudyzf@huvuddator> <CAK7LNATRxYCx9sE1haw815votyA5K8GQrMPPh0Q+n3kYa=JsgA@mail.gmail.com>
- <20180209124607.akjhncb5sempjqcn@huvuddator> <CAGXu5j+hv6G3m+fgr7ibXAnoE-2GsxtXoqr0pd5AaaNdFVQxYg@mail.gmail.com>
- <20180210054843.z3g7wvcmlccvww3h@huvuddator> <CAK7LNARHmAF2SxBcc1aUEH5MMzUo_furLevqy7QzGxqNRHYiyQ@mail.gmail.com>
- <20180210074924.3nhxsza5zdbaahxx@huvuddator> <20180210080556.mycqsjhxbaguwhay@huvuddator>
- <20180210085519.737ckf4bcl57h4g2@huvuddator> <CAGXu5jKQgxxC2RQL0dxLKFVED2v-LiWKjtXY3DDpfwAXbnxM4Q@mail.gmail.com>
- <CA+55aFz-SJ970iqDsR8-Ke4z6WvB4n9RXAeen8pG=+YJWubETw@mail.gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Sat, 10 Feb 2018 20:13:31 -0800
-Message-ID: <CAGXu5jLo0iuMsH89vj3nr8sv+1YvXfXgoPeBdxHwZm5i=DWoOA@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell=
+In-Reply-To: <20180210142504.29890-3-npiggin@gmail.com>
+References: <20180210142504.29890-1-npiggin@gmail.com> <20180210142504.29890-3-npiggin@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 11 Feb 2018 13:38:04 +0900
+Message-ID: <CAK7LNAT=9d9W8kTjzSTRATLvvHVUqQN-7h_owvon_a=oLy0T_A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: rename built-in.o to built-in.a
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Sat, Feb 10, 2018 at 12:08 PM, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
-> On Sat, Feb 10, 2018 at 11:23 AM, Kees Cook <keescook@chromium.org> wrote:
->>
->> So, if this could do something like this:
->>
->>         config CC_HAS_STACKPROTECTOR_STRONG
->>                 bool
->>                 option
->> shell="scripts/gcc-${ARCH}_${BITS}-has-stack-protector.sh $CC
->> $KBUILD_CPPFLAGS"
+2018-02-10 23:25 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> Incremental linking is gone, so rename built-in.o to built-in.a, which
+> is the usual extension for archive files.
 >
-> Guys, this is not that important.
+> This patch does two things, first is a simple search/replace:
 >
-> Don't make some stupid script for stackprotector. If the user doesn't
-> have a gcc that supports -fstackprotector-*, then don't show the
-> options. It matters NOT ONE WHIT whether that then means that
-> stackprotector will be off by default later.
+> git grep -l 'built-in\.o' | xargs sed -i 's/built-in\.o/built-in\.a/g'
+>
+> The second is to invert nesting of nested text manipulations to avoid
+> filtering built-in.a out from libs-y2:
+>
+> -libs-y2 := $(filter-out %.a, $(patsubst %/, %/built-in.a, $(libs-y)))
+> +libs-y2 := $(patsubst %/, %/built-in.a, $(filter-out %.a, $(libs-y)))
+>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-What? Maybe you're misunderstanding the script? This script already exists:
 
-$ ls scripts/gcc-x86_*
-scripts/gcc-x86_32-has-stack-protector.sh
-scripts/gcc-x86_64-has-stack-protector.sh
+I think this is the right thing to do, but I have no idea
+why 'less kernel/built-in.a' shows strange output.
+Do you have a clue?
 
-It's been there since the very beginning when Arjan added it to
-validate that the compiler actually produces a stack protector when
-you give it -fstack-protector. Older gccs broke this entirely, more
-recent misconfigurations (as seen with some of Arnd's local gcc
-builds) did similar, and there have been regressions in some versions
-where gcc's x86 support flipped to the global canary instead of the
-%gs-offset canary.
 
-> Seriously. This is classic "Kees thinks that _his_ code is so
-> important that everybody should get the value _he_ cares about".
+Without this patch,
+'emacs kernel/built-in.o'
+'cat kernel/built-in.o'
+'less kernel/built-in.o'
 
-I care about the kernel build informing people about what's gone wrong
-as early as possible instead of producing an unbootable image that
-takes forever to debug.
+showed me the same content.
 
--Kees
+$ less kernel/built-in.o | head -n 10
+!<thin>
+//                                              2964      `
+fork.o/
+exec_domain.o/
+panic.o/
+cpu.o/
+exit.o/
+softirq.o/
+resource.o/
+sysctl.o/
+
+
+
+
+After applying this patch,
+'less kernel/built-in.a' is strange.
+
+
+$ less kernel/built-in.a | head -n 10
+rw-r--r-- 0/0  60216 Jan  1 09:00 1970 kernel/fork.o
+rw-r--r-- 0/0   3648 Jan  1 09:00 1970 kernel/exec_domain.o
+rw-r--r-- 0/0  20552 Jan  1 09:00 1970 kernel/panic.o
+rw-r--r-- 0/0  87752 Jan  1 09:00 1970 kernel/cpu.o
+rw-r--r-- 0/0  34136 Jan  1 09:00 1970 kernel/exit.o
+rw-r--r-- 0/0  41448 Jan  1 09:00 1970 kernel/softirq.o
+rw-r--r-- 0/0  40904 Jan  1 09:00 1970 kernel/resource.o
+rw-r--r-- 0/0  60968 Jan  1 09:00 1970 kernel/sysctl.o
+rw-r--r-- 0/0   4472 Jan  1 09:00 1970 kernel/sysctl_binary.o
+rw-r--r-- 0/0  12472 Jan  1 09:00 1970 kernel/capability.o
+
+
+However, 'cat kernel/built-in.a' works as I expect.
+
+$ cat  kernel/built-in.a | head -n 10
+!<thin>
+//                                              2964      `
+fork.o/
+exec_domain.o/
+panic.o/
+cpu.o/
+exit.o/
+softirq.o/
+resource.o/
+sysctl.o/
+
+
+
+Is my 'less' insane?
+Or, is this intentional behavior of 'less'?
+
+
+
 
 -- 
-Kees Cook
-Pixel Security
+Best Regards
+Masahiro Yamada
