@@ -1,69 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:35875 "EHLO
-        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751077AbeBKQkT (ORCPT
+Received: from mail-ua0-f193.google.com ([209.85.217.193]:33813 "EHLO
+        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753545AbeBKQyc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Feb 2018 11:40:19 -0500
+        Sun, 11 Feb 2018 11:54:32 -0500
+Received: by mail-ua0-f193.google.com with SMTP id g5so8121198uac.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 11 Feb 2018 08:54:31 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180210141405.syaeuuktkebsp5jy@huvuddator>
-References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-17-ulfalizer@gmail.com>
- <CANiq72kaCDcUHFuJ0P4CA-0KGgg+a8T+66p0aPwatAjfvDB8bA@mail.gmail.com> <20180210141405.syaeuuktkebsp5jy@huvuddator>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sun, 11 Feb 2018 17:40:18 +0100
-Message-ID: <CANiq72mDZQFGsTXZM+ULd-5BLbA6xOjvKPoiCKuvF_hyhBmCrA@mail.gmail.com>
-Subject: Re: [PATCH v2] auxdisplay: img-ascii-lcd: kconfig: Remove MIPS_SEAD3 reference
+In-Reply-To: <CA+55aFyPyYyG-riaBQU5cGp_sC=r8mf9Mg6L=DUEH6EyQfWYwA@mail.gmail.com>
+References: <1518106752-29228-1-git-send-email-yamada.masahiro@socionext.com>
+ <1518106752-29228-5-git-send-email-yamada.masahiro@socionext.com>
+ <20180209053038.pscoijvowmyudyzf@huvuddator> <CAK7LNATRxYCx9sE1haw815votyA5K8GQrMPPh0Q+n3kYa=JsgA@mail.gmail.com>
+ <20180209124607.akjhncb5sempjqcn@huvuddator> <CAGXu5j+hv6G3m+fgr7ibXAnoE-2GsxtXoqr0pd5AaaNdFVQxYg@mail.gmail.com>
+ <20180210054843.z3g7wvcmlccvww3h@huvuddator> <CAK7LNARHmAF2SxBcc1aUEH5MMzUo_furLevqy7QzGxqNRHYiyQ@mail.gmail.com>
+ <20180210074924.3nhxsza5zdbaahxx@huvuddator> <20180210080556.mycqsjhxbaguwhay@huvuddator>
+ <20180210085519.737ckf4bcl57h4g2@huvuddator> <CAGXu5jKQgxxC2RQL0dxLKFVED2v-LiWKjtXY3DDpfwAXbnxM4Q@mail.gmail.com>
+ <CA+55aFz-SJ970iqDsR8-Ke4z6WvB4n9RXAeen8pG=+YJWubETw@mail.gmail.com>
+ <CAGXu5jLo0iuMsH89vj3nr8sv+1YvXfXgoPeBdxHwZm5i=DWoOA@mail.gmail.com>
+ <CA+55aFxdx3FYE6YGifRR=BSG9QzXwgThj5z7RmV5P5+RpNXSiQ@mail.gmail.com> <CA+55aFyPyYyG-riaBQU5cGp_sC=r8mf9Mg6L=DUEH6EyQfWYwA@mail.gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Sun, 11 Feb 2018 08:54:29 -0800
+Message-ID: <CAGXu5jJXn0YgPz9fzrHrWOhQCB_+iN2TJ4AQXjozxh32pBowhQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell=
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, Tony Lindgren <tony@atomide.com>, npiggin@gmail.com, yamada.masahiro@socionext.com
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Sat, Feb 10, 2018 at 3:14 PM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> Commit 3f5f0a4475e1 ("MIPS: generic: Convert SEAD-3 to a generic board")
-> removed the MIPS_SEAD3 symbol and moved the setting of IMG_ASCII_LCD to
-> the board-sead-3.config defconfig file, but IMG_ASCII_LCD still
-> references the removed MIPS_SEAD3 symbol.
->
-> Remove the reference.
->
-> Discovered with the
-> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
-> script.
->
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
-> Changes in v2:
->
->  - The wrong commit was referenced in the commit message.
->
->  - Mention that IMG_ASCII_LCD is now set via the board-sead-3.config defconfig
->    file.
->
->  - Clarify that Kconfig is involved. The previous commit title was
->    "auxdisplay: img-ascii-lcd: Remove MIPS_SEAD3 reference".
->
+On Sat, Feb 10, 2018 at 11:28 PM, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+> On Sat, Feb 10, 2018 at 8:46 PM, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>>
+>> Argh. I wanted to get rid of all that entirely, and simplify this all.
+>> The mentioned script (and bugzilla) was from 2006, I assumed this was
+>> all historical.
+>>
+>> But if it has broken again since, I guess we need to have a silly script. Grr.
+> [...]
+> Oh well. It looks like we really have to have those nasty exceptions
+> from the normal rules.
 
-Thanks for the new version!
+Yeah, I was really disappointed to discover the broken gcc case Arnd
+had while I was testing the new ..._AUTO option. I thought I was going
+to be able to throw away a whole bunch of the complexity too. :( And
+this was on top of the recent discussion about raising the minimum gcc
+level to a place where there wasn't any need for the "old broken gcc"
+stack-protectors checks. But, no, that would have been too easy. :(
 
-Signed-off-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+-Kees
 
->
->  drivers/auxdisplay/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/auxdisplay/Kconfig b/drivers/auxdisplay/Kconfig
-> index 2c2ed9cf8796..3cba78d36eec 100644
-> --- a/drivers/auxdisplay/Kconfig
-> +++ b/drivers/auxdisplay/Kconfig
-> @@ -137,7 +137,7 @@ config CFAG12864B_RATE
->  config IMG_ASCII_LCD
->         tristate "Imagination Technologies ASCII LCD Display"
->         depends on HAS_IOMEM
-> -       default y if MIPS_MALTA || MIPS_SEAD3
-> +       default y if MIPS_MALTA
->         select SYSCON
->         help
->           Enable this to support the simple ASCII LCD displays found on
-> --
-> 2.14.1
->
+-- 
+Kees Cook
+Pixel Security
