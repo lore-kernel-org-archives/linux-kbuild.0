@@ -1,9 +1,9 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:35208 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753862AbeBLOY1 (ORCPT
+Received: from mail-vk0-f65.google.com ([209.85.213.65]:39598 "EHLO
+        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933721AbeBLO3U (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Feb 2018 09:24:27 -0500
+        Mon, 12 Feb 2018 09:29:20 -0500
 MIME-Version: 1.0
 In-Reply-To: <CAK7LNAQPGht_wBPr_66shL-59mvaXRzDeuSNKicf+zu5Y1CmCA@mail.gmail.com>
 References: <20180210085519.737ckf4bcl57h4g2@huvuddator> <CAGXu5jKQgxxC2RQL0dxLKFVED2v-LiWKjtXY3DDpfwAXbnxM4Q@mail.gmail.com>
@@ -15,17 +15,18 @@ References: <20180210085519.737ckf4bcl57h4g2@huvuddator> <CAGXu5jKQgxxC2RQL0dxLK
  <CAFkk2KSk_OpwagN_Ru0fHPyALK5HwtxHOcMhT8OHqeOH3hOP+w@mail.gmail.com>
  <CAFkk2KRm+_NQ2QLUta7fbezngLpD3eZ5NEp57SymBRMUZQZ4wQ@mail.gmail.com>
  <20180212125458.vb4ve3ieejvuvo65@huvuddator> <CAK7LNAQPGht_wBPr_66shL-59mvaXRzDeuSNKicf+zu5Y1CmCA@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 12 Feb 2018 23:23:37 +0900
-Message-ID: <CAK7LNATZZPHMVM+2a_iXwggMT-VF=-nkMom7e4JYzgPpnC0RPg@mail.gmail.com>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Mon, 12 Feb 2018 15:29:18 +0100
+Message-ID: <CAFkk2KR9sBHDcv5_HEc5dFTMOzW_7DpPH3i42tnriRVKVxho9w@mail.gmail.com>
 Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell=
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Kees Cook <keescook@chromium.org>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Tejun Heo <tj@kernel.org>, Ingo Molnar <mingo@kernel.org>, "Van De Ven, Arjan" <arjan.van.de.ven@intel.com>, Arnd Bergmann <arnd@arndb.de>
 
-2018-02-12 23:21 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+On Mon, Feb 12, 2018 at 3:21 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 > 2018-02-12 21:54 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
 >> On Sun, Feb 11, 2018 at 09:42:09PM +0100, Ulf Magnusson wrote:
 >>> On Sun, Feb 11, 2018 at 9:29 PM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
@@ -134,29 +135,13 @@ Cc: Kees Cook <keescook@chromium.org>, Linus Torvalds <torvalds@linux-foundation
 > silentoldconfig touches include/generated/autoconf.h
 > so, files that depend on it will be re-compiled, unnecessarily.
 
+Hmm... my understanding was that fixdep would replace those direct
+dependencies on include/generated/autoconf.h with dependencies on the
+magic empty files corresponding to Kconfig symbols in include/config/.
 
-Sorry, I take back this comment.
-fixdep takes care of this.
+What stuff depends directly on include/generated/autoconf.h?
 
-So, autoconf.h is removed from dependency.
+I'm way more familiar with Kconfig than the kernel Makefiles.
 
-
-
-
-
->
-> silentoldconfig ( 'syncconfig' in a more proper name)
-> should be run only when necessary.
->
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Cheers,
+Ulf
