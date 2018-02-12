@@ -1,75 +1,158 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f194.google.com ([209.85.216.194]:42168 "EHLO
-        mail-qt0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932157AbeBKW3c (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:29913 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932266AbeBLA6Q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Feb 2018 17:29:32 -0500
+        Sun, 11 Feb 2018 19:58:16 -0500
+Received: from mail-vk0-f44.google.com (mail-vk0-f44.google.com [209.85.213.44]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id w1C0wDNk014793
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Feb 2018 09:58:14 +0900
+Received: by mail-vk0-f44.google.com with SMTP id a63so7940408vkg.6
+        for <linux-kbuild@vger.kernel.org>; Sun, 11 Feb 2018 16:58:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a3DHkpbRxUTP77OoeAqRHDz-tL-qYxLfq61Wv8NUPmyjA@mail.gmail.com>
-References: <20180210054843.z3g7wvcmlccvww3h@huvuddator> <CAK7LNARHmAF2SxBcc1aUEH5MMzUo_furLevqy7QzGxqNRHYiyQ@mail.gmail.com>
- <20180210074924.3nhxsza5zdbaahxx@huvuddator> <20180210080556.mycqsjhxbaguwhay@huvuddator>
- <20180210085519.737ckf4bcl57h4g2@huvuddator> <CAGXu5jKQgxxC2RQL0dxLKFVED2v-LiWKjtXY3DDpfwAXbnxM4Q@mail.gmail.com>
- <CA+55aFz-SJ970iqDsR8-Ke4z6WvB4n9RXAeen8pG=+YJWubETw@mail.gmail.com>
- <CAGXu5jLo0iuMsH89vj3nr8sv+1YvXfXgoPeBdxHwZm5i=DWoOA@mail.gmail.com>
- <CA+55aFxdx3FYE6YGifRR=BSG9QzXwgThj5z7RmV5P5+RpNXSiQ@mail.gmail.com>
- <CA+55aFyPyYyG-riaBQU5cGp_sC=r8mf9Mg6L=DUEH6EyQfWYwA@mail.gmail.com>
- <20180211103432.pf2ot6nd7nbhdhsy@huvuddator> <CAGXu5jLtFcvbazxUvL_=6uT+a8m0JQEB7v0OE41Z-PMoX_fWpA@mail.gmail.com>
- <CA+55aFz3gUKQMr-X-b=ytLPX0AjGUaXNtLSUQ0_xZwZuDU33RQ@mail.gmail.com>
- <CAGXu5jLV-i5OAbXMQiJC-idXB+XrxMCC+RigQ+4R6eZWqn4rgg@mail.gmail.com>
- <CA+55aFwWQ4nL2Asmzn0NSsw=w-tX5hAM9bFiOZhxehnhWH+wkw@mail.gmail.com>
- <CA+55aFy4WNC=pmga19CHhrX9QwOJsu1bUvGL0oNxq5EeMW94eg@mail.gmail.com> <CAK8P3a3DHkpbRxUTP77OoeAqRHDz-tL-qYxLfq61Wv8NUPmyjA@mail.gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Sun, 11 Feb 2018 23:29:29 +0100
-Message-ID: <CAMuHMdWoXH3+bifmHAQb8KYz5Tsfz=zxRqAsVmfsexbucX6w0g@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell=
+In-Reply-To: <20180211211508.4261ebf2@roar.ozlabs.ibm.com>
+References: <20180210142504.29890-1-npiggin@gmail.com> <20180210142504.29890-3-npiggin@gmail.com>
+ <CAK7LNAT=9d9W8kTjzSTRATLvvHVUqQN-7h_owvon_a=oLy0T_A@mail.gmail.com> <20180211211508.4261ebf2@roar.ozlabs.ibm.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 12 Feb 2018 09:57:32 +0900
+Message-ID: <CAK7LNAQwrtJyydyvvjjtOngCkc9WLk9-0Pk57GpfCP9srAQQrg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: rename built-in.o to built-in.a
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Tejun Heo <tj@kernel.org>, Ingo Molnar <mingo@kernel.org>, "Van De Ven, Arjan" <arjan.van.de.ven@intel.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Sun, Feb 11, 2018 at 10:10 PM, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Sun, Feb 11, 2018 at 9:06 PM, Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->> On Sun, Feb 11, 2018 at 11:53 AM, Linus Torvalds
->> <torvalds@linux-foundation.org> wrote:
->>>
->>> Well, it's still not a very *big* bump. With modern distros being at
->>> 7.3, and people testing pre-releases of gcc-8, something like gcc-4.5
->>> is still pretty darn ancient.
->>
->> ... it's worth noting that our _documentation_ may claim that gcc-3.2
->> is the minimum supported version, but Arnd pointed out that a few
->> months ago that apparently nothing older than 4.1 has actually worked
->> for a longish while, and gcc-4.3 was needed on several architectures.
->>
->> So the _real_ jump in required gcc version would be from 4.1 (4.3 in
->> many cases) to 4.5, not from our documented "3.2 minimum".
->>
->> Arnd claimed that some architectures needed even newer-than-4.3, but I
->> assume that's limited to things like RISC-V that simply don't have old
->> gcc support at all.
+2018-02-11 20:15 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> On Sun, 11 Feb 2018 13:38:04 +0900
+> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 >
-> Right. Also architecture specific features may need something more recent,
-> and in some cases like the 'initializer for anonymous union needs extra
-> curly braces', a trivial change would make it work, but a lot of architectures
-> have obviously never been built with toolchains old enough to actually
-> run into those cases.
+>> 2018-02-10 23:25 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+>> > Incremental linking is gone, so rename built-in.o to built-in.a, which
+>> > is the usual extension for archive files.
+>> >
+>> > This patch does two things, first is a simple search/replace:
+>> >
+>> > git grep -l 'built-in\.o' | xargs sed -i 's/built-in\.o/built-in\.a/g'
+>> >
+>> > The second is to invert nesting of nested text manipulations to avoid
+>> > filtering built-in.a out from libs-y2:
+>> >
+>> > -libs-y2 := $(filter-out %.a, $(patsubst %/, %/built-in.a, $(libs-y)))
+>> > +libs-y2 := $(patsubst %/, %/built-in.a, $(filter-out %.a, $(libs-y)))
+>> >
+>> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>>
+>>
+>> I think this is the right thing to do, but I have no idea
+>> why 'less kernel/built-in.a' shows strange output.
+>> Do you have a clue?
+>>
+>>
+>> Without this patch,
+>> 'emacs kernel/built-in.o'
+>> 'cat kernel/built-in.o'
+>> 'less kernel/built-in.o'
+>>
+>> showed me the same content.
+>>
+>> $ less kernel/built-in.o | head -n 10
+>> !<thin>
+>> //                                              2964      `
+>> fork.o/
+>> exec_domain.o/
+>> panic.o/
+>> cpu.o/
+>> exit.o/
+>> softirq.o/
+>> resource.o/
+>> sysctl.o/
+>>
+>>
+>>
+>>
+>> After applying this patch,
+>> 'less kernel/built-in.a' is strange.
+>>
+>>
+>> $ less kernel/built-in.a | head -n 10
+>> rw-r--r-- 0/0  60216 Jan  1 09:00 1970 kernel/fork.o
+>> rw-r--r-- 0/0   3648 Jan  1 09:00 1970 kernel/exec_domain.o
+>> rw-r--r-- 0/0  20552 Jan  1 09:00 1970 kernel/panic.o
+>> rw-r--r-- 0/0  87752 Jan  1 09:00 1970 kernel/cpu.o
+>> rw-r--r-- 0/0  34136 Jan  1 09:00 1970 kernel/exit.o
+>> rw-r--r-- 0/0  41448 Jan  1 09:00 1970 kernel/softirq.o
+>> rw-r--r-- 0/0  40904 Jan  1 09:00 1970 kernel/resource.o
+>> rw-r--r-- 0/0  60968 Jan  1 09:00 1970 kernel/sysctl.o
+>> rw-r--r-- 0/0   4472 Jan  1 09:00 1970 kernel/sysctl_binary.o
+>> rw-r--r-- 0/0  12472 Jan  1 09:00 1970 kernel/capability.o
+>>
+>>
+>> However, 'cat kernel/built-in.a' works as I expect.
+>>
+>> $ cat  kernel/built-in.a | head -n 10
+>> !<thin>
+>> //                                              2964      `
+>> fork.o/
+>> exec_domain.o/
+>> panic.o/
+>> cpu.o/
+>> exit.o/
+>> softirq.o/
+>> resource.o/
+>> sysctl.o/
+>>
+>>
+>>
+>> Is my 'less' insane?
+>> Or, is this intentional behavior of 'less'?
 >
-> Geert is the only person I know that actively uses gcc-4.1, and he actually
-> sent some patches that seem to get additional architectures to build on
-> that version, when they were previously on gcc-4.3+.
+> Interesting, my less does not do that. Instead of the raw contents
+> of the file, yours is providing output of `ar tv`, which is
+> reconstructing more of the archive metadata. I guess it is keyed
+> on the filename extension.
 
-And as long as gcc-4.1 helps me finding real bugs (which it did for the
-current merge window), I plan to keep on using it.
+Ah, I see.  'ar tv' and 'less' gave me the same output.
 
-Gr{oetje,eeting}s,
 
-                        Geert
+> Do you have an alias for it, or maybe the distro patches the tool?
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+I use Ubuntu 16.04 LTS.
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Not alias'ed
+
+$ type less
+less is hashed (/usr/bin/less)
+$ /usr/bin/less kernel/built-in.a | head -n 10
+rw-r--r-- 0/0  60216 Jan  1 09:00 1970 kernel/fork.o
+rw-r--r-- 0/0   3648 Jan  1 09:00 1970 kernel/exec_domain.o
+rw-r--r-- 0/0  20552 Jan  1 09:00 1970 kernel/panic.o
+rw-r--r-- 0/0  87752 Jan  1 09:00 1970 kernel/cpu.o
+rw-r--r-- 0/0  34136 Jan  1 09:00 1970 kernel/exit.o
+rw-r--r-- 0/0  41448 Jan  1 09:00 1970 kernel/softirq.o
+rw-r--r-- 0/0  40904 Jan  1 09:00 1970 kernel/resource.o
+rw-r--r-- 0/0  60968 Jan  1 09:00 1970 kernel/sysctl.o
+rw-r--r-- 0/0   4472 Jan  1 09:00 1970 kernel/sysctl_binary.o
+rw-r--r-- 0/0  12472 Jan  1 09:00 1970 kernel/capability.o
+
+
+
+Could be patched by the disto.
+
+
+
+
+> It seems a bit rude for your less tool to reformat data for you.
+>
+> Thanks,
+> Nick
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
