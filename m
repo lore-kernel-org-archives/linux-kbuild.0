@@ -1,91 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:24972 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933588AbeBMJAP (ORCPT
+Received: from mailout4.samsung.com ([203.254.224.34]:23636 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935010AbeBMMbu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Feb 2018 04:00:15 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAK8P3a1SiejhK+eSx_mYqJratytU+_6FSjjatZE9n171GiA0mg@mail.gmail.com>
-References: <20180210054843.z3g7wvcmlccvww3h@huvuddator> <CAK7LNARHmAF2SxBcc1aUEH5MMzUo_furLevqy7QzGxqNRHYiyQ@mail.gmail.com>
- <20180210074924.3nhxsza5zdbaahxx@huvuddator> <20180210080556.mycqsjhxbaguwhay@huvuddator>
- <20180210085519.737ckf4bcl57h4g2@huvuddator> <CAGXu5jKQgxxC2RQL0dxLKFVED2v-LiWKjtXY3DDpfwAXbnxM4Q@mail.gmail.com>
- <CA+55aFz-SJ970iqDsR8-Ke4z6WvB4n9RXAeen8pG=+YJWubETw@mail.gmail.com>
- <CAGXu5jLo0iuMsH89vj3nr8sv+1YvXfXgoPeBdxHwZm5i=DWoOA@mail.gmail.com>
- <CA+55aFxdx3FYE6YGifRR=BSG9QzXwgThj5z7RmV5P5+RpNXSiQ@mail.gmail.com>
- <CA+55aFyPyYyG-riaBQU5cGp_sC=r8mf9Mg6L=DUEH6EyQfWYwA@mail.gmail.com>
- <20180211103432.pf2ot6nd7nbhdhsy@huvuddator> <CAGXu5jLtFcvbazxUvL_=6uT+a8m0JQEB7v0OE41Z-PMoX_fWpA@mail.gmail.com>
- <CAK7LNAQpS6dYBnt_PjL5zrX1=eccSg80khu=WYCjnHNvDiKa3w@mail.gmail.com>
- <CAGXu5j+7kv=jrg2u7jaxFEXwHoyzDXP_jyKHYA682_BrYuHwQQ@mail.gmail.com>
- <49c196ec-891d-2030-bd6c-7222feb22059@infradead.org> <CAK7LNAREEJ_k9x2QXaT73nBg934pb9YvO9DfzhhU7+_fpDdH8g@mail.gmail.com>
- <b17cc8ff-1bf1-1026-d028-f9552701403d@infradead.org> <CAK8P3a1SiejhK+eSx_mYqJratytU+_6FSjjatZE9n171GiA0mg@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 13 Feb 2018 17:59:25 +0900
-Message-ID: <CAK7LNARXz-SYZrnyWedh6nxLYS-T18RdEPFsmBxHUW_4jQERPA@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell=
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 13 Feb 2018 07:31:50 -0500
+From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Subject: Re: [PATCH 02/11] video: fbdev: kconfig: Remove blank help text
+Date: Tue, 13 Feb 2018 13:31:45 +0100
+Message-id: <2836658.i9VlN9LAid@amdc3058>
+In-reply-to: <CAFkk2KQxPnwMKmvhCoKQ0BBciTc5JKqjJqHGHAMR5uHF0w13sg@mail.gmail.com>
+MIME-version: 1.0
+Content-transfer-encoding: 7Bit
+Content-type: text/plain; charset="us-ascii"
+References: <20180131093434.20050-1-ulfalizer@gmail.com>
+        <3132455.r9uCTL3ZTk@amdc3058>
+        <CAFkk2KQxPnwMKmvhCoKQ0BBciTc5JKqjJqHGHAMR5uHF0w13sg@mail.gmail.com>
+        <CGME20180213123147epcas2p2a2bb399e700dacef57a2340afcc0e459@epcas2p2.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Kees Cook <keescook@chromium.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Tejun Heo <tj@kernel.org>, Ingo Molnar <mingo@kernel.org>, "Van De Ven, Arjan" <arjan.van.de.ven@intel.com>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dan Carpenter <dan.carpenter@oracle.com>, Paul Bolle <pebolle@tiscali.nl>, Arnd Bergmann <arnd@arndb.de>, Michal Simek <michal.simek@xilinx.com>, Hans de Goede <j.w.r.degoede@gmail.com>, dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org
 
-2018-02-13 17:35 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
-> On Tue, Feb 13, 2018 at 2:53 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
->> On 02/12/2018 05:41 PM, Masahiro Yamada wrote:
->>> 2018-02-13 8:48 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
->>>> On 02/12/2018 07:24 AM, Kees Cook wrote:
->>>>> On Mon, Feb 12, 2018 at 6:39 AM, Masahiro Yamada
->>>>> <yamada.masahiro@socionext.com> wrote:
->>>>
->>>>>>> (And in thinking about this, does Kconfig know the true $CC in use?
->>>>>>> i.e. the configured cross compiler, etc?)
->>>>>>
->>>>>> I was thinking of removing CONFIG_CROSS_COMPILE.
->>>>>>
->>>>>> A user can dynamically change CROSS_COMPILE from
->>>>>> "make menuconfig".
->>>>>
->>>>> Most builds I've seen implement cross compilers as an environment
->>>>> variable during all "make" invocations.
->>>>
->>>> I agree. I think you would break a bunch of build bots if you remove that.
->>>
->>>
->>> For clarification, I suggested to remove CONFIG_CROSS_COMPILE.
->>>
->>> The following code:
->>> https://github.com/torvalds/linux/blob/v4.16-rc1/Makefile#L315
->>> https://github.com/torvalds/linux/blob/v4.16-rc1/init/Kconfig#L58
->>>
->>> I hope build bots are not using this.
->>>
->>>
->>> Passing CROSS_COMPILE via the command line, environment
->>> is still supported.
->>
->> OK, I misunderstood.  That one can go away IMO.
->
-> Removing it will break the workflow for some people in a minor way
-> though. Could we have the top-level Makefile try to detect the
-> CROSS_COMPILE? Instead of just using CC=gcc as the default,
-> we could check for ${ARCH}!=`uname -m` and then see if $PATH
-> contains a ${ARCH}-linux-gcc, ${ARCH}-elf-gcc or ${ARCH}-gcc.
->
-> it will need slightly more complexity to deal with architectures
-> that have different identifiers in linux and gcc, but I think it would
-> be a nice feature anyway.
->
->      Arnd
+On Thursday, February 01, 2018 05:56:18 PM Ulf Magnusson wrote:
+> On Thu, Feb 1, 2018 at 4:52 PM, Bartlomiej Zolnierkiewicz
+> <b.zolnierkie@samsung.com> wrote:
+> >
+> > Hi,
+> >
+> > On Wednesday, January 31, 2018 10:34:21 AM Ulf Magnusson wrote:
+> >> Blank help texts are probably either a typo, a Kconfig misunderstanding,
+> >> or some kind of half-committing to adding a help text (in which case a
+> >> TODO comment would be clearer, if the help text really can't be added
+> >> right away).
+> >>
+> >> Best to remove them, IMO.
+> >
+> > How about actually adding some meaningful help texts instead
+> > (as a general rule each user visible option should have valid
+> > help text)?
+> >
+> >> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> >> ---
+> >>  drivers/video/fbdev/Kconfig | 1 -
+> >>  1 file changed, 1 deletion(-)
+> >>
+> >> diff --git a/drivers/video/fbdev/Kconfig b/drivers/video/fbdev/Kconfig
+> >> index 6962b4583fd7..11e699f1062b 100644
+> >> --- a/drivers/video/fbdev/Kconfig
+> >> +++ b/drivers/video/fbdev/Kconfig
+> >> @@ -1156,7 +1156,6 @@ config FB_I810_I2C
+> >>       bool "Enable DDC Support"
+> >>       depends on FB_I810 && FB_I810_GTF
+> >>       select FB_DDC
+> >> -     help
+> >
+> > Please add a missing help text instead (take a look at FB_SAVAGE_I2C
+> > config option to see how a valid help text entry should look like).
+> 
+> The FB_I810_I2C option was added in 74f6ae84b23 ("[PATCH] i810fb: Add
+> i2c/DDC support"). What do you think about adding this bit from the
+> commit message as the help text?
+> 
+>   Add DDC/I2C support for i810fb.  This will allow the driver to get display
+>   information, especially for monitors with fickle timings.
 
-Some architectures such as m68k, mips, etc.
-do this in their arch/*/Makefile
-by using $(call cc-cross-prefix, ...)
+Seems fine to me, please add:
 
-But, currently we do not do this globally.
+    If unsure, say Y.
 
-It would be possible to do it, but it does not mean
-backward-compatible with CONFIG_CROSS_COMPILE.
+and send it as a proper patch.
 
+> I'm not familiar with this code, so I don't want to do too much
+> guessing myself. :)
 
--- 
-Best Regards
-Masahiro Yamada
+:)
+
+> > In the longer term we should consider removing *_I2C config options
+> > and just make the main config options always enable I2C subsystem
+> > directly if needed/useful (some fbdev drivers are doing it this way
+> > already).
+> >
+> >>  config FB_LE80578
+> >>       tristate "Intel LE80578 (Vermilion) support"
+> >
+> > Best regards,
+> > --
+> > Bartlomiej Zolnierkiewicz
+> > Samsung R&D Institute Poland
+> > Samsung Electronics
+> >
+> 
+> Cheers,
+> Ulf
+
+Best regards,
+--
+Bartlomiej Zolnierkiewicz
+Samsung R&D Institute Poland
+Samsung Electronics
+
