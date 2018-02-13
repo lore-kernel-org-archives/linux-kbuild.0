@@ -1,66 +1,135 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:51628 "EHLO
-        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932378AbeBLXsK (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:52605 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932877AbeBMA5C (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Feb 2018 18:48:10 -0500
-Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell=
-References: <20180210054843.z3g7wvcmlccvww3h@huvuddator>
- <CAK7LNARHmAF2SxBcc1aUEH5MMzUo_furLevqy7QzGxqNRHYiyQ@mail.gmail.com>
- <20180210074924.3nhxsza5zdbaahxx@huvuddator>
- <20180210080556.mycqsjhxbaguwhay@huvuddator>
- <20180210085519.737ckf4bcl57h4g2@huvuddator>
- <CAGXu5jKQgxxC2RQL0dxLKFVED2v-LiWKjtXY3DDpfwAXbnxM4Q@mail.gmail.com>
- <CA+55aFz-SJ970iqDsR8-Ke4z6WvB4n9RXAeen8pG=+YJWubETw@mail.gmail.com>
- <CAGXu5jLo0iuMsH89vj3nr8sv+1YvXfXgoPeBdxHwZm5i=DWoOA@mail.gmail.com>
- <CA+55aFxdx3FYE6YGifRR=BSG9QzXwgThj5z7RmV5P5+RpNXSiQ@mail.gmail.com>
- <CA+55aFyPyYyG-riaBQU5cGp_sC=r8mf9Mg6L=DUEH6EyQfWYwA@mail.gmail.com>
- <20180211103432.pf2ot6nd7nbhdhsy@huvuddator>
- <CAGXu5jLtFcvbazxUvL_=6uT+a8m0JQEB7v0OE41Z-PMoX_fWpA@mail.gmail.com>
- <CAK7LNAQpS6dYBnt_PjL5zrX1=eccSg80khu=WYCjnHNvDiKa3w@mail.gmail.com>
- <CAGXu5j+7kv=jrg2u7jaxFEXwHoyzDXP_jyKHYA682_BrYuHwQQ@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <49c196ec-891d-2030-bd6c-7222feb22059@infradead.org>
-Date: Mon, 12 Feb 2018 15:48:02 -0800
+        Mon, 12 Feb 2018 19:57:02 -0500
+Received: by mail-wm0-f68.google.com with SMTP id j199so681878wmj.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Feb 2018 16:57:02 -0800 (PST)
+From: Eugeniu Rosca <roscaeugeniu@gmail.com>
+Subject: [PATCH 1/2] kconfig: Print reverse dependencies on new line consistently
+Date: Tue, 13 Feb 2018 01:56:09 +0100
+Message-Id: <20180213005610.10575-1-rosca.eugeniu@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5j+7kv=jrg2u7jaxFEXwHoyzDXP_jyKHYA682_BrYuHwQQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Tejun Heo <tj@kernel.org>, Ingo Molnar <mingo@kernel.org>, "Van De Ven, Arjan" <arjan.van.de.ven@intel.com>, Arnd Bergmann <arnd@arndb.de>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Ulf Magnusson <ulfalizer@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Petr Vorel <petr.vorel@gmail.com>, Paul Bolle <pebolle@tiscali.nl>
+Cc: Eugeniu Rosca <erosca@de.adit-jv.com>, linux-kbuild@vger.kernel.org, Eugeniu Rosca <rosca.eugeniu@gmail.com>
 
-On 02/12/2018 07:24 AM, Kees Cook wrote:
-> On Mon, Feb 12, 2018 at 6:39 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
+From: Eugeniu Rosca <erosca@de.adit-jv.com>
 
->>> (And in thinking about this, does Kconfig know the true $CC in use?
->>> i.e. the configured cross compiler, etc?)
->>
->> I was thinking of removing CONFIG_CROSS_COMPILE.
->>
->> A user can dynamically change CROSS_COMPILE from
->> "make menuconfig".
-> 
-> Most builds I've seen implement cross compilers as an environment
-> variable during all "make" invocations.
+Commit 1ccb27143360 ("kconfig: make "Selected by:" and "Implied by:"
+readable") made an incredible improvement in how reverse dependencies
+are perceived by the user, by breaking down the single (often
+interminable) expression string into small readable chunks, each of
+them displayed on a separate line:
 
-I agree. I think you would break a bunch of build bots if you remove that.
+Selected by:
+- A & B
+- C & (D || E)
 
->> If we continue to support this, $CC changes
->> according to CONFIG_CROSS_COMPILE.
->> Then, compiler flags must be re-evaluated
->> every time a user changes a compiler in use.
->> It will introduce much more complexity.
-> 
-> Right now, this is just handled in the Makefile: all the right
-> variables exist, etc.
-> 
-> -Kees
-> 
+Unfortunately, what happens with the non-OR (either E_SYMBOL or E_AND)
+expressions is that they don't get a dedicated line:
 
+Selected by: F & G
 
+That's arguably a bug/misbehavior, but it makes the implementation of
+something like below more complicated:
+
+Selected by:
+- [m] F & G /* where (F & G) evaluates to '=m' */
+
+Adding '[m]', '[y]' or '[ ]' to the left side of each reverse dependency
+is subject of a different commit. The purpose of current commit is to
+print the 'Selected by:' and 'Implied by:' expressions on a separate
+line _consistently_.
+
+An example of change contributed by this commit is seen below.
+
+│ Symbol: NEED_SG_DMA_LENGTH [=y]
+│ ...
+│   Selected by: IOMMU_DMA [=y] && IOMMU_SUPPORT [=y]
+
+becomes:
+
+│ Symbol: NEED_SG_DMA_LENGTH [=y]
+│ ...
+│   Selected by:
+│   - IOMMU_DMA [=y] && IOMMU_SUPPORT [=y]
+
+This patch has been tested using a custom variant of zconfdump which
+prints the reverse dependencies for each config symbol.
+
+Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Suggested-by: Ulf Magnusson <ulfalizer@gmail.com>
+Signed-off-by: Eugeniu Rosca <erosca@de.adit-jv.com>
+---
+ scripts/kconfig/expr.c | 31 ++++++++++++++++++++++---------
+ 1 file changed, 22 insertions(+), 9 deletions(-)
+
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index d45381986ac7..0704bcdf4c78 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -1179,6 +1179,16 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
+ 	return expr_get_leftmost_symbol(ret);
+ }
+ 
++static void
++expr_print_newline(struct expr *e,
++		   void (*fn)(void *, struct symbol *, const char *),
++		   void *data,
++		   int prevtoken)
++{
++	fn(data, NULL, "\n  - ");
++	expr_print(e, fn, data, prevtoken);
++}
++
+ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken, bool revdep)
+ {
+ 	if (!e) {
+@@ -1191,7 +1201,10 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
+ 	switch (e->type) {
+ 	case E_SYMBOL:
+ 		if (e->left.sym->name)
+-			fn(data, e->left.sym, e->left.sym->name);
++			if (revdep)
++				expr_print_newline(e, fn, data, E_OR);
++			else
++				fn(data, e->left.sym, e->left.sym->name);
+ 		else
+ 			fn(data, NULL, "<choice>");
+ 		break;
+@@ -1234,19 +1247,19 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
+ 		fn(data, e->right.sym, e->right.sym->name);
+ 		break;
+ 	case E_OR:
+-		if (revdep && e->left.expr->type != E_OR)
+-			fn(data, NULL, "\n  - ");
+ 		__expr_print(e->left.expr, fn, data, E_OR, revdep);
+-		if (revdep)
+-			fn(data, NULL, "\n  - ");
+-		else
++		if (!revdep)
+ 			fn(data, NULL, " || ");
+ 		__expr_print(e->right.expr, fn, data, E_OR, revdep);
+ 		break;
+ 	case E_AND:
+-		expr_print(e->left.expr, fn, data, E_AND);
+-		fn(data, NULL, " && ");
+-		expr_print(e->right.expr, fn, data, E_AND);
++		if (revdep) {
++			expr_print_newline(e, fn, data, E_OR);
++		} else {
++			expr_print(e->left.expr, fn, data, E_AND);
++			fn(data, NULL, " && ");
++			expr_print(e->right.expr, fn, data, E_AND);
++		}
+ 		break;
+ 	case E_LIST:
+ 		fn(data, e->right.sym, e->right.sym->name);
 -- 
-~Randy
+2.16.1
+
