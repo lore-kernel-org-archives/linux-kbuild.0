@@ -1,57 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:45151 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964879AbeBMOCz (ORCPT
+Received: from mail.free-electrons.com ([62.4.15.54]:57631 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933848AbeBMPnP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Feb 2018 09:02:55 -0500
-Date: Tue, 13 Feb 2018 15:02:48 +0100
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH] video: fbdev: kconfig: Add help text to FB_I810_I2C
-Message-ID: <20180213140248.h4yyc77futu74xg7@huvuddator>
-References: <20180131093434.20050-1-ulfalizer@gmail.com>
- <3132455.r9uCTL3ZTk@amdc3058>
- <CAFkk2KQxPnwMKmvhCoKQ0BBciTc5JKqjJqHGHAMR5uHF0w13sg@mail.gmail.com>
- <CGME20180213123147epcas2p2a2bb399e700dacef57a2340afcc0e459@epcas2p2.samsung.com>
- <2836658.i9VlN9LAid@amdc3058>
+        Tue, 13 Feb 2018 10:43:15 -0500
+From: Gregory CLEMENT <gregory.clement@bootlin.com>
+Subject: Re: [PATCH 01/20] ARM: mvebu: Fix broken PL310_ERRATA_753970 selects
+References: <20180205012146.23981-1-ulfalizer@gmail.com>
+        <20180205012146.23981-2-ulfalizer@gmail.com>
+Date: Tue, 13 Feb 2018 16:43:11 +0100
+In-Reply-To: <20180205012146.23981-2-ulfalizer@gmail.com> (Ulf Magnusson's
+        message of "Mon, 5 Feb 2018 02:21:13 +0100")
+Message-ID: <87lgfwq4j4.fsf@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2836658.i9VlN9LAid@amdc3058>
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dan Carpenter <dan.carpenter@oracle.com>, Paul Bolle <pebolle@tiscali.nl>, Arnd Bergmann <arnd@arndb.de>, Michal Simek <michal.simek@xilinx.com>, Hans de Goede <j.w.r.degoede@gmail.com>, dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, tony@atomide.com, linus.walleij@linaro.org, will.deacon@arm.com, paulus@ozlabs.org, yamada.masahiro@socionext.com, hch@lst.de, egtvedt@samfundet.no, robh@kernel.org, Russell King <linux@armlinux.org.uk>, m.szyprowski@samsung.com, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Jason Cooper <jason@lakedaemon.net>, linux-kbuild@vger.kernel.org, mina86@mina86.com, npiggin@gmail.com, Gregory Clement <gregory.clement@free-electrons.com>, linux-arm-kernel@lists.infradead.org, vgupta@synopsys.com, sboyd@codeaurora.org, tfiga@chromium.org, paul.burton@mips.com, mgorman@techsingularity.net
 
-The FB_I810_I2C symbol previously had a blank help text, which was
-removed in e9829ac4e5fd ("video: fbdev: kconfig: Remove blank help
-text").
-
-Give it a proper help text, derived from commit 74f6ae84b23 ("[PATCH]
-i810fb: Add > i2c/DDC support").
-
-Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
----
-Note: The removal of the blank help text is already in Linus' tree.
-
- drivers/video/fbdev/Kconfig | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/video/fbdev/Kconfig b/drivers/video/fbdev/Kconfig
-index 11e699f1062b..c691f1489bb7 100644
---- a/drivers/video/fbdev/Kconfig
-+++ b/drivers/video/fbdev/Kconfig
-@@ -1156,6 +1156,11 @@ config FB_I810_I2C
- 	bool "Enable DDC Support"
- 	depends on FB_I810 && FB_I810_GTF
- 	select FB_DDC
-+	help
-+	  Add DDC/I2C support for i810fb.  This will allow the driver to get
-+	  display information, especially for monitors with fickle timings.
-+
-+	  If unsure, say Y.
+Hi Ulf,
  
- config FB_LE80578
- 	tristate "Intel LE80578 (Vermilion) support"
--- 
-2.14.1
+ On lun., févr. 05 2018, Ulf Magnusson <ulfalizer@gmail.com> wrote:
 
+> The MACH_ARMADA_375 and MACH_ARMADA_38X boards select ARM_ERRATA_753970,
+> but it was renamed to PL310_ERRATA_753970 by commit fa0ce4035d48 ("ARM:
+> 7162/1: errata: tidy up Kconfig options for PL310 errata workarounds").
+>
+> Fix the selects to use the new name.
+>
+> Discovered with the
+> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+> script.
+
+Applied on mvebu/fixes with the "Fixes": and "CC:stable" flags
+
+Thanks,
+
+Gregory
+
+>
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> ---
+>  arch/arm/mach-mvebu/Kconfig | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm/mach-mvebu/Kconfig b/arch/arm/mach-mvebu/Kconfig
+> index 6b32dc527edc..2c20599cc350 100644
+> --- a/arch/arm/mach-mvebu/Kconfig
+> +++ b/arch/arm/mach-mvebu/Kconfig
+> @@ -41,7 +41,7 @@ config MACH_ARMADA_375
+>  	depends on ARCH_MULTI_V7
+>  	select ARMADA_370_XP_IRQ
+>  	select ARM_ERRATA_720789
+> -	select ARM_ERRATA_753970
+> +	select PL310_ERRATA_753970
+>  	select ARM_GIC
+>  	select ARMADA_375_CLK
+>  	select HAVE_ARM_SCU
+> @@ -57,7 +57,7 @@ config MACH_ARMADA_38X
+>  	bool "Marvell Armada 380/385 boards"
+>  	depends on ARCH_MULTI_V7
+>  	select ARM_ERRATA_720789
+> -	select ARM_ERRATA_753970
+> +	select PL310_ERRATA_753970
+>  	select ARM_GIC
+>  	select ARM_GLOBAL_TIMER
+>  	select CLKSRC_ARM_GLOBAL_TIMER_SCHED_CLOCK
+> -- 
+> 2.14.1
+>
+>
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+
+-- 
+Gregory Clement, Bootlin (formerly Free Electrons)
+Embedded Linux and Kernel engineering
+http://bootlin.com
