@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:41756 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933463AbeBMHox (ORCPT
+Received: from mail-lf0-f52.google.com ([209.85.215.52]:40780 "EHLO
+        mail-lf0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933617AbeBMH6g (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Feb 2018 02:44:53 -0500
+        Tue, 13 Feb 2018 02:58:36 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH] Makefile: Fix lying comment re. silentoldconfig
-Date: Tue, 13 Feb 2018 08:44:17 +0100
-Message-Id: <20180213074422.20608-1-ulfalizer@gmail.com>
+Subject: [PATCH v2] Makefile: Fix lying comment re. silentoldconfig
+Date: Tue, 13 Feb 2018 08:58:20 +0100
+Message-Id: <20180213075821.24499-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -35,14 +35,18 @@ that silentoldconfig gets rerun if conf_write_autoconf() fails between
 writing out auto.conf.cmd and auto.conf (a comment in the function
 indicates that auto.conf is deliberately written out last to mark
 completion of the operation). It seems the Makefile dependency between
-.config and include/config/auto.conf would already take care of that
-though, since .config would still be out of date re.
-include/config/auto.conf if the operation fails.
+include/config/auto.conf and .config would already take care of that
+though, since include/config/auto.conf would still be out of date re.
+.config if the operation fails.
 
-Cop out and leave the prerequisite in for now though.
+Cop out and leave the prerequisite in for now.
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
+Changes in v2:
+include/config/auto.conf depends on .config, not the other way around, so swap
+them in some places in the commit message to make it less confusing.
+
  Makefile | 11 +++++++----
  1 file changed, 7 insertions(+), 4 deletions(-)
 
