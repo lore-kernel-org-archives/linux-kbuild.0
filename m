@@ -1,77 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f52.google.com ([209.85.215.52]:40780 "EHLO
-        mail-lf0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933617AbeBMH6g (ORCPT
+Received: from mail-oi0-f65.google.com ([209.85.218.65]:38465 "EHLO
+        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933631AbeBMIf7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Feb 2018 02:58:36 -0500
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH v2] Makefile: Fix lying comment re. silentoldconfig
-Date: Tue, 13 Feb 2018 08:58:20 +0100
-Message-Id: <20180213075821.24499-1-ulfalizer@gmail.com>
+        Tue, 13 Feb 2018 03:35:59 -0500
+MIME-Version: 1.0
+In-Reply-To: <b17cc8ff-1bf1-1026-d028-f9552701403d@infradead.org>
+References: <20180210054843.z3g7wvcmlccvww3h@huvuddator> <CAK7LNARHmAF2SxBcc1aUEH5MMzUo_furLevqy7QzGxqNRHYiyQ@mail.gmail.com>
+ <20180210074924.3nhxsza5zdbaahxx@huvuddator> <20180210080556.mycqsjhxbaguwhay@huvuddator>
+ <20180210085519.737ckf4bcl57h4g2@huvuddator> <CAGXu5jKQgxxC2RQL0dxLKFVED2v-LiWKjtXY3DDpfwAXbnxM4Q@mail.gmail.com>
+ <CA+55aFz-SJ970iqDsR8-Ke4z6WvB4n9RXAeen8pG=+YJWubETw@mail.gmail.com>
+ <CAGXu5jLo0iuMsH89vj3nr8sv+1YvXfXgoPeBdxHwZm5i=DWoOA@mail.gmail.com>
+ <CA+55aFxdx3FYE6YGifRR=BSG9QzXwgThj5z7RmV5P5+RpNXSiQ@mail.gmail.com>
+ <CA+55aFyPyYyG-riaBQU5cGp_sC=r8mf9Mg6L=DUEH6EyQfWYwA@mail.gmail.com>
+ <20180211103432.pf2ot6nd7nbhdhsy@huvuddator> <CAGXu5jLtFcvbazxUvL_=6uT+a8m0JQEB7v0OE41Z-PMoX_fWpA@mail.gmail.com>
+ <CAK7LNAQpS6dYBnt_PjL5zrX1=eccSg80khu=WYCjnHNvDiKa3w@mail.gmail.com>
+ <CAGXu5j+7kv=jrg2u7jaxFEXwHoyzDXP_jyKHYA682_BrYuHwQQ@mail.gmail.com>
+ <49c196ec-891d-2030-bd6c-7222feb22059@infradead.org> <CAK7LNAREEJ_k9x2QXaT73nBg934pb9YvO9DfzhhU7+_fpDdH8g@mail.gmail.com>
+ <b17cc8ff-1bf1-1026-d028-f9552701403d@infradead.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Tue, 13 Feb 2018 09:35:57 +0100
+Message-ID: <CAK8P3a1SiejhK+eSx_mYqJratytU+_6FSjjatZE9n171GiA0mg@mail.gmail.com>
+Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell=
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, Ulf Magnusson <ulfalizer@gmail.com>, Michal Marek <michal.lkml@markovi.net>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Tejun Heo <tj@kernel.org>, Ingo Molnar <mingo@kernel.org>, "Van De Ven, Arjan" <arjan.van.de.ven@intel.com>
 
-The comment above the silentoldconfig invocation is outdated.
-'make oldconfig' updates just .config and doesn't touch the
-include/config/ tree.
+On Tue, Feb 13, 2018 at 2:53 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
+> On 02/12/2018 05:41 PM, Masahiro Yamada wrote:
+>> 2018-02-13 8:48 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+>>> On 02/12/2018 07:24 AM, Kees Cook wrote:
+>>>> On Mon, Feb 12, 2018 at 6:39 AM, Masahiro Yamada
+>>>> <yamada.masahiro@socionext.com> wrote:
+>>>
+>>>>>> (And in thinking about this, does Kconfig know the true $CC in use?
+>>>>>> i.e. the configured cross compiler, etc?)
+>>>>>
+>>>>> I was thinking of removing CONFIG_CROSS_COMPILE.
+>>>>>
+>>>>> A user can dynamically change CROSS_COMPILE from
+>>>>> "make menuconfig".
+>>>>
+>>>> Most builds I've seen implement cross compilers as an environment
+>>>> variable during all "make" invocations.
+>>>
+>>> I agree. I think you would break a bunch of build bots if you remove that.
+>>
+>>
+>> For clarification, I suggested to remove CONFIG_CROSS_COMPILE.
+>>
+>> The following code:
+>> https://github.com/torvalds/linux/blob/v4.16-rc1/Makefile#L315
+>> https://github.com/torvalds/linux/blob/v4.16-rc1/init/Kconfig#L58
+>>
+>> I hope build bots are not using this.
+>>
+>>
+>> Passing CROSS_COMPILE via the command line, environment
+>> is still supported.
+>
+> OK, I misunderstood.  That one can go away IMO.
 
-This came up in https://lkml.org/lkml/2018/2/12/415.
+Removing it will break the workflow for some people in a minor way
+though. Could we have the top-level Makefile try to detect the
+CROSS_COMPILE? Instead of just using CC=gcc as the default,
+we could check for ${ARCH}!=`uname -m` and then see if $PATH
+contains a ${ARCH}-linux-gcc, ${ARCH}-elf-gcc or ${ARCH}-gcc.
 
-While fixing the comment, make it more informative by explaining the
-purpose of the unfortunately named silentoldconfig.
+it will need slightly more complexity to deal with architectures
+that have different identifiers in linux and gcc, but I think it would
+be a nice feature anyway.
 
-I can't make sense of the comment re. auto.conf.cmd and a cleaned tree.
-include/config/auto.conf and include/config/auto.conf.cmd are both
-created simultaneously by silentoldconfig (in
-scripts/kconfig/confdata.c, by conf_write_autoconf()), and nothing seems
-to remove auto.conf.cmd that wouldn't remove auto.conf. Remove that part
-of the comment rather than blindly copying it. It might be a leftover
-from an older way of doing things.
-
-The include/config/auto.conf.cmd prerequisite might be there to ensure
-that silentoldconfig gets rerun if conf_write_autoconf() fails between
-writing out auto.conf.cmd and auto.conf (a comment in the function
-indicates that auto.conf is deliberately written out last to mark
-completion of the operation). It seems the Makefile dependency between
-include/config/auto.conf and .config would already take care of that
-though, since include/config/auto.conf would still be out of date re.
-.config if the operation fails.
-
-Cop out and leave the prerequisite in for now.
-
-Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
----
-Changes in v2:
-include/config/auto.conf depends on .config, not the other way around, so swap
-them in some places in the commit message to make it less confusing.
-
- Makefile | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 79ad2bfa24b6..61ed99ad4b1b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -579,10 +579,13 @@ ifeq ($(KBUILD_EXTMOD),)
- # To avoid any implicit rule to kick in, define an empty command
- $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
- 
--# If .config is newer than include/config/auto.conf, someone tinkered
--# with it and forgot to run make oldconfig.
--# if auto.conf.cmd is missing then we are probably in a cleaned tree so
--# we execute the config step to be sure to catch updated Kconfig files
-+# The actual configuration files used during the build are stored in
-+# include/generated/ and include/config/. Update them if .config is newer than
-+# include/config/auto.conf (which mirrors .config).
-+#
-+# The include/config/ tree manages dependencies between source files and
-+# Kconfig symbols and lets us avoid doing a full rebuild whenever the
-+# configuration is changed. See scripts/basic/fixdep.c
- include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
- 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
- else
--- 
-2.14.1
-
+     Arnd
