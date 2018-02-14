@@ -1,48 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:46794 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S966996AbeBNKL5 (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:19259 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S967342AbeBNLc0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Feb 2018 05:11:57 -0500
-Received: by mail-io0-f193.google.com with SMTP id k80so13228119ioe.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 14 Feb 2018 02:11:57 -0800 (PST)
+        Wed, 14 Feb 2018 06:32:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNARZaB6c7BYOaP9aKU38npfOiHG7=6R0QGLAsTA8egd18g@mail.gmail.com>
-References: <20180131093434.20050-1-ulfalizer@gmail.com> <20180131093434.20050-4-ulfalizer@gmail.com>
- <CAK7LNARZaB6c7BYOaP9aKU38npfOiHG7=6R0QGLAsTA8egd18g@mail.gmail.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Wed, 14 Feb 2018 11:11:56 +0100
-Message-ID: <CAPDyKFr0sC9+3aEjyQECAKj_KLtUoubM8DTwz1ZFqLLXjJf2ag@mail.gmail.com>
-Subject: Re: [PATCH 03/11] mmc: kconfig: Remove blank help text
+In-Reply-To: <6f19ae3f-249e-2d20-dcd6-e34c475a2638@cn.fujitsu.com>
+References: <fb60e245-86f2-53c6-79d8-bd395ef011dd@cn.fujitsu.com>
+ <CAK7LNARjks+EWiKq4KkHrbQTOAYWzRku_fuj_-8dcThQB=h6PA@mail.gmail.com> <6f19ae3f-249e-2d20-dcd6-e34c475a2638@cn.fujitsu.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 14 Feb 2018 20:31:29 +0900
+Message-ID: <CAK7LNATofb+-Y=hTQd2B2rGW=-XrQ9wN0+nXozhLpPv+dhWHfg@mail.gmail.com>
+Subject: Re: why scripts/link-vmlinux.sh has a final build of init/
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dan Carpenter <dan.carpenter@oracle.com>, Paul Bolle <pebolle@tiscali.nl>, Adrian Hunter <adrian.hunter@intel.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Shawn Lin <shawn.lin@rock-chips.com>, Simon Horman <horms+renesas@verge.net.au>, Jan Glauber <jglauber@cavium.com>, Eric Anholt <eric@anholt.net>, Carlo Caione <carlo@endlessm.com>, Venkat Gopalakrishnan <venkatg@codeaurora.org>, Kishon Vijay Abraham I <kishon@ti.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Rui Feng <rui_feng@realsil.com.cn>, linux-mmc <linux-mmc@vger.kernel.org>
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On 1 February 2018 at 18:09, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2018-01-31 18:34 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->> Blank help texts are probably either a typo, a Kconfig misunderstanding,
->> or some kind of half-committing to adding a help text (in which case a
->> TODO comment would be clearer, if the help text really can't be added
->> right away).
->>
->> Best to remove them, IMO.
->>
->> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->> ---
+2018-02-13 16:08 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+
+> BTW, I still have 2 questions.
 >
+> 1. In final build, why need
 >
-> FYI.
+>    GCC_PLUGINS_CFLAGS="${GCC_PLUGINS_CFLAGS}"
 >
-> I picked up this patch to kbuild
-> because I need this to suppress warning messages
-> introduced by 11/11.
+> Doesn't GCC_PLUGINS_CFLAGS already exist in the environment?
+>
+> I also tested the Randomizing Structure Layout plugin with this patch,
+> the plugin seems works in my test.
 
-Okay. Feel free to add my ack.
 
-[...]
+I have not tested, but GCC_PLUGINS_CFLAGS="${GCC_PLUGINS_CFLAGS}"
+is probably unnecessary.
 
-Kind regards
-Uffe
+
+
+> 2. scripts/link-vmlinux.sh seems just handle only one argument: clean.
+> So why shouldn't it be:
+
+
+To detect the change of $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux)
+because link-vmlinux.sh depends on them.
+
+
+
+> diff --git a/Makefile b/Makefile
+> index ccd981892ef2..21d93b545381 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -998,7 +998,7 @@ ARCH_POSTLINK := $(wildcard
+> $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
+>
+>  # Final link of vmlinux with optional arch pass after final link
+>  cmd_link-vmlinux =                                                 \
+> -       $(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
+> +       $(CONFIG_SHELL) $<;                                         \
+>         $(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+>
+>  vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
