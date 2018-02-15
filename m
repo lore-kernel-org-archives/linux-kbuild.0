@@ -1,68 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:19259 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S967342AbeBNLc0 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Feb 2018 06:32:26 -0500
-MIME-Version: 1.0
-In-Reply-To: <6f19ae3f-249e-2d20-dcd6-e34c475a2638@cn.fujitsu.com>
-References: <fb60e245-86f2-53c6-79d8-bd395ef011dd@cn.fujitsu.com>
- <CAK7LNARjks+EWiKq4KkHrbQTOAYWzRku_fuj_-8dcThQB=h6PA@mail.gmail.com> <6f19ae3f-249e-2d20-dcd6-e34c475a2638@cn.fujitsu.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 14 Feb 2018 20:31:29 +0900
-Message-ID: <CAK7LNATofb+-Y=hTQd2B2rGW=-XrQ9wN0+nXozhLpPv+dhWHfg@mail.gmail.com>
-Subject: Re: why scripts/link-vmlinux.sh has a final build of init/
+Received: from mga11.intel.com ([192.55.52.93]:51652 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754805AbeBOHf7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 15 Feb 2018 02:35:59 -0500
+Message-ID: <1518680151.7832.26.camel@intel.com>
+Subject: Re: [PATCH 18/20] iwlwifi: fix malformed CONFIG_IWLWIFI_PCIE_RTPM
+ default
+From: Luciano Coelho <luciano.coelho@intel.com>
+Date: Thu, 15 Feb 2018 09:35:51 +0200
+In-Reply-To: <20180205012146.23981-19-ulfalizer@gmail.com>
+References: <20180205012146.23981-1-ulfalizer@gmail.com>
+         <20180205012146.23981-19-ulfalizer@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Johannes Berg <johannes.berg@intel.com>, Emmanuel Grumbach <emmanuel.grumbach@intel.com>, Intel Linux Wireless <linuxwifi@intel.com>, Kalle Valo <kvalo@codeaurora.org>, linux-wireless@vger.kernel.org, netdev@vger.kernel.org
 
-2018-02-13 16:08 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+On Mon, 2018-02-05 at 02:21 +0100, Ulf Magnusson wrote:
+> 'default false' should be 'default n', though they happen to have the
+> same effect here, due to undefined symbols ('false' in this case)
+> evaluating to n in a tristate sense.
+> 
+> Remove the default instead of changing it. bool and tristate symbols
+> implicitly default to n.
+> 
+> Discovered with the
+> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_und
+> efined.py
+> script.
+> 
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> ---
 
-> BTW, I still have 2 questions.
->
-> 1. In final build, why need
->
->    GCC_PLUGINS_CFLAGS="${GCC_PLUGINS_CFLAGS}"
->
-> Doesn't GCC_PLUGINS_CFLAGS already exist in the environment?
->
-> I also tested the Randomizing Structure Layout plugin with this patch,
-> the plugin seems works in my test.
+Thanks, Ulf!
 
+This is applied in our internal tree and will eventually reach the
+mainline, following our usual upstreaming process.
 
-I have not tested, but GCC_PLUGINS_CFLAGS="${GCC_PLUGINS_CFLAGS}"
-is probably unnecessary.
-
-
-
-> 2. scripts/link-vmlinux.sh seems just handle only one argument: clean.
-> So why shouldn't it be:
-
-
-To detect the change of $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux)
-because link-vmlinux.sh depends on them.
-
-
-
-> diff --git a/Makefile b/Makefile
-> index ccd981892ef2..21d93b545381 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -998,7 +998,7 @@ ARCH_POSTLINK := $(wildcard
-> $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
->
->  # Final link of vmlinux with optional arch pass after final link
->  cmd_link-vmlinux =                                                 \
-> -       $(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
-> +       $(CONFIG_SHELL) $<;                                         \
->         $(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
->
->  vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+--
+Cheers,
+Luca.
