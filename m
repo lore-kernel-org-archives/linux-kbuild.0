@@ -1,45 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:51652 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754805AbeBOHf7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Feb 2018 02:35:59 -0500
-Message-ID: <1518680151.7832.26.camel@intel.com>
-Subject: Re: [PATCH 18/20] iwlwifi: fix malformed CONFIG_IWLWIFI_PCIE_RTPM
- default
-From: Luciano Coelho <luciano.coelho@intel.com>
-Date: Thu, 15 Feb 2018 09:35:51 +0200
-In-Reply-To: <20180205012146.23981-19-ulfalizer@gmail.com>
-References: <20180205012146.23981-1-ulfalizer@gmail.com>
-         <20180205012146.23981-19-ulfalizer@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:52940 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1163660AbeBOVIE (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 15 Feb 2018 16:08:04 -0500
+From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: [PATCH] disable sparse warnings about unknown attributes
+Date: Thu, 15 Feb 2018 22:07:50 +0100
+Message-Id: <20180215210750.28813-1-luc.vanoostenryck@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, Johannes Berg <johannes.berg@intel.com>, Emmanuel Grumbach <emmanuel.grumbach@intel.com>, Intel Linux Wireless <linuxwifi@intel.com>, Kalle Valo <kvalo@codeaurora.org>, linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Josh Triplett <josh@joshtriplett.org>, Randy Dunlap <rdunlap@infradead.org>, linux-sparse@vger.kernel.org, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 
-On Mon, 2018-02-05 at 02:21 +0100, Ulf Magnusson wrote:
-> 'default false' should be 'default n', though they happen to have the
-> same effect here, due to undefined symbols ('false' in this case)
-> evaluating to n in a tristate sense.
-> 
-> Remove the default instead of changing it. bool and tristate symbols
-> implicitly default to n.
-> 
-> Discovered with the
-> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_und
-> efined.py
-> script.
-> 
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
+Currently, sparse issues warnings on code using an attribute
+it doesn't know about.
 
-Thanks, Ulf!
+One of the problem with this is that these warnings have no
+value for the developer, it's just noise for him. At best these
+warnings tell something about some deficiencies of sparse itself
+but not about a potential problem with code analyzed.
 
-This is applied in our internal tree and will eventually reach the
-mainline, following our usual upstreaming process.
+A second problem with this is that sparse release are, alas,
+less frequent than new attributes are added to GCC.
 
---
-Cheers,
-Luca.
+So, avoid the noise by asking sparse to not warn about
+attributes it doesn't know about.
+
+Reference: https://marc.info/?l=linux-sparse&m=151871600016790
+Reference: https://marc.info/?l=linux-sparse&m=151871725417322
+Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 79ad2bfa2..8d9a7374c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -388,7 +388,7 @@ PYTHON		= python
+ CHECK		= sparse
+ 
+ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
+-		  -Wbitwise -Wno-return-void $(CF)
++		  -Wbitwise -Wno-return-void -Wno-unknown-attribute $(CF)
+ NOSTDINC_FLAGS  =
+ CFLAGS_MODULE   =
+ AFLAGS_MODULE   =
+-- 
+2.16.0
+
