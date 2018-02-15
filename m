@@ -1,64 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:43230 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1163785AbeBOXVS (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:46980 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1164715AbeBOXiN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Feb 2018 18:21:18 -0500
-Subject: Re: [PATCH] disable sparse warnings about unknown attributes
-References: <20180215210750.28813-1-luc.vanoostenryck@gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <c215cf31-ba19-49ff-3da9-268e64ea1ba0@infradead.org>
-Date: Thu, 15 Feb 2018 15:21:14 -0800
-MIME-Version: 1.0
-In-Reply-To: <20180215210750.28813-1-luc.vanoostenryck@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Thu, 15 Feb 2018 18:38:13 -0500
+Received: by mail-pg0-f65.google.com with SMTP id a11so1029082pgu.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 15 Feb 2018 15:38:13 -0800 (PST)
+Date: Thu, 15 Feb 2018 15:38:12 -0800 (PST)
+Subject: Re: [RFC PATCH 4/7] kconfig: support new special property shell
+In-Reply-To: <CA+55aFy4WNC=pmga19CHhrX9QwOJsu1bUvGL0oNxq5EeMW94eg@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-0ca7cce5-5731-4bf4-b116-b719d3aad34b@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Josh Triplett <josh@joshtriplett.org>, linux-sparse@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: keescook@chromium.org, ulfalizer@gmail.com, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>, akpm@linux-foundation.org, nicolas.pitre@linaro.org, mcgrof@suse.com, rdunlap@infradead.org, sam@ravnborg.org, michal.lkml@markovi.net, schwidefsky@de.ibm.com, pavel@ucw.cz, linux-s390@vger.kernel.org, jkosina@suse.cz, linux-kernel@vger.kernel.org, tj@kernel.org, mingo@kernel.org, arjan.van.de.ven@intel.com, Arnd Bergmann <arnd@arndb.de>
 
-On 02/15/2018 01:07 PM, Luc Van Oostenryck wrote:
-> Currently, sparse issues warnings on code using an attribute
-> it doesn't know about.
-> 
-> One of the problem with this is that these warnings have no
-> value for the developer, it's just noise for him. At best these
-> warnings tell something about some deficiencies of sparse itself
-> but not about a potential problem with code analyzed.
-> 
-> A second problem with this is that sparse release are, alas,
-> less frequent than new attributes are added to GCC.
-> 
-> So, avoid the noise by asking sparse to not warn about
-> attributes it doesn't know about.
-> 
-> Reference: https://marc.info/?l=linux-sparse&m=151871600016790
-> Reference: https://marc.info/?l=linux-sparse&m=151871725417322
-> Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 79ad2bfa2..8d9a7374c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -388,7 +388,7 @@ PYTHON		= python
->  CHECK		= sparse
->  
->  CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
-> -		  -Wbitwise -Wno-return-void $(CF)
-> +		  -Wbitwise -Wno-return-void -Wno-unknown-attribute $(CF)
->  NOSTDINC_FLAGS  =
->  CFLAGS_MODULE   =
->  AFLAGS_MODULE   =
-> 
+On Sun, 11 Feb 2018 12:06:35 PST (-0800), Linus Torvalds wrote:
+> On Sun, Feb 11, 2018 at 11:53 AM, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>>
+>> Well, it's still not a very *big* bump. With modern distros being at
+>> 7.3, and people testing pre-releases of gcc-8, something like gcc-4.5
+>> is still pretty darn ancient.
+>
+> ... it's worth noting that our _documentation_ may claim that gcc-3.2
+> is the minimum supported version, but Arnd pointed out that a few
+> months ago that apparently nothing older than 4.1 has actually worked
+> for a longish while, and gcc-4.3 was needed on several architectures.
+>
+> So the _real_ jump in required gcc version would be from 4.1 (4.3 in
+> many cases) to 4.5, not from our documented "3.2 minimum".
+>
+> Arnd claimed that some architectures needed even newer-than-4.3, but I
+> assume that's limited to things like RISC-V that simply don't have old
+> gcc support at all.
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
+Just for the record, we'd really like users to use GCC 7.3.0 and binutils 2.30 
+(or newer), as even though we had support earlier versions (back to binutils 
+2.28 and gcc 7.1.0) there's a handful of bugs floating around in our ports 
+there.
 
-thanks,
--- 
-~Randy
+Of course, I'm not suggesting that as a kernel-wide policy :).  It looks like 
+we're going to end up with distributions shipping 7.3.0 and 2.30 as their first 
+RISC-V versions, so hopefully we're safe here.
+
+> That was from a discussion about bug report that only happened with
+> gcc-4.4, and was because gcc-4.4 did insane things, so we were talking
+> about how it wasn't necessarily worth supporting.
+>
+> So we really have had a lot of unrelated reasons why just saying
+> "gcc-4.5 or newer"  would be a good thing.
+>
+>             Linus
