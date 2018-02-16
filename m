@@ -1,91 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.24]:33403 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.13]:49045 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751114AbeBPVm1 (ORCPT
+        with ESMTP id S1751109AbeBPVmW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 16:42:27 -0500
+        Fri, 16 Feb 2018 16:42:22 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 2/3] Kconfig: improve handling for all{rand,yes,no,}.config fragments
-Date: Fri, 16 Feb 2018 22:41:12 +0100
-Message-Id: <20180216214117.1947175-3-arnd@arndb.de>
+Subject: [PATCH 1/3] Kconfig: disable PROFILE_ALL_BRANCHES for compile testing
+Date: Fri, 16 Feb 2018 22:41:11 +0100
+Message-Id: <20180216214117.1947175-2-arnd@arndb.de>
 In-Reply-To: <20180216214117.1947175-1-arnd@arndb.de>
 References: <20180216214117.1947175-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+To: linux-kbuild@vger.kernel.org
+Cc: "Yann E . MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>
 
-The kernel currently supports two methods of dealing with config
-fragments in the tree:
+This can easily double the time for compiling a driver but does not
+provide any benefit for the compile tester, so it's better left disabled.
 
-a) Running "make foo.config" looks for arch/$(ARCH)/configs/foo.config
-   and kernel/configs/foo.config, and applies the defaults from those
-   files on top of the current configuration.
+In addition, any 'inline' function that is not also 'static' and that
+contains an 'if' causes a warning like
 
-b) Running "KCONFIG_ALLCONFIG=1 make randconfig" (or the equivalent
-   allmodconfig/allnoconfig/allyesconfig/alldefconfig) will look
-   for a "allrandconfig.config" file in the current directory or the
-   top of the $(srctree). These are used as defaults before we generate
-   the remaining options.
+include/linux/string.h:212:2: note: in expansion of macro 'if'
+  if (strscpy(p, q, p_size < q_size ? p_size : q_size) < 0)
+  ^~
+include/linux/compiler.h:162:4: warning: '______f' is static but declared in inline function 'strcpy' which is not static
 
-This is rather inconsistent, and prevents us from easily shipping
-good defaults for "randconfig". I'm extending the logic here so that
-the second case also looks for the hardcoded file names in the standard
-directories (first arch/$(ARCH)/configs/, then kernel/configs) in the
-source tree.
+without this patch, and I could not come up with a nice fix for that.
+In combination with my patch to always enable 'CONFIG_COMPILE_TEST'
+during 'randconfig' builds, we can at least hide these warnings for
+most users.
 
+Cc: Steven Rostedt <rostedt@goodmis.org>
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- scripts/kconfig/conf.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ kernel/trace/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 866369f10ff8..848bf4d15e9a 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -493,8 +493,9 @@ int main(int ac, char **av)
- {
- 	const char *progname = av[0];
- 	int opt;
--	const char *name, *defconfig_file = NULL /* gcc uninit */;
-+	const char *arch, *name, *defconfig_file = NULL /* gcc uninit */;
- 	struct stat tmpstat;
-+	char fullname[PATH_MAX+1];
- 
- 	setlocale(LC_ALL, "");
- 	bindtextdomain(PACKAGE, LOCALEDIR);
-@@ -621,14 +622,24 @@ int main(int ac, char **av)
- 		case randconfig:	name = "allrandom.config"; break;
- 		default: break;
- 		}
--		if (conf_read_simple(name, S_DEF_USER) &&
--		    conf_read_simple("all.config", S_DEF_USER)) {
--			fprintf(stderr,
--				_("*** KCONFIG_ALLCONFIG set, but no \"%s\" or \"all.config\" file found\n"),
--				name);
--			exit(1);
-+		/* try ./name, arch/$(ARCH)/configs/name and kernel/config/name */
-+		if (!conf_read_simple(name, S_DEF_USER))
-+			break;
-+		arch = getenv("ARCH");
-+		if (arch) {
-+			snprintf(fullname, sizeof(fullname), "arch/%s/configs/%s",
-+				 arch, name);
-+			if (!conf_read_simple(fullname, S_DEF_USER))
-+				break;
- 		}
--		break;
-+		snprintf(fullname, sizeof(fullname), "kernel/configs/%s", name);
-+		if (!conf_read_simple(fullname, S_DEF_USER))
-+			break;
-+
-+		fprintf(stderr,
-+			_("*** KCONFIG_ALLCONFIG set, but no \"%s\" or \"all.config\" file found\n"),
-+				name);
-+		exit(1);
- 	default:
- 		break;
- 	}
+diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
+index 434c840e2d82..faaf687b13b1 100644
+--- a/kernel/trace/Kconfig
++++ b/kernel/trace/Kconfig
+@@ -345,6 +345,7 @@ config PROFILE_ANNOTATED_BRANCHES
+ config PROFILE_ALL_BRANCHES
+ 	bool "Profile all if conditionals"
+ 	select TRACE_BRANCH_PROFILING
++	depends on !COMPILE_TEST
+ 	help
+ 	  This tracer profiles all branch conditions. Every if ()
+ 	  taken in the kernel is recorded whether it hit or miss.
 -- 
 2.9.0
 
