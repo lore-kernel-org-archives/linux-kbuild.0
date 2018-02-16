@@ -1,57 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([217.72.192.73]:45185 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.24]:33403 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751009AbeBPVmh (ORCPT
+        with ESMTP id S1751114AbeBPVm1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 16:42:37 -0500
+        Fri, 16 Feb 2018 16:42:27 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 3/3] Kconfig: add a default allrandom.config
-Date: Fri, 16 Feb 2018 22:41:13 +0100
-Message-Id: <20180216214117.1947175-4-arnd@arndb.de>
+Subject: [PATCH 2/3] Kconfig: improve handling for all{rand,yes,no,}.config fragments
+Date: Fri, 16 Feb 2018 22:41:12 +0100
+Message-Id: <20180216214117.1947175-3-arnd@arndb.de>
 In-Reply-To: <20180216214117.1947175-1-arnd@arndb.de>
 References: <20180216214117.1947175-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: "Yann E . MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+To: linux-kbuild@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
 
-Building randconfig kernels frequently leads to build errors from
-drivers that have additional build dependencies, or that we don't
-want to build for compile-testing for some other reason.
+The kernel currently supports two methods of dealing with config
+fragments in the tree:
 
-We already have a couple of compile-time options that can deal with this
-problem, but the complete set is not documented well.  We also have a
-method to override some options during 'make randconfig' and a couple
-of other make targets. However, we don't yet combine those two.
+a) Running "make foo.config" looks for arch/$(ARCH)/configs/foo.config
+   and kernel/configs/foo.config, and applies the defaults from those
+   files on top of the current configuration.
 
-This adds a new allrandom.config file to turn on CONFIG_COMPILE_TEST,
-CONFIG_STANDALONE and CONFIG_PREVENT_FIRMWARE_BUILD for all randconfig
-builds. This in turn disables some other options that we already try
-to avoid in 'allmodconfig' builds and that make no sense in a general
-randconfig build.
+b) Running "KCONFIG_ALLCONFIG=1 make randconfig" (or the equivalent
+   allmodconfig/allnoconfig/allyesconfig/alldefconfig) will look
+   for a "allrandconfig.config" file in the current directory or the
+   top of the $(srctree). These are used as defaults before we generate
+   the remaining options.
 
-Building with 'make randconfig KCONFIG_ALLCONFIG=1' should now always
-succeed without warnings on x86 and arm64, aside from recent regressions.
-Other architectures probably need additional bugfixes.
+This is rather inconsistent, and prevents us from easily shipping
+good defaults for "randconfig". I'm extending the logic here so that
+the second case also looks for the hardcoded file names in the standard
+directories (first arch/$(ARCH)/configs/, then kernel/configs) in the
+source tree.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- kernel/configs/allrandom.config | 6 ++++++
- 1 file changed, 6 insertions(+)
- create mode 100644 kernel/configs/allrandom.config
+ scripts/kconfig/conf.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
-diff --git a/kernel/configs/allrandom.config b/kernel/configs/allrandom.config
-new file mode 100644
-index 000000000000..67294ef2e3a2
---- /dev/null
-+++ b/kernel/configs/allrandom.config
-@@ -0,0 +1,6 @@
-+# maximize search space, disable options not worth testing
-+CONFIG_COMPILE_TEST=y
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 866369f10ff8..848bf4d15e9a 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -493,8 +493,9 @@ int main(int ac, char **av)
+ {
+ 	const char *progname = av[0];
+ 	int opt;
+-	const char *name, *defconfig_file = NULL /* gcc uninit */;
++	const char *arch, *name, *defconfig_file = NULL /* gcc uninit */;
+ 	struct stat tmpstat;
++	char fullname[PATH_MAX+1];
+ 
+ 	setlocale(LC_ALL, "");
+ 	bindtextdomain(PACKAGE, LOCALEDIR);
+@@ -621,14 +622,24 @@ int main(int ac, char **av)
+ 		case randconfig:	name = "allrandom.config"; break;
+ 		default: break;
+ 		}
+-		if (conf_read_simple(name, S_DEF_USER) &&
+-		    conf_read_simple("all.config", S_DEF_USER)) {
+-			fprintf(stderr,
+-				_("*** KCONFIG_ALLCONFIG set, but no \"%s\" or \"all.config\" file found\n"),
+-				name);
+-			exit(1);
++		/* try ./name, arch/$(ARCH)/configs/name and kernel/config/name */
++		if (!conf_read_simple(name, S_DEF_USER))
++			break;
++		arch = getenv("ARCH");
++		if (arch) {
++			snprintf(fullname, sizeof(fullname), "arch/%s/configs/%s",
++				 arch, name);
++			if (!conf_read_simple(fullname, S_DEF_USER))
++				break;
+ 		}
+-		break;
++		snprintf(fullname, sizeof(fullname), "kernel/configs/%s", name);
++		if (!conf_read_simple(fullname, S_DEF_USER))
++			break;
 +
-+# reduce compile-time dependencies
-+CONFIG_STANDALONE=y
-+CONFIG_PREVENT_FIRMWARE_BUILD=y
++		fprintf(stderr,
++			_("*** KCONFIG_ALLCONFIG set, but no \"%s\" or \"all.config\" file found\n"),
++				name);
++		exit(1);
+ 	default:
+ 		break;
+ 	}
 -- 
 2.9.0
 
