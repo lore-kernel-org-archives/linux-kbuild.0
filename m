@@ -1,220 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:41933 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750713AbeBPUX0 (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:40503 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750864AbeBPUXe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 15:23:26 -0500
+        Fri, 16 Feb 2018 15:23:34 -0500
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH 0/3] Improve and extend checkpatch.pl Kconfig help text checks
-Date: Fri, 16 Feb 2018 21:22:52 +0100
-Message-Id: <20180216202255.25307-1-ulfalizer@gmail.com>
+Subject: [PATCH 3/3] checkpatch: kconfig: prefer 'help' over '---help---'
+Date: Fri, 16 Feb 2018 21:22:55 +0100
+Message-Id: <20180216202255.25307-4-ulfalizer@gmail.com>
+In-Reply-To: <20180216202255.25307-1-ulfalizer@gmail.com>
+References: <20180216202255.25307-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: apw@canonical.com, joe@perches.com
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
 
-Hello,
+IMO, we should discourage '---help---' for new help texts, even in cases
+where it would be consistent with other help texts in the file. This
+will help if we ever want to get rid of '---help---' in the future.
 
-This patchset contains some improvements for the Kconfig help text check in
-scripts/checkconfig.pl:
+Also simplify the code to only check for exactly '---help---'. Since
+commit c2264564df3d ("kconfig: warn of unhandled characters in Kconfig
+commands"), '---help---' is a proper keyword and can only appear in that
+form. Prior to that commit, '---help---' working was more of a syntactic
+quirk.
 
- - Commits 1 and 2 make the check more robust by checking menuconfig symbols
-   and choices as well as symbols defined with 'config', and by making the
-   detection of definition boundaries more reliable.
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+---
+ scripts/checkpatch.pl | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
- - Commit 3 adds a check for new '---help---'s being introduced. IMO, 'help'
-   should be encouraged in new code.
-
-All three commits can be applied independently.
-
-The existing code is a bit weird in that it doesn't require symbols with "long"
-definitions (e.g., many selects) to have help texts. Fixing that is outside the
-scope of this patchset. I couldn't tell if it was deliberate.
-
-I'm a Perl noob, so check for bad practices. :)
-
-The changes were tested by running 'checkpatch.pl -f' on some large existing
-Kconfig files in the kernel and looking for false positives (e.g.
-arch/{x86,arm}/Kconfig).
-
-This test file was also used, which contains some cases that confused the old
-code:
-
-	config BAD_1
-		bool "bad 1"
-	
-	config BAD_2
-		bool 'bad 2'
-	
-	config BAD_3
-		bool "bad 3"
-		help
-		  1
-		  2
-		  3
-	
-	menuconfig BAD_4
-		bool "bad 4"
-		help
-		  1
-		  2
-		  3
-	
-	config BAD_5
-		bool
-		prompt "bad 5"
-		help
-		  1
-		  2
-		  3
-	
-	config BAD_6
-		bool "bad 6"
-		help
-		  1
-		  2
-		  3
-	
-	if FOO
-	
-	config BAD_7
-		bool "bad 7"
-		help
-		  1
-		  2
-		  3
-	
-	endif
-	
-	config BAD_8
-		bool "bad 8"
-		help
-		  1
-		  2
-		  3
-	
-	source "foo"
-	
-	config BAD_9
-		bool "bad 9"
-		---help---
-		  1
-		  2
-		  3
-		  4
-	
-	choice
-		bool "bad choice"
-		help
-		  1
-		  2
-		  3
-	
-	endchoice
-	
-	config OK_1
-		bool
-	
-	config OK_2
-		bool "ok 2"
-		help
-		  1
-		  2
-		  3
-		  4
-	
-	config OK_3
-		tristate "ok 3"
-		help
-		  1
-		  2
-		  3
-		  4
-	
-	config OK_4
-		tristate
-		prompt "ok 4"
-		help
-		  1
-		  2
-		  3
-		  4
-	
-	choice
-		bool "ok choice"
-		help
-		  1
-		  2
-		  3
-		  4
-	
-	endchoice
-
-
-This now produces the following warnings:
-
-	WARNING: please write a paragraph that describes the config symbol fully
-	#9: FILE: Kconfig.test_help_check:9:
-	+config BAD_1
-	
-	WARNING: please write a paragraph that describes the config symbol fully
-	#12: FILE: Kconfig.test_help_check:12:
-	+config BAD_2
-	
-	WARNING: please write a paragraph that describes the config symbol fully
-	#15: FILE: Kconfig.test_help_check:15:
-	+config BAD_3
-	
-	WARNING: please write a paragraph that describes the config symbol fully
-	#22: FILE: Kconfig.test_help_check:22:
-	+menuconfig BAD_4
-	
-	WARNING: please write a paragraph that describes the config symbol fully
-	#29: FILE: Kconfig.test_help_check:29:
-	+config BAD_5
-	
-	WARNING: please write a paragraph that describes the config symbol fully
-	#37: FILE: Kconfig.test_help_check:37:
-	+config BAD_6
-	
-	WARNING: please write a paragraph that describes the config symbol fully
-	#46: FILE: Kconfig.test_help_check:46:
-	+config BAD_7
-	
-	WARNING: please write a paragraph that describes the config symbol fully
-	#55: FILE: Kconfig.test_help_check:55:
-	+config BAD_8
-	
-	WARNING: prefer 'help' over '---help---' for new help texts
-	#64: FILE: Kconfig.test_help_check:64:
-	+config BAD_9
-	
-	WARNING: please write a paragraph that describes the config symbol fully
-	#72: FILE: Kconfig.test_help_check:72:
-	+choice
-	
-	total: 0 errors, 10 warnings, 117 lines checked
-	
-	NOTE: For some of the reported defects, checkpatch may be able to
-	      mechanically convert to the typical style using --fix or --fix-inplace.
-	
-	Kconfig.test_help_check has style problems, please review.
-	
-	NOTE: If any of the errors are false positives, please report
-	      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-Cheers,
-Ulf
-
-Ulf Magnusson (3):
-  checkpatch: kconfig: recognize more prompts when checking help texts
-  checkpatch: kconfig: check help texts for menuconfig and choice
-  checkpatch: kconfig: prefer 'help' over '---help---'
-
- scripts/checkpatch.pl | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
-
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 54b782fab4fd..2784f6ab309f 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2817,7 +2817,11 @@ sub process {
+ 
+ 				if ($lines[$ln - 1] =~ /^\+\s*(?:bool|tristate|prompt)\s*["']/) {
+ 					$is_start = 1;
+-				} elsif ($lines[$ln - 1] =~ /^\+\s*(?:---)?help(?:---)?$/) {
++				} elsif ($lines[$ln - 1] =~ /^\+\s*(?:help|---help---)\s*$/) {
++					if ($lines[$ln - 1] =~ "---help---") {
++						WARN("CONFIG_DESCRIPTION",
++						     "prefer 'help' over '---help---' for new help texts\n" . $herecurr);
++					}
+ 					$length = -1;
+ 				}
+ 
 -- 
 2.14.1
 
