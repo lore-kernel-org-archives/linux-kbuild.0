@@ -1,69 +1,220 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pb-smtp1.pobox.com ([64.147.108.70]:59962 "EHLO
-        pb-smtp1.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750743AbeBPTtd (ORCPT
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:41933 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750713AbeBPUX0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 14:49:33 -0500
-Date: Fri, 16 Feb 2018 14:49:31 -0500 (EST)
-From: Nicolas Pitre <nico@fluxnic.net>
-Subject: Re: [PATCH 08/23] kconfig: add 'macro' keyword to support user-defined
- function
-In-Reply-To: <1518806331-7101-9-git-send-email-yamada.masahiro@socionext.com>
-Message-ID: <nycvar.YSQ.7.76.1802161438470.31719@knanqh.ubzr>
-References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com> <1518806331-7101-9-git-send-email-yamada.masahiro@socionext.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        Fri, 16 Feb 2018 15:23:26 -0500
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: [PATCH 0/3] Improve and extend checkpatch.pl Kconfig help text checks
+Date: Fri, 16 Feb 2018 21:22:52 +0100
+Message-Id: <20180216202255.25307-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: apw@canonical.com, joe@perches.com
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>
 
-On Sat, 17 Feb 2018, Masahiro Yamada wrote:
+Hello,
 
-> Now, we got a basic ability to test compiler capability in Kconfig.
-> 
-> config CC_HAS_STACKPROTECTOR
->         bool
->         default $(shell $CC -Werror -fstack-protector -c -x c /dev/null -o /dev/null)
-> 
-> This works, but it is ugly to repeat this long boilerplate.
-> 
-> We want to describe like this:
-> 
-> config CC_HAS_STACKPROTECTOR
->         bool
->         default $(cc-option -fstack-protector)
-> 
-> It is straight-forward to implement a new function, but I do not like
-> to hard-code specialized functions like this.  Hence, here is another
-> feature to add functions from Kconfig files.
-> 
-> A user-defined function can be defined as a string type symbol with
-> a special keyword 'macro'.  It can be referenced in the same way as
-> built-in functions.  This feature was also inspired by Makefile where
-> user-defined functions are referenced by $(call func-name, args...),
-> but I omitted the 'call' to makes it shorter.
-> 
-> The macro definition can contain $(1), $(2), ... which will be replaced
-> with arguments from the caller.
-> 
-> Example code:
-> 
->   config cc-option
->           string
->           macro $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
+This patchset contains some improvements for the Kconfig help text check in
+scripts/checkconfig.pl:
 
-I think this syntax for defining a macro shouldn't start with the 
-"config" keyword, unless you want it to be part of the config symbol 
-space and land it in .config. And typing it as a "string" while it 
-actually returns y/n (hence a bool) is also strange.
+ - Commits 1 and 2 make the check more robust by checking menuconfig symbols
+   and choices as well as symbols defined with 'config', and by making the
+   detection of definition boundaries more reliable.
 
-What about this instead:
+ - Commit 3 adds a check for new '---help---'s being introduced. IMO, 'help'
+   should be encouraged in new code.
 
-macro cc-option
-	bool $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
+All three commits can be applied independently.
 
-This makes it easier to extend as well if need be.
+The existing code is a bit weird in that it doesn't require symbols with "long"
+definitions (e.g., many selects) to have help texts. Fixing that is outside the
+scope of this patchset. I couldn't tell if it was deliberate.
+
+I'm a Perl noob, so check for bad practices. :)
+
+The changes were tested by running 'checkpatch.pl -f' on some large existing
+Kconfig files in the kernel and looking for false positives (e.g.
+arch/{x86,arm}/Kconfig).
+
+This test file was also used, which contains some cases that confused the old
+code:
+
+	config BAD_1
+		bool "bad 1"
+	
+	config BAD_2
+		bool 'bad 2'
+	
+	config BAD_3
+		bool "bad 3"
+		help
+		  1
+		  2
+		  3
+	
+	menuconfig BAD_4
+		bool "bad 4"
+		help
+		  1
+		  2
+		  3
+	
+	config BAD_5
+		bool
+		prompt "bad 5"
+		help
+		  1
+		  2
+		  3
+	
+	config BAD_6
+		bool "bad 6"
+		help
+		  1
+		  2
+		  3
+	
+	if FOO
+	
+	config BAD_7
+		bool "bad 7"
+		help
+		  1
+		  2
+		  3
+	
+	endif
+	
+	config BAD_8
+		bool "bad 8"
+		help
+		  1
+		  2
+		  3
+	
+	source "foo"
+	
+	config BAD_9
+		bool "bad 9"
+		---help---
+		  1
+		  2
+		  3
+		  4
+	
+	choice
+		bool "bad choice"
+		help
+		  1
+		  2
+		  3
+	
+	endchoice
+	
+	config OK_1
+		bool
+	
+	config OK_2
+		bool "ok 2"
+		help
+		  1
+		  2
+		  3
+		  4
+	
+	config OK_3
+		tristate "ok 3"
+		help
+		  1
+		  2
+		  3
+		  4
+	
+	config OK_4
+		tristate
+		prompt "ok 4"
+		help
+		  1
+		  2
+		  3
+		  4
+	
+	choice
+		bool "ok choice"
+		help
+		  1
+		  2
+		  3
+		  4
+	
+	endchoice
 
 
-Nicolas
+This now produces the following warnings:
+
+	WARNING: please write a paragraph that describes the config symbol fully
+	#9: FILE: Kconfig.test_help_check:9:
+	+config BAD_1
+	
+	WARNING: please write a paragraph that describes the config symbol fully
+	#12: FILE: Kconfig.test_help_check:12:
+	+config BAD_2
+	
+	WARNING: please write a paragraph that describes the config symbol fully
+	#15: FILE: Kconfig.test_help_check:15:
+	+config BAD_3
+	
+	WARNING: please write a paragraph that describes the config symbol fully
+	#22: FILE: Kconfig.test_help_check:22:
+	+menuconfig BAD_4
+	
+	WARNING: please write a paragraph that describes the config symbol fully
+	#29: FILE: Kconfig.test_help_check:29:
+	+config BAD_5
+	
+	WARNING: please write a paragraph that describes the config symbol fully
+	#37: FILE: Kconfig.test_help_check:37:
+	+config BAD_6
+	
+	WARNING: please write a paragraph that describes the config symbol fully
+	#46: FILE: Kconfig.test_help_check:46:
+	+config BAD_7
+	
+	WARNING: please write a paragraph that describes the config symbol fully
+	#55: FILE: Kconfig.test_help_check:55:
+	+config BAD_8
+	
+	WARNING: prefer 'help' over '---help---' for new help texts
+	#64: FILE: Kconfig.test_help_check:64:
+	+config BAD_9
+	
+	WARNING: please write a paragraph that describes the config symbol fully
+	#72: FILE: Kconfig.test_help_check:72:
+	+choice
+	
+	total: 0 errors, 10 warnings, 117 lines checked
+	
+	NOTE: For some of the reported defects, checkpatch may be able to
+	      mechanically convert to the typical style using --fix or --fix-inplace.
+	
+	Kconfig.test_help_check has style problems, please review.
+	
+	NOTE: If any of the errors are false positives, please report
+	      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+Cheers,
+Ulf
+
+Ulf Magnusson (3):
+  checkpatch: kconfig: recognize more prompts when checking help texts
+  checkpatch: kconfig: check help texts for menuconfig and choice
+  checkpatch: kconfig: prefer 'help' over '---help---'
+
+ scripts/checkpatch.pl | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
+
+-- 
+2.14.1
+
