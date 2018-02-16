@@ -1,72 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f176.google.com ([209.85.223.176]:33006 "EHLO
-        mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751008AbeBPTRy (ORCPT
+Received: from pb-smtp1.pobox.com ([64.147.108.70]:59962 "EHLO
+        pb-smtp1.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750743AbeBPTtd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 14:17:54 -0500
+        Fri, 16 Feb 2018 14:49:33 -0500
+Date: Fri, 16 Feb 2018 14:49:31 -0500 (EST)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: [PATCH 08/23] kconfig: add 'macro' keyword to support user-defined
+ function
+In-Reply-To: <1518806331-7101-9-git-send-email-yamada.masahiro@socionext.com>
+Message-ID: <nycvar.YSQ.7.76.1802161438470.31719@knanqh.ubzr>
+References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com> <1518806331-7101-9-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-In-Reply-To: <1518806331-7101-12-git-send-email-yamada.masahiro@socionext.com>
-References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com> <1518806331-7101-12-git-send-email-yamada.masahiro@socionext.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 16 Feb 2018 11:17:52 -0800
-Message-ID: <CA+55aFwQLrrBeXZXK_qUXiGVFNv3qPJS4tNKFacuk0Y0WgZjCA@mail.gmail.com>
-Subject: Re: [PATCH 11/23] kconfig: add 'shell-stdout' function
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Fri, Feb 16, 2018 at 10:38 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> This is the second built-in function, which retrieves the first line
-> of stdout from the given shell command.
+On Sat, 17 Feb 2018, Masahiro Yamada wrote:
 
-This is the only part I really don't much like in your patch series.
+> Now, we got a basic ability to test compiler capability in Kconfig.
+> 
+> config CC_HAS_STACKPROTECTOR
+>         bool
+>         default $(shell $CC -Werror -fstack-protector -c -x c /dev/null -o /dev/null)
+> 
+> This works, but it is ugly to repeat this long boilerplate.
+> 
+> We want to describe like this:
+> 
+> config CC_HAS_STACKPROTECTOR
+>         bool
+>         default $(cc-option -fstack-protector)
+> 
+> It is straight-forward to implement a new function, but I do not like
+> to hard-code specialized functions like this.  Hence, here is another
+> feature to add functions from Kconfig files.
+> 
+> A user-defined function can be defined as a string type symbol with
+> a special keyword 'macro'.  It can be referenced in the same way as
+> built-in functions.  This feature was also inspired by Makefile where
+> user-defined functions are referenced by $(call func-name, args...),
+> but I omitted the 'call' to makes it shorter.
+> 
+> The macro definition can contain $(1), $(2), ... which will be replaced
+> with arguments from the caller.
+> 
+> Example code:
+> 
+>   config cc-option
+>           string
+>           macro $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
 
-Most of it is just lovely and looks very nice and powerful, but the
-difference between "$(shell ..." and "$(shell-stdout ..." to me is
-bvery ugly.
+I think this syntax for defining a macro shouldn't start with the 
+"config" keyword, unless you want it to be part of the config symbol 
+space and land it in .config. And typing it as a "string" while it 
+actually returns y/n (hence a bool) is also strange.
 
-Can we *please* make "shell-stdout" go away, and make this just be "shell"?
+What about this instead:
 
-The rule would be very simple:
+macro cc-option
+	bool $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
 
- - if the result of the shell command is a failure, the result is 'n'
+This makes it easier to extend as well if need be.
 
- - otherwise, the result is the first line of stdout
 
- - if the result is empty, we replace it with 'y'.
-
-So doing $(shell true) would be 100% equivalent to $(shell echo y),
-and you could still do that
-
-          default $(shell $CC --version | grep -q gcc)
-
-because it would just automatically do the right thing.
-
-Basically, the only difference is how $(shell ) works in the success
-case: the result won't necessarily be 'y', it will be whatever output.
-But if you want to always turn it into 'y' (say, you don't have a "-q"
-flag for the grep equivalent above), you can always do so with
-
-          default $(shell $CC --version | noqgrep gcc > /dev/null)
-
-So it seems to me that there is never any fundamental reason why we'd
-want both "shell" and "shell-stdout", since "shell-stdout" is
-fundamentally more powerful than "shell", and can always be used as
-such (and just renamed to "shell").
-
-Because I really think that it's just much prettier and more intuitive
-to be able to say
-
-        default "/boot/config-$(shell uname --release)"
-
-without that "-stdout" thing.
-
-Hmm?
-
-But I do want to say how much I liked this series. Just this part
-seemed to result in uglier Kconfig scripts.
-
-         Linus
+Nicolas
