@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:57762 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:57763 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752521AbeBPSlS (ORCPT
+        with ESMTP id S1752622AbeBPSlS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 16 Feb 2018 13:41:18 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 07/23] kconfig: add function support and implement 'shell' function
-Date: Sat, 17 Feb 2018 03:38:35 +0900
-Message-Id: <1518806331-7101-8-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 03/23] kconfig: add xstrdup() helper
+Date: Sat, 17 Feb 2018 03:38:31 +0900
+Message-Id: <1518806331-7101-4-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,423 +15,112 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-This commit adds a new concept 'function' to Kconfig.  A function call
-resembles a variable reference with arguments, and looks like this:
-
-  $(function arg1, arg2, arg3, ...)
-
-(Actually, this syntax was inspired by Makefile.)
-
-Real examples will look like this:
-
-  $(shell true)
-  $(cc-option -fstackprotector)
-
-This commit adds the basic infrastructure to add, delete, evaluate
-functions.
-
-Also, add the first built-in function $(shell ...).  This evaluates
-to 'y' if the given command exits with 0, 'n' otherwise.
-
-I am also planning to support user-defined functions (a.k.a 'macro')
-for cases where hard-coding is not preferred.
-
-If you want to try this feature, the hello-world code is someting below.
-
-Example code:
-
-  config CC_IS_GCC
-          bool
-          default $(shell $CC --version | grep -q gcc)
-
-  config CC_IS_CLANG
-          bool
-          default $(shell $CC --version | grep -q clang)
-
-  config CC_HAS_OZ
-          bool
-          default $(shell $CC -Werror -Oz -c -x c /dev/null -o /dev/null)
-
-Result:
-
-  $ make -s alldefconfig && tail -n 3 .config
-  CONFIG_CC_IS_GCC=y
-  # CONFIG_CC_IS_CLANG is not set
-  # CONFIG_CC_HAS_OZ is not set
-
-  $ make CC=clang -s alldefconfig && tail -n 3 .config
-  # CONFIG_CC_IS_GCC is not set
-  CONFIG_CC_IS_CLANG=y
-  CONFIG_CC_HAS_OZ=y
-
-A function call can appear anywhere a symbol reference can appear.
-So, the following code is possible.
-
-Example code:
-
-  config CC_NAME
-          string
-          default "gcc" if $(shell $CC --version | grep -q gcc)
-          default "clang" if $(shell $CC --version | grep -q clang)
-          default "unknown compiler"
-
-Result:
-
-  $ make -s alldefconfig && tail -n 1 .config
-  CONFIG_CC_NAME="gcc"
-
-  $ make CC=clang -s alldefconfig && tail -n 1 .config
-  CONFIG_CC_NAME="clang"
+We already have xmalloc(), xcalloc(), and xrealloc(().  Add xstrdup()
+as well to save tedious error handling.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-Reminder for myself:
-Update Documentation/kbuild/kconfig-language.txt
+ scripts/kconfig/confdata.c  |  2 +-
+ scripts/kconfig/kxgettext.c |  2 +-
+ scripts/kconfig/lkc.h       |  1 +
+ scripts/kconfig/symbol.c    |  4 ++--
+ scripts/kconfig/util.c      | 11 +++++++++++
+ scripts/kconfig/zconf.y     |  2 +-
+ 6 files changed, 17 insertions(+), 5 deletions(-)
 
-
- scripts/kconfig/function.c  | 149 ++++++++++++++++++++++++++++++++++++++++++++
- scripts/kconfig/lkc_proto.h |   5 ++
- scripts/kconfig/util.c      |  46 +++++++++++---
- scripts/kconfig/zconf.l     |  38 ++++++++++-
- scripts/kconfig/zconf.y     |   9 +++
- 5 files changed, 238 insertions(+), 9 deletions(-)
- create mode 100644 scripts/kconfig/function.c
-
-diff --git a/scripts/kconfig/function.c b/scripts/kconfig/function.c
-new file mode 100644
-index 0000000..60e59be
---- /dev/null
-+++ b/scripts/kconfig/function.c
-@@ -0,0 +1,149 @@
-+// SPDX-License-Identifier: GPL-2.0
-+//
-+// Copyright (C) 2018 Masahiro Yamada <yamada.masahiro@socionext.com>
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include "list.h"
-+
-+#define FUNCTION_MAX_ARGS		10
-+
-+static LIST_HEAD(function_list);
-+
-+struct function {
-+	const char *name;
-+	char *(*func)(int argc, char *argv[]);
-+	struct list_head node;
-+};
-+
-+static struct function *func_lookup(const char *name)
-+{
-+	struct function *f;
-+
-+	list_for_each_entry(f, &function_list, node) {
-+		if (!strcmp(name, f->name))
-+			return f;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void func_add(const char *name, char *(*func)(int argc, char *argv[]))
-+{
-+	struct function *f;
-+
-+	f = func_lookup(name);
-+	if (f) {
-+		fprintf(stderr, "%s: function already exists. ignored.\n", name);
-+		return;
-+	}
-+
-+	f = xmalloc(sizeof(*f));
-+	f->name = name;
-+	f->func = func;
-+
-+	list_add_tail(&f->node, &function_list);
-+}
-+
-+static void func_del(struct function *f)
-+{
-+	list_del(&f->node);
-+	free(f);
-+}
-+
-+static char *func_call(int argc, char *argv[])
-+{
-+	struct function *f;
-+
-+	f = func_lookup(argv[0]);
-+	if (!f) {
-+		fprintf(stderr, "%s: function not found\n", argv[0]);
-+		return NULL;
-+	}
-+
-+	return f->func(argc, argv);
-+}
-+
-+static char *func_eval(const char *func)
-+{
-+	char *expanded, *saveptr, *str, *token, *res;
-+	const char *delim;
-+	int argc = 0;
-+	char *argv[FUNCTION_MAX_ARGS];
-+
-+	expanded = expand_string_value(func);
-+
-+	str = expanded;
-+	delim = " ";
-+
-+	while ((token = strtok_r(str, delim, &saveptr))) {
-+		argv[argc++] = token;
-+		str = NULL;
-+		delim = ",";
-+	}
-+
-+	res = func_call(argc, argv);
-+
-+	free(expanded);
-+
-+	return res ?: xstrdup("");
-+}
-+
-+char *func_eval_n(const char *func, size_t n)
-+{
-+	char *tmp, *res;
-+
-+	tmp = xmalloc(n + 1);
-+	memcpy(tmp, func, n);
-+	*(tmp + n) = '\0';
-+
-+	res = func_eval(tmp);
-+
-+	free(tmp);
-+
-+	return res;
-+}
-+
-+/* built-in functions */
-+static char *do_shell(int argc, char *argv[])
-+{
-+	static const char *pre = "(";
-+	static const char *post = ") >/dev/null 2>&1";
-+	char *cmd;
-+	int ret;
-+
-+	if (argc != 2)
-+		return NULL;
-+
-+	/*
-+	 * Surround the command with ( ) in case it is piped commands.
-+	 * Also, redirect stdout and stderr to /dev/null.
-+	 */
-+	cmd = xmalloc(strlen(pre) + strlen(argv[1]) + strlen(post) + 1);
-+	strcpy(cmd, pre);
-+	strcat(cmd, argv[1]);
-+	strcat(cmd, post);
-+
-+	ret = system(cmd);
-+
-+	free(cmd);
-+
-+	return xstrdup(ret == 0 ? "y" : "n");
-+}
-+
-+void func_init(void)
-+{
-+	/* register built-in functions */
-+	func_add("shell", do_shell);
-+}
-+
-+void func_exit(void)
-+{
-+	struct function *f, *tmp;
-+
-+	/* unregister all functions */
-+	list_for_each_entry_safe(f, tmp, &function_list, node)
-+		func_del(f);
-+}
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index 9884adc..09a4f53 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -48,5 +48,10 @@ const char * sym_get_string_value(struct symbol *sym);
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 5c12dc9..df26c7b 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -178,7 +178,7 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 	case S_HEX:
+ 	done:
+ 		if (sym_string_valid(sym, p)) {
+-			sym->def[def].val = strdup(p);
++			sym->def[def].val = xstrdup(p);
+ 			sym->flags |= def_flags;
+ 		} else {
+ 			if (def != S_DEF_AUTO)
+diff --git a/scripts/kconfig/kxgettext.c b/scripts/kconfig/kxgettext.c
+index 2858738..240880a 100644
+--- a/scripts/kconfig/kxgettext.c
++++ b/scripts/kconfig/kxgettext.c
+@@ -101,7 +101,7 @@ static struct message *message__new(const char *msg, char *option,
+ 	if (self->files == NULL)
+ 		goto out_fail;
  
- const char * prop_get_type_name(enum prop_type type);
+-	self->msg = strdup(msg);
++	self->msg = xstrdup(msg);
+ 	if (self->msg == NULL)
+ 		goto out_fail_msg;
  
-+/* function.c */
-+char *func_eval_n(const char *func, size_t n);
-+void func_init(void);
-+void func_exit(void);
-+
- /* expr.c */
- void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken);
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index 4e23feb..2d5ec2d 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -115,6 +115,7 @@ int file_write_dep(const char *name);
+ void *xmalloc(size_t size);
+ void *xcalloc(size_t nmemb, size_t size);
+ void *xrealloc(void *p, size_t size);
++char *xstrdup(const char *s);
+ 
+ struct gstr {
+ 	size_t len;
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index cca9663..2220bc4 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -183,7 +183,7 @@ static void sym_validate_range(struct symbol *sym)
+ 		sprintf(str, "%lld", val2);
+ 	else
+ 		sprintf(str, "0x%llx", val2);
+-	sym->curr.val = strdup(str);
++	sym->curr.val = xstrdup(str);
+ }
+ 
+ static void sym_set_changed(struct symbol *sym)
+@@ -849,7 +849,7 @@ struct symbol *sym_lookup(const char *name, int flags)
+ 				   : !(symbol->flags & (SYMBOL_CONST|SYMBOL_CHOICE))))
+ 				return symbol;
+ 		}
+-		new_name = strdup(name);
++		new_name = xstrdup(name);
+ 	} else {
+ 		new_name = NULL;
+ 		hash = 0;
 diff --git a/scripts/kconfig/util.c b/scripts/kconfig/util.c
-index dddf85b..ed89fb9 100644
+index b98a79e..c6f6e21 100644
 --- a/scripts/kconfig/util.c
 +++ b/scripts/kconfig/util.c
-@@ -93,9 +93,10 @@ static char *env_expand_n(const char *name, size_t n)
+@@ -154,3 +154,14 @@ void *xrealloc(void *p, size_t size)
+ 	fprintf(stderr, "Out of memory.\n");
+ 	exit(1);
  }
- 
- /*
-- * Expand environments embedded in the string given in argument. Environments
-- * to be expanded shall be prefixed by a '$'. Unknown environment expands to
-- * the empty string.
-+ * Expand environments and functions embedded in the string given in argument.
-+ * Environments to be expanded shall be prefixed by a '$'. Functions to be
-+ * evaluated shall be surrounded by $(). Unknown environment/function expands
-+ * to the empty string.
-  */
- char *expand_string_value(const char *in)
- {
-@@ -113,11 +114,40 @@ char *expand_string_value(const char *in)
- 	while ((p = strchr(in, '$'))) {
- 		char *new;
- 
--		q = p + 1;
--		while (isalnum(*q) || *q == '_')
--			q++;
--
--		new = env_expand_n(p + 1, q - p - 1);
-+		/*
-+		 * If the next character is '(', it is a function.
-+		 * Otherwise, environment.
-+		 */
-+		if (*(p + 1) == '(') {
-+			int nest = 0;
 +
-+			q = p + 2;
-+			while (1) {
-+				if (*q == '\0') {
-+					fprintf(stderr,
-+						"unterminated function: %s\n",
-+						p);
-+					new = xstrdup("");
-+					break;
-+				} else if (*q == '(') {
-+					nest++;
-+				} else if (*q == ')') {
-+					if (nest-- == 0) {
-+						new = func_eval_n(p + 2,
-+								  q - p - 2);
-+						q++;
-+						break;
-+					}
-+				}
-+				q++;
-+			}
-+		} else {
-+			q = p + 1;
-+			while (isalnum(*q) || *q == '_')
-+				q++;
++char *xstrdup(const char *s)
++{
++	char *p;
 +
-+			new = env_expand_n(p + 1, q - p - 1);
-+		}
- 
- 		reslen = strlen(res) + (p - in) + strlen(new) + 1;
- 		res = xrealloc(res, reslen);
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 0d89ea6..f433ab0 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -1,7 +1,7 @@
- %option nostdinit noyywrap never-interactive full ecs
- %option 8bit nodefault perf-report perf-report
- %option noinput
--%x COMMAND HELP STRING PARAM
-+%x COMMAND HELP STRING PARAM FUNCTION
- %{
- /*
-  * Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>
-@@ -25,6 +25,7 @@ static struct {
- 
- static char *text;
- static int text_size, text_asize;
-+static int function_nest;
- 
- struct buffer {
- 	struct buffer *parent;
-@@ -138,6 +139,12 @@ n	[$A-Za-z0-9_-]
- 		new_string();
- 		BEGIN(STRING);
- 	}
-+	"$("	{
-+		new_string();
-+		append_string(yytext, yyleng);
-+		function_nest = 0;
-+		BEGIN(FUNCTION);
-+	}
- 	\n	BEGIN(INITIAL); current_file->lineno++; return T_EOL;
- 	({n}|[/.])+	{
- 		const struct kconf_id *id = kconf_id_lookup(yytext, yyleng);
-@@ -196,6 +203,35 @@ n	[$A-Za-z0-9_-]
- 	}
- }
- 
-+<FUNCTION>{
-+	[^()\n]* {
-+		append_string(yytext, yyleng);
-+	}
-+	"(" {
-+		append_string(yytext, yyleng);
-+		function_nest++;
-+	}
-+	")" {
-+		append_string(yytext, yyleng);
-+		if (function_nest-- == 0) {
-+			BEGIN(PARAM);
-+			yylval.string = text;
-+			return T_WORD;
-+		}
-+	}
-+	\n {
-+		fprintf(stderr,
-+			"%s:%d:warning: multi-line function not supported\n",
-+			zconf_curname(), zconf_lineno());
-+		current_file->lineno++;
-+		BEGIN(INITIAL);
-+		return T_EOL;
-+	}
-+	<<EOF>>	{
-+		BEGIN(INITIAL);
-+	}
++	p = strdup(s);
++	if (p)
++		return p;
++	fprintf(stderr, "Out of memory.\n");
++	exit(1);
 +}
-+
- <HELP>{
- 	[ \t]+	{
- 		ts = 0;
 diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 784083d..d9977de 100644
+index 4893676..ad6305b 100644
 --- a/scripts/kconfig/zconf.y
 +++ b/scripts/kconfig/zconf.y
-@@ -534,11 +534,19 @@ void conf_parse(const char *name)
+@@ -127,7 +127,7 @@ no_mainmenu_stmt: /* empty */
+ 	 * later regardless of whether it comes from the 'prompt' in
+ 	 * mainmenu_stmt or here
+ 	 */
+-	menu_add_prompt(P_MENU, strdup("Linux Kernel Configuration"), NULL);
++	menu_add_prompt(P_MENU, xstrdup("Linux Kernel Configuration"), NULL);
+ };
  
- 	zconf_initscan(name);
  
-+	func_init();
- 	_menu_init();
- 
- 	if (getenv("ZCONF_DEBUG"))
- 		yydebug = 1;
- 	yyparse();
-+
-+	/*
-+	 * Currently, functions are evaluated only when Kconfig files are
-+	 * parsed. We can free functions here.
-+	 */
-+	func_exit();
-+
- 	if (yynerrs)
- 		exit(1);
- 	if (!modules_sym)
-@@ -778,4 +786,5 @@ void zconfdump(FILE *out)
- #include "confdata.c"
- #include "expr.c"
- #include "symbol.c"
-+#include "function.c"
- #include "menu.c"
 -- 
 2.7.4
 
