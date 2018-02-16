@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:57777 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:57775 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752694AbeBPSlT (ORCPT
+        with ESMTP id S1752689AbeBPSlT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 16 Feb 2018 13:41:19 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 13/23] kconfig: expand environments/functions in (main)menu, comment, prompt
-Date: Sat, 17 Feb 2018 03:38:41 +0900
-Message-Id: <1518806331-7101-14-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 02/23] kbuild: remove CONFIG_CROSS_COMPILE support
+Date: Sat, 17 Feb 2018 03:38:30 +0900
+Message-Id: <1518806331-7101-3-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,132 +15,72 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Expand the prompt passed to menu_add_prompt().  This affects
-'mainmenu', 'menu', 'prompt', 'comment'.
+Kbuild provides a couple of ways to specify CROSS_COMPILE:
 
-Another good thing is, I am fixing the memory leak for the case
-without mainmenu.  The 'mainmenu' should be independent of user
-configuration.  So, its prompt can be expanded in the first parse
-phase.  The ugly hack for no_mainmenu_stmt is gone.
+[1] Command line
+[2] Environment
+[3] arch/*/Makefile (only some architectures)
+[4] CONFIG_CROSS_COMPILE
+
+[4] is problematic for the compiler capability tests in Kconfig.
+CONFIG_CROSS_COMPILE allows users to change the compiler prefix from
+'make menuconfig', etc.  It means, the compiler options would have
+to be all re-calculated everytime CONFIG_CROSS_COMPILE is changed.
+
+To avoid complexity and performance issues, I'd like to evaluate
+the shell commands statically, i.e. only parsing Kconfig files.
+
+I guess the majority is [1] or [2].  Currently, there are only
+4 defconfig files that specify CONFIG_CROSS_COMPILE.
+  arch/arm/configs/lpc18xx_defconfig
+  arch/hexagon/configs/comet_defconfig
+  arch/openrisc/configs/or1ksim_defconfig
+  arch/openrisc/configs/simple_smp_defconfig
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/kconfig/menu.c  |  2 +-
- scripts/kconfig/zconf.y | 30 +++++++++++-------------------
- 2 files changed, 12 insertions(+), 20 deletions(-)
+ Makefile     | 3 ---
+ init/Kconfig | 9 ---------
+ 2 files changed, 12 deletions(-)
 
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index a9d0ccc..462b995 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -176,7 +176,7 @@ static struct property *menu_add_prop(enum prop_type type, char *prompt, struct
+diff --git a/Makefile b/Makefile
+index a27e6d8..94a957e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -307,12 +307,9 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+ # CROSS_COMPILE can be set on the command line
+ # make CROSS_COMPILE=ia64-linux-
+ # Alternatively CROSS_COMPILE can be set in the environment.
+-# A third alternative is to store a setting in .config so that plain
+-# "make" in the configured kernel build directory always uses that.
+ # Default value for CROSS_COMPILE is not to prefix executables
+ # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
+ ARCH		?= $(SUBARCH)
+-CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
  
- struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr *dep)
- {
--	return menu_add_prop(type, prompt, NULL, dep);
-+	return menu_add_prop(type, expand_string_value(prompt), NULL, dep);
- }
+ # Architecture as present in compile.h
+ UTS_MACHINE 	:= $(ARCH)
+diff --git a/init/Kconfig b/init/Kconfig
+index e37f4b2..df18492 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -54,15 +54,6 @@ config INIT_ENV_ARG_LIMIT
+ 	  Maximum of each of the number of arguments and environment
+ 	  variables passed to init from the kernel command line.
  
- void menu_add_visibility(struct expr *expr)
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 19452b6..ef006be 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -110,28 +110,16 @@ static struct menu *current_menu, *current_entry;
- %%
- input: nl start | start;
- 
--start: mainmenu_stmt stmt_list | no_mainmenu_stmt stmt_list;
-+start: mainmenu_stmt stmt_list | stmt_list;
- 
- /* mainmenu entry */
- 
- mainmenu_stmt: T_MAINMENU prompt nl
- {
- 	menu_add_prompt(P_MENU, $2, NULL);
-+	free($2);
- };
- 
--/* Default main menu, if there's no mainmenu entry */
 -
--no_mainmenu_stmt: /* empty */
--{
--	/*
--	 * Hack: Keep the main menu title on the heap so we can safely free it
--	 * later regardless of whether it comes from the 'prompt' in
--	 * mainmenu_stmt or here
--	 */
--	menu_add_prompt(P_MENU, xstrdup("Linux Kernel Configuration"), NULL);
--};
+-config CROSS_COMPILE
+-	string "Cross-compiler tool prefix"
+-	help
+-	  Same as running 'make CROSS_COMPILE=prefix-' but stored for
+-	  default make runs in this kernel build directory.  You don't
+-	  need to set this unless you want the configured kernel build
+-	  directory to select the cross-compiler automatically.
 -
--
- stmt_list:
- 	  /* empty */
- 	| stmt_list common_stmt
-@@ -217,6 +205,7 @@ config_option: T_TYPE prompt_stmt_opt T_EOL
- config_option: T_PROMPT prompt if_expr T_EOL
- {
- 	menu_add_prompt(P_PROMPT, $2, $3);
-+	free($2);
- 	printd(DEBUG_PARSE, "%s:%d:prompt\n", zconf_curname(), zconf_lineno());
- };
- 
-@@ -316,6 +305,7 @@ choice_option_list:
- choice_option: T_PROMPT prompt if_expr T_EOL
- {
- 	menu_add_prompt(P_PROMPT, $2, $3);
-+	free($2);
- 	printd(DEBUG_PARSE, "%s:%d:prompt\n", zconf_curname(), zconf_lineno());
- };
- 
-@@ -385,6 +375,7 @@ menu: T_MENU prompt T_EOL
- {
- 	menu_add_entry(NULL);
- 	menu_add_prompt(P_MENU, $2, NULL);
-+	free($2);
- 	printd(DEBUG_PARSE, "%s:%d:menu\n", zconf_curname(), zconf_lineno());
- };
- 
-@@ -424,6 +415,7 @@ comment: T_COMMENT prompt T_EOL
- {
- 	menu_add_entry(NULL);
- 	menu_add_prompt(P_COMMENT, $2, NULL);
-+	free($2);
- 	printd(DEBUG_PARSE, "%s:%d:comment\n", zconf_curname(), zconf_lineno());
- };
- 
-@@ -489,6 +481,7 @@ prompt_stmt_opt:
- 	| prompt if_expr
- {
- 	menu_add_prompt(P_PROMPT, $1, $2);
-+	free($1);
- };
- 
- prompt:	  T_WORD
-@@ -536,7 +529,6 @@ word_opt: /* empty */			{ $$ = NULL; }
- 
- void conf_parse(const char *name)
- {
--	const char *tmp;
- 	struct symbol *sym;
- 	int i;
- 
-@@ -560,10 +552,10 @@ void conf_parse(const char *name)
- 	if (!modules_sym)
- 		modules_sym = sym_find( "n" );
- 
--	tmp = rootmenu.prompt->text;
--	rootmenu.prompt->text = _(rootmenu.prompt->text);
--	rootmenu.prompt->text = expand_string_value(rootmenu.prompt->text);
--	free((char*)tmp);
-+	if (!menu_has_prompt(&rootmenu)) {
-+		current_entry = &rootmenu;
-+		menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
-+	}
- 
- 	menu_finalize(&rootmenu);
- 	for_all_symbols(i, sym) {
+ config COMPILE_TEST
+ 	bool "Compile also drivers which will not load"
+ 	depends on !UML
 -- 
 2.7.4
 
