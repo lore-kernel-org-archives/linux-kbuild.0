@@ -1,52 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:54197 "EHLO
+Received: from mout.kundenserver.de ([217.72.192.73]:45185 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750961AbeBPVlj (ORCPT
+        with ESMTP id S1751009AbeBPVmh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 16:41:39 -0500
+        Fri, 16 Feb 2018 16:42:37 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 0/3] fixing the last failures in randconfig builds
-Date: Fri, 16 Feb 2018 22:41:10 +0100
-Message-Id: <20180216214117.1947175-1-arnd@arndb.de>
+Subject: [PATCH 3/3] Kconfig: add a default allrandom.config
+Date: Fri, 16 Feb 2018 22:41:13 +0100
+Message-Id: <20180216214117.1947175-4-arnd@arndb.de>
+In-Reply-To: <20180216214117.1947175-1-arnd@arndb.de>
+References: <20180216214117.1947175-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: "Yann E . MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
 
-I've recently done some build testing on 4.14-stable and to my surprise
-found only a handful of bugfixes were required to build all x86 and arm64
-randconfig output without any warnings using gcc-7.2.1. I have submitted
-the remaining trivial patches now, and this is the non-trivial remaining
-part, where we turn off some options that are known to cause problems in
-randconfig builds.
+Building randconfig kernels frequently leads to build errors from
+drivers that have additional build dependencies, or that we don't
+want to build for compile-testing for some other reason.
 
-While I've carried the same patches in my randconfig test tree for a long
-time, I wasn't entirely sure about my approach and never submitted them
-for inclusion. Now that this is literally all that is remains, I'd like
-to propose all three for inclusion.
+We already have a couple of compile-time options that can deal with this
+problem, but the complete set is not documented well.  We also have a
+method to override some options during 'make randconfig' and a couple
+of other make targets. However, we don't yet combine those two.
 
-If someone has another idea for how to address these, that's fine with
-me as well, as long as we can make sure at least COMPILE_TEST is enabled
-for randconfig builds by default (everything else can be derived from that
-if necessary).
+This adds a new allrandom.config file to turn on CONFIG_COMPILE_TEST,
+CONFIG_STANDALONE and CONFIG_PREVENT_FIRMWARE_BUILD for all randconfig
+builds. This in turn disables some other options that we already try
+to avoid in 'allmodconfig' builds and that make no sense in a general
+randconfig build.
 
-Note that the 4.15 release has a couple of build-time regressions that I
-have sent bugfixes for but that so far have not made it in, and 4.16-rc
-still has a number of other issues without patches.
+Building with 'make randconfig KCONFIG_ALLCONFIG=1' should now always
+succeed without warnings on x86 and arm64, aside from recent regressions.
+Other architectures probably need additional bugfixes.
 
-       Arnd
-
-Arnd Bergmann (3):
-  Kconfig: disable PROFILE_ALL_BRANCHES for compile testing
-  Kconfig: improve handling for all{rand,yes,no,}.config fragments
-  Kconfig: add a default allrandom.config
-
- kernel/configs/allrandom.config |  6 ++++++
- kernel/trace/Kconfig            |  1 +
- scripts/kconfig/conf.c          | 27 +++++++++++++++++++--------
- 3 files changed, 26 insertions(+), 8 deletions(-)
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ kernel/configs/allrandom.config | 6 ++++++
+ 1 file changed, 6 insertions(+)
  create mode 100644 kernel/configs/allrandom.config
 
+diff --git a/kernel/configs/allrandom.config b/kernel/configs/allrandom.config
+new file mode 100644
+index 000000000000..67294ef2e3a2
+--- /dev/null
++++ b/kernel/configs/allrandom.config
+@@ -0,0 +1,6 @@
++# maximize search space, disable options not worth testing
++CONFIG_COMPILE_TEST=y
++
++# reduce compile-time dependencies
++CONFIG_STANDALONE=y
++CONFIG_PREVENT_FIRMWARE_BUILD=y
 -- 
 2.9.0
 
