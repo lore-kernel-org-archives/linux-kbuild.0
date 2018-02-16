@@ -1,76 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:57824 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:58323 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752719AbeBPSlU (ORCPT
+        with ESMTP id S1752921AbeBPSlr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 13:41:20 -0500
+        Fri, 16 Feb 2018 13:41:47 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 18/23] gcov: remove CONFIG_GCOV_FORMAT_AUTODETECT
-Date: Sat, 17 Feb 2018 03:38:46 +0900
-Message-Id: <1518806331-7101-19-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 14/23] kconfig: show compiler version text in the top comment
+Date: Sat, 17 Feb 2018 03:38:42 +0900
+Message-Id: <1518806331-7101-15-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-CONFIG_GCOV_FORMAT_AUTODETECT compiles either gcc_3_4.c or gcc_4_7.c
-according to your GCC version.
+The kernel configuration phase is now tightly coupled with the compiler
+in use.  It will be nice to show the compiler information in Kconfig.
 
-We can achieve the equivalent behavior by setting reasonable default
-in the 'choice' with the knowledge of the compiler version.
+The compiler information will be displayed like this:
 
-Users are still allowed to change it if they need to do so.
+  $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- config
+  scripts/kconfig/conf  --oldaskconfig Kconfig
+  *
+  * Linux/arm64 4.16.0-rc1 Kernel Configuration
+  *
+  *
+  * Compiler: aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011
+  *
+  *
+  * General setup
+  *
+  Compile also drivers which will not load (COMPILE_TEST) [N/y/?]
+
+If you use GUI methods such as menuconfig, it will be displayed in the
+top menu.
+
+This is simply implemented by using 'comment'.  So, it will be saved
+into the .config file as well.
+
+This commit has a very important meaning.  If the compile is upgraded,
+Kconfig must be re-run since different compilers have different sets
+of supported options.
+
+All referenced environments are written to include/config/auto.conf.cmd
+so that any environment change triggers silentoldconfig, and prompt
+the user to input new values if needed.
+
+With this commit, something like follows will be added to
+include/config/auto.conf.cmd
+
+  ifneq "$(CC_VERSION_TEXT)" "aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011"
+  include/config/auto.conf: FORCE
+  endif
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- kernel/gcov/Kconfig  | 18 ++++++------------
- kernel/gcov/Makefile |  2 --
- 2 files changed, 6 insertions(+), 14 deletions(-)
+ Kconfig  | 2 ++
+ Makefile | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/kernel/gcov/Kconfig b/kernel/gcov/Kconfig
-index 1276aab..c56bee7 100644
---- a/kernel/gcov/Kconfig
-+++ b/kernel/gcov/Kconfig
-@@ -53,20 +53,14 @@ config GCOV_PROFILE_ALL
- choice
- 	prompt "Specify GCOV format"
- 	depends on GCOV_KERNEL
--	default GCOV_FORMAT_AUTODETECT
-+	default GCOV_FORMAT_3_4 if CC_IS_GCC && GCC_VERSION < 40700
-+	default GCOV_FORMAT_4_7
- 	---help---
--	The gcov format is usually determined by the GCC version, but there are
-+	The gcov format is usually determined by the GCC version, and the
-+	default is chosen according to your GCC version. However, there are
- 	exceptions where format changes are integrated in lower-version GCCs.
--	In such a case use this option to adjust the format used in the kernel
--	accordingly.
--
--	If unsure, choose "Autodetect".
--
--config GCOV_FORMAT_AUTODETECT
--	bool "Autodetect"
--	---help---
--	Select this option to use the format that corresponds to your GCC
--	version.
-+	In such a case, change this option to adjust the format used in the
-+	kernel accordingly.
+diff --git a/Kconfig b/Kconfig
+index e6ece5b..99ed4b8 100644
+--- a/Kconfig
++++ b/Kconfig
+@@ -5,4 +5,6 @@
+ #
+ mainmenu "Linux/$ARCH $KERNELVERSION Kernel Configuration"
  
- config GCOV_FORMAT_3_4
- 	bool "GCC 3.4 format"
-diff --git a/kernel/gcov/Makefile b/kernel/gcov/Makefile
-index c6c50e5..ff06d64 100644
---- a/kernel/gcov/Makefile
-+++ b/kernel/gcov/Makefile
-@@ -4,5 +4,3 @@ ccflags-y := -DSRCTREE='"$(srctree)"' -DOBJTREE='"$(objtree)"'
- obj-y := base.o fs.o
- obj-$(CONFIG_GCOV_FORMAT_3_4) += gcc_3_4.o
- obj-$(CONFIG_GCOV_FORMAT_4_7) += gcc_4_7.o
--obj-$(CONFIG_GCOV_FORMAT_AUTODETECT) += $(call cc-ifversion, -lt, 0407, \
--							gcc_3_4.o, gcc_4_7.o)
++comment "Compiler: $CC_VERSION_TEXT"
++
+ source "arch/$SRCARCH/Kconfig"
+diff --git a/Makefile b/Makefile
+index 6491404..b8df04b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -438,6 +438,8 @@ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
+ export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
+ export KBUILD_ARFLAGS
+ 
++export CC_VERSION_TEXT := $(shell $(CC) --version | head -n 1)
++
+ # When compiling out-of-tree modules, put MODVERDIR in the module
+ # tree rather than in the kernel tree. The kernel tree might
+ # even be read-only.
 -- 
 2.7.4
 
