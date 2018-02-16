@@ -1,55 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:57773 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752671AbeBPSlS (ORCPT
+Received: from mail-io0-f176.google.com ([209.85.223.176]:33006 "EHLO
+        mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751008AbeBPTRy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 13:41:18 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 15/23] kconfig: add CC_IS_GCC and GCC_VERSION
-Date: Sat, 17 Feb 2018 03:38:43 +0900
-Message-Id: <1518806331-7101-16-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
+        Fri, 16 Feb 2018 14:17:54 -0500
+MIME-Version: 1.0
+In-Reply-To: <1518806331-7101-12-git-send-email-yamada.masahiro@socionext.com>
+References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com> <1518806331-7101-12-git-send-email-yamada.masahiro@socionext.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 16 Feb 2018 11:17:52 -0800
+Message-ID: <CA+55aFwQLrrBeXZXK_qUXiGVFNv3qPJS4tNKFacuk0Y0WgZjCA@mail.gmail.com>
+Subject: Re: [PATCH 11/23] kconfig: add 'shell-stdout' function
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-This will be useful to specify the required compiler version,
-like this:
+On Fri, Feb 16, 2018 at 10:38 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> This is the second built-in function, which retrieves the first line
+> of stdout from the given shell command.
 
-config FOO
-        bool "Use Foo"
-        depends on GCC_VERSION >= 408000
-        help
-          This feature requires GCC 4.8 or newer.
+This is the only part I really don't much like in your patch series.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Most of it is just lovely and looks very nice and powerful, but the
+difference between "$(shell ..." and "$(shell-stdout ..." to me is
+bvery ugly.
 
- init/Kconfig | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Can we *please* make "shell-stdout" go away, and make this just be "shell"?
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 837a584..f2da5e9 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -12,6 +12,15 @@ config cc-option
- 	string
- 	macro $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
- 
-+config CC_IS_GCC
-+	bool
-+	default $(shell $CC --version | grep -q gcc)
-+
-+config GCC_VERSION
-+	int
-+	default $(shell-stdout $srctree/scripts/gcc-version.sh -p $CC | sed 's/^0*//') if CC_IS_GCC
-+	default 0
-+
- config CONSTRUCTORS
- 	bool
- 	depends on !UML
--- 
-2.7.4
+The rule would be very simple:
 
+ - if the result of the shell command is a failure, the result is 'n'
+
+ - otherwise, the result is the first line of stdout
+
+ - if the result is empty, we replace it with 'y'.
+
+So doing $(shell true) would be 100% equivalent to $(shell echo y),
+and you could still do that
+
+          default $(shell $CC --version | grep -q gcc)
+
+because it would just automatically do the right thing.
+
+Basically, the only difference is how $(shell ) works in the success
+case: the result won't necessarily be 'y', it will be whatever output.
+But if you want to always turn it into 'y' (say, you don't have a "-q"
+flag for the grep equivalent above), you can always do so with
+
+          default $(shell $CC --version | noqgrep gcc > /dev/null)
+
+So it seems to me that there is never any fundamental reason why we'd
+want both "shell" and "shell-stdout", since "shell-stdout" is
+fundamentally more powerful than "shell", and can always be used as
+such (and just renamed to "shell").
+
+Because I really think that it's just much prettier and more intuitive
+to be able to say
+
+        default "/boot/config-$(shell uname --release)"
+
+without that "-stdout" thing.
+
+Hmm?
+
+But I do want to say how much I liked this series. Just this part
+seemed to result in uglier Kconfig scripts.
+
+         Linus
