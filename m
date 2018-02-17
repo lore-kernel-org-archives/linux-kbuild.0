@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:52708 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750960AbeBQCID (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:55344 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750948AbeBQCIN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 21:08:03 -0500
-Received: by mail-wm0-f65.google.com with SMTP id t3so6109555wmc.2
-        for <linux-kbuild@vger.kernel.org>; Fri, 16 Feb 2018 18:08:02 -0800 (PST)
+        Fri, 16 Feb 2018 21:08:13 -0500
+Received: by mail-wm0-f68.google.com with SMTP id h74so6125610wme.5
+        for <linux-kbuild@vger.kernel.org>; Fri, 16 Feb 2018 18:08:13 -0800 (PST)
 From: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Subject: [PATCH v3 1/3] kconfig: Print reverse dependencies on new line consistently
-Date: Sat, 17 Feb 2018 03:05:21 +0100
-Message-Id: <371cac6c90c4e1013f5bbfb53e48b572695b509a.1518826148.git.erosca@de.adit-jv.com>
+Subject: [PATCH v3 2/3] kconfig: Prepare for printing reverse dependencies in groups
+Date: Sat, 17 Feb 2018 03:05:22 +0100
+Message-Id: <8414488e9b702af60d9f6fd3488e66d18523e68c.1518826148.git.erosca@de.adit-jv.com>
 In-Reply-To: <cover.1518826148.git.erosca@de.adit-jv.com>
 References: <cover.1518826148.git.erosca@de.adit-jv.com>
 In-Reply-To: <cover.1518826148.git.erosca@de.adit-jv.com>
@@ -21,124 +21,167 @@ Cc: Eugeniu Rosca <erosca@de.adit-jv.com>, Eugeniu Rosca <rosca.eugeniu@gmail.co
 
 From: Eugeniu Rosca <erosca@de.adit-jv.com>
 
-Commit 1ccb27143360 ("kconfig: make "Selected by:" and "Implied by:"
-readable") made an incredible improvement in how reverse dependencies
-are perceived by the user, by breaking down the single (often
-interminable) expression string into small readable chunks, each of
-them displayed on a separate line:
+Currently, reverse dependencies are printed like [1]. Prepare the ground
+for printing them like [2]. No functional change is intended in this
+patch.
 
-Selected by:
-- A && B
-- C && (D || E)
+[1] Current pattern for printing reverse dependencies:
+  Selected by:
+  - EXPR_A_Y /* evaluates to =y */
+  - EXPR_B_N /* evaluates to =n */
+  - EXPR_C_Y /* evaluates to =y */
+  - EXPR_D_M /* evaluates to =m */
+  - EXPR_E_N /* evaluates to =n */
 
-Unfortunately, what happens with the non-OR (either E_SYMBOL or E_AND)
-expressions is that they don't get a dedicated line:
+[2] Upcoming pattern for printing reverse dependencies:
+  Selected by [y]:
+  - EXPR_A_Y
+  - EXPR_C_Y
+  Selected by [m]:
+  - EXPR_D_M
+  Selected by [n]:
+  - EXPR_B_N
+  - EXPR_E_N
 
-Selected by: F && G
-
-That's arguably a bug/misbehavior, but it puts some amount of burden in
-implementing new ways of printing reverse dependencies to the user. As
-example, if we prefix every reverse dependency top level "||" token by
-its tristate value, then subjectively [2] looks more readable than [1].
-
-[1] Selected by: [m] F && G
-[2] Selected by:
-    - [m] F && G
-
-Also, if we print the reverse dependency sub-expressions in groups
-(clustered by the tristate value they evaluate to), then
-subjectively [4] looks more readable than [3].
-
-[3] Selected by [m]: F && G
-[4] Selected by [m]:
-    - F && G
-
-Based on the above, print all the reverse dependency sub-expressions on
-a separate line _consistently_. An example of change contributed by this
-commit is seen below.
-
-| Symbol: NEED_SG_DMA_LENGTH [=y]
-| ...
-|   Selected by: IOMMU_DMA [=y] && IOMMU_SUPPORT [=y]
-
-becomes:
-
-| Symbol: NEED_SG_DMA_LENGTH [=y]
-| ...
-|   Selected by:
-|   - IOMMU_DMA [=y] && IOMMU_SUPPORT [=y]
-
-This patch has been tested using a tuned variant of zconfdump which
-prints the reverse dependencies for each config symbol.
-
-Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Suggested-by: Ulf Magnusson <ulfalizer@gmail.com>
 Signed-off-by: Eugeniu Rosca <erosca@de.adit-jv.com>
 ---
- scripts/kconfig/expr.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
+ scripts/kconfig/expr.c | 38 +++++++++++++++++++++++++++-----------
+ scripts/kconfig/expr.h |  7 ++++++-
+ scripts/kconfig/menu.c |  4 ++--
+ 3 files changed, 35 insertions(+), 14 deletions(-)
 
 diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index d45381986ac7..b89baed7f15c 100644
+index b89baed7f15c..c610cb14284f 100644
 --- a/scripts/kconfig/expr.c
 +++ b/scripts/kconfig/expr.c
-@@ -1179,6 +1179,16 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
- 	return expr_get_leftmost_symbol(ret);
+@@ -1189,7 +1189,12 @@ expr_print_newline(struct expr *e,
+ 	expr_print(e, fn, data, prevtoken);
  }
  
+-static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken, bool revdep)
 +static void
-+expr_print_newline(struct expr *e,
-+		   void (*fn)(void *, struct symbol *, const char *),
-+		   void *data,
-+		   int prevtoken)
-+{
-+	fn(data, NULL, "\n  - ");
-+	expr_print(e, fn, data, prevtoken);
-+}
-+
- static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken, bool revdep)
++__expr_print(struct expr *e,
++	     void (*fn)(void *, struct symbol *, const char *),
++	     void *data,
++	     int prevtoken,
++	     enum print_type type)
  {
  	if (!e) {
-@@ -1191,7 +1201,10 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
+ 		fn(data, NULL, "y");
+@@ -1201,10 +1206,16 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
  	switch (e->type) {
  	case E_SYMBOL:
  		if (e->left.sym->name)
--			fn(data, e->left.sym, e->left.sym->name);
-+			if (!revdep)
-+				fn(data, e->left.sym, e->left.sym->name);
-+			else
-+				expr_print_newline(e, fn, data, E_OR);
+-			if (!revdep)
++			switch (type) {
++			case PRINT_NORMAL:
+ 				fn(data, e->left.sym, e->left.sym->name);
+-			else
++				break;
++			case PRINT_REVDEP_ALL:
+ 				expr_print_newline(e, fn, data, E_OR);
++				break;
++			default:
++				break;
++			}
  		else
  			fn(data, NULL, "<choice>");
  		break;
-@@ -1234,19 +1247,19 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
+@@ -1247,18 +1258,23 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
  		fn(data, e->right.sym, e->right.sym->name);
  		break;
  	case E_OR:
--		if (revdep && e->left.expr->type != E_OR)
--			fn(data, NULL, "\n  - ");
- 		__expr_print(e->left.expr, fn, data, E_OR, revdep);
--		if (revdep)
--			fn(data, NULL, "\n  - ");
--		else
-+		if (!revdep)
+-		__expr_print(e->left.expr, fn, data, E_OR, revdep);
+-		if (!revdep)
++		__expr_print(e->left.expr, fn, data, E_OR, type);
++		if (type == PRINT_NORMAL)
  			fn(data, NULL, " || ");
- 		__expr_print(e->right.expr, fn, data, E_OR, revdep);
+-		__expr_print(e->right.expr, fn, data, E_OR, revdep);
++		__expr_print(e->right.expr, fn, data, E_OR, type);
  		break;
  	case E_AND:
--		expr_print(e->left.expr, fn, data, E_AND);
--		fn(data, NULL, " && ");
--		expr_print(e->right.expr, fn, data, E_AND);
-+		if (!revdep) {
-+			expr_print(e->left.expr, fn, data, E_AND);
-+			fn(data, NULL, " && ");
-+			expr_print(e->right.expr, fn, data, E_AND);
-+		} else {
-+			expr_print_newline(e, fn, data, E_OR);
-+		}
+-		if (!revdep) {
++		switch (type) {
++		case PRINT_NORMAL:
+ 			expr_print(e->left.expr, fn, data, E_AND);
+ 			fn(data, NULL, " && ");
+ 			expr_print(e->right.expr, fn, data, E_AND);
+-		} else {
++			break;
++		case PRINT_REVDEP_ALL:
+ 			expr_print_newline(e, fn, data, E_OR);
++			break;
++		default:
++			break;
+ 		}
  		break;
  	case E_LIST:
- 		fn(data, e->right.sym, e->right.sym->name);
+@@ -1289,7 +1305,7 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
+ 
+ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken)
+ {
+-	__expr_print(e, fn, data, prevtoken, false);
++	__expr_print(e, fn, data, prevtoken, PRINT_NORMAL);
+ }
+ 
+ static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
+@@ -1342,7 +1358,7 @@ void expr_gstr_print(struct expr *e, struct gstr *gs)
+  * line with a minus. This makes expressions much easier to read.
+  * Suitable for reverse dependency expressions.
+  */
+-void expr_gstr_print_revdep(struct expr *e, struct gstr *gs)
++void expr_gstr_print_revdep(struct expr *e, struct gstr *gs, enum print_type t)
+ {
+-	__expr_print(e, expr_print_gstr_helper, gs, E_NONE, true);
++	__expr_print(e, expr_print_gstr_helper, gs, E_NONE, t);
+ }
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index c16e82e302a2..21cb67c15091 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -34,6 +34,11 @@ enum expr_type {
+ 	E_LIST, E_SYMBOL, E_RANGE
+ };
+ 
++enum print_type {
++	PRINT_NORMAL,
++	PRINT_REVDEP_ALL,
++};
++
+ union expr_data {
+ 	struct expr *expr;
+ 	struct symbol *sym;
+@@ -310,7 +315,7 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2);
+ void expr_fprint(struct expr *e, FILE *out);
+ struct gstr; /* forward */
+ void expr_gstr_print(struct expr *e, struct gstr *gs);
+-void expr_gstr_print_revdep(struct expr *e, struct gstr *gs);
++void expr_gstr_print_revdep(struct expr *e, struct gstr *gs, enum print_type t);
+ 
+ static inline int expr_is_yes(struct expr *e)
+ {
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 99222855544c..5b8edba105f2 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -828,14 +828,14 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
+ 	get_symbol_props_str(r, sym, P_SELECT, _("  Selects: "));
+ 	if (sym->rev_dep.expr) {
+ 		str_append(r, _("  Selected by: "));
+-		expr_gstr_print_revdep(sym->rev_dep.expr, r);
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, PRINT_REVDEP_ALL);
+ 		str_append(r, "\n");
+ 	}
+ 
+ 	get_symbol_props_str(r, sym, P_IMPLY, _("  Implies: "));
+ 	if (sym->implied.expr) {
+ 		str_append(r, _("  Implied by: "));
+-		expr_gstr_print_revdep(sym->implied.expr, r);
++		expr_gstr_print_revdep(sym->implied.expr, r, PRINT_REVDEP_ALL);
+ 		str_append(r, "\n");
+ 	}
+ 
 -- 
 2.16.1
 
