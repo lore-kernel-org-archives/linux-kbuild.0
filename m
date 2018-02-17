@@ -1,263 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:40476 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750960AbeBQCIV (ORCPT
+Received: from pb-smtp1.pobox.com ([64.147.108.70]:54601 "EHLO
+        pb-smtp1.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751032AbeBQCam (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 21:08:21 -0500
-Received: by mail-wm0-f65.google.com with SMTP id v10so6047793wmh.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 16 Feb 2018 18:08:20 -0800 (PST)
-From: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Subject: [PATCH v3 3/3] kconfig: Print reverse dependencies in groups
-Date: Sat, 17 Feb 2018 03:05:23 +0100
-Message-Id: <0ed37972989a9ba7a8b50777bd60ea8f46495a2a.1518826148.git.erosca@de.adit-jv.com>
-In-Reply-To: <cover.1518826148.git.erosca@de.adit-jv.com>
-References: <cover.1518826148.git.erosca@de.adit-jv.com>
-In-Reply-To: <cover.1518826148.git.erosca@de.adit-jv.com>
-References: <cover.1518826148.git.erosca@de.adit-jv.com>
+        Fri, 16 Feb 2018 21:30:42 -0500
+Date: Fri, 16 Feb 2018 21:30:38 -0500 (EST)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: [PATCH 08/23] kconfig: add 'macro' keyword to support user-defined
+ function
+In-Reply-To: <20180216235138.b4p6q62auvnzb2sy@huvuddator>
+Message-ID: <nycvar.YSQ.7.76.1802162118010.31644@knanqh.ubzr>
+References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com> <1518806331-7101-9-git-send-email-yamada.masahiro@socionext.com> <nycvar.YSQ.7.76.1802161438470.31719@knanqh.ubzr> <20180216235138.b4p6q62auvnzb2sy@huvuddator>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Ulf Magnusson <ulfalizer@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>
-Cc: Eugeniu Rosca <erosca@de.adit-jv.com>, Eugeniu Rosca <rosca.eugeniu@gmail.com>, linux-kbuild@vger.kernel.org
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-From: Eugeniu Rosca <erosca@de.adit-jv.com>
+On Sat, 17 Feb 2018, Ulf Magnusson wrote:
 
-Assuming commit 617aebe6a97e ("Merge tag 'usercopy-v4.16-rc1' of
-git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux"), ARCH=arm64
-and vanilla arm64 defconfig, here is the top 10 CONFIG options with
-the highest amount of top level "||" sub-expressions/tokens that make
-up the final "{Selected,Implied} by" reverse dependency expression.
+> On Fri, Feb 16, 2018 at 02:49:31PM -0500, Nicolas Pitre wrote:
+> > On Sat, 17 Feb 2018, Masahiro Yamada wrote:
+> > 
+> > > Now, we got a basic ability to test compiler capability in Kconfig.
+> > > 
+> > > config CC_HAS_STACKPROTECTOR
+> > >         bool
+> > >         default $(shell $CC -Werror -fstack-protector -c -x c /dev/null -o /dev/null)
+> > > 
+> > > This works, but it is ugly to repeat this long boilerplate.
+> > > 
+> > > We want to describe like this:
+> > > 
+> > > config CC_HAS_STACKPROTECTOR
+> > >         bool
+> > >         default $(cc-option -fstack-protector)
+> > > 
+> > > It is straight-forward to implement a new function, but I do not like
+> > > to hard-code specialized functions like this.  Hence, here is another
+> > > feature to add functions from Kconfig files.
+> > > 
+> > > A user-defined function can be defined as a string type symbol with
+> > > a special keyword 'macro'.  It can be referenced in the same way as
+> > > built-in functions.  This feature was also inspired by Makefile where
+> > > user-defined functions are referenced by $(call func-name, args...),
+> > > but I omitted the 'call' to makes it shorter.
+> > > 
+> > > The macro definition can contain $(1), $(2), ... which will be replaced
+> > > with arguments from the caller.
+> > > 
+> > > Example code:
+> > > 
+> > >   config cc-option
+> > >           string
+> > >           macro $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
+> > 
+> > I think this syntax for defining a macro shouldn't start with the 
+> > "config" keyword, unless you want it to be part of the config symbol 
+> > space and land it in .config. And typing it as a "string" while it 
+> > actually returns y/n (hence a bool) is also strange.
+> > 
+> > What about this instead:
+> > 
+> > macro cc-option
+> > 	bool $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
+> > 
+> > This makes it easier to extend as well if need be.
+> > 
+> > 
+> > Nicolas
+> 
+> I haven't gone over the patchset in detail yet and might be missing
+> something here, but if this is just meant to be a textual shorthand,
+> then why give it a type at all?
 
-| Config                        | Revdep all | Revdep ![=n] |
-|-------------------------------|------------|--------------|
-| REGMAP_I2C                    | 212        | 9            |
-| CRC32                         | 167        | 25           |
-| FW_LOADER                     | 128        | 5            |
-| MFD_CORE                      | 124        | 9            |
-| FB_CFB_IMAGEBLIT              | 114        | 2            |
-| FB_CFB_COPYAREA               | 111        | 2            |
-| FB_CFB_FILLRECT               | 110        | 2            |
-| SND_PCM                       | 103        | 2            |
-| CRYPTO_HASH                   | 87         | 19           |
-| WATCHDOG_CORE                 | 86         | 6            |
+It is meant to be like a user-defined function.
 
-The story behind the above is that users need to visually
-review/evaluate 212 expressions which *potentially* select REGMAP_I2C
-in order to identify the expressions which *actually* select REGMAP_I2C,
-for a particular ARCH and for a particular defconfig used.
+> Do you think a simpler syntax like this would make sense?
+> 
+> 	macro cc-option "$(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)"
+> 
+> That's the most general version, where you could use it for other stuff
+> besides $(shell ...) as well, just to keep parity.
 
-To make this experience smoother, change the way reverse dependencies
-are displayed to the user from [1] to [2].
+This is not extendable.  Let's imagine that you might want to implement 
+some kind of conditionals some day e.g.:
 
-[1] Old representation of reverse dependencies for DMA_ENGINE_RAID:
-  Selected by:
-  - AMCC_PPC440SPE_ADMA [=n] && DMADEVICES [=y] && (440SPe || 440SP)
-  - BCM_SBA_RAID [=m] && DMADEVICES [=y] && (ARM64 [=y] || ...
-  - FSL_RAID [=n] && DMADEVICES [=y] && FSL_SOC && ...
-  - INTEL_IOATDMA [=n] && DMADEVICES [=y] && PCI [=y] && X86_64
-  - MV_XOR [=n] && DMADEVICES [=y] && (PLAT_ORION || ARCH_MVEBU [=y] ...
-  - MV_XOR_V2 [=y] && DMADEVICES [=y] && ARM64 [=y]
-  - XGENE_DMA [=n] && DMADEVICES [=y] && (ARCH_XGENE [=y] || ...
-  - DMATEST [=n] && DMADEVICES [=y] && DMA_ENGINE [=y]
+macro complex_test
+	bool $(shell foo) if LOCKDEP_SUPPORT
+	bool y if DEBUG_DRIVER
+	bool n
 
-[2] New representation of reverse dependencies for DMA_ENGINE_RAID:
-  Selected by [y]:
-  - MV_XOR_V2 [=y] && DMADEVICES [=y] && ARM64 [=y]
-  Selected by [m]:
-  - BCM_SBA_RAID [=m] && DMADEVICES [=y] && (ARM64 [=y] || ...
-  Selected by [n]:
-  - AMCC_PPC440SPE_ADMA [=n] && DMADEVICES [=y] && (440SPe || ...
-  - FSL_RAID [=n] && DMADEVICES [=y] && FSL_SOC && ...
-  - INTEL_IOATDMA [=n] && DMADEVICES [=y] && PCI [=y] && X86_64
-  - MV_XOR [=n] && DMADEVICES [=y] && (PLAT_ORION || ARCH_MVEBU [=y] ...
-  - XGENE_DMA [=n] && DMADEVICES [=y] && (ARCH_XGENE [=y] || ...
-  - DMATEST [=n] && DMADEVICES [=y] && DMA_ENGINE [=y]
+There is no real advantage to simplify the macro definition to its 
+simplest expression, unlike its actual usage.
 
-Signed-off-by: Eugeniu Rosca <erosca@de.adit-jv.com>
----
- scripts/kconfig/expr.c      | 59 ++++++++++++++++++++++++++++++++++++++++++++-
- scripts/kconfig/expr.h      |  4 +++
- scripts/kconfig/lkc_proto.h |  1 +
- scripts/kconfig/menu.c      | 37 ++++++++++++++++++++--------
- 4 files changed, 90 insertions(+), 11 deletions(-)
+> Are there any cases where something more advanced than that might be
+> warranted (e.g., macros that expand to complete expressions)?
 
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index c610cb14284f..48b99371d276 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -1213,6 +1213,18 @@ __expr_print(struct expr *e,
- 			case PRINT_REVDEP_ALL:
- 				expr_print_newline(e, fn, data, E_OR);
- 				break;
-+			case PRINT_REVDEP_YES:
-+				if (expr_calc_value(e) == yes)
-+					expr_print_newline(e, fn, data, E_OR);
-+				break;
-+			case PRINT_REVDEP_MOD:
-+				if (expr_calc_value(e) == mod)
-+					expr_print_newline(e, fn, data, E_OR);
-+				break;
-+			case PRINT_REVDEP_NO:
-+				if (expr_calc_value(e) == no)
-+					expr_print_newline(e, fn, data, E_OR);
-+				break;
- 			default:
- 				break;
- 			}
-@@ -1273,6 +1285,18 @@ __expr_print(struct expr *e,
- 		case PRINT_REVDEP_ALL:
- 			expr_print_newline(e, fn, data, E_OR);
- 			break;
-+		case PRINT_REVDEP_YES:
-+			if (expr_calc_value(e) == yes)
-+				expr_print_newline(e, fn, data, E_OR);
-+			break;
-+		case PRINT_REVDEP_MOD:
-+			if (expr_calc_value(e) == mod)
-+				expr_print_newline(e, fn, data, E_OR);
-+			break;
-+		case PRINT_REVDEP_NO:
-+			if (expr_calc_value(e) == no)
-+				expr_print_newline(e, fn, data, E_OR);
-+			break;
- 		default:
- 			break;
- 		}
-@@ -1353,10 +1377,43 @@ void expr_gstr_print(struct expr *e, struct gstr *gs)
- 	expr_print(e, expr_print_gstr_helper, gs, E_NONE);
- }
- 
-+/*
-+ * Allow front ends to check if a specific reverse dependency expression
-+ * has at least one top level "||" member which evaluates to "val". This,
-+ * will allow front ends to, as example, avoid printing "Selected by [y]:"
-+ * line when there are actually no top level "||" sub-expressions which
-+ * evaluate to =y.
-+ */
-+bool expr_revdep_contains(struct expr *e, tristate val)
-+{
-+	bool ret = false;
-+
-+	if (!e)
-+		return ret;
-+
-+	switch (e->type) {
-+	case E_SYMBOL:
-+	case E_AND:
-+		if (expr_calc_value(e) == val)
-+			ret = true;
-+		break;
-+	case E_OR:
-+		if (expr_revdep_contains(e->left.expr, val))
-+			ret = true;
-+		else if (expr_revdep_contains(e->right.expr, val))
-+			ret = true;
-+		break;
-+	default:
-+		break;
-+	}
-+	return ret;
-+}
-+
- /*
-  * Transform the top level "||" tokens into newlines and prepend each
-  * line with a minus. This makes expressions much easier to read.
-- * Suitable for reverse dependency expressions.
-+ * Suitable for reverse dependency expressions. In addition, allow
-+ * selective printing of tokens/sub-expressions by their tristate value.
-  */
- void expr_gstr_print_revdep(struct expr *e, struct gstr *gs, enum print_type t)
- {
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index 21cb67c15091..d5b096725ca8 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -37,6 +37,9 @@ enum expr_type {
- enum print_type {
- 	PRINT_NORMAL,
- 	PRINT_REVDEP_ALL,
-+	PRINT_REVDEP_YES,
-+	PRINT_REVDEP_MOD,
-+	PRINT_REVDEP_NO,
- };
- 
- union expr_data {
-@@ -316,6 +319,7 @@ void expr_fprint(struct expr *e, FILE *out);
- struct gstr; /* forward */
- void expr_gstr_print(struct expr *e, struct gstr *gs);
- void expr_gstr_print_revdep(struct expr *e, struct gstr *gs, enum print_type t);
-+bool expr_revdep_contains(struct expr *e, tristate val);
- 
- static inline int expr_is_yes(struct expr *e)
- {
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index 9dc8abfb1dc3..69ed1477e4ef 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -25,6 +25,7 @@ bool menu_has_help(struct menu *menu);
- const char * menu_get_help(struct menu *menu);
- struct gstr get_relations_str(struct symbol **sym_arr, struct list_head *head);
- void menu_get_ext_help(struct menu *menu, struct gstr *help);
-+void get_revdep_by_type(struct expr *e, char *s, struct gstr *r);
- 
- /* symbol.c */
- extern struct symbol * symbol_hash[SYMBOL_HASHSIZE];
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 5b8edba105f2..d13ffa69d65b 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -790,6 +790,31 @@ static void get_symbol_props_str(struct gstr *r, struct symbol *sym,
- 		str_append(r, "\n");
- }
- 
-+void get_revdep_by_type(struct expr *e, char *s, struct gstr *r)
-+{
-+	if (!e)
-+		return;
-+
-+	if (expr_revdep_contains(e, yes)) {
-+		str_append(r, s);
-+		str_append(r, _(" [y]:"));
-+		expr_gstr_print_revdep(e, r, PRINT_REVDEP_YES);
-+		str_append(r, "\n");
-+	}
-+	if (expr_revdep_contains(e, mod)) {
-+		str_append(r, s);
-+		str_append(r, _(" [m]:"));
-+		expr_gstr_print_revdep(e, r, PRINT_REVDEP_MOD);
-+		str_append(r, "\n");
-+	}
-+	if (expr_revdep_contains(e, no)) {
-+		str_append(r, s);
-+		str_append(r, _(" [n]:"));
-+		expr_gstr_print_revdep(e, r, PRINT_REVDEP_NO);
-+		str_append(r, "\n");
-+	}
-+}
-+
- /*
-  * head is optional and may be NULL
-  */
-@@ -826,18 +851,10 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
- 	}
- 
- 	get_symbol_props_str(r, sym, P_SELECT, _("  Selects: "));
--	if (sym->rev_dep.expr) {
--		str_append(r, _("  Selected by: "));
--		expr_gstr_print_revdep(sym->rev_dep.expr, r, PRINT_REVDEP_ALL);
--		str_append(r, "\n");
--	}
-+	get_revdep_by_type(sym->rev_dep.expr, "  Selected by", r);
- 
- 	get_symbol_props_str(r, sym, P_IMPLY, _("  Implies: "));
--	if (sym->implied.expr) {
--		str_append(r, _("  Implied by: "));
--		expr_gstr_print_revdep(sym->implied.expr, r, PRINT_REVDEP_ALL);
--		str_append(r, "\n");
--	}
-+	get_revdep_by_type(sym->implied.expr, "  Implied by", r);
- 
- 	str_append(r, "\n\n");
- }
--- 
-2.16.1
+Maybe not now, but there is no need to close the door on the possibility 
+either.
 
+
+Nicolas
