@@ -1,104 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:36461 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750880AbeBPXvt (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:54983 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750957AbeBQCHj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 18:51:49 -0500
-Date: Sat, 17 Feb 2018 00:51:38 +0100
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: Re: [PATCH 08/23] kconfig: add 'macro' keyword to support
- user-defined function
-Message-ID: <20180216235138.b4p6q62auvnzb2sy@huvuddator>
-References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
- <1518806331-7101-9-git-send-email-yamada.masahiro@socionext.com>
- <nycvar.YSQ.7.76.1802161438470.31719@knanqh.ubzr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <nycvar.YSQ.7.76.1802161438470.31719@knanqh.ubzr>
+        Fri, 16 Feb 2018 21:07:39 -0500
+Received: by mail-wm0-f68.google.com with SMTP id z81so6098241wmb.4
+        for <linux-kbuild@vger.kernel.org>; Fri, 16 Feb 2018 18:07:39 -0800 (PST)
+From: Eugeniu Rosca <roscaeugeniu@gmail.com>
+Subject: [PATCH v3 0/3] Print reverse dependencies in groups
+Date: Sat, 17 Feb 2018 03:05:20 +0100
+Message-Id: <cover.1518826148.git.erosca@de.adit-jv.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Ulf Magnusson <ulfalizer@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>
+Cc: Eugeniu Rosca <erosca@de.adit-jv.com>, Eugeniu Rosca <rosca.eugeniu@gmail.com>, linux-kbuild@vger.kernel.org
 
-On Fri, Feb 16, 2018 at 02:49:31PM -0500, Nicolas Pitre wrote:
-> On Sat, 17 Feb 2018, Masahiro Yamada wrote:
-> 
-> > Now, we got a basic ability to test compiler capability in Kconfig.
-> > 
-> > config CC_HAS_STACKPROTECTOR
-> >         bool
-> >         default $(shell $CC -Werror -fstack-protector -c -x c /dev/null -o /dev/null)
-> > 
-> > This works, but it is ugly to repeat this long boilerplate.
-> > 
-> > We want to describe like this:
-> > 
-> > config CC_HAS_STACKPROTECTOR
-> >         bool
-> >         default $(cc-option -fstack-protector)
-> > 
-> > It is straight-forward to implement a new function, but I do not like
-> > to hard-code specialized functions like this.  Hence, here is another
-> > feature to add functions from Kconfig files.
-> > 
-> > A user-defined function can be defined as a string type symbol with
-> > a special keyword 'macro'.  It can be referenced in the same way as
-> > built-in functions.  This feature was also inspired by Makefile where
-> > user-defined functions are referenced by $(call func-name, args...),
-> > but I omitted the 'call' to makes it shorter.
-> > 
-> > The macro definition can contain $(1), $(2), ... which will be replaced
-> > with arguments from the caller.
-> > 
-> > Example code:
-> > 
-> >   config cc-option
-> >           string
-> >           macro $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
-> 
-> I think this syntax for defining a macro shouldn't start with the 
-> "config" keyword, unless you want it to be part of the config symbol 
-> space and land it in .config. And typing it as a "string" while it 
-> actually returns y/n (hence a bool) is also strange.
-> 
-> What about this instead:
-> 
-> macro cc-option
-> 	bool $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
-> 
-> This makes it easier to extend as well if need be.
-> 
-> 
-> Nicolas
+From: Eugeniu Rosca <erosca@de.adit-jv.com>
 
-I haven't gone over the patchset in detail yet and might be missing
-something here, but if this is just meant to be a textual shorthand,
-then why give it a type at all?
+Hello Masahiro, Ulf, Petr and all,
 
-Do you think a simpler syntax like this would make sense?
+Here are a few words about the motivation behind this patch series.
 
-	macro cc-option "$(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)"
+First, the reason I got in touch with Kconfig is to optimize the
+configuration of automotive kernels, as well as to align the kernel
+configuration across a number of platforms. In the context of kernel
+optimization, one of the primary goals is to filter out any features
+that are not mentioned in the platform requirements.
 
-That's the most general version, where you could use it for other stuff
-besides $(shell ...) as well, just to keep parity.
+Surprisingly or not, disabling a CONFIG option (which is assumed to
+be unneeded) may be not so trivial. Especially it is not trivial, when
+this CONFIG option is selected by a dozen of other configs. Before the
+moment commit 1ccb27143360 ("kconfig: make "Selected by:" and
+"Implied by:" readable") was submitted by Petr and eventually popped
+up in v4.16-rc1, it was an absolute pain to break down the "Selected by"
+reverse dependency expression in order to identify all those configs
+which select (IOW *do not allow disabling*) a certain feature (assumed
+to be not needed).
 
-You could then always just expand $() as a string, and maybe spit out
-"n" and "y" in the cases Linus suggested for $(shell ...). The existing
-logic for constant symbols should then take care of converting that into
-a tristate value where appropriate.
+This patch series tries to make one step further and puts at users'
+fingertips the revdep top level OR sub-expressions grouped/clustered by
+the tristate value they evaluate to. This should allow the users to
+directly concentrate on and tackle the active reverse dependencies,
+which imho are the only ones that matter for a given ARCH and for a
+given defconfig (nevertheless we still print all of them).
 
-If you go with that and want to support $() outside quotes, then
+Changes v2->v3:
+- Switch from reverse dependencies prefixed by their tristate value to
+  reverse dependencies grouped by the tristate value they evaluate to.
+- Skip printing "{Selected,Implied} by [y|m|n]:" if there are no top
+  level OR tokens/sub-expressions that evaluate to y|m|n (suggested
+  by Petr).
+- Use [1] as template for updating the interface/prototype of
+  __expr_print() (suggested by Ulf).
 
-	$(foo)
+Changes v1->v2:
+- Don't skip the =n reverse dependency OR tokens, since some users might
+  still need this information (suggested by Ulf).
+- Instead of using "Selected by" for active tokens only, use it for all
+  OR tokens, but specify the tristate value of each token as prefix
+  (suggested by Masahiro).
 
-would just be a shorthand for
+[1] https://marc.info/?l=linux-kbuild&m=151777006005199&w=4
 
-	"$(foo)"
+Eugeniu Rosca (3):
+  kconfig: Print reverse dependencies on new line consistently
+  kconfig: Prepare for printing reverse dependencies in groups
+  kconfig: Print reverse dependencies in groups
 
-Are there any cases where something more advanced than that might be
-warranted (e.g., macros that expand to complete expressions)? It seems
-pretty nice and nonmagical otherwise.
+ scripts/kconfig/expr.c      | 118 ++++++++++++++++++++++++++++++++++++++------
+ scripts/kconfig/expr.h      |  11 ++++-
+ scripts/kconfig/lkc_proto.h |   1 +
+ scripts/kconfig/menu.c      |  37 ++++++++++----
+ 4 files changed, 140 insertions(+), 27 deletions(-)
 
-Cheers,
-Ulf
+-- 
+2.16.1
+
