@@ -1,158 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f41.google.com ([209.85.215.41]:34968 "EHLO
-        mail-lf0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750951AbeBQGGo (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:48972 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750975AbeBQNiX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 17 Feb 2018 01:06:44 -0500
-Date: Sat, 17 Feb 2018 07:06:39 +0100
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: Re: [PATCH 08/23] kconfig: add 'macro' keyword to support
- user-defined function
-Message-ID: <20180217060639.jfcrgzvemluatnmo@huvuddator>
-References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
- <1518806331-7101-9-git-send-email-yamada.masahiro@socionext.com>
- <nycvar.YSQ.7.76.1802161438470.31719@knanqh.ubzr>
- <20180216235138.b4p6q62auvnzb2sy@huvuddator>
- <nycvar.YSQ.7.76.1802162118010.31644@knanqh.ubzr>
- <CAFkk2KTUGdLm+7HAFCq+dv78+QT9-GJivayh7M4pG9O_UkeLMQ@mail.gmail.com>
- <nycvar.YSQ.7.76.1802162331400.31644@knanqh.ubzr>
+        Sat, 17 Feb 2018 08:38:23 -0500
+Date: Sat, 17 Feb 2018 14:32:24 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 1/3] Kconfig: disable PROFILE_ALL_BRANCHES for compile
+ testing
+Message-ID: <20180217133224.GA25994@kroah.com>
+References: <20180216214117.1947175-1-arnd@arndb.de>
+ <20180216214117.1947175-2-arnd@arndb.de>
+ <20180216170346.497114b3@gandalf.local.home>
+ <CAK8P3a1ZvA3dk8qRXaF_yjirYTYkvuCggh8x7QU_p+vMxpTPNA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <nycvar.YSQ.7.76.1802162331400.31644@knanqh.ubzr>
+In-Reply-To: <CAK8P3a1ZvA3dk8qRXaF_yjirYTYkvuCggh8x7QU_p+vMxpTPNA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "Yann E . MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, stable <stable@vger.kernel.org>
 
-On Fri, Feb 16, 2018 at 11:44:25PM -0500, Nicolas Pitre wrote:
-> On Sat, 17 Feb 2018, Ulf Magnusson wrote:
+On Fri, Feb 16, 2018 at 11:14:42PM +0100, Arnd Bergmann wrote:
+> On Fri, Feb 16, 2018 at 11:03 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
+> > On Fri, 16 Feb 2018 22:41:11 +0100
+> > Arnd Bergmann <arnd@arndb.de> wrote:
+> >
+> >> This can easily double the time for compiling a driver but does not
+> >> provide any benefit for the compile tester, so it's better left disabled.
+> >>
+> >> In addition, any 'inline' function that is not also 'static' and that
+> >> contains an 'if' causes a warning like
+> >>
+> >> include/linux/string.h:212:2: note: in expansion of macro 'if'
+> >>   if (strscpy(p, q, p_size < q_size ? p_size : q_size) < 0)
+> >>   ^~
+> >> include/linux/compiler.h:162:4: warning: '______f' is static but declared in inline function 'strcpy' which is not static
+> >>
+> >> without this patch, and I could not come up with a nice fix for that.
+> >> In combination with my patch to always enable 'CONFIG_COMPILE_TEST'
+> >> during 'randconfig' builds, we can at least hide these warnings for
+> >> most users.
+> >
+> > This looks like it fixes the same issue that was already fixed and is
+> > in Linus's tree.
+> >
+> >  http://lkml.kernel.org/r/9199446b-a141-c0c3-9678-a3f9107f2750@infradead.org
+> >
+> > See commit 68e76e034b6b1 ("tracing: Prevent PROFILE_ALL_BRANCHES when
+> > FORTIFY_SOURCE=y")
 > 
-> > On Sat, Feb 17, 2018 at 3:30 AM, Nicolas Pitre <nico@fluxnic.net> wrote:
-> > > On Sat, 17 Feb 2018, Ulf Magnusson wrote:
-> > >
-> > >> On Fri, Feb 16, 2018 at 02:49:31PM -0500, Nicolas Pitre wrote:
-> > >> > On Sat, 17 Feb 2018, Masahiro Yamada wrote:
-> > >> >
-> > >> > > Now, we got a basic ability to test compiler capability in Kconfig.
-> > >> > >
-> > >> > > config CC_HAS_STACKPROTECTOR
-> > >> > >         bool
-> > >> > >         default $(shell $CC -Werror -fstack-protector -c -x c /dev/null -o /dev/null)
-> > >> > >
-> > >> > > This works, but it is ugly to repeat this long boilerplate.
-> > >> > >
-> > >> > > We want to describe like this:
-> > >> > >
-> > >> > > config CC_HAS_STACKPROTECTOR
-> > >> > >         bool
-> > >> > >         default $(cc-option -fstack-protector)
-> > >> > >
-> > >> > > It is straight-forward to implement a new function, but I do not like
-> > >> > > to hard-code specialized functions like this.  Hence, here is another
-> > >> > > feature to add functions from Kconfig files.
-> > >> > >
-> > >> > > A user-defined function can be defined as a string type symbol with
-> > >> > > a special keyword 'macro'.  It can be referenced in the same way as
-> > >> > > built-in functions.  This feature was also inspired by Makefile where
-> > >> > > user-defined functions are referenced by $(call func-name, args...),
-> > >> > > but I omitted the 'call' to makes it shorter.
-> > >> > >
-> > >> > > The macro definition can contain $(1), $(2), ... which will be replaced
-> > >> > > with arguments from the caller.
-> > >> > >
-> > >> > > Example code:
-> > >> > >
-> > >> > >   config cc-option
-> > >> > >           string
-> > >> > >           macro $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
-> > >> >
-> > >> > I think this syntax for defining a macro shouldn't start with the
-> > >> > "config" keyword, unless you want it to be part of the config symbol
-> > >> > space and land it in .config. And typing it as a "string" while it
-> > >> > actually returns y/n (hence a bool) is also strange.
-> > >> >
-> > >> > What about this instead:
-> > >> >
-> > >> > macro cc-option
-> > >> >     bool $(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
-> > >> >
-> > >> > This makes it easier to extend as well if need be.
-> > >> >
-> > >> >
-> > >> > Nicolas
-> > >>
-> > >> I haven't gone over the patchset in detail yet and might be missing
-> > >> something here, but if this is just meant to be a textual shorthand,
-> > >> then why give it a type at all?
-> > >
-> > > It is meant to be like a user-defined function.
-> > >
-> > >> Do you think a simpler syntax like this would make sense?
-> > >>
-> > >>       macro cc-option "$(shell $CC -Werror $(1) -c -x c /dev/null -o /dev/null)"
-> > >>
-> > >> That's the most general version, where you could use it for other stuff
-> > >> besides $(shell ...) as well, just to keep parity.
-> > >
-> > > This is not extendable.  Let's imagine that you might want to implement
-> > > some kind of conditionals some day e.g.:
-> > >
-> > > macro complex_test
-> > >         bool $(shell foo) if LOCKDEP_SUPPORT
-> > >         bool y if DEBUG_DRIVER
-> > >         bool n
-> > 
-> > I still don't quite get the semantics here. How would the behavior
-> > change if the type was changed to say string or int in some or all of
-> > the lines?
+> Ah, right. I missed that when I wrote the new changelog text for this old
+> patch of mine. It also means I should rebase the patch so it applies
+> on mainline, as I still want PROFILE_ALL_BRANCHES to be disabled
+> in COMPILE_TEST kernels for the build speed aspect.
 > 
-> I admit this wouldn't make sense to have multiple different types. In 
-> this example, the bool keyword acts as syntactic sugar more than 
-> anything else.
-> 
-> > Since the current model is to evaluate $() while the Kconfig files are
-> > being parsed, would this require evaluating Kconfig expressions during
-> > parsing? There is a relatively clean and (somewhat) easy to understand
-> > parsing/evaluation separation at the moment, which I like.
-> 
-> Agreed. Let's forget about the conditionals then.
-> 
-> 
-> Nicolas
+> Greg, could you add the 68e76e034b6b1 commit to 4.14-stable and
+> 4.15-stable in the meantime?
 
-This is also related to why it feels off to me to (at least for its own
-sake) make macro definitions mimic symbol definitions.
+It's already in 4.15, so I'll just queue it up to 4.14.y.
 
-To me, parsing being a different domain makes it "okay" to use a
-different syntax for macros compared to symbol definitions, especially
-if it happens to be handier. It even makes things less confusing,
-because there's less risk of mixing up the two domains (it's rare to mix
-up the preprocessor with C "proper", since the syntax is so different).
+thanks,
 
-More practically, I'm not sure that
-
-	macro foo "definition"
-
-would be that hard to extend in practice, if you'd ever need to. You could
-always add a new keyword:
-
-	fancy-macro/function/whatever foo ...
-
-I admit it'd be a bit ugly if you'd ever end up with something like
-
-	macro foo "definition"
-		bit_ugly
-
-It's still not the end of the world though, IMO, and I suspect there'd
-be better-looking options if you'd need to extend things on the macro
-side.
-
-That macro syntax seems like the simplest possible thing to me, with no
-obvious major drawbacks. Keeping parsing and evaluation cleanly
-separated is more important than the exact syntax though. It's a bonus
-if symbols and macros stand out as coming from different universes to
-people reading the Kconfig.
-
-Cheers,
-Ulf
+greg k-h
