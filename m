@@ -1,15 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:54983 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750957AbeBQCHj (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:52708 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750960AbeBQCID (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Feb 2018 21:07:39 -0500
-Received: by mail-wm0-f68.google.com with SMTP id z81so6098241wmb.4
-        for <linux-kbuild@vger.kernel.org>; Fri, 16 Feb 2018 18:07:39 -0800 (PST)
+        Fri, 16 Feb 2018 21:08:03 -0500
+Received: by mail-wm0-f65.google.com with SMTP id t3so6109555wmc.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 16 Feb 2018 18:08:02 -0800 (PST)
 From: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Subject: [PATCH v3 0/3] Print reverse dependencies in groups
-Date: Sat, 17 Feb 2018 03:05:20 +0100
-Message-Id: <cover.1518826148.git.erosca@de.adit-jv.com>
+Subject: [PATCH v3 1/3] kconfig: Print reverse dependencies on new line consistently
+Date: Sat, 17 Feb 2018 03:05:21 +0100
+Message-Id: <371cac6c90c4e1013f5bbfb53e48b572695b509a.1518826148.git.erosca@de.adit-jv.com>
+In-Reply-To: <cover.1518826148.git.erosca@de.adit-jv.com>
+References: <cover.1518826148.git.erosca@de.adit-jv.com>
+In-Reply-To: <cover.1518826148.git.erosca@de.adit-jv.com>
+References: <cover.1518826148.git.erosca@de.adit-jv.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Ulf Magnusson <ulfalizer@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>
@@ -17,62 +21,124 @@ Cc: Eugeniu Rosca <erosca@de.adit-jv.com>, Eugeniu Rosca <rosca.eugeniu@gmail.co
 
 From: Eugeniu Rosca <erosca@de.adit-jv.com>
 
-Hello Masahiro, Ulf, Petr and all,
+Commit 1ccb27143360 ("kconfig: make "Selected by:" and "Implied by:"
+readable") made an incredible improvement in how reverse dependencies
+are perceived by the user, by breaking down the single (often
+interminable) expression string into small readable chunks, each of
+them displayed on a separate line:
 
-Here are a few words about the motivation behind this patch series.
+Selected by:
+- A && B
+- C && (D || E)
 
-First, the reason I got in touch with Kconfig is to optimize the
-configuration of automotive kernels, as well as to align the kernel
-configuration across a number of platforms. In the context of kernel
-optimization, one of the primary goals is to filter out any features
-that are not mentioned in the platform requirements.
+Unfortunately, what happens with the non-OR (either E_SYMBOL or E_AND)
+expressions is that they don't get a dedicated line:
 
-Surprisingly or not, disabling a CONFIG option (which is assumed to
-be unneeded) may be not so trivial. Especially it is not trivial, when
-this CONFIG option is selected by a dozen of other configs. Before the
-moment commit 1ccb27143360 ("kconfig: make "Selected by:" and
-"Implied by:" readable") was submitted by Petr and eventually popped
-up in v4.16-rc1, it was an absolute pain to break down the "Selected by"
-reverse dependency expression in order to identify all those configs
-which select (IOW *do not allow disabling*) a certain feature (assumed
-to be not needed).
+Selected by: F && G
 
-This patch series tries to make one step further and puts at users'
-fingertips the revdep top level OR sub-expressions grouped/clustered by
-the tristate value they evaluate to. This should allow the users to
-directly concentrate on and tackle the active reverse dependencies,
-which imho are the only ones that matter for a given ARCH and for a
-given defconfig (nevertheless we still print all of them).
+That's arguably a bug/misbehavior, but it puts some amount of burden in
+implementing new ways of printing reverse dependencies to the user. As
+example, if we prefix every reverse dependency top level "||" token by
+its tristate value, then subjectively [2] looks more readable than [1].
 
-Changes v2->v3:
-- Switch from reverse dependencies prefixed by their tristate value to
-  reverse dependencies grouped by the tristate value they evaluate to.
-- Skip printing "{Selected,Implied} by [y|m|n]:" if there are no top
-  level OR tokens/sub-expressions that evaluate to y|m|n (suggested
-  by Petr).
-- Use [1] as template for updating the interface/prototype of
-  __expr_print() (suggested by Ulf).
+[1] Selected by: [m] F && G
+[2] Selected by:
+    - [m] F && G
 
-Changes v1->v2:
-- Don't skip the =n reverse dependency OR tokens, since some users might
-  still need this information (suggested by Ulf).
-- Instead of using "Selected by" for active tokens only, use it for all
-  OR tokens, but specify the tristate value of each token as prefix
-  (suggested by Masahiro).
+Also, if we print the reverse dependency sub-expressions in groups
+(clustered by the tristate value they evaluate to), then
+subjectively [4] looks more readable than [3].
 
-[1] https://marc.info/?l=linux-kbuild&m=151777006005199&w=4
+[3] Selected by [m]: F && G
+[4] Selected by [m]:
+    - F && G
 
-Eugeniu Rosca (3):
-  kconfig: Print reverse dependencies on new line consistently
-  kconfig: Prepare for printing reverse dependencies in groups
-  kconfig: Print reverse dependencies in groups
+Based on the above, print all the reverse dependency sub-expressions on
+a separate line _consistently_. An example of change contributed by this
+commit is seen below.
 
- scripts/kconfig/expr.c      | 118 ++++++++++++++++++++++++++++++++++++++------
- scripts/kconfig/expr.h      |  11 ++++-
- scripts/kconfig/lkc_proto.h |   1 +
- scripts/kconfig/menu.c      |  37 ++++++++++----
- 4 files changed, 140 insertions(+), 27 deletions(-)
+| Symbol: NEED_SG_DMA_LENGTH [=y]
+| ...
+|   Selected by: IOMMU_DMA [=y] && IOMMU_SUPPORT [=y]
 
+becomes:
+
+| Symbol: NEED_SG_DMA_LENGTH [=y]
+| ...
+|   Selected by:
+|   - IOMMU_DMA [=y] && IOMMU_SUPPORT [=y]
+
+This patch has been tested using a tuned variant of zconfdump which
+prints the reverse dependencies for each config symbol.
+
+Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Suggested-by: Ulf Magnusson <ulfalizer@gmail.com>
+Signed-off-by: Eugeniu Rosca <erosca@de.adit-jv.com>
+---
+ scripts/kconfig/expr.c | 31 ++++++++++++++++++++++---------
+ 1 file changed, 22 insertions(+), 9 deletions(-)
+
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index d45381986ac7..b89baed7f15c 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -1179,6 +1179,16 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
+ 	return expr_get_leftmost_symbol(ret);
+ }
+ 
++static void
++expr_print_newline(struct expr *e,
++		   void (*fn)(void *, struct symbol *, const char *),
++		   void *data,
++		   int prevtoken)
++{
++	fn(data, NULL, "\n  - ");
++	expr_print(e, fn, data, prevtoken);
++}
++
+ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken, bool revdep)
+ {
+ 	if (!e) {
+@@ -1191,7 +1201,10 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
+ 	switch (e->type) {
+ 	case E_SYMBOL:
+ 		if (e->left.sym->name)
+-			fn(data, e->left.sym, e->left.sym->name);
++			if (!revdep)
++				fn(data, e->left.sym, e->left.sym->name);
++			else
++				expr_print_newline(e, fn, data, E_OR);
+ 		else
+ 			fn(data, NULL, "<choice>");
+ 		break;
+@@ -1234,19 +1247,19 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
+ 		fn(data, e->right.sym, e->right.sym->name);
+ 		break;
+ 	case E_OR:
+-		if (revdep && e->left.expr->type != E_OR)
+-			fn(data, NULL, "\n  - ");
+ 		__expr_print(e->left.expr, fn, data, E_OR, revdep);
+-		if (revdep)
+-			fn(data, NULL, "\n  - ");
+-		else
++		if (!revdep)
+ 			fn(data, NULL, " || ");
+ 		__expr_print(e->right.expr, fn, data, E_OR, revdep);
+ 		break;
+ 	case E_AND:
+-		expr_print(e->left.expr, fn, data, E_AND);
+-		fn(data, NULL, " && ");
+-		expr_print(e->right.expr, fn, data, E_AND);
++		if (!revdep) {
++			expr_print(e->left.expr, fn, data, E_AND);
++			fn(data, NULL, " && ");
++			expr_print(e->right.expr, fn, data, E_AND);
++		} else {
++			expr_print_newline(e, fn, data, E_OR);
++		}
+ 		break;
+ 	case E_LIST:
+ 		fn(data, e->right.sym, e->right.sym->name);
 -- 
 2.16.1
 
