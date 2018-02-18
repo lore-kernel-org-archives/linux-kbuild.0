@@ -1,145 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:53869 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751758AbeBRVFW (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:46098 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751576AbeBRWOC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Feb 2018 16:05:22 -0500
-Received: by mail-wm0-f65.google.com with SMTP id t74so11760619wme.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 18 Feb 2018 13:05:22 -0800 (PST)
-From: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Date: Sun, 18 Feb 2018 22:05:15 +0100
-Subject: Re: [PATCH v3 3/3] kconfig: Print reverse dependencies in groups
-Message-ID: <20180218210515.GA13612@example.com>
-References: <cover.1518826148.git.erosca@de.adit-jv.com>
- <0ed37972989a9ba7a8b50777bd60ea8f46495a2a.1518826148.git.erosca@de.adit-jv.com>
- <CAFkk2KT8gQz+wmMagq-v4zLX7XuZ6MahN8KQ6SqtaAMRo5o7sA@mail.gmail.com>
- <20180218110702.GA26185@example.com>
- <20180218130246.eqfa46eswut5xwmv@huvuddator>
- <CAFkk2KRvy+jNphg2oFTofRZGCuRKgYy8z3+f9dNopfwftW=K6Q@mail.gmail.com>
- <CAFkk2KT8r8=ovH32zSU4k=SKnj-9zPGec10G4yAQP7o1frXQBg@mail.gmail.com>
- <CAFkk2KQ9FZOBULCRVR=8DJs7sPGfkp5Uv5COCGvUAsoVstPqTg@mail.gmail.com>
+        Sun, 18 Feb 2018 17:14:02 -0500
+Date: Sun, 18 Feb 2018 23:13:52 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 00/23] kconfig: move compiler capability tests to Kconfig
+Message-ID: <20180218221352.GA6651@ravnborg.org>
+References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFkk2KQ9FZOBULCRVR=8DJs7sPGfkp5Uv5COCGvUAsoVstPqTg@mail.gmail.com>
+In-Reply-To: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Eugeniu Rosca <roscaeugeniu@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Eugeniu Rosca <erosca@de.adit-jv.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, kernel-hardening@lists.openwall.com, Jonathan Corbet <corbet@lwn.net>, sparclinux@vger.kernel.org, linux-sh@vger.kernel.org, x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Rich Felker <dalias@libc.org>, Jeff Dike <jdike@addtoit.com>, "H. Peter Anvin" <hpa@zytor.com>, user-mode-linux-devel@lists.sourceforge.net, Yoshinori Sato <ysato@users.sourceforge.jp>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@samba.org>, user-mode-linux-user@lists.sourceforge.net, Ingo Molnar <mingo@redhat.com>, "David S. Miller" <davem@davemloft.net>, Michael Ellerman <mpe@ellerman.id.au>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Richard Weinberger <richard@nod.at>, Emese Revfy <re.emese@gmail.com>
 
-Hi Ulf,
+Hi Masahiro.
 
-Sometimes having so many options (all of them being equally clean,
-simple and elegant) can make the choice really hard :D
+On Sat, Feb 17, 2018 at 03:38:28AM +0900, Masahiro Yamada wrote:
+> I brushed up the implementation in this version.
+> 
+> In the previous RFC, CC_HAS_ was described by using 'option shell=',
+> like this:
+> 
+> config CC_HAS_STACKPROTECTOR
+>         bool
+>         option shell="$CC -Werror -fstack-protector -c -x c /dev/null"
+> 
+> After I thought a bit more, the following syntax is more grammatical,
+> and flexible.
+> 
+> config CC_HAS_STACKPROTECTOR
+>         bool
+>         default $(shell $CC -Werror -fstack-protector -c -x c /dev/null)
 
-Below is the interdiff between v3 and v4. Hopefully other people will
-also like this series and we will see it in in some weeks. Thank you
-very much for your support.
+Looks good - but maybe we should go one step further.
 
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index 48b99371d276..95dc058a236f 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -1180,13 +1180,19 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
- }
- 
- static void
--expr_print_newline(struct expr *e,
--		   void (*fn)(void *, struct symbol *, const char *),
--		   void *data,
--		   int prevtoken)
-+expr_print_revdep(struct expr *e,
-+		  void (*fn)(void *, struct symbol *, const char *),
-+		  void *data,
-+		  int prevtoken,
-+		  enum print_type type)
- {
--	fn(data, NULL, "\n  - ");
--	expr_print(e, fn, data, prevtoken);
-+	if (type == PRINT_REVDEP_ALL				  ||
-+	    type == PRINT_REVDEP_YES && expr_calc_value(e) == yes ||
-+	    type == PRINT_REVDEP_MOD && expr_calc_value(e) == mod ||
-+	    type == PRINT_REVDEP_NO  && expr_calc_value(e) == no) {
-+		fn(data, NULL, "\n  - ");
-+		expr_print(e, fn, data, prevtoken);
-+	}
- }
- 
- static void
-@@ -1211,21 +1217,10 @@ __expr_print(struct expr *e,
- 				fn(data, e->left.sym, e->left.sym->name);
- 				break;
- 			case PRINT_REVDEP_ALL:
--				expr_print_newline(e, fn, data, E_OR);
--				break;
- 			case PRINT_REVDEP_YES:
--				if (expr_calc_value(e) == yes)
--					expr_print_newline(e, fn, data, E_OR);
--				break;
- 			case PRINT_REVDEP_MOD:
--				if (expr_calc_value(e) == mod)
--					expr_print_newline(e, fn, data, E_OR);
--				break;
- 			case PRINT_REVDEP_NO:
--				if (expr_calc_value(e) == no)
--					expr_print_newline(e, fn, data, E_OR);
--				break;
--			default:
-+				expr_print_revdep(e, fn, data, E_OR, type);
- 				break;
- 			}
- 		else
-@@ -1283,21 +1278,10 @@ __expr_print(struct expr *e,
- 			expr_print(e->right.expr, fn, data, E_AND);
- 			break;
- 		case PRINT_REVDEP_ALL:
--			expr_print_newline(e, fn, data, E_OR);
--			break;
- 		case PRINT_REVDEP_YES:
--			if (expr_calc_value(e) == yes)
--				expr_print_newline(e, fn, data, E_OR);
--			break;
- 		case PRINT_REVDEP_MOD:
--			if (expr_calc_value(e) == mod)
--				expr_print_newline(e, fn, data, E_OR);
--			break;
- 		case PRINT_REVDEP_NO:
--			if (expr_calc_value(e) == no)
--				expr_print_newline(e, fn, data, E_OR);
--			break;
--		default:
-+			expr_print_revdep(e, fn, data, E_OR, type);
- 			break;
- 		}
- 		break;
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index d13ffa69d65b..029da77fe1b0 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -797,19 +797,19 @@ void get_revdep_by_type(struct expr *e, char *s, struct gstr *r)
- 
- 	if (expr_revdep_contains(e, yes)) {
- 		str_append(r, s);
--		str_append(r, _(" [y]:"));
-+		str_append(r, " [y]:");
- 		expr_gstr_print_revdep(e, r, PRINT_REVDEP_YES);
- 		str_append(r, "\n");
- 	}
- 	if (expr_revdep_contains(e, mod)) {
- 		str_append(r, s);
--		str_append(r, _(" [m]:"));
-+		str_append(r, " [m]:");
- 		expr_gstr_print_revdep(e, r, PRINT_REVDEP_MOD);
- 		str_append(r, "\n");
- 	}
- 	if (expr_revdep_contains(e, no)) {
- 		str_append(r, s);
--		str_append(r, _(" [n]:"));
-+		str_append(r, " [n]:");
- 		expr_gstr_print_revdep(e, r, PRINT_REVDEP_NO);
- 		str_append(r, "\n");
- 	}
+So we in the syntax explicit handles:
+- shell commands
+- other commands, defined as strings
+- environment variables
+- config variables
+
+Each case is explicit - so the reader is not confused what is used when.
+
+$(shell foo)	- output of the shell command foo. Uses $SHELL as the shell.
+		  May include optional paramters.
+		  foo may be a config variable referenced using ${} or a config variable prefixed with $
+		Example:
+
+		config BUILD_DIR
+			string
+			default $(shell cd ${objtree}; pwd)
+
+$(call bar)	- output of the bar command that may take optional parameters.
+		  bar may be a text string, a config variable or an environment variable
+		   The definition of bar may reference the parameters using $(1), $(2)
+		   In this context a config variable needs to be prefixed with $
+
+		Example:
+
+		config reverse
+			string
+			default $(2) $(1)
+
+		config NEW_ORDER
+			string
+			$(call $reverse, A, B)	# Will assign REVERSE the value "B A"
 
 
-Best regards,
-Eugeniu.
+		Example2:
+
+		config CC_OPTION
+			string
+			default $(shell ${srctree}/scripts/cc-option ${CC} $(1) $(2))
+
+		config CC_OPTIMIZE
+			string
+			$(call $CC_OPTION, -Oz, -Os)
+
+
+${FOO}		- environment variable
+
+The above is inspired by how make implement similar functionality.
+
+I'm not happy that we in one context can reference CONFIG variables
+directly, but inside the $(call ...) and $(shell ...) needs the $ prefix.
+But I could not come up with something un-ambigious where this could be avoided.
+
+The above proposal include the functionality of the macro stuff proposed in this patch-set.
+But with a simpler syntax and we keep all the other kconfig logic (depends on etc) - so
+users will not be limited in their creativity.
+
+> Current limitations:
+> 
+> Dependency on outside scripts.
+> Inter-option dependency:
+> Functions are evaluated statically:
+
+Same limitations exists with the syntax suggested above.
+
+	Sam
