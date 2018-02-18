@@ -1,169 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f68.google.com ([209.85.213.68]:34083 "EHLO
-        mail-vk0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751374AbeBRNkt (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:40391 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751489AbeBRO0V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Feb 2018 08:40:49 -0500
-Received: by mail-vk0-f68.google.com with SMTP id z190so2281699vkg.1
-        for <linux-kbuild@vger.kernel.org>; Sun, 18 Feb 2018 05:40:48 -0800 (PST)
+        Sun, 18 Feb 2018 09:26:21 -0500
+Date: Sun, 18 Feb 2018 15:26:17 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/2] kbuild: remove incremental linking option
+Message-ID: <20180218142617.GA27096@ravnborg.org>
+References: <20180210142504.29890-1-npiggin@gmail.com>
+ <20180210142504.29890-2-npiggin@gmail.com>
+ <CAK7LNASne2L_VNWoirTWc497ALujGk-MjfzjtkJ4=1PS_SLLXA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KT8r8=ovH32zSU4k=SKnj-9zPGec10G4yAQP7o1frXQBg@mail.gmail.com>
-References: <cover.1518826148.git.erosca@de.adit-jv.com> <0ed37972989a9ba7a8b50777bd60ea8f46495a2a.1518826148.git.erosca@de.adit-jv.com>
- <CAFkk2KT8gQz+wmMagq-v4zLX7XuZ6MahN8KQ6SqtaAMRo5o7sA@mail.gmail.com>
- <20180218110702.GA26185@example.com> <20180218130246.eqfa46eswut5xwmv@huvuddator>
- <CAFkk2KRvy+jNphg2oFTofRZGCuRKgYy8z3+f9dNopfwftW=K6Q@mail.gmail.com> <CAFkk2KT8r8=ovH32zSU4k=SKnj-9zPGec10G4yAQP7o1frXQBg@mail.gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Sun, 18 Feb 2018 14:40:47 +0100
-Message-ID: <CAFkk2KQ9FZOBULCRVR=8DJs7sPGfkp5Uv5COCGvUAsoVstPqTg@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] kconfig: Print reverse dependencies in groups
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNASne2L_VNWoirTWc497ALujGk-MjfzjtkJ4=1PS_SLLXA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Eugeniu Rosca <erosca@de.adit-jv.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Nicholas Piggin <npiggin@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Sun, Feb 18, 2018 at 2:35 PM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> On Sun, Feb 18, 2018 at 2:19 PM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
->> On Sun, Feb 18, 2018 at 2:02 PM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
->>> On Sun, Feb 18, 2018 at 12:07:02PM +0100, Eugeniu Rosca wrote:
->>>> If expr_print_newline is renamed to expr_print_{select,revdep}, then
->>>> I still face the need of expr_print_newline. So, I kept the *newline()
->>>> function in place and came up with below solution to aggregate
->>>> duplicated code. Please, let me know if it looks OK to you (btw, it
->>>> creates a slightly higher --stat compared to current solution).
->>>>
->>>> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
->>>> index 48b99371d276..a6316e5681d9 100644
->>>> --- a/scripts/kconfig/expr.c
->>>> +++ b/scripts/kconfig/expr.c
->>>> @@ -1189,6 +1189,34 @@ expr_print_newline(struct expr *e,
->>>>       expr_print(e, fn, data, prevtoken);
->>>>  }
->>>>
->>>> +static void
->>>> +expr_print_revdep(struct expr *e,
->>>> +               void (*fn)(void *, struct symbol *, const char *),
->>>> +               void *data,
->>>> +               int prevtoken,
->>>> +               enum print_type type)
->>>> +{
->>>> +     switch (type) {
->>>> +     case PRINT_REVDEP_ALL:
->>>> +             expr_print_newline(e, fn, data, prevtoken);
->>>> +             break;
->>>> +     case PRINT_REVDEP_YES:
->>>> +             if (expr_calc_value(e) == yes)
->>>> +                     expr_print_newline(e, fn, data, prevtoken);
->>>> +             break;
->>>> +     case PRINT_REVDEP_MOD:
->>>> +             if (expr_calc_value(e) == mod)
->>>> +                     expr_print_newline(e, fn, data, prevtoken);
->>>> +             break;
->>>> +     case PRINT_REVDEP_NO:
->>>> +             if (expr_calc_value(e) == no)
->>>> +                     expr_print_newline(e, fn, data, prevtoken);
->>>> +             break;
->>>> +     default:
->>>> +             break;
->>>> +     }
->>>> +}
->>>> +
->>>
->>> I think it's fine to have a separate expr_print_newline() function
->>> still. Getting rid of the repetition still makes it more readable to me.
->>>
->>> Maybe you could do something like this if you want to eliminate
->>> expr_print_newline() though. AFAICS, it isn't used outside
->>> expr_print_revdep().
->>>
->>>         static void
->>>         expr_print_revdep(struct expr *e,
->>>                           void (*fn)(void *, struct symbol *, const char *),
->>>                           void *data,
->>>                           int prevtoken,
->>>                           enum print_type type)
->>>         {
->>>                 if (type == PRINT_REVDEP_ALL                              ||
->>>                     type == PRINT_REVDEP_YES && expr_calc_value(e) == yes ||
->>>                     type == PRINT_REVDEP_MOD && expr_calc_value(e) == mod ||
->>>                     type == PRINT_REVDEP_NO  && expr_calc_value(e) == no) {
->>>
->>>                         fn(data, NULL, "\n - ");
->>>                         expr_print(e, fn, data, prevtoken);
->>>                 }
->>>         }
->>>
->>>
->>> Could turn that into a switch over 'type' and set a 'print_revdep' flag
->>> which is checked at the end too, if you'd prefer that:
->>>
->>>         switch (type) {
->>>         ...
->>>         case PRINT_REVDEP_YES:
->>>                 print_revdep = (expr_calc_value(e) == yes);
->>>                 break;
->>>         ...
->>>         }
->>>
->>>         if (print_revdep) {
->>>                 fn(data, NULL, "\n - ");
->>>                 expr_print(e, fn, data, prevtoken);
->>>         }
->>>
->>>
->>> Or return early:
->>>
->>>         case PRINT_REVDEP_YES:
->>>                 if (expr_calc_value(e) != yes)
->>>                         return;
->>>                 break;
->>>         ...
->>>         }
->>>
->>>         fn(data, NULL, "\n - ");
->>>         expr_print(e, fn, data, prevtoken);
->>>
->>>
->>> The original version is already fine by me though. The 'if' version
->>> seems pretty direct too.
->>>
->>> Cheers,
->>> Ulf
->>
->> Hmm... was thinking that you could get rid of 'print_type' and just
->> pass a tristate value for a moment too. There's PRINT_NORMAL and
->> PRINT_REVDEP_ALL to deal with as well though, so it'd get messy.
->>
->> Cheers,
->> Ulf
->
-> One last bikeshedding: Could factor out just the check into a function
-> and do something like this in __expr_print():
->
->         if (select_has_type(e, type))
->                 expr_print_newline(e, fn, data, prevtoken);
->
-> Having a function that's just one big 'if' feels slightly silly,
-> though it's not horrible here either IMO.
+Hi Masahiro/Nicholas.
 
-Referring to this version that is:
+On Sun, Feb 11, 2018 at 03:04:08PM +0900, Masahiro Yamada wrote:
+> (+CC Sam)
+> 
+> 2018-02-10 23:25 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> > This removes the old `ld -r` incremental link option, which has not
+> > been selected by any architecture since June 2017.
+> >
+> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> 
+> 
+> Thanks for the last piece work!
+> 
+> BTW, as a loosely related topic,
+> I guess the following partial section analysis is not working any more.
+> 
+> # Do section mismatch analysis for each module/built-in.a
+> ifdef CONFIG_DEBUG_SECTION_MISMATCH
+>   cmd_secanalysis = ; scripts/mod/modpost $@
+> endif
+> 
+> 
+> 
+> If we use thin archive for built-in.o,
+> this is not ELF, so it is always skipped
+> by the following code.
+> 
+> 
+> if ((hdr->e_ident[EI_MAG0] != ELFMAG0) ||
+>     (hdr->e_ident[EI_MAG1] != ELFMAG1) ||
+>     (hdr->e_ident[EI_MAG2] != ELFMAG2) ||
+>     (hdr->e_ident[EI_MAG3] != ELFMAG3)) {
+>         /* Not an ELF file - silently ignore it */
+>         return 0;
+> 
+> 
+> The final analysis is done against vmlinux.o, which is ELF.
+> 
+> 
+> 
+> Is it better to remove CONFIG_DEBUG_SECTION_MISMATCH?
+> Or, do you have an idea to fix it?
+> 
+> 
+> I CCed Sam, the author of commit 91341d4.
 
-        static void
-        expr_print_revdep(struct expr *e,
-                          void (*fn)(void *, struct symbol *, const char *),
-                          void *data,
-                          int prevtoken,
-                          enum print_type type)
-        {
-                if (type == PRINT_REVDEP_ALL                              ||
-                    type == PRINT_REVDEP_YES && expr_calc_value(e) == yes ||
-                    type == PRINT_REVDEP_MOD && expr_calc_value(e) == mod ||
-                    type == PRINT_REVDEP_NO  && expr_calc_value(e) == no) {
+The section mismatch analysis for the individual built-in.o files
+was added to get warnings on a level close to where the source
+of the error was.
+So the warnings was more precise (the .o file gave a good hint
+where to look for the error).
 
-                        fn(data, NULL, "\n - ");
-                        expr_print(e, fn, data, prevtoken);
-                }
-        }
 
-Cheers,
-Ulf
+And since this has not been missed we should not try to add
+extra logic to re-introduce the check on this level.
+It would require an extra link for each directory only for
+the purpose of the section mismatch detection with
+better warnings.
+So we can safely get rid of this part.
+
+
+We still do an extra link of vmlinux to support section
+mismatch analysis.
+I wonder if we could do something to avoid this extra
+link step now where we use thin archieves unconditional.
+I assume this extra link step is more RAM and CPU consuming
+now than before thin archieves since it has to process
+many more .o files.
+So there should be some wins in build time if we
+can drop any extra step.
+
+	Sam
