@@ -1,50 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:42178 "EHLO
-        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751383AbeBRRKI (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:35020 "EHLO
+        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751616AbeBRTi5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Feb 2018 12:10:08 -0500
-Date: Sun, 18 Feb 2018 18:10:05 +0100
+        Sun, 18 Feb 2018 14:38:57 -0500
+Date: Sun, 18 Feb 2018 20:38:49 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 2/2] kbuild: rename built-in.o to built-in.a
-Message-ID: <20180218171005.GA20286@ravnborg.org>
-References: <20180210142504.29890-1-npiggin@gmail.com>
- <20180210142504.29890-3-npiggin@gmail.com>
+Subject: Re: [PATCH 00/14] Add Kconfig unit tests
+Message-ID: <20180218193849.GA29324@ravnborg.org>
+References: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180210142504.29890-3-npiggin@gmail.com>
+In-Reply-To: <1517877294-4826-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@suse.de>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Heinrich Schuchardt <xypron.glpk@gmx.de>, Yaakov Selkowitz <yselkowi@redhat.com>, linux-ia64@vger.kernel.org, Fenghua Yu <fenghua.yu@intel.com>, Marc Herbert <marc.herbert@intel.com>
 
-Hi Nicholas.
+Hi Masahiro.
 
-On Sun, Feb 11, 2018 at 12:25:04AM +1000, Nicholas Piggin wrote:
-> Incremental linking is gone, so rename built-in.o to built-in.a, which
-> is the usual extension for archive files.
+On Tue, Feb 06, 2018 at 09:34:40AM +0900, Masahiro Yamada wrote:
+> I am applying various patches to Kconfig these days.
 > 
-> This patch does two things, first is a simple search/replace:
+> However, I fear regressions.  I have been thinking of unit-tests.
 > 
-> git grep -l 'built-in\.o' | xargs sed -i 's/built-in\.o/built-in\.a/g'
+> There are various cryptic parts in Kconfig and corner cases where
+> it is difficult to notice breakage.  If unit-tests cover those,
+> I will be able to apply changes more confidently.
 > 
-> The second is to invert nesting of nested text manipulations to avoid
-> filtering built-in.a out from libs-y2:
-> 
-> -libs-y2 := $(filter-out %.a, $(patsubst %/, %/built-in.a, $(libs-y)))
-> +libs-y2 := $(patsubst %/, %/built-in.a, $(filter-out %.a, $(libs-y)))
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> So, here is the trial.
+...
 
-Renaming is welcome - .o files should not list files.
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
+Great to see this done.
+And +1 for basing this on a standard framework rather than inventing your own.
 
-Did you check that make clean / make mrproper continue to
-do the right thing?
-
-I recalled we had "*.o" hardcoded somewhere but grep
-did not reveal any places that should matter.
-So likely it does.
+> If you have an idea for better implementation, comments are appreciated.
+Nope, please continue with pytest.
 
 	Sam
