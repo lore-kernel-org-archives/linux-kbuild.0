@@ -1,75 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:38182 "EHLO
-        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751025AbeBRLek (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:38871 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751292AbeBRNDB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Feb 2018 06:34:40 -0500
-Received: by mail-wm0-f49.google.com with SMTP id z9so5025011wmb.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 18 Feb 2018 03:34:40 -0800 (PST)
-From: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Date: Sun, 18 Feb 2018 12:34:30 +0100
-Subject: Re: [PATCH 2/2] kconfig: Print the value of each reverse dependency
-Message-ID: <20180218113430.GA28114@example.com>
-References: <20180213005610.10575-1-rosca.eugeniu@gmail.com>
- <20180213005610.10575-2-rosca.eugeniu@gmail.com>
- <CAFkk2KQ80dKfQaT1sx_X72ZYVu+N8dBLhEpJEAeK7f52Bb5V1g@mail.gmail.com>
- <20180213235448.GA30690@example.com>
- <CAFkk2KTtvHPtSXWX83aVaXpixU7CukG==NvwXDGmHbg0=1sC8Q@mail.gmail.com>
- <20180217172059.GA16512@example.com>
- <CAFkk2KTmPEC-CxO2u0qXBKkRvpScGFD3C6LHdgL+LCBWKf7Dig@mail.gmail.com>
+        Sun, 18 Feb 2018 08:03:01 -0500
+Received: by mail-lf0-f68.google.com with SMTP id g72so9657403lfg.5
+        for <linux-kbuild@vger.kernel.org>; Sun, 18 Feb 2018 05:03:00 -0800 (PST)
+Date: Sun, 18 Feb 2018 14:02:46 +0100
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: Re: [PATCH v3 3/3] kconfig: Print reverse dependencies in groups
+Message-ID: <20180218130246.eqfa46eswut5xwmv@huvuddator>
+References: <cover.1518826148.git.erosca@de.adit-jv.com>
+ <0ed37972989a9ba7a8b50777bd60ea8f46495a2a.1518826148.git.erosca@de.adit-jv.com>
+ <CAFkk2KT8gQz+wmMagq-v4zLX7XuZ6MahN8KQ6SqtaAMRo5o7sA@mail.gmail.com>
+ <20180218110702.GA26185@example.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAFkk2KTmPEC-CxO2u0qXBKkRvpScGFD3C6LHdgL+LCBWKf7Dig@mail.gmail.com>
+In-Reply-To: <20180218110702.GA26185@example.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Petr Vorel <petr.vorel@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Eugeniu Rosca <rosca.eugeniu@gmail.com>, Eugeniu Rosca <erosca@de.adit-jv.com>
+To: Eugeniu Rosca <roscaeugeniu@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Eugeniu Rosca <erosca@de.adit-jv.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Sat, Feb 17, 2018 at 06:31:48PM +0100, Ulf Magnusson wrote:
-> On Sat, Feb 17, 2018 at 6:20 PM, Eugeniu Rosca <roscaeugeniu@gmail.com> wrote:
-> > Hi Ulf,
-> >
-> > On Wed, Feb 14, 2018 at 05:09:50AM +0100, Ulf Magnusson wrote:
-> >> IMO, we could take this as is (after addressing other people's
-> >> comments), since it's already a big improvement, and then add sorting
-> >> later if we feel like it.
-> >>
-> >> Don't have to do everything at once. :)
-> >
-> > I agree that it's not possible to do everything perfect right from the
-> > start. But since we are changing the user experience, I just thought
-> > that we would first like to see how both implementations (prefixed
-> > vs grouped tokens) look like, then make a decision (I'm still open
-> > minded about it), then affect the users.
+On Sun, Feb 18, 2018 at 12:07:02PM +0100, Eugeniu Rosca wrote:
+> If expr_print_newline is renamed to expr_print_{select,revdep}, then
+> I still face the need of expr_print_newline. So, I kept the *newline()
+> function in place and came up with below solution to aggregate
+> duplicated code. Please, let me know if it looks OK to you (btw, it
+> creates a slightly higher --stat compared to current solution).
 > 
-> Isn't the latest patchset doing both? That seems like the best of both worlds.
+> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+> index 48b99371d276..a6316e5681d9 100644
+> --- a/scripts/kconfig/expr.c
+> +++ b/scripts/kconfig/expr.c
+> @@ -1189,6 +1189,34 @@ expr_print_newline(struct expr *e,
+>  	expr_print(e, fn, data, prevtoken);
+>  }
+>  
+> +static void
+> +expr_print_revdep(struct expr *e,
+> +		  void (*fn)(void *, struct symbol *, const char *),
+> +		  void *data,
+> +		  int prevtoken,
+> +		  enum print_type type)
+> +{
+> +	switch (type) {
+> +	case PRINT_REVDEP_ALL:
+> +		expr_print_newline(e, fn, data, prevtoken);
+> +		break;
+> +	case PRINT_REVDEP_YES:
+> +		if (expr_calc_value(e) == yes)
+> +			expr_print_newline(e, fn, data, prevtoken);
+> +		break;
+> +	case PRINT_REVDEP_MOD:
+> +		if (expr_calc_value(e) == mod)
+> +			expr_print_newline(e, fn, data, prevtoken);
+> +		break;
+> +	case PRINT_REVDEP_NO:
+> +		if (expr_calc_value(e) == no)
+> +			expr_print_newline(e, fn, data, prevtoken);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +}
+> +
 
-Well, I call "prefixed tokens" solution [1] and "grouped tokens"
-solution [2]. Assuming we share the same view, [1] has definitely less
-of an impact on Kconfig (see [3]). That's the main argument to prefer it
-over [2]. My personal choice is still [2]. However if it happens
-that other reviewers prefer [1], I won't object on it.
+I think it's fine to have a separate expr_print_newline() function
+still. Getting rid of the repetition still makes it more readable to me.
 
-[1] Selected by:
-    - [y] EXPR_Y
-    - [m] EXPR_M
-    - [ ] EXPR_N
+Maybe you could do something like this if you want to eliminate
+expr_print_newline() though. AFAICS, it isn't used outside
+expr_print_revdep().
 
-[2] Selected by [y]:
-    - EXPR_Y
-    Selected by [m]:
-    - EXPR_M
-    Selected by [n]:
-    - EXPR_N
+	static void
+	expr_print_revdep(struct expr *e,
+			  void (*fn)(void *, struct symbol *, const char *),
+			  void *data,
+			  int prevtoken,
+			  enum print_type type)
+	{
+		if (type == PRINT_REVDEP_ALL                              ||
+		    type == PRINT_REVDEP_YES && expr_calc_value(e) == yes ||
+		    type == PRINT_REVDEP_MOD && expr_calc_value(e) == mod ||
+		    type == PRINT_REVDEP_NO  && expr_calc_value(e) == no) {
 
-[3] https://marc.info/?l=linux-kbuild&m=151848343313335&w=4
+			fn(data, NULL, "\n - ");
+			expr_print(e, fn, data, prevtoken);
+		}
+	}
 
-> And yeah, I just get some personal restlessness when good stuff floats
-> around for a long time without getting in. :)
-> 
-> Cheers,
-> Ulf
 
-Thanks,
-Eugeniu.
+Could turn that into a switch over 'type' and set a 'print_revdep' flag
+which is checked at the end too, if you'd prefer that:
+
+	switch (type) {
+	...
+	case PRINT_REVDEP_YES:
+		print_revdep = (expr_calc_value(e) == yes);
+		break;
+	...
+	}
+
+	if (print_revdep) {
+		fn(data, NULL, "\n - ");
+		expr_print(e, fn, data, prevtoken);
+	}
+
+
+Or return early:
+
+	case PRINT_REVDEP_YES:
+		if (expr_calc_value(e) != yes)
+			return;
+		break;
+	...
+	}
+
+	fn(data, NULL, "\n - ");
+	expr_print(e, fn, data, prevtoken);
+
+
+The original version is already fine by me though. The 'if' version
+seems pretty direct too.
+
+Cheers,
+Ulf
