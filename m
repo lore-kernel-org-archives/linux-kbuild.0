@@ -1,55 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:58016 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753208AbeBSRSZ (ORCPT
+Received: from mail-it0-f48.google.com ([209.85.214.48]:50397 "EHLO
+        mail-it0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753267AbeBSRo3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Feb 2018 12:18:25 -0500
+        Mon, 19 Feb 2018 12:44:29 -0500
 MIME-Version: 1.0
-In-Reply-To: <1519060182-1746-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1519060182-1746-1-git-send-email-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 20 Feb 2018 02:17:39 +0900
-Message-ID: <CAK7LNAS_yqOVKGOEJ_SrvigpqEKZoriuWGuCYdwEWtTtSMxetA@mail.gmail.com>
-Subject: Re: [PATCH] sh: fix build error for empty CONFIG_BUILTIN_DTB_SOURCE
+In-Reply-To: <20180219044845.7cnqpgyiinn6hkyb@huvuddator>
+References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
+ <1518806331-7101-12-git-send-email-yamada.masahiro@socionext.com>
+ <CA+55aFwQLrrBeXZXK_qUXiGVFNv3qPJS4tNKFacuk0Y0WgZjCA@mail.gmail.com> <20180219044845.7cnqpgyiinn6hkyb@huvuddator>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 19 Feb 2018 09:44:28 -0800
+Message-ID: <CA+55aFwiRzpSRW8xhoMs9cbFFXZGmEyyVa4a7aeZzQGYuO211w@mail.gmail.com>
+Subject: Re: [PATCH 11/23] kconfig: add 'shell-stdout' function
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree@vger.kernel.org, Linux-sh list <linux-sh@vger.kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Rich Felker <dalias@libc.org>, Mark Rutland <mark.rutland@arm.com>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-02-20 2:09 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> If CONFIG_USE_BUILTIN_DTB is enabled, but CONFIG_BUILTIN_DTB_SOURCE
-> is empty (for example, allmodconfig), a build error occurs.
+On Sun, Feb 18, 2018 at 8:48 PM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> On Fri, Feb 16, 2018 at 11:17:52AM -0800, Linus Torvalds wrote:
+>>
+>> Can we *please* make "shell-stdout" go away, and make this just be "shell"?
+>>
+>> The rule would be very simple:
+>>
+>>  - if the result of the shell command is a failure, the result is 'n'
+>>
+>>  - otherwise, the result is the first line of stdout
+>>
+>>  - if the result is empty, we replace it with 'y'.
 >
-> Surround obj-y with ifneq ... endif.
->
-> I replaced $(CONFIG_USE_BUILTIN_DTB) with 'y' since this is always
-> the case from the following code from arch/sh/Makefile:
->
->   core-$(CONFIG_USE_BUILTIN_DTB)  += arch/sh/boot/dts/
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
->  arch/sh/boot/dts/Makefile | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/sh/boot/dts/Makefile b/arch/sh/boot/dts/Makefile
-> index 715def0..01d0f7f 100644
-> --- a/arch/sh/boot/dts/Makefile
-> +++ b/arch/sh/boot/dts/Makefile
-> @@ -1 +1,3 @@
-> -obj-$(CONFIG_USE_BUILTIN_DTB) += $(patsubst "%",%,$(CONFIG_BUILTIN_DTB_SOURCE)).dtb.o
-> +ifneq ($(CONFIG_BUILTIN_DTB_SOURCE),"")
-> +obj-y += $(patsubst "%",%,$(CONFIG_BUILTIN_DTB_SOURCE)).dtb.o
-> +endif
+> Could there be cases where you'd legitimately want to put empty output
+> from a command in a string (that would be common enough to matter)?
+> That'd get messier with the above rule, as it never generates an empty
+> string as output.
 
+Hmm. Maybe. Something like "LOCALVERSION_AUTO" might want that where
+you add a version string if something is true, and maybe you'd use a
+shell script for it and generate it at Kconfig time.
 
+I'm not seeing anything like that right now, but I could imagine it in
+theory, so your worry is valid.
 
-I inserted this before Nicholas' patch
-to silence the test robot.
+> Would you still be as opposed (or more opposed...) to having two
+> functions if they were called something like 'success' and 'stdout'
+> instead?
 
+Maybe the naming is indeed what annoyed me the most.
 
--- 
-Best Regards
-Masahiro Yamada
+I do like your "success"/"stdout" more than "shell"/"shell-stdout",
+because with that naming I don't get the feeling that one should
+subsume the other.
+
+          Linus
