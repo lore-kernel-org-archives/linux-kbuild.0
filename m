@@ -1,48 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:33765 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753138AbeBSRDe (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:52477 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753184AbeBSRKs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Feb 2018 12:03:34 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAL_JsqKheTj_b5TjPJq1erjjeqHJDJQG5MyUi2qbHbFJkarfGg@mail.gmail.com>
-References: <20180205012146.23981-1-ulfalizer@gmail.com> <20180205012146.23981-11-ulfalizer@gmail.com>
- <CAL_JsqKheTj_b5TjPJq1erjjeqHJDJQG5MyUi2qbHbFJkarfGg@mail.gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Mon, 19 Feb 2018 18:03:32 +0100
-Message-ID: <CAFkk2KR5eBfsXoZa-qty0neUKO0=3P82AVNb+SM37QOb7VMPDg@mail.gmail.com>
-Subject: Re: [PATCH 10/20] lib/Kconfig: Remove leftover select of GENERIC_IO
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 19 Feb 2018 12:10:48 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] sh: fix build error for empty CONFIG_BUILTIN_DTB_SOURCE
+Date: Tue, 20 Feb 2018 02:09:42 +0900
+Message-Id: <1519060182-1746-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Tomasz Figa <tfiga@chromium.org>, Paul Burton <paul.burton@mips.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, Vineet Gupta <vgupta@synopsys.com>, Mel Gorman <mgorman@techsingularity.net>, Christoph Hellwig <hch@lst.de>, Michal Nazarewicz <mina86@mina86.com>, Stephen Boyd <sboyd@codeaurora.org>, Paul Mackerras <paulus@ozlabs.org>, Will Deacon <will.deacon@arm.com>, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Andrew Morton <akpm@linux-foundation.org>, Nick Terrell <terrelln@fb.com>, Dan Williams <dan.j.williams@intel.com>, "David S. Miller" <davem@davemloft.net>, Matthew Wilcox <mawilcox@microsoft.com>, Palmer Dabbelt <palmer@dabbelt.com>, Dave Airlie <airlied@redhat.com>, Jeremy Kerr <jk@ozlabs.org>, Bart Van Assche <bart.vanassche@wdc.com>, Robin Murphy <robin.murphy@arm.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree@vger.kernel.org, linux-sh@vger.kernel.org, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>, Rich Felker <dalias@libc.org>, Mark Rutland <mark.rutland@arm.com>
 
-On Mon, Feb 19, 2018 at 4:48 PM, Rob Herring <robh@kernel.org> wrote:
-> On Sun, Feb 4, 2018 at 7:21 PM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
->> GENERIC_IO was removed by commit 9de8da47742b ("kconfig: kill off
->> GENERIC_IO option"), but HAS_IOMEM still selects it.
->>
->> Remove the select of GENERIC_IO from HAS_IOMEM.
->>
->> Discovered with the
->> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
->> script.
->>
->> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->> ---
->>  lib/Kconfig | 1 -
->>  1 file changed, 1 deletion(-)
->
-> Who do you intend to apply this because people keep sending the same fix?
->
-> Rob
+If CONFIG_USE_BUILTIN_DTB is enabled, but CONFIG_BUILTIN_DTB_SOURCE
+is empty (for example, allmodconfig), a build error occurs.
 
-I didn't have a particular tree in mind. I imagined people would pick
-up patches into the trees where they make the most sense.
+Surround obj-y with ifneq ... endif.
 
-I just turned it into a patchset to keep track of it easier myself.
-Looks like that might have caused some confusion in retrospect.
+I replaced $(CONFIG_USE_BUILTIN_DTB) with 'y' since this is always
+the case from the following code from arch/sh/Makefile:
 
-Cheers,
-Ulf
+  core-$(CONFIG_USE_BUILTIN_DTB)  += arch/sh/boot/dts/
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ arch/sh/boot/dts/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/sh/boot/dts/Makefile b/arch/sh/boot/dts/Makefile
+index 715def0..01d0f7f 100644
+--- a/arch/sh/boot/dts/Makefile
++++ b/arch/sh/boot/dts/Makefile
+@@ -1 +1,3 @@
+-obj-$(CONFIG_USE_BUILTIN_DTB) += $(patsubst "%",%,$(CONFIG_BUILTIN_DTB_SOURCE)).dtb.o
++ifneq ($(CONFIG_BUILTIN_DTB_SOURCE),"")
++obj-y += $(patsubst "%",%,$(CONFIG_BUILTIN_DTB_SOURCE)).dtb.o
++endif
+-- 
+2.7.4
+
