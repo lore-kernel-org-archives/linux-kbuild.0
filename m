@@ -1,63 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:15638 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750710AbeBTLs2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Feb 2018 06:48:28 -0500
-Date: Tue, 20 Feb 2018 19:48:24 +0800
-From: Fengguang Wu <fengguang.wu@intel.com>
-Subject: Re: [kbuild:kbuild 3/4] make[2]: *** No rule to make target
- 'arch/sh/boot/dts/.dtb.o', needed by 'arch/sh/boot/dts/built-in.a'.
-Message-ID: <20180220114824.nsdhxu7xas6zshig@wfg-t540p.sh.intel.com>
-References: <201802192300.ISBrXbI4%fengguang.wu@intel.com>
- <CAK7LNAQ3Mej-Rvfs23M0W3P8YJWbd346bv6YG_1yVMCDKpYFUw@mail.gmail.com>
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:26049 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751753AbeBTOux (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 20 Feb 2018 09:50:53 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQ3Mej-Rvfs23M0W3P8YJWbd346bv6YG_1yVMCDKpYFUw@mail.gmail.com>
+In-Reply-To: <20180215210750.28813-1-luc.vanoostenryck@gmail.com>
+References: <20180215210750.28813-1-luc.vanoostenryck@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 20 Feb 2018 23:50:02 +0900
+Message-ID: <CAK7LNAR6Pizog=NBVjYfF1owSntjOb4o7qV4WNv7d3j3LxongA@mail.gmail.com>
+Subject: Re: [PATCH] disable sparse warnings about unknown attributes
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Josh Triplett <josh@joshtriplett.org>, Randy Dunlap <rdunlap@infradead.org>, linux-sparse@vger.kernel.org
 
-Hi Masahiro,
+2018-02-16 6:07 GMT+09:00 Luc Van Oostenryck <luc.vanoostenryck@gmail.com>:
+> Currently, sparse issues warnings on code using an attribute
+> it doesn't know about.
+>
+> One of the problem with this is that these warnings have no
+> value for the developer, it's just noise for him. At best these
+> warnings tell something about some deficiencies of sparse itself
+> but not about a potential problem with code analyzed.
+>
+> A second problem with this is that sparse release are, alas,
+> less frequent than new attributes are added to GCC.
+>
+> So, avoid the noise by asking sparse to not warn about
+> attributes it doesn't know about.
+>
+> Reference: https://marc.info/?l=linux-sparse&m=151871600016790
+> Reference: https://marc.info/?l=linux-sparse&m=151871725417322
+> Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+> ---
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
 
-On Tue, Feb 20, 2018 at 01:49:31AM +0900, Masahiro Yamada wrote:
->Hi test robot,
->
->
->2018-02-20 0:18 GMT+09:00 kbuild test robot <fengguang.wu@intel.com>:
->> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
->> head:   4f89933b6227d330b98e01aed504cce515636215
->> commit: ffe8d1693c0fdb93b07f1b6449ae68bc6aba2efb [3/4] kbuild: rename built-in.o to built-in.a
->> config: sh-allmodconfig (attached as .config)
->> compiler: sh4-linux-gnu-gcc (Debian 7.2.0-11) 7.2.0
->> reproduce:
->>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->>         chmod +x ~/bin/make.cross
->>         git checkout ffe8d1693c0fdb93b07f1b6449ae68bc6aba2efb
->>         # save the attached .config to linux build tree
->>         make.cross ARCH=sh
->>
->> All errors (new ones prefixed by >>):
->>
->>>> make[2]: *** No rule to make target 'arch/sh/boot/dts/.dtb.o', needed by 'arch/sh/boot/dts/built-in.a'.
->>    make[2]: Target '__build' not remade because of errors.
->>
->> ---
->> 0-DAY kernel test infrastructure                Open Source Technology Center
->> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
->
->
->This is not a new error.
->(it just looked new because it was previously built-in.o,
-> the it is now built-in.a)
->
->all{yes,mod}config for ARCH=sh was already broken.
->
->I can send a fix-up patch for sh later,
->but Nicholas's patch is innocent, so I will keep his patch.
+Applied to linux-kbuild/kbuild.
 
-Got it, thank you!
+Thanks!
 
-Cheers,
-Fengguang
+
+-- 
+Best Regards
+Masahiro Yamada
