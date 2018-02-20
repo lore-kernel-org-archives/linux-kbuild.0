@@ -1,101 +1,140 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:18913 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750781AbeBTIOD (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:53143 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750781AbeBTIU0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Feb 2018 03:14:03 -0500
-Received: from mail-vk0-f49.google.com (mail-vk0-f49.google.com [209.85.213.49]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id w1K8DjnK007551
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Feb 2018 17:13:46 +0900
-Received: by mail-vk0-f49.google.com with SMTP id x125so2702460vkc.13
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Feb 2018 00:13:46 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <cover.1518985888.git.erosca@de.adit-jv.com>
-References: <cover.1518985888.git.erosca@de.adit-jv.com>
+        Tue, 20 Feb 2018 03:20:26 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 20 Feb 2018 17:13:04 +0900
-Message-ID: <CAK7LNAQ4z9KHsCvzQRHozcXrxY5wsLnMCqWP7weSLFC4mxh6fg@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] Kconfig: Print reverse dependencies in groups
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kconfig: clean-up reverse dependency help implementation
+Date: Tue, 20 Feb 2018 17:18:47 +0900
+Message-Id: <1519114728-1084-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Eugeniu Rosca <erosca@de.adit-jv.com>, Eugeniu Rosca <rosca.eugeniu@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Petr Vorel <petr.vorel@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Nicolas Pitre <nicolas.pitre@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-2018-02-19 5:47 GMT+09:00 Eugeniu Rosca <roscaeugeniu@gmail.com>:
-> From: Eugeniu Rosca <erosca@de.adit-jv.com>
->
-> Hello Masahiro, Ulf, Petr and all,
->
-> Here are a few words about the motivation behind this patch series.
->
-> First, the reason I got in touch with Kconfig is to optimize the
-> configuration of automotive kernels, as well as to align the kernel
-> configuration across a number of platforms. In the context of kernel
-> optimization, one of the primary goals is to filter out any features
-> that are not mentioned in the platform requirements.
->
-> Surprisingly or not, disabling a CONFIG option (which is assumed to
-> be unneeded) may be not so trivial. Especially it is not trivial, when
-> this CONFIG option is selected by a dozen of other configs. Before the
-> moment commit 1ccb27143360 ("kconfig: make "Selected by:" and
-> "Implied by:" readable") was submitted by Petr and eventually popped
-> up in v4.16-rc1, it was an absolute pain to break down the "Selected by"
-> reverse dependency expression in order to identify all those configs
-> which select (IOW *do not allow disabling*) a certain feature (assumed
-> to be not needed).
->
-> This patch series tries to make one step further and puts at users'
-> fingertips the revdep top level OR sub-expressions grouped/clustered by
-> the tristate value they evaluate to. This should allow the users to
-> directly concentrate on and tackle the active reverse dependencies,
-> which imho are the only ones that matter for a given ARCH and for a
-> given defconfig (nevertheless we still print all of them).
->
-> Changes v3->v4 (fixed review findings from Ulf):
-> - Remove redundant default cases in switch constructs.
-> - Remove gettext _() tokens in str_append() calls.
-> - Aggregate code repetitions in expr_print_revdep().
->
-> Changes v2->v3:
-> - Switch from reverse dependencies prefixed by their tristate value to
->   reverse dependencies grouped by the tristate value they evaluate to.
-> - Skip printing "{Selected,Implied} by [y|m|n]:" if there are no top
->   level OR tokens/sub-expressions that evaluate to y|m|n (suggested
->   by Petr).
-> - Use [1] as template for updating the interface/prototype of
->   __expr_print() (suggested by Ulf).
->
-> Changes v1->v2:
-> - Don't skip the =n reverse dependency OR tokens, since some users might
->   still need this information (suggested by Ulf).
-> - Instead of using "Selected by" for active tokens only, use it for all
->   OR tokens, but specify the tristate value of each token as prefix
->   (suggested by Masahiro).
->
-> [1] https://marc.info/?l=linux-kbuild&m=151777006005199&w=4
->
-> Eugeniu Rosca (3):
->   kconfig: Print reverse dependencies on new line consistently
->   kconfig: Prepare for printing reverse dependencies in groups
->   kconfig: Print reverse dependencies in groups
->
->  scripts/kconfig/expr.c      | 102 +++++++++++++++++++++++++++++++++++++-------
->  scripts/kconfig/expr.h      |  11 ++++-
->  scripts/kconfig/lkc_proto.h |   1 +
->  scripts/kconfig/menu.c      |  37 +++++++++++-----
->  4 files changed, 124 insertions(+), 27 deletions(-)
->
+This commit splits out the special E_OR handling ('-' instead of '||')
+into a dedicated helper expr_print_revdev().
 
+Restore the original expr_print() prior to commit 1ccb27143360
+("kconfig: make "Selected by:" and "Implied by:" readable").
 
-I do not like this implementation.
-The code is super ugly, the diff-stat is too much than needed.
+This makes sense because:
 
-Please rewrite the code within 20 lines.
+  - We need to chop those expressions only when printing the reverse
+    dependency, and only when E_OR is encountered
 
+  - Otherwise, it should be printed as before, so fall back to
+    expr_print()
 
+This also improves the behavior; for a single line, it was previously
+displayed in the same line as "Selected by", like this:
 
+  Selected by: A [=n] && B [=n]
 
+This will be displayed in a new line, consistently:
+
+  Selected by:
+  - A [=n] && B [=n]
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ scripts/kconfig/expr.c | 36 +++++++++++++++++++++---------------
+ scripts/kconfig/menu.c |  6 ++----
+ 2 files changed, 23 insertions(+), 19 deletions(-)
+
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index d453819..cd3a8f5 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -1179,7 +1179,9 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
+ 	return expr_get_leftmost_symbol(ret);
+ }
+ 
+-static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken, bool revdep)
++void expr_print(struct expr *e,
++		void (*fn)(void *, struct symbol *, const char *),
++		void *data, int prevtoken)
+ {
+ 	if (!e) {
+ 		fn(data, NULL, "y");
+@@ -1234,14 +1236,9 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
+ 		fn(data, e->right.sym, e->right.sym->name);
+ 		break;
+ 	case E_OR:
+-		if (revdep && e->left.expr->type != E_OR)
+-			fn(data, NULL, "\n  - ");
+-		__expr_print(e->left.expr, fn, data, E_OR, revdep);
+-		if (revdep)
+-			fn(data, NULL, "\n  - ");
+-		else
+-			fn(data, NULL, " || ");
+-		__expr_print(e->right.expr, fn, data, E_OR, revdep);
++		expr_print(e->left.expr, fn, data, E_OR);
++		fn(data, NULL, " || ");
++		expr_print(e->right.expr, fn, data, E_OR);
+ 		break;
+ 	case E_AND:
+ 		expr_print(e->left.expr, fn, data, E_AND);
+@@ -1274,11 +1271,6 @@ static void __expr_print(struct expr *e, void (*fn)(void *, struct symbol *, con
+ 		fn(data, NULL, ")");
+ }
+ 
+-void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken)
+-{
+-	__expr_print(e, fn, data, prevtoken, false);
+-}
+-
+ static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
+ {
+ 	xfwrite(str, strlen(str), 1, data);
+@@ -1329,7 +1321,21 @@ void expr_gstr_print(struct expr *e, struct gstr *gs)
+  * line with a minus. This makes expressions much easier to read.
+  * Suitable for reverse dependency expressions.
+  */
++static void expr_print_revdep(struct expr *e,
++			      void (*fn)(void *, struct symbol *, const char *),
++			      void *data)
++{
++	if (e->type == E_OR) {
++		expr_print_revdep(e->left.expr, fn, data);
++		expr_print_revdep(e->right.expr, fn, data);
++	} else {
++		fn(data, NULL, "  - ");
++		expr_print(e, fn, data, E_NONE);
++		fn(data, NULL, "\n");
++	}
++}
++
+ void expr_gstr_print_revdep(struct expr *e, struct gstr *gs)
+ {
+-	__expr_print(e, expr_print_gstr_helper, gs, E_NONE, true);
++	expr_print_revdep(e, expr_print_gstr_helper, gs);
+ }
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 9922285..7e70be3 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -827,16 +827,14 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
+ 
+ 	get_symbol_props_str(r, sym, P_SELECT, _("  Selects: "));
+ 	if (sym->rev_dep.expr) {
+-		str_append(r, _("  Selected by: "));
++		str_append(r, _("  Selected by: \n"));
+ 		expr_gstr_print_revdep(sym->rev_dep.expr, r);
+-		str_append(r, "\n");
+ 	}
+ 
+ 	get_symbol_props_str(r, sym, P_IMPLY, _("  Implies: "));
+ 	if (sym->implied.expr) {
+-		str_append(r, _("  Implied by: "));
++		str_append(r, _("  Implied by: \n"));
+ 		expr_gstr_print_revdep(sym->implied.expr, r);
+-		str_append(r, "\n");
+ 	}
+ 
+ 	str_append(r, "\n\n");
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
