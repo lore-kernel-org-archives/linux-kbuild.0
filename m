@@ -1,83 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f196.google.com ([209.85.216.196]:46591 "EHLO
-        mail-qt0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751633AbeBTLLS (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:43752 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750710AbeBTLlq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Feb 2018 06:11:18 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQVSVtXzWXjLRAQXynSvHHbiF1xYLhjLBwPfFOpnX_NRA@mail.gmail.com>
-References: <20180216214117.1947175-1-arnd@arndb.de> <20180216214117.1947175-4-arnd@arndb.de>
- <CAK7LNAQVSVtXzWXjLRAQXynSvHHbiF1xYLhjLBwPfFOpnX_NRA@mail.gmail.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Tue, 20 Feb 2018 12:11:17 +0100
-Message-ID: <CAK8P3a2WYKQPJ_y9O_HpgbwN9-b9isKkYJH4niLA02MD2uH+2w@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Kconfig: add a default allrandom.config
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 20 Feb 2018 06:41:46 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kconfig: Don't leak choice names during parsing
+Date: Tue, 20 Feb 2018 20:40:29 +0900
+Message-Id: <1519126829-7257-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "Yann E . MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, "Luis R. Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org
 
-On Tue, Feb 20, 2018 at 10:16 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2018-02-17 6:41 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
->> Building randconfig kernels frequently leads to build errors from
->> drivers that have additional build dependencies, or that we don't
->> want to build for compile-testing for some other reason.
->
-> Can you fix the former case?
+The named choice is not used in the kernel tree, but if it were used,
+it would not be freed.
 
-I'm sure it can be done with runtime detection of the tools, not sure if that's
-a good idea. What we would need here is
+The intention of the named choice can be seen in the log of
+commit 5a1aa8a1aff6 ("kconfig: add named choice group").
 
-CONFIG_WANXL_BUILD_FIRMWARE: needs to check for as68k and ld68k
-CONFIG_AIC79XX_BUILD_FIRMWARE: needs flex, bison and berkeley db.
-        I have all those but it still failed to build for me.
-STANDALONE now (after the removal of sound/oss) only controls
-      ACPI_CUSTOM_DSDT_FILE, we could remove STANDALONE now
-      I think, it doesn't actually get in the way of anything. For the stable
-      kernels, I'd still need to deal with CONFIG_STANDALONE for the oss
-      drivers.
+There is room for argument if this is useful in practice, but anyway
+I am fixing the memory leak.
 
-My feeling right now is that we're better off making both STANDALONE
-and PREVENT_FIRMWARE_BUILD depend on !COMPILE_TEST,
-and then find a way to force that.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
->> We already have a couple of compile-time options that can deal with this
->> problem, but the complete set is not documented well.  We also have a
->> method to override some options during 'make randconfig' and a couple
->> of other make targets. However, we don't yet combine those two.
->
->
-> From this statement,
->
-> kernel/configs/compile_test.config
->
-> would make more sense?
+ scripts/kconfig/zconf.y | 1 +
+ 1 file changed, 1 insertion(+)
 
-My original thought was that the allrandom.config file name is already
-documented and I just wanted a more consistent behavior, not come
-up with something new.
+diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+index 4be9805..4893676 100644
+--- a/scripts/kconfig/zconf.y
++++ b/scripts/kconfig/zconf.y
+@@ -276,6 +276,7 @@ choice: T_CHOICE word_opt T_EOL
+ 	sym->flags |= SYMBOL_AUTO;
+ 	menu_add_entry(sym);
+ 	menu_add_expr(P_CHOICE, NULL, NULL);
++	free($2);
+ 	printd(DEBUG_PARSE, "%s:%d:choice\n", zconf_curname(), zconf_lineno());
+ };
+ 
+-- 
+2.7.4
 
->> This adds a new allrandom.config file to turn on CONFIG_COMPILE_TEST,
->> CONFIG_STANDALONE and CONFIG_PREVENT_FIRMWARE_BUILD for all randconfig
->> builds. This in turn disables some other options that we already try
->> to avoid in 'allmodconfig' builds and that make no sense in a general
->> randconfig build.
->>
->> Building with 'make randconfig KCONFIG_ALLCONFIG=1' should now always
->
->
-> Can you type 'make randconfig compile_test.config', instead?
->
-> (Or 'make allmodconfig compile_test.config' for full-build test)
->
->
-> The merge_config has a little bit different logic
-> from KCONFIG_ALLCONFIG=1, but I guess it leads to the almost same result.
-
-I suspect that one difference in a randconfig kernel is that all options that
-depend on CONFIG_COMPILE_TEST have a 50% lower chance of getting
-enabled that way, but eventually they will get enabled.
-
-      Arnd
