@@ -1,132 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:44493 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750716AbeBUGLA (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:33412 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751934AbeBUHjT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Feb 2018 01:11:00 -0500
-Received: by mail-wr0-f196.google.com with SMTP id v65so1107723wrc.11
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Feb 2018 22:10:59 -0800 (PST)
-From: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Date: Wed, 21 Feb 2018 07:10:52 +0100
-Subject: Re: [PATCH v4 0/3] Kconfig: Print reverse dependencies in groups
-Message-ID: <20180221061052.GA29861@example.com>
-References: <cover.1518985888.git.erosca@de.adit-jv.com>
- <CAK7LNAQ4z9KHsCvzQRHozcXrxY5wsLnMCqWP7weSLFC4mxh6fg@mail.gmail.com>
- <CAK7LNARtH1fepGc_+E4uzhoc=ykuF1HXpy0g7wx=5xZyL7G1YQ@mail.gmail.com>
- <20180220150018.mjyjmdmao7xqyukr@huvuddator>
- <20180220195119.GA14262@vmlxhi-102.adit-jv.com>
- <CAFkk2KRxERva+XZi_fR_Epr63TwA6hKjwjCYnwtnK+xOSJUWHg@mail.gmail.com>
- <CAK7LNATTqqzJReUfkoxE=5+GsVUMv4wjOuz--=-PY_B4eK4NeA@mail.gmail.com>
+        Wed, 21 Feb 2018 02:39:19 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATTqqzJReUfkoxE=5+GsVUMv4wjOuz--=-PY_B4eK4NeA@mail.gmail.com>
+In-Reply-To: <CAFkk2KT1krKuDkWt0eHcasfC61fTVQNf-1kqw7icLP9OYGYkXQ@mail.gmail.com>
+References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
+ <20180218221352.GA6651@ravnborg.org> <CAFkk2KT1krKuDkWt0eHcasfC61fTVQNf-1kqw7icLP9OYGYkXQ@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 21 Feb 2018 16:38:25 +0900
+Message-ID: <CAK7LNAQH0WD3A3T97gce0xmZpMy0zWxTO2StfNWaDbiqjQg8gg@mail.gmail.com>
+Subject: Re: [PATCH 00/23] kconfig: move compiler capability tests to Kconfig
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Eugeniu Rosca <roscaeugeniu@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Eugeniu Rosca <erosca@de.adit-jv.com>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, kernel-hardening@lists.openwall.com, Jonathan Corbet <corbet@lwn.net>, sparclinux@vger.kernel.org, Linux-sh list <linux-sh@vger.kernel.org>, X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Rich Felker <dalias@libc.org>, Jeff Dike <jdike@addtoit.com>, "H. Peter Anvin" <hpa@zytor.com>, user-mode-linux-devel@lists.sourceforge.net, Yoshinori Sato <ysato@users.sourceforge.jp>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@samba.org>, user-mode-linux-user@lists.sourceforge.net, Ingo Molnar <mingo@redhat.com>, "David S. Miller" <davem@davemloft.net>, Michael Ellerman <mpe@ellerman.id.au>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Richard Weinberger <richard@nod.at>, Emese Revfy <re.emese@gmail.com>
 
-On Wed, Feb 21, 2018 at 02:48:45PM +0900, Masahiro Yamada wrote:
-> 2018-02-21 5:09 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> > On Tue, Feb 20, 2018 at 8:52 PM, Eugeniu Rosca <erosca@de.adit-jv.com> wrote:
-> >> On Tue, Feb 20, 2018 at 04:00:18PM +0100, Ulf Magnusson wrote:
-> >>> On Tue, Feb 20, 2018 at 05:24:01PM +0900, Masahiro Yamada wrote:
-> >>> > 2018-02-20 17:13 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> >>> > >
-> >>> > > I do not like this implementation.
-> >>> > > The code is super ugly, the diff-stat is too much than needed.
-> >>> > >
-> >>> > > Please rewrite the code within 20 lines.
-> >>> > >
-> >>> >
-> >>> > For a hint, I cleaned up the code base.
-> >>> > https://patchwork.kernel.org/patch/10229545/
-> >>> >
-> >>> > which should be equivalent to yours:
-> >>> > https://patchwork.kernel.org/patch/10226951/
-> >>> >
-> >>> >
-> >>> > No 'enum print_type', please.
-> >>>
-> >>> The reason I prefer them on separate lines consistently is to avoid stuff like the following:
-> >>>
-> >>>   Selected by [y]: MV_XOR_V2 [=y] && DMADEVICES [=y] && ARM64 [=y]
-> >>>   Selected by [n]:
-> >>>   - AMCC_PPC440SPE_ADMA [=n] && DMADEVICES [=y] && (440SPe || ...
-> >>>   - FSL_RAID [=n] && DMADEVICES [=y] && FSL_SOC && ...
-> >>>   - INTEL_IOATDMA [=n] && DMADEVICES [=y] && PCI [=y] && X86_64
-> >>>
-> >>> That looks confusing and unbalanced to me.
-> >>
-> >> I think nobody is disputing this. Masahiro's
-> >> https://patchwork.kernel.org/patch/10229545/ is also showing every
-> >> reverse dependency top level OR expression on a new row.
-> >
-> > Ohh... sorry, didn't read closely enough.
-> >
-> > Yeah, I agree that that looks like a nice and neat solution.
-> >
-> >>
-> >>>
-> >>> There are some simple ways to trim down the size of this patchset
-> >>> though.
-> >>>
-> >>> Eugeniu:
-> >>> What do you think about the following refactoring of your 3/3 patch?
-> >>> Maybe there's a way to have expr_print_revdep() take just a tristate
-> >>> too, though it's not worth it if it just grows the code elsewhere.
-> >>>
-> >>
-> >> Well, Masahiro requests not using 'enum print_type' and I still see it
-> >> in your example.
-> >
-> > One alternative would be to keep the 'revdep' flag and add an extra
-> > tristate parameter for the kinds of selects to print.
-> 
-> Using 'enum tristate' is what was in mind,
-> but I do not like to mess up __expr_print() any more.
-> 
-> I re-implemented this.
-> https://patchwork.kernel.org/patch/10231295/
-> 
+2018-02-20 0:18 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
 
-I've tested https://patchwork.kernel.org/patch/10229545/ and
-https://patchwork.kernel.org/patch/10231295/ and they work great for me.
-Thank you for this feature.
+>>
+>> I'm not happy that we in one context can reference CONFIG variables
+>> directly, but inside the $(call ...) and $(shell ...) needs the $ prefix.
+>> But I could not come up with something un-ambigious where this could be avoided.
+>
+> I think we should be careful about allowing references to config
+> symbols. It mixes up the parsing and evaluation phases, since $() is
+> expanded during parsing (which I consider a feature and think is
+> needed to retain sanity).
+>
+> Patch 06/23 removes the last existing instance of symbol references in
+> strings by getting rid of 'option env'. That's an improvement to me.
+> We shouldn't add it back.
 
-> 
-> 
-> 
-> > I'm not a huge fan of having parameters that turn meaningless
-> > depending on the values of other parameters, but it might not be
-> > terrible there, if we must get rid of 'enum print_type'. I'm always
-> > open to other suggestions too.
-> >
-> > The whole expression printing code feels a bit twisty to me with all
-> > the mutual recursion and stuff going on, but that's outside the scope
-> > of this patchset. :)
-> >
-> >>
-> >>> (By the way, I noticed that expr_print_revdep() previously generated a
-> >>> warning suggesting parentheses, which was my fault. If you saw that,
-> >>> don't copy my mistakes. The build should be warning-free. :)
-> >>
-> >> I didn't notice any warnings using gcc 5.4.0.
-> >
-> > I'm on 7.2.0, so that's probably why. It was "just" a style warning anyway. :)
-> >
-> > Cheers,
-> > Ulf
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
-> -- 
-> Best Regards
-> Masahiro Yamada
 
-Best regards,
-Eugeniu.
+This is really important design decision,
+so I'd like to hear a little more from experts.
+
+
+For example, x86 allows users to choose sub-arch, either 'i386' or 'x86_64'.
+
+https://github.com/torvalds/linux/blob/v4.16-rc2/arch/x86/Kconfig#L4
+
+
+
+If the user toggles CONFIG_64BIT,
+the bi-arch compiler will work in a slightly different mode
+(at least, back-end parts)
+
+So, my question is, is there a case,
+
+$(cc-option, -m32 -foo) is y, but
+$(cc-option, -m64 -foo) is n  ?
+(or vice versa)
+
+
+If the answer is yes, $(cc-option -foo) would have to be re-calculated
+every time CONFIG_64BIT is toggled.
+
+This is what I'd like to avoid, though.
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
