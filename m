@@ -1,197 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:37361 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750829AbeBUD5n (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:57192 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751017AbeBUEZ2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Feb 2018 22:57:43 -0500
-Received: from mail-vk0-f46.google.com (mail-vk0-f46.google.com [209.85.213.46]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id w1L3vQFG029933
-        for <linux-kbuild@vger.kernel.org>; Wed, 21 Feb 2018 12:57:26 +0900
-Received: by mail-vk0-f46.google.com with SMTP id y127so186233vky.9
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Feb 2018 19:57:26 -0800 (PST)
+        Tue, 20 Feb 2018 23:25:28 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: [PATCH RFC] kbuild: drop superfluous GCC_PLUGINS_CFLAGS assignment
+Date: Wed, 21 Feb 2018 12:25:07 +0800
+Message-ID: <20180221042507.31379-1-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <04370c02b170604b3edde66cdf087bc82710a07f.1518192692.git-series.jhogan@kernel.org>
-References: <cover.e6abe4a455cad25b6663ceb7da02aee67a3be269.1518192692.git-series.jhogan@kernel.org>
- <04370c02b170604b3edde66cdf087bc82710a07f.1518192692.git-series.jhogan@kernel.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 21 Feb 2018 12:56:44 +0900
-Message-ID: <CAK7LNAQ4OVEST5gvsgZAr4C9GgyaYrHLJBx8HvaPzEqS5zqgCQ@mail.gmail.com>
-Subject: Re: [PATCH 2/3] MIPS: Add generic list_* Makefile targets
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <jhogan@kernel.org>
-Cc: Linux-MIPS <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>, Michal Marek <michal.lkml@markovi.net>, Paul Burton <paul.burton@mips.com>, Matt Redfearn <matt.redfearn@mips.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, re.emese@gmail.com
 
-2018-02-10 1:11 GMT+09:00 James Hogan <jhogan@kernel.org>:
-> Add MIPS specific Makefile targets for listing generic defconfigs
-> (list_generic_defconfigs), generic board types (list_generic_boards),
-> and legacy defconfigs which have been converted to generic
-> (list_legacy_defconfigs).
->
-> This is useful for quick reference and for buildbots to be able to
-> automatically build all supported default configurations without parsing
-> of the generic_defconfig error output.
->
-> In order for these to work without .config being updated or
-> CROSS_COMPILE being needed, list_%s is added to no-dot-config-targets in
-> the main Makefile.
->
-> Signed-off-by: James Hogan <jhogan@kernel.org>
-> Cc: Ralf Baechle <ralf@linux-mips.org>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: Paul Burton <paul.burton@mips.com>
-> Cc: Matt Redfearn <matt.redfearn@mips.com>
-> Cc: linux-mips@linux-mips.org
-> Cc: linux-kbuild@vger.kernel.org
-> ---
->  Makefile           |  2 +-
->  arch/mips/Makefile | 51 ++++++++++++++++++++++++++++++-----------------
->  2 files changed, 34 insertions(+), 19 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 3f4d157add54..635015848a2c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -223,7 +223,7 @@ old_version_h := include/linux/version.h
->  no-dot-config-targets := clean mrproper distclean \
->                          cscope gtags TAGS tags help% %docs check% coccicheck \
->                          $(version_h) headers_% archheaders archscripts \
-> -                        kernelversion %src-pkg
-> +                        kernelversion %src-pkg list_%s
->
->  config-targets := 0
->  mixed-targets  := 0
+GCC_PLUGINS_CFLAGS is already in the environment, so it is superfluous
+to add it in commanline of final build of init/
 
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+This is only tested with Randomizing Structure Layout plugin. The test
+method is not so grace but I think it can prove the correctness of this
+patch. On the other hand, if we concerns that some flags cannot be
+passed during final build, should also consider all the other flags.
 
+Currently, with Randomizing plugin enabled, the crash utility can't work
+with it, the symptom is a Segmentation fault due to infinite function call.
 
-Unfortunately, there is no way to specify arch-specific
-no-dot-config-targets.
+With the patch, the symptom is exactly the same, so I am sure the plugin works.
 
+ scripts/link-vmlinux.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This patch made me upset a bit.
-Some solutions.
-
-
-[1] Decide list_% is the right thing
-
-[2] Invent a way to add arch-specific no-dot-config-targets
-
-    For example, add arch/mips/no-dot-config
-
-    Then, append it as follows:
-
-     no-dot-config-targets := clean mrproper distclean \
-                              cscope gtags TAGS tags help% %docs
-check% coccicheck \
-                              $(version_h) headers_% archheaders archscripts \
-                              kernelversion %src-pkg
-                              kernelversion %src-pkg $(shell cat
-arch/$(SRCARCH)/no-dot-config)
-
-   (This needs to tweak the top Makefile a bit more)
-
-[3] (Ab)use the existing name convention
-
-    For example, if you rename as follow,
-
-      list_generic_defconfigs  -> list_generic_defconfig
-
-      list_legacy_defconfigs   -> list_legacy_defconfig
-
-   This works without adding  'list_%s'
-
-
-   The hack of arch/mips/Makefile is so ugly,
-   but adding two more would not hurt.
-
-
-
-
-
-> diff --git a/arch/mips/Makefile b/arch/mips/Makefile
-> index 6f368b5cdf29..9ba487c1c4d2 100644
-> --- a/arch/mips/Makefile
-> +++ b/arch/mips/Makefile
-> @@ -447,24 +447,27 @@ archclean:
->         $(Q)$(MAKE) $(clean)=arch/mips/lasat
->
->  define archhelp
-> -       echo '  install              - install kernel into $(INSTALL_PATH)'
-> -       echo '  vmlinux.ecoff        - ECOFF boot image'
-> -       echo '  vmlinux.bin          - Raw binary boot image'
-> -       echo '  vmlinux.srec         - SREC boot image'
-> -       echo '  vmlinux.32           - 64-bit boot image wrapped in 32bits (IP22/IP32)'
-> -       echo '  vmlinuz              - Compressed boot(zboot) image'
-> -       echo '  vmlinuz.ecoff        - ECOFF zboot image'
-> -       echo '  vmlinuz.bin          - Raw binary zboot image'
-> -       echo '  vmlinuz.srec         - SREC zboot image'
-> -       echo '  uImage               - U-Boot image'
-> -       echo '  uImage.bin           - U-Boot image (uncompressed)'
-> -       echo '  uImage.bz2           - U-Boot image (bz2)'
-> -       echo '  uImage.gz            - U-Boot image (gzip)'
-> -       echo '  uImage.lzma          - U-Boot image (lzma)'
-> -       echo '  uImage.lzo           - U-Boot image (lzo)'
-> -       echo '  uzImage.bin          - U-Boot image (self-extracting)'
-> -       echo '  dtbs                 - Device-tree blobs for enabled boards'
-> -       echo '  dtbs_install         - Install dtbs to $(INSTALL_DTBS_PATH)'
-> +       echo '  install                 - install kernel into $(INSTALL_PATH)'
-> +       echo '  vmlinux.ecoff           - ECOFF boot image'
-> +       echo '  vmlinux.bin             - Raw binary boot image'
-> +       echo '  vmlinux.srec            - SREC boot image'
-> +       echo '  vmlinux.32              - 64-bit boot image wrapped in 32bits (IP22/IP32)'
-> +       echo '  vmlinuz                 - Compressed boot(zboot) image'
-> +       echo '  vmlinuz.ecoff           - ECOFF zboot image'
-> +       echo '  vmlinuz.bin             - Raw binary zboot image'
-> +       echo '  vmlinuz.srec            - SREC zboot image'
-> +       echo '  uImage                  - U-Boot image'
-> +       echo '  uImage.bin              - U-Boot image (uncompressed)'
-> +       echo '  uImage.bz2              - U-Boot image (bz2)'
-> +       echo '  uImage.gz               - U-Boot image (gzip)'
-> +       echo '  uImage.lzma             - U-Boot image (lzma)'
-> +       echo '  uImage.lzo              - U-Boot image (lzo)'
-> +       echo '  uzImage.bin             - U-Boot image (self-extracting)'
-> +       echo '  dtbs                    - Device-tree blobs for enabled boards'
-> +       echo '  dtbs_install            - Install dtbs to $(INSTALL_DTBS_PATH)'
-> +       echo '  list_generic_defconfigs - List available generic defconfigs'
-> +       echo '  list_generic_boards     - List available generic boards'
-> +       echo '  list_legacy_defconfigs  - List available legacy defconfigs'
->         echo
->         echo '  These will be default as appropriate for a configured platform.'
->         echo
-> @@ -538,6 +541,14 @@ generic_defconfig:
->         $(Q)echo
->         $(Q)false
->
-> +.PHONY: list_generic_defconfigs
-> +list_generic_defconfigs:
-> +       $(Q)for cfg in $(generic_defconfigs); do echo "$${cfg}"; done
-> +
-> +.PHONY: list_generic_boards
-> +list_generic_boards:
-> +       $(Q)for board in $(sort $(BOARDS)); do echo "$${board}"; done
-> +
->  #
->  # Legacy defconfig compatibility - these targets used to be real defconfigs but
->  # now that the boards have been converted to use the generic kernel they are
-> @@ -555,3 +566,7 @@ xilfpga_defconfig-y         := 32r2el_defconfig BOARDS=xilfpga
->  .PHONY: $(legacy_defconfigs)
->  $(legacy_defconfigs):
->         $(Q)$(MAKE) -f $(srctree)/Makefile $($@-y)
-> +
-> +.PHONY: list_legacy_defconfigs
-> +list_legacy_defconfigs:
-> +       $(Q)for cfg in $(sort $(legacy_defconfigs)); do echo "$${cfg}"; done
-> --
-> git-series 0.9.1
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index e6818b8e7141..e07b2d251ad6 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -248,7 +248,7 @@ else
+ fi;
+ 
+ # final build of init/
+-${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init GCC_PLUGINS_CFLAGS="${GCC_PLUGINS_CFLAGS}"
++${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init
+ 
+ archive_builtin
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.14.3
+
+
+
