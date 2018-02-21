@@ -1,62 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:45183 "EHLO
-        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751384AbeBUKww (ORCPT
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:33760 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751554AbeBULKn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Feb 2018 05:52:52 -0500
+        Wed, 21 Feb 2018 06:10:43 -0500
+Date: Wed, 21 Feb 2018 12:10:40 +0100
+From: Petr Vorel <petr.vorel@gmail.com>
+Subject: Re: [PATCH] kconfig: Print reverse dependencies in groups
+Message-ID: <20180221111038.clllad7wfhwd3dou@dell5510>
+Reply-To: Petr Vorel <petr.vorel@gmail.com>
+References: <1519191855-27943-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNARtZcW1v53ridFJK1MULmj8tQT4s+DoRhKj9PrbMri5rQ@mail.gmail.com>
-References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
- <20180218221352.GA6651@ravnborg.org> <CAFkk2KT1krKuDkWt0eHcasfC61fTVQNf-1kqw7icLP9OYGYkXQ@mail.gmail.com>
- <CAK7LNAQH0WD3A3T97gce0xmZpMy0zWxTO2StfNWaDbiqjQg8gg@mail.gmail.com>
- <CAK8P3a2BOQt5Y0B4271WqaJvvWqfxHxD3S6r1i1xONvb+CJ5Dg@mail.gmail.com> <CAK7LNARtZcW1v53ridFJK1MULmj8tQT4s+DoRhKj9PrbMri5rQ@mail.gmail.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 21 Feb 2018 11:52:50 +0100
-Message-ID: <CAK8P3a1DrhxWXaEs6E85W5HEhvFr23E-GDsu=0X-sG0pX+PLag@mail.gmail.com>
-Subject: Re: [PATCH 00/23] kconfig: move compiler capability tests to Kconfig
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1519191855-27943-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Rich Felker <dalias@libc.org>, Kernel Hardening <kernel-hardening@lists.openwall.com>, X86 ML <x86@kernel.org>, Paul Mackerras <paulus@samba.org>, "H. Peter Anvin" <hpa@zytor.com>, sparclinux <sparclinux@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, Jonathan Corbet <corbet@lwn.net>, Richard Weinberger <richard@nod.at>, Linux-sh list <linux-sh@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, Emese Revfy <re.emese@gmail.com>, Kees Cook <keescook@chromium.org>, uml-devel <user-mode-linux-devel@lists.sourceforge.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, Jeff Dike <jdike@addtoit.com>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, user-mode-linux-user@lists.sourceforge.net, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <michal.lkml@markovi.net>, Ulf Magnusson <ulfalizer@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>
+Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Eugeniu Rosca <roscaeugeniu@gmail.com>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Nicolas Pitre <nicolas.pitre@linaro.org>
 
-On Wed, Feb 21, 2018 at 11:20 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2018-02-21 18:56 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
->> On Wed, Feb 21, 2018 at 8:38 AM, Masahiro Yamada
->> <yamada.masahiro@socionext.com> wrote:
->>> 2018-02-20 0:18 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->
-> Let me clarify my concern.
->
-> When we test the compiler flag, is there a case
-> where a particular flag depends on -m{32,64} ?
->
-> For example, is there a compiler that supports -fstack-protector
-> for 64bit mode, but unsupports it for 32bit mode?
->
->   $(cc-option -m32)                     ->  y
->   $(cc-option -m64)                     ->  y
->   $(cc-option -fstack-protector)        ->  y
->   $(cc-option -m32 -fstack-protector)   ->  n
->   $(cc-option -m64 -fstack-protector)   ->  y
->
-> I guess this is unlikely to happen,
-> but I am not whether it is zero possibility.
->
-> If this could happen,
-> $(cc-option ) must be evaluated together with
-> correct bi-arch option (either -m32 or -m64).
->
->
-> Currently, -m32/-m64 is specified in Makefile,
-> but we are moving compiler tests to Kconfig
-> and, CONFIG_64BIT can be dynamically toggled in Kconfig.
+Hi Masahiro,
 
-I don't think it can happen for this particular combination (stack protector
-and word size), but I'm sure we'll eventually run into options that
-need to be tested in combination. For the current CFLAGS_KERNEL
-setting, we definitely have the case of needing the variables to be
-evaluated in a specific order.
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Acked-by: Petr Vorel <pvorel@suse.cz>
+Just please fix typo leading to segfault and add ':'
 
-      Arnd
+<snip>
+>  	get_symbol_props_str(r, sym, P_SELECT, _("  Selects: "));
+>  	if (sym->rev_dep.expr) {
+> -		str_append(r, _("  Selected by: \n"));
+> -		expr_gstr_print_revdep(sym->rev_dep.expr, r);
+> +		expr_gstr_print_revdep(sym->rev_dep.expr, r, yes, "  Selected by [y]\n");
+> +		expr_gstr_print_revdep(sym->rev_dep.expr, r, mod, "  Selected by [m]\n");
+> +		expr_gstr_print_revdep(sym->rev_dep.expr, r, no, "  Selected by [n]\n");
+Maybe add ':' to be consistent with the rest of titles?
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, yes, "  Selected by [y]:\n");
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, mod, "  Selected by [m]:\n");
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, no, "  Selected by [n]:\n");
+
+>  	}
+
+>  	get_symbol_props_str(r, sym, P_IMPLY, _("  Implies: "));
+>  	if (sym->implied.expr) {
+> -		str_append(r, _("  Implied by: \n"));
+> -		expr_gstr_print_revdep(sym->implied.expr, r);
+> +		expr_gstr_print_revdep(sym->rev_dep.expr, r, yes, "  Implied by [y]\n");
+> +		expr_gstr_print_revdep(sym->rev_dep.expr, r, mod, "  Implied by [m]\n");
+> +		expr_gstr_print_revdep(sym->rev_dep.expr, r, no, "  Implied by [n]\n");
+And the same here.
++ the most important thing - copy paste error, which obviously leads to segfault on
+"Implied by":
+Try search for PTP_1588_CLOCK (in x86_64 defconfig). gdb in coredump shows
+#0  0x000000000041043e in expr_print_revdep (e=0x0, fn=0x410297 <expr_print_gstr_helper>, data=0x7fff0f2a8640, pr_type=yes, title=0x7fff0f2a85a0) at scripts/kconfig/expr.c:1328
+1328        if (e->type == E_OR) {
+
+So the correct is:
+		expr_gstr_print_revdep(sym->implied.expr, r, yes, "  Implied by [y]:\n");
+		expr_gstr_print_revdep(sym->implied.expr, r, mod, "  Implied by [m]:\n");
+		expr_gstr_print_revdep(sym->implied.expr, r, no, "  Implied by [n]:\n");
+
+
+Kind regards,
+Petr
