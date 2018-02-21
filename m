@@ -1,85 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f193.google.com ([209.85.220.193]:46478 "EHLO
-        mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932271AbeBUQ5T (ORCPT
+Received: from mail-it0-f68.google.com ([209.85.214.68]:50340 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932317AbeBURCB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Feb 2018 11:57:19 -0500
+        Wed, 21 Feb 2018 12:02:01 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAR2GO21TMP=viR1sni_17zFZ+03TUh8pak1etVYEF8kTQ@mail.gmail.com>
-References: <20180216214117.1947175-1-arnd@arndb.de> <20180216214117.1947175-3-arnd@arndb.de>
- <CAK7LNARvbsMc3JpcxZjvmc3UjvACx3t66cLM_aSDcADiPA0V7g@mail.gmail.com>
- <CAK8P3a0DAu1q3jLMN=JjrNAd4a4UVFcEcLF2h1VgSvXjZsU++g@mail.gmail.com> <CAK7LNAR2GO21TMP=viR1sni_17zFZ+03TUh8pak1etVYEF8kTQ@mail.gmail.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 21 Feb 2018 17:57:18 +0100
-Message-ID: <CAK8P3a1bRC5EwXJ8=xcaZqf5c7=8h12spJ1XCf1NFvCS-7qDnw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] Kconfig: improve handling for all{rand,yes,no,}.config
- fragments
+In-Reply-To: <CAK7LNAT1QNMrHL_JikeEk1ejen-03u_vwkdQmHhHxrxHLtaa0Q@mail.gmail.com>
+References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
+ <1518806331-7101-12-git-send-email-yamada.masahiro@socionext.com>
+ <CA+55aFwQLrrBeXZXK_qUXiGVFNv3qPJS4tNKFacuk0Y0WgZjCA@mail.gmail.com>
+ <20180219044845.7cnqpgyiinn6hkyb@huvuddator> <CA+55aFwiRzpSRW8xhoMs9cbFFXZGmEyyVa4a7aeZzQGYuO211w@mail.gmail.com>
+ <CA+55aFzu8+yaAGvdZMRYJWWZmv_OnFnocnvUiSKcAyNQ1z9kmQ@mail.gmail.com> <CAK7LNAT1QNMrHL_JikeEk1ejen-03u_vwkdQmHhHxrxHLtaa0Q@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 21 Feb 2018 09:01:59 -0800
+Message-ID: <CA+55aFyNM+qrF=f2gX4ktp5U+WOycktkrYfGos7VdTdOuhtvvw@mail.gmail.com>
+Subject: Re: [PATCH 11/23] kconfig: add 'shell-stdout' function
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Feb 20, 2018 at 6:04 PM, Masahiro Yamada
+On Tue, Feb 20, 2018 at 8:59 PM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> 2018-02-20 18:59 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
->> On Tue, Feb 20, 2018 at 10:26 AM, Masahiro Yamada
->> <yamada.masahiro@socionext.com> wrote:
->>> 2018-02-17 6:41 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
->>
->>>> @@ -621,14 +622,24 @@ int main(int ac, char **av)
->>>>                 case randconfig:        name = "allrandom.config"; break;
->>>>                 default: break;
->>>>                 }
->>>> -               if (conf_read_simple(name, S_DEF_USER) &&
->>>> -                   conf_read_simple("all.config", S_DEF_USER)) {
->>>> -                       fprintf(stderr,
->>>> -                               _("*** KCONFIG_ALLCONFIG set, but no \"%s\" or \"all.config\" file found\n"),
->>>> -                               name);
->>>> -                       exit(1);
->>>> +               /* try ./name, arch/$(ARCH)/configs/name and kernel/config/name */
->>>> +               if (!conf_read_simple(name, S_DEF_USER))
->>>> +                       break;
->>>> +               arch = getenv("ARCH");
->>>> +               if (arch) {
->>>> +                       snprintf(fullname, sizeof(fullname), "arch/%s/configs/%s",
->>>> +                                arch, name);
->>>> +                       if (!conf_read_simple(fullname, S_DEF_USER))
->>>> +                               break;
->>>>                 }
->>>
->>>
->>> I am not a big fan of hard-coding the kernel directory structure.
->>>
->>> We already do this [1], but I am thinking of kicking this out.
->>> [1] https://github.com/torvalds/linux/blob/v4.16-rc1/scripts/kconfig/confdata.c#L33
->>
->> Ok, I see. How about adding a way to detect that we are build-testing
->> with randconfig instead?
 >
+> IMO, I prefer to use different names for different purpose.
+> So, 'stdout' and 'success' look good to me.
 >
-> How about implementing something in scripts/kconfig/Makefile?
+> BTW, I noticed just one built-in function is enough
+> because 'success' can be derived from 'stdout'.
 >
-> merge_config collects config fragments into 'configfiles'
+> So, my plan is, implement $(shell ...) as a built-in function.
+> This returns the stdout from the command.
 >
-> I was thinking of a similar thing.
+> Then, implement 'success' as a textual shorthand
+> by using macro, like this:
 >
->
-> If KCONFIG_ALLCONFIG is 1,
-> scripts/kconfig/Makefile searches
-> './', '$srctree/', 'arch/$(SRCARCH)/configs/', 'kernel/configs/'
-> and sets the found file in it,
->
-> If KCONFIG_ALLCONFIG already contains a file name, it is used as-is.
->
-> scripts/kconfig/conf.c will be simplified.
+> macro success $(shell ($(1) && echo y) || echo n)
 
-Yes, good idea. I'm struggling a bit with the implementation (fitting
-it into the
-simple-tagets rule), can you come up with a prototype?
+I like it. This is nice and clean, and seems to be very generic. I see
+no issues with this approach.
 
-We also need to decide what happens when e.g. both a ./all.config and
-arch/${SRCARCH}/configs/allrand.config file exist, should the first path
-take precedence or the more specific file?
-
-     Arnd
+                Linus
