@@ -1,105 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:58316 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750707AbeBUFAy (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:18195 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750738AbeBUFpw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Feb 2018 00:00:54 -0500
-MIME-Version: 1.0
-In-Reply-To: <CA+55aFzu8+yaAGvdZMRYJWWZmv_OnFnocnvUiSKcAyNQ1z9kmQ@mail.gmail.com>
-References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
- <1518806331-7101-12-git-send-email-yamada.masahiro@socionext.com>
- <CA+55aFwQLrrBeXZXK_qUXiGVFNv3qPJS4tNKFacuk0Y0WgZjCA@mail.gmail.com>
- <20180219044845.7cnqpgyiinn6hkyb@huvuddator> <CA+55aFwiRzpSRW8xhoMs9cbFFXZGmEyyVa4a7aeZzQGYuO211w@mail.gmail.com>
- <CA+55aFzu8+yaAGvdZMRYJWWZmv_OnFnocnvUiSKcAyNQ1z9kmQ@mail.gmail.com>
+        Wed, 21 Feb 2018 00:45:52 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 21 Feb 2018 13:59:59 +0900
-Message-ID: <CAK7LNAT1QNMrHL_JikeEk1ejen-03u_vwkdQmHhHxrxHLtaa0Q@mail.gmail.com>
-Subject: Re: [PATCH 11/23] kconfig: add 'shell-stdout' function
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kconfig: Print reverse dependencies in groups
+Date: Wed, 21 Feb 2018 14:44:15 +0900
+Message-Id: <1519191855-27943-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Eugeniu Rosca <roscaeugeniu@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Nicolas Pitre <nicolas.pitre@linaro.org>
 
-2018-02-20 3:01 GMT+09:00 Linus Torvalds <torvalds@linux-foundation.org>:
-> On Mon, Feb 19, 2018 at 9:44 AM, Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->>
->> I do like your "success"/"stdout" more than "shell"/"shell-stdout",
->> because with that naming I don't get the feeling that one should
->> subsume the other.
->
-> Hmm. Thinking about it some more, I really would prefer just "$(shell
-> ...)" everywhere.
->
-> But it would be nice if perhaps the error handling would match the
-> context somehow.
->
-> I'm wondering if this might tie into the whole quoting discussion in
-> the other thread.
->
-> Because the rule could be:
->
-> (a) unquoted $(shell ) is a bool, and failing is ok (and turns into
-> y/n depending on whether successful or failing)
->
-> So
->
->   config CC_IS_GCC
->           bool
->           default $(shell $CC --version | grep -q gcc)
->
-> works automatically.
->
-> (b) but with quoting, $(shell ) is a string, and failing is an error
->
-> So
->
->   config GCC_VERSION
->           int
->           default "$(shell-stdout $srctree/scripts/gcc-version.sh $CC
-> | sed 's/^0*//')" if CC_IS_GCC
->           default 0
->
-> would need those quotes, and if the shell-script returns a failure,
-> we'd _abort_.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+This patch requires the following as a pre-requisite:
+https://patchwork.kernel.org/patch/10229545/
+
+These two will work equivalently to the following three:
+
+https://patchwork.kernel.org/patch/10226951/
+https://patchwork.kernel.org/patch/10226953/
+https://patchwork.kernel.org/patch/10226955/
 
 
-GCC_VERSION is int type.
+ scripts/kconfig/expr.c | 18 ++++++++++++------
+ scripts/kconfig/expr.h |  3 ++-
+ scripts/kconfig/menu.c | 10 ++++++----
+ 3 files changed, 20 insertions(+), 11 deletions(-)
 
-Setting aside the Kconfig internal, I prefer 50700 to "50700"
-
-According to my common sense, I do not want to quote integers.
-
-
-
-
-IMO, I prefer to use different names for different purpose.
-So, 'stdout' and 'success' look good to me.
-
-
-
-BTW, I noticed just one built-in function is enough
-because 'success' can be derived from 'stdout'.
-
-
-So, my plan is, implement $(shell ...) as a built-in function.
-This returns the stdout from the command.
-
-
-Then, implement 'success' as a textual shorthand
-by using macro, like this:
-
-macro success $(shell ($(1) && echo y) || echo n)
-
-
-macro can be expanded recursively, so cc-option
-can be implemented based on 'success' macro.
-
-
-
-
-
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index cd3a8f5..49376e1 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -1323,19 +1323,25 @@ void expr_gstr_print(struct expr *e, struct gstr *gs)
+  */
+ static void expr_print_revdep(struct expr *e,
+ 			      void (*fn)(void *, struct symbol *, const char *),
+-			      void *data)
++			      void *data, tristate pr_type, const char **title)
+ {
+ 	if (e->type == E_OR) {
+-		expr_print_revdep(e->left.expr, fn, data);
+-		expr_print_revdep(e->right.expr, fn, data);
+-	} else {
++		expr_print_revdep(e->left.expr, fn, data, pr_type, title);
++		expr_print_revdep(e->right.expr, fn, data, pr_type, title);
++	} else if (expr_calc_value(e) == pr_type) {
++		if (*title) {
++			fn(data, NULL, *title);
++			*title = NULL;
++		}
++
+ 		fn(data, NULL, "  - ");
+ 		expr_print(e, fn, data, E_NONE);
+ 		fn(data, NULL, "\n");
+ 	}
+ }
+ 
+-void expr_gstr_print_revdep(struct expr *e, struct gstr *gs)
++void expr_gstr_print_revdep(struct expr *e, struct gstr *gs,
++			    tristate pr_type, const char *title)
+ {
+-	expr_print_revdep(e, expr_print_gstr_helper, gs);
++	expr_print_revdep(e, expr_print_gstr_helper, gs, pr_type, &title);
+ }
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index c16e82e..8dbf2a4 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -310,7 +310,8 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2);
+ void expr_fprint(struct expr *e, FILE *out);
+ struct gstr; /* forward */
+ void expr_gstr_print(struct expr *e, struct gstr *gs);
+-void expr_gstr_print_revdep(struct expr *e, struct gstr *gs);
++void expr_gstr_print_revdep(struct expr *e, struct gstr *gs,
++			    tristate pr_type, const char *title);
+ 
+ static inline int expr_is_yes(struct expr *e)
+ {
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 7e70be3..3b9beca 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -827,14 +827,16 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
+ 
+ 	get_symbol_props_str(r, sym, P_SELECT, _("  Selects: "));
+ 	if (sym->rev_dep.expr) {
+-		str_append(r, _("  Selected by: \n"));
+-		expr_gstr_print_revdep(sym->rev_dep.expr, r);
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, yes, "  Selected by [y]\n");
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, mod, "  Selected by [m]\n");
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, no, "  Selected by [n]\n");
+ 	}
+ 
+ 	get_symbol_props_str(r, sym, P_IMPLY, _("  Implies: "));
+ 	if (sym->implied.expr) {
+-		str_append(r, _("  Implied by: \n"));
+-		expr_gstr_print_revdep(sym->implied.expr, r);
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, yes, "  Implied by [y]\n");
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, mod, "  Implied by [m]\n");
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, no, "  Implied by [n]\n");
+ 	}
+ 
+ 	str_append(r, "\n\n");
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
