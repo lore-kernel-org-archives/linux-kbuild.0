@@ -1,40 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:35448 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750752AbeBVSuo (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Feb 2018 13:50:44 -0500
-Date: Thu, 22 Feb 2018 19:45:41 +0100
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH 20/23] gcc-plugins: always build plugins with C++
-Message-Id: <20180222194541.35076c5b2166879a8d5d234a@gmail.com>
-In-Reply-To: <1518806331-7101-21-git-send-email-yamada.masahiro@socionext.com>
-References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
-        <1518806331-7101-21-git-send-email-yamada.masahiro@socionext.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from mail.kernel.org ([198.145.29.99]:51508 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751669AbeBVXAz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 22 Feb 2018 18:00:55 -0500
+Date: Thu, 22 Feb 2018 17:00:52 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+Subject: Re: [PATCH v2 20/20] x86/PCI: VMD: Fix malformed Kconfig default
+Message-ID: <20180222230052.GA14632@bhelgaas-glaptop.roam.corp.google.com>
+References: <0180206191126.GB98765@bhelgaas-glaptop.roam.corp.google.com>
+ <20180206221106.16620-1-ulfalizer@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180206221106.16620-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, kernel-hardening@lists.openwall.com, linux-kernel@vger.kernel.orgkeescook@chromium.orgkernel-hardening@lists.openwall.com
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, lorenzo.pieralisi@arm.com, bhelgaas@google.com, linux-pci@vger.kernel.org
 
-On Sat, 17 Feb 2018 03:38:48 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-
-> If the target compiler is GCC 4.8 or newer, plugins are compiled with
-> HOSTCXX.  Otherwise, gcc-plugin.sh will select HOSTCC or HOSTCXX.
+On Tue, Feb 06, 2018 at 11:11:06PM +0100, Ulf Magnusson wrote:
+> 'default N' should be 'default n', though they happen to have the same
+> effect here, due to undefined symbols (N in this case) evaluating to n
+> in a tristate sense.
 > 
-> To simpily things, let's decide GCC 4.8 is the requirement for GCC
-> pulgins.  With this, plugins are always built with HOSTCXX.  This is a
-> feature of advanced users, so this requirement whould not be not a big
-> issue.
+> Remove the default instead of changing it. bool and tristate symbols
+> implicitly default to n.
 
-I disagree with such a decision. I think the gcc plugins should compile
-with older version because the kernel can be compiled with them too.
-The distros use these older versions as well and I can very well imagine
-that new plugins will extend these with backported features such as
-my sancov plugin.
+s/bool/Bool/
 
--- 
-Emese
+> Discovered with the
+> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+> script.
+> 
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+
+Since only this patch was posted to linux-pci, I assume it will be merged
+via some other tree.
+
+> ---
+> Changes in v2:
+> Make it clear that Kconfig is involved.
+> 
+>  drivers/pci/host/Kconfig | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/pci/host/Kconfig b/drivers/pci/host/Kconfig
+> index a4ed7484d127..dc8a2a175f19 100644
+> --- a/drivers/pci/host/Kconfig
+> +++ b/drivers/pci/host/Kconfig
+> @@ -215,7 +215,6 @@ config PCIE_TANGO_SMP8759
+>  config VMD
+>  	depends on PCI_MSI && X86_64 && SRCU
+>  	tristate "Intel Volume Management Device Driver"
+> -	default N
+>  	---help---
+>  	  Adds support for the Intel Volume Management Device (VMD). VMD is a
+>  	  secondary PCI host bridge that allows PCI Express root ports,
+> -- 
+> 2.14.1
+> 
