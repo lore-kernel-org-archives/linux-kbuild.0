@@ -1,63 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51508 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751669AbeBVXAz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Feb 2018 18:00:55 -0500
-Date: Thu, 22 Feb 2018 17:00:52 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-Subject: Re: [PATCH v2 20/20] x86/PCI: VMD: Fix malformed Kconfig default
-Message-ID: <20180222230052.GA14632@bhelgaas-glaptop.roam.corp.google.com>
-References: <0180206191126.GB98765@bhelgaas-glaptop.roam.corp.google.com>
- <20180206221106.16620-1-ulfalizer@gmail.com>
+Received: from mail-vk0-f68.google.com ([209.85.213.68]:37143 "EHLO
+        mail-vk0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751794AbeBVXma (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 22 Feb 2018 18:42:30 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180206221106.16620-1-ulfalizer@gmail.com>
+In-Reply-To: <20180222230052.GA14632@bhelgaas-glaptop.roam.corp.google.com>
+References: <0180206191126.GB98765@bhelgaas-glaptop.roam.corp.google.com>
+ <20180206221106.16620-1-ulfalizer@gmail.com> <20180222230052.GA14632@bhelgaas-glaptop.roam.corp.google.com>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Fri, 23 Feb 2018 00:42:28 +0100
+Message-ID: <CAFkk2KScFZE0sjZovi1vq2xBQ_-wx2XoSbWG6_qL2W0rR5B7YQ@mail.gmail.com>
+Subject: Re: [PATCH v2 20/20] x86/PCI: VMD: Fix malformed Kconfig default
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, lorenzo.pieralisi@arm.com, bhelgaas@google.com, linux-pci@vger.kernel.org
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Tomasz Figa <tfiga@chromium.org>, Paul Burton <paul.burton@mips.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, Vineet Gupta <vgupta@synopsys.com>, Mel Gorman <mgorman@techsingularity.net>, Christoph Hellwig <hch@lst.de>, Michal Nazarewicz <mina86@mina86.com>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, Paul Mackerras <paulus@ozlabs.org>, Will Deacon <will.deacon@arm.com>, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
 
-On Tue, Feb 06, 2018 at 11:11:06PM +0100, Ulf Magnusson wrote:
-> 'default N' should be 'default n', though they happen to have the same
-> effect here, due to undefined symbols (N in this case) evaluating to n
-> in a tristate sense.
-> 
-> Remove the default instead of changing it. bool and tristate symbols
-> implicitly default to n.
+On Fri, Feb 23, 2018 at 12:00 AM, Bjorn Helgaas <helgaas@kernel.org> wrote:
+> On Tue, Feb 06, 2018 at 11:11:06PM +0100, Ulf Magnusson wrote:
+>> 'default N' should be 'default n', though they happen to have the same
+>> effect here, due to undefined symbols (N in this case) evaluating to n
+>> in a tristate sense.
+>>
+>> Remove the default instead of changing it. bool and tristate symbols
+>> implicitly default to n.
+>
+> s/bool/Bool/
 
-s/bool/Bool/
+Not a great excuse, but I was thinking syntactically -- 'bool' and
+'tristate' symbols... :)
 
-> Discovered with the
-> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
-> script.
-> 
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>
+>> Discovered with the
+>> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
+>> script.
+>>
+>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+>
+> Since only this patch was posted to linux-pci, I assume it will be merged
+> via some other tree.
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+I didn't have a particular tree in mind for this patchset. I imagined
+people would pick up patches into the trees where they make the most
+sense, and only created the patchset to keep track of the patches more
+easily. Might have created some confusion in retrospect.
 
-Since only this patch was posted to linux-pci, I assume it will be merged
-via some other tree.
+I just did a --cc-cmd="scripts/get_maintainer.pl -i" for the
+individual patches by the way.
 
-> ---
-> Changes in v2:
-> Make it clear that Kconfig is involved.
-> 
->  drivers/pci/host/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/pci/host/Kconfig b/drivers/pci/host/Kconfig
-> index a4ed7484d127..dc8a2a175f19 100644
-> --- a/drivers/pci/host/Kconfig
-> +++ b/drivers/pci/host/Kconfig
-> @@ -215,7 +215,6 @@ config PCIE_TANGO_SMP8759
->  config VMD
->  	depends on PCI_MSI && X86_64 && SRCU
->  	tristate "Intel Volume Management Device Driver"
-> -	default N
->  	---help---
->  	  Adds support for the Intel Volume Management Device (VMD). VMD is a
->  	  secondary PCI host bridge that allows PCI Express root ports,
-> -- 
-> 2.14.1
-> 
+Cheers,
+Ulf
