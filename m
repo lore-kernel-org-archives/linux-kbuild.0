@@ -1,61 +1,135 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:28411 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751332AbeBWMit (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:36029 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751015AbeBWN0f (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Feb 2018 07:38:49 -0500
+        Fri, 23 Feb 2018 08:26:35 -0500
+Received: from mail-vk0-f45.google.com (mail-vk0-f45.google.com [209.85.213.45]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id w1NDQKCg023354
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 22:26:20 +0900
+Received: by mail-vk0-f45.google.com with SMTP id u200so5317766vke.4
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 05:26:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180222194541.35076c5b2166879a8d5d234a@gmail.com>
-References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
- <1518806331-7101-21-git-send-email-yamada.masahiro@socionext.com> <20180222194541.35076c5b2166879a8d5d234a@gmail.com>
+In-Reply-To: <CAFkk2KQPjeyE-E_TW3NBwFXbE-Q2mNnn1yAFkoA5w6xLQQ9hrw@mail.gmail.com>
+References: <20180223060901.4052-1-ulfalizer@gmail.com> <CAFkk2KQPjeyE-E_TW3NBwFXbE-Q2mNnn1yAFkoA5w6xLQQ9hrw@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 23 Feb 2018 21:37:53 +0900
-Message-ID: <CAK7LNAT0EYibS3cSDtSxyXGmRp0PoctB4aWuFhPTZxnCuAd+2A@mail.gmail.com>
-Subject: Re: [PATCH 20/23] gcc-plugins: always build plugins with C++
+Date: Fri, 23 Feb 2018 22:25:38 +0900
+Message-ID: <CAK7LNAQPMuWAOjUdOgxp2KdSg0MSkz4giXiX-RxUBQTaWWws=Q@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: do not write 'n' defaults to .config
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Kernel Hardening <kernel-hardening@lists.openwall.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>
 
-2018-02-23 3:45 GMT+09:00 Emese Revfy <re.emese@gmail.com>:
-> On Sat, 17 Feb 2018 03:38:48 +0900
-> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
->
->> If the target compiler is GCC 4.8 or newer, plugins are compiled with
->> HOSTCXX.  Otherwise, gcc-plugin.sh will select HOSTCC or HOSTCXX.
+2018-02-23 15:14 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> On Fri, Feb 23, 2018 at 7:09 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+>> === Background ===
 >>
->> To simpily things, let's decide GCC 4.8 is the requirement for GCC
->> pulgins.  With this, plugins are always built with HOSTCXX.  This is a
->> feature of advanced users, so this requirement whould not be not a big
->> issue.
+>> A "# CONFIG_FOO is not set" line is written to .config for visible
+>> bool/tristate symbols with value n. The idea is to remember the user
+>> selection without having to set a Makefile variable (having undefined
+>> Make variables correspond to n is handy when testing them in the
+>> Makefiles).
+>>
+>> Currently, a "# CONFIG_FOO is not set" line is also written to .config
+>> for all bool/tristate symbols that get the value n through a 'default'.
+>> This is inconsistent with how 'select' and 'imply' work, which only
+>> write non-n symbols. It also seems redundant:
+>>
+>>   - If the symbol is visible and has value n, then
+>>     "# CONFIG_FOO is not set" will always be written anyway.
+>>
+>>   - If the symbol is not visible, then "# CONFIG_FOO is not set" has no
+>>     effect on it.
+>>
+>>   - If the symbol becomes visible later, there shouldn't be any harm in
+>>     recalculating the default value at that point.
+>>
+>> === Changes ===
+>>
+>> Change sym_calc_value() to only set SYMBOL_WRITE (write to .config) for
+>> non-n defaults. This reduces the size of the x86 .config on my system by
+>> about 1% (due to removed "# CONFIG_FOO is not set" entries).
+>>
+>> One side effect of this change is making 'default n' equivalent to
+>> having no explicit default. That might make it clearer to people that
+>> 'default n' is redundant.
+>>
+>> This change only affects generated .config files and not autoconf.h:
+>> autoconf.h only includes #defines for non-n bool/tristate symbols.
+>>
+>> === Testing ===
+>>
+>> The following testing was done with the x86 Kconfigs:
+>>
+>>  - .config files generated before and after the change were compared to
+>>    verify that the only difference is some '# CONFIG_FOO is not set'
+>>    entries disappearing. A couple of these were inspected manually, and
+>>    most turned out to be from redundant 'default n/def_bool n'
+>>    properties.
+>>
+>>  - The generated include/generated/autoconf.h was compared before and
+>>    after the change and verified to be identical.
+>>
+>>  - As a sanity check, the same modification was done to Kconfiglib.
+>>    The Kconfiglib test suite was then run to check for any mismatches
+>>    against the output of the C implementation.
+>>
+>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>> ---
+>>  scripts/kconfig/symbol.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+>> index cca9663be5dd..02eb8b10a83c 100644
+>> --- a/scripts/kconfig/symbol.c
+>> +++ b/scripts/kconfig/symbol.c
+>> @@ -403,9 +403,10 @@ void sym_calc_value(struct symbol *sym)
+>>                         if (!sym_is_choice(sym)) {
+>>                                 prop = sym_get_default_prop(sym);
+>>                                 if (prop) {
+>> -                                       sym->flags |= SYMBOL_WRITE;
+>>                                         newval.tri = EXPR_AND(expr_calc_value(prop->expr),
+>>                                                               prop->visible.tri);
+>> +                                       if (newval.tri != no)
+>> +                                               sym->flags |= SYMBOL_WRITE;
+>>                                 }
+>>                                 if (sym->implied.tri != no) {
+>>                                         sym->flags |= SYMBOL_WRITE;
+>> --
+>> 2.14.1
+>>
 >
-> I disagree with such a decision. I think the gcc plugins should compile
-> with older version because the kernel can be compiled with them too.
-> The distros use these older versions as well and I can very well imagine
-> that new plugins will extend these with backported features such as
-> my sancov plugin.
+> This stuff gets pretty obscure, so please tell me if you can think of
+> any practical benefits to remembering an n default as a user selection
+> for non-visible symbols (which is all '# CONFIG_FOO is not set' does
+> in practice). I couldn't think of anything.
 >
 
-Let me clarify this.
+In the context of
 
-I removed the version check in the following patch:
-https://patchwork.kernel.org/patch/10225379/
+config CC_HAS_STACKPROTECTOR
+       def_bool $(cc-option -fstack-protector)
 
-So, you can enable CONFIG_GCC_PLAUGINS
-as long as scripts/gcc-plugin.sh passes
-(i.e. C++ can compile plugins).
 
-Even if it is unlikely happen,
-GCC 4.5 -> 4.8 is not a big jump.
+Currently, we have 3 cases:
 
-People were recently talking about the minimum compiler version
-https://patchwork.kernel.org/patch/10207385/
+ [1] CONFIG_CC_HAS_STACKPROTECTOR=y
+       -> compiler flag is supported
+ [2] # CONFIG_CC_HAS_STACKPROTECTOR is not set
+       -> compiler flag is unsupported
+ [3] Missing
+       -> The symbol was hidden probably due to unmet "if ... endif"
 
-The thread is super long, but my understanding was
-4.5 or 4.6 would be reasonable.
 
-So, we will be there sooner or later.
+With this change, [2] will be turned into [3].
+
+That is the only drawback I came up with.
+
+I am not sure how many people want to check .config
+to know the compiler capability...
+
 
 
 -- 
