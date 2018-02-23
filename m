@@ -1,67 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:52440 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750798AbeBWKfQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Feb 2018 05:35:16 -0500
-Date: Fri, 23 Feb 2018 10:35:03 +0000
-From: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
-Subject: Re: [PATCH v2 20/20] x86/PCI: VMD: Fix malformed Kconfig default
-Message-ID: <20180223103455.GA20461@e107981-ln.cambridge.arm.com>
-References: <0180206191126.GB98765@bhelgaas-glaptop.roam.corp.google.com>
- <20180206221106.16620-1-ulfalizer@gmail.com>
- <20180222230052.GA14632@bhelgaas-glaptop.roam.corp.google.com>
- <CAFkk2KScFZE0sjZovi1vq2xBQ_-wx2XoSbWG6_qL2W0rR5B7YQ@mail.gmail.com>
- <20180223002142.GG14632@bhelgaas-glaptop.roam.corp.google.com>
+Received: from mail-lf0-f46.google.com ([209.85.215.46]:40528 "EHLO
+        mail-lf0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750879AbeBWLeZ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 23 Feb 2018 06:34:25 -0500
+Received: by mail-lf0-f46.google.com with SMTP id 37so11916367lfs.7
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 03:34:24 -0800 (PST)
+Date: Fri, 23 Feb 2018 12:34:09 +0100
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: [PATCH v2] kconfig: only write '# CONFIG_FOO is not set' for visible
+ symbols
+Message-ID: <20180223113409.lhr5izv2ja6psrup@huvuddator>
+References: <20180223060901.4052-1-ulfalizer@gmail.com>
+ <CAFkk2KQPjeyE-E_TW3NBwFXbE-Q2mNnn1yAFkoA5w6xLQQ9hrw@mail.gmail.com>
+ <CAK8P3a1jtOWVzJFQjSjqbGHZSGGMkii1Bi5qpdAG1AvWjPKbLg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180223002142.GG14632@bhelgaas-glaptop.roam.corp.google.com>
+In-Reply-To: <CAK8P3a1jtOWVzJFQjSjqbGHZSGGMkii1Bi5qpdAG1AvWjPKbLg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Tomasz Figa <tfiga@chromium.org>, Paul Burton <paul.burton@mips.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Hans-Christian Noren Egtvedt <egtvedt@samfundet.no>, Linus Walleij <linus.walleij@linaro.org>, Vineet Gupta <vgupta@synopsys.com>, Mel Gorman <mgorman@techsingularity.net>, Christoph Hellwig <hch@lst.de>, Michal Nazarewicz <mina86@mina86.com>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, Paul Mackerras <paulus@ozlabs.org>, Will Deacon <will.deacon@arm.com>, Tony Lindgren <tony@atomide.com>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Sam Ravnborg <sam@ravnborg.org>
 
-On Thu, Feb 22, 2018 at 06:21:42PM -0600, Bjorn Helgaas wrote:
-> On Fri, Feb 23, 2018 at 12:42:28AM +0100, Ulf Magnusson wrote:
-> > On Fri, Feb 23, 2018 at 12:00 AM, Bjorn Helgaas <helgaas@kernel.org> wrote:
-> > > On Tue, Feb 06, 2018 at 11:11:06PM +0100, Ulf Magnusson wrote:
-> > >> 'default N' should be 'default n', though they happen to have the same
-> > >> effect here, due to undefined symbols (N in this case) evaluating to n
-> > >> in a tristate sense.
-> > >>
-> > >> Remove the default instead of changing it. bool and tristate symbols
-> > >> implicitly default to n.
-> > >
-> > > s/bool/Bool/
-> > 
-> > Not a great excuse, but I was thinking syntactically -- 'bool' and
-> > 'tristate' symbols... :)
-> > 
-> > >
-> > >> Discovered with the
-> > >> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
-> > >> script.
-> > >>
-> > >> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> > >
-> > > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> > >
-> > > Since only this patch was posted to linux-pci, I assume it will be merged
-> > > via some other tree.
-> > 
-> > I didn't have a particular tree in mind for this patchset. I imagined
-> > people would pick up patches into the trees where they make the most
-> > sense, and only created the patchset to keep track of the patches more
-> > easily. Might have created some confusion in retrospect.
-> > 
-> > I just did a --cc-cmd="scripts/get_maintainer.pl -i" for the
-> > individual patches by the way.
-> 
-> OK, then either Lorenzo or I will pick it up.
-> 
-> It's in drivers/pci/host/, so ideally Lorenzo will take it since he
-> looks after everything else in there.
+=== Background ===
 
-Sure I will take it, thanks.
+ - Visible n-valued bool/tristate symbols generate a
+   '# CONFIG_FOO is not set' line in the .config file. The idea is to
+   remember the user selection without having to set a Makefile
+   variable. Having n correspond to the variable being undefined in the
+   Makefiles makes for easy CONFIG_* tests.
 
-Lorenzo
+ - Invisible n-valued bool/tristate symbols normally do not generate a
+   '# CONFIG_FOO is not set' line, because user values from .config
+   files have no effect on invisible symbols anyway.
+
+Currently, there is one exception to this rule: Any bool/tristate symbol
+that gets the value n through a 'default' property generates a
+'# CONFIG_FOO is not set' line, even if the symbol is invisible.
+
+Note that this only applies to explicitly given defaults, and not when
+the symbol implicitly defaults to n (like bool/tristate symbols without
+'default' properties do).
+
+This is inconsistent, and seems redundant:
+
+  - As mentioned, the '# CONFIG_FOO is not set' won't affect the symbol
+    once the .config is read back in.
+
+  - Even if the symbol is invisible at first but becomes visible later,
+    there shouldn't be any harm in recalculating the default value
+    rather than viewing the '# CONFIG_FOO is not set' as an previous
+    user value of n.
+
+=== Changes ===
+
+Change sym_calc_value() to only set SYMBOL_WRITE (write to .config) for
+non-n defaults.
+
+This reduces the size of the x86 .config on my system by about 1% (due
+to removed "# CONFIG_FOO is not set" entries).
+
+One side effect of (and the main motivation for) this change is making
+the following two definitions behave exactly the same:
+
+	config FOO
+		bool
+
+	config FOO
+		bool
+		default n
+
+With this change, neither of these will generate a
+'# CONFIG_FOO is not set' line (assuming FOO isn't selected/implied).
+That might make it clearer to people that a bare 'default n' is
+redundant.
+
+This change only affects generated .config files and not autoconf.h:
+autoconf.h only includes #defines for non-n bool/tristate symbols.
+
+=== Testing ===
+
+The following testing was done with the x86 Kconfigs:
+
+ - .config files generated before and after the change were compared to
+   verify that the only difference is some '# CONFIG_FOO is not set'
+   entries disappearing. A couple of these were inspected manually, and
+   most turned out to be from redundant 'default n/def_bool n'
+   properties.
+
+ - The generated include/generated/autoconf.h was compared before and
+   after the change and verified to be identical.
+
+ - As a sanity check, the same modification was done to Kconfiglib.
+   The Kconfiglib test suite was then run to check for any mismatches
+   against the output of the C implementation.
+
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+---
+Changes in v2:
+Make it more explicit in the commit title and message that only invisible
+symbols are affected by the change. The previous commit title was
+"do not write 'n' defaults to .config".
+
+ scripts/kconfig/symbol.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index cca9663be5dd..02eb8b10a83c 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -403,9 +403,10 @@ void sym_calc_value(struct symbol *sym)
+ 			if (!sym_is_choice(sym)) {
+ 				prop = sym_get_default_prop(sym);
+ 				if (prop) {
+-					sym->flags |= SYMBOL_WRITE;
+ 					newval.tri = EXPR_AND(expr_calc_value(prop->expr),
+ 							      prop->visible.tri);
++					if (newval.tri != no)
++						sym->flags |= SYMBOL_WRITE;
+ 				}
+ 				if (sym->implied.tri != no) {
+ 					sym->flags |= SYMBOL_WRITE;
+-- 
+2.14.1
+
