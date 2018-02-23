@@ -1,154 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f68.google.com ([209.85.213.68]:35601 "EHLO
-        mail-vk0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751630AbeBWWD2 (ORCPT
+Received: from mail-ua0-f193.google.com ([209.85.217.193]:42014 "EHLO
+        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752071AbeBWWSS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Feb 2018 17:03:28 -0500
-Received: by mail-vk0-f68.google.com with SMTP id n132so6408570vke.2
-        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 14:03:27 -0800 (PST)
+        Fri, 23 Feb 2018 17:18:18 -0500
+Received: by mail-ua0-f193.google.com with SMTP id b23so4377574uak.9
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 14:18:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180223213313.loecroholntn4iqz@huvuddator>
-References: <20180223060901.4052-1-ulfalizer@gmail.com> <CAFkk2KQPjeyE-E_TW3NBwFXbE-Q2mNnn1yAFkoA5w6xLQQ9hrw@mail.gmail.com>
- <CAK7LNAQPMuWAOjUdOgxp2KdSg0MSkz4giXiX-RxUBQTaWWws=Q@mail.gmail.com>
- <CAK7LNAQg85PpqMP4u-dh-m2rmSiz5JmhnfX6=c4Mbm5EskMPxg@mail.gmail.com> <20180223213313.loecroholntn4iqz@huvuddator>
+In-Reply-To: <20180223140420.GA10547@vmlxhi-102.adit-jv.com>
+References: <cover.1518985888.git.erosca@de.adit-jv.com> <CAK7LNAQ4z9KHsCvzQRHozcXrxY5wsLnMCqWP7weSLFC4mxh6fg@mail.gmail.com>
+ <CAK7LNARtH1fepGc_+E4uzhoc=ykuF1HXpy0g7wx=5xZyL7G1YQ@mail.gmail.com>
+ <20180220150018.mjyjmdmao7xqyukr@huvuddator> <20180220195119.GA14262@vmlxhi-102.adit-jv.com>
+ <CAFkk2KRxERva+XZi_fR_Epr63TwA6hKjwjCYnwtnK+xOSJUWHg@mail.gmail.com>
+ <CAK7LNATTqqzJReUfkoxE=5+GsVUMv4wjOuz--=-PY_B4eK4NeA@mail.gmail.com>
+ <20180221061052.GA29861@example.com> <CAK7LNATHuCmU3WJJZs_S6ppZ2dbaZJa66yWhaCRJxqB6PLXgQg@mail.gmail.com>
+ <20180223140420.GA10547@vmlxhi-102.adit-jv.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Fri, 23 Feb 2018 23:03:26 +0100
-Message-ID: <CAFkk2KSNsED2Stz==OU+q8-WM3fL8JWe3VMh7L2Xfz=hbF_iBA@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: do not write 'n' defaults to .config
+Date: Fri, 23 Feb 2018 23:18:17 +0100
+Message-ID: <CAFkk2KRfaDZQG-F=3i-kQbGH6JzxP1q_fvKPzK1A_hJUb0GkMQ@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] Kconfig: Print reverse dependencies in groups
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>
+To: Eugeniu Rosca <erosca@de.adit-jv.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Eugeniu Rosca <roscaeugeniu@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, Feb 23, 2018 at 10:33 PM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> On Sat, Feb 24, 2018 at 12:59:51AM +0900, Masahiro Yamada wrote:
->> 2018-02-23 22:25 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->> > 2018-02-23 15:14 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->> >> On Fri, Feb 23, 2018 at 7:09 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
->> >>> === Background ===
->> >>>
->> >>> A "# CONFIG_FOO is not set" line is written to .config for visible
->> >>> bool/tristate symbols with value n. The idea is to remember the user
->> >>> selection without having to set a Makefile variable (having undefined
->> >>> Make variables correspond to n is handy when testing them in the
->> >>> Makefiles).
->> >>>
->> >>> Currently, a "# CONFIG_FOO is not set" line is also written to .config
->> >>> for all bool/tristate symbols that get the value n through a 'default'.
->> >>> This is inconsistent with how 'select' and 'imply' work, which only
->> >>> write non-n symbols. It also seems redundant:
->> >>>
->> >>>   - If the symbol is visible and has value n, then
->> >>>     "# CONFIG_FOO is not set" will always be written anyway.
->> >>>
->> >>>   - If the symbol is not visible, then "# CONFIG_FOO is not set" has no
->> >>>     effect on it.
->> >>>
->> >>>   - If the symbol becomes visible later, there shouldn't be any harm in
->> >>>     recalculating the default value at that point.
->> >>>
->> >>> === Changes ===
->> >>>
->> >>> Change sym_calc_value() to only set SYMBOL_WRITE (write to .config) for
->> >>> non-n defaults. This reduces the size of the x86 .config on my system by
->> >>> about 1% (due to removed "# CONFIG_FOO is not set" entries).
->> >>>
->> >>> One side effect of this change is making 'default n' equivalent to
->> >>> having no explicit default. That might make it clearer to people that
->> >>> 'default n' is redundant.
->> >>>
->> >>> This change only affects generated .config files and not autoconf.h:
->> >>> autoconf.h only includes #defines for non-n bool/tristate symbols.
->> >>>
->> >>> === Testing ===
->> >>>
->> >>> The following testing was done with the x86 Kconfigs:
->> >>>
->> >>>  - .config files generated before and after the change were compared to
->> >>>    verify that the only difference is some '# CONFIG_FOO is not set'
->> >>>    entries disappearing. A couple of these were inspected manually, and
->> >>>    most turned out to be from redundant 'default n/def_bool n'
->> >>>    properties.
->> >>>
->> >>>  - The generated include/generated/autoconf.h was compared before and
->> >>>    after the change and verified to be identical.
->> >>>
->> >>>  - As a sanity check, the same modification was done to Kconfiglib.
->> >>>    The Kconfiglib test suite was then run to check for any mismatches
->> >>>    against the output of the C implementation.
->> >>>
->> >>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->> >>> ---
->> >>>  scripts/kconfig/symbol.c | 3 ++-
->> >>>  1 file changed, 2 insertions(+), 1 deletion(-)
->> >>>
->> >>> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
->> >>> index cca9663be5dd..02eb8b10a83c 100644
->> >>> --- a/scripts/kconfig/symbol.c
->> >>> +++ b/scripts/kconfig/symbol.c
->> >>> @@ -403,9 +403,10 @@ void sym_calc_value(struct symbol *sym)
->> >>>                         if (!sym_is_choice(sym)) {
->> >>>                                 prop = sym_get_default_prop(sym);
->> >>>                                 if (prop) {
->> >>> -                                       sym->flags |= SYMBOL_WRITE;
->> >>>                                         newval.tri = EXPR_AND(expr_calc_value(prop->expr),
->> >>>                                                               prop->visible.tri);
->> >>> +                                       if (newval.tri != no)
->> >>> +                                               sym->flags |= SYMBOL_WRITE;
->> >>>                                 }
->> >>>                                 if (sym->implied.tri != no) {
->> >>>                                         sym->flags |= SYMBOL_WRITE;
->> >>> --
->> >>> 2.14.1
->> >>>
->> >>
->> >> This stuff gets pretty obscure, so please tell me if you can think of
->> >> any practical benefits to remembering an n default as a user selection
->> >> for non-visible symbols (which is all '# CONFIG_FOO is not set' does
->> >> in practice). I couldn't think of anything.
->> >>
->> >
->> > In the context of
->> >
->> > config CC_HAS_STACKPROTECTOR
->> >        def_bool $(cc-option -fstack-protector)
->> >
->> >
->> > Currently, we have 3 cases:
->> >
->> >  [1] CONFIG_CC_HAS_STACKPROTECTOR=y
->> >        -> compiler flag is supported
->> >  [2] # CONFIG_CC_HAS_STACKPROTECTOR is not set
->> >        -> compiler flag is unsupported
->> >  [3] Missing
->> >        -> The symbol was hidden probably due to unmet "if ... endif"
->> >
->> >
->> > With this change, [2] will be turned into [3].
->> >
->> > That is the only drawback I came up with.
->> >
->> > I am not sure how many people want to check .config
->> > to know the compiler capability...
->> >
+On Fri, Feb 23, 2018 at 3:04 PM, Eugeniu Rosca <erosca@de.adit-jv.com> wrote:
+>
+> Hi Masahiro,
+>
+> On Fri, Feb 23, 2018 at 09:10:37PM +0900, Masahiro Yamada wrote:
+>> Eugeniu,
 >>
 >>
->> I thought a bit more, then probably the grammatical
->> consistency would win.  (default n is always redundant)
+>> 2018-02-21 15:10 GMT+09:00 Eugeniu Rosca <roscaeugeniu@gmail.com>:
+>>
+>> >
+>> > I've tested https://patchwork.kernel.org/patch/10229545/ and
+>> > https://patchwork.kernel.org/patch/10231295/ and they work great for me.
+>> > Thank you for this feature.
+>> >
+>>
+>> I will give you that code in the second one.
 >
-> The behavior should be easy to explain in kconfig-language.txt too: A
-> missing entry means n, except visible n-valued symbols generate a
-> '# CONFIG_FOO is not set' comment just to keep track of the user's choice.
-> No weird exception for 'default'.
+> I appreciate that, although I am open minded who takes the authorship.
+> This feature makes my life easier and that's the most important part.
 >
-> That would demystify those '...is not set' lines too.
+>>
+>> Please fill the commit log with yours,
+>> and also fix the bugs pointed by Petr.
 >
+> Sure. Will do that.
+>
+>> Anyway, I will claim my contribution
+>> in the form of Signed-off-by when I pick it up.  :)
+>
+> I have one side question loosely related to this patch.
+>
+> Reverse dependencies are still not printed in zconfdump() (used in our kernel
+> team for e.g. cross platform .config alignment/comparison). My gut feeling
+> tells me this is mainly caused by the extremely unfriendly unreadable
+> expressions which is how reverse dependencies used to be represented before
+> commit 1ccb27143360 ("kconfig: make "Selected by:" and "Implied by:"
+> readable"). Since this is now greatly improved, would you mind printing
+> Selected/Implied-by in zconfdump? There are also other zconfdump fixes
+> sitting in my local branch, like https://patchwork.kernel.org/patch/9253535/ .
+> I would like to push them to you (they probably deserve a separate
+> thread), if you think this is appropriate.
+>
+> Best regards,
+> Eugeniu.
 
-Looks like someone already did it, see b7d4ec395673
-("Documentation/kbuild: Add guidance for the use of default"). I could
-add a small note to kconfig-language.txt to explain '...is not set'
-separately later as well.
+Shameless plug:
+
+If you need to do any fancy Kconfig parsing and comparison, then
+Kconfiglib (https://github.com/ulfalizer/Kconfiglib) might be handy.
+It makes it easy to walk the menu tree, print and inspect symbols and
+expressions, etc.
 
 Cheers,
 Ulf
