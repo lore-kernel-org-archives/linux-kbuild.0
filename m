@@ -1,48 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:45951 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751464AbeBWOW7 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Feb 2018 09:22:59 -0500
-Received: by mail-wr0-f194.google.com with SMTP id p104so14253412wrc.12
-        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 06:22:59 -0800 (PST)
-From: Robin Jarry <robin.jarry@6wind.com>
-Subject: [PATCH 1/2] kbuild: introduce HOST_EXTRALDFLAGS
-Date: Fri, 23 Feb 2018 15:22:14 +0100
-Message-Id: <16dd034819f38300bf71c8866af37cade0017585.1519393674.git.robin.jarry@6wind.com>
-In-Reply-To: <cover.1519393674.git.robin.jarry@6wind.com>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41756 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751406AbeBWPhW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 23 Feb 2018 10:37:22 -0500
+Date: Fri, 23 Feb 2018 09:37:20 -0600
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH 2/2] objtool: use host flags to detect if libelf is
+ missing
+Message-ID: <20180223153720.glun6fa2a3jde7mi@treble>
 References: <cover.1519393674.git.robin.jarry@6wind.com>
-In-Reply-To: <cover.1519393674.git.robin.jarry@6wind.com>
-References: <cover.1519393674.git.robin.jarry@6wind.com>
+ <2afbfc7911a0eb0642c33e8c2582f137a4fda2f3.1519393674.git.robin.jarry@6wind.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2afbfc7911a0eb0642c33e8c2582f137a4fda2f3.1519393674.git.robin.jarry@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>
+To: Robin Jarry <robin.jarry@6wind.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@kernel.org>
 
-Add a new user specifiable variable to provide specific linker options
-(-L, -rpath, ...) for host programs build.
+On Fri, Feb 23, 2018 at 03:22:15PM +0100, Robin Jarry wrote:
+> When libelf headers and libs are not found and CONFIG_UNWINDER_ORC is
+> selected, there is a make error introduced by
+> commit 3dd40cb320fe ("objtool: Upgrade libelf-devel warning to error for
+> CONFIG_ORC_UNWINDER").
+> 
+> Host headers and libs may be in a non-standard location and the check is
+> performed without host flags. Make sure to use host flags for the check
+> (they will be used later when building objtool anyway).
+> 
+> Fixes: 3b27a0c85d70 ("objtool: Detect and warn if libelf is missing and don't break the build")
+> Signed-off-by: Robin Jarry <robin.jarry@6wind.com>
+> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+> Cc: Ingo Molnar <mingo@kernel.org>
+> ---
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index e9609319d2b8..4e8c667b9f3f 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -955,7 +955,7 @@ export mod_sign_cmd
+>  
+>  ifdef CONFIG_STACK_VALIDATION
+>    has_libelf := $(call try-run,\
+> -		echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -,1,0)
+> +		echo "int main() {}" | $(HOSTCC) $(host_clfags) $(HOSTLDFLAGS) -xc -o /dev/null -lelf -,1,0)
+>    ifeq ($(has_libelf),1)
+>      objtool_target := tools/objtool FORCE
+>    else
+> -- 
+> 2.11.0
+> 
 
-Append these options to HOSTLDFLAGS.
+Hi Robin,
 
-Signed-off-by: Robin Jarry <robin.jarry@6wind.com>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: Ingo Molnar <mingo@kernel.org>
----
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+Did you test this?  I see some issues:
 
-diff --git a/Makefile b/Makefile
-index d9cf3a40eda9..e9609319d2b8 100644
---- a/Makefile
-+++ b/Makefile
-@@ -365,6 +365,7 @@ HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
- 		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
- HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
- HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
-+HOSTLDFLAGS  += $(HOST_EXTRALDFLAGS)
- HOST_LOADLIBES := $(HOST_LFS_LIBS)
- 
- # Make variables (CC, etc...)
+a) I don't see where the host_cflags variable comes from (and btw, it's
+   misspelled...)
+
+b) I don't see where objtool uses HOSTLDFLAGS.
+
 -- 
-2.11.0
-
+Josh
