@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f193.google.com ([209.85.128.193]:38420 "EHLO
-        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751381AbeBWOXB (ORCPT
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:45951 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751464AbeBWOW7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Feb 2018 09:23:01 -0500
-Received: by mail-wr0-f193.google.com with SMTP id n7so14295459wrn.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 06:23:00 -0800 (PST)
+        Fri, 23 Feb 2018 09:22:59 -0500
+Received: by mail-wr0-f194.google.com with SMTP id p104so14253412wrc.12
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 06:22:59 -0800 (PST)
 From: Robin Jarry <robin.jarry@6wind.com>
-Subject: [PATCH 2/2] objtool: use host flags to detect if libelf is missing
-Date: Fri, 23 Feb 2018 15:22:15 +0100
-Message-Id: <2afbfc7911a0eb0642c33e8c2582f137a4fda2f3.1519393674.git.robin.jarry@6wind.com>
+Subject: [PATCH 1/2] kbuild: introduce HOST_EXTRALDFLAGS
+Date: Fri, 23 Feb 2018 15:22:14 +0100
+Message-Id: <16dd034819f38300bf71c8866af37cade0017585.1519393674.git.robin.jarry@6wind.com>
 In-Reply-To: <cover.1519393674.git.robin.jarry@6wind.com>
 References: <cover.1519393674.git.robin.jarry@6wind.com>
 In-Reply-To: <cover.1519393674.git.robin.jarry@6wind.com>
@@ -19,36 +19,30 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>
 
-When libelf headers and libs are not found and CONFIG_UNWINDER_ORC is
-selected, there is a make error introduced by
-commit 3dd40cb320fe ("objtool: Upgrade libelf-devel warning to error for
-CONFIG_ORC_UNWINDER").
+Add a new user specifiable variable to provide specific linker options
+(-L, -rpath, ...) for host programs build.
 
-Host headers and libs may be in a non-standard location and the check is
-performed without host flags. Make sure to use host flags for the check
-(they will be used later when building objtool anyway).
+Append these options to HOSTLDFLAGS.
 
-Fixes: 3b27a0c85d70 ("objtool: Detect and warn if libelf is missing and don't break the build")
 Signed-off-by: Robin Jarry <robin.jarry@6wind.com>
 Cc: Josh Poimboeuf <jpoimboe@redhat.com>
 Cc: Ingo Molnar <mingo@kernel.org>
 ---
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/Makefile b/Makefile
-index e9609319d2b8..4e8c667b9f3f 100644
+index d9cf3a40eda9..e9609319d2b8 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -955,7 +955,7 @@ export mod_sign_cmd
+@@ -365,6 +365,7 @@ HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
+ 		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
+ HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
+ HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
++HOSTLDFLAGS  += $(HOST_EXTRALDFLAGS)
+ HOST_LOADLIBES := $(HOST_LFS_LIBS)
  
- ifdef CONFIG_STACK_VALIDATION
-   has_libelf := $(call try-run,\
--		echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -,1,0)
-+		echo "int main() {}" | $(HOSTCC) $(host_clfags) $(HOSTLDFLAGS) -xc -o /dev/null -lelf -,1,0)
-   ifeq ($(has_libelf),1)
-     objtool_target := tools/objtool FORCE
-   else
+ # Make variables (CC, etc...)
 -- 
 2.11.0
 
