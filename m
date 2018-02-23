@@ -1,53 +1,176 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55468 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751430AbeBWQeS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Feb 2018 11:34:18 -0500
-Date: Fri, 23 Feb 2018 10:34:17 -0600
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH 2/2] objtool: use host flags to detect if libelf is
- missing
-Message-ID: <20180223163417.jdj54q6uy2sefcfh@treble>
-References: <cover.1519393674.git.robin.jarry@6wind.com>
- <2afbfc7911a0eb0642c33e8c2582f137a4fda2f3.1519393674.git.robin.jarry@6wind.com>
- <20180223153720.glun6fa2a3jde7mi@treble>
- <20180223162255.cakkzdi3jpkh4vmi@6wind.com>
+Received: from mail-lf0-f54.google.com ([209.85.215.54]:43122 "EHLO
+        mail-lf0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751970AbeBWVdS (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 23 Feb 2018 16:33:18 -0500
+Received: by mail-lf0-f54.google.com with SMTP id q69so14287387lfi.10
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 13:33:17 -0800 (PST)
+Date: Fri, 23 Feb 2018 22:33:13 +0100
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: Re: [PATCH] kconfig: do not write 'n' defaults to .config
+Message-ID: <20180223213313.loecroholntn4iqz@huvuddator>
+References: <20180223060901.4052-1-ulfalizer@gmail.com>
+ <CAFkk2KQPjeyE-E_TW3NBwFXbE-Q2mNnn1yAFkoA5w6xLQQ9hrw@mail.gmail.com>
+ <CAK7LNAQPMuWAOjUdOgxp2KdSg0MSkz4giXiX-RxUBQTaWWws=Q@mail.gmail.com>
+ <CAK7LNAQg85PpqMP4u-dh-m2rmSiz5JmhnfX6=c4Mbm5EskMPxg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180223162255.cakkzdi3jpkh4vmi@6wind.com>
+In-Reply-To: <CAK7LNAQg85PpqMP4u-dh-m2rmSiz5JmhnfX6=c4Mbm5EskMPxg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robin Jarry <robin.jarry@6wind.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>
 
-On Fri, Feb 23, 2018 at 05:22:55PM +0100, Robin Jarry wrote:
-> 2018-02-23, Josh Poimboeuf:
-> > Hi Robin,
-> > 
-> > Did you test this?  I see some issues:
-> > 
-> > a) I don't see where the host_cflags variable comes from (and btw, it's
-> >    misspelled...)
+On Sat, Feb 24, 2018 at 12:59:51AM +0900, Masahiro Yamada wrote:
+> 2018-02-23 22:25 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> > 2018-02-23 15:14 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> >> On Fri, Feb 23, 2018 at 7:09 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> >>> === Background ===
+> >>>
+> >>> A "# CONFIG_FOO is not set" line is written to .config for visible
+> >>> bool/tristate symbols with value n. The idea is to remember the user
+> >>> selection without having to set a Makefile variable (having undefined
+> >>> Make variables correspond to n is handy when testing them in the
+> >>> Makefiles).
+> >>>
+> >>> Currently, a "# CONFIG_FOO is not set" line is also written to .config
+> >>> for all bool/tristate symbols that get the value n through a 'default'.
+> >>> This is inconsistent with how 'select' and 'imply' work, which only
+> >>> write non-n symbols. It also seems redundant:
+> >>>
+> >>>   - If the symbol is visible and has value n, then
+> >>>     "# CONFIG_FOO is not set" will always be written anyway.
+> >>>
+> >>>   - If the symbol is not visible, then "# CONFIG_FOO is not set" has no
+> >>>     effect on it.
+> >>>
+> >>>   - If the symbol becomes visible later, there shouldn't be any harm in
+> >>>     recalculating the default value at that point.
+> >>>
+> >>> === Changes ===
+> >>>
+> >>> Change sym_calc_value() to only set SYMBOL_WRITE (write to .config) for
+> >>> non-n defaults. This reduces the size of the x86 .config on my system by
+> >>> about 1% (due to removed "# CONFIG_FOO is not set" entries).
+> >>>
+> >>> One side effect of this change is making 'default n' equivalent to
+> >>> having no explicit default. That might make it clearer to people that
+> >>> 'default n' is redundant.
+> >>>
+> >>> This change only affects generated .config files and not autoconf.h:
+> >>> autoconf.h only includes #defines for non-n bool/tristate symbols.
+> >>>
+> >>> === Testing ===
+> >>>
+> >>> The following testing was done with the x86 Kconfigs:
+> >>>
+> >>>  - .config files generated before and after the change were compared to
+> >>>    verify that the only difference is some '# CONFIG_FOO is not set'
+> >>>    entries disappearing. A couple of these were inspected manually, and
+> >>>    most turned out to be from redundant 'default n/def_bool n'
+> >>>    properties.
+> >>>
+> >>>  - The generated include/generated/autoconf.h was compared before and
+> >>>    after the change and verified to be identical.
+> >>>
+> >>>  - As a sanity check, the same modification was done to Kconfiglib.
+> >>>    The Kconfiglib test suite was then run to check for any mismatches
+> >>>    against the output of the C implementation.
+> >>>
+> >>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> >>> ---
+> >>>  scripts/kconfig/symbol.c | 3 ++-
+> >>>  1 file changed, 2 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+> >>> index cca9663be5dd..02eb8b10a83c 100644
+> >>> --- a/scripts/kconfig/symbol.c
+> >>> +++ b/scripts/kconfig/symbol.c
+> >>> @@ -403,9 +403,10 @@ void sym_calc_value(struct symbol *sym)
+> >>>                         if (!sym_is_choice(sym)) {
+> >>>                                 prop = sym_get_default_prop(sym);
+> >>>                                 if (prop) {
+> >>> -                                       sym->flags |= SYMBOL_WRITE;
+> >>>                                         newval.tri = EXPR_AND(expr_calc_value(prop->expr),
+> >>>                                                               prop->visible.tri);
+> >>> +                                       if (newval.tri != no)
+> >>> +                                               sym->flags |= SYMBOL_WRITE;
+> >>>                                 }
+> >>>                                 if (sym->implied.tri != no) {
+> >>>                                         sym->flags |= SYMBOL_WRITE;
+> >>> --
+> >>> 2.14.1
+> >>>
+> >>
+> >> This stuff gets pretty obscure, so please tell me if you can think of
+> >> any practical benefits to remembering an n default as a user selection
+> >> for non-visible symbols (which is all '# CONFIG_FOO is not set' does
+> >> in practice). I couldn't think of anything.
+> >>
+> >
+> > In the context of
+> >
+> > config CC_HAS_STACKPROTECTOR
+> >        def_bool $(cc-option -fstack-protector)
+> >
+> >
+> > Currently, we have 3 cases:
+> >
+> >  [1] CONFIG_CC_HAS_STACKPROTECTOR=y
+> >        -> compiler flag is supported
+> >  [2] # CONFIG_CC_HAS_STACKPROTECTOR is not set
+> >        -> compiler flag is unsupported
+> >  [3] Missing
+> >        -> The symbol was hidden probably due to unmet "if ... endif"
+> >
+> >
+> > With this change, [2] will be turned into [3].
+> >
+> > That is the only drawback I came up with.
+> >
+> > I am not sure how many people want to check .config
+> > to know the compiler capability...
+> >
 > 
-> Hi Josh,
 > 
-> Shame on me... Last minute fix. I had tested this first by forcing
-> HOSTCC="gcc <CFLAGS> <LDFLAGS>" but I found it rather dirty. As it turns
-> out, my patch is not better.
-> 
-> > b) I don't see where objtool uses HOSTLDFLAGS.
-> 
-> Indeed, I also missed this (see above).
-> 
-> It looks like objtool does not use HOSTCFLAGS nor HOSTLDFLAGS (defined
-> in top Makefile). Do you see a reason why? Maybe it would be a good idea
-> to share these flags (adding some specific ones for objtool, if needed).
-> 
-> What do you think?
+> I thought a bit more, then probably the grammatical
+> consistency would win.  (default n is always redundant)
 
-Yeah, I think it would be a good idea for objtool to use HOSTCC,
-HOSTCFLAGS, and HOSTLDFLAGS.
+The behavior should be easy to explain in kconfig-language.txt too: A
+missing entry means n, except visible n-valued symbols generate a
+'# CONFIG_FOO is not set' comment just to keep track of the user's choice.
+No weird exception for 'default'.
 
--- 
-Josh
+That would demystify those '...is not set' lines too.
+
+> 
+> I want to apply this, but take a bit time
+> in case somebody may have comments.
+> 
+> 
+> BTW, do you want to check redundant 'default n'
+> by checkpatch.pl ?
+
+Was thinking of that. Guess you could generate a warning for any of the
+following:
+
+	default n
+	default "n"
+	default 'n'
+
+Could skip the warning for defaults with conditions maybe, as people
+sometimes do stuff like
+
+	default n if <cond>
+	default FOO
+
+(Though some of those look like they could refactored as well.)
+
+Or you could just say something like this for all of them:
+
+	warning: check whether 'default n' is redundant -- n is the implicit default value for bool/tristate symbols
+
+Cheers,
+Ulf
