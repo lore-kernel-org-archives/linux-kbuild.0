@@ -1,65 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:53372 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751015AbeBWLxF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Feb 2018 06:53:05 -0500
-Date: Fri, 23 Feb 2018 11:52:50 +0000
-From: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
-Subject: Re: [PATCH v2 20/20] x86/PCI: VMD: Fix malformed Kconfig default
-Message-ID: <20180223115242.GA21946@e107981-ln.cambridge.arm.com>
-References: <0180206191126.GB98765@bhelgaas-glaptop.roam.corp.google.com>
- <20180206221106.16620-1-ulfalizer@gmail.com>
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:29823 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751015AbeBWMLc (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 23 Feb 2018 07:11:32 -0500
+Received: from mail-ua0-f180.google.com (mail-ua0-f180.google.com [209.85.217.180]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id w1NCBIaT001906
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 21:11:19 +0900
+Received: by mail-ua0-f180.google.com with SMTP id u99so5532371uau.8
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 04:11:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180206221106.16620-1-ulfalizer@gmail.com>
+In-Reply-To: <20180221061052.GA29861@example.com>
+References: <cover.1518985888.git.erosca@de.adit-jv.com> <CAK7LNAQ4z9KHsCvzQRHozcXrxY5wsLnMCqWP7weSLFC4mxh6fg@mail.gmail.com>
+ <CAK7LNARtH1fepGc_+E4uzhoc=ykuF1HXpy0g7wx=5xZyL7G1YQ@mail.gmail.com>
+ <20180220150018.mjyjmdmao7xqyukr@huvuddator> <20180220195119.GA14262@vmlxhi-102.adit-jv.com>
+ <CAFkk2KRxERva+XZi_fR_Epr63TwA6hKjwjCYnwtnK+xOSJUWHg@mail.gmail.com>
+ <CAK7LNATTqqzJReUfkoxE=5+GsVUMv4wjOuz--=-PY_B4eK4NeA@mail.gmail.com> <20180221061052.GA29861@example.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 23 Feb 2018 21:10:37 +0900
+Message-ID: <CAK7LNATHuCmU3WJJZs_S6ppZ2dbaZJa66yWhaCRJxqB6PLXgQg@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] Kconfig: Print reverse dependencies in groups
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: helgaas@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tfiga@chromium.org, paul.burton@mips.com, m.szyprowski@samsung.com, egtvedt@samfundet.no, linus.walleij@linaro.org, vgupta@synopsys.com, mgorman@techsingularity.net, hch@lst.de, mina86@mina86.com, robh@kernel.org, sboyd@codeaurora.org, paulus@ozlabs.org, will.deacon@arm.com, tony@atomide.com, npiggin@gmail.com, yamada.masahiro@socionext.com, bhelgaas@google.com, linux-pci@vger.kernel.org
+To: Eugeniu Rosca <roscaeugeniu@gmail.com>
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Eugeniu Rosca <erosca@de.adit-jv.com>
 
-On Tue, Feb 06, 2018 at 11:11:06PM +0100, Ulf Magnusson wrote:
-> 'default N' should be 'default n', though they happen to have the same
-> effect here, due to undefined symbols (N in this case) evaluating to n
-> in a tristate sense.
-> 
-> Remove the default instead of changing it. bool and tristate symbols
-> implicitly default to n.
-> 
-> Discovered with the
-> https://github.com/ulfalizer/Kconfiglib/blob/master/examples/list_undefined.py
-> script.
+Eugeniu,
 
-I have remove this link - it can become stale so I do not think it is
-worth adding it to the log.
 
-I have also reworded the $SUBJECT.
+2018-02-21 15:10 GMT+09:00 Eugeniu Rosca <roscaeugeniu@gmail.com>:
 
-Applied to pci/host/misc for v4.17, let me know if that's fine for you.
+>
+> I've tested https://patchwork.kernel.org/patch/10229545/ and
+> https://patchwork.kernel.org/patch/10231295/ and they work great for me.
+> Thank you for this feature.
+>
 
-Thanks,
-Lorenzo
+I will give you that code in the second one.
 
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
-> Changes in v2:
-> Make it clear that Kconfig is involved.
-> 
->  drivers/pci/host/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/pci/host/Kconfig b/drivers/pci/host/Kconfig
-> index a4ed7484d127..dc8a2a175f19 100644
-> --- a/drivers/pci/host/Kconfig
-> +++ b/drivers/pci/host/Kconfig
-> @@ -215,7 +215,6 @@ config PCIE_TANGO_SMP8759
->  config VMD
->  	depends on PCI_MSI && X86_64 && SRCU
->  	tristate "Intel Volume Management Device Driver"
-> -	default N
->  	---help---
->  	  Adds support for the Intel Volume Management Device (VMD). VMD is a
->  	  secondary PCI host bridge that allows PCI Express root ports,
-> -- 
-> 2.14.1
-> 
+Please fill the commit log with yours,
+and also fix the bugs pointed by Petr.
+
+Anyway, I will claim my contribution
+in the form of Signed-off-by when I pick it up.  :)
+
+
+-- 
+Best Regards
+Masahiro Yamada
