@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f46.google.com ([209.85.215.46]:40528 "EHLO
-        mail-lf0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750879AbeBWLeZ (ORCPT
+Received: from mail-lf0-f43.google.com ([209.85.215.43]:39274 "EHLO
+        mail-lf0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750935AbeBWLtF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Feb 2018 06:34:25 -0500
-Received: by mail-lf0-f46.google.com with SMTP id 37so11916367lfs.7
-        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 03:34:24 -0800 (PST)
-Date: Fri, 23 Feb 2018 12:34:09 +0100
+        Fri, 23 Feb 2018 06:49:05 -0500
+Received: by mail-lf0-f43.google.com with SMTP id f75so6951537lfg.6
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 03:49:04 -0800 (PST)
+Date: Fri, 23 Feb 2018 12:49:01 +0100
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: [PATCH v2] kconfig: only write '# CONFIG_FOO is not set' for visible
+Subject: [PATCH v3] kconfig: only write '# CONFIG_FOO is not set' for visible
  symbols
-Message-ID: <20180223113409.lhr5izv2ja6psrup@huvuddator>
+Message-ID: <20180223114901.lg5syy5zrf75mndd@huvuddator>
 References: <20180223060901.4052-1-ulfalizer@gmail.com>
  <CAFkk2KQPjeyE-E_TW3NBwFXbE-Q2mNnn1yAFkoA5w6xLQQ9hrw@mail.gmail.com>
  <CAK8P3a1jtOWVzJFQjSjqbGHZSGGMkii1Bi5qpdAG1AvWjPKbLg@mail.gmail.com>
@@ -50,16 +50,20 @@ This is inconsistent, and seems redundant:
 
   - Even if the symbol is invisible at first but becomes visible later,
     there shouldn't be any harm in recalculating the default value
-    rather than viewing the '# CONFIG_FOO is not set' as an previous
+    rather than viewing the '# CONFIG_FOO is not set' as a previous
     user value of n.
 
 === Changes ===
 
 Change sym_calc_value() to only set SYMBOL_WRITE (write to .config) for
-non-n defaults.
+non-n-valued 'default' properties.
+
+Note that SYMBOL_WRITE is always set for visible symbols regardless of whether
+they have 'default' properties or not, so this change only affects invisible
+symbols.
 
 This reduces the size of the x86 .config on my system by about 1% (due
-to removed "# CONFIG_FOO is not set" entries).
+to removed '# CONFIG_FOO is not set' entries).
 
 One side effect of (and the main motivation for) this change is making
 the following two definitions behave exactly the same:
@@ -98,6 +102,10 @@ The following testing was done with the x86 Kconfigs:
 
 Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
+Changes in v3:
+Mention that SYMBOL_WRITE is always set for visible symbols. It might look like
+this change would affect those too otherwise.
+
 Changes in v2:
 Make it more explicit in the commit title and message that only invisible
 symbols are affected by the change. The previous commit title was
