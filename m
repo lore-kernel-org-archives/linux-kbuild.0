@@ -1,49 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:29823 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751015AbeBWMLc (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:28411 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751332AbeBWMit (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Feb 2018 07:11:32 -0500
-Received: from mail-ua0-f180.google.com (mail-ua0-f180.google.com [209.85.217.180]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id w1NCBIaT001906
-        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 21:11:19 +0900
-Received: by mail-ua0-f180.google.com with SMTP id u99so5532371uau.8
-        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 04:11:19 -0800 (PST)
+        Fri, 23 Feb 2018 07:38:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180221061052.GA29861@example.com>
-References: <cover.1518985888.git.erosca@de.adit-jv.com> <CAK7LNAQ4z9KHsCvzQRHozcXrxY5wsLnMCqWP7weSLFC4mxh6fg@mail.gmail.com>
- <CAK7LNARtH1fepGc_+E4uzhoc=ykuF1HXpy0g7wx=5xZyL7G1YQ@mail.gmail.com>
- <20180220150018.mjyjmdmao7xqyukr@huvuddator> <20180220195119.GA14262@vmlxhi-102.adit-jv.com>
- <CAFkk2KRxERva+XZi_fR_Epr63TwA6hKjwjCYnwtnK+xOSJUWHg@mail.gmail.com>
- <CAK7LNATTqqzJReUfkoxE=5+GsVUMv4wjOuz--=-PY_B4eK4NeA@mail.gmail.com> <20180221061052.GA29861@example.com>
+In-Reply-To: <20180222194541.35076c5b2166879a8d5d234a@gmail.com>
+References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
+ <1518806331-7101-21-git-send-email-yamada.masahiro@socionext.com> <20180222194541.35076c5b2166879a8d5d234a@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 23 Feb 2018 21:10:37 +0900
-Message-ID: <CAK7LNATHuCmU3WJJZs_S6ppZ2dbaZJa66yWhaCRJxqB6PLXgQg@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] Kconfig: Print reverse dependencies in groups
+Date: Fri, 23 Feb 2018 21:37:53 +0900
+Message-ID: <CAK7LNAT0EYibS3cSDtSxyXGmRp0PoctB4aWuFhPTZxnCuAd+2A@mail.gmail.com>
+Subject: Re: [PATCH 20/23] gcc-plugins: always build plugins with C++
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Eugeniu Rosca <erosca@de.adit-jv.com>
+To: Emese Revfy <re.emese@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Kernel Hardening <kernel-hardening@lists.openwall.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Eugeniu,
-
-
-2018-02-21 15:10 GMT+09:00 Eugeniu Rosca <roscaeugeniu@gmail.com>:
-
+2018-02-23 3:45 GMT+09:00 Emese Revfy <re.emese@gmail.com>:
+> On Sat, 17 Feb 2018 03:38:48 +0900
+> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 >
-> I've tested https://patchwork.kernel.org/patch/10229545/ and
-> https://patchwork.kernel.org/patch/10231295/ and they work great for me.
-> Thank you for this feature.
+>> If the target compiler is GCC 4.8 or newer, plugins are compiled with
+>> HOSTCXX.  Otherwise, gcc-plugin.sh will select HOSTCC or HOSTCXX.
+>>
+>> To simpily things, let's decide GCC 4.8 is the requirement for GCC
+>> pulgins.  With this, plugins are always built with HOSTCXX.  This is a
+>> feature of advanced users, so this requirement whould not be not a big
+>> issue.
+>
+> I disagree with such a decision. I think the gcc plugins should compile
+> with older version because the kernel can be compiled with them too.
+> The distros use these older versions as well and I can very well imagine
+> that new plugins will extend these with backported features such as
+> my sancov plugin.
 >
 
-I will give you that code in the second one.
+Let me clarify this.
 
-Please fill the commit log with yours,
-and also fix the bugs pointed by Petr.
+I removed the version check in the following patch:
+https://patchwork.kernel.org/patch/10225379/
 
-Anyway, I will claim my contribution
-in the form of Signed-off-by when I pick it up.  :)
+So, you can enable CONFIG_GCC_PLAUGINS
+as long as scripts/gcc-plugin.sh passes
+(i.e. C++ can compile plugins).
+
+Even if it is unlikely happen,
+GCC 4.5 -> 4.8 is not a big jump.
+
+People were recently talking about the minimum compiler version
+https://patchwork.kernel.org/patch/10207385/
+
+The thread is super long, but my understanding was
+4.5 or 4.6 would be reasonable.
+
+So, we will be there sooner or later.
 
 
 -- 
