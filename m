@@ -1,101 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:26797 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751296AbeBWE6r (ORCPT
+Received: from mail-lf0-f47.google.com ([209.85.215.47]:46540 "EHLO
+        mail-lf0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750879AbeBWGJX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Feb 2018 23:58:47 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] kbuild: simplify ld-option implementation
-Date: Fri, 23 Feb 2018 13:56:53 +0900
-Message-Id: <1519361813-8553-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1519361813-8553-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1519361813-8553-1-git-send-email-yamada.masahiro@socionext.com>
+        Fri, 23 Feb 2018 01:09:23 -0500
+Received: by mail-lf0-f47.google.com with SMTP id r80so10771359lfe.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 22 Feb 2018 22:09:23 -0800 (PST)
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: [PATCH] kconfig: do not write 'n' defaults to .config
+Date: Fri, 23 Feb 2018 07:09:01 +0100
+Message-Id: <20180223060901.4052-1-ulfalizer@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, Nick Desaulniers <ndesaulniers@google.com>, Matthias Kaehlcke <mka@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Mark Charlebois <charlebm@gmail.com>, Michael Forney <forney@google.com>, linux-kernel@vger.kernel.org, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>
+To: linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com
+Cc: sam@ravnborg.org, arnd@arndb.de, Ulf Magnusson <ulfalizer@gmail.com>
 
-Currently, linker options are tested by the coordination of $(CC) and
-$(LD) because LD needs some object to link.
+=== Background ===
 
-As commit 86a9df597cdd ("kbuild: fix linker feature test macros when
-cross compiling with Clang") addressed, we need to make sure $(CC)
-and $(LD) agree the underlying architecture of the passed object.
+A "# CONFIG_FOO is not set" line is written to .config for visible
+bool/tristate symbols with value n. The idea is to remember the user
+selection without having to set a Makefile variable (having undefined
+Make variables correspond to n is handy when testing them in the
+Makefiles).
 
-This could be a bit complex when we combine tools from different groups.
-For example, we can use clang for $(CC), but we still need to rely on
-GCC toolchain for $(LD).
+Currently, a "# CONFIG_FOO is not set" line is also written to .config
+for all bool/tristate symbols that get the value n through a 'default'.
+This is inconsistent with how 'select' and 'imply' work, which only
+write non-n symbols. It also seems redundant:
 
-So, I was searching a way for standalone testing of linker options.
-A trick I found is to use '-v'.  This prints the version string, but
-also tests if the given option is recognized.
+  - If the symbol is visible and has value n, then
+    "# CONFIG_FOO is not set" will always be written anyway.
 
-If a given option is supported,
+  - If the symbol is not visible, then "# CONFIG_FOO is not set" has no
+    effect on it.
 
-  $ aarch64-linux-gnu-ld -v --fix-cortex-a53-843419
-  GNU ld (Linaro_Binutils-2017.11) 2.28.2.20170706
-  $ echo $?
-  0
+  - If the symbol becomes visible later, there shouldn't be any harm in
+    recalculating the default value at that point.
 
-If unsupported,
+=== Changes ===
 
-  $ aarch64-linux-gnu-ld -v --fix-cortex-a53-843419
-  GNU ld (crosstool-NG linaro-1.13.1-4.7-2013.04-20130415 - Linaro GCC 2013.04) 2.23.1
-  aarch64-linux-gnu-ld: unrecognized option '--fix-cortex-a53-843419'
-  aarch64-linux-gnu-ld: use the --help option for usage information
-  $ echo $?
-  1
+Change sym_calc_value() to only set SYMBOL_WRITE (write to .config) for
+non-n defaults. This reduces the size of the x86 .config on my system by
+about 1% (due to removed "# CONFIG_FOO is not set" entries).
 
-Gold works likewise.
+One side effect of this change is making 'default n' equivalent to
+having no explicit default. That might make it clearer to people that
+'default n' is redundant.
 
-  $ aarch64-linux-gnu-ld.gold -v --fix-cortex-a53-843419
-  GNU gold (Linaro_Binutils-2017.11 2.28.2.20170706) 1.14
-  masahiro@pug:~/ref/linux$ echo $?
-  0
-  $ aarch64-linux-gnu-ld.gold -v --fix-cortex-a53-999999
-  GNU gold (Linaro_Binutils-2017.11 2.28.2.20170706) 1.14
-  aarch64-linux-gnu-ld.gold: --fix-cortex-a53-999999: unknown option
-  aarch64-linux-gnu-ld.gold: use the --help option for usage information
-  $ echo $?
-  1
+This change only affects generated .config files and not autoconf.h:
+autoconf.h only includes #defines for non-n bool/tristate symbols.
 
-LLD too.
+=== Testing ===
 
-  $ ld.lld -v --gc-sections
-  LLD 7.0.0 (http://llvm.org/git/lld.git 4a0e4190e74cea19f8a8dc625ccaebdf8b5d1585) (compatible with GNU linkers)
-  $ echo $?
-  0
-  $ ld.lld -v --fix-cortex-a53-843419
-  LLD 7.0.0 (http://llvm.org/git/lld.git 4a0e4190e74cea19f8a8dc625ccaebdf8b5d1585) (compatible with GNU linkers)
-  $ echo $?
-  0
-  $ ld.lld -v --fix-cortex-a53-999999
-  ld.lld: error: unknown argument: --fix-cortex-a53-999999
-  LLD 7.0.0 (http://llvm.org/git/lld.git 4a0e4190e74cea19f8a8dc625ccaebdf8b5d1585) (compatible with GNU linkers)
-  $ echo $?
-  1
+The following testing was done with the x86 Kconfigs:
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+ - .config files generated before and after the change were compared to
+   verify that the only difference is some '# CONFIG_FOO is not set'
+   entries disappearing. A couple of these were inspected manually, and
+   most turned out to be from redundant 'default n/def_bool n'
+   properties.
+
+ - The generated include/generated/autoconf.h was compared before and
+   after the change and verified to be identical.
+
+ - As a sanity check, the same modification was done to Kconfiglib.
+   The Kconfiglib test suite was then run to check for any mismatches
+   against the output of the C implementation.
+
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
+ scripts/kconfig/symbol.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- scripts/Kbuild.include | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 34cbd81..f9c2f07 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -237,9 +237,7 @@ cc-ldoption = $(call try-run-cached,\
- 
- # ld-option
- # Usage: LDFLAGS += $(call ld-option, -X)
--ld-option = $(call try-run-cached,\
--	$(CC) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -x c /dev/null -c -o "$$TMPO"; \
--	$(LD) $(LDFLAGS) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
-+ld-option = $(call try-run-cached, $(LD) $(LDFLAGS) $(1) -v,$(1),$(2))
- 
- # ar-option
- # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index cca9663be5dd..02eb8b10a83c 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -403,9 +403,10 @@ void sym_calc_value(struct symbol *sym)
+ 			if (!sym_is_choice(sym)) {
+ 				prop = sym_get_default_prop(sym);
+ 				if (prop) {
+-					sym->flags |= SYMBOL_WRITE;
+ 					newval.tri = EXPR_AND(expr_calc_value(prop->expr),
+ 							      prop->visible.tri);
++					if (newval.tri != no)
++						sym->flags |= SYMBOL_WRITE;
+ 				}
+ 				if (sym->implied.tri != no) {
+ 					sym->flags |= SYMBOL_WRITE;
 -- 
-2.7.4
+2.14.1
 
