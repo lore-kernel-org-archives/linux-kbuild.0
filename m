@@ -1,180 +1,159 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f194.google.com ([209.85.217.194]:32928 "EHLO
-        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751607AbeBWWrR (ORCPT
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:42532 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751425AbeBXANZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Feb 2018 17:47:17 -0500
-Received: by mail-ua0-f194.google.com with SMTP id p12so6908748uad.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 14:47:17 -0800 (PST)
+        Fri, 23 Feb 2018 19:13:25 -0500
+Received: by mail-wr0-f193.google.com with SMTP id k9so15719669wre.9
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Feb 2018 16:13:25 -0800 (PST)
+From: Eugeniu Rosca <roscaeugeniu@gmail.com>
+Date: Sat, 24 Feb 2018 01:13:15 +0100
+Subject: Re: [PATCH v4 0/3] Kconfig: Print reverse dependencies in groups
+Message-ID: <20180224001315.GA17706@example.com>
+References: <CAK7LNAQ4z9KHsCvzQRHozcXrxY5wsLnMCqWP7weSLFC4mxh6fg@mail.gmail.com>
+ <CAK7LNARtH1fepGc_+E4uzhoc=ykuF1HXpy0g7wx=5xZyL7G1YQ@mail.gmail.com>
+ <20180220150018.mjyjmdmao7xqyukr@huvuddator>
+ <20180220195119.GA14262@vmlxhi-102.adit-jv.com>
+ <CAFkk2KRxERva+XZi_fR_Epr63TwA6hKjwjCYnwtnK+xOSJUWHg@mail.gmail.com>
+ <CAK7LNATTqqzJReUfkoxE=5+GsVUMv4wjOuz--=-PY_B4eK4NeA@mail.gmail.com>
+ <20180221061052.GA29861@example.com>
+ <CAK7LNATHuCmU3WJJZs_S6ppZ2dbaZJa66yWhaCRJxqB6PLXgQg@mail.gmail.com>
+ <20180223140420.GA10547@vmlxhi-102.adit-jv.com>
+ <CAFkk2KRfaDZQG-F=3i-kQbGH6JzxP1q_fvKPzK1A_hJUb0GkMQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <64336784-9e2e-e049-e845-508e481880a8@infradead.org>
-References: <20180223060901.4052-1-ulfalizer@gmail.com> <CAFkk2KQPjeyE-E_TW3NBwFXbE-Q2mNnn1yAFkoA5w6xLQQ9hrw@mail.gmail.com>
- <CAK7LNAQPMuWAOjUdOgxp2KdSg0MSkz4giXiX-RxUBQTaWWws=Q@mail.gmail.com>
- <CAK7LNAQg85PpqMP4u-dh-m2rmSiz5JmhnfX6=c4Mbm5EskMPxg@mail.gmail.com>
- <20180223213313.loecroholntn4iqz@huvuddator> <64336784-9e2e-e049-e845-508e481880a8@infradead.org>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Fri, 23 Feb 2018 23:47:16 +0100
-Message-ID: <CAFkk2KR9RtE=9+PYOj=0Gi_YQ7-t3tQNBRQsVCXuGHr8B6-aGg@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: do not write 'n' defaults to .config
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFkk2KRfaDZQG-F=3i-kQbGH6JzxP1q_fvKPzK1A_hJUb0GkMQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Eugeniu Rosca <roscaeugeniu@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Eugeniu Rosca <erosca@de.adit-jv.com>
 
-On Fri, Feb 23, 2018 at 11:19 PM, Randy Dunlap <rdunlap@infradead.org> wrote:
-> On 02/23/2018 01:33 PM, Ulf Magnusson wrote:
->> On Sat, Feb 24, 2018 at 12:59:51AM +0900, Masahiro Yamada wrote:
->>> 2018-02-23 22:25 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->>>> 2018-02-23 15:14 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->>>>> On Fri, Feb 23, 2018 at 7:09 AM, Ulf Magnusson <ulfalizer@gmail.com> wrote:
->>>>>> === Background ===
->>>>>>
->>>>>> A "# CONFIG_FOO is not set" line is written to .config for visible
->>>>>> bool/tristate symbols with value n. The idea is to remember the user
->>>>>> selection without having to set a Makefile variable (having undefined
->>>>>> Make variables correspond to n is handy when testing them in the
->>>>>> Makefiles).
->>>>>>
->>>>>> Currently, a "# CONFIG_FOO is not set" line is also written to .config
->>>>>> for all bool/tristate symbols that get the value n through a 'default'.
->>>>>> This is inconsistent with how 'select' and 'imply' work, which only
->>>>>> write non-n symbols. It also seems redundant:
->>>>>>
->>>>>>   - If the symbol is visible and has value n, then
->>>>>>     "# CONFIG_FOO is not set" will always be written anyway.
->>>>>>
->>>>>>   - If the symbol is not visible, then "# CONFIG_FOO is not set" has no
->>>>>>     effect on it.
->>>>>>
->>>>>>   - If the symbol becomes visible later, there shouldn't be any harm in
->>>>>>     recalculating the default value at that point.
->>>>>>
->>>>>> === Changes ===
->>>>>>
->>>>>> Change sym_calc_value() to only set SYMBOL_WRITE (write to .config) for
->>>>>> non-n defaults. This reduces the size of the x86 .config on my system by
->>>>>> about 1% (due to removed "# CONFIG_FOO is not set" entries).
->>>>>>
->>>>>> One side effect of this change is making 'default n' equivalent to
->>>>>> having no explicit default. That might make it clearer to people that
->>>>>> 'default n' is redundant.
->>>>>>
->>>>>> This change only affects generated .config files and not autoconf.h:
->>>>>> autoconf.h only includes #defines for non-n bool/tristate symbols.
->>>>>>
->>>>>> === Testing ===
->>>>>>
->>>>>> The following testing was done with the x86 Kconfigs:
->>>>>>
->>>>>>  - .config files generated before and after the change were compared to
->>>>>>    verify that the only difference is some '# CONFIG_FOO is not set'
->>>>>>    entries disappearing. A couple of these were inspected manually, and
->>>>>>    most turned out to be from redundant 'default n/def_bool n'
->>>>>>    properties.
->>>>>>
->>>>>>  - The generated include/generated/autoconf.h was compared before and
->>>>>>    after the change and verified to be identical.
->>>>>>
->>>>>>  - As a sanity check, the same modification was done to Kconfiglib.
->>>>>>    The Kconfiglib test suite was then run to check for any mismatches
->>>>>>    against the output of the C implementation.
->>>>>>
->>>>>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->>>>>> ---
->>>>>>  scripts/kconfig/symbol.c | 3 ++-
->>>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
->>>>>> index cca9663be5dd..02eb8b10a83c 100644
->>>>>> --- a/scripts/kconfig/symbol.c
->>>>>> +++ b/scripts/kconfig/symbol.c
->>>>>> @@ -403,9 +403,10 @@ void sym_calc_value(struct symbol *sym)
->>>>>>                         if (!sym_is_choice(sym)) {
->>>>>>                                 prop = sym_get_default_prop(sym);
->>>>>>                                 if (prop) {
->>>>>> -                                       sym->flags |= SYMBOL_WRITE;
->>>>>>                                         newval.tri = EXPR_AND(expr_calc_value(prop->expr),
->>>>>>                                                               prop->visible.tri);
->>>>>> +                                       if (newval.tri != no)
->>>>>> +                                               sym->flags |= SYMBOL_WRITE;
->>>>>>                                 }
->>>>>>                                 if (sym->implied.tri != no) {
->>>>>>                                         sym->flags |= SYMBOL_WRITE;
->>>>>> --
->>>>>> 2.14.1
->>>>>>
->>>>>
->>>>> This stuff gets pretty obscure, so please tell me if you can think of
->>>>> any practical benefits to remembering an n default as a user selection
->>>>> for non-visible symbols (which is all '# CONFIG_FOO is not set' does
->>>>> in practice). I couldn't think of anything.
->>>>>
->>>>
->>>> In the context of
->>>>
->>>> config CC_HAS_STACKPROTECTOR
->>>>        def_bool $(cc-option -fstack-protector)
->>>>
->>>>
->>>> Currently, we have 3 cases:
->>>>
->>>>  [1] CONFIG_CC_HAS_STACKPROTECTOR=y
->>>>        -> compiler flag is supported
->>>>  [2] # CONFIG_CC_HAS_STACKPROTECTOR is not set
->>>>        -> compiler flag is unsupported
->>>>  [3] Missing
->>>>        -> The symbol was hidden probably due to unmet "if ... endif"
->>>>
->>>>
->>>> With this change, [2] will be turned into [3].
->>>>
->>>> That is the only drawback I came up with.
->>>>
->>>> I am not sure how many people want to check .config
->>>> to know the compiler capability...
->>>>
->>>
->>>
->>> I thought a bit more, then probably the grammatical
->>> consistency would win.  (default n is always redundant)
->>
->> The behavior should be easy to explain in kconfig-language.txt too: A
->> missing entry means n, except visible n-valued symbols generate a
->> '# CONFIG_FOO is not set' comment just to keep track of the user's choice.
->> No weird exception for 'default'.
->>
->> That would demystify those '...is not set' lines too.
->>
->>>
->>> I want to apply this, but take a bit time
->>> in case somebody may have comments.
->>>
->>>
->>> BTW, do you want to check redundant 'default n'
->>> by checkpatch.pl ?
->>
->> Was thinking of that. Guess you could generate a warning for any of the
->> following:
->>
->>       default n
->>       default "n"
->>       default 'n'
->
-> We also sometimes see:
->         default N
-> :)
->
+Hi Ulf,
 
-Could add a warning that looks for 'default N/M/Y' and says to use
-'default n/m/y' as well, maybe (after which you'd get a new warning
-telling you to get rid of the "default n"... never happy :P).
+On Fri, Feb 23, 2018 at 11:18:17PM +0100, Ulf Magnusson wrote:
+> On Fri, Feb 23, 2018 at 3:04 PM, Eugeniu Rosca <erosca@de.adit-jv.com> wrote:
+> >
+> > Hi Masahiro,
+> >
+> > On Fri, Feb 23, 2018 at 09:10:37PM +0900, Masahiro Yamada wrote:
+> >> Eugeniu,
+> >>
+> >>
+> >> 2018-02-21 15:10 GMT+09:00 Eugeniu Rosca <roscaeugeniu@gmail.com>:
+> >>
+> >> >
+> >> > I've tested https://patchwork.kernel.org/patch/10229545/ and
+> >> > https://patchwork.kernel.org/patch/10231295/ and they work great for me.
+> >> > Thank you for this feature.
+> >> >
+> >>
+> >> I will give you that code in the second one.
+> >
+> > I appreciate that, although I am open minded who takes the authorship.
+> > This feature makes my life easier and that's the most important part.
+> >
+> >>
+> >> Please fill the commit log with yours,
+> >> and also fix the bugs pointed by Petr.
+> >
+> > Sure. Will do that.
+> >
+> >> Anyway, I will claim my contribution
+> >> in the form of Signed-off-by when I pick it up.  :)
+> >
+> > I have one side question loosely related to this patch.
+> >
+> > Reverse dependencies are still not printed in zconfdump() (used in our kernel
+> > team for e.g. cross platform .config alignment/comparison). My gut feeling
+> > tells me this is mainly caused by the extremely unfriendly unreadable
+> > expressions which is how reverse dependencies used to be represented before
+> > commit 1ccb27143360 ("kconfig: make "Selected by:" and "Implied by:"
+> > readable"). Since this is now greatly improved, would you mind printing
+> > Selected/Implied-by in zconfdump? There are also other zconfdump fixes
+> > sitting in my local branch, like https://patchwork.kernel.org/patch/9253535/ .
+> > I would like to push them to you (they probably deserve a separate
+> > thread), if you think this is appropriate.
+> >
+> > Best regards,
+> > Eugeniu.
+> 
+> Shameless plug:
+> 
+> If you need to do any fancy Kconfig parsing and comparison, then
+> Kconfiglib (https://github.com/ulfalizer/Kconfiglib) might be handy.
+> It makes it easy to walk the menu tree, print and inspect symbols and
+> expressions, etc.
 
-Masahiro:
-Could you bump https://lkml.org/lkml/2018/2/22/935 if you're happy
-with it? Maybe Joe is waiting to see if you have objections.
+Currently, when comparing kernel configurations of two platforms P1 and
+P2, our zconfdump parser generates reports like below. It helps us quite
+much during .config alignment. The report can be isolated to a specific menu
+entry (in this case, it is "General setup"). In this particular case, P1 is
+imx6 using v3.14 kernel and P2 is rcar3 using a v4.x kernel. If Kconfiglib
+is able to generate a similar diff report, I will happily embrace it.
+If not, we might have no choice but keep using zconfdump for a while.
 
-After that I could add some new checks.
+Unfortunately, I haven't found some time to put my hands on Kconfiglib
+yet and I don't know what it is (or would be) capable of. Bottomline,
+the motivation to fix and enrich vanilla zconfdump functionality
+originates from making such reports possible on our side.
 
-Cheers,
-Ulf
+                                  Boolean -    - String   
+                                Tristate - \  / - Hex
+                              config -    \ || / - Integer
+                         menuconfig - \    |||| /
+                                     \|    |||||
+  Config Name                 Val    MC    TBSHI    Cfg.Origin         Comments
+                             P1 P2  P1 P2  P1 P2  P1         P2         P1 P2
+HAVE_KERNEL_GZIP             y  -   C  C   B  B   sel-by     -          01 -
+HAVE_KERNEL_LZMA             y  -   C  C   B  B   sel-by     -          02 -
+HAVE_KERNEL_XZ               y  -   C  C   B  B   sel-by     -          03 -
+HAVE_KERNEL_LZO              y  -   C  C   B  B   sel-by     -          04 -
+HAVE_KERNEL_LZ4              y  -   C  C   B  B   sel-by     -          05 -
+HAVE_KERNEL_LZ77             y  -   C  -   B  -   sel-by     -          06 -
+KERNEL_LZO                   y  -   C  C   B  B   defconfig  -          -  -
+KTIME_SCALAR                 y  -   C  -   B  -   sel-by     -          07 -
+GENERIC_CLOCKEVENTS_BUILD    y  -   C  -   B  -   default    -          08 -
+IKCONFIG                     m  y   C  C   T  T   defconfig  defconfig  -  -
+MM_OWNER                     y  -   C  -   B  -   sel-by     -          09 -
+PERF_USE_VMALLOC             y  -   C  C   B  B   sel-by     -          10 -
+HAVE_OPROFILE                y  -   C  C   B  B   sel-by     -          11 -
+UPROBES                      y  n   C  C   B  B   sel-by     default    12 13
+ARCH_USE_BUILTIN_BSWAP       y  -   C  C   B  B   sel-by     -          14 -
+HAVE_DMA_ATTRS               y  -   C  -   B  -   sel-by     -          15 -
+ARCH_WANT_IPC_PARSE_VERSION  y  -   C  C   B  B   sel-by     -          16 -
+MODULES_USE_ELF_REL          y  -   C  C   B  B   sel-by     -          17 -
+OLD_SIGACTION                y  -   C  C   B  B   sel-by     -          18 -
+TREE_PREEMPT_RCU             y  -   C  -   B  -   sel-by-ch  -          19 -
+RCU_FANOUT                   32 64  C  C   I  I   default    default    20 21
+RESOURCE_COUNTERS            y  -   C  -   B  -   defconfig  -          -  -
+
+Comments:
+01) selected by (ARM [=y])
+02) selected by (ARM [=y])
+03) selected by (ARM [=y])
+04) selected by (ARM [=y])
+05) selected by (ARM [=y])
+06) selected by (ARM [=y])
+07) selected by (ARM [=y])
+08) default y if GENERIC_CLOCKEVENTS [=y]
+09) selected by (MEMCG [=y] && CGROUPS [=y] && RESOURCE_COUNTERS [=y])
+10) selected by (ARM [=y])
+11) selected by (ARM [=y] && HAVE_PERF_EVENTS [=y])
+12) selected by (UPROBE_EVENT [=y] && TRACING_SUPPORT [=y] && FTRACE [=y] &&
+                 ARCH_SUPPORTS_UPROBES [=y] && MMU [=y] && PERF_EVENTS [=y])
+13) default n
+14) selected by (ARM [=y])
+15) selected by (ARM [=y])
+16) selected by (ARM [=y])
+17) selected by (ARM [=y])
+18) selected by (ARM [=y])
+19) selected by choice "RCU Implementation"
+20) default 32 if ((TREE_RCU || TREE_PREEMPT_RCU) && !64BIT) [=y]
+21) default 64 if ((TREE_RCU || PREEMPT_RCU) && RCU_EXPERT && 64BIT) [=y]
+ 
+> Cheers,
+> Ulf
+
+Best regards,
+Eugeniu.
