@@ -1,30 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:44313 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751131AbeBXO7s (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:58437 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751270AbeBXPNL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 24 Feb 2018 09:59:48 -0500
+        Sat, 24 Feb 2018 10:13:11 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180221042507.31379-1-caoj.fnst@cn.fujitsu.com>
-References: <20180221042507.31379-1-caoj.fnst@cn.fujitsu.com>
+In-Reply-To: <1519126829-7257-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1519126829-7257-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 24 Feb 2018 23:58:53 +0900
-Message-ID: <CAK7LNASyTRwpFRum2x4LQ9Yfdgk6b3tmXcm3RcTLgNZ8_pu3sw@mail.gmail.com>
-Subject: Re: [PATCH RFC] kbuild: drop superfluous GCC_PLUGINS_CFLAGS assignment
+Date: Sun, 25 Feb 2018 00:12:24 +0900
+Message-ID: <CAK7LNARfW9+RgDCKK_9SZE_n9ShPZDcEvqi2H_jKKUyFVj1BRg@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Don't leak choice names during parsing
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-02-21 13:25 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
-> GCC_PLUGINS_CFLAGS is already in the environment, so it is superfluous
-> to add it in commanline of final build of init/
+2018-02-20 20:40 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> The named choice is not used in the kernel tree, but if it were used,
+> it would not be freed.
 >
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> The intention of the named choice can be seen in the log of
+> commit 5a1aa8a1aff6 ("kconfig: add named choice group").
+>
+> There is room for argument if this is useful in practice, but anyway
+> I am fixing the memory leak.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Applied to linux-kbuild,
-with 'commanline' fixed to 'command line'.
+
+Applied to linux-kbuild/kconfig.
 
 
 
