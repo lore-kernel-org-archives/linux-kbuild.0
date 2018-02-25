@@ -1,25 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f66.google.com ([209.85.213.66]:40960 "EHLO
-        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750720AbeBYFzX (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:17284 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751611AbeBYMcZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 25 Feb 2018 00:55:23 -0500
-Received: by mail-vk0-f66.google.com with SMTP id t201so7943537vke.8
-        for <linux-kbuild@vger.kernel.org>; Sat, 24 Feb 2018 21:55:23 -0800 (PST)
+        Sun, 25 Feb 2018 07:32:25 -0500
+Received: from mail-ua0-f171.google.com (mail-ua0-f171.google.com [209.85.217.171]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id w1PCWGiA024974
+        for <linux-kbuild@vger.kernel.org>; Sun, 25 Feb 2018 21:32:17 +0900
+Received: by mail-ua0-f171.google.com with SMTP id f5so2715451uam.5
+        for <linux-kbuild@vger.kernel.org>; Sun, 25 Feb 2018 04:32:17 -0800 (PST)
 MIME-Version: 1.0
 In-Reply-To: <20180224152418.9289-1-rosca.eugeniu@gmail.com>
 References: <20180224152418.9289-1-rosca.eugeniu@gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Sun, 25 Feb 2018 06:55:22 +0100
-Message-ID: <CAFkk2KS24p_HT+Vjy8ocYiyVq0+AXF=M2=vqFNHeMJuQ5P5Utw@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 25 Feb 2018 21:31:35 +0900
+Message-ID: <CAK7LNATQ2=ump3Mf57Cg8bodeDbSkOcOqwuAudao68dDNGmvPw@mail.gmail.com>
 Subject: Re: [PATCH v5] kconfig: Print reverse dependencies in groups
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Petr Vorel <petr.vorel@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Eugeniu Rosca <erosca@de.adit-jv.com>, Eugeniu Rosca <rosca.eugeniu@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Petr Vorel <petr.vorel@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Eugeniu Rosca <erosca@de.adit-jv.com>, Eugeniu Rosca <rosca.eugeniu@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Sat, Feb 24, 2018 at 4:24 PM, Eugeniu Rosca <roscaeugeniu@gmail.com> wrote:
+2018-02-25 0:24 GMT+09:00 Eugeniu Rosca <roscaeugeniu@gmail.com>:
 > From: Eugeniu Rosca <erosca@de.adit-jv.com>
 >
 > Surprisingly or not, disabling a CONFIG option (which is assumed to
@@ -124,92 +127,18 @@ On Sat, Feb 24, 2018 at 4:24 PM, Eugeniu Rosca <roscaeugeniu@gmail.com> wrote:
 > * Instead of using "Selected by" for active tokens only, use it for all
 >   OR tokens, but specify the tristate value of each token as prefix
 >   (suggested by Masahiro).
->
->  scripts/kconfig/expr.c | 18 ++++++++++++------
->  scripts/kconfig/expr.h |  3 ++-
->  scripts/kconfig/menu.c | 10 ++++++----
->  3 files changed, 20 insertions(+), 11 deletions(-)
->
-> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-> index cd3a8f501f38..49376e12fa30 100644
-> --- a/scripts/kconfig/expr.c
-> +++ b/scripts/kconfig/expr.c
-> @@ -1323,19 +1323,25 @@ void expr_gstr_print(struct expr *e, struct gstr *gs)
->   */
->  static void expr_print_revdep(struct expr *e,
->                               void (*fn)(void *, struct symbol *, const char *),
-> -                             void *data)
-> +                             void *data, tristate pr_type, const char **title)
->  {
->         if (e->type == E_OR) {
-> -               expr_print_revdep(e->left.expr, fn, data);
-> -               expr_print_revdep(e->right.expr, fn, data);
-> -       } else {
-> +               expr_print_revdep(e->left.expr, fn, data, pr_type, title);
-> +               expr_print_revdep(e->right.expr, fn, data, pr_type, title);
-> +       } else if (expr_calc_value(e) == pr_type) {
-> +               if (*title) {
-> +                       fn(data, NULL, *title);
-> +                       *title = NULL;
-> +               }
-> +
->                 fn(data, NULL, "  - ");
->                 expr_print(e, fn, data, E_NONE);
->                 fn(data, NULL, "\n");
->         }
->  }
->
-> -void expr_gstr_print_revdep(struct expr *e, struct gstr *gs)
-> +void expr_gstr_print_revdep(struct expr *e, struct gstr *gs,
-> +                           tristate pr_type, const char *title)
->  {
-> -       expr_print_revdep(e, expr_print_gstr_helper, gs);
-> +       expr_print_revdep(e, expr_print_gstr_helper, gs, pr_type, &title);
->  }
-> diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-> index c16e82e302a2..8dbf2a4cdae1 100644
-> --- a/scripts/kconfig/expr.h
-> +++ b/scripts/kconfig/expr.h
-> @@ -310,7 +310,8 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2);
->  void expr_fprint(struct expr *e, FILE *out);
->  struct gstr; /* forward */
->  void expr_gstr_print(struct expr *e, struct gstr *gs);
-> -void expr_gstr_print_revdep(struct expr *e, struct gstr *gs);
-> +void expr_gstr_print_revdep(struct expr *e, struct gstr *gs,
-> +                           tristate pr_type, const char *title);
->
->  static inline int expr_is_yes(struct expr *e)
->  {
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index 7e70be34aa6c..3415fe0bbad7 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -827,14 +827,16 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
->
->         get_symbol_props_str(r, sym, P_SELECT, _("  Selects: "));
->         if (sym->rev_dep.expr) {
-> -               str_append(r, _("  Selected by: \n"));
-> -               expr_gstr_print_revdep(sym->rev_dep.expr, r);
-> +               expr_gstr_print_revdep(sym->rev_dep.expr, r, yes, "  Selected by [y]:\n");
-> +               expr_gstr_print_revdep(sym->rev_dep.expr, r, mod, "  Selected by [m]:\n");
-> +               expr_gstr_print_revdep(sym->rev_dep.expr, r, no, "  Selected by [n]:\n");
->         }
->
->         get_symbol_props_str(r, sym, P_IMPLY, _("  Implies: "));
->         if (sym->implied.expr) {
-> -               str_append(r, _("  Implied by: \n"));
-> -               expr_gstr_print_revdep(sym->implied.expr, r);
-> +               expr_gstr_print_revdep(sym->implied.expr, r, yes, "  Implied by [y]:\n");
-> +               expr_gstr_print_revdep(sym->implied.expr, r, mod, "  Implied by [m]:\n");
-> +               expr_gstr_print_revdep(sym->implied.expr, r, no, "  Implied by [n]:\n");
->         }
->
->         str_append(r, "\n\n");
-> --
-> 2.16.2
->
 
+Applied with
+
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
 Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 
-Cheers,
-Ulf
+
+Thanks!
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
