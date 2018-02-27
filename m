@@ -1,42 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:31275 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751952AbeB0IQZ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Feb 2018 03:16:25 -0500
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Subject: [PATCH] kbuild/kallsyms: trivial typo fix
-Date: Tue, 27 Feb 2018 16:16:19 +0800
-Message-ID: <20180227081619.23935-1-caoj.fnst@cn.fujitsu.com>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34078 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751554AbeB0RpT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 27 Feb 2018 12:45:19 -0500
+Date: Tue, 27 Feb 2018 11:45:18 -0600
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH v2 0/3] kbuild: fix host progs build with libs in non
+ standard locations
+Message-ID: <20180227174518.qzw6eqmuyggcvjl6@treble>
+References: <cover.1519393674.git.robin.jarry@6wind.com>
+ <cover.1519668832.git.robin.jarry@6wind.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cover.1519668832.git.robin.jarry@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: michal.lkml@markovi.net, yamada.masahiro@socionext.com
+To: Robin Jarry <robin.jarry@6wind.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
----
-I guess this belongs to kbuild though get_maintainer.pl doesn't tell me that.
+On Mon, Feb 26, 2018 at 07:41:45PM +0100, Robin Jarry wrote:
+> This patchset allows to build host programs that depend on external libs
+> installed in non standard locations (i.e. not in /usr/include, /usr/lib,
+> etc.).  For now, the only way is to force HOSTCC to include both the
+> path to the host compiler and the build flags.
+> 
+> I have encountered this issue when building linux into the buildroot
+> framework. host-* versions of libs may be compiled and installed in a
+> host staging dir removing the need to install them on the build system.
+> 
+> I'm not really satisfied with the new HOST_{C,LD}FLAGS variables.  They
+> are too similar to HOST{C,LD}FLAGS and I find them confusing.  However,
+> HOST_EXTRA*FLAGS are already reserved for local use in makefiles (see
+> Documentation/kbuild/makefiles.txt).  And I didn't want to have even
+> longer USER_HOST_*FLAGS.  If someone has a better proposition, I'll
+> happily make a v3.
 
- scripts/kallsyms.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+In Documentation/kbuild/kbuild.txt, we have the following environment
+variables:
 
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 9ee9bf7fd1a2..65792650c630 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -595,7 +595,7 @@ static void optimize_result(void)
- 		 * original char code */
- 		if (!best_table_len[i]) {
- 
--			/* find the token with the breates profit value */
-+			/* find the token with the best profit value */
- 			best = find_best_token();
- 			if (token_profit[best] == 0)
- 				break;
+  KCFLAGS
+  --------------------------------------------------
+  Additional options to the C compiler (for built-in and modules).
+  
+  CFLAGS_KERNEL
+  --------------------------------------------------
+  Additional options for $(CC) when used to compile
+  code that is compiled as built-in.
+  
+  CFLAGS_MODULE
+  --------------------------------------------------
+  Additional module specific options to use for $(CC).
+  
+  LDFLAGS_MODULE
+  --------------------------------------------------
+  Additional options used for $(LD) when linking modules.
+  
+  LDFLAGS_vmlinux
+  --------------------------------------------------
+  Additional options passed to final link of vmlinux.
+
+So instead of
+
+  HOST_CFLAGS
+  HOST_LDFLAGS
+
+maybe it would be more consistent to call them
+
+  CFLAGS_HOST
+  LDFLAGS_HOST
+
+?
+
+Also, the new environment variables should be documented in the above
+file.
+
 -- 
-2.14.3
-
-
-
+Josh
