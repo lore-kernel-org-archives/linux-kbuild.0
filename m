@@ -1,77 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:39688 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932088AbeB1TAE (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:55083 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932780AbeB1TSP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Feb 2018 14:00:04 -0500
-Subject: Re: [PATCH] Documentation: Update ncurses package names for
- menuconfig
-References: <1519801192-31201-1-git-send-email-arvindprasanna@gmail.com>
- <43a91eb4-646a-b4d8-5b3d-b0bfde0019d9@infradead.org>
- <CAK-=9LoNfYP_-tm+W2GvUWjWgs=BZ-VRFmVNzTCadzQWaee9yg@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <e484c42f-4fe6-10f5-dab8-cfd749911486@infradead.org>
-Date: Wed, 28 Feb 2018 10:59:58 -0800
-MIME-Version: 1.0
-In-Reply-To: <CAK-=9LoNfYP_-tm+W2GvUWjWgs=BZ-VRFmVNzTCadzQWaee9yg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        Wed, 28 Feb 2018 14:18:15 -0500
+Received: by mail-wm0-f68.google.com with SMTP id z81so7103682wmb.4
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Feb 2018 11:18:14 -0800 (PST)
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: [PATCH 1/3] fixdep: remove stale references to uml-config.h
+Date: Wed, 28 Feb 2018 20:17:35 +0100
+Message-Id: <20180228191805.20094-1-linux@rasmusvillemoes.dk>
+In-Reply-To: <CA+55aFz_ww8ohU68Jz34pg_x7gpGpJ+FC-dmS_Rm_VvY01GGpg@mail.gmail.com>
+References: <CA+55aFz_ww8ohU68Jz34pg_x7gpGpJ+FC-dmS_Rm_VvY01GGpg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arvind Prasanna <arvindprasanna@gmail.com>
-Cc: Kate Stewart <kstewart@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Al Viro <viro@zeniv.linux.org.uk>, Richard Weinberger <richard@nod.at>, user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 02/28/2018 09:39 AM, Arvind Prasanna wrote:
-> Hi Randy:
-> 
-> On 02/27/2018 10:59 PM, Arvind Prasanna wrote:
->> The package name is ncurses-devel for Redhat based distros
->> and libncurses-devel for Debian based distros.
-> 
-> The above lines are part of the commit message and the patch says to install either ncurses-devel or libncurses-dev based on the user's Linux distribution. Would you prefer I add my commit message lines to the patch as well?
-> 
-> Thanks,
-> 
-> Arvind.
-> 
-> 
-> On Wed, Feb 28, 2018 at 12:31 PM, Randy Dunlap <rdunlap@infradead.org <mailto:rdunlap@infradead.org>> wrote:
-> 
->     On 02/27/2018 10:59 PM, Arvind Prasanna wrote:
->     > The package name is ncurses-devel for Redhat based distros
->     > and libncurses-devel for Debian based distros.
-> 
->           ^^^^^^^^^^^^^^^^ That's not what the patch says. Please clarify.
+uml-config.h hasn't existed in this decade (87e299e5c750 - x86, um: get
+rid of uml-config.h). The few remaining UML_CONFIG instances are defined
+directly in terms of their real CONFIG symbol in common-offsets.h, so
+unlike when the symbols got defined via a sed script, anything that uses
+UML_CONFIG_FOO now should also automatically pick up a dependency on
+CONFIG_FOO via the normal fixdep mechanism (since common-offsets.h
+should at least recursively be a dependency). Hence I believe we should
+actually be able to ignore the HELLO_CONFIG_BOOM cases.
 
-For Debian-based distros, is it libncurses-devel (above) or is it
-libncurses-dev (as below)?  [latter is without the ending "el"]
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: user-mode-linux-devel@lists.sourceforge.net
+Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+---
+ scripts/basic/fixdep.c | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-
-And what about the other few hundred distros?  (rhetorical)
-
-
->     >
->     > Signed-off-by: Arvind Prasanna <arvindprasanna@gmail.com <mailto:arvindprasanna@gmail.com>>
->     > ---
->     >  scripts/kconfig/lxdialog/check-lxdialog.sh | 3 ++-
->     >  1 file changed, 2 insertions(+), 1 deletion(-)
->     >
->     > diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
->     > index a10bd9d..4353e40 100755
->     > --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
->     > +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
->     > @@ -55,7 +55,8 @@ EOF
->     >           echo " *** required header files."                            1>&2
->     >           echo " *** 'make menuconfig' requires the ncurses libraries." 1>&2
->     >           echo " *** "                                                  1>&2
->     > -         echo " *** Install ncurses (ncurses-devel) and try again."    1>&2
->     > +         echo " *** Install ncurses (ncurses-devel or libncurses-dev   1>&2
->     > +                *** depending on your distribution) and try again."    1>&2
->     >           echo " *** "                                                  1>&2
->     >           exit 1
->     >       fi
-
-
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index fa3d39b6f23b..d7fbe545dd5d 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -93,14 +93,6 @@
+  * (Note: it'd be easy to port over the complete mkdep state machine,
+  *  but I don't think the added complexity is worth it)
+  */
+-/*
+- * Note 2: if somebody writes HELLO_CONFIG_BOOM in a file, it will depend onto
+- * CONFIG_BOOM. This could seem a bug (not too hard to fix), but please do not
+- * fix it! Some UserModeLinux files (look at arch/um/) call CONFIG_BOOM as
+- * UML_CONFIG_BOOM, to avoid conflicts with /usr/include/linux/autoconf.h,
+- * through arch/um/include/uml-config.h; this fixdep "bug" makes sure that
+- * those files will have correct dependencies.
+- */
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -286,7 +278,6 @@ static int is_ignored_file(const char *s, int len)
+ {
+ 	return str_ends_with(s, len, "include/generated/autoconf.h") ||
+ 	       str_ends_with(s, len, "include/generated/autoksyms.h") ||
+-	       str_ends_with(s, len, "arch/um/include/uml-config.h") ||
+ 	       str_ends_with(s, len, "include/linux/kconfig.h") ||
+ 	       str_ends_with(s, len, ".ver");
+ }
 -- 
-~Randy
+2.15.1
+
