@@ -1,47 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f173.google.com ([209.85.128.173]:46903 "EHLO
-        mail-wr0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752679AbeB1RYg (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:51498 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932580AbeB1Rb0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Feb 2018 12:24:36 -0500
-Received: by mail-wr0-f173.google.com with SMTP id m12so3240144wrm.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Feb 2018 09:24:35 -0800 (PST)
-Date: Wed, 28 Feb 2018 18:24:20 +0100
-From: Robin Jarry <robin.jarry@6wind.com>
-Subject: Re: [PATCH v2 0/3] kbuild: fix host progs build with libs in non
- standard locations
-Message-ID: <20180228172420.usinpmathg4gvvav@6wind.com>
-References: <cover.1519393674.git.robin.jarry@6wind.com>
- <cover.1519668832.git.robin.jarry@6wind.com>
- <20180227174518.qzw6eqmuyggcvjl6@treble>
- <CAK7LNAQLDRefb34KzF=3UUBdRLsDXtaZhRVQjRE2ZMaqNEb4LA@mail.gmail.com>
+        Wed, 28 Feb 2018 12:31:26 -0500
+Subject: Re: [PATCH] Documentation: Update ncurses package names for
+ menuconfig
+References: <1519801192-31201-1-git-send-email-arvindprasanna@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <43a91eb4-646a-b4d8-5b3d-b0bfde0019d9@infradead.org>
+Date: Wed, 28 Feb 2018 09:31:24 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQLDRefb34KzF=3UUBdRLsDXtaZhRVQjRE2ZMaqNEb4LA@mail.gmail.com>
+In-Reply-To: <1519801192-31201-1-git-send-email-arvindprasanna@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Arvind Prasanna <arvindprasanna@gmail.com>
+Cc: Kate Stewart <kstewart@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-2018-02-28, Masahiro Yamada:
-[snip]
-> So, my idea is to rename existing
-> 
->  HOSTCFLAGS     ->  KBUILD_HOSTCFLAGS
->  HOSTCXXFLAGS   ->  KBUILD_HOSTCXXFLAGS
->  HOSTLDFLAGS    ->  KBUILD_HOSTLDFLAGS
->  HOST_LOADLIBES ->  KBUILD_HOSTLDLIBS
-> 
-> 
-> ("LOADLIBES" is too long, so rename it to "LDLIBS")
-> 
-> 
-> Then, re-add no-prefix ones as user interface.
+On 02/27/2018 10:59 PM, Arvind Prasanna wrote:
+> The package name is ncurses-devel for Redhat based distros
+> and libncurses-devel for Debian based distros.
 
-Hi Masahiro,
+      ^^^^^^^^^^^^^^^^ That's not what the patch says. Please clarify.
 
-Ok, I'll add the rename patch in a v3 of my series.
+> 
+> Signed-off-by: Arvind Prasanna <arvindprasanna@gmail.com>
+> ---
+>  scripts/kconfig/lxdialog/check-lxdialog.sh | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
+> index a10bd9d..4353e40 100755
+> --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
+> +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+> @@ -55,7 +55,8 @@ EOF
+>  	    echo " *** required header files."                            1>&2
+>  	    echo " *** 'make menuconfig' requires the ncurses libraries." 1>&2
+>  	    echo " *** "                                                  1>&2
+> -	    echo " *** Install ncurses (ncurses-devel) and try again."    1>&2
+> +	    echo " *** Install ncurses (ncurses-devel or libncurses-dev   1>&2
+> +	           *** depending on your distribution) and try again."    1>&2
+>  	    echo " *** "                                                  1>&2
+>  	    exit 1
+>  	fi
+> 
 
+thanks,
 -- 
-Robin
+~Randy
