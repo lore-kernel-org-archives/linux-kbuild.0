@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:24336 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:24337 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751890AbeB1AQs (ORCPT
+        with ESMTP id S1751899AbeB1AQs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 27 Feb 2018 19:16:48 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 2/6] kconfig: remove unneeded input_mode test in conf()
-Date: Wed, 28 Feb 2018 09:15:22 +0900
-Message-Id: <1519776926-30459-3-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 5/6] kconfig: invoke oldconfig instead of silentoldconfig from local*config
+Date: Wed, 28 Feb 2018 09:15:25 +0900
+Message-Id: <1519776926-30459-6-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,32 +15,39 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Marc Herbert <marc.herbert@intel.com>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-conf() is never called for listnewconfig / olddefconfig.
+The purpose of local{yes,mod}config is to arrange the .config file
+based on actually loaded modules.  It is unnecessary to update
+include/generated/autoconf.h and include/config/* stuff here.
+
+They will be automatically updated during the build.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
 
-Changes in v2: None
+Changes in v2:
+  - newly added
 
- scripts/kconfig/conf.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ scripts/kconfig/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 4227d3b..1faa55f 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -358,9 +358,7 @@ static void conf(struct menu *menu)
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index c5d1d1a..bf9289a 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -49,11 +49,11 @@ localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+ 			cmp -s .tmp.config .config ||			\
+ 			(mv -f .config .config.old.1;			\
+ 			 mv -f .tmp.config .config;			\
+-			 $(obj)/conf $(silent) --silentoldconfig $(Kconfig); \
++			 $(obj)/conf $(silent) --oldconfig $(Kconfig); \
+ 			 mv -f .config.old.1 .config.old)		\
+ 	else								\
+ 			mv -f .tmp.config .config;			\
+-			$(obj)/conf $(silent) --silentoldconfig $(Kconfig); \
++			$(obj)/conf $(silent) --oldconfig $(Kconfig); \
+ 	fi
+ 	$(Q)rm -f .tmp.config
  
- 		switch (prop->type) {
- 		case P_MENU:
--			if ((input_mode == silentoldconfig ||
--			     input_mode == listnewconfig ||
--			     input_mode == olddefconfig) &&
-+			if (input_mode == silentoldconfig &&
- 			    rootEntry != menu) {
- 				check_conf(menu);
- 				return;
 -- 
 2.7.4
 
