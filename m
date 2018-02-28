@@ -1,171 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:24339 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751898AbeB1AQs (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:35340 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751117AbeB1AXW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Feb 2018 19:16:48 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 4/6] kconfig: hide irrelevant sub-menus for oldconfig
-Date: Wed, 28 Feb 2018 09:15:24 +0900
-Message-Id: <1519776926-30459-5-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
+        Tue, 27 Feb 2018 19:23:22 -0500
+Subject: Re: [PATCH v2 0/3] kbuild: fix host progs build with libs in non
+ standard locations
+References: <cover.1519393674.git.robin.jarry@6wind.com>
+ <cover.1519668832.git.robin.jarry@6wind.com>
+ <20180227174518.qzw6eqmuyggcvjl6@treble>
+ <20180227205231.t2wmh4e2ky2ganyo@6wind.com>
+ <20180227213825.ht7a2ggjjxgnleys@treble>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <739369f0-14a9-fc87-3cbd-06ef7ab5dddc@infradead.org>
+Date: Tue, 27 Feb 2018 16:23:18 -0800
+MIME-Version: 1.0
+In-Reply-To: <20180227213825.ht7a2ggjjxgnleys@treble>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Marc Herbert <marc.herbert@intel.com>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Josh Poimboeuf <jpoimboe@redhat.com>, Robin Jarry <robin.jarry@6wind.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
 
-Historically, "make oldconfig" has changed its behavior several times,
-quieter or louder.  (I attached the history below.)  Currently, it is
-not as quiet as it should be.  This commit addresses it.
+On 02/27/2018 01:38 PM, Josh Poimboeuf wrote:
+> On Tue, Feb 27, 2018 at 09:52:31PM +0100, Robin Jarry wrote:
+>> 2018-02-27, Josh Poimboeuf:
+>>> In Documentation/kbuild/kbuild.txt, we have the following environment
+>>> variables:
+>>>
+>>>   KCFLAGS
+>>>   --------------------------------------------------
+>>>   Additional options to the C compiler (for built-in and modules).
+>>>   
+>>>   CFLAGS_KERNEL
+>>>   --------------------------------------------------
+>>>   Additional options for $(CC) when used to compile
+>>>   code that is compiled as built-in.
+>>>   
+>>>   CFLAGS_MODULE
+>>>   --------------------------------------------------
+>>>   Additional module specific options to use for $(CC).
+>>>   
+>>>   LDFLAGS_MODULE
+>>>   --------------------------------------------------
+>>>   Additional options used for $(LD) when linking modules.
+>>>   
+>>>   LDFLAGS_vmlinux
+>>>   --------------------------------------------------
+>>>   Additional options passed to final link of vmlinux.
+>>>
+>>> So instead of
+>>>
+>>>   HOST_CFLAGS
+>>>   HOST_LDFLAGS
+>>>
+>>> maybe it would be more consistent to call them
+>>>
+>>>   CFLAGS_HOST
+>>>   LDFLAGS_HOST
+>>>
+>>> ?
+>>
+>> I had missed this file. Indeed {C,LD}FLAGS_HOST are much less confusing!
+>>
+>>> Also, the new environment variables should be documented in the above
+>>> file.
+>>
+>> Sure, I'll do that. However, I feel like I should also leave the
+>> paragraph in Documentation/admin-guide/README.txt.
+>>
+>> What do you think?
+> 
+> [ Adding Jon Corbet to CC in case he has an opinion. ]
+> 
+> I think that paragraph in the admin guide seems a bit out of place,
+> because that file only seems to cover the most common cases.
+> 
+> No other env variables are described in that file (and some of the
+> previously existing env variables are much more likely to be used than
+> these new ones anyway).
+> 
+> It might be a good idea to instead just add a reference to kbuild.txt,
+> suggesting the user refer to that file if they want to learn more about
+> what env variables can be used to customize the build.
 
-  Test Case
-  ---------
+(IMHO :)  I agree, the addition to admin-guide/README.rst (not .txt) is in
+the wrong place, although it could contain a pointer to kbuild/ like Josh says.
 
----------------------------(Kconfig)----------------------------
-menu "menu"
+And if you do move that text to kbuild/, please change "non standard" to
+"non-standard" in 2 places.
 
-config FOO
-        bool "foo"
-
-menu "sub menu"
-
-config BAR
-        bool "bar"
-
-endmenu
-
-endmenu
-
-menu "sibling menu"
-
-config BAZ
-        bool "baz"
-
-endmenu
-----------------------------------------------------------------
-
----------------------------(.config)----------------------------
-CONFIG_BAR=y
-CONFIG_BAZ=y
-----------------------------------------------------------------
-
-With the Kconfig and .config above, "make silentoldconfig" and
-"make oldconfig" work differently, like follows:
-
-  $ make silentoldconfig
-  scripts/kconfig/conf  --silentoldconfig Kconfig
-  *
-  * Restart config...
-  *
-  *
-  * menu
-  *
-  foo (FOO) [N/y/?] (NEW) y
-  #
-  # configuration written to .config
-  #
-
-  $ make oldconfig
-  scripts/kconfig/conf  --oldconfig Kconfig
-  *
-  * Restart config...
-  *
-  *
-  * menu
-  *
-  foo (FOO) [N/y/?] (NEW) y
-  *
-  * sub menu
-  *
-  bar (BAR) [Y/n/?] y
-  #
-  # configuration written to .config
-  #
-
-Both hide "sibling node" since it is irrelevant.  The difference is
-that silentoldconfig hides "sub menu" whereas oldconfig does not.
-The behavior of silentoldconfig is preferred since the "sub menu"
-does not contain any new symbol.
-
-The root cause is in conf().  There are three input modes that can
-call conf(); oldaskconfig, oldconfig, and silentoldconfig.
-
-Everytime conf() encounters a menu entry, it calls check_conf() to
-check if it contains new symbols.  If no new symbol is found, the
-menu is just skipped.
-
-Currently, this happens only when input_mode == silentoldconfig.
-The oldaskconfig enters into the check_conf() loop as silentoldconfig,
-so oldaskconfig works likewise for the second loop or later, but it
-never happens for oldconfig.  So, irrelevant sub-menus are shown for
-oldconfig.
-
-Change the test condition to "input_mode != oldaskconfig".  This is
-false only for the first loop of oldaskconfig; it must ask the user
-all symbols, so no need to call check_conf().
-
-  History of oldconfig
-  --------------------
-
-[0] Originally, "make oldconfig" was as loud as "make config"  (It
-    showed the entire .config file)
-
-[1] Commit cd9140e1e73a ("kconfig: make oldconfig is now less chatty")
-    made oldconfig quieter, but it was still less quieter than
-    silentoldconfig.  (oldconfig did not hide sub-menus)
-
-[2] Commit 204c96f60904 ("kconfig: fix silentoldconfig") changed
-    the input_mode of oldconfig to "ask_silent" from "ask_new".
-    So, oldconfig really became as quiet as silentoldconfig.
-    (oldconfig hided irrelevant sub-menus)
-
-[3] Commit 4062f1a4c030 ("kconfig: use long options in conf") made
-    oldconfig as loud as [0] due to misconversion.
-
-[4] Commit 14828349719a ("kconfig: fix make oldconfig") addressed
-    the misconversion of [3], but it made oldconfig quieter only to
-    the same level as [1], not [2].
-
-This commit is restoring the behavior of [2].
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
----
-
-Changes in v2:
-  - Add a brief comment
-
- scripts/kconfig/conf.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 59656d3..11a4e45 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -358,8 +358,11 @@ static void conf(struct menu *menu)
- 
- 		switch (prop->type) {
- 		case P_MENU:
--			if (input_mode == silentoldconfig &&
--			    rootEntry != menu) {
-+			/*
-+			 * Except in oldaskconfig mode, we show only menus that
-+			 * contain new symbols.
-+			 */
-+			if (input_mode != oldaskconfig && rootEntry != menu) {
- 				check_conf(menu);
- 				return;
- 			}
-@@ -660,7 +663,7 @@ int main(int ac, char **av)
- 	case oldaskconfig:
- 		rootEntry = &rootmenu;
- 		conf(&rootmenu);
--		input_mode = silentoldconfig;
-+		input_mode = oldconfig;
- 		/* fall through */
- 	case oldconfig:
- 	case listnewconfig:
+thanks,
 -- 
-2.7.4
-
+~Randy
