@@ -1,33 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:59898 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751521AbeB1CKa (ORCPT
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:38132 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750835AbeB1FPk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Feb 2018 21:10:30 -0500
-Subject: Re: [PATCH v2 6/6] kconfig: rename silentoldconfig to syncconfig
+        Wed, 28 Feb 2018 00:15:40 -0500
+Date: Wed, 28 Feb 2018 06:15:25 +0100
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: Re: [PATCH v2 5/6] kconfig: invoke oldconfig instead of
+ silentoldconfig from local*config
+Message-ID: <20180228051525.a2vouqs6djnd2cnf@huvuddator>
 References: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
- <1519776926-30459-7-git-send-email-yamada.masahiro@socionext.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <6fc6557b-8806-0f5d-671e-eeda67c5e3dc@infradead.org>
-Date: Tue, 27 Feb 2018 18:10:25 -0800
+ <1519776926-30459-6-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-In-Reply-To: <1519776926-30459-7-git-send-email-yamada.masahiro@socionext.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <1519776926-30459-6-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Marc Herbert <marc.herbert@intel.com>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Marc Herbert <marc.herbert@intel.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
 
-On 02/27/2018 04:15 PM, Masahiro Yamada wrote:
-> As commit cedd55d49dee ("kconfig: Remove silentoldconfig from help
-> and docs; fix kconfig/conf's help") mentioned, 'silentoldconfig' is a
-> historical misnomer.  That commit removed it from help and docs since
-> it is an internal interface.  If so, it should be allowed to rename
-> it to something more intuitive.  'syncconfig' is the one I came up
-> with because it updates the .config if necessary, then synchronize
-> other files with it.
+On Wed, Feb 28, 2018 at 09:15:25AM +0900, Masahiro Yamada wrote:
+> The purpose of local{yes,mod}config is to arrange the .config file
+> based on actually loaded modules.  It is unnecessary to update
+> include/generated/autoconf.h and include/config/* stuff here.
+> 
+> They will be automatically updated during the build.
 > 
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
@@ -35,19 +33,45 @@ On 02/27/2018 04:15 PM, Masahiro Yamada wrote:
 > Changes in v2:
 >   - newly added
 > 
->  Documentation/kbuild/kconfig.txt |  2 +-
->  Makefile                         |  2 +-
->  scripts/kconfig/Makefile         |  4 ++--
->  scripts/kconfig/conf.c           | 20 ++++++++++----------
->  4 files changed, 14 insertions(+), 14 deletions(-)
+>  scripts/kconfig/Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index c5d1d1a..bf9289a 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -49,11 +49,11 @@ localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
 
-It wouldn't hurt to update this line also: (I would just drop "silentoldconfig")
+(Unrelated: $(obj)/streamline_config.pl is a checked-in file, so I
+wonder if there's any point to having it as a prerequisite of the phony
+targets local{yes,mod}config.)
 
-     Make oldconfig/silentoldconfig/menuconfig/etc.
+>  			cmp -s .tmp.config .config ||			\
+>  			(mv -f .config .config.old.1;			\
+>  			 mv -f .tmp.config .config;			\
+> -			 $(obj)/conf $(silent) --silentoldconfig $(Kconfig); \
+> +			 $(obj)/conf $(silent) --oldconfig $(Kconfig); \
 
-in Documentation/networking/i40e.txt.
+Maybe add extra space to keep \ aligned.
 
+>  			 mv -f .config.old.1 .config.old)		\
+>  	else								\
+>  			mv -f .tmp.config .config;			\
+> -			$(obj)/conf $(silent) --silentoldconfig $(Kconfig); \
+> +			$(obj)/conf $(silent) --oldconfig $(Kconfig); \
 
-thanks,
--- 
-~Randy
+Ditto here.
+
+>  	fi
+>  	$(Q)rm -f .tmp.config
+>  
+> -- 
+> 2.7.4
+> 
+
+I'm not an expert on the Makefiles, but seems reasonable to me.
+
+Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+
+Cheers,
+Ulf
