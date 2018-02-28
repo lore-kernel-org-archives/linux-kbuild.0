@@ -1,145 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:47702 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752395AbeB1Oyk (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:44718 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752450AbeB1PFO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Feb 2018 09:54:40 -0500
-Received: from mail-ua0-f169.google.com (mail-ua0-f169.google.com [209.85.217.169]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id w1SEsWwa019071
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Feb 2018 23:54:33 +0900
-Received: by mail-ua0-f169.google.com with SMTP id p12so1708991uad.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Feb 2018 06:54:33 -0800 (PST)
+        Wed, 28 Feb 2018 10:05:14 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180223114901.lg5syy5zrf75mndd@huvuddator>
-References: <20180223060901.4052-1-ulfalizer@gmail.com> <CAFkk2KQPjeyE-E_TW3NBwFXbE-Q2mNnn1yAFkoA5w6xLQQ9hrw@mail.gmail.com>
- <CAK8P3a1jtOWVzJFQjSjqbGHZSGGMkii1Bi5qpdAG1AvWjPKbLg@mail.gmail.com> <20180223114901.lg5syy5zrf75mndd@huvuddator>
+In-Reply-To: <1519801192-31201-1-git-send-email-arvindprasanna@gmail.com>
+References: <1519801192-31201-1-git-send-email-arvindprasanna@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 28 Feb 2018 23:53:51 +0900
-Message-ID: <CAK7LNAT1C2UN0hK82UiydgEtO_x9b4RUk6A_c0E5QZj2Tc-jrw@mail.gmail.com>
-Subject: Re: [PATCH v3] kconfig: only write '# CONFIG_FOO is not set' for
- visible symbols
+Date: Thu, 1 Mar 2018 00:04:18 +0900
+Message-ID: <CAK7LNATafNCOBMsNezrCT8j_N2kJiLt7S063wRtjGsaJTgxLvA@mail.gmail.com>
+Subject: Re: [PATCH] Documentation: Update ncurses package names for menuconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Arvind Prasanna <arvindprasanna@gmail.com>
+Cc: Kate Stewart <kstewart@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-02-23 20:49 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> === Background ===
+2018-02-28 15:59 GMT+09:00 Arvind Prasanna <arvindprasanna@gmail.com>:
+> The package name is ncurses-devel for Redhat based distros
+> and libncurses-devel for Debian based distros.
 >
->  - Visible n-valued bool/tristate symbols generate a
->    '# CONFIG_FOO is not set' line in the .config file. The idea is to
->    remember the user selection without having to set a Makefile
->    variable. Having n correspond to the variable being undefined in the
->    Makefiles makes for easy CONFIG_* tests.
->
->  - Invisible n-valued bool/tristate symbols normally do not generate a
->    '# CONFIG_FOO is not set' line, because user values from .config
->    files have no effect on invisible symbols anyway.
->
-> Currently, there is one exception to this rule: Any bool/tristate symbol
-> that gets the value n through a 'default' property generates a
-> '# CONFIG_FOO is not set' line, even if the symbol is invisible.
->
-> Note that this only applies to explicitly given defaults, and not when
-> the symbol implicitly defaults to n (like bool/tristate symbols without
-> 'default' properties do).
->
-> This is inconsistent, and seems redundant:
->
->   - As mentioned, the '# CONFIG_FOO is not set' won't affect the symbol
->     once the .config is read back in.
->
->   - Even if the symbol is invisible at first but becomes visible later,
->     there shouldn't be any harm in recalculating the default value
->     rather than viewing the '# CONFIG_FOO is not set' as a previous
->     user value of n.
->
-> === Changes ===
->
-> Change sym_calc_value() to only set SYMBOL_WRITE (write to .config) for
-> non-n-valued 'default' properties.
->
-> Note that SYMBOL_WRITE is always set for visible symbols regardless of whether
-> they have 'default' properties or not, so this change only affects invisible
-> symbols.
->
-> This reduces the size of the x86 .config on my system by about 1% (due
-> to removed '# CONFIG_FOO is not set' entries).
->
-> One side effect of (and the main motivation for) this change is making
-> the following two definitions behave exactly the same:
->
->         config FOO
->                 bool
->
->         config FOO
->                 bool
->                 default n
->
-> With this change, neither of these will generate a
-> '# CONFIG_FOO is not set' line (assuming FOO isn't selected/implied).
-> That might make it clearer to people that a bare 'default n' is
-> redundant.
->
-> This change only affects generated .config files and not autoconf.h:
-> autoconf.h only includes #defines for non-n bool/tristate symbols.
->
-> === Testing ===
->
-> The following testing was done with the x86 Kconfigs:
->
->  - .config files generated before and after the change were compared to
->    verify that the only difference is some '# CONFIG_FOO is not set'
->    entries disappearing. A couple of these were inspected manually, and
->    most turned out to be from redundant 'default n/def_bool n'
->    properties.
->
->  - The generated include/generated/autoconf.h was compared before and
->    after the change and verified to be identical.
->
->  - As a sanity check, the same modification was done to Kconfiglib.
->    The Kconfiglib test suite was then run to check for any mismatches
->    against the output of the C implementation.
->
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> Signed-off-by: Arvind Prasanna <arvindprasanna@gmail.com>
 > ---
-> Changes in v3:
-> Mention that SYMBOL_WRITE is always set for visible symbols. It might look like
-> this change would affect those too otherwise.
+>  scripts/kconfig/lxdialog/check-lxdialog.sh | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> Changes in v2:
-> Make it more explicit in the commit title and message that only invisible
-> symbols are affected by the change. The previous commit title was
-> "do not write 'n' defaults to .config".
+> diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
+> index a10bd9d..4353e40 100755
+> --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
+> +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+> @@ -55,7 +55,8 @@ EOF
+>             echo " *** required header files."                            1>&2
+>             echo " *** 'make menuconfig' requires the ncurses libraries." 1>&2
+>             echo " *** "                                                  1>&2
+> -           echo " *** Install ncurses (ncurses-devel) and try again."    1>&2
+> +           echo " *** Install ncurses (ncurses-devel or libncurses-dev   1>&2
+> +                  *** depending on your distribution) and try again."    1>&2
+>             echo " *** "                                                  1>&2
+>             exit 1
+>         fi
+> --
+> 2.7.4
 
 
-Applied to linux-kbuild/kconfig.
+'echo' is missing in the line you added.
+So, the error message will be displayed like follows:
+
+
+
+ *** Unable to find the ncurses libraries or the
+ *** required header files.
+ *** 'make menuconfig' requires the ncurses libraries.
+ ***
+ *** Install ncurses (ncurses-devel or libncurses-dev   1>&2
+           *** depending on your distribution) and try again.
+ ***
+
+
+
+
+I fixed it up locally, and applied to linux-kbuild/kconfig.
 Thanks!
 
 
->  scripts/kconfig/symbol.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index cca9663be5dd..02eb8b10a83c 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -403,9 +403,10 @@ void sym_calc_value(struct symbol *sym)
->                         if (!sym_is_choice(sym)) {
->                                 prop = sym_get_default_prop(sym);
->                                 if (prop) {
-> -                                       sym->flags |= SYMBOL_WRITE;
->                                         newval.tri = EXPR_AND(expr_calc_value(prop->expr),
->                                                               prop->visible.tri);
-> +                                       if (newval.tri != no)
-> +                                               sym->flags |= SYMBOL_WRITE;
->                                 }
->                                 if (sym->implied.tri != no) {
->                                         sym->flags |= SYMBOL_WRITE;
-> --
-> 2.14.1
->
+
+
+
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
 > the body of a message to majordomo@vger.kernel.org
