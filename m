@@ -1,13 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:57329 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:57349 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752138AbeB1KQA (ORCPT
+        with ESMTP id S1752150AbeB1KQA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 28 Feb 2018 05:16:00 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/2] kbuild: remove command line interface LDFLAGS_MODULE from makefiles.txt
-Date: Wed, 28 Feb 2018 19:14:23 +0900
-Message-Id: <1519812864-852-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 2/2] kbuild: remove internally used LDFLAGS_vmlinux from kbuild.txt
+Date: Wed, 28 Feb 2018 19:14:24 +0900
+Message-Id: <1519812864-852-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1519812864-852-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1519812864-852-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -17,47 +19,36 @@ Documentation/kbuild/makefiles.txt lists variables used in Makefile
 whereas Documentation/kbuild/kbuild.txt describes user assignable
 parameters given via environments or the command line.
 
-LDFLAGS_MODULE is a command line interface, so it should be dropped
-from makefiles.txt.
+The top Makefile and arch/*/Makefile accumulate proper linker flags to
+LDFLAGS_vmlinux.  So, users can not override it from the command line.
+Generally, per-file options are not supposed to be user-assignable.
+Remove the misleading entry from kbuild.txt.
 
-Some lines below in this file, it is clearly explained that
-KBUILD_LDFLAGS_MODULE is the right one for the internal use:
-
-    KBUILD_LDFLAGS_MODULE   Options for $(LD) when linking modules
-
-        $(KBUILD_LDFLAGS_MODULE) is used to add arch-specific options
-        used when linking modules. This is often a linker script.
-        From commandline LDFLAGS_MODULE shall be used (see kbuild.txt).
-
-Then, kbuild.txt explains LDFLAGS_MODULE, like follows:
-
-    LDFLAGS_MODULE
-    --------------------------------------------------
-    Additional options used for $(LD) when linking modules.
+If we need a way to append user-specific flags for linking the kernel,
+LDFLAGS_KERNEL would be a consistent choice because we already expose
+LDFLAGS_MODULE counter-part to users.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Documentation/kbuild/makefiles.txt | 6 ------
- 1 file changed, 6 deletions(-)
+ Documentation/kbuild/kbuild.txt | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 667cd899..048fc39 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -837,12 +837,6 @@ When kbuild executes, the following steps are followed (roughly):
- 	Note: ldflags-y can be used to further customise
- 	the flags used. See chapter 3.7.
+diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+index ac2363e..6c9c69e 100644
+--- a/Documentation/kbuild/kbuild.txt
++++ b/Documentation/kbuild/kbuild.txt
+@@ -50,10 +50,6 @@ LDFLAGS_MODULE
+ --------------------------------------------------
+ Additional options used for $(LD) when linking modules.
  
--    LDFLAGS_MODULE	Options for $(LD) when linking modules
+-LDFLAGS_vmlinux
+---------------------------------------------------
+-Additional options passed to final link of vmlinux.
 -
--	LDFLAGS_MODULE is used to set specific flags for $(LD) when
--	linking the .ko files used for modules.
--	Default is "-r", for relocatable output.
--
-     LDFLAGS_vmlinux	Options for $(LD) when linking vmlinux
- 
- 	LDFLAGS_vmlinux is used to specify additional flags to pass to
+ KBUILD_VERBOSE
+ --------------------------------------------------
+ Set the kbuild verbosity. Can be assigned same values as "V=...".
 -- 
 2.7.4
 
