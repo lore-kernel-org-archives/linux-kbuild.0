@@ -1,45 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45468 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751568AbeB0Vln (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Feb 2018 16:41:43 -0500
-Date: Tue, 27 Feb 2018 15:41:42 -0600
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH v2 3/3] objtool: use global host flags for compilation
-Message-ID: <20180227214142.4nrt22uita5qrm35@treble>
-References: <cover.1519393674.git.robin.jarry@6wind.com>
- <cover.1519668832.git.robin.jarry@6wind.com>
- <2fa138b613417581eca23afd8741aaf75fbf966a.1519668832.git.robin.jarry@6wind.com>
- <20180227174932.e4pbucnwhducv7xr@treble>
- <20180227205523.cvzium5loc4km4qh@6wind.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180227205523.cvzium5loc4km4qh@6wind.com>
+Received: from conuserg-09.nifty.com ([210.131.2.76]:24306 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751706AbeB1AQr (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 27 Feb 2018 19:16:47 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v2 3/6] kconfig: remove redundant input_mode test for check_conf() loop
+Date: Wed, 28 Feb 2018 09:15:23 +0900
+Message-Id: <1519776926-30459-4-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robin Jarry <robin.jarry@6wind.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Marc Herbert <marc.herbert@intel.com>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Tue, Feb 27, 2018 at 09:55:23PM +0100, Robin Jarry wrote:
-> 2018-02-27, Josh Poimboeuf:
-> > On Mon, Feb 26, 2018 at 07:41:48PM +0100, Robin Jarry wrote:
-> [snip]
-> > >  ifdef CONFIG_STACK_VALIDATION
-> > >    has_libelf := $(call try-run,\
-> > > -		echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -,1,0)
-> > > +	echo "int main() {}" | $(HOSTCC) $(HOSTLDFLAGS) -xc -o /dev/null -lelf -,1,0)
-> > 
-> > This should probably also have HOSTCFLAGS, since the objtool makefile
-> > uses it as well.
-> 
-> I had intentionally omitted HOSTCFLAGS since the compiled code does not
-> contain any #include statements (only -lelf). But adding them cannot
-> hurt.
+check_conf() never increments conf_cnt for listnewconfig, so conf_cnt
+is always zero.
 
-Ah, right.  The point of this check is to see if it can find libelf, so
-I guess using HOSTCFLAGS wouldn't have a point here.  So it's fine the
-way it is.
+In other words, conf_cnt is not zero, "input_mode != listnewconfig"
+is met.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+---
+
+Changes in v2: None
+
+ scripts/kconfig/conf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 1faa55f..59656d3 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -669,7 +669,7 @@ int main(int ac, char **av)
+ 		do {
+ 			conf_cnt = 0;
+ 			check_conf(&rootmenu);
+-		} while (conf_cnt && input_mode != listnewconfig);
++		} while (conf_cnt);
+ 		break;
+ 	case olddefconfig:
+ 	default:
 -- 
-Josh
+2.7.4
+
