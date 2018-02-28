@@ -1,31 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:38132 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750835AbeB1FPk (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:44446 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751027AbeB1Flt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Feb 2018 00:15:40 -0500
-Date: Wed, 28 Feb 2018 06:15:25 +0100
+        Wed, 28 Feb 2018 00:41:49 -0500
+Date: Wed, 28 Feb 2018 06:41:34 +0100
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Subject: Re: [PATCH v2 5/6] kconfig: invoke oldconfig instead of
- silentoldconfig from local*config
-Message-ID: <20180228051525.a2vouqs6djnd2cnf@huvuddator>
+Subject: Re: [PATCH v2 6/6] kconfig: rename silentoldconfig to syncconfig
+Message-ID: <20180228054134.uqqztixborcd3h3d@huvuddator>
 References: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
- <1519776926-30459-6-git-send-email-yamada.masahiro@socionext.com>
+ <1519776926-30459-7-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1519776926-30459-6-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1519776926-30459-7-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Marc Herbert <marc.herbert@intel.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Marc Herbert <marc.herbert@intel.com>, Sam Ravnborg <sam@ravnborg.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
 
-On Wed, Feb 28, 2018 at 09:15:25AM +0900, Masahiro Yamada wrote:
-> The purpose of local{yes,mod}config is to arrange the .config file
-> based on actually loaded modules.  It is unnecessary to update
-> include/generated/autoconf.h and include/config/* stuff here.
-> 
-> They will be automatically updated during the build.
+On Wed, Feb 28, 2018 at 09:15:26AM +0900, Masahiro Yamada wrote:
+> As commit cedd55d49dee ("kconfig: Remove silentoldconfig from help
+> and docs; fix kconfig/conf's help") mentioned, 'silentoldconfig' is a
+> historical misnomer.  That commit removed it from help and docs since
+> it is an internal interface.  If so, it should be allowed to rename
+> it to something more intuitive.  'syncconfig' is the one I came up
+> with because it updates the .config if necessary, then synchronize
+> other files with it.
 > 
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
@@ -33,45 +34,163 @@ On Wed, Feb 28, 2018 at 09:15:25AM +0900, Masahiro Yamada wrote:
 > Changes in v2:
 >   - newly added
 > 
->  scripts/kconfig/Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  Documentation/kbuild/kconfig.txt |  2 +-
+>  Makefile                         |  2 +-
+>  scripts/kconfig/Makefile         |  4 ++--
+>  scripts/kconfig/conf.c           | 20 ++++++++++----------
+>  4 files changed, 14 insertions(+), 14 deletions(-)
 > 
+> diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
+> index bbc99c0..7233118 100644
+> --- a/Documentation/kbuild/kconfig.txt
+> +++ b/Documentation/kbuild/kconfig.txt
+> @@ -119,7 +119,7 @@ Examples:
+>  		15% of tristates will be set to 'y', 15% to 'm', 70% to 'n'
+>  
+>  ______________________________________________________________________
+> -Environment variables for 'silentoldconfig'
+> +Environment variables for 'syncconfig'
+>  
+>  KCONFIG_NOSILENTUPDATE
+>  --------------------------------------------------
+> diff --git a/Makefile b/Makefile
+> index 8706bf2..ea23d9b 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -598,7 +598,7 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
+>  # include/generated/ and include/config/. Update them if .config is newer than
+>  # include/config/auto.conf (which mirrors .config).
+>  include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
+> -	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
+> +	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
+>  else
+>  # external modules needs include/generated/autoconf.h and include/config/auto.conf
+>  # but do not care if they are up-to-date. Use auto.conf to trigger the test
 > diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index c5d1d1a..bf9289a 100644
+> index bf9289a..988258a 100644
 > --- a/scripts/kconfig/Makefile
 > +++ b/scripts/kconfig/Makefile
-> @@ -49,11 +49,11 @@ localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
-
-(Unrelated: $(obj)/streamline_config.pl is a checked-in file, so I
-wonder if there's any point to having it as a prerequisite of the phony
-targets local{yes,mod}config.)
-
->  			cmp -s .tmp.config .config ||			\
->  			(mv -f .config .config.old.1;			\
->  			 mv -f .tmp.config .config;			\
-> -			 $(obj)/conf $(silent) --silentoldconfig $(Kconfig); \
-> +			 $(obj)/conf $(silent) --oldconfig $(Kconfig); \
-
-Maybe add extra space to keep \ aligned.
-
->  			 mv -f .config.old.1 .config.old)		\
->  	else								\
->  			mv -f .tmp.config .config;			\
-> -			$(obj)/conf $(silent) --silentoldconfig $(Kconfig); \
-> +			$(obj)/conf $(silent) --oldconfig $(Kconfig); \
-
-Ditto here.
-
->  	fi
->  	$(Q)rm -f .tmp.config
+> @@ -3,7 +3,7 @@
+>  # Kernel configuration targets
+>  # These targets are used from top-level makefile
 >  
+> -PHONY += xconfig gconfig menuconfig config silentoldconfig update-po-config \
+> +PHONY += xconfig gconfig menuconfig config syncconfig update-po-config \
+>  	localmodconfig localyesconfig
+>  
+>  ifdef KBUILD_KCONFIG
+> @@ -36,7 +36,7 @@ nconfig: $(obj)/nconf
+>  
+>  # This has become an internal implementation detail and is now deprecated
+>  # for external use.
+> -silentoldconfig: $(obj)/conf
+> +syncconfig: $(obj)/conf
+>  	$(Q)mkdir -p include/config include/generated
+>  	$(Q)test -e include/generated/autoksyms.h || \
+>  	    touch   include/generated/autoksyms.h
+> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> index 11a4e45..4e08121 100644
+> --- a/scripts/kconfig/conf.c
+> +++ b/scripts/kconfig/conf.c
+> @@ -23,7 +23,7 @@ static void check_conf(struct menu *menu);
+>  
+>  enum input_mode {
+>  	oldaskconfig,
+> -	silentoldconfig,
+> +	syncconfig,
+>  	oldconfig,
+>  	allnoconfig,
+>  	allyesconfig,
+> @@ -100,7 +100,7 @@ static int conf_askvalue(struct symbol *sym, const char *def)
+>  
+>  	switch (input_mode) {
+>  	case oldconfig:
+> -	case silentoldconfig:
+> +	case syncconfig:
+>  		if (sym_has_value(sym)) {
+>  			printf("%s\n", def);
+>  			return 0;
+> @@ -293,7 +293,7 @@ static int conf_choice(struct menu *menu)
+>  		printf("[1-%d?]: ", cnt);
+>  		switch (input_mode) {
+>  		case oldconfig:
+> -		case silentoldconfig:
+> +		case syncconfig:
+>  			if (!is_new) {
+>  				cnt = def;
+>  				printf("%d\n", cnt);
+> @@ -441,7 +441,7 @@ static void check_conf(struct menu *menu)
+>  static struct option long_opts[] = {
+>  	{"oldaskconfig",    no_argument,       NULL, oldaskconfig},
+>  	{"oldconfig",       no_argument,       NULL, oldconfig},
+> -	{"silentoldconfig", no_argument,       NULL, silentoldconfig},
+> +	{"syncconfig",      no_argument,       NULL, syncconfig},
+>  	{"defconfig",       optional_argument, NULL, defconfig},
+>  	{"savedefconfig",   required_argument, NULL, savedefconfig},
+>  	{"allnoconfig",     no_argument,       NULL, allnoconfig},
+> @@ -468,8 +468,8 @@ static void conf_usage(const char *progname)
+>  	printf("  --listnewconfig         List new options\n");
+>  	printf("  --oldaskconfig          Start a new configuration using a line-oriented program\n");
+>  	printf("  --oldconfig             Update a configuration using a provided .config as base\n");
+> -	printf("  --silentoldconfig       Similar to oldconfig but generates configuration in\n"
+> -	       "                          include/{generated/,config/} (oldconfig used to be more verbose)\n");
+> +	printf("  --syncconfig            Similar to oldconfig but generates configuration in\n"
+> +	       "                          include/{generated/,config/}\n");
+>  	printf("  --olddefconfig          Same as oldconfig but sets new symbols to their default value\n");
+>  	printf("  --oldnoconfig           An alias of olddefconfig\n");
+>  	printf("  --defconfig <file>      New config with default defined in <file>\n");
+> @@ -501,7 +501,7 @@ int main(int ac, char **av)
+>  		}
+>  		input_mode = (enum input_mode)opt;
+>  		switch (opt) {
+> -		case silentoldconfig:
+> +		case syncconfig:
+>  			sync_kconfig = 1;
+>  			break;
+>  		case defconfig:
+> @@ -583,7 +583,7 @@ int main(int ac, char **av)
+>  		}
+>  		break;
+>  	case savedefconfig:
+> -	case silentoldconfig:
+> +	case syncconfig:
+>  	case oldaskconfig:
+>  	case oldconfig:
+>  	case listnewconfig:
+> @@ -667,7 +667,7 @@ int main(int ac, char **av)
+>  		/* fall through */
+>  	case oldconfig:
+>  	case listnewconfig:
+> -	case silentoldconfig:
+> +	case syncconfig:
+>  		/* Update until a loop caused no more changes */
+>  		do {
+>  			conf_cnt = 0;
+> @@ -680,7 +680,7 @@ int main(int ac, char **av)
+>  	}
+>  
+>  	if (sync_kconfig) {
+> -		/* silentoldconfig is used during the build so we shall update autoconf.
+> +		/* syncconfig is used during the build so we shall update autoconf.
+>  		 * All other commands are only used to generate a config.
+>  		 */
+>  		if (conf_get_changed() && conf_write(NULL)) {
 > -- 
 > 2.7.4
 > 
 
-I'm not an expert on the Makefiles, but seems reasonable to me.
+I wonder if it might be helpful to keep the silentoldconfig target for a
+while and have it just fail with a message like the following:
 
-Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+	silentoldconfig has been renamed to syncconfig and is now an
+	internal implementation detail.	What you probably want is
+	oldconfig.
+
+Going on Google and https://lkml.org/lkml/2018/2/12/1084, there might be
+quite a lot of scripts and the like that call silentoldconfig.
+
+Alternatively, it could call through to syncconfig and also generate a
+warning that it's about to removed (like for olddefconfig).
 
 Cheers,
 Ulf
