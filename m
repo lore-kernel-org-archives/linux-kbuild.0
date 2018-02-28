@@ -1,45 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f193.google.com ([209.85.220.193]:45778 "EHLO
-        mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934720AbeB1QO4 (ORCPT
+Received: from mail-wr0-f173.google.com ([209.85.128.173]:46903 "EHLO
+        mail-wr0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752679AbeB1RYg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Feb 2018 11:14:56 -0500
-From: Arvind Prasanna <arvindprasanna@gmail.com>
-Subject: [PATCH v2] Documentation: Update ncurses package names for menuconfig
-Date: Wed, 28 Feb 2018 11:14:40 -0500
-Message-Id: <1519834482-1756-1-git-send-email-arvindprasanna@gmail.com>
-In-Reply-To: <CAK7LNATafNCOBMsNezrCT8j_N2kJiLt7S063wRtjGsaJTgxLvA@mail.gmail.com>
-References: <CAK7LNATafNCOBMsNezrCT8j_N2kJiLt7S063wRtjGsaJTgxLvA@mail.gmail.com>
+        Wed, 28 Feb 2018 12:24:36 -0500
+Received: by mail-wr0-f173.google.com with SMTP id m12so3240144wrm.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Feb 2018 09:24:35 -0800 (PST)
+Date: Wed, 28 Feb 2018 18:24:20 +0100
+From: Robin Jarry <robin.jarry@6wind.com>
+Subject: Re: [PATCH v2 0/3] kbuild: fix host progs build with libs in non
+ standard locations
+Message-ID: <20180228172420.usinpmathg4gvvav@6wind.com>
+References: <cover.1519393674.git.robin.jarry@6wind.com>
+ <cover.1519668832.git.robin.jarry@6wind.com>
+ <20180227174518.qzw6eqmuyggcvjl6@treble>
+ <CAK7LNAQLDRefb34KzF=3UUBdRLsDXtaZhRVQjRE2ZMaqNEb4LA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAQLDRefb34KzF=3UUBdRLsDXtaZhRVQjRE2ZMaqNEb4LA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: yamada.masahiro@socionext.com, Arvind Prasanna <arvindprasanna@gmail.com>, Kate Stewart <kstewart@linuxfoundation.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-The package name is ncurses-devel for Redhat based distros
-and libncurses-devel for Debian based distros.
+2018-02-28, Masahiro Yamada:
+[snip]
+> So, my idea is to rename existing
+> 
+>  HOSTCFLAGS     ->  KBUILD_HOSTCFLAGS
+>  HOSTCXXFLAGS   ->  KBUILD_HOSTCXXFLAGS
+>  HOSTLDFLAGS    ->  KBUILD_HOSTLDFLAGS
+>  HOST_LOADLIBES ->  KBUILD_HOSTLDLIBS
+> 
+> 
+> ("LOADLIBES" is too long, so rename it to "LDLIBS")
+> 
+> 
+> Then, re-add no-prefix ones as user interface.
 
-Signed-off-by: Arvind Prasanna <arvindprasanna@gmail.com>
----
+Hi Masahiro,
 
-Changes in v2:
-- Add a missing echo as pointed out by one of the reviewers.
+Ok, I'll add the rename patch in a v3 of my series.
 
- scripts/kconfig/lxdialog/check-lxdialog.sh | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-index a10bd9d..6c0bcd9 100755
---- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-+++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-@@ -55,7 +55,8 @@ EOF
- 	    echo " *** required header files."                            1>&2
- 	    echo " *** 'make menuconfig' requires the ncurses libraries." 1>&2
- 	    echo " *** "                                                  1>&2
--	    echo " *** Install ncurses (ncurses-devel) and try again."    1>&2
-+	    echo " *** Install ncurses (ncurses-devel or libncurses-dev " 1>&2
-+	    echo " *** depending on your distribution) and try again."    1>&2
- 	    echo " *** "                                                  1>&2
- 	    exit 1
- 	fi
 -- 
-2.7.4
-
+Robin
