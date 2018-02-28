@@ -1,79 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:35480 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933361AbeB1TSR (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:51923 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933349AbeB1TSQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Feb 2018 14:18:17 -0500
-Received: by mail-wm0-f66.google.com with SMTP id x7so7168241wmc.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Feb 2018 11:18:17 -0800 (PST)
+        Wed, 28 Feb 2018 14:18:16 -0500
+Received: by mail-wm0-f67.google.com with SMTP id h21so7146771wmd.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Feb 2018 11:18:15 -0800 (PST)
 From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: [PATCH 3/3] fixdep: do not ignore kconfig.h
-Date: Wed, 28 Feb 2018 20:17:37 +0100
-Message-Id: <20180228191805.20094-3-linux@rasmusvillemoes.dk>
+Subject: [PATCH 2/3] fixdep: remove some false CONFIG_ matches
+Date: Wed, 28 Feb 2018 20:17:36 +0100
+Message-Id: <20180228191805.20094-2-linux@rasmusvillemoes.dk>
 In-Reply-To: <20180228191805.20094-1-linux@rasmusvillemoes.dk>
 References: <CA+55aFz_ww8ohU68Jz34pg_x7gpGpJ+FC-dmS_Rm_VvY01GGpg@mail.gmail.com>
  <20180228191805.20094-1-linux@rasmusvillemoes.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-kconfig.h was excluded from consideration by fixdep by
-6a5be57f0f00 (fixdep: fix extraneous dependencies) to avoid some false
-positive hits
+The string CONFIG_ quite often appears after other alphanumerics,
+meaning that that instance cannot be referencing a Kconfig
+symbol. Omitting these means make has fewer files to stat() when
+deciding what needs to be rebuilt - for a defconfig build, this seems to
+remove about 2% of the (wildcard ...) lines from the .o.cmd files.
 
-(1) include/config/.h
-(2) include/config/h.h
-(3) include/config/foo.h
-
-(1) occurred because kconfig.h contains the string CONFIG_ in a
-comment. However, since dee81e988674 (fixdep: faster CONFIG_ search), we
-have a check that the part after CONFIG_ is non-empty, so this does not
-happen anymore (and CONFIG_ appears by itself elsewhere, so that check
-is worthwhile).
-
-(2) comes from the include guard, __LINUX_KCONFIG_H. But with the
-previous patch, we no longer match that either.
-
-That leaves (3), which amounts to one [1] false dependency (aka stat() call
-done by make), which I think we can live with:
-
-We've already had one case [2] where the lack of include/linux/kconfig.h in
-the .o.cmd file caused a missing rebuild, and while I originally thought
-we should just put kconfig.h in the dependency list without parsing it
-for the CONFIG_ pattern, we actually do have some real CONFIG_ symbols
-mentioned in it, and one can imagine some translation unit that just
-does '#ifdef __BIG_ENDIAN' but doesn't through some other header
-actually depend on CONFIG_CPU_BIG_ENDIAN - so changing the target
-endianness could end up rebuilding the world, minus that small
-TU. Quoting Linus,
-
-  ... when missing dependencies cause a missed re-compile, the resulting
-  bugs can be _really_ subtle.
-
-[1] well, two, we now also have CONFIG_BOOGER/booger.h - we could change
-that to FOO if we care
-
-[2] https://lkml.org/lkml/2018/2/22/838
-
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
 Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
 ---
- scripts/basic/fixdep.c | 1 -
- 1 file changed, 1 deletion(-)
+ scripts/basic/fixdep.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 1b21870d6e7f..449b68c4c90c 100644
+index d7fbe545dd5d..1b21870d6e7f 100644
 --- a/scripts/basic/fixdep.c
 +++ b/scripts/basic/fixdep.c
-@@ -283,7 +283,6 @@ static int is_ignored_file(const char *s, int len)
+@@ -225,8 +225,13 @@ static int str_ends_with(const char *s, int slen, const char *sub)
+ static void parse_config_file(const char *p)
  {
- 	return str_ends_with(s, len, "include/generated/autoconf.h") ||
- 	       str_ends_with(s, len, "include/generated/autoksyms.h") ||
--	       str_ends_with(s, len, "include/linux/kconfig.h") ||
- 	       str_ends_with(s, len, ".ver");
- }
+ 	const char *q, *r;
++	const char *start = p;
  
+ 	while ((p = strstr(p, "CONFIG_"))) {
++		if (p > start && (isalnum(p[-1]) || p[-1] == '_')) {
++			p += 7;
++			continue;
++		}
+ 		p += 7;
+ 		q = p;
+ 		while (*q && (isalnum(*q) || *q == '_'))
 -- 
 2.15.1
 
