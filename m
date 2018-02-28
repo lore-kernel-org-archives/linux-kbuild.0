@@ -1,39 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f193.google.com ([209.85.220.193]:38596 "EHLO
-        mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751631AbeB1HA6 (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:57329 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752138AbeB1KQA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Feb 2018 02:00:58 -0500
-From: Arvind Prasanna <arvindprasanna@gmail.com>
-Subject: [PATCH] Documentation: Update ncurses package names for menuconfig
-Date: Wed, 28 Feb 2018 01:59:50 -0500
-Message-Id: <1519801192-31201-1-git-send-email-arvindprasanna@gmail.com>
+        Wed, 28 Feb 2018 05:16:00 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/2] kbuild: remove command line interface LDFLAGS_MODULE from makefiles.txt
+Date: Wed, 28 Feb 2018 19:14:23 +0900
+Message-Id: <1519812864-852-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: Arvind Prasanna <arvindprasanna@gmail.com>, Kate Stewart <kstewart@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Randy Dunlap <rdunlap@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Robin Jarry <robin.jarry@6wind.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
 
-The package name is ncurses-devel for Redhat based distros
-and libncurses-devel for Debian based distros.
+Documentation/kbuild/makefiles.txt lists variables used in Makefile
+whereas Documentation/kbuild/kbuild.txt describes user assignable
+parameters given via environments or the command line.
 
-Signed-off-by: Arvind Prasanna <arvindprasanna@gmail.com>
+LDFLAGS_MODULE is a command line interface, so it should be dropped
+from makefiles.txt.
+
+Some lines below in this file, it is clearly explained that
+KBUILD_LDFLAGS_MODULE is the right one for the internal use:
+
+    KBUILD_LDFLAGS_MODULE   Options for $(LD) when linking modules
+
+        $(KBUILD_LDFLAGS_MODULE) is used to add arch-specific options
+        used when linking modules. This is often a linker script.
+        From commandline LDFLAGS_MODULE shall be used (see kbuild.txt).
+
+Then, kbuild.txt explains LDFLAGS_MODULE, like follows:
+
+    LDFLAGS_MODULE
+    --------------------------------------------------
+    Additional options used for $(LD) when linking modules.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
- scripts/kconfig/lxdialog/check-lxdialog.sh | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-index a10bd9d..4353e40 100755
---- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-+++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-@@ -55,7 +55,8 @@ EOF
- 	    echo " *** required header files."                            1>&2
- 	    echo " *** 'make menuconfig' requires the ncurses libraries." 1>&2
- 	    echo " *** "                                                  1>&2
--	    echo " *** Install ncurses (ncurses-devel) and try again."    1>&2
-+	    echo " *** Install ncurses (ncurses-devel or libncurses-dev   1>&2
-+	           *** depending on your distribution) and try again."    1>&2
- 	    echo " *** "                                                  1>&2
- 	    exit 1
- 	fi
+ Documentation/kbuild/makefiles.txt | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 667cd899..048fc39 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -837,12 +837,6 @@ When kbuild executes, the following steps are followed (roughly):
+ 	Note: ldflags-y can be used to further customise
+ 	the flags used. See chapter 3.7.
+ 
+-    LDFLAGS_MODULE	Options for $(LD) when linking modules
+-
+-	LDFLAGS_MODULE is used to set specific flags for $(LD) when
+-	linking the .ko files used for modules.
+-	Default is "-r", for relocatable output.
+-
+     LDFLAGS_vmlinux	Options for $(LD) when linking vmlinux
+ 
+ 	LDFLAGS_vmlinux is used to specify additional flags to pass to
 -- 
 2.7.4
 
