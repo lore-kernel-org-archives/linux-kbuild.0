@@ -1,61 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:21060 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934962AbeCAHpE (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:36610 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965096AbeCAI50 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Mar 2018 02:45:04 -0500
+        Thu, 1 Mar 2018 03:57:26 -0500
+Date: Thu, 1 Mar 2018 10:57:21 +0200
+From: Dafna Hirschfeld <dafna3@gmail.com>
+Subject: [PATCH] Coccinelle: memdup: Fix typo in warning messages
+Message-ID: <20180301085717.GA4508@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180228051525.a2vouqs6djnd2cnf@huvuddator>
-References: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
- <1519776926-30459-6-git-send-email-yamada.masahiro@socionext.com> <20180228051525.a2vouqs6djnd2cnf@huvuddator>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 1 Mar 2018 16:44:17 +0900
-Message-ID: <CAK7LNATWRmYf7nfGcFiGe2DF2PSkE9mrS51GytzWEz5DYToN0w@mail.gmail.com>
-Subject: Re: [PATCH v2 5/6] kconfig: invoke oldconfig instead of
- silentoldconfig from local*config
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Herbert <marc.herbert@intel.com>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Julia.Lawall@lip6.fr, Gilles.Muller@lip6.fr, nicolas.palix@imag.fr, michal.lkml@markovi.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: outreachy-kernel@googlegroups.com
 
-2018-02-28 14:15 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> On Wed, Feb 28, 2018 at 09:15:25AM +0900, Masahiro Yamada wrote:
->> The purpose of local{yes,mod}config is to arrange the .config file
->> based on actually loaded modules.  It is unnecessary to update
->> include/generated/autoconf.h and include/config/* stuff here.
->>
->> They will be automatically updated during the build.
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->>
->> Changes in v2:
->>   - newly added
->>
->>  scripts/kconfig/Makefile | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
->> index c5d1d1a..bf9289a 100644
->> --- a/scripts/kconfig/Makefile
->> +++ b/scripts/kconfig/Makefile
->> @@ -49,11 +49,11 @@ localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
->
-> (Unrelated: $(obj)/streamline_config.pl is a checked-in file, so I
-> wonder if there's any point to having it as a prerequisite of the phony
-> targets local{yes,mod}config.)
->
+Replace 'kmemdep' with 'kmemdup' in warning messages.
 
-Indeed.
+Signed-off-by: Dafna Hirschfeld <dafna3@gmail.com>
+Acked-by: Julia Lawall <julia.lawall@lip6.fr>
+---
+ scripts/coccinelle/api/memdup.cocci | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-It it unrelated, but I think it is worth fixing.
-
-Care to send a patch, please?
-
-
-
-
+diff --git a/scripts/coccinelle/api/memdup.cocci b/scripts/coccinelle/api/memdup.cocci
+index 1249b72..8fd6437 100644
+--- a/scripts/coccinelle/api/memdup.cocci
++++ b/scripts/coccinelle/api/memdup.cocci
+@@ -56,10 +56,10 @@ statement S;
+ p << r.p;
+ @@
+ 
+-coccilib.org.print_todo(p[0], "WARNING opportunity for kmemdep")
++coccilib.org.print_todo(p[0], "WARNING opportunity for kmemdup")
+ 
+ @script:python depends on report@
+ p << r.p;
+ @@
+ 
+-coccilib.report.print_report(p[0], "WARNING opportunity for kmemdep")
++coccilib.report.print_report(p[0], "WARNING opportunity for kmemdup")
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
