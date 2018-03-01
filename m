@@ -1,42 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:20056 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965144AbeCAARO (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:25515 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966373AbeCAGgS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Feb 2018 19:17:14 -0500
-MIME-Version: 1.0
-In-Reply-To: <a83b79e2-3db1-efb4-9122-46708b36b58a@infradead.org>
-References: <CAK-=9LoRtOjN9_jCxtHf_fLeh3NpW6KOgYNuD09PKbDkCaCajg@mail.gmail.com>
- <1519853553-10626-1-git-send-email-arvindprasanna@gmail.com> <a83b79e2-3db1-efb4-9122-46708b36b58a@infradead.org>
+        Thu, 1 Mar 2018 01:36:18 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 1 Mar 2018 09:16:29 +0900
-Message-ID: <CAK7LNAQuoc1fc4mLzrixUjsrbtZceZ7aY_4SHNFeGxAan1JaGQ@mail.gmail.com>
-Subject: Re: [PATCH v3] Documentation: Update ncurses package names for menuconfig
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v3 1/2] kconfig: invoke oldconfig instead of silentoldconfig from local*config
+Date: Thu,  1 Mar 2018 15:34:36 +0900
+Message-Id: <1519886077-31914-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Arvind Prasanna <arvindprasanna@gmail.com>, Philippe Ombredanne <pombredanne@nexb.com>, Thomas Gleixner <tglx@linutronix.de>, Kate Stewart <kstewart@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Marc Herbert <marc.herbert@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-2018-03-01 6:47 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> On 02/28/2018 01:32 PM, Arvind Prasanna wrote:
->> The package name is ncurses-devel for Redhat based distros
->> and libncurses-dev for Debian based distros.
->>
->> Signed-off-by: Arvind Prasanna <arvindprasanna@gmail.com>
->
-> Thanks. Looks good to me.
->
-> Acked-by: Randy Dunlap <rdunlap@infradead.org>
->
+The purpose of local{yes,mod}config is to arrange the .config file
+based on actually loaded modules.  It is unnecessary to update
+include/generated/autoconf.h and include/config/* stuff here.
+They will be updated as needed during the build.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+---
 
-Randy, thanks!  Eagle eyes!
+Changes in v3:
+  - Fix alignment of back-slashes
 
-I will replace it with v3.
+Changes in v2:
+  - newly added
 
+ scripts/kconfig/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index cb3ec53..41e2a9f 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -49,11 +49,11 @@ localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+ 			cmp -s .tmp.config .config ||			\
+ 			(mv -f .config .config.old.1;			\
+ 			 mv -f .tmp.config .config;			\
+-			 $(obj)/conf $(silent) --silentoldconfig $(Kconfig); \
++			 $(obj)/conf $(silent) --oldconfig $(Kconfig);	\
+ 			 mv -f .config.old.1 .config.old)		\
+ 	else								\
+ 			mv -f .tmp.config .config;			\
+-			$(obj)/conf $(silent) --silentoldconfig $(Kconfig); \
++			$(obj)/conf $(silent) --oldconfig $(Kconfig);	\
+ 	fi
+ 	$(Q)rm -f .tmp.config
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
