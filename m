@@ -1,112 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:42741 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1031893AbeCAPXf (ORCPT
+Received: from mail-ua0-f195.google.com ([209.85.217.195]:35424 "EHLO
+        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1032742AbeCARLs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Mar 2018 10:23:35 -0500
+        Thu, 1 Mar 2018 12:11:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATrMVvjurGBLvCHH_5Vio_Xm83h8yaiLQPU0VUUvQLCuQ@mail.gmail.com>
-References: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
- <1519776926-30459-6-git-send-email-yamada.masahiro@socionext.com>
- <20180228051525.a2vouqs6djnd2cnf@huvuddator> <CAK7LNATWRmYf7nfGcFiGe2DF2PSkE9mrS51GytzWEz5DYToN0w@mail.gmail.com>
- <20180301111801.gdhoam4kqrbqnasv@huvuddator> <CAK7LNATrMVvjurGBLvCHH_5Vio_Xm83h8yaiLQPU0VUUvQLCuQ@mail.gmail.com>
+In-Reply-To: <CAK7LNARjgqCbTO7x_8kzzfCdU6HWNyFLNZzwfU2hYRZmWHT_kw@mail.gmail.com>
+References: <1518806331-7101-1-git-send-email-yamada.masahiro@socionext.com>
+ <1518806331-7101-5-git-send-email-yamada.masahiro@socionext.com> <CAK7LNARjgqCbTO7x_8kzzfCdU6HWNyFLNZzwfU2hYRZmWHT_kw@mail.gmail.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 1 Mar 2018 16:23:33 +0100
-Message-ID: <CAFkk2KS=Z2qHgh5X_W9uTPPG1qHop_m7ZoHYQy5Ss9PpBTJd6Q@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: remove redundant streamline_config.pl prerequisite
+Date: Thu, 1 Mar 2018 18:11:47 +0100
+Message-ID: <CAFkk2KQaOF3UijN5164G9wyJnym6QHoGSPKMtB8jsS9FRtRdAQ@mail.gmail.com>
+Subject: Re: [PATCH 04/23] kconfig: set SYMBOL_AUTO to the symbol marked with defconfig_list
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Herbert <marc.herbert@intel.com>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On Thu, Mar 1, 2018 at 3:39 PM, Masahiro Yamada
+On Thu, Mar 1, 2018 at 4:05 PM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> 2018-03-01 20:18 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->> The local{yes,mod}config targets currently have streamline_config.pl as
->> a prerequisite. This is redundant, because streamline_config.pl is a
->> checked-in file with no prerequisites.
+> 2018-02-17 3:38 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+>> The 'defconfig_list' is a weird attribute.  If the '.config' is
+>> missing, conf_read_simple() iterates over all visible defaults,
+>> then it uses the first one for which fopen() succeeds.
 >>
->> Remove the prerequisite and reference streamline_config.pl directly in
->> the recipe of the rule instead.
+>> config DEFCONFIG_LIST
+>>         string
+>>         depends on !UML
+>>         option defconfig_list
+>>         default "/lib/modules/$UNAME_RELEASE/.config"
+>>         default "/etc/kernel-config"
+>>         default "/boot/config-$UNAME_RELEASE"
+>>         default "$ARCH_DEFCONFIG"
+>>         default "arch/$ARCH/defconfig"
 >>
->> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>> However, like other symbols, the first visible default is always
+>> written out to the .config file.  This might be different from what
+>> has been actually used.
+>>
+>> For example, on my machine, the third one "/boot/config-$UNAME_RELEASE"
+>> is opened, like follows:
+>>
+>>   $ rm .config
+>>   $ make oldconfig 2>/dev/null
+>>   scripts/kconfig/conf  --oldconfig Kconfig
+>>   #
+>>   # using defaults found in /boot/config-4.4.0-112-generic
+>>   #
+>>   *
+>>   * Restart config...
+>>   *
+>>   *
+>>   * IRQ subsystem
+>>   *
+>>   Expose irq internals in debugfs (GENERIC_IRQ_DEBUGFS) [N/y/?] (NEW)
+>>
+>> However, the resulted .config file contains the first one since it is
+>> visible:
+>>
+>>   $ grep CONFIG_DEFCONFIG_LIST .config
+>>   CONFIG_DEFCONFIG_LIST="/lib/modules/$UNAME_RELEASE/.config"
+>>
+>> In order to stop confusing people, prevent this CONFIG option from
+>> being written to the .config file.
+>>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 >> ---
->>  scripts/kconfig/Makefile | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>
+> This one is almost trivial, so I will pick it up now.
+>
+> Ulf, do you have any comment about this one?
+>
+>
+>
+>
+>> I'd like to fix the root case of this weirdness later.
+>> (and other 'option' attributes as well)
 >>
->> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
->> index 1f74336d4e23..58be52cb464d 100644
->
->
-> Thanks! Almost good.
->
-> Just small nits.
->
->
->> --- a/scripts/kconfig/Makefile
->> +++ b/scripts/kconfig/Makefile
->> @@ -77,9 +77,9 @@ silentoldconfig: $(obj)/conf
->>             touch   include/generated/autoksyms.h
->>         $< $(silent) --$@ $(Kconfig)
+>> But, this series is focusing a more important work in a bigger picture.
 >>
->> -localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
->> +localyesconfig localmodconfig: $(obj)/conf
->>         $(Q)mkdir -p include/config include/generated
->> -       $(Q)perl $< --$@ $(srctree) $(Kconfig) > .tmp.config
->> +       $(Q)perl $(obj)/streamline_config.pl --$@ $(srctree) $(Kconfig) > .tmp.config
->
->
->
-> '$(src)/streamline_config.pl' is better than '$(obj)/streamline_config.pl'
-> since it is a checked-in file.
->
-> '$(src)' and '$(obj)' are always the same.
-> (https://github.com/torvalds/linux/blob/master/scripts/Makefile.build#L6)
->
->
-> So, there is no effective difference.
-> It is just a coding convention to use $(obj)/ for generated files,
-> and $(src)/ for source files.
->
-> The original code already used $(obj)/, so this is not your fault
-> but I want to fix it while we are here.
->
->
->
-> One more nit.
->
-> $(obj)/conf $(silent) --silentoldconfig $(Kconfig);
->
-> can be
->
-> $< $(silent) --silentoldconfig $(Kconfig);
->
->
-> I guess you did not touch this line to avoid
-> conflict with my patch.
-
-Yep, plus I wanted to keep the patch focused.
-
->
->
->
-> If you agree those two, shall I fix it up
-> when I apply it?
-
-That's fine by me. I'll assume less sanity from the existing code from
-now on. :)
-
->
->
->
->
->
->>         $(Q)if [ -f .config ]; then                                     \
->>                         cmp -s .tmp.config .config ||                   \
->>                         (mv -f .config .config.old.1;                   \
+>> For now, I decided to just hide CONFIG_DEFCONFIG_LIST
+>> from the .config file.
+>>
+>>
+>>  scripts/kconfig/menu.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+>> index 9922285..36cd3e1 100644
+>> --- a/scripts/kconfig/menu.c
+>> +++ b/scripts/kconfig/menu.c
+>> @@ -212,6 +212,7 @@ void menu_add_option(int token, char *arg)
+>>                         sym_defconfig_list = current_entry->sym;
+>>                 else if (sym_defconfig_list != current_entry->sym)
+>>                         zconf_error("trying to redefine defconfig symbol");
+>> +               sym_defconfig_list->flags |= SYMBOL_AUTO;
+>>                 break;
+>>         case T_OPT_ENV:
+>>                 prop_add_env(arg);
 >> --
->> 2.14.1
+>> 2.7.4
 >>
 >> --
 >> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
@@ -119,5 +114,9 @@ now on. :)
 > Best Regards
 > Masahiro Yamada
 
-Thanks,
+Seems reasonable to me.
+
+Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+
+Cheers,
 Ulf
