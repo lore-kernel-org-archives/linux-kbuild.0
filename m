@@ -1,18 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:51247 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1031055AbeCAOkP (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:24752 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1031447AbeCAOpf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Mar 2018 09:40:15 -0500
+        Thu, 1 Mar 2018 09:45:35 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180301111801.gdhoam4kqrbqnasv@huvuddator>
+In-Reply-To: <CAK7LNATrMVvjurGBLvCHH_5Vio_Xm83h8yaiLQPU0VUUvQLCuQ@mail.gmail.com>
 References: <1519776926-30459-1-git-send-email-yamada.masahiro@socionext.com>
  <1519776926-30459-6-git-send-email-yamada.masahiro@socionext.com>
  <20180228051525.a2vouqs6djnd2cnf@huvuddator> <CAK7LNATWRmYf7nfGcFiGe2DF2PSkE9mrS51GytzWEz5DYToN0w@mail.gmail.com>
- <20180301111801.gdhoam4kqrbqnasv@huvuddator>
+ <20180301111801.gdhoam4kqrbqnasv@huvuddator> <CAK7LNATrMVvjurGBLvCHH_5Vio_Xm83h8yaiLQPU0VUUvQLCuQ@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 1 Mar 2018 23:39:27 +0900
-Message-ID: <CAK7LNATrMVvjurGBLvCHH_5Vio_Xm83h8yaiLQPU0VUUvQLCuQ@mail.gmail.com>
+Date: Thu, 1 Mar 2018 23:44:38 +0900
+Message-ID: <CAK7LNAQRc_WCw1kSQs3YDjtX=eRKQXtkixifR3hdz1kz2Gt1+A@mail.gmail.com>
 Subject: Re: [PATCH] kconfig: remove redundant streamline_config.pl prerequisite
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -20,89 +20,88 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Ulf Magnusson <ulfalizer@gmail.com>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Herbert <marc.herbert@intel.com>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-03-01 20:18 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> The local{yes,mod}config targets currently have streamline_config.pl as
-> a prerequisite. This is redundant, because streamline_config.pl is a
-> checked-in file with no prerequisites.
+2018-03-01 23:39 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> 2018-03-01 20:18 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+>> The local{yes,mod}config targets currently have streamline_config.pl as
+>> a prerequisite. This is redundant, because streamline_config.pl is a
+>> checked-in file with no prerequisites.
+>>
+>> Remove the prerequisite and reference streamline_config.pl directly in
+>> the recipe of the rule instead.
+>>
+>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>> ---
+>>  scripts/kconfig/Makefile | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+>> index 1f74336d4e23..58be52cb464d 100644
 >
-> Remove the prerequisite and reference streamline_config.pl directly in
-> the recipe of the rule instead.
 >
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->  scripts/kconfig/Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Thanks! Almost good.
 >
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index 1f74336d4e23..58be52cb464d 100644
-
-
-Thanks! Almost good.
-
-Just small nits.
-
-
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -77,9 +77,9 @@ silentoldconfig: $(obj)/conf
->             touch   include/generated/autoksyms.h
->         $< $(silent) --$@ $(Kconfig)
+> Just small nits.
 >
-> -localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
-> +localyesconfig localmodconfig: $(obj)/conf
->         $(Q)mkdir -p include/config include/generated
-> -       $(Q)perl $< --$@ $(srctree) $(Kconfig) > .tmp.config
-> +       $(Q)perl $(obj)/streamline_config.pl --$@ $(srctree) $(Kconfig) > .tmp.config
-
-
-
-'$(src)/streamline_config.pl' is better than '$(obj)/streamline_config.pl'
-since it is a checked-in file.
-
-'$(src)' and '$(obj)' are always the same.
-(https://github.com/torvalds/linux/blob/master/scripts/Makefile.build#L6)
-
-
-So, there is no effective difference.
-It is just a coding convention to use $(obj)/ for generated files,
-and $(src)/ for source files.
-
-The original code already used $(obj)/, so this is not your fault
-but I want to fix it while we are here.
-
-
-
-One more nit.
-
-$(obj)/conf $(silent) --silentoldconfig $(Kconfig);
-
-can be
-
-$< $(silent) --silentoldconfig $(Kconfig);
-
-
-I guess you did not touch this line to avoid
-conflict with my patch.
-
-
-
-If you agree those two, shall I fix it up
-when I apply it?
-
-
-
-
-
->         $(Q)if [ -f .config ]; then                                     \
->                         cmp -s .tmp.config .config ||                   \
->                         (mv -f .config .config.old.1;                   \
-> --
-> 2.14.1
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> --- a/scripts/kconfig/Makefile
+>> +++ b/scripts/kconfig/Makefile
+>> @@ -77,9 +77,9 @@ silentoldconfig: $(obj)/conf
+>>             touch   include/generated/autoksyms.h
+>>         $< $(silent) --$@ $(Kconfig)
+>>
+>> -localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+>> +localyesconfig localmodconfig: $(obj)/conf
+>>         $(Q)mkdir -p include/config include/generated
+>> -       $(Q)perl $< --$@ $(srctree) $(Kconfig) > .tmp.config
+>> +       $(Q)perl $(obj)/streamline_config.pl --$@ $(srctree) $(Kconfig) > .tmp.config
+>
+>
+>
+> '$(src)/streamline_config.pl' is better than '$(obj)/streamline_config.pl'
+> since it is a checked-in file.
+>
+> '$(src)' and '$(obj)' are always the same.
+> (https://github.com/torvalds/linux/blob/master/scripts/Makefile.build#L6)
+>
+>
+> So, there is no effective difference.
+> It is just a coding convention to use $(obj)/ for generated files,
+> and $(src)/ for source files.
+>
+> The original code already used $(obj)/, so this is not your fault
+> but I want to fix it while we are here.
+
+
+No.
+
+This is not a matter of taste,
+but a bug that must be fixed.
+
+
+This patch breaks out-of-tree build.
+
+If O=... is given, it is error.
+
+
+$ make O=foo  localyesconfig
+make[1]: Leaving directory '/home/masahiro/workspace/linux-yamada/foo'
+masahiro@grover:~/workspace/linux-yamada$ make O=foo  localyesconfig
+make[1]: Entering directory '/home/masahiro/workspace/linux-yamada/foo'
+  GEN     ./Makefile
+Can't open perl script "scripts/kconfig/streamline_config.pl": No such
+file or directory
+../scripts/kconfig/Makefile:46: recipe for target 'localyesconfig' failed
+make[2]: *** [localyesconfig] Error 2
+/home/masahiro/workspace/linux-yamada/Makefile:521: recipe for target
+'localyesconfig' failed
+make[1]: *** [localyesconfig] Error 2
+make[1]: Leaving directory '/home/masahiro/workspace/linux-yamada/foo'
+Makefile:146: recipe for target 'sub-make' failed
+make: *** [sub-make] Error 2
+
+
+
+The right fix is $(srctree)/$(src)/streamline_config.pl
 
 
 
