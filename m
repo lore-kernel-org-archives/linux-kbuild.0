@@ -1,24 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:36910 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935717AbeCBHiI (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:42951 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1034253AbeCBHo3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Mar 2018 02:38:08 -0500
-Date: Thu, 1 Mar 2018 21:38:03 -1000
+        Fri, 2 Mar 2018 02:44:29 -0500
+Date: Thu, 1 Mar 2018 21:44:24 -1000
 From: Joey Pabalinas <joeypabalinas@gmail.com>
 Subject: [PATCH] scripts/kconfig: replace single character strcat() appends
-Message-ID: <20180302073803.ocrbfxx6xxxtku2z@gmail.com>
+Message-ID: <20180302074424.2myh3zhxnbpaohjq@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="edy6nsnmyukhqzdb"
+        protocol="application/pgp-signature"; boundary="bd6lqbgbkpl4nnon"
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, kernel@vger.kernel.org, Joey Pabalinas <joeypabalinas@gmail.com>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Joey Pabalinas <joeypabalinas@gmail.com>
 
 
---edy6nsnmyukhqzdb
+--bd6lqbgbkpl4nnon
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
@@ -90,24 +90,26 @@ index cca9663be5ddd91870..67600f48660f2ac142 100644
 --=20
 2.16.2
 
---edy6nsnmyukhqzdb
+Sorry about the double send, clipboards are very fickle beasts :(
+
+--bd6lqbgbkpl4nnon
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEKlZXrihdNOcUPZTNruvLfWhyVBkFAlqY/1sACgkQruvLfWhy
-VBme9w/+ILgo47u16XZKUkmGNMqbGNcXzJ9pKKpG2kD0ePZQAJzyLEIJAN4B0B9C
-ZmlOoucgFaXQxTjZ1Psi3xTZLA80fxaK0PiRtuGKisEC3JURUtc+3/1PukvSnrH/
-Deb84VCKRh/gvr8lcvJI+T+/3W41IICIgH3qk+bP2T6KcYoPUwWFj/oJJd0/FF7+
-DNdRl2Inqy2PJkxqKQ9q3Tybp/0UJyQacnPo4kCz2XjDxVTCgos5h4OiIZrX+uQ0
-a0hktxTpbbKgAKQjtcwy1FfUr1SZ4Grfeu9/t1cvq9TS6MnXPtg2R04YKTD7eCBb
-GXg3opzzIsfUBag5W694YEHexx/Ko1WfTOeCLiTRhe15DRKv+x2ulAQQA4ESj7kz
-VytIbX45iN7vA/xvbQIwfsrY4i7IRiDMf5ZnS0mITrLjghQ84kqxzzPCHHc/B30l
-C+SYLvDt9Uya2N3pHziLAoBgfU/3daXKGF+92eEr8jMTaObVlROhXoG8tcsfRzBp
-bAwoC7V6icbejoycbx+BVJUMLxsf7/idU7j/qGd1V5Q91Ue+Vv2zQdHNIIMRqheG
-r6DLpchfcu+yZ9Zr8hA8YZipAhnz2adZG/Te2zOSE/2SBxbjUqRxllEDRcwQ4Hd/
-U2BH2oXkVX1h0GwQ+PQtThqmn22PKVJUXQaaueZ0QIjx2vASXOs=
-=bmfQ
+iQIzBAEBCAAdFiEEKlZXrihdNOcUPZTNruvLfWhyVBkFAlqZANgACgkQruvLfWhy
+VBkMpxAA4WWKNhpeoQc9XUH4aQwN6pfAS13WHvB0cT5angyIeG30zEK5FlV8nog+
+jif+QVJGKWRqIQzWqI78UQkIJoJz4p8TN/Zfitn0QnXM2koy6GOE8P9Z+itWzxzL
+iutNN9/J0QwlBbzF6k0dMU2lot7Z1Bmpm6LcL0ioGIW6oVNQYz46WrhjGNxfl5Hu
+flQOsj9CFhgRL0iUizf7N0OaCN8H9dj4lqYfTNMiTr3DYXZuAixAazZ3rTbmUIJV
+AxiOEim5LTCGIsxYw1iRrnnhrhu0Dz6bDBC8+LrTyxMoYIxZXsAy+rfv6pxgKweP
+O6ZV898YbPvrk1u+WL/gK/MINHAttccssI/p3yr/GToCr41msdXT1HRlnISd2wtM
+zutMGF20/tUMB3/N0i52jLyFxDo4bdq4h3ycroc87ttgd51rwHRfBd8KJUMqPS6/
+aNlyFc3w724HunPdNYU5b9QJcL4wiEypmTxdJNEwBq2oIt+FTIuSoWbRUUF3l+9p
+O+GSsfmVD0pTwkwwquXyvTWgQaYj437xDCeJooXY706+19Pr8s4RHziyqTNiyP7P
+BVFzEqG7vo+EP0WBt/vIyCN/Ky7WRMqu1C93S3a0tLWPU3BAuYVrVDlY/M/RGzCh
+G/flH/1D0wowxQ4qsTkZTxNWZ+5OLWNok0zgUiziwKUfdHTtNE8=
+=z1dk
 -----END PGP SIGNATURE-----
 
---edy6nsnmyukhqzdb--
+--bd6lqbgbkpl4nnon--
