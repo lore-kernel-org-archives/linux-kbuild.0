@@ -1,102 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:35976 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932927AbeCBHJI (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:36910 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935717AbeCBHiI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Mar 2018 02:09:08 -0500
+        Fri, 2 Mar 2018 02:38:08 -0500
+Date: Thu, 1 Mar 2018 21:38:03 -1000
+From: Joey Pabalinas <joeypabalinas@gmail.com>
+Subject: [PATCH] scripts/kconfig: replace single character strcat() appends
+Message-ID: <20180302073803.ocrbfxx6xxxtku2z@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1519965121-12017-12-git-send-email-yamada.masahiro@socionext.com>
-References: <1519965121-12017-1-git-send-email-yamada.masahiro@socionext.com> <1519965121-12017-12-git-send-email-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 2 Mar 2018 16:08:13 +0900
-Message-ID: <CAK7LNASShS-umtrDwhc7vg1mc-u01cO4qSsAxX1rxBQ_pjVZ3g@mail.gmail.com>
-Subject: Re: [PATCH v2 11/11] kconfig: unittest: test if recursive inclusion
- is detected
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="edy6nsnmyukhqzdb"
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-
-2018-03-02 13:32 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> If recursive inclusion is detected, it should fail with error messages.
-> Test this.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->
-> Changes in v2:
->   - coding style clean-up based on PEP8, PEP257
->
->  scripts/kconfig/tests/err_recursive_inc/Kconfig         |  1 +
->  scripts/kconfig/tests/err_recursive_inc/Kconfig.inc     |  1 +
->  scripts/kconfig/tests/err_recursive_inc/__init__.py     | 10 ++++++++++
->  scripts/kconfig/tests/err_recursive_inc/expected_stderr |  4 ++++
->  4 files changed, 16 insertions(+)
->  create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig
->  create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig.inc
->  create mode 100644 scripts/kconfig/tests/err_recursive_inc/__init__.py
->  create mode 100644 scripts/kconfig/tests/err_recursive_inc/expected_stderr
->
-> diff --git a/scripts/kconfig/tests/err_recursive_inc/Kconfig b/scripts/kconfig/tests/err_recursive_inc/Kconfig
-> new file mode 100644
-> index 0000000..3ce7a3f
-> --- /dev/null
-> +++ b/scripts/kconfig/tests/err_recursive_inc/Kconfig
-> @@ -0,0 +1 @@
-> +source "Kconfig.inc"
-> diff --git a/scripts/kconfig/tests/err_recursive_inc/Kconfig.inc b/scripts/kconfig/tests/err_recursive_inc/Kconfig.inc
-> new file mode 100644
-> index 0000000..1fab1c1
-> --- /dev/null
-> +++ b/scripts/kconfig/tests/err_recursive_inc/Kconfig.inc
-> @@ -0,0 +1 @@
-> +source "Kconfig"
-> diff --git a/scripts/kconfig/tests/err_recursive_inc/__init__.py b/scripts/kconfig/tests/err_recursive_inc/__init__.py
-> new file mode 100644
-> index 0000000..0e4c839
-> --- /dev/null
-> +++ b/scripts/kconfig/tests/err_recursive_inc/__init__.py
-> @@ -0,0 +1,10 @@
-> +"""
-> +Detect recursive inclusion error.
-> +
-> +If recursive inclusion is detected, it should fail with error messages.
-> +"""
-> +
-> +
-> +def test(conf):
-> +    assert conf.oldaskconfig() != 0
-> +    assert conf.stderr_contains('expected_stderr')
-> diff --git a/scripts/kconfig/tests/err_recursive_inc/expected_stderr b/scripts/kconfig/tests/err_recursive_inc/expected_stderr
-> new file mode 100644
-> index 0000000..b256c91
-> --- /dev/null
-> +++ b/scripts/kconfig/tests/err_recursive_inc/expected_stderr
-> @@ -0,0 +1,4 @@
-> +Kconfig:1: recursive inclusion detected. Inclusion path:
-> +  current file : 'Kconfig'
-> +  included from: 'Kconfig.inc:1'
-> +  included from: 'Kconfig:3'
+To: linux-kbuild@vger.kernel.org
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, kernel@vger.kernel.org, Joey Pabalinas <joeypabalinas@gmail.com>
 
 
-Currently, the line number is wrong.
+--edy6nsnmyukhqzdb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The following patch should be applied first
-https://patchwork.kernel.org/patch/10253541/
+Convert strcat() calls which only append single characters
+to the end of res into simpler (and most likely cheaper)
+single assignment statements.
 
+Signed-off-by: Joey Pabalinas <joeypabalinas@gmail.com>
 
-Then, expected data should be changed
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-  included from: 'Kconfig:3'
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index cca9663be5ddd91870..67600f48660f2ac142 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -910,8 +910,7 @@ char *sym_expand_string_value(const char *in)
+ 	 * freed, so make sure to always allocate a new string
+ 	 */
+ 	reslen =3D strlen(in) + 1;
+-	res =3D xmalloc(reslen);
+-	res[0] =3D '\0';
++	res =3D xcalloc(1, reslen);
+=20
+ 	while ((src =3D strchr(in, '$'))) {
+ 		char *p, name[SYMBOL_MAXLENGTH];
+@@ -951,7 +950,7 @@ const char *sym_escape_string_value(const char *in)
+ {
+ 	const char *p;
+ 	size_t reslen;
+-	char *res;
++	char *res, *end;
+ 	size_t l;
+=20
+ 	reslen =3D strlen(in) + strlen("\"\"") + 1;
+@@ -968,25 +967,25 @@ const char *sym_escape_string_value(const char *in)
+ 		p++;
+ 	}
+=20
+-	res =3D xmalloc(reslen);
+-	res[0] =3D '\0';
+-
+-	strcat(res, "\"");
++	res =3D xcalloc(1, reslen);
++	end =3D res;
++	*end++ =3D '\"';
+=20
+ 	p =3D in;
+ 	for (;;) {
+ 		l =3D strcspn(p, "\"\\");
+ 		strncat(res, p, l);
+ 		p +=3D l;
++		end +=3D l;
+=20
+ 		if (p[0] =3D=3D '\0')
+ 			break;
+=20
+-		strcat(res, "\\");
+-		strncat(res, p++, 1);
++		*end++ =3D '\\';
++		*end++ =3D *p++;
+ 	}
++	*end =3D '\"';
+=20
+-	strcat(res, "\"");
+ 	return res;
+ }
+=20
+--=20
+2.16.2
 
-->
+--edy6nsnmyukhqzdb
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  included from: 'Kconfig:1'
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEKlZXrihdNOcUPZTNruvLfWhyVBkFAlqY/1sACgkQruvLfWhy
+VBme9w/+ILgo47u16XZKUkmGNMqbGNcXzJ9pKKpG2kD0ePZQAJzyLEIJAN4B0B9C
+ZmlOoucgFaXQxTjZ1Psi3xTZLA80fxaK0PiRtuGKisEC3JURUtc+3/1PukvSnrH/
+Deb84VCKRh/gvr8lcvJI+T+/3W41IICIgH3qk+bP2T6KcYoPUwWFj/oJJd0/FF7+
+DNdRl2Inqy2PJkxqKQ9q3Tybp/0UJyQacnPo4kCz2XjDxVTCgos5h4OiIZrX+uQ0
+a0hktxTpbbKgAKQjtcwy1FfUr1SZ4Grfeu9/t1cvq9TS6MnXPtg2R04YKTD7eCBb
+GXg3opzzIsfUBag5W694YEHexx/Ko1WfTOeCLiTRhe15DRKv+x2ulAQQA4ESj7kz
+VytIbX45iN7vA/xvbQIwfsrY4i7IRiDMf5ZnS0mITrLjghQ84kqxzzPCHHc/B30l
+C+SYLvDt9Uya2N3pHziLAoBgfU/3daXKGF+92eEr8jMTaObVlROhXoG8tcsfRzBp
+bAwoC7V6icbejoycbx+BVJUMLxsf7/idU7j/qGd1V5Q91Ue+Vv2zQdHNIIMRqheG
+r6DLpchfcu+yZ9Zr8hA8YZipAhnz2adZG/Te2zOSE/2SBxbjUqRxllEDRcwQ4Hd/
+U2BH2oXkVX1h0GwQ+PQtThqmn22PKVJUXQaaueZ0QIjx2vASXOs=
+=bmfQ
+-----END PGP SIGNATURE-----
 
-
--- 
-Best Regards
-Masahiro Yamada
+--edy6nsnmyukhqzdb--
