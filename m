@@ -1,17 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f193.google.com ([209.85.217.193]:36421 "EHLO
-        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1424139AbeCBKlT (ORCPT
+Received: from mail-ua0-f196.google.com ([209.85.217.196]:42827 "EHLO
+        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1423672AbeCBLOk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Mar 2018 05:41:19 -0500
+        Fri, 2 Mar 2018 06:14:40 -0500
 MIME-Version: 1.0
-In-Reply-To: <1519965121-12017-9-git-send-email-yamada.masahiro@socionext.com>
-References: <1519965121-12017-1-git-send-email-yamada.masahiro@socionext.com> <1519965121-12017-9-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1519965121-12017-10-git-send-email-yamada.masahiro@socionext.com>
+References: <1519965121-12017-1-git-send-email-yamada.masahiro@socionext.com> <1519965121-12017-10-git-send-email-yamada.masahiro@socionext.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Fri, 2 Mar 2018 11:41:17 +0100
-Message-ID: <CAFkk2KSxdvHD+k_xusJ5pzohOSk9VF=Frk-ED6bLJnuyLZBAzQ@mail.gmail.com>
-Subject: Re: [PATCH v2 08/11] kconfig: unittest: test defconfig when two
- choices interact
+Date: Fri, 2 Mar 2018 12:14:39 +0100
+Message-ID: <CAFkk2KQTjnTLkBx_8jXLejxVJLHV6gijN0_MCYDwbsL+KNkp=w@mail.gmail.com>
+Subject: Re: [PATCH v2 09/11] kconfig: unittest: test randconfig for choice in choice
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -20,104 +19,45 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@
 
 On Fri, Mar 2, 2018 at 5:31 AM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> Commit fbe98bb9ed3d ("kconfig: Fix defconfig when one choice menu
-> selects options that another choice menu depends on") fixed defconfig
-> when two choices interact (i.e. calculating the visibility of a choice
-> requires to calculate another choice).
+> Commit 3b9a19e08960 ("kconfig: loop as long as we changed some symbols
+> in randconfig") fixed randconfig where a choice contains a sub-choice.
+> Prior to that commit, the sub-choice values were not set.
 >
-> The test code in that commit log was based on the real world example,
-> and complicated.  So, I shrunk it down to the following:
->
-> defconfig.choice:
-> ---8<---
-> CONFIG_CHOICE_VAL0=y
-> ---8<---
->
-> ---8<---
-> config MODULES
->         bool "Enable loadable module support"
->         option modules
->         default y
->
-> choice
->         prompt "Choice"
->
-> config CHOICE_VAL0
->         tristate "Choice 0"
->
-> config CHOICE_VAL1
->         tristate "Choice 1"
->
-> endchoice
->
-> choice
->         prompt "Another choice"
->         depends on CHOICE_VAL0
->
-> config DUMMY
->         bool "dummy"
->
-> endchoice
-> ---8<---
->
-> Prior to commit fbe98bb9ed3d,
->
->   $ scripts/kconfig/conf --defconfig=defconfig.choice Kconfig.choice
->
-> resulted in:
->
->   CONFIG_MODULES=y
->   CONFIG_CHOICE_VAL0=m
->   # CONFIG_CHOICE_VAL1 is not set
->   CONFIG_DUMMY=y
->
-> where the expected result would be:
->
->   CONFIG_MODULES=y
->   CONFIG_CHOICE_VAL0=y
->   # CONFIG_CHOICE_VAL1 is not set
->   CONFIG_DUMMY=y
->
-> Roughly, this weird behavior happened like this:
->
-> Symbols are calculated a couple of times.  First, all symbols are
-> calculated in conf_read().  The first 'choice' is evaluated to 'y'
-> due to the SYMBOL_DEF_USER flag, but sym_calc_choice() clears it
-> unless all of its choice values are explicitly set by the user.
->
-> conf_set_all_new_symbols() clears all SYMBOL_VALID flags.  Then, only
-> choices are calculated.  At this point, the SYMBOL_DEF_USER for the
-> first choice is unset, so, it is evaluated to 'm'.  (this is weird)
+> This is complicated usage, but it is still used in the real world;
+> drivers/usb/gadget/legacy/Kconfig is source'd in a choice context,
+> then creates a sub-choice in it.
 
-This is because tristate choices start out in m mode btw (they have an
-implicit select of 'm && <visibibility>' on them, added add the end of
-menu_finalize()).
+That file is the only one that does all that weird choice stuff btw.
 
-> set_all_choice_values() sets SYMBOL_DEF_USER again to choice symbols.
+It's an optional choice with the choice symbols source'd from a
+separate file, containing non-symbol items and symbols that end up in
+implicit submenus and aren't considered choice symbols.
+
+It's as if it was written to make use of as much obscure Kconfig stuff
+as possible. :P
+
 >
-> When calculating the second choice, due to 'depends on CHOICE_VAL0',
-> it triggers the calculation of CHOICE_VAL0.  As a result, SYMBOL_VALID
-> is set for CHOICE_VAL0.
+> For the test case in this commit, there are 3 possible results.
 >
-> Symbols except choices get the final chance of re-calculation in
-> conf_write().  In a normal case, CHOICE_VAL0 would be re-caluculated,
-> then the first choice would be indirectly re-calculated with the
-> SYMBOL_DEF_USER which has been set by set_all_choice_values(), which
-> would be evaluated to 'y'.  But, in this case, CHOICE_VAL0 has been
-> marked SYMBOL_VALID, so it is simply skipped.  Then, =m is written out
-> to the .config file.
+> Case 1:
+>   CONFIG_A=y
+>   # CONFIG_B is not set
 >
-> Add a unit test for this naive case.
-
-At a high level, I think the problem is that the choice mode is
-forgotten. It should be y because of the CONFIG_CHOICE_VAL0=y
-assignment, but reverts back to m temporarily, and during that window
-a choice symbol is evaluated and gets the wrong value.
-
-I wonder if all this twisty code and the weird flags
-(SYMBOL_NEED_SET_CHOICE_VALUES... hmm) are required. Perhaps an extra
-invalidation or the like would be enough.
-
+> Case 2:
+>   # CONFIG_A is not set
+>   CONFIG_B=y
+>   CONFIG_C=y
+>   # CONFIG_D is not set
+>
+> Case 3:
+>   # CONFIG_A is not set
+>   CONFIG_B=y
+>   # CONFIG_C is not set
+>   CONFIG_D=y
+>   CONFIG_E=y
+>
+> So, this test iterates several times, and checks if the result is
+> either of the three.
 >
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
@@ -125,102 +65,119 @@ invalidation or the like would be enough.
 > Changes in v2:
 >   - Newly added
 >
->  scripts/kconfig/tests/inter_choice/Kconfig         | 24 ++++++++++++++++++++++
->  scripts/kconfig/tests/inter_choice/__init__.py     | 14 +++++++++++++
->  scripts/kconfig/tests/inter_choice/defconfig       |  1 +
->  scripts/kconfig/tests/inter_choice/expected_config |  4 ++++
->  4 files changed, 43 insertions(+)
->  create mode 100644 scripts/kconfig/tests/inter_choice/Kconfig
->  create mode 100644 scripts/kconfig/tests/inter_choice/__init__.py
->  create mode 100644 scripts/kconfig/tests/inter_choice/defconfig
->  create mode 100644 scripts/kconfig/tests/inter_choice/expected_config
+>  scripts/kconfig/tests/rand_nested_choice/Kconfig   | 33 ++++++++++++++++++++++
+>  .../kconfig/tests/rand_nested_choice/__init__.py   | 16 +++++++++++
+>  .../tests/rand_nested_choice/expected_stdout0      |  2 ++
+>  .../tests/rand_nested_choice/expected_stdout1      |  4 +++
+>  .../tests/rand_nested_choice/expected_stdout2      |  5 ++++
+>  5 files changed, 60 insertions(+)
+>  create mode 100644 scripts/kconfig/tests/rand_nested_choice/Kconfig
+>  create mode 100644 scripts/kconfig/tests/rand_nested_choice/__init__.py
+>  create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout0
+>  create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout1
+>  create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout2
 >
-> diff --git a/scripts/kconfig/tests/inter_choice/Kconfig b/scripts/kconfig/tests/inter_choice/Kconfig
+> diff --git a/scripts/kconfig/tests/rand_nested_choice/Kconfig b/scripts/kconfig/tests/rand_nested_choice/Kconfig
 > new file mode 100644
-> index 0000000..57d55c4
+> index 0000000..c591d51
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/inter_choice/Kconfig
-> @@ -0,0 +1,24 @@
-> +config MODULES
-> +       bool "Enable loadable module support"
-> +       option modules
-> +       default y
-> +
+> +++ b/scripts/kconfig/tests/rand_nested_choice/Kconfig
+> @@ -0,0 +1,33 @@
 > +choice
-> +       prompt "Choice"
+> +       prompt "choice"
 > +
-> +config CHOICE_VAL0
-> +       tristate "Choice 0"
+> +config A
+> +       bool "A"
 > +
-> +config CHOIVE_VAL1
-> +       tristate "Choice 1"
+> +config B
+> +       bool "B"
+> +
+> +if B
+> +choice
+> +       prompt "sub choice"
+> +
+> +config C
+> +       bool "C"
+> +
+> +config D
+> +       bool "D"
+> +
+> +if D
+> +choice
+> +       prompt "subsub choice"
+> +
+> +config E
+> +       bool "E"
 > +
 > +endchoice
-> +
-> +choice
-> +       prompt "Another choice"
-> +       depends on CHOICE_VAL0
-> +
-> +config DUMMY
-> +       bool "dummy"
+> +endif # D
 > +
 > +endchoice
-> diff --git a/scripts/kconfig/tests/inter_choice/__init__.py b/scripts/kconfig/tests/inter_choice/__init__.py
+> +endif # B
+> +
+> +endchoice
+> diff --git a/scripts/kconfig/tests/rand_nested_choice/__init__.py b/scripts/kconfig/tests/rand_nested_choice/__init__.py
 > new file mode 100644
-> index 0000000..5c7fc36
+> index 0000000..9ceadf6
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/inter_choice/__init__.py
-> @@ -0,0 +1,14 @@
+> +++ b/scripts/kconfig/tests/rand_nested_choice/__init__.py
+> @@ -0,0 +1,16 @@
 > +"""
-> +Do not affect user-assigned choice value by another choice.
+> +Set random values resursively in netsted choices.
+
+Two small typos: recursively, nested
+
 > +
-> +Handling of state flags for choices is complecated.  In old days,
-> +the defconfig result of a choice could be affected by another choice
-> +if those choices interact by 'depends on', 'select', etc.
+> +Kconfig can create a choice-in-choice structure by using 'if' statement.
+> +randconfig should correctly set randome choice values.
+
+Typo: random
+
 > +
-> +Related Linux commit: fbe98bb9ed3dae23e320c6b113e35f129538d14a
+> +Related Linux commit: 3b9a19e08960e5cdad5253998637653e592a3c29
 > +"""
 > +
 > +
 > +def test(conf):
-> +    assert conf.defconfig('defconfig') == 0
-> +    assert conf.config_contains('expected_config')
-> diff --git a/scripts/kconfig/tests/inter_choice/defconfig b/scripts/kconfig/tests/inter_choice/defconfig
+> +    for i in range(20):
+> +        assert conf.randconfig() == 0
+> +        assert (conf.config_contains('expected_stdout0') or
+> +                conf.config_contains('expected_stdout1') or
+> +                conf.config_contains('expected_stdout2'))
+> diff --git a/scripts/kconfig/tests/rand_nested_choice/expected_stdout0 b/scripts/kconfig/tests/rand_nested_choice/expected_stdout0
 > new file mode 100644
-> index 0000000..162c414
+> index 0000000..05450f3
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/inter_choice/defconfig
-> @@ -0,0 +1 @@
-> +CONFIG_CHOICE_VAL0=y
-> diff --git a/scripts/kconfig/tests/inter_choice/expected_config b/scripts/kconfig/tests/inter_choice/expected_config
+> +++ b/scripts/kconfig/tests/rand_nested_choice/expected_stdout0
+> @@ -0,0 +1,2 @@
+> +CONFIG_A=y
+> +# CONFIG_B is not set
+> diff --git a/scripts/kconfig/tests/rand_nested_choice/expected_stdout1 b/scripts/kconfig/tests/rand_nested_choice/expected_stdout1
 > new file mode 100644
-> index 0000000..5dceefb
+> index 0000000..37ab295
 > --- /dev/null
-> +++ b/scripts/kconfig/tests/inter_choice/expected_config
+> +++ b/scripts/kconfig/tests/rand_nested_choice/expected_stdout1
 > @@ -0,0 +1,4 @@
-> +CONFIG_MODULES=y
-> +CONFIG_CHOICE_VAL0=y
-> +# CONFIG_CHOIVE_VAL1 is not set
-> +CONFIG_DUMMY=y
+> +# CONFIG_A is not set
+> +CONFIG_B=y
+> +CONFIG_C=y
+> +# CONFIG_D is not set
+> diff --git a/scripts/kconfig/tests/rand_nested_choice/expected_stdout2 b/scripts/kconfig/tests/rand_nested_choice/expected_stdout2
+> new file mode 100644
+> index 0000000..849ff47
+> --- /dev/null
+> +++ b/scripts/kconfig/tests/rand_nested_choice/expected_stdout2
+> @@ -0,0 +1,5 @@
+> +# CONFIG_A is not set
+> +CONFIG_B=y
+> +# CONFIG_C is not set
+> +CONFIG_D=y
+> +CONFIG_E=y
 > --
 > 2.7.4
 >
 
 Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
-
-This reminded me of a bug I reported ages ago, which afaict hasn't
-been fixed: https://lkml.org/lkml/2012/12/5/458 (in retrospect,
-sym_clear_all_valid() is cheap).
-
-When manually patching all defconfig files in the kernel to disable
-modules and running the Kconfiglib test suite, that bug triggers for a
-few defconfigs. It has previously triggered for a few unpatched
-defconfig files too -- see
-https://github.com/ulfalizer/Kconfiglib#notes.
-
-I just add an extra sym_clear_all_valid() at the end of
-conf_set_all_new_symbols() to fix it. It'd be worth checking if that
-fixes this problem too.
 
 Cheers,
 Ulf
