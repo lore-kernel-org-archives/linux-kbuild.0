@@ -1,59 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f170.google.com ([209.85.217.170]:37497 "EHLO
-        mail-ua0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751894AbeCCJey (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:53938 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752088AbeCCPfV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 3 Mar 2018 04:34:54 -0500
+        Sat, 3 Mar 2018 10:35:21 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAB=NE6V+5MK-ytS+-QBppSBLz7T4hRQV8eMA2Vv9-crcbj7NYg@mail.gmail.com>
-References: <1519965121-12017-1-git-send-email-yamada.masahiro@socionext.com>
- <1519965121-12017-10-git-send-email-yamada.masahiro@socionext.com>
- <CAFkk2KQTjnTLkBx_8jXLejxVJLHV6gijN0_MCYDwbsL+KNkp=w@mail.gmail.com> <CAB=NE6V+5MK-ytS+-QBppSBLz7T4hRQV8eMA2Vv9-crcbj7NYg@mail.gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Sat, 3 Mar 2018 10:34:53 +0100
-Message-ID: <CAFkk2KT70V-bKpUKi_pczO30bh7mAfSPPxghvESG16_CuXJpWg@mail.gmail.com>
-Subject: Re: [PATCH v2 09/11] kconfig: unittest: test randconfig for choice in choice
+In-Reply-To: <1519974312-20477-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1519974312-20477-1-git-send-email-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 4 Mar 2018 00:34:30 +0900
+Message-ID: <CAK7LNARDFMoPQ4iwV-FKXxWiNOSxU5cFcSw18tHChMEqAmrQNg@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: fix line number in recursive inclusion error message
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Randy Dunlap <rdunlap@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Mar 2, 2018 at 10:29 PM, Luis R. Rodriguez <mcgrof@kernel.org> wrote:
+2018-03-02 16:05 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> When recursive inclusion is detected, the line number of the last
+> 'included from:' is wrong.
 >
+> [Test Case]
 >
-> On Fri, Mar 2, 2018, 3:14 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
->>
->> On Fri, Mar 2, 2018 at 5:31 AM, Masahiro Yamada
->> > This is complicated usage, but it is still used in the real world;
->> > drivers/usb/gadget/legacy/Kconfig is source'd in a choice context,
->> > then creates a sub-choice in it.
->>
->> That file is the only one that does all that weird choice stuff btw.
->>
->> It's as if it was written to make use of as much obscure Kconfig stuff
->> as possible. :P
+> Kconfig:
+>   -------->8--------
+>   source "Kconfig2"
+>   -------->8--------
 >
+> Kconfig2:
+>   -------->8--------
+>   source "Kconfig3"
+>   -------->8--------
 >
-> Can't we just use another way to describe this requirement on this file,
-> with the trade-off of simplifying kconfig semantics?
+> Kconfig3:
+>   -------->8--------
+>   source "Kconfig"
+>   -------->8--------
 >
->   Luis
+> [Result]
+>
+>   $ make allyesconfig
+>   scripts/kconfig/conf  --allyesconfig Kconfig
+>   Kconfig:1: recursive inclusion detected. Inclusion path:
+>     current file : 'Kconfig'
+>     included from: 'Kconfig3:1'
+>     included from: 'Kconfig2:1'
+>     included from: 'Kconfig:3'
+>   scripts/kconfig/Makefile:89: recipe for target 'allyesconfig' failed
+>   make[1]: *** [allyesconfig] Error 1
+>   Makefile:512: recipe for target 'allyesconfig' failed
+>   make: *** [allyesconfig] Error 2
+>
+> where we expect
+>
+>     current file : 'Kconfig'
+>     included from: 'Kconfig3:1'
+>     included from: 'Kconfig2:1'
+>     included from: 'Kconfig:1'
+>
+> The 'iter->lineno+1' in the second fpinrtf() should be 'iter->lineno-1'.
+> I refactored the code to merge two fprintf().
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
 
-I don't think changing how drivers/usb/gadget/legacy/Kconfig does
-things would allow for any simplifications, unfortunately (except to
-get rid of the fix tested by this patch, maybe).
+Applied to linux-kbuild/fixes.
 
-Being able to have non-choice-value symbols and choices in choices is
-a side effect of automatic submenu creation. Symbols and choices that
-depend on the symbol before them end up in a submenu, and only the
-top-level symbols in the choice are marked as choice value symbols.
 
-I always wondered whether that was an intended feature or just
-something people discovered works (it seems to work anyway...). It
-feels pretty iffy to have cosmetic submenus affect behavior like that,
-but playing devil's advocate, it kinda makes sense to put symbols
-close to the symbols they depend on if you can get away with it.
 
-Cheers,
-Ulf
+-- 
+Best Regards
+Masahiro Yamada
