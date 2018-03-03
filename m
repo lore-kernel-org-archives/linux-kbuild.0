@@ -1,106 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:39550 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752177AbeCCPjO (ORCPT
+Received: from mail-ua0-f196.google.com ([209.85.217.196]:32783 "EHLO
+        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752116AbeCCSO7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 3 Mar 2018 10:39:14 -0500
+        Sat, 3 Mar 2018 13:14:59 -0500
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 4 Mar 2018 00:38:21 +0900
-Message-ID: <CAK7LNAThdvSDbAdD=JcQDdwhXnV2-coNif5Vje-=uJGVFHzVrA@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v4.16-rc4
+In-Reply-To: <20180302231256.4aevdu2b5ylyrzkr@gmail.com>
+References: <20180302074424.2myh3zhxnbpaohjq@gmail.com> <20180302134453.mtd4uepeiviicyef@huvuddator>
+ <20180302231256.4aevdu2b5ylyrzkr@gmail.com>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Sat, 3 Mar 2018 19:14:57 +0100
+Message-ID: <CAFkk2KST+RcRxnYCPKN5yQCr7vfMZUL3TTytFJ+Ad0B_Au4DVw@mail.gmail.com>
+Subject: Re: [PATCH] scripts/kconfig: replace single character strcat() appends
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
+To: Joey Pabalinas <joeypabalinas@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnaud Lacombe <lacombar@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi Linus,
+On Sat, Mar 3, 2018 at 12:12 AM, Joey Pabalinas <joeypabalinas@gmail.com> wrote:
+> On Fri, Mar 02, 2018 at 02:44:53PM +0100, Ulf Magnusson wrote:
+>> Not sure this is an improvement. Zeroing the bytes after the initial
+>> null terminator is redundant, and the explicit '\0' makes it clearer to
+>> me what's going on.
+>
+> Yes, I agree with you, that is definitely quite true. This along with
+> the other comments you made me want to rethink this a little bit.
+>
+> On Fri, Mar 02, 2018 at 02:44:53PM +0100, Ulf Magnusson wrote:
+>> I like the approach, but I wonder if we can take it a bit further.
+>> Here's what I'd do:
+>>
+>>       1. Rename the 'in' parameter to 's'.
+>>       2. Rename 'p' to 'in'.
+>>       3. Rename 'end' to 'out'
+>>
+>> At that point, you're reading from 'in' and writing to 'out', which
+>> seems pretty nice and readable.
+>>
+>> This code is pretty cold by the way, so it wouldn't matter for
+>> performance. GCC knows how functions like strcat() work too, and uses
+>> that to optimize (see
+>> https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html).
+>>
+>> I'm all for trying to make Kconfig's code neater though.
+>
+> Since this code is pretty cold (completely agree with you there), I
+> think it would actually be much more useful to rework my patch to
+> have a more style-centric approach rather than an optimization-centric
+> one; this code would definitely benefit from being neater.
 
-Here are Kbuild fixes for v4.16.
-Please pull!
+I actually prefer the memcpy() version for style reasons, even though
+it might've looked like an optimization:
 
+With strncat(), the result string is written via both 'res' and 'end'.
+With memcpy(), it's only written via the 'end'. That seems less
+twisty.
 
-The following changes since commit 4a3928c6f8a53fa1aed28ccba227742486e8ddcb:
+Maybe this is outside the scope of the original patch, but while we're here. :)
 
-  Linux 4.16-rc3 (2018-02-25 18:50:41 -0800)
+>
+> Some useful changes would be to rename of the _atrociously_ short
+> identifiers like p and l.
 
-are available in the git repository at:
+Yeah, 'l' in particular isn't the best name, IMO ('len' is both short
+and explicit, and won't be confused for 1). 'p' can be fine if it's
+obvious in context (bit dubious here), but 'in' and 'out' (for 'end')
+would be more informative.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v4.16
+'s' is clear from convention to me. In general, I fully agree that you
+should avoid hard-to-guess names though.
 
-for you to fetch changes up to 50186e121ea1adcc43d0f9f790ee45e0b0f1202f:
+>
+> Anyway I'll give that link a read over and try and make a V2 later
+> on today.
+>
+> Appreciate the feedback, thanks for the comments!
+>
+> --
+> Cheers,
+> Joey Pabalinas
 
-  MAINTAINERS: take over Kconfig maintainership (2018-03-03 12:28:27 +0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v4.16
-
-- suppress sparse warnings about unknown attributes
-
-- fix typos and stale comments
-
-- fix build error of arch/sh
-
-- fix wrong use of ld-option vs cc-ldoption
-
-- remove redundant GCC_PLUGINS_CFLAGS assignment
-
-- fix another memory leak of Kconfig
-
-- fix line number in error messages of Kconfig
-
-- do not write confusing CONFIG_DEFCONFIG_LIST out to .config
-
-- add xstrdup() to Kconfig to handle memory shortage errors
-
-- show also a Debian package name if ncurses is missing
-
-----------------------------------------------------------------
-Arvind Prasanna (1):
-      kconfig: Update ncurses package names for menuconfig
-
-Cao jin (2):
-      kbuild: drop superfluous GCC_PLUGINS_CFLAGS assignment
-      kbuild/kallsyms: trivial typo fix
-
-Dafna Hirschfeld (1):
-      Coccinelle: memdup: Fix typo in warning messages
-
-Luc Van Oostenryck (1):
-      kbuild: disable sparse warnings about unknown attributes
-
-Masahiro Yamada (7):
-      kconfig: add xstrdup() helper
-      kconfig: set SYMBOL_AUTO to the symbol marked with defconfig_list
-      sh: fix build error for empty CONFIG_BUILTIN_DTB_SOURCE
-      kconfig: Don't leak choice names during parsing
-      kbuild: test --build-id linker flag by ld-option instead of cc-ldoption
-      kconfig: fix line number in recursive inclusion error message
-      MAINTAINERS: take over Kconfig maintainership
-
-Ulf Magnusson (1):
-      Makefile: Fix lying comment re. silentoldconfig
-
- MAINTAINERS                                |  4 +++-
- Makefile                                   | 12 +++++-------
- arch/sh/boot/dts/Makefile                  |  4 +++-
- scripts/coccinelle/api/memdup.cocci        |  4 ++--
- scripts/kallsyms.c                         |  2 +-
- scripts/kconfig/confdata.c                 |  2 +-
- scripts/kconfig/kxgettext.c                |  2 +-
- scripts/kconfig/lkc.h                      |  1 +
- scripts/kconfig/lxdialog/check-lxdialog.sh |  3 ++-
- scripts/kconfig/menu.c                     |  1 +
- scripts/kconfig/symbol.c                   |  4 ++--
- scripts/kconfig/util.c                     | 11 +++++++++++
- scripts/kconfig/zconf.l                    | 12 ++++--------
- scripts/kconfig/zconf.y                    |  3 ++-
- scripts/link-vmlinux.sh                    |  2 +-
- 15 files changed, 40 insertions(+), 27 deletions(-)
-
-
--- 
-Best Regards
-Masahiro Yamada
+Cheers,
+Ulf
