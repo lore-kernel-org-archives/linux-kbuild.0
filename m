@@ -1,93 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:33956 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934345AbeCBXNB (ORCPT
+Received: from mail-ua0-f170.google.com ([209.85.217.170]:37497 "EHLO
+        mail-ua0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751894AbeCCJey (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Mar 2018 18:13:01 -0500
-Date: Fri, 2 Mar 2018 13:12:56 -1000
-From: Joey Pabalinas <joeypabalinas@gmail.com>
-Subject: Re: [PATCH] scripts/kconfig: replace single character strcat()
- appends
-Message-ID: <20180302231256.4aevdu2b5ylyrzkr@gmail.com>
-References: <20180302074424.2myh3zhxnbpaohjq@gmail.com>
- <20180302134453.mtd4uepeiviicyef@huvuddator>
+        Sat, 3 Mar 2018 04:34:54 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="5c6njx6tk3sxs4db"
-Content-Disposition: inline
-In-Reply-To: <20180302134453.mtd4uepeiviicyef@huvuddator>
+In-Reply-To: <CAB=NE6V+5MK-ytS+-QBppSBLz7T4hRQV8eMA2Vv9-crcbj7NYg@mail.gmail.com>
+References: <1519965121-12017-1-git-send-email-yamada.masahiro@socionext.com>
+ <1519965121-12017-10-git-send-email-yamada.masahiro@socionext.com>
+ <CAFkk2KQTjnTLkBx_8jXLejxVJLHV6gijN0_MCYDwbsL+KNkp=w@mail.gmail.com> <CAB=NE6V+5MK-ytS+-QBppSBLz7T4hRQV8eMA2Vv9-crcbj7NYg@mail.gmail.com>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Sat, 3 Mar 2018 10:34:53 +0100
+Message-ID: <CAFkk2KT70V-bKpUKi_pczO30bh7mAfSPPxghvESG16_CuXJpWg@mail.gmail.com>
+Subject: Re: [PATCH v2 09/11] kconfig: unittest: test randconfig for choice in choice
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Randy Dunlap <rdunlap@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
+On Fri, Mar 2, 2018 at 10:29 PM, Luis R. Rodriguez <mcgrof@kernel.org> wrote:
+>
+>
+> On Fri, Mar 2, 2018, 3:14 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
+>>
+>> On Fri, Mar 2, 2018 at 5:31 AM, Masahiro Yamada
+>> > This is complicated usage, but it is still used in the real world;
+>> > drivers/usb/gadget/legacy/Kconfig is source'd in a choice context,
+>> > then creates a sub-choice in it.
+>>
+>> That file is the only one that does all that weird choice stuff btw.
+>>
+>> It's as if it was written to make use of as much obscure Kconfig stuff
+>> as possible. :P
+>
+>
+> Can't we just use another way to describe this requirement on this file,
+> with the trade-off of simplifying kconfig semantics?
+>
+>   Luis
 
---5c6njx6tk3sxs4db
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I don't think changing how drivers/usb/gadget/legacy/Kconfig does
+things would allow for any simplifications, unfortunately (except to
+get rid of the fix tested by this patch, maybe).
 
-On Fri, Mar 02, 2018 at 02:44:53PM +0100, Ulf Magnusson wrote:
-> Not sure this is an improvement. Zeroing the bytes after the initial
-> null terminator is redundant, and the explicit '\0' makes it clearer to
-> me what's going on.
+Being able to have non-choice-value symbols and choices in choices is
+a side effect of automatic submenu creation. Symbols and choices that
+depend on the symbol before them end up in a submenu, and only the
+top-level symbols in the choice are marked as choice value symbols.
 
-Yes, I agree with you, that is definitely quite true. This along with
-the other comments you made me want to rethink this a little bit.
+I always wondered whether that was an intended feature or just
+something people discovered works (it seems to work anyway...). It
+feels pretty iffy to have cosmetic submenus affect behavior like that,
+but playing devil's advocate, it kinda makes sense to put symbols
+close to the symbols they depend on if you can get away with it.
 
-On Fri, Mar 02, 2018 at 02:44:53PM +0100, Ulf Magnusson wrote:
-> I like the approach, but I wonder if we can take it a bit further.
-> Here's what I'd do:
->=20
-> 	1. Rename the 'in' parameter to 's'.
-> 	2. Rename 'p' to 'in'.
-> 	3. Rename 'end' to 'out'
->=20
-> At that point, you're reading from 'in' and writing to 'out', which
-> seems pretty nice and readable.
->=20
-> This code is pretty cold by the way, so it wouldn't matter for
-> performance. GCC knows how functions like strcat() work too, and uses
-> that to optimize (see
-> https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html).
->=20
-> I'm all for trying to make Kconfig's code neater though.
-
-Since this code is pretty cold (completely agree with you there), I
-think it would actually be much more useful to rework my patch to
-have a more style-centric approach rather than an optimization-centric
-one; this code would definitely benefit from being neater.
-
-Some useful changes would be to rename of the _atrociously_ short
-identifiers like p and l.
-
-Anyway I'll give that link a read over and try and make a V2 later
-on today.
-
-Appreciate the feedback, thanks for the comments!
-
---=20
 Cheers,
-Joey Pabalinas
-
---5c6njx6tk3sxs4db
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEKlZXrihdNOcUPZTNruvLfWhyVBkFAlqZ2ngACgkQruvLfWhy
-VBl/2hAA0tVRbvfSQVQv/LRD8Wp+CAcnvnLwI4VPp0vrCh/f/oxqUV533/6Cj2o6
-0AatrgS4Qa1VyiIZjaMUaerwnzsWQAnBA2+iXpP5RbcicreMCfN/YI6qtr/brzvR
-Q35wOtU6QqM6s4tg5Se0gS71UkgPgItwRLN4tZoGCSWooBPjOtU58tY69YzxJVBk
-Vi1Os3RiuJzMwEjdv/ztwjSTWN37op9ZwjFFB9X7WEGiJw3VI8iZ5fANI0OR+niH
-6QTp4Hmz1OzHqze837pn7T8xY02pwU2IsZkGAWxrdZgPip1iTaQxEOQGLNWSSvQ9
-WWmd/H2a0+ifxx22FdtFhBviip+gK0xcSCYaOeh8MVphWwuWsC7FCWmszw8H2blz
-47SfjCsHsAKisxwCMIZH/q2YegFUvqjKnfQ1aK2AmgWvek44oknDUA40XHQyUQyw
-Cl8/Rr+LTTcAtX+Xb4HDOOflSQq5YpX6N4ZwxI6z0wuxdcnLQM3KSgACjdrgp+YS
-TfvHu+jabiI5p/Wi7SQ+Otw3imAzrexfX42GPnno0xGPOrgleBAuNgMq9P99rMf4
-5WkqKFOdqRh6w9sSFQvzLQdEltXgfxkZxm+sevao70YFE98rutIOrd2/V+Qrs8wt
-nVjQeN3BSxUl/msIuTmK6g584+6QvSL7N5IGNnkXzI7XUpnLWqA=
-=Uaaf
------END PGP SIGNATURE-----
-
---5c6njx6tk3sxs4db--
+Ulf
