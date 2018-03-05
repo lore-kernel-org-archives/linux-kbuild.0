@@ -1,75 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f52.google.com ([209.85.215.52]:43221 "EHLO
-        mail-lf0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935020AbeCENHP (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:56824 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752003AbeCEOun (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Mar 2018 08:07:15 -0500
-Received: by mail-lf0-f52.google.com with SMTP id q69so22969083lfi.10
-        for <linux-kbuild@vger.kernel.org>; Mon, 05 Mar 2018 05:07:14 -0800 (PST)
-Received: from [84.217.165.85] (c-55a5d954.501502050104-0-757473696b74.cust.bredbandsbolaget.se. [84.217.165.85])
-        by smtp.gmail.com with ESMTPSA id p74sm2720131ljp.5.2018.03.05.05.07.12
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Mar 2018 05:07:12 -0800 (PST)
-From: Thomas Lindroth <thomas.lindroth@gmail.com>
-Subject: Intermittent build failure with TRIM_UNUSED_KSYMS and related
- problems
-Message-ID: <ccedea72-0e61-500c-86e5-976ecb5cefb5@gmail.com>
-Date: Mon, 5 Mar 2018 14:07:12 +0100
+        Mon, 5 Mar 2018 09:50:43 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180228191805.20094-3-linux@rasmusvillemoes.dk>
+References: <CA+55aFz_ww8ohU68Jz34pg_x7gpGpJ+FC-dmS_Rm_VvY01GGpg@mail.gmail.com>
+ <20180228191805.20094-1-linux@rasmusvillemoes.dk> <20180228191805.20094-3-linux@rasmusvillemoes.dk>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 5 Mar 2018 23:49:54 +0900
+Message-ID: <CAK7LNASNtKdRqOkBb6E3_EiVp2kEvWTqDOAN3VXMWWTiTF_rOA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] fixdep: do not ignore kconfig.h
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-I upgraded to 4.14.23 from an earlier kernel series a while ago and turned on some new options. Soon after I noticed one of my virtual machines didn't work right. It's a kvm based VM using vfio for assigning a pci device to the VM. The guest OS could no longer initialize that pci device. After a lot of trial and error I narrowed down the problem to TRIM_UNUSED_KSYMS, which I enabled in the upgrade.
+2018-03-01 4:17 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
+> kconfig.h was excluded from consideration by fixdep by
+> 6a5be57f0f00 (fixdep: fix extraneous dependencies) to avoid some false
+> positive hits
+>
+> (1) include/config/.h
+> (2) include/config/h.h
+> (3) include/config/foo.h
+>
+> (1) occurred because kconfig.h contains the string CONFIG_ in a
+> comment. However, since dee81e988674 (fixdep: faster CONFIG_ search), we
+> have a check that the part after CONFIG_ is non-empty, so this does not
+> happen anymore (and CONFIG_ appears by itself elsewhere, so that check
+> is worthwhile).
+>
+> (2) comes from the include guard, __LINUX_KCONFIG_H. But with the
+> previous patch, we no longer match that either.
+>
+> That leaves (3), which amounts to one [1] false dependency (aka stat() call
+> done by make), which I think we can live with:
+>
+> We've already had one case [2] where the lack of include/linux/kconfig.h in
+> the .o.cmd file caused a missing rebuild, and while I originally thought
+> we should just put kconfig.h in the dependency list without parsing it
+> for the CONFIG_ pattern, we actually do have some real CONFIG_ symbols
+> mentioned in it, and one can imagine some translation unit that just
+> does '#ifdef __BIG_ENDIAN' but doesn't through some other header
+> actually depend on CONFIG_CPU_BIG_ENDIAN - so changing the target
+> endianness could end up rebuilding the world, minus that small
+> TU. Quoting Linus,
+>
+>   ... when missing dependencies cause a missed re-compile, the resulting
+>   bugs can be _really_ subtle.
+>
+> [1] well, two, we now also have CONFIG_BOOGER/booger.h - we could change
+> that to FOO if we care
+>
+> [2] https://lkml.org/lkml/2018/2/22/838
+>
+> Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+> ---
+>  scripts/basic/fixdep.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+> index 1b21870d6e7f..449b68c4c90c 100644
+> --- a/scripts/basic/fixdep.c
+> +++ b/scripts/basic/fixdep.c
+> @@ -283,7 +283,6 @@ static int is_ignored_file(const char *s, int len)
+>  {
+>         return str_ends_with(s, len, "include/generated/autoconf.h") ||
+>                str_ends_with(s, len, "include/generated/autoksyms.h") ||
+> -              str_ends_with(s, len, "include/linux/kconfig.h") ||
+>                str_ends_with(s, len, ".ver");
+>  }
+>
+> --
+> 2.15.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-If and only if TRIM_UNUSED_KSYMS is enabled the guest gets the error "code 43" which is a generic error code meaning failure to initialize driver in windows based OS. I don't notice any other problems besides that.
 
-As I understand it TRIM_UNUSED_KSYMS will build the kernel and modules, then check which symbols are used by the modules and remove all unused EXPORT_SYMBOL_* from the kernel and rebuild it again. When I build the kernel I get a line like "KSYMS   symbols: before=1872, after=1871, changed=17" followed by rebuild of a few files. One of the rebuilt files is always drivers/pci/access.c which looks suspicions based on the error I get.
+The series, applied to linux-kbuild/fixes.  Thanks!
 
-EXPORT_SYMBOL_GPL(pci_user_read_config_##size);
-EXPORT_SYMBOL_GPL(pci_user_write_config_##size);
-drivers/pci/access.c got these two exports. They stand out because they are macros instead of functions. The only place they are used in the kernel is vfio. All other uses are for accessing pci config space from userspace. I don't think anything in my userspace tries to access pci config space so that could explain why I only see a problem with the vfio based VM. I don't know why TRIM_UNUSED_KSYMS cause problems with vfio but I suspect those macros are related.
 
-When testing various config options I would change an option, run make clean followed by make. Turns out make clean doesn't clean include/generated/autoksyms.h. That's why the KSYMS line reported before=1872 instead of before=0. I guessed the kernel build might be confused about which files needed rebuilding so I tried to use a clean build path instead. That did not help to resolve the VM problem but it did result in build failures.
-
-The build failure is intermittent and only happens about once every 10 builds.
-Here is the full "make V=1 j1" output from a failed build:
-https://gist.githubusercontent.com/anonymous/3ee68c7936248c6f0772bcac8c5b6257/raw/b62df75c5329ec8f3bf556da1145bdf69d5d69f8/gistfile1.txt
-Here is the same output from a build that succeeds:
-https://gist.githubusercontent.com/anonymous/85331c68f448781ba64bbaafcd5cb47f/raw/55a86eff8a5e42fe93c26ce1df2aa7c96d1ae803/gistfile1.txt
-Here is the .config I used:
-https://gist.githubusercontent.com/anonymous/0d5eceb5ae65ffc5e853fb2664bb3acb/raw/8ca8f1a35468b5aac5b6485a12e71362e8d83ff3/gistfile1.txt
-
-Sorry for using gist links but the output is probably too big for the mailing list and regular pastebins.
-
-The build failure always looks something like this but the undefined symbols varies:
-  Building modules, stage 2.
-  MODPOST 146 modules
-ERROR: "__put_user_2" [net/ipv4/netfilter/ip_tables.ko] undefined!
-ERROR: "__put_user_2" [net/ipv4/netfilter/arp_tables.ko] undefined!
-ERROR: "__put_user_8" [fs/udf/udf.ko] undefined!
-ERROR: "__put_user_4" [fs/udf/udf.ko] undefined!
-ERROR: "__put_user_8" [fs/fat/fat.ko] undefined!
-ERROR: "__put_user_1" [fs/fat/fat.ko] undefined!
-ERROR: "__put_user_4" [fs/fat/fat.ko] undefined!
-ERROR: "__put_user_2" [fs/fat/fat.ko] undefined!
-ERROR: "__put_user_4" [drivers/net/tap.ko] undefined!
-ERROR: "__put_user_2" [drivers/net/tap.ko] undefined!
-ERROR: "__put_user_8" [drivers/media/v4l2-core/videodev.ko] undefined!
-ERROR: "__put_user_1" [drivers/media/v4l2-core/videodev.ko] undefined!
-ERROR: "__put_user_4" [drivers/media/v4l2-core/videodev.ko] undefined!
-ERROR: "__put_user_8" [drivers/input/joydev.ko] undefined!
-ERROR: "__put_user_1" [drivers/input/joydev.ko] undefined!
-ERROR: "__put_user_4" [drivers/input/joydev.ko] undefined!
-ERROR: "__fill_rsb" [arch/x86/kvm/kvm-intel.ko] undefined!
-make[2]: *** [/usr/src/linux-4.14.23/scripts/Makefile.modpost:92: __modpost] Error 1
-make[1]: *** [/usr/src/linux-4.14.23/Makefile:1218: modules] Error 2
-make[1]: Leaving directory '/home/cocobo/repository/kernel_build'
-
-The only difference between the two pasted build logs is that the failing build doesn't rebuild arch/x86/lib/retpoline.S.
-
-I don't know what cause the build failures but it seems like the build system can get confused about which files needs to be rebuild when trimming symbols.
+-- 
+Best Regards
+Masahiro Yamada
