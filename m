@@ -1,60 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:23104 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752522AbeCEPCG (ORCPT
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:40602 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751354AbeCEPVk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Mar 2018 10:02:06 -0500
+        Mon, 5 Mar 2018 10:21:40 -0500
+Received: by mail-wm0-f45.google.com with SMTP id t6so16305479wmt.5
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Mar 2018 07:21:39 -0800 (PST)
+Date: Mon, 5 Mar 2018 16:21:25 +0100
+From: Robin Jarry <robin.jarry@6wind.com>
+Subject: Re: [PATCH] objtool: make use of pkg-config for libelf
+Message-ID: <20180305152125.7fjlbermrfvg4wzi@6wind.com>
+References: <20180301125537.14160-1-pp@emlix.com>
+ <20180305145339.444neh5ablzofg42@treble>
 MIME-Version: 1.0
-In-Reply-To: <1519812864-852-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1519812864-852-1-git-send-email-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 6 Mar 2018 00:01:21 +0900
-Message-ID: <CAK7LNASzxVy1D48-aOTfwNRdMd48CSoJfe0hpvH=XXZL5czwmQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: remove command line interface LDFLAGS_MODULE
- from makefiles.txt
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180305145339.444neh5ablzofg42@treble>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Randy Dunlap <rdunlap@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Robin Jarry <robin.jarry@6wind.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
+To: Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Philipp Puschmann <pp@emlix.com>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, peterz@infradead.org, linux-kbuild@vger.kernel.org
 
-2018-02-28 19:14 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> Documentation/kbuild/makefiles.txt lists variables used in Makefile
-> whereas Documentation/kbuild/kbuild.txt describes user assignable
-> parameters given via environments or the command line.
->
-> LDFLAGS_MODULE is a command line interface, so it should be dropped
-> from makefiles.txt.
->
-> Some lines below in this file, it is clearly explained that
-> KBUILD_LDFLAGS_MODULE is the right one for the internal use:
->
->     KBUILD_LDFLAGS_MODULE   Options for $(LD) when linking modules
->
->         $(KBUILD_LDFLAGS_MODULE) is used to add arch-specific options
->         used when linking modules. This is often a linker script.
->         From commandline LDFLAGS_MODULE shall be used (see kbuild.txt).
->
-> Then, kbuild.txt explains LDFLAGS_MODULE, like follows:
->
->     LDFLAGS_MODULE
->     --------------------------------------------------
->     Additional options used for $(LD) when linking modules.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
->  Documentation/kbuild/makefiles.txt | 6 ------
->  1 file changed, 6 deletions(-)
+2018-03-05, Josh Poimboeuf:
+> [ Adding Robin ]
+> 
+> Robin, does this fix the same issue as your recent patches?  If so, I'd
+> prefer this one because it doesn't need any new environment variables.
 
+Hi Josh,
 
-Both applied to linux-kbuild/kbuild.
-
-
-
-
-
+this looks like it would work. I need to do proper testing before
+confirmation. Also, I did not have time to work on a v3. I'll wait a bit
+to see where this goes first.
 
 -- 
-Best Regards
-Masahiro Yamada
+Robin
