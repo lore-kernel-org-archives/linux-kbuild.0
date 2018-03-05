@@ -1,63 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:49699 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933671AbeCEJjQ (ORCPT
+Received: from mail-lf0-f52.google.com ([209.85.215.52]:43221 "EHLO
+        mail-lf0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935020AbeCENHP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Mar 2018 04:39:16 -0500
+        Mon, 5 Mar 2018 08:07:15 -0500
+Received: by mail-lf0-f52.google.com with SMTP id q69so22969083lfi.10
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Mar 2018 05:07:14 -0800 (PST)
+Received: from [84.217.165.85] (c-55a5d954.501502050104-0-757473696b74.cust.bredbandsbolaget.se. [84.217.165.85])
+        by smtp.gmail.com with ESMTPSA id p74sm2720131ljp.5.2018.03.05.05.07.12
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 05 Mar 2018 05:07:12 -0800 (PST)
+From: Thomas Lindroth <thomas.lindroth@gmail.com>
+Subject: Intermittent build failure with TRIM_UNUSED_KSYMS and related
+ problems
+Message-ID: <ccedea72-0e61-500c-86e5-976ecb5cefb5@gmail.com>
+Date: Mon, 5 Mar 2018 14:07:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKwiHFjv7a=+RstT8up7aSctUW5=y0A3nz_FvG=5Jd1DHC07Tw@mail.gmail.com>
-References: <CA+55aFz_ww8ohU68Jz34pg_x7gpGpJ+FC-dmS_Rm_VvY01GGpg@mail.gmail.com>
- <20180228191805.20094-1-linux@rasmusvillemoes.dk> <20180228191805.20094-3-linux@rasmusvillemoes.dk>
- <CAK7LNAQ9WKj5Uz=A2QKctM9H8WFErfo_J_rGSn7B5jig+4gv_w@mail.gmail.com> <CAKwiHFjv7a=+RstT8up7aSctUW5=y0A3nz_FvG=5Jd1DHC07Tw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 5 Mar 2018 18:38:32 +0900
-Message-ID: <CAK7LNASc1scA3PTGeaMxeRjzyUFZoFgudvBMDyrULOkrjUWGBQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] fixdep: do not ignore kconfig.h
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
 
-2018-03-05 17:15 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
-> On 5 March 2018 at 05:52, Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
->> 2018-03-01 4:17 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
->>> kconfig.h was excluded from consideration by fixdep by
->>> 6a5be57f0f00 (fixdep: fix extraneous dependencies) to avoid some false
->>> positive hits
-> [...]
->>> We've already had one case [2] where the lack of include/linux/kconfig.h in
->>> the .o.cmd file caused a missing rebuild,
-> [...]
->>> [2] https://lkml.org/lkml/2018/2/22/838
->>
->>
->> Sorry, I missed to include this series in the Kbuild fixes PR
->> I sent two days ago.
->>
->> I was not tracking the randomize-struct thread.
->> I read [2] and I noticed the background of this series just now.
->>
->> Hopefully, I will have another opportunity of PR
->> if this series is necessary for v4.16  (seems so)
->
-> I should probably have put 3/3 first, if that is 4.16 material, the
-> other two can obviously wait for 4.17. They don't really depend on
-> each other apart from overlapping context, and the above commit
-> message would need slight rewording if put before the others. I can do
-> that reordering and resend if you wish.
->
-> Rasmus
+I upgraded to 4.14.23 from an earlier kernel series a while ago and turned on some new options. Soon after I noticed one of my virtual machines didn't work right. It's a kvm based VM using vfio for assigning a pci device to the VM. The guest OS could no longer initialize that pci device. After a lot of trial and error I narrowed down the problem to TRIM_UNUSED_KSYMS, which I enabled in the upgrade.
 
-1/3 is obviously safe, 2/3 too.
-I think the current series is OK for v4.16.
-I will queue it up to the fixes branch shortly.
+If and only if TRIM_UNUSED_KSYMS is enabled the guest gets the error "code 43" which is a generic error code meaning failure to initialize driver in windows based OS. I don't notice any other problems besides that.
 
-Thanks!
+As I understand it TRIM_UNUSED_KSYMS will build the kernel and modules, then check which symbols are used by the modules and remove all unused EXPORT_SYMBOL_* from the kernel and rebuild it again. When I build the kernel I get a line like "KSYMS   symbols: before=1872, after=1871, changed=17" followed by rebuild of a few files. One of the rebuilt files is always drivers/pci/access.c which looks suspicions based on the error I get.
 
+EXPORT_SYMBOL_GPL(pci_user_read_config_##size);
+EXPORT_SYMBOL_GPL(pci_user_write_config_##size);
+drivers/pci/access.c got these two exports. They stand out because they are macros instead of functions. The only place they are used in the kernel is vfio. All other uses are for accessing pci config space from userspace. I don't think anything in my userspace tries to access pci config space so that could explain why I only see a problem with the vfio based VM. I don't know why TRIM_UNUSED_KSYMS cause problems with vfio but I suspect those macros are related.
 
+When testing various config options I would change an option, run make clean followed by make. Turns out make clean doesn't clean include/generated/autoksyms.h. That's why the KSYMS line reported before=1872 instead of before=0. I guessed the kernel build might be confused about which files needed rebuilding so I tried to use a clean build path instead. That did not help to resolve the VM problem but it did result in build failures.
 
+The build failure is intermittent and only happens about once every 10 builds.
+Here is the full "make V=1 j1" output from a failed build:
+https://gist.githubusercontent.com/anonymous/3ee68c7936248c6f0772bcac8c5b6257/raw/b62df75c5329ec8f3bf556da1145bdf69d5d69f8/gistfile1.txt
+Here is the same output from a build that succeeds:
+https://gist.githubusercontent.com/anonymous/85331c68f448781ba64bbaafcd5cb47f/raw/55a86eff8a5e42fe93c26ce1df2aa7c96d1ae803/gistfile1.txt
+Here is the .config I used:
+https://gist.githubusercontent.com/anonymous/0d5eceb5ae65ffc5e853fb2664bb3acb/raw/8ca8f1a35468b5aac5b6485a12e71362e8d83ff3/gistfile1.txt
 
--- 
-Best Regards
-Masahiro Yamada
+Sorry for using gist links but the output is probably too big for the mailing list and regular pastebins.
+
+The build failure always looks something like this but the undefined symbols varies:
+  Building modules, stage 2.
+  MODPOST 146 modules
+ERROR: "__put_user_2" [net/ipv4/netfilter/ip_tables.ko] undefined!
+ERROR: "__put_user_2" [net/ipv4/netfilter/arp_tables.ko] undefined!
+ERROR: "__put_user_8" [fs/udf/udf.ko] undefined!
+ERROR: "__put_user_4" [fs/udf/udf.ko] undefined!
+ERROR: "__put_user_8" [fs/fat/fat.ko] undefined!
+ERROR: "__put_user_1" [fs/fat/fat.ko] undefined!
+ERROR: "__put_user_4" [fs/fat/fat.ko] undefined!
+ERROR: "__put_user_2" [fs/fat/fat.ko] undefined!
+ERROR: "__put_user_4" [drivers/net/tap.ko] undefined!
+ERROR: "__put_user_2" [drivers/net/tap.ko] undefined!
+ERROR: "__put_user_8" [drivers/media/v4l2-core/videodev.ko] undefined!
+ERROR: "__put_user_1" [drivers/media/v4l2-core/videodev.ko] undefined!
+ERROR: "__put_user_4" [drivers/media/v4l2-core/videodev.ko] undefined!
+ERROR: "__put_user_8" [drivers/input/joydev.ko] undefined!
+ERROR: "__put_user_1" [drivers/input/joydev.ko] undefined!
+ERROR: "__put_user_4" [drivers/input/joydev.ko] undefined!
+ERROR: "__fill_rsb" [arch/x86/kvm/kvm-intel.ko] undefined!
+make[2]: *** [/usr/src/linux-4.14.23/scripts/Makefile.modpost:92: __modpost] Error 1
+make[1]: *** [/usr/src/linux-4.14.23/Makefile:1218: modules] Error 2
+make[1]: Leaving directory '/home/cocobo/repository/kernel_build'
+
+The only difference between the two pasted build logs is that the failing build doesn't rebuild arch/x86/lib/retpoline.S.
+
+I don't know what cause the build failures but it seems like the build system can get confused about which files needs to be rebuild when trimming symbols.
