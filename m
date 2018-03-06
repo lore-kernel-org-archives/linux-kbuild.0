@@ -1,37 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:40602 "EHLO
-        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751354AbeCEPVk (ORCPT
+Received: from mail-vk0-f65.google.com ([209.85.213.65]:42389 "EHLO
+        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932088AbeCFEwB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Mar 2018 10:21:40 -0500
-Received: by mail-wm0-f45.google.com with SMTP id t6so16305479wmt.5
-        for <linux-kbuild@vger.kernel.org>; Mon, 05 Mar 2018 07:21:39 -0800 (PST)
-Date: Mon, 5 Mar 2018 16:21:25 +0100
-From: Robin Jarry <robin.jarry@6wind.com>
-Subject: Re: [PATCH] objtool: make use of pkg-config for libelf
-Message-ID: <20180305152125.7fjlbermrfvg4wzi@6wind.com>
-References: <20180301125537.14160-1-pp@emlix.com>
- <20180305145339.444neh5ablzofg42@treble>
+        Mon, 5 Mar 2018 23:52:01 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180305145339.444neh5ablzofg42@treble>
+In-Reply-To: <CAK7LNAQjnCnPvFZEPR2YM9EsOALnPy=FeugZC_8PFrngb9AQgQ@mail.gmail.com>
+References: <20180216202255.25307-1-ulfalizer@gmail.com> <1518815662.13169.27.camel@perches.com>
+ <CAFkk2KSRswP2FEV7mTMJwLe+WRDdVEUnZBOyh_XWrQu2tW07zg@mail.gmail.com> <CAK7LNAQjnCnPvFZEPR2YM9EsOALnPy=FeugZC_8PFrngb9AQgQ@mail.gmail.com>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Tue, 6 Mar 2018 05:52:00 +0100
+Message-ID: <CAFkk2KTUZYMc9poahUQMoQi=wSVnNHDt0SS8BTdRHs59m=qO4w@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Improve and extend checkpatch.pl Kconfig help text checks
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: Philipp Puschmann <pp@emlix.com>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, peterz@infradead.org, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Joe Perches <joe@perches.com>, Robo Bot <apw@canonical.com>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-03-05, Josh Poimboeuf:
-> [ Adding Robin ]
-> 
-> Robin, does this fix the same issue as your recent patches?  If so, I'd
-> prefer this one because it doesn't need any new environment variables.
+On Sat, Feb 24, 2018 at 2:53 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> 2018-02-23 10:30 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+>> On Fri, Feb 16, 2018 at 10:14 PM, Joe Perches <joe@perches.com> wrote:
+>>> On Fri, 2018-02-16 at 21:22 +0100, Ulf Magnusson wrote:
+>>>> Hello,
+>>>>
+>>>> This patchset contains some improvements for the Kconfig help text check in
+>>>> scripts/checkconfig.pl:
+>>>
+>>> Seems sensible enough to me.
+>>> Signed-off-by: Joe Perches <joe@perches.com>
+>>
+>> Will you be taking this in yourself?
+>>
+>> (Adding Masahiro on CC -- forgot when I sent the patchset.)
+>>
+>> Cheers,
+>> Ulf
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> I am not a perl expert, but I have no objection for this series.
+>
+>
+> Thanks!
+>
+>
+>
+>
+> --
+> Best Regards
+> Masahiro Yamada
 
-Hi Josh,
-
-this looks like it would work. I need to do proper testing before
-confirmation. Also, I did not have time to work on a v3. I'll wait a bit
-to see where this goes first.
-
--- 
-Robin
+*Bump*
