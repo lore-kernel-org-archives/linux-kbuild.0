@@ -1,72 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:61523 "EHLO
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:64310 "EHLO
         conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753305AbeCFJhp (ORCPT
+        with ESMTP id S1750819AbeCFJkP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Mar 2018 04:37:45 -0500
+        Tue, 6 Mar 2018 04:40:15 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KT70V-bKpUKi_pczO30bh7mAfSPPxghvESG16_CuXJpWg@mail.gmail.com>
-References: <1519965121-12017-1-git-send-email-yamada.masahiro@socionext.com>
- <1519965121-12017-10-git-send-email-yamada.masahiro@socionext.com>
- <CAFkk2KQTjnTLkBx_8jXLejxVJLHV6gijN0_MCYDwbsL+KNkp=w@mail.gmail.com>
- <CAB=NE6V+5MK-ytS+-QBppSBLz7T4hRQV8eMA2Vv9-crcbj7NYg@mail.gmail.com> <CAFkk2KT70V-bKpUKi_pczO30bh7mAfSPPxghvESG16_CuXJpWg@mail.gmail.com>
+In-Reply-To: <1519886077-31914-2-git-send-email-yamada.masahiro@socionext.com>
+References: <1519886077-31914-1-git-send-email-yamada.masahiro@socionext.com> <1519886077-31914-2-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 6 Mar 2018 18:36:50 +0900
-Message-ID: <CAK7LNAT728fMNs2nAc0oAN=TocdL6eGXjy3=16Rjy+qo2E9VcA@mail.gmail.com>
-Subject: Re: [PATCH v2 09/11] kconfig: unittest: test randconfig for choice in choice
+Date: Tue, 6 Mar 2018 18:39:30 +0900
+Message-ID: <CAK7LNARM_1fXyh8hnnAw7DGC97LZ7-pcriqWC9gQ4uSnU==Vpg@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] kconfig: rename silentoldconfig to syncconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Randy Dunlap <rdunlap@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Marc Herbert <marc.herbert@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Jeff Kirsher <jeffrey.t.kirsher@intel.com>, Michal Marek <michal.lkml@markovi.net>, intel-wired-lan@lists.osuosl.org
 
-2018-03-03 18:34 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> On Fri, Mar 2, 2018 at 10:29 PM, Luis R. Rodriguez <mcgrof@kernel.org> wrote:
->>
->>
->> On Fri, Mar 2, 2018, 3:14 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
->>>
->>> On Fri, Mar 2, 2018 at 5:31 AM, Masahiro Yamada
->>> > This is complicated usage, but it is still used in the real world;
->>> > drivers/usb/gadget/legacy/Kconfig is source'd in a choice context,
->>> > then creates a sub-choice in it.
->>>
->>> That file is the only one that does all that weird choice stuff btw.
->>>
->>> It's as if it was written to make use of as much obscure Kconfig stuff
->>> as possible. :P
->>
->>
->> Can't we just use another way to describe this requirement on this file,
->> with the trade-off of simplifying kconfig semantics?
->>
->>   Luis
+2018-03-01 15:34 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> As commit cedd55d49dee ("kconfig: Remove silentoldconfig from help
+> and docs; fix kconfig/conf's help") mentioned, 'silentoldconfig' is a
+> historical misnomer.  That commit removed it from help and docs since
+> it is an internal interface.  If so, it should be allowed to rename
+> it to something more intuitive.  'syncconfig' is the one I came up
+> with because it updates the .config if necessary, then synchronize
+> include/generated/autoconf.h and include/config/* with it.
 >
-> I don't think changing how drivers/usb/gadget/legacy/Kconfig does
-> things would allow for any simplifications, unfortunately (except to
-> get rid of the fix tested by this patch, maybe).
-
-We could also revert 3b9a19e08960e5cd.  :)
-
-
-> Being able to have non-choice-value symbols and choices in choices is
-> a side effect of automatic submenu creation. Symbols and choices that
-> depend on the symbol before them end up in a submenu, and only the
-> top-level symbols in the choice are marked as choice value symbols.
+> You should not manually invoke 'silentoldcofig'.  Display warning if
+> used in case existing scripts are doing wrong.
 >
-> I always wondered whether that was an intended feature or just
-> something people discovered works (it seems to work anyway...). It
-> feels pretty iffy to have cosmetic submenus affect behavior like that,
-> but playing devil's advocate, it kinda makes sense to put symbols
-> close to the symbols they depend on if you can get away with it.
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
+> Changes in v3:
+>   - Fix Documentation/networking/i40e.txt
+>   - Display warning if silentoldconfig is used
+>
+> Changes in v2:
+>   - newly added
 >
 
-I am happy to drop this test
-if removing the seem-to-work feature will clean up the code.
-
-
-Now I am accumulating test cases.
-
+Both applied to linux-kbuild/kconfig.
 
 
 -- 
