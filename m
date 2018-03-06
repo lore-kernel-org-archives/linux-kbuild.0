@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:23729 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750801AbeCFKO7 (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:60973 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753024AbeCFKx2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Mar 2018 05:14:59 -0500
+        Tue, 6 Mar 2018 05:53:28 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kconfig: make unmet dependency warnings readable
-Date: Tue,  6 Mar 2018 19:13:30 +0900
-Message-Id: <1520331210-27940-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2] kconfig: make unmet dependency warnings readable
+Date: Tue,  6 Mar 2018 19:51:39 +0900
+Message-Id: <1520333499-31854-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -28,14 +28,23 @@ Here is test code to demonstrate how it currently works.
 
   config A
           bool "A"
-          depends on DEP2
-          select C
+          select E
 
   config B
           bool "B"
-          select C
+          depends on DEP2
+          select E
 
   config C
+          bool "C"
+          depends on DEP1 && DEP2
+          select E
+
+  config D
+          def_bool n
+	  select E
+
+  config E
           bool
           depends on DEP1 && DEP2
 
@@ -43,22 +52,23 @@ Here is test code to demonstrate how it currently works.
 
   $ make allyesconfig
   scripts/kconfig/conf  --allyesconfig Kconfig
-  warning: (A && B) selects C which has unmet direct dependencies
-  (DEP1 && DEP2)
+  warning: (A && B && D) selects E which has unmet direct
+  dependencies (DEP1 && DEP2)
 
 Here, I see some points to be improved.
 
-First, '(A || B)' would make more sense than '(A && B)'.  I am not
-sure if this is intentional, but expr_simplify_unmet_dep() turns OR
-expressions into AND, like follows:
+First, '(A || B || D)' would make more sense than '(A && B && D)'.
+I am not sure if this is intentional, but expr_simplify_unmet_dep()
+turns OR expressions into AND, like follows:
 
         case E_OR:
                 return expr_alloc_and(
 
-Second, 'A' never causes unmet dependency because 'DEP1' is fixed to
-'y', and 'A' correctly depends on 'DEP2'.  It will be better to not
-report 'A', but it is impossible to avoid this false positive in the
-current expr_simplify_unmet_dep().
+Second, we see false positives.  'A' is a real unmet dependency.
+'B' is false positive because 'DEP1' is fixed to 'y', and 'B' depends
+on 'DEP2'.  'C' was correctly dropped by expr_simplify_unmet_dep().
+'D' is also false positive because it has no chance to be enabled.
+Current expr_simplify_unmet_dep() cannot avoid those false positives.
 
 After all, I decided to use the same helpers as used for printing
 reverse dependencies in the help.
@@ -129,6 +139,9 @@ PROC_FS [=y] && !MIPS && !PPC && !S390 && !MICROBLAZE && !ARM_UNWIND &&
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
+
+Changes in v2:
+  - update test case
 
  scripts/kconfig/expr.c   | 29 -----------------------------
  scripts/kconfig/expr.h   |  1 -
