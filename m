@@ -1,62 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f194.google.com ([209.85.223.194]:46111 "EHLO
-        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965541AbeCHGva (ORCPT
+Received: from mail-it0-f67.google.com ([209.85.214.67]:55237 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S964960AbeCHG42 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Mar 2018 01:51:30 -0500
-Received: by mail-io0-f194.google.com with SMTP id p78so5887917iod.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 07 Mar 2018 22:51:30 -0800 (PST)
+        Thu, 8 Mar 2018 01:56:28 -0500
+Subject: Re: [PATCH] kbuild: Handle builtin dtb files containing hyphens
+References: <20180307140633.26182-1-jhogan@kernel.org>
+From: Frank Rowand <frowand.list@gmail.com>
+Message-ID: <2bb96235-6b1f-07bb-3dfe-d5dbb8eddb7f@gmail.com>
+Date: Wed, 7 Mar 2018 22:56:25 -0800
 MIME-Version: 1.0
-Reply-To: paymasterofficedesk@gmail.com
-From: James Williams <johnsonmakuofficeuba@gmail.com>
-Date: Thu, 8 Mar 2018 07:51:28 +0100
-Message-ID: <CAF94_XpU7nf5E0bGSLZN-2W+G1cPYrcAswpznWNnJ=vpjmdMGg@mail.gmail.com>
-Subject: Urgent response
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20180307140633.26182-1-jhogan@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: James Hogan <jhogan@kernel.org>, linux-kbuild@vger.kernel.org, devicetree@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Ralf Baechle <ralf@linux-mips.org>, Florian Fainelli <f.fainelli@gmail.com>, Kevin Cernekee <cernekee@gmail.com>, linux-mips@linux-mips.org, stable@vger.kernel.org
 
-Attn: Beneficiary,
+On 03/07/18 06:06, James Hogan wrote:
+> On dtb files which contain hyphens, the dt_S_dtb command to build the
+> dtb.S files (which allow DTB files to be built into the kernel) results
+> in errors like the following:
 
-We have contacted the Federal Ministry of Finance on your Behalf and
-they have brought a solution to your problem by coordinating your
-payment in total (10,000,000.00) Ten Million Dollars in an atm card
-which you can use to withdraw money from any ATM MACHINE CENTER
-anywhere in the world with a maximum of 10000 Dollars daily. You now
-have the lawful right to claim your fund in an atm card. Since the
-Federal Bureau of Investigation is involved in this transaction, you
-have to be rest assured for this is 100% risk free it is our duty to
-protect the American Citizens, European Citizens, Asian Citizen. All I
-want you to do is to contact the atm card CENTER Via email or call the
-office telephone number one of the Consultant will assist you for
-their requirements to proceed and procure your Approval Slip on your
-behalf.
+< snip >
 
-CONTACT INFORMATION
-NAME: James  Williams
-EMAIL: paymasterofficedesk@gmail.com
+Hi James,
 
+Sorry for dribbling my comments out in so many emails.  :-)
 
-Do contact us with your details:
+Please change the subject line to say "dtb filenames" instead
+of "dtb files".
 
-Full name//
-Address// Age//
- Telephone Numbers//
-Occupation//
- Your Country//
-Bank Details//
+Thanks,
 
-So your files would be updated after which the Delivery of your
-atm card will be affected to your designated home Address without any
-further delay and the bank will transfer your funds in total
-(10,000,000.00) Ten Million Dollars to your Bank account. We
-will reply you with the secret code (1600 atm card). We advice you get
-back to the payment office after you have contacted the ATM SWIFT CARD
-CENTER and we do await your response so we can move on with our
-Investigation and make sure your ATM SWIFT CARD gets to you.
-
-
-Best Regards
-James Williams
-Paymaster General
-Federal Republic Of Nigeri
+Frank
