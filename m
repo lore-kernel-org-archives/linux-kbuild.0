@@ -1,59 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:60402 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755044AbeCHBF4 (ORCPT
+Received: from mail-io0-f194.google.com ([209.85.223.194]:46111 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965541AbeCHGva (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Mar 2018 20:05:56 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/5] kbuild: remove unnecessary $(subst $(obj)/,,...) in modname-multi
-Date: Thu,  8 Mar 2018 10:04:59 +0900
-Message-Id: <1520471103-10089-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1520471103-10089-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1520471103-10089-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 8 Mar 2018 01:51:30 -0500
+Received: by mail-io0-f194.google.com with SMTP id p78so5887917iod.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 07 Mar 2018 22:51:30 -0800 (PST)
+MIME-Version: 1.0
+Reply-To: paymasterofficedesk@gmail.com
+From: James Williams <johnsonmakuofficeuba@gmail.com>
+Date: Thu, 8 Mar 2018 07:51:28 +0100
+Message-ID: <CAF94_XpU7nf5E0bGSLZN-2W+G1cPYrcAswpznWNnJ=vpjmdMGg@mail.gmail.com>
+Subject: Urgent response
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Cao jin <caoj.fnst@cn.fujitsu.com>, Govind Singh <govinds@codeaurora.org>, Kalle Valo <kvalo@codeaurora.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-In the context ...
+Attn: Beneficiary,
 
-    $(obj)/%.s: $(src)/%.c FORCE
-            $(call if_changed_dep,cc_s_c)
+We have contacted the Federal Ministry of Finance on your Behalf and
+they have brought a solution to your problem by coordinating your
+payment in total (10,000,000.00) Ten Million Dollars in an atm card
+which you can use to withdraw money from any ATM MACHINE CENTER
+anywhere in the world with a maximum of 10000 Dollars daily. You now
+have the lawful right to claim your fund in an atm card. Since the
+Federal Bureau of Investigation is involved in this transaction, you
+have to be rest assured for this is 100% risk free it is our duty to
+protect the American Citizens, European Citizens, Asian Citizen. All I
+want you to do is to contact the atm card CENTER Via email or call the
+office telephone number one of the Consultant will assist you for
+their requirements to proceed and procure your Approval Slip on your
+behalf.
 
-    $(obj)/%.i: $(src)/%.c FORCE
-            $(call if_changed_dep,cpp_i_c)
+CONTACT INFORMATION
+NAME: James  Williams
+EMAIL: paymasterofficedesk@gmail.com
 
-    $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
-            $(call cmd,force_checksrc)
-            $(call if_changed_rule,cc_o_c)
 
-    $(obj)/%.lst: $(src)/%.c FORCE
-            $(call if_changed_dep,cc_lst_c)
+Do contact us with your details:
 
-'$*' returns the stem of the target (the part of '%'), so $(obj)/ has
-already been ripped off.
+Full name//
+Address// Age//
+ Telephone Numbers//
+Occupation//
+ Your Country//
+Bank Details//
 
-$(subst $(obj)/,,$*.o) is the same as $(*.o)
+So your files would be updated after which the Delivery of your
+atm card will be affected to your designated home Address without any
+further delay and the bank will transfer your funds in total
+(10,000,000.00) Ten Million Dollars to your Bank account. We
+will reply you with the secret code (1600 atm card). We advice you get
+back to the payment office after you have contacted the ATM SWIFT CARD
+CENTER and we do await your response so we can move on with our
+Investigation and make sure your ATM SWIFT CARD gets to you.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- scripts/Makefile.lib | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 5589bae..a7e315f 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -175,7 +175,7 @@ dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
- 
- # Finds the multi-part object the current object will be linked into
- modname-multi = $(sort $(foreach m,$(multi-used),\
--		$(if $(filter $(subst $(obj)/,,$*.o), $($(m:.o=-objs)) $($(m:.o=-y))),$(m:.o=))))
-+		$(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y))),$(m:.o=))))
- 
- # Useful for describing the dependency of composite objects
- # Usage:
--- 
-2.7.4
-
+Best Regards
+James Williams
+Paymaster General
+Federal Republic Of Nigeri
