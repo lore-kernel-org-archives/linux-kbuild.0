@@ -1,41 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:60404 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:60436 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755043AbeCHBF4 (ORCPT
+        with ESMTP id S1755046AbeCHBF5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Mar 2018 20:05:56 -0500
+        Wed, 7 Mar 2018 20:05:57 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 0/5] kbuild: always define KBUILD_MODNAME, and clean-up/fix modname
-Date: Thu,  8 Mar 2018 10:04:58 +0900
-Message-Id: <1520471103-10089-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 5/5] kbuild: move modname and modname-multi close to modname_flags
+Date: Thu,  8 Mar 2018 10:05:03 +0900
+Message-Id: <1520471103-10089-6-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1520471103-10089-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1520471103-10089-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Cao jin <caoj.fnst@cn.fujitsu.com>, Govind Singh <govinds@codeaurora.org>, Kalle Valo <kvalo@codeaurora.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
+Just a cosmetic change to put related code close together.
 
-3/5 takes into account '-m' case for multi-used-m.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-2/5 is necessary beforehand because 3/5 would cause a build error for
-drivers/net/ethernet/cavium/liquidio/lio_ethtool.c
+ scripts/Makefile.build |  2 --
+ scripts/Makefile.lib   | 14 ++++++++------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-1, 4, 5 are just clean-ups.
-
-
-
-Cao jin (1):
-  kbuild: fix modname for composite modules
-
-Masahiro Yamada (4):
-  kbuild: remove unnecessary $(subst $(obj)/,,...) in modname-multi
-  kbuild: define KBUILD_MODNAME even if multiple modules share objects
-  kbuild: simplify modname calculation
-  kbuild: move modname and modname-multi close to modname_flags
-
- scripts/Makefile.build | 12 ------------
- scripts/Makefile.lib   | 22 +++++++++-------------
- 2 files changed, 9 insertions(+), 25 deletions(-)
-
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index b8aecb7..2d8f90e 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -131,8 +131,6 @@ $(real-objs-m:.o=.lst): quiet_modtag := [M]
+ 
+ $(obj-m)              : quiet_modtag := [M]
+ 
+-modname = $(if $(modname-multi),$(modname-multi),$(basetarget))
+-
+ quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
+ cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
+ 
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index e4e8e1b..b17f4cd 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -77,6 +77,14 @@ multi-used-y	:= $(addprefix $(obj)/,$(multi-used-y))
+ multi-used-m	:= $(addprefix $(obj)/,$(multi-used-m))
+ subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
+ 
++# Finds the multi-part object the current object will be linked into.
++# If the object belongs to two or more multi-part objects, all of them are
++# concatenated with a colon separator.
++modname-multi = $(subst $(space),:,$(sort $(foreach m,$(multi-used),\
++		$(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=)))))
++
++modname = $(if $(modname-multi),$(modname-multi),$(basetarget))
++
+ # These flags are needed for modversions and compiling, so we define them here
+ # $(modname_flags) defines KBUILD_MODNAME as the name of the module it will
+ # end up in (or would, if it gets compiled in)
+@@ -165,12 +173,6 @@ dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
+ 		 $(addprefix -I,$(DTC_INCLUDE))                          \
+ 		 -undef -D__DTS__
+ 
+-# Finds the multi-part object the current object will be linked into
+-# If the object belongs to two or more multi-part objects, all of them are
+-# concatenated with a colon separator.
+-modname-multi = $(subst $(space),:,$(sort $(foreach m,$(multi-used),\
+-		$(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=)))))
+-
+ # Useful for describing the dependency of composite objects
+ # Usage:
+ #   $(call multi_depend, multi_used_targets, suffix_to_remove, suffix_to_add)
 -- 
 2.7.4
 
