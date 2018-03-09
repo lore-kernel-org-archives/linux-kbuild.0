@@ -1,17 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:54896 "EHLO
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:28346 "EHLO
         heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750848AbeCIDN0 (ORCPT
+        with ESMTP id S1750898AbeCIDOb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Mar 2018 22:13:26 -0500
-Subject: Re: [PATCH 4/5] kbuild: simplify modname calculation
+        Thu, 8 Mar 2018 22:14:31 -0500
+Subject: Re: [PATCH 5/5] kbuild: move modname and modname-multi close to
+ modname_flags
 References: <1520471103-10089-1-git-send-email-yamada.masahiro@socionext.com>
- <1520471103-10089-5-git-send-email-yamada.masahiro@socionext.com>
+ <1520471103-10089-6-git-send-email-yamada.masahiro@socionext.com>
 From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <4c97d2e7-4029-e19e-4fc2-44d0cea927a5@cn.fujitsu.com>
-Date: Fri, 9 Mar 2018 11:12:38 +0800
+Message-ID: <f4660c10-5481-3308-1117-6a71666c1674@cn.fujitsu.com>
+Date: Fri, 9 Mar 2018 11:13:42 +0800
 MIME-Version: 1.0
-In-Reply-To: <1520471103-10089-5-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1520471103-10089-6-git-send-email-yamada.masahiro@socionext.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -23,70 +24,12 @@ Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Gov
 
 
 On 03/08/2018 09:05 AM, Masahiro Yamada wrote:
-> modname can be calculated much more simply.  If modname-multi is
-> empty, it is a single-used object.  So, modname = $(basetarget).> Otherwise, modname = $(modname-multi).
+> Just a cosmetic change to put related code close together.
 > 
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
->  scripts/Makefile.build | 12 +-----------
->  scripts/Makefile.lib   |  7 -------
->  2 files changed, 1 insertion(+), 18 deletions(-)
-> 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 4f2b25d..b8aecb7 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -131,17 +131,7 @@ $(real-objs-m:.o=.lst): quiet_modtag := [M]
->  
->  $(obj-m)              : quiet_modtag := [M]
->  
-> -# Default for not multi-part modules
-> -modname = $(basetarget)
-> -
-> -$(multi-objs-m)         : modname = $(modname-multi)
-> -$(multi-objs-m:.o=.i)   : modname = $(modname-multi)
-> -$(multi-objs-m:.o=.s)   : modname = $(modname-multi)
-> -$(multi-objs-m:.o=.lst) : modname = $(modname-multi)
-> -$(multi-objs-y)         : modname = $(modname-multi)
-> -$(multi-objs-y:.o=.i)   : modname = $(modname-multi)
-> -$(multi-objs-y:.o=.s)   : modname = $(modname-multi)
-> -$(multi-objs-y:.o=.lst) : modname = $(modname-multi)
-> +modname = $(if $(modname-multi),$(modname-multi),$(basetarget))
->  
->  quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
->  cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 9217d40..e4e8e1b 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -47,11 +47,6 @@ multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m
->  multi-used   := $(multi-used-y) $(multi-used-m)
->  single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
->  
-> -# Build list of the parts of our composite objects, our composite
-> -# objects depend on those (obviously)
-> -multi-objs-y := $(foreach m, $(multi-used-y), $($(m:.o=-objs)) $($(m:.o=-y)))
-> -multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)))
-> -
->  # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
->  # tell kbuild to descend
->  subdir-obj-y := $(filter %/built-in.o, $(obj-y))
-> @@ -80,8 +75,6 @@ real-objs-m	:= $(addprefix $(obj)/,$(real-objs-m))
->  single-used-m	:= $(addprefix $(obj)/,$(single-used-m))
->  multi-used-y	:= $(addprefix $(obj)/,$(multi-used-y))
->  multi-used-m	:= $(addprefix $(obj)/,$(multi-used-m))
-> -multi-objs-y	:= $(addprefix $(obj)/,$(multi-objs-y))
-> -multi-objs-m	:= $(addprefix $(obj)/,$(multi-objs-m))
->  subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
->  
->  # These flags are needed for modversions and compiling, so we define them here
-> 
-
-multi-objs-y/m seems only exist for rules above with target-specific
-variable assignment. A great simplification, So
 
 Reviewed-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+
 -- 
 Sincerely,
 Cao jin
