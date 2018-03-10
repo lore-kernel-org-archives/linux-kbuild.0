@@ -1,202 +1,302 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:38090 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751325AbeCJAHc (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:41648 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751974AbeCJK5E (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Mar 2018 19:07:32 -0500
-From: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Date: Sat, 10 Mar 2018 01:07:27 +0100
-Subject: Re: [PATCH v2] kconfig: make unmet dependency warnings readable
-Message-ID: <20180310000727.GA8881@example.com>
-References: <1520333499-31854-1-git-send-email-yamada.masahiro@socionext.com>
+        Sat, 10 Mar 2018 05:57:04 -0500
+Date: Sat, 10 Mar 2018 00:56:59 -1000
+From: Joey Pabalinas <joeypabalinas@gmail.com>
+Subject: [PATCH v2] scripts/kconfig: cleanup symbol handling code
+Message-ID: <20180310105659.7e34lk4kvcbl64lg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="5oo6xr74tsg54goh"
 Content-Disposition: inline
-In-Reply-To: <1520333499-31854-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Ulf Magnusson <ulfalizer@gmail.com>, Eugeniu Rosca <roscaeugeniu@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Petr Vorel <petr.vorel@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Joey Pabalinas <joeypabalinas@gmail.com>
 
-Hi Masahiro,
 
-Thanks for constantly improving the user experience of Kconfig.
-Just one small remark below.
+--5oo6xr74tsg54goh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 06, 2018 at 07:51:39PM +0900, Masahiro Yamada wrote:
-> Currently, the unmet dependency warnings end up with endlessly long
-> expressions, most of which are false positives.
-> 
-> Here is test code to demonstrate how it currently works.
-> 
-> [Test Case]
-> 
->   config DEP1
->           def_bool y
-> 
->   config DEP2
->           def_bool n
-> 
->   config A
->           bool "A"
->           select E
-> 
->   config B
->           bool "B"
->           depends on DEP2
->           select E
-> 
->   config C
->           bool "C"
->           depends on DEP1 && DEP2
->           select E
-> 
->   config D
->           def_bool n
-> 	  select E
-> 
->   config E
->           bool
->           depends on DEP1 && DEP2
-> 
-> [Result]
-> 
->   $ make allyesconfig
->   scripts/kconfig/conf  --allyesconfig Kconfig
->   warning: (A && B && D) selects E which has unmet direct
->   dependencies (DEP1 && DEP2)
-> 
-> Here, I see some points to be improved.
-> 
-> First, '(A || B || D)' would make more sense than '(A && B && D)'.
-> I am not sure if this is intentional, but expr_simplify_unmet_dep()
-> turns OR expressions into AND, like follows:
-> 
->         case E_OR:
->                 return expr_alloc_and(
-> 
-> Second, we see false positives.  'A' is a real unmet dependency.
-> 'B' is false positive because 'DEP1' is fixed to 'y', and 'B' depends
-> on 'DEP2'.  'C' was correctly dropped by expr_simplify_unmet_dep().
-> 'D' is also false positive because it has no chance to be enabled.
-> Current expr_simplify_unmet_dep() cannot avoid those false positives.
-> 
-> After all, I decided to use the same helpers as used for printing
-> reverse dependencies in the help.
-> 
-> With this commit, unreadable warnings in the real world:
-> 
-> $ make ARCH=score allyesconfig
-> scripts/kconfig/conf  --allyesconfig Kconfig
-> warning: (HWSPINLOCK_QCOM && AHCI_MTK && STMMAC_PLATFORM && DWMAC_IPQ806X
-> && DWMAC_LPC18XX && DWMAC_OXNAS && DWMAC_ROCKCHIP && DWMAC_SOCFPGA && DWMA
-> C_STI && TI_CPSW && PINCTRL_GEMINI && PINCTRL_OXNAS && PINCTRL_ROCKCHIP &&
->  PINCTRL_DOVE && PINCTRL_ARMADA_37XX && PINCTRL_STM32 && S3C2410_WATCHDOG
-> && VIDEO_OMAP3 && VIDEO_S5P_FIMC && USB_XHCI_MTK && RTC_DRV_AT91SAM9 && LP
-> C18XX_DMAMUX && VIDEO_OMAP4 && COMMON_CLK_GEMINI && COMMON_CLK_ASPEED && C
-> OMMON_CLK_NXP && COMMON_CLK_OXNAS && COMMON_CLK_BOSTON && ATMEL_ST && QCOM
-> _ADSP_PIL && QCOM_Q6V5_PIL && QCOM_GSBI && ATMEL_EBI && ST_IRQCHIP && RESE
-> T_IMX7 && PHY_HI6220_USB && PHY_RALINK_USB && PHY_ROCKCHIP_PCIE && PHY_DA8
-> XX_USB) selects MFD_SYSCON which has unmet direct dependencies (HAS_IOMEM)
-> warning: (PINCTRL_AT91 && PINCTRL_AT91PIO4 && PINCTRL_OXNAS && PINCTRL_PIS
-> TACHIO && PINCTRL_PIC32 && PINCTRL_MESON && PINCTRL_NOMADIK && PINCTRL_MTK
->  && PINCTRL_MT7622 && GPIO_TB10X) selects OF_GPIO which has unmet direct d
-> ependencies (GPIOLIB && OF && HAS_IOMEM)
-> warning: (FAULT_INJECTION_STACKTRACE_FILTER && LATENCYTOP && LOCKDEP) sele
-> cts FRAME_POINTER which has unmet direct dependencies (DEBUG_KERNEL && (CR
-> IS || M68K || FRV || UML || SUPERH || BLACKFIN || MN10300 || METAG) || ARC
-> H_WANT_FRAME_POINTERS)
-> 
-> will be turned into:
-> 
-> $ make ARCH=score allyesconfig
-> scripts/kconfig/conf  --allyesconfig Kconfig
-> 
-> WARNING:
->  Unmet direct dependencies detected for MFD_SYSCON
->  Depends on:
->     HAS_IOMEM [=n]
->  Selected by [y]:
->   - PINCTRL_STM32 [=y] && PINCTRL [=y] && (ARCH_STM32 || COMPILE_TEST [=y])
-> && OF [=y]
->   - RTC_DRV_AT91SAM9 [=y] && RTC_CLASS [=y] && (ARCH_AT91 || COMPILE_TEST
-> [=y])
->   - ATMEL_ST [=y] && GENERIC_CLOCKEVENTS [=y]
->   - RESET_IMX7 [=y] && RESET_CONTROLLER [=y]
->   - PHY_HI6220_USB [=y] && (ARCH_HISI && ARM64 || COMPILE_TEST [=y])
->   - PHY_RALINK_USB [=y] && (RALINK || COMPILE_TEST [=y])
->   - PHY_ROCKCHIP_PCIE [=y] && (ARCH_ROCKCHIP && OF [=y] || COMPILE_TEST
-> [=y])
-> 
-> WARNING:
->  Unmet direct dependencies detected for OF_GPIO
->  Depends on:
->     GPIOLIB [=y] && OF [=y] && HAS_IOMEM [=n]
->  Selected by [y]:
->   - PINCTRL_MTK [=y] && PINCTRL [=y] && (ARCH_MEDIATEK || COMPILE_TEST
-> [=y]) && OF [=y]
->   - PINCTRL_MT7622 [=y] && PINCTRL [=y] && (ARCH_MEDIATEK || COMPILE_TEST
-> [=y]) && OF [=y] && (ARM64 || COMPILE_TEST [=y])
-> 
-> WARNING:
->  Unmet direct dependencies detected for FRAME_POINTER
->  Depends on:
->     DEBUG_KERNEL [=y] && (CRIS || M68K || FRV || UML || SUPERH || BLACKFIN
->  || MN10300 || METAG) || ARCH_WANT_FRAME_POINTERS [=n]
->  Selected by [y]:
->   - LATENCYTOP [=y] && DEBUG_KERNEL [=y] && STACKTRACE_SUPPORT [=y] &&
-> PROC_FS [=y] && !MIPS && !PPC && !S390 && !MICROBLAZE && !ARM_UNWIND &&
-> !ARC && !X86
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
-> Changes in v2:
->   - update test case
-> 
->  scripts/kconfig/expr.c   | 29 -----------------------------
->  scripts/kconfig/expr.h   |  1 -
->  scripts/kconfig/symbol.c | 33 +++++++++++++++++++++------------
->  3 files changed, 21 insertions(+), 42 deletions(-)
-> 
-> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-> index 49376e1..235e179 100644
-> --- a/scripts/kconfig/expr.c
-> +++ b/scripts/kconfig/expr.c
-> @@ -1150,35 +1150,6 @@ expr_get_leftmost_symbol(const struct expr *e)
->  	return expr_copy(e);
->  }
->  
-> -/*
-> - * Given expression `e1' and `e2', returns the leaf of the longest
-> - * sub-expression of `e1' not containing 'e2.
-> - */
-> -struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
-> -{
-> -	struct expr *ret;
-> -
-> -	switch (e1->type) {
-> -	case E_OR:
-> -		return expr_alloc_and(
-> -		    expr_simplify_unmet_dep(e1->left.expr, e2),
-> -		    expr_simplify_unmet_dep(e1->right.expr, e2));
-> -	case E_AND: {
-> -		struct expr *e;
-> -		e = expr_alloc_and(expr_copy(e1), expr_copy(e2));
-> -		e = expr_eliminate_dups(e);
-> -		ret = (!expr_eq(e, e1)) ? e1 : NULL;
-> -		expr_free(e);
-> -		break;
-> -		}
-> -	default:
-> -		ret = e1;
-> -		break;
-> -	}
-> -
-> -	return expr_get_leftmost_symbol(ret);
+Many of the variable names in scripts/kconfig/symbol.c are
+far too terse to the point of not at all identifying _what_
+they are actually used for (`p` and `l` as a couple examples),
+and overall there is a large amount of code that could use
+some cleaning up.
 
-It looks like expr_get_leftmost_symbol() has no more callers left and
-could be removed with this patch?
+Give more explicit names to these variables, fix a couple cases
+where different variables were sharing the same name and shadowing
+each other, and overall cleanup a bit of the messiness in
+sym_expand_string_value() and sym_escape_string_value()
+while maintaining equivalent program behavior.
 
-Thanks,
-Eugeniu.
+Suggested-by: Ulf Magnusson <ulfalizer@gmail.com>
+Signed-off-by: Joey Pabalinas <joeypabalinas@gmail.com>
+
+ 1 file changed, 69 insertions(+), 61 deletions(-)
+
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 2220bc4b051bd914e3..9ee32ddb44e193719c 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -5,8 +5,8 @@
+=20
+ #include <ctype.h>
+ #include <stdlib.h>
+-#include <string.h>
+ #include <regex.h>
++#include <linux/string.h>
+ #include <sys/utsname.h>
+=20
+ #include "lkc.h"
+@@ -337,7 +337,7 @@ void sym_calc_value(struct symbol *sym)
+ {
+ 	struct symbol_value newval, oldval;
+ 	struct property *prop;
+-	struct expr *e;
++	struct expr *expr;
+=20
+ 	if (!sym)
+ 		return;
+@@ -469,7 +469,7 @@ void sym_calc_value(struct symbol *sym)
+ 		struct symbol *choice_sym;
+=20
+ 		prop =3D sym_get_choice_prop(sym);
+-		expr_list_for_each_sym(prop->expr, e, choice_sym) {
++		expr_list_for_each_sym(prop->expr, expr, choice_sym) {
+ 			if ((sym->flags & SYMBOL_WRITE) &&
+ 			    choice_sym->visible !=3D no)
+ 				choice_sym->flags |=3D SYMBOL_WRITE;
+@@ -899,94 +899,100 @@ struct symbol *sym_find(const char *name)
+  * name to be expanded shall be prefixed by a '$'. Unknown symbol expands =
+to
+  * the empty string.
+  */
+-char *sym_expand_string_value(const char *in)
++char *sym_expand_string_value(const char *src)
+ {
+-	const char *src;
+-	char *res;
+-	size_t reslen;
++	const char *in;
++	char *res, *out;
++	size_t res_len, src_len;
+=20
+ 	/*
+-	 * Note: 'in' might come from a token that's about to be
++	 * Note: 'src' might come from a token that'src about to be
+ 	 * freed, so make sure to always allocate a new string
+ 	 */
+-	reslen =3D strlen(in) + 1;
+-	res =3D xmalloc(reslen);
+-	res[0] =3D '\0';
++	res_len =3D strlen(src) + 1;
++	res =3D xmalloc(res_len);
++	out =3D res;
+=20
+-	while ((src =3D strchr(in, '$'))) {
++	while ((in =3D strchr(src, '$'))) {
+ 		char *p, name[SYMBOL_MAXLENGTH];
+-		const char *symval =3D "";
++		const char *sym_val =3D "";
+ 		struct symbol *sym;
+-		size_t newlen;
++		size_t new_len, sym_len;
+=20
+-		strncat(res, in, src - in);
+-		src++;
++		strscpy(out, src, in - src);
++		out +=3D in - src;
++		in++;
+=20
+ 		p =3D name;
+-		while (isalnum(*src) || *src =3D=3D '_')
+-			*p++ =3D *src++;
++		while (isalnum(*in) || *in =3D=3D '_')
++			*p++ =3D *in++;
+ 		*p =3D '\0';
+=20
+ 		sym =3D sym_find(name);
+ 		if (sym !=3D NULL) {
+ 			sym_calc_value(sym);
+-			symval =3D sym_get_string_value(sym);
++			sym_val =3D sym_get_string_value(sym);
+ 		}
+=20
+-		newlen =3D strlen(res) + strlen(symval) + strlen(src) + 1;
+-		if (newlen > reslen) {
+-			reslen =3D newlen;
+-			res =3D xrealloc(res, reslen);
++		sym_len =3D strlen(sym_val);
++		new_len =3D sym_len + strlen(res) + strlen(in) + 1;
++		if (new_len > res_len) {
++			res_len =3D new_len;
++			res =3D xrealloc(res, res_len);
+ 		}
+=20
+-		strcat(res, symval);
+-		in =3D src;
++		strscpy(out, sym_val, sym_len);
++		out +=3D sym_len;
++		src =3D in;
+ 	}
+-	strcat(res, in);
++	src_len =3D strlen(src);
++	strscpy(out, src, src_len);
++	out +=3D src_len;
++	*out =3D '\0';
+=20
+ 	return res;
+ }
+=20
+-const char *sym_escape_string_value(const char *in)
++const char *sym_escape_string_value(const char *src)
+ {
+-	const char *p;
+-	size_t reslen;
+-	char *res;
+-	size_t l;
++	const char *in;
++	size_t res_len, in_len;
++	char *res, *out;
+=20
+-	reslen =3D strlen(in) + strlen("\"\"") + 1;
++	res_len =3D strlen(src) + strlen("\"\"") + 1;
+=20
+-	p =3D in;
++	in =3D src;
+ 	for (;;) {
+-		l =3D strcspn(p, "\"\\");
+-		p +=3D l;
++		in_len =3D strcspn(in, "\"\\");
++		in +=3D in_len;
+=20
+-		if (p[0] =3D=3D '\0')
++		if (*in =3D=3D '\0')
+ 			break;
+=20
+-		reslen++;
+-		p++;
++		res_len++;
++		in++;
+ 	}
+=20
+-	res =3D xmalloc(reslen);
+-	res[0] =3D '\0';
++	res =3D xmalloc(res_len);
++	out =3D res;
++	*out++ =3D '\"';
+=20
+-	strcat(res, "\"");
+-
+-	p =3D in;
++	in =3D src;
+ 	for (;;) {
+-		l =3D strcspn(p, "\"\\");
+-		strncat(res, p, l);
+-		p +=3D l;
++		in_len =3D strcspn(in, "\"\\");
++		strscpy(out, in, in_len);
++		in +=3D in_len;
++		out +=3D in_len;
+=20
+-		if (p[0] =3D=3D '\0')
++		if (*in =3D=3D '\0')
+ 			break;
+=20
+-		strcat(res, "\\");
+-		strncat(res, p++, 1);
++		*out++ =3D '\\';
++		*out++ =3D *in++;
+ 	}
++	*out++ =3D '\"';
++	*out =3D '\0';
+=20
+-	strcat(res, "\"");
+ 	return res;
+ }
+=20
+@@ -1014,8 +1020,8 @@ static int sym_rel_comp(const void *sym1, const void =
+*sym2)
+ 	 * exactly; if this is the case, we can't decide which comes first,
+ 	 * and we fallback to sorting alphabetically.
+ 	 */
+-	exact1 =3D (s1->eo - s1->so) =3D=3D strlen(s1->sym->name);
+-	exact2 =3D (s2->eo - s2->so) =3D=3D strlen(s2->sym->name);
++	exact1 =3D (s1->eo - s1->so) =3D=3D (off_t)strlen(s1->sym->name);
++	exact2 =3D (s2->eo - s2->so) =3D=3D (off_t)strlen(s2->sym->name);
+ 	if (exact1 && !exact2)
+ 		return -1;
+ 	if (!exact1 && exact2)
+@@ -1390,31 +1396,33 @@ const char *prop_get_type_name(enum prop_type type)
+ 	return "unknown";
+ }
+=20
+-static void prop_add_env(const char *env)
++static void prop_add_env(const char *env_key)
+ {
+ 	struct symbol *sym, *sym2;
+ 	struct property *prop;
+-	char *p;
++	char *env_val;
+=20
+ 	sym =3D current_entry->sym;
+ 	sym->flags |=3D SYMBOL_AUTO;
+ 	for_all_properties(sym, prop, P_ENV) {
+ 		sym2 =3D prop_get_symbol(prop);
+-		if (strcmp(sym2->name, env))
++		if (strcmp(sym2->name, env_key))
+ 			menu_warn(current_entry, "redefining environment symbol from %s",
+ 				  sym2->name);
+ 		return;
+ 	}
+=20
+ 	prop =3D prop_alloc(P_ENV, sym);
+-	prop->expr =3D expr_alloc_symbol(sym_lookup(env, SYMBOL_CONST));
++	prop->expr =3D expr_alloc_symbol(sym_lookup(env_key, SYMBOL_CONST));
+=20
+ 	sym_env_list =3D expr_alloc_one(E_LIST, sym_env_list);
+ 	sym_env_list->right.sym =3D sym;
++	env_val =3D getenv(env_key);
+=20
+-	p =3D getenv(env);
+-	if (p)
+-		sym_add_default(sym, p);
+-	else
+-		menu_warn(current_entry, "environment variable %s undefined", env);
++	if (likely(env_val)) {
++		sym_add_default(sym, env_val);
++		return;
++	}
++
++	menu_warn(current_entry, "environment variable %s undefined", env_key);
+ }
+--=20
+2.16.2
+
+--5oo6xr74tsg54goh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEKlZXrihdNOcUPZTNruvLfWhyVBkFAlqjufsACgkQruvLfWhy
+VBnPgw/+OMcFdo5BJ5otPdx+8lSdeiIRlnIv9NRnk4HTlsiJDyMBLWRc2QsIbMvp
+5X2BbQorijnj+O25K9XEOZnU3bImPaik1XNZBhRC4e2JdeHwrgXiluJ/Ei1AZ9Wa
+jqFOz2YEFj2z8R6Zep/7Oceowe8GP7D/vZHSz8zn+l44T627ovSuXPwWVZQPkUDg
+1XZ8IYXNXm7ItXvF6LTIYmPgl7n0+HajAKlPuEcqFe31q9QX7H5gMzyEcz/MGGed
+8J3bmRlgIthI3G2NUv7LQZmiphwt/o+yaMn83V4cCEWjbk+1BW56MX4t3LUA+Bga
+W/WVkBvbTzX87l6tnVv1RSaqzhOt8VXlRHiydHxhs9gSTNciVVT0PMbODmpWNQpb
+JO5DsEeGAU6Jy4rYnB/IwLLH98vZpTVzNW+h+GOQD650bbUHQeseDkVErImdilNs
+EuW/qu68BRXniUCFonktFhmX44XGMs5x78out1kYscRBWSIok54nbO5/VaA2//Sy
+54YwdVM0hYQxBsD3pxoB+nfbq7LyTg0iFQh1f7aQqmSHBEx58FxBTXlVrCB1RfMK
+NGZSw2FubXCy5QQpHNotOsZtMq+2jyjv/w17Yb8bMAWOFnf6JLQtejSP7z7ERbHX
+Pf+XDdyt33pHRiYGJLs8qE+gwKlzn8LE17oWrxaUsDdVboiRZd4=
+=mb9x
+-----END PGP SIGNATURE-----
+
+--5oo6xr74tsg54goh--
