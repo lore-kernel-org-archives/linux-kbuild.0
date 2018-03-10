@@ -1,278 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:29582 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932150AbeCJPyc (ORCPT
+Received: from mail-it0-f68.google.com ([209.85.214.68]:38885 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752238AbeCJSo0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 10 Mar 2018 10:54:32 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3] kconfig: make unmet dependency warnings readable
-Date: Sun, 11 Mar 2018 00:51:59 +0900
-Message-Id: <1520697119-17483-1-git-send-email-yamada.masahiro@socionext.com>
+        Sat, 10 Mar 2018 13:44:26 -0500
+Received: by mail-it0-f68.google.com with SMTP id j7-v6so6688933ita.3
+        for <linux-kbuild@vger.kernel.org>; Sat, 10 Mar 2018 10:44:26 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNASRLcaegdM8nWwqmw9mVMZvR7nQJTu8YuPya3Hse5z6PA@mail.gmail.com>
+References: <CAK7LNASRLcaegdM8nWwqmw9mVMZvR7nQJTu8YuPya3Hse5z6PA@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 10 Mar 2018 10:44:25 -0800
+Message-ID: <CA+55aFxRjUCCKj6opiSrWw7gOC38yb+h7XivMrR0iMT-oRTxCg@mail.gmail.com>
+Subject: Re: [GIT PULL] Kbuild fixes for v4.16-rc5
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Eugeniu Rosca <erosca@de.adit-jv.com>, Petr Vorel <pvorel@suse.cz>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Currently, the unmet dependency warnings end up with endlessly long
-expressions, most of which are false positives.
+On Sat, Mar 10, 2018 at 5:48 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> Please pull more Kbuild fixes for v4.16.
 
-Here is test code to demonstrate how it currently works.
+Pulled.
 
-[Test Case]
+And I really don't think these are the reason, but I wonder if you've
+looked at why an empty build seems to have become slower lately?
 
-  config DEP1
-          def_bool y
+I do "allmodconfig" builds between each pull, and it used to be in the
+40+ second range. Now it's in the "just over a minute" range. That's
+with absolutely nothing actually being built.
 
-  config DEP2
-          bool "DEP2"
+That "nothing rebuilt" is actually the big expense for me for the
+later -rc handling, since it completely dominates when the pull
+requests shrink (even if *something* gets rebuilt, the one minute for
+the empty build is 90+% of the time).
 
-  config A
-          bool "A"
-          select E
+It might not be kbuild that has triggered this, it might be something
+else. But some trivial profiling shows that it's definitely pretty
+much all in make, although 'modpost' does show up:
 
-  config B
-          bool "B"
-          depends on DEP2
-          select E
+  83.18%  make
+  11.30%  modpost
+   5.10%  sh
+   0.31%  cat
+   0.03%  cc1
+   0.01%  grep
+   ...
 
-  config C
-          bool "C"
-          depends on DEP1 && DEP2
-          select E
+The above was just from
 
-  config D
-          def_bool n
-          select E
+    perf record -e cycles:pp make -j16
 
-  config E
-          bool
-          depends on DEP1 && DEP2
+and then doing a
 
-[Result]
+    perf report --sort=comm
 
-  $ make config
-  scripts/kconfig/conf  --oldaskconfig Kconfig
-  *
-  * Linux Kernel Configuration
-  *
-  DEP2 (DEP2) [N/y/?] (NEW) n
-  A (A) [N/y/?] (NEW) y
-  warning: (A && B && D) selects E which has unmet direct
-  dependencies (DEP1 && DEP2)
+to see a very high-level overview.
 
-Here, I see some points to be improved.
+Pretty much all of the time in 'make' is spent on parsing, it seems:
 
-First, '(A || B || D)' would make more sense than '(A && B && D)'.
-I am not sure if this is intentional, but expr_simplify_unmet_dep()
-turns OR expressions into AND, like follows:
+   5.24%  make      [.] hash_find_slot
+   3.86%  make      [.] __strlen_avx2
+   3.76%  make      [.] _int_malloc
+   3.25%  make      [.] target_environment
+   2.82%  make      [.] __memmove_avx_unaligned_erms
+   2.49%  make      [.] __strcmp_sse2_unaligned
+   2.41%  modpost   [.] parse_file
+   2.21%  make      [.] malloc
+   2.18%  make      [.] 0x000000000001e1f3
+   2.10%  make      [.] glob
+   2.06%  make      [.] __strchr_avx2
+   1.92%  make      [.] parse_variable_definition
+   1.76%  make      [.] _int_free
+   1.52%  make      [.] parse_file_seq
+   1.49%  make      [.] find_next_token
+   ....
 
-        case E_OR:
-                return expr_alloc_and(
+and maybe it's 'make' that has gotten upgraded and slowed down, and
+it's not our build system at all.
 
-Second, we see false positives.  'A' is a real unmet dependency.
-'B' is false positive because 'DEP1' is fixed to 'y', and 'B' depends
-on 'DEP2'.  'C' was correctly dropped by expr_simplify_unmet_dep().
-'D' is also false positive because it has no chance to be enabled.
-Current expr_simplify_unmet_dep() cannot avoid those false positives.
+Yes, my build times continually do go up as the kernel grows, so
+that's normal. It's just that there seems to have been a fairly big
+jump in the last month or so.
 
-After all, I decided to use the same helpers as used for printing
-reverse dependencies in the help.
+I haven't tried to bisect anything, I thought I'd just mention it in
+case you go "yeah, I'm aware.."
 
-With this commit, unreadable warnings in the real world:
-
-$ make ARCH=score allyesconfig
-scripts/kconfig/conf  --allyesconfig Kconfig
-warning: (HWSPINLOCK_QCOM && AHCI_MTK && STMMAC_PLATFORM && DWMAC_IPQ806X
-&& DWMAC_LPC18XX && DWMAC_OXNAS && DWMAC_ROCKCHIP && DWMAC_SOCFPGA && DWMA
-C_STI && TI_CPSW && PINCTRL_GEMINI && PINCTRL_OXNAS && PINCTRL_ROCKCHIP &&
- PINCTRL_DOVE && PINCTRL_ARMADA_37XX && PINCTRL_STM32 && S3C2410_WATCHDOG
-&& VIDEO_OMAP3 && VIDEO_S5P_FIMC && USB_XHCI_MTK && RTC_DRV_AT91SAM9 && LP
-C18XX_DMAMUX && VIDEO_OMAP4 && COMMON_CLK_GEMINI && COMMON_CLK_ASPEED && C
-OMMON_CLK_NXP && COMMON_CLK_OXNAS && COMMON_CLK_BOSTON && ATMEL_ST && QCOM
-_ADSP_PIL && QCOM_Q6V5_PIL && QCOM_GSBI && ATMEL_EBI && ST_IRQCHIP && RESE
-T_IMX7 && PHY_HI6220_USB && PHY_RALINK_USB && PHY_ROCKCHIP_PCIE && PHY_DA8
-XX_USB) selects MFD_SYSCON which has unmet direct dependencies (HAS_IOMEM)
-warning: (PINCTRL_AT91 && PINCTRL_AT91PIO4 && PINCTRL_OXNAS && PINCTRL_PIS
-TACHIO && PINCTRL_PIC32 && PINCTRL_MESON && PINCTRL_NOMADIK && PINCTRL_MTK
- && PINCTRL_MT7622 && GPIO_TB10X) selects OF_GPIO which has unmet direct d
-ependencies (GPIOLIB && OF && HAS_IOMEM)
-warning: (FAULT_INJECTION_STACKTRACE_FILTER && LATENCYTOP && LOCKDEP) sele
-cts FRAME_POINTER which has unmet direct dependencies (DEBUG_KERNEL && (CR
-IS || M68K || FRV || UML || SUPERH || BLACKFIN || MN10300 || METAG) || ARC
-H_WANT_FRAME_POINTERS)
-
-will be turned into:
-
-$ make ARCH=score allyesconfig
-scripts/kconfig/conf  --allyesconfig Kconfig
-
-WARNING: unmet direct dependencies detected for MFD_SYSCON
- Depends on:
-    HAS_IOMEM [=n]
- Selected by [y]:
-  - PINCTRL_STM32 [=y] && PINCTRL [=y] && (ARCH_STM32 || COMPILE_TEST [=y])
-&& OF [=y]
-  - RTC_DRV_AT91SAM9 [=y] && RTC_CLASS [=y] && (ARCH_AT91 || COMPILE_TEST
-[=y])
-  - ATMEL_ST [=y] && GENERIC_CLOCKEVENTS [=y]
-  - RESET_IMX7 [=y] && RESET_CONTROLLER [=y]
-  - PHY_HI6220_USB [=y] && (ARCH_HISI && ARM64 || COMPILE_TEST [=y])
-  - PHY_RALINK_USB [=y] && (RALINK || COMPILE_TEST [=y])
-  - PHY_ROCKCHIP_PCIE [=y] && (ARCH_ROCKCHIP && OF [=y] || COMPILE_TEST
-[=y])
-
-WARNING: unmet direct dependencies detected for OF_GPIO
- Depends on:
-    GPIOLIB [=y] && OF [=y] && HAS_IOMEM [=n]
- Selected by [y]:
-  - PINCTRL_MTK [=y] && PINCTRL [=y] && (ARCH_MEDIATEK || COMPILE_TEST
-[=y]) && OF [=y]
-  - PINCTRL_MT7622 [=y] && PINCTRL [=y] && (ARCH_MEDIATEK || COMPILE_TEST
-[=y]) && OF [=y] && (ARM64 || COMPILE_TEST [=y])
-
-WARNING: unmet direct dependencies detected for FRAME_POINTER
- Depends on:
-    DEBUG_KERNEL [=y] && (CRIS || M68K || FRV || UML || SUPERH || BLACKFIN
- || MN10300 || METAG) || ARCH_WANT_FRAME_POINTERS [=n]
- Selected by [y]:
-  - LATENCYTOP [=y] && DEBUG_KERNEL [=y] && STACKTRACE_SUPPORT [=y] &&
-PROC_FS [=y] && !MIPS && !PPC && !S390 && !MICROBLAZE && !ARM_UNWIND &&
-!ARC && !X86
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Reviewed-by: Petr Vorel <petr.vorel@gmail.com>
----
-
-Changes in v3:
-  - Remove unused expr_get_leftmost_symbol()
-  - Move error message to the same line as 'WARNING'
-  - update test case
-
-Changes in v2:
-  - update test case
-
- scripts/kconfig/expr.c   | 42 ------------------------------------------
- scripts/kconfig/expr.h   |  1 -
- scripts/kconfig/symbol.c | 34 ++++++++++++++++++++++------------
- 3 files changed, 22 insertions(+), 55 deletions(-)
-
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index 49376e1..e1a39e9 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -1137,48 +1137,6 @@ static int expr_compare_type(enum expr_type t1, enum expr_type t2)
- 	return 0;
- }
- 
--static inline struct expr *
--expr_get_leftmost_symbol(const struct expr *e)
--{
--
--	if (e == NULL)
--		return NULL;
--
--	while (e->type != E_SYMBOL)
--		e = e->left.expr;
--
--	return expr_copy(e);
--}
--
--/*
-- * Given expression `e1' and `e2', returns the leaf of the longest
-- * sub-expression of `e1' not containing 'e2.
-- */
--struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
--{
--	struct expr *ret;
--
--	switch (e1->type) {
--	case E_OR:
--		return expr_alloc_and(
--		    expr_simplify_unmet_dep(e1->left.expr, e2),
--		    expr_simplify_unmet_dep(e1->right.expr, e2));
--	case E_AND: {
--		struct expr *e;
--		e = expr_alloc_and(expr_copy(e1), expr_copy(e2));
--		e = expr_eliminate_dups(e);
--		ret = (!expr_eq(e, e1)) ? e1 : NULL;
--		expr_free(e);
--		break;
--		}
--	default:
--		ret = e1;
--		break;
--	}
--
--	return expr_get_leftmost_symbol(ret);
--}
--
- void expr_print(struct expr *e,
- 		void (*fn)(void *, struct symbol *, const char *),
- 		void *data, int prevtoken)
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index 8dbf2a4..94a383b 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -305,7 +305,6 @@ struct expr *expr_transform(struct expr *e);
- int expr_contains_symbol(struct expr *dep, struct symbol *sym);
- bool expr_depends_symbol(struct expr *dep, struct symbol *sym);
- struct expr *expr_trans_compare(struct expr *e, enum expr_type type, struct symbol *sym);
--struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2);
- 
- void expr_fprint(struct expr *e, FILE *out);
- struct gstr; /* forward */
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 0f7eba7..8b13c16 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -333,6 +333,26 @@ static struct symbol *sym_calc_choice(struct symbol *sym)
- 	return def_sym;
- }
- 
-+static void sym_warn_unmet_dependency(struct symbol *sym)
-+{
-+	struct gstr gs = str_new();
-+
-+	str_printf(&gs,
-+		   "\nWARNING: unmet direct dependencies detected for %s\n"
-+		   " Depends on:\n"
-+		   "    ",
-+		   sym->name);
-+	expr_gstr_print(sym->dir_dep.expr, &gs);
-+	str_printf(&gs, "\n");
-+
-+	expr_gstr_print_revdep(sym->rev_dep.expr, &gs, yes,
-+			       " Selected by [y]:\n");
-+	expr_gstr_print_revdep(sym->rev_dep.expr, &gs, mod,
-+			       " Selected by [m]:\n");
-+
-+	fputs(str_get(&gs), stderr);
-+}
-+
- void sym_calc_value(struct symbol *sym)
- {
- 	struct symbol_value newval, oldval;
-@@ -414,18 +434,8 @@ void sym_calc_value(struct symbol *sym)
- 				}
- 			}
- 		calc_newval:
--			if (sym->dir_dep.tri == no && sym->rev_dep.tri != no) {
--				struct expr *e;
--				e = expr_simplify_unmet_dep(sym->rev_dep.expr,
--				    sym->dir_dep.expr);
--				fprintf(stderr, "warning: (");
--				expr_fprint(e, stderr);
--				fprintf(stderr, ") selects %s which has unmet direct dependencies (",
--					sym->name);
--				expr_fprint(sym->dir_dep.expr, stderr);
--				fprintf(stderr, ")\n");
--				expr_free(e);
--			}
-+			if (sym->dir_dep.tri == no && sym->rev_dep.tri != no)
-+				sym_warn_unmet_dependency(sym);
- 			newval.tri = EXPR_OR(newval.tri, sym->rev_dep.tri);
- 		}
- 		if (newval.tri == mod &&
--- 
-2.7.4
-
+                     Linus
