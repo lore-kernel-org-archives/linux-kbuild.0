@@ -1,92 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:38885 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752238AbeCJSo0 (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:35512 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932144AbeCKUM5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 10 Mar 2018 13:44:26 -0500
-Received: by mail-it0-f68.google.com with SMTP id j7-v6so6688933ita.3
-        for <linux-kbuild@vger.kernel.org>; Sat, 10 Mar 2018 10:44:26 -0800 (PST)
+        Sun, 11 Mar 2018 16:12:57 -0400
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] kbuild: check for pkg-config on make menu/n/g/xconfig
+Message-ID: <09cf5537-b2d7-5bf5-0c0b-d0b765e1e75b@infradead.org>
+Date: Sun, 11 Mar 2018 13:12:51 -0700
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNASRLcaegdM8nWwqmw9mVMZvR7nQJTu8YuPya3Hse5z6PA@mail.gmail.com>
-References: <CAK7LNASRLcaegdM8nWwqmw9mVMZvR7nQJTu8YuPya3Hse5z6PA@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 10 Mar 2018 10:44:25 -0800
-Message-ID: <CA+55aFxRjUCCKj6opiSrWw7gOC38yb+h7XivMrR0iMT-oRTxCg@mail.gmail.com>
-Subject: Re: [GIT PULL] Kbuild fixes for v4.16-rc5
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: LKML <linux-kernel@vger.kernel.org>
 
-On Sat, Mar 10, 2018 at 5:48 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Please pull more Kbuild fixes for v4.16.
+From: Randy Dunlap <rdunlap@infradead.org>
 
-Pulled.
+Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
+that other required files are present, but none of these check that
+pkg-config itself is present.  Add a check for all 4 of these targets.
 
-And I really don't think these are the reason, but I wonder if you've
-looked at why an empty build seems to have become slower lately?
+Fixes kernel bugzilla #77511:
+https://bugzilla.kernel.org/show_bug.cgi?id=77511
 
-I do "allmodconfig" builds between each pull, and it used to be in the
-40+ second range. Now it's in the "just over a minute" range. That's
-with absolutely nothing actually being built.
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+I'm also OK with just documenting the pkg-config requirement in
+Documentation/Changes (= Documentation/process/changes.rst).
 
-That "nothing rebuilt" is actually the big expense for me for the
-later -rc handling, since it completely dominates when the pull
-requests shrink (even if *something* gets rebuilt, the one minute for
-the empty build is 90+% of the time).
++ chmod +x scripts/kconfig/check-pkgconfig.sh
 
-It might not be kbuild that has triggered this, it might be something
-else. But some trivial profiling shows that it's definitely pretty
-much all in make, although 'modpost' does show up:
+ scripts/kconfig/Makefile           |   15 ++++++++++++++-
+ scripts/kconfig/check-pkgconfig.sh |   13 +++++++++++++
+ 2 files changed, 27 insertions(+), 1 deletion(-)
 
-  83.18%  make
-  11.30%  modpost
-   5.10%  sh
-   0.31%  cat
-   0.03%  cc1
-   0.01%  grep
-   ...
+--- lnx-416-rc3.orig/scripts/kconfig/Makefile
++++ lnx-416-rc3/scripts/kconfig/Makefile
+@@ -160,6 +160,9 @@ help:
+ 	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
+ 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
+ 
++# pkg-config check
++check-pkgconfig  := $(srctree)/$(src)/check-pkgconfig.sh
++
+ # lxdialog stuff
+ check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
+ 
+@@ -205,7 +208,17 @@ $(addprefix $(obj)/, mconf.o $(lxdialog)
+ $(obj)/dochecklxdialog:
+ 	$(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC) $(HOST_EXTRACFLAGS) $(HOSTLOADLIBES_mconf)
+ 
+-always := dochecklxdialog
++# Check that we have pkg-config (used by each of menu/n/g/xconfig)
++PHONY += $(obj)/docheckpkgconfig
++$(addprefix $(obj)/, mconf.o): $(obj)/docheckpkgconfig
++$(addprefix $(obj)/, nconf.o): $(obj)/docheckpkgconfig
++$(addprefix $(obj)/, gconf.o): $(obj)/docheckpkgconfig
++$(addprefix $(obj)/, qconf.o): $(obj)/docheckpkgconfig
++
++$(obj)/docheckpkgconfig:
++	$(Q)$(CONFIG_SHELL) $(check-pkgconfig)
++
++always := docheckpkgconfig dochecklxdialog
+ 
+ # Add environment specific flags
+ HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTCC) $(HOSTCFLAGS))
+--- /dev/null
++++ lnx-416-rc3/scripts/kconfig/check-pkgconfig.sh
+@@ -0,0 +1,13 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++# Check for pkg-config presence
++
++pkgcfg=`which pkg-config >/dev/null 2>&1`
++found=$?
++
++if [ $found -ne 0 ]; then
++	echo "'make *config' requires 'pkg-config'. Please install it." 1>&2
++	exit 1		# error
++fi
++
++exit 0
 
-The above was just from
 
-    perf record -e cycles:pp make -j16
-
-and then doing a
-
-    perf report --sort=comm
-
-to see a very high-level overview.
-
-Pretty much all of the time in 'make' is spent on parsing, it seems:
-
-   5.24%  make      [.] hash_find_slot
-   3.86%  make      [.] __strlen_avx2
-   3.76%  make      [.] _int_malloc
-   3.25%  make      [.] target_environment
-   2.82%  make      [.] __memmove_avx_unaligned_erms
-   2.49%  make      [.] __strcmp_sse2_unaligned
-   2.41%  modpost   [.] parse_file
-   2.21%  make      [.] malloc
-   2.18%  make      [.] 0x000000000001e1f3
-   2.10%  make      [.] glob
-   2.06%  make      [.] __strchr_avx2
-   1.92%  make      [.] parse_variable_definition
-   1.76%  make      [.] _int_free
-   1.52%  make      [.] parse_file_seq
-   1.49%  make      [.] find_next_token
-   ....
-
-and maybe it's 'make' that has gotten upgraded and slowed down, and
-it's not our build system at all.
-
-Yes, my build times continually do go up as the kernel grows, so
-that's normal. It's just that there seems to have been a fairly big
-jump in the last month or so.
-
-I haven't tried to bisect anything, I thought I'd just mention it in
-case you go "yeah, I'm aware.."
-
-                     Linus
