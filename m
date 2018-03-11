@@ -1,88 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:35512 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932144AbeCKUM5 (ORCPT
+Received: from mail-io0-f174.google.com ([209.85.223.174]:35813 "EHLO
+        mail-io0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932232AbeCKVAw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Mar 2018 16:12:57 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] kbuild: check for pkg-config on make menu/n/g/xconfig
-Message-ID: <09cf5537-b2d7-5bf5-0c0b-d0b765e1e75b@infradead.org>
-Date: Sun, 11 Mar 2018 13:12:51 -0700
+        Sun, 11 Mar 2018 17:00:52 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <09cf5537-b2d7-5bf5-0c0b-d0b765e1e75b@infradead.org>
+References: <09cf5537-b2d7-5bf5-0c0b-d0b765e1e75b@infradead.org>
+From: =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
+Date: Sun, 11 Mar 2018 22:00:51 +0100
+Message-ID: <CAEYzJUEr0Wvv9UOV4wBYC6E3bh_0ih5A=ebPaKs06egZAZfPUw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: check for pkg-config on make menu/n/g/xconfig
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, LKML <linux-kernel@vger.kernel.org>
 
-From: Randy Dunlap <rdunlap@infradead.org>
+On 11 March 2018 at 21:12, Randy Dunlap <rdunlap@infradead.org> wrote:
+> +pkgcfg=3D`which pkg-config >/dev/null 2>&1`
 
-Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
-that other required files are present, but none of these check that
-pkg-config itself is present.  Add a check for all 4 of these targets.
+Please use "command -v" instead of "which". command -v is in POSIX, so
+the shell will have it for sure (builtin). which is not a builtin, it
+is an external command that may or may not be installed on the system.
 
-Fixes kernel bugzilla #77511:
-https://bugzilla.kernel.org/show_bug.cgi?id=77511
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-I'm also OK with just documenting the pkg-config requirement in
-Documentation/Changes (= Documentation/process/changes.rst).
-
-+ chmod +x scripts/kconfig/check-pkgconfig.sh
-
- scripts/kconfig/Makefile           |   15 ++++++++++++++-
- scripts/kconfig/check-pkgconfig.sh |   13 +++++++++++++
- 2 files changed, 27 insertions(+), 1 deletion(-)
-
---- lnx-416-rc3.orig/scripts/kconfig/Makefile
-+++ lnx-416-rc3/scripts/kconfig/Makefile
-@@ -160,6 +160,9 @@ help:
- 	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
- 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
- 
-+# pkg-config check
-+check-pkgconfig  := $(srctree)/$(src)/check-pkgconfig.sh
-+
- # lxdialog stuff
- check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
- 
-@@ -205,7 +208,17 @@ $(addprefix $(obj)/, mconf.o $(lxdialog)
- $(obj)/dochecklxdialog:
- 	$(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC) $(HOST_EXTRACFLAGS) $(HOSTLOADLIBES_mconf)
- 
--always := dochecklxdialog
-+# Check that we have pkg-config (used by each of menu/n/g/xconfig)
-+PHONY += $(obj)/docheckpkgconfig
-+$(addprefix $(obj)/, mconf.o): $(obj)/docheckpkgconfig
-+$(addprefix $(obj)/, nconf.o): $(obj)/docheckpkgconfig
-+$(addprefix $(obj)/, gconf.o): $(obj)/docheckpkgconfig
-+$(addprefix $(obj)/, qconf.o): $(obj)/docheckpkgconfig
-+
-+$(obj)/docheckpkgconfig:
-+	$(Q)$(CONFIG_SHELL) $(check-pkgconfig)
-+
-+always := docheckpkgconfig dochecklxdialog
- 
- # Add environment specific flags
- HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTCC) $(HOSTCFLAGS))
---- /dev/null
-+++ lnx-416-rc3/scripts/kconfig/check-pkgconfig.sh
-@@ -0,0 +1,13 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# Check for pkg-config presence
-+
-+pkgcfg=`which pkg-config >/dev/null 2>&1`
-+found=$?
-+
-+if [ $found -ne 0 ]; then
-+	echo "'make *config' requires 'pkg-config'. Please install it." 1>&2
-+	exit 1		# error
-+fi
-+
-+exit 0
-
-
+Best regards,
+Bj=C3=B8rn Forsman
