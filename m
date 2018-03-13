@@ -1,190 +1,177 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:41802 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:41651 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752484AbeCMJOB (ORCPT
+        with ESMTP id S1752395AbeCMJN4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Mar 2018 05:14:01 -0400
+        Tue, 13 Mar 2018 05:13:56 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 08/11] kconfig: tests: test defconfig when two choices interact
-Date: Tue, 13 Mar 2018 18:12:09 +0900
-Message-Id: <1520932332-2449-9-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1520932332-2449-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1520932332-2449-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v3 00/11] Add Kconfig unit tests
+Date: Tue, 13 Mar 2018 18:12:01 +0900
+Message-Id: <1520932332-2449-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Tony Luck <tony.luck@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Tony Luck <tony.luck@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Commit fbe98bb9ed3d ("kconfig: Fix defconfig when one choice menu
-selects options that another choice menu depends on") fixed defconfig
-when two choices interact (i.e. calculating the visibility of a choice
-requires to calculate another choice).
+I am applying various cleanups to Kconfig these days.
 
-The test code in that commit log was based on the real world example,
-and complicated.  So, I shrunk it down to the following:
+However, I fear regressions.  I have been thinking of unit-tests.
 
-defconfig.choice:
----8<---
-CONFIG_CHOICE_VAL0=y
----8<---
+There are various cryptic parts in Kconfig and corner cases where
+it is difficult to notice breakage.  If unit-tests cover those,
+I will be able to apply changes more confidently.
 
----8<---
-config MODULES
-        def_bool y
-        option modules
+This series introduces a unit-tests.  The framework is written based
+on pytest.  Also, this is written in Python 3.  Python 2 will retire
+in 2020.  So, I believe new python tools should be written in Python 3.
 
-choice
-        prompt "Choice"
+This is my Python 3 and pytest versions.
 
-config CHOICE_VAL0
-        tristate "Choice 0"
+$ python3 --version
+Python 3.5.2
+$ python3 -m pytest --version
+This is pytest version 3.4.1, imported from /home/masahiro/.local/lib/python3.5/site-packages/pytest.py
 
-config CHOICE_VAL1
-        tristate "Choice 1"
+How to use?
+-----------
 
-endchoice
+Please make sure Python3 and pytest are installed on your system.
 
-choice
-        prompt "Another choice"
-        depends on CHOICE_VAL0
+Then, run "make testconfig"
 
-config DUMMY
-        bool "dummy"
+The result looks like as follows:
 
-endchoice
----8<---
+$ make testconfig
+python3 -B -m pytest ./scripts/kconfig/tests \
+-o cache_dir=/home/masahiro/workspace/bsp/linux-yamada/scripts/kconfig/tests/.cache \
 
-Prior to commit fbe98bb9ed3d,
+================================= test session starts =================================
+platform linux -- Python 3.5.2, pytest-3.4.1, py-1.5.2, pluggy-0.6.0 -- /usr/bin/python3
+cachedir: scripts/kconfig/tests/.cache
+rootdir: /home/masahiro/workspace/bsp/linux-yamada/scripts/kconfig/tests, inifile: pytest.ini
+collected 14 items
 
-  $ scripts/kconfig/conf --defconfig=defconfig.choice Kconfig.choice
+scripts/kconfig/tests/auto_submenu/__init__.py::test PASSED                     [  7%]
+scripts/kconfig/tests/choice/__init__.py::test_oldask0 PASSED                   [ 14%]
+scripts/kconfig/tests/choice/__init__.py::test_oldask1 PASSED                   [ 21%]
+scripts/kconfig/tests/choice/__init__.py::test_allyes PASSED                    [ 28%]
+scripts/kconfig/tests/choice/__init__.py::test_allmod PASSED                    [ 35%]
+scripts/kconfig/tests/choice/__init__.py::test_allno PASSED                     [ 42%]
+scripts/kconfig/tests/choice/__init__.py::test_alldef PASSED                    [ 50%]
+scripts/kconfig/tests/choice_value_with_m_dep/__init__.py::test PASSED          [ 57%]
+scripts/kconfig/tests/err_recursive_inc/__init__.py::test PASSED                [ 64%]
+scripts/kconfig/tests/inter_choice/__init__.py::test PASSED                     [ 71%]
+scripts/kconfig/tests/new_choice_with_dep/__init__.py::test PASSED              [ 78%]
+scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py::test PASSED            [ 85%]
+scripts/kconfig/tests/rand_nested_choice/__init__.py::test PASSED               [ 92%]
+scripts/kconfig/tests/warn_recursive_dep/__init__.py::test PASSED               [100%]
 
-resulted in:
 
-  CONFIG_MODULES=y
-  CONFIG_CHOICE_VAL0=m
-  # CONFIG_CHOICE_VAL1 is not set
-  CONFIG_DUMMY=y
+Masahiro Yamada (11):
+  kbuild: add PYTHON2 and PYTHON3 variables
+  kconfig: tests: add framework for Kconfig unit testing
+  kconfig: tests: add basic choice tests
+  kconfig: tests: test automatic submenu creation
+  kconfig: tests: test if new symbols in choice are asked
+  kconfig: tests: check unneeded "is not set" with unmet dependency
+  kconfig: tests: check visibility of tristate choice values in y choice
+  kconfig: tests: test defconfig when two choices interact
+  kconfig: tests: test randconfig for choice in choice
+  kconfig: tests: test if recursive dependencies are detected
+  kconfig: tests: test if recursive inclusion is detected
 
-where the expected result would be:
-
-  CONFIG_MODULES=y
-  CONFIG_CHOICE_VAL0=y
-  # CONFIG_CHOICE_VAL1 is not set
-  CONFIG_DUMMY=y
-
-Roughly, this weird behavior happened like this:
-
-Symbols are calculated a couple of times.  First, all symbols are
-calculated in conf_read().  The first 'choice' is evaluated to 'y'
-due to the SYMBOL_DEF_USER flag, but sym_calc_choice() clears it
-unless all of its choice values are explicitly set by the user.
-
-conf_set_all_new_symbols() clears all SYMBOL_VALID flags.  Then, only
-choices are calculated.  Here, the SYMBOL_DEF_USER for the first choice
-has been forgotten, so it is evaluated to 'm'.  set_all_choice_values()
-sets SYMBOL_DEF_USER again to choice symbols.
-
-When calculating the second choice, due to 'depends on CHOICE_VAL0',
-it triggers the calculation of CHOICE_VAL0.  As a result, SYMBOL_VALID
-is set for CHOICE_VAL0.
-
-Symbols except choices get the final chance of re-calculation in
-conf_write().  In a normal case, CHOICE_VAL0 would be re-calculated,
-then the first choice would be indirectly re-calculated with the
-SYMBOL_DEF_USER which has been recalled by set_all_choice_values(),
-which would be evaluated to 'y'.  But, in this case, CHOICE_VAL0 has
-already been marked as SYMBOL_VALID, so this re-calculation does not
-happen.  Then, =m from the conf_set_all_new_symbols() phase is written
-out to the .config file.
-
-Add a unit test for this naive case.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
----
-
-Changes in v3:
-  - Use def_bool for MODULES
-
-Changes in v2:
-  - Newly added
-
- scripts/kconfig/tests/inter_choice/Kconfig         | 23 ++++++++++++++++++++++
- scripts/kconfig/tests/inter_choice/__init__.py     | 14 +++++++++++++
- scripts/kconfig/tests/inter_choice/defconfig       |  1 +
- scripts/kconfig/tests/inter_choice/expected_config |  4 ++++
- 4 files changed, 42 insertions(+)
+ Makefile                                           |   4 +-
+ scripts/kconfig/Makefile                           |   8 +
+ scripts/kconfig/tests/auto_submenu/Kconfig         |  50 ++++
+ scripts/kconfig/tests/auto_submenu/__init__.py     |  12 +
+ scripts/kconfig/tests/auto_submenu/expected_stdout |  10 +
+ scripts/kconfig/tests/choice/Kconfig               |  54 ++++
+ scripts/kconfig/tests/choice/__init__.py           |  40 +++
+ .../kconfig/tests/choice/alldef_expected_config    |   5 +
+ .../kconfig/tests/choice/allmod_expected_config    |   9 +
+ scripts/kconfig/tests/choice/allno_expected_config |   5 +
+ .../kconfig/tests/choice/allyes_expected_config    |   9 +
+ .../kconfig/tests/choice/oldask0_expected_stdout   |  10 +
+ scripts/kconfig/tests/choice/oldask1_config        |   2 +
+ .../kconfig/tests/choice/oldask1_expected_stdout   |  15 ++
+ .../kconfig/tests/choice_value_with_m_dep/Kconfig  |  19 ++
+ .../tests/choice_value_with_m_dep/__init__.py      |  15 ++
+ .../kconfig/tests/choice_value_with_m_dep/config   |   2 +
+ .../tests/choice_value_with_m_dep/expected_config  |   3 +
+ .../tests/choice_value_with_m_dep/expected_stdout  |   4 +
+ scripts/kconfig/tests/conftest.py                  | 291 +++++++++++++++++++++
+ scripts/kconfig/tests/err_recursive_inc/Kconfig    |   1 +
+ scripts/kconfig/tests/err_recursive_inc/Kconfig2   |   1 +
+ scripts/kconfig/tests/err_recursive_inc/Kconfig3   |   1 +
+ .../kconfig/tests/err_recursive_inc/__init__.py    |  10 +
+ .../tests/err_recursive_inc/expected_stderr        |   5 +
+ scripts/kconfig/tests/inter_choice/Kconfig         |  23 ++
+ scripts/kconfig/tests/inter_choice/__init__.py     |  14 +
+ scripts/kconfig/tests/inter_choice/defconfig       |   1 +
+ scripts/kconfig/tests/inter_choice/expected_config |   4 +
+ scripts/kconfig/tests/new_choice_with_dep/Kconfig  |  37 +++
+ .../kconfig/tests/new_choice_with_dep/__init__.py  |  14 +
+ scripts/kconfig/tests/new_choice_with_dep/config   |   3 +
+ .../tests/new_choice_with_dep/expected_stdout      |  10 +
+ .../kconfig/tests/no_write_if_dep_unmet/Kconfig    |  14 +
+ .../tests/no_write_if_dep_unmet/__init__.py        |  19 ++
+ scripts/kconfig/tests/no_write_if_dep_unmet/config |   1 +
+ .../tests/no_write_if_dep_unmet/expected_config    |   5 +
+ scripts/kconfig/tests/pytest.ini                   |   7 +
+ scripts/kconfig/tests/rand_nested_choice/Kconfig   |  33 +++
+ .../kconfig/tests/rand_nested_choice/__init__.py   |  16 ++
+ .../tests/rand_nested_choice/expected_stdout0      |   2 +
+ .../tests/rand_nested_choice/expected_stdout1      |   4 +
+ .../tests/rand_nested_choice/expected_stdout2      |   5 +
+ scripts/kconfig/tests/warn_recursive_dep/Kconfig   |  62 +++++
+ .../kconfig/tests/warn_recursive_dep/__init__.py   |   9 +
+ .../tests/warn_recursive_dep/expected_stderr       |  30 +++
+ 46 files changed, 897 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/kconfig/tests/auto_submenu/Kconfig
+ create mode 100644 scripts/kconfig/tests/auto_submenu/__init__.py
+ create mode 100644 scripts/kconfig/tests/auto_submenu/expected_stdout
+ create mode 100644 scripts/kconfig/tests/choice/Kconfig
+ create mode 100644 scripts/kconfig/tests/choice/__init__.py
+ create mode 100644 scripts/kconfig/tests/choice/alldef_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/allmod_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/allno_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/allyes_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/oldask0_expected_stdout
+ create mode 100644 scripts/kconfig/tests/choice/oldask1_config
+ create mode 100644 scripts/kconfig/tests/choice/oldask1_expected_stdout
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/Kconfig
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/__init__.py
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/config
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/expected_config
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout
+ create mode 100644 scripts/kconfig/tests/conftest.py
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig2
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig3
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/__init__.py
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/expected_stderr
  create mode 100644 scripts/kconfig/tests/inter_choice/Kconfig
  create mode 100644 scripts/kconfig/tests/inter_choice/__init__.py
  create mode 100644 scripts/kconfig/tests/inter_choice/defconfig
  create mode 100644 scripts/kconfig/tests/inter_choice/expected_config
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/Kconfig
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/__init__.py
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/config
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/expected_stdout
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/config
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
+ create mode 100644 scripts/kconfig/tests/pytest.ini
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/Kconfig
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/__init__.py
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout0
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout1
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout2
+ create mode 100644 scripts/kconfig/tests/warn_recursive_dep/Kconfig
+ create mode 100644 scripts/kconfig/tests/warn_recursive_dep/__init__.py
+ create mode 100644 scripts/kconfig/tests/warn_recursive_dep/expected_stderr
 
-diff --git a/scripts/kconfig/tests/inter_choice/Kconfig b/scripts/kconfig/tests/inter_choice/Kconfig
-new file mode 100644
-index 0000000..e44449f
---- /dev/null
-+++ b/scripts/kconfig/tests/inter_choice/Kconfig
-@@ -0,0 +1,23 @@
-+config MODULES
-+	def_bool y
-+	option modules
-+
-+choice
-+	prompt "Choice"
-+
-+config CHOICE_VAL0
-+	tristate "Choice 0"
-+
-+config CHOIVE_VAL1
-+	tristate "Choice 1"
-+
-+endchoice
-+
-+choice
-+	prompt "Another choice"
-+	depends on CHOICE_VAL0
-+
-+config DUMMY
-+	bool "dummy"
-+
-+endchoice
-diff --git a/scripts/kconfig/tests/inter_choice/__init__.py b/scripts/kconfig/tests/inter_choice/__init__.py
-new file mode 100644
-index 0000000..5c7fc36
---- /dev/null
-+++ b/scripts/kconfig/tests/inter_choice/__init__.py
-@@ -0,0 +1,14 @@
-+"""
-+Do not affect user-assigned choice value by another choice.
-+
-+Handling of state flags for choices is complecated.  In old days,
-+the defconfig result of a choice could be affected by another choice
-+if those choices interact by 'depends on', 'select', etc.
-+
-+Related Linux commit: fbe98bb9ed3dae23e320c6b113e35f129538d14a
-+"""
-+
-+
-+def test(conf):
-+    assert conf.defconfig('defconfig') == 0
-+    assert conf.config_contains('expected_config')
-diff --git a/scripts/kconfig/tests/inter_choice/defconfig b/scripts/kconfig/tests/inter_choice/defconfig
-new file mode 100644
-index 0000000..162c414
---- /dev/null
-+++ b/scripts/kconfig/tests/inter_choice/defconfig
-@@ -0,0 +1 @@
-+CONFIG_CHOICE_VAL0=y
-diff --git a/scripts/kconfig/tests/inter_choice/expected_config b/scripts/kconfig/tests/inter_choice/expected_config
-new file mode 100644
-index 0000000..5dceefb
---- /dev/null
-+++ b/scripts/kconfig/tests/inter_choice/expected_config
-@@ -0,0 +1,4 @@
-+CONFIG_MODULES=y
-+CONFIG_CHOICE_VAL0=y
-+# CONFIG_CHOIVE_VAL1 is not set
-+CONFIG_DUMMY=y
 -- 
 2.7.4
 
