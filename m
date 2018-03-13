@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:41805 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:41800 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752488AbeCMJOB (ORCPT
+        with ESMTP id S1752483AbeCMJOB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 13 Mar 2018 05:14:01 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 10/11] kconfig: tests: test if recursive dependencies are detected
-Date: Tue, 13 Mar 2018 18:12:11 +0900
-Message-Id: <1520932332-2449-11-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v3 09/11] kconfig: tests: test randconfig for choice in choice
+Date: Tue, 13 Mar 2018 18:12:10 +0900
+Message-Id: <1520932332-2449-10-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1520932332-2449-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1520932332-2449-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,146 +15,149 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Tony Luck <tony.luck@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Recursive dependency should be detected and warned.  Test this.
+Commit 3b9a19e08960 ("kconfig: loop as long as we changed some symbols
+in randconfig") fixed randconfig where a choice contains a sub-choice.
+Prior to that commit, the sub-choice values were not set.
 
-This indirectly tests the line number increments.
+I am not sure whether this is an intended feature or just something
+people discovered works, but it is used in the real world;
+drivers/usb/gadget/legacy/Kconfig is source'd in a choice context,
+then creates a sub-choice in it.
+
+For the test case in this commit, there are 3 possible results.
+
+Case 1:
+  CONFIG_A=y
+  # CONFIG_B is not set
+
+Case 2:
+  # CONFIG_A is not set
+  CONFIG_B=y
+  CONFIG_C=y
+  # CONFIG_D is not set
+
+Case 3:
+  # CONFIG_A is not set
+  CONFIG_B=y
+  # CONFIG_C is not set
+  CONFIG_D=y
+  CONFIG_E=y
+
+So, this test iterates several times, and checks if the result is
+either of the three.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
 
-Changes in v3: None
+Changes in v3:
+  - Fix typos
+
 Changes in v2:
-  - Fix missing end quote
-  - coding style clean-up based on PEP8, PEP257
+  - Newly added
 
- scripts/kconfig/tests/warn_recursive_dep/Kconfig   | 62 ++++++++++++++++++++++
- .../kconfig/tests/warn_recursive_dep/__init__.py   |  9 ++++
- .../tests/warn_recursive_dep/expected_stderr       | 30 +++++++++++
- 3 files changed, 101 insertions(+)
- create mode 100644 scripts/kconfig/tests/warn_recursive_dep/Kconfig
- create mode 100644 scripts/kconfig/tests/warn_recursive_dep/__init__.py
- create mode 100644 scripts/kconfig/tests/warn_recursive_dep/expected_stderr
+ scripts/kconfig/tests/rand_nested_choice/Kconfig   | 33 ++++++++++++++++++++++
+ .../kconfig/tests/rand_nested_choice/__init__.py   | 16 +++++++++++
+ .../tests/rand_nested_choice/expected_stdout0      |  2 ++
+ .../tests/rand_nested_choice/expected_stdout1      |  4 +++
+ .../tests/rand_nested_choice/expected_stdout2      |  5 ++++
+ 5 files changed, 60 insertions(+)
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/Kconfig
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/__init__.py
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout0
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout1
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout2
 
-diff --git a/scripts/kconfig/tests/warn_recursive_dep/Kconfig b/scripts/kconfig/tests/warn_recursive_dep/Kconfig
+diff --git a/scripts/kconfig/tests/rand_nested_choice/Kconfig b/scripts/kconfig/tests/rand_nested_choice/Kconfig
 new file mode 100644
-index 0000000..a65bfcb
+index 0000000..c591d51
 --- /dev/null
-+++ b/scripts/kconfig/tests/warn_recursive_dep/Kconfig
-@@ -0,0 +1,62 @@
-+# depends on itself
++++ b/scripts/kconfig/tests/rand_nested_choice/Kconfig
+@@ -0,0 +1,33 @@
++choice
++	prompt "choice"
 +
 +config A
 +	bool "A"
-+	depends on A
-+
-+# select itself
 +
 +config B
-+	bool
-+	select B
++	bool "B"
 +
-+# depends on each other
++if B
++choice
++	prompt "sub choice"
 +
-+config C1
-+	bool "C1"
-+	depends on C2
++config C
++	bool "C"
 +
-+config C2
-+	bool "C2"
-+	depends on C1
++config D
++	bool "D"
 +
-+# depends on and select
++if D
++choice
++	prompt "subsub choice"
 +
-+config D1
-+	bool "D1"
-+	depends on D2
-+	select D2
++config E
++	bool "E"
 +
-+config D2
-+	bool
++endchoice
++endif # D
 +
-+# depends on and imply
-+# This is not recursive dependency
++endchoice
++endif # B
 +
-+config E1
-+	bool "E1"
-+	depends on E2
-+	imply E2
-+
-+config E2
-+	bool "E2"
-+
-+# property
-+
-+config F1
-+	bool "F1"
-+	default F2
-+
-+config F2
-+	bool "F2"
-+	depends on F1
-+
-+# menu
-+
-+menu "menu depending on its content"
-+	depends on G
-+
-+config G
-+	bool "G"
-+
-+endmenu
-diff --git a/scripts/kconfig/tests/warn_recursive_dep/__init__.py b/scripts/kconfig/tests/warn_recursive_dep/__init__.py
++endchoice
+diff --git a/scripts/kconfig/tests/rand_nested_choice/__init__.py b/scripts/kconfig/tests/rand_nested_choice/__init__.py
 new file mode 100644
-index 0000000..adb2195
+index 0000000..e729a4e
 --- /dev/null
-+++ b/scripts/kconfig/tests/warn_recursive_dep/__init__.py
-@@ -0,0 +1,9 @@
++++ b/scripts/kconfig/tests/rand_nested_choice/__init__.py
+@@ -0,0 +1,16 @@
 +"""
-+Warn recursive inclusion.
++Set random values recursively in nested choices.
 +
-+Recursive dependency should be warned.
++Kconfig can create a choice-in-choice structure by using 'if' statement.
++randconfig should correctly set random choice values.
++
++Related Linux commit: 3b9a19e08960e5cdad5253998637653e592a3c29
 +"""
++
 +
 +def test(conf):
-+    assert conf.oldaskconfig() == 0
-+    assert conf.stderr_contains('expected_stderr')
-diff --git a/scripts/kconfig/tests/warn_recursive_dep/expected_stderr b/scripts/kconfig/tests/warn_recursive_dep/expected_stderr
++    for i in range(20):
++        assert conf.randconfig() == 0
++        assert (conf.config_contains('expected_stdout0') or
++                conf.config_contains('expected_stdout1') or
++                conf.config_contains('expected_stdout2'))
+diff --git a/scripts/kconfig/tests/rand_nested_choice/expected_stdout0 b/scripts/kconfig/tests/rand_nested_choice/expected_stdout0
 new file mode 100644
-index 0000000..3de807d
+index 0000000..05450f3
 --- /dev/null
-+++ b/scripts/kconfig/tests/warn_recursive_dep/expected_stderr
-@@ -0,0 +1,30 @@
-+Kconfig:9:error: recursive dependency detected!
-+Kconfig:9:	symbol B is selected by B
-+For a resolution refer to Documentation/kbuild/kconfig-language.txt
-+subsection "Kconfig recursive dependency limitations"
-+
-+Kconfig:3:error: recursive dependency detected!
-+Kconfig:3:	symbol A depends on A
-+For a resolution refer to Documentation/kbuild/kconfig-language.txt
-+subsection "Kconfig recursive dependency limitations"
-+
-+Kconfig:15:error: recursive dependency detected!
-+Kconfig:15:	symbol C1 depends on C2
-+Kconfig:19:	symbol C2 depends on C1
-+For a resolution refer to Documentation/kbuild/kconfig-language.txt
-+subsection "Kconfig recursive dependency limitations"
-+
-+Kconfig:30:error: recursive dependency detected!
-+Kconfig:30:	symbol D2 is selected by D1
-+Kconfig:25:	symbol D1 depends on D2
-+For a resolution refer to Documentation/kbuild/kconfig-language.txt
-+subsection "Kconfig recursive dependency limitations"
-+
-+Kconfig:59:error: recursive dependency detected!
-+Kconfig:59:	symbol G depends on G
-+For a resolution refer to Documentation/kbuild/kconfig-language.txt
-+subsection "Kconfig recursive dependency limitations"
-+
-+Kconfig:50:error: recursive dependency detected!
-+Kconfig:50:	symbol F2 depends on F1
-+Kconfig:48:	symbol F1 default value contains F2
++++ b/scripts/kconfig/tests/rand_nested_choice/expected_stdout0
+@@ -0,0 +1,2 @@
++CONFIG_A=y
++# CONFIG_B is not set
+diff --git a/scripts/kconfig/tests/rand_nested_choice/expected_stdout1 b/scripts/kconfig/tests/rand_nested_choice/expected_stdout1
+new file mode 100644
+index 0000000..37ab295
+--- /dev/null
++++ b/scripts/kconfig/tests/rand_nested_choice/expected_stdout1
+@@ -0,0 +1,4 @@
++# CONFIG_A is not set
++CONFIG_B=y
++CONFIG_C=y
++# CONFIG_D is not set
+diff --git a/scripts/kconfig/tests/rand_nested_choice/expected_stdout2 b/scripts/kconfig/tests/rand_nested_choice/expected_stdout2
+new file mode 100644
+index 0000000..849ff47
+--- /dev/null
++++ b/scripts/kconfig/tests/rand_nested_choice/expected_stdout2
+@@ -0,0 +1,5 @@
++# CONFIG_A is not set
++CONFIG_B=y
++# CONFIG_C is not set
++CONFIG_D=y
++CONFIG_E=y
 -- 
 2.7.4
 
