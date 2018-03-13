@@ -1,87 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:49462 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932211AbeCMCaw (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:44716 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751391AbeCMGLz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Mar 2018 22:30:52 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v2] kbuild: check for pkg-config on make {menu,n,g,x}config
-Message-ID: <9e9438b0-568a-8dc0-dad6-d29b6e39e53a@infradead.org>
-Date: Mon, 12 Mar 2018 19:30:47 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Tue, 13 Mar 2018 02:11:55 -0400
+Received: by mail-pg0-f67.google.com with SMTP id l4so7557399pgp.11
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Mar 2018 23:11:55 -0700 (PDT)
+From: Douglas Anderson <dianders@chromium.org>
+Subject: [PATCH v3 0/2] kbuild: Fix corner caches with .cache.mk
+Date: Mon, 12 Mar 2018 23:11:07 -0700
+Message-Id: <20180313061109.72629-1-dianders@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Bj=c3=b8rn_Forsman?= <bjorn.forsman@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: malat@debian.org, dave.hansen@intel.com, yang.s@alibaba-inc.com, linux@roeck-us.net, Douglas Anderson <dianders@chromium.org>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Ingo Molnar <mingo@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>
 
-From: Randy Dunlap <rdunlap@infradead.org>
+This two-patches fixes two corner cases with .cache.mk that have been
+reported.  Neither problem was catastrophic, but certainly several
+people ran into the problem solved by the first patch (can't build
+after gcc upgrade) and wasted time debugging, so it's really a good
+idea to fix.
 
-Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
-that other required files are present, but none of these check that
-pkg-config itself is present.  Add a check for all 4 of these targets.
+Sorry for the big delay between v2 and v3.  I never quite caught up
+with email after the holidays, but hopefully better late than never...
 
-Fixes kernel bugzilla #77511:
-https://bugzilla.kernel.org/show_bug.cgi?id=77511
+Changes in v3:
+- Fix as per Masahiro Yamada (move change to main Makefile)
+- Use "uid 0" as the heuristic instead of install
+- Do the checking in the main Makefile instead of Kbuild.include
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-v2: use 'command -v' instead of 'which'
+Changes in v2:
+- Don't error if MAKECMDGOALS is blank.
 
-I'm also OK with just documenting the pkg-config requirement in
-Documentation/Changes (= Documentation/process/changes.rst).
+Douglas Anderson (2):
+  kbuild: Require a 'make clean' if we detect gcc changed underneath us
+  kbuild: Don't mess with the .cache.mk when root
 
- scripts/kconfig/Makefile           |   15 ++++++++++++++-
- scripts/kconfig/check-pkgconfig.sh |   12 ++++++++++++
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ Makefile               | 15 +++++++++++++++
+ scripts/Kbuild.include |  2 ++
+ 2 files changed, 17 insertions(+)
 
---- lnx-416-rc3.orig/scripts/kconfig/Makefile
-+++ lnx-416-rc3/scripts/kconfig/Makefile
-@@ -160,6 +160,9 @@ help:
- 	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
- 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
- 
-+# pkg-config check
-+check-pkgconfig  := $(srctree)/$(src)/check-pkgconfig.sh
-+
- # lxdialog stuff
- check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
- 
-@@ -205,7 +208,17 @@ $(addprefix $(obj)/, mconf.o $(lxdialog)
- $(obj)/dochecklxdialog:
- 	$(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC) $(HOST_EXTRACFLAGS) $(HOSTLOADLIBES_mconf)
- 
--always := dochecklxdialog
-+# Check that we have pkg-config (used by each of menu/n/g/xconfig)
-+PHONY += $(obj)/docheckpkgconfig
-+$(addprefix $(obj)/, mconf.o): $(obj)/docheckpkgconfig
-+$(addprefix $(obj)/, nconf.o): $(obj)/docheckpkgconfig
-+$(addprefix $(obj)/, gconf.o): $(obj)/docheckpkgconfig
-+$(addprefix $(obj)/, qconf.o): $(obj)/docheckpkgconfig
-+
-+$(obj)/docheckpkgconfig:
-+	$(Q)$(CONFIG_SHELL) $(check-pkgconfig)
-+
-+always := docheckpkgconfig dochecklxdialog
- 
- # Add environment specific flags
- HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTCC) $(HOSTCFLAGS))
---- /dev/null
-+++ lnx-416-rc3/scripts/kconfig/check-pkgconfig.sh
-@@ -0,0 +1,12 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# Check for pkg-config presence
-+
-+pkgcfg=`command -v pkg-config`
-+
-+if [ "$pkgcfg" = "" ]; then
-+	echo "'make *config' requires 'pkg-config'. Please install it." 1>&2
-+	exit 1		# error
-+fi
-+
-+exit 0
-
+-- 
+2.16.2.660.g709887971b-goog
 
