@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:41840 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:41835 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752302AbeCMJOB (ORCPT
+        with ESMTP id S1752511AbeCMJOB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 13 Mar 2018 05:14:01 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 11/11] kconfig: tests: test if recursive inclusion is detected
-Date: Tue, 13 Mar 2018 18:12:12 +0900
-Message-Id: <1520932332-2449-12-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v3 06/11] kconfig: tests: check unneeded "is not set" with unmet dependency
+Date: Tue, 13 Mar 2018 18:12:07 +0900
+Message-Id: <1520932332-2449-7-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1520932332-2449-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1520932332-2449-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,83 +15,94 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Tony Luck <tony.luck@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-If recursive inclusion is detected, it should fail with error
-messages.  Test this.
+Commit cb67ab2cd2b8 ("kconfig: do not write choice values when their
+dependency becomes n") fixed a problem where "# CONFIG_... is not set"
+for choice values are wrongly written into the .config file when they
+are once visible, then become invisible later.
 
-This also tests the line numbers in the error message, fixed by
-commit 5ae6fcc4bb82 ("kconfig: fix line number in recursive inclusion
-error message").
+Add a test for this naive case.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
 
-Changes in v3:
-  - Replace the test code with the one used by commit
-
+Changes in v3: None
 Changes in v2:
   - coding style clean-up based on PEP8, PEP257
 
- scripts/kconfig/tests/err_recursive_inc/Kconfig         |  1 +
- scripts/kconfig/tests/err_recursive_inc/Kconfig2        |  1 +
- scripts/kconfig/tests/err_recursive_inc/Kconfig3        |  1 +
- scripts/kconfig/tests/err_recursive_inc/__init__.py     | 10 ++++++++++
- scripts/kconfig/tests/err_recursive_inc/expected_stderr |  5 +++++
- 5 files changed, 18 insertions(+)
- create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig
- create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig2
- create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig3
- create mode 100644 scripts/kconfig/tests/err_recursive_inc/__init__.py
- create mode 100644 scripts/kconfig/tests/err_recursive_inc/expected_stderr
+ scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig   | 14 ++++++++++++++
+ .../kconfig/tests/no_write_if_dep_unmet/__init__.py   | 19 +++++++++++++++++++
+ scripts/kconfig/tests/no_write_if_dep_unmet/config    |  1 +
+ .../tests/no_write_if_dep_unmet/expected_config       |  5 +++++
+ 4 files changed, 39 insertions(+)
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/config
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
 
-diff --git a/scripts/kconfig/tests/err_recursive_inc/Kconfig b/scripts/kconfig/tests/err_recursive_inc/Kconfig
+diff --git a/scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig b/scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig
 new file mode 100644
-index 0000000..f21c890
+index 0000000..c00b8fe
 --- /dev/null
-+++ b/scripts/kconfig/tests/err_recursive_inc/Kconfig
-@@ -0,0 +1 @@
-+source "Kconfig2"
-diff --git a/scripts/kconfig/tests/err_recursive_inc/Kconfig2 b/scripts/kconfig/tests/err_recursive_inc/Kconfig2
-new file mode 100644
-index 0000000..b341502
---- /dev/null
-+++ b/scripts/kconfig/tests/err_recursive_inc/Kconfig2
-@@ -0,0 +1 @@
-+source "Kconfig3"
-diff --git a/scripts/kconfig/tests/err_recursive_inc/Kconfig3 b/scripts/kconfig/tests/err_recursive_inc/Kconfig3
-new file mode 100644
-index 0000000..1fab1c1
---- /dev/null
-+++ b/scripts/kconfig/tests/err_recursive_inc/Kconfig3
-@@ -0,0 +1 @@
-+source "Kconfig"
-diff --git a/scripts/kconfig/tests/err_recursive_inc/__init__.py b/scripts/kconfig/tests/err_recursive_inc/__init__.py
-new file mode 100644
-index 0000000..0e4c839
---- /dev/null
-+++ b/scripts/kconfig/tests/err_recursive_inc/__init__.py
-@@ -0,0 +1,10 @@
-+"""
-+Detect recursive inclusion error.
++++ b/scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig
+@@ -0,0 +1,14 @@
++config A
++	bool "A"
 +
-+If recursive inclusion is detected, it should fail with error messages.
++choice
++	prompt "Choice ?"
++	depends on A
++
++config CHOICE_B
++	bool "Choice B"
++
++config CHOICE_C
++	bool "Choice C"
++
++endchoice
+diff --git a/scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py b/scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py
+new file mode 100644
+index 0000000..207261b
+--- /dev/null
++++ b/scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py
+@@ -0,0 +1,19 @@
++"""
++Do not write choice values to .config if the dependency is unmet.
++
++"# CONFIG_... is not set" should not be written into the .config file
++for symbols with unmet dependency.
++
++This was not working correctly for choice values because choice needs
++a bit different symbol computation.
++
++This checks that no unneeded "# COFIG_... is not set" is contained in
++the .config file.
++
++Related Linux commit: cb67ab2cd2b8abd9650292c986c79901e3073a59
 +"""
 +
 +
 +def test(conf):
-+    assert conf.oldaskconfig() != 0
-+    assert conf.stderr_contains('expected_stderr')
-diff --git a/scripts/kconfig/tests/err_recursive_inc/expected_stderr b/scripts/kconfig/tests/err_recursive_inc/expected_stderr
++    assert conf.oldaskconfig('config', 'n') == 0
++    assert conf.config_matches('expected_config')
+diff --git a/scripts/kconfig/tests/no_write_if_dep_unmet/config b/scripts/kconfig/tests/no_write_if_dep_unmet/config
 new file mode 100644
-index 0000000..84cc0a1
+index 0000000..abd280e
 --- /dev/null
-+++ b/scripts/kconfig/tests/err_recursive_inc/expected_stderr
++++ b/scripts/kconfig/tests/no_write_if_dep_unmet/config
+@@ -0,0 +1 @@
++CONFIG_A=y
+diff --git a/scripts/kconfig/tests/no_write_if_dep_unmet/expected_config b/scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
+new file mode 100644
+index 0000000..0d15e41
+--- /dev/null
++++ b/scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
 @@ -0,0 +1,5 @@
-+Kconfig:1: recursive inclusion detected. Inclusion path:
-+  current file : 'Kconfig'
-+  included from: 'Kconfig3:1'
-+  included from: 'Kconfig2:1'
-+  included from: 'Kconfig:1'
++#
++# Automatically generated file; DO NOT EDIT.
++# Linux Kernel Configuration
++#
++# CONFIG_A is not set
 -- 
 2.7.4
 
