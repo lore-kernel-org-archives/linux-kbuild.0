@@ -1,85 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f68.google.com ([209.85.160.68]:45705 "EHLO
-        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751753AbeCMGL5 (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:44717 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751886AbeCMGL7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Mar 2018 02:11:57 -0400
-Received: by mail-pl0-f68.google.com with SMTP id v9-v6so10761963plp.12
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Mar 2018 23:11:57 -0700 (PDT)
+        Tue, 13 Mar 2018 02:11:59 -0400
+Received: by mail-pg0-f65.google.com with SMTP id l4so7557427pgp.11
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Mar 2018 23:11:58 -0700 (PDT)
 From: Douglas Anderson <dianders@chromium.org>
-Subject: [PATCH v3 1/2] kbuild: Require a 'make clean' if we detect gcc changed underneath us
-Date: Mon, 12 Mar 2018 23:11:08 -0700
-Message-Id: <20180313061109.72629-2-dianders@chromium.org>
+Subject: [PATCH v3 2/2] kbuild: Don't mess with the .cache.mk when root
+Date: Mon, 12 Mar 2018 23:11:09 -0700
+Message-Id: <20180313061109.72629-3-dianders@chromium.org>
 In-Reply-To: <20180313061109.72629-1-dianders@chromium.org>
 References: <20180313061109.72629-1-dianders@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: malat@debian.org, dave.hansen@intel.com, yang.s@alibaba-inc.com, linux@roeck-us.net, Douglas Anderson <dianders@chromium.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: malat@debian.org, dave.hansen@intel.com, yang.s@alibaba-inc.com, linux@roeck-us.net, Douglas Anderson <dianders@chromium.org>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Ingo Molnar <mingo@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>
 
-Several people reported that the commit 3298b690b21c ("kbuild: Add a
-cache for generated variables") caused them problems when they updated
-gcc versions.  Specifically the reports all looked something similar
-to this:
+As pointed out by Masahiro Yamada people often run "sudo make install"
+or "sudo make modules_install".  In theory, that could cause a cache
+file (or the directory containing it) to be created by root.  After
+doing this then subsequent invocations to make would yell with a whole
+bunch of warnings like:
 
-> In file included from ./include/uapi/linux/uuid.h:21:0,
->                  from ./include/linux/uuid.h:19,
->                  from ./include/linux/mod_devicetable.h:12,
->                  from scripts/mod/devicetable-offsets.c:2:
-> ./include/linux/string.h:8:20: fatal error: stdarg.h: No such file or
->                  directory
->  #include <stdarg.h>
+  /bin/sh: ./.cache.mk: Permission denied
 
-Masahiro Yamada determined that the problem was with:
+These yells would be mostly harmless (we'd just go on running without
+the cache), but they're ugly.
 
-  NOSTDINC_FLAGS += -nostdinc -isystem $(call shell-cached,$(CC)
-  -print-file-name=include)
+The above situation would be fairly unlikely because it should only
+happen if someone does "sudo make install" before doing a normal
+"make", which is an invalid thing to do.  If you did a normal "make"
+before the "sudo make install" then all the cache files and
+directories should have already been created by a normal user and,
+even if the superuser needed to add to the existing files, we wouldn't
+end up with a permission problem.
 
-Specifically that the stale result of -print-file-name is stored in
-the cache file.  It was determined that a "make clean" fixed the
-problems in all cases.
+The above situation would also not have been catastrophic because
+presumably if the user was able to run "sudo make install" then they
+should also be able to run "sudo make clean" to clean things up.
 
-In this particular case we could certainly try to clean just the cache
-when we detect a gcc update, but it seems like overall it's a bad idea
-to do an incremental build when gcc changes.  We should warn the user
-and tell them that they need a 'make clean'.
+However, even though the problem described is relatively minor, it
+probably makes sense to add a heuristic to avoid creating cache files
+when we're running as root.  This heuristic doesn't add a ton of
+overhead and it might save someone time tracking down strange
+"Permission denied" messages.  We'll consider this heuristic good
+enough because the problem really shouldn't be that serious.
 
 Fixes: 3298b690b21c ("kbuild: Add a cache for generated variables")
-Reported-by: Yang Shi <yang.s@alibaba-inc.com>
-Reported-by: Dave Hansen <dave.hansen@intel.com>
-Reported-by: Mathieu Malaterre <malat@debian.org>
+Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Signed-off-by: Douglas Anderson <dianders@chromium.org>
 ---
 
 Changes in v3:
-- Fix as per Masahiro Yamada (move change to main Makefile)
+- Use "uid 0" as the heuristic instead of install
+- Do the checking in the main Makefile instead of Kbuild.include
 
-Changes in v2:
-- Don't error if MAKECMDGOALS is blank.
+Changes in v2: None
 
- Makefile | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ Makefile               | 6 ++++++
+ scripts/Kbuild.include | 2 ++
+ 2 files changed, 8 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index c4322dea3ca2..f1e61470640b 100644
+index f1e61470640b..c4d2131831ba 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -573,6 +573,15 @@ virt-y		:= virt/
- endif # KBUILD_EXTMOD
+@@ -268,6 +268,12 @@ __build_one_by_one:
  
- ifeq ($(dot-config),1)
-+# Require a 'make clean' if the compiler changed; not only does the .cache.mk
-+# need to be thrown out but we should also start with fresh object files.
-+cc-fullversion-uncached := \
-+	$(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-version.sh -p $(CC))
-+
-+ifneq ($(cc-fullversion-uncached),$(cc-fullversion))
-+   $(error Detected new CC version ($(cc-fullversion-uncached) vs $(cc-fullversion)).  Please 'make clean')
+ else
+ 
++# Don't create Makefile caches if running as root since they can't be deleted
++# easily; in the real world we might be root when doing "sudo make install"
++ifeq ($(shell id -u),0)
++export KBUILD_NOCACHE := 1
 +endif
 +
- # Read in config
- -include include/config/auto.conf
- 
+ # We need some generic definitions (do not try to remake the file).
+ scripts/Kbuild.include: ;
+ include scripts/Kbuild.include
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 065324a8046f..581f93f20119 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -137,12 +137,14 @@ __sanitize-opt = $(subst $$,_,$(subst $(right_paren),_,$(subst $(left_paren),_,$
+ define __run-and-store
+ ifeq ($(origin $(1)),undefined)
+   $$(eval $(1) := $$(shell $$(2)))
++ifneq ($(KBUILD_NOCACHE),1)
+ ifeq ($(create-cache-dir),1)
+   $$(shell mkdir -p $(dir $(make-cache)))
+   $$(eval create-cache-dir :=)
+ endif
+   $$(shell echo '$(1) := $$($(1))' >> $(make-cache))
+ endif
++endif
+ endef
+ __shell-cached = $(eval $(call __run-and-store,$(1)))$($(1))
+ shell-cached = $(call __shell-cached,__cached_$(call __sanitize-opt,$(1)),$(1))
 -- 
 2.16.2.660.g709887971b-goog
 
