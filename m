@@ -1,86 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:41660 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:41661 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752302AbeCMJN4 (ORCPT
+        with ESMTP id S1752188AbeCMJN4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 13 Mar 2018 05:13:56 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 01/11] kbuild: add PYTHON2 and PYTHON3 variables
-Date: Tue, 13 Mar 2018 18:12:02 +0900
-Message-Id: <1520932332-2449-2-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v3 07/11] kconfig: tests: check visibility of tristate choice values in y choice
+Date: Tue, 13 Mar 2018 18:12:08 +0900
+Message-Id: <1520932332-2449-8-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1520932332-2449-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1520932332-2449-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Tony Luck <tony.luck@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Tony Luck <tony.luck@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-The variable 'PYTHON' allows users to specify a proper executable
-name in case the default 'python' does not work.  However, this does
-not address the case where both Python 2.x and 3.x scripts are used
-in one source tree.
+If tristate choice values depend on symbols set to 'm', they should be
+hidden when the choice containing them is changed from 'm' to 'y'
+(i.e. exclusive choice).
 
-PEP 394 (https://www.python.org/dev/peps/pep-0394/) provides a
-convention for Python scripts portability.  Here is a quotation:
+This issue was fixed by commit fa64e5f6a35e ("kconfig/symbol.c: handle
+choice_values that depend on 'm' symbols").
 
-  In order to tolerate differences across platforms, all new code
-  that needs to invoke the Python interpreter should not specify
-  'python', but rather should specify either 'python2' or 'python3'.
-  This distinction should be made in shebangs, when invoking from a
-  shell script, when invoking via the system() call, or when invoking
-  in any other context.
-  One exception to this is scripts that are deliberately written to
-  be source compatible with both Python 2.x and 3.x. Such scripts may
-  continue to use python on their shebang line without affecting their
-  portability.
+Add a test case to avoid regression.
 
-To meet this requirement, this commit adds new variables 'PYTHON2'
-and 'PYTHON3'.
+For the input in this unit test, there is a room for argument if
+"# CONFIG_CHOICE1 is not set" should be written to the .config file.
 
-arch/ia64/scripts/unwcheck.py is the only script that has ever used
-$(PYTHON).  Recent commit bd5edbe67794 ("ia64: convert unwcheck.py to
-python3") converted it to be compatible with both Python 2.x and 3.x,
-so this is the exceptional case where the use of 'python' is allowed.
-So, I did not touch arch/ia64/Makefile.
+After commit fa64e5f6a35e, this line was written to the .config file.
 
-tools/perf/Makefile.config sets PYTHON and PYTHON2 by itself, so it
-is not affected by this commit.
+With commit cb67ab2cd2b8 ("kconfig: do not write choice values when
+their dependency becomes n"), it is not written now.
+
+In this test, "# CONFIG_CHOICE1 is not set" is don't care.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
 
-Changes in v3:
-  - Keep PYTHON as-is because ia64 recently converted its script
-    compatible with Python 3.x
-
+Changes in v3: None
 Changes in v2:
-  - Add backward compatibility for PYTHON
+  - coding style clean-up based on PEP8, PEP257
 
- Makefile | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ scripts/kconfig/tests/choice_value_with_m_dep/Kconfig | 19 +++++++++++++++++++
+ .../kconfig/tests/choice_value_with_m_dep/__init__.py | 15 +++++++++++++++
+ scripts/kconfig/tests/choice_value_with_m_dep/config  |  2 ++
+ .../tests/choice_value_with_m_dep/expected_config     |  3 +++
+ .../tests/choice_value_with_m_dep/expected_stdout     |  4 ++++
+ 5 files changed, 43 insertions(+)
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/Kconfig
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/__init__.py
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/config
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/expected_config
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout
 
-diff --git a/Makefile b/Makefile
-index e02d092..7a5f85e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -385,6 +385,8 @@ INSTALLKERNEL  := installkernel
- DEPMOD		= /sbin/depmod
- PERL		= perl
- PYTHON		= python
-+PYTHON2		= python2
-+PYTHON3		= python3
- CHECK		= sparse
- 
- CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
-@@ -430,7 +432,7 @@ GCC_PLUGINS_CFLAGS :=
- 
- export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
- export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
--export MAKE LEX YACC AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
-+export MAKE LEX YACC AWK GENKSYMS INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
- export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
- 
- export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
+diff --git a/scripts/kconfig/tests/choice_value_with_m_dep/Kconfig b/scripts/kconfig/tests/choice_value_with_m_dep/Kconfig
+new file mode 100644
+index 0000000..11ac25c
+--- /dev/null
++++ b/scripts/kconfig/tests/choice_value_with_m_dep/Kconfig
+@@ -0,0 +1,19 @@
++config MODULES
++	def_bool y
++	option modules
++
++config DEP
++	tristate
++	default m
++
++choice
++	prompt "Tristate Choice"
++
++config CHOICE0
++	tristate "Choice 0"
++
++config CHOICE1
++	tristate "Choice 1"
++	depends on DEP
++
++endchoice
+diff --git a/scripts/kconfig/tests/choice_value_with_m_dep/__init__.py b/scripts/kconfig/tests/choice_value_with_m_dep/__init__.py
+new file mode 100644
+index 0000000..f8d728c
+--- /dev/null
++++ b/scripts/kconfig/tests/choice_value_with_m_dep/__init__.py
+@@ -0,0 +1,15 @@
++"""
++Hide tristate choice values with mod dependency in y choice.
++
++If tristate choice values depend on symbols set to 'm', they should be
++hidden when the choice containing them is changed from 'm' to 'y'
++(i.e. exclusive choice).
++
++Related Linux commit: fa64e5f6a35efd5e77d639125d973077ca506074
++"""
++
++
++def test(conf):
++    assert conf.oldaskconfig('config', 'y') == 0
++    assert conf.config_contains('expected_config')
++    assert conf.stdout_contains('expected_stdout')
+diff --git a/scripts/kconfig/tests/choice_value_with_m_dep/config b/scripts/kconfig/tests/choice_value_with_m_dep/config
+new file mode 100644
+index 0000000..3a126b7
+--- /dev/null
++++ b/scripts/kconfig/tests/choice_value_with_m_dep/config
+@@ -0,0 +1,2 @@
++CONFIG_CHOICE0=m
++CONFIG_CHOICE1=m
+diff --git a/scripts/kconfig/tests/choice_value_with_m_dep/expected_config b/scripts/kconfig/tests/choice_value_with_m_dep/expected_config
+new file mode 100644
+index 0000000..4d07b44
+--- /dev/null
++++ b/scripts/kconfig/tests/choice_value_with_m_dep/expected_config
+@@ -0,0 +1,3 @@
++CONFIG_MODULES=y
++CONFIG_DEP=m
++CONFIG_CHOICE0=y
+diff --git a/scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout b/scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout
+new file mode 100644
+index 0000000..2b50ab6
+--- /dev/null
++++ b/scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout
+@@ -0,0 +1,4 @@
++Tristate Choice [M/y/?] y
++Tristate Choice
++> 1. Choice 0 (CHOICE0)
++choice[1]: 1
 -- 
 2.7.4
 
