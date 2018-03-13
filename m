@@ -1,91 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f177.google.com ([209.85.217.177]:45032 "EHLO
-        mail-ua0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933461AbeCMQh3 (ORCPT
+Received: from mail-vk0-f66.google.com ([209.85.213.66]:45144 "EHLO
+        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932637AbeCMQoO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Mar 2018 12:37:29 -0400
-Received: by mail-ua0-f177.google.com with SMTP id s92so143430uas.11
-        for <linux-kbuild@vger.kernel.org>; Tue, 13 Mar 2018 09:37:28 -0700 (PDT)
+        Tue, 13 Mar 2018 12:44:14 -0400
+Received: by mail-vk0-f66.google.com with SMTP id k187so151627vke.12
+        for <linux-kbuild@vger.kernel.org>; Tue, 13 Mar 2018 09:44:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQn1qM7zQvtUxiN-wG64RypmbHiE0ybzsXcc4aRvzmFCA@mail.gmail.com>
-References: <20180313061109.72629-1-dianders@chromium.org> <CAK7LNAQn1qM7zQvtUxiN-wG64RypmbHiE0ybzsXcc4aRvzmFCA@mail.gmail.com>
+In-Reply-To: <CAKwvOdnPSMSOenPiPqBpDf=hf5q5uQ5MF0pOLAea5T5_VPhmaA@mail.gmail.com>
+References: <20180313061109.72629-1-dianders@chromium.org> <20180313061109.72629-3-dianders@chromium.org>
+ <20180313061603.jsgiumet23uqi6hl@gmail.com> <CAD=FV=UEuWww=H=TY=E8JvEmrobDNi5+rbTXvTAmZ2brpK+sdg@mail.gmail.com>
+ <CAKwvOdnPSMSOenPiPqBpDf=hf5q5uQ5MF0pOLAea5T5_VPhmaA@mail.gmail.com>
 From: Doug Anderson <dianders@chromium.org>
-Date: Tue, 13 Mar 2018 09:37:27 -0700
-Message-ID: <CAD=FV=UOwqYuHn8RUa8+W_pcJL1_ZGLfvBUg+68yW7TqbJcKDg@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] kbuild: Fix corner caches with .cache.mk
+Date: Tue, 13 Mar 2018 09:44:11 -0700
+Message-ID: <CAD=FV=UvT-BrpZcz4RV=cRW4Nf9rBkYvc2JgcQr465NMYjAvJw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] kbuild: Don't mess with the .cache.mk when root
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Mathieu Malaterre <malat@debian.org>, Dave Hansen <dave.hansen@intel.com>, Yang Shi <yang.s@alibaba-inc.com>, Guenter Roeck <linux@roeck-us.net>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Ingo Molnar <mingo@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Ingo Molnar <mingo@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Mathieu Malaterre <malat@debian.org>, Dave Hansen <dave.hansen@intel.com>, Yang Shi <yang.s@alibaba-inc.com>, Guenter Roeck <linux@roeck-us.net>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Thomas Gleixner <tglx@linutronix.de>
 
 Hi,
 
-On Tue, Mar 13, 2018 at 12:49 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Hi Douglas,
+On Tue, Mar 13, 2018 at 9:33 AM, Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+> On Mon, Mar 12, 2018 at 11:23 PM Doug Anderson <dianders@chromium.org>
+> wrote:
 >
+>> Hi,
 >
-> 2018-03-13 15:11 GMT+09:00 Douglas Anderson <dianders@chromium.org>:
->> This two-patches fixes two corner cases with .cache.mk that have been
->> reported.  Neither problem was catastrophic, but certainly several
->> people ran into the problem solved by the first patch (can't build
->> after gcc upgrade) and wasted time debugging, so it's really a good
->> idea to fix.
->>
->> Sorry for the big delay between v2 and v3.  I never quite caught up
->> with email after the holidays, but hopefully better late than never...
+>> On Mon, Mar 12, 2018 at 11:16 PM, Ingo Molnar <mingo@kernel.org> wrote:
+>> >
+>> > * Douglas Anderson <dianders@chromium.org> wrote:
+>> >
+>> >> +# Don't create Makefile caches if running as root since they can't be
+> deleted
+>> >> +# easily; in the real world we might be root when doing "sudo make
+> install"
+>> >> +ifeq ($(shell id -u),0)
+>> >> +export KBUILD_NOCACHE := 1
+>> >> +endif
+>> >
+>> > Please don't do this - many prominent kernel developers build their
+> kernels as
+>> > root - this makes the build slower for them, and also bifurcates
+> testing.
 >
+>> Ah, interesting.  I hadn't realized that!
 >
-> If v3 had been sent in time for v4.15
-> I would have immediately queued it up.
+>> I'm OK with dropping this patch myself.  It was mostly addressing a
+>> potential problem pointed out by Masahiro Yamada when we were talking
+>> about .cache.mk, but I don't think anyone has actually experienced the
+>> problems listed in the CL description.
+>
+>>    /bin/sh: ./.cache.mk: Permission denied
+>
+> I feel like I've definitely seen that permission error before.
 
-Sigh.  My apologies again for sitting on this for so long.  :(
-
-
-> But, the situation has changed.
->
-> The direction of the development is
-> to move the compiler flags evaluation to the Kconfig phase,
-> and remove the Kbuild cache.
->
->
-> If you are interested in the background,
-> here are some of resources:
->
-> Linus' comment that finally moved this work forward:
-> https://lkml.org/lkml/2018/2/7/527
->
-> Tons of discussion about the initial version:
-> https://patchwork.kernel.org/patch/10207385/
->
-> The core patch in the latest version:
-> https://patchwork.kernel.org/patch/10225355/
->
->
-> And, I am removing the Kbuild cache entirely:
-> https://patchwork.kernel.org/patch/10225437/
-
-Oh, that's great!
+Hopefully the error message was obvious enough that it didn't take you
+too long to think to type "sudo make clean"?  I know it's better for
+people not to have to figure this out, but my hope is at least it's
+not too arcane of an errror message.
 
 
-> I do not know how to handle your patches
-> since I am removing the addressed code for 4.17-rc1,
-> which is comming in a month or so.
+> Is there any issue if I:
 >
-> If this is a fatal problem, we can queue it up
-> only for 4.16, but I do not hear problem reports these days...
+> $ make clean
+> $ make
+> $ sudo make install
+> <hack around>
+> $ make
 
-Just drop them.  Ingo hated patch 2/2, and (like you) I haven't heard
-any complaints about the problems described by patch 1/2 in the last
-few months.  I got back to this because I told myself I would try to
-re-focus on upstream stuff while I was at ELC, not because I suddenly
-got another stream of complaints.  ;)
-
-
-Anyway, glad to here you've come up with a better solution for the
-future and we can get rid of the cache.  Thank you for all your hard
-work!
+I don't personally know of any problems with the above flow.
 
 
--Doug
+> Or it's only a problem if:
+>
+> $ make clean
+> $ sudo make install
+> <hack around>
+> $ make
+
+Yeah, just that one.
+
+NOTE: as Masahiro noted in response to the cover letter [1], he's come
+up with a better solution to the problem that was solved by the
+.cache.mk and he's planning to remove it shortly.
+
+
+[1] https://lkml.org/lkml/2018/3/13/100
