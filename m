@@ -1,37 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:34708 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751417AbeCNIbe (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:38072 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751279AbeCNQou (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Mar 2018 04:31:34 -0400
-Date: Wed, 14 Mar 2018 09:30:48 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v3 2/2] kbuild: Don't mess with the .cache.mk when root
-Message-ID: <20180314083048.GC4082@hirez.programming.kicks-ass.net>
-References: <20180313061109.72629-1-dianders@chromium.org>
- <20180313061109.72629-3-dianders@chromium.org>
- <20180313061603.jsgiumet23uqi6hl@gmail.com>
- <CAD=FV=UEuWww=H=TY=E8JvEmrobDNi5+rbTXvTAmZ2brpK+sdg@mail.gmail.com>
- <CAKwvOdnPSMSOenPiPqBpDf=hf5q5uQ5MF0pOLAea5T5_VPhmaA@mail.gmail.com>
- <CAD=FV=UvT-BrpZcz4RV=cRW4Nf9rBkYvc2JgcQr465NMYjAvJw@mail.gmail.com>
- <CA+55aFzTT5fzz__pY2HhxK=GPnJ8vtpgtok672AAXfSGg+ztuQ@mail.gmail.com>
- <20180314072316.zc7qe2reox3htw3z@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180314072316.zc7qe2reox3htw3z@gmail.com>
+        Wed, 14 Mar 2018 12:44:50 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 0/7] kbuild: various fix, clean-up, improvements of CONFIG_TRIM_UNUSED_KSYMS
+Date: Thu, 15 Mar 2018 01:44:14 +0900
+Message-Id: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Doug Anderson <dianders@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Mathieu Malaterre <malat@debian.org>, Dave Hansen <dave.hansen@intel.com>, Yang Shi <yang.s@alibaba-inc.com>, Guenter Roeck <linux@roeck-us.net>, Matthias Kaehlcke <mka@chromium.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>
+To: linux-kbuild@vger.kernel.org
+Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Wed, Mar 14, 2018 at 08:23:16AM +0100, Ingo Molnar wrote:
-> 
-> * Linus Torvalds <torvalds@linux-foundation.org> wrote:
-> 
-> > If Ingo wants to build as root, maybe we could even make him set some
-> > environment flag to avoid errors.
-> 
-> I only build as root infrequently, but I think PeterZ does it more frequently?
 
-Yeah, a bunch of my testboxes don't even have a regular user account.
+
+
+Masahiro Yamada (7):
+  kbuild: clear LDFLAGS in the top Makefile
+  kbuild: touch autoksyms.h when it is really missing
+  kbuild: move 'scripts' target below
+  kbuild: restore touching autoksyms.h to the top Makefile
+  kbuild: hide CONFIG_TRIM_UNUSED_KSYMS code from external module
+    building
+  kbuild: move include/config/ksym/* to include/ksym/*
+  kbuild: link vmlinux just once for CONFIG_TRIM_UNUSED_KSYMS
+
+ .gitignore                  |  1 +
+ Makefile                    | 66 ++++++++++++++++++++++-----------------------
+ scripts/Kbuild.include      |  2 +-
+ scripts/adjust_autoksyms.sh |  7 +++--
+ scripts/basic/fixdep.c      |  8 +++---
+ scripts/kconfig/Makefile    |  2 --
+ 6 files changed, 41 insertions(+), 45 deletions(-)
+
+-- 
+2.7.4
+
