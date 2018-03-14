@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:38074 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:38080 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751599AbeCNQou (ORCPT
+        with ESMTP id S1752150AbeCNQou (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 14 Mar 2018 12:44:50 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 4/7] kbuild: restore touching autoksyms.h to the top Makefile
-Date: Thu, 15 Mar 2018 01:44:18 +0900
-Message-Id: <1521045861-22418-5-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 7/7] kbuild: link vmlinux just once for CONFIG_TRIM_UNUSED_KSYMS
+Date: Thu, 15 Mar 2018 01:44:21 +0900
+Message-Id: <1521045861-22418-8-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,110 +15,105 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Commit d3fc425e819b ("kbuild: make sure autoksyms.h exists early")
-moved the code that touches autoksyms.h to scripts/kconfig/Makefile
-with obscure reason.
+If CONFIG_TRIM_UNUSED_KSYMS is enabled and the kernel is built from
+a pristine state, the vmlinux is linked twice.
 
-From Nicolas' comment [1], he did not seem to be sure about the root
-cause.
+[1] A user runs "make"
 
-I guess I figured it out, so here is a fix-up I think is more correct.
-According to the error log in the original post [2], the build failed
-in scripts/mod/devicetable-offsets.c
+[2] First build with empty autoksyms.h
 
-scripts/mod/Makefile is descended from scripts/Makefile, which is
-invoked from the top-level Makefile by the 'scripts' target.
+[3] adjust_autoksyms.sh updates autoksyms.h and recurses "make vmlinux"
 
-To build vmlinux and/or modules, Kbuild descend into $(vmlinux-dirs).
-This depends on 'prepare' and 'script' as follows:
+  --------(begin sub-make)--------
+  [4] Second build with new autoksyms.h
 
-  $(vmlinux-dirs): prepare scripts
+  [5] link-vmlinux.sh is invoked because "vmlinux" is missing
+  ---------(end sub-make)---------
 
-Because there is no dependency between 'prepare' and 'scripts', the
-parallel building can run them simultaneously.
+[6] link-vmlinux.sh is invoked again despite "vmlinux" is up-to-date.
 
-'prepare' depends on 'prepare1', which touched autoksyms.h, whereas
-'scripts' descends into script/, then scripts/mod/, which needed
-<generated/autoksyms.h> if CONFIG_TRIM_UNUSED_KSYMS.  This was the
-reason of race.
+The reason of [6] is probably because Make already decided to update
+"vmlinux" at the time of [2] because "vmlinux" was missing when Make
+generated the dependency list.
 
-I am not happy to have unrelated code in the Kconfig Makefile, so
-getting it back to the top Makefile.
+link-vmlinus.sh is costly, so it is better to not run it when unneeded.
+Split CONFIG_TRIM_UNUSED_KSYMS handling to a dedicated target.
 
-I remove the standalone test target because I want to use it to
-create an empty autoksyms.h file.  Here is a little improvement;
-unnecessary autoksyms.h is not created when CONFIG_TRIM_UNUSED_KSYMS
-is disabled.
+The reason of commit 2441e78b1919 ("kbuild: better abstract vmlinux
+sequential prerequisites") was to cater to CONFIG_BUILD_DOCSRC, but
+it was later removed by commit 184892925118 ("samples: move blackfin
+gptimers-example from Documentation").
 
-[1] https://lkml.org/lkml/2016/11/30/734
-[2] https://lkml.org/lkml/2016/11/30/531
+I also changed adjust_autoksyms.sh to simply exit with 1 or 0 to make
+it look straightforward.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Commit:
-
-The discussion happened in Nov. 2016.
-
-I was not involved in it.
-I was not the Kbuild maintainer at that time.
-
-END
-
 ---
 
- Makefile                 | 12 +++++++-----
- scripts/kconfig/Makefile |  2 --
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ Makefile                    | 28 ++++++++++++----------------
+ scripts/adjust_autoksyms.sh |  3 +--
+ 2 files changed, 13 insertions(+), 18 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index fab0e19..decc870 100644
+index 1dab647..0a7bab6 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1010,9 +1010,11 @@ ifdef CONFIG_TRIM_UNUSED_KSYMS
- 	  "$(MAKE) -f $(srctree)/Makefile vmlinux"
- endif
+@@ -987,21 +987,11 @@ export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(vmlinux-alldirs)) arch Doc
  
--# standalone target for easier testing
--include/generated/autoksyms.h: FORCE
--	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh true
-+autoksyms_h := $(if $(CONFIG_TRIM_UNUSED_KSYMS), include/generated/autoksyms.h)
-+
-+$(autoksyms_h):
-+	$(Q)mkdir -p $(dir $@)
-+	$(Q)touch $@
+ vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_INIT) $(KBUILD_VMLINUX_MAIN) $(KBUILD_VMLINUX_LIBS)
  
- ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
+-# Include targets which we want to execute sequentially if the rest of the
+-# kernel build went well. If CONFIG_TRIM_UNUSED_KSYMS is set, this might be
+-# evaluated more than once.
+-PHONY += vmlinux_prereq
+-vmlinux_prereq: $(vmlinux-deps) FORCE
+-ifdef CONFIG_HEADERS_CHECK
+-	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
+-endif
+-ifdef CONFIG_GDB_SCRIPTS
+-	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
+-endif
+-ifdef CONFIG_TRIM_UNUSED_KSYMS
+-	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh \
+-	  "$(MAKE) -f $(srctree)/Makefile vmlinux"
+-endif
++# Recurse until adjust_autoksyms.sh is satisfied
++PHONY += autoksyms_recursive
++autoksyms_recursive: $(vmlinux-deps)
++	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh || \
++	$(MAKE) -f $(srctree)/Makefile autoksyms_recursive
  
-@@ -1056,7 +1058,7 @@ include/config/kernel.release: include/config/auto.conf FORCE
- # in parallel
- PHONY += scripts
- scripts: scripts_basic include/config/auto.conf include/config/tristate.conf \
--	 asm-generic gcc-plugins autoksyms
-+	 asm-generic gcc-plugins $(autoksyms_h)
- 	$(Q)$(MAKE) $(build)=$(@)
+ # For the kernel to actually contain only the needed exported symbols,
+ # we have to build modules as well to determine what those symbols are.
+@@ -1023,7 +1013,13 @@ cmd_link-vmlinux =                                                 \
+ 	$(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
+ 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
  
- # Things we need to do before we recursively start building the kernel
-@@ -1086,7 +1088,7 @@ endif
- # that need to depend on updated CONFIG_* values can be checked here.
- prepare2: prepare3 prepare-compiler-check outputmakefile asm-generic
+-vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
++vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
++ifdef CONFIG_HEADERS_CHECK
++	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
++endif
++ifdef CONFIG_GDB_SCRIPTS
++	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
++endif
+ 	+$(call if_changed,link-vmlinux)
  
--prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
-+prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h \
-                    include/config/auto.conf
- 	$(cmd_crmodverdir)
- 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index cb3ec53..eb139a1 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -38,8 +38,6 @@ nconfig: $(obj)/nconf
- # for external use.
- silentoldconfig: $(obj)/conf
- 	$(Q)mkdir -p include/config include/generated
--	$(Q)test -e include/generated/autoksyms.h || \
--	    touch   include/generated/autoksyms.h
- 	$< $(silent) --$@ $(Kconfig)
- 
- localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+ # Build samples along the rest of the kernel
+diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+index 7bb3618..1377cf8 100755
+--- a/scripts/adjust_autoksyms.sh
++++ b/scripts/adjust_autoksyms.sh
+@@ -95,8 +95,7 @@ if [ $changed -gt 0 ]; then
+ 	info "KSYMS" "symbols: before=$old, after=$new, changed=$changed"
+ 	info "UPD" "$cur_ksyms_file"
+ 	mv -f "$new_ksyms_file" "$cur_ksyms_file"
+-	# Then trigger a rebuild of affected source files
+-	exec $@
++	exit 1
+ else
+ 	rm -f "$new_ksyms_file"
+ fi
 -- 
 2.7.4
 
