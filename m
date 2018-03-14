@@ -1,51 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:38069 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:38067 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751988AbeCNQou (ORCPT
+        with ESMTP id S1751991AbeCNQou (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 14 Mar 2018 12:44:50 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/7] kbuild: touch autoksyms.h when it is really missing
-Date: Thu, 15 Mar 2018 01:44:16 +0900
-Message-Id: <1521045861-22418-3-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 3/7] kbuild: move 'scripts' target below
+Date: Thu, 15 Mar 2018 01:44:17 +0900
+Message-Id: <1521045861-22418-4-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-From the comment, I expect this code creates autoksyms.h in case it
-is missing, but it actually touches it when it does exists.
+Just a trivial change to prepare for the next commit.
+This target is still invisible from external module building.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-I do not know when this code is useful...
+ Makefile | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-If autoksyms.h were missing, build should have already failed because
-include/{linux,asm-generic}/export.h need it.
-
-Maybe for standalone test?
-Or, in order to make this script self-contained?
-
-
- scripts/adjust_autoksyms.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
-index 513da1a..a52210b 100755
---- a/scripts/adjust_autoksyms.sh
-+++ b/scripts/adjust_autoksyms.sh
-@@ -49,7 +49,7 @@ case "${KCONFIG_CONFIG}" in
- esac
+diff --git a/Makefile b/Makefile
+index 5eb5d9d..fab0e19 100644
+--- a/Makefile
++++ b/Makefile
+@@ -556,14 +556,6 @@ endif
+ export KBUILD_MODULES KBUILD_BUILTIN
  
- # In case it doesn't exist yet...
--if [ -e "$cur_ksyms_file" ]; then touch "$cur_ksyms_file"; fi
-+if [ ! -e "$cur_ksyms_file" ]; then touch "$cur_ksyms_file"; fi
+ ifeq ($(KBUILD_EXTMOD),)
+-# Additional helpers built in scripts/
+-# Carefully list dependencies so we do not try to build scripts twice
+-# in parallel
+-PHONY += scripts
+-scripts: scripts_basic include/config/auto.conf include/config/tristate.conf \
+-	 asm-generic gcc-plugins
+-	$(Q)$(MAKE) $(build)=$(@)
+-
+ # Objects we will link into vmlinux / subdirs we need to visit
+ init-y		:= init/
+ drivers-y	:= drivers/ sound/ firmware/
+@@ -1059,6 +1051,13 @@ endef
+ include/config/kernel.release: include/config/auto.conf FORCE
+ 	$(call filechk,kernel.release)
  
- # Generate a new ksym list file with symbols needed by the current
- # set of modules.
++# Additional helpers built in scripts/
++# Carefully list dependencies so we do not try to build scripts twice
++# in parallel
++PHONY += scripts
++scripts: scripts_basic include/config/auto.conf include/config/tristate.conf \
++	 asm-generic gcc-plugins autoksyms
++	$(Q)$(MAKE) $(build)=$(@)
+ 
+ # Things we need to do before we recursively start building the kernel
+ # or the modules are listed in "prepare".
 -- 
 2.7.4
 
