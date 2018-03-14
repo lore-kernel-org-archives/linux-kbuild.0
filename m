@@ -1,123 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:38073 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752078AbeCNQou (ORCPT
+Received: from mail-io0-f193.google.com ([209.85.223.193]:39366 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751551AbeCNR0h (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Mar 2018 12:44:50 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 6/7] kbuild: move include/config/ksym/* to include/ksym/*
-Date: Thu, 15 Mar 2018 01:44:20 +0900
-Message-Id: <1521045861-22418-7-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
+        Wed, 14 Mar 2018 13:26:37 -0400
+Received: by mail-io0-f193.google.com with SMTP id v10so5287054iob.6
+        for <linux-kbuild@vger.kernel.org>; Wed, 14 Mar 2018 10:26:37 -0700 (PDT)
+Date: Wed, 14 Mar 2018 13:26:35 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH 2/7] kbuild: touch autoksyms.h when it is really
+ missing
+In-Reply-To: <1521045861-22418-3-git-send-email-yamada.masahiro@socionext.com>
+Message-ID: <nycvar.YSQ.7.76.1803141324420.28583@knanqh.ubzr>
+References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com> <1521045861-22418-3-git-send-email-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, linux-kernel@vger.kernel.org
 
-The idea of using fixdep was inspired by Kconfig, but autoksyms
-is unrelated to Kconfig.  So, I want to get those touched files
-out of include/config/.  The directory include/ksym/ is removed
-by "make clean".  We do not need to keep it for external module
-building.
+On Thu, 15 Mar 2018, Masahiro Yamada wrote:
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+> From the comment, I expect this code creates autoksyms.h in case it
+> is missing, but it actually touches it when it does exists.
 
- .gitignore                  | 1 +
- Makefile                    | 2 +-
- scripts/Kbuild.include      | 2 +-
- scripts/adjust_autoksyms.sh | 2 +-
- scripts/basic/fixdep.c      | 8 ++++----
- 5 files changed, 8 insertions(+), 7 deletions(-)
+Oops, indeed.
 
-diff --git a/.gitignore b/.gitignore
-index 1be78fd..85bcc26 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -87,6 +87,7 @@ modules.builtin
- #
- include/config
- include/generated
-+include/ksym
- arch/*/include/generated
- 
- # stgit generated dirs
-diff --git a/Makefile b/Makefile
-index e60b16f..1dab647 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1327,7 +1327,7 @@ endif # CONFIG_MODULES
- # make distclean Remove editor backup files, patch leftover files and the like
- 
- # Directories & files removed with 'make clean'
--CLEAN_DIRS  += $(MODVERDIR)
-+CLEAN_DIRS  += $(MODVERDIR) include/ksym
- 
- # Directories & files removed with 'make mrproper'
- MRPROPER_DIRS  += include/config usr/include include/generated          \
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 065324a..045971e 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -368,7 +368,7 @@ ksym_dep_filter =                                                            \
- 	    $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;        \
- 	  boot*|build*|cpp_its_S|*cpp_lds_S|dtc|host*|vdso*) : ;;            \
- 	  *) echo "Don't know how to preprocess $(1)" >&2; false ;;          \
--	esac | tr ";" "\n" | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
-+	esac | tr ";" "\n" | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/\1/p'
- 
- cmd_and_fixdep =                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
-diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
-index a52210b..7bb3618 100755
---- a/scripts/adjust_autoksyms.sh
-+++ b/scripts/adjust_autoksyms.sh
-@@ -81,7 +81,7 @@ sort "$cur_ksyms_file" "$new_ksyms_file" | uniq -u |
- sed -n 's/^#define __KSYM_\(.*\) 1/\1/p' | tr "A-Z_" "a-z/" |
- while read sympath; do
- 	if [ -z "$sympath" ]; then continue; fi
--	depfile="include/config/ksym/${sympath}.h"
-+	depfile="include/ksym/${sympath}.h"
- 	mkdir -p "$(dirname "$depfile")"
- 	touch "$depfile"
- 	echo $((count += 1))
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 449b68c..f387538 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -113,11 +113,11 @@ static void usage(void)
- /*
-  * Print out a dependency path from a symbol name
-  */
--static void print_config(const char *m, int slen)
-+static void print_dep(const char *m, int slen, const char *dir)
- {
- 	int c, i;
- 
--	printf("    $(wildcard include/config/");
-+	printf("    $(wildcard %s/", dir);
- 	for (i = 0; i < slen; i++) {
- 		c = m[i];
- 		if (c == '_')
-@@ -140,7 +140,7 @@ static void do_extra_deps(void)
- 			fprintf(stderr, "fixdep: bad data on stdin\n");
- 			exit(1);
- 		}
--		print_config(buf, len - 1);
-+		print_dep(buf, len - 1, "include/ksym");
- 	}
- }
- 
-@@ -208,7 +208,7 @@ static void use_config(const char *m, int slen)
- 	    return;
- 
- 	define_config(m, slen, hash);
--	print_config(m, slen);
-+	print_dep(m, slen, "include/config");
- }
- 
- /* test if s ends in sub */
--- 
-2.7.4
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
+> I do not know when this code is useful...
+> 
+> If autoksyms.h were missing, build should have already failed because
+> include/{linux,asm-generic}/export.h need it.
+> 
+> Maybe for standalone test?
+> Or, in order to make this script self-contained?
 
+I agree it isn't very useful. Proof: it was wrong and wouldn't have 
+worked as intended. So the best fix might be to simply remove that line.
+
+
+
+> 
+> 
+>  scripts/adjust_autoksyms.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+> index 513da1a..a52210b 100755
+> --- a/scripts/adjust_autoksyms.sh
+> +++ b/scripts/adjust_autoksyms.sh
+> @@ -49,7 +49,7 @@ case "${KCONFIG_CONFIG}" in
+>  esac
+>  
+>  # In case it doesn't exist yet...
+> -if [ -e "$cur_ksyms_file" ]; then touch "$cur_ksyms_file"; fi
+> +if [ ! -e "$cur_ksyms_file" ]; then touch "$cur_ksyms_file"; fi
+>  
+>  # Generate a new ksym list file with symbols needed by the current
+>  # set of modules.
+> -- 
+> 2.7.4
+> 
+> 
