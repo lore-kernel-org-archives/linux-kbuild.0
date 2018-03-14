@@ -1,66 +1,138 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:39366 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751551AbeCNR0h (ORCPT
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:36851 "EHLO
+        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751353AbeCNRwS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Mar 2018 13:26:37 -0400
-Received: by mail-io0-f193.google.com with SMTP id v10so5287054iob.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 14 Mar 2018 10:26:37 -0700 (PDT)
-Date: Wed, 14 Mar 2018 13:26:35 -0400 (EDT)
+        Wed, 14 Mar 2018 13:52:18 -0400
+Received: by mail-qk0-f196.google.com with SMTP id d206so4422748qkb.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 14 Mar 2018 10:52:18 -0700 (PDT)
+Date: Wed, 14 Mar 2018 13:52:16 -0400 (EDT)
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH 2/7] kbuild: touch autoksyms.h when it is really
- missing
-In-Reply-To: <1521045861-22418-3-git-send-email-yamada.masahiro@socionext.com>
-Message-ID: <nycvar.YSQ.7.76.1803141324420.28583@knanqh.ubzr>
-References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com> <1521045861-22418-3-git-send-email-yamada.masahiro@socionext.com>
+Subject: Re: [PATCH 4/7] kbuild: restore touching autoksyms.h to the top
+ Makefile
+In-Reply-To: <1521045861-22418-5-git-send-email-yamada.masahiro@socionext.com>
+Message-ID: <nycvar.YSQ.7.76.1803141350430.28583@knanqh.ubzr>
+References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com> <1521045861-22418-5-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
 On Thu, 15 Mar 2018, Masahiro Yamada wrote:
 
-> From the comment, I expect this code creates autoksyms.h in case it
-> is missing, but it actually touches it when it does exists.
-
-Oops, indeed.
-
+> Commit d3fc425e819b ("kbuild: make sure autoksyms.h exists early")
+> moved the code that touches autoksyms.h to scripts/kconfig/Makefile
+> with obscure reason.
+> 
+> From Nicolas' comment [1], he did not seem to be sure about the root
+> cause.
+> 
+> I guess I figured it out, so here is a fix-up I think is more correct.
+> According to the error log in the original post [2], the build failed
+> in scripts/mod/devicetable-offsets.c
+> 
+> scripts/mod/Makefile is descended from scripts/Makefile, which is
+> invoked from the top-level Makefile by the 'scripts' target.
+> 
+> To build vmlinux and/or modules, Kbuild descend into $(vmlinux-dirs).
+> This depends on 'prepare' and 'script' as follows:
+> 
+>   $(vmlinux-dirs): prepare scripts
+> 
+> Because there is no dependency between 'prepare' and 'scripts', the
+> parallel building can run them simultaneously.
+> 
+> 'prepare' depends on 'prepare1', which touched autoksyms.h, whereas
+> 'scripts' descends into script/, then scripts/mod/, which needed
+> <generated/autoksyms.h> if CONFIG_TRIM_UNUSED_KSYMS.  This was the
+> reason of race.
+> 
+> I am not happy to have unrelated code in the Kconfig Makefile, so
+> getting it back to the top Makefile.
+> 
+> I remove the standalone test target because I want to use it to
+> create an empty autoksyms.h file.  Here is a little improvement;
+> unnecessary autoksyms.h is not created when CONFIG_TRIM_UNUSED_KSYMS
+> is disabled.
+> 
+> [1] https://lkml.org/lkml/2016/11/30/734
+> [2] https://lkml.org/lkml/2016/11/30/531
+> 
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+You're the make master!
+
+Acked-by: Nicolas Pitre <nico@linaro.org>
+
+
+
+> Commit:
+> 
+> The discussion happened in Nov. 2016.
+> 
+> I was not involved in it.
+> I was not the Kbuild maintainer at that time.
+> 
+> END
+> 
 > ---
 > 
-> I do not know when this code is useful...
+>  Makefile                 | 12 +++++++-----
+>  scripts/kconfig/Makefile |  2 --
+>  2 files changed, 7 insertions(+), 7 deletions(-)
 > 
-> If autoksyms.h were missing, build should have already failed because
-> include/{linux,asm-generic}/export.h need it.
-> 
-> Maybe for standalone test?
-> Or, in order to make this script self-contained?
-
-I agree it isn't very useful. Proof: it was wrong and wouldn't have 
-worked as intended. So the best fix might be to simply remove that line.
-
-
-
-> 
-> 
->  scripts/adjust_autoksyms.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
-> index 513da1a..a52210b 100755
-> --- a/scripts/adjust_autoksyms.sh
-> +++ b/scripts/adjust_autoksyms.sh
-> @@ -49,7 +49,7 @@ case "${KCONFIG_CONFIG}" in
->  esac
+> diff --git a/Makefile b/Makefile
+> index fab0e19..decc870 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1010,9 +1010,11 @@ ifdef CONFIG_TRIM_UNUSED_KSYMS
+>  	  "$(MAKE) -f $(srctree)/Makefile vmlinux"
+>  endif
 >  
->  # In case it doesn't exist yet...
-> -if [ -e "$cur_ksyms_file" ]; then touch "$cur_ksyms_file"; fi
-> +if [ ! -e "$cur_ksyms_file" ]; then touch "$cur_ksyms_file"; fi
+> -# standalone target for easier testing
+> -include/generated/autoksyms.h: FORCE
+> -	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh true
+> +autoksyms_h := $(if $(CONFIG_TRIM_UNUSED_KSYMS), include/generated/autoksyms.h)
+> +
+> +$(autoksyms_h):
+> +	$(Q)mkdir -p $(dir $@)
+> +	$(Q)touch $@
 >  
->  # Generate a new ksym list file with symbols needed by the current
->  # set of modules.
+>  ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
+>  
+> @@ -1056,7 +1058,7 @@ include/config/kernel.release: include/config/auto.conf FORCE
+>  # in parallel
+>  PHONY += scripts
+>  scripts: scripts_basic include/config/auto.conf include/config/tristate.conf \
+> -	 asm-generic gcc-plugins autoksyms
+> +	 asm-generic gcc-plugins $(autoksyms_h)
+>  	$(Q)$(MAKE) $(build)=$(@)
+>  
+>  # Things we need to do before we recursively start building the kernel
+> @@ -1086,7 +1088,7 @@ endif
+>  # that need to depend on updated CONFIG_* values can be checked here.
+>  prepare2: prepare3 prepare-compiler-check outputmakefile asm-generic
+>  
+> -prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
+> +prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h \
+>                     include/config/auto.conf
+>  	$(cmd_crmodverdir)
+>  
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index cb3ec53..eb139a1 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -38,8 +38,6 @@ nconfig: $(obj)/nconf
+>  # for external use.
+>  silentoldconfig: $(obj)/conf
+>  	$(Q)mkdir -p include/config include/generated
+> -	$(Q)test -e include/generated/autoksyms.h || \
+> -	    touch   include/generated/autoksyms.h
+>  	$< $(silent) --$@ $(Kconfig)
+>  
+>  localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
 > -- 
 > 2.7.4
 > 
