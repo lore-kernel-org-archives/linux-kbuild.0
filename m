@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:38068 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:38073 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752011AbeCNQou (ORCPT
+        with ESMTP id S1752078AbeCNQou (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 14 Mar 2018 12:44:50 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 5/7] kbuild: hide CONFIG_TRIM_UNUSED_KSYMS code from external module building
-Date: Thu, 15 Mar 2018 01:44:19 +0900
-Message-Id: <1521045861-22418-6-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 6/7] kbuild: move include/config/ksym/* to include/ksym/*
+Date: Thu, 15 Mar 2018 01:44:20 +0900
+Message-Id: <1521045861-22418-7-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,49 +15,109 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-If CONFIG_TRIM_UNUSED_KYMS is enabled, KBUILD_MODULES is set.  This
-code is unneeded for external module building because KBUILD_MODULES
-is always set.  Move this code inside "ifeq ($(KBUILD_EXTMOD),)"
-conditional.
+The idea of using fixdep was inspired by Kconfig, but autoksyms
+is unrelated to Kconfig.  So, I want to get those touched files
+out of include/config/.  The directory include/ksym/ is removed
+by "make clean".  We do not need to keep it for external module
+building.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ .gitignore                  | 1 +
+ Makefile                    | 2 +-
+ scripts/Kbuild.include      | 2 +-
+ scripts/adjust_autoksyms.sh | 2 +-
+ scripts/basic/fixdep.c      | 8 ++++----
+ 5 files changed, 8 insertions(+), 7 deletions(-)
 
+diff --git a/.gitignore b/.gitignore
+index 1be78fd..85bcc26 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -87,6 +87,7 @@ modules.builtin
+ #
+ include/config
+ include/generated
++include/ksym
+ arch/*/include/generated
+ 
+ # stgit generated dirs
 diff --git a/Makefile b/Makefile
-index decc870..e60b16f 100644
+index e60b16f..1dab647 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -603,13 +603,6 @@ else
- include/config/auto.conf: ;
- endif # $(dot-config)
+@@ -1327,7 +1327,7 @@ endif # CONFIG_MODULES
+ # make distclean Remove editor backup files, patch leftover files and the like
  
--# For the kernel to actually contain only the needed exported symbols,
--# we have to build modules as well to determine what those symbols are.
--# (this can be evaluated only once include/config/auto.conf has been included)
--ifdef CONFIG_TRIM_UNUSED_KSYMS
--  KBUILD_MODULES := 1
--endif
--
- # The all: target is the default when no target is given on the
- # command line.
- # This allow a user to issue only 'make' to build a kernel including modules
-@@ -1010,6 +1003,13 @@ ifdef CONFIG_TRIM_UNUSED_KSYMS
- 	  "$(MAKE) -f $(srctree)/Makefile vmlinux"
- endif
+ # Directories & files removed with 'make clean'
+-CLEAN_DIRS  += $(MODVERDIR)
++CLEAN_DIRS  += $(MODVERDIR) include/ksym
  
-+# For the kernel to actually contain only the needed exported symbols,
-+# we have to build modules as well to determine what those symbols are.
-+# (this can be evaluated only once include/config/auto.conf has been included)
-+ifdef CONFIG_TRIM_UNUSED_KSYMS
-+  KBUILD_MODULES := 1
-+endif
-+
- autoksyms_h := $(if $(CONFIG_TRIM_UNUSED_KSYMS), include/generated/autoksyms.h)
+ # Directories & files removed with 'make mrproper'
+ MRPROPER_DIRS  += include/config usr/include include/generated          \
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 065324a..045971e 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -368,7 +368,7 @@ ksym_dep_filter =                                                            \
+ 	    $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;        \
+ 	  boot*|build*|cpp_its_S|*cpp_lds_S|dtc|host*|vdso*) : ;;            \
+ 	  *) echo "Don't know how to preprocess $(1)" >&2; false ;;          \
+-	esac | tr ";" "\n" | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
++	esac | tr ";" "\n" | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/\1/p'
  
- $(autoksyms_h):
+ cmd_and_fixdep =                                                             \
+ 	$(echo-cmd) $(cmd_$(1));                                             \
+diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+index a52210b..7bb3618 100755
+--- a/scripts/adjust_autoksyms.sh
++++ b/scripts/adjust_autoksyms.sh
+@@ -81,7 +81,7 @@ sort "$cur_ksyms_file" "$new_ksyms_file" | uniq -u |
+ sed -n 's/^#define __KSYM_\(.*\) 1/\1/p' | tr "A-Z_" "a-z/" |
+ while read sympath; do
+ 	if [ -z "$sympath" ]; then continue; fi
+-	depfile="include/config/ksym/${sympath}.h"
++	depfile="include/ksym/${sympath}.h"
+ 	mkdir -p "$(dirname "$depfile")"
+ 	touch "$depfile"
+ 	echo $((count += 1))
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index 449b68c..f387538 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -113,11 +113,11 @@ static void usage(void)
+ /*
+  * Print out a dependency path from a symbol name
+  */
+-static void print_config(const char *m, int slen)
++static void print_dep(const char *m, int slen, const char *dir)
+ {
+ 	int c, i;
+ 
+-	printf("    $(wildcard include/config/");
++	printf("    $(wildcard %s/", dir);
+ 	for (i = 0; i < slen; i++) {
+ 		c = m[i];
+ 		if (c == '_')
+@@ -140,7 +140,7 @@ static void do_extra_deps(void)
+ 			fprintf(stderr, "fixdep: bad data on stdin\n");
+ 			exit(1);
+ 		}
+-		print_config(buf, len - 1);
++		print_dep(buf, len - 1, "include/ksym");
+ 	}
+ }
+ 
+@@ -208,7 +208,7 @@ static void use_config(const char *m, int slen)
+ 	    return;
+ 
+ 	define_config(m, slen, hash);
+-	print_config(m, slen);
++	print_dep(m, slen, "include/config");
+ }
+ 
+ /* test if s ends in sub */
 -- 
 2.7.4
 
