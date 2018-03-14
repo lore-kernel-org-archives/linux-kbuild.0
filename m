@@ -1,47 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:38070 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:38069 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752081AbeCNQou (ORCPT
+        with ESMTP id S1751988AbeCNQou (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 14 Mar 2018 12:44:50 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/7] kbuild: clear LDFLAGS in the top Makefile
-Date: Thu, 15 Mar 2018 01:44:15 +0900
-Message-Id: <1521045861-22418-2-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 2/7] kbuild: touch autoksyms.h when it is really missing
+Date: Thu, 15 Mar 2018 01:44:16 +0900
+Message-Id: <1521045861-22418-3-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Currently LDFLAGS is not cleared, so same flags are accumulated in
-LDFLAGS when the top Makefile is recursively invoked.
-
-I found unneeded rebuild for ARCH=arm64 when CONFIG_TRIM_UNUSED_KSYMS
-is enabled.  If include/generated/autoksyms.h is updated, the top
-Makefile is recursively invoked, then arch/arm64/Makefile adds one
-more '-maarch64linux'.  Due to the command line change, modules are
-rebuilt needlessly.
+From the comment, I expect this code creates autoksyms.h in case it
+is missing, but it actually touches it when it does exists.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+I do not know when this code is useful...
 
-diff --git a/Makefile b/Makefile
-index e02d092..5eb5d9d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -426,6 +426,7 @@ KBUILD_CFLAGS_KERNEL :=
- KBUILD_AFLAGS_MODULE  := -DMODULE
- KBUILD_CFLAGS_MODULE  := -DMODULE
- KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
-+LDFLAGS :=
- GCC_PLUGINS_CFLAGS :=
+If autoksyms.h were missing, build should have already failed because
+include/{linux,asm-generic}/export.h need it.
+
+Maybe for standalone test?
+Or, in order to make this script self-contained?
+
+
+ scripts/adjust_autoksyms.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+index 513da1a..a52210b 100755
+--- a/scripts/adjust_autoksyms.sh
++++ b/scripts/adjust_autoksyms.sh
+@@ -49,7 +49,7 @@ case "${KCONFIG_CONFIG}" in
+ esac
  
- export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+ # In case it doesn't exist yet...
+-if [ -e "$cur_ksyms_file" ]; then touch "$cur_ksyms_file"; fi
++if [ ! -e "$cur_ksyms_file" ]; then touch "$cur_ksyms_file"; fi
+ 
+ # Generate a new ksym list file with symbols needed by the current
+ # set of modules.
 -- 
 2.7.4
 
