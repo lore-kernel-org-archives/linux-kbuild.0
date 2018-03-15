@@ -1,48 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:34739 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750731AbeCOG11 (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:62131 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751362AbeCOGhV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Mar 2018 02:27:27 -0400
+        Thu, 15 Mar 2018 02:37:21 -0400
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1803141324420.28583@knanqh.ubzr>
+In-Reply-To: <nycvar.YSQ.7.76.1803141419550.28583@knanqh.ubzr>
 References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
- <1521045861-22418-3-git-send-email-yamada.masahiro@socionext.com> <nycvar.YSQ.7.76.1803141324420.28583@knanqh.ubzr>
+ <1521045861-22418-6-git-send-email-yamada.masahiro@socionext.com> <nycvar.YSQ.7.76.1803141419550.28583@knanqh.ubzr>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 15 Mar 2018 15:26:41 +0900
-Message-ID: <CAK7LNAQMLA9-wOJ5Tgr1tuOTox33544cty3rVzAxvvyGQgs5Dg@mail.gmail.com>
-Subject: Re: [PATCH 2/7] kbuild: touch autoksyms.h when it is really missing
+Date: Thu, 15 Mar 2018 15:36:27 +0900
+Message-ID: <CAK7LNATTFjexL0gmtyL0QNpRQUeTPYsjoOxb3+9F20vFaE3Xdg@mail.gmail.com>
+Subject: Re: [PATCH 5/7] kbuild: hide CONFIG_TRIM_UNUSED_KSYMS code from
+ external module building
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-03-15 2:26 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
+2018-03-15 3:32 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
 > On Thu, 15 Mar 2018, Masahiro Yamada wrote:
 >
->> From the comment, I expect this code creates autoksyms.h in case it
->> is missing, but it actually touches it when it does exists.
+>> If CONFIG_TRIM_UNUSED_KYMS is enabled, KBUILD_MODULES is set.
 >
-> Oops, indeed.
->
+> Not when you do "make vmlinux" though.
+
+I could not understand this.
+
+Unless I am missing something,
+I think this code is always parsed.
+
+
+
+>> This code is unneeded for external module building because
+>> KBUILD_MODULES is always set.  Move this code inside "ifeq
+>> ($(KBUILD_EXTMOD),)" conditional.
+>>
 >> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>
+> Acked-by: Nicolas Pitre <nico@linaro.org>
+>
 >> ---
 >>
->> I do not know when this code is useful...
+>>  Makefile | 14 +++++++-------
+>>  1 file changed, 7 insertions(+), 7 deletions(-)
 >>
->> If autoksyms.h were missing, build should have already failed because
->> include/{linux,asm-generic}/export.h need it.
+>> diff --git a/Makefile b/Makefile
+>> index decc870..e60b16f 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -603,13 +603,6 @@ else
+>>  include/config/auto.conf: ;
+>>  endif # $(dot-config)
 >>
->> Maybe for standalone test?
->> Or, in order to make this script self-contained?
->
-> I agree it isn't very useful. Proof: it was wrong and wouldn't have
-> worked as intended. So the best fix might be to simply remove that line.
->
-
-OK, I will remove the code.
-
+>> -# For the kernel to actually contain only the needed exported symbols,
+>> -# we have to build modules as well to determine what those symbols are.
+>> -# (this can be evaluated only once include/config/auto.conf has been included)
+>> -ifdef CONFIG_TRIM_UNUSED_KSYMS
+>> -  KBUILD_MODULES := 1
+>> -endif
+>> -
+>>  # The all: target is the default when no target is given on the
+>>  # command line.
+>>  # This allow a user to issue only 'make' to build a kernel including modules
+>> @@ -1010,6 +1003,13 @@ ifdef CONFIG_TRIM_UNUSED_KSYMS
+>>         "$(MAKE) -f $(srctree)/Makefile vmlinux"
+>>  endif
+>>
+>> +# For the kernel to actually contain only the needed exported symbols,
+>> A+# we have to build modules as well to determine what those symbols
+> are.
+>> +# (this can be evaluated only once include/config/auto.conf has been included)
+>> +ifdef CONFIG_TRIM_UNUSED_KSYMS
+>> +  KBUILD_MODULES := 1
+>> +endif
+>> +
+>>  autoksyms_h := $(if $(CONFIG_TRIM_UNUSED_KSYMS), include/generated/autoksyms.h)
+>>
+>>  $(autoksyms_h):
+>> --
+>> 2.7.4
+>>
+>>
 
 
 
