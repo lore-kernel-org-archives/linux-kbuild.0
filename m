@@ -1,137 +1,117 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:36147 "EHLO
-        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751408AbeCNTGU (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:53920 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750731AbeCOFvj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Mar 2018 15:06:20 -0400
-Received: by mail-qt0-f195.google.com with SMTP id c7so4657940qtn.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 14 Mar 2018 12:06:19 -0700 (PDT)
-Date: Wed, 14 Mar 2018 15:06:17 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH 7/7] kbuild: link vmlinux just once for
- CONFIG_TRIM_UNUSED_KSYMS
-In-Reply-To: <1521045861-22418-8-git-send-email-yamada.masahiro@socionext.com>
-Message-ID: <nycvar.YSQ.7.76.1803141448330.28583@knanqh.ubzr>
-References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com> <1521045861-22418-8-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 15 Mar 2018 01:51:39 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <9e9438b0-568a-8dc0-dad6-d29b6e39e53a@infradead.org>
+References: <9e9438b0-568a-8dc0-dad6-d29b6e39e53a@infradead.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 15 Mar 2018 14:50:35 +0900
+Message-ID: <CAK7LNAQxcVRvhJn6GQVdLLuEq0sJEUcfwkbMpmx9j9nbjscQRg@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: check for pkg-config on make {menu,n,g,x}config
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
 
-On Thu, 15 Mar 2018, Masahiro Yamada wrote:
-
-> If CONFIG_TRIM_UNUSED_KSYMS is enabled and the kernel is built from
-> a pristine state, the vmlinux is linked twice.
-> 
-> [1] A user runs "make"
-> 
-> [2] First build with empty autoksyms.h
-> 
-> [3] adjust_autoksyms.sh updates autoksyms.h and recurses "make vmlinux"
-> 
->   --------(begin sub-make)--------
->   [4] Second build with new autoksyms.h
-> 
->   [5] link-vmlinux.sh is invoked because "vmlinux" is missing
->   ---------(end sub-make)---------
-> 
-> [6] link-vmlinux.sh is invoked again despite "vmlinux" is up-to-date.
-> 
-> The reason of [6] is probably because Make already decided to update
-> "vmlinux" at the time of [2] because "vmlinux" was missing when Make
-> generated the dependency list.
-
-But the dependency list for vmlinux contains FORCE so the target is 
-always remade in (2) anyway. The decision to actually invoke 
-link-vmlinux.sh comes from "if_changed". Why is $(call if_changed,...) 
-in (6) not noticing that vmlinux is up to date?
-
-> 
-> link-vmlinus.sh is costly, so it is better to not run it when unneeded.
-> Split CONFIG_TRIM_UNUSED_KSYMS handling to a dedicated target.
-> 
-> The reason of commit 2441e78b1919 ("krbuild: better abstract vmlinux
-> sequential prerequisites") was to cater to CONFIG_BUILD_DOCSRC, but
-> it was later removed by commit 184892925118 ("samples: move blackfin
-> gptimers-example from Documentation").
-> 
-> I also changed adjust_autoksyms.sh to simply exit with 1 or 0 to make
-> it look straightforward.
-
-That is wrong. If the script fails for some reason (it runs with -e set) 
-then this will trigger an endless recursive make instead of failing the 
-build.
-
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+2018-03-13 11:30 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+> From: Randy Dunlap <rdunlap@infradead.org>
+>
+> Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
+> that other required files are present, but none of these check that
+> pkg-config itself is present.  Add a check for all 4 of these targets.
+>
+> Fixes kernel bugzilla #77511:
+> https://bugzilla.kernel.org/show_bug.cgi?id=77511
+>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 > ---
-> 
->  Makefile                    | 28 ++++++++++++----------------
->  scripts/adjust_autoksyms.sh |  3 +--
->  2 files changed, 13 insertions(+), 18 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 1dab647..0a7bab6 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -987,21 +987,11 @@ export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(vmlinux-alldirs)) arch Doc
->  
->  vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_INIT) $(KBUILD_VMLINUX_MAIN) $(KBUILD_VMLINUX_LIBS)
->  
-> -# Include targets which we want to execute sequentially if the rest of the
-> -# kernel build went well. If CONFIG_TRIM_UNUSED_KSYMS is set, this might be
-> -# evaluated more than once.
-> -PHONY += vmlinux_prereq
-> -vmlinux_prereq: $(vmlinux-deps) FORCE
-> -ifdef CONFIG_HEADERS_CHECK
-> -	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
-> -endif
-> -ifdef CONFIG_GDB_SCRIPTS
-> -	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
-> -endif
-> -ifdef CONFIG_TRIM_UNUSED_KSYMS
-> -	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh \
-> -	  "$(MAKE) -f $(srctree)/Makefile vmlinux"
-> -endif
-> +# Recurse until adjust_autoksyms.sh is satisfied
-> +PHONY += autoksyms_recursive
-> +autoksyms_recursive: $(vmlinux-deps)
-> +	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh || \
-> +	$(MAKE) -f $(srctree)/Makefile autoksyms_recursive
->  
->  # For the kernel to actually contain only the needed exported symbols,
->  # we have to build modules as well to determine what those symbols are.
-> @@ -1023,7 +1013,13 @@ cmd_link-vmlinux =                                                 \
->  	$(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
->  	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
->  
-> -vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
-> +vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
-> +ifdef CONFIG_HEADERS_CHECK
-> +	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
-> +endif
-> +ifdef CONFIG_GDB_SCRIPTS
-> +	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
-> +endif
->  	+$(call if_changed,link-vmlinux)
->  
->  # Build samples along the rest of the kernel
-> diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
-> index 7bb3618..1377cf8 100755
-> --- a/scripts/adjust_autoksyms.sh
-> +++ b/scripts/adjust_autoksyms.sh
-> @@ -95,8 +95,7 @@ if [ $changed -gt 0 ]; then
->  	info "KSYMS" "symbols: before=$old, after=$new, changed=$changed"
->  	info "UPD" "$cur_ksyms_file"
->  	mv -f "$new_ksyms_file" "$cur_ksyms_file"
-> -	# Then trigger a rebuild of affected source files
-> -	exec $@
-> +	exit 1
->  else
->  	rm -f "$new_ksyms_file"
->  fi
-> -- 
-> 2.7.4
-> 
-> 
+> v2: use 'command -v' instead of 'which'
+>
+> I'm also OK with just documenting the pkg-config requirement in
+> Documentation/Changes (= Documentation/process/changes.rst).
+>
+>  scripts/kconfig/Makefile           |   15 ++++++++++++++-
+>  scripts/kconfig/check-pkgconfig.sh |   12 ++++++++++++
+>  2 files changed, 26 insertions(+), 1 deletion(-)
+>
+> --- lnx-416-rc3.orig/scripts/kconfig/Makefile
+> +++ lnx-416-rc3/scripts/kconfig/Makefile
+> @@ -160,6 +160,9 @@ help:
+>         @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
+>         @echo  '  tinyconfig      - Configure the tiniest possible kernel'
+>
+> +# pkg-config check
+> +check-pkgconfig  := $(srctree)/$(src)/check-pkgconfig.sh
+> +
+>  # lxdialog stuff
+>  check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
+>
+> @@ -205,7 +208,17 @@ $(addprefix $(obj)/, mconf.o $(lxdialog)
+>  $(obj)/dochecklxdialog:
+>         $(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC) $(HOST_EXTRACFLAGS) $(HOSTLOADLIBES_mconf)
+>
+> -always := dochecklxdialog
+> +# Check that we have pkg-config (used by each of menu/n/g/xconfig)
+> +PHONY += $(obj)/docheckpkgconfig
+> +$(addprefix $(obj)/, mconf.o): $(obj)/docheckpkgconfig
+> +$(addprefix $(obj)/, nconf.o): $(obj)/docheckpkgconfig
+> +$(addprefix $(obj)/, gconf.o): $(obj)/docheckpkgconfig
+> +$(addprefix $(obj)/, qconf.o): $(obj)/docheckpkgconfig
+> +
+> +$(obj)/docheckpkgconfig:
+> +       $(Q)$(CONFIG_SHELL) $(check-pkgconfig)
+> +
+> +always := docheckpkgconfig dochecklxdialog
+
+
+I did not test this patch, but does this check work as expected?
+
+Probably we want to run 'docheckpkgconfig'
+before 'dochecklxdiag', '.tmp_gtkcheck', '.tmp_qtcheck', etc.
+But, I do not see such dependencies.
+
+
+Also, if we make 'pkg-config' mandatory,
+should we entirely drop fall-back logics like follows?
+
+https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/lxdialog/check-lxdialog.sh#L10
+https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/lxdialog/check-lxdialog.sh#L29
+https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/Makefile#L230
+
+
+What do you think?
+
+
+>  # Add environment specific flags
+>  HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTCC) $(HOSTCFLAGS))
+> --- /dev/null
+> +++ lnx-416-rc3/scripts/kconfig/check-pkgconfig.sh
+> @@ -0,0 +1,12 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Check for pkg-config presence
+> +
+> +pkgcfg=`command -v pkg-config`
+> +
+> +if [ "$pkgcfg" = "" ]; then
+> +       echo "'make *config' requires 'pkg-config'. Please install it." 1>&2
+> +       exit 1          # error
+> +fi
+> +
+> +exit 0
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
