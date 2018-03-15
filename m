@@ -1,117 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:53920 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750731AbeCOFvj (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:63149 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751482AbeCOG0E (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Mar 2018 01:51:39 -0400
-MIME-Version: 1.0
-In-Reply-To: <9e9438b0-568a-8dc0-dad6-d29b6e39e53a@infradead.org>
-References: <9e9438b0-568a-8dc0-dad6-d29b6e39e53a@infradead.org>
+        Thu, 15 Mar 2018 02:26:04 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 15 Mar 2018 14:50:35 +0900
-Message-ID: <CAK7LNAQxcVRvhJn6GQVdLLuEq0sJEUcfwkbMpmx9j9nbjscQRg@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: check for pkg-config on make {menu,n,g,x}config
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kconfig: do not include both curses.h and ncurses.h for nconfig
+Date: Thu, 15 Mar 2018 15:25:27 +0900
+Message-Id: <1521095127-23067-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-2018-03-13 11:30 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> From: Randy Dunlap <rdunlap@infradead.org>
->
-> Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
-> that other required files are present, but none of these check that
-> pkg-config itself is present.  Add a check for all 4 of these targets.
->
-> Fixes kernel bugzilla #77511:
-> https://bugzilla.kernel.org/show_bug.cgi?id=77511
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
-> v2: use 'command -v' instead of 'which'
->
-> I'm also OK with just documenting the pkg-config requirement in
-> Documentation/Changes (= Documentation/process/changes.rst).
->
->  scripts/kconfig/Makefile           |   15 ++++++++++++++-
->  scripts/kconfig/check-pkgconfig.sh |   12 ++++++++++++
->  2 files changed, 26 insertions(+), 1 deletion(-)
->
-> --- lnx-416-rc3.orig/scripts/kconfig/Makefile
-> +++ lnx-416-rc3/scripts/kconfig/Makefile
-> @@ -160,6 +160,9 @@ help:
->         @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
->         @echo  '  tinyconfig      - Configure the tiniest possible kernel'
->
-> +# pkg-config check
-> +check-pkgconfig  := $(srctree)/$(src)/check-pkgconfig.sh
-> +
->  # lxdialog stuff
->  check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
->
-> @@ -205,7 +208,17 @@ $(addprefix $(obj)/, mconf.o $(lxdialog)
->  $(obj)/dochecklxdialog:
->         $(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC) $(HOST_EXTRACFLAGS) $(HOSTLOADLIBES_mconf)
->
-> -always := dochecklxdialog
-> +# Check that we have pkg-config (used by each of menu/n/g/xconfig)
-> +PHONY += $(obj)/docheckpkgconfig
-> +$(addprefix $(obj)/, mconf.o): $(obj)/docheckpkgconfig
-> +$(addprefix $(obj)/, nconf.o): $(obj)/docheckpkgconfig
-> +$(addprefix $(obj)/, gconf.o): $(obj)/docheckpkgconfig
-> +$(addprefix $(obj)/, qconf.o): $(obj)/docheckpkgconfig
-> +
-> +$(obj)/docheckpkgconfig:
-> +       $(Q)$(CONFIG_SHELL) $(check-pkgconfig)
-> +
-> +always := docheckpkgconfig dochecklxdialog
+nconf.h includes <curses.h> and "ncurses.h", but it does not need to
+include both.  Generally, it should fall back to curses.h only when
+ncurses.h is not found.  But, looks like it has never happened;
+these includes have been here for many years since commit 692d97c380c6
+("kconfig: new configuration interface (nconfig)"), and nobody has
+complained about hard-coding of ncurses.h .  Let's simply drop the
+curses.h inclusion.
 
+I replaced "ncurses.h" with <ncurses.h> since it does not exist in
+the local directory.
 
-I did not test this patch, but does this check work as expected?
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Probably we want to run 'docheckpkgconfig'
-before 'dochecklxdiag', '.tmp_gtkcheck', '.tmp_qtcheck', etc.
-But, I do not see such dependencies.
+ scripts/kconfig/nconf.h | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-
-Also, if we make 'pkg-config' mandatory,
-should we entirely drop fall-back logics like follows?
-
-https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/lxdialog/check-lxdialog.sh#L10
-https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/lxdialog/check-lxdialog.sh#L29
-https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/Makefile#L230
-
-
-What do you think?
-
-
->  # Add environment specific flags
->  HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTCC) $(HOSTCFLAGS))
-> --- /dev/null
-> +++ lnx-416-rc3/scripts/kconfig/check-pkgconfig.sh
-> @@ -0,0 +1,12 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Check for pkg-config presence
-> +
-> +pkgcfg=`command -v pkg-config`
-> +
-> +if [ "$pkgcfg" = "" ]; then
-> +       echo "'make *config' requires 'pkg-config'. Please install it." 1>&2
-> +       exit 1          # error
-> +fi
-> +
-> +exit 0
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/scripts/kconfig/nconf.h b/scripts/kconfig/nconf.h
+index 0d52617..9f6f21d 100644
+--- a/scripts/kconfig/nconf.h
++++ b/scripts/kconfig/nconf.h
+@@ -15,7 +15,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <locale.h>
+-#include <curses.h>
++#include <ncurses.h>
+ #include <menu.h>
+ #include <panel.h>
+ #include <form.h>
+@@ -24,8 +24,6 @@
+ #include <time.h>
+ #include <sys/time.h>
+ 
+-#include "ncurses.h"
+-
+ #define max(a, b) ({\
+ 		typeof(a) _a = a;\
+ 		typeof(b) _b = b;\
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
