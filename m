@@ -1,88 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:62131 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751362AbeCOGhV (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:47367 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750777AbeCOIBV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Mar 2018 02:37:21 -0400
+        Thu, 15 Mar 2018 04:01:21 -0400
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1803141419550.28583@knanqh.ubzr>
+In-Reply-To: <nycvar.YSQ.7.76.1803141448330.28583@knanqh.ubzr>
 References: <1521045861-22418-1-git-send-email-yamada.masahiro@socionext.com>
- <1521045861-22418-6-git-send-email-yamada.masahiro@socionext.com> <nycvar.YSQ.7.76.1803141419550.28583@knanqh.ubzr>
+ <1521045861-22418-8-git-send-email-yamada.masahiro@socionext.com> <nycvar.YSQ.7.76.1803141448330.28583@knanqh.ubzr>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 15 Mar 2018 15:36:27 +0900
-Message-ID: <CAK7LNATTFjexL0gmtyL0QNpRQUeTPYsjoOxb3+9F20vFaE3Xdg@mail.gmail.com>
-Subject: Re: [PATCH 5/7] kbuild: hide CONFIG_TRIM_UNUSED_KSYMS code from
- external module building
+Date: Thu, 15 Mar 2018 17:00:26 +0900
+Message-ID: <CAK7LNATANL6Lfa6=05g9fCfj0ZLNHu_XnPEfurrOBQ8YXqUc4w@mail.gmail.com>
+Subject: Re: [PATCH 7/7] kbuild: link vmlinux just once for CONFIG_TRIM_UNUSED_KSYMS
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nicolas Pitre <nicolas.pitre@linaro.org>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jarod Wilson <jarod@redhat.com>, Prarit Bhargava <prarit@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-03-15 3:32 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
+2018-03-15 4:06 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
 > On Thu, 15 Mar 2018, Masahiro Yamada wrote:
 >
->> If CONFIG_TRIM_UNUSED_KYMS is enabled, KBUILD_MODULES is set.
+>> If CONFIG_TRIM_UNUSED_KSYMS is enabled and the kernel is built from
+>> a pristine state, the vmlinux is linked twice.
+>>
+>> [1] A user runs "make"
+>>
+>> [2] First build with empty autoksyms.h
+>>
+>> [3] adjust_autoksyms.sh updates autoksyms.h and recurses "make vmlinux"
+>>
+>>   --------(begin sub-make)--------
+>>   [4] Second build with new autoksyms.h
+>>
+>>   [5] link-vmlinux.sh is invoked because "vmlinux" is missing
+>>   ---------(end sub-make)---------
+>>
+>> [6] link-vmlinux.sh is invoked again despite "vmlinux" is up-to-date.
+>>
+>> The reason of [6] is probably because Make already decided to update
+>> "vmlinux" at the time of [2] because "vmlinux" was missing when Make
+>> generated the dependency list.
 >
-> Not when you do "make vmlinux" though.
+> But the dependency list for vmlinux contains FORCE so the target is
+> always remade in (2) anyway. The decision to actually invoke
+> link-vmlinux.sh comes from "if_changed". Why is $(call if_changed,...)
+> in (6) not noticing that vmlinux is up to date?
 
-I could not understand this.
+if_changed (more specifically 'any-prereq')
+is implemented based on '$?'.
 
-Unless I am missing something,
-I think this code is always parsed.
+So, this problem can be narrowed down to
+how Make decides '$?'.
+
+
+If you apply the first 6 patches, and put the following
+debug code, you will see what has happened to $?
+
+
+@@ -1024,6 +1026,7 @@ cmd_link-vmlinux =
+                  \
+        $(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+
+ vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
++       @echo newer deps: $?
+        +$(call if_changed,link-vmlinux)
+
+ # Build samples along the rest of the kernel
 
 
 
->> This code is unneeded for external module building because
->> KBUILD_MODULES is always set.  Move this code inside "ifeq
->> ($(KBUILD_EXTMOD),)" conditional.
+I am not familiar with Make internal, but
+I can test it with simple code.
+
+
+[Test Makefile]
+A: B
+        cp B A
+        echo $?
+
+B: C
+        cp C B
+        touch A
+
+[Result]
+$ rm -rf A B C
+$ touch C
+$ make
+cp C B
+touch A
+cp B A
+echo B
+B
+
+
+In the recipe of 'B', 'A' is touched,
+so the dependency 'A: B' has already been met
+before the recipe of 'A' is executed,
+but Make does not notice that fact,
+then tries to update 'A'.
+
+
+The situation is the same.
+vmlinux has been updated in the recursed sub-make,
+but it is not noticed.
+
+
+
+
 >>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> link-vmlinus.sh is costly, so it is better to not run it when unneeded.
+>> Split CONFIG_TRIM_UNUSED_KSYMS handling to a dedicated target.
+>>
+>> The reason of commit 2441e78b1919 ("krbuild: better abstract vmlinux
+>> sequential prerequisites") was to cater to CONFIG_BUILD_DOCSRC, but
+>> it was later removed by commit 184892925118 ("samples: move blackfin
+>> gptimers-example from Documentation").
+>>
+>> I also changed adjust_autoksyms.sh to simply exit with 1 or 0 to make
+>> it look straightforward.
 >
-> Acked-by: Nicolas Pitre <nico@linaro.org>
->
->> ---
->>
->>  Makefile | 14 +++++++-------
->>  1 file changed, 7 insertions(+), 7 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index decc870..e60b16f 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -603,13 +603,6 @@ else
->>  include/config/auto.conf: ;
->>  endif # $(dot-config)
->>
->> -# For the kernel to actually contain only the needed exported symbols,
->> -# we have to build modules as well to determine what those symbols are.
->> -# (this can be evaluated only once include/config/auto.conf has been included)
->> -ifdef CONFIG_TRIM_UNUSED_KSYMS
->> -  KBUILD_MODULES := 1
->> -endif
->> -
->>  # The all: target is the default when no target is given on the
->>  # command line.
->>  # This allow a user to issue only 'make' to build a kernel including modules
->> @@ -1010,6 +1003,13 @@ ifdef CONFIG_TRIM_UNUSED_KSYMS
->>         "$(MAKE) -f $(srctree)/Makefile vmlinux"
->>  endif
->>
->> +# For the kernel to actually contain only the needed exported symbols,
->> A+# we have to build modules as well to determine what those symbols
-> are.
->> +# (this can be evaluated only once include/config/auto.conf has been included)
->> +ifdef CONFIG_TRIM_UNUSED_KSYMS
->> +  KBUILD_MODULES := 1
->> +endif
->> +
->>  autoksyms_h := $(if $(CONFIG_TRIM_UNUSED_KSYMS), include/generated/autoksyms.h)
->>
->>  $(autoksyms_h):
->> --
->> 2.7.4
->>
->>
+> That is wrong. If the script fails for some reason (it runs with -e set)
+> then this will trigger an endless recursive make instead of failing the
+> build.
+
+Sorry, I missed this case.  You are right.
+
+I will restore the original code.
 
 
 
