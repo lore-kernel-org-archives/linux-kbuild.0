@@ -1,147 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f194.google.com ([209.85.220.194]:37325 "EHLO
-        mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751571AbeCPDal (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:32427 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751497AbeCPDiK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Mar 2018 23:30:41 -0400
-Received: by mail-qk0-f194.google.com with SMTP id y137so9697763qka.4
-        for <linux-kbuild@vger.kernel.org>; Thu, 15 Mar 2018 20:30:40 -0700 (PDT)
-Date: Thu, 15 Mar 2018 23:30:38 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH v3 7/7] kbuild: link vmlinux only once for
- CONFIG_TRIM_UNUSED_KSYMS
-In-Reply-To: <1521170449-31194-1-git-send-email-yamada.masahiro@socionext.com>
-Message-ID: <nycvar.YSQ.7.76.1803152330010.1853@knanqh.ubzr>
-References: <1521170449-31194-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 15 Mar 2018 23:38:10 -0400
+Received: from mail-vk0-f45.google.com (mail-vk0-f45.google.com [209.85.213.45]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id w2G3bhVQ006865
+        for <linux-kbuild@vger.kernel.org>; Fri, 16 Mar 2018 12:37:44 +0900
+Received: by mail-vk0-f45.google.com with SMTP id o205so1978567vke.11
+        for <linux-kbuild@vger.kernel.org>; Thu, 15 Mar 2018 20:37:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <nycvar.YSQ.7.76.1803152133000.28583@knanqh.ubzr>
+References: <ccedea72-0e61-500c-86e5-976ecb5cefb5@gmail.com>
+ <CAK7LNAS9rOhyEdSUBbhPVW572437w5g7zLqMGSHn4gg3nbCU_g@mail.gmail.com>
+ <nycvar.YSQ.7.76.1803121331280.28583@knanqh.ubzr> <4bbfeb74-c912-74e5-4f4d-287ec7ad065d@gmail.com>
+ <nycvar.YSQ.7.76.1803131922060.28583@knanqh.ubzr> <4aee7e23-ac36-9495-14a9-471379a7896b@gmail.com>
+ <nycvar.YSQ.7.76.1803151504080.28583@knanqh.ubzr> <CAK7LNAR8Z1H9+wcMt4nMkrBU9K4=sTZQFi5p26N1rPR_LtJVJQ@mail.gmail.com>
+ <nycvar.YSQ.7.76.1803152133000.28583@knanqh.ubzr>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 16 Mar 2018 12:37:02 +0900
+Message-ID: <CAK7LNASBoV496V+kGaTodU1agV3O-zupPDb5nSv+iqpiMzLYyw@mail.gmail.com>
+Subject: Re: Intermittent build failure with TRIM_UNUSED_KSYMS and related problems
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Thomas Lindroth <thomas.lindroth@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, 16 Mar 2018, Masahiro Yamada wrote:
-
-> If CONFIG_TRIM_UNUSED_KSYMS is enabled and the kernel is built from
-> a pristine state, the vmlinux is linked twice.
-> 
-> [1] A user runs "make"
-> 
-> [2] First build with empty autoksyms.h
-> 
-> [3] adjust_autoksyms.sh updates autoksyms.h and recurses "make vmlinux"
-> 
->   --------(begin sub-make)--------
->   [4] Second build with new autoksyms.h
-> 
->   [5] link-vmlinux.sh is invoked because "vmlinux" is missing
->   ---------(end sub-make)---------
-> 
-> [6] link-vmlinux.sh is invoked again despite "vmlinux" is up-to-date.
-> 
-> The reason of [6] is probably because Make already decided to update
-> "vmlinux" at the time of [2] because "vmlinux" was missing when Make
-> built up the dependency graph.
-> 
-> Because 'if_changed' is implemented based on '$?', this issue can be
-> narrowed down to how Make handles '$?'.
-> 
-> You can test it with the following simple code:
-> 
-> [Test Makefile]
->   A: B
->           @echo newer prerequisite: $?
->           cp B A
-> 
->   B: C
->           cp C B
->           touch A
-> 
-> [Result]
->   $ rm -f A B
->   $ touch C
->   $ make
->   cp C B
->   touch A
->   newer prerequisite: B
->   cp B A
-> 
-> Here, 'A' has been touched in the recipe of 'B'.  So, the dependency
-> 'A: B' has already been met before the recipe of 'A' is executed.
-> However, Make does not notice the fact that the recipe of 'B' also
-> updates 'A' as a side-effect.
-> 
-> The situation is similar in this case; 'vmlinux' has actually been
-> updated in the 'vmlinux_prereq' target.  Make cannot predict this, so
-> judges 'vmlinux' is old.
-> 
-> link-vmlinus.sh is costly, so it is better to not run it when unneeded.
-> Split CONFIG_TRIM_UNUSED_KSYMS recursion to a dedicated target.
-> 
-> The reason of commit 2441e78b1919 ("kbuild: better abstract vmlinux
-> sequential prerequisites") was to cater to CONFIG_BUILD_DOCSRC, but
-> it was later removed by commit 184892925118 ("samples: move blackfin
-> gptimers-example from Documentation").
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-
-Acked-by: Nicolas Pitre <nico@linaro.org>
+2018-03-16 10:40 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
+> On Fri, 16 Mar 2018, Masahiro Yamada wrote:
+>
+>> 2018-03-16 5:56 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
+>> > ----- >8
+>> > Subject: [PATCH] kbuild: make scripts/adjust_autoksyms.sh robust against timestamp races
+>> >
+>> > Some filesystems have timestamps with coarse precision that may allow
+>> > for a recently built object file to have the same timestamp as the
+>> > updated time on one of its dependency files. When that happens, the
+>> > object file doesn't get rebuilt as it should.
+>> >
+>> > This is especially the case on filesystems that don't have sub-second
+>> > time precision, such as ext3 or Ext4 with 128B inodes.
+>> >
+>> > Let's prevent that by making sure updated dependency files have a newer
+>> > timestamp than the first file we created (i.e. autoksyms.h.tmpnew).
+>> >
+>> > Reported-by: Thomas Lindroth <thomas.lindroth@gmail.com>
+>> > Signed-off-by: Nicolas Pitre <nico@linaro.org>
+>> >
+>> > diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+>> > index 513da1a4a2..d67830e6e3 100755
+>> > --- a/scripts/adjust_autoksyms.sh
+>> > +++ b/scripts/adjust_autoksyms.sh
+>> > @@ -84,6 +84,13 @@ while read sympath; do
+>> >         depfile="include/config/ksym/${sympath}.h"
+>> >         mkdir -p "$(dirname "$depfile")"
+>> >         touch "$depfile"
+>>
+>> Just a nit.
+>>
+>> I think this 'touch' is unnecessary.
+>> If $depfile does not exist, the '-nt' is evaluated to false,
+>> so it will be touched inside the while loop anyway.
+>
+> Though it is more efficient with the first touch up front, as the common
+> case requires only 2 stat system calls instead of 4.
 
 
-> ---
-> 
-> Changes in v3:
->   - autoksyms_recursive should be surrounded by
->     ifdef CONFIG_TRIM_UNUSED_KSYMS
-> 
-> Changes in v2:
->   - Discard my wrong change to adjust_autoksyms.sh
->   - Add more commit log to explain how Make is working
-> 
->  Makefile | 22 ++++++++++------------
->  1 file changed, 10 insertions(+), 12 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 5fee703..ff62b8e 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -998,17 +998,9 @@ export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(vmlinux-alldirs)) arch Doc
->  
->  vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_INIT) $(KBUILD_VMLINUX_MAIN) $(KBUILD_VMLINUX_LIBS)
->  
-> -# Include targets which we want to execute sequentially if the rest of the
-> -# kernel build went well. If CONFIG_TRIM_UNUSED_KSYMS is set, this might be
-> -# evaluated more than once.
-> -PHONY += vmlinux_prereq
-> -vmlinux_prereq: $(vmlinux-deps) FORCE
-> -ifdef CONFIG_HEADERS_CHECK
-> -	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
-> -endif
-> -ifdef CONFIG_GDB_SCRIPTS
-> -	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
-> -endif
-> +# Recurse until adjust_autoksyms.sh is satisfied
-> +PHONY += autoksyms_recursive
-> +autoksyms_recursive: $(vmlinux-deps)
->  ifdef CONFIG_TRIM_UNUSED_KSYMS
->  	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh \
->  	  "$(MAKE) -f $(srctree)/Makefile vmlinux"
-> @@ -1034,7 +1026,13 @@ cmd_link-vmlinux =                                                 \
->  	$(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
->  	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
->  
-> -vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
-> +vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
-> +ifdef CONFIG_HEADERS_CHECK
-> +	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
-> +endif
-> +ifdef CONFIG_GDB_SCRIPTS
-> +	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
-> +endif
->  	+$(call if_changed,link-vmlinux)
->  
->  # Build samples along the rest of the kernel
-> -- 
-> 2.7.4
-> 
-> 
+Ah, you are right.
+I take my comment back.
+
+I am fine with this patch.
+Thanks!
+
+
+
+>> > +       # Filesystems with coarse time precision may create timestamps
+>> > +       # equal to the one from a file that was very recently built and that
+>> > +       # needs to be rebuild. Let's guard against that by making sure our
+>> > +       # dep files are always newer than the first file we created here.
+>> > +       while [ ! "$depfile" -nt "$new_ksyms_file" ]; do
+>> > +               touch "$depfile"
+>> > +       done
+>> >         echo $((count += 1))
+>> >  done | tail -1 )
+>> >  changed=${changed:-0}
+>> > ----- >8
+>>
+>>
+>> --
+>> Best Regards
+>> Masahiro Yamada
+>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
