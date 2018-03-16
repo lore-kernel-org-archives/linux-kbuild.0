@@ -1,66 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:44537 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:44540 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752816AbeCPCTM (ORCPT
+        with ESMTP id S1752857AbeCPCTM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 15 Mar 2018 22:19:12 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 5/7] kbuild: move CONFIG_TRIM_UNUSED_KSYMS code unneeded for external module
-Date: Fri, 16 Mar 2018 11:18:42 +0900
-Message-Id: <1521166725-24157-6-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 2/7] kbuild: remove wrong 'touch' in adjust_autoksyms.sh
+Date: Fri, 16 Mar 2018 11:18:39 +0900
+Message-Id: <1521166725-24157-3-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1521166725-24157-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1521166725-24157-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-The external module building does not need to parse this code because
-KBUILD_MODULES is always set anyway.
+The comment mentions it creates autoksyms.h in case it is missing,
+but the actual code touches it when it does exists.
 
-Move this code inside the "ifeq ($(KBUILD_EXTMOD),) ... endif" block.
+The build system creates it anyway because <linux/export.h> and
+<asm-generic/export.h> need it.
+
+The code would not have worked as intended, and people have not
+noticed it.  This is a proof that we can simply remove it.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Acked-by: Nicolas Pitre <nico@linaro.org>
 ---
 
-Changes in v2: None
+Changes in v2:
+  - Remove the code instead of fixing it
 
- Makefile | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ scripts/adjust_autoksyms.sh | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 0a3895c..ef42adb 100644
---- a/Makefile
-+++ b/Makefile
-@@ -614,13 +614,6 @@ else
- include/config/auto.conf: ;
- endif # $(dot-config)
+diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+index a162258..e0dd0d5 100755
+--- a/scripts/adjust_autoksyms.sh
++++ b/scripts/adjust_autoksyms.sh
+@@ -48,9 +48,6 @@ case "${KCONFIG_CONFIG}" in
+ 	. "./${KCONFIG_CONFIG}"
+ esac
  
--# For the kernel to actually contain only the needed exported symbols,
--# we have to build modules as well to determine what those symbols are.
--# (this can be evaluated only once include/config/auto.conf has been included)
--ifdef CONFIG_TRIM_UNUSED_KSYMS
--  KBUILD_MODULES := 1
--endif
+-# In case it doesn't exist yet...
+-if [ -e "$cur_ksyms_file" ]; then touch "$cur_ksyms_file"; fi
 -
- # The all: target is the default when no target is given on the
- # command line.
- # This allow a user to issue only 'make' to build a kernel including modules
-@@ -1021,6 +1014,13 @@ ifdef CONFIG_TRIM_UNUSED_KSYMS
- 	  "$(MAKE) -f $(srctree)/Makefile vmlinux"
- endif
- 
-+# For the kernel to actually contain only the needed exported symbols,
-+# we have to build modules as well to determine what those symbols are.
-+# (this can be evaluated only once include/config/auto.conf has been included)
-+ifdef CONFIG_TRIM_UNUSED_KSYMS
-+  KBUILD_MODULES := 1
-+endif
-+
- autoksyms_h := $(if $(CONFIG_TRIM_UNUSED_KSYMS), include/generated/autoksyms.h)
- 
- $(autoksyms_h):
+ # Generate a new ksym list file with symbols needed by the current
+ # set of modules.
+ cat > "$new_ksyms_file" << EOT
 -- 
 2.7.4
 
