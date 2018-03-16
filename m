@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:44539 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:44532 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752884AbeCPCTM (ORCPT
+        with ESMTP id S1752819AbeCPCTM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 15 Mar 2018 22:19:12 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 3/7] kbuild: move 'scripts' target below
-Date: Fri, 16 Mar 2018 11:18:40 +0900
-Message-Id: <1521166725-24157-4-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 1/7] kbuild: clear LDFLAGS in the top Makefile
+Date: Fri, 16 Mar 2018 11:18:38 +0900
+Message-Id: <1521166725-24157-2-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1521166725-24157-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1521166725-24157-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,50 +15,35 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Just a trivial change to prepare for the next commit.
-This target is still invisible from external module building.
+Currently LDFLAGS is not cleared, so same flags are accumulated in
+LDFLAGS when the top Makefile is recursively invoked.
+
+I found unneeded rebuild for ARCH=arm64 when CONFIG_TRIM_UNUSED_KSYMS
+is enabled.  If include/generated/autoksyms.h is updated, the top
+Makefile is recursively invoked, then arch/arm64/Makefile adds one
+more '-maarch64linux'.  Due to the command line change, modules are
+rebuilt needlessly.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v2: None
 
- Makefile | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/Makefile b/Makefile
-index ac8755d..f8e9e12 100644
+index d9bb6dd6..ac8755d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -567,14 +567,6 @@ endif
- export KBUILD_MODULES KBUILD_BUILTIN
+@@ -437,6 +437,7 @@ KBUILD_CFLAGS_KERNEL :=
+ KBUILD_AFLAGS_MODULE  := -DMODULE
+ KBUILD_CFLAGS_MODULE  := -DMODULE
+ KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
++LDFLAGS :=
+ GCC_PLUGINS_CFLAGS :=
  
- ifeq ($(KBUILD_EXTMOD),)
--# Additional helpers built in scripts/
--# Carefully list dependencies so we do not try to build scripts twice
--# in parallel
--PHONY += scripts
--scripts: scripts_basic include/config/auto.conf include/config/tristate.conf \
--	 asm-generic gcc-plugins
--	$(Q)$(MAKE) $(build)=$(@)
--
- # Objects we will link into vmlinux / subdirs we need to visit
- init-y		:= init/
- drivers-y	:= drivers/ sound/ firmware/
-@@ -1070,6 +1062,13 @@ endef
- include/config/kernel.release: include/config/auto.conf FORCE
- 	$(call filechk,kernel.release)
- 
-+# Additional helpers built in scripts/
-+# Carefully list dependencies so we do not try to build scripts twice
-+# in parallel
-+PHONY += scripts
-+scripts: scripts_basic include/config/auto.conf include/config/tristate.conf \
-+	 asm-generic gcc-plugins autoksyms
-+	$(Q)$(MAKE) $(build)=$(@)
- 
- # Things we need to do before we recursively start building the kernel
- # or the modules are listed in "prepare".
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
 -- 
 2.7.4
 
