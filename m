@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:20643 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:20830 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750847AbeCPHhn (ORCPT
+        with ESMTP id S1753209AbeCPHhs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Mar 2018 03:37:43 -0400
+        Fri, 16 Mar 2018 03:37:48 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 1/7] kbuild: clear LDFLAGS in the top Makefile
-Date: Fri, 16 Mar 2018 16:37:09 +0900
-Message-Id: <1521185836-19120-2-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 5/7] kbuild: move CONFIG_TRIM_UNUSED_KSYMS code unneeded for external module
+Date: Fri, 16 Mar 2018 16:37:13 +0900
+Message-Id: <1521185836-19120-6-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1521185836-19120-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1521185836-19120-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,14 +15,10 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Michal Marek <michal.lkml@markovi.net>, Nicolas Pitre <nicolas.pitre@linaro.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Currently LDFLAGS is not cleared, so same flags are accumulated in
-LDFLAGS when the top Makefile is recursively invoked.
+The external module building does not need to parse this code because
+KBUILD_MODULES is always set anyway.
 
-I found unneeded rebuild for ARCH=arm64 when CONFIG_TRIM_UNUSED_KSYMS
-is enabled.  If include/generated/autoksyms.h is updated, the top
-Makefile is recursively invoked, then arch/arm64/Makefile adds one
-more '-maarch64linux'.  Due to the command line change, modules are
-rebuilt needlessly.
+Move this code inside the "ifeq ($(KBUILD_EXTMOD),) ... endif" block.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Acked-by: Nicolas Pitre <nico@linaro.org>
@@ -32,21 +28,41 @@ Changes in v4: None
 Changes in v3: None
 Changes in v2: None
 
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ Makefile | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index d9bb6dd6..ac8755d 100644
+index 0a3895c..ef42adb 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -437,6 +437,7 @@ KBUILD_CFLAGS_KERNEL :=
- KBUILD_AFLAGS_MODULE  := -DMODULE
- KBUILD_CFLAGS_MODULE  := -DMODULE
- KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
-+LDFLAGS :=
- GCC_PLUGINS_CFLAGS :=
+@@ -614,13 +614,6 @@ else
+ include/config/auto.conf: ;
+ endif # $(dot-config)
  
- export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+-# For the kernel to actually contain only the needed exported symbols,
+-# we have to build modules as well to determine what those symbols are.
+-# (this can be evaluated only once include/config/auto.conf has been included)
+-ifdef CONFIG_TRIM_UNUSED_KSYMS
+-  KBUILD_MODULES := 1
+-endif
+-
+ # The all: target is the default when no target is given on the
+ # command line.
+ # This allow a user to issue only 'make' to build a kernel including modules
+@@ -1021,6 +1014,13 @@ ifdef CONFIG_TRIM_UNUSED_KSYMS
+ 	  "$(MAKE) -f $(srctree)/Makefile vmlinux"
+ endif
+ 
++# For the kernel to actually contain only the needed exported symbols,
++# we have to build modules as well to determine what those symbols are.
++# (this can be evaluated only once include/config/auto.conf has been included)
++ifdef CONFIG_TRIM_UNUSED_KSYMS
++  KBUILD_MODULES := 1
++endif
++
+ autoksyms_h := $(if $(CONFIG_TRIM_UNUSED_KSYMS), include/generated/autoksyms.h)
+ 
+ $(autoksyms_h):
 -- 
 2.7.4
 
