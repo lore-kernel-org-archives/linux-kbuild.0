@@ -1,24 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailserver.int.pan.wroc.pl ([156.17.85.6]:60289 "EHLO
-        mserv3.int.pan.wroc.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752998AbeCQUmm (ORCPT
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:35517 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754304AbeCRWRw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 17 Mar 2018 16:42:42 -0400
+        Sun, 18 Mar 2018 18:17:52 -0400
+From: Eugeniu Rosca <roscaeugeniu@gmail.com>
+Date: Sun, 18 Mar 2018 23:17:37 +0100
+Subject: Re: [PATCH v4 1/2] kconfig: warn unmet direct dependency of tristate
+ symbols selected by y
+Message-ID: <20180318221737.GA25547@example.com>
+References: <1520934968-30406-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date: Sat, 17 Mar 2018 22:41:44 +0200
-From: Roy Cockrum <Donatingfunds@gmail.com>
-Subject: =?UTF-8?Q?Spende_von_=E2=82=AC_3=2E400=2E000=2C00_EUR?=
-Reply-To: roycockrumdonatingfunds@gmail.com
-Message-ID: <349c3d00271df8e1462682239b9f5773@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1520934968-30406-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Eugeniu Rosca <roscaeugeniu@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Petr Vorel <petr.vorel@gmail.com>, Eugeniu Rosca <erosca@de.adit-jv.com>, linux-kernel@vger.kernel.org
 
+Hi Masahiro,
 
+On Tue, Mar 13, 2018 at 06:56:07PM +0900, Masahiro Yamada wrote:
+> Commit 246cf9c26bf1 ("kbuild: Warn on selecting symbols with unmet
+> direct dependencies") forcibly promoted ->dir_dep.tri to yes from mod.
+> So, the unmet direct dependencies of tristate symbols are not reported.
+> 
+> [Test Case]
+> 
+>   config MODULES
+>           def_bool y
+>           option modules
+> 
+>   config A
+>           def_bool y
+>           select B
+> 
+>   config B
+>           tristate "B"
+>           depends on m
+> 
+> This causes unmet dependency because 'B' is forced 'y' ignoring
+> 'depends on m'.  This should be warned.
+> 
+> On the other hand, the following case ('B' is bool) should not be
+> warned, so 'depends on m' for bool symbols should be naturally treated
+> as 'depends on y'.
+> 
+> [Test Case2 (not unmet dependency)]
+> 
+>   config MODULES
+>           def_bool y
+>           option modules
+> 
+>   config A
+>           def_bool y
+>           select B
+> 
+>   config B
+>           bool "B"
+>           depends on m
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
+> Changes in v4:
+>   - newly added
+> 
+> 
+>  scripts/kconfig/symbol.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+> index 0f7eba7..def860b 100644
+> --- a/scripts/kconfig/symbol.c
+> +++ b/scripts/kconfig/symbol.c
+> @@ -243,7 +243,7 @@ static void sym_calc_visibility(struct symbol *sym)
+>  	tri = yes;
+>  	if (sym->dir_dep.expr)
+>  		tri = expr_calc_value(sym->dir_dep.expr);
+> -	if (tri == mod)
+> +	if (sym->type == S_BOOLEAN && tri == mod)
 
-Hallo,ich bin Roy Cockrum, 58, aus Knoxville,Tennessee Vereinigte 
-Staaten von Amerika, Sie haben eine Spende von € 3.400.000,00 EUR, 
-kontaktieren Sie mich für weitere Details: 
-roycockrumdonatingfunds@gmail.com
+This seems to be very close to one of the issues fixed in the old
+v2.6.5 commit 5a87d187fce1 ("[PATCH] config: choice fix") accessible at
+https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?h=5a87d187fce1
+
+IMHO you could probably use (not tested!):
++	if (tri == mod && sym_get_type(sym) == S_BOOLEAN)
+
+instead of
++	if (sym->type == S_BOOLEAN && tri == mod)
+
+to be consistent with the rest of sym_calc_visibility().
+
+Also, since after this commit there will be a great amount of symmetry
+between how dirdep/revdep/weak-revdep are calculated inside
+sym_calc_visibility(), somebody could probably unify the implementations
+in future (not subject of this patch).
+
+>  		tri = yes;
+>  	if (sym->dir_dep.tri != tri) {
+>  		sym->dir_dep.tri = tri;
+> @@ -414,7 +414,7 @@ void sym_calc_value(struct symbol *sym)
+>  				}
+>  			}
+>  		calc_newval:
+> -			if (sym->dir_dep.tri == no && sym->rev_dep.tri != no) {
+> +			if (sym->dir_dep.tri < sym->rev_dep.tri) {
+
+Looks good.
+
+>  				struct expr *e;
+>  				e = expr_simplify_unmet_dep(sym->rev_dep.expr,
+>  				    sym->dir_dep.expr);
+> -- 
+> 2.7.4
+> 
+
+Best regards,
+Eugeniu.
