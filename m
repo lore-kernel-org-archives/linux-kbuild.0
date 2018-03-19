@@ -1,80 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:61343 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933016AbeCSLd3 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Mar 2018 07:33:29 -0400
+Received: from m12-11.163.com ([220.181.12.11]:41293 "EHLO m12-11.163.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932257AbeCSMKD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 19 Mar 2018 08:10:03 -0400
+From: yuan linyu <cugyly@163.com>
+Subject: [PATCH kconfig] kconfig: lxdialog: clean string input with whitespace
+Date: Mon, 19 Mar 2018 20:09:07 +0800
+Message-Id: <20180319120907.5108-1-cugyly@163.com>
 MIME-Version: 1.0
-In-Reply-To: <1521458773-14224-3-git-send-email-yamada.masahiro@socionext.com>
-References: <1521458773-14224-1-git-send-email-yamada.masahiro@socionext.com> <1521458773-14224-3-git-send-email-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 19 Mar 2018 20:32:30 +0900
-Message-ID: <CAK7LNAT76N+v=eHz=rEwYLBM7kK0q3bD1dOe7-gc0p-XvyTz_w@mail.gmail.com>
-Subject: Re: [PATCH 3/7] lib: zstd: clean up Makefile for simpler composite
- object handling
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, yuan linyu <Linyu.Yuan@alcatel-sbell.com.cn>
 
-2018-03-19 20:26 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> Now, Kbuild nicely handles composite objects to avoid multiple
-> definition.
->
-> Makefiles can simply add the same objects multiple times across
-> composite objects.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
-> The is clean-up from build system point of view.
->
-> I will apply this for the Kbuild tree.
->
->
->  lib/zstd/Makefile | 16 ++++------------
->  1 file changed, 4 insertions(+), 12 deletions(-)
->
-> diff --git a/lib/zstd/Makefile b/lib/zstd/Makefile
-> index dd0a359..a1a64cf 100644
-> --- a/lib/zstd/Makefile
-> +++ b/lib/zstd/Makefile
-> @@ -4,15 +4,7 @@ obj-$(CONFIG_ZSTD_DECOMPRESS) += zstd_decompress.o
->  ccflags-y += -O3
->
->  # Object files unique to zstd_compress and zstd_decompress
+From: yuan linyu <Linyu.Yuan@alcatel-sbell.com.cn>
 
-This comment line should be removed as well.
+remove leading/trailing whitespace and all whitespace
 
+Signed-off-by: yuan linyu <Linyu.Yuan@alcatel-sbell.com.cn>
+---
+ scripts/kconfig/lxdialog/inputbox.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-
-> -zstd_compress-y := fse_compress.o huf_compress.o compress.o
-> -zstd_decompress-y := huf_decompress.o decompress.o
-> -
-> -# These object files are shared between the modules.
-> -# Always add them to zstd_compress.
-> -# Unless both zstd_compress and zstd_decompress are built in
-> -# then also add them to zstd_decompress.
-> -zstd_compress-y += entropy_common.o fse_decompress.o zstd_common.o
-> -
-> -ifneq ($(CONFIG_ZSTD_COMPRESS)$(CONFIG_ZSTD_DECOMPRESS),yy)
-> -       zstd_decompress-y += entropy_common.o fse_decompress.o zstd_common.o
-> -endif
-> +zstd_compress-y := fse_compress.o huf_compress.o compress.o \
-> +                  entropy_common.o fse_decompress.o zstd_common.o
-> +zstd_decompress-y := huf_decompress.o decompress.o \
-> +                    entropy_common.o fse_decompress.o zstd_common.o
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
+index d58de1dc5360..647a9dcb8710 100644
+--- a/scripts/kconfig/lxdialog/inputbox.c
++++ b/scripts/kconfig/lxdialog/inputbox.c
+@@ -38,6 +38,31 @@ static void print_buttons(WINDOW * dialog, int height, int width, int selected)
+ 	wrefresh(dialog);
+ }
+ 
++static void dialog_input_clean(void)
++{
++	char *instr = dialog_input_result;
++	int l, s, e;
++
++	l = strlen(instr);
++	if (l == 0)
++		return;
++	for (s = 0; s < l; s++) {
++		if (instr[s] != ' ')
++			break;
++		instr[s] = '\0';
++	}
++	if (s == l)
++		return;
++	for (e = l - 1; e > 0; e--) {
++		if (instr[e] != ' ')
++			break;
++		instr[e] = '\0';
++	}
++	if (s == 0)
++		return;
++	memmove(instr, instr + s, e - s + 2);
++}
++
+ /*
+  * Display a dialog box for inputing a string
+  */
+@@ -234,6 +259,7 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
+ 		case 'O':
+ 		case 'o':
+ 			delwin(dialog);
++			dialog_input_clean();
+ 			return 0;
+ 		case 'H':
+ 		case 'h':
+@@ -281,6 +307,7 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
+ 		case ' ':
+ 		case '\n':
+ 			delwin(dialog);
++			dialog_input_clean();
+ 			return (button == -1 ? 0 : button);
+ 		case 'X':
+ 		case 'x':
 -- 
-Best Regards
-Masahiro Yamada
+2.14.1
+
+
