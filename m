@@ -1,81 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from m12-11.163.com ([220.181.12.11]:41293 "EHLO m12-11.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932257AbeCSMKD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Mar 2018 08:10:03 -0400
-From: yuan linyu <cugyly@163.com>
-Subject: [PATCH kconfig] kconfig: lxdialog: clean string input with whitespace
-Date: Mon, 19 Mar 2018 20:09:07 +0800
-Message-Id: <20180319120907.5108-1-cugyly@163.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from mail.kmu-office.ch ([178.209.48.109]:43776 "EHLO
+        mail.kmu-office.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1030487AbeCSVNB (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 19 Mar 2018 17:13:01 -0400
+From: Stefan Agner <stefan@agner.ch>
+Subject: [PATCH] kbuild: set no-integrated-as before incl. arch Makefile
+Date: Mon, 19 Mar 2018 22:12:53 +0100
+Message-Id: <20180319211253.3172-1-stefan@agner.ch>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, yuan linyu <Linyu.Yuan@alcatel-sbell.com.cn>
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: arnd@arndb.de, mka@chromium.org, geert@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Stefan Agner <stefan@agner.ch>
 
-From: yuan linyu <Linyu.Yuan@alcatel-sbell.com.cn>
+In order to make sure compiler flag detection for ARM works
+correctly the no-integrated-as flags need to be set before
+including the arch specific Makefile.
 
-remove leading/trailing whitespace and all whitespace
-
-Signed-off-by: yuan linyu <Linyu.Yuan@alcatel-sbell.com.cn>
+Fixes: cfe17c9bbe6a ("kbuild: move cc-option and cc-disable-warning after incl. arch Makefile")
+Signed-off-by: Stefan Agner <stefan@agner.ch>
 ---
- scripts/kconfig/lxdialog/inputbox.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
-index d58de1dc5360..647a9dcb8710 100644
---- a/scripts/kconfig/lxdialog/inputbox.c
-+++ b/scripts/kconfig/lxdialog/inputbox.c
-@@ -38,6 +38,31 @@ static void print_buttons(WINDOW * dialog, int height, int width, int selected)
- 	wrefresh(dialog);
- }
+diff --git a/Makefile b/Makefile
+index 56f76a5cd006..0474803c65f7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -487,6 +487,8 @@ CLANG_GCC_TC	:= --gcc-toolchain=$(GCC_TOOLCHAIN)
+ endif
+ KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+ KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
++KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
++KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+ endif
  
-+static void dialog_input_clean(void)
-+{
-+	char *instr = dialog_input_result;
-+	int l, s, e;
-+
-+	l = strlen(instr);
-+	if (l == 0)
-+		return;
-+	for (s = 0; s < l; s++) {
-+		if (instr[s] != ' ')
-+			break;
-+		instr[s] = '\0';
-+	}
-+	if (s == l)
-+		return;
-+	for (e = l - 1; e > 0; e--) {
-+		if (instr[e] != ' ')
-+			break;
-+		instr[e] = '\0';
-+	}
-+	if (s == 0)
-+		return;
-+	memmove(instr, instr + s, e - s + 2);
-+}
-+
- /*
-  * Display a dialog box for inputing a string
-  */
-@@ -234,6 +259,7 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
- 		case 'O':
- 		case 'o':
- 			delwin(dialog);
-+			dialog_input_clean();
- 			return 0;
- 		case 'H':
- 		case 'h':
-@@ -281,6 +307,7 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
- 		case ' ':
- 		case '\n':
- 			delwin(dialog);
-+			dialog_input_clean();
- 			return (button == -1 ? 0 : button);
- 		case 'X':
- 		case 'x':
+ RETPOLINE_CFLAGS_GCC := -mindirect-branch=thunk-extern -mindirect-branch-register
+@@ -744,8 +746,6 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+ # See modpost pattern 2
+ KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+-KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+-KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+ else
+ 
+ # These warnings generated too much noise in a regular build.
 -- 
-2.14.1
-
+2.16.2
 
