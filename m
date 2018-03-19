@@ -1,21 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:51364 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:50217 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932274AbeCSJC6 (ORCPT
+        with ESMTP id S932387AbeCSJCU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Mar 2018 05:02:58 -0400
+        Mon, 19 Mar 2018 05:02:20 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 5/5] kbuild: move modname and modname-multi close to modname_flags
-Date: Mon, 19 Mar 2018 18:01:27 +0900
-Message-Id: <1521450087-27291-5-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1521450087-27291-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1521450087-27291-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 1/5] kbuild: remove unnecessary $(subst $(obj)/, , ...) in modname-multi
+Date: Mon, 19 Mar 2018 18:01:23 +0900
+Message-Id: <1521450087-27291-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 
-Just a cosmetic change to put related code close together.
+In the context ...
+
+    $(obj)/%.s: $(src)/%.c FORCE
+            $(call if_changed_dep,cc_s_c)
+
+    $(obj)/%.i: $(src)/%.c FORCE
+            $(call if_changed_dep,cpp_i_c)
+
+    $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
+            $(call cmd,force_checksrc)
+            $(call if_changed_rule,cc_o_c)
+
+    $(obj)/%.lst: $(src)/%.c FORCE
+            $(call if_changed_dep,cc_lst_c)
+
+'$*' returns the stem of the target (the part of '%'), so $(obj)/ has
+already been ripped off.
+
+$(subst $(obj)/,,$*.o) is the same as $*.o
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Reviewed-by: Cao jin <caoj.fnst@cn.fujitsu.com>
@@ -23,55 +39,22 @@ Reviewed-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 
 Changes in v2: None
 
- scripts/Makefile.build |  2 --
- scripts/Makefile.lib   | 14 ++++++++------
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ scripts/Makefile.lib | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f5858f6..93d05e3 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -131,8 +131,6 @@ $(real-objs-m:.o=.lst): quiet_modtag := [M]
- 
- $(obj-m)              : quiet_modtag := [M]
- 
--modname = $(if $(modname-multi),$(modname-multi),$(basetarget))
--
- quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
- cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
- 
 diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 537629f..33af8d4 100644
+index 5fd60af..4eedd6e 100644
 --- a/scripts/Makefile.lib
 +++ b/scripts/Makefile.lib
-@@ -77,6 +77,14 @@ multi-used-y	:= $(addprefix $(obj)/,$(multi-used-y))
- multi-used-m	:= $(addprefix $(obj)/,$(multi-used-m))
- subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
+@@ -175,7 +175,7 @@ dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
  
-+# Finds the multi-part object the current object will be linked into.
-+# If the object belongs to two or more multi-part objects, all of them are
-+# concatenated with a colon separator.
-+modname-multi = $(subst $(space),:,$(sort $(foreach m,$(multi-used),\
-+		$(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=)))))
-+
-+modname = $(if $(modname-multi),$(modname-multi),$(basetarget))
-+
- # These flags are needed for modversions and compiling, so we define them here
- # $(modname_flags) defines KBUILD_MODNAME as the name of the module it will
- # end up in (or would, if it gets compiled in)
-@@ -162,12 +170,6 @@ dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
- 		 $(addprefix -I,$(DTC_INCLUDE))                          \
- 		 -undef -D__DTS__
+ # Finds the multi-part object the current object will be linked into
+ modname-multi = $(sort $(foreach m,$(multi-used),\
+-		$(if $(filter $(subst $(obj)/,,$*.o), $($(m:.o=-objs)) $($(m:.o=-y))),$(m:.o=))))
++		$(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y))),$(m:.o=))))
  
--# Finds the multi-part object the current object will be linked into
--# If the object belongs to two or more multi-part objects, all of them are
--# concatenated with a colon separator.
--modname-multi = $(subst $(space),:,$(sort $(foreach m,$(multi-used),\
--		$(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=)))))
--
  # Useful for describing the dependency of composite objects
  # Usage:
- #   $(call multi_depend, multi_used_targets, suffix_to_remove, suffix_to_add)
 -- 
 2.7.4
 
