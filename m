@@ -1,60 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:50217 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932387AbeCSJCU (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:30060 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755299AbeCSL1M (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Mar 2018 05:02:20 -0400
+        Mon, 19 Mar 2018 07:27:12 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 1/5] kbuild: remove unnecessary $(subst $(obj)/, , ...) in modname-multi
-Date: Mon, 19 Mar 2018 18:01:23 +0900
-Message-Id: <1521450087-27291-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 3/7] lib: zstd: clean up Makefile for simpler composite object handling
+Date: Mon, 19 Mar 2018 20:26:09 +0900
+Message-Id: <1521458773-14224-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1521458773-14224-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1521458773-14224-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-In the context ...
+Now, Kbuild nicely handles composite objects to avoid multiple
+definition.
 
-    $(obj)/%.s: $(src)/%.c FORCE
-            $(call if_changed_dep,cc_s_c)
-
-    $(obj)/%.i: $(src)/%.c FORCE
-            $(call if_changed_dep,cpp_i_c)
-
-    $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
-            $(call cmd,force_checksrc)
-            $(call if_changed_rule,cc_o_c)
-
-    $(obj)/%.lst: $(src)/%.c FORCE
-            $(call if_changed_dep,cc_lst_c)
-
-'$*' returns the stem of the target (the part of '%'), so $(obj)/ has
-already been ripped off.
-
-$(subst $(obj)/,,$*.o) is the same as $*.o
+Makefiles can simply add the same objects multiple times across
+composite objects.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Reviewed-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 ---
 
-Changes in v2: None
+The is clean-up from build system point of view.
 
- scripts/Makefile.lib | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I will apply this for the Kbuild tree.
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 5fd60af..4eedd6e 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -175,7 +175,7 @@ dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
+
+ lib/zstd/Makefile | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
+
+diff --git a/lib/zstd/Makefile b/lib/zstd/Makefile
+index dd0a359..a1a64cf 100644
+--- a/lib/zstd/Makefile
++++ b/lib/zstd/Makefile
+@@ -4,15 +4,7 @@ obj-$(CONFIG_ZSTD_DECOMPRESS) += zstd_decompress.o
+ ccflags-y += -O3
  
- # Finds the multi-part object the current object will be linked into
- modname-multi = $(sort $(foreach m,$(multi-used),\
--		$(if $(filter $(subst $(obj)/,,$*.o), $($(m:.o=-objs)) $($(m:.o=-y))),$(m:.o=))))
-+		$(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y))),$(m:.o=))))
- 
- # Useful for describing the dependency of composite objects
- # Usage:
+ # Object files unique to zstd_compress and zstd_decompress
+-zstd_compress-y := fse_compress.o huf_compress.o compress.o
+-zstd_decompress-y := huf_decompress.o decompress.o
+-
+-# These object files are shared between the modules.
+-# Always add them to zstd_compress.
+-# Unless both zstd_compress and zstd_decompress are built in
+-# then also add them to zstd_decompress.
+-zstd_compress-y += entropy_common.o fse_decompress.o zstd_common.o
+-
+-ifneq ($(CONFIG_ZSTD_COMPRESS)$(CONFIG_ZSTD_DECOMPRESS),yy)
+-	zstd_decompress-y += entropy_common.o fse_decompress.o zstd_common.o
+-endif
++zstd_compress-y := fse_compress.o huf_compress.o compress.o \
++		   entropy_common.o fse_decompress.o zstd_common.o
++zstd_decompress-y := huf_decompress.o decompress.o \
++		     entropy_common.o fse_decompress.o zstd_common.o
 -- 
 2.7.4
 
