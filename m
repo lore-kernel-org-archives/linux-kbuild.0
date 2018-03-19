@@ -1,148 +1,141 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kmu-office.ch ([178.209.48.109]:57071 "EHLO
-        mail.kmu-office.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754646AbeCSAln (ORCPT
+Received: from mail-pl0-f66.google.com ([209.85.160.66]:44512 "EHLO
+        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754258AbeCSAzE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:41:43 -0400
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Date: Mon, 19 Mar 2018 01:41:41 +0100
-From: Stefan Agner <stefan@agner.ch>
-Subject: Re: kbuild: move cc-option and cc-disable-warning after incl. arch
- Makefile
-In-Reply-To: <1511784913-3396-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1511784913-3396-1-git-send-email-yamada.masahiro@socionext.com>
-Message-ID: <9026b476c29fdd2d68b2e90ab0a155d0@agner.ch>
+        Sun, 18 Mar 2018 20:55:04 -0400
+Received: by mail-pl0-f66.google.com with SMTP id 9-v6so9241888ple.11
+        for <linux-kbuild@vger.kernel.org>; Sun, 18 Mar 2018 17:55:04 -0700 (PDT)
+From: Michael Forney <mforney@mforney.org>
+Subject: [PATCH v2] kbuild: Use ls(1) instead of stat(1) to obtain file size
+Date: Sun, 18 Mar 2018 17:54:02 -0700
+Message-Id: <20180319005402.30495-1-mforney@mforney.org>
+In-Reply-To: <20180128225838.1275-1-mforney@mforney.org>
+References: <20180128225838.1275-1-mforney@mforney.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, mka@chromium.org, arnd@arndb.de
+Cc: linux-kbuild@vger.kernel.org
 
-Hi Masahiro,
+From: Michael Forney <forney@google.com>
 
-On 27.11.2017 13:15, Masahiro Yamada wrote:
-> Geert reported commit ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before
-> incl. arch Makefile") broke cross-compilation using a cross-compiler
-> that supports less compiler options than the host compiler.
-> 
-> For example,
-> 
->   cc1: error: unrecognized command line option "-Wno-unused-but-set-variable"
-> 
-> This problem happens on architectures that setup CROSS_COMPILE in their
-> arch/*/Makefile.
-> 
-> Move the cc-option and cc-disable-warning back to the original position,
-> but keep the Clang target options.
+stat(1) is not standardized and different implementations have their own
+(conflicting) flags for querying the size of a file.
 
-This seems to break arm (32-bit) clang support for me. It seems to break
-correct compiler flag detection in some way.
+ls(1) provides the same information (value of st.st_size) in the 5th
+column, except when the file is a character or block device. This output
+is standardized[0]. The -n option turns on -l, which writes lines
+formatted like
 
-Just moving no-integrated-as back to before including the arch Makefile
-seems to fix the issue:
+  "%s %u %s %s %u %s %s\n", <file mode>, <number of links>,
+      <owner name>, <group name>, <size>, <date and time>,
+      <pathname>
 
---- a/Makefile
-+++ b/Makefile
-@@ -487,6 +487,7 @@ CLANG_GCC_TC        :=
---gcc-toolchain=$(GCC_TOOLCHAIN)
- endif
- KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
- KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
-+KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
- endif
+but instead of writing the <owner name> and <group name>, it writes the
+numeric owner and group IDs (this avoids /etc/passwd and /etc/group
+lookups as well as potential field splitting issues).
+
+The <size> field is specified as "the value that would be returned for
+the file in the st_size field of struct stat".
+
+To avoid duplicating logic in several locations in the tree, create
+scripts/file-size.sh and update callers to use that instead of stat(1).
+
+[0] http://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10
+
+Signed-off-by: Michael Forney <forney@google.com>
+---
+Changes in v2:
+* Use a wrapper script instead of calling ls(1) directly.
+* Also replace a couple of other instances of `stat -c '%s'`.
+* Update description with justification of ls(1) usage.
+
+ arch/arm/boot/deflate_xip_data.sh            | 2 +-
+ arch/powerpc/boot/wrapper                    | 2 +-
+ scripts/Makefile.lib                         | 2 +-
+ scripts/file-size.sh                         | 4 ++++
+ scripts/link-vmlinux.sh                      | 4 ++--
+ tools/testing/selftests/efivarfs/efivarfs.sh | 2 +-
+ 6 files changed, 10 insertions(+), 6 deletions(-)
+ create mode 100755 scripts/file-size.sh
+
+diff --git a/arch/arm/boot/deflate_xip_data.sh b/arch/arm/boot/deflate_xip_data.sh
+index 1189598a25eb..07adfc734fa3 100755
+--- a/arch/arm/boot/deflate_xip_data.sh
++++ b/arch/arm/boot/deflate_xip_data.sh
+@@ -45,7 +45,7 @@ data_start=$(($__data_loc - $base_offset))
+ data_end=$(($_edata_loc - $base_offset))
  
- RETPOLINE_CFLAGS_GCC := -mindirect-branch=thunk-extern
--mindirect-branch-register
-@@ -744,7 +745,6 @@ KBUILD_CFLAGS += $(call cc-disable-warning,
-tautological-compare)
- # See modpost pattern 2
- KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
- KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
--KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
- KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
- else
+ # Make sure data occupies the last part of the file.
+-file_end=$(stat -c "%s" "$XIPIMAGE")
++file_end=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" "$XIPIMAGE")
+ if [ "$file_end" != "$data_end" ]; then
+ 	printf "end of xipImage doesn't match with _edata_loc (%#x vs %#x)\n" \
+ 	       $(($file_end + $base_offset)) $_edata_loc 2>&1
+diff --git a/arch/powerpc/boot/wrapper b/arch/powerpc/boot/wrapper
+index 76fe3ccfd381..f9141eaec6ff 100755
+--- a/arch/powerpc/boot/wrapper
++++ b/arch/powerpc/boot/wrapper
+@@ -355,7 +355,7 @@ vmz="$tmpdir/`basename \"$kernel\"`.$ext"
+ 
+ # Calculate the vmlinux.strip size
+ ${CROSS}objcopy $objflags "$kernel" "$vmz.$$"
+-strip_size=$(stat -c %s $vmz.$$)
++strip_size=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" "$vmz.$$")
+ 
+ if [ -z "$cacheit" -o ! -f "$vmz$compression" -o "$vmz$compression" -ot "$kernel" ]; then
+     # recompress the image if we need to
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 7dee1da83e2a..5f74eafa2daa 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -319,7 +319,7 @@ dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
+ size_append = printf $(shell						\
+ dec_size=0;								\
+ for F in $1; do								\
+-	fsize=$$(stat -c "%s" $$F);					\
++	fsize=$$($(CONFIG_SHELL) $(srctree)/scripts/file-size.sh $$F);	\
+ 	dec_size=$$(expr $$dec_size + $$fsize);				\
+ done;									\
+ printf "%08x\n" $$dec_size |						\
+diff --git a/scripts/file-size.sh b/scripts/file-size.sh
+new file mode 100755
+index 000000000000..7eb7423416b5
+--- /dev/null
++++ b/scripts/file-size.sh
+@@ -0,0 +1,4 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++set -- $(ls -dn "$1")
++printf '%s\n' "$5"
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index c0d129d7f430..573d2ea88842 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -296,8 +296,8 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
+ 	kallsyms .tmp_vmlinux2 .tmp_kallsyms2.o
+ 
+ 	# step 3
+-	size1=$(stat -c "%s" .tmp_kallsyms1.o)
+-	size2=$(stat -c "%s" .tmp_kallsyms2.o)
++	size1=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" .tmp_kallsyms1.o)
++	size2=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" .tmp_kallsyms2.o)
+ 
+ 	if [ $size1 -ne $size2 ] || [ -n "${KALLSYMS_EXTRA_PASS}" ]; then
+ 		kallsymso=.tmp_kallsyms3.o
+diff --git a/tools/testing/selftests/efivarfs/efivarfs.sh b/tools/testing/selftests/efivarfs/efivarfs.sh
+index c6d5790575ae..0bcec427edba 100755
+--- a/tools/testing/selftests/efivarfs/efivarfs.sh
++++ b/tools/testing/selftests/efivarfs/efivarfs.sh
+@@ -53,7 +53,7 @@ test_create()
+ 		exit 1
+ 	fi
+ 
+-	if [ $(stat -c %s $file) -ne 5 ]; then
++	if [ "$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" "$file")" -ne 5 ]; then
+ 		echo "$file has invalid size" >&2
+ 		exit 1
+ 	fi
+-- 
+2.16.2
 
-Does that sound like a reasonable fix?
-
-Note that arm support is not completely upstream yet, but only few
-patches are necessary currently:
-http://git.agner.ch/gitweb/?p=linux.git;a=shortlog;h=refs/heads/v4.16-rc5-clang-arm-no-revert
-
---
-Stefan
-
-
-> 
-> Fixes: ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before incl. arch Makefile")
-> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> ---
-> 
->  Makefile | 43 +++++++++++++++++++++++--------------------
->  1 file changed, 23 insertions(+), 20 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index aa67428..ac2d4e1 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -484,26 +484,6 @@ CLANG_GCC_TC	:= --gcc-toolchain=$(GCC_TOOLCHAIN)
->  endif
->  KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
->  KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
-> -KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
-> -# Quiet clang warning: comparison of unsigned expression < 0 is always false
-> -KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
-> -# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
-> -# source of a reference will be _MergedGlobals and not on of the
-> whitelisted names.
-> -# See modpost pattern 2
-> -KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
-> -KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-> -KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
-> -KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
-> -else
-> -
-> -# These warnings generated too much noise in a regular build.
-> -# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
->  endif
->  
->  ifeq ($(config-targets),1)
-> @@ -715,6 +695,29 @@ ifdef CONFIG_CC_STACKPROTECTOR
->  endif
->  KBUILD_CFLAGS += $(stackp-flag)
->  
-> +ifeq ($(cc-name),clang)
-> +KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
-> +# Quiet clang warning: comparison of unsigned expression < 0 is always false
-> +KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
-> +# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
-> +# source of a reference will be _MergedGlobals and not on of the
-> whitelisted names.
-> +# See modpost pattern 2
-> +KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
-> +KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-> +KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
-> +KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
-> +else
-> +
-> +# These warnings generated too much noise in a regular build.
-> +# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
-> +endif
-> +
->  ifdef CONFIG_FRAME_POINTER
->  KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
->  else
