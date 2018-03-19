@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:30277 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:30214 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932939AbeCSL1T (ORCPT
+        with ESMTP id S1755299AbeCSL1Q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Mar 2018 07:27:19 -0400
+        Mon, 19 Mar 2018 07:27:16 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 7/7] kbuild: clean up multi-used module link rule
-Date: Mon, 19 Mar 2018 20:26:13 +0900
-Message-Id: <1521458773-14224-7-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 4/7] net: liquidio: clean up Makefile for simpler composite object handling
+Date: Mon, 19 Mar 2018 20:26:10 +0900
+Message-Id: <1521458773-14224-4-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1521458773-14224-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1521458773-14224-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,30 +15,86 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-cmd_link_multi-link is used only for cmd_link_multi-m.
+Now, Kbuild nicely handles composite objects to avoid multiple
+definition.
+
+Makefiles can simply add the same objects multiple times across
+composite objects.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/Makefile.build | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+The is clean-up from build system point of view.
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index e5c1aa3..77cce68 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -526,10 +526,8 @@ $($(subst $(obj)/,,$(@:.o=-objs)))    \
- $($(subst $(obj)/,,$(@:.o=-y)))       \
- $($(subst $(obj)/,,$(@:.o=-m)))), $^)
+I will apply this for the Kbuild tree.
+
+
+ drivers/net/ethernet/cavium/liquidio/Makefile | 51 +++++++++------------------
+ 1 file changed, 16 insertions(+), 35 deletions(-)
+
+diff --git a/drivers/net/ethernet/cavium/liquidio/Makefile b/drivers/net/ethernet/cavium/liquidio/Makefile
+index e3fc464..bc99375 100644
+--- a/drivers/net/ethernet/cavium/liquidio/Makefile
++++ b/drivers/net/ethernet/cavium/liquidio/Makefile
+@@ -2,42 +2,23 @@
+ #
+ # Cavium Liquidio ethernet device driver
+ #
+-obj-$(CONFIG_LIQUIDIO) += liquidio.o
  
--cmd_link_multi-link = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
+-liquidio-$(CONFIG_LIQUIDIO) += lio_ethtool.o \
+-			lio_core.o         \
+-			request_manager.o  \
+-			response_manager.o \
+-			octeon_device.o    \
+-			cn66xx_device.o    \
+-			cn68xx_device.o    \
+-			cn23xx_pf_device.o \
+-			cn23xx_vf_device.o \
+-			octeon_mailbox.o   \
+-			octeon_mem_ops.o   \
+-			octeon_droq.o      \
+-			octeon_nic.o
++common-objs :=	lio_ethtool.o		\
++		lio_core.o		\
++		request_manager.o	\
++		response_manager.o	\
++		octeon_device.o		\
++		cn66xx_device.o		\
++		cn68xx_device.o		\
++		cn23xx_pf_device.o	\
++		cn23xx_vf_device.o	\
++		octeon_mailbox.o	\
++		octeon_mem_ops.o	\
++		octeon_droq.o		\
++		octeon_nic.o
+ 
+-liquidio-objs := lio_main.o octeon_console.o lio_vf_rep.o $(liquidio-y)
++obj-$(CONFIG_LIQUIDIO) += liquidio.o
++liquidio-y := lio_main.o octeon_console.o lio_vf_rep.o $(common-objs)
+ 
+ obj-$(CONFIG_LIQUIDIO_VF) += liquidio_vf.o
 -
- quiet_cmd_link_multi-m = LD [M]  $@
--cmd_link_multi-m = $(cmd_link_multi-link)
-+cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
- 
- $(multi-used-m): FORCE
- 	$(call if_changed,link_multi-m)
+-ifeq ($(CONFIG_LIQUIDIO)$(CONFIG_LIQUIDIO_VF), yy)
+-	liquidio_vf-objs := lio_vf_main.o
+-else
+-liquidio_vf-$(CONFIG_LIQUIDIO_VF) += lio_ethtool.o \
+-			lio_core.o         \
+-			request_manager.o  \
+-			response_manager.o \
+-			octeon_device.o    \
+-			cn66xx_device.o    \
+-			cn68xx_device.o    \
+-			cn23xx_pf_device.o \
+-			cn23xx_vf_device.o \
+-			octeon_mailbox.o   \
+-			octeon_mem_ops.o   \
+-			octeon_droq.o      \
+-			octeon_nic.o
+-
+-liquidio_vf-objs := lio_vf_main.o $(liquidio_vf-y)
+-endif
++liquidio_vf-y := lio_vf_main.o $(common-objs)
 -- 
 2.7.4
 
