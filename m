@@ -1,84 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:23818 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754579AbeCSCiZ (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:49938 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932387AbeCSJCL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Mar 2018 22:38:25 -0400
-MIME-Version: 1.0
-In-Reply-To: <9026b476c29fdd2d68b2e90ab0a155d0@agner.ch>
-References: <1511784913-3396-1-git-send-email-yamada.masahiro@socionext.com> <9026b476c29fdd2d68b2e90ab0a155d0@agner.ch>
+        Mon, 19 Mar 2018 05:02:11 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 19 Mar 2018 11:37:41 +0900
-Message-ID: <CAK7LNAQKzXK_MYAEh0kke96wA0MWmKhUjZhnbugX5WTf2kyTVw@mail.gmail.com>
-Subject: Re: kbuild: move cc-option and cc-disable-warning after incl. arch Makefile
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v2 3/5] kbuild: fix modname for composite modules
+Date: Mon, 19 Mar 2018 18:01:25 +0900
+Message-Id: <1521450087-27291-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1521450087-27291-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1521450087-27291-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stefan Agner <stefan@agner.ch>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Arnd Bergmann <arnd@arndb.de>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 
-2018-03-19 9:41 GMT+09:00 Stefan Agner <stefan@agner.ch>:
-> Hi Masahiro,
->
-> On 27.11.2017 13:15, Masahiro Yamada wrote:
->> Geert reported commit ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before
->> incl. arch Makefile") broke cross-compilation using a cross-compiler
->> that supports less compiler options than the host compiler.
->>
->> For example,
->>
->>   cc1: error: unrecognized command line option "-Wno-unused-but-set-variable"
->>
->> This problem happens on architectures that setup CROSS_COMPILE in their
->> arch/*/Makefile.
->>
->> Move the cc-option and cc-disable-warning back to the original position,
->> but keep the Clang target options.
->
-> This seems to break arm (32-bit) clang support for me. It seems to break
-> correct compiler flag detection in some way.
->
-> Just moving no-integrated-as back to before including the arch Makefile
-> seems to fix the issue:
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
 
-Sorry, looks like I broke it.
+Commit cf4f21938e13 ("kbuild: Allow to specify composite modules
+with modname-m") added modname-m support, but missed to update the
+corresponding multi-objs-m & modname-multi definition.
 
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+Changes in v2: None
 
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -487,6 +487,7 @@ CLANG_GCC_TC        :=
-> --gcc-toolchain=$(GCC_TOOLCHAIN)
->  endif
->  KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
->  KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
-> +KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
->  endif
->
->  RETPOLINE_CFLAGS_GCC := -mindirect-branch=thunk-extern
-> -mindirect-branch-register
-> @@ -744,7 +745,6 @@ KBUILD_CFLAGS += $(call cc-disable-warning,
-> tautological-compare)
->  # See modpost pattern 2
->  KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
->  KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-> -KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
->  KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
->  else
->
-> Does that sound like a reasonable fix?
+ scripts/Makefile.lib | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-Yes, I think so.
-
-
-For consistency, please move
-KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
-as well.
-
-
-
-
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 7feb960..35c868f 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -50,7 +50,7 @@ single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
+ # Build list of the parts of our composite objects, our composite
+ # objects depend on those (obviously)
+ multi-objs-y := $(foreach m, $(multi-used-y), $($(m:.o=-objs)) $($(m:.o=-y)))
+-multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)))
++multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)))
+ 
+ # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
+ # tell kbuild to descend
+@@ -173,7 +173,7 @@ dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
+ # If the object belongs to two or more multi-part objects, all of them are
+ # concatenated with a colon separator.
+ modname-multi = $(subst $(space),:,$(sort $(foreach m,$(multi-used),\
+-		$(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y))),$(m:.o=)))))
++		$(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=)))))
+ 
+ # Useful for describing the dependency of composite objects
+ # Usage:
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
