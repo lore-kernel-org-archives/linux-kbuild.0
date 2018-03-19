@@ -1,122 +1,148 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:35517 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754304AbeCRWRw (ORCPT
+Received: from mail.kmu-office.ch ([178.209.48.109]:57071 "EHLO
+        mail.kmu-office.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754646AbeCSAln (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Mar 2018 18:17:52 -0400
-From: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Date: Sun, 18 Mar 2018 23:17:37 +0100
-Subject: Re: [PATCH v4 1/2] kconfig: warn unmet direct dependency of tristate
- symbols selected by y
-Message-ID: <20180318221737.GA25547@example.com>
-References: <1520934968-30406-1-git-send-email-yamada.masahiro@socionext.com>
+        Sun, 18 Mar 2018 20:41:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1520934968-30406-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Date: Mon, 19 Mar 2018 01:41:41 +0100
+From: Stefan Agner <stefan@agner.ch>
+Subject: Re: kbuild: move cc-option and cc-disable-warning after incl. arch
+ Makefile
+In-Reply-To: <1511784913-3396-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1511784913-3396-1-git-send-email-yamada.masahiro@socionext.com>
+Message-ID: <9026b476c29fdd2d68b2e90ab0a155d0@agner.ch>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Eugeniu Rosca <roscaeugeniu@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Petr Vorel <petr.vorel@gmail.com>, Eugeniu Rosca <erosca@de.adit-jv.com>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, mka@chromium.org, arnd@arndb.de
 
 Hi Masahiro,
 
-On Tue, Mar 13, 2018 at 06:56:07PM +0900, Masahiro Yamada wrote:
-> Commit 246cf9c26bf1 ("kbuild: Warn on selecting symbols with unmet
-> direct dependencies") forcibly promoted ->dir_dep.tri to yes from mod.
-> So, the unmet direct dependencies of tristate symbols are not reported.
+On 27.11.2017 13:15, Masahiro Yamada wrote:
+> Geert reported commit ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before
+> incl. arch Makefile") broke cross-compilation using a cross-compiler
+> that supports less compiler options than the host compiler.
 > 
-> [Test Case]
+> For example,
 > 
->   config MODULES
->           def_bool y
->           option modules
+>   cc1: error: unrecognized command line option "-Wno-unused-but-set-variable"
 > 
->   config A
->           def_bool y
->           select B
+> This problem happens on architectures that setup CROSS_COMPILE in their
+> arch/*/Makefile.
 > 
->   config B
->           tristate "B"
->           depends on m
+> Move the cc-option and cc-disable-warning back to the original position,
+> but keep the Clang target options.
+
+This seems to break arm (32-bit) clang support for me. It seems to break
+correct compiler flag detection in some way.
+
+Just moving no-integrated-as back to before including the arch Makefile
+seems to fix the issue:
+
+--- a/Makefile
++++ b/Makefile
+@@ -487,6 +487,7 @@ CLANG_GCC_TC        :=
+--gcc-toolchain=$(GCC_TOOLCHAIN)
+ endif
+ KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+ KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
++KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+ endif
+ 
+ RETPOLINE_CFLAGS_GCC := -mindirect-branch=thunk-extern
+-mindirect-branch-register
+@@ -744,7 +745,6 @@ KBUILD_CFLAGS += $(call cc-disable-warning,
+tautological-compare)
+ # See modpost pattern 2
+ KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+-KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+ KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+ else
+
+Does that sound like a reasonable fix?
+
+Note that arm support is not completely upstream yet, but only few
+patches are necessary currently:
+http://git.agner.ch/gitweb/?p=linux.git;a=shortlog;h=refs/heads/v4.16-rc5-clang-arm-no-revert
+
+--
+Stefan
+
+
 > 
-> This causes unmet dependency because 'B' is forced 'y' ignoring
-> 'depends on m'.  This should be warned.
-> 
-> On the other hand, the following case ('B' is bool) should not be
-> warned, so 'depends on m' for bool symbols should be naturally treated
-> as 'depends on y'.
-> 
-> [Test Case2 (not unmet dependency)]
-> 
->   config MODULES
->           def_bool y
->           option modules
-> 
->   config A
->           def_bool y
->           select B
-> 
->   config B
->           bool "B"
->           depends on m
-> 
+> Fixes: ae6b289a3789 ("kbuild: Set KBUILD_CFLAGS before incl. arch Makefile")
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
 > ---
 > 
-> Changes in v4:
->   - newly added
+>  Makefile | 43 +++++++++++++++++++++++--------------------
+>  1 file changed, 23 insertions(+), 20 deletions(-)
 > 
-> 
->  scripts/kconfig/symbol.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index 0f7eba7..def860b 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -243,7 +243,7 @@ static void sym_calc_visibility(struct symbol *sym)
->  	tri = yes;
->  	if (sym->dir_dep.expr)
->  		tri = expr_calc_value(sym->dir_dep.expr);
-> -	if (tri == mod)
-> +	if (sym->type == S_BOOLEAN && tri == mod)
-
-This seems to be very close to one of the issues fixed in the old
-v2.6.5 commit 5a87d187fce1 ("[PATCH] config: choice fix") accessible at
-https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?h=5a87d187fce1
-
-IMHO you could probably use (not tested!):
-+	if (tri == mod && sym_get_type(sym) == S_BOOLEAN)
-
-instead of
-+	if (sym->type == S_BOOLEAN && tri == mod)
-
-to be consistent with the rest of sym_calc_visibility().
-
-Also, since after this commit there will be a great amount of symmetry
-between how dirdep/revdep/weak-revdep are calculated inside
-sym_calc_visibility(), somebody could probably unify the implementations
-in future (not subject of this patch).
-
->  		tri = yes;
->  	if (sym->dir_dep.tri != tri) {
->  		sym->dir_dep.tri = tri;
-> @@ -414,7 +414,7 @@ void sym_calc_value(struct symbol *sym)
->  				}
->  			}
->  		calc_newval:
-> -			if (sym->dir_dep.tri == no && sym->rev_dep.tri != no) {
-> +			if (sym->dir_dep.tri < sym->rev_dep.tri) {
-
-Looks good.
-
->  				struct expr *e;
->  				e = expr_simplify_unmet_dep(sym->rev_dep.expr,
->  				    sym->dir_dep.expr);
-> -- 
-> 2.7.4
-> 
-
-Best regards,
-Eugeniu.
+> diff --git a/Makefile b/Makefile
+> index aa67428..ac2d4e1 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -484,26 +484,6 @@ CLANG_GCC_TC	:= --gcc-toolchain=$(GCC_TOOLCHAIN)
+>  endif
+>  KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+>  KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+> -KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+> -KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+> -KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+> -KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
+> -# Quiet clang warning: comparison of unsigned expression < 0 is always false
+> -KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+> -# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+> -# source of a reference will be _MergedGlobals and not on of the
+> whitelisted names.
+> -# See modpost pattern 2
+> -KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+> -KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+> -KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+> -KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+> -else
+> -
+> -# These warnings generated too much noise in a regular build.
+> -# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+>  endif
+>  
+>  ifeq ($(config-targets),1)
+> @@ -715,6 +695,29 @@ ifdef CONFIG_CC_STACKPROTECTOR
+>  endif
+>  KBUILD_CFLAGS += $(stackp-flag)
+>  
+> +ifeq ($(cc-name),clang)
+> +KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
+> +# Quiet clang warning: comparison of unsigned expression < 0 is always false
+> +KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+> +# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+> +# source of a reference will be _MergedGlobals and not on of the
+> whitelisted names.
+> +# See modpost pattern 2
+> +KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+> +KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+> +KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+> +KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+> +else
+> +
+> +# These warnings generated too much noise in a regular build.
+> +# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+> +endif
+> +
+>  ifdef CONFIG_FRAME_POINTER
+>  KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
+>  else
