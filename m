@@ -1,74 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:58053 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750888AbeCTPR0 (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:48055 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751633AbeCTPW1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Mar 2018 11:17:26 -0400
-Received: from mail-vk0-f54.google.com (mail-vk0-f54.google.com [209.85.213.54]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id w2KFHILN022161
-        for <linux-kbuild@vger.kernel.org>; Wed, 21 Mar 2018 00:17:19 +0900
-Received: by mail-vk0-f54.google.com with SMTP id l123so1147083vke.8
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Mar 2018 08:17:19 -0700 (PDT)
+        Tue, 20 Mar 2018 11:22:27 -0400
+Received: from mail-ua0-f174.google.com (mail-ua0-f174.google.com [209.85.217.174]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id w2KFMHj9025195
+        for <linux-kbuild@vger.kernel.org>; Wed, 21 Mar 2018 00:22:18 +0900
+Received: by mail-ua0-f174.google.com with SMTP id t29so1277869uae.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 20 Mar 2018 08:22:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1803151504080.28583@knanqh.ubzr>
-References: <ccedea72-0e61-500c-86e5-976ecb5cefb5@gmail.com>
- <CAK7LNAS9rOhyEdSUBbhPVW572437w5g7zLqMGSHn4gg3nbCU_g@mail.gmail.com>
- <nycvar.YSQ.7.76.1803121331280.28583@knanqh.ubzr> <4bbfeb74-c912-74e5-4f4d-287ec7ad065d@gmail.com>
- <nycvar.YSQ.7.76.1803131922060.28583@knanqh.ubzr> <4aee7e23-ac36-9495-14a9-471379a7896b@gmail.com>
- <nycvar.YSQ.7.76.1803151504080.28583@knanqh.ubzr>
+In-Reply-To: <20180319005402.30495-1-mforney@mforney.org>
+References: <20180128225838.1275-1-mforney@mforney.org> <20180319005402.30495-1-mforney@mforney.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 21 Mar 2018 00:16:37 +0900
-Message-ID: <CAK7LNARdit6ddTBVuf425VSeTQF3v3mR5tSBJ7La2VZFSNC-yw@mail.gmail.com>
-Subject: Re: Intermittent build failure with TRIM_UNUSED_KSYMS and related problems
+Date: Wed, 21 Mar 2018 00:21:36 +0900
+Message-ID: <CAK7LNAQuRe_b6GoGBjMWkX0j0eNURZziejYVCAAhOMKUTH=s3Q@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: Use ls(1) instead of stat(1) to obtain file size
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Lindroth <thomas.lindroth@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nicolas Pitre <nicolas.pitre@linaro.org>
+To: Michael Forney <mforney@mforney.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi Thomas,
-
-
-2018-03-16 5:56 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
-> Subject: [PATCH] kbuild: make scripts/adjust_autoksyms.sh robust against timestamp races
+2018-03-19 9:54 GMT+09:00 Michael Forney <mforney@mforney.org>:
+> From: Michael Forney <forney@google.com>
 >
-> Some filesystems have timestamps with coarse precision that may allow
-> for a recently built object file to have the same timestamp as the
-> updated time on one of its dependency files. When that happens, the
-> object file doesn't get rebuilt as it should.
+> stat(1) is not standardized and different implementations have their own
+> (conflicting) flags for querying the size of a file.
 >
-> This is especially the case on filesystems that don't have sub-second
-> time precision, such as ext3 or Ext4 with 128B inodes.
+> ls(1) provides the same information (value of st.st_size) in the 5th
+> column, except when the file is a character or block device. This output
+> is standardized[0]. The -n option turns on -l, which writes lines
+> formatted like
 >
-> Let's prevent that by making sure updated dependency files have a newer
-> timestamp than the first file we created (i.e. autoksyms.h.tmpnew).
+>   "%s %u %s %s %u %s %s\n", <file mode>, <number of links>,
+>       <owner name>, <group name>, <size>, <date and time>,
+>       <pathname>
 >
-> Reported-by: Thomas Lindroth <thomas.lindroth@gmail.com>
-> Signed-off-by: Nicolas Pitre <nico@linaro.org>
+> but instead of writing the <owner name> and <group name>, it writes the
+> numeric owner and group IDs (this avoids /etc/passwd and /etc/group
+> lookups as well as potential field splitting issues).
 >
-> diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
-> index 513da1a4a2..d67830e6e3 100755
-> --- a/scripts/adjust_autoksyms.sh
-> +++ b/scripts/adjust_autoksyms.sh
-> @@ -84,6 +84,13 @@ while read sympath; do
->         depfile="include/config/ksym/${sympath}.h"
->         mkdir -p "$(dirname "$depfile")"
->         touch "$depfile"
-> +       # Filesystems with coarse time precision may create timestamps
-> +       # equal to the one from a file that was very recently built and that
-> +       # needs to be rebuild. Let's guard against that by making sure our
-> +       # dep files are always newer than the first file we created here.
-> +       while [ ! "$depfile" -nt "$new_ksyms_file" ]; do
-> +               touch "$depfile"
-> +       done
->         echo $((count += 1))
->  done | tail -1 )
->  changed=${changed:-0}
+> The <size> field is specified as "the value that would be returned for
+> the file in the st_size field of struct stat".
+>
+> To avoid duplicating logic in several locations in the tree, create
+> scripts/file-size.sh and update callers to use that instead of stat(1).
+>
+> [0] http://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10
+>
+> Signed-off-by: Michael Forney <forney@google.com>
+> ---
+> Changes in v2:
+> * Use a wrapper script instead of calling ls(1) directly.
+> * Also replace a couple of other instances of `stat -c '%s'`.
+> * Update description with justification of ls(1) usage.
+>
 
-
-Does this patch solve your problem?
-I guess so, but I want you to test it just in case.
-
+Applied to linux-kbuild. Thanks!
 
 -- 
 Best Regards
