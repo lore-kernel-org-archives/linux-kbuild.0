@@ -1,142 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:26525 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750991AbeCTD6n (ORCPT
+Received: from userp2130.oracle.com ([156.151.31.86]:45332 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750888AbeCTFpl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Mar 2018 23:58:43 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180318221737.GA25547@example.com>
-References: <1520934968-30406-1-git-send-email-yamada.masahiro@socionext.com> <20180318221737.GA25547@example.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 20 Mar 2018 12:57:46 +0900
-Message-ID: <CAK7LNASu48Gbe0Ch6f1t235xA2Nhxdz3fN1-ht07xst636+mgg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/2] kconfig: warn unmet direct dependency of tristate
- symbols selected by y
+        Tue, 20 Mar 2018 01:45:41 -0400
+Message-ID: <1521524675.3354.302.camel@oracle.com>
+Subject: Re: [PATCH v4 1/1] runchecks: Generalize make C={1,2} to support
+ multiple checkers
+From: Knut Omang <knut.omang@oracle.com>
+Date: Tue, 20 Mar 2018 06:44:35 +0100
+In-Reply-To: <1517815200.3118.383.camel@oracle.com>
+References: <cover.a7e2d48abd08947a9bb46ef5d18a8f33066cc40d.1516356501.git-series.knut.omang@oracle.com>
+         <c271ba8f99393585d69db71f40db3c01c44769e4.1516356501.git-series.knut.omang@oracle.com>
+         <1517812899.3118.372.camel@oracle.com>
+         <CAK7LNAS8QG947WpFn6bCnNVLj=x7jbAyLKVRS429wP+1jYbOUA@mail.gmail.com>
+         <1517815200.3118.383.camel@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eugeniu Rosca <roscaeugeniu@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Petr Vorel <petr.vorel@gmail.com>, Eugeniu Rosca <erosca@de.adit-jv.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, =?ISO-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Gilles Muller <Gilles.Muller@lip6.fr>, Tom Saeger <tom.saeger@oracle.com>, Michal Marek <michal.lkml@markovi.net>, =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Julia Lawall <Julia.Lawall@lip6.fr>, John Haxby <john.haxby@oracle.com>, =?ISO-8859-1?Q?=C5smund_=D8stvold?= <asmund.ostvold@oracle.com>, Matthew Wilcox <willy@infradead.org>, "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>, cocci@systeme.lip6.fr, Andrew Morton <akpm@linux-foundation.org>
 
-2018-03-19 7:17 GMT+09:00 Eugeniu Rosca <roscaeugeniu@gmail.com>:
-> Hi Masahiro,
->
-> On Tue, Mar 13, 2018 at 06:56:07PM +0900, Masahiro Yamada wrote:
->> Commit 246cf9c26bf1 ("kbuild: Warn on selecting symbols with unmet
->> direct dependencies") forcibly promoted ->dir_dep.tri to yes from mod.
->> So, the unmet direct dependencies of tristate symbols are not reported.
->>
->> [Test Case]
->>
->>   config MODULES
->>           def_bool y
->>           option modules
->>
->>   config A
->>           def_bool y
->>           select B
->>
->>   config B
->>           tristate "B"
->>           depends on m
->>
->> This causes unmet dependency because 'B' is forced 'y' ignoring
->> 'depends on m'.  This should be warned.
->>
->> On the other hand, the following case ('B' is bool) should not be
->> warned, so 'depends on m' for bool symbols should be naturally treated
->> as 'depends on y'.
->>
->> [Test Case2 (not unmet dependency)]
->>
->>   config MODULES
->>           def_bool y
->>           option modules
->>
->>   config A
->>           def_bool y
->>           select B
->>
->>   config B
->>           bool "B"
->>           depends on m
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->>
->> Changes in v4:
->>   - newly added
->>
->>
->>  scripts/kconfig/symbol.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
->> index 0f7eba7..def860b 100644
->> --- a/scripts/kconfig/symbol.c
->> +++ b/scripts/kconfig/symbol.c
->> @@ -243,7 +243,7 @@ static void sym_calc_visibility(struct symbol *sym)
->>       tri = yes;
->>       if (sym->dir_dep.expr)
->>               tri = expr_calc_value(sym->dir_dep.expr);
->> -     if (tri == mod)
->> +     if (sym->type == S_BOOLEAN && tri == mod)
->
-> This seems to be very close to one of the issues fixed in the old
-> v2.6.5 commit 5a87d187fce1 ("[PATCH] config: choice fix") accessible at
-> https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?h=5a87d187fce1
->
-> IMHO you could probably use (not tested!):
-> +       if (tri == mod && sym_get_type(sym) == S_BOOLEAN)
->
-> instead of
-> +       if (sym->type == S_BOOLEAN && tri == mod)
->
-> to be consistent with the rest of sym_calc_visibility().
+On Mon, 2018-02-05 at 08:20 +0100, Knut Omang wrote:
+> On Mon, 2018-02-05 at 16:03 +0900, Masahiro Yamada wrote:
 
+Hi Masahiro,
 
-I tested it, and probably OK.
+I know these are busy times but any hope of getting forward on this?
+Anything more I can do to ease the process?
 
-I will squash the diff.
+Thanks for your time,
+Knut
 
-Thanks.
-
-
-
-
-> Also, since after this commit there will be a great amount of symmetry
-> between how dirdep/revdep/weak-revdep are calculated inside
-> sym_calc_visibility(), somebody could probably unify the implementations
-> in future (not subject of this patch).
->
->>               tri = yes;
->>       if (sym->dir_dep.tri != tri) {
->>               sym->dir_dep.tri = tri;
->> @@ -414,7 +414,7 @@ void sym_calc_value(struct symbol *sym)
->>                               }
->>                       }
->>               calc_newval:
->> -                     if (sym->dir_dep.tri == no && sym->rev_dep.tri != no) {
->> +                     if (sym->dir_dep.tri < sym->rev_dep.tri) {
->
-> Looks good.
->
->>                               struct expr *e;
->>                               e = expr_simplify_unmet_dep(sym->rev_dep.expr,
->>                                   sym->dir_dep.expr);
->> --
->> 2.7.4
->>
->
+> > 2018-02-05 15:41 GMT+09:00 Knut Omang <knut.omang@oracle.com>:
+> > > On Fri, 2018-01-19 at 11:14 +0100, Knut Omang wrote:
+> > >> Add scripts/runchecks which has generic support for running
+> > >> checker tools in a convenient and user friendly way that
+> > >> the author hopes can contribute to rein in issues detected
+> > >> by these tools in a manageable and convenient way.
+> > >>
+> > >> scripts/runchecks provides the following basic functionality:
+> > >>
+> > >> * Makes it possible to selectively suppress output from individual
+> > >>   checks on a per file or per subsystem basis.
+> > >> * Unifies output and suppression input from different tools
+> > >>   by providing a single unified syntax and presentation for the
+> > >>   underlying tools in the style of "scripts/checkpatch.pl --show-types".
+> > >> * Allows selective run of one, or more (or all) configured tools
+> > >>   for each file.
+> > >>
+> > >> In the Makefile system, the sparse specific setup has been replaced
+> > >> by setup for runchecks.
+> > >
+> > > Hi all,
+> > >
+> > > - Anything more I can/need to do to bring this forward?
+> > > - Any quiet concerns?
+> > >
+> > > I realize it is a subsystem crossing change,
+> > 
+> > Is it?  Only Kbuild this is related to.
+> 
+> Ok, I see!
+> 
+> > > and a lot going on elsewhere,
+> > > nevertheless I believe this is a time saver in the slightly longer run,
+> > > as it allows automation of checking, even without a "perfect"
+> > > code base to begin with.
+> > >
+> > 
+> > Sorry for the delay.
+> 
+> I understand, no problem - just was afraid it was about to get lost 
+> in between subsystems,
+> 
+> > I have not been able to find time to dive into the detail yet.
+> > (Actually, I tried to do that for v2 or v3, where Python code was so dirty,
+> > then consumed my time to figure out what the code was trying to do)
+> 
+> Hopefully v4 is cleaner from a Python code style point of view at least,
+> but let me know if you have any particular part of the code in mind wrt 
+> readability. Also hopefully the docs should be of help.
+> 
+> > I find my concern here:
+> > https://lkml.org/lkml/2018/1/5/497
+> 
+> I believe I have addressed the issues there in v4.
+> 
+> > Anyway, I will take a look again when I find some time.
+> > You do not need to take care of the detail until I request to do so.
+> 
+> Ok, thanks a lot for your time and the quick response now!
+> 
 > Best regards,
-> Eugeniu.
+> Knut
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Best Regards
-Masahiro Yamada
