@@ -1,81 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:57910 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751597AbeCUNfJ (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:19262 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751597AbeCUNfu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Mar 2018 09:35:09 -0400
-Received: from mail-ua0-f179.google.com (mail-ua0-f179.google.com [209.85.217.179]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id w2LDYgeM026435
-        for <linux-kbuild@vger.kernel.org>; Wed, 21 Mar 2018 22:34:42 +0900
-Received: by mail-ua0-f179.google.com with SMTP id c40so3292579uae.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 21 Mar 2018 06:34:42 -0700 (PDT)
+        Wed, 21 Mar 2018 09:35:50 -0400
+Received: from mail-vk0-f53.google.com (mail-vk0-f53.google.com [209.85.213.53]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id w2LDZW2o019948
+        for <linux-kbuild@vger.kernel.org>; Wed, 21 Mar 2018 22:35:33 +0900
+Received: by mail-vk0-f53.google.com with SMTP id l123so3048897vke.8
+        for <linux-kbuild@vger.kernel.org>; Wed, 21 Mar 2018 06:35:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1803210900410.7132@knanqh.ubzr>
-References: <ccedea72-0e61-500c-86e5-976ecb5cefb5@gmail.com>
- <CAK7LNAS9rOhyEdSUBbhPVW572437w5g7zLqMGSHn4gg3nbCU_g@mail.gmail.com>
- <nycvar.YSQ.7.76.1803121331280.28583@knanqh.ubzr> <4bbfeb74-c912-74e5-4f4d-287ec7ad065d@gmail.com>
- <nycvar.YSQ.7.76.1803131922060.28583@knanqh.ubzr> <4aee7e23-ac36-9495-14a9-471379a7896b@gmail.com>
- <nycvar.YSQ.7.76.1803151504080.28583@knanqh.ubzr> <CAK7LNARdit6ddTBVuf425VSeTQF3v3mR5tSBJ7La2VZFSNC-yw@mail.gmail.com>
- <6a32ecdf-f25a-ca2f-6c10-52d4cc56cc6f@gmail.com> <nycvar.YSQ.7.76.1803210900410.7132@knanqh.ubzr>
+In-Reply-To: <CAGw6cBtg+yC5KhZYqRtEZY1q5WhjOxH=Laivg8MS5-s2uhqvUA@mail.gmail.com>
+References: <20180128225838.1275-1-mforney@mforney.org> <20180319005402.30495-1-mforney@mforney.org>
+ <CAK7LNAQuRe_b6GoGBjMWkX0j0eNURZziejYVCAAhOMKUTH=s3Q@mail.gmail.com> <CAGw6cBtg+yC5KhZYqRtEZY1q5WhjOxH=Laivg8MS5-s2uhqvUA@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 21 Mar 2018 22:34:01 +0900
-Message-ID: <CAK7LNASxpx7Boa1UiSqpCsmkspGa76MJp2Ncpf9eCXRsJjGDJw@mail.gmail.com>
-Subject: Re: Intermittent build failure with TRIM_UNUSED_KSYMS and related problems
+Date: Wed, 21 Mar 2018 22:34:51 +0900
+Message-ID: <CAK7LNATwQzc5vD46aOEnv5mYiitynqRVVMkDM2hHszY-T8N2fQ@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: Use ls(1) instead of stat(1) to obtain file size
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Thomas Lindroth <thomas.lindroth@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Michael Forney <mforney@mforney.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-03-21 10:07 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
-> On Tue, 20 Mar 2018, Thomas Lindroth wrote:
->
->> On 03/20/2018 04:16 PM, Masahiro Yamada wrote:
->> >> Some filesystems have timestamps with coarse precision that may allow
->> >> for a recently built object file to have the same timestamp as the
->> >> updated time on one of its dependency files. When that happens, the
->> >> object file doesn't get rebuilt as it should.
->> >>
->> >> This is especially the case on filesystems that don't have sub-second
->> >> time precision, such as ext3 or Ext4 with 128B inodes.
->> >>
->> >> Let's prevent that by making sure updated dependency files have a newer
->> >> timestamp than the first file we created (i.e. autoksyms.h.tmpnew).
->> >>
->> >> Reported-by: Thomas Lindroth <thomas.lindroth@gmail.com>
->> >> Signed-off-by: Nicolas Pitre <nico@linaro.org>
->> >>
->> >> diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
->> >> index 513da1a4a2..d67830e6e3 100755
->> >> --- a/scripts/adjust_autoksyms.sh
->> >> +++ b/scripts/adjust_autoksyms.sh
->> >> @@ -84,6 +84,13 @@ while read sympath; do
->> >>         depfile="include/config/ksym/${sympath}.h"
->> >>         mkdir -p "$(dirname "$depfile")"
->> >>         touch "$depfile"
->> >> +       # Filesystems with coarse time precision may create timestamps
->> >> +       # equal to the one from a file that was very recently built and that
->> >> +       # needs to be rebuild. Let's guard against that by making sure our
->> >> +       # dep files are always newer than the first file we created here.
->> >> +       while [ ! "$depfile" -nt "$new_ksyms_file" ]; do
->> >> +               touch "$depfile"
->> >> +       done
->> >>         echo $((count += 1))
->> >>  done | tail -1 )
->> >>  changed=${changed:-0}
->> >
->> >
->> > Does this patch solve your problem?
->> > I guess so, but I want you to test it just in case.
+2018-03-21 15:03 GMT+09:00 Michael Forney <mforney@mforney.org>:
+> On 2018-03-20, Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+>> 2018-03-19 9:54 GMT+09:00 Michael Forney <mforney@mforney.org>:
+>>> From: Michael Forney <forney@google.com>
+>>>
+>>> stat(1) is not standardized and different implementations have their own
+>>> (conflicting) flags for querying the size of a file.
+>>>
+>>> ls(1) provides the same information (value of st.st_size) in the 5th
+>>> column, except when the file is a character or block device. This output
+>>> is standardized[0]. The -n option turns on -l, which writes lines
+>>> formatted like
+>>>
+>>>   "%s %u %s %s %u %s %s\n", <file mode>, <number of links>,
+>>>       <owner name>, <group name>, <size>, <date and time>,
+>>>       <pathname>
+>>>
+>>> but instead of writing the <owner name> and <group name>, it writes the
+>>> numeric owner and group IDs (this avoids /etc/passwd and /etc/group
+>>> lookups as well as potential field splitting issues).
+>>>
+>>> The <size> field is specified as "the value that would be returned for
+>>> the file in the st_size field of struct stat".
+>>>
+>>> To avoid duplicating logic in several locations in the tree, create
+>>> scripts/file-size.sh and update callers to use that instead of stat(1).
+>>>
+>>> [0]
+>>> http://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html#tag_20_73_10
+>>>
+>>> Signed-off-by: Michael Forney <forney@google.com>
+>>> ---
+>>> Changes in v2:
+>>> * Use a wrapper script instead of calling ls(1) directly.
+>>> * Also replace a couple of other instances of `stat -c '%s'`.
+>>> * Update description with justification of ls(1) usage.
+>>>
 >>
->> Yes, it solves the build problem but I'm still experiencing the original
->> problem with vfio forwarded pci device even with this patch.
+>> Applied to linux-kbuild. Thanks!
 >
-> All this patch pretends to do is fix the build race issue.
-> So it should probably be applied for that reason alone.
+> Thanks, Masahiro!
+>
+> However, I just realized that we probably need to revert the change to
+> tools/testing/selftests/efivarfs/efivarfs.sh since it is called
+> through a separate Makefile system that does not have $CONFIG_SHELL
+> and $srctree defined.
+>
+> Sorry for the mistake.
 
-I agree.
-Applied to linux-kbuild/fixes.  Thanks!
+OK, I reverted the offending part.
 
 
 
