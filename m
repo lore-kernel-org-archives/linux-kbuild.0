@@ -1,74 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:46912 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753456AbeCVPUk (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:47772 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751898AbeCVRBQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Mar 2018 11:20:40 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180216202255.25307-4-ulfalizer@gmail.com>
-References: <20180216202255.25307-1-ulfalizer@gmail.com> <20180216202255.25307-4-ulfalizer@gmail.com>
+        Thu, 22 Mar 2018 13:01:16 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 23 Mar 2018 00:19:40 +0900
-Message-ID: <CAK7LNATvuFG2jqqH4w53W3oXCHhQR5gZ1E+2MEemgzKfc8XmEQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] checkpatch: kconfig: prefer 'help' over '---help---'
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 1/3] kconfig: remove duplicated file name and lineno of recursive inclusion
+Date: Fri, 23 Mar 2018 02:00:12 +0900
+Message-Id: <1521738014-18895-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Robo Bot <apw@canonical.com>, Joe Perches <joe@perches.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-2018-02-17 5:22 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> IMO, we should discourage '---help---' for new help texts, even in cases
-> where it would be consistent with other help texts in the file. This
-> will help if we ever want to get rid of '---help---' in the future.
->
-> Also simplify the code to only check for exactly '---help---'. Since
-> commit c2264564df3d ("kconfig: warn of unhandled characters in Kconfig
-> commands"), '---help---' is a proper keyword and can only appear in that
-> form. Prior to that commit, '---help---' working was more of a syntactic
-> quirk.
->
-> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
-> ---
->  scripts/checkpatch.pl | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index 54b782fab4fd..2784f6ab309f 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -2817,7 +2817,11 @@ sub process {
->
->                                 if ($lines[$ln - 1] =~ /^\+\s*(?:bool|tristate|prompt)\s*["']/) {
->                                         $is_start = 1;
-> -                               } elsif ($lines[$ln - 1] =~ /^\+\s*(?:---)?help(?:---)?$/) {
-> +                               } elsif ($lines[$ln - 1] =~ /^\+\s*(?:help|---help---)\s*$/) {
-> +                                       if ($lines[$ln - 1] =~ "---help---") {
-> +                                               WARN("CONFIG_DESCRIPTION",
-> +                                                    "prefer 'help' over '---help---' for new help texts\n" . $herecurr);
-> +                                       }
->                                         $length = -1;
->                                 }
->
+As in the unit test, the error message for the recursive inclusion
+looks like this:
 
+  Kconfig.inc1:4: recursive inclusion detected. Inclusion path:
+    current file : 'Kconfig.inc1'
+    included from: 'Kconfig.inc3:1'
+    included from: 'Kconfig.inc2:3'
+    included from: 'Kconfig.inc1:4'
 
-I applied this, but perhaps the line number for the offending part
-could be improved.
+The 'Kconfig.inc1:4' is duplicated in the first and last lines.
+Also, the single quotes do not help readability.
 
-The warning looks like this.
+Change the message like follows:
 
+  Recursive inclusion detected.
+  Inclusion path:
+    current file : Kconfig.inc1
+    included from: Kconfig.inc3:1
+    included from: Kconfig.inc2:3
+    included from: Kconfig.inc1:4
 
-WARNING: prefer 'help' over '---help---' for new help texts
-#1109: FILE: init/Kconfig:1109:
-+config SGETMASK_SYSCALL
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ scripts/kconfig/tests/err_recursive_inc/expected_stderr | 11 ++++++-----
+ scripts/kconfig/zconf.l                                 |  9 ++++-----
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-The #1109 points to the line of the symbol start.
-IMHO, it is even better to point to the '---help---' line.
-
-
-
-
+diff --git a/scripts/kconfig/tests/err_recursive_inc/expected_stderr b/scripts/kconfig/tests/err_recursive_inc/expected_stderr
+index a15dbed..6b582ee 100644
+--- a/scripts/kconfig/tests/err_recursive_inc/expected_stderr
++++ b/scripts/kconfig/tests/err_recursive_inc/expected_stderr
+@@ -1,5 +1,6 @@
+-Kconfig.inc1:4: recursive inclusion detected. Inclusion path:
+-  current file : 'Kconfig.inc1'
+-  included from: 'Kconfig.inc3:1'
+-  included from: 'Kconfig.inc2:3'
+-  included from: 'Kconfig.inc1:4'
++Recursive inclusion detected.
++Inclusion path:
++  current file : Kconfig.inc1
++  included from: Kconfig.inc3:1
++  included from: Kconfig.inc2:3
++  included from: Kconfig.inc1:4
+diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
+index 88b650e..6f139d2 100644
+--- a/scripts/kconfig/zconf.l
++++ b/scripts/kconfig/zconf.l
+@@ -328,14 +328,13 @@ void zconf_nextfile(const char *name)
+ 	for (iter = current_file->parent; iter; iter = iter->parent ) {
+ 		if (!strcmp(current_file->name,iter->name) ) {
+ 			fprintf(stderr,
+-				"%s:%d: recursive inclusion detected. "
+-				"Inclusion path:\n  current file : '%s'\n",
+-				zconf_curname(), zconf_lineno(),
+-				zconf_curname());
++				"Recursive inclusion detected.\n"
++				"Inclusion path:\n"
++				"  current file : %s\n", zconf_curname());
+ 			iter = current_file;
+ 			do {
+ 				iter = iter->parent;
+-				fprintf(stderr, "  included from: '%s:%d'\n",
++				fprintf(stderr, "  included from: %s:%d\n",
+ 					iter->name, iter->lineno - 1);
+ 			} while (strcmp(iter->name, current_file->name));
+ 			exit(1);
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
