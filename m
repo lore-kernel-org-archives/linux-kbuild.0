@@ -1,17 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:38852 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755074AbeCVPOW (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:46912 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753456AbeCVPUk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Mar 2018 11:14:22 -0400
+        Thu, 22 Mar 2018 11:20:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180216202255.25307-3-ulfalizer@gmail.com>
-References: <20180216202255.25307-1-ulfalizer@gmail.com> <20180216202255.25307-3-ulfalizer@gmail.com>
+In-Reply-To: <20180216202255.25307-4-ulfalizer@gmail.com>
+References: <20180216202255.25307-1-ulfalizer@gmail.com> <20180216202255.25307-4-ulfalizer@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 23 Mar 2018 00:13:38 +0900
-Message-ID: <CAK7LNATn1qu0+sXvEtLwd7eJJDNtm0Mt_MaPA3_W=TnxZkK7fQ@mail.gmail.com>
-Subject: Re: [PATCH 2/3] checkpatch: kconfig: check help texts for menuconfig
- and choice
+Date: Fri, 23 Mar 2018 00:19:40 +0900
+Message-ID: <CAK7LNATvuFG2jqqH4w53W3oXCHhQR5gZ1E+2MEemgzKfc8XmEQ@mail.gmail.com>
+Subject: Re: [PATCH 3/3] checkpatch: kconfig: prefer 'help' over '---help---'
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -19,31 +18,54 @@ To: Ulf Magnusson <ulfalizer@gmail.com>
 Cc: Robo Bot <apw@canonical.com>, Joe Perches <joe@perches.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
 2018-02-17 5:22 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> Currently, only Kconfig symbols are checked for a missing or short help
-> text, and are only checked if they are defined with the 'config'
-> keyword.
+> IMO, we should discourage '---help---' for new help texts, even in cases
+> where it would be consistent with other help texts in the file. This
+> will help if we ever want to get rid of '---help---' in the future.
 >
-> To make the check more general, extend it to also check help texts for
-> choices and for symbols defined with the 'menuconfig' keyword.
+> Also simplify the code to only check for exactly '---help---'. Since
+> commit c2264564df3d ("kconfig: warn of unhandled characters in Kconfig
+> commands"), '---help---' is a proper keyword and can only appear in that
+> form. Prior to that commit, '---help---' working was more of a syntactic
+> quirk.
 >
-> This increases the accuracy of the check for symbols that would already
-> have been checked as well, since e.g. a 'menuconfig' symbol after a help
-> text will be recognized as ending the preceding symbol/choice
-> definition.
+> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+> ---
+>  scripts/checkpatch.pl | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 >
-> To increase the accuracy of the check further, also recognize 'if',
-> 'endif', 'menu', 'endmenu', 'endchoice', and 'source' as ending a
-> symbol/choice definition.
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 54b782fab4fd..2784f6ab309f 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2817,7 +2817,11 @@ sub process {
+>
+>                                 if ($lines[$ln - 1] =~ /^\+\s*(?:bool|tristate|prompt)\s*["']/) {
+>                                         $is_start = 1;
+> -                               } elsif ($lines[$ln - 1] =~ /^\+\s*(?:---)?help(?:---)?$/) {
+> +                               } elsif ($lines[$ln - 1] =~ /^\+\s*(?:help|---help---)\s*$/) {
+> +                                       if ($lines[$ln - 1] =~ "---help---") {
+> +                                               WARN("CONFIG_DESCRIPTION",
+> +                                                    "prefer 'help' over '---help---' for new help texts\n" . $herecurr);
+> +                                       }
+>                                         $length = -1;
+>                                 }
+>
 
 
-Currently, this is not checked for the last symbol in a file.
-Perhaps, EOF could be also an ending of symbol definition.
+I applied this, but perhaps the line number for the offending part
+could be improved.
 
-This patch is a good improvement enough,
-so I queued it up.
+The warning looks like this.
 
-If you have an idea for further improvement,
-v2 is welcome, of course.
+
+WARNING: prefer 'help' over '---help---' for new help texts
+#1109: FILE: init/Kconfig:1109:
++config SGETMASK_SYSCALL
+
+
+The #1109 points to the line of the symbol start.
+IMHO, it is even better to point to the '---help---' line.
+
 
 
 
