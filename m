@@ -1,51 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:38291 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751464AbeCVU6f (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:40540 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751291AbeCVVF3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Mar 2018 16:58:35 -0400
-Received: by mail-wm0-f68.google.com with SMTP id l16so33744wmh.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 22 Mar 2018 13:58:34 -0700 (PDT)
+        Thu, 22 Mar 2018 17:05:29 -0400
+Received: by mail-wm0-f67.google.com with SMTP id t6so40785wmt.5
+        for <linux-kbuild@vger.kernel.org>; Thu, 22 Mar 2018 14:05:28 -0700 (PDT)
 From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: [PATCH] MAINTAINERS: Update Kbuild entry with a few paths
-Date: Thu, 22 Mar 2018 21:58:27 +0100
-Message-Id: <20180322205827.24578-1-linux@rasmusvillemoes.dk>
+Subject: [RFC resend 1/2] modpost: delete stale comment
+Date: Thu, 22 Mar 2018 22:05:23 +0100
+Message-Id: <20180322210525.25361-1-linux@rasmusvillemoes.dk>
+In-Reply-To: <20180322150005.15061-2-linux@rasmusvillemoes.dk>
+References: <20180322150005.15061-2-linux@rasmusvillemoes.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org
+Cc: Rusty Russell <rusty@rustcorp.com.au>, Sam Ravnborg <sam@ravnborg.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-I managed to send some modpost patches to old addresses of both
-Masahiro and Michal, and omitted linux-kbuild from cc, because my
-tried and trusted scripts/get_maintainer wrapper failed me. Add the
-modpost directory to the MAINTAINERS entry, and while at it make the
-Makefile glob match scripts/Makefile itself, and add one matching the
-Kbuild.include file as well.
+Commit (7840fea200cd "kbuild: Fix computing srcversion for modules")
+fixed the comment above parse_source_files to refer to the new source_
+line, but left this one behind that could still give the impression that
+drivers/net/dummy.c appears in the deps_ variable.
 
 Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
 ---
-Hi Kbuild maintainers. Hope you don't mind me extending this entry a bit.
+Resending because I didn't reach any current kbuild maintainers nor
+the kbuild mailing list.
 
- MAINTAINERS | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ scripts/mod/sumversion.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4e62756936fa..5f5d4faddc74 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7640,9 +7640,11 @@ L:	linux-kbuild@vger.kernel.org
- S:	Maintained
- F:	Documentation/kbuild/
- F:	Makefile
--F:	scripts/Makefile.*
-+F:	scripts/Kbuild*
-+F:	scripts/Makefile*
- F:	scripts/basic/
- F:	scripts/mk*
-+F:	scripts/mod/
- F:	scripts/package/
+diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
+index 944418da9fe3..0f6dcb4011a8 100644
+--- a/scripts/mod/sumversion.c
++++ b/scripts/mod/sumversion.c
+@@ -330,14 +330,7 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
+ 		goto out;
+ 	}
  
- KERNEL JANITORS
+-	/* There will be a line like so:
+-		deps_drivers/net/dummy.o := \
+-		  drivers/net/dummy.c \
+-		    $(wildcard include/config/net/fastroute.h) \
+-		  include/linux/module.h \
+-
+-	   Sum all files in the same dir or subdirs.
+-	*/
++	/* Sum all files in the same dir or subdirs. */
+ 	while ((line = get_next_line(&pos, file, flen)) != NULL) {
+ 		char* p = line;
+ 
 -- 
 2.15.1
 
