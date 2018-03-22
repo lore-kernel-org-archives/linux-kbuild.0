@@ -1,111 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:35045 "EHLO
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:38852 "EHLO
         conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751706AbeCVPKZ (ORCPT
+        with ESMTP id S1755074AbeCVPOW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Mar 2018 11:10:25 -0400
+        Thu, 22 Mar 2018 11:14:22 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNARD1yWA4uoFh0kF5nO2BzXopW2rtx9+LKHfC7--AFjcxw@mail.gmail.com>
-References: <20180216202255.25307-1-ulfalizer@gmail.com> <1518815662.13169.27.camel@perches.com>
- <CAFkk2KSRswP2FEV7mTMJwLe+WRDdVEUnZBOyh_XWrQu2tW07zg@mail.gmail.com>
- <CAK7LNAQjnCnPvFZEPR2YM9EsOALnPy=FeugZC_8PFrngb9AQgQ@mail.gmail.com>
- <CAFkk2KTUZYMc9poahUQMoQi=wSVnNHDt0SS8BTdRHs59m=qO4w@mail.gmail.com> <CAK7LNARD1yWA4uoFh0kF5nO2BzXopW2rtx9+LKHfC7--AFjcxw@mail.gmail.com>
+In-Reply-To: <20180216202255.25307-3-ulfalizer@gmail.com>
+References: <20180216202255.25307-1-ulfalizer@gmail.com> <20180216202255.25307-3-ulfalizer@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 23 Mar 2018 00:09:41 +0900
-Message-ID: <CAK7LNATPFdFADwSfhcnXm0oXWBM1rgUrWGgT5sWdqfvPg4TG+Q@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Improve and extend checkpatch.pl Kconfig help text checks
+Date: Fri, 23 Mar 2018 00:13:38 +0900
+Message-ID: <CAK7LNATn1qu0+sXvEtLwd7eJJDNtm0Mt_MaPA3_W=TnxZkK7fQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] checkpatch: kconfig: check help texts for menuconfig
+ and choice
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>, Andrew Morton <akpm@linux-foundation.org>
-Cc: Joe Perches <joe@perches.com>, Robo Bot <apw@canonical.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Robo Bot <apw@canonical.com>, Joe Perches <joe@perches.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-03-06 14:13 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> (+To: Andrew)
+2018-02-17 5:22 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> Currently, only Kconfig symbols are checked for a missing or short help
+> text, and are only checked if they are defined with the 'config'
+> keyword.
 >
-> 2018-03-06 13:52 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->> On Sat, Feb 24, 2018 at 2:53 PM, Masahiro Yamada
->> <yamada.masahiro@socionext.com> wrote:
->>> 2018-02-23 10:30 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->>>> On Fri, Feb 16, 2018 at 10:14 PM, Joe Perches <joe@perches.com> wrote:
->>>>> On Fri, 2018-02-16 at 21:22 +0100, Ulf Magnusson wrote:
->>>>>> Hello,
->>>>>>
->>>>>> This patchset contains some improvements for the Kconfig help text check in
->>>>>> scripts/checkconfig.pl:
->>>>>
->>>>> Seems sensible enough to me.
->>>>> Signed-off-by: Joe Perches <joe@perches.com>
->>>>
->>>> Will you be taking this in yourself?
->>>>
->>>> (Adding Masahiro on CC -- forgot when I sent the patchset.)
->>>>
->>>> Cheers,
->>>> Ulf
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>>
->>> I am not a perl expert, but I have no objection for this series.
->>>
->>>
->>> Thanks!
->>>
->>>
->>>
->>>
->>> --
->>> Best Regards
->>> Masahiro Yamada
->>
->> *Bump*
+> To make the check more general, extend it to also check help texts for
+> choices and for symbols defined with the 'menuconfig' keyword.
 >
+> This increases the accuracy of the check for symbols that would already
+> have been checked as well, since e.g. a 'menuconfig' symbol after a help
+> text will be recognized as ending the preceding symbol/choice
+> definition.
 >
-> Who is addressed by "*Bump*" ?
->
->
->
-> I think patches for checkpatch.pl
-> are supposed to be taken care of by Andrew.
->
-> He forwards patches to Linus.
->
->
-> $ git log --no-merges --pretty=fuller scripts/checkpatch.pl  | grep
-> 'Commit:' | sort | uniq -c | sort -nr
->     555 Commit:     Linus Torvalds <torvalds@linux-foundation.org>
->      16 Commit:     Linus Torvalds <torvalds@woody.linux-foundation.org>
->       4 Commit:     Paul E. McKenney <paulmck@linux.vnet.ibm.com>
->       4 Commit:     Michael S. Tsirkin <mst@redhat.com>
->       2 Commit:     Thomas Gleixner <tglx@linutronix.de>
->       2 Commit:     Ingo Molnar <mingo@kernel.org>
->       2 Commit:     Greg Kroah-Hartman <gregkh@suse.de>
->       1 Commit:     Tobin C. Harding <me@tobin.cc>
->       1 Commit:     Rob Herring <robh@kernel.org>
->       1 Commit:     Petr Mladek <pmladek@suse.com>
->       1 Commit:     Michal Marek <mmarek@suse.cz>
->       1 Commit:     Mauro Carvalho Chehab <mchehab@s-opensource.com>
->       1 Commit:     Masahiro Yamada <yamada.masahiro@socionext.com>
->       1 Commit:     Lucas De Marchi <lucas.demarchi@profusion.mobi>
->       1 Commit:     Jiri Kosina <jkosina@suse.cz>
->       1 Commit:     Dan Williams <dan.j.williams@intel.com>
->       1 Commit:     Bjorn Helgaas <bhelgaas@google.com>
->
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+> To increase the accuracy of the check further, also recognize 'if',
+> 'endif', 'menu', 'endmenu', 'endchoice', and 'source' as ending a
+> symbol/choice definition.
 
 
-I thought Andrew would pick it up, but
-nobody is taking care of this after all.
+Currently, this is not checked for the last symbol in a file.
+Perhaps, EOF could be also an ending of symbol definition.
 
-I queued it up now.
+This patch is a good improvement enough,
+so I queued it up.
+
+If you have an idea for further improvement,
+v2 is welcome, of course.
 
 
 
