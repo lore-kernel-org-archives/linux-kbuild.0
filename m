@@ -1,70 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:47943 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751898AbeCVRBZ (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:38291 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751464AbeCVU6f (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Mar 2018 13:01:25 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/3] kconfig: detect recursive inclusion earlier
-Date: Fri, 23 Mar 2018 02:00:13 +0900
-Message-Id: <1521738014-18895-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1521738014-18895-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1521738014-18895-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 22 Mar 2018 16:58:35 -0400
+Received: by mail-wm0-f68.google.com with SMTP id l16so33744wmh.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 22 Mar 2018 13:58:34 -0700 (PDT)
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: [PATCH] MAINTAINERS: Update Kbuild entry with a few paths
+Date: Thu, 22 Mar 2018 21:58:27 +0100
+Message-Id: <20180322205827.24578-1-linux@rasmusvillemoes.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org
 
-Currently, the recursive inclusion is not detected when the offending
-file is about to be included; it is detected the offending file is
-about to include the *next* file.  This is because the detection loop
-does not involve the file being included.
+I managed to send some modpost patches to old addresses of both
+Masahiro and Michal, and omitted linux-kbuild from cc, because my
+tried and trusted scripts/get_maintainer wrapper failed me. Add the
+modpost directory to the MAINTAINERS entry, and while at it make the
+Makefile glob match scripts/Makefile itself, and add one matching the
+Kbuild.include file as well.
 
-Do this check against the file that is about to be included so that
-the recursive inclusion is detected before unneeded parsing happens.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
 ---
+Hi Kbuild maintainers. Hope you don't mind me extending this entry a bit.
 
- scripts/kconfig/zconf.l | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ MAINTAINERS | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 6f139d2..29b5d33 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -325,23 +325,25 @@ void zconf_nextfile(const char *name)
- 	buf->parent = current_buf;
- 	current_buf = buf;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4e62756936fa..5f5d4faddc74 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -7640,9 +7640,11 @@ L:	linux-kbuild@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/kbuild/
+ F:	Makefile
+-F:	scripts/Makefile.*
++F:	scripts/Kbuild*
++F:	scripts/Makefile*
+ F:	scripts/basic/
+ F:	scripts/mk*
++F:	scripts/mod/
+ F:	scripts/package/
  
--	for (iter = current_file->parent; iter; iter = iter->parent ) {
--		if (!strcmp(current_file->name,iter->name) ) {
-+	file->parent = current_file;
-+
-+	for (iter = current_file; iter; iter = iter->parent) {
-+		if (!strcmp(iter->name, file->name)) {
- 			fprintf(stderr,
- 				"Recursive inclusion detected.\n"
- 				"Inclusion path:\n"
--				"  current file : %s\n", zconf_curname());
--			iter = current_file;
-+				"  current file : %s\n", file->name);
-+			iter = file;
- 			do {
- 				iter = iter->parent;
- 				fprintf(stderr, "  included from: %s:%d\n",
- 					iter->name, iter->lineno - 1);
--			} while (strcmp(iter->name, current_file->name));
-+			} while (strcmp(iter->name, file->name));
- 			exit(1);
- 		}
- 	}
-+
- 	file->lineno = 1;
--	file->parent = current_file;
- 	current_file = file;
- }
- 
+ KERNEL JANITORS
 -- 
-2.7.4
+2.15.1
 
