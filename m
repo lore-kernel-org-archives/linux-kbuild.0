@@ -1,49 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr30073.outbound.protection.outlook.com ([40.107.3.73]:52135
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752175AbeCWR7r (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Mar 2018 13:59:47 -0400
-Date: Fri, 23 Mar 2018 11:59:36 -0600
-From: Jason Gunthorpe <jgg@mellanox.com>
-Subject: [PATCH] kbuild: rpm-pkg: Support GNU tar >= 1.29
-Message-ID: <20180323175936.GA18412@ziepe.ca>
+Received: from mail-pl0-f65.google.com ([209.85.160.65]:42914 "EHLO
+        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751604AbeCXBUE (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 23 Mar 2018 21:20:04 -0400
+Subject: Re: [PATCH 02/10] kbuild: clean up *.lex.c and *.tab.[ch] patterns
+ from top-level Makefile
+References: <1521810279-6282-1-git-send-email-yamada.masahiro@socionext.com>
+ <1521810279-6282-2-git-send-email-yamada.masahiro@socionext.com>
+From: Frank Rowand <frowand.list@gmail.com>
+Message-ID: <4c0eafe3-a888-008a-84cd-b31698d201ea@gmail.com>
+Date: Fri, 23 Mar 2018 18:20:01 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <1521810279-6282-2-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Daniel Pressler <danielpr@mellanox.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Frank Rowand <frank.rowand@sony.com>, Geert Uytterhoeven <geert@linux-m68k.org>
 
-There is a change in how command line parsing is done in this version.
-Excludes and includes are now ordered with the file list. Since
-the spec file puts the file list before the exclude list it means newer
-tar ignores the excludes and packs all the build output into the
-kernel-devel RPM resulting in a huge package.
+On 03/23/18 06:04, Masahiro Yamada wrote:
+> Files suffixed by .lex.c, .tab.[ch] are generated lexers, parsers,
+> respectively.  Clean them up globally from the top Makefile.
+> 
+> Some of the final host programs they are linked into are needed for
+> building external modules, but those intermediates are unneeded.
+> They can be cleaned away by 'make clean' instead of 'make mrproper'.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Simple argument re-ordering fixes the problem.
+Acked-by: Frank Rowand <frowand.list@gmail.com>
 
-Signed-off-by: Jason Gunthorpe <jgg@mellanox.com>
----
- scripts/package/mkspec | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+-Frank
 
-At the very least this effects FC27.
-
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index 280027fad991c1..61427c6f220922 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -98,7 +98,7 @@ $M	make %{?_smp_mflags} INSTALL_MOD_PATH=%{buildroot} KBUILD_SRC= modules_instal
- $S$M	rm -f %{buildroot}/lib/modules/$KERNELRELEASE/build
- $S$M	rm -f %{buildroot}/lib/modules/$KERNELRELEASE/source
- $S$M	mkdir -p %{buildroot}/usr/src/kernels/$KERNELRELEASE
--$S$M	tar cf - . $EXCLUDES | tar xf - -C %{buildroot}/usr/src/kernels/$KERNELRELEASE
-+$S$M	tar cf - $EXCLUDES . | tar xf - -C %{buildroot}/usr/src/kernels/$KERNELRELEASE
- $S$M	cd %{buildroot}/lib/modules/$KERNELRELEASE
- $S$M	ln -sf /usr/src/kernels/$KERNELRELEASE build
- $S$M	ln -sf /usr/src/kernels/$KERNELRELEASE source
--- 
-2.16.2
+> ---
+> 
+>  Makefile                  | 1 +
+>  scripts/dtc/Makefile      | 6 ++----
+>  scripts/genksyms/Makefile | 2 --
+>  scripts/kconfig/Makefile  | 2 +-
+>  4 files changed, 4 insertions(+), 7 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 493e267..168432e 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1613,6 +1613,7 @@ clean: $(clean-dirs)
+>  		-o -name '*.dwo' -o -name '*.lst' \
+>  		-o -name '*.su'  \
+>  		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+> +		-o -name '*.lex.c' -o -name '*.tab.[ch]' \
+>  		-o -name '*.symtypes' -o -name 'modules.order' \
+>  		-o -name modules.builtin -o -name '.tmp_*.o.*' \
+>  		-o -name .cache.mk \
+> diff --git a/scripts/dtc/Makefile b/scripts/dtc/Makefile
+> index a88b8c9..d17ba64 100644
+> --- a/scripts/dtc/Makefile
+> +++ b/scripts/dtc/Makefile
+> @@ -28,7 +28,5 @@ HOSTCFLAGS_dtc-parser.tab.o := $(HOSTCFLAGS_DTC)
+>  # dependencies on generated files need to be listed explicitly
+>  $(obj)/dtc-lexer.lex.o: $(obj)/dtc-parser.tab.h
+>  
+> -# generated files need to include *.cmd and be cleaned explicitly
+> -generated-files	:= dtc-lexer.lex.c dtc-parser.tab.c dtc-parser.tab.h
+> -targets		:= $(generated-files)
+> -clean-files	:= $(generated-files)
+> +# generated files need to include *.cmd
+> +targets := dtc-lexer.lex.c dtc-parser.tab.c dtc-parser.tab.h
+> diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
+> index 34d6ab1..0ccac51 100644
+> --- a/scripts/genksyms/Makefile
+> +++ b/scripts/genksyms/Makefile
+> @@ -11,5 +11,3 @@ HOSTCFLAGS_lex.lex.o := -I$(src)
+>  
+>  # dependencies on generated files need to be listed explicitly
+>  $(obj)/lex.lex.o: $(obj)/parse.tab.h
+> -
+> -clean-files	:= lex.lex.c parse.tab.c parse.tab.h
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index f9bdd02..1dcd797 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -209,7 +209,7 @@ hostprogs-y := conf nconf mconf kxgettext qconf gconf
+>  
+>  targets		+= zconf.tab.c zconf.lex.c
+>  clean-files	:= qconf.moc .tmp_qtcheck .tmp_gtkcheck
+> -clean-files	+= zconf.tab.c zconf.lex.c gconf.glade.h
+> +clean-files	+= gconf.glade.h
+>  clean-files     += config.pot linux.pot
+>  
+>  # Check that we have the required ncurses stuff installed for lxdialog (menuconfig)
+> 
 
