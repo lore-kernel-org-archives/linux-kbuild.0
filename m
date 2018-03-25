@@ -1,65 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga12.intel.com ([192.55.52.136]:22558 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753739AbeCYRay (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 25 Mar 2018 13:30:54 -0400
-Date: Mon, 26 Mar 2018 01:30:18 +0800
-From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [kbuild:kconfig-shell-v2 36/53] scripts/kconfig/zconf.tab.c:2483:10:
- fatal error: env.c: No such file or directory
-Message-ID: <201803260156.YIHCeYR0%fengguang.wu@intel.com>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:35896 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750959AbeCYWcs (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 25 Mar 2018 18:32:48 -0400
+Received: by mail-wm0-f65.google.com with SMTP id x82so12084416wmg.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 25 Mar 2018 15:32:48 -0700 (PDT)
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: [PATCH] objtool: fix build with future Make
+Date: Mon, 26 Mar 2018 00:32:39 +0200
+Message-Id: <20180325223239.14778-1-linux@rasmusvillemoes.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org
+To: Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>
+Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v2
-head:   e57fb0ae1935962534ab1b5f98e067a8f521b0e8
-commit: af252189c051c6482cd81479ece4829e6c918d5c [36/53] kconfig: reference environments directly and remove 'option env=' syntax
-config: i386-tinyconfig
-compiler: gcc-7 (Debian 7.3.0-1) 7.3.0
-reproduce:
-        git checkout af252189c051c6482cd81479ece4829e6c918d5c
-        make ARCH=i386  tinyconfig
-        make ARCH=i386 
+I tried building using a freshly built Make (4.2.1-69-g8a731d1), but the
+objtool build broke with
 
-All errors (new ones prefixed by >>):
+orc_dump.c: In function ‘orc_dump’:
+orc_dump.c:106:2: error: ‘elf_getshnum’ is deprecated [-Werror=deprecated-declarations]
+  if (elf_getshdrnum(elf, &nr_sections)) {
 
->> scripts/kconfig/zconf.tab.c:2483:10: fatal error: env.c: No such file or directory
-    #include "env.c"
-             ^~~~~~~
-   compilation terminated.
-   make[2]: *** [scripts/kconfig/zconf.tab.o] Error 1
-   make[2]: Target 'oldconfig' not remade because of errors.
-   make[1]: *** [oldconfig] Error 2
-   make: *** [sub-make] Error 2
---
->> scripts/kconfig/zconf.tab.c:2483:10: fatal error: env.c: No such file or directory
-    #include "env.c"
-             ^~~~~~~
-   compilation terminated.
-   make[2]: *** [scripts/kconfig/zconf.tab.o] Error 1
-   make[2]: Target 'oldnoconfig' not remade because of errors.
-   make[1]: *** [oldnoconfig] Error 2
-   make: *** [sub-make] Error 2
---
->> scripts/kconfig/zconf.tab.c:2483:10: fatal error: env.c: No such file or directory
-    #include "env.c"
-             ^~~~~~~
-   compilation terminated.
-   make[5]: *** [scripts/kconfig/zconf.tab.o] Error 1
-   make[5]: Target 'allnoconfig' not remade because of errors.
-   make[4]: *** [allnoconfig] Error 2
-   make[3]: *** [__build_one_by_one] Error 2
-   make[3]: Target 'allnoconfig' not remade because of errors.
-   make[3]: Target 'tiny.config' not remade because of errors.
-   make[2]: *** [tinyconfig] Error 2
-   make[1]: *** [tinyconfig] Error 2
-   make: *** [sub-make] Error 2
+Turns out that with that new Make, the backslash was not removed, so cpp
+didn't see a #include directive, grep found nothing, and
+-DLIBELF_USE_DEPRECATED was wrongly put in CFLAGS.
 
+Now, that new Make behaviour is documented in their NEWS file:
+
+  * WARNING: Backward-incompatibility!
+    Number signs (#) appearing inside a macro reference or function invocation
+    no longer introduce comments and should not be escaped with backslashes:
+    thus a call such as:
+      foo := $(shell echo '#')
+    is legal.  Previously the number sign needed to be escaped, for example:
+      foo := $(shell echo '\#')
+    Now this latter will resolve to "\#".  If you want to write makefiles
+    portable to both versions, assign the number sign to a variable:
+      C := \#
+      foo := $(shell echo '$C')
+    This was claimed to be fixed in 3.81, but wasn't, for some reason.
+    To detect this change search for 'nocomment' in the .FEATURES variable.
+
+There are likely other places in the tree that will need fixing, so
+cc-ing Kbuild, but with this at least a x86-64 defconfig builds.
+
+Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+ tools/objtool/Makefile         | 2 +-
+ tools/scripts/Makefile.include | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
+index e6acc281dd37..8ae824dbfca3 100644
+--- a/tools/objtool/Makefile
++++ b/tools/objtool/Makefile
+@@ -35,7 +35,7 @@ CFLAGS   += -Wall -Werror $(WARNINGS) -fomit-frame-pointer -O2 -g $(INCLUDES)
+ LDFLAGS  += -lelf $(LIBSUBCMD)
+ 
+ # Allow old libelf to be used:
+-elfshdr := $(shell echo '\#include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
++elfshdr := $(shell echo '$(pound)include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
+ CFLAGS += $(if $(elfshdr),,-DLIBELF_USE_DEPRECATED)
+ 
+ AWK = awk
+diff --git a/tools/scripts/Makefile.include b/tools/scripts/Makefile.include
+index dd614463d4d6..495066bafbe3 100644
+--- a/tools/scripts/Makefile.include
++++ b/tools/scripts/Makefile.include
+@@ -120,3 +120,5 @@ ifneq ($(silent),1)
+ 	QUIET_UNINST   = @printf '  UNINST   %s\n' $1;
+   endif
+ endif
++
++pound := \#
+-- 
+2.15.1
+
