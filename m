@@ -1,61 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f52.google.com ([209.85.160.52]:35638 "EHLO
-        mail-pl0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750839AbeCZCFB (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:54331 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751024AbeCZLsr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 25 Mar 2018 22:05:01 -0400
-Date: Sun, 25 Mar 2018 16:04:56 -1000
-From: Joey Pabalinas <joeypabalinas@gmail.com>
-Subject: Re: [PATCH v2] scripts/kconfig: cleanup symbol handling code
-Message-ID: <20180326020456.iyuwu5dmkzrxjtj4@gmail.com>
-References: <20180310105659.7e34lk4kvcbl64lg@gmail.com>
- <CAK7LNASOFW41HO3S4kUWsR4ro4BgSjPYXG8vrtwVhzMAV3gw0A@mail.gmail.com>
+        Mon, 26 Mar 2018 07:48:47 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ql37mq4kj2zs3ih3"
-Content-Disposition: inline
-In-Reply-To: <CAK7LNASOFW41HO3S4kUWsR4ro4BgSjPYXG8vrtwVhzMAV3gw0A@mail.gmail.com>
+In-Reply-To: <20180325230918.23161-1-linux@rasmusvillemoes.dk>
+References: <20180325223239.14778-1-linux@rasmusvillemoes.dk> <20180325230918.23161-1-linux@rasmusvillemoes.dk>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 26 Mar 2018 20:48:00 +0900
+Message-ID: <CAK7LNASRP4nmKcTsF0QRvCOrX40MMO=FafOs+xG+UNA-b_61Dw@mail.gmail.com>
+Subject: Re: [PATCH 2/1] Kbuild: fix # escaping in .cmd files for future Make
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Joey Pabalinas <joeypabalinas@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Douglas Anderson <dianders@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Matthias Kaehlcke <mka@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+
+2018-03-26 8:09 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
+> The latest official Make release is 4.2.1 from mid-2016, but the current
+> git release has this relevant note in the NEWS file:
+>
+>   * WARNING: Backward-incompatibility!
+>     Number signs (#) appearing inside a macro reference or function invocation
+>     no longer introduce comments and should not be escaped with backslashes:
+>     thus a call such as:
+>       foo := $(shell echo '#')
+>     is legal.  Previously the number sign needed to be escaped, for example:
+>       foo := $(shell echo '\#')
+>     Now this latter will resolve to "\#".  If you want to write makefiles
+>     portable to both versions, assign the number sign to a variable:
+>       C := \#
+>       foo := $(shell echo '$C')
+>     This was claimed to be fixed in 3.81, but wasn't, for some reason.
+>     To detect this change search for 'nocomment' in the .FEATURES variable.
+>
+> Prepare for whatever future Make release contains that change by fixing
+> up the .cmd file escaping - without this, make always thinks the command
+> string has changed and hence rebuilds everything.
+>
+> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+> ---
+> So the previous patch made everything build, but building again
+> revealed that this central place very much also needed fixing.
+>
+>  scripts/Kbuild.include | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index 065324a8046f..7a926e4688f4 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -10,6 +10,7 @@ space   := $(empty) $(empty)
+>  space_escape := _-_SPACE_-_
+>  right_paren := )
+>  left_paren := (
+> +pound := \#
+>
+>  ###
+>  # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
+> @@ -328,7 +329,7 @@ endif
+>  # (needed for make)
+>  # Replace >'< with >'\''< to be able to enclose the whole string in '...'
+>  # (needed for the shell)
+> -make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
+> +make-cmd = $(call escsq,$(subst $(pound),\\$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
+>
+
+Thanks for the patch, but this changes the behavior.
+With '#' replaced with $(pound), '\\' does not escape anything,
+so it is treated as '\\'.
 
 
---ql37mq4kj2zs3ih3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The following keeps the current behavior:
 
-On Mon, Mar 26, 2018 at 01:52:26AM +0900, Masahiro Yamada wrote:
-> I want to see Kconfig improvements in a bigger picture.
->=20
-> The changes below are noise.
+make-cmd = $(call escsq,$(subst $(pound),\$(pound),$(subst
+$$,$$$$,$(cmd_$(1)))))
 
-That's understandable; I do agree that nothing here is _fundamentally_
-broken at all, so no worries.
 
---=20
-Cheers,
-Joey Pabalinas
 
---ql37mq4kj2zs3ih3
-Content-Type: application/pgp-signature; name="signature.asc"
+But, I think the following is an even better fix:
 
------BEGIN PGP SIGNATURE-----
+make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst
+$$,$$$$,$(cmd_$(1)))))
 
-iQIzBAEBCAAdFiEEKlZXrihdNOcUPZTNruvLfWhyVBkFAlq4VUgACgkQruvLfWhy
-VBkEAhAAs2RkZ6WUPG5KeT590WPKJmv6h2O22PWREAR5uC1hBrdBmZgfvnHgwGy3
-n5oyN/6O/B4YTFxlmZMOou4ZnaH5IFpsyLCHWc70mzH+vZMWoRBzR5KWRSA977AG
-GApigHNbm0RpxgZnc70fBGOqG0m6IGmaDZnlrwG/m+0C2KQH0V2Rb7PQFI/vNtSq
-RkNWfWZfTv/1H7ALnOvSTcAzlBOSeRC/CjmY5LVA1f5JxMFL0k/oMpvfaDhPvPbv
-IVTVjcb9pNTOB/aP2sm7ou2om7jUTrGbZzhqv9pYqNEhpU451MbQ4I7gItY1Z/4k
-xMFXNbjeZg5sqwsqZpMbhCGmmD77i9c4tDCJYnFPRL78abu2TNp2MWOG+DrUfP89
-jwdxmGIFBWmsCIi76tih2qgFtV8xtS+FU5+vod8bjM5bPthis4ObZe/QrSD9PHis
-lHGu+mlVPSLmOGFPoKCE8R4EBsepnoYqzApuhujWkyMNStzqjN5T/DNWsqqp4EUx
-8IG8PgsJxa56sL5CfaHNnIRJsmq7N9UBv/aq08lm7lKEyaV3OFo2kxpUxIAMeR0T
-Gs7HwMCz3Sy0lKmBqPUIg6YMhUdOiQK2Rn1f55YXhEIzNoVM3jIlUkxdvmNq0HmF
-BlYwQ0QspMONq6/TuF2ucyNOQrnkEjW486uy68X+5M6gi9CoCmA=
-=1y3U
------END PGP SIGNATURE-----
 
---ql37mq4kj2zs3ih3--
+
+The following 4 test cases produce the same foo.txt,
+but insane .cmd file is produced for some case.
+Adjusting the number of back-slashes is not a perfect solution.
+
+Replacing # with $(pound) works for all the cases.
+
+
+[test code 1]
+extra-y := foo.txt
+
+quiet_cmd_foo = DEFINE   $@
+      cmd_foo = echo '\#define FOO' >$@
+
+$(obj)/foo.txt: FORCE
+        $(call if_changed,foo)
+
+
+[test code 2]
+extra-y := foo.txt
+
+quiet_cmd_foo = DEFINE   $@
+      cmd_foo = echo \\\#define FOO >$@
+
+$(obj)/foo.txt: FORCE
+        $(call if_changed,foo)
+
+
+[test code3]
+extra-y := foo.txt
+
+quiet_cmd_foo = DEFINE   $@
+      cmd_foo = echo '$(pound)define FOO' >$@
+
+$(obj)/foo.txt: FORCE
+        $(call if_changed,foo)
+
+
+
+[test code4]
+extra-y := foo.txt
+
+quiet_cmd_foo = DEFINE   $@
+      cmd_foo = echo \$(pound)define FOO >$@
+
+$(obj)/foo.txt: FORCE
+        $(call if_changed,foo)
+
+
+
+
+
+           | current | \$(pound) | \\$(pound) | $$(pound)
+----------------------------------------------------------
+test code1 |    OK   |    OK     |     NG     |   OK
+test code2 |    NG   |    NG     |     OK     |   OK
+test code3 |    OK   |    OK     |     NG     |   OK
+test code4 |    NG   |    NG     |     OK     |   OK
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
