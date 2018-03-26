@@ -1,94 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:33148 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751299AbeCYXmR (ORCPT
+Received: from mail-pl0-f52.google.com ([209.85.160.52]:35638 "EHLO
+        mail-pl0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750839AbeCZCFB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 25 Mar 2018 19:42:17 -0400
-Subject: Re: [PATCH] objtool: fix build with future Make
-References: <20180325223239.14778-1-linux@rasmusvillemoes.dk>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <932b18fd-7782-7f43-7405-70986596ae31@infradead.org>
-Date: Sun, 25 Mar 2018 16:42:09 -0700
+        Sun, 25 Mar 2018 22:05:01 -0400
+Date: Sun, 25 Mar 2018 16:04:56 -1000
+From: Joey Pabalinas <joeypabalinas@gmail.com>
+Subject: Re: [PATCH v2] scripts/kconfig: cleanup symbol handling code
+Message-ID: <20180326020456.iyuwu5dmkzrxjtj4@gmail.com>
+References: <20180310105659.7e34lk4kvcbl64lg@gmail.com>
+ <CAK7LNASOFW41HO3S4kUWsR4ro4BgSjPYXG8vrtwVhzMAV3gw0A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180325223239.14778-1-linux@rasmusvillemoes.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ql37mq4kj2zs3ih3"
+Content-Disposition: inline
+In-Reply-To: <CAK7LNASOFW41HO3S4kUWsR4ro4BgSjPYXG8vrtwVhzMAV3gw0A@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
-
-On 03/25/2018 03:32 PM, Rasmus Villemoes wrote:
-> I tried building using a freshly built Make (4.2.1-69-g8a731d1), but the
-> objtool build broke with
-> 
-> orc_dump.c: In function ‘orc_dump’:
-> orc_dump.c:106:2: error: ‘elf_getshnum’ is deprecated [-Werror=deprecated-declarations]
->   if (elf_getshdrnum(elf, &nr_sections)) {
-> 
-> Turns out that with that new Make, the backslash was not removed, so cpp
-> didn't see a #include directive, grep found nothing, and
-> -DLIBELF_USE_DEPRECATED was wrongly put in CFLAGS.
-> 
-> Now, that new Make behaviour is documented in their NEWS file:
-> 
->   * WARNING: Backward-incompatibility!
->     Number signs (#) appearing inside a macro reference or function invocation
->     no longer introduce comments and should not be escaped with backslashes:
->     thus a call such as:
->       foo := $(shell echo '#')
->     is legal.  Previously the number sign needed to be escaped, for example:
->       foo := $(shell echo '\#')
->     Now this latter will resolve to "\#".  If you want to write makefiles
->     portable to both versions, assign the number sign to a variable:
->       C := \#
->       foo := $(shell echo '$C')
->     This was claimed to be fixed in 3.81, but wasn't, for some reason.
->     To detect this change search for 'nocomment' in the .FEATURES variable.
-> 
-> There are likely other places in the tree that will need fixing, so
-> cc-ing Kbuild, but with this at least a x86-64 defconfig builds.
-
-Hi,
-
-For one of these patches, can we say:
-Fixes https://bugzilla.kernel.org/show_bug.cgi?id=197847
-?
-
-Thanks.
-
-> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-> ---
->  tools/objtool/Makefile         | 2 +-
->  tools/scripts/Makefile.include | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
-> index e6acc281dd37..8ae824dbfca3 100644
-> --- a/tools/objtool/Makefile
-> +++ b/tools/objtool/Makefile
-> @@ -35,7 +35,7 @@ CFLAGS   += -Wall -Werror $(WARNINGS) -fomit-frame-pointer -O2 -g $(INCLUDES)
->  LDFLAGS  += -lelf $(LIBSUBCMD)
->  
->  # Allow old libelf to be used:
-> -elfshdr := $(shell echo '\#include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
-> +elfshdr := $(shell echo '$(pound)include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
->  CFLAGS += $(if $(elfshdr),,-DLIBELF_USE_DEPRECATED)
->  
->  AWK = awk
-> diff --git a/tools/scripts/Makefile.include b/tools/scripts/Makefile.include
-> index dd614463d4d6..495066bafbe3 100644
-> --- a/tools/scripts/Makefile.include
-> +++ b/tools/scripts/Makefile.include
-> @@ -120,3 +120,5 @@ ifneq ($(silent),1)
->  	QUIET_UNINST   = @printf '  UNINST   %s\n' $1;
->    endif
->  endif
-> +
-> +pound := \#
-> 
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Joey Pabalinas <joeypabalinas@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
 
--- 
-~Randy
+--ql37mq4kj2zs3ih3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 26, 2018 at 01:52:26AM +0900, Masahiro Yamada wrote:
+> I want to see Kconfig improvements in a bigger picture.
+>=20
+> The changes below are noise.
+
+That's understandable; I do agree that nothing here is _fundamentally_
+broken at all, so no worries.
+
+--=20
+Cheers,
+Joey Pabalinas
+
+--ql37mq4kj2zs3ih3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEKlZXrihdNOcUPZTNruvLfWhyVBkFAlq4VUgACgkQruvLfWhy
+VBkEAhAAs2RkZ6WUPG5KeT590WPKJmv6h2O22PWREAR5uC1hBrdBmZgfvnHgwGy3
+n5oyN/6O/B4YTFxlmZMOou4ZnaH5IFpsyLCHWc70mzH+vZMWoRBzR5KWRSA977AG
+GApigHNbm0RpxgZnc70fBGOqG0m6IGmaDZnlrwG/m+0C2KQH0V2Rb7PQFI/vNtSq
+RkNWfWZfTv/1H7ALnOvSTcAzlBOSeRC/CjmY5LVA1f5JxMFL0k/oMpvfaDhPvPbv
+IVTVjcb9pNTOB/aP2sm7ou2om7jUTrGbZzhqv9pYqNEhpU451MbQ4I7gItY1Z/4k
+xMFXNbjeZg5sqwsqZpMbhCGmmD77i9c4tDCJYnFPRL78abu2TNp2MWOG+DrUfP89
+jwdxmGIFBWmsCIi76tih2qgFtV8xtS+FU5+vod8bjM5bPthis4ObZe/QrSD9PHis
+lHGu+mlVPSLmOGFPoKCE8R4EBsepnoYqzApuhujWkyMNStzqjN5T/DNWsqqp4EUx
+8IG8PgsJxa56sL5CfaHNnIRJsmq7N9UBv/aq08lm7lKEyaV3OFo2kxpUxIAMeR0T
+Gs7HwMCz3Sy0lKmBqPUIg6YMhUdOiQK2Rn1f55YXhEIzNoVM3jIlUkxdvmNq0HmF
+BlYwQ0QspMONq6/TuF2ucyNOQrnkEjW486uy68X+5M6gi9CoCmA=
+=1y3U
+-----END PGP SIGNATURE-----
+
+--ql37mq4kj2zs3ih3--
