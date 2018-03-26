@@ -1,148 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:54331 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751024AbeCZLsr (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:28130 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751024AbeCZPXk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 26 Mar 2018 07:48:47 -0400
+        Mon, 26 Mar 2018 11:23:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180325230918.23161-1-linux@rasmusvillemoes.dk>
-References: <20180325223239.14778-1-linux@rasmusvillemoes.dk> <20180325230918.23161-1-linux@rasmusvillemoes.dk>
+In-Reply-To: <20180323175936.GA18412@ziepe.ca>
+References: <20180323175936.GA18412@ziepe.ca>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 26 Mar 2018 20:48:00 +0900
-Message-ID: <CAK7LNASRP4nmKcTsF0QRvCOrX40MMO=FafOs+xG+UNA-b_61Dw@mail.gmail.com>
-Subject: Re: [PATCH 2/1] Kbuild: fix # escaping in .cmd files for future Make
+Date: Tue, 27 Mar 2018 00:22:44 +0900
+Message-ID: <CAK7LNAR--43op1wQsHaBP6egbusQoEB0AcH15sjbRxAbJR=rwQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: rpm-pkg: Support GNU tar >= 1.29
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Douglas Anderson <dianders@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Matthias Kaehlcke <mka@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Jason Gunthorpe <jgg@mellanox.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Daniel Pressler <danielpr@mellanox.com>
 
-2018-03-26 8:09 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
-> The latest official Make release is 4.2.1 from mid-2016, but the current
-> git release has this relevant note in the NEWS file:
+2018-03-24 2:59 GMT+09:00 Jason Gunthorpe <jgg@mellanox.com>:
+> There is a change in how command line parsing is done in this version.
+> Excludes and includes are now ordered with the file list. Since
+> the spec file puts the file list before the exclude list it means newer
+> tar ignores the excludes and packs all the build output into the
+> kernel-devel RPM resulting in a huge package.
 >
->   * WARNING: Backward-incompatibility!
->     Number signs (#) appearing inside a macro reference or function invocation
->     no longer introduce comments and should not be escaped with backslashes:
->     thus a call such as:
->       foo := $(shell echo '#')
->     is legal.  Previously the number sign needed to be escaped, for example:
->       foo := $(shell echo '\#')
->     Now this latter will resolve to "\#".  If you want to write makefiles
->     portable to both versions, assign the number sign to a variable:
->       C := \#
->       foo := $(shell echo '$C')
->     This was claimed to be fixed in 3.81, but wasn't, for some reason.
->     To detect this change search for 'nocomment' in the .FEATURES variable.
+> Simple argument re-ordering fixes the problem.
 >
-> Prepare for whatever future Make release contains that change by fixing
-> up the .cmd file escaping - without this, make always thinks the command
-> string has changed and hence rebuilds everything.
->
-> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+> Signed-off-by: Jason Gunthorpe <jgg@mellanox.com>
 > ---
-> So the previous patch made everything build, but building again
-> revealed that this central place very much also needed fixing.
->
->  scripts/Kbuild.include | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index 065324a8046f..7a926e4688f4 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -10,6 +10,7 @@ space   := $(empty) $(empty)
->  space_escape := _-_SPACE_-_
->  right_paren := )
->  left_paren := (
-> +pound := \#
->
->  ###
->  # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
-> @@ -328,7 +329,7 @@ endif
->  # (needed for make)
->  # Replace >'< with >'\''< to be able to enclose the whole string in '...'
->  # (needed for the shell)
-> -make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
-> +make-cmd = $(call escsq,$(subst $(pound),\\$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
->
 
-Thanks for the patch, but this changes the behavior.
-With '#' replaced with $(pound), '\\' does not escape anything,
-so it is treated as '\\'.
+Applied to linux-kbuild/fixes. Thanks!
 
 
-The following keeps the current behavior:
-
-make-cmd = $(call escsq,$(subst $(pound),\$(pound),$(subst
-$$,$$$$,$(cmd_$(1)))))
-
-
-
-But, I think the following is an even better fix:
-
-make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst
-$$,$$$$,$(cmd_$(1)))))
-
-
-
-The following 4 test cases produce the same foo.txt,
-but insane .cmd file is produced for some case.
-Adjusting the number of back-slashes is not a perfect solution.
-
-Replacing # with $(pound) works for all the cases.
-
-
-[test code 1]
-extra-y := foo.txt
-
-quiet_cmd_foo = DEFINE   $@
-      cmd_foo = echo '\#define FOO' >$@
-
-$(obj)/foo.txt: FORCE
-        $(call if_changed,foo)
-
-
-[test code 2]
-extra-y := foo.txt
-
-quiet_cmd_foo = DEFINE   $@
-      cmd_foo = echo \\\#define FOO >$@
-
-$(obj)/foo.txt: FORCE
-        $(call if_changed,foo)
-
-
-[test code3]
-extra-y := foo.txt
-
-quiet_cmd_foo = DEFINE   $@
-      cmd_foo = echo '$(pound)define FOO' >$@
-
-$(obj)/foo.txt: FORCE
-        $(call if_changed,foo)
-
-
-
-[test code4]
-extra-y := foo.txt
-
-quiet_cmd_foo = DEFINE   $@
-      cmd_foo = echo \$(pound)define FOO >$@
-
-$(obj)/foo.txt: FORCE
-        $(call if_changed,foo)
-
-
-
-
-
-           | current | \$(pound) | \\$(pound) | $$(pound)
-----------------------------------------------------------
-test code1 |    OK   |    OK     |     NG     |   OK
-test code2 |    NG   |    NG     |     OK     |   OK
-test code3 |    OK   |    OK     |     NG     |   OK
-test code4 |    NG   |    NG     |     OK     |   OK
 
 
 
