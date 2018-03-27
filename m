@@ -1,84 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:33312 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752526AbeC0PY2 (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:38548 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753138AbeC0QwQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Mar 2018 11:24:28 -0400
-Received: from mail-vk0-f47.google.com (mail-vk0-f47.google.com [209.85.213.47]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id w2RFOHES030212
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 00:24:17 +0900
-Received: by mail-vk0-f47.google.com with SMTP id y127so13459332vky.9
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Mar 2018 08:24:17 -0700 (PDT)
+        Tue, 27 Mar 2018 12:52:16 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAAqcGHmeYqe81zG=PvoCtzhKhAU=27LT_K8OVhTykyBZGdML4A@mail.gmail.com>
-References: <20180221101032.27263-1-riku.voipio@linaro.org>
- <CAK7LNAQ+evMKMMcqQ8KX2aFGthsx=20o2X4EiQ7qu9y50ZvZjw@mail.gmail.com>
- <CAAqcGHkvKssjFmG0ebz5uBeO_PGeov5_C6MutW65ONp5riFwRg@mail.gmail.com> <CAAqcGHmeYqe81zG=PvoCtzhKhAU=27LT_K8OVhTykyBZGdML4A@mail.gmail.com>
+In-Reply-To: <87a8da66-c610-9b61-d0f8-b5bc7faf2dd7@siemens.com>
+References: <c6e11bd4-3d22-f8aa-c905-d06b16b1f5e2@siemens.com>
+ <CAAqcGH=fFv=Fh43mbi19_A-c551adVV5OSJ-53HF09ev2u-E1g@mail.gmail.com> <87a8da66-c610-9b61-d0f8-b5bc7faf2dd7@siemens.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 28 Mar 2018 00:23:36 +0900
-Message-ID: <CAK7LNASuGcv0rhX+NZ4q7D_hkq7=HqeZ2j5hOiW=F1VXeenwYA@mail.gmail.com>
-Subject: Re: [PATCH v4] scripts/package/builddeb: split generating packaging
- and build
+Date: Wed, 28 Mar 2018 01:51:25 +0900
+Message-ID: <CAK7LNATxW=5URYDu1Uj7BxwrE83HA0kb5GiqeEd3QMJ2RWQtnw@mail.gmail.com>
+Subject: Re: [PATCH] builddeb: Fix header package regarding dtc source links
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Riku,
-
-2018-03-27 22:28 GMT+09:00 Riku Voipio <riku.voipio@linaro.org>:
-
->> If I use GNU Make 4.2
+2018-03-22 16:49 GMT+09:00 Jan Kiszka <jan.kiszka@siemens.com>:
+> On 2018-03-22 15:45, Riku Voipio wrote:
+>> On 21 March 2018 at 07:15, Jan Kiszka <jan.kiszka@siemens.com> wrote:
+>>> Since d5d332d3f7e8, a couple of links in scripts/dtc/include-prefixes
+>>> are additionally required in order to build device trees with the header
+>>> package.
 >>
->> $ cat deb_pkg_log.txt
->> MAKEFLAGS for deb-pkg: rR -I/home/masahiro/ref/linux -j8
->> --jobserver-auth=3,4 --no-print-directory -- obj=scripts/package
->> MAKEFLAGS for mkdebian internal: rR -I/home/masahiro/ref/linux -j
->> --jobserver-fds=5,6 --no-print-directory -- obj=scripts/package
+>> A bit odd usecase IMHO, but:
 >
-> I'll make a wild guess, and "outside" make is your 4.2 build while the
-> intdeb-pkg ends up calling the make 4.0 that comes with your ubuntu?
-> observe the --jobserver-auth vs ---jobsserver-fds arguments.
+> The use case is not completely odd (I hope): Jailhouse hypervisor. We
+> build it as out-of-tree module so far, and we both need dtc for the
+> driver module as well as the guest device trees.
 >
 
-Ah, you are right!
+
+I do not think this use case is odd.
+
+Some drivers embed DTB for overlay, for example,
+https://patchwork.kernel.org/patch/10159055/
+
+So, building external modules may require
+ability to build DT as well.
 
 
-Probably this
-
->
-> -if [ "x$1" = "xdeb-pkg" ]
-> -then
-> -    cat <<EOF > debian/rules
-> -#!/usr/bin/make -f
-> -
-> -build:
-> -       \$(MAKE)
-
-
-
-I installed Make 4.2 into /home/masahiro/bin/,
-but /usr/bin/make is still distro-bundled older Make.
-
-/home/masahiro/bin is listed before /usr/bin in my PATH environment,
-
-So, if I type "make" from the command line, /home/masahiro/bin/make is chosen.
-Then, the outer Makefile is executed by Make 4.2.
-
-But, due to the shebang '#!/usr/bin/make -f'
-debian/rules is executed by older Make.
-
-
-Due to the incompatibility of MAKEFLAGS, Make went insane.
-
-Hmm, do you have an idea for solution?
-
-I would be possible to forcibly overwrite MAKEFLAGS, but
-IMHO, it is kind of strange to run dpkg-buildpackage
-from Makefile.
-
-
+Applied to linux-kbuild/fixes.  Thanks!
 
 
 -- 
