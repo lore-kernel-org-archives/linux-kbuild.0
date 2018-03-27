@@ -1,186 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:29808 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755395AbeC0QkR (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Mar 2018 12:40:17 -0400
-MIME-Version: 1.0
-In-Reply-To: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60560 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750939AbeC0R2F (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 27 Mar 2018 13:28:05 -0400
+Date: Tue, 27 Mar 2018 18:28:15 +0100
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v2 21/21] arm64: move GCC version check for
+ ARCH_SUPPORTS_INT128 to Kconfig
+Message-ID: <20180327172815.GH18435@arm.com>
 References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 28 Mar 2018 01:39:13 +0900
-Message-ID: <CAK7LNAR89KNWVbUBZiOP1Yv7V-0rGO3L3xKvza9hnHjn0DFJcw@mail.gmail.com>
-Subject: Re: [PATCH v2 00/21] kconfig: move compiler capability tests to Kconfig
-Content-Type: text/plain; charset="UTF-8"
+ <1522128575-5326-22-git-send-email-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1522128575-5326-22-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Emese Revfy <re.emese@gmail.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-2018-03-27 14:29 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->
-> Here is v2 to start to move compiler capability tests to Kconfig.
->
-> V1:
-> https://lkml.org/lkml/2018/2/16/610
->
-> I brushed up the implementation even more.
->
-> Major changes for v2:
-> [1] Environments and functions are expanded in the lexer (zconf.l)
->     The parser (zconf.y) receives expanded tokens.  This simplifies
->     the implementation.
->
-> [2] Implement only one built-in function 'shell'.  This returns
->     stdout from the command.  We need something to return 'y' or 'n'.
->     This is now implemented as a macro 'success'.
->
-> [3] Macros (user-defined function) are defined by 'macro' keyword
->     instead of string type symbol.
->
->     ex1) macro success $(shell ($(1) && echo y) || echo n)
->     ex2) macro cc-option $(success $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
->
-> My plan for v3
-> --------------
->
-> The MW is approaching, but I'd like to make it more lovely if
-> I have some time.
->
-> While I was writing these patches, I noticed a kind of similarity
-> between Makefile and Kconfig.
->
-> Makefile can define variables and functions to do text processing
-> during the parse phase.  After parsing, it builds up dependency
-> graph, and moves on to the execution phase.  Then, it generates
-> objects as needed by checking time-stamps.
->
-> [Makefile]
->
->   OBJ := foo.o
->   SRC := foo.c
->   CC := gcc
->
->   $(OBJ): $(SRC)
->             $(CC) -c -o $(OBJ) $(SRC)
->
-> [Makefile after text processing]
->
->   foo.o: foo.c
->           gcc -c -o foo.o foo.c
->
-> Now, we are adding tools for text processing to Kconfig.  Functions
-> are statically expanded by the lexer.  After all source files are
-> parsed, Kconfig moves on to the evaluation phase.  Then, users can
-> tweak symbol values from menus.
->
-> So, we should be able to describe Kconfig like follows:
->
-> [Kconfig]
->
->    MY_SYMBOL := CC_STACKPROTECTOR
->    MY_PROMPT := "Stackprotector"
->    success = $(shell ($(1) && echo y) || echo n)
->    cc-option = $(success $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
->
->    config $(MY_SYMBOL)
->            bool $(MY_PROMPT)
->            depends on $(cc-option -fstack-protector)
->
-> [Kconfig after text processing]
->
->    config CC_STACKPROTECTOR
->            bool "Stackptector"
->            depends on y
->
-> So, I think it is better to use '=' assignment for defining functions.
-> I will remove the 'macro' keyword.
-> Also, support variables.  A variable is a function with no argument.
-> So, it will be easy to implement it as a sub-set of function feature.
-> It is better to support two flavors of assignments, '=' and ':=' as well.
->
-> Masahiro Yamada (21):
->   kbuild: remove kbuild cache
->   kbuild: remove CONFIG_CROSS_COMPILE support
->   kconfig: move and rename sym_expand_string_value()
->   kconfig: reference environments directly and remove 'option env='
->     syntax
->   kconfig: remove string expansion in file_lookup()
->   kconfig: remove string expansion for mainmenu after yyparse()
->   kconfig: add function support and implement 'shell' function
->   kconfig: replace $UNAME_RELEASE with function call
->   kconfig: add 'macro' keyword to support user-defined function
->   kconfig: add 'success' and 'cc-option' macros
->   stack-protector: test compiler capability in Kconfig and drop AUTO
->     mode
->   kconfig: show compiler version text in the top comment
->   kconfig: add CC_IS_GCC and GCC_VERSION
->   kconfig: add CC_IS_CLANG and CLANG_VERSION
->   gcov: remove CONFIG_GCOV_FORMAT_AUTODETECT
->   kcov: imply GCC_PLUGINS and GCC_PLUGIN_SANCOV instead of select'ing
->     them
->   gcc-plugins: always build plugins with C++
->   gcc-plugins: move GCC version check for PowerPC to Kconfig
->   gcc-plugins: test GCC plugin support in Kconfig
->   gcc-plugins: enable GCC_PLUGINS for COMPILE_TEST
->   arm64: move GCC version check for ARCH_SUPPORTS_INT128 to Kconfig
->
->  Documentation/kbuild/kconfig-language.txt |   8 --
->  Kconfig                                   |   4 +-
->  Makefile                                  | 103 ++------------
->  arch/Kconfig                              |  37 ++---
->  arch/arm64/Kconfig                        |   1 +
->  arch/arm64/Makefile                       |   2 -
->  arch/powerpc/Kconfig                      |   2 +-
->  arch/sh/Kconfig                           |   4 +-
->  arch/sparc/Kconfig                        |   4 +-
->  arch/tile/Kconfig                         |   2 +-
->  arch/um/Kconfig.common                    |   4 -
->  arch/x86/Kconfig                          |  12 +-
->  arch/x86/um/Kconfig                       |   4 +-
->  init/Kconfig                              |  44 +++---
->  kernel/gcov/Kconfig                       |  17 +--
->  kernel/gcov/Makefile                      |   2 -
->  lib/Kconfig.debug                         |   7 +-
->  scripts/Kbuild.include                    | 101 ++------------
->  scripts/Makefile.gcc-plugins              |  95 ++++---------
->  scripts/clang-version.sh                  |  24 ++--
->  scripts/gcc-plugin.sh                     |  37 +----
->  scripts/gcc-plugins/Makefile              |  15 +-
->  scripts/gcc-x86_32-has-stack-protector.sh |   7 +-
->  scripts/gcc-x86_64-has-stack-protector.sh |   5 -
->  scripts/kconfig/confdata.c                |  31 +---
->  scripts/kconfig/env.c                     |  95 +++++++++++++
->  scripts/kconfig/function.c                | 225 ++++++++++++++++++++++++++++++
->  scripts/kconfig/kconf_id.c                |   1 -
->  scripts/kconfig/lkc.h                     |   9 +-
->  scripts/kconfig/lkc_proto.h               |   7 +-
->  scripts/kconfig/menu.c                    |   3 -
->  scripts/kconfig/symbol.c                  | 109 ---------------
->  scripts/kconfig/util.c                    |  96 ++++++++++---
->  scripts/kconfig/zconf.l                   |  51 ++++++-
->  scripts/kconfig/zconf.y                   |  35 ++---
->  35 files changed, 608 insertions(+), 595 deletions(-)
->  create mode 100644 scripts/kconfig/env.c
->  create mode 100644 scripts/kconfig/function.c
->
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+On Tue, Mar 27, 2018 at 02:29:35PM +0900, Masahiro Yamada wrote:
+> This becomes much neater in Kconfig.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
+> Changes in v2:
+>   - Newly added
+> 
+>  arch/arm64/Kconfig  | 1 +
+>  arch/arm64/Makefile | 2 --
+>  2 files changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 7381eeb..0c97f40 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -43,6 +43,7 @@ config ARM64
+>  	select ARCH_USE_QUEUED_RWLOCKS
+>  	select ARCH_SUPPORTS_MEMORY_FAILURE
+>  	select ARCH_SUPPORTS_ATOMIC_RMW
+> +	select ARCH_SUPPORTS_INT128 if GCC_VERSION >= 50000
+>  	select ARCH_SUPPORTS_NUMA_BALANCING
+>  	select ARCH_WANT_COMPAT_IPC_PARSE_VERSION
+>  	select ARCH_WANT_FRAME_POINTERS
+> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+> index b481b4a..7318165 100644
+> --- a/arch/arm64/Makefile
+> +++ b/arch/arm64/Makefile
+> @@ -57,8 +57,6 @@ KBUILD_AFLAGS	+= $(lseinstr) $(brokengasinst)
+>  KBUILD_CFLAGS	+= $(call cc-option,-mabi=lp64)
+>  KBUILD_AFLAGS	+= $(call cc-option,-mabi=lp64)
+>  
+> -KBUILD_CFLAGS	+= $(call cc-ifversion, -ge, 0500, -DCONFIG_ARCH_SUPPORTS_INT128)
+> -
 
+If this does what it claims to do, then I agree that it's much cleaner!
 
+Acked-by: Will Deacon <will.deacon@arm.com>
 
-For convenience, the whole of this series is available at
-the following branch.
-
-git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
- kconfig-shell-v2
-
-
--- 
-Best Regards
-Masahiro Yamada
+Will
