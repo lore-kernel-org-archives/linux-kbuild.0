@@ -1,365 +1,164 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:44601 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:45398 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751765AbeC0FcA (ORCPT
+        with ESMTP id S1752227AbeC0FcZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Mar 2018 01:32:00 -0400
+        Tue, 27 Mar 2018 01:32:25 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 07/21] kconfig: add function support and implement 'shell' function
-Date: Tue, 27 Mar 2018 14:29:21 +0900
-Message-Id: <1522128575-5326-8-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 00/21] kconfig: move compiler capability tests to Kconfig
+Date: Tue, 27 Mar 2018 14:29:14 +0900
+Message-Id: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
-
-This commit adds a new concept 'function' to do more text processing
-in Kconfig.
-
-A function call looks like this:
-
-  $(function arg1, arg2, arg3, ...)
-
-(Actually, this syntax was inspired by make.)
-
-Real examples will look like this:
-
-  $(shell echo hello world)
-  $(cc-option -fstackprotector)
-
-This commit adds the basic infrastructure to add, delete, evaluate
-functions, and also the first built-in function $(shell ...).  This
-accepts a single command to execute.  It returns the standard output
-from it.
-
-[Example code]
-
-  config HELLO
-          string
-          default "$(shell echo hello world)"
-
-  config Y
-          def_bool $(shell echo y)
-
-[Result]
-
-  $ make -s alldefconfig && tail -n 2 .config
-  CONFIG_HELLO="hello world"
-  CONFIG_Y=y
-
-Caveat:
-Like environments, functions are expanded in the lexer.  You cannot
-pass symbols to function arguments.  This is a limitation to simplify
-the implementation.  I want to avoid the dynamic function evaluation,
-which would introduce much more complexity.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
-Reminder for myself:
-Update Documentation/kbuild/kconfig-language.txt
+Cc: Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, kernel-hardening@lists.openwall.com, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Emese Revfy <re.emese@gmail.com>, linux-arm-kernel@lists.infradead.org
 
 
-Changes in v2:
-  - Use 'shell' for getting stdout from the comment.
-    It was 'shell-stdout' in the previous version.
-  - Symplify the implementation since the expansion has been moved to
-    lexer.
+Here is v2 to start to move compiler capability tests to Kconfig.
 
- scripts/kconfig/function.c  | 170 ++++++++++++++++++++++++++++++++++++++++++++
- scripts/kconfig/lkc_proto.h |   5 ++
- scripts/kconfig/util.c      |  46 +++++++++---
- scripts/kconfig/zconf.y     |   9 +++
- 4 files changed, 222 insertions(+), 8 deletions(-)
+V1:
+https://lkml.org/lkml/2018/2/16/610
+
+I brushed up the implementation even more.
+
+Major changes for v2:
+[1] Environments and functions are expanded in the lexer (zconf.l)
+    The parser (zconf.y) receives expanded tokens.  This simplifies
+    the implementation.
+
+[2] Implement only one built-in function 'shell'.  This returns
+    stdout from the command.  We need something to return 'y' or 'n'.
+    This is now implemented as a macro 'success'.
+
+[3] Macros (user-defined function) are defined by 'macro' keyword
+    instead of string type symbol.
+
+    ex1) macro success $(shell ($(1) && echo y) || echo n)
+    ex2) macro cc-option $(success $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
+
+My plan for v3
+--------------
+
+The MW is approaching, but I'd like to make it more lovely if
+I have some time.
+
+While I was writing these patches, I noticed a kind of similarity
+between Makefile and Kconfig.
+
+Makefile can define variables and functions to do text processing
+during the parse phase.  After parsing, it builds up dependency
+graph, and moves on to the execution phase.  Then, it generates
+objects as needed by checking time-stamps.
+
+[Makefile]
+
+  OBJ := foo.o
+  SRC := foo.c
+  CC := gcc
+
+  $(OBJ): $(SRC)
+            $(CC) -c -o $(OBJ) $(SRC)
+
+[Makefile after text processing]
+
+  foo.o: foo.c
+          gcc -c -o foo.o foo.c
+
+Now, we are adding tools for text processing to Kconfig.  Functions
+are statically expanded by the lexer.  After all source files are
+parsed, Kconfig moves on to the evaluation phase.  Then, users can
+tweak symbol values from menus.
+
+So, we should be able to describe Kconfig like follows:
+
+[Kconfig]
+
+   MY_SYMBOL := CC_STACKPROTECTOR
+   MY_PROMPT := "Stackprotector"
+   success = $(shell ($(1) && echo y) || echo n)
+   cc-option = $(success $CC -Werror $(1) -c -x c /dev/null -o /dev/null)
+
+   config $(MY_SYMBOL)
+           bool $(MY_PROMPT)
+           depends on $(cc-option -fstack-protector)
+
+[Kconfig after text processing]
+
+   config CC_STACKPROTECTOR
+           bool "Stackptector"
+           depends on y
+
+So, I think it is better to use '=' assignment for defining functions.
+I will remove the 'macro' keyword.
+Also, support variables.  A variable is a function with no argument.
+So, it will be easy to implement it as a sub-set of function feature.
+It is better to support two flavors of assignments, '=' and ':=' as well.
+
+Masahiro Yamada (21):
+  kbuild: remove kbuild cache
+  kbuild: remove CONFIG_CROSS_COMPILE support
+  kconfig: move and rename sym_expand_string_value()
+  kconfig: reference environments directly and remove 'option env='
+    syntax
+  kconfig: remove string expansion in file_lookup()
+  kconfig: remove string expansion for mainmenu after yyparse()
+  kconfig: add function support and implement 'shell' function
+  kconfig: replace $UNAME_RELEASE with function call
+  kconfig: add 'macro' keyword to support user-defined function
+  kconfig: add 'success' and 'cc-option' macros
+  stack-protector: test compiler capability in Kconfig and drop AUTO
+    mode
+  kconfig: show compiler version text in the top comment
+  kconfig: add CC_IS_GCC and GCC_VERSION
+  kconfig: add CC_IS_CLANG and CLANG_VERSION
+  gcov: remove CONFIG_GCOV_FORMAT_AUTODETECT
+  kcov: imply GCC_PLUGINS and GCC_PLUGIN_SANCOV instead of select'ing
+    them
+  gcc-plugins: always build plugins with C++
+  gcc-plugins: move GCC version check for PowerPC to Kconfig
+  gcc-plugins: test GCC plugin support in Kconfig
+  gcc-plugins: enable GCC_PLUGINS for COMPILE_TEST
+  arm64: move GCC version check for ARCH_SUPPORTS_INT128 to Kconfig
+
+ Documentation/kbuild/kconfig-language.txt |   8 --
+ Kconfig                                   |   4 +-
+ Makefile                                  | 103 ++------------
+ arch/Kconfig                              |  37 ++---
+ arch/arm64/Kconfig                        |   1 +
+ arch/arm64/Makefile                       |   2 -
+ arch/powerpc/Kconfig                      |   2 +-
+ arch/sh/Kconfig                           |   4 +-
+ arch/sparc/Kconfig                        |   4 +-
+ arch/tile/Kconfig                         |   2 +-
+ arch/um/Kconfig.common                    |   4 -
+ arch/x86/Kconfig                          |  12 +-
+ arch/x86/um/Kconfig                       |   4 +-
+ init/Kconfig                              |  44 +++---
+ kernel/gcov/Kconfig                       |  17 +--
+ kernel/gcov/Makefile                      |   2 -
+ lib/Kconfig.debug                         |   7 +-
+ scripts/Kbuild.include                    | 101 ++------------
+ scripts/Makefile.gcc-plugins              |  95 ++++---------
+ scripts/clang-version.sh                  |  24 ++--
+ scripts/gcc-plugin.sh                     |  37 +----
+ scripts/gcc-plugins/Makefile              |  15 +-
+ scripts/gcc-x86_32-has-stack-protector.sh |   7 +-
+ scripts/gcc-x86_64-has-stack-protector.sh |   5 -
+ scripts/kconfig/confdata.c                |  31 +---
+ scripts/kconfig/env.c                     |  95 +++++++++++++
+ scripts/kconfig/function.c                | 225 ++++++++++++++++++++++++++++++
+ scripts/kconfig/kconf_id.c                |   1 -
+ scripts/kconfig/lkc.h                     |   9 +-
+ scripts/kconfig/lkc_proto.h               |   7 +-
+ scripts/kconfig/menu.c                    |   3 -
+ scripts/kconfig/symbol.c                  | 109 ---------------
+ scripts/kconfig/util.c                    |  96 ++++++++++---
+ scripts/kconfig/zconf.l                   |  51 ++++++-
+ scripts/kconfig/zconf.y                   |  35 ++---
+ 35 files changed, 608 insertions(+), 595 deletions(-)
+ create mode 100644 scripts/kconfig/env.c
  create mode 100644 scripts/kconfig/function.c
 
-diff --git a/scripts/kconfig/function.c b/scripts/kconfig/function.c
-new file mode 100644
-index 0000000..913685f
---- /dev/null
-+++ b/scripts/kconfig/function.c
-@@ -0,0 +1,170 @@
-+// SPDX-License-Identifier: GPL-2.0
-+//
-+// Copyright (C) 2018 Masahiro Yamada <yamada.masahiro@socionext.com>
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include "list.h"
-+
-+#define FUNCTION_MAX_ARGS		10
-+
-+static LIST_HEAD(function_list);
-+
-+struct function {
-+	char *name;
-+	char *(*func)(struct function *f, int argc, char *argv[]);
-+	struct list_head node;
-+};
-+
-+static struct function *func_lookup(const char *name)
-+{
-+	struct function *f;
-+
-+	list_for_each_entry(f, &function_list, node) {
-+		if (!strcmp(name, f->name))
-+			return f;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void func_add(const char *name,
-+		     char *(*func)(struct function *f, int argc, char *argv[]))
-+{
-+	struct function *f;
-+
-+	f = func_lookup(name);
-+	if (f) {
-+		fprintf(stderr, "%s: function already exists. ignored.\n", name);
-+		return;
-+	}
-+
-+	f = xmalloc(sizeof(*f));
-+	f->name = xstrdup(name);
-+	f->func = func;
-+
-+	list_add_tail(&f->node, &function_list);
-+}
-+
-+static void func_del(struct function *f)
-+{
-+	list_del(&f->node);
-+	free(f->name);
-+	free(f);
-+}
-+
-+static char *func_call(int argc, char *argv[])
-+{
-+	struct function *f;
-+
-+	f = func_lookup(argv[0]);
-+	if (!f) {
-+		fprintf(stderr, "%s: function not found\n", argv[0]);
-+		return NULL;
-+	}
-+
-+	return f->func(f, argc, argv);
-+}
-+
-+static char *func_eval(const char *func)
-+{
-+	char *expanded, *saveptr, *str, *token, *res;
-+	const char *delim;
-+	int argc = 0;
-+	char *argv[FUNCTION_MAX_ARGS];
-+
-+	expanded = expand_string_value(func);
-+
-+	str = expanded;
-+	delim = " ";
-+
-+	while ((token = strtok_r(str, delim, &saveptr))) {
-+		argv[argc++] = token;
-+		str = NULL;
-+		delim = ",";
-+	}
-+
-+	res = func_call(argc, argv);
-+
-+	free(expanded);
-+
-+	return res ?: xstrdup("");
-+}
-+
-+char *func_eval_n(const char *func, size_t n)
-+{
-+	char *tmp, *res;
-+
-+	tmp = xmalloc(n + 1);
-+	memcpy(tmp, func, n);
-+	*(tmp + n) = '\0';
-+
-+	res = func_eval(tmp);
-+
-+	free(tmp);
-+
-+	return res;
-+}
-+
-+/* built-in functions */
-+static char *do_shell(struct function *f, int argc, char *argv[])
-+{
-+	static const char *pre = "(";
-+	static const char *post = ") 2>/dev/null";
-+	FILE *p;
-+	char buf[256];
-+	char *cmd;
-+	int ret;
-+
-+	if (argc != 2)
-+		return NULL;
-+
-+	/*
-+	 * Surround the command with ( ) in case it is piped commands.
-+	 * Also, redirect stderr to /dev/null.
-+	 */
-+	cmd = xmalloc(strlen(pre) + strlen(argv[1]) + strlen(post) + 1);
-+	strcpy(cmd, pre);
-+	strcat(cmd, argv[1]);
-+	strcat(cmd, post);
-+
-+	p = popen(cmd, "r");
-+	if (!p) {
-+		perror(cmd);
-+		goto free;
-+	}
-+	if (fgets(buf, sizeof(buf), p)) {
-+		size_t len = strlen(buf);
-+
-+		if (buf[len - 1] == '\n')
-+			buf[len - 1] = '\0';
-+	} else {
-+		buf[0] = '\0';
-+	}
-+
-+	ret = pclose(p);
-+	if (ret == -1)
-+		perror(cmd);
-+
-+free:
-+	free(cmd);
-+
-+	return xstrdup(buf);
-+}
-+
-+void func_init(void)
-+{
-+	/* register built-in functions */
-+	func_add("shell", do_shell);
-+}
-+
-+void func_exit(void)
-+{
-+	struct function *f, *tmp;
-+
-+	/* unregister all functions */
-+	list_for_each_entry_safe(f, tmp, &function_list, node)
-+		func_del(f);
-+}
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index 9884adc..09a4f53 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -48,5 +48,10 @@ const char * sym_get_string_value(struct symbol *sym);
- 
- const char * prop_get_type_name(enum prop_type type);
- 
-+/* function.c */
-+char *func_eval_n(const char *func, size_t n);
-+void func_init(void);
-+void func_exit(void);
-+
- /* expr.c */
- void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken);
-diff --git a/scripts/kconfig/util.c b/scripts/kconfig/util.c
-index 3d27c49..218b051 100644
---- a/scripts/kconfig/util.c
-+++ b/scripts/kconfig/util.c
-@@ -13,9 +13,10 @@
- #include "lkc.h"
- 
- /*
-- * Expand environments embedded in the string given in argument. Environments
-- * to be expanded shall be prefixed by a '$'. Unknown environment expands to
-- * the empty string.
-+ * Expand environments and functions embedded in the string given in argument.
-+ * Environments to be expanded shall be prefixed by a '$'. Functions to be
-+ * evaluated shall be surrounded by $(). Unknown environment/function expands
-+ * to the empty string.
-  */
- char *expand_string_value(const char *in)
- {
-@@ -33,11 +34,40 @@ char *expand_string_value(const char *in)
- 	while ((p = strchr(in, '$'))) {
- 		char *new;
- 
--		q = p + 1;
--		while (isalnum(*q) || *q == '_')
--			q++;
--
--		new = env_expand_n(p + 1, q - p - 1);
-+		/*
-+		 * If the next character is '(', it is a function.
-+		 * Otherwise, environment.
-+		 */
-+		if (*(p + 1) == '(') {
-+			int nest = 0;
-+
-+			q = p + 2;
-+			while (1) {
-+				if (*q == '\0') {
-+					fprintf(stderr,
-+						"unterminated function: %s\n",
-+						p);
-+					new = xstrdup("");
-+					break;
-+				} else if (*q == '(') {
-+					nest++;
-+				} else if (*q == ')') {
-+					if (nest-- == 0) {
-+						new = func_eval_n(p + 2,
-+								  q - p - 2);
-+						q++;
-+						break;
-+					}
-+				}
-+				q++;
-+			}
-+		} else {
-+			q = p + 1;
-+			while (isalnum(*q) || *q == '_')
-+				q++;
-+
-+			new = env_expand_n(p + 1, q - p - 1);
-+		}
- 
- 		reslen = strlen(res) + (p - in) + strlen(new) + 1;
- 		res = xrealloc(res, reslen);
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index d8120c7..feaea18 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -520,11 +520,19 @@ void conf_parse(const char *name)
- 
- 	zconf_initscan(name);
- 
-+	func_init();
- 	_menu_init();
- 
- 	if (getenv("ZCONF_DEBUG"))
- 		yydebug = 1;
- 	yyparse();
-+
-+	/*
-+	 * Currently, functions are evaluated only when Kconfig files are
-+	 * parsed. We can free functions here.
-+	 */
-+	func_exit();
-+
- 	if (yynerrs)
- 		exit(1);
- 	if (!modules_sym)
-@@ -765,4 +773,5 @@ void zconfdump(FILE *out)
- #include "confdata.c"
- #include "expr.c"
- #include "symbol.c"
-+#include "function.c"
- #include "menu.c"
 -- 
 2.7.4
 
