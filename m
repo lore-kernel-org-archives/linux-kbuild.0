@@ -1,41 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f193.google.com ([209.85.217.193]:43103 "EHLO
-        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752125AbeC1LZj (ORCPT
+Received: from mail-ua0-f181.google.com ([209.85.217.181]:41116 "EHLO
+        mail-ua0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752850AbeC1L32 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Mar 2018 07:25:39 -0400
-Received: by mail-ua0-f193.google.com with SMTP id u4so1267177uaf.10
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 04:25:38 -0700 (PDT)
+        Wed, 28 Mar 2018 07:29:28 -0400
+Received: by mail-ua0-f181.google.com with SMTP id i2so1283407uak.8
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 04:29:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1522128575-5326-17-git-send-email-yamada.masahiro@socionext.com>
-References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com> <1522128575-5326-17-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1522128575-5326-18-git-send-email-yamada.masahiro@socionext.com>
+References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com> <1522128575-5326-18-git-send-email-yamada.masahiro@socionext.com>
 From: Kees Cook <keescook@chromium.org>
-Date: Wed, 28 Mar 2018 04:25:37 -0700
-Message-ID: <CAGXu5j+YCwPjd9ha2hP26Wjho8q4vVA6kzvOjGUROVJxffGekQ@mail.gmail.com>
-Subject: Re: [PATCH v2 16/21] kcov: imply GCC_PLUGINS and GCC_PLUGIN_SANCOV
- instead of select'ing them
+Date: Wed, 28 Mar 2018 04:29:26 -0700
+Message-ID: <CAGXu5j+mJeG+POhgPkoanX8SVnY0LvTDoBUsyTNGpKh0KYiHMQ@mail.gmail.com>
+Subject: Re: [PATCH v2 17/21] gcc-plugins: always build plugins with C++
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>, Kernel Hardening <kernel-hardening@lists.openwall.com>, Emese Revfy <re.emese@gmail.com>
 
 On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> As Documentation/kbuild/kconfig-language.txt notes, 'select' should be
-> used with care - it forces a lower limit of another symbol, ignoring
-> the dependency.  In this case, KCOV can select GCC_PLUGINS even if
-> 'depends on HAVE_GCC_PLUGINS' is unmet.
+> If the target compiler is GCC 4.8 or newer, plugins are compiled with
+> HOSTCXX.  Otherwise, gcc-plugin.sh will select HOSTCC or HOSTCXX.
 >
-> 'imply' is modest enough to observe the dependency, and this makes
-> sense.  If you enable KCOV, you will probably want to enable
-> GCC_PLUGIN_SANCOV, but it should not break the dependency.
->
-> I also remove unneeded code, I just happened to notice.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> To simplify things, drop the HOSTCC support for plugins.  If you use
+> GCC plugins, the requirement for the target compiler is GCC 4.8 (or
+> older compiler with necessary features backported).  This is a feature
+> for advanced users, so this requirement would not be a big deal.
+> Currently, building plugins requires GCC 4.5, so this is not a big jump.
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Emese already NAKed this, and I'd agree. 4.5 to 4.8 is quite a jump
+(see all the threads on minimum gcc versions). Until we're at 4.8 as a
+minimum, let's leave this as-is. "To simply things" doesn't seem like
+a good enough reason to me.
 
 -Kees
 
