@@ -1,101 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:51490 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750922AbeC1DVk (ORCPT
+Received: from mail-ua0-f193.google.com ([209.85.217.193]:34278 "EHLO
+        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752318AbeC1D0M (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Mar 2018 23:21:40 -0400
+        Tue, 27 Mar 2018 23:26:12 -0400
+Received: by mail-ua0-f193.google.com with SMTP id l21so670400uak.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Mar 2018 20:26:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5jJMEG6WZo8qEjGpFBkU7FkjyFbjf5diZqa8sz+XqCxHuQ@mail.gmail.com>
-References: <1522204848-11803-1-git-send-email-yamada.masahiro@socionext.com> <CAGXu5jJMEG6WZo8qEjGpFBkU7FkjyFbjf5diZqa8sz+XqCxHuQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 28 Mar 2018 12:20:33 +0900
-Message-ID: <CAK7LNAQ69JWJU_RJzr39b4gtF1ss-qm_b_AzLBFf2+m2-bx+Xg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: move <linux/compiler_types.h> out of <linux/kconfig.h>
+In-Reply-To: <1522128575-5326-13-git-send-email-yamada.masahiro@socionext.com>
+References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com> <1522128575-5326-13-git-send-email-yamada.masahiro@socionext.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Tue, 27 Mar 2018 20:26:11 -0700
+Message-ID: <CAGXu5j+runDn9cZ8SCMYQzWr3twBvQPt=sRP+UNJfjxv19a4Yw@mail.gmail.com>
+Subject: Re: [PATCH v2 12/21] kconfig: show compiler version text in the top comment
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, LKML <linux-kernel@vger.kernel.org>, Philippe Ombredanne <pombredanne@nexb.com>, Michal Marek <michal.lkml@markovi.net>, Kate Stewart <kstewart@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>
 
-2018-03-28 12:10 GMT+09:00 Kees Cook <keescook@chromium.org>:
-> On Tue, Mar 27, 2018 at 7:40 PM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> Since commit 28128c61e08e ("kconfig.h: Include compiler types to avoid
->> missed struct attributes"), <linux/kconfig.h> pulls in kernel-space
->> headers to unrelated file.
->>
->> Commit 0f9da844d877 ("MIPS: boot: Define __ASSEMBLY__ for its.S build")
->> suppressed the build error by defining __ASSEMBLY__, but ITS (i.e. DTS)
->> is not assembly, and should not include <linux/compiler_types.h> in the
->> first place.
->>
->> Looking at arch/s390/tools/Makefile, host programs gen_facilities and
->> gen_opcode_table now pull in <linux/compiler_types.h> as well.
->>
->> The motivation for that commit was to define necessary attributes
->> before any struct is defined.  Obviously, this happens only in C.
->>
->> It is enough to include <linux/compiler_types.h> only when compiling
->> C files, and only when compiling kernel space.
->>
->> Move the <linux/compiler_types.h> inclusion to c_flags.
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->>
->> I will also send a correct fix-up for MIPS Makefile later.
+On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> The kernel configuration phase is now tightly coupled with the compiler
+> in use.  It will be nice to show the compiler information in Kconfig.
 >
-> As long as the result is the same: it's impossible to define a
-> structure without defined attributes, I'm fine with it. :)
+> The compiler information will be displayed like this:
 >
-> Question below...
+>   $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- config
+>   scripts/kconfig/conf  --oldaskconfig Kconfig
+>   *
+>   * Linux/arm64 4.16.0-rc1 Kernel Configuration
+>   *
+>   *
+>   * Compiler: aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011
+>   *
+>   *
+>   * General setup
+>   *
+>   Compile also drivers which will not load (COMPILE_TEST) [N/y/?]
 >
->>
->>
->>
->>  include/linux/kconfig.h | 3 ---
->>  scripts/Makefile.lib    | 1 +
->>  2 files changed, 1 insertion(+), 3 deletions(-)
->>
->> diff --git a/include/linux/kconfig.h b/include/linux/kconfig.h
->> index dcde947..cc8fa10 100644
->> --- a/include/linux/kconfig.h
->> +++ b/include/linux/kconfig.h
->> @@ -70,7 +70,4 @@
->>   */
->>  #define IS_ENABLED(option) __or(IS_BUILTIN(option), IS_MODULE(option))
->>
->> -/* Make sure we always have all types and struct attributes defined. */
->> -#include <linux/compiler_types.h>
->> -
->>  #endif /* __LINUX_KCONFIG_H */
->> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
->> index c114ce5..07d0740 100644
->> --- a/scripts/Makefile.lib
->> +++ b/scripts/Makefile.lib
->> @@ -152,6 +152,7 @@ __cpp_flags     = $(call flags,_cpp_flags)
->>  endif
->>
->>  c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
->> +                -include $(srctree)/include/linux/compiler_types.h       \
+> If you use GUI methods such as menuconfig, it will be displayed in the
+> top menu.
 >
-> Why here instead of adding it to LINUXINCLUDE ?
+> This is simply implemented by using 'comment'.  So, it will be saved
+> into the .config file as well.
 >
+> This commit has a very important meaning.  If the compiler is upgraded,
+> Kconfig must be re-run since different compilers have different sets
+> of supported options.
+>
+> All referenced environments are written to include/config/auto.conf.cmd
+> so that any environment change triggers syncconfig, and prompt the user
+> to input new values if needed.
+>
+> With this commit, something like follows will be added to
+> include/config/auto.conf.cmd
+>
+>   ifneq "$(CC_VERSION_TEXT)" "aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011"
+>   include/config/auto.conf: FORCE
+>   endif
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
+I like seeing this in the config. Good idea!
 
-LINUXINCLUDE contains '-include $(srctree)/include/linux/kconfig.h'
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-If you add compier_types.h there, nothing would change.
+-Kees
 
-
-My intention is to include <linux/compiler_types.h> only for C.
-Not assembly, linker scripts, or anything else.
-
-
-
+> ---
+>
+> Changes in v2: None
+>
+>  Kconfig  | 2 ++
+>  Makefile | 2 ++
+>  2 files changed, 4 insertions(+)
+>
+> diff --git a/Kconfig b/Kconfig
+> index e6ece5b..99ed4b8 100644
+> --- a/Kconfig
+> +++ b/Kconfig
+> @@ -5,4 +5,6 @@
+>  #
+>  mainmenu "Linux/$ARCH $KERNELVERSION Kernel Configuration"
+>
+> +comment "Compiler: $CC_VERSION_TEXT"
+> +
+>  source "arch/$SRCARCH/Kconfig"
+> diff --git a/Makefile b/Makefile
+> index 5cadffa..3dc9eb8 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -450,6 +450,8 @@ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
+>  export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
+>  export KBUILD_ARFLAGS
+>
+> +export CC_VERSION_TEXT := $(shell $(CC) --version | head -n 1)
+> +
+>  # When compiling out-of-tree modules, put MODVERDIR in the module
+>  # tree rather than in the kernel tree. The kernel tree might
+>  # even be read-only.
+> --
+> 2.7.4
+>
 
 
 
 -- 
-Best Regards
-Masahiro Yamada
+Kees Cook
+Pixel Security
