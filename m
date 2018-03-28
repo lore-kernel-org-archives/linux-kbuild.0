@@ -1,87 +1,155 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f49.google.com ([209.85.215.49]:39468 "EHLO
-        mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752447AbeC1I66 (ORCPT
+Received: from mail-ua0-f169.google.com ([209.85.217.169]:33273 "EHLO
+        mail-ua0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752106AbeC1LSg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Mar 2018 04:58:58 -0400
-Received: by mail-lf0-f49.google.com with SMTP id p142-v6so2364765lfd.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 01:58:57 -0700 (PDT)
+        Wed, 28 Mar 2018 07:18:36 -0400
+Received: by mail-ua0-f169.google.com with SMTP id f6so1284323ual.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 04:18:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNASuGcv0rhX+NZ4q7D_hkq7=HqeZ2j5hOiW=F1VXeenwYA@mail.gmail.com>
-References: <20180221101032.27263-1-riku.voipio@linaro.org>
- <CAK7LNAQ+evMKMMcqQ8KX2aFGthsx=20o2X4EiQ7qu9y50ZvZjw@mail.gmail.com>
- <CAAqcGHkvKssjFmG0ebz5uBeO_PGeov5_C6MutW65ONp5riFwRg@mail.gmail.com>
- <CAAqcGHmeYqe81zG=PvoCtzhKhAU=27LT_K8OVhTykyBZGdML4A@mail.gmail.com> <CAK7LNASuGcv0rhX+NZ4q7D_hkq7=HqeZ2j5hOiW=F1VXeenwYA@mail.gmail.com>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Wed, 28 Mar 2018 11:58:56 +0300
-Message-ID: <CAAqcGHn6mHHMGmcBFfRdwNSJwPaOfmnidw_T_hRKS66V47aryg@mail.gmail.com>
-Subject: Re: [PATCH v4] scripts/package/builddeb: split generating packaging
- and build
+In-Reply-To: <1522128575-5326-12-git-send-email-yamada.masahiro@socionext.com>
+References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com> <1522128575-5326-12-git-send-email-yamada.masahiro@socionext.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 28 Mar 2018 04:18:32 -0700
+Message-ID: <CAGXu5j+F1GXNE9T3vOo+Sq+GfX2Cy5a8tFU--qVBJwaJkt=s6Q@mail.gmail.com>
+Subject: Re: [PATCH v2 11/21] stack-protector: test compiler capability in
+ Kconfig and drop AUTO mode
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>
 
-On 27 March 2018 at 18:23, Masahiro Yamada
+On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> Riku,
+> Move the test for -fstack-protector(-strong) option to Kconfig.
 >
-> 2018-03-27 22:28 GMT+09:00 Riku Voipio <riku.voipio@linaro.org>:
+> If the compiler does not support the option, the corresponding menu
+> is automatically hidden.  If _STRONG is not supported, it will fall
+> back to _REGULAR.  If _REGULAR is not supported, it will be disabled.
+> This means, _AUTO is implicitly handled by the dependency solver of
+> Kconfig, hence removed.
 >
->>> If I use GNU Make 4.2
->>>
->>> $ cat deb_pkg_log.txt
->>> MAKEFLAGS for deb-pkg: rR -I/home/masahiro/ref/linux -j8
->>> --jobserver-auth=3,4 --no-print-directory -- obj=scripts/package
->>> MAKEFLAGS for mkdebian internal: rR -I/home/masahiro/ref/linux -j
->>> --jobserver-fds=5,6 --no-print-directory -- obj=scripts/package
->>
->> I'll make a wild guess, and "outside" make is your 4.2 build while the
->> intdeb-pkg ends up calling the make 4.0 that comes with your ubuntu?
->> observe the --jobserver-auth vs ---jobsserver-fds arguments.
->>
+> I also turned the 'choice' into only two boolean symbols.  The use of
+> 'choice' is not a good idea here, because all of all{yes,mod,no}config
+> would choose the first visible value, while we want allnoconfig to
+> disable as many features as possible.
 >
-> Ah, you are right!
+> X86 has additional shell scripts in case the compiler supports the
+> option, but generates broken code.  I added CC_HAS_SANE_STACKPROTECTOR
+> to test this.  I had to add -m32 to gcc-x86_32-has-stack-protector.sh
+> to make it work correctly.
 >
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+This looks really good. Notes below...
+
+> ---
 >
-> Probably this
+> Changes in v2:
+>   - Describe $(cc-option ...) directly in depends on context
 >
->>
->> -if [ "x$1" = "xdeb-pkg" ]
->> -then
->> -    cat <<EOF > debian/rules
->> -#!/usr/bin/make -f
-
-This is actually mandated in Debian policy:
-
-https://www.debian.org/doc/debian-policy/#main-building-script-debian-rules
-
-> So, if I type "make" from the command line, /home/masahiro/bin/make is chosen.
-> Then, the outer Makefile is executed by Make 4.2.
+>  Makefile                                  | 93 ++-----------------------------
+>  arch/Kconfig                              | 29 +++-------
+>  arch/x86/Kconfig                          |  8 ++-
+>  scripts/gcc-x86_32-has-stack-protector.sh |  7 +--
+>  scripts/gcc-x86_64-has-stack-protector.sh |  5 --
+>  5 files changed, 22 insertions(+), 120 deletions(-)
 >
-> But, due to the shebang '#!/usr/bin/make -f'
-> debian/rules is executed by older Make.
+> diff --git a/Makefile b/Makefile
+> index 5c395ed..5cadffa 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -675,55 +675,11 @@ ifneq ($(CONFIG_FRAME_WARN),0)
+>  KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
+>  endif
 >
-> Due to the incompatibility of MAKEFLAGS, Make went insane.
->
-> Hmm, do you have an idea for solution?
+> -# This selects the stack protector compiler flag. Testing it is delayed
+> -# until after .config has been reprocessed, in the prepare-compiler-check
+> -# target.
+> -ifdef CONFIG_CC_STACKPROTECTOR_AUTO
+> -  stackp-flag := $(call cc-option,-fstack-protector-strong,$(call cc-option,-fstack-protector))
+> -  stackp-name := AUTO
+> -else
+> -ifdef CONFIG_CC_STACKPROTECTOR_REGULAR
+> -  stackp-flag := -fstack-protector
+> -  stackp-name := REGULAR
+> -else
+> -ifdef CONFIG_CC_STACKPROTECTOR_STRONG
+> -  stackp-flag := -fstack-protector-strong
+> -  stackp-name := STRONG
+> -else
+> -  # If either there is no stack protector for this architecture or
+> -  # CONFIG_CC_STACKPROTECTOR_NONE is selected, we're done, and $(stackp-name)
+> -  # is empty, skipping all remaining stack protector tests.
+> -  #
+> -  # Force off for distro compilers that enable stack protector by default.
+> -  KBUILD_CFLAGS += $(call cc-option, -fno-stack-protector)
+> -endif
+> -endif
+> -endif
+> -# Find arch-specific stack protector compiler sanity-checking script.
+> -ifdef stackp-name
+> -ifneq ($(stackp-flag),)
+> -  stackp-path := $(srctree)/scripts/gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh
+> -  stackp-check := $(wildcard $(stackp-path))
+> -  # If the wildcard test matches a test script, run it to check functionality.
+> -  ifdef stackp-check
+> -    ifneq ($(shell $(CONFIG_SHELL) $(stackp-check) $(CC) $(KBUILD_CPPFLAGS) $(biarch)),y)
+> -      stackp-broken := y
+> -    endif
+> -  endif
+> -  ifndef stackp-broken
+> -    # If the stack protector is functional, enable code that depends on it.
+> -    KBUILD_CPPFLAGS += -DCONFIG_CC_STACKPROTECTOR
+> -    # Either we've already detected the flag (for AUTO) or we'll fail the
+> -    # build in the prepare-compiler-check rule (for specific flag).
+> -    KBUILD_CFLAGS += $(stackp-flag)
+> -  else
+> -    # We have to make sure stack protector is unconditionally disabled if
+> -    # the compiler is broken (in case we're going to continue the build in
+> -    # AUTO mode).
 
-One option:
+Let's keep this comment (slightly rewritten) since the reason for
+setting this flag isn't obvious.
 
-+++ b/scripts/package/mkdebian
-cat <<EOF > debian/rules
--#!/usr/bin/make -f
-#!$(which $MAKE)  -f
+> -    KBUILD_CFLAGS += $(call cc-option, -fno-stack-protector)
+> -  endif
+> -endif
+> -endif
+> +stackp-flags-y                                 := -fno-stack-protector
 
-This will let people build with whatever make they please, with the
-price that the resulting source package will not build elsewhere.
+This is a (minor?) regression in my testing. Making this unconditional
+may break for a compiler built without stack-protector. It should be
+rare, but it's technically possible. Perhaps:
 
-Option 2 is to error out if "which $MAKE" != /usr/bin/make
+stackp-flags-y := ($call cc-option, -fno-stack-protector)
 
-> I would be possible to forcibly overwrite MAKEFLAGS
+> +stackp-flags-$(CONFIG_CC_STACKPROTECTOR)       := -fstack-protector
+> +stackp-flags-$(CONFIG_CC_STACKPROTECTOR_STRONG)        := -fstack-protector-strong
+> +
+> +KBUILD_CFLAGS += $(stackp-flags-y)
+> [...]
+> diff --git a/arch/Kconfig b/arch/Kconfig
+> index 8e0d665..b42378d 100644
+> --- a/arch/Kconfig
+> +++ b/arch/Kconfig
+> @@ -535,13 +535,13 @@ config HAVE_CC_STACKPROTECTOR
+>         bool
+>         help
+>           An arch should select this symbol if:
+> -         - its compiler supports the -fstack-protector option
 
-I think one goal is to keep deb-pkg simple, and fudging MAKEFLAGS
-would go against that goal.
+Please leave this note: it's still valid. An arch must still have
+compiler support for this to be sensible.
 
-Riku
+>           - it has implemented a stack canary (e.g. __stack_chk_guard)
+> [...]
+
+Otherwise, this tests well for me. Nicely done!
+
+-Kees
+
+-- 
+Kees Cook
+Pixel Security
