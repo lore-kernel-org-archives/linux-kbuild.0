@@ -1,18 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f181.google.com ([209.85.217.181]:41116 "EHLO
-        mail-ua0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752850AbeC1L32 (ORCPT
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:42226 "EHLO
+        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751230AbeC1LbB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Mar 2018 07:29:28 -0400
-Received: by mail-ua0-f181.google.com with SMTP id i2so1283407uak.8
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 04:29:27 -0700 (PDT)
+        Wed, 28 Mar 2018 07:31:01 -0400
+Received: by mail-vk0-f67.google.com with SMTP id y127so1160716vky.9
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 04:31:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1522128575-5326-18-git-send-email-yamada.masahiro@socionext.com>
-References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com> <1522128575-5326-18-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1522128575-5326-19-git-send-email-yamada.masahiro@socionext.com>
+References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com> <1522128575-5326-19-git-send-email-yamada.masahiro@socionext.com>
 From: Kees Cook <keescook@chromium.org>
-Date: Wed, 28 Mar 2018 04:29:26 -0700
-Message-ID: <CAGXu5j+mJeG+POhgPkoanX8SVnY0LvTDoBUsyTNGpKh0KYiHMQ@mail.gmail.com>
-Subject: Re: [PATCH v2 17/21] gcc-plugins: always build plugins with C++
+Date: Wed, 28 Mar 2018 04:30:59 -0700
+Message-ID: <CAGXu5jJrd2w5ys6tfwH6zd6dpep65XuV3wCZs=hUi=p5nbjDHw@mail.gmail.com>
+Subject: Re: [PATCH v2 18/21] gcc-plugins: move GCC version check for PowerPC
+ to Kconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -21,19 +22,59 @@ Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
 On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> If the target compiler is GCC 4.8 or newer, plugins are compiled with
-> HOSTCXX.  Otherwise, gcc-plugin.sh will select HOSTCC or HOSTCXX.
+> For PowerPC, GCC 5.2 is the requirement for GCC plugins.  Move the
+> version check to Kconfig so that the GCC plugin menus will be hidden
+> if an older compiler is in use.
 >
-> To simplify things, drop the HOSTCC support for plugins.  If you use
-> GCC plugins, the requirement for the target compiler is GCC 4.8 (or
-> older compiler with necessary features backported).  This is a feature
-> for advanced users, so this requirement would not be a big deal.
-> Currently, building plugins requires GCC 4.5, so this is not a big jump.
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Acked-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+> ---
+>
+> Changes in v2: None
+>
+>  arch/powerpc/Kconfig         | 2 +-
+>  scripts/Makefile.gcc-plugins | 8 --------
+>  2 files changed, 1 insertion(+), 9 deletions(-)
+>
+> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+> index 73ce5dd..b8474c2 100644
+> --- a/arch/powerpc/Kconfig
+> +++ b/arch/powerpc/Kconfig
+> @@ -195,7 +195,7 @@ config PPC
+>         select HAVE_FTRACE_MCOUNT_RECORD
+>         select HAVE_FUNCTION_GRAPH_TRACER
+>         select HAVE_FUNCTION_TRACER
+> -       select HAVE_GCC_PLUGINS
+> +       select HAVE_GCC_PLUGINS                 if GCC_VERSION >= 50200
+>         select HAVE_GENERIC_GUP
+>         select HAVE_HW_BREAKPOINT               if PERF_EVENTS && (PPC_BOOK3S || PPC_8xx)
+>         select HAVE_IDE
+> diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
+> index b0f9108..25da4c0 100644
+> --- a/scripts/Makefile.gcc-plugins
+> +++ b/scripts/Makefile.gcc-plugins
+> @@ -56,14 +56,6 @@ gcc-plugins-check: FORCE
+>  ifdef CONFIG_GCC_PLUGINS
+>    ifeq ($(PLUGINCC),)
+>      ifneq ($(GCC_PLUGINS_CFLAGS),)
+> -      # Various gccs between 4.5 and 5.1 have bugs on powerpc due to missing
+> -      # header files. gcc <= 4.6 doesn't work at all, gccs from 4.8 to 5.1 have
+> -      # issues with 64-bit targets.
+> -      ifeq ($(ARCH),powerpc)
+> -        ifeq ($(call cc-ifversion, -le, 0501, y), y)
+> -         @echo "Cannot use CONFIG_GCC_PLUGINS: plugin support on gcc <= 5.1 is buggy on powerpc, please upgrade to gcc 5.2 or newer" >&2 && exit 1
 
-Emese already NAKed this, and I'd agree. 4.5 to 4.8 is quite a jump
-(see all the threads on minimum gcc versions). Until we're at 4.8 as a
-minimum, let's leave this as-is. "To simply things" doesn't seem like
-a good enough reason to me.
+I think we should retain the "buggy" note as a comment in Kconfig
+since that knowledge isn't obvious just from the GCC_VERSION test.
+
+> -        endif
+> -      endif
+>        $(Q)$(srctree)/scripts/gcc-plugin.sh --show-error $(HOSTCXX) $(CC) || true
+>        @echo "Cannot use CONFIG_GCC_PLUGINS: your gcc installation does not support plugins, perhaps the necessary headers are missing?" >&2 && exit 1
+>      endif
+> --
+> 2.7.4
+>
 
 -Kees
 
