@@ -1,65 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:40130 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753180AbeC1Lw6 (ORCPT
+Received: from mail-vk0-f68.google.com ([209.85.213.68]:46988 "EHLO
+        mail-vk0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753113AbeC1Lxl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Mar 2018 07:52:58 -0400
+        Wed, 28 Mar 2018 07:53:41 -0400
+Received: by mail-vk0-f68.google.com with SMTP id f124so1193580vkg.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 04:53:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5jK48XYSpga0M-49GPrMT3iud7rqEOD7ZpKQR-MXi=zjWw@mail.gmail.com>
-References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
- <1522128575-5326-15-git-send-email-yamada.masahiro@socionext.com> <CAGXu5jK48XYSpga0M-49GPrMT3iud7rqEOD7ZpKQR-MXi=zjWw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 28 Mar 2018 20:52:01 +0900
-Message-ID: <CAK7LNAQAvt7uWyY+FdnKfxzMBXHAgkxmycKm+-NRHYxo1LtLJA@mail.gmail.com>
-Subject: Re: [PATCH v2 14/21] kconfig: add CC_IS_CLANG and CLANG_VERSION
+In-Reply-To: <1522128575-5326-17-git-send-email-yamada.masahiro@socionext.com>
+References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com> <1522128575-5326-17-git-send-email-yamada.masahiro@socionext.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 28 Mar 2018 04:53:39 -0700
+Message-ID: <CAGXu5jKXtGgyP8zh0Gg1k-U=A4KYEuyPsxiXxtFeaNJPn+metg@mail.gmail.com>
+Subject: Re: [PATCH v2 16/21] kcov: imply GCC_PLUGINS and GCC_PLUGIN_SANCOV
+ instead of select'ing them
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>
 
-2018-03-28 20:22 GMT+09:00 Kees Cook <keescook@chromium.org>:
-> On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> This will be useful to describe the clang version dependency.
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> As Documentation/kbuild/kconfig-language.txt notes, 'select' should be
+> used with care - it forces a lower limit of another symbol, ignoring
+> the dependency.  In this case, KCOV can select GCC_PLUGINS even if
+> 'depends on HAVE_GCC_PLUGINS' is unmet.
 >
-> One aspect of clang version checking that may be "weird" (and likely
-> won't be meaningful for very long as we're about to raise the minimum
-> gcc version), is that clang claims to be gcc version 4.2 if you look
-> at #defines. This is already handled in compiler.h, but may be weird
-> in Kconfig.
+> 'imply' is modest enough to observe the dependency, and this makes
+> sense.  If you enable KCOV, you will probably want to enable
+> GCC_PLUGIN_SANCOV, but it should not break the dependency.
+>
+> I also remove unneeded code, I just happened to notice.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>   - Drop depends on GCC_VERSION
+>
+> ---
+>
+> Changes in v2: None
+>
+>  lib/Kconfig.debug | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 5be22e4..8243c9d 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -743,8 +743,8 @@ config KCOV
+>         bool "Code coverage for fuzzing"
+>         depends on ARCH_HAS_KCOV
+>         select DEBUG_FS
+> -       select GCC_PLUGINS if !COMPILE_TEST
+> -       select GCC_PLUGIN_SANCOV if !COMPILE_TEST
+> +       imply GCC_PLUGINS
+> +       imply GCC_PLUGIN_SANCOV
+>         help
+>           KCOV exposes kernel code coverage information in a form suitable
+>           for coverage-guided fuzzing (randomized testing).
+
+Actually, I think this can be improved, as KCOV should depend on either:
+
+-fsanitize-coverage=trace-pc support (in gcc 6+, see scripts/Makefile.kcov)
+
+or
+
+GCC_PLUGIN_SANCOV (which provides the trace-pc support via the plugin
+for gcc before 6)
+
+> @@ -758,7 +758,6 @@ config KCOV
+>  config KCOV_ENABLE_COMPARISONS
+>         bool "Enable comparison operands collection by KCOV"
+>         depends on KCOV
+> -       default n
+>         help
+>           KCOV also exposes operands of every comparison in the instrumented
+>           code along with operand sizes and PCs of the comparison instructions.
+
+Similarly, this depends on -fsanitize-coverage=trace-cmp
+
+> @@ -768,7 +767,7 @@ config KCOV_ENABLE_COMPARISONS
+>  config KCOV_INSTRUMENT_ALL
+>         bool "Instrument all code by default"
+>         depends on KCOV
+> -       default y if KCOV
+> +       default y
+>         help
+>           If you are doing generic system call fuzzing (like e.g. syzkaller),
+>           then you will want to instrument the whole kernel and you should
+> --
+> 2.7.4
 >
 
-
-CONFIG_CLANG_VERSION gives me real clang version.
-
-
-$ clang --version
-clang version 7.0.0 (http://llvm.org/git/clang.git
-f1d1f4c4591e81cfa80034df094b26d7eb4fa92b)
-(http://llvm.org/git/llvm.git
-d157ba2f80790d23d717c4ff3f5bee30d98d6a51)
-Target: x86_64-unknown-linux-gnu
-Thread model: posix
-InstalledDir: /home/masahiro/toolchains/clang-latest/bin
-
-$ make CC=clang defconfig
-*** Default configuration is based on 'x86_64_defconfig'
-#
-# configuration written to .config
-#
-$ grep  CLANG_VERSION .config
-CONFIG_CLANG_VERSION=70000
-
-
-
-I am just porting
-https://patchwork.kernel.org/patch/10085765/
-to Kconfig.
-
+-Kees
 
 -- 
-Best Regards
-Masahiro Yamada
+Kees Cook
+Pixel Security
