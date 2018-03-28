@@ -1,222 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr00138.outbound.protection.outlook.com ([40.107.0.138]:7747
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750798AbeCaFL1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 31 Mar 2018 01:11:27 -0400
-Date: Fri, 30 Mar 2018 22:11:09 -0700
-From: Andrei Vagin <avagin@virtuozzo.com>
-Subject: Re: [03/10] genksyms: generate lexer and parser during build instead
- of shipping
-Message-ID: <20180331051107.GA23033@outlook.office365.com>
-References: <1521810279-6282-3-git-send-email-yamada.masahiro@socionext.com>
- <20180330174022.GA8890@outlook.office365.com>
- <20180330222145.GC20025@outlook.office365.com>
- <CAK7LNARab5mN0F4OrW03v=EsmaRiutLxqR6J1vkybVW=gMvzqw@mail.gmail.com>
+Received: from mslow2.mail.gandi.net ([217.70.178.242]:44946 "EHLO
+        slow1-d.mail.gandi.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751404AbeCaGe4 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 31 Mar 2018 02:34:56 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARab5mN0F4OrW03v=EsmaRiutLxqR6J1vkybVW=gMvzqw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date: Wed, 28 Mar 2018 18:20:19 +0200
+From: KELLY ALAN <kellyalan@cfmeroengines.com>
+Subject: TRADING  ACCOUNT
+Reply-To: kellyalan@cfmeroengines.com
+Message-ID: <d065669a4759cd1447352b8980163ca5@service-courrier.site>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Frank Rowand <frank.rowand@sony.com>, Geert Uytterhoeven <geert@linux-m68k.org>
+To: kellyalan@cfmeroengines.com
 
-On Sat, Mar 31, 2018 at 11:20:22AM +0900, Masahiro Yamada wrote:
-> 2018-03-31 7:21 GMT+09:00 Andrei Vagin <avagin@virtuozzo.com>:
-> > On Fri, Mar 30, 2018 at 10:40:22AM -0700, Andrei Vagin wrote:
-> >> On Fri, Mar 23, 2018 at 10:04:32PM +0900, Masahiro Yamada wrote:
-> >> > Now that the kernel build supports flex and bison, remove the _shipped
-> >> > files and generate them during the build instead.
-> >> >
-> >> > There are no more shipped lexer and parser, so I ripped off the rules
-> >> > in scripts/Malefile.lib that were used for REGENERATE_PARSERS.
-> >> >
-> >> > The genksyms parser has ambiguous grammar, which would emit warnings:
-> >> >
-> >> >  scripts/genksyms/parse.y: warning: 9 shift/reduce conflicts [-Wconflicts-sr]
-> >> >  scripts/genksyms/parse.y: warning: 5 reduce/reduce conflicts [-Wconflicts-rr]
-> >> >
-> >> > They are normally suppressed, but displayed when W=1 is given.
-> >> >
-> >> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> >> > ---
-> >> >
-> >> >  scripts/Makefile.lib                 |   24 +-
-> >> >  scripts/genksyms/Makefile            |   23 +
-> >> >  scripts/genksyms/lex.lex.c_shipped   | 2291 --------------------------------
-> >> >  scripts/genksyms/parse.tab.c_shipped | 2394 ----------------------------------
-> >> >  scripts/genksyms/parse.tab.h_shipped |  119 --
-> >> >  5 files changed, 26 insertions(+), 4825 deletions(-)
-> >> >  delete mode 100644 scripts/genksyms/lex.lex.c_shipped
-> >> >  delete mode 100644 scripts/genksyms/parse.tab.c_shipped
-> >> >  delete mode 100644 scripts/genksyms/parse.tab.h_shipped
-> >> >
-> >> > diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> >> > index 2fde810..b7d2c97 100644
-> >> > --- a/scripts/Makefile.lib
-> >> > +++ b/scripts/Makefile.lib
-> >> > @@ -183,14 +183,8 @@ endef
-> >> >  quiet_cmd_flex = LEX     $@
-> >> >        cmd_flex = $(LEX) -o$@ -L $<
-> >> >
-> >> > -ifdef REGENERATE_PARSERS
-> >> > -.PRECIOUS: $(src)/%.lex.c_shipped
-> >> > -$(src)/%.lex.c_shipped: $(src)/%.l
-> >> > -   $(call cmd,flex)
-> >> > -endif
-> >> > -
-> >> >  .PRECIOUS: $(obj)/%.lex.c
-> >> > -$(filter %.lex.c,$(targets)): $(obj)/%.lex.c: $(src)/%.l FORCE
-> >> > +$(obj)/%.lex.c: $(src)/%.l FORCE
-> >> >     $(call if_changed,flex)
-> >> >
-> >> >  # YACC
-> >> > @@ -198,27 +192,15 @@ $(filter %.lex.c,$(targets)): $(obj)/%.lex.c: $(src)/%.l FORCE
-> >> >  quiet_cmd_bison = YACC    $@
-> >> >        cmd_bison = $(YACC) -o$@ -t -l $<
-> >> >
-> >> > -ifdef REGENERATE_PARSERS
-> >> > -.PRECIOUS: $(src)/%.tab.c_shipped
-> >> > -$(src)/%.tab.c_shipped: $(src)/%.y
-> >> > -   $(call cmd,bison)
-> >> > -endif
-> >> > -
-> >> >  .PRECIOUS: $(obj)/%.tab.c
-> >> > -$(filter %.tab.c,$(targets)): $(obj)/%.tab.c: $(src)/%.y FORCE
-> >> > +$(obj)/%.tab.c: $(src)/%.y FORCE
-> >> >     $(call if_changed,bison)
-> >> >
-> >> >  quiet_cmd_bison_h = YACC    $@
-> >> >        cmd_bison_h = bison -o/dev/null --defines=$@ -t -l $<
-> >> >
-> >> > -ifdef REGENERATE_PARSERS
-> >> > -.PRECIOUS: $(src)/%.tab.h_shipped
-> >> > -$(src)/%.tab.h_shipped: $(src)/%.y
-> >> > -   $(call cmd,bison_h)
-> >> > -endif
-> >> > -
-> >> >  .PRECIOUS: $(obj)/%.tab.h
-> >> > -$(filter %.tab.h,$(targets)): $(obj)/%.tab.h: $(src)/%.y FORCE
-> >> > +$(obj)/%.tab.h: $(src)/%.y FORCE
-> >> >     $(call if_changed,bison_h)
-> >> >
-> >> >  # Shipped files
-> >> > diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
-> >> > index 0ccac51..f4749e8 100644
-> >> > --- a/scripts/genksyms/Makefile
-> >> > +++ b/scripts/genksyms/Makefile
-> >> > @@ -5,9 +5,32 @@ always             := $(hostprogs-y)
-> >> >
-> >> >  genksyms-objs      := genksyms.o parse.tab.o lex.lex.o
-> >> >
-> >> > +# FIXME: fix the ambiguous grammar in parse.y and delete this hack
-> >> > +#
-> >> > +# Suppress shift/reduce, reduce/reduce conflicts warnings
-> >> > +# unless W=1 is specified.
-> >> > +ifeq ($(findstring 1,$(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
-> >> > +SUPPRESS_BISON_WARNING := 2>/dev/null
-> >>
-> >> We have a robot which runs CRIU tests on linux-next.
-> >> Yesterday it failed with this error:
-> >>
-> >>   HOSTCC  scripts/genksyms/genksyms.o
-> >> make[2]: *** [scripts/genksyms/parse.tab.c] Error 127
-> >>
-> >> cripts/genksyms/Makefile:20: recipe for target 'scripts/genksyms/parse.tab.c' failed
-> >> scripts/Makefile.build:559: recipe for target 'scripts/genksyms' failed
-> >> Makefile:1073: recipe for target 'scripts' failed
-> >> make[1]: *** [scripts/genksyms] Error 2
-> >> make: *** [scripts] Error 2
-> >> make: *** Waiting for unfinished jobs....
-> >>
-> >> https://travis-ci.org/avagin/linux/jobs/360056903
-> >>
-> >> From this output, it is very hard to understand what was going wrong.
-> >
-> >
-> > The reason was that bison and fles were not installed, but I think the
-> > error message should be more clear.
-> >
-> >>
-> >> Thanks,
-> >> Andrei
-> >>
-> 
-> Thanks for the report.
-> 
-> 
-> OK, I will apply the fix-up attached below.
-> 
-> If bison is not installed, it will fail with clear message.
+Dear sir ,
 
-Thank you!
+I KELLY ALAN purchasing and sales manager of CFM INTERNATIONAL . Our 
+Company specialised in Supplying computer hardware and Electronic .We 
+want to extend our supplier list because of concurrency in prices on the 
+international market
+We are seeking a supplier with whom we can to have  partnered long-term 
+in order to have competitive prices .we are interested to buy the 
+products you sell and want to place an order with you in big quantities.
+Can you give us payment facilities ( 14 , 30 or 60 days payment terms ) 
+?
+What is the procedure for our account opening  and credit line 
+application ?
 
-> 
->   HOSTCC  scripts/genksyms/genksyms.o
-> /bin/sh: 1: bison: not found
-> make[2]: *** [scripts/genksyms/Makefile:18:
-> scripts/genksyms/parse.tab.c] Error 127
-> make[1]: *** [scripts/Makefile.build:559: scripts/genksyms] Error 2
-> make: *** [Makefile:1073: scripts] Error 2
-> 
-> 
-> BTW, without flex and bison, how did you build Kconfig?
+Cordially
 
-A config is created on the host, but a kernel is compiled in a docker
-container. Maybe bison was installed on the host.
+KELLY ALAN
 
-We do something like this:
-
-$ make olddefconfig
-$ make localyesconfig
-$ docker run -v /home/travis/build/avagin/linux:/mnt/kernel -v
-/home/travis/.ccache:/mnt/ccache -w /mnt/kernel criu-kernel make -j 4
-
-> 
-> Since commit 29c833061c1d8c2d1d23a62e7061561eadd76cdb,
-> Kconfig requires flex and bison, and this commit is
-> in Linus' tree for a couple of month.
-> 
-> Without flex and bison, you cannot do even "make *config"
-> Nobody has ever complaint about this.
-> 
-> 
-> 
-> 
-> diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
-> index aeefd47..7cb3d70 100644
-> --- a/scripts/genksyms/Makefile
-> +++ b/scripts/genksyms/Makefile
-> @@ -10,20 +10,20 @@ genksyms-objs       := genksyms.o parse.tab.o lex.lex.o
->  # Suppress shift/reduce, reduce/reduce conflicts warnings
->  # unless W=1 is specified.
->  ifeq ($(findstring 1,$(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
-> -SUPPRESS_BISON_WARNING := 2>/dev/null
-> -endif
-> 
->  quiet_cmd_bison_no_warn = $(quet_cmd_bison)
-> -      cmd_bison_no_warn = $(cmd_bison) $(SUPPRESS_BISON_WARNING)
-> +      cmd_bison_no_warn = $(YACC) --version >/dev/null; $(cmd_bison)
-> 2>/dev/null
-> 
->  $(obj)/parse.tab.c: $(src)/parse.y FORCE
->         $(call if_changed,bison_no_warn)
-> 
->  quiet_cmd_bison_h_no_warn = $(quet_cmd_bison_h)
-> -      cmd_bison_h_no_warn = $(cmd_bison_h) $(SUPPRESS_BISON_WARNING)
-> +      cmd_bison_h_no_warn = $(YACC) --version >/dev/null;
-> $(cmd_bison_h) 2>/dev/null
-> 
->  $(obj)/parse.tab.h: $(src)/parse.y FORCE
->         $(call if_changed,bison_h_no_warn)
-> +
-> +endif
->  # FIXME END
-> 
->  # -I needed for generated C source (shipped source)
-> 
-> 
-> -- 
-> Best Regards
-> Masahiro Yamada
+CFM INTERNATIONAL
+2 BOULEVARD DU GAL MARTIAL VALIN
+75015 PARIS
+REG N° 732075312
+VAT N°FR60732075312
+TEL +33171025367
+FAX +33177759149
+https://www.cfmaeroengines.com
