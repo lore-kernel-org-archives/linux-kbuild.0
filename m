@@ -1,88 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f66.google.com ([209.85.213.66]:35816 "EHLO
-        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751341AbeC1Lrw (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:40130 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753180AbeC1Lw6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Mar 2018 07:47:52 -0400
-Received: by mail-vk0-f66.google.com with SMTP id h134so1198092vke.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 04:47:51 -0700 (PDT)
+        Wed, 28 Mar 2018 07:52:58 -0400
 MIME-Version: 1.0
-In-Reply-To: <1522128575-5326-21-git-send-email-yamada.masahiro@socionext.com>
-References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com> <1522128575-5326-21-git-send-email-yamada.masahiro@socionext.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Wed, 28 Mar 2018 04:47:50 -0700
-Message-ID: <CAGXu5jJQfYXqsF7pcRsUtY9Mrw+Yi_Y6+CBAwDrQT_4kpUiHDA@mail.gmail.com>
-Subject: Re: [PATCH v2 20/21] gcc-plugins: enable GCC_PLUGINS for COMPILE_TEST
+In-Reply-To: <CAGXu5jK48XYSpga0M-49GPrMT3iud7rqEOD7ZpKQR-MXi=zjWw@mail.gmail.com>
+References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
+ <1522128575-5326-15-git-send-email-yamada.masahiro@socionext.com> <CAGXu5jK48XYSpga0M-49GPrMT3iud7rqEOD7ZpKQR-MXi=zjWw@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 28 Mar 2018 20:52:01 +0900
+Message-ID: <CAK7LNAQAvt7uWyY+FdnKfxzMBXHAgkxmycKm+-NRHYxo1LtLJA@mail.gmail.com>
+Subject: Re: [PATCH v2 14/21] kconfig: add CC_IS_CLANG and CLANG_VERSION
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Kees Cook <keescook@chromium.org>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> The plugin availability is checked in Kconfig, so all{yes,mod}config
-> will not be bothered.  Remove 'depends on !COMPILE_TEST'.
+2018-03-28 20:22 GMT+09:00 Kees Cook <keescook@chromium.org>:
+> On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> This will be useful to describe the clang version dependency.
+>>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+> One aspect of clang version checking that may be "weird" (and likely
+> won't be meaningful for very long as we're about to raise the minimum
+> gcc version), is that clang claims to be gcc version 4.2 if you look
+> at #defines. This is already handled in compiler.h, but may be weird
+> in Kconfig.
 >
-> Changes in v2:
->   - Remove more 'depends on'
->
->  arch/Kconfig | 4 ----
->  1 file changed, 4 deletions(-)
->
-> diff --git a/arch/Kconfig b/arch/Kconfig
-> index 88cc925..b07094c 100644
-> --- a/arch/Kconfig
-> +++ b/arch/Kconfig
-> @@ -414,7 +414,6 @@ menuconfig GCC_PLUGINS
->         bool "GCC plugins"
->         depends on HAVE_GCC_PLUGINS
->         depends on $(success $srctree/scripts/gcc-plugin.sh $HOSTCXX $CC)
-> -       depends on !COMPILE_TEST
->         help
->           GCC plugins are loadable modules that provide extra features to the
->           compiler. They are useful for runtime instrumentation and static analysis.
 
-This one is nice, yes! We get coverage for anyone with plugin support.
 
-> @@ -424,7 +423,6 @@ menuconfig GCC_PLUGINS
->  config GCC_PLUGIN_CYC_COMPLEXITY
->         bool "Compute the cyclomatic complexity of a function" if EXPERT
->         depends on GCC_PLUGINS
-> -       depends on !COMPILE_TEST
->         help
->           The complexity M of a function's control flow graph is defined as:
->            M = E - N + 2P
-> @@ -487,7 +485,6 @@ config GCC_PLUGIN_STRUCTLEAK_BYREF_ALL
->  config GCC_PLUGIN_STRUCTLEAK_VERBOSE
->         bool "Report forcefully initialized variables"
->         depends on GCC_PLUGIN_STRUCTLEAK
-> -       depends on !COMPILE_TEST
->         help
->           This option will cause a warning to be printed each time the
->           structleak plugin finds a variable it thinks needs to be
-> @@ -527,7 +524,6 @@ config GCC_PLUGIN_RANDSTRUCT
->  config GCC_PLUGIN_RANDSTRUCT_PERFORMANCE
->         bool "Use cacheline-aware structure randomization"
->         depends on GCC_PLUGIN_RANDSTRUCT
-> -       depends on !COMPILE_TEST
->         help
->           If you say Y here, the RANDSTRUCT randomization will make a
->           best effort at restricting randomization to cacheline-sized
+CONFIG_CLANG_VERSION gives me real clang version.
 
-All three of these, though, please leave as they were. They're either
-needlessly noisy for COMPILE_TEST (GCC_PLUGIN_CYC_COMPLEXITY and
-*_VERBOSE), or reduce the COMPILE_TEST coverage
-(GCC_PLUGIN_RANDSTRUCT_PERFORMANCE).
 
-(And perhaps a comment is needed to explain these to avoid confusion
-in the future?)
+$ clang --version
+clang version 7.0.0 (http://llvm.org/git/clang.git
+f1d1f4c4591e81cfa80034df094b26d7eb4fa92b)
+(http://llvm.org/git/llvm.git
+d157ba2f80790d23d717c4ff3f5bee30d98d6a51)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/masahiro/toolchains/clang-latest/bin
 
--Kees
+$ make CC=clang defconfig
+*** Default configuration is based on 'x86_64_defconfig'
+#
+# configuration written to .config
+#
+$ grep  CLANG_VERSION .config
+CONFIG_CLANG_VERSION=70000
+
+
+
+I am just porting
+https://patchwork.kernel.org/patch/10085765/
+to Kconfig.
+
 
 -- 
-Kees Cook
-Pixel Security
+Best Regards
+Masahiro Yamada
