@@ -1,51 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f45.google.com ([209.85.215.45]:35826 "EHLO
-        mail-lf0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750795AbeC2Hg1 (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:56170 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751215AbeC2Pid (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Mar 2018 03:36:27 -0400
-Received: by mail-lf0-f45.google.com with SMTP id t132-v6so7057740lfe.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Mar 2018 00:36:26 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <e46ed72fab5dd0a575e22efa360150ae003db939.camel@decadent.org.uk>
-References: <20180221101032.27263-1-riku.voipio@linaro.org>
- <CAK7LNAQ+evMKMMcqQ8KX2aFGthsx=20o2X4EiQ7qu9y50ZvZjw@mail.gmail.com>
- <CAAqcGHkvKssjFmG0ebz5uBeO_PGeov5_C6MutW65ONp5riFwRg@mail.gmail.com>
- <CAAqcGHmeYqe81zG=PvoCtzhKhAU=27LT_K8OVhTykyBZGdML4A@mail.gmail.com>
- <CAK7LNASuGcv0rhX+NZ4q7D_hkq7=HqeZ2j5hOiW=F1VXeenwYA@mail.gmail.com>
- <CAAqcGHn6mHHMGmcBFfRdwNSJwPaOfmnidw_T_hRKS66V47aryg@mail.gmail.com> <e46ed72fab5dd0a575e22efa360150ae003db939.camel@decadent.org.uk>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Thu, 29 Mar 2018 10:36:25 +0300
-Message-ID: <CAAqcGHnBZnpexospouTdfOq4NNYg4kDDirKg6+HbYsQrKeUf6Q@mail.gmail.com>
-Subject: Re: [PATCH v4] scripts/package/builddeb: split generating packaging
- and build
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 29 Mar 2018 11:38:33 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: use -fmacro-prefix-map to make __FILE__ a relative path
+Date: Fri, 30 Mar 2018 00:36:06 +0900
+Message-Id: <1522337766-6476-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Randy Dunlap <rdunlap@infradead.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Joe Perches <joe@perches.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Tom Rini <trini@konsulko.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On 29 March 2018 at 03:20, Ben Hutchings <ben@decadent.org.uk> wrote:
-> On Wed, 2018-03-28 at 11:58 +0300, Riku Voipio wrote:
-> [...]
->> One option:
->>
->> +++ b/scripts/package/mkdebian
->> cat <<EOF > debian/rules
->> -#!/usr/bin/make -f
->> #!$(which $MAKE)  -f
-> [..]
->
-> Shebang lines are interpreted by the kernel, not by a shell.  So you
-> can't do anything clever like that.
+The __FILE__ macro is used everywhere in the kernel to locate the file
+path printing the log message.  The biggest users of this macro are
+WARN_ON() and friends.  If the kernel is built out of tree, this could
+be a long absolute path, like this:
 
-Look more closely ;) Shell expands the variables into the herefile. So
-if make is picked from a nonstandard location, the debian/rules
-shebang becomes #!/home/masahiro/bin/make -f
+  WARNING: CPU: 1 PID: 1 at /path/to/build/directory/arch/arm64/kernel/foo.c:...
 
-As I said the price of this hack is that if use make from non-standard
-location, the source package won't build anywhere else. Then again,
-you probably shouldn't use non-standard tools when building source
-packages for others to consume.
+This is because Kbuild runs in the objtree instead of the srctree.
 
-Riku
+Commit 9da0763bdd82 ("kbuild: Use relative path when building in a
+subdir of the source tree") mitigated the pain to some extent;
+$(srctree) becomes ".." if the objtree is a child of the srctree.
+
+For other cases of out-of-tree build, __FILE__ is still the absolute
+path.  It also means the kernel image depends on where it was built.
+
+A brand-new option from GCC solves this problem.
+
+-fmacro-prefix-map=<old>=<new>
+  When preprocessing files residing in directory <old>, expand the
+  __FILE__ and __BASE_FILE__ macros as if the files resided in
+  directory <new> instead.  This can be used to change an absolute
+  path to a relative path by using . for <new> which can result in
+  more reproducible builds that are location independent.  This
+  option also affects __builtin_FILE() during compilation.
+
+If your compiler supports this option, __FILE__ is the relative path
+from the root of srctree regardless of O= option.
+
+Please note __FILE__ is always an absolute path for external modules.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+I tested this on GCC 8.
+(not released yet, but you can get the source code from the trunk.)
+
+
+ Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 7ba478a..d2d44f9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -813,6 +813,11 @@ KBUILD_CFLAGS	+= $(call cc-option,-ffunction-sections,)
+ KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
+ endif
+ 
++#ifneq ($(KBUILD_SRC),)
++# Change __FILE__ to a relative path from the srctree
++KBUILD_CFLAGS	+= $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
++#endif
++
+ # arch Makefile may override CC so keep this after arch Makefile is included
+ NOSTDINC_FLAGS += -nostdinc -isystem $(call shell-cached,$(CC) -print-file-name=include)
+ CHECKFLAGS     += $(NOSTDINC_FLAGS)
+-- 
+2.7.4
+
