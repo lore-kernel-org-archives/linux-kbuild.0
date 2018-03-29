@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:56170 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751215AbeC2Pid (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:33079 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751182AbeC2Pmh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Mar 2018 11:38:33 -0400
+        Thu, 29 Mar 2018 11:42:37 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: use -fmacro-prefix-map to make __FILE__ a relative path
-Date: Fri, 30 Mar 2018 00:36:06 +0900
-Message-Id: <1522337766-6476-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2] kbuild: use -fmacro-prefix-map to make __FILE__ a relative path
+Date: Fri, 30 Mar 2018 00:40:47 +0900
+Message-Id: <1522338047-7128-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -51,21 +51,24 @@ I tested this on GCC 8.
 (not released yet, but you can get the source code from the trunk.)
 
 
+Changes in v2:
+  - Comment-in the ifeq
+
  Makefile | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index 7ba478a..d2d44f9 100644
+index 7ba478a..5acee54 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -813,6 +813,11 @@ KBUILD_CFLAGS	+= $(call cc-option,-ffunction-sections,)
  KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
  endif
  
-+#ifneq ($(KBUILD_SRC),)
 +# Change __FILE__ to a relative path from the srctree
++ifneq ($(KBUILD_SRC),)
 +KBUILD_CFLAGS	+= $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
-+#endif
++endif
 +
  # arch Makefile may override CC so keep this after arch Makefile is included
  NOSTDINC_FLAGS += -nostdinc -isystem $(call shell-cached,$(CC) -print-file-name=include)
