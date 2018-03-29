@@ -1,67 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:43703 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751325AbeC2AsT (ORCPT
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:33779 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751206AbeC2AsR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Mar 2018 20:48:19 -0400
-Received: by mail-pf0-f193.google.com with SMTP id j2so2022776pff.10
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 17:48:18 -0700 (PDT)
+        Wed, 28 Mar 2018 20:48:17 -0400
+Received: by mail-pg0-f68.google.com with SMTP id i194so1950981pgd.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 17:48:17 -0700 (PDT)
 From: Laura Abbott <labbott@redhat.com>
-Subject: [PATCH 3/3] kbuild: Allow passing additional HOSTCFLAGS and HOSTLDFLAGS
-Date: Wed, 28 Mar 2018 17:48:05 -0700
-Message-Id: <20180329004805.7278-4-labbott@redhat.com>
+Subject: [PATCH 2/3] objtool: Support HOSTCFLAGS and HOSTLDFLAGS
+Date: Wed, 28 Mar 2018 17:48:04 -0700
+Message-Id: <20180329004805.7278-3-labbott@redhat.com>
 In-Reply-To: <20180329004805.7278-1-labbott@redhat.com>
 References: <20180329004805.7278-1-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: Laura Abbott <labbott@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Laura Abbott <labbott@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-
-Similar to AFLAGS_KBUILD, there may be uses (e.g. hardening) for passing in
-additional flags to host programs. Allow these to be passed in from the
-environment.
+It may be useful to compile host programs with different flags (e.g.
+hardening). Ensure that objtool picks up the appropriate flags.
 
 Signed-off-by: Laura Abbott <labbott@redhat.com>
 ---
- Documentation/kbuild/kbuild.txt | 9 +++++++++
- Makefile                        | 3 +++
- 2 files changed, 12 insertions(+)
+ tools/objtool/Makefile | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index ac2363ea05c5..3751a4bc8596 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -24,6 +24,15 @@ KAFLAGS
- --------------------------------------------------
- Additional options to the assembler (for built-in and modules).
+diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
+index e6acc281dd37..0ff3bcac1ca9 100644
+--- a/tools/objtool/Makefile
++++ b/tools/objtool/Makefile
+@@ -31,8 +31,9 @@ INCLUDES := -I$(srctree)/tools/include \
+ 	    -I$(srctree)/tools/arch/$(HOSTARCH)/include/uapi \
+ 	    -I$(srctree)/tools/objtool/arch/$(ARCH)/include
+ WARNINGS := $(EXTRA_WARNINGS) -Wno-switch-default -Wno-switch-enum -Wno-packed
+-CFLAGS   += -Wall -Werror $(WARNINGS) -fomit-frame-pointer -O2 -g $(INCLUDES)
+-LDFLAGS  += -lelf $(LIBSUBCMD)
++CFLAGS   += -Wall -Werror $(WARNINGS) $(HOSTCFLAGS) -fomit-frame-pointer -O2 -g \
++	    $(INCLUDES)
++LDFLAGS  += -lelf $(LIBSUBCMD) $(HOSTLDFLAGS)
  
-+AFLAGS_HOSTCFLAGS
-+--------------------------------------------------
-+Additional options passed to the compiler when building host programs.
-+
-+AFLAGS_HOSTLDFLAGS
-+--------------------------------------------------
-+Additional options passed to the linker (through the compiler) when buidling
-+host programs.
-+
- AFLAGS_MODULE
- --------------------------------------------------
- Additional module specific options to use for $(AS).
-diff --git a/Makefile b/Makefile
-index 7ba478ab8c82..2cab3f8d489c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -367,6 +367,9 @@ HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
- HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
- HOST_LOADLIBES := $(HOST_LFS_LIBS)
- 
-+HOSTCFLAGS  += $(AFLAGS_HOSTCFLAGS)
-+HOSTLDFLAGS  += $(AFLAGS_HOSTLDFLAGS)
-+
- # Make variables (CC, etc...)
- AS		= $(CROSS_COMPILE)as
- LD		= $(CROSS_COMPILE)ld
+ # Allow old libelf to be used:
+ elfshdr := $(shell echo '\#include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
 -- 
 2.16.2
 
