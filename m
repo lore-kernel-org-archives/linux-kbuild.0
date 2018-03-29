@@ -1,41 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f66.google.com ([209.85.213.66]:36141 "EHLO
-        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752663AbeC1Lza (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:59306 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750781AbeC2AUV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Mar 2018 07:55:30 -0400
-Received: by mail-vk0-f66.google.com with SMTP id q198so1206837vke.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2018 04:55:30 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1522128575-5326-22-git-send-email-yamada.masahiro@socionext.com>
-References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com> <1522128575-5326-22-git-send-email-yamada.masahiro@socionext.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Wed, 28 Mar 2018 04:55:29 -0700
-Message-ID: <CAGXu5jJUp6GaDtEKwg7_nOoyDEumZx0MTeW4cr_NFSbNxxa06Q@mail.gmail.com>
-Subject: Re: [PATCH v2 21/21] arm64: move GCC version check for
- ARCH_SUPPORTS_INT128 to Kconfig
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 28 Mar 2018 20:20:21 -0400
+Message-ID: <e46ed72fab5dd0a575e22efa360150ae003db939.camel@decadent.org.uk>
+Subject: Re: [PATCH v4] scripts/package/builddeb: split generating packaging
+ and build
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Thu, 29 Mar 2018 01:20:08 +0100
+In-Reply-To: <CAAqcGHn6mHHMGmcBFfRdwNSJwPaOfmnidw_T_hRKS66V47aryg@mail.gmail.com>
+References: <20180221101032.27263-1-riku.voipio@linaro.org>
+         <CAK7LNAQ+evMKMMcqQ8KX2aFGthsx=20o2X4EiQ7qu9y50ZvZjw@mail.gmail.com>
+         <CAAqcGHkvKssjFmG0ebz5uBeO_PGeov5_C6MutW65ONp5riFwRg@mail.gmail.com>
+         <CAAqcGHmeYqe81zG=PvoCtzhKhAU=27LT_K8OVhTykyBZGdML4A@mail.gmail.com>
+         <CAK7LNASuGcv0rhX+NZ4q7D_hkq7=HqeZ2j5hOiW=F1VXeenwYA@mail.gmail.com>
+         <CAAqcGHn6mHHMGmcBFfRdwNSJwPaOfmnidw_T_hRKS66V47aryg@mail.gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-KXpXxwZ6mZm9WpLjtHVD"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, LKML <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
 
-On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> This becomes much neater in Kconfig.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Is there a reason this doesn't have a cc-option test, or was this a
-silent addition to the compiler? (And as such, should there be a
-comment for this in the Kconfig?)
+--=-KXpXxwZ6mZm9WpLjtHVD
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Regardless:
+On Wed, 2018-03-28 at 11:58 +0300, Riku Voipio wrote:
+[...]
+> One option:
+>=20
+> +++ b/scripts/package/mkdebian
+> cat <<EOF > debian/rules
+> -#!/usr/bin/make -f
+> #!$(which $MAKE)  -f
+[..]
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Shebang lines are interpreted by the kernel, not by a shell.  So you
+can't do anything clever like that.
 
--Kees
+Ben.
 
--- 
-Kees Cook
-Pixel Security
+--=20
+Ben Hutchings
+Who are all these weirdos? - David Bowie, on joining IRC
+
+
+--=-KXpXxwZ6mZm9WpLjtHVD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAlq8MTgACgkQ57/I7JWG
+EQlKiw/8CLJmAa8nIFabmMtqZ95xlNMGt+pgGyibS4YFaJmQgwhgpEPuutZJPIx2
+fUcis6zzWODNrvxocSBZ8oFYGgmghWzKDuwpcZ6fcKThPe6f38jye8CQClyar2z6
+CSh9zPSYMgerkW10/+KB4nOpzrhAayGuCxG+UugHGxMICe6ZYCMvVQo5cR/LJ6LA
+fHA4RbH6UPi+NMHRLPQtMZ3vqpqIM2NBrF1vj76q/vB9yhAD4uUjg6Gurjy63NfJ
+ysL2AMHeASL4j7OSdNWB1v0KXGdGwhGefIKsLYOKfWpN+g/1XYgAHityrpS3RE4u
+etL7q0hVbXzpnxq9bU5lD5doOnWqB+Y4TGmR+O8ReqFZRBRkirxVIjQvIn1YWDL1
++iCUL9QCrNWQnTDYfSxVC/hjmcwgYmT2hfoVAxAa67PgBVP89ulxuq96OLLkM2pM
+RQOEuKrzw5IJ8pednGrBKu8LksJaS5tq0UEsNXNqxCkcUigS9P5t1UMD8atcOq4m
+UIWqy7bWg3VP5T4/HtxnNJuw0XYgGy8GR63nbcwFej6T4gyRd/iJbNjq8caWCYB8
+ikJLEw3rSdo92JTohYLsh5/kVxphTNRkhlH+Oif1n03Dn2IKWk6TRR2mmVmTP2P8
+K1KgCmGEtFqPXdpvVswzU/nFZ86afCjCSp3FgvO9FOv6yVpJO1c=
+=pyYU
+-----END PGP SIGNATURE-----
+
+--=-KXpXxwZ6mZm9WpLjtHVD--
