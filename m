@@ -1,72 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:35673 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750979AbeC2SBS (ORCPT
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:44808 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752125AbeC2SBW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Mar 2018 14:01:18 -0400
-Received: by mail-pf0-f195.google.com with SMTP id u86so3756662pfd.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Mar 2018 11:01:17 -0700 (PDT)
+        Thu, 29 Mar 2018 14:01:22 -0400
+Received: by mail-pf0-f196.google.com with SMTP id m68so3753261pfm.11
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Mar 2018 11:01:22 -0700 (PDT)
 From: Laura Abbott <labbott@redhat.com>
-Subject: [RFCv2 PATCH 0/3] Salted build ids via linker sections
-Date: Thu, 29 Mar 2018 11:01:09 -0700
-Message-Id: <20180329180112.11055-1-labbott@redhat.com>
+Subject: [RFCv2 PATCH 2/3] kbuild: Link with generated build-salt header
+Date: Thu, 29 Mar 2018 11:01:11 -0700
+Message-Id: <20180329180112.11055-3-labbott@redhat.com>
+In-Reply-To: <20180329180112.11055-1-labbott@redhat.com>
+References: <20180329180112.11055-1-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andy Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Laura Abbott <labbott@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, linux-kernel@vger.kernel.org, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org
 
-Hi,
+Now that we have a header with appropriate data, link it into the kernel
+and modules. If BUILD_ID_SALT isn't set, the script should be empty.
 
-This is v2 of my proposal to allow unique build-ids in the kernel. from
-last time:
-
-""
-In Fedora, the debug information is packaged separately (foo-debuginfo) and
-can be installed separately. There's been a long standing issue where only one
-version of a debuginfo info package can be installed at a time. Mark Wielaard
-made an effort for Fedora 27 to allow parallel installation of debuginfo (see
-https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo for
-more details)
-
-Part of the requirement to allow this to work is that build ids are
-unique between builds. The existing upstream rpm implementation ensures
-this by re-calculating the build-id using the version and release as a
-seed. This doesn't work 100% for the kernel because of the vDSO which is
-its own binary and doesn't get updated. After poking holes in a few of my
-ideas, there was a discussion with some people from the binutils team about
-adding --build-id-salt to let ld do the calculation debugedit is doing. There
-was a counter proposal made about adding some extra information via a .comment
-which will affect the build id calculation but just get stripped out.
-""
-
-This v2 cleans up the naming to be consistent and also switches to a
-config option vs. an environment variable. I've seen some sporadic
-failures about missing the generated header so I think I'm still missing
-a dependency somewhere. I'm still mostly looking for feedback whether
-this would be acceptable for merging or if we should just persue a
---build-id-salt in binutils.
-
-Thanks,
-Laura
-
-
-Laura Abbott (3):
-  kbuild: Introduce build-salt generated header
-  kbuild: Link with generated build-salt header
-  x86/vdso: Add build salt to the vDSO
-
- Makefile                              | 13 +++++++++++--
- arch/x86/entry/vdso/vdso-layout.lds.S |  3 +++
- init/Kconfig                          |  8 ++++++++
- scripts/.gitignore                    |  1 +
- scripts/Makefile                      |  2 +-
- scripts/build-salt.lds.S              |  5 +++++
- scripts/gensalt                       | 21 +++++++++++++++++++++
- scripts/link-vmlinux.sh               |  3 ++-
- 8 files changed, 52 insertions(+), 4 deletions(-)
+Signed-off-by: Laura Abbott <labbott@redhat.com>
+---
+v2: Changed names to be consistent
+---
+ Makefile                 | 4 +++-
+ scripts/.gitignore       | 1 +
+ scripts/Makefile         | 2 +-
+ scripts/build-salt.lds.S | 5 +++++
+ scripts/link-vmlinux.sh  | 3 ++-
+ 5 files changed, 12 insertions(+), 3 deletions(-)
  create mode 100644 scripts/build-salt.lds.S
- create mode 100755 scripts/gensalt
 
+diff --git a/Makefile b/Makefile
+index b80c2d6d0854..171f82295e5e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -425,7 +425,8 @@ KBUILD_AFLAGS_KERNEL :=
+ KBUILD_CFLAGS_KERNEL :=
+ KBUILD_AFLAGS_MODULE  := -DMODULE
+ KBUILD_CFLAGS_MODULE  := -DMODULE
+-KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
++KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds \
++			 -T $(srctree)/scripts/build-salt.lds
+ GCC_PLUGINS_CFLAGS :=
+ 
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+@@ -1004,6 +1005,7 @@ export KBUILD_VMLINUX_INIT := $(head-y) $(init-y)
+ export KBUILD_VMLINUX_MAIN := $(core-y) $(libs-y2) $(drivers-y) $(net-y) $(virt-y)
+ export KBUILD_VMLINUX_LIBS := $(libs-y1)
+ export KBUILD_LDS          := arch/$(SRCARCH)/kernel/vmlinux.lds
++export EXTRA_LDS           := scripts/build-salt.lds
+ export LDFLAGS_vmlinux
+ # used by scripts/package/Makefile
+ export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(vmlinux-alldirs)) arch Documentation include samples scripts tools)
+diff --git a/scripts/.gitignore b/scripts/.gitignore
+index 0442c06eefcb..1c840ef4f0c8 100644
+--- a/scripts/.gitignore
++++ b/scripts/.gitignore
+@@ -13,3 +13,4 @@ asn1_compiler
+ extract-cert
+ sign-file
+ insert-sys-cert
++build-salt.lds
+diff --git a/scripts/Makefile b/scripts/Makefile
+index 25ab143cbe14..47f6ed5b0bcd 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -25,7 +25,7 @@ HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
+ HOSTLOADLIBES_sign-file = -lcrypto
+ HOSTLOADLIBES_extract-cert = -lcrypto
+ 
+-always		:= $(hostprogs-y) $(hostprogs-m)
++always		:= $(hostprogs-y) $(hostprogs-m) build-salt.lds
+ 
+ # The following hostprogs-y programs are only build on demand
+ hostprogs-y += unifdef
+diff --git a/scripts/build-salt.lds.S b/scripts/build-salt.lds.S
+new file mode 100644
+index 000000000000..f85981f1187e
+--- /dev/null
++++ b/scripts/build-salt.lds.S
+@@ -0,0 +1,5 @@
++#include <generated/build-salt.h>
++
++SECTIONS {
++	BUILD_ID_SALT
++}
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index be56a1153014..2b57e0139acb 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -93,6 +93,7 @@ modpost_link()
+ vmlinux_link()
+ {
+ 	local lds="${objtree}/${KBUILD_LDS}"
++	local extra_lds="${objtree}/${EXTRA_LDS}"
+ 	local objects
+ 
+ 	if [ "${SRCARCH}" != "um" ]; then
+@@ -114,7 +115,7 @@ vmlinux_link()
+ 		fi
+ 
+ 		${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o ${2}		\
+-			-T ${lds} ${objects}
++			-T ${lds} -T ${extra_lds} ${objects}
+ 	else
+ 		if [ -n "${CONFIG_THIN_ARCHIVES}" ]; then
+ 			objects="-Wl,--whole-archive			\
 -- 
 2.16.2
 
