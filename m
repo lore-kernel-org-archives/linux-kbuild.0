@@ -1,67 +1,204 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga17.intel.com ([192.55.52.151]:46411 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752392AbeC3ROT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 30 Mar 2018 13:14:19 -0400
-From: Juro Bystricky <juro.bystricky@intel.com>
-Subject: [PATCH] modpost: srcversion sometimes incorrect
-Date: Fri, 30 Mar 2018 10:14:05 -0700
-Message-Id: <1522430045-31685-1-git-send-email-juro.bystricky@intel.com>
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:23350 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752784AbeCaCVH (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 30 Mar 2018 22:21:07 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180330222145.GC20025@outlook.office365.com>
+References: <1521810279-6282-3-git-send-email-yamada.masahiro@socionext.com>
+ <20180330174022.GA8890@outlook.office365.com> <20180330222145.GC20025@outlook.office365.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 31 Mar 2018 11:20:22 +0900
+Message-ID: <CAK7LNARab5mN0F4OrW03v=EsmaRiutLxqR6J1vkybVW=gMvzqw@mail.gmail.com>
+Subject: Re: [03/10] genksyms: generate lexer and parser during build instead
+ of shipping
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, richard.purdie@linuxfoundation.org, jurobystricky@hotmail.com, Juro Bystricky <juro.bystricky@intel.com>
+To: Andrei Vagin <avagin@virtuozzo.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Frank Rowand <frank.rowand@sony.com>, Geert Uytterhoeven <geert@linux-m68k.org>
 
-"srcversion" field inserted into module modinfo section contains a
-sum of the source files which made it. However, this field can
-be incorrect. Building the same module can end up having inconsistent
-srcversion field eventhough the sources remain the same.
-This can be reproduced by building modules in a deeply nested directory,
-but other factors contribute as well.
+2018-03-31 7:21 GMT+09:00 Andrei Vagin <avagin@virtuozzo.com>:
+> On Fri, Mar 30, 2018 at 10:40:22AM -0700, Andrei Vagin wrote:
+>> On Fri, Mar 23, 2018 at 10:04:32PM +0900, Masahiro Yamada wrote:
+>> > Now that the kernel build supports flex and bison, remove the _shipped
+>> > files and generate them during the build instead.
+>> >
+>> > There are no more shipped lexer and parser, so I ripped off the rules
+>> > in scripts/Malefile.lib that were used for REGENERATE_PARSERS.
+>> >
+>> > The genksyms parser has ambiguous grammar, which would emit warnings:
+>> >
+>> >  scripts/genksyms/parse.y: warning: 9 shift/reduce conflicts [-Wconflicts-sr]
+>> >  scripts/genksyms/parse.y: warning: 5 reduce/reduce conflicts [-Wconflicts-rr]
+>> >
+>> > They are normally suppressed, but displayed when W=1 is given.
+>> >
+>> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> > ---
+>> >
+>> >  scripts/Makefile.lib                 |   24 +-
+>> >  scripts/genksyms/Makefile            |   23 +
+>> >  scripts/genksyms/lex.lex.c_shipped   | 2291 --------------------------------
+>> >  scripts/genksyms/parse.tab.c_shipped | 2394 ----------------------------------
+>> >  scripts/genksyms/parse.tab.h_shipped |  119 --
+>> >  5 files changed, 26 insertions(+), 4825 deletions(-)
+>> >  delete mode 100644 scripts/genksyms/lex.lex.c_shipped
+>> >  delete mode 100644 scripts/genksyms/parse.tab.c_shipped
+>> >  delete mode 100644 scripts/genksyms/parse.tab.h_shipped
+>> >
+>> > diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+>> > index 2fde810..b7d2c97 100644
+>> > --- a/scripts/Makefile.lib
+>> > +++ b/scripts/Makefile.lib
+>> > @@ -183,14 +183,8 @@ endef
+>> >  quiet_cmd_flex = LEX     $@
+>> >        cmd_flex = $(LEX) -o$@ -L $<
+>> >
+>> > -ifdef REGENERATE_PARSERS
+>> > -.PRECIOUS: $(src)/%.lex.c_shipped
+>> > -$(src)/%.lex.c_shipped: $(src)/%.l
+>> > -   $(call cmd,flex)
+>> > -endif
+>> > -
+>> >  .PRECIOUS: $(obj)/%.lex.c
+>> > -$(filter %.lex.c,$(targets)): $(obj)/%.lex.c: $(src)/%.l FORCE
+>> > +$(obj)/%.lex.c: $(src)/%.l FORCE
+>> >     $(call if_changed,flex)
+>> >
+>> >  # YACC
+>> > @@ -198,27 +192,15 @@ $(filter %.lex.c,$(targets)): $(obj)/%.lex.c: $(src)/%.l FORCE
+>> >  quiet_cmd_bison = YACC    $@
+>> >        cmd_bison = $(YACC) -o$@ -t -l $<
+>> >
+>> > -ifdef REGENERATE_PARSERS
+>> > -.PRECIOUS: $(src)/%.tab.c_shipped
+>> > -$(src)/%.tab.c_shipped: $(src)/%.y
+>> > -   $(call cmd,bison)
+>> > -endif
+>> > -
+>> >  .PRECIOUS: $(obj)/%.tab.c
+>> > -$(filter %.tab.c,$(targets)): $(obj)/%.tab.c: $(src)/%.y FORCE
+>> > +$(obj)/%.tab.c: $(src)/%.y FORCE
+>> >     $(call if_changed,bison)
+>> >
+>> >  quiet_cmd_bison_h = YACC    $@
+>> >        cmd_bison_h = bison -o/dev/null --defines=$@ -t -l $<
+>> >
+>> > -ifdef REGENERATE_PARSERS
+>> > -.PRECIOUS: $(src)/%.tab.h_shipped
+>> > -$(src)/%.tab.h_shipped: $(src)/%.y
+>> > -   $(call cmd,bison_h)
+>> > -endif
+>> > -
+>> >  .PRECIOUS: $(obj)/%.tab.h
+>> > -$(filter %.tab.h,$(targets)): $(obj)/%.tab.h: $(src)/%.y FORCE
+>> > +$(obj)/%.tab.h: $(src)/%.y FORCE
+>> >     $(call if_changed,bison_h)
+>> >
+>> >  # Shipped files
+>> > diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
+>> > index 0ccac51..f4749e8 100644
+>> > --- a/scripts/genksyms/Makefile
+>> > +++ b/scripts/genksyms/Makefile
+>> > @@ -5,9 +5,32 @@ always             := $(hostprogs-y)
+>> >
+>> >  genksyms-objs      := genksyms.o parse.tab.o lex.lex.o
+>> >
+>> > +# FIXME: fix the ambiguous grammar in parse.y and delete this hack
+>> > +#
+>> > +# Suppress shift/reduce, reduce/reduce conflicts warnings
+>> > +# unless W=1 is specified.
+>> > +ifeq ($(findstring 1,$(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
+>> > +SUPPRESS_BISON_WARNING := 2>/dev/null
+>>
+>> We have a robot which runs CRIU tests on linux-next.
+>> Yesterday it failed with this error:
+>>
+>>   HOSTCC  scripts/genksyms/genksyms.o
+>> make[2]: *** [scripts/genksyms/parse.tab.c] Error 127
+>>
+>> cripts/genksyms/Makefile:20: recipe for target 'scripts/genksyms/parse.tab.c' failed
+>> scripts/Makefile.build:559: recipe for target 'scripts/genksyms' failed
+>> Makefile:1073: recipe for target 'scripts' failed
+>> make[1]: *** [scripts/genksyms] Error 2
+>> make: *** [scripts] Error 2
+>> make: *** Waiting for unfinished jobs....
+>>
+>> https://travis-ci.org/avagin/linux/jobs/360056903
+>>
+>> From this output, it is very hard to understand what was going wrong.
+>
+>
+> The reason was that bison and fles were not installed, but I think the
+> error message should be more clear.
+>
+>>
+>> Thanks,
+>> Andrei
+>>
 
-The reason for incorrect srcversion is that some source files can be
-simply silently skipped from the checksum calculation due to limited
-buffer space for line parsing.
+Thanks for the report.
 
-This patch addresses two issues:
 
-1. Allocates a larger line buffer (32k vs 4k).
-2. Issues a warning if a line length exceeds the line buffer.
+OK, I will apply the fix-up attached below.
 
-Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
----
- scripts/mod/modpost.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+If bison is not installed, it will fail with clear message.
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 9917f92..955f26e 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -385,9 +385,10 @@ void *grab_file(const char *filename, unsigned long *size)
-   * spaces in the beginning of the line is trimmed away.
-   * Return a pointer to a static buffer.
-   **/
-+#define MODPOST_MAX_LINE 32768
- char *get_next_line(unsigned long *pos, void *file, unsigned long size)
- {
--	static char line[4096];
-+	static char line[MODPOST_MAX_LINE];
- 	int skip = 1;
- 	size_t len = 0;
- 	signed char *p = (signed char *)file + *pos;
-@@ -402,8 +403,11 @@ char *get_next_line(unsigned long *pos, void *file, unsigned long size)
- 		if (*p != '\n' && (*pos < size)) {
- 			len++;
- 			*s++ = *p++;
--			if (len > 4095)
-+			if (len > (sizeof(line)-1)) {
-+				warn(" %s: line exceeds buffer size %zu bytes\n"
-+				     , __func__, sizeof(line));
- 				break; /* Too long, stop */
-+			}
- 		} else {
- 			/* End of string */
- 			*s = '\0';
+  HOSTCC  scripts/genksyms/genksyms.o
+/bin/sh: 1: bison: not found
+make[2]: *** [scripts/genksyms/Makefile:18:
+scripts/genksyms/parse.tab.c] Error 127
+make[1]: *** [scripts/Makefile.build:559: scripts/genksyms] Error 2
+make: *** [Makefile:1073: scripts] Error 2
+
+
+BTW, without flex and bison, how did you build Kconfig?
+
+Since commit 29c833061c1d8c2d1d23a62e7061561eadd76cdb,
+Kconfig requires flex and bison, and this commit is
+in Linus' tree for a couple of month.
+
+Without flex and bison, you cannot do even "make *config"
+Nobody has ever complaint about this.
+
+
+
+
+diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
+index aeefd47..7cb3d70 100644
+--- a/scripts/genksyms/Makefile
++++ b/scripts/genksyms/Makefile
+@@ -10,20 +10,20 @@ genksyms-objs       := genksyms.o parse.tab.o lex.lex.o
+ # Suppress shift/reduce, reduce/reduce conflicts warnings
+ # unless W=1 is specified.
+ ifeq ($(findstring 1,$(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
+-SUPPRESS_BISON_WARNING := 2>/dev/null
+-endif
+
+ quiet_cmd_bison_no_warn = $(quet_cmd_bison)
+-      cmd_bison_no_warn = $(cmd_bison) $(SUPPRESS_BISON_WARNING)
++      cmd_bison_no_warn = $(YACC) --version >/dev/null; $(cmd_bison)
+2>/dev/null
+
+ $(obj)/parse.tab.c: $(src)/parse.y FORCE
+        $(call if_changed,bison_no_warn)
+
+ quiet_cmd_bison_h_no_warn = $(quet_cmd_bison_h)
+-      cmd_bison_h_no_warn = $(cmd_bison_h) $(SUPPRESS_BISON_WARNING)
++      cmd_bison_h_no_warn = $(YACC) --version >/dev/null;
+$(cmd_bison_h) 2>/dev/null
+
+ $(obj)/parse.tab.h: $(src)/parse.y FORCE
+        $(call if_changed,bison_h_no_warn)
++
++endif
+ # FIXME END
+
+ # -I needed for generated C source (shipped source)
+
+
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
