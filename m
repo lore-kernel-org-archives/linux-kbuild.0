@@ -1,32 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:23388 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752065AbeDCQb1 (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:33347 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752240AbeDCQkU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Apr 2018 12:31:27 -0400
+        Tue, 3 Apr 2018 12:40:20 -0400
 MIME-Version: 1.0
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 4 Apr 2018 01:30:23 +0900
-Message-ID: <CAK7LNAQM7V2bz0o1Gwb+w3xjkbdJ=rvg5Hxg0iuTT=4fzZ0D3A@mail.gmail.com>
-Subject: [GIT PULL 1/2] Kbuild updates for 4.17
+Date: Wed, 4 Apr 2018 01:39:21 +0900
+Message-ID: <CAK7LNAQJ_eUVzzy9RzDn2uN3bNJLvw03fy8AQdmNo7eEo5ZVpw@mail.gmail.com>
+Subject: [GIT PULL 2/2] Kconfig updates for 4.17
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
 
 Hi Linus,
 
-Please pull Kbuild updates for v4.17.
-
-
-You will see a merge conflict in
-arch/blackfin/kernel/bfin_ksyms.c
-
-This file was already removed since
-the blackfin support was entirely dropped.
-So, please remove it.
-
+Please pull Kconfig updates for 4.17.
 
 
 
@@ -37,111 +28,182 @@ The following changes since commit 0c8efd610b58cb23cefdfa12015799079aef94ae:
 are available in the git repository at:
 
   git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-v4.17
+tags/kconfig-v4.17
 
-for you to fetch changes up to a95b37e20db9a2b05354eec009b2188523a21c8e:
+for you to fetch changes up to 18492685e479fd4d8e1dca836f57c11b6800f083:
 
-  kbuild: get <linux/compiler_types.h> out of <linux/kconfig.h>
-(2018-03-31 12:22:38 +0900)
-
-----------------------------------------------------------------
-Kbuild updates for v4.17
-
-- add a shell script to get Clang version
-
-- improve portability of build scripts
-
-- drop always-enabled CONFIG_THIN_ARCHIVE and remove unused code
-
-- rename built-in.o which is now thin archive to built-in.a
-
-- process clean/build targets one by one to get along with -j option
-
-- simplify ld-option
-
-- improve building with CONFIG_TRIM_UNUSED_KSYMS
-
-- define KBUILD_MODNAME even for objects shared among multiple modules
-
-- avoid linking multiple instances of same objects from composite objects
-
-- move <linux/compiler_types.h> to c_flags to include it only for C files
-
-- clean-up various Makefiles
+  kconfig: use yylineno option instead of manual lineno increments
+(2018-03-26 02:04:07 +0900)
 
 ----------------------------------------------------------------
-Cao jin (1):
-      kbuild: fix modname for composite modules
+Kconfig updates for v4.17
 
-Masahiro Yamada (23):
-      kbuild: process mixture of clean/build targets one by one
-      kbuild: simplify ld-option implementation
-      kbuild: remove command line interface LDFLAGS_MODULE from makefiles.txt
-      kbuild: remove internally used LDFLAGS_vmlinux from kbuild.txt
-      kbuild: clear LDFLAGS in the top Makefile
-      kbuild: remove wrong 'touch' in adjust_autoksyms.sh
-      kbuild: move 'scripts' target below
-      kbuild: restore autoksyms.h touch to the top Makefile
-      kbuild: move CONFIG_TRIM_UNUSED_KSYMS code unneeded for external module
-      kbuild: move include/config/ksym/* to include/ksym/*
-      kbuild: link vmlinux only once for CONFIG_TRIM_UNUSED_KSYMS
-      kbuild: remove unnecessary $(subst $(obj)/, , ...) in modname-multi
-      kbuild: define KBUILD_MODNAME even if multiple modules share objects
-      kbuild: simplify modname calculation
-      kbuild: move modname and modname-multi close to modname_flags
-      kbuild: rename real-objs-y/m to real-obj-y/m
-      kbuild: link $(real-obj-y) instead of $(obj-y) into built-in.a
-      lib: zstd: clean up Makefile for simpler composite object handling
-      net: liquidio: clean up Makefile for simpler composite object handling
-      kbuild: remove partial section mismatch detection for built-in.a
-      kbuild: clean up archive rule of built-in.a
-      kbuild: clean up link rule of composite modules
-      kbuild: get <linux/compiler_types.h> out of <linux/kconfig.h>
+- improve checkpatch for more precise Kconfig code checking
 
-Michael Forney (2):
-      kbuild: Improve portability of some sed invocations
-      kbuild: Use ls(1) instead of stat(1) to obtain file size
+- clarify effective selects by grouping reverse dependencies in help
 
-Nicholas Piggin (2):
-      kbuild: remove incremental linking option
-      kbuild: rename built-in.o to built-in.a
+- do not write out '# CONFIG_FOO is not set' from invisible symbols
 
-Sami Tolvanen (1):
-      kbuild: add clang-version.sh
+- make oldconfig as silent as it should be
 
- .gitignore                                    |   1 +
- Documentation/kbuild/kbuild.txt               |   4 --
- Documentation/kbuild/makefiles.txt            |  28 ++++-----
- Documentation/process/changes.rst             |   2 +-
- Makefile                                      |  89 ++++++++++++++-------------
- arch/Kconfig                                  |   6 --
- arch/arm/boot/deflate_xip_data.sh             |   2 +-
- arch/blackfin/kernel/bfin_ksyms.c             |   2 +-
- arch/powerpc/boot/wrapper                     |   2 +-
- arch/powerpc/kernel/Makefile                  |   2 +-
- drivers/net/ethernet/cavium/liquidio/Makefile |  51 +++++-----------
- drivers/s390/Makefile                         |   2 +-
- include/linux/kconfig.h                       |   3 -
- lib/Kconfig.debug                             |   4 +-
- lib/zstd/Makefile                             |  17 ++----
- scripts/Kbuild.include                        |   6 +-
- scripts/Makefile.build                        |  97
-++++++++++--------------------
- scripts/Makefile.lib                          |  47 +++++++--------
- scripts/adjust_autoksyms.sh                   |   9 ++-
- scripts/basic/fixdep.c                        |   8 +--
- scripts/clang-version.sh                      |  33 ++++++++++
- scripts/file-size.sh                          |   4 ++
- scripts/gen_initramfs_list.sh                 |   2 +-
- scripts/headers_install.sh                    |  10 ++--
- scripts/kconfig/Makefile                      |   2 -
- scripts/link-vmlinux.sh                       | 103
-++++++++++++--------------------
- scripts/namespace.pl                          |   2 +-
- usr/initramfs_data.S                          |   2 +-
- 28 files changed, 235 insertions(+), 305 deletions(-)
- create mode 100755 scripts/clang-version.sh
- create mode 100755 scripts/file-size.sh
+- rename 'silentoldconfig' to 'syncconfig'
+
+- add unit-test framework and several test cases
+
+- warn unmet dependency of tristate symbols
+
+- make unmet dependency warnings readable, removing false positives
+
+- improve recursive include detection
+
+- use yylineno to simplify the line number tracking
+
+- misc cleanups
+
+----------------------------------------------------------------
+Eugeniu Rosca (1):
+      kconfig: Print reverse dependencies in groups
+
+Masahiro Yamada (24):
+      kconfig: clean-up reverse dependency help implementation
+      kconfig: do not call check_conf() for olddefconfig
+      kconfig: remove unneeded input_mode test in conf()
+      kconfig: remove redundant input_mode test for check_conf() loop
+      kconfig: hide irrelevant sub-menus for oldconfig
+      kconfig: invoke oldconfig instead of silentoldconfig from local*config
+      kconfig: rename silentoldconfig to syncconfig
+      kbuild: add PYTHON2 and PYTHON3 variables
+      kconfig: tests: add framework for Kconfig unit testing
+      kconfig: tests: add basic choice tests
+      kconfig: tests: test automatic submenu creation
+      kconfig: tests: test if new symbols in choice are asked
+      kconfig: tests: check unneeded "is not set" with unmet dependency
+      kconfig: tests: check visibility of tristate choice values in y choice
+      kconfig: tests: test defconfig when two choices interact
+      kconfig: tests: test randconfig for choice in choice
+      kconfig: tests: test if recursive dependencies are detected
+      kconfig: tests: test if recursive inclusion is detected
+      kconfig: warn unmet direct dependency of tristate symbols selected by y
+      kconfig: make unmet dependency warnings readable
+      kconfig: do not include both curses.h and ncurses.h for nconfig
+      kconfig: remove duplicated file name and lineno of recursive inclusion
+      kconfig: detect recursive inclusion earlier
+      kconfig: use yylineno option instead of manual lineno increments
+
+Ulf Magnusson (5):
+      checkpatch: kconfig: recognize more prompts when checking help texts
+      checkpatch: kconfig: check help texts for menuconfig and choice
+      checkpatch: kconfig: prefer 'help' over '---help---'
+      kconfig: only write '# CONFIG_FOO is not set' for visible symbols
+      kconfig: remove redundant streamline_config.pl prerequisite
+
+ Documentation/kbuild/kconfig.txt                       |   2 +-
+ Documentation/networking/i40e.txt                      |   2 +-
+ Makefile                                               |   6 +-
+ scripts/checkpatch.pl                                  |  21 +-
+ scripts/kconfig/Makefile                               |  29 ++-
+ scripts/kconfig/conf.c                                 |  41 ++--
+ scripts/kconfig/expr.c                                 |  86 +++----
+ scripts/kconfig/expr.h                                 |   4 +-
+ scripts/kconfig/lkc.h                                  |   1 +
+ scripts/kconfig/menu.c                                 |  12 +-
+ scripts/kconfig/nconf.h                                |   4 +-
+ scripts/kconfig/symbol.c                               |  40 ++--
+ scripts/kconfig/tests/auto_submenu/Kconfig             |  50 ++++
+ scripts/kconfig/tests/auto_submenu/__init__.py         |  12 +
+ scripts/kconfig/tests/auto_submenu/expected_stdout     |  10 +
+ scripts/kconfig/tests/choice/Kconfig                   |  54 +++++
+ scripts/kconfig/tests/choice/__init__.py               |  40 ++++
+ scripts/kconfig/tests/choice/alldef_expected_config    |   5 +
+ scripts/kconfig/tests/choice/allmod_expected_config    |   9 +
+ scripts/kconfig/tests/choice/allno_expected_config     |   5 +
+ scripts/kconfig/tests/choice/allyes_expected_config    |   9 +
+ scripts/kconfig/tests/choice/oldask0_expected_stdout   |  10 +
+ scripts/kconfig/tests/choice/oldask1_config            |   2 +
+ scripts/kconfig/tests/choice/oldask1_expected_stdout   |  15 ++
+ scripts/kconfig/tests/choice_value_with_m_dep/Kconfig  |  19 ++
+ .../kconfig/tests/choice_value_with_m_dep/__init__.py  |  15 ++
+ scripts/kconfig/tests/choice_value_with_m_dep/config   |   2 +
+ .../tests/choice_value_with_m_dep/expected_config      |   3 +
+ .../tests/choice_value_with_m_dep/expected_stdout      |   4 +
+ scripts/kconfig/tests/conftest.py                      | 291
++++++++++++++++++++++++
+ scripts/kconfig/tests/err_recursive_inc/Kconfig        |   1 +
+ scripts/kconfig/tests/err_recursive_inc/Kconfig.inc1   |   4 +
+ scripts/kconfig/tests/err_recursive_inc/Kconfig.inc2   |   3 +
+ scripts/kconfig/tests/err_recursive_inc/Kconfig.inc3   |   1 +
+ scripts/kconfig/tests/err_recursive_inc/__init__.py    |  10 +
+ .../kconfig/tests/err_recursive_inc/expected_stderr    |   6 +
+ scripts/kconfig/tests/inter_choice/Kconfig             |  23 ++
+ scripts/kconfig/tests/inter_choice/__init__.py         |  14 ++
+ scripts/kconfig/tests/inter_choice/defconfig           |   1 +
+ scripts/kconfig/tests/inter_choice/expected_config     |   4 +
+ scripts/kconfig/tests/new_choice_with_dep/Kconfig      |  37 +++
+ scripts/kconfig/tests/new_choice_with_dep/__init__.py  |  14 ++
+ scripts/kconfig/tests/new_choice_with_dep/config       |   3 +
+ .../kconfig/tests/new_choice_with_dep/expected_stdout  |  10 +
+ scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig    |  14 ++
+ .../kconfig/tests/no_write_if_dep_unmet/__init__.py    |  19 ++
+ scripts/kconfig/tests/no_write_if_dep_unmet/config     |   1 +
+ .../tests/no_write_if_dep_unmet/expected_config        |   5 +
+ scripts/kconfig/tests/pytest.ini                       |   7 +
+ scripts/kconfig/tests/rand_nested_choice/Kconfig       |  33 +++
+ scripts/kconfig/tests/rand_nested_choice/__init__.py   |  16 ++
+ .../kconfig/tests/rand_nested_choice/expected_stdout0  |   2 +
+ .../kconfig/tests/rand_nested_choice/expected_stdout1  |   4 +
+ .../kconfig/tests/rand_nested_choice/expected_stdout2  |   5 +
+ scripts/kconfig/tests/warn_recursive_dep/Kconfig       |  62 +++++
+ scripts/kconfig/tests/warn_recursive_dep/__init__.py   |   9 +
+ .../kconfig/tests/warn_recursive_dep/expected_stderr   |  30 +++
+ scripts/kconfig/zconf.l                                |  41 ++--
+ 58 files changed, 1043 insertions(+), 139 deletions(-)
+ create mode 100644 scripts/kconfig/tests/auto_submenu/Kconfig
+ create mode 100644 scripts/kconfig/tests/auto_submenu/__init__.py
+ create mode 100644 scripts/kconfig/tests/auto_submenu/expected_stdout
+ create mode 100644 scripts/kconfig/tests/choice/Kconfig
+ create mode 100644 scripts/kconfig/tests/choice/__init__.py
+ create mode 100644 scripts/kconfig/tests/choice/alldef_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/allmod_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/allno_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/allyes_expected_config
+ create mode 100644 scripts/kconfig/tests/choice/oldask0_expected_stdout
+ create mode 100644 scripts/kconfig/tests/choice/oldask1_config
+ create mode 100644 scripts/kconfig/tests/choice/oldask1_expected_stdout
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/Kconfig
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/__init__.py
+ create mode 100644 scripts/kconfig/tests/choice_value_with_m_dep/config
+ create mode 100644
+scripts/kconfig/tests/choice_value_with_m_dep/expected_config
+ create mode 100644
+scripts/kconfig/tests/choice_value_with_m_dep/expected_stdout
+ create mode 100644 scripts/kconfig/tests/conftest.py
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig.inc1
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig.inc2
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/Kconfig.inc3
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/__init__.py
+ create mode 100644 scripts/kconfig/tests/err_recursive_inc/expected_stderr
+ create mode 100644 scripts/kconfig/tests/inter_choice/Kconfig
+ create mode 100644 scripts/kconfig/tests/inter_choice/__init__.py
+ create mode 100644 scripts/kconfig/tests/inter_choice/defconfig
+ create mode 100644 scripts/kconfig/tests/inter_choice/expected_config
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/Kconfig
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/__init__.py
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/config
+ create mode 100644 scripts/kconfig/tests/new_choice_with_dep/expected_stdout
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/Kconfig
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/__init__.py
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/config
+ create mode 100644 scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
+ create mode 100644 scripts/kconfig/tests/pytest.ini
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/Kconfig
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/__init__.py
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout0
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout1
+ create mode 100644 scripts/kconfig/tests/rand_nested_choice/expected_stdout2
+ create mode 100644 scripts/kconfig/tests/warn_recursive_dep/Kconfig
+ create mode 100644 scripts/kconfig/tests/warn_recursive_dep/__init__.py
+ create mode 100644 scripts/kconfig/tests/warn_recursive_dep/expected_stderr
 
 
 -- 
