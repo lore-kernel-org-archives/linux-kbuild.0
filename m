@@ -1,66 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.130]:60917 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751247AbeDDMqT (ORCPT
+Received: from mail-wr0-f172.google.com ([209.85.128.172]:42177 "EHLO
+        mail-wr0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751097AbeDDNUh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Apr 2018 08:46:19 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] x86: olpc: fix inconsistent MFD_CS5535 configuration
-Date: Wed,  4 Apr 2018 14:44:54 +0200
-Message-Id: <20180404124539.3817101-1-arnd@arndb.de>
+        Wed, 4 Apr 2018 09:20:37 -0400
+Subject: Re: [PATCH v2] tools: fix cross-compile var clobbering
+References: <20180106201601.11074-1-martin@martingkelly.com>
+ <20180107214028.23771-1-martin@martingkelly.com>
+From: Jiri Slaby <jslaby@suse.cz>
+Message-ID: <cc9e8b57-b2e0-91a5-aa9f-9488c78a9860@suse.cz>
+Date: Wed, 4 Apr 2018 15:20:33 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180107214028.23771-1-martin@martingkelly.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, "H. Peter Anvin" <hpa@zytor.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+To: Martin Kelly <martin@martingkelly.com>, linux-kbuild@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>, Johannes Weiner <hannes@cmpxchg.org>, Linus Walleij <linus.walleij@linaro.org>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Stephen Hemminger <sthemmin@microsoft.com>, Jonathan Cameron <jic23@kernel.org>, =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali.rohar@gmail.com>, Richard Purdie <rpurdie@rpsys.net>, Jacek Anaszewski <jacek.anaszewski@gmail.com>, Pavel Machek <pavel@ucw.cz>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Robert Moore <robert.moore@intel.com>, Lv Zheng <lv.zheng@intel.com>, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, Mark Brown <broonie@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Valentina Manea <valentina.manea.m@gmail.com>, Shuah Khan <shuahkh@osg.samsung.com>, Shuah Khan <shuah@kernel.org>, Mario Limonciello <mario.limonciello@dell.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
 
-This Kconfig warning appeared after a fix to the Kconfig validation.
-The GPIO_CS5535 driver depends on the MFD_CS5535 driver, but the former
-is selected in places where the latter is not:
+On 01/07/2018, 10:40 PM, Martin Kelly wrote:
+> From: Martin Kelly <martin@martingkelly.com>
+...
+> --- a/tools/power/acpi/Makefile.config
+> +++ b/tools/power/acpi/Makefile.config
+> @@ -56,9 +56,6 @@ INSTALL_SCRIPT = ${INSTALL_PROGRAM}
+>  # to compile vs uClibc, that can be done here as well.
+>  CROSS = #/usr/i386-linux-uclibc/usr/bin/i386-uclibc-
+>  CROSS_COMPILE ?= $(CROSS)
+> -CC = $(CROSS_COMPILE)gcc
+> -LD = $(CROSS_COMPILE)gcc
 
-WARNING: unmet direct dependencies detected for GPIO_CS5535
-  Depends on [m]: GPIOLIB [=y] && (X86 [=y] || MIPS || COMPILE_TEST [=y]) && MFD_CS5535 [=m]
-  Selected by [y]:
-  - OLPC_XO1_SCI [=y] && X86_32 [=y] && OLPC [=y] && OLPC_XO1_PM [=y] && INPUT [=y]=y
+This one makes difference -- acpi is special. This used to be:
+LD = gcc
 
-The warning does seem appropriate, since the GPIO_CS5535 driver won't
-work unless MFD_CS5535 is also present. However, there is no link time
-dependency between the two, so this caused no problems during randconfig
-testing before.
+Now it is:
+LD = ld
 
-This changes the 'select GPIO_CS5535' to 'depends on GPIO_CS5535' to
-avoid the issue, at the expense of making it harder to configure the
-driver (one now has to select the dependencies first).
+And due to that, we get:
+ld: unrecognized option '-D_LINUX'
 
-The 'select MFD_CORE' part is completely redundant, since we already
-depend on MFD_CS5535 here, so I'm removing that as well.
+Should we do:
+LD = $(CC)
 
-Ideally, the private symbols exported by that cs5535 gpio driver would
-just be converted to gpiolib interfaces so we could expletely avoid
-this dependency.
+or fix this elsewhere differently?
 
-Fixes: f622f8279581 ("kconfig: warn unmet direct dependency of tristate symbols selected by y")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- arch/x86/Kconfig | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index bf4ddea48e61..ffb2b858e2b1 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -2773,11 +2773,9 @@ config OLPC_XO1_RTC
- 
- config OLPC_XO1_SCI
- 	bool "OLPC XO-1 SCI extras"
--	depends on OLPC && OLPC_XO1_PM
-+	depends on OLPC && OLPC_XO1_PM && GPIO_CS5535=y
- 	depends on INPUT=y
- 	select POWER_SUPPLY
--	select GPIO_CS5535
--	select MFD_CORE
- 	---help---
- 	  Add support for SCI-based features of the OLPC XO-1 laptop:
- 	   - EC-driven system wakeups
+thanks,
 -- 
-2.9.0
-
+js
+suse labs
