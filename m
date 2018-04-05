@@ -1,122 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:52124 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750757AbeDEEiX (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:65159 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751038AbeDEEnG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 00:38:23 -0400
-Received: from mail-ua0-f179.google.com (mail-ua0-f179.google.com [209.85.217.179]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id w354cBH7022866
-        for <linux-kbuild@vger.kernel.org>; Thu, 5 Apr 2018 13:38:12 +0900
-Received: by mail-ua0-f179.google.com with SMTP id n20so14671698ual.7
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Apr 2018 21:38:11 -0700 (PDT)
+        Thu, 5 Apr 2018 00:43:06 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAAqcGHn6mHHMGmcBFfRdwNSJwPaOfmnidw_T_hRKS66V47aryg@mail.gmail.com>
-References: <20180221101032.27263-1-riku.voipio@linaro.org>
- <CAK7LNAQ+evMKMMcqQ8KX2aFGthsx=20o2X4EiQ7qu9y50ZvZjw@mail.gmail.com>
- <CAAqcGHkvKssjFmG0ebz5uBeO_PGeov5_C6MutW65ONp5riFwRg@mail.gmail.com>
- <CAAqcGHmeYqe81zG=PvoCtzhKhAU=27LT_K8OVhTykyBZGdML4A@mail.gmail.com>
- <CAK7LNASuGcv0rhX+NZ4q7D_hkq7=HqeZ2j5hOiW=F1VXeenwYA@mail.gmail.com> <CAAqcGHn6mHHMGmcBFfRdwNSJwPaOfmnidw_T_hRKS66V47aryg@mail.gmail.com>
+In-Reply-To: <20180329004805.7278-3-labbott@redhat.com>
+References: <20180329004805.7278-1-labbott@redhat.com> <20180329004805.7278-3-labbott@redhat.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 5 Apr 2018 13:37:30 +0900
-Message-ID: <CAK7LNAT82c+g96i9TQwe+N7UfsmKFkW43fEg1Xd5DwGkZV4mJw@mail.gmail.com>
-Subject: Re: [PATCH v4] scripts/package/builddeb: split generating packaging
- and build
+Date: Thu, 5 Apr 2018 13:42:05 +0900
+Message-ID: <CAK7LNASd5Ano4G0Uay8MffBp0yb5TQ_1C+WaGv57pPv_J15_gQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] objtool: Support HOSTCFLAGS and HOSTLDFLAGS
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
+To: Laura Abbott <labbott@redhat.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-03-28 17:58 GMT+09:00 Riku Voipio <riku.voipio@linaro.org>:
-> On 27 March 2018 at 18:23, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> Riku,
->>
->> 2018-03-27 22:28 GMT+09:00 Riku Voipio <riku.voipio@linaro.org>:
->>
->>>> If I use GNU Make 4.2
->>>>
->>>> $ cat deb_pkg_log.txt
->>>> MAKEFLAGS for deb-pkg: rR -I/home/masahiro/ref/linux -j8
->>>> --jobserver-auth=3D3,4 --no-print-directory -- obj=3Dscripts/package
->>>> MAKEFLAGS for mkdebian internal: rR -I/home/masahiro/ref/linux -j
->>>> --jobserver-fds=3D5,6 --no-print-directory -- obj=3Dscripts/package
->>>
->>> I'll make a wild guess, and "outside" make is your 4.2 build while the
->>> intdeb-pkg ends up calling the make 4.0 that comes with your ubuntu?
->>> observe the --jobserver-auth vs ---jobsserver-fds arguments.
->>>
->>
->> Ah, you are right!
->>
->>
->> Probably this
->>
->>>
->>> -if [ "x$1" =3D "xdeb-pkg" ]
->>> -then
->>> -    cat <<EOF > debian/rules
->>> -#!/usr/bin/make -f
+2018-03-29 9:48 GMT+09:00 Laura Abbott <labbott@redhat.com>:
+> It may be useful to compile host programs with different flags (e.g.
+> hardening). Ensure that objtool picks up the appropriate flags.
 >
-> This is actually mandated in Debian policy:
+> Signed-off-by: Laura Abbott <labbott@redhat.com>
+> ---
+
+
+I saw some similar patches before.
+
+I thought they are fixing this way
+https://patchwork.kernel.org/patch/10251259/
+
+but, I am not tacking the progress.
+
+
+
+
+>  tools/objtool/Makefile | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> https://www.debian.org/doc/debian-policy/#main-building-script-debian-rul=
-es
+> diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
+> index e6acc281dd37..0ff3bcac1ca9 100644
+> --- a/tools/objtool/Makefile
+> +++ b/tools/objtool/Makefile
+> @@ -31,8 +31,9 @@ INCLUDES := -I$(srctree)/tools/include \
+>             -I$(srctree)/tools/arch/$(HOSTARCH)/include/uapi \
+>             -I$(srctree)/tools/objtool/arch/$(ARCH)/include
+>  WARNINGS := $(EXTRA_WARNINGS) -Wno-switch-default -Wno-switch-enum -Wno-packed
+> -CFLAGS   += -Wall -Werror $(WARNINGS) -fomit-frame-pointer -O2 -g $(INCLUDES)
+> -LDFLAGS  += -lelf $(LIBSUBCMD)
+> +CFLAGS   += -Wall -Werror $(WARNINGS) $(HOSTCFLAGS) -fomit-frame-pointer -O2 -g \
+> +           $(INCLUDES)
+> +LDFLAGS  += -lelf $(LIBSUBCMD) $(HOSTLDFLAGS)
 >
->> So, if I type "make" from the command line, /home/masahiro/bin/make is c=
-hosen.
->> Then, the outer Makefile is executed by Make 4.2.
->>
->> But, due to the shebang '#!/usr/bin/make -f'
->> debian/rules is executed by older Make.
->>
->> Due to the incompatibility of MAKEFLAGS, Make went insane.
->>
->> Hmm, do you have an idea for solution?
+>  # Allow old libelf to be used:
+>  elfshdr := $(shell echo '\#include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
+> --
+> 2.16.2
 >
-> One option:
->
-> +++ b/scripts/package/mkdebian
-> cat <<EOF > debian/rules
-> -#!/usr/bin/make -f
-> #!$(which $MAKE)  -f
->
-> This will let people build with whatever make they please, with the
-> price that the resulting source package will not build elsewhere.
-
-
-I prefer this idea.
-
-
-Just a nit:
-
-Maybe is 'command -v' more portable than 'which'?
-
-Bj=C3=B8rn Forsman stated so in the following:
-https://lkml.org/lkml/2018/3/11/196
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
-Now the parallel building works nicely.
-So, I think '-j1' for dpkg-buildpackage is unnecessary.
-
-
-
-> Option 2 is to error out if "which $MAKE" !=3D /usr/bin/make
->
->> I would be possible to forcibly overwrite MAKEFLAGS
->
-> I think one goal is to keep deb-pkg simple, and fudging MAKEFLAGS
-> would go against that goal.
-
-I agree.
-Please forget my comment.
-
-
-
-
-
---=20
+-- 
 Best Regards
 Masahiro Yamada
