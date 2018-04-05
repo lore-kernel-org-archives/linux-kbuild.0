@@ -1,55 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:44028 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751249AbeDEOYJ (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:20533 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751259AbeDEOue (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 10:24:09 -0400
+        Thu, 5 Apr 2018 10:50:34 -0400
+Received: from mail-ua0-f169.google.com (mail-ua0-f169.google.com [209.85.217.169]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id w35EoNPK013067
+        for <linux-kbuild@vger.kernel.org>; Thu, 5 Apr 2018 23:50:24 +0900
+Received: by mail-ua0-f169.google.com with SMTP id a17so8483600uaf.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 05 Apr 2018 07:50:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <c59adbdd18dc083fc1e08a9a889e67282fcbbaa2.1519668832.git.robin.jarry@6wind.com>
-References: <cover.1519393674.git.robin.jarry@6wind.com> <cover.1519668832.git.robin.jarry@6wind.com>
- <c59adbdd18dc083fc1e08a9a889e67282fcbbaa2.1519668832.git.robin.jarry@6wind.com>
+In-Reply-To: <20180405112229.5576-1-riku.voipio@linaro.org>
+References: <20180405112229.5576-1-riku.voipio@linaro.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 5 Apr 2018 23:23:22 +0900
-Message-ID: <CAK7LNASj6O790hbr0de4dU4GPk99LCGBsGj6t65G1iyxA7WhSA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] kbuild: use HOSTLDFLAGS for single .c executables
+Date: Thu, 5 Apr 2018 23:49:42 +0900
+Message-ID: <CAK7LNASm_7+vRr_uM8efR+UgUaQzJYQH=mE9DCv3yv46F0sV9Q@mail.gmail.com>
+Subject: Re: [PATCH v5] scripts/package/builddeb: split generating packaging
+ and build
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robin Jarry <robin.jarry@6wind.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@kernel.org>
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
 
-2018-02-27 3:41 GMT+09:00 Robin Jarry <robin.jarry@6wind.com>:
-> When compiling executables from a single .c file, the linker is also
-> invoked. Pass the HOSTLDFLAGS like for other linker commands.
+2018-04-05 20:22 GMT+09:00  <riku.voipio@linaro.org>:
+> From: Riku Voipio <riku.voipio@linaro.org>
 >
-> Signed-off-by: Robin Jarry <robin.jarry@6wind.com>
-> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-> Cc: Ingo Molnar <mingo@kernel.org>
+> Move debian/ directory generation out of builddeb to a new script,
+> mkdebian. The package build commands are kept in builddeb, which
+> is now an internal command called from debian/rules.
+>
+> With these changes in place, we can now use dpkg-buildpackage from
+> deb-pkg and bindeb-pkg removing need for handrolled source/changes
+> generation.
+>
+> This patch is based on the criticism of the current state of builddeb
+> discussed on:
+>
+> https://patchwork.kernel.org/patch/9656403/
+>
+> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 > ---
->  scripts/Makefile.host | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-> index e6dc6ae2d7c4..aa971cc3f339 100644
-> --- a/scripts/Makefile.host
-> +++ b/scripts/Makefile.host
-> @@ -84,7 +84,7 @@ hostcxx_flags  = -Wp,-MD,$(depfile) $(__hostcxx_flags)
->  # Create executable from a single .c file
->  # host-csingle -> Executable
->  quiet_cmd_host-csingle         = HOSTCC  $@
-> -      cmd_host-csingle = $(HOSTCC) $(hostc_flags) -o $@ $< \
-> +      cmd_host-csingle = $(HOSTCC) $(hostc_flags) $(HOSTLDFLAGS) -o $@ $< \
->                 $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
->  $(host-csingle): $(obj)/%: $(src)/%.c FORCE
->         $(call if_changed_dep,host-csingle)
+
+Applied to linux-kbuild
+with the following fix-up.  Thanks!
 
 
-This one is correct anyway.
+> +cat <<EOF > debian/rules
+> +#!$(command -v $MAKE)  -f
 
-I applied to linux-kbuild.
+I see two spaces between '$(command -v $MAKE)' and '-f'
 
-
-
--- 
-Best Regards
-Masahiro Yamada
+I removed one space.
