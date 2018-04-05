@@ -1,54 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:20533 "EHLO
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:21287 "EHLO
         conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751259AbeDEOue (ORCPT
+        with ESMTP id S1751259AbeDEOvT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 10:50:34 -0400
-Received: from mail-ua0-f169.google.com (mail-ua0-f169.google.com [209.85.217.169]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id w35EoNPK013067
-        for <linux-kbuild@vger.kernel.org>; Thu, 5 Apr 2018 23:50:24 +0900
-Received: by mail-ua0-f169.google.com with SMTP id a17so8483600uaf.13
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Apr 2018 07:50:24 -0700 (PDT)
+        Thu, 5 Apr 2018 10:51:19 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180405112229.5576-1-riku.voipio@linaro.org>
-References: <20180405112229.5576-1-riku.voipio@linaro.org>
+In-Reply-To: <1522383326-3880-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1522383326-3880-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 5 Apr 2018 23:49:42 +0900
-Message-ID: <CAK7LNASm_7+vRr_uM8efR+UgUaQzJYQH=mE9DCv3yv46F0sV9Q@mail.gmail.com>
-Subject: Re: [PATCH v5] scripts/package/builddeb: split generating packaging
- and build
+Date: Thu, 5 Apr 2018 23:50:25 +0900
+Message-ID: <CAK7LNAR7qOTYnK3JEShhVo807mMwm9-DiSB2yZrKa4vr+BBD1g@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: use -fmacro-prefix-map to make __FILE__ a
+ relative path
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Michal Marek <michal.lkml@markovi.net>, Linus Torvalds <torvalds@linux-foundation.org>, Tom Rini <trini@konsulko.com>, Joe Perches <joe@perches.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-04-05 20:22 GMT+09:00  <riku.voipio@linaro.org>:
-> From: Riku Voipio <riku.voipio@linaro.org>
+2018-03-30 13:15 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> The __FILE__ macro is used everywhere in the kernel to locate the file
+> printing the log message, such as WARN_ON(), etc.  If the kernel is
+> built out of tree, this can be a long absolute path, like this:
 >
-> Move debian/ directory generation out of builddeb to a new script,
-> mkdebian. The package build commands are kept in builddeb, which
-> is now an internal command called from debian/rules.
+>   WARNING: CPU: 1 PID: 1 at /path/to/build/directory/arch/arm64/kernel/foo.c:...
 >
-> With these changes in place, we can now use dpkg-buildpackage from
-> deb-pkg and bindeb-pkg removing need for handrolled source/changes
-> generation.
+> This is because Kbuild runs in the objtree instead of the srctree,
+> then __FILE__ is expanded to a file path prefixed with $(srctree)/.
 >
-> This patch is based on the criticism of the current state of builddeb
-> discussed on:
+> Commit 9da0763bdd82 ("kbuild: Use relative path when building in a
+> subdir of the source tree") improved this to some extent; $(srctree)
+> becomes ".." if the objtree is a child of the srctree.
 >
-> https://patchwork.kernel.org/patch/9656403/
+> For other cases of out-of-tree build, __FILE__ is still the absolute
+> path.  It also means the kernel image depends on where it was built.
 >
-> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+> A brand-new option from GCC, -fmacro-prefix-map, solves this problem.
+> If your compiler supports it, __FILE__ is the relative path from the
+> srctree regardless of O= option.  This provides more readable log and
+> more reproducible builds.
+>
+> Please note __FILE__ is always an absolute path for external modules.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
+>
+> I tested this on GCC 8.
+> (not released yet, but you can get the source code from the trunk.)
 
-Applied to linux-kbuild
-with the following fix-up.  Thanks!
+
+Applied to linux-kbuild.
 
 
-> +cat <<EOF > debian/rules
-> +#!$(command -v $MAKE)  -f
 
-I see two spaces between '$(command -v $MAKE)' and '-f'
-
-I removed one space.
+-- 
+Best Regards
+Masahiro Yamada
