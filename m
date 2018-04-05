@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:40636 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751038AbeDEFAp (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:38003 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751117AbeDEFOw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 01:00:45 -0400
+        Thu, 5 Apr 2018 01:14:52 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180329004805.7278-4-labbott@redhat.com>
-References: <20180329004805.7278-1-labbott@redhat.com> <20180329004805.7278-4-labbott@redhat.com>
+In-Reply-To: <20180329004805.7278-2-labbott@redhat.com>
+References: <20180329004805.7278-1-labbott@redhat.com> <20180329004805.7278-2-labbott@redhat.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 5 Apr 2018 13:59:58 +0900
-Message-ID: <CAK7LNAT8gsvd-DP_TAFNSbJ_Bn=H-gjfuirWd9kmxh8Yx60cfA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] kbuild: Allow passing additional HOSTCFLAGS and HOSTLDFLAGS
+Date: Thu, 5 Apr 2018 14:13:45 +0900
+Message-ID: <CAK7LNAQNbgwN1B9ER0b3QyUn6iC3YiwhgnsPpZ-geW8YJuFB4A@mail.gmail.com>
+Subject: Re: [PATCH 1/3] kbuild: Support HOSTLDFLAGS
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -19,81 +19,75 @@ Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbu
 
 2018-03-29 9:48 GMT+09:00 Laura Abbott <labbott@redhat.com>:
 >
-> Similar to AFLAGS_KBUILD, there may be uses (e.g. hardening) for passing in
-> additional flags to host programs. Allow these to be passed in from the
-> environment.
+> In addition to HOSTCFLAGS, there's HOSTLDFLAGS. Ensure these get passed to
+> calls to build host binaries.
 >
 > Signed-off-by: Laura Abbott <labbott@redhat.com>
 > ---
->  Documentation/kbuild/kbuild.txt | 9 +++++++++
->  Makefile                        | 3 +++
->  2 files changed, 12 insertions(+)
+>  scripts/Makefile.host      | 6 +++---
+>  tools/build/Makefile.build | 2 +-
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 >
-> diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-> index ac2363ea05c5..3751a4bc8596 100644
-> --- a/Documentation/kbuild/kbuild.txt
-> +++ b/Documentation/kbuild/kbuild.txt
-> @@ -24,6 +24,15 @@ KAFLAGS
->  --------------------------------------------------
->  Additional options to the assembler (for built-in and modules).
+> diff --git a/scripts/Makefile.host b/scripts/Makefile.host
+> index e6dc6ae2d7c4..a3a0e2282a56 100644
+> --- a/scripts/Makefile.host
+> +++ b/scripts/Makefile.host
+> @@ -84,7 +84,7 @@ hostcxx_flags  = -Wp,-MD,$(depfile) $(__hostcxx_flags)
+>  # Create executable from a single .c file
+>  # host-csingle -> Executable
+>  quiet_cmd_host-csingle         = HOSTCC  $@
+> -      cmd_host-csingle = $(HOSTCC) $(hostc_flags) -o $@ $< \
+> +      cmd_host-csingle = $(HOSTCC) $(HOSTLDFLAGS) $(hostc_flags) -o $@ $< \
+>                 $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
+>  $(host-csingle): $(obj)/%: $(src)/%.c FORCE
+>         $(call if_changed_dep,host-csingle)
+
+
+This hunk is correct, but Robin posted this.
+https://patchwork.kernel.org/patch/10243073/
+
+Somehow it fell into a crack, and I missed to pick it up.
+I will apply it lately.
+
+
+
+
+> @@ -102,7 +102,7 @@ $(call multi_depend, $(host-cmulti), , -objs)
+>  # Create .o file from a single .c file
+>  # host-cobjs -> .o
+>  quiet_cmd_host-cobjs   = HOSTCC  $@
+> -      cmd_host-cobjs   = $(HOSTCC) $(hostc_flags) -c -o $@ $<
+> +      cmd_host-cobjs   = $(HOSTCC) $(HOSTLDFLAGS) $(hostc_flags) -c -o $@ $<
+>  $(host-cobjs): $(obj)/%.o: $(src)/%.c FORCE
+>         $(call if_changed_dep,host-cobjs)
 >
-> +AFLAGS_HOSTCFLAGS
-> +--------------------------------------------------
-> +Additional options passed to the compiler when building host programs.
-> +
-> +AFLAGS_HOSTLDFLAGS
-> +--------------------------------------------------
-> +Additional options passed to the linker (through the compiler) when buidling
-> +host programs.
-> +
+
+This does not involve the link stage.
+You should not do this.
 
 
-I am afraid you misunderstood the meaning of 'AFLAGS'.
-
-AFLAGS is not 'Additional flags', but 'Assembler flags'
-that are used for compiling *.S files.
-
-AFLAGS for host programs is weird.
-
-
-
-I see similar proposals from different people.
-
-I replied like follows:
-https://lkml.org/lkml/2018/2/28/178
-
-However, Robin seems busy lately.
-
-I will wait a bit, then
-if nobody does this, I may do it.
-
-
-
-
->  AFLAGS_MODULE
->  --------------------------------------------------
->  Additional module specific options to use for $(AS).
-> diff --git a/Makefile b/Makefile
-> index 7ba478ab8c82..2cab3f8d489c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -367,6 +367,9 @@ HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
->  HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
->  HOST_LOADLIBES := $(HOST_LFS_LIBS)
+> @@ -126,7 +126,7 @@ $(host-cxxobjs): $(obj)/%.o: $(src)/%.cc FORCE
+>  # Compile .c file, create position independent .o file
+>  # host-cshobjs -> .o
+>  quiet_cmd_host-cshobjs = HOSTCC  -fPIC $@
+> -      cmd_host-cshobjs = $(HOSTCC) $(hostc_flags) -fPIC -c -o $@ $<
+> +      cmd_host-cshobjs = $(HOSTCC) $(HOSTLDFLAGS) $(hostc_flags) -fPIC -c -o $@ $<
+>  $(host-cshobjs): $(obj)/%.o: $(src)/%.c FORCE
+>         $(call if_changed_dep,host-cshobjs)
 >
-> +HOSTCFLAGS  += $(AFLAGS_HOSTCFLAGS)
-> +HOSTLDFLAGS  += $(AFLAGS_HOSTLDFLAGS)
-> +
->  # Make variables (CC, etc...)
->  AS             = $(CROSS_COMPILE)as
->  LD             = $(CROSS_COMPILE)ld
-> --
-> 2.16.2
+> diff --git a/tools/build/Makefile.build b/tools/build/Makefile.build
+> index cd72016c3cfa..cab55f0d90e1 100644
+> --- a/tools/build/Makefile.build
+> +++ b/tools/build/Makefile.build
+> @@ -64,7 +64,7 @@ quiet_cmd_cc_o_c = CC       $@
+>        cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  quiet_cmd_host_cc_o_c = HOSTCC   $@
+> -      cmd_host_cc_o_c = $(HOSTCC) $(host_c_flags) -c -o $@ $<
+> +      cmd_host_cc_o_c = $(HOSTCC) $(HOSTLDFLAGS) $(host_c_flags) -c -o $@ $<
+>
+>  quiet_cmd_cxx_o_c = CXX      $@
+>        cmd_cxx_o_c = $(CXX) $(cxx_flags) -c -o $@ $<
 
 
 
