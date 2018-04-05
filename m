@@ -1,172 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34424 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751179AbeDEPQy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 11:16:54 -0400
-From: Jiri Olsa <jolsa@kernel.org>
-Subject: [PATCH 1/9] perf tools: Make read_build_id function public
-Date: Thu,  5 Apr 2018 17:16:37 +0200
-Message-Id: <20180405151645.19130-2-jolsa@kernel.org>
-In-Reply-To: <20180405151645.19130-1-jolsa@kernel.org>
-References: <20180405151645.19130-1-jolsa@kernel.org>
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:17109 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751454AbeDEPvx (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 5 Apr 2018 11:51:53 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180405151645.19130-4-jolsa@kernel.org>
+References: <20180405151645.19130-1-jolsa@kernel.org> <20180405151645.19130-4-jolsa@kernel.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 6 Apr 2018 00:50:00 +0900
+Message-ID: <CAK7LNAQHEWAk_J8uZ4_ETR=JzBU9szDCVNxmUvY447uMj1XLVA@mail.gmail.com>
+Subject: Re: [PATCH 3/9] kbuild: Do not pass arguments to link-vmlinux.sh
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
+To: Jiri Olsa <jolsa@kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
 
-And renaming it into parse_notes_buildid to be more
-precise and usable in following patches.
+2018-04-06 0:16 GMT+09:00 Jiri Olsa <jolsa@kernel.org>:
+> There's no need to pass LD* arguments to link-vmlinux.sh,
+> because they are passed as variables. The only argument
+> the link-vmlinux.sh supports is the 'clean' argument.
+>
+> Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+> ---
 
-Link: http://lkml.kernel.org/n/tip-v1mz76rkdxfnbfz2v05fumn6@git.kernel.org
-Signed-off-by: Jiri Olsa <jolsa@kernel.org>
----
- tools/perf/util/symbol-minimal.c | 50 ++--------------------------------------
- tools/perf/util/util.c           | 48 ++++++++++++++++++++++++++++++++++++++
- tools/perf/util/util.h           |  4 ++++
- 3 files changed, 54 insertions(+), 48 deletions(-)
+Wrong.
 
-diff --git a/tools/perf/util/symbol-minimal.c b/tools/perf/util/symbol-minimal.c
-index ff48d0d49584..bd281d3dc508 100644
---- a/tools/perf/util/symbol-minimal.c
-+++ b/tools/perf/util/symbol-minimal.c
-@@ -24,53 +24,6 @@ static bool check_need_swap(int file_endian)
- 	return host_endian != file_endian;
- }
- 
--#define NOTE_ALIGN(sz) (((sz) + 3) & ~3)
--
--#define NT_GNU_BUILD_ID	3
--
--static int read_build_id(void *note_data, size_t note_len, void *bf,
--			 size_t size, bool need_swap)
--{
--	struct {
--		u32 n_namesz;
--		u32 n_descsz;
--		u32 n_type;
--	} *nhdr;
--	void *ptr;
--
--	ptr = note_data;
--	while (ptr < (note_data + note_len)) {
--		const char *name;
--		size_t namesz, descsz;
--
--		nhdr = ptr;
--		if (need_swap) {
--			nhdr->n_namesz = bswap_32(nhdr->n_namesz);
--			nhdr->n_descsz = bswap_32(nhdr->n_descsz);
--			nhdr->n_type = bswap_32(nhdr->n_type);
--		}
--
--		namesz = NOTE_ALIGN(nhdr->n_namesz);
--		descsz = NOTE_ALIGN(nhdr->n_descsz);
--
--		ptr += sizeof(*nhdr);
--		name = ptr;
--		ptr += namesz;
--		if (nhdr->n_type == NT_GNU_BUILD_ID &&
--		    nhdr->n_namesz == sizeof("GNU")) {
--			if (memcmp(name, "GNU", sizeof("GNU")) == 0) {
--				size_t sz = min(size, descsz);
--				memcpy(bf, ptr, sz);
--				memset(bf + sz, 0, size - sz);
--				return 0;
--			}
--		}
--		ptr += descsz;
--	}
--
--	return -1;
--}
--
- int filename__read_debuglink(const char *filename __maybe_unused,
- 			     char *debuglink __maybe_unused,
- 			     size_t size __maybe_unused)
-@@ -153,7 +106,8 @@ int filename__read_build_id(const char *filename, void *bf, size_t size)
- 			if (fread(buf, buf_size, 1, fp) != 1)
- 				goto out_free;
- 
--			ret = read_build_id(buf, buf_size, bf, size, need_swap);
-+			ret = parse_notes_buildid(buf, buf_size, bf, size,
-+						  need_swap);
- 			if (ret == 0)
- 				ret = size;
- 			break;
-diff --git a/tools/perf/util/util.c b/tools/perf/util/util.c
-index 1019bbc5dbd8..41fc61d941ef 100644
---- a/tools/perf/util/util.c
-+++ b/tools/perf/util/util.c
-@@ -447,6 +447,54 @@ fetch_kernel_version(unsigned int *puint, char *str,
- 	return 0;
- }
- 
-+#define NOTE_ALIGN(sz) (((sz) + 3) & ~3)
-+
-+#define NT_GNU_BUILD_ID	3
-+
-+int parse_notes_buildid(void *note_data, size_t note_len, void *bf,
-+			size_t size, bool need_swap)
-+{
-+	struct {
-+		u32 n_namesz;
-+		u32 n_descsz;
-+		u32 n_type;
-+	} *nhdr;
-+	void *ptr;
-+
-+	ptr = note_data;
-+	while (ptr < (note_data + note_len)) {
-+		const char *name;
-+		size_t namesz, descsz;
-+
-+		nhdr = ptr;
-+		if (need_swap) {
-+			nhdr->n_namesz = bswap_32(nhdr->n_namesz);
-+			nhdr->n_descsz = bswap_32(nhdr->n_descsz);
-+			nhdr->n_type = bswap_32(nhdr->n_type);
-+		}
-+
-+		namesz = NOTE_ALIGN(nhdr->n_namesz);
-+		descsz = NOTE_ALIGN(nhdr->n_descsz);
-+
-+		ptr += sizeof(*nhdr);
-+		name = ptr;
-+		ptr += namesz;
-+		if (nhdr->n_type == NT_GNU_BUILD_ID &&
-+		    nhdr->n_namesz == sizeof("GNU")) {
-+			if (memcmp(name, "GNU", sizeof("GNU")) == 0) {
-+				size_t sz = min(size, descsz);
-+
-+				memcpy(bf, ptr, sz);
-+				memset(bf + sz, 0, size - sz);
-+				return 0;
-+			}
-+		}
-+		ptr += descsz;
-+	}
-+
-+	return -1;
-+}
-+
- const char *perf_tip(const char *dirpath)
- {
- 	struct strlist *tips;
-diff --git a/tools/perf/util/util.h b/tools/perf/util/util.h
-index 9496365da3d7..27106548396b 100644
---- a/tools/perf/util/util.h
-+++ b/tools/perf/util/util.h
-@@ -47,6 +47,10 @@ extern int cacheline_size;
- 
- int fetch_kernel_version(unsigned int *puint,
- 			 char *str, size_t str_sz);
-+
-+int parse_notes_buildid(void *note_data, size_t note_len, void *bf,
-+			size_t size, bool need_swap);
-+
- #define KVER_VERSION(x)		(((x) >> 16) & 0xff)
- #define KVER_PATCHLEVEL(x)	(((x) >> 8) & 0xff)
- #define KVER_SUBLEVEL(x)	((x) & 0xff)
+$(LD) $(LDFLAGS) $(LDFLAGS_vmlinux)
+exist here so that any change in them
+invokes scripts/linkk-vmlinux.sh
+
+
+
+
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index d3300e46f925..a65a3919c6ad 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1027,7 +1027,7 @@ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
+>
+>  # Final link of vmlinux with optional arch pass after final link
+>  cmd_link-vmlinux =                                                 \
+> -       $(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
+> +       $(CONFIG_SHELL) $< ;                                       \
+>         $(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+>
+>  vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
+
+
+
+
+
+
 -- 
-2.13.6
-
+Best Regards
+Masahiro Yamada
