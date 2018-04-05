@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55684 "EHLO mx1.redhat.com"
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34474 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751616AbeDEPRA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 11:17:00 -0400
+        id S1751638AbeDEPRC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 5 Apr 2018 11:17:02 -0400
 From: Jiri Olsa <jolsa@kernel.org>
-Subject: [PATCH 3/9] kbuild: Do not pass arguments to link-vmlinux.sh
-Date: Thu,  5 Apr 2018 17:16:39 +0200
-Message-Id: <20180405151645.19130-4-jolsa@kernel.org>
+Subject: [PATCH 4/9] kbuild: Add filechk2 function
+Date: Thu,  5 Apr 2018 17:16:40 +0200
+Message-Id: <20180405151645.19130-5-jolsa@kernel.org>
 In-Reply-To: <20180405151645.19130-1-jolsa@kernel.org>
 References: <20180405151645.19130-1-jolsa@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,28 +14,54 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
 Cc: lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
 
-There's no need to pass LD* arguments to link-vmlinux.sh,
-because they are passed as variables. The only argument
-the link-vmlinux.sh supports is the 'clean' argument.
+Adding filechk2 function  that has the same semantics
+as filechk, but it takes the target file from the 2nd
+argument instead of from the '$@' as in the filechk
+function.
+
+This function is needed when we can't have separate
+target for the file, like in the following patch.
 
 Signed-off-by: Jiri Olsa <jolsa@kernel.org>
 ---
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/Kbuild.include | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index d3300e46f925..a65a3919c6ad 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1027,7 +1027,7 @@ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 065324a8046f..9775ce2771d4 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -67,6 +67,30 @@ define filechk
+ 	fi
+ endef
  
- # Final link of vmlinux with optional arch pass after final link
- cmd_link-vmlinux =                                                 \
--	$(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
-+	$(CONFIG_SHELL) $< ;                                       \
- 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
- 
- vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
++# filechk2 is used to check if the content of a generated file is updated.
++# It follows the same logic as the filechk except instead of the $@ target
++# variable, the checked file is passed in 2nd argument.
++#
++# Sample usage:
++# define filechk_sample
++#	echo $KERNELRELEASE
++# endef
++# version.h : Makefile
++#	$(call filechk2,sample,version.h)
++# endef
++define filechk2
++	$(Q)set -e;					\
++	$(kecho) '  CHK     $(2)';			\
++	mkdir -p $(dir $(2));				\
++	$(filechk_$(1)) < $< > $(2).tmp;		\
++	if [ -r $(2) ] && cmp -s $(2) $(2).tmp; then	\
++		rm -f $(2).tmp;				\
++	else						\
++		$(kecho) '  UPD     $(2)';		\
++		mv -f $(2).tmp $(2);			\
++	fi
++endef
++
+ ######
+ # gcc support functions
+ # See documentation in Documentation/kbuild/makefiles.txt
 -- 
 2.13.6
 
