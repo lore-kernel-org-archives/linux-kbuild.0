@@ -1,102 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:55080 "EHLO
-        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751473AbeDEVnI (ORCPT
+Received: from mail-pl0-f65.google.com ([209.85.160.65]:41816 "EHLO
+        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751443AbeDEVvM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 17:43:08 -0400
-Received: by mail-wm0-f52.google.com with SMTP id r191so9206310wmg.4
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Apr 2018 14:43:07 -0700 (PDT)
-Subject: Re: [PATCH 2/1] Kbuild: fix # escaping in .cmd files for future Make
-References: <20180325223239.14778-1-linux@rasmusvillemoes.dk>
- <20180325230918.23161-1-linux@rasmusvillemoes.dk>
- <CAK7LNASRP4nmKcTsF0QRvCOrX40MMO=FafOs+xG+UNA-b_61Dw@mail.gmail.com>
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Message-ID: <1d69b982-ac3b-af0d-ae1f-16387a8be095@rasmusvillemoes.dk>
-Date: Thu, 5 Apr 2018 23:43:05 +0200
+        Thu, 5 Apr 2018 17:51:12 -0400
+Received: by mail-pl0-f65.google.com with SMTP id bj1-v6so18744981plb.8
+        for <linux-kbuild@vger.kernel.org>; Thu, 05 Apr 2018 14:51:12 -0700 (PDT)
+Subject: Re: [PATCH 3/3] kbuild: Allow passing additional HOSTCFLAGS and
+ HOSTLDFLAGS
+References: <20180329004805.7278-1-labbott@redhat.com>
+ <20180329004805.7278-4-labbott@redhat.com>
+ <CAK7LNAT8gsvd-DP_TAFNSbJ_Bn=H-gjfuirWd9kmxh8Yx60cfA@mail.gmail.com>
+From: Laura Abbott <labbott@redhat.com>
+Message-ID: <535356b9-2c3b-46cc-e53e-820a932a0d6e@redhat.com>
+Date: Thu, 5 Apr 2018 14:51:09 -0700
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNASRP4nmKcTsF0QRvCOrX40MMO=FafOs+xG+UNA-b_61Dw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAK7LNAT8gsvd-DP_TAFNSbJ_Bn=H-gjfuirWd9kmxh8Yx60cfA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Douglas Anderson <dianders@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Matthias Kaehlcke <mka@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>
 
-On 2018-03-26 13:48, Masahiro Yamada wrote:
-> 2018-03-26 8:09 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
->> The latest official Make release is 4.2.1 from mid-2016, but the current
->> git release has this relevant note in the NEWS file:
+On 04/04/2018 09:59 PM, Masahiro Yamada wrote:
+> 2018-03-29 9:48 GMT+09:00 Laura Abbott <labbott@redhat.com>:
 >>
->>   * WARNING: Backward-incompatibility!
->>     Number signs (#) appearing inside a macro reference or function invocation
->>     no longer introduce comments and should not be escaped with backslashes:
->>     thus a call such as:
->>       foo := $(shell echo '#')
->>     is legal.  Previously the number sign needed to be escaped, for example:
->>       foo := $(shell echo '\#')
->>     Now this latter will resolve to "\#".  If you want to write makefiles
->>     portable to both versions, assign the number sign to a variable:
->>       C := \#
->>       foo := $(shell echo '$C')
->>     This was claimed to be fixed in 3.81, but wasn't, for some reason.
->>     To detect this change search for 'nocomment' in the .FEATURES variable.
+>> Similar to AFLAGS_KBUILD, there may be uses (e.g. hardening) for passing in
+>> additional flags to host programs. Allow these to be passed in from the
+>> environment.
 >>
->> Prepare for whatever future Make release contains that change by fixing
->> up the .cmd file escaping - without this, make always thinks the command
->> string has changed and hence rebuilds everything.
->>
->> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+>> Signed-off-by: Laura Abbott <labbott@redhat.com>
 >> ---
->> So the previous patch made everything build, but building again
->> revealed that this central place very much also needed fixing.
+>>   Documentation/kbuild/kbuild.txt | 9 +++++++++
+>>   Makefile                        | 3 +++
+>>   2 files changed, 12 insertions(+)
 >>
->>  scripts/Kbuild.include | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
+>> diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+>> index ac2363ea05c5..3751a4bc8596 100644
+>> --- a/Documentation/kbuild/kbuild.txt
+>> +++ b/Documentation/kbuild/kbuild.txt
+>> @@ -24,6 +24,15 @@ KAFLAGS
+>>   --------------------------------------------------
+>>   Additional options to the assembler (for built-in and modules).
 >>
->> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
->> index 065324a8046f..7a926e4688f4 100644
->> --- a/scripts/Kbuild.include
->> +++ b/scripts/Kbuild.include
->> @@ -10,6 +10,7 @@ space   := $(empty) $(empty)
->>  space_escape := _-_SPACE_-_
->>  right_paren := )
->>  left_paren := (
->> +pound := \#
->>
->>  ###
->>  # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
->> @@ -328,7 +329,7 @@ endif
->>  # (needed for make)
->>  # Replace >'< with >'\''< to be able to enclose the whole string in '...'
->>  # (needed for the shell)
->> -make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
->> +make-cmd = $(call escsq,$(subst $(pound),\\$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
->>
-> 
-> Thanks for the patch, but this changes the behavior.
-> With '#' replaced with $(pound), '\\' does not escape anything,
-> so it is treated as '\\'.
+>> +AFLAGS_HOSTCFLAGS
+>> +--------------------------------------------------
+>> +Additional options passed to the compiler when building host programs.
+>> +
+>> +AFLAGS_HOSTLDFLAGS
+>> +--------------------------------------------------
+>> +Additional options passed to the linker (through the compiler) when buidling
+>> +host programs.
+>> +
 > 
 > 
-> The following keeps the current behavior:
+> I am afraid you misunderstood the meaning of 'AFLAGS'.
 > 
-> make-cmd = $(call escsq,$(subst $(pound),\$(pound),$(subst
-> $$,$$$$,$(cmd_$(1)))))
+> AFLAGS is not 'Additional flags', but 'Assembler flags'
+> that are used for compiling *.S files.
+> 
+> AFLAGS for host programs is weird.
 > 
 > 
 > 
-> But, I think the following is an even better fix:
+> I see similar proposals from different people.
 > 
-> make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst
-> $$,$$$$,$(cmd_$(1)))))
+> I replied like follows:
+> https://lkml.org/lkml/2018/2/28/178
+> 
+> However, Robin seems busy lately.
+> 
+> I will wait a bit, then
+> if nobody does this, I may do it.
+> 
 
-Makefile quoting has never been my strong suit. I actually thought I
-tested my change by looking at some .o.cmd files containing \# before
-and after, but I was fooled by tools/ containing and using their own
-copy of make-cmd - so tools/build/Build.include will also need fixing.
+Thanks for the pointer. I'll keep an eye out for those patches.
 
-Yes, writing $(pound) to the .cmd file seems like the safest choice. Do
-you want me to respin or can/will you do the patch(es) yourself?
+> 
+> 
+> 
+>>   AFLAGS_MODULE
+>>   --------------------------------------------------
+>>   Additional module specific options to use for $(AS).
+>> diff --git a/Makefile b/Makefile
+>> index 7ba478ab8c82..2cab3f8d489c 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -367,6 +367,9 @@ HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
+>>   HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
+>>   HOST_LOADLIBES := $(HOST_LFS_LIBS)
+>>
+>> +HOSTCFLAGS  += $(AFLAGS_HOSTCFLAGS)
+>> +HOSTLDFLAGS  += $(AFLAGS_HOSTLDFLAGS)
+>> +
+>>   # Make variables (CC, etc...)
+>>   AS             = $(CROSS_COMPILE)as
+>>   LD             = $(CROSS_COMPILE)ld
+>> --
+>> 2.16.2
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
 
-Rasmus
