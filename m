@@ -1,73 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37602 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751655AbeDES75 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 14:59:57 -0400
-Date: Thu, 5 Apr 2018 20:59:50 +0200
-From: Jiri Olsa <jolsa@redhat.com>
-Subject: Re: [PATCH 3/9] kbuild: Do not pass arguments to link-vmlinux.sh
-Message-ID: <20180405185950.GA3668@krava>
-References: <20180405151645.19130-1-jolsa@kernel.org>
- <20180405151645.19130-4-jolsa@kernel.org>
- <CAK7LNAQHEWAk_J8uZ4_ETR=JzBU9szDCVNxmUvY447uMj1XLVA@mail.gmail.com>
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:55080 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751473AbeDEVnI (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 5 Apr 2018 17:43:08 -0400
+Received: by mail-wm0-f52.google.com with SMTP id r191so9206310wmg.4
+        for <linux-kbuild@vger.kernel.org>; Thu, 05 Apr 2018 14:43:07 -0700 (PDT)
+Subject: Re: [PATCH 2/1] Kbuild: fix # escaping in .cmd files for future Make
+References: <20180325223239.14778-1-linux@rasmusvillemoes.dk>
+ <20180325230918.23161-1-linux@rasmusvillemoes.dk>
+ <CAK7LNASRP4nmKcTsF0QRvCOrX40MMO=FafOs+xG+UNA-b_61Dw@mail.gmail.com>
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Message-ID: <1d69b982-ac3b-af0d-ae1f-16387a8be095@rasmusvillemoes.dk>
+Date: Thu, 5 Apr 2018 23:43:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQHEWAk_J8uZ4_ETR=JzBU9szDCVNxmUvY447uMj1XLVA@mail.gmail.com>
+In-Reply-To: <CAK7LNASRP4nmKcTsF0QRvCOrX40MMO=FafOs+xG+UNA-b_61Dw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Jiri Olsa <jolsa@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Douglas Anderson <dianders@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Matthias Kaehlcke <mka@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Apr 06, 2018 at 12:50:00AM +0900, Masahiro Yamada wrote:
-> 2018-04-06 0:16 GMT+09:00 Jiri Olsa <jolsa@kernel.org>:
-> > There's no need to pass LD* arguments to link-vmlinux.sh,
-> > because they are passed as variables. The only argument
-> > the link-vmlinux.sh supports is the 'clean' argument.
-> >
-> > Signed-off-by: Jiri Olsa <jolsa@kernel.org>
-> > ---
+On 2018-03-26 13:48, Masahiro Yamada wrote:
+> 2018-03-26 8:09 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
+>> The latest official Make release is 4.2.1 from mid-2016, but the current
+>> git release has this relevant note in the NEWS file:
+>>
+>>   * WARNING: Backward-incompatibility!
+>>     Number signs (#) appearing inside a macro reference or function invocation
+>>     no longer introduce comments and should not be escaped with backslashes:
+>>     thus a call such as:
+>>       foo := $(shell echo '#')
+>>     is legal.  Previously the number sign needed to be escaped, for example:
+>>       foo := $(shell echo '\#')
+>>     Now this latter will resolve to "\#".  If you want to write makefiles
+>>     portable to both versions, assign the number sign to a variable:
+>>       C := \#
+>>       foo := $(shell echo '$C')
+>>     This was claimed to be fixed in 3.81, but wasn't, for some reason.
+>>     To detect this change search for 'nocomment' in the .FEATURES variable.
+>>
+>> Prepare for whatever future Make release contains that change by fixing
+>> up the .cmd file escaping - without this, make always thinks the command
+>> string has changed and hence rebuilds everything.
+>>
+>> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+>> ---
+>> So the previous patch made everything build, but building again
+>> revealed that this central place very much also needed fixing.
+>>
+>>  scripts/Kbuild.include | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+>> index 065324a8046f..7a926e4688f4 100644
+>> --- a/scripts/Kbuild.include
+>> +++ b/scripts/Kbuild.include
+>> @@ -10,6 +10,7 @@ space   := $(empty) $(empty)
+>>  space_escape := _-_SPACE_-_
+>>  right_paren := )
+>>  left_paren := (
+>> +pound := \#
+>>
+>>  ###
+>>  # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
+>> @@ -328,7 +329,7 @@ endif
+>>  # (needed for make)
+>>  # Replace >'< with >'\''< to be able to enclose the whole string in '...'
+>>  # (needed for the shell)
+>> -make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
+>> +make-cmd = $(call escsq,$(subst $(pound),\\$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
+>>
 > 
-> Wrong.
+> Thanks for the patch, but this changes the behavior.
+> With '#' replaced with $(pound), '\\' does not escape anything,
+> so it is treated as '\\'.
 > 
-> $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux)
-> exist here so that any change in them
-> invokes scripts/linkk-vmlinux.sh
+> 
+> The following keeps the current behavior:
+> 
+> make-cmd = $(call escsq,$(subst $(pound),\$(pound),$(subst
+> $$,$$$$,$(cmd_$(1)))))
+> 
+> 
+> 
+> But, I think the following is an even better fix:
+> 
+> make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst
+> $$,$$$$,$(cmd_$(1)))))
 
-sry, I can't see that.. but it's just a side fix,
-which is actually not needed for the rest
+Makefile quoting has never been my strong suit. I actually thought I
+tested my change by looking at some .o.cmd files containing \# before
+and after, but I was fooled by tools/ containing and using their own
+copy of make-cmd - so tools/build/Build.include will also need fixing.
 
-I'll check on more and address this separately
+Yes, writing $(pound) to the .cmd file seems like the safest choice. Do
+you want me to respin or can/will you do the patch(es) yourself?
 
-thanks,
-jirka
-
-> 
-> 
-> 
-> 
-> >  Makefile | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/Makefile b/Makefile
-> > index d3300e46f925..a65a3919c6ad 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -1027,7 +1027,7 @@ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
-> >
-> >  # Final link of vmlinux with optional arch pass after final link
-> >  cmd_link-vmlinux =                                                 \
-> > -       $(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
-> > +       $(CONFIG_SHELL) $< ;                                       \
-> >         $(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
-> >
-> >  vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
-> 
-> 
-> 
-> 
-> 
-> 
-> -- 
-> Best Regards
-> Masahiro Yamada
+Rasmus
