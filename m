@@ -1,59 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:65159 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751038AbeDEEnG (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:40636 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751038AbeDEFAp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 00:43:06 -0400
+        Thu, 5 Apr 2018 01:00:45 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180329004805.7278-3-labbott@redhat.com>
-References: <20180329004805.7278-1-labbott@redhat.com> <20180329004805.7278-3-labbott@redhat.com>
+In-Reply-To: <20180329004805.7278-4-labbott@redhat.com>
+References: <20180329004805.7278-1-labbott@redhat.com> <20180329004805.7278-4-labbott@redhat.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 5 Apr 2018 13:42:05 +0900
-Message-ID: <CAK7LNASd5Ano4G0Uay8MffBp0yb5TQ_1C+WaGv57pPv_J15_gQ@mail.gmail.com>
-Subject: Re: [PATCH 2/3] objtool: Support HOSTCFLAGS and HOSTLDFLAGS
+Date: Thu, 5 Apr 2018 13:59:58 +0900
+Message-ID: <CAK7LNAT8gsvd-DP_TAFNSbJ_Bn=H-gjfuirWd9kmxh8Yx60cfA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] kbuild: Allow passing additional HOSTCFLAGS and HOSTLDFLAGS
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Laura Abbott <labbott@redhat.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>
 
 2018-03-29 9:48 GMT+09:00 Laura Abbott <labbott@redhat.com>:
-> It may be useful to compile host programs with different flags (e.g.
-> hardening). Ensure that objtool picks up the appropriate flags.
+>
+> Similar to AFLAGS_KBUILD, there may be uses (e.g. hardening) for passing in
+> additional flags to host programs. Allow these to be passed in from the
+> environment.
 >
 > Signed-off-by: Laura Abbott <labbott@redhat.com>
 > ---
-
-
-I saw some similar patches before.
-
-I thought they are fixing this way
-https://patchwork.kernel.org/patch/10251259/
-
-but, I am not tacking the progress.
-
-
-
-
->  tools/objtool/Makefile | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  Documentation/kbuild/kbuild.txt | 9 +++++++++
+>  Makefile                        | 3 +++
+>  2 files changed, 12 insertions(+)
 >
-> diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
-> index e6acc281dd37..0ff3bcac1ca9 100644
-> --- a/tools/objtool/Makefile
-> +++ b/tools/objtool/Makefile
-> @@ -31,8 +31,9 @@ INCLUDES := -I$(srctree)/tools/include \
->             -I$(srctree)/tools/arch/$(HOSTARCH)/include/uapi \
->             -I$(srctree)/tools/objtool/arch/$(ARCH)/include
->  WARNINGS := $(EXTRA_WARNINGS) -Wno-switch-default -Wno-switch-enum -Wno-packed
-> -CFLAGS   += -Wall -Werror $(WARNINGS) -fomit-frame-pointer -O2 -g $(INCLUDES)
-> -LDFLAGS  += -lelf $(LIBSUBCMD)
-> +CFLAGS   += -Wall -Werror $(WARNINGS) $(HOSTCFLAGS) -fomit-frame-pointer -O2 -g \
-> +           $(INCLUDES)
-> +LDFLAGS  += -lelf $(LIBSUBCMD) $(HOSTLDFLAGS)
+> diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+> index ac2363ea05c5..3751a4bc8596 100644
+> --- a/Documentation/kbuild/kbuild.txt
+> +++ b/Documentation/kbuild/kbuild.txt
+> @@ -24,6 +24,15 @@ KAFLAGS
+>  --------------------------------------------------
+>  Additional options to the assembler (for built-in and modules).
 >
->  # Allow old libelf to be used:
->  elfshdr := $(shell echo '\#include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
+> +AFLAGS_HOSTCFLAGS
+> +--------------------------------------------------
+> +Additional options passed to the compiler when building host programs.
+> +
+> +AFLAGS_HOSTLDFLAGS
+> +--------------------------------------------------
+> +Additional options passed to the linker (through the compiler) when buidling
+> +host programs.
+> +
+
+
+I am afraid you misunderstood the meaning of 'AFLAGS'.
+
+AFLAGS is not 'Additional flags', but 'Assembler flags'
+that are used for compiling *.S files.
+
+AFLAGS for host programs is weird.
+
+
+
+I see similar proposals from different people.
+
+I replied like follows:
+https://lkml.org/lkml/2018/2/28/178
+
+However, Robin seems busy lately.
+
+I will wait a bit, then
+if nobody does this, I may do it.
+
+
+
+
+>  AFLAGS_MODULE
+>  --------------------------------------------------
+>  Additional module specific options to use for $(AS).
+> diff --git a/Makefile b/Makefile
+> index 7ba478ab8c82..2cab3f8d489c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -367,6 +367,9 @@ HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
+>  HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
+>  HOST_LOADLIBES := $(HOST_LFS_LIBS)
+>
+> +HOSTCFLAGS  += $(AFLAGS_HOSTCFLAGS)
+> +HOSTLDFLAGS  += $(AFLAGS_HOSTLDFLAGS)
+> +
+>  # Make variables (CC, etc...)
+>  AS             = $(CROSS_COMPILE)as
+>  LD             = $(CROSS_COMPILE)ld
 > --
 > 2.16.2
 >
