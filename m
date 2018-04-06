@@ -1,78 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:42989 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751495AbeDEWB0 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:39620 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751274AbeDFBAr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 18:01:26 -0400
-Received: by mail-pl0-f65.google.com with SMTP id g20-v6so21187953plo.9
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Apr 2018 15:01:25 -0700 (PDT)
-Subject: Re: [PATCH 2/3] objtool: Support HOSTCFLAGS and HOSTLDFLAGS
-References: <20180329004805.7278-1-labbott@redhat.com>
- <20180329004805.7278-3-labbott@redhat.com>
- <CAK7LNASd5Ano4G0Uay8MffBp0yb5TQ_1C+WaGv57pPv_J15_gQ@mail.gmail.com>
-From: Laura Abbott <labbott@redhat.com>
-Message-ID: <d9f3c234-27ef-943a-c931-4c597ae84924@redhat.com>
-Date: Thu, 5 Apr 2018 15:01:23 -0700
+        Thu, 5 Apr 2018 21:00:47 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNASd5Ano4G0Uay8MffBp0yb5TQ_1C+WaGv57pPv_J15_gQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180405185950.GA3668@krava>
+References: <20180405151645.19130-1-jolsa@kernel.org> <20180405151645.19130-4-jolsa@kernel.org>
+ <CAK7LNAQHEWAk_J8uZ4_ETR=JzBU9szDCVNxmUvY447uMj1XLVA@mail.gmail.com> <20180405185950.GA3668@krava>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 6 Apr 2018 09:59:59 +0900
+Message-ID: <CAK7LNATU9_zBH9DpayNOCGsFVL0K+Y8Np0z7wxFuwO3Cf1K_tg@mail.gmail.com>
+Subject: Re: [PATCH 3/9] kbuild: Do not pass arguments to link-vmlinux.sh
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Jiri Olsa <jolsa@redhat.com>
+Cc: Jiri Olsa <jolsa@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
 
-On 04/04/2018 09:42 PM, Masahiro Yamada wrote:
-> 2018-03-29 9:48 GMT+09:00 Laura Abbott <labbott@redhat.com>:
->> It may be useful to compile host programs with different flags (e.g.
->> hardening). Ensure that objtool picks up the appropriate flags.
+2018-04-06 3:59 GMT+09:00 Jiri Olsa <jolsa@redhat.com>:
+> On Fri, Apr 06, 2018 at 12:50:00AM +0900, Masahiro Yamada wrote:
+>> 2018-04-06 0:16 GMT+09:00 Jiri Olsa <jolsa@kernel.org>:
+>> > There's no need to pass LD* arguments to link-vmlinux.sh,
+>> > because they are passed as variables. The only argument
+>> > the link-vmlinux.sh supports is the 'clean' argument.
+>> >
+>> > Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+>> > ---
 >>
->> Signed-off-by: Laura Abbott <labbott@redhat.com>
->> ---
-> 
-> 
-> I saw some similar patches before.
-> 
-> I thought they are fixing this way
-> https://patchwork.kernel.org/patch/10251259/
-> 
-> but, I am not tacking the progress.
-> 
-> 
-> 
+>> Wrong.
+>>
+>> $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux)
+>> exist here so that any change in them
+>> invokes scripts/linkk-vmlinux.sh
+>
+> sry, I can't see that.. but it's just a side fix,
+> which is actually not needed for the rest
+>
+> I'll check on more and address this separately
 
-That looks like a different issue since it's still not going to
-pick up the HOST{C,LD}FLAGS.
 
-> 
->>   tools/objtool/Makefile | 5 +++--
->>   1 file changed, 3 insertions(+), 2 deletions(-)
+The link command is recorded in .vmlinux.cmd
+then, it is checked by if_changed in the next rebuild
+because link-vmlinux is invoked by $(call if_changed,...)
+
+     +$(call if_changed,link-vmlinux)
+
+
+
+> thanks,
+> jirka
+>
 >>
->> diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
->> index e6acc281dd37..0ff3bcac1ca9 100644
->> --- a/tools/objtool/Makefile
->> +++ b/tools/objtool/Makefile
->> @@ -31,8 +31,9 @@ INCLUDES := -I$(srctree)/tools/include \
->>              -I$(srctree)/tools/arch/$(HOSTARCH)/include/uapi \
->>              -I$(srctree)/tools/objtool/arch/$(ARCH)/include
->>   WARNINGS := $(EXTRA_WARNINGS) -Wno-switch-default -Wno-switch-enum -Wno-packed
->> -CFLAGS   += -Wall -Werror $(WARNINGS) -fomit-frame-pointer -O2 -g $(INCLUDES)
->> -LDFLAGS  += -lelf $(LIBSUBCMD)
->> +CFLAGS   += -Wall -Werror $(WARNINGS) $(HOSTCFLAGS) -fomit-frame-pointer -O2 -g \
->> +           $(INCLUDES)
->> +LDFLAGS  += -lelf $(LIBSUBCMD) $(HOSTLDFLAGS)
 >>
->>   # Allow old libelf to be used:
->>   elfshdr := $(shell echo '\#include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
+>>
+>>
+>> >  Makefile | 2 +-
+>> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>> >
+>> > diff --git a/Makefile b/Makefile
+>> > index d3300e46f925..a65a3919c6ad 100644
+>> > --- a/Makefile
+>> > +++ b/Makefile
+>> > @@ -1027,7 +1027,7 @@ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
+>> >
+>> >  # Final link of vmlinux with optional arch pass after final link
+>> >  cmd_link-vmlinux =                                                 \
+>> > -       $(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
+>> > +       $(CONFIG_SHELL) $< ;                                       \
+>> >         $(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+>> >
+>> >  vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
+>>
+>>
+>>
+>>
+>>
+>>
 >> --
->> 2.16.2
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
+>> Best Regards
+>> Masahiro Yamada
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
+
+
+-- 
+Best Regards
+Masahiro Yamada
