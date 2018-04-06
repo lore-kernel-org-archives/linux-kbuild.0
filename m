@@ -1,52 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57280 "EHLO mx1.redhat.com"
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41760 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751412AbeDFQzC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Apr 2018 12:55:02 -0400
-Date: Fri, 6 Apr 2018 18:54:45 +0200
-From: Jiri Olsa <jolsa@redhat.com>
-Subject: Re: [PATCH 3/9] kbuild: Do not pass arguments to link-vmlinux.sh
-Message-ID: <20180406165445.GB13785@krava>
-References: <20180405151645.19130-1-jolsa@kernel.org>
- <20180405151645.19130-4-jolsa@kernel.org>
- <CAK7LNAQHEWAk_J8uZ4_ETR=JzBU9szDCVNxmUvY447uMj1XLVA@mail.gmail.com>
- <20180405185950.GA3668@krava>
- <CAK7LNATU9_zBH9DpayNOCGsFVL0K+Y8Np0z7wxFuwO3Cf1K_tg@mail.gmail.com>
+        id S1751344AbeDFR1H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 6 Apr 2018 13:27:07 -0400
+Date: Fri, 6 Apr 2018 12:27:05 -0500
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH 2/3] objtool: Support HOSTCFLAGS and HOSTLDFLAGS
+Message-ID: <20180406172705.zvvmdf6d32jzj5v3@treble>
+References: <20180329004805.7278-1-labbott@redhat.com>
+ <20180329004805.7278-3-labbott@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAK7LNATU9_zBH9DpayNOCGsFVL0K+Y8Np0z7wxFuwO3Cf1K_tg@mail.gmail.com>
+In-Reply-To: <20180329004805.7278-3-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Jiri Olsa <jolsa@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
+To: Laura Abbott <labbott@redhat.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Apr 06, 2018 at 09:59:59AM +0900, Masahiro Yamada wrote:
-> 2018-04-06 3:59 GMT+09:00 Jiri Olsa <jolsa@redhat.com>:
-> > On Fri, Apr 06, 2018 at 12:50:00AM +0900, Masahiro Yamada wrote:
-> >> 2018-04-06 0:16 GMT+09:00 Jiri Olsa <jolsa@kernel.org>:
-> >> > There's no need to pass LD* arguments to link-vmlinux.sh,
-> >> > because they are passed as variables. The only argument
-> >> > the link-vmlinux.sh supports is the 'clean' argument.
-> >> >
-> >> > Signed-off-by: Jiri Olsa <jolsa@kernel.org>
-> >> > ---
-> >>
-> >> Wrong.
-> >>
-> >> $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux)
-> >> exist here so that any change in them
-> >> invokes scripts/linkk-vmlinux.sh
-> >
-> > sry, I can't see that.. but it's just a side fix,
-> > which is actually not needed for the rest
-> >
-> > I'll check on more and address this separately
+On Wed, Mar 28, 2018 at 05:48:04PM -0700, Laura Abbott wrote:
+> It may be useful to compile host programs with different flags (e.g.
+> hardening). Ensure that objtool picks up the appropriate flags.
 > 
+> Signed-off-by: Laura Abbott <labbott@redhat.com>
+> ---
+>  tools/objtool/Makefile | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> The link command is recorded in .vmlinux.cmd
+> diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
+> index e6acc281dd37..0ff3bcac1ca9 100644
+> --- a/tools/objtool/Makefile
+> +++ b/tools/objtool/Makefile
+> @@ -31,8 +31,9 @@ INCLUDES := -I$(srctree)/tools/include \
+>  	    -I$(srctree)/tools/arch/$(HOSTARCH)/include/uapi \
+>  	    -I$(srctree)/tools/objtool/arch/$(ARCH)/include
+>  WARNINGS := $(EXTRA_WARNINGS) -Wno-switch-default -Wno-switch-enum -Wno-packed
+> -CFLAGS   += -Wall -Werror $(WARNINGS) -fomit-frame-pointer -O2 -g $(INCLUDES)
+> -LDFLAGS  += -lelf $(LIBSUBCMD)
+> +CFLAGS   += -Wall -Werror $(WARNINGS) $(HOSTCFLAGS) -fomit-frame-pointer -O2 -g \
+> +	    $(INCLUDES)
 
-i see.. just for the sake command line,
+HOSTCFLAGS already has '-Wall', '-fomit-frame-pointer', and '-O2', so we
+can remove the setting of those in CFLAGS here.
 
-thanks for explanation
-jirka
+-- 
+Josh
