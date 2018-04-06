@@ -1,40 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from muru.com ([72.249.23.125]:35522 "EHLO muru.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750962AbeDFQqT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Apr 2018 12:46:19 -0400
-Date: Fri, 6 Apr 2018 09:46:15 -0700
-From: Tony Lindgren <tony@atomide.com>
-Subject: Re: [BUG] Fix drivers/memory O= build
-Message-ID: <20180406164615.GL5700@atomide.com>
-References: <20180406102519.GN16141@n2100.armlinux.org.uk>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57280 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751412AbeDFQzC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 6 Apr 2018 12:55:02 -0400
+Date: Fri, 6 Apr 2018 18:54:45 +0200
+From: Jiri Olsa <jolsa@redhat.com>
+Subject: Re: [PATCH 3/9] kbuild: Do not pass arguments to link-vmlinux.sh
+Message-ID: <20180406165445.GB13785@krava>
+References: <20180405151645.19130-1-jolsa@kernel.org>
+ <20180405151645.19130-4-jolsa@kernel.org>
+ <CAK7LNAQHEWAk_J8uZ4_ETR=JzBU9szDCVNxmUvY447uMj1XLVA@mail.gmail.com>
+ <20180405185950.GA3668@krava>
+ <CAK7LNATU9_zBH9DpayNOCGsFVL0K+Y8Np0z7wxFuwO3Cf1K_tg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180406102519.GN16141@n2100.armlinux.org.uk>
+In-Reply-To: <CAK7LNATU9_zBH9DpayNOCGsFVL0K+Y8Np0z7wxFuwO3Cf1K_tg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: linux-arm-kernel@lists.infradead.org, Dave Gerlach <d-gerlach@ti.com>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-omap@vger.kernel.org, arm-soc@armlinux.org.uk
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Jiri Olsa <jolsa@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
 
-* Russell King - ARM Linux <linux@armlinux.org.uk> [180406 03:27]:
-> When building a kernel with split object directories, the following
-> failure occurs:
+On Fri, Apr 06, 2018 at 09:59:59AM +0900, Masahiro Yamada wrote:
+> 2018-04-06 3:59 GMT+09:00 Jiri Olsa <jolsa@redhat.com>:
+> > On Fri, Apr 06, 2018 at 12:50:00AM +0900, Masahiro Yamada wrote:
+> >> 2018-04-06 0:16 GMT+09:00 Jiri Olsa <jolsa@kernel.org>:
+> >> > There's no need to pass LD* arguments to link-vmlinux.sh,
+> >> > because they are passed as variables. The only argument
+> >> > the link-vmlinux.sh supports is the 'clean' argument.
+> >> >
+> >> > Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+> >> > ---
+> >>
+> >> Wrong.
+> >>
+> >> $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux)
+> >> exist here so that any change in them
+> >> invokes scripts/linkk-vmlinux.sh
+> >
+> > sry, I can't see that.. but it's just a side fix,
+> > which is actually not needed for the rest
+> >
+> > I'll check on more and address this separately
 > 
-> .../drivers/memory/emif-asm-offsets.c:1:0: fatal error: can't open drivers/memory/emif-asm-offsets.s for writing: No such file or directory
-> compilation terminated.
-> drivers/memory/Makefile.asm-offsets:2: recipe for target 'drivers/memory/emif-asm-offsets.s' failed
-> make[2]: *** [drivers/memory/emif-asm-offsets.s] Error 1
-> .../Makefile:1060: recipe for target 'arch/arm/mach-omap2' failed
-> make[1]: *** [arch/arm/mach-omap2] Error 2
 > 
-> This prevents any kernel being built that includes decending into
-> arch/arm/mach-omap2 with split object directories.
-> 
-> This is a regression.
+> The link command is recorded in .vmlinux.cmd
 
-Dave, I presume you're looking into this already?
+i see.. just for the sake command line,
 
-Regards,
-
-Tony
+thanks for explanation
+jirka
