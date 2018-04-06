@@ -1,82 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50086 "EHLO mx1.redhat.com"
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47864 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752836AbeDFNXb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Apr 2018 09:23:31 -0400
-Date: Fri, 6 Apr 2018 09:23:30 -0400
-From: Don Zickus <dzickus@redhat.com>
-Subject: Re: [PATCH] kconfig: add support for new option 'listnewdefconfig'
-Message-ID: <20180406132330.exxlbxbnleafndwi@redhat.com>
-References: <20180404195625.24657-1-dzickus@redhat.com>
- <CAK7LNAQ78HHOz1fu2==_nZDzUTuxRZLHuFu6yu1C354xH8Y8fA@mail.gmail.com>
- <20180405150329.6ax5pdmwiurx3kg7@redhat.com>
- <CAK7LNAQwaWKbw8hCwH3V4g9fVTZfuj_VWU0juwnE6sg6QvyJ8g@mail.gmail.com>
+        id S1754175AbeDFPHn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 6 Apr 2018 11:07:43 -0400
+Date: Fri, 6 Apr 2018 17:07:36 +0200
+From: Jiri Olsa <jolsa@redhat.com>
+Subject: Re: [RFC 0/9] bpf: Add buildid check support
+Message-ID: <20180406150736.GA13785@krava>
+References: <20180405151645.19130-1-jolsa@kernel.org>
+ <20180406013719.ekptkxbwzpjeaanu@ast-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK7LNAQwaWKbw8hCwH3V4g9fVTZfuj_VWU0juwnE6sg6QvyJ8g@mail.gmail.com>
+In-Reply-To: <20180406013719.ekptkxbwzpjeaanu@ast-mbp.dhcp.thefacebook.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Jiri Olsa <jolsa@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
 
-On Fri, Apr 06, 2018 at 04:29:53PM +0900, Masahiro Yamada wrote:
-> 2018-04-06 0:03 GMT+09:00 Don Zickus <dzickus@redhat.com>:
-> > On Thu, Apr 05, 2018 at 11:29:11AM +0900, Masahiro Yamada wrote:
-> >> 2018-04-05 4:56 GMT+09:00 Don Zickus <dzickus@redhat.com>:
-> >> > We at Red Hat/Fedora have generally tried to have a per file breakdown of
-> >> > every config option we set.  This makes it easy for us to add new options
-> >> > when they are exposed and keep a changelog of why they were set.
-> >> >
-> >> > A Fedora example is here:
-> >> >   https://src.fedoraproject.org/cgit/rpms/kernel.git/tree/configs/fedora/generic
-> >> >
-> >> > Using various merge scripts, we build up a config file and run it through
-> >> > 'make listnewconfig' and 'make oldnoconfig'.   The idea is to print out new
-> >> > config options that haven't been manually set and use the default until
-> >> > a patch is posted to set it properly.
-> >> >
-> >> > To speed things up, it would be nice to make it easier to generate a
-> >> > patch to post the default setting.  The output of 'make listnewconfig'
-> >> > has two issues that limit us:
-> >> >
-> >> > - it doesn't provide the default value
-> >> > - it doesn't provide the new 'choice' options that get flagged in
-> >> >   'oldconfig'
-> >>
-> >>
-> >> So, 'listnewconfig' is a subset of 'listnewdefconfig'.
-> >>
-> >> I wonder if we could extend 'listnewconfig' to meet your demands
-> >> instead of adding the new target.
-> >
-> > Sure.  I am open to whatever you think is appropriate. :-)
+On Thu, Apr 05, 2018 at 06:37:23PM -0700, Alexei Starovoitov wrote:
+> On Thu, Apr 05, 2018 at 05:16:36PM +0200, Jiri Olsa wrote:
+> > hi,
+> > eBPF programs loaded for kprobes are allowed to read kernel
+> > internal structures. We check the provided kernel version
+> > to ensure that the program is loaded for the proper kernel. 
+> > 
+> > The problem is that the version check is not enough, because
+> > it only follows the version setup from kernel's Makefile.
+> > However, the internal kernel structures change based on the
+> > .config data, so in practise we have different kernels with
+> > same version.
+> > 
+> > The eBPF kprobe program thus then get loaded for different
+> > kernel than it's been built for, get wrong data (silently)
+> > and provide misleading output.
+> > 
+> > This patchset implements additional check in eBPF loading code
+> > on provided build ID (from kernel's elf image, .notes section
+> > GNU build ID) to ensure we load the eBPF program on correct
+> > kernel.
+> > 
+> > Also available in here (based on bpf-next/master):
+> >   https://git.kernel.org/pub/scm/linux/kernel/git/jolsa/perf.git
+> >   bpf/checksum
+> > 
+> > This patchset consists of several changes:
+> > 
+> > - adding CONFIG_BUILDID_H option that instructs the build
+> >   to generate uapi header file with build ID data, that
+> >   will be included by eBPF program
+> > 
+> > - adding CONFIG_BPF_BUILDID_CHECK option and new bpf_attr
+> >   field to allow build ID checking when loading the eBPF
+> >   program
+> > 
+> > - changing libbpf to read and pass build ID to the kernel
+> > 
+> > - several small side fixes
+> > 
+> > - example perf eBPF code in bpf-samples/bpf-stdout-example.c
+> >   to show the build ID support/usage.
+> > 
+> >     # perf record -vv  -e ./bpf-samples/bpf-stdout-example.c kill 2>&1 | grep buildid
+> >     libbpf: section(7) buildid, size 21, link 0, flags 3, type=1
+> >     libbpf: kernel buildid of ./bpf-samples/bpf-stdout-example.c is: 6e25edeb408513184e2753bebad25d42314501a0
+> > 
+> >   The buildid is provided the same way we provide kernel
+> >   version, in a special "buildid" section:
+> > 
+> >     # cat ./bpf-samples/bpf-stdout-example.c
+> >     ...
+> >     #include <linux/buildid.h>
+> > 
+> >     char _buildid[] SEC("buildid") = LINUX_BUILDID_DATA;
+> >     ...
+> > 
+> >   where LINUX_BUILDID_DATA is defined in the generated buildid.h.
+> > 
+> > please note it's an RFC ;-) any comments and suggestions are welcome
 > 
+> I think this is overkill.
 > 
-> I prefer extending the existing target.
+> We're very heavy users of kprobe+bpf. It's used for lots
+> of different cases and usage is constantly growing,
+> but I haven't seen a single case of :
+> 
+> > The eBPF kprobe program thus then get loaded for different
+> > kernel than it's been built for, get wrong data (silently)
+> > and provide misleading output.
+> 
+> but I saw plenty of the opposite. People pre-compile the program
+> and hack kernel version when they load, since they know in advance
+> that kprobe+bpf doesn't use any kernel specific things.
+> The existing kernel version check for kprobe+bpf is already annoying
+> to them.
 
-Ok.  So, you want me to respin with my additions added to listnewconfig,
-right?  Easy enough.
+perhaps verifier could detect this (via bpf_probe_read usage) and disable
+the version check automaticaly for such program?
 
-> 
-> 
-> 
-> 
-> >>
-> >>
-> >> What for '#choice' comment ?
-> >
-> > This was something silly added by me to make it obvious that
-> > CONFIG_KERNEL_XZ doesn't needed to be decided, it just needs us to re-review
-> > our current default to see if we should keep it or switch to something new.
-> >
-> > We can drop that piece of the patch.  I wasn't sure if that separating
-> > 'choices' from 'configs|menuconfigs' is interesting or not.
-> 
-> 
-> I think it is better to drop '#choice'.
+and in the same way force the version check (or buildid when enabled)
+once the bpf_probe_read is detected
 
-Sure.  No problem. :-)
-
-Cheers,
-Don
+thanks,
+jirka
