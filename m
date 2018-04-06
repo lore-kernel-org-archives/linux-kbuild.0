@@ -1,36 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:48510 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751759AbeDFKZk (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Apr 2018 06:25:40 -0400
-Date: Fri, 6 Apr 2018 11:25:19 +0100
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: [BUG] Fix drivers/memory O= build
-Message-ID: <20180406102519.GN16141@n2100.armlinux.org.uk>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50086 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752836AbeDFNXb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 6 Apr 2018 09:23:31 -0400
+Date: Fri, 6 Apr 2018 09:23:30 -0400
+From: Don Zickus <dzickus@redhat.com>
+Subject: Re: [PATCH] kconfig: add support for new option 'listnewdefconfig'
+Message-ID: <20180406132330.exxlbxbnleafndwi@redhat.com>
+References: <20180404195625.24657-1-dzickus@redhat.com>
+ <CAK7LNAQ78HHOz1fu2==_nZDzUTuxRZLHuFu6yu1C354xH8Y8fA@mail.gmail.com>
+ <20180405150329.6ax5pdmwiurx3kg7@redhat.com>
+ <CAK7LNAQwaWKbw8hCwH3V4g9fVTZfuj_VWU0juwnE6sg6QvyJ8g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <CAK7LNAQwaWKbw8hCwH3V4g9fVTZfuj_VWU0juwnE6sg6QvyJ8g@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org, Tony Lindgren <tony@atomide.com>, Dave Gerlach <d-gerlach@ti.com>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-omap@vger.kernel.org, arm-soc@armlinux.org.uk
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-When building a kernel with split object directories, the following
-failure occurs:
+On Fri, Apr 06, 2018 at 04:29:53PM +0900, Masahiro Yamada wrote:
+> 2018-04-06 0:03 GMT+09:00 Don Zickus <dzickus@redhat.com>:
+> > On Thu, Apr 05, 2018 at 11:29:11AM +0900, Masahiro Yamada wrote:
+> >> 2018-04-05 4:56 GMT+09:00 Don Zickus <dzickus@redhat.com>:
+> >> > We at Red Hat/Fedora have generally tried to have a per file breakdown of
+> >> > every config option we set.  This makes it easy for us to add new options
+> >> > when they are exposed and keep a changelog of why they were set.
+> >> >
+> >> > A Fedora example is here:
+> >> >   https://src.fedoraproject.org/cgit/rpms/kernel.git/tree/configs/fedora/generic
+> >> >
+> >> > Using various merge scripts, we build up a config file and run it through
+> >> > 'make listnewconfig' and 'make oldnoconfig'.   The idea is to print out new
+> >> > config options that haven't been manually set and use the default until
+> >> > a patch is posted to set it properly.
+> >> >
+> >> > To speed things up, it would be nice to make it easier to generate a
+> >> > patch to post the default setting.  The output of 'make listnewconfig'
+> >> > has two issues that limit us:
+> >> >
+> >> > - it doesn't provide the default value
+> >> > - it doesn't provide the new 'choice' options that get flagged in
+> >> >   'oldconfig'
+> >>
+> >>
+> >> So, 'listnewconfig' is a subset of 'listnewdefconfig'.
+> >>
+> >> I wonder if we could extend 'listnewconfig' to meet your demands
+> >> instead of adding the new target.
+> >
+> > Sure.  I am open to whatever you think is appropriate. :-)
+> 
+> 
+> I prefer extending the existing target.
 
-.../drivers/memory/emif-asm-offsets.c:1:0: fatal error: can't open drivers/memory/emif-asm-offsets.s for writing: No such file or directory
-compilation terminated.
-drivers/memory/Makefile.asm-offsets:2: recipe for target 'drivers/memory/emif-asm-offsets.s' failed
-make[2]: *** [drivers/memory/emif-asm-offsets.s] Error 1
-.../Makefile:1060: recipe for target 'arch/arm/mach-omap2' failed
-make[1]: *** [arch/arm/mach-omap2] Error 2
+Ok.  So, you want me to respin with my additions added to listnewconfig,
+right?  Easy enough.
 
-This prevents any kernel being built that includes decending into
-arch/arm/mach-omap2 with split object directories.
+> 
+> 
+> 
+> 
+> >>
+> >>
+> >> What for '#choice' comment ?
+> >
+> > This was something silly added by me to make it obvious that
+> > CONFIG_KERNEL_XZ doesn't needed to be decided, it just needs us to re-review
+> > our current default to see if we should keep it or switch to something new.
+> >
+> > We can drop that piece of the patch.  I wasn't sure if that separating
+> > 'choices' from 'configs|menuconfigs' is interesting or not.
+> 
+> 
+> I think it is better to drop '#choice'.
 
-This is a regression.
+Sure.  No problem. :-)
 
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+Cheers,
+Don
