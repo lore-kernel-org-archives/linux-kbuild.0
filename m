@@ -1,47 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41760 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751344AbeDFR1H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Apr 2018 13:27:07 -0400
-Date: Fri, 6 Apr 2018 12:27:05 -0500
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH 2/3] objtool: Support HOSTCFLAGS and HOSTLDFLAGS
-Message-ID: <20180406172705.zvvmdf6d32jzj5v3@treble>
-References: <20180329004805.7278-1-labbott@redhat.com>
- <20180329004805.7278-3-labbott@redhat.com>
+Received: from aserp2130.oracle.com ([141.146.126.79]:54118 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751367AbeDFSpq (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 6 Apr 2018 14:45:46 -0400
+Subject: Re: [BUG] Fix drivers/memory O= build
+References: <20180406102519.GN16141@n2100.armlinux.org.uk>
+ <20180406164615.GL5700@atomide.com>
+From: Santosh Shilimkar <santosh.shilimkar@oracle.com>
+Message-ID: <06568f5b-3e4a-f761-7242-85dcc8aeb6a5@oracle.com>
+Date: Fri, 6 Apr 2018 11:45:01 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180329004805.7278-3-labbott@redhat.com>
+In-Reply-To: <20180406164615.GL5700@atomide.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Tony Lindgren <tony@atomide.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Dave Gerlach <d-gerlach@ti.com>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-omap@vger.kernel.org, arm-soc@armlinux.org.uk
 
-On Wed, Mar 28, 2018 at 05:48:04PM -0700, Laura Abbott wrote:
-> It may be useful to compile host programs with different flags (e.g.
-> hardening). Ensure that objtool picks up the appropriate flags.
+On 4/6/2018 9:46 AM, Tony Lindgren wrote:
+> * Russell King - ARM Linux <linux@armlinux.org.uk> [180406 03:27]:
+>> When building a kernel with split object directories, the following
+>> failure occurs:
+>>
+>> .../drivers/memory/emif-asm-offsets.c:1:0: fatal error: can't open drivers/memory/emif-asm-offsets.s for writing: No such file or directory
+>> compilation terminated.
+>> drivers/memory/Makefile.asm-offsets:2: recipe for target 'drivers/memory/emif-asm-offsets.s' failed
+>> make[2]: *** [drivers/memory/emif-asm-offsets.s] Error 1
+>> .../Makefile:1060: recipe for target 'arch/arm/mach-omap2' failed
+>> make[1]: *** [arch/arm/mach-omap2] Error 2
+>>
+>> This prevents any kernel being built that includes decending into
+>> arch/arm/mach-omap2 with split object directories.
+>>
+>> This is a regression.
 > 
-> Signed-off-by: Laura Abbott <labbott@redhat.com>
-> ---
->  tools/objtool/Makefile | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> Dave, I presume you're looking into this already?
 > 
-> diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
-> index e6acc281dd37..0ff3bcac1ca9 100644
-> --- a/tools/objtool/Makefile
-> +++ b/tools/objtool/Makefile
-> @@ -31,8 +31,9 @@ INCLUDES := -I$(srctree)/tools/include \
->  	    -I$(srctree)/tools/arch/$(HOSTARCH)/include/uapi \
->  	    -I$(srctree)/tools/objtool/arch/$(ARCH)/include
->  WARNINGS := $(EXTRA_WARNINGS) -Wno-switch-default -Wno-switch-enum -Wno-packed
-> -CFLAGS   += -Wall -Werror $(WARNINGS) -fomit-frame-pointer -O2 -g $(INCLUDES)
-> -LDFLAGS  += -lelf $(LIBSUBCMD)
-> +CFLAGS   += -Wall -Werror $(WARNINGS) $(HOSTCFLAGS) -fomit-frame-pointer -O2 -g \
-> +	    $(INCLUDES)
+Fix is already posted by 'Anders Roxell <anders.roxell@linaro.org>'
+You are copied on the email Tony.
 
-HOSTCFLAGS already has '-Wall', '-fomit-frame-pointer', and '-O2', so we
-can remove the setting of those in CFLAGS here.
-
--- 
-Josh
+Regards,
+Santosh
