@@ -1,92 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:39620 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751274AbeDFBAr (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:46557 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751275AbeDFBh0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 21:00:47 -0400
+        Thu, 5 Apr 2018 21:37:26 -0400
+Date: Thu, 5 Apr 2018 18:37:23 -0700
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Subject: Re: [RFC 0/9] bpf: Add buildid check support
+Message-ID: <20180406013719.ekptkxbwzpjeaanu@ast-mbp.dhcp.thefacebook.com>
+References: <20180405151645.19130-1-jolsa@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180405185950.GA3668@krava>
-References: <20180405151645.19130-1-jolsa@kernel.org> <20180405151645.19130-4-jolsa@kernel.org>
- <CAK7LNAQHEWAk_J8uZ4_ETR=JzBU9szDCVNxmUvY447uMj1XLVA@mail.gmail.com> <20180405185950.GA3668@krava>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 6 Apr 2018 09:59:59 +0900
-Message-ID: <CAK7LNATU9_zBH9DpayNOCGsFVL0K+Y8Np0z7wxFuwO3Cf1K_tg@mail.gmail.com>
-Subject: Re: [PATCH 3/9] kbuild: Do not pass arguments to link-vmlinux.sh
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180405151645.19130-1-jolsa@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Olsa <jolsa@redhat.com>
-Cc: Jiri Olsa <jolsa@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
+To: Jiri Olsa <jolsa@kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
 
-2018-04-06 3:59 GMT+09:00 Jiri Olsa <jolsa@redhat.com>:
-> On Fri, Apr 06, 2018 at 12:50:00AM +0900, Masahiro Yamada wrote:
->> 2018-04-06 0:16 GMT+09:00 Jiri Olsa <jolsa@kernel.org>:
->> > There's no need to pass LD* arguments to link-vmlinux.sh,
->> > because they are passed as variables. The only argument
->> > the link-vmlinux.sh supports is the 'clean' argument.
->> >
->> > Signed-off-by: Jiri Olsa <jolsa@kernel.org>
->> > ---
->>
->> Wrong.
->>
->> $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux)
->> exist here so that any change in them
->> invokes scripts/linkk-vmlinux.sh
->
-> sry, I can't see that.. but it's just a side fix,
-> which is actually not needed for the rest
->
-> I'll check on more and address this separately
+On Thu, Apr 05, 2018 at 05:16:36PM +0200, Jiri Olsa wrote:
+> hi,
+> eBPF programs loaded for kprobes are allowed to read kernel
+> internal structures. We check the provided kernel version
+> to ensure that the program is loaded for the proper kernel. 
+> 
+> The problem is that the version check is not enough, because
+> it only follows the version setup from kernel's Makefile.
+> However, the internal kernel structures change based on the
+> .config data, so in practise we have different kernels with
+> same version.
+> 
+> The eBPF kprobe program thus then get loaded for different
+> kernel than it's been built for, get wrong data (silently)
+> and provide misleading output.
+> 
+> This patchset implements additional check in eBPF loading code
+> on provided build ID (from kernel's elf image, .notes section
+> GNU build ID) to ensure we load the eBPF program on correct
+> kernel.
+> 
+> Also available in here (based on bpf-next/master):
+>   https://git.kernel.org/pub/scm/linux/kernel/git/jolsa/perf.git
+>   bpf/checksum
+> 
+> This patchset consists of several changes:
+> 
+> - adding CONFIG_BUILDID_H option that instructs the build
+>   to generate uapi header file with build ID data, that
+>   will be included by eBPF program
+> 
+> - adding CONFIG_BPF_BUILDID_CHECK option and new bpf_attr
+>   field to allow build ID checking when loading the eBPF
+>   program
+> 
+> - changing libbpf to read and pass build ID to the kernel
+> 
+> - several small side fixes
+> 
+> - example perf eBPF code in bpf-samples/bpf-stdout-example.c
+>   to show the build ID support/usage.
+> 
+>     # perf record -vv  -e ./bpf-samples/bpf-stdout-example.c kill 2>&1 | grep buildid
+>     libbpf: section(7) buildid, size 21, link 0, flags 3, type=1
+>     libbpf: kernel buildid of ./bpf-samples/bpf-stdout-example.c is: 6e25edeb408513184e2753bebad25d42314501a0
+> 
+>   The buildid is provided the same way we provide kernel
+>   version, in a special "buildid" section:
+> 
+>     # cat ./bpf-samples/bpf-stdout-example.c
+>     ...
+>     #include <linux/buildid.h>
+> 
+>     char _buildid[] SEC("buildid") = LINUX_BUILDID_DATA;
+>     ...
+> 
+>   where LINUX_BUILDID_DATA is defined in the generated buildid.h.
+> 
+> please note it's an RFC ;-) any comments and suggestions are welcome
 
+I think this is overkill.
 
-The link command is recorded in .vmlinux.cmd
-then, it is checked by if_changed in the next rebuild
-because link-vmlinux is invoked by $(call if_changed,...)
+We're very heavy users of kprobe+bpf. It's used for lots
+of different cases and usage is constantly growing,
+but I haven't seen a single case of :
 
-     +$(call if_changed,link-vmlinux)
+> The eBPF kprobe program thus then get loaded for different
+> kernel than it's been built for, get wrong data (silently)
+> and provide misleading output.
 
+but I saw plenty of the opposite. People pre-compile the program
+and hack kernel version when they load, since they know in advance
+that kprobe+bpf doesn't use any kernel specific things.
+The existing kernel version check for kprobe+bpf is already annoying
+to them.
+This buildid check they can easily bypass the same way.
+imo the whole thing just adds complexity and doesn't solve anything.
+Sorry, this is a Nack.
 
-
-> thanks,
-> jirka
->
->>
->>
->>
->>
->> >  Makefile | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> >
->> > diff --git a/Makefile b/Makefile
->> > index d3300e46f925..a65a3919c6ad 100644
->> > --- a/Makefile
->> > +++ b/Makefile
->> > @@ -1027,7 +1027,7 @@ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
->> >
->> >  # Final link of vmlinux with optional arch pass after final link
->> >  cmd_link-vmlinux =                                                 \
->> > -       $(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
->> > +       $(CONFIG_SHELL) $< ;                                       \
->> >         $(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
->> >
->> >  vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
->>
->>
->>
->>
->>
->>
->> --
->> Best Regards
->> Masahiro Yamada
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Best Regards
-Masahiro Yamada
