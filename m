@@ -1,99 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f67.google.com ([209.85.160.67]:46557 "EHLO
-        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751275AbeDFBh0 (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:23815 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751523AbeDFDx7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Apr 2018 21:37:26 -0400
-Date: Thu, 5 Apr 2018 18:37:23 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: Re: [RFC 0/9] bpf: Add buildid check support
-Message-ID: <20180406013719.ekptkxbwzpjeaanu@ast-mbp.dhcp.thefacebook.com>
-References: <20180405151645.19130-1-jolsa@kernel.org>
+        Thu, 5 Apr 2018 23:53:59 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180405151645.19130-1-jolsa@kernel.org>
+In-Reply-To: <1d69b982-ac3b-af0d-ae1f-16387a8be095@rasmusvillemoes.dk>
+References: <20180325223239.14778-1-linux@rasmusvillemoes.dk>
+ <20180325230918.23161-1-linux@rasmusvillemoes.dk> <CAK7LNASRP4nmKcTsF0QRvCOrX40MMO=FafOs+xG+UNA-b_61Dw@mail.gmail.com>
+ <1d69b982-ac3b-af0d-ae1f-16387a8be095@rasmusvillemoes.dk>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 6 Apr 2018 12:53:00 +0900
+Message-ID: <CAK7LNARvTJJR=fa9_NyvwfX9z+f51Ha9XQzLrmVakVWUV4eAQw@mail.gmail.com>
+Subject: Re: [PATCH 2/1] Kbuild: fix # escaping in .cmd files for future Make
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Olsa <jolsa@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Douglas Anderson <dianders@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Matthias Kaehlcke <mka@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, Apr 05, 2018 at 05:16:36PM +0200, Jiri Olsa wrote:
-> hi,
-> eBPF programs loaded for kprobes are allowed to read kernel
-> internal structures. We check the provided kernel version
-> to ensure that the program is loaded for the proper kernel. 
-> 
-> The problem is that the version check is not enough, because
-> it only follows the version setup from kernel's Makefile.
-> However, the internal kernel structures change based on the
-> .config data, so in practise we have different kernels with
-> same version.
-> 
-> The eBPF kprobe program thus then get loaded for different
-> kernel than it's been built for, get wrong data (silently)
-> and provide misleading output.
-> 
-> This patchset implements additional check in eBPF loading code
-> on provided build ID (from kernel's elf image, .notes section
-> GNU build ID) to ensure we load the eBPF program on correct
-> kernel.
-> 
-> Also available in here (based on bpf-next/master):
->   https://git.kernel.org/pub/scm/linux/kernel/git/jolsa/perf.git
->   bpf/checksum
-> 
-> This patchset consists of several changes:
-> 
-> - adding CONFIG_BUILDID_H option that instructs the build
->   to generate uapi header file with build ID data, that
->   will be included by eBPF program
-> 
-> - adding CONFIG_BPF_BUILDID_CHECK option and new bpf_attr
->   field to allow build ID checking when loading the eBPF
->   program
-> 
-> - changing libbpf to read and pass build ID to the kernel
-> 
-> - several small side fixes
-> 
-> - example perf eBPF code in bpf-samples/bpf-stdout-example.c
->   to show the build ID support/usage.
-> 
->     # perf record -vv  -e ./bpf-samples/bpf-stdout-example.c kill 2>&1 | grep buildid
->     libbpf: section(7) buildid, size 21, link 0, flags 3, type=1
->     libbpf: kernel buildid of ./bpf-samples/bpf-stdout-example.c is: 6e25edeb408513184e2753bebad25d42314501a0
-> 
->   The buildid is provided the same way we provide kernel
->   version, in a special "buildid" section:
-> 
->     # cat ./bpf-samples/bpf-stdout-example.c
->     ...
->     #include <linux/buildid.h>
-> 
->     char _buildid[] SEC("buildid") = LINUX_BUILDID_DATA;
->     ...
-> 
->   where LINUX_BUILDID_DATA is defined in the generated buildid.h.
-> 
-> please note it's an RFC ;-) any comments and suggestions are welcome
+2018-04-06 6:43 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
+> On 2018-03-26 13:48, Masahiro Yamada wrote:
+>> 2018-03-26 8:09 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
+>>> The latest official Make release is 4.2.1 from mid-2016, but the current
+>>> git release has this relevant note in the NEWS file:
+>>>
+>>>   * WARNING: Backward-incompatibility!
+>>>     Number signs (#) appearing inside a macro reference or function invocation
+>>>     no longer introduce comments and should not be escaped with backslashes:
+>>>     thus a call such as:
+>>>       foo := $(shell echo '#')
+>>>     is legal.  Previously the number sign needed to be escaped, for example:
+>>>       foo := $(shell echo '\#')
+>>>     Now this latter will resolve to "\#".  If you want to write makefiles
+>>>     portable to both versions, assign the number sign to a variable:
+>>>       C := \#
+>>>       foo := $(shell echo '$C')
+>>>     This was claimed to be fixed in 3.81, but wasn't, for some reason.
+>>>     To detect this change search for 'nocomment' in the .FEATURES variable.
+>>>
+>>> Prepare for whatever future Make release contains that change by fixing
+>>> up the .cmd file escaping - without this, make always thinks the command
+>>> string has changed and hence rebuilds everything.
+>>>
+>>> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+>>> ---
+>>> So the previous patch made everything build, but building again
+>>> revealed that this central place very much also needed fixing.
+>>>
+>>>  scripts/Kbuild.include | 3 ++-
+>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+>>> index 065324a8046f..7a926e4688f4 100644
+>>> --- a/scripts/Kbuild.include
+>>> +++ b/scripts/Kbuild.include
+>>> @@ -10,6 +10,7 @@ space   := $(empty) $(empty)
+>>>  space_escape := _-_SPACE_-_
+>>>  right_paren := )
+>>>  left_paren := (
+>>> +pound := \#
+>>>
+>>>  ###
+>>>  # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
+>>> @@ -328,7 +329,7 @@ endif
+>>>  # (needed for make)
+>>>  # Replace >'< with >'\''< to be able to enclose the whole string in '...'
+>>>  # (needed for the shell)
+>>> -make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
+>>> +make-cmd = $(call escsq,$(subst $(pound),\\$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
+>>>
+>>
+>> Thanks for the patch, but this changes the behavior.
+>> With '#' replaced with $(pound), '\\' does not escape anything,
+>> so it is treated as '\\'.
+>>
+>>
+>> The following keeps the current behavior:
+>>
+>> make-cmd = $(call escsq,$(subst $(pound),\$(pound),$(subst
+>> $$,$$$$,$(cmd_$(1)))))
+>>
+>>
+>>
+>> But, I think the following is an even better fix:
+>>
+>> make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst
+>> $$,$$$$,$(cmd_$(1)))))
+>
+> Makefile quoting has never been my strong suit. I actually thought I
+> tested my change by looking at some .o.cmd files containing \# before
+> and after, but I was fooled by tools/ containing and using their own
+> copy of make-cmd - so tools/build/Build.include will also need fixing.
+>
+> Yes, writing $(pound) to the .cmd file seems like the safest choice. Do
+> you want me to respin or can/will you do the patch(es) yourself?
+>
 
-I think this is overkill.
+Can you send v2 please?
 
-We're very heavy users of kprobe+bpf. It's used for lots
-of different cases and usage is constantly growing,
-but I haven't seen a single case of :
+I will pick it up shortly.
 
-> The eBPF kprobe program thus then get loaded for different
-> kernel than it's been built for, get wrong data (silently)
-> and provide misleading output.
 
-but I saw plenty of the opposite. People pre-compile the program
-and hack kernel version when they load, since they know in advance
-that kprobe+bpf doesn't use any kernel specific things.
-The existing kernel version check for kprobe+bpf is already annoying
-to them.
-This buildid check they can easily bypass the same way.
-imo the whole thing just adds complexity and doesn't solve anything.
-Sorry, this is a Nack.
 
+-- 
+Best Regards
+Masahiro Yamada
