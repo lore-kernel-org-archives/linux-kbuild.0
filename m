@@ -1,105 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47864 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754175AbeDFPHn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Apr 2018 11:07:43 -0400
-Date: Fri, 6 Apr 2018 17:07:36 +0200
-From: Jiri Olsa <jolsa@redhat.com>
-Subject: Re: [RFC 0/9] bpf: Add buildid check support
-Message-ID: <20180406150736.GA13785@krava>
-References: <20180405151645.19130-1-jolsa@kernel.org>
- <20180406013719.ekptkxbwzpjeaanu@ast-mbp.dhcp.thefacebook.com>
+Received: from muru.com ([72.249.23.125]:35522 "EHLO muru.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750962AbeDFQqT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 6 Apr 2018 12:46:19 -0400
+Date: Fri, 6 Apr 2018 09:46:15 -0700
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [BUG] Fix drivers/memory O= build
+Message-ID: <20180406164615.GL5700@atomide.com>
+References: <20180406102519.GN16141@n2100.armlinux.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180406013719.ekptkxbwzpjeaanu@ast-mbp.dhcp.thefacebook.com>
+In-Reply-To: <20180406102519.GN16141@n2100.armlinux.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Jiri Olsa <jolsa@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, lkml <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, Quentin Monnet <quentin.monnet@netronome.com>, Eugene Syromiatnikov <esyr@redhat.com>, Jiri Benc <jbenc@redhat.com>, Stanislav Kozina <skozina@redhat.com>, Jerome Marchand <jmarchan@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Jiri Kosina <jkosina@suse.cz>
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: linux-arm-kernel@lists.infradead.org, Dave Gerlach <d-gerlach@ti.com>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-omap@vger.kernel.org, arm-soc@armlinux.org.uk
 
-On Thu, Apr 05, 2018 at 06:37:23PM -0700, Alexei Starovoitov wrote:
-> On Thu, Apr 05, 2018 at 05:16:36PM +0200, Jiri Olsa wrote:
-> > hi,
-> > eBPF programs loaded for kprobes are allowed to read kernel
-> > internal structures. We check the provided kernel version
-> > to ensure that the program is loaded for the proper kernel. 
-> > 
-> > The problem is that the version check is not enough, because
-> > it only follows the version setup from kernel's Makefile.
-> > However, the internal kernel structures change based on the
-> > .config data, so in practise we have different kernels with
-> > same version.
-> > 
-> > The eBPF kprobe program thus then get loaded for different
-> > kernel than it's been built for, get wrong data (silently)
-> > and provide misleading output.
-> > 
-> > This patchset implements additional check in eBPF loading code
-> > on provided build ID (from kernel's elf image, .notes section
-> > GNU build ID) to ensure we load the eBPF program on correct
-> > kernel.
-> > 
-> > Also available in here (based on bpf-next/master):
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/jolsa/perf.git
-> >   bpf/checksum
-> > 
-> > This patchset consists of several changes:
-> > 
-> > - adding CONFIG_BUILDID_H option that instructs the build
-> >   to generate uapi header file with build ID data, that
-> >   will be included by eBPF program
-> > 
-> > - adding CONFIG_BPF_BUILDID_CHECK option and new bpf_attr
-> >   field to allow build ID checking when loading the eBPF
-> >   program
-> > 
-> > - changing libbpf to read and pass build ID to the kernel
-> > 
-> > - several small side fixes
-> > 
-> > - example perf eBPF code in bpf-samples/bpf-stdout-example.c
-> >   to show the build ID support/usage.
-> > 
-> >     # perf record -vv  -e ./bpf-samples/bpf-stdout-example.c kill 2>&1 | grep buildid
-> >     libbpf: section(7) buildid, size 21, link 0, flags 3, type=1
-> >     libbpf: kernel buildid of ./bpf-samples/bpf-stdout-example.c is: 6e25edeb408513184e2753bebad25d42314501a0
-> > 
-> >   The buildid is provided the same way we provide kernel
-> >   version, in a special "buildid" section:
-> > 
-> >     # cat ./bpf-samples/bpf-stdout-example.c
-> >     ...
-> >     #include <linux/buildid.h>
-> > 
-> >     char _buildid[] SEC("buildid") = LINUX_BUILDID_DATA;
-> >     ...
-> > 
-> >   where LINUX_BUILDID_DATA is defined in the generated buildid.h.
-> > 
-> > please note it's an RFC ;-) any comments and suggestions are welcome
+* Russell King - ARM Linux <linux@armlinux.org.uk> [180406 03:27]:
+> When building a kernel with split object directories, the following
+> failure occurs:
 > 
-> I think this is overkill.
+> .../drivers/memory/emif-asm-offsets.c:1:0: fatal error: can't open drivers/memory/emif-asm-offsets.s for writing: No such file or directory
+> compilation terminated.
+> drivers/memory/Makefile.asm-offsets:2: recipe for target 'drivers/memory/emif-asm-offsets.s' failed
+> make[2]: *** [drivers/memory/emif-asm-offsets.s] Error 1
+> .../Makefile:1060: recipe for target 'arch/arm/mach-omap2' failed
+> make[1]: *** [arch/arm/mach-omap2] Error 2
 > 
-> We're very heavy users of kprobe+bpf. It's used for lots
-> of different cases and usage is constantly growing,
-> but I haven't seen a single case of :
+> This prevents any kernel being built that includes decending into
+> arch/arm/mach-omap2 with split object directories.
 > 
-> > The eBPF kprobe program thus then get loaded for different
-> > kernel than it's been built for, get wrong data (silently)
-> > and provide misleading output.
-> 
-> but I saw plenty of the opposite. People pre-compile the program
-> and hack kernel version when they load, since they know in advance
-> that kprobe+bpf doesn't use any kernel specific things.
-> The existing kernel version check for kprobe+bpf is already annoying
-> to them.
+> This is a regression.
 
-perhaps verifier could detect this (via bpf_probe_read usage) and disable
-the version check automaticaly for such program?
+Dave, I presume you're looking into this already?
 
-and in the same way force the version check (or buildid when enabled)
-once the bpf_probe_read is detected
+Regards,
 
-thanks,
-jirka
+Tony
