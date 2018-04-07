@@ -1,125 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:55820 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751956AbeDFVhM (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:30757 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751780AbeDGC4X (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Apr 2018 17:37:12 -0400
-Subject: Re: [PATCH v2] kbuild: check for pkg-config on make
- {menu,n,g,x}config
-References: <9e9438b0-568a-8dc0-dad6-d29b6e39e53a@infradead.org>
- <CAK7LNAQxcVRvhJn6GQVdLLuEq0sJEUcfwkbMpmx9j9nbjscQRg@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <3ce8f87d-69fa-231a-b51c-9805e6525032@infradead.org>
-Date: Fri, 6 Apr 2018 14:37:08 -0700
+        Fri, 6 Apr 2018 22:56:23 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQxcVRvhJn6GQVdLLuEq0sJEUcfwkbMpmx9j9nbjscQRg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180406185505.GD10990@n2100.armlinux.org.uk>
+References: <20180406102519.GN16141@n2100.armlinux.org.uk> <20180406164615.GL5700@atomide.com>
+ <06568f5b-3e4a-f761-7242-85dcc8aeb6a5@oracle.com> <20180406185505.GD10990@n2100.armlinux.org.uk>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 7 Apr 2018 11:55:22 +0900
+Message-ID: <CAK7LNARbST+-oy-J9B2Q2vSp0nhnn9gqOnT7urZdjQZhSpYB-Q@mail.gmail.com>
+Subject: Re: [BUG] Fix drivers/memory O= build
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Bj=c3=b8rn_Forsman?= <bjorn.forsman@gmail.com>
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Santosh Shilimkar <santosh.shilimkar@oracle.com>, Tony Lindgren <tony@atomide.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Dave Gerlach <d-gerlach@ti.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux-OMAP <linux-omap@vger.kernel.org>, arm-soc@armlinux.org.uk
 
-On 03/14/2018 10:50 PM, Masahiro Yamada wrote:
-> 2018-03-13 11:30 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
->> From: Randy Dunlap <rdunlap@infradead.org>
->>
->> Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
->> that other required files are present, but none of these check that
->> pkg-config itself is present.  Add a check for all 4 of these targets.
->>
->> Fixes kernel bugzilla #77511:
->> https://bugzilla.kernel.org/show_bug.cgi?id=77511
->>
->> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
->> ---
->> v2: use 'command -v' instead of 'which'
->>
->> I'm also OK with just documenting the pkg-config requirement in
->> Documentation/Changes (= Documentation/process/changes.rst).
->>
->>  scripts/kconfig/Makefile           |   15 ++++++++++++++-
->>  scripts/kconfig/check-pkgconfig.sh |   12 ++++++++++++
->>  2 files changed, 26 insertions(+), 1 deletion(-)
->>
->> --- lnx-416-rc3.orig/scripts/kconfig/Makefile
->> +++ lnx-416-rc3/scripts/kconfig/Makefile
->> @@ -160,6 +160,9 @@ help:
->>         @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
->>         @echo  '  tinyconfig      - Configure the tiniest possible kernel'
->>
->> +# pkg-config check
->> +check-pkgconfig  := $(srctree)/$(src)/check-pkgconfig.sh
->> +
->>  # lxdialog stuff
->>  check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
->>
->> @@ -205,7 +208,17 @@ $(addprefix $(obj)/, mconf.o $(lxdialog)
->>  $(obj)/dochecklxdialog:
->>         $(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC) $(HOST_EXTRACFLAGS) $(HOSTLOADLIBES_mconf)
->>
->> -always := dochecklxdialog
->> +# Check that we have pkg-config (used by each of menu/n/g/xconfig)
->> +PHONY += $(obj)/docheckpkgconfig
->> +$(addprefix $(obj)/, mconf.o): $(obj)/docheckpkgconfig
->> +$(addprefix $(obj)/, nconf.o): $(obj)/docheckpkgconfig
->> +$(addprefix $(obj)/, gconf.o): $(obj)/docheckpkgconfig
->> +$(addprefix $(obj)/, qconf.o): $(obj)/docheckpkgconfig
->> +
->> +$(obj)/docheckpkgconfig:
->> +       $(Q)$(CONFIG_SHELL) $(check-pkgconfig)
->> +
->> +always := docheckpkgconfig dochecklxdialog
-> 
-> 
-> I did not test this patch, but does this check work as expected?
-> 
-> Probably we want to run 'docheckpkgconfig'
-> before 'dochecklxdiag', '.tmp_gtkcheck', '.tmp_qtcheck', etc.
-> But, I do not see such dependencies.
-> 
-> 
-> Also, if we make 'pkg-config' mandatory,
-> should we entirely drop fall-back logics like follows?
-> 
-> https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/lxdialog/check-lxdialog.sh#L10
-> https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/lxdialog/check-lxdialog.sh#L29
-> https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/Makefile#L230
-> 
-> 
-> What do you think?
-> 
-
-Hi,
-
-I'm willing to keep patching/testing on this, but both pkg-config and depmod
-(for depmod, see: https://bugzilla.kernel.org/show_bug.cgi?id=198965)
-are basic requirements IMO, so just documenting their requirements is good
-enough to me, but might not be good enough for some users.
-
-Comments?
+2018-04-07 3:55 GMT+09:00 Russell King - ARM Linux <linux@armlinux.org.uk>:
+> On Fri, Apr 06, 2018 at 11:45:01AM -0700, Santosh Shilimkar wrote:
+>> On 4/6/2018 9:46 AM, Tony Lindgren wrote:
+>> >* Russell King - ARM Linux <linux@armlinux.org.uk> [180406 03:27]:
+>> >>When building a kernel with split object directories, the following
+>> >>failure occurs:
+>> >>
+>> >>.../drivers/memory/emif-asm-offsets.c:1:0: fatal error: can't open drivers/memory/emif-asm-offsets.s for writing: No such file or directory
+>> >>compilation terminated.
+>> >>drivers/memory/Makefile.asm-offsets:2: recipe for target 'drivers/memory/emif-asm-offsets.s' failed
+>> >>make[2]: *** [drivers/memory/emif-asm-offsets.s] Error 1
+>> >>.../Makefile:1060: recipe for target 'arch/arm/mach-omap2' failed
+>> >>make[1]: *** [arch/arm/mach-omap2] Error 2
+>> >>
+>> >>This prevents any kernel being built that includes decending into
+>> >>arch/arm/mach-omap2 with split object directories.
+>> >>
+>> >>This is a regression.
+>> >
+>> >Dave, I presume you're looking into this already?
+>> >
+>> Fix is already posted by 'Anders Roxell <anders.roxell@linaro.org>'
+>> You are copied on the email Tony.
+>
+> Arnd also has a fix for it as well, which moves emif-asm-offsets.s
+> into include/generated, as that will always exist prior to these
+> rules being invoked.  Arnd's passing it through his randconfig
+> builder before publishing it.
 
 
-> 
->>  # Add environment specific flags
->>  HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTCC) $(HOSTCFLAGS))
->> --- /dev/null
->> +++ lnx-416-rc3/scripts/kconfig/check-pkgconfig.sh
->> @@ -0,0 +1,12 @@
->> +#!/bin/sh
->> +# SPDX-License-Identifier: GPL-2.0
->> +# Check for pkg-config presence
->> +
->> +pkgcfg=`command -v pkg-config`
->> +
->> +if [ "$pkgcfg" = "" ]; then
->> +       echo "'make *config' requires 'pkg-config'. Please install it." 1>&2
->> +       exit 1          # error
->> +fi
->> +
->> +exit 0
+I do not like this idea.
 
-thanks,
+Not sure exactly what Arnd is trying to do,
+but the same file should not be touched from multiple points
+in case Kbuild descends into mach-omap2/ and memory/ at the same time.
+
+
+I recommend to put copies in each directory:
+
+arch/arm/mach-omap2/emif-asm-offsets.h
+drivers/memory/ti-emif-asm-offsets.h
+
+
+If you want me to send a patch,
+I will give it a try.
+
+
+
+
 -- 
-~Randy
+Best Regards
+Masahiro Yamada
