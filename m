@@ -1,90 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:37974 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751447AbeDGNih (ORCPT
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:35227 "EHLO
+        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752847AbeDHVfd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 7 Apr 2018 09:38:37 -0400
-Date: Sat, 7 Apr 2018 14:38:17 +0100
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [BUG] Fix drivers/memory O= build
-Message-ID: <20180407133817.GE10990@n2100.armlinux.org.uk>
-References: <20180406102519.GN16141@n2100.armlinux.org.uk>
- <20180406164615.GL5700@atomide.com>
- <06568f5b-3e4a-f761-7242-85dcc8aeb6a5@oracle.com>
- <20180406185505.GD10990@n2100.armlinux.org.uk>
- <CAK7LNARbST+-oy-J9B2Q2vSp0nhnn9gqOnT7urZdjQZhSpYB-Q@mail.gmail.com>
+        Sun, 8 Apr 2018 17:35:33 -0400
+Received: by mail-wm0-f50.google.com with SMTP id r82so12420352wme.0
+        for <linux-kbuild@vger.kernel.org>; Sun, 08 Apr 2018 14:35:32 -0700 (PDT)
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: [PATCH v2] Kbuild: fix # escaping in .cmd files for future Make
+Date: Sun,  8 Apr 2018 23:35:28 +0200
+Message-Id: <20180408213528.26758-1-linux@rasmusvillemoes.dk>
+In-Reply-To: <CAK7LNARvTJJR=fa9_NyvwfX9z+f51Ha9XQzLrmVakVWUV4eAQw@mail.gmail.com>
+References: <CAK7LNARvTJJR=fa9_NyvwfX9z+f51Ha9XQzLrmVakVWUV4eAQw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARbST+-oy-J9B2Q2vSp0nhnn9gqOnT7urZdjQZhSpYB-Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Santosh Shilimkar <santosh.shilimkar@oracle.com>, Tony Lindgren <tony@atomide.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Dave Gerlach <d-gerlach@ti.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux-OMAP <linux-omap@vger.kernel.org>, arm-soc@armlinux.org.uk
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
 
-On Sat, Apr 07, 2018 at 11:55:22AM +0900, Masahiro Yamada wrote:
-> 2018-04-07 3:55 GMT+09:00 Russell King - ARM Linux <linux@armlinux.org.uk>:
-> > On Fri, Apr 06, 2018 at 11:45:01AM -0700, Santosh Shilimkar wrote:
-> >> On 4/6/2018 9:46 AM, Tony Lindgren wrote:
-> >> >* Russell King - ARM Linux <linux@armlinux.org.uk> [180406 03:27]:
-> >> >>When building a kernel with split object directories, the following
-> >> >>failure occurs:
-> >> >>
-> >> >>.../drivers/memory/emif-asm-offsets.c:1:0: fatal error: can't open drivers/memory/emif-asm-offsets.s for writing: No such file or directory
-> >> >>compilation terminated.
-> >> >>drivers/memory/Makefile.asm-offsets:2: recipe for target 'drivers/memory/emif-asm-offsets.s' failed
-> >> >>make[2]: *** [drivers/memory/emif-asm-offsets.s] Error 1
-> >> >>.../Makefile:1060: recipe for target 'arch/arm/mach-omap2' failed
-> >> >>make[1]: *** [arch/arm/mach-omap2] Error 2
-> >> >>
-> >> >>This prevents any kernel being built that includes decending into
-> >> >>arch/arm/mach-omap2 with split object directories.
-> >> >>
-> >> >>This is a regression.
-> >> >
-> >> >Dave, I presume you're looking into this already?
-> >> >
-> >> Fix is already posted by 'Anders Roxell <anders.roxell@linaro.org>'
-> >> You are copied on the email Tony.
-> >
-> > Arnd also has a fix for it as well, which moves emif-asm-offsets.s
-> > into include/generated, as that will always exist prior to these
-> > rules being invoked.  Arnd's passing it through his randconfig
-> > builder before publishing it.
-> 
-> 
-> I do not like this idea.
-> 
-> Not sure exactly what Arnd is trying to do,
-> but the same file should not be touched from multiple points
-> in case Kbuild descends into mach-omap2/ and memory/ at the same time.
-> 
-> 
-> I recommend to put copies in each directory:
-> 
-> arch/arm/mach-omap2/emif-asm-offsets.h
-> drivers/memory/ti-emif-asm-offsets.h
-> 
-> 
-> If you want me to send a patch,
-> I will give it a try.
+I tried building using a freshly built Make (4.2.1-69-g8a731d1), but
+already the objtool build broke with
 
-Or we try and find another way around this.
+orc_dump.c: In function ‘orc_dump’:
+orc_dump.c:106:2: error: ‘elf_getshnum’ is deprecated [-Werror=deprecated-declarations]
+  if (elf_getshdrnum(elf, &nr_sections)) {
 
-The original idea was to start throwing platform specific (iow, stuff in
-arch/arm/mach-omap2/) includes into arch/arm/kernel/asm-offsets.c.  I
-objected to that, and suggested that the generic infrastructure for doing
-the asm-offsets thing should be used to generate an architecture specific
-header.
+Turns out that with that new Make, the backslash was not removed, so cpp
+didn't see a #include directive, grep found nothing, and
+-DLIBELF_USE_DEPRECATED was wrongly put in CFLAGS.
 
-Then it turns out that files in both arch/arm/mach-omap2 and drivers/memory
-need these constants, and TI proposed the existing method.
+Now, that new Make behaviour is documented in their NEWS file:
 
-Obviously, all the right people reviewed it and approved it, which is why
-it's now in mainline, but unfortunately it doesn't actually work, and
-breaks my kernel builds!
+  * WARNING: Backward-incompatibility!
+    Number signs (#) appearing inside a macro reference or function invocation
+    no longer introduce comments and should not be escaped with backslashes:
+    thus a call such as:
+      foo := $(shell echo '#')
+    is legal.  Previously the number sign needed to be escaped, for example:
+      foo := $(shell echo '\#')
+    Now this latter will resolve to "\#".  If you want to write makefiles
+    portable to both versions, assign the number sign to a variable:
+      C := \#
+      foo := $(shell echo '$C')
+    This was claimed to be fixed in 3.81, but wasn't, for some reason.
+    To detect this change search for 'nocomment' in the .FEATURES variable.
 
+This also fixes up the two make-cmd instances to replace # with $(pound)
+rather than with \#. There might very well be other places that need
+similar fixup in preparation for whatever future Make release contains
+the above change, but at least this builds an x86_64 defconfig with the
+new make.
+
+Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=197847
+Cc: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+---
+v2:
+
+- squash the original objtool-only patch with the patch fixing up
+  make-cmd, to avoid repeating the reference to the Make NEWS.
+
+- use $(pound) in .cmd files to avoid backslash-counting issues (Masahiro).
+
+- add bugzilla link (Randy).
+
+ scripts/Kbuild.include         | 5 +++--
+ tools/build/Build.include      | 5 +++--
+ tools/objtool/Makefile         | 2 +-
+ tools/scripts/Makefile.include | 2 ++
+ 4 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index cce31ee876b6..50cee534fd64 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -10,6 +10,7 @@ space   := $(empty) $(empty)
+ space_escape := _-_SPACE_-_
+ right_paren := )
+ left_paren := (
++pound := \#
+ 
+ ###
+ # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
+@@ -322,11 +323,11 @@ endif
+ 
+ # Replace >$< with >$$< to preserve $ when reloading the .cmd file
+ # (needed for make)
+-# Replace >#< with >\#< to avoid starting a comment in the .cmd file
++# Replace >#< with >$(pound)< to avoid starting a comment in the .cmd file
+ # (needed for make)
+ # Replace >'< with >'\''< to be able to enclose the whole string in '...'
+ # (needed for the shell)
+-make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
++make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
+ 
+ # Find any prerequisites that is newer than target or that does not exist.
+ # PHONY targets skipped in both cases.
+diff --git a/tools/build/Build.include b/tools/build/Build.include
+index 418871d02ebf..a4bbb984941d 100644
+--- a/tools/build/Build.include
++++ b/tools/build/Build.include
+@@ -12,6 +12,7 @@
+ # Convenient variables
+ comma   := ,
+ squote  := '
++pound   := \#
+ 
+ ###
+ # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
+@@ -43,11 +44,11 @@ echo-cmd = $(if $($(quiet)cmd_$(1)),\
+ ###
+ # Replace >$< with >$$< to preserve $ when reloading the .cmd file
+ # (needed for make)
+-# Replace >#< with >\#< to avoid starting a comment in the .cmd file
++# Replace >#< with >$(pound)< to avoid starting a comment in the .cmd file
+ # (needed for make)
+ # Replace >'< with >'\''< to be able to enclose the whole string in '...'
+ # (needed for the shell)
+-make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
++make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
+ 
+ ###
+ # Find any prerequisites that is newer than target or that does not exist.
+diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
+index e6acc281dd37..8ae824dbfca3 100644
+--- a/tools/objtool/Makefile
++++ b/tools/objtool/Makefile
+@@ -35,7 +35,7 @@ CFLAGS   += -Wall -Werror $(WARNINGS) -fomit-frame-pointer -O2 -g $(INCLUDES)
+ LDFLAGS  += -lelf $(LIBSUBCMD)
+ 
+ # Allow old libelf to be used:
+-elfshdr := $(shell echo '\#include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
++elfshdr := $(shell echo '$(pound)include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
+ CFLAGS += $(if $(elfshdr),,-DLIBELF_USE_DEPRECATED)
+ 
+ AWK = awk
+diff --git a/tools/scripts/Makefile.include b/tools/scripts/Makefile.include
+index dd614463d4d6..495066bafbe3 100644
+--- a/tools/scripts/Makefile.include
++++ b/tools/scripts/Makefile.include
+@@ -120,3 +120,5 @@ ifneq ($(silent),1)
+ 	QUIET_UNINST   = @printf '  UNINST   %s\n' $1;
+   endif
+ endif
++
++pound := \#
 -- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+2.15.1
+
