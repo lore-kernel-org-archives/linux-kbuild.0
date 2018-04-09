@@ -1,71 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:34080 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752136AbeDINby (ORCPT
+Received: from mail-vk0-f66.google.com ([209.85.213.66]:37448 "EHLO
+        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753064AbeDIPES (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Apr 2018 09:31:54 -0400
+        Mon, 9 Apr 2018 11:04:18 -0400
+Received: by mail-vk0-f66.google.com with SMTP id r19so4952682vkf.4
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Apr 2018 08:04:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180408213528.26758-1-linux@rasmusvillemoes.dk>
-References: <CAK7LNARvTJJR=fa9_NyvwfX9z+f51Ha9XQzLrmVakVWUV4eAQw@mail.gmail.com>
- <20180408213528.26758-1-linux@rasmusvillemoes.dk>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 9 Apr 2018 22:31:02 +0900
-Message-ID: <CAK7LNARmy0COjgWgSa7uB426Me_jAmeJCDSQkJWZoTVwqoA1CA@mail.gmail.com>
-Subject: Re: [PATCH v2] Kbuild: fix # escaping in .cmd files for future Make
+In-Reply-To: <CAK7LNAScTUhpvgnNzuOGZ2ueh-d4R4r=v5wzOGsd+pYn+MF-rQ@mail.gmail.com>
+References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
+ <1522128575-5326-12-git-send-email-yamada.masahiro@socionext.com>
+ <CAGXu5j+F1GXNE9T3vOo+Sq+GfX2Cy5a8tFU--qVBJwaJkt=s6Q@mail.gmail.com> <CAK7LNAScTUhpvgnNzuOGZ2ueh-d4R4r=v5wzOGsd+pYn+MF-rQ@mail.gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Mon, 9 Apr 2018 08:04:16 -0700
+Message-ID: <CAGXu5jJCpDtVcFckLzeTg=Du0TWL=KGUH1_k2LSbv8PTONQ2Mw@mail.gmail.com>
+Subject: Re: [PATCH v2 11/21] stack-protector: test compiler capability in
+ Kconfig and drop AUTO mode
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>
 
-2018-04-09 6:35 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
-> I tried building using a freshly built Make (4.2.1-69-g8a731d1), but
-> already the objtool build broke with
+On Mon, Apr 9, 2018 at 1:54 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> 2018-03-28 20:18 GMT+09:00 Kees Cook <keescook@chromium.org>:
+>> On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
+>> <yamada.masahiro@socionext.com> wrote:
+>>> diff --git a/arch/Kconfig b/arch/Kconfig
+>>> index 8e0d665..b42378d 100644
+>>> --- a/arch/Kconfig
+>>> +++ b/arch/Kconfig
+>>> @@ -535,13 +535,13 @@ config HAVE_CC_STACKPROTECTOR
+>>>         bool
+>>>         help
+>>>           An arch should select this symbol if:
+>>> -         - its compiler supports the -fstack-protector option
+>>
+>> Please leave this note: it's still valid. An arch must still have
+>> compiler support for this to be sensible.
+>>
 >
-> orc_dump.c: In function =E2=80=98orc_dump=E2=80=99:
-> orc_dump.c:106:2: error: =E2=80=98elf_getshnum=E2=80=99 is deprecated [-W=
-error=3Ddeprecated-declarations]
->   if (elf_getshdrnum(elf, &nr_sections)) {
+> No.
 >
-> Turns out that with that new Make, the backslash was not removed, so cpp
-> didn't see a #include directive, grep found nothing, and
-> -DLIBELF_USE_DEPRECATED was wrongly put in CFLAGS.
+> "its compiler supports the -fstack-protector option"
+> is tested by $(cc-option -fstack-protector)
 >
-> Now, that new Make behaviour is documented in their NEWS file:
->
->   * WARNING: Backward-incompatibility!
->     Number signs (#) appearing inside a macro reference or function invoc=
-ation
->     no longer introduce comments and should not be escaped with backslash=
-es:
->     thus a call such as:
->       foo :=3D $(shell echo '#')
->     is legal.  Previously the number sign needed to be escaped, for examp=
-le:
->       foo :=3D $(shell echo '\#')
->     Now this latter will resolve to "\#".  If you want to write makefiles
->     portable to both versions, assign the number sign to a variable:
->       C :=3D \#
->       foo :=3D $(shell echo '$C')
->     This was claimed to be fixed in 3.81, but wasn't, for some reason.
->     To detect this change search for 'nocomment' in the .FEATURES variabl=
-e.
->
-> This also fixes up the two make-cmd instances to replace # with $(pound)
-> rather than with \#. There might very well be other places that need
-> similar fixup in preparation for whatever future Make release contains
-> the above change, but at least this builds an x86_64 defconfig with the
-> new make.
->
-> Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=3D197847
-> Cc: Randy Dunlap <rdunlap@infradead.org>
-> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-> ---
+> ARCH does not need to know the GCC support level.
 
-Applied to linux-kbuild.  Thanks!
+That's not correct: if you enable stack protector for a kernel
+architecture that doesn't having it enabled, it's unlikely for the
+resulting kernel to boot. An architecture must handle the changes that
+the compiler introduces when adding -fstack-protector (for example,
+having the stack protector canary value defined, having the failure
+function defined, handling context switches changing canaries, etc).
 
+-Kees
 
---=20
-Best Regards
-Masahiro Yamada
+-- 
+Kees Cook
+Pixel Security
