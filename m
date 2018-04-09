@@ -1,167 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:29853 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751441AbeDIIzU (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:34080 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752136AbeDINby (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Apr 2018 04:55:20 -0400
+        Mon, 9 Apr 2018 09:31:54 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5j+F1GXNE9T3vOo+Sq+GfX2Cy5a8tFU--qVBJwaJkt=s6Q@mail.gmail.com>
-References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
- <1522128575-5326-12-git-send-email-yamada.masahiro@socionext.com> <CAGXu5j+F1GXNE9T3vOo+Sq+GfX2Cy5a8tFU--qVBJwaJkt=s6Q@mail.gmail.com>
+In-Reply-To: <20180408213528.26758-1-linux@rasmusvillemoes.dk>
+References: <CAK7LNARvTJJR=fa9_NyvwfX9z+f51Ha9XQzLrmVakVWUV4eAQw@mail.gmail.com>
+ <20180408213528.26758-1-linux@rasmusvillemoes.dk>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 9 Apr 2018 17:54:31 +0900
-Message-ID: <CAK7LNAScTUhpvgnNzuOGZ2ueh-d4R4r=v5wzOGsd+pYn+MF-rQ@mail.gmail.com>
-Subject: Re: [PATCH v2 11/21] stack-protector: test compiler capability in
- Kconfig and drop AUTO mode
+Date: Mon, 9 Apr 2018 22:31:02 +0900
+Message-ID: <CAK7LNARmy0COjgWgSa7uB426Me_jAmeJCDSQkJWZoTVwqoA1CA@mail.gmail.com>
+Subject: Re: [PATCH v2] Kbuild: fix # escaping in .cmd files for future Make
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-03-28 20:18 GMT+09:00 Kees Cook <keescook@chromium.org>:
-> On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> Move the test for -fstack-protector(-strong) option to Kconfig.
->>
->> If the compiler does not support the option, the corresponding menu
->> is automatically hidden.  If _STRONG is not supported, it will fall
->> back to _REGULAR.  If _REGULAR is not supported, it will be disabled.
->> This means, _AUTO is implicitly handled by the dependency solver of
->> Kconfig, hence removed.
->>
->> I also turned the 'choice' into only two boolean symbols.  The use of
->> 'choice' is not a good idea here, because all of all{yes,mod,no}config
->> would choose the first visible value, while we want allnoconfig to
->> disable as many features as possible.
->>
->> X86 has additional shell scripts in case the compiler supports the
->> option, but generates broken code.  I added CC_HAS_SANE_STACKPROTECTOR
->> to test this.  I had to add -m32 to gcc-x86_32-has-stack-protector.sh
->> to make it work correctly.
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+2018-04-09 6:35 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
+> I tried building using a freshly built Make (4.2.1-69-g8a731d1), but
+> already the objtool build broke with
 >
-> This looks really good. Notes below...
+> orc_dump.c: In function =E2=80=98orc_dump=E2=80=99:
+> orc_dump.c:106:2: error: =E2=80=98elf_getshnum=E2=80=99 is deprecated [-W=
+error=3Ddeprecated-declarations]
+>   if (elf_getshdrnum(elf, &nr_sections)) {
 >
->> ---
->>
->> Changes in v2:
->>   - Describe $(cc-option ...) directly in depends on context
->>
->>  Makefile                                  | 93 ++-----------------------------
->>  arch/Kconfig                              | 29 +++-------
->>  arch/x86/Kconfig                          |  8 ++-
->>  scripts/gcc-x86_32-has-stack-protector.sh |  7 +--
->>  scripts/gcc-x86_64-has-stack-protector.sh |  5 --
->>  5 files changed, 22 insertions(+), 120 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index 5c395ed..5cadffa 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -675,55 +675,11 @@ ifneq ($(CONFIG_FRAME_WARN),0)
->>  KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
->>  endif
->>
->> -# This selects the stack protector compiler flag. Testing it is delayed
->> -# until after .config has been reprocessed, in the prepare-compiler-check
->> -# target.
->> -ifdef CONFIG_CC_STACKPROTECTOR_AUTO
->> -  stackp-flag := $(call cc-option,-fstack-protector-strong,$(call cc-option,-fstack-protector))
->> -  stackp-name := AUTO
->> -else
->> -ifdef CONFIG_CC_STACKPROTECTOR_REGULAR
->> -  stackp-flag := -fstack-protector
->> -  stackp-name := REGULAR
->> -else
->> -ifdef CONFIG_CC_STACKPROTECTOR_STRONG
->> -  stackp-flag := -fstack-protector-strong
->> -  stackp-name := STRONG
->> -else
->> -  # If either there is no stack protector for this architecture or
->> -  # CONFIG_CC_STACKPROTECTOR_NONE is selected, we're done, and $(stackp-name)
->> -  # is empty, skipping all remaining stack protector tests.
->> -  #
->> -  # Force off for distro compilers that enable stack protector by default.
->> -  KBUILD_CFLAGS += $(call cc-option, -fno-stack-protector)
->> -endif
->> -endif
->> -endif
->> -# Find arch-specific stack protector compiler sanity-checking script.
->> -ifdef stackp-name
->> -ifneq ($(stackp-flag),)
->> -  stackp-path := $(srctree)/scripts/gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh
->> -  stackp-check := $(wildcard $(stackp-path))
->> -  # If the wildcard test matches a test script, run it to check functionality.
->> -  ifdef stackp-check
->> -    ifneq ($(shell $(CONFIG_SHELL) $(stackp-check) $(CC) $(KBUILD_CPPFLAGS) $(biarch)),y)
->> -      stackp-broken := y
->> -    endif
->> -  endif
->> -  ifndef stackp-broken
->> -    # If the stack protector is functional, enable code that depends on it.
->> -    KBUILD_CPPFLAGS += -DCONFIG_CC_STACKPROTECTOR
->> -    # Either we've already detected the flag (for AUTO) or we'll fail the
->> -    # build in the prepare-compiler-check rule (for specific flag).
->> -    KBUILD_CFLAGS += $(stackp-flag)
->> -  else
->> -    # We have to make sure stack protector is unconditionally disabled if
->> -    # the compiler is broken (in case we're going to continue the build in
->> -    # AUTO mode).
+> Turns out that with that new Make, the backslash was not removed, so cpp
+> didn't see a #include directive, grep found nothing, and
+> -DLIBELF_USE_DEPRECATED was wrongly put in CFLAGS.
 >
-> Let's keep this comment (slightly rewritten) since the reason for
-> setting this flag isn't obvious.
-
-Will move this to help of arch/x86/Kconfig
-
-
->> -    KBUILD_CFLAGS += $(call cc-option, -fno-stack-protector)
->> -  endif
->> -endif
->> -endif
->> +stackp-flags-y                                 := -fno-stack-protector
+> Now, that new Make behaviour is documented in their NEWS file:
 >
-> This is a (minor?) regression in my testing. Making this unconditional
-> may break for a compiler built without stack-protector. It should be
-> rare, but it's technically possible. Perhaps:
+>   * WARNING: Backward-incompatibility!
+>     Number signs (#) appearing inside a macro reference or function invoc=
+ation
+>     no longer introduce comments and should not be escaped with backslash=
+es:
+>     thus a call such as:
+>       foo :=3D $(shell echo '#')
+>     is legal.  Previously the number sign needed to be escaped, for examp=
+le:
+>       foo :=3D $(shell echo '\#')
+>     Now this latter will resolve to "\#".  If you want to write makefiles
+>     portable to both versions, assign the number sign to a variable:
+>       C :=3D \#
+>       foo :=3D $(shell echo '$C')
+>     This was claimed to be fixed in 3.81, but wasn't, for some reason.
+>     To detect this change search for 'nocomment' in the .FEATURES variabl=
+e.
 >
-> stackp-flags-y := ($call cc-option, -fno-stack-protector)
-
-Will add CONFIG_CC_HAS_STACKPROTECTOR_NONE
-
-
->> +stackp-flags-$(CONFIG_CC_STACKPROTECTOR)       := -fstack-protector
->> +stackp-flags-$(CONFIG_CC_STACKPROTECTOR_STRONG)        := -fstack-protector-strong
->> +
->> +KBUILD_CFLAGS += $(stackp-flags-y)
->> [...]
->> diff --git a/arch/Kconfig b/arch/Kconfig
->> index 8e0d665..b42378d 100644
->> --- a/arch/Kconfig
->> +++ b/arch/Kconfig
->> @@ -535,13 +535,13 @@ config HAVE_CC_STACKPROTECTOR
->>         bool
->>         help
->>           An arch should select this symbol if:
->> -         - its compiler supports the -fstack-protector option
+> This also fixes up the two make-cmd instances to replace # with $(pound)
+> rather than with \#. There might very well be other places that need
+> similar fixup in preparation for whatever future Make release contains
+> the above change, but at least this builds an x86_64 defconfig with the
+> new make.
 >
-> Please leave this note: it's still valid. An arch must still have
-> compiler support for this to be sensible.
->
+> Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=3D197847
+> Cc: Randy Dunlap <rdunlap@infradead.org>
+> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+> ---
 
-No.
-
-"its compiler supports the -fstack-protector option"
-is tested by $(cc-option -fstack-protector)
-
-ARCH does not need to know the GCC support level.
+Applied to linux-kbuild.  Thanks!
 
 
-
-
->>           - it has implemented a stack canary (e.g. __stack_chk_guard)
-
--- 
+--=20
 Best Regards
 Masahiro Yamada
