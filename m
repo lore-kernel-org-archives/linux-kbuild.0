@@ -1,40 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f44.google.com ([209.85.213.44]:35975 "EHLO
-        mail-vk0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752278AbeDJHAF (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Apr 2018 03:00:05 -0400
-Received: by mail-vk0-f44.google.com with SMTP id q198so6371688vke.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 10 Apr 2018 00:00:05 -0700 (PDT)
+Received: from muru.com ([72.249.23.125]:36102 "EHLO muru.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753128AbeDJNzU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 10 Apr 2018 09:55:20 -0400
+Date: Tue, 10 Apr 2018 06:55:16 -0700
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [BUG] Fix drivers/memory O= build
+Message-ID: <20180410135516.GT5700@atomide.com>
+References: <20180406102519.GN16141@n2100.armlinux.org.uk>
+ <20180406164615.GL5700@atomide.com>
+ <06568f5b-3e4a-f761-7242-85dcc8aeb6a5@oracle.com>
+ <20180406185505.GD10990@n2100.armlinux.org.uk>
+ <CAK7LNARbST+-oy-J9B2Q2vSp0nhnn9gqOnT7urZdjQZhSpYB-Q@mail.gmail.com>
+ <20180407133817.GE10990@n2100.armlinux.org.uk>
+ <ba6087c5-c69e-1adc-9d9d-0ef5b19fb30e@ti.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATJidxieoNoo=CTk_-BpKJv8dwq+q1MAmsRDivd6ZrotQ@mail.gmail.com>
-References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
- <1522128575-5326-21-git-send-email-yamada.masahiro@socionext.com>
- <CAGXu5jJQfYXqsF7pcRsUtY9Mrw+Yi_Y6+CBAwDrQT_4kpUiHDA@mail.gmail.com> <CAK7LNATJidxieoNoo=CTk_-BpKJv8dwq+q1MAmsRDivd6ZrotQ@mail.gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 10 Apr 2018 00:00:03 -0700
-Message-ID: <CAGXu5jLTzqe3MVZnY+SOrreUBUZZOsEDsZNuS66ZxXjRzywv3A@mail.gmail.com>
-Subject: Re: [PATCH v2 20/21] gcc-plugins: enable GCC_PLUGINS for COMPILE_TEST
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ba6087c5-c69e-1adc-9d9d-0ef5b19fb30e@ti.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>
+To: Dave Gerlach <d-gerlach@ti.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux-OMAP <linux-omap@vger.kernel.org>, arm-soc@armlinux.org.uk
 
-On Mon, Apr 9, 2018 at 11:15 PM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Can you explain a bit more about GCC_PLUGIN_RANDSTRUCT_PERFORMANCE?
->
-> IIUC, this option reduces the randomization.
+* Dave Gerlach <d-gerlach@ti.com> [180409 16:07]:
+> I've inlined the changes below. I will send a proper split up series if it's
+> considered acceptable.
 
-Correct: I don't want to do COMPILE_TEST buids with
-GCC_PLUGIN_RANDSTRUCT_PERFORMANCE since it is effectively a subset of
-the GCC_PLUGIN_RANDSTRUCT possibilities. So, ..._PERFORMANCE shouldn't
-be enabled for COMPILE_TEST, as that would reduce the coverage for
-buid tests.
+Seems fine from my point of view. No need to split the patch, best to
+do the fix as a single patch.
 
--Kees
+We should test build it also with make randconfigs though.
 
--- 
-Kees Cook
-Pixel Security
+So assuming others are OK with this and it does not introduce
+new randconfig build errors:
+
+Acked-by: Tony Lindgren <tony@atomide.com>
