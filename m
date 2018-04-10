@@ -1,113 +1,133 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:29957 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751624AbeDJDQQ (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:64053 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751771AbeDJGQa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Apr 2018 23:16:16 -0400
+        Tue, 10 Apr 2018 02:16:30 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5jJCpDtVcFckLzeTg=Du0TWL=KGUH1_k2LSbv8PTONQ2Mw@mail.gmail.com>
+In-Reply-To: <CAGXu5jJQfYXqsF7pcRsUtY9Mrw+Yi_Y6+CBAwDrQT_4kpUiHDA@mail.gmail.com>
 References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
- <1522128575-5326-12-git-send-email-yamada.masahiro@socionext.com>
- <CAGXu5j+F1GXNE9T3vOo+Sq+GfX2Cy5a8tFU--qVBJwaJkt=s6Q@mail.gmail.com>
- <CAK7LNAScTUhpvgnNzuOGZ2ueh-d4R4r=v5wzOGsd+pYn+MF-rQ@mail.gmail.com> <CAGXu5jJCpDtVcFckLzeTg=Du0TWL=KGUH1_k2LSbv8PTONQ2Mw@mail.gmail.com>
+ <1522128575-5326-21-git-send-email-yamada.masahiro@socionext.com> <CAGXu5jJQfYXqsF7pcRsUtY9Mrw+Yi_Y6+CBAwDrQT_4kpUiHDA@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 10 Apr 2018 12:15:30 +0900
-Message-ID: <CAK7LNATULgbS6mxYJUumnkVZU_1LhQwS0jL=v_=HAjtRiF12yA@mail.gmail.com>
-Subject: Re: [PATCH v2 11/21] stack-protector: test compiler capability in
- Kconfig and drop AUTO mode
+Date: Tue, 10 Apr 2018 15:15:43 +0900
+Message-ID: <CAK7LNATJidxieoNoo=CTk_-BpKJv8dwq+q1MAmsRDivd6ZrotQ@mail.gmail.com>
+Subject: Re: [PATCH v2 20/21] gcc-plugins: enable GCC_PLUGINS for COMPILE_TEST
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Kees Cook <keescook@chromium.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>
 
-2018-04-10 0:04 GMT+09:00 Kees Cook <keescook@chromium.org>:
-> On Mon, Apr 9, 2018 at 1:54 AM, Masahiro Yamada
+2018-03-28 20:47 GMT+09:00 Kees Cook <keescook@chromium.org>:
+> On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
 > <yamada.masahiro@socionext.com> wrote:
->> 2018-03-28 20:18 GMT+09:00 Kees Cook <keescook@chromium.org>:
->>> On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
->>> <yamada.masahiro@socionext.com> wrote:
->>>> diff --git a/arch/Kconfig b/arch/Kconfig
->>>> index 8e0d665..b42378d 100644
->>>> --- a/arch/Kconfig
->>>> +++ b/arch/Kconfig
->>>> @@ -535,13 +535,13 @@ config HAVE_CC_STACKPROTECTOR
->>>>         bool
->>>>         help
->>>>           An arch should select this symbol if:
->>>> -         - its compiler supports the -fstack-protector option
->>>
->>> Please leave this note: it's still valid. An arch must still have
->>> compiler support for this to be sensible.
->>>
+>> The plugin availability is checked in Kconfig, so all{yes,mod}config
+>> will not be bothered.  Remove 'depends on !COMPILE_TEST'.
 >>
->> No.
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> ---
 >>
->> "its compiler supports the -fstack-protector option"
->> is tested by $(cc-option -fstack-protector)
+>> Changes in v2:
+>>   - Remove more 'depends on'
 >>
->> ARCH does not need to know the GCC support level.
+>>  arch/Kconfig | 4 ----
+>>  1 file changed, 4 deletions(-)
+>>
+>> diff --git a/arch/Kconfig b/arch/Kconfig
+>> index 88cc925..b07094c 100644
+>> --- a/arch/Kconfig
+>> +++ b/arch/Kconfig
+>> @@ -414,7 +414,6 @@ menuconfig GCC_PLUGINS
+>>         bool "GCC plugins"
+>>         depends on HAVE_GCC_PLUGINS
+>>         depends on $(success $srctree/scripts/gcc-plugin.sh $HOSTCXX $CC)
+>> -       depends on !COMPILE_TEST
+>>         help
+>>           GCC plugins are loadable modules that provide extra features to the
+>>           compiler. They are useful for runtime instrumentation and static analysis.
 >
-> That's not correct: if you enable stack protector for a kernel
-> architecture that doesn't having it enabled, it's unlikely for the
-> resulting kernel to boot. An architecture must handle the changes that
-> the compiler introduces when adding -fstack-protector (for example,
-> having the stack protector canary value defined, having the failure
-> function defined, handling context switches changing canaries, etc).
+> This one is nice, yes! We get coverage for anyone with plugin support.
+>
+>> @@ -424,7 +423,6 @@ menuconfig GCC_PLUGINS
+>>  config GCC_PLUGIN_CYC_COMPLEXITY
+>>         bool "Compute the cyclomatic complexity of a function" if EXPERT
+>>         depends on GCC_PLUGINS
+>> -       depends on !COMPILE_TEST
+>>         help
+>>           The complexity M of a function's control flow graph is defined as:
+>>            M = E - N + 2P
+>> @@ -487,7 +485,6 @@ config GCC_PLUGIN_STRUCTLEAK_BYREF_ALL
+>>  config GCC_PLUGIN_STRUCTLEAK_VERBOSE
+>>         bool "Report forcefully initialized variables"
+>>         depends on GCC_PLUGIN_STRUCTLEAK
+>> -       depends on !COMPILE_TEST
+>>         help
+>>           This option will cause a warning to be printed each time the
+>>           structleak plugin finds a variable it thinks needs to be
+>> @@ -527,7 +524,6 @@ config GCC_PLUGIN_RANDSTRUCT
+>>  config GCC_PLUGIN_RANDSTRUCT_PERFORMANCE
+>>         bool "Use cacheline-aware structure randomization"
+>>         depends on GCC_PLUGIN_RANDSTRUCT
+>> -       depends on !COMPILE_TEST
+>>         help
+>>           If you say Y here, the RANDSTRUCT randomization will make a
+>>           best effort at restricting randomization to cacheline-sized
+>
+> All three of these, though, please leave as they were. They're either
+> needlessly noisy for COMPILE_TEST (GCC_PLUGIN_CYC_COMPLEXITY and
+> *_VERBOSE),
+
+
+CONFIG_GCC_PLUGIN_CYC_COMPLEXITY is crazily annoying.
+I wonder if the right thing might be to dump the log to
+a separate report file instead of messing up the console,
+but this is a different issue.
+So I will keep this as-is.
+
+
+
+
+CONFIG_GCC_PLUGIN_STRUCTLEAK_VERBOSE prinkles
+ 'userspace variable will be forcibly initialized'
+
+If this is a matter of warning level,
+we generally control this by W= option
+as you see in scripts/Makefile.extrawarn
+
+But, maybe I am wrong.  I will keep this as-is
+until I figure out what is the right thing to do
+for warning verbosity.
+
+
+
+
+> or reduce the COMPILE_TEST coverage
+> (GCC_PLUGIN_RANDSTRUCT_PERFORMANCE).
 >
 
+Can you explain a bit more about GCC_PLUGIN_RANDSTRUCT_PERFORMANCE?
 
+IIUC, this option reduces the randomization.
 
-It is still hard to understand this.
-
-
-When we "its compiler supports the -fstack-protector option",
-we have two meanings
-
-[1] the stack protector feature is implemented in GCC source code.
-
-[2] -fstack-protector is recognized as a valid option in the GCC being used.
-    This can be tested by $(cc-option -fstack-protector)
-
-I guess you were talking about [1], where as I [2].
-Is this correct?
-
-
-Does [2] happen only after [1] happens?
-Or, are they independent?
-
-If there is a case where GCC recognizes -fstack-protector,
-but not implemented?
-
-
-For x86, there are cases where the option is recognized but not working.
-That's why we have
-scripts/gcc-x86_{32,64}-has-stack-protector.sh
-
-Generally, if GCC accepts -fstack-protector as a valid option,
-we expect "it is working".
-
-I wonder why we need additional information about the compiler
-even after $(cc-option -fstack-protector) succeeds.
-
-
-This is just a matter of comment.
-
-Can you clarify your problem?
+Is it related to COMPILE_TEST coverage?
 
 
 
 
-> resulting kernel to boot. An architecture must handle the changes that
-> the compiler introduces when adding -fstack-protector (for example,
-> having the stack protector canary value defined, having the failure
-> function defined, handling context switches changing canaries, etc).
+
+
+> (And perhaps a comment is needed to explain these to avoid confusion
+> in the future?)
 >
-
-All of these are talking about the kernel side implementation.
-So, it is included in the following comment I am still keeping.
-
-  - it has implemented a stack canary (e.g. __stack_chk_guard)
+> -Kees
+>
+> --
+> Kees Cook
+> Pixel Security
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
