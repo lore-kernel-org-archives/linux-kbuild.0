@@ -1,165 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:20283 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754332AbeDJPCA (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Apr 2018 11:02:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35246 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756091AbeDJWsQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 10 Apr 2018 18:48:16 -0400
+Date: Tue, 10 Apr 2018 23:48:06 +0100
+From: James Hogan <jhogan@kernel.org>
+Subject: Re: [PATCH] bug.h: Work around GCC PR82365 in BUG()
+Message-ID: <20180410224805.GA21429@saruman>
+References: <20171219114112.939391-1-arnd@arndb.de>
 MIME-Version: 1.0
-In-Reply-To: <ba6087c5-c69e-1adc-9d9d-0ef5b19fb30e@ti.com>
-References: <20180406102519.GN16141@n2100.armlinux.org.uk> <20180406164615.GL5700@atomide.com>
- <06568f5b-3e4a-f761-7242-85dcc8aeb6a5@oracle.com> <20180406185505.GD10990@n2100.armlinux.org.uk>
- <CAK7LNARbST+-oy-J9B2Q2vSp0nhnn9gqOnT7urZdjQZhSpYB-Q@mail.gmail.com>
- <20180407133817.GE10990@n2100.armlinux.org.uk> <ba6087c5-c69e-1adc-9d9d-0ef5b19fb30e@ti.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 11 Apr 2018 00:01:11 +0900
-Message-ID: <CAK7LNASOs9B0qOGfRthh-+Aca_+wJjKmLcXpoFO0OrHvva=YdA@mail.gmail.com>
-Subject: Re: [BUG] Fix drivers/memory O= build
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
+Content-Disposition: inline
+In-Reply-To: <20171219114112.939391-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Gerlach <d-gerlach@ti.com>
-Cc: Russell King - ARM Linux <linux@armlinux.org.uk>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, Tony Lindgren <tony@atomide.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux-OMAP <linux-omap@vger.kernel.org>, arm-soc@armlinux.org.uk
-
-2018-04-10 1:05 GMT+09:00 Dave Gerlach <d-gerlach@ti.com>:
-> Hi,
-> On 04/07/2018 08:38 AM, Russell King - ARM Linux wrote:
->> On Sat, Apr 07, 2018 at 11:55:22AM +0900, Masahiro Yamada wrote:
->>> 2018-04-07 3:55 GMT+09:00 Russell King - ARM Linux <linux@armlinux.org.uk>:
->>>> On Fri, Apr 06, 2018 at 11:45:01AM -0700, Santosh Shilimkar wrote:
->>>>> On 4/6/2018 9:46 AM, Tony Lindgren wrote:
->>>>>> * Russell King - ARM Linux <linux@armlinux.org.uk> [180406 03:27]:
->>>>>>> When building a kernel with split object directories, the following
->>>>>>> failure occurs:
->>>>>>>
->>>>>>> .../drivers/memory/emif-asm-offsets.c:1:0: fatal error: can't open drivers/memory/emif-asm-offsets.s for writing: No such file or directory
->>>>>>> compilation terminated.
->>>>>>> drivers/memory/Makefile.asm-offsets:2: recipe for target 'drivers/memory/emif-asm-offsets.s' failed
->>>>>>> make[2]: *** [drivers/memory/emif-asm-offsets.s] Error 1
->>>>>>> .../Makefile:1060: recipe for target 'arch/arm/mach-omap2' failed
->>>>>>> make[1]: *** [arch/arm/mach-omap2] Error 2
->>>>>>>
->>>>>>> This prevents any kernel being built that includes decending into
->>>>>>> arch/arm/mach-omap2 with split object directories.
->>>>>>>
->>>>>>> This is a regression.
->>>>>>
->>>>>> Dave, I presume you're looking into this already?
->>>>>>
->>>>> Fix is already posted by 'Anders Roxell <anders.roxell@linaro.org>'
->>>>> You are copied on the email Tony.
->>>>
->>>> Arnd also has a fix for it as well, which moves emif-asm-offsets.s
->>>> into include/generated, as that will always exist prior to these
->>>> rules being invoked.  Arnd's passing it through his randconfig
->>>> builder before publishing it.
->>>
->>>
->>> I do not like this idea.
->>>
->>> Not sure exactly what Arnd is trying to do,
->>> but the same file should not be touched from multiple points
->>> in case Kbuild descends into mach-omap2/ and memory/ at the same time.
->>>
->>>
->>> I recommend to put copies in each directory:
->>>
->>> arch/arm/mach-omap2/emif-asm-offsets.h
->>> drivers/memory/ti-emif-asm-offsets.h
->>>
->>>
->>> If you want me to send a patch,
->>> I will give it a try.
->>
->> Or we try and find another way around this.
->>
->> The original idea was to start throwing platform specific (iow, stuff in
->> arch/arm/mach-omap2/) includes into arch/arm/kernel/asm-offsets.c.  I
->> objected to that, and suggested that the generic infrastructure for doing
->> the asm-offsets thing should be used to generate an architecture specific
->> header.
->>
->> Then it turns out that files in both arch/arm/mach-omap2 and drivers/memory
->> need these constants, and TI proposed the existing method.
->>
->> Obviously, all the right people reviewed it and approved it, which is why
->> it's now in mainline, but unfortunately it doesn't actually work, and
->> breaks my kernel builds!
->>
->
-> A solution that I see is to allow pm-asm-offsets to just include the macros that
-> would be defined by emif-asm-offsets in the header generated by pm-asm-offsets.
-> This way there is no need to introduce the arch -> drivers build dependency that
-> is causing our issue, each driver generates its own header with everything it
-> needs included. I'll move the actual macro definitions for emif-asm-offsets.c
-> into a header and then by including them in both emif-asm-offsets and
-> pm-asm-offsets we get all macro definitions in both places with them still being
-> defined only in one location.
->
-> I've inlined the changes below. I will send a proper split up series if it's
-> considered acceptable.
->
-> Regards,
-> Dave
->
-> 8< ----------------------
-> From 7350c7caa773d7235ddb21013bd039a16cb6d156 Mon Sep 17 00:00:00 2001
-> From: Dave Gerlach <d-gerlach@ti.com>
-> Date: Mon, 9 Apr 2018 10:56:59 -0500
-> Subject: [PATCH] RFC: Fix build when using split object directories
->
-> The sleep33xx and sleep43xx files should not depend on a header file
-> generated in drivers/memory. Remove this dependency and instead generate
-> the macros needed as part of pm-asm-offsets.c to avoid complicating the
-> build.
->
-> Signed-off-by: Dave Gerlach <d-gerlach@ti.com>
-> ---
->  arch/arm/mach-omap2/Makefile         |  7 +---
->  arch/arm/mach-omap2/pm-asm-offsets.c |  3 ++
->  arch/arm/mach-omap2/sleep33xx.S      |  1 -
->  arch/arm/mach-omap2/sleep43xx.S      |  1 -
->  drivers/memory/emif-asm-offsets.c    | 72 +---------------------------------
->  include/linux/ti-emif-sram.h         | 75 ++++++++++++++++++++++++++++++++++++
->  6 files changed, 81 insertions(+), 78 deletions(-)
->
-> diff --git a/arch/arm/mach-omap2/Makefile b/arch/arm/mach-omap2/Makefile
-> index 4603c30fef73..1257810cdb80 100644
-> --- a/arch/arm/mach-omap2/Makefile
-> +++ b/arch/arm/mach-omap2/Makefile
-> @@ -243,8 +243,5 @@ arch/arm/mach-omap2/pm-asm-offsets.s:
-> arch/arm/mach-omap2/pm-asm-offsets.c
->  include/generated/ti-pm-asm-offsets.h: arch/arm/mach-omap2/pm-asm-offsets.s FORCE
->         $(call filechk,offsets,__TI_PM_ASM_OFFSETS_H__)
->
-> -# For rule to generate ti-emif-asm-offsets.h dependency
-> -include drivers/memory/Makefile.asm-offsets
-> -
-> -arch/arm/mach-omap2/sleep33xx.o: include/generated/ti-pm-asm-offsets.h
-> include/generated/ti-emif-asm-offsets.h
-> -arch/arm/mach-omap2/sleep43xx.o: include/generated/ti-pm-asm-offsets.h
-> include/generated/ti-emif-asm-offsets.h
-> +arch/arm/mach-omap2/sleep33xx.o: include/generated/ti-pm-asm-offsets.h
-> +arch/arm/mach-omap2/sleep43xx.o: include/generated/ti-pm-asm-offsets.h
+To: Arnd Bergmann <arnd@arndb.de>, linux-mips@linux-mips.org, Paul Burton <paul.burton@mips.com>, Maciej Rozycki <macro@mips.com>
+Cc: linux-arch@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Vineet Gupta <vgupta@synopsys.com>, Mikael Starvik <starvik@axis.com>, Jesper Nilsson <jesper.nilsson@axis.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, "David S. Miller" <davem@davemloft.net>, Christopher Li <sparse@chrisli.org>, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Will Deacon <will.deacon@arm.com>, "Steven Rostedt (VMware)" <rostedt@goodmis.org>, Mark Rutland <mark.rutland@arm.com>, linux-snps-arc@lists.infradead.org, linux-kernel@vger.kernel.org, linux-cris-kernel@axis.com, linux-ia64@vger.kernel.org, linux-m68k@lists.linux-m68k.org, sparclinux@vger.kernel.org, linux-sparse@vger.kernel.org
 
 
-Nit:
-You are touching these two lines.
-You can also describe it like this:
+--sdtB3X0nJg68CQEu
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-$(obj)/sleep33xx.o $(obj)/sleep43xx.o: include/generated/ti-pm-asm-offsets.h
+Hi Arnd,
 
+On Tue, Dec 19, 2017 at 12:39:33PM +0100, Arnd Bergmann wrote:
+> diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+> index 5d595cfdb2c4..66cfdad68f7e 100644
+> --- a/include/linux/compiler-gcc.h
+> +++ b/include/linux/compiler-gcc.h
+> @@ -205,6 +205,15 @@
+>  #endif
+> =20
+>  /*
+> + * calling noreturn functions, __builtin_unreachable() and __builtin_tra=
+p()
+> + * confuse the stack allocation in gcc, leading to overly large stack
+> + * frames, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D82365
+> + *
+> + * Adding an empty inline assembly before it works around the problem
+> + */
+> +#define barrier_before_unreachable() asm volatile("")
+> +
+> +/*
+>   * Mark a position in code as unreachable.  This can be used to
+>   * suppress control flow warnings after asm blocks that transfer
+>   * control elsewhere.
+> @@ -214,7 +223,11 @@
+>   * unreleased.  Really, we need to have autoconf for the kernel.
+>   */
+>  #define unreachable() \
+> -	do { annotate_unreachable(); __builtin_unreachable(); } while (0)
+> +	do {					\
+> +		annotate_unreachable();		\
+> +		barrier_before_unreachable();	\
+> +		__builtin_unreachable();	\
+> +	} while (0)
 
+Unfortunately this breaks microMIPS builds (e.g. MIPS
+micro32r2_defconfig and micro32r2el_defconfig) on gcc 7.2, due to the
+lack of .insn in the asm volatile. Because of the
+__builtin_unreachable() there is no code following it. Without the empty
+asm the compiler will apparently put the .insn there automatically, but
+with the empty asm it doesn't. Therefore the assembler won't treat an
+immediately preceeding label as pointing at 16-bit microMIPS
+instructions which need the ISA bit set, i.e. bit 0 of the address.
+This causes assembler errors since the branch target is treated as a
+different ISA mode:
 
-I prefer putting the local header, ti-pm-asm-offsets.h,
-into arch/arm/mach-omap2/, but that is a different issue.
+arch/mips/mm/dma-default.s:3265: Error: branch to a symbol in another ISA m=
+ode
+arch/mips/mm/dma-default.s:5027: Error: branch to a symbol in another ISA m=
+ode
 
-So, I am fine with this.
+Due to a compiler bug on gcc 4.9.2 -> somewhere before 7.2, Paul
+submitted these patches a while back:
+https://patchwork.linux-mips.org/patch/13360/
+https://patchwork.linux-mips.org/patch/13361/
 
+Your patch (suitably fixed for microMIPS) would I imagine fix that issue
+too (it certainly fixes the resulting link error on microMIPS builds
+with an old toolchain).
 
-Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Before I forward port those patches to add .insn for MIPS, is that sort
+of approach (an arch specific asm/compiler-gcc.h to allow MIPS to
+override barrier_before_unreachable()) an acceptable fix?
 
+Thanks
+James
 
+--sdtB3X0nJg68CQEu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
--- 
-Best Regards
-Masahiro Yamada
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEd80NauSabkiESfLYbAtpk944dnoFAlrNPx8ACgkQbAtpk944
+dnqSJw/+Kb3O5v2XI2GmfHi/0KELq1a0ZD1AXtMeexXWCA/G67vblwP7DhFAB5px
+IV666quqgKR09AdudWDm8+fMbH15AqlMBXRIgLRtyq6a8CuSD9P67MClnniB7+kq
+hWOqGYKwg/jAmw5E/ALHs1Xl9CmNnLnyVVG+utwTO3vA/2BkeA81oSCaeokhKlOX
+5KM9nTqjxW3eCP2syAXmlBli9bdGX7puZ3fXj7dNPbYTnOAT7E1NH4sD0+gr20Xv
+Vjwn+JVKxCdyMrQqIG5E/enYM3Gk+4z9Xjv7GFQB/I/iOuhUBzHbm6Fy7B+08xhl
+utcCYQKHnFia0a5rFHXesqonCB5KvATesX2yWYNpRatj/5Dn37kdY1+1hGqNeNbN
+WNtXKVOegnWJnBLu7TQ8XJxZnYuKvA+2Uj2pb5tTD2M1SYqxAfsJdxqv9GnutJKH
+R9INBc/U7/gqRfez9ycihU1ZcNJHj88I+ePMxUgphcKHdBiCryoO3Xf4+PA+EGhY
+AW176RF4f7VgZP3WgJ3WOTfD4Cq+FfqKGcQDyD8KnZ7o0pdiRY1tcrczeyYLd7Rl
+Rx7JcW9SE7SENMHbdiygBuLTKIbhYl1YXf9VcAm/mYSzgWfVhd9IXIN55FnViPvR
+d3Z7bA8GuxlydlHGdt2OYgSuIuJ3+MqNpIhIOTBNASjd7PdEVAA=
+=oUHg
+-----END PGP SIGNATURE-----
+
+--sdtB3X0nJg68CQEu--
