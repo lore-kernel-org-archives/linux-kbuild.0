@@ -1,47 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f180.google.com ([209.85.217.180]:40635 "EHLO
-        mail-ua0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752807AbeDKQJE (ORCPT
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:46349 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750734AbeDKSP3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 11 Apr 2018 12:09:04 -0400
-Received: by mail-ua0-f180.google.com with SMTP id n20so1502733ual.7
-        for <linux-kbuild@vger.kernel.org>; Wed, 11 Apr 2018 09:09:03 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNASerehkH2391jHcXoqysiw-PWuxHsAgqHp+7vp04q+tYA@mail.gmail.com>
-References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
- <1522128575-5326-20-git-send-email-yamada.masahiro@socionext.com>
- <CAGXu5jJB3AKMC8U--H61eUkFJeMogLMq00dBUUrfg4n2b4FbOQ@mail.gmail.com> <CAK7LNASerehkH2391jHcXoqysiw-PWuxHsAgqHp+7vp04q+tYA@mail.gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Wed, 11 Apr 2018 09:09:02 -0700
-Message-ID: <CAGXu5j+8OZ6cfQ9km1Y0Lgb3_vVCvgpqdacAPHDikvH_S=gnVQ@mail.gmail.com>
-Subject: Re: [PATCH v2 19/21] gcc-plugins: test GCC plugin support in Kconfig
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 11 Apr 2018 14:15:29 -0400
+Received: by mail-wr0-f196.google.com with SMTP id d1so2652802wrj.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 11 Apr 2018 11:15:28 -0700 (PDT)
+From: Javier Martinez Canillas <javierm@redhat.com>
+Subject: [PATCH] kbuild: rpm-pkg: use kernel-install as a fallback for new-kernel-pkg
+Date: Wed, 11 Apr 2018 20:15:24 +0200
+Message-Id: <20180411181525.23902-1-javierm@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>, Kernel Hardening <kernel-hardening@lists.openwall.com>, Emese Revfy <re.emese@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: Peter Jones <pjones@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Josh Boyer <jwboyer@redhat.com>, Javier Martinez Canillas <javierm@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
-On Wed, Apr 11, 2018 at 8:55 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> No.
-> There is no problem to use a compiler without plugin support.
->
-> If a user does not want to use plugin in the first place,
-> why does he/she need to be bothered by such information in stderr?
+The new-kernel-pkg script is only present when grubby is installed, but it
+may not always be the case. So if the script isn't present, attempt to use
+the kernel-install script as a fallback instead.
 
-So, I don't think it's needed for the first version of this, but it'd
-be nice to have a way for end users to discover _why_ some option they
-want is unavailable. Having them dig through the Kconfigs, edit
-scripts to see stderr again, running those by hand, etc, is really
-unfriendly. If, instead, stderr was visible from the menuconfig "help"
-for a Kconfig, it could serve as automatic documentation for why
-something wasn't enabled. I don't mean for stderr to get sprayed out
-during a regular "make"; I agree: that would be ugly and pointless.
-I'd just like some way for the reason behind an option being disabled
-to be discoverable in some way.
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
 
--Kees
+---
 
+ scripts/package/mkspec | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index 61427c6f2209..e05646dc24dc 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -118,6 +118,8 @@ $S$M	ln -sf /usr/src/kernels/$KERNELRELEASE source
+ 	%preun
+ 	if [ -x /sbin/new-kernel-pkg ]; then
+ 	new-kernel-pkg --remove $KERNELRELEASE --rminitrd --initrdfile=/boot/initramfs-$KERNELRELEASE.img
++	elif [ -x /usr/bin/kernel-install ]; then
++	kernel-install remove $KERNELRELEASE
+ 	fi
+ 
+ 	%postun
 -- 
-Kees Cook
-Pixel Security
+2.14.3
+
