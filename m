@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:54457 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:54957 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750867AbeDMFIP (ORCPT
+        with ESMTP id S1752223AbeDMFIa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Apr 2018 01:08:15 -0400
+        Fri, 13 Apr 2018 01:08:30 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 05/30] kconfig: remove string expansion in file_lookup()
-Date: Fri, 13 Apr 2018 14:06:14 +0900
-Message-Id: <1523595999-27433-6-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 06/30] kconfig: remove string expansion for mainmenu after yyparse()
+Date: Fri, 13 Apr 2018 14:06:15 +0900
+Message-Id: <1523595999-27433-7-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,26 +15,11 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-There are two callers of file_lookup(), but there is no more reason
-to expand the given path.
+Now that environments are expanded in the lexer, conf_parse() does
+not need to expand them explicitly.
 
-[1] zconf_initscan()
-    This is used to open the first Kconfig.  sym_expand_string_value()
-    has never been used in a useful way here; before opening the first
-    Kconfig file, obviously there is no symbol to expand.  If you use
-    expand_string_value() instead, environments in KBUILD_KCONFIG would
-    be expanded, but I do not see practical benefits for that.
-
-[2] zconf_nextfile()
-    This is used to open the next file from 'source' statement.
-    Symbols in the path like "arch/$SRCARCH/Kconfig" needed expanding,
-    but it was replaced with the direct environment expansion.  The
-    environment has already been expanded before the token is passed
-    to the parser.
-
-By the way, file_lookup() was already buggy; it expanded a given path,
-but it used the path before expansion for look-up:
-        if (!strcmp(name, file->name)) {
+The hack introduced by commit 0724a7c32a54 ("kconfig: Don't leak
+main menus during parsing") can go away.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
@@ -43,35 +28,67 @@ Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 
 Changes in v3: None
 Changes in v2:
-  - Simplify the patch.  Just remove text expansion.
+  - Simplify the patch.  Just remove the text expansion.
 
- scripts/kconfig/util.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ scripts/kconfig/zconf.y | 24 +++++-------------------
+ 1 file changed, 5 insertions(+), 19 deletions(-)
 
-diff --git a/scripts/kconfig/util.c b/scripts/kconfig/util.c
-index 807147e..790967df 100644
---- a/scripts/kconfig/util.c
-+++ b/scripts/kconfig/util.c
-@@ -14,18 +14,16 @@
- struct file *file_lookup(const char *name)
+diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+index 3a4a0fa..22e318c 100644
+--- a/scripts/kconfig/zconf.y
++++ b/scripts/kconfig/zconf.y
+@@ -109,7 +109,7 @@ static struct menu *current_menu, *current_entry;
+ %%
+ input: nl start | start;
+ 
+-start: mainmenu_stmt stmt_list | no_mainmenu_stmt stmt_list;
++start: mainmenu_stmt stmt_list | stmt_list;
+ 
+ /* mainmenu entry */
+ 
+@@ -118,19 +118,6 @@ mainmenu_stmt: T_MAINMENU prompt nl
+ 	menu_add_prompt(P_MENU, $2, NULL);
+ };
+ 
+-/* Default main menu, if there's no mainmenu entry */
+-
+-no_mainmenu_stmt: /* empty */
+-{
+-	/*
+-	 * Hack: Keep the main menu title on the heap so we can safely free it
+-	 * later regardless of whether it comes from the 'prompt' in
+-	 * mainmenu_stmt or here
+-	 */
+-	menu_add_prompt(P_MENU, xstrdup("Linux Kernel Configuration"), NULL);
+-};
+-
+-
+ stmt_list:
+ 	  /* empty */
+ 	| stmt_list common_stmt
+@@ -528,7 +515,6 @@ word_opt: /* empty */			{ $$ = NULL; }
+ 
+ void conf_parse(const char *name)
  {
- 	struct file *file;
--	char *file_name = sym_expand_string_value(name);
+-	const char *tmp;
+ 	struct symbol *sym;
+ 	int i;
  
- 	for (file = file_list; file; file = file->next) {
- 		if (!strcmp(name, file->name)) {
--			free(file_name);
- 			return file;
- 		}
- 	}
+@@ -544,10 +530,10 @@ void conf_parse(const char *name)
+ 	if (!modules_sym)
+ 		modules_sym = sym_find( "n" );
  
- 	file = xmalloc(sizeof(*file));
- 	memset(file, 0, sizeof(*file));
--	file->name = file_name;
-+	file->name = xstrdup(name);
- 	file->next = file_list;
- 	file_list = file;
- 	return file;
+-	tmp = rootmenu.prompt->text;
+-	rootmenu.prompt->text = _(rootmenu.prompt->text);
+-	rootmenu.prompt->text = sym_expand_string_value(rootmenu.prompt->text);
+-	free((char*)tmp);
++	if (!menu_has_prompt(&rootmenu)) {
++		current_entry = &rootmenu;
++		menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
++	}
+ 
+ 	menu_finalize(&rootmenu);
+ 	for_all_symbols(i, sym) {
 -- 
 2.7.4
 
