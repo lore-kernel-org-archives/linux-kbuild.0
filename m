@@ -1,90 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:59354 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752328AbeDMQIy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Apr 2018 12:08:54 -0400
-Date: Sat, 14 Apr 2018 00:08:22 +0800
-From: kbuild test robot <lkp@intel.com>
-Subject: [kbuild:kconfig-shell-v3 27/30] sh: 1: [: -ge: unexpected operator
-Message-ID: <201804140019.sbToLIOd%fengguang.wu@intel.com>
+Received: from mail-ua0-f169.google.com ([209.85.217.169]:40328 "EHLO
+        mail-ua0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753182AbeDMQlt (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 13 Apr 2018 12:41:49 -0400
+Received: by mail-ua0-f169.google.com with SMTP id n20so6167738ual.7
+        for <linux-kbuild@vger.kernel.org>; Fri, 13 Apr 2018 09:41:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <1523595999-27433-22-git-send-email-yamada.masahiro@socionext.com>
+References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com> <1523595999-27433-22-git-send-email-yamada.masahiro@socionext.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Fri, 13 Apr 2018 09:41:48 -0700
+Message-ID: <CAGXu5jLt4xoxXTw83-npD4WmumPzSC9WnbOkkDoR=VYa5R4rYw@mail.gmail.com>
+Subject: Re: [PATCH 21/30] stack-protector: test compiler capability in
+ Kconfig and drop AUTO mode
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Nicholas Piggin <npiggin@gmail.com>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v3
-head:   cab76bbc77d9c585f35b5b9289850a3ae64bb879
-commit: fe34c682a2be3082dd2dde96ebe51861dec98449 [27/30] gcc-plugins: test plugin support in Kconfig and clean up Makefile
-config: um-x86_64_defconfig
-compiler: gcc-7 (Debian 7.3.0-1) 7.3.0
-reproduce:
-        git checkout fe34c682a2be3082dd2dde96ebe51861dec98449
-        make ARCH=um SUBARCH=x86_64 defconfig
-        make ARCH=um SUBARCH=x86_64
+On Thu, Apr 12, 2018 at 10:06 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> +stackp-flags-$(CONFIG_CC_HAS_STACKPROTECTOR_NONE) := -fno-stack-protector
+> +stackp-flags-$(CONFIG_CC_STACKPROTECTOR)          := -fstack-protector
+> +stackp-flags-$(CONFIG_CC_STACKPROTECTOR_STRONG)   := -fstack-protector-strong
+> +
+> +KBUILD_CFLAGS += $(stackp-flags-y)
 
-All errors (new ones prefixed by >>):
+So, technically, this works just fine. I wonder if it has an overly
+confusing result, in that the compiler under normal situations will
+see:
 
-   init/Kconfig:13: syntax error
-   init/Kconfig:12: invalid option
-   init/Kconfig:21: syntax error
-   init/Kconfig:20: invalid option
->> sh: 1: [: -ge: unexpected operator
-   arch/Kconfig:552: syntax error
-   arch/Kconfig:551: invalid option
-   arch/Kconfig:557: syntax error
-   arch/Kconfig:556: invalid option
-   arch/Kconfig:581: syntax error
-   arch/Kconfig:580: invalid option
-   lib/Kconfig.debug:741: syntax error
-   lib/Kconfig.debug:740: invalid option
-   lib/Kconfig.debug:762: syntax error
-   lib/Kconfig.debug:761: invalid option
-   make[2]: *** [defconfig] Error 1
-   make[1]: *** [defconfig] Error 2
-   make: *** [sub-make] Error 2
---
-   init/Kconfig:13: syntax error
-   init/Kconfig:12: invalid option
-   init/Kconfig:21: syntax error
-   init/Kconfig:20: invalid option
->> sh: 1: [: -ge: unexpected operator
-   arch/Kconfig:552: syntax error
-   arch/Kconfig:551: invalid option
-   arch/Kconfig:557: syntax error
-   arch/Kconfig:556: invalid option
-   arch/Kconfig:581: syntax error
-   arch/Kconfig:580: invalid option
-   lib/Kconfig.debug:741: syntax error
-   lib/Kconfig.debug:740: invalid option
-   lib/Kconfig.debug:762: syntax error
-   lib/Kconfig.debug:761: invalid option
-   make[2]: *** [oldconfig] Error 1
-   make[1]: *** [oldconfig] Error 2
-   make: *** [sub-make] Error 2
---
-   init/Kconfig:13: syntax error
-   init/Kconfig:12: invalid option
-   init/Kconfig:21: syntax error
-   init/Kconfig:20: invalid option
->> sh: 1: [: -ge: unexpected operator
-   arch/Kconfig:552: syntax error
-   arch/Kconfig:551: invalid option
-   arch/Kconfig:557: syntax error
-   arch/Kconfig:556: invalid option
-   arch/Kconfig:581: syntax error
-   arch/Kconfig:580: invalid option
-   lib/Kconfig.debug:741: syntax error
-   lib/Kconfig.debug:740: invalid option
-   lib/Kconfig.debug:762: syntax error
-   lib/Kconfig.debug:761: invalid option
-   make[2]: *** [olddefconfig] Error 1
-   make[2]: Target 'oldnoconfig' not remade because of errors.
-   make[1]: *** [oldnoconfig] Error 2
-   make: *** [sub-make] Error 2
+gcc ... -fno-stack-protector -fstack-protector -fstack-protector-strong ...
 
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+How about something like this instead:
+
+ifdef CONFIG_CC_STACKPROTECTOR_STRONG
+KBUILD_CFLAGS += -fstack-protector-strong
+else
+ifdef CONFIG_CC_STACKPROTECTOR
+KBUILD_CFLAGS += -fstack-protector
+else
+KBUILD_CFLAGS += -fno-stack-protector
+endif
+endif
+
+-Kees
+
+-- 
+Kees Cook
+Pixel Security
