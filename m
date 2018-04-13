@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:55808 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:55830 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753244AbeDMFI7 (ORCPT
+        with ESMTP id S1753254AbeDMFJA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Apr 2018 01:08:59 -0400
+        Fri, 13 Apr 2018 01:09:00 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 24/30] gcov: remove CONFIG_GCOV_FORMAT_AUTODETECT
-Date: Fri, 13 Apr 2018 14:06:33 +0900
-Message-Id: <1523595999-27433-25-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 25/30] kcov: test compiler capability in Kconfig and correct dependency
+Date: Fri, 13 Apr 2018 14:06:34 +0900
+Message-Id: <1523595999-27433-26-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,78 +15,141 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-CONFIG_GCOV_FORMAT_AUTODETECT compiles either gcc_3_4.c or gcc_4_7.c
-according to your GCC version.
+As Documentation/kbuild/kconfig-language.txt notes, 'select' should be
+be used with care - it forces a lower limit of another symbol, ignoring
+the dependency.  Currently, KCOV can select GCC_PLUGINS even if arch
+does not select HAVE_GCC_PLUGINS.  This could cause the unmet direct
+dependency.
 
-We can achieve the equivalent behavior by setting reasonable dependency
-with the knowledge of the compiler version.
+Now that Kconfig can test compiler capability, let's handle this in a
+more sophisticated way.
 
-If GCC older than 4.7 is used, GCOV_FORMAT_3_4 is the default, but users
-are still allowed to select GCOV_FORMAT_4_7 in case the newer format is
-back-ported.
+There are two ways to enable KCOV; use the compiler that natively
+supports -fsanitize-coverage=trace-pc, or build the SANCOV plugin if
+the compiler has ability to build GCC plugins.  Hence, the correct
+dependency for KCOV is:
 
-On the other hand, If GCC 4.7 or newer is used, there is no reason to
-use GCOV_FORMAT_3_4, so it should be hidden.
+  depends on CC_HAS_SANCOV_TRACE_PC || GCC_PLUGINS
 
-If you downgrade the compiler to GCC 4.7 or older, oldconfig/syncconfig
-will display a prompt for the choice because GCOV_FORMAT_3_4 becomes
-visible as a new symbol.
+You do not need to build the SANCOV plugin if the compiler already
+supports -fsanitize-coverage=trace-pc.  Hence, the select should be:
+
+  select GCC_PLUGIN_SANCOV if !CC_HAS_SANCOV_TRACE_PC
+
+With this, GCC_PLUGIN_SANCOV is selected only when necessary, so
+scripts/Makefile.gcc-plugins can be cleaner.
+
+I also cleaned up Kconfig and scripts/Makefile.kcov as well.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Acked-by: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
 
-Changes in v3: None
-Changes in v2: None
+Changes in v3:
+  - Replace the previous 'select -> imply' patch with
+    a new approach
 
- kernel/gcov/Kconfig  | 17 +++++------------
- kernel/gcov/Makefile |  2 --
- 2 files changed, 5 insertions(+), 14 deletions(-)
+Changes in v2:
+  - Drop depends on GCC_VERSION
 
-diff --git a/kernel/gcov/Kconfig b/kernel/gcov/Kconfig
-index 1276aab..1e3823f 100644
---- a/kernel/gcov/Kconfig
-+++ b/kernel/gcov/Kconfig
-@@ -53,23 +53,16 @@ config GCOV_PROFILE_ALL
- choice
- 	prompt "Specify GCOV format"
- 	depends on GCOV_KERNEL
--	default GCOV_FORMAT_AUTODETECT
- 	---help---
--	The gcov format is usually determined by the GCC version, but there are
-+	The gcov format is usually determined by the GCC version, and the
-+	default is chosen according to your GCC version. However, there are
- 	exceptions where format changes are integrated in lower-version GCCs.
--	In such a case use this option to adjust the format used in the kernel
--	accordingly.
--
--	If unsure, choose "Autodetect".
--
--config GCOV_FORMAT_AUTODETECT
--	bool "Autodetect"
--	---help---
--	Select this option to use the format that corresponds to your GCC
--	version.
-+	In such a case, change this option to adjust the format used in the
-+	kernel accordingly.
+ Makefile                     |  2 +-
+ lib/Kconfig.debug            | 11 +++++++----
+ scripts/Makefile.gcc-plugins |  6 +-----
+ scripts/Makefile.kcov        | 10 ++++++----
+ 4 files changed, 15 insertions(+), 14 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 889d002..88733b7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -623,7 +623,7 @@ all: vmlinux
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
+ KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
+ CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage -fno-tree-loop-im $(call cc-disable-warning,maybe-uninitialized,)
+-export CFLAGS_GCOV CFLAGS_KCOV
++export CFLAGS_GCOV
  
- config GCOV_FORMAT_3_4
- 	bool "GCC 3.4 format"
-+	depends on CC_IS_GCC && GCC_VERSION < 40700
- 	---help---
- 	Select this option to use the format defined by GCC 3.4.
+ # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
+ # values of the respective KBUILD_* variables
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index c40c7b7..1335717 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -736,12 +736,15 @@ config ARCH_HAS_KCOV
+ 	  only for x86_64. KCOV requires testing on other archs, and most likely
+ 	  disabling of instrumentation for some early boot code.
  
-diff --git a/kernel/gcov/Makefile b/kernel/gcov/Makefile
-index c6c50e5..ff06d64 100644
---- a/kernel/gcov/Makefile
-+++ b/kernel/gcov/Makefile
-@@ -4,5 +4,3 @@ ccflags-y := -DSRCTREE='"$(srctree)"' -DOBJTREE='"$(objtree)"'
- obj-y := base.o fs.o
- obj-$(CONFIG_GCOV_FORMAT_3_4) += gcc_3_4.o
- obj-$(CONFIG_GCOV_FORMAT_4_7) += gcc_4_7.o
--obj-$(CONFIG_GCOV_FORMAT_AUTODETECT) += $(call cc-ifversion, -lt, 0407, \
--							gcc_3_4.o, gcc_4_7.o)
++config CC_HAS_SANCOV_TRACE_PC
++	def_bool $(cc-option -fsanitize-coverage=trace-pc)
++
+ config KCOV
+ 	bool "Code coverage for fuzzing"
+ 	depends on ARCH_HAS_KCOV
++	depends on CC_HAS_SANCOV_TRACE_PC || GCC_PLUGINS
+ 	select DEBUG_FS
+-	select GCC_PLUGINS if !COMPILE_TEST
+-	select GCC_PLUGIN_SANCOV if !COMPILE_TEST
++	select GCC_PLUGIN_SANCOV if !CC_HAS_SANCOV_TRACE_PC
+ 	help
+ 	  KCOV exposes kernel code coverage information in a form suitable
+ 	  for coverage-guided fuzzing (randomized testing).
+@@ -755,7 +758,7 @@ config KCOV
+ config KCOV_ENABLE_COMPARISONS
+ 	bool "Enable comparison operands collection by KCOV"
+ 	depends on KCOV
+-	default n
++	depends on $(cc-option -fsanitize-coverage=trace-cmp)
+ 	help
+ 	  KCOV also exposes operands of every comparison in the instrumented
+ 	  code along with operand sizes and PCs of the comparison instructions.
+@@ -765,7 +768,7 @@ config KCOV_ENABLE_COMPARISONS
+ config KCOV_INSTRUMENT_ALL
+ 	bool "Instrument all code by default"
+ 	depends on KCOV
+-	default y if KCOV
++	default y
+ 	help
+ 	  If you are doing generic system call fuzzing (like e.g. syzkaller),
+ 	  then you will want to instrument the whole kernel and you should
+diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
+index 7f5c862..0ce3802 100644
+--- a/scripts/Makefile.gcc-plugins
++++ b/scripts/Makefile.gcc-plugins
+@@ -14,16 +14,12 @@ ifdef CONFIG_GCC_PLUGINS
+   endif
+ 
+   ifdef CONFIG_GCC_PLUGIN_SANCOV
+-    ifeq ($(strip $(CFLAGS_KCOV)),)
+       # It is needed because of the gcc-plugin.sh and gcc version checks.
+       gcc-plugin-$(CONFIG_GCC_PLUGIN_SANCOV)           += sancov_plugin.so
+ 
+-      ifneq ($(PLUGINCC),)
+-        CFLAGS_KCOV := $(SANCOV_PLUGIN)
+-      else
++      ifeq ($(PLUGINCC),)
+         $(warning warning: cannot use CONFIG_KCOV: -fsanitize-coverage=trace-pc is not supported by compiler)
+       endif
+-    endif
+   endif
+ 
+   gcc-plugin-$(CONFIG_GCC_PLUGIN_STRUCTLEAK)	+= structleak_plugin.so
+diff --git a/scripts/Makefile.kcov b/scripts/Makefile.kcov
+index 5cc7203..d71ba73 100644
+--- a/scripts/Makefile.kcov
++++ b/scripts/Makefile.kcov
+@@ -1,7 +1,9 @@
+ ifdef CONFIG_KCOV
+-CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
+-ifeq ($(CONFIG_KCOV_ENABLE_COMPARISONS),y)
+-CFLAGS_KCOV += $(call cc-option,-fsanitize-coverage=trace-cmp,)
+-endif
++
++kcov-flags-$(CONFIG_CC_HAS_SANCOV_TRACE_PC)	+= -fsanitize-coverage=trace-pc
++kcov-flags-$(CONFIG_KCOV_ENABLE_COMPARISONS)	+= -fsanitize-coverage=trace-cmp
++kcov-flags-$(CONFIG_GCC_PLUGIN_SANKOV)		+= -fplugin=$(objtree)/scripts/gcc-plugins/sancov_plugin.so
++
++export CFLAGS_KCOV := $(kcov-flags-y)
+ 
+ endif
 -- 
 2.7.4
 
