@@ -1,330 +1,274 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:56515 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752137AbeDMDZ0 (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:54456 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750859AbeDMFIP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Apr 2018 23:25:26 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180413025856.19969-1-d-gerlach@ti.com>
-References: <20180413025856.19969-1-d-gerlach@ti.com>
+        Fri, 13 Apr 2018 01:08:15 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 13 Apr 2018 12:24:35 +0900
-Message-ID: <CAK7LNARos-nJ17XNzdZ=zdgsK=HgbmZY7Txac-i4ioy8ZsQWUg@mail.gmail.com>
-Subject: Re: [PATCH v2] ARM: omap2: Fix build when using split object directories
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 08/30] kconfig: add built-in function support
+Date: Fri, 13 Apr 2018 14:06:17 +0900
+Message-Id: <1523595999-27433-9-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Gerlach <d-gerlach@ti.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Tony Lindgren <tony@atomide.com>, Russell King - ARM Linux <linux@armlinux.org.uk>, Santosh Shilimkar <santosh.shilimkar@oracle.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux-OMAP <linux-omap@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Anders Roxell <anders.roxell@linaro.org>, Michal Marek <michal.lkml@markovi.net>
+To: linux-kbuild@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-2018-04-13 11:58 GMT+09:00 Dave Gerlach <d-gerlach@ti.com>:
-> The sleep33xx and sleep43xx files should not depend on a header file
-> generated in drivers/memory. Remove this dependency and instead allow
-> both drivers/memory and arch/arm/mach-omap2 to generate all macros
-> needed in headers local to their own paths.
->
-> This fixes an issue where the build fail will when using O= to set a
-> split object directory and arch/arm/mach-omap2 is built before
-> drivers/memory with the following error:
->
-> .../drivers/memory/emif-asm-offsets.c:1:0: fatal error: can't open drivers/memory/emif-asm-offsets.s for writing: No such file or directory
-> compilation terminated.
->
-> Fixes: 41d9d44d7258 ("ARM: OMAP2+: pm33xx-core: Add platform code needed for PM")
-> Acked-by: Tony Lindgren <tony@atomide.com>
-> Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Tested-by: Anders Roxell <anders.roxell@linaro.org>
-> Signed-off-by: Dave Gerlach <d-gerlach@ti.com>
-> ---
-> v1 -> v2:
->  * Removed drivers/memory/Makefile.asm-offsets and consolidated into
->    drivers/memory/Makefile.
+This commit adds a new concept 'function' to do more text processing
+in Kconfig.
 
+A function call looks like this:
 
+  $(function arg1, arg2, arg3, ...)
 
-I did not mean like this.
+This commit adds the basic infrastructure to expand functions.
+Change the text expansion helpers to take arguments.
 
-I thought this clean-up would be done in a separate patch.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-I think your previous patch is OK as-is.
+Changes in v3:
+  - Split base infrastructure and 'shell' function
+    into separate patches.
 
+Changes in v2:
+  - Use 'shell' for getting stdout from the comment.
+    It was 'shell-stdout' in the previous version.
+  - Symplify the implementation since the expansion has been moved to
+    lexer.
 
+ scripts/kconfig/preprocess.c | 142 +++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 130 insertions(+), 12 deletions(-)
 
-
-
->  arch/arm/mach-omap2/Makefile         |  6 +--
->  arch/arm/mach-omap2/pm-asm-offsets.c |  3 ++
->  arch/arm/mach-omap2/sleep33xx.S      |  1 -
->  arch/arm/mach-omap2/sleep43xx.S      |  1 -
->  drivers/memory/Makefile              |  8 +++-
->  drivers/memory/Makefile.asm-offsets  |  5 ---
->  drivers/memory/emif-asm-offsets.c    | 72 +---------------------------------
->  include/linux/ti-emif-sram.h         | 75 ++++++++++++++++++++++++++++++++++++
->  8 files changed, 86 insertions(+), 85 deletions(-)
->  delete mode 100644 drivers/memory/Makefile.asm-offsets
->
-> diff --git a/arch/arm/mach-omap2/Makefile b/arch/arm/mach-omap2/Makefile
-> index 4603c30fef73..0d9ce58bc464 100644
-> --- a/arch/arm/mach-omap2/Makefile
-> +++ b/arch/arm/mach-omap2/Makefile
-> @@ -243,8 +243,4 @@ arch/arm/mach-omap2/pm-asm-offsets.s: arch/arm/mach-omap2/pm-asm-offsets.c
->  include/generated/ti-pm-asm-offsets.h: arch/arm/mach-omap2/pm-asm-offsets.s FORCE
->         $(call filechk,offsets,__TI_PM_ASM_OFFSETS_H__)
->
-> -# For rule to generate ti-emif-asm-offsets.h dependency
-> -include drivers/memory/Makefile.asm-offsets
-> -
-> -arch/arm/mach-omap2/sleep33xx.o: include/generated/ti-pm-asm-offsets.h include/generated/ti-emif-asm-offsets.h
-> -arch/arm/mach-omap2/sleep43xx.o: include/generated/ti-pm-asm-offsets.h include/generated/ti-emif-asm-offsets.h
-> +$(obj)/sleep33xx.o $(obj)/sleep43xx.o: include/generated/ti-pm-asm-offsets.h
-> diff --git a/arch/arm/mach-omap2/pm-asm-offsets.c b/arch/arm/mach-omap2/pm-asm-offsets.c
-> index 6d4392da7c11..b9846b19e5e2 100644
-> --- a/arch/arm/mach-omap2/pm-asm-offsets.c
-> +++ b/arch/arm/mach-omap2/pm-asm-offsets.c
-> @@ -7,9 +7,12 @@
->
->  #include <linux/kbuild.h>
->  #include <linux/platform_data/pm33xx.h>
-> +#include <linux/ti-emif-sram.h>
->
->  int main(void)
->  {
-> +       ti_emif_asm_offsets();
-> +
->         DEFINE(AMX3_PM_WFI_FLAGS_OFFSET,
->                offsetof(struct am33xx_pm_sram_data, wfi_flags));
->         DEFINE(AMX3_PM_L2_AUX_CTRL_VAL_OFFSET,
-> diff --git a/arch/arm/mach-omap2/sleep33xx.S b/arch/arm/mach-omap2/sleep33xx.S
-> index 218d79930b04..322b3bb868b4 100644
-> --- a/arch/arm/mach-omap2/sleep33xx.S
-> +++ b/arch/arm/mach-omap2/sleep33xx.S
-> @@ -6,7 +6,6 @@
->   *     Dave Gerlach, Vaibhav Bedia
->   */
->
-> -#include <generated/ti-emif-asm-offsets.h>
->  #include <generated/ti-pm-asm-offsets.h>
->  #include <linux/linkage.h>
->  #include <linux/ti-emif-sram.h>
-> diff --git a/arch/arm/mach-omap2/sleep43xx.S b/arch/arm/mach-omap2/sleep43xx.S
-> index b24be624e8b9..8903814a6677 100644
-> --- a/arch/arm/mach-omap2/sleep43xx.S
-> +++ b/arch/arm/mach-omap2/sleep43xx.S
-> @@ -6,7 +6,6 @@
->   *     Dave Gerlach, Vaibhav Bedia
->   */
->
-> -#include <generated/ti-emif-asm-offsets.h>
->  #include <generated/ti-pm-asm-offsets.h>
->  #include <linux/linkage.h>
->  #include <linux/ti-emif-sram.h>
-> diff --git a/drivers/memory/Makefile b/drivers/memory/Makefile
-> index 66f55240830e..b3b95380346f 100644
-> --- a/drivers/memory/Makefile
-> +++ b/drivers/memory/Makefile
-> @@ -28,6 +28,10 @@ ti-emif-sram-objs            := ti-emif-pm.o ti-emif-sram-pm.o
->
->  AFLAGS_ti-emif-sram-pm.o       :=-Wa,-march=armv7-a
->
-> -include drivers/memory/Makefile.asm-offsets
-> +drivers/memory/emif-asm-offsets.s: drivers/memory/emif-asm-offsets.c
-> +       $(call if_changed_dep,cc_s_c)
->
-> -drivers/memory/ti-emif-sram-pm.o: include/generated/ti-emif-asm-offsets.h
-> +include/generated/ti-emif-asm-offsets.h: drivers/memory/emif-asm-offsets.s FORCE
-> +       $(call filechk,offsets,__TI_EMIF_ASM_OFFSETS_H__)
-> +
-> +$(obj)/ti-emif-sram-pm.o: include/generated/ti-emif-asm-offsets.h
-> diff --git a/drivers/memory/Makefile.asm-offsets b/drivers/memory/Makefile.asm-offsets
-> deleted file mode 100644
-> index 843ff60ccb5a..000000000000
-> --- a/drivers/memory/Makefile.asm-offsets
-> +++ /dev/null
-> @@ -1,5 +0,0 @@
-> -drivers/memory/emif-asm-offsets.s: drivers/memory/emif-asm-offsets.c
-> -       $(call if_changed_dep,cc_s_c)
-> -
-> -include/generated/ti-emif-asm-offsets.h: drivers/memory/emif-asm-offsets.s FORCE
-> -       $(call filechk,offsets,__TI_EMIF_ASM_OFFSETS_H__)
-> diff --git a/drivers/memory/emif-asm-offsets.c b/drivers/memory/emif-asm-offsets.c
-> index 71a89d5d3efd..db8043019ec6 100644
-> --- a/drivers/memory/emif-asm-offsets.c
-> +++ b/drivers/memory/emif-asm-offsets.c
-> @@ -16,77 +16,7 @@
->
->  int main(void)
->  {
-> -       DEFINE(EMIF_SDCFG_VAL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_sdcfg_val));
-> -       DEFINE(EMIF_TIMING1_VAL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_timing1_val));
-> -       DEFINE(EMIF_TIMING2_VAL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_timing2_val));
-> -       DEFINE(EMIF_TIMING3_VAL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_timing3_val));
-> -       DEFINE(EMIF_REF_CTRL_VAL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_ref_ctrl_val));
-> -       DEFINE(EMIF_ZQCFG_VAL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_zqcfg_val));
-> -       DEFINE(EMIF_PMCR_VAL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_pmcr_val));
-> -       DEFINE(EMIF_PMCR_SHDW_VAL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_pmcr_shdw_val));
-> -       DEFINE(EMIF_RD_WR_LEVEL_RAMP_CTRL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_rd_wr_level_ramp_ctrl));
-> -       DEFINE(EMIF_RD_WR_EXEC_THRESH_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_rd_wr_exec_thresh));
-> -       DEFINE(EMIF_COS_CONFIG_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_cos_config));
-> -       DEFINE(EMIF_PRIORITY_TO_COS_MAPPING_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_priority_to_cos_mapping));
-> -       DEFINE(EMIF_CONNECT_ID_SERV_1_MAP_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_connect_id_serv_1_map));
-> -       DEFINE(EMIF_CONNECT_ID_SERV_2_MAP_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_connect_id_serv_2_map));
-> -       DEFINE(EMIF_OCP_CONFIG_VAL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_ocp_config_val));
-> -       DEFINE(EMIF_LPDDR2_NVM_TIM_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_lpddr2_nvm_tim));
-> -       DEFINE(EMIF_LPDDR2_NVM_TIM_SHDW_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_lpddr2_nvm_tim_shdw));
-> -       DEFINE(EMIF_DLL_CALIB_CTRL_VAL_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_dll_calib_ctrl_val));
-> -       DEFINE(EMIF_DLL_CALIB_CTRL_VAL_SHDW_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_dll_calib_ctrl_val_shdw));
-> -       DEFINE(EMIF_DDR_PHY_CTLR_1_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_ddr_phy_ctlr_1));
-> -       DEFINE(EMIF_EXT_PHY_CTRL_VALS_OFFSET,
-> -              offsetof(struct emif_regs_amx3, emif_ext_phy_ctrl_vals));
-> -       DEFINE(EMIF_REGS_AMX3_SIZE, sizeof(struct emif_regs_amx3));
-> -
-> -       BLANK();
-> -
-> -       DEFINE(EMIF_PM_BASE_ADDR_VIRT_OFFSET,
-> -              offsetof(struct ti_emif_pm_data, ti_emif_base_addr_virt));
-> -       DEFINE(EMIF_PM_BASE_ADDR_PHYS_OFFSET,
-> -              offsetof(struct ti_emif_pm_data, ti_emif_base_addr_phys));
-> -       DEFINE(EMIF_PM_CONFIG_OFFSET,
-> -              offsetof(struct ti_emif_pm_data, ti_emif_sram_config));
-> -       DEFINE(EMIF_PM_REGS_VIRT_OFFSET,
-> -              offsetof(struct ti_emif_pm_data, regs_virt));
-> -       DEFINE(EMIF_PM_REGS_PHYS_OFFSET,
-> -              offsetof(struct ti_emif_pm_data, regs_phys));
-> -       DEFINE(EMIF_PM_DATA_SIZE, sizeof(struct ti_emif_pm_data));
-> -
-> -       BLANK();
-> -
-> -       DEFINE(EMIF_PM_SAVE_CONTEXT_OFFSET,
-> -              offsetof(struct ti_emif_pm_functions, save_context));
-> -       DEFINE(EMIF_PM_RESTORE_CONTEXT_OFFSET,
-> -              offsetof(struct ti_emif_pm_functions, restore_context));
-> -       DEFINE(EMIF_PM_ENTER_SR_OFFSET,
-> -              offsetof(struct ti_emif_pm_functions, enter_sr));
-> -       DEFINE(EMIF_PM_EXIT_SR_OFFSET,
-> -              offsetof(struct ti_emif_pm_functions, exit_sr));
-> -       DEFINE(EMIF_PM_ABORT_SR_OFFSET,
-> -              offsetof(struct ti_emif_pm_functions, abort_sr));
-> -       DEFINE(EMIF_PM_FUNCTIONS_SIZE, sizeof(struct ti_emif_pm_functions));
-> +       ti_emif_asm_offsets();
->
->         return 0;
->  }
-> diff --git a/include/linux/ti-emif-sram.h b/include/linux/ti-emif-sram.h
-> index 45bc6b376492..53604b087f2c 100644
-> --- a/include/linux/ti-emif-sram.h
-> +++ b/include/linux/ti-emif-sram.h
-> @@ -60,6 +60,81 @@ struct ti_emif_pm_functions {
->         u32 abort_sr;
->  } __packed __aligned(8);
->
-> +static inline void ti_emif_asm_offsets(void)
-> +{
-> +       DEFINE(EMIF_SDCFG_VAL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_sdcfg_val));
-> +       DEFINE(EMIF_TIMING1_VAL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_timing1_val));
-> +       DEFINE(EMIF_TIMING2_VAL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_timing2_val));
-> +       DEFINE(EMIF_TIMING3_VAL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_timing3_val));
-> +       DEFINE(EMIF_REF_CTRL_VAL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_ref_ctrl_val));
-> +       DEFINE(EMIF_ZQCFG_VAL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_zqcfg_val));
-> +       DEFINE(EMIF_PMCR_VAL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_pmcr_val));
-> +       DEFINE(EMIF_PMCR_SHDW_VAL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_pmcr_shdw_val));
-> +       DEFINE(EMIF_RD_WR_LEVEL_RAMP_CTRL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_rd_wr_level_ramp_ctrl));
-> +       DEFINE(EMIF_RD_WR_EXEC_THRESH_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_rd_wr_exec_thresh));
-> +       DEFINE(EMIF_COS_CONFIG_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_cos_config));
-> +       DEFINE(EMIF_PRIORITY_TO_COS_MAPPING_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_priority_to_cos_mapping));
-> +       DEFINE(EMIF_CONNECT_ID_SERV_1_MAP_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_connect_id_serv_1_map));
-> +       DEFINE(EMIF_CONNECT_ID_SERV_2_MAP_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_connect_id_serv_2_map));
-> +       DEFINE(EMIF_OCP_CONFIG_VAL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_ocp_config_val));
-> +       DEFINE(EMIF_LPDDR2_NVM_TIM_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_lpddr2_nvm_tim));
-> +       DEFINE(EMIF_LPDDR2_NVM_TIM_SHDW_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_lpddr2_nvm_tim_shdw));
-> +       DEFINE(EMIF_DLL_CALIB_CTRL_VAL_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_dll_calib_ctrl_val));
-> +       DEFINE(EMIF_DLL_CALIB_CTRL_VAL_SHDW_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_dll_calib_ctrl_val_shdw));
-> +       DEFINE(EMIF_DDR_PHY_CTLR_1_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_ddr_phy_ctlr_1));
-> +       DEFINE(EMIF_EXT_PHY_CTRL_VALS_OFFSET,
-> +              offsetof(struct emif_regs_amx3, emif_ext_phy_ctrl_vals));
-> +       DEFINE(EMIF_REGS_AMX3_SIZE, sizeof(struct emif_regs_amx3));
-> +
-> +       BLANK();
-> +
-> +       DEFINE(EMIF_PM_BASE_ADDR_VIRT_OFFSET,
-> +              offsetof(struct ti_emif_pm_data, ti_emif_base_addr_virt));
-> +       DEFINE(EMIF_PM_BASE_ADDR_PHYS_OFFSET,
-> +              offsetof(struct ti_emif_pm_data, ti_emif_base_addr_phys));
-> +       DEFINE(EMIF_PM_CONFIG_OFFSET,
-> +              offsetof(struct ti_emif_pm_data, ti_emif_sram_config));
-> +       DEFINE(EMIF_PM_REGS_VIRT_OFFSET,
-> +              offsetof(struct ti_emif_pm_data, regs_virt));
-> +       DEFINE(EMIF_PM_REGS_PHYS_OFFSET,
-> +              offsetof(struct ti_emif_pm_data, regs_phys));
-> +       DEFINE(EMIF_PM_DATA_SIZE, sizeof(struct ti_emif_pm_data));
-> +
-> +       BLANK();
-> +
-> +       DEFINE(EMIF_PM_SAVE_CONTEXT_OFFSET,
-> +              offsetof(struct ti_emif_pm_functions, save_context));
-> +       DEFINE(EMIF_PM_RESTORE_CONTEXT_OFFSET,
-> +              offsetof(struct ti_emif_pm_functions, restore_context));
-> +       DEFINE(EMIF_PM_ENTER_SR_OFFSET,
-> +              offsetof(struct ti_emif_pm_functions, enter_sr));
-> +       DEFINE(EMIF_PM_EXIT_SR_OFFSET,
-> +              offsetof(struct ti_emif_pm_functions, exit_sr));
-> +       DEFINE(EMIF_PM_ABORT_SR_OFFSET,
-> +              offsetof(struct ti_emif_pm_functions, abort_sr));
-> +       DEFINE(EMIF_PM_FUNCTIONS_SIZE, sizeof(struct ti_emif_pm_functions));
-> +}
-> +
->  struct gen_pool;
->
->  int ti_emif_copy_pm_function_table(struct gen_pool *sram_pool, void *dst);
-> --
-> 2.16.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
+index fa4abc8..e77cf7c 100644
+--- a/scripts/kconfig/preprocess.c
++++ b/scripts/kconfig/preprocess.c
+@@ -8,6 +8,10 @@
+ 
+ #include "list.h"
+ 
++#define ARRAY_SIZE(arr)		(sizeof(arr) / sizeof((arr)[0]))
++
++static char *expand_string_with_args(const char *in, int argc, char *argv[]);
++
+ /*
+  * Environment variables
+  */
+@@ -74,9 +78,47 @@ void env_write_dep(FILE *f, const char *autoconfig_name)
+ 	}
+ }
+ 
+-static char *eval_clause(const char *in)
++/*
++ * Built-in Functions
++ */
++struct function {
++	char *name;
++	char *(*func)(int argc, char *argv[]);
++};
++
++static const struct function function_table[] = {
++};
++
++static char *function_call(const char *name, int argc, char *argv[])
+ {
+-	char *res, *name;
++	const struct function *f;
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(function_table); i++) {
++		f = &function_table[i];
++		if (!strcmp(f->name, name))
++			return f->func(argc, argv);
++	}
++
++	return NULL;
++}
++
++#define FUNCTION_MAX_ARGS		16
++
++/*
++ * Evaluate a clause with arguments.  argc/argv are arguments from the upper
++ * function call.
++ *
++ * Returned string must be freed when done
++ */
++static char *eval_clause(const char *in, int argc, char *argv[])
++{
++	char *tmp, *prev, *p, *res, *name;
++	char delim = ' ';
++	int new_argc = 0;
++	char *new_argv[FUNCTION_MAX_ARGS];
++	int nest = 0;
++	int i;
+ 
+ 	/*
+ 	 * Returns an empty string because '$()' should be evaluated
+@@ -85,10 +127,73 @@ static char *eval_clause(const char *in)
+ 	if (!*in)
+ 		return xstrdup("");
+ 
+-	name = expand_string(in);
++	tmp = xstrdup(in);
++
++	prev = p = tmp;
+ 
+-	res = env_expand(name);
++	/*
++	 * Split into tokens
++	 * The function name and the first argument are separated by a space.
++	 * Arguments are separated by a comma.
++	 * For example, if the function call is like this:
++	 *   $(foo abc,$(x),$(y))
++	 *
++	 * The input string for this helper should be:
++	 *   foo abc,$(x),$(y)
++	 *
++	 * and split into:
++	 *   new_argv[0]: foo
++	 *   new_argv[1]: abc
++	 *   new_argv[2]: $(x)
++	 *   new_argv[3]: $(y)
++	 */
++	while (*p) {
++		if (nest == 0 && *p == delim) {
++			*p = 0;
++			new_argv[new_argc++] = prev;
++			prev = p + 1;
++			delim = ',';
++		} else if (*p == '(') {
++			nest++;
++		} else if (*p == ')') {
++			nest--;
++		}
++
++		p++;
++	}
++	new_argv[new_argc++] = prev;
++
++	/*
++	 * Shift arguments
++	 * new_argv[0] represents a function name or a variable name.  Put it
++	 * into 'name', then shift the rest of the arguments.  This simplifies
++	 * 'const' handling.
++	 */
++	name = expand_string_with_args(new_argv[0], argc, argv);
++	new_argc--;
++	for (i = 0; i < new_argc; i++)
++		new_argv[i] = expand_string_with_args(new_argv[i + 1],
++						      argc, argv);
++
++	free(tmp);
++
++	/* Look for built-in functions */
++	res = function_call(name, new_argc, new_argv);
++	if (res)
++		goto out;
++
++	/* Last, try environment variable */
++	if (new_argc == 0) {
++		res = env_expand(name);
++		if (res)
++			goto out;
++	}
++
++	res = xstrdup("");
++out:
+ 	free(name);
++	for (i = 0; i < new_argc; i++)
++		free(new_argv[i]);
+ 
+ 	return res;
+ }
+@@ -115,7 +220,7 @@ static char *eval_clause(const char *in)
+  * This is because $ABC is equivalent to $(A)BC.  (Like Make, you can omit
+  * parentheses if the variable name consists of a single character.
+  */
+-char *expand_dollar(const char **str)
++static char *expand_dollar_with_args(const char **str, int argc, char *argv[])
+ {
+ 	const char *p = *str;
+ 	const char *q;
+@@ -124,6 +229,9 @@ char *expand_dollar(const char **str)
+ 
+ 	/*
+ 	 * A standalone '$' at the end of a token is treated as-is.
++	 * For example, the '$' before the comma in $(foo $,A) and the '$'
++	 * before the closing parenthesis in $(shell echo $) lose the special
++	 * meaning.  This is the behavior of Make 4.2 or newer.
+ 	 */
+ 	if (!*p)
+ 		return xstrdup("$");
+@@ -140,15 +248,15 @@ char *expand_dollar(const char **str)
+ 		tmp[0] = *p;
+ 		tmp[1] = 0;
+ 		*str = p + 1;
+-		out = eval_clause(tmp);
++		out = eval_clause(tmp, argc, argv);
+ 		free(tmp);
+ 		return out;
+ 	}
+ 
+ 	/*
+-	 * Variables that consist of multiple letters
++	 * Variables that consist of multiple letters, and function calls
+ 	 * must be surrounded with parentheses.
+-	 * For example, $(FOO)
++	 * For example, $(FOO), $(shell echo helloworld)
+ 	 */
+ 	p++;
+ 	q = p;
+@@ -163,7 +271,7 @@ char *expand_dollar(const char **str)
+ 				memcpy(tmp, p, q - p);
+ 				tmp[q - p] = 0;
+ 				*str = q + 1;
+-				out = eval_clause(tmp);
++				out = eval_clause(tmp, argc, argv);
+ 				free(tmp);
+ 				return out;
+ 			}
+@@ -179,11 +287,11 @@ char *expand_dollar(const char **str)
+ }
+ 
+ /*
+- * Expand variables in the given string.  Undefined variables
++ * Expand variables, functions, etc. in the given string.  Undefined variables
+  * expand to an empty string.
+  * The returned string must be freed when done.
+  */
+-char *expand_string(const char *in)
++static char *expand_string_with_args(const char *in, int argc, char *argv[])
+ {
+ 	const char *prev_in, *p;
+ 	char *new, *out;
+@@ -195,7 +303,7 @@ char *expand_string(const char *in)
+ 	while ((p = strchr(in, '$'))) {
+ 		prev_in = in;
+ 		in = p + 1;
+-		new = expand_dollar(&in);
++		new = expand_dollar_with_args(&in, argc, argv);
+ 		outlen = strlen(out) + (p - prev_in) + strlen(new) + 1;
+ 		out = xrealloc(out, outlen);
+ 		strncat(out, prev_in, p - prev_in);
+@@ -210,6 +318,16 @@ char *expand_string(const char *in)
+ 	return out;
+ }
+ 
++char *expand_string(const char *in)
++{
++	return expand_string_with_args(in, 0, NULL);
++}
++
++char *expand_dollar(const char **str)
++{
++	return expand_dollar_with_args(str, 0, NULL);
++}
++
+ /*
+  * Expand variables in a token.  The parsing stops when a token separater
+  * (in most cases, it is a whitespace) is encountered.  'str' is updated to
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
