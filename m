@@ -1,43 +1,305 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50522 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752821AbeDLTWK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Apr 2018 15:22:10 -0400
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH] objtool: Support HOSTCFLAGS and HOSTLDFLAGS
-Date: Thu, 12 Apr 2018 14:21:54 -0500
-Message-Id: <05a360681176f1423cb2fde8faae3a0a0261afc5.1523560825.git.jpoimboe@redhat.com>
+Received: from fllnx210.ext.ti.com ([198.47.19.17]:24203 "EHLO
+        fllnx210.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753106AbeDMC76 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 12 Apr 2018 22:59:58 -0400
+From: Dave Gerlach <d-gerlach@ti.com>
+Subject: [PATCH v2] ARM: omap2: Fix build when using split object directories
+Date: Thu, 12 Apr 2018 21:58:56 -0500
+Message-ID: <20180413025856.19969-1-d-gerlach@ti.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: x86@kernel.org
-Cc: linux-kernel@vger.kernel.org, Laura Abbott <labbott@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org, Tony Lindgren <tony@atomide.com>, Russell King - ARM Linux <linux@armlinux.org.uk>, Santosh Shilimkar <santosh.shilimkar@oracle.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org, linux-kbuild@vger.kernel.org, Anders Roxell <anders.roxell@linaro.org>, Dave Gerlach <d-gerlach@ti.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 
-From: Laura Abbott <labbott@redhat.com>
+The sleep33xx and sleep43xx files should not depend on a header file
+generated in drivers/memory. Remove this dependency and instead allow
+both drivers/memory and arch/arm/mach-omap2 to generate all macros
+needed in headers local to their own paths.
 
-It may be useful to compile host programs with different flags (e.g.
-hardening). Ensure that objtool picks up the appropriate flags.
+This fixes an issue where the build fail will when using O= to set a
+split object directory and arch/arm/mach-omap2 is built before
+drivers/memory with the following error:
 
-Signed-off-by: Laura Abbott <labbott@redhat.com>
-Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
+.../drivers/memory/emif-asm-offsets.c:1:0: fatal error: can't open drivers/memory/emif-asm-offsets.s for writing: No such file or directory
+compilation terminated.
+
+Fixes: 41d9d44d7258 ("ARM: OMAP2+: pm33xx-core: Add platform code needed for PM")
+Acked-by: Tony Lindgren <tony@atomide.com>
+Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Tested-by: Anders Roxell <anders.roxell@linaro.org>
+Signed-off-by: Dave Gerlach <d-gerlach@ti.com>
 ---
- tools/objtool/Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+v1 -> v2:
+ * Removed drivers/memory/Makefile.asm-offsets and consolidated into
+   drivers/memory/Makefile.
 
-diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
-index e6acc281dd37..7df979ae4573 100644
---- a/tools/objtool/Makefile
-+++ b/tools/objtool/Makefile
-@@ -31,8 +31,8 @@ INCLUDES := -I$(srctree)/tools/include \
- 	    -I$(srctree)/tools/arch/$(HOSTARCH)/include/uapi \
- 	    -I$(srctree)/tools/objtool/arch/$(ARCH)/include
- WARNINGS := $(EXTRA_WARNINGS) -Wno-switch-default -Wno-switch-enum -Wno-packed
--CFLAGS   += -Wall -Werror $(WARNINGS) -fomit-frame-pointer -O2 -g $(INCLUDES)
--LDFLAGS  += -lelf $(LIBSUBCMD)
-+CFLAGS   += -Werror $(WARNINGS) $(HOSTCFLAGS) -g $(INCLUDES)
-+LDFLAGS  += -lelf $(LIBSUBCMD) $(HOSTLDFLAGS)
+ arch/arm/mach-omap2/Makefile         |  6 +--
+ arch/arm/mach-omap2/pm-asm-offsets.c |  3 ++
+ arch/arm/mach-omap2/sleep33xx.S      |  1 -
+ arch/arm/mach-omap2/sleep43xx.S      |  1 -
+ drivers/memory/Makefile              |  8 +++-
+ drivers/memory/Makefile.asm-offsets  |  5 ---
+ drivers/memory/emif-asm-offsets.c    | 72 +---------------------------------
+ include/linux/ti-emif-sram.h         | 75 ++++++++++++++++++++++++++++++++++++
+ 8 files changed, 86 insertions(+), 85 deletions(-)
+ delete mode 100644 drivers/memory/Makefile.asm-offsets
+
+diff --git a/arch/arm/mach-omap2/Makefile b/arch/arm/mach-omap2/Makefile
+index 4603c30fef73..0d9ce58bc464 100644
+--- a/arch/arm/mach-omap2/Makefile
++++ b/arch/arm/mach-omap2/Makefile
+@@ -243,8 +243,4 @@ arch/arm/mach-omap2/pm-asm-offsets.s: arch/arm/mach-omap2/pm-asm-offsets.c
+ include/generated/ti-pm-asm-offsets.h: arch/arm/mach-omap2/pm-asm-offsets.s FORCE
+ 	$(call filechk,offsets,__TI_PM_ASM_OFFSETS_H__)
  
- # Allow old libelf to be used:
- elfshdr := $(shell echo '\#include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
+-# For rule to generate ti-emif-asm-offsets.h dependency
+-include drivers/memory/Makefile.asm-offsets
+-
+-arch/arm/mach-omap2/sleep33xx.o: include/generated/ti-pm-asm-offsets.h include/generated/ti-emif-asm-offsets.h
+-arch/arm/mach-omap2/sleep43xx.o: include/generated/ti-pm-asm-offsets.h include/generated/ti-emif-asm-offsets.h
++$(obj)/sleep33xx.o $(obj)/sleep43xx.o: include/generated/ti-pm-asm-offsets.h
+diff --git a/arch/arm/mach-omap2/pm-asm-offsets.c b/arch/arm/mach-omap2/pm-asm-offsets.c
+index 6d4392da7c11..b9846b19e5e2 100644
+--- a/arch/arm/mach-omap2/pm-asm-offsets.c
++++ b/arch/arm/mach-omap2/pm-asm-offsets.c
+@@ -7,9 +7,12 @@
+ 
+ #include <linux/kbuild.h>
+ #include <linux/platform_data/pm33xx.h>
++#include <linux/ti-emif-sram.h>
+ 
+ int main(void)
+ {
++	ti_emif_asm_offsets();
++
+ 	DEFINE(AMX3_PM_WFI_FLAGS_OFFSET,
+ 	       offsetof(struct am33xx_pm_sram_data, wfi_flags));
+ 	DEFINE(AMX3_PM_L2_AUX_CTRL_VAL_OFFSET,
+diff --git a/arch/arm/mach-omap2/sleep33xx.S b/arch/arm/mach-omap2/sleep33xx.S
+index 218d79930b04..322b3bb868b4 100644
+--- a/arch/arm/mach-omap2/sleep33xx.S
++++ b/arch/arm/mach-omap2/sleep33xx.S
+@@ -6,7 +6,6 @@
+  *	Dave Gerlach, Vaibhav Bedia
+  */
+ 
+-#include <generated/ti-emif-asm-offsets.h>
+ #include <generated/ti-pm-asm-offsets.h>
+ #include <linux/linkage.h>
+ #include <linux/ti-emif-sram.h>
+diff --git a/arch/arm/mach-omap2/sleep43xx.S b/arch/arm/mach-omap2/sleep43xx.S
+index b24be624e8b9..8903814a6677 100644
+--- a/arch/arm/mach-omap2/sleep43xx.S
++++ b/arch/arm/mach-omap2/sleep43xx.S
+@@ -6,7 +6,6 @@
+  *	Dave Gerlach, Vaibhav Bedia
+  */
+ 
+-#include <generated/ti-emif-asm-offsets.h>
+ #include <generated/ti-pm-asm-offsets.h>
+ #include <linux/linkage.h>
+ #include <linux/ti-emif-sram.h>
+diff --git a/drivers/memory/Makefile b/drivers/memory/Makefile
+index 66f55240830e..b3b95380346f 100644
+--- a/drivers/memory/Makefile
++++ b/drivers/memory/Makefile
+@@ -28,6 +28,10 @@ ti-emif-sram-objs		:= ti-emif-pm.o ti-emif-sram-pm.o
+ 
+ AFLAGS_ti-emif-sram-pm.o	:=-Wa,-march=armv7-a
+ 
+-include drivers/memory/Makefile.asm-offsets
++drivers/memory/emif-asm-offsets.s: drivers/memory/emif-asm-offsets.c
++	$(call if_changed_dep,cc_s_c)
+ 
+-drivers/memory/ti-emif-sram-pm.o: include/generated/ti-emif-asm-offsets.h
++include/generated/ti-emif-asm-offsets.h: drivers/memory/emif-asm-offsets.s FORCE
++	$(call filechk,offsets,__TI_EMIF_ASM_OFFSETS_H__)
++
++$(obj)/ti-emif-sram-pm.o: include/generated/ti-emif-asm-offsets.h
+diff --git a/drivers/memory/Makefile.asm-offsets b/drivers/memory/Makefile.asm-offsets
+deleted file mode 100644
+index 843ff60ccb5a..000000000000
+--- a/drivers/memory/Makefile.asm-offsets
++++ /dev/null
+@@ -1,5 +0,0 @@
+-drivers/memory/emif-asm-offsets.s: drivers/memory/emif-asm-offsets.c
+-	$(call if_changed_dep,cc_s_c)
+-
+-include/generated/ti-emif-asm-offsets.h: drivers/memory/emif-asm-offsets.s FORCE
+-	$(call filechk,offsets,__TI_EMIF_ASM_OFFSETS_H__)
+diff --git a/drivers/memory/emif-asm-offsets.c b/drivers/memory/emif-asm-offsets.c
+index 71a89d5d3efd..db8043019ec6 100644
+--- a/drivers/memory/emif-asm-offsets.c
++++ b/drivers/memory/emif-asm-offsets.c
+@@ -16,77 +16,7 @@
+ 
+ int main(void)
+ {
+-	DEFINE(EMIF_SDCFG_VAL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_sdcfg_val));
+-	DEFINE(EMIF_TIMING1_VAL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_timing1_val));
+-	DEFINE(EMIF_TIMING2_VAL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_timing2_val));
+-	DEFINE(EMIF_TIMING3_VAL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_timing3_val));
+-	DEFINE(EMIF_REF_CTRL_VAL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_ref_ctrl_val));
+-	DEFINE(EMIF_ZQCFG_VAL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_zqcfg_val));
+-	DEFINE(EMIF_PMCR_VAL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_pmcr_val));
+-	DEFINE(EMIF_PMCR_SHDW_VAL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_pmcr_shdw_val));
+-	DEFINE(EMIF_RD_WR_LEVEL_RAMP_CTRL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_rd_wr_level_ramp_ctrl));
+-	DEFINE(EMIF_RD_WR_EXEC_THRESH_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_rd_wr_exec_thresh));
+-	DEFINE(EMIF_COS_CONFIG_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_cos_config));
+-	DEFINE(EMIF_PRIORITY_TO_COS_MAPPING_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_priority_to_cos_mapping));
+-	DEFINE(EMIF_CONNECT_ID_SERV_1_MAP_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_connect_id_serv_1_map));
+-	DEFINE(EMIF_CONNECT_ID_SERV_2_MAP_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_connect_id_serv_2_map));
+-	DEFINE(EMIF_OCP_CONFIG_VAL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_ocp_config_val));
+-	DEFINE(EMIF_LPDDR2_NVM_TIM_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_lpddr2_nvm_tim));
+-	DEFINE(EMIF_LPDDR2_NVM_TIM_SHDW_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_lpddr2_nvm_tim_shdw));
+-	DEFINE(EMIF_DLL_CALIB_CTRL_VAL_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_dll_calib_ctrl_val));
+-	DEFINE(EMIF_DLL_CALIB_CTRL_VAL_SHDW_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_dll_calib_ctrl_val_shdw));
+-	DEFINE(EMIF_DDR_PHY_CTLR_1_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_ddr_phy_ctlr_1));
+-	DEFINE(EMIF_EXT_PHY_CTRL_VALS_OFFSET,
+-	       offsetof(struct emif_regs_amx3, emif_ext_phy_ctrl_vals));
+-	DEFINE(EMIF_REGS_AMX3_SIZE, sizeof(struct emif_regs_amx3));
+-
+-	BLANK();
+-
+-	DEFINE(EMIF_PM_BASE_ADDR_VIRT_OFFSET,
+-	       offsetof(struct ti_emif_pm_data, ti_emif_base_addr_virt));
+-	DEFINE(EMIF_PM_BASE_ADDR_PHYS_OFFSET,
+-	       offsetof(struct ti_emif_pm_data, ti_emif_base_addr_phys));
+-	DEFINE(EMIF_PM_CONFIG_OFFSET,
+-	       offsetof(struct ti_emif_pm_data, ti_emif_sram_config));
+-	DEFINE(EMIF_PM_REGS_VIRT_OFFSET,
+-	       offsetof(struct ti_emif_pm_data, regs_virt));
+-	DEFINE(EMIF_PM_REGS_PHYS_OFFSET,
+-	       offsetof(struct ti_emif_pm_data, regs_phys));
+-	DEFINE(EMIF_PM_DATA_SIZE, sizeof(struct ti_emif_pm_data));
+-
+-	BLANK();
+-
+-	DEFINE(EMIF_PM_SAVE_CONTEXT_OFFSET,
+-	       offsetof(struct ti_emif_pm_functions, save_context));
+-	DEFINE(EMIF_PM_RESTORE_CONTEXT_OFFSET,
+-	       offsetof(struct ti_emif_pm_functions, restore_context));
+-	DEFINE(EMIF_PM_ENTER_SR_OFFSET,
+-	       offsetof(struct ti_emif_pm_functions, enter_sr));
+-	DEFINE(EMIF_PM_EXIT_SR_OFFSET,
+-	       offsetof(struct ti_emif_pm_functions, exit_sr));
+-	DEFINE(EMIF_PM_ABORT_SR_OFFSET,
+-	       offsetof(struct ti_emif_pm_functions, abort_sr));
+-	DEFINE(EMIF_PM_FUNCTIONS_SIZE, sizeof(struct ti_emif_pm_functions));
++	ti_emif_asm_offsets();
+ 
+ 	return 0;
+ }
+diff --git a/include/linux/ti-emif-sram.h b/include/linux/ti-emif-sram.h
+index 45bc6b376492..53604b087f2c 100644
+--- a/include/linux/ti-emif-sram.h
++++ b/include/linux/ti-emif-sram.h
+@@ -60,6 +60,81 @@ struct ti_emif_pm_functions {
+ 	u32 abort_sr;
+ } __packed __aligned(8);
+ 
++static inline void ti_emif_asm_offsets(void)
++{
++	DEFINE(EMIF_SDCFG_VAL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_sdcfg_val));
++	DEFINE(EMIF_TIMING1_VAL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_timing1_val));
++	DEFINE(EMIF_TIMING2_VAL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_timing2_val));
++	DEFINE(EMIF_TIMING3_VAL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_timing3_val));
++	DEFINE(EMIF_REF_CTRL_VAL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_ref_ctrl_val));
++	DEFINE(EMIF_ZQCFG_VAL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_zqcfg_val));
++	DEFINE(EMIF_PMCR_VAL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_pmcr_val));
++	DEFINE(EMIF_PMCR_SHDW_VAL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_pmcr_shdw_val));
++	DEFINE(EMIF_RD_WR_LEVEL_RAMP_CTRL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_rd_wr_level_ramp_ctrl));
++	DEFINE(EMIF_RD_WR_EXEC_THRESH_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_rd_wr_exec_thresh));
++	DEFINE(EMIF_COS_CONFIG_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_cos_config));
++	DEFINE(EMIF_PRIORITY_TO_COS_MAPPING_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_priority_to_cos_mapping));
++	DEFINE(EMIF_CONNECT_ID_SERV_1_MAP_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_connect_id_serv_1_map));
++	DEFINE(EMIF_CONNECT_ID_SERV_2_MAP_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_connect_id_serv_2_map));
++	DEFINE(EMIF_OCP_CONFIG_VAL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_ocp_config_val));
++	DEFINE(EMIF_LPDDR2_NVM_TIM_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_lpddr2_nvm_tim));
++	DEFINE(EMIF_LPDDR2_NVM_TIM_SHDW_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_lpddr2_nvm_tim_shdw));
++	DEFINE(EMIF_DLL_CALIB_CTRL_VAL_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_dll_calib_ctrl_val));
++	DEFINE(EMIF_DLL_CALIB_CTRL_VAL_SHDW_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_dll_calib_ctrl_val_shdw));
++	DEFINE(EMIF_DDR_PHY_CTLR_1_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_ddr_phy_ctlr_1));
++	DEFINE(EMIF_EXT_PHY_CTRL_VALS_OFFSET,
++	       offsetof(struct emif_regs_amx3, emif_ext_phy_ctrl_vals));
++	DEFINE(EMIF_REGS_AMX3_SIZE, sizeof(struct emif_regs_amx3));
++
++	BLANK();
++
++	DEFINE(EMIF_PM_BASE_ADDR_VIRT_OFFSET,
++	       offsetof(struct ti_emif_pm_data, ti_emif_base_addr_virt));
++	DEFINE(EMIF_PM_BASE_ADDR_PHYS_OFFSET,
++	       offsetof(struct ti_emif_pm_data, ti_emif_base_addr_phys));
++	DEFINE(EMIF_PM_CONFIG_OFFSET,
++	       offsetof(struct ti_emif_pm_data, ti_emif_sram_config));
++	DEFINE(EMIF_PM_REGS_VIRT_OFFSET,
++	       offsetof(struct ti_emif_pm_data, regs_virt));
++	DEFINE(EMIF_PM_REGS_PHYS_OFFSET,
++	       offsetof(struct ti_emif_pm_data, regs_phys));
++	DEFINE(EMIF_PM_DATA_SIZE, sizeof(struct ti_emif_pm_data));
++
++	BLANK();
++
++	DEFINE(EMIF_PM_SAVE_CONTEXT_OFFSET,
++	       offsetof(struct ti_emif_pm_functions, save_context));
++	DEFINE(EMIF_PM_RESTORE_CONTEXT_OFFSET,
++	       offsetof(struct ti_emif_pm_functions, restore_context));
++	DEFINE(EMIF_PM_ENTER_SR_OFFSET,
++	       offsetof(struct ti_emif_pm_functions, enter_sr));
++	DEFINE(EMIF_PM_EXIT_SR_OFFSET,
++	       offsetof(struct ti_emif_pm_functions, exit_sr));
++	DEFINE(EMIF_PM_ABORT_SR_OFFSET,
++	       offsetof(struct ti_emif_pm_functions, abort_sr));
++	DEFINE(EMIF_PM_FUNCTIONS_SIZE, sizeof(struct ti_emif_pm_functions));
++}
++
+ struct gen_pool;
+ 
+ int ti_emif_copy_pm_function_table(struct gen_pool *sram_pool, void *dst);
 -- 
-2.14.3
+2.16.1
 
