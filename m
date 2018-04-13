@@ -1,26 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:18796 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750839AbeDMFd3 (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:54810 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752996AbeDMFi1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Apr 2018 01:33:29 -0400
+        Fri, 13 Apr 2018 01:38:27 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5jKmnO3o4dwWXrizKCeVpj3RCzw_zsHPseZrLXAgGb0YdQ@mail.gmail.com>
+In-Reply-To: <CAFkk2KQn2TQ8iRqNQADN2WgYGchMaZ-pA7dyT_qmPb1Ed5pS2Q@mail.gmail.com>
 References: <1522128575-5326-1-git-send-email-yamada.masahiro@socionext.com>
- <1522128575-5326-8-git-send-email-yamada.masahiro@socionext.com> <CAGXu5jKmnO3o4dwWXrizKCeVpj3RCzw_zsHPseZrLXAgGb0YdQ@mail.gmail.com>
+ <1522128575-5326-8-git-send-email-yamada.masahiro@socionext.com> <CAFkk2KQn2TQ8iRqNQADN2WgYGchMaZ-pA7dyT_qmPb1Ed5pS2Q@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 13 Apr 2018 14:32:20 +0900
-Message-ID: <CAK7LNARr1bHkub1kOaa1ep72Tth8HJocr5dS0TFx7+L7VyFH6A@mail.gmail.com>
+Date: Fri, 13 Apr 2018 14:37:22 +0900
+Message-ID: <CAK7LNAQg7KvXe_of+emcti_e--xtzpdxmbQkwV_r2hRGTh1p3w@mail.gmail.com>
 Subject: Re: [PATCH v2 07/21] kconfig: add function support and implement
  'shell' function
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Ulf Magnusson <ulfalizer@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, LKML <linux-kernel@vger.kernel.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Nicolas Pitre <nico@linaro.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-03-28 12:41 GMT+09:00 Kees Cook <keescook@chromium.org>:
-> On Mon, Mar 26, 2018 at 10:29 PM, Masahiro Yamada
+2018-04-01 13:19 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+> On Tue, Mar 27, 2018 at 7:29 AM, Masahiro Yamada
 > <yamada.masahiro@socionext.com> wrote:
 >> This commit adds a new concept 'function' to do more text processing
 >> in Kconfig.
@@ -67,51 +67,366 @@ Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 >>
 >> Reminder for myself:
 >> Update Documentation/kbuild/kconfig-language.txt
+>>
+>>
+>> Changes in v2:
+>>   - Use 'shell' for getting stdout from the comment.
+>>     It was 'shell-stdout' in the previous version.
+>>   - Symplify the implementation since the expansion has been moved to
+>>     lexer.
+>>
+>>  scripts/kconfig/function.c  | 170 ++++++++++++++++++++++++++++++++++++++++++++
+>>  scripts/kconfig/lkc_proto.h |   5 ++
+>>  scripts/kconfig/util.c      |  46 +++++++++---
+>>  scripts/kconfig/zconf.y     |   9 +++
+>>  4 files changed, 222 insertions(+), 8 deletions(-)
+>>  create mode 100644 scripts/kconfig/function.c
+>>
+>> diff --git a/scripts/kconfig/function.c b/scripts/kconfig/function.c
+>> new file mode 100644
+>> index 0000000..913685f
+>> --- /dev/null
+>> +++ b/scripts/kconfig/function.c
+>> @@ -0,0 +1,170 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +//
+>> +// Copyright (C) 2018 Masahiro Yamada <yamada.masahiro@socionext.com>
+>> +
+>> +#include <stdio.h>
+>> +#include <stdlib.h>
+>> +#include <string.h>
+>> +
+>> +#include "list.h"
+>> +
+>> +#define FUNCTION_MAX_ARGS              10
+>> +
+>> +static LIST_HEAD(function_list);
+>> +
+>> +struct function {
+>> +       char *name;
+>> +       char *(*func)(struct function *f, int argc, char *argv[]);
+>> +       struct list_head node;
+>> +};
+>> +
+>> +static struct function *func_lookup(const char *name)
+>> +{
+>> +       struct function *f;
+>> +
+>> +       list_for_each_entry(f, &function_list, node) {
+>> +               if (!strcmp(name, f->name))
+>> +                       return f;
+>> +       }
+>> +
+>> +       return NULL;
+>> +}
+>> +
+>> +static void func_add(const char *name,
+>> +                    char *(*func)(struct function *f, int argc, char *argv[]))
+>> +{
+>> +       struct function *f;
+>> +
+>> +       f = func_lookup(name);
+>> +       if (f) {
+>> +               fprintf(stderr, "%s: function already exists. ignored.\n", name);
+>> +               return;
+>> +       }
+>> +
+>> +       f = xmalloc(sizeof(*f));
+>> +       f->name = xstrdup(name);
+>> +       f->func = func;
+>> +
+>> +       list_add_tail(&f->node, &function_list);
+>> +}
+>> +
+>> +static void func_del(struct function *f)
+>> +{
+>> +       list_del(&f->node);
+>> +       free(f->name);
+>> +       free(f);
+>> +}
+>> +
+>> +static char *func_call(int argc, char *argv[])
+>> +{
+>> +       struct function *f;
+>> +
+>> +       f = func_lookup(argv[0]);
+>> +       if (!f) {
+>> +               fprintf(stderr, "%s: function not found\n", argv[0]);
+>> +               return NULL;
+>> +       }
+>> +
+>> +       return f->func(f, argc, argv);
+>> +}
+>> +
+>> +static char *func_eval(const char *func)
+>> +{
+>> +       char *expanded, *saveptr, *str, *token, *res;
+>> +       const char *delim;
+>> +       int argc = 0;
+>> +       char *argv[FUNCTION_MAX_ARGS];
+>> +
+>> +       expanded = expand_string_value(func);
+>> +
+>> +       str = expanded;
+>> +       delim = " ";
+>> +
+>> +       while ((token = strtok_r(str, delim, &saveptr))) {
+>> +               argv[argc++] = token;
 >
-> Yeah, this needs to be included here, especially given the "cannot
-> pass symbols" aspect which might surprise people.
+> Would be nice to error out if the array is overstepped.
+
+In V3, I made this a feature.
+
+
+>> +               str = NULL;
+>> +               delim = ",";
+>> +       }
+>> +
+>> +       res = func_call(argc, argv);
+>> +
+>> +       free(expanded);
+>> +
+>> +       return res ?: xstrdup("");
+>> +}
 >
->> [...]
+> Since only 'macro' will take multiple parameters, I wonder if it might
+> be better to implement the argument parsing there, and simply pass the
+> string (minus the function name) as-is to functions.
+
+I may add more built-in functions in the future.
+For example, I want to add 'if' function, which takes two or three arguments.
+
+
+> You would then be able to have ',' in shell commands, which might be
+> required -- think gcc -Wl,option and the like.
+
+I fixed 'shell' function in v3.
+
+
+>> +
+>> +char *func_eval_n(const char *func, size_t n)
+>> +{
+>> +       char *tmp, *res;
+>> +
+>> +       tmp = xmalloc(n + 1);
+>> +       memcpy(tmp, func, n);
+>> +       *(tmp + n) = '\0';
+>> +
+>> +       res = func_eval(tmp);
+>> +
+>> +       free(tmp);
+>> +
+>> +       return res;
+>> +}
+>> +
 >> +/* built-in functions */
 >> +static char *do_shell(struct function *f, int argc, char *argv[])
 >> +{
 >> +       static const char *pre = "(";
 >> +       static const char *post = ") 2>/dev/null";
 >
-> Right now the search and help screens in menuconfig just show the line
-> a config is defined and nothing more. I think it would be extremely
-> handy to include shell output here in some way.
-
-
-The current implementation cannot do this.
-
-The $(shell ...) has already expanded
-before the parser receives tokens.
-
-There is no way to know whether a token came from a source file as-is,
-or it was derived from textual substitution.
-
-
-
-
-> Especially when trying
-> to answer questions like "why aren't GCC plugins available?" it's got
-> quite a bit harder to debug.
-> Could we capture the output (especially stderr) for these kinds of hints?
-
-
-For example, it would be possible to dump the result of $(shell ...)
-evaluation into the console in debug mode.
-
-
-
-> Beyond that, looks good!
+> Arrays seem neater, since the pointers aren't needed.
 >
-> -Kees
+>> +       FILE *p;
+>> +       char buf[256];
+>> +       char *cmd;
+>> +       int ret;
 >
-> --
-> Kees Cook
-> Pixel Security
+> Could get rid of 'ret' and just do
+>
+>     if (pclose(p) == -1)
+>         perror(cmd);
+
+Done.
+
+
+>> +
+>> +       if (argc != 2)
+>> +               return NULL;
+>> +
+>> +       /*
+>> +        * Surround the command with ( ) in case it is piped commands.
+>> +        * Also, redirect stderr to /dev/null.
+>> +        */
+>> +       cmd = xmalloc(strlen(pre) + strlen(argv[1]) + strlen(post) + 1);
+>> +       strcpy(cmd, pre);
+>> +       strcat(cmd, argv[1]);
+>> +       strcat(cmd, post);
+>> +
+>> +       p = popen(cmd, "r");
+>> +       if (!p) {
+>> +               perror(cmd);
+>> +               goto free;
+>> +       }
+>> +       if (fgets(buf, sizeof(buf), p)) {
+>> +               size_t len = strlen(buf);
+>> +
+>> +               if (buf[len - 1] == '\n')
+>> +                       buf[len - 1] = '\0';
+>> +       } else {
+>> +               buf[0] = '\0';
+>> +       }
+>> +
+>> +       ret = pclose(p);
+>> +       if (ret == -1)
+>> +               perror(cmd);
+>> +
+>> +free:
+>> +       free(cmd);
+>> +
+>> +       return xstrdup(buf);
+>> +}
+>> +
+>> +void func_init(void)
+>> +{
+>> +       /* register built-in functions */
+>> +       func_add("shell", do_shell);
+>> +}
+>> +
+>> +void func_exit(void)
+>> +{
+>> +       struct function *f, *tmp;
+>> +
+>> +       /* unregister all functions */
+>> +       list_for_each_entry_safe(f, tmp, &function_list, node)
+>> +               func_del(f);
+>> +}
+>> diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+>> index 9884adc..09a4f53 100644
+>> --- a/scripts/kconfig/lkc_proto.h
+>> +++ b/scripts/kconfig/lkc_proto.h
+>> @@ -48,5 +48,10 @@ const char * sym_get_string_value(struct symbol *sym);
+>>
+>>  const char * prop_get_type_name(enum prop_type type);
+>>
+>> +/* function.c */
+>> +char *func_eval_n(const char *func, size_t n);
+>> +void func_init(void);
+>> +void func_exit(void);
+>> +
+>>  /* expr.c */
+>>  void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken);
+>> diff --git a/scripts/kconfig/util.c b/scripts/kconfig/util.c
+>> index 3d27c49..218b051 100644
+>> --- a/scripts/kconfig/util.c
+>> +++ b/scripts/kconfig/util.c
+>> @@ -13,9 +13,10 @@
+>>  #include "lkc.h"
+>>
+>>  /*
+>> - * Expand environments embedded in the string given in argument. Environments
+>> - * to be expanded shall be prefixed by a '$'. Unknown environment expands to
+>> - * the empty string.
+>> + * Expand environments and functions embedded in the string given in argument.
+>> + * Environments to be expanded shall be prefixed by a '$'. Functions to be
+>> + * evaluated shall be surrounded by $(). Unknown environment/function expands
+>> + * to the empty string.
+>>   */
+>>  char *expand_string_value(const char *in)
+>>  {
+>> @@ -33,11 +34,40 @@ char *expand_string_value(const char *in)
+>>         while ((p = strchr(in, '$'))) {
+>>                 char *new;
+>>
+>> -               q = p + 1;
+>> -               while (isalnum(*q) || *q == '_')
+>> -                       q++;
+>> -
+>> -               new = env_expand_n(p + 1, q - p - 1);
+>> +               /*
+>> +                * If the next character is '(', it is a function.
+>> +                * Otherwise, environment.
+>> +                */
+>> +               if (*(p + 1) == '(') {
+>> +                       int nest = 0;
+>> +
+>> +                       q = p + 2;
+>> +                       while (1) {
+>> +                               if (*q == '\0') {
+>> +                                       fprintf(stderr,
+>> +                                               "unterminated function: %s\n",
+>> +                                               p);
+>> +                                       new = xstrdup("");
+>> +                                       break;
+>> +                               } else if (*q == '(') {
+>> +                                       nest++;
+>> +                               } else if (*q == ')') {
+>> +                                       if (nest-- == 0) {
+>> +                                               new = func_eval_n(p + 2,
+>> +                                                                 q - p - 2);
+>> +                                               q++;
+>> +                                               break;
+>> +                                       }
+>> +                               }
+>> +                               q++;
+>> +                       }
+>
+> A loop like this might work too:
+>
+>     q = p + 1;
+>     do {
+>         if (*q == '\0') {
+>             *error*
+>             val = ...
+>             goto error;
+>         }
+>
+>         if (*q == '(')
+>             nest++;
+>         if (*q == ')')
+>             nest--;
+>         q++;
+>     } while (nest > 0);
+>
+>     val = func_eval_n(...)
+> error:
+>
+>> +               } else {
+>> +                       q = p + 1;
+>> +                       while (isalnum(*q) || *q == '_')
+>> +                               q++;
+>> +
+>> +                       new = env_expand_n(p + 1, q - p - 1);
+>> +               }
+>>
+>>                 reslen = strlen(res) + (p - in) + strlen(new) + 1;
+>>                 res = xrealloc(res, reslen);
+>> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+>> index d8120c7..feaea18 100644
+>> --- a/scripts/kconfig/zconf.y
+>> +++ b/scripts/kconfig/zconf.y
+>> @@ -520,11 +520,19 @@ void conf_parse(const char *name)
+>>
+>>         zconf_initscan(name);
+>>
+>> +       func_init();
+>>         _menu_init();
+>>
+>>         if (getenv("ZCONF_DEBUG"))
+>>                 yydebug = 1;
+>>         yyparse();
+>> +
+>> +       /*
+>> +        * Currently, functions are evaluated only when Kconfig files are
+>> +        * parsed. We can free functions here.
+>> +        */
+>> +       func_exit();
+>> +
+>>         if (yynerrs)
+>>                 exit(1);
+>>         if (!modules_sym)
+>> @@ -765,4 +773,5 @@ void zconfdump(FILE *out)
+>>  #include "confdata.c"
+>>  #include "expr.c"
+>>  #include "symbol.c"
+>> +#include "function.c"
+>>  #include "menu.c"
+>> --
+>> 2.7.4
+>>
+>
+> Cheers,
+> Ulf
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
 > the body of a message to majordomo@vger.kernel.org
