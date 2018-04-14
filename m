@@ -1,151 +1,263 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:18038 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751152AbeDNSpQ (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:43874 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751623AbeDNXdh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 14 Apr 2018 14:45:16 -0400
+        Sat, 14 Apr 2018 19:33:37 -0400
+Subject: Re: [PATCH 17/30] Documentation: kconfig: document a new Kconfig
+ macro language
+References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com>
+ <1523595999-27433-18-git-send-email-yamada.masahiro@socionext.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <9086cd96-bbeb-fa6e-6a62-8869ae8c7ee3@infradead.org>
+Date: Sat, 14 Apr 2018 16:33:21 -0700
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 15 Apr 2018 03:44:09 +0900
-Message-ID: <CAK7LNASVEe_RSYTys4seqEQ-uSzpJWbrq=Q5=UoL6un_DnHAQA@mail.gmail.com>
-Subject: [GIT PULL] Kbuild updates for 4.17 (2nd round)
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1523595999-27433-18-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linus,
+On 04/12/18 22:06, Masahiro Yamada wrote:
+> Add a document for the macro language introduced to Kconfig.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
+> Changes in v3: None
+> Changes in v2: None
+> 
+>  Documentation/kbuild/kconfig-macro-language.txt | 179 ++++++++++++++++++++++++
+>  MAINTAINERS                                     |   2 +-
+>  2 files changed, 180 insertions(+), 1 deletion(-)
+>  create mode 100644 Documentation/kbuild/kconfig-macro-language.txt
+> 
+> diff --git a/Documentation/kbuild/kconfig-macro-language.txt b/Documentation/kbuild/kconfig-macro-language.txt
+> new file mode 100644
+> index 0000000..1f6281b
+> --- /dev/null
+> +++ b/Documentation/kbuild/kconfig-macro-language.txt
+> @@ -0,0 +1,179 @@
+> +Concept
+> +-------
+> +
+> +The basic idea was inspired by Make. When we look at Make, we notice sort of
+> +two languages in one. One language describes dependency graphs consisting of
+> +targets and prerequisites. The other is a macro language for performing textual
+> +substitution.
+> +
+> +There is clear distinction between the two language stages. For example, you
+> +can write a makefile like follows:
+> +
+> +    APP := foo
+> +    SRC := foo.c
+> +    CC := gcc
+> +
+> +    $(APP): $(SRC)
+> +            $(CC) -o $(APP) $(SRC)
+> +
+> +The macro language replaces the variable references with their expanded form,
+> +and handles as if the source file were input like follows:
+> +
+> +    foo: foo.c
+> +            gcc -o foo foo.c
+> +
+> +Then, Make analyzes the dependency graph and determines the targets to be
+> +updated.
+> +
+> +The idea is quite similar in Kconfig - it is possible to describe a Kconfig
+> +file like this:
+> +
+> +    CC := gcc
+> +
+> +    config CC_HAS_FOO
+> +            def_bool $(shell $(srctree)/scripts/gcc-check-foo.sh $(CC))
+> +
+> +The macro language in Kconfig processes the source file into the following
+> +intermediate:
+> +
+> +    config CC_HAS_FOO
+> +            def_bool y
+> +
+> +Then, Kconfig moves onto the evaluation stage to resolve inter-symbol
+> +dependency, which is explained in kconfig-language.txt.
+> +
+> +
+> +Variables
+> +---------
+> +
+> +Like in Make, a variable in Kconfig works as a macro variable.  A macro
+> +variable is expanded "in place" to yield a text string that may then expanded
 
-Please pull more Kbuild updates for v4.17-rc1.
-Thanks!
+                                                               may then be expanded
+
+> +further. To get the value of a variable, enclose the variable name in $( ).
+> +As a special case, single-letter variable names can omit the parentheses and is
+
+                                                                            and are
+
+> +simply referenced like $X. Unlike Make, Kconfig does not support curly braces
+> +as in ${CC}.
+> +
+> +There are two types of variables: simply expanded variables and recursively
+> +expanded variables.
+> +
+> +A simply expanded variable is defined using the := assignment operator. Its
+> +righthand side is expanded immediately upon reading the line from the Kconfig
+> +file.
+> +
+> +A recursively expanded variable is defined using the = assignment operator.
+> +Its righthand side is simply stored as the value of the variable without
+> +expanding it in any way. Instead, the expansion is performed when the variable
+> +is used.
+> +
+> +There is another type of assignment operator; += is used to append text to a
+> +variable. The righthand side of += is expanded immediately if the lefthand
+> +side was originally defined as a simple variable. Otherwise, its evaluation is
+> +deferred.
+> +
+> +
+> +Functions
+> +---------
+> +
+> +Like Make, Kconfig supports both built-in and user-defined functions. A
+> +function invocation looks much like a variable reference, but includes one or
+> +more parameters separated by commas:
+> +
+> +  $(function-name arg1, arg2, arg3)
+> +
+> +Some functions are implemented as a built-in function. Currently, Kconfig
+> +supports the following:
+> +
+> + - $(shell command)
+> +
+> +  The 'shell' function accepts a single argument that is expanded and passed
+> +  to a subshell for execution. The standard output of the command is then read
+> +  and returned as the value of the function. Every newline in the output is
+> +  replaced with a space. Any trailing newlines are deleted. The standard error
+> +  is not returned, nor is any program exit status.
+> +
+> + - $(warning text)
+> +
+> +  The 'warning' function prints its arguments to stderr. The output is prefixed
+> +  with the name of the current Kconfig file, the current line number. It
+
+                                          file and the current line number. It
+
+> +  evaluates to an empty string.
+> +
+> + - $(info text)
+> +
+> +  The 'info' function is similar to 'warning' except that it sends its argument
+> +  to stdout without any Kconfig name or line number.
+
+Are current Kconfig file name and line number available so that someone can
+construct their own $(info message) messages?
+
+> +
+> +A user-defined function is defined by using the = operator. The parameters are
+> +referenced within the body definition with $1, $2, etc. (or $(1), $(2), etc.)
+> +In fact, a user-defined function is internally treated as a recursive variable.
+
+so the difference is just whether there are arguments?
+A recursive variable does not have arguments and a function always has at least
+one argument?
 
 
-The following changes since commit f605ba97fb80522656c7dce9825a908f1e765b57:
+> +
+> +A user-defined function is referenced in the same way as a built-in function:
+> +
+> +    $(my_func, arg0, arg1, arg2)
 
-  Merge tag 'vfio-v4.17-rc1' of git://github.com/awilliam/linux-vfio
-(2018-04-06 19:44:27 -0700)
+Syntax given above is:
++  $(function-name arg1, arg2, arg3)
 
-are available in the git repository at:
+with no comma after the function name.  Which is it?
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-v4.17-2
+> +
+> +Note 1:
+> +There is a slight difference in the whitespace handling of the function call
+> +between Make and Kconfig. In Make, leading whitespaces are trimmed from the
+> +first argument. So, $(info    FOO) is equivalent to $(info FOO). Kconfig keeps
+> +any leading whitespaces except the one right after the function name, which
+> +works as a separator. So, $(info    FOO) prints "   FOO" to the stdout.
+> +
+> +Note 2:
+> +In Make, a user-defined function is referenced by using a built-in function,
+> +'call', like this:
+> +
+> +    $(call my_func, arg0, arg1, arg2)
+> +
+> +However, Kconfig did not adopt this form just for the purpose of shortening the
+> +syntax.
+> +
+> +
+> +Caveats
+> +-------
+> +
+> +A variable (or function) can not be expanded across tokens. So, you can not use
 
-for you to fetch changes up to 17baab68d337a0bf4654091e2b4cd67c3fdb44d8:
+                            cannot                                     cannot
 
-  kconfig: extend output of 'listnewconfig' (2018-04-13 23:23:11 +0900)
+> +a variable as a shorthand for an expression that consists of multiple tokens.
+> +The following works:
+> +
+> +    RANGE_MIN := 1
+> +    RANGE_MAX := 3
+> +
+> +    config FOO
+> +            int "foo"
+> +            range $(RANGE_MIN) $(RANGE_MAX)
+> +
+> +But, the following does not work:
+> +
+> +    RANGES := 1 3
+> +
+> +    config FOO
+> +            int "foo"
+> +            range $(RANGES)
+> +
+> +A variable can not be expanded to any keyword in Kconfig.  The following does
 
-----------------------------------------------------------------
-Kbuild updates for v4.17 (2nd)
+              cannot
 
-- pass HOSTLDFLAGS when compiling single .c host programs
+> +not work:
+> +
+> +    MY_TYPE := tristate
+> +
+> +    config FOO
+> +            $(MY_TYPE) "foo"
+> +            default y
+> +
+> +Obviously from the design, $(shell command) is expanded in the textual
+> +substitution phase.  You can not pass symbols to the 'shell' function.
 
-- build genksyms lexer and parser files instead of using shipped
-  versions
+                            cannot
 
-- rename *-asn1.[ch] to *.asn1.[ch] for suffix consistency
+> +The following does not work as expected.
+> +
+> +    config ENDIAN_OPTION
+> +            string
+> +            default "-mbig-endian" if CPU_BIG_ENDIAN
+> +            default "-mlittle-endian" if CPU_LITTLE_ENDIAN
+> +
+> +    config CC_HAS_ENDIAN_OPTION
+> +            def_bool $(shell $(srctree)/scripts/gcc-check-option ENDIAN_OPTION)
+> +
+> +Instead, you can do like follows so that any function call is statically
+> +expanded.
+> +
+> +    config CC_HAS_ENDIAN_OPTION
+> +            bool
 
-- let the top .gitignore globally ignore artifacts generated by
-  flex, bison, and asn1_compiler
+fix indentation?
 
-- let the top Makefile globally clean artifacts generated by
-  flex, bison, and asn1_compiler
-
-- use safer .SECONDARY marker instead of .PRECIOUS to prevent
-  intermediate files from being removed
-
-- support -fmacro-prefix-map option to make __FILE__ a relative path
-
-- fix # escaping to prepare for the future GNU Make release
-
-- clean up deb-pkg by using debian tools instead of handrolled
-  source/changes generation
-
-- improve rpm-pkg portability by supporting kernel-install as a
-  fallback of new-kernel-pkg
-
-- extend Kconfig listnewconfig target to provide more information
-
-----------------------------------------------------------------
-Don Zickus (1):
-      kconfig: extend output of 'listnewconfig'
-
-Javier Martinez Canillas (1):
-      kbuild: rpm-pkg: use kernel-install as a fallback for new-kernel-pkg
-
-Masahiro Yamada (10):
-      .gitignore: move *.lex.c *.tab.[ch] patterns to the top-level .gitignore
-      kbuild: clean up *.lex.c and *.tab.[ch] patterns from top-level Makefile
-      genksyms: generate lexer and parser during build instead of shipping
-      kbuild: add %.lex.c and %.tab.[ch] to 'targets' automatically
-      kbuild: add %.dtb.S and %.dtb to 'targets' automatically
-      .gitignore: move *-asn1.[ch] patterns to the top-level .gitignore
-      kbuild: clean up *-asn1.[ch] patterns from top-level Makefile
-      kbuild: rename *-asn1.[ch] to *.asn1.[ch]
-      kbuild: mark $(targets) as .SECONDARY and remove .PRECIOUS markers
-      kbuild: use -fmacro-prefix-map to make __FILE__ a relative path
-
-Rasmus Villemoes (1):
-      Kbuild: fix # escaping in .cmd files for future Make
-
-Riku Voipio (1):
-      kbuild: deb-pkg: split generating packaging and build
-
-Robin Jarry (1):
-      kbuild: use HOSTLDFLAGS for single .c executables
-
- .gitignore                                  |    7 +-
- Makefile                                    |    5 +
- arch/arc/boot/dts/Makefile                  |    2 -
- arch/arm/crypto/Makefile                    |    2 +-
- arch/arm64/crypto/Makefile                  |    2 +-
- arch/sparc/vdso/Makefile                    |    4 +-
- arch/x86/entry/vdso/Makefile                |    4 +-
- crypto/.gitignore                           |    1 -
- crypto/Makefile                             |   14 +-
- crypto/asymmetric_keys/.gitignore           |    1 -
- crypto/asymmetric_keys/Makefile             |   31 +-
- crypto/asymmetric_keys/mscode_parser.c      |    2 +-
- crypto/asymmetric_keys/pkcs7_parser.c       |    2 +-
- crypto/asymmetric_keys/x509_cert_parser.c   |    4 +-
- crypto/rsa_helper.c                         |    4 +-
- drivers/crypto/qat/qat_common/.gitignore    |    1 -
- drivers/of/unittest-data/Makefile           |    6 -
- net/ipv4/netfilter/Makefile                 |    5 +-
- net/ipv4/netfilter/nf_nat_snmp_basic_main.c |    2 +-
- scripts/Kbuild.include                      |    5 +-
- scripts/Makefile.build                      |   23 +-
- scripts/Makefile.host                       |    2 +-
- scripts/Makefile.lib                        |   31 +-
- scripts/asn1_compiler.c                     |    2 +-
- scripts/dtc/.gitignore                      |    3 -
- scripts/dtc/Makefile                        |    5 -
- scripts/genksyms/.gitignore                 |    3 -
- scripts/genksyms/Makefile                   |   27 +-
- scripts/genksyms/lex.lex.c_shipped          | 2291 ----------------------------
- scripts/genksyms/parse.tab.c_shipped        | 2394
-------------------------------
- scripts/genksyms/parse.tab.h_shipped        |  119 --
- scripts/kconfig/.gitignore                  |    3 -
- scripts/kconfig/Makefile                    |    4 +-
- scripts/kconfig/conf.c                      |   14 +-
- scripts/package/Makefile                    |   34 +-
- scripts/package/builddeb                    |  221 +--
- scripts/package/mkdebian                    |  189 +++
- scripts/package/mkspec                      |    2 +
- tools/build/Build.include                   |    5 +-
- tools/objtool/Makefile                      |    2 +-
- tools/scripts/Makefile.include              |    2 +
- 41 files changed, 316 insertions(+), 5164 deletions(-)
- delete mode 100644 crypto/.gitignore
- delete mode 100644 crypto/asymmetric_keys/.gitignore
- delete mode 100644 drivers/crypto/qat/qat_common/.gitignore
- delete mode 100644 scripts/genksyms/lex.lex.c_shipped
- delete mode 100644 scripts/genksyms/parse.tab.c_shipped
- delete mode 100644 scripts/genksyms/parse.tab.h_shipped
- create mode 100755 scripts/package/mkdebian
+> +	    default $(shell $(srctree)/scripts/gcc-check-option -mbig-endian) if CPU_BIG_ENDIAN
+> +	    default $(shell $(srctree)/scripts/gcc-check-option -mlittle-endian) if CPU_LITTLE_ENDIAN
 
 
 -- 
-Best Regards
-Masahiro Yamada
+~Randy
