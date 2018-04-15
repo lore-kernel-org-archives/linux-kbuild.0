@@ -1,133 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f195.google.com ([209.85.217.195]:44161 "EHLO
-        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751145AbeDOIIV (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:35523 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751912AbeDOJlU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 15 Apr 2018 04:08:21 -0400
+        Sun, 15 Apr 2018 05:41:20 -0400
 MIME-Version: 1.0
-In-Reply-To: <1523595999-27433-18-git-send-email-yamada.masahiro@socionext.com>
-References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com> <1523595999-27433-18-git-send-email-yamada.masahiro@socionext.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Sun, 15 Apr 2018 10:08:20 +0200
-Message-ID: <CAFkk2KQu-GUcocDpRO=VZrjSXaZe8Bo-1feJwABX5PXhsYu+XA@mail.gmail.com>
-Subject: Re: [PATCH 17/30] Documentation: kconfig: document a new Kconfig
- macro language
+In-Reply-To: <CAGXu5jLt4xoxXTw83-npD4WmumPzSC9WnbOkkDoR=VYa5R4rYw@mail.gmail.com>
+References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com>
+ <1523595999-27433-22-git-send-email-yamada.masahiro@socionext.com> <CAGXu5jLt4xoxXTw83-npD4WmumPzSC9WnbOkkDoR=VYa5R4rYw@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 15 Apr 2018 18:40:20 +0900
+Message-ID: <CAK7LNATM=7b_KReRZ8MqhiLPfP_itaxOW-17zHZpzSn_AOgThw@mail.gmail.com>
+Subject: Re: [PATCH 21/30] stack-protector: test compiler capability in
+ Kconfig and drop AUTO mode
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Nicholas Piggin <npiggin@gmail.com>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Fri, Apr 13, 2018 at 7:06 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Add a document for the macro language introduced to Kconfig.
+2018-04-14 1:41 GMT+09:00 Kees Cook <keescook@chromium.org>:
+> On Thu, Apr 12, 2018 at 10:06 PM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> +stackp-flags-$(CONFIG_CC_HAS_STACKPROTECTOR_NONE) := -fno-stack-protector
+>> +stackp-flags-$(CONFIG_CC_STACKPROTECTOR)          := -fstack-protector
+>> +stackp-flags-$(CONFIG_CC_STACKPROTECTOR_STRONG)   := -fstack-protector-strong
+>> +
+>> +KBUILD_CFLAGS += $(stackp-flags-y)
 >
-> The motivation of this work is to move the compiler option tests to
-> Kconfig from Makefile.  A number of kernel features require the
-> compiler support.  Enabling such features blindly in Kconfig ends up
-> with a lot of nasty build-time testing in Makefiles.  If a chosen
-> feature turns out unsupported by the compiler, what the build system
-> can do is either to disable it (silently!) or to forcibly break the
-> build, despite Kconfig has let the user to enable it.
+> So, technically, this works just fine. I wonder if it has an overly
+> confusing result, in that the compiler under normal situations will
+> see:
 >
-> This change was strongly prompted by Linus Torvalds.  You can find
-> his suggestions [1] [2] in ML.  The original idea was to add a new
-> 'option', but I found generalized text expansion would make Kconfig
-> more powerful and lovely.  While polishing up the implementation, I
-> noticed sort of similarity between Make and Kconfig.  This might be
-> too immature to be called 'language', but anyway here it is.  All
-> ideas are from Make (you can even say it is addicted), so people
-> will easily understand how it works.
->
-> [1]: https://lkml.org/lkml/2016/12/9/577
-> [2]: https://lkml.org/lkml/2018/2/7/527
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
-> Changes in v3: None
-> Changes in v2: None
->
->  Documentation/kbuild/kconfig-macro-language.txt | 179 ++++++++++++++++++++++++
->  MAINTAINERS                                     |   2 +-
->  2 files changed, 180 insertions(+), 1 deletion(-)
->  create mode 100644 Documentation/kbuild/kconfig-macro-language.txt
->
-> diff --git a/Documentation/kbuild/kconfig-macro-language.txt b/Documentation/kbuild/kconfig-macro-language.txt
-> new file mode 100644
-> index 0000000..1f6281b
-> --- /dev/null
-> +++ b/Documentation/kbuild/kconfig-macro-language.txt
-> @@ -0,0 +1,179 @@
-> +Concept
-> +-------
-> +
-> +The basic idea was inspired by Make. When we look at Make, we notice sort of
-> +two languages in one. One language describes dependency graphs consisting of
-> +targets and prerequisites. The other is a macro language for performing textual
-> +substitution.
-> +
-> +There is clear distinction between the two language stages. For example, you
-> +can write a makefile like follows:
-> +
-> +    APP := foo
-> +    SRC := foo.c
-> +    CC := gcc
-> +
-> +    $(APP): $(SRC)
-> +            $(CC) -o $(APP) $(SRC)
-> +
-> +The macro language replaces the variable references with their expanded form,
-> +and handles as if the source file were input like follows:
-> +
-> +    foo: foo.c
-> +            gcc -o foo foo.c
-> +
-> +Then, Make analyzes the dependency graph and determines the targets to be
-> +updated.
-> +
-> +The idea is quite similar in Kconfig - it is possible to describe a Kconfig
-> +file like this:
-> +
-> +    CC := gcc
-> +
-> +    config CC_HAS_FOO
-> +            def_bool $(shell $(srctree)/scripts/gcc-check-foo.sh $(CC))
-> +
-> +The macro language in Kconfig processes the source file into the following
-> +intermediate:
-> +
-> +    config CC_HAS_FOO
-> +            def_bool y
-> +
-> +Then, Kconfig moves onto the evaluation stage to resolve inter-symbol
-> +dependency, which is explained in kconfig-language.txt.
-> +
-> +
-> +Variables
-> +---------
-> +
-> +Like in Make, a variable in Kconfig works as a macro variable.  A macro
-> +variable is expanded "in place" to yield a text string that may then expanded
-> +further. To get the value of a variable, enclose the variable name in $( ).
-> +As a special case, single-letter variable names can omit the parentheses and is
-> +simply referenced like $X. Unlike Make, Kconfig does not support curly braces
-> +as in ${CC}.
+> gcc ... -fno-stack-protector -fstack-protector -fstack-protector-strong ...
 
-Do we need single-letter variable names for anything? It looks like
-we're deviating
-a bit from Make behavior already.
 
-I suspect they're just a side effect of Make having automatic variables like $@.
-The Make manual discourages them otherwise:
+Kees, you are wrong.
 
-"A dollar sign followed by a character other than a dollar sign,
-open-parenthesis or
-open-brace treats that single character as the variable name. Thus, you could
-reference the variable x with `$x'. However, this practice is strongly
-discouraged,
-except in the case of the automatic variables (see section Automatic
-Variables)."
+Look at my code closely.
 
-Cheers,
-Ulf
+I used := operator instead of +=.
+
+$(stackp-flags-y) contains only one flag at most.
+
+
+
+> How about something like this instead:
+>
+> ifdef CONFIG_CC_STACKPROTECTOR_STRONG
+> KBUILD_CFLAGS += -fstack-protector-strong
+> else
+> ifdef CONFIG_CC_STACKPROTECTOR
+> KBUILD_CFLAGS += -fstack-protector
+> else
+> KBUILD_CFLAGS += -fno-stack-protector
+> endif
+> endif
+>
+
+My code is much cleaner, and working fine.
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
