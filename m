@@ -1,91 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:56205 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752112AbeDOCZc (ORCPT
+Received: from mail-vk0-f65.google.com ([209.85.213.65]:39017 "EHLO
+        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750922AbeDOHlI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 14 Apr 2018 22:25:32 -0400
-Received: from mail-ua0-f175.google.com (mail-ua0-f175.google.com [209.85.217.175]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id w3F2PHnt016382
-        for <linux-kbuild@vger.kernel.org>; Sun, 15 Apr 2018 11:25:18 +0900
-Received: by mail-ua0-f175.google.com with SMTP id n20so8040621ual.7
-        for <linux-kbuild@vger.kernel.org>; Sat, 14 Apr 2018 19:25:18 -0700 (PDT)
+        Sun, 15 Apr 2018 03:41:08 -0400
 MIME-Version: 1.0
-In-Reply-To: <201804132304.4gWZTHtV%fengguang.wu@intel.com>
-References: <201804132304.4gWZTHtV%fengguang.wu@intel.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 15 Apr 2018 11:24:36 +0900
-Message-ID: <CAK7LNAQa4wRhDwVSm11hd8vzw3QBfqOdLXUw5Ho5=+N2RAzusw@mail.gmail.com>
-Subject: Re: [kbuild:kconfig-shell-v3 21/30] arch/Kconfig:542: syntax error
+In-Reply-To: <1523595999-27433-21-git-send-email-yamada.masahiro@socionext.com>
+References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com> <1523595999-27433-21-git-send-email-yamada.masahiro@socionext.com>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Sun, 15 Apr 2018 09:41:07 +0200
+Message-ID: <CAFkk2KRTan6BLJEtLaa+6eFhTEQOJqDkQaKpKtVwd8iCvLuFMw@mail.gmail.com>
+Subject: Re: [PATCH 20/30] kconfig: add basic helper macros to scripts/Kconfig.include
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-04-14 0:12 GMT+09:00 kbuild test robot <lkp@intel.com>:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v3
-> head:   cab76bbc77d9c585f35b5b9289850a3ae64bb879
-> commit: 403c3fc6b2e7499e92eafe0ab82b18172cd495f6 [21/30] stack-protector: test compiler capability in Kconfig and drop AUTO mode
-> config: um-x86_64_defconfig
-> compiler: gcc-7 (Debian 7.3.0-1) 7.3.0
-> reproduce:
->         git checkout 403c3fc6b2e7499e92eafe0ab82b18172cd495f6
->         make ARCH=um SUBARCH=x86_64 defconfig
->         make ARCH=um SUBARCH=x86_64
+On Fri, Apr 13, 2018 at 7:06 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> Kconfig got text processing tools like we see in Make.  Add Kconfig
+> helper macros to scripts/Kconfig.include like we collect Makefile
+> macros in scripts/Kbuild.include.
 >
-> All errors (new ones prefixed by >>):
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+> ---
 >
->>> arch/Kconfig:542: syntax error
->>> arch/Kconfig:541: invalid option
->    arch/Kconfig:547: syntax error
->    arch/Kconfig:546: invalid option
->    arch/Kconfig:571: syntax error
->    arch/Kconfig:570: invalid option
->    make[2]: *** [defconfig] Error 1
->    make[1]: *** [defconfig] Error 2
->    make: *** [sub-make] Error 2
+> Changes in v3:
+>   - Move helpers to scripts/Kconfig.include
+>
+> Changes in v2: None
+>
+>  Kconfig                 |  2 ++
+>  MAINTAINERS             |  1 +
+>  scripts/Kconfig.include | 17 +++++++++++++++++
+>  3 files changed, 20 insertions(+)
+>  create mode 100644 scripts/Kconfig.include
+>
+> diff --git a/Kconfig b/Kconfig
+> index 5b55d87..a90d9f9 100644
+> --- a/Kconfig
+> +++ b/Kconfig
+> @@ -7,4 +7,6 @@ mainmenu "Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration"
+>
+>  comment "Compiler: $(CC_VERSION_TEXT)"
+>
+> +source "scripts/Kconfig.include"
+> +
+>  source "arch/$(SRCARCH)/Kconfig"
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index b9dab38..d962f4a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -7624,6 +7624,7 @@ L:        linux-kbuild@vger.kernel.org
+>  S:     Maintained
+>  F:     Documentation/kbuild/kconfig*
+>  F:     scripts/kconfig/
+> +F:     scripts/Kconfig.include
+>
+>  KDUMP
+>  M:     Dave Young <dyoung@redhat.com>
+> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+> new file mode 100644
+> index 0000000..cac7a81
+> --- /dev/null
+> +++ b/scripts/Kconfig.include
+> @@ -0,0 +1,17 @@
+> +# Kconfig helper macros
+> +
+> +# Convenient variables
+> +comma   := ,
+> +quote   := "
+> +squote  := '
+> +empty   :=
+> +space   := $(empty) $(empty)
+> +
+> +# y if the command exits with 0, n otherwise
+> +success = $(shell ($(1)) >/dev/null 2>&1 && echo y || echo n)
+
+'{ $(1); }' might work here, to avoid the extra subshell.
+
+Shaves 20-30% off the runtime here in a silly
+system("(true) >/dev/null 2>&1 && echo y || echo n") vs.
+system("{ true; } >/dev/null 2>&1 && echo y || echo n")
+comparison.
+
+> +
+> +# y if the given compiler flag is supported, n otherwise
+> +cc-option = $(success $(CC) -Werror $(1) -c -x c /dev/null -o /dev/null)
+> +
+> +# y if the given linker flag is supported, n otherwise
+> +ld-option = $(success $(LD) -v $(1))
 > --
->>> arch/Kconfig:542: syntax error
->>> arch/Kconfig:541: invalid option
->    arch/Kconfig:547: syntax error
->    arch/Kconfig:546: invalid option
->    arch/Kconfig:571: syntax error
->    arch/Kconfig:570: invalid option
->    make[2]: *** [oldconfig] Error 1
->    make[1]: *** [oldconfig] Error 2
->    make: *** [sub-make] Error 2
-> --
->>> arch/Kconfig:542: syntax error
->>> arch/Kconfig:541: invalid option
->    arch/Kconfig:547: syntax error
->    arch/Kconfig:546: invalid option
->    arch/Kconfig:571: syntax error
->    arch/Kconfig:570: invalid option
->    make[2]: *** [olddefconfig] Error 1
->    make[2]: Target 'oldnoconfig' not remade because of errors.
->    make[1]: *** [oldnoconfig] Error 2
->    make: *** [sub-make] Error 2
+> 2.7.4
 >
 
-Thanks, I will squash the following fix-up.
-
-
-diff --git a/arch/x86/um/Kconfig b/arch/x86/um/Kconfig
-index 6a15c4d..d16eae3 100644
---- a/arch/x86/um/Kconfig
-+++ b/arch/x86/um/Kconfig
-@@ -1,6 +1,8 @@
- # SPDX-License-Identifier: GPL-2.0
- mainmenu "User Mode Linux/$(SUBARCH) $(KERNELVERSION) Kernel Configuration"
-
-+source "scripts/Kconfig.include"
-+
- source "arch/um/Kconfig.common"
-
- menu "UML-specific options"
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Cheers,
+Ulf
