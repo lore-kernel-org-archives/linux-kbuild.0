@@ -1,263 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:43874 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751623AbeDNXdh (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:30651 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751270AbeDOCQ1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 14 Apr 2018 19:33:37 -0400
-Subject: Re: [PATCH 17/30] Documentation: kconfig: document a new Kconfig
- macro language
-References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com>
- <1523595999-27433-18-git-send-email-yamada.masahiro@socionext.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <9086cd96-bbeb-fa6e-6a62-8869ae8c7ee3@infradead.org>
-Date: Sat, 14 Apr 2018 16:33:21 -0700
+        Sat, 14 Apr 2018 22:16:27 -0400
+Received: from mail-ua0-f172.google.com (mail-ua0-f172.google.com [209.85.217.172]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id w3F2GIQu012763
+        for <linux-kbuild@vger.kernel.org>; Sun, 15 Apr 2018 11:16:19 +0900
+Received: by mail-ua0-f172.google.com with SMTP id d3so7726788uae.4
+        for <linux-kbuild@vger.kernel.org>; Sat, 14 Apr 2018 19:16:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1523595999-27433-18-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <201804140551.tpWKSeZ6%fengguang.wu@intel.com>
+References: <201804140551.tpWKSeZ6%fengguang.wu@intel.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 15 Apr 2018 11:15:37 +0900
+Message-ID: <CAK7LNATz0vD8qUs5vA4QVmSkjk=VU5849FaHwtndDFdrDrcsCg@mail.gmail.com>
+Subject: Re: [kbuild:kconfig-shell-v3 28/30] als.c:undefined reference to `latent_entropy'
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, linux-kernel@vger.kernel.org
+To: kbuild test robot <lkp@intel.com>
+Cc: kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 04/12/18 22:06, Masahiro Yamada wrote:
-> Add a document for the macro language introduced to Kconfig.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+2018-04-14 6:24 GMT+09:00 kbuild test robot <lkp@intel.com>:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v3
+> head:   cab76bbc77d9c585f35b5b9289850a3ae64bb879
+> commit: b45650d6f720bf0bae5b6685098ad65552cacf7a [28/30] gcc-plugins: allow to enable GCC_PLUGINS for COMPILE_TEST
+> config: s390-allmodconfig (attached as .config)
+> compiler: s390x-linux-gnu-gcc (Debian 7.2.0-11) 7.2.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         git checkout b45650d6f720bf0bae5b6685098ad65552cacf7a
+>         # save the attached .config to linux build tree
+>         make.cross ARCH=s390
+>
+> All errors (new ones prefixed by >>):
+>
+>    arch/s390/kernel/als.o: In function `verify_facilities':
+>>> als.c:(.init.text+0x24): undefined reference to `latent_entropy'
+>    als.c:(.init.text+0xae): undefined reference to `latent_entropy'
+>
 > ---
-> 
-> Changes in v3: None
-> Changes in v2: None
-> 
->  Documentation/kbuild/kconfig-macro-language.txt | 179 ++++++++++++++++++++++++
->  MAINTAINERS                                     |   2 +-
->  2 files changed, 180 insertions(+), 1 deletion(-)
->  create mode 100644 Documentation/kbuild/kconfig-macro-language.txt
-> 
-> diff --git a/Documentation/kbuild/kconfig-macro-language.txt b/Documentation/kbuild/kconfig-macro-language.txt
-> new file mode 100644
-> index 0000000..1f6281b
-> --- /dev/null
-> +++ b/Documentation/kbuild/kconfig-macro-language.txt
-> @@ -0,0 +1,179 @@
-> +Concept
-> +-------
-> +
-> +The basic idea was inspired by Make. When we look at Make, we notice sort of
-> +two languages in one. One language describes dependency graphs consisting of
-> +targets and prerequisites. The other is a macro language for performing textual
-> +substitution.
-> +
-> +There is clear distinction between the two language stages. For example, you
-> +can write a makefile like follows:
-> +
-> +    APP := foo
-> +    SRC := foo.c
-> +    CC := gcc
-> +
-> +    $(APP): $(SRC)
-> +            $(CC) -o $(APP) $(SRC)
-> +
-> +The macro language replaces the variable references with their expanded form,
-> +and handles as if the source file were input like follows:
-> +
-> +    foo: foo.c
-> +            gcc -o foo foo.c
-> +
-> +Then, Make analyzes the dependency graph and determines the targets to be
-> +updated.
-> +
-> +The idea is quite similar in Kconfig - it is possible to describe a Kconfig
-> +file like this:
-> +
-> +    CC := gcc
-> +
-> +    config CC_HAS_FOO
-> +            def_bool $(shell $(srctree)/scripts/gcc-check-foo.sh $(CC))
-> +
-> +The macro language in Kconfig processes the source file into the following
-> +intermediate:
-> +
-> +    config CC_HAS_FOO
-> +            def_bool y
-> +
-> +Then, Kconfig moves onto the evaluation stage to resolve inter-symbol
-> +dependency, which is explained in kconfig-language.txt.
-> +
-> +
-> +Variables
-> +---------
-> +
-> +Like in Make, a variable in Kconfig works as a macro variable.  A macro
-> +variable is expanded "in place" to yield a text string that may then expanded
-
-                                                               may then be expanded
-
-> +further. To get the value of a variable, enclose the variable name in $( ).
-> +As a special case, single-letter variable names can omit the parentheses and is
-
-                                                                            and are
-
-> +simply referenced like $X. Unlike Make, Kconfig does not support curly braces
-> +as in ${CC}.
-> +
-> +There are two types of variables: simply expanded variables and recursively
-> +expanded variables.
-> +
-> +A simply expanded variable is defined using the := assignment operator. Its
-> +righthand side is expanded immediately upon reading the line from the Kconfig
-> +file.
-> +
-> +A recursively expanded variable is defined using the = assignment operator.
-> +Its righthand side is simply stored as the value of the variable without
-> +expanding it in any way. Instead, the expansion is performed when the variable
-> +is used.
-> +
-> +There is another type of assignment operator; += is used to append text to a
-> +variable. The righthand side of += is expanded immediately if the lefthand
-> +side was originally defined as a simple variable. Otherwise, its evaluation is
-> +deferred.
-> +
-> +
-> +Functions
-> +---------
-> +
-> +Like Make, Kconfig supports both built-in and user-defined functions. A
-> +function invocation looks much like a variable reference, but includes one or
-> +more parameters separated by commas:
-> +
-> +  $(function-name arg1, arg2, arg3)
-> +
-> +Some functions are implemented as a built-in function. Currently, Kconfig
-> +supports the following:
-> +
-> + - $(shell command)
-> +
-> +  The 'shell' function accepts a single argument that is expanded and passed
-> +  to a subshell for execution. The standard output of the command is then read
-> +  and returned as the value of the function. Every newline in the output is
-> +  replaced with a space. Any trailing newlines are deleted. The standard error
-> +  is not returned, nor is any program exit status.
-> +
-> + - $(warning text)
-> +
-> +  The 'warning' function prints its arguments to stderr. The output is prefixed
-> +  with the name of the current Kconfig file, the current line number. It
-
-                                          file and the current line number. It
-
-> +  evaluates to an empty string.
-> +
-> + - $(info text)
-> +
-> +  The 'info' function is similar to 'warning' except that it sends its argument
-> +  to stdout without any Kconfig name or line number.
-
-Are current Kconfig file name and line number available so that someone can
-construct their own $(info message) messages?
-
-> +
-> +A user-defined function is defined by using the = operator. The parameters are
-> +referenced within the body definition with $1, $2, etc. (or $(1), $(2), etc.)
-> +In fact, a user-defined function is internally treated as a recursive variable.
-
-so the difference is just whether there are arguments?
-A recursive variable does not have arguments and a function always has at least
-one argument?
 
 
-> +
-> +A user-defined function is referenced in the same way as a built-in function:
-> +
-> +    $(my_func, arg0, arg1, arg2)
+Thanks.
 
-Syntax given above is:
-+  $(function-name arg1, arg2, arg3)
+I will squash the following fixup.
 
-with no comma after the function name.  Which is it?
 
-> +
-> +Note 1:
-> +There is a slight difference in the whitespace handling of the function call
-> +between Make and Kconfig. In Make, leading whitespaces are trimmed from the
-> +first argument. So, $(info    FOO) is equivalent to $(info FOO). Kconfig keeps
-> +any leading whitespaces except the one right after the function name, which
-> +works as a separator. So, $(info    FOO) prints "   FOO" to the stdout.
-> +
-> +Note 2:
-> +In Make, a user-defined function is referenced by using a built-in function,
-> +'call', like this:
-> +
-> +    $(call my_func, arg0, arg1, arg2)
-> +
-> +However, Kconfig did not adopt this form just for the purpose of shortening the
-> +syntax.
-> +
-> +
-> +Caveats
-> +-------
-> +
-> +A variable (or function) can not be expanded across tokens. So, you can not use
 
-                            cannot                                     cannot
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -30,7 +30,7 @@ static void conf_message(const char *fmt, ...)
+ static const char *conf_filename;
+ static int conf_lineno, conf_warnings;
 
-> +a variable as a shorthand for an expression that consists of multiple tokens.
-> +The following works:
-> +
-> +    RANGE_MIN := 1
-> +    RANGE_MAX := 3
-> +
-> +    config FOO
-> +            int "foo"
-> +            range $(RANGE_MIN) $(RANGE_MAX)
-> +
-> +But, the following does not work:
-> +
-> +    RANGES := 1 3
-> +
-> +    config FOO
-> +            int "foo"
-> +            range $(RANGES)
-> +
-> +A variable can not be expanded to any keyword in Kconfig.  The following does
+-const char conf_defname[] = "arch/$ARCH/defconfig";
++const char conf_defname[] = "arch/$(ARCH)/defconfig";
 
-              cannot
+ static void conf_warning(const char *fmt, ...)
+ {
 
-> +not work:
-> +
-> +    MY_TYPE := tristate
-> +
-> +    config FOO
-> +            $(MY_TYPE) "foo"
-> +            default y
-> +
-> +Obviously from the design, $(shell command) is expanded in the textual
-> +substitution phase.  You can not pass symbols to the 'shell' function.
 
-                            cannot
 
-> +The following does not work as expected.
-> +
-> +    config ENDIAN_OPTION
-> +            string
-> +            default "-mbig-endian" if CPU_BIG_ENDIAN
-> +            default "-mlittle-endian" if CPU_LITTLE_ENDIAN
-> +
-> +    config CC_HAS_ENDIAN_OPTION
-> +            def_bool $(shell $(srctree)/scripts/gcc-check-option ENDIAN_OPTION)
-> +
-> +Instead, you can do like follows so that any function call is statically
-> +expanded.
-> +
-> +    config CC_HAS_ENDIAN_OPTION
-> +            bool
-
-fix indentation?
-
-> +	    default $(shell $(srctree)/scripts/gcc-check-option -mbig-endian) if CPU_BIG_ENDIAN
-> +	    default $(shell $(srctree)/scripts/gcc-check-option -mlittle-endian) if CPU_LITTLE_ENDIAN
 
 
 -- 
-~Randy
+Best Regards
+Masahiro Yamada
