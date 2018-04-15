@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:39017 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750922AbeDOHlI (ORCPT
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:39479 "EHLO
+        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750871AbeDOH5p (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 15 Apr 2018 03:41:08 -0400
+        Sun, 15 Apr 2018 03:57:45 -0400
 MIME-Version: 1.0
-In-Reply-To: <1523595999-27433-21-git-send-email-yamada.masahiro@socionext.com>
-References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com> <1523595999-27433-21-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1523595999-27433-9-git-send-email-yamada.masahiro@socionext.com>
+References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com> <1523595999-27433-9-git-send-email-yamada.masahiro@socionext.com>
 From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Sun, 15 Apr 2018 09:41:07 +0200
-Message-ID: <CAFkk2KRTan6BLJEtLaa+6eFhTEQOJqDkQaKpKtVwd8iCvLuFMw@mail.gmail.com>
-Subject: Re: [PATCH 20/30] kconfig: add basic helper macros to scripts/Kconfig.include
+Date: Sun, 15 Apr 2018 09:57:43 +0200
+Message-ID: <CAFkk2KTz6icMhNma5=Evd8Mr0HL7gY5GQe1qzYS78x-ZC67fng@mail.gmail.com>
+Subject: Re: [PATCH 08/30] kconfig: add built-in function support
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -19,83 +19,129 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <to
 
 On Fri, Apr 13, 2018 at 7:06 AM, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
-> Kconfig got text processing tools like we see in Make.  Add Kconfig
-> helper macros to scripts/Kconfig.include like we collect Makefile
-> macros in scripts/Kbuild.include.
+> This commit adds a new concept 'function' to do more text processing
+> in Kconfig.
+>
+> A function call looks like this:
+>
+>   $(function arg1, arg2, arg3, ...)
+>
+> This commit adds the basic infrastructure to expand functions.
+> Change the text expansion helpers to take arguments.
 >
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 > ---
 >
 > Changes in v3:
->   - Move helpers to scripts/Kconfig.include
+>   - Split base infrastructure and 'shell' function
+>     into separate patches.
 >
-> Changes in v2: None
+> Changes in v2:
+>   - Use 'shell' for getting stdout from the comment.
+>     It was 'shell-stdout' in the previous version.
+>   - Symplify the implementation since the expansion has been moved to
+>     lexer.
 >
->  Kconfig                 |  2 ++
->  MAINTAINERS             |  1 +
->  scripts/Kconfig.include | 17 +++++++++++++++++
->  3 files changed, 20 insertions(+)
->  create mode 100644 scripts/Kconfig.include
+>  scripts/kconfig/preprocess.c | 142 +++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 130 insertions(+), 12 deletions(-)
 >
-> diff --git a/Kconfig b/Kconfig
-> index 5b55d87..a90d9f9 100644
-> --- a/Kconfig
-> +++ b/Kconfig
-> @@ -7,4 +7,6 @@ mainmenu "Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration"
+> diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
+> index fa4abc8..e77cf7c 100644
+> --- a/scripts/kconfig/preprocess.c
+> +++ b/scripts/kconfig/preprocess.c
+> @@ -8,6 +8,10 @@
 >
->  comment "Compiler: $(CC_VERSION_TEXT)"
+>  #include "list.h"
 >
-> +source "scripts/Kconfig.include"
+> +#define ARRAY_SIZE(arr)                (sizeof(arr) / sizeof((arr)[0]))
 > +
->  source "arch/$(SRCARCH)/Kconfig"
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b9dab38..d962f4a 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -7624,6 +7624,7 @@ L:        linux-kbuild@vger.kernel.org
->  S:     Maintained
->  F:     Documentation/kbuild/kconfig*
->  F:     scripts/kconfig/
-> +F:     scripts/Kconfig.include
+> +static char *expand_string_with_args(const char *in, int argc, char *argv[]);
+> +
+>  /*
+>   * Environment variables
+>   */
+> @@ -74,9 +78,47 @@ void env_write_dep(FILE *f, const char *autoconfig_name)
+>         }
+>  }
 >
->  KDUMP
->  M:     Dave Young <dyoung@redhat.com>
-> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
-> new file mode 100644
-> index 0000000..cac7a81
-> --- /dev/null
-> +++ b/scripts/Kconfig.include
-> @@ -0,0 +1,17 @@
-> +# Kconfig helper macros
+> -static char *eval_clause(const char *in)
+> +/*
+> + * Built-in Functions
+> + */
+> +struct function {
+> +       char *name;
+> +       char *(*func)(int argc, char *argv[]);
+> +};
 > +
-> +# Convenient variables
-> +comma   := ,
-> +quote   := "
-> +squote  := '
-> +empty   :=
-> +space   := $(empty) $(empty)
+> +static const struct function function_table[] = {
+> +};
 > +
-> +# y if the command exits with 0, n otherwise
-> +success = $(shell ($(1)) >/dev/null 2>&1 && echo y || echo n)
+> +static char *function_call(const char *name, int argc, char *argv[])
+>  {
+> -       char *res, *name;
+> +       const struct function *f;
+> +       int i;
+> +
+> +       for (i = 0; i < ARRAY_SIZE(function_table); i++) {
+> +               f = &function_table[i];
+> +               if (!strcmp(f->name, name))
+> +                       return f->func(argc, argv);
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +#define FUNCTION_MAX_ARGS              16
+> +
+> +/*
+> + * Evaluate a clause with arguments.  argc/argv are arguments from the upper
+> + * function call.
+> + *
+> + * Returned string must be freed when done
+> + */
+> +static char *eval_clause(const char *in, int argc, char *argv[])
+> +{
+> +       char *tmp, *prev, *p, *res, *name;
+> +       char delim = ' ';
+> +       int new_argc = 0;
+> +       char *new_argv[FUNCTION_MAX_ARGS];
+> +       int nest = 0;
+> +       int i;
+>
+>         /*
+>          * Returns an empty string because '$()' should be evaluated
+> @@ -85,10 +127,73 @@ static char *eval_clause(const char *in)
+>         if (!*in)
+>                 return xstrdup("");
+>
+> -       name = expand_string(in);
+> +       tmp = xstrdup(in);
+> +
+> +       prev = p = tmp;
+>
+> -       res = env_expand(name);
+> +       /*
+> +        * Split into tokens
+> +        * The function name and the first argument are separated by a space.
+> +        * Arguments are separated by a comma.
+> +        * For example, if the function call is like this:
+> +        *   $(foo abc,$(x),$(y))
+> +        *
+> +        * The input string for this helper should be:
+> +        *   foo abc,$(x),$(y)
+> +        *
+> +        * and split into:
+> +        *   new_argv[0]: foo
+> +        *   new_argv[1]: abc
+> +        *   new_argv[2]: $(x)
+> +        *   new_argv[3]: $(y)
+> +        */
+> +       while (*p) {
+> +               if (nest == 0 && *p == delim) {
+> +                       *p = 0;
+> +                       new_argv[new_argc++] = prev;
 
-'{ $(1); }' might work here, to avoid the extra subshell.
-
-Shaves 20-30% off the runtime here in a silly
-system("(true) >/dev/null 2>&1 && echo y || echo n") vs.
-system("{ true; } >/dev/null 2>&1 && echo y || echo n")
-comparison.
-
-> +
-> +# y if the given compiler flag is supported, n otherwise
-> +cc-option = $(success $(CC) -Werror $(1) -c -x c /dev/null -o /dev/null)
-> +
-> +# y if the given linker flag is supported, n otherwise
-> +ld-option = $(success $(LD) -v $(1))
-> --
-> 2.7.4
->
+Erroring out would be nicer than overflowing the array.
 
 Cheers,
 Ulf
