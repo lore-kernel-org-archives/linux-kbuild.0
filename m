@@ -1,144 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:18108 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751193AbeDQPIj (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Apr 2018 11:08:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42274 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751878AbeDQXJ1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 17 Apr 2018 19:09:27 -0400
+Date: Wed, 18 Apr 2018 00:09:21 +0100
+From: James Hogan <jhogan@kernel.org>
+Subject: Re: [PATCH v6 3/4] MIPS: vmlinuz: Use generic ashldi3
+Message-ID: <20180417230921.GA29046@saruman>
+References: <1523433019-17419-1-git-send-email-matt.redfearn@mips.com>
+ <1523433019-17419-3-git-send-email-matt.redfearn@mips.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KQu-GUcocDpRO=VZrjSXaZe8Bo-1feJwABX5PXhsYu+XA@mail.gmail.com>
-References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com>
- <1523595999-27433-18-git-send-email-yamada.masahiro@socionext.com> <CAFkk2KQu-GUcocDpRO=VZrjSXaZe8Bo-1feJwABX5PXhsYu+XA@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 18 Apr 2018 00:07:37 +0900
-Message-ID: <CAK7LNAQxxNddpr2PiOR=izKuH5tQhFKP91XFzdY8i6HJ_H3Fgw@mail.gmail.com>
-Subject: Re: [PATCH 17/30] Documentation: kconfig: document a new Kconfig
- macro language
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="envbJBWh7q8WU6mo"
+Content-Disposition: inline
+In-Reply-To: <1523433019-17419-3-git-send-email-matt.redfearn@mips.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-
-2018-04-15 17:08 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
-> On Fri, Apr 13, 2018 at 7:06 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> Add a document for the macro language introduced to Kconfig.
->>
->> The motivation of this work is to move the compiler option tests to
->> Kconfig from Makefile.  A number of kernel features require the
->> compiler support.  Enabling such features blindly in Kconfig ends up
->> with a lot of nasty build-time testing in Makefiles.  If a chosen
->> feature turns out unsupported by the compiler, what the build system
->> can do is either to disable it (silently!) or to forcibly break the
->> build, despite Kconfig has let the user to enable it.
->>
->> This change was strongly prompted by Linus Torvalds.  You can find
->> his suggestions [1] [2] in ML.  The original idea was to add a new
->> 'option', but I found generalized text expansion would make Kconfig
->> more powerful and lovely.  While polishing up the implementation, I
->> noticed sort of similarity between Make and Kconfig.  This might be
->> too immature to be called 'language', but anyway here it is.  All
->> ideas are from Make (you can even say it is addicted), so people
->> will easily understand how it works.
->>
->> [1]: https://lkml.org/lkml/2016/12/9/577
->> [2]: https://lkml.org/lkml/2018/2/7/527
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->>
->> Changes in v3: None
->> Changes in v2: None
->>
->>  Documentation/kbuild/kconfig-macro-language.txt | 179 ++++++++++++++++++++++++
->>  MAINTAINERS                                     |   2 +-
->>  2 files changed, 180 insertions(+), 1 deletion(-)
->>  create mode 100644 Documentation/kbuild/kconfig-macro-language.txt
->>
->> diff --git a/Documentation/kbuild/kconfig-macro-language.txt b/Documentation/kbuild/kconfig-macro-language.txt
->> new file mode 100644
->> index 0000000..1f6281b
->> --- /dev/null
->> +++ b/Documentation/kbuild/kconfig-macro-language.txt
->> @@ -0,0 +1,179 @@
->> +Concept
->> +-------
->> +
->> +The basic idea was inspired by Make. When we look at Make, we notice sort of
->> +two languages in one. One language describes dependency graphs consisting of
->> +targets and prerequisites. The other is a macro language for performing textual
->> +substitution.
->> +
->> +There is clear distinction between the two language stages. For example, you
->> +can write a makefile like follows:
->> +
->> +    APP := foo
->> +    SRC := foo.c
->> +    CC := gcc
->> +
->> +    $(APP): $(SRC)
->> +            $(CC) -o $(APP) $(SRC)
->> +
->> +The macro language replaces the variable references with their expanded form,
->> +and handles as if the source file were input like follows:
->> +
->> +    foo: foo.c
->> +            gcc -o foo foo.c
->> +
->> +Then, Make analyzes the dependency graph and determines the targets to be
->> +updated.
->> +
->> +The idea is quite similar in Kconfig - it is possible to describe a Kconfig
->> +file like this:
->> +
->> +    CC := gcc
->> +
->> +    config CC_HAS_FOO
->> +            def_bool $(shell $(srctree)/scripts/gcc-check-foo.sh $(CC))
->> +
->> +The macro language in Kconfig processes the source file into the following
->> +intermediate:
->> +
->> +    config CC_HAS_FOO
->> +            def_bool y
->> +
->> +Then, Kconfig moves onto the evaluation stage to resolve inter-symbol
->> +dependency, which is explained in kconfig-language.txt.
->> +
->> +
->> +Variables
->> +---------
->> +
->> +Like in Make, a variable in Kconfig works as a macro variable.  A macro
->> +variable is expanded "in place" to yield a text string that may then expanded
->> +further. To get the value of a variable, enclose the variable name in $( ).
->> +As a special case, single-letter variable names can omit the parentheses and is
->> +simply referenced like $X. Unlike Make, Kconfig does not support curly braces
->> +as in ${CC}.
->
-> Do we need single-letter variable names for anything? It looks like
-> we're deviating
-> a bit from Make behavior already.
->
-> I suspect they're just a side effect of Make having automatic variables like $@.
-> The Make manual discourages them otherwise:
->
-> "A dollar sign followed by a character other than a dollar sign,
-> open-parenthesis or
-> open-brace treats that single character as the variable name. Thus, you could
-> reference the variable x with `$x'. However, this practice is strongly
-> discouraged,
-> except in the case of the automatic variables (see section Automatic
-> Variables)."
->
-
-OK.  We do not need two ways to do the same thing.
-
-I will consider it
-although supporting single-letter variable is not costly.
+To: Matt Redfearn <matt.redfearn@mips.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>, Antony Pavlov <antonynpavlov@gmail.com>, Ralf Baechle <ralf@linux-mips.org>, linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
 
 
+--envbJBWh7q8WU6mo
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Best Regards
-Masahiro Yamada
+On Wed, Apr 11, 2018 at 08:50:18AM +0100, Matt Redfearn wrote:
+> diff --git a/arch/mips/boot/compressed/Makefile b/arch/mips/boot/compress=
+ed/Makefile
+> index adce180f3ee4..e03f522c33ac 100644
+> --- a/arch/mips/boot/compressed/Makefile
+> +++ b/arch/mips/boot/compressed/Makefile
+> @@ -46,9 +46,12 @@ $(obj)/uart-ath79.c: $(srctree)/arch/mips/ath79/early_=
+printk.c
+> =20
+>  vmlinuzobjs-$(CONFIG_KERNEL_XZ) +=3D $(obj)/ashldi3.o $(obj)/bswapsi.o
+> =20
+> -extra-y +=3D ashldi3.c bswapsi.c
+> -$(obj)/ashldi3.o $(obj)/bswapsi.o: KBUILD_CFLAGS +=3D -I$(srctree)/arch/=
+mips/lib
+> -$(obj)/ashldi3.c $(obj)/bswapsi.c: $(obj)/%.c: $(srctree)/arch/mips/lib/=
+%.c
+> +extra-y +=3D ashldi3.c
+> +$(obj)/ashldi3.c: $(obj)/%.c: $(srctree)/lib/%.c
+> +	$(call cmd,shipped)
+> +
+> +extra-y +=3D bswapsi.c
+> +$(obj)/bswapsi.c: $(obj)/%.c: $(srctree)/arch/mips/lib/%.c
+>  	$(call cmd,shipped)
+
+ci20_defconfig:
+
+arch/mips/boot/compressed/ashldi3.c:4:10: fatal error: libgcc.h: No such fi=
+le or directory
+ #include "libgcc.h"
+           ^~~~~~~~~~
+
+It looks like it had already copied ashldi3.c from arch/mips/lib/ when
+building an older commit, and it hasn't been regenerated from lib/ since
+the Makefile changed, so its still using the old version.
+
+I think it should be using FORCE and if_changed like this:
+
+diff --git a/arch/mips/boot/compressed/Makefile b/arch/mips/boot/compressed=
+/Makefile
+index e03f522c33ac..abe77add8789 100644
+--- a/arch/mips/boot/compressed/Makefile
++++ b/arch/mips/boot/compressed/Makefile
+@@ -47,12 +47,12 @@ $(obj)/uart-ath79.c: $(srctree)/arch/mips/ath79/early_p=
+rintk.c
+ vmlinuzobjs-$(CONFIG_KERNEL_XZ) +=3D $(obj)/ashldi3.o $(obj)/bswapsi.o
+=20
+ extra-y +=3D ashldi3.c
+-$(obj)/ashldi3.c: $(obj)/%.c: $(srctree)/lib/%.c
+-	$(call cmd,shipped)
++$(obj)/ashldi3.c: $(obj)/%.c: $(srctree)/lib/%.c FORCE
++	$(call if_changed,shipped)
+=20
+ extra-y +=3D bswapsi.c
+-$(obj)/bswapsi.c: $(obj)/%.c: $(srctree)/arch/mips/lib/%.c
+-	$(call cmd,shipped)
++$(obj)/bswapsi.c: $(obj)/%.c: $(srctree)/arch/mips/lib/%.c FORCE
++	$(call if_changed,shipped)
+=20
+ targets :=3D $(notdir $(vmlinuzobjs-y))
+=20
+That resolves the build failures when checking out old -> new without
+cleaning, since the .ashldi3.c.cmd is missing so it gets rebuilt.
+
+It should also resolve issues if the path it copies from is updated in
+future since the .ashldi3.c.cmd will get updated.
+
+If you checkout new -> old without cleaning, the now removed
+arch/mips/lib/ashldi3.c will get added which will trigger regeneration,
+so it won't error.
+
+However if you do new -> old -> new then the .ashldi3.cmd file isn't
+updated while at old, so you get the same error as above. I'm not sure
+there's much we can practically do about that, aside perhaps avoiding
+the issue in future by somehow auto-deleting stale .*.cmd files.
+
+Cc'ing kbuild folk in case they have any bright ideas.
+
+At least the straightforward old->new upgrade will work with the above
+fixup though. If you're okay with it I'm happy to apply as a fixup.
+
+Cheers
+James
+
+--envbJBWh7q8WU6mo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEd80NauSabkiESfLYbAtpk944dnoFAlrWfqAACgkQbAtpk944
+dnoDNBAAiLDAByhKyodGxTvmswaP+ef8q2hYzGxvjWKYS+U9bXYqvuDIys6iBPYZ
+q/Srcq3q7rV5LeGpMmHcIHjlmcbVg1y5aK7PipGQWiEhiKExzYmgYWlmugLT6Ra9
+lHrJz91FXzunw5hFW7kF2v87JNB2A+pI/e+/060tU6mzFNGAOsGWiDcf2j41tK57
+jqDZUdAd4XWsFZOU+DJRxXI7j2N8LUkwlWL4NmVmq7G5pa+ntodH6MhC19vFPfzL
+gFriqcg6T+cbi/wh9r9Mxe1XNI4ybrakIqXUf+x4TctM7eu4ZOpXVEWhsh6Z07DC
+XT3+/gR1fv/myTbsvp4H9EgOK5qxCGD36kMaahnZ215n+Cwng++5nPmJbrPTNK0n
+udBdYT4S5GM0RaBCbDLiegBVEPlAW3Npj+ZtiGNKKDCIXfr9DWXCgS6BBgQVP70x
+o3tGrp4kcBt1B/2Qk8K9RnB69IrtZyzcpL0wWLobaNhvXc65jbZ54KkRcI5c4D/J
+ZeePCg8k439wQqzLmEAW3pUeF/OBgnFHxj2lxUUq9OJCJuVVvDJXsOV/wnttIayn
+44oMfGn6DpBwqChvYw2DloAnLvByBaCX1i+0C63h1ExnXT6bbZlLDQhJJ0gVPlNk
+gz16P609lcrr3p6AO3HekMmVkhsPyfkMq7iIivefgWhYzog6UIE=
+=nbi6
+-----END PGP SIGNATURE-----
+
+--envbJBWh7q8WU6mo--
