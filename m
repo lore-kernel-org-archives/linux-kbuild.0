@@ -1,37 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp2130.oracle.com ([156.151.31.86]:57034 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751963AbeDRROy (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:35856 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753964AbeDTHe1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Apr 2018 13:14:54 -0400
-Subject: Re: [PATCH] ARM: omap2: Fix build when using split object directories
-References: <20180411211543.7923-1-d-gerlach@ti.com>
- <20180412082157.GB4002@localhost.localdomain>
- <CAK7LNAQiq-4daX2K4dPyzN7zr+yfkQWSJ-yy9JHgacPpYFp94w@mail.gmail.com>
- <4343a047-18b1-409d-ccda-94e72ea63e2a@ti.com>
- <20180418170903.GG5671@atomide.com>
-From: Santosh Shilimkar <santosh.shilimkar@oracle.com>
-Message-ID: <01112996-beb6-8baf-ff87-db7b3adde245@oracle.com>
-Date: Wed, 18 Apr 2018 10:14:07 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180418170903.GG5671@atomide.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Fri, 20 Apr 2018 03:34:27 -0400
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: [PATCH 0/4] LD_DEAD_CODE_DATA_ELIMINATION fixes and enabling for powerpc
+Date: Fri, 20 Apr 2018 17:34:10 +1000
+Message-Id: <20180420073414.23169-1-npiggin@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tony Lindgren <tony@atomide.com>, Dave Gerlach <d-gerlach@ti.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Anders Roxell <anders.roxell@linaro.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Russell King - ARM Linux <linux@armlinux.org.uk>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux-OMAP <linux-omap@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: linuxppc-dev@lists.ozlabs.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Christophe Leroy <christophe.leroy@c-s.fr>, Nicolas Pitre <nico@fluxnic.net>
 
-On 4/18/2018 10:09 AM, Tony Lindgren wrote:
-> * Dave Gerlach <d-gerlach@ti.com> [180413 14:08]:
->> This is the version of this patch that we want to use, will this go through you?
-> 
-> Sorry for the delay, I just noticed this. Somehow I thought Santosh
-> would queue it, but as the regression was introduced by a commit in
-> my tree I'll pick this patch into omap-for-v4.17/fixes.
-> 
-I wasn't sure since the patch has both driver and platform code.
-Thanks for picking up Tony !!
+A few people have been interested in this again. And I promised
+if it remains dead code it should be removed, so I would like to
+have another try.
 
-Acked-by: Santosh Shilimkar <ssantosh@kernel.org>
+I think I got snagged on the modules problem last time and did
+not take the time to work it out, this time I just turned off the
+compile options for modules (the linker option was never set anyway
+so no loss).
+
+This includes some linker script catches and ideas from others, I
+didn't documnt them all, but thanks for looking.
+
+I would be interested to help other archs get this working too, if
+anybody needs some help.
+
+Thanks,
+Nick
+
+Nicholas Piggin (4):
+  kbuild: Fix asm-generic/vmlinux.lds.h for
+    LD_DEAD_CODE_DATA_ELIMINATION
+  kbuild: LD_DEAD_CODE_DATA_ELIMINATION no
+    -ffunction-sections/-fdata-sections for module build
+  kbuild: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selectable if
+    enabled
+  powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selected
+
+ Makefile                          |  4 +--
+ arch/Kconfig                      | 15 ----------
+ arch/powerpc/Kconfig              |  1 +
+ arch/powerpc/kernel/vmlinux.lds.S | 22 +++++++-------
+ include/asm-generic/vmlinux.lds.h | 49 ++++++++++++++++++-------------
+ init/Kconfig                      | 27 +++++++++++++++++
+ 6 files changed, 70 insertions(+), 48 deletions(-)
+
+-- 
+2.17.0
+
