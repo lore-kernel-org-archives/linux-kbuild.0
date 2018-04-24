@@ -1,39 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:37141 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932345AbeDWTvC (ORCPT
+Received: from gauss.credativ.com ([93.94.130.89]:52208 "EHLO
+        gauss.credativ.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750736AbeDXI6X (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Apr 2018 15:51:02 -0400
-From: Mathieu Malaterre <malat@debian.org>
-Subject: [PATCH] kbuild/debian: Use KBUILD_BUILD_* when set
-Date: Mon, 23 Apr 2018 21:50:54 +0200
-Message-Id: <20180423195055.26069-1-malat@debian.org>
+        Tue, 24 Apr 2018 04:58:23 -0400
+From: Sedat Dilek <sedat.dilek@credativ.de>
+Subject: [PATCH] Makefile: Fix typo s/HOST_LOADLIBES/HOST_LOADLIBS
+Date: Tue, 24 Apr 2018 10:44:08 +0200
+Message-Id: <20180424084408.28034-1-sedat.dilek@credativ.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Mathieu Malaterre <malat@debian.org>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Sedat Dilek <sedat.dilek@credativ.de>
 
-Be nice to the user and check env vars KBUILD_BUILD_USER &
-KBUILD_BUILD_HOST when those are set.
-
-Signed-off-by: Mathieu Malaterre <malat@debian.org>
+Signed-off-by: Sedat Dilek <sedat.dilek@credativ.de>
 ---
- scripts/package/mkdebian | 2 ++
- 1 file changed, 2 insertions(+)
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index 6adb3a16ba3b..05d58d3ae8a0 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -76,6 +76,8 @@ if [ -n "$DEBEMAIL" ]; then
-        email=$DEBEMAIL
- elif [ -n "$EMAIL" ]; then
-        email=$EMAIL
-+elif [ -n "$KBUILD_BUILD_USER" ] && [ -n "$KBUILD_BUILD_HOST" ]; then
-+       email=$KBUILD_BUILD_USER@$KBUILD_BUILD_HOST
- else
-        email=$(id -nu)@$(hostname -f 2>/dev/null || hostname)
- fi
+diff --git a/Makefile b/Makefile
+index 83b6c541565a..e1869dc08288 100644
+--- a/Makefile
++++ b/Makefile
+@@ -366,7 +366,7 @@ HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
+ 		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
+ HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
+ HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
+-HOST_LOADLIBES := $(HOST_LFS_LIBS)
++HOST_LOADLIBS := $(HOST_LFS_LIBS)
+ 
+ # Make variables (CC, etc...)
+ AS		= $(CROSS_COMPILE)as
+@@ -433,7 +433,7 @@ LDFLAGS :=
+ GCC_PLUGINS_CFLAGS :=
+ 
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+-export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
++export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBS
+ export MAKE LEX YACC AWK GENKSYMS INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
+ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+ 
 -- 
-2.11.0
+2.17.0
 
