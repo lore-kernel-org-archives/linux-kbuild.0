@@ -1,50 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:36073 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752932AbeDXLIl (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:61773 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751582AbeDXPwK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Apr 2018 07:08:41 -0400
+        Tue, 24 Apr 2018 11:52:10 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180424084408.28034-1-sedat.dilek@credativ.de>
+References: <20180424084408.28034-1-sedat.dilek@credativ.de>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] genksyms: fix typo in parse.tab.{c,h} generation rules
-Date: Tue, 24 Apr 2018 20:08:18 +0900
-Message-Id: <1524568099-25206-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Wed, 25 Apr 2018 00:51:15 +0900
+Message-ID: <CAK7LNATsJ2kvw4JMS-2WsU7a9wrqcYLmfHPBwQDwbAEVFa8E1g@mail.gmail.com>
+Subject: Re: [PATCH] Makefile: Fix typo s/HOST_LOADLIBES/HOST_LOADLIBS
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Mauro Rossi <issor.oruam@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Sedat Dilek <sedat.dilek@credativ.de>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-From: Mauro Rossi <issor.oruam@gmail.com>
+2018-04-24 17:44 GMT+09:00 Sedat Dilek <sedat.dilek@credativ.de>:
+> Signed-off-by: Sedat Dilek <sedat.dilek@credativ.de>
+> ---
+>  Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 83b6c541565a..e1869dc08288 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -366,7 +366,7 @@ HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
+>                 -fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
+>  HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
+>  HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
+> -HOST_LOADLIBES := $(HOST_LFS_LIBS)
+> +HOST_LOADLIBS := $(HOST_LFS_LIBS)
+>
+>  # Make variables (CC, etc...)
+>  AS             = $(CROSS_COMPILE)as
+> @@ -433,7 +433,7 @@ LDFLAGS :=
+>  GCC_PLUGINS_CFLAGS :=
+>
+>  export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+> -export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
+> +export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBS
+>  export MAKE LEX YACC AWK GENKSYMS INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
+>  export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+>
 
-'quet' is replaced by 'quiet' in scripts/genksyms/Makefile
+Why is this a typo?
 
-Signed-off-by: Mauro Rossi <issor.oruam@gmail.com>
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- scripts/genksyms/Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Our Makefiles use HOST_LOADLIBES consistently.
 
-diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
-index ef0287e..03b7ce9 100644
---- a/scripts/genksyms/Makefile
-+++ b/scripts/genksyms/Makefile
-@@ -14,14 +14,14 @@ genksyms-objs	:= genksyms.o parse.tab.o lex.lex.o
- # so that 'bison: not found' will be displayed if it is missing.
- ifeq ($(findstring 1,$(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
- 
--quiet_cmd_bison_no_warn = $(quet_cmd_bison)
-+quiet_cmd_bison_no_warn = $(quiet_cmd_bison)
-       cmd_bison_no_warn = $(YACC) --version >/dev/null; \
- 			  $(cmd_bison) 2>/dev/null
- 
- $(obj)/parse.tab.c: $(src)/parse.y FORCE
- 	$(call if_changed,bison_no_warn)
- 
--quiet_cmd_bison_h_no_warn = $(quet_cmd_bison_h)
-+quiet_cmd_bison_h_no_warn = $(quiet_cmd_bison_h)
-       cmd_bison_h_no_warn = $(YACC) --version >/dev/null; \
- 			    $(cmd_bison_h) 2>/dev/null
- 
+
+$ git grep HOST_LOADLIB
+Makefile:HOST_LOADLIBES := $(HOST_LFS_LIBS)
+Makefile:export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
+scripts/Makefile.host:          $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
+scripts/Makefile.host:                    $(HOST_LOADLIBES)
+$(HOSTLOADLIBES_$(@F))
+scripts/Makefile.host:                    $(HOST_LOADLIBES)
+$(HOSTLOADLIBES_$(@F))
+scripts/Makefile.host:                    $(HOST_LOADLIBES)
+$(HOSTLOADLIBES_$(@F))
+scripts/Makefile.host:                    $(HOST_LOADLIBES)
+$(HOSTLOADLIBES_$(@F))
+
+
+
+
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
