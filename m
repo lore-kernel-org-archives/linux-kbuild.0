@@ -1,26 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sonic309-35.consmr.mail.ne1.yahoo.com ([66.163.184.161]:37721
-        "EHLO sonic309-35.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752670AbeDXTgi (ORCPT
+Received: from tartarus.angband.pl ([89.206.35.136]:42872 "EHLO
+        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750756AbeDYBMp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Apr 2018 15:36:38 -0400
-Date: Tue, 24 Apr 2018 19:36:35 +0000 (UTC)
-From: Sgt Clara Herbert <sgtclaraherbert@gmail.com>
-Reply-To: Sgt Clara Herbert <sgtclaraherbert@gmail.com>
-Message-ID: <237875797.404650.1524598595131@mail.yahoo.com>
-Subject: Greetings to you,
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <237875797.404650.1524598595131.ref@mail.yahoo.com>
+        Tue, 24 Apr 2018 21:12:45 -0400
+From: Adam Borowski <kilobyte@angband.pl>
+Date: Wed, 25 Apr 2018 03:12:31 +0200
+Message-Id: <20180425011231.24143-1-kilobyte@angband.pl>
+In-Reply-To: <bb5bf465-bf71-4ddb-2a7e-866bb0f76606@molgen.mpg.de>
+References: <bb5bf465-bf71-4ddb-2a7e-866bb0f76606@molgen.mpg.de>
+Subject: On Tue, Apr 24, 2018 at 11:08:34AM +0200, Paul Menzel wrote:
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Paul Menzel <pmenzel+linux-kernel@molgen.mpg.de>, Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org, x86@kernel.org, Ingo Molnar <mingo@kernel.org>
 
+'ere you go.  KERNEL_ZSTD is not in mainline yet but knowing its magic
+can't hurt -- especially that scripts may be out of sync with an installed
+kernel.  LZ4 is in since 3.11.
 
+--8<----8<----8<----8<----8<----8<----8<----8<----8<----8<----8<----8<--
+From 30886e965e7aeae8d3729c4bacf614a19e103cea Mon Sep 17 00:00:00 2001
+From: Adam Borowski <kilobyte@angband.pl>
+Date: Wed, 25 Apr 2018 02:29:18 +0200
+Subject: [PATCH] scripts: teach extract-vmlinux about LZ4 and ZSTD
 
-Greetings to you,
+Note that the LZ4 signature is different than that of modern LZ4 as we
+use the "legacy" format which suffers from some downsides like inability
+to disable compression.
 
-My name is Sgt Clara,from America i am here to search for a business partner or friend who will help me to invest my fund in his company/country Please reply me through my email.
+Signed-off-by: Adam Borowski <kilobyte@angband.pl>
+---
+ scripts/extract-vmlinux | 2 ++
+ 1 file changed, 2 insertions(+)
 
-thanks
-Sgt Clara
+diff --git a/scripts/extract-vmlinux b/scripts/extract-vmlinux
+index 5061abcc2540..e6239f39abad 100755
+--- a/scripts/extract-vmlinux
++++ b/scripts/extract-vmlinux
+@@ -57,6 +57,8 @@ try_decompress '\3757zXZ\000' abcde unxz
+ try_decompress 'BZh'          xy    bunzip2
+ try_decompress '\135\0\0\0'   xxx   unlzma
+ try_decompress '\211\114\132' xy    'lzop -d'
++try_decompress '\002!L\030'   xxx   'lz4 -d'
++try_decompress '(\265/\375'   xxx   unzstd
+ 
+ # Bail out:
+ echo "$me: Cannot find vmlinux." >&2
+-- 
+2.17.0
+
