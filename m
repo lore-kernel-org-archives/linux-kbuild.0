@@ -1,65 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:54288 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756665AbeDZVld (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:52242 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752096AbeD1WgK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Apr 2018 17:41:33 -0400
-Received: by mail-it0-f68.google.com with SMTP id h143-v6so214706ita.4
-        for <linux-kbuild@vger.kernel.org>; Thu, 26 Apr 2018 14:41:32 -0700 (PDT)
+        Sat, 28 Apr 2018 18:36:10 -0400
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] kbuild: "make tools/help" does not need syncconfig
+Message-ID: <dd61aa2b-d05d-6f54-d512-c356ecdc8a50@infradead.org>
+Date: Sat, 28 Apr 2018 15:36:08 -0700
 MIME-Version: 1.0
-References: <20180426212807.196279-1-ndesaulniers@google.com>
-In-Reply-To: <20180426212807.196279-1-ndesaulniers@google.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Thu, 26 Apr 2018 21:41:21 +0000
-Message-ID: <CAKwvOdnjgEWDo8vjOiAS_TsEoJFZZagJgaqBAdW99L-Nkr9BxA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: gcov: enable -fno-tree-loop-im if supported
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Prasad Sodagudi <psodagud@quicinc.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Hi Masahiro and Michal,
+From: Randy Dunlap <rdunlap@infradead.org>
 
-The reporter has asked for their email address to be updated to:
+Fix "make tools/help" to skip "make syncconfig".
 
-psodagud@codeaurora.org
+"make tools/help" currently tries to run "make syncconfig" even
+though there is no .config file and one is not needed just to get
+help text output.  With no .config file, make says:
 
-if you're ok with this version of the patch and choose to apply it, can you
-please update the commit message. Otherwise, I'll make this change should
-we need other changes necessitating a v2.
-On Thu, Apr 26, 2018 at 2:29 PM Nick Desaulniers <ndesaulniers@google.com>
-wrote:
+*** Configuration file ".config" not found!
+*** Please run some configurator (e.g. "make oldconfig" or
+*** "make menuconfig" or "make xconfig").
+scripts/kconfig/Makefile:40: recipe for target 'syncconfig' failed
+make[2]: *** [syncconfig] Error 1
+Makefile:525: recipe for target 'syncconfig' failed
 
-> Clang does not recognize this compiler option.
+and then goes on to run:
+make LDFLAGS= MAKEFLAGS=" " O=/linux/linux-next-20180426 subdir=tools -C ./tools/ help
 
-> Reported-by: Prasad Sodagudi <psodagud@quicinc.com>
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> ---
->   Makefile | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+which produces the requested help text.  However, the "syncconfig"
+efforts are not needed, so skip them by making "tools/help" be part
+of the no-dot-config-targets rule.
 
-> diff --git a/Makefile b/Makefile
-> index 83b6c541565a..7f653c924c18 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -623,7 +623,9 @@ all: vmlinux
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+ Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->   KBUILD_CFLAGS  += $(call cc-option,-fno-PIE)
->   KBUILD_AFLAGS  += $(call cc-option,-fno-PIE)
-> -CFLAGS_GCOV    := -fprofile-arcs -ftest-coverage -fno-tree-loop-im
-$(call cc-disable-warning,maybe-uninitialized,)
-> +CFLAGS_GCOV    := -fprofile-arcs -ftest-coverage \
-> +       $(call cc-option,-fno-tree-loop-im) \
-> +       $(call cc-disable-warning,maybe-uninitialized,)
->   export CFLAGS_GCOV CFLAGS_KCOV
-
->   # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
-> --
-> 2.17.0.441.gb46fe60e1d-goog
+--- linux-next-20180426.orig/Makefile
++++ linux-next-20180426/Makefile
+@@ -224,7 +224,7 @@ clean-targets := %clean mrproper cleando
+ no-dot-config-targets := $(clean-targets) \
+ 			 cscope gtags TAGS tags help% %docs check% coccicheck \
+ 			 $(version_h) headers_% archheaders archscripts \
+-			 kernelversion %src-pkg
++			 kernelversion %src-pkg tools/help
+ 
+ config-targets := 0
+ mixed-targets  := 0
 
 
-
---
-Thanks,
-~Nick Desaulniers
