@@ -1,83 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:37882 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:58854 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750787AbeEAPZb (ORCPT
+        with ESMTP id S1756285AbeEAR4s (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 May 2018 11:25:31 -0400
-Subject: Re: [PATCH 4/5] kernel hacking: new config DEBUG_EXPERIENCE to apply
- GCC -Og optimization
-References: <1525179614-14571-1-git-send-email-changbin.du@intel.com>
- <1525179614-14571-5-git-send-email-changbin.du@intel.com>
+        Tue, 1 May 2018 13:56:48 -0400
+Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
+References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
 From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <f19eae29-3b94-5151-04c5-6fb620bd28e9@infradead.org>
-Date: Tue, 1 May 2018 08:25:27 -0700
+Message-ID: <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
+Date: Tue, 1 May 2018 10:56:47 -0700
 MIME-Version: 1.0
-In-Reply-To: <1525179614-14571-5-git-send-email-changbin.du@intel.com>
+In-Reply-To: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: changbin.du@intel.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org
-Cc: x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
+To: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Good morning.
-
-On 05/01/2018 06:00 AM, changbin.du@intel.com wrote:
-> From: Changbin Du <changbin.du@intel.com>
+On 04/30/2018 05:57 PM, Ulf Magnusson wrote:
+> Hello,
 > 
+> Kconfiglib (https://github.com/ulfalizer/Kconfiglib) now has a
+> terminal menuconfig implementation, implemented in plain curses
+> (which is in the Python standard library).
 > 
-> Signed-off-by: Changbin Du <changbin.du@intel.com>
-> ---
->  Makefile                     |  4 ++++
->  include/linux/compiler-gcc.h |  2 +-
->  include/linux/compiler.h     |  2 +-
->  lib/Kconfig.debug            | 21 +++++++++++++++++++++
->  4 files changed, 27 insertions(+), 2 deletions(-)
+> The interface should feel familiar to people used to mconf. It has
+> some features that mconf lacks:
 > 
-
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index 90f35ad..2432e77d 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -211,6 +211,27 @@ config NO_AUTO_INLINE
->  
->  	  Use only if you want to debug the kernel.
->  
-> +config DEBUG_EXPERIENCE
-> +	bool "Optimize for better debugging experience (-Og)"
-> +	default n
-> +	select NO_AUTO_INLINE
-> +	depends on !CC_OPTIMIZE_FOR_SIZE
-> +	help
-> +	  This will apply GCC '-Og' optimization level get supported from
-
-	                                               which is supported since
-
-> +	  GCC 4.8. This optimization level offers a reasonable level of
-> +	  optimization while maintaining fast compilation and a good
-> +	  debugging experience. It is similar to '-O1' while perfer keeping
-
-	                                               while preferring to keep
-
-> +	  debug ability over runtime speed. The overall performance will
-> +	  drop a bit.
-> +
-> +	  If enabling this option break your kernel, you should either
-
-	                          breaks
-
-> +	  disable this or find a fix (mostly in the arch code). Currently
-> +	  this option has only be tested in qemu x86_64 guest.
-> +
-> +	  Use only if you want to debug the kernel, especially if you want
-> +	  to have better kernel debugging experience with gdb facilities
-> +	  like kgdb and qemu.
-> +
->  config ENABLE_WARN_DEPRECATED
->  	bool "Enable __deprecated logic"
->  	default y
+>   - Seamless resizing
 > 
+>   - Unicode support
+> 
+>   - Runs on Windows (via 'pip install windows-curses', which uses
+>     PDCurses)
+> 
+>   - Improved information displays:
+> 
+>     * All expressions are split into readable chunks
+> 
+>     * Menus and comments have information displays
+> 
+>   - Relatively easy-to-read and easy-to-tweak code.
+> 
+>     Kconfiglib automatically invalidates symbols as needed, and
+>     values can never get stale, which helps.
+> 
+> Some upcoming features are mouse support and a search feature that
+> can jump directly to the definition of a symbol. The jump-to feature
+> will use a "show-all" mode in case the symbol isn't visible.
+> 
+> See the Kconfiglib GitHub page for screenshots. The menuconfig
+> implementation is at
+> https://github.com/ulfalizer/Kconfiglib/blob/master/menuconfig.py.
+> The docstring at the top has some more information.
+
+Hi,
+
+I'm probably missing some python additive (I hope it's that easy), but
+menuconfig.py is not liking the "degree" symbol in drivers/net/can/peak_canfd/Kconfig:
+
+config CAN_PEAK_PCIEFD
+	depends on PCI
+	tristate "PEAK-System PCAN-PCIe FD cards"
+	---help---
+	  This driver adds support for the PEAK-System PCI Express FD
+	  CAN-FD cards family.
+	  These 1x or 2x CAN-FD channels cards offer CAN 2.0 a/b as well as
+	  CAN-FD access to the CAN bus. Besides the nominal bitrate of up to
+	  1 Mbit/s, the data bytes of CAN-FD frames can be transmitted with
+	  up to 12 Mbit/s. A galvanic isolation of the CAN ports protects the
+	  electronics of the card and the respective computer against
+	  disturbances of up to 500 Volts. The PCAN-PCI Express FD can be
+	  operated with ambient temperatures in a range of -40 to +85 °C.
+
+
+kconfiglib.KconfigSyntaxError: 
+Malformed ascii in drivers/net/can/peak_canfd/Kconfig
+Context: b't temperatures in a range of -40 to +85 \xc2\xb0C.\n'
+Problematic data: b'\xc2'
+Reason: ordinal not in range(128)
+
 
 thanks,
 -- 
