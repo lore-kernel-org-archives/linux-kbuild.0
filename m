@@ -1,119 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:42714 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756382AbeEASwM (ORCPT
+Received: from mail-oi0-f65.google.com ([209.85.218.65]:40608 "EHLO
+        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753505AbeEATMu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 May 2018 14:52:12 -0400
-Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
+        Tue, 1 May 2018 15:12:50 -0400
+MIME-Version: 1.0
+In-Reply-To: <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
 References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
  <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
- <25f6b309-9346-7e28-beeb-a37e69a91ce8@infradead.org>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <ac506aa3-e5f6-9bfa-a18b-441e04b21d97@infradead.org>
-Date: Tue, 1 May 2018 11:52:10 -0700
-MIME-Version: 1.0
-In-Reply-To: <25f6b309-9346-7e28-beeb-a37e69a91ce8@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Tue, 1 May 2018 21:12:49 +0200
+Message-ID: <CAFkk2KRozscmd4kQSJKwKmY3WpTody7S5XZZObf8SKLF62k6+w@mail.gmail.com>
+Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 05/01/2018 11:13 AM, Randy Dunlap wrote:
-> On 05/01/2018 10:56 AM, Randy Dunlap wrote:
->> On 04/30/2018 05:57 PM, Ulf Magnusson wrote:
->>> Hello,
->>>
->>> Kconfiglib (https://github.com/ulfalizer/Kconfiglib) now has a
->>> terminal menuconfig implementation, implemented in plain curses
->>> (which is in the Python standard library).
->>>
->>> The interface should feel familiar to people used to mconf. It has
->>> some features that mconf lacks:
->>>
->>>   - Seamless resizing
->>>
->>>   - Unicode support
->>>
->>>   - Runs on Windows (via 'pip install windows-curses', which uses
->>>     PDCurses)
->>>
->>>   - Improved information displays:
->>>
->>>     * All expressions are split into readable chunks
->>>
->>>     * Menus and comments have information displays
->>>
->>>   - Relatively easy-to-read and easy-to-tweak code.
->>>
->>>     Kconfiglib automatically invalidates symbols as needed, and
->>>     values can never get stale, which helps.
->>>
->>> Some upcoming features are mouse support and a search feature that
->>> can jump directly to the definition of a symbol. The jump-to feature
->>> will use a "show-all" mode in case the symbol isn't visible.
->>>
->>> See the Kconfiglib GitHub page for screenshots. The menuconfig
->>> implementation is at
->>> https://github.com/ulfalizer/Kconfiglib/blob/master/menuconfig.py.
->>> The docstring at the top has some more information.
+On Tue, May 1, 2018 at 7:56 PM, Randy Dunlap <rdunlap@infradead.org> wrote:
+> On 04/30/2018 05:57 PM, Ulf Magnusson wrote:
+>> Hello,
 >>
->> Hi,
+>> Kconfiglib (https://github.com/ulfalizer/Kconfiglib) now has a
+>> terminal menuconfig implementation, implemented in plain curses
+>> (which is in the Python standard library).
 >>
->> I'm probably missing some python additive (I hope it's that easy), but
->> menuconfig.py is not liking the "degree" symbol in drivers/net/can/peak_canfd/Kconfig:
+>> The interface should feel familiar to people used to mconf. It has
+>> some features that mconf lacks:
 >>
->> config CAN_PEAK_PCIEFD
->> 	depends on PCI
->> 	tristate "PEAK-System PCAN-PCIe FD cards"
->> 	---help---
->> 	  This driver adds support for the PEAK-System PCI Express FD
->> 	  CAN-FD cards family.
->> 	  These 1x or 2x CAN-FD channels cards offer CAN 2.0 a/b as well as
->> 	  CAN-FD access to the CAN bus. Besides the nominal bitrate of up to
->> 	  1 Mbit/s, the data bytes of CAN-FD frames can be transmitted with
->> 	  up to 12 Mbit/s. A galvanic isolation of the CAN ports protects the
->> 	  electronics of the card and the respective computer against
->> 	  disturbances of up to 500 Volts. The PCAN-PCI Express FD can be
->> 	  operated with ambient temperatures in a range of -40 to +85 °C.
+>>   - Seamless resizing
 >>
+>>   - Unicode support
 >>
->> kconfiglib.KconfigSyntaxError: 
->> Malformed ascii in drivers/net/can/peak_canfd/Kconfig
->> Context: b't temperatures in a range of -40 to +85 \xc2\xb0C.\n'
->> Problematic data: b'\xc2'
->> Reason: ordinal not in range(128)
-> 
-> BTW, after modifying 4 other instances of this "error," I have it running.
-> Now looking/testing. :)
+>>   - Runs on Windows (via 'pip install windows-curses', which uses
+>>     PDCurses)
+>>
+>>   - Improved information displays:
+>>
+>>     * All expressions are split into readable chunks
+>>
+>>     * Menus and comments have information displays
+>>
+>>   - Relatively easy-to-read and easy-to-tweak code.
+>>
+>>     Kconfiglib automatically invalidates symbols as needed, and
+>>     values can never get stale, which helps.
+>>
+>> Some upcoming features are mouse support and a search feature that
+>> can jump directly to the definition of a symbol. The jump-to feature
+>> will use a "show-all" mode in case the symbol isn't visible.
+>>
+>> See the Kconfiglib GitHub page for screenshots. The menuconfig
+>> implementation is at
+>> https://github.com/ulfalizer/Kconfiglib/blob/master/menuconfig.py.
+>> The docstring at the top has some more information.
+>
+> Hi,
+>
+> I'm probably missing some python additive (I hope it's that easy), but
+> menuconfig.py is not liking the "degree" symbol in drivers/net/can/peak_c=
+anfd/Kconfig:
+>
+> config CAN_PEAK_PCIEFD
+>         depends on PCI
+>         tristate "PEAK-System PCAN-PCIe FD cards"
+>         ---help---
+>           This driver adds support for the PEAK-System PCI Express FD
+>           CAN-FD cards family.
+>           These 1x or 2x CAN-FD channels cards offer CAN 2.0 a/b as well =
+as
+>           CAN-FD access to the CAN bus. Besides the nominal bitrate of up=
+ to
+>           1 Mbit/s, the data bytes of CAN-FD frames can be transmitted wi=
+th
+>           up to 12 Mbit/s. A galvanic isolation of the CAN ports protects=
+ the
+>           electronics of the card and the respective computer against
+>           disturbances of up to 500 Volts. The PCAN-PCI Express FD can be
+>           operated with ambient temperatures in a range of -40 to +85 =C2=
+=B0C.
+>
+>
+> kconfiglib.KconfigSyntaxError:
+> Malformed ascii in drivers/net/can/peak_canfd/Kconfig
+> Context: b't temperatures in a range of -40 to +85 \xc2\xb0C.\n'
+> Problematic data: b'\xc2'
+> Reason: ordinal not in range(128)
+>
+>
+> thanks,
+> --
+> ~Randy
 
-Hi Ulf,
+Thanks for trying it out!
 
-Here are a few comments for you FWIW.
+You're probably running in the C locale, which implies an ASCII
+encoding. That has caused enough trouble that the Python devs decided
+to automatically convert it to UTF-8 in Python 3.7:
+https://www.python.org/dev/peps/pep-0538/. LC_CTYPE=3DC.UTF-8 should fix
+it.
 
-menuconfig.py uses the terminal window space better than menuconfig:
-fewer margins, less Help text so more usable lines.
+It's a bit silly to have it crash for something like that though. I
+could force UTF-8 instead of respecting the locale (though it feels
+neater to respect settings), or tell Python to ignore decoding errors.
+Should probably do something at least...
 
-ESC/q is nicer than in ESC+ESC in menuconfig.
-
-What is the lower colored line for? I don't see it being used.
-
-On Quit, don't need to prompt for Save when the file is already saved
-or has not been modified.
-
-When menuconfig displays the Kconfig menu tree and it is over term-width
-characters, it truncates on the left so that the user can see all of
-the current menu name. menuconfig.py truncates on the right so that
-the current menu name may be partially lost or totally lost.
-
-To enable=y a tristate symbol, cannot enter Y, must do Space Space to cycle
-from N to M to Y.
-
-No / symbol search. I use that a lot, but I don't claim to be a
-typical user.
-
-
-Thanks.
--- 
-~Randy
+Cheers,
+Ulf
