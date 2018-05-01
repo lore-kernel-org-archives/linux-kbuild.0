@@ -1,66 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:45234 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756203AbeEASmw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 May 2018 14:42:52 -0400
-Date: Tue, 1 May 2018 14:42:48 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH 11/21] trace: Use -mcount-record for dynamic ftrace
-Message-ID: <20180501144248.1fb71b20@gandalf.local.home>
-In-Reply-To: <20171130192233.181dad47@gandalf.local.home>
-References: <20171127213423.27218-1-andi@firstfloor.org>
-        <20171127213423.27218-12-andi@firstfloor.org>
-        <20171130192233.181dad47@gandalf.local.home>
+Received: from bombadil.infradead.org ([198.137.202.133]:42714 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756382AbeEASwM (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 1 May 2018 14:52:12 -0400
+Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
+References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
+ <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
+ <25f6b309-9346-7e28-beeb-a37e69a91ce8@infradead.org>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <ac506aa3-e5f6-9bfa-a18b-441e04b21d97@infradead.org>
+Date: Tue, 1 May 2018 11:52:10 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <25f6b309-9346-7e28-beeb-a37e69a91ce8@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, samitolvanen@google.com, alxmtvv@gmail.com, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+To: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, 30 Nov 2017 19:22:33 -0500
-Steven Rostedt <rostedt@goodmis.org> wrote:
-
-> On Mon, 27 Nov 2017 13:34:13 -0800
-> Andi Kleen <andi@firstfloor.org> wrote:
+On 05/01/2018 11:13 AM, Randy Dunlap wrote:
+> On 05/01/2018 10:56 AM, Randy Dunlap wrote:
+>> On 04/30/2018 05:57 PM, Ulf Magnusson wrote:
+>>> Hello,
+>>>
+>>> Kconfiglib (https://github.com/ulfalizer/Kconfiglib) now has a
+>>> terminal menuconfig implementation, implemented in plain curses
+>>> (which is in the Python standard library).
+>>>
+>>> The interface should feel familiar to people used to mconf. It has
+>>> some features that mconf lacks:
+>>>
+>>>   - Seamless resizing
+>>>
+>>>   - Unicode support
+>>>
+>>>   - Runs on Windows (via 'pip install windows-curses', which uses
+>>>     PDCurses)
+>>>
+>>>   - Improved information displays:
+>>>
+>>>     * All expressions are split into readable chunks
+>>>
+>>>     * Menus and comments have information displays
+>>>
+>>>   - Relatively easy-to-read and easy-to-tweak code.
+>>>
+>>>     Kconfiglib automatically invalidates symbols as needed, and
+>>>     values can never get stale, which helps.
+>>>
+>>> Some upcoming features are mouse support and a search feature that
+>>> can jump directly to the definition of a symbol. The jump-to feature
+>>> will use a "show-all" mode in case the symbol isn't visible.
+>>>
+>>> See the Kconfiglib GitHub page for screenshots. The menuconfig
+>>> implementation is at
+>>> https://github.com/ulfalizer/Kconfiglib/blob/master/menuconfig.py.
+>>> The docstring at the top has some more information.
+>>
+>> Hi,
+>>
+>> I'm probably missing some python additive (I hope it's that easy), but
+>> menuconfig.py is not liking the "degree" symbol in drivers/net/can/peak_canfd/Kconfig:
+>>
+>> config CAN_PEAK_PCIEFD
+>> 	depends on PCI
+>> 	tristate "PEAK-System PCAN-PCIe FD cards"
+>> 	---help---
+>> 	  This driver adds support for the PEAK-System PCI Express FD
+>> 	  CAN-FD cards family.
+>> 	  These 1x or 2x CAN-FD channels cards offer CAN 2.0 a/b as well as
+>> 	  CAN-FD access to the CAN bus. Besides the nominal bitrate of up to
+>> 	  1 Mbit/s, the data bytes of CAN-FD frames can be transmitted with
+>> 	  up to 12 Mbit/s. A galvanic isolation of the CAN ports protects the
+>> 	  electronics of the card and the respective computer against
+>> 	  disturbances of up to 500 Volts. The PCAN-PCI Express FD can be
+>> 	  operated with ambient temperatures in a range of -40 to +85 °C.
+>>
+>>
+>> kconfiglib.KconfigSyntaxError: 
+>> Malformed ascii in drivers/net/can/peak_canfd/Kconfig
+>> Context: b't temperatures in a range of -40 to +85 \xc2\xb0C.\n'
+>> Problematic data: b'\xc2'
+>> Reason: ordinal not in range(128)
 > 
-> > From: Andi Kleen <ak@linux.intel.com>
-> > 
-> > gcc 5 supports a new -mcount-record option to generate ftrace
-> > tables directly. This avoids the need to run record_mcount
-> > manually.
-> > 
-> > Use this option when available.
-> > 
-> > So far doesn't use -mcount-nop, which also exists now.
-> > 
-> > This is needed to make ftrace work with LTO because the
-> > normal record-mcount script doesn't run over the link
-> > time output.
-> > 
-> > It should also improve build times slightly in the general
-> > case.
-> > 
-> > Cc: rostedt@goodmis.org
-> > Signed-off-by: Andi Kleen <ak@linux.intel.com>
-> > ---  
-> 
-> Hi Andi,
-> 
-> Thanks for sending this. I'm currently trying to catch up on all the
-> changes that need to get into 4.15 and will be doing a bit of
-> traveling.
-> 
-> I plan on looking at this in a week or two, and add it to the 4.16
-> queue.
->
+> BTW, after modifying 4 other instances of this "error," I have it running.
+> Now looking/testing. :)
 
-Looks like it I forgot to add it to the queue (actually, I remember
-having issues with that queue and restarted it), and this was dropped.
+Hi Ulf,
 
-Adding it this time for 4.18
+Here are a few comments for you FWIW.
 
-Sorry about that. :-/
+menuconfig.py uses the terminal window space better than menuconfig:
+fewer margins, less Help text so more usable lines.
 
--- Steve
+ESC/q is nicer than in ESC+ESC in menuconfig.
+
+What is the lower colored line for? I don't see it being used.
+
+On Quit, don't need to prompt for Save when the file is already saved
+or has not been modified.
+
+When menuconfig displays the Kconfig menu tree and it is over term-width
+characters, it truncates on the left so that the user can see all of
+the current menu name. menuconfig.py truncates on the right so that
+the current menu name may be partially lost or totally lost.
+
+To enable=y a tristate symbol, cannot enter Y, must do Space Space to cycle
+from N to M to Y.
+
+No / symbol search. I use that a lot, but I don't claim to be a
+typical user.
+
+
+Thanks.
+-- 
+~Randy
