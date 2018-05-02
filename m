@@ -1,100 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:34144 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750898AbeEBMYp (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 May 2018 08:24:45 -0400
-Date: Wed, 2 May 2018 22:24:30 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 4/4] powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be
- selected
-Message-ID: <20180502222430.2a1cced4@roar.ozlabs.ibm.com>
-In-Reply-To: <CA+7wUsy1KaWc0LJNXieNTtQcfoQyg-kFp10nGoTzVe7CdXYOyg@mail.gmail.com>
-References: <20180420073414.23169-1-npiggin@gmail.com>
-        <20180420073414.23169-5-npiggin@gmail.com>
-        <CA+7wUswuyn+YgNe732rQAzVmgDBohTMEqwsd76nQ_CH5h7Y5WA@mail.gmail.com>
-        <20180420204104.6e22b136@roar.ozlabs.ibm.com>
-        <CA+7wUsyWu3eweWjwfFoS5FD5yb3OxjLV4-XyErcNA4fJGPCf8Q@mail.gmail.com>
-        <20180421124838.5facd0f7@roar.ozlabs.ibm.com>
-        <CA+7wUsy1KaWc0LJNXieNTtQcfoQyg-kFp10nGoTzVe7CdXYOyg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from mga01.intel.com ([192.55.52.88]:58147 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751500AbeEBNzp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 2 May 2018 09:55:45 -0400
+From: changbin.du@intel.com
+Subject: [PATCH v2 5/5] asm-generic: fix build error in fix_to_virt with CONFIG_DEBUG_EXPERIENCE
+Date: Wed,  2 May 2018 21:45:00 +0800
+Message-Id: <1525268700-10631-6-git-send-email-changbin.du@intel.com>
+In-Reply-To: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
+References: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mathieu Malaterre <malat@debian.org>
-Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-arch@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>, linux-kbuild@vger.kernel.org
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org
+Cc: rostedt@goodmis.org, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Changbin Du <changbin.du@intel.com>
 
-On Wed, 2 May 2018 11:17:52 +0200
-Mathieu Malaterre <malat@debian.org> wrote:
+From: Changbin Du <changbin.du@intel.com>
 
-> Nick,
-> 
-> On Sat, Apr 21, 2018 at 4:48 AM, Nicholas Piggin <npiggin@gmail.com> wrote:
-> > On Fri, 20 Apr 2018 22:08:27 +0200
-> > Mathieu Malaterre <malat@debian.org> wrote:
-> >  
-> >> On Fri, Apr 20, 2018 at 12:41 PM, Nicholas Piggin <npiggin@gmail.com> wrote:  
-> >> > On Fri, 20 Apr 2018 12:00:49 +0200
-> >> > Mathieu Malaterre <malat@debian.org> wrote:
-> >> >  
-> >> >> On Fri, Apr 20, 2018 at 9:34 AM, Nicholas Piggin <npiggin@gmail.com> wrote:  
-> >> >> > This requires further changes to linker script to KEEP some tables
-> >> >> > and wildcard compiler generated sections into the right place. This
-> >> >> > includes pp32 modifications from Christophe Leroy.
-> >> >> >
-> >> >> > When compiling powernv_defconfig with this option:
-> >> >> >
-> >> >> > text       data      bss       dec        filename
-> >> >> > 11827621   4810490   1341080   17979191   vmlinux
-> >> >> > 11752437   4598858   1338776   17690071   vmlinux.dcde
-> >> >> >
-> >> >> > Resulting kernel is almost 400kB smaller (and still boots).
-> >> >> >
-> >> >> > [ppc32 numbers here]  
-> >> >>
-> >> >> ^^^
-> >> >>
-> >> >> Do you want somebody else to provide those numbers ?  
-> >> >
-> >> > If you have a booting kernel, yes some more numbers would be good.  
-> >>
-> >> I've used /boot/config-4.15.0-2-powerpc from my current debian
-> >> package. Rebuild master with and without option, boot ok, load/unload
-> >> module ok.
-> >>
-> >> $ size nick/vmlinux.with*
-> >>    text    data     bss     dec     hex filename
-> >> 7386425 2364370 1425432 11176227 aa8923 nick/vmlinux.with
-> >> 7461457 2475122 1428064 11364643 ad6923 nick/vmlinux.without
-> >>
-> >> This is not clear why with option the size of kernel is slightly bigger:
-> >>
-> >> $ du -sk nick/vmlinux.with*
-> >> 124488 nick/vmlinux.with
-> >> 124004 nick/vmlinux.without  
-> >
-> > Not sure. readelf -S vmlinux may show something.
-> >
-> > To really get lots of detail, you can add to the top level Makefile:
-> >
-> > LDFLAGS_vmlinux += -M  
-> 
-> Here is what I did:
-> 
-> $ git diff
-> diff --git a/Makefile b/Makefile
-> index 619a85ad716b..1a2e3d142a59 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -4,6 +4,7 @@ PATCHLEVEL = 17
->  SUBLEVEL = 0
->  EXTRAVERSION = -rc3
->  NAME = Fearless Coyote
-> +LDFLAGS_vmlinux += -M
+With '-Og' optimization level, GCC would not optimize a count for a loop
+as a constant value. But BUILD_BUG_ON() only accept compile-time constant
+values.
 
-That'll get overwritten further down. Put it down with another line
-that starts with LDFLAGS_vmlinux +=
+arch/arm/mm/mmu.o: In function `fix_to_virt':
+/home/changbin/work/linux/./include/asm-generic/fixmap.h:31: undefined reference to `__compiletime_assert_31'
+Makefile:1051: recipe for target 'vmlinux' failed
+make: *** [vmlinux] Error 1
 
-Thanks,
-Nick
+Signed-off-by: Changbin Du <changbin.du@intel.com>
+---
+ include/asm-generic/fixmap.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/asm-generic/fixmap.h b/include/asm-generic/fixmap.h
+index 827e4d3..a6576d4 100644
+--- a/include/asm-generic/fixmap.h
++++ b/include/asm-generic/fixmap.h
+@@ -28,7 +28,8 @@
+  */
+ static __always_inline unsigned long fix_to_virt(const unsigned int idx)
+ {
+-	BUILD_BUG_ON(idx >= __end_of_fixed_addresses);
++	BUILD_BUG_ON(__builtin_constant_p(idx) &&
++		     idx >= __end_of_fixed_addresses);
+ 	return __fix_to_virt(idx);
+ }
+ 
+-- 
+2.7.4
+
