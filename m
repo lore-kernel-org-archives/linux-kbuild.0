@@ -1,145 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:36980 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751428AbeEBO4g (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:60660 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751552AbeEBPtV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 May 2018 10:56:36 -0400
-Received: by mail-wm0-f67.google.com with SMTP id l1so25007570wmb.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 02 May 2018 07:56:35 -0700 (PDT)
-Date: Wed, 2 May 2018 15:56:31 +0100
-From: Daniel Thompson <daniel.thompson@linaro.org>
-Subject: Re: [PATCH v2 0/5] kernel hacking: GCC optimization for debug
- experience (-Og)
-Message-ID: <20180502145631.bzfqpw4izlrqhda6@holly.lan>
-References: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
+        Wed, 2 May 2018 11:49:21 -0400
+Received: from mail-ua0-f177.google.com (mail-ua0-f177.google.com [209.85.217.177]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id w42FnCBt016470
+        for <linux-kbuild@vger.kernel.org>; Thu, 3 May 2018 00:49:13 +0900
+Received: by mail-ua0-f177.google.com with SMTP id i3so9768950uad.4
+        for <linux-kbuild@vger.kernel.org>; Wed, 02 May 2018 08:49:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
+In-Reply-To: <1522430045-31685-1-git-send-email-juro.bystricky@intel.com>
+References: <1522430045-31685-1-git-send-email-juro.bystricky@intel.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 3 May 2018 00:48:31 +0900
+Message-ID: <CAK7LNAR3D4=7Z+T1odxG2FidWF0KM79MLiLNZNy8KqhcwLagDA@mail.gmail.com>
+Subject: Re: [PATCH] modpost: srcversion sometimes incorrect
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: changbin.du@intel.com
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org, rostedt@goodmis.org, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
+To: Juro Bystricky <juro.bystricky@intel.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Richard Purdie <richard.purdie@linuxfoundation.org>, jurobystricky@hotmail.com
 
-On Wed, May 02, 2018 at 09:44:55PM +0800, changbin.du@intel.com wrote:
-> From: Changbin Du <changbin.du@intel.com>
-> 
-> Hi all,
-> I know some kernel developers was searching for a method to dissable GCC
-> optimizations, probably they want to apply GCC '-O0' option. But since Linux
-> kernel replys on GCC optimization to remove some dead code, so '-O0' just
-> breaks the build. They do need this because they want to debug kernel with
-> qemu, simics, kgtp or kgdb.
-> 
-> Thanks for the GCC '-Og' optimization level introduced in GCC 4.8, which
-> offers a reasonable level of optimization while maintaining fast compilation
-> and a good debugging experience. It is similar to '-O1' while perfer keeping
-> debug ability over runtime speed. With '-Og', we can build a kernel with
-> better debug ability and little performance drop after some simple change.
-> 
-> In this series, firstly introduce a new config CONFIG_NO_AUTO_INLINE after two
-> fixes for this new option. With this option, only functions explicitly marked
-> with "inline" will  be inlined. This will allow the function tracer to trace
-> more functions because it only traces functions that the compiler has not
-> inlined.
-> 
-> Then introduce new config CONFIG_DEBUG_EXPERIENCE which apply '-Og'
-> optimization level for whole kernel, with a simple fix in fix_to_virt().
-> Currently this option is only tested on a QEMU gust and it works fine.
-> 
-> 
-> Comparison of vmlinux size: a bit smaller.
-> 
->     w/o CONFIG_DEBUG_EXPERIENCE
->     $ size vmlinux
->        text    data     bss     dec     hex filename
->     22665554   9709674  2920908 35296136        21a9388 vmlinux
-> 
->     w/ CONFIG_DEBUG_EXPERIENCE
->     $ size vmlinux
->        text    data     bss     dec     hex filename
->     21499032   10102758 2920908 34522698        20ec64a vmlinux
-> 
-> 
-> Comparison of system performance: a bit drop (~6%).
->     This benchmark of kernel compilation is suggested by Ingo Molnar.
->     https://lkml.org/lkml/2018/5/2/74
-
-In my mind was the opposite question. When running on the same kernel
-does a kernel whose config contains CONFIG_DEBUG_EXPERIENCE build faster
-than one without (due to the disabled optimization passes).
-
-To be honest this is more curiosity than a review comment though... if
-you have the figures please share, if not then don't sweat it on my
-account!
-
-
-Daniel.
-
-
-
-> 
->     Preparation: Set cpufreq to 'performance'.
->     for ((cpu=0; cpu<120; cpu++)); do
->       G=/sys/devices/system/cpu/cpu$cpu/cpufreq/scaling_governor
->       [ -f $G ] && echo performance > $G
->     done
-> 
->     w/o CONFIG_DEBUG_EXPERIENCE
->     $ perf stat --repeat 5 --null --pre                 '\
->         cp -a kernel ../kernel.copy.$(date +%s);         \
->         rm -rf *;                                        \
->         git checkout .;                                  \
->         echo 1 > /proc/sys/vm/drop_caches;               \
->         find ../kernel* -type f | xargs cat >/dev/null;  \
->         make -j kernel >/dev/null;                       \
->         make clean >/dev/null 2>&1;                      \
->         sync                                            '\
->                                                          \
->         make -j8 >/dev/null
-> 
->      Performance counter stats for 'make -j8' (5 runs):
-> 
->         219.764246652 seconds time elapsed                   ( +-  0.78% )
-> 
->     w/ CONFIG_DEBUG_EXPERIENCE
->     $ perf stat --repeat 5 --null --pre                 '\
->         cp -a kernel ../kernel.copy.$(date +%s);         \
->         rm -rf *;                                        \
->         git checkout .;                                  \
->         echo 1 > /proc/sys/vm/drop_caches;               \
->         find ../kernel* -type f | xargs cat >/dev/null;  \
->         make -j kernel >/dev/null;                       \
->         make clean >/dev/null 2>&1;                      \
->         sync                                            '\
->                                                          \
->         make -j8 >/dev/null
-> 
->     Performance counter stats for 'make -j8' (5 runs):
-> 
->          233.574187771 seconds time elapsed                  ( +-  0.19% )
-> 
-> Changbin Du (5):
->   x86/mm: surround level4_kernel_pgt with #ifdef
->     CONFIG_X86_5LEVEL...#endif
->   regulator: add dummy function of_find_regulator_by_node
->   kernel hacking: new config NO_AUTO_INLINE to disable compiler
->     auto-inline optimizations
->   kernel hacking: new config DEBUG_EXPERIENCE to apply GCC -Og
->     optimization
->   asm-generic: fix build error in fix_to_virt with
->     CONFIG_DEBUG_EXPERIENCE
-> 
->  Makefile                          | 10 ++++++++++
->  arch/x86/include/asm/pgtable_64.h |  2 ++
->  arch/x86/kernel/head64.c          | 13 ++++++-------
->  drivers/regulator/internal.h      |  9 +++++++--
->  include/asm-generic/fixmap.h      |  3 ++-
->  include/linux/compiler-gcc.h      |  2 +-
->  include/linux/compiler.h          |  2 +-
->  lib/Kconfig.debug                 | 39 +++++++++++++++++++++++++++++++++++++++
->  8 files changed, 68 insertions(+), 12 deletions(-)
-> 
-> -- 
+2018-03-31 2:14 GMT+09:00 Juro Bystricky <juro.bystricky@intel.com>:
+> "srcversion" field inserted into module modinfo section contains a
+> sum of the source files which made it. However, this field can
+> be incorrect. Building the same module can end up having inconsistent
+> srcversion field eventhough the sources remain the same.
+> This can be reproduced by building modules in a deeply nested directory,
+> but other factors contribute as well.
+>
+> The reason for incorrect srcversion is that some source files can be
+> simply silently skipped from the checksum calculation due to limited
+> buffer space for line parsing.
+>
+> This patch addresses two issues:
+>
+> 1. Allocates a larger line buffer (32k vs 4k).
+> 2. Issues a warning if a line length exceeds the line buffer.
+>
+> Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+> ---
+>  scripts/mod/modpost.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 9917f92..955f26e 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -385,9 +385,10 @@ void *grab_file(const char *filename, unsigned long *size)
+>    * spaces in the beginning of the line is trimmed away.
+>    * Return a pointer to a static buffer.
+>    **/
+> +#define MODPOST_MAX_LINE 32768
+>  char *get_next_line(unsigned long *pos, void *file, unsigned long size)
+>  {
+> -       static char line[4096];
+> +       static char line[MODPOST_MAX_LINE];
+>         int skip = 1;
+>         size_t len = 0;
+>         signed char *p = (signed char *)file + *pos;
+> @@ -402,8 +403,11 @@ char *get_next_line(unsigned long *pos, void *file, unsigned long size)
+>                 if (*p != '\n' && (*pos < size)) {
+>                         len++;
+>                         *s++ = *p++;
+> -                       if (len > 4095)
+> +                       if (len > (sizeof(line)-1)) {
+> +                               warn(" %s: line exceeds buffer size %zu bytes\n"
+> +                                    , __func__, sizeof(line));
+>                                 break; /* Too long, stop */
+> +                       }
+>                 } else {
+>                         /* End of string */
+>                         *s = '\0';
+> --
 > 2.7.4
-> 
+
+The whole of the file content is mapped by grab_file().
+
+I believe the right thing to do is,
+to not increase the buffer size,
+but to not use such a temporary buffer.
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
