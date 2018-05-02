@@ -1,36 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:41775 "EHLO
-        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750993AbeEBUaW (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:43146 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751261AbeEBUqA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 May 2018 16:30:22 -0400
-MIME-Version: 1.0
-In-Reply-To: <1525179614-14571-5-git-send-email-changbin.du@intel.com>
-References: <1525179614-14571-1-git-send-email-changbin.du@intel.com> <1525179614-14571-5-git-send-email-changbin.du@intel.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 2 May 2018 16:30:21 -0400
-Message-ID: <CAK8P3a0c++Ti_39WPXwwjjmRx+EUozzCVY5Y2qicyEeLop6_6w@mail.gmail.com>
-Subject: Re: [PATCH 4/5] kernel hacking: new config DEBUG_EXPERIENCE to apply
- GCC -Og optimization
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 2 May 2018 16:46:00 -0400
+Date: Wed, 2 May 2018 13:45:58 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v2 4/5] kernel hacking: new config DEBUG_EXPERIENCE to
+ apply GCC -Og optimization
+Message-Id: <20180502134558.1f388e097dcde6f589635404@linux-foundation.org>
+In-Reply-To: <20180502101707.206984e9@gandalf.local.home>
+References: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
+        <1525268700-10631-5-git-send-email-changbin.du@intel.com>
+        <20180502101707.206984e9@gandalf.local.home>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: changbin.du@intel.com
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, the arch/x86 maintainers <x86@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: changbin.du@intel.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
 
-On Tue, May 1, 2018 at 9:00 AM,  <changbin.du@intel.com> wrote:
-> From: Changbin Du <changbin.du@intel.com>
-> +config DEBUG_EXPERIENCE
-> +       bool "Optimize for better debugging experience (-Og)"
-> +       default n
-> +       select NO_AUTO_INLINE
-> +       depends on !CC_OPTIMIZE_FOR_SIZE
-> +       help
+On Wed, 2 May 2018 10:17:07 -0400 Steven Rostedt <rostedt@goodmis.org> wrote:
 
-How about having this as another option alongside CC_OPTIMIZE_FOR_SIZE
-and CC_OPTIMIZE_FOR_PERFORMANCE in the same choice statement?
+> > Comparison of vmlinux size: a bit smaller.
+> > 
+> >     w/o CONFIG_DEBUG_EXPERIENCE
+> 
+> I hate the config name.
+> 
+> I probably can't come up with better ones but let's try:
+> 
+>  CONFIG_DEBUG_OPTIMIZE ?
+>  CONFIG_OPTIMIZE_DEBUG ?
+> 
+> But "EXPERIENCE" sounds like I'm on some DEBUG LSD.
 
-We could also add another option for -Os (for faster compiles)  or possibly
-for -O3 (if anyone cares) in there.
+Metoo, but the gcc people decided on "-Og: Optimize debugging
+experience ..." and I think there are benefits if the kernel is to
+align the naming with that.
 
-      Arnd
