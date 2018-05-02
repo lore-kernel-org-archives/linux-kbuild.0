@@ -1,69 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:57398 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751111AbeEBT0e (ORCPT
+Received: from mail-ot0-f194.google.com ([74.125.82.194]:43411 "EHLO
+        mail-ot0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750945AbeEBT17 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 May 2018 15:26:34 -0400
-Subject: Re: [PATCH v2 4/5] kernel hacking: new config DEBUG_EXPERIENCE to
- apply GCC -Og optimization
-References: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
- <1525268700-10631-5-git-send-email-changbin.du@intel.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <34ba017d-2e94-7411-a675-0e3e2a6b0682@infradead.org>
-Date: Wed, 2 May 2018 12:26:30 -0700
+        Wed, 2 May 2018 15:27:59 -0400
 MIME-Version: 1.0
-In-Reply-To: <1525268700-10631-5-git-send-email-changbin.du@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAAqcGHn+3HMC_tVsOsLB1Vycdv7SYZ=1SYc0Cg3Gx-Xe=sExMg@mail.gmail.com>
+References: <20180423195055.26069-1-malat@debian.org> <CAAqcGHn+3HMC_tVsOsLB1Vycdv7SYZ=1SYc0Cg3Gx-Xe=sExMg@mail.gmail.com>
+From: Mathieu Malaterre <malat@debian.org>
+Date: Wed, 2 May 2018 21:27:37 +0200
+Message-ID: <CA+7wUswCFsW9Uf2i9gBkCffJO=yqgRORL0znBW50RojtdvRkew@mail.gmail.com>
+Subject: Re: [PATCH] kbuild/debian: Use KBUILD_BUILD_* when set
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: changbin.du@intel.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org
-Cc: rostedt@goodmis.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On 05/02/2018 06:44 AM, changbin.du@intel.com wrote:
-> From: Changbin Du <changbin.du@intel.com>
-> 
+On Wed, May 2, 2018 at 1:30 PM, Riku Voipio <riku.voipio@linaro.org> wrote:
+> On 23 April 2018 at 22:50, Mathieu Malaterre <malat@debian.org> wrote:
+>> Be nice to the user and check env vars KBUILD_BUILD_USER &
+>> KBUILD_BUILD_HOST when those are set.
+>
+> mkdebian sets the maintainer address as "$name <$email>", but this
+> patch only sets the email part. I also wonder about the precedence, I
+> think KBUILD_* should be considered over the generic Debian variables.
 
-Sorry, I missed one:
+I simply tried to re-use the KBUILD_* env vars whenever possible. This
+did made sense, since:
 
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index ab55801..e264199 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -216,6 +216,27 @@ config NO_AUTO_INLINE
->  
->  	  If unsure, select N.
->  
-> +config DEBUG_EXPERIENCE
-> +	bool "Optimize for better debugging experience (-Og)"
-> +	default n
-> +	select NO_AUTO_INLINE
-> +	depends on !CC_OPTIMIZE_FOR_SIZE
-> +	help
-> +	  This will apply GCC '-Og' optimization level which is supported
-> +	  since GCC 4.8. This optimization level offers a reasonable level
-> +	  of optimization while maintaining fast compilation and a good
-> +	  debugging experience. It is similar to '-O1' while preferring to
-> +	  keep debug ability over runtime speed. The overall performance
-> +	  will drop a bit (~6%).
-> +
-> +	  Use only if you want to debug the kernel, especially if you want
-> +	  to have better kernel debugging experience with gdb facilities
-> +	  like kgdb or qemu. If enabling this option breaks your kernel,
-> +	  you should either disable this or find a fix (mostly in the arch
-> +	  code). Currently this option has only be tested on x86_64 platform.
+$ dmesg|grep debian
+                                                                  ~
+[    0.000000] Linux version 4.14.0-0.bpo.3-amd64
+(debian-kernel@lists.debian.org) (gcc version 6.3.0 20170516 (Debian
+6.3.0-18)) #1 SMP Debian 4.14.13-1~bpo9+1 (2018-01-14)
 
-	                                        been tested
+and
 
-> +
-> +	  If unsure, select N.
-> +
->  config ENABLE_WARN_DEPRECATED
->  	bool "Enable __deprecated logic"
->  	default y
-> 
+$ apt-cache show linux-image-amd64| grep Main
+                                                                  ~
+Maintainer: Debian Kernel Team <debian-kernel@lists.debian.org>
 
+I do not believe this should take precedence over DEBEMAIL.
 
--- 
-~Randy
+> Riku
+>
+>> Signed-off-by: Mathieu Malaterre <malat@debian.org>
+>> ---
+>>  scripts/package/mkdebian | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+>> index 6adb3a16ba3b..05d58d3ae8a0 100755
+>> --- a/scripts/package/mkdebian
+>> +++ b/scripts/package/mkdebian
+>> @@ -76,6 +76,8 @@ if [ -n "$DEBEMAIL" ]; then
+>>         email=$DEBEMAIL
+>>  elif [ -n "$EMAIL" ]; then
+>>         email=$EMAIL
+>> +elif [ -n "$KBUILD_BUILD_USER" ] && [ -n "$KBUILD_BUILD_HOST" ]; then
+>> +       email=$KBUILD_BUILD_USER@$KBUILD_BUILD_HOST
+>>  else
+>>         email=$(id -nu)@$(hostname -f 2>/dev/null || hostname)
+>>  fi
+>> --
+>> 2.11.0
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
