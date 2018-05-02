@@ -1,158 +1,145 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:61453 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751769AbeEBO4t (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:36980 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751428AbeEBO4g (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 May 2018 10:56:49 -0400
+        Wed, 2 May 2018 10:56:36 -0400
+Received: by mail-wm0-f67.google.com with SMTP id l1so25007570wmb.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 02 May 2018 07:56:35 -0700 (PDT)
+Date: Wed, 2 May 2018 15:56:31 +0100
+From: Daniel Thompson <daniel.thompson@linaro.org>
+Subject: Re: [PATCH v2 0/5] kernel hacking: GCC optimization for debug
+ experience (-Og)
+Message-ID: <20180502145631.bzfqpw4izlrqhda6@holly.lan>
+References: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180322210525.25361-2-linux@rasmusvillemoes.dk>
-References: <20180322150005.15061-2-linux@rasmusvillemoes.dk>
- <20180322210525.25361-1-linux@rasmusvillemoes.dk> <20180322210525.25361-2-linux@rasmusvillemoes.dk>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 2 May 2018 23:55:54 +0900
-Message-ID: <CAK7LNAQqWht6gMitprEY-LPKpbPj5gQN=3yiLSH19BeOdiexTA@mail.gmail.com>
-Subject: Re: [RFC resend 2/2] modpost: sumversions: try to fix "same dir" logic
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Michal Marek <michal.lkml@markovi.net>, Rusty Russell <rusty@rustcorp.com.au>, Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: changbin.du@intel.com
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org, rostedt@goodmis.org, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
 
-Hi.
+On Wed, May 02, 2018 at 09:44:55PM +0800, changbin.du@intel.com wrote:
+> From: Changbin Du <changbin.du@intel.com>
+> 
+> Hi all,
+> I know some kernel developers was searching for a method to dissable GCC
+> optimizations, probably they want to apply GCC '-O0' option. But since Linux
+> kernel replys on GCC optimization to remove some dead code, so '-O0' just
+> breaks the build. They do need this because they want to debug kernel with
+> qemu, simics, kgtp or kgdb.
+> 
+> Thanks for the GCC '-Og' optimization level introduced in GCC 4.8, which
+> offers a reasonable level of optimization while maintaining fast compilation
+> and a good debugging experience. It is similar to '-O1' while perfer keeping
+> debug ability over runtime speed. With '-Og', we can build a kernel with
+> better debug ability and little performance drop after some simple change.
+> 
+> In this series, firstly introduce a new config CONFIG_NO_AUTO_INLINE after two
+> fixes for this new option. With this option, only functions explicitly marked
+> with "inline" will  be inlined. This will allow the function tracer to trace
+> more functions because it only traces functions that the compiler has not
+> inlined.
+> 
+> Then introduce new config CONFIG_DEBUG_EXPERIENCE which apply '-Og'
+> optimization level for whole kernel, with a simple fix in fix_to_virt().
+> Currently this option is only tested on a QEMU gust and it works fine.
+> 
+> 
+> Comparison of vmlinux size: a bit smaller.
+> 
+>     w/o CONFIG_DEBUG_EXPERIENCE
+>     $ size vmlinux
+>        text    data     bss     dec     hex filename
+>     22665554   9709674  2920908 35296136        21a9388 vmlinux
+> 
+>     w/ CONFIG_DEBUG_EXPERIENCE
+>     $ size vmlinux
+>        text    data     bss     dec     hex filename
+>     21499032   10102758 2920908 34522698        20ec64a vmlinux
+> 
+> 
+> Comparison of system performance: a bit drop (~6%).
+>     This benchmark of kernel compilation is suggested by Ingo Molnar.
+>     https://lkml.org/lkml/2018/5/2/74
 
-2018-03-23 6:05 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
-> The current logic for deciding whether to parse a file listed in the
-> .o.cmd file matches neither "is in same dir" (implied by the comment
-> here), nor the "/* Sum all files in the same dir or subdirs. */" a
-> little higher up. For example, for an object file in the top-level
-> crypto/ directory, we end up also parsing anything it includes from
-> include/crypto/ (though not subdirectories of that) and
-> arch/x86/include/asm/crypto/. On the other hand, we never parse anything
-> included from subdirectories of the object file's directory, contrary to
-> at least one of the comments.
->
-> This tries to fix things so that we actually implement "parse stuff
-> found in $(dirname $objfile) and below" by simply checking whether line
-> begins with dir. It doesn't quite work, though, because there are some
->
-> #include "../blabla"
->
-> directives, e.g. in drivers/scsi/libsas/ we have #include
-> "../scsi_sas_internal.h", and gcc doesn't normalize the path before
-> printing it, so we have
->
-> drivers/scsi/libsas/../scsi_sas_internal.h
->
-> in the .o.cmd file. But perhaps that's actually a good thing - then the
-> logic would be something like "if gcc found the included file using . as
-> starting point, we include it - otherwise it was found via some -I path,
-> so do not include it".
->
-> In any case, this is mostly just something I stumbled on because I'm
-> about to change the .o.cmd layout slightly, so I'd like to know what the
-> rules are really supposed to be.
+In my mind was the opposite question. When running on the same kernel
+does a kernel whose config contains CONFIG_DEBUG_EXPERIENCE build faster
+than one without (due to the disabled optimization passes).
+
+To be honest this is more curiosity than a review comment though... if
+you have the figures please share, if not then don't sweat it on my
+account!
 
 
-I have no idea about this.
-
-Rusty Russell was CCed.  He may say something about this.
-
-(I attached the log of the initial commit of sumversion.c below)
-
-
-
-
-> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-> ---
-> Resending because I didn't reach any current kbuild maintainers nor
-> the kbuild mailing list.
-
-
-It is true this patch fixes the crypto/ case,
-but it breaks out-of-tree building.
-
-
->  scripts/mod/sumversion.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-> index 0f6dcb4011a8..e4f83fb9da2f 100644
-> --- a/scripts/mod/sumversion.c
-> +++ b/scripts/mod/sumversion.c
-> @@ -368,7 +368,7 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
->                 }
->
->                 /* Check if this file is in same dir as objfile */
-> -               if ((strstr(line, dir)+strlen(dir)-1) == strrchr(line, '/')) {
-> +               if (strncmp(line, dir, dirlen) == 0) {
->                         if (!parse_file(line, md)) {
->                                 warn("could not open %s: %s\n",
->                                      line, strerror(errno));
-> --
-
-If the kernel is built out-of-tree with O= option,
-"strncmp(line, dir, dirlen) == 0" is always false.
+Daniel.
 
 
 
-
-sumversion.c was added in pre-git era.
-
-The commit log is below:
-
-
-
-
-    [PATCH] Add a MODULE_VERSION macro
-
-    From: Rusty Russell <rusty@au1.ibm.com>
-
-    The way it works is that the .mod file contains the name of the module (as
-    before), but succeeding lines are the constituent parts (assumed to be .c
-    files, which usually works: if they use MODULE_VERSION in a file for which
-    this isn't true we'll get a warning).
-
-    As we postprocess modules, we look in the .modinfo section for a
-    "version=", which is placed by the MODULE_VERSION() macro.  This will be of
-    form "version=<macroarg>" "\0" [24 chars] "\0".  The 24 chars are replaced
-    by the md4 sum of the .c files and any files they #include using '#include
-    "file"' which are found in the current directory.  Whitespace is collapsed
-    outside strings, and comments are ignored for purposes of the sum.
-
-    The result is a .modinfo entry such as
-
-        version=1.16ac-rustytest B13E9451C4CA3B89577DEFF
-
-
-
-    At the kernel summit, various people asked for a MODULE_VERSION macro to
-    store module strings (for later access through sysfs).  A simple md4 is
-    needed to identify changes in modules which, inevitably, do not update the
-    version.  It skips whitespace and comments, and includes #includes which
-    are in the same dir.
-
-    The module versions should be set according to this definition, based on
-    the RPM one, or CVS Revision tags.  Violators will be shot.
-
-     [<epoch>`:']<version>[`-'<extraversion>]
-     <epoch>: A (small) unsigned integer which allows you to start versions
-              anew. If not mentioned, it's zero.  eg. "2:1.0" is after
-         "1:2.0".
-     <version>: The <version> may contain only alphanumerics.
-     <extraversion>: Like <version>, but inserted for local
-              customizations, eg "rh3" or "rusty1".
-
-    Comparison of two versions (assuming same epoch):
-
-    Split each into all-digit and all-alphabetical parts.  Compare each one one
-    at a time: digit parts numerically, alphabetical in ASCII order.  So 0.10
-    comes after 0.9.
-
-
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+> 
+>     Preparation: Set cpufreq to 'performance'.
+>     for ((cpu=0; cpu<120; cpu++)); do
+>       G=/sys/devices/system/cpu/cpu$cpu/cpufreq/scaling_governor
+>       [ -f $G ] && echo performance > $G
+>     done
+> 
+>     w/o CONFIG_DEBUG_EXPERIENCE
+>     $ perf stat --repeat 5 --null --pre                 '\
+>         cp -a kernel ../kernel.copy.$(date +%s);         \
+>         rm -rf *;                                        \
+>         git checkout .;                                  \
+>         echo 1 > /proc/sys/vm/drop_caches;               \
+>         find ../kernel* -type f | xargs cat >/dev/null;  \
+>         make -j kernel >/dev/null;                       \
+>         make clean >/dev/null 2>&1;                      \
+>         sync                                            '\
+>                                                          \
+>         make -j8 >/dev/null
+> 
+>      Performance counter stats for 'make -j8' (5 runs):
+> 
+>         219.764246652 seconds time elapsed                   ( +-  0.78% )
+> 
+>     w/ CONFIG_DEBUG_EXPERIENCE
+>     $ perf stat --repeat 5 --null --pre                 '\
+>         cp -a kernel ../kernel.copy.$(date +%s);         \
+>         rm -rf *;                                        \
+>         git checkout .;                                  \
+>         echo 1 > /proc/sys/vm/drop_caches;               \
+>         find ../kernel* -type f | xargs cat >/dev/null;  \
+>         make -j kernel >/dev/null;                       \
+>         make clean >/dev/null 2>&1;                      \
+>         sync                                            '\
+>                                                          \
+>         make -j8 >/dev/null
+> 
+>     Performance counter stats for 'make -j8' (5 runs):
+> 
+>          233.574187771 seconds time elapsed                  ( +-  0.19% )
+> 
+> Changbin Du (5):
+>   x86/mm: surround level4_kernel_pgt with #ifdef
+>     CONFIG_X86_5LEVEL...#endif
+>   regulator: add dummy function of_find_regulator_by_node
+>   kernel hacking: new config NO_AUTO_INLINE to disable compiler
+>     auto-inline optimizations
+>   kernel hacking: new config DEBUG_EXPERIENCE to apply GCC -Og
+>     optimization
+>   asm-generic: fix build error in fix_to_virt with
+>     CONFIG_DEBUG_EXPERIENCE
+> 
+>  Makefile                          | 10 ++++++++++
+>  arch/x86/include/asm/pgtable_64.h |  2 ++
+>  arch/x86/kernel/head64.c          | 13 ++++++-------
+>  drivers/regulator/internal.h      |  9 +++++++--
+>  include/asm-generic/fixmap.h      |  3 ++-
+>  include/linux/compiler-gcc.h      |  2 +-
+>  include/linux/compiler.h          |  2 +-
+>  lib/Kconfig.debug                 | 39 +++++++++++++++++++++++++++++++++++++++
+>  8 files changed, 68 insertions(+), 12 deletions(-)
+> 
+> -- 
+> 2.7.4
+> 
