@@ -1,87 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:62241 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750936AbeEBQfC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 May 2018 12:35:02 -0400
-Subject: Re: [PATCH] modpost: srcversion sometimes incorrect
-References: <1522430045-31685-1-git-send-email-juro.bystricky@intel.com>
- <CAK7LNAR3D4=7Z+T1odxG2FidWF0KM79MLiLNZNy8KqhcwLagDA@mail.gmail.com>
-From: Juro Bystricky <juro.bystricky@linux.intel.com>
-Message-ID: <8a87f4f7-6e1e-595f-d65e-9e3226d81362@linux.intel.com>
-Date: Wed, 2 May 2018 09:34:39 -0700
+Received: from bombadil.infradead.org ([198.137.202.133]:57398 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751111AbeEBT0e (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 2 May 2018 15:26:34 -0400
+Subject: Re: [PATCH v2 4/5] kernel hacking: new config DEBUG_EXPERIENCE to
+ apply GCC -Og optimization
+References: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
+ <1525268700-10631-5-git-send-email-changbin.du@intel.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <34ba017d-2e94-7411-a675-0e3e2a6b0682@infradead.org>
+Date: Wed, 2 May 2018 12:26:30 -0700
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAR3D4=7Z+T1odxG2FidWF0KM79MLiLNZNy8KqhcwLagDA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1525268700-10631-5-git-send-email-changbin.du@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Juro Bystricky <juro.bystricky@intel.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Richard Purdie <richard.purdie@linuxfoundation.org>, jurobystricky@hotmail.com
+To: changbin.du@intel.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org
+Cc: rostedt@goodmis.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
 
-On 2018-05-02 08:48 AM, Masahiro Yamada wrote:
-> 2018-03-31 2:14 GMT+09:00 Juro Bystricky <juro.bystricky@intel.com>:
->> "srcversion" field inserted into module modinfo section contains a
->> sum of the source files which made it. However, this field can
->> be incorrect. Building the same module can end up having inconsistent
->> srcversion field eventhough the sources remain the same.
->> This can be reproduced by building modules in a deeply nested directory,
->> but other factors contribute as well.
->>
->> The reason for incorrect srcversion is that some source files can be
->> simply silently skipped from the checksum calculation due to limited
->> buffer space for line parsing.
->>
->> This patch addresses two issues:
->>
->> 1. Allocates a larger line buffer (32k vs 4k).
->> 2. Issues a warning if a line length exceeds the line buffer.
->>
->> Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
->> ---
->>   scripts/mod/modpost.c | 8 ++++++--
->>   1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
->> index 9917f92..955f26e 100644
->> --- a/scripts/mod/modpost.c
->> +++ b/scripts/mod/modpost.c
->> @@ -385,9 +385,10 @@ void *grab_file(const char *filename, unsigned long *size)
->>     * spaces in the beginning of the line is trimmed away.
->>     * Return a pointer to a static buffer.
->>     **/
->> +#define MODPOST_MAX_LINE 32768
->>   char *get_next_line(unsigned long *pos, void *file, unsigned long size)
->>   {
->> -       static char line[4096];
->> +       static char line[MODPOST_MAX_LINE];
->>          int skip = 1;
->>          size_t len = 0;
->>          signed char *p = (signed char *)file + *pos;
->> @@ -402,8 +403,11 @@ char *get_next_line(unsigned long *pos, void *file, unsigned long size)
->>                  if (*p != '\n' && (*pos < size)) {
->>                          len++;
->>                          *s++ = *p++;
->> -                       if (len > 4095)
->> +                       if (len > (sizeof(line)-1)) {
->> +                               warn(" %s: line exceeds buffer size %zu bytes\n"
->> +                                    , __func__, sizeof(line));
->>                                  break; /* Too long, stop */
->> +                       }
->>                  } else {
->>                          /* End of string */
->>                          *s = '\0';
->> --
->> 2.7.4
-> The whole of the file content is mapped by grab_file().
->
-> I believe the right thing to do is,
-> to not increase the buffer size,
-> but to not use such a temporary buffer.
->
->
->
->
-Yes, it is the right thing,  but I think quite a bit more invasive. It 
-would require rewriting the parsing code.
+On 05/02/2018 06:44 AM, changbin.du@intel.com wrote:
+> From: Changbin Du <changbin.du@intel.com>
+> 
 
+Sorry, I missed one:
+
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index ab55801..e264199 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -216,6 +216,27 @@ config NO_AUTO_INLINE
+>  
+>  	  If unsure, select N.
+>  
+> +config DEBUG_EXPERIENCE
+> +	bool "Optimize for better debugging experience (-Og)"
+> +	default n
+> +	select NO_AUTO_INLINE
+> +	depends on !CC_OPTIMIZE_FOR_SIZE
+> +	help
+> +	  This will apply GCC '-Og' optimization level which is supported
+> +	  since GCC 4.8. This optimization level offers a reasonable level
+> +	  of optimization while maintaining fast compilation and a good
+> +	  debugging experience. It is similar to '-O1' while preferring to
+> +	  keep debug ability over runtime speed. The overall performance
+> +	  will drop a bit (~6%).
+> +
+> +	  Use only if you want to debug the kernel, especially if you want
+> +	  to have better kernel debugging experience with gdb facilities
+> +	  like kgdb or qemu. If enabling this option breaks your kernel,
+> +	  you should either disable this or find a fix (mostly in the arch
+> +	  code). Currently this option has only be tested on x86_64 platform.
+
+	                                        been tested
+
+> +
+> +	  If unsure, select N.
+> +
+>  config ENABLE_WARN_DEPRECATED
+>  	bool "Enable __deprecated logic"
+>  	default y
+> 
+
+
+-- 
+~Randy
