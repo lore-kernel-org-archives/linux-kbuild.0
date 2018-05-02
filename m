@@ -1,56 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:41265 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751063AbeEBLap (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34144 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750898AbeEBMYp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 May 2018 07:30:45 -0400
-Received: by mail-lf0-f67.google.com with SMTP id o123-v6so20299186lfe.8
-        for <linux-kbuild@vger.kernel.org>; Wed, 02 May 2018 04:30:45 -0700 (PDT)
+        Wed, 2 May 2018 08:24:45 -0400
+Date: Wed, 2 May 2018 22:24:30 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 4/4] powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be
+ selected
+Message-ID: <20180502222430.2a1cced4@roar.ozlabs.ibm.com>
+In-Reply-To: <CA+7wUsy1KaWc0LJNXieNTtQcfoQyg-kFp10nGoTzVe7CdXYOyg@mail.gmail.com>
+References: <20180420073414.23169-1-npiggin@gmail.com>
+        <20180420073414.23169-5-npiggin@gmail.com>
+        <CA+7wUswuyn+YgNe732rQAzVmgDBohTMEqwsd76nQ_CH5h7Y5WA@mail.gmail.com>
+        <20180420204104.6e22b136@roar.ozlabs.ibm.com>
+        <CA+7wUsyWu3eweWjwfFoS5FD5yb3OxjLV4-XyErcNA4fJGPCf8Q@mail.gmail.com>
+        <20180421124838.5facd0f7@roar.ozlabs.ibm.com>
+        <CA+7wUsy1KaWc0LJNXieNTtQcfoQyg-kFp10nGoTzVe7CdXYOyg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180423195055.26069-1-malat@debian.org>
-References: <20180423195055.26069-1-malat@debian.org>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Wed, 2 May 2018 14:30:43 +0300
-Message-ID: <CAAqcGHn+3HMC_tVsOsLB1Vycdv7SYZ=1SYc0Cg3Gx-Xe=sExMg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild/debian: Use KBUILD_BUILD_* when set
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Mathieu Malaterre <malat@debian.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-arch@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>, linux-kbuild@vger.kernel.org
 
-On 23 April 2018 at 22:50, Mathieu Malaterre <malat@debian.org> wrote:
-> Be nice to the user and check env vars KBUILD_BUILD_USER &
-> KBUILD_BUILD_HOST when those are set.
+On Wed, 2 May 2018 11:17:52 +0200
+Mathieu Malaterre <malat@debian.org> wrote:
 
-mkdebian sets the maintainer address as "$name <$email>", but this
-patch only sets the email part. I also wonder about the precedence, I
-think KBUILD_* should be considered over the generic Debian variables.
+> Nick,
+> 
+> On Sat, Apr 21, 2018 at 4:48 AM, Nicholas Piggin <npiggin@gmail.com> wrote:
+> > On Fri, 20 Apr 2018 22:08:27 +0200
+> > Mathieu Malaterre <malat@debian.org> wrote:
+> >  
+> >> On Fri, Apr 20, 2018 at 12:41 PM, Nicholas Piggin <npiggin@gmail.com> wrote:  
+> >> > On Fri, 20 Apr 2018 12:00:49 +0200
+> >> > Mathieu Malaterre <malat@debian.org> wrote:
+> >> >  
+> >> >> On Fri, Apr 20, 2018 at 9:34 AM, Nicholas Piggin <npiggin@gmail.com> wrote:  
+> >> >> > This requires further changes to linker script to KEEP some tables
+> >> >> > and wildcard compiler generated sections into the right place. This
+> >> >> > includes pp32 modifications from Christophe Leroy.
+> >> >> >
+> >> >> > When compiling powernv_defconfig with this option:
+> >> >> >
+> >> >> > text       data      bss       dec        filename
+> >> >> > 11827621   4810490   1341080   17979191   vmlinux
+> >> >> > 11752437   4598858   1338776   17690071   vmlinux.dcde
+> >> >> >
+> >> >> > Resulting kernel is almost 400kB smaller (and still boots).
+> >> >> >
+> >> >> > [ppc32 numbers here]  
+> >> >>
+> >> >> ^^^
+> >> >>
+> >> >> Do you want somebody else to provide those numbers ?  
+> >> >
+> >> > If you have a booting kernel, yes some more numbers would be good.  
+> >>
+> >> I've used /boot/config-4.15.0-2-powerpc from my current debian
+> >> package. Rebuild master with and without option, boot ok, load/unload
+> >> module ok.
+> >>
+> >> $ size nick/vmlinux.with*
+> >>    text    data     bss     dec     hex filename
+> >> 7386425 2364370 1425432 11176227 aa8923 nick/vmlinux.with
+> >> 7461457 2475122 1428064 11364643 ad6923 nick/vmlinux.without
+> >>
+> >> This is not clear why with option the size of kernel is slightly bigger:
+> >>
+> >> $ du -sk nick/vmlinux.with*
+> >> 124488 nick/vmlinux.with
+> >> 124004 nick/vmlinux.without  
+> >
+> > Not sure. readelf -S vmlinux may show something.
+> >
+> > To really get lots of detail, you can add to the top level Makefile:
+> >
+> > LDFLAGS_vmlinux += -M  
+> 
+> Here is what I did:
+> 
+> $ git diff
+> diff --git a/Makefile b/Makefile
+> index 619a85ad716b..1a2e3d142a59 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -4,6 +4,7 @@ PATCHLEVEL = 17
+>  SUBLEVEL = 0
+>  EXTRAVERSION = -rc3
+>  NAME = Fearless Coyote
+> +LDFLAGS_vmlinux += -M
 
-Riku
+That'll get overwritten further down. Put it down with another line
+that starts with LDFLAGS_vmlinux +=
 
-> Signed-off-by: Mathieu Malaterre <malat@debian.org>
-> ---
->  scripts/package/mkdebian | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-> index 6adb3a16ba3b..05d58d3ae8a0 100755
-> --- a/scripts/package/mkdebian
-> +++ b/scripts/package/mkdebian
-> @@ -76,6 +76,8 @@ if [ -n "$DEBEMAIL" ]; then
->         email=$DEBEMAIL
->  elif [ -n "$EMAIL" ]; then
->         email=$EMAIL
-> +elif [ -n "$KBUILD_BUILD_USER" ] && [ -n "$KBUILD_BUILD_HOST" ]; then
-> +       email=$KBUILD_BUILD_USER@$KBUILD_BUILD_HOST
->  else
->         email=$(id -nu)@$(hostname -f 2>/dev/null || hostname)
->  fi
-> --
-> 2.11.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Thanks,
+Nick
