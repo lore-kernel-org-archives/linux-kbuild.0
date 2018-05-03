@@ -1,67 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:42868 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751160AbeECQjS (ORCPT
+Received: from mail-oi0-f67.google.com ([209.85.218.67]:42893 "EHLO
+        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750954AbeECRF3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 3 May 2018 12:39:18 -0400
-Subject: Re: [PATCH v2 5/5] asm-generic: fix build error in fix_to_virt with
- CONFIG_DEBUG_EXPERIENCE
-References: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
- <1525268700-10631-6-git-send-email-changbin.du@intel.com>
- <20180502101930.25a5437d@gandalf.local.home>
- <20180503132508.qudxf67tyijvjndo@intel.com>
- <20180503101920.3157f63f@gandalf.local.home>
-From: weylin <weylin.machine@gmail.com>
-Message-ID: <cfdd795e-e724-c6c7-cd47-1fea0fd9fa6b@gmail.com>
-Date: Thu, 3 May 2018 16:39:09 +0000
+        Thu, 3 May 2018 13:05:29 -0400
+Received: by mail-oi0-f67.google.com with SMTP id t27-v6so16729296oij.9
+        for <linux-kbuild@vger.kernel.org>; Thu, 03 May 2018 10:05:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180503101920.3157f63f@gandalf.local.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <20180503114627.30183-1-riku.voipio@linaro.org>
+References: <20180503114627.30183-1-riku.voipio@linaro.org>
+From: Mathieu Malaterre <malat@debian.org>
+Date: Thu, 3 May 2018 19:05:08 +0200
+Message-ID: <CA+7wUsy5GNTPn2EdsH4NX9xKihLrS-p_kbxXXjJ3ToPCR6sEpQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: deb-pkg improve maintainer address generation
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>, "Du, Changbin" <changbin.du@intel.com>
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, debian-kernel@lists.debian.org
 
-Dear kernel devs,
+Hi,
 
-After configuring for 2 hours settings, faced below on making :
-
-cc1: error: 
-/usr/src/linux-next-master/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S: 
-Input/output error
-
-Thank you for your attantion to config matter last days, It is really 
-physically  hard every time sort sort out menu again. If it would 
-ppossible to have standard -- Conservative Unix style secure / paranoid 
-choice alongwith -- allyesconfig .
-
-
-Thank you !
-
-
-On 05/03/2018 02:19 PM, Steven Rostedt wrote:
-> On Thu, 3 May 2018 21:25:08 +0800
-> "Du, Changbin" <changbin.du@intel.com> wrote:
+On Thu, May 3, 2018 at 1:46 PM,  <riku.voipio@linaro.org> wrote:
+> From: Riku Voipio <riku.voipio@linaro.org>
 >
->> I think fix_to_virt() is designed for constant idx only. So I think we should
->> fix it at the caller side by replacing it with __fix_to_virt().
->>
->> --- a/arch/arm/mm/mmu.c
->> +++ b/arch/arm/mm/mmu.c
->> @@ -1599,7 +1599,7 @@ static void __init early_fixmap_shutdown(void)
->>                  pte_t *pte;
->>                  struct map_desc map;
->>
->> -               map.virtual = fix_to_virt(i);
->> +               map.virtual = __fix_to_virt(i);
->>                  pte = pte_offset_early_fixmap(pmd_off_k(map.virtual), map.virtual);
-> That's a better solution than the current patch.
+> There is multiple issues with the genaration of maintainer string
 >
-> -- Steve
+> It uses DEBEMAIL and EMAIL enviroment variables, which may contain angle brackets,
+> creating invalid maintainer strings. The documented KBUILD_BUILD_USER and
+> KBUILD_BUILD_HOST variables are not used. Undocumented and uncommon NAME
+> variable is used. Refactor the Maintainer string to:
+>
+> - use EMAIL or DEBEMAIL directly if they are in form "name <user@host>"
+> - use KBUILD_BUILD_USER and KBUILD_BUILD_HOST if set before falling
+>   back to autodetection
+> - no longer use NAME variable or the useless Anonymous string
+>
+> The logic is switched from multiline if/then/fi statements to compact
+> shell variable substition commands.
+
+Much more elegant indeed.
+
+Acked-by: Mathieu Malaterre <malat@debian.org>
+
+> Reported-by: Mathieu Malaterre <malat@debian.org>
+> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+> ---
+>  scripts/package/mkdebian | 29 +++++++++++++++--------------
+>  1 file changed, 15 insertions(+), 14 deletions(-)
+>
+> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+> index 6adb3a16ba3b..a70f20eb877a 100755
+> --- a/scripts/package/mkdebian
+> +++ b/scripts/package/mkdebian
+> @@ -71,22 +71,23 @@ if [ "$ARCH" = "um" ] ; then
+>         packagename=user-mode-linux-$version
+>  fi
+>
+> -# Try to determine maintainer and email values
+> -if [ -n "$DEBEMAIL" ]; then
+> -       email=$DEBEMAIL
+> -elif [ -n "$EMAIL" ]; then
+> -       email=$EMAIL
+> -else
+> -       email=$(id -nu)@$(hostname -f 2>/dev/null || hostname)
+> -fi
+> -if [ -n "$DEBFULLNAME" ]; then
+> -       name=$DEBFULLNAME
+> -elif [ -n "$NAME" ]; then
+> -       name=$NAME
+> +email=${DEBEMAIL-$EMAIL}
+> +
+> +# use email string directly if it contains <email>
+> +if echo $email|grep -q '<.*>';
+> +then
+> +       maintainer=$email
+>  else
+> -       name="Anonymous"
+> +       # or construct the maintainer string
+> +       user=${KBUILD_BUILD_USER-$(id -nu)}
+> +       name=${DEBFULLNAME-$user}
+> +       if [ -n "$email" ]; then
+> +               maintainer="$name <$email>"
+> +       else
+> +               buildhost=${KBUILD_BUILD_HOST-$(hostname -f 2>/dev/null || hostname)}
+> +               maintainer="$name <$user@$buildhost>"
+> +       fi
+>  fi
+> -maintainer="$name <$email>"
+>
+>  # Try to determine distribution
+>  if [ -n "$KDEB_CHANGELOG_DIST" ]; then
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+> 2.14.2
+>
