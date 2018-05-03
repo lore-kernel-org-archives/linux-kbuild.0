@@ -1,42 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:43146 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751261AbeEBUqA (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 May 2018 16:46:00 -0400
-Date: Wed, 2 May 2018 13:45:58 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
+Received: from mail.kernel.org ([198.145.29.99]:43444 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751745AbeECBT7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 2 May 2018 21:19:59 -0400
+Date: Wed, 2 May 2018 21:19:56 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
 Subject: Re: [PATCH v2 4/5] kernel hacking: new config DEBUG_EXPERIENCE to
  apply GCC -Og optimization
-Message-Id: <20180502134558.1f388e097dcde6f589635404@linux-foundation.org>
-In-Reply-To: <20180502101707.206984e9@gandalf.local.home>
+Message-ID: <20180502211956.6c9e8d7b@vmware.local.home>
+In-Reply-To: <20180502134558.1f388e097dcde6f589635404@linux-foundation.org>
 References: <1525268700-10631-1-git-send-email-changbin.du@intel.com>
         <1525268700-10631-5-git-send-email-changbin.du@intel.com>
         <20180502101707.206984e9@gandalf.local.home>
-Mime-Version: 1.0
+        <20180502134558.1f388e097dcde6f589635404@linux-foundation.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
+To: Andrew Morton <akpm@linux-foundation.org>
 Cc: changbin.du@intel.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
 
-On Wed, 2 May 2018 10:17:07 -0400 Steven Rostedt <rostedt@goodmis.org> wrote:
+On Wed, 2 May 2018 13:45:58 -0700
+Andrew Morton <akpm@linux-foundation.org> wrote:
 
-> > Comparison of vmlinux size: a bit smaller.
+> On Wed, 2 May 2018 10:17:07 -0400 Steven Rostedt <rostedt@goodmis.org> wrote:
+> 
+> > > Comparison of vmlinux size: a bit smaller.
+> > > 
+> > >     w/o CONFIG_DEBUG_EXPERIENCE  
 > > 
-> >     w/o CONFIG_DEBUG_EXPERIENCE
+> > I hate the config name.
+> > 
+> > I probably can't come up with better ones but let's try:
+> > 
+> >  CONFIG_DEBUG_OPTIMIZE ?
+> >  CONFIG_OPTIMIZE_DEBUG ?
+> > 
+> > But "EXPERIENCE" sounds like I'm on some DEBUG LSD.  
 > 
-> I hate the config name.
-> 
-> I probably can't come up with better ones but let's try:
-> 
->  CONFIG_DEBUG_OPTIMIZE ?
->  CONFIG_OPTIMIZE_DEBUG ?
-> 
-> But "EXPERIENCE" sounds like I'm on some DEBUG LSD.
+> Metoo, but the gcc people decided on "-Og: Optimize debugging
+> experience ..." and I think there are benefits if the kernel is to
+> align the naming with that.
 
-Metoo, but the gcc people decided on "-Og: Optimize debugging
-experience ..." and I think there are benefits if the kernel is to
-align the naming with that.
+I still see that as "Optimize debugging" and "experience" is just the
+platform of what was done.
 
+With that gcc comment, I still think CONFIG_OPTIMIZE_DEBUG is more
+inline with what it is and understandable than
+CONFIG_DEBUG_EXPERIENCE. The "OPTIMIZE" is the key word there.
+
+-- Steve
