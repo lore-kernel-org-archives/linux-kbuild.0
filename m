@@ -1,154 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot0-f180.google.com ([74.125.82.180]:46347 "EHLO
-        mail-ot0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751929AbeECCrZ (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:35459 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751050AbeECJvJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 May 2018 22:47:25 -0400
+        Thu, 3 May 2018 05:51:09 -0400
+Received: by mail-lf0-f68.google.com with SMTP id y72-v6so11301935lfd.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 03 May 2018 02:51:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ac506aa3-e5f6-9bfa-a18b-441e04b21d97@infradead.org>
-References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
- <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org> <25f6b309-9346-7e28-beeb-a37e69a91ce8@infradead.org>
- <ac506aa3-e5f6-9bfa-a18b-441e04b21d97@infradead.org>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Thu, 3 May 2018 04:47:24 +0200
-Message-ID: <CAFkk2KTE+h+UY83vvbFDgG9zcyNy4jZYg+-O3p1yOBmLH-K9Xw@mail.gmail.com>
-Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
+In-Reply-To: <20180502200137.6870-1-malat@debian.org>
+References: <20180423195055.26069-1-malat@debian.org> <20180502200137.6870-1-malat@debian.org>
+From: Riku Voipio <riku.voipio@linaro.org>
+Date: Thu, 3 May 2018 12:51:07 +0300
+Message-ID: <CAAqcGHnLLb1URXUj4U7+C6HRzGNbQbFdHJaxi6hxwH-Nt85Mvw@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild/debian: Use KBUILD_BUILD_* when set
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Mathieu Malaterre <malat@debian.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Tue, May 1, 2018 at 8:52 PM, Randy Dunlap <rdunlap@infradead.org> wrote:
-> On 05/01/2018 11:13 AM, Randy Dunlap wrote:
->> On 05/01/2018 10:56 AM, Randy Dunlap wrote:
->>> On 04/30/2018 05:57 PM, Ulf Magnusson wrote:
->>>> Hello,
->>>>
->>>> Kconfiglib (https://github.com/ulfalizer/Kconfiglib) now has a
->>>> terminal menuconfig implementation, implemented in plain curses
->>>> (which is in the Python standard library).
->>>>
->>>> The interface should feel familiar to people used to mconf. It has
->>>> some features that mconf lacks:
->>>>
->>>>   - Seamless resizing
->>>>
->>>>   - Unicode support
->>>>
->>>>   - Runs on Windows (via 'pip install windows-curses', which uses
->>>>     PDCurses)
->>>>
->>>>   - Improved information displays:
->>>>
->>>>     * All expressions are split into readable chunks
->>>>
->>>>     * Menus and comments have information displays
->>>>
->>>>   - Relatively easy-to-read and easy-to-tweak code.
->>>>
->>>>     Kconfiglib automatically invalidates symbols as needed, and
->>>>     values can never get stale, which helps.
->>>>
->>>> Some upcoming features are mouse support and a search feature that
->>>> can jump directly to the definition of a symbol. The jump-to feature
->>>> will use a "show-all" mode in case the symbol isn't visible.
->>>>
->>>> See the Kconfiglib GitHub page for screenshots. The menuconfig
->>>> implementation is at
->>>> https://github.com/ulfalizer/Kconfiglib/blob/master/menuconfig.py.
->>>> The docstring at the top has some more information.
->>>
->>> Hi,
->>>
->>> I'm probably missing some python additive (I hope it's that easy), but
->>> menuconfig.py is not liking the "degree" symbol in drivers/net/can/peak=
-_canfd/Kconfig:
->>>
->>> config CAN_PEAK_PCIEFD
->>>      depends on PCI
->>>      tristate "PEAK-System PCAN-PCIe FD cards"
->>>      ---help---
->>>        This driver adds support for the PEAK-System PCI Express FD
->>>        CAN-FD cards family.
->>>        These 1x or 2x CAN-FD channels cards offer CAN 2.0 a/b as well a=
-s
->>>        CAN-FD access to the CAN bus. Besides the nominal bitrate of up =
-to
->>>        1 Mbit/s, the data bytes of CAN-FD frames can be transmitted wit=
-h
->>>        up to 12 Mbit/s. A galvanic isolation of the CAN ports protects =
-the
->>>        electronics of the card and the respective computer against
->>>        disturbances of up to 500 Volts. The PCAN-PCI Express FD can be
->>>        operated with ambient temperatures in a range of -40 to +85 =C2=
-=B0C.
->>>
->>>
->>> kconfiglib.KconfigSyntaxError:
->>> Malformed ascii in drivers/net/can/peak_canfd/Kconfig
->>> Context: b't temperatures in a range of -40 to +85 \xc2\xb0C.\n'
->>> Problematic data: b'\xc2'
->>> Reason: ordinal not in range(128)
->>
->> BTW, after modifying 4 other instances of this "error," I have it runnin=
-g.
->> Now looking/testing. :)
+On 2 May 2018 at 23:01, Mathieu Malaterre <malat@debian.org> wrote:
+> Be nice to the user and check env vars KBUILD_BUILD_USER &
+> KBUILD_BUILD_HOST when those are set.
 >
-> Hi Ulf,
+> Since DEBEMAIL accept a syntax where the full name is present, be extra
+> nice to user and extract email address only.
+> Cc: Riku Voipio <riku.voipio@linaro.org>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Mathieu Malaterre <malat@debian.org>
+> ---
+> v2: update patch since syntax of DEBEMAIL may contain full name
 >
-> Here are a few comments for you FWIW.
+>  scripts/package/mkdebian | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 >
-> menuconfig.py uses the terminal window space better than menuconfig:
-> fewer margins, less Help text so more usable lines.
+> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+> index 6adb3a16ba3b..3f4e43446db3 100755
+> --- a/scripts/package/mkdebian
+> +++ b/scripts/package/mkdebian
+> @@ -73,9 +73,19 @@ fi
 >
-> ESC/q is nicer than in ESC+ESC in menuconfig.
->
-> What is the lower colored line for? I don't see it being used.
+>  # Try to determine maintainer and email values
+>  if [ -n "$DEBEMAIL" ]; then
+> -       email=$DEBEMAIL
+> +       case "$DEBEMAIL" in
+> +         *\ * )
+> +           email=$(echo $DEBEMAIL | cut -d '<' -f2 | cut -d '>' -f1)
 
-It might show "Show-all mode enabled" now too. ;)
+Why go through all the trouble of deconstructing the string and then
+reassemble it a few lines down in the script?
 
->
-> On Quit, don't need to prompt for Save when the file is already saved
-> or has not been modified.
+I'll submit an alternative way to handle the Maintainer address setting.
 
-Fixed.
-
->
-> When menuconfig displays the Kconfig menu tree and it is over term-width
-> characters, it truncates on the left so that the user can see all of
-> the current menu name. menuconfig.py truncates on the right so that
-> the current menu name may be partially lost or totally lost.
-
-Fixed. The menu path now scrolls to the right as needed. Maybe "..."
-could be displayed as well, though I'm not sure if it's helpful in
-practice.
-
->
-> To enable=3Dy a tristate symbol, cannot enter Y, must do Space Space to c=
-ycle
-> from N to M to Y.
-
-Fixed.
-
->
-> No / symbol search. I use that a lot, but I don't claim to be a
-> typical user.
-
-Coming soon. I have added a "show-all" mode in preparation for it, as
-you might want to jump to invisible symbols.
-
-Screenshot: https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screensh=
-ots/screenshots/ss9.png
-
->
->
-> Thanks.
+> +           echo >&2 "Extracting email from DEBEMAIL. Use DEBFULLNAME instead."
+> +           ;;
+> +         *)
+> +           email=$DEBEMAIL
+> +           ;;
+> +       esac
+>  elif [ -n "$EMAIL" ]; then
+>         email=$EMAIL
+> +elif [ -n "$KBUILD_BUILD_USER" ] && [ -n "$KBUILD_BUILD_HOST" ]; then
+> +       email=$KBUILD_BUILD_USER@$KBUILD_BUILD_HOST
+>  else
+>         email=$(id -nu)@$(hostname -f 2>/dev/null || hostname)
+>  fi
 > --
-> ~Randy
-
-Thanks for the feedback! Tell me if you spot anything else.
-
-Cheers,
-Ulf
+> 2.11.0
+>
