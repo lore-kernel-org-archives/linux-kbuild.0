@@ -1,70 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:35459 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751050AbeECJvJ (ORCPT
+Received: from mail-lf0-f51.google.com ([209.85.215.51]:42058 "EHLO
+        mail-lf0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751004AbeECLrS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 3 May 2018 05:51:09 -0400
-Received: by mail-lf0-f68.google.com with SMTP id y72-v6so11301935lfd.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 03 May 2018 02:51:08 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180502200137.6870-1-malat@debian.org>
-References: <20180423195055.26069-1-malat@debian.org> <20180502200137.6870-1-malat@debian.org>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Thu, 3 May 2018 12:51:07 +0300
-Message-ID: <CAAqcGHnLLb1URXUj4U7+C6HRzGNbQbFdHJaxi6hxwH-Nt85Mvw@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild/debian: Use KBUILD_BUILD_* when set
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 3 May 2018 07:47:18 -0400
+Received: by mail-lf0-f51.google.com with SMTP id u21-v6so25500489lfu.9
+        for <linux-kbuild@vger.kernel.org>; Thu, 03 May 2018 04:47:17 -0700 (PDT)
+From: riku.voipio@linaro.org
+Subject: [PATCH] kbuild: deb-pkg improve maintainer address generation
+Date: Thu,  3 May 2018 14:46:27 +0300
+Message-Id: <20180503114627.30183-1-riku.voipio@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mathieu Malaterre <malat@debian.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: debian-kernel@lists.debian.org, malat@debian.org, Riku Voipio <riku.voipio@linaro.org>
 
-On 2 May 2018 at 23:01, Mathieu Malaterre <malat@debian.org> wrote:
-> Be nice to the user and check env vars KBUILD_BUILD_USER &
-> KBUILD_BUILD_HOST when those are set.
->
-> Since DEBEMAIL accept a syntax where the full name is present, be extra
-> nice to user and extract email address only.
-> Cc: Riku Voipio <riku.voipio@linaro.org>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Mathieu Malaterre <malat@debian.org>
-> ---
-> v2: update patch since syntax of DEBEMAIL may contain full name
->
->  scripts/package/mkdebian | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-> index 6adb3a16ba3b..3f4e43446db3 100755
-> --- a/scripts/package/mkdebian
-> +++ b/scripts/package/mkdebian
-> @@ -73,9 +73,19 @@ fi
->
->  # Try to determine maintainer and email values
->  if [ -n "$DEBEMAIL" ]; then
-> -       email=$DEBEMAIL
-> +       case "$DEBEMAIL" in
-> +         *\ * )
-> +           email=$(echo $DEBEMAIL | cut -d '<' -f2 | cut -d '>' -f1)
+From: Riku Voipio <riku.voipio@linaro.org>
 
-Why go through all the trouble of deconstructing the string and then
-reassemble it a few lines down in the script?
+There is multiple issues with the genaration of maintainer string
 
-I'll submit an alternative way to handle the Maintainer address setting.
+It uses DEBEMAIL and EMAIL enviroment variables, which may contain angle brackets,
+creating invalid maintainer strings. The documented KBUILD_BUILD_USER and
+KBUILD_BUILD_HOST variables are not used. Undocumented and uncommon NAME
+variable is used. Refactor the Maintainer string to:
 
-> +           echo >&2 "Extracting email from DEBEMAIL. Use DEBFULLNAME instead."
-> +           ;;
-> +         *)
-> +           email=$DEBEMAIL
-> +           ;;
-> +       esac
->  elif [ -n "$EMAIL" ]; then
->         email=$EMAIL
-> +elif [ -n "$KBUILD_BUILD_USER" ] && [ -n "$KBUILD_BUILD_HOST" ]; then
-> +       email=$KBUILD_BUILD_USER@$KBUILD_BUILD_HOST
->  else
->         email=$(id -nu)@$(hostname -f 2>/dev/null || hostname)
->  fi
-> --
-> 2.11.0
->
+- use EMAIL or DEBEMAIL directly if they are in form "name <user@host>"
+- use KBUILD_BUILD_USER and KBUILD_BUILD_HOST if set before falling
+  back to autodetection
+- no longer use NAME variable or the useless Anonymous string
+
+The logic is switched from multiline if/then/fi statements to compact
+shell variable substition commands.
+
+Reported-by: Mathieu Malaterre <malat@debian.org>
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+---
+ scripts/package/mkdebian | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
+
+diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+index 6adb3a16ba3b..a70f20eb877a 100755
+--- a/scripts/package/mkdebian
++++ b/scripts/package/mkdebian
+@@ -71,22 +71,23 @@ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+ fi
+ 
+-# Try to determine maintainer and email values
+-if [ -n "$DEBEMAIL" ]; then
+-       email=$DEBEMAIL
+-elif [ -n "$EMAIL" ]; then
+-       email=$EMAIL
+-else
+-       email=$(id -nu)@$(hostname -f 2>/dev/null || hostname)
+-fi
+-if [ -n "$DEBFULLNAME" ]; then
+-       name=$DEBFULLNAME
+-elif [ -n "$NAME" ]; then
+-       name=$NAME
++email=${DEBEMAIL-$EMAIL}
++
++# use email string directly if it contains <email>
++if echo $email|grep -q '<.*>';
++then
++	maintainer=$email
+ else
+-       name="Anonymous"
++	# or construct the maintainer string
++	user=${KBUILD_BUILD_USER-$(id -nu)}
++	name=${DEBFULLNAME-$user}
++	if [ -n "$email" ]; then
++		maintainer="$name <$email>"
++	else
++		buildhost=${KBUILD_BUILD_HOST-$(hostname -f 2>/dev/null || hostname)}
++		maintainer="$name <$user@$buildhost>"
++	fi
+ fi
+-maintainer="$name <$email>"
+ 
+ # Try to determine distribution
+ if [ -n "$KDEB_CHANGELOG_DIST" ]; then
+-- 
+2.14.2
+
