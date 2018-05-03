@@ -1,65 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:57992 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751186AbeECUbQ (ORCPT
+Received: from mail-oi0-f65.google.com ([209.85.218.65]:41123 "EHLO
+        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751133AbeECV0X (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 3 May 2018 16:31:16 -0400
-Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
-References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
- <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
- <25f6b309-9346-7e28-beeb-a37e69a91ce8@infradead.org>
- <ac506aa3-e5f6-9bfa-a18b-441e04b21d97@infradead.org>
- <CAFkk2KTE+h+UY83vvbFDgG9zcyNy4jZYg+-O3p1yOBmLH-K9Xw@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <5768c009-d659-c5d7-ae63-ea041362762d@infradead.org>
-Date: Thu, 3 May 2018 13:31:14 -0700
+        Thu, 3 May 2018 17:26:23 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KTE+h+UY83vvbFDgG9zcyNy4jZYg+-O3p1yOBmLH-K9Xw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <5768c009-d659-c5d7-ae63-ea041362762d@infradead.org>
+References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
+ <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org> <25f6b309-9346-7e28-beeb-a37e69a91ce8@infradead.org>
+ <ac506aa3-e5f6-9bfa-a18b-441e04b21d97@infradead.org> <CAFkk2KTE+h+UY83vvbFDgG9zcyNy4jZYg+-O3p1yOBmLH-K9Xw@mail.gmail.com>
+ <5768c009-d659-c5d7-ae63-ea041362762d@infradead.org>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Thu, 3 May 2018 23:26:22 +0200
+Message-ID: <CAFkk2KQXiWXjLjO_uOOLCDMW5-RJKT7NZ_-AT=Xm+kj5qDr4oQ@mail.gmail.com>
+Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
+To: Randy Dunlap <rdunlap@infradead.org>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 05/02/2018 07:47 PM, Ulf Magnusson wrote:
-> On Tue, May 1, 2018 at 8:52 PM, Randy Dunlap <rdunlap@infradead.org> wrote:
->> On 05/01/2018 11:13 AM, Randy Dunlap wrote:
->>
->> Hi Ulf,
->>
->> When menuconfig displays the Kconfig menu tree and it is over term-width
->> characters, it truncates on the left so that the user can see all of
->> the current menu name. menuconfig.py truncates on the right so that
->> the current menu name may be partially lost or totally lost.
-> 
-> Fixed. The menu path now scrolls to the right as needed. Maybe "..."
-> could be displayed as well, though I'm not sure if it's helpful in
-> practice.
+On Thu, May 3, 2018 at 10:31 PM, Randy Dunlap <rdunlap@infradead.org> wrote:
+> One minor nit (bikeshed?):  I'm not crazy about "make scriptconfig".  :)
+>
+> thanks,
+> --
+> ~Randy
 
-Not needed.
+To be honest, I just do
 
->>
->> To enable=y a tristate symbol, cannot enter Y, must do Space Space to cycle
->> from N to M to Y.
-> 
-> Fixed.
-> 
->>
->> No / symbol search. I use that a lot, but I don't claim to be a
->> typical user.
-> 
-> Coming soon. I have added a "show-all" mode in preparation for it, as
-> you might want to jump to invisible symbols.
+    ARCH=x86 SRCARCH=x86 KERNELVERSION=`make kernelversion` \
+        Kconfiglib/menuconfig.py
 
-Sounds good.
+Should probably add a target to the makefile patch. Need to pick up
+environment variables somehow.
 
-> Screenshot: https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss9.png
-
-
-One minor nit (bikeshed?):  I'm not crazy about "make scriptconfig".  :)
-
-thanks,
--- 
-~Randy
+Cheers,
+Ulf
