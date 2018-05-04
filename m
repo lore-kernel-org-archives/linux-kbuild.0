@@ -1,64 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:41690 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750829AbeEDAFt (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:34925 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751262AbeEDOWk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 3 May 2018 20:05:49 -0400
-Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
-References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
- <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
- <CAFkk2KRozscmd4kQSJKwKmY3WpTody7S5XZZObf8SKLF62k6+w@mail.gmail.com>
- <CAFkk2KRkEt3+786QvyjzPPAm+3HDe2+ydzZJpshfdKyUDQVfuw@mail.gmail.com>
- <CAFkk2KRvSxu+x-nb045=3L63KEk5h9URr5QYLPoYp6rqqTR4qA@mail.gmail.com>
- <3d9be2f2-3fbe-411b-8529-0e0847f01346@infradead.org>
- <CAFkk2KTPiNCWNLncz2KZB66W68YS2H348=bQsgsdqKT1fLRjMw@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <2e646e4d-4d3d-a81e-83e3-59875b425ea8@infradead.org>
-Date: Thu, 3 May 2018 17:05:46 -0700
+        Fri, 4 May 2018 10:22:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KTPiNCWNLncz2KZB66W68YS2H348=bQsgsdqKT1fLRjMw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1523595999-27433-2-git-send-email-yamada.masahiro@socionext.com>
+References: <1523595999-27433-1-git-send-email-yamada.masahiro@socionext.com> <1523595999-27433-2-git-send-email-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 4 May 2018 23:21:51 +0900
+Message-ID: <CAK7LNATV==PWHd2M63X+SMchRoTqtbnnSFSZM1bQnjCRfRrRKg@mail.gmail.com>
+Subject: Re: [PATCH 01/30] gcc-plugins: fix build condition of SANCOV plugin
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Nicholas Piggin <npiggin@gmail.com>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 05/03/2018 03:48 PM, Ulf Magnusson wrote:
-> On Thu, May 3, 2018 at 10:28 PM, Randy Dunlap <rdunlap@infradead.org> wrote:
->> Hi,
->>
->> (with new kconfiglib.py and menuconfig.py)
->>
->> Thanks for the fixes.
->>
->> If I use "LC_CTYPE=C.UTF-8" then I get the down arrows in the bottom colored
->> bar.  Without that, I get an upside-down T (that is 193, 0xc1, line drawing
->> character in the IBM extended character set).
->>
->> Hm. With LC_CTYPE=C.UTF-8, the upper colored bar prints up arrows.
->> Without that, it prints ^^^^^^^^^^^^^^.
->> That's nice that it can do either.
-> 
-> The arrows use ACS_U/DARROW from the alternate character set. You get
-> nice Unicode arrows for those with ncurses/PDCurses, plus "fallbacks"
-> (strictly speaking the Unicode arrows are fallbacks too).
+Hi Kees,
 
-Too bad it doesn't use "vvvvvvvvvvvvvv" for the down-arrow fallbacks.
-Instead of that funky IBM PC line drawing stub.
 
-> Unicode text entry is still broken with LC_CTYPE=C, because ncurses
-> respects it. Having the menuconfig just force C.UTF-8 if it's
-> available might fix a bunch of problems in practice, even if it feels
-> a bit iffy to force settings.
-> 
-> Python 3.7 will improve things at least. It converts LC_CTYPE=C into
-> LC_CTYPE=<some available UTF-8 locale>.
-> 
-> Cleanest would be if all environments sanely defaulted to UTF-8, but
-> that's not how it is in practice, unfortunately. :)
+2018-04-13 14:06 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> Since commit d677a4d60193 ("Makefile: support flag
+> -fsanitizer-coverage=trace-cmp"), you miss to build the SANCOV
+> plugin under some circumstances.
+>
+>   CONFIG_KCOV=y
+>   CONFIG_KCOV_ENABLE_COMPARISONS=y
+>   Your compiler does not support -fsanitize-coverage=trace-pc
+>   Your compiler does not support -fsanitize-coverage=trace-cmp
+>
+> Under this condition, $(CFLAGS_KCOV) is not empty but contains a
+> space, so the following ifeq-conditional is false.
+>
+>     ifeq ($(CFLAGS_KCOV),)
+>
+> Then, scripts/Makefile.gcc-plugins misses to add sancov_plugin.so to
+> gcc-plugin-y while the SANCOV plugin is necessary as an alternative
+> means.
+>
+> Fixes: d677a4d60193 ("Makefile: support flag -fsanitizer-coverage=trace-cmp")
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 
-thanks,
+
+I am planning to queue this up to the fixes branch
+since this is a bug fix.
+
+Do you have any comment on this?
+
+
+
+
+
+> Changes in v3:
+>   - newly added
+>
+> Changes in v2: None
+>
+>  scripts/Makefile.gcc-plugins | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
+> index b2a95af..7f5c862 100644
+> --- a/scripts/Makefile.gcc-plugins
+> +++ b/scripts/Makefile.gcc-plugins
+> @@ -14,7 +14,7 @@ ifdef CONFIG_GCC_PLUGINS
+>    endif
+>
+>    ifdef CONFIG_GCC_PLUGIN_SANCOV
+> -    ifeq ($(CFLAGS_KCOV),)
+> +    ifeq ($(strip $(CFLAGS_KCOV)),)
+>        # It is needed because of the gcc-plugin.sh and gcc version checks.
+>        gcc-plugin-$(CONFIG_GCC_PLUGIN_SANCOV)           += sancov_plugin.so
+>
+> --
+> 2.7.4
+>
+
+
+
 -- 
-~Randy
+Best Regards
+Masahiro Yamada
