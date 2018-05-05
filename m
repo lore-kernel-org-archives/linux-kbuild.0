@@ -1,39 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:26204 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750971AbeEEKck (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:42736 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751684AbeEEKgc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 5 May 2018 06:32:40 -0400
-Received: from mail-ua0-f174.google.com (mail-ua0-f174.google.com [209.85.217.174]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id w45AWM1v000529
-        for <linux-kbuild@vger.kernel.org>; Sat, 5 May 2018 19:32:23 +0900
-Received: by mail-ua0-f174.google.com with SMTP id h15so15593834uan.11
-        for <linux-kbuild@vger.kernel.org>; Sat, 05 May 2018 03:32:23 -0700 (PDT)
+        Sat, 5 May 2018 06:36:32 -0400
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1804161456540.28462@knanqh.ubzr>
-References: <nycvar.YSQ.7.76.1804161456540.28462@knanqh.ubzr>
+In-Reply-To: <CAKwvOdnjgEWDo8vjOiAS_TsEoJFZZagJgaqBAdW99L-Nkr9BxA@mail.gmail.com>
+References: <20180426212807.196279-1-ndesaulniers@google.com> <CAKwvOdnjgEWDo8vjOiAS_TsEoJFZZagJgaqBAdW99L-Nkr9BxA@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 5 May 2018 19:31:41 +0900
-Message-ID: <CAK7LNATk2KcnJDaO7V8XEkdeqRi-V6Aoo1gGj-1fQxpcFcJXAw@mail.gmail.com>
-Subject: Re: [PATCH] fixdep: suppress consecutive / from file paths in
- dependency list files
+Date: Sat, 5 May 2018 19:35:28 +0900
+Message-ID: <CAK7LNATHTAa+g3-Cud6iorgo-1riMzp07dmnXpk9XVmcZPuX9Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: gcov: enable -fno-tree-loop-im if supported
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Prasad Sodagudi <psodagud@quicinc.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-2018-04-17 4:07 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
-> Underscores in symbol names are translated into slashes for path names.
-> Filesystems treat consecutive slashes as if there was only one, so
-> let's do the same in the dependency list for easier grepping, etc.
+2018-04-27 6:41 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+> Hi Masahiro and Michal,
 >
-> Signed-off-by: Nicolas Pitre <nico@linaro.org>
+> The reporter has asked for their email address to be updated to:
+>
+> psodagud@codeaurora.org
+>
+> if you're ok with this version of the patch and choose to apply it, can you
+> please update the commit message. Otherwise, I'll make this change should
+> we need other changes necessitating a v2.
+> On Thu, Apr 26, 2018 at 2:29 PM Nick Desaulniers <ndesaulniers@google.com>
+> wrote:
+>
+>> Clang does not recognize this compiler option.
+>
+>> Reported-by: Prasad Sodagudi <psodagud@quicinc.com>
+>> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 
+Applied to linux-kbuild
+with the reporter's email address updated.
 
-Applied to linux-kbuild. Thanks!
-
-
+Thanks!
 
 
 
