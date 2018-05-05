@@ -1,43 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:59621 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751711AbeEEBiD (ORCPT
+Received: from heliosphere.sirena.org.uk ([172.104.155.198]:36970 "EHLO
+        heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751739AbeEEBod (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 4 May 2018 21:38:03 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180322205827.24578-1-linux@rasmusvillemoes.dk>
-References: <20180322205827.24578-1-linux@rasmusvillemoes.dk>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 5 May 2018 10:37:04 +0900
-Message-ID: <CAK7LNARK73rjwhK62+1q5ie07Y8r82ErLgLxb8RTNUcOYACgcQ@mail.gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: Update Kbuild entry with a few paths
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 4 May 2018 21:44:33 -0400
+From: Mark Brown <broonie@kernel.org>
+Subject: Applied "regulator: add dummy function of_find_regulator_by_node" to the regulator tree
+In-Reply-To: <1525179614-14571-3-git-send-email-changbin.du@intel.com>
+Message-Id: <20180505014413.ADEDE44007A@finisterre.ee.mobilebroadband>
+Date: Sat,  5 May 2018 02:44:13 +0100 (BST)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Changbin Du <changbin.du@intel.com>
+Cc: Mark Brown <broonie@kernel.org>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org, x86@kernel.org, lgirdwood@gmail.combroonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.orglinux-kernel@vger.kernel.org
 
-2018-03-23 5:58 GMT+09:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
-> I managed to send some modpost patches to old addresses of both
-> Masahiro and Michal, and omitted linux-kbuild from cc, because my
-> tried and trusted scripts/get_maintainer wrapper failed me. Add the
-> modpost directory to the MAINTAINERS entry, and while at it make the
-> Makefile glob match scripts/Makefile itself, and add one matching the
-> Kbuild.include file as well.
->
-> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-> ---
-> Hi Kbuild maintainers. Hope you don't mind me extending this entry a bit.
+The patch
 
+   regulator: add dummy function of_find_regulator_by_node
 
+has been applied to the regulator tree at
 
-Applied to linux-kbuild/fixes.
-Thanks.
+   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator.git 
 
+All being well this means that it will be integrated into the linux-next
+tree (usually sometime in the next 24 hours) and sent to Linus during
+the next merge window (or sooner if it is a bug fix), however if
+problems are discovered then the patch may be dropped or reverted.  
 
+You may get further e-mails resulting from automated or manual testing
+and review of the tree, please engage with people reporting problems and
+send followup patches addressing any issues that are reported if needed.
 
+If any updates are required or you are submitting further changes they
+should be sent as incremental updates against current git, existing
+patches will not be replaced.
 
+Please add any relevant lists and maintainers to the CCs when replying
+to this mail.
 
+Thanks,
+Mark
+
+From 08813e0ec1cb48e53c86a24d88d26b26878e7b6e Mon Sep 17 00:00:00 2001
+From: Changbin Du <changbin.du@intel.com>
+Date: Wed, 2 May 2018 21:44:57 +0800
+Subject: [PATCH] regulator: add dummy function of_find_regulator_by_node
+
+If device tree is not enabled, of_find_regulator_by_node() should have
+a dummy function since the function call is still there.
+
+This is to fix build error after CONFIG_NO_AUTO_INLINE is introduced.
+If this option is enabled, GCC will not auto-inline functions that are
+not explicitly marked as inline.
+
+In this case (no CONFIG_OF), the copmiler will report error in function
+regulator_dev_lookup().
+
+W/O NO_AUTO_INLINE, function of_get_regulator() is auto-inlined and then
+the call to of_find_regulator_by_node() is optimized out since
+of_get_regulator() always return NULL.
+
+W/ NO_AUTO_INLINE, the return value of of_get_regulator() is a variable
+so the call to of_find_regulator_by_node() cannot be optimized out. So
+we need a stub of_find_regulator_by_node().
+
+static struct regulator_dev *regulator_dev_lookup(struct device *dev,
+						  const char *supply)
+{
+	struct regulator_dev *r = NULL;
+	struct device_node *node;
+	struct regulator_map *map;
+	const char *devname = NULL;
+
+	regulator_supply_alias(&dev, &supply);
+
+	/* first do a dt based lookup */
+	if (dev && dev->of_node) {
+		node = of_get_regulator(dev, supply);
+		if (node) {
+			r = of_find_regulator_by_node(node);
+			if (r)
+				return r;
+	...
+
+Signed-off-by: Changbin Du <changbin.du@intel.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ drivers/regulator/internal.h | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/regulator/internal.h b/drivers/regulator/internal.h
+index abfd56e8c78a..24fde1e08f3a 100644
+--- a/drivers/regulator/internal.h
++++ b/drivers/regulator/internal.h
+@@ -56,14 +56,19 @@ static inline struct regulator_dev *dev_to_rdev(struct device *dev)
+ 	return container_of(dev, struct regulator_dev, dev);
+ }
+ 
+-struct regulator_dev *of_find_regulator_by_node(struct device_node *np);
+-
+ #ifdef CONFIG_OF
++struct regulator_dev *of_find_regulator_by_node(struct device_node *np);
+ struct regulator_init_data *regulator_of_get_init_data(struct device *dev,
+ 			         const struct regulator_desc *desc,
+ 				 struct regulator_config *config,
+ 				 struct device_node **node);
+ #else
++static inline struct regulator_dev *
++of_find_regulator_by_node(struct device_node *np)
++{
++	return NULL;
++}
++
+ static inline struct regulator_init_data *
+ regulator_of_get_init_data(struct device *dev,
+ 			   const struct regulator_desc *desc,
 -- 
-Best Regards
-Masahiro Yamada
+2.17.0
+
