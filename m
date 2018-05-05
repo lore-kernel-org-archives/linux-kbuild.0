@@ -1,52 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:22213 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750830AbeEEKRD (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:26204 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750971AbeEEKck (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 5 May 2018 06:17:03 -0400
+        Sat, 5 May 2018 06:32:40 -0400
+Received: from mail-ua0-f174.google.com (mail-ua0-f174.google.com [209.85.217.174]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id w45AWM1v000529
+        for <linux-kbuild@vger.kernel.org>; Sat, 5 May 2018 19:32:23 +0900
+Received: by mail-ua0-f174.google.com with SMTP id h15so15593834uan.11
+        for <linux-kbuild@vger.kernel.org>; Sat, 05 May 2018 03:32:23 -0700 (PDT)
 MIME-Version: 1.0
+In-Reply-To: <nycvar.YSQ.7.76.1804161456540.28462@knanqh.ubzr>
+References: <nycvar.YSQ.7.76.1804161456540.28462@knanqh.ubzr>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 5 May 2018 19:16:13 +0900
-Message-ID: <CAK7LNAR59KjaJdDNwJaSR_79s84hBj_MqMQ=PaFqJqzBKLUsJA@mail.gmail.com>
-Subject: [RFC] Removal of CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
+Date: Sat, 5 May 2018 19:31:41 +0900
+Message-ID: <CAK7LNATk2KcnJDaO7V8XEkdeqRi-V6Aoo1gGj-1fQxpcFcJXAw@mail.gmail.com>
+Subject: Re: [PATCH] fixdep: suppress consecutive / from file paths in
+ dependency list files
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, linux-arch <linux-arch@vger.kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Steven Miao <realmz6@gmail.com>, James Hogan <jhogan@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi.
-
-
-CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX was selected
-by BLACKFIN and METAG.
-
-Now that both architectures removed in the previous
-merge window, there is no more user of this CONFIG option.
+2018-04-17 4:07 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
+> Underscores in symbol names are translated into slashes for path names.
+> Filesystems treat consecutive slashes as if there was only one, so
+> let's do the same in the dependency list for easier grepping, etc.
+>
+> Signed-off-by: Nicolas Pitre <nico@linaro.org>
 
 
-My question is,
-is it OK to remove CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX entirely?
-
-
-In other words,
-  - Is there possibility to revive Blackfin/Metag support?
-  - Do future architectures need HAVE_UNDERSCORE_SYMBOL_PREFIX?
-
-I guess (hope) they are unlikely to happen.
+Applied to linux-kbuild. Thanks!
 
 
 
-If we can remove CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX,
-several tools (modpost, genksyms, adjust_autoksyms.sh, etc.)
-will be simplified.
 
-Also, VMLINUX_SYMBOL() in include/asm-generic/vmlinux.lds.h
-can be removed.  So, the linker script will become more readable.
-
-
-Is it OK to move forward the clean-ups?
-Comments are appreciated.
 
 
 -- 
