@@ -1,48 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:42736 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751684AbeEEKgc (ORCPT
+Received: from mail-io0-f175.google.com ([209.85.223.175]:40388 "EHLO
+        mail-io0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751118AbeEEPur (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 5 May 2018 06:36:32 -0400
+        Sat, 5 May 2018 11:50:47 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAKwvOdnjgEWDo8vjOiAS_TsEoJFZZagJgaqBAdW99L-Nkr9BxA@mail.gmail.com>
-References: <20180426212807.196279-1-ndesaulniers@google.com> <CAKwvOdnjgEWDo8vjOiAS_TsEoJFZZagJgaqBAdW99L-Nkr9BxA@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 5 May 2018 19:35:28 +0900
-Message-ID: <CAK7LNATHTAa+g3-Cud6iorgo-1riMzp07dmnXpk9XVmcZPuX9Q@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: gcov: enable -fno-tree-loop-im if supported
+References: <CAK7LNAR59KjaJdDNwJaSR_79s84hBj_MqMQ=PaFqJqzBKLUsJA@mail.gmail.com>
+In-Reply-To: <CAK7LNAR59KjaJdDNwJaSR_79s84hBj_MqMQ=PaFqJqzBKLUsJA@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 05 May 2018 15:50:35 +0000
+Message-ID: <CA+55aFzX9CeRr3HZtVN5XKK2Ema5TjXo4FCgD8ukWz6Waz=pZw@mail.gmail.com>
+Subject: Re: [RFC] Removal of CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Prasad Sodagudi <psodagud@quicinc.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-arch <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "Steven Miao (Steven Miao)" <realmz6@gmail.com>, James Hogan <jhogan@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-2018-04-27 6:41 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
-> Hi Masahiro and Michal,
->
-> The reporter has asked for their email address to be updated to:
->
-> psodagud@codeaurora.org
->
-> if you're ok with this version of the patch and choose to apply it, can you
-> please update the commit message. Otherwise, I'll make this change should
-> we need other changes necessitating a v2.
-> On Thu, Apr 26, 2018 at 2:29 PM Nick Desaulniers <ndesaulniers@google.com>
-> wrote:
->
->> Clang does not recognize this compiler option.
->
->> Reported-by: Prasad Sodagudi <psodagud@quicinc.com>
->> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+On Sat, May 5, 2018 at 12:17 AM Masahiro Yamada <
+yamada.masahiro@socionext.com> wrote:
 
-Applied to linux-kbuild
-with the reporter's email address updated.
+> My question is,
+> is it OK to remove CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX entirely?
 
-Thanks!
+Absolutely. Let's not keep legacy stuff that complicates things around
+unless necessary.
 
+Even if there might be some unlikely future reason why it might be revived
+some day, let's not use "what if" as an argument to keep unused code around.
 
-
-
--- 
-Best Regards
-Masahiro Yamada
+              Linus
