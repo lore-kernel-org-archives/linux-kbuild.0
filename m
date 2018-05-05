@@ -1,120 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from heliosphere.sirena.org.uk ([172.104.155.198]:36970 "EHLO
-        heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751739AbeEEBod (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:60227 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751954AbeEECCq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 4 May 2018 21:44:33 -0400
-From: Mark Brown <broonie@kernel.org>
-Subject: Applied "regulator: add dummy function of_find_regulator_by_node" to the regulator tree
-In-Reply-To: <1525179614-14571-3-git-send-email-changbin.du@intel.com>
-Message-Id: <20180505014413.ADEDE44007A@finisterre.ee.mobilebroadband>
-Date: Sat,  5 May 2018 02:44:13 +0100 (BST)
+        Fri, 4 May 2018 22:02:46 -0400
+MIME-Version: 1.0
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 5 May 2018 11:01:45 +0900
+Message-ID: <CAK7LNAQeiRH=E59tEgZD8zQDLLGyrpf30DqyRZOQruwDWJc3QA@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for 4.17-rc4
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Changbin Du <changbin.du@intel.com>
-Cc: Mark Brown <broonie@kernel.org>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org, x86@kernel.org, lgirdwood@gmail.combroonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.orglinux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-The patch
+Hi Linus,
 
-   regulator: add dummy function of_find_regulator_by_node
+Please pull some Kbuild fixes.
+Thanks!
 
-has been applied to the regulator tree at
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator.git 
+The following changes since commit 6da6c0db5316275015e8cc2959f12a17584aeb64:
 
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.  
+  Linux v4.17-rc3 (2018-04-29 14:17:42 -0700)
 
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
+are available in the git repository at:
 
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v4.17
 
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
+for you to fetch changes up to 0da7e43261142b93307b70da455376ad84414d0a:
 
-Thanks,
-Mark
+  genksyms: fix typo in parse.tab.{c,h} generation rules (2018-05-05
+10:24:53 +0900)
 
-From 08813e0ec1cb48e53c86a24d88d26b26878e7b6e Mon Sep 17 00:00:00 2001
-From: Changbin Du <changbin.du@intel.com>
-Date: Wed, 2 May 2018 21:44:57 +0800
-Subject: [PATCH] regulator: add dummy function of_find_regulator_by_node
+----------------------------------------------------------------
+Kbuild fixes for v4.17
 
-If device tree is not enabled, of_find_regulator_by_node() should have
-a dummy function since the function call is still there.
+- remove state comment in modpost
 
-This is to fix build error after CONFIG_NO_AUTO_INLINE is introduced.
-If this option is enabled, GCC will not auto-inline functions that are
-not explicitly marked as inline.
+- extend MAINTAINERS entry to cover modpost and more makefiles
 
-In this case (no CONFIG_OF), the copmiler will report error in function
-regulator_dev_lookup().
+- fix missed building of SANCOV gcc-plugin
 
-W/O NO_AUTO_INLINE, function of_get_regulator() is auto-inlined and then
-the call to of_find_regulator_by_node() is optimized out since
-of_get_regulator() always return NULL.
+- replace left-over 'bison' with $(YACC)
 
-W/ NO_AUTO_INLINE, the return value of of_get_regulator() is a variable
-so the call to of_find_regulator_by_node() cannot be optimized out. So
-we need a stub of_find_regulator_by_node().
+- display short log when generating parer of genksyms
 
-static struct regulator_dev *regulator_dev_lookup(struct device *dev,
-						  const char *supply)
-{
-	struct regulator_dev *r = NULL;
-	struct device_node *node;
-	struct regulator_map *map;
-	const char *devname = NULL;
+----------------------------------------------------------------
+Masahiro Yamada (2):
+      gcc-plugins: fix build condition of SANCOV plugin
+      kbuild: replace hardcoded bison in cmd_bison_h with $(YACC)
 
-	regulator_supply_alias(&dev, &supply);
+Mauro Rossi (1):
+      genksyms: fix typo in parse.tab.{c,h} generation rules
 
-	/* first do a dt based lookup */
-	if (dev && dev->of_node) {
-		node = of_get_regulator(dev, supply);
-		if (node) {
-			r = of_find_regulator_by_node(node);
-			if (r)
-				return r;
-	...
+Rasmus Villemoes (2):
+      modpost: delete stale comment
+      MAINTAINERS: Update Kbuild entry with a few paths
 
-Signed-off-by: Changbin Du <changbin.du@intel.com>
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- drivers/regulator/internal.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ MAINTAINERS                  | 4 +++-
+ scripts/Makefile.gcc-plugins | 2 +-
+ scripts/Makefile.lib         | 2 +-
+ scripts/genksyms/Makefile    | 4 ++--
+ scripts/mod/sumversion.c     | 9 +--------
+ 5 files changed, 8 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/regulator/internal.h b/drivers/regulator/internal.h
-index abfd56e8c78a..24fde1e08f3a 100644
---- a/drivers/regulator/internal.h
-+++ b/drivers/regulator/internal.h
-@@ -56,14 +56,19 @@ static inline struct regulator_dev *dev_to_rdev(struct device *dev)
- 	return container_of(dev, struct regulator_dev, dev);
- }
- 
--struct regulator_dev *of_find_regulator_by_node(struct device_node *np);
--
- #ifdef CONFIG_OF
-+struct regulator_dev *of_find_regulator_by_node(struct device_node *np);
- struct regulator_init_data *regulator_of_get_init_data(struct device *dev,
- 			         const struct regulator_desc *desc,
- 				 struct regulator_config *config,
- 				 struct device_node **node);
- #else
-+static inline struct regulator_dev *
-+of_find_regulator_by_node(struct device_node *np)
-+{
-+	return NULL;
-+}
-+
- static inline struct regulator_init_data *
- regulator_of_get_init_data(struct device *dev,
- 			   const struct regulator_desc *desc,
+
+
+
+
+
 -- 
-2.17.0
-
+Best Regards
+Masahiro Yamada
