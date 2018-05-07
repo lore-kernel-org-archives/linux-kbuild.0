@@ -1,65 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:62854 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750795AbeEGG7s (ORCPT
+Received: from mail-lf0-f48.google.com ([209.85.215.48]:32955 "EHLO
+        mail-lf0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750795AbeEGHLx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 May 2018 02:59:48 -0400
-MIME-Version: 1.0
-In-Reply-To: <1522413619.15770.88.camel@fedoraproject.org>
-References: <20180329180112.11055-1-labbott@redhat.com> <1522413619.15770.88.camel@fedoraproject.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 7 May 2018 15:58:57 +0900
-Message-ID: <CAK7LNAR5ZtwWH1SPMJeVpPkB38+9FyZOAG4AmS7NQ8NqCo_t9Q@mail.gmail.com>
-Subject: Re: [RFCv2 PATCH 0/3] Salted build ids via linker sections
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 7 May 2018 03:11:53 -0400
+Received: by mail-lf0-f48.google.com with SMTP id m18-v6so39041713lfb.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 07 May 2018 00:11:53 -0700 (PDT)
+From: riku.voipio@linaro.org
+Subject: [PATCH v2] kbuild: deb-pkg improve maintainer address generation
+Date: Mon,  7 May 2018 10:11:34 +0300
+Message-Id: <20180507071134.5213-1-riku.voipio@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mark Wielaard <mjw@fedoraproject.org>
-Cc: Laura Abbott <labbott@redhat.com>, Andy Lutomirski <luto@kernel.org>, "H . J . Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: debian-kernel@lists.debian.org, malat@debian.org, Riku Voipio <riku.voipio@linaro.org>
 
-2018-03-30 21:40 GMT+09:00 Mark Wielaard <mjw@fedoraproject.org>:
-> On Thu, 2018-03-29 at 11:01 -0700, Laura Abbott wrote:
->> I'm still mostly looking for feedback whether
->> this would be acceptable for merging or if we should just persue a
->> --build-id-salt in binutils.
->
-> Personally I would go with this approach. It seems simple and it might
-> take years before a new linker option is available everywhere.
+From: Riku Voipio <riku.voipio@linaro.org>
 
+There is multiple issues with the genaration of maintainer string
 
-Indeed.  This series is easier than --build-id-salt.
+It uses DEBEMAIL and EMAIL enviroment variables, which may contain angle brackets,
+creating invalid maintainer strings. The documented KBUILD_BUILD_USER and
+KBUILD_BUILD_HOST variables are not used. Undocumented and uncommon NAME
+variable is used. Refactor the Maintainer string to:
 
-If you do not see any better solution, I can accept this.
+- use EMAIL or DEBEMAIL directly if they are in form "name <user@host>"
+- use KBUILD_BUILD_USER and KBUILD_BUILD_HOST if set before falling
+  back to autodetection
+- no longer use NAME variable or the useless Anonymous string
 
+The logic is switched from multiline if/then/fi statements to compact
+shell variable substition commands.
 
-BTW, when I read
-https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo
-I thought "we could reverse the symlink direction from debug file to
-build-id file)"
-sensible (but I understand it is not easy to change this way).
+Reported-by: Mathieu Malaterre <malat@debian.org>
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+---
+v2: include improvements suggested by Masahiro-san
 
+ scripts/package/mkdebian | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
-If two packages share an identical image,
-one package can borrow the image from the other,
-then the storage space will be saved.
-
-So, having identical ID should be advantage,
-but we actually see only disadvantage...
-
-
-
-
-> To simplify things I think you could just always add the extra vdso
-> .comment initialized to something like KERNELRELEASE. Which distros
-> seem to update anyway to include their build number, so they wouldn't
-> need to do anything special to "update the build salt".
->
-
-
-
-
-
-
+diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+index 6adb3a16ba3b..985d72d1ab34 100755
+--- a/scripts/package/mkdebian
++++ b/scripts/package/mkdebian
+@@ -71,22 +71,21 @@ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+ fi
+ 
+-# Try to determine maintainer and email values
+-if [ -n "$DEBEMAIL" ]; then
+-       email=$DEBEMAIL
+-elif [ -n "$EMAIL" ]; then
+-       email=$EMAIL
+-else
+-       email=$(id -nu)@$(hostname -f 2>/dev/null || hostname)
+-fi
+-if [ -n "$DEBFULLNAME" ]; then
+-       name=$DEBFULLNAME
+-elif [ -n "$NAME" ]; then
+-       name=$NAME
++email=${DEBEMAIL-$EMAIL}
++
++# use email string directly if it contains <email>
++if echo $email | grep -q '<.*>'; then
++	maintainer=$email
+ else
+-       name="Anonymous"
++	# or construct the maintainer string
++	user=${KBUILD_BUILD_USER-$(id -nu)}
++	name=${DEBFULLNAME-$user}
++	if [ -z "$email" ]; then
++		buildhost=${KBUILD_BUILD_HOST-$(hostname -f 2>/dev/null || hostname)}
++		email="$user@$buildhost"
++	fi
++	maintainer="$name <$email>"
+ fi
+-maintainer="$name <$email>"
+ 
+ # Try to determine distribution
+ if [ -n "$KDEB_CHANGELOG_DIST" ]; then
 -- 
-Best Regards
-Masahiro Yamada
+2.14.2
+
