@@ -1,85 +1,159 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f48.google.com ([209.85.215.48]:32955 "EHLO
-        mail-lf0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750795AbeEGHLx (ORCPT
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:35131 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751135AbeEGJua (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 May 2018 03:11:53 -0400
-Received: by mail-lf0-f48.google.com with SMTP id m18-v6so39041713lfb.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 07 May 2018 00:11:53 -0700 (PDT)
-From: riku.voipio@linaro.org
-Subject: [PATCH v2] kbuild: deb-pkg improve maintainer address generation
-Date: Mon,  7 May 2018 10:11:34 +0300
-Message-Id: <20180507071134.5213-1-riku.voipio@linaro.org>
+        Mon, 7 May 2018 05:50:30 -0400
+Received: by mail-pg0-f68.google.com with SMTP id j11-v6so19841062pgf.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 07 May 2018 02:50:30 -0700 (PDT)
+Date: Mon, 7 May 2018 19:50:18 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [RFC PATCH 1/2] powerpc/kbuild: Use flags variables rather than
+ overriding LD/CC/AS
+Message-ID: <20180507195018.1ec8a8ea@roar.ozlabs.ibm.com>
+In-Reply-To: <CAK7LNAT3nowJ=CCE0OARdADyvuXOH+zFyQBBg3HOgp+W=ezT0g@mail.gmail.com>
+References: <20180430012351.28814-1-npiggin@gmail.com>
+        <20180430012351.28814-2-npiggin@gmail.com>
+        <CAK7LNAT3nowJ=CCE0OARdADyvuXOH+zFyQBBg3HOgp+W=ezT0g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: debian-kernel@lists.debian.org, malat@debian.org, Riku Voipio <riku.voipio@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-From: Riku Voipio <riku.voipio@linaro.org>
+On Mon, 7 May 2018 14:25:12 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-There is multiple issues with the genaration of maintainer string
+> Hi.
+> 
+> 
+> 2018-04-30 10:23 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> > The powerpc toolchain can compile combinations of 32/64 bit and
+> > big/little endian, so it's convenient to consider, e.g.,
+> >
+> >   CC -m64 -mbig-endian
+> >
+> > To be the C compiler for the purpose of invoking it to build
+> > target artifacts.  
+> 
+> Right, but this is not possible in the new Kconfig scheme
+> because CPU_BIG/LITTLE_ENDIAN can be turned on/off
+> from Kconfig menus.
+> 
+> 
+> > Rather than override, use kbuild defined variables to pass these
+> > flags around. Importantly, they must be passed to things like
+> > cc-option, so the usual cflags-y is not sufficient. This multitude
+> > of inconsistently named variables is a mess, but it's marginally
+> > better than overriding the toolchain because it matches what other
+> > architectures do.
+> >
+> > This allows powerpc builds to work with the new kconfig macro
+> > language branch. XXX: not exactly sure why it fails in the first
+> > place.  
+> 
+> 
+> Without this patch, 'scripts/kconfig/conf  --syncconfig Kconfig'
+> continues eternally.
+> 
+> This is because the change of environment variable $(CC) will
+> trigger syncconfig.
+> 
+> So, this patch is the right thing to do.
 
-It uses DEBEMAIL and EMAIL enviroment variables, which may contain angle brackets,
-creating invalid maintainer strings. The documented KBUILD_BUILD_USER and
-KBUILD_BUILD_HOST variables are not used. Undocumented and uncommon NAME
-variable is used. Refactor the Maintainer string to:
+Thanks for looking, yes I like it better. I'm still having some
+trouble with 32-bit cross compilation with 64-bit toolchain. I'm
+trying to work through this, may need some help though.
 
-- use EMAIL or DEBEMAIL directly if they are in form "name <user@host>"
-- use KBUILD_BUILD_USER and KBUILD_BUILD_HOST if set before falling
-  back to autodetection
-- no longer use NAME variable or the useless Anonymous string
+> > XXX: 32-bit builds with 64-bit toolchain gain some additional options
+> > like -funit-at-a-time from cc-option. Unclear why that is. Build
+> > appears to be correct otherwise.
+> > ---
+> >  arch/powerpc/Makefile | 14 +++++++-------
+> >  1 file changed, 7 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
+> > index 95813df90801..046b5dde9ff5 100644
+> > --- a/arch/powerpc/Makefile
+> > +++ b/arch/powerpc/Makefile
+> > @@ -74,13 +74,15 @@ endif
+> >  endif
+> >
+> >  ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
+> > -override LD    += -EL
+> > +KBUILD_CPPFLAGS        += -mlittle-endian  
+> 
+> 
+> IMHO, I personally prefer
+> 
+> KBUILD_CFLAGS        += -mlittle-endian
+> KBUILD_AFLAGS        += -mlittle-endian
+> 
+> like the current arch/powerpc/Makefile add the flag
+> to cflags-y / aflags-y separately.
 
-The logic is switched from multiline if/then/fi statements to compact
-shell variable substition commands.
+The problem I found is that we need this option to be invoked
+with 'cc-option'. I know this is probably not the right way to
+go about it though, but arm64 seems to have the same hack.
 
-Reported-by: Mathieu Malaterre <malat@debian.org>
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
----
-v2: include improvements suggested by Masahiro-san
+Any suggestions for how to solve that? Should the cc-option
+take KBUILD_CFLAGS as well?
 
- scripts/package/mkdebian | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index 6adb3a16ba3b..985d72d1ab34 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -71,22 +71,21 @@ if [ "$ARCH" = "um" ] ; then
- 	packagename=user-mode-linux-$version
- fi
- 
--# Try to determine maintainer and email values
--if [ -n "$DEBEMAIL" ]; then
--       email=$DEBEMAIL
--elif [ -n "$EMAIL" ]; then
--       email=$EMAIL
--else
--       email=$(id -nu)@$(hostname -f 2>/dev/null || hostname)
--fi
--if [ -n "$DEBFULLNAME" ]; then
--       name=$DEBFULLNAME
--elif [ -n "$NAME" ]; then
--       name=$NAME
-+email=${DEBEMAIL-$EMAIL}
-+
-+# use email string directly if it contains <email>
-+if echo $email | grep -q '<.*>'; then
-+	maintainer=$email
- else
--       name="Anonymous"
-+	# or construct the maintainer string
-+	user=${KBUILD_BUILD_USER-$(id -nu)}
-+	name=${DEBFULLNAME-$user}
-+	if [ -z "$email" ]; then
-+		buildhost=${KBUILD_BUILD_HOST-$(hostname -f 2>/dev/null || hostname)}
-+		email="$user@$buildhost"
-+	fi
-+	maintainer="$name <$email>"
- fi
--maintainer="$name <$email>"
- 
- # Try to determine distribution
- if [ -n "$KDEB_CHANGELOG_DIST" ]; then
--- 
-2.14.2
+> Only the difference would be whether -mlittle-endian
+> is passed to pre-processing the linker script, though.
+> 
+> 
+> 
+> 
+> > +LDFLAGS                += -EL
+> >  LDEMULATION    := lppc
+> >  GNUTARGET      := powerpcle
+> >  MULTIPLEWORD   := -mno-multiple
+> >  KBUILD_CFLAGS_MODULE += $(call cc-option,-mno-save-toc-indirect)
+> >  else
+> > -override LD    += -EB
+> > +KBUILD_CPPFLAGS += $(call cc-option,-mbig-endian)
+> > +LDFLAGS                += -EB
+> >  LDEMULATION    := ppc
+> >  GNUTARGET      := powerpc
+> >  MULTIPLEWORD   := -mmultiple
+> > @@ -93,8 +95,6 @@ aflags-$(CONFIG_CPU_BIG_ENDIAN)               += $(call cc-option,-mabi=elfv1)
+> >  aflags-$(CONFIG_CPU_LITTLE_ENDIAN)     += -mabi=elfv2
+> >  endif
+> >
+> > -cflags-$(CONFIG_CPU_LITTLE_ENDIAN)     += -mlittle-endian
+> > -cflags-$(CONFIG_CPU_BIG_ENDIAN)                += $(call cc-option,-mbig-endian)
+> >  ifneq ($(cc-name),clang)
+> >    cflags-$(CONFIG_CPU_LITTLE_ENDIAN)   += -mno-strict-align
+> >  endif
+> > @@ -103,9 +103,9 @@ aflags-$(CONFIG_CPU_BIG_ENDIAN)             += $(call cc-option,-mbig-endian)
+> >  aflags-$(CONFIG_CPU_LITTLE_ENDIAN)     += -mlittle-endian
+> >
+> >  ifeq ($(HAS_BIARCH),y)
+> > -override AS    += -a$(BITS)
+> > -override LD    += -m elf$(BITS)$(LDEMULATION)
+> > -override CC    += -m$(BITS)
+> > +KBUILD_CPPFLAGS        += -m$(BITS)  
+> 
+> 
+> Do you mean this?
+> 
+> KBUILD_CFLAGS        += -m$(BITS)
 
+IIRC it was the same cc-option problem.
+
+> > +KBUILD_AFLAGS  += -m$(BITS) -Wl,-a$(BITS)  
+> 
+> 
+> Both KBUILD_CPPFLAGS and KBUILD_AFLAGS are added
+> to orig_a_flags in scripts/Makefile.lib
+> 
+> So, -m$(BITS) will be doubled for *.S files.
+
+Yes, I haven't got things quite right yet.
+
+Thanks,
+Nick
