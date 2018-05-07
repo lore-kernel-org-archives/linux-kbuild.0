@@ -1,150 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:61309 "EHLO
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:35094 "EHLO
         conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750811AbeEGF0W (ORCPT
+        with ESMTP id S1750884AbeEGG3w (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 May 2018 01:26:22 -0400
-Received: from mail-ua0-f173.google.com (mail-ua0-f173.google.com [209.85.217.173]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id w475PrhD015567
-        for <linux-kbuild@vger.kernel.org>; Mon, 7 May 2018 14:25:54 +0900
-Received: by mail-ua0-f173.google.com with SMTP id i3so17576543uad.4
-        for <linux-kbuild@vger.kernel.org>; Sun, 06 May 2018 22:25:54 -0700 (PDT)
+        Mon, 7 May 2018 02:29:52 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180430012351.28814-2-npiggin@gmail.com>
-References: <20180430012351.28814-1-npiggin@gmail.com> <20180430012351.28814-2-npiggin@gmail.com>
+In-Reply-To: <20180329180112.11055-1-labbott@redhat.com>
+References: <20180329180112.11055-1-labbott@redhat.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 7 May 2018 14:25:12 +0900
-Message-ID: <CAK7LNAT3nowJ=CCE0OARdADyvuXOH+zFyQBBg3HOgp+W=ezT0g@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/2] powerpc/kbuild: Use flags variables rather than
- overriding LD/CC/AS
+Date: Mon, 7 May 2018 15:28:49 +0900
+Message-ID: <CAK7LNATTfjpkG0PLR5_anZOW5zfSZxKgFO6sHXuMf50OEtx0PQ@mail.gmail.com>
+Subject: Re: [RFCv2 PATCH 0/3] Salted build ids via linker sections
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: Laura Abbott <labbott@redhat.com>
+Cc: Andy Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi.
-
-
-2018-04-30 10:23 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
-> The powerpc toolchain can compile combinations of 32/64 bit and
-> big/little endian, so it's convenient to consider, e.g.,
+2018-03-30 3:01 GMT+09:00 Laura Abbott <labbott@redhat.com>:
+> Hi,
 >
->   CC -m64 -mbig-endian
+> This is v2 of my proposal to allow unique build-ids in the kernel. from
+> last time:
 >
-> To be the C compiler for the purpose of invoking it to build
-> target artifacts.
-
-Right, but this is not possible in the new Kconfig scheme
-because CPU_BIG/LITTLE_ENDIAN can be turned on/off
-from Kconfig menus.
-
-
-> Rather than override, use kbuild defined variables to pass these
-> flags around. Importantly, they must be passed to things like
-> cc-option, so the usual cflags-y is not sufficient. This multitude
-> of inconsistently named variables is a mess, but it's marginally
-> better than overriding the toolchain because it matches what other
-> architectures do.
+> ""
+> In Fedora, the debug information is packaged separately (foo-debuginfo) and
+> can be installed separately. There's been a long standing issue where only one
+> version of a debuginfo info package can be installed at a time. Mark Wielaard
+> made an effort for Fedora 27 to allow parallel installation of debuginfo (see
+> https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo for
+> more details)
 >
-> This allows powerpc builds to work with the new kconfig macro
-> language branch. XXX: not exactly sure why it fails in the first
-> place.
+> Part of the requirement to allow this to work is that build ids are
+> unique between builds. The existing upstream rpm implementation ensures
+> this by re-calculating the build-id using the version and release as a
+> seed. This doesn't work 100% for the kernel because of the vDSO which is
+> its own binary and doesn't get updated. After poking holes in a few of my
+> ideas, there was a discussion with some people from the binutils team about
+> adding --build-id-salt to let ld do the calculation debugedit is doing. There
+> was a counter proposal made about adding some extra information via a .comment
+> which will affect the build id calculation but just get stripped out.
+> ""
 
 
-Without this patch, 'scripts/kconfig/conf  --syncconfig Kconfig'
-continues eternally.
+I think you already know '--build-id=uuid' linker option.
 
-This is because the change of environment variable $(CC) will
-trigger syncconfig.
+Doesn't this solve your problem?
 
-So, this patch is the right thing to do.
+The disadvantage of this option is,
+we will lose reproducible building because  --build-id=uuid
+adds every time random salt.
+
+The advantage is, the implementation is even simpler,
+and easier to migrate to --build-id-salt once it is supported
+in the future.
+
+
+> This v2 cleans up the naming to be consistent and also switches to a
+> config option vs. an environment variable. I've seen some sporadic
+> failures about missing the generated header so I think I'm still missing
+> a dependency somewhere.
+
+Right.
+
+There is no dependency between 'prepare' and 'scripts'
+in the top Makefile.
+Therefore, Kbuild can run them simultaneously,
+which would cause a race in parallel building.
 
 
 
-> XXX: 32-bit builds with 64-bit toolchain gain some additional options
-> like -funit-at-a-time from cc-option. Unclear why that is. Build
-> appears to be correct otherwise.
-> ---
->  arch/powerpc/Makefile | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+
+
+
+
+
+ I'm still mostly looking for feedback whether
+> this would be acceptable for merging or if we should just persue a
+> --build-id-salt in binutils.
 >
-> diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-> index 95813df90801..046b5dde9ff5 100644
-> --- a/arch/powerpc/Makefile
-> +++ b/arch/powerpc/Makefile
-> @@ -74,13 +74,15 @@ endif
->  endif
+> Thanks,
+> Laura
 >
->  ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
-> -override LD    += -EL
-> +KBUILD_CPPFLAGS        += -mlittle-endian
-
-
-IMHO, I personally prefer
-
-KBUILD_CFLAGS        += -mlittle-endian
-KBUILD_AFLAGS        += -mlittle-endian
-
-like the current arch/powerpc/Makefile add the flag
-to cflags-y / aflags-y separately.
-
-
-Only the difference would be whether -mlittle-endian
-is passed to pre-processing the linker script, though.
-
-
-
-
-> +LDFLAGS                += -EL
->  LDEMULATION    := lppc
->  GNUTARGET      := powerpcle
->  MULTIPLEWORD   := -mno-multiple
->  KBUILD_CFLAGS_MODULE += $(call cc-option,-mno-save-toc-indirect)
->  else
-> -override LD    += -EB
-> +KBUILD_CPPFLAGS += $(call cc-option,-mbig-endian)
-> +LDFLAGS                += -EB
->  LDEMULATION    := ppc
->  GNUTARGET      := powerpc
->  MULTIPLEWORD   := -mmultiple
-> @@ -93,8 +95,6 @@ aflags-$(CONFIG_CPU_BIG_ENDIAN)               += $(call cc-option,-mabi=elfv1)
->  aflags-$(CONFIG_CPU_LITTLE_ENDIAN)     += -mabi=elfv2
->  endif
 >
-> -cflags-$(CONFIG_CPU_LITTLE_ENDIAN)     += -mlittle-endian
-> -cflags-$(CONFIG_CPU_BIG_ENDIAN)                += $(call cc-option,-mbig-endian)
->  ifneq ($(cc-name),clang)
->    cflags-$(CONFIG_CPU_LITTLE_ENDIAN)   += -mno-strict-align
->  endif
-> @@ -103,9 +103,9 @@ aflags-$(CONFIG_CPU_BIG_ENDIAN)             += $(call cc-option,-mbig-endian)
->  aflags-$(CONFIG_CPU_LITTLE_ENDIAN)     += -mlittle-endian
+> Laura Abbott (3):
+>   kbuild: Introduce build-salt generated header
+>   kbuild: Link with generated build-salt header
+>   x86/vdso: Add build salt to the vDSO
 >
->  ifeq ($(HAS_BIARCH),y)
-> -override AS    += -a$(BITS)
-> -override LD    += -m elf$(BITS)$(LDEMULATION)
-> -override CC    += -m$(BITS)
-> +KBUILD_CPPFLAGS        += -m$(BITS)
-
-
-Do you mean this?
-
-KBUILD_CFLAGS        += -m$(BITS)
-
-
-> +KBUILD_AFLAGS  += -m$(BITS) -Wl,-a$(BITS)
-
-
-Both KBUILD_CPPFLAGS and KBUILD_AFLAGS are added
-to orig_a_flags in scripts/Makefile.lib
-
-So, -m$(BITS) will be doubled for *.S files.
-
-
-> +LDFLAGS                += -m elf$(BITS)$(LDEMULATION)
->  KBUILD_ARFLAGS += --target=elf$(BITS)-$(GNUTARGET)
->  endif
+>  Makefile                              | 13 +++++++++++--
+>  arch/x86/entry/vdso/vdso-layout.lds.S |  3 +++
+>  init/Kconfig                          |  8 ++++++++
+>  scripts/.gitignore                    |  1 +
+>  scripts/Makefile                      |  2 +-
+>  scripts/build-salt.lds.S              |  5 +++++
+>  scripts/gensalt                       | 21 +++++++++++++++++++++
+>  scripts/link-vmlinux.sh               |  3 ++-
+>  8 files changed, 52 insertions(+), 4 deletions(-)
+>  create mode 100644 scripts/build-salt.lds.S
+>  create mode 100755 scripts/gensalt
 >
+> --
+> 2.16.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
