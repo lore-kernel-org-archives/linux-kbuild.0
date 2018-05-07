@@ -1,34 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.ithb.ac.id ([202.138.229.42]:53030 "EHLO mail.ithb.ac.id"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750961AbeEFJgE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 6 May 2018 05:36:04 -0400
-Content-Type: text/plain; charset="utf-8"
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:26882 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751849AbeEGArc (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 6 May 2018 20:47:32 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: =?utf-8?b?V29obHTDpHRpZ2tlaXRzc3BlbmRlIGluIEjDtmhlIHZvbiDigqwgMi4wMDAu?=
- =?utf-8?q?000=2C00?=
-From: rudi@ithb.ac.id
-Date: Sun, 06 May 2018 10:21:02 +0200
-Reply-To: richardwahlfunds@gmail.com
-Message-Id: <20180506081742.9CB2F8477DF@mail.ithb.ac.id>
+In-Reply-To: <20180420204104.6e22b136@roar.ozlabs.ibm.com>
+References: <20180420073414.23169-1-npiggin@gmail.com> <20180420073414.23169-5-npiggin@gmail.com>
+ <CA+7wUswuyn+YgNe732rQAzVmgDBohTMEqwsd76nQ_CH5h7Y5WA@mail.gmail.com> <20180420204104.6e22b136@roar.ozlabs.ibm.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 7 May 2018 09:46:43 +0900
+Message-ID: <CAK7LNASvOwam=AhN11sUKvBbtJbBzQULqs8kRV2KRS45jbSLcQ@mail.gmail.com>
+Subject: Re: [PATCH 4/4] powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selected
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <rudi@ithb.ac.id>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Mathieu Malaterre <malat@debian.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-arch <linux-arch@vger.kernel.org>, Nicolas Pitre <nico@fluxnic.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Lieber Freund,
- 
-Ich bin Herr Richard Wahl der Mega-Gewinner von $ 533M In Mega Millions Jackpot spende ich an 5 zufällige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Mail nach einem Spinball ausgewählt. Ich habe den größten Teil meines Vermögens auf eine Reihe von Wohltätigkeitsorganisationen und Organisationen verteilt. Ich habe mich freiwillig dazu entschieden, Ihnen den Betrag von € 2.000.000,00 EUR zu spenden
-eine der ausgewählten 5, um meine Gewinne zu überprüfen, finden Sie auf meiner You Tube Seite unten.
- 
-UHR MICH HIER: https://www.youtube.com/watch?v=tne02ExNDrw
- 
-Das ist dein Spendencode: [DF00430342018]
- 
-Antworten Sie mit dem Spendencode auf diese E-Mail: richardwahlfunds@gmail.com
- 
-Ich hoffe, Sie und Ihre Familie glücklich zu machen.
- 
-Grüße
-Herr Richard Wahl
+Hi Nicholas,
+
+2018-04-20 19:41 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> On Fri, 20 Apr 2018 12:00:49 +0200
+> Mathieu Malaterre <malat@debian.org> wrote:
+>
+>> On Fri, Apr 20, 2018 at 9:34 AM, Nicholas Piggin <npiggin@gmail.com> wrote:
+>> > This requires further changes to linker script to KEEP some tables
+>> > and wildcard compiler generated sections into the right place. This
+>> > includes pp32 modifications from Christophe Leroy.
+>> >
+>> > When compiling powernv_defconfig with this option:
+>> >
+>> > text       data      bss       dec        filename
+>> > 11827621   4810490   1341080   17979191   vmlinux
+>> > 11752437   4598858   1338776   17690071   vmlinux.dcde
+>> >
+>> > Resulting kernel is almost 400kB smaller (and still boots).
+>> >
+>> > [ppc32 numbers here]
+>>
+>> ^^^
+>>
+>> Do you want somebody else to provide those numbers ?
+>
+> If you have a booting kernel, yes some more numbers would be good.
+>
+> Thanks,
+> Nick
+
+
+
+I applied this series because I want it to be more tested in linux-next.
+
+
+Some requests:
+
+ - Could you provide information to replace '[ppc32 numbers here]'?
+   (or just remove it)
+
+ - V2 is welcome if you have code improvement.
+   (I thought so from your comments)
+
+Thanks.
+
+
+-- 
+Best Regards
+Masahiro Yamada
