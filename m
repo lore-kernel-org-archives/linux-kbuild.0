@@ -1,67 +1,151 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:26882 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751849AbeEGArc (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:61309 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750811AbeEGF0W (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 6 May 2018 20:47:32 -0400
+        Mon, 7 May 2018 01:26:22 -0400
+Received: from mail-ua0-f173.google.com (mail-ua0-f173.google.com [209.85.217.173]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id w475PrhD015567
+        for <linux-kbuild@vger.kernel.org>; Mon, 7 May 2018 14:25:54 +0900
+Received: by mail-ua0-f173.google.com with SMTP id i3so17576543uad.4
+        for <linux-kbuild@vger.kernel.org>; Sun, 06 May 2018 22:25:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180420204104.6e22b136@roar.ozlabs.ibm.com>
-References: <20180420073414.23169-1-npiggin@gmail.com> <20180420073414.23169-5-npiggin@gmail.com>
- <CA+7wUswuyn+YgNe732rQAzVmgDBohTMEqwsd76nQ_CH5h7Y5WA@mail.gmail.com> <20180420204104.6e22b136@roar.ozlabs.ibm.com>
+In-Reply-To: <20180430012351.28814-2-npiggin@gmail.com>
+References: <20180430012351.28814-1-npiggin@gmail.com> <20180430012351.28814-2-npiggin@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 7 May 2018 09:46:43 +0900
-Message-ID: <CAK7LNASvOwam=AhN11sUKvBbtJbBzQULqs8kRV2KRS45jbSLcQ@mail.gmail.com>
-Subject: Re: [PATCH 4/4] powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selected
+Date: Mon, 7 May 2018 14:25:12 +0900
+Message-ID: <CAK7LNAT3nowJ=CCE0OARdADyvuXOH+zFyQBBg3HOgp+W=ezT0g@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] powerpc/kbuild: Use flags variables rather than
+ overriding LD/CC/AS
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Mathieu Malaterre <malat@debian.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-arch <linux-arch@vger.kernel.org>, Nicolas Pitre <nico@fluxnic.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-Hi Nicholas,
+Hi.
 
-2018-04-20 19:41 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
-> On Fri, 20 Apr 2018 12:00:49 +0200
-> Mathieu Malaterre <malat@debian.org> wrote:
+
+2018-04-30 10:23 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> The powerpc toolchain can compile combinations of 32/64 bit and
+> big/little endian, so it's convenient to consider, e.g.,
 >
->> On Fri, Apr 20, 2018 at 9:34 AM, Nicholas Piggin <npiggin@gmail.com> wrote:
->> > This requires further changes to linker script to KEEP some tables
->> > and wildcard compiler generated sections into the right place. This
->> > includes pp32 modifications from Christophe Leroy.
->> >
->> > When compiling powernv_defconfig with this option:
->> >
->> > text       data      bss       dec        filename
->> > 11827621   4810490   1341080   17979191   vmlinux
->> > 11752437   4598858   1338776   17690071   vmlinux.dcde
->> >
->> > Resulting kernel is almost 400kB smaller (and still boots).
->> >
->> > [ppc32 numbers here]
->>
->> ^^^
->>
->> Do you want somebody else to provide those numbers ?
+>   CC -m64 -mbig-endian
 >
-> If you have a booting kernel, yes some more numbers would be good.
+> To be the C compiler for the purpose of invoking it to build
+> target artifacts.
+
+Right, but this is not possible in the new Kconfig scheme
+because CPU_BIG/LITTLE_ENDIAN can be turned on/off
+from Kconfig menus.
+
+
+> Rather than override, use kbuild defined variables to pass these
+> flags around. Importantly, they must be passed to things like
+> cc-option, so the usual cflags-y is not sufficient. This multitude
+> of inconsistently named variables is a mess, but it's marginally
+> better than overriding the toolchain because it matches what other
+> architectures do.
 >
-> Thanks,
-> Nick
+> This allows powerpc builds to work with the new kconfig macro
+> language branch. XXX: not exactly sure why it fails in the first
+> place.
+
+
+Without this patch, 'scripts/kconfig/conf  --syncconfig Kconfig'
+continues eternally.
+
+This is because the change of environment variable $(CC) will
+trigger syncconfig.
+
+So, this patch is the right thing to do.
 
 
 
-I applied this series because I want it to be more tested in linux-next.
+> XXX: 32-bit builds with 64-bit toolchain gain some additional options
+> like -funit-at-a-time from cc-option. Unclear why that is. Build
+> appears to be correct otherwise.
+> ---
+>  arch/powerpc/Makefile | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
+> index 95813df90801..046b5dde9ff5 100644
+> --- a/arch/powerpc/Makefile
+> +++ b/arch/powerpc/Makefile
+> @@ -74,13 +74,15 @@ endif
+>  endif
+>
+>  ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
+> -override LD    += -EL
+> +KBUILD_CPPFLAGS        += -mlittle-endian
 
 
-Some requests:
+IMHO, I personally prefer
 
- - Could you provide information to replace '[ppc32 numbers here]'?
-   (or just remove it)
+KBUILD_CFLAGS        += -mlittle-endian
+KBUILD_AFLAGS        += -mlittle-endian
 
- - V2 is welcome if you have code improvement.
-   (I thought so from your comments)
+like the current arch/powerpc/Makefile add the flag
+to cflags-y / aflags-y separately.
 
-Thanks.
+
+Only the difference would be whether -mlittle-endian
+is passed to pre-processing the linker script, though.
+
+
+
+
+> +LDFLAGS                += -EL
+>  LDEMULATION    := lppc
+>  GNUTARGET      := powerpcle
+>  MULTIPLEWORD   := -mno-multiple
+>  KBUILD_CFLAGS_MODULE += $(call cc-option,-mno-save-toc-indirect)
+>  else
+> -override LD    += -EB
+> +KBUILD_CPPFLAGS += $(call cc-option,-mbig-endian)
+> +LDFLAGS                += -EB
+>  LDEMULATION    := ppc
+>  GNUTARGET      := powerpc
+>  MULTIPLEWORD   := -mmultiple
+> @@ -93,8 +95,6 @@ aflags-$(CONFIG_CPU_BIG_ENDIAN)               += $(call cc-option,-mabi=elfv1)
+>  aflags-$(CONFIG_CPU_LITTLE_ENDIAN)     += -mabi=elfv2
+>  endif
+>
+> -cflags-$(CONFIG_CPU_LITTLE_ENDIAN)     += -mlittle-endian
+> -cflags-$(CONFIG_CPU_BIG_ENDIAN)                += $(call cc-option,-mbig-endian)
+>  ifneq ($(cc-name),clang)
+>    cflags-$(CONFIG_CPU_LITTLE_ENDIAN)   += -mno-strict-align
+>  endif
+> @@ -103,9 +103,9 @@ aflags-$(CONFIG_CPU_BIG_ENDIAN)             += $(call cc-option,-mbig-endian)
+>  aflags-$(CONFIG_CPU_LITTLE_ENDIAN)     += -mlittle-endian
+>
+>  ifeq ($(HAS_BIARCH),y)
+> -override AS    += -a$(BITS)
+> -override LD    += -m elf$(BITS)$(LDEMULATION)
+> -override CC    += -m$(BITS)
+> +KBUILD_CPPFLAGS        += -m$(BITS)
+
+
+Do you mean this?
+
+KBUILD_CFLAGS        += -m$(BITS)
+
+
+> +KBUILD_AFLAGS  += -m$(BITS) -Wl,-a$(BITS)
+
+
+Both KBUILD_CPPFLAGS and KBUILD_AFLAGS are added
+to orig_a_flags in scripts/Makefile.lib
+
+So, -m$(BITS) will be doubled for *.S files.
+
+
+> +LDFLAGS                += -m elf$(BITS)$(LDEMULATION)
+>  KBUILD_ARFLAGS += --target=elf$(BITS)-$(GNUTARGET)
+>  endif
+>
+
 
 
 -- 
