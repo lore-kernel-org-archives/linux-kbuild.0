@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:50568 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:50745 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753242AbeEIHYq (ORCPT
+        with ESMTP id S1756211AbeEIHYu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 9 May 2018 03:24:46 -0400
+        Wed, 9 May 2018 03:24:50 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 4/8] depmod.sh: remove symbol prefix support
-Date: Wed,  9 May 2018 16:23:48 +0900
-Message-Id: <1525850632-10921-5-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 1/8] modpost: remove symbol prefix support
+Date: Wed,  9 May 2018 16:23:45 +0900
+Message-Id: <1525850632-10921-2-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -20,72 +20,110 @@ They were removed by commit 4ba66a976072 ("arch: remove blackfin port"),
 commit bb6fb6dfcc17 ("metag: Remove arch/metag/"), respectively.
 
 No more architecture enables CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX,
-hence the last argument of scripts/depmod.sh can be removed.
+hence VMLINUX_SYMBOL_STR(foo) can be simplify replaced with "foo".
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile          |  2 +-
- scripts/depmod.sh | 21 +--------------------
- 2 files changed, 2 insertions(+), 21 deletions(-)
+ scripts/mod/modpost.c | 30 ++++++++++--------------------
+ 1 file changed, 10 insertions(+), 20 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 4cb8531..52ea534 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1760,7 +1760,7 @@ quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files))
- # Run depmod only if we have System.map and depmod is executable
- quiet_cmd_depmod = DEPMOD  $(KERNELRELEASE)
-       cmd_depmod = $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh $(DEPMOD) \
--                   $(KERNELRELEASE) "$(patsubst y,_,$(CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX))"
-+                   $(KERNELRELEASE)
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 4ff08a0..bc71925 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -19,9 +19,7 @@
+ #include <stdbool.h>
+ #include <errno.h>
+ #include "modpost.h"
+-#include "../../include/generated/autoconf.h"
+ #include "../../include/linux/license.h"
+-#include "../../include/linux/export.h"
  
- # Create temporary dir for module support files
- # clean it up only when building all modules
-diff --git a/scripts/depmod.sh b/scripts/depmod.sh
-index 9831cca..421d1aa 100755
---- a/scripts/depmod.sh
-+++ b/scripts/depmod.sh
-@@ -9,30 +9,11 @@ if test $# -ne 3; then
- fi
- DEPMOD=$1
- KERNELRELEASE=$2
--SYMBOL_PREFIX=$3
+ /* Are we using CONFIG_MODVERSIONS? */
+ static int modversions = 0;
+@@ -591,7 +589,7 @@ static void parse_elf_finish(struct elf_info *info)
+ static int ignore_undef_symbol(struct elf_info *info, const char *symname)
+ {
+ 	/* ignore __this_module, it will be resolved shortly */
+-	if (strcmp(symname, VMLINUX_SYMBOL_STR(__this_module)) == 0)
++	if (strcmp(symname, "__this_module") == 0)
+ 		return 1;
+ 	/* ignore global offset table */
+ 	if (strcmp(symname, "_GLOBAL_OFFSET_TABLE_") == 0)
+@@ -617,9 +615,6 @@ static int ignore_undef_symbol(struct elf_info *info, const char *symname)
+ 	return 0;
+ }
  
- if ! test -r System.map -a -x "$DEPMOD"; then
- 	exit 0
- fi
- 
--# older versions of depmod don't support -P <symbol-prefix>
--# support was added in module-init-tools 3.13
--if test -n "$SYMBOL_PREFIX"; then
--	release=$("$DEPMOD" --version)
--	package=$(echo "$release" | cut -d' ' -f 1)
--	if test "$package" = "module-init-tools"; then
--		version=$(echo "$release" | cut -d' ' -f 2)
--		later=$(printf '%s\n' "$version" "3.13" | sort -V | tail -n 1)
--		if test "$later" != "$version"; then
--			# module-init-tools < 3.13, drop the symbol prefix
--			SYMBOL_PREFIX=""
--		fi
--	fi
--	if test -n "$SYMBOL_PREFIX"; then
--		SYMBOL_PREFIX="-P $SYMBOL_PREFIX"
--	fi
--fi
+-#define CRC_PFX     VMLINUX_SYMBOL_STR(__crc_)
+-#define KSYMTAB_PFX VMLINUX_SYMBOL_STR(__ksymtab_)
 -
- # older versions of depmod require the version string to start with three
- # numbers, so we cheat with a symlink here
- depmod_hack_needed=true
-@@ -55,7 +36,7 @@ set -- -ae -F System.map
- if test -n "$INSTALL_MOD_PATH"; then
- 	set -- "$@" -b "$INSTALL_MOD_PATH"
- fi
--"$DEPMOD" "$@" "$KERNELRELEASE" $SYMBOL_PREFIX
-+"$DEPMOD" "$@" "$KERNELRELEASE"
- ret=$?
+ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 			       Elf_Sym *sym, const char *symname)
+ {
+@@ -634,7 +629,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 		export = export_from_sec(info, get_secindex(info, sym));
  
- if $depmod_hack_needed; then
+ 	/* CRC'd symbol */
+-	if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
++	if (strncmp(symname, "__crc_", strlen("__crc_")) == 0) {
+ 		is_crc = true;
+ 		crc = (unsigned int) sym->st_value;
+ 		if (sym->st_shndx != SHN_UNDEF && sym->st_shndx != SHN_ABS) {
+@@ -647,7 +642,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 				info->sechdrs[sym->st_shndx].sh_addr : 0);
+ 			crc = *crcp;
+ 		}
+-		sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
++		sym_update_crc(symname + strlen("__crc_"), mod, crc,
+ 				export);
+ 	}
+ 
+@@ -685,15 +680,10 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 		}
+ #endif
+ 
+-#ifdef CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
+-		if (symname[0] != '_')
+-			break;
+-		else
+-			symname++;
+-#endif
+ 		if (is_crc) {
+ 			const char *e = is_vmlinux(mod->name) ?"":".ko";
+-			warn("EXPORT symbol \"%s\" [%s%s] version generation failed, symbol will not be versioned.\n", symname + strlen(CRC_PFX), mod->name, e);
++			warn("EXPORT symbol \"%s\" [%s%s] version generation failed, symbol will not be versioned.\n",
++			     symname + strlen("__crc_"), mod->name, e);
+ 		}
+ 		mod->unres = alloc_symbol(symname,
+ 					  ELF_ST_BIND(sym->st_info) == STB_WEAK,
+@@ -701,13 +691,13 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 		break;
+ 	default:
+ 		/* All exported symbols */
+-		if (strncmp(symname, KSYMTAB_PFX, strlen(KSYMTAB_PFX)) == 0) {
+-			sym_add_exported(symname + strlen(KSYMTAB_PFX), mod,
++		if (strncmp(symname, "__ksymtab_", strlen("__ksymtab_")) == 0) {
++			sym_add_exported(symname + strlen("__ksymtab_"), mod,
+ 					export);
+ 		}
+-		if (strcmp(symname, VMLINUX_SYMBOL_STR(init_module)) == 0)
++		if (strcmp(symname, "init_module") == 0)
+ 			mod->has_init = 1;
+-		if (strcmp(symname, VMLINUX_SYMBOL_STR(cleanup_module)) == 0)
++		if (strcmp(symname, "cleanup_module") == 0)
+ 			mod->has_cleanup = 1;
+ 		break;
+ 	}
+@@ -2230,7 +2220,7 @@ static int add_versions(struct buffer *b, struct module *mod)
+ 			err = 1;
+ 			break;
+ 		}
+-		buf_printf(b, "\t{ %#8x, __VMLINUX_SYMBOL_STR(%s) },\n",
++		buf_printf(b, "\t{ %#8x, \"%s\" },\n",
+ 			   s->crc, s->name);
+ 	}
+ 
 -- 
 2.7.4
 
