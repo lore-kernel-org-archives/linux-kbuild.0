@@ -1,190 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:37321 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934689AbeEINAQ (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:44544 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965208AbeEIQHc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 9 May 2018 09:00:16 -0400
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH v2 1/4] kbuild: Fix asm-generic/vmlinux.lds.h for LD_DEAD_CODE_DATA_ELIMINATION
-Date: Wed,  9 May 2018 22:59:58 +1000
-Message-Id: <20180509130001.24276-2-npiggin@gmail.com>
-In-Reply-To: <20180509130001.24276-1-npiggin@gmail.com>
-References: <20180509130001.24276-1-npiggin@gmail.com>
+        Wed, 9 May 2018 12:07:32 -0400
+Date: Wed, 9 May 2018 18:07:27 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 5/8] export.h: remove code for prefixing symbols with
+ underscore
+Message-ID: <20180509160727.GA7459@ravnborg.org>
+References: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
+ <1525850632-10921-6-git-send-email-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1525850632-10921-6-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc: linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Joe Perches <joe@perches.com>, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org
 
-KEEP more tables, and add the function/data section wildcard to more
-section selections.
+Hi Masahiro
 
-This is a little ad-hoc at the moment, but kernel code should be moved
-to consistently use .text..x (note: double dots) for explicit sections
-and all references to it in the linker script can be made with
-TEXT_MAIN, and similarly for other sections.
+On Wed, May 09, 2018 at 04:23:49PM +0900, Masahiro Yamada wrote:
+> CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX was selected by BLACKFIN, METAG.
+> They were removed by commit 4ba66a976072 ("arch: remove blackfin port"),
+> commit bb6fb6dfcc17 ("metag: Remove arch/metag/"), respectively.
+> 
+> No more architecture enables CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX.
+> Clean up the export.h headers.  I am keeping VMLINUX_SYMBOL() and
+> VMLINUX_SYMBOL_STR() because they are widely used.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> diff --git a/include/linux/export.h b/include/linux/export.h
+> index 1a1dfdb..b768d6d 100644
+> --- a/include/linux/export.h
+> +++ b/include/linux/export.h
+> @@ -10,14 +10,8 @@
+>   * hackers place grumpy comments in header files.
+>   */
+>  
+> -/* Some toolchains use a `_' prefix for all user symbols. */
+> -#ifdef CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
+> -#define __VMLINUX_SYMBOL(x) _##x
+> -#define __VMLINUX_SYMBOL_STR(x) "_" #x
+> -#else
+>  #define __VMLINUX_SYMBOL(x) x
+>  #define __VMLINUX_SYMBOL_STR(x) #x
+> -#endif
+>  
+>  /* Indirect, so macros are expanded before pasting. */
+>  #define VMLINUX_SYMBOL(x) __VMLINUX_SYMBOL(x)
 
-For now, let's see if major architectures move to enabling this option
-then we can do some refactoring passes. Otherwise if it remains unused
-or superseded by LTO, this may not be required.
+Since we no longer need any expansion, then the indirection
+seems unnessesary.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- include/asm-generic/vmlinux.lds.h | 49 ++++++++++++++++++-------------
- 1 file changed, 29 insertions(+), 20 deletions(-)
+I think we can reduce this to just:
+#define VMLINUX_SYMBOL(x) x
 
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index af240573e482..9efb82a9a528 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -64,15 +64,24 @@
-  * generates .data.identifier sections, which need to be pulled in with
-  * .data. We don't want to pull in .data..other sections, which Linux
-  * has defined. Same for text and bss.
-+ *
-+ * RODATA_MAIN is not used because existing code already defines .rodata.x
-+ * sections to be brought in with rodata.
-  */
- #ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
- #define TEXT_MAIN .text .text.[0-9a-zA-Z_]*
- #define DATA_MAIN .data .data.[0-9a-zA-Z_]*
-+#define SDATA_MAIN .sdata .sdata.[0-9a-zA-Z_]*
-+#define RODATA_MAIN .rodata .rodata.[0-9a-zA-Z_]*
- #define BSS_MAIN .bss .bss.[0-9a-zA-Z_]*
-+#define SBSS_MAIN .sbss .sbss.[0-9a-zA-Z_]*
- #else
- #define TEXT_MAIN .text
- #define DATA_MAIN .data
-+#define SDATA_MAIN .sdata
-+#define RODATA_MAIN .rodata
- #define BSS_MAIN .bss
-+#define SBSS_MAIN .sbss
- #endif
- 
- /*
-@@ -105,7 +114,7 @@
- #ifdef CONFIG_FTRACE_MCOUNT_RECORD
- #define MCOUNT_REC()	. = ALIGN(8);				\
- 			VMLINUX_SYMBOL(__start_mcount_loc) = .; \
--			*(__mcount_loc)				\
-+			KEEP(*(__mcount_loc))			\
- 			VMLINUX_SYMBOL(__stop_mcount_loc) = .;
- #else
- #define MCOUNT_REC()
-@@ -113,7 +122,7 @@
- 
- #ifdef CONFIG_TRACE_BRANCH_PROFILING
- #define LIKELY_PROFILE()	VMLINUX_SYMBOL(__start_annotated_branch_profile) = .; \
--				*(_ftrace_annotated_branch)			      \
-+				KEEP(*(_ftrace_annotated_branch))		      \
- 				VMLINUX_SYMBOL(__stop_annotated_branch_profile) = .;
- #else
- #define LIKELY_PROFILE()
-@@ -121,7 +130,7 @@
- 
- #ifdef CONFIG_PROFILE_ALL_BRANCHES
- #define BRANCH_PROFILE()	VMLINUX_SYMBOL(__start_branch_profile) = .;   \
--				*(_ftrace_branch)			      \
-+				KEEP(*(_ftrace_branch))			      \
- 				VMLINUX_SYMBOL(__stop_branch_profile) = .;
- #else
- #define BRANCH_PROFILE()
-@@ -238,8 +247,8 @@
- 	*(DATA_MAIN)							\
- 	*(.ref.data)							\
- 	*(.data..shared_aligned) /* percpu related */			\
--	MEM_KEEP(init.data)						\
--	MEM_KEEP(exit.data)						\
-+	MEM_KEEP(init.data*)						\
-+	MEM_KEEP(exit.data*)						\
- 	*(.data.unlikely)						\
- 	VMLINUX_SYMBOL(__start_once) = .;				\
- 	*(.data.once)							\
-@@ -289,8 +298,8 @@
- 	VMLINUX_SYMBOL(__start_init_task) = .;				\
- 	VMLINUX_SYMBOL(init_thread_union) = .;				\
- 	VMLINUX_SYMBOL(init_stack) = .;					\
--	*(.data..init_task)						\
--	*(.data..init_thread_info)					\
-+	KEEP(*(.data..init_task))					\
-+	KEEP(*(.data..init_thread_info))				\
- 	. = VMLINUX_SYMBOL(__start_init_task) + THREAD_SIZE;		\
- 	VMLINUX_SYMBOL(__end_init_task) = .;
- 
-@@ -487,8 +496,8 @@
- 		*(.text.hot TEXT_MAIN .text.fixup .text.unlikely)	\
- 		*(.text..refcount)					\
- 		*(.ref.text)						\
--	MEM_KEEP(init.text)						\
--	MEM_KEEP(exit.text)						\
-+	MEM_KEEP(init.text*)						\
-+	MEM_KEEP(exit.text*)						\
- 
- 
- /* sched.text is aling to function alignment to secure we have same
-@@ -538,7 +547,7 @@
- 		VMLINUX_SYMBOL(__softirqentry_text_end) = .;
- 
- /* Section used for early init (in .S files) */
--#define HEAD_TEXT  *(.head.text)
-+#define HEAD_TEXT  KEEP(*(.head.text))
- 
- #define HEAD_TEXT_SECTION							\
- 	.head.text : AT(ADDR(.head.text) - LOAD_OFFSET) {		\
-@@ -579,11 +588,11 @@
- /* init and exit section handling */
- #define INIT_DATA							\
- 	KEEP(*(SORT(___kentry+*)))					\
--	*(.init.data)							\
--	MEM_DISCARD(init.data)						\
-+	*(.init.data init.data.*)					\
-+	MEM_DISCARD(init.data*)						\
- 	KERNEL_CTORS()							\
- 	MCOUNT_REC()							\
--	*(.init.rodata)							\
-+	*(.init.rodata .init.rodata.*)					\
- 	FTRACE_EVENTS()							\
- 	TRACE_SYSCALLS()						\
- 	KPROBE_BLACKLIST()						\
-@@ -602,16 +611,16 @@
- 	EARLYCON_TABLE()
- 
- #define INIT_TEXT							\
--	*(.init.text)							\
-+	*(.init.text .init.text.*)					\
- 	*(.text.startup)						\
--	MEM_DISCARD(init.text)
-+	MEM_DISCARD(init.text*)
- 
- #define EXIT_DATA							\
--	*(.exit.data)							\
-+	*(.exit.data .exit.data.*)					\
- 	*(.fini_array)							\
- 	*(.dtors)							\
--	MEM_DISCARD(exit.data)						\
--	MEM_DISCARD(exit.rodata)
-+	MEM_DISCARD(exit.data*)						\
-+	MEM_DISCARD(exit.rodata*)
- 
- #define EXIT_TEXT							\
- 	*(.exit.text)							\
-@@ -629,7 +638,7 @@
- 	. = ALIGN(sbss_align);						\
- 	.sbss : AT(ADDR(.sbss) - LOAD_OFFSET) {				\
- 		*(.dynsbss)						\
--		*(.sbss)						\
-+		*(SBSS_MAIN)						\
- 		*(.scommon)						\
- 	}
- 
-@@ -754,7 +763,7 @@
- #define NOTES								\
- 	.notes : AT(ADDR(.notes) - LOAD_OFFSET) {			\
- 		VMLINUX_SYMBOL(__start_notes) = .;			\
--		*(.note.*)						\
-+		KEEP(*(.note.*))					\
- 		VMLINUX_SYMBOL(__stop_notes) = .;			\
- 	}
- 
--- 
-2.17.0
+Likewise for __VMLINUX_SYMBOL_STR
 
+	Sam
