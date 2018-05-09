@@ -1,106 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:46603 "EHLO
-        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755826AbeEIHVc (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:50568 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753242AbeEIHYq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 9 May 2018 03:21:32 -0400
-Date: Wed, 9 May 2018 09:21:29 +0200
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-        <u.kleine-koenig@pengutronix.de>
-Subject: Re: [PATCH v2] kbuild: deb-pkg improve maintainer address generation
-Message-ID: <20180509072129.s5pllvhg6w7e4g6t@pengutronix.de>
-References: <20180507071134.5213-1-riku.voipio@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20180507071134.5213-1-riku.voipio@linaro.org>
+        Wed, 9 May 2018 03:24:46 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 4/8] depmod.sh: remove symbol prefix support
+Date: Wed,  9 May 2018 16:23:48 +0900
+Message-Id: <1525850632-10921-5-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: riku.voipio@linaro.org
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, debian-kernel@lists.debian.org, malat@debian.org
+To: linux-kbuild@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Joe Perches <joe@perches.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Hello,
+CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX was selected by BLACKFIN, METAG.
+They were removed by commit 4ba66a976072 ("arch: remove blackfin port"),
+commit bb6fb6dfcc17 ("metag: Remove arch/metag/"), respectively.
 
-On Mon, May 07, 2018 at 10:11:34AM +0300, riku.voipio@linaro.org wrote:
-> From: Riku Voipio <riku.voipio@linaro.org>
-> 
-> There is multiple issues with the genaration of maintainer string
-> 
-> It uses DEBEMAIL and EMAIL enviroment variables, which may contain angle brackets,
-> creating invalid maintainer strings. The documented KBUILD_BUILD_USER and
-> KBUILD_BUILD_HOST variables are not used. Undocumented and uncommon NAME
-> variable is used. Refactor the Maintainer string to:
-> 
-> - use EMAIL or DEBEMAIL directly if they are in form "name <user@host>"
-> - use KBUILD_BUILD_USER and KBUILD_BUILD_HOST if set before falling
->   back to autodetection
-> - no longer use NAME variable or the useless Anonymous string
-> 
-> The logic is switched from multiline if/then/fi statements to compact
-> shell variable substition commands.
-> 
-> Reported-by: Mathieu Malaterre <malat@debian.org>
-> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-> ---
-> v2: include improvements suggested by Masahiro-san
-> 
->  scripts/package/mkdebian | 27 +++++++++++++--------------
->  1 file changed, 13 insertions(+), 14 deletions(-)
-> 
-> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-> index 6adb3a16ba3b..985d72d1ab34 100755
-> --- a/scripts/package/mkdebian
-> +++ b/scripts/package/mkdebian
-> @@ -71,22 +71,21 @@ if [ "$ARCH" = "um" ] ; then
->  	packagename=user-mode-linux-$version
->  fi
->  
-> -# Try to determine maintainer and email values
-> -if [ -n "$DEBEMAIL" ]; then
-> -       email=$DEBEMAIL
-> -elif [ -n "$EMAIL" ]; then
-> -       email=$EMAIL
-> -else
-> -       email=$(id -nu)@$(hostname -f 2>/dev/null || hostname)
-> -fi
-> -if [ -n "$DEBFULLNAME" ]; then
-> -       name=$DEBFULLNAME
-> -elif [ -n "$NAME" ]; then
-> -       name=$NAME
-> +email=${DEBEMAIL-$EMAIL}
-> +
-> +# use email string directly if it contains <email>
-> +if echo $email | grep -q '<.*>'; then
-> +	maintainer=$email
+No more architecture enables CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX,
+hence the last argument of scripts/depmod.sh can be removed.
 
-Alternatively you can do:
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-	case "$email" in
-	*\<*\>*)
-		maintainer="$email"
-		;;
-	*)
-		...
+ Makefile          |  2 +-
+ scripts/depmod.sh | 21 +--------------------
+ 2 files changed, 2 insertions(+), 21 deletions(-)
 
-	esac
-
-which might be a tad quicker because case is shell-builtin.
-
->  else
-> -       name="Anonymous"
-> +	# or construct the maintainer string
-> +	user=${KBUILD_BUILD_USER-$(id -nu)}
-> +	name=${DEBFULLNAME-$user}
-> +	if [ -z "$email" ]; then
-> +		buildhost=${KBUILD_BUILD_HOST-$(hostname -f 2>/dev/null || hostname)}
-
-On Debian machines there is also /etc/mailname which should be preferred
-over hostname -f.
-
-Best regards
-Uwe
-
+diff --git a/Makefile b/Makefile
+index 4cb8531..52ea534 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1760,7 +1760,7 @@ quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files))
+ # Run depmod only if we have System.map and depmod is executable
+ quiet_cmd_depmod = DEPMOD  $(KERNELRELEASE)
+       cmd_depmod = $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh $(DEPMOD) \
+-                   $(KERNELRELEASE) "$(patsubst y,_,$(CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX))"
++                   $(KERNELRELEASE)
+ 
+ # Create temporary dir for module support files
+ # clean it up only when building all modules
+diff --git a/scripts/depmod.sh b/scripts/depmod.sh
+index 9831cca..421d1aa 100755
+--- a/scripts/depmod.sh
++++ b/scripts/depmod.sh
+@@ -9,30 +9,11 @@ if test $# -ne 3; then
+ fi
+ DEPMOD=$1
+ KERNELRELEASE=$2
+-SYMBOL_PREFIX=$3
+ 
+ if ! test -r System.map -a -x "$DEPMOD"; then
+ 	exit 0
+ fi
+ 
+-# older versions of depmod don't support -P <symbol-prefix>
+-# support was added in module-init-tools 3.13
+-if test -n "$SYMBOL_PREFIX"; then
+-	release=$("$DEPMOD" --version)
+-	package=$(echo "$release" | cut -d' ' -f 1)
+-	if test "$package" = "module-init-tools"; then
+-		version=$(echo "$release" | cut -d' ' -f 2)
+-		later=$(printf '%s\n' "$version" "3.13" | sort -V | tail -n 1)
+-		if test "$later" != "$version"; then
+-			# module-init-tools < 3.13, drop the symbol prefix
+-			SYMBOL_PREFIX=""
+-		fi
+-	fi
+-	if test -n "$SYMBOL_PREFIX"; then
+-		SYMBOL_PREFIX="-P $SYMBOL_PREFIX"
+-	fi
+-fi
+-
+ # older versions of depmod require the version string to start with three
+ # numbers, so we cheat with a symlink here
+ depmod_hack_needed=true
+@@ -55,7 +36,7 @@ set -- -ae -F System.map
+ if test -n "$INSTALL_MOD_PATH"; then
+ 	set -- "$@" -b "$INSTALL_MOD_PATH"
+ fi
+-"$DEPMOD" "$@" "$KERNELRELEASE" $SYMBOL_PREFIX
++"$DEPMOD" "$@" "$KERNELRELEASE"
+ ret=$?
+ 
+ if $depmod_hack_needed; then
 -- 
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+2.7.4
+
