@@ -1,84 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:47882 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934229AbeEII4V (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 9 May 2018 04:56:21 -0400
-From: changbin.du@intel.com
-Subject: [PATCH v4 2/4] kernel hacking: new config NO_AUTO_INLINE to disable compiler auto-inline optimizations
-Date: Wed,  9 May 2018 16:43:14 +0800
-Message-Id: <1525855396-7908-3-git-send-email-changbin.du@intel.com>
-In-Reply-To: <1525855396-7908-1-git-send-email-changbin.du@intel.com>
-References: <1525855396-7908-1-git-send-email-changbin.du@intel.com>
+Received: from conuserg-11.nifty.com ([210.131.2.78]:53969 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934106AbeEIJuw (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 9 May 2018 05:50:52 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 4/4] modpost: constify *modname function argument where possible
+Date: Wed,  9 May 2018 18:50:40 +0900
+Message-Id: <1525859440-29583-4-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1525859440-29583-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1525859440-29583-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org
-Cc: rostedt@goodmis.org, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Changbin Du <changbin.du@intel.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-From: Changbin Du <changbin.du@intel.com>
+Neither find_module() nor read_symbols() does change *modname.
 
-This patch add a new kernel hacking option NO_AUTO_INLINE. Selecting
-this option will prevent the compiler from optimizing the kernel by
-auto-inlining functions not marked with the inline keyword.
-
-With this option, only functions explicitly marked with "inline" will
-be inlined. This will allow the function tracer to trace more functions
-because it only traces functions that the compiler has not inlined.
-
-Signed-off-by: Changbin Du <changbin.du@intel.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
-v2: Some grammar updates from Steven.
----
- Makefile          |  6 ++++++
- lib/Kconfig.debug | 17 +++++++++++++++++
- 2 files changed, 23 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index d0d2652..6720c40 100644
---- a/Makefile
-+++ b/Makefile
-@@ -775,6 +775,12 @@ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
- 		   $(call cc-option,-fno-var-tracking)
- endif
+ scripts/mod/modpost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 9e70a6a..1663fb1 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -121,7 +121,7 @@ void *do_nofail(void *ptr, const char *expr)
+ /* A list of all modules we processed */
+ static struct module *modules;
  
-+ifdef CONFIG_NO_AUTO_INLINE
-+KBUILD_CFLAGS   += $(call cc-option, -fno-inline-functions) \
-+		   $(call cc-option, -fno-inline-small-functions) \
-+		   $(call cc-option, -fno-inline-functions-called-once)
-+endif
-+
- ifdef CONFIG_FUNCTION_TRACER
- ifndef CC_FLAGS_FTRACE
- CC_FLAGS_FTRACE := -pg
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index c40c7b7..da52243 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -198,6 +198,23 @@ config GDB_SCRIPTS
- 	  instance. See Documentation/dev-tools/gdb-kernel-debugging.rst
- 	  for further details.
+-static struct module *find_module(char *modname)
++static struct module *find_module(const char *modname)
+ {
+ 	struct module *mod;
  
-+config NO_AUTO_INLINE
-+	bool "Disable compiler auto-inline optimizations"
-+	help
-+	  This will prevent the compiler from optimizing the kernel by
-+	  auto-inlining functions not marked with the inline keyword.
-+	  With this option, only functions explicitly marked with
-+	  "inline" will be inlined. This will allow the function tracer
-+	  to trace more functions because it only traces functions that
-+	  the compiler has not inlined.
-+
-+	  Enabling this function can help debugging a kernel if using
-+	  the function tracer. But it can also change how the kernel
-+	  works, because inlining functions may change the timing,
-+	  which could make it difficult while debugging race conditions.
-+
-+	  If unsure, select N.
-+
- config ENABLE_WARN_DEPRECATED
- 	bool "Enable __deprecated logic"
- 	default y
+@@ -1929,7 +1929,7 @@ static char *remove_dot(char *s)
+ 	return s;
+ }
+ 
+-static void read_symbols(char *modname)
++static void read_symbols(const char *modname)
+ {
+ 	const char *symname;
+ 	char *version;
 -- 
 2.7.4
 
