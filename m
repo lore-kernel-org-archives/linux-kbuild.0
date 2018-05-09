@@ -1,64 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:44544 "EHLO
-        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965208AbeEIQHc (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:56081 "EHLO
+        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965358AbeEIQOE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 9 May 2018 12:07:32 -0400
-Date: Wed, 9 May 2018 18:07:27 +0200
+        Wed, 9 May 2018 12:14:04 -0400
+Date: Wed, 9 May 2018 18:13:59 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 5/8] export.h: remove code for prefixing symbols with
- underscore
-Message-ID: <20180509160727.GA7459@ravnborg.org>
+Subject: Re: [PATCH 0/8] kbuild: remove CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
+ and clean-up code
+Message-ID: <20180509161359.GB7459@ravnborg.org>
 References: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
- <1525850632-10921-6-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1525850632-10921-6-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Joe Perches <joe@perches.com>, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Joe Perches <joe@perches.com>, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Andy Whitcroft <apw@canonical.com>
 
-Hi Masahiro
+Hi Masahiro.
 
-On Wed, May 09, 2018 at 04:23:49PM +0900, Masahiro Yamada wrote:
-> CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX was selected by BLACKFIN, METAG.
-> They were removed by commit 4ba66a976072 ("arch: remove blackfin port"),
-> commit bb6fb6dfcc17 ("metag: Remove arch/metag/"), respectively.
+On Wed, May 09, 2018 at 04:23:44PM +0900, Masahiro Yamada wrote:
 > 
-> No more architecture enables CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX.
-> Clean up the export.h headers.  I am keeping VMLINUX_SYMBOL() and
-> VMLINUX_SYMBOL_STR() because they are widely used.
+> I got acknowledge to remove CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX entirely.
+> (https://lkml.org/lkml/2018/5/5/148)
 > 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> diff --git a/include/linux/export.h b/include/linux/export.h
-> index 1a1dfdb..b768d6d 100644
-> --- a/include/linux/export.h
-> +++ b/include/linux/export.h
-> @@ -10,14 +10,8 @@
->   * hackers place grumpy comments in header files.
->   */
->  
-> -/* Some toolchains use a `_' prefix for all user symbols. */
-> -#ifdef CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
-> -#define __VMLINUX_SYMBOL(x) _##x
-> -#define __VMLINUX_SYMBOL_STR(x) "_" #x
-> -#else
->  #define __VMLINUX_SYMBOL(x) x
->  #define __VMLINUX_SYMBOL_STR(x) #x
-> -#endif
->  
->  /* Indirect, so macros are expanded before pasting. */
->  #define VMLINUX_SYMBOL(x) __VMLINUX_SYMBOL(x)
+> Several tools can be cleaned-up.
+> 
+> Removing the CONFIG option makes VMLINUX_SYMBOL() no-op,
+> so this macro can be removed too.
+Looks good. You can add my:
+Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
 
-Since we no longer need any expansion, then the indirection
-seems unnessesary.
+for all patches.
+One minor comment to one patch that I let you decide what to do about.
+The code readability increases everywhere.
 
-I think we can reduce this to just:
-#define VMLINUX_SYMBOL(x) x
+> 
+> VMLINUX_SYMBOL() and VMLINUX_SYMBOL_STR() are widely used,
+> so it will take some time to kill them entirely.
+> (I will send other patches later, splitting per-arch)
 
-Likewise for __VMLINUX_SYMBOL_STR
+There are a few files outside arch/ like
+certs/system_certificates.S
+drivers/mtd/chips/gen_probe.c
+kernel/module.c
+
+They could belong in this none-arch series.
 
 	Sam
