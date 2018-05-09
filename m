@@ -1,50 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:50795 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:50743 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756214AbeEIHYw (ORCPT
+        with ESMTP id S1755400AbeEIHYu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 9 May 2018 03:24:52 -0400
+        Wed, 9 May 2018 03:24:50 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 8/8] checkpatch: remove VMLINUX_SYMBOL() check
-Date: Wed,  9 May 2018 16:23:52 +0900
-Message-Id: <1525850632-10921-9-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 2/8] genksyms: remove symbol prefix support
+Date: Wed,  9 May 2018 16:23:46 +0900
+Message-Id: <1525850632-10921-3-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Joe Perches <joe@perches.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Andy Whitcroft <apw@canonical.com>, linux-kernel@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Joe Perches <joe@perches.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Now that VMLINUX_SYMBOL() is no-op and being removed, let's stop
-checking VMLINUX_SYMBOL().
+CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX was selected by BLACKFIN, METAG.
+They were removed by commit 4ba66a976072 ("arch: remove blackfin port"),
+commit bb6fb6dfcc17 ("metag: Remove arch/metag/"), respectively.
+
+No more architecture enables CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX,
+hence the -s (--symbol-prefix) option is unnecessary.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/checkpatch.pl | 10 ----------
- 1 file changed, 10 deletions(-)
+ scripts/Makefile.build      |  2 --
+ scripts/genksyms/genksyms.c | 11 +++--------
+ 2 files changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index e16d671..ce582a8 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -5121,16 +5121,6 @@ sub process {
- 			}
- 		}
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 8bdb1dc..22df8d0 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -147,7 +147,6 @@ $(obj)/%.i: $(src)/%.c FORCE
+ cmd_gensymtypes_c =                                                         \
+     $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
+     $(GENKSYMS) $(if $(1), -T $(2))                                         \
+-     $(patsubst y,-s _,$(CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX))             \
+      $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+      $(if $(KBUILD_PRESERVE),-p)                                            \
+      -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
+@@ -355,7 +354,6 @@ cmd_gensymtypes_S =                                                         \
+      sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ) | \
+     $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
+     $(GENKSYMS) $(if $(1), -T $(2))                                         \
+-     $(patsubst y,-s _,$(CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX))             \
+      $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+      $(if $(KBUILD_PRESERVE),-p)                                            \
+      -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
+diff --git a/scripts/genksyms/genksyms.c b/scripts/genksyms/genksyms.c
+index c9235d8..e007840 100644
+--- a/scripts/genksyms/genksyms.c
++++ b/scripts/genksyms/genksyms.c
+@@ -45,7 +45,6 @@ int in_source_file;
  
--# make sure symbols are always wrapped with VMLINUX_SYMBOL() ...
--# all assignments may have only one of the following with an assignment:
--#	.
--#	ALIGN(...)
--#	VMLINUX_SYMBOL(...)
--		if ($realfile eq 'vmlinux.lds.h' && $line =~ /(?:(?:^|\s)$Ident\s*=|=\s*$Ident(?:\s|$))/) {
--			WARN("MISSING_VMLINUX_SYMBOL",
--			     "vmlinux.lds.h needs VMLINUX_SYMBOL() around C-visible symbols\n" . $herecurr);
--		}
--
- # check for redundant bracing round if etc
- 		if ($line =~ /(^.*)\bif\b/ && $1 !~ /else\s*$/) {
- 			my ($level, $endln, @chunks) =
+ static int flag_debug, flag_dump_defs, flag_reference, flag_dump_types,
+ 	   flag_preserve, flag_warnings, flag_rel_crcs;
+-static const char *mod_prefix = "";
+ 
+ static int errors;
+ static int nsyms;
+@@ -693,10 +692,10 @@ void export_symbol(const char *name)
+ 			fputs(">\n", debugfile);
+ 
+ 		/* Used as a linker script. */
+-		printf(!flag_rel_crcs ? "%s__crc_%s = 0x%08lx;\n" :
++		printf(!flag_rel_crcs ? "__crc_%s = 0x%08lx;\n" :
+ 		       "SECTIONS { .rodata : ALIGN(4) { "
+-		       "%s__crc_%s = .; LONG(0x%08lx); } }\n",
+-		       mod_prefix, name, crc);
++		       "__crc_%s = .; LONG(0x%08lx); } }\n",
++		       name, crc);
+ 	}
+ }
+ 
+@@ -769,7 +768,6 @@ int main(int argc, char **argv)
+ 
+ #ifdef __GNU_LIBRARY__
+ 	struct option long_opts[] = {
+-		{"symbol-prefix", 1, 0, 's'},
+ 		{"debug", 0, 0, 'd'},
+ 		{"warnings", 0, 0, 'w'},
+ 		{"quiet", 0, 0, 'q'},
+@@ -789,9 +787,6 @@ int main(int argc, char **argv)
+ 	while ((o = getopt(argc, argv, "s:dwqVDr:T:phR")) != EOF)
+ #endif				/* __GNU_LIBRARY__ */
+ 		switch (o) {
+-		case 's':
+-			mod_prefix = optarg;
+-			break;
+ 		case 'd':
+ 			flag_debug++;
+ 			break;
 -- 
 2.7.4
 
