@@ -1,154 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:50566 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753339AbeEIHYq (ORCPT
+Received: from heliosphere.sirena.org.uk ([172.104.155.198]:37878 "EHLO
+        heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933805AbeEIIVs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 9 May 2018 03:24:46 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 5/8] export.h: remove code for prefixing symbols with underscore
-Date: Wed,  9 May 2018 16:23:49 +0900
-Message-Id: <1525850632-10921-6-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
+        Wed, 9 May 2018 04:21:48 -0400
+Date: Wed, 9 May 2018 17:21:14 +0900
+From: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 2/5] regulator: add dummy function
+ of_find_regulator_by_node
+Message-ID: <20180509082114.GQ13402@sirena.org.uk>
+References: <1525566016-30172-1-git-send-email-changbin.du@intel.com>
+ <1525566016-30172-3-git-send-email-changbin.du@intel.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="EkxpYdHiqGHPYbUt"
+Content-Disposition: inline
+In-Reply-To: <1525566016-30172-3-git-send-email-changbin.du@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Joe Perches <joe@perches.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org
+To: changbin.du@intel.com
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org, rostedt@goodmis.org, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
 
-CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX was selected by BLACKFIN, METAG.
-They were removed by commit 4ba66a976072 ("arch: remove blackfin port"),
-commit bb6fb6dfcc17 ("metag: Remove arch/metag/"), respectively.
 
-No more architecture enables CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX.
-Clean up the export.h headers.  I am keeping VMLINUX_SYMBOL() and
-VMLINUX_SYMBOL_STR() because they are widely used.
+--EkxpYdHiqGHPYbUt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+On Sun, May 06, 2018 at 08:20:13AM +0800, changbin.du@intel.com wrote:
+> From: Changbin Du <changbin.du@intel.com>
+>=20
+> If device tree is not enabled, of_find_regulator_by_node() should have
+> a dummy function since the function call is still there.
 
- include/asm-generic/export.h | 34 ++++++++++++----------------------
- include/linux/export.h       | 16 +++++-----------
- 2 files changed, 17 insertions(+), 33 deletions(-)
+Please do not submit new versions of already applied patches, please
+submit incremental updates to the existing code.  Modifying existing
+commits creates problems for other users building on top of those
+commits so it's best practice to only change pubished git commits if
+absolutely essential.
 
-diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
-index 719db19..68efb95 100644
---- a/include/asm-generic/export.h
-+++ b/include/asm-generic/export.h
-@@ -19,42 +19,32 @@
- #define KCRC_ALIGN 4
- #endif
- 
--#ifdef CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
--#define KSYM(name) _##name
--#else
--#define KSYM(name) name
--#endif
--
- /*
-  * note on .section use: @progbits vs %progbits nastiness doesn't matter,
-  * since we immediately emit into those sections anyway.
-  */
- .macro ___EXPORT_SYMBOL name,val,sec
- #ifdef CONFIG_MODULES
--	.globl KSYM(__ksymtab_\name)
-+	.globl __ksymtab_\name
- 	.section ___ksymtab\sec+\name,"a"
- 	.balign KSYM_ALIGN
--KSYM(__ksymtab_\name):
--	__put \val, KSYM(__kstrtab_\name)
-+__ksymtab_\name:
-+	__put \val, __kstrtab_\name
- 	.previous
- 	.section __ksymtab_strings,"a"
--KSYM(__kstrtab_\name):
--#ifdef CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
--	.asciz "_\name"
--#else
-+__kstrtab_\name:
- 	.asciz "\name"
--#endif
- 	.previous
- #ifdef CONFIG_MODVERSIONS
- 	.section ___kcrctab\sec+\name,"a"
- 	.balign KCRC_ALIGN
--KSYM(__kcrctab_\name):
-+__kcrctab_\name:
- #if defined(CONFIG_MODULE_REL_CRCS)
--	.long KSYM(__crc_\name) - .
-+	.long __crc_\name - .
- #else
--	.long KSYM(__crc_\name)
-+	.long __crc_\name
- #endif
--	.weak KSYM(__crc_\name)
-+	.weak __crc_\name
- 	.previous
- #endif
- #endif
-@@ -84,12 +74,12 @@ KSYM(__kcrctab_\name):
- #endif
- 
- #define EXPORT_SYMBOL(name)					\
--	__EXPORT_SYMBOL(name, KSYM_FUNC(KSYM(name)),)
-+	__EXPORT_SYMBOL(name, KSYM_FUNC(name),)
- #define EXPORT_SYMBOL_GPL(name) 				\
--	__EXPORT_SYMBOL(name, KSYM_FUNC(KSYM(name)), _gpl)
-+	__EXPORT_SYMBOL(name, KSYM_FUNC(name), _gpl)
- #define EXPORT_DATA_SYMBOL(name)				\
--	__EXPORT_SYMBOL(name, KSYM(name),)
-+	__EXPORT_SYMBOL(name, name,)
- #define EXPORT_DATA_SYMBOL_GPL(name)				\
--	__EXPORT_SYMBOL(name, KSYM(name),_gpl)
-+	__EXPORT_SYMBOL(name, name,_gpl)
- 
- #endif
-diff --git a/include/linux/export.h b/include/linux/export.h
-index 1a1dfdb..b768d6d 100644
---- a/include/linux/export.h
-+++ b/include/linux/export.h
-@@ -10,14 +10,8 @@
-  * hackers place grumpy comments in header files.
-  */
- 
--/* Some toolchains use a `_' prefix for all user symbols. */
--#ifdef CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
--#define __VMLINUX_SYMBOL(x) _##x
--#define __VMLINUX_SYMBOL_STR(x) "_" #x
--#else
- #define __VMLINUX_SYMBOL(x) x
- #define __VMLINUX_SYMBOL_STR(x) #x
--#endif
- 
- /* Indirect, so macros are expanded before pasting. */
- #define VMLINUX_SYMBOL(x) __VMLINUX_SYMBOL(x)
-@@ -46,14 +40,14 @@ extern struct module __this_module;
- #if defined(CONFIG_MODULE_REL_CRCS)
- #define __CRC_SYMBOL(sym, sec)						\
- 	asm("	.section \"___kcrctab" sec "+" #sym "\", \"a\"	\n"	\
--	    "	.weak	" VMLINUX_SYMBOL_STR(__crc_##sym) "	\n"	\
--	    "	.long	" VMLINUX_SYMBOL_STR(__crc_##sym) " - .	\n"	\
-+	    "	.weak	__crc_" #sym "				\n"	\
-+	    "	.long	__crc_" #sym " - .			\n"	\
- 	    "	.previous					\n");
- #else
- #define __CRC_SYMBOL(sym, sec)						\
- 	asm("	.section \"___kcrctab" sec "+" #sym "\", \"a\"	\n"	\
--	    "	.weak	" VMLINUX_SYMBOL_STR(__crc_##sym) "	\n"	\
--	    "	.long	" VMLINUX_SYMBOL_STR(__crc_##sym) "	\n"	\
-+	    "	.weak	__crc_" #sym "				\n"	\
-+	    "	.long	__crc_" #sym "				\n"	\
- 	    "	.previous					\n");
- #endif
- #else
-@@ -66,7 +60,7 @@ extern struct module __this_module;
- 	__CRC_SYMBOL(sym, sec)						\
- 	static const char __kstrtab_##sym[]				\
- 	__attribute__((section("__ksymtab_strings"), aligned(1)))	\
--	= VMLINUX_SYMBOL_STR(sym);					\
-+	= #sym;								\
- 	static const struct kernel_symbol __ksymtab_##sym		\
- 	__used								\
- 	__attribute__((section("___ksymtab" sec "+" #sym), used))	\
--- 
-2.7.4
+--EkxpYdHiqGHPYbUt
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAlryr3kACgkQJNaLcl1U
+h9Cf1Qf/VZXV2l+LOlO9wC/dYLfOubi56ydHPoYZE4BS7u5oWeD5QkXCJHO2HBYd
+hdPcuUgmVFyhllxpd6b44kSgYP70DoyxZ0ijsXZ4bEgg76pGKz9Fl8vhJ2EGmoeW
+3LCZ6ESiYwFPoDs3dtIpiOpzVxghMHSqUvQeFEwzLvP08r5fzTmDTUUhXUrY/9f+
+5bG/l+YkEXqo05FKp85vs+EA4ck1GPqZWT+eNQUHqNuARGUNvvG1OHQIYk9BewC0
+vXPe8+U98hjHjRpQWWIZJr0rrh17am9+y4H+HHxjUHlh/KxVjeDuz2g6w6k3Chrw
+r0j4nYeUdcc/WoCxu+jv5Jerhn2TBQ==
+=MKwt
+-----END PGP SIGNATURE-----
+
+--EkxpYdHiqGHPYbUt--
