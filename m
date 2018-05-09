@@ -1,37 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f181.google.com ([209.85.216.181]:44240 "EHLO
-        mail-qt0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753183AbeEIMR1 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 9 May 2018 08:17:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40008 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934328AbeEIMw2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 9 May 2018 08:52:28 -0400
+Date: Wed, 9 May 2018 08:52:24 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH v4 4/4] asm-generic: fix build error in fix_to_virt with
+ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+Message-ID: <20180509085224.34116e36@gandalf.local.home>
+In-Reply-To: <1525855396-7908-5-git-send-email-changbin.du@intel.com>
+References: <1525855396-7908-1-git-send-email-changbin.du@intel.com>
+        <1525855396-7908-5-git-send-email-changbin.du@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180509160449.68b865a2@canb.auug.org.au>
-References: <20180509160449.68b865a2@canb.auug.org.au>
-From: Rob Herring <robherring2@gmail.com>
-Date: Wed, 9 May 2018 07:17:06 -0500
-Message-ID: <CAL_Jsq+nbTv-bnjo=OQR+P49MgjwL7qkcc+47=jRHb4z0V94Vw@mail.gmail.com>
-Subject: Re: linux-next: build warning after merge of the devicetree tree
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: changbin.du@intel.com
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
 
-On Wed, May 9, 2018 at 1:04 AM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> Hi Rob,
->
-> After merging the devicetree tree, today's linux-next build (arm
-> multi_v7_defconfig) produced this warning:
->
-> drivers/gpu/drm/rcar-du/rcar_du_of_lvds_r8a7795.dtb: Warning (graph_endpoint): /fragment@1/__overlay__/port@3/endpoint: graph connection to node '/fragment@0/__overlay__/lvds@feb90000/ports/port@0/endpoint' is not bidirectional
-> drivers/gpu/drm/rcar-du/rcar_du_of_lvds_r8a7790.dtb: Warning (graph_endpoint): /fragment@1/__overlay__/port@1/endpoint: graph connection to node '/fragment@0/__overlay__/lvds@feb90000/ports/port@0/endpoint' is not bidirectional
-> drivers/gpu/drm/rcar-du/rcar_du_of_lvds_r8a7790.dtb: Warning (graph_endpoint): /fragment@1/__overlay__/port@2/endpoint: graph connection to node '/fragment@0/__overlay__/lvds@feb94000/ports/port@0/endpoint' is not bidirectional
+On Wed,  9 May 2018 16:43:16 +0800
+changbin.du@intel.com wrote:
 
-I forgot about this one hiding in the tree.
+> From: Changbin Du <changbin.du@intel.com>
+> 
+> With '-Og' optimization level, GCC would not optimize a count for a loop
+> as a constant value. But BUILD_BUG_ON() only accept compile-time constant
+> values. Let's use __fix_to_virt() to avoid the error.
+> 
+> arch/arm/mm/mmu.o: In function `fix_to_virt':
+> /home/changbin/work/linux/./include/asm-generic/fixmap.h:31: undefined reference to `__compiletime_assert_31'
+> Makefile:1051: recipe for target 'vmlinux' failed
+> make: *** [vmlinux] Error 1
 
-> and over 2000 more :-(
+Perhaps we should put this patch ahead of patch 3. Why allow it to
+break?
 
-I assume you mean on other files. I've already sent out patches for
-arm and arm64 dts files.
+Anyway, besides that, I think the series looks good.
 
-Rob
+For the series: Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+
+-- Steve
+
+
+> 
+> Signed-off-by: Changbin Du <changbin.du@intel.com>
+> 
+> ---
+> v2: use __fix_to_virt() to fix the issue.
+> ---
+>  arch/arm/mm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm/mm/mmu.c b/arch/arm/mm/mmu.c
+> index e46a6a4..c08d74e 100644
+> --- a/arch/arm/mm/mmu.c
+> +++ b/arch/arm/mm/mmu.c
+> @@ -1599,7 +1599,7 @@ static void __init early_fixmap_shutdown(void)
+>  		pte_t *pte;
+>  		struct map_desc map;
+>  
+> -		map.virtual = fix_to_virt(i);
+> +		map.virtual = __fix_to_virt(i);
+>  		pte = pte_offset_early_fixmap(pmd_off_k(map.virtual), map.virtual);
+>  
+>  		/* Only i/o device mappings are supported ATM */
+
