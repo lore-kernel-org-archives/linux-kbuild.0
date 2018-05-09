@@ -1,98 +1,134 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:53968 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:53967 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934133AbeEIJuw (ORCPT
+        with ESMTP id S934150AbeEIJuw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 9 May 2018 05:50:52 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/4] modpost: pass struct elf_info pointer to get_modinfo()
-Date: Wed,  9 May 2018 18:50:37 +0900
-Message-Id: <1525859440-29583-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 2/4] modpost: use strstarts() helper more widely
+Date: Wed,  9 May 2018 18:50:38 +0900
+Message-Id: <1525859440-29583-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1525859440-29583-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1525859440-29583-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-get_(next_)modinfo takes a pointer and length pair of the .modinfo
-section.  Instead, pass struct elf_info pointer to reduce the number
-of function arguments.
+Currently, strstarts() is only used in export_from_secname().
+Use it more widely to improve the code readability.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/mod/modpost.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ scripts/mod/modpost.c | 39 ++++++++++++++++++---------------------
+ 1 file changed, 18 insertions(+), 21 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index bc71925..37a6a0b4 100644
+index 37a6a0b4..8606b6c 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -724,16 +724,17 @@ static char *next_string(char *string, unsigned long *secsize)
- 	return string;
- }
+@@ -596,19 +596,19 @@ static int ignore_undef_symbol(struct elf_info *info, const char *symname)
+ 		return 1;
+ 	if (info->hdr->e_machine == EM_PPC)
+ 		/* Special register function linked on all modules during final link of .ko */
+-		if (strncmp(symname, "_restgpr_", sizeof("_restgpr_") - 1) == 0 ||
+-		    strncmp(symname, "_savegpr_", sizeof("_savegpr_") - 1) == 0 ||
+-		    strncmp(symname, "_rest32gpr_", sizeof("_rest32gpr_") - 1) == 0 ||
+-		    strncmp(symname, "_save32gpr_", sizeof("_save32gpr_") - 1) == 0 ||
+-		    strncmp(symname, "_restvr_", sizeof("_restvr_") - 1) == 0 ||
+-		    strncmp(symname, "_savevr_", sizeof("_savevr_") - 1) == 0)
++		if (strstarts(symname, "_restgpr_") ||
++		    strstarts(symname, "_savegpr_") ||
++		    strstarts(symname, "_rest32gpr_") ||
++		    strstarts(symname, "_save32gpr_") ||
++		    strstarts(symname, "_restvr_") ||
++		    strstarts(symname, "_savevr_"))
+ 			return 1;
+ 	if (info->hdr->e_machine == EM_PPC64)
+ 		/* Special register function linked on all modules during final link of .ko */
+-		if (strncmp(symname, "_restgpr0_", sizeof("_restgpr0_") - 1) == 0 ||
+-		    strncmp(symname, "_savegpr0_", sizeof("_savegpr0_") - 1) == 0 ||
+-		    strncmp(symname, "_restvr_", sizeof("_restvr_") - 1) == 0 ||
+-		    strncmp(symname, "_savevr_", sizeof("_savevr_") - 1) == 0 ||
++		if (strstarts(symname, "_restgpr0_") ||
++		    strstarts(symname, "_savegpr0_") ||
++		    strstarts(symname, "_restvr_") ||
++		    strstarts(symname, "_savevr_") ||
+ 		    strcmp(symname, ".TOC.") == 0)
+ 			return 1;
+ 	/* Do not ignore this symbol */
+@@ -623,13 +623,13 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 	bool is_crc = false;
  
--static char *get_next_modinfo(void *modinfo, unsigned long modinfo_len,
--			      const char *tag, char *info)
-+static char *get_next_modinfo(struct elf_info *info, const char *tag,
-+			      char *prev)
- {
- 	char *p;
- 	unsigned int taglen = strlen(tag);
--	unsigned long size = modinfo_len;
-+	char *modinfo = info->modinfo;
-+	unsigned long size = info->modinfo_len;
+ 	if ((!is_vmlinux(mod->name) || mod->is_dot_o) &&
+-	    strncmp(symname, "__ksymtab", 9) == 0)
++	    strstarts(symname, "__ksymtab"))
+ 		export = export_from_secname(info, get_secindex(info, sym));
+ 	else
+ 		export = export_from_sec(info, get_secindex(info, sym));
  
--	if (info) {
--		size -= info - (char *)modinfo;
--		modinfo = next_string(info, &size);
-+	if (prev) {
-+		size -= prev - modinfo;
-+		modinfo = next_string(prev, &size);
- 	}
+ 	/* CRC'd symbol */
+-	if (strncmp(symname, "__crc_", strlen("__crc_")) == 0) {
++	if (strstarts(symname, "__crc_")) {
+ 		is_crc = true;
+ 		crc = (unsigned int) sym->st_value;
+ 		if (sym->st_shndx != SHN_UNDEF && sym->st_shndx != SHN_ABS) {
+@@ -648,7 +648,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
  
- 	for (p = modinfo; p; p = next_string(p, &size)) {
-@@ -743,11 +744,10 @@ static char *get_next_modinfo(void *modinfo, unsigned long modinfo_len,
- 	return NULL;
- }
- 
--static char *get_modinfo(void *modinfo, unsigned long modinfo_len,
--			 const char *tag)
-+static char *get_modinfo(struct elf_info *info, const char *tag)
- 
- {
--	return get_next_modinfo(modinfo, modinfo_len, tag, NULL);
-+	return get_next_modinfo(info, tag, NULL);
- }
- 
- /**
-@@ -1951,7 +1951,7 @@ static void read_symbols(char *modname)
- 		mod->skip = 1;
- 	}
- 
--	license = get_modinfo(info.modinfo, info.modinfo_len, "license");
-+	license = get_modinfo(&info, "license");
- 	if (!license && !is_vmlinux(modname))
- 		warn("modpost: missing MODULE_LICENSE() in %s\n"
- 		     "see include/linux/module.h for "
-@@ -1963,8 +1963,7 @@ static void read_symbols(char *modname)
- 			mod->gpl_compatible = 0;
- 			break;
+ 	switch (sym->st_shndx) {
+ 	case SHN_COMMON:
+-		if (!strncmp(symname, "__gnu_lto_", sizeof("__gnu_lto_")-1)) {
++		if (strstarts(symname, "__gnu_lto_")) {
+ 			/* Should warn here, but modpost runs before the linker */
+ 		} else
+ 			warn("\"%s\" [%s] is COMMON symbol\n", symname, mod->name);
+@@ -691,7 +691,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 		break;
+ 	default:
+ 		/* All exported symbols */
+-		if (strncmp(symname, "__ksymtab_", strlen("__ksymtab_")) == 0) {
++		if (strstarts(symname, "__ksymtab_")) {
+ 			sym_add_exported(symname + strlen("__ksymtab_"), mod,
+ 					export);
  		}
--		license = get_next_modinfo(info.modinfo, info.modinfo_len,
--					   "license", license);
-+		license = get_next_modinfo(&info, "license", license);
- 	}
+@@ -1171,13 +1171,13 @@ static int secref_whitelist(const struct sectioncheck *mismatch,
+ 	/* Check for pattern 1 */
+ 	if (match(tosec, init_data_sections) &&
+ 	    match(fromsec, data_sections) &&
+-	    (strncmp(fromsym, "__param", strlen("__param")) == 0))
++	    strstarts(fromsym, "__param"))
+ 		return 0;
  
- 	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
-@@ -1977,7 +1976,7 @@ static void read_symbols(char *modname)
- 	     (is_vmlinux(modname) && vmlinux_section_warnings))
- 		check_sec_ref(mod, modname, &info);
+ 	/* Check for pattern 1a */
+ 	if (strcmp(tosec, ".init.text") == 0 &&
+ 	    match(fromsec, data_sections) &&
+-	    (strncmp(fromsym, "__param_ops_", strlen("__param_ops_")) == 0))
++	    strstarts(fromsym, "__param_ops_"))
+ 		return 0;
  
--	version = get_modinfo(info.modinfo, info.modinfo_len, "version");
-+	version = get_modinfo(&info, "version");
- 	if (version)
- 		maybe_frob_rcs_version(modname, version, info.modinfo,
- 				       version - (char *)info.hdr);
+ 	/* Check for pattern 2 */
+@@ -1532,8 +1532,7 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
+ 	from = find_elf_symbol2(elf, r->r_offset, fromsec);
+ 	fromsym = sym_name(elf, from);
+ 
+-	if (!strncmp(fromsym, "reference___initcall",
+-		     sizeof("reference___initcall")-1))
++	if (strstarts(fromsym, "reference___initcall"))
+ 		return;
+ 
+ 	tosec = sec_name(elf, get_secindex(elf, sym));
+@@ -2163,9 +2162,7 @@ static void add_retpoline(struct buffer *b)
+ 
+ static void add_staging_flag(struct buffer *b, const char *name)
+ {
+-	static const char *staging_dir = "drivers/staging";
+-
+-	if (strncmp(staging_dir, name, strlen(staging_dir)) == 0)
++	if (strstarts(name, "drivers/staging"))
+ 		buf_printf(b, "\nMODULE_INFO(staging, \"Y\");\n");
+ }
+ 
 -- 
 2.7.4
 
