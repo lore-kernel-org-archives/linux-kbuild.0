@@ -1,33 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:37792 "EHLO
-        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750854AbeEJFII (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:34197 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755004AbeEJFRL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 May 2018 01:08:08 -0400
-Date: Thu, 10 May 2018 07:08:03 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 5/8] export.h: remove code for prefixing symbols with
- underscore
-Message-ID: <20180510050803.GA19160@ravnborg.org>
-References: <1525850632-10921-1-git-send-email-yamada.masahiro@socionext.com>
- <1525850632-10921-6-git-send-email-yamada.masahiro@socionext.com>
- <20180509160727.GA7459@ravnborg.org>
- <CAK7LNATojTR5QbWNS2LCeRXTX-8Rj3P2VoZaYZQhY5Kb0fv1Mg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATojTR5QbWNS2LCeRXTX-8Rj3P2VoZaYZQhY5Kb0fv1Mg@mail.gmail.com>
+        Thu, 10 May 2018 01:17:11 -0400
+Received: by mail-pf0-f194.google.com with SMTP id a14-v6so498414pfi.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 09 May 2018 22:17:10 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: [PATCH v2 0/5] kbuild and powerpc patches for new Kconfig language
+Date: Thu, 10 May 2018 15:16:54 +1000
+Message-Id: <20180510051659.15356-1-npiggin@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Joe Perches <joe@perches.com>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linuxppc-dev@lists.ozlabs.org
 
-Hi Mashahiro
+I came back to these patches and I think I have solved the remaining
+problems -- it now builds with 64-bit big and little endian (using a
+le toolchain), and also 32-bit big using 64le toolchain. There might
+be some build failures still left, but it seems to be in much better
+shape now.
 
-> Anyway VMLINUX_SYMBOL(), VMLINUX_SYMBOL_STR() will not live long.
-> I need some cycles for tree-wide cleaning, though.
+Reviews would be welcome. I don't quite know how it should be merged,
+maybe via the kbuild tree after acks from powerpc maintainer. We can
+decide that after it gets more testing and review.
 
-Fine, then there is no need to discuss the details of their
-current definition.
+Thanks,
+Nick
 
-	Sam
+Nicholas Piggin (5):
+  powerpc/kbuild: set default generic machine type for 32-bit compile
+  powerpc/kbuild: remove CROSS32 defines from top level powerpc Makefile
+  kbuild: call cc-option with the current set of KBUILD_CFLAGS
+  powerpc/kbuild: Use flags variables rather than overriding LD/CC/AS
+  powerpc/kbuild: move -mprofile-kernel check to Kconfig
+
+ arch/powerpc/Kconfig                          | 16 +------
+ arch/powerpc/Makefile                         | 46 +++++++------------
+ arch/powerpc/boot/Makefile                    | 16 +++++--
+ arch/powerpc/kernel/vdso32/Makefile           | 15 ++++--
+ .../tools/gcc-check-mprofile-kernel.sh        |  4 +-
+ scripts/Kbuild.include                        |  8 ++--
+ scripts/recordmcount.pl                       |  8 ++++
+ 7 files changed, 54 insertions(+), 59 deletions(-)
+
+-- 
+2.17.0
+
