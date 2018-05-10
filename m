@@ -1,41 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f67.google.com ([209.85.160.67]:34492 "EHLO
-        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750746AbeEJGJs (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 May 2018 02:09:48 -0400
-Received: by mail-pl0-f67.google.com with SMTP id ay10-v6so682120plb.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 09 May 2018 23:09:48 -0700 (PDT)
-Date: Thu, 10 May 2018 16:09:37 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 3/5] kbuild: call cc-option with the current set of
- KBUILD_CFLAGS
-Message-ID: <20180510160937.27997d66@roar.ozlabs.ibm.com>
-In-Reply-To: <CAK7LNATnJ_xi7nFLA5-MeP=86bK19Z9-L=muCW8LKoDYBpDHGA@mail.gmail.com>
-References: <20180510051659.15356-1-npiggin@gmail.com>
-        <20180510051659.15356-4-npiggin@gmail.com>
-        <CAK7LNATnJ_xi7nFLA5-MeP=86bK19Z9-L=muCW8LKoDYBpDHGA@mail.gmail.com>
+Received: from mga03.intel.com ([134.134.136.65]:5593 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757217AbeEJMj0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 10 May 2018 08:39:26 -0400
+Date: Thu, 10 May 2018 20:29:12 +0800
+From: "Du, Changbin" <changbin.du@intel.com>
+Subject: Re: [PATCH v4 4/4] asm-generic: fix build error in fix_to_virt with
+ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+Message-ID: <20180510122912.mqmpy4j4dj2trb5r@intel.com>
+References: <1525855396-7908-1-git-send-email-changbin.du@intel.com>
+ <1525855396-7908-5-git-send-email-changbin.du@intel.com>
+ <20180509085224.34116e36@gandalf.local.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180509085224.34116e36@gandalf.local.home>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: changbin.du@intel.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
 
-On Thu, 10 May 2018 14:29:49 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-
-> 2018-05-10 14:16 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
-> > In some cases, the options that gcc will accept depend on options it
-> > has already been given. For example -m32 / -m64 and -mbig-endian /
-> > -mlittle-endian can have this affect.  
+On Wed, May 09, 2018 at 08:52:24AM -0400, Steven Rostedt wrote:
+> On Wed,  9 May 2018 16:43:16 +0800
+> changbin.du@intel.com wrote:
 > 
-> Is cc-option not working for you?
+> > From: Changbin Du <changbin.du@intel.com>
+> > 
+> > With '-Og' optimization level, GCC would not optimize a count for a loop
+> > as a constant value. But BUILD_BUG_ON() only accept compile-time constant
+> > values. Let's use __fix_to_virt() to avoid the error.
+> > 
+> > arch/arm/mm/mmu.o: In function `fix_to_virt':
+> > /home/changbin/work/linux/./include/asm-generic/fixmap.h:31: undefined reference to `__compiletime_assert_31'
+> > Makefile:1051: recipe for target 'vmlinux' failed
+> > make: *** [vmlinux] Error 1
+> 
+> Perhaps we should put this patch ahead of patch 3. Why allow it to
+> break?
+> 
+Agree, let me exchange the last two patches.
 
-I thought it wasn't, but now I try again and it does work, sorry for
-the noise. The bug must have been something in my previous series.
-This series seems to work just as well after I remove this patch.
+> Anyway, besides that, I think the series looks good.
+> 
+> For the series: Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+> 
+> -- Steve
+> 
+> 
+> > 
+> > Signed-off-by: Changbin Du <changbin.du@intel.com>
+> > 
+> > ---
+> > v2: use __fix_to_virt() to fix the issue.
+> > ---
+> >  arch/arm/mm/mmu.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm/mm/mmu.c b/arch/arm/mm/mmu.c
+> > index e46a6a4..c08d74e 100644
+> > --- a/arch/arm/mm/mmu.c
+> > +++ b/arch/arm/mm/mmu.c
+> > @@ -1599,7 +1599,7 @@ static void __init early_fixmap_shutdown(void)
+> >  		pte_t *pte;
+> >  		struct map_desc map;
+> >  
+> > -		map.virtual = fix_to_virt(i);
+> > +		map.virtual = __fix_to_virt(i);
+> >  		pte = pte_offset_early_fixmap(pmd_off_k(map.virtual), map.virtual);
+> >  
+> >  		/* Only i/o device mappings are supported ATM */
+> 
 
+-- 
 Thanks,
-Nick
+Changbin Du
