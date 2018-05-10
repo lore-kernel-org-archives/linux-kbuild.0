@@ -1,108 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f66.google.com ([209.85.160.66]:36326 "EHLO
-        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756501AbeEJFR1 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:56375 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756391AbeEJFac (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 May 2018 01:17:27 -0400
-Received: by mail-pl0-f66.google.com with SMTP id v24-v6so611024plo.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 09 May 2018 22:17:26 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH v2 5/5] powerpc/kbuild: move -mprofile-kernel check to Kconfig
-Date: Thu, 10 May 2018 15:16:59 +1000
-Message-Id: <20180510051659.15356-6-npiggin@gmail.com>
-In-Reply-To: <20180510051659.15356-1-npiggin@gmail.com>
-References: <20180510051659.15356-1-npiggin@gmail.com>
+        Thu, 10 May 2018 01:30:32 -0400
+Received: from mail-vk0-f41.google.com (mail-vk0-f41.google.com [209.85.213.41]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id w4A5UUPA005953
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 May 2018 14:30:30 +0900
+Received: by mail-vk0-f41.google.com with SMTP id g83-v6so502894vkc.6
+        for <linux-kbuild@vger.kernel.org>; Wed, 09 May 2018 22:30:30 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180510051659.15356-4-npiggin@gmail.com>
+References: <20180510051659.15356-1-npiggin@gmail.com> <20180510051659.15356-4-npiggin@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 10 May 2018 14:29:49 +0900
+Message-ID: <CAK7LNATnJ_xi7nFLA5-MeP=86bK19Z9-L=muCW8LKoDYBpDHGA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] kbuild: call cc-option with the current set of KBUILD_CFLAGS
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linuxppc-dev@lists.ozlabs.org
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-This eliminates the workaround that requires disabling
--mprofile-kernel by default in Kconfig.
+2018-05-10 14:16 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> In some cases, the options that gcc will accept depend on options it
+> has already been given. For example -m32 / -m64 and -mbig-endian /
+> -mlittle-endian can have this affect.
 
-[ Note: this depends on https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v3 ]
+Is cc-option not working for you?
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- arch/powerpc/Kconfig                            | 16 +---------------
- arch/powerpc/Makefile                           | 14 ++------------
- arch/powerpc/tools/gcc-check-mprofile-kernel.sh |  4 ++--
- 3 files changed, 5 insertions(+), 29 deletions(-)
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index 512fcc177c87..af527f894f9b 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -460,23 +460,9 @@ config LD_HEAD_STUB_CATCH
- 
- 	  If unsure, say "N".
- 
--config DISABLE_MPROFILE_KERNEL
--	bool "Disable use of mprofile-kernel for kernel tracing"
--	depends on PPC64 && CPU_LITTLE_ENDIAN
--	default y
--	help
--	  Selecting this options disables use of the mprofile-kernel ABI for
--	  kernel tracing. That will cause options such as live patching
--	  (CONFIG_LIVEPATCH) which depend on CONFIG_DYNAMIC_FTRACE_WITH_REGS to
--	  be disabled also.
--
--	  If you have a toolchain which supports mprofile-kernel, then you can
--	  disable this. Otherwise leave it enabled. If you're not sure, say
--	  "Y".
--
- config MPROFILE_KERNEL
- 	depends on PPC64 && CPU_LITTLE_ENDIAN
--	def_bool !DISABLE_MPROFILE_KERNEL
-+	def_bool $(success $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__)
- 
- config IOMMU_HELPER
- 	def_bool PPC64
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index 5f3ec8029e50..9f69b1599c61 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -156,18 +156,8 @@ CFLAGS-$(CONFIG_GENERIC_CPU) += -mcpu=powerpc64
- endif
- 
- ifdef CONFIG_MPROFILE_KERNEL
--    ifeq ($(shell $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__),OK)
--        CC_FLAGS_FTRACE := -pg -mprofile-kernel
--        KBUILD_CPPFLAGS += -DCC_USING_MPROFILE_KERNEL
--    else
--        # If the user asked for mprofile-kernel but the toolchain doesn't
--        # support it, emit a warning and deliberately break the build later
--        # with mprofile-kernel-not-supported. We would prefer to make this an
--        # error right here, but then the user would never be able to run
--        # oldconfig to change their configuration.
--        $(warning Compiler does not support mprofile-kernel, set CONFIG_DISABLE_MPROFILE_KERNEL)
--        CC_FLAGS_FTRACE := -mprofile-kernel-not-supported
--    endif
-+	CC_FLAGS_FTRACE := -pg -mprofile-kernel
-+	KBUILD_CPPFLAGS += -DCC_USING_MPROFILE_KERNEL
- endif
- 
- CFLAGS-$(CONFIG_CELL_CPU) += $(call cc-option,-mcpu=cell)
-diff --git a/arch/powerpc/tools/gcc-check-mprofile-kernel.sh b/arch/powerpc/tools/gcc-check-mprofile-kernel.sh
-index 061f8035bdbe..ec4486a9c4a3 100755
---- a/arch/powerpc/tools/gcc-check-mprofile-kernel.sh
-+++ b/arch/powerpc/tools/gcc-check-mprofile-kernel.sh
-@@ -10,13 +10,13 @@ set -o pipefail
- # Test whether the compile option -mprofile-kernel exists and generates
- # profiling code (ie. a call to _mcount()).
- echo "int func() { return 0; }" | \
--    $* -S -x c -O2 -p -mprofile-kernel - -o - 2> /dev/null | \
-+    $* -m64 -S -x c -O2 -p -mprofile-kernel - -o - 2> /dev/null | \
-     grep -q "_mcount"
- 
- # Test whether the notrace attribute correctly suppresses calls to _mcount().
- 
- echo -e "#include <linux/compiler.h>\nnotrace int func() { return 0; }" | \
--    $* -S -x c -O2 -p -mprofile-kernel - -o - 2> /dev/null | \
-+    $* -m64 -S -x c -O2 -p -mprofile-kernel - -o - 2> /dev/null | \
-     grep -q "_mcount" && \
-     exit 1
- 
+> Passing in KBUILD_CFLAGS to cc-option allows an architecture to
+> set such basic machine types at the beginning, rather than override
+> CC itself.
+
+KBUILD_CFLAGS is passed to cc-option already
+because CC_OPTION_CFLAGS includes it:
+
+CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
+
+
+
+This patch drops KBUILD_CPPFLAGS,
+and adds KBUILD_CFLAGS twice, doesn't it?
+
+
+
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>  scripts/Kbuild.include | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index 9f7eb10079cc..66869bb815d2 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -121,7 +121,7 @@ CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
+>  # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
+>
+>  cc-option = $(call __cc-option, $(CC),\
+> -       $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS),$(1),$(2))
+> +       $(KBUILD_CFLAGS) $(CC_OPTION_CFLAGS),$(1),$(2))
+>
+>  # hostcc-option
+>  # Usage: cflags-y += $(call hostcc-option,-march=winchip-c6,-march=i586)
+> @@ -131,12 +131,12 @@ hostcc-option = $(call __cc-option, $(HOSTCC),\
+>  # cc-option-yn
+>  # Usage: flag := $(call cc-option-yn,-march=winchip-c6)
+>  cc-option-yn = $(call try-run,\
+> -       $(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
+> +       $(CC) -Werror $(KBUILD_CFLAGS) $(CC_OPTION_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
+>
+>  # cc-disable-warning
+>  # Usage: cflags-y += $(call cc-disable-warning,unused-but-set-variable)
+>  cc-disable-warning = $(call try-run,\
+> -       $(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
+> +       $(CC) -Werror $(KBUILD_CFLAGS) $(CC_OPTION_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
+>
+>  # cc-name
+>  # Expands to either gcc or clang
+> @@ -160,7 +160,7 @@ cc-if-fullversion = $(shell [ $(cc-fullversion) $(1) $(2) ] && echo $(3) || echo
+>  # cc-ldoption
+>  # Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
+>  cc-ldoption = $(call try-run,\
+> -       $(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+> +       $(CC) $(1) $(KBUILD_CFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+>
+>  # ld-option
+>  # Usage: LDFLAGS += $(call ld-option, -X)
+> --
+> 2.17.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.17.0
-
+Best Regards
+Masahiro Yamada
