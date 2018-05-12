@@ -1,73 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:8561 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750852AbeEKIUN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 May 2018 04:20:13 -0400
-From: changbin.du@intel.com
-Subject: [PATCH v5 1/4] x86/mm: surround level4_kernel_pgt with #ifdef CONFIG_X86_5LEVEL...#endif
-Date: Fri, 11 May 2018 16:09:44 +0800
-Message-Id: <1526026187-11782-2-git-send-email-changbin.du@intel.com>
-In-Reply-To: <1526026187-11782-1-git-send-email-changbin.du@intel.com>
-References: <1526026187-11782-1-git-send-email-changbin.du@intel.com>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:38319 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751438AbeELTqV (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 12 May 2018 15:46:21 -0400
+Received: by mail-wm0-f66.google.com with SMTP id m129-v6so8544434wmb.3
+        for <linux-kbuild@vger.kernel.org>; Sat, 12 May 2018 12:46:20 -0700 (PDT)
+From: Petr Vorel <petr.vorel@gmail.com>
+Subject: [PATCH 1/1] Makefile: Add testconfig target into doc
+Date: Sat, 12 May 2018 21:46:13 +0200
+Message-Id: <20180512194613.24059-1-petr.vorel@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, akpm@linux-foundation.org
-Cc: rostedt@goodmis.org, rdunlap@infradead.org, x86@kernel.org, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Changbin Du <changbin.du@intel.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Petr Vorel <petr.vorel@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-From: Changbin Du <changbin.du@intel.com>
+make testconfig appeared in these commits:
+022a4bf6b59d kconfig: tests: add framework for Kconfig unit testing
+1903c5119059 kconfig: tests: add basic choice tests
 
-The level4_kernel_pgt is only defined when X86_5LEVEL is enabled. So
-surround level4_kernel_pgt with #ifdef CONFIG_X86_5LEVEL...#endif to
-make code correct.
-
-Signed-off-by: Changbin Du <changbin.du@intel.com>
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
 ---
- arch/x86/include/asm/pgtable_64.h |  2 ++
- arch/x86/kernel/head64.c          | 13 ++++++-------
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/x86/include/asm/pgtable_64.h b/arch/x86/include/asm/pgtable_64.h
-index 877bc27..9e7f667 100644
---- a/arch/x86/include/asm/pgtable_64.h
-+++ b/arch/x86/include/asm/pgtable_64.h
-@@ -15,7 +15,9 @@
- #include <linux/bitops.h>
- #include <linux/threads.h>
- 
-+#ifdef CONFIG_X86_5LEVEL
- extern p4d_t level4_kernel_pgt[512];
-+#endif
- extern p4d_t level4_ident_pgt[512];
- extern pud_t level3_kernel_pgt[512];
- extern pud_t level3_ident_pgt[512];
-diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-index 0c408f8..775d7a6 100644
---- a/arch/x86/kernel/head64.c
-+++ b/arch/x86/kernel/head64.c
-@@ -143,16 +143,15 @@ unsigned long __head __startup_64(unsigned long physaddr,
- 
- 	pgd = fixup_pointer(&early_top_pgt, physaddr);
- 	p = pgd + pgd_index(__START_KERNEL_map);
--	if (la57)
--		*p = (unsigned long)level4_kernel_pgt;
--	else
--		*p = (unsigned long)level3_kernel_pgt;
--	*p += _PAGE_TABLE_NOENC - __START_KERNEL_map + load_delta;
--
-+#ifdef CONFIG_X86_5LEVEL
- 	if (la57) {
-+		*p = (unsigned long)level4_kernel_pgt;
- 		p4d = fixup_pointer(&level4_kernel_pgt, physaddr);
- 		p4d[511] += load_delta;
--	}
-+	} else
-+#endif
-+		*p = (unsigned long)level3_kernel_pgt;
-+	*p += _PAGE_TABLE_NOENC - __START_KERNEL_map + load_delta;
- 
- 	pud = fixup_pointer(&level3_kernel_pgt, physaddr);
- 	pud[510] += load_delta;
+diff --git a/Makefile b/Makefile
+index d0d2652db174..da9a254203f7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1477,6 +1477,9 @@ help:
+ 	@echo  'Documentation targets:'
+ 	@$(MAKE) -f $(srctree)/Documentation/Makefile dochelp
+ 	@echo  ''
++	@echo  'Testing targets:'
++	@echo  '  testconfig   - Run Kconfig unit tests'
++	@echo  ''
+ 	@echo  'Architecture specific targets ($(SRCARCH)):'
+ 	@$(if $(archhelp),$(archhelp),\
+ 		echo '  No architecture specific help defined for $(SRCARCH)')
 -- 
-2.7.4
+2.17.0
 
