@@ -1,43 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:38319 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751438AbeELTqV (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:46293 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750929AbeENAJx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 12 May 2018 15:46:21 -0400
-Received: by mail-wm0-f66.google.com with SMTP id m129-v6so8544434wmb.3
-        for <linux-kbuild@vger.kernel.org>; Sat, 12 May 2018 12:46:20 -0700 (PDT)
-From: Petr Vorel <petr.vorel@gmail.com>
-Subject: [PATCH 1/1] Makefile: Add testconfig target into doc
-Date: Sat, 12 May 2018 21:46:13 +0200
-Message-Id: <20180512194613.24059-1-petr.vorel@gmail.com>
+        Sun, 13 May 2018 20:09:53 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180509130001.24276-1-npiggin@gmail.com>
+References: <20180509130001.24276-1-npiggin@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 14 May 2018 09:08:52 +0900
+Message-ID: <CAK7LNARVkvM1deFGbdnaTt41hDqV9pCZ1+OCB0dCqPgspLMVPw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] LD_DEAD_CODE_DATA_ELIMINATION fixes and enabling
+ for powerpc
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Petr Vorel <petr.vorel@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: linux-arch <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-make testconfig appeared in these commits:
-022a4bf6b59d kconfig: tests: add framework for Kconfig unit testing
-1903c5119059 kconfig: tests: add basic choice tests
+2018-05-09 21:59 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> v2 changes only patch 4, updates the changelog with ppc32 numbers and
+> Tested-by tags, and also use TEXT_MAIN in the linker script as
+> Christophe suggested.
 
-Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
----
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index d0d2652db174..da9a254203f7 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1477,6 +1477,9 @@ help:
- 	@echo  'Documentation targets:'
- 	@$(MAKE) -f $(srctree)/Documentation/Makefile dochelp
- 	@echo  ''
-+	@echo  'Testing targets:'
-+	@echo  '  testconfig   - Run Kconfig unit tests'
-+	@echo  ''
- 	@echo  'Architecture specific targets ($(SRCARCH)):'
- 	@$(if $(archhelp),$(archhelp),\
- 		echo '  No architecture specific help defined for $(SRCARCH)')
+Replaced with v2.
+Thanks!
+
+
+> Thanks,
+> Nick
+>
+> Nicholas Piggin (4):
+>   kbuild: Fix asm-generic/vmlinux.lds.h for
+>     LD_DEAD_CODE_DATA_ELIMINATION
+>   kbuild: LD_DEAD_CODE_DATA_ELIMINATION no
+>     -ffunction-sections/-fdata-sections for module build
+>   kbuild: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selectable if
+>     enabled
+>   powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selected
+>
+>  Makefile                          |  4 +--
+>  arch/Kconfig                      | 15 ----------
+>  arch/powerpc/Kconfig              |  1 +
+>  arch/powerpc/kernel/vmlinux.lds.S | 22 +++++++-------
+>  include/asm-generic/vmlinux.lds.h | 49 ++++++++++++++++++-------------
+>  init/Kconfig                      | 27 +++++++++++++++++
+>  6 files changed, 70 insertions(+), 48 deletions(-)
+>
+> --
+> 2.17.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.17.0
-
+Best Regards
+Masahiro Yamada
