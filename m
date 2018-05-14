@@ -1,123 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:45798 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932388AbeENP23 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 14 May 2018 11:28:29 -0400
-Date: Mon, 14 May 2018 11:28:26 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH v3 3/4] powerpc/kbuild: Use flags variables rather than
- overriding LD/CC/AS
-Message-ID: <20180514112826.1b820335@gandalf.local.home>
-In-Reply-To: <20180514035228.21316-4-npiggin@gmail.com>
-References: <20180514035228.21316-1-npiggin@gmail.com>
-        <20180514035228.21316-4-npiggin@gmail.com>
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:36097 "EHLO
+        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751498AbeENQ6y (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 14 May 2018 12:58:54 -0400
+Date: Mon, 14 May 2018 18:58:44 +0200
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
+Message-ID: <20180514165844.GD27984@xo-6d-61-c0.localdomain>
+References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
+ <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
+ <CAFkk2KRozscmd4kQSJKwKmY3WpTody7S5XZZObf8SKLF62k6+w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFkk2KRozscmd4kQSJKwKmY3WpTody7S5XZZObf8SKLF62k6+w@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Segher Boessenkool <segher@kernel.crashing.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, 14 May 2018 13:52:27 +1000
-Nicholas Piggin <npiggin@gmail.com> wrote:
+Hi!
 
-> The powerpc toolchain can compile combinations of 32/64 bit and
-> big/little endian, so it's convenient to consider, e.g.,
+> > config CAN_PEAK_PCIEFD
+> >         depends on PCI
+> >         tristate "PEAK-System PCAN-PCIe FD cards"
+> >         ---help---
+> >           This driver adds support for the PEAK-System PCI Express FD
+> >           CAN-FD cards family.
+> >           These 1x or 2x CAN-FD channels cards offer CAN 2.0 a/b as well as
+> >           CAN-FD access to the CAN bus. Besides the nominal bitrate of up to
+> >           1 Mbit/s, the data bytes of CAN-FD frames can be transmitted with
+> >           up to 12 Mbit/s. A galvanic isolation of the CAN ports protects the
+> >           electronics of the card and the respective computer against
+> >           disturbances of up to 500 Volts. The PCAN-PCI Express FD can be
+> >           operated with ambient temperatures in a range of -40 to +85 °C.
+> >
+> >
+> > kconfiglib.KconfigSyntaxError:
+> > Malformed ascii in drivers/net/can/peak_canfd/Kconfig
+> > Context: b't temperatures in a range of -40 to +85 \xc2\xb0C.\n'
+> > Problematic data: b'\xc2'
+> > Reason: ordinal not in range(128)
+> >
+> >
+> > thanks,
+> > --
+> > ~Randy
 > 
->   `CC -m64 -mbig-endian`
+> Thanks for trying it out!
 > 
-> To be the C compiler for the purpose of invoking it to build target
-> artifacts. So overriding the the CC variable to include thse flags
-
-                             the                          these
-
-> works for this purpose.
+> You're probably running in the C locale, which implies an ASCII
+> encoding. That has caused enough trouble that the Python devs decided
+> to automatically convert it to UTF-8 in Python 3.7:
+> https://www.python.org/dev/peps/pep-0538/. LC_CTYPE=C.UTF-8 should fix
+> it.
 > 
-> Unfortunately that is not compatible with the way the proposed new
-> Kconfig macro language will work.
-> 
-> After previous patches in this series, these flags can be carefully
-> passed in using flags instead.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
-> Since v2:
-> - removed extra -EB in the recordmcount script (thanks mpe)
-> 
->  arch/powerpc/Makefile   | 16 +++++++++-------
->  scripts/recordmcount.pl |  7 +++++++
->  2 files changed, 16 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-> index 167b26a0780c..6faf1d6ad9dd 100644
-> --- a/arch/powerpc/Makefile
-> +++ b/arch/powerpc/Makefile
-> @@ -75,13 +75,15 @@ endif
->  endif
->  
->  ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
-> -override LD	+= -EL
-> +KBUILD_CFLAGS	+= -mlittle-endian
-> +LDFLAGS		+= -EL
->  LDEMULATION	:= lppc
->  GNUTARGET	:= powerpcle
->  MULTIPLEWORD	:= -mno-multiple
->  KBUILD_CFLAGS_MODULE += $(call cc-option,-mno-save-toc-indirect)
->  else
-> -override LD	+= -EB
-> +KBUILD_CFLAGS += $(call cc-option,-mbig-endian)
-> +LDFLAGS		+= -EB
->  LDEMULATION	:= ppc
->  GNUTARGET	:= powerpc
->  MULTIPLEWORD	:= -mmultiple
-> @@ -94,19 +96,19 @@ aflags-$(CONFIG_CPU_BIG_ENDIAN)		+= $(call cc-option,-mabi=elfv1)
->  aflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -mabi=elfv2
->  endif
->  
-> -cflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -mlittle-endian
-> -cflags-$(CONFIG_CPU_BIG_ENDIAN)		+= $(call cc-option,-mbig-endian)
->  ifneq ($(cc-name),clang)
->    cflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -mno-strict-align
->  endif
->  
-> +cflags-$(CONFIG_CPU_BIG_ENDIAN)		+= $(call cc-option,-mbig-endian)
-> +cflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -mlittle-endian
->  aflags-$(CONFIG_CPU_BIG_ENDIAN)		+= $(call cc-option,-mbig-endian)
->  aflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -mlittle-endian
->  
->  ifeq ($(HAS_BIARCH),y)
-> -override AS	+= -a$(BITS)
-> -override LD	+= -m elf$(BITS)$(LDEMULATION)
-> -override CC	+= -m$(BITS)
-> +KBUILD_CFLAGS	+= -m$(BITS)
-> +KBUILD_AFLAGS	+= -m$(BITS) -Wl,-a$(BITS)
-> +LDFLAGS		+= -m elf$(BITS)$(LDEMULATION)
->  KBUILD_ARFLAGS	+= --target=elf$(BITS)-$(GNUTARGET)
->  endif
->  
-> diff --git a/scripts/recordmcount.pl b/scripts/recordmcount.pl
-> index 191eb949d52c..3c67304a7425 100755
-> --- a/scripts/recordmcount.pl
-> +++ b/scripts/recordmcount.pl
-> @@ -274,6 +274,13 @@ if ($arch eq "x86_64") {
->      if ($bits == 64) {
->  	$type = ".quad";
->      }
-> +    if ($endian eq "big") {
-> +	    $cc .= " -mbig-endian ";
-> +	    $ld .= " -EB ";
-> +    } else {
-> +	    $cc .= " -mlittle-endian ";
-> +	    $ld .= " -EL ";
-> +    }
+> It's a bit silly to have it crash for something like that though. I
+> could force UTF-8 instead of respecting the locale (though it feels
+> neater to respect settings), or tell Python to ignore decoding errors.
+> Should probably do something at least...
 
-Have you tried building all current archs with function tracing enabled
-to make sure this doesn't break any of them? I can do it if you want.
+Well, Kconfig files are utf-8, as is the rest of kernel.
 
--- Steve
+So yes, you should respect $LC_CTYPE for display etc, but you should always
+assume Kconfig files are utf-8... and that does not need to be optional.
 
->  
->  } elsif ($arch eq "arm") {
->      $alignment = 2;
-
+									Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
