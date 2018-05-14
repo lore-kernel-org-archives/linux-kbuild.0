@@ -1,159 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f65.google.com ([209.85.218.65]:42542 "EHLO
-        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751198AbeENGHF (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 14 May 2018 02:07:05 -0400
+Received: from mga06.intel.com ([134.134.136.31]:22674 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752382AbeENHm3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 14 May 2018 03:42:29 -0400
+Date: Mon, 14 May 2018 15:42:09 +0800
+From: kbuild test robot <lkp@intel.com>
+Subject: Re: [PATCH v3 4/4] powerpc/kbuild: move -mprofile-kernel check to
+ Kconfig
+Message-ID: <201805141437.vHS2TLQv%fengguang.wu@intel.com>
+References: <20180514035228.21316-5-npiggin@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180509130001.24276-5-npiggin@gmail.com>
-References: <20180509130001.24276-1-npiggin@gmail.com> <20180509130001.24276-5-npiggin@gmail.com>
-From: Mathieu Malaterre <malat@debian.org>
-Date: Mon, 14 May 2018 08:06:43 +0200
-Message-ID: <CA+7wUswRCMQX3qrqCZYj73TDG4P1x_w6DTN-RNM0OQYQX=gm4A@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selected
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180514035228.21316-5-npiggin@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arch@vger.kernel.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linuxppc-dev@lists.ozlabs.org
 
-On Wed, May 9, 2018 at 3:00 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
-> This requires further changes to linker script to KEEP some tables
-> and wildcard compiler generated sections into the right place. This
-> includes pp32 modifications from Christophe Leroy.
->
-> When compiling powernv_defconfig with this option, the resulting
-> kernel is almost 400kB smaller (and still boots):
->
->     text      data       bss        dec   filename
-> 11827621   4810490   1341080   17979191   vmlinux
-> 11752437   4598858   1338776   17690071   vmlinux.dcde
->
-> Mathieu's numbers for custom Mac Mini G4 config has almost 200kB
+Hi Nicholas,
 
-Technically this is an oldconfig from debian original config file
-(debian official powerpc kernel package)... tested on a mac mini g4.
+I love your patch! Yet something to improve:
 
-> saving. It also had some increase in vmlinux size for as-yet
-> unknown reasons.
->
->     text      data       bss        dec   filename
->  7461457   2475122   1428064   11364643   vmlinux
->  7386425   2364370   1425432   11176227   vmlinux.dcde
->
-> Tested-by: Christophe Leroy <christophe.leroy@c-s.fr> [8xx]
-> Tested-by: Mathieu Malaterre <malat@debian.org> [32-bit powermac]
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arch/powerpc/Kconfig              |  1 +
->  arch/powerpc/kernel/vmlinux.lds.S | 22 +++++++++++-----------
->  2 files changed, 12 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-> index c32a181a7cbb..ee6dbe2efc8b 100644
-> --- a/arch/powerpc/Kconfig
-> +++ b/arch/powerpc/Kconfig
-> @@ -205,6 +205,7 @@ config PPC
->         select HAVE_KPROBES
->         select HAVE_KPROBES_ON_FTRACE
->         select HAVE_KRETPROBES
-> +       select HAVE_LD_DEAD_CODE_DATA_ELIMINATION
->         select HAVE_LIVEPATCH                   if HAVE_DYNAMIC_FTRACE_WITH_REGS
->         select HAVE_MEMBLOCK
->         select HAVE_MEMBLOCK_NODE_MAP
-> diff --git a/arch/powerpc/kernel/vmlinux.lds.S b/arch/powerpc/kernel/vmlinux.lds.S
-> index c8af90ff49f0..52a93cdd04bc 100644
-> --- a/arch/powerpc/kernel/vmlinux.lds.S
-> +++ b/arch/powerpc/kernel/vmlinux.lds.S
-> @@ -89,7 +89,7 @@ SECTIONS
->          */
->         .text BLOCK(0) : AT(ADDR(.text) - LOAD_OFFSET) {
->  #ifdef CONFIG_LD_HEAD_STUB_CATCH
-> -               *(.linker_stub_catch);
-> +               KEEP(*(.linker_stub_catch));
->                 . = . ;
->  #endif
->
-> @@ -98,7 +98,7 @@ SECTIONS
->                 ALIGN_FUNCTION();
->  #endif
->                 /* careful! __ftr_alt_* sections need to be close to .text */
-> -               *(.text.hot .text .text.fixup .text.unlikely .fixup __ftr_alt_* .ref.text);
-> +               *(.text.hot TEXT_MAIN .text.fixup .text.unlikely .fixup __ftr_alt_* .ref.text);
->                 SCHED_TEXT
->                 CPUIDLE_TEXT
->                 LOCK_TEXT
-> @@ -170,10 +170,10 @@ SECTIONS
->         .init.data : AT(ADDR(.init.data) - LOAD_OFFSET) {
->                 INIT_DATA
->                 __vtop_table_begin = .;
-> -               *(.vtop_fixup);
-> +               KEEP(*(.vtop_fixup));
->                 __vtop_table_end = .;
->                 __ptov_table_begin = .;
-> -               *(.ptov_fixup);
-> +               KEEP(*(.ptov_fixup));
->                 __ptov_table_end = .;
->         }
->
-> @@ -194,26 +194,26 @@ SECTIONS
->         . = ALIGN(8);
->         __ftr_fixup : AT(ADDR(__ftr_fixup) - LOAD_OFFSET) {
->                 __start___ftr_fixup = .;
-> -               *(__ftr_fixup)
-> +               KEEP(*(__ftr_fixup))
->                 __stop___ftr_fixup = .;
->         }
->         . = ALIGN(8);
->         __mmu_ftr_fixup : AT(ADDR(__mmu_ftr_fixup) - LOAD_OFFSET) {
->                 __start___mmu_ftr_fixup = .;
-> -               *(__mmu_ftr_fixup)
-> +               KEEP(*(__mmu_ftr_fixup))
->                 __stop___mmu_ftr_fixup = .;
->         }
->         . = ALIGN(8);
->         __lwsync_fixup : AT(ADDR(__lwsync_fixup) - LOAD_OFFSET) {
->                 __start___lwsync_fixup = .;
-> -               *(__lwsync_fixup)
-> +               KEEP(*(__lwsync_fixup))
->                 __stop___lwsync_fixup = .;
->         }
->  #ifdef CONFIG_PPC64
->         . = ALIGN(8);
->         __fw_ftr_fixup : AT(ADDR(__fw_ftr_fixup) - LOAD_OFFSET) {
->                 __start___fw_ftr_fixup = .;
-> -               *(__fw_ftr_fixup)
-> +               KEEP(*(__fw_ftr_fixup))
->                 __stop___fw_ftr_fixup = .;
->         }
->  #endif
-> @@ -226,7 +226,7 @@ SECTIONS
->         . = ALIGN(8);
->         .machine.desc : AT(ADDR(.machine.desc) - LOAD_OFFSET) {
->                 __machine_desc_start = . ;
-> -               *(.machine.desc)
-> +               KEEP(*(.machine.desc))
->                 __machine_desc_end = . ;
->         }
->  #ifdef CONFIG_RELOCATABLE
-> @@ -274,7 +274,7 @@ SECTIONS
->         .data : AT(ADDR(.data) - LOAD_OFFSET) {
->                 DATA_DATA
->                 *(.data.rel*)
-> -               *(.sdata)
-> +               *(SDATA_MAIN)
->                 *(.sdata2)
->                 *(.got.plt) *(.got)
->                 *(.plt)
-> @@ -289,7 +289,7 @@ SECTIONS
->
->         .opd : AT(ADDR(.opd) - LOAD_OFFSET) {
->                 __start_opd = .;
-> -               *(.opd)
-> +               KEEP(*(.opd))
->                 __end_opd = .;
->         }
->
-> --
-> 2.17.0
->
+[auto build test ERROR on powerpc/next]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Nicholas-Piggin/powerpc-patches-for-new-Kconfig-language/20180514-120748
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git next
+config: powerpc-defconfig
+compiler: powerpc64-linux-gnu-gcc (Debian 7.2.0-11) 7.2.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        make.cross ARCH=powerpc  defconfig
+        make.cross ARCH=powerpc 
+
+All errors (new ones prefixed by >>):
+
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+>> arch/powerpc/Kconfig:468: syntax error
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+>> arch/powerpc/Kconfig:467: invalid option
+   make[2]: *** [defconfig] Error 1
+   make[1]: *** [defconfig] Error 2
+   make: *** [sub-make] Error 2
+--
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+>> arch/powerpc/Kconfig:468: syntax error
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+>> arch/powerpc/Kconfig:467: invalid option
+   make[2]: *** [oldconfig] Error 1
+   make[1]: *** [oldconfig] Error 2
+   make: *** [sub-make] Error 2
+--
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+>> arch/powerpc/Kconfig:468: syntax error
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+   arch/powerpc/Kconfig:467:warning: ignoring unsupported character '$'
+>> arch/powerpc/Kconfig:467: invalid option
+   make[2]: *** [olddefconfig] Error 1
+   make[2]: Target 'oldnoconfig' not remade because of errors.
+   make[1]: *** [oldnoconfig] Error 2
+   make: *** [sub-make] Error 2
+
+vim +468 arch/powerpc/Kconfig
+
+e05c0e81 Kevin Hao       2013-07-16  443  
+3d72bbc4 Michael Neuling 2013-02-13  444  config PPC_TRANSACTIONAL_MEM
+3d72bbc4 Michael Neuling 2013-02-13  445         bool "Transactional Memory support for POWERPC"
+3d72bbc4 Michael Neuling 2013-02-13  446         depends on PPC_BOOK3S_64
+3d72bbc4 Michael Neuling 2013-02-13  447         depends on SMP
+7b37a123 Michael Neuling 2014-01-08  448         select ALTIVEC
+7b37a123 Michael Neuling 2014-01-08  449         select VSX
+3d72bbc4 Michael Neuling 2013-02-13  450         default n
+3d72bbc4 Michael Neuling 2013-02-13  451         ---help---
+3d72bbc4 Michael Neuling 2013-02-13  452           Support user-mode Transactional Memory on POWERPC.
+3d72bbc4 Michael Neuling 2013-02-13  453  
+951eedeb Nicholas Piggin 2017-05-29  454  config LD_HEAD_STUB_CATCH
+951eedeb Nicholas Piggin 2017-05-29  455  	bool "Reserve 256 bytes to cope with linker stubs in HEAD text" if EXPERT
+951eedeb Nicholas Piggin 2017-05-29  456  	depends on PPC64
+951eedeb Nicholas Piggin 2017-05-29  457  	default n
+951eedeb Nicholas Piggin 2017-05-29  458  	help
+951eedeb Nicholas Piggin 2017-05-29  459  	  Very large kernels can cause linker branch stubs to be generated by
+951eedeb Nicholas Piggin 2017-05-29  460  	  code in head_64.S, which moves the head text sections out of their
+951eedeb Nicholas Piggin 2017-05-29  461  	  specified location. This option can work around the problem.
+951eedeb Nicholas Piggin 2017-05-29  462  
+951eedeb Nicholas Piggin 2017-05-29  463  	  If unsure, say "N".
+951eedeb Nicholas Piggin 2017-05-29  464  
+8c50b72a Torsten Duwe    2016-03-03  465  config MPROFILE_KERNEL
+8c50b72a Torsten Duwe    2016-03-03  466  	depends on PPC64 && CPU_LITTLE_ENDIAN
+53561d2c Nicholas Piggin 2018-05-14 @467  	def_bool $(success $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__)
+8c50b72a Torsten Duwe    2016-03-03 @468  
+
+:::::: The code at line 468 was first introduced by commit
+:::::: 8c50b72a3b4f1f7cdfdfebd233b1cbd121262e65 powerpc/ftrace: Add Kconfig & Make glue for mprofile-kernel
+
+:::::: TO: Torsten Duwe <duwe@lst.de>
+:::::: CC: Michael Ellerman <mpe@ellerman.id.au>
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
