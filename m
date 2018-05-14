@@ -1,56 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:59049 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751398AbeENCFY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 13 May 2018 22:05:24 -0400
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v2 4/4] powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selected
-In-Reply-To: <20180509130001.24276-5-npiggin@gmail.com>
-References: <20180509130001.24276-1-npiggin@gmail.com> <20180509130001.24276-5-npiggin@gmail.com>
-Date: Mon, 14 May 2018 12:05:19 +1000
-Message-ID: <87a7t3q9eo.fsf@concordia.ellerman.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:43082 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751093AbeENDwo (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 13 May 2018 23:52:44 -0400
+Received: by mail-pg0-f68.google.com with SMTP id p8-v6so1346464pgq.10
+        for <linux-kbuild@vger.kernel.org>; Sun, 13 May 2018 20:52:44 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: [PATCH v3 0/4] powerpc patches for new Kconfig language
+Date: Mon, 14 May 2018 13:52:24 +1000
+Message-Id: <20180514035228.21316-1-npiggin@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-arch@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Segher Boessenkool <segher@kernel.crashing.org>
 
-Nicholas Piggin <npiggin@gmail.com> writes:
+This series of patches improves th powerpc kbuild system. The
+motivation was to to be compatible with the new Kconfig scripting
+language that Yamada-san has proposed here:
 
-> This requires further changes to linker script to KEEP some tables
-> and wildcard compiler generated sections into the right place. This
-> includes pp32 modifications from Christophe Leroy.
->
-> When compiling powernv_defconfig with this option, the resulting
-> kernel is almost 400kB smaller (and still boots):
->
->     text      data       bss        dec   filename
-> 11827621   4810490   1341080   17979191   vmlinux
-> 11752437   4598858   1338776   17690071   vmlinux.dcde
->
-> Mathieu's numbers for custom Mac Mini G4 config has almost 200kB
-> saving. It also had some increase in vmlinux size for as-yet
-> unknown reasons.
->
->     text      data       bss        dec   filename
->  7461457   2475122   1428064   11364643   vmlinux
->  7386425   2364370   1425432   11176227   vmlinux.dcde
->
-> Tested-by: Christophe Leroy <christophe.leroy@c-s.fr> [8xx]
-> Tested-by: Mathieu Malaterre <malat@debian.org> [32-bit powermac]
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arch/powerpc/Kconfig              |  1 +
->  arch/powerpc/kernel/vmlinux.lds.S | 22 +++++++++++-----------
->  2 files changed, 12 insertions(+), 11 deletions(-)
+https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git/?h=kconfig-shell-v3
 
-I'm happy for this to go in via the kbuild tree.
+I have tested on top of that tree and powerpc now builds there.
 
-As long as it's in linux-next it will get tested by my CI which should
-hopefully shake out any bugs.
+I think patches 1-3 are improvements to the build system even before
+kconfig-shell, so they could be merged ahead of it.
 
-Acked-by: Michael Ellerman <mpe@ellerman.id.au>
+Patch 4 actually takes advatage of a new feature of the kconfig-shell
+changes to improve powerpc kconfig, so that should rather be merged
+with the kbuild tree with an ack from powerpc. Yamada-san are you
+planning to merge kconfig-shell for 4.17?
 
-cheers
+Thanks,
+Nick
+
+Nicholas Piggin (4):
+  powerpc/kbuild: set default generic machine type for 32-bit compile
+  powerpc/kbuild: remove CROSS32 defines from top level powerpc Makefile
+  powerpc/kbuild: Use flags variables rather than overriding LD/CC/AS
+  powerpc/kbuild: move -mprofile-kernel check to Kconfig
+
+ arch/powerpc/Kconfig                          | 16 +------
+ arch/powerpc/Makefile                         | 45 ++++++++-----------
+ arch/powerpc/boot/Makefile                    | 16 ++++---
+ arch/powerpc/kernel/vdso32/Makefile           | 15 +++++--
+ .../tools/gcc-check-mprofile-kernel.sh        |  4 +-
+ scripts/recordmcount.pl                       |  7 +++
+ 6 files changed, 51 insertions(+), 52 deletions(-)
+
+-- 
+2.17.0
 
