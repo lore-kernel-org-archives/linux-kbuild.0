@@ -1,108 +1,159 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:35663 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750991AbeENDw7 (ORCPT
+Received: from mail-oi0-f65.google.com ([209.85.218.65]:42542 "EHLO
+        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751198AbeENGHF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 13 May 2018 23:52:59 -0400
-Received: by mail-pf0-f195.google.com with SMTP id x9-v6so5342393pfm.2
-        for <linux-kbuild@vger.kernel.org>; Sun, 13 May 2018 20:52:59 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH v3 4/4] powerpc/kbuild: move -mprofile-kernel check to Kconfig
-Date: Mon, 14 May 2018 13:52:28 +1000
-Message-Id: <20180514035228.21316-5-npiggin@gmail.com>
-In-Reply-To: <20180514035228.21316-1-npiggin@gmail.com>
-References: <20180514035228.21316-1-npiggin@gmail.com>
+        Mon, 14 May 2018 02:07:05 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180509130001.24276-5-npiggin@gmail.com>
+References: <20180509130001.24276-1-npiggin@gmail.com> <20180509130001.24276-5-npiggin@gmail.com>
+From: Mathieu Malaterre <malat@debian.org>
+Date: Mon, 14 May 2018 08:06:43 +0200
+Message-ID: <CA+7wUswRCMQX3qrqCZYj73TDG4P1x_w6DTN-RNM0OQYQX=gm4A@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selected
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Segher Boessenkool <segher@kernel.crashing.org>, Steven Rostedt <rostedt@goodmis.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arch@vger.kernel.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-This eliminates the workaround that requires disabling
--mprofile-kernel by default in Kconfig.
+On Wed, May 9, 2018 at 3:00 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
+> This requires further changes to linker script to KEEP some tables
+> and wildcard compiler generated sections into the right place. This
+> includes pp32 modifications from Christophe Leroy.
+>
+> When compiling powernv_defconfig with this option, the resulting
+> kernel is almost 400kB smaller (and still boots):
+>
+>     text      data       bss        dec   filename
+> 11827621   4810490   1341080   17979191   vmlinux
+> 11752437   4598858   1338776   17690071   vmlinux.dcde
+>
+> Mathieu's numbers for custom Mac Mini G4 config has almost 200kB
 
-[ Note: this depends on https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v3 ]
+Technically this is an oldconfig from debian original config file
+(debian official powerpc kernel package)... tested on a mac mini g4.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- arch/powerpc/Kconfig                            | 16 +---------------
- arch/powerpc/Makefile                           | 14 ++------------
- arch/powerpc/tools/gcc-check-mprofile-kernel.sh |  4 ++--
- 3 files changed, 5 insertions(+), 29 deletions(-)
-
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index 512fcc177c87..af527f894f9b 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -460,23 +460,9 @@ config LD_HEAD_STUB_CATCH
- 
- 	  If unsure, say "N".
- 
--config DISABLE_MPROFILE_KERNEL
--	bool "Disable use of mprofile-kernel for kernel tracing"
--	depends on PPC64 && CPU_LITTLE_ENDIAN
--	default y
--	help
--	  Selecting this options disables use of the mprofile-kernel ABI for
--	  kernel tracing. That will cause options such as live patching
--	  (CONFIG_LIVEPATCH) which depend on CONFIG_DYNAMIC_FTRACE_WITH_REGS to
--	  be disabled also.
--
--	  If you have a toolchain which supports mprofile-kernel, then you can
--	  disable this. Otherwise leave it enabled. If you're not sure, say
--	  "Y".
--
- config MPROFILE_KERNEL
- 	depends on PPC64 && CPU_LITTLE_ENDIAN
--	def_bool !DISABLE_MPROFILE_KERNEL
-+	def_bool $(success $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__)
- 
- config IOMMU_HELPER
- 	def_bool PPC64
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index 6faf1d6ad9dd..8f7a64fe7370 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -161,18 +161,8 @@ CFLAGS-$(CONFIG_GENERIC_CPU) += -mcpu=powerpc64
- endif
- 
- ifdef CONFIG_MPROFILE_KERNEL
--    ifeq ($(shell $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__),OK)
--        CC_FLAGS_FTRACE := -pg -mprofile-kernel
--        KBUILD_CPPFLAGS += -DCC_USING_MPROFILE_KERNEL
--    else
--        # If the user asked for mprofile-kernel but the toolchain doesn't
--        # support it, emit a warning and deliberately break the build later
--        # with mprofile-kernel-not-supported. We would prefer to make this an
--        # error right here, but then the user would never be able to run
--        # oldconfig to change their configuration.
--        $(warning Compiler does not support mprofile-kernel, set CONFIG_DISABLE_MPROFILE_KERNEL)
--        CC_FLAGS_FTRACE := -mprofile-kernel-not-supported
--    endif
-+	CC_FLAGS_FTRACE := -pg -mprofile-kernel
-+	KBUILD_CPPFLAGS += -DCC_USING_MPROFILE_KERNEL
- endif
- 
- CFLAGS-$(CONFIG_CELL_CPU) += $(call cc-option,-mcpu=cell)
-diff --git a/arch/powerpc/tools/gcc-check-mprofile-kernel.sh b/arch/powerpc/tools/gcc-check-mprofile-kernel.sh
-index 061f8035bdbe..ec4486a9c4a3 100755
---- a/arch/powerpc/tools/gcc-check-mprofile-kernel.sh
-+++ b/arch/powerpc/tools/gcc-check-mprofile-kernel.sh
-@@ -10,13 +10,13 @@ set -o pipefail
- # Test whether the compile option -mprofile-kernel exists and generates
- # profiling code (ie. a call to _mcount()).
- echo "int func() { return 0; }" | \
--    $* -S -x c -O2 -p -mprofile-kernel - -o - 2> /dev/null | \
-+    $* -m64 -S -x c -O2 -p -mprofile-kernel - -o - 2> /dev/null | \
-     grep -q "_mcount"
- 
- # Test whether the notrace attribute correctly suppresses calls to _mcount().
- 
- echo -e "#include <linux/compiler.h>\nnotrace int func() { return 0; }" | \
--    $* -S -x c -O2 -p -mprofile-kernel - -o - 2> /dev/null | \
-+    $* -m64 -S -x c -O2 -p -mprofile-kernel - -o - 2> /dev/null | \
-     grep -q "_mcount" && \
-     exit 1
- 
--- 
-2.17.0
-
+> saving. It also had some increase in vmlinux size for as-yet
+> unknown reasons.
+>
+>     text      data       bss        dec   filename
+>  7461457   2475122   1428064   11364643   vmlinux
+>  7386425   2364370   1425432   11176227   vmlinux.dcde
+>
+> Tested-by: Christophe Leroy <christophe.leroy@c-s.fr> [8xx]
+> Tested-by: Mathieu Malaterre <malat@debian.org> [32-bit powermac]
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>  arch/powerpc/Kconfig              |  1 +
+>  arch/powerpc/kernel/vmlinux.lds.S | 22 +++++++++++-----------
+>  2 files changed, 12 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+> index c32a181a7cbb..ee6dbe2efc8b 100644
+> --- a/arch/powerpc/Kconfig
+> +++ b/arch/powerpc/Kconfig
+> @@ -205,6 +205,7 @@ config PPC
+>         select HAVE_KPROBES
+>         select HAVE_KPROBES_ON_FTRACE
+>         select HAVE_KRETPROBES
+> +       select HAVE_LD_DEAD_CODE_DATA_ELIMINATION
+>         select HAVE_LIVEPATCH                   if HAVE_DYNAMIC_FTRACE_WITH_REGS
+>         select HAVE_MEMBLOCK
+>         select HAVE_MEMBLOCK_NODE_MAP
+> diff --git a/arch/powerpc/kernel/vmlinux.lds.S b/arch/powerpc/kernel/vmlinux.lds.S
+> index c8af90ff49f0..52a93cdd04bc 100644
+> --- a/arch/powerpc/kernel/vmlinux.lds.S
+> +++ b/arch/powerpc/kernel/vmlinux.lds.S
+> @@ -89,7 +89,7 @@ SECTIONS
+>          */
+>         .text BLOCK(0) : AT(ADDR(.text) - LOAD_OFFSET) {
+>  #ifdef CONFIG_LD_HEAD_STUB_CATCH
+> -               *(.linker_stub_catch);
+> +               KEEP(*(.linker_stub_catch));
+>                 . = . ;
+>  #endif
+>
+> @@ -98,7 +98,7 @@ SECTIONS
+>                 ALIGN_FUNCTION();
+>  #endif
+>                 /* careful! __ftr_alt_* sections need to be close to .text */
+> -               *(.text.hot .text .text.fixup .text.unlikely .fixup __ftr_alt_* .ref.text);
+> +               *(.text.hot TEXT_MAIN .text.fixup .text.unlikely .fixup __ftr_alt_* .ref.text);
+>                 SCHED_TEXT
+>                 CPUIDLE_TEXT
+>                 LOCK_TEXT
+> @@ -170,10 +170,10 @@ SECTIONS
+>         .init.data : AT(ADDR(.init.data) - LOAD_OFFSET) {
+>                 INIT_DATA
+>                 __vtop_table_begin = .;
+> -               *(.vtop_fixup);
+> +               KEEP(*(.vtop_fixup));
+>                 __vtop_table_end = .;
+>                 __ptov_table_begin = .;
+> -               *(.ptov_fixup);
+> +               KEEP(*(.ptov_fixup));
+>                 __ptov_table_end = .;
+>         }
+>
+> @@ -194,26 +194,26 @@ SECTIONS
+>         . = ALIGN(8);
+>         __ftr_fixup : AT(ADDR(__ftr_fixup) - LOAD_OFFSET) {
+>                 __start___ftr_fixup = .;
+> -               *(__ftr_fixup)
+> +               KEEP(*(__ftr_fixup))
+>                 __stop___ftr_fixup = .;
+>         }
+>         . = ALIGN(8);
+>         __mmu_ftr_fixup : AT(ADDR(__mmu_ftr_fixup) - LOAD_OFFSET) {
+>                 __start___mmu_ftr_fixup = .;
+> -               *(__mmu_ftr_fixup)
+> +               KEEP(*(__mmu_ftr_fixup))
+>                 __stop___mmu_ftr_fixup = .;
+>         }
+>         . = ALIGN(8);
+>         __lwsync_fixup : AT(ADDR(__lwsync_fixup) - LOAD_OFFSET) {
+>                 __start___lwsync_fixup = .;
+> -               *(__lwsync_fixup)
+> +               KEEP(*(__lwsync_fixup))
+>                 __stop___lwsync_fixup = .;
+>         }
+>  #ifdef CONFIG_PPC64
+>         . = ALIGN(8);
+>         __fw_ftr_fixup : AT(ADDR(__fw_ftr_fixup) - LOAD_OFFSET) {
+>                 __start___fw_ftr_fixup = .;
+> -               *(__fw_ftr_fixup)
+> +               KEEP(*(__fw_ftr_fixup))
+>                 __stop___fw_ftr_fixup = .;
+>         }
+>  #endif
+> @@ -226,7 +226,7 @@ SECTIONS
+>         . = ALIGN(8);
+>         .machine.desc : AT(ADDR(.machine.desc) - LOAD_OFFSET) {
+>                 __machine_desc_start = . ;
+> -               *(.machine.desc)
+> +               KEEP(*(.machine.desc))
+>                 __machine_desc_end = . ;
+>         }
+>  #ifdef CONFIG_RELOCATABLE
+> @@ -274,7 +274,7 @@ SECTIONS
+>         .data : AT(ADDR(.data) - LOAD_OFFSET) {
+>                 DATA_DATA
+>                 *(.data.rel*)
+> -               *(.sdata)
+> +               *(SDATA_MAIN)
+>                 *(.sdata2)
+>                 *(.got.plt) *(.got)
+>                 *(.plt)
+> @@ -289,7 +289,7 @@ SECTIONS
+>
+>         .opd : AT(ADDR(.opd) - LOAD_OFFSET) {
+>                 __start_opd = .;
+> -               *(.opd)
+> +               KEEP(*(.opd))
+>                 __end_opd = .;
+>         }
+>
+> --
+> 2.17.0
+>
