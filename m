@@ -1,59 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:62945 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751853AbeENB4T (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 13 May 2018 21:56:19 -0400
-Received: from mail-vk0-f45.google.com (mail-vk0-f45.google.com [209.85.213.45]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id w4E1u8dw015473
-        for <linux-kbuild@vger.kernel.org>; Mon, 14 May 2018 10:56:08 +0900
-Received: by mail-vk0-f45.google.com with SMTP id u8-v6so5736463vku.5
-        for <linux-kbuild@vger.kernel.org>; Sun, 13 May 2018 18:56:08 -0700 (PDT)
+Received: from ozlabs.org ([203.11.71.1]:59049 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751398AbeENCFY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 13 May 2018 22:05:24 -0400
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v2 4/4] powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selected
+In-Reply-To: <20180509130001.24276-5-npiggin@gmail.com>
+References: <20180509130001.24276-1-npiggin@gmail.com> <20180509130001.24276-5-npiggin@gmail.com>
+Date: Mon, 14 May 2018 12:05:19 +1000
+Message-ID: <87a7t3q9eo.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20180512194613.24059-1-petr.vorel@gmail.com>
-References: <20180512194613.24059-1-petr.vorel@gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 14 May 2018 10:55:27 +0900
-Message-ID: <CAK7LNAQK9fZ=FBXUZxrVBK4v+fTgdHjsEONQ2LTHDQCFcoqrNQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] Makefile: Add testconfig target into doc
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Petr Vorel <petr.vorel@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-arch@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
 
-2018-05-13 4:46 GMT+09:00 Petr Vorel <petr.vorel@gmail.com>:
-> make testconfig appeared in these commits:
-> 022a4bf6b59d kconfig: tests: add framework for Kconfig unit testing
-> 1903c5119059 kconfig: tests: add basic choice tests
+Nicholas Piggin <npiggin@gmail.com> writes:
+
+> This requires further changes to linker script to KEEP some tables
+> and wildcard compiler generated sections into the right place. This
+> includes pp32 modifications from Christophe Leroy.
 >
-> Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
+> When compiling powernv_defconfig with this option, the resulting
+> kernel is almost 400kB smaller (and still boots):
+>
+>     text      data       bss        dec   filename
+> 11827621   4810490   1341080   17979191   vmlinux
+> 11752437   4598858   1338776   17690071   vmlinux.dcde
+>
+> Mathieu's numbers for custom Mac Mini G4 config has almost 200kB
+> saving. It also had some increase in vmlinux size for as-yet
+> unknown reasons.
+>
+>     text      data       bss        dec   filename
+>  7461457   2475122   1428064   11364643   vmlinux
+>  7386425   2364370   1425432   11176227   vmlinux.dcde
+>
+> Tested-by: Christophe Leroy <christophe.leroy@c-s.fr> [8xx]
+> Tested-by: Mathieu Malaterre <malat@debian.org> [32-bit powermac]
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->  Makefile | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/Makefile b/Makefile
-> index d0d2652db174..da9a254203f7 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1477,6 +1477,9 @@ help:
->         @echo  'Documentation targets:'
->         @$(MAKE) -f $(srctree)/Documentation/Makefile dochelp
->         @echo  ''
-> +       @echo  'Testing targets:'
-> +       @echo  '  testconfig   - Run Kconfig unit tests'
-> +       @echo  ''
->         @echo  'Architecture specific targets ($(SRCARCH)):'
->         @$(if $(archhelp),$(archhelp),\
->                 echo '  No architecture specific help defined for $(SRCARCH)')
-> --
+>  arch/powerpc/Kconfig              |  1 +
+>  arch/powerpc/kernel/vmlinux.lds.S | 22 +++++++++++-----------
+>  2 files changed, 12 insertions(+), 11 deletions(-)
 
-I think this should be added to scripts/kconfig/Makefile
+I'm happy for this to go in via the kbuild tree.
 
-Can you also mention 'python3 and pytest are required' ?
+As long as it's in linux-next it will get tested by my CI which should
+hopefully shake out any bugs.
 
+Acked-by: Michael Ellerman <mpe@ellerman.id.au>
 
+cheers
 
--- 
-Best Regards
-Masahiro Yamada
