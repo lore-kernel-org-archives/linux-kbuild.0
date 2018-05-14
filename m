@@ -1,70 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www62.your-server.de ([213.133.104.62]:43844 "EHLO
-        www62.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750750AbeENTUi (ORCPT
+Received: from mail-oi0-f46.google.com ([209.85.218.46]:41793 "EHLO
+        mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752060AbeENUv4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 14 May 2018 15:20:38 -0400
-Subject: Re: [PATCH v3] selftests: add headers_install to lib.mk
-References: <20180413090351.25662-1-anders.roxell@linaro.org>
- <20180514115809.9803-1-anders.roxell@linaro.org>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <1a021bf3-cf93-aa12-c5a8-1ea6c7900fbb@iogearbox.net>
-Date: Mon, 14 May 2018 21:20:24 +0200
+        Mon, 14 May 2018 16:51:56 -0400
+Received: by mail-oi0-f46.google.com with SMTP id 11-v6so11969208ois.8
+        for <linux-kbuild@vger.kernel.org>; Mon, 14 May 2018 13:51:56 -0700 (PDT)
+Subject: Re: [RFCv2 PATCH 0/3] Salted build ids via linker sections
+References: <20180329180112.11055-1-labbott@redhat.com>
+ <1522413619.15770.88.camel@fedoraproject.org>
+ <CAK7LNAR5ZtwWH1SPMJeVpPkB38+9FyZOAG4AmS7NQ8NqCo_t9Q@mail.gmail.com>
+ <CALCETrWNrk-5GPEamVSwtnTxCOV4foreRUu789ZcOzykd0DYPA@mail.gmail.com>
+From: Laura Abbott <labbott@redhat.com>
+Message-ID: <42e86b87-b09e-c3e9-8328-7fa418efb627@redhat.com>
+Date: Mon, 14 May 2018 13:51:52 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180514115809.9803-1-anders.roxell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CALCETrWNrk-5GPEamVSwtnTxCOV4foreRUu789ZcOzykd0DYPA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anders Roxell <anders.roxell@linaro.org>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, shuah@kernel.org, bamv2005@gmail.com, brgl@bgdev.pl, pbonzini@redhat.com, akpm@linux-foundation.org, rppt@linux.vnet.ibm.com, aarcange@redhat.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com
+To: Andy Lutomirski <luto@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Mark Wielaard <mjw@fedoraproject.org>, "H. J. Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org
 
-On 05/14/2018 01:58 PM, Anders Roxell wrote:
-> If the kernel headers aren't installed we can't build all the tests.
-> Add a new make target rule 'khdr' in the file lib.mk to generate the
-> kernel headers and that gets include for every test-dir Makefile that
-> includes lib.mk If the testdir in turn have its own sub-dirs the
-> top_srcdir needs to be set to the linux-rootdir to be able to generate
-> the kernel headers.
+On 05/07/2018 07:49 PM, Andy Lutomirski wrote:
+> On Sun, May 6, 2018 at 11:59 PM Masahiro Yamada <
+> yamada.masahiro@socionext.com> wrote:
 > 
-> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
-> Reviewed-by: Fathi Boudra <fathi.boudra@linaro.org>
-> ---
->  Makefile                                          | 14 +-------------
->  scripts/subarch.include                           | 13 +++++++++++++
->  tools/testing/selftests/android/Makefile          |  2 +-
->  tools/testing/selftests/android/ion/Makefile      |  1 +
->  tools/testing/selftests/bpf/Makefile              |  5 ++---
->  tools/testing/selftests/futex/functional/Makefile |  1 +
->  tools/testing/selftests/gpio/Makefile             |  7 ++-----
->  tools/testing/selftests/kvm/Makefile              |  7 ++-----
->  tools/testing/selftests/lib.mk                    | 10 ++++++++++
->  tools/testing/selftests/vm/Makefile               |  4 ----
->  10 files changed, 33 insertions(+), 31 deletions(-)
->  create mode 100644 scripts/subarch.include
-[...]
-> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-> index 438d4f93875b..9741609a0eb1 100644
-> --- a/tools/testing/selftests/bpf/Makefile
-> +++ b/tools/testing/selftests/bpf/Makefile
-> @@ -16,9 +16,8 @@ LDLIBS += -lcap -lelf -lrt -lpthread
->  TEST_CUSTOM_PROGS = $(OUTPUT)/urandom_read
->  all: $(TEST_CUSTOM_PROGS)
->  
-> -$(TEST_CUSTOM_PROGS): urandom_read
-> -
-> -urandom_read: urandom_read.c
-> +$(TEST_CUSTOM_PROGS):| khdr
-> +$(TEST_CUSTOM_PROGS): urandom_read.c
->  	$(CC) -o $(TEST_CUSTOM_PROGS) -static $<
->  
->  # Order correspond to 'make run_tests' order
+>> 2018-03-30 21:40 GMT+09:00 Mark Wielaard <mjw@fedoraproject.org>:
+>>> On Thu, 2018-03-29 at 11:01 -0700, Laura Abbott wrote:
+>>>> I'm still mostly looking for feedback whether
+>>>> this would be acceptable for merging or if we should just persue a
+>>>> --build-id-salt in binutils.
+>>>
+>>> Personally I would go with this approach. It seems simple and it might
+>>> take years before a new linker option is available everywhere.
+> 
+> 
+>> Indeed.  This series is easier than --build-id-salt.
+> 
+>> If you do not see any better solution, I can accept this.
+> 
+> 
+>> BTW, when I read
+>> https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo
+>> I thought "we could reverse the symlink direction from debug file to
+>> build-id file)"
+>> sensible (but I understand it is not easy to change this way).
+> 
+> 
+>> If two packages share an identical image,
+>> one package can borrow the image from the other,
+>> then the storage space will be saved.
+> 
+>> So, having identical ID should be advantage,
+>> but we actually see only disadvantage...
+> 
+> 
+> 
+> 
+>>> To simplify things I think you could just always add the extra vdso
+>>> .comment initialized to something like KERNELRELEASE. Which distros
+>>> seem to update anyway to include their build number, so they wouldn't
+>>> need to do anything special to "update the build salt".
+>>>
+> 
+> That's what I was thinking, too.  Would that solve Fedora's problem?
+> 
 
-Can you elaborate on the error in BPF you're seeing that would force a
-headers_install for it? Some people are running the tools/ infrastructure
-(incl. BPF kselftests) outside of kernel tree where this dependency would
-break their setup. Why BPF bits cannot be fixed otherwise?
-
-Thanks,
-Daniel
+Yes, that seems reasonable.
