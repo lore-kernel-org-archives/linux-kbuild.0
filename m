@@ -1,127 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot0-f193.google.com ([74.125.82.193]:40308 "EHLO
-        mail-ot0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752285AbeENVCL (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 14 May 2018 17:02:11 -0400
-Received: by mail-ot0-f193.google.com with SMTP id n1-v6so15938470otf.7
-        for <linux-kbuild@vger.kernel.org>; Mon, 14 May 2018 14:02:11 -0700 (PDT)
-Subject: Re: [RFCv2 PATCH 0/3] Salted build ids via linker sections
-References: <20180329180112.11055-1-labbott@redhat.com>
- <CAK7LNATTfjpkG0PLR5_anZOW5zfSZxKgFO6sHXuMf50OEtx0PQ@mail.gmail.com>
-From: Laura Abbott <labbott@redhat.com>
-Message-ID: <fb123c1f-7680-9e75-125a-e4e66f0f9c93@redhat.com>
-Date: Mon, 14 May 2018 14:02:07 -0700
+Received: from ozlabs.org ([203.11.71.1]:54071 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752208AbeEOFYX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 15 May 2018 01:24:23 -0400
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v3 3/4] powerpc/kbuild: Use flags variables rather than overriding LD/CC/AS
+In-Reply-To: <20180514112826.1b820335@gandalf.local.home>
+References: <20180514035228.21316-1-npiggin@gmail.com> <20180514035228.21316-4-npiggin@gmail.com> <20180514112826.1b820335@gandalf.local.home>
+Date: Tue, 15 May 2018 15:24:21 +1000
+Message-ID: <87tvr9o5iy.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATTfjpkG0PLR5_anZOW5zfSZxKgFO6sHXuMf50OEtx0PQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Andy Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Steven Rostedt <rostedt@goodmis.org>, Nicholas Piggin <npiggin@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
 
-On 05/06/2018 11:28 PM, Masahiro Yamada wrote:
-> 2018-03-30 3:01 GMT+09:00 Laura Abbott <labbott@redhat.com>:
->> Hi,
->>
->> This is v2 of my proposal to allow unique build-ids in the kernel. from
->> last time:
->>
->> ""
->> In Fedora, the debug information is packaged separately (foo-debuginfo) and
->> can be installed separately. There's been a long standing issue where only one
->> version of a debuginfo info package can be installed at a time. Mark Wielaard
->> made an effort for Fedora 27 to allow parallel installation of debuginfo (see
->> https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo for
->> more details)
->>
->> Part of the requirement to allow this to work is that build ids are
->> unique between builds. The existing upstream rpm implementation ensures
->> this by re-calculating the build-id using the version and release as a
->> seed. This doesn't work 100% for the kernel because of the vDSO which is
->> its own binary and doesn't get updated. After poking holes in a few of my
->> ideas, there was a discussion with some people from the binutils team about
->> adding --build-id-salt to let ld do the calculation debugedit is doing. There
->> was a counter proposal made about adding some extra information via a .comment
->> which will affect the build id calculation but just get stripped out.
->> ""
-> 
-> 
-> I think you already know '--build-id=uuid' linker option.
-> 
-> Doesn't this solve your problem?
-> 
-> The disadvantage of this option is,
-> we will lose reproducible building because  --build-id=uuid
-> adds every time random salt.
-> 
-> The advantage is, the implementation is even simpler,
-> and easier to migrate to --build-id-salt once it is supported
-> in the future.
-> 
-> 
+Steven Rostedt <rostedt@goodmis.org> writes:
+> On Mon, 14 May 2018 13:52:27 +1000
+> Nicholas Piggin <npiggin@gmail.com> wrote:
+>> The powerpc toolchain can compile combinations of 32/64 bit and
+>> big/little endian, so it's convenient to consider, e.g.,
+>> 
+>>   `CC -m64 -mbig-endian`
+>> 
+>> To be the C compiler for the purpose of invoking it to build target
+>> artifacts. So overriding the the CC variable to include thse flags
+...
+>> diff --git a/scripts/recordmcount.pl b/scripts/recordmcount.pl
+>> index 191eb949d52c..3c67304a7425 100755
+>> --- a/scripts/recordmcount.pl
+>> +++ b/scripts/recordmcount.pl
+>> @@ -274,6 +274,13 @@ if ($arch eq "x86_64") {
+>>      if ($bits == 64) {
+>>  	$type = ".quad";
+>>      }
+>> +    if ($endian eq "big") {
+>> +	    $cc .= " -mbig-endian ";
+>> +	    $ld .= " -EB ";
+>> +    } else {
+>> +	    $cc .= " -mlittle-endian ";
+>> +	    $ld .= " -EL ";
+>> +    }
+>
+> Have you tried building all current archs with function tracing enabled
+> to make sure this doesn't break any of them? I can do it if you want.
 
-It could, theoretically. The reproducibility is nice though and
-I'd like to keep the kernel close to matching what other packages
-do though.
+We shouldn't need to should we? This is only touching powerpc specific
+code (if I understand perl that is).
 
-Thanks,
-Laura
+eg:
 
->> This v2 cleans up the naming to be consistent and also switches to a
->> config option vs. an environment variable. I've seen some sporadic
->> failures about missing the generated header so I think I'm still missing
->> a dependency somewhere.
-> 
-> Right.
-> 
-> There is no dependency between 'prepare' and 'scripts'
-> in the top Makefile.
-> Therefore, Kbuild can run them simultaneously,
-> which would cause a race in parallel building.
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
->   I'm still mostly looking for feedback whether
->> this would be acceptable for merging or if we should just persue a
->> --build-id-salt in binutils.
->>
->> Thanks,
->> Laura
->>
->>
->> Laura Abbott (3):
->>    kbuild: Introduce build-salt generated header
->>    kbuild: Link with generated build-salt header
->>    x86/vdso: Add build salt to the vDSO
->>
->>   Makefile                              | 13 +++++++++++--
->>   arch/x86/entry/vdso/vdso-layout.lds.S |  3 +++
->>   init/Kconfig                          |  8 ++++++++
->>   scripts/.gitignore                    |  1 +
->>   scripts/Makefile                      |  2 +-
->>   scripts/build-salt.lds.S              |  5 +++++
->>   scripts/gensalt                       | 21 +++++++++++++++++++++
->>   scripts/link-vmlinux.sh               |  3 ++-
->>   8 files changed, 52 insertions(+), 4 deletions(-)
->>   create mode 100644 scripts/build-salt.lds.S
->>   create mode 100755 scripts/gensalt
->>
->> --
->> 2.16.2
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
+$ git diff -U9 scripts/recordmcount.pl
+diff --git a/scripts/recordmcount.pl b/scripts/recordmcount.pl
+index 191eb949d52c..3c67304a7425 100755
+--- a/scripts/recordmcount.pl
++++ b/scripts/recordmcount.pl
+@@ -268,18 +268,25 @@ if ($arch eq "x86_64") {
+ } elsif ($arch eq "powerpc") {
+     $local_regex = "^[0-9a-fA-F]+\\s+t\\s+(\\.?\\S+)";
+     # See comment in the sparc64 section for why we use '\w'.
+     $function_regex = "^([0-9a-fA-F]+)\\s+<(\\.?\\w*?)>:";
+     $mcount_regex = "^\\s*([0-9a-fA-F]+):.*\\s\\.?_mcount\$";
+ 
+     if ($bits == 64) {
+        $type = ".quad";
+     }
++    if ($endian eq "big") {
++           $cc .= " -mbig-endian ";
++           $ld .= " -EB ";
++    } else {
++           $cc .= " -mlittle-endian ";
++           $ld .= " -EL ";
++    }
+ 
+ } elsif ($arch eq "arm") {
+     $alignment = 2;
+     $section_type = '%progbits';
+     $mcount_regex = "^\\s*([0-9a-fA-F]+):\\s*R_ARM_(CALL|PC24|THM_CALL)" .
+                        "\\s+(__gnu_mcount_nc|mcount)\$";
+ 
+ } elsif ($arch eq "arm64") {
+     $alignment = 3;
 
+
+cheers
