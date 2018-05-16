@@ -1,31 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:34220 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751533AbeEPIQr (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:41751 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751510AbeEPOPK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 May 2018 04:16:47 -0400
-Date: Wed, 16 May 2018 10:16:35 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH] Makefile: disable PIE before testing asm goto
-Message-ID: <20180516081635.GE12198@hirez.programming.kicks-ass.net>
-References: <20180516055136.6F4EAA095A@unicorn.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180516055136.6F4EAA095A@unicorn.suse.cz>
+        Wed, 16 May 2018 10:15:10 -0400
+Received: by mail-pl0-f67.google.com with SMTP id az12-v6so507195plb.8
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 May 2018 07:15:10 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: [PATCH v4 0/4] powerpc patches for new Kconfig language
+Date: Thu, 17 May 2018 00:14:54 +1000
+Message-Id: <20180516141458.18996-1-npiggin@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andreas Faerber <afaerber@suse.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Segher Boessenkool <segher@kernel.crashing.org>
 
-On Wed, May 16, 2018 at 07:51:36AM +0200, Michal Kubecek wrote:
-> Since commit e501ce957a78 ("x86: Force asm-goto"), aarch64 build on
-> distributions which enable PIE by default (e.g. openSUSE Tumbleweed) does
-> not detect support for asm goto correctly. The problem is that ARM specific
-> part of scripts/gcc-goto.sh fails with PIE even with recent gcc versions.
-> Moving the asm goto detection up in Makefile put it before the place where
-> we disable PIE. As a result, kernel is built without jump label support.
+This series of patches improves th powerpc kbuild system. The
+motivation was to to be compatible with the new Kconfig scripting
+language that Yamada-san has proposed here:
 
-Ugh, that's nasty. Thanks for fixing that.
+https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git/?h=kconfig-shell-v3
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+I have tested on top of that tree and powerpc now builds there.
+
+I think patches 1-3 are improvements to the build system even before
+kconfig-shell, so they could be merged ahead of it in the powerpc
+tree.
+
+Patch 4 takes advatage of a new feature of the kconfig-shell work to
+improve powerpc kconfig, so that should instead be merged with the
+kbuild tree with an ack from powerpc, after patches 1-3 are merged.
+
+v4 just brings some build fixes to patch 3 (including a change from
+patch 4 that belonged in patch 3), and improvemets to changelogs.
+
+Thanks,
+Nick
+
+Nicholas Piggin (4):
+  powerpc/kbuild: set default generic machine type for 32-bit compile
+  powerpc/kbuild: remove CROSS32 defines from top level powerpc Makefile
+  powerpc/kbuild: Use flags variables rather than overriding LD/CC/AS
+  powerpc/kbuild: move -mprofile-kernel check to Kconfig
+
+ arch/powerpc/Kconfig                          | 16 +------
+ arch/powerpc/Makefile                         | 45 ++++++++-----------
+ arch/powerpc/boot/Makefile                    | 16 ++++---
+ arch/powerpc/kernel/vdso32/Makefile           | 15 +++++--
+ .../tools/gcc-check-mprofile-kernel.sh        | 12 +++--
+ scripts/recordmcount.pl                       | 18 +++++++-
+ 6 files changed, 67 insertions(+), 55 deletions(-)
+
+-- 
+2.17.0
+
