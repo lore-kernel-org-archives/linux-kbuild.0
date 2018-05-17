@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:26250 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:25144 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752349AbeEQGT5 (ORCPT
+        with ESMTP id S1752176AbeEQGTU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 May 2018 02:19:57 -0400
+        Thu, 17 May 2018 02:19:20 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 28/31] gcc-plugins: move GCC version check for PowerPC to Kconfig
-Date: Thu, 17 May 2018 15:17:07 +0900
-Message-Id: <1526537830-22606-29-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 30/31] gcc-plugins: allow to enable GCC_PLUGINS for COMPILE_TEST
+Date: Thu, 17 May 2018 15:17:09 +0900
+Message-Id: <1526537830-22606-31-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,56 +15,71 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-For PowerPC, GCC 5.2 is the requirement for GCC plugins.  Move the
-version check to Kconfig so that the GCC plugin menus will be hidden
-if an older compiler is in use.
+Now that the compiler's plugin support is checked in Kconfig,
+all{yes,mod}config will not be bothered.
+
+Remove 'depends on !COMPILE_TEST' for GCC_PLUGINS.
+
+'depends on !COMPILE_TEST' for the following three are still kept:
+  GCC_PLUGIN_CYC_COMPLEXITY
+  GCC_PLUGIN_STRUCTLEAK_VERBOSE
+  GCC_PLUGIN_RANDSTRUCT_PERFORMANCE
+
+Kees said to do so because the first two are too noisy, and the last
+one would reduce the compile test coverage.  I commented the reasons
+in arch/Kconfig.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Acked-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
 ---
 
 Changes in v4: None
 Changes in v3:
-  - Move comment to Kconfig as well
+  - Add comment about reason
 
 Changes in v2: None
 
- arch/powerpc/Kconfig         | 2 +-
- scripts/Makefile.gcc-plugins | 8 --------
- 2 files changed, 1 insertion(+), 9 deletions(-)
+ arch/Kconfig | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index c32a181..17e53e6 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -195,7 +195,7 @@ config PPC
- 	select HAVE_FTRACE_MCOUNT_RECORD
- 	select HAVE_FUNCTION_GRAPH_TRACER
- 	select HAVE_FUNCTION_TRACER
--	select HAVE_GCC_PLUGINS
-+	select HAVE_GCC_PLUGINS			if GCC_VERSION >= 50200   # plugin support on gcc <= 5.1 is buggy on PPC
- 	select HAVE_GENERIC_GUP
- 	select HAVE_HW_BREAKPOINT		if PERF_EVENTS && (PPC_BOOK3S || PPC_8xx)
- 	select HAVE_IDE
-diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-index 0ce3802..1e92353 100644
---- a/scripts/Makefile.gcc-plugins
-+++ b/scripts/Makefile.gcc-plugins
-@@ -53,14 +53,6 @@ gcc-plugins-check: FORCE
- ifdef CONFIG_GCC_PLUGINS
-   ifeq ($(PLUGINCC),)
-     ifneq ($(GCC_PLUGINS_CFLAGS),)
--      # Various gccs between 4.5 and 5.1 have bugs on powerpc due to missing
--      # header files. gcc <= 4.6 doesn't work at all, gccs from 4.8 to 5.1 have
--      # issues with 64-bit targets.
--      ifeq ($(ARCH),powerpc)
--        ifeq ($(call cc-ifversion, -le, 0501, y), y)
--	  @echo "Cannot use CONFIG_GCC_PLUGINS: plugin support on gcc <= 5.1 is buggy on powerpc, please upgrade to gcc 5.2 or newer" >&2 && exit 1
--        endif
--      endif
-       ifeq ($(call cc-ifversion, -ge, 0405, y), y)
- 	$(Q)$(srctree)/scripts/gcc-plugin.sh --show-error "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)" || true
- 	@echo "Cannot use CONFIG_GCC_PLUGINS: your gcc installation does not support plugins, perhaps the necessary headers are missing?" >&2 && exit 1
+diff --git a/arch/Kconfig b/arch/Kconfig
+index 70f585f..6e8f0cf 100644
+--- a/arch/Kconfig
++++ b/arch/Kconfig
+@@ -420,7 +420,6 @@ menuconfig GCC_PLUGINS
+ 	bool "GCC plugins"
+ 	depends on HAVE_GCC_PLUGINS
+ 	depends on PLUGIN_HOSTCC != ""
+-	depends on !COMPILE_TEST
+ 	help
+ 	  GCC plugins are loadable modules that provide extra features to the
+ 	  compiler. They are useful for runtime instrumentation and static analysis.
+@@ -430,7 +429,7 @@ menuconfig GCC_PLUGINS
+ config GCC_PLUGIN_CYC_COMPLEXITY
+ 	bool "Compute the cyclomatic complexity of a function" if EXPERT
+ 	depends on GCC_PLUGINS
+-	depends on !COMPILE_TEST
++	depends on !COMPILE_TEST	# too noisy
+ 	help
+ 	  The complexity M of a function's control flow graph is defined as:
+ 	   M = E - N + 2P
+@@ -497,7 +496,7 @@ config GCC_PLUGIN_STRUCTLEAK_BYREF_ALL
+ config GCC_PLUGIN_STRUCTLEAK_VERBOSE
+ 	bool "Report forcefully initialized variables"
+ 	depends on GCC_PLUGIN_STRUCTLEAK
+-	depends on !COMPILE_TEST
++	depends on !COMPILE_TEST	# too noisy
+ 	help
+ 	  This option will cause a warning to be printed each time the
+ 	  structleak plugin finds a variable it thinks needs to be
+@@ -537,7 +536,7 @@ config GCC_PLUGIN_RANDSTRUCT
+ config GCC_PLUGIN_RANDSTRUCT_PERFORMANCE
+ 	bool "Use cacheline-aware structure randomization"
+ 	depends on GCC_PLUGIN_RANDSTRUCT
+-	depends on !COMPILE_TEST
++	depends on !COMPILE_TEST	# do not reduce test coverage
+ 	help
+ 	  If you say Y here, the RANDSTRUCT randomization will make a
+ 	  best effort at restricting randomization to cacheline-sized
 -- 
 2.7.4
 
