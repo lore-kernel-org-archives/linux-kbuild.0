@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:24134 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:24372 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750825AbeEQGSu (ORCPT
+        with ESMTP id S1751858AbeEQGS4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 May 2018 02:18:50 -0400
+        Thu, 17 May 2018 02:18:56 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 01/31] kbuild: remove kbuild cache
-Date: Thu, 17 May 2018 15:16:40 +0900
-Message-Id: <1526537830-22606-2-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 03/31] kconfig: reference environment variables directly and remove 'option env='
+Date: Thu, 17 May 2018 15:16:42 +0900
+Message-Id: <1526537830-22606-4-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,257 +15,873 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-The kbuild cache was introduced to remember the result of shell
-commands, some of which are expensive to compute, such as
-$(call cc-option,...).
+To get access to environment variables, Kconfig needs to define a
+symbol using "option env=" syntax.  It is tedious to add a symbol entry
+for each environment variable given that we need to define much more
+such as 'CC', 'AS', 'srctree' etc. to evaluate the compiler capability
+in Kconfig.
 
-However, this turned out not so clever as I had first expected.
-Actually, it is problematic.  For example, "$(CC) -print-file-name"
-is cached.  If the compiler is updated, the stale search path causes
-build error, which is difficult to figure out.  Another problem
-scenario is cache files could be touched while install targets are
-running under the root permission.  We can patch them if desired,
-but the build infrastructure is getting uglier and uglier.
+Adding '$' for symbol references is grammatically inconsistent.
+Looking at the code, the symbols prefixed with 'S' are expanded by:
+ - conf_expand_value()
+   This is used to expand 'arch/$ARCH/defconfig' and 'defconfig_list'
+ - sym_expand_string_value()
+   This is used to expand strings in 'source' and 'mainmenu'
 
-Now, we are going to move compiler flag tests to the configuration
-phase.  If this is completed, the result of compiler tests will be
-naturally cached in the .config file.  We will not have performance
-issues of incremental building since this testing only happens at
-Kconfig time.
+All of them are fixed values independent of user configuration.  So,
+they can be changed into the direct expansion instead of symbols.
 
-To start this work with a cleaner code base, remove the kbuild
-cache first.
+This change makes the code much cleaner.  The bounce symbols 'SRCARCH',
+'ARCH', 'SUBARCH', 'KERNELVERSION' are gone.
 
-Revert the following commits:
-Commit 9a234a2e3843 ("kbuild: create directory for make cache only when necessary")
-Commit e17c400ae194 ("kbuild: shrink .cache.mk when it exceeds 1000 lines")
-Commit 4e56207130ed ("kbuild: Cache a few more calls to the compiler")
-Commit 3298b690b21c ("kbuild: Add a cache for generated variables")
+sym_init() hard-coding 'UNAME_RELEASE' is also gone.  'UNAME_RELEASE'
+should be replaced with an environment variable.
+
+ARCH_DEFCONFIG is a normal symbol, so it should be simply referenced
+without '$' prefix.
+
+The new syntax is addicted by Make.  The variable reference needs
+parentheses, like $(FOO), but you can omit them for single-letter
+variables, like $F.  Yet, in Makefiles, people tend to use the
+parenthetical form for consistency / clarification.
+
+At this moment, only the environment variable is supported, but I will
+extend the concept of 'variable' later on.
+
+The variables are expanded in the lexer so we can simplify the token
+handling on the parser side.
+
+For example, the following code works.
+
+[Example code]
+
+  config MY_TOOLCHAIN_LIST
+          string
+          default "My tools: CC=$(CC), AS=$(AS), CPP=$(CPP)"
+
+[Result]
+
+  $ make -s alldefconfig && tail -n 1 .config
+  CONFIG_MY_TOOLCHAIN_LIST="My tools: CC=gcc, AS=as, CPP=gcc -E"
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
 
-Changes in v4: None
-Changes in v3: None
-Changes in v2: None
+Changes in v4:
+  - Enclose ARCH in conf_defname
+  - Drop single-letter support
 
- Makefile               |   5 +--
- scripts/Kbuild.include | 101 +++++++------------------------------------------
- 2 files changed, 16 insertions(+), 90 deletions(-)
+Changes in v3:
+  - Reimplement
+  - Variable reference need parentheses except single-letter variable
 
+Changes in v2:
+  - Move the string expansion to the lexer phase.
+  - Split environment helpers to env.c
+
+ Documentation/kbuild/kconfig-language.txt |   8 -
+ Kconfig                                   |   8 +-
+ Makefile                                  |   3 +-
+ arch/sh/Kconfig                           |   4 +-
+ arch/sparc/Kconfig                        |   4 +-
+ arch/um/Kconfig.common                    |   4 -
+ arch/x86/Kconfig                          |   4 +-
+ arch/x86/um/Kconfig                       |   6 +-
+ init/Kconfig                              |  16 +-
+ scripts/kconfig/confdata.c                |  33 +---
+ scripts/kconfig/kconf_id.c                |   1 -
+ scripts/kconfig/lkc.h                     |   4 -
+ scripts/kconfig/lkc_proto.h               |   6 +
+ scripts/kconfig/menu.c                    |   3 -
+ scripts/kconfig/preprocess.c              | 247 ++++++++++++++++++++++++++++++
+ scripts/kconfig/symbol.c                  |  56 -------
+ scripts/kconfig/util.c                    |  18 +--
+ scripts/kconfig/zconf.l                   |  67 +++++++-
+ scripts/kconfig/zconf.y                   |   2 +-
+ 19 files changed, 340 insertions(+), 154 deletions(-)
+ create mode 100644 scripts/kconfig/preprocess.c
+
+diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+index f5b9493..0e966e8 100644
+--- a/Documentation/kbuild/kconfig-language.txt
++++ b/Documentation/kbuild/kconfig-language.txt
+@@ -198,14 +198,6 @@ applicable everywhere (see syntax).
+     enables the third modular state for all config symbols.
+     At most one symbol may have the "modules" option set.
+ 
+-  - "env"=<value>
+-    This imports the environment variable into Kconfig. It behaves like
+-    a default, except that the value comes from the environment, this
+-    also means that the behaviour when mixing it with normal defaults is
+-    undefined at this point. The symbol is currently not exported back
+-    to the build environment (if this is desired, it can be done via
+-    another symbol).
+-
+   - "allnoconfig_y"
+     This declares the symbol as one that should have the value y when
+     using "allnoconfig". Used for symbols that hide other symbols.
+diff --git a/Kconfig b/Kconfig
+index 8c4c1cb..4af1b42 100644
+--- a/Kconfig
++++ b/Kconfig
+@@ -3,10 +3,6 @@
+ # For a description of the syntax of this configuration file,
+ # see Documentation/kbuild/kconfig-language.txt.
+ #
+-mainmenu "Linux/$ARCH $KERNELVERSION Kernel Configuration"
++mainmenu "Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration"
+ 
+-config SRCARCH
+-	string
+-	option env="SRCARCH"
+-
+-source "arch/$SRCARCH/Kconfig"
++source "arch/$(SRCARCH)/Kconfig"
 diff --git a/Makefile b/Makefile
-index ba3106b..e78f73f 100644
+index 01b2211..c6278e6 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -501,7 +501,7 @@ RETPOLINE_CFLAGS := $(call cc-option,$(RETPOLINE_CFLAGS_GCC),$(call cc-option,$(
- export RETPOLINE_CFLAGS
+@@ -284,7 +284,8 @@ include scripts/Kbuild.include
+ # Read KERNELRELEASE from include/config/kernel.release (if it exists)
+ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+ KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+-export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
++UNAME_RELEASE := $(shell uname --release)
++export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION UNAME_RELEASE
  
- # check for 'asm goto'
--ifeq ($(call shell-cached,$(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
-+ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
-   CC_HAVE_ASM_GOTO := 1
-   KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
-   KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
-@@ -804,7 +804,7 @@ KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
- endif
+ # SUBARCH tells the usermode build what the underlying arch is.  That is set
+ # first, and if a usermode build is happening, the "ARCH=um" on the command
+diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
+index 1851eae..c8400e3 100644
+--- a/arch/sh/Kconfig
++++ b/arch/sh/Kconfig
+@@ -58,7 +58,7 @@ config SUPERH
+ 	  <http://www.linux-sh.org/>.
  
- # arch Makefile may override CC so keep this after arch Makefile is included
--NOSTDINC_FLAGS += -nostdinc -isystem $(call shell-cached,$(CC) -print-file-name=include)
-+NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
- CHECKFLAGS     += $(NOSTDINC_FLAGS)
+ config SUPERH32
+-	def_bool ARCH = "sh"
++	def_bool "$(ARCH)" = "sh"
+ 	select HAVE_KPROBES
+ 	select HAVE_KRETPROBES
+ 	select HAVE_IOREMAP_PROT if MMU && !X2TLB
+@@ -77,7 +77,7 @@ config SUPERH32
+ 	select HAVE_CC_STACKPROTECTOR
  
- # warn about C99 declaration after statement
-@@ -1622,7 +1622,6 @@ clean: $(clean-dirs)
- 		-o -name '*.asn1.[ch]' \
- 		-o -name '*.symtypes' -o -name 'modules.order' \
- 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
--		-o -name .cache.mk \
- 		-o -name '*.c.[012]*.*' \
- 		-o -name '*.ll' \
- 		-o -name '*.gcno' \) -type f -print | xargs rm -f
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 50cee53..925a851 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -8,8 +8,6 @@ squote  := '
- empty   :=
- space   := $(empty) $(empty)
- space_escape := _-_SPACE_-_
--right_paren := )
--left_paren := (
- pound := \#
+ config SUPERH64
+-	def_bool ARCH = "sh64"
++	def_bool "$(ARCH)" = "sh64"
+ 	select HAVE_EXIT_THREAD
+ 	select KALLSYMS
  
- ###
-@@ -83,71 +81,6 @@ cc-cross-prefix =  \
- 			echo $(c);                                    \
- 		fi)))
+diff --git a/arch/sparc/Kconfig b/arch/sparc/Kconfig
+index 8767e45..df7410c 100644
+--- a/arch/sparc/Kconfig
++++ b/arch/sparc/Kconfig
+@@ -1,6 +1,6 @@
+ config 64BIT
+-	bool "64-bit kernel" if ARCH = "sparc"
+-	default ARCH = "sparc64"
++	bool "64-bit kernel" if "$(ARCH)" = "sparc"
++	default "$(ARCH)" = "sparc64"
+ 	help
+ 	  SPARC is a family of RISC microprocessors designed and marketed by
+ 	  Sun Microsystems, incorporated.  They are very widely found in Sun
+diff --git a/arch/um/Kconfig.common b/arch/um/Kconfig.common
+index c68add8..07f84c8 100644
+--- a/arch/um/Kconfig.common
++++ b/arch/um/Kconfig.common
+@@ -54,10 +54,6 @@ config HZ
+ 	int
+ 	default 100
  
--# Tools for caching Makefile variables that are "expensive" to compute.
--#
--# Here we want to help deal with variables that take a long time to compute
--# by making it easy to store these variables in a cache.
--#
--# The canonical example here is testing for compiler flags.  On a simple system
--# each call to the compiler takes 10 ms, but on a system with a compiler that's
--# called through various wrappers it can take upwards of 100 ms.  If we have
--# 100 calls to the compiler this can take 1 second (on a simple system) or 10
--# seconds (on a complicated system).
--#
--# The "cache" will be in Makefile syntax and can be directly included.
--# Any time we try to reference a variable that's not in the cache we'll
--# calculate it and store it in the cache for next time.
+-config SUBARCH
+-	string
+-	option env="SUBARCH"
 -
--# Include values from last time
--make-cache := $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/,$(if $(obj),$(obj)/)).cache.mk
--$(make-cache): ;
---include $(make-cache)
+ config NR_CPUS
+ 	int
+ 	range 1 1
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index c07f492..2236505 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1,8 +1,8 @@
+ # SPDX-License-Identifier: GPL-2.0
+ # Select 32 or 64 bit
+ config 64BIT
+-	bool "64-bit kernel" if ARCH = "x86"
+-	default ARCH != "i386"
++	bool "64-bit kernel" if "$(ARCH)" = "x86"
++	default "$(ARCH)" != "i386"
+ 	---help---
+ 	  Say yes to build a 64-bit kernel - formerly known as x86_64
+ 	  Say no to build a 32-bit kernel - formerly known as i386
+diff --git a/arch/x86/um/Kconfig b/arch/x86/um/Kconfig
+index 13ed827..6a15c4d 100644
+--- a/arch/x86/um/Kconfig
++++ b/arch/x86/um/Kconfig
+@@ -1,5 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+-mainmenu "User Mode Linux/$SUBARCH $KERNELVERSION Kernel Configuration"
++mainmenu "User Mode Linux/$(SUBARCH) $(KERNELVERSION) Kernel Configuration"
+ 
+ source "arch/um/Kconfig.common"
+ 
+@@ -16,8 +16,8 @@ config UML_X86
+ 	select GENERIC_FIND_FIRST_BIT
+ 
+ config 64BIT
+-	bool "64-bit kernel" if SUBARCH = "x86"
+-	default SUBARCH != "i386"
++	bool "64-bit kernel" if "$(SUBARCH)" = "x86"
++	default "$(SUBARCH)" != "i386"
+ 
+ config X86_32
+ 	def_bool !64BIT
+diff --git a/init/Kconfig b/init/Kconfig
+index 4537962..752816b 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1,20 +1,12 @@
+-config ARCH
+-	string
+-	option env="ARCH"
 -
--cached-data := $(filter __cached_%, $(.VARIABLES))
+-config KERNELVERSION
+-	string
+-	option env="KERNELVERSION"
 -
--# If cache exceeds 1000 lines, shrink it down to 500.
--ifneq ($(word 1000,$(cached-data)),)
--$(shell tail -n 500 $(make-cache) > $(make-cache).tmp; \
--	mv $(make-cache).tmp $(make-cache))
--endif
+ config DEFCONFIG_LIST
+ 	string
+ 	depends on !UML
+ 	option defconfig_list
+-	default "/lib/modules/$UNAME_RELEASE/.config"
++	default "/lib/modules/$(UNAME_RELEASE)/.config"
+ 	default "/etc/kernel-config"
+-	default "/boot/config-$UNAME_RELEASE"
+-	default "$ARCH_DEFCONFIG"
+-	default "arch/$ARCH/defconfig"
++	default "/boot/config-$(UNAME_RELEASE)"
++	default ARCH_DEFCONFIG
++	default "arch/$(ARCH)/defconfig"
+ 
+ config CONSTRUCTORS
+ 	bool
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index df26c7b..f72587c 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -30,7 +30,7 @@ static void conf_message(const char *fmt, ...)
+ static const char *conf_filename;
+ static int conf_lineno, conf_warnings;
+ 
+-const char conf_defname[] = "arch/$ARCH/defconfig";
++const char conf_defname[] = "arch/$(ARCH)/defconfig";
+ 
+ static void conf_warning(const char *fmt, ...)
+ {
+@@ -81,39 +81,13 @@ const char *conf_get_autoconfig_name(void)
+ 	return name ? name : "include/config/auto.conf";
+ }
+ 
+-static char *conf_expand_value(const char *in)
+-{
+-	struct symbol *sym;
+-	const char *src;
+-	static char res_value[SYMBOL_MAXLENGTH];
+-	char *dst, name[SYMBOL_MAXLENGTH];
 -
--create-cache-dir := $(if $(KBUILD_SRC),$(if $(cache-data),,1))
+-	res_value[0] = 0;
+-	dst = name;
+-	while ((src = strchr(in, '$'))) {
+-		strncat(res_value, in, src - in);
+-		src++;
+-		dst = name;
+-		while (isalnum(*src) || *src == '_')
+-			*dst++ = *src++;
+-		*dst = 0;
+-		sym = sym_lookup(name, 0);
+-		sym_calc_value(sym);
+-		strcat(res_value, sym_get_string_value(sym));
+-		in = src;
+-	}
+-	strcat(res_value, in);
 -
--# Usage: $(call __sanitize-opt,Hello=Hola$(comma)Goodbye Adios)
--#
--# Convert all '$', ')', '(', '\', '=', ' ', ',', ':' to '_'
--__sanitize-opt = $(subst $$,_,$(subst $(right_paren),_,$(subst $(left_paren),_,$(subst \,_,$(subst =,_,$(subst $(space),_,$(subst $(comma),_,$(subst :,_,$(1)))))))))
+-	return res_value;
+-}
 -
--# Usage:   $(call shell-cached,shell_command)
--# Example: $(call shell-cached,md5sum /usr/bin/gcc)
--#
--# If we've already seen a call to this exact shell command (even in a
--# previous invocation of make!) we'll return the value.  If not, we'll
--# compute it and store the result for future runs.
--#
--# This is a bit of voodoo, but basic explanation is that if the variable
--# was undefined then we'll evaluate the shell command and store the result
--# into the variable.  We'll then store that value in the cache and finally
--# output the value.
--#
--# NOTE: The $$(2) here isn't actually a parameter to __run-and-store.  We
--# happen to know that the caller will have their shell command in $(2) so the
--# result of "call"ing this will produce a reference to that $(2).  The reason
--# for this strangeness is to avoid an extra level of eval (and escaping) of
--# $(2).
--define __run-and-store
--ifeq ($(origin $(1)),undefined)
--  $$(eval $(1) := $$(shell $$(2)))
--ifeq ($(create-cache-dir),1)
--  $$(shell mkdir -p $(dir $(make-cache)))
--  $$(eval create-cache-dir :=)
--endif
--  $$(shell echo '$(1) := $$($(1))' >> $(make-cache))
--endif
--endef
--__shell-cached = $(eval $(call __run-and-store,$(1)))$($(1))
--shell-cached = $(call __shell-cached,__cached_$(call __sanitize-opt,$(1)),$(1))
+ char *conf_get_default_confname(void)
+ {
+ 	struct stat buf;
+ 	static char fullname[PATH_MAX+1];
+ 	char *env, *name;
+ 
+-	name = conf_expand_value(conf_defname);
++	name = expand_string(conf_defname);
+ 	env = getenv(SRCTREE);
+ 	if (env) {
+ 		sprintf(fullname, "%s/%s", env, name);
+@@ -274,7 +248,8 @@ int conf_read_simple(const char *name, int def)
+ 			if (expr_calc_value(prop->visible.expr) == no ||
+ 			    prop->expr->type != E_SYMBOL)
+ 				continue;
+-			name = conf_expand_value(prop->expr->left.sym->name);
++			sym_calc_value(prop->expr->left.sym);
++			name = sym_get_string_value(prop->expr->left.sym);
+ 			in = zconf_fopen(name);
+ 			if (in) {
+ 				conf_message(_("using defaults found in %s"),
+diff --git a/scripts/kconfig/kconf_id.c b/scripts/kconfig/kconf_id.c
+index 3ea9c5f..b3e0ea0 100644
+--- a/scripts/kconfig/kconf_id.c
++++ b/scripts/kconfig/kconf_id.c
+@@ -32,7 +32,6 @@ static struct kconf_id kconf_id_array[] = {
+ 	{ "on",			T_ON,			TF_PARAM },
+ 	{ "modules",		T_OPT_MODULES,		TF_OPTION },
+ 	{ "defconfig_list",	T_OPT_DEFCONFIG_LIST,	TF_OPTION },
+-	{ "env",		T_OPT_ENV,		TF_OPTION },
+ 	{ "allnoconfig_y",	T_OPT_ALLNOCONFIG_Y,	TF_OPTION },
+ };
+ 
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index f4394af..553098a 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -58,7 +58,6 @@ enum conf_def_mode {
+ 
+ #define T_OPT_MODULES		1
+ #define T_OPT_DEFCONFIG_LIST	2
+-#define T_OPT_ENV		3
+ #define T_OPT_ALLNOCONFIG_Y	4
+ 
+ struct kconf_id {
+@@ -134,9 +133,6 @@ void str_printf(struct gstr *gs, const char *fmt, ...);
+ const char *str_get(struct gstr *gs);
+ 
+ /* symbol.c */
+-extern struct expr *sym_env_list;
 -
- # output directory for tests below
- TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
+-void sym_init(void);
+ void sym_clear_all_valid(void);
+ struct symbol *sym_choice_default(struct symbol *sym);
+ const char *sym_get_string_default(struct symbol *sym);
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index 9dc8abf..9f465fe 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -49,5 +49,11 @@ const char * sym_get_string_value(struct symbol *sym);
  
-@@ -155,36 +88,30 @@ TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
- # Usage: option = $(call try-run, $(CC)...-o "$$TMP",option-ok,otherwise)
- # Exit code chooses option. "$$TMP" serves as a temporary file and is
- # automatically cleaned up.
--__try-run = set -e;			\
-+try-run = $(shell set -e;		\
- 	TMP="$(TMPOUT).$$$$.tmp";	\
- 	TMPO="$(TMPOUT).$$$$.o";	\
- 	if ($(1)) >/dev/null 2>&1;	\
- 	then echo "$(2)";		\
- 	else echo "$(3)";		\
- 	fi;				\
--	rm -f "$$TMP" "$$TMPO"
+ const char * prop_get_type_name(enum prop_type type);
+ 
++/* preprocess.c */
++void env_write_dep(FILE *f, const char *auto_conf_name);
++char *expand_string(const char *in);
++char *expand_dollar(const char **str);
++char *expand_one_token(const char **str);
++
+ /* expr.c */
+ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken);
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 5c5c137..8148305 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -214,9 +214,6 @@ void menu_add_option(int token, char *arg)
+ 			zconf_error("trying to redefine defconfig symbol");
+ 		sym_defconfig_list->flags |= SYMBOL_AUTO;
+ 		break;
+-	case T_OPT_ENV:
+-		prop_add_env(arg);
+-		break;
+ 	case T_OPT_ALLNOCONFIG_Y:
+ 		current_entry->sym->flags |= SYMBOL_ALLNOCONFIG_Y;
+ 		break;
+diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
+new file mode 100644
+index 0000000..1bf506c
+--- /dev/null
++++ b/scripts/kconfig/preprocess.c
+@@ -0,0 +1,247 @@
++// SPDX-License-Identifier: GPL-2.0
++//
++// Copyright (C) 2018 Masahiro Yamada <yamada.masahiro@socionext.com>
++
++#include <stdarg.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "list.h"
++
++static void __attribute__((noreturn)) pperror(const char *format, ...)
++{
++	va_list ap;
++
++	fprintf(stderr, "%s:%d: ", current_file->name, yylineno);
++	va_start(ap, format);
++	vfprintf(stderr, format, ap);
++	va_end(ap);
++	fprintf(stderr, "\n");
++
++	exit(1);
++}
++
++/*
++ * Environment variables
++ */
++static LIST_HEAD(env_list);
++
++struct env {
++	char *name;
++	char *value;
++	struct list_head node;
++};
++
++static void env_add(const char *name, const char *value)
++{
++	struct env *e;
++
++	e = xmalloc(sizeof(*e));
++	e->name = xstrdup(name);
++	e->value = xstrdup(value);
++
++	list_add_tail(&e->node, &env_list);
++}
++
++static void env_del(struct env *e)
++{
++	list_del(&e->node);
++	free(e->name);
++	free(e->value);
++	free(e);
++}
++
++/* The returned pointer must be freed when done */
++static char *env_expand(const char *name)
++{
++	struct env *e;
++	const char *value;
++
++	list_for_each_entry(e, &env_list, node) {
++		if (!strcmp(name, e->name))
++			return xstrdup(e->value);
++	}
++
++	value = getenv(name);
++	if (!value)
++		value = "";
++
++	/*
++	 * We need to remember all referenced environments.
++	 * They will be written out to include/config/auto.conf.cmd
++	 */
++	env_add(name, value);
++
++	return xstrdup(value);
++}
++
++void env_write_dep(FILE *f, const char *autoconfig_name)
++{
++	struct env *e, *tmp;
++
++	list_for_each_entry_safe(e, tmp, &env_list, node) {
++		fprintf(f, "ifneq \"$(%s)\" \"%s\"\n", e->name, e->value);
++		fprintf(f, "%s: FORCE\n", autoconfig_name);
++		fprintf(f, "endif\n");
++		env_del(e);
++	}
++}
++
++static char *eval_clause(const char *in)
++{
++	char *res, *name;
++
++	/*
++	 * Returns an empty string because '$()' should be evaluated
++	 * to a null string.
++	 */
++	if (!*in)
++		return xstrdup("");
++
++	name = expand_string(in);
++
++	res = env_expand(name);
++	free(name);
++
++	return res;
++}
++
++/*
++ * Expand a string that follows '$'
++ *
++ * For example, if the input string is
++ *     ($(FOO)$($(BAR)))$(BAZ)
++ * this helper evaluates
++ *     $($(FOO)$($(BAR)))
++ * and returns the resulted string, then updates 'str' to point to the next
++ * character after the corresponding closing parenthesis, in this case, *str
++ * will be
++ *     $(BAR)
++ */
++char *expand_dollar(const char **str)
++{
++	const char *p = *str;
++	const char *q;
++	char *tmp, *out;
++	int nest = 0;
++
++	/* '$$' represents an escaped '$' */
++	if (*p == '$') {
++		*str = p + 1;
++		return xstrdup("$");
++	}
++
++	/*
++	 * Kconfig does not support single-letter variable as in $A
++	 * or curly braces as in ${CC}.
++	 */
++	if (*p != '(')
++		pperror("syntax error: '$' not followed by '('", p);
++
++	p++;
++	q = p;
++	while (*q) {
++		if (*q == '(') {
++			nest++;
++		} else if (*q == ')') {
++			if (nest-- == 0)
++				break;
++		}
++		q++;
++	}
++
++	if (!*q)
++		pperror("unterminated reference to '%s': missing ')'", p);
++
++	tmp = xmalloc(q - p + 1);
++	memcpy(tmp, p, q - p);
++	tmp[q - p] = 0;
++	*str = q + 1;
++	out = eval_clause(tmp);
++	free(tmp);
++
++	return out;
++}
++
++/*
++ * Expand variables in the given string.  Undefined variables
++ * expand to an empty string.
++ * The returned string must be freed when done.
++ */
++char *expand_string(const char *in)
++{
++	const char *prev_in, *p;
++	char *new, *out;
++	size_t outlen;
++
++	out = xmalloc(1);
++	*out = 0;
++
++	while ((p = strchr(in, '$'))) {
++		prev_in = in;
++		in = p + 1;
++		new = expand_dollar(&in);
++		outlen = strlen(out) + (p - prev_in) + strlen(new) + 1;
++		out = xrealloc(out, outlen);
++		strncat(out, prev_in, p - prev_in);
++		strcat(out, new);
++		free(new);
++	}
++
++	outlen = strlen(out) + strlen(in) + 1;
++	out = xrealloc(out, outlen);
++	strcat(out, in);
++
++	return out;
++}
++
++/*
++ * Expand variables in a token.  The parsing stops when a token separater
++ * (in most cases, it is a whitespace) is encountered.  'str' is updated to
++ * point to the next character.
++ *
++ * The returned string must be freed when done.
++ */
++char *expand_one_token(const char **str)
++{
++	const char *in, *prev_in, *p;
++	char *new, *out;
++	size_t outlen;
++
++	out = xmalloc(1);
++	*out = 0;
++
++	p = in = *str;
++
++	while (1) {
++		if (*p == '$') {
++			prev_in = in;
++			in = p + 1;
++			new = expand_dollar(&in);
++			outlen = strlen(out) + (p - prev_in) + strlen(new) + 1;
++			out = xrealloc(out, outlen);
++			strncat(out, prev_in, p - prev_in);
++			strcat(out, new);
++			free(new);
++			p = in;
++			continue;
++		}
++
++		/* Valid characters in a symbol (why '.' and '/' ?) */
++		if (isalnum(*p) || *p == '_' || *p == '-' || *p == '.' || *p == '/') {
++			p++;
++			continue;
++		}
++
++		break;
++	}
++
++	outlen = strlen(out) + (p - in) + 1;
++	out = xrealloc(out, outlen);
++	strncat(out, in, p - in);
++
++	*str = p;
++
++	return out;
++}
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index f0b2e3b..2460648 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -33,33 +33,6 @@ struct symbol *sym_defconfig_list;
+ struct symbol *modules_sym;
+ tristate modules_val;
+ 
+-struct expr *sym_env_list;
 -
--try-run = $(shell $(__try-run))
+-static void sym_add_default(struct symbol *sym, const char *def)
+-{
+-	struct property *prop = prop_alloc(P_DEFAULT, sym);
 -
--# try-run-cached
--# This works like try-run, but the result is cached.
--try-run-cached = $(call shell-cached,$(__try-run))
-+	rm -f "$$TMP" "$$TMPO")
+-	prop->expr = expr_alloc_symbol(sym_lookup(def, SYMBOL_CONST));
+-}
+-
+-void sym_init(void)
+-{
+-	struct symbol *sym;
+-	struct utsname uts;
+-	static bool inited = false;
+-
+-	if (inited)
+-		return;
+-	inited = true;
+-
+-	uname(&uts);
+-
+-	sym = sym_lookup("UNAME_RELEASE", 0);
+-	sym->type = S_STRING;
+-	sym->flags |= SYMBOL_AUTO;
+-	sym_add_default(sym, uts.release);
+-}
+-
+ enum symbol_type sym_get_type(struct symbol *sym)
+ {
+ 	enum symbol_type type = sym->type;
+@@ -1401,32 +1374,3 @@ const char *prop_get_type_name(enum prop_type type)
+ 	}
+ 	return "unknown";
+ }
+-
+-static void prop_add_env(const char *env)
+-{
+-	struct symbol *sym, *sym2;
+-	struct property *prop;
+-	char *p;
+-
+-	sym = current_entry->sym;
+-	sym->flags |= SYMBOL_AUTO;
+-	for_all_properties(sym, prop, P_ENV) {
+-		sym2 = prop_get_symbol(prop);
+-		if (strcmp(sym2->name, env))
+-			menu_warn(current_entry, "redefining environment symbol from %s",
+-				  sym2->name);
+-		return;
+-	}
+-
+-	prop = prop_alloc(P_ENV, sym);
+-	prop->expr = expr_alloc_symbol(sym_lookup(env, SYMBOL_CONST));
+-
+-	sym_env_list = expr_alloc_one(E_LIST, sym_env_list);
+-	sym_env_list->right.sym = sym;
+-
+-	p = getenv(env);
+-	if (p)
+-		sym_add_default(sym, p);
+-	else
+-		menu_warn(current_entry, "environment variable %s undefined", env);
+-}
+diff --git a/scripts/kconfig/util.c b/scripts/kconfig/util.c
+index c6f6e21..807147e 100644
+--- a/scripts/kconfig/util.c
++++ b/scripts/kconfig/util.c
+@@ -34,8 +34,6 @@ struct file *file_lookup(const char *name)
+ /* write a dependency file as used by kbuild to track dependencies */
+ int file_write_dep(const char *name)
+ {
+-	struct symbol *sym, *env_sym;
+-	struct expr *e;
+ 	struct file *file;
+ 	FILE *out;
  
- # as-option
- # Usage: cflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
+@@ -54,21 +52,7 @@ int file_write_dep(const char *name)
+ 	fprintf(out, "\n%s: \\\n"
+ 		     "\t$(deps_config)\n\n", conf_get_autoconfig_name());
  
--as-option = $(call try-run-cached,\
-+as-option = $(call try-run,\
- 	$(CC) $(KBUILD_CFLAGS) $(1) -c -x assembler /dev/null -o "$$TMP",$(1),$(2))
+-	expr_list_for_each_sym(sym_env_list, e, sym) {
+-		struct property *prop;
+-		const char *value;
+-
+-		prop = sym_get_env_prop(sym);
+-		env_sym = prop_get_symbol(prop);
+-		if (!env_sym)
+-			continue;
+-		value = getenv(env_sym->name);
+-		if (!value)
+-			value = "";
+-		fprintf(out, "ifneq \"$(%s)\" \"%s\"\n", env_sym->name, value);
+-		fprintf(out, "%s: FORCE\n", conf_get_autoconfig_name());
+-		fprintf(out, "endif\n");
+-	}
++	env_write_dep(out, conf_get_autoconfig_name());
  
- # as-instr
- # Usage: cflags-y += $(call as-instr,instr,option1,option2)
+ 	fprintf(out, "\n$(deps_config): ;\n");
+ 	fclose(out);
+diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
+index 045093d..9dc5fe3 100644
+--- a/scripts/kconfig/zconf.l
++++ b/scripts/kconfig/zconf.l
+@@ -1,6 +1,5 @@
+ %option nostdinit noyywrap never-interactive full ecs
+ %option 8bit nodefault yylineno
+-%option noinput
+ %x COMMAND HELP STRING PARAM
+ %{
+ /*
+@@ -35,6 +34,8 @@ struct buffer *current_buf;
  
--as-instr = $(call try-run-cached,\
-+as-instr = $(call try-run,\
- 	printf "%b\n" "$(1)" | $(CC) $(KBUILD_AFLAGS) -c -x assembler -o "$$TMP" -,$(2),$(3))
+ static int last_ts, first_ts;
  
- # __cc-option
- # Usage: MY_CFLAGS += $(call __cc-option,$(CC),$(MY_CFLAGS),-march=winchip-c6,-march=i586)
--__cc-option = $(call try-run-cached,\
-+__cc-option = $(call try-run,\
- 	$(1) -Werror $(2) $(3) -c -x c /dev/null -o "$$TMP",$(3),$(4))
++static char *expand_token(const char *in, size_t n);
++static void append_expanded_string(const char *in);
+ static void zconf_endhelp(void);
+ static void zconf_endfile(void);
  
- # Do not attempt to build with gcc plugins during cc-option tests.
-@@ -204,23 +131,23 @@ hostcc-option = $(call __cc-option, $(HOSTCC),\
+@@ -147,6 +148,13 @@ n	[A-Za-z0-9_-]
+ 		yylval.string = text;
+ 		return T_WORD;
+ 	}
++	({n}|[/.$])+	{
++		/* this token includes at least one '$' */
++		yylval.string = expand_token(yytext, yyleng);
++		if (strlen(yylval.string))
++			return T_WORD;
++		free(yylval.string);
++	}
+ 	#.*	/* comment */
+ 	\\\n	;
+ 	[[:blank:]]+
+@@ -157,12 +165,13 @@ n	[A-Za-z0-9_-]
+ }
  
- # cc-option-yn
- # Usage: flag := $(call cc-option-yn,-march=winchip-c6)
--cc-option-yn = $(call try-run-cached,\
-+cc-option-yn = $(call try-run,\
- 	$(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
+ <STRING>{
+-	[^'"\\\n]+/\n	{
++	"$".*	append_expanded_string(yytext);
++	[^$'"\\\n]+/\n	{
+ 		append_string(yytext, yyleng);
+ 		yylval.string = text;
+ 		return T_WORD_QUOTE;
+ 	}
+-	[^'"\\\n]+	{
++	[^$'"\\\n]+	{
+ 		append_string(yytext, yyleng);
+ 	}
+ 	\\.?/\n	{
+@@ -249,6 +258,58 @@ n	[A-Za-z0-9_-]
+ }
  
- # cc-disable-warning
- # Usage: cflags-y += $(call cc-disable-warning,unused-but-set-variable)
--cc-disable-warning = $(call try-run-cached,\
-+cc-disable-warning = $(call try-run,\
- 	$(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
+ %%
++static char *expand_token(const char *in, size_t n)
++{
++	char *out;
++	int c;
++	char c2;
++	const char *rest, *end;
++
++	new_string();
++	append_string(in, n);
++
++	/* get the whole the line because we do not know the end of token. */
++	while ((c = input()) != EOF) {
++		if (c == '\n') {
++			unput(c);
++			break;
++		}
++		c2 = c;
++		append_string(&c2, 1);
++	}
++
++	rest = text;
++	out = expand_one_token(&rest);
++
++	/* push back unused characters to the input stream */
++	end = rest + strlen(rest);
++	while (end > rest)
++		unput(*--end);
++
++	free(text);
++
++	return out;
++}
++
++static void append_expanded_string(const char *str)
++{
++	const char *end;
++	char *res;
++
++	str++;
++
++	res = expand_dollar(&str);
++
++	/* push back unused characters to the input stream */
++	end = str + strlen(str);
++	while (end > str)
++		unput(*--end);
++
++	append_string(res, strlen(res));
++
++	free(res);
++}
++
+ void zconf_starthelp(void)
+ {
+ 	new_string();
+diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+index ad6305b..3a4a0fa 100644
+--- a/scripts/kconfig/zconf.y
++++ b/scripts/kconfig/zconf.y
+@@ -534,7 +534,6 @@ void conf_parse(const char *name)
  
- # cc-name
- # Expands to either gcc or clang
--cc-name = $(call shell-cached,$(CC) -v 2>&1 | grep -q "clang version" && echo clang || echo gcc)
-+cc-name = $(shell $(CC) -v 2>&1 | grep -q "clang version" && echo clang || echo gcc)
+ 	zconf_initscan(name);
  
- # cc-version
--cc-version = $(call shell-cached,$(CONFIG_SHELL) $(srctree)/scripts/gcc-version.sh $(CC))
-+cc-version = $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-version.sh $(CC))
+-	sym_init();
+ 	_menu_init();
  
- # cc-fullversion
--cc-fullversion = $(call shell-cached,$(CONFIG_SHELL) \
-+cc-fullversion = $(shell $(CONFIG_SHELL) \
- 	$(srctree)/scripts/gcc-version.sh -p $(CC))
- 
- # cc-ifversion
-@@ -233,21 +160,21 @@ cc-if-fullversion = $(shell [ $(cc-fullversion) $(1) $(2) ] && echo $(3) || echo
- 
- # cc-ldoption
- # Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
--cc-ldoption = $(call try-run-cached,\
-+cc-ldoption = $(call try-run,\
- 	$(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
- 
- # ld-option
- # Usage: LDFLAGS += $(call ld-option, -X)
--ld-option = $(call try-run-cached, $(LD) $(LDFLAGS) $(1) -v,$(1),$(2))
-+ld-option = $(call try-run, $(LD) $(LDFLAGS) $(1) -v,$(1),$(2))
- 
- # ar-option
- # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
- # Important: no spaces around options
--ar-option = $(call try-run-cached, $(AR) rc$(1) "$$TMP",$(1),$(2))
-+ar-option = $(call try-run, $(AR) rc$(1) "$$TMP",$(1),$(2))
- 
- # ld-version
- # Note this is mainly for HJ Lu's 3 number binutil versions
--ld-version = $(call shell-cached,$(LD) --version | $(srctree)/scripts/ld-version.sh)
-+ld-version = $(shell $(LD) --version | $(srctree)/scripts/ld-version.sh)
- 
- # ld-ifversion
- # Usage:  $(call ld-ifversion, -ge, 22252, y)
+ 	if (getenv("ZCONF_DEBUG"))
+@@ -780,3 +779,4 @@ void zconfdump(FILE *out)
+ #include "expr.c"
+ #include "symbol.c"
+ #include "menu.c"
++#include "preprocess.c"
 -- 
 2.7.4
 
