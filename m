@@ -1,66 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:24366 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751850AbeEQGS4 (ORCPT
+Received: from mail-vk0-f68.google.com ([209.85.213.68]:44686 "EHLO
+        mail-vk0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752297AbeEQG0W (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 May 2018 02:18:56 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 09/31] kconfig: replace $(UNAME_RELEASE) with function call
-Date: Thu, 17 May 2018 15:16:48 +0900
-Message-Id: <1526537830-22606-10-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 17 May 2018 02:26:22 -0400
+Received: by mail-vk0-f68.google.com with SMTP id x66-v6so2007281vka.11
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 May 2018 23:26:21 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1526537830-22606-24-git-send-email-yamada.masahiro@socionext.com>
+References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com> <1526537830-22606-24-git-send-email-yamada.masahiro@socionext.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 16 May 2018 23:26:20 -0700
+Message-ID: <CAGXu5jKhZWMfKWvj2QhU8LaXD4CqO9oVZ==Ux919jN7fKG8okg@mail.gmail.com>
+Subject: Re: [PATCH v4 23/31] stack-protector: test compiler capability in
+ Kconfig and drop AUTO mode
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>
 
-Now that 'shell' function is supported, this can be self-contained in
-Kconfig.
+On Wed, May 16, 2018 at 11:17 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> Move the test for -fstack-protector(-strong) option to Kconfig.
+>
+> If the compiler does not support the option, the corresponding menu
+> is automatically hidden.  If STRONG is not supported, it will fall
+> back to REGULAR.  If REGULAR is not supported, it will be disabled.
+> This means, AUTO is implicitly handled by the dependency solver of
+> Kconfig, hence removed.
+>
+> I also turned the 'choice' into only two boolean symbols.  The use of
+> 'choice' is not a good idea here, because all of all{yes,mod,no}config
+> would choose the first visible value, while we want allnoconfig to
+> disable as many features as possible.
+>
+> X86 has additional shell scripts in case the compiler supports those
+> options, but generates broken code.  I added CC_HAS_SANE_STACKPROTECTOR
+> to test this.  I had to add -m32 to gcc-x86_32-has-stack-protector.sh
+> to make it work correctly.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
----
+Thanks!
 
-Changes in v4: None
-Changes in v3: None
-Changes in v2: None
+Acked-by: Kees Cook <keescook@chromium.org>
 
- Makefile     | 3 +--
- init/Kconfig | 4 ++--
- 2 files changed, 3 insertions(+), 4 deletions(-)
+-Kees
 
-diff --git a/Makefile b/Makefile
-index c6278e6..01b2211 100644
---- a/Makefile
-+++ b/Makefile
-@@ -284,8 +284,7 @@ include scripts/Kbuild.include
- # Read KERNELRELEASE from include/config/kernel.release (if it exists)
- KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
- KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
--UNAME_RELEASE := $(shell uname --release)
--export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION UNAME_RELEASE
-+export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
- 
- # SUBARCH tells the usermode build what the underlying arch is.  That is set
- # first, and if a usermode build is happening, the "ARCH=um" on the command
-diff --git a/init/Kconfig b/init/Kconfig
-index 752816b..66f0463 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -2,9 +2,9 @@ config DEFCONFIG_LIST
- 	string
- 	depends on !UML
- 	option defconfig_list
--	default "/lib/modules/$(UNAME_RELEASE)/.config"
-+	default "/lib/modules/$(shell, uname --release)/.config"
- 	default "/etc/kernel-config"
--	default "/boot/config-$(UNAME_RELEASE)"
-+	default "/boot/config-$(shell, uname --release)"
- 	default ARCH_DEFCONFIG
- 	default "arch/$(ARCH)/defconfig"
- 
 -- 
-2.7.4
-
+Kees Cook
+Pixel Security
