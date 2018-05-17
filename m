@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:25000 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:24993 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752153AbeEQGTQ (ORCPT
+        with ESMTP id S1751396AbeEQGTQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 17 May 2018 02:19:16 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 15/31] kconfig: add 'info', 'warning', and 'error' built-in functions
-Date: Thu, 17 May 2018 15:16:54 +0900
-Message-Id: <1526537830-22606-16-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 17/31] kconfig: add 'filename' and 'lineno' built-in variables
+Date: Thu, 17 May 2018 15:16:56 +0900
+Message-Id: <1526537830-22606-18-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,68 +15,65 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Add 'info', 'warning', and 'error' functions as in Make.
+The special variables, $(filename) and $(lineno), are expanded to a
+file name and its line number being parsed, respectively.
 
-They print messages during parsing Kconfig files. 'error' will be
-useful to terminate the parsing immediately in fatal cases.
-
+Suggested-by: Randy Dunlap <rdunlap@infradead.org>
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v4:
-  - Add 'error' function
+ - Newly added
 
 Changes in v3: None
 Changes in v2: None
 
- scripts/kconfig/preprocess.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ scripts/kconfig/preprocess.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
 diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
-index 47b32dc..591bcf7 100644
+index 88844a7..c39e30e 100644
 --- a/scripts/kconfig/preprocess.c
 +++ b/scripts/kconfig/preprocess.c
-@@ -104,6 +104,20 @@ struct function {
- 	char *(*func)(int argc, char *argv[], int old_argc, char *old_argv[]);
- };
+@@ -111,6 +111,11 @@ static char *do_error(int argc, char *argv[], int old_argc, char *old_argv[])
+ 	return NULL;
+ }
  
-+static char *do_error(int argc, char *argv[], int old_argc, char *old_argv[])
++static char *do_filename(int argc, char *argv[], int old_argc, char *old_argv[])
 +{
-+	pperror("%s", argv[0]);
-+
-+	return NULL;
++	return xstrdup(current_file->name);
 +}
 +
-+static char *do_info(int argc, char *argv[], int old_argc, char *old_argv[])
+ static char *do_if(int argc, char *argv[], int old_argc, char *old_argv[])
+ {
+ 	char *cond, *p, *res;
+@@ -144,6 +149,15 @@ static char *do_info(int argc, char *argv[], int old_argc, char *old_argv[])
+ 	return xstrdup("");
+ }
+ 
++static char *do_lineno(int argc, char *argv[], int old_argc, char *old_argv[])
 +{
-+	printf("%s\n", argv[0]);
++	char buf[16];
 +
-+	return xstrdup("");
++	sprintf(buf, "%d", yylineno);
++
++	return xstrdup(buf);
 +}
 +
  static char *do_shell(int argc, char *argv[], int old_argc, char *old_argv[])
  {
  	FILE *p;
-@@ -144,9 +158,19 @@ static char *do_shell(int argc, char *argv[], int old_argc, char *old_argv[])
- 	return xstrdup(buf);
- }
- 
-+static char *do_warning(int argc, char *argv[], int old_argc, char *old_argv[])
-+{
-+	fprintf(stderr, "%s:%d: %s\n", current_file->name, yylineno, argv[0]);
-+
-+	return xstrdup("");
-+}
-+
+@@ -194,8 +208,10 @@ static char *do_warning(int argc, char *argv[], int old_argc, char *old_argv[])
  static const struct function function_table[] = {
  	/* Name		MIN	MAX	EXP?	Function */
-+	{ "error",	1,	1,	true,	do_error },
-+	{ "info",	1,	1,	true,	do_info },
+ 	{ "error",	1,	1,	true,	do_error },
++	{ "filename",	0,	0,	false,	do_filename },
+ 	{ "if",		2,	3,	false,	do_if },
+ 	{ "info",	1,	1,	true,	do_info },
++	{ "lineno",	0,	0,	false,	do_lineno },
  	{ "shell",	1,	1,	true,	do_shell },
-+	{ "warning",	1,	1,	true,	do_warning },
+ 	{ "warning",	1,	1,	true,	do_warning },
  };
- 
- #define FUNCTION_MAX_ARGS		16
 -- 
 2.7.4
 
