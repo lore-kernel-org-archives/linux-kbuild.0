@@ -1,90 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:39289 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751595AbeEPOPZ (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:24132 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750815AbeEQGSu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 May 2018 10:15:25 -0400
-Received: by mail-pf0-f195.google.com with SMTP id a22-v6so425491pfn.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 16 May 2018 07:15:25 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH v4 4/4] powerpc/kbuild: move -mprofile-kernel check to Kconfig
-Date: Thu, 17 May 2018 00:14:58 +1000
-Message-Id: <20180516141458.18996-5-npiggin@gmail.com>
-In-Reply-To: <20180516141458.18996-1-npiggin@gmail.com>
-References: <20180516141458.18996-1-npiggin@gmail.com>
+        Thu, 17 May 2018 02:18:50 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v4 02/31] kbuild: remove CONFIG_CROSS_COMPILE support
+Date: Thu, 17 May 2018 15:16:41 +0900
+Message-Id: <1526537830-22606-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Segher Boessenkool <segher@kernel.crashing.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-This eliminates the workaround that requires disabling
--mprofile-kernel by default in Kconfig.
+Kbuild provides a couple of ways to specify CROSS_COMPILE:
 
-[ Note: this depends on https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v3 ]
+[1] Command line
+[2] Environment
+[3] arch/*/Makefile (only some architectures)
+[4] CONFIG_CROSS_COMPILE
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+[4] is problematic for the compiler capability tests in Kconfig.
+CONFIG_CROSS_COMPILE allows users to change the compiler prefix from
+'make menuconfig', etc.  It means, the compiler options would have
+to be all re-calculated everytime CONFIG_CROSS_COMPILE is changed.
+
+To avoid complexity and performance issues, I'd like to evaluate
+the shell commands statically, i.e. only parsing Kconfig files.
+
+I guess the majority is [1] or [2].  Currently, there are only
+5 defconfig files that specify CONFIG_CROSS_COMPILE.
+  arch/arm/configs/lpc18xx_defconfig
+  arch/hexagon/configs/comet_defconfig
+  arch/nds32/configs/defconfig
+  arch/openrisc/configs/or1ksim_defconfig
+  arch/openrisc/configs/simple_smp_defconfig
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
-Since v3:
-- Moved a stray hunk back to patch 3 where it belongs.
 
- arch/powerpc/Kconfig  | 16 +---------------
- arch/powerpc/Makefile | 14 ++------------
- 2 files changed, 3 insertions(+), 27 deletions(-)
+Changes in v4: None
+Changes in v3: None
+Changes in v2: None
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index 512fcc177c87..af527f894f9b 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -460,23 +460,9 @@ config LD_HEAD_STUB_CATCH
+ Makefile     | 3 ---
+ init/Kconfig | 9 ---------
+ 2 files changed, 12 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index e78f73f..01b2211 100644
+--- a/Makefile
++++ b/Makefile
+@@ -316,12 +316,9 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+ # CROSS_COMPILE can be set on the command line
+ # make CROSS_COMPILE=ia64-linux-
+ # Alternatively CROSS_COMPILE can be set in the environment.
+-# A third alternative is to store a setting in .config so that plain
+-# "make" in the configured kernel build directory always uses that.
+ # Default value for CROSS_COMPILE is not to prefix executables
+ # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
+ ARCH		?= $(SUBARCH)
+-CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
  
- 	  If unsure, say "N".
+ # Architecture as present in compile.h
+ UTS_MACHINE 	:= $(ARCH)
+diff --git a/init/Kconfig b/init/Kconfig
+index f013afc..4537962 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -54,15 +54,6 @@ config INIT_ENV_ARG_LIMIT
+ 	  Maximum of each of the number of arguments and environment
+ 	  variables passed to init from the kernel command line.
  
--config DISABLE_MPROFILE_KERNEL
--	bool "Disable use of mprofile-kernel for kernel tracing"
--	depends on PPC64 && CPU_LITTLE_ENDIAN
--	default y
+-
+-config CROSS_COMPILE
+-	string "Cross-compiler tool prefix"
 -	help
--	  Selecting this options disables use of the mprofile-kernel ABI for
--	  kernel tracing. That will cause options such as live patching
--	  (CONFIG_LIVEPATCH) which depend on CONFIG_DYNAMIC_FTRACE_WITH_REGS to
--	  be disabled also.
+-	  Same as running 'make CROSS_COMPILE=prefix-' but stored for
+-	  default make runs in this kernel build directory.  You don't
+-	  need to set this unless you want the configured kernel build
+-	  directory to select the cross-compiler automatically.
 -
--	  If you have a toolchain which supports mprofile-kernel, then you can
--	  disable this. Otherwise leave it enabled. If you're not sure, say
--	  "Y".
--
- config MPROFILE_KERNEL
- 	depends on PPC64 && CPU_LITTLE_ENDIAN
--	def_bool !DISABLE_MPROFILE_KERNEL
-+	def_bool $(success $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__)
- 
- config IOMMU_HELPER
- 	def_bool PPC64
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index 6faf1d6ad9dd..8f7a64fe7370 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -161,18 +161,8 @@ CFLAGS-$(CONFIG_GENERIC_CPU) += -mcpu=powerpc64
- endif
- 
- ifdef CONFIG_MPROFILE_KERNEL
--    ifeq ($(shell $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__),OK)
--        CC_FLAGS_FTRACE := -pg -mprofile-kernel
--        KBUILD_CPPFLAGS += -DCC_USING_MPROFILE_KERNEL
--    else
--        # If the user asked for mprofile-kernel but the toolchain doesn't
--        # support it, emit a warning and deliberately break the build later
--        # with mprofile-kernel-not-supported. We would prefer to make this an
--        # error right here, but then the user would never be able to run
--        # oldconfig to change their configuration.
--        $(warning Compiler does not support mprofile-kernel, set CONFIG_DISABLE_MPROFILE_KERNEL)
--        CC_FLAGS_FTRACE := -mprofile-kernel-not-supported
--    endif
-+	CC_FLAGS_FTRACE := -pg -mprofile-kernel
-+	KBUILD_CPPFLAGS += -DCC_USING_MPROFILE_KERNEL
- endif
- 
- CFLAGS-$(CONFIG_CELL_CPU) += $(call cc-option,-mcpu=cell)
+ config COMPILE_TEST
+ 	bool "Compile also drivers which will not load"
+ 	depends on !UML
 -- 
-2.17.0
+2.7.4
 
