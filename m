@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:24995 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:25000 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750826AbeEQGTQ (ORCPT
+        with ESMTP id S1752153AbeEQGTQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 17 May 2018 02:19:16 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 13/31] kconfig: support append assignment operator
-Date: Thu, 17 May 2018 15:16:52 +0900
-Message-Id: <1526537830-22606-14-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 15/31] kconfig: add 'info', 'warning', and 'error' built-in functions
+Date: Thu, 17 May 2018 15:16:54 +0900
+Message-Id: <1526537830-22606-16-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,112 +15,68 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Support += operator.  This appends a space and the text on the
-righthand side to a variable.
+Add 'info', 'warning', and 'error' functions as in Make.
 
-The timing of the evaluation of the righthand side depends on the
-flavor of the variable.  If the lefthand side was originally defined
-as a simple variable, the righthand side is expanded immediately.
-Otherwise, the expansion is deferred.  Appending something to an
-undefined variable results in a recursive variable.
-
-To implement this, we need to remember the flavor of variables.
+They print messages during parsing Kconfig files. 'error' will be
+useful to terminate the parsing immediately in fatal cases.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-Changes in v4: None
-Changes in v3:
-  - newly added
+Changes in v4:
+  - Add 'error' function
 
+Changes in v3: None
 Changes in v2: None
 
- scripts/kconfig/lkc_proto.h  |  1 +
- scripts/kconfig/preprocess.c | 29 +++++++++++++++++++++++++++--
- scripts/kconfig/zconf.l      |  1 +
- 3 files changed, 29 insertions(+), 2 deletions(-)
+ scripts/kconfig/preprocess.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index 6303193..a8b7a33 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -52,6 +52,7 @@ const char * prop_get_type_name(enum prop_type type);
- enum variable_flavor {
- 	VAR_SIMPLE,
- 	VAR_RECURSIVE,
-+	VAR_APPEND,
- };
- void env_write_dep(FILE *f, const char *auto_conf_name);
- void variable_add(const char *name, const char *value,
 diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
-index 5d7bd9d..47b32dc 100644
+index 47b32dc..591bcf7 100644
 --- a/scripts/kconfig/preprocess.c
 +++ b/scripts/kconfig/preprocess.c
-@@ -208,6 +208,7 @@ static LIST_HEAD(variable_list);
- struct variable {
- 	char *name;
- 	char *value;
-+	enum variable_flavor flavor;
- 	struct list_head node;
+@@ -104,6 +104,20 @@ struct function {
+ 	char *(*func)(int argc, char *argv[], int old_argc, char *old_argv[]);
  };
  
-@@ -250,18 +251,42 @@ void variable_add(const char *name, const char *value,
- 		  enum variable_flavor flavor)
++static char *do_error(int argc, char *argv[], int old_argc, char *old_argv[])
++{
++	pperror("%s", argv[0]);
++
++	return NULL;
++}
++
++static char *do_info(int argc, char *argv[], int old_argc, char *old_argv[])
++{
++	printf("%s\n", argv[0]);
++
++	return xstrdup("");
++}
++
+ static char *do_shell(int argc, char *argv[], int old_argc, char *old_argv[])
  {
- 	struct variable *v;
-+	char *new_value;
-+	bool append = false;
- 
- 	v = variable_lookup(name);
- 	if (v) {
--		free(v->value);
-+		/* For defined variables, += inherits the existing flavor */
-+		if (flavor == VAR_APPEND) {
-+			flavor = v->flavor;
-+			append = true;
-+		} else {
-+			free(v->value);
-+		}
- 	} else {
-+		/* For undefined variables, += assumes the recursive flavor */
-+		if (flavor == VAR_APPEND)
-+			flavor = VAR_RECURSIVE;
-+
- 		v = xmalloc(sizeof(*v));
- 		v->name = xstrdup(name);
- 		list_add_tail(&v->node, &variable_list);
- 	}
- 
--	v->value = (flavor == VAR_SIMPLE) ? expand_string(value) :
-+	v->flavor = flavor;
-+
-+	new_value = (flavor == VAR_SIMPLE) ? expand_string(value) :
- 								xstrdup(value);
-+
-+	if (append) {
-+		v->value = xrealloc(v->value,
-+				    strlen(v->value) + strlen(new_value) + 2);
-+		strcat(v->value, " ");
-+		strcat(v->value, new_value);
-+		free(new_value);
-+	} else {
-+		v->value = new_value;
-+	}
+ 	FILE *p;
+@@ -144,9 +158,19 @@ static char *do_shell(int argc, char *argv[], int old_argc, char *old_argv[])
+ 	return xstrdup(buf);
  }
  
- static void variable_del(struct variable *v)
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index aa76942..c68ca56b 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -116,6 +116,7 @@ n	[A-Za-z0-9_-]
- 	}
- 	"="	{ BEGIN(ASSIGN_VAL); yylval.flavor = VAR_RECURSIVE; return T_ASSIGN; }
- 	":="	{ BEGIN(ASSIGN_VAL); yylval.flavor = VAR_SIMPLE; return T_ASSIGN; }
-+	"+="	{ BEGIN(ASSIGN_VAL); yylval.flavor = VAR_APPEND; return T_ASSIGN; }
- 	[[:blank:]]+
- 	.	warn_ignored_character(*yytext);
- 	\n	{
++static char *do_warning(int argc, char *argv[], int old_argc, char *old_argv[])
++{
++	fprintf(stderr, "%s:%d: %s\n", current_file->name, yylineno, argv[0]);
++
++	return xstrdup("");
++}
++
+ static const struct function function_table[] = {
+ 	/* Name		MIN	MAX	EXP?	Function */
++	{ "error",	1,	1,	true,	do_error },
++	{ "info",	1,	1,	true,	do_info },
+ 	{ "shell",	1,	1,	true,	do_shell },
++	{ "warning",	1,	1,	true,	do_warning },
+ };
+ 
+ #define FUNCTION_MAX_ARGS		16
 -- 
 2.7.4
 
