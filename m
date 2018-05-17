@@ -1,110 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:24196 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751061AbeEQGSv (ORCPT
+Received: from mail-ua0-f194.google.com ([209.85.217.194]:46303 "EHLO
+        mail-ua0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751524AbeEQG3A (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 May 2018 02:18:51 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 08/31] kconfig: add 'shell' built-in function
-Date: Thu, 17 May 2018 15:16:47 +0900
-Message-Id: <1526537830-22606-9-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 17 May 2018 02:29:00 -0400
+Received: by mail-ua0-f194.google.com with SMTP id e8-v6so2189340uam.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 May 2018 23:28:59 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1526537830-22606-7-git-send-email-yamada.masahiro@socionext.com>
+References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com> <1526537830-22606-7-git-send-email-yamada.masahiro@socionext.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 16 May 2018 23:28:58 -0700
+Message-ID: <CAGXu5j+iAHM06OnJ8ECt1ZHHRrX+J++dy=pSSJf-kb0Z2C+8Cw@mail.gmail.com>
+Subject: Re: [PATCH v4 06/31] kconfig: remove sym_expand_string_value()
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>
 
-This accepts a single command to execute.  It returns the standard
-output from it.
+On Wed, May 16, 2018 at 11:16 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> There is no more caller of sym_expand_string_value().
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-[Example code]
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-  config HELLO
-          string
-          default "$(shell,echo hello world)"
+Easy to review! :)
 
-  config Y
-          def_bool $(shell,echo y)
+-Kees
 
-[Result]
-
-  $ make -s alldefconfig && tail -n 2 .config
-  CONFIG_HELLO="hello world"
-  CONFIG_Y=y
-
-Caveat:
-Like environments, functions are expanded in the lexer.  You cannot
-pass symbols to function arguments.  This is a limitation to simplify
-the implementation.  I want to avoid the dynamic function evaluation,
-which would introduce much more complexity.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
-Changes in v4:
-  - Accept only one argument to simplify the implementation
-
-Changes in v3: None
-Changes in v2: None
-
- scripts/kconfig/preprocess.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
-
-diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
-index 5be28ec..d8c5f60 100644
---- a/scripts/kconfig/preprocess.c
-+++ b/scripts/kconfig/preprocess.c
-@@ -104,8 +104,49 @@ struct function {
- 	char *(*func)(int argc, char *argv[], int old_argc, char *old_argv[]);
- };
- 
-+static char *do_shell(int argc, char *argv[], int old_argc, char *old_argv[])
-+{
-+	FILE *p;
-+	char buf[256];
-+	char *cmd;
-+	size_t nread;
-+	int i;
-+
-+	cmd = argv[0];
-+
-+	p = popen(cmd, "r");
-+	if (!p) {
-+		perror(cmd);
-+		exit(1);
-+	}
-+
-+	nread = fread(buf, 1, sizeof(buf), p);
-+	if (nread == sizeof(buf))
-+		nread--;
-+
-+	/* remove trailing new lines */
-+	while (buf[nread - 1] == '\n')
-+		nread--;
-+
-+	buf[nread] = 0;
-+
-+	/* replace a new line with a space */
-+	for (i = 0; i < nread; i++) {
-+		if (buf[i] == '\n')
-+			buf[i] = ' ';
-+	}
-+
-+	if (pclose(p) == -1) {
-+		perror(cmd);
-+		exit(1);
-+	}
-+
-+	return xstrdup(buf);
-+}
-+
- static const struct function function_table[] = {
- 	/* Name		MIN	MAX	EXP?	Function */
-+	{ "shell",	1,	1,	true,	do_shell },
- };
- 
- #define FUNCTION_MAX_ARGS		16
 -- 
-2.7.4
-
+Kees Cook
+Pixel Security
