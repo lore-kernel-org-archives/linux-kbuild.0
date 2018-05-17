@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:24362 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:24366 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750825AbeEQGS4 (ORCPT
+        with ESMTP id S1751850AbeEQGS4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 17 May 2018 02:18:56 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 05/31] kconfig: remove string expansion for mainmenu after yyparse()
-Date: Thu, 17 May 2018 15:16:44 +0900
-Message-Id: <1526537830-22606-6-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 09/31] kconfig: replace $(UNAME_RELEASE) with function call
+Date: Thu, 17 May 2018 15:16:48 +0900
+Message-Id: <1526537830-22606-10-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,11 +15,8 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Now that environments are expanded in the lexer, conf_parse() does
-not need to expand them explicitly.
-
-The hack introduced by commit 0724a7c32a54 ("kconfig: Don't leak
-main menus during parsing") can go away.
+Now that 'shell' function is supported, this can be self-contained in
+Kconfig.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
@@ -28,68 +25,42 @@ Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 
 Changes in v4: None
 Changes in v3: None
-Changes in v2:
-  - Simplify the patch.  Just remove the text expansion.
+Changes in v2: None
 
- scripts/kconfig/zconf.y | 24 +++++-------------------
- 1 file changed, 5 insertions(+), 19 deletions(-)
+ Makefile     | 3 +--
+ init/Kconfig | 4 ++--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 3a4a0fa..22e318c 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -109,7 +109,7 @@ static struct menu *current_menu, *current_entry;
- %%
- input: nl start | start;
+diff --git a/Makefile b/Makefile
+index c6278e6..01b2211 100644
+--- a/Makefile
++++ b/Makefile
+@@ -284,8 +284,7 @@ include scripts/Kbuild.include
+ # Read KERNELRELEASE from include/config/kernel.release (if it exists)
+ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+ KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+-UNAME_RELEASE := $(shell uname --release)
+-export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION UNAME_RELEASE
++export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
  
--start: mainmenu_stmt stmt_list | no_mainmenu_stmt stmt_list;
-+start: mainmenu_stmt stmt_list | stmt_list;
+ # SUBARCH tells the usermode build what the underlying arch is.  That is set
+ # first, and if a usermode build is happening, the "ARCH=um" on the command
+diff --git a/init/Kconfig b/init/Kconfig
+index 752816b..66f0463 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -2,9 +2,9 @@ config DEFCONFIG_LIST
+ 	string
+ 	depends on !UML
+ 	option defconfig_list
+-	default "/lib/modules/$(UNAME_RELEASE)/.config"
++	default "/lib/modules/$(shell, uname --release)/.config"
+ 	default "/etc/kernel-config"
+-	default "/boot/config-$(UNAME_RELEASE)"
++	default "/boot/config-$(shell, uname --release)"
+ 	default ARCH_DEFCONFIG
+ 	default "arch/$(ARCH)/defconfig"
  
- /* mainmenu entry */
- 
-@@ -118,19 +118,6 @@ mainmenu_stmt: T_MAINMENU prompt nl
- 	menu_add_prompt(P_MENU, $2, NULL);
- };
- 
--/* Default main menu, if there's no mainmenu entry */
--
--no_mainmenu_stmt: /* empty */
--{
--	/*
--	 * Hack: Keep the main menu title on the heap so we can safely free it
--	 * later regardless of whether it comes from the 'prompt' in
--	 * mainmenu_stmt or here
--	 */
--	menu_add_prompt(P_MENU, xstrdup("Linux Kernel Configuration"), NULL);
--};
--
--
- stmt_list:
- 	  /* empty */
- 	| stmt_list common_stmt
-@@ -528,7 +515,6 @@ word_opt: /* empty */			{ $$ = NULL; }
- 
- void conf_parse(const char *name)
- {
--	const char *tmp;
- 	struct symbol *sym;
- 	int i;
- 
-@@ -544,10 +530,10 @@ void conf_parse(const char *name)
- 	if (!modules_sym)
- 		modules_sym = sym_find( "n" );
- 
--	tmp = rootmenu.prompt->text;
--	rootmenu.prompt->text = _(rootmenu.prompt->text);
--	rootmenu.prompt->text = sym_expand_string_value(rootmenu.prompt->text);
--	free((char*)tmp);
-+	if (!menu_has_prompt(&rootmenu)) {
-+		current_entry = &rootmenu;
-+		menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
-+	}
- 
- 	menu_finalize(&rootmenu);
- 	for_all_symbols(i, sym) {
 -- 
 2.7.4
 
