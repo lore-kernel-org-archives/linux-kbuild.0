@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:24994 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:24995 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751231AbeEQGTQ (ORCPT
+        with ESMTP id S1750826AbeEQGTQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 17 May 2018 02:19:16 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 18/31] kconfig: error out if a recursive variable references itself
-Date: Thu, 17 May 2018 15:16:57 +0900
-Message-Id: <1526537830-22606-19-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 13/31] kconfig: support append assignment operator
+Date: Thu, 17 May 2018 15:16:52 +0900
+Message-Id: <1526537830-22606-14-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,80 +15,112 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-When using a recursively expanded variable, it is a common mistake
-to make circular reference.
+Support += operator.  This appends a space and the text on the
+righthand side to a variable.
 
-For example, Make terminates the following code:
+The timing of the evaluation of the righthand side depends on the
+flavor of the variable.  If the lefthand side was originally defined
+as a simple variable, the righthand side is expanded immediately.
+Otherwise, the expansion is deferred.  Appending something to an
+undefined variable results in a recursive variable.
 
-  X = $(X)
-  Y := $(X)
-
-Let's detect the circular expansion in Kconfig, too.
-
-On the other hand, a function that recurses itself is a commonly-used
-programming technique.  So, Make does not check recursion in the
-reference with 'call'.  For example, the following code continues
-running eternally:
-
-  X = $(call X)
-  Y := $(X)
-
-Kconfig allows circular expansion if one or more arguments are given,
-but terminates when the same function is recursively invoked 1000 times,
-assuming it is a programming mistake.
+To implement this, we need to remember the flavor of variables.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-Changes in v4:
- - Newly added
+Changes in v4: None
+Changes in v3:
+  - newly added
 
-Changes in v3: None
 Changes in v2: None
 
- scripts/kconfig/preprocess.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ scripts/kconfig/lkc_proto.h  |  1 +
+ scripts/kconfig/preprocess.c | 29 +++++++++++++++++++++++++++--
+ scripts/kconfig/zconf.l      |  1 +
+ 3 files changed, 29 insertions(+), 2 deletions(-)
 
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index 6303193..a8b7a33 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -52,6 +52,7 @@ const char * prop_get_type_name(enum prop_type type);
+ enum variable_flavor {
+ 	VAR_SIMPLE,
+ 	VAR_RECURSIVE,
++	VAR_APPEND,
+ };
+ void env_write_dep(FILE *f, const char *auto_conf_name);
+ void variable_add(const char *name, const char *value,
 diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
-index c39e30e..246f879 100644
+index 5d7bd9d..47b32dc 100644
 --- a/scripts/kconfig/preprocess.c
 +++ b/scripts/kconfig/preprocess.c
-@@ -276,6 +276,7 @@ struct variable {
+@@ -208,6 +208,7 @@ static LIST_HEAD(variable_list);
+ struct variable {
  	char *name;
  	char *value;
- 	enum variable_flavor flavor;
-+	int exp_count;
++	enum variable_flavor flavor;
  	struct list_head node;
  };
  
-@@ -306,8 +307,19 @@ static char *variable_expand(const char *name, int argc, char *argv[],
- 		expanded_argv[i] = expand_string_with_args(argv[i],
- 							   old_argc, old_argv);
+@@ -250,18 +251,42 @@ void variable_add(const char *name, const char *value,
+ 		  enum variable_flavor flavor)
+ {
+ 	struct variable *v;
++	char *new_value;
++	bool append = false;
  
-+	if (argc == 0 && v->exp_count)
-+		pperror("Recursive variable '%s' references itself (eventually)",
-+			name);
+ 	v = variable_lookup(name);
+ 	if (v) {
+-		free(v->value);
++		/* For defined variables, += inherits the existing flavor */
++		if (flavor == VAR_APPEND) {
++			flavor = v->flavor;
++			append = true;
++		} else {
++			free(v->value);
++		}
+ 	} else {
++		/* For undefined variables, += assumes the recursive flavor */
++		if (flavor == VAR_APPEND)
++			flavor = VAR_RECURSIVE;
 +
-+	if (v->exp_count > 1000)
-+		pperror("Too deep recursive expansion");
-+
-+	v->exp_count++;
-+
- 	res = expand_string_with_args(v->value, argc, expanded_argv);
- 
-+	v->exp_count--;
-+
- 	for (i = 0; i < argc; i++)
- 		free(expanded_argv[i]);
- 
-@@ -337,6 +349,7 @@ void variable_add(const char *name, const char *value,
- 
  		v = xmalloc(sizeof(*v));
  		v->name = xstrdup(name);
-+		v->exp_count = 0;
  		list_add_tail(&v->node, &variable_list);
  	}
  
+-	v->value = (flavor == VAR_SIMPLE) ? expand_string(value) :
++	v->flavor = flavor;
++
++	new_value = (flavor == VAR_SIMPLE) ? expand_string(value) :
+ 								xstrdup(value);
++
++	if (append) {
++		v->value = xrealloc(v->value,
++				    strlen(v->value) + strlen(new_value) + 2);
++		strcat(v->value, " ");
++		strcat(v->value, new_value);
++		free(new_value);
++	} else {
++		v->value = new_value;
++	}
+ }
+ 
+ static void variable_del(struct variable *v)
+diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
+index aa76942..c68ca56b 100644
+--- a/scripts/kconfig/zconf.l
++++ b/scripts/kconfig/zconf.l
+@@ -116,6 +116,7 @@ n	[A-Za-z0-9_-]
+ 	}
+ 	"="	{ BEGIN(ASSIGN_VAL); yylval.flavor = VAR_RECURSIVE; return T_ASSIGN; }
+ 	":="	{ BEGIN(ASSIGN_VAL); yylval.flavor = VAR_SIMPLE; return T_ASSIGN; }
++	"+="	{ BEGIN(ASSIGN_VAL); yylval.flavor = VAR_APPEND; return T_ASSIGN; }
+ 	[[:blank:]]+
+ 	.	warn_ignored_character(*yytext);
+ 	\n	{
 -- 
 2.7.4
 
