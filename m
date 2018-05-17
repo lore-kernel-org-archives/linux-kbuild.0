@@ -1,56 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:41816 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752243AbeEQHwI (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:51916 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750924AbeEQIif (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 May 2018 03:52:08 -0400
-Date: Thu, 17 May 2018 17:51:56 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v4 00/31] kconfig: move compiler capability tests to
- Kconfig
-Message-ID: <20180517175156.4c4246f6@roar.ozlabs.ibm.com>
-In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 17 May 2018 04:38:35 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <fb123c1f-7680-9e75-125a-e4e66f0f9c93@redhat.com>
+References: <20180329180112.11055-1-labbott@redhat.com> <CAK7LNATTfjpkG0PLR5_anZOW5zfSZxKgFO6sHXuMf50OEtx0PQ@mail.gmail.com>
+ <fb123c1f-7680-9e75-125a-e4e66f0f9c93@redhat.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 17 May 2018 17:37:40 +0900
+Message-ID: <CAK7LNAR=YQswK2cgq2XUYpK-LrODGd-nSxg20b5fbsitNjD_PQ@mail.gmail.com>
+Subject: Re: [RFCv2 PATCH 0/3] Salted build ids via linker sections
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org
+To: Laura Abbott <labbott@redhat.com>
+Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Thu, 17 May 2018 15:16:39 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+2018-05-15 6:02 GMT+09:00 Laura Abbott <labbott@redhat.com>:
+> On 05/06/2018 11:28 PM, Masahiro Yamada wrote:
+>>
+>> 2018-03-30 3:01 GMT+09:00 Laura Abbott <labbott@redhat.com>:
+>>>
+>>> Hi,
+>>>
+>>> This is v2 of my proposal to allow unique build-ids in the kernel. from
+>>> last time:
+>>>
+>>> ""
+>>> In Fedora, the debug information is packaged separately (foo-debuginfo)
+>>> and
+>>> can be installed separately. There's been a long standing issue where
+>>> only one
+>>> version of a debuginfo info package can be installed at a time. Mark
+>>> Wielaard
+>>> made an effort for Fedora 27 to allow parallel installation of debuginfo
+>>> (see
+>>> https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo for
+>>> more details)
+>>>
+>>> Part of the requirement to allow this to work is that build ids are
+>>> unique between builds. The existing upstream rpm implementation ensures
+>>> this by re-calculating the build-id using the version and release as a
+>>> seed. This doesn't work 100% for the kernel because of the vDSO which is
+>>> its own binary and doesn't get updated. After poking holes in a few of my
+>>> ideas, there was a discussion with some people from the binutils team
+>>> about
+>>> adding --build-id-salt to let ld do the calculation debugedit is doing.
+>>> There
+>>> was a counter proposal made about adding some extra information via a
+>>> .comment
+>>> which will affect the build id calculation but just get stripped out.
+>>> ""
+>>
+>>
+>>
+>> I think you already know '--build-id=uuid' linker option.
+>>
+>> Doesn't this solve your problem?
+>>
+>> The disadvantage of this option is,
+>> we will lose reproducible building because  --build-id=uuid
+>> adds every time random salt.
+>>
+>> The advantage is, the implementation is even simpler,
+>> and easier to migrate to --build-id-salt once it is supported
+>> in the future.
+>>
+>>
+>
+> It could, theoretically. The reproducibility is nice though and
+> I'd like to keep the kernel close to matching what other packages
+> do though.
 
-> [Introduction]
-> 
-> The motivation of this work is to move the compiler option tests to
-> Kconfig from Makefile.  A number of kernel features require the
-> compiler support.  Enabling such features blindly in Kconfig ends up
-> with a lot of nasty build-time testing in Makefiles.  If a chosen
-> feature turns out unsupported by the compiler, what the build system
-> can do is either to disable it (silently!) or to forcibly break the
-> build, despite Kconfig has let the user to enable it.  By moving the
-> compiler capability tests to Kconfig, Kconfig entries will be visible
-> only when they are available.
-> 
-> [Major Changes in V4]
+Okay.
+I left some comments in v2
+about improvement, and cause of
+the sporadic build failures.
 
-Do you have a git tree for v4? I can test it with the powerpc patches.
+Will wait for v3.
 
-The new scripting capability in kconfig has allowed us to already
-improve the config process on powerpc:
-
-https://marc.info/?l=linuxppc-embedded&m=152648110727868&w=2
-
-I'm sure there's more clever things we can do with it but I haven't
-had time to think about it yet. One thing that comes to mind is that
-It might be nice to show the option as disabled, then the user could
-upgrade their compiler to get the options they want.
-
-Anyway v3 worked fine for me, the documentation is really nice, I
-could implement the above patch without any problem despite being a
-kbuild dummy. Thanks for the series, ack from me.
-
-Thanks,
-Nick
+-- 
+Best Regards
+Masahiro Yamada
