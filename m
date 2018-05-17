@@ -1,111 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:24197 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751097AbeEQGSv (ORCPT
+Received: from mail-ua0-f195.google.com ([209.85.217.195]:45448 "EHLO
+        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751409AbeEQG34 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 May 2018 02:18:51 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 06/31] kconfig: remove sym_expand_string_value()
-Date: Thu, 17 May 2018 15:16:45 +0900
-Message-Id: <1526537830-22606-7-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 17 May 2018 02:29:56 -0400
+Received: by mail-ua0-f195.google.com with SMTP id j5-v6so2189374uak.12
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 May 2018 23:29:56 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1526537830-22606-29-git-send-email-yamada.masahiro@socionext.com>
+References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com> <1526537830-22606-29-git-send-email-yamada.masahiro@socionext.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 16 May 2018 23:29:55 -0700
+Message-ID: <CAGXu5jKSwSj6GiaDbmL2DHHqWUQTfPpQ=+8HtHxDUWrnK_9xHw@mail.gmail.com>
+Subject: Re: [PATCH v4 28/31] gcc-plugins: move GCC version check for PowerPC
+ to Kconfig
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>
 
-There is no more caller of sym_expand_string_value().
+On Wed, May 16, 2018 at 11:17 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> For PowerPC, GCC 5.2 is the requirement for GCC plugins.  Move the
+> version check to Kconfig so that the GCC plugin menus will be hidden
+> if an older compiler is in use.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Acked-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-Changes in v4: None
-Changes in v3:
-  - newly added
+-Kees
 
-Changes in v2: None
-
- scripts/kconfig/lkc_proto.h |  1 -
- scripts/kconfig/symbol.c    | 53 ---------------------------------------------
- 2 files changed, 54 deletions(-)
-
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index 9f465fe..c46929f 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -31,7 +31,6 @@ extern struct symbol * symbol_hash[SYMBOL_HASHSIZE];
- 
- struct symbol * sym_lookup(const char *name, int flags);
- struct symbol * sym_find(const char *name);
--char *sym_expand_string_value(const char *in);
- const char * sym_escape_string_value(const char *in);
- struct symbol ** sym_re_search(const char *pattern);
- const char * sym_type_name(enum symbol_type type);
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 2460648..7c9a88e 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -879,59 +879,6 @@ struct symbol *sym_find(const char *name)
- 	return symbol;
- }
- 
--/*
-- * Expand symbol's names embedded in the string given in argument. Symbols'
-- * name to be expanded shall be prefixed by a '$'. Unknown symbol expands to
-- * the empty string.
-- */
--char *sym_expand_string_value(const char *in)
--{
--	const char *src;
--	char *res;
--	size_t reslen;
--
--	/*
--	 * Note: 'in' might come from a token that's about to be
--	 * freed, so make sure to always allocate a new string
--	 */
--	reslen = strlen(in) + 1;
--	res = xmalloc(reslen);
--	res[0] = '\0';
--
--	while ((src = strchr(in, '$'))) {
--		char *p, name[SYMBOL_MAXLENGTH];
--		const char *symval = "";
--		struct symbol *sym;
--		size_t newlen;
--
--		strncat(res, in, src - in);
--		src++;
--
--		p = name;
--		while (isalnum(*src) || *src == '_')
--			*p++ = *src++;
--		*p = '\0';
--
--		sym = sym_find(name);
--		if (sym != NULL) {
--			sym_calc_value(sym);
--			symval = sym_get_string_value(sym);
--		}
--
--		newlen = strlen(res) + strlen(symval) + strlen(src) + 1;
--		if (newlen > reslen) {
--			reslen = newlen;
--			res = xrealloc(res, reslen);
--		}
--
--		strcat(res, symval);
--		in = src;
--	}
--	strcat(res, in);
--
--	return res;
--}
--
- const char *sym_escape_string_value(const char *in)
- {
- 	const char *p;
 -- 
-2.7.4
-
+Kees Cook
+Pixel Security
