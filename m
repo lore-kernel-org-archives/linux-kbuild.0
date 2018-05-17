@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:24212 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:24196 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751179AbeEQGSv (ORCPT
+        with ESMTP id S1751061AbeEQGSv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 17 May 2018 02:18:51 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 10/31] kconfig: begin PARAM state only when seeing a command keyword
-Date: Thu, 17 May 2018 15:16:49 +0900
-Message-Id: <1526537830-22606-11-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 08/31] kconfig: add 'shell' built-in function
+Date: Thu, 17 May 2018 15:16:47 +0900
+Message-Id: <1526537830-22606-9-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,48 +15,96 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Currently, any statement line starts with a keyword with TF_COMMAND
-flag.  So, the following three lines are dead code.
+This accepts a single command to execute.  It returns the standard
+output from it.
 
-        alloc_string(yytext, yyleng);
-        zconflval.string = text;
-        return T_WORD;
+[Example code]
 
-If a T_WORD token is returned in this context, it will cause syntax
-error in the parser anyway.
+  config HELLO
+          string
+          default "$(shell,echo hello world)"
 
-The next commit will support the assignment statement where a line
-starts with an arbitrary identifier.  So, I want the lexer to switch
-to the PARAM state only when it sees a command keyword.
+  config Y
+          def_bool $(shell,echo y)
+
+[Result]
+
+  $ make -s alldefconfig && tail -n 2 .config
+  CONFIG_HELLO="hello world"
+  CONFIG_Y=y
+
+Caveat:
+Like environments, functions are expanded in the lexer.  You cannot
+pass symbols to function arguments.  This is a limitation to simplify
+the implementation.  I want to avoid the dynamic function evaluation,
+which would introduce much more complexity.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-Changes in v4: None
-Changes in v3:
- - Newly added
+Changes in v4:
+  - Accept only one argument to simplify the implementation
 
+Changes in v3: None
 Changes in v2: None
 
- scripts/kconfig/zconf.l | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/kconfig/preprocess.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 9dc5fe3..5e53348 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -102,10 +102,10 @@ n	[A-Za-z0-9_-]
- <COMMAND>{
- 	{n}+	{
- 		const struct kconf_id *id = kconf_id_lookup(yytext, yyleng);
--		BEGIN(PARAM);
- 		current_pos.file = current_file;
- 		current_pos.lineno = yylineno;
- 		if (id && id->flags & TF_COMMAND) {
-+			BEGIN(PARAM);
- 			yylval.id = id;
- 			return id->token;
- 		}
+diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
+index 5be28ec..d8c5f60 100644
+--- a/scripts/kconfig/preprocess.c
++++ b/scripts/kconfig/preprocess.c
+@@ -104,8 +104,49 @@ struct function {
+ 	char *(*func)(int argc, char *argv[], int old_argc, char *old_argv[]);
+ };
+ 
++static char *do_shell(int argc, char *argv[], int old_argc, char *old_argv[])
++{
++	FILE *p;
++	char buf[256];
++	char *cmd;
++	size_t nread;
++	int i;
++
++	cmd = argv[0];
++
++	p = popen(cmd, "r");
++	if (!p) {
++		perror(cmd);
++		exit(1);
++	}
++
++	nread = fread(buf, 1, sizeof(buf), p);
++	if (nread == sizeof(buf))
++		nread--;
++
++	/* remove trailing new lines */
++	while (buf[nread - 1] == '\n')
++		nread--;
++
++	buf[nread] = 0;
++
++	/* replace a new line with a space */
++	for (i = 0; i < nread; i++) {
++		if (buf[i] == '\n')
++			buf[i] = ' ';
++	}
++
++	if (pclose(p) == -1) {
++		perror(cmd);
++		exit(1);
++	}
++
++	return xstrdup(buf);
++}
++
+ static const struct function function_table[] = {
+ 	/* Name		MIN	MAX	EXP?	Function */
++	{ "shell",	1,	1,	true,	do_shell },
+ };
+ 
+ #define FUNCTION_MAX_ARGS		16
 -- 
 2.7.4
 
