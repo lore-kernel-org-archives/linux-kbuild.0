@@ -1,98 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:33676 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:34396 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750959AbeERExu (ORCPT
+        with ESMTP id S1751909AbeEREyO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 May 2018 00:53:50 -0400
+        Fri, 18 May 2018 00:54:14 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 5/5] kconfig: refactor ncurses package checks for building nconf
-Date: Fri, 18 May 2018 13:52:26 +0900
-Message-Id: <1526619146-1895-6-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1526619146-1895-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1526619146-1895-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 0/5] kconfig: refactor package checks for GUI frontends
+Date: Fri, 18 May 2018 13:52:21 +0900
+Message-Id: <1526619146-1895-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Philippe Ombredanne <pombredanne@nexb.com>, Michal Marek <michal.lkml@markovi.net>, Kate Stewart <kstewart@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arvind Prasanna <arvindprasanna@gmail.com>
 
-Building nconf requires ncurses, but its presence is not checked.
-Check and configure necessary packages as in the other GUI frontends.
+Kconfig supports 4 GUI frontends.
+Each of them needs some support packages, but checks them differently:
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+  qconf, gconf: check packages in Makefile (pkg-config is required)
+  mconf: lxdialog/check-lxdialog.sh
+  nconf: needs ncurses, but its presence is not checked
 
- scripts/kconfig/Makefile     | 16 ++++++++--------
- scripts/kconfig/nconf-cfg.sh | 22 ++++++++++++++++++++++
- 2 files changed, 30 insertions(+), 8 deletions(-)
+This series refactor the package checks so that all of them work
+in the same way.
+
+The package check scripts have been moved to scripts/kconfig/*conf-cfg.sh
+
+The motivation of this clean-up is Randy's following patch:
+https://patchwork.kernel.org/patch/10277723/
+
+I want to clean up existing code before adding more checks.
+
+
+
+Masahiro Yamada (5):
+  kbuild: do not display CHK for filechk
+  kconfig: refactor Qt package checks for building qconf
+  kconfig: refactor GTK+ package checks for building gconf
+  kconfig: refactor ncurses package checks for building mconf
+  kconfig: refactor ncurses package checks for building nconf
+
+ scripts/Kbuild.include                     |   1 -
+ scripts/kconfig/Makefile                   | 160 ++++++++++-------------------
+ scripts/kconfig/gconf-cfg.sh               |  23 +++++
+ scripts/kconfig/lxdialog/check-lxdialog.sh |  93 -----------------
+ scripts/kconfig/lxdialog/dialog.h          |   2 +-
+ scripts/kconfig/mconf-cfg.sh               |  24 +++++
+ scripts/kconfig/nconf-cfg.sh               |  22 ++++
+ scripts/kconfig/qconf-cfg.sh               |  25 +++++
+ 8 files changed, 148 insertions(+), 202 deletions(-)
+ create mode 100755 scripts/kconfig/gconf-cfg.sh
+ delete mode 100755 scripts/kconfig/lxdialog/check-lxdialog.sh
+ create mode 100755 scripts/kconfig/mconf-cfg.sh
  create mode 100644 scripts/kconfig/nconf-cfg.sh
+ create mode 100755 scripts/kconfig/qconf-cfg.sh
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 25a3d25..b90e801 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -176,15 +176,12 @@ help:
- # ===========================================================================
- # Shared Makefile for the various kconfig executables:
- # conf:	  Used for defconfig, oldconfig and related targets
--# nconf:  Used for the nconfig target.
--#         Utilizes ncurses
- # object files used by all kconfig flavours
- 
- conf-objs	:= conf.o  zconf.tab.o
--nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
- kxgettext-objs	:= kxgettext.o zconf.tab.o
- 
--hostprogs-y := conf nconf kxgettext
-+hostprogs-y := conf kxgettext
- 
- targets		+= zconf.lex.c
- clean-files	+= gconf.glade.h
-@@ -199,10 +196,13 @@ HOST_EXTRACXXFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTC
- HOSTCFLAGS_zconf.lex.o	:= -I$(src)
- HOSTCFLAGS_zconf.tab.o	:= -I$(src)
- 
--HOSTLOADLIBES_nconf	= $(shell \
--				pkg-config --libs menuw panelw ncursesw 2>/dev/null \
--				|| pkg-config --libs menu panel ncurses 2>/dev/null \
--				|| echo "-lmenu -lpanel -lncurses"  )
-+# nconf: Used for the nconfig target based on ncurses
-+hostprogs-y	+= nconf
-+nconf-objs	:= nconf.o zconf.tab.o nconf.gui.o
-+
-+HOSTLOADLIBES_nconf	= $(shell . $(obj)/.nconf-cfg && echo $$libs)
-+
-+$(obj)/nconf.o: $(obj)/.nconf-cfg
- 
- # mconf: Used for the menuconfig target based on lxdialog
- hostprogs-y	+= mconf
-diff --git a/scripts/kconfig/nconf-cfg.sh b/scripts/kconfig/nconf-cfg.sh
-new file mode 100644
-index 0000000..9def36f
---- /dev/null
-+++ b/scripts/kconfig/nconf-cfg.sh
-@@ -0,0 +1,22 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+
-+PKG="menuw panelw ncursesw"
-+PKG2="menu panel ncurses"
-+
-+if pkg-config --exists $PKG; then
-+	echo libs=\"$(pkg-config --libs $PKG)\"
-+	exit 0
-+fi
-+
-+if pkg-config --exists $PKG2; then
-+	echo libs=\"$(pkg-config --libs $PKG2)\"
-+	exit 0
-+fi
-+
-+echo >&2 "*"
-+echo >&2 "* Unable to find the ncurses."
-+echo >&2 "* Install ncurses (ncurses-devel or libncurses-dev"
-+echo >&2 "* depending on your distribution)"
-+echo >&2 "*"
-+exit 1
 -- 
 2.7.4
 
