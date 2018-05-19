@@ -1,116 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:38275 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750841AbeERFLj (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:56272 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752451AbeESSDA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 May 2018 01:11:39 -0400
+        Sat, 19 May 2018 14:03:00 -0400
+Subject: Re: [PATCH 4/5] kconfig: refactor ncurses package checks for building
+ mconf
+References: <1526619146-1895-1-git-send-email-yamada.masahiro@socionext.com>
+ <1526619146-1895-5-git-send-email-yamada.masahiro@socionext.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <1e943db9-1340-2a23-be43-2bde85e3535b@infradead.org>
+Date: Sat, 19 May 2018 11:02:55 -0700
 MIME-Version: 1.0
-In-Reply-To: <3ce8f87d-69fa-231a-b51c-9805e6525032@infradead.org>
-References: <9e9438b0-568a-8dc0-dad6-d29b6e39e53a@infradead.org>
- <CAK7LNAQxcVRvhJn6GQVdLLuEq0sJEUcfwkbMpmx9j9nbjscQRg@mail.gmail.com> <3ce8f87d-69fa-231a-b51c-9805e6525032@infradead.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 18 May 2018 14:10:43 +0900
-Message-ID: <CAK7LNAThmjib15eR3C6wdXKoaWr=AC+CrEJmj6iC2Vdhz9nOqA@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: check for pkg-config on make {menu,n,g,x}config
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1526619146-1895-5-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arvind Prasanna <arvindprasanna@gmail.com>
 
-Hi Randy,
+On 05/17/18 21:52, Masahiro Yamada wrote:
+> The mconf (or its infrastructure, lxdiaglog) depends on ncurses.
+> check-lxdialog.sh has additional checks in case pkg-config is not
+> available.  However, qconf and gconf already rely on pkg-config to
+> check necessary packages.  For simplification, drop the fallback
+> code from check-lxdialog.sh and move/rename to mconf-cfg.sh to
+> make it work in the same way as the other GUI frontends.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-2018-04-07 6:37 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> On 03/14/2018 10:50 PM, Masahiro Yamada wrote:
->> 2018-03-13 11:30 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
->>> From: Randy Dunlap <rdunlap@infradead.org>
->>>
->>> Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
->>> that other required files are present, but none of these check that
->>> pkg-config itself is present.  Add a check for all 4 of these targets.
->>>
->>> Fixes kernel bugzilla #77511:
->>> https://bugzilla.kernel.org/show_bug.cgi?id=77511
->>>
->>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
->>> ---
->>> v2: use 'command -v' instead of 'which'
->>>
->>> I'm also OK with just documenting the pkg-config requirement in
->>> Documentation/Changes (= Documentation/process/changes.rst).
->>>
->>>  scripts/kconfig/Makefile           |   15 ++++++++++++++-
->>>  scripts/kconfig/check-pkgconfig.sh |   12 ++++++++++++
->>>  2 files changed, 26 insertions(+), 1 deletion(-)
->>>
->>> --- lnx-416-rc3.orig/scripts/kconfig/Makefile
->>> +++ lnx-416-rc3/scripts/kconfig/Makefile
->>> @@ -160,6 +160,9 @@ help:
->>>         @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
->>>         @echo  '  tinyconfig      - Configure the tiniest possible kernel'
->>>
->>> +# pkg-config check
->>> +check-pkgconfig  := $(srctree)/$(src)/check-pkgconfig.sh
->>> +
->>>  # lxdialog stuff
->>>  check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
->>>
->>> @@ -205,7 +208,17 @@ $(addprefix $(obj)/, mconf.o $(lxdialog)
->>>  $(obj)/dochecklxdialog:
->>>         $(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC) $(HOST_EXTRACFLAGS) $(HOSTLOADLIBES_mconf)
->>>
->>> -always := dochecklxdialog
->>> +# Check that we have pkg-config (used by each of menu/n/g/xconfig)
->>> +PHONY += $(obj)/docheckpkgconfig
->>> +$(addprefix $(obj)/, mconf.o): $(obj)/docheckpkgconfig
->>> +$(addprefix $(obj)/, nconf.o): $(obj)/docheckpkgconfig
->>> +$(addprefix $(obj)/, gconf.o): $(obj)/docheckpkgconfig
->>> +$(addprefix $(obj)/, qconf.o): $(obj)/docheckpkgconfig
->>> +
->>> +$(obj)/docheckpkgconfig:
->>> +       $(Q)$(CONFIG_SHELL) $(check-pkgconfig)
->>> +
->>> +always := docheckpkgconfig dochecklxdialog
->>
->>
->> I did not test this patch, but does this check work as expected?
->>
->> Probably we want to run 'docheckpkgconfig'
->> before 'dochecklxdiag', '.tmp_gtkcheck', '.tmp_qtcheck', etc.
->> But, I do not see such dependencies.
->>
->>
->> Also, if we make 'pkg-config' mandatory,
->> should we entirely drop fall-back logics like follows?
->>
->> https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/lxdialog/check-lxdialog.sh#L10
->> https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/lxdialog/check-lxdialog.sh#L29
->> https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/Makefile#L230
->>
->>
->> What do you think?
->>
->
-> Hi,
->
-> I'm willing to keep patching/testing on this, but both pkg-config and depmod
-> (for depmod, see: https://bugzilla.kernel.org/show_bug.cgi?id=198965)
-> are basic requirements IMO, so just documenting their requirements is good
-> enough to me, but might not be good enough for some users.
->
-> Comments?
+Hi,
 
-Sorry for late comments.
+I began by testing "make menuconfig" first and immediately got this:
 
-OK, I am fine with making pkg-config a requirement.
-(and it should be documented)
+*
+* Unable to find the ncurses.
+* Install ncurses (ncurses-devel or libncurses-dev
+* depending on your distribution)
+*
 
-But, I'd like to clean-up scripts/kconfig/Makefile first.
-It is already cluttered, and hesitate to add new code based on that.
-I posted the patches.
+I do have ncurses-devel installed.  However, it seems that
+pkg-config on openSUSE is not very reliable.  zypper (package management
+tool) says:
 
-Could you send v3 after the cleaning work is done?
+$ zypper info ncurses-devel
+Loading repository data...
+Reading installed packages...
 
+Information for package ncurses-devel:
+--------------------------------------
+Repository     : openSUSE-Leap-42.3-Update                            
+Name           : ncurses-devel                                        
+Version        : 5.9-62.1                                             
+Arch           : x86_64                                               
+Vendor         : openSUSE                                             
+Installed Size : 25.0 MiB                                             
+Installed      : Yes                                                  
+Status         : up-to-date                                           
+Source package : ncurses-5.9-62.1.src                                 
+Summary        : Include Files and Libraries mandatory for Development
+Description    :                                                      
+    This package contains all necessary include files and libraries needed
+    to develop applications that require these.
+<END>
+
+but there doesn't seem to be a way to get cflags and libs (name).
+
+
+> diff --git a/scripts/kconfig/mconf-cfg.sh b/scripts/kconfig/mconf-cfg.sh
+> new file mode 100755
+> index 0000000..7d5a4b2
+> --- /dev/null
+> +++ b/scripts/kconfig/mconf-cfg.sh
+> @@ -0,0 +1,24 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +PKG="ncursesw"
+> +PKG2="ncurses"
+> +
+> +if pkg-config --exists $PKG; then
+> +	echo cflags=\"-DNCURSES_WIDECHAR=1 $(pkg-config --cflags $PKG)\"
+> +	echo libs=\"$(pkg-config --libs $PKG)\"
+> +	exit 0
+> +fi
+> +
+> +if pkg-config --exists $PKG2; then
+> +	echo cflags=\"$(pkg-config --cflags $PKG2)\"
+> +	echo libs=\"$(pkg-config --libs $PKG2)\"
+> +	exit 0
+> +fi
+> +
+> +echo >&2 "*"
+> +echo >&2 "* Unable to find the ncurses."
+
+                              the ncurses package."
+
+> +echo >&2 "* Install ncurses (ncurses-devel or libncurses-dev"
+> +echo >&2 "* depending on your distribution)"
+
+                                 distribution)."
+
+> +echo >&2 "*"
+> +exit 1
+> 
+
+(more on the other patches later.)
+
+thanks.
 -- 
-Best Regards
-Masahiro Yamada
+~Randy
