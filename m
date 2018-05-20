@@ -1,46 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:22125 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751410AbeETISp (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:42057 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751347AbeETIWE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 May 2018 04:18:45 -0400
+        Sun, 20 May 2018 04:22:04 -0400
+MIME-Version: 1.0
+In-Reply-To: <1e943db9-1340-2a23-be43-2bde85e3535b@infradead.org>
+References: <1526619146-1895-1-git-send-email-yamada.masahiro@socionext.com>
+ <1526619146-1895-5-git-send-email-yamada.masahiro@socionext.com> <1e943db9-1340-2a23-be43-2bde85e3535b@infradead.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 1/5] kbuild: do not display CHK for filechk
-Date: Sun, 20 May 2018 17:16:49 +0900
-Message-Id: <1526804213-8238-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1526804213-8238-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1526804213-8238-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Sun, 20 May 2018 17:21:16 +0900
+Message-ID: <CAK7LNAQ7p7TD2_qVCbdAjLKjpYYoaDWx-73Xqba__Ub6zwsJcQ@mail.gmail.com>
+Subject: Re: [PATCH 4/5] kconfig: refactor ncurses package checks for building mconf
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arvind Prasanna <arvindprasanna@gmail.com>
 
-filechk displays two short logs; CHK for creating a temporary file,
-and UPD for really updating the target.
+2018-05-20 3:02 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+> On 05/17/18 21:52, Masahiro Yamada wrote:
+>> The mconf (or its infrastructure, lxdiaglog) depends on ncurses.
+>> check-lxdialog.sh has additional checks in case pkg-config is not
+>> available.  However, qconf and gconf already rely on pkg-config to
+>> check necessary packages.  For simplification, drop the fallback
+>> code from check-lxdialog.sh and move/rename to mconf-cfg.sh to
+>> make it work in the same way as the other GUI frontends.
+>>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>
+> Hi,
+>
+> I began by testing "make menuconfig" first and immediately got this:
+>
+> *
+> * Unable to find the ncurses.
+> * Install ncurses (ncurses-devel or libncurses-dev
+> * depending on your distribution)
+> *
+>
+> I do have ncurses-devel installed.  However, it seems that
+> pkg-config on openSUSE is not very reliable.  zypper (package management
+> tool) says:
 
-IMHO, the build system can be quiet when the target file has not
-been updated.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Oh, this is unfortunate.
 
-Changes in v2: None
+I was eager to use pkg-config only,
+but I do not want to cause troubles.
 
- scripts/Kbuild.include | 1 -
- 1 file changed, 1 deletion(-)
+Could you check v2, please?
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 50cee53..c7fedc5 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -57,7 +57,6 @@ kecho := $($(quiet)kecho)
- #   to specify a valid file as first prerequisite (often the kbuild file)
- define filechk
- 	$(Q)set -e;				\
--	$(kecho) '  CHK     $@';		\
- 	mkdir -p $(dir $@);			\
- 	$(filechk_$(1)) < $< > $@.tmp;		\
- 	if [ -r $@ ] && cmp -s $@ $@.tmp; then	\
+
+
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
