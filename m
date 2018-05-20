@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:22129 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:22132 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750932AbeETISp (ORCPT
+        with ESMTP id S1751451AbeETISp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 20 May 2018 04:18:45 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 3/5] kconfig: refactor GTK+ package checks for building gconf
-Date: Sun, 20 May 2018 17:16:51 +0900
-Message-Id: <1526804213-8238-4-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 5/5] kconfig: refactor ncurses package checks for building nconf
+Date: Sun, 20 May 2018 17:16:53 +0900
+Message-Id: <1526804213-8238-6-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1526804213-8238-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1526804213-8238-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,127 +15,101 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Refactor the package checks for gconf in the same way as for qconf.
+Building nconf requires ncurses, but its presence is not checked.
+Check and configure necessary packages by a shell script like the
+other GUI frontends.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
 ---
 
-Changes in v2: None
+Changes in v2:
+  - Add fallback code in case distributions cannot find
+    ncurses by pkg-config.
 
- scripts/kconfig/Makefile     | 43 +++++++++----------------------------------
- scripts/kconfig/gconf-cfg.sh | 23 +++++++++++++++++++++++
- 2 files changed, 32 insertions(+), 34 deletions(-)
- create mode 100755 scripts/kconfig/gconf-cfg.sh
+ scripts/kconfig/Makefile     | 16 ++++++++--------
+ scripts/kconfig/nconf-cfg.sh | 34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+), 8 deletions(-)
+ create mode 100644 scripts/kconfig/nconf-cfg.sh
 
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index e9a87bf..c222745 100644
+index 25a3d25..b90e801 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -188,8 +188,6 @@ HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags) \
- #         Utilizes ncurses
- # mconf:  Used for the menuconfig target
- #         Utilizes the lxdialog package
--# gconf:  Used for the gconfig target
--#         Based on GTK+ which needs to be installed to compile it
+@@ -176,15 +176,12 @@ help:
+ # ===========================================================================
+ # Shared Makefile for the various kconfig executables:
+ # conf:	  Used for defconfig, oldconfig and related targets
+-# nconf:  Used for the nconfig target.
+-#         Utilizes ncurses
  # object files used by all kconfig flavours
  
- lxdialog := lxdialog/checklist.o lxdialog/util.o lxdialog/inputbox.o
-@@ -199,12 +197,10 @@ conf-objs	:= conf.o  zconf.tab.o
- mconf-objs     := mconf.o zconf.tab.o $(lxdialog)
- nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
+ conf-objs	:= conf.o  zconf.tab.o
+-nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
  kxgettext-objs	:= kxgettext.o zconf.tab.o
--gconf-objs	:= gconf.o zconf.tab.o
  
--hostprogs-y := conf nconf mconf kxgettext gconf
-+hostprogs-y := conf nconf mconf kxgettext
+-hostprogs-y := conf nconf kxgettext
++hostprogs-y := conf kxgettext
  
  targets		+= zconf.lex.c
--clean-files	:= .tmp_gtkcheck
  clean-files	+= gconf.glade.h
- clean-files     += config.pot linux.pot
- 
-@@ -224,10 +220,6 @@ HOST_EXTRACXXFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTC
+@@ -199,10 +196,13 @@ HOST_EXTRACXXFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTC
  HOSTCFLAGS_zconf.lex.o	:= -I$(src)
  HOSTCFLAGS_zconf.tab.o	:= -I$(src)
  
--HOSTLOADLIBES_gconf	= `pkg-config --libs gtk+-2.0 gmodule-2.0 libglade-2.0`
--HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
--                          -Wno-missing-prototypes
--
- HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
- 
- HOSTLOADLIBES_nconf	= $(shell \
-@@ -251,31 +243,14 @@ quiet_cmd_moc = MOC     $@
- $(obj)/%.moc: $(src)/%.h $(obj)/.qconf-cfg
- 	$(call cmd,moc)
- 
--$(obj)/gconf.o: $(obj)/.tmp_gtkcheck
--
--ifeq ($(MAKECMDGOALS),gconfig)
---include $(obj)/.tmp_gtkcheck
--
--# GTK+ needs some extra effort, too...
--$(obj)/.tmp_gtkcheck:
--	@if `pkg-config --exists gtk+-2.0 gmodule-2.0 libglade-2.0`; then		\
--		if `pkg-config --atleast-version=2.0.0 gtk+-2.0`; then			\
--			touch $@;								\
--		else									\
--			echo >&2 "*"; 							\
--			echo >&2 "* GTK+ is present but version >= 2.0.0 is required.";	\
--			echo >&2 "*";							\
--			false;								\
--		fi									\
--	else										\
--		echo >&2 "*"; 								\
--		echo >&2 "* Unable to find the GTK+ installation. Please make sure that"; 	\
--		echo >&2 "* the GTK+ 2.0 development package is correctly installed..."; 	\
--		echo >&2 "* You need gtk+-2.0, glib-2.0 and libglade-2.0."; 		\
--		echo >&2 "*"; 								\
--		false;									\
--	fi
--endif
-+# gconf: Used for the gconfig target based on GTK+
-+hostprogs-y	+= gconf
-+gconf-objs	:= gconf.o zconf.tab.o
+-HOSTLOADLIBES_nconf	= $(shell \
+-				pkg-config --libs menuw panelw ncursesw 2>/dev/null \
+-				|| pkg-config --libs menu panel ncurses 2>/dev/null \
+-				|| echo "-lmenu -lpanel -lncurses"  )
++# nconf: Used for the nconfig target based on ncurses
++hostprogs-y	+= nconf
++nconf-objs	:= nconf.o zconf.tab.o nconf.gui.o
 +
-+HOSTLOADLIBES_gconf = $(shell . $(obj)/.gconf-cfg && echo $$libs)
-+HOSTCFLAGS_gconf.o  = $(shell . $(obj)/.gconf-cfg && echo $$cflags)
++HOSTLOADLIBES_nconf	= $(shell . $(obj)/.nconf-cfg && echo $$libs)
 +
-+$(obj)/gconf.o: $(obj)/.gconf-cfg
++$(obj)/nconf.o: $(obj)/.nconf-cfg
  
- $(obj)/zconf.tab.o: $(obj)/zconf.lex.c
- 
-diff --git a/scripts/kconfig/gconf-cfg.sh b/scripts/kconfig/gconf-cfg.sh
-new file mode 100755
-index 0000000..533b3d8
+ # mconf: Used for the menuconfig target based on lxdialog
+ hostprogs-y	+= mconf
+diff --git a/scripts/kconfig/nconf-cfg.sh b/scripts/kconfig/nconf-cfg.sh
+new file mode 100644
+index 0000000..8eb7948
 --- /dev/null
-+++ b/scripts/kconfig/gconf-cfg.sh
-@@ -0,0 +1,23 @@
++++ b/scripts/kconfig/nconf-cfg.sh
+@@ -0,0 +1,34 @@
 +#!/bin/sh
 +# SPDX-License-Identifier: GPL-2.0
 +
-+PKG="gtk+-2.0 gmodule-2.0 libglade-2.0"
++PKG="ncursesw menuw panelw"
++PKG2="ncurses menu panel"
 +
-+if ! pkg-config --exists $PKG; then
-+	echo >&2 "*"
-+	echo >&2 "* Unable to find the GTK+ installation. Please make sure that"
-+	echo >&2 "* the GTK+ 2.0 development package is correctly installed."
-+	echo >&2 "* You need $PKG"
-+	echo >&2 "*"
-+	exit 1
++if pkg-config --exists $PKG; then
++	echo libs=\"$(pkg-config --libs $PKG)\"
++	exit 0
 +fi
 +
-+if ! pkg-config --atleast-version=2.0.0 gtk+-2.0; then
-+	echo >&2 "*"
-+	echo >&2 "* GTK+ is present but version >= 2.0.0 is required."
-+	echo >&2 "*"
-+	exit 1
++if pkg-config --exists $PKG2; then
++	echo libs=\"$(pkg-config --libs $PKG2)\"
++	exit 0
 +fi
 +
-+echo cflags=\"$(pkg-config --cflags $PKG)\"
-+echo libs=\"$(pkg-config --libs $PKG)\"
++# Unfortunately, some distributions (e.g. openSUSE) cannot find ncurses
++# by pkg-config.
++if [ -f /usr/include/ncursesw/ncurses.h ]; then
++	echo libs=\"-lncursesw -lmenuw -lpanelw\"
++	exit 0
++fi
++
++if [ -f /usr/include/ncurses.h ]; then
++	echo libs=\"-lncurses -lmenu -lpanel\"
++	exit 0
++fi
++
++echo >&2 "*"
++echo >&2 "* Unable to find the ncurses."
++echo >&2 "* Install ncurses (ncurses-devel or libncurses-dev"
++echo >&2 "* depending on your distribution)"
++echo >&2 "*"
++exit 1
 -- 
 2.7.4
 
