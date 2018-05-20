@@ -1,105 +1,229 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:54019 "EHLO
+Received: from asavdk3.altibox.net ([109.247.116.14]:54211 "EHLO
         asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751555AbeETOji (ORCPT
+        with ESMTP id S1751631AbeETOuf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 May 2018 10:39:38 -0400
-Date: Sun, 20 May 2018 16:39:33 +0200
+        Sun, 20 May 2018 10:50:35 -0400
+Date: Sun, 20 May 2018 16:50:31 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH v4 05/31] kconfig: remove string expansion for mainmenu
- after yyparse()
-Message-ID: <20180520143933.GA9826@ravnborg.org>
+Subject: Re: [PATCH v4 07/31] kconfig: add built-in function support
+Message-ID: <20180520145031.GB9826@ravnborg.org>
 References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
- <1526537830-22606-6-git-send-email-yamada.masahiro@socionext.com>
+ <1526537830-22606-8-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1526537830-22606-6-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1526537830-22606-8-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, x86@kernel.org
 
-On Thu, May 17, 2018 at 03:16:44PM +0900, Masahiro Yamada wrote:
-> Now that environments are expanded in the lexer, conf_parse() does
-> not need to expand them explicitly.
+On Thu, May 17, 2018 at 03:16:46PM +0900, Masahiro Yamada wrote:
+> This commit adds a new concept 'function' to do more text processing
+> in Kconfig.
 > 
-> The hack introduced by commit 0724a7c32a54 ("kconfig: Don't leak
-> main menus during parsing") can go away.
+> A function call looks like this:
+> 
+>   $(function,arg1,arg2,arg3,...)
+> 
+> This commit adds the basic infrastructure to expand functions.
+> Change the text expansion helpers to take arguments.
 > 
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 > ---
 > 
-> Changes in v4: None
-> Changes in v3: None
+> Changes in v4:
+>   - Error out if arguments more than FUNCTION_MAX_ARGS are passed
+>   - Use a comma as a delimiter between the function name and the
+>     first argument
+>   - Check the number of arguments accepted by each function
+>   - Support delayed expansion of arguments.
+>     This will be needed to implement 'if' function
+> 
+> Changes in v3:
+>   - Split base infrastructure and 'shell' function
+>     into separate patches.
+> 
 > Changes in v2:
->   - Simplify the patch.  Just remove the text expansion.
+>   - Use 'shell' for getting stdout from the comment.
+>     It was 'shell-stdout' in the previous version.
+>   - Simplify the implementation since the expansion has been moved to
+>     lexer.
 > 
->  scripts/kconfig/zconf.y | 24 +++++-------------------
->  1 file changed, 5 insertions(+), 19 deletions(-)
+>  scripts/kconfig/preprocess.c | 168 ++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 159 insertions(+), 9 deletions(-)
 > 
-> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-> index 3a4a0fa..22e318c 100644
-> --- a/scripts/kconfig/zconf.y
-> +++ b/scripts/kconfig/zconf.y
-> @@ -109,7 +109,7 @@ static struct menu *current_menu, *current_entry;
->  %%
->  input: nl start | start;
+> diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
+> index 1bf506c..5be28ec 100644
+> --- a/scripts/kconfig/preprocess.c
+> +++ b/scripts/kconfig/preprocess.c
+> @@ -3,12 +3,17 @@
+>  // Copyright (C) 2018 Masahiro Yamada <yamada.masahiro@socionext.com>
 >  
-> -start: mainmenu_stmt stmt_list | no_mainmenu_stmt stmt_list;
-> +start: mainmenu_stmt stmt_list | stmt_list;
+>  #include <stdarg.h>
+> +#include <stdbool.h>
+>  #include <stdio.h>
+>  #include <stdlib.h>
+>  #include <string.h>
 >  
->  /* mainmenu entry */
+>  #include "list.h"
 >  
-> @@ -118,19 +118,6 @@ mainmenu_stmt: T_MAINMENU prompt nl
->  	menu_add_prompt(P_MENU, $2, NULL);
->  };
->  
-> -/* Default main menu, if there's no mainmenu entry */
-> -
-> -no_mainmenu_stmt: /* empty */
-> -{
-> -	/*
-> -	 * Hack: Keep the main menu title on the heap so we can safely free it
-> -	 * later regardless of whether it comes from the 'prompt' in
-> -	 * mainmenu_stmt or here
-> -	 */
-> -	menu_add_prompt(P_MENU, xstrdup("Linux Kernel Configuration"), NULL);
-> -};
-> -
-> -
->  stmt_list:
->  	  /* empty */
->  	| stmt_list common_stmt
-> @@ -528,7 +515,6 @@ word_opt: /* empty */			{ $$ = NULL; }
->  
->  void conf_parse(const char *name)
+> +#define ARRAY_SIZE(arr)		(sizeof(arr) / sizeof((arr)[0]))
+> +
+> +static char *expand_string_with_args(const char *in, int argc, char *argv[]);
+> +
+>  static void __attribute__((noreturn)) pperror(const char *format, ...)
 >  {
-> -	const char *tmp;
->  	struct symbol *sym;
->  	int i;
+>  	va_list ap;
+> @@ -88,9 +93,85 @@ void env_write_dep(FILE *f, const char *autoconfig_name)
+>  	}
+>  }
 >  
-> @@ -544,10 +530,10 @@ void conf_parse(const char *name)
->  	if (!modules_sym)
->  		modules_sym = sym_find( "n" );
+> -static char *eval_clause(const char *in)
+> +/*
+> + * Built-in functions
+> + */
+> +struct function {
+> +	const char *name;
+> +	unsigned int min_args;
+> +	unsigned int max_args;
+> +	bool expand_args;
+> +	char *(*func)(int argc, char *argv[], int old_argc, char *old_argv[]);
+> +};
+If a typedef was provided for the function then ...
+
+> +
+> +static const struct function function_table[] = {
+> +	/* Name		MIN	MAX	EXP?	Function */
+> +};
+> +
+> +#define FUNCTION_MAX_ARGS		16
+> +
+> +static char *function_expand_arg_and_call(char *(*func)(int argc, char *argv[],
+> +							int old_argc,
+> +							char *old_argv[]),
+> +					  int argc, char *argv[],
+> +					  int old_argc, char *old_argv[])
+this could be much easier to read.
+
+> +{
+> +	char *expanded_argv[FUNCTION_MAX_ARGS], *res;
+> +	int i;
+> +
+> +	for (i = 0; i < argc; i++)
+> +		expanded_argv[i] = expand_string_with_args(argv[i],
+> +							   old_argc, old_argv);
+
+No check for too many arguments here - maybe it is done in some other place.
+
+> +
+> +	res = func(argc, expanded_argv, 0, NULL);
+> +
+> +	for (i = 0; i < argc; i++)
+> +		free(expanded_argv[i]);
+> +
+> +	return res;
+> +}
+> +
+> +static char *function_call(const char *name, int argc, char *argv[],
+> +			   int old_argc, char *old_argv[])
+> +{
+> +	const struct function *f;
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(function_table); i++) {
+> +		f = &function_table[i];
+> +		if (strcmp(f->name, name))
+> +			continue;
+> +
+> +		if (argc < f->min_args)
+> +			pperror("too few function arguments passed to '%s'",
+> +				name);
+> +
+> +		if (argc > f->max_args)
+> +			pperror("too many function arguments passed to '%s'",
+> +				name);
+Number of arguments checked here, but max_args is not assiged in this patch.
+
+
+> +
+> +		if (f->expand_args)
+> +			return function_expand_arg_and_call(f->func, argc, argv,
+> +							    old_argc, old_argv);
+> +		return f->func(argc, argv, old_argc, old_argv);
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +/*
+> + * Evaluate a clause with arguments.  argc/argv are arguments from the upper
+> + * function call.
+> + *
+> + * Returned string must be freed when done
+> + */
+> +static char *eval_clause(const char *in, int argc, char *argv[])
+>  {
+> -	char *res, *name;
+> +	char *tmp, *prev, *p, *res, *name;
+> +	int new_argc = 0;
+> +	char *new_argv[FUNCTION_MAX_ARGS];
+> +	int nest = 0;
+> +	int i;
 >  
-> -	tmp = rootmenu.prompt->text;
-> -	rootmenu.prompt->text = _(rootmenu.prompt->text);
-> -	rootmenu.prompt->text = sym_expand_string_value(rootmenu.prompt->text);
-> -	free((char*)tmp);
-> +	if (!menu_has_prompt(&rootmenu)) {
-> +		current_entry = &rootmenu;
-> +		menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
+>  	/*
+>  	 * Returns an empty string because '$()' should be evaluated
+> @@ -99,10 +180,69 @@ static char *eval_clause(const char *in)
+>  	if (!*in)
+>  		return xstrdup("");
+>  
+> -	name = expand_string(in);
+> +	tmp = xstrdup(in);
+> +
+> +	prev = p = tmp;
+> +
+> +	/*
+> +	 * Split into tokens
+> +	 * The function name and arguments are separated by a comma.
+> +	 * For example, if the function call is like this:
+> +	 *   $(foo,abc,$(x),$(y))
+> +	 *
+> +	 * The input string for this helper should be:
+> +	 *   foo,abc,$(x),$(y)
+> +	 *
+> +	 * and split into:
+> +	 *   new_argv[0] = 'foo'
+> +	 *   new_argv[1] = 'abc'
+> +	 *   new_argv[2] = '$(x)'
+> +	 *   new_argv[3] = '$(y)'
+> +	 */
+> +	while (*p) {
+> +		if (nest == 0 && *p == ',') {
+> +			*p = 0;
+> +			if (new_argc >= FUNCTION_MAX_ARGS)
+> +				pperror("too many function arguments");
+> +			new_argv[new_argc++] = prev;
+> +			prev = p + 1;
+> +		} else if (*p == '(') {
+> +			nest++;
+> +		} else if (*p == ')') {
+> +			nest--;
+> +		}
+> +
+> +		p++;
+> +	}
+> +	new_argv[new_argc++] = prev;
 
-Could this be something less specific?
-To help the other users of kconfig out is the wild.
+Will the following be equal:
 
-For example:
+	$(foo,abc,$(x),$(y))
+	$(foo, abc, $(x), $(y))
 
-	menu_add_prompt(P_MENU, _("Main menu"), NULL);
-
-Note, the added _() to make the text translateable.
+make is rather annoying as space is significant, but there seems no good reason
+for kconfig to inheritate this.
+So unless there are good arguments consider alloing the spaces.
+If the current implmentation already supports optional spaces then I just missed
+it whie reviewing.
 
 	Sam
