@@ -1,59 +1,141 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:36460 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750895AbeETH7J (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:22129 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750932AbeETISp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 May 2018 03:59:09 -0400
-Received: by mail-pg0-f66.google.com with SMTP id 63-v6so2881960pgg.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 20 May 2018 00:59:09 -0700 (PDT)
-Date: Sun, 20 May 2018 17:58:58 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v4 4/4] powerpc/kbuild: move -mprofile-kernel check to
- Kconfig
-Message-ID: <20180520175858.7871aa54@roar.ozlabs.ibm.com>
-In-Reply-To: <20180516141458.18996-5-npiggin@gmail.com>
-References: <20180516141458.18996-1-npiggin@gmail.com>
-        <20180516141458.18996-5-npiggin@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Sun, 20 May 2018 04:18:45 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v2 3/5] kconfig: refactor GTK+ package checks for building gconf
+Date: Sun, 20 May 2018 17:16:51 +0900
+Message-Id: <1526804213-8238-4-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1526804213-8238-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1526804213-8238-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Segher Boessenkool <segher@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>
+Cc: "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Thu, 17 May 2018 00:14:58 +1000
-Nicholas Piggin <npiggin@gmail.com> wrote:
+Refactor the package checks for gconf in the same way as for qconf.
 
-> This eliminates the workaround that requires disabling
-> -mprofile-kernel by default in Kconfig.
-> 
-> [ Note: this depends on https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v3 ]
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-
-Here is an incremental patch that brings this up to v4.
-
-https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v4
-
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
 ---
- arch/powerpc/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index c7cc482cb660..60b83398b498 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -462,7 +462,7 @@ config LD_HEAD_STUB_CATCH
+Changes in v2: None
+
+ scripts/kconfig/Makefile     | 43 +++++++++----------------------------------
+ scripts/kconfig/gconf-cfg.sh | 23 +++++++++++++++++++++++
+ 2 files changed, 32 insertions(+), 34 deletions(-)
+ create mode 100755 scripts/kconfig/gconf-cfg.sh
+
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index e9a87bf..c222745 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -188,8 +188,6 @@ HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags) \
+ #         Utilizes ncurses
+ # mconf:  Used for the menuconfig target
+ #         Utilizes the lxdialog package
+-# gconf:  Used for the gconfig target
+-#         Based on GTK+ which needs to be installed to compile it
+ # object files used by all kconfig flavours
  
- config MPROFILE_KERNEL
- 	depends on PPC64 && CPU_LITTLE_ENDIAN
--	def_bool $(success $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__)
-+	def_bool $(success,$(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__)
+ lxdialog := lxdialog/checklist.o lxdialog/util.o lxdialog/inputbox.o
+@@ -199,12 +197,10 @@ conf-objs	:= conf.o  zconf.tab.o
+ mconf-objs     := mconf.o zconf.tab.o $(lxdialog)
+ nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
+ kxgettext-objs	:= kxgettext.o zconf.tab.o
+-gconf-objs	:= gconf.o zconf.tab.o
  
- config IOMMU_HELPER
- 	def_bool PPC64
+-hostprogs-y := conf nconf mconf kxgettext gconf
++hostprogs-y := conf nconf mconf kxgettext
+ 
+ targets		+= zconf.lex.c
+-clean-files	:= .tmp_gtkcheck
+ clean-files	+= gconf.glade.h
+ clean-files     += config.pot linux.pot
+ 
+@@ -224,10 +220,6 @@ HOST_EXTRACXXFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTC
+ HOSTCFLAGS_zconf.lex.o	:= -I$(src)
+ HOSTCFLAGS_zconf.tab.o	:= -I$(src)
+ 
+-HOSTLOADLIBES_gconf	= `pkg-config --libs gtk+-2.0 gmodule-2.0 libglade-2.0`
+-HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
+-                          -Wno-missing-prototypes
+-
+ HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
+ 
+ HOSTLOADLIBES_nconf	= $(shell \
+@@ -251,31 +243,14 @@ quiet_cmd_moc = MOC     $@
+ $(obj)/%.moc: $(src)/%.h $(obj)/.qconf-cfg
+ 	$(call cmd,moc)
+ 
+-$(obj)/gconf.o: $(obj)/.tmp_gtkcheck
+-
+-ifeq ($(MAKECMDGOALS),gconfig)
+--include $(obj)/.tmp_gtkcheck
+-
+-# GTK+ needs some extra effort, too...
+-$(obj)/.tmp_gtkcheck:
+-	@if `pkg-config --exists gtk+-2.0 gmodule-2.0 libglade-2.0`; then		\
+-		if `pkg-config --atleast-version=2.0.0 gtk+-2.0`; then			\
+-			touch $@;								\
+-		else									\
+-			echo >&2 "*"; 							\
+-			echo >&2 "* GTK+ is present but version >= 2.0.0 is required.";	\
+-			echo >&2 "*";							\
+-			false;								\
+-		fi									\
+-	else										\
+-		echo >&2 "*"; 								\
+-		echo >&2 "* Unable to find the GTK+ installation. Please make sure that"; 	\
+-		echo >&2 "* the GTK+ 2.0 development package is correctly installed..."; 	\
+-		echo >&2 "* You need gtk+-2.0, glib-2.0 and libglade-2.0."; 		\
+-		echo >&2 "*"; 								\
+-		false;									\
+-	fi
+-endif
++# gconf: Used for the gconfig target based on GTK+
++hostprogs-y	+= gconf
++gconf-objs	:= gconf.o zconf.tab.o
++
++HOSTLOADLIBES_gconf = $(shell . $(obj)/.gconf-cfg && echo $$libs)
++HOSTCFLAGS_gconf.o  = $(shell . $(obj)/.gconf-cfg && echo $$cflags)
++
++$(obj)/gconf.o: $(obj)/.gconf-cfg
+ 
+ $(obj)/zconf.tab.o: $(obj)/zconf.lex.c
+ 
+diff --git a/scripts/kconfig/gconf-cfg.sh b/scripts/kconfig/gconf-cfg.sh
+new file mode 100755
+index 0000000..533b3d8
+--- /dev/null
++++ b/scripts/kconfig/gconf-cfg.sh
+@@ -0,0 +1,23 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++
++PKG="gtk+-2.0 gmodule-2.0 libglade-2.0"
++
++if ! pkg-config --exists $PKG; then
++	echo >&2 "*"
++	echo >&2 "* Unable to find the GTK+ installation. Please make sure that"
++	echo >&2 "* the GTK+ 2.0 development package is correctly installed."
++	echo >&2 "* You need $PKG"
++	echo >&2 "*"
++	exit 1
++fi
++
++if ! pkg-config --atleast-version=2.0.0 gtk+-2.0; then
++	echo >&2 "*"
++	echo >&2 "* GTK+ is present but version >= 2.0.0 is required."
++	echo >&2 "*"
++	exit 1
++fi
++
++echo cflags=\"$(pkg-config --cflags $PKG)\"
++echo libs=\"$(pkg-config --libs $PKG)\"
 -- 
-2.17.0
+2.7.4
 
