@@ -1,86 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:37012 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751094AbeETHvS (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:36460 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750895AbeETH7J (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 May 2018 03:51:18 -0400
+        Sun, 20 May 2018 03:59:09 -0400
+Received: by mail-pg0-f66.google.com with SMTP id 63-v6so2881960pgg.3
+        for <linux-kbuild@vger.kernel.org>; Sun, 20 May 2018 00:59:09 -0700 (PDT)
+Date: Sun, 20 May 2018 17:58:58 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v4 4/4] powerpc/kbuild: move -mprofile-kernel check to
+ Kconfig
+Message-ID: <20180520175858.7871aa54@roar.ozlabs.ibm.com>
+In-Reply-To: <20180516141458.18996-5-npiggin@gmail.com>
+References: <20180516141458.18996-1-npiggin@gmail.com>
+        <20180516141458.18996-5-npiggin@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1378afb3-2b0e-da7a-5721-a8fa727e4382@infradead.org>
-References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
- <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org> <CAFkk2KRozscmd4kQSJKwKmY3WpTody7S5XZZObf8SKLF62k6+w@mail.gmail.com>
- <CAFkk2KRkEt3+786QvyjzPPAm+3HDe2+ydzZJpshfdKyUDQVfuw@mail.gmail.com>
- <CAFkk2KRvSxu+x-nb045=3L63KEk5h9URr5QYLPoYp6rqqTR4qA@mail.gmail.com>
- <3d9be2f2-3fbe-411b-8529-0e0847f01346@infradead.org> <CAFkk2KRWon_S--dxYw82cDyGXKTFA6jxrrQwstzLvHPs=6-dqQ@mail.gmail.com>
- <c4ec710f-b2bd-b9f0-c33a-159aa53ca73c@infradead.org> <1378afb3-2b0e-da7a-5721-a8fa727e4382@infradead.org>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Sun, 20 May 2018 09:51:17 +0200
-Message-ID: <CAFkk2KStOwHKmFLpNVA1GNscvi-0wihJVM_uaYNemoy6XWDxiQ@mail.gmail.com>
-Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Segher Boessenkool <segher@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>
 
-On Sun, May 20, 2018 at 6:03 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
-> On 05/19/2018 08:45 PM, Randy Dunlap wrote:
->> On 05/08/2018 09:59 AM, Ulf Magnusson wrote:
->>> Hello,
->>>
->>> I've added incremental search for jumping directly to a symbol now.
->>> Regular expressions are supported as well.
->>>
->>> Some screenshots below:
->>>
->>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss10.png
->>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss11.png
->>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss13.png
->>>
->>> The last screenshot shows how things might look after you jump to a
->>> symbol. The jumped-to symbol wasn't visible in this case, so show-all
->>> mode was turned on automatically.
->>
->> Hi Ulf,
->>
->>
->>
->> Hm, OK, I used the trick that you supplied a few weeks ago and I have the UI now.
->>
->>     ARCH=x86 SRCARCH=x86 KERNELVERSION=`make kernelversion` \
->>         Kconfiglib/menuconfig.py
->>
->> so yes, a real Makefile target would be nice. :)
->
-> I want to see all kconfig symbols that end with "_DEBUG" (so excluding
-> _DEBUGFS).  Using:
->
-> /.*_DEBUG$
->
-> shows me 6 symbols:
-> ATH9K_COMMON_DEBUG
-> DVB_B2C2_FLEXCOP_DEBUG
-> HAVE_DMA_API_DEBUG
-> IP_DCCP_TFRC_DEBUG
-> NFS_DEBUG
-> PM_SLEEP_DEBUG
->
-> so where are the other (approx.) 176?
-> see:
-> $ find . -name Kconfig\* | xargs grep "config.*_DEBUG$" | grep -v \.orig | wc
->     182     364    9179
->
->
-> Anyway, something for you to look at. :)
->
-> --
-> ~Randy
+On Thu, 17 May 2018 00:14:58 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
-I changed it to search the symbol name and the prompt separately:
-https://github.com/ulfalizer/Kconfiglib/commit/e0905818ef376c977d0a4540ea72d61b8f554bb5
+> This eliminates the workaround that requires disabling
+> -mprofile-kernel by default in Kconfig.
+> 
+> [ Note: this depends on https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v3 ]
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-Should work the way you expected now. It's more intuitive for the prompt too. :)
+Here is an incremental patch that brings this up to v4.
 
-Can just do 'debug$' by the way. No '.*' required.
+https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v4
 
-Cheers,
-Ulf
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ arch/powerpc/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+index c7cc482cb660..60b83398b498 100644
+--- a/arch/powerpc/Kconfig
++++ b/arch/powerpc/Kconfig
+@@ -462,7 +462,7 @@ config LD_HEAD_STUB_CATCH
+ 
+ config MPROFILE_KERNEL
+ 	depends on PPC64 && CPU_LITTLE_ENDIAN
+-	def_bool $(success $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__)
++	def_bool $(success,$(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__)
+ 
+ config IOMMU_HELPER
+ 	def_bool PPC64
+-- 
+2.17.0
+
