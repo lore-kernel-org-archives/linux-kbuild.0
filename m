@@ -1,124 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:49304 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:42752 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752280AbeESWmG (ORCPT
+        with ESMTP id S1752459AbeETDpG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 19 May 2018 18:42:06 -0400
-Subject: Re: [PATCH v2] kbuild: check for pkg-config on make
- {menu,n,g,x}config
-References: <9e9438b0-568a-8dc0-dad6-d29b6e39e53a@infradead.org>
- <CAK7LNAQxcVRvhJn6GQVdLLuEq0sJEUcfwkbMpmx9j9nbjscQRg@mail.gmail.com>
- <3ce8f87d-69fa-231a-b51c-9805e6525032@infradead.org>
- <CAK7LNAThmjib15eR3C6wdXKoaWr=AC+CrEJmj6iC2Vdhz9nOqA@mail.gmail.com>
+        Sat, 19 May 2018 23:45:06 -0400
+Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
+References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
+ <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
+ <CAFkk2KRozscmd4kQSJKwKmY3WpTody7S5XZZObf8SKLF62k6+w@mail.gmail.com>
+ <CAFkk2KRkEt3+786QvyjzPPAm+3HDe2+ydzZJpshfdKyUDQVfuw@mail.gmail.com>
+ <CAFkk2KRvSxu+x-nb045=3L63KEk5h9URr5QYLPoYp6rqqTR4qA@mail.gmail.com>
+ <3d9be2f2-3fbe-411b-8529-0e0847f01346@infradead.org>
+ <CAFkk2KRWon_S--dxYw82cDyGXKTFA6jxrrQwstzLvHPs=6-dqQ@mail.gmail.com>
 From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <d5bf517b-fb51-043c-737e-28e00354e630@infradead.org>
-Date: Sat, 19 May 2018 15:42:04 -0700
+Message-ID: <c4ec710f-b2bd-b9f0-c33a-159aa53ca73c@infradead.org>
+Date: Sat, 19 May 2018 20:45:04 -0700
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAThmjib15eR3C6wdXKoaWr=AC+CrEJmj6iC2Vdhz9nOqA@mail.gmail.com>
+In-Reply-To: <CAFkk2KRWon_S--dxYw82cDyGXKTFA6jxrrQwstzLvHPs=6-dqQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Bj=c3=b8rn_Forsman?= <bjorn.forsman@gmail.com>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 05/17/18 22:10, Masahiro Yamada wrote:
-> Hi Randy,
+On 05/08/2018 09:59 AM, Ulf Magnusson wrote:
+> Hello,
 > 
-> 2018-04-07 6:37 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
->> On 03/14/2018 10:50 PM, Masahiro Yamada wrote:
->>> 2018-03-13 11:30 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
->>>> From: Randy Dunlap <rdunlap@infradead.org>
->>>>
->>>> Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
->>>> that other required files are present, but none of these check that
->>>> pkg-config itself is present.  Add a check for all 4 of these targets.
->>>>
->>>> Fixes kernel bugzilla #77511:
->>>> https://bugzilla.kernel.org/show_bug.cgi?id=77511
->>>>
->>>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
->>>> ---
->>>> v2: use 'command -v' instead of 'which'
->>>>
->>>> I'm also OK with just documenting the pkg-config requirement in
->>>> Documentation/Changes (= Documentation/process/changes.rst).
->>>>
->>>>  scripts/kconfig/Makefile           |   15 ++++++++++++++-
->>>>  scripts/kconfig/check-pkgconfig.sh |   12 ++++++++++++
->>>>  2 files changed, 26 insertions(+), 1 deletion(-)
->>>>
->>>> --- lnx-416-rc3.orig/scripts/kconfig/Makefile
->>>> +++ lnx-416-rc3/scripts/kconfig/Makefile
->>>> @@ -160,6 +160,9 @@ help:
->>>>         @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
->>>>         @echo  '  tinyconfig      - Configure the tiniest possible kernel'
->>>>
->>>> +# pkg-config check
->>>> +check-pkgconfig  := $(srctree)/$(src)/check-pkgconfig.sh
->>>> +
->>>>  # lxdialog stuff
->>>>  check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
->>>>
->>>> @@ -205,7 +208,17 @@ $(addprefix $(obj)/, mconf.o $(lxdialog)
->>>>  $(obj)/dochecklxdialog:
->>>>         $(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC) $(HOST_EXTRACFLAGS) $(HOSTLOADLIBES_mconf)
->>>>
->>>> -always := dochecklxdialog
->>>> +# Check that we have pkg-config (used by each of menu/n/g/xconfig)
->>>> +PHONY += $(obj)/docheckpkgconfig
->>>> +$(addprefix $(obj)/, mconf.o): $(obj)/docheckpkgconfig
->>>> +$(addprefix $(obj)/, nconf.o): $(obj)/docheckpkgconfig
->>>> +$(addprefix $(obj)/, gconf.o): $(obj)/docheckpkgconfig
->>>> +$(addprefix $(obj)/, qconf.o): $(obj)/docheckpkgconfig
->>>> +
->>>> +$(obj)/docheckpkgconfig:
->>>> +       $(Q)$(CONFIG_SHELL) $(check-pkgconfig)
->>>> +
->>>> +always := docheckpkgconfig dochecklxdialog
->>>
->>>
->>> I did not test this patch, but does this check work as expected?
->>>
->>> Probably we want to run 'docheckpkgconfig'
->>> before 'dochecklxdiag', '.tmp_gtkcheck', '.tmp_qtcheck', etc.
->>> But, I do not see such dependencies.
->>>
->>>
->>> Also, if we make 'pkg-config' mandatory,
->>> should we entirely drop fall-back logics like follows?
->>>
->>> https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/lxdialog/check-lxdialog.sh#L10
->>> https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/lxdialog/check-lxdialog.sh#L29
->>> https://github.com/torvalds/linux/blob/v4.16-rc5/scripts/kconfig/Makefile#L230
->>>
->>>
->>> What do you think?
->>>
->>
->> Hi,
->>
->> I'm willing to keep patching/testing on this, but both pkg-config and depmod
->> (for depmod, see: https://bugzilla.kernel.org/show_bug.cgi?id=198965)
->> are basic requirements IMO, so just documenting their requirements is good
->> enough to me, but might not be good enough for some users.
->>
->> Comments?
+> I've added incremental search for jumping directly to a symbol now.
+> Regular expressions are supported as well.
 > 
-> Sorry for late comments.
+> Some screenshots below:
 > 
-> OK, I am fine with making pkg-config a requirement.
-> (and it should be documented)
+> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss10.png
+> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss11.png
+> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss13.png
 > 
-> But, I'd like to clean-up scripts/kconfig/Makefile first.
-> It is already cluttered, and hesitate to add new code based on that.
-> I posted the patches.
-> 
-> Could you send v3 after the cleaning work is done?
+> The last screenshot shows how things might look after you jump to a
+> symbol. The jumped-to symbol wasn't visible in this case, so show-all
+> mode was turned on automatically.
 
-Sure, I'll give it a try.
+Hi Ulf,
 
-thanks.
+Do I need to save kconfiglib.py in a special location?
+
+With (new) kconfiglib.py and menuconfig.py, I am getting this:
+
+$ make ARCH=x86_64 O=xx64 iscriptconfig
+make[1]: Entering directory '/home/rdunlap/lnx/lnx-417-rc3/xx64'
+  GEN     ./Makefile
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ImportError: No module named 'kconfiglib'
+>>> 
+
+and then if I (being a Python novice) copy kconfiglib.py to
+/usr/lib/python3.4/site-packages/ and try again, I get 16 warning messages (below)
+and then this:
+
+A Kconfig instance 'kconf' for the architecture x86_64 has been created.
+>>> 
+
+What am I supposed to do now?
+
+Hm, OK, I used the trick that you supplied a few weeks ago and I have the UI now.
+
+    ARCH=x86 SRCARCH=x86 KERNELVERSION=`make kernelversion` \
+        Kconfiglib/menuconfig.py
+
+so yes, a real Makefile target would be nice. :)
+
+
+thanks,
 -- 
 ~Randy
+
+the 16 warning messages:
+
+warning: SCSI_DPT_I2O (defined at drivers/scsi/Kconfig:482) has leading or trailing whitespace in its prompt
+warning: ATM_FIRESTREAM (defined at drivers/atm/Kconfig:149) has leading or trailing whitespace in its prompt
+warning: IWLWIFI (defined at drivers/net/wireless/intel/iwlwifi/Kconfig:1) has leading or trailing whitespace in its prompt
+warning: REGULATOR_MAX8973 (defined at drivers/regulator/Kconfig:479) has leading or trailing whitespace in its prompt
+warning: MEMSTICK_TIFM_MS (defined at drivers/memstick/host/Kconfig:7) has leading or trailing whitespace in its prompt
+warning: MV_XOR_V2 (defined at drivers/dma/Kconfig:374) has leading or trailing whitespace in its prompt
+warning: PANEL_LCD_PIN_E (defined at drivers/auxdisplay/Kconfig:335) has leading or trailing whitespace in its prompt
+warning: PANEL_LCD_PIN_RS (defined at drivers/auxdisplay/Kconfig:350) has leading or trailing whitespace in its prompt
+warning: PANEL_LCD_PIN_RW (defined at drivers/auxdisplay/Kconfig:365) has leading or trailing whitespace in its prompt
+warning: PANEL_LCD_PIN_SCL (defined at drivers/auxdisplay/Kconfig:380) has leading or trailing whitespace in its prompt
+warning: PANEL_LCD_PIN_SDA (defined at drivers/auxdisplay/Kconfig:395) has leading or trailing whitespace in its prompt
+warning: PANEL_LCD_PIN_BL (defined at drivers/auxdisplay/Kconfig:410) has leading or trailing whitespace in its prompt
+warning: INTEGRITY_AUDIT (defined at security/integrity/Kconfig:54) has leading or trailing whitespace in its prompt
+warning: the choice symbol VIRT_CPU_ACCOUNTING_GEN (defined at init/Kconfig:359) is selected by the following symbols, which has no effect: 
+ - NO_HZ_FULL (defined at kernel/time/Kconfig:85)
+warning: the choice symbol M486 (defined at arch/x86/Kconfig.cpu:53) is selected by the following symbols, which has no effect: 
+ - X86_RDC321X (defined at arch/x86/Kconfig:653)
+warning: the choice symbol FB_LITTLE_ENDIAN (defined at drivers/video/fbdev/Kconfig:168) is selected by the following symbols, which has no effect: 
+ - FB_MB862XX_LIME (defined at drivers/video/fbdev/Kconfig:2190)
