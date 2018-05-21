@@ -1,9 +1,9 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:35698 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:43158 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751745AbeEUCWa (ORCPT
+        with ESMTP id S1752311AbeEUDON (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 May 2018 22:22:30 -0400
+        Sun, 20 May 2018 23:14:13 -0400
 Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
 References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
  <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
@@ -14,12 +14,12 @@ References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
  <CAFkk2KRWon_S--dxYw82cDyGXKTFA6jxrrQwstzLvHPs=6-dqQ@mail.gmail.com>
  <c4ec710f-b2bd-b9f0-c33a-159aa53ca73c@infradead.org>
  <1378afb3-2b0e-da7a-5721-a8fa727e4382@infradead.org>
- <CAFkk2KStOwHKmFLpNVA1GNscvi-0wihJVM_uaYNemoy6XWDxiQ@mail.gmail.com>
+ <CAFkk2KS=bYn3t-764CEy+sq9E8FUbWH=L-yQbDhAYQpnrgmsiQ@mail.gmail.com>
 From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <63c7222b-b324-2cca-b4f9-3e07cd59780b@infradead.org>
-Date: Sun, 20 May 2018 19:22:29 -0700
+Message-ID: <4a4b12fc-ab54-20c4-7aa7-a83c4faecf25@infradead.org>
+Date: Sun, 20 May 2018 19:45:22 -0700
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KStOwHKmFLpNVA1GNscvi-0wihJVM_uaYNemoy6XWDxiQ@mail.gmail.com>
+In-Reply-To: <CAFkk2KS=bYn3t-764CEy+sq9E8FUbWH=L-yQbDhAYQpnrgmsiQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -28,7 +28,7 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Ulf Magnusson <ulfalizer@gmail.com>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 05/20/2018 12:51 AM, Ulf Magnusson wrote:
+On 05/19/2018 09:47 PM, Ulf Magnusson wrote:
 > On Sun, May 20, 2018 at 6:03 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
 >> On 05/19/2018 08:45 PM, Randy Dunlap wrote:
 >>> On 05/08/2018 09:59 AM, Ulf Magnusson wrote:
@@ -82,17 +82,40 @@ On 05/20/2018 12:51 AM, Ulf Magnusson wrote:
 >> --
 >> ~Randy
 > 
-> I changed it to search the symbol name and the prompt separately:
-> https://github.com/ulfalizer/Kconfiglib/commit/e0905818ef376c977d0a4540ea72d61b8f554bb5
+> It's related to how the search is done. Searching for "DEBUG\b" (word
+> boundary) instead will find all of them.
 > 
-> Should work the way you expected now. It's more intuitive for the prompt too. :)
+> A string is generated for each symbol. For symbols with prompts, this
+> string includes the prompt as well, so you get e.g.
+> 
+>     AB8500_DEBUG "Enable debug info via debugfs"
+> 
+> Those strings are then searched/displayed.
+> 
+> What you got with your search was all symbols whose names end in
+> "_DEBUG" that don't have a prompt.
+> 
+> The nice thing about searching both the name and the prompt is that
+> e.g. "debugfs ab8500" will find the symbol above. I'm also planning to
+> add menus to the search, by generating 'menu: "menu title"' strings
+> for them.
+> 
+> It's a bit awkward/unintuitive that what you tried doesn't work
+> though. Maybe the symbol name could be searched separately from the
+> prompt, though I'd be a bit sad to abandon the super simple
+> single-string-per-entry implementation approach. :)
 
-Yes, and a user shouldn't need to know about the implementation details.
+Hi Ulf,
 
-> Can just do 'debug$' by the way. No '.*' required.
+What else are you planning to do with /(search)?
 
-Yep, I had already figured that out.
 
-thanks,
+/syscall lists 20 or so symbols. It would be nice if each one of those
+showed its current setting [y,n,maybe^Wm].
+
+
+I like Toggle show-all mode.  When I use xconfig, I usually turn on most
+of its options, including one like that.
+
 -- 
 ~Randy
