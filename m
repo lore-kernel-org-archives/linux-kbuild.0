@@ -1,371 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:32715 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751245AbeEUEoe (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:26919 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750907AbeEUEtq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 May 2018 00:44:34 -0400
+        Mon, 21 May 2018 00:49:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KQUps1rhjxdOVz5Mkt+p7VkHX+o5aHvP3u0Hka0_ULcow@mail.gmail.com>
-References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
- <1526537830-22606-4-git-send-email-yamada.masahiro@socionext.com> <CAFkk2KQUps1rhjxdOVz5Mkt+p7VkHX+o5aHvP3u0Hka0_ULcow@mail.gmail.com>
+In-Reply-To: <7819f81c-2de6-4202-1349-ae4ce01caa26@infradead.org>
+References: <1526804213-8238-1-git-send-email-yamada.masahiro@socionext.com>
+ <1526804213-8238-6-git-send-email-yamada.masahiro@socionext.com> <7819f81c-2de6-4202-1349-ae4ce01caa26@infradead.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 21 May 2018 13:43:42 +0900
-Message-ID: <CAK7LNARP2b=jN_ioj3dT=3yiSTv7Ezu-MSPuh0vO30irN5D1nA@mail.gmail.com>
-Subject: Re: [PATCH v4 03/31] kconfig: reference environment variables
- directly and remove 'option env='
+Date: Mon, 21 May 2018 13:48:59 +0900
+Message-ID: <CAK7LNARzdUZ3=PWwM_SC-t6XEoCgGEBfh4kj_KMv9WUquAHJ0g@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] kconfig: refactor ncurses package checks for
+ building nconf
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "Luis R . Rodriguez" <mcgrof@suse.com>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi.
+2018-05-21 8:41 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+> On 05/20/2018 01:16 AM, Masahiro Yamada wrote:
+>> Building nconf requires ncurses, but its presence is not checked.
+>> Check and configure necessary packages by a shell script like the
+>> other GUI frontends.
+>>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> ---
+>>
+>
+>> diff --git a/scripts/kconfig/nconf-cfg.sh b/scripts/kconfig/nconf-cfg.sh
+>> new file mode 100644
+>> index 0000000..8eb7948
+>> --- /dev/null
+>> +++ b/scripts/kconfig/nconf-cfg.sh
+>> @@ -0,0 +1,34 @@
+>> +#!/bin/sh
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +
+>> +PKG="ncursesw menuw panelw"
+>> +PKG2="ncurses menu panel"
+>> +
+>> +if pkg-config --exists $PKG; then
+>> +     echo libs=\"$(pkg-config --libs $PKG)\"
+>> +     exit 0
+>> +fi
+>> +
+>> +if pkg-config --exists $PKG2; then
+>> +     echo libs=\"$(pkg-config --libs $PKG2)\"
+>> +     exit 0
+>> +fi
+>> +
+>
+> I guess this one needs clags, especially -I, like the mconf patch contains...
 
 
 
-2018-05-21 0:46 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+I thought so.
 
-> s/environments/environment variables/
+But, the current scripts/kconfig/Makefile
+adds 'pkg-config --libs' to nconf,
+but does nothing about 'pkg-config --cflags' for nconf.
+Therefore, I kept the current behavior just in case.
 
-Will fix.
+
+The nconfig in the current version is not working for you, right?
+
+
 
 
 >
->> +        * They will be written out to include/config/auto.conf.cmd
->> +        */
->> +       env_add(name, value);
+>> +# Unfortunately, some distributions (e.g. openSUSE) cannot find ncurses
+>> +# by pkg-config.
+>> +if [ -f /usr/include/ncursesw/ncurses.h ]; then
+>> +     echo libs=\"-lncursesw -lmenuw -lpanelw\"
+>> +     exit 0
+>> +fi
 >> +
->> +       return xstrdup(value);
->> +}
+>> +if [ -f /usr/include/ncurses.h ]; then
+>> +     echo libs=\"-lncurses -lmenu -lpanel\"
+>> +     exit 0
+>> +fi
 >> +
->> +void env_write_dep(FILE *f, const char *autoconfig_name)
->> +{
->> +       struct env *e, *tmp;
->> +
->> +       list_for_each_entry_safe(e, tmp, &env_list, node) {
->> +               fprintf(f, "ifneq \"$(%s)\" \"%s\"\n", e->name, e->value);
->> +               fprintf(f, "%s: FORCE\n", autoconfig_name);
->> +               fprintf(f, "endif\n");
->> +               env_del(e);
->> +       }
->> +}
->> +
->> +static char *eval_clause(const char *in)
->> +{
->> +       char *res, *name;
->> +
->> +       /*
->> +        * Returns an empty string because '$()' should be evaluated
->> +        * to a null string.
->> +        */
+>> +echo >&2 "*"
+>> +echo >&2 "* Unable to find the ncurses."
 >
-> Do you know of cases where this is more useful than erroring out?
+>                               the ncurses package."
 >
-> Not saying it doesn't make sense. Just curious.
-
-
-I just followed how Make works.
-
-Anyway, eval_clause() will return null string for null input.
-I will remove that hunk.
-
-
-
-
->> +       if (!*in)
->> +               return xstrdup("");
->> +
->> +       name = expand_string(in);
->> +
->> +       res = env_expand(name);
->> +       free(name);
->> +
->> +       return res;
->> +}
->> +
->> +/*
->> + * Expand a string that follows '$'
->> + *
->> + * For example, if the input string is
->> + *     ($(FOO)$($(BAR)))$(BAZ)
->> + * this helper evaluates
->> + *     $($(FOO)$($(BAR)))
->> + * and returns the resulted string, then updates 'str' to point to the next
+>> +echo >&2 "* Install ncurses (ncurses-devel or libncurses-dev"
+>> +echo >&2 "* depending on your distribution)"
 >
-> s/resulted/resulting/
+>                                  distribution)."
 >
-> Maybe something like this would make the behavior a bit clearer:
->
->   ...and returns a new string containing the expansion, also advancing
->   'str' to point to the next character after... (note that this function does
->   a recursive expansion) ...
-
-
-Is this OK?
-
-/*
- * Expand a string that follows '$'
- *
- * For example, if the input string is
- *     ($(FOO)$($(BAR)))$(BAZ)
- * this helper evaluates
- *     $($(FOO)$($(BAR)))
- * and returns a new string containing the expansion (note that the string is
- * recursively expanded), also advancing 'str' to point to the next character
- * after the corresponding closing parenthesis, in this case, *str will be
- *     $(BAR)
- */
-
-
-
->> + * character after the corresponding closing parenthesis, in this case, *str
->> + * will be
->> + *     $(BAR)
->> + */
->> +char *expand_dollar(const char **str)
->> +{
->> +       const char *p = *str;
->> +       const char *q;
->> +       char *tmp, *out;
->> +       int nest = 0;
->> +
->> +       /* '$$' represents an escaped '$' */
->> +       if (*p == '$') {
->> +               *str = p + 1;
->> +               return xstrdup("$");
->> +       }
->> +
->> +       /*
->> +        * Kconfig does not support single-letter variable as in $A
->> +        * or curly braces as in ${CC}.
->> +        */
->> +       if (*p != '(')
->> +               pperror("syntax error: '$' not followed by '('", p);
->
-> Could say "not followed by '(' by or '$'".
-
-Will do.
-
-
->> +
->> +       p++;
->> +       q = p;
->> +       while (*q) {
->> +               if (*q == '(') {
->> +                       nest++;
->> +               } else if (*q == ')') {
->> +                       if (nest-- == 0)
->> +                               break;
->> +               }
->> +               q++;
->> +       }
->> +
->> +       if (!*q)
->> +               pperror("unterminated reference to '%s': missing ')'", p);
->> +
->> +       tmp = xmalloc(q - p + 1);
->> +       memcpy(tmp, p, q - p);
->> +       tmp[q - p] = 0;
->> +       *str = q + 1;
->> +       out = eval_clause(tmp);
->> +       free(tmp);
->> +
->> +       return out;
->
-> This might be a bit clearer, since the 'str' update and the expansion
-> are independent:
-
-Indeed, will do.
-
->
->   /* Advance 'str' to after the expanded initial portion of the string */
->   *str = q + 1;
->
->   /* Save the "FOO" part of "(FOO)" into 'tmp' and expand it recursively */
->   tmp = xmalloc(q - p + 1);
->   memcpy(tmp, p, q - p);
->   tmp[q - p] = '\0';
->   out = eval_clause(tmp);
->   free(tmp);
->
->   return out;
->
-> ...or switched around, but thought putting the 'str' bit first might
-> emphasize that it isn't modified.
-
-
-I prefer advancing the pointer at last.
-
-
-
-
->> +}
->> +
->> +/*
->> + * Expand variables in the given string.  Undefined variables
->> + * expand to an empty string.
->
-> I wonder what the tradeoffs are vs. erroring out here (or leaving
-> undefined variables as-is).
-
-
-I want to stick to the Make-like behavior here and exploit it in some cases.
-We can set some variables in some arch/*/Kconfig,
-but unset in the others.
-
-
-
-
-In some arch/*/Kconfig:
-
-min-gcc-version := 40900
-
-
-
-
-In init/Kconfig:
-
-# GCC 4.5 is required to build Linux Kernel.
-# Some architectures may override it (from arch/*/Kconfig) for their
-requirement.
-min-gcc-version := $(if,$(min-gcc-version),$(min-gcc-version),40500)
-
-... check the gcc version, then show error
-if it is older than $(min-gcc-version).
-
-
-
-
-
-
-
-
->> + * The returned string must be freed when done.
->> + */
->> +char *expand_string(const char *in)
->> +{
->> +       const char *prev_in, *p;
->> +       char *new, *out;
->> +       size_t outlen;
->> +
->> +       out = xmalloc(1);
->> +       *out = 0;
->> +
->> +       while ((p = strchr(in, '$'))) {
->> +               prev_in = in;
->> +               in = p + 1;
->> +               new = expand_dollar(&in);
->> +               outlen = strlen(out) + (p - prev_in) + strlen(new) + 1;
->> +               out = xrealloc(out, outlen);
->> +               strncat(out, prev_in, p - prev_in);
->> +               strcat(out, new);
->> +               free(new);
->
-> Some code duplication with expand_one_token() here. Do you think
-> something could be factored out/reorganized?
-
-
-Yes.  For example, the following would work.
-If you prefer that, I can update it in v5.
-
-
-
-
-static char *__expand_string(const char **str, bool (*is_end)(const char *))
-{
-        const char *in, *prev_in, *p;
-        char *new, *out;
-        size_t outlen;
-
-        out = xmalloc(1);
-        *out = 0;
-
-        p = in = *str;
-
-        while (1) {
-                if (*p == '$') {
-                        prev_in = in;
-                        in = p + 1;
-                        new = expand_dollar(&in);
-                        outlen = strlen(out) + (p - prev_in) + strlen(new) + 1;
-                        out = xrealloc(out, outlen);
-                        strncat(out, prev_in, p - prev_in);
-                        strcat(out, new);
-                        free(new);
-                        p = in;
-                        continue;
-                }
-
-                if (is_end(p))
-                        break;
-
-                p++;
-        }
-
-        outlen = strlen(out) + (p - in) + 1;
-        out = xrealloc(out, outlen);
-        strncat(out, in, p - in);
-
-        *str = p;
-
-        return out;
-}
-
-static bool is_end_of_str(const char *s)
-{
-        return !*s;
-}
-
-char *expand_string(const char *in)
-{
-        return __expand_string(&in, is_end_of_str);
-}
-
-static bool is_end_of_token(const char *s)
-{
-        return !(isalnum(*s) || *s == '_' || *s == '-' || *s == '.' ||
-*s == '/');
-}
-
-char *expand_one_token(const char **str)
-{
-        return __expand_string(str, is_end_of_token);
-}
-
-
-
-
-
-> I wonder if it might be cleaner to have expand_dollar() take a pointer
-> to the '$'. Might even out in terms of the +1's you'd have to add, as
-> all callers manually bump the pointer before the call now. I haven't
-> tried implementing it though, so hard to say.
-
-
-If I do this, I'd want to add a sanity check to expand_dollar().
-I'd rather like to avoid unneeded code.
-
-
-static char *expand_dollar(...)
-{
-        assert(*p == '$');
-        p++;
-
-        /* '$$' represents an escaped '$' */
-        if (*p == '$') {
-               *str = p + 1;
-               return xstrdup("$");
-        }
-
-         ...
-
-
-}
-
-
->
-> Some short inline comments similar to above would help too I think.
->
+>> +echo >&2 "*"
+>> +exit 1
+>>
 
 
 
