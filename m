@@ -1,148 +1,374 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:50054 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750836AbeEUDrT (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:32715 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751245AbeEUEoe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 May 2018 23:47:19 -0400
-Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
-References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
- <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
- <CAFkk2KRozscmd4kQSJKwKmY3WpTody7S5XZZObf8SKLF62k6+w@mail.gmail.com>
- <CAFkk2KRkEt3+786QvyjzPPAm+3HDe2+ydzZJpshfdKyUDQVfuw@mail.gmail.com>
- <CAFkk2KRvSxu+x-nb045=3L63KEk5h9URr5QYLPoYp6rqqTR4qA@mail.gmail.com>
- <3d9be2f2-3fbe-411b-8529-0e0847f01346@infradead.org>
- <CAFkk2KRWon_S--dxYw82cDyGXKTFA6jxrrQwstzLvHPs=6-dqQ@mail.gmail.com>
- <c4ec710f-b2bd-b9f0-c33a-159aa53ca73c@infradead.org>
- <1378afb3-2b0e-da7a-5721-a8fa727e4382@infradead.org>
- <CAFkk2KS=bYn3t-764CEy+sq9E8FUbWH=L-yQbDhAYQpnrgmsiQ@mail.gmail.com>
- <4a4b12fc-ab54-20c4-7aa7-a83c4faecf25@infradead.org>
- <CAFkk2KTrC7DEe7dU4Jq13YBNWGDSa8KmMm0mpFvxokrKeMzCFg@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <4310659d-e36f-63d3-88b3-e1c5235679b2@infradead.org>
-Date: Sun, 20 May 2018 20:47:15 -0700
+        Mon, 21 May 2018 00:44:34 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFkk2KTrC7DEe7dU4Jq13YBNWGDSa8KmMm0mpFvxokrKeMzCFg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAFkk2KQUps1rhjxdOVz5Mkt+p7VkHX+o5aHvP3u0Hka0_ULcow@mail.gmail.com>
+References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
+ <1526537830-22606-4-git-send-email-yamada.masahiro@socionext.com> <CAFkk2KQUps1rhjxdOVz5Mkt+p7VkHX+o5aHvP3u0Hka0_ULcow@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 21 May 2018 13:43:42 +0900
+Message-ID: <CAK7LNARP2b=jN_ioj3dT=3yiSTv7Ezu-MSPuh0vO30irN5D1nA@mail.gmail.com>
+Subject: Re: [PATCH v4 03/31] kconfig: reference environment variables
+ directly and remove 'option env='
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>
 
-On 05/20/2018 08:33 PM, Ulf Magnusson wrote:
-> On Mon, May 21, 2018 at 4:45 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
->> On 05/19/2018 09:47 PM, Ulf Magnusson wrote:
->>> On Sun, May 20, 2018 at 6:03 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
->>>> On 05/19/2018 08:45 PM, Randy Dunlap wrote:
->>>>> On 05/08/2018 09:59 AM, Ulf Magnusson wrote:
->>>>>> Hello,
->>>>>>
->>>>>> I've added incremental search for jumping directly to a symbol now.
->>>>>> Regular expressions are supported as well.
->>>>>>
->>>>>> Some screenshots below:
->>>>>>
->>>>>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss10.png
->>>>>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss11.png
->>>>>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss13.png
->>>>>>
->>>>>> The last screenshot shows how things might look after you jump to a
->>>>>> symbol. The jumped-to symbol wasn't visible in this case, so show-all
->>>>>> mode was turned on automatically.
->>>>>
->>>>> Hi Ulf,
->>>>>
->>>>>
->>>>>
->>>>> Hm, OK, I used the trick that you supplied a few weeks ago and I have the UI now.
->>>>>
->>>>>     ARCH=x86 SRCARCH=x86 KERNELVERSION=`make kernelversion` \
->>>>>         Kconfiglib/menuconfig.py
->>>>>
->>>>> so yes, a real Makefile target would be nice. :)
->>>>
->>>> I want to see all kconfig symbols that end with "_DEBUG" (so excluding
->>>> _DEBUGFS).  Using:
->>>>
->>>> /.*_DEBUG$
->>>>
->>>> shows me 6 symbols:
->>>> ATH9K_COMMON_DEBUG
->>>> DVB_B2C2_FLEXCOP_DEBUG
->>>> HAVE_DMA_API_DEBUG
->>>> IP_DCCP_TFRC_DEBUG
->>>> NFS_DEBUG
->>>> PM_SLEEP_DEBUG
->>>>
->>>> so where are the other (approx.) 176?
->>>> see:
->>>> $ find . -name Kconfig\* | xargs grep "config.*_DEBUG$" | grep -v \.orig | wc
->>>>     182     364    9179
->>>>
->>>>
->>>> Anyway, something for you to look at. :)
->>>>
->>>> --
->>>> ~Randy
->>>
->>> It's related to how the search is done. Searching for "DEBUG\b" (word
->>> boundary) instead will find all of them.
->>>
->>> A string is generated for each symbol. For symbols with prompts, this
->>> string includes the prompt as well, so you get e.g.
->>>
->>>     AB8500_DEBUG "Enable debug info via debugfs"
->>>
->>> Those strings are then searched/displayed.
->>>
->>> What you got with your search was all symbols whose names end in
->>> "_DEBUG" that don't have a prompt.
->>>
->>> The nice thing about searching both the name and the prompt is that
->>> e.g. "debugfs ab8500" will find the symbol above. I'm also planning to
->>> add menus to the search, by generating 'menu: "menu title"' strings
->>> for them.
->>>
->>> It's a bit awkward/unintuitive that what you tried doesn't work
->>> though. Maybe the symbol name could be searched separately from the
->>> prompt, though I'd be a bit sad to abandon the super simple
->>> single-string-per-entry implementation approach. :)
->>
->> Hi Ulf,
->>
->> What else are you planning to do with /(search)?
-> 
-> Here's the stuff I've thought of so far:
-> 
->   - Display invisible symbols in red (to match show-all mode)
-> 
->   - Search prompts of menus and comments as well
-> 
->   - Have [F1] show the help display without canceling the search,
->     so you can quickly scan through a bunch of symbols
-> 
-> Maybe you could get fancy with stuff like finding symbols that are
-> related to other symbols in particular ways too...
-> 
->> /syscall lists 20 or so symbols. It would be nice if each one of those
->> showed its current setting [y,n,maybe^Wm].
-> 
-> Nice idea. I added it:
-> https://github.com/ulfalizer/Kconfiglib/commit/3161affaa5bb8350a39bfd305c56171a25b02151
-> 
-> Works for strings/int/hex too.
+Hi.
 
-Thanks.
 
->> I like Toggle show-all mode.  When I use xconfig, I usually turn on most
->> of its options, including one like that.
-> 
-> IIRC, xconfig doesn't make it very clear which symbols are invisible
-> in show-all mode. That's why I made them red.
 
-Yes, that's helpful.
+2018-05-21 0:46 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
+
+> s/environments/environment variables/
+
+Will fix.
+
+
+>
+>> +        * They will be written out to include/config/auto.conf.cmd
+>> +        */
+>> +       env_add(name, value);
+>> +
+>> +       return xstrdup(value);
+>> +}
+>> +
+>> +void env_write_dep(FILE *f, const char *autoconfig_name)
+>> +{
+>> +       struct env *e, *tmp;
+>> +
+>> +       list_for_each_entry_safe(e, tmp, &env_list, node) {
+>> +               fprintf(f, "ifneq \"$(%s)\" \"%s\"\n", e->name, e->value);
+>> +               fprintf(f, "%s: FORCE\n", autoconfig_name);
+>> +               fprintf(f, "endif\n");
+>> +               env_del(e);
+>> +       }
+>> +}
+>> +
+>> +static char *eval_clause(const char *in)
+>> +{
+>> +       char *res, *name;
+>> +
+>> +       /*
+>> +        * Returns an empty string because '$()' should be evaluated
+>> +        * to a null string.
+>> +        */
+>
+> Do you know of cases where this is more useful than erroring out?
+>
+> Not saying it doesn't make sense. Just curious.
+
+
+I just followed how Make works.
+
+Anyway, eval_clause() will return null string for null input.
+I will remove that hunk.
+
+
+
+
+>> +       if (!*in)
+>> +               return xstrdup("");
+>> +
+>> +       name = expand_string(in);
+>> +
+>> +       res = env_expand(name);
+>> +       free(name);
+>> +
+>> +       return res;
+>> +}
+>> +
+>> +/*
+>> + * Expand a string that follows '$'
+>> + *
+>> + * For example, if the input string is
+>> + *     ($(FOO)$($(BAR)))$(BAZ)
+>> + * this helper evaluates
+>> + *     $($(FOO)$($(BAR)))
+>> + * and returns the resulted string, then updates 'str' to point to the next
+>
+> s/resulted/resulting/
+>
+> Maybe something like this would make the behavior a bit clearer:
+>
+>   ...and returns a new string containing the expansion, also advancing
+>   'str' to point to the next character after... (note that this function does
+>   a recursive expansion) ...
+
+
+Is this OK?
+
+/*
+ * Expand a string that follows '$'
+ *
+ * For example, if the input string is
+ *     ($(FOO)$($(BAR)))$(BAZ)
+ * this helper evaluates
+ *     $($(FOO)$($(BAR)))
+ * and returns a new string containing the expansion (note that the string is
+ * recursively expanded), also advancing 'str' to point to the next character
+ * after the corresponding closing parenthesis, in this case, *str will be
+ *     $(BAR)
+ */
+
+
+
+>> + * character after the corresponding closing parenthesis, in this case, *str
+>> + * will be
+>> + *     $(BAR)
+>> + */
+>> +char *expand_dollar(const char **str)
+>> +{
+>> +       const char *p = *str;
+>> +       const char *q;
+>> +       char *tmp, *out;
+>> +       int nest = 0;
+>> +
+>> +       /* '$$' represents an escaped '$' */
+>> +       if (*p == '$') {
+>> +               *str = p + 1;
+>> +               return xstrdup("$");
+>> +       }
+>> +
+>> +       /*
+>> +        * Kconfig does not support single-letter variable as in $A
+>> +        * or curly braces as in ${CC}.
+>> +        */
+>> +       if (*p != '(')
+>> +               pperror("syntax error: '$' not followed by '('", p);
+>
+> Could say "not followed by '(' by or '$'".
+
+Will do.
+
+
+>> +
+>> +       p++;
+>> +       q = p;
+>> +       while (*q) {
+>> +               if (*q == '(') {
+>> +                       nest++;
+>> +               } else if (*q == ')') {
+>> +                       if (nest-- == 0)
+>> +                               break;
+>> +               }
+>> +               q++;
+>> +       }
+>> +
+>> +       if (!*q)
+>> +               pperror("unterminated reference to '%s': missing ')'", p);
+>> +
+>> +       tmp = xmalloc(q - p + 1);
+>> +       memcpy(tmp, p, q - p);
+>> +       tmp[q - p] = 0;
+>> +       *str = q + 1;
+>> +       out = eval_clause(tmp);
+>> +       free(tmp);
+>> +
+>> +       return out;
+>
+> This might be a bit clearer, since the 'str' update and the expansion
+> are independent:
+
+Indeed, will do.
+
+>
+>   /* Advance 'str' to after the expanded initial portion of the string */
+>   *str = q + 1;
+>
+>   /* Save the "FOO" part of "(FOO)" into 'tmp' and expand it recursively */
+>   tmp = xmalloc(q - p + 1);
+>   memcpy(tmp, p, q - p);
+>   tmp[q - p] = '\0';
+>   out = eval_clause(tmp);
+>   free(tmp);
+>
+>   return out;
+>
+> ...or switched around, but thought putting the 'str' bit first might
+> emphasize that it isn't modified.
+
+
+I prefer advancing the pointer at last.
+
+
+
+
+>> +}
+>> +
+>> +/*
+>> + * Expand variables in the given string.  Undefined variables
+>> + * expand to an empty string.
+>
+> I wonder what the tradeoffs are vs. erroring out here (or leaving
+> undefined variables as-is).
+
+
+I want to stick to the Make-like behavior here and exploit it in some cases.
+We can set some variables in some arch/*/Kconfig,
+but unset in the others.
+
+
+
+
+In some arch/*/Kconfig:
+
+min-gcc-version := 40900
+
+
+
+
+In init/Kconfig:
+
+# GCC 4.5 is required to build Linux Kernel.
+# Some architectures may override it (from arch/*/Kconfig) for their
+requirement.
+min-gcc-version := $(if,$(min-gcc-version),$(min-gcc-version),40500)
+
+... check the gcc version, then show error
+if it is older than $(min-gcc-version).
+
+
+
+
+
+
+
+
+>> + * The returned string must be freed when done.
+>> + */
+>> +char *expand_string(const char *in)
+>> +{
+>> +       const char *prev_in, *p;
+>> +       char *new, *out;
+>> +       size_t outlen;
+>> +
+>> +       out = xmalloc(1);
+>> +       *out = 0;
+>> +
+>> +       while ((p = strchr(in, '$'))) {
+>> +               prev_in = in;
+>> +               in = p + 1;
+>> +               new = expand_dollar(&in);
+>> +               outlen = strlen(out) + (p - prev_in) + strlen(new) + 1;
+>> +               out = xrealloc(out, outlen);
+>> +               strncat(out, prev_in, p - prev_in);
+>> +               strcat(out, new);
+>> +               free(new);
+>
+> Some code duplication with expand_one_token() here. Do you think
+> something could be factored out/reorganized?
+
+
+Yes.  For example, the following would work.
+If you prefer that, I can update it in v5.
+
+
+
+
+static char *__expand_string(const char **str, bool (*is_end)(const char *))
+{
+        const char *in, *prev_in, *p;
+        char *new, *out;
+        size_t outlen;
+
+        out = xmalloc(1);
+        *out = 0;
+
+        p = in = *str;
+
+        while (1) {
+                if (*p == '$') {
+                        prev_in = in;
+                        in = p + 1;
+                        new = expand_dollar(&in);
+                        outlen = strlen(out) + (p - prev_in) + strlen(new) + 1;
+                        out = xrealloc(out, outlen);
+                        strncat(out, prev_in, p - prev_in);
+                        strcat(out, new);
+                        free(new);
+                        p = in;
+                        continue;
+                }
+
+                if (is_end(p))
+                        break;
+
+                p++;
+        }
+
+        outlen = strlen(out) + (p - in) + 1;
+        out = xrealloc(out, outlen);
+        strncat(out, in, p - in);
+
+        *str = p;
+
+        return out;
+}
+
+static bool is_end_of_str(const char *s)
+{
+        return !*s;
+}
+
+char *expand_string(const char *in)
+{
+        return __expand_string(&in, is_end_of_str);
+}
+
+static bool is_end_of_token(const char *s)
+{
+        return !(isalnum(*s) || *s == '_' || *s == '-' || *s == '.' ||
+*s == '/');
+}
+
+char *expand_one_token(const char **str)
+{
+        return __expand_string(str, is_end_of_token);
+}
+
+
+
+
+
+> I wonder if it might be cleaner to have expand_dollar() take a pointer
+> to the '$'. Might even out in terms of the +1's you'd have to add, as
+> all callers manually bump the pointer before the call now. I haven't
+> tried implementing it though, so hard to say.
+
+
+If I do this, I'd want to add a sanity check to expand_dollar().
+I'd rather like to avoid unneeded code.
+
+
+static char *expand_dollar(...)
+{
+        assert(*p == '$');
+        p++;
+
+        /* '$$' represents an escaped '$' */
+        if (*p == '$') {
+               *str = p + 1;
+               return xstrdup("$");
+        }
+
+         ...
+
+
+}
+
+
+>
+> Some short inline comments similar to above would help too I think.
+>
+
 
 
 -- 
-~Randy
+Best Regards
+Masahiro Yamada
