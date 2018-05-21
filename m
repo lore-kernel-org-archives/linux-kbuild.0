@@ -1,87 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:49548 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751650AbeETXlE (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:35698 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751745AbeEUCWa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 May 2018 19:41:04 -0400
-Subject: Re: [PATCH v2 5/5] kconfig: refactor ncurses package checks for
- building nconf
-References: <1526804213-8238-1-git-send-email-yamada.masahiro@socionext.com>
- <1526804213-8238-6-git-send-email-yamada.masahiro@socionext.com>
+        Sun, 20 May 2018 22:22:30 -0400
+Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
+References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
+ <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
+ <CAFkk2KRozscmd4kQSJKwKmY3WpTody7S5XZZObf8SKLF62k6+w@mail.gmail.com>
+ <CAFkk2KRkEt3+786QvyjzPPAm+3HDe2+ydzZJpshfdKyUDQVfuw@mail.gmail.com>
+ <CAFkk2KRvSxu+x-nb045=3L63KEk5h9URr5QYLPoYp6rqqTR4qA@mail.gmail.com>
+ <3d9be2f2-3fbe-411b-8529-0e0847f01346@infradead.org>
+ <CAFkk2KRWon_S--dxYw82cDyGXKTFA6jxrrQwstzLvHPs=6-dqQ@mail.gmail.com>
+ <c4ec710f-b2bd-b9f0-c33a-159aa53ca73c@infradead.org>
+ <1378afb3-2b0e-da7a-5721-a8fa727e4382@infradead.org>
+ <CAFkk2KStOwHKmFLpNVA1GNscvi-0wihJVM_uaYNemoy6XWDxiQ@mail.gmail.com>
 From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <7819f81c-2de6-4202-1349-ae4ce01caa26@infradead.org>
-Date: Sun, 20 May 2018 16:41:01 -0700
+Message-ID: <63c7222b-b324-2cca-b4f9-3e07cd59780b@infradead.org>
+Date: Sun, 20 May 2018 19:22:29 -0700
 MIME-Version: 1.0
-In-Reply-To: <1526804213-8238-6-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <CAFkk2KStOwHKmFLpNVA1GNscvi-0wihJVM_uaYNemoy6XWDxiQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: "Luis R . Rodriguez" <mcgrof@suse.com>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 05/20/2018 01:16 AM, Masahiro Yamada wrote:
-> Building nconf requires ncurses, but its presence is not checked.
-> Check and configure necessary packages by a shell script like the
-> other GUI frontends.
+On 05/20/2018 12:51 AM, Ulf Magnusson wrote:
+> On Sun, May 20, 2018 at 6:03 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
+>> On 05/19/2018 08:45 PM, Randy Dunlap wrote:
+>>> On 05/08/2018 09:59 AM, Ulf Magnusson wrote:
+>>>> Hello,
+>>>>
+>>>> I've added incremental search for jumping directly to a symbol now.
+>>>> Regular expressions are supported as well.
+>>>>
+>>>> Some screenshots below:
+>>>>
+>>>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss10.png
+>>>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss11.png
+>>>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss13.png
+>>>>
+>>>> The last screenshot shows how things might look after you jump to a
+>>>> symbol. The jumped-to symbol wasn't visible in this case, so show-all
+>>>> mode was turned on automatically.
+>>>
+>>> Hi Ulf,
+>>>
+>>>
+>>>
+>>> Hm, OK, I used the trick that you supplied a few weeks ago and I have the UI now.
+>>>
+>>>     ARCH=x86 SRCARCH=x86 KERNELVERSION=`make kernelversion` \
+>>>         Kconfiglib/menuconfig.py
+>>>
+>>> so yes, a real Makefile target would be nice. :)
+>>
+>> I want to see all kconfig symbols that end with "_DEBUG" (so excluding
+>> _DEBUGFS).  Using:
+>>
+>> /.*_DEBUG$
+>>
+>> shows me 6 symbols:
+>> ATH9K_COMMON_DEBUG
+>> DVB_B2C2_FLEXCOP_DEBUG
+>> HAVE_DMA_API_DEBUG
+>> IP_DCCP_TFRC_DEBUG
+>> NFS_DEBUG
+>> PM_SLEEP_DEBUG
+>>
+>> so where are the other (approx.) 176?
+>> see:
+>> $ find . -name Kconfig\* | xargs grep "config.*_DEBUG$" | grep -v \.orig | wc
+>>     182     364    9179
+>>
+>>
+>> Anyway, something for you to look at. :)
+>>
+>> --
+>> ~Randy
 > 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+> I changed it to search the symbol name and the prompt separately:
+> https://github.com/ulfalizer/Kconfiglib/commit/e0905818ef376c977d0a4540ea72d61b8f554bb5
 > 
+> Should work the way you expected now. It's more intuitive for the prompt too. :)
 
-> diff --git a/scripts/kconfig/nconf-cfg.sh b/scripts/kconfig/nconf-cfg.sh
-> new file mode 100644
-> index 0000000..8eb7948
-> --- /dev/null
-> +++ b/scripts/kconfig/nconf-cfg.sh
-> @@ -0,0 +1,34 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +PKG="ncursesw menuw panelw"
-> +PKG2="ncurses menu panel"
-> +
-> +if pkg-config --exists $PKG; then
-> +	echo libs=\"$(pkg-config --libs $PKG)\"
-> +	exit 0
-> +fi
-> +
-> +if pkg-config --exists $PKG2; then
-> +	echo libs=\"$(pkg-config --libs $PKG2)\"
-> +	exit 0
-> +fi
-> +
+Yes, and a user shouldn't need to know about the implementation details.
 
-I guess this one needs clags, especially -I, like the mconf patch contains...
+> Can just do 'debug$' by the way. No '.*' required.
 
+Yep, I had already figured that out.
 
-> +# Unfortunately, some distributions (e.g. openSUSE) cannot find ncurses
-> +# by pkg-config.
-> +if [ -f /usr/include/ncursesw/ncurses.h ]; then
-> +	echo libs=\"-lncursesw -lmenuw -lpanelw\"
-> +	exit 0
-> +fi
-> +
-> +if [ -f /usr/include/ncurses.h ]; then
-> +	echo libs=\"-lncurses -lmenu -lpanel\"
-> +	exit 0
-> +fi
-> +
-> +echo >&2 "*"
-> +echo >&2 "* Unable to find the ncurses."
-
-                              the ncurses package."
-
-> +echo >&2 "* Install ncurses (ncurses-devel or libncurses-dev"
-> +echo >&2 "* depending on your distribution)"
-
-                                 distribution)."
-
-> +echo >&2 "*"
-> +exit 1
-> 
-
-
+thanks,
 -- 
 ~Randy
