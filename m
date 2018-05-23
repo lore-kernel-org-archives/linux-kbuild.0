@@ -1,25 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:48255 "EHLO
-        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751157AbeEWEsP (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:54092 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934299AbeEWVHd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 May 2018 00:48:15 -0400
-Date: Wed, 23 May 2018 06:48:12 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
+        Wed, 23 May 2018 17:07:33 -0400
 Subject: Re: [PATCH] fixup! kconfig: refactor ncurses package checks for
  building mconf and nconf
-Message-ID: <20180523044812.GA24650@ravnborg.org>
 References: <1527041491-12647-1-git-send-email-yamada.masahiro@socionext.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <55f33ace-61b0-51f8-647b-7238a5ab32b5@infradead.org>
+Date: Wed, 23 May 2018 14:07:26 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <1527041491-12647-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org
 
-On Wed, May 23, 2018 at 11:11:31AM +0900, Masahiro Yamada wrote:
+On 05/22/2018 07:11 PM, Masahiro Yamada wrote:
 > It is redundant to pass -DNCURSES_WIDECHAR=1 explicitly; when we use
 > 'pkg-config --cflags', it takes care of appropriate flags.
 > 
@@ -37,7 +38,14 @@ On Wed, May 23, 2018 at 11:11:31AM +0900, Masahiro Yamada wrote:
 > 
 > I'd like to squash this into it.
 
-Looks good.
-Reviewed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Sure.  Works for me.  Thanks.
 
-	Sam
+> 
+> 
+>  scripts/kconfig/mconf-cfg.sh | 8 ++++----
+>  scripts/kconfig/nconf-cfg.sh | 7 ++++---
+>  2 files changed, 8 insertions(+), 7 deletions(-)
+
+
+-- 
+~Randy
