@@ -1,45 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:40356 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934544AbeEWWxq (ORCPT
+Received: from mail-it0-f67.google.com ([209.85.214.67]:51788 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934770AbeEWX4D (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 May 2018 18:53:46 -0400
-Received: by mail-pg0-f68.google.com with SMTP id l2-v6so10045140pgc.7
-        for <linux-kbuild@vger.kernel.org>; Wed, 23 May 2018 15:53:46 -0700 (PDT)
-Subject: Re: [PATCHv3 2/2] x86/vdso: Add build salt to the vDSO
-References: <20180523001939.9431-1-labbott@redhat.com>
- <20180523001939.9431-3-labbott@redhat.com>
- <CALCETrX9P2Lwrx7wGc22poVWX2AHAqXbUdhcijyoJ3tGhaxijg@mail.gmail.com>
-From: Laura Abbott <labbott@redhat.com>
-Message-ID: <15dcff14-ea1b-18c8-4cd1-06586cf6f05b@redhat.com>
-Date: Wed, 23 May 2018 15:53:39 -0700
+        Wed, 23 May 2018 19:56:03 -0400
 MIME-Version: 1.0
-In-Reply-To: <CALCETrX9P2Lwrx7wGc22poVWX2AHAqXbUdhcijyoJ3tGhaxijg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20180523001939.9431-1-labbott@redhat.com> <20180523001939.9431-3-labbott@redhat.com>
+ <CALCETrX9P2Lwrx7wGc22poVWX2AHAqXbUdhcijyoJ3tGhaxijg@mail.gmail.com> <15dcff14-ea1b-18c8-4cd1-06586cf6f05b@redhat.com>
+In-Reply-To: <15dcff14-ea1b-18c8-4cd1-06586cf6f05b@redhat.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 23 May 2018 16:55:52 -0700
+Message-ID: <CA+55aFxxUadENxUWU8jZqLnG=hvNA-fKCPQUMCKs2r0yWHc=rA@mail.gmail.com>
+Subject: Re: [PATCHv3 2/2] x86/vdso: Add build salt to the vDSO
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Lutomirski <luto@kernel.org>
-Cc: Mark Wielaard <mjw@fedoraproject.org>, "H. J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org
+To: Laura Abbott <labbott@redhat.com>
+Cc: Andrew Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H.J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, the arch/x86 maintainers <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, nickc@redhat.com, ccoutant@gmail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 05/22/2018 05:33 PM, Andy Lutomirski wrote:
-> On Tue, May 22, 2018 at 5:19 PM Laura Abbott <labbott@redhat.com> wrote:
-> 
-> 
->> The vDSO is linked separately from the kernel and modules. Ensure it picks
->> up the comment section, if available.
-> 
-> Did you end up preferring this to just sticking the kernel version in a
-> .comment in the vDSO for some reason?
-> 
+On Wed, May 23, 2018 at 3:53 PM Laura Abbott <labbott@redhat.com> wrote:
 
-Actually I remember now why this is necessary: there is not a simple way
-to encode a string into a linker file as it has to be spit out byte
-by byte. The autogeneration was the easiest way to make that happen.
-Maybe there's some horrific c preprocessing or other generation that
-could happen but I doubt that's any worse than the generated linker
-script.
+> Actually I remember now why this is necessary: there is not a simple way
+> to encode a string into a linker file as it has to be spit out byte
+> by byte.
 
-Thanks,
-Laura
+I think you can use the "fill" thing to basically add any random data to a
+section.
+
+So you can do something like
+
+        . = ALIGN(16);
+        .salt : AT(ADDR(.salt) - LOAD_OFFSET) {
+                LONG(0xffaa5500);
+                . = ALIGN(16);
+        } =0x01234567890abcdef
+
+in the lds file, and you'll get a section that looks like this:
+
+   [torvalds@i7 linux]$ objdump -h vmlinux -j .salt -s
+
+   vmlinux:     file format elf64-x86-64
+
+   Sections:
+    Idx Name          Size      VMA               LMA               File off
+  Algn
+     15 .salt         00000010  ffffffff8432b000  000000000432b000  0352b000
+  2**0
+                      CONTENTS, ALLOC, LOAD, DATA
+    Contents of section .salt:
+     ffffffff8432b000 0055aaff 00123456 7890abcd ef001234  .U....4Vx......4
+
+Now whether that is sufficient for your needs, I dunno.
+
+               Linus
