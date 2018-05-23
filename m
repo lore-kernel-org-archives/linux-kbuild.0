@@ -1,51 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:54092 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934299AbeEWVHd (ORCPT
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:40356 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934544AbeEWWxq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 May 2018 17:07:33 -0400
-Subject: Re: [PATCH] fixup! kconfig: refactor ncurses package checks for
- building mconf and nconf
-References: <1527041491-12647-1-git-send-email-yamada.masahiro@socionext.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <55f33ace-61b0-51f8-647b-7238a5ab32b5@infradead.org>
-Date: Wed, 23 May 2018 14:07:26 -0700
+        Wed, 23 May 2018 18:53:46 -0400
+Received: by mail-pg0-f68.google.com with SMTP id l2-v6so10045140pgc.7
+        for <linux-kbuild@vger.kernel.org>; Wed, 23 May 2018 15:53:46 -0700 (PDT)
+Subject: Re: [PATCHv3 2/2] x86/vdso: Add build salt to the vDSO
+References: <20180523001939.9431-1-labbott@redhat.com>
+ <20180523001939.9431-3-labbott@redhat.com>
+ <CALCETrX9P2Lwrx7wGc22poVWX2AHAqXbUdhcijyoJ3tGhaxijg@mail.gmail.com>
+From: Laura Abbott <labbott@redhat.com>
+Message-ID: <15dcff14-ea1b-18c8-4cd1-06586cf6f05b@redhat.com>
+Date: Wed, 23 May 2018 15:53:39 -0700
 MIME-Version: 1.0
-In-Reply-To: <1527041491-12647-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CALCETrX9P2Lwrx7wGc22poVWX2AHAqXbUdhcijyoJ3tGhaxijg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org
+To: Andy Lutomirski <luto@kernel.org>
+Cc: Mark Wielaard <mjw@fedoraproject.org>, "H. J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org
 
-On 05/22/2018 07:11 PM, Masahiro Yamada wrote:
-> It is redundant to pass -DNCURSES_WIDECHAR=1 explicitly; when we use
-> 'pkg-config --cflags', it takes care of appropriate flags.
+On 05/22/2018 05:33 PM, Andy Lutomirski wrote:
+> On Tue, May 22, 2018 at 5:19 PM Laura Abbott <labbott@redhat.com> wrote:
 > 
-> Actually, 'pkg-config --cflags' will add -D_GNU_SOURCE, which will
-> define _XOPEN_SOURCE_EXTENDED, and NCURSES_WIDECHAR=1, anyway.
 > 
-> I added -D_GNU_SOURCE to follow the suggestion of pkg-config
-> for cases where pkg-config is not useful.
+>> The vDSO is linked separately from the kernel and modules. Ensure it picks
+>> up the comment section, if available.
 > 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+> Did you end up preferring this to just sticking the kernel version in a
+> .comment in the vDSO for some reason?
 > 
-> The v3 (https://patchwork.kernel.org/patch/10417413/) was
-> reviewed and tested.
-> 
-> I'd like to squash this into it.
 
-Sure.  Works for me.  Thanks.
+Actually I remember now why this is necessary: there is not a simple way
+to encode a string into a linker file as it has to be spit out byte
+by byte. The autogeneration was the easiest way to make that happen.
+Maybe there's some horrific c preprocessing or other generation that
+could happen but I doubt that's any worse than the generated linker
+script.
 
-> 
-> 
->  scripts/kconfig/mconf-cfg.sh | 8 ++++----
->  scripts/kconfig/nconf-cfg.sh | 7 ++++---
->  2 files changed, 8 insertions(+), 7 deletions(-)
-
-
--- 
-~Randy
+Thanks,
+Laura
