@@ -1,116 +1,172 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f67.google.com ([209.85.218.67]:41302 "EHLO
-        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935440AbeEXCQF (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:28395 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751591AbeEXEqB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 May 2018 22:16:05 -0400
-Received: by mail-oi0-f67.google.com with SMTP id 11-v6so65160ois.8
-        for <linux-kbuild@vger.kernel.org>; Wed, 23 May 2018 19:16:05 -0700 (PDT)
-Subject: Re: [PATCHv3 2/2] x86/vdso: Add build salt to the vDSO
-References: <20180523001939.9431-1-labbott@redhat.com>
- <20180523001939.9431-3-labbott@redhat.com>
- <CALCETrX9P2Lwrx7wGc22poVWX2AHAqXbUdhcijyoJ3tGhaxijg@mail.gmail.com>
- <15dcff14-ea1b-18c8-4cd1-06586cf6f05b@redhat.com>
- <CAK7LNARMJ0WNnxWXPxpyq_K_osBTRZB+0-Vo5XS_ME9GyZ0UxQ@mail.gmail.com>
- <CAK7LNARYXqx6U+fA2AuY00vMkMDbcNSf-VG_Avf+9j5AMLSsJw@mail.gmail.com>
-From: Laura Abbott <labbott@redhat.com>
-Message-ID: <f930aa34-c8d1-6e78-2c0f-363c0be1c9a6@redhat.com>
-Date: Wed, 23 May 2018 19:16:02 -0700
+        Thu, 24 May 2018 00:46:01 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNARYXqx6U+fA2AuY00vMkMDbcNSf-VG_Avf+9j5AMLSsJw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAFkk2KT0PAS8=bqHeSux3XwUx4fwKKqQoJkGeXRo8DHtEQNrDQ@mail.gmail.com>
+References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
+ <1526537830-22606-4-git-send-email-yamada.masahiro@socionext.com>
+ <CAFkk2KQUps1rhjxdOVz5Mkt+p7VkHX+o5aHvP3u0Hka0_ULcow@mail.gmail.com>
+ <CAK7LNARP2b=jN_ioj3dT=3yiSTv7Ezu-MSPuh0vO30irN5D1nA@mail.gmail.com> <CAFkk2KT0PAS8=bqHeSux3XwUx4fwKKqQoJkGeXRo8DHtEQNrDQ@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 24 May 2018 13:45:15 +0900
+Message-ID: <CAK7LNARMMWj+z_E7urs4kOFMC4+1NiCYt4ueB6gVFr86vgiVKg@mail.gmail.com>
+Subject: Re: [PATCH v4 03/31] kconfig: reference environment variables
+ directly and remove 'option env='
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H. J. Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>
 
-On 05/23/2018 06:43 PM, Masahiro Yamada wrote:
-> 2018-05-24 9:11 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->> 2018-05-24 7:53 GMT+09:00 Laura Abbott <labbott@redhat.com>:
->>> On 05/22/2018 05:33 PM, Andy Lutomirski wrote:
->>>>
->>>> On Tue, May 22, 2018 at 5:19 PM Laura Abbott <labbott@redhat.com> wrote:
->>>>
->>>>
->>>>> The vDSO is linked separately from the kernel and modules. Ensure it
->>>>> picks
->>>>> up the comment section, if available.
->>>>
->>>>
->>>> Did you end up preferring this to just sticking the kernel version in a
->>>> .comment in the vDSO for some reason?
->>>>
->>>
->>> Actually I remember now why this is necessary: there is not a simple way
->>> to encode a string into a linker file as it has to be spit out byte
->>> by byte. The autogeneration was the easiest way to make that happen.
->>> Maybe there's some horrific c preprocessing or other generation that
->>> could happen but I doubt that's any worse than the generated linker
->>> script.
->>>
->>
->>
->> I am personally prefer CONFIG option (as you did in v2) to KERNELVERSION.
->>
->>
->> If you use "hex" type instead of "string" type in Kconfig,
->> and LONG() instead of BYTE() in the script script,
->> this can be much simpler, right?
->>
->>
->>
->>
->>
->> config BUILD_ID_SALT
->>          hex "Build ID Salt"
->>          help
->>             ...
->>
->>
->>
->>
->> Then, in scripts/Makefile,
->>
->>
->> define filechk_build-salt.lds
->>          { \
->>                  echo "SECTIONS {"; \
->>                  echo ".comment (INFO) : { LONG($(CONFIG_BUILD_ID_SALT)); }"; \
->>                  echo "}"; \
->>          }
->> endef
->>
->> $(obj)/build-salt.lds: $(src)/Makefile FORCE
->>          $(call filechk,build-salt.lds)
->>
->>
->>
->>
->> This is now so simple that we can even remove the shell script.
-> 
-> 
-> 
-> I had not noticed the comments from Linus and Andy
-> before I posted mine.
-> 
-> 
-> Maybe, we should not add binary data into the .comment section.
-> 
-> 
-> 
+2018-05-21 20:06 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
 
-The comments from Linus and Andy apply to the vDSO but I don't
-think they work for the kernel/modules. We need something that
-can apply to every module and the kernel and the linker script
-seems like easiest way to do that. The vDSO is a self-contained
-binary so it makes sense to not use the linker script there and
-instead throw something in one of the existing files.
+>>
+>> static char *__expand_string(const char **str, bool (*is_end)(const char *))
+>> {
+>>         const char *in, *prev_in, *p;
+>>         char *new, *out;
+>>         size_t outlen;
+>>
+>>         out = xmalloc(1);
+>>         *out = 0;
+>>
+>>         p = in = *str;
+>>
+>>         while (1) {
+>>                 if (*p == '$') {
+>>                         prev_in = in;
+>>                         in = p + 1;
+>>                         new = expand_dollar(&in);
+>>                         outlen = strlen(out) + (p - prev_in) + strlen(new) + 1;
+>>                         out = xrealloc(out, outlen);
+>>                         strncat(out, prev_in, p - prev_in);
+>>                         strcat(out, new);
+>>                         free(new);
+>>                         p = in;
+>>                         continue;
+>>                 }
+>>
+>>                 if (is_end(p))
+>>                         break;
+>>
+>>                 p++;
+>>         }
+>>
+>>         outlen = strlen(out) + (p - in) + 1;
+>>         out = xrealloc(out, outlen);
+>>         strncat(out, in, p - in);
+>>
+>>         *str = p;
+>>
+>>         return out;
+>> }
+>>
+>> static bool is_end_of_str(const char *s)
+>> {
+>>         return !*s;
+>> }
+>>
+>> char *expand_string(const char *in)
+>> {
+>>         return __expand_string(&in, is_end_of_str);
+>> }
+>>
+>> static bool is_end_of_token(const char *s)
+>> {
+>>         return !(isalnum(*s) || *s == '_' || *s == '-' || *s == '.' ||
+>> *s == '/');
+>> }
+>>
+>> char *expand_one_token(const char **str)
+>> {
+>>         return __expand_string(str, is_end_of_token);
+>> }
+>
+> Yep, something like that would be nicer I think.
+>
+> This variant might work too (untested):
+>
+>   dollar_i = p;
+>   p++;
+>   expansion = expand_dollar(&p);
+>
+>   out = xrealloc(out, strlen(out) + (dollar_i - in)
+>                       + strlen(expansion) + 1);
+>   strncat(out, in, dollar_i - in);
+>   strcat(out, expansion);
+>   free(expansion);
+>
+>   in = p;
+>
+>   continue;
+>
+> The p++ would disappear if expand_dollar() took a pointer to the '$'.
+>
 
-I'm kind of iffy about making the build-id salt a hex string
-since that requires bit more work to generate. I'll experiment
-in a new version.
 
-Thanks,
-Laura
+I took the variable name "expansion" because
+it is more descriptive than "new".
+
+
+I rewrote like follows:
+
+
+static char *__expand_string(const char **str, bool (*is_end)(const char *))
+{
+        const char *in, *p;
+        char *expansion, *out;
+        size_t in_len, out_len;
+
+        out = xmalloc(1);
+        *out = 0;
+        out_len = 1;
+
+        p = in = *str;
+
+        while (1) {
+                if (*p == '$') {
+                        in_len = p - in;
+                        p++;
+                        expansion = expand_dollar(&p);
+                        out_len += in_len + strlen(expansion);
+                        out = xrealloc(out, out_len);
+                        strncat(out, in, in_len);
+                        strcat(out, expansion);
+                        free(expansion);
+                        in = p;
+                        continue;
+                }
+
+                if (is_end(p))
+                        break;
+
+                p++;
+        }
+
+        in_len = p - in;
+        out_len += in_len;
+        out = xrealloc(out, out_len);
+        strncat(out, in, in_len);
+
+        /* Advance 'str' to the end character */
+        *str = p;
+
+        return out;
+}
+
+
+
+I used "out_len" to remember the length of "out"
+instead of calculating strlen(out) every time.
+
+I do not need dollar_p.
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
