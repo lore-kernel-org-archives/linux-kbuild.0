@@ -1,89 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:26694 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933416AbeEXAMv (ORCPT
+Received: from mail-ot0-f194.google.com ([74.125.82.194]:40290 "EHLO
+        mail-ot0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935347AbeEXBgM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 May 2018 20:12:51 -0400
-MIME-Version: 1.0
-In-Reply-To: <15dcff14-ea1b-18c8-4cd1-06586cf6f05b@redhat.com>
-References: <20180523001939.9431-1-labbott@redhat.com> <20180523001939.9431-3-labbott@redhat.com>
- <CALCETrX9P2Lwrx7wGc22poVWX2AHAqXbUdhcijyoJ3tGhaxijg@mail.gmail.com> <15dcff14-ea1b-18c8-4cd1-06586cf6f05b@redhat.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 24 May 2018 09:11:47 +0900
-Message-ID: <CAK7LNARMJ0WNnxWXPxpyq_K_osBTRZB+0-Vo5XS_ME9GyZ0UxQ@mail.gmail.com>
+        Wed, 23 May 2018 21:36:12 -0400
+Received: by mail-ot0-f194.google.com with SMTP id n1-v6so5106otf.7
+        for <linux-kbuild@vger.kernel.org>; Wed, 23 May 2018 18:36:12 -0700 (PDT)
 Subject: Re: [PATCHv3 2/2] x86/vdso: Add build salt to the vDSO
-Content-Type: text/plain; charset="UTF-8"
+References: <20180523001939.9431-1-labbott@redhat.com>
+ <20180523001939.9431-3-labbott@redhat.com>
+ <CALCETrX9P2Lwrx7wGc22poVWX2AHAqXbUdhcijyoJ3tGhaxijg@mail.gmail.com>
+ <15dcff14-ea1b-18c8-4cd1-06586cf6f05b@redhat.com>
+ <CA+55aFxxUadENxUWU8jZqLnG=hvNA-fKCPQUMCKs2r0yWHc=rA@mail.gmail.com>
+ <195C83C0-067C-4B55-89BD-9CF3155C6E69@amacapital.net>
+ <CA+55aFxXCWc5qCAsuRmrCGqL7ws4f6B_zy1WR98kHgr_XZs3fw@mail.gmail.com>
+From: Laura Abbott <labbott@redhat.com>
+Message-ID: <6b4c2c4f-00db-22b7-db3a-a1e76899c6d0@redhat.com>
+Date: Wed, 23 May 2018 18:36:08 -0700
+MIME-Version: 1.0
+In-Reply-To: <CA+55aFxXCWc5qCAsuRmrCGqL7ws4f6B_zy1WR98kHgr_XZs3fw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H. J. Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>, Andy Lutomirski <luto@amacapital.net>
+Cc: Andrew Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H.J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, the arch/x86 maintainers <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, nickc@redhat.com, ccoutant@gmail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-05-24 7:53 GMT+09:00 Laura Abbott <labbott@redhat.com>:
-> On 05/22/2018 05:33 PM, Andy Lutomirski wrote:
->>
->> On Tue, May 22, 2018 at 5:19 PM Laura Abbott <labbott@redhat.com> wrote:
->>
->>
->>> The vDSO is linked separately from the kernel and modules. Ensure it
->>> picks
->>> up the comment section, if available.
->>
->>
->> Did you end up preferring this to just sticking the kernel version in a
->> .comment in the vDSO for some reason?
->>
->
-> Actually I remember now why this is necessary: there is not a simple way
-> to encode a string into a linker file as it has to be spit out byte
-> by byte. The autogeneration was the easiest way to make that happen.
-> Maybe there's some horrific c preprocessing or other generation that
-> could happen but I doubt that's any worse than the generated linker
-> script.
->
+On 05/23/2018 05:06 PM, Linus Torvalds wrote:
+> 
+> 
+> On Wed, May 23, 2018, 17:01 Andy Lutomirski <luto@amacapital.net <mailto:luto@amacapital.net>> wrote:
+> 
+> 
+>     I don’t know whether I’m missing something obvious, but can’t this be in C?
+> 
+> 
+> Yes, but I thought Laura wanted to limit it to linker file tricks (this thread has gone on for so long that I've forgotten the details of why).
+> 
+>         Linus
+> 
+> 
 
+So we have to update the kernel and every module and the easiest way
+to do that was the linker script. I was assuming I'd just use the
+same approach for the vDSO but you're right that there's no reason
+we can't apply a different technique. I notice there's already a
+vdso-note.S which adds LINUX_VERSION_CODE as a note. This doesn't
+include the extra version so it doesn't quite meet our needs.
+There's no reason why we can't throw something else in there for
+good measure.
 
-I am personally prefer CONFIG option (as you did in v2) to KERNELVERSION.
-
-
-If you use "hex" type instead of "string" type in Kconfig,
-and LONG() instead of BYTE() in the script script,
-this can be much simpler, right?
-
-
-
-
-
-config BUILD_ID_SALT
-        hex "Build ID Salt"
-        help
-           ...
-
-
-
-
-Then, in scripts/Makefile,
-
-
-define filechk_build-salt.lds
-        { \
-                echo "SECTIONS {"; \
-                echo ".comment (INFO) : { LONG($(CONFIG_BUILD_ID_SALT)); }"; \
-                echo "}"; \
-        }
-endef
-
-$(obj)/build-salt.lds: $(src)/Makefile FORCE
-        $(call filechk,build-salt.lds)
-
-
-
-
-This is now so simple that we can even remove the shell script.
-
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Thanks,
+Laura
