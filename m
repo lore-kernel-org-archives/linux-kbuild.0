@@ -1,94 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:27450 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935287AbeEXBow (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:27746 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935372AbeEXB4k (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 May 2018 21:44:52 -0400
+        Wed, 23 May 2018 21:56:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNARMJ0WNnxWXPxpyq_K_osBTRZB+0-Vo5XS_ME9GyZ0UxQ@mail.gmail.com>
+In-Reply-To: <20180523001939.9431-3-labbott@redhat.com>
 References: <20180523001939.9431-1-labbott@redhat.com> <20180523001939.9431-3-labbott@redhat.com>
- <CALCETrX9P2Lwrx7wGc22poVWX2AHAqXbUdhcijyoJ3tGhaxijg@mail.gmail.com>
- <15dcff14-ea1b-18c8-4cd1-06586cf6f05b@redhat.com> <CAK7LNARMJ0WNnxWXPxpyq_K_osBTRZB+0-Vo5XS_ME9GyZ0UxQ@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 24 May 2018 10:43:55 +0900
-Message-ID: <CAK7LNARYXqx6U+fA2AuY00vMkMDbcNSf-VG_Avf+9j5AMLSsJw@mail.gmail.com>
+Date: Thu, 24 May 2018 10:55:33 +0900
+Message-ID: <CAK7LNATRqL8JcnED8L1b6XZbVYVp0j34=XFf=yKCHpSa2d8qKQ@mail.gmail.com>
 Subject: Re: [PATCHv3 2/2] x86/vdso: Add build salt to the vDSO
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Laura Abbott <labbott@redhat.com>
-Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H. J. Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-05-24 9:11 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> 2018-05-24 7:53 GMT+09:00 Laura Abbott <labbott@redhat.com>:
->> On 05/22/2018 05:33 PM, Andy Lutomirski wrote:
->>>
->>> On Tue, May 22, 2018 at 5:19 PM Laura Abbott <labbott@redhat.com> wrote:
->>>
->>>
->>>> The vDSO is linked separately from the kernel and modules. Ensure it
->>>> picks
->>>> up the comment section, if available.
->>>
->>>
->>> Did you end up preferring this to just sticking the kernel version in a
->>> .comment in the vDSO for some reason?
->>>
->>
->> Actually I remember now why this is necessary: there is not a simple way
->> to encode a string into a linker file as it has to be spit out byte
->> by byte. The autogeneration was the easiest way to make that happen.
->> Maybe there's some horrific c preprocessing or other generation that
->> could happen but I doubt that's any worse than the generated linker
->> script.
->>
+2018-05-23 9:19 GMT+09:00 Laura Abbott <labbott@redhat.com>:
 >
+> The vDSO is linked separately from the kernel and modules. Ensure it picks
+> up the comment section, if available.
 >
-> I am personally prefer CONFIG option (as you did in v2) to KERNELVERSION.
->
->
-> If you use "hex" type instead of "string" type in Kconfig,
-> and LONG() instead of BYTE() in the script script,
-> this can be much simpler, right?
->
->
->
->
->
-> config BUILD_ID_SALT
->         hex "Build ID Salt"
->         help
->            ...
->
->
->
->
-> Then, in scripts/Makefile,
->
->
-> define filechk_build-salt.lds
->         { \
->                 echo "SECTIONS {"; \
->                 echo ".comment (INFO) : { LONG($(CONFIG_BUILD_ID_SALT)); }"; \
->                 echo "}"; \
->         }
-> endef
->
-> $(obj)/build-salt.lds: $(src)/Makefile FORCE
->         $(call filechk,build-salt.lds)
->
->
->
->
-> This is now so simple that we can even remove the shell script.
+> Signed-off-by: Laura Abbott <labbott@redhat.com>
+> ---
+> v3: Invoke the generated linker script. The ".." nightmare is pretty
+> ugly but I didn't see an easier way to pick up the generated file.
+> That was actually part of my motivation for using an #include since
+> paths for those are standardized.
 
 
+Maybe, you found a different approach.
 
-I had not noticed the comments from Linus and Andy
-before I posted mine.
+FWIW,
 
+If you use the linker script approach, you could simply use
 
-Maybe, we should not add binary data into the .comment section.
+scripts/build-salt.lds
+
+  instead of
+
+$(obj)/../../../../scripts/build-salt.lds
+
 
 
 
