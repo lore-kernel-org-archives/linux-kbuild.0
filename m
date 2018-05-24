@@ -1,76 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:60429 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1030707AbeEXOLS (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:34343 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1030742AbeEXOWY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 24 May 2018 10:11:18 -0400
+        Thu, 24 May 2018 10:22:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <1526973741-664-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1526973741-664-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <20180523044609.GA23800@ravnborg.org>
+References: <20180522194928.GA29900@ravnborg.org> <CAK7LNAQUF6YbHRTJOtQ9F91M-iqF1U+PemDAbsdx3qzcqg4Ufw@mail.gmail.com>
+ <CAK7LNAQWHeR71=H5Z94jAMjRjE-kmjFaPrQy6_cd5=G_WHEpUw@mail.gmail.com> <20180523044609.GA23800@ravnborg.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 24 May 2018 23:10:31 +0900
-Message-ID: <CAK7LNAT88uzCRpH18GT3Hy2M_MPFx0Y4DLijk2gjHRHDr9-DWA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] kconfig: refactor package checks for GUI frontends
+Date: Thu, 24 May 2018 23:21:26 +0900
+Message-ID: <CAK7LNARata6s_Dm_ykVNX2o15psE0LyuFvXQFESa7=n58s+nxg@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/1] kconfig: drop localization support
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Philippe Ombredanne <pombredanne@nexb.com>, Michal Marek <michal.lkml@markovi.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arvind Prasanna <arvindprasanna@gmail.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>
 
-2018-05-22 16:22 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->
-> Kconfig supports 4 GUI frontends.
-> Each of them needs some support packages, but checks them differently:
->
->   qconf, gconf: check packages in Makefile (pkg-config is required)
->   mconf: lxdialog/check-lxdialog.sh
->   nconf: needs ncurses, but its presence is not checked
->
-> This series refactor the package checks so that all of them work
-> in the same way.
->
-> The package check scripts have been moved to scripts/kconfig/*conf-cfg.sh
->
-> The motivation of this clean-up is Randy's following patch:
-> https://patchwork.kernel.org/patch/10277723/
->
-> I want to clean up existing code before adding more checks.
->
->
-> Masahiro Yamada (4):
->   kbuild: do not display CHK for filechk
->   kconfig: refactor Qt package checks for building qconf
->   kconfig: refactor GTK+ package checks for building gconf
->   kconfig: refactor ncurses package checks for building mconf and nconf
-
-
-Applied to linux-kbuild/kconfig.
+Hi Sam,
 
 
 
-
->  scripts/Kbuild.include                     |   1 -
->  scripts/kconfig/Makefile                   | 168 ++++++++++-------------------
->  scripts/kconfig/gconf-cfg.sh               |  23 ++++
->  scripts/kconfig/lxdialog/check-lxdialog.sh |  93 ----------------
->  scripts/kconfig/lxdialog/dialog.h          |   2 +-
->  scripts/kconfig/mconf-cfg.sh               |  44 ++++++++
->  scripts/kconfig/nconf-cfg.sh               |  43 ++++++++
->  scripts/kconfig/qconf-cfg.sh               |  25 +++++
->  8 files changed, 195 insertions(+), 204 deletions(-)
->  create mode 100755 scripts/kconfig/gconf-cfg.sh
->  delete mode 100755 scripts/kconfig/lxdialog/check-lxdialog.sh
->  create mode 100755 scripts/kconfig/mconf-cfg.sh
->  create mode 100644 scripts/kconfig/nconf-cfg.sh
->  create mode 100755 scripts/kconfig/qconf-cfg.sh
+2018-05-23 13:46 GMT+09:00 Sam Ravnborg <sam@ravnborg.org>:
+> Hi Masahiro.
 >
-> --
-> 2.7.4
+>> > Ulf Magnusson originally mentioned this removal some time ago.
+>> >
+>> > So, here is his tag.
+>> > Suggested-by: Ulf Magnusson <ulfalizer@gmail.com>
+> Added.
 >
+>> PHONY += xconfig gconfig menuconfig config syncconfig update-po-config \
+>>      localmodconfig localyesconfig
+>>
+>>
+>> The 'update-po-config' is left-over in the PHONY assignment.
+> Good catch.
+>
+>> This is simple, so I can fix it up locally.
+> Fine
+>
+> If there is any other feedback I will respin the patch.
+>
+>         Sam
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Applied to linux-kbuild/kconfig.  Thanks!
+
+
+When I applied this, I added the following fix-up.
+
+
+
+diff --git a/scripts/kconfig/.gitignore b/scripts/kconfig/.gitignore
+index 54266f3..0aabc1d 100644
+--- a/scripts/kconfig/.gitignore
++++ b/scripts/kconfig/.gitignore
+@@ -2,7 +2,6 @@
+ # Generated files
+ #
+ *.moc
+-*.mo
+
+ #
+ # configuration programs
+
+
+
+
+.mo is no longer generated.
+
+It was added by
+commit c26dd719a5b9d94d12211f2d101bd7dffb7f9f1f
+
+
+
+Please double-check if it is OK.
 
 
 
