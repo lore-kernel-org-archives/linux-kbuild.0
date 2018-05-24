@@ -1,48 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cli-5b7ef064.bcn.adamo.es ([91.126.240.100]:62083 "HELO
-        mail.sysvalve.es" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-        with SMTP id S965306AbeEXIr4 (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:60429 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1030707AbeEXOLS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 24 May 2018 04:47:56 -0400
-Date: Thu, 24 May 2018 10:47:55 +0200
-From: =?iso-8859-1?Q?L=2E_Alberto_Gim=E9nez?= <agimenez@sysvalve.es>
-Subject: Re: [PATCH] build: Exclude cscope and tags files from packaging
-Message-ID: <20180524084754.GA10037@bart.evergreen.loc>
-References: <20180517134838.8403-1-agimenez@sysvalve.es>
- <CAAqcGH=PuRgsDU81R5P=_JSvV+vVqntBO6ivEpY2v8AqKAuGsQ@mail.gmail.com>
+        Thu, 24 May 2018 10:11:18 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAqcGH=PuRgsDU81R5P=_JSvV+vVqntBO6ivEpY2v8AqKAuGsQ@mail.gmail.com>
+In-Reply-To: <1526973741-664-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1526973741-664-1-git-send-email-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 24 May 2018 23:10:31 +0900
+Message-ID: <CAK7LNAT88uzCRpH18GT3Hy2M_MPFx0Y4DLijk2gjHRHDr9-DWA@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] kconfig: refactor package checks for GUI frontends
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Philippe Ombredanne <pombredanne@nexb.com>, Michal Marek <michal.lkml@markovi.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arvind Prasanna <arvindprasanna@gmail.com>
 
-On Mon, May 21, 2018 at 04:06:15PM +0300, Riku Voipio wrote:
-> On 17 May 2018 at 16:48, L. Alberto Giménez <agimenez@sysvalve.es> wrote:
-> > When building a Debian package, cscope and tags generated files are
-> > accounted in the Debian packaging process, even causing some errors
-> > under some circumstances (generating diff between "pristine" tar and
-> > "patched sources").
-> 
-> Honestly you should use make mrproper, if you want to spin out source
-> packages. If otoh you don't have a use for the source package, use
-> bindeb-pkg.
+2018-05-22 16:22 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+>
+> Kconfig supports 4 GUI frontends.
+> Each of them needs some support packages, but checks them differently:
+>
+>   qconf, gconf: check packages in Makefile (pkg-config is required)
+>   mconf: lxdialog/check-lxdialog.sh
+>   nconf: needs ncurses, but its presence is not checked
+>
+> This series refactor the package checks so that all of them work
+> in the same way.
+>
+> The package check scripts have been moved to scripts/kconfig/*conf-cfg.sh
+>
+> The motivation of this clean-up is Randy's following patch:
+> https://patchwork.kernel.org/patch/10277723/
+>
+> I want to clean up existing code before adding more checks.
+>
+>
+> Masahiro Yamada (4):
+>   kbuild: do not display CHK for filechk
+>   kconfig: refactor Qt package checks for building qconf
+>   kconfig: refactor GTK+ package checks for building gconf
+>   kconfig: refactor ncurses package checks for building mconf and nconf
 
-Well, to be honest I just wanted a .deb file to distribute to my VM in order to test
-and squash some bugs quickly, and in my machine, it was causing a recompilation every
-time I tried to build a new package, (26 minutes withh allyes).
 
-I just wanted to speed up things and avoid the full compilation that deb-pkg was
-doing (and mrproper would cause anyway) if I already had everything done.
-
-But I realized that bindeb-pkg does just what I want, so you can ignore this patch,
-sorry for the inconvenience.
+Applied to linux-kbuild/kconfig.
 
 
-Regards,
+
+
+>  scripts/Kbuild.include                     |   1 -
+>  scripts/kconfig/Makefile                   | 168 ++++++++++-------------------
+>  scripts/kconfig/gconf-cfg.sh               |  23 ++++
+>  scripts/kconfig/lxdialog/check-lxdialog.sh |  93 ----------------
+>  scripts/kconfig/lxdialog/dialog.h          |   2 +-
+>  scripts/kconfig/mconf-cfg.sh               |  44 ++++++++
+>  scripts/kconfig/nconf-cfg.sh               |  43 ++++++++
+>  scripts/kconfig/qconf-cfg.sh               |  25 +++++
+>  8 files changed, 195 insertions(+), 204 deletions(-)
+>  create mode 100755 scripts/kconfig/gconf-cfg.sh
+>  delete mode 100755 scripts/kconfig/lxdialog/check-lxdialog.sh
+>  create mode 100755 scripts/kconfig/mconf-cfg.sh
+>  create mode 100644 scripts/kconfig/nconf-cfg.sh
+>  create mode 100755 scripts/kconfig/qconf-cfg.sh
+>
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-L. Alberto Giménez
-GnuPG key ID 0xDD4E27AB
+Best Regards
+Masahiro Yamada
