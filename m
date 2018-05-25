@@ -1,75 +1,167 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:6227 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932570AbeEYDuc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 24 May 2018 23:50:32 -0400
-Subject: Re: Wrong -dirty suffix set by setlocalversion (was: BUG in git
- diff-index)
-References: <89d82c84-7a3b-9c4c-679e-a7a723669592@intel.com>
- <20180524230334.12452-1-michael.w.mason@intel.com>
-From: Marc Herbert <Marc.Herbert@intel.com>
-Message-ID: <0dc31052-4cfd-3b92-0a4a-96c8ecfafff6@intel.com>
-Date: Thu, 24 May 2018 20:50:28 -0700
+Received: from merlin.infradead.org ([205.233.59.134]:47924 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1030616AbeEYWGM (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 25 May 2018 18:06:12 -0400
+Subject: Re: [ANNOUNCE] Kconfiglib menuconfig implementation
+References: <CAFkk2KRTnRpi5thUGTM2+LZMyitggdJtiOBO7E0pTn93fz6-SQ@mail.gmail.com>
+ <d4c3b2ab-385d-fe7a-bdb1-2d497d620de5@infradead.org>
+ <CAFkk2KRozscmd4kQSJKwKmY3WpTody7S5XZZObf8SKLF62k6+w@mail.gmail.com>
+ <CAFkk2KRkEt3+786QvyjzPPAm+3HDe2+ydzZJpshfdKyUDQVfuw@mail.gmail.com>
+ <CAFkk2KRvSxu+x-nb045=3L63KEk5h9URr5QYLPoYp6rqqTR4qA@mail.gmail.com>
+ <3d9be2f2-3fbe-411b-8529-0e0847f01346@infradead.org>
+ <CAFkk2KRWon_S--dxYw82cDyGXKTFA6jxrrQwstzLvHPs=6-dqQ@mail.gmail.com>
+ <c4ec710f-b2bd-b9f0-c33a-159aa53ca73c@infradead.org>
+ <1378afb3-2b0e-da7a-5721-a8fa727e4382@infradead.org>
+ <CAFkk2KS=bYn3t-764CEy+sq9E8FUbWH=L-yQbDhAYQpnrgmsiQ@mail.gmail.com>
+ <4a4b12fc-ab54-20c4-7aa7-a83c4faecf25@infradead.org>
+ <CAFkk2KTrC7DEe7dU4Jq13YBNWGDSa8KmMm0mpFvxokrKeMzCFg@mail.gmail.com>
+ <4310659d-e36f-63d3-88b3-e1c5235679b2@infradead.org>
+ <CAFkk2KQRYG28AY_qLMYOg65nD8FAWhh4Q2d3C3dq87dX66-rSA@mail.gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <c2b18940-3444-98f7-18f3-a96b88997f05@infradead.org>
+Date: Fri, 25 May 2018 15:06:07 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180524230334.12452-1-michael.w.mason@intel.com>
+In-Reply-To: <CAFkk2KQRYG28AY_qLMYOg65nD8FAWhh4Q2d3C3dq87dX66-rSA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Mason <michael.w.mason@intel.com>
-Cc: andy.work@nglowry.com, git@vger.kernel.org, gitster@pobox.com, josh@joshtriplett.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, lists@nerdbynature.de, peff@peff.net, nico-linuxsetlocalversion@schottelius.org
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 24/05/2018 16:03, Mike Mason wrote:
+On 05/22/2018 03:18 AM, Ulf Magnusson wrote:
+> On Mon, May 21, 2018 at 5:47 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
+>> On 05/20/2018 08:33 PM, Ulf Magnusson wrote:
+>>> On Mon, May 21, 2018 at 4:45 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
+>>>> On 05/19/2018 09:47 PM, Ulf Magnusson wrote:
+>>>>> On Sun, May 20, 2018 at 6:03 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
+>>>>>> On 05/19/2018 08:45 PM, Randy Dunlap wrote:
+>>>>>>> On 05/08/2018 09:59 AM, Ulf Magnusson wrote:
+>>>>>>>> Hello,
+>>>>>>>>
+>>>>>>>> I've added incremental search for jumping directly to a symbol now.
+>>>>>>>> Regular expressions are supported as well.
+>>>>>>>>
+>>>>>>>> Some screenshots below:
+>>>>>>>>
+>>>>>>>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss10.png
+>>>>>>>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss11.png
+>>>>>>>> https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/ss13.png
+>>>>>>>>
+>>>>>>>> The last screenshot shows how things might look after you jump to a
+>>>>>>>> symbol. The jumped-to symbol wasn't visible in this case, so show-all
+>>>>>>>> mode was turned on automatically.
+>>>>>>>
+>>>>>>> Hi Ulf,
+>>>>>>>
+>>>>>>>
+>>>>>>>
+>>>>>>> Hm, OK, I used the trick that you supplied a few weeks ago and I have the UI now.
+>>>>>>>
+>>>>>>>     ARCH=x86 SRCARCH=x86 KERNELVERSION=`make kernelversion` \
+>>>>>>>         Kconfiglib/menuconfig.py
+>>>>>>>
+>>>>>>> so yes, a real Makefile target would be nice. :)
+>>>>>>
+>>>>>> I want to see all kconfig symbols that end with "_DEBUG" (so excluding
+>>>>>> _DEBUGFS).  Using:
+>>>>>>
+>>>>>> /.*_DEBUG$
+>>>>>>
+>>>>>> shows me 6 symbols:
+>>>>>> ATH9K_COMMON_DEBUG
+>>>>>> DVB_B2C2_FLEXCOP_DEBUG
+>>>>>> HAVE_DMA_API_DEBUG
+>>>>>> IP_DCCP_TFRC_DEBUG
+>>>>>> NFS_DEBUG
+>>>>>> PM_SLEEP_DEBUG
+>>>>>>
+>>>>>> so where are the other (approx.) 176?
+>>>>>> see:
+>>>>>> $ find . -name Kconfig\* | xargs grep "config.*_DEBUG$" | grep -v \.orig | wc
+>>>>>>     182     364    9179
+>>>>>>
+>>>>>>
+>>>>>> Anyway, something for you to look at. :)
+>>>>>>
+>>>>>> --
+>>>>>> ~Randy
+>>>>>
+>>>>> It's related to how the search is done. Searching for "DEBUG\b" (word
+>>>>> boundary) instead will find all of them.
+>>>>>
+>>>>> A string is generated for each symbol. For symbols with prompts, this
+>>>>> string includes the prompt as well, so you get e.g.
+>>>>>
+>>>>>     AB8500_DEBUG "Enable debug info via debugfs"
+>>>>>
+>>>>> Those strings are then searched/displayed.
+>>>>>
+>>>>> What you got with your search was all symbols whose names end in
+>>>>> "_DEBUG" that don't have a prompt.
+>>>>>
+>>>>> The nice thing about searching both the name and the prompt is that
+>>>>> e.g. "debugfs ab8500" will find the symbol above. I'm also planning to
+>>>>> add menus to the search, by generating 'menu: "menu title"' strings
+>>>>> for them.
+>>>>>
+>>>>> It's a bit awkward/unintuitive that what you tried doesn't work
+>>>>> though. Maybe the symbol name could be searched separately from the
+>>>>> prompt, though I'd be a bit sad to abandon the super simple
+>>>>> single-string-per-entry implementation approach. :)
+>>>>
+>>>> Hi Ulf,
+>>>>
+>>>> What else are you planning to do with /(search)?
+>>>
+>>> Here's the stuff I've thought of so far:
+>>>
+>>>   - Display invisible symbols in red (to match show-all mode)
+>>>
+>>>   - Search prompts of menus and comments as well
+>>>
+>>>   - Have [F1] show the help display without canceling the search,
+>>>     so you can quickly scan through a bunch of symbols
+>>>
+>>> Maybe you could get fancy with stuff like finding symbols that are
+>>> related to other symbols in particular ways too...
+>>>
+>>>> /syscall lists 20 or so symbols. It would be nice if each one of those
+>>>> showed its current setting [y,n,maybe^Wm].
+>>>
+>>> Nice idea. I added it:
+>>> https://github.com/ulfalizer/Kconfiglib/commit/3161affaa5bb8350a39bfd305c56171a25b02151
+>>>
+>>> Works for strings/int/hex too.
+>>
+>> Thanks.
+>>
+>>>> I like Toggle show-all mode.  When I use xconfig, I usually turn on most
+>>>> of its options, including one like that.
+>>>
+>>> IIRC, xconfig doesn't make it very clear which symbols are invisible
+>>> in show-all mode. That's why I made them red.
+>>
+>> Yes, that's helpful.
+>>
+>>
+>> --
+>> ~Randy
+> 
+> Hello,
+> 
+> I've added a mode that lists the names of all symbols in the menu now
+> as well, toggled with 'c' ('n' was taken :).
+> 
+> Any other features you miss from xconfig? Other suggestions?
 
-> diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-> index 71f39410691b..9da4c5e83285 100755
-> --- a/scripts/setlocalversion
-> +++ b/scripts/setlocalversion
-> @@ -73,8 +73,10 @@ scm_version()
->  			printf -- '-svn%s' "`git svn find-rev $head`"
->  		fi
->  
-> -		# Check for uncommitted changes
-> -		if git diff-index --name-only HEAD | grep -qv "^scripts/package"; then
-> +		# Check for uncommitted changes. Only check mtime and size.
-> +       # Ignore insequential ctime, uid, gid and inode differences.
-> +		if git -c "core.checkstat=minimal" diff-index --name-only HEAD | \
-> +				grep -qv "^scripts/package"; then
->  			printf '%s' -dirty
->  		fi
+Hi Ulf,
 
-FWIW:
+Nothing comes to mind just now.  I'll let you know if I think of anything else.
 
-Reported-by: Marc.Herbert@intel.com
-Reviewed-by: Marc.Herbert@intel.com  (assuming a future and decent commit message)
-Tested-by: Marc.Herbert@intel.com
-
-
-So the real use case is making a copy of a whole tree before building.
-Typical in automated builds, old example:
-https://groups.google.com/a/chromium.org/d/msg/chromium-os-dev/zxOa0OLWFkw/N_Sb7EZOBwAJ 
-
-Here's a more complex but faster and more transparent way to test Mike's fix
-than copying an entire tree:
-
-# Make sure you start from a clean state
-git describe --dirty      # must not -dirty
-
-make prepare
-
-# Simulate a copy of the tree but with just one file
-rsync --perms --times  README   README.mtime_backup
-rm  README
-rsync --perms --times  README.mtime_backup   README
-stat  README  README.mtime_backup 
-
-# Demo the BUG fixed by Mike
-./scripts/setlocalversion # -dirty BUG! because spurious inode ctime difference
-git diff-index  HEAD
-git describe --dirty      # not -dirty
-./scripts/setlocalversion # not -dirty any more cause describe refreshed index
-
-# Make sure mtime still causes -dirty with AND without Mike's fix
-touch README
-./scripts/setlocalversion # -dirty
+thanks,
+-- 
+~Randy
