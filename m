@@ -1,184 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot0-f172.google.com ([74.125.82.172]:42123 "EHLO
-        mail-ot0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1032376AbeEZUru (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:23315 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934160AbeE0IxK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 26 May 2018 16:47:50 -0400
+        Sun, 27 May 2018 04:53:10 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNARMMWj+z_E7urs4kOFMC4+1NiCYt4ueB6gVFr86vgiVKg@mail.gmail.com>
-References: <1526537830-22606-1-git-send-email-yamada.masahiro@socionext.com>
- <1526537830-22606-4-git-send-email-yamada.masahiro@socionext.com>
- <CAFkk2KQUps1rhjxdOVz5Mkt+p7VkHX+o5aHvP3u0Hka0_ULcow@mail.gmail.com>
- <CAK7LNARP2b=jN_ioj3dT=3yiSTv7Ezu-MSPuh0vO30irN5D1nA@mail.gmail.com>
- <CAFkk2KT0PAS8=bqHeSux3XwUx4fwKKqQoJkGeXRo8DHtEQNrDQ@mail.gmail.com> <CAK7LNARMMWj+z_E7urs4kOFMC4+1NiCYt4ueB6gVFr86vgiVKg@mail.gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Sat, 26 May 2018 22:47:49 +0200
-Message-ID: <CAFkk2KQZV35nQFALHz4ADrrBXOaLirVEf1Z5TAU3zuHDPL1SWw@mail.gmail.com>
-Subject: Re: [PATCH v4 03/31] kconfig: reference environment variables
- directly and remove 'option env='
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 27 May 2018 17:52:09 +0900
+Message-ID: <CAK7LNASasVNYmXu3tgLaG7rePhvKJ1exMjQ0iBjVRwKUMWYNYg@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v4.17-rc7
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, X86 ML <x86@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-On Thu, May 24, 2018 at 6:45 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2018-05-21 20:06 GMT+09:00 Ulf Magnusson <ulfalizer@gmail.com>:
->
->>>
->>> static char *__expand_string(const char **str, bool (*is_end)(const char *))
->>> {
->>>         const char *in, *prev_in, *p;
->>>         char *new, *out;
->>>         size_t outlen;
->>>
->>>         out = xmalloc(1);
->>>         *out = 0;
->>>
->>>         p = in = *str;
->>>
->>>         while (1) {
->>>                 if (*p == '$') {
->>>                         prev_in = in;
->>>                         in = p + 1;
->>>                         new = expand_dollar(&in);
->>>                         outlen = strlen(out) + (p - prev_in) + strlen(new) + 1;
->>>                         out = xrealloc(out, outlen);
->>>                         strncat(out, prev_in, p - prev_in);
->>>                         strcat(out, new);
->>>                         free(new);
->>>                         p = in;
->>>                         continue;
->>>                 }
->>>
->>>                 if (is_end(p))
->>>                         break;
->>>
->>>                 p++;
->>>         }
->>>
->>>         outlen = strlen(out) + (p - in) + 1;
->>>         out = xrealloc(out, outlen);
->>>         strncat(out, in, p - in);
->>>
->>>         *str = p;
->>>
->>>         return out;
->>> }
->>>
->>> static bool is_end_of_str(const char *s)
->>> {
->>>         return !*s;
->>> }
->>>
->>> char *expand_string(const char *in)
->>> {
->>>         return __expand_string(&in, is_end_of_str);
->>> }
->>>
->>> static bool is_end_of_token(const char *s)
->>> {
->>>         return !(isalnum(*s) || *s == '_' || *s == '-' || *s == '.' ||
->>> *s == '/');
->>> }
->>>
->>> char *expand_one_token(const char **str)
->>> {
->>>         return __expand_string(str, is_end_of_token);
->>> }
->>
->> Yep, something like that would be nicer I think.
->>
->> This variant might work too (untested):
->>
->>   dollar_i = p;
->>   p++;
->>   expansion = expand_dollar(&p);
->>
->>   out = xrealloc(out, strlen(out) + (dollar_i - in)
->>                       + strlen(expansion) + 1);
->>   strncat(out, in, dollar_i - in);
->>   strcat(out, expansion);
->>   free(expansion);
->>
->>   in = p;
->>
->>   continue;
->>
->> The p++ would disappear if expand_dollar() took a pointer to the '$'.
->>
->
->
-> I took the variable name "expansion" because
-> it is more descriptive than "new".
->
->
-> I rewrote like follows:
->
->
-> static char *__expand_string(const char **str, bool (*is_end)(const char *))
-> {
->         const char *in, *p;
->         char *expansion, *out;
->         size_t in_len, out_len;
->
->         out = xmalloc(1);
->         *out = 0;
->         out_len = 1;
->
->         p = in = *str;
->
->         while (1) {
->                 if (*p == '$') {
->                         in_len = p - in;
->                         p++;
->                         expansion = expand_dollar(&p);
->                         out_len += in_len + strlen(expansion);
->                         out = xrealloc(out, out_len);
->                         strncat(out, in, in_len);
->                         strcat(out, expansion);
->                         free(expansion);
->                         in = p;
->                         continue;
->                 }
->
->                 if (is_end(p))
->                         break;
->
->                 p++;
->         }
->
->         in_len = p - in;
->         out_len += in_len;
->         out = xrealloc(out, out_len);
->         strncat(out, in, in_len);
->
->         /* Advance 'str' to the end character */
->         *str = p;
->
->         return out;
-> }
->
->
->
-> I used "out_len" to remember the length of "out"
-> instead of calculating strlen(out) every time.
->
-> I do not need dollar_p.
->
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+Hi Linus,
 
-Looks good to me.
 
-Could keep some 'out' pointer to avoid the str(n)cat()s too, but
-pretty sure it's overkilling it. Should have some general string
-buffer helpers at that point I think. :)
+Please pull a little more Kbuild fixes for v4.17
+Thanks.
 
-Cheers,
-Ulf
+
+
+The following changes since commit 75bc37fefc4471e718ba8e651aa74673d4e0a9eb:
+
+  Linux 4.17-rc4 (2018-05-06 16:57:38 -1000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v4.17-2
+
+for you to fetch changes up to 8438ee76b004ef66d125ade64c91fc128047d244:
+
+  Makefile: disable PIE before testing asm goto (2018-05-17 22:36:40 +0900)
+
+----------------------------------------------------------------
+Kbuild fixes for v4.17 (2nd)
+
+- enable -fno-tree-loop-im only when supported
+
+- add -fno-PIE option before the asm-goto test
+
+----------------------------------------------------------------
+Michal Kubecek (1):
+      Makefile: disable PIE before testing asm goto
+
+Nick Desaulniers (1):
+      kbuild: gcov: enable -fno-tree-loop-im if supported
+
+ Makefile | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+-- 
+Best Regards
+Masahiro Yamada
