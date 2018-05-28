@@ -1,42 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:53940 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S937436AbeE1Nra (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.13]:40771 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1032932AbeE1Pcm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 May 2018 09:47:30 -0400
-From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: [PATCH] kbuild: $(CHECK) doesnt need NOSTDINC_FLAGS twice
-Date: Mon, 28 May 2018 15:47:22 +0200
-Message-Id: <20180528134722.11358-1-luc.vanoostenryck@gmail.com>
+        Mon, 28 May 2018 11:32:42 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] [net-next, wrong] make BPFILTER_UMH depend on X86
+Date: Mon, 28 May 2018 17:31:01 +0200
+Message-Id: <20180528153222.2037158-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Currently, $(CHECK) receives NOSTDINC_FLAGS twice:
-* first directly in the main Makefile via CHECKFLAGS,
-* then indirectly in scripts/Makefile.build via c_flags.
+When build testing across architectures, I run into a build error on
+all targets other than X86:
 
-Since once is enough, leave the occurence via c_flags and
-remove the one via CHECKFLAGS.
+gcc-8.1.0-nolibc/arm-linux-gnueabi/bin/arm-linux-gnueabi-objdump: net/bpfilter/bpfilter_umh: File format not recognized
+gcc-8.1.0-nolibc/arm-linux-gnueabi/bin/arm-linux-gnueabi-objcopy:net/bpfilter/bpfilter_umh.o: Invalid bfd target
 
-Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+The problem is that 'hostprogs' get built with 'gcc' rather than
+'$(CROSS_COMPILE)gcc', and my default gcc (as most people's) targets x86.
+
+To work around it, adding an X86 dependency gets randconfigs building
+again on my box.
+
+Clearly, this is not a good solution, since it should actually work fine
+when building native kernels on other architectures but that is now
+disabled, while cross building an x86 kernel on another host is still
+broken after my patch.
+
+What we probably want here is to try out if the compiler is able to build
+executables for the target architecture and not build the helper otherwise,
+at least when compile-testing. No idea how to do that though.
+
+Link: http://www.kernel.org/pub/tools/crosstool/
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- Makefile | 1 -
- 1 file changed, 1 deletion(-)
+ net/bpfilter/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Makefile b/Makefile
-index 56ba070df..3140ab1db 100644
---- a/Makefile
-+++ b/Makefile
-@@ -808,7 +808,6 @@ endif
- 
- # arch Makefile may override CC so keep this after arch Makefile is included
- NOSTDINC_FLAGS += -nostdinc -isystem $(call shell-cached,$(CC) -print-file-name=include)
--CHECKFLAGS     += $(NOSTDINC_FLAGS)
- 
- # warn about C99 declaration after statement
- KBUILD_CFLAGS += $(call cc-option,-Wdeclaration-after-statement,)
+diff --git a/net/bpfilter/Kconfig b/net/bpfilter/Kconfig
+index 60725c5f79db..61cc4fcbb4d0 100644
+--- a/net/bpfilter/Kconfig
++++ b/net/bpfilter/Kconfig
+@@ -9,6 +9,7 @@ menuconfig BPFILTER
+ if BPFILTER
+ config BPFILTER_UMH
+ 	tristate "bpfilter kernel module with user mode helper"
++	depends on X86 # actually depends on native builds
+ 	default m
+ 	help
+ 	  This builds bpfilter kernel module with embedded user mode helper
 -- 
-2.17.0
+2.9.0
 
