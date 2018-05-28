@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:22283 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:22335 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933233AbeE1JYj (ORCPT
+        with ESMTP id S933272AbeE1JYl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 May 2018 05:24:39 -0400
+        Mon, 28 May 2018 05:24:41 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v5 21/31] kconfig: show compiler version text in the top comment
-Date: Mon, 28 May 2018 18:21:58 +0900
-Message-Id: <1527499328-13213-22-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v5 31/31] Documentation: kconfig: add recommended way to describe compiler support
+Date: Mon, 28 May 2018 18:22:08 +0900
+Message-Id: <1527499328-13213-32-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,98 +15,70 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-The kernel configuration phase is now tightly coupled with the compiler
-in use.  It will be nice to show the compiler information in Kconfig.
-
-The compiler information will be displayed like this:
-
-  $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- config
-  scripts/kconfig/conf  --oldaskconfig Kconfig
-  *
-  * Linux/arm64 4.16.0-rc1 Kernel Configuration
-  *
-  *
-  * Compiler: aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011
-  *
-  *
-  * General setup
-  *
-  Compile also drivers which will not load (COMPILE_TEST) [N/y/?]
-
-If you use GUI methods such as menuconfig, it will be displayed in the
-top menu.
-
-This is simply implemented by using the 'comment' statement.  So, it
-will be saved into the .config file as well.
-
-This commit has a very important meaning.  If the compiler is upgraded,
-Kconfig must be re-run since different compilers have different sets
-of supported options.
-
-All referenced environments are written to include/config/auto.conf.cmd
-so that any environment change triggers syncconfig, and prompt the user
-to input new values if needed.
-
-With this commit, something like follows will be added to
-include/config/auto.conf.cmd
-
-  ifneq "$(CC_VERSION_TEXT)" "aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011"
-  include/config/auto.conf: FORCE
-  endif
+It would be nice if the source code is written in the same style.
+This proposes the convention for describing the compiler capability
+in Kconfig.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
 
-Changes in v5: None
-Changes in v4:
-  - Add comment to arch/x86/um/Kconfig as well
+This is not a technical issue, but it would be nice if everybody
+follows the same coding style.
 
+Without any documemation, people may write the code in their own way.
+For example, there could be some possibilities for the option naming.
+
+  CC_HAS_
+  CC_SUPPORTS_
+  CC_HAVE_
+  ...
+
+IMHO, CC_HAS_ is short and enough to understand the meaning.
+
+CC_SUPPORTS_ is also good, but I personally prefer the shorter one.
+
+Comments are appreciated.
+
+
+Changes in v5:
+  - Newly added
+
+Changes in v4: None
 Changes in v3: None
 Changes in v2: None
 
- Kconfig             | 2 ++
- Makefile            | 2 ++
- arch/x86/um/Kconfig | 2 ++
- 3 files changed, 6 insertions(+)
+ Documentation/kbuild/kconfig-language.txt | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/Kconfig b/Kconfig
-index 4af1b42..5b55d87 100644
---- a/Kconfig
-+++ b/Kconfig
-@@ -5,4 +5,6 @@
- #
- mainmenu "Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration"
+diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+index 0e966e8..a4eb018 100644
+--- a/Documentation/kbuild/kconfig-language.txt
++++ b/Documentation/kbuild/kconfig-language.txt
+@@ -473,6 +473,24 @@ config option to 'y' no matter the dependencies.
+ The dependencies are moved to the symbol GENERIC_IOMAP and we avoid the
+ situation where select forces a symbol equals to 'y'.
  
-+comment "Compiler: $(CC_VERSION_TEXT)"
++Adding features that need compiler support
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 +
- source "arch/$(SRCARCH)/Kconfig"
-diff --git a/Makefile b/Makefile
-index 58afa07..defb383 100644
---- a/Makefile
-+++ b/Makefile
-@@ -442,6 +442,8 @@ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
- export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
- export KBUILD_ARFLAGS
- 
-+export CC_VERSION_TEXT := $(shell $(CC) --version | head -n 1)
++There are several features that need compiler support. The recommended way
++to describe the dependency on the compiler feature is to use "depends on"
++followed by a test macro.
 +
- # When compiling out-of-tree modules, put MODVERDIR in the module
- # tree rather than in the kernel tree. The kernel tree might
- # even be read-only.
-diff --git a/arch/x86/um/Kconfig b/arch/x86/um/Kconfig
-index 6a15c4d..a992f8e 100644
---- a/arch/x86/um/Kconfig
-+++ b/arch/x86/um/Kconfig
-@@ -1,6 +1,8 @@
- # SPDX-License-Identifier: GPL-2.0
- mainmenu "User Mode Linux/$(SUBARCH) $(KERNELVERSION) Kernel Configuration"
- 
-+comment "Compiler: $(CC_VERSION_TEXT)"
++config CC_STACKPROTECTOR
++	bool "Stack Protector buffer overflow detection"
++	depends on $(cc-option,-fstack-protector)
++	...
 +
- source "arch/um/Kconfig.common"
- 
- menu "UML-specific options"
++If you need to expose a compiler capability to makefiles and/or C source files,
++CC_HAS_ is the recommended prefix for the config option.
++
++config CC_HAS_STACKPROTECTOR_NONE
++	def_bool $(cc-option,-fno-stack-protector)
++
+ Build as module only
+ ~~~~~~~~~~~~~~~~~~~~
+ To restrict a component build to module-only, qualify its config symbol
 -- 
 2.7.4
 
