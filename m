@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:21477 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:22283 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754138AbeE1JYN (ORCPT
+        with ESMTP id S933233AbeE1JYj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 May 2018 05:24:13 -0400
+        Mon, 28 May 2018 05:24:39 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v5 07/31] kconfig: make default prompt of mainmenu less specific
-Date: Mon, 28 May 2018 18:21:44 +0900
-Message-Id: <1527499328-13213-8-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v5 21/31] kconfig: show compiler version text in the top comment
+Date: Mon, 28 May 2018 18:21:58 +0900
+Message-Id: <1527499328-13213-22-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,51 +15,98 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-If "mainmenu" is not specified, "Linux Kernel Configuration" is used
-as a default prompt.
+The kernel configuration phase is now tightly coupled with the compiler
+in use.  It will be nice to show the compiler information in Kconfig.
 
-Given that Kconfig is used in other projects than Linux, let's use
-a more generic prompt, "Main menu".
+The compiler information will be displayed like this:
 
-Suggested-by: Sam Ravnborg <sam@ravnborg.org>
+  $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- config
+  scripts/kconfig/conf  --oldaskconfig Kconfig
+  *
+  * Linux/arm64 4.16.0-rc1 Kernel Configuration
+  *
+  *
+  * Compiler: aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011
+  *
+  *
+  * General setup
+  *
+  Compile also drivers which will not load (COMPILE_TEST) [N/y/?]
+
+If you use GUI methods such as menuconfig, it will be displayed in the
+top menu.
+
+This is simply implemented by using the 'comment' statement.  So, it
+will be saved into the .config file as well.
+
+This commit has a very important meaning.  If the compiler is upgraded,
+Kconfig must be re-run since different compilers have different sets
+of supported options.
+
+All referenced environments are written to include/config/auto.conf.cmd
+so that any environment change triggers syncconfig, and prompt the user
+to input new values if needed.
+
+With this commit, something like follows will be added to
+include/config/auto.conf.cmd
+
+  ifneq "$(CC_VERSION_TEXT)" "aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011"
+  include/config/auto.conf: FORCE
+  endif
+
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
 
-Changes in v5:
-  - Newly added
+Changes in v5: None
+Changes in v4:
+  - Add comment to arch/x86/um/Kconfig as well
 
-Changes in v4: None
 Changes in v3: None
 Changes in v2: None
 
- scripts/kconfig/tests/no_write_if_dep_unmet/expected_config | 2 +-
- scripts/kconfig/zconf.y                                     | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ Kconfig             | 2 ++
+ Makefile            | 2 ++
+ arch/x86/um/Kconfig | 2 ++
+ 3 files changed, 6 insertions(+)
 
-diff --git a/scripts/kconfig/tests/no_write_if_dep_unmet/expected_config b/scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
-index 0d15e41..4732288 100644
---- a/scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
-+++ b/scripts/kconfig/tests/no_write_if_dep_unmet/expected_config
-@@ -1,5 +1,5 @@
+diff --git a/Kconfig b/Kconfig
+index 4af1b42..5b55d87 100644
+--- a/Kconfig
++++ b/Kconfig
+@@ -5,4 +5,6 @@
  #
- # Automatically generated file; DO NOT EDIT.
--# Linux Kernel Configuration
-+# Main menu
- #
- # CONFIG_A is not set
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 22e318c..8a82aaf 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -532,7 +532,7 @@ void conf_parse(const char *name)
+ mainmenu "Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration"
  
- 	if (!menu_has_prompt(&rootmenu)) {
- 		current_entry = &rootmenu;
--		menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
-+		menu_add_prompt(P_MENU, "Main menu", NULL);
- 	}
++comment "Compiler: $(CC_VERSION_TEXT)"
++
+ source "arch/$(SRCARCH)/Kconfig"
+diff --git a/Makefile b/Makefile
+index 58afa07..defb383 100644
+--- a/Makefile
++++ b/Makefile
+@@ -442,6 +442,8 @@ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
+ export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
+ export KBUILD_ARFLAGS
  
- 	menu_finalize(&rootmenu);
++export CC_VERSION_TEXT := $(shell $(CC) --version | head -n 1)
++
+ # When compiling out-of-tree modules, put MODVERDIR in the module
+ # tree rather than in the kernel tree. The kernel tree might
+ # even be read-only.
+diff --git a/arch/x86/um/Kconfig b/arch/x86/um/Kconfig
+index 6a15c4d..a992f8e 100644
+--- a/arch/x86/um/Kconfig
++++ b/arch/x86/um/Kconfig
+@@ -1,6 +1,8 @@
+ # SPDX-License-Identifier: GPL-2.0
+ mainmenu "User Mode Linux/$(SUBARCH) $(KERNELVERSION) Kernel Configuration"
+ 
++comment "Compiler: $(CC_VERSION_TEXT)"
++
+ source "arch/um/Kconfig.common"
+ 
+ menu "UML-specific options"
 -- 
 2.7.4
 
