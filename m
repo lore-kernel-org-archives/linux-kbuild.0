@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:22951 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:22960 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933272AbeE1JZC (ORCPT
+        with ESMTP id S933509AbeE1JZD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 May 2018 05:25:02 -0400
+        Mon, 28 May 2018 05:25:03 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v5 25/31] kconfig: add CC_IS_CLANG and CLANG_VERSION
-Date: Mon, 28 May 2018 18:22:02 +0900
-Message-Id: <1527499328-13213-26-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v5 22/31] kconfig: add basic helper macros to scripts/Kconfig.include
+Date: Mon, 28 May 2018 18:21:59 +0900
+Message-Id: <1527499328-13213-23-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,72 +15,106 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-This will be useful to describe the clang version dependency.
+Kconfig got text processing tools like we see in Make.  Add Kconfig
+helper macros to scripts/Kconfig.include like we collect Makefile
+macros in scripts/Kbuild.include.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
 ---
 
-Changes in v5: None
-Changes in v4: None
-Changes in v3: None
+Changes in v5:
+  - Add dollar, right_paren, left_paren variables
+
+Changes in v4:
+  - source scripts/Kconfig.include
+    from arch/x86/um/Kconfig since UML is special
+  - Use { $(1); } for 'success' macro for better performance
+  - Use -E instead of -c for 'cc-option' macro for better performance
+  - Add 'if-success' macro
+
+Changes in v3:
+  - Move helpers to scripts/Kconfig.include
+
 Changes in v2: None
 
- init/Kconfig             |  7 +++++++
- scripts/clang-version.sh | 18 ++++--------------
- 2 files changed, 11 insertions(+), 14 deletions(-)
+ Kconfig                 |  2 ++
+ MAINTAINERS             |  1 +
+ arch/x86/um/Kconfig     |  2 ++
+ scripts/Kconfig.include | 27 +++++++++++++++++++++++++++
+ 4 files changed, 32 insertions(+)
+ create mode 100644 scripts/Kconfig.include
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 2e33d93..22e095d 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -16,6 +16,13 @@ config GCC_VERSION
- 	default $(shell,$(srctree)/scripts/gcc-version.sh -p $(CC) | sed 's/^0*//') if CC_IS_GCC
- 	default 0
+diff --git a/Kconfig b/Kconfig
+index 5b55d87..a90d9f9 100644
+--- a/Kconfig
++++ b/Kconfig
+@@ -7,4 +7,6 @@ mainmenu "Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration"
  
-+config CC_IS_CLANG
-+	def_bool $(success,$(CC) --version | grep -q clang)
+ comment "Compiler: $(CC_VERSION_TEXT)"
+ 
++source "scripts/Kconfig.include"
 +
-+config CLANG_VERSION
-+	int
-+	default $(shell,$(srctree)/scripts/clang-version.sh $(CC))
+ source "arch/$(SRCARCH)/Kconfig"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b87723a..79decb1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -7639,6 +7639,7 @@ L:	linux-kbuild@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/kbuild/kconfig*
+ F:	scripts/kconfig/
++F:	scripts/Kconfig.include
+ 
+ KDUMP
+ M:	Dave Young <dyoung@redhat.com>
+diff --git a/arch/x86/um/Kconfig b/arch/x86/um/Kconfig
+index a992f8e..9d529f2 100644
+--- a/arch/x86/um/Kconfig
++++ b/arch/x86/um/Kconfig
+@@ -3,6 +3,8 @@ mainmenu "User Mode Linux/$(SUBARCH) $(KERNELVERSION) Kernel Configuration"
+ 
+ comment "Compiler: $(CC_VERSION_TEXT)"
+ 
++source "scripts/Kconfig.include"
 +
- config CONSTRUCTORS
- 	bool
- 	depends on !UML
-diff --git a/scripts/clang-version.sh b/scripts/clang-version.sh
-index 9780efa..dbf0a31 100755
---- a/scripts/clang-version.sh
-+++ b/scripts/clang-version.sh
-@@ -10,24 +10,14 @@
- # clang-5.0.1 etc.
- #
+ source "arch/um/Kconfig.common"
  
--if [ "$1" = "-p" ] ; then
--	with_patchlevel=1;
--	shift;
--fi
--
- compiler="$*"
- 
--if [ ${#compiler} -eq 0 ]; then
--	echo "Error: No compiler specified."
--	printf "Usage:\n\t$0 <clang-command>\n"
-+if !( $compiler --version | grep -q clang) ; then
-+	echo 0
- 	exit 1
- fi
- 
- MAJOR=$(echo __clang_major__ | $compiler -E -x c - | tail -n 1)
- MINOR=$(echo __clang_minor__ | $compiler -E -x c - | tail -n 1)
--if [ "x$with_patchlevel" != "x" ] ; then
--	PATCHLEVEL=$(echo __clang_patchlevel__ | $compiler -E -x c - | tail -n 1)
--	printf "%02d%02d%02d\\n" $MAJOR $MINOR $PATCHLEVEL
--else
--	printf "%02d%02d\\n" $MAJOR $MINOR
--fi
-+PATCHLEVEL=$(echo __clang_patchlevel__ | $compiler -E -x c - | tail -n 1)
-+printf "%d%02d%02d\\n" $MAJOR $MINOR $PATCHLEVEL
+ menu "UML-specific options"
+diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+new file mode 100644
+index 0000000..bf7c0c9
+--- /dev/null
++++ b/scripts/Kconfig.include
+@@ -0,0 +1,27 @@
++# Kconfig helper macros
++
++# Convenient variables
++comma       := ,
++quote       := "
++squote      := '
++empty       :=
++space       := $(empty) $(empty)
++dollar      := $
++right_paren := )
++left_paren  := (
++
++# $(if-success,<command>,<then>,<else>)
++# Return <then> if <command> exits with 0, <else> otherwise.
++if-success = $(shell,{ $(1); } >/dev/null 2>&1 && echo "$(2)" || echo "$(3)")
++
++# $(success,<command>)
++# Return y if <command> exits with 0, n otherwise
++success = $(if-success,$(1),y,n)
++
++# $(cc-option,<flag>)
++# Return y if the compiler supports <flag>, n otherwise
++cc-option = $(success,$(CC) -Werror $(1) -E -x c /dev/null -o /dev/null)
++
++# $(ld-option,<flag>)
++# Return y if the linker supports <flag>, n otherwise
++ld-option = $(success,$(LD) -v $(1))
 -- 
 2.7.4
 
