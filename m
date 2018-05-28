@@ -1,59 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:40771 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1032932AbeE1Pcm (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:36129 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932116AbeE1RA4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 May 2018 11:32:42 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] [net-next, wrong] make BPFILTER_UMH depend on X86
-Date: Mon, 28 May 2018 17:31:01 +0200
-Message-Id: <20180528153222.2037158-1-arnd@arndb.de>
+        Mon, 28 May 2018 13:00:56 -0400
+From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: [PATCH] kbuild: add endianness flag to CHEKCFLAGS
+Date: Mon, 28 May 2018 19:00:48 +0200
+Message-Id: <20180528170048.16595-1-luc.vanoostenryck@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Jonas Bonn <jonas@southpole.se>, Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>, Stafford Horne <shorne@gmail.com>, "James E . J . Bottomley" <jejb@parisc-linux.org>, Helge Deller <deller@gmx.de>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, openrisc@lists.librecores.org, linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 
-When build testing across architectures, I run into a build error on
-all targets other than X86:
+The kernel depends on macros like __BYTE_ORDER__,
+__BIG_ENDIAN__ or __LITTLE_ENDIAN__.
 
-gcc-8.1.0-nolibc/arm-linux-gnueabi/bin/arm-linux-gnueabi-objdump: net/bpfilter/bpfilter_umh: File format not recognized
-gcc-8.1.0-nolibc/arm-linux-gnueabi/bin/arm-linux-gnueabi-objcopy:net/bpfilter/bpfilter_umh.o: Invalid bfd target
+OTOH, sparse doesn't know about the endianness of the kernel and
+by default uses the same as the machine on which sparse was built.
 
-The problem is that 'hostprogs' get built with 'gcc' rather than
-'$(CROSS_COMPILE)gcc', and my default gcc (as most people's) targets x86.
+Ensure that sparse can predefine the macros corresponding to
+how the kernel was configured by adding -m{big,little}-endian
+to CHECKFLAGS in the main Makefile (and so for all archs).
+Also, remove the equivalent done in arch specific Makefiles.
 
-To work around it, adding an X86 dependency gets randconfigs building
-again on my box.
-
-Clearly, this is not a good solution, since it should actually work fine
-when building native kernels on other architectures but that is now
-disabled, while cross building an x86 kernel on another host is still
-broken after my patch.
-
-What we probably want here is to try out if the compiler is able to build
-executables for the target architecture and not build the helper otherwise,
-at least when compile-testing. No idea how to do that though.
-
-Link: http://www.kernel.org/pub/tools/crosstool/
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 ---
- net/bpfilter/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ Makefile               | 3 +++
+ arch/openrisc/Makefile | 1 -
+ arch/parisc/Makefile   | 2 +-
+ arch/s390/Makefile     | 2 +-
+ 4 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/net/bpfilter/Kconfig b/net/bpfilter/Kconfig
-index 60725c5f79db..61cc4fcbb4d0 100644
---- a/net/bpfilter/Kconfig
-+++ b/net/bpfilter/Kconfig
-@@ -9,6 +9,7 @@ menuconfig BPFILTER
- if BPFILTER
- config BPFILTER_UMH
- 	tristate "bpfilter kernel module with user mode helper"
-+	depends on X86 # actually depends on native builds
- 	default m
- 	help
- 	  This builds bpfilter kernel module with embedded user mode helper
+diff --git a/Makefile b/Makefile
+index 56ba070df..057a278d2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -878,6 +878,9 @@ ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
+ LDFLAGS_vmlinux	+= $(call ld-option, -X,)
+ endif
+ 
++# insure the checker run with the right endianness
++CHECKFLAGS += $(if $(CONFIG_CPU_BIG_ENDIAN),-mbig,-mlittle)
++
+ # Default kernel image to build when no specific target is given.
+ # KBUILD_IMAGE may be overruled on the command line or
+ # set in the environment
+diff --git a/arch/openrisc/Makefile b/arch/openrisc/Makefile
+index cf8802962..89076a66e 100644
+--- a/arch/openrisc/Makefile
++++ b/arch/openrisc/Makefile
+@@ -25,7 +25,6 @@ LDFLAGS_vmlinux :=
+ LIBGCC 		:= $(shell $(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name)
+ 
+ KBUILD_CFLAGS	+= -pipe -ffixed-r10 -D__linux__
+-CHECKFLAGS	+= -mbig-endian
+ 
+ ifeq ($(CONFIG_OPENRISC_HAVE_INST_MUL),y)
+ 	KBUILD_CFLAGS += $(call cc-option,-mhard-mul)
+diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
+index 34ac503e2..348ae4779 100644
+--- a/arch/parisc/Makefile
++++ b/arch/parisc/Makefile
+@@ -22,7 +22,7 @@ KBUILD_IMAGE := vmlinuz
+ KBUILD_DEFCONFIG := default_defconfig
+ 
+ NM		= sh $(srctree)/arch/parisc/nm
+-CHECKFLAGS	+= -D__hppa__=1 -mbig-endian
++CHECKFLAGS	+= -D__hppa__=1
+ LIBGCC		= $(shell $(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name)
+ export LIBGCC
+ 
+diff --git a/arch/s390/Makefile b/arch/s390/Makefile
+index c79936d02..68a690442 100644
+--- a/arch/s390/Makefile
++++ b/arch/s390/Makefile
+@@ -18,7 +18,7 @@ KBUILD_CFLAGS	+= -m64
+ KBUILD_AFLAGS	+= -m64
+ UTS_MACHINE	:= s390x
+ STACK_SIZE	:= 16384
+-CHECKFLAGS	+= -D__s390__ -D__s390x__ -mbig-endian
++CHECKFLAGS	+= -D__s390__ -D__s390x__
+ 
+ export LD_BFD
+ 
 -- 
-2.9.0
+2.17.0
 
