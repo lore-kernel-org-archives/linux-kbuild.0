@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:21618 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:21615 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754324AbeE1JYQ (ORCPT
+        with ESMTP id S1754319AbeE1JYQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 28 May 2018 05:24:16 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v5 11/31] kconfig: begin PARAM state only when seeing a command keyword
-Date: Mon, 28 May 2018 18:21:48 +0900
-Message-Id: <1527499328-13213-12-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v5 17/31] kconfig: add 'filename' and 'lineno' built-in variables
+Date: Mon, 28 May 2018 18:21:54 +0900
+Message-Id: <1527499328-13213-18-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,49 +15,66 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Currently, any statement line starts with a keyword with TF_COMMAND
-flag.  So, the following three lines are dead code.
+The special variables, $(filename) and $(lineno), are expanded to a
+file name and its line number being parsed, respectively.
 
-        alloc_string(yytext, yyleng);
-        zconflval.string = text;
-        return T_WORD;
-
-If a T_WORD token is returned in this context, it will cause syntax
-error in the parser anyway.
-
-The next commit will support the assignment statement where a line
-starts with an arbitrary identifier.  So, I want the lexer to switch
-to the PARAM state only when it sees a command keyword.
-
+Suggested-by: Randy Dunlap <rdunlap@infradead.org>
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
 
 Changes in v5: None
-Changes in v4: None
-Changes in v3:
+Changes in v4:
  - Newly added
 
+Changes in v3: None
 Changes in v2: None
 
- scripts/kconfig/zconf.l | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/kconfig/preprocess.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index b385590..9a14797 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -102,10 +102,10 @@ n	[A-Za-z0-9_-]
- <COMMAND>{
- 	{n}+	{
- 		const struct kconf_id *id = kconf_id_lookup(yytext, yyleng);
--		BEGIN(PARAM);
- 		current_pos.file = current_file;
- 		current_pos.lineno = yylineno;
- 		if (id && id->flags & TF_COMMAND) {
-+			BEGIN(PARAM);
- 			yylval.id = id;
- 			return id->token;
- 		}
+diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
+index 5ee58ee..0574039 100644
+--- a/scripts/kconfig/preprocess.c
++++ b/scripts/kconfig/preprocess.c
+@@ -114,6 +114,11 @@ static char *do_error_if(int argc, char *argv[])
+ 	return NULL;
+ }
+ 
++static char *do_filename(int argc, char *argv[])
++{
++	return xstrdup(current_file->name);
++}
++
+ static char *do_info(int argc, char *argv[])
+ {
+ 	printf("%s\n", argv[0]);
+@@ -121,6 +126,15 @@ static char *do_info(int argc, char *argv[])
+ 	return xstrdup("");
+ }
+ 
++static char *do_lineno(int argc, char *argv[])
++{
++	char buf[16];
++
++	sprintf(buf, "%d", yylineno);
++
++	return xstrdup(buf);
++}
++
+ static char *do_shell(int argc, char *argv[])
+ {
+ 	FILE *p;
+@@ -173,7 +187,9 @@ static char *do_warning_if(int argc, char *argv[])
+ static const struct function function_table[] = {
+ 	/* Name		MIN	MAX	Function */
+ 	{ "error-if",	2,	2,	do_error_if },
++	{ "filename",	0,	0,	do_filename },
+ 	{ "info",	1,	1,	do_info },
++	{ "lineno",	0,	0,	do_lineno },
+ 	{ "shell",	1,	1,	do_shell },
+ 	{ "warning-if",	2,	2,	do_warning_if },
+ };
 -- 
 2.7.4
 
