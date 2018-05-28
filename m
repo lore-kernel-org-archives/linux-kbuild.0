@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:21625 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:21628 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754333AbeE1JYR (ORCPT
+        with ESMTP id S1754334AbeE1JYR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 28 May 2018 05:24:17 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v5 16/31] kconfig: add 'info', 'warning-if', and 'error-if' built-in functions
-Date: Mon, 28 May 2018 18:21:53 +0900
-Message-Id: <1527499328-13213-17-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v5 18/31] kconfig: error out if a recursive variable references itself
+Date: Mon, 28 May 2018 18:21:55 +0900
+Message-Id: <1527499328-13213-19-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,86 +15,84 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Syntax:
-  $(info,<text>)
-  $(warning-if,<condition>,<text>)
-  $(error-if,<condition>,<text)
+When using a recursively expanded variable, it is a common mistake
+to make circular reference.
 
-The 'info' function prints a message to stdout as in Make.
+For example, Make terminates the following code:
 
-The 'warning-if' and 'error-if' are similar to 'warning' and 'error'
-in Make, but take the condition parameter.  They are effective only
-when the <condition> part is y.
+  X = $(X)
+  Y := $(X)
 
-Kconfig does not implement the lazy expansion as used in the 'if'
-'and, 'or' functions in Make.  In other words, Kconfig does not
-support conditional expansion.  The unconditional 'error' function
-would always terminate the parsing, hence would be useless in Kconfig.
+Let's detect the circular expansion in Kconfig, too.
+
+On the other hand, a function that recurses itself is a commonly-used
+programming technique.  So, Make does not check recursion in the
+reference with 'call'.  For example, the following code continues
+running eternally:
+
+  X = $(call X)
+  Y := $(X)
+
+Kconfig allows circular expansion if one or more arguments are given,
+but terminates when the same function is recursively invoked 1000 times,
+assuming it is a programming mistake.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
 
-Changes in v5:
-  - Replace 'warning', 'error' with 'warning-if', 'error-if'
-
+Changes in v5: None
 Changes in v4:
-  - Add 'error' function
+ - Newly added
 
 Changes in v3: None
 Changes in v2: None
 
- scripts/kconfig/preprocess.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ scripts/kconfig/preprocess.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
-index 56aa1f0..5ee58ee 100644
+index 0574039..65da87f 100644
 --- a/scripts/kconfig/preprocess.c
 +++ b/scripts/kconfig/preprocess.c
-@@ -106,6 +106,21 @@ struct function {
- 	char *(*func)(int argc, char *argv[]);
+@@ -229,6 +229,7 @@ struct variable {
+ 	char *name;
+ 	char *value;
+ 	enum variable_flavor flavor;
++	int exp_count;
+ 	struct list_head node;
  };
  
-+static char *do_error_if(int argc, char *argv[])
-+{
-+	if (!strcmp(argv[0], "y"))
-+		pperror("%s", argv[1]);
+@@ -253,11 +254,22 @@ static char *variable_expand(const char *name, int argc, char *argv[])
+ 	if (!v)
+ 		return NULL;
+ 
++	if (argc == 0 && v->exp_count)
++		pperror("Recursive variable '%s' references itself (eventually)",
++			name);
 +
-+	return NULL;
-+}
++	if (v->exp_count > 1000)
++		pperror("Too deep recursive expansion");
 +
-+static char *do_info(int argc, char *argv[])
-+{
-+	printf("%s\n", argv[0]);
++	v->exp_count++;
 +
-+	return xstrdup("");
-+}
+ 	if (v->flavor == VAR_RECURSIVE)
+ 		res = expand_string_with_args(v->value, argc, argv);
+ 	else
+ 		res = xstrdup(v->value);
+ 
++	v->exp_count--;
 +
- static char *do_shell(int argc, char *argv[])
- {
- 	FILE *p;
-@@ -146,9 +161,21 @@ static char *do_shell(int argc, char *argv[])
- 	return xstrdup(buf);
+ 	return res;
  }
  
-+static char *do_warning_if(int argc, char *argv[])
-+{
-+	if (!strcmp(argv[0], "y"))
-+		fprintf(stderr, "%s:%d: %s\n",
-+			current_file->name, yylineno, argv[1]);
-+
-+	return xstrdup("");
-+}
-+
- static const struct function function_table[] = {
- 	/* Name		MIN	MAX	Function */
-+	{ "error-if",	2,	2,	do_error_if },
-+	{ "info",	1,	1,	do_info },
- 	{ "shell",	1,	1,	do_shell },
-+	{ "warning-if",	2,	2,	do_warning_if },
- };
+@@ -284,6 +296,7 @@ void variable_add(const char *name, const char *value,
  
- #define FUNCTION_MAX_ARGS		16
+ 		v = xmalloc(sizeof(*v));
+ 		v->name = xstrdup(name);
++		v->exp_count = 0;
+ 		list_add_tail(&v->node, &variable_list);
+ 	}
+ 
 -- 
 2.7.4
 
