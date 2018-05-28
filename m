@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:23137 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:22951 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933643AbeE1JZI (ORCPT
+        with ESMTP id S933272AbeE1JZC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 May 2018 05:25:08 -0400
+        Mon, 28 May 2018 05:25:02 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v5 27/31] kcov: test compiler capability in Kconfig and correct dependency
-Date: Mon, 28 May 2018 18:22:04 +0900
-Message-Id: <1527499328-13213-28-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v5 25/31] kconfig: add CC_IS_CLANG and CLANG_VERSION
+Date: Mon, 28 May 2018 18:22:02 +0900
+Message-Id: <1527499328-13213-26-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,31 +15,7 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-As Documentation/kbuild/kconfig-language.txt notes, 'select' should be
-be used with care - it forces a lower limit of another symbol, ignoring
-the dependency.  Currently, KCOV can select GCC_PLUGINS even if arch
-does not select HAVE_GCC_PLUGINS.  This could cause the unmet direct
-dependency.
-
-Now that Kconfig can test compiler capability, let's handle this in a
-more sophisticated way.
-
-There are two ways to enable KCOV; use the compiler that natively
-supports -fsanitize-coverage=trace-pc, or build the SANCOV plugin if
-the compiler has ability to build GCC plugins.  Hence, the correct
-dependency for KCOV is:
-
-  depends on CC_HAS_SANCOV_TRACE_PC || GCC_PLUGINS
-
-You do not need to build the SANCOV plugin if the compiler already
-supports -fsanitize-coverage=trace-pc.  Hence, the select should be:
-
-  select GCC_PLUGIN_SANCOV if !CC_HAS_SANCOV_TRACE_PC
-
-With this, GCC_PLUGIN_SANCOV is selected only when necessary, so
-scripts/Makefile.gcc-plugins can be cleaner.
-
-I also cleaned up Kconfig and scripts/Makefile.kcov as well.
+This will be useful to describe the clang version dependency.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
@@ -47,112 +23,64 @@ Reviewed-by: Kees Cook <keescook@chromium.org>
 
 Changes in v5: None
 Changes in v4: None
-Changes in v3:
-  - Replace the previous 'select -> imply' patch with
-    a new approach
+Changes in v3: None
+Changes in v2: None
 
-Changes in v2:
-  - Drop depends on GCC_VERSION
+ init/Kconfig             |  7 +++++++
+ scripts/clang-version.sh | 18 ++++--------------
+ 2 files changed, 11 insertions(+), 14 deletions(-)
 
- Makefile                     |  2 +-
- lib/Kconfig.debug            | 11 +++++++----
- scripts/Makefile.gcc-plugins |  6 +-----
- scripts/Makefile.kcov        | 10 ++++++----
- 4 files changed, 15 insertions(+), 14 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 80e0800..4b5a17a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -626,7 +626,7 @@ all: vmlinux
- CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage \
- 	$(call cc-option,-fno-tree-loop-im) \
- 	$(call cc-disable-warning,maybe-uninitialized,)
--export CFLAGS_GCOV CFLAGS_KCOV
-+export CFLAGS_GCOV
+diff --git a/init/Kconfig b/init/Kconfig
+index 2e33d93..22e095d 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -16,6 +16,13 @@ config GCC_VERSION
+ 	default $(shell,$(srctree)/scripts/gcc-version.sh -p $(CC) | sed 's/^0*//') if CC_IS_GCC
+ 	default 0
  
- # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
- # values of the respective KBUILD_* variables
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index c40c7b7..b76cab2 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -736,12 +736,15 @@ config ARCH_HAS_KCOV
- 	  only for x86_64. KCOV requires testing on other archs, and most likely
- 	  disabling of instrumentation for some early boot code.
- 
-+config CC_HAS_SANCOV_TRACE_PC
-+	def_bool $(cc-option,-fsanitize-coverage=trace-pc)
++config CC_IS_CLANG
++	def_bool $(success,$(CC) --version | grep -q clang)
 +
- config KCOV
- 	bool "Code coverage for fuzzing"
- 	depends on ARCH_HAS_KCOV
-+	depends on CC_HAS_SANCOV_TRACE_PC || GCC_PLUGINS
- 	select DEBUG_FS
--	select GCC_PLUGINS if !COMPILE_TEST
--	select GCC_PLUGIN_SANCOV if !COMPILE_TEST
-+	select GCC_PLUGIN_SANCOV if !CC_HAS_SANCOV_TRACE_PC
- 	help
- 	  KCOV exposes kernel code coverage information in a form suitable
- 	  for coverage-guided fuzzing (randomized testing).
-@@ -755,7 +758,7 @@ config KCOV
- config KCOV_ENABLE_COMPARISONS
- 	bool "Enable comparison operands collection by KCOV"
- 	depends on KCOV
--	default n
-+	depends on $(cc-option,-fsanitize-coverage=trace-cmp)
- 	help
- 	  KCOV also exposes operands of every comparison in the instrumented
- 	  code along with operand sizes and PCs of the comparison instructions.
-@@ -765,7 +768,7 @@ config KCOV_ENABLE_COMPARISONS
- config KCOV_INSTRUMENT_ALL
- 	bool "Instrument all code by default"
- 	depends on KCOV
--	default y if KCOV
-+	default y
- 	help
- 	  If you are doing generic system call fuzzing (like e.g. syzkaller),
- 	  then you will want to instrument the whole kernel and you should
-diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-index 7f5c862..0ce3802 100644
---- a/scripts/Makefile.gcc-plugins
-+++ b/scripts/Makefile.gcc-plugins
-@@ -14,16 +14,12 @@ ifdef CONFIG_GCC_PLUGINS
-   endif
- 
-   ifdef CONFIG_GCC_PLUGIN_SANCOV
--    ifeq ($(strip $(CFLAGS_KCOV)),)
-       # It is needed because of the gcc-plugin.sh and gcc version checks.
-       gcc-plugin-$(CONFIG_GCC_PLUGIN_SANCOV)           += sancov_plugin.so
- 
--      ifneq ($(PLUGINCC),)
--        CFLAGS_KCOV := $(SANCOV_PLUGIN)
--      else
-+      ifeq ($(PLUGINCC),)
-         $(warning warning: cannot use CONFIG_KCOV: -fsanitize-coverage=trace-pc is not supported by compiler)
-       endif
--    endif
-   endif
- 
-   gcc-plugin-$(CONFIG_GCC_PLUGIN_STRUCTLEAK)	+= structleak_plugin.so
-diff --git a/scripts/Makefile.kcov b/scripts/Makefile.kcov
-index 5cc7203..d71ba73 100644
---- a/scripts/Makefile.kcov
-+++ b/scripts/Makefile.kcov
-@@ -1,7 +1,9 @@
- ifdef CONFIG_KCOV
--CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
--ifeq ($(CONFIG_KCOV_ENABLE_COMPARISONS),y)
--CFLAGS_KCOV += $(call cc-option,-fsanitize-coverage=trace-cmp,)
--endif
++config CLANG_VERSION
++	int
++	default $(shell,$(srctree)/scripts/clang-version.sh $(CC))
 +
-+kcov-flags-$(CONFIG_CC_HAS_SANCOV_TRACE_PC)	+= -fsanitize-coverage=trace-pc
-+kcov-flags-$(CONFIG_KCOV_ENABLE_COMPARISONS)	+= -fsanitize-coverage=trace-cmp
-+kcov-flags-$(CONFIG_GCC_PLUGIN_SANKOV)		+= -fplugin=$(objtree)/scripts/gcc-plugins/sancov_plugin.so
-+
-+export CFLAGS_KCOV := $(kcov-flags-y)
+ config CONSTRUCTORS
+ 	bool
+ 	depends on !UML
+diff --git a/scripts/clang-version.sh b/scripts/clang-version.sh
+index 9780efa..dbf0a31 100755
+--- a/scripts/clang-version.sh
++++ b/scripts/clang-version.sh
+@@ -10,24 +10,14 @@
+ # clang-5.0.1 etc.
+ #
  
- endif
+-if [ "$1" = "-p" ] ; then
+-	with_patchlevel=1;
+-	shift;
+-fi
+-
+ compiler="$*"
+ 
+-if [ ${#compiler} -eq 0 ]; then
+-	echo "Error: No compiler specified."
+-	printf "Usage:\n\t$0 <clang-command>\n"
++if !( $compiler --version | grep -q clang) ; then
++	echo 0
+ 	exit 1
+ fi
+ 
+ MAJOR=$(echo __clang_major__ | $compiler -E -x c - | tail -n 1)
+ MINOR=$(echo __clang_minor__ | $compiler -E -x c - | tail -n 1)
+-if [ "x$with_patchlevel" != "x" ] ; then
+-	PATCHLEVEL=$(echo __clang_patchlevel__ | $compiler -E -x c - | tail -n 1)
+-	printf "%02d%02d%02d\\n" $MAJOR $MINOR $PATCHLEVEL
+-else
+-	printf "%02d%02d\\n" $MAJOR $MINOR
+-fi
++PATCHLEVEL=$(echo __clang_patchlevel__ | $compiler -E -x c - | tail -n 1)
++printf "%d%02d%02d\\n" $MAJOR $MINOR $PATCHLEVEL
 -- 
 2.7.4
 
