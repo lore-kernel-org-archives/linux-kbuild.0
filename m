@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:23171 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:23137 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933656AbeE1JZJ (ORCPT
+        with ESMTP id S933643AbeE1JZI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 May 2018 05:25:09 -0400
+        Mon, 28 May 2018 05:25:08 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v5 23/31] stack-protector: test compiler capability in Kconfig and drop AUTO mode
-Date: Mon, 28 May 2018 18:22:00 +0900
-Message-Id: <1527499328-13213-24-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v5 27/31] kcov: test compiler capability in Kconfig and correct dependency
+Date: Mon, 28 May 2018 18:22:04 +0900
+Message-Id: <1527499328-13213-28-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,282 +15,144 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Move the test for -fstack-protector(-strong) option to Kconfig.
+As Documentation/kbuild/kconfig-language.txt notes, 'select' should be
+be used with care - it forces a lower limit of another symbol, ignoring
+the dependency.  Currently, KCOV can select GCC_PLUGINS even if arch
+does not select HAVE_GCC_PLUGINS.  This could cause the unmet direct
+dependency.
 
-If the compiler does not support the option, the corresponding menu
-is automatically hidden.  If STRONG is not supported, it will fall
-back to REGULAR.  If REGULAR is not supported, it will be disabled.
-This means, AUTO is implicitly handled by the dependency solver of
-Kconfig, hence removed.
+Now that Kconfig can test compiler capability, let's handle this in a
+more sophisticated way.
 
-I also turned the 'choice' into only two boolean symbols.  The use of
-'choice' is not a good idea here, because all of all{yes,mod,no}config
-would choose the first visible value, while we want allnoconfig to
-disable as many features as possible.
+There are two ways to enable KCOV; use the compiler that natively
+supports -fsanitize-coverage=trace-pc, or build the SANCOV plugin if
+the compiler has ability to build GCC plugins.  Hence, the correct
+dependency for KCOV is:
 
-X86 has additional shell scripts in case the compiler supports those
-options, but generates broken code.  I added CC_HAS_SANE_STACKPROTECTOR
-to test this.  I had to add -m32 to gcc-x86_32-has-stack-protector.sh
-to make it work correctly.
+  depends on CC_HAS_SANCOV_TRACE_PC || GCC_PLUGINS
+
+You do not need to build the SANCOV plugin if the compiler already
+supports -fsanitize-coverage=trace-pc.  Hence, the select should be:
+
+  select GCC_PLUGIN_SANCOV if !CC_HAS_SANCOV_TRACE_PC
+
+With this, GCC_PLUGIN_SANCOV is selected only when necessary, so
+scripts/Makefile.gcc-plugins can be cleaner.
+
+I also cleaned up Kconfig and scripts/Makefile.kcov as well.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Acked-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
 
 Changes in v5: None
 Changes in v4: None
-Changes in v3: None
-Changes in v2: None
+Changes in v3:
+  - Replace the previous 'select -> imply' patch with
+    a new approach
 
- Makefile                                  | 93 ++-----------------------------
- arch/Kconfig                              | 32 ++++-------
- arch/x86/Kconfig                          | 11 +++-
- scripts/gcc-x86_32-has-stack-protector.sh |  7 +--
- scripts/gcc-x86_64-has-stack-protector.sh |  5 --
- 5 files changed, 28 insertions(+), 120 deletions(-)
+Changes in v2:
+  - Drop depends on GCC_VERSION
+
+ Makefile                     |  2 +-
+ lib/Kconfig.debug            | 11 +++++++----
+ scripts/Makefile.gcc-plugins |  6 +-----
+ scripts/Makefile.kcov        | 10 ++++++----
+ 4 files changed, 15 insertions(+), 14 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index defb383..80e0800 100644
+index 80e0800..4b5a17a 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -675,55 +675,11 @@ ifneq ($(CONFIG_FRAME_WARN),0)
- KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
- endif
+@@ -626,7 +626,7 @@ all: vmlinux
+ CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage \
+ 	$(call cc-option,-fno-tree-loop-im) \
+ 	$(call cc-disable-warning,maybe-uninitialized,)
+-export CFLAGS_GCOV CFLAGS_KCOV
++export CFLAGS_GCOV
  
--# This selects the stack protector compiler flag. Testing it is delayed
--# until after .config has been reprocessed, in the prepare-compiler-check
--# target.
--ifdef CONFIG_CC_STACKPROTECTOR_AUTO
--  stackp-flag := $(call cc-option,-fstack-protector-strong,$(call cc-option,-fstack-protector))
--  stackp-name := AUTO
--else
--ifdef CONFIG_CC_STACKPROTECTOR_REGULAR
--  stackp-flag := -fstack-protector
--  stackp-name := REGULAR
--else
--ifdef CONFIG_CC_STACKPROTECTOR_STRONG
--  stackp-flag := -fstack-protector-strong
--  stackp-name := STRONG
--else
--  # If either there is no stack protector for this architecture or
--  # CONFIG_CC_STACKPROTECTOR_NONE is selected, we're done, and $(stackp-name)
--  # is empty, skipping all remaining stack protector tests.
--  #
--  # Force off for distro compilers that enable stack protector by default.
--  KBUILD_CFLAGS += $(call cc-option, -fno-stack-protector)
--endif
--endif
--endif
--# Find arch-specific stack protector compiler sanity-checking script.
--ifdef stackp-name
--ifneq ($(stackp-flag),)
--  stackp-path := $(srctree)/scripts/gcc-$(SRCARCH)_$(BITS)-has-stack-protector.sh
--  stackp-check := $(wildcard $(stackp-path))
--  # If the wildcard test matches a test script, run it to check functionality.
--  ifdef stackp-check
--    ifneq ($(shell $(CONFIG_SHELL) $(stackp-check) $(CC) $(KBUILD_CPPFLAGS) $(biarch)),y)
--      stackp-broken := y
+ # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
+ # values of the respective KBUILD_* variables
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index c40c7b7..b76cab2 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -736,12 +736,15 @@ config ARCH_HAS_KCOV
+ 	  only for x86_64. KCOV requires testing on other archs, and most likely
+ 	  disabling of instrumentation for some early boot code.
+ 
++config CC_HAS_SANCOV_TRACE_PC
++	def_bool $(cc-option,-fsanitize-coverage=trace-pc)
++
+ config KCOV
+ 	bool "Code coverage for fuzzing"
+ 	depends on ARCH_HAS_KCOV
++	depends on CC_HAS_SANCOV_TRACE_PC || GCC_PLUGINS
+ 	select DEBUG_FS
+-	select GCC_PLUGINS if !COMPILE_TEST
+-	select GCC_PLUGIN_SANCOV if !COMPILE_TEST
++	select GCC_PLUGIN_SANCOV if !CC_HAS_SANCOV_TRACE_PC
+ 	help
+ 	  KCOV exposes kernel code coverage information in a form suitable
+ 	  for coverage-guided fuzzing (randomized testing).
+@@ -755,7 +758,7 @@ config KCOV
+ config KCOV_ENABLE_COMPARISONS
+ 	bool "Enable comparison operands collection by KCOV"
+ 	depends on KCOV
+-	default n
++	depends on $(cc-option,-fsanitize-coverage=trace-cmp)
+ 	help
+ 	  KCOV also exposes operands of every comparison in the instrumented
+ 	  code along with operand sizes and PCs of the comparison instructions.
+@@ -765,7 +768,7 @@ config KCOV_ENABLE_COMPARISONS
+ config KCOV_INSTRUMENT_ALL
+ 	bool "Instrument all code by default"
+ 	depends on KCOV
+-	default y if KCOV
++	default y
+ 	help
+ 	  If you are doing generic system call fuzzing (like e.g. syzkaller),
+ 	  then you will want to instrument the whole kernel and you should
+diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
+index 7f5c862..0ce3802 100644
+--- a/scripts/Makefile.gcc-plugins
++++ b/scripts/Makefile.gcc-plugins
+@@ -14,16 +14,12 @@ ifdef CONFIG_GCC_PLUGINS
+   endif
+ 
+   ifdef CONFIG_GCC_PLUGIN_SANCOV
+-    ifeq ($(strip $(CFLAGS_KCOV)),)
+       # It is needed because of the gcc-plugin.sh and gcc version checks.
+       gcc-plugin-$(CONFIG_GCC_PLUGIN_SANCOV)           += sancov_plugin.so
+ 
+-      ifneq ($(PLUGINCC),)
+-        CFLAGS_KCOV := $(SANCOV_PLUGIN)
+-      else
++      ifeq ($(PLUGINCC),)
+         $(warning warning: cannot use CONFIG_KCOV: -fsanitize-coverage=trace-pc is not supported by compiler)
+       endif
 -    endif
--  endif
--  ifndef stackp-broken
--    # If the stack protector is functional, enable code that depends on it.
--    KBUILD_CPPFLAGS += -DCONFIG_CC_STACKPROTECTOR
--    # Either we've already detected the flag (for AUTO) or we'll fail the
--    # build in the prepare-compiler-check rule (for specific flag).
--    KBUILD_CFLAGS += $(stackp-flag)
--  else
--    # We have to make sure stack protector is unconditionally disabled if
--    # the compiler is broken (in case we're going to continue the build in
--    # AUTO mode).
--    KBUILD_CFLAGS += $(call cc-option, -fno-stack-protector)
--  endif
+   endif
+ 
+   gcc-plugin-$(CONFIG_GCC_PLUGIN_STRUCTLEAK)	+= structleak_plugin.so
+diff --git a/scripts/Makefile.kcov b/scripts/Makefile.kcov
+index 5cc7203..d71ba73 100644
+--- a/scripts/Makefile.kcov
++++ b/scripts/Makefile.kcov
+@@ -1,7 +1,9 @@
+ ifdef CONFIG_KCOV
+-CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
+-ifeq ($(CONFIG_KCOV_ENABLE_COMPARISONS),y)
+-CFLAGS_KCOV += $(call cc-option,-fsanitize-coverage=trace-cmp,)
 -endif
--endif
-+stackp-flags-$(CONFIG_CC_HAS_STACKPROTECTOR_NONE) := -fno-stack-protector
-+stackp-flags-$(CONFIG_CC_STACKPROTECTOR)          := -fstack-protector
-+stackp-flags-$(CONFIG_CC_STACKPROTECTOR_STRONG)   := -fstack-protector-strong
 +
-+KBUILD_CFLAGS += $(stackp-flags-y)
- 
- ifeq ($(cc-name),clang)
- KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-@@ -1102,7 +1058,7 @@ endif
- # prepare2 creates a makefile if using a separate output directory.
- # From this point forward, .config has been reprocessed, so any rules
- # that need to depend on updated CONFIG_* values can be checked here.
--prepare2: prepare3 prepare-compiler-check outputmakefile asm-generic
-+prepare2: prepare3 outputmakefile asm-generic
- 
- prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h \
-                    include/config/auto.conf
-@@ -1128,43 +1084,6 @@ uapi-asm-generic:
- PHONY += prepare-objtool
- prepare-objtool: $(objtool_target)
- 
--# Check for CONFIG flags that require compiler support. Abort the build
--# after .config has been processed, but before the kernel build starts.
--#
--# For security-sensitive CONFIG options, we don't want to fallback and/or
--# silently change which compiler flags will be used, since that leads to
--# producing kernels with different security feature characteristics
--# depending on the compiler used. (For example, "But I selected
--# CC_STACKPROTECTOR_STRONG! Why did it build with _REGULAR?!")
--PHONY += prepare-compiler-check
--prepare-compiler-check: FORCE
--# Make sure compiler supports requested stack protector flag.
--ifdef stackp-name
--  # Warn about CONFIG_CC_STACKPROTECTOR_AUTO having found no option.
--  ifeq ($(stackp-flag),)
--	@echo CONFIG_CC_STACKPROTECTOR_$(stackp-name): \
--		  Compiler does not support any known stack-protector >&2
--  else
--  # Fail if specifically requested stack protector is missing.
--  ifeq ($(call cc-option, $(stackp-flag)),)
--	@echo Cannot use CONFIG_CC_STACKPROTECTOR_$(stackp-name): \
--		  $(stackp-flag) not supported by compiler >&2 && exit 1
--  endif
--  endif
--endif
--# Make sure compiler does not have buggy stack-protector support. If a
--# specific stack-protector was requested, fail the build, otherwise warn.
--ifdef stackp-broken
--  ifeq ($(stackp-name),AUTO)
--	@echo CONFIG_CC_STACKPROTECTOR_$(stackp-name): \
--                  $(stackp-flag) available but compiler is broken: disabling >&2
--  else
--	@echo Cannot use CONFIG_CC_STACKPROTECTOR_$(stackp-name): \
--                  $(stackp-flag) available but compiler is broken >&2 && exit 1
--  endif
--endif
--	@:
--
- # Generate some files
- # ---------------------------------------------------------------------------
- 
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 75dd23a..1556ef4 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -539,13 +539,16 @@ config HAVE_CC_STACKPROTECTOR
- 	bool
- 	help
- 	  An arch should select this symbol if:
--	  - its compiler supports the -fstack-protector option
- 	  - it has implemented a stack canary (e.g. __stack_chk_guard)
- 
--choice
--	prompt "Stack Protector buffer overflow detection"
-+config CC_HAS_STACKPROTECTOR_NONE
-+	def_bool $(cc-option,-fno-stack-protector)
++kcov-flags-$(CONFIG_CC_HAS_SANCOV_TRACE_PC)	+= -fsanitize-coverage=trace-pc
++kcov-flags-$(CONFIG_KCOV_ENABLE_COMPARISONS)	+= -fsanitize-coverage=trace-cmp
++kcov-flags-$(CONFIG_GCC_PLUGIN_SANKOV)		+= -fplugin=$(objtree)/scripts/gcc-plugins/sancov_plugin.so
 +
-+config CC_STACKPROTECTOR
-+	bool "Stack Protector buffer overflow detection"
- 	depends on HAVE_CC_STACKPROTECTOR
--	default CC_STACKPROTECTOR_AUTO
-+	depends on $(cc-option,-fstack-protector)
-+	default y
- 	help
- 	  This option turns on the "stack-protector" GCC feature. This
- 	  feature puts, at the beginning of functions, a canary value on
-@@ -555,14 +558,6 @@ choice
- 	  overwrite the canary, which gets detected and the attack is then
- 	  neutralized via a kernel panic.
++export CFLAGS_KCOV := $(kcov-flags-y)
  
--config CC_STACKPROTECTOR_NONE
--	bool "None"
--	help
--	  Disable "stack-protector" GCC feature.
--
--config CC_STACKPROTECTOR_REGULAR
--	bool "Regular"
--	help
- 	  Functions will have the stack-protector canary logic added if they
- 	  have an 8-byte or larger character array on the stack.
- 
-@@ -574,7 +569,10 @@ config CC_STACKPROTECTOR_REGULAR
- 	  by about 0.3%.
- 
- config CC_STACKPROTECTOR_STRONG
--	bool "Strong"
-+	bool "Strong Stack Protector"
-+	depends on CC_STACKPROTECTOR
-+	depends on $(cc-option,-fstack-protector-strong)
-+	default y
- 	help
- 	  Functions will have the stack-protector canary logic added in any
- 	  of the following conditions:
-@@ -592,14 +590,6 @@ config CC_STACKPROTECTOR_STRONG
- 	  about 20% of all kernel functions, which increases the kernel code
- 	  size by about 2%.
- 
--config CC_STACKPROTECTOR_AUTO
--	bool "Automatic"
--	help
--	  If the compiler supports it, the best available stack-protector
--	  option will be chosen.
--
--endchoice
--
- config LD_DEAD_CODE_DATA_ELIMINATION
- 	bool
- 	help
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 2236505..9ab335f 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -126,7 +126,7 @@ config X86
- 	select HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD if X86_64
- 	select HAVE_ARCH_VMAP_STACK		if X86_64
- 	select HAVE_ARCH_WITHIN_STACK_FRAMES
--	select HAVE_CC_STACKPROTECTOR
-+	select HAVE_CC_STACKPROTECTOR		if CC_HAS_SANE_STACKPROTECTOR
- 	select HAVE_CMPXCHG_DOUBLE
- 	select HAVE_CMPXCHG_LOCAL
- 	select HAVE_CONTEXT_TRACKING		if X86_64
-@@ -345,6 +345,15 @@ config PGTABLE_LEVELS
- 	default 2
- 
- source "init/Kconfig"
-+
-+config CC_HAS_SANE_STACKPROTECTOR
-+	bool
-+	default $(success,$(srctree)/scripts/gcc-x86_64-has-stack-protector.sh $(CC)) if 64BIT
-+	default $(success,$(srctree)/scripts/gcc-x86_32-has-stack-protector.sh $(CC))
-+	help
-+	   We have to make sure stack protector is unconditionally disabled if
-+	   the compiler produces broken code.
-+
- source "kernel/Kconfig.freezer"
- 
- menu "Processor type and features"
-diff --git a/scripts/gcc-x86_32-has-stack-protector.sh b/scripts/gcc-x86_32-has-stack-protector.sh
-index 6b2aeef..f5c1194 100755
---- a/scripts/gcc-x86_32-has-stack-protector.sh
-+++ b/scripts/gcc-x86_32-has-stack-protector.sh
-@@ -1,9 +1,4 @@
- #!/bin/sh
- # SPDX-License-Identifier: GPL-2.0
- 
--echo "int foo(void) { char X[200]; return 3; }" | $* -S -x c -c -O0 -fstack-protector - -o - 2> /dev/null | grep -q "%gs"
--if [ "$?" -eq "0" ] ; then
--	echo y
--else
--	echo n
--fi
-+echo "int foo(void) { char X[200]; return 3; }" | $* -S -x c -c -m32 -O0 -fstack-protector - -o - 2> /dev/null | grep -q "%gs"
-diff --git a/scripts/gcc-x86_64-has-stack-protector.sh b/scripts/gcc-x86_64-has-stack-protector.sh
-index 4a48bdc..3755af0 100755
---- a/scripts/gcc-x86_64-has-stack-protector.sh
-+++ b/scripts/gcc-x86_64-has-stack-protector.sh
-@@ -2,8 +2,3 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- echo "int foo(void) { char X[200]; return 3; }" | $* -S -x c -c -O0 -mcmodel=kernel -fno-PIE -fstack-protector - -o - 2> /dev/null | grep -q "%gs"
--if [ "$?" -eq "0" ] ; then
--	echo y
--else
--	echo n
--fi
+ endif
 -- 
 2.7.4
 
