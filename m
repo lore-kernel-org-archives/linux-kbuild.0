@@ -1,89 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:55554 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755686AbeE1S1m (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 May 2018 14:27:42 -0400
-From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: [PATCH v2] kbuild: add endianness flag to CHEKCFLAGS
-Date: Mon, 28 May 2018 20:27:35 +0200
-Message-Id: <20180528182735.18257-1-luc.vanoostenryck@gmail.com>
+Received: from ozlabs.org ([203.11.71.1]:36329 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754569AbeE2GES (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 29 May 2018 02:04:18 -0400
+Date: Tue, 29 May 2018 16:04:15 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: linux-next: build warning after merge of the devicetree tree
+Message-ID: <20180529160415.5da54b08@canb.auug.org.au>
+In-Reply-To: <CAL_Jsq+nbTv-bnjo=OQR+P49MgjwL7qkcc+47=jRHb4z0V94Vw@mail.gmail.com>
+References: <20180509160449.68b865a2@canb.auug.org.au>
+        <CAL_Jsq+nbTv-bnjo=OQR+P49MgjwL7qkcc+47=jRHb4z0V94Vw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/xGvQJ8uUMEfKuePU45zux=E"; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Jonas Bonn <jonas@southpole.se>, Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>, Stafford Horne <shorne@gmail.com>, "James E . J . Bottomley" <jejb@parisc-linux.org>, Helge Deller <deller@gmx.de>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, openrisc@lists.librecores.org, linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+To: Rob Herring <robherring2@gmail.com>
+Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-The kernel depends on macros like __BYTE_ORDER__,
-__BIG_ENDIAN__ or __LITTLE_ENDIAN__.
+--Sig_/xGvQJ8uUMEfKuePU45zux=E
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-OTOH, sparse doesn't know about the endianness of the kernel and
-by default uses the same as the machine on which sparse was built.
+Hi Rob,
 
-Ensure that sparse can predefine the macros corresponding to
-how the kernel was configured by adding -m{big,little}-endian
-to CHECKFLAGS in the main Makefile (and so for all archs).
-Also, remove the equivalent done in arch specific Makefiles.
+On Wed, 9 May 2018 07:17:06 -0500 Rob Herring <robherring2@gmail.com> wrote:
+>
+> > and over 2000 more :-( =20
+>=20
+> I assume you mean on other files. I've already sent out patches for
+> arm and arm64 dts files.
 
-Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
----
- Makefile               | 3 +++
- arch/openrisc/Makefile | 1 -
- arch/parisc/Makefile   | 2 +-
- arch/s390/Makefile     | 2 +-
- 4 files changed, 5 insertions(+), 3 deletions(-)
+Yeah, we appear to be just down to this now:
 
-diff --git a/Makefile b/Makefile
-index 56ba070df..6c6610913 100644
---- a/Makefile
-+++ b/Makefile
-@@ -878,6 +878,9 @@ ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
- LDFLAGS_vmlinux	+= $(call ld-option, -X,)
- endif
- 
-+# insure the checker run with the right endianness
-+CHECKFLAGS += $(if $(CONFIG_CPU_BIG_ENDIAN),-mbig-endian,-mlittle-endian)
-+
- # Default kernel image to build when no specific target is given.
- # KBUILD_IMAGE may be overruled on the command line or
- # set in the environment
-diff --git a/arch/openrisc/Makefile b/arch/openrisc/Makefile
-index cf8802962..89076a66e 100644
---- a/arch/openrisc/Makefile
-+++ b/arch/openrisc/Makefile
-@@ -25,7 +25,6 @@ LDFLAGS_vmlinux :=
- LIBGCC 		:= $(shell $(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name)
- 
- KBUILD_CFLAGS	+= -pipe -ffixed-r10 -D__linux__
--CHECKFLAGS	+= -mbig-endian
- 
- ifeq ($(CONFIG_OPENRISC_HAVE_INST_MUL),y)
- 	KBUILD_CFLAGS += $(call cc-option,-mhard-mul)
-diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
-index 34ac503e2..348ae4779 100644
---- a/arch/parisc/Makefile
-+++ b/arch/parisc/Makefile
-@@ -22,7 +22,7 @@ KBUILD_IMAGE := vmlinuz
- KBUILD_DEFCONFIG := default_defconfig
- 
- NM		= sh $(srctree)/arch/parisc/nm
--CHECKFLAGS	+= -D__hppa__=1 -mbig-endian
-+CHECKFLAGS	+= -D__hppa__=1
- LIBGCC		= $(shell $(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name)
- export LIBGCC
- 
-diff --git a/arch/s390/Makefile b/arch/s390/Makefile
-index c79936d02..68a690442 100644
---- a/arch/s390/Makefile
-+++ b/arch/s390/Makefile
-@@ -18,7 +18,7 @@ KBUILD_CFLAGS	+= -m64
- KBUILD_AFLAGS	+= -m64
- UTS_MACHINE	:= s390x
- STACK_SIZE	:= 16384
--CHECKFLAGS	+= -D__s390__ -D__s390x__ -mbig-endian
-+CHECKFLAGS	+= -D__s390__ -D__s390x__
- 
- export LD_BFD
- 
--- 
-2.17.0
+arch/arm/boot/dts/qcom-apq8064-arrow-sd-600eval.dtb: Warning (graph_endpoin=
+t): /soc/mdp@5100000/ports/port@3/endpoint: graph connection to node '/soc/=
+hdmi-tx@4a00000/ports/port@0/endpoint' is not bidirectional
+arch/arm/boot/dts/rk3288-evb-act8846.dtb: Warning (graph_endpoint): /dp@ff9=
+70000/ports/port@1/endpoint: graph node unit address error, expected "0"
+arch/arm/boot/dts/rk3288-evb-rk808.dtb: Warning (graph_endpoint): /dp@ff970=
+000/ports/port@1/endpoint: graph node unit address error, expected "0"
+arch/arm/boot/dts/rk3288-veyron-jaq.dtb: Warning (graph_endpoint): /dp@ff97=
+0000/ports/port@1/endpoint: graph node unit address error, expected "0"
+arch/arm/boot/dts/rk3288-veyron-jerry.dtb: Warning (graph_endpoint): /dp@ff=
+970000/ports/port@1/endpoint: graph node unit address error, expected "0"
+arch/arm/boot/dts/rk3288-veyron-minnie.dtb: Warning (graph_endpoint): /dp@f=
+f970000/ports/port@1/endpoint: graph node unit address error, expected "0"
+arch/arm/boot/dts/rk3288-veyron-pinky.dtb: Warning (graph_endpoint): /dp@ff=
+970000/ports/port@1/endpoint: graph node unit address error, expected "0"
+arch/arm/boot/dts/rk3288-veyron-speedy.dtb: Warning (graph_endpoint): /dp@f=
+f970000/ports/port@1/endpoint: graph node unit address error, expected "0"
 
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/xGvQJ8uUMEfKuePU45zux=E
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlsM7V8ACgkQAVBC80lX
+0GzWCgf/dvr0oYnLxzYXLCnLiv/at4ML7V6MPa9mjfwVMkZ324eQKMP+kbTq7TEp
+ndm86b42YXCL41ErG37G054+veq1yE7fvpEj7cgVodkBjbp4K7BiWH1IKeE1+4tq
+1xVDL6jCDG+p7zzdKuxcs86QkRGbxv5vbIt4Cz7q1EvSHtT2CmN2vfCZ1pOVs8pt
+pMuDjdfRQ13Dl9guJRBBxzza7RM+4IZ5MrDk6/sRVlfbJ+t5CC1YYEbjk9GNVKL5
+t3cAqoliK9yQpoICIfPNmosBKwXODJ06aQHU6IbyrLtF5mG1OQr4NGk9rsDfsPMo
+30pt6VILOCo6JqlKLV5PndrBehesYA==
+=d4NB
+-----END PGP SIGNATURE-----
+
+--Sig_/xGvQJ8uUMEfKuePU45zux=E--
