@@ -1,99 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:17330 "EHLO
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:58897 "EHLO
         conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933444AbeE2NIw (ORCPT
+        with ESMTP id S933548AbeE2Nkw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 May 2018 09:08:52 -0400
+        Tue, 29 May 2018 09:40:52 -0400
+Received: from mail-vk0-f42.google.com (mail-vk0-f42.google.com [209.85.213.42]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id w4TDeTM2030708
+        for <linux-kbuild@vger.kernel.org>; Tue, 29 May 2018 22:40:30 +0900
+Received: by mail-vk0-f42.google.com with SMTP id 200-v6so6803911vkc.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 29 May 2018 06:40:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180528182735.18257-1-luc.vanoostenryck@gmail.com>
-References: <20180528182735.18257-1-luc.vanoostenryck@gmail.com>
+In-Reply-To: <20180516141458.18996-2-npiggin@gmail.com>
+References: <20180516141458.18996-1-npiggin@gmail.com> <20180516141458.18996-2-npiggin@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 29 May 2018 22:08:06 +0900
-Message-ID: <CAK7LNASM461EHR-4VOMR8d-kx4v8RbZtr7cQ2YQ7X4JYTGenZg@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: add endianness flag to CHEKCFLAGS
+Date: Tue, 29 May 2018 22:39:48 +0900
+Message-ID: <CAK7LNASsx_gDQePtNRdiY8v4RbysQqoKKfr1LW6dsz=7fq-oEQ@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] powerpc/kbuild: set default generic machine type
+ for 32-bit compile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Cc: Jonas Bonn <jonas@southpole.se>, Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>, Stafford Horne <shorne@gmail.com>, "James E . J . Bottomley" <jejb@parisc-linux.org>, Helge Deller <deller@gmx.de>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, openrisc@lists.librecores.org, linux-parisc@vger.kernel.org, linux-s390 <linux-s390@vger.kernel.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Segher Boessenkool <segher@kernel.crashing.org>
 
-2018-05-29 3:27 GMT+09:00 Luc Van Oostenryck <luc.vanoostenryck@gmail.com>:
-> The kernel depends on macros like __BYTE_ORDER__,
-> __BIG_ENDIAN__ or __LITTLE_ENDIAN__.
+2018-05-16 23:14 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> Some 64-bit toolchains uses the wrong ISA variant for compiling 32-bit
+> kernels, even with -m32. Debian's powerpc64le is one such case, and
+> that is because it is built with --with-cpu=power8.
 >
-> OTOH, sparse doesn't know about the endianness of the kernel and
-> by default uses the same as the machine on which sparse was built.
+> So when cross compiling a 32-bit kernel with a 64-bit toolchain, set
+> -mcpu=powerpc initially, which is the generic 32-bit powerpc machine
+> type and scheduling model. CPU and platform code can override this
+> with subsequent -mcpu flags if necessary.
 >
-> Ensure that sparse can predefine the macros corresponding to
-> how the kernel was configured by adding -m{big,little}-endian
-> to CHECKFLAGS in the main Makefile (and so for all archs).
-> Also, remove the equivalent done in arch specific Makefiles.
+> This is not done for 32-bit toolchains otherwise it would override
+> their defaults, which are presumably set appropriately for the
+> environment (moreso than a 64-bit cross compiler).
 >
-> Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+> This fixes a lot of build failures due to incompatible assembly when
+> compiling 32-bit kernel with th Debian powerpc64le 64-bit toolchain.
+>
+> Cc: Segher Boessenkool <segher@kernel.crashing.org>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
 
 
-Applied to linux-kbuild. Thanks.
+Can you please remove the noise changes?
+
+1/4 adds some blank lines, then 2/4 removes them.
 
 
->  Makefile               | 3 +++
->  arch/openrisc/Makefile | 1 -
->  arch/parisc/Makefile   | 2 +-
->  arch/s390/Makefile     | 2 +-
->  4 files changed, 5 insertions(+), 3 deletions(-)
+
+
+>  arch/powerpc/Makefile | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 >
-> diff --git a/Makefile b/Makefile
-> index 56ba070df..6c6610913 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -878,6 +878,9 @@ ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
->  LDFLAGS_vmlinux        += $(call ld-option, -X,)
+> diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
+> index 95813df90801..15ca4bafad82 100644
+> --- a/arch/powerpc/Makefile
+> +++ b/arch/powerpc/Makefile
+> @@ -24,9 +24,20 @@ ifeq ($(HAS_BIARCH),y)
+>  ifeq ($(CROSS32_COMPILE),)
+>  CROSS32CC      := $(CC) -m32
+>  KBUILD_ARFLAGS += --target=elf32-powerpc
+> +
+
+This blank line will be removed by the next patch.
+
+
+> +ifdef CONFIG_PPC32
+> +# These options will be overridden by any -mcpu option that the CPU
+> +# or platform code sets later on the command line, but they are needed
+> +# to set a sane 32-bit cpu target for the 64-bit cross compiler which
+> +# may default to the wrong ISA.
+> +KBUILD_CFLAGS          += -mcpu=powerpc
+> +KBUILD_AFLAGS          += -mcpu=powerpc
+> +endif
+> +
+
+This blank line will be removed by the next patch.
+
+
+>  endif
 >  endif
 >
-> +# insure the checker run with the right endianness
-> +CHECKFLAGS += $(if $(CONFIG_CPU_BIG_ENDIAN),-mbig-endian,-mlittle-endian)
 > +
->  # Default kernel image to build when no specific target is given.
->  # KBUILD_IMAGE may be overruled on the command line or
->  # set in the environment
-> diff --git a/arch/openrisc/Makefile b/arch/openrisc/Makefile
-> index cf8802962..89076a66e 100644
-> --- a/arch/openrisc/Makefile
-> +++ b/arch/openrisc/Makefile
-> @@ -25,7 +25,6 @@ LDFLAGS_vmlinux :=
->  LIBGCC                 := $(shell $(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name)
+
+This blank line will be removed by the next patch.
+
+
+
+>  export CROSS32CC CROSS32AR
 >
->  KBUILD_CFLAGS  += -pipe -ffixed-r10 -D__linux__
-> -CHECKFLAGS     += -mbig-endian
->
->  ifeq ($(CONFIG_OPENRISC_HAVE_INST_MUL),y)
->         KBUILD_CFLAGS += $(call cc-option,-mhard-mul)
-> diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
-> index 34ac503e2..348ae4779 100644
-> --- a/arch/parisc/Makefile
-> +++ b/arch/parisc/Makefile
-> @@ -22,7 +22,7 @@ KBUILD_IMAGE := vmlinuz
->  KBUILD_DEFCONFIG := default_defconfig
->
->  NM             = sh $(srctree)/arch/parisc/nm
-> -CHECKFLAGS     += -D__hppa__=1 -mbig-endian
-> +CHECKFLAGS     += -D__hppa__=1
->  LIBGCC         = $(shell $(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name)
->  export LIBGCC
->
-> diff --git a/arch/s390/Makefile b/arch/s390/Makefile
-> index c79936d02..68a690442 100644
-> --- a/arch/s390/Makefile
-> +++ b/arch/s390/Makefile
-> @@ -18,7 +18,7 @@ KBUILD_CFLAGS += -m64
->  KBUILD_AFLAGS  += -m64
->  UTS_MACHINE    := s390x
->  STACK_SIZE     := 16384
-> -CHECKFLAGS     += -D__s390__ -D__s390x__ -mbig-endian
-> +CHECKFLAGS     += -D__s390__ -D__s390x__
->
->  export LD_BFD
->
+>  ifeq ($(CROSS_COMPILE),)
 > --
 > 2.17.0
 >
