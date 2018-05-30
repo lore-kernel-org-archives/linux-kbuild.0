@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:47511 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753562AbeE3ObG (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:63325 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750914AbeE3OdI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 30 May 2018 10:31:06 -0400
-Received: from mail-vk0-f46.google.com (mail-vk0-f46.google.com [209.85.213.46]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id w4UEUjV7020000
-        for <linux-kbuild@vger.kernel.org>; Wed, 30 May 2018 23:30:46 +0900
-Received: by mail-vk0-f46.google.com with SMTP id g72-v6so11209289vke.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 30 May 2018 07:30:46 -0700 (PDT)
+        Wed, 30 May 2018 10:33:08 -0400
+Received: from mail-vk0-f49.google.com (mail-vk0-f49.google.com [209.85.213.49]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id w4UEX1jh002086
+        for <linux-kbuild@vger.kernel.org>; Wed, 30 May 2018 23:33:01 +0900
+Received: by mail-vk0-f49.google.com with SMTP id g72-v6so11214342vke.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 30 May 2018 07:33:01 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <20180530121922.22122-2-npiggin@gmail.com>
 References: <20180530121922.22122-1-npiggin@gmail.com> <20180530121922.22122-2-npiggin@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 30 May 2018 23:30:04 +0900
-Message-ID: <CAK7LNAQCzWQ78aFF=1HPvE=6eWCCGvccjaz4UmR01jcfUu+-jQ@mail.gmail.com>
+Date: Wed, 30 May 2018 23:32:20 +0900
+Message-ID: <CAK7LNAQJcZO7sy6qkX+vVSX9rx5db+r2Ni=4dgpY=jgbh7-VjA@mail.gmail.com>
 Subject: Re: [PATCH v5 1/4] powerpc/kbuild: set default generic machine type
  for 32-bit compile
 Content-Type: text/plain; charset="UTF-8"
@@ -39,7 +39,19 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linu
 >
 > This fixes a lot of build failures due to incompatible assembly when
 > compiling 32-bit kernel with th Debian powerpc64le 64-bit toolchain.
->
+
+When I applied this patch, I changed the following.
+
+"th" -> "the"
+
+
+Please let me know if my fix-up is bad.
+
+
+
+
+
+
 > Cc: Segher Boessenkool <segher@kernel.crashing.org>
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 >
@@ -75,11 +87,6 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linu
 > To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-All applied to linux-kbuild/kconfig.
-Thanks!
-
 
 
 
