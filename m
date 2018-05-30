@@ -1,134 +1,294 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:21866 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934388AbeE2Ntw (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:20955 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965181AbeE3Aj3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 May 2018 09:49:52 -0400
-Received: from mail-ua0-f178.google.com (mail-ua0-f178.google.com [209.85.217.178]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id w4TDncEM003104
-        for <linux-kbuild@vger.kernel.org>; Tue, 29 May 2018 22:49:38 +0900
-Received: by mail-ua0-f178.google.com with SMTP id e8-v6so9991966uam.13
-        for <linux-kbuild@vger.kernel.org>; Tue, 29 May 2018 06:49:38 -0700 (PDT)
+        Tue, 29 May 2018 20:39:29 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180516141458.18996-5-npiggin@gmail.com>
-References: <20180516141458.18996-1-npiggin@gmail.com> <20180516141458.18996-5-npiggin@gmail.com>
+In-Reply-To: <CAK7LNATmbiigNnPmfwOgMHqxyTOJ0H4ROMAfHZKqRxYN+W-=1w@mail.gmail.com>
+References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com> <CAK7LNATmbiigNnPmfwOgMHqxyTOJ0H4ROMAfHZKqRxYN+W-=1w@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 29 May 2018 22:48:57 +0900
-Message-ID: <CAK7LNASczrs9KVmeXuXjckPzrWjK=hsWMkk0iJKxw63kWuqoeQ@mail.gmail.com>
-Subject: Re: [PATCH v4 4/4] powerpc/kbuild: move -mprofile-kernel check to Kconfig
+Date: Wed, 30 May 2018 09:38:38 +0900
+Message-ID: <CAK7LNAT0S-4qq1T3q25H0BGsJSUpTsgV_+TGKBiPW-MUKyqzsQ@mail.gmail.com>
+Subject: Re: [PATCH v5 00/31] kconfig: move compiler capability tests to Kconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Segher Boessenkool <segher@kernel.crashing.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-2018-05-16 23:14 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
-> This eliminates the workaround that requires disabling
-> -mprofile-kernel by default in Kconfig.
+2018-05-28 21:23 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> 2018-05-28 18:21 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+>>
+>> [Introduction]
+>>
+>> The motivation of this work is to move the compiler option tests to
+>> Kconfig from Makefile.  A number of kernel features require the
+>> compiler support.  Enabling such features blindly in Kconfig ends up
+>> with a lot of nasty build-time testing in Makefiles.  If a chosen
+>> feature turns out unsupported by the compiler, what the build system
+>> can do is either to disable it (silently!) or to forcibly break the
+>> build, despite Kconfig has let the user to enable it.  By moving the
+>> compiler capability tests to Kconfig, Kconfig entries will be visible
+>> only when they are available.
+>>
+>> [Major Changes in V5]
+>>
+>> V5 removed the complexity unnecessary for Kconfig.
+>>
+>>  - In order to make the implementation simpler, I drop the lazy
+>>    argument expansion.
+>>    In V5, parameters are expanded before passed to a function.
+>>    (the same behavior as v3)
+>>
+>>  - Replace 'warning', 'error' functions with 'warning-if',
+>>    'error-if' functions.  The new functions are effective
+>>    only when the condition part is 'y'.
+>>
+>>  - In V4, '$' must be followed by '$' or '('.
+>>    '$$' meant an escaped '$'.
+>>
+>>    V4 caused a build error for ARC architecture due to the
+>>    following line:
+>>    https://github.com/torvalds/linux/blob/v4.17-rc4/arch/arc/Kconfig#L252
+>>
+>>    Of course, we could rephrase "D$" to "D cache", but
+>>    I treaked the grammar a little bit.
+>>
+>>    Kconfig decided to not support single-letter variable as in "$X".
+>>    Nor curly braces as in "${CC}" are not supported.
+>>    This means variable/function references in Kconfig always start
+>>    with "$(".
+>>    We can use '$' not followed by '(' as-is.
+>>    We do not need the "$$" escape sequence.
+>>    If necessary, we can use a trick to print '$(' verbatim.  See below.
+>>
+>>  - Fix a wrong behavior of simply expanded variables.
+>>    V4 expanded simply expanded variables when used, but it should not.
+>>
+>>    For example,
+>>
+>>    dollar := $
+>>    X := 1
+>>    Y := $(dollar)(X)
+>>    $(info,$(Y))
+>>
+>>    V5 prints '$(X)', not '1'.
+>>
+>>  - Remove a space after a comma is $( ) context.
+>>    Actually, spaces do not matter in most cases.
+>>
+>>    You can write either
+>>
+>>       $(cc-option,-fstack-protector)
+>>
+>>    or
+>>
+>>       $(cc-option, -fstack-protector)
+>>
+>>    In fact, both style co-exist in our Makefiles too.
+>>    However, there are some cases where they do matter.
+>>
+>>    I remove spaces after commas for consistency.
+>>    If you are unsure, no-space-after-comma is always safe.
+>>
+>> [Major Changes in V4]
+>>
+>>  - In V4, I slightly change the syntax of a function call.
+>>    I chose grammatical consistency and simplicity.
+>>    Anyway, Kconfig is deviating from Make behavior already.
+>>
+>>    In v3, a function call looked like this:
+>>
+>>       $(func-name arg1,arg2,arg3)
+>>
+>>    In v4, a function is invoked like follows:
+>>
+>>       $(func-name,arg1,arg2,arg3)
+>>
+>>    The difference is that the function name and the first argument
+>>    are separated by a comma.
+>>
+>>  - V3 supported single-letter variable like $X.
+>>    V4 dropped it because we do not need multiple ways to do the
+>>    same thing.
+>>    You must always enclose a variable name like $(X).
+>>
+>>  - Support lazy argument expansion.  This is necessary for implementing
+>>    'if', 'and', 'or' functions as in Make.
+>>
+>>  - Add more built-in functions:
+>>    'if', 'error', 'filename', 'lineno'
+>>
+>>  - Error out if a recursive variable references itself eventually.
+>>    For example,  X = $(X)
+>>    ends up with a circular expansion.  It must be terminated
+>>    since the expansion would continue eternally.
+>>
+>>  - Update Documentation and unit-tests, accordingly.
+>>
+>> [Major Changes in V3]
+>>
+>> This version looks more like Make.
+>>
+>>   - Use = operator instead of 'macro' keyword
+>>     to define a user-defined function.
+>>
+>>   - 'Recursively expanded variable' is implemented as a side-effect.
+>>      A variable is a function with zero argument.
+>>
+>>   - Support simply expanded variable which is defined by := operator
+>>
+>>   - Support += operator.
+>>     Probably, this feature will be useful to accumulate compiler flags.
+>>     At least, Clang needs some prerequisite flags such as triplet
+>>     to test other compiler flags.
+>>
+>>   - Support $(info ...) and $(warning ...) built-in functions,
+>>     which were useful while I was debugging this.
+>>
+>>   - Add documentation
+>>
+>>   - Add unit tests
+>>
+>>   - Collect helpers to scripts/Kconfig.include
+>>
+>> [Old Versions]
+>>
+>> V4:  https://lkml.org/lkml/2018/5/17/97
+>> V3:  https://lkml.org/lkml/2018/4/13/37
+>> V2:  https://lkml.org/lkml/2018/2/16/610
+>> V1:  https://lkml.org/lkml/2018/2/16/610
+>> RFC: https://lkml.org/lkml/2018/2/8/429
+>>
+>>
+>> Masahiro Yamada (31):
+>>   kbuild: remove kbuild cache
+>>   kbuild: remove CONFIG_CROSS_COMPILE support
+>>   kconfig: reference environment variables directly and remove 'option
+>>     env='
+>>   kconfig: remove string expansion in file_lookup()
+>>   kconfig: remove string expansion for mainmenu after yyparse()
+>>   kconfig: remove sym_expand_string_value()
+>>   kconfig: make default prompt of mainmenu less specific
+>>   kconfig: add built-in function support
+>>   kconfig: add 'shell' built-in function
+>>   kconfig: replace $(UNAME_RELEASE) with function call
+>>   kconfig: begin PARAM state only when seeing a command keyword
+>>   kconfig: support user-defined function and recursively expanded
+>>     variable
+>>   kconfig: support simply expanded variable
+>>   kconfig: support append assignment operator
+>>   kconfig: expand lefthand side of assignment statement
+>>   kconfig: add 'info', 'warning-if', and 'error-if' built-in functions
+>>   kconfig: add 'filename' and 'lineno' built-in variables
+>>   kconfig: error out if a recursive variable references itself
+>>   Documentation: kconfig: document a new Kconfig macro language
+>>   kconfig: test: add Kconfig macro language tests
+>>   kconfig: show compiler version text in the top comment
+>>   kconfig: add basic helper macros to scripts/Kconfig.include
+>>   stack-protector: test compiler capability in Kconfig and drop AUTO
+>>     mode
+>>   kconfig: add CC_IS_GCC and GCC_VERSION
+>>   kconfig: add CC_IS_CLANG and CLANG_VERSION
+>>   gcov: remove CONFIG_GCOV_FORMAT_AUTODETECT
+>>   kcov: test compiler capability in Kconfig and correct dependency
+>>   gcc-plugins: move GCC version check for PowerPC to Kconfig
+>>   gcc-plugins: test plugin support in Kconfig and clean up Makefile
+>>   gcc-plugins: allow to enable GCC_PLUGINS for COMPILE_TEST
+>>   Documentation: kconfig: add recommended way to describe compiler
+>>     support
+>>
+>>  Documentation/kbuild/kconfig-language.txt          |  26 +-
+>>  Documentation/kbuild/kconfig-macro-language.txt    | 242 +++++++++
+>>  Kconfig                                            |  10 +-
+>>  MAINTAINERS                                        |   3 +-
+>>  Makefile                                           | 105 +---
+>>  arch/Kconfig                                       |  49 +-
+>>  arch/powerpc/Kconfig                               |   2 +-
+>>  arch/sh/Kconfig                                    |   4 +-
+>>  arch/sparc/Kconfig                                 |   4 +-
+>>  arch/um/Kconfig.common                             |   4 -
+>>  arch/x86/Kconfig                                   |  15 +-
+>>  arch/x86/um/Kconfig                                |  10 +-
+>>  init/Kconfig                                       |  40 +-
+>>  kernel/gcov/Kconfig                                |  17 +-
+>>  kernel/gcov/Makefile                               |   2 -
+>>  lib/Kconfig.debug                                  |  11 +-
+>>  scripts/Kbuild.include                             | 101 +---
+>>  scripts/Kconfig.include                            |  30 ++
+>>  scripts/Makefile.gcc-plugins                       |  91 +---
+>>  scripts/Makefile.kcov                              |  10 +-
+>>  scripts/clang-version.sh                           |  18 +-
+>>  scripts/gcc-plugins/Makefile                       |   1 +
+>>  scripts/gcc-x86_32-has-stack-protector.sh          |   7 +-
+>>  scripts/gcc-x86_64-has-stack-protector.sh          |   5 -
+>>  scripts/kconfig/confdata.c                         |  33 +-
+>>  scripts/kconfig/kconf_id.c                         |   1 -
+>>  scripts/kconfig/lkc.h                              |   5 +-
+>>  scripts/kconfig/lkc_proto.h                        |  15 +-
+>>  scripts/kconfig/menu.c                             |   3 -
+>>  scripts/kconfig/preprocess.c                       | 572 +++++++++++++++++++++
+>>  scripts/kconfig/symbol.c                           | 109 ----
+>>  .../tests/no_write_if_dep_unmet/expected_config    |   2 +-
+>>  .../kconfig/tests/preprocess/builtin_func/Kconfig  |  27 +
+>>  .../tests/preprocess/builtin_func/__init__.py      |   9 +
+>>  .../tests/preprocess/builtin_func/expected_stderr  |   5 +
+>>  .../tests/preprocess/builtin_func/expected_stdout  |   1 +
+>>  .../tests/preprocess/circular_expansion/Kconfig    |   5 +
+>>  .../preprocess/circular_expansion/__init__.py      |  11 +
+>>  .../preprocess/circular_expansion/expected_stderr  |   1 +
+>>  scripts/kconfig/tests/preprocess/escape/Kconfig    |  44 ++
+>>  .../kconfig/tests/preprocess/escape/__init__.py    |   8 +
+>>  .../tests/preprocess/escape/expected_stderr        |  10 +
+>>  scripts/kconfig/tests/preprocess/variable/Kconfig  |  53 ++
+>>  .../kconfig/tests/preprocess/variable/__init__.py  |   8 +
+>>  .../tests/preprocess/variable/expected_stderr      |   9 +
+>>  scripts/kconfig/util.c                             |  33 +-
+>>  scripts/kconfig/zconf.l                            |  95 +++-
+>>  scripts/kconfig/zconf.y                            |  46 +-
+>>  48 files changed, 1345 insertions(+), 567 deletions(-)
+>>  create mode 100644 Documentation/kbuild/kconfig-macro-language.txt
+>>  create mode 100644 scripts/Kconfig.include
+>>  create mode 100644 scripts/kconfig/preprocess.c
+>>  create mode 100644 scripts/kconfig/tests/preprocess/builtin_func/Kconfig
+>>  create mode 100644 scripts/kconfig/tests/preprocess/builtin_func/__init__.py
+>>  create mode 100644 scripts/kconfig/tests/preprocess/builtin_func/expected_stderr
+>>  create mode 100644 scripts/kconfig/tests/preprocess/builtin_func/expected_stdout
+>>  create mode 100644 scripts/kconfig/tests/preprocess/circular_expansion/Kconfig
+>>  create mode 100644 scripts/kconfig/tests/preprocess/circular_expansion/__init__.py
+>>  create mode 100644 scripts/kconfig/tests/preprocess/circular_expansion/expected_stderr
+>>  create mode 100644 scripts/kconfig/tests/preprocess/escape/Kconfig
+>>  create mode 100644 scripts/kconfig/tests/preprocess/escape/__init__.py
+>>  create mode 100644 scripts/kconfig/tests/preprocess/escape/expected_stderr
+>>  create mode 100644 scripts/kconfig/tests/preprocess/variable/Kconfig
+>>  create mode 100644 scripts/kconfig/tests/preprocess/variable/__init__.py
+>>  create mode 100644 scripts/kconfig/tests/preprocess/variable/expected_stderr
+>>
+>> --
+>> 2.7.4
+>>
 >
-> [ Note: this depends on https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig-shell-v3 ]
 >
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
-> Since v3:
-> - Moved a stray hunk back to patch 3 where it belongs.
 >
->  arch/powerpc/Kconfig  | 16 +---------------
->  arch/powerpc/Makefile | 14 ++------------
->  2 files changed, 3 insertions(+), 27 deletions(-)
+> I pushed this series to
 >
-> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-> index 512fcc177c87..af527f894f9b 100644
-> --- a/arch/powerpc/Kconfig
-> +++ b/arch/powerpc/Kconfig
-> @@ -460,23 +460,9 @@ config LD_HEAD_STUB_CATCH
+> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+> kconfig-shell-v5
 >
->           If unsure, say "N".
->
-> -config DISABLE_MPROFILE_KERNEL
-> -       bool "Disable use of mprofile-kernel for kernel tracing"
-> -       depends on PPC64 && CPU_LITTLE_ENDIAN
-> -       default y
-> -       help
-> -         Selecting this options disables use of the mprofile-kernel ABI for
-> -         kernel tracing. That will cause options such as live patching
-> -         (CONFIG_LIVEPATCH) which depend on CONFIG_DYNAMIC_FTRACE_WITH_REGS to
-> -         be disabled also.
-> -
-> -         If you have a toolchain which supports mprofile-kernel, then you can
-> -         disable this. Otherwise leave it enabled. If you're not sure, say
-> -         "Y".
-> -
->  config MPROFILE_KERNEL
->         depends on PPC64 && CPU_LITTLE_ENDIAN
-> -       def_bool !DISABLE_MPROFILE_KERNEL
-> +       def_bool $(success $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__)
 
 
-Your fix-up patch is good,
-but could you check my comments below please?
+I pushed this series to the for-next branch.
+Unless a significant problem is reported,
+I'd like to merge this series in the upcoming MW.
+At least, I need to keep it in linux-next for a while.
 
+Your comments and tags are still appreciated.
+I will add tags (or replace patches if necessary) later,
+but I want this series tested in linux-next
+to expose to more developers' eyes.
 
-
->  config IOMMU_HELPER
->         def_bool PPC64
-> diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-> index 6faf1d6ad9dd..8f7a64fe7370 100644
-> --- a/arch/powerpc/Makefile
-> +++ b/arch/powerpc/Makefile
-> @@ -161,18 +161,8 @@ CFLAGS-$(CONFIG_GENERIC_CPU) += -mcpu=powerpc64
->  endif
->
->  ifdef CONFIG_MPROFILE_KERNEL
-> -    ifeq ($(shell $(srctree)/arch/powerpc/tools/gcc-check-mprofile-kernel.sh $(CC) -I$(srctree)/include -D__KERNEL__),OK)
-
-
-You do not need to compare the returned string with "OK" any more.
-
-
-Please remove the
-echo "OK"
-line from the shell script.
-
-
-
-> -        CC_FLAGS_FTRACE := -pg -mprofile-kernel
-> -        KBUILD_CPPFLAGS += -DCC_USING_MPROFILE_KERNEL
-> -    else
-> -        # If the user asked for mprofile-kernel but the toolchain doesn't
-> -        # support it, emit a warning and deliberately break the build later
-> -        # with mprofile-kernel-not-supported. We would prefer to make this an
-> -        # error right here, but then the user would never be able to run
-> -        # oldconfig to change their configuration.
-> -        $(warning Compiler does not support mprofile-kernel, set CONFIG_DISABLE_MPROFILE_KERNEL)
-> -        CC_FLAGS_FTRACE := -mprofile-kernel-not-supported
-> -    endif
-> +       CC_FLAGS_FTRACE := -pg -mprofile-kernel
-> +       KBUILD_CPPFLAGS += -DCC_USING_MPROFILE_KERNEL
-
-
-Now, CONFIG_MPROFILE_KERNEL is equivalent to CC_USING_MPROFILE_KERNEL.
-
-
-If you replace #ifdef CC_USING_MPROFILE_KERNEL
-with #ifdef CONFIG_MPROFILE_KERNEL,
-you can remove CC_USING_MRPROFILE_KERNEL entirely, right?
-
-
-
-
-
->  endif
->
->  CFLAGS-$(CONFIG_CELL_CPU) += $(call cc-option,-mcpu=cell)
-> --
-> 2.17.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+It passed my local test.  O-day bot did not report anything so far.
 
 
 -- 
