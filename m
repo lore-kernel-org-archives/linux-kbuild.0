@@ -1,120 +1,177 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f67.google.com ([209.85.160.67]:44121 "EHLO
-        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753944AbeEaGul (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:38113 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754072AbeEaIii (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 May 2018 02:50:41 -0400
-Received: by mail-pl0-f67.google.com with SMTP id z9-v6so9296593plk.11
-        for <linux-kbuild@vger.kernel.org>; Wed, 30 May 2018 23:50:41 -0700 (PDT)
+        Thu, 31 May 2018 04:38:38 -0400
+Received: by mail-wm0-f65.google.com with SMTP id m129-v6so52347391wmb.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 31 May 2018 01:38:37 -0700 (PDT)
+Date: Thu, 31 May 2018 09:38:32 +0100
+From: Daniel Thompson <daniel.thompson@linaro.org>
+Subject: Re: [PATCH] kbuild: add machine size to CHEKCFLAGS
+Message-ID: <20180531083832.glzcj23cgucev77v@holly.lan>
+References: <20180530204838.22079-1-luc.vanoostenryck@gmail.com>
 MIME-Version: 1.0
-References: <CAKwvOd=jmi_7LvZbS0PA5-zt62m5ZFPUNG7JtMQVmerCR63ebQ@mail.gmail.com>
- <BDEF22F0-84A5-4A36-B153-13E6A4260922@zytor.com> <CAKwvOdnLt5qr_5ah86qdsocTxUbo_3X1y3PPRp1EZwt=__NxnA@mail.gmail.com>
- <dd1626ae-114f-3817-c8b2-f845e079bfc6@zytor.com> <CAKwvOdkEHqv7Ut8H6Rb+gSvfWsMHqO=E3f7yxm=06m9yEn=h6w@mail.gmail.com>
- <26B017D5-4063-46CB-8768-B0E5E7CD3838@zytor.com> <CAKwvOdk_4g5PsRUoLgOeWEwt+d0diyD_Ycx6s7LQsJrSMsBEuA@mail.gmail.com>
- <319FB971-ABB6-4BE7-969B-D87D84853196@zytor.com> <CAKwvOdmryseROx=iSs6CZ86-tr90Fni8RC_w6Y7nFSXGW=508g@mail.gmail.com>
- <31A5469A-176F-451F-886A-ECD649DDC78C@zytor.com> <CAKwvOdkpWZC4vWK8hDdgUGseTmK4Hz5uDHn_mP9yc=jbfdVPmg@mail.gmail.com>
- <A042BB2E-FACF-4AE0-8B1E-716061666C5F@zytor.com> <CAKwvOdkWsxoyXCnQz+Xwh0RQ0yPPVD3iCqVaWAimW_Z4QU0XiA@mail.gmail.com>
- <38f21c66-fa34-3a77-33bc-d15065c15af9@zytor.com> <CAKwvOdkurUGcSAGjR8_nDRgHLFLj93E1wAA3+O0A+pKPHvzwRA@mail.gmail.com>
-In-Reply-To: <CAKwvOdkurUGcSAGjR8_nDRgHLFLj93E1wAA3+O0A+pKPHvzwRA@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 30 May 2018 23:50:28 -0700
-Message-ID: <CAKwvOd=FN0G-zs-DMF3ubs8y9-PDEamfi__P_iv_JgN3bH6qFw@mail.gmail.com>
-Subject: Re: [clang] stack protector and f1f029c7bf
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180530204838.22079-1-luc.vanoostenryck@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: hpa@zytor.com
-Cc: Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Matthias Kaehlcke <mka@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, LKML <linux-kernel@vger.kernel.org>, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Richard Henderson <rth@twiddle.net>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, "James E . J . Bottomley" <jejb@parisc-linux.org>, Helge Deller <deller@gmx.de>, "David S . Miller" <davem@davemloft.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Brendan Higgins <brendanhiggins@google.com>, Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-ia64@vger.kernel.org, linux-mips@linux-mips.org, linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, Christoph Hellwig <hch@infradead.org>, Rob Landley <rob@landley.net>
 
-On Fri, May 25, 2018 at 3:38 PM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
->
-> On Fri, May 25, 2018 at 2:06 PM H. Peter Anvin <hpa@zytor.com> wrote:
-> > On 05/25/18 13:36, Nick Desaulniers wrote:
-> > > On Fri, May 25, 2018 at 10:56 AM <hpa@zytor.com> wrote:
-> > >> You need the extern inline in the .h file and the out-of-line .S file
-> > > I don't see how you can specify to the linker from assembly source that
-> > > this function should be treated as `extern inline`?
-> > "extern inline" is a C directive. In the header file you should provide
-> > the inlinable implementation (which is already there.) It means that "if
-> > you don't want to inline this there is an external implementation
-> > available."
->
-> oh you put `extern inline` on the definition, not the declaration?! What?!
->
-> http://m68hc11.serveftp.org/inline-1.php
->
-> in fact documents that trick.  Wow, I've never seen that before.  Seems
-> like there's not too many instances in the kernel.
->
-> This seems to inline native_save_fl() properly into the call sites, but the
-> boot code now fails to link due to multiple definitions when trying link
-> the objects from arch/x86/boot/compressed/ into vmlinux.
->
-> When disassembling the the arch/x86/boot/compressed/ objects, I can see
-> they're pulling in the `extern inline` c versions, but still outlining
-> them! (gcc and clang).
->
-> That seems to contradict the statement from the above link:
-> "In no case is the function compiled on its own, not even if you refer to
-> its address explicitly"
->
-> This is kind of funny; first we were wondering why native_save_fl was
-> getting outlined as a static inline function, which Alistair tracked down
-> to the incorrect use as a function pointer. Now I'm playing why is
-> native_save_fl getting outlined as an extern inline function.
->
-> If I move the .S file to be in arch/x86/kernel/boot/compressed, the boot
-> code now links but then paravirt.o fails to link.  Referring to the .S from
-> both Makefiles results in multiple definitions that the linker doesn't
-> like. (and the boot code still containing outlines).
->
-> I don't understand how `extern inline` signals to the linker that "this
-> version should be taken if you find no others".  From what I can tell with
-> `readelf -a` and `objdump -d`, a function marked `extern inline` vs not
-> look similar.
->
-> Then again, arch/x86/boot/compressed/Makefile completely resets
-> KBUILD_CFLAGS and KBUILD_AFLAGS, which may be problematic (if there's some
-> kind of command line flag that affects `extern inline` linkage).
+On Wed, May 30, 2018 at 10:48:38PM +0200, Luc Van Oostenryck wrote:
+> By default, sparse assumes a 64bit machine when compiled on x86-64
+> and 32bit when compiled on anything else.
+> 
+> This can of course create all sort of problems for the other archs, like
+> issuing false warnings ('shift too big (32) for type unsigned long'), or
+> worse, failing to emit legitimate warnings.
+> 
+> Fix this by adding the -m32/-m64 flag, depending on CONFIG_64BIT,
+> to CHECKFLAGS in the main Makefile (and so for all archs).
+> Also, remove the now unneeded -m32/-m64 in arch specific Makefiles.
+> 
+> Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 
-Aha! This (wiping away CFLAGS) was it!  The rules for `extern inline`
-for gnu89 and c99 are exactly the opposite! [0][1]
+Looks like a good clean up to me. However the typo in the Subject: line
+did attract my attention.
 
-c99: "a function defined extern inline will always, emit an externally
-visible function."
 
-but then
+Daniel.
 
-gnu89: "gnu89 semantics of inline and extern inline are essentially
-the exact opposite of those in C99"
 
-This is elaborated more concisely in [2].
-
-If I add `-std=gnu89` to the KBUILD_CFLAGS for compilation units that
-are missing that flag but include irqflags.h, I stop getting multiple
-definition linkage errors and link the expected kernel image!
-
-This is something to seriously consider for whoever might ever want to
-change the kernel's C standard: that you'll end up flipping the
-semantics of `extern inline`.  Sounds like `-fgnu89-inline` compiler
-flag or `gnu_inline` attribute could be used to correct such a
-situation.
-
-+ KBUILD maintainers and mailing list.
-
-Completely overwriting the KBUILD_CFLAGS from sub directory Makefiles
-(using the := operator) has been making me feel uneasy, since we very
-carefully try to set the necessary flags for Clang in the top level
-Makefile.  In this case, the C standard is different for at least 2
-subdirectories, which has implications for at least the above case
-with the linkage of `extern inline` functions.
-
-Will do further testing and cut a patch set tomorrow.
-
-[0] https://en.wikipedia.org/wiki/Inline_function#C99
-[1] https://en.wikipedia.org/wiki/Inline_function#gnu89
-[2] http://blahg.josefsipek.net/?p=529
--- 
-Thanks,
-~Nick Desaulniers
+> ---
+>  Makefile             | 3 +++
+>  arch/alpha/Makefile  | 2 +-
+>  arch/arm/Makefile    | 2 +-
+>  arch/arm64/Makefile  | 2 +-
+>  arch/ia64/Makefile   | 2 +-
+>  arch/mips/Makefile   | 3 ---
+>  arch/parisc/Makefile | 2 +-
+>  arch/sparc/Makefile  | 2 +-
+>  arch/x86/Makefile    | 2 +-
+>  9 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 6c6610913..18379987c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -881,6 +881,9 @@ endif
+>  # insure the checker run with the right endianness
+>  CHECKFLAGS += $(if $(CONFIG_CPU_BIG_ENDIAN),-mbig-endian,-mlittle-endian)
+>  
+> +# the checker needs the correct machine size
+> +CHECKFLAGS += $(if $(CONFIG_64BIT),-m64,-m32)
+> +
+>  # Default kernel image to build when no specific target is given.
+>  # KBUILD_IMAGE may be overruled on the command line or
+>  # set in the environment
+> diff --git a/arch/alpha/Makefile b/arch/alpha/Makefile
+> index 2cc3cc519..c5ec8c09c 100644
+> --- a/arch/alpha/Makefile
+> +++ b/arch/alpha/Makefile
+> @@ -11,7 +11,7 @@
+>  NM := $(NM) -B
+>  
+>  LDFLAGS_vmlinux	:= -static -N #-relax
+> -CHECKFLAGS	+= -D__alpha__ -m64
+> +CHECKFLAGS	+= -D__alpha__
+>  cflags-y	:= -pipe -mno-fp-regs -ffixed-8
+>  cflags-y	+= $(call cc-option, -fno-jump-tables)
+>  
+> diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+> index e4e537f27..f32a5468d 100644
+> --- a/arch/arm/Makefile
+> +++ b/arch/arm/Makefile
+> @@ -135,7 +135,7 @@ endif
+>  KBUILD_CFLAGS	+=$(CFLAGS_ABI) $(CFLAGS_ISA) $(arch-y) $(tune-y) $(call cc-option,-mshort-load-bytes,$(call cc-option,-malignment-traps,)) -msoft-float -Uarm
+>  KBUILD_AFLAGS	+=$(CFLAGS_ABI) $(AFLAGS_ISA) $(arch-y) $(tune-y) -include asm/unified.h -msoft-float
+>  
+> -CHECKFLAGS	+= -D__arm__ -m32
+> +CHECKFLAGS	+= -D__arm__
+>  
+>  #Default value
+>  head-y		:= arch/arm/kernel/head$(MMUEXT).o
+> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+> index 87f7d2f9f..3c353b471 100644
+> --- a/arch/arm64/Makefile
+> +++ b/arch/arm64/Makefile
+> @@ -78,7 +78,7 @@ LDFLAGS		+= -maarch64linux
+>  UTS_MACHINE	:= aarch64
+>  endif
+>  
+> -CHECKFLAGS	+= -D__aarch64__ -m64
+> +CHECKFLAGS	+= -D__aarch64__
+>  
+>  ifeq ($(CONFIG_ARM64_MODULE_PLTS),y)
+>  KBUILD_LDFLAGS_MODULE	+= -T $(srctree)/arch/arm64/kernel/module.lds
+> diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
+> index 2dd7f519a..45f59808b 100644
+> --- a/arch/ia64/Makefile
+> +++ b/arch/ia64/Makefile
+> @@ -18,7 +18,7 @@ READELF := $(CROSS_COMPILE)readelf
+>  
+>  export AWK
+>  
+> -CHECKFLAGS	+= -m64 -D__ia64=1 -D__ia64__=1 -D_LP64 -D__LP64__
+> +CHECKFLAGS	+= -D__ia64=1 -D__ia64__=1 -D_LP64 -D__LP64__
+>  
+>  OBJCOPYFLAGS	:= --strip-all
+>  LDFLAGS_vmlinux	:= -static
+> diff --git a/arch/mips/Makefile b/arch/mips/Makefile
+> index 5e9fce076..e2122cca4 100644
+> --- a/arch/mips/Makefile
+> +++ b/arch/mips/Makefile
+> @@ -309,9 +309,6 @@ ifdef CONFIG_MIPS
+>  CHECKFLAGS += $(shell $(CC) $(KBUILD_CFLAGS) -dM -E -x c /dev/null | \
+>  	egrep -vw '__GNUC_(|MINOR_|PATCHLEVEL_)_' | \
+>  	sed -e "s/^\#define /-D'/" -e "s/ /'='/" -e "s/$$/'/" -e 's/\$$/&&/g')
+> -ifdef CONFIG_64BIT
+> -CHECKFLAGS		+= -m64
+> -endif
+>  endif
+>  
+>  OBJCOPYFLAGS		+= --remove-section=.reginfo
+> diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
+> index 348ae4779..714284ea6 100644
+> --- a/arch/parisc/Makefile
+> +++ b/arch/parisc/Makefile
+> @@ -28,7 +28,7 @@ export LIBGCC
+>  
+>  ifdef CONFIG_64BIT
+>  UTS_MACHINE	:= parisc64
+> -CHECKFLAGS	+= -D__LP64__=1 -m64
+> +CHECKFLAGS	+= -D__LP64__=1
+>  CC_ARCHES	= hppa64
+>  LD_BFD		:= elf64-hppa-linux
+>  else # 32-bit
+> diff --git a/arch/sparc/Makefile b/arch/sparc/Makefile
+> index edac927e4..966a13d2b 100644
+> --- a/arch/sparc/Makefile
+> +++ b/arch/sparc/Makefile
+> @@ -39,7 +39,7 @@ else
+>  # sparc64
+>  #
+>  
+> -CHECKFLAGS    += -D__sparc__ -D__sparc_v9__ -D__arch64__ -m64
+> +CHECKFLAGS    += -D__sparc__ -D__sparc_v9__ -D__arch64__
+>  LDFLAGS       := -m elf64_sparc
+>  export BITS   := 64
+>  UTS_MACHINE   := sparc64
+> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+> index 60135cbd9..f0a6ea224 100644
+> --- a/arch/x86/Makefile
+> +++ b/arch/x86/Makefile
+> @@ -94,7 +94,7 @@ ifeq ($(CONFIG_X86_32),y)
+>  else
+>          BITS := 64
+>          UTS_MACHINE := x86_64
+> -        CHECKFLAGS += -D__x86_64__ -m64
+> +        CHECKFLAGS += -D__x86_64__
+>  
+>          biarch := -m64
+>          KBUILD_AFLAGS += -m64
+> -- 
+> 2.17.0
+> 
