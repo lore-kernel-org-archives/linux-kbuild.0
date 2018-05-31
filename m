@@ -1,155 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:26265 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750974AbeEaFBD (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:44121 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753944AbeEaGul (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 May 2018 01:01:03 -0400
-Received: from mail-vk0-f51.google.com (mail-vk0-f51.google.com [209.85.213.51]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id w4V50rnS031736
-        for <linux-kbuild@vger.kernel.org>; Thu, 31 May 2018 14:00:54 +0900
-Received: by mail-vk0-f51.google.com with SMTP id s187-v6so745329vke.9
-        for <linux-kbuild@vger.kernel.org>; Wed, 30 May 2018 22:00:54 -0700 (PDT)
+        Thu, 31 May 2018 02:50:41 -0400
+Received: by mail-pl0-f67.google.com with SMTP id z9-v6so9296593plk.11
+        for <linux-kbuild@vger.kernel.org>; Wed, 30 May 2018 23:50:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87k1rkzbry.fsf@concordia.ellerman.id.au>
-References: <20180530121922.22122-1-npiggin@gmail.com> <87o9gxyzpo.fsf@concordia.ellerman.id.au>
- <CAK7LNARoj4g5Wf2Do1npiQUeTpiiFZLuNdmW4JfZw2D-Oe++jw@mail.gmail.com> <87k1rkzbry.fsf@concordia.ellerman.id.au>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 31 May 2018 14:00:12 +0900
-Message-ID: <CAK7LNARbz8YC7=vB_Pt-FFepLfLY-Yt=8ZiOAoPeZV3EA3VQOg@mail.gmail.com>
-Subject: Re: [PATCH v5 0/4] powerpc patches for new Kconfig language
+References: <CAKwvOd=jmi_7LvZbS0PA5-zt62m5ZFPUNG7JtMQVmerCR63ebQ@mail.gmail.com>
+ <BDEF22F0-84A5-4A36-B153-13E6A4260922@zytor.com> <CAKwvOdnLt5qr_5ah86qdsocTxUbo_3X1y3PPRp1EZwt=__NxnA@mail.gmail.com>
+ <dd1626ae-114f-3817-c8b2-f845e079bfc6@zytor.com> <CAKwvOdkEHqv7Ut8H6Rb+gSvfWsMHqO=E3f7yxm=06m9yEn=h6w@mail.gmail.com>
+ <26B017D5-4063-46CB-8768-B0E5E7CD3838@zytor.com> <CAKwvOdk_4g5PsRUoLgOeWEwt+d0diyD_Ycx6s7LQsJrSMsBEuA@mail.gmail.com>
+ <319FB971-ABB6-4BE7-969B-D87D84853196@zytor.com> <CAKwvOdmryseROx=iSs6CZ86-tr90Fni8RC_w6Y7nFSXGW=508g@mail.gmail.com>
+ <31A5469A-176F-451F-886A-ECD649DDC78C@zytor.com> <CAKwvOdkpWZC4vWK8hDdgUGseTmK4Hz5uDHn_mP9yc=jbfdVPmg@mail.gmail.com>
+ <A042BB2E-FACF-4AE0-8B1E-716061666C5F@zytor.com> <CAKwvOdkWsxoyXCnQz+Xwh0RQ0yPPVD3iCqVaWAimW_Z4QU0XiA@mail.gmail.com>
+ <38f21c66-fa34-3a77-33bc-d15065c15af9@zytor.com> <CAKwvOdkurUGcSAGjR8_nDRgHLFLj93E1wAA3+O0A+pKPHvzwRA@mail.gmail.com>
+In-Reply-To: <CAKwvOdkurUGcSAGjR8_nDRgHLFLj93E1wAA3+O0A+pKPHvzwRA@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Wed, 30 May 2018 23:50:28 -0700
+Message-ID: <CAKwvOd=FN0G-zs-DMF3ubs8y9-PDEamfi__P_iv_JgN3bH6qFw@mail.gmail.com>
+Subject: Re: [clang] stack protector and f1f029c7bf
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: hpa@zytor.com
+Cc: Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Matthias Kaehlcke <mka@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, LKML <linux-kernel@vger.kernel.org>, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-05-31 13:31 GMT+09:00 Michael Ellerman <mpe@ellerman.id.au>:
-> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
->> 2018-05-30 23:39 GMT+09:00 Michael Ellerman <mpe@ellerman.id.au>:
->>> Nicholas Piggin <npiggin@gmail.com> writes:
->>>
->>>> This series of patches improves th powerpc kbuild system. The
->>>> motivation was to to be compatible with the new Kconfig scripting
->>>> language that Yamada-san has implemented here for merge:
->>>>
->>>> https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git/log/?h=kconfig
->>>>
->>>> I have tested on top of that tree, powerpc now builds there.
->>>>
->>>> To avoid build breakage, the first 3 patches must go before the
->>>> kconfig change, and the 4th patch must go after it.
->>>>
->>>> v5 changes:
->>>> - Patch 4 update to syntax changed since kconfig-shell-v3 release.
->>>> - Patch 4 suggestions from Masahiro Yamada, remove unnecessary "OK"
->>>>   output from check mprofile script, and fold CC_USING_MPROFILE_KERNEL
->>>>   into CONFIG_MPROFILE_KERNEL.
->>>> - Reduce whitespace disturbance in patch 1.
->>>
->>> I've put this series in a topic branch.
->>>
->>>   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git/log/?h=topic/kbuild
->>
->>
->> No, you can't.
->>
->> This series depends on my Kconfig work.
+On Fri, May 25, 2018 at 3:38 PM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
 >
-> The *last* commit depends on your work, the rest do not.
+> On Fri, May 25, 2018 at 2:06 PM H. Peter Anvin <hpa@zytor.com> wrote:
+> > On 05/25/18 13:36, Nick Desaulniers wrote:
+> > > On Fri, May 25, 2018 at 10:56 AM <hpa@zytor.com> wrote:
+> > >> You need the extern inline in the .h file and the out-of-line .S file
+> > > I don't see how you can specify to the linker from assembly source that
+> > > this function should be treated as `extern inline`?
+> > "extern inline" is a C directive. In the header file you should provide
+> > the inlinable implementation (which is already there.) It means that "if
+> > you don't want to inline this there is an external implementation
+> > available."
 >
->> You queued it up on v4.17-rc3,
->> but necessary patches are not there.
->>
->> You will get build errors.
+> oh you put `extern inline` on the definition, not the declaration?! What?!
 >
-> I do not get any build errors for the first three commits.
-
-
-Right, the first three are fine.
-
-If we make sure commit cfff26c2dc7a1
-does not appear in Linus' tree,
-we are good.
-
-
-
-
->>> I'll plan to merge the first three into the powerpc tree.
->>
->> Please do not do this.
->>
->> You can issue Acked-by instead.
+> http://m68hc11.serveftp.org/inline-1.php
 >
-> I'd prefer the first three commits were in my tree so they're tested
-> properly.
+> in fact documents that trick.  Wow, I've never seen that before.  Seems
+> like there's not too many instances in the kernel.
 >
->> I need all the 4 patches to my tree.
->> Otherwise, the git-bisect'ability breaks for PowerPC.
+> This seems to inline native_save_fl() properly into the call sites, but the
+> boot code now fails to link due to multiple definitions when trying link
+> the objects from arch/x86/boot/compressed/ into vmlinux.
 >
-> You should merge all 4 into your tree, ie. all of my topic/kbuild
-> branch.
-
-This depends on what "merge" means.
-
-If it means "git pull", I cannot pull your topic/kbuild branch
-since it is broken.
-
-
-
-masahiro@pug:~/ref/linux-ppc$ git log -1
-commit cfff26c2dc7a18a4d10366896a68fb0ef9c793cb
-Author: Nicholas Piggin <npiggin@gmail.com>
-Date:   Wed May 30 22:19:22 2018 +1000
-
-    powerpc/kbuild: move -mprofile-kernel check to Kconfig
-
-    This eliminates the workaround that requires disabling
-    -mprofile-kernel by default in Kconfig.
-
-    [ Note: this depends on
-https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-kconfig-shell-v3 ]
-
-    Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-    Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-masahiro@pug:~/ref/linux-ppc$ make ARCH=powerpc  ppc64_defconfig
-arch/powerpc/Kconfig:465:warning: ignoring unsupported character '$'
-arch/powerpc/Kconfig:465:warning: ignoring unsupported character ','
-arch/powerpc/Kconfig:465:warning: ignoring unsupported character '$'
-arch/powerpc/Kconfig:466: syntax error
-arch/powerpc/Kconfig:465:warning: ignoring unsupported character '$'
-arch/powerpc/Kconfig:465:warning: ignoring unsupported character '$'
-arch/powerpc/Kconfig:465: invalid option
-scripts/kconfig/Makefile:122: recipe for target 'ppc64_defconfig' failed
-make[1]: *** [ppc64_defconfig] Error 1
-Makefile:525: recipe for target 'ppc64_defconfig' failed
-make: *** [ppc64_defconfig] Error 2
-
-
-
-
-
-So, how do you want me to handle the last patch?
-
-I can pull the first three from your branch,
-then I can cherry-pick the last one on top of my kconfig tree.
-
-Is this what you mean?
-
-
-
-> And, I'll merge the first 3 into my tree.
+> When disassembling the the arch/x86/boot/compressed/ objects, I can see
+> they're pulling in the `extern inline` c versions, but still outlining
+> them! (gcc and clang).
 >
-> There should be no bisection breakage as a result.
+> That seems to contradict the statement from the above link:
+> "In no case is the function compiled on its own, not even if you refer to
+> its address explicitly"
 >
-> cheers
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> This is kind of funny; first we were wondering why native_save_fl was
+> getting outlined as a static inline function, which Alistair tracked down
+> to the incorrect use as a function pointer. Now I'm playing why is
+> native_save_fl getting outlined as an extern inline function.
+>
+> If I move the .S file to be in arch/x86/kernel/boot/compressed, the boot
+> code now links but then paravirt.o fails to link.  Referring to the .S from
+> both Makefiles results in multiple definitions that the linker doesn't
+> like. (and the boot code still containing outlines).
+>
+> I don't understand how `extern inline` signals to the linker that "this
+> version should be taken if you find no others".  From what I can tell with
+> `readelf -a` and `objdump -d`, a function marked `extern inline` vs not
+> look similar.
+>
+> Then again, arch/x86/boot/compressed/Makefile completely resets
+> KBUILD_CFLAGS and KBUILD_AFLAGS, which may be problematic (if there's some
+> kind of command line flag that affects `extern inline` linkage).
 
+Aha! This (wiping away CFLAGS) was it!  The rules for `extern inline`
+for gnu89 and c99 are exactly the opposite! [0][1]
 
+c99: "a function defined extern inline will always, emit an externally
+visible function."
 
+but then
+
+gnu89: "gnu89 semantics of inline and extern inline are essentially
+the exact opposite of those in C99"
+
+This is elaborated more concisely in [2].
+
+If I add `-std=gnu89` to the KBUILD_CFLAGS for compilation units that
+are missing that flag but include irqflags.h, I stop getting multiple
+definition linkage errors and link the expected kernel image!
+
+This is something to seriously consider for whoever might ever want to
+change the kernel's C standard: that you'll end up flipping the
+semantics of `extern inline`.  Sounds like `-fgnu89-inline` compiler
+flag or `gnu_inline` attribute could be used to correct such a
+situation.
+
++ KBUILD maintainers and mailing list.
+
+Completely overwriting the KBUILD_CFLAGS from sub directory Makefiles
+(using the := operator) has been making me feel uneasy, since we very
+carefully try to set the necessary flags for Clang in the top level
+Makefile.  In this case, the C standard is different for at least 2
+subdirectories, which has implications for at least the above case
+with the linkage of `extern inline` functions.
+
+Will do further testing and cut a patch set tomorrow.
+
+[0] https://en.wikipedia.org/wiki/Inline_function#C99
+[1] https://en.wikipedia.org/wiki/Inline_function#gnu89
+[2] http://blahg.josefsipek.net/?p=529
 -- 
-Best Regards
-Masahiro Yamada
+Thanks,
+~Nick Desaulniers
