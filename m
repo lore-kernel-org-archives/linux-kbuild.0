@@ -1,86 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:46750 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932593AbeEaBnT (ORCPT
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:36780 "EHLO
+        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750868AbeEaER4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 30 May 2018 21:43:19 -0400
+        Thu, 31 May 2018 00:17:56 -0400
+Date: Wed, 30 May 2018 21:18:35 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Kconfig warnings with GCC 8.1.0
+Message-ID: <20180531041835.GA15842@flashbox>
 MIME-Version: 1.0
-In-Reply-To: <20180530151736.nzpde2bgzn4koi7f@ast-mbp>
-References: <20180528153222.2037158-1-arnd@arndb.de> <20180530151736.nzpde2bgzn4koi7f@ast-mbp>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 31 May 2018 10:42:24 +0900
-Message-ID: <CAK7LNATdw+nTQ0O7jBUDTKHaL53ejZ=oTPocFOJ1brtDr-GB1Q@mail.gmail.com>
-Subject: Re: [PATCH] [net-next, wrong] make BPFILTER_UMH depend on X86
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, netdev@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-2018-05-31 0:17 GMT+09:00 Alexei Starovoitov <alexei.starovoitov@gmail.com>:
-> On Mon, May 28, 2018 at 05:31:01PM +0200, Arnd Bergmann wrote:
->> When build testing across architectures, I run into a build error on
->> all targets other than X86:
->>
->> gcc-8.1.0-nolibc/arm-linux-gnueabi/bin/arm-linux-gnueabi-objdump: net/bpfilter/bpfilter_umh: File format not recognized
->> gcc-8.1.0-nolibc/arm-linux-gnueabi/bin/arm-linux-gnueabi-objcopy:net/bpfilter/bpfilter_umh.o: Invalid bfd target
->>
->> The problem is that 'hostprogs' get built with 'gcc' rather than
->> '$(CROSS_COMPILE)gcc', and my default gcc (as most people's) targets x86.
->>
->> To work around it, adding an X86 dependency gets randconfigs building
->> again on my box.
->>
->> Clearly, this is not a good solution, since it should actually work fine
->> when building native kernels on other architectures but that is now
->> disabled, while cross building an x86 kernel on another host is still
->> broken after my patch.
->>
->> What we probably want here is to try out if the compiler is able to build
->> executables for the target architecture and not build the helper otherwise,
->> at least when compile-testing. No idea how to do that though.
->>
->> Link: http://www.kernel.org/pub/tools/crosstool/
->> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
->> Cc: linux-kbuild@vger.kernel.org
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->> ---
->>  net/bpfilter/Kconfig | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/net/bpfilter/Kconfig b/net/bpfilter/Kconfig
->> index 60725c5f79db..61cc4fcbb4d0 100644
->> --- a/net/bpfilter/Kconfig
->> +++ b/net/bpfilter/Kconfig
->> @@ -9,6 +9,7 @@ menuconfig BPFILTER
->>  if BPFILTER
->>  config BPFILTER_UMH
->>       tristate "bpfilter kernel module with user mode helper"
->> +     depends on X86 # actually depends on native builds
->
-> depends on X86 will break it on arm.
-> I think the better short term fix would be to test that HOSTCC == CC
-> It doesn't have to be the same compiler. HOSTCC's arch == kernel ARCH
-> Not sure how to hack makefile to do that.
-> Long term we need to get rid of HOSTCC dependency.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Hi everyone,
 
-Hmm.
-For cross-compiling, we set 'ARCH' via the environment variable or the
-command line.
+My apologies if this has already been reported in some capacity, I
+searched the mailing list and patchwork but I didn't see anything.
 
-ARCH is not explicitly set, the top-level Makefile sets it to $(SUBARCH)
+With GCC 8.1.0, I am starting to see the following warnings from
+Kconfig:
 
+  CC    scripts/kconfig/zconf.tab.c
+  LEX     scripts/kconfig/zconf.lex.c
+  HOSTCC  scripts/kconfig/zconf.tab.o
+In file included from scripts/kconfig/zconf.tab.c:2496:
+scripts/kconfig/confdata.c: In function ‘conf_write’:
+scripts/kconfig/confdata.c:748:22: warning: ‘%s’ directive writing likely 7 or more bytes into a region of size between 1 and 4097 [-Wformat-overflow=]
+  sprintf(newname, "%s%s", dirname, basename);
+                      ^~
+scripts/kconfig/confdata.c:748:19: note: assuming directive output of 7 bytes
+  sprintf(newname, "%s%s", dirname, basename);
+                   ^~~~~~
+scripts/kconfig/confdata.c:748:2: note: ‘sprintf’ output 1 or more bytes (assuming 4104) into a destination of size 4097
+  sprintf(newname, "%s%s", dirname, basename);
+  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+scripts/kconfig/confdata.c:751:23: warning: ‘.tmpconfig.’ directive writing 11 bytes into a region of size between 1 and 4097 [-Wformat-overflow=]
+   sprintf(tmpname, "%s.tmpconfig.%d", dirname, (int)getpid());
+                       ^~~~~~~~~~~
+scripts/kconfig/confdata.c:751:3: note: ‘sprintf’ output between 13 and 4119 bytes into a destination of size 4097
+   sprintf(tmpname, "%s.tmpconfig.%d", dirname, (int)getpid());
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  HOSTCC  scripts/kconfig/conf.o
+  HOSTLD  scripts/kconfig/conf
 
-ARCH ?= $(SUBARCH)
+I am not sure if this is a false positive or not, otherwise I would have
+sent a patch. I tested on the latest linux-next with Masahiro's for-next
+branch, currently at commit 57282f7da50c ("Merge branch 'kconfig' into
+for-next").
 
-
-Maybe, we can assume the native build if $(ARCH) and $(SUBARCH) are the same?
-
-
--- 
-Best Regards
-Masahiro Yamada
+Thanks!
+Nathan
