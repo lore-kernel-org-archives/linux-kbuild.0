@@ -1,56 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:36780 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750868AbeEaER4 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 May 2018 00:17:56 -0400
-Date: Wed, 30 May 2018 21:18:35 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Kconfig warnings with GCC 8.1.0
-Message-ID: <20180531041835.GA15842@flashbox>
+Received: from ozlabs.org ([203.11.71.1]:43941 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753852AbeEaEbc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 31 May 2018 00:31:32 -0400
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v5 0/4] powerpc patches for new Kconfig language
+In-Reply-To: <CAK7LNARoj4g5Wf2Do1npiQUeTpiiFZLuNdmW4JfZw2D-Oe++jw@mail.gmail.com>
+References: <20180530121922.22122-1-npiggin@gmail.com> <87o9gxyzpo.fsf@concordia.ellerman.id.au> <CAK7LNARoj4g5Wf2Do1npiQUeTpiiFZLuNdmW4JfZw2D-Oe++jw@mail.gmail.com>
+Date: Thu, 31 May 2018 14:31:29 +1000
+Message-ID: <87k1rkzbry.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-Hi everyone,
+Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+> 2018-05-30 23:39 GMT+09:00 Michael Ellerman <mpe@ellerman.id.au>:
+>> Nicholas Piggin <npiggin@gmail.com> writes:
+>>
+>>> This series of patches improves th powerpc kbuild system. The
+>>> motivation was to to be compatible with the new Kconfig scripting
+>>> language that Yamada-san has implemented here for merge:
+>>>
+>>> https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git/log/?h=kconfig
+>>>
+>>> I have tested on top of that tree, powerpc now builds there.
+>>>
+>>> To avoid build breakage, the first 3 patches must go before the
+>>> kconfig change, and the 4th patch must go after it.
+>>>
+>>> v5 changes:
+>>> - Patch 4 update to syntax changed since kconfig-shell-v3 release.
+>>> - Patch 4 suggestions from Masahiro Yamada, remove unnecessary "OK"
+>>>   output from check mprofile script, and fold CC_USING_MPROFILE_KERNEL
+>>>   into CONFIG_MPROFILE_KERNEL.
+>>> - Reduce whitespace disturbance in patch 1.
+>>
+>> I've put this series in a topic branch.
+>>
+>>   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git/log/?h=topic/kbuild
+>
+>
+> No, you can't.
+>
+> This series depends on my Kconfig work.
 
-My apologies if this has already been reported in some capacity, I
-searched the mailing list and patchwork but I didn't see anything.
+The *last* commit depends on your work, the rest do not.
 
-With GCC 8.1.0, I am starting to see the following warnings from
-Kconfig:
+> You queued it up on v4.17-rc3,
+> but necessary patches are not there.
+>
+> You will get build errors.
 
-  CC    scripts/kconfig/zconf.tab.c
-  LEX     scripts/kconfig/zconf.lex.c
-  HOSTCC  scripts/kconfig/zconf.tab.o
-In file included from scripts/kconfig/zconf.tab.c:2496:
-scripts/kconfig/confdata.c: In function ‘conf_write’:
-scripts/kconfig/confdata.c:748:22: warning: ‘%s’ directive writing likely 7 or more bytes into a region of size between 1 and 4097 [-Wformat-overflow=]
-  sprintf(newname, "%s%s", dirname, basename);
-                      ^~
-scripts/kconfig/confdata.c:748:19: note: assuming directive output of 7 bytes
-  sprintf(newname, "%s%s", dirname, basename);
-                   ^~~~~~
-scripts/kconfig/confdata.c:748:2: note: ‘sprintf’ output 1 or more bytes (assuming 4104) into a destination of size 4097
-  sprintf(newname, "%s%s", dirname, basename);
-  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-scripts/kconfig/confdata.c:751:23: warning: ‘.tmpconfig.’ directive writing 11 bytes into a region of size between 1 and 4097 [-Wformat-overflow=]
-   sprintf(tmpname, "%s.tmpconfig.%d", dirname, (int)getpid());
-                       ^~~~~~~~~~~
-scripts/kconfig/confdata.c:751:3: note: ‘sprintf’ output between 13 and 4119 bytes into a destination of size 4097
-   sprintf(tmpname, "%s.tmpconfig.%d", dirname, (int)getpid());
-   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  HOSTCC  scripts/kconfig/conf.o
-  HOSTLD  scripts/kconfig/conf
+I do not get any build errors for the first three commits.
 
-I am not sure if this is a false positive or not, otherwise I would have
-sent a patch. I tested on the latest linux-next with Masahiro's for-next
-branch, currently at commit 57282f7da50c ("Merge branch 'kconfig' into
-for-next").
+>> I'll plan to merge the first three into the powerpc tree.
+>
+> Please do not do this.
+>
+> You can issue Acked-by instead.
 
-Thanks!
-Nathan
+I'd prefer the first three commits were in my tree so they're tested
+properly.
+
+> I need all the 4 patches to my tree.
+> Otherwise, the git-bisect'ability breaks for PowerPC.
+
+You should merge all 4 into your tree, ie. all of my topic/kbuild
+branch.
+
+And, I'll merge the first 3 into my tree.
+
+There should be no bisection breakage as a result.
+
+cheers
