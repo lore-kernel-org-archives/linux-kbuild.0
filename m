@@ -1,28 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:59790 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932091AbeEaAGq (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:38545 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932593AbeEaBcx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 30 May 2018 20:06:46 -0400
-Subject: Re: [PATCH] kbuild: add machine size to CHEKCFLAGS
-References: <20180530204838.22079-1-luc.vanoostenryck@gmail.com>
- <d47b72cc-9209-a190-38b3-969870e1bf26@suse.de>
- <CAMHZB6GXVPvr1uwbemuxqPPtNzYT7jeVokR6q9tz2mS_=TG6vA@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <01db7e93-89f3-361a-29c6-5146cda1d745@infradead.org>
-Date: Wed, 30 May 2018 17:06:24 -0700
+        Wed, 30 May 2018 21:32:53 -0400
 MIME-Version: 1.0
 In-Reply-To: <CAMHZB6GXVPvr1uwbemuxqPPtNzYT7jeVokR6q9tz2mS_=TG6vA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20180530204838.22079-1-luc.vanoostenryck@gmail.com>
+ <d47b72cc-9209-a190-38b3-969870e1bf26@suse.de> <CAMHZB6GXVPvr1uwbemuxqPPtNzYT7jeVokR6q9tz2mS_=TG6vA@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 31 May 2018 10:31:49 +0900
+Message-ID: <CAK7LNARYP9T4pfuA32KrnP4-8_S+BPkvGBVyFgWXp_roXfQV7w@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: add machine size to CHEKCFLAGS
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Richard Henderson <rth@twiddle.net>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, "James E . J . Bottomley" <jejb@parisc-linux.org>, Helge Deller <deller@gmx.de>, "David S . Miller" <davem@davemloft.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Brendan Higgins <brendanhiggins@google.com>, Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-alpha@vger.kernel.org, "moderated list:ARM/Allwinner sunXi SoC support" <linux-arm-kernel@lists.infradead.org>, linux-ia64@vger.kernel.org, linux-mips@linux-mips.org, linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, Christoph Hellwig <hch@infradead.org>, Rob Landley <rob@landley.net>
+To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Cc: =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, Michal Marek <michal.lkml@markovi.net>, Richard Henderson <rth@twiddle.net>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, "James E . J . Bottomley" <jejb@parisc-linux.org>, Helge Deller <deller@gmx.de>, "David S . Miller" <davem@davemloft.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Brendan Higgins <brendanhiggins@google.com>, Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-alpha@vger.kernel.org, "moderated list:ARM/Allwinner sunXi SoC support" <linux-arm-kernel@lists.infradead.org>, linux-ia64@vger.kernel.org, Linux-MIPS <linux-mips@linux-mips.org>, linux-parisc@vger.kernel.org, sparclinux <sparclinux@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Christoph Hellwig <hch@infradead.org>, Rob Landley <rob@landley.net>
 
-On 05/30/2018 04:06 PM, Luc Van Oostenryck wrote:
-> On Thu, May 31, 2018 at 12:00 AM, Andreas Färber <afaerber@suse.de> wrote:
+2018-05-31 8:06 GMT+09:00 Luc Van Oostenryck <luc.vanoostenryck@gmail.com>:
+> On Thu, May 31, 2018 at 12:00 AM, Andreas F=C3=A4rber <afaerber@suse.de> =
+wrote:
 >> Hi Luc,
 >>
 >> The typo in the subject made me curious...
@@ -31,8 +30,10 @@ On 05/30/2018 04:06 PM, Luc Van Oostenryck wrote:
 >>> By default, sparse assumes a 64bit machine when compiled on x86-64
 >>> and 32bit when compiled on anything else.
 >>>
->>> This can of course create all sort of problems for the other archs, like
->>> issuing false warnings ('shift too big (32) for type unsigned long'), or
+>>> This can of course create all sort of problems for the other archs, lik=
+e
+>>> issuing false warnings ('shift too big (32) for type unsigned long'), o=
+r
 >>> worse, failing to emit legitimate warnings.
 >>>
 >>> Fix this by adding the -m32/-m64 flag, depending on CONFIG_64BIT,
@@ -55,38 +56,58 @@ On 05/30/2018 04:06 PM, Luc Van Oostenryck wrote:
 >> What about the architectures not touched by your patch that previously
 >> had no -m32/-m64? (arc, c6x, h8300, hexagon, m68k, microblaze, nds32,
 >> nios2, openrisc, powerpc, riscv, s390, sh, unicore32, xtensa)
-> 
-> As explained in the patch, by default sparse uses -m64 if compiled on x86-64
+>
+> As explained in the patch, by default sparse uses -m64 if compiled on x86=
+-64
 > and 32bit on everything else (well, more recent versions use -m64 if
 > compiled on any 64 bit machine). I think that most ppc devs use a ppc
 > machine and so ppc was most probably fine (at least ppc64) but I suspect
 > that most of these others archs either had never sparse used on them
 > or had a lot of wrong warnings. IOW, it was maybe OK but most probably
 > incorrect for them and now it is OK.
-> 
+>
 >> You forgot to CC them on this patch.
-> 
+>
 > I didn't thought/knew  it was needed and the CC list is already
 > quite long but, if needed, no problem for me.
-
-Ideally, adding linux-arch@vger.kernel.org would be sufficient, but
-sadly I have doubts about that.
-
+>
 >> Have you really checked that all their toolchains support the -m32/-m64
 >> flags you newly introduce for them? Apart from non-biarch architectures,
->> I'm thinking of 31-bit s390 as a corner case where !64 != 32.
-> 
+>> I'm thinking of 31-bit s390 as a corner case where !64 !=3D 32.
+>
 > Hmm, there is no change to anything I call 'toolchain related', like
 > compiler and linker. The only change is sparse (or any other checker)
 > receiving now a correct and explicit -m32 or -m64.
-> 
+
+
+Right.  We are talking about sparse.
+Nobody needs to test vmlinux or whatever objects.
+
+Except the typo in the subject (I can locally fix it up, though),
+this patch looks good to me.
+
+
+
+
+
+
 > For s390, as far as I know:
 > 1) it has CONFIG_64BIT unconditionally definee (because the old 31bit
 >    is no more supported, now everything is s390x only).
 > 2) even if the *address space* was only 31 bit, I'm very sure
 >    that sizeof(long) and sizeof(void*) was 4 on these machine
 >    hence -m32 would have been correct.
+>
+> Best regards,
+> -- Luc
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" i=
+n
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
--- 
-~Randy
+
+--=20
+Best Regards
+Masahiro Yamada
