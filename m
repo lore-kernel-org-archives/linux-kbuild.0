@@ -1,123 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:31426 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751293AbeFAKae (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Jun 2018 06:30:34 -0400
+Received: from ozlabs.org ([203.11.71.1]:53729 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750807AbeFAKep (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 1 Jun 2018 06:34:45 -0400
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v5 0/4] powerpc patches for new Kconfig language
+In-Reply-To: <CAK7LNASxgQOsSveFuKrx7do-+643KUZwU_Gn+z7O7JK+TtMEww@mail.gmail.com>
+References: <20180530121922.22122-1-npiggin@gmail.com> <87o9gxyzpo.fsf@concordia.ellerman.id.au> <CAK7LNARoj4g5Wf2Do1npiQUeTpiiFZLuNdmW4JfZw2D-Oe++jw@mail.gmail.com> <87k1rkzbry.fsf@concordia.ellerman.id.au> <CAK7LNARbz8YC7=vB_Pt-FFepLfLY-Yt=8ZiOAoPeZV3EA3VQOg@mail.gmail.com> <876034yrek.fsf@concordia.ellerman.id.au> <CAK7LNASxgQOsSveFuKrx7do-+643KUZwU_Gn+z7O7JK+TtMEww@mail.gmail.com>
+Date: Fri, 01 Jun 2018 20:34:42 +1000
+Message-ID: <871sdq4wxp.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a0SSJCK36JWxMuTWX1vCF4y7Rys8QL=_nz6syPsR_+c=w@mail.gmail.com>
-References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
- <CAK7LNATmbiigNnPmfwOgMHqxyTOJ0H4ROMAfHZKqRxYN+W-=1w@mail.gmail.com>
- <CAK7LNAT0S-4qq1T3q25H0BGsJSUpTsgV_+TGKBiPW-MUKyqzsQ@mail.gmail.com> <CAK8P3a0SSJCK36JWxMuTWX1vCF4y7Rys8QL=_nz6syPsR_+c=w@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 1 Jun 2018 19:29:44 +0900
-Message-ID: <CAK7LNATn-1zkbVwaSEzKATioGUF0w7-yTNndzDONMfe9QOTnAg@mail.gmail.com>
-Subject: Re: [PATCH v5 00/31] kconfig: move compiler capability tests to Kconfig
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-2018-06-01 17:31 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
-> On Wed, May 30, 2018 at 2:38 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> 2018-05-28 21:23 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->>> 2018-05-28 18:21 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+Hi Masahiro,
+
+Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+...
 >
->>
->> I pushed this series to the for-next branch.
->> Unless a significant problem is reported,
->> I'd like to merge this series in the upcoming MW.
->> At least, I need to keep it in linux-next for a while.
->>
->> Your comments and tags are still appreciated.
->> I will add tags (or replace patches if necessary) later,
->> but I want this series tested in linux-next
->> to expose to more developers' eyes.
->>
->> It passed my local test.  O-day bot did not report anything so far.
+> Also, the change logs could be dropped.
 >
-> I found a problem when using ccache, resulting in this output while building
-> scripts/kconfig:
+> I see
 >
-> $  make V=1 O=obj-tmp/ CC="ccache gcc" defconfig
-> make[1]: Entering directory '/git/arm-soc'
-> make -C /home/arnd/arm-soc/obj-tmp KBUILD_SRC=/git/arm-soc \
-> -f /git/arm-soc/Makefile defconfig
-> make[2]: Entering directory '/git/arm-soc/obj-tmp'
-> make -f ../scripts/Makefile.build obj=scripts/basic
->   gcc -Wp,-MD,scripts/basic/.fixdep.d -Iscripts/basic -Wall
-> -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
-> -std=gnu89  -o scripts/basic/fixdep ../scripts/basic/fixdep.c
-> rm -f .tmp_quiet_recordmcount
-> ln -fsn .. source
-> /bin/bash ../scripts/mkmakefile \
->     .. . 4 17
-> make -f ../scripts/Makefile.build obj=scripts/kconfig defconfig
->   gcc -Wp,-MD,scripts/kconfig/.conf.o.d -Iscripts/kconfig -Wall
-> -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
-> -std=gnu89 -c -o scripts/kconfig/conf.o ../scripts/kconfig/conf.c
->   bison -oscripts/kconfig/zconf.tab.c -t -l ../scripts/kconfig/zconf.y
->   flex -oscripts/kconfig/zconf.lex.c -L ../scripts/kconfig/zconf.l
->   gcc -Wp,-MD,scripts/kconfig/.zconf.tab.o.d -Iscripts/kconfig -Wall
-> -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
-> -std=gnu89  -I../scripts/kconfig -c -o scripts/kconfig/zconf.tab.o
-> scripts/kconfig/zconf.tab.c
->   gcc  -o scripts/kconfig/conf scripts/kconfig/conf.o
-> scripts/kconfig/zconf.tab.o
-> scripts/kconfig/conf  --defconfig=arch/arm/configs/multi_v7_defconfig Kconfig
-> ccache: invalid option -- 'r'
-> Usage:
->     ccache [options]
->     ccache compiler [compiler options]
->     compiler [compiler options]          (via symbolic link)
+> Since v1: reworded changelog to explain the cause of the problem (thanks
+> Segher) and moved the flags into the 64-32 cross compile case.
 >
-> Options:
->     -c, --cleanup         delete old files and recalculate size counters
->                           (normally not needed as this is done automatically)
->     -C, --clear           clear the cache completely (except configuration)
->     -F, --max-files=N     set maximum number of files in cache to N (use 0 for
->                           no limit)
->     -M, --max-size=SIZE   set maximum size of cache to SIZE (use 0 for no
->                           limit); available suffixes: k, M, G, T (decimal) and
->                           Ki, Mi, Gi, Ti (binary); default suffix: G
->     -o, --set-config=K=V  set configuration key K to value V
->     -p, --print-config    print current configuration options
->     -s, --show-stats      show statistics summary
->     -z, --zero-stats      zero statistics counters
+> or
 >
->     -h, --help            print this help text
->     -V, --version         print version and copyright information
+> Since v1: removed extra -EB in the recordmcount script (thanks mpe)
 >
-> See also <https://ccache.samba.org>.
-> #
-> # configuration written to .config
-> #
-> make[2]: Leaving directory '/git/arm-soc/obj-tmp'
-> make[1]: Leaving directory '/git/arm-soc'
 >
-> It appears to just keep going after this output, but clearly something is wrong.
-> I bisected it to bde197706614 ("gcc-plugins: test plugin support in Kconfig
-> and clean up Makefile").
+> above your signed-off-by.
+>
+>
+> Of course, this is your call,
+> and you do not need to disturb the git history if it is too late.
 
+You're right, sorry those are bit messy.
 
-Thanks for the report!
+I'm happy to update them, I haven't merged them yet, but I see you have
+them in your tree.
 
+So I won't change them unless you confirm you're OK with it. Let me
+know.
 
-In the original scripts/Makefile.gcc-plugins,
-the parameters to scripts/gcc-plugin.sh were quoted by "..."
-
-I need to keep quoting.
-https://patchwork.kernel.org/patch/10442941/
-
-Hmm, too much quoting is messy.
-It works though...
-
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+cheers
