@@ -1,61 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:26586 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750795AbeFAEwQ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Jun 2018 00:52:16 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] gcc-plugins: disable GCC_PLUGIN_STRUCTLEAK_BYREF_ALL for COMPILE_TEST
-Date: Fri,  1 Jun 2018 13:51:23 +0900
-Message-Id: <1527828683-4518-1-git-send-email-yamada.masahiro@socionext.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from mx2.suse.de ([195.135.220.15]:43714 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750869AbeFAFuz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 1 Jun 2018 01:50:55 -0400
+From: Petr Vorel <pvorel@suse.cz>
+Subject: [PATCH v2 1/2] kbuild: Add testconfig into make help output
+Date: Fri,  1 Jun 2018 07:50:40 +0200
+Message-Id: <20180601055041.12922-1-pvorel@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Petr Vorel <pvorel@suse.cz>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-We have enabled GCC_PLUGINS for COMPILE_TEST, but allmodconfig now
-produces new warnings.
-
-  CC [M]  drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.o
-drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c: In function ‘wlc_phy_workarounds_nphy_rev7’:
-drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c:16563:1: warning: the frame size of 3128 bytes is larger than 2048 bytes [-Wframe-larger-than=]
- }
- ^
-drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c: In function ‘wlc_phy_workarounds_nphy_rev3’:
-drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c:16905:1: warning: the frame size of 2800 bytes is larger than 2048 bytes [-Wframe-larger-than=]
- }
- ^
-drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c: In function ‘wlc_phy_cal_txiqlo_nphy’:
-drivers/net/wireless/broadcom/brcm80211/brcmsmac/phy/phy_n.c:26033:1: warning: the frame size of 2488 bytes is larger than 2048 bytes [-Wframe-larger-than=]
- }
- ^
-
-It looks like GCC_PLUGIN_STRUCTLEAK_BYREF_ALL is causing this.
-Add "depends on !COMPILE_TEST" to not dirturb the compile test.
-
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Suggested-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Petr Vorel <pvorel@suse.cz>
 ---
-
- arch/Kconfig | 1 +
+ scripts/kconfig/Makefile | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/arch/Kconfig b/arch/Kconfig
-index e9475d0..e5ff804 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -489,6 +489,7 @@ config GCC_PLUGIN_STRUCTLEAK
- config GCC_PLUGIN_STRUCTLEAK_BYREF_ALL
- 	bool "Force initialize all struct type variables passed by reference"
- 	depends on GCC_PLUGIN_STRUCTLEAK
-+	depends on !COMPILE_TEST
- 	help
- 	  Zero initialize any struct type local variable that may be passed by
- 	  reference without having been initialized.
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 5def8779d7d8..36b092150c45 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -172,6 +172,7 @@ help:
+ 	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
+ 	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
+ 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
++	@echo  '  testconfig	  - Run Kconfig unit tests (requires python3 and pytest)'
+ 
+ # lxdialog stuff
+ check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
 -- 
-2.7.4
+2.16.3
 
