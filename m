@@ -1,44 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:47697 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751293AbeFANWf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Jun 2018 09:22:35 -0400
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v5 0/4] powerpc patches for new Kconfig language
-In-Reply-To: <CAK7LNASwEv8RGi=PtKyDjcwt9DFy93ug22xQAWOJ2b5j+yNkqg@mail.gmail.com>
-References: <20180530121922.22122-1-npiggin@gmail.com> <87o9gxyzpo.fsf@concordia.ellerman.id.au> <CAK7LNARoj4g5Wf2Do1npiQUeTpiiFZLuNdmW4JfZw2D-Oe++jw@mail.gmail.com> <87k1rkzbry.fsf@concordia.ellerman.id.au> <CAK7LNARbz8YC7=vB_Pt-FFepLfLY-Yt=8ZiOAoPeZV3EA3VQOg@mail.gmail.com> <876034yrek.fsf@concordia.ellerman.id.au> <CAK7LNASxgQOsSveFuKrx7do-+643KUZwU_Gn+z7O7JK+TtMEww@mail.gmail.com> <871sdq4wxp.fsf@concordia.ellerman.id.au> <CAK7LNASwEv8RGi=PtKyDjcwt9DFy93ug22xQAWOJ2b5j+yNkqg@mail.gmail.com>
-Date: Fri, 01 Jun 2018 23:22:27 +1000
-Message-ID: <87po1a3alo.fsf@concordia.ellerman.id.au>
+Received: from mail-qt0-f196.google.com ([209.85.216.196]:32807 "EHLO
+        mail-qt0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752467AbeFAPUO (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 1 Jun 2018 11:20:14 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAK7LNATdw+nTQ0O7jBUDTKHaL53ejZ=oTPocFOJ1brtDr-GB1Q@mail.gmail.com>
+References: <20180528153222.2037158-1-arnd@arndb.de> <20180530151736.nzpde2bgzn4koi7f@ast-mbp>
+ <CAK7LNATdw+nTQ0O7jBUDTKHaL53ejZ=oTPocFOJ1brtDr-GB1Q@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Fri, 1 Jun 2018 17:20:12 +0200
+Message-ID: <CAK8P3a1MSsL1vhV7Y98wCnP6NzK+OhqYpkoNuRm2J5PkJEK8=g@mail.gmail.com>
+Subject: Re: [PATCH] [net-next, wrong] make BPFILTER_UMH depend on X86
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, "David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Masahiro Yamada <yamada.masahiro@socionext.com> writes:
-> 2018-06-01 19:34 GMT+09:00 Michael Ellerman <mpe@ellerman.id.au>:
-...
+On Thu, May 31, 2018 at 3:42 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> 2018-05-31 0:17 GMT+09:00 Alexei Starovoitov <alexei.starovoitov@gmail.com>:
+>> On Mon, May 28, 2018 at 05:31:01PM +0200, Arnd Bergmann wrote:
+
+> Hmm.
+> For cross-compiling, we set 'ARCH' via the environment variable or the
+> command line.
 >
-> Could you update your branch, please?
+> ARCH is not explicitly set, the top-level Makefile sets it to $(SUBARCH)
+>
+>
+> ARCH ?= $(SUBARCH)
+>
+>
+> Maybe, we can assume the native build if $(ARCH) and $(SUBARCH) are the same?
+>
 
-Done.
-
-I've only pushed the first three patches this time, to avoid any
-confusion. Hopefully :)
-
-The top commit is:
-
-  1421dc6d4829 ("powerpc/kbuild: Use flags variables rather than overriding LD/CC/AS")
+SUBARCH is also used with a special meaning for arch/um where we build
+with ARCH=um SUBARCH=x86, either on native (x86) or cross builds.
 
 
-For the fourth one you're welcome to add my ack when you apply it:
+So doing that would still work in most but not all cases.
 
-  Acked-by: Michael Ellerman <mpe@ellerman.id.au>
+What is the reason for using HOSTCC rather than CC anyway? I think
+the correct way to do this would be to check if CC is able to link binaries
+and disallow the option if it's not.
 
-> Then, I will re-pull the new one.
+Don't we already do something like that for tools/testing/selftest which
+also needs to generate binaries with CC?
 
-Thanks! Sorry this took a while to get right, next time we'll be much
-better at it ;)
-
-cheers
+       Arnd
