@@ -1,52 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f196.google.com ([209.85.216.196]:32807 "EHLO
-        mail-qt0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752467AbeFAPUO (ORCPT
+Received: from mail-pg0-f49.google.com ([74.125.83.49]:44997 "EHLO
+        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752663AbeFARNc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Jun 2018 11:20:14 -0400
+        Fri, 1 Jun 2018 13:13:32 -0400
+Received: by mail-pg0-f49.google.com with SMTP id p21-v6so11542925pgd.11
+        for <linux-kbuild@vger.kernel.org>; Fri, 01 Jun 2018 10:13:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATdw+nTQ0O7jBUDTKHaL53ejZ=oTPocFOJ1brtDr-GB1Q@mail.gmail.com>
-References: <20180528153222.2037158-1-arnd@arndb.de> <20180530151736.nzpde2bgzn4koi7f@ast-mbp>
- <CAK7LNATdw+nTQ0O7jBUDTKHaL53ejZ=oTPocFOJ1brtDr-GB1Q@mail.gmail.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Fri, 1 Jun 2018 17:20:12 +0200
-Message-ID: <CAK8P3a1MSsL1vhV7Y98wCnP6NzK+OhqYpkoNuRm2J5PkJEK8=g@mail.gmail.com>
-Subject: Re: [PATCH] [net-next, wrong] make BPFILTER_UMH depend on X86
+References: <CAKwvOd=jmi_7LvZbS0PA5-zt62m5ZFPUNG7JtMQVmerCR63ebQ@mail.gmail.com>
+ <BDEF22F0-84A5-4A36-B153-13E6A4260922@zytor.com> <CAKwvOdnLt5qr_5ah86qdsocTxUbo_3X1y3PPRp1EZwt=__NxnA@mail.gmail.com>
+ <dd1626ae-114f-3817-c8b2-f845e079bfc6@zytor.com> <CAKwvOdkEHqv7Ut8H6Rb+gSvfWsMHqO=E3f7yxm=06m9yEn=h6w@mail.gmail.com>
+ <26B017D5-4063-46CB-8768-B0E5E7CD3838@zytor.com> <CAKwvOdk_4g5PsRUoLgOeWEwt+d0diyD_Ycx6s7LQsJrSMsBEuA@mail.gmail.com>
+ <319FB971-ABB6-4BE7-969B-D87D84853196@zytor.com> <CAKwvOdmryseROx=iSs6CZ86-tr90Fni8RC_w6Y7nFSXGW=508g@mail.gmail.com>
+ <31A5469A-176F-451F-886A-ECD649DDC78C@zytor.com> <CAKwvOdkpWZC4vWK8hDdgUGseTmK4Hz5uDHn_mP9yc=jbfdVPmg@mail.gmail.com>
+ <A042BB2E-FACF-4AE0-8B1E-716061666C5F@zytor.com> <CAKwvOdkWsxoyXCnQz+Xwh0RQ0yPPVD3iCqVaWAimW_Z4QU0XiA@mail.gmail.com>
+ <38f21c66-fa34-3a77-33bc-d15065c15af9@zytor.com> <CAKwvOdkurUGcSAGjR8_nDRgHLFLj93E1wAA3+O0A+pKPHvzwRA@mail.gmail.com>
+ <CAKwvOd=FN0G-zs-DMF3ubs8y9-PDEamfi__P_iv_JgN3bH6qFw@mail.gmail.com>
+In-Reply-To: <CAKwvOd=FN0G-zs-DMF3ubs8y9-PDEamfi__P_iv_JgN3bH6qFw@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Fri, 1 Jun 2018 10:13:19 -0700
+Message-ID: <CAKwvOd=8torqMSGr8-1yPzNdom+is2dFpNeHSatyqeLBMyieZg@mail.gmail.com>
+Subject: Re: [clang] stack protector and f1f029c7bf
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, "David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: hpa@zytor.com
+Cc: Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Matthias Kaehlcke <mka@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, LKML <linux-kernel@vger.kernel.org>, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Thu, May 31, 2018 at 3:42 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2018-05-31 0:17 GMT+09:00 Alexei Starovoitov <alexei.starovoitov@gmail.com>:
->> On Mon, May 28, 2018 at 05:31:01PM +0200, Arnd Bergmann wrote:
+On Wed, May 30, 2018 at 11:50 PM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+> Will do further testing and cut a patch set tomorrow.
 
-> Hmm.
-> For cross-compiling, we set 'ARCH' via the environment variable or the
-> command line.
->
-> ARCH is not explicitly set, the top-level Makefile sets it to $(SUBARCH)
->
->
-> ARCH ?= $(SUBARCH)
->
->
-> Maybe, we can assume the native build if $(ARCH) and $(SUBARCH) are the same?
->
-
-SUBARCH is also used with a special meaning for arch/um where we build
-with ARCH=um SUBARCH=x86, either on native (x86) or cross builds.
-
-
-So doing that would still work in most but not all cases.
-
-What is the reason for using HOSTCC rather than CC anyway? I think
-the correct way to do this would be to check if CC is able to link binaries
-and disallow the option if it's not.
-
-Don't we already do something like that for tools/testing/selftest which
-also needs to generate binaries with CC?
-
-       Arnd
+https://lkml.org/lkml/2018/6/1/679
+(sorry, should have re-cc-ed everyone from this thread, will try to
+re-add when there's feedback)
+-- 
+Thanks,
+~Nick Desaulniers
