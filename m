@@ -1,81 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:29236 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750877AbeFBHkt (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:61545 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750892AbeFBHvE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 2 Jun 2018 03:40:49 -0400
+        Sat, 2 Jun 2018 03:51:04 -0400
+Received: from mail-ua0-f169.google.com (mail-ua0-f169.google.com [209.85.217.169]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id w527ovAH004335
+        for <linux-kbuild@vger.kernel.org>; Sat, 2 Jun 2018 16:50:58 +0900
+Received: by mail-ua0-f169.google.com with SMTP id a2-v6so18883716uak.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 02 Jun 2018 00:50:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180531041835.GA15842@flashbox>
-References: <20180531041835.GA15842@flashbox>
+In-Reply-To: <20180601055041.12922-2-pvorel@suse.cz>
+References: <20180601055041.12922-1-pvorel@suse.cz> <20180601055041.12922-2-pvorel@suse.cz>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 2 Jun 2018 16:39:46 +0900
-Message-ID: <CAK7LNARjg0Hh+3KcyXx0F4ieFzVwaoDJrk+3YA3xHAKT+vD8fQ@mail.gmail.com>
-Subject: Re: Kconfig warnings with GCC 8.1.0
+Date: Sat, 2 Jun 2018 16:50:16 +0900
+Message-ID: <CAK7LNATM5VVUghpA1Bd0yCM4xAd9hexnQk4xpfv9=bZa8McXGg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] kbuild: Fix indent in help
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nathan Chancellor <natechancellor@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Petr Vorel <pvorel@suse.cz>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi.
-
-
-2018-05-31 13:18 GMT+09:00 Nathan Chancellor <natechancellor@gmail.com>:
-> Hi everyone,
+2018-06-01 14:50 GMT+09:00 Petr Vorel <pvorel@suse.cz>:
+> + move last word of nconfig help to the previous line
 >
-> My apologies if this has already been reported in some capacity, I
-> searched the mailing list and patchwork but I didn't see anything.
-
-
-I think you are the first reporter.
-
-
-> With GCC 8.1.0, I am starting to see the following warnings from
-> Kconfig:
+> Signed-off-by: Petr Vorel <pvorel@suse.cz>
+> ---
+>  scripts/kconfig/Makefile | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >
->   CC    scripts/kconfig/zconf.tab.c
->   LEX     scripts/kconfig/zconf.lex.c
->   HOSTCC  scripts/kconfig/zconf.tab.o
-> In file included from scripts/kconfig/zconf.tab.c:2496:
-> scripts/kconfig/confdata.c: In function =E2=80=98conf_write=E2=80=99:
-> scripts/kconfig/confdata.c:748:22: warning: =E2=80=98%s=E2=80=99 directiv=
-e writing likely 7 or more bytes into a region of size between 1 and 4097 [=
--Wformat-overflow=3D]
->   sprintf(newname, "%s%s", dirname, basename);
->                       ^~
-> scripts/kconfig/confdata.c:748:19: note: assuming directive output of 7 b=
-ytes
->   sprintf(newname, "%s%s", dirname, basename);
->                    ^~~~~~
-> scripts/kconfig/confdata.c:748:2: note: =E2=80=98sprintf=E2=80=99 output =
-1 or more bytes (assuming 4104) into a destination of size 4097
->   sprintf(newname, "%s%s", dirname, basename);
->   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> scripts/kconfig/confdata.c:751:23: warning: =E2=80=98.tmpconfig.=E2=80=99=
- directive writing 11 bytes into a region of size between 1 and 4097 [-Wfor=
-mat-overflow=3D]
->    sprintf(tmpname, "%s.tmpconfig.%d", dirname, (int)getpid());
->                        ^~~~~~~~~~~
-> scripts/kconfig/confdata.c:751:3: note: =E2=80=98sprintf=E2=80=99 output =
-between 13 and 4119 bytes into a destination of size 4097
->    sprintf(tmpname, "%s.tmpconfig.%d", dirname, (int)getpid());
->    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   HOSTCC  scripts/kconfig/conf.o
->   HOSTLD  scripts/kconfig/conf
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index 36b092150c45..fda6b1734ee0 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -151,8 +151,7 @@ clean-dirs += tests/.cache
+>  # Help text used by make help
+>  help:
+>         @echo  '  config          - Update current config utilising a line-oriented program'
+> -       @echo  '  nconfig         - Update current config utilising a ncurses menu based'
+> -       @echo  '                    program'
+> +       @echo  '  nconfig         - Update current config utilising a ncurses menu based program'
+
+This is OK.
+
+
+>         @echo  '  menuconfig      - Update current config utilising a menu based program'
+>         @echo  '  xconfig         - Update current config utilising a Qt based front-end'
+>         @echo  '  gconfig         - Update current config utilising a GTK+ based front-end'
+> @@ -169,7 +168,7 @@ help:
+>         @echo  '  listnewconfig   - List new options'
+>         @echo  '  olddefconfig    - Same as oldconfig but sets new symbols to their'
+>         @echo  '                    default value without prompting'
+> -       @echo  '  kvmconfig       - Enable additional options for kvm guest kernel support'
+> +       @echo  '  kvmconfig       - Enable additional options for kvm guest kernel support'
+
+
+Could you explain how the indent was broken on your machine?
+
+
+I think you replaced a tab after kvmconfig
+with some spaces.
+
+But, I see tab-indentation in other lines.
+(config, menuconfig, tinyconfig, etc.)
+
+If you change this, you should keep "tab vs space" consistent.
+
+
+
+
+
+>         @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
+>         @echo  '  tinyconfig      - Configure the tiniest possible kernel'
+>         @echo  '  testconfig      - Run Kconfig unit tests (requires python3 and pytest)'
+> --
+> 2.16.3
 >
-> I am not sure if this is a false positive or not, otherwise I would have
-> sent a patch. I tested on the latest linux-next with Masahiro's for-next
-> branch, currently at commit 57282f7da50c ("Merge branch 'kconfig' into
-> for-next").
-
-
-I think these are legitimate warnings.
-
-A patch is welcome.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
---=20
+-- 
 Best Regards
 Masahiro Yamada
