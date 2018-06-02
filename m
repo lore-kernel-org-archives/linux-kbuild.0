@@ -1,39 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f49.google.com ([74.125.83.49]:44997 "EHLO
-        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752663AbeFARNc (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:38285 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750748AbeFBEx3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Jun 2018 13:13:32 -0400
-Received: by mail-pg0-f49.google.com with SMTP id p21-v6so11542925pgd.11
-        for <linux-kbuild@vger.kernel.org>; Fri, 01 Jun 2018 10:13:32 -0700 (PDT)
+        Sat, 2 Jun 2018 00:53:29 -0400
+Received: by mail-pf0-f194.google.com with SMTP id b74-v6so9969185pfl.5
+        for <linux-kbuild@vger.kernel.org>; Fri, 01 Jun 2018 21:53:29 -0700 (PDT)
+Date: Sat, 2 Jun 2018 14:53:17 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v5 0/4] powerpc patches for new Kconfig language
+Message-ID: <20180602145317.0a6b2efd@roar.ozlabs.ibm.com>
+In-Reply-To: <87po1a3alo.fsf@concordia.ellerman.id.au>
+References: <20180530121922.22122-1-npiggin@gmail.com>
+        <87o9gxyzpo.fsf@concordia.ellerman.id.au>
+        <CAK7LNARoj4g5Wf2Do1npiQUeTpiiFZLuNdmW4JfZw2D-Oe++jw@mail.gmail.com>
+        <87k1rkzbry.fsf@concordia.ellerman.id.au>
+        <CAK7LNARbz8YC7=vB_Pt-FFepLfLY-Yt=8ZiOAoPeZV3EA3VQOg@mail.gmail.com>
+        <876034yrek.fsf@concordia.ellerman.id.au>
+        <CAK7LNASxgQOsSveFuKrx7do-+643KUZwU_Gn+z7O7JK+TtMEww@mail.gmail.com>
+        <871sdq4wxp.fsf@concordia.ellerman.id.au>
+        <CAK7LNASwEv8RGi=PtKyDjcwt9DFy93ug22xQAWOJ2b5j+yNkqg@mail.gmail.com>
+        <87po1a3alo.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-References: <CAKwvOd=jmi_7LvZbS0PA5-zt62m5ZFPUNG7JtMQVmerCR63ebQ@mail.gmail.com>
- <BDEF22F0-84A5-4A36-B153-13E6A4260922@zytor.com> <CAKwvOdnLt5qr_5ah86qdsocTxUbo_3X1y3PPRp1EZwt=__NxnA@mail.gmail.com>
- <dd1626ae-114f-3817-c8b2-f845e079bfc6@zytor.com> <CAKwvOdkEHqv7Ut8H6Rb+gSvfWsMHqO=E3f7yxm=06m9yEn=h6w@mail.gmail.com>
- <26B017D5-4063-46CB-8768-B0E5E7CD3838@zytor.com> <CAKwvOdk_4g5PsRUoLgOeWEwt+d0diyD_Ycx6s7LQsJrSMsBEuA@mail.gmail.com>
- <319FB971-ABB6-4BE7-969B-D87D84853196@zytor.com> <CAKwvOdmryseROx=iSs6CZ86-tr90Fni8RC_w6Y7nFSXGW=508g@mail.gmail.com>
- <31A5469A-176F-451F-886A-ECD649DDC78C@zytor.com> <CAKwvOdkpWZC4vWK8hDdgUGseTmK4Hz5uDHn_mP9yc=jbfdVPmg@mail.gmail.com>
- <A042BB2E-FACF-4AE0-8B1E-716061666C5F@zytor.com> <CAKwvOdkWsxoyXCnQz+Xwh0RQ0yPPVD3iCqVaWAimW_Z4QU0XiA@mail.gmail.com>
- <38f21c66-fa34-3a77-33bc-d15065c15af9@zytor.com> <CAKwvOdkurUGcSAGjR8_nDRgHLFLj93E1wAA3+O0A+pKPHvzwRA@mail.gmail.com>
- <CAKwvOd=FN0G-zs-DMF3ubs8y9-PDEamfi__P_iv_JgN3bH6qFw@mail.gmail.com>
-In-Reply-To: <CAKwvOd=FN0G-zs-DMF3ubs8y9-PDEamfi__P_iv_JgN3bH6qFw@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Fri, 1 Jun 2018 10:13:19 -0700
-Message-ID: <CAKwvOd=8torqMSGr8-1yPzNdom+is2dFpNeHSatyqeLBMyieZg@mail.gmail.com>
-Subject: Re: [clang] stack protector and f1f029c7bf
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: hpa@zytor.com
-Cc: Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Matthias Kaehlcke <mka@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, LKML <linux-kernel@vger.kernel.org>, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-On Wed, May 30, 2018 at 11:50 PM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
-> Will do further testing and cut a patch set tomorrow.
+On Fri, 01 Jun 2018 23:22:27 +1000
+Michael Ellerman <mpe@ellerman.id.au> wrote:
 
-https://lkml.org/lkml/2018/6/1/679
-(sorry, should have re-cc-ed everyone from this thread, will try to
-re-add when there's feedback)
--- 
+> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+> > 2018-06-01 19:34 GMT+09:00 Michael Ellerman <mpe@ellerman.id.au>:  
+> ...
+> >
+> > Could you update your branch, please?  
+> 
+> Done.
+> 
+> I've only pushed the first three patches this time, to avoid any
+> confusion. Hopefully :)
+> 
+> The top commit is:
+> 
+>   1421dc6d4829 ("powerpc/kbuild: Use flags variables rather than overriding LD/CC/AS")
+> 
+> 
+> For the fourth one you're welcome to add my ack when you apply it:
+> 
+>   Acked-by: Michael Ellerman <mpe@ellerman.id.au>
+> 
+> > Then, I will re-pull the new one.  
+> 
+> Thanks! Sorry this took a while to get right, next time we'll be much
+> better at it ;)
+
+Thank you both for sorting out my mess.
+
 Thanks,
-~Nick Desaulniers
+Nick
