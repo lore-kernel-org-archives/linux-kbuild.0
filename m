@@ -1,59 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:46430 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751000AbeFDXvG (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:45305 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751042AbeFEAIx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Jun 2018 19:51:06 -0400
-Date: Mon, 4 Jun 2018 16:51:03 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: Re: [PATCH] [net-next, wrong] make BPFILTER_UMH depend on X86
-Message-ID: <20180604235101.fdhkvbx3m7m2u5uc@ast-mbp>
-References: <20180528153222.2037158-1-arnd@arndb.de>
- <20180530151736.nzpde2bgzn4koi7f@ast-mbp>
- <CAK7LNATdw+nTQ0O7jBUDTKHaL53ejZ=oTPocFOJ1brtDr-GB1Q@mail.gmail.com>
- <CAK8P3a1MSsL1vhV7Y98wCnP6NzK+OhqYpkoNuRm2J5PkJEK8=g@mail.gmail.com>
+        Mon, 4 Jun 2018 20:08:53 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a1MSsL1vhV7Y98wCnP6NzK+OhqYpkoNuRm2J5PkJEK8=g@mail.gmail.com>
+In-Reply-To: <dbd4d0dc92ba45dcae81cbab8ab8ba29@agner.ch>
+References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
+ <1527499328-13213-25-git-send-email-yamada.masahiro@socionext.com> <dbd4d0dc92ba45dcae81cbab8ab8ba29@agner.ch>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 5 Jun 2018 09:07:58 +0900
+Message-ID: <CAK7LNAQ9t-eRRb_mYunEAocaYksOTr=4sw+pExhMd9AvMx+zOw@mail.gmail.com>
+Subject: Re: [PATCH v5 24/31] kconfig: add CC_IS_GCC and GCC_VERSION
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, "David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Stefan Agner <stefan@agner.ch>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild-owner@vger.kernel.org
 
-On Fri, Jun 01, 2018 at 05:20:12PM +0200, Arnd Bergmann wrote:
-> On Thu, May 31, 2018 at 3:42 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> > 2018-05-31 0:17 GMT+09:00 Alexei Starovoitov <alexei.starovoitov@gmail.com>:
-> >> On Mon, May 28, 2018 at 05:31:01PM +0200, Arnd Bergmann wrote:
-> 
-> > Hmm.
-> > For cross-compiling, we set 'ARCH' via the environment variable or the
-> > command line.
-> >
-> > ARCH is not explicitly set, the top-level Makefile sets it to $(SUBARCH)
-> >
-> >
-> > ARCH ?= $(SUBARCH)
-> >
-> >
-> > Maybe, we can assume the native build if $(ARCH) and $(SUBARCH) are the same?
-> >
-> 
-> SUBARCH is also used with a special meaning for arch/um where we build
-> with ARCH=um SUBARCH=x86, either on native (x86) or cross builds.
-> 
-> 
-> So doing that would still work in most but not all cases.
-> 
-> What is the reason for using HOSTCC rather than CC anyway? I think
-> the correct way to do this would be to check if CC is able to link binaries
-> and disallow the option if it's not.
+Hi Stefan
 
-that's a great idea. Let's do that.
+2018-06-05 6:49 GMT+09:00 Stefan Agner <stefan@agner.ch>:
+> Hi Masahiro,
+>
+> On 28.05.2018 11:22, Masahiro Yamada wrote:
+>> This will be useful to specify the required compiler version,
+>> like this:
+>>
+>> config FOO
+>>         bool "Use Foo"
+>>         depends on GCC_VERSION >= 40800
+>>         help
+>>           This feature requires GCC 4.8 or newer.
+>>
+>
+> I tried using CC_IS_GCC today while using clang. It seems that it is set
+> to y despite I am using CC=clang.
+>
+> .config looks like this after config:
+>
+> ...
+> CONFIG_CC_IS_GCC=y
+> CONFIG_GCC_VERSION=40201
+> CONFIG_CC_IS_CLANG=y
+> CONFIG_CLANG_VERSION=60000
+> ...
+>
+>
+> I am using clang 6.0.0 on Arch Linux, which seems to return a version
+> when using gcc-version.sh:
+> ./scripts/gcc-version.sh clang | sed 's/^0*//'
+> 402
+>
+> I guess that should not be the case?
+>
 
-> Don't we already do something like that for tools/testing/selftest which
-> also needs to generate binaries with CC?
 
-I couldn't find such makefile magic. Can you please help me with this?
-
+What will 'clang --version' print on your machine?
