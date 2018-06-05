@@ -1,73 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:33944 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751856AbeFEIYg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Jun 2018 04:24:36 -0400
-From: changbin.du@intel.com
-Subject: [PATCH v5 1/4] x86/mm: surround level4_kernel_pgt with #ifdef CONFIG_X86_5LEVEL...#endif
-Date: Tue,  5 Jun 2018 16:13:37 +0800
-Message-Id: <1528186420-6615-2-git-send-email-changbin.du@intel.com>
-In-Reply-To: <1528186420-6615-1-git-send-email-changbin.du@intel.com>
-References: <1528186420-6615-1-git-send-email-changbin.du@intel.com>
+Received: from mail.kmu-office.ch ([178.209.48.109]:56590 "EHLO
+        mail.kmu-office.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751859AbeFEIha (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 5 Jun 2018 04:37:30 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Date: Tue, 05 Jun 2018 10:37:27 +0200
+From: Stefan Agner <stefan@agner.ch>
+Subject: Re: [PATCH v5 24/31] kconfig: add CC_IS_GCC and GCC_VERSION
+In-Reply-To: <CAK7LNASU_hPdd0u-m-eehByP4wU270e+Z6Dy2CVxGF-4JLMgVw@mail.gmail.com>
+References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
+ <1527499328-13213-25-git-send-email-yamada.masahiro@socionext.com>
+ <dbd4d0dc92ba45dcae81cbab8ab8ba29@agner.ch>
+ <CAK7LNAQ9t-eRRb_mYunEAocaYksOTr=4sw+pExhMd9AvMx+zOw@mail.gmail.com>
+ <9a58f4b4e488a3bfc41aba39bc73f8ff@agner.ch>
+ <CAK7LNASU_hPdd0u-m-eehByP4wU270e+Z6Dy2CVxGF-4JLMgVw@mail.gmail.com>
+Message-ID: <f0543804f8a94108651212b03bf10005@agner.ch>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mingo@redhat.com, akpm@linux-foundation.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net
-Cc: rostedt@goodmis.org, tglx@linutronix.de, rdunlap@infradead.org, x86@kernel.org, linux@armlinux.org.uk, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, changbin.du@gmail.com, Changbin Du <changbin.du@intel.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild-owner@vger.kernel.org
 
-From: Changbin Du <changbin.du@intel.com>
+On 05.06.2018 08:27, Masahiro Yamada wrote:
+> 2018-06-05 14:50 GMT+09:00 Stefan Agner <stefan@agner.ch>:
+>> On 05.06.2018 02:07, Masahiro Yamada wrote:
+>>> Hi Stefan
+>>>
+>>> 2018-06-05 6:49 GMT+09:00 Stefan Agner <stefan@agner.ch>:
+>>>> Hi Masahiro,
+>>>>
+>>>> On 28.05.2018 11:22, Masahiro Yamada wrote:
+>>>>> This will be useful to specify the required compiler version,
+>>>>> like this:
+>>>>>
+>>>>> config FOO
+>>>>>         bool "Use Foo"
+>>>>>         depends on GCC_VERSION >= 40800
+>>>>>         help
+>>>>>           This feature requires GCC 4.8 or newer.
+>>>>>
+>>>>
+>>>> I tried using CC_IS_GCC today while using clang. It seems that it is set
+>>>> to y despite I am using CC=clang.
+>>>>
+>>>> .config looks like this after config:
+>>>>
+>>>> ...
+>>>> CONFIG_CC_IS_GCC=y
+>>>> CONFIG_GCC_VERSION=40201
+>>>> CONFIG_CC_IS_CLANG=y
+>>>> CONFIG_CLANG_VERSION=60000
+>>>> ...
+>>>>
+>>>>
+>>>> I am using clang 6.0.0 on Arch Linux, which seems to return a version
+>>>> when using gcc-version.sh:
+>>>> ./scripts/gcc-version.sh clang | sed 's/^0*//'
+>>>> 402
+>>>>
+>>>> I guess that should not be the case?
+>>>>
+>>>
+>>>
+>>> What will 'clang --version' print on your machine?
+>>
+>> $ clang --version
+>> clang version 6.0.0 (tags/RELEASE_600/final)
+>> Target: x86_64-pc-linux-gnu
+>> Thread model: posix
+>> InstalledDir:
+>> /home/ags/gcc-linaro-7.2.1-2017.11-x86_64_arm-linux-gnueabihf/bin
+>>
+>> I use a symlink to clang in my cross compiler toolchain, that is why
+>> InstalledDir points to a GCC toolchain.
+>>
+> 
+> Ah, I see.
+> 
+> 
+> I will fix it up like follows:
+> 
+> 
+> diff --git a/init/Kconfig b/init/Kconfig
+> index e5a0d89..efc43c6 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -9,7 +9,7 @@ config DEFCONFIG_LIST
+>         default "arch/$(ARCH)/defconfig"
+> 
+>  config CC_IS_GCC
+> -       def_bool $(success,$(CC) --version | grep -q gcc)
+> +       def_bool $(success,$(CC) --version | head -n 1 | grep -q gcc)
 
-The level4_kernel_pgt is only defined when X86_5LEVEL is enabled. So
-surround level4_kernel_pgt with #ifdef CONFIG_X86_5LEVEL...#endif to
-make code correct.
+Yes that works for me:
 
-Signed-off-by: Changbin Du <changbin.du@intel.com>
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
----
- arch/x86/include/asm/pgtable_64.h |  2 ++
- arch/x86/kernel/head64.c          | 13 ++++++-------
- 2 files changed, 8 insertions(+), 7 deletions(-)
+...
+CONFIG_GCC_VERSION=0                                                    
+                                                                   
+CONFIG_CC_IS_CLANG=y                                                    
+                                                                   
+CONFIG_CLANG_VERSION=60000
+...
 
-diff --git a/arch/x86/include/asm/pgtable_64.h b/arch/x86/include/asm/pgtable_64.h
-index 877bc27..9e7f667 100644
---- a/arch/x86/include/asm/pgtable_64.h
-+++ b/arch/x86/include/asm/pgtable_64.h
-@@ -15,7 +15,9 @@
- #include <linux/bitops.h>
- #include <linux/threads.h>
- 
-+#ifdef CONFIG_X86_5LEVEL
- extern p4d_t level4_kernel_pgt[512];
-+#endif
- extern p4d_t level4_ident_pgt[512];
- extern pud_t level3_kernel_pgt[512];
- extern pud_t level3_ident_pgt[512];
-diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-index 0c408f8..775d7a6 100644
---- a/arch/x86/kernel/head64.c
-+++ b/arch/x86/kernel/head64.c
-@@ -143,16 +143,15 @@ unsigned long __head __startup_64(unsigned long physaddr,
- 
- 	pgd = fixup_pointer(&early_top_pgt, physaddr);
- 	p = pgd + pgd_index(__START_KERNEL_map);
--	if (la57)
--		*p = (unsigned long)level4_kernel_pgt;
--	else
--		*p = (unsigned long)level3_kernel_pgt;
--	*p += _PAGE_TABLE_NOENC - __START_KERNEL_map + load_delta;
--
-+#ifdef CONFIG_X86_5LEVEL
- 	if (la57) {
-+		*p = (unsigned long)level4_kernel_pgt;
- 		p4d = fixup_pointer(&level4_kernel_pgt, physaddr);
- 		p4d[511] += load_delta;
--	}
-+	} else
-+#endif
-+		*p = (unsigned long)level3_kernel_pgt;
-+	*p += _PAGE_TABLE_NOENC - __START_KERNEL_map + load_delta;
- 
- 	pud = fixup_pointer(&level3_kernel_pgt, physaddr);
- 	pud[510] += load_delta;
--- 
-2.7.4
+--
+Stefan
 
+> 
+>  config GCC_VERSION
+>         int
+> @@ -17,7 +17,7 @@ config GCC_VERSION
+>         default 0
+> 
+>  config CC_IS_CLANG
+> -       def_bool $(success,$(CC) --version | grep -q clang)
+> +       def_bool $(success,$(CC) --version | head -n 1 | grep -q clang)
+> 
+>  config CLANG_VERSION
+>         int
+> 
+> 
+> 
+> 
+> Best Regards
+> Masahiro Yamada
