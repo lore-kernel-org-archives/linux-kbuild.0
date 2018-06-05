@@ -1,127 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kmu-office.ch ([178.209.48.109]:56590 "EHLO
-        mail.kmu-office.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751859AbeFEIha (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:43676 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751764AbeFENQa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Jun 2018 04:37:30 -0400
+        Tue, 5 Jun 2018 09:16:30 -0400
+Received: from mail-vk0-f50.google.com (mail-vk0-f50.google.com [209.85.213.50]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id w55DGHgS016695
+        for <linux-kbuild@vger.kernel.org>; Tue, 5 Jun 2018 22:16:18 +0900
+Received: by mail-vk0-f50.google.com with SMTP id b134-v6so1339130vke.13
+        for <linux-kbuild@vger.kernel.org>; Tue, 05 Jun 2018 06:16:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Date: Tue, 05 Jun 2018 10:37:27 +0200
-From: Stefan Agner <stefan@agner.ch>
-Subject: Re: [PATCH v5 24/31] kconfig: add CC_IS_GCC and GCC_VERSION
-In-Reply-To: <CAK7LNASU_hPdd0u-m-eehByP4wU270e+Z6Dy2CVxGF-4JLMgVw@mail.gmail.com>
-References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
- <1527499328-13213-25-git-send-email-yamada.masahiro@socionext.com>
- <dbd4d0dc92ba45dcae81cbab8ab8ba29@agner.ch>
- <CAK7LNAQ9t-eRRb_mYunEAocaYksOTr=4sw+pExhMd9AvMx+zOw@mail.gmail.com>
- <9a58f4b4e488a3bfc41aba39bc73f8ff@agner.ch>
- <CAK7LNASU_hPdd0u-m-eehByP4wU270e+Z6Dy2CVxGF-4JLMgVw@mail.gmail.com>
-Message-ID: <f0543804f8a94108651212b03bf10005@agner.ch>
+In-Reply-To: <20180602090803.6362-1-pvorel@suse.cz>
+References: <20180602090803.6362-1-pvorel@suse.cz>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 5 Jun 2018 22:15:36 +0900
+Message-ID: <CAK7LNASWmw=MDEwMGO+KarQ-GrY5M0fMWGg+TEMdguB4VGH65w@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: Add testconfig into make help output
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild-owner@vger.kernel.org
+To: Petr Vorel <pvorel@suse.cz>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 05.06.2018 08:27, Masahiro Yamada wrote:
-> 2018-06-05 14:50 GMT+09:00 Stefan Agner <stefan@agner.ch>:
->> On 05.06.2018 02:07, Masahiro Yamada wrote:
->>> Hi Stefan
->>>
->>> 2018-06-05 6:49 GMT+09:00 Stefan Agner <stefan@agner.ch>:
->>>> Hi Masahiro,
->>>>
->>>> On 28.05.2018 11:22, Masahiro Yamada wrote:
->>>>> This will be useful to specify the required compiler version,
->>>>> like this:
->>>>>
->>>>> config FOO
->>>>>         bool "Use Foo"
->>>>>         depends on GCC_VERSION >= 40800
->>>>>         help
->>>>>           This feature requires GCC 4.8 or newer.
->>>>>
->>>>
->>>> I tried using CC_IS_GCC today while using clang. It seems that it is set
->>>> to y despite I am using CC=clang.
->>>>
->>>> .config looks like this after config:
->>>>
->>>> ...
->>>> CONFIG_CC_IS_GCC=y
->>>> CONFIG_GCC_VERSION=40201
->>>> CONFIG_CC_IS_CLANG=y
->>>> CONFIG_CLANG_VERSION=60000
->>>> ...
->>>>
->>>>
->>>> I am using clang 6.0.0 on Arch Linux, which seems to return a version
->>>> when using gcc-version.sh:
->>>> ./scripts/gcc-version.sh clang | sed 's/^0*//'
->>>> 402
->>>>
->>>> I guess that should not be the case?
->>>>
->>>
->>>
->>> What will 'clang --version' print on your machine?
->>
->> $ clang --version
->> clang version 6.0.0 (tags/RELEASE_600/final)
->> Target: x86_64-pc-linux-gnu
->> Thread model: posix
->> InstalledDir:
->> /home/ags/gcc-linaro-7.2.1-2017.11-x86_64_arm-linux-gnueabihf/bin
->>
->> I use a symlink to clang in my cross compiler toolchain, that is why
->> InstalledDir points to a GCC toolchain.
->>
-> 
-> Ah, I see.
-> 
-> 
-> I will fix it up like follows:
-> 
-> 
-> diff --git a/init/Kconfig b/init/Kconfig
-> index e5a0d89..efc43c6 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -9,7 +9,7 @@ config DEFCONFIG_LIST
->         default "arch/$(ARCH)/defconfig"
-> 
->  config CC_IS_GCC
-> -       def_bool $(success,$(CC) --version | grep -q gcc)
-> +       def_bool $(success,$(CC) --version | head -n 1 | grep -q gcc)
+2018-06-02 18:08 GMT+09:00 Petr Vorel <pvorel@suse.cz>:
+> Signed-off-by: Petr Vorel <pvorel@suse.cz>
+> ---
 
-Yes that works for me:
+Both applied to linux-kbuild.  Thanks!
 
-...
-CONFIG_GCC_VERSION=0                                                    
-                                                                   
-CONFIG_CC_IS_CLANG=y                                                    
-                                                                   
-CONFIG_CLANG_VERSION=60000
-...
 
---
-Stefan
 
-> 
->  config GCC_VERSION
->         int
-> @@ -17,7 +17,7 @@ config GCC_VERSION
->         default 0
-> 
->  config CC_IS_CLANG
-> -       def_bool $(success,$(CC) --version | grep -q clang)
-> +       def_bool $(success,$(CC) --version | head -n 1 | grep -q clang)
-> 
->  config CLANG_VERSION
->         int
-> 
-> 
-> 
-> 
-> Best Regards
-> Masahiro Yamada
+>  scripts/kconfig/Makefile | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index 5def8779d7d8..36b092150c45 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -172,6 +172,7 @@ help:
+>         @echo  '  kvmconfig       - Enable additional options for kvm guest kernel support'
+>         @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
+>         @echo  '  tinyconfig      - Configure the tiniest possible kernel'
+> +       @echo  '  testconfig      - Run Kconfig unit tests (requires python3 and pytest)'
+>
+>  # lxdialog stuff
+>  check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
+> --
+> 2.17.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
