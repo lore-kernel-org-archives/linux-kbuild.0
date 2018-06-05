@@ -1,109 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:42627 "EHLO
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:33009 "EHLO
         conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750788AbeFEG2l (ORCPT
+        with ESMTP id S1751223AbeFEGzA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Jun 2018 02:28:41 -0400
+        Tue, 5 Jun 2018 02:55:00 -0400
 MIME-Version: 1.0
-In-Reply-To: <9a58f4b4e488a3bfc41aba39bc73f8ff@agner.ch>
-References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
- <1527499328-13213-25-git-send-email-yamada.masahiro@socionext.com>
- <dbd4d0dc92ba45dcae81cbab8ab8ba29@agner.ch> <CAK7LNAQ9t-eRRb_mYunEAocaYksOTr=4sw+pExhMd9AvMx+zOw@mail.gmail.com>
- <9a58f4b4e488a3bfc41aba39bc73f8ff@agner.ch>
+In-Reply-To: <f13a8e3c-ebc6-53f7-1bac-965c0f30b110@infradead.org>
+References: <f13a8e3c-ebc6-53f7-1bac-965c0f30b110@infradead.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 5 Jun 2018 15:27:45 +0900
-Message-ID: <CAK7LNASU_hPdd0u-m-eehByP4wU270e+Z6Dy2CVxGF-4JLMgVw@mail.gmail.com>
-Subject: Re: [PATCH v5 24/31] kconfig: add CC_IS_GCC and GCC_VERSION
+Date: Tue, 5 Jun 2018 15:53:58 +0900
+Message-ID: <CAK7LNASN_L0An5OBwif7S4wt5Lz54yAdSNw_8ODV0UETa+aDjw@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: check for pkg-config on make {menu,n,g.x}config
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stefan Agner <stefan@agner.ch>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild-owner@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>, Sam Ravnborg <sam@ravnborg.org>
 
-2018-06-05 14:50 GMT+09:00 Stefan Agner <stefan@agner.ch>:
-> On 05.06.2018 02:07, Masahiro Yamada wrote:
->> Hi Stefan
->>
->> 2018-06-05 6:49 GMT+09:00 Stefan Agner <stefan@agner.ch>:
->>> Hi Masahiro,
->>>
->>> On 28.05.2018 11:22, Masahiro Yamada wrote:
->>>> This will be useful to specify the required compiler version,
->>>> like this:
->>>>
->>>> config FOO
->>>>         bool "Use Foo"
->>>>         depends on GCC_VERSION >= 40800
->>>>         help
->>>>           This feature requires GCC 4.8 or newer.
->>>>
->>>
->>> I tried using CC_IS_GCC today while using clang. It seems that it is set
->>> to y despite I am using CC=clang.
->>>
->>> .config looks like this after config:
->>>
->>> ...
->>> CONFIG_CC_IS_GCC=y
->>> CONFIG_GCC_VERSION=40201
->>> CONFIG_CC_IS_CLANG=y
->>> CONFIG_CLANG_VERSION=60000
->>> ...
->>>
->>>
->>> I am using clang 6.0.0 on Arch Linux, which seems to return a version
->>> when using gcc-version.sh:
->>> ./scripts/gcc-version.sh clang | sed 's/^0*//'
->>> 402
->>>
->>> I guess that should not be the case?
->>>
->>
->>
->> What will 'clang --version' print on your machine?
+Hi Randy,
+
+
+2018-06-04 11:59 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+> From: Randy Dunlap <rdunlap@infradead.org>
 >
-> $ clang --version
-> clang version 6.0.0 (tags/RELEASE_600/final)
-> Target: x86_64-pc-linux-gnu
-> Thread model: posix
-> InstalledDir:
-> /home/ags/gcc-linaro-7.2.1-2017.11-x86_64_arm-linux-gnueabihf/bin
+> Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
+> that other required files are present and to determine build flags
+> settings, but none of these check that pkg-config itself is present.
+> Add a check for all 4 of these targets and update
+> Documentation/process/changes.rst to mention 'pkg-config'.
 >
-> I use a symlink to clang in my cross compiler toolchain, that is why
-> InstalledDir points to a GCC toolchain.
+> Fixes kernel bugzilla #77511:
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D77511
 >
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Bj=C3=B8rn Forsman <bjorn.forsman@gmail.com>
+> ---
+> Strictly speaking, pkg-config is not required if someone is only
+> using 'make {menu,n}config' since there are fallbacks for those
+> two targets.
+>
+>  Documentation/process/changes.rst  |    8 ++++++++
+>  scripts/kconfig/Makefile           |    6 ++++++
+>  scripts/kconfig/check-pkgconfig.sh |   12 ++++++++++++
+>  3 files changed, 26 insertions(+)
+>
+> --- linux-next-20180601.orig/scripts/kconfig/Makefile
+> +++ linux-next-20180601/scripts/kconfig/Makefile
+> @@ -214,11 +214,17 @@ $(obj)/gconf.o: $(obj)/.gconf-cfg
+>  $(obj)/zconf.tab.o: $(obj)/zconf.lex.c
+>
+>  # check if necessary packages are available, and configure build flags
+> +# pkg-config check
+> +define check_pkg_config
+> +       $(CONFIG_SHELL) $(srctree)/scripts/kconfig/check-pkgconfig.sh FOR=
+CE
 
-Ah, I see.
 
-
-I will fix it up like follows:
-
-
-diff --git a/init/Kconfig b/init/Kconfig
-index e5a0d89..efc43c6 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -9,7 +9,7 @@ config DEFCONFIG_LIST
-        default "arch/$(ARCH)/defconfig"
-
- config CC_IS_GCC
--       def_bool $(success,$(CC) --version | grep -q gcc)
-+       def_bool $(success,$(CC) --version | head -n 1 | grep -q gcc)
-
- config GCC_VERSION
-        int
-@@ -17,7 +17,7 @@ config GCC_VERSION
-        default 0
-
- config CC_IS_CLANG
--       def_bool $(success,$(CC) --version | grep -q clang)
-+       def_bool $(success,$(CC) --version | head -n 1 | grep -q clang)
-
- config CLANG_VERSION
-        int
+Passing FORCE to check-pkg-config.sh strange.
 
 
 
+How about calling your script from filechk_conf_cfg, like this?
 
+
+define filechk_conf_cfg
+        $(CONFIG_SHELL) $(srctree)/scripts/kconfig/check-pkgconfig.sh; \
+        $(CONFIG_SHELL) $<
+endef
+
+
+
+
+
+
+> +endef
+> +
+>  define filechk_conf_cfg
+>         $(CONFIG_SHELL) $<
+>  endef
+>
+>  $(obj)/.%conf-cfg: $(src)/%conf-cfg.sh FORCE
+> +       $(call check_pkg_config)
+>         $(call filechk,conf_cfg)
+>
+>  clean-files +=3D .*conf-cfg
+> --- /dev/null
+> +++ linux-next-20180601/scripts/kconfig/check-pkgconfig.sh
+> @@ -0,0 +1,12 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Check for pkg-config presence
+> +
+> +pkgcfg=3D`command -v pkg-config`
+> +
+> +if [ "$pkgcfg" =3D "" ]; then
+> +       echo "'make *config' requires 'pkg-config'. Please install it." 1=
+>&2
+> +       exit 1          # error
+> +fi
+> +
+> +exit 0
+
+
+You can remove 'exit 0' at the end.
+and move the 'pkgcfg' to the conditional line.
+
+How about something like this?
+
+
+if [ -z $(command -v pkg-config) ]; then
+        echo "'make *config' requires 'pkg-config'. Please install it." 1>&=
+2
+        exit 1
+fi
+
+
+Thanks.
+
+
+
+> --- linux-next-20180601.orig/Documentation/process/changes.rst
+> +++ linux-next-20180601/Documentation/process/changes.rst
+> @@ -81,6 +81,14 @@ The build system has, as of 4.13, switch
+>  rather than incremental linking (`ld -r`) for built-in.a intermediate st=
+eps.
+>  This requires binutils 2.20 or newer.
+>
+> +pkg-config
+> +----------
+> +
+> +The build system, as of 4.18, requires pkg-config to check for installed
+> +kconfig tools and to determine flags settings for use in
+> +'make {menu,n,g,x}config'.  Previously pkg-config was being used but not
+> +verified or documented.
+> +
+>  Flex
+>  ----
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" i=
+n
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
 Best Regards
 Masahiro Yamada
