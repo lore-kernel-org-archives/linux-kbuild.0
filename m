@@ -1,106 +1,139 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:43650 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751937AbeFFO0Q (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:47365 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932202AbeFFRHj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Jun 2018 10:26:16 -0400
-Date: Wed, 6 Jun 2018 16:26:00 +0200
-From: Johan Hovold <johan@kernel.org>
-Subject: Re: [PATCH v5 2/4] kernel hacking: new config NO_AUTO_INLINE to
- disable compiler auto-inline optimizations
-Message-ID: <20180606142600.GN13775@localhost>
-References: <1528186420-6615-3-git-send-email-changbin.du@intel.com>
- <201806060501.btF3aJMZ%fengguang.wu@intel.com>
- <20180606095714.1d3c2def@vmware.local.home>
+        Wed, 6 Jun 2018 13:07:39 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180606095714.1d3c2def@vmware.local.home>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 7 Jun 2018 02:06:51 +0900
+Message-ID: <CAK7LNAQhF_A1CE28_4qe0DWS4pDeR1xw399NATm7X2UUKLe7=w@mail.gmail.com>
+Subject: [GIT PULL 1/2] Kbuild updates for v4.18
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>, Viresh Kumar <viresh.kumar@linaro.org>
-Cc: kbuild test robot <lkp@intel.com>, linux-arch@vger.kernel.org, michal.lkml@markovi.net, linux-kernel@vger.kernel.org, arnd@arndb.de, yamada.masahiro@socionext.com, lgirdwood@gmail.com, broonie@kernel.org, rdunlap@infradead.org, x86@kernel.org, linux@armlinux.org.uk, changbin.du@intel.com, linux-sparse@vger.kernel.org, mingo@redhat.com, kbuild-all@01.org, akpm@linux-foundation.org, changbin.du@gmail.com, tglx@linutronix.de, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-On Wed, Jun 06, 2018 at 09:57:14AM -0400, Steven Rostedt wrote:
-> On Wed, 6 Jun 2018 05:21:55 +0800
-> kbuild test robot <lkp@intel.com> wrote:
-> 
-> > Hi Changbin,
-> > 
-> > Thank you for the patch! Perhaps something to improve:
-> > 
-> > [auto build test WARNING on linus/master]
-> > [also build test WARNING on v4.17 next-20180605]
-> > [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-> > 
-> > url:    https://github.com/0day-ci/linux/commits/changbin-du-intel-com/kernel-hacking-GCC-optimization-for-better-debug-experience-Og/20180606-001415
-> > config: ia64-allmodconfig (attached as .config)
-> > compiler: ia64-linux-gcc (GCC) 8.1.0
-> > reproduce:
-> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-> >         chmod +x ~/bin/make.cross
-> >         # save the attached .config to linux build tree
-> >         make.cross ARCH=ia64 
-> > 
-> > All warnings (new ones prefixed by >>):
-> > 
-> >    drivers//staging/greybus/fw-management.c: In function 'fw_mgmt_load_and_validate_operation':
-> > >> drivers//staging/greybus/fw-management.c:153:2: warning: 'strncpy' specified bound 10 equals destination size [-Wstringop-truncation]  
-> >      strncpy(request.firmware_tag, tag, GB_FIRMWARE_TAG_MAX_SIZE);
-> >      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >    drivers//staging/greybus/fw-management.c: In function 'fw_mgmt_backend_fw_update_operation':
-> >    drivers//staging/greybus/fw-management.c:304:2: warning: 'strncpy' specified bound 10 equals destination size [-Wstringop-truncation]
-> >      strncpy(request.firmware_tag, tag, GB_FIRMWARE_TAG_MAX_SIZE);
-> >      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > --
-> >    drivers/auxdisplay/panel.c: In function 'panel_bind_key':
-> > >> drivers/auxdisplay/panel.c:1509:2: warning: 'strncpy' specified bound 12 equals destination size [-Wstringop-truncation]  
-> >      strncpy(key->u.kbd.press_str, press, sizeof(key->u.kbd.press_str));
-> >      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >    drivers/auxdisplay/panel.c:1510:2: warning: 'strncpy' specified bound 12 equals destination size [-Wstringop-truncation]
-> >      strncpy(key->u.kbd.repeat_str, repeat, sizeof(key->u.kbd.repeat_str));
-> >      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Nice! This patch actually caused bugs in other areas of the code to be
-> caught by the build system.
-> 
-> The patch is not wrong. The code that has these warnings are.
+Hi Linus,
 
-Looks like the greybus code above is working as intended by checking for
-unterminated string after the strncpy, even if this does now triggers
-the truncation warning.
+Please pull Kbuild updates for v4.18
 
-drivers/auxdisplay/panel.c looks broken, though.
 
-> > vim +/strncpy +153 drivers//staging/greybus/fw-management.c
-> > 
-> > 013e6653 Viresh Kumar 2016-05-14  138  
-> > 013e6653 Viresh Kumar 2016-05-14  139  static int fw_mgmt_load_and_validate_operation(struct fw_mgmt *fw_mgmt,
-> > 013e6653 Viresh Kumar 2016-05-14  140  					       u8 load_method, const char *tag)
-> > 013e6653 Viresh Kumar 2016-05-14  141  {
-> > 013e6653 Viresh Kumar 2016-05-14  142  	struct gb_fw_mgmt_load_and_validate_fw_request request;
-> > 013e6653 Viresh Kumar 2016-05-14  143  	int ret;
-> > 013e6653 Viresh Kumar 2016-05-14  144  
-> > 013e6653 Viresh Kumar 2016-05-14  145  	if (load_method != GB_FW_LOAD_METHOD_UNIPRO &&
-> > 013e6653 Viresh Kumar 2016-05-14  146  	    load_method != GB_FW_LOAD_METHOD_INTERNAL) {
-> > 013e6653 Viresh Kumar 2016-05-14  147  		dev_err(fw_mgmt->parent,
-> > 013e6653 Viresh Kumar 2016-05-14  148  			"invalid load-method (%d)\n", load_method);
-> > 013e6653 Viresh Kumar 2016-05-14  149  		return -EINVAL;
-> > 013e6653 Viresh Kumar 2016-05-14  150  	}
-> > 013e6653 Viresh Kumar 2016-05-14  151  
-> > 013e6653 Viresh Kumar 2016-05-14  152  	request.load_method = load_method;
-> > b2abeaa1 Viresh Kumar 2016-08-11 @153  	strncpy(request.firmware_tag, tag, GB_FIRMWARE_TAG_MAX_SIZE);
-> > 013e6653 Viresh Kumar 2016-05-14  154  
-> > 013e6653 Viresh Kumar 2016-05-14  155  	/*
-> > 013e6653 Viresh Kumar 2016-05-14  156  	 * The firmware-tag should be NULL terminated, otherwise throw error and
-> > 013e6653 Viresh Kumar 2016-05-14  157  	 * fail.
-> > 013e6653 Viresh Kumar 2016-05-14  158  	 */
-> > b2abeaa1 Viresh Kumar 2016-08-11  159  	if (request.firmware_tag[GB_FIRMWARE_TAG_MAX_SIZE - 1] != '\0') {
-> > 013e6653 Viresh Kumar 2016-05-14  160  		dev_err(fw_mgmt->parent, "load-and-validate: firmware-tag is not NULL terminated\n");
-> > 013e6653 Viresh Kumar 2016-05-14  161  		return -EINVAL;
-> > 013e6653 Viresh Kumar 2016-05-14  162  	}
 
-Viresh, do you want to work around the warning somehow?
+The following changes since commit 75bc37fefc4471e718ba8e651aa74673d4e0a9eb:
 
-Thanks,
-Johan
+  Linux 4.17-rc4 (2018-05-06 16:57:38 -1000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-v4.18
+
+for you to fetch changes up to 1f2f01b122d7c78a9e842a126ef168afb279552b:
+
+  kbuild: add machine size to CHECKFLAGS (2018-06-01 11:36:58 +0900)
+
+----------------------------------------------------------------
+Kbuild updates for v4.18
+
+- improve fixdep to coalesce consecutive slashes in dep-files
+
+- fix some issues of the maintainer string generation in deb-pkg script
+
+- remove unused CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX and clean-up
+  several tools and linker scripts
+
+- clean-up modpost
+
+- allow to enable the dead code/data elimination for PowerPC in EXPERT mode
+
+- improve two coccinelle scripts for better performance
+
+- pass endianness and machine size flags to sparse for all architecture
+
+- misc fixes
+
+----------------------------------------------------------------
+Joey Pabalinas (1):
+      scripts/tags.sh: use `find` for $ALLSOURCE_ARCHS generation
+
+Julia Lawall (2):
+      coccinelle: mini_lock: improve performance
+      coccinelle: deref_null: improve performance
+
+Luc Van Oostenryck (3):
+      kbuild: $(CHECK) doesnt need NOSTDINC_FLAGS twice
+      kbuild: add endianness flag to CHEKCFLAGS
+      kbuild: add machine size to CHECKFLAGS
+
+Masahiro Yamada (12):
+      modpost: remove symbol prefix support
+      genksyms: remove symbol prefix support
+      kallsyms: remove symbol prefix support
+      depmod.sh: remove symbol prefix support
+      export.h: remove code for prefixing symbols with underscore
+      kbuild: remove CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
+      vmlinux.lds.h: remove no-op macro VMLINUX_SYMBOL()
+      checkpatch: remove VMLINUX_SYMBOL() check
+      modpost: pass struct elf_info pointer to get_modinfo()
+      modpost: use strstarts() helper more widely
+      modpost: remove redundant is_vmlinux() test
+      modpost: constify *modname function argument where possible
+
+Nicholas Piggin (4):
+      kbuild: Fix asm-generic/vmlinux.lds.h for LD_DEAD_CODE_DATA_ELIMINATION
+      kbuild: LD_DEAD_CODE_DATA_ELIMINATION no
+-ffunction-sections/-fdata-sections for module build
+      kbuild: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selectable if enabled
+      powerpc: Allow LD_DEAD_CODE_DATA_ELIMINATION to be selected
+
+Nicolas Pitre (1):
+      fixdep: suppress consecutive / from file paths in dependency list files
+
+Riku Voipio (1):
+      kbuild: deb-pkg improve maintainer address generation
+
+nixiaoming (1):
+      scripts: Fixed printf format mismatch
+
+ Makefile                                 |  13 +-
+ arch/Kconfig                             |  21 ---
+ arch/alpha/Makefile                      |   2 +-
+ arch/arm/Makefile                        |   2 +-
+ arch/arm64/Makefile                      |   2 +-
+ arch/ia64/Makefile                       |   2 +-
+ arch/mips/Makefile                       |   3 -
+ arch/openrisc/Makefile                   |   1 -
+ arch/parisc/Makefile                     |   4 +-
+ arch/powerpc/Kconfig                     |   1 +
+ arch/powerpc/kernel/vmlinux.lds.S        |  22 +--
+ arch/s390/Makefile                       |   2 +-
+ arch/sparc/Makefile                      |   2 +-
+ arch/x86/Makefile                        |   2 +-
+ include/asm-generic/export.h             |  34 ++--
+ include/asm-generic/vmlinux.lds.h        | 334
+++++++++++++++++++-----------------
+ include/linux/export.h                   |  16 +-
+ init/Kconfig                             |  27 +++
+ scripts/Makefile.build                   |   9 +-
+ scripts/adjust_autoksyms.sh              |   3 -
+ scripts/basic/fixdep.c                   |   6 +-
+ scripts/checkpatch.pl                    |  10 --
+ scripts/coccinelle/locks/mini_lock.cocci |   6 +-
+ scripts/coccinelle/null/deref_null.cocci |  40 ++---
+ scripts/depmod.sh                        |  25 +--
+ scripts/genksyms/genksyms.c              |  11 +-
+ scripts/kallsyms.c                       |  49 ++---
+ scripts/link-vmlinux.sh                  |   4 -
+ scripts/mod/modpost.c                    |  97 +++++-----
+ scripts/package/mkdebian                 |  27 ++-
+ scripts/recordmcount.c                   |   2 +-
+ scripts/recordmcount.h                   |   2 +-
+ scripts/tags.sh                          |  11 +-
+ 33 files changed, 349 insertions(+), 443 deletions(-)
+
+
+-- 
+Best Regards
+Masahiro Yamada
