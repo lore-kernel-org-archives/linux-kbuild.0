@@ -1,233 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:33426 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932977AbeFFRTX (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Jun 2018 13:19:23 -0400
+Received: from terminus.zytor.com ([198.137.202.136]:37503 "EHLO
+        mail.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932724AbeFFQlu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 6 Jun 2018 12:41:50 -0400
+Date: Wed, 06 Jun 2018 09:39:25 -0700
+In-Reply-To: <CA+icZUXEpe954z0TSbhSJPdFCfOqsBtpO9mPZBcJ2HWubSo_zQ@mail.gmail.com>
+References: <20180605170532.170361-1-ndesaulniers@google.com> <20180605170532.170361-2-ndesaulniers@google.com> <202492204c2d5bd5ca27307cbca5e44673b739ed.camel@perches.com> <5ad1876557235a089a50e6ed6c558a7dcb0da714.camel@perches.com> <CA+icZUXEpe954z0TSbhSJPdFCfOqsBtpO9mPZBcJ2HWubSo_zQ@mail.gmail.com>
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 7 Jun 2018 02:18:18 +0900
-Message-ID: <CAK7LNASMpvFgue9gZ=6Epq_Skt2pvTVOoT9w=SzA_uGR87KP-w@mail.gmail.com>
-Subject: [GIT PULL 2/2] Kconfig updates for v4.18
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH v2 1/2] compiler-gcc.h: add gnu_inline to all inline declarations
+From: hpa@zytor.com
+Message-ID: <5C97550D-BEF4-4069-9373-F7543E3878FB@zytor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
+To: sedat.dilek@gmail.comSedat Dilek <sedat.dilek@gmail.com>, Joe Perches <joe@perches.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, akpm@linux-foundation.org, ard.biesheuvel@linaro.org, aryabinin@virtuozzo.com, akataria@vmware.com, boris.ostrovsky@oracle.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jan.kiszka@siemens.com, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, kirill.shutemov@linux.intel.com, mingo@redhat.com, mjg59@google.com, mka@chromium.org, pombredanne@nexb.com, rostedt@goodmis.org, tglx@linutronix.de, thomas.lendacky@amd.com, tweek@google.com, linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, rientjes@google.com
 
-Hi Linus,
+On June 6, 2018 1:05:45 AM PDT, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>Hi,
+>
+>when discovering 'gnu_inline', I found ...
+>
+>$ git grep -w  __FORTIFY_INLINE
+>include/linux/string.h:#define __FORTIFY_INLINE extern __always_inline
+>__attribute__((gnu_inline))
+>include/linux/string.h:__FORTIFY_INLINE char *strncpy(char *p, const
+>char *q, __kernel_size_t size)
+>include/linux/string.h:__FORTIFY_INLINE char *strcat(char *p, const
+>char *q)
+>include/linux/string.h:__FORTIFY_INLINE __kernel_size_t strlen(const
+>char *p)
+>include/linux/string.h:__FORTIFY_INLINE __kernel_size_t strnlen(const
+>char *p, __kernel_size_t maxlen)
+>include/linux/string.h:__FORTIFY_INLINE size_t strlcpy(char *p, const
+>char *q, size_t size)
+>include/linux/string.h:__FORTIFY_INLINE char *strncat(char *p, const
+>char *q, __kernel_size_t count)
+>include/linux/string.h:__FORTIFY_INLINE void *memset(void *p, int c,
+>__kernel_size_t size)
+>include/linux/string.h:__FORTIFY_INLINE void *memcpy(void *p, const
+>void *q, __kernel_size_t size)
+>include/linux/string.h:__FORTIFY_INLINE void *memmove(void *p, const
+>void *q, __kernel_size_t size)
+>include/linux/string.h:__FORTIFY_INLINE void *memscan(void *p, int c,
+>__kernel_size_t size)
+>include/linux/string.h:__FORTIFY_INLINE int memcmp(const void *p,
+>const void *q, __kernel_size_t size)
+>include/linux/string.h:__FORTIFY_INLINE void *memchr(const void *p,
+>int c, __kernel_size_t size)
+>include/linux/string.h:__FORTIFY_INLINE void *memchr_inv(const void
+>*p, int c, size_t size)
+>include/linux/string.h:__FORTIFY_INLINE void *kmemdup(const void *p,
+>size_t size, gfp_t gfp)
+>include/linux/string.h:__FORTIFY_INLINE char *strcpy(char *p, const
+>char *q)
+>
+>After the inline changes suggested by Joe this can be adapted?
+>
+>Beyond this, a general question: Can someone explain why all these
+>inline defines are in compiler-gcc.h (as there exists compiler.h and
+>compiler-clang.h)?
+>
+>Thanks.
+>
+>Regards,
+>- Sedat -
 
-Please pull Kconfig updates for v4.18
+Because gcc itself also supports both GNU89-style and C99-style inlines, but the kernel was built with the former, and it is not necessarily a trivial modification, except for "static inline" which is the same for both.
 
-(The follow-up cleanup works are not included in this PR.
-I will send them later on because I need to wait for
-some prerequisite patches from the PowerPC subsystem.)
-
-
-You will see a conflict in the top-level Makefile.
-It should be resolved as follows:
-(The correct fix is also available in linux-next)
-
-------------------------------------------
-diff --cc Makefile
-index 0d5cdaa,defb383..bbc979a
---- a/Makefile
-+++ b/Makefile
-@@@ -807,7 -806,8 +806,7 @@@ KBUILD_CFLAGS_KERNEL       += $(call cc-optio
-  endif
-
-  # arch Makefile may override CC so keep this after arch Makefile is included
-- NOSTDINC_FLAGS += -nostdinc -isystem $(call shell-cached,$(CC)
--print-file-name=include)
-+ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
- -CHECKFLAGS     += $(NOSTDINC_FLAGS)
-
-  # warn about C99 declaration after statement
-  KBUILD_CFLAGS += $(call cc-option,-Wdeclaration-after-statement,)
--------------------------------------------
-
-
-
-
-The following changes since commit b04e217704b7f879c6b91222b066983a44a7a09f:
-
-  Linux 4.17-rc7 (2018-05-27 13:01:47 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kconfig-v4.18
-
-for you to fetch changes up to 2ae89c7a82ea9d81a19b4fc2df23bef4b112f24e:
-
-  kconfig: Avoid format overflow warning from GCC 8.1 (2018-06-05
-22:07:21 +0900)
-
-----------------------------------------------------------------
-Kconfig updates for v4.18
-
-Kconfig now supports new functionality to perform textual substitution.
-It has been a while since Linus suggested to move compiler option tests
-from makefiles to Kconfig. Finally, here it is. The implementation has
-been generalized into a Make-like macro language. Some built-in functions
-such as 'shell' are provided. Variables and user-defined functions are
-also supported so that 'cc-option', 'ld-option', etc. are implemented as
-macros.
-
-Summary:
-
-- refactor package checks for building {m,n,q,g}conf
-
-- remove unused/unmaintained localization support
-
-- remove Kbuild cache
-
-- drop CONFIG_CROSS_COMPILE support
-
-- replace 'option env=' with direct variable expansion
-
-- add built-in functions such as 'shell'
-
-- support variables and user-defined functions
-
-- add helper macros as as 'cc-option'
-
-- add unit tests and a document of the new macro language
-
-- add 'testconfig' to help
-
-- fix warnings from GCC 8.1
-
-----------------------------------------------------------------
-Masahiro Yamada (26):
-      kbuild: do not display CHK for filechk
-      kconfig: refactor Qt package checks for building qconf
-      kconfig: refactor GTK+ package checks for building gconf
-      kconfig: refactor ncurses package checks for building mconf and nconf
-      kbuild: remove kbuild cache
-      kbuild: remove CONFIG_CROSS_COMPILE support
-      kconfig: reference environment variables directly and remove 'option env='
-      kconfig: remove string expansion in file_lookup()
-      kconfig: remove string expansion for mainmenu after yyparse()
-      kconfig: remove sym_expand_string_value()
-      kconfig: make default prompt of mainmenu less specific
-      kconfig: add built-in function support
-      kconfig: add 'shell' built-in function
-      kconfig: replace $(UNAME_RELEASE) with function call
-      kconfig: begin PARAM state only when seeing a command keyword
-      kconfig: support user-defined function and recursively expanded variable
-      kconfig: support simply expanded variable
-      kconfig: support append assignment operator
-      kconfig: expand lefthand side of assignment statement
-      kconfig: add 'info', 'warning-if', and 'error-if' built-in functions
-      kconfig: add 'filename' and 'lineno' built-in variables
-      kconfig: error out if a recursive variable references itself
-      Documentation: kconfig: document a new Kconfig macro language
-      kconfig: test: add Kconfig macro language tests
-      kconfig: show compiler version text in the top comment
-      kconfig: add basic helper macros to scripts/Kconfig.include
-
-Nathan Chancellor (1):
-      kconfig: Avoid format overflow warning from GCC 8.1
-
-Petr Vorel (2):
-      kconfig: Add testconfig into make help output
-      kbuild: Move last word of nconfig help to the previous line
-
-Sam Ravnborg (1):
-      kconfig: drop localization support
-
- Documentation/kbuild/kconfig-language.txt             |   8 -
- Documentation/kbuild/kconfig-macro-language.txt       | 242 +++++++++
- Kconfig                                               |  10 +-
- MAINTAINERS                                           |   3 +-
- Makefile                                              |  10 +-
- arch/sh/Kconfig                                       |   4 +-
- arch/sparc/Kconfig                                    |   4 +-
- arch/um/Kconfig.common                                |   4 -
- arch/x86/Kconfig                                      |   4 +-
- arch/x86/um/Kconfig                                   |  10 +-
- init/Kconfig                                          |  25 +-
- scripts/Kbuild.include                                | 102 +---
- scripts/Kconfig.include                               |  27 +
- scripts/kconfig/.gitignore                            |   4 -
- scripts/kconfig/Makefile                              | 194 ++------
- scripts/kconfig/POTFILES.in                           |  12 -
- scripts/kconfig/check.sh                              |  14 -
- scripts/kconfig/conf.c                                |  51 +-
- scripts/kconfig/confdata.c                            |  39 +-
- scripts/kconfig/gconf-cfg.sh                          |  23 +
- scripts/kconfig/gconf.c                               |  46 +-
- scripts/kconfig/kconf_id.c                            |   1 -
- scripts/kconfig/kxgettext.c                           | 235 ---------
- scripts/kconfig/lkc.h                                 |  19 +-
- scripts/kconfig/lkc_proto.h                           |  15 +-
- scripts/kconfig/lxdialog/check-lxdialog.sh            |  93 ----
- scripts/kconfig/lxdialog/checklist.c                  |   4 +-
- scripts/kconfig/lxdialog/dialog.h                     |   8 +-
- scripts/kconfig/lxdialog/inputbox.c                   |   4 +-
- scripts/kconfig/lxdialog/menubox.c                    |  10 +-
- scripts/kconfig/lxdialog/textbox.c                    |   2 +-
- scripts/kconfig/lxdialog/yesno.c                      |   4 +-
- scripts/kconfig/mconf-cfg.sh                          |  44 ++
- scripts/kconfig/mconf.c                               | 141 +++---
- scripts/kconfig/menu.c                                |  23 +-
- scripts/kconfig/nconf-cfg.sh                          |  44 ++
- scripts/kconfig/nconf.c                               | 148 +++---
- scripts/kconfig/nconf.h                               |   1 -
- scripts/kconfig/preprocess.c                          | 572
-++++++++++++++++++++++
- scripts/kconfig/qconf-cfg.sh                          |  25 +
- scripts/kconfig/qconf.cc                              | 104 ++--
- scripts/kconfig/symbol.c                              | 109 -----
- .../tests/no_write_if_dep_unmet/expected_config       |   2 +-
- scripts/kconfig/tests/preprocess/builtin_func/Kconfig |  27 +
- .../kconfig/tests/preprocess/builtin_func/__init__.py |   9 +
- .../tests/preprocess/builtin_func/expected_stderr     |   5 +
- .../tests/preprocess/builtin_func/expected_stdout     |   1 +
- .../tests/preprocess/circular_expansion/Kconfig       |   5 +
- .../tests/preprocess/circular_expansion/__init__.py   |  11 +
- .../preprocess/circular_expansion/expected_stderr     |   1 +
- scripts/kconfig/tests/preprocess/escape/Kconfig       |  44 ++
- scripts/kconfig/tests/preprocess/escape/__init__.py   |   8 +
- .../kconfig/tests/preprocess/escape/expected_stderr   |  10 +
- scripts/kconfig/tests/preprocess/variable/Kconfig     |  53 ++
- scripts/kconfig/tests/preprocess/variable/__init__.py |   8 +
- .../kconfig/tests/preprocess/variable/expected_stderr |   9 +
- scripts/kconfig/util.c                                |  33 +-
- scripts/kconfig/zconf.l                               |  95 +++-
- scripts/kconfig/zconf.y                               |  46 +-
- 59 files changed, 1666 insertions(+), 1143 deletions(-)
- create mode 100644 Documentation/kbuild/kconfig-macro-language.txt
- create mode 100644 scripts/Kconfig.include
- delete mode 100644 scripts/kconfig/POTFILES.in
- delete mode 100755 scripts/kconfig/check.sh
- create mode 100755 scripts/kconfig/gconf-cfg.sh
- delete mode 100644 scripts/kconfig/kxgettext.c
- delete mode 100755 scripts/kconfig/lxdialog/check-lxdialog.sh
- create mode 100755 scripts/kconfig/mconf-cfg.sh
- create mode 100644 scripts/kconfig/nconf-cfg.sh
- create mode 100644 scripts/kconfig/preprocess.c
- create mode 100755 scripts/kconfig/qconf-cfg.sh
- create mode 100644 scripts/kconfig/tests/preprocess/builtin_func/Kconfig
- create mode 100644 scripts/kconfig/tests/preprocess/builtin_func/__init__.py
- create mode 100644
-scripts/kconfig/tests/preprocess/builtin_func/expected_stderr
- create mode 100644
-scripts/kconfig/tests/preprocess/builtin_func/expected_stdout
- create mode 100644 scripts/kconfig/tests/preprocess/circular_expansion/Kconfig
- create mode 100644
-scripts/kconfig/tests/preprocess/circular_expansion/__init__.py
- create mode 100644
-scripts/kconfig/tests/preprocess/circular_expansion/expected_stderr
- create mode 100644 scripts/kconfig/tests/preprocess/escape/Kconfig
- create mode 100644 scripts/kconfig/tests/preprocess/escape/__init__.py
- create mode 100644 scripts/kconfig/tests/preprocess/escape/expected_stderr
- create mode 100644 scripts/kconfig/tests/preprocess/variable/Kconfig
- create mode 100644 scripts/kconfig/tests/preprocess/variable/__init__.py
- create mode 100644 scripts/kconfig/tests/preprocess/variable/expected_stderr
-
-
+The other option is to pass -fgnu89-inline on the command line, which is supported by both gcc and clang. The two methods are fully equivalent.
 -- 
-Best Regards
-Masahiro Yamada
+Sent from my Android device with K-9 Mail. Please excuse my brevity.
