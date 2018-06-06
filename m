@@ -1,95 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0083.hostedemail.com ([216.40.44.83]:46626 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752405AbeFEV7e (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:58094 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752741AbeFFAl4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Jun 2018 17:59:34 -0400
-Message-ID: <91704f8e949fd48869e1b36b959780cf19e96d44.camel@perches.com>
-Subject: Re: [PATCH v2 1/2] compiler-gcc.h: add gnu_inline to all inline
- declarations
-From: Joe Perches <joe@perches.com>
-Date: Tue, 05 Jun 2018 14:59:25 -0700
-In-Reply-To: <CAKwvOd=zuy0BJC3f3EKT_9Mg83qdZxAxw_RJ4okAMKrpKjJRHQ@mail.gmail.com>
-References: <20180605170532.170361-1-ndesaulniers@google.com>
-         <20180605170532.170361-2-ndesaulniers@google.com>
-         <202492204c2d5bd5ca27307cbca5e44673b739ed.camel@perches.com>
-         <5ad1876557235a089a50e6ed6c558a7dcb0da714.camel@perches.com>
-         <CAKwvOd=zuy0BJC3f3EKT_9Mg83qdZxAxw_RJ4okAMKrpKjJRHQ@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Tue, 5 Jun 2018 20:41:56 -0400
+Subject: Re: [PATCH v3] kbuild: check for pkg-config on make
+ {menu,n,g.x}config
+References: <f13a8e3c-ebc6-53f7-1bac-965c0f30b110@infradead.org>
+ <CAK7LNASN_L0An5OBwif7S4wt5Lz54yAdSNw_8ODV0UETa+aDjw@mail.gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <d74293e3-02a2-b5fc-4f69-9e6924726278@infradead.org>
+Date: Tue, 5 Jun 2018 17:41:51 -0700
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNASN_L0An5OBwif7S4wt5Lz54yAdSNw_8ODV0UETa+aDjw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, akataria@vmware.com, boris.ostrovsky@oracle.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, hpa@zytor.com, "J. Kiszka" <jan.kiszka@siemens.com>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, kirill.shutemov@linux.intel.com, mingo@redhat.com, mjg59@google.com, Matthias Kaehlcke <mka@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, rostedt@goodmis.org, Thomas Gleixner <tglx@linutronix.de>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Bj=c3=b8rn_Forsman?= <bjorn.forsman@gmail.com>, Sam Ravnborg <sam@ravnborg.org>
 
-On Tue, 2018-06-05 at 12:50 -0700, Nick Desaulniers wrote:
-> On Tue, Jun 5, 2018 at 12:14 PM Joe Perches <joe@perches.com> wrote:
-> > 
-> > On Tue, 2018-06-05 at 10:23 -0700, Joe Perches wrote:
-> > > Perhaps these are simpler as
-> > > 
-> > > #define __inline__    inline
-> > > #define __inline      inline
-> > 
-> > Currently, there are these uses of inline variants in the kernel
-> > 
-> > $ git grep -w inline | wc -l
-> > 68410
-> > $ git grep -w __inline__ | wc -l
-> > 503
-> > $ git grep -w __inline | wc -l
-> > 57
-> > 
-> > So it seems it's also reasonable to sed all uses of __inline to inline
-> > and perhaps remove __inline eventually altogether.
-> > (perhaps there are still too many __inline__ uses)
-> 
-> Yeah, that sounds good. Should I split that into 3 patches:
-> 
-> > Excluding scripts and a few other files,
-> > here's a possible patch done with:
-> > 
-> > $ git grep -w --name-only __inline | \
-> >   grep -vP '^(?:arch/alpha/|include/|scripts/)' | \
-> >   xargs sed -r -i -e 's/\b__inline\b/inline/g' \
-> >                   -e 's/\binline\s+static\b/static inline/g'
-> > ---
-> >  Documentation/trace/tracepoint-analysis.rst             |  2 +-
-> >  drivers/staging/rtl8723bs/core/rtw_pwrctrl.c            |  4 ++--
-> >  drivers/staging/rtl8723bs/core/rtw_wlan_util.c          |  2 +-
-> >  drivers/staging/rtl8723bs/include/drv_types.h           |  6 +++---
-> >  drivers/staging/rtl8723bs/include/ieee80211.h           |  6 +++---
-> >  drivers/staging/rtl8723bs/include/osdep_service.h       | 10 +++++-----
-> >  drivers/staging/rtl8723bs/include/osdep_service_linux.h | 14 +++++++-------
-> >  drivers/staging/rtl8723bs/include/rtw_mlme.h            | 14 +++++++-------
-> >  drivers/staging/rtl8723bs/include/rtw_recv.h            | 16 ++++++++--------
-> >  drivers/staging/rtl8723bs/include/sta_info.h            |  2 +-
-> >  drivers/staging/rtl8723bs/include/wifi.h                | 14 +++++++-------
-> >  drivers/staging/rtl8723bs/include/wlan_bssdef.h         |  2 +-
-> >  lib/zstd/mem.h                                          |  2 +-
-> >  13 files changed, 47 insertions(+), 47 deletions(-)
+On 06/04/2018 11:53 PM, Masahiro Yamada wrote:
+> Hi Randy,
 > 
 > 
-> 1 for documentation, 1 for rtl8723bs, 1 for zstd?
+> 2018-06-04 11:59 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+>> From: Randy Dunlap <rdunlap@infradead.org>
+>>
+>> Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
+>> that other required files are present and to determine build flags
+>> settings, but none of these check that pkg-config itself is present.
+>> Add a check for all 4 of these targets and update
+>> Documentation/process/changes.rst to mention 'pkg-config'.
+>>
+>> Fixes kernel bugzilla #77511:
+>> https://bugzilla.kernel.org/show_bug.cgi?id=77511
+>>
+>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+>> Cc: Bjørn Forsman <bjorn.forsman@gmail.com>
+>> ---
+>> Strictly speaking, pkg-config is not required if someone is only
+>> using 'make {menu,n}config' since there are fallbacks for those
+>> two targets.
+>>
 
-Seems sensible to me.
 
-> Follow up set or include in v3?
+OK, I made your suggested changes and will test it later and then resend it.
 
-Your choice.  Probably a follow up would work best.
-
-Also, the remaining __inline uses would be:
-
-arch/alpha/include/asm/compiler.h:#undef __inline
-include/linux/compiler-gcc.h:#define __inline __inline  __attribute__((always_inline,unused)) notrace
-include/linux/compiler-gcc.h:#define __inline __inline  __attribute__((unused)) notrace
-scripts/checkpatch.pl:our $Inline       = qr{inline|__always_inline|noinline|__inline|__inline__};
-scripts/checkpatch.pl:# Check for __inline__ and __inline, prefer inline
-scripts/checkpatch.pl:              $line =~ /\b(__inline__|__inline)\b/) {
-scripts/checkpatch.pl:                          $fixed[$fixlinenr] =~ s/\b(__inline__|__inline)\b/inline/;
-scripts/genksyms/keywords.c:    { "__inline", INLINE_KEYW },
-scripts/kernel-doc:    $prototype =~ s/^__inline +//;
-
-So all of these could be removed/updated appropriately too
-
+thanks,
+-- 
+~Randy
