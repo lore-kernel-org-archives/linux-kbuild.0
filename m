@@ -1,75 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.136]:37503 "EHLO
-        mail.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932724AbeFFQlu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Jun 2018 12:41:50 -0400
-Date: Wed, 06 Jun 2018 09:39:25 -0700
-In-Reply-To: <CA+icZUXEpe954z0TSbhSJPdFCfOqsBtpO9mPZBcJ2HWubSo_zQ@mail.gmail.com>
-References: <20180605170532.170361-1-ndesaulniers@google.com> <20180605170532.170361-2-ndesaulniers@google.com> <202492204c2d5bd5ca27307cbca5e44673b739ed.camel@perches.com> <5ad1876557235a089a50e6ed6c558a7dcb0da714.camel@perches.com> <CA+icZUXEpe954z0TSbhSJPdFCfOqsBtpO9mPZBcJ2HWubSo_zQ@mail.gmail.com>
+Received: from mail.kernel.org ([198.145.29.99]:35170 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751714AbeFFS0h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 6 Jun 2018 14:26:37 -0400
+Date: Wed, 6 Jun 2018 14:26:22 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH v5 2/4] kernel hacking: new config NO_AUTO_INLINE to
+ disable compiler auto-inline optimizations
+Message-ID: <20180606142622.2338abf6@vmware.local.home>
+In-Reply-To: <20180606142600.GN13775@localhost>
+References: <1528186420-6615-3-git-send-email-changbin.du@intel.com>
+        <201806060501.btF3aJMZ%fengguang.wu@intel.com>
+        <20180606095714.1d3c2def@vmware.local.home>
+        <20180606142600.GN13775@localhost>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Subject: Re: [PATCH v2 1/2] compiler-gcc.h: add gnu_inline to all inline declarations
-From: hpa@zytor.com
-Message-ID: <5C97550D-BEF4-4069-9373-F7543E3878FB@zytor.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sedat.dilek@gmail.comSedat Dilek <sedat.dilek@gmail.com>, Joe Perches <joe@perches.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, akpm@linux-foundation.org, ard.biesheuvel@linaro.org, aryabinin@virtuozzo.com, akataria@vmware.com, boris.ostrovsky@oracle.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jan.kiszka@siemens.com, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, kirill.shutemov@linux.intel.com, mingo@redhat.com, mjg59@google.com, mka@chromium.org, pombredanne@nexb.com, rostedt@goodmis.org, tglx@linutronix.de, thomas.lendacky@amd.com, tweek@google.com, linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, rientjes@google.com
+To: Johan Hovold <johan@kernel.org>
+Cc: Viresh Kumar <viresh.kumar@linaro.org>, kbuild test robot <lkp@intel.com>, linux-arch@vger.kernel.org, michal.lkml@markovi.net, linux-kernel@vger.kernel.org, arnd@arndb.de, yamada.masahiro@socionext.com, lgirdwood@gmail.com, broonie@kernel.org, rdunlap@infradead.org, x86@kernel.org, linux@armlinux.org.uk, changbin.du@intel.com, linux-sparse@vger.kernel.org, mingo@redhat.com, kbuild-all@01.org, akpm@linux-foundation.org, changbin.du@gmail.com, tglx@linutronix.de, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-On June 6, 2018 1:05:45 AM PDT, Sedat Dilek <sedat.dilek@gmail.com> wrote:
->Hi,
->
->when discovering 'gnu_inline', I found ...
->
->$ git grep -w  __FORTIFY_INLINE
->include/linux/string.h:#define __FORTIFY_INLINE extern __always_inline
->__attribute__((gnu_inline))
->include/linux/string.h:__FORTIFY_INLINE char *strncpy(char *p, const
->char *q, __kernel_size_t size)
->include/linux/string.h:__FORTIFY_INLINE char *strcat(char *p, const
->char *q)
->include/linux/string.h:__FORTIFY_INLINE __kernel_size_t strlen(const
->char *p)
->include/linux/string.h:__FORTIFY_INLINE __kernel_size_t strnlen(const
->char *p, __kernel_size_t maxlen)
->include/linux/string.h:__FORTIFY_INLINE size_t strlcpy(char *p, const
->char *q, size_t size)
->include/linux/string.h:__FORTIFY_INLINE char *strncat(char *p, const
->char *q, __kernel_size_t count)
->include/linux/string.h:__FORTIFY_INLINE void *memset(void *p, int c,
->__kernel_size_t size)
->include/linux/string.h:__FORTIFY_INLINE void *memcpy(void *p, const
->void *q, __kernel_size_t size)
->include/linux/string.h:__FORTIFY_INLINE void *memmove(void *p, const
->void *q, __kernel_size_t size)
->include/linux/string.h:__FORTIFY_INLINE void *memscan(void *p, int c,
->__kernel_size_t size)
->include/linux/string.h:__FORTIFY_INLINE int memcmp(const void *p,
->const void *q, __kernel_size_t size)
->include/linux/string.h:__FORTIFY_INLINE void *memchr(const void *p,
->int c, __kernel_size_t size)
->include/linux/string.h:__FORTIFY_INLINE void *memchr_inv(const void
->*p, int c, size_t size)
->include/linux/string.h:__FORTIFY_INLINE void *kmemdup(const void *p,
->size_t size, gfp_t gfp)
->include/linux/string.h:__FORTIFY_INLINE char *strcpy(char *p, const
->char *q)
->
->After the inline changes suggested by Joe this can be adapted?
->
->Beyond this, a general question: Can someone explain why all these
->inline defines are in compiler-gcc.h (as there exists compiler.h and
->compiler-clang.h)?
->
->Thanks.
->
->Regards,
->- Sedat -
+On Wed, 6 Jun 2018 16:26:00 +0200
+Johan Hovold <johan@kernel.org> wrote:
 
-Because gcc itself also supports both GNU89-style and C99-style inlines, but the kernel was built with the former, and it is not necessarily a trivial modification, except for "static inline" which is the same for both.
+> Looks like the greybus code above is working as intended by checking for
+> unterminated string after the strncpy, even if this does now triggers
+> the truncation warning.
 
-The other option is to pass -fgnu89-inline on the command line, which is supported by both gcc and clang. The two methods are fully equivalent.
--- 
-Sent from my Android device with K-9 Mail. Please excuse my brevity.
+Ah, yes I now see that. Thanks for pointing it out. But perhaps it
+should also add the "- 1" to the strncpy() so that gcc doesn't think
+it's a mistake.
+
+-- Steve
