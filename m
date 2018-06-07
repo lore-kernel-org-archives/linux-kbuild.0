@@ -1,121 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:42130 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932733AbeFGI7e (ORCPT
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:41414 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753157AbeFGJK2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Jun 2018 04:59:34 -0400
+        Thu, 7 Jun 2018 05:10:28 -0400
+Received: by mail-pf0-f196.google.com with SMTP id a11-v6so4598669pff.8
+        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jun 2018 02:10:28 -0700 (PDT)
+Date: Thu, 7 Jun 2018 14:40:25 +0530
+From: Viresh Kumar <viresh.kumar@linaro.org>
+Subject: Re: [PATCH v5 2/4] kernel hacking: new config NO_AUTO_INLINE to
+ disable compiler auto-inline optimizations
+Message-ID: <20180607091025.m7dfix3e2xbwx4cs@vireshk-i7>
+References: <1528186420-6615-3-git-send-email-changbin.du@intel.com>
+ <201806060501.btF3aJMZ%fengguang.wu@intel.com>
+ <20180606095714.1d3c2def@vmware.local.home>
+ <20180606142600.GN13775@localhost>
+ <20180606142622.2338abf6@vmware.local.home>
+ <20180607041718.qpqucjzlvcm5h3gn@vireshk-i7>
+ <20180607074628.kd3iyxevwj3ypzbr@intel.com>
+ <20180607083856.ealw62v3wx43zeqz@vireshk-i7>
+ <1303b1abf9f9229a8d3ccbb68a3e413266b360d7.camel@petrovitsch.priv.at>
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdUDCtnyqydZan9Q-+hOQacWGJrrMbw4LshjYSjn2=yBjw@mail.gmail.com>
-References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
- <1527499328-13213-22-git-send-email-yamada.masahiro@socionext.com> <CAMuHMdUDCtnyqydZan9Q-+hOQacWGJrrMbw4LshjYSjn2=yBjw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 7 Jun 2018 17:58:33 +0900
-Message-ID: <CAK7LNAQxS7xkqja2J5FNkRfhCtQpeKqJVsQXFggQrJT6cL_2Cw@mail.gmail.com>
-Subject: Re: [PATCH v5 21/31] kconfig: show compiler version text in the top comment
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1303b1abf9f9229a8d3ccbb68a3e413266b360d7.camel@petrovitsch.priv.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Bernd Petrovitsch <bernd@petrovitsch.priv.at>
+Cc: "Du, Changbin" <changbin.du@intel.com>, Steven Rostedt <rostedt@goodmis.org>, gregkh@linuxfoundation.org, alex.elder@linaro.org, Johan Hovold <johan@kernel.org>, kbuild test robot <lkp@intel.com>, linux-arch@vger.kernel.org, michal.lkml@markovi.net, linux-kernel@vger.kernel.org, arnd@arndb.de, yamada.masahiro@socionext.com, lgirdwood@gmail.com, broonie@kernel.org, rdunlap@infradead.org, x86@kernel.org, linux@armlinux.org.uk, linux-sparse@vger.kernel.org, mingo@redhat.com, kbuild-all@01.org, akpm@linux-foundation.org, changbin.du@gmail.com, tglx@linutronix.de, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-Hi Geert,
+On 07-06-18, 11:03, Bernd Petrovitsch wrote:
+> On Thu, 2018-06-07 at 14:08 +0530, Viresh Kumar wrote:
+> > On 07-06-18, 15:46, Du, Changbin wrote:
+> > > I think if the destination is not a null terminated string (If I understand your
+> > > description below), memcpy can be used to get rid of such warning. The warning
+> > > makes sense in general as explained in mannual. Thanks!
+> > 
+> > The destination should be a null terminated string eventually, but we first need
+> > to make sure src is a null terminated string.
+> 
+> Is there strnlen() or memchr() in the kernel?
+> Then check the source before copying it.
 
+It would be extra work, but memchr can be used to work around this I believe.
 
-2018-06-07 17:42 GMT+09:00 Geert Uytterhoeven <geert@linux-m68k.org>:
-> Hi Yamada-san,
->
-> On Mon, May 28, 2018 at 11:21 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> The kernel configuration phase is now tightly coupled with the compiler
->> in use.  It will be nice to show the compiler information in Kconfig.
->>
->> The compiler information will be displayed like this:
->>
->>   $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- config
->>   scripts/kconfig/conf  --oldaskconfig Kconfig
->>   *
->>   * Linux/arm64 4.16.0-rc1 Kernel Configuration
->>   *
->>   *
->>   * Compiler: aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011
->>   *
->>   *
->>   * General setup
->>   *
->>   Compile also drivers which will not load (COMPILE_TEST) [N/y/?]
->>
->> If you use GUI methods such as menuconfig, it will be displayed in the
->> top menu.
->>
->> This is simply implemented by using the 'comment' statement.  So, it
->> will be saved into the .config file as well.
->>
->> This commit has a very important meaning.  If the compiler is upgraded,
->> Kconfig must be re-run since different compilers have different sets
->> of supported options.
->>
->> All referenced environments are written to include/config/auto.conf.cmd
->> so that any environment change triggers syncconfig, and prompt the user
->> to input new values if needed.
->>
->> With this commit, something like follows will be added to
->> include/config/auto.conf.cmd
->>
->>   ifneq "$(CC_VERSION_TEXT)" "aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011"
->>   include/config/auto.conf: FORCE
->>   endif
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> Reviewed-by: Kees Cook <keescook@chromium.org>
->
-> This is now commit 21c54b774744719c ("kconfig: show compiler version text
-> in the top comment") upstream.
->
-> This commit broke cross-compilation for me:
->
->     $ make ARCH=m68k
->     scripts/kconfig/conf  --syncconfig Kconfig
->     scripts/kconfig/conf  --syncconfig Kconfig
->     scripts/kconfig/conf  --syncconfig Kconfig
->     scripts/kconfig/conf  --syncconfig Kconfig
->     ...
->
-> with O=:
->
->       GEN     ./Makefile
->      scripts/kconfig/conf  --syncconfig Kconfig
->       GEN     ./Makefile
->     scripts/kconfig/conf  --syncconfig Kconfig
->       GEN     ./Makefile
->     scripts/kconfig/conf  --syncconfig Kconfig
->       GEN     ./Makefile
->     ...
->
-> .config gained (both with/without O=):
->
->     #
->     # Compiler: gcc (Ubuntu 5.4.0-6ubuntu1~16.04.9) 5.4.0 20160609
->     #
->
-> which is definitely wrong when cross-compiling for m68k.
->
-> Reverting the commit, and fixing up the conflicts, fixes the issue for me
->
-> Do you have a clue?
-> Thanks!
-
-
-Agh, I missed the case where CROSS_COMPILE is
-set by arch/$(SRCARCH)/Makefile.
-
-
-I will fix it.  Thanks for the report!
-
-
-
-
-
+@Johan ??
 
 -- 
-Best Regards
-Masahiro Yamada
+viresh
