@@ -1,37 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:37366 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753260AbeFGUQJ (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:44565 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932323AbeFGUtk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Jun 2018 16:16:09 -0400
-Received: by mail-pg0-f67.google.com with SMTP id r21-v6so4943579pgv.4
-        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jun 2018 13:16:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20180607183219.192973-1-ndesaulniers@google.com>
- <20180607183219.192973-3-ndesaulniers@google.com> <2f7fc4bf-d0fe-0d3a-ffdd-02cc82c83747@linux.intel.com>
-In-Reply-To: <2f7fc4bf-d0fe-0d3a-ffdd-02cc82c83747@linux.intel.com>
+        Thu, 7 Jun 2018 16:49:40 -0400
+Received: by mail-pl0-f67.google.com with SMTP id z9-v6so6871170plk.11
+        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jun 2018 13:49:40 -0700 (PDT)
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Thu, 7 Jun 2018 13:15:55 -0700
-Message-ID: <CAKwvOdkhoOG=Ki-hLL-GtE_++TJ_fy6G_D+xER_vS-aZSjH61A@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] x86/asm: add _ASM_ARG* constants for argument
- registers to <asm/asm.h>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v4 0/3] extern inline native_save_fl for paravirt
+Date: Thu,  7 Jun 2018 13:49:24 -0700
+Message-Id: <20180607204927.219329-1-ndesaulniers@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@linux.intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, hpa@zytor.com, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com
+To: akpm@linux-foundation.org, hpa@zytor.com, mingo@redhat.com, tglx@linutronix.de
+Cc: linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, sedat.dilek@gmail.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, arnd@arndb.de, rientjes@google.com, acme@redhat.com, pombredanne@nexb.com, aryabinin@virtuozzo.com, kstewart@linuxfoundation.org, boris.ostrovsky@oracle.com, jan.kiszka@siemens.com, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, ard.biesheuvel@linaro.org, akataria@vmware.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, mka@chromium.org, ndesaulniers@google.com, thomas.lendacky@amd.com, tweek@google.com, mjg59@google.com, joe@perches.com
 
-On Thu, Jun 7, 2018 at 1:14 PM H. Peter Anvin <hpa@linux.intel.com> wrote:
->
-> On 06/07/18 11:32, Nick Desaulniers wrote:
-> >
-> > Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
->
-> If this was suggested by Sedat, I didn't see that suggestion...
+paravirt depends on a custom calling convention (callee saved), but
+expects this from a static inline function that it then forces to be
+outlined. This is problematic because different compilers or flags can
+then add a stack guard that violates the calling conventions.
 
-I took his suggestion which was to fix the typo in the commit message.
-https://lkml.org/lkml/2018/6/5/776
+Uses extern inline with the out-of-line definition in assembly to
+prevent compilers from adding stack guards to the outlined version.
+
+Other parts of the codebase overwrite KBUILD_CFLAGS, which is *extremely
+problematic* for extern inline, as the sematics are completely the
+opposite depending on what C standard is used.
+http://blahg.josefsipek.net/?p=529
+
+Changes since v3:
+  Take Joe's suggestion to hoist __inline__ and __inline out of
+  conditional block.
+
+Changes since v2:
+  Take hpa's _ASM_ARG patch into the set in order to simplify cross
+  32b/64b x86 assembly and rebase my final patch to use it.  Apply
+  Sedat's typo fix to commit message and sign off on it. Take Joe's
+  suggestion to simplify __inline__ and __inline. Add Arnd to list of
+  folks who made helpful suggestions.
+
+Changes since v1:
+  Prefer gnu_inline function attribute instead of explicitly setting C
+  standard compiler flag in problematic Makefiles. We should instead
+  carefully evaluate if those Makefiles should be overwriting
+  KBUILD_CFLAGS at all. Dropped the previous first two patches and added
+  a new first patch.
+
+H. Peter Anvin (1):
+  x86/asm: add _ASM_ARG* constants for argument registers to <asm/asm.h>
+
+Nick Desaulniers (2):
+  compiler-gcc.h: add gnu_inline to all inline declarations
+  x86: paravirt: make native_save_fl extern inline
+
+ arch/x86/include/asm/asm.h      | 59 +++++++++++++++++++++++++++++++++
+ arch/x86/include/asm/irqflags.h |  2 +-
+ arch/x86/kernel/Makefile        |  1 +
+ arch/x86/kernel/irqflags.S      | 26 +++++++++++++++
+ include/linux/compiler-gcc.h    | 17 ++++++----
+ 5 files changed, 97 insertions(+), 8 deletions(-)
+ create mode 100644 arch/x86/kernel/irqflags.S
 
 -- 
-Thanks,
-~Nick Desaulniers
+2.17.1.1185.g55be947832-goog
+
