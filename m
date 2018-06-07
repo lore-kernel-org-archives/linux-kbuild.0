@@ -1,39 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f68.google.com ([209.85.160.68]:35113 "EHLO
-        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753326AbeFGIjB (ORCPT
+Received: from mail-vk0-f65.google.com ([209.85.213.65]:34232 "EHLO
+        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753484AbeFGImz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Jun 2018 04:39:01 -0400
-Received: by mail-pl0-f68.google.com with SMTP id i5-v6so5672564plt.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jun 2018 01:39:00 -0700 (PDT)
-Date: Thu, 7 Jun 2018 14:08:56 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-Subject: Re: [PATCH v5 2/4] kernel hacking: new config NO_AUTO_INLINE to
- disable compiler auto-inline optimizations
-Message-ID: <20180607083856.ealw62v3wx43zeqz@vireshk-i7>
-References: <1528186420-6615-3-git-send-email-changbin.du@intel.com>
- <201806060501.btF3aJMZ%fengguang.wu@intel.com>
- <20180606095714.1d3c2def@vmware.local.home>
- <20180606142600.GN13775@localhost>
- <20180606142622.2338abf6@vmware.local.home>
- <20180607041718.qpqucjzlvcm5h3gn@vireshk-i7>
- <20180607074628.kd3iyxevwj3ypzbr@intel.com>
+        Thu, 7 Jun 2018 04:42:55 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180607074628.kd3iyxevwj3ypzbr@intel.com>
+In-Reply-To: <1527499328-13213-22-git-send-email-yamada.masahiro@socionext.com>
+References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com> <1527499328-13213-22-git-send-email-yamada.masahiro@socionext.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 7 Jun 2018 10:42:53 +0200
+Message-ID: <CAMuHMdUDCtnyqydZan9Q-+hOQacWGJrrMbw4LshjYSjn2=yBjw@mail.gmail.com>
+Subject: Re: [PATCH v5 21/31] kconfig: show compiler version text in the top comment
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Du, Changbin" <changbin.du@intel.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>, gregkh@linuxfoundation.org, alex.elder@linaro.org, Johan Hovold <johan@kernel.org>, kbuild test robot <lkp@intel.com>, linux-arch@vger.kernel.org, michal.lkml@markovi.net, linux-kernel@vger.kernel.org, arnd@arndb.de, yamada.masahiro@socionext.com, lgirdwood@gmail.com, broonie@kernel.org, rdunlap@infradead.org, x86@kernel.org, linux@armlinux.org.uk, linux-sparse@vger.kernel.org, mingo@redhat.com, kbuild-all@01.org, akpm@linux-foundation.org, changbin.du@gmail.com, tglx@linutronix.de, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On 07-06-18, 15:46, Du, Changbin wrote:
-> I think if the destination is not a null terminated string (If I understand your
-> description below), memcpy can be used to get rid of such warning. The warning
-> makes sense in general as explained in mannual. Thanks!
+Hi Yamada-san,
 
-The destination should be a null terminated string eventually, but we first need
-to make sure src is a null terminated string.
+On Mon, May 28, 2018 at 11:21 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> The kernel configuration phase is now tightly coupled with the compiler
+> in use.  It will be nice to show the compiler information in Kconfig.
+>
+> The compiler information will be displayed like this:
+>
+>   $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- config
+>   scripts/kconfig/conf  --oldaskconfig Kconfig
+>   *
+>   * Linux/arm64 4.16.0-rc1 Kernel Configuration
+>   *
+>   *
+>   * Compiler: aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011
+>   *
+>   *
+>   * General setup
+>   *
+>   Compile also drivers which will not load (COMPILE_TEST) [N/y/?]
+>
+> If you use GUI methods such as menuconfig, it will be displayed in the
+> top menu.
+>
+> This is simply implemented by using the 'comment' statement.  So, it
+> will be saved into the .config file as well.
+>
+> This commit has a very important meaning.  If the compiler is upgraded,
+> Kconfig must be re-run since different compilers have different sets
+> of supported options.
+>
+> All referenced environments are written to include/config/auto.conf.cmd
+> so that any environment change triggers syncconfig, and prompt the user
+> to input new values if needed.
+>
+> With this commit, something like follows will be added to
+> include/config/auto.conf.cmd
+>
+>   ifneq "$(CC_VERSION_TEXT)" "aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011"
+>   include/config/auto.conf: FORCE
+>   endif
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+
+This is now commit 21c54b774744719c ("kconfig: show compiler version text
+in the top comment") upstream.
+
+This commit broke cross-compilation for me:
+
+    $ make ARCH=m68k
+    scripts/kconfig/conf  --syncconfig Kconfig
+    scripts/kconfig/conf  --syncconfig Kconfig
+    scripts/kconfig/conf  --syncconfig Kconfig
+    scripts/kconfig/conf  --syncconfig Kconfig
+    ...
+
+with O=:
+
+      GEN     ./Makefile
+     scripts/kconfig/conf  --syncconfig Kconfig
+      GEN     ./Makefile
+    scripts/kconfig/conf  --syncconfig Kconfig
+      GEN     ./Makefile
+    scripts/kconfig/conf  --syncconfig Kconfig
+      GEN     ./Makefile
+    ...
+
+.config gained (both with/without O=):
+
+    #
+    # Compiler: gcc (Ubuntu 5.4.0-6ubuntu1~16.04.9) 5.4.0 20160609
+    #
+
+which is definitely wrong when cross-compiling for m68k.
+
+Reverting the commit, and fixing up the conflicts, fixes the issue for me
+
+Do you have a clue?
+Thanks!
+
+Gr{oetje,eeting}s,
+
+                        Geert
 
 -- 
-viresh
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
