@@ -1,61 +1,139 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:46996 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934984AbeFGSc0 (ORCPT
+Received: from mail-pl0-f66.google.com ([209.85.160.66]:45559 "EHLO
+        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933329AbeFGSj7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Jun 2018 14:32:26 -0400
-Received: by mail-pg0-f66.google.com with SMTP id d2-v6so5145126pga.13
-        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jun 2018 11:32:26 -0700 (PDT)
+        Thu, 7 Jun 2018 14:39:59 -0400
+Received: by mail-pl0-f66.google.com with SMTP id c23-v6so6665482plz.12
+        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jun 2018 11:39:59 -0700 (PDT)
+MIME-Version: 1.0
+References: <20180607183219.192973-1-ndesaulniers@google.com> <20180607183219.192973-4-ndesaulniers@google.com>
+In-Reply-To: <20180607183219.192973-4-ndesaulniers@google.com>
 From: Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v3 0/3] extern inline native_save_fl for paravirt
-Date: Thu,  7 Jun 2018 11:32:16 -0700
-Message-Id: <20180607183219.192973-1-ndesaulniers@google.com>
+Date: Thu, 7 Jun 2018 11:39:46 -0700
+Message-ID: <CAKwvOdkoAwT2RiGzJ=dSfx9+SJ27gJimdtKQg2Aoi5+-SbA79g@mail.gmail.com>
+Subject: Re: [PATCH v3 3/3] x86: paravirt: make native_save_fl extern inline
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: akpm@linux-foundation.org, hpa@zytor.com, mingo@redhat.com, tglx@linutronix.de
-Cc: linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, sedat.dilek@gmail.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, arnd@arndb.de, rientjes@google.com, acme@redhat.com, pombredanne@nexb.com, aryabinin@virtuozzo.com, kstewart@linuxfoundation.org, boris.ostrovsky@oracle.com, jan.kiszka@siemens.com, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, ard.biesheuvel@linaro.org, akataria@vmware.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, mka@chromium.org, ndesaulniers@google.com, thomas.lendacky@amd.com, tweek@google.com, mjg59@google.com, joe@perches.com
+To: Andrew Morton <akpm@linux-foundation.org>, hpa@zytor.com, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com
 
-paravirt depends on a custom calling convention (callee saved), but
-expects this from a static inline function that it then forces to be
-outlined. This is problematic because different compilers or flags can
-then add a stack guard that violates the calling conventions.
+On Thu, Jun 7, 2018 at 11:32 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+>
+> native_save_fl() is marked static inline, but by using it as
+> a function pointer in arch/x86/kernel/paravirt.c, it MUST be outlined.
+>
+> paravirt's use of native_save_fl() also requires that no GPRs other than
+> %rax are clobbered.
+>
+> Compilers have different heuristics which they use to emit stack guard
+> code, the emittance of which can break paravirt's callee saved assumption
+> by clobbering %rcx.
+>
+> Marking a function definition extern inline means that if this version
+> cannot be inlined, then the out-of-line version will be preferred. By
+> having the out-of-line version be implemented in assembly, it cannot be
+> instrumented with a stack protector, which might violate custom calling
+> conventions that code like paravirt rely on.
+>
+> The semantics of extern inline has changed since gnu89. This means that
+> folks using GCC versions >= 5.1 may see symbol redefinition errors at
+> link time for subdirs that override KBUILD_CFLAGS (making the C standard
+> used implicit) regardless of this patch. This has been cleaned up
+> earlier in the patch set, but is left as a note in the commit message
+> for future travelers.
+>
+> Reports:
+> https://lkml.org/lkml/2018/5/7/534
+> https://github.com/ClangBuiltLinux/linux/issues/16
+>
+> Discussion:
+> https://bugs.llvm.org/show_bug.cgi?id=37512
+> https://lkml.org/lkml/2018/5/24/1371
+>
+> Thanks to the many folks that participated in the discussion.
+>
+> Debugged-by: Alistair Strachan <astrachan@google.com>
+> Debugged-by: Matthias Kaehlcke <mka@chromium.org>
+> Reported-by: Sedat Dilek <sedat.dilek@gmail.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> Suggested-by: Arnd Bergmann <arnd@arndb.de>
+> Suggested-by: H. Peter Anvin <hpa@zytor.com>
+> Suggested-by: Tom Stellar <tstellar@redhat.com>
+> Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+> ---
+>  arch/x86/include/asm/irqflags.h |  2 +-
+>  arch/x86/kernel/Makefile        |  1 +
+>  arch/x86/kernel/irqflags.S      | 26 ++++++++++++++++++++++++++
+>  3 files changed, 28 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/x86/kernel/irqflags.S
+>
+> diff --git a/arch/x86/include/asm/irqflags.h b/arch/x86/include/asm/irqflags.h
+> index 89f08955fff7..c4fc17220df9 100644
+> --- a/arch/x86/include/asm/irqflags.h
+> +++ b/arch/x86/include/asm/irqflags.h
+> @@ -13,7 +13,7 @@
+>   * Interrupt control:
+>   */
+>
+> -static inline unsigned long native_save_fl(void)
+> +extern inline unsigned long native_save_fl(void)
+>  {
+>         unsigned long flags;
+>
+> diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+> index 02d6f5cf4e70..8824d01c0c35 100644
+> --- a/arch/x86/kernel/Makefile
+> +++ b/arch/x86/kernel/Makefile
+> @@ -61,6 +61,7 @@ obj-y                 += alternative.o i8253.o hw_breakpoint.o
+>  obj-y                  += tsc.o tsc_msr.o io_delay.o rtc.o
+>  obj-y                  += pci-iommu_table.o
+>  obj-y                  += resource.o
+> +obj-y                  += irqflags.o
+>
+>  obj-y                          += process.o
+>  obj-y                          += fpu/
+> diff --git a/arch/x86/kernel/irqflags.S b/arch/x86/kernel/irqflags.S
+> new file mode 100644
+> index 000000000000..ddeeaac8adda
+> --- /dev/null
+> +++ b/arch/x86/kernel/irqflags.S
+> @@ -0,0 +1,26 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#include <asm/asm.h>
+> +#include <asm/export.h>
+> +#include <linux/linkage.h>
+> +
+> +/*
+> + * unsigned long native_save_fl(void)
+> + */
+> +ENTRY(native_save_fl)
+> +       pushf
+> +       pop %_ASM_AX
+> +       ret
+> +ENDPROC(native_save_fl)
+> +EXPORT_SYMBOL(native_save_fl)
+> +
+> +/*
+> + * void native_restore_fl(unsigned long flags)
+> + * %eax/%rdi: flags
+> + */
+> +ENTRY(native_restore_fl)
+> +       push %_ASM_ARG1
+> +       popf
+> +       ret
+> +ENDPROC(native_restore_fl)
+> +EXPORT_SYMBOL(native_restore_fl)
+> --
+> 2.17.1.1185.g55be947832-goog
+>
 
-Uses extern inline with the out-of-line definition in assembly to
-prevent compilers from adding stack guards to the outlined version.
-
-Other parts of the codebase overwrite KBUILD_CFLAGS, which is *extremely
-problematic* for extern inline, as the sematics are completely the
-opposite depending on what C standard is used.
-http://blahg.josefsipek.net/?p=529
-
-Changes since v2:
-  Take hpa's _ASM_ARG patch into the set in order to simplify cross
-  32b/64b x86 assembly.  Apply Sedat's typo fix to commit message and
-  sign off on it. Take Joe's sugguestion to simplify __inline__ and
-  __inline. Add Arnd to list of folks who made helpful suggestions.
-
-Changes since v1:
-  Prefer gnu_inline function attribute instead of explicitly setting C
-  standard compiler flag in problematic Makefiles. We should instead
-  carefully evaluate if those Makefiles should be overwriting
-  KBUILD_CFLAGS at all. Dropped the previous first two patches and added
-  a new first patch.
-
-H. Peter Anvin (1):
-  x86/asm: add _ASM_ARG* constants for argument registers to <asm/asm.h>
-
-Nick Desaulniers (2):
-  compiler-gcc.h: add gnu_inline to all inline declarations
-  x86: paravirt: make native_save_fl extern inline
-
- arch/x86/include/asm/asm.h      | 59 +++++++++++++++++++++++++++++++++
- arch/x86/include/asm/irqflags.h |  2 +-
- arch/x86/kernel/Makefile        |  1 +
- arch/x86/kernel/irqflags.S      | 26 +++++++++++++++
- include/linux/compiler-gcc.h    | 17 ++++++----
- 5 files changed, 98 insertions(+), 7 deletions(-)
- create mode 100644 arch/x86/kernel/irqflags.S
+Probably should have mentioned in the notes/cover letter that this was
+rebased on hpa's patch (2/3) in this series. As a change from v2.
 
 -- 
-2.17.1.1185.g55be947832-goog
-
+Thanks,
+~Nick Desaulniers
