@@ -1,226 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:46343 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752620AbeFGLJW (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:37863 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750891AbeFGN4G (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Jun 2018 07:09:22 -0400
-Received: by mail-lf0-f65.google.com with SMTP id j13-v6so14017853lfb.13
-        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jun 2018 04:09:21 -0700 (PDT)
-From: Anders Roxell <anders.roxell@linaro.org>
-Subject: [PATCH v4] selftests: add headers_install to lib.mk
-Date: Thu,  7 Jun 2018 13:09:11 +0200
-Message-Id: <20180607110911.12252-1-anders.roxell@linaro.org>
-In-Reply-To: <20180413090351.25662-1-anders.roxell@linaro.org>
-References: <20180413090351.25662-1-anders.roxell@linaro.org>
+        Thu, 7 Jun 2018 09:56:06 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: [RFC v2 0/1] Emacs-like isearch for mconf.
+Date: Thu,  7 Jun 2018 15:53:08 +0200
+Message-Id: <20180607135309.16928-1-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, shuah@kernel.org, bamv2005@gmail.com, brgl@bgdev.pl, pbonzini@redhat.com, akpm@linux-foundation.org, rppt@linux.vnet.ibm.com, aarcange@redhat.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, Anders Roxell <anders.roxell@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>
+Cc: Dirk Gouders <dirk@gouders.net>
 
-If the kernel headers aren't installed we can't build all the tests.
-Add a new make target rule 'khdr' in the file lib.mk to generate the
-kernel headers and that gets include for every test-dir Makefile that
-includes lib.mk If the testdir in turn have its own sub-dirs the
-top_srcdir needs to be set to the linux-rootdir to be able to generate
-the kernel headers.
+*** BLURB HERE ***
 
-Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
-Reviewed-by: Fathi Boudra <fathi.boudra@linaro.org>
----
- Makefile                                           | 14 +-------------
- scripts/subarch.include                            | 13 +++++++++++++
- tools/testing/selftests/android/Makefile           |  2 +-
- tools/testing/selftests/android/ion/Makefile       |  2 ++
- tools/testing/selftests/futex/functional/Makefile  |  1 +
- tools/testing/selftests/gpio/Makefile              |  7 ++-----
- tools/testing/selftests/kvm/Makefile               |  7 ++-----
- tools/testing/selftests/lib.mk                     | 12 ++++++++++++
- tools/testing/selftests/net/Makefile               |  1 +
- .../selftests/networking/timestamping/Makefile     |  1 +
- tools/testing/selftests/vm/Makefile                |  4 ----
- 11 files changed, 36 insertions(+), 28 deletions(-)
- create mode 100644 scripts/subarch.include
+Hello,
 
-diff --git a/Makefile b/Makefile
-index 6b9aea95ae3a..8050072300fa 100644
---- a/Makefile
-+++ b/Makefile
-@@ -286,19 +286,7 @@ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
- KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
- export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
- 
--# SUBARCH tells the usermode build what the underlying arch is.  That is set
--# first, and if a usermode build is happening, the "ARCH=um" on the command
--# line overrides the setting of ARCH below.  If a native build is happening,
--# then ARCH is assigned, getting whatever value it gets normally, and
--# SUBARCH is subsequently ignored.
--
--SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
--				  -e s/sun4u/sparc64/ \
--				  -e s/arm.*/arm/ -e s/sa110/arm/ \
--				  -e s/s390x/s390/ -e s/parisc64/parisc/ \
--				  -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
--				  -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ \
--				  -e s/riscv.*/riscv/)
-+include scripts/subarch.include
- 
- # Cross compiling and selecting different set of gcc/bin-utils
- # ---------------------------------------------------------------------------
-diff --git a/scripts/subarch.include b/scripts/subarch.include
-new file mode 100644
-index 000000000000..650682821126
---- /dev/null
-+++ b/scripts/subarch.include
-@@ -0,0 +1,13 @@
-+# SUBARCH tells the usermode build what the underlying arch is.  That is set
-+# first, and if a usermode build is happening, the "ARCH=um" on the command
-+# line overrides the setting of ARCH below.  If a native build is happening,
-+# then ARCH is assigned, getting whatever value it gets normally, and
-+# SUBARCH is subsequently ignored.
-+
-+SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
-+				  -e s/sun4u/sparc64/ \
-+				  -e s/arm.*/arm/ -e s/sa110/arm/ \
-+				  -e s/s390x/s390/ -e s/parisc64/parisc/ \
-+				  -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
-+				  -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ \
-+				  -e s/riscv.*/riscv/)
-diff --git a/tools/testing/selftests/android/Makefile b/tools/testing/selftests/android/Makefile
-index 72c25a3cb658..d9a725478375 100644
---- a/tools/testing/selftests/android/Makefile
-+++ b/tools/testing/selftests/android/Makefile
-@@ -6,7 +6,7 @@ TEST_PROGS := run.sh
- 
- include ../lib.mk
- 
--all:
-+all: khdr
- 	@for DIR in $(SUBDIRS); do		\
- 		BUILD_TARGET=$(OUTPUT)/$$DIR;	\
- 		mkdir $$BUILD_TARGET  -p;	\
-diff --git a/tools/testing/selftests/android/ion/Makefile b/tools/testing/selftests/android/ion/Makefile
-index e03695287f76..88cfe88e466f 100644
---- a/tools/testing/selftests/android/ion/Makefile
-+++ b/tools/testing/selftests/android/ion/Makefile
-@@ -10,6 +10,8 @@ $(TEST_GEN_FILES): ipcsocket.c ionutils.c
- 
- TEST_PROGS := ion_test.sh
- 
-+KSFT_KHDR_INSTALL := 1
-+top_srcdir = ../../../../..
- include ../../lib.mk
- 
- $(OUTPUT)/ionapp_export: ionapp_export.c ipcsocket.c ionutils.c
-diff --git a/tools/testing/selftests/futex/functional/Makefile b/tools/testing/selftests/futex/functional/Makefile
-index ff8feca49746..ad1eeb14fda7 100644
---- a/tools/testing/selftests/futex/functional/Makefile
-+++ b/tools/testing/selftests/futex/functional/Makefile
-@@ -18,6 +18,7 @@ TEST_GEN_FILES := \
- 
- TEST_PROGS := run.sh
- 
-+top_srcdir = ../../../../..
- include ../../lib.mk
- 
- $(TEST_GEN_FILES): $(HEADERS)
-diff --git a/tools/testing/selftests/gpio/Makefile b/tools/testing/selftests/gpio/Makefile
-index 1bbb47565c55..4665cdbf1a8d 100644
---- a/tools/testing/selftests/gpio/Makefile
-+++ b/tools/testing/selftests/gpio/Makefile
-@@ -21,11 +21,8 @@ endef
- CFLAGS += -O2 -g -std=gnu99 -Wall -I../../../../usr/include/
- LDLIBS += -lmount -I/usr/include/libmount
- 
--$(BINARIES): ../../../gpio/gpio-utils.o ../../../../usr/include/linux/gpio.h
-+$(BINARIES):| khdr
-+$(BINARIES): ../../../gpio/gpio-utils.o
- 
- ../../../gpio/gpio-utils.o:
- 	make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C ../../../gpio
--
--../../../../usr/include/linux/gpio.h:
--	make -C ../../../.. headers_install INSTALL_HDR_PATH=$(shell pwd)/../../../../usr/
--
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index d9d00319b07c..bcb69380bbab 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -32,9 +32,6 @@ $(LIBKVM_OBJ): $(OUTPUT)/%.o: %.c
- $(OUTPUT)/libkvm.a: $(LIBKVM_OBJ)
- 	$(AR) crs $@ $^
- 
--$(LINUX_HDR_PATH):
--	make -C $(top_srcdir) headers_install
--
--all: $(STATIC_LIBS) $(LINUX_HDR_PATH)
-+all: $(STATIC_LIBS)
- $(TEST_GEN_PROGS): $(STATIC_LIBS)
--$(TEST_GEN_PROGS) $(LIBKVM_OBJ): | $(LINUX_HDR_PATH)
-+$(STATIC_LIBS):| khdr
-diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
-index 17ab36605a8e..0a8e75886224 100644
---- a/tools/testing/selftests/lib.mk
-+++ b/tools/testing/selftests/lib.mk
-@@ -16,8 +16,20 @@ TEST_GEN_PROGS := $(patsubst %,$(OUTPUT)/%,$(TEST_GEN_PROGS))
- TEST_GEN_PROGS_EXTENDED := $(patsubst %,$(OUTPUT)/%,$(TEST_GEN_PROGS_EXTENDED))
- TEST_GEN_FILES := $(patsubst %,$(OUTPUT)/%,$(TEST_GEN_FILES))
- 
-+top_srcdir ?= ../../../..
-+include $(top_srcdir)/scripts/subarch.include
-+ARCH		?= $(SUBARCH)
-+
- all: $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED) $(TEST_GEN_FILES)
- 
-+.PHONY: khdr
-+khdr:
-+	make ARCH=$(ARCH) -C $(top_srcdir) headers_install
-+
-+ifdef KSFT_KHDR_INSTALL
-+$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED) $(TEST_GEN_FILES):| khdr
-+endif
-+
- .ONESHELL:
- define RUN_TEST_PRINT_RESULT
- 	TEST_HDR_MSG="selftests: "`basename $$PWD`:" $$BASENAME_TEST";	\
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 663e11e85727..d515dabc6b0d 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -15,6 +15,7 @@ TEST_GEN_FILES += udpgso udpgso_bench_tx udpgso_bench_rx
- TEST_GEN_PROGS = reuseport_bpf reuseport_bpf_cpu reuseport_bpf_numa
- TEST_GEN_PROGS += reuseport_dualstack reuseaddr_conflict
- 
-+KSFT_KHDR_INSTALL := 1
- include ../lib.mk
- 
- $(OUTPUT)/reuseport_bpf_numa: LDFLAGS += -lnuma
-diff --git a/tools/testing/selftests/networking/timestamping/Makefile b/tools/testing/selftests/networking/timestamping/Makefile
-index a728040edbe1..14cfcf006936 100644
---- a/tools/testing/selftests/networking/timestamping/Makefile
-+++ b/tools/testing/selftests/networking/timestamping/Makefile
-@@ -5,6 +5,7 @@ TEST_PROGS := hwtstamp_config rxtimestamp timestamping txtimestamp
- 
- all: $(TEST_PROGS)
- 
-+top_srcdir = ../../../../..
- include ../../lib.mk
- 
- clean:
-diff --git a/tools/testing/selftests/vm/Makefile b/tools/testing/selftests/vm/Makefile
-index fdefa2295ddc..58759454b1d0 100644
---- a/tools/testing/selftests/vm/Makefile
-+++ b/tools/testing/selftests/vm/Makefile
-@@ -25,10 +25,6 @@ TEST_PROGS := run_vmtests
- 
- include ../lib.mk
- 
--$(OUTPUT)/userfaultfd: ../../../../usr/include/linux/kernel.h
- $(OUTPUT)/userfaultfd: LDLIBS += -lpthread
- 
- $(OUTPUT)/mlock-random-test: LDLIBS += -lcap
--
--../../../../usr/include/linux/kernel.h:
--	make -C ../../../.. headers_install
+this is v2 of the isearch implementation, I also added Documentation changes which
+probably have to be split, because the older symbol-search also was undokumented in
+mconf (I basically copied the relevant documentation from Documentation/kbuild/kconfig.txt.
+
+I could not completely let off CTRL-s but am certainly fine with get rid of it and
+stay with just one special key (e.g. \) to start isearch.
+
+Changes since v1:
+
+* Additionally to CTRL-s, \ can be used to start isearch.
+
+* Raw mode is off by default an can be enabled by an environment
+  variable MENUCONFIG_RAW_MODE.
+
+* I also added a variable for toggling raw mode but did not implement
+  anything else.
+
+* The isearch indicator is now displayed as soon as isearch is
+  started.
+
+* Any key except \, CTRL-s, alphanumeric characters and space
+  terminates isearch and -- except ESC ESC -- is further processed,
+  e.g. ENTER terminates isearch and is then used to navigate into a
+  submenu.
+
+* Problems with mismatches and matches above the current position were
+  fixed.
+
+Dirk
+
+ Documentation/kbuild/kconfig.txt   |  18 +++-
+ scripts/kconfig/lxdialog/dialog.h  |   6 ++
+ scripts/kconfig/lxdialog/menubox.c | 173 +++++++++++++++++++++++++++++++++++++
+ scripts/kconfig/lxdialog/util.c    |  14 +++
+ scripts/kconfig/mconf.c            |  48 +++++++++-
+ 5 files changed, 256 insertions(+), 3 deletions(-)
+
 -- 
-2.17.1
+2.16.4
 
