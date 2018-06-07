@@ -1,76 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:34451 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751956AbeFGK1S (ORCPT
+Received: from mail-pl0-f66.google.com ([209.85.160.66]:39996 "EHLO
+        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932100AbeFGLHf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Jun 2018 06:27:18 -0400
-Date: Thu, 7 Jun 2018 12:27:01 +0200
-From: Johan Hovold <johan@kernel.org>
-Subject: Re: [PATCH v5 2/4] kernel hacking: new config NO_AUTO_INLINE to
- disable compiler auto-inline optimizations
-Message-ID: <20180607102701.GU13775@localhost>
-References: <20180606142600.GN13775@localhost>
- <20180606142622.2338abf6@vmware.local.home>
- <20180607041718.qpqucjzlvcm5h3gn@vireshk-i7>
- <20180607074628.kd3iyxevwj3ypzbr@intel.com>
- <20180607083856.ealw62v3wx43zeqz@vireshk-i7>
- <1303b1abf9f9229a8d3ccbb68a3e413266b360d7.camel@petrovitsch.priv.at>
- <20180607091025.m7dfix3e2xbwx4cs@vireshk-i7>
- <20180607091816.GT13775@localhost>
- <20180607091923.n5q5uzsxuymy3vov@vireshk-i7>
- <314bb2b3-186e-d7b0-d800-f77a42fd80fa@linaro.org>
+        Thu, 7 Jun 2018 07:07:35 -0400
+Received: by mail-pl0-f66.google.com with SMTP id t12-v6so5912489plo.7
+        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jun 2018 04:07:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <314bb2b3-186e-d7b0-d800-f77a42fd80fa@linaro.org>
+In-Reply-To: <1a021bf3-cf93-aa12-c5a8-1ea6c7900fbb@iogearbox.net>
+References: <20180413090351.25662-1-anders.roxell@linaro.org>
+ <20180514115809.9803-1-anders.roxell@linaro.org> <1a021bf3-cf93-aa12-c5a8-1ea6c7900fbb@iogearbox.net>
+From: Anders Roxell <anders.roxell@linaro.org>
+Date: Thu, 7 Jun 2018 13:07:33 +0200
+Message-ID: <CADYN=9LR5rqf_2vqW0jKixZpnvtM_XyOwJuvXX4hgMwGkD-QoA@mail.gmail.com>
+Subject: Re: [PATCH v3] selftests: add headers_install to lib.mk
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alex Elder <elder@linaro.org>
-Cc: Viresh Kumar <viresh.kumar@linaro.org>, Johan Hovold <johan@kernel.org>, Bernd Petrovitsch <bernd@petrovitsch.priv.at>, "Du, Changbin" <changbin.du@intel.com>, Steven Rostedt <rostedt@goodmis.org>, gregkh@linuxfoundation.org, alex.elder@linaro.org, kbuild test robot <lkp@intel.com>, linux-arch@vger.kernel.org, michal.lkml@markovi.net, linux-kernel@vger.kernel.org, arnd@arndb.de, yamada.masahiro@socionext.com, lgirdwood@gmail.com, broonie@kernel.org, rdunlap@infradead.org, x86@kernel.org, linux@armlinux.org.uk, linux-sparse@vger.kernel.org, mingo@redhat.com, kbuild-all@01.org, akpm@linux-foundation.org, changbin.du@gmail.com, tglx@linutronix.de, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Shuah Khan <shuah@kernel.org>, Bamvor Zhang <bamv2005@gmail.com>, brgl@bgdev.pl, Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, aarcange@redhat.com, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kselftest@vger.kernel.org, Networking <netdev@vger.kernel.org>, alexei.starovoitov@gmail.com
 
-On Thu, Jun 07, 2018 at 05:12:51AM -0500, Alex Elder wrote:
-> On 06/07/2018 04:19 AM, Viresh Kumar wrote:
-> > On 07-06-18, 11:18, Johan Hovold wrote:
-> >> If you want to work around the warning and think you can do it in some
-> >> non-contrived way, then go for it.
-> >>
-> >> Clearing the request buffer, checking for termination using strnlen, and
-> >> then using memcpy might not be too bad.
-> >>
-> >> But after all, it is a false positive, so leaving things as they stand
-> >> is fine too.
-> > 
-> > Leave it then :)
-> > 
-> 
-> It's interesting that the warning isn't reported for this in
-> fw_mgmt_interface_fw_version_operation().  The difference there is
-> that you actually put a zero byte at that last position before
-> returning.  I'm mildly impressed if gcc is distinguishing that.
+On 14 May 2018 at 21:20, Daniel Borkmann <daniel@iogearbox.net> wrote:
+> On 05/14/2018 01:58 PM, Anders Roxell wrote:
+>> If the kernel headers aren't installed we can't build all the tests.
+>> Add a new make target rule 'khdr' in the file lib.mk to generate the
+>> kernel headers and that gets include for every test-dir Makefile that
+>> includes lib.mk If the testdir in turn have its own sub-dirs the
+>> top_srcdir needs to be set to the linux-rootdir to be able to generate
+>> the kernel headers.
+>>
+>> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+>> Reviewed-by: Fathi Boudra <fathi.boudra@linaro.org>
+>> ---
+>>  Makefile                                          | 14 +-------------
+>>  scripts/subarch.include                           | 13 +++++++++++++
+>>  tools/testing/selftests/android/Makefile          |  2 +-
+>>  tools/testing/selftests/android/ion/Makefile      |  1 +
+>>  tools/testing/selftests/bpf/Makefile              |  5 ++---
+>>  tools/testing/selftests/futex/functional/Makefile |  1 +
+>>  tools/testing/selftests/gpio/Makefile             |  7 ++-----
+>>  tools/testing/selftests/kvm/Makefile              |  7 ++-----
+>>  tools/testing/selftests/lib.mk                    | 10 ++++++++++
+>>  tools/testing/selftests/vm/Makefile               |  4 ----
+>>  10 files changed, 33 insertions(+), 31 deletions(-)
+>>  create mode 100644 scripts/subarch.include
+> [...]
+>> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
+>> index 438d4f93875b..9741609a0eb1 100644
+>> --- a/tools/testing/selftests/bpf/Makefile
+>> +++ b/tools/testing/selftests/bpf/Makefile
+>> @@ -16,9 +16,8 @@ LDLIBS += -lcap -lelf -lrt -lpthread
+>>  TEST_CUSTOM_PROGS = $(OUTPUT)/urandom_read
+>>  all: $(TEST_CUSTOM_PROGS)
+>>
+>> -$(TEST_CUSTOM_PROGS): urandom_read
+>> -
+>> -urandom_read: urandom_read.c
+>> +$(TEST_CUSTOM_PROGS):| khdr
+>> +$(TEST_CUSTOM_PROGS): urandom_read.c
+>>       $(CC) -o $(TEST_CUSTOM_PROGS) -static $<
+>>
+>>  # Order correspond to 'make run_tests' order
+>
+> Can you elaborate on the error in BPF you're seeing that would force a
+> headers_install for it?
 
-Found a redhat blog post claiming it does check for some cases like
-that:
+BPF shouldn't be affected, a new revision of the patch does not touch
+the bpf/Makefile.
+I will send out a patch soon.
 
-	https://developers.redhat.com/blog/2018/05/24/detecting-string-truncation-with-gcc-8/
+Cheers,
+Anders
 
-> You *are* returning the fw_info->firmware_tag array newly filled
-> with a non-null-terminated string in one of the two cases that
-> get warnings in "fw-management.c".
-
-No, there's no warning for that one (line 250), and there fw_info is
-used as the source, not the destination, so no unterminated string is
-returned there either.
-
-> But the other one is only
-> updating a buffer in a local/automatic variable.
-
-All three cases, except the one that is explicitly terminated.
-
-> Weird.  I wish there were a non-clumsy way of marking false positives
-> like this as A-OK.
-
-The gcc docs mentions an attribute for that but it seems a bit overkill
-here.
-
-Thanks,
-Johan
+> Some people are running the tools/ infrastructure
+> (incl. BPF kselftests) outside of kernel tree where this dependency would
+> break their setup. Why BPF bits cannot be fixed otherwise?
+>
+> Thanks,
+> Daniel
