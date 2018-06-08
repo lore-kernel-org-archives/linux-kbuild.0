@@ -1,59 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f202.google.com ([209.85.223.202]:38836 "EHLO
-        mail-io0-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753224AbeFHVrw (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:39367 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752708AbeFHVxm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Jun 2018 17:47:52 -0400
-Received: by mail-io0-f202.google.com with SMTP id g22-v6so11065083ioh.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 08 Jun 2018 14:47:52 -0700 (PDT)
+        Fri, 8 Jun 2018 17:53:42 -0400
+Date: Fri, 8 Jun 2018 23:53:38 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [PATCH] kconfig: fix localmodconfig
+Message-ID: <20180608215338.GA28473@ravnborg.org>
 MIME-Version: 1.0
-Date: Fri,  8 Jun 2018 14:47:46 -0700
-Message-Id: <20180608214746.136554-1-gthelen@google.com>
-Subject: [PATCH] trace: fix SKIP_STACK_VALIDATION=1 build
-From: Greg Thelen <gthelen@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>, Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Greg Thelen <gthelen@google.com>
+To: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Kevin Locke <kevin@kevinlocke.name>, Andrei Vagin <avagin@virtuozzo.com>
 
-Non gcc-5 builds with CONFIG_STACK_VALIDATION=y and
-SKIP_STACK_VALIDATION=1 fail.
-Example output:
-  /bin/sh: init/.tmp_main.o: Permission denied
+From 47857284fd19ef953e3beb7338154924a74b62d2 Mon Sep 17 00:00:00 2001
+From: Sam Ravnborg <sam@ravnborg.org>
+Date: Fri, 8 Jun 2018 23:48:31 +0200
+Subject: [PATCH 1/1] kconfig: fix localmodconfig
 
-commit 96f60dfa5819 ("trace: Use -mcount-record for dynamic ftrace"),
-added a mismatched endif.  This causes cmd_objtool to get mistakenly
-set.
+When kconfig syntax moved to use $(FOO) for environment variables
+localmodconfig was not updated.
+Fix so it now works with the new syntax $(FOO)
 
-Relocate endif to balance the newly added -record-mcount check.
-
-Fixes: 96f60dfa5819 ("trace: Use -mcount-record for dynamic ftrace")
-Signed-off-by: Greg Thelen <gthelen@google.com>
+Fixes: 104daea149c45cc84842ce77a9bd6436d19f3dd8 ("kconfig: reference environment variables directly and remove 'option env='")
+Reported-by: Kevin Locke <kevin@kevinlocke.name>
+Reported-by: Andrei Vagin <avagin@virtuozzo.com>
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/Makefile.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/kconfig/streamline_config.pl | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 34d9e9ce97c2..e7889f486ca1 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -239,6 +239,7 @@ cmd_record_mcount =						\
- 	     "$(CC_FLAGS_FTRACE)" ]; then			\
- 		$(sub_cmd_record_mcount)			\
- 	fi;
-+endif # -record-mcount
- endif # CONFIG_FTRACE_MCOUNT_RECORD
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index a2e83ab17de3..4686531e2f8c 100755
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -165,10 +165,10 @@ sub read_kconfig {
+     my $last_source = "";
  
- ifdef CONFIG_STACK_VALIDATION
-@@ -263,7 +264,6 @@ ifneq ($(RETPOLINE_CFLAGS),)
-   objtool_args += --retpoline
- endif
- endif
--endif
+     # Check for any environment variables used
+-    while ($source =~ /\$(\w+)/ && $last_source ne $source) {
++    while ($source =~ /\$\((\w+)\)/ && $last_source ne $source) {
+ 	my $env = $1;
+ 	$last_source = $source;
+-	$source =~ s/\$$env/$ENV{$env}/;
++	$source =~ s/\$\($env\)/$ENV{$env}/;
+     }
  
- 
- ifdef CONFIG_MODVERSIONS
+     open(my $kinfile, '<', $source) || die "Can't open $kconfig";
 -- 
-2.18.0.rc1.242.g61856ae69a-goog
+2.12.0
 
