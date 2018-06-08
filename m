@@ -1,130 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:55009 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752311AbeFHHFX (ORCPT
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:42978 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751021AbeFHH76 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Jun 2018 03:05:23 -0400
+        Fri, 8 Jun 2018 03:59:58 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQxS7xkqja2J5FNkRfhCtQpeKqJVsQXFggQrJT6cL_2Cw@mail.gmail.com>
-References: <1527499328-13213-1-git-send-email-yamada.masahiro@socionext.com>
- <1527499328-13213-22-git-send-email-yamada.masahiro@socionext.com>
- <CAMuHMdUDCtnyqydZan9Q-+hOQacWGJrrMbw4LshjYSjn2=yBjw@mail.gmail.com> <CAK7LNAQxS7xkqja2J5FNkRfhCtQpeKqJVsQXFggQrJT6cL_2Cw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 8 Jun 2018 16:04:35 +0900
-Message-ID: <CAK7LNAR5f+ZU+W9hUZJW+78rATsUjmgSnq31f-iZkMgPEhaoBw@mail.gmail.com>
-Subject: Re: [PATCH v5 21/31] kconfig: show compiler version text in the top comment
+In-Reply-To: <20180607204927.219329-2-ndesaulniers@google.com>
+References: <20180607204927.219329-1-ndesaulniers@google.com> <20180607204927.219329-2-ndesaulniers@google.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Fri, 8 Jun 2018 09:59:54 +0200
+Message-ID: <CAK8P3a0yi+MrOS=+pjCeUu==YBE_AppB8vfqdsQS-1NpSO2c4A@mail.gmail.com>
+Subject: Re: [PATCH v4 1/3] compiler-gcc.h: add gnu_inline to all inline declarations
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nicholas Piggin <npiggin@gmail.com>, "Luis R . Rodriguez" <mcgrof@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, linux-efi@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>, virtualization@lists.linux-foundation.org, astrachan@google.com, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, David Rientjes <rientjes@google.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Jan Kiszka <jan.kiszka@siemens.com>, Steven Rostedt <rostedt@goodmis.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, Brijesh Singh <brijesh.singh@amd.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, gregkh <gregkh@linuxfoundation.org>, Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>, Juergen Gross <jgross@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, "Lendacky, Thomas" <thomas.lendacky@amd.com>, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, Joe Perches <joe@perches.com>
 
-Hi Geert,
-
-
-2018-06-07 17:58 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> Hi Geert,
+On Thu, Jun 7, 2018 at 10:49 PM, Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+> Functions marked extern inline do not emit an externally visible
+> function when the gnu89 C standard is used. Some KBUILD Makefiles
+> overwrite KBUILD_CFLAGS. This is an issue for GCC 5.1+ users as without
+> an explicit C standard specified, the default is gnu11. Since c99, the
+> semantics of extern inline have changed such that an externally visible
+> function is always emitted. This can lead to multiple definition errors
+> of extern inline functions at link time of compilation units whose build
+> files have removed an explicit C standard compiler flag for users of GCC
+> 5.1+ or Clang.
 >
->
-> 2018-06-07 17:42 GMT+09:00 Geert Uytterhoeven <geert@linux-m68k.org>:
->> Hi Yamada-san,
->>
->> On Mon, May 28, 2018 at 11:21 AM, Masahiro Yamada
->> <yamada.masahiro@socionext.com> wrote:
->>> The kernel configuration phase is now tightly coupled with the compiler
->>> in use.  It will be nice to show the compiler information in Kconfig.
->>>
->>> The compiler information will be displayed like this:
->>>
->>>   $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- config
->>>   scripts/kconfig/conf  --oldaskconfig Kconfig
->>>   *
->>>   * Linux/arm64 4.16.0-rc1 Kernel Configuration
->>>   *
->>>   *
->>>   * Compiler: aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011
->>>   *
->>>   *
->>>   * General setup
->>>   *
->>>   Compile also drivers which will not load (COMPILE_TEST) [N/y/?]
->>>
->>> If you use GUI methods such as menuconfig, it will be displayed in the
->>> top menu.
->>>
->>> This is simply implemented by using the 'comment' statement.  So, it
->>> will be saved into the .config file as well.
->>>
->>> This commit has a very important meaning.  If the compiler is upgraded,
->>> Kconfig must be re-run since different compilers have different sets
->>> of supported options.
->>>
->>> All referenced environments are written to include/config/auto.conf.cmd
->>> so that any environment change triggers syncconfig, and prompt the user
->>> to input new values if needed.
->>>
->>> With this commit, something like follows will be added to
->>> include/config/auto.conf.cmd
->>>
->>>   ifneq "$(CC_VERSION_TEXT)" "aarch64-linux-gnu-gcc (Linaro GCC 7.2-2017.11) 7.2.1 20171011"
->>>   include/config/auto.conf: FORCE
->>>   endif
->>>
->>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->>> Reviewed-by: Kees Cook <keescook@chromium.org>
->>
->> This is now commit 21c54b774744719c ("kconfig: show compiler version text
->> in the top comment") upstream.
->>
->> This commit broke cross-compilation for me:
->>
->>     $ make ARCH=m68k
->>     scripts/kconfig/conf  --syncconfig Kconfig
->>     scripts/kconfig/conf  --syncconfig Kconfig
->>     scripts/kconfig/conf  --syncconfig Kconfig
->>     scripts/kconfig/conf  --syncconfig Kconfig
->>     ...
->>
->> with O=:
->>
->>       GEN     ./Makefile
->>      scripts/kconfig/conf  --syncconfig Kconfig
->>       GEN     ./Makefile
->>     scripts/kconfig/conf  --syncconfig Kconfig
->>       GEN     ./Makefile
->>     scripts/kconfig/conf  --syncconfig Kconfig
->>       GEN     ./Makefile
->>     ...
->>
->> .config gained (both with/without O=):
->>
->>     #
->>     # Compiler: gcc (Ubuntu 5.4.0-6ubuntu1~16.04.9) 5.4.0 20160609
->>     #
->>
->> which is definitely wrong when cross-compiling for m68k.
->>
->> Reverting the commit, and fixing up the conflicts, fixes the issue for me
->>
->> Do you have a clue?
->> Thanks!
->
->
-> Agh, I missed the case where CROSS_COMPILE is
-> set by arch/$(SRCARCH)/Makefile.
->
->
-> I will fix it.  Thanks for the report!
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> Suggested-by: H. Peter Anvin <hpa@zytor.com>
+> Suggested-by: Joe Perches <joe@perches.com>
 
+I suspect this will break Geert's gcc-4.1.2, which I think doesn't have that
+attribute yet (4.1.3 or higher have it according to the documentation.
 
-I posted a patch.
-https://patchwork.kernel.org/patch/10453685/
+It wouldn't be hard to work around that if we want to keep that version
+working, or we could decide that it's time to officially stop supporting
+that version, but we should probably decide on one or the other.
 
-I hope it will fix your problem.
-
-
-Thanks,
-
--- 
-Best Regards
-Masahiro Yamada
+        Arnd
