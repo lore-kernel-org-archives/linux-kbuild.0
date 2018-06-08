@@ -1,75 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:48426 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752478AbeFHUEL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Jun 2018 16:04:11 -0400
-Date: Fri, 8 Jun 2018 16:03:55 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH v5 2/4] kernel hacking: new config NO_AUTO_INLINE to
- disable compiler auto-inline optimizations
-Message-ID: <20180608160355.67712eb8@vmware.local.home>
-In-Reply-To: <20180607091816.GT13775@localhost>
-References: <1528186420-6615-3-git-send-email-changbin.du@intel.com>
-        <201806060501.btF3aJMZ%fengguang.wu@intel.com>
-        <20180606095714.1d3c2def@vmware.local.home>
-        <20180606142600.GN13775@localhost>
-        <20180606142622.2338abf6@vmware.local.home>
-        <20180607041718.qpqucjzlvcm5h3gn@vireshk-i7>
-        <20180607074628.kd3iyxevwj3ypzbr@intel.com>
-        <20180607083856.ealw62v3wx43zeqz@vireshk-i7>
-        <1303b1abf9f9229a8d3ccbb68a3e413266b360d7.camel@petrovitsch.priv.at>
-        <20180607091025.m7dfix3e2xbwx4cs@vireshk-i7>
-        <20180607091816.GT13775@localhost>
+Received: from merlin.infradead.org ([205.233.59.134]:40454 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752754AbeFHUs5 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 8 Jun 2018 16:48:57 -0400
+Subject: Re: [PATCH] uapi: Make generic uapi headers compile standalone.
+References: <20180606231602.231326-1-jchowdhary@google.com>
+ <b6b6dd56-c948-54e8-df95-3d170a3c1e7d@infradead.org>
+ <fe1d69e1-1a0f-a3ea-e45f-994698d53dbd@google.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <cf1b59ad-994b-f6ac-8e58-2b24ef346c49@infradead.org>
+Date: Fri, 8 Jun 2018 13:48:50 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <fe1d69e1-1a0f-a3ea-e45f-994698d53dbd@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Johan Hovold <johan@kernel.org>
-Cc: Viresh Kumar <viresh.kumar@linaro.org>, Bernd Petrovitsch <bernd@petrovitsch.priv.at>, "Du, Changbin" <changbin.du@intel.com>, gregkh@linuxfoundation.org, alex.elder@linaro.org, kbuild test robot <lkp@intel.com>, linux-arch@vger.kernel.org, michal.lkml@markovi.net, linux-kernel@vger.kernel.org, arnd@arndb.de, yamada.masahiro@socionext.com, lgirdwood@gmail.com, broonie@kernel.org, rdunlap@infradead.org, x86@kernel.org, linux@armlinux.org.uk, linux-sparse@vger.kernel.org, mingo@redhat.com, kbuild-all@01.org, akpm@linux-foundation.org, changbin.du@gmail.com, tglx@linutronix.de, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Jayant Chowdhary <jchowdhary@google.com>, linux-kernel@vger.kernel.org
+Cc: akpm@linux-foundation.org, kernel-team@android.com, linux-kbuild@vger.kernel.org
 
-On Thu, 7 Jun 2018 11:18:16 +0200
-Johan Hovold <johan@kernel.org> wrote:
-
-
-> If you want to work around the warning and think you can do it in some
-> non-contrived way, then go for it.
+On 06/08/2018 11:36 AM, Jayant Chowdhary wrote:
+> Hi Randy,
 > 
-> Clearing the request buffer, checking for termination using strnlen, and
-> then using memcpy might not be too bad.
+> On 06/07/2018 05:07 PM, Randy Dunlap wrote:
+>> On 06/06/2018 04:16 PM, Jayant Chowdhary wrote:
+>>> In order for static analysis tools to analyze each of the uapi headers,
+>>> we need to enable them to compile stand-alone. Some uapi headers were
+>>> missing dependencies which would not make them compile stand-alone in
+>>> user-land. This patch adds those dependencies.
+>>
+>> Hi,
+>>
+>> Thanks for getting started on this.  I see that the kbuild robot and I were
+>> still not able to do successful builds even after this patch is applied.
+>> We were building different targets though.  robot was doing kernel builds
+>> and I was doing a large "all-uapi" build.
+>>
+>> I started on my all-uapi work about 1 week ago but haven't posted anything yet,
+>> but it's posted (attached) below.  It's not yet up to kernel quality yet (for a
+>> Makefile), and I have made very little progress toward a successful userspace build.
+>>
+>> If anyone is interested, just put these 3 files in <kernel_tree>/tools/build
+>> and then run:
+>>
+>> make ARCH=$some_arch O=build_dir headers_check
+>> so that the headers will be cleaned up and installed in build_dir/usr/.
+>>
+>> Then run 'make -f all-uapi.mk'
+>> and the userspace program with all header files found in build_dir/usr/include
+>> will be built -- i.e., attempted (not successfully).
+>>
+>> (note: chmod +x hdr-fix-lines.pl)
+>>
+>>
 > 
-> But after all, it is a false positive, so leaving things as they stand
-> is fine too.
+> Thank you for this. This is surely a more formal way of finding out and
+> verifying problems w.r.t the uapi headers, being compiled from user-land. I do
+> have one concern with this approach though: the make target 'all-uapi.o' depends
+> on all-uapi.h, which includes all the uapi headers installed in <build-dir>. So
+> this does make sure that when all the uapi headers are included, a user-land
+> program will be able to compile fine, without adding any additional
+> dependencies. However, this could be masking some cases of dependency exclusion.
+> An example can be seen as follows:
+> 
+> Header dependency chain:
+> A.h->B.h, however A.h doesn't actually include B.h
+> C.h->B.h, C.h does include B.h
+> 
+> all-uapi.h
+> #include<C.h>
+> #include<A.h>
+> 
+> all-uapi.h will compile fine, since the inclusion of C.h before A.h satisfies
+> A.h's dependency on B.h. However, if a user-land program includes just A.h, it
+> will not compile without adding B.h. So the target being built successfully
+> masked an issue with the uapi header, no?
 
-Not sure how contrived you think this is, but it solves the warning
-without adding extra work in the normal case.
+Yes, good point.
 
--- Steve
+> I guess it might be better to just have a Makefile which produces a target for
+> each header in the set produced by 'make headers_install' and compile those,
+> with a -I flag as <build-dir>/usr/include ?
 
-diff --git a/drivers/staging/greybus/fw-management.c b/drivers/staging/greybus/fw-management.c
-index 71aec14f8181..4fb9f1dff47d 100644
---- a/drivers/staging/greybus/fw-management.c
-+++ b/drivers/staging/greybus/fw-management.c
-@@ -150,15 +150,18 @@ static int fw_mgmt_load_and_validate_operation(struct fw_mgmt *fw_mgmt,
- 	}
- 
- 	request.load_method = load_method;
--	strncpy(request.firmware_tag, tag, GB_FIRMWARE_TAG_MAX_SIZE);
-+	strncpy(request.firmware_tag, tag, GB_FIRMWARE_TAG_MAX_SIZE - 1);
- 
- 	/*
- 	 * The firmware-tag should be NULL terminated, otherwise throw error and
- 	 * fail.
- 	 */
--	if (request.firmware_tag[GB_FIRMWARE_TAG_MAX_SIZE - 1] != '\0') {
--		dev_err(fw_mgmt->parent, "load-and-validate: firmware-tag is not NULL terminated\n");
--		return -EINVAL;
-+	if (request.firmware_tag[GB_FIRMWARE_TAG_MAX_SIZE - 2] != '\0') {
-+		if (tag[GB_FIRMWARE_TAG_MAX_SIZE - 1] != '\0') {
-+			dev_err(fw_mgmt->parent, "load-and-validate: firmware-tag is not NULL terminated\n");
-+			return -EINVAL;
-+		}
-+		request.firmware_tag[GB_FIRMWARE_TAG_MAX_SIZE - 1] = '\0';
- 	}
- 
- 	/* Allocate ids from 1 to 255 (u8-max), 0 is an invalid id */
+Yes, that makes sense.  Should be fairly straightforward to do that.
+
+> Also, do you think it might be better to do this work in phases ? I'm guessing
+> we'll be seeing many headers to fix (especially arch specific ones). Fixing
+> these separately: first the generic ones, followed by the ones for the arches,
+> might be easier ?
+
+Absolutely.  I was planning to just focus on one sub-directory of
+usr/include/choose_one (and begin with a smaller one).
+
+
+thanks,
+-- 
+~Randy
