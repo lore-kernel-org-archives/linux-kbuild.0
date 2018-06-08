@@ -1,287 +1,142 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:42538 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752081AbeFGWih (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Jun 2018 18:38:37 -0400
-Date: Fri, 8 Jun 2018 06:37:41 +0800
-From: kbuild test robot <lkp@intel.com>
+Received: from merlin.infradead.org ([205.233.59.134]:59210 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752449AbeFHAHG (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 7 Jun 2018 20:07:06 -0400
 Subject: Re: [PATCH] uapi: Make generic uapi headers compile standalone.
-Message-ID: <201806080652.8WjxQoFE%fengguang.wu@intel.com>
 References: <20180606231602.231326-1-jchowdhary@google.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <b6b6dd56-c948-54e8-df95-3d170a3c1e7d@infradead.org>
+Date: Thu, 7 Jun 2018 17:07:01 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20180606231602.231326-1-jchowdhary@google.com>
+Content-Type: multipart/mixed;
+ boundary="------------B62B25DCCC7D3ABB45F9F1E7"
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jayant Chowdhary <jchowdhary@google.com>
-Cc: kbuild-all@01.org, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, kernel-team@android.com, linux-kbuild@vger.kernel.org
+To: Jayant Chowdhary <jchowdhary@google.com>, linux-kernel@vger.kernel.org
+Cc: akpm@linux-foundation.org, kernel-team@android.com, linux-kbuild@vger.kernel.org
 
-Hi Jayant,
+This is a multi-part message in MIME format.
+--------------B62B25DCCC7D3ABB45F9F1E7
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Thank you for the patch! Perhaps something to improve:
+On 06/06/2018 04:16 PM, Jayant Chowdhary wrote:
+> In order for static analysis tools to analyze each of the uapi headers,
+> we need to enable them to compile stand-alone. Some uapi headers were
+> missing dependencies which would not make them compile stand-alone in
+> user-land. This patch adds those dependencies.
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v4.17 next-20180607]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+Hi,
 
-url:    https://github.com/0day-ci/linux/commits/Jayant-Chowdhary/uapi-Make-generic-uapi-headers-compile-standalone/20180608-014548
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF=-D__CHECK_ENDIAN__
+Thanks for getting started on this.  I see that the kbuild robot and I were
+still not able to do successful builds even after this patch is applied.
+We were building different targets though.  robot was doing kernel builds
+and I was doing a large "all-uapi" build.
+
+I started on my all-uapi work about 1 week ago but haven't posted anything yet,
+but it's posted (attached) below.  It's not yet up to kernel quality yet (for a
+Makefile), and I have made very little progress toward a successful userspace build.
+
+If anyone is interested, just put these 3 files in <kernel_tree>/tools/build
+and then run:
+
+make ARCH=$some_arch O=build_dir headers_check
+so that the headers will be cleaned up and installed in build_dir/usr/.
+
+Then run 'make -f all-uapi.mk'
+and the userspace program with all header files found in build_dir/usr/include
+will be built -- i.e., attempted (not successfully).
+
+(note: chmod +x hdr-fix-lines.pl)
 
 
-sparse warnings: (new ones prefixed by >>)
+-- 
+~Randy
 
-   drivers/gpu/drm/radeon/cik.c:6721:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6721:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6721:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6722:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6722:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6722:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6724:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6724:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6724:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6725:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6725:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6725:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6726:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6726:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6726:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6731:49: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6731:49:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6731:49:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6733:49: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6733:49:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6733:49:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6735:57: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6735:57:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6735:57:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6742:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6742:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6742:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6743:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6743:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6743:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6746:33: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6746:33:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6746:33:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6747:33: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6747:33:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6747:33:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6750:33: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6750:33:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6750:33:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6751:33: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6751:33:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6751:33:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6755:33: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6755:33:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6755:33:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6756:33: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6756:33:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6756:33:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6759:33: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6759:33:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6759:33:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6760:33: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6760:33:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6760:33:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6763:33: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6763:33:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6763:33:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6764:33: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6764:33:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6764:33:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6768:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6768:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6768:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6769:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6769:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6769:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6771:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6771:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6771:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6772:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned int volatile [unsigned] [usertype] <noident> @@    got latile [unsigned] [usertype] <noident> @@
-   drivers/gpu/drm/radeon/cik.c:6772:25:    expected unsigned int volatile [unsigned] [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:6772:25:    got restricted __le32 [usertype] <noident>
-   drivers/gpu/drm/radeon/cik.c:7497:24: sparse: cast to restricted __le32
-   drivers/gpu/drm/radeon/cik.c:7587:27: sparse: cast to restricted __le32
-   drivers/gpu/drm/radeon/cik.c:7588:28: sparse: cast to restricted __le32
-   drivers/gpu/drm/radeon/cik.c:7589:27: sparse: cast to restricted __le32
-   drivers/gpu/drm/radeon/cik.c:7497:24: sparse: cast to restricted __le32
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9065:16: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9142:15: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9142:15: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9144:22: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9144:22: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9262:29: sparse: expression using sizeof(void)
-   drivers/gpu/drm/radeon/cik.c:9293:39: sparse: expression using sizeof(void)
->> drivers/gpu/drm/radeon/cik.c:9333:39: sparse: too many warnings
+--------------B62B25DCCC7D3ABB45F9F1E7
+Content-Type: text/x-makefile;
+ name="all-uapi.mk"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="all-uapi.mk"
 
-vim +9333 drivers/gpu/drm/radeon/cik.c
+# all-uapi.mk
+# currently resides in tools/build/
+#
+# before running 'make -f all-uapi.mk',
+# run (from top of kernel tree): make ARCH=arch O=dir headers_check
+# so that the uapi headers will be installed.
 
-cd84a27d Alex Deucher  2012-07-20  9234  
-cd84a27d Alex Deucher  2012-07-20  9235  /**
-cd84a27d Alex Deucher  2012-07-20  9236   * dce8_program_watermarks - program display watermarks
-cd84a27d Alex Deucher  2012-07-20  9237   *
-cd84a27d Alex Deucher  2012-07-20  9238   * @rdev: radeon_device pointer
-cd84a27d Alex Deucher  2012-07-20  9239   * @radeon_crtc: the selected display controller
-cd84a27d Alex Deucher  2012-07-20  9240   * @lb_size: line buffer size
-cd84a27d Alex Deucher  2012-07-20  9241   * @num_heads: number of display controllers in use
-cd84a27d Alex Deucher  2012-07-20  9242   *
-cd84a27d Alex Deucher  2012-07-20  9243   * Calculate and program the display watermarks for the
-cd84a27d Alex Deucher  2012-07-20  9244   * selected display controller (CIK).
-cd84a27d Alex Deucher  2012-07-20  9245   */
-cd84a27d Alex Deucher  2012-07-20  9246  static void dce8_program_watermarks(struct radeon_device *rdev,
-cd84a27d Alex Deucher  2012-07-20  9247  				    struct radeon_crtc *radeon_crtc,
-cd84a27d Alex Deucher  2012-07-20  9248  				    u32 lb_size, u32 num_heads)
-cd84a27d Alex Deucher  2012-07-20  9249  {
-cd84a27d Alex Deucher  2012-07-20  9250  	struct drm_display_mode *mode = &radeon_crtc->base.mode;
-58ea2dea Alex Deucher  2013-01-24  9251  	struct dce8_wm_params wm_low, wm_high;
-e6b9a6c8 Mario Kleiner 2017-04-24  9252  	u32 active_time;
-cd84a27d Alex Deucher  2012-07-20  9253  	u32 line_time = 0;
-cd84a27d Alex Deucher  2012-07-20  9254  	u32 latency_watermark_a = 0, latency_watermark_b = 0;
-cd84a27d Alex Deucher  2012-07-20  9255  	u32 tmp, wm_mask;
-cd84a27d Alex Deucher  2012-07-20  9256  
-cd84a27d Alex Deucher  2012-07-20  9257  	if (radeon_crtc->base.enabled && num_heads && mode) {
-55f61a04 Mario Kleiner 2017-06-13  9258  		active_time = (u32) div_u64((u64)mode->crtc_hdisplay * 1000000,
-55f61a04 Mario Kleiner 2017-06-13  9259  					    (u32)mode->clock);
-55f61a04 Mario Kleiner 2017-06-13  9260  		line_time = (u32) div_u64((u64)mode->crtc_htotal * 1000000,
-55f61a04 Mario Kleiner 2017-06-13  9261  					  (u32)mode->clock);
-55f61a04 Mario Kleiner 2017-06-13  9262  		line_time = min(line_time, (u32)65535);
-cd84a27d Alex Deucher  2012-07-20  9263  
-58ea2dea Alex Deucher  2013-01-24  9264  		/* watermark for high clocks */
-58ea2dea Alex Deucher  2013-01-24  9265  		if ((rdev->pm.pm_method == PM_METHOD_DPM) &&
-58ea2dea Alex Deucher  2013-01-24  9266  		    rdev->pm.dpm_enabled) {
-58ea2dea Alex Deucher  2013-01-24  9267  			wm_high.yclk =
-58ea2dea Alex Deucher  2013-01-24  9268  				radeon_dpm_get_mclk(rdev, false) * 10;
-58ea2dea Alex Deucher  2013-01-24  9269  			wm_high.sclk =
-58ea2dea Alex Deucher  2013-01-24  9270  				radeon_dpm_get_sclk(rdev, false) * 10;
-58ea2dea Alex Deucher  2013-01-24  9271  		} else {
-58ea2dea Alex Deucher  2013-01-24  9272  			wm_high.yclk = rdev->pm.current_mclk * 10;
-58ea2dea Alex Deucher  2013-01-24  9273  			wm_high.sclk = rdev->pm.current_sclk * 10;
-58ea2dea Alex Deucher  2013-01-24  9274  		}
-58ea2dea Alex Deucher  2013-01-24  9275  
-58ea2dea Alex Deucher  2013-01-24  9276  		wm_high.disp_clk = mode->clock;
-58ea2dea Alex Deucher  2013-01-24  9277  		wm_high.src_width = mode->crtc_hdisplay;
-e6b9a6c8 Mario Kleiner 2017-04-24  9278  		wm_high.active_time = active_time;
-58ea2dea Alex Deucher  2013-01-24  9279  		wm_high.blank_time = line_time - wm_high.active_time;
-58ea2dea Alex Deucher  2013-01-24  9280  		wm_high.interlaced = false;
-cd84a27d Alex Deucher  2012-07-20  9281  		if (mode->flags & DRM_MODE_FLAG_INTERLACE)
-58ea2dea Alex Deucher  2013-01-24  9282  			wm_high.interlaced = true;
-58ea2dea Alex Deucher  2013-01-24  9283  		wm_high.vsc = radeon_crtc->vsc;
-58ea2dea Alex Deucher  2013-01-24  9284  		wm_high.vtaps = 1;
-cd84a27d Alex Deucher  2012-07-20  9285  		if (radeon_crtc->rmx_type != RMX_OFF)
-58ea2dea Alex Deucher  2013-01-24  9286  			wm_high.vtaps = 2;
-58ea2dea Alex Deucher  2013-01-24  9287  		wm_high.bytes_per_pixel = 4; /* XXX: get this from fb config */
-58ea2dea Alex Deucher  2013-01-24  9288  		wm_high.lb_size = lb_size;
-58ea2dea Alex Deucher  2013-01-24  9289  		wm_high.dram_channels = cik_get_number_of_dram_channels(rdev);
-58ea2dea Alex Deucher  2013-01-24  9290  		wm_high.num_heads = num_heads;
-cd84a27d Alex Deucher  2012-07-20  9291  
-cd84a27d Alex Deucher  2012-07-20  9292  		/* set for high clocks */
-58ea2dea Alex Deucher  2013-01-24  9293  		latency_watermark_a = min(dce8_latency_watermark(&wm_high), (u32)65535);
-58ea2dea Alex Deucher  2013-01-24  9294  
-58ea2dea Alex Deucher  2013-01-24  9295  		/* possibly force display priority to high */
-58ea2dea Alex Deucher  2013-01-24  9296  		/* should really do this at mode validation time... */
-58ea2dea Alex Deucher  2013-01-24  9297  		if (!dce8_average_bandwidth_vs_dram_bandwidth_for_display(&wm_high) ||
-58ea2dea Alex Deucher  2013-01-24  9298  		    !dce8_average_bandwidth_vs_available_bandwidth(&wm_high) ||
-58ea2dea Alex Deucher  2013-01-24  9299  		    !dce8_check_latency_hiding(&wm_high) ||
-58ea2dea Alex Deucher  2013-01-24  9300  		    (rdev->disp_priority == 2)) {
-58ea2dea Alex Deucher  2013-01-24  9301  			DRM_DEBUG_KMS("force priority to high\n");
-58ea2dea Alex Deucher  2013-01-24  9302  		}
-58ea2dea Alex Deucher  2013-01-24  9303  
-58ea2dea Alex Deucher  2013-01-24  9304  		/* watermark for low clocks */
-58ea2dea Alex Deucher  2013-01-24  9305  		if ((rdev->pm.pm_method == PM_METHOD_DPM) &&
-58ea2dea Alex Deucher  2013-01-24  9306  		    rdev->pm.dpm_enabled) {
-58ea2dea Alex Deucher  2013-01-24  9307  			wm_low.yclk =
-58ea2dea Alex Deucher  2013-01-24  9308  				radeon_dpm_get_mclk(rdev, true) * 10;
-58ea2dea Alex Deucher  2013-01-24  9309  			wm_low.sclk =
-58ea2dea Alex Deucher  2013-01-24  9310  				radeon_dpm_get_sclk(rdev, true) * 10;
-58ea2dea Alex Deucher  2013-01-24  9311  		} else {
-58ea2dea Alex Deucher  2013-01-24  9312  			wm_low.yclk = rdev->pm.current_mclk * 10;
-58ea2dea Alex Deucher  2013-01-24  9313  			wm_low.sclk = rdev->pm.current_sclk * 10;
-58ea2dea Alex Deucher  2013-01-24  9314  		}
-58ea2dea Alex Deucher  2013-01-24  9315  
-58ea2dea Alex Deucher  2013-01-24  9316  		wm_low.disp_clk = mode->clock;
-58ea2dea Alex Deucher  2013-01-24  9317  		wm_low.src_width = mode->crtc_hdisplay;
-e6b9a6c8 Mario Kleiner 2017-04-24  9318  		wm_low.active_time = active_time;
-58ea2dea Alex Deucher  2013-01-24  9319  		wm_low.blank_time = line_time - wm_low.active_time;
-58ea2dea Alex Deucher  2013-01-24  9320  		wm_low.interlaced = false;
-58ea2dea Alex Deucher  2013-01-24  9321  		if (mode->flags & DRM_MODE_FLAG_INTERLACE)
-58ea2dea Alex Deucher  2013-01-24  9322  			wm_low.interlaced = true;
-58ea2dea Alex Deucher  2013-01-24  9323  		wm_low.vsc = radeon_crtc->vsc;
-58ea2dea Alex Deucher  2013-01-24  9324  		wm_low.vtaps = 1;
-58ea2dea Alex Deucher  2013-01-24  9325  		if (radeon_crtc->rmx_type != RMX_OFF)
-58ea2dea Alex Deucher  2013-01-24  9326  			wm_low.vtaps = 2;
-58ea2dea Alex Deucher  2013-01-24  9327  		wm_low.bytes_per_pixel = 4; /* XXX: get this from fb config */
-58ea2dea Alex Deucher  2013-01-24  9328  		wm_low.lb_size = lb_size;
-58ea2dea Alex Deucher  2013-01-24  9329  		wm_low.dram_channels = cik_get_number_of_dram_channels(rdev);
-58ea2dea Alex Deucher  2013-01-24  9330  		wm_low.num_heads = num_heads;
-58ea2dea Alex Deucher  2013-01-24  9331  
-cd84a27d Alex Deucher  2012-07-20  9332  		/* set for low clocks */
-58ea2dea Alex Deucher  2013-01-24 @9333  		latency_watermark_b = min(dce8_latency_watermark(&wm_low), (u32)65535);
-cd84a27d Alex Deucher  2012-07-20  9334  
-cd84a27d Alex Deucher  2012-07-20  9335  		/* possibly force display priority to high */
-cd84a27d Alex Deucher  2012-07-20  9336  		/* should really do this at mode validation time... */
-58ea2dea Alex Deucher  2013-01-24  9337  		if (!dce8_average_bandwidth_vs_dram_bandwidth_for_display(&wm_low) ||
-58ea2dea Alex Deucher  2013-01-24  9338  		    !dce8_average_bandwidth_vs_available_bandwidth(&wm_low) ||
-58ea2dea Alex Deucher  2013-01-24  9339  		    !dce8_check_latency_hiding(&wm_low) ||
-cd84a27d Alex Deucher  2012-07-20  9340  		    (rdev->disp_priority == 2)) {
-cd84a27d Alex Deucher  2012-07-20  9341  			DRM_DEBUG_KMS("force priority to high\n");
-cd84a27d Alex Deucher  2012-07-20  9342  		}
-5b5561b3 Mario Kleiner 2015-11-25  9343  
-5b5561b3 Mario Kleiner 2015-11-25  9344  		/* Save number of lines the linebuffer leads before the scanout */
-5b5561b3 Mario Kleiner 2015-11-25  9345  		radeon_crtc->lb_vblank_lead_lines = DIV_ROUND_UP(lb_size, mode->crtc_hdisplay);
-cd84a27d Alex Deucher  2012-07-20  9346  	}
-cd84a27d Alex Deucher  2012-07-20  9347  
-cd84a27d Alex Deucher  2012-07-20  9348  	/* select wm A */
-cd84a27d Alex Deucher  2012-07-20  9349  	wm_mask = RREG32(DPG_WATERMARK_MASK_CONTROL + radeon_crtc->crtc_offset);
-cd84a27d Alex Deucher  2012-07-20  9350  	tmp = wm_mask;
-cd84a27d Alex Deucher  2012-07-20  9351  	tmp &= ~LATENCY_WATERMARK_MASK(3);
-cd84a27d Alex Deucher  2012-07-20  9352  	tmp |= LATENCY_WATERMARK_MASK(1);
-cd84a27d Alex Deucher  2012-07-20  9353  	WREG32(DPG_WATERMARK_MASK_CONTROL + radeon_crtc->crtc_offset, tmp);
-cd84a27d Alex Deucher  2012-07-20  9354  	WREG32(DPG_PIPE_LATENCY_CONTROL + radeon_crtc->crtc_offset,
-cd84a27d Alex Deucher  2012-07-20  9355  	       (LATENCY_LOW_WATERMARK(latency_watermark_a) |
-cd84a27d Alex Deucher  2012-07-20  9356  		LATENCY_HIGH_WATERMARK(line_time)));
-cd84a27d Alex Deucher  2012-07-20  9357  	/* select wm B */
-cd84a27d Alex Deucher  2012-07-20  9358  	tmp = RREG32(DPG_WATERMARK_MASK_CONTROL + radeon_crtc->crtc_offset);
-cd84a27d Alex Deucher  2012-07-20  9359  	tmp &= ~LATENCY_WATERMARK_MASK(3);
-cd84a27d Alex Deucher  2012-07-20  9360  	tmp |= LATENCY_WATERMARK_MASK(2);
-cd84a27d Alex Deucher  2012-07-20  9361  	WREG32(DPG_WATERMARK_MASK_CONTROL + radeon_crtc->crtc_offset, tmp);
-cd84a27d Alex Deucher  2012-07-20  9362  	WREG32(DPG_PIPE_LATENCY_CONTROL + radeon_crtc->crtc_offset,
-cd84a27d Alex Deucher  2012-07-20  9363  	       (LATENCY_LOW_WATERMARK(latency_watermark_b) |
-cd84a27d Alex Deucher  2012-07-20  9364  		LATENCY_HIGH_WATERMARK(line_time)));
-cd84a27d Alex Deucher  2012-07-20  9365  	/* restore original selection */
-cd84a27d Alex Deucher  2012-07-20  9366  	WREG32(DPG_WATERMARK_MASK_CONTROL + radeon_crtc->crtc_offset, wm_mask);
-58ea2dea Alex Deucher  2013-01-24  9367  
-58ea2dea Alex Deucher  2013-01-24  9368  	/* save values for DPM */
-58ea2dea Alex Deucher  2013-01-24  9369  	radeon_crtc->line_time = line_time;
-58ea2dea Alex Deucher  2013-01-24  9370  	radeon_crtc->wm_high = latency_watermark_a;
-58ea2dea Alex Deucher  2013-01-24  9371  	radeon_crtc->wm_low = latency_watermark_b;
-cd84a27d Alex Deucher  2012-07-20  9372  }
-cd84a27d Alex Deucher  2012-07-20  9373  
+srctree=../..
+CC=gcc
 
-:::::: The code at line 9333 was first introduced by commit
-:::::: 58ea2deab36ecf0b416d3486442cc6df693dcc79 drm/radeon/kms: fix up dce8 display watermark calc for dpm
+all: all-uapi.h all-uapi.o
 
-:::::: TO: Alex Deucher <alexander.deucher@amd.com>
-:::::: CC: Alex Deucher <alexander.deucher@amd.com>
+all-uapi.h: all-uapi.mk hdr-fix-lines.pl
+	rm -f all-uapi.h
+	touch all-uapi.h
+#	find $(srctree)/xx64/usr/include/uapi -type f | grep -v \\.orig |
+	find $(srctree)/xx64/usr/include -type f | grep -v \\.orig | \
+		./hdr-fix-lines.pl >>all-uapi.h
 
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+all-uapi.o: all-uapi.h
+	$(CC) -I../../xx64/usr/include all-uapi.c -o all-uapi.o
+
+--------------B62B25DCCC7D3ABB45F9F1E7
+Content-Type: text/x-csrc;
+ name="all-uapi.c"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="all-uapi.c"
+
+// SPDX GPL 2.0
+// This userspace source file pulls in all #include <uapi/*> header files
+// to see what kinds of problems happen.
+
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdint.h>
+
+#include <linux/posix_types.h>
+#include <asm-generic/ipcbuf.h>
+
+#include "all-uapi.h"
+
+int main(int argc, char *argv[])
+{
+}
+
+--------------B62B25DCCC7D3ABB45F9F1E7
+Content-Type: application/x-perl;
+ name="hdr-fix-lines.pl"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="hdr-fix-lines.pl"
+
+#! /usr/bin/perl
+
+# $_ is a filename like ../../include/uapi/linux/prctl.h
+# convert it to be like: $include <uapi/linux/prctl.h>
+# input via stdin; output to stdout.
+# vi:ts=4
+
+LINE:
+	while ($line = <STDIN>) {
+		chomp $line;		# drop ending newline
+
+		# skip if not a .h file
+		next LINE if ($line !~ m/\.h$/);
+		# skip any /asm.*posix_types/
+		next LINE if ($line =~ "asm.*posix_types");
+
+		$line =~ s@^.*include/@#include <@;
+		$line =~ s@\.h$@.h>@;
+
+		print "$line\n";
+	} ### < STDIN
+
+--------------B62B25DCCC7D3ABB45F9F1E7--
