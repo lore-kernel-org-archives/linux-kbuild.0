@@ -1,381 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:45398 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753285AbeFHSxZ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Jun 2018 14:53:25 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [RFC v4 1/1] i-search functionality for mconf
-Date: Fri,  8 Jun 2018 20:46:06 +0200
-Message-Id: <20180608184606.5029-2-dirk@gouders.net>
-In-Reply-To: <20180608184606.5029-1-dirk@gouders.net>
-References: <20180608184606.5029-1-dirk@gouders.net>
+Received: from mail.kernel.org ([198.145.29.99]:48426 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752478AbeFHUEL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 8 Jun 2018 16:04:11 -0400
+Date: Fri, 8 Jun 2018 16:03:55 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH v5 2/4] kernel hacking: new config NO_AUTO_INLINE to
+ disable compiler auto-inline optimizations
+Message-ID: <20180608160355.67712eb8@vmware.local.home>
+In-Reply-To: <20180607091816.GT13775@localhost>
+References: <1528186420-6615-3-git-send-email-changbin.du@intel.com>
+        <201806060501.btF3aJMZ%fengguang.wu@intel.com>
+        <20180606095714.1d3c2def@vmware.local.home>
+        <20180606142600.GN13775@localhost>
+        <20180606142622.2338abf6@vmware.local.home>
+        <20180607041718.qpqucjzlvcm5h3gn@vireshk-i7>
+        <20180607074628.kd3iyxevwj3ypzbr@intel.com>
+        <20180607083856.ealw62v3wx43zeqz@vireshk-i7>
+        <1303b1abf9f9229a8d3ccbb68a3e413266b360d7.camel@petrovitsch.priv.at>
+        <20180607091025.m7dfix3e2xbwx4cs@vireshk-i7>
+        <20180607091816.GT13775@localhost>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
-Cc: Dirk Gouders <dirk@gouders.net>
+To: Johan Hovold <johan@kernel.org>
+Cc: Viresh Kumar <viresh.kumar@linaro.org>, Bernd Petrovitsch <bernd@petrovitsch.priv.at>, "Du, Changbin" <changbin.du@intel.com>, gregkh@linuxfoundation.org, alex.elder@linaro.org, kbuild test robot <lkp@intel.com>, linux-arch@vger.kernel.org, michal.lkml@markovi.net, linux-kernel@vger.kernel.org, arnd@arndb.de, yamada.masahiro@socionext.com, lgirdwood@gmail.com, broonie@kernel.org, rdunlap@infradead.org, x86@kernel.org, linux@armlinux.org.uk, linux-sparse@vger.kernel.org, mingo@redhat.com, kbuild-all@01.org, akpm@linux-foundation.org, changbin.du@gmail.com, tglx@linutronix.de, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-This patch prototypes isearch functionality for mconf based on an idea of
-Sam Ravnborg:
+On Thu, 7 Jun 2018 11:18:16 +0200
+Johan Hovold <johan@kernel.org> wrote:
 
-* mconf now distinguishes if the focus is on the menu items or the
-  buttons below it.
 
-* At startup focus is on the menu items and alphanumeric
-  characters or space entered are used to form a string that is
-  searched for.
+> If you want to work around the warning and think you can do it in some
+> non-contrived way, then go for it.
+> 
+> Clearing the request buffer, checking for termination using strnlen, and
+> then using memcpy might not be too bad.
+> 
+> But after all, it is a false positive, so leaving things as they stand
+> is fine too.
 
-* BACKSPACE is used to remove the last character of the search string.
+Not sure how contrived you think this is, but it solves the warning
+without adding extra work in the normal case.
 
-* ENTER can be used to enter a submenu.
+-- Steve
 
-* Horizontal arrow keys put focus on the buttons with the known
-  behavior.
-
-* The TAB key is now exclusively used to toggle the focus.
-
-* Vertical arrow keys work anywhere.
-
-* When the focus is on the buttons, all keys (e.g. hotkeys) work the
-  same as before this change.
-
-* '\' can be used to search for other occurences of an already entered
-  string.
-
-* To use y|n|m on an item, focus has to be on the buttons.
-
-An example to navigate into the USB support menu under Device Drivers:
-
-   1) de		# Navigates to the item "Device Drivers"
-   2) ENTER		# Enter the submenu
-   3) USB		# Navigate to the item "USB support"
-   4) ENTER		# Enter the submenu
-
----
- scripts/kconfig/lxdialog/dialog.h  |   3 +
- scripts/kconfig/lxdialog/menubox.c | 207 +++++++++++++++++++++++++++++++++----
- 2 files changed, 189 insertions(+), 21 deletions(-)
-
-diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
-index 0b00be5abaa6..02b036435919 100644
---- a/scripts/kconfig/lxdialog/dialog.h
-+++ b/scripts/kconfig/lxdialog/dialog.h
-@@ -50,6 +50,8 @@
- #define TR(params) _tracef params
- 
- #define KEY_ESC 27
-+#define KEY_CTRL_S 19
-+#define KEY_ENTR 10
- #define TAB 9
- #define MAX_LEN 2048
- #define BUF_SIZE (10*1024)
-@@ -238,6 +240,7 @@ int dialog_checklist(const char *title, const char *prompt, int height,
- 		     int width, int list_height);
- int dialog_inputbox(const char *title, const char *prompt, int height,
- 		    int width, const char *init);
-+int do_isearch(char *str, int choice, int scroll);
- 
- /*
-  * This is the base for fictitious keys, which activate
-diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-index d70cab36137e..e49280115b52 100644
---- a/scripts/kconfig/lxdialog/menubox.c
-+++ b/scripts/kconfig/lxdialog/menubox.c
-@@ -56,10 +56,17 @@
-  * fscanf would read in 'scroll', and eventually that value would get used.
-  */
- 
-+#include <string.h>
- #include "dialog.h"
- 
-+#define ISEARCH_LEN 32
-+#define ISEARCH_INDICATOR_LEN (ISEARCH_LEN + 8)
-+static char isearch_str[ISEARCH_LEN] = "";
-+
- static int menu_width, item_x;
- 
-+static int focus_on_buttons;
-+
- /*
-  * Print menu item
-  */
-@@ -85,7 +92,10 @@ static void do_print_item(WINDOW * win, const char *item, int line_y,
- #else
- 	wclrtoeol(win);
- #endif
--	wattrset(win, selected ? dlg.item_selected.atr : dlg.item.atr);
-+	if (focus_on_buttons)
-+		wattrset(win, selected ? A_UNDERLINE : dlg.item.atr);
-+	else
-+		wattrset(win, selected ? dlg.item_selected.atr : dlg.item.atr);
- 	mvwaddstr(win, line_y, item_x, menu_item);
- 	if (hotkey) {
- 		wattrset(win, selected ? dlg.tag_key_selected.atr
-@@ -105,6 +115,32 @@ do {									\
- 	do_print_item(menu, item_str(), choice, selected, !item_is_tag(':')); \
- } while (0)
- 
-+
-+/*
-+* Print the isearch indicator.
-+*/
-+static void print_isearch(WINDOW * win, int y, int x, int height, bool isearch)
-+{
-+	unsigned char i = 0;
-+
-+	wmove(win, y, x);
-+
-+	y = y + height + 1;
-+	wmove(win, y, x);
-+
-+	if (isearch) {
-+		wattrset(win, dlg.button_key_inactive.atr);
-+		waddstr(win, "isearch: ");
-+		waddstr(win, isearch_str);
-+		i = ISEARCH_INDICATOR_LEN - strlen(isearch_str);
-+	}
-+
-+	wattrset(win, dlg.menubox_border.atr);
-+
-+	for ( ; i < ISEARCH_INDICATOR_LEN; i++ )
-+		waddch(win, ACS_HLINE);
-+}
-+
- /*
-  * Print the scroll indicators.
-  */
-@@ -157,6 +193,9 @@ static void print_buttons(WINDOW * win, int height, int width, int selected)
- 	int x = width / 2 - 28;
- 	int y = height - 2;
- 
-+	if (!focus_on_buttons)
-+		selected = -1;
-+
- 	print_button(win, "Select", y, x, selected == 0);
- 	print_button(win, " Exit ", y, x + 12, selected == 1);
- 	print_button(win, " Help ", y, x + 24, selected == 2);
-@@ -178,6 +217,32 @@ static void do_scroll(WINDOW *win, int *scroll, int n)
- 	wrefresh(win);
- }
- 
-+/*
-+ * Incremental search for text in dialog menu entries.
-+ * The search operates as a ring search, continuing at the top after
-+ * the last entry has been visited.
-+ *
-+ * Returned is -1 if no match was found, else the absolute index of
-+ * the matching item.
-+ */
-+int do_isearch(char *str, int choice, int scroll)
-+{
-+	int found = 0;
-+	int i;
-+
-+	for (i = 0; i < item_count(); i++) {
-+		item_set((choice + scroll + i)%item_count());
-+		if (strcasestr(item_str(), str)) {
-+			found = 1;
-+			break;
-+		}
-+	}
-+
-+	if (found)
-+		return (choice + scroll + i)%item_count();
-+	return -1;
-+}
-+
- /*
-  * Display a menu for choosing among a number of options
-  */
-@@ -275,6 +340,7 @@ int dialog_menu(const char *title, const char *prompt,
- 	print_arrows(dialog, item_count(), scroll,
- 		     box_y, box_x + item_x + 1, menu_height);
- 
-+	print_isearch(dialog, box_y, box_x + item_x + 5, menu_height, !focus_on_buttons);
- 	print_buttons(dialog, height, width, 0);
- 	wmove(menu, choice, item_x + 1);
- 	wrefresh(menu);
-@@ -285,22 +351,27 @@ int dialog_menu(const char *title, const char *prompt,
- 		if (key < 256 && isalpha(key))
- 			key = tolower(key);
- 
--		if (strchr("ynmh", key))
--			i = max_choice;
--		else {
--			for (i = choice + 1; i < max_choice; i++) {
--				item_set(scroll + i);
--				j = first_alpha(item_str(), "YyNnMmHh");
--				if (key == tolower(item_str()[j]))
--					break;
--			}
--			if (i == max_choice)
--				for (i = 0; i < max_choice; i++) {
-+		if (focus_on_buttons) {
-+			/*
-+			 * Find item matching hot key.
-+			 */
-+			if (strchr("ynmh", key))
-+				i = max_choice;
-+			else {
-+				for (i = choice + 1; i < max_choice; i++) {
- 					item_set(scroll + i);
- 					j = first_alpha(item_str(), "YyNnMmHh");
- 					if (key == tolower(item_str()[j]))
- 						break;
- 				}
-+				if (i == max_choice)
-+					for (i = 0; i < max_choice; i++) {
-+						item_set(scroll + i);
-+						j = first_alpha(item_str(), "YyNnMmHh");
-+						if (key == tolower(item_str()[j]))
-+							break;
-+					}
-+			}
- 		}
- 
- 		if (item_count() != 0 &&
-@@ -370,16 +441,117 @@ int dialog_menu(const char *title, const char *prompt,
- 			continue;	/* wait for another key press */
- 		}
- 
-+		if (!focus_on_buttons) {
-+			i = -1;
-+
-+			if (key == '\n') {
-+				/* save scroll info */
-+				*s_scroll = scroll;
-+				delwin(menu);
-+				delwin(dialog);
-+				item_set(scroll + choice);
-+				item_set_selected(1);
-+				isearch_str[0] = '\0';
-+				return 0; /* 0 means first button "Select" */
-+			}
-+
-+			if ( key == KEY_BACKSPACE && isearch_str[0] ) {
-+				isearch_str[i = (strlen(isearch_str) - 1)] = '\0';
-+				i = -1;
-+			}
-+
-+			if (key < 256 && (isalnum(key) || key == ' ')) {
-+				if (strlen(isearch_str) < ISEARCH_LEN - 1) {
-+					isearch_str[i = strlen(isearch_str)] = key;
-+					isearch_str[i+1] = '\0';
-+				}
-+
-+				/* Remove highligt of current item */
-+				print_item(scroll + choice, choice, FALSE);
-+				i = do_isearch(isearch_str, choice, scroll);
-+			}
-+
-+			if (key == '\\') {
-+				/* Remove highligt of current item */
-+				print_item(scroll + choice, choice, FALSE);
-+				i = do_isearch(isearch_str, choice + 1, scroll);
-+			}
-+
-+			/*
-+			 * Handle matches
-+			 */
-+			if (i >= 0) {
-+				i -= scroll;
-+
-+				if (i >= max_choice)
-+					/*
-+					 * Handle matches below the currently visible menu entries.
-+					 */
-+					while (i >= max_choice) {
-+						do_scroll(menu, &scroll, 1);
-+						i--;
-+						print_item(max_choice + scroll - 1, max_choice - 1, false);
-+					}
-+				else if (i < 0)
-+					/*
-+					 * Handle matches higher in the menu (ring search).
-+					 */
-+					while (i < 0) {
-+						do_scroll(menu, &scroll, -1);
-+						i++;
-+						print_item(scroll, 0, false);
-+					}
-+				choice = i;
-+			} else {
-+				i = choice;
-+				goto a;
-+			}
-+
-+			print_item(scroll + choice, choice, TRUE);
-+			print_isearch(dialog, box_y, box_x + item_x + 5, menu_height, true);
-+			print_arrows(dialog, item_count(), scroll,
-+				     box_y, box_x + item_x + 1, menu_height);
-+
-+			wnoutrefresh(dialog);
-+			wrefresh(menu);
-+			i = max_choice;
-+			continue;
-+		}
-+	a:
- 		switch (key) {
--		case KEY_LEFT:
- 		case TAB:
-+			focus_on_buttons = 1 - focus_on_buttons;
-+			print_isearch(dialog, box_y, box_x + item_x + 5, menu_height, !focus_on_buttons);
-+
-+			print_item(scroll + choice, choice, TRUE);
-+			print_buttons(dialog, height, width, button);
-+			wrefresh(menu);
-+			break;
-+		case KEY_LEFT:
- 		case KEY_RIGHT:
-+			focus_on_buttons = 1;
- 			button = ((key == KEY_LEFT ? --button : ++button) < 0)
- 			    ? 4 : (button > 4 ? 0 : button);
- 
-+			print_isearch(dialog, box_y, box_x + item_x + 5, menu_height, !focus_on_buttons);
-+			print_item(scroll + choice, choice, TRUE);
- 			print_buttons(dialog, height, width, button);
- 			wrefresh(menu);
- 			break;
-+		case KEY_ESC:
-+			key = on_key_esc(menu);
-+			break;
-+		case KEY_RESIZE:
-+			on_key_resize();
-+			delwin(menu);
-+			delwin(dialog);
-+			goto do_resize;
-+		}
-+
-+		/*
-+		 * Focus is on buttons, handle keys appropriately
-+		 */
-+		switch (key) {
- 		case ' ':
- 		case 's':
- 		case 'y':
-@@ -390,6 +562,7 @@ int dialog_menu(const char *title, const char *prompt,
- 		case '?':
- 		case 'z':
- 		case '\n':
-+			isearch_str[0] = '\0';
- 			/* save scroll info */
- 			*s_scroll = scroll;
- 			delwin(menu);
-@@ -421,14 +594,6 @@ int dialog_menu(const char *title, const char *prompt,
- 		case 'x':
- 			key = KEY_ESC;
- 			break;
--		case KEY_ESC:
--			key = on_key_esc(menu);
--			break;
--		case KEY_RESIZE:
--			on_key_resize();
--			delwin(menu);
--			delwin(dialog);
--			goto do_resize;
- 		}
+diff --git a/drivers/staging/greybus/fw-management.c b/drivers/staging/greybus/fw-management.c
+index 71aec14f8181..4fb9f1dff47d 100644
+--- a/drivers/staging/greybus/fw-management.c
++++ b/drivers/staging/greybus/fw-management.c
+@@ -150,15 +150,18 @@ static int fw_mgmt_load_and_validate_operation(struct fw_mgmt *fw_mgmt,
  	}
- 	delwin(menu);
--- 
-2.16.4
-
+ 
+ 	request.load_method = load_method;
+-	strncpy(request.firmware_tag, tag, GB_FIRMWARE_TAG_MAX_SIZE);
++	strncpy(request.firmware_tag, tag, GB_FIRMWARE_TAG_MAX_SIZE - 1);
+ 
+ 	/*
+ 	 * The firmware-tag should be NULL terminated, otherwise throw error and
+ 	 * fail.
+ 	 */
+-	if (request.firmware_tag[GB_FIRMWARE_TAG_MAX_SIZE - 1] != '\0') {
+-		dev_err(fw_mgmt->parent, "load-and-validate: firmware-tag is not NULL terminated\n");
+-		return -EINVAL;
++	if (request.firmware_tag[GB_FIRMWARE_TAG_MAX_SIZE - 2] != '\0') {
++		if (tag[GB_FIRMWARE_TAG_MAX_SIZE - 1] != '\0') {
++			dev_err(fw_mgmt->parent, "load-and-validate: firmware-tag is not NULL terminated\n");
++			return -EINVAL;
++		}
++		request.firmware_tag[GB_FIRMWARE_TAG_MAX_SIZE - 1] = '\0';
+ 	}
+ 
+ 	/* Allocate ids from 1 to 255 (u8-max), 0 is an invalid id */
