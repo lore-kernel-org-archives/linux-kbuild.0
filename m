@@ -1,142 +1,178 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:59210 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752449AbeFHAHG (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:55490 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752407AbeFHAWy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Jun 2018 20:07:06 -0400
-Subject: Re: [PATCH] uapi: Make generic uapi headers compile standalone.
-References: <20180606231602.231326-1-jchowdhary@google.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <b6b6dd56-c948-54e8-df95-3d170a3c1e7d@infradead.org>
-Date: Thu, 7 Jun 2018 17:07:01 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180606231602.231326-1-jchowdhary@google.com>
-Content-Type: multipart/mixed;
- boundary="------------B62B25DCCC7D3ABB45F9F1E7"
-Content-Language: en-US
+        Thu, 7 Jun 2018 20:22:54 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: fix endless syncconfig in case arch Makefile sets CROSS_COMPILE
+Date: Fri,  8 Jun 2018 09:21:43 +0900
+Message-Id: <1528417303-14842-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jayant Chowdhary <jchowdhary@google.com>, linux-kernel@vger.kernel.org
-Cc: akpm@linux-foundation.org, kernel-team@android.com, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 
-This is a multi-part message in MIME format.
---------------B62B25DCCC7D3ABB45F9F1E7
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Commit 21c54b774744 ("kconfig: show compiler version text in the top
+comment") was intended to detect the compiler upgrade, but Geert
+reported a breakage on the m68k build.
 
-On 06/06/2018 04:16 PM, Jayant Chowdhary wrote:
-> In order for static analysis tools to analyze each of the uapi headers,
-> we need to enable them to compile stand-alone. Some uapi headers were
-> missing dependencies which would not make them compile stand-alone in
-> user-land. This patch adds those dependencies.
+The compiler upgrade is detected by the change of the environment
+variable, CC_VERSION_TEXT, which contains the first line of the output
+from $(CC) --version.  Currently, this works well when CROSS_COMPILE
+is given via the environment variable or the Make command line.
 
-Hi,
+However, some architectures such as m68k can specify CROSS_COMPILE
+from arch/$(SRCARCH)/Makefile as well.  In this case, "make ARCH=m68k"
+ends up with endless syncconfig loop.
 
-Thanks for getting started on this.  I see that the kbuild robot and I were
-still not able to do successful builds even after this patch is applied.
-We were building different targets though.  robot was doing kernel builds
-and I was doing a large "all-uapi" build.
+  $ make ARCH=m68k defconfig
+  *** Default configuration is based on 'multi_defconfig'
+  #
+  # configuration written to .config
+  #
+  $ make ARCH=m68k
+  scripts/kconfig/conf  --syncconfig Kconfig
+  scripts/kconfig/conf  --syncconfig Kconfig
+  scripts/kconfig/conf  --syncconfig Kconfig
+  scripts/kconfig/conf  --syncconfig Kconfig
 
-I started on my all-uapi work about 1 week ago but haven't posted anything yet,
-but it's posted (attached) below.  It's not yet up to kernel quality yet (for a
-Makefile), and I have made very little progress toward a successful userspace build.
+Things are happening like this:
 
-If anyone is interested, just put these 3 files in <kernel_tree>/tools/build
-and then run:
+Because arch/$(SRCARCH)/Makefile is included after CC_VERSION_TEXT
+is set, it contains the host compiler version in the defconfig phase.
 
-make ARCH=$some_arch O=build_dir headers_check
-so that the headers will be cleaned up and installed in build_dir/usr/.
+To create or update auto.conf, the following line is triggered:
 
-Then run 'make -f all-uapi.mk'
-and the userspace program with all header files found in build_dir/usr/include
-will be built -- i.e., attempted (not successfully).
+include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
+        $(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
 
-(note: chmod +x hdr-fix-lines.pl)
+This recurses the top Makefile after arch/$(SRCARCH)/Makefile is
+included.  CROSS_COMPILE is set to a m68k toolchain prefix and
+exported to the recursed Make.  Then, syncconfig is invoked with
+the target compiler version in CC_VERSION_TEXT.
 
+The Make will restart because auto.conf and auto.conf.cmd have been
+updated.  At this point, CROSS_COMPILE is reset, so CC_VERSION_TEXT
+is set to the host compiler version again.  Then, syncconfig is
+triggered due to the change of CC_VERSION_TEXT.  This loop continues
+eternally.
 
+To fix this problem, $(CC_VERSION_TEXT) must be evaluated only after
+arch/$(SRCARCH)/Makefile.  Setting it earlier is OK as long as it is
+defined by using the '=' operator instead of ':='.
+
+For the defconfig phase, $(CC_VERSION_TEXT) is evaluated when Kbuild
+descends into scripts/kconfig/, so it contains the target compiler
+version correctly.
+
+include/config/auto.conf.cmd references $(CC_VERSION_TEXT) as well,
+so it must be included after arch/$(SRCARCH)/Makefile.
+
+Fixes: 21c54b774744 ("kconfig: show compiler version text in the top comment")
+Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Makefile | 54 ++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 30 insertions(+), 24 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 019a5a0..747edaf 100644
+--- a/Makefile
++++ b/Makefile
+@@ -442,8 +442,6 @@ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
+ export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
+ export KBUILD_ARFLAGS
+ 
+-export CC_VERSION_TEXT := $(shell $(CC) --version | head -n 1)
+-
+ # When compiling out-of-tree modules, put MODVERDIR in the module
+ # tree rather than in the kernel tree. The kernel tree might
+ # even be read-only.
+@@ -514,6 +512,12 @@ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/cc-can-link.sh $(CC)), y)
+   export CC_CAN_LINK
+ endif
+ 
++# The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
++# Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
++# CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
++# and from include/config/auto.conf.cmd to detect the compiler upgrade.
++CC_VERSION_TEXT = $(shell $(CC) --version | head -n 1)
++
+ ifeq ($(config-targets),1)
+ # ===========================================================================
+ # *config targets only - make sure prerequisites are updated, and descend
+@@ -523,7 +527,7 @@ ifeq ($(config-targets),1)
+ # KBUILD_DEFCONFIG may point out an alternative default configuration
+ # used for 'make defconfig'
+ include arch/$(SRCARCH)/Makefile
+-export KBUILD_DEFCONFIG KBUILD_KCONFIG
++export KBUILD_DEFCONFIG KBUILD_KCONFIG CC_VERSION_TEXT
+ 
+ config: scripts_basic outputmakefile FORCE
+ 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+@@ -585,12 +589,32 @@ virt-y		:= virt/
+ endif # KBUILD_EXTMOD
+ 
+ ifeq ($(dot-config),1)
+-# Read in config
+ -include include/config/auto.conf
++endif
++
++# The all: target is the default when no target is given on the
++# command line.
++# This allow a user to issue only 'make' to build a kernel including modules
++# Defaults to vmlinux, but the arch makefile usually adds further targets
++all: vmlinux
++
++CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage \
++	$(call cc-option,-fno-tree-loop-im) \
++	$(call cc-disable-warning,maybe-uninitialized,)
++export CFLAGS_GCOV CFLAGS_KCOV
++
++# The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
++# values of the respective KBUILD_* variables
++ARCH_CPPFLAGS :=
++ARCH_AFLAGS :=
++ARCH_CFLAGS :=
++include arch/$(SRCARCH)/Makefile
+ 
++ifeq ($(dot-config),1)
+ ifeq ($(KBUILD_EXTMOD),)
+-# Read in dependencies to all Kconfig* files, make sure to run
+-# oldconfig if changes are detected.
++# Read in dependencies to all Kconfig* files, make sure to run syncconfig if
++# changes are detected. This should be included after arch/$(SRCARCH)/Makefile
++# because some architectures define CROSS_COMPILE there.
+ -include include/config/auto.conf.cmd
+ 
+ # To avoid any implicit rule to kick in, define an empty command
+@@ -622,24 +646,6 @@ else
+ include/config/auto.conf: ;
+ endif # $(dot-config)
+ 
+-# The all: target is the default when no target is given on the
+-# command line.
+-# This allow a user to issue only 'make' to build a kernel including modules
+-# Defaults to vmlinux, but the arch makefile usually adds further targets
+-all: vmlinux
+-
+-CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage \
+-	$(call cc-option,-fno-tree-loop-im) \
+-	$(call cc-disable-warning,maybe-uninitialized,)
+-export CFLAGS_GCOV CFLAGS_KCOV
+-
+-# The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
+-# values of the respective KBUILD_* variables
+-ARCH_CPPFLAGS :=
+-ARCH_AFLAGS :=
+-ARCH_CFLAGS :=
+-include arch/$(SRCARCH)/Makefile
+-
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
 -- 
-~Randy
+2.7.4
 
---------------B62B25DCCC7D3ABB45F9F1E7
-Content-Type: text/x-makefile;
- name="all-uapi.mk"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="all-uapi.mk"
-
-# all-uapi.mk
-# currently resides in tools/build/
-#
-# before running 'make -f all-uapi.mk',
-# run (from top of kernel tree): make ARCH=arch O=dir headers_check
-# so that the uapi headers will be installed.
-
-srctree=../..
-CC=gcc
-
-all: all-uapi.h all-uapi.o
-
-all-uapi.h: all-uapi.mk hdr-fix-lines.pl
-	rm -f all-uapi.h
-	touch all-uapi.h
-#	find $(srctree)/xx64/usr/include/uapi -type f | grep -v \\.orig |
-	find $(srctree)/xx64/usr/include -type f | grep -v \\.orig | \
-		./hdr-fix-lines.pl >>all-uapi.h
-
-all-uapi.o: all-uapi.h
-	$(CC) -I../../xx64/usr/include all-uapi.c -o all-uapi.o
-
---------------B62B25DCCC7D3ABB45F9F1E7
-Content-Type: text/x-csrc;
- name="all-uapi.c"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="all-uapi.c"
-
-// SPDX GPL 2.0
-// This userspace source file pulls in all #include <uapi/*> header files
-// to see what kinds of problems happen.
-
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdint.h>
-
-#include <linux/posix_types.h>
-#include <asm-generic/ipcbuf.h>
-
-#include "all-uapi.h"
-
-int main(int argc, char *argv[])
-{
-}
-
---------------B62B25DCCC7D3ABB45F9F1E7
-Content-Type: application/x-perl;
- name="hdr-fix-lines.pl"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="hdr-fix-lines.pl"
-
-#! /usr/bin/perl
-
-# $_ is a filename like ../../include/uapi/linux/prctl.h
-# convert it to be like: $include <uapi/linux/prctl.h>
-# input via stdin; output to stdout.
-# vi:ts=4
-
-LINE:
-	while ($line = <STDIN>) {
-		chomp $line;		# drop ending newline
-
-		# skip if not a .h file
-		next LINE if ($line !~ m/\.h$/);
-		# skip any /asm.*posix_types/
-		next LINE if ($line =~ "asm.*posix_types");
-
-		$line =~ s@^.*include/@#include <@;
-		$line =~ s@\.h$@.h>@;
-
-		print "$line\n";
-	} ### < STDIN
-
---------------B62B25DCCC7D3ABB45F9F1E7--
