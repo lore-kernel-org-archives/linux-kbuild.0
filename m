@@ -1,92 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:32865 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752676AbeFHOew (ORCPT
+Received: from vulcan.kevinlocke.name ([107.191.43.88]:33522 "EHLO
+        vulcan.kevinlocke.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751486AbeFHOlx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Jun 2018 10:34:52 -0400
+        Fri, 8 Jun 2018 10:41:53 -0400
+Date: Fri, 8 Jun 2018 08:33:15 -0600
+From: Kevin Locke <kevin@kevinlocke.name>
+Subject: master regression: localmodconfig Can't open arch/$(SRCARCH)/Kconfig
+Message-ID: <20180608143315.GA17356@kevinolos>
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <5C97550D-BEF4-4069-9373-F7543E3878FB@zytor.com>
-References: <20180605170532.170361-1-ndesaulniers@google.com>
- <20180605170532.170361-2-ndesaulniers@google.com> <202492204c2d5bd5ca27307cbca5e44673b739ed.camel@perches.com>
- <5ad1876557235a089a50e6ed6c558a7dcb0da714.camel@perches.com>
- <CA+icZUXEpe954z0TSbhSJPdFCfOqsBtpO9mPZBcJ2HWubSo_zQ@mail.gmail.com> <5C97550D-BEF4-4069-9373-F7543E3878FB@zytor.com>
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Fri, 8 Jun 2018 16:34:50 +0200
-Message-ID: <CA+icZUUz1Zb1e0LbeccY-3=HY02txe4BiNwhN0vqW_RkQpfLCw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] compiler-gcc.h: add gnu_inline to all inline declarations
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: hpa@zytor.com
-Cc: Joe Perches <joe@perches.com>, Nick Desaulniers <ndesaulniers@google.com>, akpm@linux-foundation.org, ard.biesheuvel@linaro.org, aryabinin@virtuozzo.com, akataria@vmware.com, boris.ostrovsky@oracle.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jan.kiszka@siemens.com, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, kirill.shutemov@linux.intel.com, mingo@redhat.com, mjg59@google.com, mka@chromium.org, pombredanne@nexb.com, rostedt@goodmis.org, tglx@linutronix.de, thomas.lendacky@amd.com, tweek@google.com, linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, rientjes@google.com
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org
 
-On Wed, Jun 6, 2018 at 6:39 PM,  <hpa@zytor.com> wrote:
-...
->>Beyond this, a general question: Can someone explain why all these
->>inline defines are in compiler-gcc.h (as there exists compiler.h and
->>compiler-clang.h)?
->>
->>Thanks.
->>
->>Regards,
->>- Sedat -
->
-> Because gcc itself also supports both GNU89-style and C99-style inlines, but the kernel was built with the former, and it is not necessarily a trivial modification, except for "static inline" which is the same for both.
->
-> The other option is to pass -fgnu89-inline on the command line, which is supported by both gcc and clang. The two methods are fully equivalent.
->
+Hello,
 
-We have...
+Running `make localmodconfig` with GNU Make 4.1 (Debian package
+version 4.1-9.1) in the current torvalds master results in the
+following error:
 
-$ ls include/linux/compiler*
-include/linux/compiler-clang.h  include/linux/compiler-gcc.h
-include/linux/compiler.h  include/linux/compiler-intel.h
-include/linux/compiler_types.h
+Can't open arch/$(SRCARCH)/Kconfig at ./scripts/kconfig/streamline_config.pl line 174, <$kinfile> line 8.
+scripts/kconfig/Makefile:44: recipe for target 'localmodconfig' failed
+make[1]: *** [localmodconfig] Error 2
+Makefile:526: recipe for target 'localmodconfig' failed
+make: *** [localmodconfig] Error 2
 
-include/linux/compiler_types.h says...
+I bisected the regression to 104daea149c45cc84842ce77a9bd6436d19f3dd8.
 
-#ifdef __GNUC__
-#include <linux/compiler-gcc.h>
-#endif
-...
-/* Intel compiler defines __GNUC__. So we will overwrite implementations
- * coming from above header files here
- */
-#ifdef __INTEL_COMPILER
-# include <linux/compiler-intel.h>
-#endif
+If there is any other information I can provide or way I can assist,
+or if I have reported the issue incorrectly, please let me know.
 
-/* Clang compiler defines __GNUC__. So we will overwrite implementations
- * coming from above header files here
- */
-#ifdef __clang__
-#include <linux/compiler-clang.h>
-#endif
-
-/*
- * Generic compiler-dependent macros required for kernel
- * build go below this comment. Actual compiler/compiler version
- * specific implementations come from the above header files
- */
-...
-
-include/linux/compiler-clang.h says...
-
-#ifndef __LINUX_COMPILER_TYPES_H
-#error "Please don't include <linux/compiler-clang.h> directly,
-include <linux/compiler.h> instead."
-#endif
-
-So, compiler-clang.h uses defines etc. from compiler-gcc.h but might
-overwrite it.
-Correct?
-I would have expected inline defines in compiler.h as I thought there
-is the place for generic stuff.
-
-Maybe you can clarify on the roles of especially compiler.h and
-compiler_types.h.
-
-Thanks.
-
-- sed@ -
+Thanks,
+Kevin
