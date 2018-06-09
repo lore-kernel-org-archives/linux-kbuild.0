@@ -1,40 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([193.170.194.197]:40134 "EHLO
-        one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752905AbeFHWSf (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:35780 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752911AbeFIA7i (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Jun 2018 18:18:35 -0400
-Date: Fri, 8 Jun 2018 15:08:00 -0700
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH] trace: fix SKIP_STACK_VALIDATION=1 build
-Message-ID: <20180608220759.irqviu5g4a3w7nms@two.firstfloor.org>
-References: <20180608214746.136554-1-gthelen@google.com>
+        Fri, 8 Jun 2018 20:59:38 -0400
+Subject: Re: [RFC v4 1/1] i-search functionality for mconf
+References: <20180608184606.5029-1-dirk@gouders.net>
+ <20180608184606.5029-2-dirk@gouders.net>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <6cd5ead5-c24e-d2e2-e87e-eb2c1f7b5672@infradead.org>
+Date: Fri, 8 Jun 2018 17:59:27 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180608214746.136554-1-gthelen@google.com>
+In-Reply-To: <20180608184606.5029-2-dirk@gouders.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Thelen <gthelen@google.com>
-Cc: Andi Kleen <andi@firstfloor.org>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, x86@kernel.org, linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+To: Dirk Gouders <dirk@gouders.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
 
-On Fri, Jun 08, 2018 at 02:47:46PM -0700, Greg Thelen wrote:
-> Non gcc-5 builds with CONFIG_STACK_VALIDATION=y and
-> SKIP_STACK_VALIDATION=1 fail.
-> Example output:
->   /bin/sh: init/.tmp_main.o: Permission denied
+On 06/08/2018 11:46 AM, Dirk Gouders wrote:
+> This patch prototypes isearch functionality for mconf based on an idea of
+> Sam Ravnborg:
 > 
-> commit 96f60dfa5819 ("trace: Use -mcount-record for dynamic ftrace"),
-> added a mismatched endif.  This causes cmd_objtool to get mistakenly
-> set.
+> * mconf now distinguishes if the focus is on the menu items or the
+>   buttons below it.
 > 
-> Relocate endif to balance the newly added -record-mcount check.
+> * At startup focus is on the menu items and alphanumeric
+>   characters or space entered are used to form a string that is
+>   searched for.
 > 
-> Fixes: 96f60dfa5819 ("trace: Use -mcount-record for dynamic ftrace")
-> Signed-off-by: Greg Thelen <gthelen@google.com>
+> * BACKSPACE is used to remove the last character of the search string.
+> 
+> * ENTER can be used to enter a submenu.
+> 
+> * Horizontal arrow keys put focus on the buttons with the known
+>   behavior.
+> 
+> * The TAB key is now exclusively used to toggle the focus.
+> 
+> * Vertical arrow keys work anywhere.
+> 
+> * When the focus is on the buttons, all keys (e.g. hotkeys) work the
+>   same as before this change.
+> 
+> * '\' can be used to search for other occurences of an already entered
+>   string.
+> 
+> * To use y|n|m on an item, focus has to be on the buttons.
+> 
+> An example to navigate into the USB support menu under Device Drivers:
+> 
+>    1) de		# Navigates to the item "Device Drivers"
+>    2) ENTER		# Enter the submenu
+>    3) USB		# Navigate to the item "USB support"
+>    4) ENTER		# Enter the submenu
 
-Looks good thanks.
+Hi Dirk,
 
-Acked-by: Andi Kleen <ak@linux.intel.com>
+Much like Sam, I got locked in isearch mode.  The TAB key would not switch
+into the buttons focus.  I had to kill it.
 
--Andi
+
+-- 
+~Randy
