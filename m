@@ -1,66 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:35780 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752911AbeFIA7i (ORCPT
+Received: from vulcan.kevinlocke.name ([107.191.43.88]:34550 "EHLO
+        vulcan.kevinlocke.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751199AbeFIFZL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Jun 2018 20:59:38 -0400
-Subject: Re: [RFC v4 1/1] i-search functionality for mconf
-References: <20180608184606.5029-1-dirk@gouders.net>
- <20180608184606.5029-2-dirk@gouders.net>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <6cd5ead5-c24e-d2e2-e87e-eb2c1f7b5672@infradead.org>
-Date: Fri, 8 Jun 2018 17:59:27 -0700
+        Sat, 9 Jun 2018 01:25:11 -0400
+Date: Fri, 8 Jun 2018 23:25:08 -0600
+From: Kevin Locke <kevin@kevinlocke.name>
+Subject: Re: [PATCH] kconfig: fix localmodconfig
+Message-ID: <20180609052508.GA10667@kevinolos>
+References: <20180608215338.GA28473@ravnborg.org>
 MIME-Version: 1.0
-In-Reply-To: <20180608184606.5029-2-dirk@gouders.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180608215338.GA28473@ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Andrei Vagin <avagin@virtuozzo.com>
 
-On 06/08/2018 11:46 AM, Dirk Gouders wrote:
-> This patch prototypes isearch functionality for mconf based on an idea of
-> Sam Ravnborg:
+On Fri, 2018-06-08 at 23:53 +0200, Sam Ravnborg wrote:
+> When kconfig syntax moved to use $(FOO) for environment variables
+> localmodconfig was not updated.
+> Fix so it now works with the new syntax $(FOO)
 > 
-> * mconf now distinguishes if the focus is on the menu items or the
->   buttons below it.
-> 
-> * At startup focus is on the menu items and alphanumeric
->   characters or space entered are used to form a string that is
->   searched for.
-> 
-> * BACKSPACE is used to remove the last character of the search string.
-> 
-> * ENTER can be used to enter a submenu.
-> 
-> * Horizontal arrow keys put focus on the buttons with the known
->   behavior.
-> 
-> * The TAB key is now exclusively used to toggle the focus.
-> 
-> * Vertical arrow keys work anywhere.
-> 
-> * When the focus is on the buttons, all keys (e.g. hotkeys) work the
->   same as before this change.
-> 
-> * '\' can be used to search for other occurences of an already entered
->   string.
-> 
-> * To use y|n|m on an item, focus has to be on the buttons.
-> 
-> An example to navigate into the USB support menu under Device Drivers:
-> 
->    1) de		# Navigates to the item "Device Drivers"
->    2) ENTER		# Enter the submenu
->    3) USB		# Navigate to the item "USB support"
->    4) ENTER		# Enter the submenu
+> Fixes: 104daea149c45cc84842ce77a9bd6436d19f3dd8 ("kconfig: reference environment variables directly and remove 'option env='")
 
-Hi Dirk,
+I can confirm `make localmodconfig` from 104daea149c4 with this patch
+applied creates the same .config as it did in 104daea149c4^ and that
+it creates a plausible .config (which I haven't built/tested yet) when
+applied to master.
 
-Much like Sam, I got locked in isearch mode.  The TAB key would not switch
-into the buttons focus.  I had to kill it.
+Works for me.  Thanks for the very fast fix!
 
+Tested-by: Kevin Locke <kevin@kevinlocke.name>
 
--- 
-~Randy
+Cheers,
+Kevin
