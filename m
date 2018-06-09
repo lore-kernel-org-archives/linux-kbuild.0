@@ -1,63 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:46112 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751751AbeFIHtR (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:33655 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752979AbeFILhu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 9 Jun 2018 03:49:17 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [RFC v4 0/1] i-search functionality for mconf
-In-Reply-To: <20180608215655.GB28473@ravnborg.org> (Sam Ravnborg's message of
-        "Fri, 8 Jun 2018 23:56:55 +0200")
-References: <20180608184606.5029-1-dirk@gouders.net>
-        <20180608215655.GB28473@ravnborg.org>
-Date: Sat, 09 Jun 2018 09:40:27 +0200
-Message-ID: <ghlgbo5rx0.fsf@lena.gouders.net>
+        Sat, 9 Jun 2018 07:37:50 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAMuHMdX7oyxQKyc-DTXKG+o0SA_eJhKEFznn3bPxD0Gi=sA01A@mail.gmail.com>
+References: <1528417303-14842-1-git-send-email-yamada.masahiro@socionext.com> <CAMuHMdX7oyxQKyc-DTXKG+o0SA_eJhKEFznn3bPxD0Gi=sA01A@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 9 Jun 2018 20:36:56 +0900
+Message-ID: <CAK7LNATYmFiCgB8jxOxKtPxjMeVqgXOspE+72B4=uLmuLSyyjw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix endless syncconfig in case arch Makefile sets CROSS_COMPILE
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, linux-m68k <linux-m68k@lists.linux-m68k.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>
 
-Sam Ravnborg <sam@ravnborg.org> writes:
-
-> Hi Dirk.
+2018-06-08 17:20 GMT+09:00 Geert Uytterhoeven <geert@linux-m68k.org>:
+> Hi Yamada-san,
 >
-> On Fri, Jun 08, 2018 at 08:46:05PM +0200, Dirk Gouders wrote:
->> Hello,
->> 
->> this version is a prototype of the idea, Sam suggested -- I hope I
->> undestood it correctly.
->> 
->> This is a remarkable change to mconf in it's behavior; mainly it now
->> differentiates two focuses and operates differently, depending on the
->> focus.  When the focus is on the menu, mconf is in i-search mode, for
->> a detailed description see 1/1.
->> 
->> As stated earlier, this is just a prototype, documentation is missing
->> and the code is not ready for a real commit.
+> On Fri, Jun 8, 2018 at 2:21 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> Commit 21c54b774744 ("kconfig: show compiler version text in the top
+>> comment") was intended to detect the compiler upgrade, but Geert
+>> reported a breakage on the m68k build.
+>>
+>> The compiler upgrade is detected by the change of the environment
+>> variable, CC_VERSION_TEXT, which contains the first line of the output
+>> from $(CC) --version.  Currently, this works well when CROSS_COMPILE
+>> is given via the environment variable or the Make command line.
+>>
+>> However, some architectures such as m68k can specify CROSS_COMPILE
+>> from arch/$(SRCARCH)/Makefile as well.  In this case, "make ARCH=m68k"
+>> ends up with endless syncconfig loop.
+>>
+>>   $ make ARCH=m68k defconfig
+>>   *** Default configuration is based on 'multi_defconfig'
+>>   #
+>>   # configuration written to .config
+>>   #
+>>   $ make ARCH=m68k
+>>   scripts/kconfig/conf  --syncconfig Kconfig
+>>   scripts/kconfig/conf  --syncconfig Kconfig
+>>   scripts/kconfig/conf  --syncconfig Kconfig
+>>   scripts/kconfig/conf  --syncconfig Kconfig
 >
-> When trying this out it started to work as envisioned.
-> But somehw I manage to get stuck in the menus and cannot navigate to
-> the buttons.
+> [...]
 >
-> Consider to remove the old short-cut for the menus.
-> (Most/all the first_alph thingy in menubox.c)
-> That will avoid two confliting navigations principles and likely
-> make the code simpler to read.
+>> Fixes: 21c54b774744 ("kconfig: show compiler version text in the top comment")
+>> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 >
-> I am not sure, but maybe you can get rid of all the hotkey
-> support in print_item with this change too.
+> Thanks for fixing this quickly!
+>
+> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-Hi Sam,
 
-thank you (and also to Randy) for having a look at it.
+Applied to linux-kbuild.
 
-Next, I will prepare a patch, more thorougly tested,
-documentation included and with hotkey support removed.
 
-You are right, trying to support two navigation principles makes
-everything too complex and I was too eager to keep as much of today's
-functionality as possible.
 
-Dirk
+-- 
+Best Regards
+Masahiro Yamada
