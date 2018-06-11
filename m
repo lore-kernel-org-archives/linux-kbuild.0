@@ -1,243 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:35202 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932081AbeFKQBG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Jun 2018 12:01:06 -0400
-Date: Mon, 11 Jun 2018 12:00:57 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH v5 4/4] kernel hacking: new config
- CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og optimization
-Message-ID: <20180611120057.5391dfc6@vmware.local.home>
-In-Reply-To: <201806101929.E2oiistg%fengguang.wu@intel.com>
-References: <1528186420-6615-5-git-send-email-changbin.du@intel.com>
-        <201806101929.E2oiistg%fengguang.wu@intel.com>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:44895 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753511AbeFKVT5 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 11 Jun 2018 17:19:57 -0400
+Date: Tue, 12 Jun 2018 06:19:53 +0900
+From: Stafford Horne <shorne@gmail.com>
+Subject: Re: [PATCH 2/2] [RFC] disable -Wattribute-alias warning for
+ SYSCALL_DEFINEx()
+Message-ID: <20180611211953.GJ3652@lianli.shorne-pla.net>
+References: <20171205153259.2522368-1-arnd@arndb.de>
+ <20171205160651.2920270-1-arnd@arndb.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171205160651.2920270-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: changbin.du@intel.com, kbuild-all@01.org, mingo@redhat.com, akpm@linux-foundation.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, rdunlap@infradead.org, x86@kernel.org, linux@armlinux.org.uk, lgirdwood@gmail.com, broonie@kernel.org, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, changbin.du@gmail.com
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Douglas Anderson <dianders@chromium.org>, Al Viro <viro@zeniv.linux.org.uk>, Heiko Carstens <heiko.carstens@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Matthias Kaehlcke <mka@chromium.org>, Deepa Dinamani <deepa.kernel@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Frederic Weisbecker <fweisbec@gmail.com>, Stephan Mueller <smueller@chronox.de>, "David S. Miller" <davem@davemloft.net>, Yonghong Song <yhs@fb.com>, Thomas Garnier <thgarnie@google.com>, David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org
 
-On Sun, 10 Jun 2018 23:49:55 +0800
-kbuild test robot <lkp@intel.com> wrote:
-
-> Hi Changbin,
+On Tue, Dec 05, 2017 at 05:06:31PM +0100, Arnd Bergmann wrote:
+> gcc-8 warns for every single definition of a system call entry
+> point, e.g.:
 > 
-> Thank you for the patch! Perhaps something to improve:
+> include/linux/compat.h:56:18: error: 'compat_sys_rt_sigprocmask' alias between functions of incompatible types 'long int(int,  compat_sigset_t *, compat_sigset_t *, compat_size_t)' {aka 'long int(int,  struct <anonymous> *, struct <anonymous> *, unsigned int)'} and 'long int(long int,  long int,  long int,  long int)' [-Werror=attribute-alias]
+>   asmlinkage long compat_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))\
+>                   ^~~~~~~~~~
+> include/linux/compat.h:45:2: note: in expansion of macro 'COMPAT_SYSCALL_DEFINEx'
+>   COMPAT_SYSCALL_DEFINEx(4, _##name, __VA_ARGS__)
+>   ^~~~~~~~~~~~~~~~~~~~~~
+> kernel/signal.c:2601:1: note: in expansion of macro 'COMPAT_SYSCALL_DEFINE4'
+>  COMPAT_SYSCALL_DEFINE4(rt_sigprocmask, int, how, compat_sigset_t __user *, nset,
+>  ^~~~~~~~~~~~~~~~~~~~~~
+> include/linux/compat.h:60:18: note: aliased declaration here
+>   asmlinkage long compat_SyS##name(__MAP(x,__SC_LONG,__VA_ARGS__))\
+>                   ^~~~~~~~~~
 > 
-> [auto build test WARNING on linus/master]
-> [also build test WARNING on v4.17 next-20180608]
-> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+> The new warning seems reasonable in principle, but it doesn't
+> help us here, since we rely on the type mismatch to sanitize the
+> system call arguments. After I reported this as GCC PR82435, a new
+> -Wno-attribute-alias option was added that could be used to turn the
+> warning off globally on the command line, but I'd prefer to do it a
+> little more fine-grained.
 > 
-> url:    https://github.com/0day-ci/linux/commits/changbin-du-intel-com/kernel-hacking-GCC-optimization-for-better-debug-experience-Og/20180606-001415
-> config: i386-randconfig-x076-06101602 (attached as .config)
-> compiler: gcc-7 (Debian 7.3.0-16) 7.3.0
-> reproduce:
->         # save the attached .config to linux build tree
->         make ARCH=i386 
+> Interestingly, turning a warning off and on again inside of
+> a single macro doesn't always work, in this case I had to add
+> an extra statement inbetween and decided to copy the __SC_TEST
+> one from the native syscall to the compat syscall macro.  See
+> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83256 for more details
+> about this.
 > 
-> Note: it may well be a FALSE warning. FWIW you are at least aware of it now.
-> http://gcc.gnu.org/wiki/Better_Uninitialized_Warnings
-> 
-> All warnings (new ones prefixed by >>):
-> 
->    drivers//usb/typec/fusb302/fusb302.c: In function 'fusb302_handle_togdone_src':
-> >> drivers//usb/typec/fusb302/fusb302.c:1413:10: warning: 'ra_comp' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->      else if (ra_comp)
->              ^
+> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82435
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-This is a false warning. I'm surprised gcc couldn't catch it. Although
-that code looks like it could have been  done a bit nicer.
+Hi Arnd,
 
+What ever happened to this patch?  I am compiline the kernel with the new
+OpenRISC GCC backend port https://github.com/stffrdhrn/gcc/commits/or1k-port,
+which is based on gcc 9.0.0 and seeing similar 'alias between functions of
+incompatible types' warnings.
 
-> --
->    drivers/infiniband/ulp/ipoib/ipoib_main.c: In function 'ipoib_get_netdev':
-> >> drivers/infiniband/ulp/ipoib/ipoib_main.c:2021:30: warning: 'dev' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->      if (!hca->alloc_rdma_netdev || PTR_ERR(dev) == -EOPNOTSUPP)
-> --
+I found this old patch which seems will fix the issue, but it seems to not have
+been merged.  Did we find another solution?
 
-Strange, this is also false, with the same construct.
+Case in point, when I build x86 64 on gcc 8.1.1, I am not seeing the warnings.
+Is this not an issue for x86?
 
-	if (a) {
-		b = init;
-	}
-	if (!a) {
-		use b;
-
-It warns that b may be unused. I'm guessing the extra option we add in
-gcc by the patch causes gcc to break in this regard.
-
-
-
->    kernel//cgroup/cgroup-v1.c: In function 'cgroup1_mount':
-> >> kernel//cgroup/cgroup-v1.c:1268:3: warning: 'root' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->       percpu_ref_reinit(&root->cgrp.self.refcnt);
->       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> --
-
-Slightly different construct, but similar:
-
-	ret = func();
-	if (ret)
-		goto out_unlock;
-
-	root = init;
-
- out_unlock:
-
-	if (ret)
-		return;
-
-	use root;
-
-
-
->    kernel//trace/bpf_trace.c: In function 'bpf_trace_printk':
-> >> kernel//trace/bpf_trace.c:226:20: warning: 'unsafe_addr' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->               (void *) (long) unsafe_addr,
->                        ^~~~~~~~~~~~~~~~~~
-
-Again similar:
-
-	if (fmt_cnt >= 3)
-		return;
-
-	switch (fmt_cnt) {
-	case 1:
-		unsafe_addr = init;
-		break;
-	case 2:
-		unsafe_addr = init2;
-		break;
-	case 3:
-		unsafe_addr = init3;
-		break;
-	}
-
-	use init;
-
-
->    kernel//trace/bpf_trace.c:170:6: note: 'unsafe_addr' was declared here
->      u64 unsafe_addr;
->          ^~~~~~~~~~~
-> --
->    net//6lowpan/iphc.c: In function 'lowpan_header_decompress':
->    net//6lowpan/iphc.c:617:12: warning: 'iphc1' may be used uninitialized in this function [-Wmaybe-uninitialized]
->      u8 iphc0, iphc1, cid = 0;
->                ^~~~~
-> >> net//6lowpan/iphc.c:617:5: warning: 'iphc0' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->      u8 iphc0, iphc1, cid = 0;
->         ^~~~~
-
-Similar but crazier:
-
-	if (lowpan_fetch_skb(&iphc0) ||
-	    lowpan_fetch_skb(&iphc1))
-		return;
-
-	use iphc0 and ipch1;
-
-where lowpan_fetch_skb() is:
-
-	if (test())
-		return true;
-
-	init data (iphc0 or iphc1);
-	return false;
-
-
-> --
->    net//netfilter/nf_tables_api.c: In function 'nf_tables_dump_set':
-> >> net//netfilter/nf_tables_api.c:3625:2: warning: 'set' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->      set->ops->walk(&dump_ctx->ctx, set, &args.iter);
->      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-I don't have the same kernel, as this doesn't match. But I'm sure it's
-a false positive like the others.
-
-
-> --
->    drivers/media/dvb-frontends/mn88472.c: In function 'mn88472_set_frontend':
-> >> drivers/media/dvb-frontends/mn88472.c:339:27: warning: 'bandwidth_vals_ptr' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->             bandwidth_vals_ptr[i]);
->                               ^
-> >> drivers/media/dvb-frontends/mn88472.c:320:8: warning: 'bandwidth_val' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->      ret = regmap_write(dev->regmap[2], 0x04, bandwidth_val);
->            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This one may not be a false positive. It really looks like there's a
-path to that being used uninitialized. But I haven't torn that function
-apart enough to really tell, but I don't fault gcc for not warning
-about it. But I like to know if gcc doesn't warn without this patch?
-
-
-> --
->    drivers/media/dvb-frontends/mn88473.c: In function 'mn88473_set_frontend':
-> >> drivers/media/dvb-frontends/mn88473.c:162:7: warning: 'conf_val_ptr' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->       ret = regmap_bulk_write(dev->regmap[1], 0x10, conf_val_ptr, 6);
->       ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Same as the one before it. Need to see if this isn't really a real
-issue.
-
-> --
->    net//netfilter/ipvs/ip_vs_sync.c: In function 'ip_vs_sync_conn':
-> >> net//netfilter/ipvs/ip_vs_sync.c:731:13: warning: 'm' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->      m->nr_conns++;
->      ~~~~~~~~~~~^~
-
-gcc is really stupid on this one.
-
-	if (buff)
-		init m;
-	if (!buff)
-		init m;
-
-	use m;
-
-Really?
-
-> --
->    drivers//hwspinlock/hwspinlock_core.c: In function 'of_hwspin_lock_get_id':
-> >> drivers//hwspinlock/hwspinlock_core.c:339:19: warning: 'id' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->      return ret ? ret : id;
->             ~~~~~~~~~~^~~~
-
-
-Again, we jump here without initializing 'id' when ret is set.
-
-
-> --
->    drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c: In function 'mlxsw_sp_nexthop_group_update':
-> >> drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:3078:7: warning: 'err' may be used uninitialized in this function [-Wmaybe-uninitialized]  
->        if (err)
->           ^
-> 
-> vim +/ra_comp +1413 drivers//usb/typec/fusb302/fusb302.c
-> 
-
-
-Another switch statement false positive:
-
-	nh->type can only be set to two different values, and then we
-	have:
-
-	switch (nh->type) {
-	case value1:
-		err = func();
-		break;
-	case value2:
-		err = func2();
-		break;
-	}
-	if (err)
-
-
-Of all the warnings, only one looks like it could be a possible issue.
-Thus, this patch causes gcc to fail more on it analysis. The one
-possible issue should have been caught by gcc without this patch, so
-I'm skeptical that it is indeed an issue, but it's complex and I am
-impressed if gcc really did figure it out.
-
--- Steve
+-Stafford
