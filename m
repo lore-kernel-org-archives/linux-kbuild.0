@@ -1,95 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:36280 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933082AbeFKM7Z (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:46051 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753999AbeFKPq6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Jun 2018 08:59:25 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [RFC v5 0/1] i-search navigation for mconf
-Date: Mon, 11 Jun 2018 14:51:54 +0200
-Message-Id: <20180611125155.21470-1-dirk@gouders.net>
+        Mon, 11 Jun 2018 11:46:58 -0400
+Date: Mon, 11 Jun 2018 17:46:33 +0200
+From: Johan Hovold <johan@kernel.org>
+Subject: Re: [PATCH v5 2/4] kernel hacking: new config NO_AUTO_INLINE to
+ disable compiler auto-inline optimizations
+Message-ID: <20180611154633.GC13775@localhost>
+References: <20180606095714.1d3c2def@vmware.local.home>
+ <20180606142600.GN13775@localhost>
+ <20180606142622.2338abf6@vmware.local.home>
+ <20180607041718.qpqucjzlvcm5h3gn@vireshk-i7>
+ <20180607074628.kd3iyxevwj3ypzbr@intel.com>
+ <20180607083856.ealw62v3wx43zeqz@vireshk-i7>
+ <1303b1abf9f9229a8d3ccbb68a3e413266b360d7.camel@petrovitsch.priv.at>
+ <20180607091025.m7dfix3e2xbwx4cs@vireshk-i7>
+ <20180607091816.GT13775@localhost>
+ <20180608160355.67712eb8@vmware.local.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180608160355.67712eb8@vmware.local.home>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
-Cc: Dirk Gouders <dirk@gouders.net>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Johan Hovold <johan@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, Bernd Petrovitsch <bernd@petrovitsch.priv.at>, "Du, Changbin" <changbin.du@intel.com>, gregkh@linuxfoundation.org, alex.elder@linaro.org, kbuild test robot <lkp@intel.com>, linux-arch@vger.kernel.org, michal.lkml@markovi.net, linux-kernel@vger.kernel.org, arnd@arndb.de, yamada.masahiro@socionext.com, lgirdwood@gmail.com, broonie@kernel.org, rdunlap@infradead.org, x86@kernel.org, linux@armlinux.org.uk, linux-sparse@vger.kernel.org, mingo@redhat.com, kbuild-all@01.org, akpm@linux-foundation.org, changbin.du@gmail.com, tglx@linutronix.de, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-Hello,
+On Fri, Jun 08, 2018 at 04:03:55PM -0400, Steven Rostedt wrote:
+> On Thu, 7 Jun 2018 11:18:16 +0200
+> Johan Hovold <johan@kernel.org> wrote:
+> 
+> 
+> > If you want to work around the warning and think you can do it in some
+> > non-contrived way, then go for it.
+> > 
+> > Clearing the request buffer, checking for termination using strnlen, and
+> > then using memcpy might not be too bad.
+> > 
+> > But after all, it is a false positive, so leaving things as they stand
+> > is fine too.
+> 
+> Not sure how contrived you think this is, but it solves the warning
+> without adding extra work in the normal case.
+> 
+> -- Steve
+> 
+> diff --git a/drivers/staging/greybus/fw-management.c b/drivers/staging/greybus/fw-management.c
+> index 71aec14f8181..4fb9f1dff47d 100644
+> --- a/drivers/staging/greybus/fw-management.c
+> +++ b/drivers/staging/greybus/fw-management.c
+> @@ -150,15 +150,18 @@ static int fw_mgmt_load_and_validate_operation(struct fw_mgmt *fw_mgmt,
+>  	}
+>  
+>  	request.load_method = load_method;
+> -	strncpy(request.firmware_tag, tag, GB_FIRMWARE_TAG_MAX_SIZE);
+> +	strncpy(request.firmware_tag, tag, GB_FIRMWARE_TAG_MAX_SIZE - 1);
+>  
+>  	/*
+>  	 * The firmware-tag should be NULL terminated, otherwise throw error and
+>  	 * fail.
+>  	 */
+> -	if (request.firmware_tag[GB_FIRMWARE_TAG_MAX_SIZE - 1] != '\0') {
+> -		dev_err(fw_mgmt->parent, "load-and-validate: firmware-tag is not NULL terminated\n");
+> -		return -EINVAL;
+> +	if (request.firmware_tag[GB_FIRMWARE_TAG_MAX_SIZE - 2] != '\0') {
+> +		if (tag[GB_FIRMWARE_TAG_MAX_SIZE - 1] != '\0') {
+> +			dev_err(fw_mgmt->parent, "load-and-validate: firmware-tag is not NULL terminated\n");
+> +			return -EINVAL;
+> +		}
+> +		request.firmware_tag[GB_FIRMWARE_TAG_MAX_SIZE - 1] = '\0';
+>  	}
 
-I reworked the prototype for the i-search navigation concept.  It is
-now more thoroughly tested and hopefully not a waste of time to have a
-look at it.
+Well, I think it's quite far from obvious what is going on above, and
+not least why things are being done this way (which a comment may help
+with).
 
-For the focus-sensitive help text, I modified the function
-print_autowrap() and for now called it print_autowrap_fill().  It
-could replace the old function but does a bit more work than it.
+And just NUL-terminating the (automatic) buffer before returning wasn't
+enough? Then it may be better to do away with strncpy completely.
 
-With this navigation concept, mconf's behavior (in i-search mode) is
-quite different from the known one, most noticeably the need to switch
-focus to the buttons to be able to use <y|n|m|space>.   Ideas are very
-welcome.
+But should we really be working around gcc this way? If the
+implementation of this new warning isn't smart enough yet, should it not
+just be disabled instead?
 
-Interesting in i-search mode is the ability to not only search item
-strings, but also their selection marks.  So, one can search for items
-selected as a module, for example.
-
-Dirk
-
-Changes in v5:
-
-* More thoroughly tested code
-
-* Hotkey navigation concept completely dropped
-
-* Printable characters except special ones form the search string
-
-* Focus-sensitive help text above menu
-
-* DEL erases search string
-
-* Matching string is highlighted in selected menu item
-
-* README help text adjusted
-
-Changes in v4:
-
-* Prototype: consequent i-search navigation concept
-
-Changes in v3:
-
-* Use current git tree to make the patch apply.
-
-* Eliminate debugging output to stderr.
-
-Changes in v2:
-
-* Additionally to CTRL-s, \ can be used to start isearch.
-
-* Raw mode is off by default an can be enabled by an environment
-  variable MENUCONFIG_RAW_MODE.
-
-* I also added a variable for toggling raw mode but did not implement
-  anything else.
-
-* The isearch indicator is now displayed as soon as isearch is
-  started.
-
-* Any key except \, CTRL-s, alphanumeric characters and space
-  terminates isearch and -- except ESC ESC -- is further processed,
-  e.g. ENTER terminates isearch and is then used to navigate into a
-  submenu.
-
-* Problems with mismatches and matches above the current position were
-  fixed.
-
-Dirk Gouders (1):
-  i-search navigation for mconf
-
- scripts/kconfig/lxdialog/dialog.h  |   3 +
- scripts/kconfig/lxdialog/menubox.c | 489 +++++++++++++++++++++++++++----------
- scripts/kconfig/lxdialog/util.c    | 106 +++++++-
- scripts/kconfig/mconf.c            |  68 ++++--
- 4 files changed, 506 insertions(+), 160 deletions(-)
-
--- 
-2.16.4
-
+Thanks,
+Johan
