@@ -1,68 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:43732 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934684AbeFLAcs (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:39858 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934801AbeFLAcw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Jun 2018 20:32:48 -0400
-Received: by mail-pf0-f195.google.com with SMTP id y8-v6so2055963pfm.10
-        for <linux-kbuild@vger.kernel.org>; Mon, 11 Jun 2018 17:32:48 -0700 (PDT)
+        Mon, 11 Jun 2018 20:32:52 -0400
+Received: by mail-pl0-f67.google.com with SMTP id f1-v6so13309027plt.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 Jun 2018 17:32:52 -0700 (PDT)
 From: Laura Abbott <labbott@redhat.com>
-Subject: [PATCHv4 0/3] Salted build ids via linker sections
-Date: Mon, 11 Jun 2018 17:32:21 -0700
-Message-Id: <20180612003224.3658-1-labbott@redhat.com>
+Subject: [PATCHv4 2/3] kbuild: Introduce build-salt linker section and config option
+Date: Mon, 11 Jun 2018 17:32:23 -0700
+Message-Id: <20180612003224.3658-3-labbott@redhat.com>
+In-Reply-To: <20180612003224.3658-1-labbott@redhat.com>
+References: <20180612003224.3658-1-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andy Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Laura Abbott <labbott@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, linux-kernel@vger.kernel.org, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org
 
 
-Hi,
+The build id generated from --build-id can be generated in several different
+ways, with the default being the sha1 on the output of the linked file. For
+distributions, it can be useful to make sure this ID is unique, even if the
+actual file contents don't change. The easiest way to do this is to insert
+a section with some data.
 
-This is v4 of the series to allow unique build ids in the kernel. As a
-reminder of the context:
+Introduce a macro to insert a linker section which will be filled
+with a hex value. This will ensure the build id can be changed just via
+a config option. Users who don't care about this can leave the
+default value and strip the section.
 
-""
-In Fedora, the debug information is packaged separately (foo-debuginfo) and
-can be installed separately. There's been a long standing issue where only one
-version of a debuginfo info package can be installed at a time. Mark Wielaard
-made an effort for Fedora 27 to allow parallel installation of debuginfo (see
-https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo for
-more details)
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Laura Abbott <labbott@redhat.com>
+---
+ include/asm-generic/vmlinux.lds.h | 6 ++++++
+ init/Kconfig                      | 9 +++++++++
+ scripts/module-common.lds.S       | 4 ++++
+ 3 files changed, 19 insertions(+)
 
-Part of the requirement to allow this to work is that build ids are
-unique between builds. The existing upstream rpm implementation ensures
-this by re-calculating the build-id using the version and release as a
-seed. This doesn't work 100% for the kernel because of the vDSO which is
-its own binary and doesn't get updated. After poking holes in a few of my
-ideas, there was a discussion with some people from the binutils team about
-adding --build-id-salt to let ld do the calculation debugedit is doing. There
-was a counter proposal made to add in the salt while building. The
-easiest proposal was to add an item in the linker script vs. linking in
-an object since we need the salt to go in every module as well as the
-kernel and vmlinux.
-""
-
-v4 takes Linus' suggestion of using linker fill to insert the build id.
-This removes the need to use a generated header which makes things much
-easier. One change is that because this section isn't .comment it won't
-get stripped automatically. This is pretty small but I also know people
-can be picky so I'm open to opinions or suggestions here.
-
-Laura Abbott (3):
-  scripts: Preprocess module-common.lds
-  kbuild: Introduce build-salt linker section and config option
-  x86: Add build salt to the vDSO and kernel linker scripts
-
- arch/x86/entry/vdso/vdso-layout.lds.S              | 3 ++-
- arch/x86/kernel/vmlinux.lds.S                      | 1 +
- include/asm-generic/vmlinux.lds.h                  | 6 ++++++
- init/Kconfig                                       | 9 +++++++++
- scripts/.gitignore                                 | 1 +
- scripts/Makefile                                   | 2 +-
- scripts/{module-common.lds => module-common.lds.S} | 4 ++++
- 7 files changed, 24 insertions(+), 2 deletions(-)
- rename scripts/{module-common.lds => module-common.lds.S} (94%)
-
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index e373e2e10f6a..4af7e683aad2 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -830,6 +830,12 @@
+ #define PERCPU_DECRYPTED_SECTION
+ #endif
+ 
++#define	BUILD_SALT							\
++	. = ALIGN(32);							\
++	.salt : AT(ADDR(.salt) - LOAD_OFFSET) {				\
++	  LONG(0xffaa5500);						\
++	  . = ALIGN(32);						\
++	} = CONFIG_BUILD_ID_SALT					\
+ 
+ /*
+  * Default discarded sections.
+diff --git a/init/Kconfig b/init/Kconfig
+index d2b8b2ea097e..eb92ccfe4ecb 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1967,3 +1967,12 @@ config ARCH_HAS_SYNC_CORE_BEFORE_USERMODE
+ # <asm/syscall_wrapper.h>.
+ config ARCH_HAS_SYSCALL_WRAPPER
+ 	def_bool n
++
++config BUILD_ID_SALT
++	hex "Build ID Salt"
++	default 0x12345678
++	help
++	   The build ID is used to link binaries and their debug info. Setting
++	   this option will use the value in the calculation of the build id.
++	   This is mostly useful for distributions which want to ensure the
++	   build is unique between builds. It's safe to leave the default.
+diff --git a/scripts/module-common.lds.S b/scripts/module-common.lds.S
+index d61b9e8678e8..3c8410270ac1 100644
+--- a/scripts/module-common.lds.S
++++ b/scripts/module-common.lds.S
+@@ -3,6 +3,9 @@
+  * Archs are free to supply their own linker scripts.  ld will
+  * combine them automatically.
+  */
++
++#include <asm-generic/vmlinux.lds.h>
++
+ SECTIONS {
+ 	/DISCARD/ : {
+ 		*(.discard)
+@@ -23,4 +26,5 @@ SECTIONS {
+ 	.init_array		0 : ALIGN(8) { *(SORT(.init_array.*)) *(.init_array) }
+ 
+ 	__jump_table		0 : ALIGN(8) { KEEP(*(__jump_table)) }
++	BUILD_SALT
+ }
 -- 
 2.18.0.rc1
 
