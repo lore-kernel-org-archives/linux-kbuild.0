@@ -1,76 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:41434 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933350AbeFLMFH (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:43238 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933363AbeFLQTm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Jun 2018 08:05:07 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH] nconf: respect i-search search pattern boundaries
-Date: Tue, 12 Jun 2018 14:04:41 +0200
-Message-Id: <20180612120441.22325-1-dirk@gouders.net>
+        Tue, 12 Jun 2018 12:19:42 -0400
+Subject: Re: [PATCH] nconf: respect i-search search pattern boundaries
+References: <20180612120441.22325-1-dirk@gouders.net>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <e6ca0598-bdac-aef7-5b5d-5b593f122ba8@infradead.org>
+Date: Tue, 12 Jun 2018 09:19:38 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180612120441.22325-1-dirk@gouders.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Dirk Gouders <dirk@gouders.net>, Dirk@services.gouders.net
+To: Dirk Gouders <dirk@gouders.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Dirk@services.gouders.net
 
-This patch adds boundary checks for nconf's i-search pattern.
+On 06/12/2018 05:04 AM, Dirk Gouders wrote:
+> This patch adds boundary checks for nconf's i-search pattern.
+> 
+> Further, the pattern buffer is always bzero'ed when '/' is
+> pressed, so the second line in the code below was not needed (and
+> otherwise wouldn't have worked as expected):
+> 
+> 	state->pattern[strlen(state->pattern)] = c;
+> 	state->pattern[strlen(state->pattern)] = '\0';
+> 
+> Finally, the pattern length was reduced to a length that still
+> seems sufficient but will not fill more than the top line of the
+> screen, thus eliminating special treatment needs on resizes or normal
+> exit of i-search.
+> 
+> Signed-off-by: Dirk Gouders
 
-Further, the pattern buffer is always bzero'ed when '/' is
-pressed, so the second line in the code below was not needed (and
-otherwise wouldn't have worked as expected):
+S-O-B: line should also have your email address after your name.
 
-	state->pattern[strlen(state->pattern)] = c;
-	state->pattern[strlen(state->pattern)] = '\0';
+> ---
+>  scripts/kconfig/nconf.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 
-Finally, the pattern length was reduced to a length that still
-seems sufficient but will not fill more than the top line of the
-screen, thus eliminating special treatment needs on resizes or normal
-exit of i-search.
+Your patch descsription makes sense.  I tested nconf (make nconfig)
+both with and without this patch.  I didn't like the /search results
+in either case.  F1 (Help) says:
 
-Signed-off-by: Dirk Gouders
----
- scripts/kconfig/nconf.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ ││ Start incremental, case-insensitive search for STRING in menu entries,   ││
+ ││     no regex support, STRING is displayed in upper left corner           ││
+ ││                             </>STRING                                    ││
+ ││     Remove last character   <Backspace>                                  ││
+ ││     Jump to next hit        <Down>                                       ││
+ ││     Jump to previous hit    <Up>                                         ││
+ ││ Exit menu search mode       </>  <Esc>
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 97b78445584b..0e224528aaf9 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -1007,11 +1007,12 @@ static void adj_match_dir(match_f *match_direction)
- 	/* else, do no change.. */
- }
- 
-+#define PATTERN_LENGTH 64
- struct match_state
- {
- 	int in_search;
- 	match_f match_direction;
--	char pattern[256];
-+	char pattern[PATTERN_LENGTH];
- };
- 
- /* Return 0 means I have handled the key. In such a case, ans should hold the
-@@ -1035,8 +1036,8 @@ static int do_match(int key, struct match_state *state, int *ans)
- 		return 1;
- 
- 	if (isalnum(c) || isgraph(c) || c == ' ') {
--		state->pattern[strlen(state->pattern)] = c;
--		state->pattern[strlen(state->pattern)] = '\0';
-+		if (strlen(state->pattern) + 1 < PATTERN_LENGTH)
-+			state->pattern[strlen(state->pattern)] = c;
- 		adj_match_dir(&state->match_direction);
- 		*ans = get_mext_match(state->pattern,
- 				state->match_direction);
-@@ -1049,7 +1050,8 @@ static int do_match(int key, struct match_state *state, int *ans)
- 		*ans = get_mext_match(state->pattern,
- 				state->match_direction);
- 	} else if (key == KEY_BACKSPACE || key == 127) {
--		state->pattern[strlen(state->pattern)-1] = '\0';
-+		if (state->pattern[0] != '\0')
-+			state->pattern[strlen(state->pattern)-1] = '\0';
- 		adj_match_dir(&state->match_direction);
- 	} else
- 		terminate_search = 1;
+but I couldn't get <Down> == "Jump to next hit" to work for me at all
+(with or without the patch).
+
+thanks,
 -- 
-2.16.4
-
+~Randy
