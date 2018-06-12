@@ -1,78 +1,158 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:37470 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933313AbeFLTIn (ORCPT
+Received: from ex13-edg-ou-001.vmware.com ([208.91.0.189]:36894 "EHLO
+        EX13-EDG-OU-001.vmware.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1754146AbeFLTFd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Jun 2018 15:08:43 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH v2] nconf: respect i-search pattern boundaries
-Date: Tue, 12 Jun 2018 21:06:04 +0200
-Message-Id: <20180612190604.4889-1-dirk@gouders.net>
+        Tue, 12 Jun 2018 15:05:33 -0400
+From: Nadav Amit <namit@vmware.com>
+Subject: [PATCH v4 1/9] Makefile: Prepare for using macros for inline asm
+Date: Tue, 12 Jun 2018 04:50:42 -0700
+Message-ID: <20180612115050.185112-2-namit@vmware.com>
+In-Reply-To: <20180612115050.185112-1-namit@vmware.com>
+References: <20180612115050.185112-1-namit@vmware.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>
-Cc: Dirk Gouders <dirk@gouders.net>
+To: linux-kernel@vger.kernel.org, x86@kernel.org
+Cc: Nadav Amit <namit@vmware.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
 
-This patch adds boundary checks for nconf's i-search pattern.
+Using macros for inline assembly improves both readability and
+compilation decisions that are distorted by big assembly blocks that use
+alternative sections. Compile macros.S and use it to assemble all C
+files. Currently, only x86 will use it.
 
-Further, the pattern buffer is always bzero'ed when '/' is
-pressed, so the second line in the code below was not needed (and
-otherwise wouldn't have worked as expected):
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: x86@kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
-	state->pattern[strlen(state->pattern)] = c;
-	state->pattern[strlen(state->pattern)] = '\0';
-
-Finally, the pattern length was reduced to a length that still
-seems sufficient but will not fill more than the top line of the
-screen, thus eliminating special treatment needs on resizes or normal
-exit of i-search.
-
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
+Signed-off-by: Nadav Amit <namit@vmware.com>
 ---
-Changes in v2: Correct S-O-B line, remove double search from subject.
----
- scripts/kconfig/nconf.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ Makefile                 |  9 +++++++--
+ arch/x86/Makefile        | 11 +++++++++--
+ arch/x86/kernel/Makefile |  6 ++++++
+ arch/x86/kernel/macros.S |  7 +++++++
+ scripts/Kbuild.include   |  4 +++-
+ 5 files changed, 32 insertions(+), 5 deletions(-)
+ create mode 100644 arch/x86/kernel/macros.S
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 97b78445584b..0e224528aaf9 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -1007,11 +1007,12 @@ static void adj_match_dir(match_f *match_direction)
- 	/* else, do no change.. */
- }
+diff --git a/Makefile b/Makefile
+index 554dcaddbce4..026586db2f26 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1085,7 +1085,7 @@ scripts: scripts_basic include/config/auto.conf include/config/tristate.conf \
+ # version.h and scripts_basic is processed / created.
  
-+#define PATTERN_LENGTH 64
- struct match_state
- {
- 	int in_search;
- 	match_f match_direction;
--	char pattern[256];
-+	char pattern[PATTERN_LENGTH];
- };
+ # Listed in dependency order
+-PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
++PHONY += prepare archprepare macroprepare prepare0 prepare1 prepare2 prepare3
  
- /* Return 0 means I have handled the key. In such a case, ans should hold the
-@@ -1035,8 +1036,8 @@ static int do_match(int key, struct match_state *state, int *ans)
- 		return 1;
+ # prepare3 is used to check if we are building in a separate output directory,
+ # and if so do:
+@@ -1109,7 +1109,9 @@ prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h \
+                    include/config/auto.conf
+ 	$(cmd_crmodverdir)
  
- 	if (isalnum(c) || isgraph(c) || c == ' ') {
--		state->pattern[strlen(state->pattern)] = c;
--		state->pattern[strlen(state->pattern)] = '\0';
-+		if (strlen(state->pattern) + 1 < PATTERN_LENGTH)
-+			state->pattern[strlen(state->pattern)] = c;
- 		adj_match_dir(&state->match_direction);
- 		*ans = get_mext_match(state->pattern,
- 				state->match_direction);
-@@ -1049,7 +1050,8 @@ static int do_match(int key, struct match_state *state, int *ans)
- 		*ans = get_mext_match(state->pattern,
- 				state->match_direction);
- 	} else if (key == KEY_BACKSPACE || key == 127) {
--		state->pattern[strlen(state->pattern)-1] = '\0';
-+		if (state->pattern[0] != '\0')
-+			state->pattern[strlen(state->pattern)-1] = '\0';
- 		adj_match_dir(&state->match_direction);
- 	} else
- 		terminate_search = 1;
+-archprepare: archheaders archscripts prepare1 scripts_basic
++macroprepare: prepare1 archmacros
++
++archprepare: archheaders archscripts macroprepare scripts_basic
+ 
+ prepare0: archprepare gcc-plugins
+ 	$(Q)$(MAKE) $(build)=.
+@@ -1214,6 +1216,9 @@ archheaders:
+ PHONY += archscripts
+ archscripts:
+ 
++PHONY += archmacros
++archmacros:
++
+ PHONY += __headers
+ __headers: $(version_h) scripts_basic uapi-asm-generic archheaders archscripts
+ 	$(Q)$(MAKE) $(build)=scripts build_unifdef
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 60135cbd905c..6b82314776fd 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -235,8 +235,8 @@ ifdef CONFIG_X86_64
+ LDFLAGS += $(call ld-option, -z max-page-size=0x200000)
+ endif
+ 
+-# Speed up the build
+-KBUILD_CFLAGS += -pipe
++# We cannot use -pipe flag since we give an additional .s file to the compiler
++#KBUILD_CFLAGS += -pipe
+ # Workaround for a gcc prelease that unfortunately was shipped in a suse release
+ KBUILD_CFLAGS += -Wno-sign-compare
+ #
+@@ -258,11 +258,18 @@ archscripts: scripts_basic
+ archheaders:
+ 	$(Q)$(MAKE) $(build)=arch/x86/entry/syscalls all
+ 
++archmacros:
++	$(Q)$(MAKE) $(build)=arch/x86/kernel macros
++
+ archprepare:
+ ifeq ($(CONFIG_KEXEC_FILE),y)
+ 	$(Q)$(MAKE) $(build)=arch/x86/purgatory arch/x86/purgatory/kexec-purgatory.c
+ endif
+ 
++ASM_MACRO_FLAGS = -Wa,arch/x86/kernel/macros.s
++export ASM_MACRO_FLAGS
++KBUILD_CFLAGS += $(ASM_MACRO_FLAGS)
++
+ ###
+ # Kernel objects
+ 
+diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+index 02d6f5cf4e70..fdb6c5b2a922 100644
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -9,6 +9,12 @@ extra-y	+= ebda.o
+ extra-y	+= platform-quirks.o
+ extra-y	+= vmlinux.lds
+ 
++$(obj)/macros.s: $(obj)/macros.S FORCE
++	$(call if_changed_dep,cpp_s_S)
++
++macros: $(obj)/macros.s
++	@:
++
+ CPPFLAGS_vmlinux.lds += -U$(UTS_MACHINE)
+ 
+ ifdef CONFIG_FUNCTION_TRACER
+diff --git a/arch/x86/kernel/macros.S b/arch/x86/kernel/macros.S
+new file mode 100644
+index 000000000000..cfc1c7d1a6eb
+--- /dev/null
++++ b/arch/x86/kernel/macros.S
+@@ -0,0 +1,7 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++/*
++ * This file includes headers whose assembly part includes macros which are
++ * commonly used. The macros are precompiled into assmebly file which is later
++ * assembled together with each compiled file.
++ */
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 50cee534fd64..ad2c02062aa4 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -189,7 +189,9 @@ __cc-option = $(call try-run-cached,\
+ 
+ # Do not attempt to build with gcc plugins during cc-option tests.
+ # (And this uses delayed resolution so the flags will be up to date.)
+-CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
++# In addition, do not include the asm macros which are built later.
++CC_OPTION_FILTERED = $(GCC_PLUGINS_CFLAGS) $(ASM_MACRO_FLAGS)
++CC_OPTION_CFLAGS = $(filter-out $(CC_OPTION_FILTERED),$(KBUILD_CFLAGS))
+ 
+ # cc-option
+ # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
 -- 
-2.16.4
+2.17.0
 
