@@ -1,72 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot0-f195.google.com ([74.125.82.195]:46522 "EHLO
-        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932957AbeFLSSH (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:39713 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932463AbeFLSd1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Jun 2018 14:18:07 -0400
-Received: by mail-ot0-f195.google.com with SMTP id q1-v6so29179119oth.13
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jun 2018 11:18:06 -0700 (PDT)
-Subject: Re: [PATCHv4 1/3] scripts: Preprocess module-common.lds
-References: <20180612003224.3658-2-labbott@redhat.com>
- <201806120915.NeKL1aUj%fengguang.wu@intel.com>
- <8736xsv8w3.fsf@concordia.ellerman.id.au>
-From: Laura Abbott <labbott@redhat.com>
-Message-ID: <1d6bf671-ec88-2d04-065c-96045759c680@redhat.com>
-Date: Tue, 12 Jun 2018 11:18:02 -0700
+        Tue, 12 Jun 2018 14:33:27 -0400
+Received: by mail-pf0-f194.google.com with SMTP id r11-v6so12547320pfl.6
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jun 2018 11:33:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <8736xsv8w3.fsf@concordia.ellerman.id.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20180607204927.219329-1-ndesaulniers@google.com>
+ <20180607204927.219329-2-ndesaulniers@google.com> <CAK8P3a0yi+MrOS=+pjCeUu==YBE_AppB8vfqdsQS-1NpSO2c4A@mail.gmail.com>
+ <CA+icZUXDoeo5ktZZPFcFyLzk3xthM-98N88QJFzesg6t+Vr5cQ@mail.gmail.com>
+In-Reply-To: <CA+icZUXDoeo5ktZZPFcFyLzk3xthM-98N88QJFzesg6t+Vr5cQ@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Tue, 12 Jun 2018 11:33:14 -0700
+Message-ID: <CAKwvOdmxFHfkj81YAXa8fE86fC+k+KvqMvgk4=e62pNCcXbKOg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/3] compiler-gcc.h: add gnu_inline to all inline declarations
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>, kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, Andy Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, linux-kernel@vger.kernel.org, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org
+To: sedat.dilek@gmail.com, Arnd Bergmann <arnd@arndb.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>, hpa@zytor.com, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com
 
-On 06/11/2018 11:03 PM, Michael Ellerman wrote:
-> kbuild test robot <lkp@intel.com> writes:
-> 
->> Hi Laura,
->>
->> I love your patch! Yet something to improve:
->>
->> [auto build test ERROR on linus/master]
->> [also build test ERROR on v4.17 next-20180608]
->> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
->>
->> url:    https://github.com/0day-ci/linux/commits/Laura-Abbott/scripts-Preprocess-module-common-lds/20180612-083632
->> config: i386-randconfig-a1-201823 (attached as .config)
->> compiler: gcc-4.9 (Debian 4.9.4-2) 4.9.4
->> reproduce:
->>          # save the attached .config to linux build tree
->>          make ARCH=i386
->>
->> All errors (new ones prefixed by >>):
->>
->>>> ld: cannot open linker script file scripts/module-common.lds: No such file or directory
-> 
-> This seems to need the following.
-> 
-> cheers
-> 
-> 
-> diff --git a/Makefile b/Makefile
-> index 73f0bb2c7a98..55a5725b6606 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -425,7 +425,7 @@ KBUILD_AFLAGS_KERNEL :=
->   KBUILD_CFLAGS_KERNEL :=
->   KBUILD_AFLAGS_MODULE  := -DMODULE
->   KBUILD_CFLAGS_MODULE  := -DMODULE
-> -KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
-> +KBUILD_LDFLAGS_MODULE := -T $(objtree)/scripts/module-common.lds
->   LDFLAGS :=
->   GCC_PLUGINS_CFLAGS :=
->   
-> 
+On Fri, Jun 8, 2018 at 3:04 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>
+> On Fri, Jun 8, 2018 at 9:59 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> > On Thu, Jun 7, 2018 at 10:49 PM, Nick Desaulniers
+> > <ndesaulniers@google.com> wrote:
+> >> Functions marked extern inline do not emit an externally visible
+> >> function when the gnu89 C standard is used. Some KBUILD Makefiles
+> >> overwrite KBUILD_CFLAGS. This is an issue for GCC 5.1+ users as without
+> >> an explicit C standard specified, the default is gnu11. Since c99, the
+> >> semantics of extern inline have changed such that an externally visible
+> >> function is always emitted. This can lead to multiple definition errors
+> >> of extern inline functions at link time of compilation units whose build
+> >> files have removed an explicit C standard compiler flag for users of GCC
+> >> 5.1+ or Clang.
+> >>
+> >> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> >> Suggested-by: H. Peter Anvin <hpa@zytor.com>
+> >> Suggested-by: Joe Perches <joe@perches.com>
+> >
+> > I suspect this will break Geert's gcc-4.1.2, which I think doesn't have that
+> > attribute yet (4.1.3 or higher have it according to the documentation.
+> >
+> > It wouldn't be hard to work around that if we want to keep that version
+> > working, or we could decide that it's time to officially stop supporting
+> > that version, but we should probably decide on one or the other.
 
-Thanks for pointing that out. I think I missed that when refactoring.
-I'll fix that in the next version plus adding your powerpc patch.
+Heh, so earlier we decided against compiler flags (-std=gnu89 or
+-fgnu89-inline) in preference to function attributes.  The function
+attribute is preferable as some of the Makefiles [accidentally?]
+overwrite KBUILD_CFLAGS, which is problematic for gcc 5.1 users as the
+implicit c standard used was changed to gnu11 from gnu89.  What's nice
+is that to support gcc 4.1 users, we simply don't need to add any
+attribute, as their implicit c standard is gnu89 which has the
+semantics for extern inline that we want.  I have a simple change to
+this patch that can support users of various gcc versions, see below:
 
+> Good point.
+> What is the minimum requirement of GCC version currently?
+> AFAICS x86/asm-goto support requires GCC >= 4.5?
+
+Yes, but that's only for x86, IIUC.  It seems the kernel may have
+different minimum required versions of GCC based on arch then?  That
+may be ok, but I'm not sure that's easy to keep track of without
+having it explicitly stated somewhere like the docs perhaps?
+
+> Just FYI...
+> ...saw the last days in upstream commits that kbuild/kconfig for
+> 4.18-rc1 offers possibilities to check for cc-version dependencies.
+
+Those will be helpful.  If we want to pursue compiler flags, which get
+set some Makefiles, then yes.  But I think a simpler change to my
+patch would be as below.
+
+It seems gcc did not get __has_attribute [0] until 5.1, but will
+define __GNUC_GNU_INLINE__ if supported. [1]  Unfortunately, Clang
+does not define __GNUC_GNU_INLINE__ [2].  So a proper feature test
+might look like:
+
+```
+#ifndef __has_attribute
+#define __has_attribute(x) 0
+#endif
+
+#if defined(__GNUC_GNU_INLINE__) || __has_attribute(gnu_inline)
+#define __gnu_inline __attribute__(gnu_inline)
+#endif
+
+#define inline inline __attribute__((always_inline, unused)) notrace
+__gnu_inline
+```
+
+Thoughts on this approach? I can send a v5 tomorrow if there's no
+major issues.  Feedback appreciated, as always.
+
+[0] https://clang.llvm.org/docs/LanguageExtensions.html#has-attribute
+[1] https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#Common-Function-Attributes
+[2] https://bugs.llvm.org/show_bug.cgi?id=37784
+-- 
 Thanks,
-Laura
+~Nick Desaulniers
