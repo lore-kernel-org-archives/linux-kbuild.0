@@ -1,158 +1,169 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ex13-edg-ou-001.vmware.com ([208.91.0.189]:36894 "EHLO
-        EX13-EDG-OU-001.vmware.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1754146AbeFLTFd (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:46583 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754228AbeFLUUM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Jun 2018 15:05:33 -0400
-From: Nadav Amit <namit@vmware.com>
-Subject: [PATCH v4 1/9] Makefile: Prepare for using macros for inline asm
-Date: Tue, 12 Jun 2018 04:50:42 -0700
-Message-ID: <20180612115050.185112-2-namit@vmware.com>
-In-Reply-To: <20180612115050.185112-1-namit@vmware.com>
-References: <20180612115050.185112-1-namit@vmware.com>
+        Tue, 12 Jun 2018 16:20:12 -0400
+Received: by mail-pg0-f65.google.com with SMTP id d2-v6so94073pga.13
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jun 2018 13:20:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20180607204927.219329-1-ndesaulniers@google.com>
+ <20180607204927.219329-2-ndesaulniers@google.com> <CAK8P3a0yi+MrOS=+pjCeUu==YBE_AppB8vfqdsQS-1NpSO2c4A@mail.gmail.com>
+ <CA+icZUXDoeo5ktZZPFcFyLzk3xthM-98N88QJFzesg6t+Vr5cQ@mail.gmail.com>
+ <CAKwvOdmxFHfkj81YAXa8fE86fC+k+KvqMvgk4=e62pNCcXbKOg@mail.gmail.com> <201806121851.w5CIpTY7134381@mail.zytor.com>
+In-Reply-To: <201806121851.w5CIpTY7134381@mail.zytor.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Tue, 12 Jun 2018 13:19:58 -0700
+Message-ID: <CAKwvOdkeEqb0HnHoggpwmHiKtDo06VN0N_r9ffv0rzigNLvXUg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/3] compiler-gcc.h: add gnu_inline to all inline declarations
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, x86@kernel.org
-Cc: Nadav Amit <namit@vmware.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
+To: hpa@zytor.com
+Cc: sedat.dilek@gmail.com, Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao.jin@zytor.com
 
-Using macros for inline assembly improves both readability and
-compilation decisions that are distorted by big assembly blocks that use
-alternative sections. Compile macros.S and use it to assemble all C
-files. Currently, only x86 will use it.
+On Tue, Jun 12, 2018 at 11:51 AM H. Peter Anvin <hpa@zytor.com> wrote:
+>
+> <caoj.fnst@cn.fujitsu.com>,Greg KH <gregkh@linuxfoundation.org>,jarkko.sa=
+kkinen@linux.intel.com,jgross@suse.com,Josh Poimboeuf <jpoimboe@redhat.com>=
+,Matthias Kaehlcke <mka@chromium.org>,thomas.lendacky@amd.com,Thiebaud Weks=
+teen <tweek@google.com>,mjg59@google.com,joe@perches.com
+> From: hpa@zytor.com
+> Message-ID: <191E4EBE-4CB2-4C8B-AB61-689A91FFE7A8@zytor.com>
+>
+> On June 12, 2018 11:33:14 AM PDT, Nick Desaulniers <ndesaulniers@google.c=
+om> wrote:
+> >On Fri, Jun 8, 2018 at 3:04 AM Sedat Dilek <sedat.dilek@gmail.com>
+> >wrote:
+> >>
+> >> On Fri, Jun 8, 2018 at 9:59 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> >> > On Thu, Jun 7, 2018 at 10:49 PM, Nick Desaulniers
+> >> > <ndesaulniers@google.com> wrote:
+> >> >> Functions marked extern inline do not emit an externally visible
+> >> >> function when the gnu89 C standard is used. Some KBUILD Makefiles
+> >> >> overwrite KBUILD_CFLAGS. This is an issue for GCC 5.1+ users as
+> >without
+> >> >> an explicit C standard specified, the default is gnu11. Since c99,
+> >the
+> >> >> semantics of extern inline have changed such that an externally
+> >visible
+> >> >> function is always emitted. This can lead to multiple definition
+> >errors
+> >> >> of extern inline functions at link time of compilation units whose
+> >build
+> >> >> files have removed an explicit C standard compiler flag for users
+> >of GCC
+> >> >> 5.1+ or Clang.
+> >> >>
+> >> >> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> >> >> Suggested-by: H. Peter Anvin <hpa@zytor.com>
+> >> >> Suggested-by: Joe Perches <joe@perches.com>
+> >> >
+> >> > I suspect this will break Geert's gcc-4.1.2, which I think doesn't
+> >have that
+> >> > attribute yet (4.1.3 or higher have it according to the
+> >documentation.
+> >> >
+> >> > It wouldn't be hard to work around that if we want to keep that
+> >version
+> >> > working, or we could decide that it's time to officially stop
+> >supporting
+> >> > that version, but we should probably decide on one or the other.
+> >
+> >Heh, so earlier we decided against compiler flags (-std=3Dgnu89 or
+> >-fgnu89-inline) in preference to function attributes.  The function
+> >attribute is preferable as some of the Makefiles [accidentally?]
+> >overwrite KBUILD_CFLAGS, which is problematic for gcc 5.1 users as the
+> >implicit c standard used was changed to gnu11 from gnu89.  What's nice
+> >is that to support gcc 4.1 users, we simply don't need to add any
+> >attribute, as their implicit c standard is gnu89 which has the
+> >semantics for extern inline that we want.  I have a simple change to
+> >this patch that can support users of various gcc versions, see below:
+> >
+> >> Good point.
+> >> What is the minimum requirement of GCC version currently?
+> >> AFAICS x86/asm-goto support requires GCC >=3D 4.5?
+> >
+> >Yes, but that's only for x86, IIUC.  It seems the kernel may have
+> >different minimum required versions of GCC based on arch then?  That
+> >may be ok, but I'm not sure that's easy to keep track of without
+> >having it explicitly stated somewhere like the docs perhaps?
+> >
+> >> Just FYI...
+> >> ...saw the last days in upstream commits that kbuild/kconfig for
+> >> 4.18-rc1 offers possibilities to check for cc-version dependencies.
+> >
+> >Those will be helpful.  If we want to pursue compiler flags, which get
+> >set some Makefiles, then yes.  But I think a simpler change to my
+> >patch would be as below.
+> >
+> >It seems gcc did not get __has_attribute [0] until 5.1, but will
+> >define __GNUC_GNU_INLINE__ if supported. [1]  Unfortunately, Clang
+> >does not define __GNUC_GNU_INLINE__ [2].  So a proper feature test
+> >might look like:
+> >
+> >```
+> >#ifndef __has_attribute
+> >#define __has_attribute(x) 0
+> >#endif
+> >
+> >#if defined(__GNUC_GNU_INLINE__) || __has_attribute(gnu_inline)
+> >#define __gnu_inline __attribute__(gnu_inline)
+> >#endif
+> >
+> >#define inline inline __attribute__((always_inline, unused)) notrace
+> >__gnu_inline
+> >```
+> >
+> >Thoughts on this approach? I can send a v5 tomorrow if there's no
+> >major issues.  Feedback appreciated, as always.
+> >
+> >[0] https://clang.llvm.org/docs/LanguageExtensions.html#has-attribute
+> >[1]
+> >https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#Commo=
+n-Function-Attributes
+> >[2] https://bugs.llvm.org/show_bug.cgi?id=3D37784
+>
+> Please fix clang. It isn't all that hard to fix.
+>
+> However, __GCC_GNU_INLINE__ means you are in GNU mode by default, on gcc'=
+s new enough to have multiple misses.
+>
+> The right thing to look for is __GCC_STDC_INLINE__ in which case you need=
+ the attribute.
 
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: x86@kernel.org
-Cc: linux-kbuild@vger.kernel.org
+Oh, by [0] __GCC_STDC_INLINE__ is indeed actually the correct symbol
+to check for.  Clang does support that, so nothing to fix there.
 
-Signed-off-by: Nadav Amit <namit@vmware.com>
----
- Makefile                 |  9 +++++++--
- arch/x86/Makefile        | 11 +++++++++--
- arch/x86/kernel/Makefile |  6 ++++++
- arch/x86/kernel/macros.S |  7 +++++++
- scripts/Kbuild.include   |  4 +++-
- 5 files changed, 32 insertions(+), 5 deletions(-)
- create mode 100644 arch/x86/kernel/macros.S
+> By the way, you should check clang against gcc's predefined macros by doi=
+ng:
+>
+> gcc [options] -x c -Wp,-dM -E /dev/null | sort
+>
+> Options can change the predefined macros substantially, especially the, -=
+std=3D, arch and -O options. -x c can be replaced with e.g. -x c++, objecti=
+ve-c, assembler-with-cpp etc.
 
-diff --git a/Makefile b/Makefile
-index 554dcaddbce4..026586db2f26 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1085,7 +1085,7 @@ scripts: scripts_basic include/config/auto.conf include/config/tristate.conf \
- # version.h and scripts_basic is processed / created.
- 
- # Listed in dependency order
--PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
-+PHONY += prepare archprepare macroprepare prepare0 prepare1 prepare2 prepare3
- 
- # prepare3 is used to check if we are building in a separate output directory,
- # and if so do:
-@@ -1109,7 +1109,9 @@ prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h \
-                    include/config/auto.conf
- 	$(cmd_crmodverdir)
- 
--archprepare: archheaders archscripts prepare1 scripts_basic
-+macroprepare: prepare1 archmacros
-+
-+archprepare: archheaders archscripts macroprepare scripts_basic
- 
- prepare0: archprepare gcc-plugins
- 	$(Q)$(MAKE) $(build)=.
-@@ -1214,6 +1216,9 @@ archheaders:
- PHONY += archscripts
- archscripts:
- 
-+PHONY += archmacros
-+archmacros:
-+
- PHONY += __headers
- __headers: $(version_h) scripts_basic uapi-asm-generic archheaders archscripts
- 	$(Q)$(MAKE) $(build)=scripts build_unifdef
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 60135cbd905c..6b82314776fd 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -235,8 +235,8 @@ ifdef CONFIG_X86_64
- LDFLAGS += $(call ld-option, -z max-page-size=0x200000)
- endif
- 
--# Speed up the build
--KBUILD_CFLAGS += -pipe
-+# We cannot use -pipe flag since we give an additional .s file to the compiler
-+#KBUILD_CFLAGS += -pipe
- # Workaround for a gcc prelease that unfortunately was shipped in a suse release
- KBUILD_CFLAGS += -Wno-sign-compare
- #
-@@ -258,11 +258,18 @@ archscripts: scripts_basic
- archheaders:
- 	$(Q)$(MAKE) $(build)=arch/x86/entry/syscalls all
- 
-+archmacros:
-+	$(Q)$(MAKE) $(build)=arch/x86/kernel macros
-+
- archprepare:
- ifeq ($(CONFIG_KEXEC_FILE),y)
- 	$(Q)$(MAKE) $(build)=arch/x86/purgatory arch/x86/purgatory/kexec-purgatory.c
- endif
- 
-+ASM_MACRO_FLAGS = -Wa,arch/x86/kernel/macros.s
-+export ASM_MACRO_FLAGS
-+KBUILD_CFLAGS += $(ASM_MACRO_FLAGS)
-+
- ###
- # Kernel objects
- 
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 02d6f5cf4e70..fdb6c5b2a922 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -9,6 +9,12 @@ extra-y	+= ebda.o
- extra-y	+= platform-quirks.o
- extra-y	+= vmlinux.lds
- 
-+$(obj)/macros.s: $(obj)/macros.S FORCE
-+	$(call if_changed_dep,cpp_s_S)
-+
-+macros: $(obj)/macros.s
-+	@:
-+
- CPPFLAGS_vmlinux.lds += -U$(UTS_MACHINE)
- 
- ifdef CONFIG_FUNCTION_TRACER
-diff --git a/arch/x86/kernel/macros.S b/arch/x86/kernel/macros.S
-new file mode 100644
-index 000000000000..cfc1c7d1a6eb
---- /dev/null
-+++ b/arch/x86/kernel/macros.S
-@@ -0,0 +1,7 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+/*
-+ * This file includes headers whose assembly part includes macros which are
-+ * commonly used. The macros are precompiled into assmebly file which is later
-+ * assembled together with each compiled file.
-+ */
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 50cee534fd64..ad2c02062aa4 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -189,7 +189,9 @@ __cc-option = $(call try-run-cached,\
- 
- # Do not attempt to build with gcc plugins during cc-option tests.
- # (And this uses delayed resolution so the flags will be up to date.)
--CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
-+# In addition, do not include the asm macros which are built later.
-+CC_OPTION_FILTERED = $(GCC_PLUGINS_CFLAGS) $(ASM_MACRO_FLAGS)
-+CC_OPTION_CFLAGS = $(filter-out $(CC_OPTION_FILTERED),$(KBUILD_CFLAGS))
- 
- # cc-option
- # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
--- 
-2.17.0
+Neat, I'll have to bookmark that incantation.  I can s/gcc/clang/ to
+get a similar list (which is how I know it supports
+__GCC_STDC_INLINE__).
 
+Patch now becomes something like:
+
+#ifdef __GNUC_GNU_INLINE__
+#define __gnu_inline __attribute__((gnu_inline))
+#else
+#define __gnu_inline
+#endif
+
+#define inline inline __attribute__((always_inline, unused)) notrace
+__gnu_inline
+...
+
+Issues with that approach?
+
+[0] https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
+--=20
+Thanks,
+~Nick Desaulniers
