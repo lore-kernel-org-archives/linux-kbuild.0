@@ -1,96 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f67.google.com ([209.85.160.67]:39858 "EHLO
-        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934801AbeFLAcw (ORCPT
+Received: from mail-io0-f193.google.com ([209.85.223.193]:33075 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933350AbeFLBaE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Jun 2018 20:32:52 -0400
-Received: by mail-pl0-f67.google.com with SMTP id f1-v6so13309027plt.6
-        for <linux-kbuild@vger.kernel.org>; Mon, 11 Jun 2018 17:32:52 -0700 (PDT)
-From: Laura Abbott <labbott@redhat.com>
-Subject: [PATCHv4 2/3] kbuild: Introduce build-salt linker section and config option
-Date: Mon, 11 Jun 2018 17:32:23 -0700
-Message-Id: <20180612003224.3658-3-labbott@redhat.com>
-In-Reply-To: <20180612003224.3658-1-labbott@redhat.com>
+        Mon, 11 Jun 2018 21:30:04 -0400
+MIME-Version: 1.0
 References: <20180612003224.3658-1-labbott@redhat.com>
+In-Reply-To: <20180612003224.3658-1-labbott@redhat.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 11 Jun 2018 18:29:53 -0700
+Message-ID: <CA+55aFwG-UwwHHuOWFnC3tphyEcyfx1zQMx8JuxmUGWo4YwD-Q@mail.gmail.com>
+Subject: Re: [PATCHv4 0/3] Salted build ids via linker sections
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Laura Abbott <labbott@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, linux-kernel@vger.kernel.org, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org
+To: Laura Abbott <labbott@redhat.com>
+Cc: Andrew Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H.J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, the arch/x86 maintainers <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, nickc@redhat.com, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
+On Mon, Jun 11, 2018 at 5:32 PM Laura Abbott <labbott@redhat.com> wrote:
+>
+> v4 takes Linus' suggestion of using linker fill to insert the build id.
 
-The build id generated from --build-id can be generated in several different
-ways, with the default being the sha1 on the output of the linked file. For
-distributions, it can be useful to make sure this ID is unique, even if the
-actual file contents don't change. The easiest way to do this is to insert
-a section with some data.
+Heh. I was hoping somebody would come up with a way to avoid my crazy
+"put a LONG into an aligned section to cause alignment filling" thing.
 
-Introduce a macro to insert a linker section which will be filled
-with a hex value. This will ensure the build id can be changed just via
-a config option. Users who don't care about this can leave the
-default value and strip the section.
+Because somebody will ask "what the heck is the meaning of that
+LONG(0xffaa5500) thing"?
 
-Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: Laura Abbott <labbott@redhat.com>
----
- include/asm-generic/vmlinux.lds.h | 6 ++++++
- init/Kconfig                      | 9 +++++++++
- scripts/module-common.lds.S       | 4 ++++
- 3 files changed, 19 insertions(+)
+But since I couldn't come up with anything better myself, I guess I
+can't complain.
 
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index e373e2e10f6a..4af7e683aad2 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -830,6 +830,12 @@
- #define PERCPU_DECRYPTED_SECTION
- #endif
- 
-+#define	BUILD_SALT							\
-+	. = ALIGN(32);							\
-+	.salt : AT(ADDR(.salt) - LOAD_OFFSET) {				\
-+	  LONG(0xffaa5500);						\
-+	  . = ALIGN(32);						\
-+	} = CONFIG_BUILD_ID_SALT					\
- 
- /*
-  * Default discarded sections.
-diff --git a/init/Kconfig b/init/Kconfig
-index d2b8b2ea097e..eb92ccfe4ecb 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1967,3 +1967,12 @@ config ARCH_HAS_SYNC_CORE_BEFORE_USERMODE
- # <asm/syscall_wrapper.h>.
- config ARCH_HAS_SYSCALL_WRAPPER
- 	def_bool n
-+
-+config BUILD_ID_SALT
-+	hex "Build ID Salt"
-+	default 0x12345678
-+	help
-+	   The build ID is used to link binaries and their debug info. Setting
-+	   this option will use the value in the calculation of the build id.
-+	   This is mostly useful for distributions which want to ensure the
-+	   build is unique between builds. It's safe to leave the default.
-diff --git a/scripts/module-common.lds.S b/scripts/module-common.lds.S
-index d61b9e8678e8..3c8410270ac1 100644
---- a/scripts/module-common.lds.S
-+++ b/scripts/module-common.lds.S
-@@ -3,6 +3,9 @@
-  * Archs are free to supply their own linker scripts.  ld will
-  * combine them automatically.
-  */
-+
-+#include <asm-generic/vmlinux.lds.h>
-+
- SECTIONS {
- 	/DISCARD/ : {
- 		*(.discard)
-@@ -23,4 +26,5 @@ SECTIONS {
- 	.init_array		0 : ALIGN(8) { *(SORT(.init_array.*)) *(.init_array) }
- 
- 	__jump_table		0 : ALIGN(8) { KEEP(*(__jump_table)) }
-+	BUILD_SALT
- }
--- 
-2.18.0.rc1
+> This is pretty small but I also know people can be picky so I'm open to opinions or suggestions here.
 
+I'm not sure anybody will care about 32 bytes. Although maybe it could
+be made to be just 8 bytes (four bytes to force padding, four bytes of
+padding) and put somewhere where you'll have more padding anyway due
+to being followed by a PAGE_ALIGNED section or something?
+
+I don't think we care.
+
+Anyway, I'll pull this if somebody sends it to me, it seems to be
+fairly minimally invasive and apparently fixes an issue for distros.
+
+                Linus
