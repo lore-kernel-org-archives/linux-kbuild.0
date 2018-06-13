@@ -1,94 +1,299 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:51860 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933643AbeFMF2n (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:18988 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754416AbeFMGHo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Jun 2018 01:28:43 -0400
-Subject: Re: [PATCH v2] nconf: respect i-search pattern boundaries
-References: <20180612190604.4889-1-dirk@gouders.net>
- <d22bf7c4-45ce-3354-8bbc-feb9c755f92c@infradead.org>
- <gh602nfen1.fsf@lena.gouders.net>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <fd325c0e-e957-c465-da02-54642a6e8a58@infradead.org>
-Date: Tue, 12 Jun 2018 22:28:39 -0700
+        Wed, 13 Jun 2018 02:07:44 -0400
 MIME-Version: 1.0
-In-Reply-To: <gh602nfen1.fsf@lena.gouders.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20180612003224.3658-3-labbott@redhat.com>
+References: <20180612003224.3658-1-labbott@redhat.com> <20180612003224.3658-3-labbott@redhat.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 13 Jun 2018 15:06:44 +0900
+Message-ID: <CAK7LNASB3Jdj3TwWJGmSEsrXWfJX8xcm1ZN2gKwY7P8hReog-w@mail.gmail.com>
+Subject: Re: [PATCHv4 2/3] kbuild: Introduce build-salt linker section and
+ config option
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Laura Abbott <labbott@redhat.com>
+Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 06/12/2018 10:18 PM, Dirk Gouders wrote:
-> Randy Dunlap <rdunlap@infradead.org> writes:
-> 
->> On 06/12/2018 12:06 PM, Dirk Gouders wrote:
->>> This patch adds boundary checks for nconf's i-search pattern.
->>>
->>> Further, the pattern buffer is always bzero'ed when '/' is
->>> pressed, so the second line in the code below was not needed (and
->>> otherwise wouldn't have worked as expected):
->>>
->>> 	state->pattern[strlen(state->pattern)] = c;
->>> 	state->pattern[strlen(state->pattern)] = '\0';
->>>
->>> Finally, the pattern length was reduced to a length that still
->>> seems sufficient but will not fill more than the top line of the
->>> screen, thus eliminating special treatment needs on resizes or normal
->>> exit of i-search.
->>>
->>> Signed-off-by: Dirk Gouders <dirk@gouders.net>
->>> ---
->>> Changes in v2: Correct S-O-B line, remove double search from subject.
->>> ---
->>>  scripts/kconfig/nconf.c | 10 ++++++----
->>>  1 file changed, 6 insertions(+), 4 deletions(-)
->>
->> Hi Dirk,
->>
->> For v1 of the patch:  no, I wasn't using PageUp/PageDown, just the up/down arrow
->> keys.
->>
->> Maybe I'm confused about /search in nconfig.  nconfig Help says:
->>
->>  ││ Start incremental, case-insensitive search for STRING in menu entries,   ││
->>  ││     no regex support, STRING is displayed in upper left corner           ││
->>  ││                             </>STRING                                    ││
->>  ││     Remove last character   <Backspace>                                  ││
->>  ││     Jump to next hit        <Down>                                       ││
->>  ││     Jump to previous hit    <Up>                                         ││
->>  ││ Exit menu search mode       </>  <Esc>
->>
->> First of all, does this only search in the Kconfig prompt strings?
-> 
-> Hi Randy,
-> 
-> yes, it only searches the items in the current menu and this
-> probably was the reason to make you think the arrow keys don't work.
-> 
-> This is also the case for the i-search RFC I posted for mconf.  I know,
-> it would be extremely convenient to i-search in _all_ config symbols from
-> the top level menu and then navigate to the submenus that contain
-> matches but such a change needs a lot more work to be done.
-> 
+Hi.
 
-Ah, I see.  Thanks for explaining.
 
-> 
->> (from top-level menu)
->> OK, I want to search for "debug", so I enter "/debug" and the upper left
->> corner displays: searching: debug
->>
->> The nconfig highlight bar goes to the Device Drivers menu.
->> That's it.  It hasn't found "debug" (it found "de" AFAICT).
->> Using Up/Down arrow keys don't do anything.  I gave up.
->>
->> What am I doing wrong?
->>
->> thanks,
+2018-06-12 9:32 GMT+09:00 Laura Abbott <labbott@redhat.com>:
+>
+> The build id generated from --build-id can be generated in several different
+> ways, with the default being the sha1 on the output of the linked file. For
+> distributions, it can be useful to make sure this ID is unique, even if the
+> actual file contents don't change. The easiest way to do this is to insert
+> a section with some data.
+>
+> Introduce a macro to insert a linker section which will be filled
+> with a hex value. This will ensure the build id can be changed just via
+> a config option. Users who don't care about this can leave the
+> default value and strip the section.
+>
+> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Signed-off-by: Laura Abbott <labbott@redhat.com>
+> ---
+>  include/asm-generic/vmlinux.lds.h | 6 ++++++
+>  init/Kconfig                      | 9 +++++++++
+>  scripts/module-common.lds.S       | 4 ++++
+>  3 files changed, 19 insertions(+)
+>
+> diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+> index e373e2e10f6a..4af7e683aad2 100644
+> --- a/include/asm-generic/vmlinux.lds.h
+> +++ b/include/asm-generic/vmlinux.lds.h
+> @@ -830,6 +830,12 @@
+>  #define PERCPU_DECRYPTED_SECTION
+>  #endif
+>
+> +#define        BUILD_SALT                                                      \
+> +       . = ALIGN(32);                                                  \
+> +       .salt : AT(ADDR(.salt) - LOAD_OFFSET) {                         \
+> +         LONG(0xffaa5500);                                             \
+> +         . = ALIGN(32);                                                \
+> +       } = CONFIG_BUILD_ID_SALT                                        \
+
+
+What is 0xffaa5500 ?
+
+Is it another salt in addition to CONFIG_BUILD_ID_SALT ?
+
+Or, does it have a special meaning?
+
+
+
+>  /*
+>   * Default discarded sections.
+> diff --git a/init/Kconfig b/init/Kconfig
+> index d2b8b2ea097e..eb92ccfe4ecb 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -1967,3 +1967,12 @@ config ARCH_HAS_SYNC_CORE_BEFORE_USERMODE
+>  # <asm/syscall_wrapper.h>.
+>  config ARCH_HAS_SYSCALL_WRAPPER
+>         def_bool n
+> +
+> +config BUILD_ID_SALT
+> +       hex "Build ID Salt"
+> +       default 0x12345678
+> +       help
+> +          The build ID is used to link binaries and their debug info. Setting
+> +          this option will use the value in the calculation of the build id.
+> +          This is mostly useful for distributions which want to ensure the
+> +          build is unique between builds. It's safe to leave the default.
+
+
+If you run "make menuconfig",
+you will notice this looks so strange;
+"Build ID Salt" is displayed in the top level menu.
+
+
+
+
+
+
+> diff --git a/scripts/module-common.lds.S b/scripts/module-common.lds.S
+> index d61b9e8678e8..3c8410270ac1 100644
+> --- a/scripts/module-common.lds.S
+> +++ b/scripts/module-common.lds.S
+> @@ -3,6 +3,9 @@
+>   * Archs are free to supply their own linker scripts.  ld will
+>   * combine them automatically.
+>   */
+> +
+> +#include <asm-generic/vmlinux.lds.h>
+> +
+
+You are pulling many macros in <asm-generic/vmlinux.lds.h>
+into modules, VDSO, etc.
+
+
+You also need to touch
+arch/*/kernel/vmlinux.lds.S
+of all architectures.
+
+This is not so nice.
+
+
+
+
+>  SECTIONS {
+>         /DISCARD/ : {
+>                 *(.discard)
+> @@ -23,4 +26,5 @@ SECTIONS {
+>         .init_array             0 : ALIGN(8) { *(SORT(.init_array.*)) *(.init_array) }
+>
+>         __jump_table            0 : ALIGN(8) { KEEP(*(__jump_table)) }
+> +       BUILD_SALT
+>  }
+> --
+> 2.18.0.rc1
+
+
+
+I was playing with a different approach.
+
+Instead of touching linker scripts around,
+how about putting the salt into an elfnote?
+
+
+The compiler puts the build ID
+into the '.note.gnu.build-id' section.
+
+So, I guess it is sensible to put
+the salt into '.note.*' section as well.
+
+
+I attached my trial below:
+
+
+ - I moved 'config BUILD_SALT' to a better location
+   so that it will be displayed in the "General setup" menu.
+
+ - I added 'range 0 0xffffffff' to avoid warnings.
+
+ - I renamed the config symbol to CONFIG_BUILD_SALT
+   and change the default to 0x0.
+   Of course, this is just bike-shed things, though..
+
+ - It looks like 'owner=Linux, type_id=0'
+   is already used in VDSO.
+   https://github.com/torvalds/linux/blob/v4.17/arch/arm64/kernel/vdso/note.S#L26
+
+   I chose 0x100 for the type id, but it could be a different value
+
+
+diff --git a/arch/x86/entry/vdso/vdso-note.S b/arch/x86/entry/vdso/vdso-note.S
+index 79a071e..7942317 100644
+--- a/arch/x86/entry/vdso/vdso-note.S
++++ b/arch/x86/entry/vdso/vdso-note.S
+@@ -3,6 +3,7 @@
+  * Here we can supply some information useful to userland.
+  */
+
++#include <linux/build-salt.h>
+ #include <linux/uts.h>
+ #include <linux/version.h>
+ #include <linux/elfnote.h>
+@@ -10,3 +11,5 @@
+ ELFNOTE_START(Linux, 0, "a")
+        .long LINUX_VERSION_CODE
+ ELFNOTE_END
++
++BUILD_SALT
+diff --git a/arch/x86/entry/vdso/vdso32/note.S
+b/arch/x86/entry/vdso/vdso32/note.S
+index 9fd51f2..e78047d 100644
+--- a/arch/x86/entry/vdso/vdso32/note.S
++++ b/arch/x86/entry/vdso/vdso32/note.S
+@@ -4,6 +4,7 @@
+  * Here we can supply some information useful to userland.
+  */
+
++#include <linux/build-salt.h>
+ #include <linux/version.h>
+ #include <linux/elfnote.h>
+
+@@ -14,6 +15,8 @@ ELFNOTE_START(Linux, 0, "a")
+        .long LINUX_VERSION_CODE
+ ELFNOTE_END
+
++BUILD_SALT
++
+ #ifdef CONFIG_XEN
+ /*
+  * Add a special note telling glibc's dynamic linker a fake hardware
+diff --git a/include/linux/build-salt.h b/include/linux/build-salt.h
+new file mode 100644
+index 0000000..66e87c9
+--- /dev/null
++++ b/include/linux/build-salt.h
+@@ -0,0 +1,20 @@
++#ifndef __BUILD_SALT_H
++#define __BUILD_SALT_H
++
++#include <linux/elfnote.h>
++
++#define LINUX_ELFNOTE_BUILD_SALT       0x100
++
++#ifdef __ASSEMBLER__
++
++#define BUILD_SALT \
++       ELFNOTE(Linux, LINUX_ELFNOTE_BUILD_SALT, .long CONFIG_BUILD_SALT)
++
++#else
++
++#define BUILD_SALT \
++       ELFNOTE32("Linux", LINUX_ELFNOTE_BUILD_SALT, CONFIG_BUILD_SALT)
++
++#endif
++
++#endif /* __BUILD_SALT_H */
+diff --git a/init/Kconfig b/init/Kconfig
+index d2b8b2e..54b5828 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -92,6 +92,16 @@ config LOCALVERSION_AUTO
+
+          which is done within the script "scripts/setlocalversion".)
+
++config BUILD_SALT
++       hex "Build ID Salt"
++       default 0x0
++       range 0 0xffffffff
++       help
++          The build ID is used to link binaries and their debug info. Setting
++          this option will use the value in the calculation of the build id.
++          This is mostly useful for distributions which want to ensure the
++          build is unique between builds. It's safe to leave the default.
++
+ config HAVE_KERNEL_GZIP
+        bool
+
+diff --git a/init/version.c b/init/version.c
+index bfb4e3f..ef4012e 100644
+--- a/init/version.c
++++ b/init/version.c
+@@ -7,6 +7,7 @@
+  */
+
+ #include <generated/compile.h>
++#include <linux/build-salt.h>
+ #include <linux/export.h>
+ #include <linux/uts.h>
+ #include <linux/utsname.h>
+@@ -49,3 +50,5 @@ const char linux_proc_banner[] =
+        "%s version %s"
+        " (" LINUX_COMPILE_BY "@" LINUX_COMPILE_HOST ")"
+        " (" LINUX_COMPILER ") %s\n";
++
++BUILD_SALT;
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 1663fb1..dc6d714 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2125,10 +2125,13 @@ static int check_modname_len(struct module *mod)
+  **/
+ static void add_header(struct buffer *b, struct module *mod)
+ {
++       buf_printf(b, "#include <linux/build-salt.h>\n");
+        buf_printf(b, "#include <linux/module.h>\n");
+        buf_printf(b, "#include <linux/vermagic.h>\n");
+        buf_printf(b, "#include <linux/compiler.h>\n");
+        buf_printf(b, "\n");
++       buf_printf(b, "BUILD_SALT;\n");
++       buf_printf(b, "\n");
+        buf_printf(b, "MODULE_INFO(vermagic, VERMAGIC_STRING);\n");
+        buf_printf(b, "MODULE_INFO(name, KBUILD_MODNAME);\n");
+        buf_printf(b, "\n");
+
+
 
 
 -- 
-~Randy
+Best Regards
+Masahiro Yamada
