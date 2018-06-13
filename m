@@ -1,37 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:56920 "EHLO
-        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935302AbeFMUgT (ORCPT
+Received: from mail-pl0-f65.google.com ([209.85.160.65]:42689 "EHLO
+        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935764AbeFMVFd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Jun 2018 16:36:19 -0400
-Date: Wed, 13 Jun 2018 22:36:14 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH v4 1/9] Makefile: Prepare for using macros for inline asm
-Message-ID: <20180613203614.GB10472@ravnborg.org>
-References: <20180612115050.185112-1-namit@vmware.com>
- <20180612115050.185112-2-namit@vmware.com>
- <CAK7LNATmjTi4Odp5AfbVHCemn7S_tB9nKvgNOf5sp8BiVJma7Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATmjTi4Odp5AfbVHCemn7S_tB9nKvgNOf5sp8BiVJma7Q@mail.gmail.com>
+        Wed, 13 Jun 2018 17:05:33 -0400
+Received: by mail-pl0-f65.google.com with SMTP id w17-v6so2220869pll.9
+        for <linux-kbuild@vger.kernel.org>; Wed, 13 Jun 2018 14:05:33 -0700 (PDT)
+From: Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v5 0/3] extern inline native_save_fl for paravirt
+Date: Wed, 13 Jun 2018 14:05:15 -0700
+Message-Id: <20180613210518.113983-1-ndesaulniers@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nadav Amit <namit@vmware.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: akpm@linux-foundation.org, hpa@zytor.com, mingo@redhat.com, tglx@linutronix.de
+Cc: linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, sedat.dilek@gmail.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, arnd@arndb.de, rientjes@google.com, acme@redhat.com, pombredanne@nexb.com, aryabinin@virtuozzo.com, kstewart@linuxfoundation.org, boris.ostrovsky@oracle.com, jan.kiszka@siemens.com, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, ard.biesheuvel@linaro.org, akataria@vmware.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, mka@chromium.org, ndesaulniers@google.com, thomas.lendacky@amd.com, tweek@google.com, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com
 
-> 
-> > +macros: $(obj)/macros.s
-> > +       @:
-> 
-> If you add a phony target, it should be added to 'PHONY'.
+paravirt depends on a custom calling convention (callee saved), but
+expects this from a static inline function that it then forces to be
+outlined. This is problematic because different compilers or flags can
+then add a stack guard that violates the calling conventions.
 
-Or this part:
-> +archmacros:
-> +       $(Q)$(MAKE) $(build)=arch/x86/kernel macros
+Uses extern inline with the out-of-line definition in assembly to
+prevent compilers from adding stack guards to the outlined version.
 
-could be modified to specify the exact filename so this indirection is not needed.
+Other parts of the codebase overwrite KBUILD_CFLAGS, which is *extremely
+problematic* for extern inline, as the sematics are completely the
+opposite depending on what C standard is used.
+http://blahg.josefsipek.net/?p=529
 
-PS. Only one file posted to kbuild, so impossible to review as context is missing.
+Changes since v4:
+  Take Arnd's and hpa's suggestions properly feature detect gnu_inline
+  attribute to support gcc 4.1.
 
-	Sam
+Changes since v3:
+  Take Joe's suggestion to hoist __inline__ and __inline out of
+  conditional block.
+
+Changes since v2:
+  Take hpa's _ASM_ARG patch into the set in order to simplify cross
+  32b/64b x86 assembly and rebase my final patch to use it.  Apply
+  Sedat's typo fix to commit message and sign off on it. Take Joe's
+  suggestion to simplify __inline__ and __inline. Add Arnd to list of
+  folks who made helpful suggestions.
+
+Changes since v1:
+  Prefer gnu_inline function attribute instead of explicitly setting C
+  standard compiler flag in problematic Makefiles. We should instead
+  carefully evaluate if those Makefiles should be overwriting
+  KBUILD_CFLAGS at all. Dropped the previous first two patches and added
+  a new first patch.
+
+H. Peter Anvin (1):
+  x86/asm: add _ASM_ARG* constants for argument registers to <asm/asm.h>
+
+Nick Desaulniers (2):
+  compiler-gcc.h: add gnu_inline to all inline declarations
+  x86: paravirt: make native_save_fl extern inline
+
+ arch/x86/include/asm/asm.h      | 59 +++++++++++++++++++++++++++++++++
+ arch/x86/include/asm/irqflags.h |  2 +-
+ arch/x86/kernel/Makefile        |  1 +
+ arch/x86/kernel/irqflags.S      | 26 +++++++++++++++
+ include/linux/compiler-gcc.h    | 29 ++++++++++++----
+ 5 files changed, 109 insertions(+), 8 deletions(-)
+ create mode 100644 arch/x86/kernel/irqflags.S
+
+-- 
+2.18.0.rc1.244.gcf134e6275-goog
+
