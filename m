@@ -1,70 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f67.google.com ([209.85.160.67]:40702 "EHLO
-        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933533AbeFLVgc (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:59594 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932596AbeFMAHS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Jun 2018 17:36:32 -0400
-Received: by mail-pl0-f67.google.com with SMTP id t12-v6so225356plo.7
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jun 2018 14:36:32 -0700 (PDT)
+        Tue, 12 Jun 2018 20:07:18 -0400
+Subject: Re: uapi headers userspace build results
+References: <8b90457a-5b1d-818c-d2d6-ba3d16ad3eaf@infradead.org>
+ <1ef3a7b9-5172-9f7a-01fa-4866e765fbbe@google.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <b5a73c3f-b70d-110f-896d-82fd81982cf8@infradead.org>
+Date: Tue, 12 Jun 2018 17:07:16 -0700
 MIME-Version: 1.0
-References: <20180607204927.219329-1-ndesaulniers@google.com>
- <20180607204927.219329-2-ndesaulniers@google.com> <CAK8P3a0yi+MrOS=+pjCeUu==YBE_AppB8vfqdsQS-1NpSO2c4A@mail.gmail.com>
- <CA+icZUXDoeo5ktZZPFcFyLzk3xthM-98N88QJFzesg6t+Vr5cQ@mail.gmail.com>
- <CAKwvOdmxFHfkj81YAXa8fE86fC+k+KvqMvgk4=e62pNCcXbKOg@mail.gmail.com>
- <201806121851.w5CIpTY7134381@mail.zytor.com> <CAKwvOdkeEqb0HnHoggpwmHiKtDo06VN0N_r9ffv0rzigNLvXUg@mail.gmail.com>
- <7e375fab-f8ad-705a-dd04-f7e18952bd0c@zytor.com>
-In-Reply-To: <7e375fab-f8ad-705a-dd04-f7e18952bd0c@zytor.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Tue, 12 Jun 2018 14:36:19 -0700
-Message-ID: <CAKwvOdksGzdeFOAiYRNahFqxRoYoTMGkTeprfP4oZPzdF94WLA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/3] compiler-gcc.h: add gnu_inline to all inline declarations
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1ef3a7b9-5172-9f7a-01fa-4866e765fbbe@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: hpa@zytor.com
-Cc: sedat.dilek@gmail.com, Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com
+To: Jayant Chowdhary <jchowdhary@google.com>, LKML <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, kernel-team@android.com
 
-On Tue, Jun 12, 2018 at 2:31 PM H. Peter Anvin <hpa@zytor.com> wrote:
->
-> On 06/12/18 13:19, Nick Desaulniers wrote:
-> >
-> > Oh, by [0] __GCC_STDC_INLINE__ is indeed actually the correct symbol
-> > to check for.  Clang does support that, so nothing to fix there.
-> >
-> >> By the way, you should check clang against gcc's predefined macros by doing:
-> >>
-> >> gcc [options] -x c -Wp,-dM -E /dev/null | sort
-> >>
-> >> Options can change the predefined macros substantially, especially the, -std=, arch and -O options. -x c can be replaced with e.g. -x c++, objective-c, assembler-with-cpp etc.
-> >
-> > Neat, I'll have to bookmark that incantation.  I can s/gcc/clang/ to
-> > get a similar list (which is how I know it supports
-> > __GCC_STDC_INLINE__).>
->
-> I bet that if you add -fgnu89-inlines then it *does* define
-> __GNUC_GNU_INLINE__.
+On 06/12/2018 01:39 PM, Jayant Chowdhary wrote:
+> Hi Randy,
+> 
+> On 06/11/2018 10:49 PM, Randy Dunlap wrote:
+>> Hi,
+>>
+>> Here is what I have so far.  It begins with a makefile and some
+>> template files that are added to.  There's a good bit of Perl also.
+>>
+>> I put all of these files in tools/uapi/ and run them from there.
+>>
+>> There is one .c file generated for each .h file in builddir/usr/include
+>> (O=builddir).
+>>
+> 
+> Thanks for this! I wrote a small Makefile (uapi-compile.mk) which I'd put in
+> tools/build (I can change this to tools/uapi, if that is more apt).
 
-Indeed! I see what you mean about [options] changing the predefined symbol list.
+Your makefile foo is much better than mine is.
+Yes, I think that it deserves to be in its own sub-directory.
 
-> > Patch now becomes something like:
-> >
-> > #ifdef __GNUC_GNU_INLINE__
-> > #define __gnu_inline __attribute__((gnu_inline))
-> > #else
-> > #define __gnu_inline
-> > #endif
-> >
-> > #define inline inline __attribute__((always_inline, unused)) notrace
-> > __gnu_inline
-> > ...
-> >
-> > Issues with that approach?
-> >
->
-> s/__GNUC_GNU_INLINE__/__GNUC_STDC_INLINE__/
+> uapi-compile.mk straight-away compiles the uapi headers, without pulling them
+> into any generated c source files. It may also be invoked with an environment
 
-Oops, sorry, yes good catch.
+Hm, I didn't even know that is possible.
 
+> variable 'UAPI_DIR' specifying the directory, for which the user would like to
+> compile headers. This way we can test a directory at a time as well. In your
+
+Yes, good, I was planning to make a way to restrict the build to certain sub-dirs.
+
+> opinion, would this be simpler to have rather than having to auto-generate c
+> source files including each uapi header and also autog-enerating the make
+> targets? I feel like this approach would make maintaining these makefiles/
+> scripts easier as well.
+
+Sure, this is much better than my scripts.
+
+>> Out of 889 header files, I see 45 errors.  That is better than I expected.
+>>
+>> The makefiles and scripts are attached (tar), as well as the output (I used
+>> 'make -ik' so that make would keep going after errors and attempt to build
+>> all target files).
+>>
+>> have fun!
+>>
+> 
+> I did a 'make ARCH=arm64 headers_install' from the kernel source's root, and
+> then a 'make -kf uapi-compile.mk all > build.log 2>&1' to compile all the
+> headers. Out of 864 headers, I see 20 compilation failures.
+> 
+> I'm attaching uapi-compile.mk and the build.log file along.
+
+I have some usage comments.
+
+Since I ran 'make ARCH=x86_64 O=xx64 headers_install', I had to modify
+uapi-compile.mk to use that SRC_DIR:
+
+SRC_DIR :=../../xx64
+
+Also, I first tried to make BDIR as a sub-directory of tools/uapi/ and
+uapi-compile.mk did not work (when using BDIR=BDIR).
+Then I did 'mkdir ../../xx64/BDIR' and specified BDIR=../../xx64/BDIR and
+that worked.  But:  that sub-dir is not used:
+
+gcc -I../../xx64/usr/include/ --include=../../xx64/usr/include/linux/posix_types.h --include=../../xx64/usr/include/asm-generic/ipcbuf.h --include=stdarg.h --include=stdint.h --include=stddef.h -c ../../xx64/usr/include//linux/caif/caif_socket.h -o ../../xx64/BDIR/../../xx64/usr/include//linux/caif/caif_socket.o
+[see the next comment]
+
+Oh, this makefile builds the .o files in the same sub-dirs as their
+respective .h files.  I don't especially like that, but as long as
+make clean works, it will do.  [and make clean does work]
+
+Thanks.
 -- 
-Thanks,
-~Nick Desaulniers
+~Randy
