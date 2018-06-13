@@ -1,15 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:53968 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935564AbeFMPze (ORCPT
+Received: from mail-it0-f66.google.com ([209.85.214.66]:52641 "EHLO
+        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935404AbeFMQD2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Jun 2018 11:55:34 -0400
+        Wed, 13 Jun 2018 12:03:28 -0400
 MIME-Version: 1.0
 References: <CAK7LNARDLbEhbJGrKY6HGwfxL8ebAMBDa_2A+s2QkzQGEKyFHQ@mail.gmail.com>
-In-Reply-To: <CAK7LNARDLbEhbJGrKY6HGwfxL8ebAMBDa_2A+s2QkzQGEKyFHQ@mail.gmail.com>
+ <CA+55aFyxY9f9_eGv3CvA0zwzo8K5WeNbNPDFuyhtCrzRyic85A@mail.gmail.com>
+In-Reply-To: <CA+55aFyxY9f9_eGv3CvA0zwzo8K5WeNbNPDFuyhtCrzRyic85A@mail.gmail.com>
 From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 13 Jun 2018 08:55:22 -0700
-Message-ID: <CA+55aFyxY9f9_eGv3CvA0zwzo8K5WeNbNPDFuyhtCrzRyic85A@mail.gmail.com>
+Date: Wed, 13 Jun 2018 09:03:16 -0700
+Message-ID: <CA+55aFy2KEzTiF=0nG8_RFoPpycaqc=n-hf-mQSbKotMzYJG-w@mail.gmail.com>
 Subject: Re: [GIT PULL] Kbuild updates for 4.18 (2nd round)
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,42 +18,46 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-On Wed, Jun 13, 2018 at 7:47 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Wed, Jun 13, 2018 at 8:55 AM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> Please pull more Kbuild updates.
+> On Wed, Jun 13, 2018 at 7:47 AM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> >
+> > Please pull more Kbuild updates.
+>
+> Pulled. However, I notice a few oddities.
 
-Pulled. However, I notice a few oddities.
+Oh, and one actual bug: "make oldconfig" doesn't work right.
 
-This causes a non-clang build to have
+I used to have
 
-    CLANG_VERSION=0
+  CONFIG_HAVE_CC_STACKPROTECTOR=y
+  # CONFIG_CC_STACKPROTECTOR_NONE is not set
+  # CONFIG_CC_STACKPROTECTOR_REGULAR is not set
+  # CONFIG_CC_STACKPROTECTOR_STRONG is not set
+  CONFIG_CC_STACKPROTECTOR_AUTO=y
 
-in the config file. Maybe that's intentional to simplify other
-expressions (ie allow "depends on CLANG_VERSION > xyz" elsewhere), but
-it does look a bit odd. It looks like GCC_VERSION does the same. But
-wouldn't that work even if  it's undefined (I didn't check the Kconfig
-language rules)?
+which means that since my compiler supports -fstack-protector-strong,
+I should get CONFIG_CC_STACKPROTECTOR_STRONG.
 
-So if it _wasn't_ intentional, maybe add a
+But that's not at all what I get. I get
 
-        depends on CC_IX_xyz
+  CONFIG_HAVE_CC_STACKPROTECTOR=y
+  CONFIG_CC_HAS_STACKPROTECTOR_NONE=y
+  CONFIG_CC_STACKPROTECTOR=y
+  # CONFIG_CC_STACKPROTECTOR_STRONG is not set
+  CONFIG_CC_HAS_SANE_STACKPROTECTOR=y
 
-to the 'xyz_VERSION' config options? That would seem to be a bit more
-logical to me.
+ie CONFIG_CC_STACKPROTECTOR_STRONG basically went away.
 
-Also, we already had one bug in the compiler detection due to the grep
-looking at the wrong lines earlier. Shouldn't we have some sanity
-checking of the CC_IS_xyz things?
+The reason for that is that it takes the *old* value of
+CONFIG_CC_STACKPROTECTOR_STRONG, which was "no", but that's wrong.
 
-IOW, maybe we should error out if we see *both* CC_IS_GCC and
-CC_IS_CLANG, but also if we see neither?
+The meaning of the config option has changed, but it took the default
+from the old meaning, and decided that I shouldn't get strong stack
+protection any more.
 
-Other than those small nit-picks, I  really like how it's more
-legible, in addition to this part:
+This is a pretty dangerous silent change.
 
- 26 files changed, 173 insertions(+), 308 deletions(-)
-
-Thanks,
-
-          Linus
+               Linus
