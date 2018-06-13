@@ -1,47 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:37719 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750939AbeFMJrD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Jun 2018 05:47:03 -0400
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCHv4 1/3] scripts: Preprocess module-common.lds
-In-Reply-To: <1d6bf671-ec88-2d04-065c-96045759c680@redhat.com>
-References: <20180612003224.3658-2-labbott@redhat.com> <201806120915.NeKL1aUj%fengguang.wu@intel.com> <8736xsv8w3.fsf@concordia.ellerman.id.au> <1d6bf671-ec88-2d04-065c-96045759c680@redhat.com>
-Date: Wed, 13 Jun 2018 19:46:57 +1000
-Message-ID: <87y3fjrpbi.fsf@concordia.ellerman.id.au>
+Received: from mail-oi0-f46.google.com ([209.85.218.46]:33510 "EHLO
+        mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935296AbeFMMT7 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 13 Jun 2018 08:19:59 -0400
+Received: by mail-oi0-f46.google.com with SMTP id c6-v6so2105832oiy.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 13 Jun 2018 05:19:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+From: Mathieu Malaterre <malat@debian.org>
+Date: Wed, 13 Jun 2018 14:19:44 +0200
+Message-ID: <CA+7wUszK=FNu6_duoaQfs4z+r7j+W64njXr1C0=tXM6K2Hux6w@mail.gmail.com>
+Subject: Syncing .version and VERSION
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>, kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, Andy Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, linux-kernel@vger.kernel.org, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Laura Abbott <labbott@redhat.com> writes:
-> On 06/11/2018 11:03 PM, Michael Ellerman wrote:
->> kbuild test robot <lkp@intel.com> writes:
-...
->>> All errors (new ones prefixed by >>):
->>>
->>>>> ld: cannot open linker script file scripts/module-common.lds: No such file or directory
->> 
->> This seems to need the following.
->> 
->> diff --git a/Makefile b/Makefile
->> index 73f0bb2c7a98..55a5725b6606 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -425,7 +425,7 @@ KBUILD_AFLAGS_KERNEL :=
->>   KBUILD_CFLAGS_KERNEL :=
->>   KBUILD_AFLAGS_MODULE  := -DMODULE
->>   KBUILD_CFLAGS_MODULE  := -DMODULE
->> -KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
->> +KBUILD_LDFLAGS_MODULE := -T $(objtree)/scripts/module-common.lds
->>   LDFLAGS :=
->>   GCC_PLUGINS_CFLAGS :=
->
-> Thanks for pointing that out. I think I missed that when refactoring.
-> I'll fix that in the next version plus adding your powerpc patch.
+Hi there,
 
-Thanks.
+I am getting confused in between the version used for the debian
+package vs the VERSION value used in the kernel. Would it be possible
+to sync them ?
 
-cheers
+Steps:
+
+$ git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+$ make O=ps3 ARCH=powerpc ps3_defconfig
+$ echo 12345 > ps3/.version
+$ make -j8 O=ps3 ARCH=powerpc CROSS_COMPILE=powerpc-linux-gnu- V=1
+bindeb-pkg | grep 1234
+dpkg-buildpackage: info: source version 4.17.0-11730-gf5b7769eb040-12345
+++ expr 012345 + 1
++ VERSION=12346
++ echo 12346
+dpkg-deb: building package 'linux-headers-4.17.0-11730-gf5b7769eb040'
+in '../linux-headers-4.17.0-11730-gf5b7769eb040_4.17.0-11730-gf5b7769eb040-12345_powerpc.deb'.
+dpkg-deb: building package 'linux-libc-dev' in
+'../linux-libc-dev_4.17.0-11730-gf5b7769eb040-12345_powerpc.deb'.
+dpkg-deb: building package 'linux-image-4.17.0-11730-gf5b7769eb040' in
+'../linux-image-4.17.0-11730-gf5b7769eb040_4.17.0-11730-gf5b7769eb040-12345_powerpc.deb'.
+dpkg-deb: building package
+'linux-image-4.17.0-11730-gf5b7769eb040-dbg' in
+'../linux-image-4.17.0-11730-gf5b7769eb040-dbg_4.17.0-11730-gf5b7769eb040-12345_powerpc.deb'.
+ dpkg-genchanges --build=binary
+>../linux-4.17.0-11730-gf5b7769eb040_4.17.0-11730-gf5b7769eb040-12345_powerpc.changes
