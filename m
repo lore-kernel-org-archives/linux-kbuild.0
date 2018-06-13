@@ -1,68 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:52776 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753517AbeFMCEJ (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:35202 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754483AbeFMFUy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Jun 2018 22:04:09 -0400
+        Wed, 13 Jun 2018 01:20:54 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: Re: [PATCH v2] nconf: respect i-search pattern boundaries
+In-Reply-To: <d22bf7c4-45ce-3354-8bbc-feb9c755f92c@infradead.org> (Randy
+        Dunlap's message of "Tue, 12 Jun 2018 18:09:28 -0700")
+References: <20180612190604.4889-1-dirk@gouders.net>
+        <d22bf7c4-45ce-3354-8bbc-feb9c755f92c@infradead.org>
+Date: Wed, 13 Jun 2018 07:18:26 +0200
+Message-ID: <gh602nfen1.fsf@lena.gouders.net>
 MIME-Version: 1.0
-In-Reply-To: <20180612003224.3658-2-labbott@redhat.com>
-References: <20180612003224.3658-1-labbott@redhat.com> <20180612003224.3658-2-labbott@redhat.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 13 Jun 2018 11:03:08 +0900
-Message-ID: <CAK7LNASJw4JjHD3RSmyBExvw+v+GE916RQiSZTQA+U-d4FXt1w@mail.gmail.com>
-Subject: Re: [PATCHv4 1/3] scripts: Preprocess module-common.lds
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-06-12 9:32 GMT+09:00 Laura Abbott <labbott@redhat.com>:
+Randy Dunlap <rdunlap@infradead.org> writes:
+
+> On 06/12/2018 12:06 PM, Dirk Gouders wrote:
+>> This patch adds boundary checks for nconf's i-search pattern.
+>>=20
+>> Further, the pattern buffer is always bzero'ed when '/' is
+>> pressed, so the second line in the code below was not needed (and
+>> otherwise wouldn't have worked as expected):
+>>=20
+>> 	state->pattern[strlen(state->pattern)] =3D c;
+>> 	state->pattern[strlen(state->pattern)] =3D '\0';
+>>=20
+>> Finally, the pattern length was reduced to a length that still
+>> seems sufficient but will not fill more than the top line of the
+>> screen, thus eliminating special treatment needs on resizes or normal
+>> exit of i-search.
+>>=20
+>> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+>> ---
+>> Changes in v2: Correct S-O-B line, remove double search from subject.
+>> ---
+>>  scripts/kconfig/nconf.c | 10 ++++++----
+>>  1 file changed, 6 insertions(+), 4 deletions(-)
 >
-> In preparation for some upcoming work, allow module-common.lds
-> to be run through the preprocessor.
+> Hi Dirk,
 >
-> Signed-off-by: Laura Abbott <labbott@redhat.com>
-> ---
->  scripts/.gitignore                                 | 1 +
->  scripts/Makefile                                   | 2 +-
->  scripts/{module-common.lds => module-common.lds.S} | 0
->  3 files changed, 2 insertions(+), 1 deletion(-)
->  rename scripts/{module-common.lds => module-common.lds.S} (100%)
+> For v1 of the patch:  no, I wasn't using PageUp/PageDown, just the up/dow=
+n arrow
+> keys.
 >
-> diff --git a/scripts/.gitignore b/scripts/.gitignore
-> index 0442c06eefcb..afd1de57d9c6 100644
-> --- a/scripts/.gitignore
-> +++ b/scripts/.gitignore
-> @@ -13,3 +13,4 @@ asn1_compiler
->  extract-cert
->  sign-file
->  insert-sys-cert
-> +module-common.lds
-> diff --git a/scripts/Makefile b/scripts/Makefile
-> index 25ab143cbe14..631d9d1a71e4 100644
-> --- a/scripts/Makefile
-> +++ b/scripts/Makefile
-> @@ -25,7 +25,7 @@ HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
->  HOSTLOADLIBES_sign-file = -lcrypto
->  HOSTLOADLIBES_extract-cert = -lcrypto
+> Maybe I'm confused about /search in nconfig.  nconfig Help says:
 >
-> -always         := $(hostprogs-y) $(hostprogs-m)
-> +always         := $(hostprogs-y) $(hostprogs-m) module-common.lds
+>  =E2=94=82=E2=94=82 Start incremental, case-insensitive search for STRING=
+ in menu entries,   =E2=94=82=E2=94=82
+>  =E2=94=82=E2=94=82     no regex support, STRING is displayed in upper le=
+ft corner           =E2=94=82=E2=94=82
+>  =E2=94=82=E2=94=82                             </>STRING                =
+                    =E2=94=82=E2=94=82
+>  =E2=94=82=E2=94=82     Remove last character   <Backspace>              =
+                    =E2=94=82=E2=94=82
+>  =E2=94=82=E2=94=82     Jump to next hit        <Down>                   =
+                    =E2=94=82=E2=94=82
+>  =E2=94=82=E2=94=82     Jump to previous hit    <Up>                     =
+                    =E2=94=82=E2=94=82
+>  =E2=94=82=E2=94=82 Exit menu search mode       </>  <Esc>
+>
+> First of all, does this only search in the Kconfig prompt strings?
 
+Hi Randy,
 
-You do not need to generate module-common.lds all the time.
-It is necessary only when the module feature is enabled.
+yes, it only searches the items in the current menu and this
+probably was the reason to make you think the arrow keys don't work.
 
-You can do like this:
+This is also the case for the i-search RFC I posted for mconf.  I know,
+it would be extremely convenient to i-search in _all_ config symbols from
+the top level menu and then navigate to the submenus that contain
+matches but such a change needs a lot more work to be done.
 
-extra-$(CONFIG_MODULES)  +=  module-common.lds
+Dirk
 
-
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+> (from top-level menu)
+> OK, I want to search for "debug", so I enter "/debug" and the upper left
+> corner displays: searching: debug
+>
+> The nconfig highlight bar goes to the Device Drivers menu.
+> That's it.  It hasn't found "debug" (it found "de" AFAICT).
+> Using Up/Down arrow keys don't do anything.  I gave up.
+>
+> What am I doing wrong?
+>
+> thanks,
