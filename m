@@ -1,32 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:44213 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752719AbeFNG04 (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:43055 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754860AbeFNKha (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Jun 2018 02:26:56 -0400
-MIME-Version: 1.0
-References: <CAK7LNARDLbEhbJGrKY6HGwfxL8ebAMBDa_2A+s2QkzQGEKyFHQ@mail.gmail.com>
- <CA+55aFyxY9f9_eGv3CvA0zwzo8K5WeNbNPDFuyhtCrzRyic85A@mail.gmail.com>
- <CA+55aFy2KEzTiF=0nG8_RFoPpycaqc=n-hf-mQSbKotMzYJG-w@mail.gmail.com>
- <CAK7LNASd7Mc8eU76L24ZC0OFdUf566adNGVvX9Ou987cT3CCWw@mail.gmail.com>
- <CA+55aFz7KGMcvABxJfYs719ySyt2JouDX9t0SAV4Qu9yY9tfPA@mail.gmail.com> <CAK7LNAT4m8JgOttC5D16ALKqvMtt-6Vi4nFUdVaTMQSQPwYN-w@mail.gmail.com>
-In-Reply-To: <CAK7LNAT4m8JgOttC5D16ALKqvMtt-6Vi4nFUdVaTMQSQPwYN-w@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 14 Jun 2018 15:26:45 +0900
-Message-ID: <CA+55aFyHcEojRqf+pvGuZF1nExY_SFWX7QZ7ifBZPtJfB_BWDg@mail.gmail.com>
-Subject: Re: [GIT PULL] Kbuild updates for 4.18 (2nd round)
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 14 Jun 2018 06:37:30 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/3] x86: fix dependency of X86_32_LAZY_GS
+Date: Thu, 14 Jun 2018 19:36:43 +0900
+Message-Id: <1528972605-24264-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1528972605-24264-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1528972605-24264-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-On Thu, Jun 14, 2018 at 3:16 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Could you run sed directly in your tree?
+Commit 2a61f4747eea ("stack-protector: test compiler capability in
+Kconfig and drop AUTO mode") replaced the 'choice' with two boolean
+symbols, so CC_STACKPROTECTOR_NONE no longer exists.
 
-Sure, I did that on the  plane. Now on the ground, pushed out.
-Somebody should double- and triple-check it.
+Prior to commit 2bc2f688fdf8 ("Makefile: move stack-protector
+availability out of Kconfig"), this line was like this:
 
-            Linus
+  depends on X86_32 && !CC_STACKPROTECTOR
+
+The CC_ prefix was dropped by commit 050e9baa9dc9 ("Kbuild: rename
+CC_STACKPROTECTOR[_STRONG] config variables"), so the dependency
+now should be:
+
+  depends on X86_32 && !STACKPROTECTOR
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ arch/x86/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 455a670..d6c6ee6 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -327,7 +327,7 @@ config X86_64_SMP
+ 
+ config X86_32_LAZY_GS
+ 	def_bool y
+-	depends on X86_32 && CC_STACKPROTECTOR_NONE
++	depends on X86_32 && !STACKPROTECTOR
+ 
+ config ARCH_SUPPORTS_UPROBES
+ 	def_bool y
+-- 
+2.7.4
+
