@@ -1,95 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:45292 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754912AbeFNNU4 (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:29581 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965517AbeFNOkk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Jun 2018 09:20:56 -0400
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <20180613210518.113983-1-ndesaulniers@google.com>
-References: <20180613210518.113983-1-ndesaulniers@google.com>
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Thu, 14 Jun 2018 15:20:53 +0200
-Message-ID: <CA+icZUWW8yxxdQHC6gkqXnTkW70tLbL1Rmpa5dfVyihWSb9hLQ@mail.gmail.com>
-Subject: Re: [PATCH v5 0/3] extern inline native_save_fl for paravirt
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 14 Jun 2018 10:40:40 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v2 3/3] bpfilter: check compiler capability in Kconfig
+Date: Thu, 14 Jun 2018 23:39:32 +0900
+Message-Id: <1528987172-19810-4-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1528987172-19810-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1528987172-19810-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: akpm@linux-foundation.org, hpa@zytor.com, mingo@redhat.com, tglx@linutronix.de, linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, rientjes@google.com, acme@redhat.com, pombredanne@nexb.com, aryabinin@virtuozzo.com, kstewart@linuxfoundation.org, boris.ostrovsky@oracle.com, jan.kiszka@siemens.com, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, ard.biesheuvel@linaro.org, akataria@vmware.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, mka@chromium.org, thomas.lendacky@amd.com, tweek@google.com, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com
+To: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, "David S . Miller" <davem@davemloft.net>
+Cc: Arnd Bergmann <arnd@arndb.de>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Daniel Borkmann <daniel@iogearbox.net>
 
-On Wed, Jun 13, 2018 at 11:05 PM, Nick Desaulniers
-<ndesaulniers@google.com> wrote:
-> paravirt depends on a custom calling convention (callee saved), but
-> expects this from a static inline function that it then forces to be
-> outlined. This is problematic because different compilers or flags can
-> then add a stack guard that violates the calling conventions.
->
-> Uses extern inline with the out-of-line definition in assembly to
-> prevent compilers from adding stack guards to the outlined version.
->
-> Other parts of the codebase overwrite KBUILD_CFLAGS, which is *extremely
-> problematic* for extern inline, as the sematics are completely the
-> opposite depending on what C standard is used.
-> http://blahg.josefsipek.net/?p=529
->
-> Changes since v4:
->   Take Arnd's and hpa's suggestions properly feature detect gnu_inline
->   attribute to support gcc 4.1.
->
-> Changes since v3:
->   Take Joe's suggestion to hoist __inline__ and __inline out of
->   conditional block.
->
-> Changes since v2:
->   Take hpa's _ASM_ARG patch into the set in order to simplify cross
->   32b/64b x86 assembly and rebase my final patch to use it.  Apply
->   Sedat's typo fix to commit message and sign off on it. Take Joe's
->   suggestion to simplify __inline__ and __inline. Add Arnd to list of
->   folks who made helpful suggestions.
->
-> Changes since v1:
->   Prefer gnu_inline function attribute instead of explicitly setting C
->   standard compiler flag in problematic Makefiles. We should instead
->   carefully evaluate if those Makefiles should be overwriting
->   KBUILD_CFLAGS at all. Dropped the previous first two patches and added
->   a new first patch.
->
-> H. Peter Anvin (1):
->   x86/asm: add _ASM_ARG* constants for argument registers to <asm/asm.h>
->
-> Nick Desaulniers (2):
->   compiler-gcc.h: add gnu_inline to all inline declarations
->   x86: paravirt: make native_save_fl extern inline
->
->  arch/x86/include/asm/asm.h      | 59 +++++++++++++++++++++++++++++++++
->  arch/x86/include/asm/irqflags.h |  2 +-
->  arch/x86/kernel/Makefile        |  1 +
->  arch/x86/kernel/irqflags.S      | 26 +++++++++++++++
->  include/linux/compiler-gcc.h    | 29 ++++++++++++----
->  5 files changed, 109 insertions(+), 8 deletions(-)
->  create mode 100644 arch/x86/kernel/irqflags.S
->
-> --
-> 2.18.0.rc1.244.gcf134e6275-goog
->
+With the brand-new syntax extension of Kconfig, we can directly
+check the compiler capability in the configuration phase.
 
-Hi Nick,
+If the cc-can-link.sh fails, the BPFILTER_UMH is automatically
+hidden by the dependency.
 
-thanks for v5 of your patchset.
+I deleted 'default n', which is no-op.
 
-I was able to boot into bare metal.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-root@iniza:~# cat /proc/version
-Linux version 4.14.49-1-iniza-llvmlinux (sedat.dilek@gmail.com@iniza)
-(clang version 7.0.0- (trunk)) #1 SMP 2018-06-14
+Changes in v2:
+  - newly added
 
-root@iniza:~# dpkg -l | grep clang-7
-ii  clang-7
-1:7~svn334344-1~exp1+0~20180609091248.1814~1.gbp8ccab3 amd64        C,
-C++ and Objective-C compiler
+ Makefile               | 5 -----
+ net/Makefile           | 4 ----
+ net/bpfilter/Kconfig   | 2 +-
+ scripts/cc-can-link.sh | 2 +-
+ 4 files changed, 2 insertions(+), 11 deletions(-)
 
-Feel free to add my Tested-By.
+diff --git a/Makefile b/Makefile
+index 8a26b59..9ada673 100644
+--- a/Makefile
++++ b/Makefile
+@@ -507,11 +507,6 @@ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLA
+   KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
+ endif
+ 
+-ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/cc-can-link.sh $(CC)), y)
+-  CC_CAN_LINK := y
+-  export CC_CAN_LINK
+-endif
+-
+ # The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
+ # Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
+ # CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
+diff --git a/net/Makefile b/net/Makefile
+index 13ec0d5..bdaf539 100644
+--- a/net/Makefile
++++ b/net/Makefile
+@@ -20,11 +20,7 @@ obj-$(CONFIG_TLS)		+= tls/
+ obj-$(CONFIG_XFRM)		+= xfrm/
+ obj-$(CONFIG_UNIX)		+= unix/
+ obj-$(CONFIG_NET)		+= ipv6/
+-ifneq ($(CC_CAN_LINK),y)
+-$(warning CC cannot link executables. Skipping bpfilter.)
+-else
+ obj-$(CONFIG_BPFILTER)		+= bpfilter/
+-endif
+ obj-$(CONFIG_PACKET)		+= packet/
+ obj-$(CONFIG_NET_KEY)		+= key/
+ obj-$(CONFIG_BRIDGE)		+= bridge/
+diff --git a/net/bpfilter/Kconfig b/net/bpfilter/Kconfig
+index a948b07..76deb66 100644
+--- a/net/bpfilter/Kconfig
++++ b/net/bpfilter/Kconfig
+@@ -1,6 +1,5 @@
+ menuconfig BPFILTER
+ 	bool "BPF based packet filtering framework (BPFILTER)"
+-	default n
+ 	depends on NET && BPF && INET
+ 	help
+ 	  This builds experimental bpfilter framework that is aiming to
+@@ -9,6 +8,7 @@ menuconfig BPFILTER
+ if BPFILTER
+ config BPFILTER_UMH
+ 	tristate "bpfilter kernel module with user mode helper"
++	depends on $(success,$(srctree)/scripts/cc-can-link.sh $(CC))
+ 	default m
+ 	help
+ 	  This builds bpfilter kernel module with embedded user mode helper
+diff --git a/scripts/cc-can-link.sh b/scripts/cc-can-link.sh
+index 208eb28..6efcead 100755
+--- a/scripts/cc-can-link.sh
++++ b/scripts/cc-can-link.sh
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-cat << "END" | $@ -x c - -o /dev/null >/dev/null 2>&1 && echo "y"
++cat << "END" | $@ -x c - -o /dev/null >/dev/null 2>&1
+ #include <stdio.h>
+ int main(void)
+ {
+-- 
+2.7.4
 
-Regards,
-- Sedat -
