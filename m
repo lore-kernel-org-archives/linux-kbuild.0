@@ -1,50 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:45304 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755002AbeFNKjd (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:45292 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754912AbeFNNU4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Jun 2018 06:39:33 -0400
+        Thu, 14 Jun 2018 09:20:56 -0400
 MIME-Version: 1.0
-In-Reply-To: <CA+55aFyHcEojRqf+pvGuZF1nExY_SFWX7QZ7ifBZPtJfB_BWDg@mail.gmail.com>
-References: <CAK7LNARDLbEhbJGrKY6HGwfxL8ebAMBDa_2A+s2QkzQGEKyFHQ@mail.gmail.com>
- <CA+55aFyxY9f9_eGv3CvA0zwzo8K5WeNbNPDFuyhtCrzRyic85A@mail.gmail.com>
- <CA+55aFy2KEzTiF=0nG8_RFoPpycaqc=n-hf-mQSbKotMzYJG-w@mail.gmail.com>
- <CAK7LNASd7Mc8eU76L24ZC0OFdUf566adNGVvX9Ou987cT3CCWw@mail.gmail.com>
- <CA+55aFz7KGMcvABxJfYs719ySyt2JouDX9t0SAV4Qu9yY9tfPA@mail.gmail.com>
- <CAK7LNAT4m8JgOttC5D16ALKqvMtt-6Vi4nFUdVaTMQSQPwYN-w@mail.gmail.com> <CA+55aFyHcEojRqf+pvGuZF1nExY_SFWX7QZ7ifBZPtJfB_BWDg@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 14 Jun 2018 19:38:36 +0900
-Message-ID: <CAK7LNAQtVZujrViSRa=8BZHXo184qK7uLhBXxfacwcgXJoZOqQ@mail.gmail.com>
-Subject: Re: [GIT PULL] Kbuild updates for 4.18 (2nd round)
+Reply-To: sedat.dilek@gmail.com
+In-Reply-To: <20180613210518.113983-1-ndesaulniers@google.com>
+References: <20180613210518.113983-1-ndesaulniers@google.com>
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Thu, 14 Jun 2018 15:20:53 +0200
+Message-ID: <CA+icZUWW8yxxdQHC6gkqXnTkW70tLbL1Rmpa5dfVyihWSb9hLQ@mail.gmail.com>
+Subject: Re: [PATCH v5 0/3] extern inline native_save_fl for paravirt
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: akpm@linux-foundation.org, hpa@zytor.com, mingo@redhat.com, tglx@linutronix.de, linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, rientjes@google.com, acme@redhat.com, pombredanne@nexb.com, aryabinin@virtuozzo.com, kstewart@linuxfoundation.org, boris.ostrovsky@oracle.com, jan.kiszka@siemens.com, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, ard.biesheuvel@linaro.org, akataria@vmware.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, mka@chromium.org, thomas.lendacky@amd.com, tweek@google.com, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com
 
-Hi Linus,
-
-
-2018-06-14 15:26 GMT+09:00 Linus Torvalds <torvalds@linux-foundation.org>:
-> On Thu, Jun 14, 2018 at 3:16 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->>
->> Could you run sed directly in your tree?
+On Wed, Jun 13, 2018 at 11:05 PM, Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+> paravirt depends on a custom calling convention (callee saved), but
+> expects this from a static inline function that it then forces to be
+> outlined. This is problematic because different compilers or flags can
+> then add a stack guard that violates the calling conventions.
 >
-> Sure, I did that on the  plane. Now on the ground, pushed out.
-> Somebody should double- and triple-check it.
+> Uses extern inline with the out-of-line definition in assembly to
+> prevent compilers from adding stack guards to the outlined version.
+>
+> Other parts of the codebase overwrite KBUILD_CFLAGS, which is *extremely
+> problematic* for extern inline, as the sematics are completely the
+> opposite depending on what C standard is used.
+> http://blahg.josefsipek.net/?p=529
+>
+> Changes since v4:
+>   Take Arnd's and hpa's suggestions properly feature detect gnu_inline
+>   attribute to support gcc 4.1.
+>
+> Changes since v3:
+>   Take Joe's suggestion to hoist __inline__ and __inline out of
+>   conditional block.
+>
+> Changes since v2:
+>   Take hpa's _ASM_ARG patch into the set in order to simplify cross
+>   32b/64b x86 assembly and rebase my final patch to use it.  Apply
+>   Sedat's typo fix to commit message and sign off on it. Take Joe's
+>   suggestion to simplify __inline__ and __inline. Add Arnd to list of
+>   folks who made helpful suggestions.
+>
+> Changes since v1:
+>   Prefer gnu_inline function attribute instead of explicitly setting C
+>   standard compiler flag in problematic Makefiles. We should instead
+>   carefully evaluate if those Makefiles should be overwriting
+>   KBUILD_CFLAGS at all. Dropped the previous first two patches and added
+>   a new first patch.
+>
+> H. Peter Anvin (1):
+>   x86/asm: add _ASM_ARG* constants for argument registers to <asm/asm.h>
+>
+> Nick Desaulniers (2):
+>   compiler-gcc.h: add gnu_inline to all inline declarations
+>   x86: paravirt: make native_save_fl extern inline
+>
+>  arch/x86/include/asm/asm.h      | 59 +++++++++++++++++++++++++++++++++
+>  arch/x86/include/asm/irqflags.h |  2 +-
+>  arch/x86/kernel/Makefile        |  1 +
+>  arch/x86/kernel/irqflags.S      | 26 +++++++++++++++
+>  include/linux/compiler-gcc.h    | 29 ++++++++++++----
+>  5 files changed, 109 insertions(+), 8 deletions(-)
+>  create mode 100644 arch/x86/kernel/irqflags.S
+>
+> --
+> 2.18.0.rc1.244.gcf134e6275-goog
 >
 
-I double-checked it.
-Yes, renaming is perfect.  Thank you!
+Hi Nick,
 
+thanks for v5 of your patchset.
 
-However, while I was checking it, I noticed some other issues.
+I was able to boot into bare metal.
 
-I have sent three patches.
-If they look good, could you apply them please?
+root@iniza:~# cat /proc/version
+Linux version 4.14.49-1-iniza-llvmlinux (sedat.dilek@gmail.com@iniza)
+(clang version 7.0.0- (trunk)) #1 SMP 2018-06-14
 
+root@iniza:~# dpkg -l | grep clang-7
+ii  clang-7
+1:7~svn334344-1~exp1+0~20180609091248.1814~1.gbp8ccab3 amd64        C,
+C++ and Objective-C compiler
 
--- 
-Best Regards
-Masahiro Yamada
+Feel free to add my Tested-By.
+
+Regards,
+- Sedat -
