@@ -1,71 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw0-f193.google.com ([209.85.161.193]:35186 "EHLO
-        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964899AbeFNQNt (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Jun 2018 12:13:49 -0400
-Received: by mail-yw0-f193.google.com with SMTP id v131-v6so2329458ywg.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 14 Jun 2018 09:13:48 -0700 (PDT)
+Received: from terminus.zytor.com ([198.137.202.136]:60711 "EHLO
+        mail.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755325AbeFNUuO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 14 Jun 2018 16:50:14 -0400
+Subject: Re: [PATCH v5 2/3] x86/asm: add _ASM_ARG* constants for argument
+ registers to <asm/asm.h>
+References: <20180613210518.113983-1-ndesaulniers@google.com>
+ <20180613210518.113983-3-ndesaulniers@google.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Message-ID: <b027a324-ffae-fd5e-d8a3-03934be91a2d@zytor.com>
+Date: Thu, 14 Jun 2018 13:47:27 -0700
 MIME-Version: 1.0
-In-Reply-To: <1528972605-24264-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1528972605-24264-1-git-send-email-yamada.masahiro@socionext.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Thu, 14 Jun 2018 09:13:47 -0700
-Message-ID: <CAGXu5j+NCxOa9LWss5LF94q8=pSaSw=HxRuGJ8QV-eKXA57Eww@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Some more changes for stack protector config symbols
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20180613210518.113983-3-ndesaulniers@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>, akpm@linux-foundation.org, mingo@redhat.com, tglx@linutronix.de
+Cc: linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, sedat.dilek@gmail.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, arnd@arndb.de, rientjes@google.com, acme@redhat.com, pombredanne@nexb.com, aryabinin@virtuozzo.com, kstewart@linuxfoundation.org, boris.ostrovsky@oracle.com, jan.kiszka@siemens.com, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, ard.biesheuvel@linaro.org, akataria@vmware.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, mka@chromium.org, thomas.lendacky@amd.com, tweek@google.com, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com, "H. Peter Anvin" <hpa@linux.intel.com>
 
-On Thu, Jun 14, 2018 at 3:36 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Hi Linus,
->
-> While I was checking the renaming commit,
-> I noticed some more fixups.
->
-> The first two patches take care of what I missed to update.
->
-> The last one is another renaming for consistency.
-> (Sorry, I should have asked you that.)
->
-> Please consider applying this series.
+On 06/13/18 14:05, Nick Desaulniers wrote:
+> From: "H. Peter Anvin" <hpa@linux.intel.com>
+> 
+> i386 and x86-64 uses different registers for arguments; make them
+> available so we don't have to #ifdef in the actual code.
+> 
+> Native size and specified size (q, l, w, b) versions are provided.
+> 
+> Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
+> Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Consider the series:
+I still object to Suggested-by: here.  Sedat did a correction, which is
+a Reviewed-by:, but unless I'm completely out to sea, there was no
+suggestion on Sedat's part of this; and I had certainly not seen it when
+I wrote the code.
 
-Acked-by: Kees Cook <keescook@chromium.org>
+	-hpa
 
-Thanks for the fixes!
-
--Kees
-
->
->
->
-> Masahiro Yamada (3):
->   x86: fix dependency of X86_32_LAZY_GS
->   kconfig: tinyconfig: remove stale stack protector fixups
->   Kbuild: rename HAVE_CC_STACKPROTECTOR config variable
->
->  Documentation/features/debug/stackprotector/arch-support.txt | 2 +-
->  arch/Kconfig                                                 | 4 ++--
->  arch/arm/Kconfig                                             | 2 +-
->  arch/arm64/Kconfig                                           | 2 +-
->  arch/mips/Kconfig                                            | 2 +-
->  arch/sh/Kconfig                                              | 2 +-
->  arch/x86/Kconfig                                             | 4 ++--
->  arch/xtensa/Kconfig                                          | 2 +-
->  kernel/configs/tiny.config                                   | 4 ----
->  9 files changed, 10 insertions(+), 14 deletions(-)
->
-> --
-> 2.7.4
->
-
-
-
--- 
-Kees Cook
-Pixel Security
