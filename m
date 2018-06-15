@@ -1,62 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:34053 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750890AbeFOEEr (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:33583 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756583AbeFOWg0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Jun 2018 00:04:47 -0400
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <CAKwvOdngs8k_T=nDKh8JYdAwwFoJRcCU0bZu0tJHQ+keZ5+RFQ@mail.gmail.com>
-References: <20180613210518.113983-1-ndesaulniers@google.com>
- <20180613210518.113983-3-ndesaulniers@google.com> <b027a324-ffae-fd5e-d8a3-03934be91a2d@zytor.com>
- <CAKwvOdngs8k_T=nDKh8JYdAwwFoJRcCU0bZu0tJHQ+keZ5+RFQ@mail.gmail.com>
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Fri, 15 Jun 2018 06:04:45 +0200
-Message-ID: <CA+icZUWTqyrHGj=OzUtb7Kry0x_dH0-C9d5CpmDgzgZc0a9=Lg@mail.gmail.com>
-Subject: Re: [PATCH v5 2/3] x86/asm: add _ASM_ARG* constants for argument
- registers to <asm/asm.h>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 15 Jun 2018 18:36:26 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: [RFC v6 0/1] mconf: global i-search in menu structure
+Date: Sat, 16 Jun 2018 00:29:06 +0200
+Message-Id: <20180615222907.23449-1-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: hpa@zytor.com, Andrew Morton <akpm@linux-foundation.org>, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com, "H. Peter Anvin" <hpa@linux.intel.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Dirk Gouders <dirk@gouders.net>
 
-On Thu, Jun 14, 2018 at 10:59 PM, Nick Desaulniers
-<ndesaulniers@google.com> wrote:
-> On Thu, Jun 14, 2018 at 1:48 PM H. Peter Anvin <hpa@zytor.com> wrote:
->>
->> On 06/13/18 14:05, Nick Desaulniers wrote:
->> > From: "H. Peter Anvin" <hpa@linux.intel.com>
->> >
->> > i386 and x86-64 uses different registers for arguments; make them
->> > available so we don't have to #ifdef in the actual code.
->> >
->> > Native size and specified size (q, l, w, b) versions are provided.
->> >
->> > Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
->> > Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
->> > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
->>
->> I still object to Suggested-by: here.  Sedat did a correction, which is
->> a Reviewed-by:, but unless I'm completely out to sea, there was no
->> suggestion on Sedat's part of this; and I had certainly not seen it when
->> I wrote the code.
->
-> I'm fine with changing it from a Suggested-by to a Reviewed-by.  Can
-> you do that when you apply the set, or should I send a v6?
->
+Hello,
 
-Hi,
+version 6 of this RFC was mainly influenced by a discussion with Randy
+Dunlap about a patch for i-search in nconf.
 
-this issue with Clang and Paravirt is such an ancient issue.
-Back to the days in 2011 before LLVMlinux was born, the project was
-called lll-project.
-Fact is the issue is today fixed.
-Not sure about the credits Suggested-by/Reviewed-by in the
-Linux-kernel development process.
-I did not count the number of compiler runs here.
-A Tested-by is OK for me.
-Anyway, the beast is dead, this counts for me.
+In that discussion I stated that it would be a lot of work to
+implement a global i-search but while thinking about that statement
+afterwards, I realized that most of the needed functionality is
+already there in search_conf(), the search function for config
+symbols.
 
-Regards,
-- Sedat -
+The menu tree is converted in a flat menu to ease the implementation
+of a cyclic i-search and the rest of the implementation does no longer
+interfere so much with current menu handling.
+
+Dirk
+
+Changes in v6:
+
+* The modification of the function print_autowrap() was reworked and
+  is no longer a separate function.
+
+* The i-search navigation was completely reworked and now works on the
+  whole menu tree.
+
+* Hotkeys are back, because they do not interfere that much with this
+  version of i-search navigation.
+
+Changes in v5:
+
+* More thoroughly tested code
+
+* Hotkey navigation concept completely dropped
+
+* Printable characters except special ones form the search string
+
+* Focus-sensitive help text above menu
+
+* DEL erases search string
+
+* Matching string is highlighted in selected menu item
+
+* README help text adjusted
+
+Changes in v4:
+
+* Prototype: consequent i-search navigation concept
+
+Changes in v3:
+
+* Use current git tree to make the patch apply.
+
+* Eliminate debugging output to stderr.
+
+Changes in v2:
+
+* Additionally to CTRL-s, \ can be used to start isearch.
+
+* Raw mode is off by default an can be enabled by an environment
+  variable MENUCONFIG_RAW_MODE.
+
+* I also added a variable for toggling raw mode but did not implement
+  anything else.
+
+* The isearch indicator is now displayed as soon as isearch is
+  started.
+
+* Any key except \, CTRL-s, alphanumeric characters and space
+  terminates isearch and -- except ESC ESC -- is further processed,
+  e.g. ENTER terminates isearch and is then used to navigate into a
+  submenu.
+
+* Problems with mismatches and matches above the current position were
+  fixed.
+
+Dirk Gouders (1):
+  mconf: global i-search in menu structure
+
+ scripts/kconfig/lxdialog/checklist.c |   2 +-
+ scripts/kconfig/lxdialog/dialog.h    |   3 +-
+ scripts/kconfig/lxdialog/inputbox.c  |   2 +-
+ scripts/kconfig/lxdialog/menubox.c   | 177 +++++++++++++++++++++++++++++-----
+ scripts/kconfig/lxdialog/util.c      |  37 ++++++-
+ scripts/kconfig/lxdialog/yesno.c     |   2 +-
+ scripts/kconfig/mconf.c              | 181 +++++++++++++++++++++++++++++++++--
+ 7 files changed, 364 insertions(+), 40 deletions(-)
+
+-- 
+2.16.4
+
