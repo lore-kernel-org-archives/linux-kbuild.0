@@ -1,52 +1,116 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.136]:54567 "EHLO
-        mail.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S965126AbeFOASb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Jun 2018 20:18:31 -0400
-Subject: Re: [PATCH v5 2/3] x86/asm: add _ASM_ARG* constants for argument
- registers to <asm/asm.h>
-References: <20180613210518.113983-1-ndesaulniers@google.com>
- <20180613210518.113983-3-ndesaulniers@google.com>
- <b027a324-ffae-fd5e-d8a3-03934be91a2d@zytor.com>
- <CAKwvOdngs8k_T=nDKh8JYdAwwFoJRcCU0bZu0tJHQ+keZ5+RFQ@mail.gmail.com>
-From: "H. Peter Anvin" <hpa@zytor.com>
-Message-ID: <deb5a074-b057-9388-4ab7-42295b5bb46c@zytor.com>
-Date: Thu, 14 Jun 2018 17:17:23 -0700
-MIME-Version: 1.0
-In-Reply-To: <CAKwvOdngs8k_T=nDKh8JYdAwwFoJRcCU0bZu0tJHQ+keZ5+RFQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: from conuserg-08.nifty.com ([210.131.2.75]:27010 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965001AbeFOBU3 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 14 Jun 2018 21:20:29 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v3 2/3] mtd: rawnand: denali_dt: use dev as a shorthand of &pdev->dev
+Date: Fri, 15 Jun 2018 10:18:51 +0900
+Message-Id: <1529025532-22087-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1529025532-22087-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1529025532-22087-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com, "H. Peter Anvin" <hpa@linux.intel.com>
+To: linux-mtd@lists.infradead.org, Boris Brezillon <boris.brezillon@bootlin.com>
+Cc: Rob Herring <robh+dt@kernel.org>, linux-kbuild@vger.kernel.org, Richard Weinberger <richard@nod.at>, Masahiro Yamada <yamada.masahiro@socionext.com>, Miquel Raynal <miquel.raynal@bootlin.com>, linux-kernel@vger.kernel.org, Marek Vasut <marek.vasut@gmail.com>, Brian Norris <computersforpeace@gmail.com>, David Woodhouse <dwmw2@infradead.org>
 
-On 06/14/18 13:59, Nick Desaulniers wrote:
-> On Thu, Jun 14, 2018 at 1:48 PM H. Peter Anvin <hpa@zytor.com> wrote:
->>
->> On 06/13/18 14:05, Nick Desaulniers wrote:
->>> From: "H. Peter Anvin" <hpa@linux.intel.com>
->>>
->>> i386 and x86-64 uses different registers for arguments; make them
->>> available so we don't have to #ifdef in the actual code.
->>>
->>> Native size and specified size (q, l, w, b) versions are provided.
->>>
->>> Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
->>> Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
->>> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
->>
->> I still object to Suggested-by: here.  Sedat did a correction, which is
->> a Reviewed-by:, but unless I'm completely out to sea, there was no
->> suggestion on Sedat's part of this; and I had certainly not seen it when
->> I wrote the code.
-> 
-> I'm fine with changing it from a Suggested-by to a Reviewed-by.  Can
-> you do that when you apply the set, or should I send a v6?
-> 
+The probe function references &pdev->dev many times.  Add 'dev' as
+a shorthand.
 
-I'm not handling patch mechanics for x86 at the moment.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-	-hpa
+Changes in v3: None
+Changes in v2: None
+
+ drivers/mtd/nand/raw/denali_dt.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/mtd/nand/raw/denali_dt.c b/drivers/mtd/nand/raw/denali_dt.c
+index ce6239d..afaae37 100644
+--- a/drivers/mtd/nand/raw/denali_dt.c
++++ b/drivers/mtd/nand/raw/denali_dt.c
+@@ -81,38 +81,39 @@ MODULE_DEVICE_TABLE(of, denali_nand_dt_ids);
+ 
+ static int denali_dt_probe(struct platform_device *pdev)
+ {
++	struct device *dev = &pdev->dev;
+ 	struct resource *res;
+ 	struct denali_dt *dt;
+ 	const struct denali_dt_data *data;
+ 	struct denali_nand_info *denali;
+ 	int ret;
+ 
+-	dt = devm_kzalloc(&pdev->dev, sizeof(*dt), GFP_KERNEL);
++	dt = devm_kzalloc(dev, sizeof(*dt), GFP_KERNEL);
+ 	if (!dt)
+ 		return -ENOMEM;
+ 	denali = &dt->denali;
+ 
+-	data = of_device_get_match_data(&pdev->dev);
++	data = of_device_get_match_data(dev);
+ 	if (data) {
+ 		denali->revision = data->revision;
+ 		denali->caps = data->caps;
+ 		denali->ecc_caps = data->ecc_caps;
+ 	}
+ 
+-	denali->dev = &pdev->dev;
++	denali->dev = dev;
+ 	denali->irq = platform_get_irq(pdev, 0);
+ 	if (denali->irq < 0) {
+-		dev_err(&pdev->dev, "no irq defined\n");
++		dev_err(dev, "no irq defined\n");
+ 		return denali->irq;
+ 	}
+ 
+ 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "denali_reg");
+-	denali->reg = devm_ioremap_resource(&pdev->dev, res);
++	denali->reg = devm_ioremap_resource(dev, res);
+ 	if (IS_ERR(denali->reg))
+ 		return PTR_ERR(denali->reg);
+ 
+ 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "nand_data");
+-	denali->host = devm_ioremap_resource(&pdev->dev, res);
++	denali->host = devm_ioremap_resource(dev, res);
+ 	if (IS_ERR(denali->host))
+ 		return PTR_ERR(denali->host);
+ 
+@@ -120,19 +121,19 @@ static int denali_dt_probe(struct platform_device *pdev)
+ 	 * A single anonymous clock is supported for the backward compatibility.
+ 	 * New platforms should support all the named clocks.
+ 	 */
+-	dt->clk = devm_clk_get(&pdev->dev, "nand");
++	dt->clk = devm_clk_get(dev, "nand");
+ 	if (IS_ERR(dt->clk))
+-		dt->clk = devm_clk_get(&pdev->dev, NULL);
++		dt->clk = devm_clk_get(dev, NULL);
+ 	if (IS_ERR(dt->clk)) {
+-		dev_err(&pdev->dev, "no clk available\n");
++		dev_err(dev, "no clk available\n");
+ 		return PTR_ERR(dt->clk);
+ 	}
+ 
+-	dt->clk_x = devm_clk_get(&pdev->dev, "nand_x");
++	dt->clk_x = devm_clk_get(dev, "nand_x");
+ 	if (IS_ERR(dt->clk_x))
+ 		dt->clk_x = NULL;
+ 
+-	dt->clk_ecc = devm_clk_get(&pdev->dev, "ecc");
++	dt->clk_ecc = devm_clk_get(dev, "ecc");
+ 	if (IS_ERR(dt->clk_ecc))
+ 		dt->clk_ecc = NULL;
+ 
+@@ -155,7 +156,7 @@ static int denali_dt_probe(struct platform_device *pdev)
+ 		 * Hardcode the clock rates for the backward compatibility.
+ 		 * This works for both SOCFPGA and UniPhier.
+ 		 */
+-		dev_notice(&pdev->dev,
++		dev_notice(dev,
+ 			   "necessary clock is missing. default clock rates are used.\n");
+ 		denali->clk_x_rate = 200000000;
+ 	}
+-- 
+2.7.4
 
