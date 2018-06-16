@@ -1,80 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 9pmail.ess.barracuda.com ([64.235.150.224]:51251 "EHLO
-        9pmail.ess.barracuda.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752921AbeFPBMJ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Jun 2018 21:12:09 -0400
-From: Paul Burton <paul.burton@mips.com>
-Subject: [PATCH 3/3] Revert "powerpc: fix build failure by disabling attribute-alias warning in pci_32"
-Date: Fri, 15 Jun 2018 17:53:22 -0700
-Message-ID: <20180616005323.7938-4-paul.burton@mips.com>
-In-Reply-To: <20180616005323.7938-1-paul.burton@mips.com>
-References: <20180616005323.7938-1-paul.burton@mips.com>
+Received: from mail.skyhub.de ([5.9.137.197]:59486 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932479AbeFPLKK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 16 Jun 2018 07:10:10 -0400
+Date: Sat, 16 Jun 2018 13:10:05 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: /bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+Message-ID: <20180616111004.GB28657@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>, linux-mips@linux-mips.org, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Thomas Gleixner <tglx@linutronix.de>, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Matthias Kaehlcke <mka@chromium.org>, He Zhe <zhe.he@windriver.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Khem Raj <raj.khem@gmail.com>, Christophe Leroy <christophe.leroy@c-s.fr>, Al Viro <viro@zeniv.linux.org.uk>, Stafford Horne <shorne@gmail.com>, Gideon Israel Dsouza <gidisrael@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org, Paul Burton <paul.burton@mips.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-With SYSCALL_DEFINEx() disabling -Wattribute-alias generically, there's
-no need to duplicate that for PowerPC's pciconfig_iobase syscall.
+Hi,
 
-This reverts commit 415520373975 ("powerpc: fix build failure by
-disabling attribute-alias warning in pci_32").
+I'm seeing this when I do
 
-Signed-off-by: Paul Burton <paul.burton@mips.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Douglas Anderson <dianders@chromium.org>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Heiko Carstens <heiko.carstens@de.ibm.com>
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-Cc: Matthew Wilcox <matthew@wil.cx>
-Cc: Matthias Kaehlcke <mka@chromium.org>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Ingo Molnar <mingo@kernel.org>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Gideon Israel Dsouza <gidisrael@gmail.com>
-Cc: Christophe Leroy <christophe.leroy@c-s.fr>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Stafford Horne <shorne@gmail.com>
-Cc: Khem Raj <raj.khem@gmail.com>
-Cc: He Zhe <zhe.he@windriver.com>
-Cc: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-mips@linux-mips.org
-Cc: linuxppc-dev@lists.ozlabs.org
+# make menuconfig
 
----
+after a fresh repo clean: git clean -dqfx
 
- arch/powerpc/kernel/pci_32.c | 4 ----
- 1 file changed, 4 deletions(-)
+Might wanna silence it...
 
-diff --git a/arch/powerpc/kernel/pci_32.c b/arch/powerpc/kernel/pci_32.c
-index 4f861055a852..d63b488d34d7 100644
---- a/arch/powerpc/kernel/pci_32.c
-+++ b/arch/powerpc/kernel/pci_32.c
-@@ -285,9 +285,6 @@ pci_bus_to_hose(int bus)
-  * Note that the returned IO or memory base is a physical address
-  */
- 
--#pragma GCC diagnostic push
--#pragma GCC diagnostic ignored "-Wpragmas"
--#pragma GCC diagnostic ignored "-Wattribute-alias"
- SYSCALL_DEFINE3(pciconfig_iobase, long, which,
- 		unsigned long, bus, unsigned long, devfn)
- {
-@@ -313,4 +310,3 @@ SYSCALL_DEFINE3(pciconfig_iobase, long, which,
- 
- 	return result;
- }
--#pragma GCC diagnostic pop
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+  HOSTCC  scripts/kconfig/lxdialog/checklist.o
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+  HOSTCC  scripts/kconfig/lxdialog/inputbox.o
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+  HOSTCC  scripts/kconfig/lxdialog/menubox.o
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+  HOSTCC  scripts/kconfig/lxdialog/textbox.o
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+  HOSTCC  scripts/kconfig/lxdialog/util.o
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+/bin/sh: 1: .: Can't open scripts/kconfig/.mconf-cfg
+  HOSTCC  scripts/kconfig/lxdialog/yesno.o
+  UPD     scripts/kconfig/.mconf-cfg
+  HOSTCC  scripts/kconfig/mconf.o
+  HOSTLD  scripts/kconfig/mconf
+scripts/kconfig/mconf  Kconfig
+
+Thx.
+
 -- 
-2.17.1
+Regards/Gruss,
+    Boris.
 
+Good mailing practices for 400: avoid top-posting and trim the reply.
