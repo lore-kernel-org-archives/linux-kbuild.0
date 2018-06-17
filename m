@@ -1,73 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:36745 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756932AbeFQBL4 (ORCPT
+Received: from stumail.xidian.edu.cn ([202.117.112.40]:49830 "HELO
+        stu.xidian.edu.cn" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1754321AbeFQLZZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 16 Jun 2018 21:11:56 -0400
-Date: Sun, 17 Jun 2018 10:11:53 +0900
-From: Stafford Horne <shorne@gmail.com>
-Subject: Re: [PATCH 0/3] Resolve -Wattribute-alias warnings from
- SYSCALL_DEFINEx()
-Message-ID: <20180617011153.GA24595@lianli.shorne-pla.net>
-References: <20180616005323.7938-1-paul.burton@mips.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180616005323.7938-1-paul.burton@mips.com>
+        Sun, 17 Jun 2018 07:25:25 -0400
+From: Xi Ruoyao <ryxi@stu.xidian.edu.cn>
+Date: Sun, 17 Jun 2018 18:16:07 +0800
+Subject: [PATCH] Kbuild: fix mismatched if/endif pairs
+Message-Id: <180617191612798b1a5d7a74c59e7905c31fd3f36f5d@stu.xidian.edu.cn>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Burton <paul.burton@mips.com>
-Cc: linux-kbuild@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, linux-mips@linux-mips.org, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Thomas Gleixner <tglx@linutronix.de>, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Matthias Kaehlcke <mka@chromium.org>, He Zhe <zhe.he@windriver.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Khem Raj <raj.khem@gmail.com>, Christophe Leroy <christophe.leroy@c-s.fr>, Al Viro <viro@zeniv.linux.org.uk>, Gideon Israel Dsouza <gidisrael@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Xi Ruoyao <ryxi@stu.xidian.edu.cn>
 
-On Fri, Jun 15, 2018 at 05:53:19PM -0700, Paul Burton wrote:
-> This series introduces infrastructure allowing compiler diagnostics to
-> be disabled or their severity modified for specific pieces of code, with
-> suitable abstractions to prevent that code from becoming tied to a
-> specific compiler.
-> 
-> This infrastructure is then used to disable the -Wattribute-alias
-> warning around syscall definitions, which rely on type mismatches to
-> sanitize arguments.
-> 
-> Finally PowerPC-specific #pragma's are removed now that the generic code
-> is handling this.
-> 
-> The series takes Arnd's RFC patches & addresses the review comments they
-> received. The most notable effect of this series to to avoid warnings &
-> build failures caused by -Wattribute-alias when compiling the kernel
-> with GCC 8.
-> 
-> Applies cleanly atop master as of 9215310cf13b ("Merge
-> git://git.kernel.org/pub/scm/linux/kernel/git/davem/net").
-> 
-> Thanks,
->     Paul
-> 
-> Arnd Bergmann (2):
->   kbuild: add macro for controlling warnings to linux/compiler.h
->   disable -Wattribute-alias warning for SYSCALL_DEFINEx()
-> 
-> Paul Burton (1):
->   Revert "powerpc: fix build failure by disabling attribute-alias
->     warning in pci_32"
-> 
->  arch/powerpc/kernel/pci_32.c   |  4 ---
->  include/linux/compat.h         |  8 ++++-
->  include/linux/compiler-gcc.h   | 66 ++++++++++++++++++++++++++++++++++
->  include/linux/compiler_types.h | 18 ++++++++++
->  include/linux/syscalls.h       |  4 +++
->  5 files changed, 95 insertions(+), 5 deletions(-)
+In scripts/Makefile.build, there are two mismatched if/endif pairs.
+They stop the generation of orc unwind table if CONFIG_FTRACE_MCOUNT_RECORD
+is not set.  dmesg complains:
 
-Hello Paul,
+WARNING: WARNING: Bad or missing .orc_unwind table.  Disabling unwinder.
 
-I tested the series out with the new OpenRISC 9.0.0 port and the
--Wattribute-alias warnings are gone.  Thank you.
+This comment moves an endif to match the if/endif pairs.
 
-Using toolchain binaries from:
-  https://github.com/stffrdhrn/gcc/releases/tag/or1k-9.0.0-20180613
+Signed-off-by: Xi Ruoyao <ryxi@stu.xidian.edu.cn>
+---
+ scripts/Makefile.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-For the series:
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 34d9e9ce97c2..16509a038d77 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -239,6 +239,7 @@ cmd_record_mcount =						\
+ 	     "$(CC_FLAGS_FTRACE)" ]; then			\
+ 		$(sub_cmd_record_mcount)			\
+ 	fi;
++endif # cc-option(-mrecord-mcount)
+ endif # CONFIG_FTRACE_MCOUNT_RECORD
+ 
+ ifdef CONFIG_STACK_VALIDATION
+@@ -263,7 +264,6 @@ ifneq ($(RETPOLINE_CFLAGS),)
+   objtool_args += --retpoline
+ endif
+ endif
+-endif
+ 
+ 
+ ifdef CONFIG_MODVERSIONS
+-- 
+2.16.2
 
-Tested-by: Stafford Horne <shorne@gmail.com>
-
--Stafford
