@@ -1,51 +1,142 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from stumail.xidian.edu.cn ([202.117.112.40]:49830 "HELO
-        stu.xidian.edu.cn" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1754321AbeFQLZZ (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:34912 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933343AbeFQMWt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 Jun 2018 07:25:25 -0400
-From: Xi Ruoyao <ryxi@stu.xidian.edu.cn>
-Date: Sun, 17 Jun 2018 18:16:07 +0800
-Subject: [PATCH] Kbuild: fix mismatched if/endif pairs
-Message-Id: <180617191612798b1a5d7a74c59e7905c31fd3f36f5d@stu.xidian.edu.cn>
+        Sun, 17 Jun 2018 08:22:49 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: [RFC v7 0/1] mconf: global i-search in menu prompts
+Date: Sun, 17 Jun 2018 14:15:33 +0200
+Message-Id: <20180617121534.4809-1-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Xi Ruoyao <ryxi@stu.xidian.edu.cn>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Dirk Gouders <dirk@gouders.net>
 
-In scripts/Makefile.build, there are two mismatched if/endif pairs.
-They stop the generation of orc unwind table if CONFIG_FTRACE_MCOUNT_RECORD
-is not set.  dmesg complains:
+Hello,
 
-WARNING: WARNING: Bad or missing .orc_unwind table.  Disabling unwinder.
+I reworked this RFC and checked it against submitting-patches.rst so
+the quality should have raised.
 
-This comment moves an endif to match the if/endif pairs.
+In that document, I read that permission of the person should be asked
+for before adding a Suggested-by.  So, apologies go to Sam.  I
+removed that line from the commit message and am now asking for your
+permission to add it.
 
-Signed-off-by: Xi Ruoyao <ryxi@stu.xidian.edu.cn>
----
- scripts/Makefile.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Most noticeable changes are that the exact starting position before
+doing i-search is now remebered and i-search stays on the current item
+if a character was added and the new string also matches this item.
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 34d9e9ce97c2..16509a038d77 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -239,6 +239,7 @@ cmd_record_mcount =						\
- 	     "$(CC_FLAGS_FTRACE)" ]; then			\
- 		$(sub_cmd_record_mcount)			\
- 	fi;
-+endif # cc-option(-mrecord-mcount)
- endif # CONFIG_FTRACE_MCOUNT_RECORD
- 
- ifdef CONFIG_STACK_VALIDATION
-@@ -263,7 +264,6 @@ ifneq ($(RETPOLINE_CFLAGS),)
-   objtool_args += --retpoline
- endif
- endif
--endif
- 
- 
- ifdef CONFIG_MODVERSIONS
+Also, compiler warnings were eliminated and A_UNDERLINE was replaced
+with A_STANDOUT to mark active menu items when the focus is on the
+buttons, because I tested mconf on a tty where underlines were not
+visible.  For a complete list of changes see below.
+
+Dirk
+
+Changes in v7:
+
+* make menu_isearch() return void
+
+* Suggested-by removed, ask for Sam's permission
+
+* Rework i-search instructions text
+
+* Remember exact starting position in menu
+
+* Stay on menu item if it matches pattern with a character added
+
+* Fix print_autowrap for short texts
+
+* Focus on buttons: use A_STANDOUT for current menu item
+
+* Fix compiler warnings
+
+* Don't exclude comments in searches
+
+* ESC also clears search string
+
+* Remove the last parameter of print_isearch and use focus_on_buttons
+  instead
+
+* Document changes to print_autowrap and conf() in commit message
+
+* Rework comments in the code
+
+* Rework commit message, add a motivation part
+
+* Free serialized menu array on exit
+
+Changes in v6:
+
+* The modification of the function print_autowrap() was reworked and
+  is no longer a separate function.
+
+* The i-search navigation was completely reworked and now works on the
+  whole menu tree.
+
+* Hotkeys are back, because they do not interfere that much with this
+  version of i-search navigation.
+
+Changes in v5:
+
+* More thoroughly tested code
+
+* Hotkey navigation concept completely dropped
+
+* Printable characters except special ones form the search string
+
+* Focus-sensitive help text above menu
+
+* DEL erases search string
+
+* Matching string is highlighted in selected menu item
+
+* README help text adjusted
+
+Changes in v4:
+
+* Prototype: consequent i-search navigation concept
+
+Changes in v3:
+
+* Use current git tree to make the patch apply.
+
+* Eliminate debugging output to stderr.
+
+Changes in v2:
+
+* Additionally to CTRL-s, \ can be used to start isearch.
+
+* Raw mode is off by default an can be enabled by an environment
+  variable MENUCONFIG_RAW_MODE.
+
+* I also added a variable for toggling raw mode but did not implement
+  anything else.
+
+* The isearch indicator is now displayed as soon as isearch is
+  started.
+
+* Any key except \, CTRL-s, alphanumeric characters and space
+  terminates isearch and -- except ESC ESC -- is further processed,
+  e.g. ENTER terminates isearch and is then used to navigate into a
+  submenu.
+
+* Problems with mismatches and matches above the current position were
+  fixed.
+
+Dirk Gouders (1):
+  mconf: global i-search in menu prompts
+
+ scripts/kconfig/lxdialog/checklist.c |   2 +-
+ scripts/kconfig/lxdialog/dialog.h    |   3 +-
+ scripts/kconfig/lxdialog/inputbox.c  |   2 +-
+ scripts/kconfig/lxdialog/menubox.c   | 181 +++++++++++++++++++++---
+ scripts/kconfig/lxdialog/util.c      |  45 +++++-
+ scripts/kconfig/lxdialog/yesno.c     |   2 +-
+ scripts/kconfig/mconf.c              | 202 +++++++++++++++++++++++++--
+ 7 files changed, 398 insertions(+), 39 deletions(-)
+
 -- 
-2.16.2
+2.17.1
 
