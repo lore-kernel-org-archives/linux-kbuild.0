@@ -1,134 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:58220 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756959AbeFQAIS (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:55506 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756930AbeFQAlx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 16 Jun 2018 20:08:18 -0400
+        Sat, 16 Jun 2018 20:41:53 -0400
+MIME-Version: 1.0
+In-Reply-To: <D9AF0864-EE2A-4C2E-A5A4-C002DEB95B2B@vmware.com>
+References: <20180612115050.185112-1-namit@vmware.com> <20180612115050.185112-2-namit@vmware.com>
+ <CAK7LNATmjTi4Odp5AfbVHCemn7S_tB9nKvgNOf5sp8BiVJma7Q@mail.gmail.com> <D9AF0864-EE2A-4C2E-A5A4-C002DEB95B2B@vmware.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/2] kbuild: do not update config when running install targets
-Date: Sun, 17 Jun 2018 09:07:06 +0900
-Message-Id: <1529194027-15752-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Sun, 17 Jun 2018 09:40:56 +0900
+Message-ID: <CAK7LNASdmie+Y4haU5bCMb8s4RztHzOcFXUxGxjcCqsbwPN7uw@mail.gmail.com>
+Subject: Re: [PATCH v4 1/9] Makefile: Prepare for using macros for inline asm
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+To: Nadav Amit <namit@vmware.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-"make syncconfig" is automatically invoked when any of the following
-happens:
+Hi.
 
- - .config is updated
- - any of Kconfig files is updated
- - any of environment variables referenced in Kconfig is changed
+2018-06-14 7:19 GMT+09:00 Nadav Amit <namit@vmware.com>:
+>>
+>>
+>> I have not fully understood this series yet.
+>>
+>> I do not have enough skill in x86 architecture,
+>> but just some comments from the build system point of view.
+>>
+>>
+>>
+>> I guess this will probably break the parallel building.
+>>
+>> Kbuild can build 'prepare' and 'scripts' simultaneously.
+>>
+>>
+>> I locally modified the following line:
+>>
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 2dea909440..6ad484a 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -1030,7 +1030,7 @@ $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
+>> # Error messages still appears in the original language
+>>
+>> PHONY += $(vmlinux-dirs)
+>> -$(vmlinux-dirs): prepare scripts
+>> +$(vmlinux-dirs): scripts prepare
+>>        $(Q)$(MAKE) $(build)=$@ need-builtin=1
+>>
+>> define filechk_kernel.release
+>>
+>>
+>>
+>> masahiro@grover:~/workspace/linux-kbuild$ make  defconfig
+>>  HOSTCC  scripts/basic/fixdep
+>>  HOSTCC  scripts/kconfig/conf.o
+>>  YACC    scripts/kconfig/zconf.tab.c
+>>  LEX     scripts/kconfig/zconf.lex.c
+>>  HOSTCC  scripts/kconfig/zconf.tab.o
+>>  HOSTLD  scripts/kconfig/conf
+>> *** Default configuration is based on 'x86_64_defconfig'
+>> #
+>> # configuration written to .config
+>> #
+>> masahiro@grover:~/workspace/linux-kbuild$ make all
+>> scripts/kconfig/conf  --syncconfig Kconfig
+>>  WRAP    arch/x86/include/generated/uapi/asm/bpf_perf_event.h
+>>  WRAP    arch/x86/include/generated/uapi/asm/poll.h
+>>  WRAP    arch/x86/include/generated/asm/dma-contiguous.h
+>>  WRAP    arch/x86/include/generated/asm/early_ioremap.h
+>>  WRAP    arch/x86/include/generated/asm/mcs_spinlock.h
+>>  WRAP    arch/x86/include/generated/asm/mm-arch-hooks.h
+>>  CC      scripts/mod/empty.o
+>> Assembler messages:
+>> Error: can't open arch/x86/kernel/macros.s for reading: No such file
+>> or directory
+>> make[2]: *** [scripts/Makefile.build:318: scripts/mod/empty.o] Error 1
+>> make[1]: *** [scripts/Makefile.build:558: scripts/mod] Error 2
+>> make: *** [Makefile:1050: scripts] Error 2
+>
+> You are right. I tried to filter out the use of the switch (exported as
+> ASM_MACRO_FLAGS) for empty.o. Any suggestions on how to do it properly?
 
-Then, it updates configuration files such as include/config/auto.conf
-include/generated/autoconf.h, etc.
 
-Even install targets (install, modules_install, etc.) are no exception.
-However, they should never ever modify the source tree.  Install
-targets are often run with root privileges.  Once those configuration
-files are owned by root, "make mrproper" would end up with permission
-error.
+You can do like this:
 
-Install targets should just copy things blindly.  They should not care
-whether the configuration is up-to-date or not.  This makes more sense
-because we are interested in the configuration that was used in the
-previous kernel building.
 
-This issue has existed since before, but rarely happened.  I expect
-more chance where people are hit by this; with the new Kconfig syntax
-extension, the .config now contains the compiler information.  If you
-cross-compile the kernel with CROSS_COMPILE, but forget to pass it
-for "make install", you meet "any of environment variables referenced
-in Kconfig is changed" because $(CC) is referenced in Kconfig.
-Another scenario is the compiler upgrade before the installation.
+diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
+index 42c5d50..a5b4af4 100644
+--- a/scripts/mod/Makefile
++++ b/scripts/mod/Makefile
+@@ -4,6 +4,8 @@ OBJECT_FILES_NON_STANDARD := y
+ hostprogs-y    := modpost mk_elfconfig
+ always         := $(hostprogs-y) empty.o
 
-To solve this, we can make the configuration read-only when running
-install targets.  We already do this for external modules.
-
-Install targets need the configuration.  "make modules_install" refer
-to some config options such as CONFIG_MODULES.  "make dtbs_install"
-also needs CONFIG_ARCH_* to decide which dtb files to install.
-But, do not update it.
-
-Now, Make targets are categorized into 3 groups:
-
-[1] Do not need the kernel configuration at all
-
-    help, coccicheck, headers_install etc.
-
-[2] Need the latest kernel configuration
-
-    If new config options are added, Kconfig will show prompt to
-    ask user's selection.
-
-    Build targets such as vmlinux, in-kernel modules are the cases.
-
-[3] Need the kernel configuration, but do not want to update it
-
-    Install targets except headers_install, and external modules
-    are the cases.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- Makefile | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 8a26b59..f934a81 100644
---- a/Makefile
-+++ b/Makefile
-@@ -225,10 +225,12 @@ no-dot-config-targets := $(clean-targets) \
- 			 cscope gtags TAGS tags help% %docs check% coccicheck \
- 			 $(version_h) headers_% archheaders archscripts \
- 			 kernelversion %src-pkg
-+no-sync-config-targets := $(no-dot-config-targets) install %install
- 
--config-targets := 0
--mixed-targets  := 0
--dot-config     := 1
-+config-targets  := 0
-+mixed-targets   := 0
-+dot-config      := 1
-+may-sync-config := 1
- 
- ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
- 	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
-@@ -236,6 +238,16 @@ ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
- 	endif
- endif
- 
-+ifneq ($(filter $(no-sync-config-targets), $(MAKECMDGOALS)),)
-+	ifeq ($(filter-out $(no-sync-config-targets), $(MAKECMDGOALS)),)
-+		may-sync-config := 0
-+	endif
-+endif
++CFLAGS_REMOVE_empty.o := $(ASM_MACRO_FLAGS)
 +
-+ifneq ($(KBUILD_EXTMOD),)
-+	may-sync-config := 0
-+endif
-+
- ifeq ($(KBUILD_EXTMOD),)
-         ifneq ($(filter config %config,$(MAKECMDGOALS)),)
-                 config-targets := 1
-@@ -611,7 +623,7 @@ ARCH_CFLAGS :=
- include arch/$(SRCARCH)/Makefile
- 
- ifeq ($(dot-config),1)
--ifeq ($(KBUILD_EXTMOD),)
-+ifeq ($(may-sync-config),1)
- # Read in dependencies to all Kconfig* files, make sure to run syncconfig if
- # changes are detected. This should be included after arch/$(SRCARCH)/Makefile
- # because some architectures define CROSS_COMPILE there.
-@@ -639,7 +651,7 @@ include/config/auto.conf:
- 	echo >&2 ;							\
- 	/bin/false)
- 
--endif # KBUILD_EXTMOD
-+endif # may-sync-config
- 
- else
- # Dummy target needed, because used as prerequisite
+ modpost-objs   := modpost.o file2alias.o sumversion.o
+
+ devicetable-offsets-file := devicetable-offsets.h
+
+
+
+
+
+modpost is an exceptional hostprogam - it depends on
+target compiler, which makes the build order complicated.
+
+I want to compile under scripts/ only with $(HOSTCC).
+
+I am planning to change modpost
+target-independent by detecting
+32/64 bit, little/big-endianness run-time.
+Then, empty.c will go away.
+
+
+In the meanwhile, CFLAGS_REMOVE_ will do
+as a workaround.
+
+
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
