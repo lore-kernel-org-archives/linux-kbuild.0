@@ -1,142 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:34912 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933343AbeFQMWt (ORCPT
+Received: from stumail.xidian.edu.cn ([202.117.112.40]:50783 "HELO
+        stu.xidian.edu.cn" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S934229AbeFQLgu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 Jun 2018 08:22:49 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [RFC v7 0/1] mconf: global i-search in menu prompts
-Date: Sun, 17 Jun 2018 14:15:33 +0200
-Message-Id: <20180617121534.4809-1-dirk@gouders.net>
+        Sun, 17 Jun 2018 07:36:50 -0400
+Message-ID: <1529235406.17103.2.camel@stu.xidian.edu.cn>
+Subject: Re: [PATCH] Kbuild: fix mismatched if/endif pairs
+From: Xi Ruoyao <ryxi@stu.xidian.edu.cn>
+Date: Sun, 17 Jun 2018 19:36:46 +0800
+In-Reply-To: <18061719212289a3d6de53ebc1ba6c4a188e1b0779da@stu.xidian.edu.cn>
+References: <18061719212289a3d6de53ebc1ba6c4a188e1b0779da@stu.xidian.edu.cn>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
-Cc: Dirk Gouders <dirk@gouders.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: ryxi@stu.xidian.edu.cn, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello,
+On 2018-06-17 18:16 +0800, Xi Ruoyao wrote:
+> In scripts/Makefile.build, there are two mismatched if/endif pairs.
+> They stop the generation of orc unwind table if CONFIG_FTRACE_MCOUNT_RECORD
+> is not set.  dmesg complains:
 
-I reworked this RFC and checked it against submitting-patches.rst so
-the quality should have raised.
+Duplication of patch 10455267 in patchwork.  Sorry for noise :(.
 
-In that document, I read that permission of the person should be asked
-for before adding a Suggested-by.  So, apologies go to Sam.  I
-removed that line from the commit message and am now asking for your
-permission to add it.
-
-Most noticeable changes are that the exact starting position before
-doing i-search is now remebered and i-search stays on the current item
-if a character was added and the new string also matches this item.
-
-Also, compiler warnings were eliminated and A_UNDERLINE was replaced
-with A_STANDOUT to mark active menu items when the focus is on the
-buttons, because I tested mconf on a tty where underlines were not
-visible.  For a complete list of changes see below.
-
-Dirk
-
-Changes in v7:
-
-* make menu_isearch() return void
-
-* Suggested-by removed, ask for Sam's permission
-
-* Rework i-search instructions text
-
-* Remember exact starting position in menu
-
-* Stay on menu item if it matches pattern with a character added
-
-* Fix print_autowrap for short texts
-
-* Focus on buttons: use A_STANDOUT for current menu item
-
-* Fix compiler warnings
-
-* Don't exclude comments in searches
-
-* ESC also clears search string
-
-* Remove the last parameter of print_isearch and use focus_on_buttons
-  instead
-
-* Document changes to print_autowrap and conf() in commit message
-
-* Rework comments in the code
-
-* Rework commit message, add a motivation part
-
-* Free serialized menu array on exit
-
-Changes in v6:
-
-* The modification of the function print_autowrap() was reworked and
-  is no longer a separate function.
-
-* The i-search navigation was completely reworked and now works on the
-  whole menu tree.
-
-* Hotkeys are back, because they do not interfere that much with this
-  version of i-search navigation.
-
-Changes in v5:
-
-* More thoroughly tested code
-
-* Hotkey navigation concept completely dropped
-
-* Printable characters except special ones form the search string
-
-* Focus-sensitive help text above menu
-
-* DEL erases search string
-
-* Matching string is highlighted in selected menu item
-
-* README help text adjusted
-
-Changes in v4:
-
-* Prototype: consequent i-search navigation concept
-
-Changes in v3:
-
-* Use current git tree to make the patch apply.
-
-* Eliminate debugging output to stderr.
-
-Changes in v2:
-
-* Additionally to CTRL-s, \ can be used to start isearch.
-
-* Raw mode is off by default an can be enabled by an environment
-  variable MENUCONFIG_RAW_MODE.
-
-* I also added a variable for toggling raw mode but did not implement
-  anything else.
-
-* The isearch indicator is now displayed as soon as isearch is
-  started.
-
-* Any key except \, CTRL-s, alphanumeric characters and space
-  terminates isearch and -- except ESC ESC -- is further processed,
-  e.g. ENTER terminates isearch and is then used to navigate into a
-  submenu.
-
-* Problems with mismatches and matches above the current position were
-  fixed.
-
-Dirk Gouders (1):
-  mconf: global i-search in menu prompts
-
- scripts/kconfig/lxdialog/checklist.c |   2 +-
- scripts/kconfig/lxdialog/dialog.h    |   3 +-
- scripts/kconfig/lxdialog/inputbox.c  |   2 +-
- scripts/kconfig/lxdialog/menubox.c   | 181 +++++++++++++++++++++---
- scripts/kconfig/lxdialog/util.c      |  45 +++++-
- scripts/kconfig/lxdialog/yesno.c     |   2 +-
- scripts/kconfig/mconf.c              | 202 +++++++++++++++++++++++++--
- 7 files changed, 398 insertions(+), 39 deletions(-)
-
+But let's fix this quickly, since the issue breaks ORC unwinder completely
+(at least with my configuration).
 -- 
-2.17.1
-
+Xi Ruoyao <ryxi@stu.xidian.edu.cn>
+School of Aerospace Science and Technology, Xidian University
