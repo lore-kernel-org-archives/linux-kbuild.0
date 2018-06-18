@@ -1,72 +1,124 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.bootlin.com ([62.4.15.54]:51605 "EHLO mail.bootlin.com"
+Received: from mail.bootlin.com ([62.4.15.54]:51687 "EHLO mail.bootlin.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932510AbeFRHqt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Jun 2018 03:46:49 -0400
-Date: Mon, 18 Jun 2018 09:46:36 +0200
+        id S932510AbeFRHrx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Jun 2018 03:47:53 -0400
+Date: Mon, 18 Jun 2018 09:47:32 +0200
 From: Boris Brezillon <boris.brezillon@bootlin.com>
-Subject: Re: [PATCH v3 1/3] mtd: rawnand: denali_dt: add more clocks based
- on IP datasheet
-Message-ID: <20180618094636.0e40c518@bbrezillon>
-In-Reply-To: <5816516.AqyscFuYxX@blindfold>
+Subject: Re: [PATCH v3 2/3] mtd: rawnand: denali_dt: use dev as a shorthand
+ of &pdev->dev
+Message-ID: <20180618094732.4864f16b@bbrezillon>
+In-Reply-To: <1529025532-22087-3-git-send-email-yamada.masahiro@socionext.com>
 References: <1529025532-22087-1-git-send-email-yamada.masahiro@socionext.com>
-        <1529025532-22087-2-git-send-email-yamada.masahiro@socionext.com>
-        <5816516.AqyscFuYxX@blindfold>
+        <1529025532-22087-3-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Weinberger <richard@nod.at>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-mtd@lists.infradead.org, Rob Herring <robh+dt@kernel.org>, linux-kbuild@vger.kernel.org, "linux-stable #4 . 14+" <stable@vger.kernel.org>, devicetree@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>, linux-kernel@vger.kernel.org, Marek Vasut <marek.vasut@gmail.com>, Brian Norris <computersforpeace@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Mark Rutland <mark.rutland@arm.com>Miquel Raynal <miquel.raynal@bootlin.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-mtd@lists.infradead.org, Rob Herring <robh+dt@kernel.org>, linux-kbuild@vger.kernel.org, Richard Weinberger <richard@nod.at>, Miquel Raynal <miquel.raynal@bootlin.com>, linux-kernel@vger.kernel.org, Marek Vasut <marek.vasut@gmail.com>, Brian Norris <computersforpeace@gmail.com>, David Woodhouse <dwmw2@infradead.org>
 
-On Mon, 18 Jun 2018 09:09:02 +0200
-Richard Weinberger <richard@nod.at> wrote:
+On Fri, 15 Jun 2018 10:18:51 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-> Am Freitag, 15. Juni 2018, 03:18:50 CEST schrieb Masahiro Yamada:
-> > According to the Denali User's Guide, this IP needs three clocks:
-> > 
-> >  - clk: controller core clock
-> > 
-> >  - clk_x: bus interface clock
-> > 
-> >  - ecc_clk: clock at which ECC circuitry is run
-> > 
-> > Currently, denali_dt.c requires a single anonymous clock and its
-> > frequency.  However, the driver needs to get the frequency of "clk_x"
-> > not "clk".  This is confusing because people tend to assume the
-> > anonymous clock means the core clock.  In fact, I got a report of
-> > SOCFPGA breakage because the timing parameters are calculated based
-> > on a wrong frequency.
-> > 
-> > Instead of the cheesy implementation, the clocks in the real hardware
-> > should be represented in the driver and the DT-binding.
-> > 
-> > However, adding new clocks would break the existing platforms.  For the
-> > backward compatibility, the driver still accepts a single clock just as
-> > before.  If clk_x is missing, clk_x_rate is set to a hardcoded value.
-> > This is fine for existing DT of Socionext UniPhier, and also fixes the
-> > issue of Altera (Intel) SOCFPGA because both platforms use 200 MHz for
-> > the bus interface clock.
-> > 
-> > Fixes: 1bb88666775e ("mtd: nand: denali: handle timing parameters by setup_data_interface()")
-> > Cc: linux-stable <stable@vger.kernel.org> #4.14+
-> > Reported-by: Richard Weinberger <richard@nod.at>
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>  
+> The probe function references &pdev->dev many times.  Add 'dev' as
+> a shorthand.
 > 
-> Reviewed-by: Richard Weinberger <richard@nod.at>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Maybe a
+Reviewed-by: Boris Brezillon <boris.brezillon@bootlin.com>
 
-Tested-by: Richard Weinberger <richard@nod.at>
+> ---
+> 
+> Changes in v3: None
+> Changes in v2: None
+> 
+>  drivers/mtd/nand/raw/denali_dt.c | 25 +++++++++++++------------
+>  1 file changed, 13 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/mtd/nand/raw/denali_dt.c b/drivers/mtd/nand/raw/denali_dt.c
+> index ce6239d..afaae37 100644
+> --- a/drivers/mtd/nand/raw/denali_dt.c
+> +++ b/drivers/mtd/nand/raw/denali_dt.c
+> @@ -81,38 +81,39 @@ MODULE_DEVICE_TABLE(of, denali_nand_dt_ids);
+>  
+>  static int denali_dt_probe(struct platform_device *pdev)
+>  {
+> +	struct device *dev = &pdev->dev;
+>  	struct resource *res;
+>  	struct denali_dt *dt;
+>  	const struct denali_dt_data *data;
+>  	struct denali_nand_info *denali;
+>  	int ret;
+>  
+> -	dt = devm_kzalloc(&pdev->dev, sizeof(*dt), GFP_KERNEL);
+> +	dt = devm_kzalloc(dev, sizeof(*dt), GFP_KERNEL);
+>  	if (!dt)
+>  		return -ENOMEM;
+>  	denali = &dt->denali;
+>  
+> -	data = of_device_get_match_data(&pdev->dev);
+> +	data = of_device_get_match_data(dev);
+>  	if (data) {
+>  		denali->revision = data->revision;
+>  		denali->caps = data->caps;
+>  		denali->ecc_caps = data->ecc_caps;
+>  	}
+>  
+> -	denali->dev = &pdev->dev;
+> +	denali->dev = dev;
+>  	denali->irq = platform_get_irq(pdev, 0);
+>  	if (denali->irq < 0) {
+> -		dev_err(&pdev->dev, "no irq defined\n");
+> +		dev_err(dev, "no irq defined\n");
+>  		return denali->irq;
+>  	}
+>  
+>  	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "denali_reg");
+> -	denali->reg = devm_ioremap_resource(&pdev->dev, res);
+> +	denali->reg = devm_ioremap_resource(dev, res);
+>  	if (IS_ERR(denali->reg))
+>  		return PTR_ERR(denali->reg);
+>  
+>  	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "nand_data");
+> -	denali->host = devm_ioremap_resource(&pdev->dev, res);
+> +	denali->host = devm_ioremap_resource(dev, res);
+>  	if (IS_ERR(denali->host))
+>  		return PTR_ERR(denali->host);
+>  
+> @@ -120,19 +121,19 @@ static int denali_dt_probe(struct platform_device *pdev)
+>  	 * A single anonymous clock is supported for the backward compatibility.
+>  	 * New platforms should support all the named clocks.
+>  	 */
+> -	dt->clk = devm_clk_get(&pdev->dev, "nand");
+> +	dt->clk = devm_clk_get(dev, "nand");
+>  	if (IS_ERR(dt->clk))
+> -		dt->clk = devm_clk_get(&pdev->dev, NULL);
+> +		dt->clk = devm_clk_get(dev, NULL);
+>  	if (IS_ERR(dt->clk)) {
+> -		dev_err(&pdev->dev, "no clk available\n");
+> +		dev_err(dev, "no clk available\n");
+>  		return PTR_ERR(dt->clk);
+>  	}
+>  
+> -	dt->clk_x = devm_clk_get(&pdev->dev, "nand_x");
+> +	dt->clk_x = devm_clk_get(dev, "nand_x");
+>  	if (IS_ERR(dt->clk_x))
+>  		dt->clk_x = NULL;
+>  
+> -	dt->clk_ecc = devm_clk_get(&pdev->dev, "ecc");
+> +	dt->clk_ecc = devm_clk_get(dev, "ecc");
+>  	if (IS_ERR(dt->clk_ecc))
+>  		dt->clk_ecc = NULL;
+>  
+> @@ -155,7 +156,7 @@ static int denali_dt_probe(struct platform_device *pdev)
+>  		 * Hardcode the clock rates for the backward compatibility.
+>  		 * This works for both SOCFPGA and UniPhier.
+>  		 */
+> -		dev_notice(&pdev->dev,
+> +		dev_notice(dev,
+>  			   "necessary clock is missing. default clock rates are used.\n");
+>  		denali->clk_x_rate = 200000000;
+>  	}
 
-?
-
-> Reported-by: Philipp Rosenberger <p.rosenberger@linutronix.de>
-
-Should I replace your Reported-by by this one or simply add it?
-
-Miquel, I'll take this patch in mtd/fixes, and let you take the 2
-others in nand/next. That means you'll have to back merge v4.18-rc2
-into the nand/next tree, or base your tree on v4.18-rc2 instead of
-v4.18-rc1.
