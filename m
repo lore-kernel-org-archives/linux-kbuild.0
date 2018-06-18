@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60323 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:60399 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754383AbeFRE4D (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Jun 2018 00:56:03 -0400
+        id S1754672AbeFRE41 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Jun 2018 00:56:27 -0400
 From: NeilBrown <neilb@suse.com>
 Date: Mon, 18 Jun 2018 14:55:20 +1000
-Subject: [PATCH 1/5] kbuild: detect directories in components of a module.
-Message-ID: <152929772039.17463.15099887779014761901.stgit@noble>
+Subject: [PATCH 5/5] kbuild: Add documentation for modobj-m
+Message-ID: <152929772056.17463.10310561149828315203.stgit@noble>
 In-Reply-To: <152929708853.17463.17302660556961083137.stgit@noble>
 References: <152929708853.17463.17302660556961083137.stgit@noble>
 MIME-Version: 1.0
@@ -17,94 +17,112 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-This is a first step in a larger change and so can
-only be fully understood in the larger context.
-
-This patch changes the code for extracting directories
-from a list of objects to extract them from real-obj-X
-instead of obj-X.
-This should not cause any change in behaviour yet
-as listing directories as components of an object is
-not currently supported and will cause an error.
-A future patch will give a useful meaning to directories
-listed in componsite objects.
-
-A consequence of this change is that any subsequent use of obj-y or
-obj-m will still have directories listed in it.
-There are no subsequent uses of obj-y and only 2 of obj-m.
-
-1/ obj-m is included as a dependency of __build.  subdir-ym, which
-  contains all the directories mentioned in obj-m, is also a
-  dependency, so this won't change the set of final dependencies.
-
-2/ Any rule that builds a directory listed in obj-m will find that
-   quite_modtag has the value '[M]'.  As quiet_modtag is not used
-   when descending into directories, this is of no consequence.
+Add documentation for building modules
+from multiple directories using modobj-m.
 
 Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- scripts/Makefile.lib |   38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+ Documentation/kbuild/makefiles.txt |   65 ++++++++++++++++++++++++++++++++++--
+ 1 file changed, 61 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 1bb594fcfe12..ddfdd5cf47cd 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -25,36 +25,36 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
- # and -m subdirs.  Just put -y's first.
- modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 048fc39a6b91..985a60cf0663 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -225,17 +225,74 @@ more details, with real examples.
+ 	part of the composite object ext2.o if $(CONFIG_EXT2_FS_XATTR)
+ 	evaluates to 'y'.
  
-+# if $(foo-objs), $(foo-y), or $(foo-m) exists, foo.o is a composite object
-+multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
-+multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))), $(m))))
-+multi-used   := $(multi-used-y) $(multi-used-m)
-+single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
++	If you wish to include code in some other directory into a
++	module, that directory should be configured to create a
++	mod.a target from the relevant code, as described below.
++	The list of components for the module (e.g. foo-y) should
++	then contain the name of the directory (with trailing /).
++	The mod.a from that directory will be built and included
++	into this module.
 +
-+# Replace multi-part objects by their individual parts,
-+# including built-in.a from subdirectories
-+real-obj-y := $(foreach m, $(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
-+real-obj-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)),$(m)))
+ 	Note: Of course, when you are building objects into the kernel,
+ 	the syntax above will also work. So, if you have CONFIG_EXT2_FS=y,
+ 	kbuild will build an ext2.o file for you out of the individual
+ 	parts and then link this into built-in.a, as you would expect.
+ 
+---- 3.4 Objects which export symbols
++--- 3.4 Loadable modules from multiple directories - modobj-m
 +
- # Handle objects in subdirs
- # ---------------------------------------------------------------------------
--# o if we encounter foo/ in $(obj-y), replace it by foo/built-in.a
-+# o if we encounter foo/ in $(real-obj-y), replace it by foo/built-in.a
- #   and add the directory to the list of dirs to descend into: $(subdir-y)
--# o if we encounter foo/ in $(obj-m), remove it from $(obj-m)
-+# o if we encounter foo/ in $(real-obj-m), remove it from $(real-obj-m)
- #   and add the directory to the list of dirs to descend into: $(subdir-m)
--__subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
-+__subdir-y	:= $(patsubst %/,%,$(filter %/, $(real-obj-y)))
- subdir-y	+= $(__subdir-y)
--__subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
-+__subdir-m	:= $(patsubst %/,%,$(filter %/, $(real-obj-m)))
- subdir-m	+= $(__subdir-m)
--obj-y		:= $(patsubst %/, %/built-in.a, $(obj-y))
--obj-m		:= $(filter-out %/, $(obj-m))
-+real-obj-y	:= $(patsubst %/, %/built-in.a, $(real-obj-y))
-+real-obj-m	:= $(filter-out %/, $(real-obj-m))
++	One way to build modules with source from multiple directories
++	is to list relative path names of all source files in a
++	single Makefile.
++
++	Example:
++		btrfs-$(CONFIG_BTRFS_FS_RUN_SANITY_TESTS) += tests/free-space-tests.o \
++		        tests/extent-buffer-tests.o tests/btrfs-tests.o \
++		....
++
++	This works, but defeats the ability to build individual
++	directories, or individual target files such as assembly
++	language targets.
++
++	Example:
++		make btrfs/tests/free-space-tests.s
++
++	A more general way is to create a mod.a file using modobj-m
++
++	Example:
++		modobj-$(CONFIG_LUSTRE_FS) += fid_request.o fid_lib.o lproc_fid.o
++
++	modobj-y is treated identically to obj-y so if CONFIG_LUSTRE_FS=y
++	then these objects are built in to the kernel.  If
++	CONFIG_LUSTRE_FS=m then these objects are gathered into an archive
++	called mod.a.  Archives from other directories can be included
++	by listing the directories in modobj-m, so
++
++	Example:
++		modobj-$(CONFIG_LUSTRE_FS) += fid/ fld/
++
++	This will create a mod.a in the same directory as the
++	Makefile, combining the contents of mod.a from the listed
++	directories.  The mod.a can instead be included into a module
++	by listing the directory with any other local object files.
++
++	Example:
++		obj-$(CONFIG_LUSTRE_FS) += lustre.o
++		lustre-y := module.o
++		lustre-y += obdclass/ ldlm/ ptlrpc/ fld/ osc/ mgc/
++
++	When CONFIG_LUSTRE_FS=m, kbuild will build lustre.ko from module.o and
++	the mod.a archives created in the listed directories.
++
++	When components of a module are built in a different directory
++	kbuild cannot determine the name of the module so the
++	KBUILD_MODNAME macro is left undefined.
++
++--- 3.5 Objects which export symbols
  
- # Subdirectories we need to descend into
- subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
+ 	No special notation is required in the makefiles for
+ 	modules exporting symbols.
  
--# if $(foo-objs), $(foo-y), or $(foo-m) exists, foo.o is a composite object
--multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
--multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))), $(m))))
--multi-used   := $(multi-used-y) $(multi-used-m)
--single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
--
--# $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
-+# $(subdir-obj-y) is the list of objects in $(real-obj-y) which uses dir/ to
- # tell kbuild to descend
--subdir-obj-y := $(filter %/built-in.a, $(obj-y))
--
--# Replace multi-part objects by their individual parts,
--# including built-in.a from subdirectories
--real-obj-y := $(foreach m, $(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
--real-obj-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)),$(m)))
-+subdir-obj-y := $(filter %/built-in.a, $(real-obj-y))
+---- 3.5 Library file goals - lib-y
++--- 3.6 Library file goals - lib-y
  
- # DTB
- # If CONFIG_OF_ALL_DTBS is enabled, all DT blobs are built
+ 	Objects listed with obj-* are used for modules, or
+ 	combined in a built-in.a for that specific directory.
+@@ -263,7 +320,7 @@ more details, with real examples.
+ 
+ 	Use of lib-y is normally restricted to lib/ and arch/*/lib.
+ 
+---- 3.6 Descending down in directories
++--- 3.7 Descending down in directories
+ 
+ 	A Makefile is only responsible for building objects in its own
+ 	directory. Files in subdirectories should be taken care of by
+@@ -290,7 +347,7 @@ more details, with real examples.
+ 	names. This allows kbuild to totally skip the directory if the
+ 	corresponding CONFIG_ option is neither 'y' nor 'm'.
+ 
+---- 3.7 Compilation flags
++--- 3.8 Compilation flags
+ 
+     ccflags-y, asflags-y and ldflags-y
+ 	These three flags apply only to the kbuild makefile in which they
 
 
