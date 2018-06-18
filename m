@@ -1,82 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.bootlin.com ([62.4.15.54]:34896 "EHLO mail.bootlin.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933501AbeFRMSP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Jun 2018 08:18:15 -0400
-Date: Mon, 18 Jun 2018 14:18:00 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: Re: [PATCH v3 1/3] mtd: rawnand: denali_dt: add more clocks based
- on IP datasheet
-Message-ID: <20180618141800.2b8b9721@xps13>
-In-Reply-To: <20180618094636.0e40c518@bbrezillon>
-References: <1529025532-22087-1-git-send-email-yamada.masahiro@socionext.com>
-        <1529025532-22087-2-git-send-email-yamada.masahiro@socionext.com>
-        <5816516.AqyscFuYxX@blindfold>
-        <20180618094636.0e40c518@bbrezillon>
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:41150 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752650AbeFRNGA (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Jun 2018 09:06:00 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20180616005323.7938-1-paul.burton@mips.com>
+References: <20180616005323.7938-1-paul.burton@mips.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Mon, 18 Jun 2018 15:05:57 +0200
+Message-ID: <CAK8P3a2Yz-02On2K2U0+8+tR8RQCQ+KWh7CrtqL9L+FweP+TPQ@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Resolve -Wattribute-alias warnings from SYSCALL_DEFINEx()
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Boris Brezillon <boris.brezillon@bootlin.com>
-Cc: Richard Weinberger <richard@nod.at>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-mtd@lists.infradead.org, Rob Herring <robh+dt@kernel.org>, linux-kbuild@vger.kernel.org, "linux-stable #4 . 14+" <stable@vger.kernel.org>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Marek Vasut <marek.vasut@gmail.com>, Brian Norris <computersforpeace@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Mark Rutland <mark.rutland@arm.com>
+To: Paul Burton <paul.burton@mips.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, "open list:RALINK MIPS ARCHITECTURE" <linux-mips@linux-mips.org>, Ingo Molnar <mingo@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Thomas Gleixner <tglx@linutronix.de>, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Matthias Kaehlcke <mka@chromium.org>, He Zhe <zhe.he@windriver.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Khem Raj <raj.khem@gmail.com>, Christophe Leroy <christophe.leroy@c-s.fr>, Al Viro <viro@zeniv.linux.org.uk>, Stafford Horne <shorne@gmail.com>, Gideon Israel Dsouza <gidisrael@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Paul Mackerras <paulus@samba.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-Hi Boris,
+On Sat, Jun 16, 2018 at 2:53 AM, Paul Burton <paul.burton@mips.com> wrote:
+> This series introduces infrastructure allowing compiler diagnostics to
+> be disabled or their severity modified for specific pieces of code, with
+> suitable abstractions to prevent that code from becoming tied to a
+> specific compiler.
+>
+> This infrastructure is then used to disable the -Wattribute-alias
+> warning around syscall definitions, which rely on type mismatches to
+> sanitize arguments.
+>
+> Finally PowerPC-specific #pragma's are removed now that the generic code
+> is handling this.
+>
+> The series takes Arnd's RFC patches & addresses the review comments they
+> received. The most notable effect of this series to to avoid warnings &
+> build failures caused by -Wattribute-alias when compiling the kernel
+> with GCC 8.
+>
+> Applies cleanly atop master as of 9215310cf13b ("Merge
+> git://git.kernel.org/pub/scm/linux/kernel/git/davem/net").
+>
 
-On Mon, 18 Jun 2018 09:46:36 +0200, Boris Brezillon
-<boris.brezillon@bootlin.com> wrote:
+Sorry I dropped the ball on this earlier, and thanks a lot for picking
+it up again! From what I can tell, your version addresses all issues
+I was aware of, so we should merge that.
 
-> On Mon, 18 Jun 2018 09:09:02 +0200
-> Richard Weinberger <richard@nod.at> wrote:
-> 
-> > Am Freitag, 15. Juni 2018, 03:18:50 CEST schrieb Masahiro Yamada:  
-> > > According to the Denali User's Guide, this IP needs three clocks:
-> > > 
-> > >  - clk: controller core clock
-> > > 
-> > >  - clk_x: bus interface clock
-> > > 
-> > >  - ecc_clk: clock at which ECC circuitry is run
-> > > 
-> > > Currently, denali_dt.c requires a single anonymous clock and its
-> > > frequency.  However, the driver needs to get the frequency of "clk_x"
-> > > not "clk".  This is confusing because people tend to assume the
-> > > anonymous clock means the core clock.  In fact, I got a report of
-> > > SOCFPGA breakage because the timing parameters are calculated based
-> > > on a wrong frequency.
-> > > 
-> > > Instead of the cheesy implementation, the clocks in the real hardware
-> > > should be represented in the driver and the DT-binding.
-> > > 
-> > > However, adding new clocks would break the existing platforms.  For the
-> > > backward compatibility, the driver still accepts a single clock just as
-> > > before.  If clk_x is missing, clk_x_rate is set to a hardcoded value.
-> > > This is fine for existing DT of Socionext UniPhier, and also fixes the
-> > > issue of Altera (Intel) SOCFPGA because both platforms use 200 MHz for
-> > > the bus interface clock.
-> > > 
-> > > Fixes: 1bb88666775e ("mtd: nand: denali: handle timing parameters by setup_data_interface()")
-> > > Cc: linux-stable <stable@vger.kernel.org> #4.14+
-> > > Reported-by: Richard Weinberger <richard@nod.at>
-> > > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>    
-> > 
-> > Reviewed-by: Richard Weinberger <richard@nod.at>  
-> 
-> Maybe a
-> 
-> Tested-by: Richard Weinberger <richard@nod.at>
-> 
-> ?
-> 
-> > Reported-by: Philipp Rosenberger <p.rosenberger@linutronix.de>  
-> 
-> Should I replace your Reported-by by this one or simply add it?
-> 
-> Miquel, I'll take this patch in mtd/fixes, and let you take the 2
-> others in nand/next. That means you'll have to back merge v4.18-rc2
-> into the nand/next tree, or base your tree on v4.18-rc2 instead of
-> v4.18-rc1.
-
-Sure.
-
-Miquèl
+      Arnd
