@@ -1,87 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:19607 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755019AbeFRHBx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Jun 2018 03:01:53 -0400
-Subject: Re: [PATCH 3/3] Revert "powerpc: fix build failure by disabling
- attribute-alias warning in pci_32"
-References: <20180616005323.7938-1-paul.burton@mips.com>
- <20180616005323.7938-4-paul.burton@mips.com>
-From: Christophe LEROY <christophe.leroy@c-s.fr>
-Message-ID: <14ef00cd-088c-d165-f4b2-b63eb2f3866b@c-s.fr>
-Date: Mon, 18 Jun 2018 09:01:50 +0200
+Received: from lithops.sigma-star.at ([195.201.40.130]:41816 "EHLO
+        lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755005AbeFRHJF (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Jun 2018 03:09:05 -0400
+From: Richard Weinberger <richard@nod.at>
+Subject: Re: [PATCH v3 1/3] mtd: rawnand: denali_dt: add more clocks based on IP datasheet
+Date: Mon, 18 Jun 2018 09:09:02 +0200
+Message-ID: <5816516.AqyscFuYxX@blindfold>
+In-Reply-To: <1529025532-22087-2-git-send-email-yamada.masahiro@socionext.com>
+References: <1529025532-22087-1-git-send-email-yamada.masahiro@socionext.com> <1529025532-22087-2-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-In-Reply-To: <20180616005323.7938-4-paul.burton@mips.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Burton <paul.burton@mips.com>, linux-kbuild@vger.kernel.org
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>, linux-mips@linux-mips.org, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Thomas Gleixner <tglx@linutronix.de>, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Matthias Kaehlcke <mka@chromium.org>, He Zhe <zhe.he@windriver.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Khem Raj <raj.khem@gmail.com>, Al Viro <viro@zeniv.linux.org.uk>, Stafford Horne <shorne@gmail.com>, Gideon Israel Dsouza <gidisrael@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-mtd@lists.infradead.org, Boris Brezillon <boris.brezillon@bootlin.com>, Rob Herring <robh+dt@kernel.org>, linux-kbuild@vger.kernel.org, "linux-stable #4 . 14+" <stable@vger.kernel.org>, devicetree@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>, linux-kernel@vger.kernel.org, Marek Vasut <marek.vasut@gmail.com>, Brian Norris <computersforpeace@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Mark Rutland <mark.rutland@arm.com>
 
+Am Freitag, 15. Juni 2018, 03:18:50 CEST schrieb Masahiro Yamada:
+> According to the Denali User's Guide, this IP needs three clocks:
+> 
+>  - clk: controller core clock
+> 
+>  - clk_x: bus interface clock
+> 
+>  - ecc_clk: clock at which ECC circuitry is run
+> 
+> Currently, denali_dt.c requires a single anonymous clock and its
+> frequency.  However, the driver needs to get the frequency of "clk_x"
+> not "clk".  This is confusing because people tend to assume the
+> anonymous clock means the core clock.  In fact, I got a report of
+> SOCFPGA breakage because the timing parameters are calculated based
+> on a wrong frequency.
+> 
+> Instead of the cheesy implementation, the clocks in the real hardware
+> should be represented in the driver and the DT-binding.
+> 
+> However, adding new clocks would break the existing platforms.  For the
+> backward compatibility, the driver still accepts a single clock just as
+> before.  If clk_x is missing, clk_x_rate is set to a hardcoded value.
+> This is fine for existing DT of Socionext UniPhier, and also fixes the
+> issue of Altera (Intel) SOCFPGA because both platforms use 200 MHz for
+> the bus interface clock.
+> 
+> Fixes: 1bb88666775e ("mtd: nand: denali: handle timing parameters by setup_data_interface()")
+> Cc: linux-stable <stable@vger.kernel.org> #4.14+
+> Reported-by: Richard Weinberger <richard@nod.at>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
+Reviewed-by: Richard Weinberger <richard@nod.at>
+Reported-by: Philipp Rosenberger <p.rosenberger@linutronix.de>
 
-Le 16/06/2018 à 02:53, Paul Burton a écrit :
-> With SYSCALL_DEFINEx() disabling -Wattribute-alias generically, there's
-> no need to duplicate that for PowerPC's pciconfig_iobase syscall.
-> 
-> This reverts commit 415520373975 ("powerpc: fix build failure by
-> disabling attribute-alias warning in pci_32").
-> 
-> Signed-off-by: Paul Burton <paul.burton@mips.com>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Douglas Anderson <dianders@chromium.org>
-> Cc: Al Viro <viro@zeniv.linux.org.uk>
-> Cc: Heiko Carstens <heiko.carstens@de.ibm.com>
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Cc: Matthew Wilcox <matthew@wil.cx>
-> Cc: Matthias Kaehlcke <mka@chromium.org>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Ingo Molnar <mingo@kernel.org>
-> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Gideon Israel Dsouza <gidisrael@gmail.com>
-> Cc: Christophe Leroy <christophe.leroy@c-s.fr>
-> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Cc: Paul Mackerras <paulus@samba.org>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Stafford Horne <shorne@gmail.com>
-> Cc: Khem Raj <raj.khem@gmail.com>
-> Cc: He Zhe <zhe.he@windriver.com>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-mips@linux-mips.org
-> Cc: linuxppc-dev@lists.ozlabs.org
-
-Acked-by: Christophe Leroy <christophe.leroy@c-s.fr>
-
-> 
-> ---
-> 
->   arch/powerpc/kernel/pci_32.c | 4 ----
->   1 file changed, 4 deletions(-)
-> 
-> diff --git a/arch/powerpc/kernel/pci_32.c b/arch/powerpc/kernel/pci_32.c
-> index 4f861055a852..d63b488d34d7 100644
-> --- a/arch/powerpc/kernel/pci_32.c
-> +++ b/arch/powerpc/kernel/pci_32.c
-> @@ -285,9 +285,6 @@ pci_bus_to_hose(int bus)
->    * Note that the returned IO or memory base is a physical address
->    */
->   
-> -#pragma GCC diagnostic push
-> -#pragma GCC diagnostic ignored "-Wpragmas"
-> -#pragma GCC diagnostic ignored "-Wattribute-alias"
->   SYSCALL_DEFINE3(pciconfig_iobase, long, which,
->   		unsigned long, bus, unsigned long, devfn)
->   {
-> @@ -313,4 +310,3 @@ SYSCALL_DEFINE3(pciconfig_iobase, long, which,
->   
->   	return result;
->   }
-> -#pragma GCC diagnostic pop
-> 
+Thanks,
+//richard
