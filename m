@@ -1,377 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:18584 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S966368AbeFSRfX (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:49282 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1030330AbeFSRny (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Jun 2018 13:35:23 -0400
+        Tue, 19 Jun 2018 13:43:54 -0400
+Subject: Re: [RFC v7 1/1] mconf: global i-search in menu prompts
+References: <20180617121534.4809-1-dirk@gouders.net>
+ <20180617121534.4809-2-dirk@gouders.net>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <01450eac-3c65-efa1-8a9e-aaea98088bac@infradead.org>
+Date: Tue, 19 Jun 2018 10:43:45 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180616005323.7938-2-paul.burton@mips.com>
-References: <20180616005323.7938-1-paul.burton@mips.com> <20180616005323.7938-2-paul.burton@mips.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 20 Jun 2018 02:34:35 +0900
-Message-ID: <CAK7LNASvCha27kU4ipn23uOpNuxkzJrNzWBwYcxN4n=3xtv8SA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] kbuild: add macro for controlling warnings to linux/compiler.h
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20180617121534.4809-2-dirk@gouders.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Burton <paul.burton@mips.com>, Arnd Bergmann <arnd@arndb.de>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Linux-MIPS <linux-mips@linux-mips.org>, Ingo Molnar <mingo@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Thomas Gleixner <tglx@linutronix.de>, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Matthias Kaehlcke <mka@chromium.org>, He Zhe <zhe.he@windriver.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Khem Raj <raj.khem@gmail.com>, Christophe Leroy <christophe.leroy@c-s.fr>, Al Viro <viro@zeniv.linux.org.uk>, Stafford Horne <shorne@gmail.com>, Gideon Israel Dsouza <gidisrael@gmail.com>, Kees Cook <keescook@chromium.org>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Paul Mackerras <paulus@samba.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: Dirk Gouders <dirk@gouders.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
 
-Hi.
+On 06/17/2018 05:15 AM, Dirk Gouders wrote:
 
-2018-06-16 9:53 GMT+09:00 Paul Burton <paul.burton@mips.com>:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> I have occasionally run into a situation where it would make sense to
-> control a compiler warning from a source file rather than doing so from
-> a Makefile using the $(cc-disable-warning, ...) or $(cc-option, ...)
-> helpers.
->
-> The approach here is similar to what glibc uses, using __diag() and
-> related macros to encapsulate a _Pragma("GCC diagnostic ...") statement
-> that gets turned into the respective "#pragma GCC diagnostic ..." by
-> the preprocessor when the macro gets expanded.
->
-> Like glibc, I also have an argument to pass the affected compiler
-> version, but decided to actually evaluate that one. For now, this
-> supports GCC_4_6, GCC_4_7, GCC_4_8, GCC_4_9, GCC_5, GCC_6, GCC_7,
-> GCC_8 and GCC_9. Adding support for CLANG_5 and other interesting
-> versions is straightforward here. GNU compilers starting with gcc-4.2
-> could support it in principle, but "#pragma GCC diagnostic push"
-> was only added in gcc-4.6, so it seems simpler to not deal with those
-> at all. The same versions show a large number of warnings already,
-> so it seems easier to just leave it at that and not do a more
-> fine-grained control for them.
->
-> The use cases I found so far include:
->
-> - turning off the gcc-8 -Wattribute-alias warning inside of the
->   SYSCALL_DEFINEx() macro without having to do it globally.
->
-> - Reducing the build time for a simple re-make after a change,
->   once we move the warnings from ./Makefile and
->   ./scripts/Makefile.extrawarn into linux/compiler.h
->
-> - More control over the warnings based on other configurations,
->   using preprocessor syntax instead of Makefile syntax. This should make
->   it easier for the average developer to understand and change things.
->
-> - Adding an easy way to turn the W=1 option on unconditionally
->   for a subdirectory or a specific file. This has been requested
->   by several developers in the past that want to have their subsystems
->   W=1 clean.
->
-> - Integrating clang better into the build systems. Clang supports
->   more warnings than GCC, and we probably want to classify them
->   as default, W=1, W=2 etc, but there are cases in which the
->   warnings should be classified differently due to excessive false
->   positives from one or the other compiler.
->
-> - Adding a way to turn the default warnings into errors (e.g. using
->   a new "make E=0" tag) while not also turning the W=1 warnings into
->   errors.
->
-> This patch for now just adds the minimal infrastructure in order to
-> do the first of the list above. As the #pragma GCC diagnostic
-> takes precedence over command line options, the next step would be
-> to convert a lot of the individual Makefiles that set nonstandard
-> options to use __diag() instead.
->
-> [paul.burton@mips.com:
->   - Rebase atop current master.
->   - Add __diag_GCC, or more generally __diag_<compiler>, abstraction to
->     avoid code outside of linux/compiler-gcc.h needing to duplicate
->     knowledge about different GCC versions.
->   - Add a comment argument to __diag_{ignore,warn,error} which isn't
->     used in the expansion of the macros but serves to push people to
->     document the reason for using them - per feedback from Kees Cook.]
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Paul Burton <paul.burton@mips.com>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Douglas Anderson <dianders@chromium.org>
-> Cc: Al Viro <viro@zeniv.linux.org.uk>
-> Cc: Heiko Carstens <heiko.carstens@de.ibm.com>
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Cc: Matthew Wilcox <matthew@wil.cx>
-> Cc: Matthias Kaehlcke <mka@chromium.org>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Ingo Molnar <mingo@kernel.org>
-> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Gideon Israel Dsouza <gidisrael@gmail.com>
-> Cc: Christophe Leroy <christophe.leroy@c-s.fr>
-> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Cc: Paul Mackerras <paulus@samba.org>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Stafford Horne <shorne@gmail.com>
-> Cc: Khem Raj <raj.khem@gmail.com>
-> Cc: He Zhe <zhe.he@windriver.com>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-mips@linux-mips.org
-> Cc: linuxppc-dev@lists.ozlabs.org
+> Signed-off-by: Dirk Gouders <dirk@gouders.net>
 > ---
->
->  include/linux/compiler-gcc.h   | 66 ++++++++++++++++++++++++++++++++++
->  include/linux/compiler_types.h | 18 ++++++++++
->  2 files changed, 84 insertions(+)
->
-> diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-> index f1a7492a5cc8..aba64a2912d8 100644
-> --- a/include/linux/compiler-gcc.h
-> +++ b/include/linux/compiler-gcc.h
-> @@ -347,3 +347,69 @@
->  #if GCC_VERSION >= 50100
->  #define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
->  #endif
+>  scripts/kconfig/lxdialog/checklist.c |   2 +-
+>  scripts/kconfig/lxdialog/dialog.h    |   3 +-
+>  scripts/kconfig/lxdialog/inputbox.c  |   2 +-
+>  scripts/kconfig/lxdialog/menubox.c   | 181 +++++++++++++++++++++---
+>  scripts/kconfig/lxdialog/util.c      |  45 +++++-
+>  scripts/kconfig/lxdialog/yesno.c     |   2 +-
+>  scripts/kconfig/mconf.c              | 202 +++++++++++++++++++++++++--
+>  7 files changed, 398 insertions(+), 39 deletions(-)
+
+Hi Dirk,
+
+A few typos below...
+
+
+> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> index 5294ed159b98..e2e6fc973f6f 100644
+> --- a/scripts/kconfig/mconf.c
+> +++ b/scripts/kconfig/mconf.c
+> @@ -21,6 +21,12 @@
+>  #include "lkc.h"
+>  #include "lxdialog/dialog.h"
+>  
+> +extern int focus_on_buttons;
+> +extern char isearch_str[];
+> +static struct menu **flat_menu; /* serialized menu tree */
+> +static int flat_menu_max = 10;
+> +static int in_isearch;	      /* Ensure at most one instance of i-search is active */
 > +
-> +/*
-> + * turn individual warnings and errors on and off locally, depending
-> + * on version.
-> + */
-> +#define __diag_GCC(version, s) __diag_GCC_ ## version(s)
-> +
-> +#if GCC_VERSION >= 40600
-> +#define __diag_str1(s) #s
-> +#define __diag_str(s) __diag_str1(s)
-> +#define __diag(s) _Pragma(__diag_str(GCC diagnostic s))
-> +
-> +/* compilers before gcc-4.6 do not understand "#pragma GCC diagnostic push" */
-> +#define __diag_GCC_4_6(s) __diag(s)
-> +#else
-> +#define __diag(s)
-> +#define __diag_GCC_4_6(s)
-> +#endif
-> +
-> +#if GCC_VERSION >= 40700
-> +#define __diag_GCC_4_7(s) __diag(s)
-> +#else
-> +#define __diag_GCC_4_7(s)
-> +#endif
-> +
-> +#if GCC_VERSION >= 40800
-> +#define __diag_GCC_4_8(s) __diag(s)
-> +#else
-> +#define __diag_GCC_4_8(s)
-> +#endif
-> +
-> +#if GCC_VERSION >= 40900
-> +#define __diag_GCC_4_9(s) __diag(s)
-> +#else
-> +#define __diag_GCC_4_9(s)
-> +#endif
-> +
-> +#if GCC_VERSION >= 50000
-> +#define __diag_GCC_5(s) __diag(s)
-> +#else
-> +#define __diag_GCC_5(s)
-> +#endif
-> +
-> +#if GCC_VERSION >= 60000
-> +#define __diag_GCC_6(s) __diag(s)
-> +#else
-> +#define __diag_GCC_6(s)
-> +#endif
-> +
-> +#if GCC_VERSION >= 70000
-> +#define __diag_GCC_7(s) __diag(s)
-> +#else
-> +#define __diag_GCC_7(s)
-> +#endif
-> +
-> +#if GCC_VERSION >= 80000
-> +#define __diag_GCC_8(s) __diag(s)
-> +#else
-> +#define __diag_GCC_8(s)
-> +#endif
-> +
-> +#if GCC_VERSION >= 90000
-> +#define __diag_GCC_9(s) __diag(s)
-> +#else
-> +#define __diag_GCC_9(s)
-> +#endif
+>  static const char mconf_readme[] =
+>  "Overview\n"
+>  "--------\n"
+> @@ -36,20 +42,74 @@ static const char mconf_readme[] =
+>  "while *, M or whitespace inside braces means to build in, build as\n"
+>  "a module or to exclude the feature respectively.\n"
+>  "\n"
+> -"To change any of these features, highlight it with the cursor\n"
+> -"keys and press <Y> to build it in, <M> to make it a module or\n"
+> +"Operation modes\n"
+> +"---------------\n"
+> +"Menuconfig operates in two modes, depending on the focus that can be\n"
+> +"either on the menu or the buttons below it. The focus is on the\n"
+> +"buttons if one button (the selected one) is highlighted, otherwise it\n"
+> +"is on the menu.\n"
+> +"\n"
+> +"To change any of the above features, it has to be navigated to (see\n"
+> +"below) so that it is highlited, focus then has to be on the buttons\n"
+
+                         highlighted,
+
+> +"before you press <Y> to build it in, <M> to make it a module or\n"
+>  "<N> to remove it.  You may also press the <Space Bar> to cycle\n"
+>  "through the available options (i.e. Y->N->M->Y).\n"
+>  "\n"
+> +"Navigation\n"
+> +"----------\n"
+> +"The following keys work independent of the current focus:\n"
+
+                            independently
+
+> +"\n"
+> +"o vertical arrow keys are used to navigate to menu items\n"
+> +"\n"
+> +"o horizontal arrow keys put the focus on the buttons and cycle\n"
+> +"  between the buttons.\n"
+> +"\n"
+> +"o <PAGE UP> and <PAGE DOWN> scroll invisible items into view.\n"
+> +"\n"
+> +"o <ENTER> visits a submenu\n"
+> +"  Submenus are designated by \"--->\", empty ones by \"----\".\n"
+> +"\n"
+> +"o <ESC><ESC> leaves a submenu or (in the main menu) exits menuconfig\n"
+> +"  and clears the current i-search string."
+> +"\n"
+> +"o <TAB> is reserved to toggle the focus between menu and buttons\n"
+> +"\n"
+> +"When menuconfig starts, the focus is on the menu and i-search mode\n"
+> +"is active.  I-search performs continuous cyclic searches for an entered\n"
+> +"string in the prompt texts of the whole menu tree.\n"
+> +"\n"
+> +"Subsequent characters can be entered to build a search-string the\n"
+> +"menu items are searched for and each time a character is added the\n"
+> +"current string is searched for starting from the current position in\n"
+> +"the menu tree.  If a match is found it is immediately navigated to.\n"
+> +"\n"
+> +"Keys with a special meaning are:\n"
+> +"\n"
+> +"o <BACKSPACE> removes the last character from the current search string\n"
+> +"\n"
+> +"o <DEL> clears the search string\n"
+> +"\n"
+> +"o <\\> (backslash) can be used to find further matches of a string\n"
+> +"\n"
+> +"When the focus is on the buttons the following keys can be used:\n"
+> +"\n"
+> +"o <x> can be used for exit identical to <ESC><ESC>\n"
+> +"\n"
+> +"o <y>, <n>, <m> or <SPACE> change the selected item\n"
+> +"\n"
+> +"o <+> and <-> keys navigate menu items identical to vertical arrow\n"
+> +"  keys\n"
+> +"\n"
+> +"o <h> or <?> display help messages\n"
+> +"\n"
+> +"o <z> toggles the display of hidden options\n"
+
+Ah, there it is!  Thanks.
+
+> +"\n"
+>  "Some additional keyboard hints:\n"
+>  "\n"
+>  "Menus\n"
+>  "----------\n"
+> -"o  Use the Up/Down arrow keys (cursor keys) to highlight the item you\n"
+> -"   wish to change or the submenu you wish to select and press <Enter>.\n"
+> -"   Submenus are designated by \"--->\", empty ones by \"----\".\n"
+> -"\n"
+> -"   Shortcut: Press the option's highlighted letter (hotkey).\n"
+> +"o  Hotkeys (available with focus on buttons): Press the target option's\n"
+> +"             highlighted letter (hotkey).\n"
+>  "             Pressing a hotkey more than once will sequence\n"
+>  "             through all visible items which use that hotkey.\n"
+>  "\n"
 
 
-Hmm, we would have to add this for every release.
-
-
-
-> diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-> index 6b79a9bba9a7..313a2ad884e0 100644
-> --- a/include/linux/compiler_types.h
-> +++ b/include/linux/compiler_types.h
-> @@ -271,4 +271,22 @@ struct ftrace_likely_data {
->  # define __native_word(t) (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
->  #endif
->
-> +#ifndef __diag
-> +#define __diag(string)
-> +#endif
-> +
-> +#ifndef __diag_GCC
-> +#define __diag_GCC(string)
-> +#endif
-
-
-
-
-__diag_GCC() takes two arguments,
-so it should be:
-
-#ifndef __diag_GCC
-#define __diag_GCC(version, s)
-#endif
-
-
-Otherwise, this would cause warning like this:
-
-
-arch/arm64/kernel/sys.c:40:1: error: macro "__diag_GCC" passed 2
-arguments, but takes just 1
- SYSCALL_DEFINE1(arm64_personality, unsigned int, personality)
- ^~~~~~~~~~
-
-
-
-
-
-
-
-> +#define __diag_push()  __diag(push)
-> +#define __diag_pop()   __diag(pop)
-> +
-> +#define __diag_ignore(compiler, version, option, comment) \
-> +       __diag_ ## compiler(version, ignored option)
-> +#define __diag_warn(compiler, version, option, comment) \
-> +       __diag_ ## compiler(version, warning option)
-> +#define __diag_error(compiler, version, option, comment) \
-> +       __diag_ ## compiler(version, error   option)
-> +
-
-
-To me, it looks like this is putting GCC/Clang specific things
-in the common file, <linux/compiler_types.h> .
-
-All compilers must use "ignored", "warning", "error",
-not allowed to use "ignore".
-
-
-
-I also wonder if we could avoid proliferating __diag_GCC_*.
-
-
-
->  #endif /* __LINUX_COMPILER_TYPES_H */
-> --
-> 2.17.1
->
-
-
-I attached a bit different implementation below.
-
-I used -Wno-pragmas to avoid unknown option warnings.
-
-
-
-
-diff --git a/Makefile b/Makefile
-index ca2af1a..d610d81 100644
---- a/Makefile
-+++ b/Makefile
-@@ -817,6 +817,8 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=designated-init)
- # change __FILE__ to the relative path from the srctree
- KBUILD_CFLAGS  += $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
-
-+KBUILD_CFLAGS   += $(call cc-option,-Wno-pragmas)
-+
- # use the deterministic mode of AR if available
- KBUILD_ARFLAGS := $(call ar-option,D)
-
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index f1a7492..3f9c1cc 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -3,6 +3,8 @@
- #error "Please don't include <linux/compiler-gcc.h> directly, include
-<linux/compiler.h> instead."
- #endif
-
-+#include <linux/stringify.h>
-+
- /*
-  * Common definitions for all gcc versions go here.
-  */
-@@ -259,6 +261,16 @@
-  */
- #define __visible      __attribute__((externally_visible))
-
-+/* turn individual warnings and errors on and off locally */
-+#define __diag_gcc(s)  _Pragma(__stringify(GCC diagnostic s))
-+
-+#define __diag_push()  __diag_gcc(push)
-+#define __diag_pop()   __diag_gcc(pop)
-+
-+#define __diag_ignore(option, comment) __diag_gcc(ignored __stringify(option))
-+#define __diag_warn(option, comment)   __diag_gcc(warning __stringify(option))
-+#define __diag_error(option, comment)  __diag_gcc(error __stringify(option))
-+
- #endif /* GCC_VERSION >= 40600 */
-diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-index 6b79a9b..32e354f 100644
---- a/include/linux/compiler_types.h
-+++ b/include/linux/compiler_types.h
-@@ -271,4 +271,24 @@ struct ftrace_likely_data {
- # define __native_word(t) (sizeof(t) == sizeof(char) || sizeof(t) ==
-sizeof(short) || sizeof(t) == sizeof(int) || sizeof(t) ==
-sizeof(long))
- #endif
-
-+#ifndef __diag_push
-+#define __diag_push()
-+#endif
-+
-+#ifndef __diag_pop
-+#define __diag_pop()
-+#endif
-+
-+#ifndef __diag_ignore
-+#define __diag_ignore(option, comment)
-+#endif
-+
-+#ifndef __diag_warn
-+#define __diag_warn(option, comment)
-+#endif
-+
-+#ifndef __diag_error
-+#define __diag_error(option, comment)
-+#endif
-+
- #endif /* __LINUX_COMPILER_TYPES_H */
-
-
-
-
-
-Usage is
-
-       __diag_push();
-       __diag_ignore(-Wattribute-alias,
-                     "Type aliasing is used to sanitize syscall arguments");
-              ...
-       __diag_pop();
-
-
-
-
-Comments, ideas are appreciated.
-
-
-
-
+thanks,
 -- 
-Best Regards
-Masahiro Yamada
+~Randy
