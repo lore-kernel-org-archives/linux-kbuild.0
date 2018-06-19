@@ -1,86 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:50440 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1030442AbeFSTuS (ORCPT
+Received: from 9pmail.ess.barracuda.com ([64.235.150.224]:42294 "EHLO
+        9pmail.ess.barracuda.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966263AbeFSURB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Jun 2018 15:50:18 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [RFC v7 1/1] mconf: global i-search in menu prompts
-In-Reply-To: <7a371124-007b-f758-44f0-c70c64ff5974@infradead.org> (Randy
-        Dunlap's message of "Tue, 19 Jun 2018 12:34:21 -0700")
-References: <20180617121534.4809-1-dirk@gouders.net>
-        <20180617121534.4809-2-dirk@gouders.net>
-        <6e23227d-f3ed-2197-7458-b060b8c90b64@infradead.org>
-        <ghk1qusjf8.fsf@lena.gouders.net>
-        <7a371124-007b-f758-44f0-c70c64ff5974@infradead.org>
-Date: Tue, 19 Jun 2018 21:43:34 +0200
-Message-ID: <ghfu1isgt5.fsf@lena.gouders.net>
+        Tue, 19 Jun 2018 16:17:01 -0400
+From: Paul Burton <paul.burton@mips.com>
+Subject: [PATCH v2 0/3] Resolve -Wattribute-alias warnings from SYSCALL_DEFINEx()
+Date: Tue, 19 Jun 2018 13:14:55 -0700
+Message-ID: <20180619201458.4559-1-paul.burton@mips.com>
+In-Reply-To: <20180619190225.7eguhiw3ixaiwpgl@pburton-laptop>
+References: <20180619190225.7eguhiw3ixaiwpgl@pburton-laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Mauro Carvalho Chehab <mchehab@kernel.org>, linux-mips@linux-mips.org, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Thomas Gleixner <tglx@linutronix.de>, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Matthias Kaehlcke <mka@chromium.org>, He Zhe <zhe.he@windriver.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Khem Raj <raj.khem@gmail.com>, Christophe Leroy <christophe.leroy@c-s.fr>, Al Viro <viro@zeniv.linux.org.uk>, Stafford Horne <shorne@gmail.com>, Gideon Israel Dsouza <gidisrael@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org, Paul Burton <paul.burton@mips.com>
 
-Randy Dunlap <rdunlap@infradead.org> writes:
+This series introduces infrastructure allowing compiler diagnostics to
+be disabled or their severity modified for specific pieces of code, with
+suitable abstractions to prevent that code from becoming tied to a
+specific compiler.
 
-> On 06/19/2018 11:47 AM, Dirk Gouders wrote:
->> Randy Dunlap <rdunlap@infradead.org> writes:
->> 
->>> Hi Dirk,
->>>
->>> On 06/17/2018 05:15 AM, Dirk Gouders wrote:
->>>>
->>>> At any time, at most one i-search is active and the navigation path to
->>>> the current menu is displayed in the subtitle, the second line in the
->>>> menu window.
->>>
->>> Nice.
->>>
->>> And the highlight of the current menu item is also nice when TAB is used to
->>> switch to the buttons.  As well as toggling the help text based on context.
->>>
->>>
->>>> Navigation example:
->>>>
->>>> To navigate to options concerning NFS file systems, simply type 'n',
->>>> 'f' and 's'.
->>>>
->>>> Hint: use the 'z' key with focus on buttons to search for invisible
->>>>       prompts.
->>>
->>> I think what this says is that the 'z' key is a toggle for the display of
->>> some (invisible) prompts.  Is that correct?
->>>
->>>
->>>
->>> I reliably (consistently) get a segfault.  I have hit it several times.
->>> Here is one way to get it:
->>>
->>> $ make menuconfig
->>> and then enter:
->>> /debug\
->> 
->> Hello Randy,
->> 
->> thank you for testing and your comments!
->> 
->> Concerning the segfault, I already have a version 8 prepared but wanted
->> to do more testing before disturbing people, again.
->> 
->> The initialization and operation of the serialized menu was ugly and
->> wrong.  I did not notice segfaults so far, but I can imagine the
->> segfaults you noticed are caused by this, because the code you tested
->> did not operate only on propper initialized array elements.
->> 
->> Before sending out version 8, I would like to include your other
->> suggestions as well, so could you please try the attached patch if that
->> also produces the segfaults?
->
-> Yes, this one is working for me without faults.
+This infrastructure is then used to disable the -Wattribute-alias
+warning around syscall definitions, which rely on type mismatches to
+sanitize arguments.
 
-Thank you very much.
+Finally PowerPC-specific #pragma's are removed now that the generic code
+is handling this.
 
-I will prepare a v8 with your comments on the diff also respected.
+The series takes Arnd's RFC patches & addresses the review comments they
+received. The most notable effect of this series to to avoid warnings &
+build failures caused by -Wattribute-alias when compiling the kernel
+with GCC 8.
 
-Dirk
+Applies cleanly atop v4.18-rc1.
+
+Thanks,
+    Paul
+
+Arnd Bergmann (2):
+  kbuild: add macro for controlling warnings to linux/compiler.h
+  disable -Wattribute-alias warning for SYSCALL_DEFINEx()
+
+Paul Burton (1):
+  powerpc: Remove -Wattribute-alias pragmas
+
+ arch/powerpc/kernel/pci_32.c    |  4 ----
+ arch/powerpc/kernel/pci_64.c    |  4 ----
+ arch/powerpc/kernel/rtas.c      |  4 ----
+ arch/powerpc/kernel/signal_32.c |  8 --------
+ arch/powerpc/kernel/signal_64.c |  4 ----
+ arch/powerpc/kernel/syscalls.c  |  4 ----
+ arch/powerpc/mm/subpage-prot.c  |  4 ----
+ include/linux/compat.h          |  8 +++++++-
+ include/linux/compiler-gcc.h    | 27 +++++++++++++++++++++++++++
+ include/linux/compiler_types.h  | 18 ++++++++++++++++++
+ include/linux/syscalls.h        |  4 ++++
+ 11 files changed, 56 insertions(+), 33 deletions(-)
+
+-- 
+2.17.1
+
