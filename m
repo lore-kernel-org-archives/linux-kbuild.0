@@ -1,256 +1,233 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36765 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:36061 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752018AbeFSEFb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Jun 2018 00:05:31 -0400
+        id S937237AbeFSD5h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Jun 2018 23:57:37 -0400
 From: NeilBrown <neilb@suse.com>
-Date: Tue, 19 Jun 2018 14:05:23 +1000
-Subject: Re: [RFC PATCH 0/5] kbuild: build modules from code in multiple directories.
-In-Reply-To: <20180618082017.GA4752@infradead.org>
-References: <152929708853.17463.17302660556961083137.stgit@noble> <20180618082017.GA4752@infradead.org>
-Message-ID: <87po0ne7zw.fsf@notabene.neil.brown.name>
+Date: Tue, 19 Jun 2018 13:57:26 +1000
+Subject: [PATCH 3/5 - v2] kbuild: support building of per-directory mod.a
+In-Reply-To: <152929772048.17463.15650870667867788917.stgit@noble>
+References: <152929708853.17463.17302660556961083137.stgit@noble> <152929772048.17463.15650870667867788917.stgit@noble>
+Message-ID: <87sh5je8d5.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
         micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
 --=-=-=
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 18 2018, Christoph Hellwig wrote:
 
-> On Mon, Jun 18, 2018 at 02:55:20PM +1000, NeilBrown wrote:
->> This set of patches makes it possible to build a module from
->> code in multiple directories without needing to list files from one
->> directory in the Makefile of another directory.
->>=20
->> The code was developed for lustre (which is now out-of-tree :-( ) but
->> can be useful elsewhere, such as for xfs and btrfs and others.
->>=20
->> In fs/xfs/Makefile the section:
->>=20
->> xfs-y				+=3D $(addprefix libxfs/, \
->> 				   xfs_ag.o \
->> 				   xfs_alloc.o \
->> 				.....
->>=20
->> could become
->>=20
->> xfs-y +=3D libxfs/
->>=20
->> and then in fs/xfs/libxfs/Makefile we would have
->>=20
->> modobj-$(CONFIG_XFS_FS) +=3D xfs_ag.o \
->> 			   xfs_alloc.o \
->> 			   .....
->>=20
->> A similar process could move filenames for scrub/* from the
->> fs/xfs/Makefile to fs/xfs/scrub/Makefile
->
-> How about you actually convert it as an example?
+This patch allows a "mod.a" to be built in any
+directory.  A previous patch allows that mod.a
+to be included in any module or another mod.a.
 
-Sure ... found a bug while testing it.  Thanks :-)
+This is achieved via a new pair of macros: modobj-y and modobj-m.
 
-From=20ac7953b4ba6d9a2a69dab84dd772aafca38d8377 Mon Sep 17 00:00:00 2001
-From: NeilBrown <neilb@suse.com>
-Date: Tue, 19 Jun 2018 13:59:16 +1000
-Subject: [PATCH] kbuild/xfs: example modobj-m conversion
+Anything in modobj-y is added to obj-y and is otherwise
+ignored.
+Anything listed in modobj-m is built, almost as though "modobj.o" was
+a requested target.  The objects are then combined
+into mod.a.
+These objects are always built with part-of-module=3Dy.
 
-This is a demonstration patch to show how
-xfs can be changed to make use of the proposed modobj-m=3D
-functionality, should the xfs developers want that.
+This is sufficient to build a module from source in
+multiple directories.  Each "other" directory lists
+something like
+ modobj-$(CONFIG_FOO) +=3D bar.o bar.o bat.o
+
+and the main directory lists
+
+ obj-$(CONFIG-FOO) =3D foo.o
+ foo-y =3D other1/ ../friend/other2/ module.o
 
 Signed-off-by: NeilBrown <neilb@suse.com>
 =2D--
- fs/xfs/Makefile        | 78 ++--------------------------------------------=
-----
- fs/xfs/libxfs/Makefile | 43 ++++++++++++++++++++++++++++
- fs/xfs/scrub/Makefile  | 29 +++++++++++++++++++
- 3 files changed, 74 insertions(+), 76 deletions(-)
- create mode 100644 fs/xfs/libxfs/Makefile
- create mode 100644 fs/xfs/scrub/Makefile
 
-diff --git a/fs/xfs/Makefile b/fs/xfs/Makefile
-index 2f3f75a7f180..0ba854045fe9 100644
-=2D-- a/fs/xfs/Makefile
-+++ b/fs/xfs/Makefile
-@@ -15,47 +15,7 @@ obj-$(CONFIG_XFS_FS)		+=3D xfs.o
- xfs-y				+=3D xfs_trace.o
+There was bug in the first version of this.
+This line:
++targets +=3D $(filter-out $(subdir-obj-m) $(real-modobj-m), $(real-obj-m))
+is now
++targets +=3D $(filter-out $(subdir-obj-m), $(real-modobj-m) $(real-obj-m))
+
+Comma in the wrong place.
+
+Thanks,
+NeilBrown
+
+ scripts/Makefile.build | 44 +++++++++++++++++++++++++++++++++-----------
+ scripts/Makefile.lib   | 14 ++++++++++----
+ 2 files changed, 43 insertions(+), 15 deletions(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 928cd073a657..8ac10348c131 100644
+=2D-- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -15,6 +15,8 @@ obj-y :=3D
+ obj-m :=3D
+ lib-y :=3D
+ lib-m :=3D
++modobj-y :=3D
++modobj-m :=3D
+ always :=3D
+ targets :=3D
+ subdir-y :=3D
+@@ -80,12 +82,16 @@ ifneq ($(strip $(real-obj-y) $(need-builtin)),)
+ builtin-target :=3D $(obj)/built-in.a
+ endif
 =20
- # build the libxfs code first
-=2Dxfs-y				+=3D $(addprefix libxfs/, \
-=2D				   xfs_ag.o \
-=2D				   xfs_alloc.o \
-=2D				   xfs_alloc_btree.o \
-=2D				   xfs_attr.o \
-=2D				   xfs_attr_leaf.o \
-=2D				   xfs_attr_remote.o \
-=2D				   xfs_bit.o \
-=2D				   xfs_bmap.o \
-=2D				   xfs_bmap_btree.o \
-=2D				   xfs_btree.o \
-=2D				   xfs_da_btree.o \
-=2D				   xfs_da_format.o \
-=2D				   xfs_defer.o \
-=2D				   xfs_dir2.o \
-=2D				   xfs_dir2_block.o \
-=2D				   xfs_dir2_data.o \
-=2D				   xfs_dir2_leaf.o \
-=2D				   xfs_dir2_node.o \
-=2D				   xfs_dir2_sf.o \
-=2D				   xfs_dquot_buf.o \
-=2D				   xfs_ialloc.o \
-=2D				   xfs_ialloc_btree.o \
-=2D				   xfs_iext_tree.o \
-=2D				   xfs_inode_fork.o \
-=2D				   xfs_inode_buf.o \
-=2D				   xfs_log_rlimit.o \
-=2D				   xfs_ag_resv.o \
-=2D				   xfs_rmap.o \
-=2D				   xfs_rmap_btree.o \
-=2D				   xfs_refcount.o \
-=2D				   xfs_refcount_btree.o \
-=2D				   xfs_sb.o \
-=2D				   xfs_symlink_remote.o \
-=2D				   xfs_trans_resv.o \
-=2D				   xfs_types.o \
-=2D				   )
-=2D# xfs_rtbitmap is shared with libxfs
-=2Dxfs-$(CONFIG_XFS_RT)		+=3D $(addprefix libxfs/, \
-=2D				   xfs_rtbitmap.o \
-=2D				   )
-+xfs-y				+=3D libxfs/
++ifneq ($(strip $(modobj-m)),)
++modobj-target :=3D $(obj)/mod.a
++endif
++
+ modorder-target :=3D $(obj)/modules.order
 =20
- # highlevel code
- xfs-y				+=3D xfs_aops.o \
-@@ -127,38 +87,4 @@ xfs-$(CONFIG_SYSCTL)		+=3D xfs_sysctl.o
- xfs-$(CONFIG_COMPAT)		+=3D xfs_ioctl32.o
- xfs-$(CONFIG_EXPORTFS_BLOCK_OPS)	+=3D xfs_pnfs.o
+ # We keep a list of all modules in $(MODVERDIR)
 =20
-=2D# online scrub/repair
-=2Difeq ($(CONFIG_XFS_ONLINE_SCRUB),y)
-=2D
-=2D# Tracepoints like to blow up, so build that before everything else
-=2D
-=2Dxfs-y				+=3D $(addprefix scrub/, \
-=2D				   trace.o \
-=2D				   agheader.o \
-=2D				   alloc.o \
-=2D				   attr.o \
-=2D				   bmap.o \
-=2D				   btree.o \
-=2D				   common.o \
-=2D				   dabtree.o \
-=2D				   dir.o \
-=2D				   ialloc.o \
-=2D				   inode.o \
-=2D				   parent.o \
-=2D				   refcount.o \
-=2D				   rmap.o \
-=2D				   scrub.o \
-=2D				   symlink.o \
-=2D				   )
-=2D
-=2Dxfs-$(CONFIG_XFS_RT)		+=3D scrub/rtbitmap.o
-=2Dxfs-$(CONFIG_XFS_QUOTA)		+=3D scrub/quota.o
-=2D
-=2D# online repair
-=2Difeq ($(CONFIG_XFS_ONLINE_REPAIR),y)
-=2Dxfs-y				+=3D $(addprefix scrub/, \
-=2D				   agheader_repair.o \
-=2D				   repair.o \
-=2D				   )
-=2Dendif
-=2Dendif
-+xfs-$(CONFIG_XFS_ONLINE_SCRUB)	+=3D scrub/
-diff --git a/fs/xfs/libxfs/Makefile b/fs/xfs/libxfs/Makefile
-new file mode 100644
-index 000000000000..9b90c289bdda
-=2D-- /dev/null
-+++ b/fs/xfs/libxfs/Makefile
-@@ -0,0 +1,43 @@
-+# SPDX-License-Identifier: GPL-2.0
+ __build: $(if $(KBUILD_BUILTIN),$(builtin-target) $(lib-target) $(extra-y)=
+) \
+=2D	 $(if $(KBUILD_MODULES),$(obj-m) $(modorder-target)) \
++	 $(if $(KBUILD_MODULES),$(obj-m) $(modorder-target) $(modobj-target))  \
+ 	 $(subdir-ym) $(always)
+ 	@:
+=20
+@@ -119,17 +125,19 @@ modkern_cflags =3D                                   =
+       \
+ 		$(KBUILD_CFLAGS_KERNEL) $(CFLAGS_KERNEL))
+ quiet_modtag :=3D $(empty)   $(empty)
+=20
+=2D$(real-obj-m)        : part-of-module :=3D y
+=2D$(real-obj-m:.o=3D.i)  : part-of-module :=3D y
+=2D$(real-obj-m:.o=3D.s)  : part-of-module :=3D y
+=2D$(real-obj-m:.o=3D.lst): part-of-module :=3D y
++_mod_obj =3D $(real-obj-m) $(real-modobj-m)
 +
-+ccflags-y +=3D -I$(src)/..
++$(_mod_obj)        : part-of-module :=3D y
++$(_mod_obj:.o=3D.i)  : part-of-module :=3D y
++$(_mod_obj:.o=3D.s)  : part-of-module :=3D y
++$(_mod_obj:.o=3D.lst): part-of-module :=3D y
+=20
+=2D$(real-obj-m)        : quiet_modtag :=3D [M]
+=2D$(real-obj-m:.o=3D.i)  : quiet_modtag :=3D [M]
+=2D$(real-obj-m:.o=3D.s)  : quiet_modtag :=3D [M]
+=2D$(real-obj-m:.o=3D.lst): quiet_modtag :=3D [M]
++$(_mod_obj)        : quiet_modtag :=3D [M]
++$(_mod_obj:.o=3D.i)  : quiet_modtag :=3D [M]
++$(_mod_obj:.o=3D.s)  : quiet_modtag :=3D [M]
++$(_mod_obj:.o=3D.lst): quiet_modtag :=3D [M]
+=20
+=2D$(obj-m)             : quiet_modtag :=3D [M]
++$(obj-m)           : quiet_modtag :=3D [M]
+=20
+ quiet_cmd_cc_s_c =3D CC $(quiet_modtag)  $@
+ cmd_cc_s_c       =3D $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $=
+@ $<
+@@ -417,7 +425,7 @@ $(obj)/%.o: $(src)/%.S $(objtool_dep) FORCE
+ 	$(call if_changed_rule,as_o_S)
+=20
+ targets +=3D $(filter-out $(subdir-obj-y), $(real-obj-y))
+=2Dtargets +=3D $(filter-out $(subdir-obj-m), $(real-obj-m))
++targets +=3D $(filter-out $(subdir-obj-m), $(real-modobj-m) $(real-obj-m))
+ targets +=3D $(lib-y) $(extra-y) $(MAKECMDGOALS) $(always)
+=20
+ # Linker scripts preprocessor (.lds.S -> .lds)
+@@ -508,6 +516,20 @@ targets +=3D $(obj)/lib-ksyms.o
+=20
+ endif
+=20
++ifdef modobj-target
 +
-+# xfs_rtbitmap is shared with libxfs
-+xobj-$(CONFIG_XFS_RT)		+=3D xfs_rtbitmap.o
++quiet_cmd_ar_modobj =3D AR      $@
++      cmd_ar_modobj =3D rm -f $@; \
++                    $(AR) rcTP$(KBUILD_ARFLAGS) $@ $(filter $(real-modobj-=
+m), $^)
 +
-+modobj-$(CONFIG_XFS_FS) +=3D	   xfs_ag.o \
-+				   xfs_alloc.o \
-+				   xfs_alloc_btree.o \
-+				   xfs_attr.o \
-+				   xfs_attr_leaf.o \
-+				   xfs_attr_remote.o \
-+				   xfs_bit.o \
-+				   xfs_bmap.o \
-+				   xfs_bmap_btree.o \
-+				   xfs_btree.o \
-+				   xfs_da_btree.o \
-+				   xfs_da_format.o \
-+				   xfs_defer.o \
-+				   xfs_dir2.o \
-+				   xfs_dir2_block.o \
-+				   xfs_dir2_data.o \
-+				   xfs_dir2_leaf.o \
-+				   xfs_dir2_node.o \
-+				   xfs_dir2_sf.o \
-+				   xfs_dquot_buf.o \
-+				   xfs_ialloc.o \
-+				   xfs_ialloc_btree.o \
-+				   xfs_iext_tree.o \
-+				   xfs_inode_fork.o \
-+				   xfs_inode_buf.o \
-+				   xfs_log_rlimit.o \
-+				   xfs_ag_resv.o \
-+				   xfs_rmap.o \
-+				   xfs_rmap_btree.o \
-+				   xfs_refcount.o \
-+				   xfs_refcount_btree.o \
-+				   xfs_sb.o \
-+				   xfs_symlink_remote.o \
-+				   xfs_trans_resv.o \
-+				   xfs_types.o \
-+				   $(xobj-y)
-diff --git a/fs/xfs/scrub/Makefile b/fs/xfs/scrub/Makefile
-new file mode 100644
-index 000000000000..f91818a0e6ee
-=2D-- /dev/null
-+++ b/fs/xfs/scrub/Makefile
-@@ -0,0 +1,29 @@
-+# SPDX-License-Identifier: GPL-2.0
++$(modobj-target): $(real-modobj-m) FORCE
++	$(call if_changed,ar_modobj)
 +
-+# Tracepoints like to blow up, so build that before everything else
++targets +=3D $(modobj-target)
 +
-+ccflags-y +=3D -I$(src)/..
-+ccflags-y +=3D -I$(src)/../libxfs
++endif # modobj-target
 +
-+xobj-$(CONFIG_XFS_RT)		+=3D rtbitmap.o
-+xobj-$(CONFIG_XFS_QUOTA)	+=3D quota.o
-+xobj-$(CONFIG_XFS_ONLINE_REPAIR)+=3D agheader_repair.o \
-+				   repair.o
 +
-+modobj-$(CONFIG_XFS_FS) +=3D	   trace.o \
-+				   agheader.o \
-+				   alloc.o \
-+				   attr.o \
-+				   bmap.o \
-+				   btree.o \
-+				   common.o \
-+				   dabtree.o \
-+				   dir.o \
-+				   ialloc.o \
-+				   inode.o \
-+				   parent.o \
-+				   refcount.o \
-+				   rmap.o \
-+				   scrub.o \
-+				   symlink.o \
-+				   $(xobj-y)
+ #
+ # Rule to link composite objects
+ #
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 6e7aa08324f0..c84167169a59 100644
+=2D-- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -16,12 +16,13 @@ KBUILD_CFLAGS +=3D $(subdir-ccflags-y)
+ # is exactly what happens for directories in obj-y. So move all
+ # directories from obj-m to obj-y.  Then we will know that any directory
+ # in real-obj-m is a component of some other object.
+=2Dobj-y :=3D $(obj-y) $(filter %/, $(obj-m))
++obj-y :=3D $(obj-y) $(filter %/, $(obj-m)) $(filter-out $(obj-y), $(modobj=
+-y))
+ obj-m :=3D $(filter-out %/, $(obj-m))
+=20
+ # When an object is listed to be built compiled-in and modular,
+ # only build the compiled-in version
+ obj-m :=3D $(filter-out $(obj-y),$(obj-m))
++modobj-m :=3D $(filter-out $(obj-y), $(modobj-m))
+=20
+ # Libraries are always collected in one lib file.
+ # Filter out objects already built-in
+@@ -42,6 +43,7 @@ single-used-m :=3D $(sort $(filter-out $(multi-used-m),$(=
+obj-m)))
+ # including built-in.a from subdirectories
+ real-obj-y :=3D $(foreach m, $(obj-y), $(if $(strip $($(m:.o=3D-objs)) $($=
+(m:.o=3D-y))),$($(m:.o=3D-objs)) $($(m:.o=3D-y)),$(m)))
+ real-obj-m :=3D $(foreach m, $(obj-m), $(if $(strip $($(m:.o=3D-objs)) $($=
+(m:.o=3D-y)) $($(m:.o=3D-m))),$($(m:.o=3D-objs)) $($(m:.o=3D-y)) $($(m:.o=
+=3D-m)),$(m)))
++real-modobj-m :=3D $(foreach m, $(modobj-m), $(if $(strip $($(m:.o=3D-objs=
+)) $($(m:.o=3D-y)) $($(m:.o=3D-m))),$($(m:.o=3D-objs)) $($(m:.o=3D-y)) $($(=
+m:.o=3D-m)),$(m)))
+=20
+ # Handle objects in subdirs
+ # ------------------------------------------------------------------------=
+---
+@@ -53,8 +55,11 @@ __subdir-y	:=3D $(patsubst %/,%,$(filter %/, $(real-obj-=
+y)))
+ subdir-y	+=3D $(__subdir-y)
+ __subdir-m	:=3D $(patsubst %/,%,$(filter %/, $(real-obj-m)))
+ subdir-m	+=3D $(__subdir-m)
++__subdir-mo	:=3D $(patsubst %/,%,$(filter %/, $(real-modobj-m)))
++subdir-m	+=3D $(__subdir-mo)
+ real-obj-y	:=3D $(patsubst %/, %/built-in.a, $(real-obj-y))
+ real-obj-m	:=3D $(patsubst %/, %/mod.a, $(real-obj-m))
++real-modobj-m	:=3D $(patsubst %/, %/mod.a, $(real-modobj-m))
+=20
+ # Subdirectories we need to descend into
+ subdir-ym	:=3D $(sort $(subdir-y) $(subdir-m))
+@@ -62,9 +67,9 @@ subdir-ym	:=3D $(sort $(subdir-y) $(subdir-m))
+ # $(subdir-obj-y) is the list of objects in $(real-obj-y) which uses dir/ =
+to
+ # tell kbuild to descend
+ subdir-obj-y :=3D $(filter %/built-in.a, $(real-obj-y))
+=2D# $(subdir-obj-m) is the list of objects in $(real-obj-m) which uses dir=
+/ to
+=2D# tell kbuild to descend
+=2Dsubdir-obj-m :=3D $(filter %/mod.a, $(real-obj-m))
++# $(subdir-obj-m) is the list of objects in $(real-obj-m) and
++# $(real-modobj-m) which use dir/ to tell kbuild to descend
++subdir-obj-m :=3D $(filter %/mod.a, $(real-obj-m) $(real-modobj-m))
+=20
+ # DTB
+ # If CONFIG_OF_ALL_DTBS is enabled, all DT blobs are built
+@@ -83,6 +88,7 @@ subdir-obj-y	:=3D $(addprefix $(obj)/,$(subdir-obj-y))
+ subdir-obj-m	:=3D $(addprefix $(obj)/,$(subdir-obj-m))
+ real-obj-y	:=3D $(addprefix $(obj)/,$(real-obj-y))
+ real-obj-m	:=3D $(addprefix $(obj)/,$(real-obj-m))
++real-modobj-m	:=3D $(addprefix $(obj)/,$(real-modobj-m))
+ single-used-m	:=3D $(addprefix $(obj)/,$(single-used-m))
+ multi-used-m	:=3D $(addprefix $(obj)/,$(multi-used-m))
+ subdir-ym	:=3D $(addprefix $(obj)/,$(subdir-ym))
 =2D-=20
 2.14.0.rc0.dirty
 
@@ -260,18 +237,18 @@ Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlsogQMACgkQOeye3VZi
-gblolxAApgmgcWZP7IJUrVc13ywt1AtxzavWKvjGnj5ghn/tj4iIrxjvk9XBR/+B
-m0gK1X1rJL0eNLU2biuYg6SD2uOhJIWXZcgPgujUoSblow/80ifF0qQ3MGZUc97I
-ql+n1g8p7q7em6mbf7qfEYrHRbwyTURuj8dCNZKO7gyD7LwWa791xgfIWEtFHEKV
-cL3OjEY5f6pOE8qMQ9GJx0lyR4gfUzzWNr21P33+Fak/Zne4wTHNyRWwTfaZeIXq
-H6d3rAaD/FUsPFWJ83vF3dq4RftLneCP6+eFGnwQ/X/A/4KxjT4VWeg4gOpI4U6r
-JvfWpjyylj/V99G7oYNRJWZxLyKDSwDIQEoZOIp0sL184ZgCs9wWJIVm7QpWaq5E
-cR926qDtn45xbAfPJJCej8INNFr2d8neV/bDuubgFxQN0vSnhDPuFPIORklvTa6z
-XQJlXy2cs8QGzqwElgkee/IhCBwm2NKrN695Lp28/0lgVhTnCmOWVIXMp8kAb+6Z
-PbjuPdWbzQMDRLCguhEO59cP5P+qOvXRX5tTSSx2SpXGAw//1h7d+sZASfDy8pNa
-/0GdLAjjnQMF5nyOR0kQchXUKQ1EPgCamVBJnPm5baohCQo9PPK2kzqewicD1pqe
-hKVQvwEKbPkFeJDebHP/W8hBsZTrYcsPafalZaWZxZXqMSTAFcc=
-=wfOQ
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlsofycACgkQOeye3VZi
+gbmDeg//eRZqtJCwLR9S28bE4yrVcof4p9koOYwKS/WwPYyJ2D4C123c4n3Sa6GY
+Ay0Su1F0R/gFDMtzgXtZ3OEEeyx439Nt4+qxEFarSOx7QJs/VtBvrLBjrGc8DJB7
+ZmIoHoetTkkD9OePb+wCaFJLlwl7x3sJ8+1Aoc19JmCwO/Sa/hHW0wlgGPe/n8jo
++pMb2rSobtzQO+0Ds7zvdPotAlvW7pjpiln2a03FJwT74luy8hm/T7TxX/mWQJyJ
+jKDyNk3FNBgKgsm20oxl570q5nLRExLHdY19MvY168PpkwfyI8zBTO5g7MhobYzk
+rZcIEPGdUXf3ugzCQT/DZBdcReUX/YxPLnID3fti+2b415O/butOT22D8u2cPkRh
+b7WQSAfnHudKa++J6kfX0lL70RcJnam4Redaxo/Ca1OO0L3ozYXftuo8kF1mHPaO
+usFH1x4h37M5/qwL87/bpu/lCHgeByiK2emT5lRLkl+T951xFWHqGteC99wlRwid
+H5mC/kO2AMrwy7gcSq8lXa2SHvrTM7h82Tt1TOT4vz6m3JeI1zv44R5jcgkbLOe5
+XhCdpXjcOIunVQd4HTl1Yb29ZMNlcjQcuVtnR3sSCxObmVGA8XOnu9S2IZS7yrhT
+AGhmck4VEkvzKkbCG42PXqwEX1hXL3PuxhQxdrjFPWHE8+vAmjk=
+=Mjrh
 -----END PGP SIGNATURE-----
 --=-=-=--
