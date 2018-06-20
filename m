@@ -1,47 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:39062 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754654AbeFTRkY (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:58482 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754521AbeFTTCc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Jun 2018 13:40:24 -0400
-Received: by mail-wm0-f65.google.com with SMTP id p11-v6so972295wmc.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jun 2018 10:40:24 -0700 (PDT)
-From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v3 10/17] khwasan, mm: perform untagged pointers comparison in krealloc
-Date: Wed, 20 Jun 2018 19:39:56 +0200
-Message-Id: <6ab2ac0b6a7d12d2a6616e847732305dde544a99.1529515183.git.andreyknvl@google.com>
-In-Reply-To: <cover.1529515183.git.andreyknvl@google.com>
-References: <cover.1529515183.git.andreyknvl@google.com>
+        Wed, 20 Jun 2018 15:02:32 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: Re: [RFC v8 1/1] mconf: global i-search in menu prompts
+In-Reply-To: <f02cc7c6-d92e-24f3-b0ad-df9e6bf7630a@infradead.org> (Randy
+        Dunlap's message of "Wed, 20 Jun 2018 11:21:28 -0700")
+References: <20180620084217.8597-1-dirk@gouders.net>
+        <20180620084217.8597-2-dirk@gouders.net>
+        <f02cc7c6-d92e-24f3-b0ad-df9e6bf7630a@infradead.org>
+Date: Wed, 20 Jun 2018 20:55:31 +0200
+Message-ID: <ghpo0l2spo.fsf@lena.gouders.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
-Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Andrey Konovalov <andreyknvl@google.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
 
-The krealloc function checks where the same buffer was reused or a new one
-allocated by comparing kernel pointers. KHWASAN changes memory tag on the
-krealloc'ed chunk of memory and therefore also changes the pointer tag of
-the returned pointer. Therefore we need to perform comparison on untagged
-(with tags reset) pointers to check whether it's the same memory region or
-not.
+Randy Dunlap <rdunlap@infradead.org> writes:
 
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
----
- mm/slab_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Hi,
+>
+> On 06/20/2018 01:42 AM, Dirk Gouders wrote:
+>> 
+>> Operation
+>> ---------
+>> The TAB key is reserved to toggle the focus between menu and bottons.
+>> Focus is on the buttons if one of the buttens (the active one) is
+>> hightlighted, otherwise it is on the menu.
+>> 
+>> When the focus is on the buttons, mconf operates as before with the
+>> exception of the TAB key.
+>> 
+>> When the focus is on the menu, mconf operates in i-search mode and the
+>> following input has special meaning:
+>> 
+>> * <\> (backslash) can be used to search for other occurences of an
+>>   already entered string.  On empty search strings, nothing happens.
+>> 
+>> * Any other printable character than backslash and '\n' is appended to
+>>   the current search string and a match is searched for.  If a match
+>>   is found, it is immediately navigated to.
+>
+> About that paragraph above:  I tried to search for "fs-cache", as in:
+>
+> config FSCACHE_DEBUG
+> 	bool "Debug FS-Cache"
+>
+> but i-search does not allow me to enter a '-' character.  Seems odd to me.
 
-diff --git a/mm/slab_common.c b/mm/slab_common.c
-index c279b52c7565..7746d2ef5d45 100644
---- a/mm/slab_common.c
-+++ b/mm/slab_common.c
-@@ -1509,7 +1509,7 @@ void *krealloc(const void *p, size_t new_size, gfp_t flags)
- 	}
- 
- 	ret = __do_krealloc(p, new_size, flags);
--	if (ret && p != ret)
-+	if (ret && khwasan_reset_tag(p) != khwasan_reset_tag(ret))
- 		kfree(p);
- 
- 	return ret;
--- 
-2.18.0.rc1.244.gcf134e6275-goog
+Hi Randy,
 
+thanks for all your testing.
+
+'-' and '+' previously had the same meaning as <KEY_UP>, <KEY_DOWN>,
+respectively.  If you are on the top menu item and press '-' there is
+nothing to scroll up so it appears as if the pressed key wasn't
+processed.
+
+I-search should add those characters to the pattern but I broke that two
+or three versions before when I fixed another issue.
+
+I will add this to my list of test cases so this won't happen again.
+
+Dirk
+
+
+> Still doing other testing...
+>
+>
+>> * BACKSPACE is used to remove the last character of the search string.
+>> 
+>> * DEL clears the search string.
+>> 
+>> * ENTER can be used to enter a submenu.
+>> 
+>> * ESC ESC exits the current isearch and clears the search string.
+>> 
+>> * Horizontal arrow keys still cycle between the buttons but also
+>>   switch focus to the buttons.
+>> 
+>> * Vertical arroy keys navigate the menu items.
+>> 
+>> At any time, at most one i-search is active and the navigation path to
+>> the current menu is displayed in the subtitle, the second line in the
+>> menu window.
+>> 
+>> Navigation example:
+>> 
+>> To navigate to options concerning NFS file systems, simply type 'n',
+>> 'f' and 's'.
+>> 
+>> Hint: use the 'z' key with focus on buttons to search for invisible
+>>       prompts.
