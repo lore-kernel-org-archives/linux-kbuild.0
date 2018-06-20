@@ -1,52 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:38643 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754601AbeFTRkT (ORCPT
+Received: from mail-yb0-f194.google.com ([209.85.213.194]:41436 "EHLO
+        mail-yb0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754361AbeFTSMs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Jun 2018 13:40:19 -0400
-Received: by mail-wm0-f68.google.com with SMTP id 69-v6so986036wmf.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jun 2018 10:40:19 -0700 (PDT)
-From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v3 07/17] khwasan, arm64: fix up fault handling logic
-Date: Wed, 20 Jun 2018 19:39:53 +0200
-Message-Id: <719e17667dcf93c2789c2b6c873aa424cfe378b9.1529515183.git.andreyknvl@google.com>
-In-Reply-To: <cover.1529515183.git.andreyknvl@google.com>
-References: <cover.1529515183.git.andreyknvl@google.com>
+        Wed, 20 Jun 2018 14:12:48 -0400
+Date: Wed, 20 Jun 2018 12:12:45 -0600
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v3 1/3] mtd: rawnand: denali_dt: add more clocks based on
+ IP datasheet
+Message-ID: <20180620181245.GA30779@rob-hp-laptop>
+References: <1529025532-22087-1-git-send-email-yamada.masahiro@socionext.com>
+ <1529025532-22087-2-git-send-email-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1529025532-22087-2-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
-Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Andrey Konovalov <andreyknvl@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-mtd@lists.infradead.org, Boris Brezillon <boris.brezillon@bootlin.com>, linux-kbuild@vger.kernel.org, Richard Weinberger <richard@nod.at>, "linux-stable #4 . 14+" <stable@vger.kernel.org>, devicetree@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>, linux-kernel@vger.kernel.org, Marek Vasut <marek.vasut@gmail.com>, Brian Norris <computersforpeace@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Mark Rutland <mark.rutland@arm.com>
 
-show_pte in arm64 fault handling relies on the fact that the top byte of
-a kernel pointer is 0xff, which isn't always the case with KHWASAN enabled.
-Reset the top byte.
+On Fri, Jun 15, 2018 at 10:18:50AM +0900, Masahiro Yamada wrote:
+> According to the Denali User's Guide, this IP needs three clocks:
+> 
+>  - clk: controller core clock
+> 
+>  - clk_x: bus interface clock
+> 
+>  - ecc_clk: clock at which ECC circuitry is run
+> 
+> Currently, denali_dt.c requires a single anonymous clock and its
+> frequency.  However, the driver needs to get the frequency of "clk_x"
+> not "clk".  This is confusing because people tend to assume the
+> anonymous clock means the core clock.  In fact, I got a report of
+> SOCFPGA breakage because the timing parameters are calculated based
+> on a wrong frequency.
+> 
+> Instead of the cheesy implementation, the clocks in the real hardware
+> should be represented in the driver and the DT-binding.
+> 
+> However, adding new clocks would break the existing platforms.  For the
+> backward compatibility, the driver still accepts a single clock just as
+> before.  If clk_x is missing, clk_x_rate is set to a hardcoded value.
+> This is fine for existing DT of Socionext UniPhier, and also fixes the
+> issue of Altera (Intel) SOCFPGA because both platforms use 200 MHz for
+> the bus interface clock.
+> 
+> Fixes: 1bb88666775e ("mtd: nand: denali: handle timing parameters by setup_data_interface()")
+> Cc: linux-stable <stable@vger.kernel.org> #4.14+
+> Reported-by: Richard Weinberger <richard@nod.at>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
+> Changes in v3:
+>   - Change the patch order so that the bug-fix one comes the first
+> 
+> Changes in v2:
+>   - Split patches into sensible chunks
+> 
+>  .../devicetree/bindings/mtd/denali-nand.txt        |  5 +++
+>  drivers/mtd/nand/raw/denali_dt.c                   | 49 ++++++++++++++++++++--
+>  2 files changed, 50 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/mtd/denali-nand.txt b/Documentation/devicetree/bindings/mtd/denali-nand.txt
+> index 0ee8edb..f33da87 100644
+> --- a/Documentation/devicetree/bindings/mtd/denali-nand.txt
+> +++ b/Documentation/devicetree/bindings/mtd/denali-nand.txt
+> @@ -8,6 +8,9 @@ Required properties:
+>    - reg : should contain registers location and length for data and reg.
+>    - reg-names: Should contain the reg names "nand_data" and "denali_reg"
+>    - interrupts : The interrupt number.
+> +  - clocks: should contain phandle of the controller core clock, the bus
+> +    interface clock, and the ECC circuit clock.
+> +  - clock-names: should contain "nand", "nand_x", "ecc"
 
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
----
- arch/arm64/mm/fault.c | 3 +++
- 1 file changed, 3 insertions(+)
+The subject says "add more clocks", but it doesn't look like any clocks 
+were supported before. Or documentation was missing?
 
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index b8eecc7b9531..b7b152783d54 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -32,6 +32,7 @@
- #include <linux/perf_event.h>
- #include <linux/preempt.h>
- #include <linux/hugetlb.h>
-+#include <linux/kasan.h>
- 
- #include <asm/bug.h>
- #include <asm/cmpxchg.h>
-@@ -134,6 +135,8 @@ void show_pte(unsigned long addr)
- 	pgd_t *pgdp;
- 	pgd_t pgd;
- 
-+	addr = (unsigned long)khwasan_reset_tag((void *)addr);
-+
- 	if (addr < TASK_SIZE) {
- 		/* TTBR0 */
- 		mm = current->active_mm;
--- 
-2.18.0.rc1.244.gcf134e6275-goog
+Please split bindings to a separate patch.
 
+Rob
