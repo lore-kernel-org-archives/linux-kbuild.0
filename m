@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:45731 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754417AbeFTRkK (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:38623 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754570AbeFTRkN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Jun 2018 13:40:10 -0400
-Received: by mail-wr0-f196.google.com with SMTP id o12-v6so344382wrm.12
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jun 2018 10:40:09 -0700 (PDT)
+        Wed, 20 Jun 2018 13:40:13 -0400
+Received: by mail-wm0-f66.google.com with SMTP id 69-v6so985581wmf.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jun 2018 10:40:12 -0700 (PDT)
 From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v3 01/17] khwasan, mm: change kasan hooks signatures
-Date: Wed, 20 Jun 2018 19:39:47 +0200
-Message-Id: <fe5ff92303da75a384369031ab20320c53860872.1529515183.git.andreyknvl@google.com>
+Subject: [PATCH v3 03/17] khwasan: add CONFIG_KASAN_GENERIC and CONFIG_KASAN_HW
+Date: Wed, 20 Jun 2018 19:39:49 +0200
+Message-Id: <641ea2edfdc57d8ca30096699c47fd7360381287.1529515183.git.andreyknvl@google.com>
 In-Reply-To: <cover.1529515183.git.andreyknvl@google.com>
 References: <cover.1529515183.git.andreyknvl@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,320 +17,410 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
 Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Andrey Konovalov <andreyknvl@google.com>
 
-KHWASAN will change the value of the top byte of pointers returned from the
-kernel allocation functions (such as kmalloc). This patch updates KASAN
-hooks signatures and their usage in SLAB and SLUB code to reflect that.
+This commit splits the current CONFIG_KASAN config option into two:
+1. CONFIG_KASAN_GENERIC, that enables the generic software-only KASAN
+   version (the one that exists now);
+2. CONFIG_KASAN_HW, that enables KHWASAN.
+
+With CONFIG_KASAN_HW enabled, compiler options are changed to instrument
+kernel files wiht -fsantize=hwaddress (except the ones for which
+KASAN_SANITIZE := n is set).
+
+Both CONFIG_KASAN_GENERIC and CONFIG_KASAN_HW support both
+CONFIG_KASAN_INLINE and CONFIG_KASAN_OUTLINE instrumentation modes.
+
+This commit also adds empty placeholder (for now) implementation of
+KHWASAN specific hooks inserted by the compiler and adjusts common hooks
+implementation to compile correctly with each of the config options.
 
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- include/linux/kasan.h | 34 +++++++++++++++++++++++-----------
- mm/kasan/kasan.c      | 24 ++++++++++++++----------
- mm/slab.c             | 12 ++++++------
- mm/slab.h             |  2 +-
- mm/slab_common.c      |  4 ++--
- mm/slub.c             | 15 +++++++--------
- 6 files changed, 53 insertions(+), 38 deletions(-)
+ arch/arm64/Kconfig             |  1 +
+ include/linux/compiler-clang.h |  5 ++-
+ include/linux/compiler-gcc.h   |  4 ++
+ include/linux/compiler.h       |  3 +-
+ include/linux/kasan.h          | 16 +++++--
+ lib/Kconfig.kasan              | 76 ++++++++++++++++++++++++++--------
+ mm/kasan/Makefile              |  6 ++-
+ mm/kasan/khwasan.c             | 75 +++++++++++++++++++++++++++++++++
+ mm/slub.c                      |  2 +-
+ scripts/Makefile.kasan         | 27 +++++++++++-
+ 10 files changed, 187 insertions(+), 28 deletions(-)
+ create mode 100644 mm/kasan/khwasan.c
 
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 42c090cf0292..43d9de526d3a 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -92,6 +92,7 @@ config ARM64
+ 	select HAVE_ARCH_HUGE_VMAP
+ 	select HAVE_ARCH_JUMP_LABEL
+ 	select HAVE_ARCH_KASAN if !(ARM64_16K_PAGES && ARM64_VA_BITS_48)
++	select HAVE_ARCH_KASAN_HW if !(ARM64_16K_PAGES && ARM64_VA_BITS_48)
+ 	select HAVE_ARCH_KGDB
+ 	select HAVE_ARCH_MMAP_RND_BITS
+ 	select HAVE_ARCH_MMAP_RND_COMPAT_BITS if COMPAT
+diff --git a/include/linux/compiler-clang.h b/include/linux/compiler-clang.h
+index 7087446c24c8..6ac1761ff102 100644
+--- a/include/linux/compiler-clang.h
++++ b/include/linux/compiler-clang.h
+@@ -21,13 +21,16 @@
+ #define KASAN_ABI_VERSION 5
+ 
+ /* emulate gcc's __SANITIZE_ADDRESS__ flag */
+-#if __has_feature(address_sanitizer)
++#if __has_feature(address_sanitizer) || __has_feature(hwaddress_sanitizer)
+ #define __SANITIZE_ADDRESS__
+ #endif
+ 
+ #undef __no_sanitize_address
+ #define __no_sanitize_address __attribute__((no_sanitize("address")))
+ 
++#undef __no_sanitize_hwaddress
++#define __no_sanitize_hwaddress __attribute__((no_sanitize("hwaddress")))
++
+ /* Clang doesn't have a way to turn it off per-function, yet. */
+ #ifdef __noretpoline
+ #undef __noretpoline
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index f1a7492a5cc8..24ca815de84b 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -338,6 +338,10 @@
+ #define __no_sanitize_address
+ #endif
+ 
++#if !defined(__no_sanitize_hwaddress)
++#define __no_sanitize_hwaddress	/* gcc doesn't support KHWASAN */
++#endif
++
+ /*
+  * A trick to suppress uninitialized variable warning without generating any
+  * code
+diff --git a/include/linux/compiler.h b/include/linux/compiler.h
+index 42506e4d1f53..6439fdd46b4e 100644
+--- a/include/linux/compiler.h
++++ b/include/linux/compiler.h
+@@ -195,7 +195,8 @@ void __read_once_size(const volatile void *p, void *res, int size)
+  * 	https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67368
+  * '__maybe_unused' allows us to avoid defined-but-not-used warnings.
+  */
+-# define __no_kasan_or_inline __no_sanitize_address __maybe_unused
++# define __no_kasan_or_inline __no_sanitize_address __no_sanitize_hwaddress \
++			      __maybe_unused
+ #else
+ # define __no_kasan_or_inline __always_inline
+ #endif
 diff --git a/include/linux/kasan.h b/include/linux/kasan.h
-index de784fd11d12..cbdc54543803 100644
+index cbdc54543803..6608aa9b35ac 100644
 --- a/include/linux/kasan.h
 +++ b/include/linux/kasan.h
-@@ -53,14 +53,14 @@ void kasan_unpoison_object_data(struct kmem_cache *cache, void *object);
- void kasan_poison_object_data(struct kmem_cache *cache, void *object);
- void kasan_init_slab_obj(struct kmem_cache *cache, const void *object);
+@@ -45,8 +45,6 @@ void kasan_free_pages(struct page *page, unsigned int order);
  
--void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags);
-+void *kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags);
- void kasan_kfree_large(void *ptr, unsigned long ip);
- void kasan_poison_kfree(void *ptr, unsigned long ip);
--void kasan_kmalloc(struct kmem_cache *s, const void *object, size_t size,
-+void *kasan_kmalloc(struct kmem_cache *s, const void *object, size_t size,
- 		  gfp_t flags);
--void kasan_krealloc(const void *object, size_t new_size, gfp_t flags);
-+void *kasan_krealloc(const void *object, size_t new_size, gfp_t flags);
+ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
+ 			slab_flags_t *flags);
+-void kasan_cache_shrink(struct kmem_cache *cache);
+-void kasan_cache_shutdown(struct kmem_cache *cache);
  
--void kasan_slab_alloc(struct kmem_cache *s, void *object, gfp_t flags);
-+void *kasan_slab_alloc(struct kmem_cache *s, void *object, gfp_t flags);
- bool kasan_slab_free(struct kmem_cache *s, void *object, unsigned long ip);
+ void kasan_poison_slab(struct page *page);
+ void kasan_unpoison_object_data(struct kmem_cache *cache, void *object);
+@@ -94,8 +92,6 @@ static inline void kasan_free_pages(struct page *page, unsigned int order) {}
+ static inline void kasan_cache_create(struct kmem_cache *cache,
+ 				      unsigned int *size,
+ 				      slab_flags_t *flags) {}
+-static inline void kasan_cache_shrink(struct kmem_cache *cache) {}
+-static inline void kasan_cache_shutdown(struct kmem_cache *cache) {}
  
- struct kasan_cache {
-@@ -105,16 +105,28 @@ static inline void kasan_poison_object_data(struct kmem_cache *cache,
- static inline void kasan_init_slab_obj(struct kmem_cache *cache,
- 				const void *object) {}
+ static inline void kasan_poison_slab(struct page *page) {}
+ static inline void kasan_unpoison_object_data(struct kmem_cache *cache,
+@@ -141,4 +137,16 @@ static inline size_t kasan_metadata_size(struct kmem_cache *cache) { return 0; }
  
--static inline void kasan_kmalloc_large(void *ptr, size_t size, gfp_t flags) {}
-+static inline void *kasan_kmalloc_large(void *ptr, size_t size, gfp_t flags)
-+{
-+	return ptr;
-+}
- static inline void kasan_kfree_large(void *ptr, unsigned long ip) {}
- static inline void kasan_poison_kfree(void *ptr, unsigned long ip) {}
--static inline void kasan_kmalloc(struct kmem_cache *s, const void *object,
--				size_t size, gfp_t flags) {}
--static inline void kasan_krealloc(const void *object, size_t new_size,
--				 gfp_t flags) {}
-+static inline void *kasan_kmalloc(struct kmem_cache *s, const void *object,
-+				size_t size, gfp_t flags)
-+{
-+	return (void *)object;
-+}
-+static inline void *kasan_krealloc(const void *object, size_t new_size,
-+				 gfp_t flags)
-+{
-+	return (void *)object;
-+}
+ #endif /* CONFIG_KASAN */
  
--static inline void kasan_slab_alloc(struct kmem_cache *s, void *object,
--				   gfp_t flags) {}
-+static inline void *kasan_slab_alloc(struct kmem_cache *s, void *object,
-+				   gfp_t flags)
-+{
-+	return object;
-+}
- static inline bool kasan_slab_free(struct kmem_cache *s, void *object,
- 				   unsigned long ip)
- {
-diff --git a/mm/kasan/kasan.c b/mm/kasan/kasan.c
-index f185455b3406..f04aa1e0ba48 100644
---- a/mm/kasan/kasan.c
-+++ b/mm/kasan/kasan.c
-@@ -485,9 +485,9 @@ void kasan_init_slab_obj(struct kmem_cache *cache, const void *object)
- 	__memset(alloc_info, 0, sizeof(*alloc_info));
- }
- 
--void kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
-+void *kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
- {
--	kasan_kmalloc(cache, object, cache->object_size, flags);
-+	return kasan_kmalloc(cache, object, cache->object_size, flags);
- }
- 
- static bool __kasan_slab_free(struct kmem_cache *cache, void *object,
-@@ -528,7 +528,7 @@ bool kasan_slab_free(struct kmem_cache *cache, void *object, unsigned long ip)
- 	return __kasan_slab_free(cache, object, ip, true);
- }
- 
--void kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
-+void *kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
- 		   gfp_t flags)
- {
- 	unsigned long redzone_start;
-@@ -538,7 +538,7 @@ void kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
- 		quarantine_reduce();
- 
- 	if (unlikely(object == NULL))
--		return;
-+		return NULL;
- 
- 	redzone_start = round_up((unsigned long)(object + size),
- 				KASAN_SHADOW_SCALE_SIZE);
-@@ -551,10 +551,12 @@ void kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
- 
- 	if (cache->flags & SLAB_KASAN)
- 		set_track(&get_alloc_info(cache, object)->alloc_track, flags);
++#ifdef CONFIG_KASAN_GENERIC
 +
-+	return (void *)object;
- }
- EXPORT_SYMBOL(kasan_kmalloc);
- 
--void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
-+void *kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
- {
- 	struct page *page;
- 	unsigned long redzone_start;
-@@ -564,7 +566,7 @@ void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
- 		quarantine_reduce();
- 
- 	if (unlikely(ptr == NULL))
--		return;
-+		return NULL;
- 
- 	page = virt_to_page(ptr);
- 	redzone_start = round_up((unsigned long)(ptr + size),
-@@ -574,21 +576,23 @@ void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
- 	kasan_unpoison_shadow(ptr, size);
- 	kasan_poison_shadow((void *)redzone_start, redzone_end - redzone_start,
- 		KASAN_PAGE_REDZONE);
++void kasan_cache_shrink(struct kmem_cache *cache);
++void kasan_cache_shutdown(struct kmem_cache *cache);
 +
-+	return (void *)ptr;
- }
++#else /* CONFIG_KASAN_GENERIC */
++
++static inline void kasan_cache_shrink(struct kmem_cache *cache) {}
++static inline void kasan_cache_shutdown(struct kmem_cache *cache) {}
++
++#endif /* CONFIG_KASAN_GENERIC */
++
+ #endif /* LINUX_KASAN_H */
+diff --git a/lib/Kconfig.kasan b/lib/Kconfig.kasan
+index 3d35d062970d..baf2619b7ff4 100644
+--- a/lib/Kconfig.kasan
++++ b/lib/Kconfig.kasan
+@@ -1,33 +1,73 @@
+ config HAVE_ARCH_KASAN
+ 	bool
  
--void kasan_krealloc(const void *object, size_t size, gfp_t flags)
-+void *kasan_krealloc(const void *object, size_t size, gfp_t flags)
- {
- 	struct page *page;
++config HAVE_ARCH_KASAN_HW
++	bool
++
+ if HAVE_ARCH_KASAN
  
- 	if (unlikely(object == ZERO_SIZE_PTR))
--		return;
-+		return ZERO_SIZE_PTR;
+ config KASAN
+-	bool "KASan: runtime memory debugger"
++	bool "KASAN: runtime memory debugger"
++	help
++	  Enables KASAN (KernelAddressSANitizer) - runtime memory debugger,
++	  designed to find out-of-bounds accesses and use-after-free bugs.
++
++choice
++	prompt "KASAN mode"
++	depends on KASAN
++	default KASAN_GENERIC
++	help
++	  KASAN has two modes: KASAN (a classic version, similar to userspace
++	  ASan, enabled with CONFIG_KASAN_GENERIC) and KHWASAN (a version
++	  based on pointer tagging, only for arm64, similar to userspace
++	  HWASan, enabled with CONFIG_KASAN_HW).
++
++config KASAN_GENERIC
++	bool "KASAN: the generic mode"
+ 	depends on SLUB || (SLAB && !DEBUG_SLAB)
+ 	select CONSTRUCTORS
+ 	select STACKDEPOT
+ 	help
+-	  Enables kernel address sanitizer - runtime memory debugger,
+-	  designed to find out-of-bounds accesses and use-after-free bugs.
+-	  This is strictly a debugging feature and it requires a gcc version
+-	  of 4.9.2 or later. Detection of out of bounds accesses to stack or
+-	  global variables requires gcc 5.0 or later.
+-	  This feature consumes about 1/8 of available memory and brings about
+-	  ~x3 performance slowdown.
++	  Enables the generic mode of KASAN.
++	  This is strictly a debugging feature and it requires a GCC version
++	  of 4.9.2 or later. Detection of out-of-bounds accesses to stack or
++	  global variables requires GCC 5.0 or later.
++	  This mode consumes about 1/8 of available memory at kernel start
++	  and introduces an overhead of ~x1.5 for the rest of the allocations.
++	  The performance slowdown is ~x3.
++	  For better error detection enable CONFIG_STACKTRACE.
++	  Currently CONFIG_KASAN_GENERIC doesn't work with CONFIG_DEBUG_SLAB
++	  (the resulting kernel does not boot).
++
++if HAVE_ARCH_KASAN_HW
++
++config KASAN_HW
++	bool "KHWASAN: the hardware assisted mode"
++	depends on SLUB || (SLAB && !DEBUG_SLAB)
++	select CONSTRUCTORS
++	select STACKDEPOT
++	help
++	  Enabled KHWASAN (KASAN mode based on pointer tagging).
++	  This mode requires Top Byte Ignore support by the CPU and therefore
++	  only supported for arm64.
++	  This feature requires clang revision 330044 or later.
++	  This mode consumes about 1/16 of available memory at kernel start
++	  and introduces an overhead of ~20% for the rest of the allocations.
+ 	  For better error detection enable CONFIG_STACKTRACE.
+-	  Currently CONFIG_KASAN doesn't work with CONFIG_DEBUG_SLAB
++	  Currently CONFIG_KASAN_HW doesn't work with CONFIG_DEBUG_SLAB
+ 	  (the resulting kernel does not boot).
  
- 	page = virt_to_head_page(object);
++endif
++
++endchoice
++
+ config KASAN_EXTRA
+-	bool "KAsan: extra checks"
+-	depends on KASAN && DEBUG_KERNEL && !COMPILE_TEST
++	bool "KASAN: extra checks"
++	depends on KASAN_GENERIC && DEBUG_KERNEL && !COMPILE_TEST
+ 	help
+-	  This enables further checks in the kernel address sanitizer, for now
+-	  it only includes the address-use-after-scope check that can lead
+-	  to excessive kernel stack usage, frame size warnings and longer
+-	  compile time.
++	  This enables further checks in KASAN, for now it only includes the
++	  address-use-after-scope check that can lead to excessive kernel
++	  stack usage, frame size warnings and longer compile time.
+ 	  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81715 has more
  
- 	if (unlikely(!PageSlab(page)))
--		kasan_kmalloc_large(object, size, flags);
-+		return kasan_kmalloc_large(object, size, flags);
- 	else
--		kasan_kmalloc(page->slab_cache, object, size, flags);
-+		return kasan_kmalloc(page->slab_cache, object, size, flags);
- }
  
- void kasan_poison_kfree(void *ptr, unsigned long ip)
-diff --git a/mm/slab.c b/mm/slab.c
-index aa76a70e087e..6fdca9ec2ea4 100644
---- a/mm/slab.c
-+++ b/mm/slab.c
-@@ -3551,7 +3551,7 @@ void *kmem_cache_alloc(struct kmem_cache *cachep, gfp_t flags)
- {
- 	void *ret = slab_alloc(cachep, flags, _RET_IP_);
+@@ -52,16 +92,16 @@ config KASAN_INLINE
+ 	  memory accesses. This is faster than outline (in some workloads
+ 	  it gives about x2 boost over outline instrumentation), but
+ 	  make kernel's .text size much bigger.
+-	  This requires a gcc version of 5.0 or later.
++	  For CONFIG_KASAN_GENERIC this requires GCC 5.0 or later.
  
--	kasan_slab_alloc(cachep, ret, flags);
-+	ret = kasan_slab_alloc(cachep, ret, flags);
- 	trace_kmem_cache_alloc(_RET_IP_, ret,
- 			       cachep->object_size, cachep->size, flags);
+ endchoice
  
-@@ -3617,7 +3617,7 @@ kmem_cache_alloc_trace(struct kmem_cache *cachep, gfp_t flags, size_t size)
+ config TEST_KASAN
+-	tristate "Module for testing kasan for bug detection"
++	tristate "Module for testing KASAN for bug detection"
+ 	depends on m && KASAN
+ 	help
+ 	  This is a test module doing various nasty things like
+ 	  out of bounds accesses, use after free. It is useful for testing
+-	  kernel debugging features like kernel address sanitizer.
++	  kernel debugging features like KASAN.
  
- 	ret = slab_alloc(cachep, flags, _RET_IP_);
+ endif
+diff --git a/mm/kasan/Makefile b/mm/kasan/Makefile
+index a6df14bffb6b..14955add96d3 100644
+--- a/mm/kasan/Makefile
++++ b/mm/kasan/Makefile
+@@ -2,6 +2,7 @@
+ KASAN_SANITIZE := n
+ UBSAN_SANITIZE_common.o := n
+ UBSAN_SANITIZE_kasan.o := n
++UBSAN_SANITIZE_khwasan.o := n
+ KCOV_INSTRUMENT := n
  
--	kasan_kmalloc(cachep, ret, size, flags);
-+	ret = kasan_kmalloc(cachep, ret, size, flags);
- 	trace_kmalloc(_RET_IP_, ret,
- 		      size, cachep->size, flags);
- 	return ret;
-@@ -3641,7 +3641,7 @@ void *kmem_cache_alloc_node(struct kmem_cache *cachep, gfp_t flags, int nodeid)
- {
- 	void *ret = slab_alloc_node(cachep, flags, nodeid, _RET_IP_);
+ CFLAGS_REMOVE_kasan.o = -pg
+@@ -10,5 +11,8 @@ CFLAGS_REMOVE_kasan.o = -pg
  
--	kasan_slab_alloc(cachep, ret, flags);
-+	ret = kasan_slab_alloc(cachep, ret, flags);
- 	trace_kmem_cache_alloc_node(_RET_IP_, ret,
- 				    cachep->object_size, cachep->size,
- 				    flags, nodeid);
-@@ -3660,7 +3660,7 @@ void *kmem_cache_alloc_node_trace(struct kmem_cache *cachep,
+ CFLAGS_common.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
+ CFLAGS_kasan.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
++CFLAGS_khwasan.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
  
- 	ret = slab_alloc_node(cachep, flags, nodeid, _RET_IP_);
- 
--	kasan_kmalloc(cachep, ret, size, flags);
-+	ret = kasan_kmalloc(cachep, ret, size, flags);
- 	trace_kmalloc_node(_RET_IP_, ret,
- 			   size, cachep->size,
- 			   flags, nodeid);
-@@ -3679,7 +3679,7 @@ __do_kmalloc_node(size_t size, gfp_t flags, int node, unsigned long caller)
- 	if (unlikely(ZERO_OR_NULL_PTR(cachep)))
- 		return cachep;
- 	ret = kmem_cache_alloc_node_trace(cachep, flags, node, size);
--	kasan_kmalloc(cachep, ret, size, flags);
-+	ret = kasan_kmalloc(cachep, ret, size, flags);
- 
- 	return ret;
- }
-@@ -3715,7 +3715,7 @@ static __always_inline void *__do_kmalloc(size_t size, gfp_t flags,
- 		return cachep;
- 	ret = slab_alloc(cachep, flags, caller);
- 
--	kasan_kmalloc(cachep, ret, size, flags);
-+	ret = kasan_kmalloc(cachep, ret, size, flags);
- 	trace_kmalloc(caller, ret,
- 		      size, cachep->size, flags);
- 
-diff --git a/mm/slab.h b/mm/slab.h
-index 68bdf498da3b..15ef6a0d9c16 100644
---- a/mm/slab.h
-+++ b/mm/slab.h
-@@ -441,7 +441,7 @@ static inline void slab_post_alloc_hook(struct kmem_cache *s, gfp_t flags,
- 
- 		kmemleak_alloc_recursive(object, s->object_size, 1,
- 					 s->flags, flags);
--		kasan_slab_alloc(s, object, flags);
-+		p[i] = kasan_slab_alloc(s, object, flags);
- 	}
- 
- 	if (memcg_kmem_enabled())
-diff --git a/mm/slab_common.c b/mm/slab_common.c
-index 890b1f04a03a..c279b52c7565 100644
---- a/mm/slab_common.c
-+++ b/mm/slab_common.c
-@@ -1179,7 +1179,7 @@ void *kmalloc_order(size_t size, gfp_t flags, unsigned int order)
- 	page = alloc_pages(flags, order);
- 	ret = page ? page_address(page) : NULL;
- 	kmemleak_alloc(ret, size, 1, flags);
--	kasan_kmalloc_large(ret, size, flags);
-+	ret = kasan_kmalloc_large(ret, size, flags);
- 	return ret;
- }
- EXPORT_SYMBOL(kmalloc_order);
-@@ -1457,7 +1457,7 @@ static __always_inline void *__do_krealloc(const void *p, size_t new_size,
- 		ks = ksize(p);
- 
- 	if (ks >= new_size) {
--		kasan_krealloc((void *)p, new_size, flags);
-+		p = kasan_krealloc((void *)p, new_size, flags);
- 		return (void *)p;
- 	}
- 
+-obj-y := common.o kasan.o report.o kasan_init.o quarantine.o
++obj-$(CONFIG_KASAN) := common.o kasan_init.o report.o
++obj-$(CONFIG_KASAN_GENERIC) += kasan.o quarantine.o
++obj-$(CONFIG_KASAN_HW) += khwasan.o
+diff --git a/mm/kasan/khwasan.c b/mm/kasan/khwasan.c
+new file mode 100644
+index 000000000000..e2c3a7f7fd1f
+--- /dev/null
++++ b/mm/kasan/khwasan.c
+@@ -0,0 +1,75 @@
++/*
++ * This file contains core KHWASAN code.
++ *
++ * Copyright (c) 2018 Google, Inc.
++ * Author: Andrey Konovalov <andreyknvl@google.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ */
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++#define DISABLE_BRANCH_PROFILING
++
++#include <linux/export.h>
++#include <linux/interrupt.h>
++#include <linux/init.h>
++#include <linux/kasan.h>
++#include <linux/kernel.h>
++#include <linux/kmemleak.h>
++#include <linux/linkage.h>
++#include <linux/memblock.h>
++#include <linux/memory.h>
++#include <linux/mm.h>
++#include <linux/module.h>
++#include <linux/printk.h>
++#include <linux/random.h>
++#include <linux/sched.h>
++#include <linux/sched/task_stack.h>
++#include <linux/slab.h>
++#include <linux/stacktrace.h>
++#include <linux/string.h>
++#include <linux/types.h>
++#include <linux/vmalloc.h>
++#include <linux/bug.h>
++
++#include "kasan.h"
++#include "../slab.h"
++
++void check_memory_region(unsigned long addr, size_t size, bool write,
++				unsigned long ret_ip)
++{
++}
++
++#define DEFINE_HWASAN_LOAD_STORE(size)					\
++	void __hwasan_load##size##_noabort(unsigned long addr)		\
++	{								\
++	}								\
++	EXPORT_SYMBOL(__hwasan_load##size##_noabort);			\
++	void __hwasan_store##size##_noabort(unsigned long addr)		\
++	{								\
++	}								\
++	EXPORT_SYMBOL(__hwasan_store##size##_noabort)
++
++DEFINE_HWASAN_LOAD_STORE(1);
++DEFINE_HWASAN_LOAD_STORE(2);
++DEFINE_HWASAN_LOAD_STORE(4);
++DEFINE_HWASAN_LOAD_STORE(8);
++DEFINE_HWASAN_LOAD_STORE(16);
++
++void __hwasan_loadN_noabort(unsigned long addr, unsigned long size)
++{
++}
++EXPORT_SYMBOL(__hwasan_loadN_noabort);
++
++void __hwasan_storeN_noabort(unsigned long addr, unsigned long size)
++{
++}
++EXPORT_SYMBOL(__hwasan_storeN_noabort);
++
++void __hwasan_tag_memory(unsigned long addr, u8 tag, unsigned long size)
++{
++}
++EXPORT_SYMBOL(__hwasan_tag_memory);
 diff --git a/mm/slub.c b/mm/slub.c
-index a3b8467c14af..a60887938c19 100644
+index a60887938c19..5d1e1dee159b 100644
 --- a/mm/slub.c
 +++ b/mm/slub.c
-@@ -1336,10 +1336,10 @@ static inline void dec_slabs_node(struct kmem_cache *s, int node,
-  * Hooks for other subsystems that check memory allocations. In a typical
-  * production configuration these hooks all should produce no code at all.
-  */
--static inline void kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
-+static inline void *kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
+@@ -2956,7 +2956,7 @@ static __always_inline void slab_free(struct kmem_cache *s, struct page *page,
+ 		do_slab_free(s, page, head, tail, cnt, addr);
+ }
+ 
+-#ifdef CONFIG_KASAN
++#ifdef CONFIG_KASAN_GENERIC
+ void ___cache_free(struct kmem_cache *cache, void *x, unsigned long addr)
  {
- 	kmemleak_alloc(ptr, size, 1, flags);
--	kasan_kmalloc_large(ptr, size, flags);
-+	return kasan_kmalloc_large(ptr, size, flags);
- }
+ 	do_slab_free(cache, virt_to_head_page(x), x, NULL, 1, addr);
+diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+index 69552a39951d..49c6e056c697 100644
+--- a/scripts/Makefile.kasan
++++ b/scripts/Makefile.kasan
+@@ -1,5 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+-ifdef CONFIG_KASAN
++ifdef CONFIG_KASAN_GENERIC
+ ifdef CONFIG_KASAN_INLINE
+ 	call_threshold := 10000
+ else
+@@ -42,6 +42,29 @@ ifdef CONFIG_KASAN_EXTRA
+ CFLAGS_KASAN += $(call cc-option, -fsanitize-address-use-after-scope)
+ endif
  
- static __always_inline void kfree_hook(void *x)
-@@ -2732,7 +2732,7 @@ void *kmem_cache_alloc_trace(struct kmem_cache *s, gfp_t gfpflags, size_t size)
- {
- 	void *ret = slab_alloc(s, gfpflags, _RET_IP_);
- 	trace_kmalloc(_RET_IP_, ret, size, s->size, gfpflags);
--	kasan_kmalloc(s, ret, size, gfpflags);
-+	ret = kasan_kmalloc(s, ret, size, gfpflags);
- 	return ret;
- }
- EXPORT_SYMBOL(kmem_cache_alloc_trace);
-@@ -2760,7 +2760,7 @@ void *kmem_cache_alloc_node_trace(struct kmem_cache *s,
- 	trace_kmalloc_node(_RET_IP_, ret,
- 			   size, s->size, gfpflags, node);
+-CFLAGS_KASAN_NOSANITIZE := -fno-builtin
++endif
++
++ifdef CONFIG_KASAN_HW
++
++ifdef CONFIG_KASAN_INLINE
++    instrumentation_flags := -mllvm -hwasan-mapping-offset=$(KASAN_SHADOW_OFFSET)
++else
++    instrumentation_flags := -mllvm -hwasan-instrument-with-calls=1
++endif
  
--	kasan_kmalloc(s, ret, size, gfpflags);
-+	ret = kasan_kmalloc(s, ret, size, gfpflags);
- 	return ret;
- }
- EXPORT_SYMBOL(kmem_cache_alloc_node_trace);
-@@ -3750,7 +3750,7 @@ void *__kmalloc(size_t size, gfp_t flags)
- 
- 	trace_kmalloc(_RET_IP_, ret, size, s->size, flags);
- 
--	kasan_kmalloc(s, ret, size, flags);
-+	ret = kasan_kmalloc(s, ret, size, flags);
- 
- 	return ret;
- }
-@@ -3767,8 +3767,7 @@ static void *kmalloc_large_node(size_t size, gfp_t flags, int node)
- 	if (page)
- 		ptr = page_address(page);
- 
--	kmalloc_large_node_hook(ptr, size, flags);
--	return ptr;
-+	return kmalloc_large_node_hook(ptr, size, flags);
- }
- 
- void *__kmalloc_node(size_t size, gfp_t flags, int node)
-@@ -3795,7 +3794,7 @@ void *__kmalloc_node(size_t size, gfp_t flags, int node)
- 
- 	trace_kmalloc_node(_RET_IP_, ret, size, s->size, flags, node);
- 
--	kasan_kmalloc(s, ret, size, flags);
-+	ret = kasan_kmalloc(s, ret, size, flags);
- 
- 	return ret;
- }
++CFLAGS_KASAN := -fsanitize=kernel-hwaddress \
++		-mllvm -hwasan-instrument-stack=0 \
++		$(instrumentation_flags)
++
++ifeq ($(call cc-option, $(CFLAGS_KASAN) -Werror),)
++    ifneq ($(CONFIG_COMPILE_TEST),y)
++        $(warning Cannot use CONFIG_KASAN_HW: \
++            -fsanitize=hwaddress is not supported by compiler)
++    endif
++endif
++
++endif
++
++ifdef CONFIG_KASAN
++CFLAGS_KASAN_NOSANITIZE := -fno-builtin
+ endif
 -- 
 2.18.0.rc1.244.gcf134e6275-goog
 
