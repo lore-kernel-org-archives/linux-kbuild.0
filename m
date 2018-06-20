@@ -1,170 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:37061 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754446AbeFTRkb (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:41016 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754455AbeFTSVf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Jun 2018 13:40:31 -0400
-Received: by mail-wm0-f68.google.com with SMTP id r125-v6so997989wmg.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jun 2018 10:40:31 -0700 (PDT)
-From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v3 14/17] khwasan, arm64: add brk handler for inline instrumentation
-Date: Wed, 20 Jun 2018 19:40:00 +0200
-Message-Id: <6660ebcd8b5c7b70b91731cb62dff85be5a94684.1529515183.git.andreyknvl@google.com>
-In-Reply-To: <cover.1529515183.git.andreyknvl@google.com>
-References: <cover.1529515183.git.andreyknvl@google.com>
+        Wed, 20 Jun 2018 14:21:35 -0400
+Subject: Re: [RFC v8 1/1] mconf: global i-search in menu prompts
+References: <20180620084217.8597-1-dirk@gouders.net>
+ <20180620084217.8597-2-dirk@gouders.net>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <f02cc7c6-d92e-24f3-b0ad-df9e6bf7630a@infradead.org>
+Date: Wed, 20 Jun 2018 11:21:28 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180620084217.8597-2-dirk@gouders.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
-Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Andrey Konovalov <andreyknvl@google.com>
+To: Dirk Gouders <dirk@gouders.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
 
-KHWASAN inline instrumentation mode (which embeds checks of shadow memory
-into the generated code, instead of inserting a callback) generates a brk
-instruction when a tag mismatch is detected.
+Hi,
 
-This commit add a KHWASAN brk handler, that decodes the immediate value
-passed to the brk instructions (to extract information about the memory
-access that triggered the mismatch), reads the register values (x0 contains
-the guilty address) and reports the bug.
+On 06/20/2018 01:42 AM, Dirk Gouders wrote:
+> 
+> Operation
+> ---------
+> The TAB key is reserved to toggle the focus between menu and bottons.
+> Focus is on the buttons if one of the buttens (the active one) is
+> hightlighted, otherwise it is on the menu.
+> 
+> When the focus is on the buttons, mconf operates as before with the
+> exception of the TAB key.
+> 
+> When the focus is on the menu, mconf operates in i-search mode and the
+> following input has special meaning:
+> 
+> * <\> (backslash) can be used to search for other occurences of an
+>   already entered string.  On empty search strings, nothing happens.
+> 
+> * Any other printable character than backslash and '\n' is appended to
+>   the current search string and a match is searched for.  If a match
+>   is found, it is immediately navigated to.
 
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
----
- arch/arm64/include/asm/brk-imm.h |  2 +
- arch/arm64/kernel/traps.c        | 69 +++++++++++++++++++++++++++++++-
- 2 files changed, 69 insertions(+), 2 deletions(-)
+About that paragraph above:  I tried to search for "fs-cache", as in:
 
-diff --git a/arch/arm64/include/asm/brk-imm.h b/arch/arm64/include/asm/brk-imm.h
-index ed693c5bcec0..e4a7013321dc 100644
---- a/arch/arm64/include/asm/brk-imm.h
-+++ b/arch/arm64/include/asm/brk-imm.h
-@@ -16,10 +16,12 @@
-  * 0x400: for dynamic BRK instruction
-  * 0x401: for compile time BRK instruction
-  * 0x800: kernel-mode BUG() and WARN() traps
-+ * 0x9xx: KHWASAN trap (allowed values 0x900 - 0x9ff)
-  */
- #define FAULT_BRK_IMM			0x100
- #define KGDB_DYN_DBG_BRK_IMM		0x400
- #define KGDB_COMPILED_DBG_BRK_IMM	0x401
- #define BUG_BRK_IMM			0x800
-+#define KHWASAN_BRK_IMM			0x900
- 
- #endif
-diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-index d399d459397b..95152a4fd202 100644
---- a/arch/arm64/kernel/traps.c
-+++ b/arch/arm64/kernel/traps.c
-@@ -35,6 +35,7 @@
- #include <linux/sizes.h>
- #include <linux/syscalls.h>
- #include <linux/mm_types.h>
-+#include <linux/kasan.h>
- 
- #include <asm/atomic.h>
- #include <asm/bug.h>
-@@ -269,10 +270,14 @@ void arm64_notify_die(const char *str, struct pt_regs *regs,
- 	}
- }
- 
--void arm64_skip_faulting_instruction(struct pt_regs *regs, unsigned long size)
-+void __arm64_skip_faulting_instruction(struct pt_regs *regs, unsigned long size)
- {
- 	regs->pc += size;
-+}
- 
-+void arm64_skip_faulting_instruction(struct pt_regs *regs, unsigned long size)
-+{
-+	__arm64_skip_faulting_instruction(regs, size);
- 	/*
- 	 * If we were single stepping, we want to get the step exception after
- 	 * we return from the trap.
-@@ -791,7 +796,7 @@ static int bug_handler(struct pt_regs *regs, unsigned int esr)
- 	}
- 
- 	/* If thread survives, skip over the BUG instruction and continue: */
--	arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
-+	__arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
- 	return DBG_HOOK_HANDLED;
- }
- 
-@@ -801,6 +806,59 @@ static struct break_hook bug_break_hook = {
- 	.fn = bug_handler,
- };
- 
-+#ifdef CONFIG_KASAN_HW
-+
-+#define KHWASAN_ESR_RECOVER	0x20
-+#define KHWASAN_ESR_WRITE	0x10
-+#define KHWASAN_ESR_SIZE_MASK	0x0f
-+#define KHWASAN_ESR_SIZE(esr)	(1 << ((esr) & KHWASAN_ESR_SIZE_MASK))
-+
-+static int khwasan_handler(struct pt_regs *regs, unsigned int esr)
-+{
-+	bool recover = esr & KHWASAN_ESR_RECOVER;
-+	bool write = esr & KHWASAN_ESR_WRITE;
-+	size_t size = KHWASAN_ESR_SIZE(esr);
-+	u64 addr = regs->regs[0];
-+	u64 pc = regs->pc;
-+
-+	if (user_mode(regs))
-+		return DBG_HOOK_ERROR;
-+
-+	kasan_report(addr, size, write, pc);
-+
-+	/*
-+	 * The instrumentation allows to control whether we can proceed after
-+	 * a crash was detected. This is done by passing the -recover flag to
-+	 * the compiler. Disabling recovery allows to generate more compact
-+	 * code.
-+	 *
-+	 * Unfortunately disabling recovery doesn't work for the kernel right
-+	 * now. KHWASAN reporting is disabled in some contexts (for example when
-+	 * the allocator accesses slab object metadata; same is true for KASAN;
-+	 * this is controlled by current->kasan_depth). All these accesses are
-+	 * detected by the tool, even though the reports for them are not
-+	 * printed.
-+	 *
-+	 * This is something that might be fixed at some point in the future.
-+	 */
-+	if (!recover)
-+		die("Oops - KHWASAN", regs, 0);
-+
-+	/* If thread survives, skip over the brk instruction and continue: */
-+	__arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
-+	return DBG_HOOK_HANDLED;
-+}
-+
-+#define KHWASAN_ESR_VAL (0xf2000000 | KHWASAN_BRK_IMM)
-+#define KHWASAN_ESR_MASK 0xffffff00
-+
-+static struct break_hook khwasan_break_hook = {
-+	.esr_val = KHWASAN_ESR_VAL,
-+	.esr_mask = KHWASAN_ESR_MASK,
-+	.fn = khwasan_handler,
-+};
-+#endif
-+
- /*
-  * Initial handler for AArch64 BRK exceptions
-  * This handler only used until debug_traps_init().
-@@ -808,6 +866,10 @@ static struct break_hook bug_break_hook = {
- int __init early_brk64(unsigned long addr, unsigned int esr,
- 		struct pt_regs *regs)
- {
-+#ifdef CONFIG_KASAN_HW
-+	if ((esr & KHWASAN_ESR_MASK) == KHWASAN_ESR_VAL)
-+		return khwasan_handler(regs, esr) != DBG_HOOK_HANDLED;
-+#endif
- 	return bug_handler(regs, esr) != DBG_HOOK_HANDLED;
- }
- 
-@@ -815,4 +877,7 @@ int __init early_brk64(unsigned long addr, unsigned int esr,
- void __init trap_init(void)
- {
- 	register_break_hook(&bug_break_hook);
-+#ifdef CONFIG_KASAN_HW
-+	register_break_hook(&khwasan_break_hook);
-+#endif
- }
+config FSCACHE_DEBUG
+	bool "Debug FS-Cache"
+
+but i-search does not allow me to enter a '-' character.  Seems odd to me.
+
+
+Still doing other testing...
+
+
+> * BACKSPACE is used to remove the last character of the search string.
+> 
+> * DEL clears the search string.
+> 
+> * ENTER can be used to enter a submenu.
+> 
+> * ESC ESC exits the current isearch and clears the search string.
+> 
+> * Horizontal arrow keys still cycle between the buttons but also
+>   switch focus to the buttons.
+> 
+> * Vertical arroy keys navigate the menu items.
+> 
+> At any time, at most one i-search is active and the navigation path to
+> the current menu is displayed in the subtitle, the second line in the
+> menu window.
+> 
+> Navigation example:
+> 
+> To navigate to options concerning NFS file systems, simply type 'n',
+> 'f' and 's'.
+> 
+> Hint: use the 'z' key with focus on buttons to search for invisible
+>       prompts.
+
 -- 
-2.18.0.rc1.244.gcf134e6275-goog
-
+~Randy
