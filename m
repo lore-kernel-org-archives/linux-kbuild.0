@@ -1,63 +1,230 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:32949 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932231AbeFTQk6 (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:31399 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754129AbeFTXSQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Jun 2018 12:40:58 -0400
-Received: by mail-pg0-f65.google.com with SMTP id e11-v6so79023pgq.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jun 2018 09:40:58 -0700 (PDT)
+        Wed, 20 Jun 2018 19:18:16 -0400
 MIME-Version: 1.0
-References: <20180613210518.113983-1-ndesaulniers@google.com>
- <20180613210518.113983-3-ndesaulniers@google.com> <b027a324-ffae-fd5e-d8a3-03934be91a2d@zytor.com>
- <CAKwvOdngs8k_T=nDKh8JYdAwwFoJRcCU0bZu0tJHQ+keZ5+RFQ@mail.gmail.com> <deb5a074-b057-9388-4ab7-42295b5bb46c@zytor.com>
-In-Reply-To: <deb5a074-b057-9388-4ab7-42295b5bb46c@zytor.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 20 Jun 2018 09:40:46 -0700
-Message-ID: <CAKwvOdmE-EHJY7tgzkhyQqNT3m3oWtd6iE3sWBTz19Rijzx4Ew@mail.gmail.com>
-Subject: Re: [PATCH v5 2/3] x86/asm: add _ASM_ARG* constants for argument
- registers to <asm/asm.h>
+In-Reply-To: <20180619201458.4559-2-paul.burton@mips.com>
+References: <20180619190225.7eguhiw3ixaiwpgl@pburton-laptop>
+ <20180619201458.4559-1-paul.burton@mips.com> <20180619201458.4559-2-paul.burton@mips.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 21 Jun 2018 08:17:18 +0900
+Message-ID: <CAK7LNASxuQJJsbBQocWSDpeiEuB2A68r2Znbo8ayk2mujywkpQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] kbuild: add macro for controlling warnings to linux/compiler.h
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: hpa@zytor.com, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com, "H. Peter Anvin" <hpa@linux.intel.com>
+To: Paul Burton <paul.burton@mips.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Linux-MIPS <linux-mips@linux-mips.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Thomas Gleixner <tglx@linutronix.de>, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Matthias Kaehlcke <mka@chromium.org>, He Zhe <zhe.he@windriver.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Khem Raj <raj.khem@gmail.com>, Christophe Leroy <christophe.leroy@c-s.fr>, Al Viro <viro@zeniv.linux.org.uk>, Stafford Horne <shorne@gmail.com>, Gideon Israel Dsouza <gidisrael@gmail.com>, Kees Cook <keescook@chromium.org>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Paul Mackerras <paulus@samba.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-On Thu, Jun 14, 2018 at 5:17 PM H. Peter Anvin <hpa@zytor.com> wrote:
+Hi.
+
+
+2018-06-20 5:14 GMT+09:00 Paul Burton <paul.burton@mips.com>:
+> From: Arnd Bergmann <arnd@arndb.de>
 >
-> On 06/14/18 13:59, Nick Desaulniers wrote:
-> > On Thu, Jun 14, 2018 at 1:48 PM H. Peter Anvin <hpa@zytor.com> wrote:
-> >>
-> >> On 06/13/18 14:05, Nick Desaulniers wrote:
-> >>> From: "H. Peter Anvin" <hpa@linux.intel.com>
-> >>>
-> >>> i386 and x86-64 uses different registers for arguments; make them
-> >>> available so we don't have to #ifdef in the actual code.
-> >>>
-> >>> Native size and specified size (q, l, w, b) versions are provided.
-> >>>
-> >>> Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
-> >>> Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
-> >>> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> >>
-> >> I still object to Suggested-by: here.  Sedat did a correction, which is
-> >> a Reviewed-by:, but unless I'm completely out to sea, there was no
-> >> suggestion on Sedat's part of this; and I had certainly not seen it when
-> >> I wrote the code.
-> >
-> > I'm fine with changing it from a Suggested-by to a Reviewed-by.  Can
-> > you do that when you apply the set, or should I send a v6?
-> >
+> I have occasionally run into a situation where it would make sense to
+> control a compiler warning from a source file rather than doing so from
+> a Makefile using the $(cc-disable-warning, ...) or $(cc-option, ...)
+> helpers.
 >
-> I'm not handling patch mechanics for x86 at the moment.
+> The approach here is similar to what glibc uses, using __diag() and
+> related macros to encapsulate a _Pragma("GCC diagnostic ...") statement
+> that gets turned into the respective "#pragma GCC diagnostic ..." by
+> the preprocessor when the macro gets expanded.
+>
+> Like glibc, I also have an argument to pass the affected compiler
+> version, but decided to actually evaluate that one. For now, this
+> supports GCC_4_6, GCC_4_7, GCC_4_8, GCC_4_9, GCC_5, GCC_6, GCC_7,
+> GCC_8 and GCC_9. Adding support for CLANG_5 and other interesting
+> versions is straightforward here. GNU compilers starting with gcc-4.2
+> could support it in principle, but "#pragma GCC diagnostic push"
+> was only added in gcc-4.6, so it seems simpler to not deal with those
+> at all. The same versions show a large number of warnings already,
+> so it seems easier to just leave it at that and not do a more
+> fine-grained control for them.
+>
+> The use cases I found so far include:
+>
+> - turning off the gcc-8 -Wattribute-alias warning inside of the
+>   SYSCALL_DEFINEx() macro without having to do it globally.
+>
+> - Reducing the build time for a simple re-make after a change,
+>   once we move the warnings from ./Makefile and
+>   ./scripts/Makefile.extrawarn into linux/compiler.h
+>
+> - More control over the warnings based on other configurations,
+>   using preprocessor syntax instead of Makefile syntax. This should make
+>   it easier for the average developer to understand and change things.
+>
+> - Adding an easy way to turn the W=1 option on unconditionally
+>   for a subdirectory or a specific file. This has been requested
+>   by several developers in the past that want to have their subsystems
+>   W=1 clean.
+>
+> - Integrating clang better into the build systems. Clang supports
+>   more warnings than GCC, and we probably want to classify them
+>   as default, W=1, W=2 etc, but there are cases in which the
+>   warnings should be classified differently due to excessive false
+>   positives from one or the other compiler.
+>
+> - Adding a way to turn the default warnings into errors (e.g. using
+>   a new "make E=0" tag) while not also turning the W=1 warnings into
+>   errors.
+>
+> This patch for now just adds the minimal infrastructure in order to
+> do the first of the list above. As the #pragma GCC diagnostic
+> takes precedence over command line options, the next step would be
+> to convert a lot of the individual Makefiles that set nonstandard
+> options to use __diag() instead.
+>
+> [paul.burton@mips.com:
+>   - Rebase atop current master.
+>   - Add __diag_GCC, or more generally __diag_<compiler>, abstraction to
+>     avoid code outside of linux/compiler-gcc.h needing to duplicate
+>     knowledge about different GCC versions.
+>   - Add a comment argument to __diag_{ignore,warn,error} which isn't
+>     used in the expansion of the macros but serves to push people to
+>     document the reason for using them - per feedback from Kees Cook.
+>   - Translate severity to GCC-specific pragmas in linux/compiler-gcc.h
+>     rather than using GCC-specific in linux/compiler_types.h.
+>   - Drop all but GCC 8 macros, since we only need to define macros for
+>     versions that we need to introduce pragmas for, and as of this
+>     series that's just GCC 8.
+>   - Capitalize comments in linux/compiler-gcc.h to match the style of
+>     the rest of the file.
+>   - Line up macro definitions with tabs in linux/compiler-gcc.h.]
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Paul Burton <paul.burton@mips.com>
+> Tested-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> Tested-by: Stafford Horne <shorne@gmail.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Douglas Anderson <dianders@chromium.org>
+> Cc: Al Viro <viro@zeniv.linux.org.uk>
+> Cc: Heiko Carstens <heiko.carstens@de.ibm.com>
+> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: Matthew Wilcox <matthew@wil.cx>
+> Cc: Matthias Kaehlcke <mka@chromium.org>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Ingo Molnar <mingo@kernel.org>
+> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Gideon Israel Dsouza <gidisrael@gmail.com>
+> Cc: Christophe Leroy <christophe.leroy@c-s.fr>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Stafford Horne <shorne@gmail.com>
+> Cc: Khem Raj <raj.khem@gmail.com>
+> Cc: He Zhe <zhe.he@windriver.com>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-mips@linux-mips.org
+> Cc: linuxppc-dev@lists.ozlabs.org
+>
+> ---
+>
+> Changes in v2:
+> - Add version argument to fallback __diag_GCC definition.
+> - Translate severity from generic ignore,warn,error to GCC-specific
+>   pragma content ignored,warning,error in linux/compiler-gcc.h in order
+>   to keep linux/compiler_types.h generic per feedback from Masahiro
+>   Yamada.
+> - Drop all but GCC 8 macros, since we only need to define macros for
+>   versions that we need to introduce pragmas for, and as of this series
+>   that's just GCC 8.
+> - Capitalize comments in linux/compiler-gcc.h to match the style of the
+>   rest of the file.
+> - Line up macro definitions with tabs in linux/compiler-gcc.h.
+>
+>  include/linux/compiler-gcc.h   | 27 +++++++++++++++++++++++++++
+>  include/linux/compiler_types.h | 18 ++++++++++++++++++
+>  2 files changed, 45 insertions(+)
+>
+> diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+> index f1a7492a5cc8..5067a90af9c3 100644
+> --- a/include/linux/compiler-gcc.h
+> +++ b/include/linux/compiler-gcc.h
+> @@ -347,3 +347,30 @@
+>  #if GCC_VERSION >= 50100
+>  #define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
+>  #endif
+> +
+> +/*
+> + * Turn individual warnings and errors on and off locally, depending
+> + * on version.
+> + */
+> +#define __diag_GCC(version, severity, s) \
+> +       __diag_GCC_ ## version(__diag_GCC_ ## severity s)
+> +
+> +/* Severity used in pragma directives */
+> +#define __diag_GCC_ignore      ignored
+> +#define __diag_GCC_warn                warning
+> +#define __diag_GCC_error       error
+> +
+> +/* Compilers before gcc-4.6 do not understand "#pragma GCC diagnostic push" */
+> +#if GCC_VERSION >= 40600
+> +#define __diag_str1(s)         #s
+> +#define __diag_str(s)          __diag_str1(s)
+> +#define __diag(s)              _Pragma(__diag_str(GCC diagnostic s))
+> +#else
+> +#define __diag(s)
 
-Hi Ingo and Thomas,
-Have you had a chance to review this patch series for application?
 
-Note that Juergen (the paravirt maintainer) acked the series:
-https://bugs.llvm.org/show_bug.cgi?id=37880
-The only issue being swapping a Suggested-by for a Reviewed-by tag for
-one commit, as above.
+You can omit the #else here
+because it is covered by compiler_types.h
 
---
-Thanks,
-~Nick Desaulniers
+
+
+> +#endif
+> +
+> +#if GCC_VERSION >= 80000
+> +#define __diag_GCC_8(s)                __diag(s)
+> +#else
+> +#define __diag_GCC_8(s)
+> +#endif
+> diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+> index 6b79a9bba9a7..a8ba6b04152c 100644
+> --- a/include/linux/compiler_types.h
+> +++ b/include/linux/compiler_types.h
+> @@ -271,4 +271,22 @@ struct ftrace_likely_data {
+>  # define __native_word(t) (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+>  #endif
+>
+> +#ifndef __diag
+> +#define __diag(string)
+> +#endif
+> +
+> +#ifndef __diag_GCC
+> +#define __diag_GCC(version, severity, string)
+> +#endif
+> +
+> +#define __diag_push()  __diag(push)
+> +#define __diag_pop()   __diag(pop)
+> +
+> +#define __diag_ignore(compiler, version, option, comment) \
+> +       __diag_ ## compiler(version, ignore, option)
+> +#define __diag_warn(compiler, version, option, comment) \
+> +       __diag_ ## compiler(version, warn, option)
+> +#define __diag_error(compiler, version, option, comment) \
+> +       __diag_ ## compiler(version, error, option)
+> +
+>  #endif /* __LINUX_COMPILER_TYPES_H */
+> --
+> 2.17.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
