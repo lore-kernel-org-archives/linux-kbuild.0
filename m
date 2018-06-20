@@ -1,120 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:52971 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932588AbeFTRkg (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:34428 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932368AbeFTUCJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Jun 2018 13:40:36 -0400
-Received: by mail-wm0-f44.google.com with SMTP id p126-v6so863140wmb.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jun 2018 10:40:35 -0700 (PDT)
-From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v3 17/17] kasan: add SPDX-License-Identifier mark to source files
-Date: Wed, 20 Jun 2018 19:40:03 +0200
-Message-Id: <f76d3070776e0038eda3cd76d471d1bfeae18480.1529515183.git.andreyknvl@google.com>
-In-Reply-To: <cover.1529515183.git.andreyknvl@google.com>
-References: <cover.1529515183.git.andreyknvl@google.com>
+        Wed, 20 Jun 2018 16:02:09 -0400
+Subject: Re: [RFC v8 1/1] mconf: global i-search in menu prompts
+References: <20180620084217.8597-1-dirk@gouders.net>
+ <20180620084217.8597-2-dirk@gouders.net>
+ <f02cc7c6-d92e-24f3-b0ad-df9e6bf7630a@infradead.org>
+ <ghpo0l2spo.fsf@lena.gouders.net>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <126839db-5cc1-7dad-5a1f-21899dc6236e@infradead.org>
+Date: Wed, 20 Jun 2018 13:02:03 -0700
+MIME-Version: 1.0
+In-Reply-To: <ghpo0l2spo.fsf@lena.gouders.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
-Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Andrey Konovalov <andreyknvl@google.com>
+To: Dirk Gouders <dirk@gouders.net>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
 
-This patch adds a "SPDX-License-Identifier: GPL-2.0" mark to all source
-files under mm/kasan.
+On 06/20/2018 11:55 AM, Dirk Gouders wrote:
+> Randy Dunlap <rdunlap@infradead.org> writes:
+> 
+>> Hi,
+>>
+>> On 06/20/2018 01:42 AM, Dirk Gouders wrote:
+>>>
+>>> Operation
+>>> ---------
+>>> The TAB key is reserved to toggle the focus between menu and bottons.
+>>> Focus is on the buttons if one of the buttens (the active one) is
+>>> hightlighted, otherwise it is on the menu.
+>>>
+>>> When the focus is on the buttons, mconf operates as before with the
+>>> exception of the TAB key.
+>>>
+>>> When the focus is on the menu, mconf operates in i-search mode and the
+>>> following input has special meaning:
+>>>
+>>> * <\> (backslash) can be used to search for other occurences of an
+>>>   already entered string.  On empty search strings, nothing happens.
+>>>
+>>> * Any other printable character than backslash and '\n' is appended to
+>>>   the current search string and a match is searched for.  If a match
+>>>   is found, it is immediately navigated to.
+>>
+>> About that paragraph above:  I tried to search for "fs-cache", as in:
+>>
+>> config FSCACHE_DEBUG
+>> 	bool "Debug FS-Cache"
+>>
+>> but i-search does not allow me to enter a '-' character.  Seems odd to me.
+> 
+> Hi Randy,
+> 
+> thanks for all your testing.
+> 
+> '-' and '+' previously had the same meaning as <KEY_UP>, <KEY_DOWN>,
+> respectively.  If you are on the top menu item and press '-' there is
+> nothing to scroll up so it appears as if the pressed key wasn't
+> processed.
+> 
+> I-search should add those characters to the pattern but I broke that two
+> or three versions before when I fixed another issue.
+> 
+> I will add this to my list of test cases so this won't happen again.
+> 
+> Dirk
+> 
+> 
+>> Still doing other testing...
 
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
----
- mm/kasan/common.c         | 1 +
- mm/kasan/kasan.c          | 1 +
- mm/kasan/kasan.h          | 2 +-
- mm/kasan/kasan_init.c     | 1 +
- mm/kasan/kasan_report.c   | 1 +
- mm/kasan/khwasan.c        | 1 +
- mm/kasan/khwasan_report.c | 1 +
- mm/kasan/quarantine.c     | 1 +
- mm/kasan/report.c         | 1 +
- 9 files changed, 9 insertions(+), 1 deletion(-)
+I haven't hit any other issues.
 
-diff --git a/mm/kasan/common.c b/mm/kasan/common.c
-index 6cf7dec0b765..955e0ebdc644 100644
---- a/mm/kasan/common.c
-+++ b/mm/kasan/common.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains common KASAN and KHWASAN code.
-  *
-diff --git a/mm/kasan/kasan.c b/mm/kasan/kasan.c
-index 44ec228de0a2..128a865c9e05 100644
---- a/mm/kasan/kasan.c
-+++ b/mm/kasan/kasan.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains core KASAN code.
-  *
-diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
-index 6f4f2ebf5f57..3feacd889e24 100644
---- a/mm/kasan/kasan.h
-+++ b/mm/kasan/kasan.h
-@@ -1,4 +1,4 @@
--/* SPDX-License-Identifier: GPL-2.0 */
-+// SPDX-License-Identifier: GPL-2.0
- #ifndef __MM_KASAN_KASAN_H
- #define __MM_KASAN_KASAN_H
- 
-diff --git a/mm/kasan/kasan_init.c b/mm/kasan/kasan_init.c
-index f436246ccc79..2dfa730a9d43 100644
---- a/mm/kasan/kasan_init.c
-+++ b/mm/kasan/kasan_init.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains some kasan initialization code.
-  *
-diff --git a/mm/kasan/kasan_report.c b/mm/kasan/kasan_report.c
-index fdf2d77e3125..48da73f4ef7c 100644
---- a/mm/kasan/kasan_report.c
-+++ b/mm/kasan/kasan_report.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains KASAN specific error reporting code.
-  *
-diff --git a/mm/kasan/khwasan.c b/mm/kasan/khwasan.c
-index fd1725022794..f0d528a8c3f3 100644
---- a/mm/kasan/khwasan.c
-+++ b/mm/kasan/khwasan.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains core KHWASAN code.
-  *
-diff --git a/mm/kasan/khwasan_report.c b/mm/kasan/khwasan_report.c
-index 51238b404b08..4e193546d94e 100644
---- a/mm/kasan/khwasan_report.c
-+++ b/mm/kasan/khwasan_report.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains KHWASAN specific error reporting code.
-  *
-diff --git a/mm/kasan/quarantine.c b/mm/kasan/quarantine.c
-index 3a8ddf8baf7d..0e4dc1a22615 100644
---- a/mm/kasan/quarantine.c
-+++ b/mm/kasan/quarantine.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * KASAN quarantine.
-  *
-diff --git a/mm/kasan/report.c b/mm/kasan/report.c
-index e031c78f2e52..633b4b245798 100644
---- a/mm/kasan/report.c
-+++ b/mm/kasan/report.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains common KASAN and KHWASAN error reporting code.
-  *
+thanks,
 -- 
-2.18.0.rc1.244.gcf134e6275-goog
-
+~Randy
