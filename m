@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:39039 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754598AbeFTRkQ (ORCPT
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:47030 "EHLO
+        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754686AbeFTRk2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Jun 2018 13:40:16 -0400
-Received: by mail-wm0-f66.google.com with SMTP id p11-v6so971745wmc.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jun 2018 10:40:16 -0700 (PDT)
+        Wed, 20 Jun 2018 13:40:28 -0400
+Received: by mail-wr0-f195.google.com with SMTP id v13-v6so341026wrp.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jun 2018 10:40:27 -0700 (PDT)
 From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v3 05/17] khwasan: initialize shadow to 0xff
-Date: Wed, 20 Jun 2018 19:39:51 +0200
-Message-Id: <29bf9a5e71137411b8238fb2b8535811a91adbe8.1529515183.git.andreyknvl@google.com>
+Subject: [PATCH v3 12/17] khwasan: add bug reporting routines
+Date: Wed, 20 Jun 2018 19:39:58 +0200
+Message-Id: <58d2d6ab8b079659872e3b37f816b8aeb9aeab5c.1529515183.git.andreyknvl@google.com>
 In-Reply-To: <cover.1529515183.git.andreyknvl@google.com>
 References: <cover.1529515183.git.andreyknvl@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,108 +17,191 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
 Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Andrey Konovalov <andreyknvl@google.com>
 
-A KHWASAN shadow memory cell contains a memory tag, that corresponds to
-the tag in the top byte of the pointer, that points to that memory. The
-native top byte value of kernel pointers is 0xff, so with KHWASAN we
-need to initialize shadow memory to 0xff. This commit does that.
+This commit adds rountines, that print KHWASAN error reports. Those are
+quite similar to KASAN, the difference is:
+
+1. The way KHWASAN finds the first bad shadow cell (with a mismatching
+   tag). KHWASAN compares memory tags from the shadow memory to the pointer
+   tag.
+
+2. KHWASAN reports all bugs with the "KASAN: invalid-access" header. This
+   is done, so various external tools that already parse the kernel logs
+   looking for KASAN reports wouldn't need to be changed.
 
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- arch/arm64/mm/kasan_init.c | 16 ++++++++++++++--
- include/linux/kasan.h      |  8 ++++++++
- mm/kasan/common.c          |  3 ++-
- 3 files changed, 24 insertions(+), 3 deletions(-)
+ include/linux/kasan.h     |  3 +++
+ mm/kasan/kasan_report.c   |  7 ++---
+ mm/kasan/khwasan_report.c | 21 +++++++++++++++
+ mm/kasan/report.c         | 57 +++++++++++++++++++++------------------
+ 4 files changed, 57 insertions(+), 31 deletions(-)
 
-diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
-index 12145874c02b..7a31e8ccbad2 100644
---- a/arch/arm64/mm/kasan_init.c
-+++ b/arch/arm64/mm/kasan_init.c
-@@ -44,6 +44,15 @@ static phys_addr_t __init kasan_alloc_zeroed_page(int node)
- 	return __pa(p);
- }
- 
-+static phys_addr_t __init kasan_alloc_raw_page(int node)
-+{
-+	void *p = memblock_virt_alloc_try_nid_raw(PAGE_SIZE, PAGE_SIZE,
-+						  __pa(MAX_DMA_ADDRESS),
-+						  MEMBLOCK_ALLOC_ACCESSIBLE,
-+						  node);
-+	return __pa(p);
-+}
-+
- static pte_t *__init kasan_pte_offset(pmd_t *pmdp, unsigned long addr, int node,
- 				      bool early)
- {
-@@ -89,7 +98,9 @@ static void __init kasan_pte_populate(pmd_t *pmdp, unsigned long addr,
- 
- 	do {
- 		phys_addr_t page_phys = early ? __pa_symbol(kasan_zero_page)
--					      : kasan_alloc_zeroed_page(node);
-+					      : kasan_alloc_raw_page(node);
-+		if (!early)
-+			memset(__va(page_phys), KASAN_SHADOW_INIT, PAGE_SIZE);
- 		next = addr + PAGE_SIZE;
- 		set_pte(ptep, pfn_pte(__phys_to_pfn(page_phys), PAGE_KERNEL));
- 	} while (ptep++, addr = next, addr != end && pte_none(READ_ONCE(*ptep)));
-@@ -139,6 +150,7 @@ asmlinkage void __init kasan_early_init(void)
- 		KASAN_SHADOW_END - (1UL << (64 - KASAN_SHADOW_SCALE_SHIFT)));
- 	BUILD_BUG_ON(!IS_ALIGNED(KASAN_SHADOW_START, PGDIR_SIZE));
- 	BUILD_BUG_ON(!IS_ALIGNED(KASAN_SHADOW_END, PGDIR_SIZE));
-+
- 	kasan_pgd_populate(KASAN_SHADOW_START, KASAN_SHADOW_END, NUMA_NO_NODE,
- 			   true);
- }
-@@ -235,7 +247,7 @@ void __init kasan_init(void)
- 		set_pte(&kasan_zero_pte[i],
- 			pfn_pte(sym_to_pfn(kasan_zero_page), PAGE_KERNEL_RO));
- 
--	memset(kasan_zero_page, 0, PAGE_SIZE);
-+	memset(kasan_zero_page, KASAN_SHADOW_INIT, PAGE_SIZE);
- 	cpu_replace_ttbr1(lm_alias(swapper_pg_dir));
- 
- 	/* At this point kasan is fully initialized. Enable error messages */
 diff --git a/include/linux/kasan.h b/include/linux/kasan.h
-index 6608aa9b35ac..336385baf926 100644
+index d7624b879d86..e209027f3b52 100644
 --- a/include/linux/kasan.h
 +++ b/include/linux/kasan.h
-@@ -139,6 +139,8 @@ static inline size_t kasan_metadata_size(struct kmem_cache *cache) { return 0; }
+@@ -161,6 +161,9 @@ void *khwasan_set_tag(const void *addr, u8 tag);
+ u8 khwasan_get_tag(const void *addr);
+ void *khwasan_reset_tag(const void *ptr);
  
- #ifdef CONFIG_KASAN_GENERIC
- 
-+#define KASAN_SHADOW_INIT 0
++void kasan_report(unsigned long addr, size_t size,
++			bool write, unsigned long ip);
 +
- void kasan_cache_shrink(struct kmem_cache *cache);
- void kasan_cache_shutdown(struct kmem_cache *cache);
+ #else /* CONFIG_KASAN_HW */
  
-@@ -149,4 +151,10 @@ static inline void kasan_cache_shutdown(struct kmem_cache *cache) {}
+ static inline void khwasan_init(void) { }
+diff --git a/mm/kasan/kasan_report.c b/mm/kasan/kasan_report.c
+index 2d8decbecbd5..fdf2d77e3125 100644
+--- a/mm/kasan/kasan_report.c
++++ b/mm/kasan/kasan_report.c
+@@ -33,10 +33,10 @@
+ #include "kasan.h"
+ #include "../slab.h"
  
- #endif /* CONFIG_KASAN_GENERIC */
+-static const void *find_first_bad_addr(const void *addr, size_t size)
++void *find_first_bad_addr(void *addr, size_t size)
+ {
+ 	u8 shadow_val = *(u8 *)kasan_mem_to_shadow(addr);
+-	const void *first_bad_addr = addr;
++	void *first_bad_addr = addr;
  
-+#ifdef CONFIG_KASAN_HW
+ 	while (!shadow_val && first_bad_addr < addr + size) {
+ 		first_bad_addr += KASAN_SHADOW_SCALE_SIZE;
+@@ -50,9 +50,6 @@ static const char *get_shadow_bug_type(struct kasan_access_info *info)
+ 	const char *bug_type = "unknown-crash";
+ 	u8 *shadow_addr;
+ 
+-	info->first_bad_addr = find_first_bad_addr(info->access_addr,
+-						info->access_size);
+-
+ 	shadow_addr = (u8 *)kasan_mem_to_shadow(info->first_bad_addr);
+ 
+ 	/*
+diff --git a/mm/kasan/khwasan_report.c b/mm/kasan/khwasan_report.c
+index 2edbc3c76be5..51238b404b08 100644
+--- a/mm/kasan/khwasan_report.c
++++ b/mm/kasan/khwasan_report.c
+@@ -37,3 +37,24 @@ const char *get_bug_type(struct kasan_access_info *info)
+ {
+ 	return "invalid-access";
+ }
 +
-+#define KASAN_SHADOW_INIT 0xFF
++void *find_first_bad_addr(void *addr, size_t size)
++{
++	u8 tag = get_tag(addr);
++	void *untagged_addr = reset_tag(addr);
++	u8 *shadow = (u8 *)kasan_mem_to_shadow(untagged_addr);
++	void *first_bad_addr = untagged_addr;
 +
-+#endif /* CONFIG_KASAN_HW */
++	while (*shadow == tag && first_bad_addr < untagged_addr + size) {
++		first_bad_addr += KASAN_SHADOW_SCALE_SIZE;
++		shadow = (u8 *)kasan_mem_to_shadow(first_bad_addr);
++	}
++	return first_bad_addr;
++}
 +
- #endif /* LINUX_KASAN_H */
-diff --git a/mm/kasan/common.c b/mm/kasan/common.c
-index e78ebeff1f4c..656baa8984c7 100644
---- a/mm/kasan/common.c
-+++ b/mm/kasan/common.c
-@@ -473,11 +473,12 @@ int kasan_module_alloc(void *addr, size_t size)
++void print_tags(u8 addr_tag, const void *addr)
++{
++	u8 *shadow = (u8 *)kasan_mem_to_shadow(addr);
++
++	pr_err("Pointer tag: [%02x], memory tag: [%02x]\n", addr_tag, *shadow);
++}
+diff --git a/mm/kasan/report.c b/mm/kasan/report.c
+index 155247a6f8a8..e031c78f2e52 100644
+--- a/mm/kasan/report.c
++++ b/mm/kasan/report.c
+@@ -64,11 +64,10 @@ static int __init kasan_set_multi_shot(char *str)
+ }
+ __setup("kasan_multi_shot", kasan_set_multi_shot);
  
- 	ret = __vmalloc_node_range(shadow_size, 1, shadow_start,
- 			shadow_start + shadow_size,
--			GFP_KERNEL | __GFP_ZERO,
-+			GFP_KERNEL,
- 			PAGE_KERNEL, VM_NO_GUARD, NUMA_NO_NODE,
- 			__builtin_return_address(0));
+-static void print_error_description(struct kasan_access_info *info,
+-					const char *bug_type)
++static void print_error_description(struct kasan_access_info *info)
+ {
+ 	pr_err("BUG: KASAN: %s in %pS\n",
+-		bug_type, (void *)info->ip);
++		get_bug_type(info), (void *)info->ip);
+ 	pr_err("%s of size %zu at addr %px by task %s/%d\n",
+ 		info->is_write ? "Write" : "Read", info->access_size,
+ 		info->access_addr, current->comm, task_pid_nr(current));
+@@ -272,6 +271,8 @@ void kasan_report_invalid_free(void *object, unsigned long ip)
  
- 	if (ret) {
-+		__memset(ret, KASAN_SHADOW_INIT, shadow_size);
- 		find_vm_area(addr)->flags |= VM_KASAN;
- 		kmemleak_ignore(ret);
- 		return 0;
+ 	start_report(&flags);
+ 	pr_err("BUG: KASAN: double-free or invalid-free in %pS\n", (void *)ip);
++	print_tags(get_tag(object), reset_tag(object));
++	object = reset_tag(object);
+ 	pr_err("\n");
+ 	print_address_description(object);
+ 	pr_err("\n");
+@@ -279,41 +280,45 @@ void kasan_report_invalid_free(void *object, unsigned long ip)
+ 	end_report(&flags);
+ }
+ 
+-static void kasan_report_error(struct kasan_access_info *info)
+-{
+-	unsigned long flags;
+-
+-	start_report(&flags);
+-
+-	print_error_description(info, get_bug_type(info));
+-	pr_err("\n");
+-
+-	if (!addr_has_shadow(info->access_addr)) {
+-		dump_stack();
+-	} else {
+-		print_address_description((void *)info->access_addr);
+-		pr_err("\n");
+-		print_shadow_for_address(info->first_bad_addr);
+-	}
+-
+-	end_report(&flags);
+-}
+-
+ void kasan_report(unsigned long addr, size_t size,
+ 		bool is_write, unsigned long ip)
+ {
+ 	struct kasan_access_info info;
++	void *tagged_addr;
++	void *untagged_addr;
++	unsigned long flags;
+ 
+ 	if (likely(!report_enabled()))
+ 		return;
+ 
+ 	disable_trace_on_warning();
+ 
+-	info.access_addr = (void *)addr;
+-	info.first_bad_addr = (void *)addr;
++	tagged_addr = (void *)addr;
++	untagged_addr = reset_tag(tagged_addr);
++
++	info.access_addr = tagged_addr;
++	if (addr_has_shadow(untagged_addr))
++		info.first_bad_addr = find_first_bad_addr(tagged_addr, size);
++	else
++		info.first_bad_addr = untagged_addr;
+ 	info.access_size = size;
+ 	info.is_write = is_write;
+ 	info.ip = ip;
+ 
+-	kasan_report_error(&info);
++	start_report(&flags);
++
++	print_error_description(&info);
++	if (addr_has_shadow(untagged_addr))
++		print_tags(get_tag(tagged_addr), info.first_bad_addr);
++	pr_err("\n");
++
++	if (addr_has_shadow(untagged_addr)) {
++		print_address_description(untagged_addr);
++		pr_err("\n");
++		print_shadow_for_address(info.first_bad_addr);
++	} else {
++		dump_stack();
++	}
++
++	end_report(&flags);
+ }
 -- 
 2.18.0.rc1.244.gcf134e6275-goog
 
