@@ -1,34 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52244 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754468AbeFTPfc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Jun 2018 11:35:32 -0400
-Date: Wed, 20 Jun 2018 10:35:28 -0500
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH] Kbuild: fix mismatched if/endif pairs
-Message-ID: <20180620153528.jbevuhgj3rgvcbte@treble>
-References: <180617191612798b1a5d7a74c59e7905c31fd3f36f5d@stu.xidian.edu.cn>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:32949 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932231AbeFTQk6 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 20 Jun 2018 12:40:58 -0400
+Received: by mail-pg0-f65.google.com with SMTP id e11-v6so79023pgq.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jun 2018 09:40:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <180617191612798b1a5d7a74c59e7905c31fd3f36f5d@stu.xidian.edu.cn>
+References: <20180613210518.113983-1-ndesaulniers@google.com>
+ <20180613210518.113983-3-ndesaulniers@google.com> <b027a324-ffae-fd5e-d8a3-03934be91a2d@zytor.com>
+ <CAKwvOdngs8k_T=nDKh8JYdAwwFoJRcCU0bZu0tJHQ+keZ5+RFQ@mail.gmail.com> <deb5a074-b057-9388-4ab7-42295b5bb46c@zytor.com>
+In-Reply-To: <deb5a074-b057-9388-4ab7-42295b5bb46c@zytor.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Wed, 20 Jun 2018 09:40:46 -0700
+Message-ID: <CAKwvOdmE-EHJY7tgzkhyQqNT3m3oWtd6iE3sWBTz19Rijzx4Ew@mail.gmail.com>
+Subject: Re: [PATCH v5 2/3] x86/asm: add _ASM_ARG* constants for argument
+ registers to <asm/asm.h>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Xi Ruoyao <ryxi@stu.xidian.edu.cn>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: hpa@zytor.com, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com, "H. Peter Anvin" <hpa@linux.intel.com>
 
-On Sun, Jun 17, 2018 at 06:16:07PM +0800, Xi Ruoyao wrote:
-> In scripts/Makefile.build, there are two mismatched if/endif pairs.
-> They stop the generation of orc unwind table if CONFIG_FTRACE_MCOUNT_RECORD
-> is not set.  dmesg complains:
-> 
-> WARNING: WARNING: Bad or missing .orc_unwind table.  Disabling unwinder.
-> 
-> This comment moves an endif to match the if/endif pairs.
-> 
-> Signed-off-by: Xi Ruoyao <ryxi@stu.xidian.edu.cn>
+On Thu, Jun 14, 2018 at 5:17 PM H. Peter Anvin <hpa@zytor.com> wrote:
+>
+> On 06/14/18 13:59, Nick Desaulniers wrote:
+> > On Thu, Jun 14, 2018 at 1:48 PM H. Peter Anvin <hpa@zytor.com> wrote:
+> >>
+> >> On 06/13/18 14:05, Nick Desaulniers wrote:
+> >>> From: "H. Peter Anvin" <hpa@linux.intel.com>
+> >>>
+> >>> i386 and x86-64 uses different registers for arguments; make them
+> >>> available so we don't have to #ifdef in the actual code.
+> >>>
+> >>> Native size and specified size (q, l, w, b) versions are provided.
+> >>>
+> >>> Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
+> >>> Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+> >>> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> >>
+> >> I still object to Suggested-by: here.  Sedat did a correction, which is
+> >> a Reviewed-by:, but unless I'm completely out to sea, there was no
+> >> suggestion on Sedat's part of this; and I had certainly not seen it when
+> >> I wrote the code.
+> >
+> > I'm fine with changing it from a Suggested-by to a Reviewed-by.  Can
+> > you do that when you apply the set, or should I send a v6?
+> >
+>
+> I'm not handling patch mechanics for x86 at the moment.
 
-Reviewed-by: Josh Poimboeuf <jpoimboe@redhat.com>
+Hi Ingo and Thomas,
+Have you had a chance to review this patch series for application?
 
--- 
-Josh
+Note that Juergen (the paravirt maintainer) acked the series:
+https://bugs.llvm.org/show_bug.cgi?id=37880
+The only issue being swapping a Suggested-by for a Reviewed-by tag for
+one commit, as above.
+
+--
+Thanks,
+~Nick Desaulniers
