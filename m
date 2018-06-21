@@ -1,76 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:55536 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932755AbeFUNbU (ORCPT
+Received: from relmlor3.renesas.com ([210.160.252.173]:25344 "EHLO
+        relmlie2.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S933399AbeFUQpp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 Jun 2018 09:31:20 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH] kconfig: fix line numbers for if-entries in menu tree
-Date: Thu, 21 Jun 2018 15:30:54 +0200
-Message-Id: <20180621133054.21090-1-dirk@gouders.net>
+        Thu, 21 Jun 2018 12:45:45 -0400
+From: Chris Brandt <Chris.Brandt@renesas.com>
+Subject: RE: [PATCHv4 4/4] ARM: versatile: support configuring versatile
+ machine for no-MMU
+Date: Thu, 21 Jun 2018 16:45:38 +0000
+Message-ID: <TY1PR01MB1562B232625397CCACD5931A8A760@TY1PR01MB1562.jpnprd01.prod.outlook.com>
+References: <20180618141905.7789-1-gerg@linux-m68k.org>
+ <20180618141905.7789-5-gerg@linux-m68k.org>
+ <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com>
+ <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
+In-Reply-To: <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Dirk Gouders <dirk@gouders.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>, Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Russell King <linux@armlinux.org.uk>, Vladimir Murzin <vladimir.murzin@arm.com>, Arnd Bergmann <arnd@arndb.de>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-The line numers for if-entries in the menu tree are off by one or more
-lines which is confusing when debugging for correctness of unrelated changes.
+On Thursday, June 21, 2018 1, Nicolas Pitre wrote:
+> > I've just sent a patch to do that.
+>=20
+> Your patch isn't wrong per se.  But it is not enough. The issue here
+> would be easily fixed with some kconfig extension so that:
+>=20
+> - If XIP or NOMMU is selected then only one target in the multiplatform
+>   set can be selected, basically turning it into a choice menu.
+>=20
+> - If more than one multiplatform targets is selected then XIP and NOMMU
+>   can no longere be selected.
+>
 
-According to the git log, commit a02f0570ae201c49 (kconfig: improve
-error handling in the parser) was the last one that changed that part
-of the parser and replaced
+Over the years I tried to tackle this issue in multiple different ways,=20
+while still staying in the limitations of kbuild.
+Basically, everything was shot down for one reason or another (or the=20
+only way to do it is really ugly...so I didn't even ask).
 
-	"if_entry: T_IF expr T_EOL"
-by
-	"if_entry: T_IF expr nl"
+kbuild doesn't really have a mutually exclusive property that can be=20
+dynamically set/cleared.
 
-but the commit message does not state why this has been done.
 
-When reverting that part of the commit, only the line numers are
-corrected (checked with cdebug = DEBUG_PARSE in zconf.y), otherwise
-the menu tree remains unchanged (checked with zconfdump() enabled in
-conf.c).
+In the end, I saw only 2 paths for adding XIP to ARM MMU builds:
 
-An example for the corrected line numbers:
+1) Modify kbuild to give the ability as stated above.
 
-drivers/soc/Kconfig:15:source drivers/soc/tegra/Kconfig
-drivers/soc/tegra/Kconfig:4:if
-drivers/soc/tegra/Kconfig:6:if
+2) Make XIP builds somehow be able to run at multiple physical address=20
+by modifying the binaries post-build (Arnd's suggestion).
 
-changes to:
 
-drivers/soc/Kconfig:15:source drivers/soc/tegra/Kconfig
-drivers/soc/tegra/Kconfig:1:if
-drivers/soc/tegra/Kconfig:4:if
+What I have been doing is simply applying this patch to arch/arm/Kconifg
+before every XIP KERNEL build:
 
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
+ config XIP_KERNEL
+ 	bool "Kernel Execute-In-Place from ROM"
+-	depends on !ARM_LPAE && !ARCH_MULTIPLATFORM
++	depends on !ARM_LPAE
+ 	help
+ 	  Execute-In-Place allows the kernel to run from non-volatile storage
+ 	  directly addressable by the CPU, such as NOR flash. This saves RAM
 
----
- scripts/kconfig/zconf.y | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 6f9b0aa32a82..ed84d4a8e288 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -31,7 +31,7 @@ struct symbol *symbol_hash[SYMBOL_HASHSIZE];
- static struct menu *current_menu, *current_entry;
- 
- %}
--%expect 32
-+%expect 31
- 
- %union
- {
-@@ -337,7 +337,7 @@ choice_block:
- 
- /* if entry */
- 
--if_entry: T_IF expr nl
-+if_entry: T_IF expr T_EOL
- {
- 	printd(DEBUG_PARSE, "%s:%d:if\n", zconf_curname(), zconf_lineno());
- 	menu_add_entry(NULL);
--- 
-2.13.6
 
+Chris
