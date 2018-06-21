@@ -1,84 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:55745 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754104AbeFUHEJ (ORCPT
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:40389 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932845AbeFUMni (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 Jun 2018 03:04:09 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [RFC v8 1/1] mconf: global i-search in menu prompts
-In-Reply-To: <126839db-5cc1-7dad-5a1f-21899dc6236e@infradead.org> (Randy
-        Dunlap's message of "Wed, 20 Jun 2018 13:02:03 -0700")
-References: <20180620084217.8597-1-dirk@gouders.net>
-        <20180620084217.8597-2-dirk@gouders.net>
-        <f02cc7c6-d92e-24f3-b0ad-df9e6bf7630a@infradead.org>
-        <ghpo0l2spo.fsf@lena.gouders.net>
-        <126839db-5cc1-7dad-5a1f-21899dc6236e@infradead.org>
-Date: Thu, 21 Jun 2018 08:57:12 +0200
-Message-ID: <ghin6clj93.fsf@lena.gouders.net>
+        Thu, 21 Jun 2018 08:43:38 -0400
+Date: Thu, 21 Jun 2018 14:43:34 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCHv4 3/3] x86: Add build salt to the vDSO and kernel linker
+ scripts
+Message-ID: <20180621124334.GA30110@gmail.com>
+References: <20180612003224.3658-1-labbott@redhat.com>
+ <20180612003224.3658-4-labbott@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180612003224.3658-4-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Segher Boessenkool <segher@kernel.crashing.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Laura Abbott <labbott@redhat.com>
+Cc: Andy Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, linux-kernel@vger.kernel.org, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org
 
-Randy Dunlap <rdunlap@infradead.org> writes:
 
-> On 06/20/2018 11:55 AM, Dirk Gouders wrote:
->> Randy Dunlap <rdunlap@infradead.org> writes:
->> 
->>> Hi,
->>>
->>> On 06/20/2018 01:42 AM, Dirk Gouders wrote:
->>>>
->>>> Operation
->>>> ---------
->>>> The TAB key is reserved to toggle the focus between menu and bottons.
->>>> Focus is on the buttons if one of the buttens (the active one) is
->>>> hightlighted, otherwise it is on the menu.
->>>>
->>>> When the focus is on the buttons, mconf operates as before with the
->>>> exception of the TAB key.
->>>>
->>>> When the focus is on the menu, mconf operates in i-search mode and the
->>>> following input has special meaning:
->>>>
->>>> * <\> (backslash) can be used to search for other occurences of an
->>>>   already entered string.  On empty search strings, nothing happens.
->>>>
->>>> * Any other printable character than backslash and '\n' is appended to
->>>>   the current search string and a match is searched for.  If a match
->>>>   is found, it is immediately navigated to.
->>>
->>> About that paragraph above:  I tried to search for "fs-cache", as in:
->>>
->>> config FSCACHE_DEBUG
->>> 	bool "Debug FS-Cache"
->>>
->>> but i-search does not allow me to enter a '-' character.  Seems odd to me.
->> 
->> Hi Randy,
->> 
->> thanks for all your testing.
->> 
->> '-' and '+' previously had the same meaning as <KEY_UP>, <KEY_DOWN>,
->> respectively.  If you are on the top menu item and press '-' there is
->> nothing to scroll up so it appears as if the pressed key wasn't
->> processed.
->> 
->> I-search should add those characters to the pattern but I broke that two
->> or three versions before when I fixed another issue.
->> 
->> I will add this to my list of test cases so this won't happen again.
->> 
->> Dirk
->> 
->> 
->>> Still doing other testing...
->
-> I haven't hit any other issues.
+* Laura Abbott <labbott@redhat.com> wrote:
 
-Thank you for testing!
-The issue concerning '-' and '+' I will fix.
+> 
+> Both the kernel and the vDSO need to have unique build ids.
+> Insert the build salt section to make the build ids unique.
+> 
+> Signed-off-by: Laura Abbott <labbott@redhat.com>
+> ---
+>  arch/x86/entry/vdso/vdso-layout.lds.S | 3 ++-
+>  arch/x86/kernel/vmlinux.lds.S         | 1 +
+>  2 files changed, 3 insertions(+), 1 deletion(-)
 
-Dirk
+Acked-by: Ingo Molnar <mingo@kernel.org>
+
+What is the upstream merge plan for this series? kbuild tree?
+
+Thanks,
+
+	Ingo
