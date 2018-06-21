@@ -1,96 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f201.google.com ([209.85.216.201]:50779 "EHLO
-        mail-qt0-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933420AbeFUQXf (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:52499 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933349AbeFUM2Q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 Jun 2018 12:23:35 -0400
-Received: by mail-qt0-f201.google.com with SMTP id z26-v6so2818429qto.17
-        for <linux-kbuild@vger.kernel.org>; Thu, 21 Jun 2018 09:23:34 -0700 (PDT)
+        Thu, 21 Jun 2018 08:28:16 -0400
+Date: Thu, 21 Jun 2018 14:28:11 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH v5 2/3] x86/asm: add _ASM_ARG* constants for argument
+ registers to <asm/asm.h>
+Message-ID: <20180621122811.GA25066@gmail.com>
+References: <20180613210518.113983-1-ndesaulniers@google.com>
+ <20180613210518.113983-3-ndesaulniers@google.com>
+ <b027a324-ffae-fd5e-d8a3-03934be91a2d@zytor.com>
+ <CAKwvOdngs8k_T=nDKh8JYdAwwFoJRcCU0bZu0tJHQ+keZ5+RFQ@mail.gmail.com>
+ <deb5a074-b057-9388-4ab7-42295b5bb46c@zytor.com>
+ <CAKwvOdmE-EHJY7tgzkhyQqNT3m3oWtd6iE3sWBTz19Rijzx4Ew@mail.gmail.com>
 MIME-Version: 1.0
-Date: Thu, 21 Jun 2018 09:23:22 -0700
-In-Reply-To: <20180621162324.36656-1-ndesaulniers@google.com>
-Message-Id: <20180621162324.36656-2-ndesaulniers@google.com>
-References: <20180621162324.36656-1-ndesaulniers@google.com>
-Subject: [PATCH v6 1/3] compiler-gcc.h: add gnu_inline to all inline declarations
-From: Nick Desaulniers <ndesaulniers@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKwvOdmE-EHJY7tgzkhyQqNT3m3oWtd6iE3sWBTz19Rijzx4Ew@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mingo@redhat.com, tglx@linutronix.de
-Cc: akpm@linux-foundation.org, hpa@zytor.com, linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, sedat.dilek@gmail.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, arnd@arndb.de, rientjes@google.com, acme@redhat.com, pombredanne@nexb.com, aryabinin@virtuozzo.com, kstewart@linuxfoundation.org, boris.ostrovsky@oracle.com, jan.kiszka@siemens.com, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, ard.biesheuvel@linaro.org, akataria@vmware.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, mka@chromium.org, ndesaulniers@google.com, thomas.lendacky@amd.com, tweek@google.com, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: hpa@zytor.com, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com, "H. Peter Anvin" <hpa@linux.intel.com>
 
-Functions marked extern inline do not emit an externally visible
-function when the gnu89 C standard is used. Some KBUILD Makefiles
-overwrite KBUILD_CFLAGS. This is an issue for GCC 5.1+ users as without
-an explicit C standard specified, the default is gnu11. Since c99, the
-semantics of extern inline have changed such that an externally visible
-function is always emitted. This can lead to multiple definition errors
-of extern inline functions at link time of compilation units whose build
-files have removed an explicit C standard compiler flag for users of GCC
-5.1+ or Clang.
 
-Acked-by: Juergen Gross <jgross@suse.com>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-Suggested-by: Arnd Bergmann <arnd@arndb.de>
-Suggested-by: H. Peter Anvin <hpa@zytor.com>
-Suggested-by: Joe Perches <joe@perches.com>
----
- include/linux/compiler-gcc.h | 29 ++++++++++++++++++++++-------
- 1 file changed, 22 insertions(+), 7 deletions(-)
+* Nick Desaulniers <ndesaulniers@google.com> wrote:
 
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index b4bf73f5e38f..c7cfca4ba02b 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -65,6 +65,18 @@
- #define __must_be_array(a)	BUILD_BUG_ON_ZERO(__same_type((a), &(a)[0]))
- #endif
- 
-+/*
-+ * Feature detection for gnu_inline (gnu89 extern inline semantics). Either
-+ * __GNUC_STDC_INLINE__ is defined (not using gnu89 extern inline semantics,
-+ * and we opt in to the gnu89 semantics), or __GNUC_STDC_INLINE__ is not
-+ * defined so the gnu89 semantics are the default.
-+ */
-+#ifdef __GNUC_STDC_INLINE__
-+#define __gnu_inline	__attribute__((gnu_inline))
-+#else
-+#define __gnu_inline
-+#endif
-+
- /*
-  * Force always-inline if the user requests it so via the .config,
-  * or if gcc is too old.
-@@ -72,19 +84,22 @@
-  * -Wunused-function.  This turns out to avoid the need for complex #ifdef
-  * directives.  Suppress the warning in clang as well by using "unused"
-  * function attribute, which is redundant but not harmful for gcc.
-+ * Prefer gnu_inline, so that extern inline functions do not emit an
-+ * externally visible function. This makes extern inline behave as per gnu89
-+ * semantics rather than c99. This prevents multiple symbol definition errors
-+ * of extern inline functions at link time.
-+ * A lot of inline functions can cause havoc with function tracing.
-  */
- #if !defined(CONFIG_ARCH_SUPPORTS_OPTIMIZED_INLINING) ||		\
-     !defined(CONFIG_OPTIMIZE_INLINING) || (__GNUC__ < 4)
--#define inline inline		__attribute__((always_inline,unused)) notrace
--#define __inline__ __inline__	__attribute__((always_inline,unused)) notrace
--#define __inline __inline	__attribute__((always_inline,unused)) notrace
-+#define inline \
-+	inline __attribute__((always_inline, unused)) notrace __gnu_inline
- #else
--/* A lot of inline functions can cause havoc with function tracing */
--#define inline inline		__attribute__((unused)) notrace
--#define __inline__ __inline__	__attribute__((unused)) notrace
--#define __inline __inline	__attribute__((unused)) notrace
-+#define inline inline		__attribute__((unused)) notrace __gnu_inline
- #endif
- 
-+#define __inline__ inline
-+#define __inline inline
- #define __always_inline	inline __attribute__((always_inline))
- #define  noinline	__attribute__((noinline))
- 
--- 
-2.18.0.rc2.346.g013aa6912e-goog
+> On Thu, Jun 14, 2018 at 5:17 PM H. Peter Anvin <hpa@zytor.com> wrote:
+> >
+> > On 06/14/18 13:59, Nick Desaulniers wrote:
+> > > On Thu, Jun 14, 2018 at 1:48 PM H. Peter Anvin <hpa@zytor.com> wrote:
+> > >>
+> > >> On 06/13/18 14:05, Nick Desaulniers wrote:
+> > >>> From: "H. Peter Anvin" <hpa@linux.intel.com>
+> > >>>
+> > >>> i386 and x86-64 uses different registers for arguments; make them
+> > >>> available so we don't have to #ifdef in the actual code.
+> > >>>
+> > >>> Native size and specified size (q, l, w, b) versions are provided.
+> > >>>
+> > >>> Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
+> > >>> Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+> > >>> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> > >>
+> > >> I still object to Suggested-by: here.  Sedat did a correction, which is
+> > >> a Reviewed-by:, but unless I'm completely out to sea, there was no
+> > >> suggestion on Sedat's part of this; and I had certainly not seen it when
+> > >> I wrote the code.
+> > >
+> > > I'm fine with changing it from a Suggested-by to a Reviewed-by.  Can
+> > > you do that when you apply the set, or should I send a v6?
+> > >
+> >
+> > I'm not handling patch mechanics for x86 at the moment.
+> 
+> Hi Ingo and Thomas,
+> Have you had a chance to review this patch series for application?
+> 
+> Note that Juergen (the paravirt maintainer) acked the series:
+> https://bugs.llvm.org/show_bug.cgi?id=37880
+> The only issue being swapping a Suggested-by for a Reviewed-by tag for
+> one commit, as above.
 
+Could you please update the series with all suggestions and tags and send a new 
+series?
+
+Thanks,
+
+	Ingo
