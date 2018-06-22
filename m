@@ -1,100 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:59441 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751266AbeFVSFJ (ORCPT
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:45806 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933820AbeFVSiz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 Jun 2018 14:05:09 -0400
-Received: from mail-ua0-f173.google.com (mail-ua0-f173.google.com [209.85.217.173]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id w5MI52ON001774
-        for <linux-kbuild@vger.kernel.org>; Sat, 23 Jun 2018 03:05:03 +0900
-Received: by mail-ua0-f173.google.com with SMTP id c23-v6so4844439uan.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 22 Jun 2018 11:05:03 -0700 (PDT)
+        Fri, 22 Jun 2018 14:38:55 -0400
+Date: Fri, 22 Jun 2018 19:38:38 +0100
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCHv4 4/4] ARM: versatile: support configuring versatile
+ machine for no-MMU
+Message-ID: <20180622183838.GZ17671@n2100.armlinux.org.uk>
+References: <20180618141905.7789-5-gerg@linux-m68k.org>
+ <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com>
+ <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
+ <20180622110145.GU17671@n2100.armlinux.org.uk>
+ <nycvar.YSQ.7.76.1806221110140.16670@knanqh.ubzr>
+ <CAMuHMdWZPM3Q9fVXWiw1bMVWNRCYGoQa-XukJka-2xsP-=HmVQ@mail.gmail.com>
+ <nycvar.YSQ.7.76.1806221146140.16670@knanqh.ubzr>
+ <TY1PR01MB15624342267F973525BF45698A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
+ <nycvar.YSQ.7.76.1806221244490.16670@knanqh.ubzr>
+ <TY1PR01MB1562C54E8DD3942F40F8CBBD8A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20180621133054.21090-1-dirk@gouders.net>
-References: <20180621133054.21090-1-dirk@gouders.net>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 23 Jun 2018 03:04:21 +0900
-Message-ID: <CAK7LNASJqRkufPo8RM1oTNVxJjHqNNzihf=oR1TFHWnUoqvmpA@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: fix line numbers for if-entries in menu tree
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <TY1PR01MB1562C54E8DD3942F40F8CBBD8A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Chris Brandt <Chris.Brandt@renesas.com>
+Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Vladimir Murzin <vladimir.murzin@arm.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-2018-06-21 22:30 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
-> The line numers for if-entries in the menu tree are off by one or more
-> lines which is confusing when debugging for correctness of unrelated changes.
->
-> According to the git log, commit a02f0570ae201c49 (kconfig: improve
-> error handling in the parser) was the last one that changed that part
-> of the parser and replaced
->
->         "if_entry: T_IF expr T_EOL"
-> by
->         "if_entry: T_IF expr nl"
->
-> but the commit message does not state why this has been done.
->
-> When reverting that part of the commit, only the line numers are
-> corrected (checked with cdebug = DEBUG_PARSE in zconf.y), otherwise
-> the menu tree remains unchanged (checked with zconfdump() enabled in
-> conf.c).
->
-> An example for the corrected line numbers:
->
-> drivers/soc/Kconfig:15:source drivers/soc/tegra/Kconfig
-> drivers/soc/tegra/Kconfig:4:if
-> drivers/soc/tegra/Kconfig:6:if
->
-> changes to:
->
-> drivers/soc/Kconfig:15:source drivers/soc/tegra/Kconfig
-> drivers/soc/tegra/Kconfig:1:if
-> drivers/soc/tegra/Kconfig:4:if
->
-> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+On Fri, Jun 22, 2018 at 05:23:09PM +0000, Chris Brandt wrote:
+> Then here's a question.
+> 
+> To be clear, the discussion is around
+> 
+>   "Being able to build a kernel that will not boot"
+> 
+> So which one of these is more important: build or boot?
 
-Applied to linux-kbuild/fixes.  Thanks!
+We care about both.
 
+> Meaning what if you can select multiple platforms in kconfig, but then 
+> there is a .c file that does more sanity checking that then prevents the 
+> full build using a #error.
 
+... which is not acceptable.  We have a lot of automated build
+infrastructure to build almost every commit in the mainline kernel
+against almost every build configuration that is present in the
+kernel and every architecture that is present in the mainline kernel.
+We also have people that build random configurations and fix any
+build failures and warnings which result from that.
 
-> ---
->  scripts/kconfig/zconf.y | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-> index 6f9b0aa32a82..ed84d4a8e288 100644
-> --- a/scripts/kconfig/zconf.y
-> +++ b/scripts/kconfig/zconf.y
-> @@ -31,7 +31,7 @@ struct symbol *symbol_hash[SYMBOL_HASHSIZE];
->  static struct menu *current_menu, *current_entry;
->
->  %}
-> -%expect 32
-> +%expect 31
->
->  %union
->  {
-> @@ -337,7 +337,7 @@ choice_block:
->
->  /* if entry */
->
-> -if_entry: T_IF expr nl
-> +if_entry: T_IF expr T_EOL
->  {
->         printd(DEBUG_PARSE, "%s:%d:if\n", zconf_curname(), zconf_lineno());
->         menu_add_entry(NULL);
-> --
-> 2.13.6
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I also build randconfigs here.
 
+> In that case you can never "build" a kernel that has no chance of 
+> booting on all the selected platforms.
+> 
+> There are configs options today that you can select, but unless some 
+> external criteria is  met during build time, the build will fail (like
+> with a "missing .h file" message or something)
 
+Such as?  I don't think that's found by the randconfig builders - I've
+never noticed any such failures on ARM.
 
 -- 
-Best Regards
-Masahiro Yamada
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
