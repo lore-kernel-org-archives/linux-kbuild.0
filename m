@@ -1,68 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:45806 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933820AbeFVSiz (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:37687 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933382AbeFVT2K (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 Jun 2018 14:38:55 -0400
-Date: Fri, 22 Jun 2018 19:38:38 +0100
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCHv4 4/4] ARM: versatile: support configuring versatile
- machine for no-MMU
-Message-ID: <20180622183838.GZ17671@n2100.armlinux.org.uk>
-References: <20180618141905.7789-5-gerg@linux-m68k.org>
- <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com>
- <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
- <20180622110145.GU17671@n2100.armlinux.org.uk>
- <nycvar.YSQ.7.76.1806221110140.16670@knanqh.ubzr>
- <CAMuHMdWZPM3Q9fVXWiw1bMVWNRCYGoQa-XukJka-2xsP-=HmVQ@mail.gmail.com>
- <nycvar.YSQ.7.76.1806221146140.16670@knanqh.ubzr>
- <TY1PR01MB15624342267F973525BF45698A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
- <nycvar.YSQ.7.76.1806221244490.16670@knanqh.ubzr>
- <TY1PR01MB1562C54E8DD3942F40F8CBBD8A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TY1PR01MB1562C54E8DD3942F40F8CBBD8A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
+        Fri, 22 Jun 2018 15:28:10 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: [PATCH 1/3] kconfig: avoid assert()-triggered segfaults in xfwrite()
+Date: Fri, 22 Jun 2018 21:27:37 +0200
+Message-Id: <20180622192739.5327-2-dirk@gouders.net>
+In-Reply-To: <20180622192739.5327-1-dirk@gouders.net>
+References: <20180622192739.5327-1-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Chris Brandt <Chris.Brandt@renesas.com>
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Vladimir Murzin <vladimir.murzin@arm.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Dirk Gouders <dirk@gouders.net>
 
-On Fri, Jun 22, 2018 at 05:23:09PM +0000, Chris Brandt wrote:
-> Then here's a question.
-> 
-> To be clear, the discussion is around
-> 
->   "Being able to build a kernel that will not boot"
-> 
-> So which one of these is more important: build or boot?
+xfwrite uses assert() to ensure it does not operate on empty strings.
+Two users respect this, expr_print_file_helper() doesn't and causes
+segfaults e.g. when the dependency for an empty default string is printed.
 
-We care about both.
+Fix this by calling xfwrite with an empty string pattern ("") for
+empty strings.
 
-> Meaning what if you can select multiple platforms in kconfig, but then 
-> there is a .c file that does more sanity checking that then prevents the 
-> full build using a #error.
+INITRAMFS_SOURCE was one symbol that caused this problem, with this
+fix applied the zconfdump() output for this symbol looks as follows:
 
-... which is not acceptable.  We have a lot of automated build
-infrastructure to build almost every commit in the mainline kernel
-against almost every build configuration that is present in the
-kernel and every architecture that is present in the mainline kernel.
-We also have people that build random configurations and fix any
-build failures and warnings which result from that.
+------------------------------------------------------------------------
+config INITRAMFS_SOURCE
+  string
+  symbol INITRAMFS_SOURCE
+  prompt "Initramfs source file(s)" if BLK_DEV_INITRD
+  default "" if BLK_DEV_INITRD
+  help
+This can be either a single cpio archive with a .cpio suffix or a
+space-separated list of directories and files for building the
+initramfs image.  A cpio archive should contain a filesystem archive
+to be used as an initramfs image.  Directories should contain a
+filesystem layout to be included in the initramfs image.  Files
+should contain entries according to the format described by the
+"usr/gen_init_cpio" program in the kernel tree.
 
-I also build randconfigs here.
+When multiple directories and files are specified then the
+initramfs image will be the aggregate of all of them.
 
-> In that case you can never "build" a kernel that has no chance of 
-> booting on all the selected platforms.
-> 
-> There are configs options today that you can select, but unless some 
-> external criteria is  met during build time, the build will fail (like
-> with a "missing .h file" message or something)
+See <file:Documentation/early-userspace/README> for more details.
 
-Such as?  I don't think that's found by the randconfig builders - I've
-never noticed any such failures on ARM.
+If you are not sure, leave it blank.
+------------------------------------------------------------------------
 
+Signed-off-by: Dirk Gouders <dirk@gouders.net>
+---
+ scripts/kconfig/expr.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index e1a39e90841d..e064bf4c2881 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -1231,7 +1231,10 @@ void expr_print(struct expr *e,
+ 
+ static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
+ {
+-	xfwrite(str, strlen(str), 1, data);
++	if (*str != '\0')
++		xfwrite(str, strlen(str), 1, data);
++	else
++		xfwrite("\"\"", 2, 1, data);
+ }
+ 
+ void expr_fprint(struct expr *e, FILE *out)
 -- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+2.13.6
+
