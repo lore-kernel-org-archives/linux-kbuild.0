@@ -1,78 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua0-f196.google.com ([209.85.217.196]:39069 "EHLO
-        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750931AbeFVG2B (ORCPT
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:40340 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751307AbeFVLCJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 Jun 2018 02:28:01 -0400
-Received: by mail-ua0-f196.google.com with SMTP id n4-v6so3614403uad.6
-        for <linux-kbuild@vger.kernel.org>; Thu, 21 Jun 2018 23:28:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <20180618141905.7789-1-gerg@linux-m68k.org> <20180618141905.7789-5-gerg@linux-m68k.org>
- <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com>
- <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr> <TY1PR01MB1562B232625397CCACD5931A8A760@TY1PR01MB1562.jpnprd01.prod.outlook.com>
-In-Reply-To: <TY1PR01MB1562B232625397CCACD5931A8A760@TY1PR01MB1562.jpnprd01.prod.outlook.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 22 Jun 2018 08:27:46 +0200
-Message-ID: <CAMuHMdXPiDGg+S3VQutSYSBwBbjW_wV+nTSBHuu7a3VNTghm1A@mail.gmail.com>
+        Fri, 22 Jun 2018 07:02:09 -0400
+Date: Fri, 22 Jun 2018 12:01:45 +0100
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
 Subject: Re: [PATCHv4 4/4] ARM: versatile: support configuring versatile
  machine for no-MMU
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20180622110145.GU17671@n2100.armlinux.org.uk>
+References: <20180618141905.7789-1-gerg@linux-m68k.org>
+ <20180618141905.7789-5-gerg@linux-m68k.org>
+ <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com>
+ <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Chris Brandt <Chris.Brandt@renesas.com>
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Russell King <linux@armlinux.org.uk>, Vladimir Murzin <vladimir.murzin@arm.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Vladimir Murzin <vladimir.murzin@arm.com>, Chris Brandt <Chris.Brandt@renesas.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org
 
-Hi Chris,
+On Thu, Jun 21, 2018 at 12:24:04PM -0400, Nicolas Pitre wrote:
+> [ adding linux-kbuild for their input ]
+> 
+> On Thu, 21 Jun 2018, Geert Uytterhoeven wrote:
+> 
+> > I'm afraid adding (duplicating) machine entries for nommu support is not a
+> > sustainable solutions. Any machine can run a nommu kernel, in theory.
+> > 
+> > I'm aware of the objection "but you cannot build a nommu kernel that can
+> > boot on multiple systems".  That's true (unless RAM/FLASH addresses are the
+> > same). So don't do that.
+> > 
+> > All of the above is true for XIP, too, hence applies with s/nommu/XIP/.
+> > One more reason not to have this duplication.
+> > 
+> > The current "ARM multiplatform" has actually two meanings:
+> >   1. It groups platforms that follow the "ARM multiplatform" framework,
+> >   2. It allows to build a single kernel that can be booted on multiple
+> >      platforms.
+> > To avoid the duplication, I think 2 should be relaxed when specialized
+> > options like XIP or NOMMU are selected.
+> > 
+> > I've just sent a patch to do that.
+> 
+> Your patch isn't wrong per se.  But it is not enough. The issue here 
+> would be easily fixed with some kconfig extension so that:
+> 
+> - If XIP or NOMMU is selected then only one target in the multiplatform 
+>   set can be selected, basically turning it into a choice menu.
 
-On Thu, Jun 21, 2018 at 6:45 PM Chris Brandt <Chris.Brandt@renesas.com> wrote:
-> On Thursday, June 21, 2018 1, Nicolas Pitre wrote:
-> > > I've just sent a patch to do that.
-> >
-> > Your patch isn't wrong per se.  But it is not enough. The issue here
-> > would be easily fixed with some kconfig extension so that:
-> >
-> > - If XIP or NOMMU is selected then only one target in the multiplatform
-> >   set can be selected, basically turning it into a choice menu.
-> >
-> > - If more than one multiplatform targets is selected then XIP and NOMMU
-> >   can no longere be selected.
->
-> Over the years I tried to tackle this issue in multiple different ways,
-> while still staying in the limitations of kbuild.
-> Basically, everything was shot down for one reason or another (or the
-> only way to do it is really ugly...so I didn't even ask).
->
-> kbuild doesn't really have a mutually exclusive property that can be
-> dynamically set/cleared.
->
-> In the end, I saw only 2 paths for adding XIP to ARM MMU builds:
->
-> 1) Modify kbuild to give the ability as stated above.
+I don't think that's how it should work.  Consider the V7M case, where
+we have better standardisation of the physical address layout than
+previous ARM devices.  We have three platforms which are V7M compliant:
 
-Would that actually help, or would it only give you a false feeling of safety?
-Most "multiplatform" sub-architectures (like iMX or "shmobile") still have
-multiple families and SoCs, so you have to repeat the exercise at that level.
+- AT91
+- iMX
+- STM32
 
-Still, even when configuring a kernel for a single SoC, the final board
-selection is at the DTS level.
+These have separate symbols:
 
-Conclusion: If you want NOMMU and/or XIP, you have to know what you're doing,
-and hand-holding at whatever level may not save you from making mistakes.
+menuconfig ARCH_AT91
+	bool "AT91/Microchip SoCs"
+	depends on ARCH_MULTI_V4T || ARCH_MULTI_V5 || ARCH_MULTI_V7 || ARM_SINGLE_ARMV7M
 
-> 2) Make XIP builds somehow be able to run at multiple physical address
-> by modifying the binaries post-build (Arnd's suggestion).
+menuconfig ARCH_MXC
+	bool "Freescale i.MX family"
+	depends on ARCH_MULTI_V4_V5 || ARCH_MULTI_V6_V7 || ARM_SINGLE_ARMV7M
 
-That's actually an interesting one: no manual configuration (iff parameters
-would be extracted from the DTB), so nothing can go wrong ;-)
-I guess it applies to NOMMU, too.
+menuconfig ARCH_STM32
+	bool "STMicroelectronics STM32 family" if ARM_SINGLE_ARMV7M || ARCH_MULTI_V7
 
-Gr{oetje,eeting}s,
+With your suggestion, you would become only build a kernel for one of
+these, but that is not the case today: it's possible to build a single
+kernel which supports all these platforms.
 
-                        Geert
+So, I don't think we want your suggestion.
+
+What we have today is flexible enough that we can have the best of
+multiplatform vs the restrictions caused by the variance in hardware.
+IOW, what we have is a compromise, which I believe is a reasonable,
+functional, and good compromise that fits the real world physical
+conditions with the least amount of overhead.
+
+Every other suggestion I've seen posted has drawbacks, from artificially
+restricting what can be selected (eg, as in your case) to allowing more
+platforms to be selected thereby creating non-bootable kernels (eg, as
+in Geert's case.)
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
