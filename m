@@ -1,80 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f196.google.com ([209.85.220.196]:38786 "EHLO
-        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933593AbeFVP0A (ORCPT
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:43982 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753072AbeFVQL3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 Jun 2018 11:26:00 -0400
-Received: by mail-qk0-f196.google.com with SMTP id y4-v6so3865623qka.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 22 Jun 2018 08:26:00 -0700 (PDT)
-Date: Fri, 22 Jun 2018 11:25:57 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
+        Fri, 22 Jun 2018 12:11:29 -0400
+Date: Fri, 22 Jun 2018 17:11:01 +0100
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
 Subject: Re: [PATCHv4 4/4] ARM: versatile: support configuring versatile
  machine for no-MMU
-In-Reply-To: <20180622110145.GU17671@n2100.armlinux.org.uk>
-Message-ID: <nycvar.YSQ.7.76.1806221110140.16670@knanqh.ubzr>
-References: <20180618141905.7789-1-gerg@linux-m68k.org> <20180618141905.7789-5-gerg@linux-m68k.org> <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com> <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
+Message-ID: <20180622161101.GW17671@n2100.armlinux.org.uk>
+References: <20180618141905.7789-1-gerg@linux-m68k.org>
+ <20180618141905.7789-5-gerg@linux-m68k.org>
+ <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com>
+ <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
  <20180622110145.GU17671@n2100.armlinux.org.uk>
+ <nycvar.YSQ.7.76.1806221110140.16670@knanqh.ubzr>
+ <CAMuHMdWZPM3Q9fVXWiw1bMVWNRCYGoQa-XukJka-2xsP-=HmVQ@mail.gmail.com>
+ <nycvar.YSQ.7.76.1806221146140.16670@knanqh.ubzr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <nycvar.YSQ.7.76.1806221146140.16670@knanqh.ubzr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Vladimir Murzin <vladimir.murzin@arm.com>, Chris Brandt <Chris.Brandt@renesas.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Vladimir Murzin <vladimir.murzin@arm.com>, Chris Brandt <Chris.Brandt@renesas.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Fri, 22 Jun 2018, Russell King - ARM Linux wrote:
+On Fri, Jun 22, 2018 at 11:57:32AM -0400, Nicolas Pitre wrote:
+> That is no longer a kernel config/build issue if you the system 
+> integrator put an XIP kernel on a target with the wrong DT.
+> 
+> The XIP kernel does require that you provide the actual memory base 
+> address as a constant to the build system but that could be extracted 
+> directly from the DT data if having a kconfig prompt for that is too 
+> unwieldy. The new kconfig macro language in mainline could even be 
+> leveraged to do that at config time.
 
-> On Thu, Jun 21, 2018 at 12:24:04PM -0400, Nicolas Pitre wrote:
-> > [ adding linux-kbuild for their input ]
-> > 
-> > On Thu, 21 Jun 2018, Geert Uytterhoeven wrote:
-> > 
-> > > I've just sent a patch to do that.
-> > 
-> > Your patch isn't wrong per se.  But it is not enough. The issue here 
-> > would be easily fixed with some kconfig extension so that:
-> > 
-> > - If XIP or NOMMU is selected then only one target in the multiplatform 
-> >   set can be selected, basically turning it into a choice menu.
-> 
-> I don't think that's how it should work.  Consider the V7M case, where
-> we have better standardisation of the physical address layout than
-> previous ARM devices.  We have three platforms which are V7M compliant:
-> 
-> - AT91
-> - iMX
-> - STM32
-> 
-> These have separate symbols:
-> 
-> menuconfig ARCH_AT91
-> 	bool "AT91/Microchip SoCs"
-> 	depends on ARCH_MULTI_V4T || ARCH_MULTI_V5 || ARCH_MULTI_V7 || ARM_SINGLE_ARMV7M
-> 
-> menuconfig ARCH_MXC
-> 	bool "Freescale i.MX family"
-> 	depends on ARCH_MULTI_V4_V5 || ARCH_MULTI_V6_V7 || ARM_SINGLE_ARMV7M
-> 
-> menuconfig ARCH_STM32
-> 	bool "STMicroelectronics STM32 family" if ARM_SINGLE_ARMV7M || ARCH_MULTI_V7
-> 
-> With your suggestion, you would become only build a kernel for one of
-> these, but that is not the case today: it's possible to build a single
-> kernel which supports all these platforms.
+That is actually incorrect - you're too used to the dynamic fixup of
+virt_to_phys() and friends now!
 
-That is still something that could be accommodated if the kconfig 
-language was more accommodating. The problem comes from the fact that 
-some options are mutually exclusive, like platforms with conflicting 
-memory maps and XIP.
+Given that XIP is typically used in environments where the kernel text
+is very much unmodifyable, we disable CONFIG_ARM_PATCH_PHYS_VIRT.  When
+disabled, we use a constant translation, based upon the build-time
+CONFIG_PHYS_OFFSET and CONFIG_PAGE_OFFSET settings.
 
-Leaving your example above aside for the moment, let's just pick the 
-ARCH_MULTIPLATFORM group which is always the problematic one in 
-practice. We need a way to limit platform selection within that set to 
-only one platform among them all if XIP_KERNEL is set. And that is 
-impossible to express with the kconfig language today.
+The early assembler relies upon these settings - which must be known
+before we enable the MMU.  As such, DT parsing is not available to us
+at that point (as we can't run any C code, because we won't be calling
+it at the address it was linked for.)
 
-So, my assertion is that, unless someone volunteers a solution to the 
-kconfig language to express mutual exclusion between symbols, this issue 
-just can't be fixed properly.
+I suppose someone who was sufficiently motivated could write assembly-
+based parsing of DT to extract the memory regions and work out what the
+right settings are.  Is there really the motivation to do that - there
+was a burst of XIP interest a few releases ago but it seems to have
+tailed off.
 
-
-Nicolas
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
