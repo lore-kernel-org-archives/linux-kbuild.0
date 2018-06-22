@@ -1,71 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.bootlin.com ([62.4.15.54]:50455 "EHLO mail.bootlin.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751098AbeFVLnD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 Jun 2018 07:43:03 -0400
-Date: Fri, 22 Jun 2018 13:42:35 +0200
-From: Boris Brezillon <boris.brezillon@bootlin.com>
-Subject: Re: [PATCH v3 1/3] mtd: rawnand: denali_dt: add more clocks based
- on IP datasheet
-Message-ID: <20180622134235.5ab76325@bbrezillon>
-In-Reply-To: <20180619132811.45bf6454@bbrezillon>
-References: <1529025532-22087-1-git-send-email-yamada.masahiro@socionext.com>
-        <1529025532-22087-2-git-send-email-yamada.masahiro@socionext.com>
-        <20180619132811.45bf6454@bbrezillon>
+Received: from mail-qk0-f194.google.com ([209.85.220.194]:33622 "EHLO
+        mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933853AbeFVP5f (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 22 Jun 2018 11:57:35 -0400
+Received: by mail-qk0-f194.google.com with SMTP id c131-v6so3930699qkb.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 22 Jun 2018 08:57:34 -0700 (PDT)
+Date: Fri, 22 Jun 2018 11:57:32 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCHv4 4/4] ARM: versatile: support configuring versatile
+ machine for no-MMU
+In-Reply-To: <CAMuHMdWZPM3Q9fVXWiw1bMVWNRCYGoQa-XukJka-2xsP-=HmVQ@mail.gmail.com>
+Message-ID: <nycvar.YSQ.7.76.1806221146140.16670@knanqh.ubzr>
+References: <20180618141905.7789-1-gerg@linux-m68k.org> <20180618141905.7789-5-gerg@linux-m68k.org> <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com> <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr> <20180622110145.GU17671@n2100.armlinux.org.uk>
+ <nycvar.YSQ.7.76.1806221110140.16670@knanqh.ubzr> <CAMuHMdWZPM3Q9fVXWiw1bMVWNRCYGoQa-XukJka-2xsP-=HmVQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-mtd@lists.infradead.org, Miquel Raynal <miquel.raynal@bootlin.com>, David Woodhouse <dwmw2@infradead.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org, Richard Weinberger <richard@nod.at>, linux-kernel@vger.kernel.org, "linux-stable #4 . 14+" <stable@vger.kernel.org>, Marek Vasut <marek.vasut@gmail.com>, Rob Herring <robh+dt@kernel.org>, Brian Norris <computersforpeace@gmail.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Russell King <linux@armlinux.org.uk>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Vladimir Murzin <vladimir.murzin@arm.com>, Chris Brandt <Chris.Brandt@renesas.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi Masahiro,
+On Fri, 22 Jun 2018, Geert Uytterhoeven wrote:
 
-On Tue, 19 Jun 2018 13:28:11 +0200
-Boris Brezillon <boris.brezillon@bootlin.com> wrote:
-
-> Hi Masahiro,
+> Hi Nicolas,
 > 
-> On Fri, 15 Jun 2018 10:18:50 +0900
-> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+> On Fri, Jun 22, 2018 at 5:26 PM Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
+> > On Fri, 22 Jun 2018, Russell King - ARM Linux wrote:
+> > > On Thu, Jun 21, 2018 at 12:24:04PM -0400, Nicolas Pitre wrote:
+> > > > [ adding linux-kbuild for their input ]
+> > > >
+> > > > On Thu, 21 Jun 2018, Geert Uytterhoeven wrote:
+> > > > > I've just sent a patch to do that.
+> > > >
+> > > > Your patch isn't wrong per se.  But it is not enough. The issue here
+> > > > would be easily fixed with some kconfig extension so that:
+> > > >
+> > > > - If XIP or NOMMU is selected then only one target in the multiplatform
+> > > >   set can be selected, basically turning it into a choice menu.
+> > >
+> > > I don't think that's how it should work.  Consider the V7M case, where
+> > > we have better standardisation of the physical address layout than
+> > > previous ARM devices.  We have three platforms which are V7M compliant:
+> > >
+> > > - AT91
+> > > - iMX
+> > > - STM32
+> > >
+> > > These have separate symbols:
+> > >
+> > > menuconfig ARCH_AT91
+> > >       bool "AT91/Microchip SoCs"
+> > >       depends on ARCH_MULTI_V4T || ARCH_MULTI_V5 || ARCH_MULTI_V7 || ARM_SINGLE_ARMV7M
+> > >
+> > > menuconfig ARCH_MXC
+> > >       bool "Freescale i.MX family"
+> > >       depends on ARCH_MULTI_V4_V5 || ARCH_MULTI_V6_V7 || ARM_SINGLE_ARMV7M
+> > >
+> > > menuconfig ARCH_STM32
+> > >       bool "STMicroelectronics STM32 family" if ARM_SINGLE_ARMV7M || ARCH_MULTI_V7
+> > >
+> > > With your suggestion, you would become only build a kernel for one of
+> > > these, but that is not the case today: it's possible to build a single
+> > > kernel which supports all these platforms.
+> >
+> > That is still something that could be accommodated if the kconfig
+> > language was more accommodating. The problem comes from the fact that
+> > some options are mutually exclusive, like platforms with conflicting
+> > memory maps and XIP.
+> >
+> > Leaving your example above aside for the moment, let's just pick the
+> > ARCH_MULTIPLATFORM group which is always the problematic one in
+> > practice. We need a way to limit platform selection within that set to
+> > only one platform among them all if XIP_KERNEL is set. And that is
+> > impossible to express with the kconfig language today.
+> >
+> > So, my assertion is that, unless someone volunteers a solution to the
+> > kconfig language to express mutual exclusion between symbols, this issue
+> > just can't be fixed properly.
 > 
-> > According to the Denali User's Guide, this IP needs three clocks:
-> > 
-> >  - clk: controller core clock
-> > 
-> >  - clk_x: bus interface clock
-> > 
-> >  - ecc_clk: clock at which ECC circuitry is run
-> > 
-> > Currently, denali_dt.c requires a single anonymous clock and its
-> > frequency.  However, the driver needs to get the frequency of "clk_x"
-> > not "clk".  This is confusing because people tend to assume the
-> > anonymous clock means the core clock.  In fact, I got a report of
-> > SOCFPGA breakage because the timing parameters are calculated based
-> > on a wrong frequency.
-> > 
-> > Instead of the cheesy implementation, the clocks in the real hardware
-> > should be represented in the driver and the DT-binding.
-> > 
-> > However, adding new clocks would break the existing platforms.  For the
-> > backward compatibility, the driver still accepts a single clock just as
-> > before.  If clk_x is missing, clk_x_rate is set to a hardcoded value.
-> > This is fine for existing DT of Socionext UniPhier, and also fixes the
-> > issue of Altera (Intel) SOCFPGA because both platforms use 200 MHz for
-> > the bus interface clock.
-> > 
-> > Fixes: 1bb88666775e ("mtd: nand: denali: handle timing parameters by setup_data_interface()")  
-> 
-> Sorry for changing my mind, but I think this patch is doing more than
-> just fixing a bug. The bugfix should IMO be limited to unconditionally
-> setting ->clk_x_rate to 200000000 since this is what was done before
-> commit 1bb88666775e. And the remaining changes should go in nand/next.
+> Even that would not be sufficient, as these days the final target platform
+> selection is not by a Kconfig symbol, but by a DT[SB] file.
 
-Do you want me to write this patch? Note that I can't really take this
-patch since Rob asked for a new version with DT bindings changes placed
-in a separate patch.
+That is no longer a kernel config/build issue if you the system 
+integrator put an XIP kernel on a target with the wrong DT.
 
-Regards,
+The XIP kernel does require that you provide the actual memory base 
+address as a constant to the build system but that could be extracted 
+directly from the DT data if having a kconfig prompt for that is too 
+unwieldy. The new kconfig macro language in mainline could even be 
+leveraged to do that at config time.
 
-Boris
+All that is possible already. But config symbol mutual exclusion is not.
+
+
+Nicolas
