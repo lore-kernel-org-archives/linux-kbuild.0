@@ -1,45 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:51711 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933353AbeFVCYH (ORCPT
+Received: from mail-ua0-f196.google.com ([209.85.217.196]:39069 "EHLO
+        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750931AbeFVG2B (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 Jun 2018 22:24:07 -0400
-Date: Fri, 22 Jun 2018 04:24:02 +0200
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH v6 3/3] x86: paravirt: make native_save_fl extern inline
-Message-ID: <20180622022402.GA24194@gmail.com>
-References: <20180621162324.36656-1-ndesaulniers@google.com>
- <20180621162324.36656-4-ndesaulniers@google.com>
+        Fri, 22 Jun 2018 02:28:01 -0400
+Received: by mail-ua0-f196.google.com with SMTP id n4-v6so3614403uad.6
+        for <linux-kbuild@vger.kernel.org>; Thu, 21 Jun 2018 23:28:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180621162324.36656-4-ndesaulniers@google.com>
+References: <20180618141905.7789-1-gerg@linux-m68k.org> <20180618141905.7789-5-gerg@linux-m68k.org>
+ <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com>
+ <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr> <TY1PR01MB1562B232625397CCACD5931A8A760@TY1PR01MB1562.jpnprd01.prod.outlook.com>
+In-Reply-To: <TY1PR01MB1562B232625397CCACD5931A8A760@TY1PR01MB1562.jpnprd01.prod.outlook.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 22 Jun 2018 08:27:46 +0200
+Message-ID: <CAMuHMdXPiDGg+S3VQutSYSBwBbjW_wV+nTSBHuu7a3VNTghm1A@mail.gmail.com>
+Subject: Re: [PATCHv4 4/4] ARM: versatile: support configuring versatile
+ machine for no-MMU
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: mingo@redhat.com, tglx@linutronix.de, akpm@linux-foundation.org, hpa@zytor.com, linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux-foundation.org, astrachan@google.com, manojgupta@google.com, ghackmann@google.com, sedat.dilek@gmail.com, tstellar@redhat.com, keescook@google.com, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, geert@linux-m68k.org, will.deacon@arm.com, mawilcox@microsoft.com, arnd@arndb.de, rientjes@google.com, acme@redhat.com, pombredanne@nexb.com, aryabinin@virtuozzo.com, kstewart@linuxfoundation.org, boris.ostrovsky@oracle.com, jan.kiszka@siemens.com, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, ard.biesheuvel@linaro.org, akataria@vmware.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, gregkh@linuxfoundation.org, jarkko.sakkinen@linux.intel.com, jgross@suse.com, jpoimboe@redhat.com, mka@chromium.org, thomas.lendacky@amd.com, tweek@google.com, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com
+To: Chris Brandt <Chris.Brandt@renesas.com>
+Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Russell King <linux@armlinux.org.uk>, Vladimir Murzin <vladimir.murzin@arm.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
+Hi Chris,
 
-* Nick Desaulniers <ndesaulniers@google.com> wrote:
+On Thu, Jun 21, 2018 at 6:45 PM Chris Brandt <Chris.Brandt@renesas.com> wrote:
+> On Thursday, June 21, 2018 1, Nicolas Pitre wrote:
+> > > I've just sent a patch to do that.
+> >
+> > Your patch isn't wrong per se.  But it is not enough. The issue here
+> > would be easily fixed with some kconfig extension so that:
+> >
+> > - If XIP or NOMMU is selected then only one target in the multiplatform
+> >   set can be selected, basically turning it into a choice menu.
+> >
+> > - If more than one multiplatform targets is selected then XIP and NOMMU
+> >   can no longere be selected.
+>
+> Over the years I tried to tackle this issue in multiple different ways,
+> while still staying in the limitations of kbuild.
+> Basically, everything was shot down for one reason or another (or the
+> only way to do it is really ugly...so I didn't even ask).
+>
+> kbuild doesn't really have a mutually exclusive property that can be
+> dynamically set/cleared.
+>
+> In the end, I saw only 2 paths for adding XIP to ARM MMU builds:
+>
+> 1) Modify kbuild to give the ability as stated above.
 
-> native_save_fl() is marked static inline, but by using it as
-> a function pointer in arch/x86/kernel/paravirt.c, it MUST be outlined.
+Would that actually help, or would it only give you a false feeling of safety?
+Most "multiplatform" sub-architectures (like iMX or "shmobile") still have
+multiple families and SoCs, so you have to repeat the exercise at that level.
 
-> --- a/arch/x86/include/asm/irqflags.h
-> +++ b/arch/x86/include/asm/irqflags.h
-> @@ -13,7 +13,7 @@
->   * Interrupt control:
->   */
->  
-> -static inline unsigned long native_save_fl(void)
-> +extern inline unsigned long native_save_fl(void)
->  {
->  	unsigned long flags;
->  
+Still, even when configuring a kernel for a single SoC, the final board
+selection is at the DTS level.
 
-What's the code generation effect of this on say a defconfig kernel vmlinux with 
-paravirt enabled?
+Conclusion: If you want NOMMU and/or XIP, you have to know what you're doing,
+and hand-holding at whatever level may not save you from making mistakes.
 
-Thanks,
+> 2) Make XIP builds somehow be able to run at multiple physical address
+> by modifying the binaries post-build (Arnd's suggestion).
 
-	Ingo
+That's actually an interesting one: no manual configuration (iff parameters
+would be extracted from the DTB), so nothing can go wrong ;-)
+I guess it applies to NOMMU, too.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
