@@ -1,76 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:44764 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754324AbeFVRKI (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:35342 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754291AbeFVRK3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 Jun 2018 13:10:08 -0400
-Date: Fri, 22 Jun 2018 18:09:51 +0100
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCHv4 4/4] ARM: versatile: support configuring versatile
- machine for no-MMU
-Message-ID: <20180622170951.GY17671@n2100.armlinux.org.uk>
-References: <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com>
- <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
- <20180622110145.GU17671@n2100.armlinux.org.uk>
- <nycvar.YSQ.7.76.1806221110140.16670@knanqh.ubzr>
- <CAMuHMdWZPM3Q9fVXWiw1bMVWNRCYGoQa-XukJka-2xsP-=HmVQ@mail.gmail.com>
- <nycvar.YSQ.7.76.1806221146140.16670@knanqh.ubzr>
- <20180622161101.GW17671@n2100.armlinux.org.uk>
- <nycvar.YSQ.7.76.1806221218230.16670@knanqh.ubzr>
- <20180622164012.GX17671@n2100.armlinux.org.uk>
- <nycvar.YSQ.7.76.1806221247210.16670@knanqh.ubzr>
+        Fri, 22 Jun 2018 13:10:29 -0400
+Received: by mail-pf0-f195.google.com with SMTP id c22-v6so3513271pfi.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 22 Jun 2018 10:10:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <nycvar.YSQ.7.76.1806221247210.16670@knanqh.ubzr>
+References: <20180621162324.36656-1-ndesaulniers@google.com>
+ <20180621162324.36656-4-ndesaulniers@google.com> <20180622022402.GA24194@gmail.com>
+In-Reply-To: <20180622022402.GA24194@gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Fri, 22 Jun 2018 10:10:16 -0700
+Message-ID: <CAKwvOdn5gnB5cK=cy6weKyxAn4SNEdZTT_MtT_D_nHRG5EDZ4g@mail.gmail.com>
+Subject: Re: [PATCH v6 3/3] x86: paravirt: make native_save_fl extern inline
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Vladimir Murzin <vladimir.murzin@arm.com>, Chris Brandt <Chris.Brandt@renesas.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Ingo Molnar <mingo@kernel.org>
+Cc: mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, hpa@zytor.com, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com
 
-On Fri, Jun 22, 2018 at 12:54:18PM -0400, Nicolas Pitre wrote:
-> On Fri, 22 Jun 2018, Russell King - ARM Linux wrote:
-> 
-> > On Fri, Jun 22, 2018 at 12:21:33PM -0400, Nicolas Pitre wrote:
-> > > On Fri, 22 Jun 2018, Russell King - ARM Linux wrote:
-> > > > That is actually incorrect - you're too used to the dynamic fixup of
-> > > > virt_to_phys() and friends now!
-> > > > 
-> > > > Given that XIP is typically used in environments where the kernel text
-> > > > is very much unmodifyable, we disable CONFIG_ARM_PATCH_PHYS_VIRT.  When
-> > > > disabled, we use a constant translation, based upon the build-time
-> > > > CONFIG_PHYS_OFFSET and CONFIG_PAGE_OFFSET settings.
-> > > > 
-> > > > The early assembler relies upon these settings - which must be known
-> > > > before we enable the MMU.  As such, DT parsing is not available to us
-> > > > at that point (as we can't run any C code, because we won't be calling
-> > > > it at the address it was linked for.)
-> > > 
-> > > I think you got me wrong.  I meant DT parsing at config or build time, 
-> > > not at run time.
-> > 
-> > That seems backwards and complicated.  It seems this would end up
-> > with:
-> > 
-> > - you configure the kernel
-> > - build the dtb files
-> > - reconfigure parsing a specific dtb file built in the previous step
-> > - build the kernel proper
-> 
-> ... or just stick the right value manually when prompting for 
-> XIP_PHYS_ADDR.  Really, depending on DT is a non issue that only pulls 
-> the conversation away from the actual kconfig language limitation that 
-> needs to be overcome.
+On Thu, Jun 21, 2018 at 7:24 PM Ingo Molnar <mingo@kernel.org> wrote:
+> * Nick Desaulniers <ndesaulniers@google.com> wrote:
+>
+> > native_save_fl() is marked static inline, but by using it as
+> > a function pointer in arch/x86/kernel/paravirt.c, it MUST be outlined.
+>
+> > --- a/arch/x86/include/asm/irqflags.h
+> > +++ b/arch/x86/include/asm/irqflags.h
+> > @@ -13,7 +13,7 @@
+> >   * Interrupt control:
+> >   */
+> >
+> > -static inline unsigned long native_save_fl(void)
+> > +extern inline unsigned long native_save_fl(void)
+> >  {
+> >       unsigned long flags;
+> >
+>
+> What's the code generation effect of this on say a defconfig kernel vmlinux with
+> paravirt enabled?
 
-Which is _exactly_ what we do today, so I don't see what point you're
-making in this sub-thread.
+Starting with this patch set applied:
+$ make CC=gcc-8 -j46
+$ objdump -d vmlinux | grep native_save_fl --context=3
+ffffffff81059140 <native_save_fl>:
+ffffffff81059140: 9c                    pushfq
+ffffffff81059141: 58                    pop    %rax
+ffffffff81059142: c3                    retq
+$ git checkout HEAD~3
+$ make CC=gcc-8 -j46
+$ objdump -d vmlinux | grep native_save_fl --context=3
+ffffffff81079410 <native_save_fl>:
+ffffffff81079410: 9c                    pushfq
+ffffffff81079411: 58                    pop    %rax
+ffffffff81079412: c3                    retq
 
-I thought we were discussing about getting Kconfig to obtain settings
-from dtb files.  If you have a point to make, please don't make the
-discussion impossible by changing your point, it makes it a waste of
-time trying to have a discussion.
-
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+Mainly, this is to prevent the compiler from adding a stack protector
+to the outlined version, as the stack protector clobbers %rcx, but
+paravirt expects %rcx to be preserved. More info can be found:
+https://lkml.org/lkml/2018/5/24/1242--
+Thanks,
+~Nick Desaulniers
