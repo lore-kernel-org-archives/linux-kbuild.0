@@ -1,74 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:37687 "EHLO
+Received: from services.gouders.net ([141.101.32.176]:39160 "EHLO
         services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933382AbeFVT2K (ORCPT
+        with ESMTP id S933382AbeFVTcZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 Jun 2018 15:28:10 -0400
+        Fri, 22 Jun 2018 15:32:25 -0400
 From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH 1/3] kconfig: avoid assert()-triggered segfaults in xfwrite()
-Date: Fri, 22 Jun 2018 21:27:37 +0200
-Message-Id: <20180622192739.5327-2-dirk@gouders.net>
-In-Reply-To: <20180622192739.5327-1-dirk@gouders.net>
-References: <20180622192739.5327-1-dirk@gouders.net>
+Subject: [PATCH 0/3] Fixes concerning zconfdump()
+Date: Fri, 22 Jun 2018 21:27:36 +0200
+Message-Id: <20180622192739.5327-1-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Dirk Gouders <dirk@gouders.net>
+Cc: Dirk Gouders <dirk@gouders.net>, Sam Ravnborg <sam@ravnborg.org>
 
-xfwrite uses assert() to ensure it does not operate on empty strings.
-Two users respect this, expr_print_file_helper() doesn't and causes
-segfaults e.g. when the dependency for an empty default string is printed.
+Hi Masahiro,
 
-Fix this by calling xfwrite with an empty string pattern ("") for
-empty strings.
+this series contains two actual fixes, the third patch is rather aimed
+to be an RFC.  I find it quite useful to have a target at hand to
+easily generate debugging output from the parser when needed.  I could
+imagine this target could also be used to add some parser tests to the
+recently introduced automated tests, but perhap you already have other
+plans or better suggestions.
 
-INITRAMFS_SOURCE was one symbol that caused this problem, with this
-fix applied the zconfdump() output for this symbol looks as follows:
+Dirk
 
-------------------------------------------------------------------------
-config INITRAMFS_SOURCE
-  string
-  symbol INITRAMFS_SOURCE
-  prompt "Initramfs source file(s)" if BLK_DEV_INITRD
-  default "" if BLK_DEV_INITRD
-  help
-This can be either a single cpio archive with a .cpio suffix or a
-space-separated list of directories and files for building the
-initramfs image.  A cpio archive should contain a filesystem archive
-to be used as an initramfs image.  Directories should contain a
-filesystem layout to be included in the initramfs image.  Files
-should contain entries according to the format described by the
-"usr/gen_init_cpio" program in the kernel tree.
+Dirk Gouders (3):
+  kconfig: avoid assert()-triggered segfaults in xfwrite()
+  kconfig: handle P_SYMBOL in print_symbol()
+  kconfig: add debugconfig target for debugging purposes
 
-When multiple directories and files are specified then the
-initramfs image will be the aggregate of all of them.
+ scripts/kconfig/Makefile | 10 ++++++++-
+ scripts/kconfig/dconf.c  | 55 ++++++++++++++++++++++++++++++++++++++++++++++++
+ scripts/kconfig/expr.c   |  5 ++++-
+ scripts/kconfig/expr.h   |  3 +++
+ scripts/kconfig/zconf.y  |  4 ++++
+ 5 files changed, 75 insertions(+), 2 deletions(-)
+ create mode 100644 scripts/kconfig/dconf.c
 
-See <file:Documentation/early-userspace/README> for more details.
-
-If you are not sure, leave it blank.
-------------------------------------------------------------------------
-
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
----
- scripts/kconfig/expr.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index e1a39e90841d..e064bf4c2881 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -1231,7 +1231,10 @@ void expr_print(struct expr *e,
- 
- static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
- {
--	xfwrite(str, strlen(str), 1, data);
-+	if (*str != '\0')
-+		xfwrite(str, strlen(str), 1, data);
-+	else
-+		xfwrite("\"\"", 2, 1, data);
- }
- 
- void expr_fprint(struct expr *e, FILE *out)
 -- 
 2.13.6
 
