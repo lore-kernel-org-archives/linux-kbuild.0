@@ -1,64 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:35342 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754291AbeFVRK3 (ORCPT
+Received: from relmlor4.renesas.com ([210.160.252.174]:15570 "EHLO
+        relmlie3.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S932721AbeFVRXO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 Jun 2018 13:10:29 -0400
-Received: by mail-pf0-f195.google.com with SMTP id c22-v6so3513271pfi.2
-        for <linux-kbuild@vger.kernel.org>; Fri, 22 Jun 2018 10:10:29 -0700 (PDT)
+        Fri, 22 Jun 2018 13:23:14 -0400
+From: Chris Brandt <Chris.Brandt@renesas.com>
+Subject: RE: [PATCHv4 4/4] ARM: versatile: support configuring versatile
+ machine for no-MMU
+Date: Fri, 22 Jun 2018 17:23:09 +0000
+Message-ID: <TY1PR01MB1562C54E8DD3942F40F8CBBD8A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
+References: <20180618141905.7789-1-gerg@linux-m68k.org>
+ <20180618141905.7789-5-gerg@linux-m68k.org>
+ <CAMuHMdUyCEq0U_CJindwcSEF+0dR-SJc1v8zGT-CcUqVkdOeVw@mail.gmail.com>
+ <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
+ <20180622110145.GU17671@n2100.armlinux.org.uk>
+ <nycvar.YSQ.7.76.1806221110140.16670@knanqh.ubzr>
+ <CAMuHMdWZPM3Q9fVXWiw1bMVWNRCYGoQa-XukJka-2xsP-=HmVQ@mail.gmail.com>
+ <nycvar.YSQ.7.76.1806221146140.16670@knanqh.ubzr>
+ <TY1PR01MB15624342267F973525BF45698A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
+ <nycvar.YSQ.7.76.1806221244490.16670@knanqh.ubzr>
+In-Reply-To: <nycvar.YSQ.7.76.1806221244490.16670@knanqh.ubzr>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20180621162324.36656-1-ndesaulniers@google.com>
- <20180621162324.36656-4-ndesaulniers@google.com> <20180622022402.GA24194@gmail.com>
-In-Reply-To: <20180622022402.GA24194@gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Fri, 22 Jun 2018 10:10:16 -0700
-Message-ID: <CAKwvOdn5gnB5cK=cy6weKyxAn4SNEdZTT_MtT_D_nHRG5EDZ4g@mail.gmail.com>
-Subject: Re: [PATCH v6 3/3] x86: paravirt: make native_save_fl extern inline
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, hpa@zytor.com, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Russell King <linux@armlinux.org.uk>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Vladimir Murzin <vladimir.murzin@arm.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thu, Jun 21, 2018 at 7:24 PM Ingo Molnar <mingo@kernel.org> wrote:
-> * Nick Desaulniers <ndesaulniers@google.com> wrote:
->
-> > native_save_fl() is marked static inline, but by using it as
-> > a function pointer in arch/x86/kernel/paravirt.c, it MUST be outlined.
->
-> > --- a/arch/x86/include/asm/irqflags.h
-> > +++ b/arch/x86/include/asm/irqflags.h
-> > @@ -13,7 +13,7 @@
-> >   * Interrupt control:
-> >   */
-> >
-> > -static inline unsigned long native_save_fl(void)
-> > +extern inline unsigned long native_save_fl(void)
-> >  {
-> >       unsigned long flags;
-> >
->
-> What's the code generation effect of this on say a defconfig kernel vmlinux with
-> paravirt enabled?
+On Friday, June 22, 2018, Nicolas Pitre wrote:
+> > So, why do we feel that XIP_KERNEL needs a warm safety blanket around
+> > it?
+>=20
+> Because we simply try not to create invalid kernel configurations.
+> XIP_KERNEL is not more special than other symbols in that respect.
 
-Starting with this patch set applied:
-$ make CC=gcc-8 -j46
-$ objdump -d vmlinux | grep native_save_fl --context=3
-ffffffff81059140 <native_save_fl>:
-ffffffff81059140: 9c                    pushfq
-ffffffff81059141: 58                    pop    %rax
-ffffffff81059142: c3                    retq
-$ git checkout HEAD~3
-$ make CC=gcc-8 -j46
-$ objdump -d vmlinux | grep native_save_fl --context=3
-ffffffff81079410 <native_save_fl>:
-ffffffff81079410: 9c                    pushfq
-ffffffff81079411: 58                    pop    %rax
-ffffffff81079412: c3                    retq
+Then here's a question.
 
-Mainly, this is to prevent the compiler from adding a stack protector
-to the outlined version, as the stack protector clobbers %rcx, but
-paravirt expects %rcx to be preserved. More info can be found:
-https://lkml.org/lkml/2018/5/24/1242--
-Thanks,
-~Nick Desaulniers
+To be clear, the discussion is around
+
+  "Being able to build a kernel that will not boot"
+
+So which one of these is more important: build or boot?
+
+Meaning what if you can select multiple platforms in kconfig, but then=20
+there is a .c file that does more sanity checking that then prevents the=20
+full build using a #error.
+
+In that case you can never "build" a kernel that has no chance of=20
+booting on all the selected platforms.
+
+There are configs options today that you can select, but unless some=20
+external criteria is  met during build time, the build will fail (like
+with a "missing .h file" message or something)
+
+
+Chris
