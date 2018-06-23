@@ -1,57 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:17376 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751620AbeFWIK6 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:43018 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751769AbeFWIlE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 23 Jun 2018 04:10:58 -0400
+        Sat, 23 Jun 2018 04:41:04 -0400
 MIME-Version: 1.0
-In-Reply-To: <874li0vvii.fsf@turtle.gmx.de>
-References: <874li0vvii.fsf@turtle.gmx.de>
+In-Reply-To: <20180619201458.4559-1-paul.burton@mips.com>
+References: <20180619190225.7eguhiw3ixaiwpgl@pburton-laptop> <20180619201458.4559-1-paul.burton@mips.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 23 Jun 2018 17:10:11 +0900
-Message-ID: <CAK7LNARPOqbmhKOOMCZjeLFihs-1Fh7388vLtHzH3X5zz=EKDw@mail.gmail.com>
-Subject: Re: [PATCH] stack-protector: Fix test with 32-bit userland and CONFIG_64BIT=y
+Date: Sat, 23 Jun 2018 17:40:12 +0900
+Message-ID: <CAK7LNASFqH7a1ZLhp_aLQXTPxODPbctVwEZ+5SL1OMp0kRQJGQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] Resolve -Wattribute-alias warnings from SYSCALL_DEFINEx()
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sven Joachim <svenjoac@gmx.de>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Paul Burton <paul.burton@mips.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Linux-MIPS <linux-mips@linux-mips.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Matthew Wilcox <matthew@wil.cx>, Thomas Gleixner <tglx@linutronix.de>, Douglas Anderson <dianders@chromium.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Matthias Kaehlcke <mka@chromium.org>, He Zhe <zhe.he@windriver.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Khem Raj <raj.khem@gmail.com>, Christophe Leroy <christophe.leroy@c-s.fr>, Al Viro <viro@zeniv.linux.org.uk>, Stafford Horne <shorne@gmail.com>, Gideon Israel Dsouza <gidisrael@gmail.com>, Kees Cook <keescook@chromium.org>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Paul Mackerras <paulus@samba.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-2018-06-19 2:45 GMT+09:00 Sven Joachim <svenjoac@gmx.de>:
-> When building a 64-bit 4.18-rc1 kernel with a 32-bit userland, I
-> noticed that stack protection was silently disabled.  Adding -m64 in
-> gcc-x86_64-has-stack-protector.sh fixed that, similar to what has been
-> noticed in commit 2a61f4747eea ("stack-protector: test compiler
-> capability in Kconfig and drop AUTO mode") for
-> gcc-x86_32-has-stack-protector.sh.
+2018-06-20 5:14 GMT+09:00 Paul Burton <paul.burton@mips.com>:
+> This series introduces infrastructure allowing compiler diagnostics to
+> be disabled or their severity modified for specific pieces of code, with
+> suitable abstractions to prevent that code from becoming tied to a
+> specific compiler.
 >
-> Signed-off-by: Sven Joachim <svenjoac@gmx.de>
-> ---
-
-Applied to linux-kbuild/fixes.  Thanks!
-
-
-
->  scripts/gcc-x86_64-has-stack-protector.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> This infrastructure is then used to disable the -Wattribute-alias
+> warning around syscall definitions, which rely on type mismatches to
+> sanitize arguments.
 >
-> diff --git a/scripts/gcc-x86_64-has-stack-protector.sh b/scripts/gcc-x86_64-has-stack-protector.sh
-> index 3755af0cd9f7..75e4e22b986a 100755
-> --- a/scripts/gcc-x86_64-has-stack-protector.sh
-> +++ b/scripts/gcc-x86_64-has-stack-protector.sh
-> @@ -1,4 +1,4 @@
->  #!/bin/sh
->  # SPDX-License-Identifier: GPL-2.0
+> Finally PowerPC-specific #pragma's are removed now that the generic code
+> is handling this.
 >
-> -echo "int foo(void) { char X[200]; return 3; }" | $* -S -x c -c -O0 -mcmodel=kernel -fno-PIE -fstack-protector - -o - 2> /dev/null | grep -q "%gs"
-> +echo "int foo(void) { char X[200]; return 3; }" | $* -S -x c -c -m64 -O0 -mcmodel=kernel -fno-PIE -fstack-protector - -o - 2> /dev/null | grep -q "%gs"
-> --
-> 2.17.1
+> The series takes Arnd's RFC patches & addresses the review comments they
+> received. The most notable effect of this series to to avoid warnings &
+> build failures caused by -Wattribute-alias when compiling the kernel
+> with GCC 8.
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Applies cleanly atop v4.18-rc1.
+
+
+Series, applied to linux-kbuild/fixes.
+(since we need to fix warnings from GCC 8.1)
+
+
+Thanks!
 
 
 
