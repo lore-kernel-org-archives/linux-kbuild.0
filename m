@@ -1,136 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:44603 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751492AbeFWN6N (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:56975 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751813AbeFWQn6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 23 Jun 2018 09:58:13 -0400
+        Sat, 23 Jun 2018 12:43:58 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 2/3] kbuild: do not update config when running install targets
-Date: Sat, 23 Jun 2018 22:56:08 +0900
-Message-Id: <1529762169-13488-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1529762169-13488-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1529762169-13488-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: reword help of LD_DEAD_CODE_DATA_ELIMINATION
+Date: Sun, 24 Jun 2018 01:41:51 +0900
+Message-Id: <1529772111-5780-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Ingo Molnar <mingo@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
 
-"make syncconfig" is automatically invoked when any of the following
-happens:
-
- - .config is updated
- - any of Kconfig files is updated
- - any of environment variables referenced in Kconfig is changed
-
-Then, it updates configuration files such as include/config/auto.conf
-include/generated/autoconf.h, etc.
-
-Even install targets (install, modules_install, etc.) are no exception.
-However, they should never ever modify the source tree.  Install
-targets are often run with root privileges.  Once those configuration
-files are owned by root, "make mrproper" would end up with permission
-error.
-
-Install targets should just copy things blindly.  They should not care
-whether the configuration is up-to-date or not.  This makes more sense
-because we are interested in the configuration that was used in the
-previous kernel building.
-
-This issue has existed since before, but rarely happened.  I expect
-more chance where people are hit by this; with the new Kconfig syntax
-extension, the .config now contains the compiler information.  If you
-cross-compile the kernel with CROSS_COMPILE, but forget to pass it
-for "make install", you meet "any of environment variables referenced
-in Kconfig is changed" because $(CC) is referenced in Kconfig.
-Another scenario is the compiler upgrade before the installation.
-
-Install targets need the configuration.  "make modules_install" refer
-to CONFIG_MODULES etc.  "make dtbs_install" also needs CONFIG_ARCH_*
-to decide which dtb files to install.  However, the auto-update of
-the configuration files should be avoided.  We already do this for
-external modules.
-
-Now, Make targets are categorized into 3 groups:
-
-[1] Do not need the kernel configuration at all
-
-    help, coccicheck, headers_install etc.
-
-[2] Need the latest kernel configuration
-
-    If new config options are added, Kconfig will show prompt to
-    ask user's selection.
-
-    Build targets such as vmlinux, in-kernel modules are the cases.
-
-[3] Need the kernel configuration, but do not want to update it
-
-    Install targets except headers_install, and external modules
-    are the cases.
+Since commit 5d20ee3192a5 ("kbuild: Allow LD_DEAD_CODE_DATA_ELIMINATION
+to be selectable if enabled"), HAVE_LD_DEAD_CODE_DATA_ELIMINATION is
+supposed to be selected by architectures that are capable of this
+functionality.  LD_DEAD_CODE_DATA_ELIMINATION is now users' selection.
+Update the help message.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-Changes in v2: None
+ init/Kconfig | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
- Makefile | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 413c2ed..f1e06fba 100644
---- a/Makefile
-+++ b/Makefile
-@@ -225,10 +225,12 @@ no-dot-config-targets := $(clean-targets) \
- 			 cscope gtags TAGS tags help% %docs check% coccicheck \
- 			 $(version_h) headers_% archheaders archscripts \
- 			 kernelversion %src-pkg
-+no-sync-config-targets := $(no-dot-config-targets) install %install
+diff --git a/init/Kconfig b/init/Kconfig
+index fde3d09..041f3a0 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1051,10 +1051,9 @@ config LD_DEAD_CODE_DATA_ELIMINATION
+ 	depends on HAVE_LD_DEAD_CODE_DATA_ELIMINATION
+ 	depends on EXPERT
+ 	help
+-	  Select this if the architecture wants to do dead code and
+-	  data elimination with the linker by compiling with
+-	  -ffunction-sections -fdata-sections, and linking with
+-	  --gc-sections.
++	  Enable this if you want to do dead code and data elimination with
++	  the linker by compiling with -ffunction-sections -fdata-sections,
++	  and linking with --gc-sections.
  
--config-targets := 0
--mixed-targets  := 0
--dot-config     := 1
-+config-targets  := 0
-+mixed-targets   := 0
-+dot-config      := 1
-+may-sync-config := 1
- 
- ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
- 	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
-@@ -236,6 +238,16 @@ ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
- 	endif
- endif
- 
-+ifneq ($(filter $(no-sync-config-targets), $(MAKECMDGOALS)),)
-+	ifeq ($(filter-out $(no-sync-config-targets), $(MAKECMDGOALS)),)
-+		may-sync-config := 0
-+	endif
-+endif
-+
-+ifneq ($(KBUILD_EXTMOD),)
-+	may-sync-config := 0
-+endif
-+
- ifeq ($(KBUILD_EXTMOD),)
-         ifneq ($(filter config %config,$(MAKECMDGOALS)),)
-                 config-targets := 1
-@@ -611,7 +623,7 @@ ARCH_CFLAGS :=
- include arch/$(SRCARCH)/Makefile
- 
- ifeq ($(dot-config),1)
--ifeq ($(KBUILD_EXTMOD),)
-+ifeq ($(may-sync-config),1)
- # Read in dependencies to all Kconfig* files, make sure to run syncconfig if
- # changes are detected. This should be included after arch/$(SRCARCH)/Makefile
- # because some architectures define CROSS_COMPILE there.
-@@ -639,7 +651,7 @@ include/config/auto.conf:
- 	echo >&2 ;							\
- 	/bin/false)
- 
--endif # KBUILD_EXTMOD
-+endif # may-sync-config
- 
- else
- # Dummy target needed, because used as prerequisite
+ 	  This can reduce on disk and in-memory size of the kernel
+ 	  code and static data, particularly for small configs and
 -- 
 2.7.4
 
