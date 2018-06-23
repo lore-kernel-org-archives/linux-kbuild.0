@@ -1,77 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:47062 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751406AbeFVUdx (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:59296 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933783AbeFWDI0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 Jun 2018 16:33:53 -0400
-Date: Fri, 22 Jun 2018 21:33:36 +0100
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCHv4 4/4] ARM: versatile: support configuring versatile
- machine for no-MMU
-Message-ID: <20180622203336.GA17671@n2100.armlinux.org.uk>
-References: <nycvar.YSQ.7.76.1806211212010.16670@knanqh.ubzr>
- <20180622110145.GU17671@n2100.armlinux.org.uk>
- <nycvar.YSQ.7.76.1806221110140.16670@knanqh.ubzr>
- <CAMuHMdWZPM3Q9fVXWiw1bMVWNRCYGoQa-XukJka-2xsP-=HmVQ@mail.gmail.com>
- <nycvar.YSQ.7.76.1806221146140.16670@knanqh.ubzr>
- <TY1PR01MB15624342267F973525BF45698A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
- <nycvar.YSQ.7.76.1806221244490.16670@knanqh.ubzr>
- <TY1PR01MB1562C54E8DD3942F40F8CBBD8A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
- <20180622183838.GZ17671@n2100.armlinux.org.uk>
- <TY1PR01MB1562F7C31AF6AFC4A1BBA1748A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
+        Fri, 22 Jun 2018 23:08:26 -0400
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] kconfig: document Kconfig source file comments
+Message-ID: <b2854ed6-073d-11b9-b344-571a0903995c@infradead.org>
+Date: Fri, 22 Jun 2018 20:08:21 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TY1PR01MB1562F7C31AF6AFC4A1BBA1748A750@TY1PR01MB1562.jpnprd01.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Chris Brandt <Chris.Brandt@renesas.com>
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Greg Ungerer <gerg@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Vladimir Murzin <vladimir.murzin@arm.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: LKML <linux-kernel@vger.kernel.org>
 
-On Fri, Jun 22, 2018 at 08:25:06PM +0000, Chris Brandt wrote:
-> On Friday, June 22, 2018, Russell King - ARM Linux wrote:
-> > > There are configs options today that you can select, but unless some
-> > > external criteria is  met during build time, the build will fail (like
-> > > with a "missing .h file" message or something)
-> > 
-> > Such as?  I don't think that's found by the randconfig builders - I've
-> > never noticed any such failures on ARM.
-> 
-> I got this set once by accident after a kernel update
-> 
->    CONFIG_SYSTEM_TRUSTED_KEYRING=y
-> 
-> which then let me to this error:
-> 
->   HOSTCC  scripts/extract-cert
-> ../scripts/extract-cert.c:21:25: fatal error: openssl/bio.h: No such file or directory
-> compilation terminated.
+From: Randy Dunlap <rdunlap@infradead.org>
 
-Hmm.  Is that a problem if the documented minimum requirements to build
-the kernel are violated?  It seems the openssl 1.0.0 development package
-is required to build kernels v4.3 and beyond.
+I saw this type of Kconfig construct on LKML:
 
-Here's what Documentation/process/changes.rst has to say about it:
+config SYMBOOL
+	#bool "prompt string"
+	default y
 
-Current Minimal Requirements
-****************************
-...
-====================== ===============  ========================================
-        Program        Minimal version       Command to check the version
-====================== ===============  ========================================
-openssl & libcrypto    1.0.0            openssl version
-...
-OpenSSL
--------
+and wondered what it does.  Then I wondered if '#' comments are
+even documented.  They aren't, so add a little doc for that.
 
-Module signing and external certificate handling use the OpenSSL program and
-crypto library to do key creation and signature generation.
+Ah, good.  kconfig says:
+arch/x86/Kconfig:2942:warning: config symbol defined without type
 
-You will need openssl to build kernels 3.7 and higher if module signing is
-enabled.  You will also need openssl development packages to build kernels 4.3
-and higher.
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+ Documentation/kbuild/kconfig-language.txt |    6 ++++++
+ 1 file changed, 6 insertions(+)
 
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+--- lnx-418-rc1.orig/Documentation/kbuild/kconfig-language.txt
++++ lnx-418-rc1/Documentation/kbuild/kconfig-language.txt
+@@ -430,6 +430,12 @@ This sets the config program's title bar
+ to use it. It should be placed at the top of the configuration, before any
+ other statement.
+ 
++'#' Kconfig source file comment:
++
++An unquoted '#' character anywhere in a source file line indicates
++the beginning of a source file comment.  The remainder of that line
++is a comment.
++
+ 
+ Kconfig hints
+ -------------
+
+
