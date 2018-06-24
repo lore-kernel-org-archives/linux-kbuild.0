@@ -1,87 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:58536 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751895AbeFXCgy (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:64051 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751582AbeFXI5K (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 23 Jun 2018 22:36:54 -0400
+        Sun, 24 Jun 2018 04:57:10 -0400
 MIME-Version: 1.0
-In-Reply-To: <87r2l4jkgf.fsf@xmission.com>
-References: <CAK7LNASMpvFgue9gZ=6Epq_Skt2pvTVOoT9w=SzA_uGR87KP-w@mail.gmail.com>
- <87r2l4jkgf.fsf@xmission.com>
+In-Reply-To: <201806240006.eCGYTuNX%fengguang.wu@intel.com>
+References: <1529762169-13488-1-git-send-email-yamada.masahiro@socionext.com> <201806240006.eCGYTuNX%fengguang.wu@intel.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 24 Jun 2018 11:36:06 +0900
-Message-ID: <CAK7LNATmdv+n7i0sJTAQMkbRHRVj-mihJs5nS-oi4fUkB8x8qg@mail.gmail.com>
-Subject: Re: [GIT PULL 2/2] Kconfig updates for v4.18
+Date: Sun, 24 Jun 2018 17:56:24 +0900
+Message-ID: <CAK7LNARv7VyPaew6XpRiYqh1YTapj-oErGuiq4rS1_BmEjC8Lw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] kbuild: use 'include' directive to load auto.conf
+ from top Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Eric W. Biederman" <ebiederm@xmission.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: kbuild test robot <lkp@intel.com>
+Cc: kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
 Hi.
 
-2018-06-18 22:25 GMT+09:00 Eric W. Biederman <ebiederm@xmission.com>:
-> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+2018-06-24 3:59 GMT+09:00 kbuild test robot <lkp@intel.com>:
+> Hi Masahiro,
 >
->> - drop CONFIG_CROSS_COMPILE support
+> I love your patch! Yet something to improve:
 >
-> aka
->> commit f1089c92da791034af73478159626007cba7f092
->> Author: Masahiro Yamada <yamada.masahiro@socionext.com>
->> Date:   Mon May 28 18:21:39 2018 +0900
->>
->>     kbuild: remove CONFIG_CROSS_COMPILE support
->>
->>     Kbuild provides a couple of ways to specify CROSS_COMPILE:
->>
->>     [1] Command line
->>     [2] Environment
->>     [3] arch/*/Makefile (only some architectures)
->>     [4] CONFIG_CROSS_COMPILE
->>
->>     [4] is problematic for the compiler capability tests in Kconfig.
->>     CONFIG_CROSS_COMPILE allows users to change the compiler prefix from
->>     'make menuconfig', etc.  It means, the compiler options would have
->>     to be all re-calculated everytime CONFIG_CROSS_COMPILE is changed.
->>
->>     To avoid complexity and performance issues, I'd like to evaluate
->>     the shell commands statically, i.e. only parsing Kconfig files.
->>
->>     I guess the majority is [1] or [2].  Currently, there are only
->>     5 defconfig files that specify CONFIG_CROSS_COMPILE.
->>       arch/arm/configs/lpc18xx_defconfig
->>       arch/hexagon/configs/comet_defconfig
->>       arch/nds32/configs/defconfig
->>       arch/openrisc/configs/or1ksim_defconfig
->>       arch/openrisc/configs/simple_smp_defconfig
->>
->>     Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->>     Reviewed-by: Kees Cook <keescook@chromium.org>
->>
+> [auto build test ERROR on kbuild/for-next]
+> [also build test ERROR on v4.18-rc1 next-20180622]
+> [cannot apply to mmarek/for-next mmarek/rc-fixes]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 >
-> I just started working against 4.18-rc1 and discovered this.
->
-> This has broken my setup for building and testing changes on other
-> architectures.  I have to put the name of the compiler prefix somewhere.
-> The mapping between the prefix to gcc and the linux architecture is
-> non-trivial.  Especially with a lot of architectures in the test pool.
->
-> I am tired and frustrated this morning as this is going to keep me from
-> getting done what I had planned today.
->
-> This is a regression pure and simple.  It breaks my workflow.  Please
-> fix it.
->
-> Eric
->
+> url:    https://github.com/0day-ci/linux/commits/Masahiro-Yamada/kbuild-use-include-directive-to-load-auto-conf-from-top-Makefile/20180623-220114
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
+> config: xtensa-nommu_kc705_defconfig (attached as .config)
+> compiler: xtensa-de212-elf-gcc (crosstool-NG crosstool-ng-1.23.0-307-g452ee331) 7.3.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         GCC_VERSION=7.3.0 make.cross ARCH=xtensa
 
-Sorry, I cannot fix.
+This did not work for me
+because the make.cross script tries to download GCC 7.3.0 xtensa-linux
+but it is missing in the web site.
 
-As I mentioned in the commit log,
-CONFIG_CROSS_COMPILE cannot co-exist with the new Kconfig feature.
+$ GCC_VERSION=7.3.0 make.cross ARCH=xtensa
+Cannot find xtensa-linux under
+https://download.01.org/0day-ci/cross-package check
+/tmp/crosstool-files
 
-Only the possible fix is to revert almost all Kbuild/Kconfig commits
-merged in the previous MW, but I do not want to.
+
+I installed xtensa-de212-elf-gcc by hand,
+but I could not reproduce the error.
+
+
+GCC_VERSION=7.2.0 make.cross ARCH=xtensa
+worked, but I could not reproduce the issue either.
+(the build terminated with a different error.)
+
+
+Where can I see the full build log?
+
+
+> All errors (new ones prefixed by >>):
+>
+>>> Makefile:592: include/config/auto.conf: No such file or directory
+>    drivers/staging/mt7621-dts/Kconfig:4:warning: 'BUILTIN_DTB' has wrong type. 'select' only accept arguments of bool and tristate type
+>    <stdin>:1332:2: warning: #warning syscall io_pgetevents not implemented [-Wcpp]
+>    <stdin>:1335:2: warning: #warning syscall rseq not implemented [-Wcpp]
+>
+> vim +592 Makefile
+>
+>    590
+>    591  ifeq ($(dot-config),1)
+>  > 592  include include/config/auto.conf
+>    593  endif
+>    594
+>
+> ---
+> 0-DAY kernel test infrastructure                Open Source Technology Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
 
 
