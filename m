@@ -1,99 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:60893 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934448AbeFZD5C (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 25 Jun 2018 23:57:02 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [RESEND PATCH] bpfilter: check compiler capability in Kconfig
-Date: Tue, 26 Jun 2018 12:55:35 +0900
-Message-Id: <1529985336-27522-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from mail.kernel.org ([198.145.29.99]:34152 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934184AbeFYOQK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 25 Jun 2018 10:16:10 -0400
+Date: Mon, 25 Jun 2018 10:16:07 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH] trace: fix SKIP_STACK_VALIDATION=1 build
+Message-ID: <20180625101607.08db48ff@gandalf.local.home>
+In-Reply-To: <CAK7LNARngmBXa5w3XFfuA7pEv39vWjJVNJ+3XVLPYd9QLH+f-A@mail.gmail.com>
+References: <20180608214746.136554-1-gthelen@google.com>
+        <CAK7LNARngmBXa5w3XFfuA7pEv39vWjJVNJ+3XVLPYd9QLH+f-A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Matteo Croce <mcroce@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Daniel Borkmann <daniel@iogearbox.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Greg Thelen <gthelen@google.com>, Andi Kleen <andi@firstfloor.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Andi Kleen <ak@linux.intel.com>, Michal Marek <michal.lkml@markovi.net>
 
-With the brand-new syntax extension of Kconfig, we can directly
-check the compiler capability in the configuration phase.
+On Sat, 23 Jun 2018 02:42:26 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-If the cc-can-link.sh fails, the BPFILTER_UMH is automatically
-hidden by the dependency.
+> 2018-06-09 6:47 GMT+09:00 Greg Thelen <gthelen@google.com>:
+> > Non gcc-5 builds with CONFIG_STACK_VALIDATION=y and
+> > SKIP_STACK_VALIDATION=1 fail.
+> > Example output:
+> >   /bin/sh: init/.tmp_main.o: Permission denied
+> >
+> > commit 96f60dfa5819 ("trace: Use -mcount-record for dynamic ftrace"),
+> > added a mismatched endif.  This causes cmd_objtool to get mistakenly
+> > set.
+> >
+> > Relocate endif to balance the newly added -record-mcount check.
+> >
+> > Fixes: 96f60dfa5819 ("trace: Use -mcount-record for dynamic ftrace")
+> > Signed-off-by: Greg Thelen <gthelen@google.com>
+> > ---  
+> 
+> Applied to linux-kbuild/fixes. Thanks!
+> 
+> 
 
-I also deleted 'default n', which is no-op.
+I already pushed this to Linus. As I was the one to mess it up in the
+first place ;-) (I think I applied it with some fuzz)
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ed7d40bc67b8353c677b38c6cdddcdc310c0f452
 
- Makefile               | 5 -----
- net/Makefile           | 4 ----
- net/bpfilter/Kconfig   | 2 +-
- scripts/cc-can-link.sh | 2 +-
- 4 files changed, 2 insertions(+), 11 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index a6d4872..f71ea52 100644
---- a/Makefile
-+++ b/Makefile
-@@ -520,11 +520,6 @@ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLA
-   KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
- endif
- 
--ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/cc-can-link.sh $(CC)), y)
--  CC_CAN_LINK := y
--  export CC_CAN_LINK
--endif
--
- # The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
- # Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
- # CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
-diff --git a/net/Makefile b/net/Makefile
-index 13ec0d5..bdaf539 100644
---- a/net/Makefile
-+++ b/net/Makefile
-@@ -20,11 +20,7 @@ obj-$(CONFIG_TLS)		+= tls/
- obj-$(CONFIG_XFRM)		+= xfrm/
- obj-$(CONFIG_UNIX)		+= unix/
- obj-$(CONFIG_NET)		+= ipv6/
--ifneq ($(CC_CAN_LINK),y)
--$(warning CC cannot link executables. Skipping bpfilter.)
--else
- obj-$(CONFIG_BPFILTER)		+= bpfilter/
--endif
- obj-$(CONFIG_PACKET)		+= packet/
- obj-$(CONFIG_NET_KEY)		+= key/
- obj-$(CONFIG_BRIDGE)		+= bridge/
-diff --git a/net/bpfilter/Kconfig b/net/bpfilter/Kconfig
-index a948b07..76deb66 100644
---- a/net/bpfilter/Kconfig
-+++ b/net/bpfilter/Kconfig
-@@ -1,6 +1,5 @@
- menuconfig BPFILTER
- 	bool "BPF based packet filtering framework (BPFILTER)"
--	default n
- 	depends on NET && BPF && INET
- 	help
- 	  This builds experimental bpfilter framework that is aiming to
-@@ -9,6 +8,7 @@ menuconfig BPFILTER
- if BPFILTER
- config BPFILTER_UMH
- 	tristate "bpfilter kernel module with user mode helper"
-+	depends on $(success,$(srctree)/scripts/cc-can-link.sh $(CC))
- 	default m
- 	help
- 	  This builds bpfilter kernel module with embedded user mode helper
-diff --git a/scripts/cc-can-link.sh b/scripts/cc-can-link.sh
-index 208eb28..6efcead 100755
---- a/scripts/cc-can-link.sh
-+++ b/scripts/cc-can-link.sh
-@@ -1,7 +1,7 @@
- #!/bin/sh
- # SPDX-License-Identifier: GPL-2.0
- 
--cat << "END" | $@ -x c - -o /dev/null >/dev/null 2>&1 && echo "y"
-+cat << "END" | $@ -x c - -o /dev/null >/dev/null 2>&1
- #include <stdio.h>
- int main(void)
- {
--- 
-2.7.4
-
+-- Steve
