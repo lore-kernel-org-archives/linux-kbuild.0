@@ -1,76 +1,215 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:54084 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751372AbeFZHNb (ORCPT
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:45347 "EHLO
+        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935479AbeFZNPr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Jun 2018 03:13:31 -0400
-Date: Tue, 26 Jun 2018 09:13:25 +0200
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH v6 3/3] x86: paravirt: make native_save_fl extern inline
-Message-ID: <20180626071325.GA25751@gmail.com>
-References: <20180621162324.36656-1-ndesaulniers@google.com>
- <20180621162324.36656-4-ndesaulniers@google.com>
- <20180622022402.GA24194@gmail.com>
- <CAKwvOdn5gnB5cK=cy6weKyxAn4SNEdZTT_MtT_D_nHRG5EDZ4g@mail.gmail.com>
+        Tue, 26 Jun 2018 09:15:47 -0400
+Received: by mail-wr0-f195.google.com with SMTP id u7-v6so1951719wrn.12
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jun 2018 06:15:46 -0700 (PDT)
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: [PATCH v4 07/17] khwasan: add tag related helper functions
+Date: Tue, 26 Jun 2018 15:15:17 +0200
+Message-Id: <0aaff2112647cc4b3aaa1a2be127285dcb5af2c5.1530018818.git.andreyknvl@google.com>
+In-Reply-To: <cover.1530018818.git.andreyknvl@google.com>
+References: <cover.1530018818.git.andreyknvl@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdn5gnB5cK=cy6weKyxAn4SNEdZTT_MtT_D_nHRG5EDZ4g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, hpa@zytor.com, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
+Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Andrey Konovalov <andreyknvl@google.com>
 
+This commit adds a few helper functions, that are meant to be used to
+work with tags embedded in the top byte of kernel pointers: to set, to
+get or to reset (set to 0xff) the top byte.
 
-* Nick Desaulniers <ndesaulniers@google.com> wrote:
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+---
+ arch/arm64/mm/kasan_init.c |  2 ++
+ include/linux/kasan.h      | 23 ++++++++++++++++
+ mm/kasan/kasan.h           | 55 ++++++++++++++++++++++++++++++++++++++
+ mm/kasan/khwasan.c         | 47 ++++++++++++++++++++++++++++++++
+ 4 files changed, 127 insertions(+)
 
-> On Thu, Jun 21, 2018 at 7:24 PM Ingo Molnar <mingo@kernel.org> wrote:
-> > * Nick Desaulniers <ndesaulniers@google.com> wrote:
-> >
-> > > native_save_fl() is marked static inline, but by using it as
-> > > a function pointer in arch/x86/kernel/paravirt.c, it MUST be outlined.
-> >
-> > > --- a/arch/x86/include/asm/irqflags.h
-> > > +++ b/arch/x86/include/asm/irqflags.h
-> > > @@ -13,7 +13,7 @@
-> > >   * Interrupt control:
-> > >   */
-> > >
-> > > -static inline unsigned long native_save_fl(void)
-> > > +extern inline unsigned long native_save_fl(void)
-> > >  {
-> > >       unsigned long flags;
-> > >
-> >
-> > What's the code generation effect of this on say a defconfig kernel vmlinux with
-> > paravirt enabled?
-> 
-> Starting with this patch set applied:
-> $ make CC=gcc-8 -j46
-> $ objdump -d vmlinux | grep native_save_fl --context=3
-> ffffffff81059140 <native_save_fl>:
-> ffffffff81059140: 9c                    pushfq
-> ffffffff81059141: 58                    pop    %rax
-> ffffffff81059142: c3                    retq
-> $ git checkout HEAD~3
-> $ make CC=gcc-8 -j46
-> $ objdump -d vmlinux | grep native_save_fl --context=3
-> ffffffff81079410 <native_save_fl>:
-> ffffffff81079410: 9c                    pushfq
-> ffffffff81079411: 58                    pop    %rax
-> ffffffff81079412: c3                    retq
-> 
-> Mainly, this is to prevent the compiler from adding a stack protector
-> to the outlined version, as the stack protector clobbers %rcx, but
-> paravirt expects %rcx to be preserved. More info can be found:
-> https://lkml.org/lkml/2018/5/24/1242--
+diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
+index 7a31e8ccbad2..e7f37c0b7e14 100644
+--- a/arch/arm64/mm/kasan_init.c
++++ b/arch/arm64/mm/kasan_init.c
+@@ -250,6 +250,8 @@ void __init kasan_init(void)
+ 	memset(kasan_zero_page, KASAN_SHADOW_INIT, PAGE_SIZE);
+ 	cpu_replace_ttbr1(lm_alias(swapper_pg_dir));
+ 
++	khwasan_init();
++
+ 	/* At this point kasan is fully initialized. Enable error messages */
+ 	init_task.kasan_depth = 0;
+ 	pr_info("KernelAddressSanitizer initialized\n");
+diff --git a/include/linux/kasan.h b/include/linux/kasan.h
+index 336385baf926..d7624b879d86 100644
+--- a/include/linux/kasan.h
++++ b/include/linux/kasan.h
+@@ -155,6 +155,29 @@ static inline void kasan_cache_shutdown(struct kmem_cache *cache) {}
+ 
+ #define KASAN_SHADOW_INIT 0xFF
+ 
++void khwasan_init(void);
++
++void *khwasan_set_tag(const void *addr, u8 tag);
++u8 khwasan_get_tag(const void *addr);
++void *khwasan_reset_tag(const void *ptr);
++
++#else /* CONFIG_KASAN_HW */
++
++static inline void khwasan_init(void) { }
++
++static inline void *khwasan_set_tag(const void *addr, u8 tag)
++{
++	return (void *)addr;
++}
++static inline u8 khwasan_get_tag(const void *addr)
++{
++	return 0xFF;
++}
++static inline void *khwasan_reset_tag(const void *ptr)
++{
++	return (void *)ptr;
++}
++
+ #endif /* CONFIG_KASAN_HW */
+ 
+ #endif /* LINUX_KASAN_H */
+diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
+index 19b950eaccff..a7cc27d96608 100644
+--- a/mm/kasan/kasan.h
++++ b/mm/kasan/kasan.h
+@@ -8,6 +8,10 @@
+ #define KASAN_SHADOW_SCALE_SIZE (1UL << KASAN_SHADOW_SCALE_SHIFT)
+ #define KASAN_SHADOW_MASK       (KASAN_SHADOW_SCALE_SIZE - 1)
+ 
++#define KHWASAN_TAG_KERNEL	0xFF /* native kernel pointers tag */
++#define KHWASAN_TAG_INVALID	0xFE /* inaccessible memory tag */
++#define KHWASAN_TAG_MAX		0xFD /* maximum value for random tags */
++
+ #define KASAN_FREE_PAGE         0xFF  /* page was freed */
+ #define KASAN_PAGE_REDZONE      0xFE  /* redzone for kmalloc_large allocations */
+ #define KASAN_KMALLOC_REDZONE   0xFC  /* redzone inside slub object */
+@@ -126,6 +130,57 @@ static inline void quarantine_reduce(void) { }
+ static inline void quarantine_remove_cache(struct kmem_cache *cache) { }
+ #endif
+ 
++#ifdef CONFIG_KASAN_HW
++
++#define KHWASAN_TAG_SHIFT 56
++#define KHWASAN_TAG_MASK (0xFFUL << KHWASAN_TAG_SHIFT)
++
++u8 random_tag(void);
++
++static inline void *set_tag(const void *addr, u8 tag)
++{
++	u64 a = (u64)addr;
++
++	a &= ~KHWASAN_TAG_MASK;
++	a |= ((u64)tag << KHWASAN_TAG_SHIFT);
++
++	return (void *)a;
++}
++
++static inline u8 get_tag(const void *addr)
++{
++	return (u8)((u64)addr >> KHWASAN_TAG_SHIFT);
++}
++
++static inline void *reset_tag(const void *addr)
++{
++	return set_tag(addr, KHWASAN_TAG_KERNEL);
++}
++
++#else /* CONFIG_KASAN_HW */
++
++static inline u8 random_tag(void)
++{
++	return 0;
++}
++
++static inline void *set_tag(const void *addr, u8 tag)
++{
++	return (void *)addr;
++}
++
++static inline u8 get_tag(const void *addr)
++{
++	return 0;
++}
++
++static inline void *reset_tag(const void *addr)
++{
++	return (void *)addr;
++}
++
++#endif /* CONFIG_KASAN_HW */
++
+ /*
+  * Exported functions for interfaces called from assembly or from generated
+  * code. Declarations here to avoid warning about missing declarations.
+diff --git a/mm/kasan/khwasan.c b/mm/kasan/khwasan.c
+index e2c3a7f7fd1f..d34679b8f8c7 100644
+--- a/mm/kasan/khwasan.c
++++ b/mm/kasan/khwasan.c
+@@ -38,6 +38,53 @@
+ #include "kasan.h"
+ #include "../slab.h"
+ 
++static DEFINE_PER_CPU(u32, prng_state);
++
++void khwasan_init(void)
++{
++	int cpu;
++
++	for_each_possible_cpu(cpu)
++		per_cpu(prng_state, cpu) = get_random_u32();
++}
++
++/*
++ * If a preemption happens between this_cpu_read and this_cpu_write, the only
++ * side effect is that we'll give a few allocated in different contexts objects
++ * the same tag. Since KHWASAN is meant to be used a probabilistic bug-detection
++ * debug feature, this doesn’t have significant negative impact.
++ *
++ * Ideally the tags use strong randomness to prevent any attempts to predict
++ * them during explicit exploit attempts. But strong randomness is expensive,
++ * and we did an intentional trade-off to use a PRNG. This non-atomic RMW
++ * sequence has in fact positive effect, since interrupts that randomly skew
++ * PRNG at unpredictable points do only good.
++ */
++u8 random_tag(void)
++{
++	u32 state = this_cpu_read(prng_state);
++
++	state = 1664525 * state + 1013904223;
++	this_cpu_write(prng_state, state);
++
++	return (u8)(state % (KHWASAN_TAG_MAX + 1));
++}
++
++void *khwasan_set_tag(const void *addr, u8 tag)
++{
++	return set_tag(addr, tag);
++}
++
++u8 khwasan_get_tag(const void *addr)
++{
++	return get_tag(addr);
++}
++
++void *khwasan_reset_tag(const void *addr)
++{
++	return reset_tag(addr);
++}
++
+ void check_memory_region(unsigned long addr, size_t size, bool write,
+ 				unsigned long ret_ip)
+ {
+-- 
+2.18.0.rc2.346.g013aa6912e-goog
 
-Ok!
-
-Acked-by: Ingo Molnar <mingo@kernel.org>
-
-What's the planned upstreaming route for these patches/fixes?
-
-Thanks,
-
-	Ingo
