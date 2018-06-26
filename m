@@ -1,44 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:33859 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752145AbeFZQXA (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:54021 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935521AbeFZNPx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Jun 2018 12:23:00 -0400
-Received: by mail-pl0-f65.google.com with SMTP id z9-v6so1938533plo.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jun 2018 09:23:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <20180621162324.36656-1-ndesaulniers@google.com>
- <20180621162324.36656-4-ndesaulniers@google.com> <20180622022402.GA24194@gmail.com>
- <CAKwvOdn5gnB5cK=cy6weKyxAn4SNEdZTT_MtT_D_nHRG5EDZ4g@mail.gmail.com> <20180626071325.GA25751@gmail.com>
-In-Reply-To: <20180626071325.GA25751@gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Tue, 26 Jun 2018 12:22:47 -0400
-Message-ID: <CAKwvOdnW9r=pgmodEL0VXCv=PZVt_WMCA+B5x4D5oKRM1y-0Ow@mail.gmail.com>
-Subject: Re: [PATCH v6 3/3] x86: paravirt: make native_save_fl extern inline
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 26 Jun 2018 09:15:53 -0400
+Received: by mail-wm0-f68.google.com with SMTP id x6-v6so1883005wmc.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jun 2018 06:15:53 -0700 (PDT)
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: [PATCH v4 10/17] khwasan, mm: perform untagged pointers comparison in krealloc
+Date: Tue, 26 Jun 2018 15:15:20 +0200
+Message-Id: <be2d28030622fa8201844cf438654568ae1808e0.1530018818.git.andreyknvl@google.com>
+In-Reply-To: <cover.1530018818.git.andreyknvl@google.com>
+References: <cover.1530018818.git.andreyknvl@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, hpa@zytor.com, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, geert@linux-m68k.org, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, kirill.shutemov@linux.intel.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
+Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Andrey Konovalov <andreyknvl@google.com>
 
-On Tue, Jun 26, 2018 at 3:13 AM Ingo Molnar <mingo@kernel.org> wrote:
-> Ok!
->
-> Acked-by: Ingo Molnar <mingo@kernel.org>
->
-> What's the planned upstreaming route for these patches/fixes?
+The krealloc function checks where the same buffer was reused or a new one
+allocated by comparing kernel pointers. KHWASAN changes memory tag on the
+krealloc'ed chunk of memory and therefore also changes the pointer tag of
+the returned pointer. Therefore we need to perform comparison on untagged
+(with tags reset) pointers to check whether it's the same memory region or
+not.
 
-While the fix is mainly for paravirt, 2/3 of the patches exclusively
-touch arch/x86, so I think they should go up in the x86 tree (as
-opposed to paravirt's), if you would be so kind.  hpa mentioned not
-handling merges in https://lkml.org/lkml/2018/6/14/903, so I reached
-out to you and tglx.
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+---
+ mm/slab_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-(Also, this is the first series I've ever sent (as opposed to one off
-commits), so I'm unfamiliar with the protocol for merging series that
-may be touch more than one subsystem.  I assume we don't split up
-series to take parts in one tree vs another?)
-
+diff --git a/mm/slab_common.c b/mm/slab_common.c
+index c279b52c7565..7746d2ef5d45 100644
+--- a/mm/slab_common.c
++++ b/mm/slab_common.c
+@@ -1509,7 +1509,7 @@ void *krealloc(const void *p, size_t new_size, gfp_t flags)
+ 	}
+ 
+ 	ret = __do_krealloc(p, new_size, flags);
+-	if (ret && p != ret)
++	if (ret && khwasan_reset_tag(p) != khwasan_reset_tag(ret))
+ 		kfree(p);
+ 
+ 	return ret;
 -- 
-Thanks,
-~Nick Desaulniers
+2.18.0.rc2.346.g013aa6912e-goog
+
