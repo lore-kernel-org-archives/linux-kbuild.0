@@ -1,98 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:18427 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751596AbeFXKYz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 24 Jun 2018 06:24:55 -0400
-Date: Sun, 24 Jun 2018 18:35:16 +0800
-From: Philip Li <philip.li@intel.com>
-Subject: Re: [kbuild-all] [PATCH v2 1/3] kbuild: use 'include' directive to
- load auto.conf from top Makefile
-Message-ID: <20180624103516.GA29697@intel.com>
-References: <1529762169-13488-1-git-send-email-yamada.masahiro@socionext.com>
- <201806240006.eCGYTuNX%fengguang.wu@intel.com>
- <CAK7LNARv7VyPaew6XpRiYqh1YTapj-oErGuiq4rS1_BmEjC8Lw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARv7VyPaew6XpRiYqh1YTapj-oErGuiq4rS1_BmEjC8Lw@mail.gmail.com>
+Received: from conuserg-12.nifty.com ([210.131.2.79]:60893 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934448AbeFZD5C (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 25 Jun 2018 23:57:02 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [RESEND PATCH] bpfilter: check compiler capability in Kconfig
+Date: Tue, 26 Jun 2018 12:55:35 +0900
+Message-Id: <1529985336-27522-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: kbuild test robot <lkp@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Matteo Croce <mcroce@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Daniel Borkmann <daniel@iogearbox.net>
 
-On Sun, Jun 24, 2018 at 05:56:24PM +0900, Masahiro Yamada wrote:
-> Hi.
-> 
-> 2018-06-24 3:59 GMT+09:00 kbuild test robot <lkp@intel.com>:
-> > Hi Masahiro,
-> >
-> > I love your patch! Yet something to improve:
-> >
-> > [auto build test ERROR on kbuild/for-next]
-> > [also build test ERROR on v4.18-rc1 next-20180622]
-> > [cannot apply to mmarek/for-next mmarek/rc-fixes]
-> > [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-> >
-> > url:    https://github.com/0day-ci/linux/commits/Masahiro-Yamada/kbuild-use-include-directive-to-load-auto-conf-from-top-Makefile/20180623-220114
-> > base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
-> > config: xtensa-nommu_kc705_defconfig (attached as .config)
-> > compiler: xtensa-de212-elf-gcc (crosstool-NG crosstool-ng-1.23.0-307-g452ee331) 7.3.0
-> > reproduce:
-> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-> >         chmod +x ~/bin/make.cross
-> >         # save the attached .config to linux build tree
-> >         GCC_VERSION=7.3.0 make.cross ARCH=xtensa
-> 
-> This did not work for me
-> because the make.cross script tries to download GCC 7.3.0 xtensa-linux
-> but it is missing in the web site.
-> 
-> $ GCC_VERSION=7.3.0 make.cross ARCH=xtensa
-> Cannot find xtensa-linux under
-> https://download.01.org/0day-ci/cross-package check
-> /tmp/crosstool-files
-thanks for info, we will fix it as early as possible, and
-reproduce the issue to provide feedback later.
+With the brand-new syntax extension of Kconfig, we can directly
+check the compiler capability in the configuration phase.
 
-> 
-> 
-> I installed xtensa-de212-elf-gcc by hand,
-> but I could not reproduce the error.
-> 
-> 
-> GCC_VERSION=7.2.0 make.cross ARCH=xtensa
-> worked, but I could not reproduce the issue either.
-> (the build terminated with a different error.)
-> 
-> 
-> Where can I see the full build log?
-> 
-> 
-> > All errors (new ones prefixed by >>):
-> >
-> >>> Makefile:592: include/config/auto.conf: No such file or directory
-> >    drivers/staging/mt7621-dts/Kconfig:4:warning: 'BUILTIN_DTB' has wrong type. 'select' only accept arguments of bool and tristate type
-> >    <stdin>:1332:2: warning: #warning syscall io_pgetevents not implemented [-Wcpp]
-> >    <stdin>:1335:2: warning: #warning syscall rseq not implemented [-Wcpp]
-> >
-> > vim +592 Makefile
-> >
-> >    590
-> >    591  ifeq ($(dot-config),1)
-> >  > 592  include include/config/auto.conf
-> >    593  endif
-> >    594
-> >
-> > ---
-> > 0-DAY kernel test infrastructure                Open Source Technology Center
-> > https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
-> 
-> 
-> 
-> -- 
-> Best Regards
-> Masahiro Yamada
-> _______________________________________________
-> kbuild-all mailing list
-> kbuild-all@lists.01.org
-> https://lists.01.org/mailman/listinfo/kbuild-all
+If the cc-can-link.sh fails, the BPFILTER_UMH is automatically
+hidden by the dependency.
+
+I also deleted 'default n', which is no-op.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Makefile               | 5 -----
+ net/Makefile           | 4 ----
+ net/bpfilter/Kconfig   | 2 +-
+ scripts/cc-can-link.sh | 2 +-
+ 4 files changed, 2 insertions(+), 11 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a6d4872..f71ea52 100644
+--- a/Makefile
++++ b/Makefile
+@@ -520,11 +520,6 @@ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLA
+   KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
+ endif
+ 
+-ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/cc-can-link.sh $(CC)), y)
+-  CC_CAN_LINK := y
+-  export CC_CAN_LINK
+-endif
+-
+ # The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
+ # Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
+ # CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
+diff --git a/net/Makefile b/net/Makefile
+index 13ec0d5..bdaf539 100644
+--- a/net/Makefile
++++ b/net/Makefile
+@@ -20,11 +20,7 @@ obj-$(CONFIG_TLS)		+= tls/
+ obj-$(CONFIG_XFRM)		+= xfrm/
+ obj-$(CONFIG_UNIX)		+= unix/
+ obj-$(CONFIG_NET)		+= ipv6/
+-ifneq ($(CC_CAN_LINK),y)
+-$(warning CC cannot link executables. Skipping bpfilter.)
+-else
+ obj-$(CONFIG_BPFILTER)		+= bpfilter/
+-endif
+ obj-$(CONFIG_PACKET)		+= packet/
+ obj-$(CONFIG_NET_KEY)		+= key/
+ obj-$(CONFIG_BRIDGE)		+= bridge/
+diff --git a/net/bpfilter/Kconfig b/net/bpfilter/Kconfig
+index a948b07..76deb66 100644
+--- a/net/bpfilter/Kconfig
++++ b/net/bpfilter/Kconfig
+@@ -1,6 +1,5 @@
+ menuconfig BPFILTER
+ 	bool "BPF based packet filtering framework (BPFILTER)"
+-	default n
+ 	depends on NET && BPF && INET
+ 	help
+ 	  This builds experimental bpfilter framework that is aiming to
+@@ -9,6 +8,7 @@ menuconfig BPFILTER
+ if BPFILTER
+ config BPFILTER_UMH
+ 	tristate "bpfilter kernel module with user mode helper"
++	depends on $(success,$(srctree)/scripts/cc-can-link.sh $(CC))
+ 	default m
+ 	help
+ 	  This builds bpfilter kernel module with embedded user mode helper
+diff --git a/scripts/cc-can-link.sh b/scripts/cc-can-link.sh
+index 208eb28..6efcead 100755
+--- a/scripts/cc-can-link.sh
++++ b/scripts/cc-can-link.sh
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-cat << "END" | $@ -x c - -o /dev/null >/dev/null 2>&1 && echo "y"
++cat << "END" | $@ -x c - -o /dev/null >/dev/null 2>&1
+ #include <stdio.h>
+ int main(void)
+ {
+-- 
+2.7.4
+
