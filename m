@@ -1,132 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:35228 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934027AbeF0TYE (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:41684 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751854AbeF0XIE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Jun 2018 15:24:04 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [PATCH 1/3] kconfig: avoid assert()-triggered segfaults in xfwrite()
-In-Reply-To: <CAK7LNASmkU0LUyG3aOeUNODrwkpp2=mBAWSVhePgGBO7R9Z1HA@mail.gmail.com>
-        (Masahiro Yamada's message of "Thu, 28 Jun 2018 01:29:49 +0900")
-References: <20180622192739.5327-1-dirk@gouders.net>
-        <20180622192739.5327-2-dirk@gouders.net>
-        <CAK7LNASmkU0LUyG3aOeUNODrwkpp2=mBAWSVhePgGBO7R9Z1HA@mail.gmail.com>
-Date: Wed, 27 Jun 2018 21:23:57 +0200
-Message-ID: <ghd0wc58z6.fsf@lena.gouders.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        Wed, 27 Jun 2018 19:08:04 -0400
+Date: Wed, 27 Jun 2018 16:08:00 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
+ sanitizer
+Message-Id: <20180627160800.3dc7f9ee41c0badbf7342520@linux-foundation.org>
+In-Reply-To: <cover.1530018818.git.andreyknvl@google.com>
+References: <cover.1530018818.git.andreyknvl@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>
 
-Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+On Tue, 26 Jun 2018 15:15:10 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
 
-> 2018-06-23 4:27 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
->> xfwrite uses assert() to ensure it does not operate on empty strings.
->> Two users respect this, expr_print_file_helper() doesn't and causes
->> segfaults e.g. when the dependency for an empty default string is printed.
->>
->> Fix this by calling xfwrite with an empty string pattern ("") for
->> empty strings.
->>
->> INITRAMFS_SOURCE was one symbol that caused this problem, with this
->> fix applied the zconfdump() output for this symbol looks as follows:
->>
->> ------------------------------------------------------------------------
->> config INITRAMFS_SOURCE
->>   string
->>   symbol INITRAMFS_SOURCE
->>   prompt "Initramfs source file(s)" if BLK_DEV_INITRD
->>   default "" if BLK_DEV_INITRD
->>   help
->> This can be either a single cpio archive with a .cpio suffix or a
->> space-separated list of directories and files for building the
->> initramfs image.  A cpio archive should contain a filesystem archive
->> to be used as an initramfs image.  Directories should contain a
->> filesystem layout to be included in the initramfs image.  Files
->> should contain entries according to the format described by the
->> "usr/gen_init_cpio" program in the kernel tree.
->>
->> When multiple directories and files are specified then the
->> initramfs image will be the aggregate of all of them.
->>
->> See <file:Documentation/early-userspace/README> for more details.
->>
->> If you are not sure, leave it blank.
->> ------------------------------------------------------------------------
->>
->> Signed-off-by: Dirk Gouders <dirk@gouders.net>
->> ---
->
->
-> Hmm, please let me think about this.
->
-> I know this is an easy way to fix the seg-fault,
-> but I think it is not a correct way.
->
->
->
-> If the config entry were like this:
->
-> config INITRAMFS_SOURCE
->         string "Initramfs source file(s)"
->         default "foo"
->
->
->
-> It would be dumped like this:
->
-> config INITRAMFS_SOURCE
->   string
->   symbol INITRAMFS_SOURCE
->   prompt "Initramfs source file(s)"
->   default foo
->
->
->
->
-> I want it to be displayed like this:
->
->    default "foo"
->
->
-> If we can quote the string values,
-> the problem will be eventually fixed.
->
-> It may not be easy to fix it...
+> This patchset adds a new mode to KASAN [1], which is called KHWASAN
+> (Kernel HardWare assisted Address SANitizer).
+> 
+> The plan is to implement HWASan [2] for the kernel with the incentive,
+> that it's going to have comparable to KASAN performance, but in the same
+> time consume much less memory, trading that off for somewhat imprecise
+> bug detection and being supported only for arm64.
 
-That's a good idea, it provides more consistency.
+Why do we consider this to be a worthwhile change?
 
-I will send an update and also replace the term "segfault" with "abort"
-as this is the way assert() terminates the program.
+Is KASAN's memory consumption actually a significant problem?  Some
+data regarding that would be very useful.
 
-Dirk
+If it is a large problem then we still have that problem on x86, so the
+problem remains largely unsolved?
 
->
->>  scripts/kconfig/expr.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
->> index e1a39e90841d..e064bf4c2881 100644
->> --- a/scripts/kconfig/expr.c
->> +++ b/scripts/kconfig/expr.c
->> @@ -1231,7 +1231,10 @@ void expr_print(struct expr *e,
->>
->>  static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
->>  {
->> -       xfwrite(str, strlen(str), 1, data);
->> +       if (*str != '\0')
->> +               xfwrite(str, strlen(str), 1, data);
->> +       else
->> +               xfwrite("\"\"", 2, 1, data);
->>  }
->>
->>  void expr_fprint(struct expr *e, FILE *out)
->> --
->> 2.13.6
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> ====== Benchmarks
+> 
+> The following numbers were collected on Odroid C2 board. Both KASAN and
+> KHWASAN were used in inline instrumentation mode.
+> 
+> Boot time [1]:
+> * ~1.7 sec for clean kernel
+> * ~5.0 sec for KASAN
+> * ~5.0 sec for KHWASAN
+> 
+> Slab memory usage after boot [2]:
+> * ~40 kb for clean kernel
+> * ~105 kb + 1/8th shadow ~= 118 kb for KASAN
+> * ~47 kb + 1/16th shadow ~= 50 kb for KHWASAN
+> 
+> Network performance [3]:
+> * 8.33 Gbits/sec for clean kernel
+> * 3.17 Gbits/sec for KASAN
+> * 2.85 Gbits/sec for KHWASAN
+> 
+> Note, that KHWASAN (compared to KASAN) doesn't require quarantine.
+> 
+> [1] Time before the ext4 driver is initialized.
+> [2] Measured as `cat /proc/meminfo | grep Slab`.
+> [3] Measured as `iperf -s & iperf -c 127.0.0.1 -t 30`.
+
+The above doesn't actually demonstrate the whole point of the
+patchset: to reduce KASAN's very high memory consumption?
+
