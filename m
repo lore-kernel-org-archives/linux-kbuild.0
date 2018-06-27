@@ -1,85 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:45986 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965110AbeF0QbY (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:35228 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934027AbeF0TYE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Jun 2018 12:31:24 -0400
-Received: from mail-ua0-f169.google.com (mail-ua0-f169.google.com [209.85.217.169]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id w5RGVFxH013701
-        for <linux-kbuild@vger.kernel.org>; Thu, 28 Jun 2018 01:31:16 +0900
-Received: by mail-ua0-f169.google.com with SMTP id r18-v6so1645107ual.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 27 Jun 2018 09:31:16 -0700 (PDT)
+        Wed, 27 Jun 2018 15:24:04 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: Re: [PATCH 1/3] kconfig: avoid assert()-triggered segfaults in xfwrite()
+In-Reply-To: <CAK7LNASmkU0LUyG3aOeUNODrwkpp2=mBAWSVhePgGBO7R9Z1HA@mail.gmail.com>
+        (Masahiro Yamada's message of "Thu, 28 Jun 2018 01:29:49 +0900")
+References: <20180622192739.5327-1-dirk@gouders.net>
+        <20180622192739.5327-2-dirk@gouders.net>
+        <CAK7LNASmkU0LUyG3aOeUNODrwkpp2=mBAWSVhePgGBO7R9Z1HA@mail.gmail.com>
+Date: Wed, 27 Jun 2018 21:23:57 +0200
+Message-ID: <ghd0wc58z6.fsf@lena.gouders.net>
 MIME-Version: 1.0
-In-Reply-To: <20180622192739.5327-3-dirk@gouders.net>
-References: <20180622192739.5327-1-dirk@gouders.net> <20180622192739.5327-3-dirk@gouders.net>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 28 Jun 2018 01:30:34 +0900
-Message-ID: <CAK7LNARBO2u4fn5_R08Q34DLZfg3VEa_N=mg3+vgNcGYr-_1wA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] kconfig: handle P_SYMBOL in print_symbol()
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-06-23 4:27 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
-> Each symbol has a property of type P_SYMBOL since commit
-> 59e89e3ddf8523be (kconfig: save location of config symbols).
-> Handle those properties in print_symbol().
+Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+
+> 2018-06-23 4:27 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
+>> xfwrite uses assert() to ensure it does not operate on empty strings.
+>> Two users respect this, expr_print_file_helper() doesn't and causes
+>> segfaults e.g. when the dependency for an empty default string is printed.
+>>
+>> Fix this by calling xfwrite with an empty string pattern ("") for
+>> empty strings.
+>>
+>> INITRAMFS_SOURCE was one symbol that caused this problem, with this
+>> fix applied the zconfdump() output for this symbol looks as follows:
+>>
+>> ------------------------------------------------------------------------
+>> config INITRAMFS_SOURCE
+>>   string
+>>   symbol INITRAMFS_SOURCE
+>>   prompt "Initramfs source file(s)" if BLK_DEV_INITRD
+>>   default "" if BLK_DEV_INITRD
+>>   help
+>> This can be either a single cpio archive with a .cpio suffix or a
+>> space-separated list of directories and files for building the
+>> initramfs image.  A cpio archive should contain a filesystem archive
+>> to be used as an initramfs image.  Directories should contain a
+>> filesystem layout to be included in the initramfs image.  Files
+>> should contain entries according to the format described by the
+>> "usr/gen_init_cpio" program in the kernel tree.
+>>
+>> When multiple directories and files are specified then the
+>> initramfs image will be the aggregate of all of them.
+>>
+>> See <file:Documentation/early-userspace/README> for more details.
+>>
+>> If you are not sure, leave it blank.
+>> ------------------------------------------------------------------------
+>>
+>> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+>> ---
 >
-> Further, place a pointer to print_symbol() in the comment above the
-> list of known property type.
 >
-> Signed-off-by: Dirk Gouders <dirk@gouders.net>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-
-
-Applied to linux-kbuild/fixes. Thanks!
-
-> ---
->  scripts/kconfig/expr.h  | 3 +++
->  scripts/kconfig/zconf.y | 4 ++++
->  2 files changed, 7 insertions(+)
+> Hmm, please let me think about this.
 >
-> diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-> index 94a383b21df6..f63b41b0dd49 100644
-> --- a/scripts/kconfig/expr.h
-> +++ b/scripts/kconfig/expr.h
-> @@ -171,6 +171,9 @@ struct symbol {
->   * config BAZ
->   *         int "BAZ Value"
->   *         range 1..255
-> + *
-> + * Please, also check zconf.y:print_symbol() when modifying the
-> + * list of property types!
->   */
->  enum prop_type {
->         P_UNKNOWN,
-> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-> index 6f9b0aa32a82..525b82c5fb58 100644
-> --- a/scripts/kconfig/zconf.y
-> +++ b/scripts/kconfig/zconf.y
-> @@ -717,6 +717,10 @@ static void print_symbol(FILE *out, struct menu *menu)
->                         print_quoted_string(out, prop->text);
->                         fputc('\n', out);
->                         break;
-> +               case P_SYMBOL:
-> +                       fputs( "  symbol ", out);
-> +                       fprintf(out, "%s\n", prop->sym->name);
-> +                       break;
->                 default:
->                         fprintf(out, "  unknown prop %d!\n", prop->type);
->                         break;
-> --
-> 2.13.6
+> I know this is an easy way to fix the seg-fault,
+> but I think it is not a correct way.
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> If the config entry were like this:
+>
+> config INITRAMFS_SOURCE
+>         string "Initramfs source file(s)"
+>         default "foo"
+>
+>
+>
+> It would be dumped like this:
+>
+> config INITRAMFS_SOURCE
+>   string
+>   symbol INITRAMFS_SOURCE
+>   prompt "Initramfs source file(s)"
+>   default foo
+>
+>
+>
+>
+> I want it to be displayed like this:
+>
+>    default "foo"
+>
+>
+> If we can quote the string values,
+> the problem will be eventually fixed.
+>
+> It may not be easy to fix it...
 
+That's a good idea, it provides more consistency.
 
+I will send an update and also replace the term "segfault" with "abort"
+as this is the way assert() terminates the program.
 
--- 
-Best Regards
-Masahiro Yamada
+Dirk
+
+>
+>>  scripts/kconfig/expr.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+>> index e1a39e90841d..e064bf4c2881 100644
+>> --- a/scripts/kconfig/expr.c
+>> +++ b/scripts/kconfig/expr.c
+>> @@ -1231,7 +1231,10 @@ void expr_print(struct expr *e,
+>>
+>>  static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
+>>  {
+>> -       xfwrite(str, strlen(str), 1, data);
+>> +       if (*str != '\0')
+>> +               xfwrite(str, strlen(str), 1, data);
+>> +       else
+>> +               xfwrite("\"\"", 2, 1, data);
+>>  }
+>>
+>>  void expr_fprint(struct expr *e, FILE *out)
+>> --
+>> 2.13.6
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
