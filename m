@@ -1,51 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yb0-f193.google.com ([209.85.213.193]:34826 "EHLO
-        mail-yb0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751634AbeFZWCt (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:26389 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751909AbeF0FxY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Jun 2018 18:02:49 -0400
-Received: by mail-yb0-f193.google.com with SMTP id x15-v6so3937213ybm.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jun 2018 15:02:49 -0700 (PDT)
+        Wed, 27 Jun 2018 01:53:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <46d20fac2dc15d842ebf23c62372ecdb892d7efd.camel@perches.com>
-References: <20180626174013.GA41617@beast> <46d20fac2dc15d842ebf23c62372ecdb892d7efd.camel@perches.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 26 Jun 2018 15:02:47 -0700
-Message-ID: <CAGXu5j+8uqu7vQeupbPF26UTnAvTrwYObqrVAueM9ztFKaH-qw@mail.gmail.com>
-Subject: Re: [RFC][PATCH] Makefile: globally enable VLA warning
+In-Reply-To: <152929772052.17463.10728056000221362647.stgit@noble>
+References: <152929708853.17463.17302660556961083137.stgit@noble> <152929772052.17463.10728056000221362647.stgit@noble>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 27 Jun 2018 14:52:33 +0900
+Message-ID: <CAK7LNAR2n_Kf7HEwWgLwH8sjyVAiJUWkvV7ZAbkNn0KgVTUx1Q@mail.gmail.com>
+Subject: Re: [PATCH 4/5] kbuild: disable KBUILD_MODNAME when building for mod.a
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, "Gustavo A. R. Silva" <gustavo@embeddedor.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Palmer Dabbelt <palmer@dabbelt.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, David Airlie <airlied@linux.ie>, linux-kbuild <linux-kbuild@vger.kernel.org>, intel-gfx@lists.freedesktop.org, Maling list - DRI developers <dri-devel@lists.freedesktop.org>, Linus Torvalds <torvalds@linux-foundation.org>
+To: NeilBrown <neilb@suse.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, Jun 26, 2018 at 1:21 PM, Joe Perches <joe@perches.com> wrote:
-> On Tue, 2018-06-26 at 10:40 -0700, Kees Cook wrote:
->> This is the patch I've got prepared now that fixes for all VLAs have been
->> sent to maintainers (some are still under review/adjustment, but there
->> aren't any unexplored cases left). My intention would be to have this land
->> at the end of the next merge window after all the pending VLA patches
->> have landed. I just wanted to get any feedback here, since it touches
->> a couple areas in the process and I didn't want anyone to be surprised. :)
-> []
->> diff --git a/Makefile b/Makefile
-> []
->> @@ -778,6 +778,9 @@ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
->>  # warn about C99 declaration after statement
->>  KBUILD_CFLAGS += $(call cc-option,-Wdeclaration-after-statement,)
->>
->> +# VLAs should not be used anywhere in the kernel
->> +KBUILD_CFLAGS += $(call cc-option,-Wvla)
+2018-06-18 13:55 GMT+09:00 NeilBrown <neilb@suse.com>:
+> When building an object to be included in mod.a we
+> cannot know the name of the module.  So don't define
+> KBUILD_MODNAME.  This will ensure attempt to use
+> that macro when the module name isn't know will
+> trigger an error.
+
+Honestly, I hate KBUILD_MODNAME.
+
+If KBUILD_MODNAME is undefined,
+you cannot call pr_debug() in the sub-directory for example.
+
+CONFIG_DYNAMIC_DEBUG requires KBUILD_MODNAME,
+but people often miss to notice that, then cause build errors.
+
+
+
+
+
+> Signed-off-by: NeilBrown <neilb@suse.com>
+> ---
+>  scripts/Makefile.lib |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> I'd probably spell out what a VLA is here.
-> # VLAs (Variable Length Arrays) should not be used anywhere in the kernel
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index c84167169a59..d09246474f2e 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -96,7 +96,7 @@ subdir-ym     := $(addprefix $(obj)/,$(subdir-ym))
+>  # Finds the multi-part object the current object will be linked into.
+>  # If the object belongs to two or more multi-part objects, all of them are
+>  # concatenated with a colon separator.
+> -modname-multi = $(subst $(space),:,$(sort $(foreach m,$(multi-used),\
+> +modname-multi = $(subst $(space),:,$(sort $(foreach m,$(multi-used) modobj.o,\
+>                 $(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=)))))
 >
-> Beyond that, seems sensible, thanks.
+>  modname = $(if $(modname-multi),$(modname-multi),$(basetarget))
+> @@ -106,7 +106,7 @@ modname = $(if $(modname-multi),$(modname-multi),$(basetarget))
+>  # end up in (or would, if it gets compiled in)
+>  name-fix = $(squote)$(quote)$(subst $(comma),_,$(subst -,_,$1))$(quote)$(squote)
+>  basename_flags = -DKBUILD_BASENAME=$(call name-fix,$(basetarget))
+> -modname_flags  = -DKBUILD_MODNAME=$(call name-fix,$(modname))
+> +modname_flags  = $(if $(filter-out modobj,$(modname)),-DKBUILD_MODNAME=$(call name-fix,$(modname)))
+>
+>  orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) \
+>                   $(ccflags-y) $(CFLAGS_$(basetarget).o)
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Ah yes, good idea. I've made that change locally now. Thanks!
 
--Kees
 
 -- 
-Kees Cook
-Pixel Security
+Best Regards
+Masahiro Yamada
