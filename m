@@ -1,90 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:25231 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965245AbeF1Nkf (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:44237 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966300AbeF1N5Z (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Jun 2018 09:40:35 -0400
+        Thu, 28 Jun 2018 09:57:25 -0400
 MIME-Version: 1.0
-In-Reply-To: <201806240006.eCGYTuNX%fengguang.wu@intel.com>
-References: <1529762169-13488-1-git-send-email-yamada.masahiro@socionext.com> <201806240006.eCGYTuNX%fengguang.wu@intel.com>
+In-Reply-To: <d55c2992-09b8-5182-419d-8efa5782ea16@redhat.com>
+References: <20180612003224.3658-1-labbott@redhat.com> <20180612003224.3658-4-labbott@redhat.com>
+ <20180621124334.GA30110@gmail.com> <d55c2992-09b8-5182-419d-8efa5782ea16@redhat.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 28 Jun 2018 22:39:33 +0900
-Message-ID: <CAK7LNATEc6SO9ws9zS7zAnQThKf8q1bK1S3DdSGKfipDz8sAhA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] kbuild: use 'include' directive to load auto.conf
- from top Makefile
+Date: Thu, 28 Jun 2018 22:56:27 +0900
+Message-ID: <CAK7LNATnp8oow-Ra36Ucy3GOfYH_TxmxCPkwMw6WceW5fTbCcA@mail.gmail.com>
+Subject: Re: [PATCHv4 3/3] x86: Add build salt to the vDSO and kernel linker scripts
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Laura Abbott <labbott@redhat.com>
+Cc: Ingo Molnar <mingo@kernel.org>, Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-06-24 3:59 GMT+09:00 kbuild test robot <lkp@intel.com>:
-> Hi Masahiro,
+Hi.
+
+
+2018-06-22 0:58 GMT+09:00 Laura Abbott <labbott@redhat.com>:
+> On 06/21/2018 05:43 AM, Ingo Molnar wrote:
+>>
+>>
+>> * Laura Abbott <labbott@redhat.com> wrote:
+>>
+>>>
+>>> Both the kernel and the vDSO need to have unique build ids.
+>>> Insert the build salt section to make the build ids unique.
+>>>
+>>> Signed-off-by: Laura Abbott <labbott@redhat.com>
+>>> ---
+>>>   arch/x86/entry/vdso/vdso-layout.lds.S | 3 ++-
+>>>   arch/x86/kernel/vmlinux.lds.S         | 1 +
+>>>   2 files changed, 3 insertions(+), 1 deletion(-)
+>>
+>>
+>> Acked-by: Ingo Molnar <mingo@kernel.org>
+>>
+>> What is the upstream merge plan for this series? kbuild tree?
+>>
+>> Thanks,
+>>
+>>         Ingo
+>>
 >
-> I love your patch! Yet something to improve:
->
-> [auto build test ERROR on kbuild/for-next]
-> [also build test ERROR on v4.18-rc1 next-20180622]
-> [cannot apply to mmarek/for-next mmarek/rc-fixes]
-> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
->
-> url:    https://github.com/0day-ci/linux/commits/Masahiro-Yamada/kbuild-use-include-directive-to-load-auto-conf-from-top-Makefile/20180623-220114
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
-> config: xtensa-nommu_kc705_defconfig (attached as .config)
-> compiler: xtensa-de212-elf-gcc (crosstool-NG crosstool-ng-1.23.0-307-g452ee331) 7.3.0
-> reproduce:
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # save the attached .config to linux build tree
->         GCC_VERSION=7.3.0 make.cross ARCH=xtensa
->
-> All errors (new ones prefixed by >>):
->
->>> Makefile:592: include/config/auto.conf: No such file or directory
+> There was an alternate proposal that requires slightly fewer
+> changes that needs to be cleaned up and submitted. I do
+> think the plan is for the series to eventually go through
+> the kbuild tree.
 
 
-I was able to reproduce this.
-
-
-This depends on the version of GNU Make.
-
-The warning is displayed if you use GNU Make 4.1 or older.
-No more annoying warning is displayed for GNU Make 4.2 or later.
-
-Probably, this commit in GNU Make:
-
-commit 87a5f98d248fe63fe6e3e53ee3e1b1b1fa5e49dc
-Author: Paul Smith <psmith@gnu.org>
-Date:   Sat Apr 9 19:49:27 2016 -0400
-
-    [SV 102] Don't show unnecessary include file errors.
-
-
-However, 4.2 is quite new.  I will do something with it.
-
+Yes.  V5 is welcome.
 
 Thanks.
 
 
-
-
-
-
->    drivers/staging/mt7621-dts/Kconfig:4:warning: 'BUILTIN_DTB' has wrong type. 'select' only accept arguments of bool and tristate type
->    <stdin>:1332:2: warning: #warning syscall io_pgetevents not implemented [-Wcpp]
->    <stdin>:1335:2: warning: #warning syscall rseq not implemented [-Wcpp]
->
-> vim +592 Makefile
->
->    590
->    591  ifeq ($(dot-config),1)
->  > 592  include include/config/auto.conf
->    593  endif
->    594
->
-> ---
-> 0-DAY kernel test infrastructure                Open Source Technology Center
-> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
 
 
