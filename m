@@ -1,133 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39506 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1030575AbeF1TDo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Jun 2018 15:03:44 -0400
-Date: Thu, 28 Jun 2018 11:16:23 +0200
-From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
-Subject: Re: due to kconfig changes kernel config file is no longer
- sufficient for configuring the kernel
-Message-ID: <20180628111623.3807fe9b@naga.suse.cz>
-In-Reply-To: <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
-References: <20180627143705.5a1fed1c@kitsune.suse.cz>
-        <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:40836 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934012AbeF1Tkm (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 28 Jun 2018 15:40:42 -0400
+Date: Thu, 28 Jun 2018 12:40:39 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
+ sanitizer
+Message-Id: <20180628124039.8a42ab5e2994fb2876ff4f75@linux-foundation.org>
+In-Reply-To: <CAAeHK+xz552VNpZxgWwU-hbTqF5_F6YVDw3fSv=4OT8mNrqPzg@mail.gmail.com>
+References: <cover.1530018818.git.andreyknvl@google.com>
+        <20180627160800.3dc7f9ee41c0badbf7342520@linux-foundation.org>
+        <CAAeHK+xz552VNpZxgWwU-hbTqF5_F6YVDw3fSv=4OT8mNrqPzg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Takashi Iwai <tiwai@suse.de>, Andreas Schwab <schwab@suse.de>, Michal Kubecek <mkubecek@suse.cz>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>
 
-On Wed, 27 Jun 2018 23:07:21 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+On Thu, 28 Jun 2018 20:29:07 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
 
-> Hi.
-> 
-> 
-> 2018-06-27 21:37 GMT+09:00 Michal Suchánek <msuchanek@suse.de>:
-> > Hello,
+> >> Slab memory usage after boot [2]:
+> >> * ~40 kb for clean kernel
+> >> * ~105 kb + 1/8th shadow ~= 118 kb for KASAN
+> >> * ~47 kb + 1/16th shadow ~= 50 kb for KHWASAN
+> >>
+> >> Network performance [3]:
+> >> * 8.33 Gbits/sec for clean kernel
+> >> * 3.17 Gbits/sec for KASAN
+> >> * 2.85 Gbits/sec for KHWASAN
+> >>
+> >> Note, that KHWASAN (compared to KASAN) doesn't require quarantine.
+> >>
+> >> [1] Time before the ext4 driver is initialized.
+> >> [2] Measured as `cat /proc/meminfo | grep Slab`.
+> >> [3] Measured as `iperf -s & iperf -c 127.0.0.1 -t 30`.
 > >
-> > in the x86 Kconfig we have this:
-> >
-> > # Select 32 or 64 bit
-> > config 64BIT
-> >         bool "64-bit kernel" if "$(ARCH)" = "x86"
-> >         default "$(ARCH)" != "i386"
-> >         ---help---
-> >           Say yes to build a 64-bit kernel - formerly known as
-> > x86_64 Say no to build a 32-bit kernel - formerly known as i386
-> >
-> > Since commit 104daea149c4 ("kconfig: reference environment variables
-> > directly and remove 'option env='") the value of ARCH is not saved
-> > in the kernel config.  
+> > The above doesn't actually demonstrate the whole point of the
+> > patchset: to reduce KASAN's very high memory consumption?
 > 
-> I think this commit is unrelated.  It was just a syntax change.
+> You mean that memory usage numbers collected after boot don't give a
+> representative picture of actual memory consumption on real workloads?
+> 
+> What kind of memory consumption testing would you like to see?
 
-This does not look like syntax only change to me:
+Well, 100kb or so is a teeny amount on virtually any machine.  I'm
+assuming the savings are (much) more significant once the machine gets
+loaded up and doing work?
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 15aae32e0719..1217fc62ca61 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1,20 +1,12 @@
--config ARCH
--       string
--       option env="ARCH"
--
--config KERNELVERSION
--       string
--       option env="KERNELVERSION"
--
-
-> 
-> Unless I am missing something,
-> we have never saved ARCH in the .config in the past.
-
-There was a config symbol defined for it before the commit removed it.
-
-> 
-> 
-> > Since commit f467c5640c29 ("kconfig: only write '#
-> > CONFIG_FOO is not set' for visible symbols") the value of 64BIT is
-> > not saved if the ARCH is set i386 or x86_64 because the symbol is
-> > not visible.  
-> 
-> This is correct.
-> 
-> It was discussed a few weeks ago.
-> 
-> https://lkml.org/lkml/2018/6/5/847
-> 
-> 
-> > There is a number of ways to hack this particular case to work.
-> >
-> > However, there is a more general problem with this. Some config
-> > options may depend on the environment, may not be saved, and the
-> > environment is not saved either.  
-> 
-> Which environment variables in particular are in your mind?
-
-Any that is used in Kconfig.
-
-> 
-> As for ARCH, you need to pass the same ARCH as you used for building
-> the kernel. (For native building, you do not have to pass ARCH
-> explicitly, though.)
-
-Except if you do pass it to make config you may need to pass it to to
-make later as well.
-
-> 
-> As for CC, HOSTCC, etc.
-> yes, these are new 'unsaved' environments.
-> 
-> CONFIG options now depend on the compiler.
-> This is the concept suggested by Linus Torvalds.
-> 
-> 
-> > So in the end all the infrastructure with symlinks
-> > from module directory pointing to the kernel source and object
-> > directory is useless. To interpret the config stored there you need
-> > the environment and that is not saved anywhere. So if you try to
-> > build out-of-tree module it might end up reconfiguring your kernel
-> > and producing useless modules.  
-> 
-> No. out-of-tree module building never ever re-configures the kernel.
-
-It does implicitly because the config values depend on environment that
-is not saved and the values themselves are not saved either. If that
-happens to expose a new variable it is even explicitly reconfigured.
-
-> 
-> out-of-tree modules are built with exactly the same configuration
-> as used for the kernel.
-
-It is not true. And that is the problem. You need the config file and
-dump of the environment passed to the make command at configuration
-time to get the exact same configuration. The environment is not saved
-anywhere, though.
-
-Thanks
-
-Michal
