@@ -1,60 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:45040 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932203AbeF1KvV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Jun 2018 06:51:21 -0400
-Date: Thu, 28 Jun 2018 11:51:06 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
- sanitizer
-Message-ID: <20180628105057.GA26019@e103592.cambridge.arm.com>
-References: <cover.1530018818.git.andreyknvl@google.com>
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:25231 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965245AbeF1Nkf (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 28 Jun 2018 09:40:35 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1530018818.git.andreyknvl@google.com>
+In-Reply-To: <201806240006.eCGYTuNX%fengguang.wu@intel.com>
+References: <1529762169-13488-1-git-send-email-yamada.masahiro@socionext.com> <201806240006.eCGYTuNX%fengguang.wu@intel.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 28 Jun 2018 22:39:33 +0900
+Message-ID: <CAK7LNATEc6SO9ws9zS7zAnQThKf8q1bK1S3DdSGKfipDz8sAhA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] kbuild: use 'include' directive to load auto.conf
+ from top Makefile
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
+To: kbuild test robot <lkp@intel.com>
+Cc: kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Jun 26, 2018 at 03:15:10PM +0200, Andrey Konovalov wrote:
-> This patchset adds a new mode to KASAN [1], which is called KHWASAN
-> (Kernel HardWare assisted Address SANitizer).
-> 
-> The plan is to implement HWASan [2] for the kernel with the incentive,
-> that it's going to have comparable to KASAN performance, but in the same
-> time consume much less memory, trading that off for somewhat imprecise
-> bug detection and being supported only for arm64.
-> 
-> The overall idea of the approach used by KHWASAN is the following:
-> 
-> 1. By using the Top Byte Ignore arm64 CPU feature, we can store pointer
->    tags in the top byte of each kernel pointer.
-
-[...]
-
-This is a change from the current situation, so the kernel may be
-making implicit assumptions about the top byte of kernel addresses.
-
-Randomising the top bits may cause things like address conversions and
-pointer arithmetic to break.
-
-For example, (q - p) will not produce the expected result if q and p
-have different tags.
-
-Conversions, such as between pointer and pfn, may also go wrong if not
-appropriately masked.
-
-There are also potential pointer comparison and aliasing issues if
-the tag bits are ever stripped or modified.
+2018-06-24 3:59 GMT+09:00 kbuild test robot <lkp@intel.com>:
+> Hi Masahiro,
+>
+> I love your patch! Yet something to improve:
+>
+> [auto build test ERROR on kbuild/for-next]
+> [also build test ERROR on v4.18-rc1 next-20180622]
+> [cannot apply to mmarek/for-next mmarek/rc-fixes]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+>
+> url:    https://github.com/0day-ci/linux/commits/Masahiro-Yamada/kbuild-use-include-directive-to-load-auto-conf-from-top-Makefile/20180623-220114
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
+> config: xtensa-nommu_kc705_defconfig (attached as .config)
+> compiler: xtensa-de212-elf-gcc (crosstool-NG crosstool-ng-1.23.0-307-g452ee331) 7.3.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         GCC_VERSION=7.3.0 make.cross ARCH=xtensa
+>
+> All errors (new ones prefixed by >>):
+>
+>>> Makefile:592: include/config/auto.conf: No such file or directory
 
 
-What was your approach to tracking down all the points in the code
-where we have a potential issue?
+I was able to reproduce this.
 
-(I haven't dug through the series in detail yet, so this may be
-answered somewhere already...)
 
-Cheers
----Dave
+This depends on the version of GNU Make.
+
+The warning is displayed if you use GNU Make 4.1 or older.
+No more annoying warning is displayed for GNU Make 4.2 or later.
+
+Probably, this commit in GNU Make:
+
+commit 87a5f98d248fe63fe6e3e53ee3e1b1b1fa5e49dc
+Author: Paul Smith <psmith@gnu.org>
+Date:   Sat Apr 9 19:49:27 2016 -0400
+
+    [SV 102] Don't show unnecessary include file errors.
+
+
+However, 4.2 is quite new.  I will do something with it.
+
+
+Thanks.
+
+
+
+
+
+
+>    drivers/staging/mt7621-dts/Kconfig:4:warning: 'BUILTIN_DTB' has wrong type. 'select' only accept arguments of bool and tristate type
+>    <stdin>:1332:2: warning: #warning syscall io_pgetevents not implemented [-Wcpp]
+>    <stdin>:1335:2: warning: #warning syscall rseq not implemented [-Wcpp]
+>
+> vim +592 Makefile
+>
+>    590
+>    591  ifeq ($(dot-config),1)
+>  > 592  include include/config/auto.conf
+>    593  endif
+>    594
+>
+> ---
+> 0-DAY kernel test infrastructure                Open Source Technology Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
