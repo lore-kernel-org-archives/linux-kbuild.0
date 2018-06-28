@@ -1,57 +1,133 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f66.google.com ([209.85.214.66]:39599 "EHLO
-        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935280AbeF1S4n (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Jun 2018 14:56:43 -0400
-Received: by mail-it0-f66.google.com with SMTP id p185-v6so14055366itp.4
-        for <linux-kbuild@vger.kernel.org>; Thu, 28 Jun 2018 11:56:43 -0700 (PDT)
+Received: from mx2.suse.de ([195.135.220.15]:39506 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1030575AbeF1TDo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 28 Jun 2018 15:03:44 -0400
+Date: Thu, 28 Jun 2018 11:16:23 +0200
+From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+Subject: Re: due to kconfig changes kernel config file is no longer
+ sufficient for configuring the kernel
+Message-ID: <20180628111623.3807fe9b@naga.suse.cz>
+In-Reply-To: <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
+References: <20180627143705.5a1fed1c@kitsune.suse.cz>
+        <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180628105057.GA26019@e103592.cambridge.arm.com>
-References: <cover.1530018818.git.andreyknvl@google.com> <20180628105057.GA26019@e103592.cambridge.arm.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Thu, 28 Jun 2018 20:56:41 +0200
-Message-ID: <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
-Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address sanitizer
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Takashi Iwai <tiwai@suse.de>, Andreas Schwab <schwab@suse.de>, Michal Kubecek <mkubecek@suse.cz>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org
 
-On Thu, Jun 28, 2018 at 12:51 PM, Dave Martin <Dave.Martin@arm.com> wrote:
-> On Tue, Jun 26, 2018 at 03:15:10PM +0200, Andrey Konovalov wrote:
->> 1. By using the Top Byte Ignore arm64 CPU feature, we can store pointer
->>    tags in the top byte of each kernel pointer.
->
-> [...]
->
-> This is a change from the current situation, so the kernel may be
-> making implicit assumptions about the top byte of kernel addresses.
->
-> Randomising the top bits may cause things like address conversions and
-> pointer arithmetic to break.
->
-> For example, (q - p) will not produce the expected result if q and p
-> have different tags.
+On Wed, 27 Jun 2018 23:07:21 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-If q and p have different tags, that means they come from different
-allocations. I don't think it would make sense to calculate pointer
-difference in this case.
+> Hi.
+> 
+> 
+> 2018-06-27 21:37 GMT+09:00 Michal Suchánek <msuchanek@suse.de>:
+> > Hello,
+> >
+> > in the x86 Kconfig we have this:
+> >
+> > # Select 32 or 64 bit
+> > config 64BIT
+> >         bool "64-bit kernel" if "$(ARCH)" = "x86"
+> >         default "$(ARCH)" != "i386"
+> >         ---help---
+> >           Say yes to build a 64-bit kernel - formerly known as
+> > x86_64 Say no to build a 32-bit kernel - formerly known as i386
+> >
+> > Since commit 104daea149c4 ("kconfig: reference environment variables
+> > directly and remove 'option env='") the value of ARCH is not saved
+> > in the kernel config.  
+> 
+> I think this commit is unrelated.  It was just a syntax change.
 
->
-> Conversions, such as between pointer and pfn, may also go wrong if not
-> appropriately masked.
->
-> There are also potential pointer comparison and aliasing issues if
-> the tag bits are ever stripped or modified.
->
->
-> What was your approach to tracking down all the points in the code
-> where we have a potential issue?
+This does not look like syntax only change to me:
 
-I've been fuzzing the kernel built with KWHASAN with syzkaller. This
-gives a decent coverage and I was able to find some places where
-fixups were required this way. Right now the fuzzer is running without
-issues. It doesn't prove that all such places are fixed, but I don't
-know a better way to test this.
+diff --git a/init/Kconfig b/init/Kconfig
+index 15aae32e0719..1217fc62ca61 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1,20 +1,12 @@
+-config ARCH
+-       string
+-       option env="ARCH"
+-
+-config KERNELVERSION
+-       string
+-       option env="KERNELVERSION"
+-
+
+> 
+> Unless I am missing something,
+> we have never saved ARCH in the .config in the past.
+
+There was a config symbol defined for it before the commit removed it.
+
+> 
+> 
+> > Since commit f467c5640c29 ("kconfig: only write '#
+> > CONFIG_FOO is not set' for visible symbols") the value of 64BIT is
+> > not saved if the ARCH is set i386 or x86_64 because the symbol is
+> > not visible.  
+> 
+> This is correct.
+> 
+> It was discussed a few weeks ago.
+> 
+> https://lkml.org/lkml/2018/6/5/847
+> 
+> 
+> > There is a number of ways to hack this particular case to work.
+> >
+> > However, there is a more general problem with this. Some config
+> > options may depend on the environment, may not be saved, and the
+> > environment is not saved either.  
+> 
+> Which environment variables in particular are in your mind?
+
+Any that is used in Kconfig.
+
+> 
+> As for ARCH, you need to pass the same ARCH as you used for building
+> the kernel. (For native building, you do not have to pass ARCH
+> explicitly, though.)
+
+Except if you do pass it to make config you may need to pass it to to
+make later as well.
+
+> 
+> As for CC, HOSTCC, etc.
+> yes, these are new 'unsaved' environments.
+> 
+> CONFIG options now depend on the compiler.
+> This is the concept suggested by Linus Torvalds.
+> 
+> 
+> > So in the end all the infrastructure with symlinks
+> > from module directory pointing to the kernel source and object
+> > directory is useless. To interpret the config stored there you need
+> > the environment and that is not saved anywhere. So if you try to
+> > build out-of-tree module it might end up reconfiguring your kernel
+> > and producing useless modules.  
+> 
+> No. out-of-tree module building never ever re-configures the kernel.
+
+It does implicitly because the config values depend on environment that
+is not saved and the values themselves are not saved either. If that
+happens to expose a new variable it is even explicitly reconfigured.
+
+> 
+> out-of-tree modules are built with exactly the same configuration
+> as used for the kernel.
+
+It is not true. And that is the problem. You need the config file and
+dump of the environment passed to the make command at configuration
+time to get the exact same configuration. The environment is not saved
+anywhere, though.
+
+Thanks
+
+Michal
