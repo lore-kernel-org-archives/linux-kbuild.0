@@ -1,53 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:40836 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934012AbeF1Tkm (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:35502 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752005AbeF1Xjy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Jun 2018 15:40:42 -0400
-Date: Thu, 28 Jun 2018 12:40:39 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
- sanitizer
-Message-Id: <20180628124039.8a42ab5e2994fb2876ff4f75@linux-foundation.org>
-In-Reply-To: <CAAeHK+xz552VNpZxgWwU-hbTqF5_F6YVDw3fSv=4OT8mNrqPzg@mail.gmail.com>
-References: <cover.1530018818.git.andreyknvl@google.com>
-        <20180627160800.3dc7f9ee41c0badbf7342520@linux-foundation.org>
-        <CAAeHK+xz552VNpZxgWwU-hbTqF5_F6YVDw3fSv=4OT8mNrqPzg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Thu, 28 Jun 2018 19:39:54 -0400
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH v4] kconfig: check for pkg-config on make {menu,n,g,x}config
+Message-ID: <c2541256-d3de-e0cf-077c-cdb590c3c152@infradead.org>
+Date: Thu, 28 Jun 2018 16:39:50 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: =?UTF-8?Q?Bj=c3=b8rn_Forsman?= <bjorn.forsman@gmail.com>
 
-On Thu, 28 Jun 2018 20:29:07 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
+From: Randy Dunlap <rdunlap@infradead.org>
 
-> >> Slab memory usage after boot [2]:
-> >> * ~40 kb for clean kernel
-> >> * ~105 kb + 1/8th shadow ~= 118 kb for KASAN
-> >> * ~47 kb + 1/16th shadow ~= 50 kb for KHWASAN
-> >>
-> >> Network performance [3]:
-> >> * 8.33 Gbits/sec for clean kernel
-> >> * 3.17 Gbits/sec for KASAN
-> >> * 2.85 Gbits/sec for KHWASAN
-> >>
-> >> Note, that KHWASAN (compared to KASAN) doesn't require quarantine.
-> >>
-> >> [1] Time before the ext4 driver is initialized.
-> >> [2] Measured as `cat /proc/meminfo | grep Slab`.
-> >> [3] Measured as `iperf -s & iperf -c 127.0.0.1 -t 30`.
-> >
-> > The above doesn't actually demonstrate the whole point of the
-> > patchset: to reduce KASAN's very high memory consumption?
-> 
-> You mean that memory usage numbers collected after boot don't give a
-> representative picture of actual memory consumption on real workloads?
-> 
-> What kind of memory consumption testing would you like to see?
+Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
+that other required files are present and to determine build flags
+settings, but none of these check that pkg-config itself is present.
+Add a check for all 4 of these targets and update
+Documentation/process/changes.rst to mention 'pkg-config'.
 
-Well, 100kb or so is a teeny amount on virtually any machine.  I'm
-assuming the savings are (much) more significant once the machine gets
-loaded up and doing work?
+Fixes kernel bugzilla #77511:
+https://bugzilla.kernel.org/show_bug.cgi?id=77511
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Bjørn Forsman <bjorn.forsman@gmail.com>
+---
+v4: apply Masahiro's suggestions
+
+Strictly speaking, pkg-config is not required if someone is only
+using 'make {menu,n}config' since there are fallbacks for those
+two targets.
+
+ Documentation/process/changes.rst  |    8 ++++++++
+ scripts/kconfig/Makefile           |    1 +
+ scripts/kconfig/check-pkgconfig.sh |    8 ++++++++
+ 3 files changed, 17 insertions(+)
+
+--- linux-next-20180628.orig/scripts/kconfig/Makefile
++++ linux-next-20180628/scripts/kconfig/Makefile
+@@ -215,6 +215,7 @@ $(obj)/zconf.tab.o: $(obj)/zconf.lex.c
+ 
+ # check if necessary packages are available, and configure build flags
+ define filechk_conf_cfg
++	$(CONFIG_SHELL) $(srctree)/scripts/kconfig/check-pkgconfig.sh; \
+ 	$(CONFIG_SHELL) $<
+ endef
+ 
+--- /dev/null
++++ linux-next-20180628/scripts/kconfig/check-pkgconfig.sh
+@@ -0,0 +1,8 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++# Check for pkg-config presence
++
++if [ -z $(command -v pkg-config) ]; then
++	echo "'make *config' requires 'pkg-config'. Please install it." 1>&2
++	exit 1
++fi
+--- linux-next-20180628.orig/Documentation/process/changes.rst
++++ linux-next-20180628/Documentation/process/changes.rst
+@@ -81,6 +81,14 @@ The build system has, as of 4.13, switch
+ rather than incremental linking (`ld -r`) for built-in.a intermediate steps.
+ This requires binutils 2.20 or newer.
+ 
++pkg-config
++----------
++
++The build system, as of 4.18, requires pkg-config to check for installed
++kconfig tools and to determine flags settings for use in
++'make {menu,n,g,x}config'.  Previously pkg-config was being used but not
++verified or documented.
++
+ Flex
+ ----
+ 
 
