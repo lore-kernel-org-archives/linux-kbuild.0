@@ -1,66 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:44237 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S966300AbeF1N5Z (ORCPT
+Received: from mail-io0-f196.google.com ([209.85.223.196]:39599 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966518AbeF1S0l (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Jun 2018 09:57:25 -0400
+        Thu, 28 Jun 2018 14:26:41 -0400
+Received: by mail-io0-f196.google.com with SMTP id e13-v6so6137550iof.6
+        for <linux-kbuild@vger.kernel.org>; Thu, 28 Jun 2018 11:26:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d55c2992-09b8-5182-419d-8efa5782ea16@redhat.com>
-References: <20180612003224.3658-1-labbott@redhat.com> <20180612003224.3658-4-labbott@redhat.com>
- <20180621124334.GA30110@gmail.com> <d55c2992-09b8-5182-419d-8efa5782ea16@redhat.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 28 Jun 2018 22:56:27 +0900
-Message-ID: <CAK7LNATnp8oow-Ra36Ucy3GOfYH_TxmxCPkwMw6WceW5fTbCcA@mail.gmail.com>
-Subject: Re: [PATCHv4 3/3] x86: Add build salt to the vDSO and kernel linker scripts
+In-Reply-To: <20180627181138.14c9b66e13b8778506205f89@linux-foundation.org>
+References: <cover.1530018818.git.andreyknvl@google.com> <20180627160800.3dc7f9ee41c0badbf7342520@linux-foundation.org>
+ <CAN=P9pivApAo76Kjc0TUDE0kvJn0pET=47xU6e=ioZV2VqO0Rg@mail.gmail.com>
+ <CAEZpscCcP6=O_OCqSwW8Y6u9Ee99SzWN+hRcgpP2tK=OEBFnNw@mail.gmail.com> <20180627181138.14c9b66e13b8778506205f89@linux-foundation.org>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Thu, 28 Jun 2018 20:26:39 +0200
+Message-ID: <CAAeHK+wg35W6D3Cat7w8kqV+9fB6dKmnCUuUrZP_tz5=vKk+0Q@mail.gmail.com>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address sanitizer
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Ingo Molnar <mingo@kernel.org>, Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Vishwath Mohan <vishwath@google.com>, Kostya Serebryany <kcc@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>
 
-Hi.
-
-
-2018-06-22 0:58 GMT+09:00 Laura Abbott <labbott@redhat.com>:
-> On 06/21/2018 05:43 AM, Ingo Molnar wrote:
+On Thu, Jun 28, 2018 at 3:11 AM, Andrew Morton
+<akpm@linux-foundation.org> wrote:
+> On Wed, 27 Jun 2018 17:59:00 -0700 Vishwath Mohan <vishwath@google.com> wrote:
+>> Yeah, I can confirm that it's an issue. Like Kostya mentioned, I don't have
+>> data on-hand, but anecdotally both ASAN and KASAN have proven problematic
+>> to enable for environments that don't tolerate the increased memory
+>> pressure well. This includes,
+>> (a) Low-memory form factors - Wear, TV, Things, lower-tier phones like Go
+>> (c) Connected components like Pixel's visual core
+>> <https://www.blog.google/products/pixel/pixel-visual-core-image-processing-and-machine-learning-pixel-2/>
 >>
 >>
->> * Laura Abbott <labbott@redhat.com> wrote:
->>
->>>
->>> Both the kernel and the vDSO need to have unique build ids.
->>> Insert the build salt section to make the build ids unique.
->>>
->>> Signed-off-by: Laura Abbott <labbott@redhat.com>
->>> ---
->>>   arch/x86/entry/vdso/vdso-layout.lds.S | 3 ++-
->>>   arch/x86/kernel/vmlinux.lds.S         | 1 +
->>>   2 files changed, 3 insertions(+), 1 deletion(-)
->>
->>
->> Acked-by: Ingo Molnar <mingo@kernel.org>
->>
->> What is the upstream merge plan for this series? kbuild tree?
->>
->> Thanks,
->>
->>         Ingo
->>
+>> These are both places I'd love to have a low(er) memory footprint option at
+>> my disposal.
 >
-> There was an alternate proposal that requires slightly fewer
-> changes that needs to be cleaned up and submitted. I do
-> think the plan is for the series to eventually go through
-> the kbuild tree.
+> Thanks.
+>
+> It really is important that such information be captured in the
+> changelogs.  In as much detail as can be mustered.
 
-
-Yes.  V5 is welcome.
-
-Thanks.
-
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+I'll add it to the changelog in v5. Thanks!
