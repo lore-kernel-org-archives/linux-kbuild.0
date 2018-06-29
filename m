@@ -1,33 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:39873 "EHLO
-        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S967075AbeF2QgM (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 29 Jun 2018 12:36:12 -0400
-Received: by mail-io0-f196.google.com with SMTP id e13-v6so8984685iof.6
-        for <linux-kbuild@vger.kernel.org>; Fri, 29 Jun 2018 09:36:12 -0700 (PDT)
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:59200 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751901AbeF2KOo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 29 Jun 2018 06:14:44 -0400
+Date: Fri, 29 Jun 2018 11:14:35 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
+ sanitizer
+Message-ID: <20180629101435.263hujat2amnm3hi@lakrids.cambridge.arm.com>
+References: <cover.1530018818.git.andreyknvl@google.com>
+ <20180628105057.GA26019@e103592.cambridge.arm.com>
+ <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180629110709.GA17859@arm.com>
-References: <cover.1530018818.git.andreyknvl@google.com> <20180628105057.GA26019@e103592.cambridge.arm.com>
- <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com> <20180629110709.GA17859@arm.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Fri, 29 Jun 2018 18:36:10 +0200
-Message-ID: <CAAeHK+wHd8B2nhat-Z2Y2=s4NVobPG7vjr2CynjFhqPTwQRepQ@mail.gmail.com>
-Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address sanitizer
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Will Deacon <will.deacon@arm.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Dave Martin <Dave.Martin@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 
-On Fri, Jun 29, 2018 at 1:07 PM, Will Deacon <will.deacon@arm.com> wrote:
-> It might not seen sensible, but we could still be relying on this in the
-> kernel and so this change would introduce a regression. I think we need
-> a way to identify such pointer usage before these patches can seriously be
-> considered for mainline inclusion.
+On Thu, Jun 28, 2018 at 08:56:41PM +0200, Andrey Konovalov wrote:
+> On Thu, Jun 28, 2018 at 12:51 PM, Dave Martin <Dave.Martin@arm.com> wrote:
+> > On Tue, Jun 26, 2018 at 03:15:10PM +0200, Andrey Konovalov wrote:
+> >> 1. By using the Top Byte Ignore arm64 CPU feature, we can store pointer
+> >>    tags in the top byte of each kernel pointer.
+> >
+> > [...]
+> >
+> > This is a change from the current situation, so the kernel may be
+> > making implicit assumptions about the top byte of kernel addresses.
 
-Another point that I have here is that KHWASAN is a debugging tool not
-meant to be used in production. We're not trying to change the ABI or
-something like that (referring to the other HWASAN patchset). We can
-fix up the non obvious places where untagging is needed in a case by
-case basis with additional patches when testing reveals it.
+[...]
+
+> > What was your approach to tracking down all the points in the code
+> > where we have a potential issue?
+> 
+> I've been fuzzing the kernel built with KWHASAN with syzkaller. This
+> gives a decent coverage and I was able to find some places where
+> fixups were required this way. Right now the fuzzer is running without
+> issues. It doesn't prove that all such places are fixed, but I don't
+> know a better way to test this.
+
+While fuzzing shows that the kernel doesn't crash (and this is very
+important), it does not show that it exhibits the expected behaviour,
+and there could be a number of soft failures present.
+
+e.g. certain functions might just return an error code if a pointer has
+a tag other than 0xff (such that it looks like a kernel pointer) or 0x00
+(such that it looks like a user pointer), and this might not result in a
+fatal error even though the behaviour is not what we require.
+
+Perhaps it's possible to compare the behaviour of a kernel making use of
+tags with one which does not, though I'm not sure at which level the
+comparison needs to be performed.
+
+Thanks,
+Mark.
