@@ -1,83 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:35502 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752005AbeF1Xjy (ORCPT
+Received: from aserp2130.oracle.com ([141.146.126.79]:49522 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965409AbeF2NpK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Jun 2018 19:39:54 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v4] kconfig: check for pkg-config on make {menu,n,g,x}config
-Message-ID: <c2541256-d3de-e0cf-077c-cdb590c3c152@infradead.org>
-Date: Thu, 28 Jun 2018 16:39:50 -0700
+        Fri, 29 Jun 2018 09:45:10 -0400
+Date: Fri, 29 Jun 2018 16:42:57 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
+ sanitizer
+Message-ID: <20180629134257.ci5ninozkh2ni6wd@mwanda>
+References: <cover.1530018818.git.andreyknvl@google.com>
+ <20180628105057.GA26019@e103592.cambridge.arm.com>
+ <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
+ <20180629110419.GC26019@e103592.cambridge.arm.com>
+ <20180629112613.7i4xesjyxolc63gu@ltop.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180629112613.7i4xesjyxolc63gu@ltop.local>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: =?UTF-8?Q?Bj=c3=b8rn_Forsman?= <bjorn.forsman@gmail.com>
+To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Cc: Dave Martin <Dave.Martin@arm.com>, Andrey Konovalov <andreyknvl@google.com>, Mark Rutland <mark.rutland@arm.com>, Kate Stewart <kstewart@linuxfoundation.org>, linux-doc@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Linux Memory Management List <linux-mm@kvack.org>, Alexander Potapenko <glider@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Christoph Lameter <cl@linux.com>, Ingo Molnar <mingo@kernel.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Evgeniy Stepanov <eugenis@google.com>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Dmitry Vyukov <dvyukov@google.com>, Kostya Serebryany <kcc@google.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nick Desaulniers <ndesaulniers@google.com>, LKML <linux-kernel@vger.kernel.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Lee Smith <Lee.Smith@arm.com>, Andrew Morton <akpm@linux-foundation.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, smatch@vger.kernel.org
 
-From: Randy Dunlap <rdunlap@infradead.org>
+On Fri, Jun 29, 2018 at 01:26:14PM +0200, Luc Van Oostenryck wrote:
+> On Fri, Jun 29, 2018 at 12:04:22PM +0100, Dave Martin wrote:
+> > 
+> > Can sparse be hacked to identify pointer subtractions where the pointers
+> > are cannot be statically proved to point into the same allocation?
+> 
+> sparse only see the (deatils of) the function it analyses and all
+> visible declarations, nothing more.
+> 
+> It would be more a job for smatch which do global analysis.
+> But to identify such subtractions yu must already have a (good)
+> pointer alias analysis which I don't think smatch do (but I can
+> be wrong, Dan & smatch's ml added in CC).
 
-Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
-that other required files are present and to determine build flags
-settings, but none of these check that pkg-config itself is present.
-Add a check for all 4 of these targets and update
-Documentation/process/changes.rst to mention 'pkg-config'.
+That would be hard to manage.  Maybe in a year from now...
 
-Fixes kernel bugzilla #77511:
-https://bugzilla.kernel.org/show_bug.cgi?id=77511
+Pointer math errors tend to get caught pretty quick because they're on
+the success path so I don't imagine there are huge numbers of bugs.
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Bjørn Forsman <bjorn.forsman@gmail.com>
----
-v4: apply Masahiro's suggestions
-
-Strictly speaking, pkg-config is not required if someone is only
-using 'make {menu,n}config' since there are fallbacks for those
-two targets.
-
- Documentation/process/changes.rst  |    8 ++++++++
- scripts/kconfig/Makefile           |    1 +
- scripts/kconfig/check-pkgconfig.sh |    8 ++++++++
- 3 files changed, 17 insertions(+)
-
---- linux-next-20180628.orig/scripts/kconfig/Makefile
-+++ linux-next-20180628/scripts/kconfig/Makefile
-@@ -215,6 +215,7 @@ $(obj)/zconf.tab.o: $(obj)/zconf.lex.c
- 
- # check if necessary packages are available, and configure build flags
- define filechk_conf_cfg
-+	$(CONFIG_SHELL) $(srctree)/scripts/kconfig/check-pkgconfig.sh; \
- 	$(CONFIG_SHELL) $<
- endef
- 
---- /dev/null
-+++ linux-next-20180628/scripts/kconfig/check-pkgconfig.sh
-@@ -0,0 +1,8 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# Check for pkg-config presence
-+
-+if [ -z $(command -v pkg-config) ]; then
-+	echo "'make *config' requires 'pkg-config'. Please install it." 1>&2
-+	exit 1
-+fi
---- linux-next-20180628.orig/Documentation/process/changes.rst
-+++ linux-next-20180628/Documentation/process/changes.rst
-@@ -81,6 +81,14 @@ The build system has, as of 4.13, switch
- rather than incremental linking (`ld -r`) for built-in.a intermediate steps.
- This requires binutils 2.20 or newer.
- 
-+pkg-config
-+----------
-+
-+The build system, as of 4.18, requires pkg-config to check for installed
-+kconfig tools and to determine flags settings for use in
-+'make {menu,n,g,x}config'.  Previously pkg-config was being used but not
-+verified or documented.
-+
- Flex
- ----
- 
+regards,
+dan carpenter
 
