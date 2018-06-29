@@ -1,61 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:59842 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932119AbeF2LHP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 29 Jun 2018 07:07:15 -0400
-Date: Fri, 29 Jun 2018 12:07:06 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
- sanitizer
-Message-ID: <20180629110706.37aqq6x4vhnblkb6@armageddon.cambridge.arm.com>
-References: <cover.1530018818.git.andreyknvl@google.com>
- <20180628105057.GA26019@e103592.cambridge.arm.com>
- <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
+Received: from mail-it0-f68.google.com ([209.85.214.68]:54637 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933368AbeF2MpJ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 29 Jun 2018 08:45:09 -0400
+Received: by mail-it0-f68.google.com with SMTP id 76-v6so2641203itx.4
+        for <linux-kbuild@vger.kernel.org>; Fri, 29 Jun 2018 05:45:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
+In-Reply-To: <20180628124039.8a42ab5e2994fb2876ff4f75@linux-foundation.org>
+References: <cover.1530018818.git.andreyknvl@google.com> <20180627160800.3dc7f9ee41c0badbf7342520@linux-foundation.org>
+ <CAAeHK+xz552VNpZxgWwU-hbTqF5_F6YVDw3fSv=4OT8mNrqPzg@mail.gmail.com> <20180628124039.8a42ab5e2994fb2876ff4f75@linux-foundation.org>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Fri, 29 Jun 2018 14:45:08 +0200
+Message-ID: <CAAeHK+xsBOKghUp9XhpfXGqU=gjSYuy3G2GH14zWNEmaLPy8_w@mail.gmail.com>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address sanitizer
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, Mark Rutland <mark.rutland@arm.com>, Kate Stewart <kstewart@linuxfoundation.org>, linux-doc@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Linux Memory Management List <linux-mm@kvack.org>, Alexander Potapenko <glider@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Christoph Lameter <cl@linux.com>, Ingo Molnar <mingo@kernel.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Evgeniy Stepanov <eugenis@google.com>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Dmitry Vyukov <dvyukov@google.com>, Kostya Serebryany <kcc@google.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nick Desaulniers <ndesaulniers@google.com>, LKML <linux-kernel@vger.kernel.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Lee Smith <Lee.Smith@arm.com>, Andrew Morton <akpm@linux-foundation.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>
 
-On Thu, Jun 28, 2018 at 08:56:41PM +0200, Andrey Konovalov wrote:
-> On Thu, Jun 28, 2018 at 12:51 PM, Dave Martin <Dave.Martin@arm.com> wrote:
-> > On Tue, Jun 26, 2018 at 03:15:10PM +0200, Andrey Konovalov wrote:
-> >> 1. By using the Top Byte Ignore arm64 CPU feature, we can store pointer
-> >>    tags in the top byte of each kernel pointer.
-> >
-> > [...]
-> >
-> > This is a change from the current situation, so the kernel may be
-> > making implicit assumptions about the top byte of kernel addresses.
-> >
-> > Randomising the top bits may cause things like address conversions and
-> > pointer arithmetic to break.
-> >
-> > For example, (q - p) will not produce the expected result if q and p
-> > have different tags.
-> 
-> If q and p have different tags, that means they come from different
-> allocations. I don't think it would make sense to calculate pointer
-> difference in this case.
+On Thu, Jun 28, 2018 at 9:40 PM, Andrew Morton
+<akpm@linux-foundation.org> wrote:
+> On Thu, 28 Jun 2018 20:29:07 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
+>
+>> >> Slab memory usage after boot [2]:
+>> >> * ~40 kb for clean kernel
+>> >> * ~105 kb + 1/8th shadow ~= 118 kb for KASAN
+>> >> * ~47 kb + 1/16th shadow ~= 50 kb for KHWASAN
+>> >>
+>> >> Network performance [3]:
+>> >> * 8.33 Gbits/sec for clean kernel
+>> >> * 3.17 Gbits/sec for KASAN
+>> >> * 2.85 Gbits/sec for KHWASAN
+>> >>
+>> >> Note, that KHWASAN (compared to KASAN) doesn't require quarantine.
+>> >>
+>> >> [1] Time before the ext4 driver is initialized.
+>> >> [2] Measured as `cat /proc/meminfo | grep Slab`.
+>> >> [3] Measured as `iperf -s & iperf -c 127.0.0.1 -t 30`.
+>> >
+>> > The above doesn't actually demonstrate the whole point of the
+>> > patchset: to reduce KASAN's very high memory consumption?
+>>
+>> You mean that memory usage numbers collected after boot don't give a
+>> representative picture of actual memory consumption on real workloads?
+>>
+>> What kind of memory consumption testing would you like to see?
+>
+> Well, 100kb or so is a teeny amount on virtually any machine.  I'm
+> assuming the savings are (much) more significant once the machine gets
+> loaded up and doing work?
 
-Well, there is a lot of pointer comparison in the kernel which means
-pointer difference. Take is_vmalloc_addr() for example, even if your
-patchset does not cover (IIUC) vmalloc() at the moment, this function
-may be called with slab addresses. Presumably they would all fail the
-check with a non-0xff tag but it's something needs understood. If you
-later add support for vmalloc(), this test would fail (as would the
-rb tree search in find_vmap_area(). Kmemleak would probably break as
-well as it makes heavy use of rb tree.
+So with clean kernel after boot we get 40 kb memory usage. With KASAN
+it is ~120 kb, which is 200% overhead. With KHWASAN it's 50 kb, which
+is 25% overhead. This should approximately scale to any amounts of
+used slab memory. For example with 100 mb memory usage we would get
++200 mb for KASAN and +25 mb with KHWASAN. (And KASAN also requires
+quarantine for better use-after-free detection). I can explicitly
+mention the overhead in %s in the changelog.
 
-Basically you need to be very clear about kernel pointer usage (with an
-associated tag or type) vs address range it refers to and in most cases
-converted to an unsigned long. See the other discussion on sparse, it
-could potentially be useful if we can detect the places where a pointer
-is converted to ulong and maybe hide such conversion behind a macro with
-the arm64 implementation also clearing the tag.
-
--- 
-Catalin
+If you think it makes sense, I can also make separate measurements
+with some workload. What kind of workload should I use?
