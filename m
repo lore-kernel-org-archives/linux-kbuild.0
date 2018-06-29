@@ -1,92 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:52273 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934348AbeF2JN3 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 29 Jun 2018 05:13:29 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH v2 1/2] kconfig: expr_print(): print constant symbols within quotes
-Date: Fri, 29 Jun 2018 11:12:36 +0200
-Message-Id: <20180629091237.16620-2-dirk@gouders.net>
-In-Reply-To: <20180629091237.16620-1-dirk@gouders.net>
-References: <ghd0wc58z6.fsf@lena.gouders.net>
- <20180629091237.16620-1-dirk@gouders.net>
+Received: from foss.arm.com ([217.140.101.70]:59654 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932078AbeF2LEb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 29 Jun 2018 07:04:31 -0400
+Date: Fri, 29 Jun 2018 12:04:22 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
+ sanitizer
+Message-ID: <20180629110419.GC26019@e103592.cambridge.arm.com>
+References: <cover.1530018818.git.andreyknvl@google.com>
+ <20180628105057.GA26019@e103592.cambridge.arm.com>
+ <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Dirk Gouders <dirk@gouders.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Kate Stewart <kstewart@linuxfoundation.org>, linux-doc@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Linux Memory Management List <linux-mm@kvack.org>, Alexander Potapenko <glider@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Christoph Lameter <cl@linux.com>, Ingo Molnar <mingo@kernel.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Evgeniy Stepanov <eugenis@google.com>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Dmitry Vyukov <dvyukov@google.com>, Kostya Serebryany <kcc@google.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nick Desaulniers <ndesaulniers@google.com>, LKML <linux-kernel@vger.kernel.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Lee Smith <Lee.Smith@arm.com>, Andrew Morton <akpm@linux-foundation.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 
-Motivation for this commit was the problem that xfwrite() uses
-assert() to ensure it does not operate on empty strings.  This caused
-aborts when the dependency for an empty default string was printed.
+On Thu, Jun 28, 2018 at 08:56:41PM +0200, Andrey Konovalov wrote:
+> On Thu, Jun 28, 2018 at 12:51 PM, Dave Martin <Dave.Martin@arm.com> wrote:
+> > On Tue, Jun 26, 2018 at 03:15:10PM +0200, Andrey Konovalov wrote:
+> >> 1. By using the Top Byte Ignore arm64 CPU feature, we can store pointer
+> >>    tags in the top byte of each kernel pointer.
+> >
+> > [...]
+> >
+> > This is a change from the current situation, so the kernel may be
+> > making implicit assumptions about the top byte of kernel addresses.
+> >
+> > Randomising the top bits may cause things like address conversions and
+> > pointer arithmetic to break.
+> >
+> > For example, (q - p) will not produce the expected result if q and p
+> > have different tags.
+> 
+> If q and p have different tags, that means they come from different
+> allocations. I don't think it would make sense to calculate pointer
+> difference in this case.
 
-A possibility to fix this issue would be to print all string
-constants in quotes which has the positive effect that empty
-strings have a length of 2 and do not trigger aborts.
+It's not strictly valid to subtract pointers from different allocations
+in C, but it's hard to prove statically that two pointers are guaranteed
+to point into the same allocation.
 
-But currently, constant symbols are typeless, so this patch implements
-a fix by identifying all constant symbols by the symbol flag
-SYMBOL_CONST and printing their names within quotes.
+It's likely that we're getting away with it in some places today.
 
-Note:
+> > Conversions, such as between pointer and pfn, may also go wrong if not
+> > appropriately masked.
+> >
+> > There are also potential pointer comparison and aliasing issues if
+> > the tag bits are ever stripped or modified.
+> >
+> >
+> > What was your approach to tracking down all the points in the code
+> > where we have a potential issue?
+> 
+> I've been fuzzing the kernel built with KWHASAN with syzkaller. This
+> gives a decent coverage and I was able to find some places where
+> fixups were required this way. Right now the fuzzer is running without
+> issues. It doesn't prove that all such places are fixed, but I don't
+> know a better way to test this.
 
-The symbols y, m and n are statically defined as constants in symbol.c
-and hence also printed within quotes.  Kconfig files contain a mixture
-of those symbols specified within and without quotes and we cannot
-reproduce that after parsing.
+Can sparse be hacked to identify pointer subtractions where the pointers
+are cannot be statically proved to point into the same allocation?
 
-Also, the kconfig language allows for (semantically meant) constant
-string, int and hex symbols to be specified within quotes or without,
-which is OK as long as there is no other symbol that is something
-other than the constant symbol that was meant to be; the following
-Kconfig file tries to illustrate this:
+Maybe the number of hits for this wouldn't be outrageously high, though
+I expect there would be a fair number.
 
-config a
-       int "Meant to have default 5..."
-       default 5
+Tracking pointers that have been cast to integer types is harder.
+Ideally we'd want to do that, to flag up potentially problematic
+masking and other similar hacks.
 
-config 5
-       int "but this symbol plays games."
-       default "7"
-
-This implementation reproduces exactly the described mixture from the
-Kconfig files, thus original data.
-
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
----
- scripts/kconfig/expr.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index e1a39e90841d..b36e94e36f84 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -1141,6 +1141,8 @@ void expr_print(struct expr *e,
- 		void (*fn)(void *, struct symbol *, const char *),
- 		void *data, int prevtoken)
- {
-+	const char *quoted;
-+
- 	if (!e) {
- 		fn(data, NULL, "y");
- 		return;
-@@ -1151,7 +1153,15 @@ void expr_print(struct expr *e,
- 	switch (e->type) {
- 	case E_SYMBOL:
- 		if (e->left.sym->name)
--			fn(data, e->left.sym, e->left.sym->name);
-+			/*
-+			 * Print constant symbols within quotes
-+			 */
-+			if (e->left.sym->flags & SYMBOL_CONST) {
-+				quoted = sym_escape_string_value(e->left.sym->name);
-+				fn(data, e->left.sym, quoted);
-+				free((void*)quoted);
-+			} else
-+				fn(data, e->left.sym, e->left.sym->name);
- 		else
- 			fn(data, NULL, "<choice>");
- 		break;
--- 
-2.16.1
-
+Cheers
+---Dave
