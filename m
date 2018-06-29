@@ -1,47 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp2130.oracle.com ([141.146.126.79]:49522 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965409AbeF2NpK (ORCPT
+Received: from mail-io0-f196.google.com ([209.85.223.196]:39873 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S967075AbeF2QgM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 29 Jun 2018 09:45:10 -0400
-Date: Fri, 29 Jun 2018 16:42:57 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
- sanitizer
-Message-ID: <20180629134257.ci5ninozkh2ni6wd@mwanda>
-References: <cover.1530018818.git.andreyknvl@google.com>
- <20180628105057.GA26019@e103592.cambridge.arm.com>
- <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
- <20180629110419.GC26019@e103592.cambridge.arm.com>
- <20180629112613.7i4xesjyxolc63gu@ltop.local>
+        Fri, 29 Jun 2018 12:36:12 -0400
+Received: by mail-io0-f196.google.com with SMTP id e13-v6so8984685iof.6
+        for <linux-kbuild@vger.kernel.org>; Fri, 29 Jun 2018 09:36:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180629112613.7i4xesjyxolc63gu@ltop.local>
+In-Reply-To: <20180629110709.GA17859@arm.com>
+References: <cover.1530018818.git.andreyknvl@google.com> <20180628105057.GA26019@e103592.cambridge.arm.com>
+ <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com> <20180629110709.GA17859@arm.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Fri, 29 Jun 2018 18:36:10 +0200
+Message-ID: <CAAeHK+wHd8B2nhat-Z2Y2=s4NVobPG7vjr2CynjFhqPTwQRepQ@mail.gmail.com>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address sanitizer
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, Andrey Konovalov <andreyknvl@google.com>, Mark Rutland <mark.rutland@arm.com>, Kate Stewart <kstewart@linuxfoundation.org>, linux-doc@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Linux Memory Management List <linux-mm@kvack.org>, Alexander Potapenko <glider@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Christoph Lameter <cl@linux.com>, Ingo Molnar <mingo@kernel.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Evgeniy Stepanov <eugenis@google.com>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Dmitry Vyukov <dvyukov@google.com>, Kostya Serebryany <kcc@google.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nick Desaulniers <ndesaulniers@google.com>, LKML <linux-kernel@vger.kernel.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Lee Smith <Lee.Smith@arm.com>, Andrew Morton <akpm@linux-foundation.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, smatch@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Dave Martin <Dave.Martin@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 
-On Fri, Jun 29, 2018 at 01:26:14PM +0200, Luc Van Oostenryck wrote:
-> On Fri, Jun 29, 2018 at 12:04:22PM +0100, Dave Martin wrote:
-> > 
-> > Can sparse be hacked to identify pointer subtractions where the pointers
-> > are cannot be statically proved to point into the same allocation?
-> 
-> sparse only see the (deatils of) the function it analyses and all
-> visible declarations, nothing more.
-> 
-> It would be more a job for smatch which do global analysis.
-> But to identify such subtractions yu must already have a (good)
-> pointer alias analysis which I don't think smatch do (but I can
-> be wrong, Dan & smatch's ml added in CC).
+On Fri, Jun 29, 2018 at 1:07 PM, Will Deacon <will.deacon@arm.com> wrote:
+> It might not seen sensible, but we could still be relying on this in the
+> kernel and so this change would introduce a regression. I think we need
+> a way to identify such pointer usage before these patches can seriously be
+> considered for mainline inclusion.
 
-That would be hard to manage.  Maybe in a year from now...
-
-Pointer math errors tend to get caught pretty quick because they're on
-the success path so I don't imagine there are huge numbers of bugs.
-
-regards,
-dan carpenter
-
+Another point that I have here is that KHWASAN is a debugging tool not
+meant to be used in production. We're not trying to change the ABI or
+something like that (referring to the other HWASAN patchset). We can
+fix up the non obvious places where untagging is needed in a case by
+case basis with additional patches when testing reveals it.
