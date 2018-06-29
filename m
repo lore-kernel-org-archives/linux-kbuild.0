@@ -1,42 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f67.google.com ([209.85.214.67]:36644 "EHLO
-        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932678AbeF2NSc (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:42798 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754720AbeF2MJP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 29 Jun 2018 09:18:32 -0400
-Received: by mail-it0-f67.google.com with SMTP id j135-v6so2831499itj.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 29 Jun 2018 06:18:32 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180629112613.7i4xesjyxolc63gu@ltop.local>
-References: <cover.1530018818.git.andreyknvl@google.com> <20180628105057.GA26019@e103592.cambridge.arm.com>
- <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
- <20180629110419.GC26019@e103592.cambridge.arm.com> <20180629112613.7i4xesjyxolc63gu@ltop.local>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Fri, 29 Jun 2018 15:18:31 +0200
-Message-ID: <CAAeHK+zXzTEo_DJ5a7KaVDQa06Gx98Oj2O3jMFJo_tNgkq822g@mail.gmail.com>
-Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address sanitizer
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 29 Jun 2018 08:09:15 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: [PATCH v3 0/1] kconfig: expr_print(): print constant symbols within quotes
+Date: Fri, 29 Jun 2018 14:08:51 +0200
+Message-Id: <20180629120852.20416-1-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, Mark Rutland <mark.rutland@arm.com>, Kate Stewart <kstewart@linuxfoundation.org>, linux-doc@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Linux Memory Management List <linux-mm@kvack.org>, Alexander Potapenko <glider@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Christoph Lameter <cl@linux.com>, Ingo Molnar <mingo@kernel.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Evgeniy Stepanov <eugenis@google.com>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Dmitry Vyukov <dvyukov@google.com>, Kostya Serebryany <kcc@google.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nick Desaulniers <ndesaulniers@google.com>, LKML <linux-kernel@vger.kernel.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Lee Smith <Lee.Smith@arm.com>, Andrew Morton <akpm@linux-foundation.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, smatch@vger.kernel.org, Dan Carpenter <dan.carpenter@oracle.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Dirk Gouders <dirk@gouders.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, Jun 29, 2018 at 1:26 PM, Luc Van Oostenryck
-<luc.vanoostenryck@gmail.com> wrote:
-> On Fri, Jun 29, 2018 at 12:04:22PM +0100, Dave Martin wrote:
->>
->> Can sparse be hacked to identify pointer subtractions where the pointers
->> are cannot be statically proved to point into the same allocation?
+Hi Masahiro,
 
-Re all the comments about finding all the places where we do pointer
-subtraction/comparison:
+I'm sorry to have to send a v3 before you could even comment on v2.
 
-I might be wrong, but I doubt you can easily do that with static analysis.
+But, I was so concentrated on the default values that I totaly missed
+the remaining part of expressions to be handled consistently.
 
-What we could do is to try to detect all such subtractions/comparisons
-dynamically. The idea is to instrument all pointer/ulong
-subtraction/comparison instructions and try to detect tags mismatch.
-And then run some workload (e.g. syzkaller) to trigger more kernel
-code. The question is how much false positives we would get, since I
-imagine there would be a number of cases when we compare some random
-ulongs.
+Dirk
+
+Dirk Gouders (1):
+  kconfig: expr_print(): print constant symbols within quotes
+
+ scripts/kconfig/expr.c | 57 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 30 insertions(+), 27 deletions(-)
+
+-- 
+2.16.1
+
