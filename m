@@ -1,38 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:40302 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934360AbeF2L0S (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 29 Jun 2018 07:26:18 -0400
-Date: Fri, 29 Jun 2018 13:26:14 +0200
-From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Received: from foss.arm.com ([217.140.101.70]:59778 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751114AbeF2LGc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 29 Jun 2018 07:06:32 -0400
+Date: Fri, 29 Jun 2018 12:07:10 +0100
+From: Will Deacon <will.deacon@arm.com>
 Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
  sanitizer
-Message-ID: <20180629112613.7i4xesjyxolc63gu@ltop.local>
+Message-ID: <20180629110709.GA17859@arm.com>
 References: <cover.1530018818.git.andreyknvl@google.com>
  <20180628105057.GA26019@e103592.cambridge.arm.com>
  <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
- <20180629110419.GC26019@e103592.cambridge.arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180629110419.GC26019@e103592.cambridge.arm.com>
+In-Reply-To: <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Andrey Konovalov <andreyknvl@google.com>, Mark Rutland <mark.rutland@arm.com>, Kate Stewart <kstewart@linuxfoundation.org>, linux-doc@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Linux Memory Management List <linux-mm@kvack.org>, Alexander Potapenko <glider@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Christoph Lameter <cl@linux.com>, Ingo Molnar <mingo@kernel.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Evgeniy Stepanov <eugenis@google.com>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Dmitry Vyukov <dvyukov@google.com>, Kostya Serebryany <kcc@google.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nick Desaulniers <ndesaulniers@google.com>, LKML <linux-kernel@vger.kernel.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Lee Smith <Lee.Smith@arm.com>, Andrew Morton <akpm@linux-foundation.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, smatch@vger.kernel.org, Dan Carpenter <dan.carpenter@oracle.com>
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Dave Martin <Dave.Martin@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 
-On Fri, Jun 29, 2018 at 12:04:22PM +0100, Dave Martin wrote:
+On Thu, Jun 28, 2018 at 08:56:41PM +0200, Andrey Konovalov wrote:
+> On Thu, Jun 28, 2018 at 12:51 PM, Dave Martin <Dave.Martin@arm.com> wrote:
+> > On Tue, Jun 26, 2018 at 03:15:10PM +0200, Andrey Konovalov wrote:
+> >> 1. By using the Top Byte Ignore arm64 CPU feature, we can store pointer
+> >>    tags in the top byte of each kernel pointer.
+> >
+> > [...]
+> >
+> > This is a change from the current situation, so the kernel may be
+> > making implicit assumptions about the top byte of kernel addresses.
+> >
+> > Randomising the top bits may cause things like address conversions and
+> > pointer arithmetic to break.
+> >
+> > For example, (q - p) will not produce the expected result if q and p
+> > have different tags.
 > 
-> Can sparse be hacked to identify pointer subtractions where the pointers
-> are cannot be statically proved to point into the same allocation?
+> If q and p have different tags, that means they come from different
+> allocations. I don't think it would make sense to calculate pointer
+> difference in this case.
 
-sparse only see the (deatils of) the function it analyses and all
-visible declarations, nothing more.
+It might not seen sensible, but we could still be relying on this in the
+kernel and so this change would introduce a regression. I think we need
+a way to identify such pointer usage before these patches can seriously be
+considered for mainline inclusion. For example use of '>' and '<' to
+compare pointers in an rbtree could be affected by the introduction of
+tags.
 
-It would be more a job for smatch which do global analysis.
-But to identify such subtractions yu must already have a (good)
-pointer alias analysis which I don't think smatch do (but I can
-be wrong, Dan & smatch's ml added in CC).
-
--- Luc Van Oostenryck
+Will
