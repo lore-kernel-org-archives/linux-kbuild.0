@@ -1,49 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:60594 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936522AbeF3ClU (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:42174 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751071AbeF3OPO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 29 Jun 2018 22:41:20 -0400
-Date: Fri, 29 Jun 2018 19:41:17 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
- sanitizer
-Message-Id: <20180629194117.01b2d31e805808eee5c97b4d@linux-foundation.org>
-In-Reply-To: <CAAeHK+xsBOKghUp9XhpfXGqU=gjSYuy3G2GH14zWNEmaLPy8_w@mail.gmail.com>
-References: <cover.1530018818.git.andreyknvl@google.com>
-        <20180627160800.3dc7f9ee41c0badbf7342520@linux-foundation.org>
-        <CAAeHK+xz552VNpZxgWwU-hbTqF5_F6YVDw3fSv=4OT8mNrqPzg@mail.gmail.com>
-        <20180628124039.8a42ab5e2994fb2876ff4f75@linux-foundation.org>
-        <CAAeHK+xsBOKghUp9XhpfXGqU=gjSYuy3G2GH14zWNEmaLPy8_w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Sat, 30 Jun 2018 10:15:14 -0400
+MIME-Version: 1.0
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 30 Jun 2018 23:14:12 +0900
+Message-ID: <CAK7LNASY2kiCLCUoUaE3u-ddkxRj4CvaLa1-=m72MKyAFt0bhw@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v4.18-rc3
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, 29 Jun 2018 14:45:08 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
+Hi Linus,
 
-> >> What kind of memory consumption testing would you like to see?
-> >
-> > Well, 100kb or so is a teeny amount on virtually any machine.  I'm
-> > assuming the savings are (much) more significant once the machine gets
-> > loaded up and doing work?
-> 
-> So with clean kernel after boot we get 40 kb memory usage. With KASAN
-> it is ~120 kb, which is 200% overhead. With KHWASAN it's 50 kb, which
-> is 25% overhead. This should approximately scale to any amounts of
-> used slab memory. For example with 100 mb memory usage we would get
-> +200 mb for KASAN and +25 mb with KHWASAN. (And KASAN also requires
-> quarantine for better use-after-free detection). I can explicitly
-> mention the overhead in %s in the changelog.
-> 
-> If you think it makes sense, I can also make separate measurements
-> with some workload. What kind of workload should I use?
+Please pull Kbuild fixes.  Thanks!
 
-Whatever workload people were running when they encountered problems
-with KASAN memory consumption ;)
 
-I dunno, something simple.  `find / > /dev/null'?
+The following changes since commit ce397d215ccd07b8ae3f71db689aedb85d56ab40:
 
+  Linux 4.18-rc1 (2018-06-17 08:04:49 +0900)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v4.18
+
+for you to fetch changes up to 73d1c580f92b203f4c3a189ee98c917c65712f7e:
+
+  kconfig: loop boundary condition fix (2018-06-28 22:48:08 +0900)
+
+----------------------------------------------------------------
+Kbuild fixes for v4.18
+
+- introduce __diag_* macros and suppress -Wattribute-alias warnings from GCC 8
+
+- fix stack protector test script for x86_64
+
+- fix line number handling in Kconfig
+
+- document that '#' starts a comment in Kconfig
+
+- handle P_SYMBOL property in dump debugging of Kconfig
+
+- correct help message of LD_DEAD_CODE_DATA_ELIMINATION
+
+- fix occasional segmentation faults in Kconfig
+
+----------------------------------------------------------------
+Arnd Bergmann (2):
+      kbuild: add macro for controlling warnings to linux/compiler.h
+      disable -Wattribute-alias warning for SYSCALL_DEFINEx()
+
+Dirk Gouders (2):
+      kconfig: fix line numbers for if-entries in menu tree
+      kconfig: handle P_SYMBOL in print_symbol()
+
+Jerry James (1):
+      kconfig: loop boundary condition fix
+
+Masahiro Yamada (1):
+      kbuild: reword help of LD_DEAD_CODE_DATA_ELIMINATION
+
+Paul Burton (1):
+      powerpc: Remove -Wattribute-alias pragmas
+
+Randy Dunlap (1):
+      kconfig: document Kconfig source file comments
+
+Sven Joachim (1):
+      stack-protector: Fix test with 32-bit userland and CONFIG_64BIT=y
+
+ Documentation/kbuild/kconfig-language.txt |  6 ++++++
+ arch/powerpc/kernel/pci_32.c              |  4 ----
+ arch/powerpc/kernel/pci_64.c              |  4 ----
+ arch/powerpc/kernel/rtas.c                |  4 ----
+ arch/powerpc/kernel/signal_32.c           |  8 --------
+ arch/powerpc/kernel/signal_64.c           |  4 ----
+ arch/powerpc/kernel/syscalls.c            |  4 ----
+ arch/powerpc/mm/subpage-prot.c            |  4 ----
+ include/linux/compat.h                    |  8 +++++++-
+ include/linux/compiler-gcc.h              | 25 +++++++++++++++++++++++++
+ include/linux/compiler_types.h            | 18 ++++++++++++++++++
+ include/linux/syscalls.h                  |  4 ++++
+ init/Kconfig                              |  7 +++----
+ scripts/gcc-x86_64-has-stack-protector.sh |  2 +-
+ scripts/kconfig/expr.h                    |  3 +++
+ scripts/kconfig/preprocess.c              |  2 +-
+ scripts/kconfig/zconf.y                   |  8 ++++++--
+ 17 files changed, 74 insertions(+), 41 deletions(-)
+
+
+-- 
+Best Regards
+Masahiro Yamada
