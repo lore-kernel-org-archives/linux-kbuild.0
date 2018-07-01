@@ -1,59 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:45596 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965010AbeGARMt (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:59680 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752570AbeGAQLS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 1 Jul 2018 13:12:49 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] kbuild: check for /sbin/depmod installed
-Message-ID: <1df7f847-484c-a368-9dc2-50d191f8be9b@infradead.org>
-Date: Sun, 1 Jul 2018 10:12:44 -0700
+        Sun, 1 Jul 2018 12:11:18 -0400
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 3.18 02/85] tools build: Fix Makefile(s) to properly invoke tools build
+Date: Sun,  1 Jul 2018 18:01:20 +0200
+Message-Id: <20180701153122.463768891@linuxfoundation.org>
+In-Reply-To: <20180701153122.365061142@linuxfoundation.org>
+References: <20180701153122.365061142@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Michal Marek <michal.lkml@markovi.net>, Chih-Wei Huang <cwhuang@linux.org.tw>
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Brian Norris <computersforpeace@gmail.com>, Jiri Olsa <jolsa@kernel.org>, Borislav Petkov <bp@suse.de>, David Ahern <dsahern@gmail.com>, David Howells <dhowells@redhat.com>, Michal Marek <mmarek@suse.cz>, Namhyung Kim <namhyung@kernel.org>, Paul Mackerras <paulus@samba.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Arnaldo Carvalho de Melo <acme@redhat.com>, Guenter Roeck <linux@roeck-us.net>
 
-From: Randy Dunlap <rdunlap@infradead.org>
+3.18-stable review patch.  If anyone has any objections, please let me know.
 
-Verify that 'depmod' ($DEPMOD) is installed.
-This is a partial revert of 620c231c7a7f (from 2012):
-  ("kbuild: do not check for ancient modutils tools")
+------------------
 
-Fixes kernel bugzilla #198965:
-https://bugzilla.kernel.org/show_bug.cgi?id=198965
+From: Jiri Olsa <jolsa@kernel.org>
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: Chih-Wei Huang <cwhuang@linux.org.tw>
-Cc: stable@vger.kernel.org # any kernel since 2012
+commit 16671c1e1cac2dbb995feb4bc55082fd939b5c2c upstream.
+
+Several fixes were needed to allow following builds:
+  $ make tools/tmon
+  $ make -C <kernelsrc> tools/perf
+  $ make -C <kernelsrc>/tools perf
+
+ - some of the tools (perf) use same make variables as in
+   kernel build, unsetting srctree and objtree
+ - using original $(O) for O variable
+ - perf build does not follow the descend function setup
+   invoking it via it's own make rule
+
+I tried the rest of the tools/Makefile targets and they
+seem to work now.
+
+Reported-by: Brian Norris <computersforpeace@gmail.com>
+Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Brian Norris <computersforpeace@gmail.com>
+Cc: David Ahern <dsahern@gmail.com>
+Cc: David Howells <dhowells@redhat.com>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: Namhyung Kim <namhyung@kernel.org>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org
+Link: http://lkml.kernel.org/r/1429389280-18720-3-git-send-email-jolsa@kernel.org
+Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+Cc: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
 ---
- scripts/depmod.sh |    8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ Makefile       |    5 ++---
+ tools/Makefile |   12 +++++++++++-
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
---- lnx-418-rc2.orig/scripts/depmod.sh
-+++ lnx-418-rc2/scripts/depmod.sh
-@@ -10,10 +10,16 @@ fi
- DEPMOD=$1
- KERNELRELEASE=$2
+--- a/Makefile
++++ b/Makefile
+@@ -214,7 +214,6 @@ VPATH		:= $(srctree)$(if $(KBUILD_EXTMOD
  
--if ! test -r System.map -a -x "$DEPMOD"; then
-+if ! test -r System.map ; then
- 	exit 0
- fi
+ export srctree objtree VPATH
  
-+if [ -z $(command -v $DEPMOD) ]; then
-+	echo "'make *install' requires $DEPMOD. Please install it." >&2
-+	echo "This is probably in the module-init-tools package." >&2
-+	exit 1
-+fi
+-
+ # SUBARCH tells the usermode build what the underlying arch is.  That is set
+ # first, and if a usermode build is happening, the "ARCH=um" on the command
+ # line overrides the setting of ARCH below.  If a native build is happening,
+@@ -1505,11 +1504,11 @@ image_name:
+ # Clear a bunch of variables before executing the submake
+ tools/: FORCE
+ 	$(Q)mkdir -p $(objtree)/tools
+-	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(objtree) subdir=tools -C $(src)/tools/
++	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(O) subdir=tools -C $(src)/tools/
+ 
+ tools/%: FORCE
+ 	$(Q)mkdir -p $(objtree)/tools
+-	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(objtree) subdir=tools -C $(src)/tools/ $*
++	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(O) subdir=tools -C $(src)/tools/ $*
+ 
+ # Single targets
+ # ---------------------------------------------------------------------------
+--- a/tools/Makefile
++++ b/tools/Makefile
+@@ -1,3 +1,8 @@
++# Some of the tools (perf) use same make variables
++# as in kernel build.
++export srctree=
++export objtree=
 +
- # older versions of depmod require the version string to start with three
- # numbers, so we cheat with a symlink here
- depmod_hack_needed=true
+ include scripts/Makefile.include
+ 
+ help:
+@@ -54,8 +59,13 @@ liblockdep: FORCE
+ libapi: FORCE
+ 	$(call descend,lib/api)
+ 
++# The perf build does not follow the descend function setup,
++# invoking it via it's own make rule.
++PERF_O   = $(if $(O),$(O)/tools/perf,)
++
+ perf: FORCE
+-	$(call descend,$@)
++	$(Q)mkdir -p $(PERF_O) .
++	$(Q)$(MAKE) --no-print-directory -C perf O=$(PERF_O) subdir=
+ 
+ selftests: FORCE
+ 	$(call descend,testing/$@)
 
 
