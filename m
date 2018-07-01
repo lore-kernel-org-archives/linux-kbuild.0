@@ -1,102 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:47208 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751106AbeF3OUX (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 30 Jun 2018 10:20:23 -0400
-MIME-Version: 1.0
-In-Reply-To: <c2541256-d3de-e0cf-077c-cdb590c3c152@infradead.org>
-References: <c2541256-d3de-e0cf-077c-cdb590c3c152@infradead.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 30 Jun 2018 23:19:36 +0900
-Message-ID: <CAK7LNAS288qs50R=bL0R7mZfw0WhGsda409u6rbZ84PTNM98Rg@mail.gmail.com>
-Subject: Re: [PATCH v4] kconfig: check for pkg-config on make {menu,n,g,x}config
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail.horus.com ([78.46.148.228]:56973 "EHLO mail.horus.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752082AbeGANMu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 1 Jul 2018 09:12:50 -0400
+From: Matthias Reichl <hias@horus.com>
+Subject: [PATCH] kbuild: honor HOSTCFLAGS and HOSTLDFLAGS in libelf test
+Date: Sun,  1 Jul 2018 15:07:33 +0200
+Message-Id: <20180701130733.7781-1-hias@horus.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-2018-06-29 8:39 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> From: Randy Dunlap <rdunlap@infradead.org>
->
-> Each of 'make {menu,n,g,x}config' uses (needs) pkg-config to make sure
-> that other required files are present and to determine build flags
-> settings, but none of these check that pkg-config itself is present.
-> Add a check for all 4 of these targets and update
-> Documentation/process/changes.rst to mention 'pkg-config'.
->
-> Fixes kernel bugzilla #77511:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D77511
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Bj=C3=B8rn Forsman <bjorn.forsman@gmail.com>
-> ---
+Since commit 596a9f6768af ("objtool: Support HOSTCFLAGS and HOSTLDFLAGS")
+objtool can use a libelf installed in a non-standard location by
+passing in appropriate HOST flags.
 
-Applied to linux-kbuild/kconfig.   Thanks!
+The libelf check in the main Makefile is done without these flags
+and fails if no libelf is installed on the system.
 
+Fix this by adding HOSTCFLAGS and HOSTLDFLAGS to the libelf check.
 
-> v4: apply Masahiro's suggestions
->
-> Strictly speaking, pkg-config is not required if someone is only
-> using 'make {menu,n}config' since there are fallbacks for those
-> two targets.
->
->  Documentation/process/changes.rst  |    8 ++++++++
->  scripts/kconfig/Makefile           |    1 +
->  scripts/kconfig/check-pkgconfig.sh |    8 ++++++++
->  3 files changed, 17 insertions(+)
->
-> --- linux-next-20180628.orig/scripts/kconfig/Makefile
-> +++ linux-next-20180628/scripts/kconfig/Makefile
-> @@ -215,6 +215,7 @@ $(obj)/zconf.tab.o: $(obj)/zconf.lex.c
->
->  # check if necessary packages are available, and configure build flags
->  define filechk_conf_cfg
-> +       $(CONFIG_SHELL) $(srctree)/scripts/kconfig/check-pkgconfig.sh; \
->         $(CONFIG_SHELL) $<
->  endef
->
-> --- /dev/null
-> +++ linux-next-20180628/scripts/kconfig/check-pkgconfig.sh
-> @@ -0,0 +1,8 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Check for pkg-config presence
-> +
-> +if [ -z $(command -v pkg-config) ]; then
-> +       echo "'make *config' requires 'pkg-config'. Please install it." 1=
->&2
-> +       exit 1
-> +fi
-> --- linux-next-20180628.orig/Documentation/process/changes.rst
-> +++ linux-next-20180628/Documentation/process/changes.rst
-> @@ -81,6 +81,14 @@ The build system has, as of 4.13, switch
->  rather than incremental linking (`ld -r`) for built-in.a intermediate st=
-eps.
->  This requires binutils 2.20 or newer.
->
-> +pkg-config
-> +----------
-> +
-> +The build system, as of 4.18, requires pkg-config to check for installed
-> +kconfig tools and to determine flags settings for use in
-> +'make {menu,n,g,x}config'.  Previously pkg-config was being used but not
-> +verified or documented.
-> +
->  Flex
->  ----
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" i=
-n
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Matthias Reichl <hias@horus.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/Makefile b/Makefile
+index c9132594860b..b0485fddc554 100644
+--- a/Makefile
++++ b/Makefile
+@@ -933,7 +933,7 @@ export mod_sign_cmd
+ 
+ ifdef CONFIG_STACK_VALIDATION
+   has_libelf := $(call try-run,\
+-		echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -,1,0)
++		echo "int main() {}" | $(HOSTCC) $(HOSTCFLAGS) -xc -o /dev/null -lelf $(HOSTLDFLAGS) -,1,0)
+   ifeq ($(has_libelf),1)
+     objtool_target := tools/objtool FORCE
+   else
+-- 
+2.11.0
 
-
---=20
-Best Regards
-Masahiro Yamada
