@@ -1,82 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:59594 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752459AbeGAQLC (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:45596 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965010AbeGARMt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 1 Jul 2018 12:11:02 -0400
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 3.18 01/85] tools build: No need to make libapi for perf explicitly
-Date: Sun,  1 Jul 2018 18:01:19 +0200
-Message-Id: <20180701153122.425960620@linuxfoundation.org>
-In-Reply-To: <20180701153122.365061142@linuxfoundation.org>
-References: <20180701153122.365061142@linuxfoundation.org>
+        Sun, 1 Jul 2018 13:12:49 -0400
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] kbuild: check for /sbin/depmod installed
+Message-ID: <1df7f847-484c-a368-9dc2-50d191f8be9b@infradead.org>
+Date: Sun, 1 Jul 2018 10:12:44 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Jiri Olsa <jolsa@kernel.org>, Borislav Petkov <bp@suse.de>, Brian Norris <computersforpeace@gmail.com>, David Ahern <dsahern@gmail.com>, David Howells <dhowells@redhat.com>, Michal Marek <mmarek@suse.cz>, Namhyung Kim <namhyung@kernel.org>, Paul Mackerras <paulus@samba.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Arnaldo Carvalho de Melo <acme@redhat.com>, Guenter Roeck <linux@roeck-us.net>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Michal Marek <michal.lkml@markovi.net>, Chih-Wei Huang <cwhuang@linux.org.tw>
 
-3.18-stable review patch.  If anyone has any objections, please let me know.
+From: Randy Dunlap <rdunlap@infradead.org>
 
-------------------
+Verify that 'depmod' ($DEPMOD) is installed.
+This is a partial revert of 620c231c7a7f (from 2012):
+  ("kbuild: do not check for ancient modutils tools")
 
-From: Jiri Olsa <jolsa@kernel.org>
+Fixes kernel bugzilla #198965:
+https://bugzilla.kernel.org/show_bug.cgi?id=198965
 
-commit 379a9a28a1b4364ab08fec35c84d39cf4995c509 upstream.
-
-The perf build handles its dependencies by itself.
-
-Also renaming libapi libapikfs to libapi as it got
-changed just recently.
-
-Signed-off-by: Jiri Olsa <jolsa@kernel.org>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: Brian Norris <computersforpeace@gmail.com>
-Cc: David Ahern <dsahern@gmail.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Namhyung Kim <namhyung@kernel.org>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org
-Link: http://lkml.kernel.org/r/1429389280-18720-2-git-send-email-jolsa@kernel.org
-Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
-Cc: Guenter Roeck <linux@roeck-us.net>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Cc: Chih-Wei Huang <cwhuang@linux.org.tw>
+Cc: stable@vger.kernel.org # any kernel since 2012
 ---
- tools/Makefile |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/depmod.sh |    8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
---- a/tools/Makefile
-+++ b/tools/Makefile
-@@ -51,10 +51,10 @@ cgroup firewire hv guest usb virtio vm n
- liblockdep: FORCE
- 	$(call descend,lib/lockdep)
+--- lnx-418-rc2.orig/scripts/depmod.sh
++++ lnx-418-rc2/scripts/depmod.sh
+@@ -10,10 +10,16 @@ fi
+ DEPMOD=$1
+ KERNELRELEASE=$2
  
--libapikfs: FORCE
-+libapi: FORCE
- 	$(call descend,lib/api)
+-if ! test -r System.map -a -x "$DEPMOD"; then
++if ! test -r System.map ; then
+ 	exit 0
+ fi
  
--perf: libapikfs FORCE
-+perf: FORCE
- 	$(call descend,$@)
- 
- selftests: FORCE
-@@ -106,10 +106,10 @@ cgroup_clean hv_clean firewire_clean lgu
- liblockdep_clean:
- 	$(call descend,lib/lockdep,clean)
- 
--libapikfs_clean:
-+libapi_clean:
- 	$(call descend,lib/api,clean)
- 
--perf_clean: libapikfs_clean
-+perf_clean:
- 	$(call descend,$(@:_clean=),clean)
- 
- selftests_clean:
++if [ -z $(command -v $DEPMOD) ]; then
++	echo "'make *install' requires $DEPMOD. Please install it." >&2
++	echo "This is probably in the module-init-tools package." >&2
++	exit 1
++fi
++
+ # older versions of depmod require the version string to start with three
+ # numbers, so we cheat with a symlink here
+ depmod_hack_needed=true
 
 
