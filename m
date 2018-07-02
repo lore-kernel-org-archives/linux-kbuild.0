@@ -1,116 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:37342 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:50392 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753092AbeGBCqN (ORCPT
+        with ESMTP id S1752049AbeGBOrO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 1 Jul 2018 22:46:13 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v2] kbuild: verify that $DEPMOD is installed
-Message-ID: <53a0c9d4-cf1c-fbcf-3706-742f5ad41178@infradead.org>
-Date: Sun, 1 Jul 2018 19:46:06 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Mon, 2 Jul 2018 10:47:14 -0400
+From: Christoph Hellwig <hch@lst.de>
+Subject: include architecture Kconfig files from top-level Kconfig
+Date: Mon,  2 Jul 2018 08:47:06 -0600
+Message-Id: <20180702144711.22111-1-hch@lst.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Chih-Wei Huang <cwhuang@linux.org.tw>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Randy Dunlap <rdunlap@infradead.org>
+Hi Masahiro,
 
-Verify that 'depmod' ($DEPMOD) is installed.
-This is a partial revert of 620c231c7a7f (from 2012):
-  ("kbuild: do not check for ancient modutils tools")
+what do you think about the series below, which moves the includes
+of all the architecture independ Kconfig files to the top-level
+Kconfig instead of duplicating the includes in all architectures?
 
-Also update Documentation/process/changes.rst to refer to
-kmod instead of module-init-tools.
-
-Fixes kernel bugzilla #198965:
-https://bugzilla.kernel.org/show_bug.cgi?id=198965
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: Jessica Yu <jeyu@kernel.org>
-Cc: Chih-Wei Huang <cwhuang@linux.org.tw>
-Cc: stable@vger.kernel.org # any kernel since 2012
----
-v2:
-- spell out that modules_install requires $DEPMOD
-- remove references to module-init-tools from
-  Documentation/process/changes.rst and add kmod
-
- Documentation/process/changes.rst |   19 +++++++------------
- scripts/depmod.sh                 |    8 +++++++-
- 2 files changed, 14 insertions(+), 13 deletions(-)
-
---- lnx-418-rc3.orig/scripts/depmod.sh
-+++ lnx-418-rc3/scripts/depmod.sh
-@@ -10,10 +10,16 @@ fi
- DEPMOD=$1
- KERNELRELEASE=$2
- 
--if ! test -r System.map -a -x "$DEPMOD"; then
-+if ! test -r System.map ; then
- 	exit 0
- fi
- 
-+if [ -z $(command -v $DEPMOD) ]; then
-+	echo "'make modules_install' requires $DEPMOD. Please install it." >&2
-+	echo "This is probably in the kmod package." >&2
-+	exit 1
-+fi
-+
- # older versions of depmod require the version string to start with three
- # numbers, so we cheat with a symlink here
- depmod_hack_needed=true
---- lnx-418-rc3.orig/Documentation/process/changes.rst
-+++ lnx-418-rc3/Documentation/process/changes.rst
-@@ -35,7 +35,7 @@ binutils               2.20
- flex                   2.5.35           flex --version
- bison                  2.0              bison --version
- util-linux             2.10o            fdformat --version
--module-init-tools      0.9.10           depmod -V
-+kmod                   13               depmod -V
- e2fsprogs              1.41.4           e2fsck -V
- jfsutils               1.1.3            fsck.jfs -V
- reiserfsprogs          3.6.3            reiserfsck -V
-@@ -156,12 +156,6 @@ is not build with ``CONFIG_KALLSYMS`` an
- reproduce the Oops with that option, then you can still decode that Oops
- with ksymoops.
- 
--Module-Init-Tools
-------------------
--
--A new module loader is now in the kernel that requires ``module-init-tools``
--to use.  It is backward compatible with the 2.4.x series kernels.
--
- Mkinitrd
- --------
- 
-@@ -371,16 +365,17 @@ Util-linux
- 
- - <https://www.kernel.org/pub/linux/utils/util-linux/>
- 
-+Kmod
-+----
-+
-+- <https://www.kernel.org/pub/linux/utils/kernel/kmod/>
-+- <https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git>
-+
- Ksymoops
- --------
- 
- - <https://www.kernel.org/pub/linux/utils/kernel/ksymoops/v2.4/>
- 
--Module-Init-Tools
-------------------
--
--- <https://www.kernel.org/pub/linux/utils/kernel/module-init-tools/>
--
- Mkinitrd
- --------
- 
-
+Note that this only handles the low-hanging fruite, there are a lot
+of other bits that should probably be cleaned up to be common,
+but those will be not entirely trivial.
