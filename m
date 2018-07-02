@@ -1,16 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:52560 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:53748 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752715AbeGBVRe (ORCPT
+        with ESMTP id S1753476AbeGBWCt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Jul 2018 17:17:34 -0400
-Subject: [PATCH] arch/Kconfig: use a menu to reduce clutter
+        Mon, 2 Jul 2018 18:02:49 -0400
+Subject: [PATCH] Kconfig: menus: add PREEMPT options back
 References: <20180702144711.22111-1-hch@lst.de>
+ <20180702144711.22111-4-hch@lst.de>
 From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <6ba546f8-42bd-4400-131f-bb389812cb56@infradead.org>
-Date: Mon, 2 Jul 2018 14:17:33 -0700
+Message-ID: <ccf301c1-366c-4af5-54c7-36ddd4e33c52@infradead.org>
+Date: Mon, 2 Jul 2018 15:02:45 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180702144711.22111-1-hch@lst.de>
+In-Reply-To: <20180702144711.22111-4-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -21,30 +22,23 @@ Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 From: Randy Dunlap <rdunlap@infradead.org>
 
-Put everything in arch/Kconfig into a General options menu
-so that they don't clutter up the main/major/primary list of
-menu options.
+Looks like the PREEMPT symbols from kernel/Kconfig.preempt were
+lost, so add them back.  Otherwise some of the RCU options are
+set differently than they should be.
 
 Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 ---
- arch/Kconfig |    4 ++++
- 1 file changed, 4 insertions(+)
+ init/Kconfig |    1 +
+ 1 file changed, 1 insertion(+)
 
---- linux-next-20180702.orig/arch/Kconfig
-+++ linux-next-20180702/arch/Kconfig
-@@ -3,6 +3,8 @@
- # General architecture dependent options
- #
+--- linux-next-20180702.orig/init/Kconfig
++++ linux-next-20180702/init/Kconfig
+@@ -332,6 +332,7 @@ config AUDIT_TREE
  
-+menu "General architecture-dependent options"
-+
- config CRASH_CORE
- 	bool
+ source "kernel/irq/Kconfig"
+ source "kernel/time/Kconfig"
++source "kernel/Kconfig.preempt"
  
-@@ -1028,3 +1030,5 @@ config REFCOUNT_FULL
- 	  security flaw exploits.
+ menu "CPU/Task time and stats accounting"
  
- source "kernel/gcov/Kconfig"
-+
-+endmenu
 
