@@ -1,44 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:53748 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753476AbeGBWCt (ORCPT
+Received: from mail-ua0-f195.google.com ([209.85.217.195]:41939 "EHLO
+        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753524AbeGBXjy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Jul 2018 18:02:49 -0400
-Subject: [PATCH] Kconfig: menus: add PREEMPT options back
-References: <20180702144711.22111-1-hch@lst.de>
- <20180702144711.22111-4-hch@lst.de>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <ccf301c1-366c-4af5-54c7-36ddd4e33c52@infradead.org>
-Date: Mon, 2 Jul 2018 15:02:45 -0700
+        Mon, 2 Jul 2018 19:39:54 -0400
+Received: by mail-ua0-f195.google.com with SMTP id t14-v6so70403uao.8
+        for <linux-kbuild@vger.kernel.org>; Mon, 02 Jul 2018 16:39:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180702144711.22111-4-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180702203321.GA8371@bombadil.infradead.org>
+References: <cover.1530018818.git.andreyknvl@google.com> <20180627160800.3dc7f9ee41c0badbf7342520@linux-foundation.org>
+ <CAN=P9pivApAo76Kjc0TUDE0kvJn0pET=47xU6e=ioZV2VqO0Rg@mail.gmail.com> <20180702203321.GA8371@bombadil.infradead.org>
+From: Evgenii Stepanov <eugenis@google.com>
+Date: Mon, 2 Jul 2018 16:39:51 -0700
+Message-ID: <CAFKCwrg=3J-ARaOJgc73oRE7hQxs1VV7YiZEPS7Dt8Gfn6cWQA@mail.gmail.com>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address sanitizer
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Kostya Serebryany <kcc@google.com>, Andrew Morton <akpm@linux-foundation.org>, Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg KH <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-From: Randy Dunlap <rdunlap@infradead.org>
+On Mon, Jul 2, 2018 at 1:33 PM, Matthew Wilcox <willy@infradead.org> wrote:
+> On Wed, Jun 27, 2018 at 05:04:28PM -0700, Kostya Serebryany wrote:
+>> The problem is more significant on mobile devices than on desktop/server.
+>> I'd love to have [K]HWASAN on x86_64 as well, but it's less trivial since x86_64
+>> doesn't have an analog of aarch64's top-byte-ignore hardware feature.
+>
+> Well, can we emulate it in software?
+>
+> We've got 48 bits of virtual address space on x86.  If we need all 8
+> bits, then that takes us down to 40 bits (39 bits for user and 39 bits
+> for kernel).  My laptop only has 34 bits of physical memory, so could
+> we come up with a memory layout which works for me?
 
-Looks like the PREEMPT symbols from kernel/Kconfig.preempt were
-lost, so add them back.  Otherwise some of the RCU options are
-set differently than they should be.
+Yes, probably.
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
- init/Kconfig |    1 +
- 1 file changed, 1 insertion(+)
+We've tried this in userspace by mapping a file multiple times, but
+that's very slow, likely because of the extra TLB pressure.
+It should be possible to achieve better performance in the kernel with
+some page table tricks (i.e. if we take top 8 bits out of 48, then
+there would be only two second-level tables, and the top-level table
+will look like [p1, p2, p1, p2, ...]). I'm not 100% sure if that would
+work.
 
---- linux-next-20180702.orig/init/Kconfig
-+++ linux-next-20180702/init/Kconfig
-@@ -332,6 +332,7 @@ config AUDIT_TREE
- 
- source "kernel/irq/Kconfig"
- source "kernel/time/Kconfig"
-+source "kernel/Kconfig.preempt"
- 
- menu "CPU/Task time and stats accounting"
- 
-
+I don't think this should be part of this patchset, but it's good to
+keep this in mind.
