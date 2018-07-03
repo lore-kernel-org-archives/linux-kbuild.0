@@ -1,51 +1,130 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:36510 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753526AbeGCXeo (ORCPT
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:38748 "EHLO
+        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753419AbeGCXei (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Jul 2018 19:34:44 -0400
-Received: by mail-oi0-f68.google.com with SMTP id r16-v6so7247065oie.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 03 Jul 2018 16:34:43 -0700 (PDT)
+        Tue, 3 Jul 2018 19:34:38 -0400
+Received: by mail-oi0-f66.google.com with SMTP id v8-v6so7229729oie.5
+        for <linux-kbuild@vger.kernel.org>; Tue, 03 Jul 2018 16:34:38 -0700 (PDT)
 From: Laura Abbott <labbott@redhat.com>
-Subject: [PATCHv5 3/4] powerpc: Add build salt to the vDSO
-Date: Tue,  3 Jul 2018 16:34:29 -0700
-Message-Id: <20180703233430.14416-4-labbott@redhat.com>
+Subject: [PATCHv5 1/4] kbuild: Add build salt to the kernel and modules
+Date: Tue,  3 Jul 2018 16:34:27 -0700
+Message-Id: <20180703233430.14416-2-labbott@redhat.com>
 In-Reply-To: <20180703233430.14416-1-labbott@redhat.com>
 References: <20180703233430.14416-1-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Ellerman <mpe@ellerman.id.au>
-Cc: Laura Abbott <labbott@redhat.com>, Andy Lutomirski <luto@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, linux-kernel@vger.kernel.org, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
+To: Andy Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Ellerman <mpe@ellerman.id.au>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: Laura Abbott <labbott@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, linux-kernel@vger.kernel.org, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
 
 
-The vDSO needs to have a unique build id in a similar manner
-to the kernel and modules. Use the build salt macro.
+The build id generated from --build-id can be generated in several different
+ways, with the default being the sha1 on the output of the linked file. For
+distributions, it can be useful to make sure this ID is unique, even if the
+actual file contents don't change. The easiest way to do this is to insert
+a section with some data.
 
+Add an ELF note to both the kernel and module which contains some data based
+off of a config option.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Signed-off-by: Laura Abbott <labbott@redhat.com>
 ---
-v5: New approach with the BUILD_SALT macro
+v5: I used S-o-b here since the majority of the code was written
+already. Please feel free to change the tag if you think it's not
+appropriate. I also tweaked this to take an ascii string instead of just
+a hex value since this makes things much easier on the distribution
+side.
 ---
- arch/powerpc/kernel/vdso32/note.S | 3 +++
- 1 file changed, 3 insertions(+)
+ include/linux/build-salt.h | 20 ++++++++++++++++++++
+ init/Kconfig               |  9 +++++++++
+ init/version.c             |  3 +++
+ scripts/mod/modpost.c      |  3 +++
+ 4 files changed, 35 insertions(+)
+ create mode 100644 include/linux/build-salt.h
 
-diff --git a/arch/powerpc/kernel/vdso32/note.S b/arch/powerpc/kernel/vdso32/note.S
-index d4b5be4f3d5f..ec1d05265c75 100644
---- a/arch/powerpc/kernel/vdso32/note.S
-+++ b/arch/powerpc/kernel/vdso32/note.S
-@@ -5,6 +5,7 @@
+diff --git a/include/linux/build-salt.h b/include/linux/build-salt.h
+new file mode 100644
+index 000000000000..bb007bd05e7a
+--- /dev/null
++++ b/include/linux/build-salt.h
+@@ -0,0 +1,20 @@
++#ifndef __BUILD_SALT_H
++#define __BUILD_SALT_H
++
++#include <linux/elfnote.h>
++
++#define LINUX_ELFNOTE_BUILD_SALT       0x100
++
++#ifdef __ASSEMBLER__
++
++#define BUILD_SALT \
++       ELFNOTE(Linux, LINUX_ELFNOTE_BUILD_SALT, .asciz CONFIG_BUILD_SALT)
++
++#else
++
++#define BUILD_SALT \
++       ELFNOTE32("Linux", LINUX_ELFNOTE_BUILD_SALT, CONFIG_BUILD_SALT)
++
++#endif
++
++#endif /* __BUILD_SALT_H */
+diff --git a/init/Kconfig b/init/Kconfig
+index 041f3a022122..8de789f40db9 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -107,6 +107,15 @@ config LOCALVERSION_AUTO
  
- #include <linux/uts.h>
- #include <linux/version.h>
+ 	  which is done within the script "scripts/setlocalversion".)
+ 
++config BUILD_SALT
++       string "Build ID Salt"
++       default "Linux"
++       help
++          The build ID is used to link binaries and their debug info. Setting
++          this option will use the value in the calculation of the build id.
++          This is mostly useful for distributions which want to ensure the
++          build is unique between builds. It's safe to leave the default.
++
+ config HAVE_KERNEL_GZIP
+ 	bool
+ 
+diff --git a/init/version.c b/init/version.c
+index bfb4e3f4955e..ef4012ec4375 100644
+--- a/init/version.c
++++ b/init/version.c
+@@ -7,6 +7,7 @@
+  */
+ 
+ #include <generated/compile.h>
 +#include <linux/build-salt.h>
- 
- #define ASM_ELF_NOTE_BEGIN(name, flags, vendor, type)			      \
- 	.section name, flags;						      \
-@@ -23,3 +24,5 @@
- 	ASM_ELF_NOTE_BEGIN(".note.kernel-version", "a", UTS_SYSNAME, 0)
- 	.long LINUX_VERSION_CODE
- 	ASM_ELF_NOTE_END
+ #include <linux/export.h>
+ #include <linux/uts.h>
+ #include <linux/utsname.h>
+@@ -49,3 +50,5 @@ const char linux_proc_banner[] =
+ 	"%s version %s"
+ 	" (" LINUX_COMPILE_BY "@" LINUX_COMPILE_HOST ")"
+ 	" (" LINUX_COMPILER ") %s\n";
 +
 +BUILD_SALT;
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 1663fb19343a..dc6d714e4dcb 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2125,10 +2125,13 @@ static int check_modname_len(struct module *mod)
+  **/
+ static void add_header(struct buffer *b, struct module *mod)
+ {
++	buf_printf(b, "#include <linux/build-salt.h>\n");
+ 	buf_printf(b, "#include <linux/module.h>\n");
+ 	buf_printf(b, "#include <linux/vermagic.h>\n");
+ 	buf_printf(b, "#include <linux/compiler.h>\n");
+ 	buf_printf(b, "\n");
++	buf_printf(b, "BUILD_SALT;\n");
++	buf_printf(b, "\n");
+ 	buf_printf(b, "MODULE_INFO(vermagic, VERMAGIC_STRING);\n");
+ 	buf_printf(b, "MODULE_INFO(name, KBUILD_MODNAME);\n");
+ 	buf_printf(b, "\n");
 -- 
 2.17.1
 
