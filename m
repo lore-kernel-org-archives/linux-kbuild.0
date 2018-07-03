@@ -1,86 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43168 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753183AbeGCWOg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Jul 2018 18:14:36 -0400
-From: NeilBrown <neilb@suse.com>
-Date: Wed, 04 Jul 2018 08:14:28 +1000
-Subject: Re: [PATCH 4/5] kbuild: disable KBUILD_MODNAME when building for mod.a
-In-Reply-To: <CAK7LNAR2n_Kf7HEwWgLwH8sjyVAiJUWkvV7ZAbkNn0KgVTUx1Q@mail.gmail.com>
-References: <152929708853.17463.17302660556961083137.stgit@noble> <152929772052.17463.10728056000221362647.stgit@noble> <CAK7LNAR2n_Kf7HEwWgLwH8sjyVAiJUWkvV7ZAbkNn0KgVTUx1Q@mail.gmail.com>
-Message-ID: <87efgk0xx7.fsf@notabene.neil.brown.name>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha256; protocol="application/pgp-signature"
+Received: from mail-oi0-f68.google.com ([209.85.218.68]:39090 "EHLO
+        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752049AbeGCXWG (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 3 Jul 2018 19:22:06 -0400
+Received: by mail-oi0-f68.google.com with SMTP id d189-v6so7182445oib.6
+        for <linux-kbuild@vger.kernel.org>; Tue, 03 Jul 2018 16:22:06 -0700 (PDT)
+From: Laura Abbott <labbott@redhat.com>
+Subject: [PATCHv5 0/4] Salted build ids via ELF notes
+Date: Tue,  3 Jul 2018 16:21:56 -0700
+Message-Id: <20180703232200.11315-1-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Andy Lutomirski <luto@kernel.org>, mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Ellerman <mpe@ellerman.id.au>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: Laura Abbott <labbott@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, linux-kernel@vger.kernel.org, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
 
---=-=-=
-Content-Type: text/plain
 
-On Wed, Jun 27 2018, Masahiro Yamada wrote:
+Hi,
 
-> 2018-06-18 13:55 GMT+09:00 NeilBrown <neilb@suse.com>:
->> When building an object to be included in mod.a we
->> cannot know the name of the module.  So don't define
->> KBUILD_MODNAME.  This will ensure attempt to use
->> that macro when the module name isn't know will
->> trigger an error.
->
-> Honestly, I hate KBUILD_MODNAME.
->
-> If KBUILD_MODNAME is undefined,
-> you cannot call pr_debug() in the sub-directory for example.
+This is v5 of the series to allow unique build ids in the kernel. As a
+reminder of the context:
 
-I think this is only true if you have something like
+""
+In Fedora, the debug information is packaged separately (foo-debuginfo) and
+can be installed separately. There's been a long standing issue where only one
+version of a debuginfo info package can be installed at a time. Mark Wielaard
+made an effort for Fedora 27 to allow parallel installation of debuginfo (see
+https://fedoraproject.org/wiki/Changes/ParallelInstallableDebuginfo for
+more details)
 
-#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+Part of the requirement to allow this to work is that build ids are
+unique between builds. The existing upstream rpm implementation ensures
+this by re-calculating the build-id using the version and release as a
+seed. This doesn't work 100% for the kernel because of the vDSO which is
+its own binary and doesn't get updated. After poking holes in a few of my
+ideas, there was a discussion with some people from the binutils team about
+adding --build-id-salt to let ld do the calculation debugedit is doing. There
+was a counter proposal made to add in the salt while building. The
+easiest proposal was to add an item in the linker script vs. linking in
+an object since we need the salt to go in every module as well as the
+kernel and vmlinux.
+""
 
-in your .c files.  Developers who use modobj-m could be advised not to
-do this.
+v5 uses the approach suggested by Masahiro Yamada which uses the
+existing ELF note macro to more easily add the salt (vs previous
+approaches which tried to adjust via linker section).
 
->
-> CONFIG_DYNAMIC_DEBUG requires KBUILD_MODNAME,
-> but people often miss to notice that, then cause build errors.
-
-Yes, I can see that.
-We could change it to use a default ("no-name") if KBUILD_MODNAME isn't
-defined.  Or we could require that KBUILD_MODNAME always be defined.
-
-Where I've been using these patches I've sometimes been adding
-
-  ccflags-y += -DKBUILD_MODNAME='"FOO"'
-
-to Makefiles so that modules_params get handled correctly on non-module
-builds.  I've thought about instead allowing "modobj-name" to be defined
-and requiring that it be set if either modobj-[yn] is set.  Then it gets
-used for the KBUILD_MODNAME when building modobj modules.
-
-Would you prefer to always require KBUILD_MODNAME, or to use a default
-name for dynamic-debug?
+If arch maintainers are okay, I'd like acks for this so this can go
+through the kbuild tree.
 
 Thanks,
-NeilBrown
+Laura
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+Laura Abbott (4):
+  kbuild: Add build salt to the kernel and modules
+  x86: Add build salt to the vDSO
+  powerpc: Add build salt to the vDSO
+  arm64: Add build salt to the vDSO
 
------BEGIN PGP SIGNATURE-----
+ arch/arm64/kernel/vdso/note.S     |  3 +++
+ arch/powerpc/kernel/vdso32/note.S |  3 +++
+ arch/x86/entry/vdso/vdso-note.S   |  3 +++
+ arch/x86/entry/vdso/vdso32/note.S |  3 +++
+ include/linux/build-salt.h        | 20 ++++++++++++++++++++
+ init/Kconfig                      |  9 +++++++++
+ init/version.c                    |  3 +++
+ scripts/mod/modpost.c             |  3 +++
+ 8 files changed, 47 insertions(+)
+ create mode 100644 include/linux/build-salt.h
 
-iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAls79UQACgkQOeye3VZi
-gbkeuw//Qmp9HcEtcoeR8iagsbCxtosyNdqv4zrcLVMtTIOc3ECO8dFFPtKvVyUB
-uu3/HnDYNwx2En59vilrk1pdfpKe97ivK4MBzQ/ztMspploxGuVqL0qrExjxKYXB
-shkzEhxu8bjSRiZ7DpOBMN2ngUDN+oIbcmRST3UuYlJz4yUleqoI3wpWpcO6faQ6
-wFNRbV7SUT5LRaunEeIyWIzgvOqIU+97iv2AeCyZjfOL5del/v/IKdeMj9JVFJQK
-8UUmF8oktj8Rys+5eJ0jjxqhsOatUiwnsF4ThrC3eR3gro62RFkgfTMb4tzZ/jAU
-s5G8diFhqzwg+KXCD2WdnmejWqjuHWCZvAvJzZ8KfomcfP7kjE8kMjJSZun4xh1j
-Th29yWuH2jYm5/Ltw9YftqXjogrxdMmscl3Xotdz9m1NUQVar2Y27BZm3v2E5Mw7
-FsMmgml1rCDh6OuVxY8j2hoB+1TbBx4Yo7uwp/DL/8WUKKb6rTVxdZ8oiot6YqH1
-RskoE1jXW7xf4ZOtFGZ4+u4qORqd+x8hMyEFY/tx2vA5ULC539QxoFtL1saIuU9M
-LET3AgxhGO70C1cGJtzgPLyzNkCVARcSaFINB52qpRtKcBYiwJGagJS5t9ZF92+U
-Y/xa0Q05t5wCpeuxKtfNbr2whMSLnSA9GS5gTpRqazF4tQEWcuA=
-=G3LZ
------END PGP SIGNATURE-----
---=-=-=--
+-- 
+2.17.1
+
