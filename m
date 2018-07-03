@@ -1,46 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:53440 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934296AbeGCRfa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Jul 2018 13:35:30 -0400
-Date: Tue, 3 Jul 2018 18:36:08 +0100
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
- sanitizer
-Message-ID: <20180703173608.GF27243@arm.com>
-References: <cover.1530018818.git.andreyknvl@google.com>
- <20180628105057.GA26019@e103592.cambridge.arm.com>
- <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
- <20180629110709.GA17859@arm.com>
- <CAAeHK+wHd8B2nhat-Z2Y2=s4NVobPG7vjr2CynjFhqPTwQRepQ@mail.gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:43168 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753183AbeGCWOg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 3 Jul 2018 18:14:36 -0400
+From: NeilBrown <neilb@suse.com>
+Date: Wed, 04 Jul 2018 08:14:28 +1000
+Subject: Re: [PATCH 4/5] kbuild: disable KBUILD_MODNAME when building for mod.a
+In-Reply-To: <CAK7LNAR2n_Kf7HEwWgLwH8sjyVAiJUWkvV7ZAbkNn0KgVTUx1Q@mail.gmail.com>
+References: <152929708853.17463.17302660556961083137.stgit@noble> <152929772052.17463.10728056000221362647.stgit@noble> <CAK7LNAR2n_Kf7HEwWgLwH8sjyVAiJUWkvV7ZAbkNn0KgVTUx1Q@mail.gmail.com>
+Message-ID: <87efgk0xx7.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+wHd8B2nhat-Z2Y2=s4NVobPG7vjr2CynjFhqPTwQRepQ@mail.gmail.com>
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, Jun 29, 2018 at 06:36:10PM +0200, Andrey Konovalov wrote:
-> On Fri, Jun 29, 2018 at 1:07 PM, Will Deacon <will.deacon@arm.com> wrote:
-> > It might not seen sensible, but we could still be relying on this in the
-> > kernel and so this change would introduce a regression. I think we need
-> > a way to identify such pointer usage before these patches can seriously be
-> > considered for mainline inclusion.
-> 
-> Another point that I have here is that KHWASAN is a debugging tool not
-> meant to be used in production. We're not trying to change the ABI or
-> something like that (referring to the other HWASAN patchset). We can
-> fix up the non obvious places where untagging is needed in a case by
-> case basis with additional patches when testing reveals it.
+--=-=-=
+Content-Type: text/plain
 
-Hmm, but elsewhere in this thread, Evgenii is motivating the need for this
-patch set precisely because the lower overhead means it's suitable for
-"near-production" use. So I don't think writing this off as a debugging
-feature is the right approach, and we instead need to put effort into
-analysing the impact of address tags on the kernel as a whole. Playing
-whack-a-mole with subtle tag issues sounds like the worst possible outcome
-for the long-term.
+On Wed, Jun 27 2018, Masahiro Yamada wrote:
 
-Will
+> 2018-06-18 13:55 GMT+09:00 NeilBrown <neilb@suse.com>:
+>> When building an object to be included in mod.a we
+>> cannot know the name of the module.  So don't define
+>> KBUILD_MODNAME.  This will ensure attempt to use
+>> that macro when the module name isn't know will
+>> trigger an error.
+>
+> Honestly, I hate KBUILD_MODNAME.
+>
+> If KBUILD_MODNAME is undefined,
+> you cannot call pr_debug() in the sub-directory for example.
+
+I think this is only true if you have something like
+
+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+
+in your .c files.  Developers who use modobj-m could be advised not to
+do this.
+
+>
+> CONFIG_DYNAMIC_DEBUG requires KBUILD_MODNAME,
+> but people often miss to notice that, then cause build errors.
+
+Yes, I can see that.
+We could change it to use a default ("no-name") if KBUILD_MODNAME isn't
+defined.  Or we could require that KBUILD_MODNAME always be defined.
+
+Where I've been using these patches I've sometimes been adding
+
+  ccflags-y += -DKBUILD_MODNAME='"FOO"'
+
+to Makefiles so that modules_params get handled correctly on non-module
+builds.  I've thought about instead allowing "modobj-name" to be defined
+and requiring that it be set if either modobj-[yn] is set.  Then it gets
+used for the KBUILD_MODNAME when building modobj modules.
+
+Would you prefer to always require KBUILD_MODNAME, or to use a default
+name for dynamic-debug?
+
+Thanks,
+NeilBrown
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAls79UQACgkQOeye3VZi
+gbkeuw//Qmp9HcEtcoeR8iagsbCxtosyNdqv4zrcLVMtTIOc3ECO8dFFPtKvVyUB
+uu3/HnDYNwx2En59vilrk1pdfpKe97ivK4MBzQ/ztMspploxGuVqL0qrExjxKYXB
+shkzEhxu8bjSRiZ7DpOBMN2ngUDN+oIbcmRST3UuYlJz4yUleqoI3wpWpcO6faQ6
+wFNRbV7SUT5LRaunEeIyWIzgvOqIU+97iv2AeCyZjfOL5del/v/IKdeMj9JVFJQK
+8UUmF8oktj8Rys+5eJ0jjxqhsOatUiwnsF4ThrC3eR3gro62RFkgfTMb4tzZ/jAU
+s5G8diFhqzwg+KXCD2WdnmejWqjuHWCZvAvJzZ8KfomcfP7kjE8kMjJSZun4xh1j
+Th29yWuH2jYm5/Ltw9YftqXjogrxdMmscl3Xotdz9m1NUQVar2Y27BZm3v2E5Mw7
+FsMmgml1rCDh6OuVxY8j2hoB+1TbBx4Yo7uwp/DL/8WUKKb6rTVxdZ8oiot6YqH1
+RskoE1jXW7xf4ZOtFGZ4+u4qORqd+x8hMyEFY/tx2vA5ULC539QxoFtL1saIuU9M
+LET3AgxhGO70C1cGJtzgPLyzNkCVARcSaFINB52qpRtKcBYiwJGagJS5t9ZF92+U
+Y/xa0Q05t5wCpeuxKtfNbr2whMSLnSA9GS5gTpRqazF4tQEWcuA=
+=G3LZ
+-----END PGP SIGNATURE-----
+--=-=-=--
