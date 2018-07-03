@@ -1,51 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:56704 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753105AbeGCCYh (ORCPT
+Received: from mail-yb0-f194.google.com ([209.85.213.194]:46463 "EHLO
+        mail-yb0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753835AbeGCCZ2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Jul 2018 22:24:37 -0400
+        Mon, 2 Jul 2018 22:25:28 -0400
+Received: by mail-yb0-f194.google.com with SMTP id s14-v6so143030ybp.13
+        for <linux-kbuild@vger.kernel.org>; Mon, 02 Jul 2018 19:25:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5jKcWjm-56VRj=0kKU0Fb1ZrGgJ8WgesD0cN2x9WHTGwDw@mail.gmail.com>
-References: <1530578352-18613-1-git-send-email-yamada.masahiro@socionext.com> <CAGXu5jKcWjm-56VRj=0kKU0Fb1ZrGgJ8WgesD0cN2x9WHTGwDw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 3 Jul 2018 11:23:41 +0900
-Message-ID: <CAK7LNAT13TrEbq5YR74YA1Snimn53MLjZFbHhbS2jLuvXn9a=g@mail.gmail.com>
+In-Reply-To: <CAK7LNAT13TrEbq5YR74YA1Snimn53MLjZFbHhbS2jLuvXn9a=g@mail.gmail.com>
+References: <1530578352-18613-1-git-send-email-yamada.masahiro@socionext.com>
+ <CAGXu5jKcWjm-56VRj=0kKU0Fb1ZrGgJ8WgesD0cN2x9WHTGwDw@mail.gmail.com> <CAK7LNAT13TrEbq5YR74YA1Snimn53MLjZFbHhbS2jLuvXn9a=g@mail.gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Mon, 2 Jul 2018 19:25:26 -0700
+Message-ID: <CAGXu5j+sQ9Fz+zYW8AXyDjuKtOSh-e7b_02N5nkD_DV7Voj10g@mail.gmail.com>
 Subject: Re: [PATCH] gcc-plugins: remove unused GCC_PLUGIN_SUBDIR
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Emese Revfy <re.emese@gmail.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi Kees,
-
-2018-07-03 11:18 GMT+09:00 Kees Cook <keescook@chromium.org>:
-> On Mon, Jul 2, 2018 at 5:39 PM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> GCC_PLUGIN_SUBDIR has never been used.  If you really need this in
->> the future, please re-add it then.
+On Mon, Jul 2, 2018 at 7:23 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> Hi Kees,
+>
+> 2018-07-03 11:18 GMT+09:00 Kees Cook <keescook@chromium.org>:
+>> On Mon, Jul 2, 2018 at 5:39 PM, Masahiro Yamada
+>> <yamada.masahiro@socionext.com> wrote:
+>>> GCC_PLUGIN_SUBDIR has never been used.  If you really need this in
+>>> the future, please re-add it then.
+>>>
+>>> For now, the code is unused. Remove.
+>>>
+>>> 'export HOSTLIBS' is not necessary either.
+>>>
+>>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 >>
->> For now, the code is unused. Remove.
+>> Acked-by: Kees Cook <keescook@chromium.org>
 >>
->> 'export HOSTLIBS' is not necessary either.
+>> Is this going via your tree, or should I take it via the gcc-plugins tree?
 >>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> Thanks!
+>>
+>> -Kees
 >
-> Acked-by: Kees Cook <keescook@chromium.org>
->
-> Is this going via your tree, or should I take it via the gcc-plugins tree?
->
-> Thanks!
->
-> -Kees
+> Could you pick it up to your tree?
 
-Could you pick it up to your tree?
+Happily; thanks!
 
-Thanks.
-
-
-
+-Kees
 
 -- 
-Best Regards
-Masahiro Yamada
+Kees Cook
+Pixel Security
