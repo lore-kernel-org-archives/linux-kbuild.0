@@ -1,56 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:53146 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752794AbeGDT7S (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jul 2018 15:59:18 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] kbuild: delete INSTALL_FW_PATH from kbuild documentation
-Message-ID: <6477e1be-6686-582b-35b5-72e9f677619f@infradead.org>
-Date: Wed, 4 Jul 2018 12:59:16 -0700
+Received: from mx2.suse.de ([195.135.220.15]:40056 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752607AbeGDVyv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 4 Jul 2018 17:54:51 -0400
+From: NeilBrown <neilb@suse.com>
+Date: Thu, 05 Jul 2018 07:54:38 +1000
+Subject: Re: [PATCH 4/5] kbuild: disable KBUILD_MODNAME when building for mod.a
+In-Reply-To: <CAK7LNAS22VUQytcX=BQt48qeAn9Rq00Sb555Gu98J+=8R_3OVA@mail.gmail.com>
+References: <152929708853.17463.17302660556961083137.stgit@noble> <152929772052.17463.10728056000221362647.stgit@noble> <CAK7LNAR2n_Kf7HEwWgLwH8sjyVAiJUWkvV7ZAbkNn0KgVTUx1Q@mail.gmail.com> <87efgk0xx7.fsf@notabene.neil.brown.name> <CAK7LNAS22VUQytcX=BQt48qeAn9Rq00Sb555Gu98J+=8R_3OVA@mail.gmail.com>
+Message-ID: <87po02zmxt.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-From: Randy Dunlap <rdunlap@infradead.org>
+--=-=-=
+Content-Type: text/plain
 
-Removed Kbuild documentation for INSTALL_FW_PATH.
+On Wed, Jul 04 2018, Masahiro Yamada wrote:
 
-The kbuild symbol INSTALL_FW_PATH was removed from Kbuild tools in
-September 2014 (for 4.14) but the symbol was not deleted from
-the kbuild documentation, so do that now.
+> 2018-07-04 7:14 GMT+09:00 NeilBrown <neilb@suse.com>:
+>>
+>> Where I've been using these patches I've sometimes been adding
+>>
+>>   ccflags-y += -DKBUILD_MODNAME='"FOO"'
+>>
+>> to Makefiles so that modules_params get handled correctly on non-module
+>> builds.  I've thought about instead allowing "modobj-name" to be defined
+>> and requiring that it be set if either modobj-[yn] is set.  Then it gets
+>> used for the KBUILD_MODNAME when building modobj modules.
+>>
+>> Would you prefer to always require KBUILD_MODNAME, or to use a default
+>> name for dynamic-debug?
+>>
+>> Thanks,
+>> NeilBrown
+>
+>
+> I prefer flat directory structure for modules.
+> Most of modules fit in a single directory.
 
-Fixes: 5620a0d1aac ("firmware: delete in-kernel firmware")
+I'd prefer that too in general.
+But some modules are bigger than others and some times it helps to
+sub-divide a module.
+xfs, btrfs, ceph, net/dccp, and lustre all already use multiple
+directories despite the poor support, so clearly some developers
+like a more structured approach to organizing their code.
+Wouldn't it be good to allow them to make full use of the kbuild system?
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: stable@vger.kernel.org # 4.14 and later
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- Documentation/kbuild/kbuild.txt |    9 ---------
- 1 file changed, 9 deletions(-)
+Thanks,
+NeilBrown
 
---- linux-next-20180704.orig/Documentation/kbuild/kbuild.txt
-+++ linux-next-20180704/Documentation/kbuild/kbuild.txt
-@@ -149,15 +149,6 @@ stripped after they are installed.  If I
- the default option --strip-debug will be used.  Otherwise,
- INSTALL_MOD_STRIP value will be used as the options to the strip command.
- 
--INSTALL_FW_PATH
----------------------------------------------------
--INSTALL_FW_PATH specifies where to install the firmware blobs.
--The default value is:
--
--    $(INSTALL_MOD_PATH)/lib/firmware
--
--The value can be overridden in which case the default value is ignored.
--
- INSTALL_HDR_PATH
- --------------------------------------------------
- INSTALL_HDR_PATH specifies where to install user space headers when
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAls9Qh8ACgkQOeye3VZi
+gbnwbBAAukVXTvGp9Ex5BEkDF6fjnH5145HO5ImPrZ220H2P5fX1EmUxnxczah8o
+dAA6tqgjRJXnTsK8VtnVIOu/aYqV2m7WS5T5vSQyMMrL32Jf56kO2vQlamCiMLNt
+omOQqKDI21g6j3Y0N97ZF9YzXJFqKsZWhCA4Phm8L/a8MvyWOTonvylWUM0gN6ME
+hOIlof6+vWj9dlVZAD50xxO6AQ2PrbzIhyeIIgqm7F7icU25ZLb53o3CV8w6d0mk
+i1c5gdBLk/STw2dBBJwDKF9y1wZgLF1XryyOn3FjJQ/IKCzJjJAKyA3KKUWCcXSL
+pWYI5b6W/qUh3XJ5SwboW6vQnhdfxMj+S5+EXgmnPG6EW/FZdOfZ3xVj9PNF1jTs
+iWHdWAGXJVuOX9ot98Brp0z8Gy0Dvw9uFRNwRx16+rXnzd1lLkdNGey6QDqTtnbA
+2EcVQxcqyVDp2LO0yIdl+Ye8GKC4HmPZnnfDOA9SqR7VF20C8IOLsSvd5PbCAvZq
+CXqN7FDDZPHOk2hSt3sopaEq0o3hWtNzVRdq0WgXg9i97vWHqbwOcOM8P0VcSKs9
+2nM5/OYNOY/euo5OqqVostcyKZNdiM5xwEm0+uytlugGHNFkAMXRMzoChxNBEyGc
+4rJ78UR1l0H5mdq9ahC0IeX1HoO5G4MJlp6VdlYN+d9KmOoAMx0=
+=l4yM
+-----END PGP SIGNATURE-----
+--=-=-=--
