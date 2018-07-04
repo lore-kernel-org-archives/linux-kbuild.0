@@ -1,74 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:38456 "EHLO
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:51726 "EHLO
         conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932471AbeGDD7x (ORCPT
+        with ESMTP id S933214AbeGDMJ2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Jul 2018 23:59:53 -0400
+        Wed, 4 Jul 2018 08:09:28 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180703233430.14416-2-labbott@redhat.com>
-References: <20180703233430.14416-1-labbott@redhat.com> <20180703233430.14416-2-labbott@redhat.com>
+In-Reply-To: <87efgk0xx7.fsf@notabene.neil.brown.name>
+References: <152929708853.17463.17302660556961083137.stgit@noble>
+ <152929772052.17463.10728056000221362647.stgit@noble> <CAK7LNAR2n_Kf7HEwWgLwH8sjyVAiJUWkvV7ZAbkNn0KgVTUx1Q@mail.gmail.com>
+ <87efgk0xx7.fsf@notabene.neil.brown.name>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 4 Jul 2018 12:59:00 +0900
-Message-ID: <CAK7LNAS7XBwDidNaLKC1wD+G30AyAvTHG5GN=UAiP5zz1EO8JA@mail.gmail.com>
-Subject: Re: [PATCHv5 1/4] kbuild: Add build salt to the kernel and modules
+Date: Wed, 4 Jul 2018 21:08:43 +0900
+Message-ID: <CAK7LNAS22VUQytcX=BQt48qeAn9Rq00Sb555Gu98J+=8R_3OVA@mail.gmail.com>
+Subject: Re: [PATCH 4/5] kbuild: disable KBUILD_MODNAME when building for mod.a
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: NeilBrown <neilb@suse.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi.
-
-Thanks for the update.
-
-
-2018-07-04 8:34 GMT+09:00 Laura Abbott <labbott@redhat.com>:
+2018-07-04 7:14 GMT+09:00 NeilBrown <neilb@suse.com>:
+> On Wed, Jun 27 2018, Masahiro Yamada wrote:
 >
-> The build id generated from --build-id can be generated in several different
-> ways, with the default being the sha1 on the output of the linked file. For
-> distributions, it can be useful to make sure this ID is unique, even if the
-> actual file contents don't change. The easiest way to do this is to insert
-> a section with some data.
+>> 2018-06-18 13:55 GMT+09:00 NeilBrown <neilb@suse.com>:
+>>> When building an object to be included in mod.a we
+>>> cannot know the name of the module.  So don't define
+>>> KBUILD_MODNAME.  This will ensure attempt to use
+>>> that macro when the module name isn't know will
+>>> trigger an error.
+>>
+>> Honestly, I hate KBUILD_MODNAME.
+>>
+>> If KBUILD_MODNAME is undefined,
+>> you cannot call pr_debug() in the sub-directory for example.
 >
-> Add an ELF note to both the kernel and module which contains some data based
-> off of a config option.
+> I think this is only true if you have something like
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Laura Abbott <labbott@redhat.com>
-> ---
-> v5: I used S-o-b here since the majority of the code was written
-> already.
-
-
-I think Suggested-by is good enough.
-S-o-b is appended as a patch is passed from people to people.
-
-Anyway, this looks good except one bike-shed.
-
-> Please feel free to change the tag if you think it's not
-> appropriate. I also tweaked this to take an ascii string instead of just
-> a hex value since this makes things much easier on the distribution
-> side.
-> ---
-
-
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 041f3a022122..8de789f40db9 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -107,6 +107,15 @@ config LOCALVERSION_AUTO
+> #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 >
->           which is done within the script "scripts/setlocalversion".)
+> in your .c files.  Developers who use modobj-m could be advised not to
+> do this.
 >
-> +config BUILD_SALT
-> +       string "Build ID Salt"
-> +       default "Linux"
+>>
+>> CONFIG_DYNAMIC_DEBUG requires KBUILD_MODNAME,
+>> but people often miss to notice that, then cause build errors.
+>
+> Yes, I can see that.
+> We could change it to use a default ("no-name") if KBUILD_MODNAME isn't
+> defined.  Or we could require that KBUILD_MODNAME always be defined.
+>
+> Where I've been using these patches I've sometimes been adding
+>
+>   ccflags-y += -DKBUILD_MODNAME='"FOO"'
+>
+> to Makefiles so that modules_params get handled correctly on non-module
+> builds.  I've thought about instead allowing "modobj-name" to be defined
+> and requiring that it be set if either modobj-[yn] is set.  Then it gets
+> used for the KBUILD_MODNAME when building modobj modules.
+>
+> Would you prefer to always require KBUILD_MODNAME, or to use a default
+> name for dynamic-debug?
+>
+> Thanks,
+> NeilBrown
 
 
-How about empty string ""
-for default?
-
-
+I prefer flat directory structure for modules.
+Most of modules fit in a single directory.
 
 
 -- 
