@@ -1,76 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40056 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752607AbeGDVyv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jul 2018 17:54:51 -0400
-From: NeilBrown <neilb@suse.com>
-Date: Thu, 05 Jul 2018 07:54:38 +1000
-Subject: Re: [PATCH 4/5] kbuild: disable KBUILD_MODNAME when building for mod.a
-In-Reply-To: <CAK7LNAS22VUQytcX=BQt48qeAn9Rq00Sb555Gu98J+=8R_3OVA@mail.gmail.com>
-References: <152929708853.17463.17302660556961083137.stgit@noble> <152929772052.17463.10728056000221362647.stgit@noble> <CAK7LNAR2n_Kf7HEwWgLwH8sjyVAiJUWkvV7ZAbkNn0KgVTUx1Q@mail.gmail.com> <87efgk0xx7.fsf@notabene.neil.brown.name> <CAK7LNAS22VUQytcX=BQt48qeAn9Rq00Sb555Gu98J+=8R_3OVA@mail.gmail.com>
-Message-ID: <87po02zmxt.fsf@notabene.neil.brown.name>
+Received: from bombadil.infradead.org ([198.137.202.133]:45938 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753068AbeGDWt6 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 4 Jul 2018 18:49:58 -0400
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] kconfig: update user kconfig tools doc.
+Message-ID: <0eb8bc34-a0e0-eea8-be62-8420bd82c717@infradead.org>
+Date: Wed, 4 Jul 2018 15:49:56 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: LKML <linux-kernel@vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
+From: Randy Dunlap <rdunlap@infradead.org>
 
-On Wed, Jul 04 2018, Masahiro Yamada wrote:
+Update Documentation/kbuild/kconfig.txt, which mostly contains
+user help for using the kernel config tools.
 
-> 2018-07-04 7:14 GMT+09:00 NeilBrown <neilb@suse.com>:
->>
->> Where I've been using these patches I've sometimes been adding
->>
->>   ccflags-y += -DKBUILD_MODNAME='"FOO"'
->>
->> to Makefiles so that modules_params get handled correctly on non-module
->> builds.  I've thought about instead allowing "modobj-name" to be defined
->> and requiring that it be set if either modobj-[yn] is set.  Then it gets
->> used for the KBUILD_MODNAME when building modobj modules.
->>
->> Would you prefer to always require KBUILD_MODNAME, or to use a default
->> name for dynamic-debug?
->>
->> Thanks,
->> NeilBrown
->
->
-> I prefer flat directory structure for modules.
-> Most of modules fit in a single directory.
+- Add mention of 'nconfig' embedded help text.
+- Make the section on new config symbols readable.
+- Correct how to find menuconfig search help.
+- Add section on 'nconfig' usage.
+- Mention that gconfig has multiple viewing modes/options.
 
-I'd prefer that too in general.
-But some modules are bigger than others and some times it helps to
-sub-divide a module.
-xfs, btrfs, ceph, net/dccp, and lustre all already use multiple
-directories despite the poor support, so clearly some developers
-like a more structured approach to organizing their code.
-Wouldn't it be good to allow them to make full use of the kbuild system?
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+ Documentation/kbuild/kconfig.txt |   51 ++++++++++++++++++++++++-----
+ 1 file changed, 43 insertions(+), 8 deletions(-)
 
-Thanks,
-NeilBrown
+--- lnx-418-rc3.orig/Documentation/kbuild/kconfig.txt
++++ lnx-418-rc3/Documentation/kbuild/kconfig.txt
+@@ -2,9 +2,9 @@ This file contains some assistance for u
+ 
+ Use "make help" to list all of the possible configuration targets.
+ 
+-The xconfig ('qconf') and menuconfig ('mconf') programs also
+-have embedded help text.  Be sure to check it for navigation,
+-search, and other general help text.
++The xconfig ('qconf'), menuconfig ('mconf'), and nconfig ('nconf')
++programs also have embedded help text.  Be sure to check that for
++navigation, search, and other general help text.
+ 
+ ======================================================================
+ General
+@@ -17,13 +17,16 @@ this happens, using a previously working
+ for you, so you may find that you need to see what NEW kernel
+ symbols have been introduced.
+ 
+-To see a list of new config symbols when using "make oldconfig", use
++To see a list of new config symbols, use
+ 
+ 	cp user/some/old.config .config
+ 	make listnewconfig
+ 
+ and the config program will list any new symbols, one per line.
+ 
++Alternatively, you can use the brute force method:
++
++	make oldconfig
+ 	scripts/diffconfig .config.old .config | less
+ 
+ ______________________________________________________________________
+@@ -160,7 +163,7 @@ Searching in menuconfig:
+ 		This lists all config symbols that contain "hotplug",
+ 		e.g., HOTPLUG_CPU, MEMORY_HOTPLUG.
+ 
+-	For search help, enter / followed TAB-TAB-TAB (to highlight
++	For search help, enter / followed by TAB-TAB (to highlight
+ 	<Help>) and Enter.  This will tell you that you can also use
+ 	regular expressions (regexes) in the search string, so if you
+ 	are not interested in MEMORY_HOTPLUG, you could try
+@@ -203,6 +206,39 @@ Example:
+ 
+ 
+ ======================================================================
++nconfig
++--------------------------------------------------
++
++nconfig is an alternate text-based configurator.  It lists function
++keys across the bottom of the terminal (window) that execute commands.
++You can also just use the corresponding numeric key to execute the
++commands unless you are in a data entry window.  E.g., instead of F6
++for Save, you can just press 6.
++
++Use F1 for Global help or F3 for the Short help menu.
++
++Searching in nconfig:
++
++	You can search either in the menu entry "prompt" strings
++	or in the configuration symbols.
++
++	Use / to begin a search through the menu entries.  This does
++	not support regular expressions.  Use <Down> or <Up> for
++	Next hit and Previous hit, respectively.  Use <Esc> to
++	terminate the search mode.
++
++	F8 (SymSearch) searches the configuration symbols for the
++	given string or regular expression (regex).
++
++NCONFIG_MODE
++--------------------------------------------------
++This mode shows all sub-menus in one large tree.
++
++Example:
++	make NCONFIG_MODE=single_menu nconfig
++
++
++======================================================================
+ xconfig
+ --------------------------------------------------
+ 
+@@ -230,8 +266,7 @@ gconfig
+ 
+ Searching in gconfig:
+ 
+-	None (gconfig isn't maintained as well as xconfig or menuconfig);
+-	however, gconfig does have a few more viewing choices than
+-	xconfig does.
++	There is no search command in gconfig.  However, gconfig does
++	have several different viewing choices, modes, and options.
+ 
+ ###
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAls9Qh8ACgkQOeye3VZi
-gbnwbBAAukVXTvGp9Ex5BEkDF6fjnH5145HO5ImPrZ220H2P5fX1EmUxnxczah8o
-dAA6tqgjRJXnTsK8VtnVIOu/aYqV2m7WS5T5vSQyMMrL32Jf56kO2vQlamCiMLNt
-omOQqKDI21g6j3Y0N97ZF9YzXJFqKsZWhCA4Phm8L/a8MvyWOTonvylWUM0gN6ME
-hOIlof6+vWj9dlVZAD50xxO6AQ2PrbzIhyeIIgqm7F7icU25ZLb53o3CV8w6d0mk
-i1c5gdBLk/STw2dBBJwDKF9y1wZgLF1XryyOn3FjJQ/IKCzJjJAKyA3KKUWCcXSL
-pWYI5b6W/qUh3XJ5SwboW6vQnhdfxMj+S5+EXgmnPG6EW/FZdOfZ3xVj9PNF1jTs
-iWHdWAGXJVuOX9ot98Brp0z8Gy0Dvw9uFRNwRx16+rXnzd1lLkdNGey6QDqTtnbA
-2EcVQxcqyVDp2LO0yIdl+Ye8GKC4HmPZnnfDOA9SqR7VF20C8IOLsSvd5PbCAvZq
-CXqN7FDDZPHOk2hSt3sopaEq0o3hWtNzVRdq0WgXg9i97vWHqbwOcOM8P0VcSKs9
-2nM5/OYNOY/euo5OqqVostcyKZNdiM5xwEm0+uytlugGHNFkAMXRMzoChxNBEyGc
-4rJ78UR1l0H5mdq9ahC0IeX1HoO5G4MJlp6VdlYN+d9KmOoAMx0=
-=l4yM
------END PGP SIGNATURE-----
---=-=-=--
