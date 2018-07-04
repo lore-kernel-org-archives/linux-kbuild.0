@@ -1,74 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:51726 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933214AbeGDMJ2 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jul 2018 08:09:28 -0400
+Received: from foss.arm.com ([217.140.101.70]:41228 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753103AbeGDRfg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 4 Jul 2018 13:35:36 -0400
+Date: Wed, 4 Jul 2018 18:36:15 +0100
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCHv5 4/4] arm64: Add build salt to the vDSO
+Message-ID: <20180704173615.GC9668@arm.com>
+References: <20180703233430.14416-1-labbott@redhat.com>
+ <20180703233430.14416-5-labbott@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87efgk0xx7.fsf@notabene.neil.brown.name>
-References: <152929708853.17463.17302660556961083137.stgit@noble>
- <152929772052.17463.10728056000221362647.stgit@noble> <CAK7LNAR2n_Kf7HEwWgLwH8sjyVAiJUWkvV7ZAbkNn0KgVTUx1Q@mail.gmail.com>
- <87efgk0xx7.fsf@notabene.neil.brown.name>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 4 Jul 2018 21:08:43 +0900
-Message-ID: <CAK7LNAS22VUQytcX=BQt48qeAn9Rq00Sb555Gu98J+=8R_3OVA@mail.gmail.com>
-Subject: Re: [PATCH 4/5] kbuild: disable KBUILD_MODNAME when building for mod.a
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180703233430.14416-5-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: NeilBrown <neilb@suse.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Laura Abbott <labbott@redhat.com>
+Cc: mjw@fedoraproject.org, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Catalin Marinas <catalin.marinas@arm.com>, Andy Lutomirski <luto@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, linux-kernel@vger.kernel.org, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Michael Ellerman <mpe@ellerman.id.au>, linux-arm-kernel@lists.infradead.org
 
-2018-07-04 7:14 GMT+09:00 NeilBrown <neilb@suse.com>:
-> On Wed, Jun 27 2018, Masahiro Yamada wrote:
->
->> 2018-06-18 13:55 GMT+09:00 NeilBrown <neilb@suse.com>:
->>> When building an object to be included in mod.a we
->>> cannot know the name of the module.  So don't define
->>> KBUILD_MODNAME.  This will ensure attempt to use
->>> that macro when the module name isn't know will
->>> trigger an error.
->>
->> Honestly, I hate KBUILD_MODNAME.
->>
->> If KBUILD_MODNAME is undefined,
->> you cannot call pr_debug() in the sub-directory for example.
->
-> I think this is only true if you have something like
->
-> #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
->
-> in your .c files.  Developers who use modobj-m could be advised not to
-> do this.
->
->>
->> CONFIG_DYNAMIC_DEBUG requires KBUILD_MODNAME,
->> but people often miss to notice that, then cause build errors.
->
-> Yes, I can see that.
-> We could change it to use a default ("no-name") if KBUILD_MODNAME isn't
-> defined.  Or we could require that KBUILD_MODNAME always be defined.
->
-> Where I've been using these patches I've sometimes been adding
->
->   ccflags-y += -DKBUILD_MODNAME='"FOO"'
->
-> to Makefiles so that modules_params get handled correctly on non-module
-> builds.  I've thought about instead allowing "modobj-name" to be defined
-> and requiring that it be set if either modobj-[yn] is set.  Then it gets
-> used for the KBUILD_MODNAME when building modobj modules.
->
-> Would you prefer to always require KBUILD_MODNAME, or to use a default
-> name for dynamic-debug?
->
-> Thanks,
-> NeilBrown
+On Tue, Jul 03, 2018 at 04:34:30PM -0700, Laura Abbott wrote:
+> 
+> The vDSO needs to have a unique build id in a similar manner
+> to the kernel and modules. Use the build salt macro.
+> 
+> Signed-off-by: Laura Abbott <labbott@redhat.com>
+> ---
+> v5: I was previously focused on x86 only but since powerpc gave a patch,
+> I figured I would do arm64 since the changes were also fairly simple.
+> ---
+>  arch/arm64/kernel/vdso/note.S | 3 +++
+>  1 file changed, 3 insertions(+)
 
+If you drop the trailing semicolon, then:
 
-I prefer flat directory structure for modules.
-Most of modules fit in a single directory.
+Acked-by: Will Deacon <will.deacon@arm.com>
 
+Will
 
--- 
-Best Regards
-Masahiro Yamada
+> diff --git a/arch/arm64/kernel/vdso/note.S b/arch/arm64/kernel/vdso/note.S
+> index b82c85e5d972..2c429dfd3f45 100644
+> --- a/arch/arm64/kernel/vdso/note.S
+> +++ b/arch/arm64/kernel/vdso/note.S
+> @@ -22,7 +22,10 @@
+>  #include <linux/uts.h>
+>  #include <linux/version.h>
+>  #include <linux/elfnote.h>
+> +#include <linux/build-salt.h>
+>  
+>  ELFNOTE_START(Linux, 0, "a")
+>  	.long LINUX_VERSION_CODE
+>  ELFNOTE_END
+> +
+> +BUILD_SALT;
+> -- 
+> 2.17.1
+> 
