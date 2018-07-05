@@ -1,64 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:44119 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:43891 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753372AbeGECln (ORCPT
+        with ESMTP id S1753062AbeGEClg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jul 2018 22:41:43 -0400
+        Wed, 4 Jul 2018 22:41:36 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 07/12] kbuild: use 'include' directive to load auto.conf from top Makefile
-Date: Thu,  5 Jul 2018 11:39:44 +0900
-Message-Id: <1530758389-30862-8-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v3 08/12] kbuild: add .DELETE_ON_ERROR special target
+Date: Thu,  5 Jul 2018 11:39:45 +0900
+Message-Id: <1530758389-30862-9-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-When you build targets that require the kernel configuration, dot-config
-is set to 1, then the top-level Makefile includes auto.conf.  However,
-Make considers its inclusion is optional because the '-include' directive
-is used here.
+If Make gets a fatal signal while a shell is executing, it may delete
+the target file that the recipe was supposed to update.  This is needed
+to make sure that it is remade from scratch when Make is next run; if
+Make is interrupted after the recipe has begun to write the target file,
+it results in an incomplete file whose time stamp is newer than that
+of the prerequisites files.  Make automatically deletes the incomplete
+file on interrupt unless the target is marked .PRECIOUS.
 
-If a necessary configuration file is missing for the external module
-building, the following error message is displayed:
+The situation is just the same as when the shell fails for some reasons.
+Usually when a recipe line fails, if it has changed the target file at
+all, the file is corrupted, or at least it is not completely updated.
+Yet the file’s time stamp says that it is now up to date, so the next
+time Make runs, it will not try to update that file.
 
-  ERROR: Kernel configuration is invalid.
-         include/generated/autoconf.h or include/config/auto.conf are missing.
-         Run 'make oldconfig && make prepare' on kernel src to fix it.
+However, Make does not cater to delete the incomplete target file in
+this case.  We need to add .DELETE_ON_ERROR somewhere in the Makefile
+to request it.
 
-However, Make still continues building; /bin/false let the creation of
-'include/config/auto.config' fail, but Make can ignore the error since
-it is included by the '-include' directive.
+scripts/Kbuild.include seems a suitable place to add it because it is
+included from almost all sub-makes.
 
-I guess the reason of using '-include' directive was to suppress
-the warning when you build the kernel from a pristine source tree:
+Please note .DELETE_ON_ERROR is not effective for phony targets.
 
-  Makefile:605: include/config/auto.conf: No such file or directory
+The external module building should never ever touch the kernel tree.
+The following recipe fails if include/generated/autoconf.h is missing.
+However, include/config/auto.conf is not deleted since it is a phony
+target.
 
-The previous commit made sure include/config/auto.conf exists after
-the 'make *config' stage.  Now, we can use the 'include' directive
-without showing the warning.
+ PHONY += include/config/auto.conf
+
+ include/config/auto.conf:
+         $(Q)test -e include/generated/autoconf.h -a -e $@ || (          \
+         echo >&2;                                                       \
+         echo >&2 "  ERROR: Kernel configuration is invalid.";           \
+         echo >&2 "         include/generated/autoconf.h or $@ are missing.";\
+         echo >&2 "         Run 'make oldconfig && make prepare' on kernel src to fix it."; \
+         echo >&2 ;                                                      \
+         /bin/false)
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/Kbuild.include | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index d15ac32..ef24068 100644
---- a/Makefile
-+++ b/Makefile
-@@ -584,7 +584,7 @@ virt-y		:= virt/
- endif # KBUILD_EXTMOD
- 
- ifeq ($(dot-config),1)
---include include/config/auto.conf
-+include include/config/auto.conf
- endif
- 
- # The all: target is the default when no target is given on the
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index c8156d6..b2d14f1 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -400,3 +400,6 @@ endif
+ endef
+ #
+ ###############################################################################
++
++# delete partially updated (i.e. corrupted) files on error
++.DELETE_ON_ERROR:
 -- 
 2.7.4
 
