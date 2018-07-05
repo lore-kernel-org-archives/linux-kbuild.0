@@ -1,146 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:43642 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:43641 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753155AbeGECl3 (ORCPT
+        with ESMTP id S1753161AbeGECl3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 4 Jul 2018 22:41:29 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 09/12] kbuild: do not update config when running install targets
-Date: Thu,  5 Jul 2018 11:39:46 +0900
-Message-Id: <1530758389-30862-10-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v3 04/12] kconfig: create directories needed for syncconfig by itself
+Date: Thu,  5 Jul 2018 11:39:41 +0900
+Message-Id: <1530758389-30862-5-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-"make syncconfig" is automatically invoked when any of the following
-happens:
+'make syncconfig' creates some files such as include/config/auto.conf,
+include/generate/autoconf.h, etc. but the necessary directory creation
+relies on scripts/kconfig/Makefile.
 
- - .config is updated
- - any of Kconfig files is updated
- - any of environment variables referenced in Kconfig is changed
+To make Kconfig self-contained, create directories as needed in
+conf_write_autoconf().
 
-Then, it updates configuration files such as include/config/auto.conf
-include/generated/autoconf.h, etc.
-
-Even install targets (install, modules_install, etc.) are no exception.
-However, they should never ever modify the source tree.  Install
-targets are often run with root privileges.  Once those configuration
-files are owned by root, "make mrproper" would end up with permission
-error.
-
-Install targets should just copy things blindly.  They should not care
-whether the configuration is up-to-date or not.  This makes more sense
-because we are interested in the configuration that was used in the
-previous kernel building.
-
-This issue has existed since before, but rarely happened.  I expect
-more chance where people are hit by this; with the new Kconfig syntax
-extension, the .config now contains the compiler information.  If you
-cross-compile the kernel with CROSS_COMPILE, but forget to pass it
-for "make install", you meet "any of environment variables referenced
-in Kconfig is changed" because $(CC) is referenced in Kconfig.
-Another scenario is the compiler upgrade before the installation.
-
-Install targets need the configuration.  "make modules_install" refer
-to CONFIG_MODULES etc.  "make dtbs_install" also needs CONFIG_ARCH_*
-to decide which dtb files to install.  However, the auto-update of
-the configuration files should be avoided.  We already do this for
-external modules.
-
-Now, Make targets are categorized into 3 groups:
-
-[1] Do not need the kernel configuration at all
-
-    help, coccicheck, headers_install etc.
-
-[2] Need the latest kernel configuration
-
-    If new config options are added, Kconfig will show prompt to
-    ask user's selection.
-
-    Build targets such as vmlinux, in-kernel modules are the cases.
-
-[3] Need the kernel configuration, but do not want to update it
-
-    Install targets except headers_install, and external modules
-    are the cases.
+This change allows scripts/kconfig/Makefile cleanups; syncconfig can
+be merged into simple-targets.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 27 ++++++++++++++++++++-------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+ scripts/kconfig/Makefile   | 15 ++++++---------
+ scripts/kconfig/confdata.c | 14 ++++++++++++++
+ 2 files changed, 20 insertions(+), 9 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index ef24068..f0663c8 100644
---- a/Makefile
-+++ b/Makefile
-@@ -225,10 +225,12 @@ no-dot-config-targets := $(clean-targets) \
- 			 cscope gtags TAGS tags help% %docs check% coccicheck \
- 			 $(version_h) headers_% archheaders archscripts \
- 			 kernelversion %src-pkg
-+no-sync-config-targets := $(no-dot-config-targets) install %install
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index c9e8cf5..dffe268 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -3,8 +3,7 @@
+ # Kernel configuration targets
+ # These targets are used from top-level makefile
  
--config-targets := 0
--mixed-targets  := 0
--dot-config     := 1
-+config-targets  := 0
-+mixed-targets   := 0
-+dot-config      := 1
-+may-sync-config := 1
+-PHONY += xconfig gconfig menuconfig config syncconfig \
+-	localmodconfig localyesconfig
++PHONY += xconfig gconfig menuconfig config localmodconfig localyesconfig
  
- ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
- 	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
-@@ -236,6 +238,16 @@ ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
- 	endif
- endif
+ ifdef KBUILD_KCONFIG
+ Kconfig := $(KBUILD_KCONFIG)
+@@ -34,12 +33,6 @@ config: $(obj)/conf
+ nconfig: $(obj)/nconf
+ 	$< $(silent) $(Kconfig)
  
-+ifneq ($(filter $(no-sync-config-targets), $(MAKECMDGOALS)),)
-+	ifeq ($(filter-out $(no-sync-config-targets), $(MAKECMDGOALS)),)
-+		may-sync-config := 0
-+	endif
-+endif
+-# This has become an internal implementation detail and is now deprecated
+-# for external use.
+-syncconfig: $(obj)/conf
+-	$(Q)mkdir -p include/config include/generated
+-	$< $(silent) --$@ $(Kconfig)
+-
+ localyesconfig localmodconfig: $(obj)/conf
+ 	$(Q)perl $(srctree)/$(src)/streamline_config.pl --$@ $(srctree) $(Kconfig) > .tmp.config
+ 	$(Q)if [ -f .config ]; then 					\
+@@ -55,8 +48,12 @@ localyesconfig localmodconfig: $(obj)/conf
+ 	$(Q)rm -f .tmp.config
+ 
+ # These targets map 1:1 to the commandline options of 'conf'
++#
++# Note:
++#  syncconfig has become an internal implementation detail and is now
++#  deprecated for external use
+ simple-targets := oldconfig allnoconfig allyesconfig allmodconfig \
+-	alldefconfig randconfig listnewconfig olddefconfig
++	alldefconfig randconfig listnewconfig olddefconfig syncconfig
+ PHONY += $(simple-targets)
+ 
+ $(simple-targets): $(obj)/conf
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 881993e..38b3a6c 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -898,6 +898,9 @@ static int conf_write_dep(const char *name)
+ 
+ 	fprintf(out, "\n$(deps_config): ;\n");
+ 	fclose(out);
 +
-+ifneq ($(KBUILD_EXTMOD),)
-+	may-sync-config := 0
-+endif
++	if (mkdir_p(name))
++		return 1;
+ 	rename("..config.tmp", name);
+ 	return 0;
+ }
+@@ -914,6 +917,8 @@ static int conf_split_config(void)
+ 	conf_read_simple(name, S_DEF_AUTO);
+ 	sym_calc_value(modules_sym);
+ 
++	if (mkdir_p("include/config/"))
++		return 1;
+ 	if (chdir("include/config"))
+ 		return 1;
+ 
+@@ -990,6 +995,7 @@ static int conf_split_config(void)
+ 				res = 1;
+ 				goto out;
+ 			}
 +
- ifeq ($(KBUILD_EXTMOD),)
-         ifneq ($(filter config %config,$(MAKECMDGOALS)),)
-                 config-targets := 1
-@@ -606,7 +618,7 @@ ARCH_CFLAGS :=
- include arch/$(SRCARCH)/Makefile
- 
- ifeq ($(dot-config),1)
--ifeq ($(KBUILD_EXTMOD),)
-+ifeq ($(may-sync-config),1)
- # Read in dependencies to all Kconfig* files, make sure to run syncconfig if
- # changes are detected. This should be included after arch/$(SRCARCH)/Makefile
- # because some architectures define CROSS_COMPILE there.
-@@ -621,8 +633,9 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
- include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
- 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
- else
--# external modules needs include/generated/autoconf.h and include/config/auto.conf
--# but do not care if they are up-to-date. Use auto.conf to trigger the test
-+# External modules and some install targets need include/generated/autoconf.h
-+# and include/config/auto.conf but do not care if they are up-to-date.
-+# Use auto.conf to trigger the test
- PHONY += include/config/auto.conf
- 
- include/config/auto.conf:
-@@ -634,7 +647,7 @@ include/config/auto.conf:
- 	echo >&2 ;							\
- 	/bin/false)
- 
--endif # KBUILD_EXTMOD
-+endif # may-sync-config
- 
- else
- # Dummy target needed, because used as prerequisite
+ 			/* Try it again. */
+ 			fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+ 			if (fd == -1) {
+@@ -1062,14 +1068,22 @@ int conf_write_autoconf(void)
+ 	name = getenv("KCONFIG_AUTOHEADER");
+ 	if (!name)
+ 		name = "include/generated/autoconf.h";
++	if (mkdir_p(name))
++		return 1;
+ 	if (rename(".tmpconfig.h", name))
+ 		return 1;
++
+ 	name = getenv("KCONFIG_TRISTATE");
+ 	if (!name)
+ 		name = "include/config/tristate.conf";
++	if (mkdir_p(name))
++		return 1;
+ 	if (rename(".tmpconfig_tristate", name))
+ 		return 1;
++
+ 	name = conf_get_autoconfig_name();
++	if (mkdir_p(name))
++		return 1;
+ 	/*
+ 	 * This must be the last step, kbuild has a dependency on auto.conf
+ 	 * and this marks the successful completion of the previous steps.
 -- 
 2.7.4
 
