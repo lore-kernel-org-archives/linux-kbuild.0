@@ -1,121 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:65161 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750884AbeGEGFG (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:49402 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752440AbeGEJHT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Jul 2018 02:05:06 -0400
+        Thu, 5 Jul 2018 05:07:19 -0400
 MIME-Version: 1.0
-In-Reply-To: <7f7dfd3d-6d4b-fc64-956b-1defc5c5a7c3@infradead.org>
-References: <20180702144711.22111-1-hch@lst.de> <20180702144711.22111-2-hch@lst.de>
- <43b9a29d-27fc-1b6e-6f90-9187749bf338@infradead.org> <7f7dfd3d-6d4b-fc64-956b-1defc5c5a7c3@infradead.org>
+In-Reply-To: <87po02zmxt.fsf@notabene.neil.brown.name>
+References: <152929708853.17463.17302660556961083137.stgit@noble>
+ <152929772052.17463.10728056000221362647.stgit@noble> <CAK7LNAR2n_Kf7HEwWgLwH8sjyVAiJUWkvV7ZAbkNn0KgVTUx1Q@mail.gmail.com>
+ <87efgk0xx7.fsf@notabene.neil.brown.name> <CAK7LNAS22VUQytcX=BQt48qeAn9Rq00Sb555Gu98J+=8R_3OVA@mail.gmail.com>
+ <87po02zmxt.fsf@notabene.neil.brown.name>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 5 Jul 2018 15:04:07 +0900
-Message-ID: <CAK7LNASspaTidLtkfnip5rfmEOdt4uw94kzN=obo_1VM-q80=A@mail.gmail.com>
-Subject: Re: [PATCH 1/5] kconfig: include common Kconfig files from top-level Kconfig
+Date: Thu, 5 Jul 2018 18:06:26 +0900
+Message-ID: <CAK7LNAT9deaBb0aiFW+00G-S4FTVdN5GX-n3HbEUR07nzHQUmQ@mail.gmail.com>
+Subject: Re: [PATCH 4/5] kbuild: disable KBUILD_MODNAME when building for mod.a
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: NeilBrown <neilb@suse.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-07-03 5:50 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> On 07/02/18 13:41, Randy Dunlap wrote:
+2018-07-05 6:54 GMT+09:00 NeilBrown <neilb@suse.com>:
+> On Wed, Jul 04 2018, Masahiro Yamada wrote:
 >
->> --- linux-next-20180702.orig/init/Kconfig
->> +++ linux-next-20180702/init/Kconfig
->> @@ -1717,6 +1717,12 @@ config PROFILING
->>  config TRACEPOINTS
->>       bool
+>> 2018-07-04 7:14 GMT+09:00 NeilBrown <neilb@suse.com>:
+>>>
+>>> Where I've been using these patches I've sometimes been adding
+>>>
+>>>   ccflags-y += -DKBUILD_MODNAME='"FOO"'
+>>>
+>>> to Makefiles so that modules_params get handled correctly on non-module
+>>> builds.  I've thought about instead allowing "modobj-name" to be defined
+>>> and requiring that it be set if either modobj-[yn] is set.  Then it gets
+>>> used for the KBUILD_MODNAME when building modobj modules.
+>>>
+>>> Would you prefer to always require KBUILD_MODNAME, or to use a default
+>>> name for dynamic-debug?
+>>>
+>>> Thanks,
+>>> NeilBrown
 >>
->> +# Note:  arch/$(SRCARCH)/Kconfig needs to be before arch/Kconfig
->> +# so that each $ARCH can specify its values for CONFIG_PGTABLE_LEVELS
->> +# before the default value is found in arch/Kconfig.
->> +
->> +source "arch/$(SRCARCH)/Kconfig"
->> +
->>  source "arch/Kconfig"
 >>
->>  endmenu              # General setup
->>
+>> I prefer flat directory structure for modules.
+>> Most of modules fit in a single directory.
 >
-> except that the endmenu should be moved up a few lines so that the
-> Processor type and features menu is not part of the General setup menu.
->
-> v2 patch is below.
->
-> ---
-> From: Randy Dunlap <rdunlap@infradead.org>
->
-> Present "General setup" before "Processor type and features".
-> This is done by sourcing arch/$(SRCARCH)/Kconfig before arch/Kconfig
-> inside init/Kconfig.
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
-> v2: move General setup's endmenu before the $ARCH Kconfigs.
->
->  Kconfig      |    2 --
->  init/Kconfig |   10 ++++++++--
->  2 files changed, 8 insertions(+), 4 deletions(-)
->
-> --- linux-next-20180702.orig/Kconfig
-> +++ linux-next-20180702/Kconfig
-> @@ -9,8 +9,6 @@ comment "Compiler: $(CC_VERSION_TEXT)"
->
->  source "scripts/Kconfig.include"
->
-> -source "arch/$(SRCARCH)/Kconfig"
-> -
->  source "init/Kconfig"
->
->  source "kernel/Kconfig.freezer"
-> --- linux-next-20180702.orig/init/Kconfig
-> +++ linux-next-20180702/init/Kconfig
-> @@ -1717,10 +1717,16 @@ config PROFILING
->  config TRACEPOINTS
->         bool
->
-> -source "arch/Kconfig"
-> -
->  endmenu                # General setup
->
-> +# Note:  arch/$(SRCARCH)/Kconfig needs to be before arch/Kconfig
-> +# so that each $ARCH can specify its values for CONFIG_PGTABLE_LEVELS
-> +# before the default value is found in arch/Kconfig.
+> I'd prefer that too in general.
+> But some modules are bigger than others and some times it helps to
+> sub-divide a module.
+> xfs, btrfs, ceph, net/dccp, and lustre all already use multiple
+> directories despite the poor support, so clearly some developers
+> like a more structured approach to organizing their code.
+> Wouldn't it be good to allow them to make full use of the kbuild system?
 
 
-Is it possible to explain it in a little more generic way?
+xfs is quite big, but the others are not too bad.
+You can collect files into a single directory if you want.
+If you mind the namespace, one tip might be to group files with prefix.
+For example,
+
+  drivers/btrfs/tests/foo.o  ->  drivers/btrfs/test-foo.o
+
+I do not want to introduce a mess to core build scripts.
 
 
-...
-so that arch/$(SRCARCH)/Kconfig can override the default values
-in arch/Kconfig.
-
-
-I am not a native speaker.
-Please reword it so that it sounds more natural.
-
-
-Thanks.
-
-
-
-
-
-
-> +source "arch/$(SRCARCH)/Kconfig"
-> +
-> +source "arch/Kconfig"
-> +
->  config RT_MUTEXES
->         bool
->
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Thanks,
+> NeilBrown
 
 
 
