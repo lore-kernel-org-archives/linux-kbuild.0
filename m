@@ -1,83 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:44784 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753437AbeGEP6c (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Jul 2018 11:58:32 -0400
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 56E052400A
-        for <linux-kbuild@vger.kernel.org>; Thu,  5 Jul 2018 15:58:31 +0000 (UTC)
-Received: by mail-wm0-f46.google.com with SMTP id n17-v6so11804616wmh.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Jul 2018 08:58:31 -0700 (PDT)
+Received: from mail-qt0-f196.google.com ([209.85.216.196]:46341 "EHLO
+        mail-qt0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753752AbeGETFm (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 5 Jul 2018 15:05:42 -0400
+Received: by mail-qt0-f196.google.com with SMTP id h5-v6so8003841qtm.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 05 Jul 2018 12:05:42 -0700 (PDT)
+Subject: Re: [PATCHv5 4/4] arm64: Add build salt to the vDSO
+References: <20180703233430.14416-1-labbott@redhat.com>
+ <20180703233430.14416-5-labbott@redhat.com>
+ <CAK7LNARxwNkzkUif9dj1oVFGYP4J41C+t=W4YFVxM+J94siGvA@mail.gmail.com>
+From: Laura Abbott <labbott@redhat.com>
+Message-ID: <33c28c0a-e429-51ea-0428-26fcfafa61bb@redhat.com>
+Date: Thu, 5 Jul 2018 12:05:38 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180703233430.14416-3-labbott@redhat.com>
-References: <20180703233430.14416-1-labbott@redhat.com> <20180703233430.14416-3-labbott@redhat.com>
-From: Andy Lutomirski <luto@kernel.org>
-Date: Thu, 5 Jul 2018 08:58:09 -0700
-Message-ID: <CALCETrVZi2WYbBSifaNV4wajj52PyG-w7z9DekfJvSuZAKi1nA@mail.gmail.com>
-Subject: Re: [PATCHv5 2/4] x86: Add build salt to the vDSO
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNARxwNkzkUif9dj1oVFGYP4J41C+t=W4YFVxM+J94siGvA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andy Lutomirski <luto@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 
-On Tue, Jul 3, 2018 at 4:34 PM, Laura Abbott <labbott@redhat.com> wrote:
->
-> The vDSO needs to have a unique build id in a similar manner
-> to the kernel and modules. Use the build salt macro.
->
+On 07/03/2018 08:55 PM, Masahiro Yamada wrote:
+> Hi.
+> 
+> 2018-07-04 8:34 GMT+09:00 Laura Abbott <labbott@redhat.com>:
+>>
+>> The vDSO needs to have a unique build id in a similar manner
+>> to the kernel and modules. Use the build salt macro.
+>>
+>> Signed-off-by: Laura Abbott <labbott@redhat.com>
+>> ---
+>> v5: I was previously focused on x86 only but since powerpc gave a patch,
+>> I figured I would do arm64 since the changes were also fairly simple.
+>> ---
+>>   arch/arm64/kernel/vdso/note.S | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/arch/arm64/kernel/vdso/note.S b/arch/arm64/kernel/vdso/note.S
+>> index b82c85e5d972..2c429dfd3f45 100644
+>> --- a/arch/arm64/kernel/vdso/note.S
+>> +++ b/arch/arm64/kernel/vdso/note.S
+>> @@ -22,7 +22,10 @@
+>>   #include <linux/uts.h>
+>>   #include <linux/version.h>
+>>   #include <linux/elfnote.h>
+>> +#include <linux/build-salt.h>
+>>
+>>   ELFNOTE_START(Linux, 0, "a")
+>>          .long LINUX_VERSION_CODE
+>>   ELFNOTE_END
+>> +
+>> +BUILD_SALT;
+> 
+> 
+> 
+> I think this works, but
+> I prefer no-semicolon in assembly files.
+> 
+> For coding consistency,
+> I want ';' as statement delimiter in .c files.
+> But, only new line after each statement in .S files.
+> 
+> For example, in arch/x86/xen/xen-head.S
+> I see no semicolon after ELFNOTE().
+> 
+> I found this:
+> http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0473k/dom1359731141352.html
+> It says ';' starts a comment line
+> although it is not the case of GAS.
+> 
+> 
+> Same for 3/4.
+> 
+> 
+> 
 
-Looks good to me.  I have no idea whose tree these would go through.
-
-> Signed-off-by: Laura Abbott <labbott@redhat.com>
-> ---
-> v5: Switched to using the single line BUILD_SALT macro
-> ---
->  arch/x86/entry/vdso/vdso-note.S   | 3 +++
->  arch/x86/entry/vdso/vdso32/note.S | 3 +++
->  2 files changed, 6 insertions(+)
->
-> diff --git a/arch/x86/entry/vdso/vdso-note.S b/arch/x86/entry/vdso/vdso-note.S
-> index 79a071e4357e..79423170118f 100644
-> --- a/arch/x86/entry/vdso/vdso-note.S
-> +++ b/arch/x86/entry/vdso/vdso-note.S
-> @@ -3,6 +3,7 @@
->   * Here we can supply some information useful to userland.
->   */
->
-> +#include <linux/build-salt.h>
->  #include <linux/uts.h>
->  #include <linux/version.h>
->  #include <linux/elfnote.h>
-> @@ -10,3 +11,5 @@
->  ELFNOTE_START(Linux, 0, "a")
->         .long LINUX_VERSION_CODE
->  ELFNOTE_END
-> +
-> +BUILD_SALT
-> diff --git a/arch/x86/entry/vdso/vdso32/note.S b/arch/x86/entry/vdso/vdso32/note.S
-> index 9fd51f206314..e78047d119f6 100644
-> --- a/arch/x86/entry/vdso/vdso32/note.S
-> +++ b/arch/x86/entry/vdso/vdso32/note.S
-> @@ -4,6 +4,7 @@
->   * Here we can supply some information useful to userland.
->   */
->
-> +#include <linux/build-salt.h>
->  #include <linux/version.h>
->  #include <linux/elfnote.h>
->
-> @@ -14,6 +15,8 @@ ELFNOTE_START(Linux, 0, "a")
->         .long LINUX_VERSION_CODE
->  ELFNOTE_END
->
-> +BUILD_SALT
-> +
->  #ifdef CONFIG_XEN
->  /*
->   * Add a special note telling glibc's dynamic linker a fake hardware
-> --
-> 2.17.1
->
+Yes, that was a typo out of habit. Will fix.
