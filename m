@@ -1,75 +1,166 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:38508 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752973AbeGECWs (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:43647 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753154AbeGECl3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jul 2018 22:22:48 -0400
-Subject: Re: [PATCH] kbuild: delete INSTALL_FW_PATH from kbuild documentation
-References: <6477e1be-6686-582b-35b5-72e9f677619f@infradead.org>
- <CAK7LNATj1ibX=GMJ92fpX45Ba2WJKKb=h7_ZR9DeZcyBGcMHbQ@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <43f37d95-89cc-fd42-46c3-533f85f014e8@infradead.org>
-Date: Wed, 4 Jul 2018 19:22:47 -0700
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNATj1ibX=GMJ92fpX45Ba2WJKKb=h7_ZR9DeZcyBGcMHbQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Wed, 4 Jul 2018 22:41:29 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v3 02/12] kconfig: split out helpers to check file/directory, create directory
+Date: Thu,  5 Jul 2018 11:39:39 +0900
+Message-Id: <1530758389-30862-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On 07/04/18 18:49, Masahiro Yamada wrote:
-> 2018-07-05 4:59 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
->> From: Randy Dunlap <rdunlap@infradead.org>
->>
->> Removed Kbuild documentation for INSTALL_FW_PATH.
->>
->> The kbuild symbol INSTALL_FW_PATH was removed from Kbuild tools in
->> September 2014 (for 4.14) but the symbol was not deleted from
-> 
-> I think 'September 2017'
-> although I can fix up the log locally.
+Split out helpers:
+ is_file() - check if the given path exists and it is a regular file
+ is_dir() - check if the given path exists and it is a directory
+ mkdir_p() - create the parent directories of the given path
 
-Right you are.  and thanks.
+These helpers will be reused in later commits.
 
-> 
-> 
-> 
->> the kbuild documentation, so do that now.
->>
->> Fixes: 5620a0d1aac ("firmware: delete in-kernel firmware")
->>
->> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
->> Cc: stable@vger.kernel.org # 4.14 and later
->> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->> ---
->>  Documentation/kbuild/kbuild.txt |    9 ---------
->>  1 file changed, 9 deletions(-)
->>
->> --- linux-next-20180704.orig/Documentation/kbuild/kbuild.txt
->> +++ linux-next-20180704/Documentation/kbuild/kbuild.txt
->> @@ -149,15 +149,6 @@ stripped after they are installed.  If I
->>  the default option --strip-debug will be used.  Otherwise,
->>  INSTALL_MOD_STRIP value will be used as the options to the strip command.
->>
->> -INSTALL_FW_PATH
->> ---------------------------------------------------
->> -INSTALL_FW_PATH specifies where to install the firmware blobs.
->> -The default value is:
->> -
->> -    $(INSTALL_MOD_PATH)/lib/firmware
->> -
->> -The value can be overridden in which case the default value is ignored.
->> -
->>  INSTALL_HDR_PATH
->>  --------------------------------------------------
->>  INSTALL_HDR_PATH specifies where to install user space headers when
->>
->>
->> --
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ scripts/kconfig/confdata.c | 85 ++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 68 insertions(+), 17 deletions(-)
 
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 4771820..881993e 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -16,6 +16,68 @@
+ 
+ #include "lkc.h"
+ 
++/* return true if 'path' exists and it is a regular file, false otherwise */
++static bool is_file(const char *path)
++{
++	struct stat st;
++
++	if (stat(path, &st))
++		return 0;
++
++	return S_ISREG(st.st_mode);
++}
++
++/* return true if 'path' exists and it is a directory, false otherwise */
++static bool is_dir(const char *path)
++{
++	struct stat st;
++
++	if (stat(path, &st))
++		return 0;
++
++	return S_ISDIR(st.st_mode);
++}
++
++/*
++ * Create the parent directory of the given path.
++ *
++ * For example, if 'include/config/auto.conf' is given, create 'include/config'.
++ * If the path ends with '/' like 'include/config/', create 'include/config'.
++ */
++static int mkdir_p(const char *path)
++{
++	char tmp[PATH_MAX + 1];
++	char *p;
++
++	strncpy(tmp, path, sizeof(tmp));
++	tmp[sizeof(tmp) - 1] = 0;
++
++	/* Remove the base name. Just return if nothing is left */
++	p = strrchr(tmp, '/');
++	if (!p)
++		return 0;
++	*(p + 1) = 0;
++
++	/* Just in case it is an absolute path */
++	p = tmp;
++	while (*p == '/')
++		p++;
++
++	while ((p = strchr(p, '/'))) {
++		*p = 0;
++
++		/* skip if the directory exists */
++		if (!is_dir(tmp) && mkdir(tmp, 0755))
++			return -1;
++
++		*p = '/';
++		while (*p == '/')
++			p++;
++	}
++
++	return 0;
++}
++
+ struct conf_printer {
+ 	void (*print_symbol)(FILE *, struct symbol *, const char *, void *);
+ 	void (*print_comment)(FILE *, const char *, void *);
+@@ -83,7 +145,6 @@ const char *conf_get_autoconfig_name(void)
+ 
+ char *conf_get_default_confname(void)
+ {
+-	struct stat buf;
+ 	static char fullname[PATH_MAX+1];
+ 	char *env, *name;
+ 
+@@ -91,7 +152,7 @@ char *conf_get_default_confname(void)
+ 	env = getenv(SRCTREE);
+ 	if (env) {
+ 		sprintf(fullname, "%s/%s", env, name);
+-		if (!stat(fullname, &buf))
++		if (is_file(fullname))
+ 			return fullname;
+ 	}
+ 	return name;
+@@ -725,10 +786,9 @@ int conf_write(const char *name)
+ 
+ 	dirname[0] = 0;
+ 	if (name && name[0]) {
+-		struct stat st;
+ 		char *slash;
+ 
+-		if (!stat(name, &st) && S_ISDIR(st.st_mode)) {
++		if (is_dir(name)) {
+ 			strcpy(dirname, name);
+ 			strcat(dirname, "/");
+ 			basename = conf_get_configname();
+@@ -848,7 +908,6 @@ static int conf_split_config(void)
+ 	char path[PATH_MAX+1];
+ 	char *s, *d, c;
+ 	struct symbol *sym;
+-	struct stat sb;
+ 	int res, i, fd;
+ 
+ 	name = conf_get_autoconfig_name();
+@@ -926,18 +985,10 @@ static int conf_split_config(void)
+ 				res = 1;
+ 				break;
+ 			}
+-			/*
+-			 * Create directory components,
+-			 * unless they exist already.
+-			 */
+-			d = path;
+-			while ((d = strchr(d, '/'))) {
+-				*d = 0;
+-				if (stat(path, &sb) && mkdir(path, 0755)) {
+-					res = 1;
+-					goto out;
+-				}
+-				*d++ = '/';
++
++			if (mkdir_p(path)) {
++				res = 1;
++				goto out;
+ 			}
+ 			/* Try it again. */
+ 			fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 -- 
-~Randy
+2.7.4
+
