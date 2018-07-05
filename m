@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:43989 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:43927 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753264AbeGEClj (ORCPT
+        with ESMTP id S1753155AbeGEClh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jul 2018 22:41:39 -0400
+        Wed, 4 Jul 2018 22:41:37 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 06/12] kconfig: allow all config targets to write auto.conf if missing
-Date: Thu,  5 Jul 2018 11:39:43 +0900
-Message-Id: <1530758389-30862-7-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v3 05/12] kconfig: make syncconfig update .config regardless of sym_change_count
+Date: Thu,  5 Jul 2018 11:39:42 +0900
+Message-Id: <1530758389-30862-6-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,236 +15,107 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Currently, only syncconfig creates or updates include/config/auto.conf
-and some other files.  Other config targets create or update only the
-.config file.
+syncconfig updates the .config only when sym_change_count > 0, i.e.
+any change in config symbols has been detected.
 
-When you configure and build the kernel from a pristine source tree,
-any config target is followed by syncconfig in the build stage since
-include/config/auto.conf is missing.
+Not only symbols but also comments are contained in the .config file.
+If only comments are updated, they are not fed back to the .config,
+then the stale comments are left-over.  Of course, this is just a
+matter of comments, but why not fix it.
 
-We are moving compiler tests from Makefile to Kconfig.  It means that
-parsing Kconfig files will be more costly since Kconfig invokes the
-compiler commands internally.  Thus, we want to avoid invoking Kconfig
-twice (one for *config to create the .config, and one for syncconfig
-to synchronize the auto.conf).  If auto.conf does not exist, we can
-generate all configuration files in the first configuration stage,
-which will save the syncconfig in the build stage.
+I see some scenarios where this happens.
 
-Please note this should be done only when auto.conf is missing.  If
-*config blindly did this, time stamp files under include/config/ would
-be unnecessarily touched, triggering unneeded rebuild of objects.
+Scenario A:
 
-I assume a scenario like this:
+ 1. You have a source tree that has already been configured.
 
- 1. You have a source tree that has already been built
-    with CONFIG_FOO disabled
+ 2. Linus increments the version number in the top-level Makefile
+    (i.e. he commits a new release)
 
- 2. Run "make menuconfig" to enable CONFIG_FOO
+ 3. You pull it, and run 'make'
 
- 3. CONFIG_FOO turns out to be unnecessary.
-    Run "make menuconfig" again to disable CONFIG_FOO
+ 4. syncconfig is invoked because the environment variable,
+    KERNELVERSION is updated, but the .config is not updated since
+    no config symbol is changed.
 
- 4. Run "make"
+ 5. The .config file contains a kernel version in the top line:
 
-In this case, include/config/foo.h should not be touched since there
-is no change in CONFIG_FOO.  The sync process should be delayed until
-the user really attempts to build the kernel.
+    # Automatically generated file; DO NOT EDIT.
+    # Linux/arm64 4.18.0-rc2 Kernel Configuration
 
-This commit has another motivation; I want to suppress the 'No such
-file or directory' warning from the 'include' directive.
+    ... which points to a previous version.
 
-The top-level Makefile includes auto.conf with '-include' directive,
-like this:
+Scenario B:
 
-  ifeq ($(dot-config),1)
-  -include include/config/auto.conf
-  endif
+ 1. You have a source tree that has already been configured.
 
-This looks strange because auto.conf is mandatory when dot-config is 1.
-I guess only the reason of using '-include' is to suppress the warning
-'include/config/auto.conf: No such file or directory' when building
-from a clean tree.  However, this has a side-effect; Make considers
-the files included by '-include' are optional.  Hence, Make continues
-to build even if it fails to generate include/config/auto.conf.  I will
-change this in the next commit, but the warning message is annoying.
-(At least, kbuild test robot reports it as a regression.)
+ 2. You upgrade the compiler, but it still has the same version number.
+    This may happen if you regularly build the latest compiler from
+    the source code.
 
-With this commit, Kconfig will generate all configuration files together
-with the .config and I guess it is a solution good enough to suppress
-the warning.
+ 3. You run 'make'
 
-Note:
-GNU Make 4.2 or later does not display the warning from the 'include'
-directive if include files are successfully generated.  See GNU Make
-commit 87a5f98d248f ("[SV 102] Don't show unnecessary include file
-errors.")  However, older GNU Make versions are still widely used.
+ 4. syncconfig is invoked because the environment variable,
+    CC_VERSION_TEXT is updated, but the .config is not updated since
+    no config symbol is changed.
+
+ 5. The .config file contains the version string of the compiler:
+
+    #
+    # Compiler: aarch64-linux-gcc (GCC) 9.0.0 20180628 (experimental)
+    #
+
+    ... which carries the information of the old compiler.
+
+If KCONFIG_NOSILENTUPDATE is set, syncconfig is not allowed to update
+the .config file.  Otherwise, it is fine to update it regardless of
+sym_change_count.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/kconfig/conf.c      | 31 +++++++++++++++++--------------
- scripts/kconfig/confdata.c  | 11 +++++++----
- scripts/kconfig/gconf.c     |  1 +
- scripts/kconfig/lkc_proto.h |  2 +-
- scripts/kconfig/mconf.c     |  1 +
- scripts/kconfig/nconf.c     |  1 +
- scripts/kconfig/qconf.cc    |  2 ++
- 7 files changed, 30 insertions(+), 19 deletions(-)
+ scripts/kconfig/conf.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 5af8991..b35cc93 100644
+index 671ff53..5af8991 100644
 --- a/scripts/kconfig/conf.c
 +++ b/scripts/kconfig/conf.c
-@@ -686,29 +686,32 @@ int main(int ac, char **av)
- 		break;
+@@ -496,6 +496,7 @@ int main(int ac, char **av)
+ 	int opt;
+ 	const char *name, *defconfig_file = NULL /* gcc uninit */;
+ 	struct stat tmpstat;
++	int no_conf_write = 0;
+ 
+ 	tty_stdio = isatty(0) && isatty(1);
+ 
+@@ -633,13 +634,14 @@ int main(int ac, char **av)
  	}
  
--	if (sync_kconfig) {
--		/* syncconfig is used during the build so we shall update autoconf.
--		 * All other commands are only used to generate a config.
--		 */
--		if (!no_conf_write && conf_write(NULL)) {
--			fprintf(stderr, "\n*** Error during writing of the configuration.\n\n");
--			exit(1);
--		}
--		if (conf_write_autoconf()) {
--			fprintf(stderr, "\n*** Error during update of the configuration.\n\n");
--			return 1;
--		}
--	} else if (input_mode == savedefconfig) {
-+	if (input_mode == savedefconfig) {
- 		if (conf_write_defconfig(defconfig_file)) {
- 			fprintf(stderr, "n*** Error while saving defconfig to: %s\n\n",
- 				defconfig_file);
- 			return 1;
+ 	if (sync_kconfig) {
+-		if (conf_get_changed()) {
+-			name = getenv("KCONFIG_NOSILENTUPDATE");
+-			if (name && *name) {
++		name = getenv("KCONFIG_NOSILENTUPDATE");
++		if (name && *name) {
++			if (conf_get_changed()) {
+ 				fprintf(stderr,
+ 					"\n*** The configuration requires explicit update.\n\n");
+ 				return 1;
+ 			}
++			no_conf_write = 1;
  		}
- 	} else if (input_mode != listnewconfig) {
--		if (conf_write(NULL)) {
+ 	}
+ 
+@@ -688,7 +690,7 @@ int main(int ac, char **av)
+ 		/* syncconfig is used during the build so we shall update autoconf.
+ 		 * All other commands are only used to generate a config.
+ 		 */
+-		if (conf_get_changed() && conf_write(NULL)) {
 +		if (!no_conf_write && conf_write(NULL)) {
  			fprintf(stderr, "\n*** Error during writing of the configuration.\n\n");
  			exit(1);
  		}
-+
-+		/*
-+		 * Create auto.conf if it does not exist.
-+		 * This prevents GNU Make 4.1 or older from emitting
-+		 * "include/config/auto.conf: No such file or directory"
-+		 * in the top-level Makefile
-+		 *
-+		 * syncconfig always creates or updates auto.conf because it is
-+		 * used during the build.
-+		 */
-+		if (conf_write_autoconf(sync_kconfig) && sync_kconfig) {
-+			fprintf(stderr,
-+				"\n*** Error during sync of the configuration.\n\n");
-+			return 1;
-+		}
- 	}
- 	return 0;
- }
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 38b3a6c..5af25a0 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -1012,13 +1012,17 @@ static int conf_split_config(void)
- 	return res;
- }
- 
--int conf_write_autoconf(void)
-+int conf_write_autoconf(int overwrite)
- {
- 	struct symbol *sym;
- 	const char *name;
-+	const char *autoconf_name = conf_get_autoconfig_name();
- 	FILE *out, *tristate, *out_h;
- 	int i;
- 
-+	if (!overwrite && is_file(autoconf_name))
-+		return 0;
-+
- 	sym_clear_all_valid();
- 
- 	conf_write_dep("include/config/auto.conf.cmd");
-@@ -1081,14 +1085,13 @@ int conf_write_autoconf(void)
- 	if (rename(".tmpconfig_tristate", name))
- 		return 1;
- 
--	name = conf_get_autoconfig_name();
--	if (mkdir_p(name))
-+	if (mkdir_p(autoconf_name))
- 		return 1;
- 	/*
- 	 * This must be the last step, kbuild has a dependency on auto.conf
- 	 * and this marks the successful completion of the previous steps.
- 	 */
--	if (rename(".tmpconfig", name))
-+	if (rename(".tmpconfig", autoconf_name))
- 		return 1;
- 
- 	return 0;
-diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
-index 610c4ab..f16ed51 100644
---- a/scripts/kconfig/gconf.c
-+++ b/scripts/kconfig/gconf.c
-@@ -525,6 +525,7 @@ void on_save_activate(GtkMenuItem * menuitem, gpointer user_data)
- {
- 	if (conf_write(NULL))
- 		text_insert_msg("Error", "Unable to save configuration !");
-+	conf_write_autoconf(0);
- }
- 
- 
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index a8b7a33..b0cd52f 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -7,7 +7,7 @@ int conf_read(const char *name);
- int conf_read_simple(const char *name, int);
- int conf_write_defconfig(const char *name);
- int conf_write(const char *name);
--int conf_write_autoconf(void);
-+int conf_write_autoconf(int overwrite);
- bool conf_get_changed(void);
- void conf_set_changed_callback(void (*fn)(void));
- void conf_set_message_callback(void (*fn)(const char *fmt, va_list ap));
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 5294ed1..82b27a0 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -977,6 +977,7 @@ static int handle_exit(void)
- 					  "\n\n");
- 			return 1;
- 		}
-+		conf_write_autoconf(0);
- 		/* fall through */
- 	case -1:
- 		if (!silent)
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 97b7844..208f7be 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -674,6 +674,7 @@ static int do_exit(void)
- 				  "Your configuration changes were NOT saved.",
- 				  1,
- 				  "<OK>");
-+		conf_write_autoconf(0);
- 		break;
- 	default:
- 		btn_dialog(
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index ad9c22d..62261b3 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -1535,6 +1535,8 @@ bool ConfigMainWindow::saveConfig(void)
- 		QMessageBox::information(this, "qconf", "Unable to save configuration!");
- 		return false;
- 	}
-+	conf_write_autoconf(0);
-+
- 	return true;
- }
- 
 -- 
 2.7.4
 
