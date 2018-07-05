@@ -1,79 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:56678 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753198AbeGEFjR (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:60028 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750884AbeGEFlU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Jul 2018 01:39:17 -0400
+        Thu, 5 Jul 2018 01:41:20 -0400
 MIME-Version: 1.0
-In-Reply-To: <e230cffa-b3ea-d5c2-3d2c-5f822c9c2e7d@infradead.org>
-References: <20180702144711.22111-1-hch@lst.de> <20180702144711.22111-2-hch@lst.de>
- <5c090e3f-ced0-62c5-c511-f4c66804ed32@infradead.org> <4dfba139-43a2-5949-3221-39cae3191ae7@infradead.org>
- <20180703133616.GB15589@lst.de> <e230cffa-b3ea-d5c2-3d2c-5f822c9c2e7d@infradead.org>
+In-Reply-To: <20180702144711.22111-3-hch@lst.de>
+References: <20180702144711.22111-1-hch@lst.de> <20180702144711.22111-3-hch@lst.de>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 5 Jul 2018 14:38:22 +0900
-Message-ID: <CAK7LNAQJ+J_d6FbcHZ5+SM6mS3MjyGq_Q3x4_BxWzXzVZvMRkQ@mail.gmail.com>
-Subject: Re: [PATCH 1/5] kconfig: include common Kconfig files from top-level Kconfig
+Date: Thu, 5 Jul 2018 14:40:15 +0900
+Message-ID: <CAK7LNAT-hR1OtB4K53EeYoJEXY6kP8OjpFDt6Kpasw2fzQKPYw@mail.gmail.com>
+Subject: Re: [PATCH 2/5] Kconfig: consolidate the "Kernel hacking menu"
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-07-04 1:11 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> On 07/03/18 06:36, Christoph Hellwig wrote:
->> On Mon, Jul 02, 2018 at 01:08:16PM -0700, Randy Dunlap wrote:
->>>> I would prefer to have init/Kconfig before arch/$(SRCARCH)/Kconfig.
->>>
->>> Ugh, that won't get this set correctly on x86_64:
->>> CONFIG_PGTABLE_LEVELS=2
->>
->> Did you try it?  As far as I can tell modern kconfig isn't really
->> order sensitive any more.
->> --
+2018-07-02 23:47 GMT+09:00 Christoph Hellwig <hch@lst.de>:
+> Move the source of lib/Kconfig.debug and arch/$(ARCH)/Kconfig.debug to
+> the top-level Kconfig.  For two architectures that means moving their
+> arch-specific symbols in that menu into a new arch Kconfig.debug file,
+> and for a few more creating a dummy file so that we can include it
+> unconditionally.
 >
-> Yes, it was wrong. :(
+> Also move the actual 'Kernel hacking' menu to lib/Kconfig.debug, where
+> it belongs.
 >
-> Once the symbol has a default value, it won't be assigned a different
-> default value (at least that's how it looks; I haven't read the kconfig
-> source code).
->
-
-The order does matter.
-
-The 'default' properties are accumulated
-as they appear.
-
-
-If arch/Kconfig were parsed before arch/x86/Kconfig,
-it would end up with this:
-
-
-
-config PGTABLE_LEVELS
-    int
-    default 2                    <- from arch/Kconfig
-    default 5 if X86_5LEVEL      <- from arch/x86/Kconfig
-    default 4 if X86_64          <- from arch/x86/Kconfig
-    default 3 if X86_PAE         <- from arch/x86/Kconfig
-    default 2                    <- from arch/x86/Kconfig
-
-So, PGTABLE_LEVELS would be always 2.
-The last four lines are dead code.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
 
 
 
+> diff --git a/arch/c6x/Kconfig.debug b/arch/c6x/Kconfig.debug
+> new file mode 100644
+> index 000000000000..49edf08813eb
+> --- /dev/null
+> +++ b/arch/c6x/Kconfig.debug
+> @@ -0,0 +1,11 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +config ACCESS_CHECK
+> +       bool "Check the user pointer address"
+> +       default y
+> +       help
+> +         Usually the pointer transfer from user space is checked to see if its
+> +         address is in the kernel space.
+> +
+> +         Say N here to disable that check to improve the performance.
+> +
 
-The correct order is arch/x86/Kconfig, arch/Kconfig
-then we can get this:
+Just a nit:
 
-config PGTABLE_LEVELS
-    int
-    default 5 if X86_5LEVEL      <- from arch/x86/Kconfig
-    default 4 if X86_64          <- from arch/x86/Kconfig
-    default 3 if X86_PAE         <- from arch/x86/Kconfig
-    default 2                    <- from arch/x86/Kconfig
-    default 2                    <- from arch/Kconfig
+When I ran 'git am', it complained about a blank line at the end of file.
+
+.git/rebase-apply/patch:229: new blank line at EOF.
+
+
+
+
 
 
 -- 
