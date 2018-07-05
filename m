@@ -1,44 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:43236 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753012AbeGECrk (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:51109 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752970AbeGECsz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jul 2018 22:47:40 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] kbuild: document the KBUILD_KCONFIG env. variable
-Message-ID: <70d08f42-27e4-ccc2-00f6-266568123d8c@infradead.org>
-Date: Wed, 4 Jul 2018 19:47:39 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Wed, 4 Jul 2018 22:48:55 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: do not drop -I without parameter
+Date: Thu,  5 Jul 2018 11:48:21 +0900
+Message-Id: <1530758901-32014-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-From: Randy Dunlap <rdunlap@infradead.org>
+The comment line for addtree says "skip if -I has no parameter".
 
-Add usage info for the Kbuild environment variable KBUILD_KCONFIG.
+What it actually does is "drop if -I has no parameter".  For example,
+if you have the compiler flag '-I foo' (a space between), it will be
+converted to 'foo'.  This completely changes the meaning.
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+What we want is, "do nothing" for -I without parameter so that
+'-I foo' is kept as-is.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
- Documentation/kbuild/kbuild.txt |    5 +++++
- 1 file changed, 5 insertions(+)
 
---- lnx-418-rc3.orig/Documentation/kbuild/kbuild.txt
-+++ lnx-418-rc3/Documentation/kbuild/kbuild.txt
-@@ -50,6 +50,11 @@ LDFLAGS_MODULE
- --------------------------------------------------
- Additional options used for $(LD) when linking modules.
+ scripts/Kbuild.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index b2d14f1..ed303f5 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -214,7 +214,7 @@ hdr-inst := -f $(srctree)/scripts/Makefile.headersinst obj
+ # Prefix -I with $(srctree) if it is not an absolute path.
+ # skip if -I has no parameter
+ addtree = $(if $(patsubst -I%,%,$(1)), \
+-$(if $(filter-out -I/% -I./% -I../%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)))
++$(if $(filter-out -I/% -I./% -I../%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)),$(1))
  
-+KBUILD_KCONFIG
-+--------------------------------------------------
-+Set the top-level Kconfig file to the value of this environment
-+variable.  The default name is "Kconfig".
-+
- KBUILD_VERBOSE
- --------------------------------------------------
- Set the kbuild verbosity. Can be assigned same values as "V=...".
-
+ # Find all -I options and call addtree
+ flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
+-- 
+2.7.4
 
