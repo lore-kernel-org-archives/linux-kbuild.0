@@ -1,77 +1,146 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:43986 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:43642 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753259AbeGEClj (ORCPT
+        with ESMTP id S1753155AbeGECl3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Jul 2018 22:41:39 -0400
+        Wed, 4 Jul 2018 22:41:29 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 00/12] kbuild/kconfig: do not update config during installation
-Date: Thu,  5 Jul 2018 11:39:37 +0900
-Message-Id: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH v3 09/12] kbuild: do not update config when running install targets
+Date: Thu,  5 Jul 2018 11:39:46 +0900
+Message-Id: <1530758389-30862-10-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
+"make syncconfig" is automatically invoked when any of the following
+happens:
 
-The main motivation of this patch series is to suppress the syncconfig
-during running installation targets.
+ - .config is updated
+ - any of Kconfig files is updated
+ - any of environment variables referenced in Kconfig is changed
 
-V1 consisted of only two patches:
-  https://patchwork.kernel.org/patch/10468105/
-  https://patchwork.kernel.org/patch/10468103/
+Then, it updates configuration files such as include/config/auto.conf
+include/generated/autoconf.h, etc.
 
-I noticed that installation targets would continue running
-even if the source tree is not configured at all
-because the inclusion of include/config/auto.conf was optional.
+Even install targets (install, modules_install, etc.) are no exception.
+However, they should never ever modify the source tree.  Install
+targets are often run with root privileges.  Once those configuration
+files are owned by root, "make mrproper" would end up with permission
+error.
 
-So, I added one more patch in V2:
- https://patchwork.kernel.org/patch/10483637/
+Install targets should just copy things blindly.  They should not care
+whether the configuration is up-to-date or not.  This makes more sense
+because we are interested in the configuration that was used in the
+previous kernel building.
 
-However, kbuild test robot reported a new warning message was displayed:
+This issue has existed since before, but rarely happened.  I expect
+more chance where people are hit by this; with the new Kconfig syntax
+extension, the .config now contains the compiler information.  If you
+cross-compile the kernel with CROSS_COMPILE, but forget to pass it
+for "make install", you meet "any of environment variables referenced
+in Kconfig is changed" because $(CC) is referenced in Kconfig.
+Another scenario is the compiler upgrade before the installation.
 
-Makefile:592: include/config/auto.conf: No such file or directory
+Install targets need the configuration.  "make modules_install" refer
+to CONFIG_MODULES etc.  "make dtbs_install" also needs CONFIG_ARCH_*
+to decide which dtb files to install.  However, the auto-update of
+the configuration files should be avoided.  We already do this for
+external modules.
 
-This warning is displayed only for Make 4.1 or older.
+Now, Make targets are categorized into 3 groups:
 
-To fix this annoying warning, I changed Kconfig too,
-which leaded to more clean-up, improvements in Kconfig.
+[1] Do not need the kernel configuration at all
 
-So, V3 is a big patch series.
+    help, coccicheck, headers_install etc.
 
+[2] Need the latest kernel configuration
 
+    If new config options are added, Kconfig will show prompt to
+    ask user's selection.
 
-Masahiro Yamada (12):
-  kconfig: rename file_write_dep and move it to confdata.c
-  kconfig: split out helpers to check file/directory, create directory
-  kconfig: remove unneeded directory generation from local*config
-  kconfig: create directories needed for syncconfig by itself
-  kconfig: make syncconfig update .config regardless of sym_change_count
-  kconfig: allow all config targets to write auto.conf if missing
-  kbuild: use 'include' directive to load auto.conf from top Makefile
-  kbuild: add .DELETE_ON_ERROR special target
-  kbuild: do not update config when running install targets
-  kbuild: do not update config for 'make kernelrelease'
-  kbuild: remove auto.conf and tristate.conf from prerequisites
-  kbuild: replace include/config/%.conf with include/config/auto.conf
+    Build targets such as vmlinux, in-kernel modules are the cases.
 
- Makefile                    |  46 +++++++++------
- scripts/Kbuild.include      |   3 +
- scripts/kconfig/Makefile    |  16 ++---
- scripts/kconfig/conf.c      |  39 +++++++------
- scripts/kconfig/confdata.c  | 139 +++++++++++++++++++++++++++++++++++++-------
- scripts/kconfig/gconf.c     |   1 +
- scripts/kconfig/lkc.h       |   1 -
- scripts/kconfig/lkc_proto.h |   2 +-
- scripts/kconfig/mconf.c     |   1 +
- scripts/kconfig/nconf.c     |   1 +
- scripts/kconfig/qconf.cc    |   2 +
- scripts/kconfig/util.c      |  30 ----------
- 12 files changed, 182 insertions(+), 99 deletions(-)
+[3] Need the kernel configuration, but do not want to update it
 
+    Install targets except headers_install, and external modules
+    are the cases.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Makefile | 27 ++++++++++++++++++++-------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index ef24068..f0663c8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -225,10 +225,12 @@ no-dot-config-targets := $(clean-targets) \
+ 			 cscope gtags TAGS tags help% %docs check% coccicheck \
+ 			 $(version_h) headers_% archheaders archscripts \
+ 			 kernelversion %src-pkg
++no-sync-config-targets := $(no-dot-config-targets) install %install
+ 
+-config-targets := 0
+-mixed-targets  := 0
+-dot-config     := 1
++config-targets  := 0
++mixed-targets   := 0
++dot-config      := 1
++may-sync-config := 1
+ 
+ ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
+ 	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
+@@ -236,6 +238,16 @@ ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
+ 	endif
+ endif
+ 
++ifneq ($(filter $(no-sync-config-targets), $(MAKECMDGOALS)),)
++	ifeq ($(filter-out $(no-sync-config-targets), $(MAKECMDGOALS)),)
++		may-sync-config := 0
++	endif
++endif
++
++ifneq ($(KBUILD_EXTMOD),)
++	may-sync-config := 0
++endif
++
+ ifeq ($(KBUILD_EXTMOD),)
+         ifneq ($(filter config %config,$(MAKECMDGOALS)),)
+                 config-targets := 1
+@@ -606,7 +618,7 @@ ARCH_CFLAGS :=
+ include arch/$(SRCARCH)/Makefile
+ 
+ ifeq ($(dot-config),1)
+-ifeq ($(KBUILD_EXTMOD),)
++ifeq ($(may-sync-config),1)
+ # Read in dependencies to all Kconfig* files, make sure to run syncconfig if
+ # changes are detected. This should be included after arch/$(SRCARCH)/Makefile
+ # because some architectures define CROSS_COMPILE there.
+@@ -621,8 +633,9 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
+ include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
+ else
+-# external modules needs include/generated/autoconf.h and include/config/auto.conf
+-# but do not care if they are up-to-date. Use auto.conf to trigger the test
++# External modules and some install targets need include/generated/autoconf.h
++# and include/config/auto.conf but do not care if they are up-to-date.
++# Use auto.conf to trigger the test
+ PHONY += include/config/auto.conf
+ 
+ include/config/auto.conf:
+@@ -634,7 +647,7 @@ include/config/auto.conf:
+ 	echo >&2 ;							\
+ 	/bin/false)
+ 
+-endif # KBUILD_EXTMOD
++endif # may-sync-config
+ 
+ else
+ # Dummy target needed, because used as prerequisite
 -- 
 2.7.4
 
