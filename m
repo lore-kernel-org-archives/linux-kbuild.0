@@ -1,32 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([23.128.96.9]:43054 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753510AbeGFAbI (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:21503 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753439AbeGFAjy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Jul 2018 20:31:08 -0400
-Date: Fri, 06 Jul 2018 09:31:03 +0900 (KST)
-Message-Id: <20180706.093103.1547249026984330034.davem@davemloft.net>
-Subject: Re: [PATCH] kbuild: update ARCH alias info for sparc
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <03cfef31-5308-7b17-9e0d-3a0dc680e750@infradead.org>
-References: <03cfef31-5308-7b17-9e0d-3a0dc680e750@infradead.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Thu, 5 Jul 2018 20:39:54 -0400
+MIME-Version: 1.0
+In-Reply-To: <53a0c9d4-cf1c-fbcf-3706-742f5ad41178@infradead.org>
+References: <53a0c9d4-cf1c-fbcf-3706-742f5ad41178@infradead.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 6 Jul 2018 09:38:52 +0900
+Message-ID: <CAK7LNASPOrhUCTwCXTbrVbjwh+AHoPkHcmJ5mzC24wU8hwsM2w@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: verify that $DEPMOD is installed
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: rdunlap@infradead.org
-Cc: linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, sparclinux@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Chih-Wei Huang <cwhuang@linux.org.tw>
 
-From: Randy Dunlap <rdunlap@infradead.org>
-Date: Thu, 5 Jul 2018 12:12:03 -0700
-
+2018-07-02 11:46 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
 > From: Randy Dunlap <rdunlap@infradead.org>
-> 
-> The supported alias for building sparc 32-bit is "sparc32",
-> not "sparc", so update the alias documentation for that.
-> Just using "sparc" produces a 64-bit config file.
-> 
+>
+> Verify that 'depmod' ($DEPMOD) is installed.
+> This is a partial revert of 620c231c7a7f (from 2012):
+>   ("kbuild: do not check for ancient modutils tools")
+>
+> Also update Documentation/process/changes.rst to refer to
+> kmod instead of module-init-tools.
+>
+> Fixes kernel bugzilla #198965:
+> https://bugzilla.kernel.org/show_bug.cgi?id=198965
+>
 > Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+> Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: Jessica Yu <jeyu@kernel.org>
+> Cc: Chih-Wei Huang <cwhuang@linux.org.tw>
+> Cc: stable@vger.kernel.org # any kernel since 2012
 
-Acked-by: David S. Miller <davem@davemloft.net>
+Applied to linux-kbuild. Thanks!
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
