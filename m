@@ -1,77 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:48009 "EHLO
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:50271 "EHLO
         conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753439AbeGFBDx (ORCPT
+        with ESMTP id S1753404AbeGFBFy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Jul 2018 21:03:53 -0400
+        Thu, 5 Jul 2018 21:05:54 -0400
 MIME-Version: 1.0
-In-Reply-To: <43f37d95-89cc-fd42-46c3-533f85f014e8@infradead.org>
-References: <6477e1be-6686-582b-35b5-72e9f677619f@infradead.org>
- <CAK7LNATj1ibX=GMJ92fpX45Ba2WJKKb=h7_ZR9DeZcyBGcMHbQ@mail.gmail.com> <43f37d95-89cc-fd42-46c3-533f85f014e8@infradead.org>
+In-Reply-To: <20180706.093103.1547249026984330034.davem@davemloft.net>
+References: <03cfef31-5308-7b17-9e0d-3a0dc680e750@infradead.org> <20180706.093103.1547249026984330034.davem@davemloft.net>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 6 Jul 2018 10:03:02 +0900
-Message-ID: <CAK7LNAT3CWRDDqb4F8vfG2-YNCZMKC0PmF64bPvm=XMV8Hz8mQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: delete INSTALL_FW_PATH from kbuild documentation
+Date: Fri, 6 Jul 2018 10:04:51 +0900
+Message-ID: <CAK7LNASqFLGVJ56dXBgj9P=S5UGCWMtJDtxVZb5t-tvTH3vckQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: update ARCH alias info for sparc
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, David Miller <davem@davemloft.net>
 
-2018-07-05 11:22 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> On 07/04/18 18:49, Masahiro Yamada wrote:
->> 2018-07-05 4:59 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
->>> From: Randy Dunlap <rdunlap@infradead.org>
->>>
->>> Removed Kbuild documentation for INSTALL_FW_PATH.
->>>
->>> The kbuild symbol INSTALL_FW_PATH was removed from Kbuild tools in
->>> September 2014 (for 4.14) but the symbol was not deleted from
->>
->> I think 'September 2017'
->> although I can fix up the log locally.
+2018-07-06 9:31 GMT+09:00 David Miller <davem@davemloft.net>:
+> From: Randy Dunlap <rdunlap@infradead.org>
+> Date: Thu, 5 Jul 2018 12:12:03 -0700
 >
-> Right you are.  and thanks.
->
+>> From: Randy Dunlap <rdunlap@infradead.org>
 >>
+>> The supported alias for building sparc 32-bit is "sparc32",
+>> not "sparc", so update the alias documentation for that.
+>> Just using "sparc" produces a 64-bit config file.
 >>
->>
->>> the kbuild documentation, so do that now.
->>>
->>> Fixes: 5620a0d1aac ("firmware: delete in-kernel firmware")
->>>
->>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
->>> Cc: stable@vger.kernel.org # 4.14 and later
->>> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->>> ---
->>>  Documentation/kbuild/kbuild.txt |    9 ---------
->>>  1 file changed, 9 deletions(-)
->>>
->>> --- linux-next-20180704.orig/Documentation/kbuild/kbuild.txt
->>> +++ linux-next-20180704/Documentation/kbuild/kbuild.txt
->>> @@ -149,15 +149,6 @@ stripped after they are installed.  If I
->>>  the default option --strip-debug will be used.  Otherwise,
->>>  INSTALL_MOD_STRIP value will be used as the options to the strip command.
->>>
->>> -INSTALL_FW_PATH
->>> ---------------------------------------------------
->>> -INSTALL_FW_PATH specifies where to install the firmware blobs.
->>> -The default value is:
->>> -
->>> -    $(INSTALL_MOD_PATH)/lib/firmware
->>> -
->>> -The value can be overridden in which case the default value is ignored.
->>> -
->>>  INSTALL_HDR_PATH
->>>  --------------------------------------------------
->>>  INSTALL_HDR_PATH specifies where to install user space headers when
->>>
->>>
->>> --
+>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 >
->
+> Acked-by: David S. Miller <davem@davemloft.net>
+> --
 
 Applied to linux-kbuild. Thanks!
+
 
 
 -- 
