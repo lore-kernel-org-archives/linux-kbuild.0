@@ -1,54 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:28819 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932123AbeGFBGf (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:27056 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753640AbeGFCy3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Jul 2018 21:06:35 -0400
+        Thu, 5 Jul 2018 22:54:29 -0400
 MIME-Version: 1.0
-In-Reply-To: <9a4b8d07-b9cc-4843-a74c-7f40ebc4c9af@infradead.org>
-References: <9a4b8d07-b9cc-4843-a74c-7f40ebc4c9af@infradead.org>
+In-Reply-To: <0eb8bc34-a0e0-eea8-be62-8420bd82c717@infradead.org>
+References: <0eb8bc34-a0e0-eea8-be62-8420bd82c717@infradead.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 6 Jul 2018 10:05:41 +0900
-Message-ID: <CAK7LNASS3k5FDGLdB=ak6-zUHZA1zsF4_v=+NsNyZbf=7Qer=g@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: update kbuild.txt ARCH alias list
+Date: Fri, 6 Jul 2018 11:53:37 +0900
+Message-ID: <CAK7LNAQ8V3WAfaA=iiWgKBPbGNOThsuPa70jZJ2W-oqrLbKiHQ@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: update user kconfig tools doc.
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Randy Dunlap <rdunlap@infradead.org>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-2018-07-05 4:57 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+2018-07-05 7:49 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
 > From: Randy Dunlap <rdunlap@infradead.org>
 >
-> In Kbuild documentation, add alias for 64-bit sh ARCH ("sh64")
-> to the list of ARCH aliases.
+> Update Documentation/kbuild/kconfig.txt, which mostly contains
+> user help for using the kernel config tools.
+>
+> - Add mention of 'nconfig' embedded help text.
+> - Make the section on new config symbols readable.
+> - Correct how to find menuconfig search help.
+> - Add section on 'nconfig' usage.
+> - Mention that gconfig has multiple viewing modes/options.
 >
 > Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 > ---
->  Documentation/kbuild/kbuild.txt |    1 +
->  1 file changed, 1 insertion(+)
->
-> --- linux-next-20180704.orig/Documentation/kbuild/kbuild.txt
-> +++ linux-next-20180704/Documentation/kbuild/kbuild.txt
-> @@ -88,6 +88,7 @@ In most cases the name of the architectu
->  directory name found in the arch/ directory.
->  But some architectures such as x86 and sparc have aliases.
->  x86: i386 for 32 bit, x86_64 for 64 bit
-> +sh: sh for 32 bit, sh64 for 64 bit
->  sparc: sparc for 32 bit, sparc64 for 64 bit
->
->  CROSS_COMPILE
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-
-Applied to linux-kbuild. Thanks!
-
+Applied to linux-kbuild/kconfig.  Thanks!
 
 
 -- 
