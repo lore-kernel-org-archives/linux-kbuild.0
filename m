@@ -1,63 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:41225 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753224AbeGFGev (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:24511 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752681AbeGFIun (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Jul 2018 02:34:51 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: add LDFLAGS_KERNEL to pass additional linker flags for vmlinux
-Date: Fri,  6 Jul 2018 15:34:03 +0900
-Message-Id: <1530858843-14997-1-git-send-email-yamada.masahiro@socionext.com>
+        Fri, 6 Jul 2018 04:50:43 -0400
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: kconfig usage in automatic kernel test
+Message-ID: <a2a39cac-79fc-22d9-e1d0-b94787526794@cn.fujitsu.com>
+Date: Fri, 6 Jul 2018 16:49:25 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Kbuild provides LDFLAGS_MODULE to allows users to give additional
-options for linking modules, but there is no way to append flags for
-linking vmlinux.
+Masahiro-san,
 
-It is true LDFLAGS_vmlinux specifies the linker options for vmlinux,
-but it is only for internal-use.
+  I am writing some utility for internal kdump test with latest kernel,
+my purpose is to test the new introduced kernel feature. For automatical
+test, I see several config target could help, like olddefconfig, all*config.
 
-We have CFLAGS_KERNEL, AFLAGS_KERNEL already, so LDFLAGS_KERNEL is
-the same pattern.
+But for my purpose, I don't find a good way. For example, olddefconfig
+will let the now config item has default value, while some feature may
+default to "N"; allyesconfig will slow the compilation notably.
+But "all*config" has KCONFIG_ALLCONFIG help to customizing some config
+item, that is a good utility, but seems it can't be used in olddefconfig.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+All these things let me have 2 questions:
 
- Documentation/kbuild/kbuild.txt | 4 ++++
- Makefile                        | 2 ++
- 2 files changed, 6 insertions(+)
+1. What would you suggest for my purpose?
 
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index 6c9c69e..f3a0a47 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -46,6 +46,10 @@ CFLAGS_MODULE
- --------------------------------------------------
- Additional module specific options to use for $(CC).
- 
-+LDFLAGS_KERNEL
-+--------------------------------------------------
-+Additional options used for $(LD) when linking vmlinux.
-+
- LDFLAGS_MODULE
- --------------------------------------------------
- Additional options used for $(LD) when linking modules.
-diff --git a/Makefile b/Makefile
-index 58bd78b..6f9f4b1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -848,6 +848,8 @@ ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
- LDFLAGS_vmlinux	+= $(call ld-option, -X,)
- endif
- 
-+LDFLAGS_vmlinux += $(LDFLAGS_KERNEL)
-+
- # insure the checker run with the right endianness
- CHECKFLAGS += $(if $(CONFIG_CPU_BIG_ENDIAN),-mbig-endian,-mlittle-endian)
- 
+2. allyesconfig, allmodconfig, randconfig seems useful for test kbuild,
+but what's the purpose of allnoconfig, alldefconfig? In others words,
+when people would need allnoconfig, alldefconfig?
 -- 
-2.7.4
+Sincerely,
+Cao jin
+
 
