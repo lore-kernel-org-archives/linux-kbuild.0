@@ -1,39 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:27056 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753640AbeGFCy3 (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:63551 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753722AbeGFCz0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Jul 2018 22:54:29 -0400
+        Thu, 5 Jul 2018 22:55:26 -0400
+Received: from mail-vk0-f52.google.com (mail-vk0-f52.google.com [209.85.213.52]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id w662tLjx000894
+        for <linux-kbuild@vger.kernel.org>; Fri, 6 Jul 2018 11:55:22 +0900
+Received: by mail-vk0-f52.google.com with SMTP id j11-v6so6025850vke.8
+        for <linux-kbuild@vger.kernel.org>; Thu, 05 Jul 2018 19:55:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0eb8bc34-a0e0-eea8-be62-8420bd82c717@infradead.org>
-References: <0eb8bc34-a0e0-eea8-be62-8420bd82c717@infradead.org>
+In-Reply-To: <20180703124331.9279-1-dirk@gouders.net>
+References: <ghd0w4wtgh.fsf@lena.gouders.net> <20180703124331.9279-1-dirk@gouders.net>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 6 Jul 2018 11:53:37 +0900
-Message-ID: <CAK7LNAQ8V3WAfaA=iiWgKBPbGNOThsuPa70jZJ2W-oqrLbKiHQ@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: update user kconfig tools doc.
+Date: Fri, 6 Jul 2018 11:54:40 +0900
+Message-ID: <CAK7LNASA3TZOS_Dp7kzFP2Zmmuy4bokEp4=iiZ9R1Gg_gG9EYw@mail.gmail.com>
+Subject: Re: [PATCH v3] kconfig: rename SYMBOL_AUTO to SYMBOL_NO_WRITE
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Dirk Gouders <dirk@gouders.net>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>
 
-2018-07-05 7:49 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> From: Randy Dunlap <rdunlap@infradead.org>
+2018-07-03 21:43 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
+> Over time, the use of the flag SYMBOL_AUTO changed from initially
+> marking three automatically generated symbols ARCH, KERNELRELEASE and
+> UNAME_RELEASE to today's effect of protecting symbols from being
+> written out.
 >
-> Update Documentation/kbuild/kconfig.txt, which mostly contains
-> user help for using the kernel config tools.
+> Currently, only symbols of type CHOICE and those with option
+> defconf_list set have that flag set.
 >
-> - Add mention of 'nconfig' embedded help text.
-> - Make the section on new config symbols readable.
-> - Correct how to find menuconfig search help.
-> - Add section on 'nconfig' usage.
-> - Mention that gconfig has multiple viewing modes/options.
+> Reflect that change in semantics in the flag's name.
 >
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+> Cc: Sam Ravnborg <sam@ravnborg.org>
 > ---
 
-
-Applied to linux-kbuild/kconfig.  Thanks!
+Applied to linux-kbuild/kconfig. Thanks!
 
 
 -- 
