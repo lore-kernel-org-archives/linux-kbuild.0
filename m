@@ -1,43 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:24511 "EHLO
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:37043 "EHLO
         heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752681AbeGFIun (ORCPT
+        with ESMTP id S1753467AbeGFI7d (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Jul 2018 04:50:43 -0400
+        Fri, 6 Jul 2018 04:59:33 -0400
+Subject: Re: [PATCH] kbuild: document the KBUILD_KCONFIG env. variable
+References: <70d08f42-27e4-ccc2-00f6-266568123d8c@infradead.org>
 From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Subject: kconfig usage in automatic kernel test
-Message-ID: <a2a39cac-79fc-22d9-e1d0-b94787526794@cn.fujitsu.com>
-Date: Fri, 6 Jul 2018 16:49:25 +0800
+Message-ID: <a8a9fa55-3dcc-f13f-ad4a-6f7ee2c23aa3@cn.fujitsu.com>
+Date: Fri, 6 Jul 2018 16:58:17 +0800
 MIME-Version: 1.0
+In-Reply-To: <70d08f42-27e4-ccc2-00f6-266568123d8c@infradead.org>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: LKML <linux-kernel@vger.kernel.org>
 
-Masahiro-san,
 
-  I am writing some utility for internal kdump test with latest kernel,
-my purpose is to test the new introduced kernel feature. For automatical
-test, I see several config target could help, like olddefconfig, all*config.
 
-But for my purpose, I don't find a good way. For example, olddefconfig
-will let the now config item has default value, while some feature may
-default to "N"; allyesconfig will slow the compilation notably.
-But "all*config" has KCONFIG_ALLCONFIG help to customizing some config
-item, that is a good utility, but seems it can't be used in olddefconfig.
+On 07/05/2018 10:47 AM, Randy Dunlap wrote:
+> From: Randy Dunlap <rdunlap@infradead.org>
+> 
+> Add usage info for the Kbuild environment variable KBUILD_KCONFIG.
+> 
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 
-All these things let me have 2 questions:
+I can recall this variable does take me a little while to find out its
+meaning during my earliest time in kbuild, so,
 
-1. What would you suggest for my purpose?
+Acked-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 
-2. allyesconfig, allmodconfig, randconfig seems useful for test kbuild,
-but what's the purpose of allnoconfig, alldefconfig? In others words,
-when people would need allnoconfig, alldefconfig?
 -- 
 Sincerely,
 Cao jin
+
+> ---
+>  Documentation/kbuild/kbuild.txt |    5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> --- lnx-418-rc3.orig/Documentation/kbuild/kbuild.txt
+> +++ lnx-418-rc3/Documentation/kbuild/kbuild.txt
+> @@ -50,6 +50,11 @@ LDFLAGS_MODULE
+>  --------------------------------------------------
+>  Additional options used for $(LD) when linking modules.
+>  
+> +KBUILD_KCONFIG
+> +--------------------------------------------------
+> +Set the top-level Kconfig file to the value of this environment
+> +variable.  The default name is "Kconfig".
+> +
+>  KBUILD_VERBOSE
+>  --------------------------------------------------
+>  Set the kbuild verbosity. Can be assigned same values as "V=...".
+> 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
+
+
 
 
