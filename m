@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:36742 "EHLO
-        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754172AbeGGBH3 (ORCPT
+Received: from mail-qk0-f182.google.com ([209.85.220.182]:43739 "EHLO
+        mail-qk0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932873AbeGGBHk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Jul 2018 21:07:29 -0400
-Received: by mail-qt0-f195.google.com with SMTP id f1-v6so11398897qti.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 06 Jul 2018 18:07:28 -0700 (PDT)
+        Fri, 6 Jul 2018 21:07:40 -0400
+Received: by mail-qk0-f182.google.com with SMTP id z74-v6so7212055qkb.10
+        for <linux-kbuild@vger.kernel.org>; Fri, 06 Jul 2018 18:07:40 -0700 (PDT)
 From: Laura Abbott <labbott@redhat.com>
-Subject: [PATCH 2/7] tools: build: Use HOSTLDFLAGS with fixdep
-Date: Fri,  6 Jul 2018 18:07:04 -0700
-Message-Id: <20180707010709.16648-3-labbott@redhat.com>
+Subject: [PATCH 7/7] Kbuild: Use HOST*FLAGS options from the command line
+Date: Fri,  6 Jul 2018 18:07:09 -0700
+Message-Id: <20180707010709.16648-8-labbott@redhat.com>
 In-Reply-To: <20180707010709.16648-1-labbott@redhat.com>
 References: <20180707010709.16648-1-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,30 +17,35 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@kernel.org>
 Cc: Laura Abbott <labbott@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Robin Jarry <robin.jarry@6wind.com>
 
-The final link of fixdep uses LDFLAGS but not the existing HOSTLDFLAGS.
-Fix this.
+Now that we have the rename in place, reuse the HOST*FLAGS options as
+something that can be set from the command line and included with the
+rest of the flags.
 
 Signed-off-by: Laura Abbott <labbott@redhat.com>
 ---
-This was another one where I couldn't tell of the use of LDFLAGS was a
-typo or intentional, hence keeping both.
----
- tools/build/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/tools/build/Makefile b/tools/build/Makefile
-index 5eb4b5ad79cb..cd0fd2cd165b 100644
---- a/tools/build/Makefile
-+++ b/tools/build/Makefile
-@@ -43,7 +43,7 @@ $(OUTPUT)fixdep-in.o: FORCE
- 	$(Q)$(MAKE) $(build)=fixdep
+diff --git a/Makefile b/Makefile
+index d925af1fb11b..77c74b3cf30b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -360,10 +360,11 @@ HOST_LFS_LIBS := $(shell getconf LFS_LIBS)
+ HOSTCC       = gcc
+ HOSTCXX      = g++
+ KBUILD_HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
+-		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
+-KBUILD_HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
+-KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
+-KBUILD_HOSTLDLIBS := $(HOST_LFS_LIBS)
++		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS) \
++		$(HOSTCFLAGS)
++KBUILD_HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
++KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
++KBUILD_HOSTLDLIBS := $(HOST_LFS_LIBS) $(HOST_LOADLIBES)
  
- $(OUTPUT)fixdep: $(OUTPUT)fixdep-in.o
--	$(QUIET_LINK)$(HOSTCC) $(LDFLAGS) -o $@ $<
-+	$(QUIET_LINK)$(HOSTCC) $(HOSTLDFLAGS) $(LDFLAGS) -o $@ $<
- 
- FORCE:
- 
+ # Make variables (CC, etc...)
+ AS		= $(CROSS_COMPILE)as
 -- 
 2.17.1
 
