@@ -1,59 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:23258 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932732AbeGHCcl (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 7 Jul 2018 22:32:41 -0400
+Received: from mail-oln040092072053.outbound.protection.outlook.com ([40.92.72.53]:44172
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751293AbeGHGbb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 8 Jul 2018 02:31:31 -0400
+From: Bernd Edlinger <bernd.edlinger@hotmail.de>
+Subject: [PATCH] Fix the oldconfig target rule
+Date: Sun, 8 Jul 2018 06:31:28 +0000
+Message-ID: <AM5PR0701MB2657B3C36CDB2D67702077D8E4450@AM5PR0701MB2657.eurprd07.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3129065340840C44BEE34B6B3CC21448@eurprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20180707010709.16648-8-labbott@redhat.com>
-References: <20180707010709.16648-1-labbott@redhat.com> <20180707010709.16648-8-labbott@redhat.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 8 Jul 2018 11:31:37 +0900
-Message-ID: <CAK7LNAS3DDC8JasQTCeOnYJCGoCsuPQcqHsSNm2BaLzaGR2e4g@mail.gmail.com>
-Subject: Re: [PATCH 7/7] Kbuild: Use HOST*FLAGS options from the command line
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Robin Jarry <robin.jarry@6wind.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-2018-07-07 10:07 GMT+09:00 Laura Abbott <labbott@redhat.com>:
-> Now that we have the rename in place, reuse the HOST*FLAGS options as
-> something that can be set from the command line and included with the
-> rest of the flags.
->
-> Signed-off-by: Laura Abbott <labbott@redhat.com>
-> ---
->  Makefile | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index d925af1fb11b..77c74b3cf30b 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -360,10 +360,11 @@ HOST_LFS_LIBS := $(shell getconf LFS_LIBS)
->  HOSTCC       = gcc
->  HOSTCXX      = g++
->  KBUILD_HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
-> -               -fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
-> -KBUILD_HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
-> -KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
-> -KBUILD_HOSTLDLIBS := $(HOST_LFS_LIBS)
-> +               -fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS) \
-> +               $(HOSTCFLAGS)
-> +KBUILD_HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
-> +KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
-> +KBUILD_HOSTLDLIBS := $(HOST_LFS_LIBS) $(HOST_LOADLIBES)
-
-
-Please use HOSTLDLIBS instead of HOST_LOADLIBES.
-
-All of these must be documented in Documentation/kbuild/kbuild.txt
-
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+VGhlIG5leHQgbWFrZSBhZnRlciBhbiBvbGRjb25maWcgcmVhZHMgaW4gdGhlIG91dGRhdGVkDQpp
+bmNsdWRlL2NvbmZpZy9hdXRvLmNvbmYgd2hpY2ggY2FuIGtpbGwgdGhlIG1ha2UgYmVmb3JlDQpp
+dCBpcyBhYmxlIHRvIGNhbGwgdGhlIHN5bmNjb25maWcgdGFyZ2V0Lg0KDQokIG1ha2UgZGVmY29u
+ZmlnDQoqKiogRGVmYXVsdCBjb25maWd1cmF0aW9uIGlzIGJhc2VkIG9uICd4ODZfNjRfZGVmY29u
+ZmlnJw0KJCBtYWtlDQpzY3JpcHRzL2tjb25maWcvY29uZiAgLS1zeW5jY29uZmlnIEtjb25maWcN
+Ck1ha2VmaWxlOjkzNjogKioqICJDYW5ub3QgZ2VuZXJhdGUgT1JDIG1ldGFkYXRhIGZvciBDT05G
+SUdfVU5XSU5ERVJfT1JDPXksDQpwbGVhc2UgaW5zdGFsbCBsaWJlbGYtZGV2LCBsaWJlbGYtZGV2
+ZWwgb3IgZWxmdXRpbHMtbGliZWxmLWRldmVsIi4gIFN0b3AuDQoNCiQgc2VkIC1pIHMvQ09ORklH
+X1VOV0lOREVSX09SQz15Ly8gLmNvbmZpZ3MNCiQgbWFrZSBvbGRjb25maWcNCkNob29zZSBrZXJu
+ZWwgdW53aW5kZXINCj4gMS4gT1JDIHVud2luZGVyIChVTldJTkRFUl9PUkMpIChORVcpDQogICAy
+LiBGcmFtZSBwb2ludGVyIHVud2luZGVyIChVTldJTkRFUl9GUkFNRV9QT0lOVEVSKQ0KY2hvaWNl
+WzEtMj9dOiAyDQokIG1ha2UNCk1ha2VmaWxlOjkzNjogKioqICJDYW5ub3QgZ2VuZXJhdGUgT1JD
+IG1ldGFkYXRhIGZvciBDT05GSUdfVU5XSU5ERVJfT1JDPXksDQpwbGVhc2UgaW5zdGFsbCBsaWJl
+bGYtZGV2LCBsaWJlbGYtZGV2ZWwgb3IgZWxmdXRpbHMtbGliZWxmLWRldmVsIi4gIFN0b3AuDQoN
+CldpdGggdGhpcyBwYXRjaCBvbGRjb25maWcgYW5kIHNpbWlsYXIgdGFyZ2V0cyBsaWtlDQptZW51
+Y29uZmlnIGNhbGwgc3luY2NvbmZpZyB0byBhdm9pZCB0aGlzIGZhaWx1cmUuDQoNClNpZ25lZC1v
+ZmYtYnk6IEJlcm5kIEVkbGluZ2VyIDxiZXJuZC5lZGxpbmdlckBob3RtYWlsLmRlPg0KLS0tDQog
+IHNjcmlwdHMva2NvbmZpZy9NYWtlZmlsZSB8IDEgKw0KICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNl
+cnRpb24oKykNCg0KZGlmZiAtLWdpdCBhL3NjcmlwdHMva2NvbmZpZy9NYWtlZmlsZSBiL3Njcmlw
+dHMva2NvbmZpZy9NYWtlZmlsZQ0KaW5kZXggYTNhYzJjOS4uZWYzNDI3NSAxMDA2NDQNCi0tLSBh
+L3NjcmlwdHMva2NvbmZpZy9NYWtlZmlsZQ0KKysrIGIvc2NyaXB0cy9rY29uZmlnL01ha2VmaWxl
+DQpAQCAtNjIsNiArNjIsNyBAQCBQSE9OWSArPSAkKHNpbXBsZS10YXJnZXRzKQ0KICANCiAgJChz
+aW1wbGUtdGFyZ2V0cyk6ICQob2JqKS9jb25mDQogIAkkPCAkKHNpbGVudCkgLS0kQCAkKEtjb25m
+aWcpDQorCSQoUSkkKE1BS0UpIC1mICQoc3JjdHJlZSkvTWFrZWZpbGUgc3luY2NvbmZpZw0KICAN
+CiAgUEhPTlkgKz0gb2xkbm9jb25maWcgc2lsZW50b2xkY29uZmlnIHNhdmVkZWZjb25maWcgZGVm
+Y29uZmlnDQogIA0KLS0gDQoxLjkuMQ0K
