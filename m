@@ -1,325 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:52076 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932220AbeGHPUI (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:33587 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751422AbeGHPoY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Jul 2018 11:20:08 -0400
-From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 3/9] um: create a proper drivers Kconfig
-Date: Sun,  8 Jul 2018 08:19:58 -0700
-Message-Id: <20180708152004.21679-4-hch@lst.de>
-In-Reply-To: <20180708152004.21679-1-hch@lst.de>
-References: <20180708152004.21679-1-hch@lst.de>
+        Sun, 8 Jul 2018 11:44:24 -0400
+Received: by mail-pl0-f67.google.com with SMTP id 6-v6so4901987plb.0
+        for <linux-kbuild@vger.kernel.org>; Sun, 08 Jul 2018 08:44:24 -0700 (PDT)
+Date: Mon, 9 Jul 2018 01:44:14 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: powerpc: 32BIT vs. 64BIT (PPC32 vs. PPC64)
+Message-ID: <20180709012328.203993bb@roar.ozlabs.ibm.com>
+In-Reply-To: <c0a17b80-6384-7437-045c-3688d9e5e7f9@infradead.org>
+References: <3f906b03-98ff-c081-4e19-b490f0b35c51@infradead.org>
+        <a3c9b9ee9ec116390c47dca65fcf14f138eccd3f.camel@kernel.crashing.org>
+        <4f3a5969-88d5-134d-508d-7617947c588c@infradead.org>
+        <20180707221316.5b75e075@roar.ozlabs.ibm.com>
+        <c0a17b80-6384-7437-045c-3688d9e5e7f9@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, linux-kbuild@vger.kernel.org, linux-um@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org, Stephen Rothwell <sfr@canb.auug.org.au>
 
-Merge arch/um/Kconfig.char and arch/um/Kconfig.net into a new
-arch/um/drivers/Kconfig.  This fits the way Kconfig files are placed
-elsewhere in the kernel tree.
+On Sat, 7 Jul 2018 07:59:49 -0700
+Randy Dunlap <rdunlap@infradead.org> wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- arch/um/Kconfig                          |   4 +-
- arch/um/Kconfig.char                     | 124 ----------------------
- arch/um/{Kconfig.net => drivers/Kconfig} | 125 ++++++++++++++++++++++-
- 3 files changed, 125 insertions(+), 128 deletions(-)
- delete mode 100644 arch/um/Kconfig.char
- rename arch/um/{Kconfig.net => drivers/Kconfig} (66%)
+> On 07/07/2018 05:13 AM, Nicholas Piggin wrote:
+> > On Fri, 6 Jul 2018 21:58:29 -0700
+> > Randy Dunlap <rdunlap@infradead.org> wrote:
+> >   
+> >> On 07/06/2018 06:45 PM, Benjamin Herrenschmidt wrote:  
+> >>> On Thu, 2018-07-05 at 14:30 -0700, Randy Dunlap wrote:    
+> >>>> Hi,
+> >>>>
+> >>>> Is there a good way (or a shortcut) to do something like:
+> >>>>
+> >>>> $ make ARCH=powerpc O=PPC32 [other_options] allmodconfig
+> >>>>   to get a PPC32/32BIT allmodconfig
+> >>>>
+> >>>> and also be able to do:
+> >>>>
+> >>>> $make ARCH=powerpc O=PPC64 [other_options] allmodconfig
+> >>>>   to get a PPC64/64BIT allmodconfig?    
+> >>>
+> >>> Hrm... O= is for the separate build dir, so there much be something
+> >>> else.
+> >>>
+> >>> You mean having ARCH= aliases like ppc/ppc32 and ppc64 ?    
+> >>
+> >> Yes.
+> >>  
+> >>> That would be a matter of overriding some .config defaults I suppose, I
+> >>> don't know how this is done on other archs.
+> >>>
+> >>> I see the aliasing trick in the Makefile but that's about it.
+> >>>     
+> >>>> Note that arch/x86, arch/sh, and arch/sparc have ways to do
+> >>>> some flavor(s) of this (from Documentation/kbuild/kbuild.txt;
+> >>>> sh and sparc based on a recent "fix" patch from me):    
+> >>>
+> >>> I fail to see what you are actually talking about here ... sorry. Do
+> >>> you have concrete examples on x86 or sparc ? From what I can tell the
+> >>> "i386" or "sparc32/sparc64" aliases just change SRCARCH in Makefile and
+> >>> 32 vs 64-bit is just a Kconfig option...    
+> >>
+> >> Yes, your summary is mostly correct.
+> >>
+> >> I'm just looking for a way to do cross-compile builds that are close to
+> >> ppc32 allmodconfig and ppc64 allmodconfig.  
+> > 
+> > Would there a problem with adding ARCH=ppc32 / ppc64 matching? This
+> > seems to work...
+> > 
+> > Thanks,
+> > Nick  
+> 
+> Yes, this mostly works and is similar to a patch (my patch) on my test machine.
+> And they both work for allmodconfig, which is my primary build target.
+> 
+> And they both have one little quirk that is confusing when the build target
+> is defconfig:
+> 
+> When ARCH=ppc32, the terminal output (stdout) is: (using O=PPC32)
+> 
+> make[1]: Entering directory '/home/rdunlap/lnx/lnx-418-rc3/PPC32'
+>   GEN     ./Makefile
+> *** Default configuration is based on 'ppc64_defconfig'   <<<<< NOTE <<<<<
+> #
+> # configuration written to .config
+> #
+> make[1]: Leaving directory '/home/rdunlap/lnx/lnx-418-rc3/PPC32'
+> 
+> 
+> I expect that can be fixed also.  :)
 
-diff --git a/arch/um/Kconfig b/arch/um/Kconfig
-index 1f605a7281cc..fc17718fbe0e 100644
---- a/arch/um/Kconfig
-+++ b/arch/um/Kconfig
-@@ -194,14 +194,12 @@ source "init/Kconfig"
- 
- source "kernel/Kconfig.freezer"
- 
--source "arch/um/Kconfig.char"
-+source "arch/um/drivers/Kconfig"
- 
- source "drivers/Kconfig"
- 
- source "net/Kconfig"
- 
--source "arch/um/Kconfig.net"
--
- source "fs/Kconfig"
- 
- source "security/Kconfig"
-diff --git a/arch/um/Kconfig.char b/arch/um/Kconfig.char
-deleted file mode 100644
-index f184bde7030e..000000000000
---- a/arch/um/Kconfig.char
-+++ /dev/null
-@@ -1,124 +0,0 @@
--# SPDX-License-Identifier: GPL-2.0
--menu "UML Character Devices"
--
--config STDERR_CONSOLE
--	bool "stderr console"
--	default y
--	help
--	  console driver which dumps all printk messages to stderr.
--
--config SSL
--	bool "Virtual serial line"
--	help
--          The User-Mode Linux environment allows you to create virtual serial
--          lines on the UML that are usually made to show up on the host as
--          ttys or ptys.
--
--          See <http://user-mode-linux.sourceforge.net/old/input.html> for more
--          information and command line examples of how to use this facility.
--
--          Unless you have a specific reason for disabling this, say Y.
--
--config NULL_CHAN
--	bool "null channel support"
--	help
--          This option enables support for attaching UML consoles and serial
--          lines to a device similar to /dev/null.  Data written to it disappears
--          and there is never any data to be read.
--
--config PORT_CHAN
--	bool "port channel support"
--	help
--          This option enables support for attaching UML consoles and serial
--          lines to host portals.  They may be accessed with 'telnet <host>
--          <port number>'.  Any number of consoles and serial lines may be
--          attached to a single portal, although what UML device you get when
--          you telnet to that portal will be unpredictable.
--          It is safe to say 'Y' here.
--
--config PTY_CHAN
--	bool "pty channel support"
--	help
--          This option enables support for attaching UML consoles and serial
--          lines to host pseudo-terminals.  Access to both traditional
--          pseudo-terminals (/dev/pty*) and pts pseudo-terminals are controlled
--          with this option.  The assignment of UML devices to host devices
--          will be announced in the kernel message log.
--          It is safe to say 'Y' here.
--
--config TTY_CHAN
--	bool "tty channel support"
--	help
--          This option enables support for attaching UML consoles and serial
--          lines to host terminals.  Access to both virtual consoles
--          (/dev/tty*) and the slave side of pseudo-terminals (/dev/ttyp* and
--          /dev/pts/*) are controlled by this option.
--          It is safe to say 'Y' here.
--
--config XTERM_CHAN
--	bool "xterm channel support"
--	help
--          This option enables support for attaching UML consoles and serial
--          lines to xterms.  Each UML device so assigned will be brought up in
--          its own xterm.
--          It is safe to say 'Y' here.
--
--config NOCONFIG_CHAN
--	bool
--	default !(XTERM_CHAN && TTY_CHAN && PTY_CHAN && PORT_CHAN && NULL_CHAN)
--
--config CON_ZERO_CHAN
--	string "Default main console channel initialization"
--	default "fd:0,fd:1"
--	help
--          This is the string describing the channel to which the main console
--          will be attached by default.  This value can be overridden from the
--          command line.  The default value is "fd:0,fd:1", which attaches the
--          main console to stdin and stdout.
--          It is safe to leave this unchanged.
--
--config CON_CHAN
--	string "Default console channel initialization"
--	default "xterm"
--	help
--          This is the string describing the channel to which all consoles
--          except the main console will be attached by default.  This value can
--          be overridden from the command line.  The default value is "xterm",
--          which brings them up in xterms.
--          It is safe to leave this unchanged, although you may wish to change
--          this if you expect the UML that you build to be run in environments
--          which don't have X or xterm available.
--
--config SSL_CHAN
--	string "Default serial line channel initialization"
--	default "pty"
--	help
--          This is the string describing the channel to which the serial lines
--          will be attached by default.  This value can be overridden from the
--          command line.  The default value is "pty", which attaches them to
--          traditional pseudo-terminals.
--          It is safe to leave this unchanged, although you may wish to change
--          this if you expect the UML that you build to be run in environments
--          which don't have a set of /dev/pty* devices.
--
--config UML_SOUND
--	tristate "Sound support"
--	help
--          This option enables UML sound support.  If enabled, it will pull in
--          soundcore and the UML hostaudio relay, which acts as a intermediary
--          between the host's dsp and mixer devices and the UML sound system.
--          It is safe to say 'Y' here.
--
--config SOUND
--	tristate
--	default UML_SOUND
--
--config SOUND_OSS_CORE
--	bool
--	default UML_SOUND
--
--config HOSTAUDIO
--	tristate
--	default UML_SOUND
--
--endmenu
-diff --git a/arch/um/Kconfig.net b/arch/um/drivers/Kconfig
-similarity index 66%
-rename from arch/um/Kconfig.net
-rename to arch/um/drivers/Kconfig
-index c390f3deb0dc..2b1aaf7755aa 100644
---- a/arch/um/Kconfig.net
-+++ b/arch/um/drivers/Kconfig
-@@ -1,5 +1,129 @@
- # SPDX-License-Identifier: GPL-2.0
- 
-+menu "UML Character Devices"
-+
-+config STDERR_CONSOLE
-+	bool "stderr console"
-+	default y
-+	help
-+	  console driver which dumps all printk messages to stderr.
-+
-+config SSL
-+	bool "Virtual serial line"
-+	help
-+          The User-Mode Linux environment allows you to create virtual serial
-+          lines on the UML that are usually made to show up on the host as
-+          ttys or ptys.
-+
-+          See <http://user-mode-linux.sourceforge.net/old/input.html> for more
-+          information and command line examples of how to use this facility.
-+
-+          Unless you have a specific reason for disabling this, say Y.
-+
-+config NULL_CHAN
-+	bool "null channel support"
-+	help
-+          This option enables support for attaching UML consoles and serial
-+          lines to a device similar to /dev/null.  Data written to it disappears
-+          and there is never any data to be read.
-+
-+config PORT_CHAN
-+	bool "port channel support"
-+	help
-+          This option enables support for attaching UML consoles and serial
-+          lines to host portals.  They may be accessed with 'telnet <host>
-+          <port number>'.  Any number of consoles and serial lines may be
-+          attached to a single portal, although what UML device you get when
-+          you telnet to that portal will be unpredictable.
-+          It is safe to say 'Y' here.
-+
-+config PTY_CHAN
-+	bool "pty channel support"
-+	help
-+          This option enables support for attaching UML consoles and serial
-+          lines to host pseudo-terminals.  Access to both traditional
-+          pseudo-terminals (/dev/pty*) and pts pseudo-terminals are controlled
-+          with this option.  The assignment of UML devices to host devices
-+          will be announced in the kernel message log.
-+          It is safe to say 'Y' here.
-+
-+config TTY_CHAN
-+	bool "tty channel support"
-+	help
-+          This option enables support for attaching UML consoles and serial
-+          lines to host terminals.  Access to both virtual consoles
-+          (/dev/tty*) and the slave side of pseudo-terminals (/dev/ttyp* and
-+          /dev/pts/*) are controlled by this option.
-+          It is safe to say 'Y' here.
-+
-+config XTERM_CHAN
-+	bool "xterm channel support"
-+	help
-+          This option enables support for attaching UML consoles and serial
-+          lines to xterms.  Each UML device so assigned will be brought up in
-+          its own xterm.
-+          It is safe to say 'Y' here.
-+
-+config NOCONFIG_CHAN
-+	bool
-+	default !(XTERM_CHAN && TTY_CHAN && PTY_CHAN && PORT_CHAN && NULL_CHAN)
-+
-+config CON_ZERO_CHAN
-+	string "Default main console channel initialization"
-+	default "fd:0,fd:1"
-+	help
-+          This is the string describing the channel to which the main console
-+          will be attached by default.  This value can be overridden from the
-+          command line.  The default value is "fd:0,fd:1", which attaches the
-+          main console to stdin and stdout.
-+          It is safe to leave this unchanged.
-+
-+config CON_CHAN
-+	string "Default console channel initialization"
-+	default "xterm"
-+	help
-+          This is the string describing the channel to which all consoles
-+          except the main console will be attached by default.  This value can
-+          be overridden from the command line.  The default value is "xterm",
-+          which brings them up in xterms.
-+          It is safe to leave this unchanged, although you may wish to change
-+          this if you expect the UML that you build to be run in environments
-+          which don't have X or xterm available.
-+
-+config SSL_CHAN
-+	string "Default serial line channel initialization"
-+	default "pty"
-+	help
-+          This is the string describing the channel to which the serial lines
-+          will be attached by default.  This value can be overridden from the
-+          command line.  The default value is "pty", which attaches them to
-+          traditional pseudo-terminals.
-+          It is safe to leave this unchanged, although you may wish to change
-+          this if you expect the UML that you build to be run in environments
-+          which don't have a set of /dev/pty* devices.
-+
-+config UML_SOUND
-+	tristate "Sound support"
-+	help
-+          This option enables UML sound support.  If enabled, it will pull in
-+          soundcore and the UML hostaudio relay, which acts as a intermediary
-+          between the host's dsp and mixer devices and the UML sound system.
-+          It is safe to say 'Y' here.
-+
-+config SOUND
-+	tristate
-+	default UML_SOUND
-+
-+config SOUND_OSS_CORE
-+	bool
-+	default UML_SOUND
-+
-+config HOSTAUDIO
-+	tristate
-+	default UML_SOUND
-+
-+endmenu
-+
- menu "UML Network Devices"
- 	depends on NET
- 
-@@ -211,4 +335,3 @@ config UML_NET_SLIRP
-         Startup example: "eth0=slirp,FE:FD:01:02:03:04,/usr/local/bin/slirp"
- 
- endmenu
--
--- 
-2.18.0
+It can, we'd just have to choose one of the many 32-bit configs to be
+the default config in that case. I don't know much about 32 bit ppc,
+so I don't know what would be the most useful for allmodconfig type of
+build tests.
 
+Even 64 bit have a bunch of major variants that are exclusive at build
+time (Server vs embedded, endian, etc). So maybe the simple ppc64/ppc32
+is not enough. Not sure.
+
+Thanks,
+Nick
