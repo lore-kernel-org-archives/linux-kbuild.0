@@ -1,65 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:49916 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754400AbeGHCE4 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:60896 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754423AbeGHCQR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 7 Jul 2018 22:04:56 -0400
+        Sat, 7 Jul 2018 22:16:17 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180707001548.21854-1-kilobyte@angband.pl>
-References: <20180707001548.21854-1-kilobyte@angband.pl>
+In-Reply-To: <a2a39cac-79fc-22d9-e1d0-b94787526794@cn.fujitsu.com>
+References: <a2a39cac-79fc-22d9-e1d0-b94787526794@cn.fujitsu.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 8 Jul 2018 11:04:05 +0900
-Message-ID: <CAK7LNARUhSo1WbgK0M1Xxh4ACGqLSh39oq+jDqcTA2byjNJ3cA@mail.gmail.com>
-Subject: Re: [PATCH resend] scripts: teach extract-vmlinux about LZ4 and ZSTD
+Date: Sun, 8 Jul 2018 11:15:30 +0900
+Message-ID: <CAK7LNAQnpQn5k0fkb+nSASe7qg1UgX6BhdR-3EEuSX=xOuPhrw@mail.gmail.com>
+Subject: Re: kconfig usage in automatic kernel test
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adam Borowski <kilobyte@angband.pl>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Paul Menzel <pmenzel+linux-kernel@molgen.mpg.de>, Pavel Machek <pavel@ucw.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Ingo Molnar <mingo@kernel.org>
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-07-07 9:15 GMT+09:00 Adam Borowski <kilobyte@angband.pl>:
-> Note that the LZ4 signature is different than that of modern LZ4 as we
-> use the "legacy" format which suffers from some downsides like inability
-> to disable compression.
+2018-07-06 17:49 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+> Masahiro-san,
 >
-> Signed-off-by: Adam Borowski <kilobyte@angband.pl>
-> ---
-> The first time this was sent I managed to screw up both the subject and
-> scissors line, so it's likely whatever filter you're using didn't notice
-> the patch inside a thread.
+>   I am writing some utility for internal kdump test with latest kernel,
+> my purpose is to test the new introduced kernel feature. For automatical
+> test, I see several config target could help, like olddefconfig, all*config.
+>
+> But for my purpose, I don't find a good way. For example, olddefconfig
+> will let the now config item has default value, while some feature may
+> default to "N"; allyesconfig will slow the compilation notably.
+> But "all*config" has KCONFIG_ALLCONFIG help to customizing some config
+> item, that is a good utility, but seems it can't be used in olddefconfig.
+>
+> All these things let me have 2 questions:
+>
+> 1. What would you suggest for my purpose?
 
-Sorry for the delay.
-Applied to linux-kbuild.  Thanks!
+
+scripts/kconfig/merge_config.sh
+can be used with any *config target.
+
+If you want to tweak some symbols based on olddefconfig,
+this could be the one you want.
 
 
+> 2. allyesconfig, allmodconfig, randconfig seems useful for test kbuild,
+> but what's the purpose of allnoconfig, alldefconfig? In others words,
+> when people would need allnoconfig, alldefconfig?
 
-> ZSTD compression for vmlinux is not yet in, but being able to unpack it
-> can't hurt.  LZ4 is in for quite a while.
->
->
->  scripts/extract-vmlinux | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/scripts/extract-vmlinux b/scripts/extract-vmlinux
-> index 5061abcc2540..e6239f39abad 100755
-> --- a/scripts/extract-vmlinux
-> +++ b/scripts/extract-vmlinux
-> @@ -57,6 +57,8 @@ try_decompress '\3757zXZ\000' abcde unxz
->  try_decompress 'BZh'          xy    bunzip2
->  try_decompress '\135\0\0\0'   xxx   unlzma
->  try_decompress '\211\114\132' xy    'lzop -d'
-> +try_decompress '\002!L\030'   xxx   'lz4 -d'
-> +try_decompress '(\265/\375'   xxx   unzstd
->
->  # Bail out:
->  echo "$me: Cannot find vmlinux." >&2
+I sometimes use allnoconfig for build testing.
+
+When I want to test the whole build process quickly,
+I disable as many drivers as possible to save time.
+
+
+I do not use alldefconfig.
+Anyway, it would not hurt to have it for completeness.
+
+
 > --
-> 2.18.0
+> Sincerely,
+> Cao jin
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
 
 
