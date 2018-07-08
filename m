@@ -1,100 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:43828 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753825AbeGHQeb (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:46319 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754369AbeGHWNY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Jul 2018 12:34:31 -0400
-Subject: Re: [PATCH 5/9] Kconfig: consolidate the "Kernel hacking" menu
-References: <20180708152004.21679-1-hch@lst.de>
- <20180708152004.21679-6-hch@lst.de>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <fd8c89be-1270-a54e-a69b-350105a04eca@infradead.org>
-Date: Sun, 8 Jul 2018 09:34:29 -0700
+        Sun, 8 Jul 2018 18:13:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180708152004.21679-6-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180706004940.32587-1-labbott@redhat.com>
+References: <20180706004940.32587-1-labbott@redhat.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 9 Jul 2018 07:12:37 +0900
+Message-ID: <CAK7LNASo7pnL32dFqdxmKqCLkBsJwGOaTHXX=rVjpi2-Y=t0Aw@mail.gmail.com>
+Subject: Re: [PATCHv6 0/4] Salted build ids via ELF notes
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Richard Weinberger <richard@nod.at>, linux-kbuild@vger.kernel.org, linux-um@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Laura Abbott <labbott@redhat.com>
+Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 
-On 07/08/2018 08:20 AM, Christoph Hellwig wrote:
-> Move the source of lib/Kconfig.debug and arch/$(ARCH)/Kconfig.debug to
-> the top-level Kconfig.  For two architectures that means moving their
-> arch-specific symbols in that menu into a new arch Kconfig.debug file,
-> and for a few more creating a dummy file so that we can include it
-> unconditionally.
-> 
-> Also move the actual 'Kernel hacking' menu to lib/Kconfig.debug, where
-> it belongs.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
+2018-07-06 9:49 GMT+09:00 Laura Abbott <labbott@redhat.com>:
+> Hi,
+>
+> This is v6 of the series to allow unique build ids. v6 is mostly minor
+> fixups and Acks for this to go through the kbuild tree.
 
 
-> ---
->  Kconfig                       |  2 ++
->  arch/alpha/Kconfig            |  2 --
->  arch/alpha/Kconfig.debug      |  5 ----
->  arch/arc/Kconfig              |  1 -
->  arch/arc/Kconfig.debug        |  5 ----
->  arch/arm/Kconfig              |  2 --
->  arch/arm/Kconfig.debug        |  5 ----
->  arch/arm64/Kconfig            |  2 --
->  arch/arm64/Kconfig.debug      |  5 ----
->  arch/c6x/Kconfig              | 15 ------------
->  arch/c6x/Kconfig.debug        | 11 +++++++++
->  arch/h8300/Kconfig            |  6 -----
->  arch/h8300/Kconfig.debug      |  1 +
->  arch/hexagon/Kconfig          |  4 ----
->  arch/hexagon/Kconfig.debug    |  1 +
->  arch/ia64/Kconfig             |  2 --
->  arch/ia64/Kconfig.debug       |  5 ----
->  arch/m68k/Kconfig             |  2 --
->  arch/m68k/Kconfig.debug       |  5 ----
->  arch/microblaze/Kconfig       |  2 --
->  arch/microblaze/Kconfig.debug |  6 -----
->  arch/mips/Kconfig             |  2 --
->  arch/mips/Kconfig.debug       |  5 ----
->  arch/nds32/Kconfig            |  4 ----
->  arch/nds32/Kconfig.debug      |  1 +
->  arch/nios2/Kconfig            |  2 --
->  arch/nios2/Kconfig.debug      |  5 ----
->  arch/openrisc/Kconfig         |  6 -----
->  arch/openrisc/Kconfig.debug   |  1 +
->  arch/parisc/Kconfig           |  2 --
->  arch/parisc/Kconfig.debug     |  5 ----
->  arch/powerpc/Kconfig          |  2 --
->  arch/powerpc/Kconfig.debug    |  5 ----
->  arch/riscv/Kconfig            | 45 -----------------------------------
->  arch/riscv/Kconfig.debug      | 37 ++++++++++++++++++++++++++++
->  arch/s390/Kconfig             |  2 --
->  arch/s390/Kconfig.debug       |  5 ----
->  arch/sh/Kconfig               |  2 --
->  arch/sh/Kconfig.debug         |  5 ----
->  arch/sparc/Kconfig            |  2 --
->  arch/sparc/Kconfig.debug      |  5 ----
->  arch/um/Kconfig               |  2 --
->  arch/um/Kconfig.debug         |  5 ----
->  arch/unicore32/Kconfig        |  2 --
->  arch/unicore32/Kconfig.debug  |  5 ----
->  arch/x86/Kconfig              |  2 --
->  arch/x86/Kconfig.debug        |  5 ----
->  arch/xtensa/Kconfig           |  2 --
->  arch/xtensa/Kconfig.debug     |  5 ----
->  lib/Kconfig.debug             |  6 +++++
->  50 files changed, 60 insertions(+), 206 deletions(-)
->  create mode 100644 arch/c6x/Kconfig.debug
->  create mode 100644 arch/h8300/Kconfig.debug
->  create mode 100644 arch/hexagon/Kconfig.debug
->  create mode 100644 arch/nds32/Kconfig.debug
->  create mode 100644 arch/openrisc/Kconfig.debug
->  create mode 100644 arch/riscv/Kconfig.debug
+Applied to linux-kbuild. Thanks!
+
+
+> Thanks,
+> Laura
+>
+> Laura Abbott (4):
+>   kbuild: Add build salt to the kernel and modules
+>   x86: Add build salt to the vDSO
+>   powerpc: Add build salt to the vDSO
+>   arm64: Add build salt to the vDSO
+>
+>  arch/arm64/kernel/vdso/note.S     |  3 +++
+>  arch/powerpc/kernel/vdso32/note.S |  3 +++
+>  arch/x86/entry/vdso/vdso-note.S   |  3 +++
+>  arch/x86/entry/vdso/vdso32/note.S |  3 +++
+>  include/linux/build-salt.h        | 20 ++++++++++++++++++++
+>  init/Kconfig                      |  9 +++++++++
+>  init/version.c                    |  3 +++
+>  scripts/mod/modpost.c             |  3 +++
+>  8 files changed, 47 insertions(+)
+>  create mode 100644 include/linux/build-salt.h
+>
+> --
+> 2.17.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 
 
 -- 
-~Randy
+Best Regards
+Masahiro Yamada
