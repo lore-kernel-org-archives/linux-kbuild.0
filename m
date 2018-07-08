@@ -1,135 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:37896 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753952AbeGHKBY (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:45312 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932690AbeGHKmT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Jul 2018 06:01:24 -0400
+        Sun, 8 Jul 2018 06:42:19 -0400
+MIME-Version: 1.0
+In-Reply-To: <AM5PR0701MB265789020943AD2E03E81AD2E4450@AM5PR0701MB2657.eurprd07.prod.outlook.com>
+References: <AM5PR0701MB2657B3C36CDB2D67702077D8E4450@AM5PR0701MB2657.eurprd07.prod.outlook.com>
+ <AM5PR0701MB265789020943AD2E03E81AD2E4450@AM5PR0701MB2657.eurprd07.prod.outlook.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] objtool: move libelf detection to Kconfig from Makefile
-Date: Sun,  8 Jul 2018 18:59:42 +0900
-Message-Id: <1531043982-13325-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Sun, 8 Jul 2018 19:41:32 +0900
+Message-ID: <CAK7LNAT1bqDKo2zS3kUVKnPYgziibuwCdQ4+Y5hQE_xbjcGAWw@mail.gmail.com>
+Subject: Re: [PATCH] Fix the oldconfig target rule
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@chromium.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
+To: Bernd Edlinger <bernd.edlinger@hotmail.de>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Currently, users are allowed to enable STACK_VALIDATION regardless
-of the compiler capability.  The top-level Makefile warns or breaks
-the build if it turns out that the host compiler cannot link libelf.
+2018-07-08 17:09 GMT+09:00 Bernd Edlinger <bernd.edlinger@hotmail.de>:
+> On 07/08/18 08:31, Bernd Edlinger wrote:
+>> The next make after an oldconfig reads in the outdated
+>> include/config/auto.conf which can kill the make before
+>> it is able to call the syncconfig target.
+>>
+>> $ make defconfig
+>> *** Default configuration is based on 'x86_64_defconfig'
+>> $ make
+>> scripts/kconfig/conf  --syncconfig Kconfig
+>> Makefile:936: *** "Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y,
+>> please install libelf-dev, libelf-devel or elfutils-libelf-devel".  Stop.
+>>
+>> $ sed -i s/CONFIG_UNWINDER_ORC=y// .configs
+>> $ make oldconfig
+>> Choose kernel unwinder
+>>> 1. ORC unwinder (UNWINDER_ORC) (NEW)
+>>    2. Frame pointer unwinder (UNWINDER_FRAME_POINTER)
+>> choice[1-2?]: 2
+>> $ make
+>> Makefile:936: *** "Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y,
+>> please install libelf-dev, libelf-devel or elfutils-libelf-devel".  Stop.
+>>
+>> With this patch oldconfig and similar targets like
+>> menuconfig call syncconfig to avoid this failure.
+>>
+>> Signed-off-by: Bernd Edlinger <bernd.edlinger@hotmail.de>
+>> ---
+>>   scripts/kconfig/Makefile | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+>> index a3ac2c9..ef34275 100644
+>> --- a/scripts/kconfig/Makefile
+>> +++ b/scripts/kconfig/Makefile
+>> @@ -62,6 +62,7 @@ PHONY += $(simple-targets)
+>>
+>>   $(simple-targets): $(obj)/conf
+>>       $< $(silent) --$@ $(Kconfig)
+>> +    $(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
+>
+> On second thought, removing the auto.conf might be sufficient:
+> $(Q)rm -f include/config/auto.conf include/config/auto.conf.cmd
+>
+> Would you prefer that?
 
-Move the libelf test to Kconfig so that users can enable the feature
-only when the host compiler can build the objtool.  The ugly check
-in the Makefile will go away.
+No.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
-I am sure about this patch only from the build system point of view.
-
-Please review this from x86 and objtool point of view.
-
-In my understanding:
-
- - UNWINDER_ORC _requires_ objtool,
-   so I added 'depends on STACK_VALIDATION'.
-   ('select' would end up with unmet depenency)
-
- - RETPORINE _wants_ objtool, so I added 'imply'
-
-Please correct me if I am wrong.
+My suggestion is this:
+https://patchwork.kernel.org/patch/10513065/
 
 
- Makefile               | 14 +-------------
- arch/x86/Kconfig       |  2 +-
- arch/x86/Kconfig.debug |  2 +-
- lib/Kconfig.debug      |  2 +-
- scripts/Makefile.build |  2 --
- 5 files changed, 4 insertions(+), 18 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index d15ac32..f724349 100644
---- a/Makefile
-+++ b/Makefile
-@@ -927,19 +927,7 @@ endif
- export mod_sign_cmd
- 
- ifdef CONFIG_STACK_VALIDATION
--  has_libelf := $(call try-run,\
--		echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -,1,0)
--  ifeq ($(has_libelf),1)
--    objtool_target := tools/objtool FORCE
--  else
--    ifdef CONFIG_UNWINDER_ORC
--      $(error "Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, please install libelf-dev, libelf-devel or elfutils-libelf-devel")
--    else
--      $(warning "Cannot use CONFIG_STACK_VALIDATION=y, please install libelf-dev, libelf-devel or elfutils-libelf-devel")
--    endif
--    SKIP_STACK_VALIDATION := 1
--    export SKIP_STACK_VALIDATION
--  endif
-+    objtool_target := tools/objtool
- endif
- 
- 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index f1dbb4e..c1ded99 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -434,7 +434,7 @@ config GOLDFISH
- config RETPOLINE
- 	bool "Avoid speculative indirect branches in kernel"
- 	default y
--	select STACK_VALIDATION if HAVE_STACK_VALIDATION
-+	imply STACK_VALIDATION
- 	help
- 	  Compile kernel with the retpoline compiler options to guard against
- 	  kernel-to-user data leaks by avoiding speculative indirect
-diff --git a/arch/x86/Kconfig.debug b/arch/x86/Kconfig.debug
-index c6dd1d9..4713b3c 100644
---- a/arch/x86/Kconfig.debug
-+++ b/arch/x86/Kconfig.debug
-@@ -364,7 +364,7 @@ choice
- config UNWINDER_ORC
- 	bool "ORC unwinder"
- 	depends on X86_64
--	select STACK_VALIDATION
-+	depends on STACK_VALIDATION
- 	---help---
- 	  This option enables the ORC (Oops Rewind Capability) unwinder for
- 	  unwinding kernel stack traces.  It uses a custom data format which is
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 8838d11..07eb744 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -364,7 +364,7 @@ config FRAME_POINTER
- config STACK_VALIDATION
- 	bool "Compile-time stack metadata validation"
- 	depends on HAVE_STACK_VALIDATION
--	default n
-+	depends on $(success,echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -)
- 	help
- 	  Add compile-time checks to validate stack metadata, including frame
- 	  pointers (if CONFIG_FRAME_POINTER is enabled).  This helps ensure
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index e7889f4..154205b 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -243,7 +243,6 @@ endif # -record-mcount
- endif # CONFIG_FTRACE_MCOUNT_RECORD
- 
- ifdef CONFIG_STACK_VALIDATION
--ifneq ($(SKIP_STACK_VALIDATION),1)
- 
- __objtool_obj := $(objtree)/tools/objtool/objtool
- 
-@@ -282,7 +281,6 @@ objtool_obj = $(if $(patsubst y%,, \
- 	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
- 	$(__objtool_obj))
- 
--endif # SKIP_STACK_VALIDATION
- endif # CONFIG_STACK_VALIDATION
- 
- # Rebuild all objects when objtool changes, or is enabled/disabled.
+
+
+
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
