@@ -1,56 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36182 "EHLO mx1.redhat.com"
+Received: from mail-oln040092067098.outbound.protection.outlook.com ([40.92.67.98]:55332
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932757AbeGHK7w (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Jul 2018 06:59:52 -0400
-Date: Sun, 8 Jul 2018 12:59:48 +0200
-From: Jiri Olsa <jolsa@redhat.com>
-Subject: Re: [PATCH 1/7] tools: build: Fixup host c flags
-Message-ID: <20180708105948.GB29861@krava>
-References: <20180707010709.16648-1-labbott@redhat.com>
- <20180707010709.16648-2-labbott@redhat.com>
+        id S932821AbeGHLNY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 8 Jul 2018 07:13:24 -0400
+From: Bernd Edlinger <bernd.edlinger@hotmail.de>
+Subject: Re: [PATCH] Fix the oldconfig target rule
+Date: Sun, 8 Jul 2018 11:13:21 +0000
+Message-ID: <AM5PR0701MB26575A5A1FBEDFC9127110BAE4450@AM5PR0701MB2657.eurprd07.prod.outlook.com>
+References: <AM5PR0701MB2657B3C36CDB2D67702077D8E4450@AM5PR0701MB2657.eurprd07.prod.outlook.com>
+ <AM5PR0701MB265789020943AD2E03E81AD2E4450@AM5PR0701MB2657.eurprd07.prod.outlook.com>
+ <CAK7LNAT1bqDKo2zS3kUVKnPYgziibuwCdQ4+Y5hQE_xbjcGAWw@mail.gmail.com>
+In-Reply-To: <CAK7LNAT1bqDKo2zS3kUVKnPYgziibuwCdQ4+Y5hQE_xbjcGAWw@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <00E67358DFEC8C4BB43244F9C2DBEDD1@eurprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180707010709.16648-2-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Robin Jarry <robin.jarry@6wind.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Fri, Jul 06, 2018 at 06:07:03PM -0700, Laura Abbott wrote:
-> Commit 0c3b7e42616f ("tools build: Add support for host programs format")
-> introduced host_c_flags which referenced CHOSTFLAGS. The actual name of the
-> variable is HOSTCFLAGS. Fix this up.
-> 
-> Fixes: 0c3b7e42616f ("tools build: Add support for host programs format")
-> Signed-off-by: Laura Abbott <labbott@redhat.com>
-> ---
-> This seemed like a typo to the best of my understanding and certain
-> things wouldn't link properly until this was fixed.
-
-ugh, thanks for finding this.. I think/hope it's typo ;-)
-
-please also change the only perf user of this:
-
-tools/perf/pmu-events/Build:CHOSTFLAGS_jevents.o   = -I$(srctree)/tools/include
-
-jirka
-
-> ---
->  tools/build/Build.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/build/Build.include b/tools/build/Build.include
-> index a4bbb984941d..b5c679cd441c 100644
-> --- a/tools/build/Build.include
-> +++ b/tools/build/Build.include
-> @@ -98,4 +98,4 @@ cxx_flags = -Wp,-MD,$(depfile) -Wp,-MT,$@ $(CXXFLAGS) -D"BUILD_STR(s)=\#s" $(CXX
->  ###
->  ## HOSTCC C flags
->  
-> -host_c_flags = -Wp,-MD,$(depfile) -Wp,-MT,$@ $(CHOSTFLAGS) -D"BUILD_STR(s)=\#s" $(CHOSTFLAGS_$(basetarget).o) $(CHOSTFLAGS_$(obj))
-> +host_c_flags = -Wp,-MD,$(depfile) -Wp,-MT,$@ $(HOSTCFLAGS) -D"BUILD_STR(s)=\#s" $(HOSTCFLAGS_$(basetarget).o) $(HOSTCFLAGS_$(obj))
-> -- 
-> 2.17.1
-> 
+T24gMDcvMDgvMTggMTI6NDEsIE1hc2FoaXJvIFlhbWFkYSB3cm90ZToNCj4gMjAxOC0wNy0wOCAx
+NzowOSBHTVQrMDk6MDAgQmVybmQgRWRsaW5nZXIgPGJlcm5kLmVkbGluZ2VyQGhvdG1haWwuZGU+
+Og0KPj4gT24gMDcvMDgvMTggMDg6MzEsIEJlcm5kIEVkbGluZ2VyIHdyb3RlOg0KPj4+IFRoZSBu
+ZXh0IG1ha2UgYWZ0ZXIgYW4gb2xkY29uZmlnIHJlYWRzIGluIHRoZSBvdXRkYXRlZA0KPj4+IGlu
+Y2x1ZGUvY29uZmlnL2F1dG8uY29uZiB3aGljaCBjYW4ga2lsbCB0aGUgbWFrZSBiZWZvcmUNCj4+
+PiBpdCBpcyBhYmxlIHRvIGNhbGwgdGhlIHN5bmNjb25maWcgdGFyZ2V0Lg0KPj4+DQo+Pj4gJCBt
+YWtlIGRlZmNvbmZpZw0KPj4+ICoqKiBEZWZhdWx0IGNvbmZpZ3VyYXRpb24gaXMgYmFzZWQgb24g
+J3g4Nl82NF9kZWZjb25maWcnDQo+Pj4gJCBtYWtlDQo+Pj4gc2NyaXB0cy9rY29uZmlnL2NvbmYg
+IC0tc3luY2NvbmZpZyBLY29uZmlnDQo+Pj4gTWFrZWZpbGU6OTM2OiAqKiogIkNhbm5vdCBnZW5l
+cmF0ZSBPUkMgbWV0YWRhdGEgZm9yIENPTkZJR19VTldJTkRFUl9PUkM9eSwNCj4+PiBwbGVhc2Ug
+aW5zdGFsbCBsaWJlbGYtZGV2LCBsaWJlbGYtZGV2ZWwgb3IgZWxmdXRpbHMtbGliZWxmLWRldmVs
+Ii4gIFN0b3AuDQo+Pj4NCj4+PiAkIHNlZCAtaSBzL0NPTkZJR19VTldJTkRFUl9PUkM9eS8vIC5j
+b25maWdzDQo+Pj4gJCBtYWtlIG9sZGNvbmZpZw0KPj4+IENob29zZSBrZXJuZWwgdW53aW5kZXIN
+Cj4+Pj4gMS4gT1JDIHVud2luZGVyIChVTldJTkRFUl9PUkMpIChORVcpDQo+Pj4gICAgIDIuIEZy
+YW1lIHBvaW50ZXIgdW53aW5kZXIgKFVOV0lOREVSX0ZSQU1FX1BPSU5URVIpDQo+Pj4gY2hvaWNl
+WzEtMj9dOiAyDQo+Pj4gJCBtYWtlDQo+Pj4gTWFrZWZpbGU6OTM2OiAqKiogIkNhbm5vdCBnZW5l
+cmF0ZSBPUkMgbWV0YWRhdGEgZm9yIENPTkZJR19VTldJTkRFUl9PUkM9eSwNCj4+PiBwbGVhc2Ug
+aW5zdGFsbCBsaWJlbGYtZGV2LCBsaWJlbGYtZGV2ZWwgb3IgZWxmdXRpbHMtbGliZWxmLWRldmVs
+Ii4gIFN0b3AuDQo+Pj4NCj4+PiBXaXRoIHRoaXMgcGF0Y2ggb2xkY29uZmlnIGFuZCBzaW1pbGFy
+IHRhcmdldHMgbGlrZQ0KPj4+IG1lbnVjb25maWcgY2FsbCBzeW5jY29uZmlnIHRvIGF2b2lkIHRo
+aXMgZmFpbHVyZS4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IEJlcm5kIEVkbGluZ2VyIDxiZXJu
+ZC5lZGxpbmdlckBob3RtYWlsLmRlPg0KPj4+IC0tLQ0KPj4+ICAgIHNjcmlwdHMva2NvbmZpZy9N
+YWtlZmlsZSB8IDEgKw0KPj4+ICAgIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKQ0KPj4+
+DQo+Pj4gZGlmZiAtLWdpdCBhL3NjcmlwdHMva2NvbmZpZy9NYWtlZmlsZSBiL3NjcmlwdHMva2Nv
+bmZpZy9NYWtlZmlsZQ0KPj4+IGluZGV4IGEzYWMyYzkuLmVmMzQyNzUgMTAwNjQ0DQo+Pj4gLS0t
+IGEvc2NyaXB0cy9rY29uZmlnL01ha2VmaWxlDQo+Pj4gKysrIGIvc2NyaXB0cy9rY29uZmlnL01h
+a2VmaWxlDQo+Pj4gQEAgLTYyLDYgKzYyLDcgQEAgUEhPTlkgKz0gJChzaW1wbGUtdGFyZ2V0cykN
+Cj4+Pg0KPj4+ICAgICQoc2ltcGxlLXRhcmdldHMpOiAkKG9iaikvY29uZg0KPj4+ICAgICAgICAk
+PCAkKHNpbGVudCkgLS0kQCAkKEtjb25maWcpDQo+Pj4gKyAgICAkKFEpJChNQUtFKSAtZiAkKHNy
+Y3RyZWUpL01ha2VmaWxlIHN5bmNjb25maWcNCj4+DQo+PiBPbiBzZWNvbmQgdGhvdWdodCwgcmVt
+b3ZpbmcgdGhlIGF1dG8uY29uZiBtaWdodCBiZSBzdWZmaWNpZW50Og0KPj4gJChRKXJtIC1mIGlu
+Y2x1ZGUvY29uZmlnL2F1dG8uY29uZiBpbmNsdWRlL2NvbmZpZy9hdXRvLmNvbmYuY21kDQo+Pg0K
+Pj4gV291bGQgeW91IHByZWZlciB0aGF0Pw0KPiANCj4gTm8uDQo+IA0KPiBNeSBzdWdnZXN0aW9u
+IGlzIHRoaXM6DQo+IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcGF0Y2gvMTA1MTMwNjUv
+DQo+IA0KPiANCg0KT2ssIHRoYW5rcyBhIGxvdC4NCg0KSSB0cmllZCB5b3VyIHBhdGNoIGFuZCBp
+dCBzZWVtcyByZWFzb25hYmxlIG1lLg0KKG5pdDogSW4gdGhlIGNoYW5nZSBsb2cgZW50cnkgcy9S
+RVRQT1JJTkUvUkVUUE9MSU5FLykNCg0KSG93ZXZlciB0aGUgd2FybmluZyBpcyBnb25lIGFzIHdl
+bGwsIHdoaWNoIHdhcyBwcm9iYWJseSBkb25lDQpvbiBwdXJwb3NlIHRvIHB1c2ggcGVvcGxlIHRv
+IGluc3RhbGwgdGhlIGVsZiBsaWJyYXJ5Lg0KDQpJIHdvbmRlciBpbiBnZW5lcmFsIGlmIHRoZSB0
+ZXN0IHVzaW5nIEhPU1RDQyBtaXNzZXMNCnNvbWVob3cgdGhlIHBvc3NpYmlsaXR5IHRoYXQgdGhl
+cmUgbWF5IGJlIGEgQ1JPU1NfQ09NUExJTEUgPw0KDQoNCkJlcm5kLg0K
