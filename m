@@ -1,67 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f65.google.com ([209.85.218.65]:42080 "EHLO
-        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754476AbeGIMA3 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Jul 2018 08:00:29 -0400
-Received: by mail-oi0-f65.google.com with SMTP id n84-v6so35335664oib.9
-        for <linux-kbuild@vger.kernel.org>; Mon, 09 Jul 2018 05:00:28 -0700 (PDT)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55746 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754528AbeGITVh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 9 Jul 2018 15:21:37 -0400
+Date: Mon, 9 Jul 2018 14:21:34 -0500
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH] objtool: move libelf detection to Kconfig from Makefile
+Message-ID: <20180709192134.vhd4lh443fymthfs@treble>
+References: <1531043982-13325-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-References: <3f906b03-98ff-c081-4e19-b490f0b35c51@infradead.org> <87sh4uj675.fsf@concordia.ellerman.id.au>
-In-Reply-To: <87sh4uj675.fsf@concordia.ellerman.id.au>
-From: Mathieu Malaterre <malat@debian.org>
-Date: Mon, 9 Jul 2018 14:00:14 +0200
-Message-ID: <CA+7wUsy2FmRhsX3OLkTPKh-9JCZCQKtTbbzP9=vLuEJ9Pn6QmA@mail.gmail.com>
-Subject: Re: powerpc: 32BIT vs. 64BIT (PPC32 vs. PPC64)
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1531043982-13325-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Paul Mackerras <paulus@samba.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Kees Cook <keescook@chromium.org>, Linus Torvalds <torvalds@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
 
-On Sun, Jul 8, 2018 at 1:53 PM Michael Ellerman <mpe@ellerman.id.au> wrote:
->
-> Randy Dunlap <rdunlap@infradead.org> writes:
-> > Hi,
-> >
-> > Is there a good way (or a shortcut) to do something like:
->
-> The best I know of is:
->
-> > $ make ARCH=powerpc O=PPC32 [other_options] allmodconfig
-> >   to get a PPC32/32BIT allmodconfig
->
-> $ echo CONFIG_PPC64=n > allmod.config
-> $ KCONFIG_ALLCONFIG=1 make allmodconfig
-> $ grep PPC32 .config
-> CONFIG_PPC32=y
->
-> Which is still a bit clunky.
->
->
-> I looked at this a while back and the problem we have is that the 32-bit
-> kernel is not a single thing. There are multiple 32-bit platforms which
-> are mutually exclusive.
->
-> eg, from menuconfig:
->
->  - 512x/52xx/6xx/7xx/74xx/82xx/83xx/86xx
->  - Freescale 85xx
->  - Freescale 8xx
->  - AMCC 40x
->  - AMCC 44x, 46x or 47x
->  - Freescale e200
+On Sun, Jul 08, 2018 at 06:59:42PM +0900, Masahiro Yamada wrote:
+> Currently, users are allowed to enable STACK_VALIDATION regardless
+> of the compiler capability.  The top-level Makefile warns or breaks
+> the build if it turns out that the host compiler cannot link libelf.
+> 
+> Move the libelf test to Kconfig so that users can enable the feature
+> only when the host compiler can build the objtool.  The ugly check
+> in the Makefile will go away.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Most Linux distro seems to have drop support for ppc32. So I'd suggest
-to pick Debian powperc default config (but I agree that I am a little
-biased here).
+Thanks for cleaning this up!
 
->
-> So we could have a 32-bit allmodconfig, but we'd need to chose one of
-> the above, and we'd still only be testing some of the code.
->
-> Having said that you're the 2nd person to ask about this, so we should
-> clearly do something to make a 32-bit allmodconfig easier, even if it's
-> not perfect.
->
-> cheers
+> I am sure about this patch only from the build system point of view.
+> 
+> Please review this from x86 and objtool point of view.
+> 
+> In my understanding:
+> 
+>  - UNWINDER_ORC _requires_ objtool,
+>    so I added 'depends on STACK_VALIDATION'.
+>    ('select' would end up with unmet depenency)
+
+Correct.
+
+>  - RETPOLINE _wants_ objtool, so I added 'imply'
+
+Yeah, I think this is fine.
+
+Acked-by: Josh Poimboeuf <jpoimboe@redhat.com>
+
+-- 
+Josh
