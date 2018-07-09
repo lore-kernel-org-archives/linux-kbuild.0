@@ -1,217 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:51162 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754468AbeGILue (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Jul 2018 07:50:34 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [PATCH v3 05/12] kconfig: make syncconfig update .config regardless of sym_change_count
-In-Reply-To: <ghbmbk0wbj.fsf@quad.gouders.net> (Dirk Gouders's message of
-        "Sat, 07 Jul 2018 01:38:08 +0200")
-References: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
-        <1530758389-30862-6-git-send-email-yamada.masahiro@socionext.com>
-        <ghva9simch.fsf@lena.gouders.net> <ghbmbk0wbj.fsf@quad.gouders.net>
-Date: Mon, 09 Jul 2018 13:39:36 +0200
-Message-ID: <ghwou4prif.fsf@lena.gouders.net>
+Received: from ozlabs.org ([203.11.71.1]:49349 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754457AbeGILvv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 9 Jul 2018 07:51:51 -0400
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: powerpc: 32BIT vs. 64BIT (PPC32 vs. PPC64)
+In-Reply-To: <20180707221316.5b75e075@roar.ozlabs.ibm.com>
+References: <3f906b03-98ff-c081-4e19-b490f0b35c51@infradead.org> <a3c9b9ee9ec116390c47dca65fcf14f138eccd3f.camel@kernel.crashing.org> <4f3a5969-88d5-134d-508d-7617947c588c@infradead.org> <20180707221316.5b75e075@roar.ozlabs.ibm.com>
+Date: Mon, 09 Jul 2018 21:51:44 +1000
+Message-ID: <87601oaapb.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-=-="
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>
+To: Nicholas Piggin <npiggin@gmail.com>, Randy Dunlap <rdunlap@infradead.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
---=-=-=
+Nicholas Piggin <npiggin@gmail.com> writes:
 
-Dirk Gouders <dirk@gouders.net> writes:
-
-> Dirk Gouders <dirk@gouders.net> writes:
+> On Fri, 6 Jul 2018 21:58:29 -0700
+> Randy Dunlap <rdunlap@infradead.org> wrote:
 >
->> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
->>
->>> syncconfig updates the .config only when sym_change_count > 0, i.e.
->>> any change in config symbols has been detected.
->>>
->>> Not only symbols but also comments are contained in the .config file.
->>> If only comments are updated, they are not fed back to the .config,
->>> then the stale comments are left-over.  Of course, this is just a
->>> matter of comments, but why not fix it.
->>
->> Hello Masahiro,
->>
->> I am currently looking at and testing this series.
->>
->> First: For this patch I would suggest to also edit the syncconfig
->>        section of "conf --help".
->>
->> Further, on a slow laptop, I was suspecting, this patch to cause full
->> rebuilds of everything, each time I ran "make syncconfig" followed by
->> "make" but could not verify this on another machine, so perhaps I am
->> just (for testing purposes) removing the wrong files (modules.builtin
->> for example) -- I am still testing.
->>
->> But, what irritates me with testing is that (also without your
->> patches) two consecutive "make" produce different output, one of them
->> always shows a warning and this is reproducable.  I just want to make
->> sure there is no other problem that influences my testing:
->>
->> $ make
->>   CALL    scripts/checksyscalls.sh
->>   DESCEND  objtool
->>   CHK     include/generated/compile.h
->>   DATAREL arch/x86/boot/compressed/vmlinux
->> Kernel: arch/x86/boot/bzImage is ready  (#15)
->>   Building modules, stage 2.
->>   MODPOST 211 modules
->>
->> $ make
->>   CALL    scripts/checksyscalls.sh
->>   DESCEND  objtool
->>   CHK     include/generated/compile.h
->>   LD      arch/x86/boot/compressed/vmlinux
->> ld: arch/x86/boot/compressed/head_64.o: warning: relocation in read-only section `.head.text'
->> ld: warning: creating a DT_TEXTREL in object.
->>   ZOFFSET arch/x86/boot/zoffset.h
->>   AS      arch/x86/boot/header.o
->>   LD      arch/x86/boot/setup.elf
->>   OBJCOPY arch/x86/boot/setup.bin
->>   OBJCOPY arch/x86/boot/vmlinux.bin
->>   BUILD   arch/x86/boot/bzImage
->> Setup is 15580 bytes (padded to 15872 bytes).
->> System is 8069 kB
->> CRC e01d75ec
->> Kernel: arch/x86/boot/bzImage is ready  (#15)
->>   Building modules, stage 2.
->>   MODPOST 211 modules
+>> On 07/06/2018 06:45 PM, Benjamin Herrenschmidt wrote:
+>> > On Thu, 2018-07-05 at 14:30 -0700, Randy Dunlap wrote:  
+>> >> Hi,
+>> >>
+>> >> Is there a good way (or a shortcut) to do something like:
+>> >>
+>> >> $ make ARCH=powerpc O=PPC32 [other_options] allmodconfig
+>> >>   to get a PPC32/32BIT allmodconfig
+>> >>
+>> >> and also be able to do:
+>> >>
+>> >> $make ARCH=powerpc O=PPC64 [other_options] allmodconfig
+>> >>   to get a PPC64/64BIT allmodconfig?  
+>> > 
+>> > Hrm... O= is for the separate build dir, so there much be something
+>> > else.
+>> > 
+>> > You mean having ARCH= aliases like ppc/ppc32 and ppc64 ?  
+>> 
+>> Yes.
+>> 
+>> > That would be a matter of overriding some .config defaults I suppose, I
+>> > don't know how this is done on other archs.
+>> > 
+>> > I see the aliasing trick in the Makefile but that's about it.
+>> >   
+>> >> Note that arch/x86, arch/sh, and arch/sparc have ways to do
+>> >> some flavor(s) of this (from Documentation/kbuild/kbuild.txt;
+>> >> sh and sparc based on a recent "fix" patch from me):  
+>> > 
+>> > I fail to see what you are actually talking about here ... sorry. Do
+>> > you have concrete examples on x86 or sparc ? From what I can tell the
+>> > "i386" or "sparc32/sparc64" aliases just change SRCARCH in Makefile and
+>> > 32 vs 64-bit is just a Kconfig option...  
+>> 
+>> Yes, your summary is mostly correct.
+>> 
+>> I'm just looking for a way to do cross-compile builds that are close to
+>> ppc32 allmodconfig and ppc64 allmodconfig.
 >
-> I spent some more time with the behaviour described above and bisected
-> to the commit after that two consecutive invocations of "make" (on an
-> already compiled tree) seem to do different things.  That commit is
-> 98f78525371b55cc (x86/boot: Refuse to build with data relocations), so I
-> put Kees and Ingo on CC.
->
-> I did the bisecting on another system, so I'll provide the output of two
-> consecutive "make" on an already compiled tree on that machine:
->
-> $ make
->   CALL    scripts/checksyscalls.sh
->   DESCEND  objtool
->   CHK     include/generated/compile.h
->   DATAREL arch/x86/boot/compressed/vmlinux
-> Kernel: arch/x86/boot/bzImage is ready  (#48)
->   Building modules, stage 2.
->   MODPOST 165 modules
->
-> $ make
->   CALL    scripts/checksyscalls.sh
->   DESCEND  objtool
->   CHK     include/generated/compile.h
->   LD      arch/x86/boot/compressed/vmlinux
->   ZOFFSET arch/x86/boot/zoffset.h
->   AS      arch/x86/boot/header.o
->   LD      arch/x86/boot/setup.elf
->   OBJCOPY arch/x86/boot/setup.bin
->   OBJCOPY arch/x86/boot/vmlinux.bin
->   BUILD   arch/x86/boot/bzImage
-> Setup is 15644 bytes (padded to 15872 bytes).
-> System is 6663 kB
-> CRC 3eb90f40
-> Kernel: arch/x86/boot/bzImage is ready  (#48)
->   Building modules, stage 2.
->   MODPOST 165 modules
->
-> If I comment out $(call if_changed,check_data_rel) in
-> arch/x86/boot/compressed/Makefile, two consecutive "make" produce
-> identical output i.e. seem to not do different things:
->
-> $ make
->   CALL    scripts/checksyscalls.sh
->   DESCEND  objtool
->   CHK     include/generated/compile.h
-> Kernel: arch/x86/boot/bzImage is ready  (#49)
->   Building modules, stage 2.
->   MODPOST 165 modules
->
-> $ make
->   CALL    scripts/checksyscalls.sh
->   DESCEND  objtool
->   CHK     include/generated/compile.h
-> Kernel: arch/x86/boot/bzImage is ready  (#49)
->   Building modules, stage 2.
->   MODPOST 165 modules
->
-> So, I guess this different behaviour of two consecutive "make" is not
-> intentional but I am failing to understand why it happens.
+> Would there a problem with adding ARCH=ppc32 / ppc64 matching? This
+> seems to work...
 
-I think, I solved the puzzle and perhaps, that saves others some time:
+It's a cute trick but I'd rather avoid it.
 
-The problem is that "if_changed" was not designed for multiple use
-inside a recipe and in the case of compressed/vmlinux, the 2-fold use
-created a kind of flip-flop for situations when nothing has to be done
-to build the target.
+It overloads ARCH which can be confusing to people and tools. For
+example I'd have to special case it in kisskb.
 
-Because each of the two users of "if_changed" stores it's footprint in
-.vmlinux.cmd but that file then isn't re-read, one of the two
-"if_changed" calculates that nothing has to be done wheras the other one
-recognizes a change in the commandline, because it sees the command-line
-for the other part of the reciepe.
+I think we can achieve a similar result by having more PHONY defconfig
+targets.
 
-In the next make, the roles flip, because the previously satisfied
-"if_changed" now sees the command-line of the other one.  And so on...
+eg, we can do ppc32_allmodconfig like below. And if there's interest we
+could do a 4xx_allmodconfig etc.
 
-I am not a Kbuild expert but the attached patch fixes that problem by
-introducing "if_changed_multi" that accepts two commands -- one whose
-commandline should be checked and a second one that should be
-executed.
-
-Dirk
-
-
---=-=-=
-Content-Disposition: inline; filename=flip-flop.patch
-Content-Description: Fix flip-flop
-
-diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-index fa42f895fdde..f39822fca994 100644
---- a/arch/x86/boot/compressed/Makefile
-+++ b/arch/x86/boot/compressed/Makefile
-@@ -107,8 +107,8 @@ define cmd_check_data_rel
- endef
+diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
+index 2ea575cb3401..2556c2182789 100644
+--- a/arch/powerpc/Makefile
++++ b/arch/powerpc/Makefile
+@@ -354,6 +354,11 @@ mpc86xx_smp_defconfig:
+ 	$(call merge_into_defconfig,mpc86xx_basic_defconfig,\
+ 		86xx-smp 86xx-hw fsl-emb-nonhw)
  
- $(obj)/vmlinux: $(vmlinux-objs-y) FORCE
--	$(call if_changed,check_data_rel)
--	$(call if_changed,ld)
-+	$(call if_changed_multi,ld,check_data_rel)
-+	$(call if_changed_multi,ld,ld)
- 
- OBJCOPYFLAGS_vmlinux.bin :=  -R .comment -S
- $(obj)/vmlinux.bin: vmlinux FORCE
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index b2d14f1136e8..3bf419319e09 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -265,6 +265,23 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
- 	$(echo-cmd) $(cmd_$(1));                                             \
- 	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
- 
-+# echo command for command stored in $2
-+# Short version is used, if $(quiet) equals `quiet_', otherwise full one.
-+echo-cmd2 = $(if $($(quiet)cmd_$(2)),\
-+	echo '  $(call escsq,$($(quiet)cmd_$(2)))$(echo-why)';)
++PHONY += ppc32_allmodconfig
++ppc32_allmodconfig:
++	$(Q)$(MAKE) KCONFIG_ALLCONFIG=$(srctree)/arch/powerpc/configs/book3s_32.config \
++		-f $(srctree)/Makefile allmodconfig
 +
-+# Execute command arg2 if commandline for command arg1 or prerequisite(s) are
-+# updated.
-+#
-+# This is safe for multiple use inside a recipe; arg1 and arg2 may be
-+# identical.
-+if_changed_multi = $(if $(strip $(any-prereq) $(arg-check)),                \
-+	@set -e;                                                             \
-+	$(echo-cmd2) : ; \
-+	$(cmd_$(2));                                            \
-+	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
-+
-+
- # Execute the command and also postprocess generated .d dependencies file.
- if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
- 	@set -e;                                                             \
+ define archhelp
+   @echo '* zImage          - Build default images selected by kernel config'
+   @echo '  zImage.*        - Compressed kernel image (arch/$(ARCH)/boot/zImage.*)'
+diff --git a/arch/powerpc/configs/book3s_32.config b/arch/powerpc/configs/book3s_32.config
+new file mode 100644
+index 000000000000..8721eb7b1294
+--- /dev/null
++++ b/arch/powerpc/configs/book3s_32.config
+@@ -0,0 +1,2 @@
++CONFIG_PPC64=n
++CONFIG_PPC_BOOK3S_32=y
 
---=-=-=--
+
+cheers
