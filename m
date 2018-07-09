@@ -1,62 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:46319 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754369AbeGHWNY (ORCPT
+Received: from s3.sipsolutions.net ([144.76.63.242]:55016 "EHLO
+        sipsolutions.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932231AbeGIIUp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Jul 2018 18:13:24 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180706004940.32587-1-labbott@redhat.com>
-References: <20180706004940.32587-1-labbott@redhat.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 9 Jul 2018 07:12:37 +0900
-Message-ID: <CAK7LNASo7pnL32dFqdxmKqCLkBsJwGOaTHXX=rVjpi2-Y=t0Aw@mail.gmail.com>
-Subject: Re: [PATCHv6 0/4] Salted build ids via ELF notes
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 9 Jul 2018 04:20:45 -0400
+From: Johannes Berg <johannes@sipsolutions.net>
+Subject: [PATCH] build: avoid evaluating cc-ifversion for ever objtool invocation
+Date: Mon,  9 Jul 2018 10:20:36 +0200
+Message-Id: <20180709082036.11190-1-johannes@sipsolutions.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Andy Lutomirski <luto@kernel.org>, Mark Wielaard <mjw@fedoraproject.org>, "H . J . Lu" <hjl.tools@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Clifton <nickc@redhat.com>, Cary Coutant <ccoutant@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Johannes Berg <johannes.berg@intel.com>
 
-2018-07-06 9:49 GMT+09:00 Laura Abbott <labbott@redhat.com>:
-> Hi,
->
-> This is v6 of the series to allow unique build ids. v6 is mostly minor
-> fixups and Acks for this to go through the kbuild tree.
+From: Johannes Berg <johannes.berg@intel.com>
 
+To speed up the build a little bit, avoid evaluating cc-ifversion for
+every objtool invocation. The variable needs to be evaluated every
+time it's used because of the $(if $(part-of-module)...) in it, but
+we don't need to call out to the compiler to get its version every
+time.
 
-Applied to linux-kbuild. Thanks!
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ scripts/Makefile.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-
-> Thanks,
-> Laura
->
-> Laura Abbott (4):
->   kbuild: Add build salt to the kernel and modules
->   x86: Add build salt to the vDSO
->   powerpc: Add build salt to the vDSO
->   arm64: Add build salt to the vDSO
->
->  arch/arm64/kernel/vdso/note.S     |  3 +++
->  arch/powerpc/kernel/vdso32/note.S |  3 +++
->  arch/x86/entry/vdso/vdso-note.S   |  3 +++
->  arch/x86/entry/vdso/vdso32/note.S |  3 +++
->  include/linux/build-salt.h        | 20 ++++++++++++++++++++
->  init/Kconfig                      |  9 +++++++++
->  init/version.c                    |  3 +++
->  scripts/mod/modpost.c             |  3 +++
->  8 files changed, 47 insertions(+)
->  create mode 100644 include/linux/build-salt.h
->
-> --
-> 2.17.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index e7889f486ca1..4f4557bc96f0 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -257,7 +257,8 @@ endif
+ ifdef CONFIG_GCOV_KERNEL
+ objtool_args += --no-unreachable
+ else
+-objtool_args += $(call cc-ifversion, -lt, 0405, --no-unreachable)
++_no_unreachable_lt_0405 := $(call cc-ifversion, -lt, 0405, --no-unreachable)
++objtool_args += $(_no_unreachable_lt_0405)
+ endif
+ ifdef CONFIG_RETPOLINE
+ ifneq ($(RETPOLINE_CFLAGS),)
 -- 
-Best Regards
-Masahiro Yamada
+2.14.4
+
