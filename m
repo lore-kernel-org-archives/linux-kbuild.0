@@ -1,17 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.molgen.mpg.de ([141.14.17.11]:37405 "EHLO mx1.molgen.mpg.de"
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:57235 "EHLO mx1.molgen.mpg.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933416AbeGJOtM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Jul 2018 10:49:12 -0400
-Subject: Re: tools/build/Build.include: fix # escaping in .cmd files for
- future Make
+        id S933248AbeGJOuh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 10 Jul 2018 10:50:37 -0400
+Subject: [PATCH v3] tools/build/Build.include: fix # escaping in .cmd files
+ for future Make
 From: Paul Menzel <pmenzel@molgen.mpg.de>
 References: <89f15a49-d18b-6b01-adb7-1385f2844cb6@molgen.mpg.de>
-Message-ID: <557a23f8-8993-d832-3290-37481c37e340@molgen.mpg.de>
-Date: Tue, 10 Jul 2018 16:49:10 +0200
+ <557a23f8-8993-d832-3290-37481c37e340@molgen.mpg.de>
+Message-ID: <2d0bd4a4-98cb-380e-36c4-e46dc5d53991@molgen.mpg.de>
+Date: Tue, 10 Jul 2018 16:50:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <89f15a49-d18b-6b01-adb7-1385f2844cb6@molgen.mpg.de>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms070502030407090306070604"
+In-Reply-To: <557a23f8-8993-d832-3290-37481c37e340@molgen.mpg.de>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms010705030902060508030702"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Masahiro Yamada <yamada.masahiro@socionext.com>
@@ -19,7 +20,7 @@ Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, linux-ke
 
 This is a cryptographically signed message in MIME format.
 
---------------ms070502030407090306070604
+--------------ms010705030902060508030702
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -63,7 +64,8 @@ Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: stable@vger.kernel.org
 Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
 ---
-v2: Added stable@vger.kernel.org
+v2: Add stable@vger.kernel.org
+v3: Add tag PATCH to subject
 
  tools/build/Build.include | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -96,7 +98,7 @@ d)
 2.16.2
 
 
---------------ms070502030407090306070604
+--------------ms010705030902060508030702
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -184,18 +186,18 @@ fndPkrXx6XWDdU3S1LyKgHlLIFtarLFm2Hb5zAUR33h+26cN6ohcGqGEEzgIG8tXS8gztEaj
 EwJERTEPMA0GA1UECAwGQmF5ZXJuMREwDwYDVQQHDAhNdWVuY2hlbjEgMB4GA1UECgwXTWF4
 LVBsYW5jay1HZXNlbGxzY2hhZnQxFTATBgNVBAMMDE1QRyBDQSAtIEcwMgIMHipSSIX8pzzF
 RvyiMA0GCWCGSAFlAwQCAQUAoIIB8TAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqG
-SIb3DQEJBTEPFw0xODA3MTAxNDQ5MTBaMC8GCSqGSIb3DQEJBDEiBCA6idfgUEDsIcuOEwSr
-diCOsFXvrbiEi+7LzL6rxI6NXjBsBgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjALBglg
+SIb3DQEJBTEPFw0xODA3MTAxNDUwMzRaMC8GCSqGSIb3DQEJBDEiBCBoSGn9UoXQ4ODGpZI7
+FrP5vhfmXzxwEBEh4fTNDCMDCzBsBgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjALBglg
 hkgBZQMEAQIwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFAMAcG
 BSsOAwIHMA0GCCqGSIb3DQMCAgEoMIGJBgkrBgEEAYI3EAQxfDB6MGoxCzAJBgNVBAYTAkRF
 MQ8wDQYDVQQIDAZCYXllcm4xETAPBgNVBAcMCE11ZW5jaGVuMSAwHgYDVQQKDBdNYXgtUGxh
 bmNrLUdlc2VsbHNjaGFmdDEVMBMGA1UEAwwMTVBHIENBIC0gRzAyAgweKlJIhfynPMVG/KIw
 gYsGCyqGSIb3DQEJEAILMXygejBqMQswCQYDVQQGEwJERTEPMA0GA1UECAwGQmF5ZXJuMREw
 DwYDVQQHDAhNdWVuY2hlbjEgMB4GA1UECgwXTWF4LVBsYW5jay1HZXNlbGxzY2hhZnQxFTAT
-BgNVBAMMDE1QRyBDQSAtIEcwMgIMHipSSIX8pzzFRvyiMA0GCSqGSIb3DQEBAQUABIIBAJmq
-8qFZTAe9WBwp9vWyL3UDV7ey2jh0Sa7n0e9IrDtp5pgLTE4HagWbSmPXj2XY52BJUSEoz60z
-ii3LDqvajH0SRfQwV7PPe1hKnFJAUfCB3LQPLuqLpr/lnUF9XKopffl+Wd2Wpfa1Fszgx5vG
-PybpNkeV1y4vVlrJuHAN5hlAYiBx7yzn8EPia3+LPbMomMKcakW+RU7KWbAbfM+VEHOQb0ba
-sAplEQcsYZteFTk1Gvxim8DLrP3NcfSMJpDQcRMnVQKGs5rzWn7vjW2vb1ye4RcldMoluY7L
-YSUXhiQBb9sKjgPeD/cls/fkV1MpWvucDr5wqM2GD7j4TrMULWMAAAAAAAA=
---------------ms070502030407090306070604--
+BgNVBAMMDE1QRyBDQSAtIEcwMgIMHipSSIX8pzzFRvyiMA0GCSqGSIb3DQEBAQUABIIBAHwS
+G7+a2jskV9mK22cMoqY791kF1Vu/XWma+iJFp2qHim+zP1n+wQl48aM3xRicywHTk78sh4Pm
+BIXcm2Xws4F/lPsDxY+iDLdgKwx0KSPAN8v3njWq4QUx71EUE7o2DLIe75kCmfbHewwHMpvv
+xzpzoyblM5jryeHnKVhOrAaEujvo3pu6rMqaUuE0vphq+YLQ92hygebLM0Ee8UWepdlANDN+
+M+u9vNRJ099LFQ697bXoHtwtOGzi7rxtQ58bcPBv9Eqwh0PFTfIaBXPoxJiMbQ4v/idaxMxO
+fcuos5Wba3NWboMnjrC7s/pQ2Y27YYlp7McrTzL061NaVdkM/wIAAAAAAAA=
+--------------ms010705030902060508030702--
