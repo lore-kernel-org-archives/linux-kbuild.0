@@ -1,54 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35520 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751047AbeGJHi5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Jul 2018 03:38:57 -0400
-Date: Tue, 10 Jul 2018 09:38:54 +0200
-From: Jiri Olsa <jolsa@redhat.com>
-Subject: Re: [PATCHv2 2/7] tools: build: Use HOSTLDFLAGS with fixdep
-Message-ID: <20180710073854.GB7671@krava>
-References: <20180710004602.21599-1-labbott@redhat.com>
- <20180710004602.21599-3-labbott@redhat.com>
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:38003 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751194AbeGJJqk (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 10 Jul 2018 05:46:40 -0400
+Subject: Re: kconfig usage in automatic kernel test
+References: <a2a39cac-79fc-22d9-e1d0-b94787526794@cn.fujitsu.com>
+ <CAK7LNAQnpQn5k0fkb+nSASe7qg1UgX6BhdR-3EEuSX=xOuPhrw@mail.gmail.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <b74953cd-0917-7c02-78e0-516485072601@cn.fujitsu.com>
+Date: Tue, 10 Jul 2018 17:45:34 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180710004602.21599-3-labbott@redhat.com>
+In-Reply-To: <CAK7LNAQnpQn5k0fkb+nSASe7qg1UgX6BhdR-3EEuSX=xOuPhrw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Robin Jarry <robin.jarry@6wind.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mon, Jul 09, 2018 at 05:45:57PM -0700, Laura Abbott wrote:
-> The final link of fixdep uses LDFLAGS but not the existing HOSTLDFLAGS.
-> Fix this.
+
+
+On 07/08/2018 10:15 AM, Masahiro Yamada wrote:
+> 2018-07-06 17:49 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+>> Masahiro-san,
+>>
+>>   I am writing some utility for internal kdump test with latest kernel,
+>> my purpose is to test the new introduced kernel feature. For automatical
+>> test, I see several config target could help, like olddefconfig, all*config.
+>>
+>> But for my purpose, I don't find a good way. For example, olddefconfig
+>> will let the now config item has default value, while some feature may
+>> default to "N"; allyesconfig will slow the compilation notably.
+>> But "all*config" has KCONFIG_ALLCONFIG help to customizing some config
+>> item, that is a good utility, but seems it can't be used in olddefconfig.
+>>
+>> All these things let me have 2 questions:
+>>
+>> 1. What would you suggest for my purpose?
 > 
-> Signed-off-by: Laura Abbott <labbott@redhat.com>
-
-Acked-by: Jiri Olsa <jolsa@kernel.org>
-
-thanks,
-jirka
-
-> ---
-> v2: Switch to just using HOSTLDFLAGS instead of both LDFLAGS and
-> HOSTLDFLAGS.
-> ---
->  tools/build/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/tools/build/Makefile b/tools/build/Makefile
-> index 5eb4b5ad79cb..5edf65e684ab 100644
-> --- a/tools/build/Makefile
-> +++ b/tools/build/Makefile
-> @@ -43,7 +43,7 @@ $(OUTPUT)fixdep-in.o: FORCE
->  	$(Q)$(MAKE) $(build)=fixdep
->  
->  $(OUTPUT)fixdep: $(OUTPUT)fixdep-in.o
-> -	$(QUIET_LINK)$(HOSTCC) $(LDFLAGS) -o $@ $<
-> +	$(QUIET_LINK)$(HOSTCC) $(HOSTLDFLAGS) -o $@ $<
->  
->  FORCE:
->  
-> -- 
-> 2.17.1
+> scripts/kconfig/merge_config.sh
+> can be used with any *config target.
 > 
+
+I took a quick glance at the script, it seems a good method to me.
+Thanks very much, Masahiro-san.
+
+> If you want to tweak some symbols based on olddefconfig,
+> this could be the one you want.
+> 
+> 
+>> 2. allyesconfig, allmodconfig, randconfig seems useful for test kbuild,
+>> but what's the purpose of allnoconfig, alldefconfig? In others words,
+>> when people would need allnoconfig, alldefconfig?
+> 
+> I sometimes use allnoconfig for build testing.
+> 
+> When I want to test the whole build process quickly,
+> I disable as many drivers as possible to save time.
+> 
+> 
+> I do not use alldefconfig.
+> Anyway, it would not hurt to have it for completeness.
+> 
+
+Thanks for clarifying.
+
+-- 
+Sincerely,
+Cao jin
+
+
