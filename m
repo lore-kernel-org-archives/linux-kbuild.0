@@ -1,204 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f177.google.com ([209.85.216.177]:34682 "EHLO
-        mail-qt0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933410AbeGJAq0 (ORCPT
+Received: from mail-qt0-f195.google.com ([209.85.216.195]:38568 "EHLO
+        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933421AbeGJAq2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Jul 2018 20:46:26 -0400
-Received: by mail-qt0-f177.google.com with SMTP id m13-v6so17008127qth.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 09 Jul 2018 17:46:26 -0700 (PDT)
+        Mon, 9 Jul 2018 20:46:28 -0400
+Received: by mail-qt0-f195.google.com with SMTP id c5-v6so16988671qth.5
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Jul 2018 17:46:28 -0700 (PDT)
 From: Laura Abbott <labbott@redhat.com>
-Subject: [PATCHv2 6/7] treewide: Rename HOST_LOADLIBES to KBUILD_HOSTLDLIBS
-Date: Mon,  9 Jul 2018 17:46:01 -0700
-Message-Id: <20180710004602.21599-7-labbott@redhat.com>
+Subject: [PATCHv2 7/7] Kbuild: Use HOST*FLAGS options from the command line
+Date: Mon,  9 Jul 2018 17:46:02 -0700
+Message-Id: <20180710004602.21599-8-labbott@redhat.com>
 In-Reply-To: <20180710004602.21599-1-labbott@redhat.com>
 References: <20180710004602.21599-1-labbott@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@kernel.org>
-Cc: Laura Abbott <labbott@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Robin Jarry <robin.jarry@6wind.com>
+Cc: Laura Abbott <labbott@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Robin Jarry <robin.jarry@6wind.com>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
 
-In preparation for enabling command line LDLIBS, re-name HOST_LOADLIBES to
-KBUILD_HOSTLDLIBS as the internal use only flags. Also rename existing usage
-to HOSTLDLIBS for consistency. This should not have any visible effects.
+
+Now that we have the rename in place, reuse the HOST*FLAGS options as
+something that can be set from the command line and included with the
+rest of the flags.
 
 Signed-off-by: Laura Abbott <labbott@redhat.com>
 ---
-v2: Rename existing HOSTLOADLIBES to HOSTLDLIBS
+v2: Use the correct name for HOSTLDLIBS, update documentation.
 ---
- Makefile                 |  4 ++--
- samples/bpf/Makefile     | 12 ++++++------
- samples/seccomp/Makefile |  6 +++---
- scripts/Makefile         |  4 ++--
- scripts/Makefile.host    | 10 +++++-----
- scripts/kconfig/Makefile |  8 ++++----
- 6 files changed, 22 insertions(+), 22 deletions(-)
+ Documentation/kbuild/kbuild.txt | 16 ++++++++++++++++
+ Makefile                        |  9 +++++----
+ 2 files changed, 21 insertions(+), 4 deletions(-)
 
+diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+index 6c9c69ec3986..9847a5974826 100644
+--- a/Documentation/kbuild/kbuild.txt
++++ b/Documentation/kbuild/kbuild.txt
+@@ -238,3 +238,19 @@ KBUILD_VMLINUX_LIBS
+ All .a "lib" files for vmlinux.
+ KBUILD_VMLINUX_INIT, KBUILD_VMLINUX_MAIN, and KBUILD_VMLINUX_LIBS together
+ specify all the object files used to link vmlinux.
++
++HOSTCFLAGS
++--------------------------------------------------
++Additional flags to be passed to $(HOSTCC) when building host programs.
++
++HOSTLDFLAGS
++--------------------------------------------------
++Additional flags to be passed to $(HOSTLD) when building host programs.
++
++HOSTCXXFLAGS
++--------------------------------------------------
++Additional flags to be passed to $(HOSTCXX) when building host programs.
++
++HOSTLDLIBS
++--------------------------------------------------
++Additional libraries to link against when building host programs.
 diff --git a/Makefile b/Makefile
-index bd2d64b89463..96e34381d9ee 100644
+index 96e34381d9ee..c2ee1d4c12c9 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -363,7 +363,7 @@ KBUILD_HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
- 		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
- KBUILD_HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
- KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
--HOST_LOADLIBES := $(HOST_LFS_LIBS)
-+KBUILD_HOSTLDLIBS := $(HOST_LFS_LIBS)
+@@ -360,10 +360,11 @@ HOST_LFS_LIBS := $(shell getconf LFS_LIBS)
+ HOSTCC       = gcc
+ HOSTCXX      = g++
+ KBUILD_HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
+-		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
+-KBUILD_HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
+-KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
+-KBUILD_HOSTLDLIBS := $(HOST_LFS_LIBS)
++		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS) \
++		$(HOSTCFLAGS)
++KBUILD_HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
++KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
++KBUILD_HOSTLDLIBS := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
  
  # Make variables (CC, etc...)
  AS		= $(CROSS_COMPILE)as
-@@ -430,7 +430,7 @@ LDFLAGS :=
- GCC_PLUGINS_CFLAGS :=
- 
- export ARCH SRCARCH CONFIG_SHELL HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
--export CPP AR NM STRIP OBJCOPY OBJDUMP KBUILD_HOSTLDFLAGS HOST_LOADLIBES
-+export CPP AR NM STRIP OBJCOPY OBJDUMP KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS
- export MAKE LEX YACC AWK GENKSYMS INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
- export HOSTCXX KBUILD_HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
- 
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 494ef04c56cc..bd9f6c2a808e 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -180,12 +180,12 @@ HOSTCFLAGS_trace_event_user.o += -I$(srctree)/tools/lib/bpf/
- HOSTCFLAGS_sampleip_user.o += -I$(srctree)/tools/lib/bpf/
- HOSTCFLAGS_task_fd_query_user.o += -I$(srctree)/tools/lib/bpf/
- 
--HOST_LOADLIBES		+= $(LIBBPF) -lelf
--HOSTLOADLIBES_tracex4		+= -lrt
--HOSTLOADLIBES_trace_output	+= -lrt
--HOSTLOADLIBES_map_perf_test	+= -lrt
--HOSTLOADLIBES_test_overhead	+= -lrt
--HOSTLOADLIBES_xdpsock		+= -pthread
-+KBUILD_HOSTLDLIBS		+= $(LIBBPF) -lelf
-+HOSTLDLIBS_tracex4		+= -lrt
-+HOSTLDLIBS_trace_output	+= -lrt
-+HOSTLDLIBS_map_perf_test	+= -lrt
-+HOSTLDLIBS_test_overhead	+= -lrt
-+HOSTLDLIBS_xdpsock		+= -pthread
- 
- # Allows pointing LLC/CLANG to a LLVM backend with bpf support, redefine on cmdline:
- #  make samples/bpf/ LLC=~/git/llvm/build/bin/llc CLANG=~/git/llvm/build/bin/clang
-diff --git a/samples/seccomp/Makefile b/samples/seccomp/Makefile
-index ba942e3ead89..cf34ff6b4065 100644
---- a/samples/seccomp/Makefile
-+++ b/samples/seccomp/Makefile
-@@ -30,9 +30,9 @@ HOSTCFLAGS_bpf-direct.o += $(MFLAG)
- HOSTCFLAGS_dropper.o += $(MFLAG)
- HOSTCFLAGS_bpf-helper.o += $(MFLAG)
- HOSTCFLAGS_bpf-fancy.o += $(MFLAG)
--HOSTLOADLIBES_bpf-direct += $(MFLAG)
--HOSTLOADLIBES_bpf-fancy += $(MFLAG)
--HOSTLOADLIBES_dropper += $(MFLAG)
-+HOSTLDLIBS_bpf-direct += $(MFLAG)
-+HOSTLDLIBS_bpf-fancy += $(MFLAG)
-+HOSTLDLIBS_dropper += $(MFLAG)
- endif
- always := $(hostprogs-m)
- endif
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 25ab143cbe14..166b94db90e3 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -22,8 +22,8 @@ hostprogs-$(CONFIG_SYSTEM_EXTRA_CERTIFICATE) += insert-sys-cert
- 
- HOSTCFLAGS_sortextable.o = -I$(srctree)/tools/include
- HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
--HOSTLOADLIBES_sign-file = -lcrypto
--HOSTLOADLIBES_extract-cert = -lcrypto
-+HOSTLDLIBS_sign-file = -lcrypto
-+HOSTLDLIBS_extract-cert = -lcrypto
- 
- always		:= $(hostprogs-y) $(hostprogs-m)
- 
-diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-index c019d781b2c9..0393f75db4d4 100644
---- a/scripts/Makefile.host
-+++ b/scripts/Makefile.host
-@@ -85,7 +85,7 @@ hostcxx_flags  = -Wp,-MD,$(depfile) $(__hostcxx_flags)
- # host-csingle -> Executable
- quiet_cmd_host-csingle 	= HOSTCC  $@
-       cmd_host-csingle	= $(HOSTCC) $(hostc_flags) $(KBUILD_HOSTLDFLAGS) -o $@ $< \
--	  	$(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
-+		$(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
- $(host-csingle): $(obj)/%: $(src)/%.c FORCE
- 	$(call if_changed_dep,host-csingle)
- 
-@@ -94,7 +94,7 @@ $(host-csingle): $(obj)/%: $(src)/%.c FORCE
- quiet_cmd_host-cmulti	= HOSTLD  $@
-       cmd_host-cmulti	= $(HOSTCC) $(KBUILD_HOSTLDFLAGS) -o $@ \
- 			  $(addprefix $(obj)/,$($(@F)-objs)) \
--			  $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
-+			  $(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
- $(host-cmulti): FORCE
- 	$(call if_changed,host-cmulti)
- $(call multi_depend, $(host-cmulti), , -objs)
-@@ -112,7 +112,7 @@ quiet_cmd_host-cxxmulti	= HOSTLD  $@
-       cmd_host-cxxmulti	= $(HOSTCXX) $(KBUILD_HOSTLDFLAGS) -o $@ \
- 			  $(foreach o,objs cxxobjs,\
- 			  $(addprefix $(obj)/,$($(@F)-$(o)))) \
--			  $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
-+			  $(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
- $(host-cxxmulti): FORCE
- 	$(call if_changed,host-cxxmulti)
- $(call multi_depend, $(host-cxxmulti), , -objs -cxxobjs)
-@@ -145,7 +145,7 @@ $(host-cxxshobjs): $(obj)/%.o: $(src)/%.c FORCE
- quiet_cmd_host-cshlib	= HOSTLLD -shared $@
-       cmd_host-cshlib	= $(HOSTCC) $(KBUILD_HOSTLDFLAGS) -shared -o $@ \
- 			  $(addprefix $(obj)/,$($(@F:.so=-objs))) \
--			  $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
-+			  $(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
- $(host-cshlib): FORCE
- 	$(call if_changed,host-cshlib)
- $(call multi_depend, $(host-cshlib), .so, -objs)
-@@ -155,7 +155,7 @@ $(call multi_depend, $(host-cshlib), .so, -objs)
- quiet_cmd_host-cxxshlib	= HOSTLLD -shared $@
-       cmd_host-cxxshlib	= $(HOSTCXX) $(KBUILD_HOSTLDFLAGS) -shared -o $@ \
- 			  $(addprefix $(obj)/,$($(@F:.so=-objs))) \
--			  $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
-+			  $(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
- $(host-cxxshlib): FORCE
- 	$(call if_changed,host-cxxshlib)
- $(call multi_depend, $(host-cxxshlib), .so, -objs)
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 035c5670d9ff..4baab548b979 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -169,7 +169,7 @@ HOSTCFLAGS_zconf.tab.o	:= -I$(src)
- hostprogs-y	+= nconf
- nconf-objs	:= nconf.o zconf.tab.o nconf.gui.o
- 
--HOSTLOADLIBES_nconf	= $(shell . $(obj)/.nconf-cfg && echo $$libs)
-+HOSTLDLIBS_nconf	= $(shell . $(obj)/.nconf-cfg && echo $$libs)
- HOSTCFLAGS_nconf.o	= $(shell . $(obj)/.nconf-cfg && echo $$cflags)
- HOSTCFLAGS_nconf.gui.o	= $(shell . $(obj)/.nconf-cfg && echo $$cflags)
- 
-@@ -180,7 +180,7 @@ hostprogs-y	+= mconf
- lxdialog	:= checklist.o inputbox.o menubox.o textbox.o util.o yesno.o
- mconf-objs	:= mconf.o zconf.tab.o $(addprefix lxdialog/, $(lxdialog))
- 
--HOSTLOADLIBES_mconf = $(shell . $(obj)/.mconf-cfg && echo $$libs)
-+HOSTLDLIBS_mconf = $(shell . $(obj)/.mconf-cfg && echo $$libs)
- $(foreach f, mconf.o $(lxdialog), \
-   $(eval KBUILD_HOSTCFLAGS_$f = $$(shell . $(obj)/.mconf-cfg && echo $$$$cflags)))
- 
-@@ -191,7 +191,7 @@ hostprogs-y	+= qconf
- qconf-cxxobjs	:= qconf.o
- qconf-objs	:= zconf.tab.o
- 
--HOSTLOADLIBES_qconf	= $(shell . $(obj)/.qconf-cfg && echo $$libs)
-+HOSTLDLIBS_qconf	= $(shell . $(obj)/.qconf-cfg && echo $$libs)
- HOSTCXXFLAGS_qconf.o	= $(shell . $(obj)/.qconf-cfg && echo $$cflags)
- 
- $(obj)/qconf.o: $(obj)/.qconf-cfg $(obj)/qconf.moc
-@@ -206,7 +206,7 @@ $(obj)/%.moc: $(src)/%.h $(obj)/.qconf-cfg
- hostprogs-y	+= gconf
- gconf-objs	:= gconf.o zconf.tab.o
- 
--HOSTLOADLIBES_gconf = $(shell . $(obj)/.gconf-cfg && echo $$libs)
-+HOSTLDLIBS_gconf = $(shell . $(obj)/.gconf-cfg && echo $$libs)
- HOSTCFLAGS_gconf.o  = $(shell . $(obj)/.gconf-cfg && echo $$cflags)
- 
- $(obj)/gconf.o: $(obj)/.gconf-cfg
 -- 
 2.17.1
 
