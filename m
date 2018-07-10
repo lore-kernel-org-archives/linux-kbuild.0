@@ -1,88 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yb0-f194.google.com ([209.85.213.194]:38887 "EHLO
-        mail-yb0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933475AbeGJPTV (ORCPT
+Received: from mail-yw0-f196.google.com ([209.85.161.196]:44637 "EHLO
+        mail-yw0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732943AbeGJS1E (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Jul 2018 11:19:21 -0400
-Received: by mail-yb0-f194.google.com with SMTP id i9-v6so8741782ybo.5
-        for <linux-kbuild@vger.kernel.org>; Tue, 10 Jul 2018 08:19:21 -0700 (PDT)
+        Tue, 10 Jul 2018 14:27:04 -0400
+Received: by mail-yw0-f196.google.com with SMTP id k18-v6so8193337ywm.11
+        for <linux-kbuild@vger.kernel.org>; Tue, 10 Jul 2018 11:26:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ghwou4prif.fsf@lena.gouders.net>
-References: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
- <1530758389-30862-6-git-send-email-yamada.masahiro@socionext.com>
- <ghva9simch.fsf@lena.gouders.net> <ghbmbk0wbj.fsf@quad.gouders.net> <ghwou4prif.fsf@lena.gouders.net>
+In-Reply-To: <20180710042609.zie5fgrvoyusmeod@treble>
+References: <1531186516-15764-1-git-send-email-yamada.masahiro@socionext.com>
+ <20180710022904.e3oql2ts4qz43bzo@treble> <CAK7LNASM+81JkGu5-z8GRZ9+sRyd55gO0G0M5c54zRhE5JhE3g@mail.gmail.com>
+ <20180710042609.zie5fgrvoyusmeod@treble>
 From: Kees Cook <keescook@chromium.org>
-Date: Tue, 10 Jul 2018 08:19:18 -0700
-Message-ID: <CAGXu5jLLAE7H37Ug+vFJ42gv5gOV1mc28BMVQeiP_kkkodjsSw@mail.gmail.com>
-Subject: Re: [PATCH v3 05/12] kconfig: make syncconfig update .config
- regardless of sym_change_count
+Date: Tue, 10 Jul 2018 11:26:52 -0700
+Message-ID: <CAGXu5jKiPFdP-wMeH5RpRuT9RAK9v-Ce=2=tmsZVYm0Bn3A-Lw@mail.gmail.com>
+Subject: Re: [PATCH v2] objtool: move libelf detection to Kconfig from Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, LKML <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@kernel.org>
+To: Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, X86 ML <x86@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Mon, Jul 9, 2018 at 4:39 AM, Dirk Gouders <dirk@gouders.net> wrote:
-> I think, I solved the puzzle and perhaps, that saves others some time:
->
-> The problem is that "if_changed" was not designed for multiple use
-> inside a recipe and in the case of compressed/vmlinux, the 2-fold use
-> created a kind of flip-flop for situations when nothing has to be done
-> to build the target.
->
-> Because each of the two users of "if_changed" stores it's footprint in
-> .vmlinux.cmd but that file then isn't re-read, one of the two
-> "if_changed" calculates that nothing has to be done wheras the other one
-> recognizes a change in the commandline, because it sees the command-line
-> for the other part of the reciepe.
+On Mon, Jul 9, 2018 at 9:26 PM, Josh Poimboeuf <jpoimboe@redhat.com> wrote:
+> I wasn't a part of the -fstack-protector conversation, but I doubt it's
+> the same pattern.  We're trying to phase out frame pointers, for several
+> reasons.  One big reason is that they cause a general slowdown across
+> the entire kernel.
 
-Ooh, nice find. Thanks for debugging this!
+My primary concern with stack-protector was that I wanted to avoid a
+disconnect between what was visible in CONFIG_* and how the kernel
+actually got built. i.e. a kernel config had
+CONFIG_STACKPROTECTOR_STRONG, it was actually built with
+-fstack-protector-strong. Having it silently downgrade to
+-fstack-protector while keeping CONFIG_STACKPROTECTOR_STRONG would
+lead to serious confusion.
 
-> In the next make, the roles flip, because the previously satisfied
-> "if_changed" now sees the command-line of the other one.  And so on...
->
-> I am not a Kbuild expert but the attached patch fixes that problem by
-> introducing "if_changed_multi" that accepts two commands -- one whose
-> commandline should be checked and a second one that should be
-> executed.
->
-> Dirk
->
->
-> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-> index fa42f895fdde..f39822fca994 100644
-> --- a/arch/x86/boot/compressed/Makefile
-> +++ b/arch/x86/boot/compressed/Makefile
-> @@ -107,8 +107,8 @@ define cmd_check_data_rel
->  endef
->
->  $(obj)/vmlinux: $(vmlinux-objs-y) FORCE
-> -       $(call if_changed,check_data_rel)
-> -       $(call if_changed,ld)
-> +       $(call if_changed_multi,ld,check_data_rel)
-> +       $(call if_changed_multi,ld,ld)
+The second issue was that I wanted the best stack protector a compiler
+supported, and at the time it wasn't possible to do this from kconfig.
 
-This does seem to do the right thing, but mainly because arg1 is what
-actually writes vmlinux, which seems a bit fragile here.
+Masahiro fixed both of these now. :) (Thank you!)
 
-However, the combination is "if_changed" with the "FORCE". This is to
-make sure the command line is evaluated in addition to the build deps.
-The check_data_rel isn't as sensitive, so maybe the right solution is
-just:
+> Since we switched the x86_64 default to the ORC unwinder, a lot of
+> people have switched over.  But this patch will reverse (or at least
+> slow down) that trend, because almost nobody has the libelf devel
+> packaged installed by default.  So over time, it will effectively make
+> frame pointers the default again in many cases.  That's exactly what we
+> *don't* want to do.  It will also cause people to accidentally re-enable
+> frame pointers when they thought they had ORC.
 
--$(obj)/vmlinux: $(vmlinux-objs-y) FORCE
--       $(call if_changed,check_data_rel)
-+$(obj)/vmlinux:: $(vmlinux-objs-y)
-+       $(call cmd,check_data_rel)
-+$(obj)/vmlinux:: $(vmlinux-objs-y) FORCE
-        $(call if_changed,ld)
+This is more like the gcc-plugins: kconfig will just not make the
+plugin CONFIG_*s visible if the gcc plugin dev package is missing on
+the build host. However, having or not having these isn't something
+we're trying to phase in or out, so the ORC case is more like how
+stack-protector was originally: fail the build if your CONFIG requires
+some additional build host package.
 
-Then check_data_rel is only evaluated with when the deps change (no
-FORCE nor if_changed needed), and doesn't interfere with the "ld"
-call?
-
-Regardless, the docs for if_changed should be updated to explicitly
-mention it should only be called once per target.
+What might be interesting is having "make *config" report certain
+CONFIG_* failures with helpful text. "WARNING: missing libelf for
+CONFIG_ORC..." or "Warning: missing gcc-plugin-dev for
+CONFIG_GCC_PLUGINS" etc?
 
 -Kees
 
