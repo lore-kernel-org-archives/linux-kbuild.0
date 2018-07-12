@@ -1,362 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:38810 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732547AbeGLVcv (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:38051 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732579AbeGLW1z (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Jul 2018 17:32:51 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [PATCH v3 05/12] kconfig: make syncconfig update .config regardless of sym_change_count
-In-Reply-To: <gh36wo1ygh.fsf@lena.gouders.net> (Dirk Gouders's message of
-        "Thu, 12 Jul 2018 13:32:30 +0200")
-References: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
-        <1530758389-30862-6-git-send-email-yamada.masahiro@socionext.com>
-        <ghva9simch.fsf@lena.gouders.net> <ghbmbk0wbj.fsf@quad.gouders.net>
-        <ghwou4prif.fsf@lena.gouders.net>
-        <CAK7LNAT9WjCMVqtq1ivxOqNERVbnC5fQbzrPrGCfz0aAbk_DEQ@mail.gmail.com>
-        <gh36wo1ygh.fsf@lena.gouders.net>
-Date: Thu, 12 Jul 2018 23:06:19 +0200
-Message-ID: <gh1sc8w4dw.fsf@lena.gouders.net>
+        Thu, 12 Jul 2018 18:27:55 -0400
+Received: from ben by shadbolt.decadent.org.uk with local (Exim 4.84_2)
+        (envelope-from <ben@decadent.org.uk>)
+        id 1fdjsq-0007iN-1f
+        for linux-kbuild@vger.kernel.org; Thu, 12 Jul 2018 23:16:20 +0100
+Date: Thu, 12 Jul 2018 23:16:20 +0100
+From: Ben Hutchings <ben@decadent.org.uk>
+Message-ID: <20180712221619.GH14131@decadent.org.uk>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-=-="
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="fckbADODYWZD5TdN"
+Content-Disposition: inline
+Subject: [RFC PATCH 0/3] kbuild: In quiet mode, print the full command line
+ if it fails
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, Michal Simek <monstr@monstr.eu>, "David S. Miller" <davem@davemloft.net>
-
---=-=-=
-
-Dirk Gouders <dirk@gouders.net> writes:
-
-> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
->
->> 2018-07-09 20:39 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
->>> Dirk Gouders <dirk@gouders.net> writes:
->>>
->>>> Dirk Gouders <dirk@gouders.net> writes:
->>>>
->>>>> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
->>>>>
->>>>>> syncconfig updates the .config only when sym_change_count > 0, i.e.
->>>>>> any change in config symbols has been detected.
->>>>>>
->>>>>> Not only symbols but also comments are contained in the .config file.
->>>>>> If only comments are updated, they are not fed back to the .config,
->>>>>> then the stale comments are left-over.  Of course, this is just a
->>>>>> matter of comments, but why not fix it.
->>>>>
->>>>> Hello Masahiro,
->>>>>
->>>>> I am currently looking at and testing this series.
->>>>>
->>>>> First: For this patch I would suggest to also edit the syncconfig
->>>>>        section of "conf --help".
->>>>>
->>>>> Further, on a slow laptop, I was suspecting, this patch to cause full
->>>>> rebuilds of everything, each time I ran "make syncconfig" followed by
->>>>> "make" but could not verify this on another machine, so perhaps I am
->>>>> just (for testing purposes) removing the wrong files (modules.builtin
->>>>> for example) -- I am still testing.
->>>>>
->>>>> But, what irritates me with testing is that (also without your
->>>>> patches) two consecutive "make" produce different output, one of them
->>>>> always shows a warning and this is reproducable.  I just want to make
->>>>> sure there is no other problem that influences my testing:
->>>>>
->>>>> $ make
->>>>>   CALL    scripts/checksyscalls.sh
->>>>>   DESCEND  objtool
->>>>>   CHK     include/generated/compile.h
->>>>>   DATAREL arch/x86/boot/compressed/vmlinux
->>>>> Kernel: arch/x86/boot/bzImage is ready  (#15)
->>>>>   Building modules, stage 2.
->>>>>   MODPOST 211 modules
->>>>>
->>>>> $ make
->>>>>   CALL    scripts/checksyscalls.sh
->>>>>   DESCEND  objtool
->>>>>   CHK     include/generated/compile.h
->>>>>   LD      arch/x86/boot/compressed/vmlinux
->>>>> ld: arch/x86/boot/compressed/head_64.o: warning: relocation in read-only section `.head.text'
->>>>> ld: warning: creating a DT_TEXTREL in object.
->>>>>   ZOFFSET arch/x86/boot/zoffset.h
->>>>>   AS      arch/x86/boot/header.o
->>>>>   LD      arch/x86/boot/setup.elf
->>>>>   OBJCOPY arch/x86/boot/setup.bin
->>>>>   OBJCOPY arch/x86/boot/vmlinux.bin
->>>>>   BUILD   arch/x86/boot/bzImage
->>>>> Setup is 15580 bytes (padded to 15872 bytes).
->>>>> System is 8069 kB
->>>>> CRC e01d75ec
->>>>> Kernel: arch/x86/boot/bzImage is ready  (#15)
->>>>>   Building modules, stage 2.
->>>>>   MODPOST 211 modules
->>>>
->>>> I spent some more time with the behaviour described above and bisected
->>>> to the commit after that two consecutive invocations of "make" (on an
->>>> already compiled tree) seem to do different things.  That commit is
->>>> 98f78525371b55cc (x86/boot: Refuse to build with data relocations), so I
->>>> put Kees and Ingo on CC.
->>>>
->>>> I did the bisecting on another system, so I'll provide the output of two
->>>> consecutive "make" on an already compiled tree on that machine:
->>>>
->>>> $ make
->>>>   CALL    scripts/checksyscalls.sh
->>>>   DESCEND  objtool
->>>>   CHK     include/generated/compile.h
->>>>   DATAREL arch/x86/boot/compressed/vmlinux
->>>> Kernel: arch/x86/boot/bzImage is ready  (#48)
->>>>   Building modules, stage 2.
->>>>   MODPOST 165 modules
->>>>
->>>> $ make
->>>>   CALL    scripts/checksyscalls.sh
->>>>   DESCEND  objtool
->>>>   CHK     include/generated/compile.h
->>>>   LD      arch/x86/boot/compressed/vmlinux
->>>>   ZOFFSET arch/x86/boot/zoffset.h
->>>>   AS      arch/x86/boot/header.o
->>>>   LD      arch/x86/boot/setup.elf
->>>>   OBJCOPY arch/x86/boot/setup.bin
->>>>   OBJCOPY arch/x86/boot/vmlinux.bin
->>>>   BUILD   arch/x86/boot/bzImage
->>>> Setup is 15644 bytes (padded to 15872 bytes).
->>>> System is 6663 kB
->>>> CRC 3eb90f40
->>>> Kernel: arch/x86/boot/bzImage is ready  (#48)
->>>>   Building modules, stage 2.
->>>>   MODPOST 165 modules
->>>>
->>>> If I comment out $(call if_changed,check_data_rel) in
->>>> arch/x86/boot/compressed/Makefile, two consecutive "make" produce
->>>> identical output i.e. seem to not do different things:
->>>>
->>>> $ make
->>>>   CALL    scripts/checksyscalls.sh
->>>>   DESCEND  objtool
->>>>   CHK     include/generated/compile.h
->>>> Kernel: arch/x86/boot/bzImage is ready  (#49)
->>>>   Building modules, stage 2.
->>>>   MODPOST 165 modules
->>>>
->>>> $ make
->>>>   CALL    scripts/checksyscalls.sh
->>>>   DESCEND  objtool
->>>>   CHK     include/generated/compile.h
->>>> Kernel: arch/x86/boot/bzImage is ready  (#49)
->>>>   Building modules, stage 2.
->>>>   MODPOST 165 modules
->>>>
->>>> So, I guess this different behaviour of two consecutive "make" is not
->>>> intentional but I am failing to understand why it happens.
->>>
->>> I think, I solved the puzzle and perhaps, that saves others some time:
->>>
->>> The problem is that "if_changed" was not designed for multiple use
->>> inside a recipe and in the case of compressed/vmlinux, the 2-fold use
->>> created a kind of flip-flop for situations when nothing has to be done
->>> to build the target.
->>>
->>> Because each of the two users of "if_changed" stores it's footprint in
->>> .vmlinux.cmd but that file then isn't re-read, one of the two
->>> "if_changed" calculates that nothing has to be done wheras the other one
->>> recognizes a change in the commandline, because it sees the command-line
->>> for the other part of the reciepe.
->>>
->>> In the next make, the roles flip, because the previously satisfied
->>> "if_changed" now sees the command-line of the other one.  And so on...
->>>
->>> I am not a Kbuild expert but the attached patch fixes that problem by
->>> introducing "if_changed_multi" that accepts two commands -- one whose
->>> commandline should be checked and a second one that should be
->>> executed.
->>
->>
->> if_changed should not appear multiple times in one target.
->>
->> I think the simplest fix-up is to
->> create a new command that combines
->> 'cmd_check_data_rel' and 'cmd_ld'.
->>
->>
->> quiet_cmd_link-vmlinux = LD      $@
->>       cmd_link-vmlinux = $(cmd_check_data_rel); $(cmd_ld)
->>
->> $(obj)/vmlinux: $(vmlinux-objs-y) FORCE
->>         $(call if_changed,link-vmlinux)
->>
->> Kbuild also supports if_changed_rule,
->> but the usage is more complex.
->>
->> There are only a few usages:
->> https://github.com/torvalds/linux/blob/v4.17/scripts/Makefile.build#L288
->
-> Just for completeness I will copy in part of a reply from Kees that
-> shows how double-colon rules can also avoid multiple use of if_changed
-> for one target:
->
-> -$(obj)/vmlinux: $(vmlinux-objs-y) FORCE
-> -       $(call if_changed,check_data_rel)
-> +$(obj)/vmlinux:: $(vmlinux-objs-y)
-> +       $(call cmd,check_data_rel)
-> +$(obj)/vmlinux:: $(vmlinux-objs-y) FORCE
->         $(call if_changed,ld)
->
-> The combined command seems to have the advantage that every command to
-> build the target gets recorded in the .cmd file
->
-> A search showed me that we have two more users that use if_changed more
-> than once for a single target:
->
->           arch/microblaze/boot/Makefile                 (fourfold)
->           arch/sparc/boot/Makefile               (2 times twofold)
->
-> The sparc case seems to apply to any of the two suggested fixes, but
-> microblaze uses if_changed in a pattern rule and also makes use of
-> parameter arguments in the sub-commands:
->
-> $(obj)/simpleImage.%: vmlinux FORCE
-> 	$(call if_changed,cp,.unstrip)
-> 	$(call if_changed,objcopy)
-> 	$(call if_changed,uimage)
-> 	$(call if_changed,strip,.strip)
-> 	@echo 'Kernel: $(UIMAGE_OUT) is ready' ' (#'`cat .version`')'
->
-> In this case, double colons would have a different meaning and the
-> combined command solution would result in a change of the sub-commands,
-> as well.  I note this in case Michal perhaps has other preferences.
->
->
-> In addition to extend the documentation, we could modify if_changed to
-> warn about it is being used more than once for a target:
->
-> # Execute command if command has changed or prerequisite(s) are updated.
-> if_changed = $(if $(filter-out undefined,$(origin if_changed_$@)),           \
-> 	@set -e;                                                             \
-> 	echo "Warning: $@: multiple use of if_changed!" >&2; ,               \
-> 	@set -e $(eval if_changed_$@ := 1) ; )                               \
->         $(if $(strip $(any-prereq) $(arg-check)),                            \
-> 	$(echo-cmd) $(cmd_$(1));                                             \
-> 	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, :)
->
-> But this fires only if if_changed is actually called and it defines many
-> variables for just that purpose, so this is perhaps not what we want...
-
-Short addition: it seems, we can use target-specific variables,
-reducing the mass of additional valiables to just one
-(more correctly: the number of targets created in parallel):
-
-# Execute command if command has changed or prerequisite(s) are updated.
-if_changed = $(if $(filter-out undefined,$(origin if_changed_cnt)),          \
-	@set -e;                                                             \
-	echo "Warning: $@: multiple use of if_changed!" >&2; ,               \
-	@set -e $(eval $@: if_changed_cnt := 1) ; )                          \
-        $(if $(strip $(any-prereq) $(arg-check)),                            \
-	$(echo-cmd) $(cmd_$(1));                                             \
-	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, :)
-
-The documentation for make says that target-specific variables are also
-in effect for all prerequisites of this target but as far as I examined
-(see attached Makefile and target "check") not for the example above.
-
-In my understanding this is because the variable is created when the
-recipe for the target is executed, i.e. all prerequisites are already
-done.
-
-I did a "quick" measurement for an allnoconfig configuration on my slow
-laptop:
-
-Without additional check:
-
-real    14m45.477s
-user    14m10.775s
-sys     0m42.997s
+To: linux-kbuild@vger.kernel.org
 
 
-With additional check:
+--fckbADODYWZD5TdN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-real    14m45.562s
-user    14m12.045s
-sys     0m41.844s
+The default (quiet) kbuild output is usually preferable to a log
+showing every command line in full.  However, after a failure the
+full command line may be more interesting.  When building from an
+interactive shell, it's trivial to retry the build with V=1, but in
+case the failed build was automated this is not so easy.
 
-Dirk
+For example,
+<https://buildd.debian.org/status/fetch.php?pkg=linux&arch=powerpcspe&ver=4.18%7Erc4-1%7Eexp1&stamp=1531410477&raw=0>
+is a build failure triggered by a change in the default compiler
+options for powerpc.  This failure is from a native build and I
+cannot reproduce it in a cross-build environment.  From the quiet
+build log I can't tell whether the same compiler options were used
+in the native build.
+
+This series changes the various standard macros used to run and
+(depending on verbosity) echo a command.  In quiet mode, if a
+command fails it will be echoed before exiting the shell.
+
+Ben.
+
+Ben Hutchings (3):
+  kbuild: Move final argument to modpost into $(cmd_modpost)
+  kbuild: Add $(run-cmd) macro for running and maybe echoing command
+  kbuild: In quiet mode, print the full command line if it fails
+
+ scripts/Kbuild.include   | 13 +++++++++----
+ scripts/Makefile.modpost |  4 ++--
+ 2 files changed, 11 insertions(+), 6 deletions(-)
 
 
---=-=-=
-Content-Disposition: inline; filename=Makefile
-Content-Description: Test target-specific variable
+--fckbADODYWZD5TdN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
--include .check.cmd
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
 
-comma   := ,
-quote   := "
-squote  := '
-empty   :=
-space   := $(empty) $(empty)
-space_escape := _-_SPACE_-_
-pound := \#
+iQIVAwUBW0fTM+e/yOyVhhEJAQr8GhAAmfGDqycIDAtEbxdlkAiCbdTdKI7oG//9
+Xn3Tcg/zJmKJDaqpsYLeYwTBrcm+UPfqtYKLz+S/rkHxEwlADpCyLU0jaz23p6KI
+JwLSONV+xTFsQwq+AhHTd0VLgUrLH7KHixnINNsyAvhmq0KKBYSYm2iLA/Vxgx09
+c8kJkkdnlT/IHRucTg13Xy1jcQ2TXfGLW9eLgZ1s1BxmiYJL0eeQa9FvyCqJgfh4
+KmGS9S9+aMIzm8WTFh7RrzIMLnyhgsy0xuTh1gik19XphsKAR1Gga1+xf4H637Pn
+m9/ovcICg9zWIGdlWIm6MUM9opeprVE1hABT4ZL8qTKDXc6/7/8RXdUpzBqCswwc
+j68SOtgx3MrFsiLoJhI+eV54VkxPmGNScWZPEvHpcj2v2pRFQGHuM77bKU8ZvDUp
+uZDmXSjHvJraOE3pUrZnrA2x9Rzpx6vL5IQjJvcs7AD/IyZpfcj06BmkKJcXBrfZ
+l63bIsrSS8mtpRGai8j9wrEgSyM5MK8QV4PsCTSis7VBKuXKwo8SqgnUnApIOhNY
+jy025Sj38r7qioPzzpfeumcEc0jc79arKDfxifgiI1kuo55unKOZBdcP5uUzGSkS
+ilceEPu+1IvqcSZ237gorjDc6U+6M1HPHq4AOftEfpBxBC+y+XlTC3/jcz07zlqO
+tBuxzhFa0Mc=
+=KW/u
+-----END PGP SIGNATURE-----
 
-quiet_cmd_a = A
-cmd_a = echo "doing a"
-quiet_cmd_b = B
-cmd_b = echo "doing b"
-
-###
-# Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
-dot-target = $(dir $@).$(notdir $@)
-
-###
-# Escape single quote for use in echo statements
-escsq = $(subst $(squote),'\$(squote)',$1)
-
-ifneq ($(KBUILD_NOCMDDEP),1)
-# Check if both arguments are the same including their order. Result is empty
-# string if equal. User may override this check using make KBUILD_NOCMDDEP=1
-arg-check = $(filter-out $(subst $(space),$(space_escape),$(strip $(cmd_$@))), \
-                         $(subst $(space),$(space_escape),$(strip $(cmd_$1))))
-else
-arg-check = $(if $(strip $(cmd_$@)),,1)
-endif
-
-# Replace >$< with >$$< to preserve $ when reloading the .cmd file
-# (needed for make)
-# Replace >#< with >$(pound)< to avoid starting a comment in the .cmd file
-# (needed for make)
-# Replace >'< with >'\''< to be able to enclose the whole string in '...'
-# (needed for the shell)
-make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
-
-# Find any prerequisites that is newer than target or that does not exist.
-# PHONY targets skipped in both cases.
-any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
-
-quiet = quiet_
-# echo command.
-# Short version is used, if $(quiet) equals `quiet_', otherwise full one.
-echo-cmd = $(if $($(quiet)cmd_$(1)),\
-	echo '  $(call escsq,$($(quiet)cmd_$(1)))$(echo-why)';)
-
-cmd = @$(echo-cmd) $(cmd_$(1))
-
-# Execute command if command has changed or prerequisite(s) are updated.
-if_changed = $(if $(filter-out undefined,$(origin if_changed_cnt)),          \
-	@set -e;                                                             \
-	echo "Warning: $@: multiple use of if_changed!" >&2; ,               \
-	@set -e $(eval $@: if_changed_cnt := 1) ; )                          \
-        $(if $(strip $(any-prereq) $(arg-check)),                            \
-	$(echo-cmd) $(cmd_$(1));                                             \
-	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, :)
-
-PHONY += FORCE
-FORCE:
-
-a.o: Makefile
-	@printf 'if_change_cnt: -%s-\n' '$(origin if_change_cnt)'
-	@touch a.o
-
-check: a.o FORCE
-	$(call if_changed,a)
-	$(call if_changed,b)
-	@touch check
-
---=-=-=--
+--fckbADODYWZD5TdN--
