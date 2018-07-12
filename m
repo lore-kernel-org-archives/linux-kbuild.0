@@ -1,90 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:49831 "EHLO
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:62709 "EHLO
         conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727455AbeGLPho (ORCPT
+        with ESMTP id S1726703AbeGLPxS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Jul 2018 11:37:44 -0400
+        Thu, 12 Jul 2018 11:53:18 -0400
 MIME-Version: 1.0
-In-Reply-To: <2d0bd4a4-98cb-380e-36c4-e46dc5d53991@molgen.mpg.de>
-References: <89f15a49-d18b-6b01-adb7-1385f2844cb6@molgen.mpg.de>
- <557a23f8-8993-d832-3290-37481c37e340@molgen.mpg.de> <2d0bd4a4-98cb-380e-36c4-e46dc5d53991@molgen.mpg.de>
+In-Reply-To: <20180710073833.GA7671@krava>
+References: <20180710004602.21599-1-labbott@redhat.com> <20180710004602.21599-2-labbott@redhat.com>
+ <20180710073833.GA7671@krava>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 13 Jul 2018 00:26:53 +0900
-Message-ID: <CAK7LNATB_hR_S4zQQ-jv=NQEnvNfkSPrZ6xbRE8bKNjNO6VTtQ@mail.gmail.com>
-Subject: Re: [PATCH v3] tools/build/Build.include: fix # escaping in .cmd
- files for future Make
+Date: Fri, 13 Jul 2018 00:42:28 +0900
+Message-ID: <CAK7LNARtugBJb5GEmqTD2PybznaRPX7Ho42P1OwKoCSaNfhNCA@mail.gmail.com>
+Subject: Re: [PATCHv2 1/7] tools: build: Fixup host c flags
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, zibeon@gmail.com
+To: Jiri Olsa <jolsa@redhat.com>
+Cc: Laura Abbott <labbott@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Robin Jarry <robin.jarry@6wind.com>, Andi Kleen <andi@firstfloor.org>, Arnaldo Carvalho de Melo <acme@redhat.com>, Madhavan Srinivasan <maddy@linux.vnet.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
 
-2018-07-10 23:50 GMT+09:00 Paul Menzel <pmenzel@molgen.mpg.de>:
-> Date: Tue, 5 Jun 2018 19:00:22 +0200
+2018-07-10 16:38 GMT+09:00 Jiri Olsa <jolsa@redhat.com>:
+> On Mon, Jul 09, 2018 at 05:45:56PM -0700, Laura Abbott wrote:
+>> Commit 0c3b7e42616f ("tools build: Add support for host programs format")
+>> introduced host_c_flags which referenced CHOSTFLAGS. The actual name of the
+>> variable is HOSTCFLAGS. Fix this up.
+>>
+>> Fixes: 0c3b7e42616f ("tools build: Add support for host programs format")
+>> Signed-off-by: Laura Abbott <labbott@redhat.com>
+>> ---
+>> v2: Also fixed another instance in perf pmu-events.
 >
-> In 2016 GNU Make made a backwards incompatible change to the way '#'
-> characters were handled in Makefiles when used inside functions or
-> macros:
+> Acked-by: Jiri Olsa <jolsa@kernel.org>
 >
-> http://git.savannah.gnu.org/cgit/make.git/commit/?id=c6966b323811c37acedff05b57
+> cc-ing more folks, that were in initial patch for heads up
 >
-> Due to this change, when attempting to run `make prepare' I get a
-> spurious make syntax error:
+> thanks,
+> jirka
 >
->     /home/earnest/linux/tools/objtool/.fixdep.o.cmd:1: *** missing separator.  Stop.
->
-> When inspecting `.fixdep.o.cmd' it includes two lines which use
-> unescaped comment characters at the top:
->
->     \# cannot find fixdep (/home/earnest/linux/tools/objtool//fixdep)
->     \# using basic dep data
->
-> This is because `tools/build/Build.include' prints these '\#'
-> characters:
->
->     printf '\# cannot find fixdep (%s)\n' $(fixdep) > $(dot-target).cmd; \
->     printf '\# using basic dep data\n\n' >> $(dot-target).cmd;           \
->
-> This completes commit 9564a8cf (Kbuild: fix # escaping in .cmd files for
-> future Make).
->
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=197847
-> Cc: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> ---
+
+Applied to linux-kbuild/fixes. Thanks!
 
 
-
-Applied to linux-kbuild/fixes.  Thanks!
-
-
-> v2: Add stable@vger.kernel.org
-> v3: Add tag PATCH to subject
 >
->  tools/build/Build.include | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/build/Build.include b/tools/build/Build.include
-> index a4bbb984941d..d9048f145f97 100644
-> --- a/tools/build/Build.include
-> +++ b/tools/build/Build.include
-> @@ -63,8 +63,8 @@ dep-cmd = $(if $(wildcard $(fixdep)),
->             $(fixdep) $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;           \
->             rm -f $(depfile);                                                    \
->             mv -f $(dot-target).tmp $(dot-target).cmd,                           \
-> -           printf '\# cannot find fixdep (%s)\n' $(fixdep) > $(dot-target).cmd; \
-> -           printf '\# using basic dep data\n\n' >> $(dot-target).cmd;           \
-> +           printf '$(pound) cannot find fixdep (%s)\n' $(fixdep) > $(dot-target).cmd; \
-> +           printf '$(pound) using basic dep data\n\n' >> $(dot-target).cmd;           \
->             cat $(depfile) >> $(dot-target).cmd;                                 \
->             printf '\n%s\n' 'cmd_$@ := $(make-cmd)' >> $(dot-target).cmd)
->
+>> ---
+>>  tools/build/Build.include   | 2 +-
+>>  tools/perf/pmu-events/Build | 2 +-
+>>  2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tools/build/Build.include b/tools/build/Build.include
+>> index a4bbb984941d..b5c679cd441c 100644
+>> --- a/tools/build/Build.include
+>> +++ b/tools/build/Build.include
+>> @@ -98,4 +98,4 @@ cxx_flags = -Wp,-MD,$(depfile) -Wp,-MT,$@ $(CXXFLAGS) -D"BUILD_STR(s)=\#s" $(CXX
+>>  ###
+>>  ## HOSTCC C flags
+>>
+>> -host_c_flags = -Wp,-MD,$(depfile) -Wp,-MT,$@ $(CHOSTFLAGS) -D"BUILD_STR(s)=\#s" $(CHOSTFLAGS_$(basetarget).o) $(CHOSTFLAGS_$(obj))
+>> +host_c_flags = -Wp,-MD,$(depfile) -Wp,-MT,$@ $(HOSTCFLAGS) -D"BUILD_STR(s)=\#s" $(HOSTCFLAGS_$(basetarget).o) $(HOSTCFLAGS_$(obj))
+>> diff --git a/tools/perf/pmu-events/Build b/tools/perf/pmu-events/Build
+>> index 17783913d330..215ba30b8534 100644
+>> --- a/tools/perf/pmu-events/Build
+>> +++ b/tools/perf/pmu-events/Build
+>> @@ -1,7 +1,7 @@
+>>  hostprogs := jevents
+>>
+>>  jevents-y    += json.o jsmn.o jevents.o
+>> -CHOSTFLAGS_jevents.o = -I$(srctree)/tools/include
+>> +HOSTCFLAGS_jevents.o = -I$(srctree)/tools/include
+>>  pmu-events-y += pmu-events.o
+>>  JDIR         =  pmu-events/arch/$(SRCARCH)
+>>  JSON         =  $(shell [ -d $(JDIR) ] &&                            \
+>> --
+>> 2.17.1
+>>
 > --
-> 2.16.2
->
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
