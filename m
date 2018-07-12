@@ -1,81 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:32138 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726210AbeGLKXC (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:50899 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726208AbeGLKsq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Jul 2018 06:23:02 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180710004602.21599-1-labbott@redhat.com>
-References: <20180710004602.21599-1-labbott@redhat.com>
+        Thu, 12 Jul 2018 06:48:46 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 12 Jul 2018 19:13:18 +0900
-Message-ID: <CAK7LNAQ0dWqaYkLjevCuboCBovcsTV1cMh48qv__wwMZs-vAxg@mail.gmail.com>
-Subject: Re: [PATCHv2 0/7] HOSTFLAGS and HOSTLDFLAGS from the environment
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kbuild: suppress warnings from 'getconf LFS_*'
+Date: Thu, 12 Jul 2018 19:38:36 +0900
+Message-Id: <1531391916-24086-1-git-send-email-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Robin Jarry <robin.jarry@6wind.com>, Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Ben Hutchings <ben.hutchings@codethink.co.uk>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-2018-07-10 9:45 GMT+09:00 Laura Abbott <labbott@redhat.com>:
->
-> Hi,
->
-> This is v2 of the series to set HOSTCFLAGS and HOSTLDFLAGS from the
-> environment. The changes are mostly minor fixups requested and also
-> include documentation of the new options.
+Suppress warnings for systems that do not recognize LFS_*.
 
+ getconf: no such configuration parameter `LFS_CFLAGS'
+ getconf: no such configuration parameter `LFS_LDFLAGS'
+ getconf: no such configuration parameter `LFS_LIBS'
 
+Fixes: d7f14c66c273 ("kbuild: Enable Large File Support for hostprogs")
+Reported-by: Chen Feng <puck.chen@hisilicon.com>
+Cc: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-I checked this series.
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-
-I left minor comments for 3/7 and 7/7.
-
-Unless you disagree,
-I will fix them up locally
-and queue it to my tree.
-
-Thanks.
-
-
-
-
-> Laura Abbott (7):
->   tools: build: Fixup host c flags
->   tools: build: Use HOSTLDFLAGS with fixdep
->   treewide: Rename HOSTCFLAGS -> KBUILD_HOSTCFLAGS
->   treewide: Rename HOSTCXXFLAGS to KBUILD_HOSTCXXFLAGS
->   treewide: Rename HOSTLDFLAGS to KBUILD_HOSTLDFLAGS
->   treewide: Rename HOST_LOADLIBES to KBUILD_HOSTLDLIBS
->   Kbuild: Use HOST*FLAGS options from the command line
->
->  Documentation/kbuild/kbuild.txt | 16 ++++++++++++++++
->  Makefile                        | 17 +++++++++--------
->  arch/alpha/boot/Makefile        |  2 +-
->  net/bpfilter/Makefile           |  4 ++--
->  samples/bpf/Makefile            | 22 +++++++++++-----------
->  samples/seccomp/Makefile        |  6 +++---
->  scripts/Kbuild.include          |  2 +-
->  scripts/Makefile                |  4 ++--
->  scripts/Makefile.host           | 24 ++++++++++++------------
->  scripts/kconfig/Makefile        | 10 +++++-----
->  tools/build/Build.include       |  2 +-
->  tools/build/Makefile            |  2 +-
->  tools/objtool/Makefile          |  4 ++--
->  tools/perf/pmu-events/Build     |  2 +-
->  14 files changed, 67 insertions(+), 50 deletions(-)
->
-> --
-> 2.17.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/Makefile b/Makefile
+index 0f035ae..abc74f8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -353,9 +353,9 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+ 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
+ 	  else echo sh; fi ; fi)
+ 
+-HOST_LFS_CFLAGS := $(shell getconf LFS_CFLAGS)
+-HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS)
+-HOST_LFS_LIBS := $(shell getconf LFS_LIBS)
++HOST_LFS_CFLAGS := $(shell getconf LFS_CFLAGS 2>/dev/null)
++HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS 2>/dev/null)
++HOST_LFS_LIBS := $(shell getconf LFS_LIBS 2>/dev/null)
+ 
+ HOSTCC       = gcc
+ HOSTCXX      = g++
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
