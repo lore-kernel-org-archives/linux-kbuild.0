@@ -1,50 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:38098 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387849AbeGMQkj (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:39724 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729735AbeGMQkd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Jul 2018 12:40:39 -0400
-Received: by mail-pf0-f194.google.com with SMTP id v15-v6so2911160pff.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 13 Jul 2018 09:25:19 -0700 (PDT)
+        Fri, 13 Jul 2018 12:40:33 -0400
+Received: by mail-pl0-f67.google.com with SMTP id p23-v6so1149876plo.6
+        for <linux-kbuild@vger.kernel.org>; Fri, 13 Jul 2018 09:25:14 -0700 (PDT)
 From: Olof Johansson <olof@lixom.net>
-Subject: [PATCH 2/2] kbuild: buildtar: add arm64 support
-Date: Fri, 13 Jul 2018 09:24:58 -0700
-Message-Id: <20180713162458.22154-2-olof@lixom.net>
-In-Reply-To: <20180713162458.22154-1-olof@lixom.net>
-References: <20180713162458.22154-1-olof@lixom.net>
+Subject: [PATCH 1/2] kbuild: buildtar: remove crufty vax pieces
+Date: Fri, 13 Jul 2018 09:24:57 -0700
+Message-Id: <20180713162458.22154-1-olof@lixom.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Olof Johansson <olof@lixom.net>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Olof Johansson <olof@lixom.net>
 
-Make 'make tar-pkg' work on arm64.
+ARCH=vax isn't in mainline; it can be added back if/when it shows up.
 
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Olof Johansson <olof@lixom.net>
 ---
- scripts/package/buildtar | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ scripts/package/buildtar | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-index 55887ac84ee4..d624a07a4e77 100755
+index e8cc72a51b32..55887ac84ee4 100755
 --- a/scripts/package/buildtar
 +++ b/scripts/package/buildtar
-@@ -105,6 +105,14 @@ case "${ARCH}" in
- 			cp -v -- "${objtree}/vmlinux" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
- 		fi
+@@ -84,10 +84,6 @@ case "${ARCH}" in
+ 		[ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
+ 		[ -f "${objtree}/lifimage" ] && cp -v -- "${objtree}/lifimage" "${tmpdir}/boot/lifimage-${KERNELRELEASE}"
  		;;
-+	arm64)
-+		for i in Image.bz2 Image.gz Image.lz4 Image.lzma Image.lzo ; do
-+			if [ -f "${objtree}/arch/arm64/boot/${i}" ] ; then
-+				cp -v -- "${objtree}/arch/arm64/boot/${i}" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
-+				break
-+			fi
-+		done
-+		;;
- 	*)
- 		[ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "${tmpdir}/boot/vmlinux-kbuild-${KERNELRELEASE}"
- 		echo "" >&2
+-	vax)
+-		[ -f "${objtree}/vmlinux.SYS" ] && cp -v -- "${objtree}/vmlinux.SYS" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}.SYS"
+-		[ -f "${objtree}/vmlinux.dsk" ] && cp -v -- "${objtree}/vmlinux.dsk" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}.dsk"
+-		;;
+ 	mips)
+ 		if [ -f "${objtree}/arch/mips/boot/compressed/vmlinux.bin" ]; then
+ 			cp -v -- "${objtree}/arch/mips/boot/compressed/vmlinux.bin" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
 -- 
 2.11.0
 
