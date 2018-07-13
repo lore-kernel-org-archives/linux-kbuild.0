@@ -1,191 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:43307 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731956AbeGMIGe (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:50152 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729751AbeGMOUw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Jul 2018 04:06:34 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [PATCH v3 00/12] kbuild/kconfig: do not update config during installation
-In-Reply-To: <CAK7LNAQeffSH2_-d9byxSetUNV1qE4h-TJusEeF_PFVt0KRH8w@mail.gmail.com>
-        (Masahiro Yamada's message of "Thu, 12 Jul 2018 17:29:49 +0900")
-References: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
-        <gh36wr1g0d.fsf@lena.gouders.net>
-        <CAK7LNAQeffSH2_-d9byxSetUNV1qE4h-TJusEeF_PFVt0KRH8w@mail.gmail.com>
-Date: Fri, 13 Jul 2018 09:44:15 +0200
-Message-ID: <ghpnzroa0g.fsf@lena.gouders.net>
+        Fri, 13 Jul 2018 10:20:52 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 13 Jul 2018 23:05:20 +0900
+Message-ID: <CAK7LNAQbXpNS-pdhUnhL7ELXArJoLCVzQhASaqTAJh0+CkwFcA@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v4.18-rc5
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+Hi Linus,
 
-> 2018-07-10 20:34 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
->> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
->>
->>> The main motivation of this patch series is to suppress the syncconfig
->>> during running installation targets.
->>>
->>> V1 consisted of only two patches:
->>>   https://patchwork.kernel.org/patch/10468105/
->>>   https://patchwork.kernel.org/patch/10468103/
->>>
->>> I noticed that installation targets would continue running
->>> even if the source tree is not configured at all
->>> because the inclusion of include/config/auto.conf was optional.
->>>
->>> So, I added one more patch in V2:
->>>  https://patchwork.kernel.org/patch/10483637/
->>>
->>> However, kbuild test robot reported a new warning message was displayed:
->>>
->>> Makefile:592: include/config/auto.conf: No such file or directory
->>>
->>> This warning is displayed only for Make 4.1 or older.
->>>
->>> To fix this annoying warning, I changed Kconfig too,
->>> which leaded to more clean-up, improvements in Kconfig.
->>>
->>> So, V3 is a big patch series.
->>
->> Hello Masahiro,
->>
->> I tested your series for a while, now.  I did not notice real issues
->> with it but want to leave some remarks about what I noticed in
->> the surroundings of your patches.
->>
->>
->>> Masahiro Yamada (12):
->>>   kconfig: rename file_write_dep and move it to confdata.c
->>
->> I might be missing some trivial use-case, but when looking at this
->> patch, I noticed an inconsistency with the file names auto.conf and
->> auto.conf.cmd.
->>
->> The first can be modified by an environment variable but when this
->> happens, auto.conf.cmd remains as is.  I noticed that only the
->> Documentation mentions that KCONFIG_AUTOCONFIG exists and confdata.c
->> uses it to serve the file name -- no other use anywhere.
->
-> Indeed.
->
-> I had also noticed this.
->
-> Probably, replacing the hardcoded 'include/config/auto.conf.cmd'
-> with  get_env('KCONFIG_AUTOCONFIG') + 'cmd' will be nice.
->
->
-> I did not touch it since it thought it was less important
-> for this patch set.
->
-> If you are willing to contribute to this,
-> a patch is welcome (after this series).
+Please pull a little more Kbuild fixes.
 
-Yes, it is not that important but it would probably help people new to
-kbuild/kconfig if we make this a bit more consistent.  I will send a
-patch that also adds some words to the documentation of
-KCONFIG_AUTOCONFIG.
 
->> Now, I am wondering if I just don't see an important case when the
->> use of KCONFIG_AUTOCONFIG is really helpful or even mandatory.
->
->
-> I do not know the historical background,
-> but I guess predecessors wanted to implement Kconfig
-> as generic/flexible as possible.
->
->
->>
->>>   kconfig: split out helpers to check file/directory, create directory
->>>   kconfig: remove unneeded directory generation from local*config
->>>   kconfig: create directories needed for syncconfig by itself
->>>   kconfig: make syncconfig update .config regardless of sym_change_count
->>
->> For this patch, I already mentioned that `conf --help' perhaps could be
->> updated.
->
-> What do you want 'conf --help' to look like ?
 
-As I said, --help does not say a lot about which files are updated, so I
-probably was too pedantic.  For --syncconfig it currently says:
+The following changes since commit 021c91791a5e7e85c567452f1be3e4c2c6cb6063:
 
-  --syncconfig            Similar to oldconfig but generates configuration in
-                          include/{generated/,config/}
+  Linux 4.18-rc3 (2018-07-01 16:04:53 -0700)
 
-which could let someone guess .config isn't touched (because of the
-"but").  If you also think so, the text could perhaps say:
+are available in the git repository at:
 
-  --syncconfig            Similar to oldconfig but generates configuration in
-                          include/{generated/,config/} in addition.
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v4.18-2
 
->
->>  On the other side, none of the entries there tells us such
->> details, so there is probably no need for syncconfig to do so.
->>
->>>   kconfig: allow all config targets to write auto.conf if missing
->>>   kbuild: use 'include' directive to load auto.conf from top Makefile
->>>   kbuild: add .DELETE_ON_ERROR special target
->>>   kbuild: do not update config when running install targets
->>>   kbuild: do not update config for 'make kernelrelease'
->>>   kbuild: remove auto.conf and tristate.conf from prerequisites
->>
->> In the surrounding of this patch I noticed -include of auto.conf and
->> tristate.conf in scripts/Makfile.modbuildin.  I tried it in some ways
->> but was not able to trigger that file being used with a missing
->> auto.conf.
->
-> Right.  auto.conf and tristate.conf are mandatory there.
->
-> '-include' should be replaced with 'include'.
->
-> Cater to send a patch?
+for you to fetch changes up to 6d79a7b424a5630a6fcab31fd7c38af4ea9c9a0f:
 
-I will do.
+  kbuild: suppress warnings from 'getconf LFS_*' (2018-07-13 00:48:18 +0900)
 
-Dirk
+----------------------------------------------------------------
+Kbuild fixes for v4.18 (2nd)
 
->
->> On the other hand, if I now manually remove tristate.conf,
->> that would not be fixed or even noticed, because of -include and I
->> wonder if it is safer to also change the -includes in that file.
->>
->> It seems, if one of those files is missing, one must have done it
->> manually or some other serious issue is present that we probably want to
->> notice.
->
-> You are right.  If somebody removes tristate.conf on purpose,
-> it is not self-healing.
->
-> I should be fixed by itself, or at least it should fail
-> with clear message.
->
-> I will reconsider this.
->
->
-> Thanks.
->
->
->
->> Dirk
->>
->>>   kbuild: replace include/config/%.conf with include/config/auto.conf
->>>
->>>  Makefile                    |  46 +++++++++------
->>>  scripts/Kbuild.include      |   3 +
->>>  scripts/kconfig/Makefile    |  16 ++---
->>>  scripts/kconfig/conf.c      |  39 +++++++------
->>>  scripts/kconfig/confdata.c  | 139 +++++++++++++++++++++++++++++++++++++-------
->>>  scripts/kconfig/gconf.c     |   1 +
->>>  scripts/kconfig/lkc.h       |   1 -
->>>  scripts/kconfig/lkc_proto.h |   2 +-
->>>  scripts/kconfig/mconf.c     |   1 +
->>>  scripts/kconfig/nconf.c     |   1 +
->>>  scripts/kconfig/qconf.cc    |   2 +
->>>  scripts/kconfig/util.c      |  30 ----------
->>>  12 files changed, 182 insertions(+), 99 deletions(-)
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+ - update Kbuild and Kconfig documents
+
+ - sanitize -I compiler option handling
+
+ - update extract-vmlinux script to recognize LZ4 and ZSTD
+
+ - fix tools Makefiles
+
+ - update tags.sh to handle __ro_after_init
+
+ - suppress warnings in case getconf does not recognize LFS_* parameters
+
+----------------------------------------------------------------
+Adam Borowski (1):
+      scripts: teach extract-vmlinux about LZ4 and ZSTD
+
+Constantine Shulyupin (1):
+      scripts/tags.sh: add __ro_after_init
+
+Laura Abbott (2):
+      tools: build: Fixup host c flags
+      tools: build: Use HOSTLDFLAGS with fixdep
+
+Masahiro Yamada (3):
+      kbuild: do not drop -I without parameter
+      kbuild: remove duplicated comments about PHONY
+      kbuild: suppress warnings from 'getconf LFS_*'
+
+Paul Menzel (1):
+      tools build: fix # escaping in .cmd files for future Make
+
+Randy Dunlap (5):
+      kbuild: update ARCH alias info for sh
+      kbuild: update ARCH alias info for sparc
+      kbuild: delete INSTALL_FW_PATH from kbuild documentation
+      kconfig: update user kconfig tools doc.
+      kbuild: document the KBUILD_KCONFIG env. variable
+
+Ulf Magnusson (1):
+      kbuild: .PHONY is not a variable, but PHONY is
+
+ Documentation/kbuild/kbuild.txt  | 17 ++++++--------
+ Documentation/kbuild/kconfig.txt | 51 +++++++++++++++++++++++++++++++++-------
+ Makefile                         |  8 +++----
+ scripts/Kbuild.include           |  2 +-
+ scripts/Makefile.build           |  3 ---
+ scripts/Makefile.clean           |  3 ---
+ scripts/Makefile.modbuiltin      |  4 ----
+ scripts/Makefile.modinst         |  4 ----
+ scripts/Makefile.modpost         |  4 ----
+ scripts/Makefile.modsign         |  3 ---
+ scripts/extract-vmlinux          |  2 ++
+ scripts/tags.sh                  |  2 +-
+ tools/build/Build.include        |  6 ++---
+ tools/build/Makefile             |  2 +-
+ tools/perf/pmu-events/Build      |  2 +-
+ 15 files changed, 63 insertions(+), 50 deletions(-)
+
+
+-- 
+Best Regards
+Masahiro Yamada
