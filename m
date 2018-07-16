@@ -1,64 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:60342 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727532AbeGPQB4 (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:40507 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727970AbeGPRzj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Jul 2018 12:01:56 -0400
-Date: Mon, 16 Jul 2018 17:33:56 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 0/6] Symbol namespaces
-Message-ID: <20180716153356.GA8034@kroah.com>
-References: <20180716122125.175792-1-maco@android.com>
+        Mon, 16 Jul 2018 13:55:39 -0400
+Received: by mail-pl0-f67.google.com with SMTP id s17-v6so6160458plp.7
+        for <linux-kbuild@vger.kernel.org>; Mon, 16 Jul 2018 10:27:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180716122125.175792-1-maco@android.com>
+References: <20180621162324.36656-1-ndesaulniers@google.com>
+ <20180621162324.36656-4-ndesaulniers@google.com> <1e19dbef068b45a4a4e9eb4072e097be@AcuMS.aculab.com>
+In-Reply-To: <1e19dbef068b45a4a4e9eb4072e097be@AcuMS.aculab.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 16 Jul 2018 10:27:04 -0700
+Message-ID: <CAKwvOdmFVnSos71vAUnayuocBDhxLg76tvGF0y3sj+4+s7TCcw@mail.gmail.com>
+Subject: Re: [PATCH v6 3/3] x86: paravirt: make native_save_fl extern inline
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Martijn Coenen <maco@android.com>
-Cc: linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Alan Stern <stern@rowland.harvard.edu>, Oliver Neukum <oneukum@suse.com>, Arnd Bergmann <arnd@arndb.de>, Jessica Yu <jeyu@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, maco@google.com, sspatil@google.com, malchev@google.com, joelaf@google.com
+To: David.Laight@aculab.com
+Cc: mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, hpa@zytor.com, linux-efi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, virtualization@lists.linux-foundation.org, Alistair Strachan <astrachan@google.com>, Manoj Gupta <manojgupta@google.com>, Greg Hackmann <ghackmann@google.com>, sedat.dilek@gmail.com, tstellar@redhat.com, Kees Cook <keescook@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Will Deacon <will.deacon@arm.com>, mawilcox@microsoft.com, Arnd Bergmann <arnd@arndb.de>, David Rientjes <rientjes@google.com>, acme@redhat.com, Philippe Ombredanne <pombredanne@nexb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kate Stewart <kstewart@linuxfoundation.org>, boris.ostrovsky@oracle.com, "J. Kiszka" <jan.kiszka@siemens.com>, rostedt@goodmis.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, akataria@vmware.com, brijesh.singh@amd.com, Cao jin <caoj.fnst@cn.fujitsu.com>, Greg KH <gregkh@linuxfoundation.org>, jarkko.sakkinen@linux.intel.com, jgross@suse.com, Josh Poimboeuf <jpoimboe@redhat.com>, Matthias Kaehlcke <mka@chromium.org>, thomas.lendacky@amd.com, Thiebaud Weksteen <tweek@google.com>, mjg59@google.com, joe@perches.com, andrea.parri@amarulasolutions.com
 
-On Mon, Jul 16, 2018 at 02:21:19PM +0200, Martijn Coenen wrote:
-> As of Linux 4.17, there are more than 30000 exported symbols
-> in the kernel. There seems to be some consensus amongst
-> kernel devs that the export surface is too large, and hard
-> to reason about.
-> 
-> Generally, these symbols fall in one of these categories:
-> 1) Symbols actually meant for drivers
-> 2) Symbols that are only exported because functionality is
->    split over multiple modules, yet they really shouldn't
->    be used by modules outside of their own subsystem
-> 3) Symbols really only meant for in-tree use
-> 
-> When module developers try to upstream their code, it
-> regularly turns out that they are using exported symbols
-> that they really shouldn't be using. This problem is even
-> bigger for drivers that are currently out-of-tree, which
-> may be using many symbols that they shouldn't be using,
-> and that break when those symbols are removed or modified.
-> 
-> This patch allows subsystem maintainers to partition their
-> exported symbols into separate namespaces, and module
-> authors to import such namespaces only when needed.
-> 
-> This allows subsystem maintainers to more easily limit
-> availability of these namespaced symbols to other parts of
-> the kernel. It can also be used to partition the set of
-> exported symbols for documentation purposes; for example,
-> a set of symbols that is really only used for debugging
-> could be in a "SUBSYSTEM_DEBUG" namespace.
+On Fri, Jul 13, 2018 at 3:15 AM David Laight <David.Laight@aculab.com> wrote:
+>
+> From: Nick Desaulniers
+> > Sent: 21 June 2018 17:23
+> >
+> > native_save_fl() is marked static inline, but by using it as
+> > a function pointer in arch/x86/kernel/paravirt.c, it MUST be outlined.
+> >
+> > paravirt's use of native_save_fl() also requires that no GPRs other than
+> > %rax are clobbered.
+> ...
+> > diff --git a/arch/x86/include/asm/irqflags.h b/arch/x86/include/asm/irqflags.h
+> > index 89f08955fff7..c4fc17220df9 100644
+> > --- a/arch/x86/include/asm/irqflags.h
+> > +++ b/arch/x86/include/asm/irqflags.h
+> > @@ -13,7 +13,7 @@
+> > * Interrupt control:
+> > */
+> >
+> > -static inline unsigned long native_save_fl(void)
+> > +extern inline unsigned long native_save_fl(void)
+>
+> This is generating a the compilation warning (that we treat as an error):
+> "no previous prototype for 'native_save_fl".
+> Fixable by replicating the line with an appended ;
 
-To give people a bit more background here, this is something that both
-Andi Kleen and I talked about over a decade ago.  Martijn based his work
-on Andi's original patches and made them all work well, something that I
-was unable to do :)
+Thanks for the report and sorry for breaking things for you.  Just
+curious about more information to try to reproduce the issue to make
+sure I fix the issue correctly:
+* What compiler and compiler version are you using?
+* Are you setting any configs or enabling any warning CFLAGS to see this?
+* Do you see this warning for other `extern inline` functions? (It
+seems like the few other ones in the kernel are for non-x86 archs)
 
-His addition of using the build system to automatically generate a patch
-for a subsystem based on the symbol namespace changes is frickin
-amazing.
-
-Great work here, this is something that I have wanted for the kernel for
-a long time.
-
-greg k-h
+I would have guessed that extern inline functions with gnu_inline
+semantics (gnu89 behavior) should not have a previous declaration, but
+it probably doesn't hurt to add it.
+-- 
+Thanks,
+~Nick Desaulniers
