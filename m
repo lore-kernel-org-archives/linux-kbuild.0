@@ -1,71 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0153.hostedemail.com ([216.40.44.153]:33881 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727610AbeGPPv5 (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:60342 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727532AbeGPQB4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Jul 2018 11:51:57 -0400
-Message-ID: <1d36bef932de0612746088388df793de99d7c129.camel@perches.com>
-Subject: Re: [PATCH] checkpatch: if_changed: check for multiple calls in
- targets
-From: Joe Perches <joe@perches.com>
-Date: Mon, 16 Jul 2018 08:23:59 -0700
-In-Reply-To: <20180716123902.5337-1-dirk@gouders.net>
-References: <20180716123902.5337-1-dirk@gouders.net>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Mon, 16 Jul 2018 12:01:56 -0400
+Date: Mon, 16 Jul 2018 17:33:56 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 0/6] Symbol namespaces
+Message-ID: <20180716153356.GA8034@kroah.com>
+References: <20180716122125.175792-1-maco@android.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180716122125.175792-1-maco@android.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>, Andy Whitcroft <apw@canonical.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Martijn Coenen <maco@android.com>
+Cc: linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Alan Stern <stern@rowland.harvard.edu>, Oliver Neukum <oneukum@suse.com>, Arnd Bergmann <arnd@arndb.de>, Jessica Yu <jeyu@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, maco@google.com, sspatil@google.com, malchev@google.com, joelaf@google.com
 
-On Mon, 2018-07-16 at 14:39 +0200, Dirk Gouders wrote:
-> Because the kbuild function if_changed writes the command line to a
-> .cmd file for later tests, multiple calls of that function within a
-> target would result in overwrites of previous values and effectively
-> render the command line test meaningless, resulting in flip-flop
-> behaviour.
+On Mon, Jul 16, 2018 at 02:21:19PM +0200, Martijn Coenen wrote:
+> As of Linux 4.17, there are more than 30000 exported symbols
+> in the kernel. There seems to be some consensus amongst
+> kernel devs that the export surface is too large, and hard
+> to reason about.
 > 
-> Produce an error for targets with multiple calls to if_changed.
+> Generally, these symbols fall in one of these categories:
+> 1) Symbols actually meant for drivers
+> 2) Symbols that are only exported because functionality is
+>    split over multiple modules, yet they really shouldn't
+>    be used by modules outside of their own subsystem
+> 3) Symbols really only meant for in-tree use
+> 
+> When module developers try to upstream their code, it
+> regularly turns out that they are using exported symbols
+> that they really shouldn't be using. This problem is even
+> bigger for drivers that are currently out-of-tree, which
+> may be using many symbols that they shouldn't be using,
+> and that break when those symbols are removed or modified.
+> 
+> This patch allows subsystem maintainers to partition their
+> exported symbols into separate namespaces, and module
+> authors to import such namespaces only when needed.
+> 
+> This allows subsystem maintainers to more easily limit
+> availability of these namespaced symbols to other parts of
+> the kernel. It can also be used to partition the set of
+> exported symbols for documentation purposes; for example,
+> a set of symbols that is really only used for debugging
+> could be in a "SUBSYSTEM_DEBUG" namespace.
 
-Hi.  Some questions:
+To give people a bit more background here, this is something that both
+Andi Kleen and I talked about over a decade ago.  Martijn based his work
+on Andi's original patches and made them all work well, something that I
+was unable to do :)
 
-How is the existing use in arch/microblaze/boot/Makefile incorrect?
+His addition of using the build system to automatically generate a patch
+for a subsystem based on the symbol namespace changes is frickin
+amazing.
 
-$(obj)/simpleImage.%: vmlinux FORCE
-	$(call if_changed,cp,.unstrip)
-	$(call if_changed,objcopy)
-	$(call if_changed,uimage)
-	$(call if_changed,strip,.strip)
-	@echo 'Kernel: $(UIMAGE_OUT) is ready' ' (#'`cat .version`')'
+Great work here, this is something that I have wanted for the kernel for
+a long time.
 
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-[]
-> @@ -2911,6 +2911,14 @@ sub process {
->  			     "Use of $flag is deprecated, please use \`$replacement->{$flag} instead.\n" . $herecurr) if ($replacement->{$flag});
->  		}
->  i
-> +		# Check for multiple calls of if_changed within a target in Makefiles
-> +		if (($realfile =~ /Makefile.*/ || $realfile =~ /Kbuild.*/) &&
-
-Why is any Kbuild file check useful?
-
-> +		    ($prevline =~ /^[ +]\t\$\(call if_changed,/) &&
-> +		    ($line =~ /^[ +]\t\$\(call if_changed,/)) {
-
-What about if_changed_dep and if_changed_rule?
-
-> +				ERROR("MULTIPLE_IF_CHANGED",
-> +				      "Multiple calls of if_changed within a target.\n" . $herecurr);
-> +		}
-
-And some more style things:
-
-There are instances with multiple tabs so probably
-these should use '\t*' or '\s*' and not '\t'.
-
-This should probably not require a single space after
-if_changed so likely:
-
-	'call\s+if_changed'
-
+greg k-h
