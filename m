@@ -1,174 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:45159 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725932AbeGNHpW (ORCPT
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:42707 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728787AbeGPMsp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 14 Jul 2018 03:45:22 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [PATCH v3 05/12] kconfig: make syncconfig update .config regardless of sym_change_count
-In-Reply-To: <CAK7LNASN6_TM6a8ciVdgOH19d+CypMP+RQBnDsCSCtqub5co=g@mail.gmail.com>
-        (Masahiro Yamada's message of "Fri, 13 Jul 2018 23:57:17 +0900")
-References: <1530758389-30862-1-git-send-email-yamada.masahiro@socionext.com>
-        <1530758389-30862-6-git-send-email-yamada.masahiro@socionext.com>
-        <ghva9simch.fsf@lena.gouders.net> <ghbmbk0wbj.fsf@quad.gouders.net>
-        <ghwou4prif.fsf@lena.gouders.net>
-        <CAK7LNAT9WjCMVqtq1ivxOqNERVbnC5fQbzrPrGCfz0aAbk_DEQ@mail.gmail.com>
-        <gh36wo1ygh.fsf@lena.gouders.net>
-        <CAK7LNASN6_TM6a8ciVdgOH19d+CypMP+RQBnDsCSCtqub5co=g@mail.gmail.com>
-Date: Sat, 14 Jul 2018 09:12:03 +0200
-Message-ID: <ghefg6ffzw.fsf@lena.gouders.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        Mon, 16 Jul 2018 08:48:45 -0400
+Received: by mail-ed1-f66.google.com with SMTP id r4-v6so1394962edp.9
+        for <linux-kbuild@vger.kernel.org>; Mon, 16 Jul 2018 05:21:33 -0700 (PDT)
+From: Martijn Coenen <maco@android.com>
+Subject: [PATCH 0/6] Symbol namespaces
+Date: Mon, 16 Jul 2018 14:21:19 +0200
+Message-Id: <20180716122125.175792-1-maco@android.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, Michal Simek <monstr@monstr.eu>, "David S. Miller" <davem@davemloft.net>
+To: linux-kernel@vger.kernel.org
+Cc: Martijn Coenen <maco@android.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Alan Stern <stern@rowland.harvard.edu>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Oliver Neukum <oneukum@suse.com>, Arnd Bergmann <arnd@arndb.de>, Jessica Yu <jeyu@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, maco@google.com, sspatil@google.com, malchev@google.com, joelaf@google.com
 
-Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+As of Linux 4.17, there are more than 30000 exported symbols
+in the kernel. There seems to be some consensus amongst
+kernel devs that the export surface is too large, and hard
+to reason about.
 
-> 2018-07-12 20:32 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
->> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
->>
->>> 2018-07-09 20:39 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
->>>> Dirk Gouders <dirk@gouders.net> writes:
->>>>
->>>> I think, I solved the puzzle and perhaps, that saves others some time:
->>>>
->>>> The problem is that "if_changed" was not designed for multiple use
->>>> inside a recipe and in the case of compressed/vmlinux, the 2-fold use
->>>> created a kind of flip-flop for situations when nothing has to be done
->>>> to build the target.
->>>>
->>>> Because each of the two users of "if_changed" stores it's footprint in
->>>> .vmlinux.cmd but that file then isn't re-read, one of the two
->>>> "if_changed" calculates that nothing has to be done wheras the other one
->>>> recognizes a change in the commandline, because it sees the command-line
->>>> for the other part of the reciepe.
->>>>
->>>> In the next make, the roles flip, because the previously satisfied
->>>> "if_changed" now sees the command-line of the other one.  And so on...
->>>>
->>>> I am not a Kbuild expert but the attached patch fixes that problem by
->>>> introducing "if_changed_multi" that accepts two commands -- one whose
->>>> commandline should be checked and a second one that should be
->>>> executed.
->>>
->>>
->>> if_changed should not appear multiple times in one target.
->>>
->>> I think the simplest fix-up is to
->>> create a new command that combines
->>> 'cmd_check_data_rel' and 'cmd_ld'.
->>>
->>>
->>> quiet_cmd_link-vmlinux = LD      $@
->>>       cmd_link-vmlinux = $(cmd_check_data_rel); $(cmd_ld)
->>>
->>> $(obj)/vmlinux: $(vmlinux-objs-y) FORCE
->>>         $(call if_changed,link-vmlinux)
->>>
->>> Kbuild also supports if_changed_rule,
->>> but the usage is more complex.
->>>
->>> There are only a few usages:
->>> https://github.com/torvalds/linux/blob/v4.17/scripts/Makefile.build#L288
->>
->> Just for completeness I will copy in part of a reply from Kees that
->> shows how double-colon rules can also avoid multiple use of if_changed
->> for one target:
->>
->> -$(obj)/vmlinux: $(vmlinux-objs-y) FORCE
->> -       $(call if_changed,check_data_rel)
->> +$(obj)/vmlinux:: $(vmlinux-objs-y)
->> +       $(call cmd,check_data_rel)
->> +$(obj)/vmlinux:: $(vmlinux-objs-y) FORCE
->>         $(call if_changed,ld)
->
-> It is difficult to use double-colon rules in a _sane_ way.
->
-> The first one just checks data_rel,
-> but does not actually generate anything.
->
-> Such targets should be marked as .PHONY,
-> but $(obj)/vmlinux is not a phony target.
-> This is strange.
->
->> The combined command seems to have the advantage that every command to
->> build the target gets recorded in the .cmd file
->>
->> A search showed me that we have two more users that use if_changed more
->> than once for a single target:
->>
->>           arch/microblaze/boot/Makefile                 (fourfold)
->>           arch/sparc/boot/Makefile               (2 times twofold)
->>
->> The sparc case seems to apply to any of the two suggested fixes,
->
-> Neither is correct.
->
->
-> $(obj)/uImage: $(obj)/image.gz
->         $(call if_changed,uimage)
->         $(call if_changed,uimage.o)
->
->
-> should be split into two targets.
->
->
-> $(obj)/uImage: $(obj)/image.gz FORCE
->         $(call if_changed,uimage)
->
-> $(obj)/uImage.o: $(obj)/uImage FORCE
->         $(call if_changed,uimage.o)
->
->
-> It is wrong in multiple ways.  FORCE is missing too.
->
->  but
->> microblaze uses if_changed in a pattern rule and also makes use of
->> parameter arguments in the sub-commands:
->>
->> $(obj)/simpleImage.%: vmlinux FORCE
->>         $(call if_changed,cp,.unstrip)
->>         $(call if_changed,objcopy)
->>         $(call if_changed,uimage)
->>         $(call if_changed,strip,.strip)
->>         @echo 'Kernel: $(UIMAGE_OUT) is ready' ' (#'`cat .version`')'
->
->
-> Probably, this is the same.
->
-> Create a target for each step.
->
->
->> In this case, double colons would have a different meaning and the
->> combined command solution would result in a change of the sub-commands,
->> as well.  I note this in case Michal perhaps has other preferences.
->>
->>
->> In addition to extend the documentation, we could modify if_changed to
->> warn about it is being used more than once for a target:
->>
->> # Execute command if command has changed or prerequisite(s) are updated.
->> if_changed = $(if $(filter-out undefined,$(origin if_changed_$@)),           \
->>         @set -e;                                                             \
->>         echo "Warning: $@: multiple use of if_changed!" >&2; ,               \
->>         @set -e $(eval if_changed_$@ := 1) ; )                               \
->>         $(if $(strip $(any-prereq) $(arg-check)),                            \
->>         $(echo-cmd) $(cmd_$(1));                                             \
->>         printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, :)
->>
->> But this fires only if if_changed is actually called and it defines many
->> variables for just that purpose, so this is perhaps not what we want...
->>
->
-> I do not want to mess up Makefile.
->
->
-> Please do this check in scripts/checkpatch.pl
-> if you want.
+Generally, these symbols fall in one of these categories:
+1) Symbols actually meant for drivers
+2) Symbols that are only exported because functionality is
+   split over multiple modules, yet they really shouldn't
+   be used by modules outside of their own subsystem
+3) Symbols really only meant for in-tree use
 
-Thank you for spending your time in the detailed explanation.
-I will use it to assemble that all to a fix and then send it for review.
+When module developers try to upstream their code, it
+regularly turns out that they are using exported symbols
+that they really shouldn't be using. This problem is even
+bigger for drivers that are currently out-of-tree, which
+may be using many symbols that they shouldn't be using,
+and that break when those symbols are removed or modified.
 
-Dirk
+This patch allows subsystem maintainers to partition their
+exported symbols into separate namespaces, and module
+authors to import such namespaces only when needed.
+
+This allows subsystem maintainers to more easily limit
+availability of these namespaced symbols to other parts of
+the kernel. It can also be used to partition the set of
+exported symbols for documentation purposes; for example,
+a set of symbols that is really only used for debugging
+could be in a "SUBSYSTEM_DEBUG" namespace.
+
+Martijn Coenen (6):
+  export: explicitly align struct kernel_symbol.
+  module: add support for symbol namespaces.
+  modpost: add support for checking symbol namespaces.
+  modpost: add support for generating namespace dependencies.
+  scripts: Coccinelle script for namespace dependencies.
+  RFC: USB: storage: move symbols into USB_STORAGE namespace.
+
+ Makefile                            |  11 +++
+ arch/m68k/include/asm/export.h      |   1 -
+ arch/x86/include/asm/Kbuild         |   1 +
+ arch/x86/include/asm/export.h       |   5 --
+ drivers/usb/storage/alauda.c        |   1 +
+ drivers/usb/storage/cypress_atacb.c |   1 +
+ drivers/usb/storage/datafab.c       |   1 +
+ drivers/usb/storage/ene_ub6250.c    |   1 +
+ drivers/usb/storage/freecom.c       |   1 +
+ drivers/usb/storage/isd200.c        |   1 +
+ drivers/usb/storage/jumpshot.c      |   1 +
+ drivers/usb/storage/karma.c         |   1 +
+ drivers/usb/storage/onetouch.c      |   1 +
+ drivers/usb/storage/realtek_cr.c    |   1 +
+ drivers/usb/storage/sddr09.c        |   1 +
+ drivers/usb/storage/sddr55.c        |   1 +
+ drivers/usb/storage/shuttle_usbat.c |   1 +
+ drivers/usb/storage/uas.c           |   1 +
+ drivers/usb/storage/usb.c           |  20 ++---
+ include/asm-generic/export.h        |   2 +-
+ include/linux/export.h              |  84 ++++++++++++++-----
+ include/linux/module.h              |  13 +++
+ kernel/module.c                     |  79 ++++++++++++++++++
+ scripts/Makefile.modpost            |   4 +-
+ scripts/add_namespace.cocci         |  19 +++++
+ scripts/mod/modpost.c               | 120 ++++++++++++++++++++++++++--
+ scripts/mod/modpost.h               |   9 +++
+ scripts/nsdeps                      |  41 ++++++++++
+ 28 files changed, 379 insertions(+), 44 deletions(-)
+ delete mode 100644 arch/x86/include/asm/export.h
+ create mode 100644 scripts/add_namespace.cocci
+ create mode 100644 scripts/nsdeps
+
+-- 
+2.18.0.203.gfac676dfb9-goog
+
