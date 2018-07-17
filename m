@@ -1,114 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:43628 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727481AbeGQH07 (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:47224 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729679AbeGQKEc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Jul 2018 03:26:59 -0400
-Subject: Re: [PATCH 4/9] kconfig: include common Kconfig files from top-level
- Kconfig
-From: Randy Dunlap <rdunlap@infradead.org>
-References: <20180708152004.21679-1-hch@lst.de>
- <20180708152004.21679-5-hch@lst.de>
- <CAK7LNAT5dzU-SOvqwnDs=bn3WA1_fmDj2abETmoHUdUExVF+WA@mail.gmail.com>
- <e36e6b2c-0984-199e-8c19-3ec54b31c12e@infradead.org>
- <7d4e0925-3d6b-7698-1ef3-4c66500d8507@infradead.org>
- <f533eb02-479b-d6b2-82e3-27abb33e7ebd@infradead.org>
-Message-ID: <cfdf8aa2-8ea3-1a13-9e4e-697c19acb854@infradead.org>
-Date: Mon, 16 Jul 2018 23:55:52 -0700
+        Tue, 17 Jul 2018 06:04:32 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: Re: [PATCH] checkpatch: if_changed: check for multiple calls in targets
+In-Reply-To: <1d36bef932de0612746088388df793de99d7c129.camel@perches.com> (Joe
+        Perches's message of "Mon, 16 Jul 2018 08:23:59 -0700")
+References: <20180716123902.5337-1-dirk@gouders.net>
+        <1d36bef932de0612746088388df793de99d7c129.camel@perches.com>
+Date: Tue, 17 Jul 2018 11:32:36 +0200
+Message-ID: <ghy3eafbrf.fsf@lena.gouders.net>
 MIME-Version: 1.0
-In-Reply-To: <f533eb02-479b-d6b2-82e3-27abb33e7ebd@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Christoph Hellwig <hch@lst.de>
-Cc: Richard Weinberger <richard@nod.at>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-um@lists.infradead.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Joe Perches <joe@perches.com>
+Cc: Andy Whitcroft <apw@canonical.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 07/16/2018 11:44 PM, Randy Dunlap wrote:
-> On 07/16/2018 11:42 PM, Randy Dunlap wrote:
->> On 07/16/2018 11:33 PM, Randy Dunlap wrote:
->>> On 07/11/2018 05:21 AM, Masahiro Yamada wrote:
->>>> 2018-07-09 0:19 GMT+09:00 Christoph Hellwig <hch@lst.de>:
->>>>> Instead of duplicating the source statements in every architecture just
->>>>> do it once in the toplevel Kconfig file.
->>>>>
->>>>> Note that with this the inclusion of arch/$(SRCARCH/Kconfig moves out of
->>>>> the top-level Kconfig into arch/Kconfig so that don't violate ordering
->>>>> constraits while keeping a sensible menu structure.
->>>>>
->>>>> Signed-off-by: Christoph Hellwig <hch@lst.de>
->>>>
->>>>
->>>>> diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
->>>>> index dd4f3d3e644f..7ab7b148181b 100644
->>>>> --- a/arch/sh/Kconfig
->>>>> +++ b/arch/sh/Kconfig
->>>>> @@ -168,10 +168,6 @@ config PGTABLE_LEVELS
->>>>>         default 3 if X2TLB
->>>>>         default 2
->>>>>
->>>>> -source "init/Kconfig"
->>>>> -
->>>>> -source "kernel/Kconfig.freezer"
->>>>> -
->>>>>  menu "System type"
->>>>>
->>>>>  #
->>>>> @@ -553,8 +549,6 @@ endchoice
->>>>>
->>>>>  endif
->>>>>
->>>>> -source "arch/sh/mm/Kconfig"
->>>>
->>>>
->>>> I noticed at least sh is broken
->>>> because "arch/sh/mm/Kconfig" is no longer included by anyone.
->>>>
->>>> I am not doing further tests.
->>>>
->>>
->>> Hi,
->>>
->>> Thanks for noticing that.
->>>
->>> I have tested all $ARCH (except um) with "allmodconfig" and so far, arch/sh/
->>> is the only one that has a problem.
->>>
->>
->> Well, there are 3 $ARCH-es that have an arch/$ARCH/mm/Kconfig file:
->> arm, sh, and unicore32.
->>
->> We can either merge those into arch/$ARCH/Kconfig or we can source
->> arch/$ARCH/mm/Kconfig for all $ARCH (where most of these files will be
->> empty).
->>
->> Christoph, thoughts/ideas?
->>
-> 
-> The first option (merge into arch/$ARCH/Kconfig) is not a good option.
-> Some of these mm/Kconfig files are Large, so the second option is the only
-> one that makes sense to me.
-> 
+Joe Perches <joe@perches.com> writes:
 
-All that *should* be needed is to add
+> On Mon, 2018-07-16 at 14:39 +0200, Dirk Gouders wrote:
+>> Because the kbuild function if_changed writes the command line to a
+>> .cmd file for later tests, multiple calls of that function within a
+>> target would result in overwrites of previous values and effectively
+>> render the command line test meaningless, resulting in flip-flop
+>> behaviour.
+>> 
+>> Produce an error for targets with multiple calls to if_changed.
+>
+> Hi.  Some questions:
+>
+> How is the existing use in arch/microblaze/boot/Makefile incorrect?
+>
+> $(obj)/simpleImage.%: vmlinux FORCE
+> 	$(call if_changed,cp,.unstrip)
+> 	$(call if_changed,objcopy)
+> 	$(call if_changed,uimage)
+> 	$(call if_changed,strip,.strip)
+> 	@echo 'Kernel: $(UIMAGE_OUT) is ready' ' (#'`cat .version`')'
 
-source arch/sh/mm/Kconfig into arch/sh/Kconfig (as is done in arm and unicore32),
-but that causes lots of .config diffs (as seen by scripts/diffconfig).
+Hi Joe,
 
-and I can't work on this any more tonight.  :)
+thank you for the review.
 
+Perhaps I should have started the commit message with:
 
->>>> Please test *ALL* architectures.
->>>>
->>>> If possible, matrix tests (arch, config-target), where
->>>> arch = arm, arm64, ...
->>>> config-target = allyesconfig, allnoconfig, alldefconfig, ...
->>>>
->>>>
->>>> Note:
->>>> scripts/diffconf is helpful.
+"The kbuild function if_changed should not be called more than once for a
+target." and then the explanatory text.
 
+In case you are interested in the thread where Masahiro explained in detail the
+real issues with those Makefiles that made them use if_changed too often:
 
--- 
-~Randy
+https://marc.info/?l=linux-kernel&m=153149389303034&w=2
+
+>> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> []
+>> @@ -2911,6 +2911,14 @@ sub process {
+>>  			     "Use of $flag is deprecated, please use \`$replacement->{$flag} instead.\n" . $herecurr) if ($replacement->{$flag});
+>>  		}
+>>  i
+>> +		# Check for multiple calls of if_changed within a target in Makefiles
+>> +		if (($realfile =~ /Makefile.*/ || $realfile =~ /Kbuild.*/) &&
+>
+> Why is any Kbuild file check useful?
+
+Because Kbuild files are makefiles and if we want to check makefiles
+they are also meant.
+
+>> +		    ($prevline =~ /^[ +]\t\$\(call if_changed,/) &&
+>> +		    ($line =~ /^[ +]\t\$\(call if_changed,/)) {
+>
+> What about if_changed_dep and if_changed_rule?
+
+This patch tries to avoid just one single issue that actually showed
+up and caused irritation.
+
+>
+>> +				ERROR("MULTIPLE_IF_CHANGED",
+>> +				      "Multiple calls of if_changed within a target.\n" . $herecurr);
+>> +		}
+>
+> And some more style things:
+>
+> There are instances with multiple tabs so probably
+> these should use '\t*' or '\s*' and not '\t'.
+
+Oh yes, I missed that.
+I guess, you mean e.g. arch/x86/purgatory/Makefile:
+
+$(obj)/purgatory.ro: $(PURGATORY_OBJS) FORCE
+		$(call if_changed,ld)
+
+I did not check the log but it seems there was one commit that for some
+reason used \t\t for the recipes.
+
+Anyway, the first TAB is mandatory, because we want to check recipes,
+only.
+
+> This should probably not require a single space after
+> if_changed so likely:
+>
+> 	'call\s+if_changed'
+
+Treewide, I did not find a single call of if_changed that uses other than
+a single space but you are right, me might see variations.
+
+So, according to your remarks, I would change the pattern to:
+
+/^[ +]\t\s*\$\(call\s+if_changed,/
+
+Dirk
