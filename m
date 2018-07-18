@@ -1,66 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:31846 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725727AbeGRGEu (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:59934 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726233AbeGRHmx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Jul 2018 02:04:50 -0400
-Received: from mail-vk0-f46.google.com (mail-vk0-f46.google.com [209.85.213.46]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id w6I5Shwv002433
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Jul 2018 14:28:43 +0900
-Received: by mail-vk0-f46.google.com with SMTP id b14-v6so1834904vke.13
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Jul 2018 22:28:43 -0700 (PDT)
+        Wed, 18 Jul 2018 03:42:53 -0400
+Subject: Re: [PATCH 4/9] kconfig: include common Kconfig files from top-level
+ Kconfig
+References: <20180708152004.21679-1-hch@lst.de>
+ <20180708152004.21679-5-hch@lst.de>
+ <CAK7LNAT5dzU-SOvqwnDs=bn3WA1_fmDj2abETmoHUdUExVF+WA@mail.gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <17c45e87-d9be-8453-1bce-18753e0a68b9@infradead.org>
+Date: Wed, 18 Jul 2018 00:06:26 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180712221749.GL14131@decadent.org.uk>
-References: <20180712221619.GH14131@decadent.org.uk> <20180712221749.GL14131@decadent.org.uk>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 18 Jul 2018 14:28:02 +0900
-Message-ID: <CAK7LNAT+wv-re08J87_Q9My2dmjgqM1U4Onh65bKw-fdPR8GjQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/3] kbuild: Move final argument to modpost into $(cmd_modpost)
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNAT5dzU-SOvqwnDs=bn3WA1_fmDj2abETmoHUdUExVF+WA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Christoph Hellwig <hch@lst.de>
+Cc: Richard Weinberger <richard@nod.at>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-um@lists.infradead.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-07-13 7:17 GMT+09:00 Ben Hutchings <ben@decadent.org.uk>:
-> The following changes to the definition of $(cmd) will require that it
-> is given a complete command line, and no additional arguments can be
-> appended..
+On 07/11/2018 05:21 AM, Masahiro Yamada wrote:
+> 2018-07-09 0:19 GMT+09:00 Christoph Hellwig <hch@lst.de>:
+>> Instead of duplicating the source statements in every architecture just
+>> do it once in the toplevel Kconfig file.
+>>
+>> Note that with this the inclusion of arch/$(SRCARCH/Kconfig moves out of
+>> the top-level Kconfig into arch/Kconfig so that don't violate ordering
+>> constraits while keeping a sensible menu structure.
+>>
+>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> 
+> 
+>> diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
+>> index dd4f3d3e644f..7ab7b148181b 100644
+>> --- a/arch/sh/Kconfig
+>> +++ b/arch/sh/Kconfig
+>> @@ -168,10 +168,6 @@ config PGTABLE_LEVELS
+>>         default 3 if X2TLB
+>>         default 2
+>>
+>> -source "init/Kconfig"
+>> -
+>> -source "kernel/Kconfig.freezer"
+>> -
+>>  menu "System type"
+>>
+>>  #
+>> @@ -553,8 +549,6 @@ endchoice
+>>
+>>  endif
+>>
+>> -source "arch/sh/mm/Kconfig"
+> 
+> 
+> I noticed at least sh is broken
+> because "arch/sh/mm/Kconfig" is no longer included by anyone.
+> 
+> I am not doing further tests.
+> 
+> 
+> Please test *ALL* architectures.
+> 
+> If possible, matrix tests (arch, config-target), where
+> arch = arm, arm64, ...
+> config-target = allyesconfig, allnoconfig, alldefconfig, ...
+> 
+> 
+> Note:
+> scripts/diffconf is helpful.
 
-Nit:  is only one period enough?
 
+For defconfig:
 
-Otherwise, looks good to me.
-
-
-
-> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-> ---
->  scripts/Makefile.modpost | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> index df4174405feb..4e56df933b79 100644
-> --- a/scripts/Makefile.modpost
-> +++ b/scripts/Makefile.modpost
-> @@ -85,11 +85,11 @@ MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
->
->  # We can go over command line length here, so be careful.
->  quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
-> -      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) $(MODPOST_OPT) -s -T -
-> +      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) $(MODPOST_OPT) -s -T - $(wildcard vmlinux)
->
->  PHONY += __modpost
->  __modpost: $(modules:.ko=.o) FORCE
-> -       $(call cmd,modpost) $(wildcard vmlinux)
-> +       $(call cmd,modpost)
->
->  quiet_cmd_kernel-mod = MODPOST $@
->        cmd_kernel-mod = $(modpost) $@
->
+All $ARCH look equivalent except for microblaze and nios2.
+For those, the config SWAP in init/Kconfig (line 221) comes before (and
+hence takes precedence) over arch/$(SRCARCH)/Kconfig settings, which is
+def_bool n for both microblaze and nios2.
 
 
 
 -- 
-Best Regards
-Masahiro Yamada
+~Randy
