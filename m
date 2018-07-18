@@ -1,86 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:59934 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726233AbeGRHmx (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:33092 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730598AbeGRJxT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Jul 2018 03:42:53 -0400
-Subject: Re: [PATCH 4/9] kconfig: include common Kconfig files from top-level
- Kconfig
-References: <20180708152004.21679-1-hch@lst.de>
- <20180708152004.21679-5-hch@lst.de>
- <CAK7LNAT5dzU-SOvqwnDs=bn3WA1_fmDj2abETmoHUdUExVF+WA@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <17c45e87-d9be-8453-1bce-18753e0a68b9@infradead.org>
-Date: Wed, 18 Jul 2018 00:06:26 -0700
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNAT5dzU-SOvqwnDs=bn3WA1_fmDj2abETmoHUdUExVF+WA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Wed, 18 Jul 2018 05:53:19 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: [PATCH] kbuild: if_changed: document single use per target limitation
+Date: Wed, 18 Jul 2018 11:13:36 +0200
+Message-Id: <20180718091336.4540-1-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Christoph Hellwig <hch@lst.de>
-Cc: Richard Weinberger <richard@nod.at>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-um@lists.infradead.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Jonathan Corbet <corbet@lwn.net>
+Cc: Dirk Gouders <dirk@gouders.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 07/11/2018 05:21 AM, Masahiro Yamada wrote:
-> 2018-07-09 0:19 GMT+09:00 Christoph Hellwig <hch@lst.de>:
->> Instead of duplicating the source statements in every architecture just
->> do it once in the toplevel Kconfig file.
->>
->> Note that with this the inclusion of arch/$(SRCARCH/Kconfig moves out of
->> the top-level Kconfig into arch/Kconfig so that don't violate ordering
->> constraits while keeping a sensible menu structure.
->>
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> 
-> 
->> diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
->> index dd4f3d3e644f..7ab7b148181b 100644
->> --- a/arch/sh/Kconfig
->> +++ b/arch/sh/Kconfig
->> @@ -168,10 +168,6 @@ config PGTABLE_LEVELS
->>         default 3 if X2TLB
->>         default 2
->>
->> -source "init/Kconfig"
->> -
->> -source "kernel/Kconfig.freezer"
->> -
->>  menu "System type"
->>
->>  #
->> @@ -553,8 +549,6 @@ endchoice
->>
->>  endif
->>
->> -source "arch/sh/mm/Kconfig"
-> 
-> 
-> I noticed at least sh is broken
-> because "arch/sh/mm/Kconfig" is no longer included by anyone.
-> 
-> I am not doing further tests.
-> 
-> 
-> Please test *ALL* architectures.
-> 
-> If possible, matrix tests (arch, config-target), where
-> arch = arm, arm64, ...
-> config-target = allyesconfig, allnoconfig, alldefconfig, ...
-> 
-> 
-> Note:
-> scripts/diffconf is helpful.
+Users of if_changed could easily feel invited to use it to divide a
+recipe into parts like:
 
+a: prereq FORCE
+	$(call if_changed,do_a)
+	$(call if_changed,do_b)
 
-For defconfig:
+But this is problematic, because if_changed should not be used more
+than once per target: in the above example, if_changed stores the
+command-line of the given command in .a.cmd and when a is up-to-date
+with respect to prereq, the file .a.cmd contains the command-line for
+the last command executed, i.e. do_b.
 
-All $ARCH look equivalent except for microblaze and nios2.
-For those, the config SWAP in init/Kconfig (line 221) comes before (and
-hence takes precedence) over arch/$(SRCARCH)/Kconfig settings, which is
-def_bool n for both microblaze and nios2.
+When the recipe is then executed again, without any change of
+prerequisites, the command-line check for do_a will fail, do_a will be
+executed and stored in .a.cmd.  The next check, however, will still see
+the old content (the file isn't re-read) and if_changed will skip
+do_b, because the command-line test will not recognize a change.  On
+the next execution of the recipe the roles will flip: do_a is OK but
+do_b not and it will be executed.  And so on...
 
+Signed-off-by: Dirk Gouders <dirk@gouders.net>
+---
+ Documentation/kbuild/makefiles.txt | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 048fc39a6b91..01fae5a01ce7 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -1105,6 +1105,12 @@ When kbuild executes, the following steps are followed (roughly):
+ 		target: source(s) FORCE
+ 	#WRONG!#	$(call if_changed, ld/objcopy/gzip/...)
+ 
++        Note: if_changed should not be used more than once per target.
++              It stores the executed command in a corresponding .cmd
++        file and multiple calls would result in overwrites and
++        unwanted results when the target is up to date and only the
++        tests on changed commands trigger execution of commands.
++
+     ld
+ 	Link target. Often, LDFLAGS_$@ is used to set specific options to ld.
+ 
 -- 
-~Randy
+2.16.1
+
