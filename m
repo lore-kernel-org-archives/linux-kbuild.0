@@ -1,83 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:39151 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728304AbeGRXuG (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:30736 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728103AbeGRXzr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Jul 2018 19:50:06 -0400
+        Wed, 18 Jul 2018 19:55:47 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180713153033.20540-1-olof@lixom.net>
-References: <20180713150701.GA3049@arm.com> <20180713153033.20540-1-olof@lixom.net>
+In-Reply-To: <20180713162458.22154-1-olof@lixom.net>
+References: <20180713162458.22154-1-olof@lixom.net>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 19 Jul 2018 08:08:53 +0900
-Message-ID: <CAK7LNAQkL+8sFPiVsxaVF9ffyWFeezTzWFQCnJKTP1Y6-C0N8Q@mail.gmail.com>
-Subject: Re: [PATCH] arm64: build with baremetal linker target instead of
- Linux when available
+Date: Thu, 19 Jul 2018 08:14:42 +0900
+Message-ID: <CAK7LNAT-xU_YOw2ox8iZvguj8w6yVZmiG560rPxnVh2DyDjvCg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: buildtar: remove crufty vax pieces
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Olof Johansson <olof@lixom.net>
-Cc: Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Michal Marek <michal.lkml@markovi.net>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Paul Kocialkowski <contact@paulk.fr>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-07-14 0:30 GMT+09:00 Olof Johansson <olof@lixom.net>:
-> Not all toolchains have the baremetal elf targets, RedHat/Fedora ones
-> in particular. So, probe for whether it's available and use the previous
-> (linux) targets if it isn't.
+2018-07-14 1:24 GMT+09:00 Olof Johansson <olof@lixom.net>:
+> ARCH=vax isn't in mainline; it can be added back if/when it shows up.
 >
-> Reported-by: Laura Abbott <labbott@redhat.com>
-> Cc: Paul Kocialkowski <contact@paulk.fr>
 > Signed-off-by: Olof Johansson <olof@lixom.net>
 > ---
->  arch/arm64/Makefile    | 9 +++++----
->  scripts/Kbuild.include | 4 ++--
->  2 files changed, 7 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-> index e7101b19d590..efe61a2e4b5e 100644
-> --- a/arch/arm64/Makefile
-> +++ b/arch/arm64/Makefile
-> @@ -60,15 +60,16 @@ ifeq ($(CONFIG_CPU_BIG_ENDIAN), y)
->  KBUILD_CPPFLAGS        += -mbig-endian
->  CHECKFLAGS     += -D__AARCH64EB__
->  AS             += -EB
-> -# We must use the linux target here, since distributions don't tend to package
-> -# the ELF linker scripts with binutils, and this results in a build failure.
-> -LDFLAGS                += -EB -maarch64linuxb
-> +# Prefer the baremetal ELF build target, but not all toolchains include
-> +# it so fall back to the standard linux version if needed.
-> +LDFLAGS                += -EB $(call ld-option, -maarch64elfb, -maarch64linuxb)
->  UTS_MACHINE    := aarch64_be
->  else
->  KBUILD_CPPFLAGS        += -mlittle-endian
->  CHECKFLAGS     += -D__AARCH64EL__
->  AS             += -EL
-> -LDFLAGS                += -EL -maarch64linux # See comment above
-> +# Same as above, prefer ELF but fall back to linux target if needed.
-> +LDFLAGS                += -EL $(call ld-option, -maarch64elf, -maarch64linux)
->  UTS_MACHINE    := aarch64
->  endif
->
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index c8156d61678c..1e13f502b42f 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -163,8 +163,8 @@ cc-ldoption = $(call try-run,\
->         $(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
->
->  # ld-option
-> -# Usage: LDFLAGS += $(call ld-option, -X)
-> -ld-option = $(call try-run, $(LD) $(LDFLAGS) $(1) -v,$(1),$(2))
-> +# Usage: LDFLAGS += $(call ld-option, -X, -Y)
-> +ld-option = $(call try-run, $(LD) $(LDFLAGS) $(1) -v,$(1),$(2),$(3))
->
->  # ar-option
->  # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
+
+Applied to linux-kbuild. Thanks!
 
 
-I guess this patch will go through the arm64 tree.
+>  scripts/package/buildtar | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+> index e8cc72a51b32..55887ac84ee4 100755
+> --- a/scripts/package/buildtar
+> +++ b/scripts/package/buildtar
+> @@ -84,10 +84,6 @@ case "${ARCH}" in
+>                 [ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
+>                 [ -f "${objtree}/lifimage" ] && cp -v -- "${objtree}/lifimage" "${tmpdir}/boot/lifimage-${KERNELRELEASE}"
+>                 ;;
+> -       vax)
+> -               [ -f "${objtree}/vmlinux.SYS" ] && cp -v -- "${objtree}/vmlinux.SYS" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}.SYS"
+> -               [ -f "${objtree}/vmlinux.dsk" ] && cp -v -- "${objtree}/vmlinux.dsk" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}.dsk"
+> -               ;;
+>         mips)
+>                 if [ -f "${objtree}/arch/mips/boot/compressed/vmlinux.bin" ]; then
+>                         cp -v -- "${objtree}/arch/mips/boot/compressed/vmlinux.bin" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
+> --
+> 2.11.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I am fine with the change of scripts/Kbuild.include
 
-Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
 -- 
 Best Regards
