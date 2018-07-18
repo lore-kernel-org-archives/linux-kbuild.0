@@ -1,171 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:20322 "EHLO
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:23439 "EHLO
         conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731151AbeGRCWK (ORCPT
+        with ESMTP id S1725958AbeGRGDL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Jul 2018 22:22:10 -0400
+        Wed, 18 Jul 2018 02:03:11 -0400
+Received: from mail-ua0-f172.google.com (mail-ua0-f172.google.com [209.85.217.172]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id w6I5R0Pv029425
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Jul 2018 14:27:01 +0900
+Received: by mail-ua0-f172.google.com with SMTP id r10-v6so2178907uao.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Jul 2018 22:27:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180622172212.199633-2-namit@vmware.com>
-References: <20180622172212.199633-1-namit@vmware.com> <20180622172212.199633-2-namit@vmware.com>
+In-Reply-To: <20180712221730.GK14131@decadent.org.uk>
+References: <20180712221619.GH14131@decadent.org.uk> <20180712221730.GK14131@decadent.org.uk>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 18 Jul 2018 10:46:00 +0900
-Message-ID: <CAK7LNASaZd9fupgu4vxc6+tnCnNMdrCi7LTwS56K1LaKODoCtA@mail.gmail.com>
-Subject: Re: [PATCH v6 1/9] Makefile: Prepare for using macros for inline asm
+Date: Wed, 18 Jul 2018 14:26:19 +0900
+Message-ID: <CAK7LNAR6qiZ1hZr-Qu1o8Ks5Sr1ejs2Wv--1zLrh9fyot7KnXQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 3/3] kbuild: In quiet mode, print the full command
+ line if it fails
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nadav Amit <namit@vmware.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-06-23 2:22 GMT+09:00 Nadav Amit <namit@vmware.com>:
-> Using macros for inline assembly improves both readability and
-> compilation decisions that are distorted by big assembly blocks that use
-> alternative sections. Compile macros.S and use it to assemble all C
-> files. Currently, only x86 will use it.
+2018-07-13 7:17 GMT+09:00 Ben Hutchings <ben@decadent.org.uk>:
+> In the $(run-cmd) macro, add a trap on EXIT that prints the
+> full command line.  Remove the trap after running the command(s)
+> successfully.
 >
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: x86@kernel.org
-> Cc: linux-kbuild@vger.kernel.org
-> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> Signed-off-by: Nadav Amit <namit@vmware.com>
+> (A more straightforward approach would be to use "if" or "||" to test
+> for failure, but that doesn't work.  Some command lines given to
+> $(run-cmd) have multiple commands separated by semi-colons, and the
+> caller must run "set -e" to enable exit-on-error.  Testing the result
+> of such a command line, even if it is probably grouped and run in a
+> sub-shell, inhibits exit-on-error and would cause some errors to be
+> ignored.)
+>
+> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+OK, this seems useful to me.
+
+
 > ---
-
-
-
-Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-
-
-
-
->  Makefile                 |  9 +++++++--
->  arch/x86/Makefile        | 11 +++++++++--
->  arch/x86/kernel/macros.S |  7 +++++++
->  scripts/Kbuild.include   |  4 +++-
->  scripts/mod/Makefile     |  2 ++
->  5 files changed, 28 insertions(+), 5 deletions(-)
->  create mode 100644 arch/x86/kernel/macros.S
+>  scripts/Kbuild.include | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 >
-> diff --git a/Makefile b/Makefile
-> index ca2af1ab91eb..66c1da72c156 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1056,7 +1056,7 @@ scripts: scripts_basic include/config/auto.conf include/config/tristate.conf \
->  # version.h and scripts_basic is processed / created.
->
->  # Listed in dependency order
-> -PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
-> +PHONY += prepare archprepare macroprepare prepare0 prepare1 prepare2 prepare3
->
->  # prepare3 is used to check if we are building in a separate output directory,
->  # and if so do:
-> @@ -1080,7 +1080,9 @@ prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h \
->                     include/config/auto.conf
->         $(cmd_crmodverdir)
->
-> -archprepare: archheaders archscripts prepare1 scripts_basic
-> +macroprepare: prepare1 archmacros
-> +
-> +archprepare: archheaders archscripts macroprepare scripts_basic
->
->  prepare0: archprepare gcc-plugins
->         $(Q)$(MAKE) $(build)=.
-> @@ -1148,6 +1150,9 @@ archheaders:
->  PHONY += archscripts
->  archscripts:
->
-> +PHONY += archmacros
-> +archmacros:
-> +
->  PHONY += __headers
->  __headers: $(version_h) scripts_basic uapi-asm-generic archheaders archscripts
->         $(Q)$(MAKE) $(build)=scripts build_unifdef
-> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-> index f0a6ea22429d..363c3d8ed964 100644
-> --- a/arch/x86/Makefile
-> +++ b/arch/x86/Makefile
-> @@ -235,8 +235,8 @@ ifdef CONFIG_X86_64
->  LDFLAGS += $(call ld-option, -z max-page-size=0x200000)
->  endif
->
-> -# Speed up the build
-> -KBUILD_CFLAGS += -pipe
-> +# We cannot use -pipe flag since we give an additional .s file to the compiler
-> +#KBUILD_CFLAGS += -pipe
->  # Workaround for a gcc prelease that unfortunately was shipped in a suse release
->  KBUILD_CFLAGS += -Wno-sign-compare
->  #
-> @@ -258,11 +258,18 @@ archscripts: scripts_basic
->  archheaders:
->         $(Q)$(MAKE) $(build)=arch/x86/entry/syscalls all
->
-> +archmacros:
-> +       $(Q)$(MAKE) $(build)=arch/x86/kernel arch/x86/kernel/macros.s
-> +
->  archprepare:
->  ifeq ($(CONFIG_KEXEC_FILE),y)
->         $(Q)$(MAKE) $(build)=arch/x86/purgatory arch/x86/purgatory/kexec-purgatory.c
->  endif
->
-> +ASM_MACRO_FLAGS = -Wa,arch/x86/kernel/macros.s
-> +export ASM_MACRO_FLAGS
-> +KBUILD_CFLAGS += $(ASM_MACRO_FLAGS)
-> +
->  ###
->  # Kernel objects
->
-> diff --git a/arch/x86/kernel/macros.S b/arch/x86/kernel/macros.S
-> new file mode 100644
-> index 000000000000..cfc1c7d1a6eb
-> --- /dev/null
-> +++ b/arch/x86/kernel/macros.S
-> @@ -0,0 +1,7 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +/*
-> + * This file includes headers whose assembly part includes macros which are
-> + * commonly used. The macros are precompiled into assmebly file which is later
-> + * assembled together with each compiled file.
-> + */
 > diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index c8156d61678c..8eeb5636a2a7 100644
+> index 8778ae4a3476..c2525aaa36ac 100644
 > --- a/scripts/Kbuild.include
 > +++ b/scripts/Kbuild.include
-> @@ -115,7 +115,9 @@ __cc-option = $(call try-run,\
+> @@ -224,7 +224,10 @@ flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
+>  echo-cmd = $(if $($(quiet)cmd_$(1)),\
+>         echo '  $(call escsq,$($(quiet)cmd_$(1)))$(echo-why)';)
 >
->  # Do not attempt to build with gcc plugins during cc-option tests.
->  # (And this uses delayed resolution so the flags will be up to date.)
-> -CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
-> +# In addition, do not include the asm macros which are built later.
-> +CC_OPTION_FILTERED = $(GCC_PLUGINS_CFLAGS) $(ASM_MACRO_FLAGS)
-> +CC_OPTION_CFLAGS = $(filter-out $(CC_OPTION_FILTERED),$(KBUILD_CFLAGS))
->
->  # cc-option
->  # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
-> diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
-> index 42c5d50f2bcc..a5b4af47987a 100644
-> --- a/scripts/mod/Makefile
-> +++ b/scripts/mod/Makefile
-> @@ -4,6 +4,8 @@ OBJECT_FILES_NON_STANDARD := y
->  hostprogs-y    := modpost mk_elfconfig
->  always         := $(hostprogs-y) empty.o
->
-> +CFLAGS_REMOVE_empty.o := $(ASM_MACRO_FLAGS)
+> -run-cmd = $(echo-cmd) $(cmd_$(1))
+> +trap-cmd-failed = trap 'test $$? = 0 || echo Failed command: '\''$(call escsq,$(call escsq,$(cmd_$(1))))'\' EXIT
+> +untrap-cmd-failed = trap - EXIT
+
+
+Why $(call escsq,...) twice?
+
+
+I think
+... echo Failed command: '\''$(call escsq,$(cmd_$(1)))'\' EXIT
+is enough.
+
+
+
+I see another problem for this.
+Make cannot detect the failure of $(call cmd,...)
+
+
+
+--------------(sample code)---------------
+
+extra-y := foo.txt
+
+quiet_cmd_always_fail = FAIL    $@
+      cmd_always_fail = /bin/false
+
+$(obj)/foo.txt:
+        $(call cmd,always_fail)
+
+------------(sample code end)-------------
+
+
+
+This should terminate the build.
+
+
+With your series, this always succeeds
+because it returns the exit code of 'trap - EXIT', which is 0.
+
+
+Maybe,
+$(cmd_$(1)) && $(untrap-cmd-failed)
+?
+
+
+
+
+
+
+
 > +
->  modpost-objs   := modpost.o file2alias.o sumversion.o
+> +run-cmd = $(echo-cmd) $(if $(cmd_$(1)), $(if $(quiet), $(trap-cmd-failed); $(cmd_$(1)); $(untrap-cmd-failed), $(cmd_$(1))))
 >
->  devicetable-offsets-file := devicetable-offsets.h
-> --
-> 2.17.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  # printing commands
+>  cmd = @$(run-cmd)
 
 
 
