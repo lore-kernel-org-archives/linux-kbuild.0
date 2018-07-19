@@ -1,102 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:38506 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729209AbeGSA6w (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:37910 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725951AbeGSG17 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Jul 2018 20:58:52 -0400
-Received: by mail-it0-f65.google.com with SMTP id v71-v6so6902230itb.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Jul 2018 17:18:30 -0700 (PDT)
+        Thu, 19 Jul 2018 02:27:59 -0400
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] kbuild: fix typos in description of "choice" in
+ kconfig-language.txt
+Message-ID: <ff6eeb9d-a7de-0bc3-05ef-53bb1286347f@infradead.org>
+Date: Wed, 18 Jul 2018 22:46:36 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180713153033.20540-1-olof@lixom.net>
-References: <20180713150701.GA3049@arm.com> <20180713153033.20540-1-olof@lixom.net>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Thu, 19 Jul 2018 09:18:29 +0900
-Message-ID: <CAKv+Gu_TkTj5sD-FjTF=GQnNvSVNF37gCpQHxJAHy0+n=SmUbA@mail.gmail.com>
-Subject: Re: [PATCH] arm64: build with baremetal linker target instead of
- Linux when available
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>, Andrew Pinski <apinski@cavium.com>, Yury Norov <ynorov@caviumnetworks.com>
-Cc: Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Paul Kocialkowski <contact@paulk.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 14 July 2018 at 00:30, Olof Johansson <olof@lixom.net> wrote:
-> Not all toolchains have the baremetal elf targets, RedHat/Fedora ones
-> in particular. So, probe for whether it's available and use the previous
-> (linux) targets if it isn't.
->
-> Reported-by: Laura Abbott <labbott@redhat.com>
-> Cc: Paul Kocialkowski <contact@paulk.fr>
-> Signed-off-by: Olof Johansson <olof@lixom.net>
-> ---
->  arch/arm64/Makefile    | 9 +++++----
->  scripts/Kbuild.include | 4 ++--
->  2 files changed, 7 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-> index e7101b19d590..efe61a2e4b5e 100644
-> --- a/arch/arm64/Makefile
-> +++ b/arch/arm64/Makefile
-> @@ -60,15 +60,16 @@ ifeq ($(CONFIG_CPU_BIG_ENDIAN), y)
->  KBUILD_CPPFLAGS        += -mbig-endian
->  CHECKFLAGS     += -D__AARCH64EB__
->  AS             += -EB
-> -# We must use the linux target here, since distributions don't tend to package
-> -# the ELF linker scripts with binutils, and this results in a build failure.
-> -LDFLAGS                += -EB -maarch64linuxb
-> +# Prefer the baremetal ELF build target, but not all toolchains include
-> +# it so fall back to the standard linux version if needed.
-> +LDFLAGS                += -EB $(call ld-option, -maarch64elfb, -maarch64linuxb)
->  UTS_MACHINE    := aarch64_be
->  else
->  KBUILD_CPPFLAGS        += -mlittle-endian
->  CHECKFLAGS     += -D__AARCH64EL__
->  AS             += -EL
-> -LDFLAGS                += -EL -maarch64linux # See comment above
-> +# Same as above, prefer ELF but fall back to linux target if needed.
-> +LDFLAGS                += -EL $(call ld-option, -maarch64elf, -maarch64linux)
->  UTS_MACHINE    := aarch64
->  endif
->
+From: Randy Dunlap <rdunlap@infradead.org>
 
-Did anyone check if just removing these options altogether would be an option?
+Fix a couple of punctuation "typos" in the description of the
+"choice" keyword.
 
-The commit that introduced them does not even mention them, but only
-mentions adding -mabi=lp64 to the cc/as flags:
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+ Documentation/kbuild/kconfig-language.txt |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-commit 3d6a7b99e3fa29b92d6288487e057e0a596bd2b0
-Author: Andrew Pinski <apinski@cavium.com>
-Date:   Mon Sep 18 11:20:20 2017 +0100
-
-    arm64: ensure the kernel is compiled for LP64
-
-    The kernel needs to be compiled as a LP64 binary for ARM64, even when
-    using a compiler that defaults to code-generation for the ILP32 ABI.
-    Consequently, we need to explicitly pass '-mabi=lp64' (supported on
-    gcc-4.9 and newer).
+--- linux-next-20180717.orig/Documentation/kbuild/kconfig-language.txt
++++ linux-next-20180717/Documentation/kbuild/kconfig-language.txt
+@@ -370,7 +370,7 @@ choices:
+ 
+ This defines a choice group and accepts any of the above attributes as
+ options. A choice can only be of type bool or tristate.  If no type is
+-specified for a choice, it's type will be determined by the type of
++specified for a choice, its type will be determined by the type of
+ the first choice element in the group or remain unknown if none of the
+ choice elements have a type specified, as well.
+ 
+@@ -384,7 +384,7 @@ A choice accepts another option "optiona
+ choice to 'n' and no entry needs to be selected.
+ If no [symbol] is associated with a choice, then you can not have multiple
+ definitions of that choice. If a [symbol] is associated to the choice,
+-then you may define the same choice (ie. with the same entries) in another
++then you may define the same choice (i.e. with the same entries) in another
+ place.
+ 
+ comment:
 
 
-
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index c8156d61678c..1e13f502b42f 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -163,8 +163,8 @@ cc-ldoption = $(call try-run,\
->         $(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
->
->  # ld-option
-> -# Usage: LDFLAGS += $(call ld-option, -X)
-> -ld-option = $(call try-run, $(LD) $(LDFLAGS) $(1) -v,$(1),$(2))
-> +# Usage: LDFLAGS += $(call ld-option, -X, -Y)
-> +ld-option = $(call try-run, $(LD) $(LDFLAGS) $(1) -v,$(1),$(2),$(3))
->
->  # ar-option
->  # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
-> --
-> 2.11.0
->
->
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
