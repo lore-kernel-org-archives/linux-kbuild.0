@@ -1,53 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:22961 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728304AbeGSAWM (ORCPT
+Received: from mail-it0-f65.google.com ([209.85.214.65]:38506 "EHLO
+        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729209AbeGSA6w (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Jul 2018 20:22:12 -0400
+        Wed, 18 Jul 2018 20:58:52 -0400
+Received: by mail-it0-f65.google.com with SMTP id v71-v6so6902230itb.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Jul 2018 17:18:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180712140539.4b5xdraq34i5dbii@kshutemo-mobl1>
-References: <1531382496-3719-1-git-send-email-yamada.masahiro@socionext.com> <20180712140539.4b5xdraq34i5dbii@kshutemo-mobl1>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 19 Jul 2018 08:41:04 +0900
-Message-ID: <CAK7LNAThEpLsFgD_pv4ZgLWfbXcNPBiPEU7qZ5ah_R=x8LQA0w@mail.gmail.com>
-Subject: Re: [PATCH 0/6] kbuild: clean-up and rename LDFLAGS to KBUILD_LDFLAGS
+In-Reply-To: <20180713153033.20540-1-olof@lixom.net>
+References: <20180713150701.GA3049@arm.com> <20180713153033.20540-1-olof@lixom.net>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Thu, 19 Jul 2018 09:18:29 +0900
+Message-ID: <CAKv+Gu_TkTj5sD-FjTF=GQnNvSVNF37gCpQHxJAHy0+n=SmUbA@mail.gmail.com>
+Subject: Re: [PATCH] arm64: build with baremetal linker target instead of
+ Linux when available
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Richard Weinberger <richard@nod.at>, X86 ML <x86@kernel.org>, linux-um@lists.infradead.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Russell King <rmk+kernel@armlinux.org.uk>, openrisc@lists.librecores.org, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-riscv@lists.infradead.org, Jeff Dike <jdike@addtoit.com>
+To: Olof Johansson <olof@lixom.net>, Andrew Pinski <apinski@cavium.com>, Yury Norov <ynorov@caviumnetworks.com>
+Cc: Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Paul Kocialkowski <contact@paulk.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 
-2018-07-12 23:05 GMT+09:00 Kirill A. Shutemov <kirill@shutemov.name>:
-> On Thu, Jul 12, 2018 at 05:01:30PM +0900, Masahiro Yamada wrote:
->>
->> This series renames LDFLAGS to KBUILD_LDFLAGS
->> after some Makefile cleanups.
->>
->> Currently, the last patch does not apply to Linus' tree
->> due to missing pre-requisite patches.
->>
->> I will resolve conflicts as needed.
->>
->>
->>
->> Masahiro Yamada (6):
->>   um: remove redundant 'export LDFLAGS' in arch/x86/Makefile.um
->>   ARM: vfp: clean-up arch/arm/vfp/Makefile
->>   kbuild: remove redundant LDFLAGS clearing in arch/*/Makefile
->>   kbuild: replace $(LDFLAGS) $(ldflags-y) with $(ld_flags)
->>   kbuild: change ld_flags to contain LDFLAGS_$(@F)
->>   kbuild: rename LDFLAGS to KBUILD_LDFLAGS
+On 14 July 2018 at 00:30, Olof Johansson <olof@lixom.net> wrote:
+> Not all toolchains have the baremetal elf targets, RedHat/Fedora ones
+> in particular. So, probe for whether it's available and use the previous
+> (linux) targets if it isn't.
 >
-> Thanks! Looks sane to me
+> Reported-by: Laura Abbott <labbott@redhat.com>
+> Cc: Paul Kocialkowski <contact@paulk.fr>
+> Signed-off-by: Olof Johansson <olof@lixom.net>
+> ---
+>  arch/arm64/Makefile    | 9 +++++----
+>  scripts/Kbuild.include | 4 ++--
+>  2 files changed, 7 insertions(+), 6 deletions(-)
 >
-> Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+> index e7101b19d590..efe61a2e4b5e 100644
+> --- a/arch/arm64/Makefile
+> +++ b/arch/arm64/Makefile
+> @@ -60,15 +60,16 @@ ifeq ($(CONFIG_CPU_BIG_ENDIAN), y)
+>  KBUILD_CPPFLAGS        += -mbig-endian
+>  CHECKFLAGS     += -D__AARCH64EB__
+>  AS             += -EB
+> -# We must use the linux target here, since distributions don't tend to package
+> -# the ELF linker scripts with binutils, and this results in a build failure.
+> -LDFLAGS                += -EB -maarch64linuxb
+> +# Prefer the baremetal ELF build target, but not all toolchains include
+> +# it so fall back to the standard linux version if needed.
+> +LDFLAGS                += -EB $(call ld-option, -maarch64elfb, -maarch64linuxb)
+>  UTS_MACHINE    := aarch64_be
+>  else
+>  KBUILD_CPPFLAGS        += -mlittle-endian
+>  CHECKFLAGS     += -D__AARCH64EL__
+>  AS             += -EL
+> -LDFLAGS                += -EL -maarch64linux # See comment above
+> +# Same as above, prefer ELF but fall back to linux target if needed.
+> +LDFLAGS                += -EL $(call ld-option, -maarch64elf, -maarch64linux)
+>  UTS_MACHINE    := aarch64
+>  endif
 >
 
+Did anyone check if just removing these options altogether would be an option?
 
-Patch 1, 3, 4, 5 applied to linux-kbuild.
+The commit that introduced them does not even mention them, but only
+mentions adding -mabi=lp64 to the cc/as flags:
+
+commit 3d6a7b99e3fa29b92d6288487e057e0a596bd2b0
+Author: Andrew Pinski <apinski@cavium.com>
+Date:   Mon Sep 18 11:20:20 2017 +0100
+
+    arm64: ensure the kernel is compiled for LP64
+
+    The kernel needs to be compiled as a LP64 binary for ARM64, even when
+    using a compiler that defaults to code-generation for the ILP32 ABI.
+    Consequently, we need to explicitly pass '-mabi=lp64' (supported on
+    gcc-4.9 and newer).
 
 
 
--- 
-Best Regards
-Masahiro Yamada
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index c8156d61678c..1e13f502b42f 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -163,8 +163,8 @@ cc-ldoption = $(call try-run,\
+>         $(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+>
+>  # ld-option
+> -# Usage: LDFLAGS += $(call ld-option, -X)
+> -ld-option = $(call try-run, $(LD) $(LDFLAGS) $(1) -v,$(1),$(2))
+> +# Usage: LDFLAGS += $(call ld-option, -X, -Y)
+> +ld-option = $(call try-run, $(LD) $(LDFLAGS) $(1) -v,$(1),$(2),$(3))
+>
+>  # ar-option
+>  # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
+> --
+> 2.11.0
+>
+>
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
