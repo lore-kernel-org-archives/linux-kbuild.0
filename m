@@ -1,42 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:39561 "EHLO gate.crashing.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731583AbeGTQeQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Jul 2018 12:34:16 -0400
-Date: Fri, 20 Jul 2018 10:44:49 -0500
-From: Segher Boessenkool <segher@kernel.crashing.org>
-Subject: Re: [PATCH v2] checkpatch: kbuild: if_changed: check for multiple calls in targets
-Message-ID: <20180720154449.GC16221@gate.crashing.org>
-References: <ghy3eafbrf.fsf@lena.gouders.net> <20180720074804.4160-1-dirk@gouders.net> <01cfa83d2e29667d311d679c904b1648cd35c614.camel@perches.com> <20180720152150.GB16221@gate.crashing.org> <4977e9adba5e826d5e7e9f503e3ce8fbaa872af5.camel@perches.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4977e9adba5e826d5e7e9f503e3ce8fbaa872af5.camel@perches.com>
+Received: from mail-qt0-f171.google.com ([209.85.216.171]:43180 "EHLO
+        mail-qt0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388006AbeGTUZ1 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 20 Jul 2018 16:25:27 -0400
+Received: by mail-qt0-f171.google.com with SMTP id f18-v6so11267592qtp.10
+        for <linux-kbuild@vger.kernel.org>; Fri, 20 Jul 2018 12:35:45 -0700 (PDT)
+From: Jeremy Cline <jcline@redhat.com>
+Subject: [PATCH] scripts: Add Python 3 support to tracing/draw_functrace.py
+Date: Fri, 20 Jul 2018 15:35:28 -0400
+Message-Id: <20180720193528.1341-1-jcline@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Dirk Gouders <dirk@gouders.net>, Andy Whitcroft <apw@canonical.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: Frederic Weisbecker <fweisbec@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jeremy Cline <jcline@redhat.com>
 
-On Fri, Jul 20, 2018 at 08:33:56AM -0700, Joe Perches wrote:
-> On Fri, 2018-07-20 at 10:21 -0500, Segher Boessenkool wrote:
-> > On Fri, Jul 20, 2018 at 03:06:37AM -0700, Joe Perches wrote:
-> > > On Fri, 2018-07-20 at 09:48 +0200, Dirk Gouders wrote:
-> > > > +		# Check for multiple calls of if_changed within a target in Makefiles
-> > > > +		if (($realfile =~ /Makefile.*/ || $realfile =~ /Kbuild.*/) &&
-> > > 
-> > > The uses of .* here are superfluous.
-> > 
-> > And it looks like you wanted to match this only at the beginning of the
-> > string, which would be /^Makefile/ etc.
-> 
-> Nope.
-> 
-> $realfile includes path and /^Makefile/ matches only the
-> top level Makefile and none of the ones in subdirectories.
+Use the print function. This maintains Python 2 support and should have
+no functional change.
 
-Then the .* is more mysterious :-)
+Signed-off-by: Jeremy Cline <jcline@redhat.com>
+---
+ scripts/tracing/draw_functrace.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-(Maybe the script should use File::Basename).
+diff --git a/scripts/tracing/draw_functrace.py b/scripts/tracing/draw_functrace.py
+index db40fa04cd51..7d44e796d362 100755
+--- a/scripts/tracing/draw_functrace.py
++++ b/scripts/tracing/draw_functrace.py
+@@ -20,6 +20,7 @@ Usage:
+ 	$ scripts/draw_functrace.py < raw_trace_func > draw_functrace
+ 	Then you have your drawn trace in draw_functrace
+ """
++from __future__ import print_function
+ 
+ 
+ import sys, re
+@@ -123,7 +124,7 @@ def main():
+ 		tree = tree.getParent(caller)
+ 		tree = tree.calls(callee, calltime)
+ 
+-	print CallTree.ROOT
++	print(CallTree.ROOT)
+ 
+ if __name__ == "__main__":
+ 	main()
+-- 
+2.17.1
 
-
-Segher
