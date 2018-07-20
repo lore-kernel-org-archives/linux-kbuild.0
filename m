@@ -1,123 +1,148 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:28745 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:28749 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727205AbeGTIfJ (ORCPT
+        with ESMTP id S1727749AbeGTIfI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Jul 2018 04:35:09 -0400
+        Fri, 20 Jul 2018 04:35:08 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 05/11] kconfig: make syncconfig update .config regardless of sym_change_count
-Date: Fri, 20 Jul 2018 16:46:30 +0900
-Message-Id: <1532072796-7947-6-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 09/11] kbuild: do not update config when running install targets
+Date: Fri, 20 Jul 2018 16:46:34 +0900
+Message-Id: <1532072796-7947-10-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1532072796-7947-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1532072796-7947-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+Cc: Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-syncconfig updates the .config only when sym_change_count > 0, i.e.
-any change in config symbols has been detected.
+"make syncconfig" is automatically invoked when any of the following
+happens:
 
-Not only symbols but also comments are contained in the .config file.
-If only comments are updated, they are not fed back to the .config,
-then the stale comments are left-over.  Of course, this is just a
-matter of comments, but why not fix it.
+ - .config is updated
+ - any of Kconfig files is updated
+ - any of environment variables referenced in Kconfig is changed
 
-I see some scenarios where this happens.
+Then, it updates configuration files such as include/config/auto.conf
+include/generated/autoconf.h, etc.
 
-Scenario A:
+Even install targets (install, modules_install, etc.) are no exception.
+However, they should never ever modify the source tree.  Install
+targets are often run with root privileges.  Once those configuration
+files are owned by root, "make mrproper" would end up with permission
+error.
 
- 1. You have a source tree that has already been configured.
+Install targets should just copy things blindly.  They should not care
+whether the configuration is up-to-date or not.  This makes more sense
+because we are interested in the configuration that was used in the
+previous kernel building.
 
- 2. Linus increments the version number in the top-level Makefile
-    (i.e. he commits a new release)
+This issue has existed since before, but rarely happened.  I expect
+more chance where people are hit by this; with the new Kconfig syntax
+extension, the .config now contains the compiler information.  If you
+cross-compile the kernel with CROSS_COMPILE, but forget to pass it
+for "make install", you meet "any of environment variables referenced
+in Kconfig is changed" because $(CC) is referenced in Kconfig.
+Another scenario is the compiler upgrade before the installation.
 
- 3. You pull it, and run 'make'
+Install targets need the configuration.  "make modules_install" refer
+to CONFIG_MODULES etc.  "make dtbs_install" also needs CONFIG_ARCH_*
+to decide which dtb files to install.  However, the auto-update of
+the configuration files should be avoided.  We already do this for
+external modules.
 
- 4. syncconfig is invoked because the environment variable,
-    KERNELVERSION is updated, but the .config is not updated since
-    no config symbol is changed.
+Now, Make targets are categorized into 3 groups:
 
- 5. The .config file contains a kernel version in the top line:
+[1] Do not need the kernel configuration at all
 
-    # Automatically generated file; DO NOT EDIT.
-    # Linux/arm64 4.18.0-rc2 Kernel Configuration
+    help, coccicheck, headers_install etc.
 
-    ... which points to a previous version.
+[2] Need the latest kernel configuration
 
-Scenario B:
+    If new config options are added, Kconfig will show prompt to
+    ask user's selection.
 
- 1. You have a source tree that has already been configured.
+    Build targets such as vmlinux, in-kernel modules are the cases.
 
- 2. You upgrade the compiler, but it still has the same version number.
-    This may happen if you regularly build the latest compiler from
-    the source code.
+[3] Need the kernel configuration, but do not want to update it
 
- 3. You run 'make'
-
- 4. syncconfig is invoked because the environment variable,
-    CC_VERSION_TEXT is updated, but the .config is not updated since
-    no config symbol is changed.
-
- 5. The .config file contains the version string of the compiler:
-
-    #
-    # Compiler: aarch64-linux-gcc (GCC) 9.0.0 20180628 (experimental)
-    #
-
-    ... which carries the information of the old compiler.
-
-If KCONFIG_NOSILENTUPDATE is set, syncconfig is not allowed to update
-the .config file.  Otherwise, it is fine to update it regardless of
-sym_change_count.
+    Install targets except headers_install, and external modules
+    are the cases.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v4: None
 
- scripts/kconfig/conf.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ Makefile | 27 ++++++++++++++++++++-------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 671ff53..5af8991 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -496,6 +496,7 @@ int main(int ac, char **av)
- 	int opt;
- 	const char *name, *defconfig_file = NULL /* gcc uninit */;
- 	struct stat tmpstat;
-+	int no_conf_write = 0;
+diff --git a/Makefile b/Makefile
+index 2fa9830..ad83917 100644
+--- a/Makefile
++++ b/Makefile
+@@ -225,10 +225,12 @@ no-dot-config-targets := $(clean-targets) \
+ 			 cscope gtags TAGS tags help% %docs check% coccicheck \
+ 			 $(version_h) headers_% archheaders archscripts \
+ 			 kernelversion %src-pkg
++no-sync-config-targets := $(no-dot-config-targets) install %install
  
- 	tty_stdio = isatty(0) && isatty(1);
+-config-targets := 0
+-mixed-targets  := 0
+-dot-config     := 1
++config-targets  := 0
++mixed-targets   := 0
++dot-config      := 1
++may-sync-config := 1
  
-@@ -633,13 +634,14 @@ int main(int ac, char **av)
- 	}
+ ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
+ 	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
+@@ -236,6 +238,16 @@ ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
+ 	endif
+ endif
  
- 	if (sync_kconfig) {
--		if (conf_get_changed()) {
--			name = getenv("KCONFIG_NOSILENTUPDATE");
--			if (name && *name) {
-+		name = getenv("KCONFIG_NOSILENTUPDATE");
-+		if (name && *name) {
-+			if (conf_get_changed()) {
- 				fprintf(stderr,
- 					"\n*** The configuration requires explicit update.\n\n");
- 				return 1;
- 			}
-+			no_conf_write = 1;
- 		}
- 	}
++ifneq ($(filter $(no-sync-config-targets), $(MAKECMDGOALS)),)
++	ifeq ($(filter-out $(no-sync-config-targets), $(MAKECMDGOALS)),)
++		may-sync-config := 0
++	endif
++endif
++
++ifneq ($(KBUILD_EXTMOD),)
++	may-sync-config := 0
++endif
++
+ ifeq ($(KBUILD_EXTMOD),)
+         ifneq ($(filter config %config,$(MAKECMDGOALS)),)
+                 config-targets := 1
+@@ -607,7 +619,7 @@ ARCH_CFLAGS :=
+ include arch/$(SRCARCH)/Makefile
  
-@@ -688,7 +690,7 @@ int main(int ac, char **av)
- 		/* syncconfig is used during the build so we shall update autoconf.
- 		 * All other commands are only used to generate a config.
- 		 */
--		if (conf_get_changed() && conf_write(NULL)) {
-+		if (!no_conf_write && conf_write(NULL)) {
- 			fprintf(stderr, "\n*** Error during writing of the configuration.\n\n");
- 			exit(1);
- 		}
+ ifeq ($(dot-config),1)
+-ifeq ($(KBUILD_EXTMOD),)
++ifeq ($(may-sync-config),1)
+ # Read in dependencies to all Kconfig* files, make sure to run syncconfig if
+ # changes are detected. This should be included after arch/$(SRCARCH)/Makefile
+ # because some architectures define CROSS_COMPILE there.
+@@ -622,8 +634,9 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
+ include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
+ else
+-# external modules needs include/generated/autoconf.h and include/config/auto.conf
+-# but do not care if they are up-to-date. Use auto.conf to trigger the test
++# External modules and some install targets need include/generated/autoconf.h
++# and include/config/auto.conf but do not care if they are up-to-date.
++# Use auto.conf to trigger the test
+ PHONY += include/config/auto.conf
+ 
+ include/config/auto.conf:
+@@ -635,7 +648,7 @@ include/config/auto.conf:
+ 	echo >&2 ;							\
+ 	/bin/false)
+ 
+-endif # KBUILD_EXTMOD
++endif # may-sync-config
+ 
+ else
+ # Dummy target needed, because used as prerequisite
 -- 
 2.7.4
 
