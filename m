@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:39186 "EHLO
+Received: from mail.linuxfoundation.org ([140.211.169.12]:43854 "EHLO
         mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732980AbeGTNT2 (ORCPT
+        with ESMTP id S2388603AbeGTNYD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Jul 2018 09:19:28 -0400
+        Fri, 20 Jul 2018 09:24:03 -0400
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.9 06/66] x86/asm: Add _ASM_ARG* constants for argument registers to <asm/asm.h>
-Date: Fri, 20 Jul 2018 14:13:23 +0200
-Message-Id: <20180720121407.614332883@linuxfoundation.org>
-In-Reply-To: <20180720121407.228772286@linuxfoundation.org>
-References: <20180720121407.228772286@linuxfoundation.org>
+Subject: [PATCH 4.14 02/92] x86/asm: Add _ASM_ARG* constants for argument registers to <asm/asm.h>
+Date: Fri, 20 Jul 2018 14:13:06 +0200
+Message-Id: <20180720121417.337640444@linuxfoundation.org>
+In-Reply-To: <20180720121417.206337808@linuxfoundation.org>
+References: <20180720121417.206337808@linuxfoundation.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,7 +17,7 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, "H. Peter Anvin" <hpa@linux.intel.com>, Nick Desaulniers <ndesaulniers@google.com>, Sedat Dilek <sedat.dilek@gmail.com>, Juergen Gross <jgross@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, acme@redhat.com, akataria@vmware.com, akpm@linux-foundation.org, andrea.parri@amarulasolutions.com, ard.biesheuvel@linaro.org, arnd@arndb.de, aryabinin@virtuozzo.com, astrachan@google.com, boris.ostrovsky@oracle.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, geert@linux-m68k.org, ghackmann@google.com, jan.kiszka@siemens.com, jarkko.sakkinen@linux.intel.com, joe@perches.com, jpoimboe@redhat.com, keescook@google.com, kirill.shutemov@linux.intel.com, kstewart@linuxfoundation.org, linux-efi@vger.kernel.org, linux-kbuild@vger.kernel.org, manojgupta@google.com, mawilcox@microsoft.com, michal.lkml@markovi.net, mjg59@google.com, mka@chromium.org, pombredanne@nexb.com, rientjes@google.com, rostedt@goodmis.org, thomas.lendacky@amd.com, tstellar@redhat.com, tweek@google.com, virtualization@lists.linux-foundation.org, will.deacon@arm.com, yamada.masahiro@socionext.com, Ingo Molnar <mingo@kernel.org>
 
-4.9-stable review patch.  If anyone has any objections, please let me know.
+4.14-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -84,7 +84,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/arch/x86/include/asm/asm.h
 +++ b/arch/x86/include/asm/asm.h
-@@ -45,6 +45,65 @@
+@@ -46,6 +46,65 @@
  #define _ASM_SI		__ASM_REG(si)
  #define _ASM_DI		__ASM_REG(di)
  
