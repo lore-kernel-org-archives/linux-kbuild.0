@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:28450 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:28419 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727222AbeGTIe6 (ORCPT
+        with ESMTP id S1727026AbeGTIe5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Jul 2018 04:34:58 -0400
+        Fri, 20 Jul 2018 04:34:57 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 07/11] kbuild: use 'include' directive to load auto.conf from top Makefile
-Date: Fri, 20 Jul 2018 16:46:32 +0900
-Message-Id: <1532072796-7947-8-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 10/11] kbuild: do not update config for 'make kernelrelease'
+Date: Fri, 20 Jul 2018 16:46:35 +0900
+Message-Id: <1532072796-7947-11-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1532072796-7947-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1532072796-7947-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,52 +15,35 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-When you build targets that require the kernel configuration, dot-config
-is set to 1, then the top-level Makefile includes auto.conf.  However,
-Make considers its inclusion is optional because the '-include' directive
-is used here.
+'make kernelrelease' depends on CONFIG_LOCALVERSION(_AUTO), but
+for the same reason as install targets, we do not want to update
+the configuration just for printing the kernelrelease string.
 
-If a necessary configuration file is missing for the external module
-building, the following error message is displayed:
-
-  ERROR: Kernel configuration is invalid.
-         include/generated/autoconf.h or include/config/auto.conf are missing.
-         Run 'make oldconfig && make prepare' on kernel src to fix it.
-
-However, Make still continues building; /bin/false let the creation of
-'include/config/auto.config' fail, but Make can ignore the error since
-it is included by the '-include' directive.
-
-I guess the reason of using '-include' directive was to suppress
-the warning when you build the kernel from a pristine source tree:
-
-  Makefile:605: include/config/auto.conf: No such file or directory
-
-The previous commit made sure include/config/auto.conf exists after
-the 'make *config' stage.  Now, we can use the 'include' directive
-without showing the warning.
+This is likely to happen when you compiled the kernel with
+CROSS_COMPILE, but forget to pass it to 'make kernelrelease'.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v4: None
 
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 5c8e9a3..2fa9830 100644
+index ad83917..0ec1c27 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -585,7 +585,7 @@ virt-y		:= virt/
- endif # KBUILD_EXTMOD
+@@ -225,7 +225,8 @@ no-dot-config-targets := $(clean-targets) \
+ 			 cscope gtags TAGS tags help% %docs check% coccicheck \
+ 			 $(version_h) headers_% archheaders archscripts \
+ 			 kernelversion %src-pkg
+-no-sync-config-targets := $(no-dot-config-targets) install %install
++no-sync-config-targets := $(no-dot-config-targets) install %install \
++			   kernelrelease
  
- ifeq ($(dot-config),1)
---include include/config/auto.conf
-+include include/config/auto.conf
- endif
- 
- # The all: target is the default when no target is given on the
+ config-targets  := 0
+ mixed-targets   := 0
 -- 
 2.7.4
 
