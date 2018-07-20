@@ -1,79 +1,154 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0029.hostedemail.com ([216.40.44.29]:53124 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729999AbeGTKyM (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:39186 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732980AbeGTNT2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Jul 2018 06:54:12 -0400
-Message-ID: <01cfa83d2e29667d311d679c904b1648cd35c614.camel@perches.com>
-Subject: Re: [PATCH v2] checkpatch: kbuild: if_changed: check for multiple
- calls in targets
-From: Joe Perches <joe@perches.com>
-Date: Fri, 20 Jul 2018 03:06:37 -0700
-In-Reply-To: <20180720074804.4160-1-dirk@gouders.net>
-References: <ghy3eafbrf.fsf@lena.gouders.net>
-         <20180720074804.4160-1-dirk@gouders.net>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Fri, 20 Jul 2018 09:19:28 -0400
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.9 06/66] x86/asm: Add _ASM_ARG* constants for argument registers to <asm/asm.h>
+Date: Fri, 20 Jul 2018 14:13:23 +0200
+Message-Id: <20180720121407.614332883@linuxfoundation.org>
+In-Reply-To: <20180720121407.228772286@linuxfoundation.org>
+References: <20180720121407.228772286@linuxfoundation.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: Andy Whitcroft <apw@canonical.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, "H. Peter Anvin" <hpa@linux.intel.com>, Nick Desaulniers <ndesaulniers@google.com>, Sedat Dilek <sedat.dilek@gmail.com>, Juergen Gross <jgross@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, acme@redhat.com, akataria@vmware.com, akpm@linux-foundation.org, andrea.parri@amarulasolutions.com, ard.biesheuvel@linaro.org, arnd@arndb.de, aryabinin@virtuozzo.com, astrachan@google.com, boris.ostrovsky@oracle.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, geert@linux-m68k.org, ghackmann@google.com, jan.kiszka@siemens.com, jarkko.sakkinen@linux.intel.com, joe@perches.com, jpoimboe@redhat.com, keescook@google.com, kirill.shutemov@linux.intel.com, kstewart@linuxfoundation.org, linux-efi@vger.kernel.org, linux-kbuild@vger.kernel.org, manojgupta@google.com, mawilcox@microsoft.com, michal.lkml@markovi.net, mjg59@google.com, mka@chromium.org, pombredanne@nexb.com, rientjes@google.com, rostedt@goodmis.org, thomas.lendacky@amd.com, tstellar@redhat.com, tweek@google.com, virtualization@lists.linux-foundation.org, will.deacon@arm.com, yamada.masahiro@socionext.com, Ingo Molnar <mingo@kernel.org>
 
-On Fri, 2018-07-20 at 09:48 +0200, Dirk Gouders wrote:
-> The kbuild function if_changed should not be called more than once for
-> a target.
-> 
-> Because that function writes the command line to a .cmd file for later
-> tests, multiple calls of it within a target would result in overwrites
-> of previous values and effectively render the command line test
-> meaningless, resulting in flip-flop behaviour.
-> 
-> Add a check for makefiles and kbuild files and produce an error for
-> targets with multiple calls to if_changed.
-> 
-> Three examples that now could be detected:
-> 
-> 98f78525371b55ccd (x86/boot: Refuse to build with data relocations)
-> 6a8dfe1cac5c591ae (microblaze: support U-BOOT image format)
-> 684151a75bf25f5ae (sparc32: added U-Boot build target: uImage)
-> 
-> Reviewed-by: Joe Perches <joe@perches.com>
+4.9-stable review patch.  If anyone has any objections, please let me know.
 
-I didn't review this.  I gave you feedback
-but didn't add a signature.
+------------------
 
-For anything other than "Suggested-by:",
-please don't add signatures to patches unless
-the person gives directly gives you one.
+From: H. Peter Anvin <hpa@linux.intel.com>
 
-> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Dirk Gouders <dirk@gouders.net>
-> ---
-> v2: rework commit message and regular expression
-> ---
->  scripts/checkpatch.pl | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index 447857ffaf6b..437e98414f74 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -2911,6 +2911,14 @@ sub process {
->  			     "Use of $flag is deprecated, please use \`$replacement->{$flag} instead.\n" . $herecurr) if ($replacement->{$flag});
->  		}
->  
-> +		# Check for multiple calls of if_changed within a target in Makefiles
-> +		if (($realfile =~ /Makefile.*/ || $realfile =~ /Kbuild.*/) &&
+commit 0e2e160033283e20f688d8bad5b89460cc5bfcc4 upstream.
 
-The uses of .* here are superfluous.
+i386 and x86-64 uses different registers for arguments; make them
+available so we don't have to #ifdef in the actual code.
 
-> +		    ($prevline =~ /^[ +]\t\s*\$\(call\s+if_changed,/) &&
-> +		    ($line =~ /^[ +]\t\s*\$\(call\s+if_changed,/)) {
-> +				ERROR("MULTIPLE_IF_CHANGED",
-> +				      "Multiple calls of if_changed within a target.\n" . $herecurr);
-> +		}
-> +
->  # check for DT compatible documentation
->  		if (defined $root &&
->  			(($realfile =~ /\.dtsi?$/ && $line =~ /^\+\s*compatible\s*=\s*\"/) ||
+Native size and specified size (q, l, w, b) versions are provided.
+
+Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
+Acked-by: Juergen Gross <jgross@suse.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: acme@redhat.com
+Cc: akataria@vmware.com
+Cc: akpm@linux-foundation.org
+Cc: andrea.parri@amarulasolutions.com
+Cc: ard.biesheuvel@linaro.org
+Cc: arnd@arndb.de
+Cc: aryabinin@virtuozzo.com
+Cc: astrachan@google.com
+Cc: boris.ostrovsky@oracle.com
+Cc: brijesh.singh@amd.com
+Cc: caoj.fnst@cn.fujitsu.com
+Cc: geert@linux-m68k.org
+Cc: ghackmann@google.com
+Cc: gregkh@linuxfoundation.org
+Cc: jan.kiszka@siemens.com
+Cc: jarkko.sakkinen@linux.intel.com
+Cc: joe@perches.com
+Cc: jpoimboe@redhat.com
+Cc: keescook@google.com
+Cc: kirill.shutemov@linux.intel.com
+Cc: kstewart@linuxfoundation.org
+Cc: linux-efi@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
+Cc: manojgupta@google.com
+Cc: mawilcox@microsoft.com
+Cc: michal.lkml@markovi.net
+Cc: mjg59@google.com
+Cc: mka@chromium.org
+Cc: pombredanne@nexb.com
+Cc: rientjes@google.com
+Cc: rostedt@goodmis.org
+Cc: thomas.lendacky@amd.com
+Cc: tstellar@redhat.com
+Cc: tweek@google.com
+Cc: virtualization@lists.linux-foundation.org
+Cc: will.deacon@arm.com
+Cc: yamada.masahiro@socionext.com
+Link: http://lkml.kernel.org/r/20180621162324.36656-3-ndesaulniers@google.com
+Signed-off-by: Ingo Molnar <mingo@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ arch/x86/include/asm/asm.h |   59 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
+
+--- a/arch/x86/include/asm/asm.h
++++ b/arch/x86/include/asm/asm.h
+@@ -45,6 +45,65 @@
+ #define _ASM_SI		__ASM_REG(si)
+ #define _ASM_DI		__ASM_REG(di)
+ 
++#ifndef __x86_64__
++/* 32 bit */
++
++#define _ASM_ARG1	_ASM_AX
++#define _ASM_ARG2	_ASM_DX
++#define _ASM_ARG3	_ASM_CX
++
++#define _ASM_ARG1L	eax
++#define _ASM_ARG2L	edx
++#define _ASM_ARG3L	ecx
++
++#define _ASM_ARG1W	ax
++#define _ASM_ARG2W	dx
++#define _ASM_ARG3W	cx
++
++#define _ASM_ARG1B	al
++#define _ASM_ARG2B	dl
++#define _ASM_ARG3B	cl
++
++#else
++/* 64 bit */
++
++#define _ASM_ARG1	_ASM_DI
++#define _ASM_ARG2	_ASM_SI
++#define _ASM_ARG3	_ASM_DX
++#define _ASM_ARG4	_ASM_CX
++#define _ASM_ARG5	r8
++#define _ASM_ARG6	r9
++
++#define _ASM_ARG1Q	rdi
++#define _ASM_ARG2Q	rsi
++#define _ASM_ARG3Q	rdx
++#define _ASM_ARG4Q	rcx
++#define _ASM_ARG5Q	r8
++#define _ASM_ARG6Q	r9
++
++#define _ASM_ARG1L	edi
++#define _ASM_ARG2L	esi
++#define _ASM_ARG3L	edx
++#define _ASM_ARG4L	ecx
++#define _ASM_ARG5L	r8d
++#define _ASM_ARG6L	r9d
++
++#define _ASM_ARG1W	di
++#define _ASM_ARG2W	si
++#define _ASM_ARG3W	dx
++#define _ASM_ARG4W	cx
++#define _ASM_ARG5W	r8w
++#define _ASM_ARG6W	r9w
++
++#define _ASM_ARG1B	dil
++#define _ASM_ARG2B	sil
++#define _ASM_ARG3B	dl
++#define _ASM_ARG4B	cl
++#define _ASM_ARG5B	r8b
++#define _ASM_ARG6B	r9b
++
++#endif
++
+ /*
+  * Macros to generate condition code outputs from inline assembly,
+  * The output operand must be type "bool".
+
+
