@@ -1,141 +1,142 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:35134 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731662AbeGTNPn (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Jul 2018 09:15:43 -0400
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.4 04/31] compiler-gcc.h: Add __attribute__((gnu_inline)) to all inline declarations
-Date: Fri, 20 Jul 2018 14:13:34 +0200
-Message-Id: <20180720121340.315434780@linuxfoundation.org>
-In-Reply-To: <20180720121340.158484922@linuxfoundation.org>
-References: <20180720121340.158484922@linuxfoundation.org>
+Received: from mail.kernel.org ([198.145.29.99]:57422 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731314AbeGTPiB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 20 Jul 2018 11:38:01 -0400
+Date: Fri, 20 Jul 2018 16:49:16 +0200
+From: Jessica Yu <jeyu@kernel.org>
+Subject: Re: [PATCH 2/6] module: add support for symbol namespaces.
+Message-ID: <20180720144916.fyqpmrtgt23sax6n@linux-8ccs>
+References: <20180716122125.175792-1-maco@android.com>
+ <20180716122125.175792-3-maco@android.com>
+ <20180719163208.5xvrafugpcbhh7kj@linux-8ccs>
+ <CAB0TPYFVSWtJ6RPRUZ1bpS-rBaV7YyPR-4B2Ogxs+FNAbiScNw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CAB0TPYFVSWtJ6RPRUZ1bpS-rBaV7YyPR-4B2Ogxs+FNAbiScNw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, "H. Peter Anvin" <hpa@zytor.com>, Joe Perches <joe@perches.com>, Nick Desaulniers <ndesaulniers@google.com>, Juergen Gross <jgross@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, acme@redhat.com, akataria@vmware.com, akpm@linux-foundation.org, andrea.parri@amarulasolutions.com, ard.biesheuvel@linaro.org, aryabinin@virtuozzo.com, astrachan@google.com, boris.ostrovsky@oracle.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, geert@linux-m68k.org, ghackmann@google.com, jan.kiszka@siemens.com, jarkko.sakkinen@linux.intel.com, jpoimboe@redhat.com, keescook@google.com, kirill.shutemov@linux.intel.com, kstewart@linuxfoundation.org, linux-efi@vger.kernel.org, linux-kbuild@vger.kernel.org, manojgupta@google.com, mawilcox@microsoft.com, michal.lkml@markovi.net, mjg59@google.com, mka@chromium.org, pombredanne@nexb.com, rientjes@google.com, rostedt@goodmis.org, sedat.dilek@gmail.com, thomas.lendacky@amd.com, tstellar@redhat.com, tweek@google.com, virtualization@lists.linux-foundation.org, will.deacon@arm.com, yamada.masahiro@socionext.com, Ingo Molnar <mingo@kernel.org>
+To: Martijn Coenen <maco@android.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Alan Stern <stern@rowland.harvard.edu>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Oliver Neukum <oneukum@suse.com>, Arnd Bergmann <arnd@arndb.de>, Stephen Boyd <sboyd@codeaurora.org>, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-m68k <linux-m68k@lists.linux-m68k.org>, USB list <linux-usb@vger.kernel.org>, USB Storage list <usb-storage@lists.one-eyed-alien.net>, linux-scsi@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>, Martijn Coenen <maco@google.com>, Sandeep Patil <sspatil@google.com>, Iliyan Malchev <malchev@google.com>, Joel Fernandes <joelaf@google.com>
 
-4.4-stable review patch.  If anyone has any objections, please let me know.
++++ Martijn Coenen [20/07/18 09:54 +0200]:
+>Hi Jessica,
+>
+>On Thu, Jul 19, 2018 at 6:32 PM, Jessica Yu <jeyu@kernel.org> wrote:
+>> First, thanks a lot for the patchset. This is definitely something that
+>> will help distros as well to declutter the exported symbol space and
+>> provide a more cleanly defined kernel interface.
+>
+>Thanks, that's good to hear!
+>
+>
+>> Hm, I'm wondering if we could avoid all this extra module-ns-dependency
+>> checking work if we just put the import stuff as a modinfo tag, like
+>> have MODULE_IMPORT_NS() insert an "import:" tag like we already do for
+>> module parameters, author, license, aliases, etc. Then we'd have that
+>> information pretty much from the start of load_module() and we don't
+>> need to wait for relocations to be applied to __knsimport. Then you
+>> could do the namespace checking right at resolve_symbol() instead of
+>> going through the extra step of building a dependency list to be
+>> verified later.
+>
+>I believe I did consider modinfo when I started with this a while
+>back, but don't recall right now why I didn't decide to use it;
+>perhaps it was the lack of support for multiple identical tags. Since
+>both modpost and the module loader have access to them, I don't see
+>why it wouldn't work, and indeed I suspect it would make the module
+>loader a bit simpler. I'll rework this and see what it looks like.
 
-------------------
-
-From: Nick Desaulniers <ndesaulniers@google.com>
-
-commit d03db2bc26f0e4a6849ad649a09c9c73fccdc656 upstream.
-
-Functions marked extern inline do not emit an externally visible
-function when the gnu89 C standard is used. Some KBUILD Makefiles
-overwrite KBUILD_CFLAGS. This is an issue for GCC 5.1+ users as without
-an explicit C standard specified, the default is gnu11. Since c99, the
-semantics of extern inline have changed such that an externally visible
-function is always emitted. This can lead to multiple definition errors
-of extern inline functions at link time of compilation units whose build
-files have removed an explicit C standard compiler flag for users of GCC
-5.1+ or Clang.
-
-Suggested-by: Arnd Bergmann <arnd@arndb.de>
-Suggested-by: H. Peter Anvin <hpa@zytor.com>
-Suggested-by: Joe Perches <joe@perches.com>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-Acked-by: Juergen Gross <jgross@suse.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: acme@redhat.com
-Cc: akataria@vmware.com
-Cc: akpm@linux-foundation.org
-Cc: andrea.parri@amarulasolutions.com
-Cc: ard.biesheuvel@linaro.org
-Cc: aryabinin@virtuozzo.com
-Cc: astrachan@google.com
-Cc: boris.ostrovsky@oracle.com
-Cc: brijesh.singh@amd.com
-Cc: caoj.fnst@cn.fujitsu.com
-Cc: geert@linux-m68k.org
-Cc: ghackmann@google.com
-Cc: gregkh@linuxfoundation.org
-Cc: jan.kiszka@siemens.com
-Cc: jarkko.sakkinen@linux.intel.com
-Cc: jpoimboe@redhat.com
-Cc: keescook@google.com
-Cc: kirill.shutemov@linux.intel.com
-Cc: kstewart@linuxfoundation.org
-Cc: linux-efi@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org
-Cc: manojgupta@google.com
-Cc: mawilcox@microsoft.com
-Cc: michal.lkml@markovi.net
-Cc: mjg59@google.com
-Cc: mka@chromium.org
-Cc: pombredanne@nexb.com
-Cc: rientjes@google.com
-Cc: rostedt@goodmis.org
-Cc: sedat.dilek@gmail.com
-Cc: thomas.lendacky@amd.com
-Cc: tstellar@redhat.com
-Cc: tweek@google.com
-Cc: virtualization@lists.linux-foundation.org
-Cc: will.deacon@arm.com
-Cc: yamada.masahiro@socionext.com
-Link: http://lkml.kernel.org/r/20180621162324.36656-2-ndesaulniers@google.com
-Signed-off-by: Ingo Molnar <mingo@kernel.org>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
----
- include/linux/compiler-gcc.h |   29 ++++++++++++++++++++++-------
- 1 file changed, 22 insertions(+), 7 deletions(-)
-
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -65,25 +65,40 @@
- #endif
- 
- /*
-+ * Feature detection for gnu_inline (gnu89 extern inline semantics). Either
-+ * __GNUC_STDC_INLINE__ is defined (not using gnu89 extern inline semantics,
-+ * and we opt in to the gnu89 semantics), or __GNUC_STDC_INLINE__ is not
-+ * defined so the gnu89 semantics are the default.
-+ */
-+#ifdef __GNUC_STDC_INLINE__
-+# define __gnu_inline	__attribute__((gnu_inline))
-+#else
-+# define __gnu_inline
-+#endif
-+
-+/*
-  * Force always-inline if the user requests it so via the .config,
-  * or if gcc is too old.
-  * GCC does not warn about unused static inline functions for
-  * -Wunused-function.  This turns out to avoid the need for complex #ifdef
-  * directives.  Suppress the warning in clang as well by using "unused"
-  * function attribute, which is redundant but not harmful for gcc.
-+ * Prefer gnu_inline, so that extern inline functions do not emit an
-+ * externally visible function. This makes extern inline behave as per gnu89
-+ * semantics rather than c99. This prevents multiple symbol definition errors
-+ * of extern inline functions at link time.
-+ * A lot of inline functions can cause havoc with function tracing.
-  */
- #if !defined(CONFIG_ARCH_SUPPORTS_OPTIMIZED_INLINING) ||		\
-     !defined(CONFIG_OPTIMIZE_INLINING) || (__GNUC__ < 4)
--#define inline inline		__attribute__((always_inline,unused)) notrace
--#define __inline__ __inline__	__attribute__((always_inline,unused)) notrace
--#define __inline __inline	__attribute__((always_inline,unused)) notrace
-+#define inline \
-+	inline __attribute__((always_inline, unused)) notrace __gnu_inline
- #else
--/* A lot of inline functions can cause havoc with function tracing */
--#define inline inline		__attribute__((unused)) notrace
--#define __inline__ __inline__	__attribute__((unused)) notrace
--#define __inline __inline	__attribute__((unused)) notrace
-+#define inline inline		__attribute__((unused)) notrace __gnu_inline
- #endif
- 
-+#define __inline__ inline
-+#define __inline inline
- #define __always_inline	inline __attribute__((always_inline))
- #define  noinline	__attribute__((noinline))
- 
+Thanks. Also, it looks like we're currently just warning (in both
+modpost and on module load) if a module uses symbols from a namespace
+it doesn't import. Are you also planning to eventually introduce
+namespace enforcement?  It'd be trivial to fail the module build in
+modpost as well as reject the module on load if it uses an exported
+symbol belonging to a namespace it doesn't import. Although, I'd go
+with the warnings for a development cycle or two, to gently introduce
+the change in API and let other subsystems as well as out-of-tree
+module developers catch up.
 
 
+Jessica
+
+>> Also, this would get rid of the extra __knsimport section, the extra
+>> ns_dependencies field in struct module, and all those helper functions that
+>> manage it. In addition, having the modinfo tag may potentially help with
+>> debugging as we have the namespace imports clearly listed if we don't have
+>> the source code for a module. We'd probably need to modify get_modinfo() to
+>> handle multiple import: tags though. Luis [1] had written some code a while
+>> ago to handle multiple (of the same) modinfo tags.
+>>
+>> Thoughts on this?
+>>
+>> Thanks,
+>>
+>> Jessica
+>>
+>> [1] https://lkml.kernel.org/r/20171130023605.29568-3-mcgrof@kernel.org
+>>
+>>
+>>> getname:
+>>>         /* We must make copy under the lock if we failed to get ref. */
+>>>         strncpy(ownername, module_name(owner), MODULE_NAME_LEN);
+>>> @@ -3061,6 +3118,11 @@ static int find_module_sections(struct module *mod,
+>>> struct load_info *info)
+>>>                                      sizeof(*mod->gpl_syms),
+>>>                                      &mod->num_gpl_syms);
+>>>         mod->gpl_crcs = section_addr(info, "__kcrctab_gpl");
+>>> +
+>>> +       mod->ns_imports = section_objs(info, "__knsimport",
+>>> +                                      sizeof(*mod->ns_imports),
+>>> +                                      &mod->num_ns_imports);
+>>> +
+>>>         mod->gpl_future_syms = section_objs(info,
+>>>                                             "__ksymtab_gpl_future",
+>>>                                             sizeof(*mod->gpl_future_syms),
+>>> @@ -3381,6 +3443,19 @@ static int post_relocation(struct module *mod,
+>>> const struct load_info *info)
+>>>         return module_finalize(info->hdr, info->sechdrs, mod);
+>>> }
+>>>
+>>> +static void verify_namespace_dependencies(struct module *mod)
+>>> +{
+>>> +       struct module_ns_dep *ns_dep;
+>>> +
+>>> +       list_for_each_entry(ns_dep, &mod->ns_dependencies, ns_dep) {
+>>> +               if (!module_imports_ns(mod, ns_dep->namespace)) {
+>>> +                       pr_warn("%s: module uses symbols from namespace
+>>> %s,"
+>>> +                               " but does not import it.\n",
+>>> +                               mod->name, ns_dep->namespace);
+>>> +               }
+>>> +       }
+>>> +}
+>>> +
+>>> /* Is this module of this name done loading?  No locks held. */
+>>> static bool finished_loading(const char *name)
+>>> {
+>>> @@ -3682,6 +3757,8 @@ static int load_module(struct load_info *info, const
+>>> char __user *uargs,
+>>>         if (err)
+>>>                 goto free_module;
+>>>
+>>> +       INIT_LIST_HEAD(&mod->ns_dependencies);
+>>> +
+>>> #ifdef CONFIG_MODULE_SIG
+>>>         mod->sig_ok = info->sig_ok;
+>>>         if (!mod->sig_ok) {
+>>> @@ -3730,6 +3807,8 @@ static int load_module(struct load_info *info, const
+>>> char __user *uargs,
+>>>         if (err < 0)
+>>>                 goto free_modinfo;
+>>>
+>>> +       verify_namespace_dependencies(mod);
+>>> +
+>>>         flush_module_icache(mod);
+>>>
+>>>         /* Now copy in args */
+>>> --
+>>> 2.18.0.203.gfac676dfb9-goog
+>>>
+>>
