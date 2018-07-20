@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:28749 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:28746 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727749AbeGTIfI (ORCPT
+        with ESMTP id S1727755AbeGTIfJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Jul 2018 04:35:08 -0400
+        Fri, 20 Jul 2018 04:35:09 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v4 09/11] kbuild: do not update config when running install targets
-Date: Fri, 20 Jul 2018 16:46:34 +0900
-Message-Id: <1532072796-7947-10-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v4 11/11] kbuild: remove auto.conf from prerequisite of phony targets
+Date: Fri, 20 Jul 2018 16:46:36 +0900
+Message-Id: <1532072796-7947-12-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1532072796-7947-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1532072796-7947-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,134 +15,87 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-"make syncconfig" is automatically invoked when any of the following
-happens:
+The top-level Makefile adds include/config/auto.conf as
+prerequisites of 'scripts', 'prepare1', etc.
 
- - .config is updated
- - any of Kconfig files is updated
- - any of environment variables referenced in Kconfig is changed
+They were needed to terminate the build when include/config/auto.conf
+is missing.
 
-Then, it updates configuration files such as include/config/auto.conf
-include/generated/autoconf.h, etc.
+Now that the inclusion of include/config/auto.conf is mandatory
+in the top-level Makefile if dot-config is 1 (Note 'include' directive
+is used instead of '-include').
 
-Even install targets (install, modules_install, etc.) are no exception.
-However, they should never ever modify the source tree.  Install
-targets are often run with root privileges.  Once those configuration
-files are owned by root, "make mrproper" would end up with permission
-error.
+Make terminates the build by itself if it fails to create or update
+include/config/auto.conf so we are sure that include/config/auto.conf
+exists in the very first stage of make.
 
-Install targets should just copy things blindly.  They should not care
-whether the configuration is up-to-date or not.  This makes more sense
-because we are interested in the configuration that was used in the
-previous kernel building.
-
-This issue has existed since before, but rarely happened.  I expect
-more chance where people are hit by this; with the new Kconfig syntax
-extension, the .config now contains the compiler information.  If you
-cross-compile the kernel with CROSS_COMPILE, but forget to pass it
-for "make install", you meet "any of environment variables referenced
-in Kconfig is changed" because $(CC) is referenced in Kconfig.
-Another scenario is the compiler upgrade before the installation.
-
-Install targets need the configuration.  "make modules_install" refer
-to CONFIG_MODULES etc.  "make dtbs_install" also needs CONFIG_ARCH_*
-to decide which dtb files to install.  However, the auto-update of
-the configuration files should be avoided.  We already do this for
-external modules.
-
-Now, Make targets are categorized into 3 groups:
-
-[1] Do not need the kernel configuration at all
-
-    help, coccicheck, headers_install etc.
-
-[2] Need the latest kernel configuration
-
-    If new config options are added, Kconfig will show prompt to
-    ask user's selection.
-
-    Build targets such as vmlinux, in-kernel modules are the cases.
-
-[3] Need the kernel configuration, but do not want to update it
-
-    Install targets except headers_install, and external modules
-    are the cases.
+I am still keeping include/config/auto.conf as the prerequisite of
+%/modules.builtin because modules.builtin is a real file.  According
+to commit a6c366324cac ("kbuild: Do not unnecessarily regenerate
+modules.builtin"), it is intentional to compare time-stamps between
+%/modules.builtin and include/config/auto.conf .  I moved tristate.conf
+here because it is only included from scripts/Makefile.modbuiltin.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v4: None
 
- Makefile | 27 ++++++++++++++++++++-------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+ Makefile | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 2fa9830..ad83917 100644
+index 0ec1c27..ceb9c1e 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -225,10 +225,12 @@ no-dot-config-targets := $(clean-targets) \
- 			 cscope gtags TAGS tags help% %docs check% coccicheck \
- 			 $(version_h) headers_% archheaders archscripts \
- 			 kernelversion %src-pkg
-+no-sync-config-targets := $(no-dot-config-targets) install %install
- 
--config-targets := 0
--mixed-targets  := 0
--dot-config     := 1
-+config-targets  := 0
-+mixed-targets   := 0
-+dot-config      := 1
-+may-sync-config := 1
- 
- ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
- 	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
-@@ -236,6 +238,16 @@ ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
- 	endif
- endif
- 
-+ifneq ($(filter $(no-sync-config-targets), $(MAKECMDGOALS)),)
-+	ifeq ($(filter-out $(no-sync-config-targets), $(MAKECMDGOALS)),)
-+		may-sync-config := 0
-+	endif
-+endif
-+
-+ifneq ($(KBUILD_EXTMOD),)
-+	may-sync-config := 0
-+endif
-+
- ifeq ($(KBUILD_EXTMOD),)
-         ifneq ($(filter config %config,$(MAKECMDGOALS)),)
-                 config-targets := 1
-@@ -607,7 +619,7 @@ ARCH_CFLAGS :=
- include arch/$(SRCARCH)/Makefile
- 
- ifeq ($(dot-config),1)
--ifeq ($(KBUILD_EXTMOD),)
-+ifeq ($(may-sync-config),1)
- # Read in dependencies to all Kconfig* files, make sure to run syncconfig if
- # changes are detected. This should be included after arch/$(SRCARCH)/Makefile
- # because some architectures define CROSS_COMPILE there.
-@@ -622,8 +634,9 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
- include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
- 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
- else
--# external modules needs include/generated/autoconf.h and include/config/auto.conf
--# but do not care if they are up-to-date. Use auto.conf to trigger the test
-+# External modules and some install targets need include/generated/autoconf.h
-+# and include/config/auto.conf but do not care if they are up-to-date.
-+# Use auto.conf to trigger the test
- PHONY += include/config/auto.conf
- 
- include/config/auto.conf:
-@@ -635,7 +648,7 @@ include/config/auto.conf:
- 	echo >&2 ;							\
+@@ -650,10 +650,6 @@ include/config/auto.conf:
  	/bin/false)
  
--endif # KBUILD_EXTMOD
-+endif # may-sync-config
+ endif # may-sync-config
+-
+-else
+-# Dummy target needed, because used as prerequisite
+-include/config/auto.conf: ;
+ endif # $(dot-config)
  
- else
- # Dummy target needed, because used as prerequisite
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
+@@ -1048,15 +1044,14 @@ define filechk_kernel.release
+ endef
+ 
+ # Store (new) KERNELRELEASE string in include/config/kernel.release
+-include/config/kernel.release: include/config/auto.conf FORCE
++include/config/kernel.release: $(srctree)/Makefile FORCE
+ 	$(call filechk,kernel.release)
+ 
+ # Additional helpers built in scripts/
+ # Carefully list dependencies so we do not try to build scripts twice
+ # in parallel
+ PHONY += scripts
+-scripts: scripts_basic include/config/auto.conf include/config/tristate.conf \
+-	 asm-generic gcc-plugins $(autoksyms_h)
++scripts: scripts_basic asm-generic gcc-plugins $(autoksyms_h)
+ 	$(Q)$(MAKE) $(build)=$(@)
+ 
+ # Things we need to do before we recursively start building the kernel
+@@ -1086,8 +1081,7 @@ endif
+ # that need to depend on updated CONFIG_* values can be checked here.
+ prepare2: prepare3 outputmakefile asm-generic
+ 
+-prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h \
+-                   include/config/auto.conf
++prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h
+ 	$(cmd_crmodverdir)
+ 
+ archprepare: archheaders archscripts prepare1 scripts_basic
+@@ -1225,7 +1219,7 @@ modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux) modules.builtin
+ modules.builtin: $(vmlinux-dirs:%=%/modules.builtin)
+ 	$(Q)$(AWK) '!x[$$0]++' $^ > $(objtree)/modules.builtin
+ 
+-%/modules.builtin: include/config/auto.conf
++%/modules.builtin: include/config/auto.conf include/config/tristate.conf
+ 	$(Q)$(MAKE) $(modbuiltin)=$*
+ 
+ 
 -- 
 2.7.4
 
