@@ -1,75 +1,232 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:44128 "EHLO
-        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388556AbeGWPaN (ORCPT
+Received: from mail-yb0-f196.google.com ([209.85.213.196]:37119 "EHLO
+        mail-yb0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388069AbeGWVwV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jul 2018 11:30:13 -0400
+        Mon, 23 Jul 2018 17:52:21 -0400
+Received: by mail-yb0-f196.google.com with SMTP id r3-v6so799730ybo.4
+        for <linux-kbuild@vger.kernel.org>; Mon, 23 Jul 2018 13:49:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180716122125.175792-1-maco@android.com>
-References: <20180716122125.175792-1-maco@android.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Mon, 23 Jul 2018 16:28:41 +0200
-Message-ID: <CAK8P3a1F2j3PL2ng7xw9TbCQqwn_U+1D5ChH+v8qWVrxOfW3xw@mail.gmail.com>
-Subject: Re: [PATCH 0/6] Symbol namespaces
+References: <20180413090351.25662-1-anders.roxell@linaro.org> <20180607110911.12252-1-anders.roxell@linaro.org>
+In-Reply-To: <20180607110911.12252-1-anders.roxell@linaro.org>
+From: Anders Roxell <anders.roxell@linaro.org>
+Date: Mon, 23 Jul 2018 22:49:12 +0200
+Message-ID: <CADYN=9J=hSFb2wCZ1+dXL=023p9y05MEGUPvH48WfPX7XDZvwQ@mail.gmail.com>
+Subject: Re: [PATCH v4] selftests: add headers_install to lib.mk
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Martijn Coenen <maco@android.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Alan Stern <stern@rowland.harvard.edu>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Oliver Neukum <oneukum@suse.com>, Jessica Yu <jeyu@kernel.org>, Stephen Boyd <sboyd@codeaurora.org>, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net, linux-scsi <linux-scsi@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Martijn Coenen <maco@google.com>, Sandeep Patil <sspatil@google.com>, malchev@google.com, Joel Fernandes <joelaf@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Shuah Khan <shuah@kernel.org>, Bamvor Zhang <bamv2005@gmail.com>, brgl@bgdev.pl, Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, aarcange@redhat.com
+Cc: linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Networking <netdev@vger.kernel.org>
 
-On Mon, Jul 16, 2018 at 2:21 PM, Martijn Coenen <maco@android.com> wrote:
-> As of Linux 4.17, there are more than 30000 exported symbols
-> in the kernel. There seems to be some consensus amongst
-> kernel devs that the export surface is too large, and hard
-> to reason about.
+On Thu, 7 Jun 2018 at 13:09, Anders Roxell <anders.roxell@linaro.org> wrote:
 >
-> Generally, these symbols fall in one of these categories:
-> 1) Symbols actually meant for drivers
-> 2) Symbols that are only exported because functionality is
->    split over multiple modules, yet they really shouldn't
->    be used by modules outside of their own subsystem
-> 3) Symbols really only meant for in-tree use
+> If the kernel headers aren't installed we can't build all the tests.
+> Add a new make target rule 'khdr' in the file lib.mk to generate the
+> kernel headers and that gets include for every test-dir Makefile that
+> includes lib.mk If the testdir in turn have its own sub-dirs the
+> top_srcdir needs to be set to the linux-rootdir to be able to generate
+> the kernel headers.
 >
-> When module developers try to upstream their code, it
-> regularly turns out that they are using exported symbols
-> that they really shouldn't be using. This problem is even
-> bigger for drivers that are currently out-of-tree, which
-> may be using many symbols that they shouldn't be using,
-> and that break when those symbols are removed or modified.
+> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+> Reviewed-by: Fathi Boudra <fathi.boudra@linaro.org>
+> ---
+>  Makefile                                           | 14 +-------------
+>  scripts/subarch.include                            | 13 +++++++++++++
+>  tools/testing/selftests/android/Makefile           |  2 +-
+>  tools/testing/selftests/android/ion/Makefile       |  2 ++
+>  tools/testing/selftests/futex/functional/Makefile  |  1 +
+>  tools/testing/selftests/gpio/Makefile              |  7 ++-----
+>  tools/testing/selftests/kvm/Makefile               |  7 ++-----
+>  tools/testing/selftests/lib.mk                     | 12 ++++++++++++
+>  tools/testing/selftests/net/Makefile               |  1 +
+>  .../selftests/networking/timestamping/Makefile     |  1 +
+>  tools/testing/selftests/vm/Makefile                |  4 ----
+>  11 files changed, 36 insertions(+), 28 deletions(-)
+>  create mode 100644 scripts/subarch.include
 >
-> This patch allows subsystem maintainers to partition their
-> exported symbols into separate namespaces, and module
-> authors to import such namespaces only when needed.
+> diff --git a/Makefile b/Makefile
+> index 6b9aea95ae3a..8050072300fa 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -286,19 +286,7 @@ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+>  KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+>  export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
 >
-> This allows subsystem maintainers to more easily limit
-> availability of these namespaced symbols to other parts of
-> the kernel. It can also be used to partition the set of
-> exported symbols for documentation purposes; for example,
-> a set of symbols that is really only used for debugging
-> could be in a "SUBSYSTEM_DEBUG" namespace.
+> -# SUBARCH tells the usermode build what the underlying arch is.  That is set
+> -# first, and if a usermode build is happening, the "ARCH=um" on the command
+> -# line overrides the setting of ARCH below.  If a native build is happening,
+> -# then ARCH is assigned, getting whatever value it gets normally, and
+> -# SUBARCH is subsequently ignored.
+> -
+> -SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+> -                                 -e s/sun4u/sparc64/ \
+> -                                 -e s/arm.*/arm/ -e s/sa110/arm/ \
+> -                                 -e s/s390x/s390/ -e s/parisc64/parisc/ \
+> -                                 -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
+> -                                 -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ \
+> -                                 -e s/riscv.*/riscv/)
+> +include scripts/subarch.include
+>
+>  # Cross compiling and selecting different set of gcc/bin-utils
+>  # ---------------------------------------------------------------------------
+> diff --git a/scripts/subarch.include b/scripts/subarch.include
+> new file mode 100644
+> index 000000000000..650682821126
+> --- /dev/null
+> +++ b/scripts/subarch.include
+> @@ -0,0 +1,13 @@
+> +# SUBARCH tells the usermode build what the underlying arch is.  That is set
+> +# first, and if a usermode build is happening, the "ARCH=um" on the command
+> +# line overrides the setting of ARCH below.  If a native build is happening,
+> +# then ARCH is assigned, getting whatever value it gets normally, and
+> +# SUBARCH is subsequently ignored.
+> +
+> +SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+> +                                 -e s/sun4u/sparc64/ \
+> +                                 -e s/arm.*/arm/ -e s/sa110/arm/ \
+> +                                 -e s/s390x/s390/ -e s/parisc64/parisc/ \
+> +                                 -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
+> +                                 -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ \
+> +                                 -e s/riscv.*/riscv/)
+> diff --git a/tools/testing/selftests/android/Makefile b/tools/testing/selftests/android/Makefile
+> index 72c25a3cb658..d9a725478375 100644
+> --- a/tools/testing/selftests/android/Makefile
+> +++ b/tools/testing/selftests/android/Makefile
+> @@ -6,7 +6,7 @@ TEST_PROGS := run.sh
+>
+>  include ../lib.mk
+>
+> -all:
+> +all: khdr
+>         @for DIR in $(SUBDIRS); do              \
+>                 BUILD_TARGET=$(OUTPUT)/$$DIR;   \
+>                 mkdir $$BUILD_TARGET  -p;       \
+> diff --git a/tools/testing/selftests/android/ion/Makefile b/tools/testing/selftests/android/ion/Makefile
+> index e03695287f76..88cfe88e466f 100644
+> --- a/tools/testing/selftests/android/ion/Makefile
+> +++ b/tools/testing/selftests/android/ion/Makefile
+> @@ -10,6 +10,8 @@ $(TEST_GEN_FILES): ipcsocket.c ionutils.c
+>
+>  TEST_PROGS := ion_test.sh
+>
+> +KSFT_KHDR_INSTALL := 1
+> +top_srcdir = ../../../../..
+>  include ../../lib.mk
+>
+>  $(OUTPUT)/ionapp_export: ionapp_export.c ipcsocket.c ionutils.c
+> diff --git a/tools/testing/selftests/futex/functional/Makefile b/tools/testing/selftests/futex/functional/Makefile
+> index ff8feca49746..ad1eeb14fda7 100644
+> --- a/tools/testing/selftests/futex/functional/Makefile
+> +++ b/tools/testing/selftests/futex/functional/Makefile
+> @@ -18,6 +18,7 @@ TEST_GEN_FILES := \
+>
+>  TEST_PROGS := run.sh
+>
+> +top_srcdir = ../../../../..
+>  include ../../lib.mk
+>
+>  $(TEST_GEN_FILES): $(HEADERS)
+> diff --git a/tools/testing/selftests/gpio/Makefile b/tools/testing/selftests/gpio/Makefile
+> index 1bbb47565c55..4665cdbf1a8d 100644
+> --- a/tools/testing/selftests/gpio/Makefile
+> +++ b/tools/testing/selftests/gpio/Makefile
+> @@ -21,11 +21,8 @@ endef
+>  CFLAGS += -O2 -g -std=gnu99 -Wall -I../../../../usr/include/
+>  LDLIBS += -lmount -I/usr/include/libmount
+>
+> -$(BINARIES): ../../../gpio/gpio-utils.o ../../../../usr/include/linux/gpio.h
+> +$(BINARIES):| khdr
+> +$(BINARIES): ../../../gpio/gpio-utils.o
+>
+>  ../../../gpio/gpio-utils.o:
+>         make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C ../../../gpio
+> -
+> -../../../../usr/include/linux/gpio.h:
+> -       make -C ../../../.. headers_install INSTALL_HDR_PATH=$(shell pwd)/../../../../usr/
+> -
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index d9d00319b07c..bcb69380bbab 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -32,9 +32,6 @@ $(LIBKVM_OBJ): $(OUTPUT)/%.o: %.c
+>  $(OUTPUT)/libkvm.a: $(LIBKVM_OBJ)
+>         $(AR) crs $@ $^
+>
+> -$(LINUX_HDR_PATH):
+> -       make -C $(top_srcdir) headers_install
+> -
+> -all: $(STATIC_LIBS) $(LINUX_HDR_PATH)
+> +all: $(STATIC_LIBS)
+>  $(TEST_GEN_PROGS): $(STATIC_LIBS)
+> -$(TEST_GEN_PROGS) $(LIBKVM_OBJ): | $(LINUX_HDR_PATH)
+> +$(STATIC_LIBS):| khdr
+> diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
+> index 17ab36605a8e..0a8e75886224 100644
+> --- a/tools/testing/selftests/lib.mk
+> +++ b/tools/testing/selftests/lib.mk
+> @@ -16,8 +16,20 @@ TEST_GEN_PROGS := $(patsubst %,$(OUTPUT)/%,$(TEST_GEN_PROGS))
+>  TEST_GEN_PROGS_EXTENDED := $(patsubst %,$(OUTPUT)/%,$(TEST_GEN_PROGS_EXTENDED))
+>  TEST_GEN_FILES := $(patsubst %,$(OUTPUT)/%,$(TEST_GEN_FILES))
+>
+> +top_srcdir ?= ../../../..
+> +include $(top_srcdir)/scripts/subarch.include
+> +ARCH           ?= $(SUBARCH)
+> +
+>  all: $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED) $(TEST_GEN_FILES)
+>
+> +.PHONY: khdr
+> +khdr:
+> +       make ARCH=$(ARCH) -C $(top_srcdir) headers_install
+> +
+> +ifdef KSFT_KHDR_INSTALL
+> +$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED) $(TEST_GEN_FILES):| khdr
+> +endif
+> +
+>  .ONESHELL:
+>  define RUN_TEST_PRINT_RESULT
+>         TEST_HDR_MSG="selftests: "`basename $$PWD`:" $$BASENAME_TEST";  \
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> index 663e11e85727..d515dabc6b0d 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -15,6 +15,7 @@ TEST_GEN_FILES += udpgso udpgso_bench_tx udpgso_bench_rx
+>  TEST_GEN_PROGS = reuseport_bpf reuseport_bpf_cpu reuseport_bpf_numa
+>  TEST_GEN_PROGS += reuseport_dualstack reuseaddr_conflict
+>
+> +KSFT_KHDR_INSTALL := 1
+>  include ../lib.mk
+>
+>  $(OUTPUT)/reuseport_bpf_numa: LDFLAGS += -lnuma
+> diff --git a/tools/testing/selftests/networking/timestamping/Makefile b/tools/testing/selftests/networking/timestamping/Makefile
+> index a728040edbe1..14cfcf006936 100644
+> --- a/tools/testing/selftests/networking/timestamping/Makefile
+> +++ b/tools/testing/selftests/networking/timestamping/Makefile
+> @@ -5,6 +5,7 @@ TEST_PROGS := hwtstamp_config rxtimestamp timestamping txtimestamp
+>
+>  all: $(TEST_PROGS)
+>
+> +top_srcdir = ../../../../..
+>  include ../../lib.mk
+>
+>  clean:
+> diff --git a/tools/testing/selftests/vm/Makefile b/tools/testing/selftests/vm/Makefile
+> index fdefa2295ddc..58759454b1d0 100644
+> --- a/tools/testing/selftests/vm/Makefile
+> +++ b/tools/testing/selftests/vm/Makefile
+> @@ -25,10 +25,6 @@ TEST_PROGS := run_vmtests
+>
+>  include ../lib.mk
+>
+> -$(OUTPUT)/userfaultfd: ../../../../usr/include/linux/kernel.h
+>  $(OUTPUT)/userfaultfd: LDLIBS += -lpthread
+>
+>  $(OUTPUT)/mlock-random-test: LDLIBS += -lcap
+> -
+> -../../../../usr/include/linux/kernel.h:
+> -       make -C ../../../.. headers_install
+> --
+> 2.17.1
+>
 
-This looks nice. I don't want to overload you with additional
-requests, but it might be good to think about how this can
-be taken further, if we want to actually convert large
-parts of the kernel to it. I have two ideas:
-
-- It would be nice to have a simple mechanism in Kconfig
-  to put all symbols in a module into a namespace that is
-  derived from KBUILD_MODNAME, to avoid having to
-  annotate every symbol separately. This could be similar
-  to how we ended up dealing with EXPORT_NO_SYMBOLS
-  in the linux-2.4 days, with the goal of eventually having
-  a namespace for each symbol. Similarly, we could pass
-  a number of default namespaces through the Makefile,
-  e.g. if we have a directory that has lots of drivers that all
-  import the symbols from a common subsystem module.
-
-- If this is possible to implement, it would be great to have
-  a way to limit the globally visible symbols in a module
-  to the ones that are explicitly exported  even when a that
-  module is built-in rather than loadable. Not sure how this
-  is best done though. A couple of things can be done with
-  objcopy, or possibly by reintroducing partial linking (which
-  was removed not too long ago).
-
-        Arnd
+Ping.
