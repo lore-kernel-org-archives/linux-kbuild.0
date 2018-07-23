@@ -1,160 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:37610 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387828AbeGWHtM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jul 2018 03:49:12 -0400
-Date: Mon, 23 Jul 2018 08:49:21 +0200
-From: Jessica Yu <jeyu@kernel.org>
-Subject: Re: [PATCH 4/6] modpost: add support for generating namespace
- dependencies.
-Message-ID: <20180723064921.wepzdsj7tb7ptjbz@linux-8ccs>
-References: <20180716122125.175792-1-maco@android.com>
- <20180716122125.175792-5-maco@android.com>
+Received: from lithops.sigma-star.at ([195.201.40.130]:44378 "EHLO
+        lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387962AbeGWLrg (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 23 Jul 2018 07:47:36 -0400
+From: Richard Weinberger <richard@nod.at>
+Subject: Re: include architecture Kconfig files from top-level Kconfig v2
+Date: Mon, 23 Jul 2018 12:46:51 +0200
+Message-ID: <8939171.tHQiqpY3WF@blindfold>
+In-Reply-To: <20180708152004.21679-1-hch@lst.de>
+References: <20180708152004.21679-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20180716122125.175792-5-maco@android.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Martijn Coenen <maco@android.com>
-Cc: linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Alan Stern <stern@rowland.harvard.edu>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Oliver Neukum <oneukum@suse.com>, Arnd Bergmann <arnd@arndb.de>, Stephen Boyd <sboyd@codeaurora.org>, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, maco@google.com, sspatil@google.com, malchev@google.com, joelaf@google.com
+To: Christoph Hellwig <hch@lst.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, linux-um@lists.infradead.org, linux-kernel@vger.kernel.org
 
-+++ Martijn Coenen [16/07/18 14:21 +0200]:
->This patch adds an option to modpost to generate a .ns_deps file per
->module, containing the namespace depedencies for that module.
->
->This file can subsequently be used by other tools to automatically add
->newly introduced namespaces to the modules that require them, saving a
->lot of manual work.
->
->Signed-off-by: Martijn Coenen <maco@android.com>
+Am Sonntag, 8. Juli 2018, 17:19:55 CEST schrieb Christoph Hellwig:
+> Hi Masahiro,
+> 
+> what do you think about the series below, which moves the includes
+> of all the architecture independ Kconfig files to the top-level
+> Kconfig instead of duplicating the includes in all architectures?
+> 
+> Note that this only handles the low-hanging fruite, there are a lot
+> of other bits that should probably be cleaned up to be common,
+> but those will be not entirely trivial.
+> 
+> Changes since v1:
+>  - add back a remove source statement from arch/arm/Kconfig
+>  - various fixes from Randy
+>  - various UML patches to be able to use the common Kconfig
 
-Regarding modpost, I think it may also be helpful to additionally
-output the namespace an exported symbol belongs to (if any) in the
-Module.symvers file.
+For the UML bits,
 
->---
-> scripts/mod/modpost.c | 58 +++++++++++++++++++++++++++++++++++++++----
-> scripts/mod/modpost.h |  2 ++
-> 2 files changed, 55 insertions(+), 5 deletions(-)
->
->diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
->index a56a8461a96a..be33d60d5527 100644
->--- a/scripts/mod/modpost.c
->+++ b/scripts/mod/modpost.c
->@@ -39,6 +39,8 @@ static int sec_mismatch_verbose = 1;
-> static int sec_mismatch_fatal = 0;
-> /* ignore missing files */
-> static int ignore_missing_files;
->+/* Write namespace dependencies */
->+static int write_ns_deps;
->
-> enum export {
-> 	export_plain,      export_unused,     export_gpl,
->@@ -2151,10 +2153,15 @@ static void check_exports(struct module *mod)
-> 		else
-> 			basename = mod->name;
->
->-		if (exp->ns && !module_imports_namespace(mod, exp->ns)) {
->-			warn("module %s uses symbol %s from namespace %s, "
->-			     "but does not import it.\n",
->-			     basename, exp->name, exp->ns);
->+		if (exp->ns) {
->+			add_namespace(&mod->required_namespaces, exp->ns);
->+
->+			if (!write_ns_deps &&
->+			    !module_imports_namespace(mod, exp->ns)) {
->+				warn("module %s uses symbol %s from namespace "
->+				     "%s, but does not import it.\n",
->+				     basename, exp->name, exp->ns);
->+			}
-> 		}
->
-> 		if (!mod->gpl_compatible)
->@@ -2457,6 +2464,38 @@ static void write_dump(const char *fname)
-> 	free(buf.p);
-> }
->
->+static void write_ns_deps_files(void)
->+{
->+	struct module *mod;
->+	struct namespace_list *ns;
->+	struct buffer ns_deps_buf = { };
->+
->+	for (mod = modules; mod; mod = mod->next) {
->+		char fname[PATH_MAX];
->+		const char *basename;
->+
->+		if (mod->skip)
->+			continue;
->+
->+		ns_deps_buf.pos = 0;
->+
->+		for (ns = mod->required_namespaces; ns; ns = ns->next)
->+			buf_printf(&ns_deps_buf, "%s\n", ns->namespace);
->+
->+		if (ns_deps_buf.pos == 0)
->+			continue;
->+
->+		basename = strrchr(mod->name, '/');
->+		if (basename)
->+			basename++;
->+		else
->+			basename = mod->name;
->+
->+		sprintf(fname, ".tmp_versions/%s.ns_deps", basename);
->+		write_if_changed(&ns_deps_buf, fname);
->+	}
->+}
->+
-> struct ext_sym_list {
-> 	struct ext_sym_list *next;
-> 	const char *file;
->@@ -2473,7 +2512,7 @@ int main(int argc, char **argv)
-> 	struct ext_sym_list *extsym_iter;
-> 	struct ext_sym_list *extsym_start = NULL;
->
->-	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awM:K:E")) != -1) {
->+	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awM:K:Ed")) != -1) {
-> 		switch (opt) {
-> 		case 'i':
-> 			kernel_read = optarg;
->@@ -2517,6 +2556,9 @@ int main(int argc, char **argv)
-> 		case 'E':
-> 			sec_mismatch_fatal = 1;
-> 			break;
->+		case 'd':
->+			write_ns_deps = 1;
->+			break;
-> 		default:
-> 			exit(1);
-> 		}
->@@ -2545,6 +2587,12 @@ int main(int argc, char **argv)
-> 		check_exports(mod);
-> 	}
->
->+	if (write_ns_deps) {
->+		/* Just write namespace dependencies and exit */
->+		write_ns_deps_files();
->+		return 0;
->+	}
->+
-> 	err = 0;
->
-> 	for (mod = modules; mod; mod = mod->next) {
->diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
->index 9626bf3e7424..92a926d375d2 100644
->--- a/scripts/mod/modpost.h
->+++ b/scripts/mod/modpost.h
->@@ -126,6 +126,8 @@ struct module {
-> 	struct buffer dev_table_buf;
-> 	char	     srcversion[25];
-> 	int is_dot_o;
->+	// Required namespace dependencies
->+	struct namespace_list *required_namespaces;
-> 	// Actual imported namespaces
-> 	struct namespace_list *imported_namespaces;
-> };
->-- 
->2.18.0.203.gfac676dfb9-goog
->
+Acked-by: Richard Weinberger <richard@nod.at>
+
+Thanks,
+//richard
+
