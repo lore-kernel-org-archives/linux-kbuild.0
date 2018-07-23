@@ -1,67 +1,176 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:37686 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387823AbeGWMNk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jul 2018 08:13:40 -0400
-Date: Mon, 23 Jul 2018 13:12:51 +0200
-From: Jessica Yu <jeyu@kernel.org>
-Subject: Re: [PATCH 2/6] module: add support for symbol namespaces.
-Message-ID: <20180723111251.x2cam6bcuglr4hhz@linux-8ccs>
-References: <20180716122125.175792-1-maco@android.com>
- <20180716122125.175792-3-maco@android.com>
- <20180719163208.5xvrafugpcbhh7kj@linux-8ccs>
- <CAB0TPYFVSWtJ6RPRUZ1bpS-rBaV7YyPR-4B2Ogxs+FNAbiScNw@mail.gmail.com>
- <20180720144916.fyqpmrtgt23sax6n@linux-8ccs>
- <CAB0TPYFQvkTsMvfJCTSFSJAoCbmOUJz7mCQGoORs6nRcC3Fhdg@mail.gmail.com>
+Received: from mail.linuxfoundation.org ([140.211.169.12]:47730 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388480AbeGWNoR (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 23 Jul 2018 09:44:17 -0400
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.4 018/107] x86/paravirt: Make native_save_fl() extern inline
+Date: Mon, 23 Jul 2018 14:41:12 +0200
+Message-Id: <20180723122413.797031305@linuxfoundation.org>
+In-Reply-To: <20180723122413.003644357@linuxfoundation.org>
+References: <20180723122413.003644357@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAB0TPYFQvkTsMvfJCTSFSJAoCbmOUJz7mCQGoORs6nRcC3Fhdg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Martijn Coenen <maco@android.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Alan Stern <stern@rowland.harvard.edu>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Oliver Neukum <oneukum@suse.com>, Arnd Bergmann <arnd@arndb.de>, Stephen Boyd <sboyd@codeaurora.org>, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-m68k <linux-m68k@lists.linux-m68k.org>, USB list <linux-usb@vger.kernel.org>, USB Storage list <usb-storage@lists.one-eyed-alien.net>, linux-scsi@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>, Martijn Coenen <maco@google.com>, Sandeep Patil <sspatil@google.com>, Iliyan Malchev <malchev@google.com>, Joel Fernandes <joelaf@google.com>
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, "H. Peter Anvin" <hpa@zytor.com>, Tom Stellar <tstellar@redhat.com>, Sedat Dilek <sedat.dilek@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Juergen Gross <jgross@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, acme@redhat.com, akataria@vmware.com, akpm@linux-foundation.org, andrea.parri@amarulasolutions.com, ard.biesheuvel@linaro.org, aryabinin@virtuozzo.com, astrachan@google.com, boris.ostrovsky@oracle.com, brijesh.singh@amd.com, caoj.fnst@cn.fujitsu.com, geert@linux-m68k.org, ghackmann@google.com, jan.kiszka@siemens.com, jarkko.sakkinen@linux.intel.com, joe@perches.com, jpoimboe@redhat.com, keescook@google.com, kirill.shutemov@linux.intel.com, kstewart@linuxfoundation.org, linux-efi@vger.kernel.org, linux-kbuild@vger.kernel.org, manojgupta@google.com, mawilcox@microsoft.com, michal.lkml@markovi.net, mjg59@google.com, mka@chromium.org, pombredanne@nexb.com, rientjes@google.com, rostedt@goodmis.org, thomas.lendacky@amd.com, tweek@google.com, virtualization@lists.linux-foundation.org, will.deacon@arm.com, yamada.masahiro@socionext.com, Ingo Molnar <mingo@kernel.org>
 
-+++ Martijn Coenen [20/07/18 17:42 +0200]:
->On Fri, Jul 20, 2018 at 4:49 PM, Jessica Yu <jeyu@kernel.org> wrote:
->> Thanks. Also, it looks like we're currently just warning (in both
->> modpost and on module load) if a module uses symbols from a namespace
->> it doesn't import. Are you also planning to eventually introduce
->> namespace enforcement?
->
->This is something I've definitely been thinking about, and was curious
->what others would think. My main concern with enforcement is that it
->will start failing to load out-of-tree modules that use newly
->namespaced symbols. On the other hand, I think those modules will need
->to be rebuilt anyway to be able to load, because the changes to struct
->kernel_symbol make them incompatible with the current kernel. That
->could be another reason for having these symbols in a special section
->(with its own struct namespaced_kernel_symbol); but on the other hand,
->it would make the module loader more complex just to facilitate
->out-of-tree drivers, and I'm not sure where the trade-off between
->those two falls.
+4.4-stable review patch.  If anyone has any objections, please let me know.
 
-IMO I don't think we should bend over backwards to accommodate
-out-of-tree modules - modifying the module loader to recognize even
-more special sections to accommodate these OOT modules would be where
-we'd draw the line I think.
+------------------
 
->> It'd be trivial to fail the module build in
->> modpost as well as reject the module on load if it uses an exported
->> symbol belonging to a namespace it doesn't import. Although, I'd go
->> with the warnings for a development cycle or two, to gently introduce
->> the change in API and let other subsystems as well as out-of-tree
->> module developers catch up.
->
->An approach like that makes sense to me. Another alternative would be
->to make it a CONFIG_ option, and let distros/etc. decide what they are
->comfortable with.
+From: Nick Desaulniers <ndesaulniers@google.com>
 
-I think going forward I would prefer to have export namespaces to be a
-normal and regular part of kernel API (as in, we shouldn't require a
-new option for it), and that the warnings for 1-2 cycles are courteous
-enough - but anyone with stronger opinions about this should speak up.
+commit d0a8d9378d16eb3c69bd8e6d23779fbdbee3a8c7 upstream.
 
-Thanks,
+native_save_fl() is marked static inline, but by using it as
+a function pointer in arch/x86/kernel/paravirt.c, it MUST be outlined.
 
-Jessica
+paravirt's use of native_save_fl() also requires that no GPRs other than
+%rax are clobbered.
+
+Compilers have different heuristics which they use to emit stack guard
+code, the emittance of which can break paravirt's callee saved assumption
+by clobbering %rcx.
+
+Marking a function definition extern inline means that if this version
+cannot be inlined, then the out-of-line version will be preferred. By
+having the out-of-line version be implemented in assembly, it cannot be
+instrumented with a stack protector, which might violate custom calling
+conventions that code like paravirt rely on.
+
+The semantics of extern inline has changed since gnu89. This means that
+folks using GCC versions >= 5.1 may see symbol redefinition errors at
+link time for subdirs that override KBUILD_CFLAGS (making the C standard
+used implicit) regardless of this patch. This has been cleaned up
+earlier in the patch set, but is left as a note in the commit message
+for future travelers.
+
+Reports:
+ https://lkml.org/lkml/2018/5/7/534
+ https://github.com/ClangBuiltLinux/linux/issues/16
+
+Discussion:
+ https://bugs.llvm.org/show_bug.cgi?id=37512
+ https://lkml.org/lkml/2018/5/24/1371
+
+Thanks to the many folks that participated in the discussion.
+
+[Backport for 4.4. 4.4 is missing commit 784d5699eddc "x86: move exports to
+actual definitions" which doesn't apply cleanly, and not really worth
+backporting IMO. It's simpler to change this patch from upstream:
+  + #include <asm-generic/export.h>
+rather than
+  + #include <asm/export.h>]
+
+Debugged-by: Alistair Strachan <astrachan@google.com>
+Debugged-by: Matthias Kaehlcke <mka@chromium.org>
+Suggested-by: Arnd Bergmann <arnd@arndb.de>
+Suggested-by: H. Peter Anvin <hpa@zytor.com>
+Suggested-by: Tom Stellar <tstellar@redhat.com>
+Reported-by: Sedat Dilek <sedat.dilek@gmail.com>
+Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+Acked-by: Juergen Gross <jgross@suse.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: acme@redhat.com
+Cc: akataria@vmware.com
+Cc: akpm@linux-foundation.org
+Cc: andrea.parri@amarulasolutions.com
+Cc: ard.biesheuvel@linaro.org
+Cc: aryabinin@virtuozzo.com
+Cc: astrachan@google.com
+Cc: boris.ostrovsky@oracle.com
+Cc: brijesh.singh@amd.com
+Cc: caoj.fnst@cn.fujitsu.com
+Cc: geert@linux-m68k.org
+Cc: ghackmann@google.com
+Cc: gregkh@linuxfoundation.org
+Cc: jan.kiszka@siemens.com
+Cc: jarkko.sakkinen@linux.intel.com
+Cc: joe@perches.com
+Cc: jpoimboe@redhat.com
+Cc: keescook@google.com
+Cc: kirill.shutemov@linux.intel.com
+Cc: kstewart@linuxfoundation.org
+Cc: linux-efi@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
+Cc: manojgupta@google.com
+Cc: mawilcox@microsoft.com
+Cc: michal.lkml@markovi.net
+Cc: mjg59@google.com
+Cc: mka@chromium.org
+Cc: pombredanne@nexb.com
+Cc: rientjes@google.com
+Cc: rostedt@goodmis.org
+Cc: thomas.lendacky@amd.com
+Cc: tweek@google.com
+Cc: virtualization@lists.linux-foundation.org
+Cc: will.deacon@arm.com
+Cc: yamada.masahiro@socionext.com
+Link: http://lkml.kernel.org/r/20180621162324.36656-4-ndesaulniers@google.com
+Signed-off-by: Ingo Molnar <mingo@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ arch/x86/include/asm/irqflags.h |    2 +-
+ arch/x86/kernel/Makefile        |    1 +
+ arch/x86/kernel/irqflags.S      |   26 ++++++++++++++++++++++++++
+ 3 files changed, 28 insertions(+), 1 deletion(-)
+
+--- a/arch/x86/include/asm/irqflags.h
++++ b/arch/x86/include/asm/irqflags.h
+@@ -8,7 +8,7 @@
+  * Interrupt control:
+  */
+ 
+-static inline unsigned long native_save_fl(void)
++extern inline unsigned long native_save_fl(void)
+ {
+ 	unsigned long flags;
+ 
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -41,6 +41,7 @@ obj-y			+= alternative.o i8253.o pci-nom
+ obj-y			+= tsc.o tsc_msr.o io_delay.o rtc.o
+ obj-y			+= pci-iommu_table.o
+ obj-y			+= resource.o
++obj-y			+= irqflags.o
+ 
+ obj-y				+= process.o
+ obj-y				+= fpu/
+--- /dev/null
++++ b/arch/x86/kernel/irqflags.S
+@@ -0,0 +1,26 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#include <asm/asm.h>
++#include <asm-generic/export.h>
++#include <linux/linkage.h>
++
++/*
++ * unsigned long native_save_fl(void)
++ */
++ENTRY(native_save_fl)
++	pushf
++	pop %_ASM_AX
++	ret
++ENDPROC(native_save_fl)
++EXPORT_SYMBOL(native_save_fl)
++
++/*
++ * void native_restore_fl(unsigned long flags)
++ * %eax/%rdi: flags
++ */
++ENTRY(native_restore_fl)
++	push %_ASM_ARG1
++	popf
++	ret
++ENDPROC(native_restore_fl)
++EXPORT_SYMBOL(native_restore_fl)
+
+
