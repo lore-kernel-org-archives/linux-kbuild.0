@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:41918 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:42302 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388585AbeGXTEl (ORCPT
+        with ESMTP id S2388705AbeGXTFA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Jul 2018 15:04:41 -0400
+        Tue, 24 Jul 2018 15:05:00 -0400
 From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 04/10] kconfig: remove duplicate SWAP symbol defintions
-Date: Tue, 24 Jul 2018 19:56:40 +0200
-Message-Id: <20180724175646.3621-5-hch@lst.de>
+Subject: [PATCH 10/10] kconfig: add a Memory Management options" menu
+Date: Tue, 24 Jul 2018 19:56:46 +0200
+Message-Id: <20180724175646.3621-11-hch@lst.de>
 In-Reply-To: <20180724175646.3621-1-hch@lst.de>
 References: <20180724175646.3621-1-hch@lst.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,82 +15,34 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, Ley Foon Tan <lftan@altera.com>, Michal Simek <monstr@monstr.eu>, linux-kbuild@vger.kernel.org, linux-um@lists.infradead.org, linux-arch@lists.infradead.org, linux-kernel@vger.kernel.org
 
-microblaze and nios2 define their own always n SWAP symbols.  Remove those
-and let the generic defintion do the right thing by adding a new symbol
-to disable swap entirely.
+This moves all the options under a proper menu.
+
+Based on a patch from Randy Dunlap.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
 ---
- arch/microblaze/Kconfig | 4 +---
- arch/nios2/Kconfig      | 4 +---
- init/Kconfig            | 9 ++++++++-
- 3 files changed, 10 insertions(+), 7 deletions(-)
+ mm/Kconfig | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/microblaze/Kconfig b/arch/microblaze/Kconfig
-index d14782100088..cc139d1b1284 100644
---- a/arch/microblaze/Kconfig
-+++ b/arch/microblaze/Kconfig
-@@ -1,5 +1,6 @@
- config MICROBLAZE
- 	def_bool y
-+	select ARCH_NO_SWAP
- 	select ARCH_HAS_GCOV_PROFILE_ALL
- 	select ARCH_MIGHT_HAVE_PC_PARPORT
- 	select ARCH_NO_COHERENT_DMA_MMAP if !MMU
-@@ -52,9 +53,6 @@ config CPU_LITTLE_ENDIAN
- 
- endchoice
- 
--config SWAP
--	def_bool n
--
- config RWSEM_GENERIC_SPINLOCK
- 	def_bool y
- 
-diff --git a/arch/nios2/Kconfig b/arch/nios2/Kconfig
-index 3d4ec88f1db1..3f9d4ef8b20f 100644
---- a/arch/nios2/Kconfig
-+++ b/arch/nios2/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- config NIOS2
- 	def_bool y
-+	select ARCH_NO_SWAP
- 	select TIMER_OF
- 	select GENERIC_ATOMIC64
- 	select GENERIC_CLOCKEVENTS
-@@ -38,9 +39,6 @@ config HAS_DMA
- config FPU
- 	def_bool n
- 
--config SWAP
--	def_bool n
--
- config RWSEM_GENERIC_SPINLOCK
- 	def_bool y
- 
-diff --git a/init/Kconfig b/init/Kconfig
-index 041f3a022122..1e69f93b809e 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -218,9 +218,16 @@ config DEFAULT_HOSTNAME
- 	  but you may wish to use a different default here to make a minimal
- 	  system more usable with less configuration.
- 
-+#
-+# For some reason microblaze and nios2 hard code SWAP=n.  Hopefully we can
-+# add proper SWAP support to them, in which case this can be remove.
-+#
-+config ARCH_NO_SWAP
-+	bool
+diff --git a/mm/Kconfig b/mm/Kconfig
+index ce95491abd6a..9ae1b6a8e30f 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -1,3 +1,6 @@
 +
- config SWAP
- 	bool "Support for paging of anonymous memory (swap)"
--	depends on MMU && BLOCK
-+	depends on MMU && BLOCK && !ARCH_NO_SWAP
- 	default y
- 	help
- 	  This option allows you to choose whether you want to have support
++menu "Memory Management options"
++
+ config SELECT_MEMORY_MODEL
+ 	def_bool y
+ 	depends on ARCH_SELECT_MEMORY_MODEL
+@@ -762,3 +765,5 @@ config GUP_BENCHMARK
+ 
+ config ARCH_HAS_PTE_SPECIAL
+ 	bool
++
++endmenu
 -- 
 2.18.0
 
