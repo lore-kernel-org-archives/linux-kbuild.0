@@ -1,53 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:38958 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728452AbeGYO4D (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 25 Jul 2018 10:56:03 -0400
-Subject: Re: [PATCH v4 13/17] khwasan: add hooks implementation
-References: <cover.1530018818.git.andreyknvl@google.com>
- <a2a93370d43ec85b02abaf8d007a15b464212221.1530018818.git.andreyknvl@google.com>
-From: "Vincenzo Frascino@Foss" <vincenzo.frascino@arm.com>
-Message-ID: <09cb5553-d84a-0e62-5174-315c14b88833@arm.com>
-Date: Wed, 25 Jul 2018 14:44:10 +0100
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:27771 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729092AbeGYPvy (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 25 Jul 2018 11:51:54 -0400
 MIME-Version: 1.0
-In-Reply-To: <a2a93370d43ec85b02abaf8d007a15b464212221.1530018818.git.andreyknvl@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+In-Reply-To: <20180720193528.1341-1-jcline@redhat.com>
+References: <20180720193528.1341-1-jcline@redhat.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 25 Jul 2018 23:39:09 +0900
+Message-ID: <CAK7LNAQWotaFhMAnW=Ah8aFO8VMxUB4bXursTe6JTZxcTzettQ@mail.gmail.com>
+Subject: Re: [PATCH] scripts: Add Python 3 support to tracing/draw_functrace.py
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
-Cc: Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
+To: Jeremy Cline <jcline@redhat.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Frederic Weisbecker <fweisbec@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 06/26/2018 02:15 PM, Andrey Konovalov wrote:
-
-> @@ -325,18 +341,41 @@ void kasan_init_slab_obj(struct kmem_cache *cache, const void *object)
->   
->   void *kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
->   {
-> -	return kasan_kmalloc(cache, object, cache->object_size, flags);
-> +	object = kasan_kmalloc(cache, object, cache->object_size, flags);
-> +	if (IS_ENABLED(CONFIG_KASAN_HW) && unlikely(cache->ctor)) {
-> +		/*
-> +		 * Cache constructor might use object's pointer value to
-> +		 * initialize some of its fields.
-> +		 */
-> +		cache->ctor(object);
+2018-07-21 4:35 GMT+09:00 Jeremy Cline <jcline@redhat.com>:
+> Use the print function. This maintains Python 2 support and should have
+> no functional change.
 >
-This seams breaking the kmem_cache_create() contract: "The @ctor is run 
-when new pages are allocated by the cache." 
-(https://elixir.bootlin.com/linux/v3.7/source/mm/slab_common.c#L83)
+> Signed-off-by: Jeremy Cline <jcline@redhat.com>
+> ---
+>  scripts/tracing/draw_functrace.py | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/tracing/draw_functrace.py b/scripts/tracing/draw_functrace.py
+> index db40fa04cd51..7d44e796d362 100755
+> --- a/scripts/tracing/draw_functrace.py
+> +++ b/scripts/tracing/draw_functrace.py
+> @@ -20,6 +20,7 @@ Usage:
+>         $ scripts/draw_functrace.py < raw_trace_func > draw_functrace
+>         Then you have your drawn trace in draw_functrace
+>  """
+> +from __future__ import print_function
 
-Since there might be preexisting code relying on it, this could lead to 
-global side effects. Did you verify that this is not the case?
+What do you need this line for?
 
-Another concern is performance related if we consider this solution 
-suitable for "near-production", since with the current implementation 
-you call the ctor (where present) on an object multiple times and this 
-ends up memsetting and repopulating the memory every time (i.e. inode.c: 
-inode_init_once). Do you know what is the performance impact?
+I have not tested this,
+but I guess print(CallTree.ROOT) will work for Python 2.
+
+
+
+>
+>  import sys, re
+> @@ -123,7 +124,7 @@ def main():
+>                 tree = tree.getParent(caller)
+>                 tree = tree.calls(callee, calltime)
+>
+> -       print CallTree.ROOT
+> +       print(CallTree.ROOT)
+>
+>  if __name__ == "__main__":
+>         main()
+> --
+> 2.17.1
+>
+
+
 
 -- 
-Regards,
-Vincenzo
-
+Best Regards
+Masahiro Yamada
