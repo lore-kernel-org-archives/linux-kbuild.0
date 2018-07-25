@@ -1,61 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr710085.outbound.protection.outlook.com ([40.107.71.85]:10848
-        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388469AbeGXTLu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Jul 2018 15:11:50 -0400
-From: Nadav Amit <namit@vmware.com>
-Subject: Re: [PATCH v6 1/9] Makefile: Prepare for using macros for inline asm
-Date: Tue, 24 Jul 2018 18:04:06 +0000
-Message-ID: <A1E263C1-C1DA-4B23-8232-8CF87DDD7A3F@vmware.com>
-References: <20180622172212.199633-1-namit@vmware.com>
- <20180622172212.199633-2-namit@vmware.com>
- <CAK7LNASaZd9fupgu4vxc6+tnCnNMdrCi7LTwS56K1LaKODoCtA@mail.gmail.com>
- <20180724111445.GB14212@gmail.com>
-In-Reply-To: <20180724111445.GB14212@gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FE2CB2B0164B394E90AFE56AE56FB9D0@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:57276 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388464AbeGYBiu (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 24 Jul 2018 21:38:50 -0400
 MIME-Version: 1.0
+In-Reply-To: <20180712125013.14285-1-ville.syrjala@linux.intel.com>
+References: <20180712125013.14285-1-ville.syrjala@linux.intel.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 25 Jul 2018 09:28:46 +0900
+Message-ID: <CAK7LNAQz1oU9=NHSbw+rOw7LLFP5PpwuvUcjEaVbN+y7uOD-xA@mail.gmail.com>
+Subject: Re: [RFC][PATCH] kconfig: Add "m or y" and "y or m" answers for oldconfig
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-xtensa@linux-xtensa.org" <linux-xtensa@linux-xtensa.org>
+To: Ville Syrjala <ville.syrjala@linux.intel.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-YXQgNDoxNCBBTSwgSW5nbyBNb2xuYXIgPG1pbmdvQGtlcm5lbC5vcmc+IHdyb3RlOg0KDQo+IA0K
-PiAqIE1hc2FoaXJvIFlhbWFkYSA8eWFtYWRhLm1hc2FoaXJvQHNvY2lvbmV4dC5jb20+IHdyb3Rl
-Og0KPiANCj4+IDIwMTgtMDYtMjMgMjoyMiBHTVQrMDk6MDAgTmFkYXYgQW1pdCA8bmFtaXRAdm13
-YXJlLmNvbT46DQo+Pj4gVXNpbmcgbWFjcm9zIGZvciBpbmxpbmUgYXNzZW1ibHkgaW1wcm92ZXMg
-Ym90aCByZWFkYWJpbGl0eSBhbmQNCj4+PiBjb21waWxhdGlvbiBkZWNpc2lvbnMgdGhhdCBhcmUg
-ZGlzdG9ydGVkIGJ5IGJpZyBhc3NlbWJseSBibG9ja3MgdGhhdCB1c2UNCj4+PiBhbHRlcm5hdGl2
-ZSBzZWN0aW9ucy4gQ29tcGlsZSBtYWNyb3MuUyBhbmQgdXNlIGl0IHRvIGFzc2VtYmxlIGFsbCBD
-DQo+Pj4gZmlsZXMuIEN1cnJlbnRseSwgb25seSB4ODYgd2lsbCB1c2UgaXQuDQo+Pj4gDQo+Pj4g
-Q2M6IFNhbSBSYXZuYm9yZyA8c2FtQHJhdm5ib3JnLm9yZz4NCj4+PiBDYzogTWFzYWhpcm8gWWFt
-YWRhIDx5YW1hZGEubWFzYWhpcm9Ac29jaW9uZXh0LmNvbT4NCj4+PiBDYzogTWljaGFsIE1hcmVr
-IDxtaWNoYWwubGttbEBtYXJrb3ZpLm5ldD4NCj4+PiBDYzogVGhvbWFzIEdsZWl4bmVyIDx0Z2x4
-QGxpbnV0cm9uaXguZGU+DQo+Pj4gQ2M6IEluZ28gTW9sbmFyIDxtaW5nb0ByZWRoYXQuY29tPg0K
-Pj4+IENjOiAiSC4gUGV0ZXIgQW52aW4iIDxocGFAenl0b3IuY29tPg0KPj4+IENjOiB4ODZAa2Vy
-bmVsLm9yZw0KPj4+IENjOiBsaW51eC1rYnVpbGRAdmdlci5rZXJuZWwub3JnDQo+Pj4gQWNrZWQt
-Ynk6IFBldGVyIFppamxzdHJhIChJbnRlbCkgPHBldGVyekBpbmZyYWRlYWQub3JnPg0KPj4+IFNp
-Z25lZC1vZmYtYnk6IE5hZGF2IEFtaXQgPG5hbWl0QHZtd2FyZS5jb20+DQo+Pj4gLS0tDQo+PiAN
-Cj4+IA0KPj4gDQo+PiBBY2tlZC1ieTogTWFzYWhpcm8gWWFtYWRhIDx5YW1hZGEubWFzYWhpcm9A
-c29jaW9uZXh0LmNvbT4NCj4+IA0KPj4gDQo+PiANCj4+IA0KPj4+IE1ha2VmaWxlICAgICAgICAg
-ICAgICAgICB8ICA5ICsrKysrKystLQ0KPj4+IGFyY2gveDg2L01ha2VmaWxlICAgICAgICB8IDEx
-ICsrKysrKysrKy0tDQo+Pj4gYXJjaC94ODYva2VybmVsL21hY3Jvcy5TIHwgIDcgKysrKysrKw0K
-Pj4+IHNjcmlwdHMvS2J1aWxkLmluY2x1ZGUgICB8ICA0ICsrKy0NCj4+PiBzY3JpcHRzL21vZC9N
-YWtlZmlsZSAgICAgfCAgMiArKw0KPj4+IDUgZmlsZXMgY2hhbmdlZCwgMjggaW5zZXJ0aW9ucygr
-KSwgNSBkZWxldGlvbnMoLSkNCj4+PiBjcmVhdGUgbW9kZSAxMDA2NDQgYXJjaC94ODYva2VybmVs
-L21hY3Jvcy5TDQo+IA0KPiBTbyB0aGlzIHBhdGNoIGFwcGVhcnMgdG8gYnJlYWsgdGhlIHh0ZW5z
-YSBjcm9zcy1idWlsZCBvbiBteSBzeXN0ZW0sIHdpdGggYW4gb2xkZXIgDQo+IHZlcnNpb24gb2Yg
-Y3Jvc3N0b29sczoNCj4gDQo+ICBNT0RQT1NUIHZtbGludXgubw0KPiAvaG9tZS9taW5nby9jcm9z
-c3Rvb2wta29yZy9iaW4vL2djYy00LjkuMC1ub2xpYmMveHRlbnNhLWxpbnV4L2Jpbi94dGVuc2Et
-bGludXgtbGQ6Li9hcmNoL3h0ZW5zYS9rZXJuZWwvdm1saW51eC5sZHM6NDMwOiANCj4gc3ludGF4
-IGVycm9yDQo+IC9ob21lL21pbmdvL3RpcC9NYWtlZmlsZToxMDEwOiByZWNpcGUgZm9yIHRhcmdl
-dCAndm1saW51eCcgZmFpbGVkDQo+IG1ha2VbMV06ICoqKiBbdm1saW51eF0gRXJyb3IgMQ0KPiBt
-YWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSAnL2Rldi9zaG0vdGlwL2J1aWxkJw0KPiBNYWtlZmls
-ZToxNDY6IHJlY2lwZSBmb3IgdGFyZ2V0ICdzdWItbWFrZeKAmSBmYWlsZWQNCg0KVGhpcyBvbmUg
-aXMgZHVlIHRvIGEgbWlzc2luZyAtRExJTktFUl9TQ1JJUFQgaW4gdGhlIE1ha2VmaWxlIG9mIHh0
-ZW5zYS4gSeKAmWxsDQpzZW5kIHRoZSBwYXRjaCB0byBmaXggaXQgYWZ0ZXIgSSBkZWFsIHdpdGgg
-dGhlIGJvb3QgZmFpbHVyZSAoZm9yIHdoaWNoIEkNCndhaXQgZm9yIHlvdXIgY29uZmlnIGZpbGUp
-Lg0KDQpUaGFua3MsDQpOYWRhdg==
+2018-07-12 21:50 GMT+09:00 Ville Syrjala <ville.syrjala@linux.intel.com>:
+> From: Ville Syrj=C3=A4l=C3=A4 <ville.syrjala@linux.intel.com>
+>
+> Make it possible to answer "m or y" or "y or m" to
+> oldconfig so that scripted kernel builds can easily
+> enable new features not present in the existing .config.
+>
+> The particular use case I have in mind is continuous integration
+> where you probably want to test build any new features. Currently
+> you would have to either blindly try both 'y' and 'm' answers
+> or parse the output to know which one will be accepted.
+>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Ville Syrj=C3=A4l=C3=A4 <ville.syrjala@linux.intel.com>
+> ---
+>  scripts/kconfig/conf.c | 26 ++++++++++++++++++++++----
+>  1 file changed, 22 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> index 671ff5364497..8038f9a6b9f4 100644
+> --- a/scripts/kconfig/conf.c
+> +++ b/scripts/kconfig/conf.c
+> @@ -201,15 +201,33 @@ static int conf_sym(struct menu *menu)
+>                         continue;
+>                 case 'm':
+>                 case 'M':
+> -                       newval =3D mod;
+> -                       if (!line[1])
+> +                       if (!strcmp(line, "m or y") ||
+> +                           !strcmp(line, "M or Y")) {
+> +                               if (sym_tristate_within_range(sym, mod))
+> +                                       newval =3D mod;
+> +                               else
+> +                                       newval =3D yes;
+>                                 break;
+> +                       } else {
+> +                               newval =3D mod;
+> +                               if (!line[1])
+> +                                       break;
+> +                       }
+>                         continue;
+>                 case 'y':
+>                 case 'Y':
+> -                       newval =3D yes;
+> -                       if (!line[1] || !strcmp(&line[1], "es"))
+> +                       if (!strcmp(line, "y or m") ||
+> +                           !strcmp(line, "Y or M")) {
+> +                               if (sym_tristate_within_range(sym, yes))
+> +                                       newval =3D yes;
+> +                               else
+> +                                       newval =3D mod;
+>                                 break;
+> +                       } else {
+> +                               newval =3D yes;
+> +                               if (!line[1] || !strcmp(&line[1], "es"))
+> +                                       break;
+> +                       }
+>                         continue;
+>                 case 0:
+>                         newval =3D oldval;
+
+
+
+
+Hmm.
+
+Instead of hard-coding specific patterns,
+can you implement this in a more generic way?
+
+
+For example, how about this?
+
+Use '/' as a delimiter
+so that user input will be "m/y", "y/m", "m/n", etc.
+
+Split the input string into tokens by strtok() or something.
+Iterate over the tokens until sym_set_tristate_value() succeeds.
+
+
+Thanks.
+
+
+
+
+> --
+> 2.16.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" i=
+n
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
