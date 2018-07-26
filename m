@@ -1,17 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:33507 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.10]:60869 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729111AbeGZJaN (ORCPT
+        with ESMTP id S1728807AbeGZJar (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Jul 2018 05:30:13 -0400
+        Thu, 26 Jul 2018 05:30:47 -0400
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] [stable 4.14] turn off -Wattribute-alias
-Date: Thu, 26 Jul 2018 10:13:22 +0200
-Message-Id: <20180726081358.3829157-1-arnd@arndb.de>
+Subject: [PATCH] [stable 4.4] turn off -Wattribute-alias
+Date: Thu, 26 Jul 2018 10:13:24 +0200
+Message-Id: <20180726081358.3829157-3-arnd@arndb.de>
+In-Reply-To: <20180726081358.3829157-1-arnd@arndb.de>
+References: <20180726081358.3829157-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: stable@vger.kernel.org
-Cc: gregkh@linuxfoundation.org, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: stable@vger.kernel.org, Michal Marek <mmarek@suse.com>
+Cc: gregkh@linuxfoundation.org, Arnd Bergmann <arnd@arndb.de>, Daniel Borkmann <daniel@iogearbox.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Starting with gcc-8.1, we get a warning about all system call definitions,
 which use an alias between functions with incompatible prototypes, e.g.:
@@ -55,17 +57,17 @@ Signed-off-by: Arnd Bergmann <arnd@arndb.de>
  1 file changed, 1 insertion(+)
 
 diff --git a/Makefile b/Makefile
-index a44d6b2adb76..91f9d2d56eac 100644
+index 54690fee0485..4812b35df210 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -642,6 +642,7 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
+@@ -624,6 +624,7 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
  KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
  KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
  KBUILD_CFLAGS	+= $(call cc-disable-warning, int-in-bool-context)
 +KBUILD_CFLAGS	+= $(call cc-disable-warning, attribute-alias)
  
  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
- KBUILD_CFLAGS	+= $(call cc-option,-Oz,-Os)
+ KBUILD_CFLAGS	+= -Os
 -- 
 2.18.0
 
