@@ -1,98 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f196.google.com ([209.85.216.196]:44686 "EHLO
-        mail-qt0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728956AbeGZLSt (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:59818 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728956AbeGZLfp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Jul 2018 07:18:49 -0400
+        Thu, 26 Jul 2018 07:35:45 -0400
+Date: Thu, 26 Jul 2018 11:19:34 +0100
+From: Ben Hutchings <ben@decadent.org.uk>
+Message-ID: <20180726101934.GT14131@decadent.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <20180726092231.GA6916@kroah.com>
-References: <20180726081358.3829157-1-arnd@arndb.de> <20180726092231.GA6916@kroah.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Thu, 26 Jul 2018 12:02:42 +0200
-Message-ID: <CAK8P3a3g7VSu3W0DiMcUdLB0b1fmUaHJxEyC30K8EfP5a9T1ig@mail.gmail.com>
-Subject: Re: [PATCH] [stable 4.14] turn off -Wattribute-alias
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="9hshNW4m6zn79FF/"
+Content-Disposition: inline
+Subject: [PATCH 00/12] Update architecture detection
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: "# 3.4.x" <stable@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: debian-kernel@lists.debian.org
 
-On Thu, Jul 26, 2018 at 11:22 AM, Greg KH <gregkh@linuxfoundation.org> wrot=
-e:
-> On Thu, Jul 26, 2018 at 10:13:22AM +0200, Arnd Bergmann wrote:
->> Starting with gcc-8.1, we get a warning about all system call definition=
-s,
->> which use an alias between functions with incompatible prototypes, e.g.:
->>
->> In file included from ../mm/process_vm_access.c:19:
->> ../include/linux/syscalls.h:211:18: warning: 'sys_process_vm_readv' alia=
-s between functions of incompatible types 'long int(pid_t,  const struct io=
-vec *, long unsigned int,  const struct iovec *, long unsigned int,  long u=
-nsigned int)' {aka 'long int(int,  const struct iovec *, long unsigned int,=
-  const struct iovec *, long unsigned int,  long unsigned int)'} and 'long =
-int(long int,  long int,  long int,  long int,  long int,  long int)' [-Wat=
-tribute-alias]
->>   asmlinkage long sys##name(__MAP(x,__SC_DECL,__VA_ARGS__)) \
->>                   ^~~
->> ../include/linux/syscalls.h:207:2: note: in expansion of macro '__SYSCAL=
-L_DEFINEx'
->>   __SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
->>   ^~~~~~~~~~~~~~~~~
->> ../include/linux/syscalls.h:201:36: note: in expansion of macro 'SYSCALL=
-_DEFINEx'
->>  #define SYSCALL_DEFINE6(name, ...) SYSCALL_DEFINEx(6, _##name, __VA_ARG=
-S__)
->>                                     ^~~~~~~~~~~~~~~
->> ../mm/process_vm_access.c:300:1: note: in expansion of macro 'SYSCALL_DE=
-FINE6'
->>  SYSCALL_DEFINE6(process_vm_readv, pid_t, pid, const struct iovec __user=
- *, lvec,
->>  ^~~~~~~~~~~~~~~
->> ../include/linux/syscalls.h:215:18: note: aliased declaration here
->>   asmlinkage long SyS##name(__MAP(x,__SC_LONG,__VA_ARGS__)) \
->>                   ^~~
->> ../include/linux/syscalls.h:207:2: note: in expansion of macro '__SYSCAL=
-L_DEFINEx'
->>   __SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
->>   ^~~~~~~~~~~~~~~~~
->> ../include/linux/syscalls.h:201:36: note: in expansion of macro 'SYSCALL=
-_DEFINEx'
->>  #define SYSCALL_DEFINE6(name, ...) SYSCALL_DEFINEx(6, _##name, __VA_ARG=
-S__)
->>                                     ^~~~~~~~~~~~~~~
->> ../mm/process_vm_access.c:300:1: note: in expansion of macro 'SYSCALL_DE=
-FINE6'
->>  SYSCALL_DEFINE6(process_vm_readv, pid_t, pid, const struct iovec __user=
- *, lvec,
->>
->> This is really noisy and does not indicate a real problem. In the latest
->> mainline kernel, this was addressed by commit bee20031772a ("disable
->> -Wattribute-alias warning for SYSCALL_DEFINEx()"), which seems too invas=
-ive
->> to backport.
->
-> Too invasive?
->
-> Here's the diffstat:
->          include/linux/compat.h   |    8 +++++++-
->          include/linux/syscalls.h |    4 ++++
->          2 files changed, 11 insertions(+), 1 deletion(-)
->
-> That seems almost trivial to backport.  Did you try it and it caused
-> other problems?
->
-> Where ever possible, I always want to use the upstream commits.
 
-I forward ported that patch a few times across kernels when that macro
-changed in subtle ways. This was particularly tricky as some using the
-new macro inside of another macro sometimes has different effects
-based on seemingly unrelated changes: in particular the addition of
-__MAP() in COMPAT_SYSCALL_DEFINEx that I had to do to work
-around gcc pr83256 can easily break.
+--9hshNW4m6zn79FF/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-It also depends on commit 8793bb7f4a9d ("kbuild: add macro for
-controlling warnings to linux/compiler.h") before it, which is not long
-but does add new infrastructure.
+This series cleans up the set_debarch function in
+scripts/package/mkdebian and adds support for several additional
+Debian architectures.
 
-      Arnd
+Ben.
+
+Ben Hutchings (12):
+  builddeb: Skip architecture detection when KBUILD_DEBARCH is set
+  builddeb: Change architecture detection fallback to use
+    dpkg-architecture
+  builddeb: Drop check for 32-bit s390
+  builddeb: Introduce functions to simplify kconfig tests in set_debarch
+  builddeb: Add automatic support for ppc64 and powerpcspe architectures
+  builddeb: Add automatic support for mips64el architecture
+  builddeb: Add automatic support for mips46{,64}{,el} architectures
+  builddeb: Add automatic support for sparc64 architecture
+  builddeb: Add automatic support for or1k architecture
+  builddeb: Add automatic support for m68k architecture
+  builddeb: Add automatic support for riscv* architectures
+  builddeb: Add automatic support for sh{3,4}{,eb} architectures
+
+ scripts/package/mkdebian | 68 +++++++++++++++++++++++++++++-----------
+ 1 file changed, 50 insertions(+), 18 deletions(-)
+
+
+--9hshNW4m6zn79FF/
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIVAwUBW1mgNue/yOyVhhEJAQrTJhAAudKNUGrjI4wzto9qZIuoMaAdVuphB+7p
+XEH9RYxCIphVAaZqaDjtWwOX5tTN4pLPLgJVGQXoWu511yu8FLncpM5/gVr5vNuz
+10R7lri1lSbFpHHKazUNOcneAplfmWzOMcGlMHBHkSHF2PTzln2MEVenH8SM4o7I
+Nu5aF4LnlNahvwC6W1Aui5+ThGkWcNAXZlX6+2QDaAOp5F/LmVM5/AkDnhPRHdsO
+TBxNjF/lWyiUXfbHwMCT7Cv8RTVEBJrvn4euODp4OLVxStuLwfIRE2CfiDuAgLOG
+hQAw6zf7DmWh43TYaZ98Q9J91WB5GPILoqPpsd6Nmxn+gBmoVUFmhEAToZdSQbiI
+EaMs2wF8jWRRY3d6mcjxxnDsug0XXs1W0KBdQuOWqeyOWvDVh78prH/HjTQ2SDpX
+fmD0otYcz+b9hCq02KQtkxY5k3/6ROCcHlCLQA0yxsm47ymzmGKCQoh9WAH+8GCj
+Cn2BI2zvmf2nnm8prI7UasdzreNfZWIbCHu29cmxtwiNHmqFCoIM5ZJPk7Au8u0Y
+P0KPIapOmYiGbddtS2bqPYeND+NIzMFZf2tc1sEgiZJqJuwdVZu9YlRet7PweLRs
++PIadEc+aya7de1RRrFIKpJEz9l8ZHt0wf0oXguTIvfAp+Idc2upcWYtEUKSGJSo
+m7uRFseDh2U=
+=UasN
+-----END PGP SIGNATURE-----
+
+--9hshNW4m6zn79FF/--
