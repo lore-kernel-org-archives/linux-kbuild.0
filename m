@@ -1,114 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:59839 "EHLO
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:59844 "EHLO
         shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728956AbeGZLhM (ORCPT
+        by vger.kernel.org with ESMTP id S1728956AbeGZLhU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Jul 2018 07:37:12 -0400
-Date: Thu, 26 Jul 2018 11:21:01 +0100
+        Thu, 26 Jul 2018 07:37:20 -0400
+Date: Thu, 26 Jul 2018 11:21:09 +0100
 From: Ben Hutchings <ben@decadent.org.uk>
-Message-ID: <20180726102101.GX14131@decadent.org.uk>
+Message-ID: <20180726102109.GY14131@decadent.org.uk>
 References: <20180726101934.GT14131@decadent.org.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="kLdbqvpuLRxNeSq5"
+        protocol="application/pgp-signature"; boundary="wHYmV+hLPeNaasdK"
 Content-Disposition: inline
 In-Reply-To: <20180726101934.GT14131@decadent.org.uk>
-Subject: [PATCH 04/12] builddeb: Introduce functions to simplify kconfig
- tests in set_debarch
+Subject: [PATCH 05/12] builddeb: Add automatic support for ppc64 and
+ powerpcspe architectures
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: debian-kernel@lists.debian.org
 
 
---kLdbqvpuLRxNeSq5
+--wHYmV+hLPeNaasdK
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-We now have many repetitive greps over the kernel config.  Refactor
-them into functions.
+We currently label 64-bit big-endian kernel packages as
+powerpc (32-bit), mostly because it was officially supported while
+ppc64 (64-bit big-endian) was not.  Now neither is officially
+supported, so label these packages as ppc64.
+
+Debian also has a powerpcspe (32-bit with SPE) architecture.
+Label packages with a suitable configuration as powerpcspe.
 
 Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
 ---
- scripts/package/mkdebian | 26 +++++++++++++++++---------
- 1 file changed, 17 insertions(+), 9 deletions(-)
+ scripts/package/mkdebian | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index f4449b575379..ada3c73d1493 100755
+index ada3c73d1493..0891974f499b 100755
 --- a/scripts/package/mkdebian
 +++ b/scripts/package/mkdebian
-@@ -6,6 +6,18 @@
-=20
- set -e
-=20
-+is_enabled() {
-+	grep -q "^CONFIG_$1=3Dy" $KCONFIG_CONFIG
-+}
-+
-+if_enabled_echo() {
-+	if is_enabled "$1"; then
-+		echo -n "$2"
-+	elif [ $# -ge 3 ]; then
-+		echo -n "$3"
-+	fi
-+}
-+
- set_debarch() {
- 	if [ -n "$KBUILD_DEBARCH" ] ; then
- 		debarch=3D"$KBUILD_DEBARCH"
-@@ -23,22 +35,18 @@ set_debarch() {
+@@ -35,7 +35,12 @@ set_debarch() {
  	s390*)
- 		debarch=3Ds390x ;;
+ 		debarch=s390x ;;
  	ppc*)
--		debarch=3D$(grep -q CPU_LITTLE_ENDIAN=3Dy $KCONFIG_CONFIG && echo ppc64e=
-l || echo powerpc) ;;
-+		debarch=3D$(if_enabled_echo CPU_LITTLE_ENDIAN ppc64el powerpc) ;;
+-		debarch=$(if_enabled_echo CPU_LITTLE_ENDIAN ppc64el powerpc) ;;
++		if is_enabled 64BIT; then
++			debarch=ppc64$(if_enabled_echo CPU_LITTLE_ENDIAN el)
++		else
++			debarch=powerpc$(if_enabled_echo SPE spe)
++		fi
++		;;
  	parisc*)
- 		debarch=3Dhppa ;;
+ 		debarch=hppa ;;
  	mips*)
--		debarch=3Dmips$(grep -q CPU_LITTLE_ENDIAN=3Dy $KCONFIG_CONFIG && echo el=
- || true) ;;
-+		debarch=3Dmips$(if_enabled_echo CPU_LITTLE_ENDIAN el) ;;
- 	aarch64|arm64)
- 		debarch=3Darm64 ;;
- 	arm*)
--		if grep -q CONFIG_AEABI=3Dy $KCONFIG_CONFIG; then
--		    if grep -q CONFIG_VFP=3Dy $KCONFIG_CONFIG; then
--			debarch=3Darmhf
--		    else
--			debarch=3Darmel
--		    fi
-+		if is_enabled AEABI; then
-+			debarch=3Darm$(if_enabled_echo VFP hf el)
- 		else
--		    debarch=3Darm
-+			debarch=3Darm
- 		fi
- 		;;
- 	*)
 
 
---kLdbqvpuLRxNeSq5
+--wHYmV+hLPeNaasdK
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIVAwUBW1mgjOe/yOyVhhEJAQqxlA/+Mm8Jt2dj4Cd/3r9pl4qhDkhuUEuJQGVt
-E1taUtErl8WfeztEiA00py0DPaBIiHj72wxV3hThbsNp5r5qqO60Dt8chmSJVqEZ
-Mi++GcXCosLELBi/hfbq9u/QO7snA0n3+QNwreh+fhjDx0a15ghucdmXTDNyKgRk
-jGll9FEvyVy/cREa4//X2sO6SgGW+mh0oDJqIVZtQ8UkDRTe74lTChWjxRFkooEL
-BBTloygrrHPywdVo/IwbTT0rvwg8Bsaxa2F23I+T5pqCVbyawrfavvGhhxA0sxW6
-i8hMXSKE4jN55BRF7VYrcJgA/T4SaLX8VxqYwGqHDQA86wb12My6tyVjKANfJe17
-H5nTednV2je+FXmxhf4aTYP8zQKCw9G1V9eAV9AbBjETecZj7TPaNO5gnUqGSSuH
-SA4x71qpYZo09+WDMkZtxhIZXESbnYf7rp1RUZ5up8Cj5JVlvNE0PuS/wEePSec9
-NL9rUj4lUNtHQsH8y+Or5uoqvVANLHywJmSsezmR4dZAME/YzZCKJuvABLFQChEc
-7HkiyYB0FCsj+YWtJKxu/vZz3Lx21JHXgfQnO58Qu6Wg92ork4DWi2vwIysdot3O
-pVAeNogWTWIYD4idYs5CCIRx3EK1aggczPHE9KSXL8ZGFXzk6QzZsTQa2GzTw1T3
-hQ8pNgmTEks=
-=BukG
+iQIVAwUBW1mglOe/yOyVhhEJAQrYBQ//fhLvdxPP+Al453zEZbQZ9BFXWWNty1Pq
+abUrpMa9mdWEvGKoOY44jxOo9bD8zvhb4qrcYpXvXfUq3KMruff8LN0TkBtcYC2i
+wclXMdYge+NaorZEkMY1LeKad+RgpJwAOk9vDfMter96a0Q1m2X9VzNSmnmuLSLF
+fDP16MYNQnC8Yb/j/UDmsXhgiZVpfqWzLTGlUF8iqgSyygv9kd/zdMCujNYwZZEt
+7leywU/Vx5/hycDOnszKTNo/XNu8pLiKvEHK7g8r3fyToBrA5wcXIGsDvW+4n9vt
+8LIM5wSHLU5S5RaU8kat1gYRFcB/6SI3DyPhZrdvhbVCQTi2IULh9fiySA3/kvHg
+7mMz51BLpfFKXrgYBSWCXo3A2o7DGQ+ha0ELPsWXcJOZoB5fbdVKtKwNvKLcQ7SV
+HW51rC2TFN/B2hX3eVztJak0kkgSuDWzVUImYdFhLdWwR3fIHhzU8DzlEiYQ2HkY
+Tb4WAfwgWJdCaGZlQ15YyGeSBt5ruh2Jk8yCtSHzQNThhb5dUWZoynP5bOIPGGL6
+2SsDPFp7nbVZo/OpZV52+1oJHaAs+MN8m2kFXMEd6DvhPAP9j9b5fEoqYSofPdQ3
+0mMRbLTTYfCfCdbgquV0QhjAzcIFZW1UBDzO/iZvkXMnMqlVhuMF8fuANMKe6kHn
+hnNf2AolYeI=
+=UgNs
 -----END PGP SIGNATURE-----
 
---kLdbqvpuLRxNeSq5--
+--wHYmV+hLPeNaasdK--
