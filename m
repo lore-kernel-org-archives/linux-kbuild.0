@@ -1,103 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:33326 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727847AbeGZJtr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Jul 2018 05:49:47 -0400
-Date: Thu, 26 Jul 2018 10:33:54 +0200
-From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
-Subject: Re: due to kconfig changes kernel config file is no longer
- sufficient for configuring the kernel
-Message-ID: <20180726103354.111f2d61@naga.suse.cz>
-In-Reply-To: <20180628111623.3807fe9b@naga.suse.cz>
-References: <20180627143705.5a1fed1c@kitsune.suse.cz>
-        <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
-        <20180628111623.3807fe9b@naga.suse.cz>
+Received: from mail.linuxfoundation.org ([140.211.169.12]:53778 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729283AbeGZKig (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 26 Jul 2018 06:38:36 -0400
+Date: Thu, 26 Jul 2018 11:22:31 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] [stable 4.14] turn off -Wattribute-alias
+Message-ID: <20180726092231.GA6916@kroah.com>
+References: <20180726081358.3829157-1-arnd@arndb.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180726081358.3829157-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Takashi Iwai <tiwai@suse.de>, Andreas Schwab <schwab@suse.de>, Michal Kubecek <mkubecek@suse.cz>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org, jslaby@suse.com
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: stable@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 28 Jun 2018 11:16:23 +0200
-Michal Suchánek <msuchanek@suse.de> wrote:
-
-> On Wed, 27 Jun 2018 23:07:21 +0900
-> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+On Thu, Jul 26, 2018 at 10:13:22AM +0200, Arnd Bergmann wrote:
+> Starting with gcc-8.1, we get a warning about all system call definitions,
+> which use an alias between functions with incompatible prototypes, e.g.:
 > 
-> > Hi.
-> > 
-> > 
-> > 2018-06-27 21:37 GMT+09:00 Michal Suchánek <msuchanek@suse.de>:  
-> > > Hello,
-> > >
-> > > in the x86 Kconfig we have this:
-> > >
-> > > # Select 32 or 64 bit
-> > > config 64BIT
-> > >         bool "64-bit kernel" if "$(ARCH)" = "x86"
-> > >         default "$(ARCH)" != "i386"
-> > >         ---help---
-> > >           Say yes to build a 64-bit kernel - formerly known as
-> > > x86_64 Say no to build a 32-bit kernel - formerly known as i386
-> > >
-> > > Since commit 104daea149c4 ("kconfig: reference environment
-> > > variables directly and remove 'option env='") the value of ARCH
-> > > is not saved in the kernel config.    
-> > 
-> > I think this commit is unrelated.  It was just a syntax change.  
+> In file included from ../mm/process_vm_access.c:19:
+> ../include/linux/syscalls.h:211:18: warning: 'sys_process_vm_readv' alias between functions of incompatible types 'long int(pid_t,  const struct iovec *, long unsigned int,  const struct iovec *, long unsigned int,  long unsigned int)' {aka 'long int(int,  const struct iovec *, long unsigned int,  const struct iovec *, long unsigned int,  long unsigned int)'} and 'long int(long int,  long int,  long int,  long int,  long int,  long int)' [-Wattribute-alias]
+>   asmlinkage long sys##name(__MAP(x,__SC_DECL,__VA_ARGS__)) \
+>                   ^~~
+> ../include/linux/syscalls.h:207:2: note: in expansion of macro '__SYSCALL_DEFINEx'
+>   __SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
+>   ^~~~~~~~~~~~~~~~~
+> ../include/linux/syscalls.h:201:36: note: in expansion of macro 'SYSCALL_DEFINEx'
+>  #define SYSCALL_DEFINE6(name, ...) SYSCALL_DEFINEx(6, _##name, __VA_ARGS__)
+>                                     ^~~~~~~~~~~~~~~
+> ../mm/process_vm_access.c:300:1: note: in expansion of macro 'SYSCALL_DEFINE6'
+>  SYSCALL_DEFINE6(process_vm_readv, pid_t, pid, const struct iovec __user *, lvec,
+>  ^~~~~~~~~~~~~~~
+> ../include/linux/syscalls.h:215:18: note: aliased declaration here
+>   asmlinkage long SyS##name(__MAP(x,__SC_LONG,__VA_ARGS__)) \
+>                   ^~~
+> ../include/linux/syscalls.h:207:2: note: in expansion of macro '__SYSCALL_DEFINEx'
+>   __SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
+>   ^~~~~~~~~~~~~~~~~
+> ../include/linux/syscalls.h:201:36: note: in expansion of macro 'SYSCALL_DEFINEx'
+>  #define SYSCALL_DEFINE6(name, ...) SYSCALL_DEFINEx(6, _##name, __VA_ARGS__)
+>                                     ^~~~~~~~~~~~~~~
+> ../mm/process_vm_access.c:300:1: note: in expansion of macro 'SYSCALL_DEFINE6'
+>  SYSCALL_DEFINE6(process_vm_readv, pid_t, pid, const struct iovec __user *, lvec,
 > 
-> This does not look like syntax only change to me:
-> 
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 15aae32e0719..1217fc62ca61 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -1,20 +1,12 @@
-> -config ARCH
-> -       string
-> -       option env="ARCH"
-> -
-> -config KERNELVERSION
-> -       string
-> -       option env="KERNELVERSION"
-> -
-> 
-> > 
-> > Unless I am missing something,
-> > we have never saved ARCH in the .config in the past.  
-> 
-> There was a config symbol defined for it before the commit removed it.
+> This is really noisy and does not indicate a real problem. In the latest
+> mainline kernel, this was addressed by commit bee20031772a ("disable
+> -Wattribute-alias warning for SYSCALL_DEFINEx()"), which seems too invasive
+> to backport.
 
-nonetheless its value was not saved anyway.
-> 
-> > 
-> >   
-> > > Since commit f467c5640c29 ("kconfig: only write '#
-> > > CONFIG_FOO is not set' for visible symbols") the value of 64BIT is
-> > > not saved if the ARCH is set i386 or x86_64 because the symbol is
-> > > not visible.    
-> > 
-> > This is correct.
-> > 
-> > It was discussed a few weeks ago.
-> > 
-> > https://lkml.org/lkml/2018/6/5/847
+Too invasive?
 
-And it went nowhere.
+Here's the diffstat:
+	 include/linux/compat.h   |    8 +++++++-
+	 include/linux/syscalls.h |    4 ++++
+	 2 files changed, 11 insertions(+), 1 deletion(-)
 
-Anyway, the observed issue with CONFIG_64BIT on x86 is the tip of a
-larger problem which was unnoticed for ages. The .config simply does
-not contain the whole kernel configuration. ie. make oldconfig (and
-make syncconfig) is *not* expected to just work. It used to work just by
-luck until f467c5640c29 ("kconfig: only write '# CONFIG_FOO is not set'
-for visible symbols") finally exposed the problem.
+That seems almost trivial to backport.  Did you try it and it caused
+other problems?
 
-So is .config supposed to contain the kernel configuration or is it
-just some byproduct of the kernel build which is meaningless outside of
-your build environment (the object tree, shell environment, etc).
+Where ever possible, I always want to use the upstream commits.
 
-Thanks
+thanks,
 
-Michal
+greg k-h
