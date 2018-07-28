@@ -1,53 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga18.intel.com ([134.134.136.126]:47380 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726103AbeG1ItJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 28 Jul 2018 04:49:09 -0400
-Date: Sat, 28 Jul 2018 15:23:12 +0800
-From: kbuild test robot <lkp@intel.com>
-Subject: [kbuild:kconfig2 1/10] arch/um/Kconfig:3: can't open file
- "arch/x86_64/um/Kconfig"
-Message-ID: <201807281506.H8XSZLgK%fengguang.wu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from mail-qt0-f195.google.com ([209.85.216.195]:36638 "EHLO
+        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728973AbeG1QQG (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 28 Jul 2018 12:16:06 -0400
+Received: by mail-qt0-f195.google.com with SMTP id t5-v6so8020896qtn.3
+        for <linux-kbuild@vger.kernel.org>; Sat, 28 Jul 2018 07:49:20 -0700 (PDT)
+From: Jeremy Cline <jcline@redhat.com>
+Subject: [PATCH v2] scripts: Add Python 3 support to tracing/draw_functrace.py
+Date: Sat, 28 Jul 2018 10:48:33 -0400
+Message-Id: <20180728144833.6336-1-jcline@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: Frederic Weisbecker <fweisbec@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jeremy Cline <jcline@redhat.com>
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig2
-head:   0e83fd903bc85173711186755591b61405647cf3
-commit: 2cc1bfaf2c45056c73970a99c3a7467e157f56aa [1/10] um: stop abusing KBUILD_KCONFIG
-config: um-x86_64_defconfig
-compiler: gcc-7 (Debian 7.3.0-16) 7.3.0
-reproduce:
-        git checkout 2cc1bfaf2c45056c73970a99c3a7467e157f56aa
-        make ARCH=um SUBARCH=x86_64 defconfig
-        make ARCH=um SUBARCH=x86_64
+Use the print function. This maintains Python 2 support and should have
+no functional change.
 
-All errors (new ones prefixed by >>):
-
->> arch/um/Kconfig:3: can't open file "arch/x86_64/um/Kconfig"
-   make[2]: *** [defconfig] Error 1
-   make[1]: *** [defconfig] Error 2
-   make: *** [sub-make] Error 2
---
->> arch/um/Kconfig:3: can't open file "arch/x86_64/um/Kconfig"
-   make[2]: *** [oldconfig] Error 1
-   make[1]: *** [oldconfig] Error 2
-   make: *** [sub-make] Error 2
---
->> arch/um/Kconfig:3: can't open file "arch/x86_64/um/Kconfig"
-   make[2]: *** [olddefconfig] Error 1
-   make[1]: *** [olddefconfig] Error 2
-   make: *** [sub-make] Error 2
-
-vim +3 arch/um/Kconfig
-
-     2	
-   > 3	source "arch/$(SUBARCH)/um/Kconfig"
-
+Signed-off-by: Jeremy Cline <jcline@redhat.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+
+Changes from v1:
+  - Drop "from __future__ import print_function" as Python 2 is not long
+    for this world and in this case the statement and function behave
+    the same way.
+
+ scripts/tracing/draw_functrace.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/tracing/draw_functrace.py b/scripts/tracing/draw_functrace.py
+index db40fa04cd51..9b6dd4f36335 100755
+--- a/scripts/tracing/draw_functrace.py
++++ b/scripts/tracing/draw_functrace.py
+@@ -123,7 +123,7 @@ def main():
+ 		tree = tree.getParent(caller)
+ 		tree = tree.calls(callee, calltime)
+ 
+-	print CallTree.ROOT
++	print(CallTree.ROOT)
+ 
+ if __name__ == "__main__":
+ 	main()
+-- 
+2.17.1
+
