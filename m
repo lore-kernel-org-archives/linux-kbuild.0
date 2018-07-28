@@ -1,87 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:47398 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730340AbeG0Kkl (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:32021 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388527AbeG1CQA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Jul 2018 06:40:41 -0400
-Date: Fri, 27 Jul 2018 11:19:39 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH] [stable 4.14] turn off -Wattribute-alias
-Message-ID: <20180727091939.GA12736@kroah.com>
-References: <20180726081358.3829157-1-arnd@arndb.de>
- <20180726092231.GA6916@kroah.com>
- <CAK8P3a3g7VSu3W0DiMcUdLB0b1fmUaHJxEyC30K8EfP5a9T1ig@mail.gmail.com>
+        Fri, 27 Jul 2018 22:16:00 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a3g7VSu3W0DiMcUdLB0b1fmUaHJxEyC30K8EfP5a9T1ig@mail.gmail.com>
+In-Reply-To: <20180727074854.GA21840@lst.de>
+References: <20180724175646.3621-1-hch@lst.de> <CAK7LNARP2HZ8GdsAU8h_b04jLWbvFXTWqiVt2hpE0vJbjP82ZA@mail.gmail.com>
+ <20180726172143.GA9836@lst.de> <CAK7LNASd0YCj4wwmT9-6GYiBz=wDoXkmQW2F_5XjbCzS9-weUw@mail.gmail.com>
+ <20180727074854.GA21840@lst.de>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 28 Jul 2018 09:50:45 +0900
+Message-ID: <CAK7LNATnt9ryzMD7=6WNnoJq2B3wT_TJisJgpF=MPFwqF6yP=g@mail.gmail.com>
+Subject: Re: include architecture Kconfig files from top-level Kconfig v3
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: "# 3.4.x" <stable@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, Ley Foon Tan <lftan@altera.com>, Michal Simek <monstr@monstr.eu>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-um@lists.infradead.org, linux-arch@lists.infradead.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, Jul 26, 2018 at 12:02:42PM +0200, Arnd Bergmann wrote:
-> On Thu, Jul 26, 2018 at 11:22 AM, Greg KH <gregkh@linuxfoundation.org> wrote:
-> > On Thu, Jul 26, 2018 at 10:13:22AM +0200, Arnd Bergmann wrote:
-> >> Starting with gcc-8.1, we get a warning about all system call definitions,
-> >> which use an alias between functions with incompatible prototypes, e.g.:
-> >>
-> >> In file included from ../mm/process_vm_access.c:19:
-> >> ../include/linux/syscalls.h:211:18: warning: 'sys_process_vm_readv' alias between functions of incompatible types 'long int(pid_t,  const struct iovec *, long unsigned int,  const struct iovec *, long unsigned int,  long unsigned int)' {aka 'long int(int,  const struct iovec *, long unsigned int,  const struct iovec *, long unsigned int,  long unsigned int)'} and 'long int(long int,  long int,  long int,  long int,  long int,  long int)' [-Wattribute-alias]
-> >>   asmlinkage long sys##name(__MAP(x,__SC_DECL,__VA_ARGS__)) \
-> >>                   ^~~
-> >> ../include/linux/syscalls.h:207:2: note: in expansion of macro '__SYSCALL_DEFINEx'
-> >>   __SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
-> >>   ^~~~~~~~~~~~~~~~~
-> >> ../include/linux/syscalls.h:201:36: note: in expansion of macro 'SYSCALL_DEFINEx'
-> >>  #define SYSCALL_DEFINE6(name, ...) SYSCALL_DEFINEx(6, _##name, __VA_ARGS__)
-> >>                                     ^~~~~~~~~~~~~~~
-> >> ../mm/process_vm_access.c:300:1: note: in expansion of macro 'SYSCALL_DEFINE6'
-> >>  SYSCALL_DEFINE6(process_vm_readv, pid_t, pid, const struct iovec __user *, lvec,
-> >>  ^~~~~~~~~~~~~~~
-> >> ../include/linux/syscalls.h:215:18: note: aliased declaration here
-> >>   asmlinkage long SyS##name(__MAP(x,__SC_LONG,__VA_ARGS__)) \
-> >>                   ^~~
-> >> ../include/linux/syscalls.h:207:2: note: in expansion of macro '__SYSCALL_DEFINEx'
-> >>   __SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
-> >>   ^~~~~~~~~~~~~~~~~
-> >> ../include/linux/syscalls.h:201:36: note: in expansion of macro 'SYSCALL_DEFINEx'
-> >>  #define SYSCALL_DEFINE6(name, ...) SYSCALL_DEFINEx(6, _##name, __VA_ARGS__)
-> >>                                     ^~~~~~~~~~~~~~~
-> >> ../mm/process_vm_access.c:300:1: note: in expansion of macro 'SYSCALL_DEFINE6'
-> >>  SYSCALL_DEFINE6(process_vm_readv, pid_t, pid, const struct iovec __user *, lvec,
-> >>
-> >> This is really noisy and does not indicate a real problem. In the latest
-> >> mainline kernel, this was addressed by commit bee20031772a ("disable
-> >> -Wattribute-alias warning for SYSCALL_DEFINEx()"), which seems too invasive
-> >> to backport.
-> >
-> > Too invasive?
-> >
-> > Here's the diffstat:
-> >          include/linux/compat.h   |    8 +++++++-
-> >          include/linux/syscalls.h |    4 ++++
-> >          2 files changed, 11 insertions(+), 1 deletion(-)
-> >
-> > That seems almost trivial to backport.  Did you try it and it caused
-> > other problems?
-> >
-> > Where ever possible, I always want to use the upstream commits.
-> 
-> I forward ported that patch a few times across kernels when that macro
-> changed in subtle ways. This was particularly tricky as some using the
-> new macro inside of another macro sometimes has different effects
-> based on seemingly unrelated changes: in particular the addition of
-> __MAP() in COMPAT_SYSCALL_DEFINEx that I had to do to work
-> around gcc pr83256 can easily break.
-> 
-> It also depends on commit 8793bb7f4a9d ("kbuild: add macro for
-> controlling warnings to linux/compiler.h") before it, which is not long
-> but does add new infrastructure.
+2018-07-27 16:48 GMT+09:00 Christoph Hellwig <hch@lst.de>:
+> On Fri, Jul 27, 2018 at 10:32:19AM +0900, Masahiro Yamada wrote:
+>> This will just add a new unmet dependency warning.
+>> CONFIG_PREEMPT_COUNT will be still selected.
+>
+> True.  I guess we simply need to prohibit CONFIG_DEBUG_ATOMIC_SLEEP
+> explicitly if PREEMPT_COUNT isn't supported.  E.g something like this:
+>
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 26d3ff7e3cf4..373ce9fecd7e 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -1195,6 +1195,7 @@ config DEBUG_ATOMIC_SLEEP
+>         bool "Sleep inside atomic section checking"
+>         select PREEMPT_COUNT
+>         depends on DEBUG_KERNEL
+> +       depends on !ARCH_NO_PREEMPT
+>         help
+>           If you say Y here, various routines which may sleep will become very
+>           noisy if they are called inside atomic sections: when a spinlock is
 
-Ah, yeah, that's a mess.  Ok, I'll go queue these up, thanks.  Maybe I
-can finally move to gcc-8 now :)
 
-thanks,
+I will fold this into 07/10.
 
-greg k-h
+
+I see another 'select PREEMPT_COUNT' in
+drivers/gpu/drm/i915/Kconfig.debug
+but DRM_I915 depends on X86, so this is not
+a real problem.
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
