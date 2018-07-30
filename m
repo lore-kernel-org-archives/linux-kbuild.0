@@ -1,250 +1,192 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:25003 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726476AbeG3Jha (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:29636 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726520AbeG3KRW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 30 Jul 2018 05:37:30 -0400
+        Mon, 30 Jul 2018 06:17:22 -0400
+Received: from mail-ua0-f173.google.com (mail-ua0-f173.google.com [209.85.217.173]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id w6U8hLHd031892
+        for <linux-kbuild@vger.kernel.org>; Mon, 30 Jul 2018 17:43:22 +0900
+Received: by mail-ua0-f173.google.com with SMTP id k8-v6so7295279uaq.12
+        for <linux-kbuild@vger.kernel.org>; Mon, 30 Jul 2018 01:43:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180628111623.3807fe9b@naga.suse.cz>
-References: <20180627143705.5a1fed1c@kitsune.suse.cz> <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
- <20180628111623.3807fe9b@naga.suse.cz>
+In-Reply-To: <c0a17b80-6384-7437-045c-3688d9e5e7f9@infradead.org>
+References: <3f906b03-98ff-c081-4e19-b490f0b35c51@infradead.org>
+ <a3c9b9ee9ec116390c47dca65fcf14f138eccd3f.camel@kernel.crashing.org>
+ <4f3a5969-88d5-134d-508d-7617947c588c@infradead.org> <20180707221316.5b75e075@roar.ozlabs.ibm.com>
+ <c0a17b80-6384-7437-045c-3688d9e5e7f9@infradead.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 30 Jul 2018 17:02:42 +0900
-Message-ID: <CAK7LNARRKU7Mfa8ZBu1qPFYFRr-5k69sjVyERM2bYcnWoBDN8g@mail.gmail.com>
-Subject: Re: due to kconfig changes kernel config file is no longer sufficient
- for configuring the kernel
+Date: Mon, 30 Jul 2018 17:42:40 +0900
+Message-ID: <CAK7LNASKiO8J8yTRGp4ngo2=ErC6S2_0bNENVsc4PoYpENQfTQ@mail.gmail.com>
+Subject: Re: powerpc: 32BIT vs. 64BIT (PPC32 vs. PPC64)
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Takashi Iwai <tiwai@suse.de>, Andreas Schwab <schwab@suse.de>, Michal Kubecek <mkubecek@suse.cz>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Nicholas Piggin <npiggin@gmail.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Paul Mackerras <paulus@samba.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-2018-06-28 18:16 GMT+09:00 Michal Such=C3=A1nek <msuchanek@suse.de>:
-> On Wed, 27 Jun 2018 23:07:21 +0900
-> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+2018-07-07 23:59 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+> On 07/07/2018 05:13 AM, Nicholas Piggin wrote:
+>> On Fri, 6 Jul 2018 21:58:29 -0700
+>> Randy Dunlap <rdunlap@infradead.org> wrote:
+>>
+>>> On 07/06/2018 06:45 PM, Benjamin Herrenschmidt wrote:
+>>>> On Thu, 2018-07-05 at 14:30 -0700, Randy Dunlap wrote:
+>>>>> Hi,
+>>>>>
+>>>>> Is there a good way (or a shortcut) to do something like:
+>>>>>
+>>>>> $ make ARCH=powerpc O=PPC32 [other_options] allmodconfig
+>>>>>   to get a PPC32/32BIT allmodconfig
+>>>>>
+>>>>> and also be able to do:
+>>>>>
+>>>>> $make ARCH=powerpc O=PPC64 [other_options] allmodconfig
+>>>>>   to get a PPC64/64BIT allmodconfig?
+>>>>
+>>>> Hrm... O= is for the separate build dir, so there much be something
+>>>> else.
+>>>>
+>>>> You mean having ARCH= aliases like ppc/ppc32 and ppc64 ?
+>>>
+>>> Yes.
+>>>
+>>>> That would be a matter of overriding some .config defaults I suppose, I
+>>>> don't know how this is done on other archs.
+>>>>
+>>>> I see the aliasing trick in the Makefile but that's about it.
+>>>>
+>>>>> Note that arch/x86, arch/sh, and arch/sparc have ways to do
+>>>>> some flavor(s) of this (from Documentation/kbuild/kbuild.txt;
+>>>>> sh and sparc based on a recent "fix" patch from me):
+>>>>
+>>>> I fail to see what you are actually talking about here ... sorry. Do
+>>>> you have concrete examples on x86 or sparc ? From what I can tell the
+>>>> "i386" or "sparc32/sparc64" aliases just change SRCARCH in Makefile and
+>>>> 32 vs 64-bit is just a Kconfig option...
+>>>
+>>> Yes, your summary is mostly correct.
+>>>
+>>> I'm just looking for a way to do cross-compile builds that are close to
+>>> ppc32 allmodconfig and ppc64 allmodconfig.
+>>
+>> Would there a problem with adding ARCH=ppc32 / ppc64 matching? This
+>> seems to work...
+>>
+>> Thanks,
+>> Nick
 >
->> Hi.
->>
->>
->> 2018-06-27 21:37 GMT+09:00 Michal Such=C3=A1nek <msuchanek@suse.de>:
->> > Hello,
->> >
->> > in the x86 Kconfig we have this:
->> >
->> > # Select 32 or 64 bit
->> > config 64BIT
->> >         bool "64-bit kernel" if "$(ARCH)" =3D "x86"
->> >         default "$(ARCH)" !=3D "i386"
->> >         ---help---
->> >           Say yes to build a 64-bit kernel - formerly known as
->> > x86_64 Say no to build a 32-bit kernel - formerly known as i386
->> >
->> > Since commit 104daea149c4 ("kconfig: reference environment variables
->> > directly and remove 'option env=3D'") the value of ARCH is not saved
->> > in the kernel config.
->>
->> I think this commit is unrelated.  It was just a syntax change.
+> Yes, this mostly works and is similar to a patch (my patch) on my test machine.
+> And they both work for allmodconfig, which is my primary build target.
 >
-> This does not look like syntax only change to me:
+> And they both have one little quirk that is confusing when the build target
+> is defconfig:
 >
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 15aae32e0719..1217fc62ca61 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -1,20 +1,12 @@
-> -config ARCH
-> -       string
-> -       option env=3D"ARCH"
-> -
-> -config KERNELVERSION
-> -       string
-> -       option env=3D"KERNELVERSION"
-> -
-
-This is just syntax change.
-
-'option env=3D' was used to reference an environment variable.
-
-Now, $(ARCH), $(KERNELVERSION) are simpler forms.
-
-
->>
->> Unless I am missing something,
->> we have never saved ARCH in the .config in the past.
+> When ARCH=ppc32, the terminal output (stdout) is: (using O=PPC32)
 >
-> There was a config symbol defined for it before the commit removed it.
-
-No.
-
-CONFIG symbols with'option env=3D'
-are not written out to the .config file.
-
-We have never had CONFIG_ARCH or CONFIG_KERNELVERSION.
-
-
-
-
->>
->>
->> > Since commit f467c5640c29 ("kconfig: only write '#
->> > CONFIG_FOO is not set' for visible symbols") the value of 64BIT is
->> > not saved if the ARCH is set i386 or x86_64 because the symbol is
->> > not visible.
->>
->> This is correct.
->>
->> It was discussed a few weeks ago.
->>
->> https://lkml.org/lkml/2018/6/5/847
->>
->>
->> > There is a number of ways to hack this particular case to work.
->> >
->> > However, there is a more general problem with this. Some config
->> > options may depend on the environment, may not be saved, and the
->> > environment is not saved either.
->>
->> Which environment variables in particular are in your mind?
+> make[1]: Entering directory '/home/rdunlap/lnx/lnx-418-rc3/PPC32'
+>   GEN     ./Makefile
+> *** Default configuration is based on 'ppc64_defconfig'   <<<<< NOTE <<<<<
+> #
+> # configuration written to .config
+> #
+> make[1]: Leaving directory '/home/rdunlap/lnx/lnx-418-rc3/PPC32'
 >
-> Any that is used in Kconfig.
-
-They are provided from outside of Kconfig.
-This is the behavior we keep since a long time ago.
-
-ARCH is given by the environment variable or the command line.
-KERNELVERSION is supplied by the top Makefile.
 
 
+Maybe, we can set one of ppc32 defconfigs to KBUILD_DEFCONFIG
+if ARCH is ppc32 ?
 
 
->>
->> As for ARCH, you need to pass the same ARCH as you used for building
->> the kernel. (For native building, you do not have to pass ARCH
->> explicitly, though.)
+ifeq ($(ARCH),ppc32)
+   KBUILD_DEFCONFIG := (some reasonable 32bit machine _defconfig)
+else
+   KBUILD_DEFCONFIG := ppc64_defconfig
+endif
+
+ifeq ($(CROSS_COMPILE),)
+    KBUILD_DEFCONFIG := $(shell uname -m)_defconfig
+endif
+
+
+> I expect that can be fixed also.  :)
 >
-> Except if you do pass it to make config you may need to pass it to to
-> make later as well.
-
-Right.
-
-For exmaple 'make ARCH=3Darm config' will create the config suitable
-only for ARM architecture.
-Then, you need to do 'make ARCH=3Darm' to build the kernel.
-
-If it is tedious to give 'ARCH=3Darm' to every make command,
-you can do 'export ARCH=3Darm' in your shell.
-
-Again, this is the behavior we have for a long time.
-
-
-
->>
->> As for CC, HOSTCC, etc.
->> yes, these are new 'unsaved' environments.
->>
->> CONFIG options now depend on the compiler.
->> This is the concept suggested by Linus Torvalds.
->>
->>
->> > So in the end all the infrastructure with symlinks
->> > from module directory pointing to the kernel source and object
->> > directory is useless. To interpret the config stored there you need
->> > the environment and that is not saved anywhere. So if you try to
->> > build out-of-tree module it might end up reconfiguring your kernel
->> > and producing useless modules.
->>
->> No. out-of-tree module building never ever re-configures the kernel.
+> And the written .config file is indeed for 32BIT, not 64BIT.
 >
-> It does implicitly because the config values depend on environment that
-> is not saved and the values themselves are not saved either. If that
-> happens to expose a new variable it is even explicitly reconfigured.
-
-
-You should have a built kernel tree
-before building external modules.
-
-The .config is already there.
-
-The .config works for external modules, given that
-
-  - ARCH is the same
-  - the compiler is the same
-
-
-
+> Thanks, Nick.
+>
+>> ---
+>>  Makefile                               | 8 ++++++++
+>>  arch/powerpc/Kconfig                   | 9 +++++++++
+>>  arch/powerpc/platforms/Kconfig.cputype | 8 --------
+>>  3 files changed, 17 insertions(+), 8 deletions(-)
 >>
->> out-of-tree modules are built with exactly the same configuration
->> as used for the kernel.
+>> diff --git a/Makefile b/Makefile
+>> index c5ce55cbc543..f97204aed17a 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -345,6 +345,14 @@ ifeq ($(ARCH),sh64)
+>>         SRCARCH := sh
+>>  endif
+>>
+>> +# Additional ARCH settings for powerpc
+>> +ifeq ($(ARCH),ppc32)
+>> +       SRCARCH := powerpc
+>> +endif
+>> +ifeq ($(ARCH),ppc64)
+>> +       SRCARCH := powerpc
+>> +endif
+>> +
+>>  KCONFIG_CONFIG       ?= .config
+>>  export KCONFIG_CONFIG
+>>
+>> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+>> index 9f2b75fe2c2d..3405b1b122be 100644
+>> --- a/arch/powerpc/Kconfig
+>> +++ b/arch/powerpc/Kconfig
+>> @@ -1,4 +1,13 @@
+>>  # SPDX-License-Identifier: GPL-2.0
+>> +
+>> +config PPC64
+>> +     bool "64-bit kernel" if "$(ARCH)" = "powerpc"
+>> +     default "$(ARCH)" != "ppc32"
+>> +     select ZLIB_DEFLATE
+>> +     help
+>> +       This option selects whether a 32-bit or a 64-bit kernel
+>> +       will be built.
+>> +
+>>  source "arch/powerpc/platforms/Kconfig.cputype"
+>>
+>>  config PPC32
+>> diff --git a/arch/powerpc/platforms/Kconfig.cputype b/arch/powerpc/platforms/Kconfig.cputype
+>> index e6a1de521319..f6e5d6ef9782 100644
+>> --- a/arch/powerpc/platforms/Kconfig.cputype
+>> +++ b/arch/powerpc/platforms/Kconfig.cputype
+>> @@ -1,12 +1,4 @@
+>>  # SPDX-License-Identifier: GPL-2.0
+>> -config PPC64
+>> -     bool "64-bit kernel"
+>> -     default n
+>> -     select ZLIB_DEFLATE
+>> -     help
+>> -       This option selects whether a 32-bit or a 64-bit kernel
+>> -       will be built.
+>> -
+>>  menu "Processor support"
+>>  choice
+>>       prompt "Processor Type"
+>>
 >
-> It is not true. And that is the problem. You need the config file and
-> dump of the environment passed to the make command at configuration
-> time to get the exact same configuration. The environment is not saved
-> anywhere, though.
-
-
-Why dump of the environment?
-
-
-If you are building external modules natively
-your distribution provides /lib/modules/$(uname -r)/build,
-which contains files enough for building external modules.
-
-You can pass the directory path to M=3D... parameter.  That's it.
-
-
-
-If you are cross-building external modules,
-you also need to
-
- - pass ARCH=3D
- - use the same compiler with CROSS_COMPILE=3D
-
-You should know both
-because you have built the kernel by your self.
-
-You do not need any other information, do you?
-
-
-
-
-> And it went nowhere.
 >
-> Anyway, the observed issue with CONFIG_64BIT on x86 is the tip of a
-> larger problem which was unnoticed for ages. The .config simply does
-> not contain the whole kernel configuration. ie. make oldconfig (and
-> make syncconfig) is *not* expected to just work. It used to work just by
-> luck until f467c5640c29 ("kconfig: only write '# CONFIG_FOO is not set'
-> for visible symbols") finally exposed the problem.
-
-If you want to build the kernel for an architecture
-other than the host machine architecture, you need to pass ARCH=3D.
-
-Building the i386 kernel on a x86_64 machine, it is a _kind_ of cross-compi=
-ling.
-So, passing ARCH=3Di386 is not so weird.
-
-
-> So is .config supposed to contain the kernel configuration or is it
-> just some byproduct of the kernel build which is meaningless outside of
-> your build environment (the object tree, shell environment, etc).
-
-The .config is supposed to contain the kernel configuration,
-'ARCH' and the compiler are exceptions.
-
-'ARCH' must be passed separately.
-
-The .config now depends on the compiler.  So, if you pass your .config
-to somebody else, some symbols that depend on the compiler support
-might be configured differently.
-
-'make syncconfig' will notice the compiler difference,
-and show prompts for user input as needed.
+> --
+> ~Randy
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
-
-
---=20
+-- 
 Best Regards
 Masahiro Yamada
