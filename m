@@ -1,69 +1,250 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bues.ch ([80.190.117.144]:42624 "EHLO bues.ch"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726241AbeG2NvD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 29 Jul 2018 09:51:03 -0400
-Date: Sun, 29 Jul 2018 13:42:02 +0200
-From: Michael =?UTF-8?B?QsO8c2No?= <m@bues.ch>
-Subject: Re: [TRIVIAL RFC PATCH] Kconfigs - reduce use of "depends on
- EXPERT"
-Message-ID: <20180729134202.5ab56762@wiggum>
-In-Reply-To: <27780ceb2056b871d746803a2ac23464396f3026.camel@perches.com>
-References: <27780ceb2056b871d746803a2ac23464396f3026.camel@perches.com>
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:25003 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726476AbeG3Jha (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 30 Jul 2018 05:37:30 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
- boundary="Sig_/zF+NOvxa9zL7F4P8tC0wFvf"; protocol="application/pgp-signature"
+In-Reply-To: <20180628111623.3807fe9b@naga.suse.cz>
+References: <20180627143705.5a1fed1c@kitsune.suse.cz> <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
+ <20180628111623.3807fe9b@naga.suse.cz>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 30 Jul 2018 17:02:42 +0900
+Message-ID: <CAK7LNARRKU7Mfa8ZBu1qPFYFRr-5k69sjVyERM2bYcnWoBDN8g@mail.gmail.com>
+Subject: Re: due to kconfig changes kernel config file is no longer sufficient
+ for configuring the kernel
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jani Nikula <jani.nikula@linux.intel.com>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, David Airlie <airlied@linux.ie>, Rob Clark <robdclark@gmail.com>, Johannes Berg <johannes.berg@intel.com>, Emmanuel Grumbach <emmanuel.grumbach@intel.com>, Luca Coelho <luciano.coelho@intel.com>, Intel Linux Wireless <linuxwifi@intel.com>, Kalle Valo <kvalo@codeaurora.org>, "David S. Miller" <davem@davemloft.net>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>
+To: =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Takashi Iwai <tiwai@suse.de>, Andreas Schwab <schwab@suse.de>, Michal Kubecek <mkubecek@suse.cz>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org
 
---Sig_/zF+NOvxa9zL7F4P8tC0wFvf
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+2018-06-28 18:16 GMT+09:00 Michal Such=C3=A1nek <msuchanek@suse.de>:
+> On Wed, 27 Jun 2018 23:07:21 +0900
+> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+>
+>> Hi.
+>>
+>>
+>> 2018-06-27 21:37 GMT+09:00 Michal Such=C3=A1nek <msuchanek@suse.de>:
+>> > Hello,
+>> >
+>> > in the x86 Kconfig we have this:
+>> >
+>> > # Select 32 or 64 bit
+>> > config 64BIT
+>> >         bool "64-bit kernel" if "$(ARCH)" =3D "x86"
+>> >         default "$(ARCH)" !=3D "i386"
+>> >         ---help---
+>> >           Say yes to build a 64-bit kernel - formerly known as
+>> > x86_64 Say no to build a 32-bit kernel - formerly known as i386
+>> >
+>> > Since commit 104daea149c4 ("kconfig: reference environment variables
+>> > directly and remove 'option env=3D'") the value of ARCH is not saved
+>> > in the kernel config.
+>>
+>> I think this commit is unrelated.  It was just a syntax change.
+>
+> This does not look like syntax only change to me:
+>
+> diff --git a/init/Kconfig b/init/Kconfig
+> index 15aae32e0719..1217fc62ca61 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -1,20 +1,12 @@
+> -config ARCH
+> -       string
+> -       option env=3D"ARCH"
+> -
+> -config KERNELVERSION
+> -       string
+> -       option env=3D"KERNELVERSION"
+> -
 
-On Sat, 28 Jul 2018 15:13:00 -0700
-Joe Perches <joe@perches.com> wrote:
+This is just syntax change.
 
->  config SSB_SILENT
-> -	bool "No SSB kernel messages"
-> -	depends on SSB && EXPERT
-> +	bool "No SSB kernel messages" if EXPERT
-> +	depends on SSB
->  	help
->  	  This option turns off all Sonics Silicon Backplane printks.
->  	  Note that you won't be able to identify problems, once
+'option env=3D' was used to reference an environment variable.
+
+Now, $(ARCH), $(KERNELVERSION) are simpler forms.
 
 
-What about removing this option entirely?
-We would just have to remove it from Kconfig and from its only use in
-drivers/ssb/ssb_private.h
-I don't think anybody uses (or should use) this option anyway.
-That would reduce the EXPERT dependencies by one, which is a good
-thing. :)
+>>
+>> Unless I am missing something,
+>> we have never saved ARCH in the .config in the past.
+>
+> There was a config symbol defined for it before the commit removed it.
+
+No.
+
+CONFIG symbols with'option env=3D'
+are not written out to the .config file.
+
+We have never had CONFIG_ARCH or CONFIG_KERNELVERSION.
+
+
+
+
+>>
+>>
+>> > Since commit f467c5640c29 ("kconfig: only write '#
+>> > CONFIG_FOO is not set' for visible symbols") the value of 64BIT is
+>> > not saved if the ARCH is set i386 or x86_64 because the symbol is
+>> > not visible.
+>>
+>> This is correct.
+>>
+>> It was discussed a few weeks ago.
+>>
+>> https://lkml.org/lkml/2018/6/5/847
+>>
+>>
+>> > There is a number of ways to hack this particular case to work.
+>> >
+>> > However, there is a more general problem with this. Some config
+>> > options may depend on the environment, may not be saved, and the
+>> > environment is not saved either.
+>>
+>> Which environment variables in particular are in your mind?
+>
+> Any that is used in Kconfig.
+
+They are provided from outside of Kconfig.
+This is the behavior we keep since a long time ago.
+
+ARCH is given by the environment variable or the command line.
+KERNELVERSION is supplied by the top Makefile.
+
+
+
+
+>>
+>> As for ARCH, you need to pass the same ARCH as you used for building
+>> the kernel. (For native building, you do not have to pass ARCH
+>> explicitly, though.)
+>
+> Except if you do pass it to make config you may need to pass it to to
+> make later as well.
+
+Right.
+
+For exmaple 'make ARCH=3Darm config' will create the config suitable
+only for ARM architecture.
+Then, you need to do 'make ARCH=3Darm' to build the kernel.
+
+If it is tedious to give 'ARCH=3Darm' to every make command,
+you can do 'export ARCH=3Darm' in your shell.
+
+Again, this is the behavior we have for a long time.
+
+
+
+>>
+>> As for CC, HOSTCC, etc.
+>> yes, these are new 'unsaved' environments.
+>>
+>> CONFIG options now depend on the compiler.
+>> This is the concept suggested by Linus Torvalds.
+>>
+>>
+>> > So in the end all the infrastructure with symlinks
+>> > from module directory pointing to the kernel source and object
+>> > directory is useless. To interpret the config stored there you need
+>> > the environment and that is not saved anywhere. So if you try to
+>> > build out-of-tree module it might end up reconfiguring your kernel
+>> > and producing useless modules.
+>>
+>> No. out-of-tree module building never ever re-configures the kernel.
+>
+> It does implicitly because the config values depend on environment that
+> is not saved and the values themselves are not saved either. If that
+> happens to expose a new variable it is even explicitly reconfigured.
+
+
+You should have a built kernel tree
+before building external modules.
+
+The .config is already there.
+
+The .config works for external modules, given that
+
+  - ARCH is the same
+  - the compiler is the same
+
+
+
+>>
+>> out-of-tree modules are built with exactly the same configuration
+>> as used for the kernel.
+>
+> It is not true. And that is the problem. You need the config file and
+> dump of the environment passed to the make command at configuration
+> time to get the exact same configuration. The environment is not saved
+> anywhere, though.
+
+
+Why dump of the environment?
+
+
+If you are building external modules natively
+your distribution provides /lib/modules/$(uname -r)/build,
+which contains files enough for building external modules.
+
+You can pass the directory path to M=3D... parameter.  That's it.
+
+
+
+If you are cross-building external modules,
+you also need to
+
+ - pass ARCH=3D
+ - use the same compiler with CROSS_COMPILE=3D
+
+You should know both
+because you have built the kernel by your self.
+
+You do not need any other information, do you?
+
+
+
+
+> And it went nowhere.
+>
+> Anyway, the observed issue with CONFIG_64BIT on x86 is the tip of a
+> larger problem which was unnoticed for ages. The .config simply does
+> not contain the whole kernel configuration. ie. make oldconfig (and
+> make syncconfig) is *not* expected to just work. It used to work just by
+> luck until f467c5640c29 ("kconfig: only write '# CONFIG_FOO is not set'
+> for visible symbols") finally exposed the problem.
+
+If you want to build the kernel for an architecture
+other than the host machine architecture, you need to pass ARCH=3D.
+
+Building the i386 kernel on a x86_64 machine, it is a _kind_ of cross-compi=
+ling.
+So, passing ARCH=3Di386 is not so weird.
+
+
+> So is .config supposed to contain the kernel configuration or is it
+> just some byproduct of the kernel build which is meaningless outside of
+> your build environment (the object tree, shell environment, etc).
+
+The .config is supposed to contain the kernel configuration,
+'ARCH' and the compiler are exceptions.
+
+'ARCH' must be passed separately.
+
+The .config now depends on the compiler.  So, if you pass your .config
+to somebody else, some symbols that depend on the compiler support
+might be configured differently.
+
+'make syncconfig' will notice the compiler difference,
+and show prompts for user input as needed.
+
+
+
+
 
 --=20
-Michael
-
---Sig_/zF+NOvxa9zL7F4P8tC0wFvf
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEihRzkKVZOnT2ipsS9TK+HZCNiw4FAltdqAoACgkQ9TK+HZCN
-iw4Ktw//R+OJKZ2oixZtTGzCwin21bIigZ+8SeqCv3UwNZELVGrvuQnQTWmF9i9T
-1kKqo82CZnHL9udgdJqFPp+zvQWDrohX45C0j+ROzBpsyNACaGU3wy7cxayv+0Bn
-uTvuRdN4LiBzkaOV1HLu6HN6RYDujuGreIe0v+ks/ugNiRPxg1QopUGISu0N98kw
-e4ypm/A3RnU+Ho4T2P3tZFAhc9PVXAUmaIT43rmxZtKxJ0Q0eCjBJmtugr0ffxYg
-fg6iG11O/zREjA0Ha9BBaOhVGTj9qg+e2X2w/hdslhfMl1Fft3//JsKRqZPlNfV7
-FI6IUx8NqwR0Cmu2b4wVtjyqNkz/1zOh2mbdkWGRQ92IpFDjaLIONo1Xd9ad/L15
-VaEckI9AlR7/Jzzz/ZHozXobS/VivBYJi35t0VseWV4kU1x4vvtlAyH7ofnlru6F
-Uk5EP3iS7qIPN3fP++ecJ8zPIJEoulxTRTj3PMW9r8io9xXWhR0cywMD8urk64XE
-zLB83QiP2ptqGncUYtTdKC1+0rEhmaZgDcLb7Uud+kUCcKLrs73PQWZFyMcURo63
-LGArOw9KENQuxhro8f7H0EUUkp44SCOlTtxEebiFka7sB2V67aGPDk9+iNEXyDny
-rwPgn393I6XpWKEe83nWlR5z2aK740mzSR0E0AKF64LJW4EnWnU=
-=fPeg
------END PGP SIGNATURE-----
-
---Sig_/zF+NOvxa9zL7F4P8tC0wFvf--
+Best Regards
+Masahiro Yamada
