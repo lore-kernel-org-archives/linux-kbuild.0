@@ -1,76 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:43350 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731912AbeGaNTk (ORCPT
+Received: from mail-it0-f67.google.com ([209.85.214.67]:51664 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732068AbeGaOqQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 Jul 2018 09:19:40 -0400
-From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 01/10] um: stop abusing KBUILD_KCONFIG
-Date: Tue, 31 Jul 2018 13:39:26 +0200
-Message-Id: <20180731113935.6105-2-hch@lst.de>
-In-Reply-To: <20180731113935.6105-1-hch@lst.de>
-References: <20180731113935.6105-1-hch@lst.de>
+        Tue, 31 Jul 2018 10:46:16 -0400
+Received: by mail-it0-f67.google.com with SMTP id e14-v6so4355072itf.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 31 Jul 2018 06:06:01 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <09cb5553-d84a-0e62-5174-315c14b88833@arm.com>
+References: <cover.1530018818.git.andreyknvl@google.com> <a2a93370d43ec85b02abaf8d007a15b464212221.1530018818.git.andreyknvl@google.com>
+ <09cb5553-d84a-0e62-5174-315c14b88833@arm.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Tue, 31 Jul 2018 15:05:59 +0200
+Message-ID: <CAAeHK+yC3XRPoTByhH1QPrX45pG3QY_2Q4gz=dfDgxfzu1Fyfw@mail.gmail.com>
+Subject: Re: [PATCH v4 13/17] khwasan: add hooks implementation
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, Ley Foon Tan <lftan@altera.com>, Michal Simek <monstr@monstr.eu>, linux-kbuild@vger.kernel.org, linux-um@lists.infradead.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org
+To: vincenzo.frascino@arm.com
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 
-Instead create a arch/um/Kconfig file that just includes the actual
-per-arch Kconfig file.  Note that we use HEADER_ARCH to find the
-per-arch Kconfig file as that variable already includes the
-normalization from i386 or x86_64 to x86.
+On Wed, Jul 25, 2018 at 3:44 PM, Vincenzo Frascino@Foss
+<vincenzo.frascino@arm.com> wrote:
+> On 06/26/2018 02:15 PM, Andrey Konovalov wrote:
+>
+>> @@ -325,18 +341,41 @@ void kasan_init_slab_obj(struct kmem_cache *cache,
+>> const void *object)
+>>     void *kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t
+>> flags)
+>>   {
+>> -       return kasan_kmalloc(cache, object, cache->object_size, flags);
+>> +       object = kasan_kmalloc(cache, object, cache->object_size, flags);
+>> +       if (IS_ENABLED(CONFIG_KASAN_HW) && unlikely(cache->ctor)) {
+>> +               /*
+>> +                * Cache constructor might use object's pointer value to
+>> +                * initialize some of its fields.
+>> +                */
+>> +               cache->ctor(object);
+>>
+> This seams breaking the kmem_cache_create() contract: "The @ctor is run when
+> new pages are allocated by the cache."
+> (https://elixir.bootlin.com/linux/v3.7/source/mm/slab_common.c#L83)
+>
+> Since there might be preexisting code relying on it, this could lead to
+> global side effects. Did you verify that this is not the case?
+>
+> Another concern is performance related if we consider this solution suitable
+> for "near-production", since with the current implementation you call the
+> ctor (where present) on an object multiple times and this ends up memsetting
+> and repopulating the memory every time (i.e. inode.c: inode_init_once). Do
+> you know what is the performance impact?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Richard Weinberger <richard@nod.at>
----
- arch/um/Kconfig     | 3 +++
- arch/um/Makefile    | 4 +---
- arch/x86/um/Kconfig | 5 -----
- 3 files changed, 4 insertions(+), 8 deletions(-)
- create mode 100644 arch/um/Kconfig
-
-diff --git a/arch/um/Kconfig b/arch/um/Kconfig
-new file mode 100644
-index 000000000000..76b4a32c9f42
---- /dev/null
-+++ b/arch/um/Kconfig
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+source "arch/$(HEADER_ARCH)/um/Kconfig"
-diff --git a/arch/um/Makefile b/arch/um/Makefile
-index e54dda8a0363..d427bfc6948f 100644
---- a/arch/um/Makefile
-+++ b/arch/um/Makefile
-@@ -113,8 +113,6 @@ define archhelp
-   echo '		   find in the kernel root.'
- endef
- 
--KBUILD_KCONFIG := $(HOST_DIR)/um/Kconfig
--
- archheaders:
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
- 	            kbuild-file=$(HOST_DIR)/include/asm/Kbuild \
-@@ -176,4 +174,4 @@ endef
- include/generated/user_constants.h: $(HOST_DIR)/um/user-offsets.s
- 	$(call filechk,gen-asm-offsets)
- 
--export SUBARCH USER_CFLAGS CFLAGS_NO_HARDENING OS DEV_NULL_PATH
-+export HEADER_ARCH SUBARCH USER_CFLAGS CFLAGS_NO_HARDENING OS DEV_NULL_PATH
-diff --git a/arch/x86/um/Kconfig b/arch/x86/um/Kconfig
-index 9d529f22fd9d..7e509c83d80d 100644
---- a/arch/x86/um/Kconfig
-+++ b/arch/x86/um/Kconfig
-@@ -1,9 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0
--mainmenu "User Mode Linux/$(SUBARCH) $(KERNELVERSION) Kernel Configuration"
--
--comment "Compiler: $(CC_VERSION_TEXT)"
--
--source "scripts/Kconfig.include"
- 
- source "arch/um/Kconfig.common"
- 
--- 
-2.18.0
-
+We can assign tags to objects with constructors when a slab is
+allocated and call constructors once as usual. The downside is that
+such object would always have the same tag when it is reallocated, so
+we won't catch use-after-frees. But that is probably something we'll
+have to deal with if we're aiming for "near-production". I'll add this
+change to v5, thanks!
