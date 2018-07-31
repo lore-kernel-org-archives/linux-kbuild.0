@@ -1,98 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:54777 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729784AbeGaLhM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 Jul 2018 07:37:12 -0400
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: powerpc: 32BIT vs. 64BIT (PPC32 vs. PPC64)
-In-Reply-To: <CAK7LNASKiO8J8yTRGp4ngo2=ErC6S2_0bNENVsc4PoYpENQfTQ@mail.gmail.com>
-References: <3f906b03-98ff-c081-4e19-b490f0b35c51@infradead.org> <a3c9b9ee9ec116390c47dca65fcf14f138eccd3f.camel@kernel.crashing.org> <4f3a5969-88d5-134d-508d-7617947c588c@infradead.org> <20180707221316.5b75e075@roar.ozlabs.ibm.com> <c0a17b80-6384-7437-045c-3688d9e5e7f9@infradead.org> <CAK7LNASKiO8J8yTRGp4ngo2=ErC6S2_0bNENVsc4PoYpENQfTQ@mail.gmail.com>
-Date: Tue, 31 Jul 2018 19:57:36 +1000
-Message-ID: <87lg9rhgmn.fsf@concordia.ellerman.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from bombadil.infradead.org ([198.137.202.133]:43288 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731912AbeGaNTh (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 31 Jul 2018 09:19:37 -0400
+From: Christoph Hellwig <hch@lst.de>
+Subject: include architecture Kconfig files from top-level Kconfig v4
+Date: Tue, 31 Jul 2018 13:39:25 +0200
+Message-Id: <20180731113935.6105-1-hch@lst.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild <linux-kbuild@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, Ley Foon Tan <lftan@altera.com>, Michal Simek <monstr@monstr.eu>, linux-kbuild@vger.kernel.org, linux-um@lists.infradead.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Masahiro Yamada <yamada.masahiro@socionext.com> writes:
-> 2018-07-07 23:59 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
->> On 07/07/2018 05:13 AM, Nicholas Piggin wrote:
->>> On Fri, 6 Jul 2018 21:58:29 -0700
->>> Randy Dunlap <rdunlap@infradead.org> wrote:
->>>
->>>> On 07/06/2018 06:45 PM, Benjamin Herrenschmidt wrote:
->>>>> On Thu, 2018-07-05 at 14:30 -0700, Randy Dunlap wrote:
->>>>>> Hi,
->>>>>>
->>>>>> Is there a good way (or a shortcut) to do something like:
->>>>>>
->>>>>> $ make ARCH=powerpc O=PPC32 [other_options] allmodconfig
->>>>>>   to get a PPC32/32BIT allmodconfig
->>>>>>
->>>>>> and also be able to do:
->>>>>>
->>>>>> $make ARCH=powerpc O=PPC64 [other_options] allmodconfig
->>>>>>   to get a PPC64/64BIT allmodconfig?
->>>>>
->>>>> Hrm... O= is for the separate build dir, so there much be something
->>>>> else.
->>>>>
->>>>> You mean having ARCH= aliases like ppc/ppc32 and ppc64 ?
->>>>
->>>> Yes.
->>>>
->>>>> That would be a matter of overriding some .config defaults I suppose, I
->>>>> don't know how this is done on other archs.
->>>>>
->>>>> I see the aliasing trick in the Makefile but that's about it.
->>>>>
->>>>>> Note that arch/x86, arch/sh, and arch/sparc have ways to do
->>>>>> some flavor(s) of this (from Documentation/kbuild/kbuild.txt;
->>>>>> sh and sparc based on a recent "fix" patch from me):
->>>>>
->>>>> I fail to see what you are actually talking about here ... sorry. Do
->>>>> you have concrete examples on x86 or sparc ? From what I can tell the
->>>>> "i386" or "sparc32/sparc64" aliases just change SRCARCH in Makefile and
->>>>> 32 vs 64-bit is just a Kconfig option...
->>>>
->>>> Yes, your summary is mostly correct.
->>>>
->>>> I'm just looking for a way to do cross-compile builds that are close to
->>>> ppc32 allmodconfig and ppc64 allmodconfig.
->>>
->>> Would there a problem with adding ARCH=ppc32 / ppc64 matching? This
->>> seems to work...
->>
->> Yes, this mostly works and is similar to a patch (my patch) on my test machine.
->> And they both work for allmodconfig, which is my primary build target.
->>
->> And they both have one little quirk that is confusing when the build target
->> is defconfig:
->>
->> When ARCH=ppc32, the terminal output (stdout) is: (using O=PPC32)
->>
->> make[1]: Entering directory '/home/rdunlap/lnx/lnx-418-rc3/PPC32'
->>   GEN     ./Makefile
->> *** Default configuration is based on 'ppc64_defconfig'   <<<<< NOTE <<<<<
->> #
->> # configuration written to .config
->> #
->> make[1]: Leaving directory '/home/rdunlap/lnx/lnx-418-rc3/PPC32'
->>
->
->
-> Maybe, we can set one of ppc32 defconfigs to KBUILD_DEFCONFIG
-> if ARCH is ppc32 ?
+Hi Masahiro,
 
-We could, but as I said in another reply I'd rather we didn't play
-tricks with ARCH.
+what do you think about the series below, which moves the includes
+of all the architecture independ Kconfig files to the top-level
+Kconfig instead of duplicating the includes in all architectures?
 
-I've merged a patch to add three new allmodconfig targets for ppc32,
-ppc64le and ppc64_book3e:
+Note that this only handles the low-hanging fruite, there are a lot
+of other bits that should probably be cleaned up to be common,
+but those will be not entirely trivial.
 
-  https://patchwork.ozlabs.org/project/linuxppc-dev/list/?series=54457&state=*
+Changes since v3:
+ - don't allow to select PREEMPT_COUNT for architectures that don't
+   implement it
+ - fix usage of SUBARCH=i386 and SUBARCH=x86_64 for um
 
+Changes since v2:
+ - fix the missing sh conversion
+ - handle the lack of CONFIG_SWAP support in microblaze and nios2
+   properly
 
-cheers
+Changes since v1:
+ - add back a remove source statement from arch/arm/Kconfig
+ - various fixes from Randy
+ - various UML patches to be able to use the common Kconfig
