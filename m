@@ -1,99 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-db5eur01on0119.outbound.protection.outlook.com ([104.47.2.119]:13126
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36604 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727063AbeGaSAD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 Jul 2018 14:00:03 -0400
-Subject: Re: [PATCH v4 13/17] khwasan: add hooks implementation
-References: <cover.1530018818.git.andreyknvl@google.com>
- <a2a93370d43ec85b02abaf8d007a15b464212221.1530018818.git.andreyknvl@google.com>
- <09cb5553-d84a-0e62-5174-315c14b88833@arm.com>
- <CAAeHK+yC3XRPoTByhH1QPrX45pG3QY_2Q4gz=dfDgxfzu1Fyfw@mail.gmail.com>
- <8240d4f9-c8df-cfe9-119d-6e933f8b13df@virtuozzo.com>
- <CACT4Y+Y=61VwwETQP3FwAN16ompSNJOCyDCG6Ew1Bm5f_Fe1Lw@mail.gmail.com>
- <b6b58786-85c9-e831-5571-58b5580c84ba@virtuozzo.com>
- <CACT4Y+aUs0YMTaQx4x9QiQsMjFNZ5gUFNuMkG_hneDPTb3Nu=Q@mail.gmail.com>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <e73efbea-9f23-9d1f-bd1d-add0c0fe4710@virtuozzo.com>
-Date: Tue, 31 Jul 2018 19:18:48 +0300
+        id S2389234AbeHAPoI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 1 Aug 2018 11:44:08 -0400
+From: David Howells <dhowells@redhat.com>
+Subject: Can we fix samples/ dependency on headers please?
 MIME-Version: 1.0
-In-Reply-To: <CACT4Y+aUs0YMTaQx4x9QiQsMjFNZ5gUFNuMkG_hneDPTb3Nu=Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <31060.1533131891.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date: Wed, 01 Aug 2018 14:58:11 +0100
+Message-ID: <31061.1533131891@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dmitry Vyukov <dvyukov@google.com>
-Cc: Andrey Konovalov <andreyknvl@google.com>, vincenzo.frascino@arm.com, Alexander Potapenko <glider@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
+Cc: dhowells@redhat.com, viro@zeniv.linux.org.uk, arnd@arndb.de, sfr@canb.auug.org.au, nico@linaro.org, linux-kernel@vger.kernel.org
 
+Hi,
 
+I'm currently having to mark various userspace programs I've added to the
+samples/ directory as BROKEN in samples/Kconfig because the root Makefile
+mucks up the dependencies between building samples and headers_install.
 
-On 07/31/2018 07:08 PM, Dmitry Vyukov wrote:
-> On Tue, Jul 31, 2018 at 6:04 PM, Andrey Ryabinin
-> <aryabinin@virtuozzo.com> wrote:
->>>>>>> @@ -325,18 +341,41 @@ void kasan_init_slab_obj(struct kmem_cache *cache,
->>>>>>> const void *object)
->>>>>>>     void *kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t
->>>>>>> flags)
->>>>>>>   {
->>>>>>> -       return kasan_kmalloc(cache, object, cache->object_size, flags);
->>>>>>> +       object = kasan_kmalloc(cache, object, cache->object_size, flags);
->>>>>>> +       if (IS_ENABLED(CONFIG_KASAN_HW) && unlikely(cache->ctor)) {
->>>>>>> +               /*
->>>>>>> +                * Cache constructor might use object's pointer value to
->>>>>>> +                * initialize some of its fields.
->>>>>>> +                */
->>>>>>> +               cache->ctor(object);
->>>>>>>
->>>>>> This seams breaking the kmem_cache_create() contract: "The @ctor is run when
->>>>>> new pages are allocated by the cache."
->>>>>> (https://elixir.bootlin.com/linux/v3.7/source/mm/slab_common.c#L83)
->>>>>>
->>>>>> Since there might be preexisting code relying on it, this could lead to
->>>>>> global side effects. Did you verify that this is not the case?
->>>>>>
->>>>>> Another concern is performance related if we consider this solution suitable
->>>>>> for "near-production", since with the current implementation you call the
->>>>>> ctor (where present) on an object multiple times and this ends up memsetting
->>>>>> and repopulating the memory every time (i.e. inode.c: inode_init_once). Do
->>>>>> you know what is the performance impact?
->>>>>
->>>>> We can assign tags to objects with constructors when a slab is
->>>>> allocated and call constructors once as usual. The downside is that
->>>>> such object would always have the same tag when it is reallocated, so
->>>>> we won't catch use-after-frees.
->>>>
->>>> Actually you should do this for SLAB_TYPESAFE_BY_RCU slabs. Usually they are with ->ctors but there
->>>> are few without constructors.
->>>> We can't reinitialize or even retag them. The latter will definitely cause false-positive use-after-free reports.
->>>
->>> Somewhat offtopic, but I can't understand how SLAB_TYPESAFE_BY_RCU
->>> slabs can be useful without ctors or at least memset(0). Objects in
->>> such slabs need to be type-stable, but I can't understand how it's
->>> possible to establish type stability without a ctor... Are these bugs?
->>
->> Yeah, I puzzled by this too. However, I think it's hard but possible to make it work, at least in theory.
->> There must be an initializer, which consists of two parts:
->> a) initilize objects fields
->> b) expose object to the world (add it to list or something like that)
->>
->> (a) part must somehow to be ok to race with another cpu which might already use the object.
->> (b) part must must use e.g. barriers to make sure that racy users will see previously inilized fields.
->> Racy users must have parring barrier of course.
->>
->> But it sound fishy, and very easy to fuck up.
-> 
-> 
-> Agree on both fronts: theoretically possible but easy to fuck up. Even
-> if it works, complexity of the code should be brain damaging and there
-> are unlikely good reasons to just not be more explicit and use a ctor.
-> 
-> 
->> I won't be surprised if every single one SLAB_TYPESAFE_BY_RCU user
->> without ->ctor is bogus. It certainly would be better to convert those to use ->ctor.
-> 
-> I have another hypothesis: they are not bogus, just don't need
-> SLAB_TYPESAFE_BY_RCU :)
-> 
+The main culprit seems to be:
 
-I'd call this a bug too.
+	commit dd92478a15fa3bfd746ee08b4ef59401c1537804
+	Author: Nicolas Pitre <nicolas.pitre@linaro.org>
+	Date:   Sun Feb 28 22:00:00 2016 -0500
+	kbuild: build sample modules along with the rest of the kernel
+ 
+which make the samples build in parallel with the build, thereby voiding the
+explicit dependency:
+
+	Documentation/ samples/: headers_install
+
+and thereby breaking:
+
+	commit ddea05fa148b4d8e66498e522a616d87f9cf81e3
+	Author: Arnd Bergmann <arnd@arndb.de>
+	Date:   Mon Jul 4 16:39:35 2016 +0200
+	kbuild: make samples depend on headers_install
+
+The obvious fix is to revert commit dd92478a15fa3bfd746ee08b4ef59401c1537804
+(see attached patch).
+
+David
+---
+commit 5c186b58db93e2644012e2fcb4c6ca2e74c6754b
+Author: David Howells <dhowells@redhat.com>
+Date:   Wed Aug 1 14:48:22 2018 +0100
+
+    Revert "kbuild: build sample modules along with the rest of the kernel"
+    
+    This reverts commit dd92478a15fa3bfd746ee08b4ef59401c1537804.
+    
+    The problem with this commit is that some of the samples require the header
+    installation to occur first, but building them in parallel with the rest of
+    the build breaks that requirement.
+    
+    Signed-off-by: David Howells <dhowells@redhat.com>
+
+diff --git a/Makefile b/Makefile
+index ca2af1ab91eb..30fc0a37ad41 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1009,16 +1009,14 @@ vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
+ ifdef CONFIG_HEADERS_CHECK
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
+ endif
++ifdef CONFIG_SAMPLES
++	$(Q)$(MAKE) $(build)=samples
++endif
+ ifdef CONFIG_GDB_SCRIPTS
+ 	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
+ endif
+ 	+$(call if_changed,link-vmlinux)
+ 
+-# Build samples along the rest of the kernel
+-ifdef CONFIG_SAMPLES
+-vmlinux-dirs += samples
+-endif
+-
+ # The actual objects are generated when descending,
+ # make sure no implicit rule kicks in
+ $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
