@@ -1,54 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:59160 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726972AbeHBA6z (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:49024 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726972AbeHBA7O (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Aug 2018 20:58:55 -0400
+        Wed, 1 Aug 2018 20:59:14 -0400
+Received: from mail-vk0-f46.google.com (mail-vk0-f46.google.com [209.85.213.46]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id w71NB0PS003261
+        for <linux-kbuild@vger.kernel.org>; Thu, 2 Aug 2018 08:11:01 +0900
+Received: by mail-vk0-f46.google.com with SMTP id b14-v6so120714vke.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 01 Aug 2018 16:11:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180731113935.6105-1-hch@lst.de>
-References: <20180731113935.6105-1-hch@lst.de>
+In-Reply-To: <20180726101934.GT14131@decadent.org.uk>
+References: <20180726101934.GT14131@decadent.org.uk>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 2 Aug 2018 08:10:00 +0900
-Message-ID: <CAK7LNASpOWQqNREQ_XN22QQM6Jx4F1Lrf76=_WHupPCFmOB2gA@mail.gmail.com>
-Subject: Re: include architecture Kconfig files from top-level Kconfig v4
+Date: Thu, 2 Aug 2018 08:10:20 +0900
+Message-ID: <CAK7LNAS0hZDKQmP0aLCM9j-SiWgrmGW=jP4g_x+TqGBOmnPU1w@mail.gmail.com>
+Subject: Re: [PATCH 00/12] Update architecture detection
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, Ley Foon Tan <lftan@altera.com>, Michal Simek <monstr@monstr.eu>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-um@lists.infradead.org, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
 
-2018-07-31 20:39 GMT+09:00 Christoph Hellwig <hch@lst.de>:
-> Hi Masahiro,
+2018-07-26 19:19 GMT+09:00 Ben Hutchings <ben@decadent.org.uk>:
+> This series cleans up the set_debarch function in
+> scripts/package/mkdebian and adds support for several additional
+> Debian architectures.
 >
-> what do you think about the series below, which moves the includes
-> of all the architecture independ Kconfig files to the top-level
-> Kconfig instead of duplicating the includes in all architectures?
+> Ben.
 >
-> Note that this only handles the low-hanging fruite, there are a lot
-> of other bits that should probably be cleaned up to be common,
-> but those will be not entirely trivial.
+> Ben Hutchings (12):
+>   builddeb: Skip architecture detection when KBUILD_DEBARCH is set
+>   builddeb: Change architecture detection fallback to use
+>     dpkg-architecture
+>   builddeb: Drop check for 32-bit s390
+>   builddeb: Introduce functions to simplify kconfig tests in set_debarch
+>   builddeb: Add automatic support for ppc64 and powerpcspe architectures
+>   builddeb: Add automatic support for mips64el architecture
+>   builddeb: Add automatic support for mips46{,64}{,el} architectures
+>   builddeb: Add automatic support for sparc64 architecture
+>   builddeb: Add automatic support for or1k architecture
+>   builddeb: Add automatic support for m68k architecture
+>   builddeb: Add automatic support for riscv* architectures
+>   builddeb: Add automatic support for sh{3,4}{,eb} architectures
 >
-> Changes since v3:
->  - don't allow to select PREEMPT_COUNT for architectures that don't
->    implement it
->  - fix usage of SUBARCH=i386 and SUBARCH=x86_64 for um
+>  scripts/package/mkdebian | 68 +++++++++++++++++++++++++++++-----------
+>  1 file changed, 50 insertions(+), 18 deletions(-)
 >
-> Changes since v2:
->  - fix the missing sh conversion
->  - handle the lack of CONFIG_SWAP support in microblaze and nios2
->    properly
->
-> Changes since v1:
->  - add back a remove source statement from arch/arm/Kconfig
->  - various fixes from Randy
->  - various UML patches to be able to use the common Kconfig
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
 
 Applied.  Thanks!
+
 
 -- 
 Best Regards
