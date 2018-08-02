@@ -1,61 +1,128 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr20137.outbound.protection.outlook.com ([40.107.2.137]:40800
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732202AbeHBQTC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Aug 2018 12:19:02 -0400
-Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
- sanitizer
-References: <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
- <20180629110709.GA17859@arm.com>
- <CAAeHK+wHd8B2nhat-Z2Y2=s4NVobPG7vjr2CynjFhqPTwQRepQ@mail.gmail.com>
- <20180703173608.GF27243@arm.com>
- <CAAeHK+wTcH+2hgm_BTkLLdn1GkjBtkhQ=vPWZCncJ6KenqgKpg@mail.gmail.com>
- <CAAeHK+xc1E64tXEEHoXqOuUNZ7E_kVyho3_mNZTCc+LTGHYFdA@mail.gmail.com>
- <20180801163538.GA10800@arm.com>
- <CACT4Y+aZtph5qDsLzTDEgpQRz4_Vtg1DD-cB18qooi6D0bexDg@mail.gmail.com>
- <20180802111031.yx3x6y5d5q6drq52@armageddon.cambridge.arm.com>
- <CACT4Y+b0gkSQHUG67MbYZUTA_aZWs7EmJ2eUzOEPWdt9==ysdg@mail.gmail.com>
- <20180802135201.qjweapbskllthvhu@armageddon.cambridge.arm.com>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <da873a0d-3c75-0a00-974e-824f1eb49de6@virtuozzo.com>
-Date: Thu, 2 Aug 2018 17:11:18 +0300
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:17029 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387456AbeHBRDa (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 2 Aug 2018 13:03:30 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180802135201.qjweapbskllthvhu@armageddon.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <31061.1533131891@warthog.procyon.org.uk>
+References: <31061.1533131891@warthog.procyon.org.uk>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 3 Aug 2018 00:11:04 +0900
+Message-ID: <CAK7LNAT2_eaGbd04y1b=rfYhabiTpbEqYO+fznJrFOdzzmQ9Kw@mail.gmail.com>
+Subject: Re: Can we fix samples/ dependency on headers please?
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, Dmitry Vyukov <dvyukov@google.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Kate Stewart <kstewart@linuxfoundation.org>, linux-doc@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Linux Memory Management List <linux-mm@kvack.org>, Alexander Potapenko <glider@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Christoph Lameter <cl@linux.com>, Ingo Molnar <mingo@kernel.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Dave Martin <Dave.Martin@arm.com>, Evgeniy Stepanov <eugenis@google.com>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrey Konovalov <andreyknvl@google.com>, Lee Smith <Lee.Smith@arm.com>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Kostya Serebryany <kcc@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Nick Desaulniers <ndesaulniers@google.com>, LKML <linux-kernel@vger.kernel.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Andrew Morton <akpm@linux-foundation.org>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>
+To: David Howells <dhowells@redhat.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, Arnd Bergmann <arnd@arndb.de>, Stephen Rothwell <sfr@canb.auug.org.au>, Nicolas Pitre <nico@linaro.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 08/02/2018 04:52 PM, Catalin Marinas wrote:
-> 
->> If somebody has a practical idea how to detect these statically, let's
->> do it. Otherwise let's go with the traditional solution to this --
->> dynamic testing. The patch series show that the problem is not a
->> disaster and we won't need to change just every line of kernel code.
-> 
-> It's indeed not a disaster but we had to do this exercise to find out
-> whether there are better ways of detecting where untagging is necessary.
-> 
-> If you want to enable khwasan in "production" and since enabling it
-> could potentially change the behaviour of existing code paths, the
-> run-time validation space doubles as we'd need to get the same code
-> coverage with and without the feature being enabled. I wouldn't say it's
-> a blocker for khwasan, more like something to be aware of.
-> 
-> The awareness is a bit of a problem as the normal programmer would have
-> to pay more attention to conversions between pointer and long. Given
-> that this is an arm64-only feature, we have a risk of khwasan-triggered
-> bugs being introduced in generic code in the future (hence the
-> suggestion of some static checker, if possible).
- 
-I don't see how we can implement such checker. There is no simple rule which defines when we need
-to remove the tag and when we can leave it in place.
-The cast to long have nothing to do with the need to remove the tag. If pointers compared for sorting objects,
-or lock ordering, than having tags is fine and it doesn't matter whether pointers compared as 'unsigned long'
-or as 'void *'.
-If developer needs to check whether the pointer is in linear mapping, than tag has to be removed.
-But again, it doesn't matter if pointer is 'unsigned long' or 'void *'. Either way, the tag has to go away.
+Hi.
+
+
+
+2018-08-01 22:58 GMT+09:00 David Howells <dhowells@redhat.com>:
+> Hi,
+>
+> I'm currently having to mark various userspace programs I've added to the
+> samples/ directory as BROKEN in samples/Kconfig because the root Makefile
+> mucks up the dependencies between building samples and headers_install.
+>
+> The main culprit seems to be:
+>
+>         commit dd92478a15fa3bfd746ee08b4ef59401c1537804
+>         Author: Nicolas Pitre <nicolas.pitre@linaro.org>
+>         Date:   Sun Feb 28 22:00:00 2016 -0500
+>         kbuild: build sample modules along with the rest of the kernel
+>
+> which make the samples build in parallel with the build, thereby voiding the
+> explicit dependency:
+>
+>         Documentation/ samples/: headers_install
+>
+> and thereby breaking:
+>
+>         commit ddea05fa148b4d8e66498e522a616d87f9cf81e3
+>         Author: Arnd Bergmann <arnd@arndb.de>
+>         Date:   Mon Jul 4 16:39:35 2016 +0200
+>         kbuild: make samples depend on headers_install
+>
+> The obvious fix is to revert commit dd92478a15fa3bfd746ee08b4ef59401c1537804
+> (see attached patch).
+>
+> David
+> ---
+> commit 5c186b58db93e2644012e2fcb4c6ca2e74c6754b
+> Author: David Howells <dhowells@redhat.com>
+> Date:   Wed Aug 1 14:48:22 2018 +0100
+>
+>     Revert "kbuild: build sample modules along with the rest of the kernel"
+>
+>     This reverts commit dd92478a15fa3bfd746ee08b4ef59401c1537804.
+>
+>     The problem with this commit is that some of the samples require the header
+>     installation to occur first, but building them in parallel with the rest of
+>     the build breaks that requirement.
+>
+>     Signed-off-by: David Howells <dhowells@redhat.com>
+>
+> diff --git a/Makefile b/Makefile
+> index ca2af1ab91eb..30fc0a37ad41 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1009,16 +1009,14 @@ vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
+>  ifdef CONFIG_HEADERS_CHECK
+>         $(Q)$(MAKE) -f $(srctree)/Makefile headers_check
+>  endif
+> +ifdef CONFIG_SAMPLES
+> +       $(Q)$(MAKE) $(build)=samples
+> +endif
+>  ifdef CONFIG_GDB_SCRIPTS
+>         $(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
+>  endif
+>         +$(call if_changed,link-vmlinux)
+>
+> -# Build samples along the rest of the kernel
+> -ifdef CONFIG_SAMPLES
+> -vmlinux-dirs += samples
+> -endif
+> -
+>  # The actual objects are generated when descending,
+>  # make sure no implicit rule kicks in
+>  $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
+> --
+
+
+I dot not understand why this would fix your problem.
+
+Does the combination of CONFIG_SAMPLES=y and CONFIG_HEADERS_CHECK=n
+still fail to build?
+
+
+If you need to install headers before building samples,
+this should work:
+
+
+diff --git a/Makefile b/Makefile
+index b47af5a..555ee84 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1023,6 +1023,7 @@ endif
+ # Build samples along the rest of the kernel
+ ifdef CONFIG_SAMPLES
+ vmlinux-dirs += samples
++samples: headers_install
+ endif
+
+ # The actual objects are generated when descending,
+
+
+
+
+Please note Arnd's patch only works for single targets.
+'samples/' and 'samples' are different targets.
+
+
+-- 
+Best Regards
+Masahiro Yamada
