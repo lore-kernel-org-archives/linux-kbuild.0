@@ -1,47 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:40543 "EHLO
-        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732068AbeHBPjB (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Aug 2018 11:39:01 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH] Kbuild: Makefile.modbuiltin: include auto.conf and tristate.conf mandatory
-Date: Thu,  2 Aug 2018 15:47:08 +0200
-Message-Id: <20180802134708.26456-1-dirk@gouders.net>
+Received: from foss.arm.com ([217.140.101.70]:58442 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732079AbeHBPn3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 2 Aug 2018 11:43:29 -0400
+Date: Thu, 2 Aug 2018 14:52:02 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
+ sanitizer
+Message-ID: <20180802135201.qjweapbskllthvhu@armageddon.cambridge.arm.com>
+References: <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
+ <20180629110709.GA17859@arm.com>
+ <CAAeHK+wHd8B2nhat-Z2Y2=s4NVobPG7vjr2CynjFhqPTwQRepQ@mail.gmail.com>
+ <20180703173608.GF27243@arm.com>
+ <CAAeHK+wTcH+2hgm_BTkLLdn1GkjBtkhQ=vPWZCncJ6KenqgKpg@mail.gmail.com>
+ <CAAeHK+xc1E64tXEEHoXqOuUNZ7E_kVyho3_mNZTCc+LTGHYFdA@mail.gmail.com>
+ <20180801163538.GA10800@arm.com>
+ <CACT4Y+aZtph5qDsLzTDEgpQRz4_Vtg1DD-cB18qooi6D0bexDg@mail.gmail.com>
+ <20180802111031.yx3x6y5d5q6drq52@armageddon.cambridge.arm.com>
+ <CACT4Y+b0gkSQHUG67MbYZUTA_aZWs7EmJ2eUzOEPWdt9==ysdg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+b0gkSQHUG67MbYZUTA_aZWs7EmJ2eUzOEPWdt9==ysdg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Dirk Gouders <dirk@gouders.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Dmitry Vyukov <dvyukov@google.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Kate Stewart <kstewart@linuxfoundation.org>, linux-doc@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Will Deacon <will.deacon@arm.com>, Paul Lawrence <paullawrence@google.com>, Linux Memory Management List <linux-mm@kvack.org>, Alexander Potapenko <glider@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Christoph Lameter <cl@linux.com>, Ingo Molnar <mingo@kernel.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-sparse@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Dave Martin <Dave.Martin@arm.com>, Evgeniy Stepanov <eugenis@google.com>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrey Konovalov <andreyknvl@google.com>, Lee Smith <Lee.Smith@arm.com>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Kostya Serebryany <kcc@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Nick Desaulniers <ndesaulniers@google.com>, LKML <linux-kernel@vger.kernel.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Andrew Morton <akpm@linux-foundation.org>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>
 
-The files auto.conf and tristate.conf are mandatory for building
-modules.builtin files, therefore include them as such.
+(trimming the quoted text a bit)
 
-Usually, the top-level Makefile ensures that those files exist but we
-want to make sure we get noticed if they are missing for whatever
-reason.
+On Thu, Aug 02, 2018 at 01:36:25PM +0200, Dmitry Vyukov wrote:
+> On Thu, Aug 2, 2018 at 1:10 PM, Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > On Wed, Aug 01, 2018 at 06:52:09PM +0200, Dmitry Vyukov wrote:
+> >> On Wed, Aug 1, 2018 at 6:35 PM, Will Deacon <will.deacon@arm.com> wrote:
+> >> > I'd really like to enable pointer tagging in the kernel, I'm just still
+> >> > failing to see how we can do it in a controlled manner where we can reason
+> >> > about the semantic changes using something other than a best-effort,
+> >> > case-by-case basis which is likely to be fragile and error-prone.
+> >> > Unfortunately, if that's all we have, then this gets relegated to a
+> >> > debug feature, which sort of defeats the point in my opinion.
+> >>
+> >> Well, in some cases there is no other way as resorting to dynamic testing.
+> >> How do we ensure that kernel does not dereference NULL pointers, does
+> >> not access objects after free or out of bounds?
+> >
+> > We should not confuse software bugs (like NULL pointer dereference) with
+> > unexpected software behaviour introduced by khwasan where pointers no
+> > longer represent only an address range (e.g. calling find_vmap_area())
+> > but rather an address and a tag.
+[...]
+> > However, not untagging a pointer when converting to long may have
+> > side-effects in some cases and I consider these bugs introduced by the
+> > khwasan support rather than bugs in the original kernel code. Ideally
+> > we'd need some tooling on top of khwasan to detect such shortcomings but
+> > I'm not sure we can do this statically, as Andrey already mentioned. For
+> > __user pointers, things are slightly better as we can detect the
+> > conversion either with sparse (modified) or some LLVM changes.
+[...]
+> For example, LOCKDEP has the same problem. Previously correct code can
+> become incorrect and require finer-grained lock class annotations.
+> KMEMLEAK has the same problem: previously correct code that hides a
+> pointer may now need changes to unhide the pointer.
 
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
----
- scripts/Makefile.modbuiltin | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+It's not actually the same. Take the kmemleak example as I'm familiar
+with, previously correct code _continues_ to run correctly in the
+presence of kmemleak. The annotation or unhiding is only necessary to
+reduce the kmemleak false positives. With khwasan, OTOH, an explicit
+untagging is necessary so that the code functions correctly again.
 
-diff --git a/scripts/Makefile.modbuiltin b/scripts/Makefile.modbuiltin
-index 40867a41615b..a072a4267746 100644
---- a/scripts/Makefile.modbuiltin
-+++ b/scripts/Makefile.modbuiltin
-@@ -8,10 +8,10 @@ src := $(obj)
- PHONY := __modbuiltin
- __modbuiltin:
- 
---include include/config/auto.conf
-+include include/config/auto.conf
- # tristate.conf sets tristate variables to uppercase 'Y' or 'M'
- # That way, we get the list of built-in modules in obj-Y
---include include/config/tristate.conf
-+include include/config/tristate.conf
- 
- include scripts/Kbuild.include
- 
+IOW, kmemleak only monitors the behaviour of the original code while
+khwasan changes such behaviour by tagging the pointers.
+
+> If somebody has a practical idea how to detect these statically, let's
+> do it. Otherwise let's go with the traditional solution to this --
+> dynamic testing. The patch series show that the problem is not a
+> disaster and we won't need to change just every line of kernel code.
+
+It's indeed not a disaster but we had to do this exercise to find out
+whether there are better ways of detecting where untagging is necessary.
+
+If you want to enable khwasan in "production" and since enabling it
+could potentially change the behaviour of existing code paths, the
+run-time validation space doubles as we'd need to get the same code
+coverage with and without the feature being enabled. I wouldn't say it's
+a blocker for khwasan, more like something to be aware of.
+
+The awareness is a bit of a problem as the normal programmer would have
+to pay more attention to conversions between pointer and long. Given
+that this is an arm64-only feature, we have a risk of khwasan-triggered
+bugs being introduced in generic code in the future (hence the
+suggestion of some static checker, if possible).
+
 -- 
-2.16.4
-
+Catalin
