@@ -1,56 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:49024 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726972AbeHBA7O (ORCPT
+Received: from mail.mineco.gob.gt ([168.234.54.171]:17101 "EHLO
+        EX2010SRV01.mineco.gob.gt" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725765AbeHBEEH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Aug 2018 20:59:14 -0400
-Received: from mail-vk0-f46.google.com (mail-vk0-f46.google.com [209.85.213.46]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id w71NB0PS003261
-        for <linux-kbuild@vger.kernel.org>; Thu, 2 Aug 2018 08:11:01 +0900
-Received: by mail-vk0-f46.google.com with SMTP id b14-v6so120714vke.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 01 Aug 2018 16:11:01 -0700 (PDT)
+        Thu, 2 Aug 2018 00:04:07 -0400
+From: Gloria Adelaida Elias Mejia <gaeliasm@mineco.gob.gt>
+Subject: Spende von $ 4,800,000.00!
+Date: Thu, 2 Aug 2018 02:08:42 +0000
+Message-ID: <0E9FB776D8E6DA429730C03A4C3AA64088127B@EX2010SRV02.mineco.gob.gt>
+Reply-To: "tomcrist895@gmail.com" <tomcrist895@gmail.com>
+Content-Language: en-US
+Content-Type: multipart/alternative;
+        boundary="_000_0E9FB776D8E6DA429730C03A4C3AA64088127BEX2010SRV02mineco_"
 MIME-Version: 1.0
-In-Reply-To: <20180726101934.GT14131@decadent.org.uk>
-References: <20180726101934.GT14131@decadent.org.uk>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 2 Aug 2018 08:10:20 +0900
-Message-ID: <CAK7LNAS0hZDKQmP0aLCM9j-SiWgrmGW=jP4g_x+TqGBOmnPU1w@mail.gmail.com>
-Subject: Re: [PATCH 00/12] Update architecture detection
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
 
-2018-07-26 19:19 GMT+09:00 Ben Hutchings <ben@decadent.org.uk>:
-> This series cleans up the set_debarch function in
-> scripts/package/mkdebian and adds support for several additional
-> Debian architectures.
->
-> Ben.
->
-> Ben Hutchings (12):
->   builddeb: Skip architecture detection when KBUILD_DEBARCH is set
->   builddeb: Change architecture detection fallback to use
->     dpkg-architecture
->   builddeb: Drop check for 32-bit s390
->   builddeb: Introduce functions to simplify kconfig tests in set_debarch
->   builddeb: Add automatic support for ppc64 and powerpcspe architectures
->   builddeb: Add automatic support for mips64el architecture
->   builddeb: Add automatic support for mips46{,64}{,el} architectures
->   builddeb: Add automatic support for sparc64 architecture
->   builddeb: Add automatic support for or1k architecture
->   builddeb: Add automatic support for m68k architecture
->   builddeb: Add automatic support for riscv* architectures
->   builddeb: Add automatic support for sh{3,4}{,eb} architectures
->
->  scripts/package/mkdebian | 68 +++++++++++++++++++++++++++++-----------
->  1 file changed, 50 insertions(+), 18 deletions(-)
->
+--_000_0E9FB776D8E6DA429730C03A4C3AA64088127BEX2010SRV02mineco_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Applied.  Thanks!
+Hallo, Sie haben eine Spende von $ 4,800,000.00, ich habe die America Lotte=
+rie im Wert von $ 40 Millionen gewonnen und ich gebe einen Teil davon an f=
+=FCnf gl=FCckliche Menschen und Wohlt=E4tigkeitseinrichtungen zum Gedenken =
+an meine verstorbene Frau, die an Krebs starb.
 
+Spendenreferenznummer: BBIB / AVL017 / 28392
 
--- 
-Best Regards
-Masahiro Yamada
+Kontaktieren Sie mich f=FCr weitere Informationen: tomcrist895@gmail.com
+
+Prost
+Tom Crist
+
+--_000_0E9FB776D8E6DA429730C03A4C3AA64088127BEX2010SRV02mineco_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<meta name=3D"Generator" content=3D"Microsoft Word 12 (filtered medium)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri","sans-serif";
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-size:10.0pt;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.Section1
+	{page:Section1;}
+-->
+</style><!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext=3D"edit">
+  <o:idmap v:ext=3D"edit" data=3D"1" />
+ </o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"EN-US" link=3D"blue" vlink=3D"purple">
+<div class=3D"Section1">
+<p class=3D"MsoNormal">Hallo, Sie haben eine Spende von $ 4,800,000.00, ich=
+ habe die America Lotterie im Wert von $ 40 Millionen gewonnen und ich gebe=
+ einen Teil davon an f=FCnf gl=FCckliche Menschen und Wohlt=E4tigkeitseinri=
+chtungen zum Gedenken an meine verstorbene
+ Frau, die an Krebs starb.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Spendenreferenznummer: BBIB / AVL017 / 28392<o:p></o=
+:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Kontaktieren Sie mich f=FCr weitere Informationen: t=
+omcrist895@gmail.com<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Prost<o:p></o:p></p>
+<p class=3D"MsoNormal">Tom Crist<o:p></o:p></p>
+</div>
+</body>
+</html>
+
+--_000_0E9FB776D8E6DA429730C03A4C3AA64088127BEX2010SRV02mineco_--
