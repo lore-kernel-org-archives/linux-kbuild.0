@@ -1,52 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:35752 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727161AbeHCCHn (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Aug 2018 22:07:43 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: kbuild: ARCH=um archheaders failed
-Message-ID: <be4f41de-c27a-abac-4b23-369c400e016e@infradead.org>
-Date: Thu, 2 Aug 2018 17:13:59 -0700
+Received: from foss.arm.com ([217.140.101.70]:40416 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728122AbeHCLSh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 3 Aug 2018 07:18:37 -0400
+Date: Fri, 3 Aug 2018 10:23:13 +0100
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v4 00/17] khwasan: kernel hardware assisted address
+ sanitizer
+Message-ID: <20180803092312.GA17798@arm.com>
+References: <cover.1530018818.git.andreyknvl@google.com>
+ <20180628105057.GA26019@e103592.cambridge.arm.com>
+ <CAAeHK+w0T43+h3xqU4a-qutxd-qiEhsvk0eaZpmAn-T0hpaLZQ@mail.gmail.com>
+ <20180629110709.GA17859@arm.com>
+ <CAAeHK+wHd8B2nhat-Z2Y2=s4NVobPG7vjr2CynjFhqPTwQRepQ@mail.gmail.com>
+ <20180703173608.GF27243@arm.com>
+ <CAAeHK+wTcH+2hgm_BTkLLdn1GkjBtkhQ=vPWZCncJ6KenqgKpg@mail.gmail.com>
+ <CAAeHK+xc1E64tXEEHoXqOuUNZ7E_kVyho3_mNZTCc+LTGHYFdA@mail.gmail.com>
+ <20180801163538.GA10800@arm.com>
+ <CACT4Y+aZtph5qDsLzTDEgpQRz4_Vtg1DD-cB18qooi6D0bexDg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+aZtph5qDsLzTDEgpQRz4_Vtg1DD-cB18qooi6D0bexDg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Richard Weinberger <richard@nod.at>, linux-um@lists.infradead.org
+To: Dmitry Vyukov <dvyukov@google.com>
+Cc: Andrey Konovalov <andreyknvl@google.com>, Andrew Morton <akpm@linux-foundation.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
 
-Hi Yamada-san,
+On Wed, Aug 01, 2018 at 06:52:09PM +0200, Dmitry Vyukov wrote:
+> On Wed, Aug 1, 2018 at 6:35 PM, Will Deacon <will.deacon@arm.com> wrote:
+> > Thanks for tracking these cases down and going through each of them. The
+> > obvious follow-up question is: how do we ensure that we keep on top of
+> > this in mainline? Are you going to repeat your experiment at every kernel
+> > release or every -rc or something else? I really can't see how we can
+> > maintain this in the long run, especially given that the coverage we have
+> > is only dynamic -- do you have an idea of how much coverage you're actually
+> > getting for, say, a defconfig+modules build?
+> >
+> > I'd really like to enable pointer tagging in the kernel, I'm just still
+> > failing to see how we can do it in a controlled manner where we can reason
+> > about the semantic changes using something other than a best-effort,
+> > case-by-case basis which is likely to be fragile and error-prone.
+> > Unfortunately, if that's all we have, then this gets relegated to a
+> > debug feature, which sort of defeats the point in my opinion.
+> 
+> Well, in some cases there is no other way as resorting to dynamic testing.
+> How do we ensure that kernel does not dereference NULL pointers, does
+> not access objects after free or out of bounds? Nohow. And, yes, it's
+> constant maintenance burden resolved via dynamic testing.
 
-I see this every few weeks.  It's not reproducible (it depends
-on the moon, Mars, etc.).
+... and the advantage of NULL pointer issues is that you're likely to see
+them as a synchronous exception at runtime, regardless of architecture and
+regardless of Kconfig options. With pointer tagging, that's certainly not
+the case, and so I don't think we can just treat issues there like we do for
+NULL pointers.
 
-I'm using O=builddir.  The build log is short (below).
-
-Do you see a makefile problem here?  (nothing to do with mmotm;
-I see it more frequently with linux-next since I do many daily
-builds with it)
-
-
-thanks.
--- 
-make[1]: Entering directory '/home/rdunlap/mmotm-2018-0802-1529/UM64'
-  UPD     include/generated/uapi/linux/version.h
-  WRAP    arch/x86/include/generated/asm/dma-contiguous.h
-  WRAP    arch/x86/include/generated/asm/export.h
-  WRAP    arch/x86/include/generated/asm/early_ioremap.h
-  WRAP    arch/x86/include/generated/asm/mcs_spinlock.h
-  WRAP    arch/x86/include/generated/asm/mm-arch-hooks.h
-  WRAP    arch/x86/include/generated/uapi/asm/bpf_perf_event.h
-  WRAP    arch/x86/include/generated/uapi/asm/poll.h
-  GEN     ./Makefile
-make[2]: *** No rule to make target 'archheaders'.  Stop.
-arch/um/Makefile:119: recipe for target 'archheaders' failed
-make[1]: *** [archheaders] Error 2
-make[1]: *** Waiting for unfinished jobs....
-  UPD     include/config/kernel.release
-make[1]: *** wait: No child processes.  Stop.
-Makefile:146: recipe for target 'sub-make' failed
-make: *** [sub-make] Error 2
-
+Will
