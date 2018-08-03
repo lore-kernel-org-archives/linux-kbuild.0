@@ -1,66 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:20365 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732430AbeHBRlK (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:35752 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727161AbeHCCHn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Aug 2018 13:41:10 -0400
+        Thu, 2 Aug 2018 22:07:43 -0400
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: kbuild: ARCH=um archheaders failed
+Message-ID: <be4f41de-c27a-abac-4b23-369c400e016e@infradead.org>
+Date: Thu, 2 Aug 2018 17:13:59 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180802134708.26456-1-dirk@gouders.net>
-References: <20180802134708.26456-1-dirk@gouders.net>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 3 Aug 2018 00:48:22 +0900
-Message-ID: <CAK7LNAS2JRuT2-2jx0t4BM9VrJROXZNL4zqsVNNvYnodHx+HAQ@mail.gmail.com>
-Subject: Re: [PATCH] Kbuild: Makefile.modbuiltin: include auto.conf and
- tristate.conf mandatory
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Richard Weinberger <richard@nod.at>, linux-um@lists.infradead.org
 
-2018-08-02 22:47 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
-> The files auto.conf and tristate.conf are mandatory for building
-> modules.builtin files, therefore include them as such.
->
-> Usually, the top-level Makefile ensures that those files exist but we
-> want to make sure we get noticed if they are missing for whatever
-> reason.
->
-> Signed-off-by: Dirk Gouders <dirk@gouders.net>
-> ---
+Hi Yamada-san,
 
-Applied. Thanks!
+I see this every few weeks.  It's not reproducible (it depends
+on the moon, Mars, etc.).
 
->  scripts/Makefile.modbuiltin | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/Makefile.modbuiltin b/scripts/Makefile.modbuiltin
-> index 40867a41615b..a072a4267746 100644
-> --- a/scripts/Makefile.modbuiltin
-> +++ b/scripts/Makefile.modbuiltin
-> @@ -8,10 +8,10 @@ src := $(obj)
->  PHONY := __modbuiltin
->  __modbuiltin:
->
-> --include include/config/auto.conf
-> +include include/config/auto.conf
->  # tristate.conf sets tristate variables to uppercase 'Y' or 'M'
->  # That way, we get the list of built-in modules in obj-Y
-> --include include/config/tristate.conf
-> +include include/config/tristate.conf
->
->  include scripts/Kbuild.include
->
-> --
-> 2.16.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I'm using O=builddir.  The build log is short (below).
+
+Do you see a makefile problem here?  (nothing to do with mmotm;
+I see it more frequently with linux-next since I do many daily
+builds with it)
 
 
-
+thanks.
 -- 
-Best Regards
-Masahiro Yamada
+make[1]: Entering directory '/home/rdunlap/mmotm-2018-0802-1529/UM64'
+  UPD     include/generated/uapi/linux/version.h
+  WRAP    arch/x86/include/generated/asm/dma-contiguous.h
+  WRAP    arch/x86/include/generated/asm/export.h
+  WRAP    arch/x86/include/generated/asm/early_ioremap.h
+  WRAP    arch/x86/include/generated/asm/mcs_spinlock.h
+  WRAP    arch/x86/include/generated/asm/mm-arch-hooks.h
+  WRAP    arch/x86/include/generated/uapi/asm/bpf_perf_event.h
+  WRAP    arch/x86/include/generated/uapi/asm/poll.h
+  GEN     ./Makefile
+make[2]: *** No rule to make target 'archheaders'.  Stop.
+arch/um/Makefile:119: recipe for target 'archheaders' failed
+make[1]: *** [archheaders] Error 2
+make[1]: *** Waiting for unfinished jobs....
+  UPD     include/config/kernel.release
+make[1]: *** wait: No child processes.  Stop.
+Makefile:146: recipe for target 'sub-make' failed
+make: *** [sub-make] Error 2
+
