@@ -1,48 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52812 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726069AbeHEDB0 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 4 Aug 2018 23:01:26 -0400
-Subject: Re: [PATCH 0/3] Kbuild: fix and clean-up arch/um/Makefile
-References: <1533358023-5801-1-git-send-email-yamada.masahiro@socionext.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <086167f3-5ed3-1184-bb6f-6c86a5bd6a77@infradead.org>
-Date: Sat, 4 Aug 2018 17:58:41 -0700
+Received: from mail.hmha.gob.ec ([190.11.21.43]:47558 "EHLO mail.hmha.gob.ec"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726100AbeHEOwU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 5 Aug 2018 10:52:20 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1533358023-5801-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: =?utf-8?b?V29obHTDpHRpZ2tlaXRzc3BlbmRlIGluIEjDtmhlIHZvbiDigqwgMi4wMDAu?=
+ =?utf-8?q?000=2C00_EUR?=
+From: elena_figueroa@hmha.gob.ec
+Date: Sun, 05 Aug 2018 05:01:25 -0700
+Reply-To: andrewlamati@gmail.com
+Message-Id: <20180805120128.3EB311F632DB@mail.hmha.gob.ec>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, linux-um@lists.infradead.org, Geert Uytterhoeven <geert@linux-m68k.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
+To: Recipients <elena_figueroa@hmha.gob.ec>
 
-On 08/03/2018 09:47 PM, Masahiro Yamada wrote:
-> 1/3 fixes the build failure reported by Randy.
-> (I may have seen a similar report before, but I cannot recall it.)
-> 
-> 2/3 and 3/3 clean-up the Makefile a bit more.
-> 
-> I'd like to apply this series to kbuild tree.
-> Ack from UML folks are appreciated.
-> 
-> 
-> 
-> Masahiro Yamada (3):
->   um: fix parallel building with O= option
->   kbuild: add %asm-generic to no-dot-config-targets
->   um: clean up archheaders recipe
-> 
->  Makefile         | 2 +-
->  arch/um/Makefile | 9 +--------
->  2 files changed, 2 insertions(+), 9 deletions(-)
-> 
-
-for the series:
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
-
-Thanks.
--- 
-~Randy
+Hallo, ich bin Herr Tayeb Souami, New Jersey, Vereinigte Staaten von Amerika, Sie haben eine Wohltätigkeitsspende in Höhe von € 2.000.000,00, ich habe die America Lotterie in Amerika im Wert von $ 315 Millionen gewonnen, und ich gebe einen Teil davon an fünf glückliche Menschen und wohltätige Häuser, um Armut aus dieser Welt zu beseitigen, bekämpfe ich die Armut. Kontaktieren Sie mich für weitere Informationen: wumt.claimservice@gmail.com
+ 
+Das ist dein Spendencode: [DFC530342018]
+ 
+Antworten Sie mit dem Spendencode auf diese E-Mail: wumt.claimservice@gmail.com
+ 
+Ich hoffe, Sie und Ihre Familie glücklich zu machen.
+ 
+Grüße
+Herr Tayeb Souami
