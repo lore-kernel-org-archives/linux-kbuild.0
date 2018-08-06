@@ -1,45 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga17.intel.com ([192.55.52.151]:46278 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726279AbeHFU2t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Aug 2018 16:28:49 -0400
-Date: Mon, 6 Aug 2018 11:07:40 -0700
-From: Andi Kleen <ak@linux.intel.com>
-Subject: Re: [PATCH 2/4] trace: avoid calling cc-option -mrecord-mcount for
- every Makefile
-Message-ID: <20180806180740.GI4238@tassilo.jf.intel.com>
-References: <cover.thread-aa7b8d.your-ad-here.call-01533557518-ext-9465@work.hours>
- <patch-2.thread-aa7b8d.git-de935bace15a.your-ad-here.call-01533557518-ext-9465@work.hours>
+Received: from mx2.suse.de ([195.135.220.15]:43314 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728601AbeHFUnx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 6 Aug 2018 16:43:53 -0400
+Date: Mon, 6 Aug 2018 20:33:29 +0200
+From: Michal Kubecek <mkubecek@suse.cz>
+Subject: Re: due to kconfig changes kernel config file is no longer
+ sufficient for configuring the kernel
+Message-ID: <20180806183329.qditzzemevdafcwb@unicorn.suse.cz>
+References: <20180627143705.5a1fed1c@kitsune.suse.cz>
+ <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
+ <20180628111623.3807fe9b@naga.suse.cz>
+ <CAK7LNARRKU7Mfa8ZBu1qPFYFRr-5k69sjVyERM2bYcnWoBDN8g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <patch-2.thread-aa7b8d.git-de935bace15a.your-ad-here.call-01533557518-ext-9465@work.hours>
+In-Reply-To: <CAK7LNARRKU7Mfa8ZBu1qPFYFRr-5k69sjVyERM2bYcnWoBDN8g@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vasily Gorbik <gor@linux.ibm.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Takashi Iwai <tiwai@suse.de>, Andreas Schwab <schwab@suse.de>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org
 
-On Mon, Aug 06, 2018 at 03:17:44PM +0200, Vasily Gorbik wrote:
-> Currently if CONFIG_FTRACE_MCOUNT_RECORD is enabled -mrecord-mcount
-> compiler flag support is tested for every Makefile.
-
-Good catch.  Does it make a measurable compile time difference?
-
+On Mon, Jul 30, 2018 at 05:02:42PM +0900, Masahiro Yamada wrote:
 > 
-> Top 4 cc-option usages:
->     511 -mrecord-mcount
->      11  -fno-stack-protector
->       9 -Wno-override-init
->       2 -fsched-pressure
+> For exmaple 'make ARCH=arm config' will create the config suitable
+> only for ARM architecture.
+> Then, you need to do 'make ARCH=arm' to build the kernel.
 > 
-> To address that move cc-option from scripts/Makefile.build to top Makefile
-> and export CC_USING_RECORD_MCOUNT to be used in original place.
+> If it is tedious to give 'ARCH=arm' to every make command,
+> you can do 'export ARCH=arm' in your shell.
 > 
-> While doing that also add -mrecord-mcount to CC_FLAGS_FTRACE (if gcc
-> actually supports it).
-> 
-> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+> Again, this is the behavior we have for a long time.
 
-Acked-by: Andi Kleen <ak@linux.intel.com>
+Actually, this no longer works reliably. For example, when I run
 
--Andi
+  ARCH=powerpc make oldconfig
+
+with our ppc64le config on x86_64 system, I get different result than
+when I run it on an actual ppc64le system (or when using a ppc64le cross
+compiler on x86_64).
+
+Since .config started to mix user configuration and build environment
+capabilities, maintaining distribution configs became real pain. And
+it's getting progressively worse.
+
+Michal Kubecek
+
