@@ -1,61 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47662 "EHLO
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46176 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729660AbeHFP0z (ORCPT
+        by vger.kernel.org with ESMTP id S1730869AbeHFPsM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Aug 2018 11:26:55 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w76DE8BK029249
-        for <linux-kbuild@vger.kernel.org>; Mon, 6 Aug 2018 09:17:51 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2kpp7psxyd-1
+        Mon, 6 Aug 2018 11:48:12 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w76DO2w2095821
+        for <linux-kbuild@vger.kernel.org>; Mon, 6 Aug 2018 09:39:02 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2kpq550pf4-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Mon, 06 Aug 2018 09:17:49 -0400
+        for <linux-kbuild@vger.kernel.org>; Mon, 06 Aug 2018 09:39:01 -0400
 Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <linux-kbuild@vger.kernel.org> from <gor@linux.ibm.com>;
-        Mon, 6 Aug 2018 14:17:48 +0100
-Date: Mon, 6 Aug 2018 15:17:41 +0200
+        Mon, 6 Aug 2018 14:39:00 +0100
+Date: Mon, 6 Aug 2018 15:38:56 +0200
 From: Vasily Gorbik <gor@linux.ibm.com>
-Subject: [PATCH 0/4] ftrace build improvements
+Subject: [PATCH] kbuild: add Map option to save vmlinux linker map file(s)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Message-Id: <cover.thread-aa7b8d.your-ad-here.call-01533557518-ext-9465@work.hours>
+Message-Id: <patch.git-39444503b4d3.your-ad-here.call-01533562662-ext-6094@work.hours>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Support for -fentry -mrecord-mcount and -mnop-mcount has been added for
-s390 in gcc master branch. An attempt to build 4.18 for s390 with that
-gcc would produce a kernel with no __mcount_loc though because of the
-new condition in scripts/Makefile.build:210 which disables recordmcount
-tool if compiler supports -mrecord-mcount (s390 relies on combination
-of -mhotpatch=0,3 gcc flag and recordmcount.pl).
+Add "Map" kbuild option, so that "make Map=1" would save vmlinux linker
+map into vmlinux.map, which is quite useful during making kernel changes
+related to how the kernel is composed.
 
-This patch series adds s390 ftrace support based on combination of -pg
--fentry -mrecord-mcount and -mnop-mcount gcc flags (that fixes issue
-mentioned above). At the same time this patch series fixes couple of
-minor issues and adds -mnop-mcount gcc flag support (utilized by s390).
+KBUILD_SAVE_LINK_MAP flag is exported and architectures
+supporting compressed kernel images might respect it and produce
+arch/*/boot/compressed/vmlinux.map for the decompressor code as well.
 
-Vasily Gorbik (4):
-  trace: handle CC_FLAGS_FTRACE more accurately
-  trace: avoid calling cc-option -mrecord-mcount for every Makefile
-  trace: add -mcount-nop option support
-  s390/ftrace: add -mfentry and -mnop-mcount support
+Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+---
+ .gitignore |  1 +
+ Makefile   | 14 ++++++++++++++
+ 2 files changed, 15 insertions(+)
 
- Makefile                       | 24 ++++++++++++++++++++----
- arch/s390/Kconfig              |  2 ++
- arch/s390/Makefile             | 16 +++++++++-------
- arch/s390/include/asm/ftrace.h |  6 +++---
- arch/s390/kernel/ftrace.c      |  2 +-
- arch/s390/kernel/mcount.S      |  2 +-
- kernel/trace/Kconfig           |  5 +++++
- kernel/trace/ftrace.c          |  2 ++
- scripts/Makefile.build         |  9 +++------
- 9 files changed, 46 insertions(+), 22 deletions(-)
-
+diff --git a/.gitignore b/.gitignore
+index 97ba6b79834c..1d2308e597ad 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -44,6 +44,7 @@
+ *.xz
+ Module.symvers
+ modules.builtin
++vmlinux.map
+ 
+ #
+ # Top-level generic files
+diff --git a/Makefile b/Makefile
+index 7a3c4548162b..f1790deae03b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -176,6 +176,14 @@ ifndef KBUILD_CHECKSRC
+   KBUILD_CHECKSRC = 0
+ endif
+ 
++# Use 'make Map=1' to enable saving linker map file(s):
++# vmlinux.map for vmlinux,
++# (arch/*/boot/compressed/vmlinux.map for arch/*/boot/compressed/vmlinux)
++
++ifeq ("$(origin Map)", "command line")
++	export KBUILD_SAVE_LINK_MAP := $(Map)
++endif
++
+ # Use make M=dir to specify directory of external module to build
+ # Old syntax make ... SUBDIRS=$PWD is still supported
+ # Setting the environment variable KBUILD_EXTMOD take precedence
+@@ -838,6 +846,11 @@ ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
+ LDFLAGS_vmlinux	+= $(call ld-option, -X,)
+ endif
+ 
++ifdef KBUILD_SAVE_LINK_MAP
++LDFLAGS_vmlinux	+= -Map=vmlinux.map
++CLEAN_FILES	+= vmlinux.map
++endif
++
+ # insure the checker run with the right endianness
+ CHECKFLAGS += $(if $(CONFIG_CPU_BIG_ENDIAN),-mbig-endian,-mlittle-endian)
+ 
+@@ -1434,6 +1447,7 @@ help:
+ 	@echo  '		2: warnings which occur quite often but may still be relevant'
+ 	@echo  '		3: more obscure warnings, can most likely be ignored'
+ 	@echo  '		Multiple levels can be combined with W=12 or W=123'
++	@echo  '  make Map=1 [targets] Save vmlinux linker map file(s)'
+ 	@echo  ''
+ 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
+ 	@echo  'For further info see the ./README file'
 -- 
 2.18.0.13.gd42ae10
 
