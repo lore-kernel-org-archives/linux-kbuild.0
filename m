@@ -1,33 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:35370 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731300AbeHGBwX (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Aug 2018 21:52:23 -0400
+Received: from gate.crashing.org ([63.228.1.57]:59365 "EHLO gate.crashing.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732135AbeHGMWB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 7 Aug 2018 08:22:01 -0400
+Date: Tue, 7 Aug 2018 05:08:22 -0500
+From: Segher Boessenkool <segher@kernel.crashing.org>
 Subject: Re: debugging kbuild
+Message-ID: <20180807100822.GD31204@gate.crashing.org>
 References: <CAKwvOdkozP4t3AusfnKfrTmhyrXh4JW4m-ersfnoeTWXcMfJSw@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <b1acffb3-bed3-a2bb-a14c-5de50159ec76@infradead.org>
-Date: Mon, 6 Aug 2018 16:40:55 -0700
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <CAKwvOdkozP4t3AusfnKfrTmhyrXh4JW4m-ersfnoeTWXcMfJSw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 08/06/2018 04:31 PM, Nick Desaulniers wrote:
+On Mon, Aug 06, 2018 at 04:31:14PM -0700, Nick Desaulniers wrote:
 > Is there a way to print the exact command that's being invoked from
 > Make? For example, some of the macro's in scripts/Kbuild.include are
 > tricky to unwind. Is there a way to dump each sub command being run?
-> 
 
-Yamada-san can answer that much better than I can.
+There always is strace...  Or maybe  make -dj  and friends.
 
-I just begin with "make V=1" for verbose command logging.
-and it will be verbose.
 
--- 
-~Randy
+Segher
