@@ -1,69 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54372 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726902AbeHGONm (ORCPT
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:39924 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730869AbeHGSoa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Aug 2018 10:13:42 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w77Bx3RT146536
-        for <linux-kbuild@vger.kernel.org>; Tue, 7 Aug 2018 07:59:41 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2kq9604cgs-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Tue, 07 Aug 2018 07:59:41 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-kbuild@vger.kernel.org> from <gor@linux.ibm.com>;
-        Tue, 7 Aug 2018 12:59:37 +0100
-Date: Tue, 7 Aug 2018 13:59:31 +0200
-From: Vasily Gorbik <gor@linux.ibm.com>
-Subject: Re: [PATCH 2/4] trace: avoid calling cc-option -mrecord-mcount for
- every Makefile
-References: <cover.thread-aa7b8d.your-ad-here.call-01533557518-ext-9465@work.hours>
- <patch-2.thread-aa7b8d.git-de935bace15a.your-ad-here.call-01533557518-ext-9465@work.hours>
- <20180806180740.GI4238@tassilo.jf.intel.com>
+        Tue, 7 Aug 2018 14:44:30 -0400
+Received: by mail-pf1-f196.google.com with SMTP id j8-v6so8841636pff.6
+        for <linux-kbuild@vger.kernel.org>; Tue, 07 Aug 2018 09:29:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180806180740.GI4238@tassilo.jf.intel.com>
-Message-Id: <your-ad-here.call-01533643171-ext-1234@work.hours>
+References: <CAKwvOdkozP4t3AusfnKfrTmhyrXh4JW4m-ersfnoeTWXcMfJSw@mail.gmail.com>
+ <20180807100822.GD31204@gate.crashing.org>
+In-Reply-To: <20180807100822.GD31204@gate.crashing.org>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Tue, 7 Aug 2018 09:29:13 -0700
+Message-ID: <CAKwvOd=FARo+s_YKiRQYpTObdDHA=LmCQxtNkdRqsDY42Aztxg@mail.gmail.com>
+Subject: Re: debugging kbuild
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <ak@linux.intel.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+To: segher@kernel.crashing.org, rdunlap@infradead.org
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mon, Aug 06, 2018 at 11:07:40AM -0700, Andi Kleen wrote:
-> On Mon, Aug 06, 2018 at 03:17:44PM +0200, Vasily Gorbik wrote:
-> > Currently if CONFIG_FTRACE_MCOUNT_RECORD is enabled -mrecord-mcount
-> > compiler flag support is tested for every Makefile.
-> 
-> Good catch.  Does it make a measurable compile time difference?
-> 
+On Tue, Aug 7, 2018 at 3:08 AM Segher Boessenkool
+<segher@kernel.crashing.org> wrote:
+>
+> On Mon, Aug 06, 2018 at 04:31:14PM -0700, Nick Desaulniers wrote:
+> > Is there a way to print the exact command that's being invoked from
+> > Make? For example, some of the macro's in scripts/Kbuild.include are
+> > tricky to unwind. Is there a way to dump each sub command being run?
+>
+> There always is strace...  Or maybe  make -dj  and friends.
 
-A bit more than couple of seconds, but it does make a difference for a
-delta build:
-with patch:
-real    0m9.405s
-user    0m6.966s
-sys     0m2.287s
+Hmm...I'm debugging a 4.9 LTS based kernel. `make V=1` and `make -dj`
+were things I tried, but don't seem to be printing the commands being
+executed (only "Reading makefile ...") until the first warning is hit.
+I wonder if someone is setting the quiet variable somehow, or if I'm
+missing a patch...
 
-without:
-real    0m12.153s
-user    0m9.058s
-sys     0m3.026s
-
-with -j48 on s390 24 cores lpar:
-with patch:
-real    0m1.949s
-user    0m7.034s
-sys     0m2.400s
-
-without:
-real    0m2.255s
-user    0m9.243s
-sys     0m3.266s
-
-> > 
-> > Top 4 cc-option usages:
-> >     511 -mrecord-mcount
-
+Thanks for the ideas.
+-- 
+Thanks,
+~Nick Desaulniers
