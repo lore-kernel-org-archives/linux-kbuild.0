@@ -1,114 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:32369 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726418AbeHGEdO (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:53340 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727289AbeHGEpW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Aug 2018 00:33:14 -0400
+        Tue, 7 Aug 2018 00:45:22 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180807105955.06c70fc8@canb.auug.org.au>
-References: <20180806103738.794c479d@canb.auug.org.au> <20180806222401.3d68fb28@canb.auug.org.au>
- <20180807105955.06c70fc8@canb.auug.org.au>
+In-Reply-To: <3f332e65-0b33-9952-6aba-f9c8953a1f26@kernel.org>
+References: <20180413090351.25662-1-anders.roxell@linaro.org>
+ <20180607110911.12252-1-anders.roxell@linaro.org> <CADYN=9J=hSFb2wCZ1+dXL=023p9y05MEGUPvH48WfPX7XDZvwQ@mail.gmail.com>
+ <f222aa8d-88b8-140c-30ed-83fd908bfd09@kernel.org> <CADYN=9LSA60E4mFwrbeY-RGi4kZV6hO0ygz0-C6QB3+KKaoxQg@mail.gmail.com>
+ <3f332e65-0b33-9952-6aba-f9c8953a1f26@kernel.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 7 Aug 2018 11:20:21 +0900
-Message-ID: <CAK7LNATFjpxxVje=5vUF88kQVYJxaYzZbPwDzqkC6hKwgscpuw@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the vfs tree
+Date: Tue, 7 Aug 2018 11:32:26 +0900
+Message-ID: <CAK7LNAQ6hNmjmZc8J54KWCtR6x4Megn3mbdzprGgSZL5Zk9GCg@mail.gmail.com>
+Subject: Re: [PATCH v4] selftests: add headers_install to lib.mk
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Al Viro <viro@zeniv.linux.org.uk>, Linux-Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Howells <dhowells@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Nicolas Pitre <nico@linaro.org>
+To: Shuah Khan <shuah@kernel.org>
+Cc: Anders Roxell <anders.roxell@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Bamvor Zhang <bamv2005@gmail.com>, brgl@bgdev.pl, Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Andrea Arcangeli <aarcange@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Networking <netdev@vger.kernel.org>
 
-2018-08-07 9:59 GMT+09:00 Stephen Rothwell <sfr@canb.auug.org.au>:
-> Hi all,
+2018-08-07 2:03 GMT+09:00 Shuah Khan <shuah@kernel.org>:
+> Hi Anders,
 >
-> On Mon, 6 Aug 2018 22:24:01 +1000 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> On 07/25/2018 10:08 AM, Anders Roxell wrote:
+>> On Tue, 24 Jul 2018 at 19:11, Shuah Khan <shuah@kernel.org> wrote:
+>>>
+>>> On 07/23/2018 02:49 PM, Anders Roxell wrote:
+>>>> On Thu, 7 Jun 2018 at 13:09, Anders Roxell <anders.roxell@linaro.org> wrote:
+>>>>>
+>>>>> If the kernel headers aren't installed we can't build all the tests.
+>>>>> Add a new make target rule 'khdr' in the file lib.mk to generate the
+>>>>> kernel headers and that gets include for every test-dir Makefile that
+>>>>> includes lib.mk If the testdir in turn have its own sub-dirs the
+>>>>> top_srcdir needs to be set to the linux-rootdir to be able to generate
+>>>>> the kernel headers.
+>>>>>
+>>>>> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+>>>>> Reviewed-by: Fathi Boudra <fathi.boudra@linaro.org>
+>>>>> ---
+>>>>>  Makefile                                           | 14 +-------------
+>>>>>  scripts/subarch.include                            | 13 +++++++++++++
+>>>>>  tools/testing/selftests/android/Makefile           |  2 +-
+>>>>>  tools/testing/selftests/android/ion/Makefile       |  2 ++
+>>>>>  tools/testing/selftests/futex/functional/Makefile  |  1 +
+>>>>>  tools/testing/selftests/gpio/Makefile              |  7 ++-----
+>>>>>  tools/testing/selftests/kvm/Makefile               |  7 ++-----
+>>>>>  tools/testing/selftests/lib.mk                     | 12 ++++++++++++
+>>>>>  tools/testing/selftests/net/Makefile               |  1 +
+>>>>>  .../selftests/networking/timestamping/Makefile     |  1 +
+>>>>>  tools/testing/selftests/vm/Makefile                |  4 ----
+>>>>>  11 files changed, 36 insertions(+), 28 deletions(-)
+>>>>>  create mode 100644 scripts/subarch.include
+>>>>>
+>>>>> diff --git a/Makefile b/Makefile
+>>>>> index 6b9aea95ae3a..8050072300fa 100644
+>>>>> --- a/Makefile
+>>>>> +++ b/Makefile
+>>>>> @@ -286,19 +286,7 @@ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+>>>>>  KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+>>>>>  export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
+>>>>>
+>>>>> -# SUBARCH tells the usermode build what the underlying arch is.  That is set
+>>>>> -# first, and if a usermode build is happening, the "ARCH=um" on the command
+>>>>> -# line overrides the setting of ARCH below.  If a native build is happening,
+>>>>> -# then ARCH is assigned, getting whatever value it gets normally, and
+>>>>> -# SUBARCH is subsequently ignored.
+>>>>> -
+>>>>> -SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+>>>>> -                                 -e s/sun4u/sparc64/ \
+>>>>> -                                 -e s/arm.*/arm/ -e s/sa110/arm/ \
+>>>>> -                                 -e s/s390x/s390/ -e s/parisc64/parisc/ \
+>>>>> -                                 -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
+>>>>> -                                 -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ \
+>>>>> -                                 -e s/riscv.*/riscv/)
+>>>>> +include scripts/subarch.include
+>>>
+>>> What is the reason for this SUBARCH block move to to scripts/subarch.include?
+>>> Is this necessary for adding headers install dependency to lib.mk?
 >>
->> On Mon, 6 Aug 2018 10:37:38 +1000 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->> >
->> > After merging the vfs tree, today's linux-next build (x86_64 allmodconfig)
->> > failed like this:
->> >
->> > samples/statx/test-fsinfo.c:26:10: fatal error: linux/fsinfo.h: No such file or directory
->> >  #include <linux/fsinfo.h>
->> >           ^~~~~~~~~~~~~~~~
->> >
->> > Caused by commit
->> >
->> >   90b413cb970a ("vfs: syscall: Add fsinfo() to query filesystem information")
->> >
->> > I guess that headers_install (or whatever its called) has not bee run
->> > before the sample code is built.
->> >
->> > I have applied the following patch for today:
->> >
->> > From: Stephen Rothwell <sfr@canb.auug.org.au>
->> > Date: Mon, 6 Aug 2018 10:29:34 +1000
->> > Subject: [PATCH] vfs: don;t build new sample programs yet
->> >
->> > It seems that headers_install is not done before the samples
->> > are build so some needed include files are not in the right place.
->> >
->> > Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
->> > ---
->> >  samples/statx/Makefile | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> >
->> > diff --git a/samples/statx/Makefile b/samples/statx/Makefile
->> > index 05b4d30cdd3c..0b4d01822eca 100644
->> > --- a/samples/statx/Makefile
->> > +++ b/samples/statx/Makefile
->> > @@ -1,5 +1,5 @@
->> >  # List of programs to build
->> > -hostprogs-$(CONFIG_SAMPLE_STATX) := test-statx test-fsinfo test-fs-query
->> > +hostprogs-$(CONFIG_SAMPLE_STATX) := test-statx
->> >
->> >  # Tell kbuild to always build the programs
->> >  always := $(hostprogs-y)
+>> This is needed to create headers for cross build.
 >>
->> It turns out that commit
->>
->>   ba5214f7f40c ("vfs: Implement parameter value retrieval with fsinfo()")
->>
->> removed the "depends on BROKEN" from CONFIG_SAMPLE_STATX and that
->> breaks other builds (at least allyesconfig on s390).
 >
-> I have added the following suggested patch (I am sorry I can't
-> find/remember who pointed me to this patch) for today (I guess that it
-> should be merged via the vfs tree as that is what is causing the build
-> failures ... in which case a real patch should be supplied with
-> appropriate SOB line).  This seems to fix the current problem.
+> I am sorry for the delay on this patch. I am going to get this into 4.19.
+> If anybody has objections, please let me.
 >
-> From: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Date: Tue, 7 Aug 2018 10:33:43 +1000
-> Subject: [PATCH] Try to get the headers installed before we build the samples
+> Anders! Will be able to rebase the patch and send me the latest. I think
+> I have Acks from kvm, android, and vm so far.
 >
-> Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> ---
->  Makefile | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/Makefile b/Makefile
-> index 9e71826f67d7..d224d94c14be 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1023,6 +1023,7 @@ endif
->  # Build samples along the rest of the kernel
->  ifdef CONFIG_SAMPLES
->  vmlinux-dirs += samples
-> +samples: headers_install
->  endif
->
->  # The actual objects are generated when descending,
-> --
 
 
-OK, I will queue this up to my tree.
+I may be missing something about the tools/ directory,
+but why isn't it like this?
 
 
-I suggested this in the discussion:
-https://patchwork.kernel.org/patch/10552353/
+kselftest: headers_install
+        $(Q)$(MAKE) -C $(srctree)/tools/testing/selftests run_tests
 
-I did not get response, though.
+
+
 
 
 
