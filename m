@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:39905 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726158AbeHHE1C (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:37728 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726158AbeHHEcS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Aug 2018 00:27:02 -0400
+        Wed, 8 Aug 2018 00:32:18 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: make samples depend on headers_install really
-Date: Wed,  8 Aug 2018 11:08:54 +0900
-Message-Id: <1533694134-6703-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2] kbuild: make samples really depend on headers_install
+Date: Wed,  8 Aug 2018 11:14:14 +0900
+Message-Id: <1533694454-7086-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: David Howells <dhowells@redhat.com>
@@ -19,13 +19,17 @@ the build failure of samples.
 Commit ddea05fa148b ("kbuild: make samples depend on headers_install")
 addressed this, but "samples/" is only used for the single target build.
 
-"make samples/" correctly installs kernel headers, but it does not
-work for general building because a phony target "sample" (no tailing
-backslash) is used.
+"make samples/" properly installs kernel headers, but it does not work
+for general building because a phony target "sample" (no trailing slash)
+is used.
 
 Reported-by: David Howells <dhowells@redhat.com>
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
+
+Changes in v2:
+  - Correct commit log (backslash -> slash)
+  - Fix a typo
 
  Makefile | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
