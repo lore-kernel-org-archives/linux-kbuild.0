@@ -1,47 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:49920 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730869AbeHGSqP (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:37503 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726275AbeHHDmd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Aug 2018 14:46:15 -0400
-Subject: Re: debugging kbuild
-References: <CAKwvOdkozP4t3AusfnKfrTmhyrXh4JW4m-ersfnoeTWXcMfJSw@mail.gmail.com>
- <20180807100822.GD31204@gate.crashing.org>
- <CAKwvOd=FARo+s_YKiRQYpTObdDHA=LmCQxtNkdRqsDY42Aztxg@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <0a3dbeeb-b169-2d8d-3175-6e7c1ebe2a7d@infradead.org>
-Date: Tue, 7 Aug 2018 09:31:03 -0700
+        Tue, 7 Aug 2018 23:42:33 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAKwvOd=FARo+s_YKiRQYpTObdDHA=LmCQxtNkdRqsDY42Aztxg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1901723.5RX4ofS7Gn@blindfold>
+References: <1533358023-5801-1-git-send-email-yamada.masahiro@socionext.com> <1901723.5RX4ofS7Gn@blindfold>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 8 Aug 2018 10:24:27 +0900
+Message-ID: <CAK7LNATZ0HQEeVaxrHSms0R37TE3UK-=up0Bfh_rcxEi7SWS_g@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Kbuild: fix and clean-up arch/um/Makefile
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>, segher@kernel.crashing.org
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Richard Weinberger <richard@nod.at>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jeff Dike <jdike@addtoit.com>, linux-um@lists.infradead.org, Randy Dunlap <rdunlap@infradead.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 08/07/2018 09:29 AM, Nick Desaulniers wrote:
-> On Tue, Aug 7, 2018 at 3:08 AM Segher Boessenkool
-> <segher@kernel.crashing.org> wrote:
+2018-08-07 5:54 GMT+09:00 Richard Weinberger <richard@nod.at>:
+> Am Samstag, 4. August 2018, 06:47:00 CEST schrieb Masahiro Yamada:
 >>
->> On Mon, Aug 06, 2018 at 04:31:14PM -0700, Nick Desaulniers wrote:
->>> Is there a way to print the exact command that's being invoked from
->>> Make? For example, some of the macro's in scripts/Kbuild.include are
->>> tricky to unwind. Is there a way to dump each sub command being run?
+>> 1/3 fixes the build failure reported by Randy.
+>> (I may have seen a similar report before, but I cannot recall it.)
 >>
->> There always is strace...  Or maybe  make -dj  and friends.
-> 
-> Hmm...I'm debugging a 4.9 LTS based kernel. `make V=1` and `make -dj`
-> were things I tried, but don't seem to be printing the commands being
-> executed (only "Reading makefile ...") until the first warning is hit.
-> I wonder if someone is setting the quiet variable somehow, or if I'm
-> missing a patch...
-> 
-> Thanks for the ideas.
-> 
+>> 2/3 and 3/3 clean-up the Makefile a bit more.
+>>
+>> I'd like to apply this series to kbuild tree.
+>> Ack from UML folks are appreciated.
+>
+> Nice to see this fixed, Masahiro! :-)
+>
+> Acked-by: Richard Weinberger <richard@nod.at>
+>
 
-Yeah, that sounds like -s (silent) is set.
+
+Applied to linux-kbuild.
+
 
 -- 
-~Randy
+Best Regards
+Masahiro Yamada
