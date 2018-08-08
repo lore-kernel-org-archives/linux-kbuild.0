@@ -1,42 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:37503 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726275AbeHHDmd (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:39905 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726158AbeHHE1C (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Aug 2018 23:42:33 -0400
-MIME-Version: 1.0
-In-Reply-To: <1901723.5RX4ofS7Gn@blindfold>
-References: <1533358023-5801-1-git-send-email-yamada.masahiro@socionext.com> <1901723.5RX4ofS7Gn@blindfold>
+        Wed, 8 Aug 2018 00:27:02 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 8 Aug 2018 10:24:27 +0900
-Message-ID: <CAK7LNATZ0HQEeVaxrHSms0R37TE3UK-=up0Bfh_rcxEi7SWS_g@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Kbuild: fix and clean-up arch/um/Makefile
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kbuild: make samples depend on headers_install really
+Date: Wed,  8 Aug 2018 11:08:54 +0900
+Message-Id: <1533694134-6703-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Weinberger <richard@nod.at>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jeff Dike <jdike@addtoit.com>, linux-um@lists.infradead.org, Randy Dunlap <rdunlap@infradead.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-2018-08-07 5:54 GMT+09:00 Richard Weinberger <richard@nod.at>:
-> Am Samstag, 4. August 2018, 06:47:00 CEST schrieb Masahiro Yamada:
->>
->> 1/3 fixes the build failure reported by Randy.
->> (I may have seen a similar report before, but I cannot recall it.)
->>
->> 2/3 and 3/3 clean-up the Makefile a bit more.
->>
->> I'd like to apply this series to kbuild tree.
->> Ack from UML folks are appreciated.
->
-> Nice to see this fixed, Masahiro! :-)
->
-> Acked-by: Richard Weinberger <richard@nod.at>
->
+Kernel headers must be installed into $(objtree)/usr/include to avoid
+the build failure of samples.
 
+Commit ddea05fa148b ("kbuild: make samples depend on headers_install")
+addressed this, but "samples/" is only used for the single target build.
 
-Applied to linux-kbuild.
+"make samples/" correctly installs kernel headers, but it does not
+work for general building because a phony target "sample" (no tailing
+backslash) is used.
 
+Reported-by: David Howells <dhowells@redhat.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 7a3c454..1e47d13 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1009,9 +1009,10 @@ ifdef CONFIG_GDB_SCRIPTS
+ endif
+ 	+$(call if_changed,link-vmlinux)
+ 
+-# Build samples along the rest of the kernel
++# Build samples along the rest of the kernel. This needs headers_install.
+ ifdef CONFIG_SAMPLES
+ vmlinux-dirs += samples
++samples: headers_install
+ endif
+ 
+ # The actual objects are generated when descending,
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
