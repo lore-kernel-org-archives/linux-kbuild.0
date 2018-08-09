@@ -1,107 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:28926 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727724AbeHIHW3 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:33255 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728034AbeHIH3u (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Aug 2018 03:22:29 -0400
+        Thu, 9 Aug 2018 03:29:50 -0400
 MIME-Version: 1.0
-In-Reply-To: <patch.git-39444503b4d3.your-ad-here.call-01533562662-ext-6094@work.hours>
-References: <patch.git-39444503b4d3.your-ad-here.call-01533562662-ext-6094@work.hours>
+In-Reply-To: <patch-1.thread-dc1802.git-dc180286abb1.your-ad-here.call-01533563120-ext-8550@work.hours>
+References: <cover.thread-dc1802.your-ad-here.call-01533563120-ext-8550@work.hours>
+ <patch-1.thread-dc1802.git-dc180286abb1.your-ad-here.call-01533563120-ext-8550@work.hours>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 9 Aug 2018 13:58:40 +0900
-Message-ID: <CAK7LNARivbQ57+raPUkek2=bsnYDhXS+hSK3kwf+0K7Hvxj31g@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: add Map option to save vmlinux linker map file(s)
+Date: Thu, 9 Aug 2018 14:06:03 +0900
+Message-ID: <CAK7LNAQ3O+5C2+sPVey_vX1OtmRQJi-RxUrXh+oxev3720tWxw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] kbuild: allow alternate src for target's implicit prerequisite
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Vasily Gorbik <gor@linux.ibm.com>
 Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018-08-06 22:38 GMT+09:00 Vasily Gorbik <gor@linux.ibm.com>:
-> Add "Map" kbuild option, so that "make Map=1" would save vmlinux linker
-> map into vmlinux.map, which is quite useful during making kernel changes
-> related to how the kernel is composed.
+2018-08-06 23:37 GMT+09:00 Vasily Gorbik <gor@linux.ibm.com>:
+> With kbuild there is no easy way to re-compile source files from another
+> directory, which is required for the decompressor on some platforms
+> (files like lib/ctype.c, lib/cmdline.c, etc). Writing custom build
+> rules for those files is not feasible since original rules are complex
+> and kbuild functions and variables are not exposed.
 >
-> KBUILD_SAVE_LINK_MAP flag is exported and architectures
-> supporting compressed kernel images might respect it and produce
-> arch/*/boot/compressed/vmlinux.map for the decompressor code as well.
+> The simplest solution is to reverse include source files either into
+> existing files or separate files. That eliminates the need to tackle
+> with the kbuild rules, but is ugly.
+>
+> Here is another solution to that problem, utilizing secondary expansion.
+> Build rules are in a form:
+> $(obj)/%.o: $(src)/%.c ...
+> $(obj)/%.o: $(src)/%.S ...
+>
+> "src" variable could be changed to cover the need of specifying alternate
+> source file directory.
+> src := $(if $(SRCDIR_$(@F)),$(SRCDIR_$(@F)),$(src))
+>
+> So, if there is SRCDIR_<target> set, it will be used, original "src" is
+> used otherwise. But that wouldn't work as it is. To be able to utilize
+> automatic variables in implicit prerequisite secondary expansion has to
+> be used and src value has to be additionally escaped.
+>
+> Alternate src dir then could be specified in Makefile as:
+> obj-y := file1.o file2.o
+> SRCDIR_file1.o := file1/src/dir
+> SRCDIR_file2.o := file2/src/dir
+>
+> Which is enough to build $(obj)/file1.o from file1/src/dir/file1.(c|S),
+> and $(obj)/file2.o from file2/src/dir/file2.(c|S)
+
+
+Is this a simple solution compared with existing ones?
+Kind of.
+
+However, it is just moving the complexity around
+from Makefiles to the core build scripts, after all.
+
+
+I guess the increase of build time is not too big,
+( 1 % or so for the incremental build of allmodconfig)
+but I do not like performing the second expansion for every directory
+to save some a few Makefiles.
+
+
+
+> Secondary expansion has been introduced with make 3.81, which is
+> minimal supported version by kbuild itself.
 >
 > Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
 > ---
-
-
-If the map file is quite useful, should it be generated all the time?
-Or, how about CONFIG option if you want this conditionally generated?
-
-I do not want to increase fine-grained command-line switches
-except _really_ useful ones.
-
-
-
-
->  .gitignore |  1 +
->  Makefile   | 14 ++++++++++++++
->  2 files changed, 15 insertions(+)
+>  scripts/Makefile.build | 26 +++++++++++++++-----------
+>  1 file changed, 15 insertions(+), 11 deletions(-)
 >
-> diff --git a/.gitignore b/.gitignore
-> index 97ba6b79834c..1d2308e597ad 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -44,6 +44,7 @@
->  *.xz
->  Module.symvers
->  modules.builtin
-> +vmlinux.map
->
->  #
->  # Top-level generic files
-> diff --git a/Makefile b/Makefile
-> index 7a3c4548162b..f1790deae03b 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -176,6 +176,14 @@ ifndef KBUILD_CHECKSRC
->    KBUILD_CHECKSRC = 0
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 514ed63ff571..97c6ece96cfb 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -70,6 +70,10 @@ $(warning kbuild: Makefile.build is included improperly)
 >  endif
 >
-> +# Use 'make Map=1' to enable saving linker map file(s):
-> +# vmlinux.map for vmlinux,
-> +# (arch/*/boot/compressed/vmlinux.map for arch/*/boot/compressed/vmlinux)
-> +
-> +ifeq ("$(origin Map)", "command line")
-> +       export KBUILD_SAVE_LINK_MAP := $(Map)
-> +endif
-> +
->  # Use make M=dir to specify directory of external module to build
->  # Old syntax make ... SUBDIRS=$PWD is still supported
->  # Setting the environment variable KBUILD_EXTMOD take precedence
-> @@ -838,6 +846,11 @@ ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
->  LDFLAGS_vmlinux        += $(call ld-option, -X,)
->  endif
->
-> +ifdef KBUILD_SAVE_LINK_MAP
-> +LDFLAGS_vmlinux        += -Map=vmlinux.map
-> +CLEAN_FILES    += vmlinux.map
-> +endif
-> +
->  # insure the checker run with the right endianness
->  CHECKFLAGS += $(if $(CONFIG_CPU_BIG_ENDIAN),-mbig-endian,-mlittle-endian)
->
-> @@ -1434,6 +1447,7 @@ help:
->         @echo  '                2: warnings which occur quite often but may still be relevant'
->         @echo  '                3: more obscure warnings, can most likely be ignored'
->         @echo  '                Multiple levels can be combined with W=12 or W=123'
-> +       @echo  '  make Map=1 [targets] Save vmlinux linker map file(s)'
->         @echo  ''
->         @echo  'Execute "make" or "make all" to build all targets marked with [*] '
->         @echo  'For further info see the ./README file'
-> --
-> 2.18.0.13.gd42ae10
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  # ===========================================================================
+> +# Allow to specify alternate source directory of target's implicit prerequisite
+> +# e.g. 'SRCDIR_cmdline.o := lib'
 
+
+This does not work for single targets.
+
+'make foo/bar/cmdline.o' works,
+but 'make foo/bar/cmdline.i' does not.
+
+
+> +.SECONDEXPANSION:
+> +srcdir := $$(if $$(SRCDIR_$$(@F)),$$(SRCDIR_$$(@F)),$(src))
+>
 
 
 -- 
