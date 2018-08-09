@@ -1,45 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f195.google.com ([209.85.223.195]:39048 "EHLO
-        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727720AbeHHTko (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:28926 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727724AbeHIHW3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Aug 2018 15:40:44 -0400
-Received: by mail-io0-f195.google.com with SMTP id o22-v6so2455051ioh.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 08 Aug 2018 10:20:06 -0700 (PDT)
-Subject: Re: [RESEND PATCH] init/Kconfig: Use short unix-style option instead
- of --longname
-References: <1533701203-31019-1-git-send-email-yamada.masahiro@socionext.com>
-From: Rob Landley <rob@landley.net>
-Message-ID: <7c415401-8732-9cdd-44f7-1878e711b440@landley.net>
-Date: Wed, 8 Aug 2018 12:19:18 -0500
+        Thu, 9 Aug 2018 03:22:29 -0400
 MIME-Version: 1.0
-In-Reply-To: <1533701203-31019-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <patch.git-39444503b4d3.your-ad-here.call-01533562662-ext-6094@work.hours>
+References: <patch.git-39444503b4d3.your-ad-here.call-01533562662-ext-6094@work.hours>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 9 Aug 2018 13:58:40 +0900
+Message-ID: <CAK7LNARivbQ57+raPUkek2=bsnYDhXS+hSK3kwf+0K7Hvxj31g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: add Map option to save vmlinux linker map file(s)
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Jiri Kosina <trivial@kernel.org>, Kees Cook <keescook@chromium.org>, Randy Dunlap <rdunlap@infradead.org>, Nicholas Piggin <npiggin@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Ingo Molnar <mingo@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 08/07/2018 11:06 PM, Masahiro Yamada wrote:
-> From: Rob Landley <rob@landley.net>
-> 
-> Avoids warning messages with the latest release of toybox, which never
-> bothered to implement the --longopts nothing was using.
-> 
-> Signed-off-by: Rob Landley <rob@landley.net>
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+2018-08-06 22:38 GMT+09:00 Vasily Gorbik <gor@linux.ibm.com>:
+> Add "Map" kbuild option, so that "make Map=1" would save vmlinux linker
+> map into vmlinux.map, which is quite useful during making kernel changes
+> related to how the kernel is composed.
+>
+> KBUILD_SAVE_LINK_MAP flag is exported and architectures
+> supporting compressed kernel images might respect it and produce
+> arch/*/boot/compressed/vmlinux.map for the decompressor code as well.
+>
+> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
 > ---
-> 
-> This was sent to the trivial ML some time ago,
-> but not applied yet.
-> 
-> I will apply this to kbuild tree for v4.19
 
-Thank you.
 
-(I have a pile of small kernel fixes but haven't had time+energy to follow up on
-them recently.)
+If the map file is quite useful, should it be generated all the time?
+Or, how about CONFIG option if you want this conditionally generated?
 
-Rob
+I do not want to increase fine-grained command-line switches
+except _really_ useful ones.
+
+
+
+
+>  .gitignore |  1 +
+>  Makefile   | 14 ++++++++++++++
+>  2 files changed, 15 insertions(+)
+>
+> diff --git a/.gitignore b/.gitignore
+> index 97ba6b79834c..1d2308e597ad 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -44,6 +44,7 @@
+>  *.xz
+>  Module.symvers
+>  modules.builtin
+> +vmlinux.map
+>
+>  #
+>  # Top-level generic files
+> diff --git a/Makefile b/Makefile
+> index 7a3c4548162b..f1790deae03b 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -176,6 +176,14 @@ ifndef KBUILD_CHECKSRC
+>    KBUILD_CHECKSRC = 0
+>  endif
+>
+> +# Use 'make Map=1' to enable saving linker map file(s):
+> +# vmlinux.map for vmlinux,
+> +# (arch/*/boot/compressed/vmlinux.map for arch/*/boot/compressed/vmlinux)
+> +
+> +ifeq ("$(origin Map)", "command line")
+> +       export KBUILD_SAVE_LINK_MAP := $(Map)
+> +endif
+> +
+>  # Use make M=dir to specify directory of external module to build
+>  # Old syntax make ... SUBDIRS=$PWD is still supported
+>  # Setting the environment variable KBUILD_EXTMOD take precedence
+> @@ -838,6 +846,11 @@ ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
+>  LDFLAGS_vmlinux        += $(call ld-option, -X,)
+>  endif
+>
+> +ifdef KBUILD_SAVE_LINK_MAP
+> +LDFLAGS_vmlinux        += -Map=vmlinux.map
+> +CLEAN_FILES    += vmlinux.map
+> +endif
+> +
+>  # insure the checker run with the right endianness
+>  CHECKFLAGS += $(if $(CONFIG_CPU_BIG_ENDIAN),-mbig-endian,-mlittle-endian)
+>
+> @@ -1434,6 +1447,7 @@ help:
+>         @echo  '                2: warnings which occur quite often but may still be relevant'
+>         @echo  '                3: more obscure warnings, can most likely be ignored'
+>         @echo  '                Multiple levels can be combined with W=12 or W=123'
+> +       @echo  '  make Map=1 [targets] Save vmlinux linker map file(s)'
+>         @echo  ''
+>         @echo  'Execute "make" or "make all" to build all targets marked with [*] '
+>         @echo  'For further info see the ./README file'
+> --
+> 2.18.0.13.gd42ae10
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
