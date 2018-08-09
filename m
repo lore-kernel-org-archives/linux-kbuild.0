@@ -1,232 +1,338 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:38728 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727858AbeHIK2C (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:40036 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727319AbeHIVrc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Aug 2018 06:28:02 -0400
-Received: by mail-lf1-f65.google.com with SMTP id a4-v6so3465776lff.5
-        for <linux-kbuild@vger.kernel.org>; Thu, 09 Aug 2018 01:04:20 -0700 (PDT)
-From: Anders Roxell <anders.roxell@linaro.org>
-Subject: [PATCH v5] selftests: add headers_install to lib.mk
-Date: Thu,  9 Aug 2018 10:04:02 +0200
-Message-Id: <20180809080402.24469-1-anders.roxell@linaro.org>
-In-Reply-To: <3f332e65-0b33-9952-6aba-f9c8953a1f26@kernel.org>
-References: <3f332e65-0b33-9952-6aba-f9c8953a1f26@kernel.org>
+        Thu, 9 Aug 2018 17:47:32 -0400
+Received: by mail-wm0-f67.google.com with SMTP id y9-v6so1368521wma.5
+        for <linux-kbuild@vger.kernel.org>; Thu, 09 Aug 2018 12:21:17 -0700 (PDT)
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: [PATCH v5 01/18] khwasan, mm: change kasan hooks signatures
+Date: Thu,  9 Aug 2018 21:20:53 +0200
+Message-Id: <327ede8363658620073d173c615a26ba9faf38d0.1533842385.git.andreyknvl@google.com>
+In-Reply-To: <cover.1533842385.git.andreyknvl@google.com>
+References: <cover.1533842385.git.andreyknvl@google.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, shuah@kernel.org, bamv2005@gmail.com, brgl@bgdev.pl, pbonzini@redhat.com, akpm@linux-foundation.org, rppt@linux.vnet.ibm.com, aarcange@redhat.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, Anders Roxell <anders.roxell@linaro.org>
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
+Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>
 
-If the kernel headers aren't installed we can't build all the tests.
-Add a new make target rule 'khdr' in the file lib.mk to generate the
-kernel headers and that gets include for every test-dir Makefile that
-includes lib.mk If the testdir in turn have its own sub-dirs the
-top_srcdir needs to be set to the linux-rootdir to be able to generate
-the kernel headers.
+KHWASAN will change the value of the top byte of pointers returned from the
+kernel allocation functions (such as kmalloc). This patch updates KASAN
+hooks signatures and their usage in SLAB and SLUB code to reflect that.
 
-Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
-Reviewed-by: Fathi Boudra <fathi.boudra@linaro.org>
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
+ include/linux/kasan.h | 34 +++++++++++++++++++++++-----------
+ mm/kasan/kasan.c      | 24 ++++++++++++++----------
+ mm/slab.c             | 12 ++++++------
+ mm/slab.h             |  2 +-
+ mm/slab_common.c      |  4 ++--
+ mm/slub.c             | 15 +++++++--------
+ 6 files changed, 53 insertions(+), 38 deletions(-)
 
-Rebased onto next-20180808
-
-Cheers,
-Anders
-
- Makefile                                           | 14 +-------------
- scripts/subarch.include                            | 13 +++++++++++++
- tools/testing/selftests/android/Makefile           |  2 +-
- tools/testing/selftests/android/ion/Makefile       |  2 ++
- tools/testing/selftests/futex/functional/Makefile  |  1 +
- tools/testing/selftests/gpio/Makefile              |  7 ++-----
- tools/testing/selftests/kvm/Makefile               |  7 ++-----
- tools/testing/selftests/lib.mk                     | 12 ++++++++++++
- tools/testing/selftests/net/Makefile               |  1 +
- .../selftests/networking/timestamping/Makefile     |  1 +
- tools/testing/selftests/vm/Makefile                |  4 ----
- 11 files changed, 36 insertions(+), 28 deletions(-)
- create mode 100644 scripts/subarch.include
-
-diff --git a/Makefile b/Makefile
-index c88d56de7fda..49dc0c6e1f23 100644
---- a/Makefile
-+++ b/Makefile
-@@ -299,19 +299,7 @@ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
- KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
- export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
+diff --git a/include/linux/kasan.h b/include/linux/kasan.h
+index de784fd11d12..cbdc54543803 100644
+--- a/include/linux/kasan.h
++++ b/include/linux/kasan.h
+@@ -53,14 +53,14 @@ void kasan_unpoison_object_data(struct kmem_cache *cache, void *object);
+ void kasan_poison_object_data(struct kmem_cache *cache, void *object);
+ void kasan_init_slab_obj(struct kmem_cache *cache, const void *object);
  
--# SUBARCH tells the usermode build what the underlying arch is.  That is set
--# first, and if a usermode build is happening, the "ARCH=um" on the command
--# line overrides the setting of ARCH below.  If a native build is happening,
--# then ARCH is assigned, getting whatever value it gets normally, and
--# SUBARCH is subsequently ignored.
--
--SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
--				  -e s/sun4u/sparc64/ \
--				  -e s/arm.*/arm/ -e s/sa110/arm/ \
--				  -e s/s390x/s390/ -e s/parisc64/parisc/ \
--				  -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
--				  -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ \
--				  -e s/riscv.*/riscv/)
-+include scripts/subarch.include
+-void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags);
++void *kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags);
+ void kasan_kfree_large(void *ptr, unsigned long ip);
+ void kasan_poison_kfree(void *ptr, unsigned long ip);
+-void kasan_kmalloc(struct kmem_cache *s, const void *object, size_t size,
++void *kasan_kmalloc(struct kmem_cache *s, const void *object, size_t size,
+ 		  gfp_t flags);
+-void kasan_krealloc(const void *object, size_t new_size, gfp_t flags);
++void *kasan_krealloc(const void *object, size_t new_size, gfp_t flags);
  
- # Cross compiling and selecting different set of gcc/bin-utils
- # ---------------------------------------------------------------------------
-diff --git a/scripts/subarch.include b/scripts/subarch.include
-new file mode 100644
-index 000000000000..650682821126
---- /dev/null
-+++ b/scripts/subarch.include
-@@ -0,0 +1,13 @@
-+# SUBARCH tells the usermode build what the underlying arch is.  That is set
-+# first, and if a usermode build is happening, the "ARCH=um" on the command
-+# line overrides the setting of ARCH below.  If a native build is happening,
-+# then ARCH is assigned, getting whatever value it gets normally, and
-+# SUBARCH is subsequently ignored.
+-void kasan_slab_alloc(struct kmem_cache *s, void *object, gfp_t flags);
++void *kasan_slab_alloc(struct kmem_cache *s, void *object, gfp_t flags);
+ bool kasan_slab_free(struct kmem_cache *s, void *object, unsigned long ip);
+ 
+ struct kasan_cache {
+@@ -105,16 +105,28 @@ static inline void kasan_poison_object_data(struct kmem_cache *cache,
+ static inline void kasan_init_slab_obj(struct kmem_cache *cache,
+ 				const void *object) {}
+ 
+-static inline void kasan_kmalloc_large(void *ptr, size_t size, gfp_t flags) {}
++static inline void *kasan_kmalloc_large(void *ptr, size_t size, gfp_t flags)
++{
++	return ptr;
++}
+ static inline void kasan_kfree_large(void *ptr, unsigned long ip) {}
+ static inline void kasan_poison_kfree(void *ptr, unsigned long ip) {}
+-static inline void kasan_kmalloc(struct kmem_cache *s, const void *object,
+-				size_t size, gfp_t flags) {}
+-static inline void kasan_krealloc(const void *object, size_t new_size,
+-				 gfp_t flags) {}
++static inline void *kasan_kmalloc(struct kmem_cache *s, const void *object,
++				size_t size, gfp_t flags)
++{
++	return (void *)object;
++}
++static inline void *kasan_krealloc(const void *object, size_t new_size,
++				 gfp_t flags)
++{
++	return (void *)object;
++}
+ 
+-static inline void kasan_slab_alloc(struct kmem_cache *s, void *object,
+-				   gfp_t flags) {}
++static inline void *kasan_slab_alloc(struct kmem_cache *s, void *object,
++				   gfp_t flags)
++{
++	return object;
++}
+ static inline bool kasan_slab_free(struct kmem_cache *s, void *object,
+ 				   unsigned long ip)
+ {
+diff --git a/mm/kasan/kasan.c b/mm/kasan/kasan.c
+index c3bd5209da38..f696c7c143c2 100644
+--- a/mm/kasan/kasan.c
++++ b/mm/kasan/kasan.c
+@@ -485,9 +485,9 @@ void kasan_init_slab_obj(struct kmem_cache *cache, const void *object)
+ 	__memset(alloc_info, 0, sizeof(*alloc_info));
+ }
+ 
+-void kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
++void *kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
+ {
+-	kasan_kmalloc(cache, object, cache->object_size, flags);
++	return kasan_kmalloc(cache, object, cache->object_size, flags);
+ }
+ 
+ static bool __kasan_slab_free(struct kmem_cache *cache, void *object,
+@@ -528,7 +528,7 @@ bool kasan_slab_free(struct kmem_cache *cache, void *object, unsigned long ip)
+ 	return __kasan_slab_free(cache, object, ip, true);
+ }
+ 
+-void kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
++void *kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
+ 		   gfp_t flags)
+ {
+ 	unsigned long redzone_start;
+@@ -538,7 +538,7 @@ void kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
+ 		quarantine_reduce();
+ 
+ 	if (unlikely(object == NULL))
+-		return;
++		return NULL;
+ 
+ 	redzone_start = round_up((unsigned long)(object + size),
+ 				KASAN_SHADOW_SCALE_SIZE);
+@@ -551,10 +551,12 @@ void kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
+ 
+ 	if (cache->flags & SLAB_KASAN)
+ 		set_track(&get_alloc_info(cache, object)->alloc_track, flags);
 +
-+SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
-+				  -e s/sun4u/sparc64/ \
-+				  -e s/arm.*/arm/ -e s/sa110/arm/ \
-+				  -e s/s390x/s390/ -e s/parisc64/parisc/ \
-+				  -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
-+				  -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ \
-+				  -e s/riscv.*/riscv/)
-diff --git a/tools/testing/selftests/android/Makefile b/tools/testing/selftests/android/Makefile
-index 72c25a3cb658..d9a725478375 100644
---- a/tools/testing/selftests/android/Makefile
-+++ b/tools/testing/selftests/android/Makefile
-@@ -6,7 +6,7 @@ TEST_PROGS := run.sh
++	return (void *)object;
+ }
+ EXPORT_SYMBOL(kasan_kmalloc);
  
- include ../lib.mk
+-void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
++void *kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
+ {
+ 	struct page *page;
+ 	unsigned long redzone_start;
+@@ -564,7 +566,7 @@ void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
+ 		quarantine_reduce();
  
--all:
-+all: khdr
- 	@for DIR in $(SUBDIRS); do		\
- 		BUILD_TARGET=$(OUTPUT)/$$DIR;	\
- 		mkdir $$BUILD_TARGET  -p;	\
-diff --git a/tools/testing/selftests/android/ion/Makefile b/tools/testing/selftests/android/ion/Makefile
-index e03695287f76..88cfe88e466f 100644
---- a/tools/testing/selftests/android/ion/Makefile
-+++ b/tools/testing/selftests/android/ion/Makefile
-@@ -10,6 +10,8 @@ $(TEST_GEN_FILES): ipcsocket.c ionutils.c
+ 	if (unlikely(ptr == NULL))
+-		return;
++		return NULL;
  
- TEST_PROGS := ion_test.sh
- 
-+KSFT_KHDR_INSTALL := 1
-+top_srcdir = ../../../../..
- include ../../lib.mk
- 
- $(OUTPUT)/ionapp_export: ionapp_export.c ipcsocket.c ionutils.c
-diff --git a/tools/testing/selftests/futex/functional/Makefile b/tools/testing/selftests/futex/functional/Makefile
-index ff8feca49746..ad1eeb14fda7 100644
---- a/tools/testing/selftests/futex/functional/Makefile
-+++ b/tools/testing/selftests/futex/functional/Makefile
-@@ -18,6 +18,7 @@ TEST_GEN_FILES := \
- 
- TEST_PROGS := run.sh
- 
-+top_srcdir = ../../../../..
- include ../../lib.mk
- 
- $(TEST_GEN_FILES): $(HEADERS)
-diff --git a/tools/testing/selftests/gpio/Makefile b/tools/testing/selftests/gpio/Makefile
-index 1bbb47565c55..4665cdbf1a8d 100644
---- a/tools/testing/selftests/gpio/Makefile
-+++ b/tools/testing/selftests/gpio/Makefile
-@@ -21,11 +21,8 @@ endef
- CFLAGS += -O2 -g -std=gnu99 -Wall -I../../../../usr/include/
- LDLIBS += -lmount -I/usr/include/libmount
- 
--$(BINARIES): ../../../gpio/gpio-utils.o ../../../../usr/include/linux/gpio.h
-+$(BINARIES):| khdr
-+$(BINARIES): ../../../gpio/gpio-utils.o
- 
- ../../../gpio/gpio-utils.o:
- 	make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C ../../../gpio
--
--../../../../usr/include/linux/gpio.h:
--	make -C ../../../.. headers_install INSTALL_HDR_PATH=$(shell pwd)/../../../../usr/
--
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index dd0e5163f01f..34d492b77a7c 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -34,9 +34,6 @@ $(LIBKVM_OBJ): $(OUTPUT)/%.o: %.c
- $(OUTPUT)/libkvm.a: $(LIBKVM_OBJ)
- 	$(AR) crs $@ $^
- 
--$(LINUX_HDR_PATH):
--	make -C $(top_srcdir) headers_install
--
--all: $(STATIC_LIBS) $(LINUX_HDR_PATH)
-+all: $(STATIC_LIBS)
- $(TEST_GEN_PROGS): $(STATIC_LIBS)
--$(TEST_GEN_PROGS) $(LIBKVM_OBJ): | $(LINUX_HDR_PATH)
-+$(STATIC_LIBS):| khdr
-diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
-index 17ab36605a8e..0a8e75886224 100644
---- a/tools/testing/selftests/lib.mk
-+++ b/tools/testing/selftests/lib.mk
-@@ -16,8 +16,20 @@ TEST_GEN_PROGS := $(patsubst %,$(OUTPUT)/%,$(TEST_GEN_PROGS))
- TEST_GEN_PROGS_EXTENDED := $(patsubst %,$(OUTPUT)/%,$(TEST_GEN_PROGS_EXTENDED))
- TEST_GEN_FILES := $(patsubst %,$(OUTPUT)/%,$(TEST_GEN_FILES))
- 
-+top_srcdir ?= ../../../..
-+include $(top_srcdir)/scripts/subarch.include
-+ARCH		?= $(SUBARCH)
+ 	page = virt_to_page(ptr);
+ 	redzone_start = round_up((unsigned long)(ptr + size),
+@@ -574,21 +576,23 @@ void kasan_kmalloc_large(const void *ptr, size_t size, gfp_t flags)
+ 	kasan_unpoison_shadow(ptr, size);
+ 	kasan_poison_shadow((void *)redzone_start, redzone_end - redzone_start,
+ 		KASAN_PAGE_REDZONE);
 +
- all: $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED) $(TEST_GEN_FILES)
++	return (void *)ptr;
+ }
  
-+.PHONY: khdr
-+khdr:
-+	make ARCH=$(ARCH) -C $(top_srcdir) headers_install
-+
-+ifdef KSFT_KHDR_INSTALL
-+$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED) $(TEST_GEN_FILES):| khdr
-+endif
-+
- .ONESHELL:
- define RUN_TEST_PRINT_RESULT
- 	TEST_HDR_MSG="selftests: "`basename $$PWD`:" $$BASENAME_TEST";	\
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 9cca68e440a0..919aa2ac00af 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -15,6 +15,7 @@ TEST_GEN_FILES += udpgso udpgso_bench_tx udpgso_bench_rx
- TEST_GEN_PROGS = reuseport_bpf reuseport_bpf_cpu reuseport_bpf_numa
- TEST_GEN_PROGS += reuseport_dualstack reuseaddr_conflict tls
+-void kasan_krealloc(const void *object, size_t size, gfp_t flags)
++void *kasan_krealloc(const void *object, size_t size, gfp_t flags)
+ {
+ 	struct page *page;
  
-+KSFT_KHDR_INSTALL := 1
- include ../lib.mk
+ 	if (unlikely(object == ZERO_SIZE_PTR))
+-		return;
++		return ZERO_SIZE_PTR;
  
- $(OUTPUT)/reuseport_bpf_numa: LDFLAGS += -lnuma
-diff --git a/tools/testing/selftests/networking/timestamping/Makefile b/tools/testing/selftests/networking/timestamping/Makefile
-index a728040edbe1..14cfcf006936 100644
---- a/tools/testing/selftests/networking/timestamping/Makefile
-+++ b/tools/testing/selftests/networking/timestamping/Makefile
-@@ -5,6 +5,7 @@ TEST_PROGS := hwtstamp_config rxtimestamp timestamping txtimestamp
+ 	page = virt_to_head_page(object);
  
- all: $(TEST_PROGS)
+ 	if (unlikely(!PageSlab(page)))
+-		kasan_kmalloc_large(object, size, flags);
++		return kasan_kmalloc_large(object, size, flags);
+ 	else
+-		kasan_kmalloc(page->slab_cache, object, size, flags);
++		return kasan_kmalloc(page->slab_cache, object, size, flags);
+ }
  
-+top_srcdir = ../../../../..
- include ../../lib.mk
+ void kasan_poison_kfree(void *ptr, unsigned long ip)
+diff --git a/mm/slab.c b/mm/slab.c
+index aa76a70e087e..6fdca9ec2ea4 100644
+--- a/mm/slab.c
++++ b/mm/slab.c
+@@ -3551,7 +3551,7 @@ void *kmem_cache_alloc(struct kmem_cache *cachep, gfp_t flags)
+ {
+ 	void *ret = slab_alloc(cachep, flags, _RET_IP_);
  
- clean:
-diff --git a/tools/testing/selftests/vm/Makefile b/tools/testing/selftests/vm/Makefile
-index 9881876d2aa0..e94b7b14bcb2 100644
---- a/tools/testing/selftests/vm/Makefile
-+++ b/tools/testing/selftests/vm/Makefile
-@@ -26,10 +26,6 @@ TEST_PROGS := run_vmtests
+-	kasan_slab_alloc(cachep, ret, flags);
++	ret = kasan_slab_alloc(cachep, ret, flags);
+ 	trace_kmem_cache_alloc(_RET_IP_, ret,
+ 			       cachep->object_size, cachep->size, flags);
  
- include ../lib.mk
+@@ -3617,7 +3617,7 @@ kmem_cache_alloc_trace(struct kmem_cache *cachep, gfp_t flags, size_t size)
  
--$(OUTPUT)/userfaultfd: ../../../../usr/include/linux/kernel.h
- $(OUTPUT)/userfaultfd: LDLIBS += -lpthread
+ 	ret = slab_alloc(cachep, flags, _RET_IP_);
  
- $(OUTPUT)/mlock-random-test: LDLIBS += -lcap
--
--../../../../usr/include/linux/kernel.h:
--	make -C ../../../.. headers_install
+-	kasan_kmalloc(cachep, ret, size, flags);
++	ret = kasan_kmalloc(cachep, ret, size, flags);
+ 	trace_kmalloc(_RET_IP_, ret,
+ 		      size, cachep->size, flags);
+ 	return ret;
+@@ -3641,7 +3641,7 @@ void *kmem_cache_alloc_node(struct kmem_cache *cachep, gfp_t flags, int nodeid)
+ {
+ 	void *ret = slab_alloc_node(cachep, flags, nodeid, _RET_IP_);
+ 
+-	kasan_slab_alloc(cachep, ret, flags);
++	ret = kasan_slab_alloc(cachep, ret, flags);
+ 	trace_kmem_cache_alloc_node(_RET_IP_, ret,
+ 				    cachep->object_size, cachep->size,
+ 				    flags, nodeid);
+@@ -3660,7 +3660,7 @@ void *kmem_cache_alloc_node_trace(struct kmem_cache *cachep,
+ 
+ 	ret = slab_alloc_node(cachep, flags, nodeid, _RET_IP_);
+ 
+-	kasan_kmalloc(cachep, ret, size, flags);
++	ret = kasan_kmalloc(cachep, ret, size, flags);
+ 	trace_kmalloc_node(_RET_IP_, ret,
+ 			   size, cachep->size,
+ 			   flags, nodeid);
+@@ -3679,7 +3679,7 @@ __do_kmalloc_node(size_t size, gfp_t flags, int node, unsigned long caller)
+ 	if (unlikely(ZERO_OR_NULL_PTR(cachep)))
+ 		return cachep;
+ 	ret = kmem_cache_alloc_node_trace(cachep, flags, node, size);
+-	kasan_kmalloc(cachep, ret, size, flags);
++	ret = kasan_kmalloc(cachep, ret, size, flags);
+ 
+ 	return ret;
+ }
+@@ -3715,7 +3715,7 @@ static __always_inline void *__do_kmalloc(size_t size, gfp_t flags,
+ 		return cachep;
+ 	ret = slab_alloc(cachep, flags, caller);
+ 
+-	kasan_kmalloc(cachep, ret, size, flags);
++	ret = kasan_kmalloc(cachep, ret, size, flags);
+ 	trace_kmalloc(caller, ret,
+ 		      size, cachep->size, flags);
+ 
+diff --git a/mm/slab.h b/mm/slab.h
+index 68bdf498da3b..15ef6a0d9c16 100644
+--- a/mm/slab.h
++++ b/mm/slab.h
+@@ -441,7 +441,7 @@ static inline void slab_post_alloc_hook(struct kmem_cache *s, gfp_t flags,
+ 
+ 		kmemleak_alloc_recursive(object, s->object_size, 1,
+ 					 s->flags, flags);
+-		kasan_slab_alloc(s, object, flags);
++		p[i] = kasan_slab_alloc(s, object, flags);
+ 	}
+ 
+ 	if (memcg_kmem_enabled())
+diff --git a/mm/slab_common.c b/mm/slab_common.c
+index 2296caf87bfb..a99a1feb52c4 100644
+--- a/mm/slab_common.c
++++ b/mm/slab_common.c
+@@ -1183,7 +1183,7 @@ void *kmalloc_order(size_t size, gfp_t flags, unsigned int order)
+ 	page = alloc_pages(flags, order);
+ 	ret = page ? page_address(page) : NULL;
+ 	kmemleak_alloc(ret, size, 1, flags);
+-	kasan_kmalloc_large(ret, size, flags);
++	ret = kasan_kmalloc_large(ret, size, flags);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(kmalloc_order);
+@@ -1461,7 +1461,7 @@ static __always_inline void *__do_krealloc(const void *p, size_t new_size,
+ 		ks = ksize(p);
+ 
+ 	if (ks >= new_size) {
+-		kasan_krealloc((void *)p, new_size, flags);
++		p = kasan_krealloc((void *)p, new_size, flags);
+ 		return (void *)p;
+ 	}
+ 
+diff --git a/mm/slub.c b/mm/slub.c
+index 51258eff4178..382bc0fea498 100644
+--- a/mm/slub.c
++++ b/mm/slub.c
+@@ -1336,10 +1336,10 @@ static inline void dec_slabs_node(struct kmem_cache *s, int node,
+  * Hooks for other subsystems that check memory allocations. In a typical
+  * production configuration these hooks all should produce no code at all.
+  */
+-static inline void kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
++static inline void *kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
+ {
+ 	kmemleak_alloc(ptr, size, 1, flags);
+-	kasan_kmalloc_large(ptr, size, flags);
++	return kasan_kmalloc_large(ptr, size, flags);
+ }
+ 
+ static __always_inline void kfree_hook(void *x)
+@@ -2732,7 +2732,7 @@ void *kmem_cache_alloc_trace(struct kmem_cache *s, gfp_t gfpflags, size_t size)
+ {
+ 	void *ret = slab_alloc(s, gfpflags, _RET_IP_);
+ 	trace_kmalloc(_RET_IP_, ret, size, s->size, gfpflags);
+-	kasan_kmalloc(s, ret, size, gfpflags);
++	ret = kasan_kmalloc(s, ret, size, gfpflags);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(kmem_cache_alloc_trace);
+@@ -2760,7 +2760,7 @@ void *kmem_cache_alloc_node_trace(struct kmem_cache *s,
+ 	trace_kmalloc_node(_RET_IP_, ret,
+ 			   size, s->size, gfpflags, node);
+ 
+-	kasan_kmalloc(s, ret, size, gfpflags);
++	ret = kasan_kmalloc(s, ret, size, gfpflags);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(kmem_cache_alloc_node_trace);
+@@ -3750,7 +3750,7 @@ void *__kmalloc(size_t size, gfp_t flags)
+ 
+ 	trace_kmalloc(_RET_IP_, ret, size, s->size, flags);
+ 
+-	kasan_kmalloc(s, ret, size, flags);
++	ret = kasan_kmalloc(s, ret, size, flags);
+ 
+ 	return ret;
+ }
+@@ -3767,8 +3767,7 @@ static void *kmalloc_large_node(size_t size, gfp_t flags, int node)
+ 	if (page)
+ 		ptr = page_address(page);
+ 
+-	kmalloc_large_node_hook(ptr, size, flags);
+-	return ptr;
++	return kmalloc_large_node_hook(ptr, size, flags);
+ }
+ 
+ void *__kmalloc_node(size_t size, gfp_t flags, int node)
+@@ -3795,7 +3794,7 @@ void *__kmalloc_node(size_t size, gfp_t flags, int node)
+ 
+ 	trace_kmalloc_node(_RET_IP_, ret, size, s->size, flags, node);
+ 
+-	kasan_kmalloc(s, ret, size, flags);
++	ret = kasan_kmalloc(s, ret, size, flags);
+ 
+ 	return ret;
+ }
 -- 
-2.18.0
+2.18.0.597.ga71716f1ad-goog
 
