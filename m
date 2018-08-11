@@ -1,33 +1,22 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.hmha.gob.ec ([190.11.21.43]:57324 "EHLO mail.hmha.gob.ec"
+Received: from mail.inea.gob.ve ([201.248.92.145]:36096 "EHLO mail.inea.gob.ve"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727691AbeHLXNn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 12 Aug 2018 19:13:43 -0400
-Content-Type: text/plain; charset="utf-8"
+        id S1727683AbeHLXod (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 12 Aug 2018 19:44:33 -0400
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8BIT
 Content-Description: Mail message body
-Subject: WICHTIGE MITTEILUNG
-From: jose_mera@hmha.gob.ec
-Date: Sun, 12 Aug 2018 10:47:58 -0700
-Reply-To: attorney.ramanala@gmail.com
-Message-Id: <20180812174801.2DD9920282AE@mail.hmha.gob.ec>
+Subject: REPLY AS SOON AS POSSIBLE
+From: "Dr Chien Direktor von Hang Seng" <mariadanieltg@gmail.com>
+Date: Sat, 11 Aug 2018 23:49:30 +0100
+Reply-To: draymndch@yahoo.co.jp
+Message-Id: <20180811224941.878DC1BB3A8E@mail.inea.gob.ve>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <jose_mera@hmha.gob.ec>
+To: Recipients <mariadanieltg@gmail.com>
 
-Lieber Freund,
- 
-Ich bin Herr Richard Wahl der Mega-Gewinner von $ 533M In Mega Millions Jackpot spende ich an 5 zufällige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Mail nach einem Spinball ausgewählt. Ich habe den größten Teil meines Vermögens auf eine Reihe von Wohltätigkeitsorganisationen und Organisationen verteilt. Ich habe mich freiwillig dazu entschieden, Ihnen den Betrag von € 2.000.000,00 zu spenden
-eine der ausgewählten 5, um meine Gewinne zu überprüfen, finden Sie auf meiner You Tube Seite unten.
- 
-UHR MICH HIER: https://www.youtube.com/watch?v=tne02ExNDrw
- 
-Das ist dein Spendencode: [DF00430342018]
- 
-Antworten Sie mit dem Spendencode auf diese E-Mail: oceanicfinancialhome@gmail.com
- 
-Ich hoffe, Sie und Ihre Familie glücklich zu machen.
- 
-Grüße
-Herr Richard Wahl
+I am Vice Chairman of Hang Seng Bank, I have Important Matter to Discuss with you concerning my late client. Died without a NEXT OF KIN. Send me your private email for full details information. email me at E-Mail: draymdm@gmail.com
+
+Regards 
+Mr.Fung
