@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.hmha.gob.ec ([190.11.21.43]:43608 "EHLO mail.hmha.gob.ec"
+Received: from mail.hmha.gob.ec ([190.11.21.43]:57324 "EHLO mail.hmha.gob.ec"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727806AbeHLVfD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 12 Aug 2018 17:35:03 -0400
+        id S1727691AbeHLXNn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 12 Aug 2018 19:13:43 -0400
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8BIT
 Content-Description: Mail message body
 Subject: WICHTIGE MITTEILUNG
-From: ines_valdiviezo@hmha.gob.ec
-Date: Sun, 12 Aug 2018 08:52:48 -0700
+From: jose_mera@hmha.gob.ec
+Date: Sun, 12 Aug 2018 10:47:58 -0700
 Reply-To: attorney.ramanala@gmail.com
-Message-Id: <20180812155251.678D82023FEF@mail.hmha.gob.ec>
+Message-Id: <20180812174801.2DD9920282AE@mail.hmha.gob.ec>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <ines_valdiviezo@hmha.gob.ec>
+To: Recipients <jose_mera@hmha.gob.ec>
 
 Lieber Freund,
  
