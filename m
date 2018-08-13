@@ -1,59 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:41880 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728293AbeHMTdg (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:55016 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729029AbeHMUKB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Aug 2018 15:33:36 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/2] kconfig: remove unused sym_get_env_prop() function
-Date: Tue, 14 Aug 2018 01:48:38 +0900
-Message-Id: <1534178919-8375-1-git-send-email-yamada.masahiro@socionext.com>
+        Mon, 13 Aug 2018 16:10:01 -0400
+Date: Mon, 13 Aug 2018 19:20:03 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/2] kconfig: remove unused sym_get_env_prop() function
+Message-ID: <20180813172003.GA20519@ravnborg.org>
+References: <1534178919-8375-1-git-send-email-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1534178919-8375-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org
 
-This function is unused since commit 104daea149c4 ("kconfig: reference
-environment variables directly and remove 'option env='").
+On Tue, Aug 14, 2018 at 01:48:38AM +0900, Masahiro Yamada wrote:
+> This function is unused since commit 104daea149c4 ("kconfig: reference
+> environment variables directly and remove 'option env='").
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Both patches are obviously correct.
+Feel free to add:
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
 
- scripts/kconfig/lkc.h    | 1 -
- scripts/kconfig/symbol.c | 9 ---------
- 2 files changed, 10 deletions(-)
+and apply to kbuild so we  can get them in this cycle.
 
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index 6b7bbc6..9eb7c83 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -125,7 +125,6 @@ const char *sym_get_string_default(struct symbol *sym);
- struct symbol *sym_check_deps(struct symbol *sym);
- struct property *prop_alloc(enum prop_type type, struct symbol *sym);
- struct symbol *prop_get_symbol(struct property *prop);
--struct property *sym_get_env_prop(struct symbol *sym);
- 
- static inline tristate sym_get_tristate_value(struct symbol *sym)
- {
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 869a5e8..073d780 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -76,15 +76,6 @@ struct property *sym_get_choice_prop(struct symbol *sym)
- 	return NULL;
- }
- 
--struct property *sym_get_env_prop(struct symbol *sym)
--{
--	struct property *prop;
--
--	for_all_properties(sym, prop, P_ENV)
--		return prop;
--	return NULL;
--}
--
- static struct property *sym_get_default_prop(struct symbol *sym)
- {
- 	struct property *prop;
--- 
-2.7.4
+	Sam
