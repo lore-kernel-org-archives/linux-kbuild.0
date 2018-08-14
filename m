@@ -1,69 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:26071 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725821AbeHNFef (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:48752 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730438AbeHNFeo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Aug 2018 01:34:35 -0400
+        Tue, 14 Aug 2018 01:34:44 -0400
 MIME-Version: 1.0
-In-Reply-To: <1533797226-6547-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1533797226-6547-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <20180813172003.GA20519@ravnborg.org>
+References: <1534178919-8375-1-git-send-email-yamada.masahiro@socionext.com> <20180813172003.GA20519@ravnborg.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 14 Aug 2018 11:48:31 +0900
-Message-ID: <CAK7LNASRUBmk4Eux-x2qr1v53CYaEBvV7uDmaur84BoxotSXKA@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: fix the rule of mainmenu_stmt symbol
+Date: Tue, 14 Aug 2018 11:48:53 +0900
+Message-ID: <CAK7LNAQ+xe56yVs=R1MjWX71Bw+kwjSeGpRP-kD0TY3oEmy4+Q@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kconfig: remove unused sym_get_env_prop() function
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-08-09 15:47 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> The rule of mainmenu_stmt does not have debug print of zconf_lineno(),
-> but if it had, it would print a wrong line number for the same reason
-> as commit b2d00d7c61c8 ("kconfig: fix line numbers for if-entries in
-> menu tree").
+2018-08-14 2:20 GMT+09:00 Sam Ravnborg <sam@ravnborg.org>:
+> On Tue, Aug 14, 2018 at 01:48:38AM +0900, Masahiro Yamada wrote:
+>> This function is unused since commit 104daea149c4 ("kconfig: reference
+>> environment variables directly and remove 'option env='").
+>>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 >
-> The mainmenu_stmt does not need to eat following empty lines because
-> they are reduced to common_stmt.
+> Both patches are obviously correct.
+> Feel free to add:
+> Acked-by: Sam Ravnborg <sam@ravnborg.org>
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+> and apply to kbuild so we  can get them in this cycle.
+>
+>         Sam
 
 
-Applied to linux-kbuild/kconfig.
-
->  scripts/kconfig/zconf.y | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-> index 4b68272..95a4fd3 100644
-> --- a/scripts/kconfig/zconf.y
-> +++ b/scripts/kconfig/zconf.y
-> @@ -31,7 +31,7 @@ struct symbol *symbol_hash[SYMBOL_HASHSIZE];
->  static struct menu *current_menu, *current_entry;
->
->  %}
-> -%expect 31
-> +%expect 30
->
->  %union
->  {
-> @@ -117,7 +117,7 @@ start: mainmenu_stmt stmt_list | stmt_list;
->
->  /* mainmenu entry */
->
-> -mainmenu_stmt: T_MAINMENU prompt nl
-> +mainmenu_stmt: T_MAINMENU prompt T_EOL
->  {
->         menu_add_prompt(P_MENU, $2, NULL);
->  };
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Applied to linux-kbuild/kconfig with Sam's Ack.
 
 
 
