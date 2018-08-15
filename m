@@ -1,49 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:53922 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726044AbeHOD0h (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:51518 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728504AbeHOGb4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Aug 2018 23:26:37 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] kconfig: add build-only configurator targets
-Message-ID: <abba6b9a-597b-a3eb-6d91-8a7261492c78@infradead.org>
-Date: Tue, 14 Aug 2018 17:36:49 -0700
+        Wed, 15 Aug 2018 02:31:56 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <adc5b6e4-28c1-7fe2-b7b1-c6b1cd39f8ed@infradead.org>
+References: <adc5b6e4-28c1-7fe2-b7b1-c6b1cd39f8ed@infradead.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 15 Aug 2018 12:40:36 +0900
+Message-ID: <CAK7LNAT3nv2aJFvro4NmCyRNEBH_Kv=1cZaqt3PrQYGGatjnLg@mail.gmail.com>
+Subject: Re: [PATCH] modpost: check strdup() return value
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Yuexing Wang <wangyxlandq@gmail.com>
 
-From: Randy Dunlap <rdunlap@infradead.org>
+2018-08-15 5:50 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+> From: Randy Dunlap <rdunlap@infradead.org>
+>
+> Fix missing error check for function strdup() in scripts/mod/modpost.c.
+>
+> Fixes kernel bugzilla #200319:
+> https://bugzilla.kernel.org/show_bug.cgi?id=200319
+>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Yuexing Wang <wangyxlandq@gmail.com>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>  scripts/mod/modpost.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> --- linux-next-20180814.orig/scripts/mod/modpost.c
+> +++ linux-next-20180814/scripts/mod/modpost.c
+> @@ -672,7 +672,7 @@ static void handle_modversions(struct mo
+>                         if (ELF_ST_TYPE(sym->st_info) == STT_SPARC_REGISTER)
+>                                 break;
+>                         if (symname[0] == '.') {
+> -                               char *munged = strdup(symname);
+> +                               char *munged = NOFAIL(strdup(symname));
+>                                 munged[0] = '_';
+>                                 munged[1] = toupper(munged[1]);
+>                                 symname = munged;
+>
+>
 
-Add build-only targets for build_menuconfig, build_nconfig,
-build_xconfig, and build_gconfig.
-(targets must end in "config" to qualify in top-level Makefile)
 
-This allows these target to be built without execution (e.g., to
-look for errors or warnings) and/or to be built and checked by sparse.
+While you are here,
+will you fix a little more?
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
- scripts/kconfig/Makefile |    8 ++++++++
- 1 file changed, 8 insertions(+)
 
---- linux-next-20180814.orig/scripts/kconfig/Makefile
-+++ linux-next-20180814/scripts/kconfig/Makefile
-@@ -33,6 +33,14 @@ config: $(obj)/conf
- nconfig: $(obj)/nconf
- 	$< $(silent) $(Kconfig)
- 
-+build_menuconfig: $(obj)/mconf
-+
-+build_nconfig: $(obj)/nconf
-+
-+build_gconfig: $(obj)/gconf
-+
-+build_xconfig: $(obj)/qconf
-+
- localyesconfig localmodconfig: $(obj)/conf
- 	$(Q)perl $(srctree)/$(src)/streamline_config.pl --$@ $(srctree) $(Kconfig) > .tmp.config
- 	$(Q)if [ -f .config ]; then 					\
+line 1321:
+            char *p = malloc(20);
+
+line 1341:
+            return strdup("");
+
+line 2039:
+            buf->p = realloc(buf->p, buf->size);
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
