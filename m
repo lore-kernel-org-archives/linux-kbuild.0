@@ -1,26 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:60764 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725898AbeHOJVl (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:47101 "EHLO
+        services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728885AbeHOQJq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Aug 2018 05:21:41 -0400
-MIME-Version: 1.0
-In-Reply-To: <gh4lfxukoo.fsf@lena.gouders.net>
-References: <1534229021-8056-1-git-send-email-yamada.masahiro@socionext.com>
- <gh8t59utb2.fsf@lena.gouders.net> <gh4lfxukoo.fsf@lena.gouders.net>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 15 Aug 2018 15:29:48 +0900
-Message-ID: <CAK7LNASjSXWYJpzkhqfMtVxTQO21Xwo2jXFLsBWLCGw5UTbWgg@mail.gmail.com>
+        Wed, 15 Aug 2018 12:09:46 -0400
+From: Dirk Gouders <dirk@gouders.net>
 Subject: Re: [PATCH 1/2] kconfig: report recursive dependency involving 'imply'
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNAQBu47aB56wpK29Aixnw9vEDVc2V8zwstVBrusBwuz6Gg@mail.gmail.com>
+        (Masahiro Yamada's message of "Wed, 15 Aug 2018 15:27:13 +0900")
+References: <1534229021-8056-1-git-send-email-yamada.masahiro@socionext.com>
+        <gh8t59utb2.fsf@lena.gouders.net>
+        <CAK7LNAQBu47aB56wpK29Aixnw9vEDVc2V8zwstVBrusBwuz6Gg@mail.gmail.com>
+Date: Wed, 15 Aug 2018 15:10:47 +0200
+Message-ID: <ghh8jv22so.fsf@lena.gouders.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2018-08-14 22:44 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
-> Dirk Gouders <dirk@gouders.net> writes:
->
+Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+
+> 2018-08-14 19:38 GMT+09:00 Dirk Gouders <dirk@gouders.net>:
 >> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
 >>
 >>> Currently, Kconfig does not report anything about the recursive
@@ -47,7 +49,15 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mich
 >>
 >> Perhaps it would be better to just error out instead of giving users the
 >> impression, Kconfig thinks such questionable behavior is OK.
->>
+>
+>
+> Taking closer look at the code, the intention is 'recursive dependency
+> is error',
+> but the behavior changed probably by an accident.
+>
+> I fixed this:
+> https://patchwork.kernel.org/patch/10566301/
+>
 >> Side note: perhaps, the documentation could be better when it comes to
 >>            recursive dependencies.  The documentation says "select" and
 >>            "imply" can be used to specify lower limits whereas direct
@@ -58,49 +68,48 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mich
 >>            Not very unlikely that it is just me who still has to
 >>            understand recursive dependencies or problems with reading
 >>            English text, though.
->>
+>
+>
+> To avoid confusion, two things should be discussed separately:
+>
+> [1] Unmet dependency
+>    This is caused by a conflict between the upper limit from 'depends on'
+>    and the lower limit from 'select'.
+>
+>     This issue does not happen for 'imply' because the upper limit
+>     specified by 'imply' is weaker.
+>
+>
+> [2] Recursive depenency
+>
+>    This can happen for any combination of 'depends on',
+>    'select', 'imply', 'if', 'default', etc.
+
+Yes, this is probably just a subject that I still have to get a deeper
+understanding for, hence I am easyly confused when faced with
+contradicting information.
+
 >> What definitely seems to get void with your patches is item c) in
 >> "Practical solutions to kconfig recursive issue" in
 >> Documentation/kbuild/kconfig-language:
 >>
 >>         c) Consider the use of "imply" instead of "select"
 >
-> Just some more information that adds to me feeling unsure about the
-> correct definition of recursive dependencies:
 >
-> With commit 29c434f367ea (kconfig: tests: test if recursive dependencies
-> are detected) a test case similar to the example above was introduced,
-> explicitely stating it is _no_ recursive dependency:
->
-> +# depends on and imply
-> +# This is not recursive dependency
-> +
-> +config E1
-> +       bool "E1"
-> +       depends on E2
-> +       imply E2
-> +
-> +config E2
-> +       bool "E2"
+> I do not know why commit 237e3ad0f195d8 added this line.
 >
 >
-> Dirk
+> Actually, I was also confused.
+>
+> I sent v2 based on your feedback.
 
+Thanks for your responses, making that all more understandable.
 
-For some reason, I added this
-without thinking why.
+Dirk
 
-
-I believe this should be recursive dependency.
-
-
-Thanks.
-
-
-
-
-
-
+>
+>
+>> Dirk
 >>
 >>> In the code above, Kconfig cannot calculate the symbol values correctly
 >>> due to the circular dependency.  For example, allyesconfig followed by
@@ -148,32 +157,26 @@ Thanks.
 >>> --- a/scripts/kconfig/symbol.c
 >>> +++ b/scripts/kconfig/symbol.c
 >>> @@ -1098,7 +1098,7 @@ static void sym_check_print_recursive(struct symbol *last_sym)
->>>                              sym->name ? sym->name : "<choice>",
->>>                              next_sym->name ? next_sym->name : "<choice>");
->>>              } else {
->>> -                    fprintf(stderr, "%s:%d:\tsymbol %s is selected by %s\n",
->>> +                    fprintf(stderr, "%s:%d:\tsymbol %s is selected or implied by %s\n",
->>>                              prop->file->name, prop->lineno,
->>>                              sym->name ? sym->name : "<choice>",
->>>                              next_sym->name ? next_sym->name : "<choice>");
+>>>                               sym->name ? sym->name : "<choice>",
+>>>                               next_sym->name ? next_sym->name : "<choice>");
+>>>               } else {
+>>> -                     fprintf(stderr, "%s:%d:\tsymbol %s is selected by %s\n",
+>>> +                     fprintf(stderr, "%s:%d:\tsymbol %s is selected or implied by %s\n",
+>>>                               prop->file->name, prop->lineno,
+>>>                               sym->name ? sym->name : "<choice>",
+>>>                               next_sym->name ? next_sym->name : "<choice>");
 >>> @@ -1161,8 +1161,13 @@ static struct symbol *sym_check_sym_deps(struct symbol *sym)
->>>      if (sym2)
->>>              goto out;
+>>>       if (sym2)
+>>>               goto out;
 >>>
->>> +    sym2 = sym_check_expr_deps(sym->implied.expr);
->>> +    if (sym2)
->>> +            goto out;
+>>> +     sym2 = sym_check_expr_deps(sym->implied.expr);
+>>> +     if (sym2)
+>>> +             goto out;
 >>> +
->>>      for (prop = sym->prop; prop; prop = prop->next) {
->>> -            if (prop->type == P_CHOICE || prop->type == P_SELECT)
->>> +            if (prop->type == P_CHOICE || prop->type == P_SELECT ||
->>> +                prop->type == P_IMPLY)
->>>                      continue;
->>>              stack.prop = prop;
->>>              sym2 = sym_check_expr_deps(prop->visible.expr);
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+>>>       for (prop = sym->prop; prop; prop = prop->next) {
+>>> -             if (prop->type == P_CHOICE || prop->type == P_SELECT)
+>>> +             if (prop->type == P_CHOICE || prop->type == P_SELECT ||
+>>> +                 prop->type == P_IMPLY)
+>>>                       continue;
+>>>               stack.prop = prop;
+>>>               sym2 = sym_check_expr_deps(prop->visible.expr);
