@@ -1,140 +1,223 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f173.google.com ([209.85.208.173]:37471 "EHLO
-        mail-lj1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729287AbeHORUa (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:56955 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729377AbeHOUtM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Aug 2018 13:20:30 -0400
-Received: by mail-lj1-f173.google.com with SMTP id v9-v6so1105946ljk.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 15 Aug 2018 07:28:06 -0700 (PDT)
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: [PATCH 3/3] Kbuild: let fixdep do the renaming to .cmd
-Date: Wed, 15 Aug 2018 16:27:49 +0200
-Message-Id: <20180815142749.18804-4-linux@rasmusvillemoes.dk>
-In-Reply-To: <20180815142749.18804-1-linux@rasmusvillemoes.dk>
-References: <20180815142749.18804-1-linux@rasmusvillemoes.dk>
+        Wed, 15 Aug 2018 16:49:12 -0400
+MIME-Version: 1.0
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 16 Aug 2018 02:55:15 +0900
+Message-ID: <CAK7LNAQH4At6xG-+JBJ16+a=P8h6Nuk9oSfG6DF0Scd2O9i9cA@mail.gmail.com>
+Subject: [GIT PULL 1/3] Kbuild updates for v4.19
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-Avoid spawning one more process per TU by having fixdep open the tmpfile
-and rename to its final name.
+Hi Linus,
 
-The only change in behaviour is that if fixdep fails, the tmpfile we
-leave behind is $(dot-target).cmd.tmp rather than $(dot-target).tmp .
+Please pull Kbuild updates for v4.19
 
-Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
----
- scripts/Kbuild.include | 10 ++++------
- scripts/basic/fixdep.c | 31 +++++++++++++++++++++++++++++--
- 2 files changed, 33 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index a944510acd9d..ded089436a3f 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -274,9 +274,8 @@ ifndef CONFIG_TRIM_UNUSED_KSYMS
- 
- cmd_and_fixdep =                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
--	scripts/basic/fixdep -r $(depfile) $@ '$(make-cmd)'                  \
--		> $(dot-target).tmp;                                         \
--	mv -f $(dot-target).tmp $(dot-target).cmd;
-+	scripts/basic/fixdep -r -o $(dot-target).cmd                         \
-+		$(depfile) $@ '$(make-cmd)';
- 
- else
- 
-@@ -298,9 +297,8 @@ ksym_dep_filter =                                                            \
- cmd_and_fixdep =                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
- 	$(ksym_dep_filter) |                                                 \
--		scripts/basic/fixdep -e -r $(depfile) $@ '$(make-cmd)'       \
--			> $(dot-target).tmp;	                             \
--	mv -f $(dot-target).tmp $(dot-target).cmd;
-+		scripts/basic/fixdep -e -r -o $(dot-target).cmd              \
-+			$(depfile) $@ '$(make-cmd)';
- 
- endif
- 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 7b59c185858a..78985052a3c7 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -94,6 +94,7 @@
-  *  but I don't think the added complexity is worth it)
-  */
- 
-+#define _GNU_SOURCE
- #include <sys/types.h>
- #include <sys/stat.h>
- #include <unistd.h>
-@@ -105,9 +106,10 @@
- 
- static void usage(void)
- {
--	fprintf(stderr, "Usage: fixdep [-e] [-r] <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, "Usage: fixdep [-e] [-r] [-o <output>] <depfile> <target> <cmdline>\n");
- 	fprintf(stderr, " -e  insert extra dependencies given on stdin\n");
- 	fprintf(stderr, " -r  remove <depfile> after processing\n");
-+	fprintf(stderr, " -o  write to <output> instead of stdout\n");
- 	exit(1);
- }
- 
-@@ -380,15 +382,17 @@ static void parse_dep_file(char *m, const char *target, int insert_extra_deps)
- int main(int argc, char *argv[])
- {
- 	const char *depfile, *target, *cmdline;
-+	char *outfile = NULL, *tmpfile;
- 	int insert_extra_deps = 0;
- 	int remove_depfile = 0;
- 	void *buf;
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "er")) != -1) {
-+	while ((opt = getopt(argc, argv, "ero:")) != -1) {
- 		switch (opt) {
- 		case 'e': insert_extra_deps = 1; break;
- 		case 'r': remove_depfile = 1; break;
-+		case 'o': outfile = optarg; break;
- 		default: usage();
- 		}
- 	}
-@@ -402,12 +406,35 @@ int main(int argc, char *argv[])
- 	target = argv[1];
- 	cmdline = argv[2];
- 
-+	if (outfile) {
-+		if (asprintf(&tmpfile, "%s.tmp", outfile) < 0) {
-+			perror("fixdep:asprintf");
-+			exit(1);
-+		}
-+		if (freopen(tmpfile, "w", stdout) == NULL) {
-+			perror("fixdep:freopen");
-+			exit(1);
-+		}
-+	}
-+
- 	printf("cmd_%s := %s\n\n", target, cmdline);
- 
- 	buf = read_file(depfile);
- 	parse_dep_file(buf, target, insert_extra_deps);
- 	free(buf);
- 
-+	if (fclose(stdout)) {
-+		perror("fixdep:fclose");
-+		exit(1);
-+	}
-+	if (outfile) {
-+		if (rename(tmpfile, outfile) < 0) {
-+			perror("fixdep:rename");
-+			exit(1);
-+		}
-+		free(tmpfile);
-+	}
-+
- 	if (remove_depfile)
- 		unlink(depfile);
- 
+
+You can pull this cleanly for now, but please remember that
+you will have to change samples/statx/Makefile
+when you pull the following commit:
+
+commit 90b413cb970a25109deb292c99120cf65e5b03ce
+Author: David Howells <dhowells@redhat.com>
+Date:   Fri Aug 3 15:34:49 2018 +0100
+
+    vfs: syscall: Add fsinfo() to query filesystem information
+
+
+
+Kbuild consolidated host compiler flag variables,
+but the vfs tree added one more occurrence.
+
+Please fix-up the Makefile as follows:
+
+---------------------------------------------------------
+diff --git a/samples/statx/Makefile b/samples/statx/Makefile
+index 05b4d30cdd3c..6a862bbc0627 100644
+--- a/samples/statx/Makefile
++++ b/samples/statx/Makefile
+@@ -7,6 +7,6 @@ always := $(hostprogs-y)
+ HOSTCFLAGS_test-statx.o += -I$(objtree)/usr/include
+
+ HOSTCFLAGS_test-fsinfo.o += -I$(objtree)/usr/include
+-HOSTLOADLIBES_test-fsinfo += -lm
++HOSTLDLIBS_test-fsinfo += -lm
+
+ HOSTCFLAGS_test-fs-query.o += -I$(objtree)/usr/include
+-----------------------------------------------------------
+
+
+
+
+
+The following changes since commit 9d3cce1e8b8561fed5f383d22a4d6949db4eadbe:
+
+  Linux 4.18-rc5 (2018-07-15 12:49:31 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-v4.19
+
+for you to fetch changes up to 512ddf7d7db056edfed3159ea7cb4e4a5eefddd4:
+
+  coccicheck: return proper error code on fail (2018-08-14 08:58:56 +0900)
+
+----------------------------------------------------------------
+Kbuild updates for v4.19
+
+- verify depmod is installed before modules_install
+
+- support build salt in case build ids must be unique between builds
+
+- allow users to specify additional host compiler flags via HOST*FLAGS,
+  and rename internal variables to KBUILD_HOST*FLAGS
+
+- update buildtar script to drop vax support, add arm64 support
+
+- update builddeb script for better debarch support
+
+- document the pit-fall of if_changed usage
+
+- fix parallel build of UML with O= option
+
+- make 'samples' target depend on headers_install to fix build errors
+
+- remove deprecated host-progs variable
+
+- add a new coccinelle script for refcount_t vs atomic_t check
+
+- improve double-test coccinelle script
+
+- misc cleanups and fixes
+
+----------------------------------------------------------------
+Ben Hutchings (12):
+      builddeb: Skip architecture detection when KBUILD_DEBARCH is set
+      builddeb: Change architecture detection fallback to use dpkg-architecture
+      builddeb: Drop check for 32-bit s390
+      builddeb: Introduce functions to simplify kconfig tests in set_debarch
+      builddeb: Add automatic support for ppc64 and powerpcspe architectures
+      builddeb: Add automatic support for mips64el architecture
+      builddeb: Add automatic support for mips{,64}r6{,el} architectures
+      builddeb: Add automatic support for sparc64 architecture
+      builddeb: Add automatic support for or1k architecture
+      builddeb: Add automatic support for m68k architecture
+      builddeb: Add automatic support for riscv* architectures
+      builddeb: Add automatic support for sh{3,4}{,eb} architectures
+
+Denis Efremov (1):
+      coccicheck: return proper error code on fail
+
+Dirk Gouders (1):
+      kbuild: if_changed: document single use per target limitation
+
+Elena Reshetova (1):
+      Coccinelle: add atomic_as_refcounter script
+
+Jeremy Cline (1):
+      scripts: Add Python 3 support to tracing/draw_functrace.py
+
+Julia Lawall (1):
+      Coccinelle: doubletest: reduce side effect false positives
+
+Laura Abbott (9):
+      kbuild: Add build salt to the kernel and modules
+      x86: Add build salt to the vDSO
+      powerpc: Add build salt to the vDSO
+      arm64: Add build salt to the vDSO
+      kbuild: Rename HOSTCFLAGS to KBUILD_HOSTCFLAGS
+      kbuild: Rename HOSTCXXFLAGS to KBUILD_HOSTCXXFLAGS
+      kbuild: Rename HOSTLDFLAGS to KBUILD_HOSTLDFLAGS
+      kbuild: Rename HOST_LOADLIBES to KBUILD_HOSTLDLIBS
+      kbuild: Use HOST*FLAGS options from the command line
+
+Masahiro Yamada (12):
+      kbuild: move bin2c back to scripts/ from scripts/basic/
+      um: remove redundant 'export LDFLAGS' in arch/x86/Makefile.um
+      kbuild: remove redundant LDFLAGS clearing in arch/*/Makefile
+      kbuild: replace $(LDFLAGS) $(ldflags-y) with $(ld_flags)
+      kbuild: change ld_flags to contain LDFLAGS_$(@F)
+      ARM: at91: remove unused duplicated filechk_offsets
+      kbuild: do not redirect the first prerequisite for filechk
+      um: fix parallel building with O= option
+      kbuild: add %asm-generic to no-dot-config-targets
+      um: clean up archheaders recipe
+      kbuild: make samples really depend on headers_install
+      kbuild: remove deprecated host-progs variable
+
+Olof Johansson (2):
+      kbuild: buildtar: remove crufty vax pieces
+      kbuild: buildtar: add arm64 support
+
+Randy Dunlap (1):
+      kbuild: verify that $DEPMOD is installed
+
+ Documentation/kbuild/kbuild.txt                   |  16 +++
+ Documentation/kbuild/makefiles.txt                |   8 +-
+ Documentation/process/changes.rst                 |  19 ++--
+ Makefile                                          |  24 +++--
+ arch/alpha/boot/Makefile                          |   2 +-
+ arch/arm/Makefile                                 |   3 -
+ arch/arm/mach-at91/Makefile                       |  25 -----
+ arch/arm64/kernel/vdso/note.S                     |   3 +
+ arch/openrisc/Makefile                            |   1 -
+ arch/powerpc/kernel/vdso32/note.S                 |   3 +
+ arch/powerpc/purgatory/Makefile                   |   3 +-
+ arch/riscv/Makefile                               |   1 -
+ arch/s390/kernel/syscalls/Makefile                |   6 +-
+ arch/s390/purgatory/Makefile                      |   3 +-
+ arch/um/Makefile                                  |  11 +-
+ arch/um/drivers/Makefile                          |   4 +-
+ arch/x86/Makefile.um                              |   2 -
+ arch/x86/entry/vdso/vdso-note.S                   |   3 +
+ arch/x86/entry/vdso/vdso32/note.S                 |   3 +
+ arch/x86/purgatory/Makefile                       |   3 +-
+ arch/xtensa/boot/Makefile                         |   3 +-
+ include/linux/build-salt.h                        |  20 ++++
+ init/Kconfig                                      |   9 ++
+ init/version.c                                    |   3 +
+ kernel/Makefile                                   |   2 +-
+ net/bpfilter/Makefile                             |   4 +-
+ samples/bpf/Makefile                              |  22 ++--
+ samples/seccomp/Makefile                          |   6 +-
+ scripts/.gitignore                                |   1 +
+ scripts/Kbuild.include                            |   4 +-
+ scripts/Makefile                                  |   5 +-
+ scripts/Makefile.build                            |   7 --
+ scripts/Makefile.clean                            |   1 -
+ scripts/Makefile.host                             |  24 ++---
+ scripts/Makefile.lib                              |   7 +-
+ scripts/basic/.gitignore                          |   1 -
+ scripts/basic/Makefile                            |   1 -
+ scripts/{basic => }/bin2c.c                       |   0
+ scripts/coccicheck                                |   5 +-
+ scripts/coccinelle/api/atomic_as_refcounter.cocci | 129
+++++++++++++++++++++++++
+ scripts/coccinelle/tests/doubletest.cocci         |  34 +++++--
+ scripts/depmod.sh                                 |   8 +-
+ scripts/kconfig/Makefile                          |   8 +-
+ scripts/mod/modpost.c                             |   3 +
+ scripts/package/buildtar                          |  12 ++-
+ scripts/package/mkdebian                          |  68 +++++++++----
+ scripts/tracing/draw_functrace.py                 |   2 +-
+ security/tomoyo/Makefile                          |   2 +-
+ tools/build/Build.include                         |   2 +-
+ tools/build/Makefile                              |   2 +-
+ tools/objtool/Makefile                            |   4 +-
+ 51 files changed, 373 insertions(+), 169 deletions(-)
+ create mode 100644 include/linux/build-salt.h
+ rename scripts/{basic => }/bin2c.c (100%)
+ create mode 100644 scripts/coccinelle/api/atomic_as_refcounter.cocci
+
+
 -- 
-2.16.4
+Best Regards
+Masahiro Yamada
