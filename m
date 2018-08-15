@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:58347 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729424AbeHOUvL (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:35590 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725867AbeHOU5l (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Aug 2018 16:51:11 -0400
+        Wed, 15 Aug 2018 16:57:41 -0400
 MIME-Version: 1.0
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 16 Aug 2018 02:57:16 +0900
-Message-ID: <CAK7LNAT9p+YPmvasWPG1qdriM+dkauf6h3bqJLnxTcZo8LG_SA@mail.gmail.com>
-Subject: [GIT PULL 2/3] Kconfig updates for v4.19
+Date: Thu, 16 Aug 2018 03:03:39 +0900
+Message-ID: <CAK7LNAROqcjzSRjkpR+-gzbTJjRe=mSkZqo39uRiDZBMZh9O=g@mail.gmail.com>
+Subject: [GIT PULL 3/3] consolidate arch Kconfig files for v4.19
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -17,40 +17,86 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Maili
 
 Hi Linus,
 
-Please pull Kconfig updates for v4.19
+Please pull this patch series to consolidate arch Kconfig files.
 
 
-You will see a conflict in the top-level Makefile.
+Sorry for many conflicts.
 
-Please fix it like follows.  (it is also available in linux-next)
-
----------------------------------------------------------------
-diff --cc Makefile
-index cc4875d,f17dd99..a0650bf
---- a/Makefile
-+++ b/Makefile
-@@@ -224,11 -224,14 +224,14 @@@ clean-targets := %clean mrproper cleand
-  no-dot-config-targets := $(clean-targets) \
-                         cscope gtags TAGS tags help% %docs check% coccicheck \
-                         $(version_h) headers_% archheaders archscripts \
- -                       kernelversion %src-pkg
- +                       %asm-generic kernelversion %src-pkg
-+ no-sync-config-targets := $(no-dot-config-targets) install %install \
-+                          kernelrelease
-
-- config-targets := 0
-- mixed-targets  := 0
-- dot-config     := 1
-+ config-targets  := 0
-+ mixed-targets   := 0
-+ dot-config      := 1
-+ may-sync-config := 1
-
-  ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
-        ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
-----------------------------------------------------------
+Equivalent fixes are available in linux-next,
+but I sorted the 'select' lines alphabetically
+in arch/nios2/Kconfig.
+(of course, this is not important, though.)
 
 
+-------------------------
+diff --cc arch/arm64/Kconfig
+index 260ff5d,daf59d3..d0a53cc
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@@ -279,10 -264,9 +279,6 @@@ config ARCH_SUPPORTS_UPROBE
+  config ARCH_PROC_KCORE_TEXT
+        def_bool y
+
+- source "init/Kconfig"
+-
+- source "kernel/Kconfig.freezer"
+ -config MULTI_IRQ_HANDLER
+ -      def_bool y
+--
+  source "arch/arm64/Kconfig.platforms"
+
+  menu "Bus support"
+diff --cc arch/mips/Kconfig
+index 642a56e,06a633e..2af13b1
+--- a/arch/mips/Kconfig
++++ b/arch/mips/Kconfig
+@@@ -2988,13 -2990,6 +2984,9 @@@ config PGTABLE_LEVEL
+        default 3 if 64BIT && !PAGE_SIZE_64KB
+        default 2
+
+ +config MIPS_AUTO_PFN_OFFSET
+ +      bool
+ +
+- source "init/Kconfig"
+-
+- source "kernel/Kconfig.freezer"
+-
+  menu "Bus options (PCI, PCMCIA, EISA, ISA, TC)"
+
+  config HW_HAS_EISA
+diff --cc arch/nios2/Kconfig
+index 9203504,cbe1844..f4ad113
+--- a/arch/nios2/Kconfig
++++ b/arch/nios2/Kconfig
+@@@ -1,9 -1,7 +1,10 @@@
+  # SPDX-License-Identifier: GPL-2.0
+  config NIOS2
+        def_bool y
+ +      select ARCH_HAS_SYNC_DMA_FOR_CPU
+ +      select ARCH_HAS_SYNC_DMA_FOR_DEVICE
++       select ARCH_NO_SWAP
+ +      select DMA_NONCOHERENT_OPS
+        select TIMER_OF
+        select GENERIC_ATOMIC64
+        select GENERIC_CLOCKEVENTS
+diff --cc arch/openrisc/Kconfig
+index dfb6a79,42e3a0f..ed5f32d
+--- a/arch/openrisc/Kconfig
++++ b/arch/openrisc/Kconfig
+@@@ -69,10 -69,9 +69,6 @@@ config STACKTRACE_SUPPOR
+  config LOCKDEP_SUPPORT
+        def_bool  y
+
+- source "init/Kconfig"
+-
+- source "kernel/Kconfig.freezer"
+ -config MULTI_IRQ_HANDLER
+ -      def_bool y
+--
+  menu "Processor type and features"
+
+  choice
+----------------------------------------------------------------
 
 
 
@@ -61,87 +107,108 @@ The following changes since commit 9d3cce1e8b8561fed5f383d22a4d6949db4eadbe:
 are available in the git repository at:
 
   git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kconfig-v4.19
+tags/kconfig-v4.19-2
 
-for you to fetch changes up to 1880861226c13ddd42c34ddd30c3b502b650fe29:
+for you to fetch changes up to 59e0b520c75c8b4588395aea6170e551c4189fd8:
 
-  kconfig: remove P_ENV property type (2018-08-14 09:01:47 +0900)
-
-----------------------------------------------------------------
-Kconfig updates for v4.19
-
-- show clearer error messages where pkg-config is needed, but not
-  installed
-
-- rename SYMBOL_AUTO to SYMBOL_NO_WRITE to reflect its semantics
-
-- create all necessary directories by Kconfig tool itself instead
-  of Makefile
-
-- update the .config unconditionally when syncconfig is invoked
-
-- use 'include' directive instead of '-include' where
-  include/config/{auto,tristate}.conf is mandatory
-
-- do not try to update the .config when running install targets
-
-- add .DELETE_ON_ERROR to delete partially updated files
-
-- misc cleanups and fixes
+  kconfig: add a Memory Management options" menu (2018-08-02 08:06:55 +0900)
 
 ----------------------------------------------------------------
-Dirk Gouders (2):
-      kconfig: rename SYMBOL_AUTO to SYMBOL_NO_WRITE
-      Kbuild: Makefile.modbuiltin: include auto.conf and tristate.conf mandatory
+Consolidation of Kconfig files by Christoph Hellwig.
 
-Masahiro Yamada (15):
-      kconfig: handle format string before calling conf_message_callback()
-      kconfig: rename file_write_dep and move it to confdata.c
-      kconfig: split out useful helpers in confdata.c
-      kconfig: remove unneeded directory generation from local*config
-      kconfig: create directories needed for syncconfig by itself
-      kconfig: make syncconfig update .config regardless of sym_change_count
-      kconfig: allow all config targets to write auto.conf if missing
-      kbuild: use 'include' directive to load auto.conf from top Makefile
-      kbuild: add .DELETE_ON_ERROR special target
-      kbuild: do not update config when running install targets
-      kbuild: do not update config for 'make kernelrelease'
-      kbuild: remove auto.conf from prerequisite of phony targets
-      kconfig: fix the rule of mainmenu_stmt symbol
-      kconfig: remove unused sym_get_env_prop() function
-      kconfig: remove P_ENV property type
+Move the source statements of arch-independent Kconfig files instead of
+duplicating the includes in every arch/$(SRCARCH)/Kconfig.
 
-Randy Dunlap (2):
-      kconfig: check for pkg-config on make {menu,n,g,x}config
-      kconfig: fix typos in description of "choice" in kconfig-language.txt
+----------------------------------------------------------------
+Christoph Hellwig (9):
+      um: stop abusing KBUILD_KCONFIG
+      um: cleanup Kconfig files
+      um: create a proper drivers Kconfig
+      kconfig: remove duplicate SWAP symbol defintions
+      kconfig: include common Kconfig files from top-level Kconfig
+      Kconfig: consolidate the "Kernel hacking" menu
+      kconfig: include kernel/Kconfig.preempt from init/Kconfig
+      kconfig: move the "Executable file formats" menu to fs/Kconfig.binfmt
+      kconfig: add a Memory Management options" menu
 
-Rob Landley (1):
-      init/Kconfig: Use short unix-style option instead of --longname
+Randy Dunlap (1):
+      kconfig: use a menu in arch/Kconfig to reduce clutter
 
- Documentation/kbuild/kconfig-language.txt |   4 +-
- Documentation/process/changes.rst         |   8 +++
- Makefile                                  |  44 +++++++-----
- init/Kconfig                              |   4 +-
- scripts/Kbuild.include                    |   3 +
- scripts/Makefile.modbuiltin               |   4 +-
- scripts/kconfig/Makefile                  |  17 ++---
- scripts/kconfig/check-pkgconfig.sh        |   8 +++
- scripts/kconfig/conf.c                    |  39 +++++-----
- scripts/kconfig/confdata.c                | 156
-++++++++++++++++++++++++++++++++--------
- scripts/kconfig/expr.h                    |   3 +-
- scripts/kconfig/gconf.c                   |   5 +-
- scripts/kconfig/lkc.h                     |   2 -
- scripts/kconfig/lkc_proto.h               |   4 +-
- scripts/kconfig/mconf.c                   |  10 ++-
- scripts/kconfig/menu.c                    |   2 +-
- scripts/kconfig/nconf.c                   |   8 +--
- scripts/kconfig/qconf.cc                  |   3 +-
- scripts/kconfig/symbol.c                  |  13 +---
- scripts/kconfig/util.c                    |  30 --------
- scripts/kconfig/zconf.y                   |   6 +-
- 21 files changed, 227 insertions(+), 146 deletions(-)
- create mode 100644 scripts/kconfig/check-pkgconfig.sh
+ Kconfig                                  |  22 ++++-
+ arch/Kconfig                             |  13 +++
+ arch/alpha/Kconfig                       |  23 +----
+ arch/alpha/Kconfig.debug                 |   5 --
+ arch/arc/Kconfig                         |  19 -----
+ arch/arc/Kconfig.debug                   |   5 --
+ arch/arm/Kconfig                         |  27 ------
+ arch/arm/Kconfig.debug                   |   5 --
+ arch/arm64/Kconfig                       |  26 ------
+ arch/arm64/Kconfig.debug                 |   5 --
+ arch/c6x/Kconfig                         |  41 ---------
+ arch/c6x/Kconfig.debug                   |  10 +++
+ arch/h8300/Kconfig                       |  36 --------
+ arch/h8300/Kconfig.debug                 |   1 +
+ arch/hexagon/Kconfig                     |  21 +----
+ arch/hexagon/Kconfig.debug               |   1 +
+ arch/ia64/Kconfig                        |  24 ------
+ arch/ia64/Kconfig.debug                  |   5 --
+ arch/m68k/Kconfig                        |  31 +------
+ arch/m68k/Kconfig.debug                  |   5 --
+ arch/microblaze/Kconfig                  |  32 +------
+ arch/microblaze/Kconfig.debug            |   6 --
+ arch/mips/Kconfig                        |  28 -------
+ arch/mips/Kconfig.debug                  |   5 --
+ arch/nds32/Kconfig                       |  21 -----
+ arch/nds32/Kconfig.debug                 |   1 +
+ arch/nios2/Kconfig                       |  32 +------
+ arch/nios2/Kconfig.debug                 |   5 --
+ arch/openrisc/Kconfig                    |  30 -------
+ arch/openrisc/Kconfig.debug              |   1 +
+ arch/parisc/Kconfig                      |  27 ------
+ arch/parisc/Kconfig.debug                |   5 --
+ arch/powerpc/Kconfig                     |  22 -----
+ arch/powerpc/Kconfig.debug               |   5 --
+ arch/riscv/Kconfig                       |  71 ----------------
+ arch/riscv/Kconfig.debug                 |  37 ++++++++
+ arch/s390/Kconfig                        |  28 -------
+ arch/s390/Kconfig.debug                  |   5 --
+ arch/sh/Kconfig                          |  26 ------
+ arch/sh/Kconfig.debug                    |   5 --
+ arch/sh/mm/Kconfig                       |   2 -
+ arch/sparc/Kconfig                       |  28 -------
+ arch/sparc/Kconfig.debug                 |   5 --
+ arch/um/{Kconfig.um => Kconfig}          |  74 +++++++++++++++-
+ arch/um/Kconfig.char                     | 124 ---------------------------
+ arch/um/Kconfig.common                   |  60 -------------
+ arch/um/Kconfig.debug                    |   5 --
+ arch/um/Kconfig.rest                     |  22 -----
+ arch/um/Makefile                         |   4 +-
+ arch/um/{Kconfig.net => drivers/Kconfig} | 125 +++++++++++++++++++++++++++-
+ arch/unicore32/Kconfig                   |  28 -------
+ arch/unicore32/Kconfig.debug             |   5 --
+ arch/x86/Kconfig                         |  26 +-----
+ arch/x86/Kconfig.debug                   |   5 --
+ arch/x86/um/Kconfig                      |  15 ----
+ arch/xtensa/Kconfig                      |  29 -------
+ arch/xtensa/Kconfig.debug                |   5 --
+ fs/Kconfig.binfmt                        |   5 ++
+ init/Kconfig                             |  14 +++-
+ kernel/Kconfig.preempt                   |   2 +
+ lib/Kconfig.debug                        |   7 ++
+ mm/Kconfig                               |   5 ++
+ 62 files changed, 316 insertions(+), 996 deletions(-)
+ create mode 100644 arch/c6x/Kconfig.debug
+ create mode 100644 arch/h8300/Kconfig.debug
+ create mode 100644 arch/hexagon/Kconfig.debug
+ create mode 100644 arch/nds32/Kconfig.debug
+ create mode 100644 arch/openrisc/Kconfig.debug
+ create mode 100644 arch/riscv/Kconfig.debug
+ rename arch/um/{Kconfig.um => Kconfig} (82%)
+ delete mode 100644 arch/um/Kconfig.char
+ delete mode 100644 arch/um/Kconfig.common
+ delete mode 100644 arch/um/Kconfig.rest
+ rename arch/um/{Kconfig.net => drivers/Kconfig} (66%)
+
 
 
 -- 
