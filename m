@@ -1,74 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:59502 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725941AbeHOWYM (ORCPT
+Received: from mail-it0-f65.google.com ([209.85.214.65]:40502 "EHLO
+        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726183AbeHPAEy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Aug 2018 18:24:12 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v2] scripts: modpost: check memory allocation results
-Message-ID: <eafb5a94-f140-27f2-bc91-c6b95a18c97d@infradead.org>
-Date: Wed, 15 Aug 2018 12:30:38 -0700
+        Wed, 15 Aug 2018 20:04:54 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CAK7LNAT9p+YPmvasWPG1qdriM+dkauf6h3bqJLnxTcZo8LG_SA@mail.gmail.com>
+In-Reply-To: <CAK7LNAT9p+YPmvasWPG1qdriM+dkauf6h3bqJLnxTcZo8LG_SA@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 15 Aug 2018 14:10:51 -0700
+Message-ID: <CA+55aFxRPLjo_XnWDw5sYLnSjNhf8iPHGXomQitnGJjyuViXCQ@mail.gmail.com>
+Subject: Re: [GIT PULL 2/3] Kconfig updates for v4.19
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Yuexing Wang <wangyxlandq@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-From: Randy Dunlap <rdunlap@infradead.org>
+On Wed, Aug 15, 2018 at 10:58 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> Masahiro Yamada (15):
+>       kconfig: make syncconfig update .config regardless of sym_change_count
 
-Fix missing error check for memory allocation functions in
-scripts/mod/modpost.c.
+This one is annoying me.
 
-Fixes kernel bugzilla #200319:
-https://bugzilla.kernel.org/show_bug.cgi?id=200319
+I don't care if it updates .config. But it does so *noisily*, so now
+my build scripts en dup having extra noise coming out from them in the
+form of another
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Yuexing Wang <wangyxlandq@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-v2: add checks in more places
+  scripts/kconfig/conf  --syncconfig Kconfig
+  #
+  # configuration written to .config
+  #
 
- scripts/mod/modpost.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+which is just distracting me and doesn't seem to add any value at all.
 
---- linux-next-20180814.orig/scripts/mod/modpost.c
-+++ linux-next-20180814/scripts/mod/modpost.c
-@@ -672,7 +672,7 @@ static void handle_modversions(struct mo
- 			if (ELF_ST_TYPE(sym->st_info) == STT_SPARC_REGISTER)
- 				break;
- 			if (symname[0] == '.') {
--				char *munged = strdup(symname);
-+				char *munged = NOFAIL(strdup(symname));
- 				munged[0] = '_';
- 				munged[1] = toupper(munged[1]);
- 				symname = munged;
-@@ -1318,7 +1318,7 @@ static Elf_Sym *find_elf_symbol2(struct
- static char *sec2annotation(const char *s)
- {
- 	if (match(s, init_exit_sections)) {
--		char *p = malloc(20);
-+		char *p = NOFAIL(malloc(20));
- 		char *r = p;
- 
- 		*p++ = '_';
-@@ -1338,7 +1338,7 @@ static char *sec2annotation(const char *
- 			strcat(p, " ");
- 		return r;
- 	} else {
--		return strdup("");
-+		return NOFAIL(strdup(""));
- 	}
- }
- 
-@@ -2036,7 +2036,7 @@ void buf_write(struct buffer *buf, const
- {
- 	if (buf->size - buf->pos < len) {
- 		buf->size += len + SZ;
--		buf->p = realloc(buf->p, buf->size);
-+		buf->p = NOFAIL(realloc(buf->p, buf->size));
- 	}
- 	strncpy(buf->p + buf->pos, s, len);
- 	buf->pos += len;
+Ok, so it happens because I for legacy reasons have a "made dep" that
+isn't useful any more (but my fingers have that as the "let's do a
+kernel build" now macro), but it does seem to be entirely pointless.
+Why make that big noise about something that doesn't even *do*
+anything?
+
+                  Linus
