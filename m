@@ -1,66 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:44131 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728981AbeHPDI3 (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:57353 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727009AbeHPFdI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Aug 2018 23:08:29 -0400
-Received: by mail-pf1-f196.google.com with SMTP id k21-v6so1169536pff.11
-        for <linux-kbuild@vger.kernel.org>; Wed, 15 Aug 2018 17:13:52 -0700 (PDT)
-Received: from localhost ([2601:647:5180:35d7::5eb6])
-        by smtp.gmail.com with ESMTPSA id 3-v6sm580810pfq.10.2018.08.15.17.13.50
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 15 Aug 2018 17:13:50 -0700 (PDT)
-From: Michael Forney <mforney@mforney.org>
-Subject: [PATCH] kbuild: Add a space after `!` to prevent parsing as file pattern
-Date: Wed, 15 Aug 2018 17:13:50 -0700
-Message-Id: <20180816001350.7516-1-mforney@mforney.org>
+        Thu, 16 Aug 2018 01:33:08 -0400
+MIME-Version: 1.0
+In-Reply-To: <eafb5a94-f140-27f2-bc91-c6b95a18c97d@infradead.org>
+References: <eafb5a94-f140-27f2-bc91-c6b95a18c97d@infradead.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 16 Aug 2018 11:37:14 +0900
+Message-ID: <CAK7LNAQWM0X3yeifD_3jsiP7yPb2G0B52fmsrBM=iqpaVSA9kA@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts: modpost: check memory allocation results
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Yuexing Wang <wangyxlandq@gmail.com>
 
-Some shells use !(pattern|...|pattern) to match file names not
-containing the specified patterns. This may result in output like
+2018-08-16 4:30 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+> From: Randy Dunlap <rdunlap@infradead.org>
+>
+> Fix missing error check for memory allocation functions in
+> scripts/mod/modpost.c.
+>
+> Fixes kernel bugzilla #200319:
+> https://bugzilla.kernel.org/show_bug.cgi?id=200319
+>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Yuexing Wang <wangyxlandq@gmail.com>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> v2: add checks in more places
 
-  $ ./scripts/clang-version.sh gcc
-  ./scripts/clang-version.sh[18]: COPYING: not found
-  printf: %d __clang_major__: conversion error
-  printf: %d __clang_minor__: conversion error
-  printf: %d __clang_patchlevel__: conversion error
-  00000
-  $
+Applied to linux-kbuild. Thanks!
 
-and set CONFIG_CLANG_VERSION to the invalid value '00000'.
 
-POSIX says[0]
+>  scripts/mod/modpost.c |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> --- linux-next-20180814.orig/scripts/mod/modpost.c
+> +++ linux-next-20180814/scripts/mod/modpost.c
+> @@ -672,7 +672,7 @@ static void handle_modversions(struct mo
+>                         if (ELF_ST_TYPE(sym->st_info) == STT_SPARC_REGISTER)
+>                                 break;
+>                         if (symname[0] == '.') {
+> -                               char *munged = strdup(symname);
+> +                               char *munged = NOFAIL(strdup(symname));
+>                                 munged[0] = '_';
+>                                 munged[1] = toupper(munged[1]);
+>                                 symname = munged;
+> @@ -1318,7 +1318,7 @@ static Elf_Sym *find_elf_symbol2(struct
+>  static char *sec2annotation(const char *s)
+>  {
+>         if (match(s, init_exit_sections)) {
+> -               char *p = malloc(20);
+> +               char *p = NOFAIL(malloc(20));
+>                 char *r = p;
+>
+>                 *p++ = '_';
+> @@ -1338,7 +1338,7 @@ static char *sec2annotation(const char *
+>                         strcat(p, " ");
+>                 return r;
+>         } else {
+> -               return strdup("");
+> +               return NOFAIL(strdup(""));
+>         }
+>  }
+>
+> @@ -2036,7 +2036,7 @@ void buf_write(struct buffer *buf, const
+>  {
+>         if (buf->size - buf->pos < len) {
+>                 buf->size += len + SZ;
+> -               buf->p = realloc(buf->p, buf->size);
+> +               buf->p = NOFAIL(realloc(buf->p, buf->size));
+>         }
+>         strncpy(buf->p + buf->pos, s, len);
+>         buf->pos += len;
+>
+>
 
-  If the pipeline begins with the reserved word ! and command1 is a
-  subshell command, the application shall ensure that the ( operator at
-  the beginning of command1 is separated from the ! by one or more
-  <blank> characters. The behavior of the reserved word ! immediately
-  followed by the ( operator is unspecified.
 
-So, just add a <blank> to prevent this.
 
-[0] http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_09_02
-
-Signed-off-by: Michael Forney <mforney@mforney.org>
----
- scripts/clang-version.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/clang-version.sh b/scripts/clang-version.sh
-index dbf0a31eb111..e65fbc3079d4 100755
---- a/scripts/clang-version.sh
-+++ b/scripts/clang-version.sh
-@@ -12,7 +12,7 @@
- 
- compiler="$*"
- 
--if !( $compiler --version | grep -q clang) ; then
-+if ! ( $compiler --version | grep -q clang) ; then
- 	echo 0
- 	exit 1
- fi
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
