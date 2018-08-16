@@ -1,45 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:40502 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726183AbeHPAEy (ORCPT
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:44131 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728981AbeHPDI3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Aug 2018 20:04:54 -0400
-MIME-Version: 1.0
-References: <CAK7LNAT9p+YPmvasWPG1qdriM+dkauf6h3bqJLnxTcZo8LG_SA@mail.gmail.com>
-In-Reply-To: <CAK7LNAT9p+YPmvasWPG1qdriM+dkauf6h3bqJLnxTcZo8LG_SA@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 15 Aug 2018 14:10:51 -0700
-Message-ID: <CA+55aFxRPLjo_XnWDw5sYLnSjNhf8iPHGXomQitnGJjyuViXCQ@mail.gmail.com>
-Subject: Re: [GIT PULL 2/3] Kconfig updates for v4.19
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 15 Aug 2018 23:08:29 -0400
+Received: by mail-pf1-f196.google.com with SMTP id k21-v6so1169536pff.11
+        for <linux-kbuild@vger.kernel.org>; Wed, 15 Aug 2018 17:13:52 -0700 (PDT)
+Received: from localhost ([2601:647:5180:35d7::5eb6])
+        by smtp.gmail.com with ESMTPSA id 3-v6sm580810pfq.10.2018.08.15.17.13.50
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 15 Aug 2018 17:13:50 -0700 (PDT)
+From: Michael Forney <mforney@mforney.org>
+Subject: [PATCH] kbuild: Add a space after `!` to prevent parsing as file pattern
+Date: Wed, 15 Aug 2018 17:13:50 -0700
+Message-Id: <20180816001350.7516-1-mforney@mforney.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Wed, Aug 15, 2018 at 10:58 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Masahiro Yamada (15):
->       kconfig: make syncconfig update .config regardless of sym_change_count
+Some shells use !(pattern|...|pattern) to match file names not
+containing the specified patterns. This may result in output like
 
-This one is annoying me.
+  $ ./scripts/clang-version.sh gcc
+  ./scripts/clang-version.sh[18]: COPYING: not found
+  printf: %d __clang_major__: conversion error
+  printf: %d __clang_minor__: conversion error
+  printf: %d __clang_patchlevel__: conversion error
+  00000
+  $
 
-I don't care if it updates .config. But it does so *noisily*, so now
-my build scripts en dup having extra noise coming out from them in the
-form of another
+and set CONFIG_CLANG_VERSION to the invalid value '00000'.
 
-  scripts/kconfig/conf  --syncconfig Kconfig
-  #
-  # configuration written to .config
-  #
+POSIX says[0]
 
-which is just distracting me and doesn't seem to add any value at all.
+  If the pipeline begins with the reserved word ! and command1 is a
+  subshell command, the application shall ensure that the ( operator at
+  the beginning of command1 is separated from the ! by one or more
+  <blank> characters. The behavior of the reserved word ! immediately
+  followed by the ( operator is unspecified.
 
-Ok, so it happens because I for legacy reasons have a "made dep" that
-isn't useful any more (but my fingers have that as the "let's do a
-kernel build" now macro), but it does seem to be entirely pointless.
-Why make that big noise about something that doesn't even *do*
-anything?
+So, just add a <blank> to prevent this.
 
-                  Linus
+[0] http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_09_02
+
+Signed-off-by: Michael Forney <mforney@mforney.org>
+---
+ scripts/clang-version.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/clang-version.sh b/scripts/clang-version.sh
+index dbf0a31eb111..e65fbc3079d4 100755
+--- a/scripts/clang-version.sh
++++ b/scripts/clang-version.sh
+@@ -12,7 +12,7 @@
+ 
+ compiler="$*"
+ 
+-if !( $compiler --version | grep -q clang) ; then
++if ! ( $compiler --version | grep -q clang) ; then
+ 	echo 0
+ 	exit 1
+ fi
+-- 
+2.17.1
