@@ -1,242 +1,124 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:44612 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726490AbeHRX4c (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:18937 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726385AbeHSBpo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 Aug 2018 19:56:32 -0400
-Received: by mail-ed1-f66.google.com with SMTP id f23-v6so6323409edr.11
-        for <linux-kbuild@vger.kernel.org>; Sat, 18 Aug 2018 13:47:34 -0700 (PDT)
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: [RFC PATCH] scripts: add header bloat measuring script
-Date: Sat, 18 Aug 2018 22:47:23 +0200
-Message-Id: <20180818204723.11060-1-linux@rasmusvillemoes.dk>
-In-Reply-To: 0180226075931.5vn4vdbfcsje2z56@gmail.com
+        Sat, 18 Aug 2018 21:45:44 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] export.h: remove VMLINUX_SYMBOL() and VMLINUX_SYMBOL_STR()
+Date: Sun, 19 Aug 2018 07:34:47 +0900
+Message-Id: <1534631687-18347-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Ingo Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arch@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org, keyrings@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
 
-With a little cooperation from fixdep, we can rather easily quantify the
-header bloat phenomenon.
+With the special case handling for Blackfin and Metag was removed by
+commit 94e58e0ac312 ("export.h: remove code for prefixing symbols with
+underscore"), VMLINUX_SYMBOL() is no-no.
 
-While computing CONFIG_ dependencies, fixdep opens all the headers used
-by a given translation unit anyway, so it's rather cheap to have it
-record the number and total size of those in the generated .o.cmd file.
+Replace the remaining usages, then remove the definition of
+VMLINUX_SYMBOL() and VMLINUX_SYMBOL_STR().
 
-Those lines can then be post-processed and summarized by the new
-header-bloat-stat.pl script. For example, backporting this to v4.17 and
-v4.18 releases shows that for a defconfig x86_64 kernel, the median
-"bloat factor" (total size of translation unit)/(size of .c file)
-increased from 237.7 to 239.8, and the average total translation unit
-size grew by 2.5% while the average .c file only increased by
-0.4%. While these numbers by themselves are not particularly alarming,
-when accumulated over several releases, builds do get noticably slower -
-back at v3.0, the median bloat factor was 177.8.
+<asm-generic/vmlinux.lds.h> no longer needs to include <linux/export.h>.
 
-Having infrastrucure like this makes it easier to measure the effect
-should anyone attempt something similar to the sched.h cleanup, or just
-go over a subsystem trimming unused #includes from .c files (if the
-script is passed one or more directories it only processes those).
-
-On a positive note, maybe 4.19 will be a rare exception; as of
-1f7a4c73a739, the median bloat factor is down to 236.0, the average .c
-file has increased by 0.4% but the average total translation unit is
-nevertheless 1.2% smaller, compared to v4.18.
-
-Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
-For some statistics, that also include build times, for releases v3.0
-through v4.15, see https://wildmoose.dk/header-bloat/ . I'm not sure
-that page will remain forever, so not including the url in the commit
-log.
 
-I can certainly understand if people feel this is of too little
-utility to hook into fixdep like this. It's certainly possible to do
-the same statistics with external tools that just parse the .o.cmd
-files themselves.
+ certs/system_certificates.S       | 16 ++++++++--------
+ include/asm-generic/vmlinux.lds.h |  2 --
+ include/linux/export.h            |  7 -------
+ usr/initramfs_data.S              |  4 ++--
+ 4 files changed, 10 insertions(+), 19 deletions(-)
 
- scripts/basic/fixdep.c       | 18 +++++++--
- scripts/header-bloat-stat.pl | 95 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 109 insertions(+), 4 deletions(-)
- create mode 100755 scripts/header-bloat-stat.pl
-
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 850966f3d602..f1dec85cf9d9 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -248,7 +248,7 @@ static void parse_config_file(const char *p)
- 	}
- }
+diff --git a/certs/system_certificates.S b/certs/system_certificates.S
+index 3918ff7..8f29058 100644
+--- a/certs/system_certificates.S
++++ b/certs/system_certificates.S
+@@ -5,8 +5,8 @@
+ 	__INITRODATA
  
--static void *read_file(const char *filename)
-+static void *read_file(const char *filename, unsigned *size)
+ 	.align 8
+-	.globl VMLINUX_SYMBOL(system_certificate_list)
+-VMLINUX_SYMBOL(system_certificate_list):
++	.globl system_certificate_list
++system_certificate_list:
+ __cert_list_start:
+ #ifdef CONFIG_MODULE_SIG
+ 	.incbin "certs/signing_key.x509"
+@@ -15,21 +15,21 @@ __cert_list_start:
+ __cert_list_end:
+ 
+ #ifdef CONFIG_SYSTEM_EXTRA_CERTIFICATE
+-	.globl VMLINUX_SYMBOL(system_extra_cert)
++	.globl system_extra_cert
+ 	.size system_extra_cert, CONFIG_SYSTEM_EXTRA_CERTIFICATE_SIZE
+-VMLINUX_SYMBOL(system_extra_cert):
++system_extra_cert:
+ 	.fill CONFIG_SYSTEM_EXTRA_CERTIFICATE_SIZE, 1, 0
+ 
+ 	.align 4
+-	.globl VMLINUX_SYMBOL(system_extra_cert_used)
+-VMLINUX_SYMBOL(system_extra_cert_used):
++	.globl system_extra_cert_used
++system_extra_cert_used:
+ 	.int 0
+ 
+ #endif /* CONFIG_SYSTEM_EXTRA_CERTIFICATE */
+ 
+ 	.align 8
+-	.globl VMLINUX_SYMBOL(system_certificate_list_size)
+-VMLINUX_SYMBOL(system_certificate_list_size):
++	.globl system_certificate_list_size
++system_certificate_list_size:
+ #ifdef CONFIG_64BIT
+ 	.quad __cert_list_end - __cert_list_start
+ #else
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index f173b5f..7b75ff6 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -54,8 +54,6 @@
+ #define LOAD_OFFSET 0
+ #endif
+ 
+-#include <linux/export.h>
+-
+ /* Align . to a 8 byte boundary equals to maximum function alignment. */
+ #define ALIGN_FUNCTION()  . = ALIGN(8)
+ 
+diff --git a/include/linux/export.h b/include/linux/export.h
+index b768d6d..c363bde 100644
+--- a/include/linux/export.h
++++ b/include/linux/export.h
+@@ -10,13 +10,6 @@
+  * hackers place grumpy comments in header files.
+  */
+ 
+-#define __VMLINUX_SYMBOL(x) x
+-#define __VMLINUX_SYMBOL_STR(x) #x
+-
+-/* Indirect, so macros are expanded before pasting. */
+-#define VMLINUX_SYMBOL(x) __VMLINUX_SYMBOL(x)
+-#define VMLINUX_SYMBOL_STR(x) __VMLINUX_SYMBOL_STR(x)
+-
+ #ifndef __ASSEMBLY__
+ struct kernel_symbol
  {
- 	struct stat st;
- 	int fd;
-@@ -276,6 +276,8 @@ static void *read_file(const char *filename)
- 	}
- 	buf[st.st_size] = '\0';
- 	close(fd);
-+	if (size)
-+		*size += st.st_size;
- 
- 	return buf;
- }
-@@ -300,6 +302,8 @@ static void parse_dep_file(char *m, const char *target, int insert_extra_deps)
- 	int saw_any_target = 0;
- 	int is_first_dep = 0;
- 	void *buf;
-+	unsigned nheaders = 0, c_size = 0, h_size = 0;
-+	unsigned *sizevar;
- 
- 	while (1) {
- 		/* Skip any "white space" */
-@@ -321,6 +325,8 @@ static void parse_dep_file(char *m, const char *target, int insert_extra_deps)
- 			/* The /next/ file is the first dependency */
- 			is_first_dep = 1;
- 		} else if (!is_ignored_file(m, p - m)) {
-+			sizevar = NULL;
-+
- 			*p = '\0';
- 
- 			/*
-@@ -343,13 +349,16 @@ static void parse_dep_file(char *m, const char *target, int insert_extra_deps)
- 					printf("source_%s := %s\n\n",
- 					       target, m);
- 					printf("deps_%s := \\\n", target);
-+					sizevar = &c_size;
- 				}
- 				is_first_dep = 0;
- 			} else {
- 				printf("  %s \\\n", m);
-+				sizevar = &h_size;
-+				nheaders++;
- 			}
- 
--			buf = read_file(m);
-+			buf = read_file(m, sizevar);
- 			parse_config_file(buf);
- 			free(buf);
- 		}
-@@ -373,7 +382,8 @@ static void parse_dep_file(char *m, const char *target, int insert_extra_deps)
- 		do_extra_deps();
- 
- 	printf("\n%s: $(deps_%s)\n\n", target, target);
--	printf("$(deps_%s):\n", target);
-+	printf("$(deps_%s):\n\n", target);
-+	printf("# header-stats: %u %u %u\n", nheaders, c_size, h_size);
- }
- 
- int main(int argc, char *argv[])
-@@ -394,7 +404,7 @@ int main(int argc, char *argv[])
- 
- 	printf("cmd_%s := %s\n\n", target, cmdline);
- 
--	buf = read_file(depfile);
-+	buf = read_file(depfile, NULL);
- 	parse_dep_file(buf, target, insert_extra_deps);
- 	free(buf);
- 
-diff --git a/scripts/header-bloat-stat.pl b/scripts/header-bloat-stat.pl
-new file mode 100755
-index 000000000000..528021907df1
---- /dev/null
-+++ b/scripts/header-bloat-stat.pl
-@@ -0,0 +1,95 @@
-+#!/usr/bin/perl
-+
-+use strict;
-+use warnings;
-+
-+use Getopt::Long;
-+use File::Find;
-+use Statistics::Descriptive;
-+
-+sub help {
-+    printf "%s [-c] [-m] [-n <name>] [<dirs>]\n", $0;
-+    printf "  -c  output a single line with data in columns\n";
-+    printf "  -m  include min/max statistics\n";
-+    printf "  -n  optional name (e.g. git revision) to use as first datum\n";
-+    exit(0);
-+}
-+
-+my $name;
-+my $minmax = 0;
-+my $column = 0;
-+
-+GetOptions("c|column" => \$column,
-+	   "m|minmax" => \$minmax,
-+	   "n|name=s" => \$name,
-+	   "h|help"   => \&help)
-+    or die "Bad option";
-+
-+my @stats =
-+    (
-+     ['mean',   sub {$_[0]->mean()}],
-+     ['min',    sub {$_[0]->min()}],
-+     ['q25',    sub {$_[0]->quantile(1)}],
-+     ['median', sub {$_[0]->quantile(2)}],
-+     ['q75',    sub {$_[0]->quantile(3)}],
-+     ['max',    sub {$_[0]->max()}],
-+    );
-+
-+my @scalars = ('hcount', 'csize', 'tsize', 'ratio');
-+my %data;
-+my @out;
-+
-+find({wanted => \&process_cmd_file, no_chdir => 1}, @ARGV ? @ARGV : '.');
-+
-+add_output('name', $name) if $name;
-+add_output('#TUs', $data{ntu});
-+for my $s (@scalars) {
-+    my $vals = Statistics::Descriptive::Full->new();
-+    $vals->add_data(@{$data{$s}});
-+    $vals->sort_data();
-+    for my $stat (@stats) {
-+	next if $s eq 'ratio' && $stat->[0] eq 'mean';
-+	next if $stat->[0] =~ m/^(min|max)$/ && !$minmax;
-+	my $val = $stat->[1]->($vals);
-+	add_output($s . "_" . $stat->[0], $val);
-+    }
-+}
-+
-+if ($column) {
-+    print join("\t", map {$_->[1]} @out), "\n";
-+} else {
-+    printf "%s\t%s\n", @$_ for @out;
-+}
-+
-+sub add_output {
-+    push @out, [@_];
-+}
-+
-+sub process_cmd_file {
-+    # Remove leading ./ components
-+    s|^(\./)*||;
-+    # Stuff that includes userspace/host headers is not interesting.
-+    if (m/^(scripts|tools)/) {
-+	$File::Find::prune = 1;
-+	return;
-+    }
-+    return unless m/\.o\.cmd$/;
-+
-+    open(my $fh, '<', $_)
-+	or die "failed to open $_: $!";
-+    while (<$fh>) {
-+	chomp;
-+	if (m/^source_/) {
-+	    # Only process stuff built from .S or .c
-+	    return unless m/\.[Sc]$/;
-+	}
-+	if (m/^# header-stats: ([0-9]+) ([0-9]+) ([0-9]+)/) {
-+	    push @{$data{hcount}}, $1;
-+	    push @{$data{csize}}, $2;
-+	    push @{$data{tsize}}, $2 + $3;
-+	    push @{$data{ratio}}, $2 ? ($2 + $3)/$2 : 1.0;
-+	    $data{ntu}++;
-+	}
-+    }
-+    close($fh);
-+}
+diff --git a/usr/initramfs_data.S b/usr/initramfs_data.S
+index b28da79..d07648f 100644
+--- a/usr/initramfs_data.S
++++ b/usr/initramfs_data.S
+@@ -30,8 +30,8 @@ __irf_start:
+ .incbin __stringify(INITRAMFS_IMAGE)
+ __irf_end:
+ .section .init.ramfs.info,"a"
+-.globl VMLINUX_SYMBOL(__initramfs_size)
+-VMLINUX_SYMBOL(__initramfs_size):
++.globl __initramfs_size
++__initramfs_size:
+ #ifdef CONFIG_64BIT
+ 	.quad __irf_end - __irf_start
+ #else
 -- 
-2.16.4
+2.7.4
