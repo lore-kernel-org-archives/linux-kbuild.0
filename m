@@ -1,76 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:39307 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726573AbeHTVmU (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Aug 2018 17:42:20 -0400
+Received: from mail-eopbgr730113.outbound.protection.outlook.com ([40.107.73.113]:28539
+        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726089AbeHTVvY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 20 Aug 2018 17:51:24 -0400
+Date: Mon, 20 Aug 2018 11:34:17 -0700
+From: Paul Burton <paul.burton@mips.com>
+Subject: Re: [PATCH v8 1/2] kbuild: Allow asm-specific compiler_types.h
+Message-ID: <20180820183417.dejfsluih7elbclu@pburton-laptop>
+References: <20180818181017.1246-1-paul.burton@mips.com>
+ <20180818181017.1246-2-paul.burton@mips.com>
+ <CAK7LNASM_ZThZRwFQJFaYqurqUVayNGPM6c7gnuHERYN7T4M3g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180806183329.qditzzemevdafcwb@unicorn.suse.cz>
-References: <20180627143705.5a1fed1c@kitsune.suse.cz> <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
- <20180628111623.3807fe9b@naga.suse.cz> <CAK7LNARRKU7Mfa8ZBu1qPFYFRr-5k69sjVyERM2bYcnWoBDN8g@mail.gmail.com>
- <20180806183329.qditzzemevdafcwb@unicorn.suse.cz>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 21 Aug 2018 03:24:51 +0900
-Message-ID: <CAK7LNASkq39NqFGEa+x6kpS9rwE7pSA36L++SUc9gwccgfySDQ@mail.gmail.com>
-Subject: Re: due to kconfig changes kernel config file is no longer sufficient
- for configuring the kernel
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNASM_ZThZRwFQJFaYqurqUVayNGPM6c7gnuHERYN7T4M3g@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Takashi Iwai <tiwai@suse.de>, Andreas Schwab <schwab@suse.de>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux-MIPS <linux-mips@linux-mips.org>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, James Hogan <jhogan@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ralf Baechle <ralf@linux-mips.org>
 
-2018-08-07 3:33 GMT+09:00 Michal Kubecek <mkubecek@suse.cz>:
-> On Mon, Jul 30, 2018 at 05:02:42PM +0900, Masahiro Yamada wrote:
->>
->> For exmaple 'make ARCH=arm config' will create the config suitable
->> only for ARM architecture.
->> Then, you need to do 'make ARCH=arm' to build the kernel.
->>
->> If it is tedious to give 'ARCH=arm' to every make command,
->> you can do 'export ARCH=arm' in your shell.
->>
->> Again, this is the behavior we have for a long time.
->
-> Actually, this no longer works reliably. For example, when I run
->
->   ARCH=powerpc make oldconfig
->
-> with our ppc64le config on x86_64 system, I get different result than
-> when I run it on an actual ppc64le system (or when using a ppc64le cross
-> compiler on x86_64).
+Hi Masahiro,
 
+On Mon, Aug 20, 2018 at 02:04:24PM +0900, Masahiro Yamada wrote:
+> 2018-08-19 3:10 GMT+09:00 Paul Burton <paul.burton@mips.com>:
+> > We have a need to override the definition of
+> > barrier_before_unreachable() for MIPS, which means we either need to add
+> > architecture-specific code into linux/compiler-gcc.h or we need to allow
+> > the architecture to provide a header that can define the macro before
+> > the generic definition. The latter seems like the better approach.
+> >
+> > A straightforward approach to the per-arch header is to make use of
+> > asm-generic to provide a default empty header & adjust architectures
+> > which don't need anything specific to make use of that by adding the
+> > header to generic-y. Unfortunately this doesn't work so well due to
+> > commit a95b37e20db9 ("kbuild: get <linux/compiler_types.h> out of
+> > <linux/kconfig.h>") which moved the inclusion of linux/compiler.h to
+> > cflags using the -include compiler flag.
+> >
+> > Because the -include flag is present for all C files we compile, we need
+> > the architecture-provided header to be present before any C files are
+> > compiled. If any C files can be compiled prior to the asm-generic header
+> > wrappers being generated then we hit a build failure due to missing
+> > header. Such cases do exist - one pointed out by the kbuild test robot
+> > is the compilation of arch/ia64/kernel/nr-irqs.c, which occurs as part
+> > of the archprepare target [1].
+> >
+> > This leaves us with a few options:
+> >
+> >   1) Use generic-y & fix any build failures we find by enforcing
+> >      ordering such that the asm-generic target occurs before any C
+> >      compilation, such that linux/compiler_types.h can always include
+> >      the generated asm-generic wrapper which in turn includes the empty
+> >      asm-generic header. This would rely on us finding all the
+> >      problematic cases - I don't know for sure that the ia64 issue is
+> >      the only one.
+> >
+> >   2) Add an actual empty header to each architecture, so that we don't
+> >      need the generated asm-generic wrapper. This seems messy.
+> >
+> >   3) Give up & add #ifdef CONFIG_MIPS or similar to
+> >      linux/compiler_types.h. This seems messy too.
+> >
+> >   4) Include the arch header only when it's actually needed, removing
+> >      the need for the asm-generic wrapper for all other architectures.
+> >
+> > This patch allows us to use approach 4, by including an
+> > asm/compiler_types.h header using the -include flag in the same way we
+> > do for linux/compiler_types.h, but only if the header actually exists.
+> 
+> I agree with the approach 4),
+> but I am of two minds about how to implement it.
+> 
+> I guess the cost of evaluating 'wildcard' for each C file
+> is unnoticeable level, but I am slightly in favor of
+> including <asm/compilr_types.h> from <linux/compiler_types.h>
+> conditionally.
+> 
+> I am not sure about the CONFIG name, but for example, like this.
+> 
+> #ifdef CONFIG_HAVE_ARCH_COMPILER_TYPES
+> #include <asm/compiler_types.h>
+> #endif
+> 
+> What do you think?
 
-This is because you used different compilers.
+That sounds fine to me - I'll submit a v9 shortly :)
 
-
-> Since .config started to mix user configuration and build environment
-> capabilities, maintaining distribution configs became real pain. And
-> it's getting progressively worse.
-
-This is improvement requested by Linus Torvalds.
-
-Prior to the change, the user configuration in the .config
-did not reflect what you get.
-Even if you enable CONFIG_FOO=y,
-it might be silently disabled by $(call cc-option, ...) in Makefile
-if the feature is not supported by the compiler.
-
-
-By moving the compiler evaluation to the Kconfig phase,
-the .config matches to what you get.
-
-
-
-> Michal Kubecek
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Thanks,
+    Paul
