@@ -1,138 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:20133 "EHLO
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:39307 "EHLO
         conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726585AbeHTT3D (ORCPT
+        with ESMTP id S1726573AbeHTVmU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Aug 2018 15:29:03 -0400
+        Mon, 20 Aug 2018 17:42:20 -0400
 MIME-Version: 1.0
-In-Reply-To: <1534631687-18347-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1534631687-18347-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <20180806183329.qditzzemevdafcwb@unicorn.suse.cz>
+References: <20180627143705.5a1fed1c@kitsune.suse.cz> <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
+ <20180628111623.3807fe9b@naga.suse.cz> <CAK7LNARRKU7Mfa8ZBu1qPFYFRr-5k69sjVyERM2bYcnWoBDN8g@mail.gmail.com>
+ <20180806183329.qditzzemevdafcwb@unicorn.suse.cz>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 21 Aug 2018 01:12:02 +0900
-Message-ID: <CAK7LNAQHcKJLahTssT8tG6i0YM_UpM2A+vKOeeuwryx2UwVWeQ@mail.gmail.com>
-Subject: Re: [PATCH] export.h: remove VMLINUX_SYMBOL() and VMLINUX_SYMBOL_STR()
+Date: Tue, 21 Aug 2018 03:24:51 +0900
+Message-ID: <CAK7LNASkq39NqFGEa+x6kpS9rwE7pSA36L++SUc9gwccgfySDQ@mail.gmail.com>
+Subject: Re: due to kconfig changes kernel config file is no longer sufficient
+ for configuring the kernel
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, keyrings@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Takashi Iwai <tiwai@suse.de>, Andreas Schwab <schwab@suse.de>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org
 
-2018-08-19 7:34 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> With the special case handling for Blackfin and Metag was removed by
-> commit 94e58e0ac312 ("export.h: remove code for prefixing symbols with
-> underscore"), VMLINUX_SYMBOL() is no-no.
+2018-08-07 3:33 GMT+09:00 Michal Kubecek <mkubecek@suse.cz>:
+> On Mon, Jul 30, 2018 at 05:02:42PM +0900, Masahiro Yamada wrote:
+>>
+>> For exmaple 'make ARCH=arm config' will create the config suitable
+>> only for ARM architecture.
+>> Then, you need to do 'make ARCH=arm' to build the kernel.
+>>
+>> If it is tedious to give 'ARCH=arm' to every make command,
+>> you can do 'export ARCH=arm' in your shell.
+>>
+>> Again, this is the behavior we have for a long time.
 >
-> Replace the remaining usages, then remove the definition of
-> VMLINUX_SYMBOL() and VMLINUX_SYMBOL_STR().
+> Actually, this no longer works reliably. For example, when I run
 >
-> <asm-generic/vmlinux.lds.h> no longer needs to include <linux/export.h>.
+>   ARCH=powerpc make oldconfig
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+> with our ppc64le config on x86_64 system, I get different result than
+> when I run it on an actual ppc64le system (or when using a ppc64le cross
+> compiler on x86_64).
 
 
-Fixed the typo no-no -> no-op,
-then applied  to linux-kbuild.
+This is because you used different compilers.
 
 
->  certs/system_certificates.S       | 16 ++++++++--------
->  include/asm-generic/vmlinux.lds.h |  2 --
->  include/linux/export.h            |  7 -------
->  usr/initramfs_data.S              |  4 ++--
->  4 files changed, 10 insertions(+), 19 deletions(-)
+> Since .config started to mix user configuration and build environment
+> capabilities, maintaining distribution configs became real pain. And
+> it's getting progressively worse.
+
+This is improvement requested by Linus Torvalds.
+
+Prior to the change, the user configuration in the .config
+did not reflect what you get.
+Even if you enable CONFIG_FOO=y,
+it might be silently disabled by $(call cc-option, ...) in Makefile
+if the feature is not supported by the compiler.
+
+
+By moving the compiler evaluation to the Kconfig phase,
+the .config matches to what you get.
+
+
+
+> Michal Kubecek
 >
-> diff --git a/certs/system_certificates.S b/certs/system_certificates.S
-> index 3918ff7..8f29058 100644
-> --- a/certs/system_certificates.S
-> +++ b/certs/system_certificates.S
-> @@ -5,8 +5,8 @@
->         __INITRODATA
->
->         .align 8
-> -       .globl VMLINUX_SYMBOL(system_certificate_list)
-> -VMLINUX_SYMBOL(system_certificate_list):
-> +       .globl system_certificate_list
-> +system_certificate_list:
->  __cert_list_start:
->  #ifdef CONFIG_MODULE_SIG
->         .incbin "certs/signing_key.x509"
-> @@ -15,21 +15,21 @@ __cert_list_start:
->  __cert_list_end:
->
->  #ifdef CONFIG_SYSTEM_EXTRA_CERTIFICATE
-> -       .globl VMLINUX_SYMBOL(system_extra_cert)
-> +       .globl system_extra_cert
->         .size system_extra_cert, CONFIG_SYSTEM_EXTRA_CERTIFICATE_SIZE
-> -VMLINUX_SYMBOL(system_extra_cert):
-> +system_extra_cert:
->         .fill CONFIG_SYSTEM_EXTRA_CERTIFICATE_SIZE, 1, 0
->
->         .align 4
-> -       .globl VMLINUX_SYMBOL(system_extra_cert_used)
-> -VMLINUX_SYMBOL(system_extra_cert_used):
-> +       .globl system_extra_cert_used
-> +system_extra_cert_used:
->         .int 0
->
->  #endif /* CONFIG_SYSTEM_EXTRA_CERTIFICATE */
->
->         .align 8
-> -       .globl VMLINUX_SYMBOL(system_certificate_list_size)
-> -VMLINUX_SYMBOL(system_certificate_list_size):
-> +       .globl system_certificate_list_size
-> +system_certificate_list_size:
->  #ifdef CONFIG_64BIT
->         .quad __cert_list_end - __cert_list_start
->  #else
-> diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-> index f173b5f..7b75ff6 100644
-> --- a/include/asm-generic/vmlinux.lds.h
-> +++ b/include/asm-generic/vmlinux.lds.h
-> @@ -54,8 +54,6 @@
->  #define LOAD_OFFSET 0
->  #endif
->
-> -#include <linux/export.h>
-> -
->  /* Align . to a 8 byte boundary equals to maximum function alignment. */
->  #define ALIGN_FUNCTION()  . = ALIGN(8)
->
-> diff --git a/include/linux/export.h b/include/linux/export.h
-> index b768d6d..c363bde 100644
-> --- a/include/linux/export.h
-> +++ b/include/linux/export.h
-> @@ -10,13 +10,6 @@
->   * hackers place grumpy comments in header files.
->   */
->
-> -#define __VMLINUX_SYMBOL(x) x
-> -#define __VMLINUX_SYMBOL_STR(x) #x
-> -
-> -/* Indirect, so macros are expanded before pasting. */
-> -#define VMLINUX_SYMBOL(x) __VMLINUX_SYMBOL(x)
-> -#define VMLINUX_SYMBOL_STR(x) __VMLINUX_SYMBOL_STR(x)
-> -
->  #ifndef __ASSEMBLY__
->  struct kernel_symbol
->  {
-> diff --git a/usr/initramfs_data.S b/usr/initramfs_data.S
-> index b28da79..d07648f 100644
-> --- a/usr/initramfs_data.S
-> +++ b/usr/initramfs_data.S
-> @@ -30,8 +30,8 @@ __irf_start:
->  .incbin __stringify(INITRAMFS_IMAGE)
->  __irf_end:
->  .section .init.ramfs.info,"a"
-> -.globl VMLINUX_SYMBOL(__initramfs_size)
-> -VMLINUX_SYMBOL(__initramfs_size):
-> +.globl __initramfs_size
-> +__initramfs_size:
->  #ifdef CONFIG_64BIT
->         .quad __irf_end - __irf_start
->  #else
 > --
-> 2.7.4
->
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
