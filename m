@@ -1,56 +1,142 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:53488 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725953AbeHSStx (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:63364 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726005AbeHTITY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 19 Aug 2018 14:49:53 -0400
-Subject: Re: make *config regression: pkg-build
-References: <alpine.LRH.2.21.1808191406030.12334@math.ut.ee>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <177f25ad-de40-ce3f-987f-ac34c2559be4@infradead.org>
-Date: Sun, 19 Aug 2018 08:37:59 -0700
+        Mon, 20 Aug 2018 04:19:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.21.1808191406030.12334@math.ut.ee>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180818181017.1246-2-paul.burton@mips.com>
+References: <20180818181017.1246-1-paul.burton@mips.com> <20180818181017.1246-2-paul.burton@mips.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 20 Aug 2018 14:04:24 +0900
+Message-ID: <CAK7LNASM_ZThZRwFQJFaYqurqUVayNGPM6c7gnuHERYN7T4M3g@mail.gmail.com>
+Subject: Re: [PATCH v8 1/2] kbuild: Allow asm-specific compiler_types.h
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Meelis Roos <mroos@linux.ee>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Linux Kernel list <linux-kernel@vger.kernel.org>
+To: Paul Burton <paul.burton@mips.com>
+Cc: Linux-MIPS <linux-mips@linux-mips.org>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, James Hogan <jhogan@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ralf Baechle <ralf@linux-mips.org>
 
-On 08/19/2018 04:15 AM, Meelis Roos wrote:
-> Just tried to run 'make menuconfig' on v4.18-10568-g08b5fa819970 and 
-> found a bad surprise:
-> 
-> 'make *config' requires 'pkg-config'. Please install it.
-> make[1]: *** [scripts/kconfig/Makefile:219: scripts/kconfig/.mconf-cfg] Error 1
-> 
-> This is clearly a regression - I have libncurses devele pakcage 
-> installed in the default system location (as do 99%+ on actuall 
-> develeopers proobably) and in this case, pkg-config is useless. 
-> pkg-config is needed only when libraries and headers are installed in 
-> non-default locations but it is bad to require installation of 
-> pkg-config on all the machines where make menuconfig would be possibly 
-> run (for example, I have a aboult 100 machine kernel testbed with 
-> self-hosted kernel compilation and machine-specific kernel 
-> configurations that ocassionally need tweaking).
-> 
-> I notice 4.18 complained it can not find pkg-config but still worked. 
-> This is clearly better than now.
+Hi Paul,
+
+
+2018-08-19 3:10 GMT+09:00 Paul Burton <paul.burton@mips.com>:
+> We have a need to override the definition of
+> barrier_before_unreachable() for MIPS, which means we either need to add
+> architecture-specific code into linux/compiler-gcc.h or we need to allow
+> the architecture to provide a header that can define the macro before
+> the generic definition. The latter seems like the better approach.
 >
-> If we want to support developers with libraries in non-default 
-> locations, why not - but the common case of system include path should 
-> work without any trouble or warnings. For exaple, test if compilation 
-> against ncurses works, and if not retry it with pkg-config (and error 
-> out if it does not give working result).
-> 
+> A straightforward approach to the per-arch header is to make use of
+> asm-generic to provide a default empty header & adjust architectures
+> which don't need anything specific to make use of that by adding the
+> header to generic-y. Unfortunately this doesn't work so well due to
+> commit a95b37e20db9 ("kbuild: get <linux/compiler_types.h> out of
+> <linux/kconfig.h>") which moved the inclusion of linux/compiler.h to
+> cflags using the -include compiler flag.
+>
+> Because the -include flag is present for all C files we compile, we need
+> the architecture-provided header to be present before any C files are
+> compiled. If any C files can be compiled prior to the asm-generic header
+> wrappers being generated then we hit a build failure due to missing
+> header. Such cases do exist - one pointed out by the kbuild test robot
+> is the compilation of arch/ia64/kernel/nr-irqs.c, which occurs as part
+> of the archprepare target [1].
+>
+> This leaves us with a few options:
+>
+>   1) Use generic-y & fix any build failures we find by enforcing
+>      ordering such that the asm-generic target occurs before any C
+>      compilation, such that linux/compiler_types.h can always include
+>      the generated asm-generic wrapper which in turn includes the empty
+>      asm-generic header. This would rely on us finding all the
+>      problematic cases - I don't know for sure that the ia64 issue is
+>      the only one.
+>
+>   2) Add an actual empty header to each architecture, so that we don't
+>      need the generated asm-generic wrapper. This seems messy.
+>
+>   3) Give up & add #ifdef CONFIG_MIPS or similar to
+>      linux/compiler_types.h. This seems messy too.
+>
+>   4) Include the arch header only when it's actually needed, removing
+>      the need for the asm-generic wrapper for all other architectures.
+>
+> This patch allows us to use approach 4, by including an
+> asm/compiler_types.h header using the -include flag in the same way we
+> do for linux/compiler_types.h, but only if the header actually exists.
 
-Hi,
-This is due to my patch: 4ab3b80159d4db63b902ef635d4b5e882911b2da.
 
-Yamada-san, any ideas?  Feel free to just revert it.
+I agree with the approach 4),
+but I am of two minds about how to implement it.
 
-thanks,
+
+I guess the cost of evaluating 'wildcard' for each C file
+is unnoticeable level, but I am slightly in favor of
+including <asm/compilr_types.h> from <linux/compiler_types.h>
+conditionally.
+
+I am not sure about the CONFIG name, but for example, like this.
+
+#ifdef CONFIG_HAVE_ARCH_COMPILER_TYPES
+#include <asm/compiler_types.h>
+#endif
+
+
+What do you think?
+
+
+
+
+
+
+> [1] https://lists.01.org/pipermail/kbuild-all/2018-August/051175.html
+>
+> Signed-off-by: Paul Burton <paul.burton@mips.com>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: James Hogan <jhogan@kernel.org>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Ralf Baechle <ralf@linux-mips.org>
+> Cc: linux-arch@vger.kernel.org
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-mips@linux-mips.org
+>
+> ---
+> Any thoughts anyone?
+>
+> This isn't the prettiest it could possibly be but it's a small change &
+> clearly shouldn't break anything, which are good qualities for a patch
+> fixing build failures that we'd ideally backport as far as 4.16.
+>
+> Changes in v8:
+> - New patch.
+>
+>  scripts/Makefile.lib | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 1bb594fcfe12..4e7b41ef029b 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -151,8 +151,11 @@ __a_flags  = $(call flags,_a_flags)
+>  __cpp_flags     = $(call flags,_cpp_flags)
+>  endif
+>
+> +c_includes     = $(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/compiler_types.h)
+> +c_includes     += $(srctree)/include/linux/compiler_types.h
+> +
+>  c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+> -                -include $(srctree)/include/linux/compiler_types.h       \
+> +                $(addprefix -include ,$(c_includes))                     \
+>                  $(__c_flags) $(modkern_cflags)                           \
+>                  $(basename_flags) $(modname_flags)
+>
+> --
+> 2.18.0
+>
+
+
+
 -- 
-~Randy
+Best Regards
+Masahiro Yamada
