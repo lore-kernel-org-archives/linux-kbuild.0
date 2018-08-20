@@ -1,142 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:63364 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726005AbeHTITY (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:31339 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726024AbeHTTE4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Aug 2018 04:19:24 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180818181017.1246-2-paul.burton@mips.com>
-References: <20180818181017.1246-1-paul.burton@mips.com> <20180818181017.1246-2-paul.burton@mips.com>
+        Mon, 20 Aug 2018 15:04:56 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 20 Aug 2018 14:04:24 +0900
-Message-ID: <CAK7LNASM_ZThZRwFQJFaYqurqUVayNGPM6c7gnuHERYN7T4M3g@mail.gmail.com>
-Subject: Re: [PATCH v8 1/2] kbuild: Allow asm-specific compiler_types.h
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] initramfs: move gen_initramfs_list.sh from scripts/ to usr/
+Date: Tue, 21 Aug 2018 00:47:07 +0900
+Message-Id: <1534780028-6479-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Burton <paul.burton@mips.com>
-Cc: Linux-MIPS <linux-mips@linux-mips.org>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, James Hogan <jhogan@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ralf Baechle <ralf@linux-mips.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Andrzej Pietrasiewicz <andrzej.p@samsung.com>, =?UTF-8?q?Bj=8F=A9=CCrn=20Forsman?= <bjorn.forsman@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, Michael Forney <forney@google.com>, Jonathan Corbet <corbet@lwn.net>, Philippe Ombredanne <pombredanne@nexb.com>, Kate Stewart <kstewart@linuxfoundation.org>, Florian Fainelli <f.fainelli@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org
 
-Hi Paul,
+scripts/gen_initramfs_list.sh is only invoked from usr/Makefile.
+Move it so that all tools to create initramfs are self-contained
+in the usr/ directory.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-2018-08-19 3:10 GMT+09:00 Paul Burton <paul.burton@mips.com>:
-> We have a need to override the definition of
-> barrier_before_unreachable() for MIPS, which means we either need to add
-> architecture-specific code into linux/compiler-gcc.h or we need to allow
-> the architecture to provide a header that can define the macro before
-> the generic definition. The latter seems like the better approach.
->
-> A straightforward approach to the per-arch header is to make use of
-> asm-generic to provide a default empty header & adjust architectures
-> which don't need anything specific to make use of that by adding the
-> header to generic-y. Unfortunately this doesn't work so well due to
-> commit a95b37e20db9 ("kbuild: get <linux/compiler_types.h> out of
-> <linux/kconfig.h>") which moved the inclusion of linux/compiler.h to
-> cflags using the -include compiler flag.
->
-> Because the -include flag is present for all C files we compile, we need
-> the architecture-provided header to be present before any C files are
-> compiled. If any C files can be compiled prior to the asm-generic header
-> wrappers being generated then we hit a build failure due to missing
-> header. Such cases do exist - one pointed out by the kbuild test robot
-> is the compilation of arch/ia64/kernel/nr-irqs.c, which occurs as part
-> of the archprepare target [1].
->
-> This leaves us with a few options:
->
->   1) Use generic-y & fix any build failures we find by enforcing
->      ordering such that the asm-generic target occurs before any C
->      compilation, such that linux/compiler_types.h can always include
->      the generated asm-generic wrapper which in turn includes the empty
->      asm-generic header. This would rely on us finding all the
->      problematic cases - I don't know for sure that the ia64 issue is
->      the only one.
->
->   2) Add an actual empty header to each architecture, so that we don't
->      need the generated asm-generic wrapper. This seems messy.
->
->   3) Give up & add #ifdef CONFIG_MIPS or similar to
->      linux/compiler_types.h. This seems messy too.
->
->   4) Include the arch header only when it's actually needed, removing
->      the need for the asm-generic wrapper for all other architectures.
->
-> This patch allows us to use approach 4, by including an
-> asm/compiler_types.h header using the -include flag in the same way we
-> do for linux/compiler_types.h, but only if the header actually exists.
+ Documentation/early-userspace/README                 | 6 +++---
+ Documentation/filesystems/ramfs-rootfs-initramfs.txt | 2 +-
+ usr/Makefile                                         | 2 +-
+ {scripts => usr}/gen_initramfs_list.sh               | 0
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+ rename {scripts => usr}/gen_initramfs_list.sh (100%)
 
-
-I agree with the approach 4),
-but I am of two minds about how to implement it.
-
-
-I guess the cost of evaluating 'wildcard' for each C file
-is unnoticeable level, but I am slightly in favor of
-including <asm/compilr_types.h> from <linux/compiler_types.h>
-conditionally.
-
-I am not sure about the CONFIG name, but for example, like this.
-
-#ifdef CONFIG_HAVE_ARCH_COMPILER_TYPES
-#include <asm/compiler_types.h>
-#endif
-
-
-What do you think?
-
-
-
-
-
-
-> [1] https://lists.01.org/pipermail/kbuild-all/2018-August/051175.html
->
-> Signed-off-by: Paul Burton <paul.burton@mips.com>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: James Hogan <jhogan@kernel.org>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Ralf Baechle <ralf@linux-mips.org>
-> Cc: linux-arch@vger.kernel.org
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: linux-mips@linux-mips.org
->
-> ---
-> Any thoughts anyone?
->
-> This isn't the prettiest it could possibly be but it's a small change &
-> clearly shouldn't break anything, which are good qualities for a patch
-> fixing build failures that we'd ideally backport as far as 4.16.
->
-> Changes in v8:
-> - New patch.
->
->  scripts/Makefile.lib | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 1bb594fcfe12..4e7b41ef029b 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -151,8 +151,11 @@ __a_flags  = $(call flags,_a_flags)
->  __cpp_flags     = $(call flags,_cpp_flags)
->  endif
->
-> +c_includes     = $(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/compiler_types.h)
-> +c_includes     += $(srctree)/include/linux/compiler_types.h
-> +
->  c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
-> -                -include $(srctree)/include/linux/compiler_types.h       \
-> +                $(addprefix -include ,$(c_includes))                     \
->                  $(__c_flags) $(modkern_cflags)                           \
->                  $(basename_flags) $(modname_flags)
->
-> --
-> 2.18.0
->
-
-
-
+diff --git a/Documentation/early-userspace/README b/Documentation/early-userspace/README
+index 2c00b07..1e10579 100644
+--- a/Documentation/early-userspace/README
++++ b/Documentation/early-userspace/README
+@@ -66,17 +66,17 @@ early userspace image can be built by an unprivileged user.
+ 
+ As a technical note, when directories and files are specified, the
+ entire CONFIG_INITRAMFS_SOURCE is passed to
+-scripts/gen_initramfs_list.sh.  This means that CONFIG_INITRAMFS_SOURCE
++usr/gen_initramfs_list.sh.  This means that CONFIG_INITRAMFS_SOURCE
+ can really be interpreted as any legal argument to
+ gen_initramfs_list.sh.  If a directory is specified as an argument then
+ the contents are scanned, uid/gid translation is performed, and
+ usr/gen_init_cpio file directives are output.  If a directory is
+-specified as an argument to scripts/gen_initramfs_list.sh then the
++specified as an argument to usr/gen_initramfs_list.sh then the
+ contents of the file are simply copied to the output.  All of the output
+ directives from directory scanning and file contents copying are
+ processed by usr/gen_init_cpio.
+ 
+-See also 'scripts/gen_initramfs_list.sh -h'.
++See also 'usr/gen_initramfs_list.sh -h'.
+ 
+ Where's this all leading?
+ =========================
+diff --git a/Documentation/filesystems/ramfs-rootfs-initramfs.txt b/Documentation/filesystems/ramfs-rootfs-initramfs.txt
+index b176928..79637d2 100644
+--- a/Documentation/filesystems/ramfs-rootfs-initramfs.txt
++++ b/Documentation/filesystems/ramfs-rootfs-initramfs.txt
+@@ -164,7 +164,7 @@ Documentation/early-userspace/README for more details.)
+ The kernel does not depend on external cpio tools.  If you specify a
+ directory instead of a configuration file, the kernel's build infrastructure
+ creates a configuration file from that directory (usr/Makefile calls
+-scripts/gen_initramfs_list.sh), and proceeds to package up that directory
++usr/gen_initramfs_list.sh), and proceeds to package up that directory
+ using the config file (by feeding it to usr/gen_init_cpio, which is created
+ from usr/gen_init_cpio.c).  The kernel's build-time cpio creation code is
+ entirely self-contained, and the kernel's boot-time extractor is also
+diff --git a/usr/Makefile b/usr/Makefile
+index 237a028..748f6a6 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -24,7 +24,7 @@ $(obj)/initramfs_data.o: $(obj)/$(datafile_y) FORCE
+ # Generate the initramfs cpio archive
+ 
+ hostprogs-y := gen_init_cpio
+-initramfs   := $(CONFIG_SHELL) $(srctree)/scripts/gen_initramfs_list.sh
++initramfs   := $(CONFIG_SHELL) $(srctree)/$(src)/gen_initramfs_list.sh
+ ramfs-input := $(if $(filter-out "",$(CONFIG_INITRAMFS_SOURCE)), \
+ 			$(shell echo $(CONFIG_INITRAMFS_SOURCE)),-d)
+ ramfs-args  := \
+diff --git a/scripts/gen_initramfs_list.sh b/usr/gen_initramfs_list.sh
+similarity index 100%
+rename from scripts/gen_initramfs_list.sh
+rename to usr/gen_initramfs_list.sh
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
