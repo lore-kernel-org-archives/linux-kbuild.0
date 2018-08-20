@@ -1,113 +1,188 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:52008 "EHLO mx1.suse.de"
+Received: from mail-by2nam03on0110.outbound.protection.outlook.com ([104.47.42.110]:2896
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726099AbeHUAuy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Aug 2018 20:50:54 -0400
-Date: Mon, 20 Aug 2018 23:33:31 +0200
-From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
-Subject: Re: due to kconfig changes kernel config file is no longer
- sufficient for configuring the kernel
-Message-ID: <20180820233331.08dd2bfb@naga.suse.cz>
-In-Reply-To: <CAK7LNATCktToMui4NYxoUXV8ZbuDK8F0JCp_CysEWaSBPUP7NQ@mail.gmail.com>
-References: <20180627143705.5a1fed1c@kitsune.suse.cz>
-        <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
-        <20180628111623.3807fe9b@naga.suse.cz>
-        <CAK7LNARRKU7Mfa8ZBu1qPFYFRr-5k69sjVyERM2bYcnWoBDN8g@mail.gmail.com>
-        <20180806200725.4efa5d35@kitsune.suse.cz>
-        <CAK7LNATCktToMui4NYxoUXV8ZbuDK8F0JCp_CysEWaSBPUP7NQ@mail.gmail.com>
+        id S1726620AbeHUByk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 20 Aug 2018 21:54:40 -0400
+From: Paul Burton <paul.burton@mips.com>
+Subject: [PATCH v9 2/2] MIPS: Workaround GCC __builtin_unreachable reordering bug
+Date: Mon, 20 Aug 2018 15:36:18 -0700
+Message-Id: <20180820223618.22319-3-paul.burton@mips.com>
+In-Reply-To: <20180820223618.22319-1-paul.burton@mips.com>
+References: <20180820183417.dejfsluih7elbclu@pburton-laptop>
+ <20180820223618.22319-1-paul.burton@mips.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Takashi Iwai <tiwai@suse.de>, Andreas Schwab <schwab@suse.de>, Michal Kubecek <mkubecek@suse.cz>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org
+To: linux-mips@linux-mips.org
+Cc: linux-arch@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, James Hogan <jhogan@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Paul Burton <paul.burton@mips.com>, Ralf Baechle <ralf@linux-mips.org>
 
-Hello,
+Some versions of GCC for the MIPS architecture suffer from a bug which
+can lead to instructions from beyond an unreachable statement being
+incorrectly reordered into earlier branch delay slots if the unreachable
+statement is the only content of a case in a switch statement. This can
+lead to seemingly random behaviour, such as invalid memory accesses from
+incorrectly reordered loads or stores, and link failures on microMIPS
+builds.
 
-On Tue, 21 Aug 2018 03:15:12 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+See this potential GCC fix for details:
 
-> 2018-08-07 3:07 GMT+09:00 Michal Suchánek <msuchanek@suse.de>:
-> > On Mon, 30 Jul 2018 17:02:42 +0900
-> > Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-> >  
-> >> 2018-06-28 18:16 GMT+09:00 Michal Suchánek <msuchanek@suse.de>:  
-> >> > On Wed, 27 Jun 2018 23:07:21 +0900
-> >> > Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-> >> >  
+    https://gcc.gnu.org/ml/gcc-patches/2015-09/msg00360.html
 
-> >>
-> >>
-> >>  
-> >> >>
-> >> >> out-of-tree modules are built with exactly the same
-> >> >> configuration as used for the kernel.  
-> >> >
-> >> > It is not true. And that is the problem. You need the config file
-> >> > and dump of the environment passed to the make command at
-> >> > configuration time to get the exact same configuration. The
-> >> > environment is not saved anywhere, though.  
-> >>
-> >>
-> >> Why dump of the environment?
-> >>
-> >>
-> >> If you are building external modules natively
-> >> your distribution provides /lib/modules/$(uname -r)/build,
-> >> which contains files enough for building external modules.
-> >>
-> >> You can pass the directory path to M=... parameter.  That's it.  
-> >
-> > No, that's not it. Since passing ARCH=i386 is the de-facto standard
-> > to configure a 32bit kernel and the result of passing that was not
-> > saved you need to pass it to make as well.  
-> 
-> 
-> If you pass ARCH= for the configuration phase,
-> you need to pass the same ARCH= in the build phase.
-> 
-> 
-> 
-> 
-> What I can suggest for you is:
-> 
-> 
-> $ make ARCH=i386 defconfig
-> $ make ARCH=i386
-> 
->    OR
-> 
-> $ make i386_defconfig
-> $ make
+Runtime problems resulting from this bug were initially observed using a
+maltasmvp_defconfig v4.4 kernel built using GCC 4.9.2 (from a Codescape
+SDK 2015.06-05 toolchain), with the result being an address exception
+taken after log messages about the L1 caches (during probe of the L2
+cache):
 
-Maybe you missed that but I do not want to build the defconfig. I want
-to build a *particular* config which has been saved in a file
-beforehand.
-> 
-> > And you need to patch a number of
-> > 3rd party build scripts that build a kernel module as part of a
-> > bigger project.  
-> 
-> 
-> You do not need to patch a number of scripts.
-> 
-> Just one liner fix.
-> Add 'export ARCH=i386' in the top level script.
+    Initmem setup node 0 [mem 0x0000000080000000-0x000000009fffffff]
+    VPE topology {2,2} total 4
+    Primary instruction cache 64kB, VIPT, 4-way, linesize 32 bytes.
+    Primary data cache 64kB, 4-way, PIPT, no aliases, linesize 32 bytes
+    <AdEL exception here>
 
-And that does not work because there is no toplevel script. rpm has
-three toplevel scripts - prep, build and install.
+This is early enough that the kernel exception vectors are not in use,
+so any further output depends upon the bootloader. This is reproducible
+in QEMU where no further output occurs - ie. the system hangs here.
+Given the nature of the bug it may potentially be hit with differing
+symptoms. The bug is known to affect GCC versions as recent as 7.3, and
+it is unclear whether GCC 8 fixed it or just happens not to encounter
+the bug in the testcase found at the link above due to differing
+optimizations.
 
-Building out-of-tree module is another toplevel script.
+This bug can be worked around by placing a volatile asm statement, which
+GCC is prevented from reordering past, prior to the
+__builtin_unreachable call.
 
-And it does not suffice to 'export ARCH=i386'. What if it was a 64bit
-config? How do I tell?
+That was actually done already for other reasons by commit 173a3efd3edb
+("bug.h: work around GCC PR82365 in BUG()"), but creates problems for
+microMIPS builds due to the lack of a .insn directive. The microMIPS ISA
+allows for interlinking with regular MIPS32 code by repurposing bit 0 of
+the program counter as an ISA mode bit. To switch modes one changes the
+value of this bit in the PC. However typical branch instructions encode
+their offsets as multiples of 2-byte instruction halfwords, which means
+they cannot change ISA mode - this must be done using either an indirect
+branch (a jump-register in MIPS terminology) or a dedicated jalx
+instruction. In order to ensure that regular branches don't attempt to
+target code in a different ISA which they can't actually switch to, the
+linker will check that branch targets are code in the same ISA as the
+branch.
 
-With more and more options left out of the config that depend on
-compiler features, environment variables, phase of the moon or whatnot
-you can't even tell what kind of kernel the user is running by looking
-at the config.
+Unfortunately our empty asm volatile statements don't qualify as code,
+and the link for microMIPS builds fails with errors such as:
 
-Thanks
+    arch/mips/mm/dma-default.s:3265: Error: branch to a symbol in another ISA mode
+    arch/mips/mm/dma-default.s:5027: Error: branch to a symbol in another ISA mode
 
-Michal
+Resolve this by adding a .insn directive within the asm statement which
+declares that what comes next is code. This may or may not be true,
+since we don't really know what comes next, but as this code is in an
+unreachable path anyway that doesn't matter since we won't execute it.
+
+We do this in asm/compiler.h & select CONFIG_HAVE_ARCH_COMPILER_H in
+order to have this included by linux/compiler_types.h after
+linux/compiler-gcc.h. This will result in asm/compiler.h being included
+in all C compilations via the -include linux/compiler_types.h argument
+in c_flags, which should be harmless.
+
+Signed-off-by: Paul Burton <paul.burton@mips.com>
+Fixes: 173a3efd3edb ("bug.h: work around GCC PR82365 in BUG()")
+Cc: James Hogan <jhogan@kernel.org>
+Cc: Ralf Baechle <ralf@linux-mips.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-mips@linux-mips.org
+
+---
+
+Changes in v9:
+- Move back to asm/compiler.h to match changes in patch 1.
+- #undef before #define since we're now including this after
+  linux/compiler-gcc.h.
+
+Changes in v8:
+- Move to asm/compiler_types.h to suit patch 1.
+- Commit message improvements.
+- Drop James' SoB since this changed a fair bit since he added it.
+
+Changes in v7:
+- Elaborate on affected GCC versions in comment.
+
+Changes in v6: None
+
+Changes in v5:
+- Comment & commit message tweaks.
+
+Changes in v4: None
+
+Changes in v3:
+- Forward port to v4.17-rc and update commit message.
+- Drop stable tag for now.
+
+Changes in v2:
+- Remove generic-y entry.
+
+ arch/mips/Kconfig                |  1 +
+ arch/mips/include/asm/compiler.h | 35 ++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
+
+diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
+index 2af13b162e5e..35511999156a 100644
+--- a/arch/mips/Kconfig
++++ b/arch/mips/Kconfig
+@@ -33,6 +33,7 @@ config MIPS
+ 	select GENERIC_SMP_IDLE_THREAD
+ 	select GENERIC_TIME_VSYSCALL
+ 	select HANDLE_DOMAIN_IRQ
++	select HAVE_ARCH_COMPILER_H
+ 	select HAVE_ARCH_JUMP_LABEL
+ 	select HAVE_ARCH_KGDB
+ 	select HAVE_ARCH_MMAP_RND_BITS if MMU
+diff --git a/arch/mips/include/asm/compiler.h b/arch/mips/include/asm/compiler.h
+index e081a265f422..cc2eb1b06050 100644
+--- a/arch/mips/include/asm/compiler.h
++++ b/arch/mips/include/asm/compiler.h
+@@ -8,6 +8,41 @@
+ #ifndef _ASM_COMPILER_H
+ #define _ASM_COMPILER_H
+ 
++/*
++ * With GCC 4.5 onwards we can use __builtin_unreachable to indicate to the
++ * compiler that a particular code path will never be hit. This allows it to be
++ * optimised out of the generated binary.
++ *
++ * Unfortunately at least GCC 4.6.3 through 7.3.0 inclusive suffer from a bug
++ * that can lead to instructions from beyond an unreachable statement being
++ * incorrectly reordered into earlier delay slots if the unreachable statement
++ * is the only content of a case in a switch statement. This can lead to
++ * seemingly random behaviour, such as invalid memory accesses from incorrectly
++ * reordered loads or stores. See this potential GCC fix for details:
++ *
++ *   https://gcc.gnu.org/ml/gcc-patches/2015-09/msg00360.html
++ *
++ * It is unclear whether GCC 8 onwards suffer from the same issue - nothing
++ * relevant is mentioned in GCC 8 release notes and nothing obviously relevant
++ * stands out in GCC commit logs, but these newer GCC versions generate very
++ * different code for the testcase which doesn't exhibit the bug.
++ *
++ * GCC also handles stack allocation suboptimally when calling noreturn
++ * functions or calling __builtin_unreachable():
++ *
++ *   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82365
++ *
++ * We work around both of these issues by placing a volatile asm statement,
++ * which GCC is prevented from reordering past, prior to __builtin_unreachable
++ * calls.
++ *
++ * The .insn statement is required to ensure that any branches to the
++ * statement, which sadly must be kept due to the asm statement, are known to
++ * be branches to code and satisfy linker requirements for microMIPS kernels.
++ */
++#undef barrier_before_unreachable
++#define barrier_before_unreachable() asm volatile(".insn")
++
+ #if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)
+ #define GCC_IMM_ASM() "n"
+ #define GCC_REG_ACCUM "$0"
+-- 
+2.18.0
