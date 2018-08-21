@@ -1,117 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:33129 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725734AbeHUG5N (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Aug 2018 02:57:13 -0400
-Date: Tue, 21 Aug 2018 13:38:42 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [Skiboot] [PATCH] opal/hmi: Wakeup the cpu before reading
- core_fir
-Message-ID: <20180821133842.1b13e972@roar.ozlabs.ibm.com>
-In-Reply-To: <20180820140605.11846-1-vaibhav@linux.ibm.com>
-References: <20180820183417.dejfsluih7elbclu@pburton-laptop>
-        <20180820223618.22319-1-paul.burton@mips.com>
-        <20180820223618.22319-2-paul.burton@mips.com>
-        <20180820140605.11846-1-vaibhav@linux.ibm.com>
+Received: from mail.hmha.gob.ec ([190.11.21.43]:45840 "EHLO mail.hmha.gob.ec"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726115AbeHUJX3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 21 Aug 2018 05:23:29 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: =?utf-8?b?V29obHTDpHRpZ2tlaXRzc3BlbmRlIGluIEjDtmhlIHZvbiDigqwgMi4wMDAu?=
+ =?utf-8?q?000=2C00_EUR?=
+From: ines_valdiviezo@hmha.gob.ec
+Date: Mon, 20 Aug 2018 17:21:55 -0700
+Reply-To: attorney.ramanala@gmail.com
+Message-Id: <20180821002158.2AA8B2125759@mail.hmha.gob.ec>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vaibhav Jain <vaibhav@linux.ibm.com>
-Cc: "Gautham R . Shenoy" <ego@linux.vnet.ibm.com>, Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>, Michael Neuling <mikey@neuling.org>, Stewart Smith <stewart@linux.ibm.com>, Linux-MIPS <linux-mips@linux-mips.org>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, James Hogan <jhogan@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ralf Baechle <ralf@linux-mips.org>
+To: Recipients <ines_valdiviezo@hmha.gob.ec>
 
-On Mon, 20 Aug 2018 19:36:05 +0530
-Vaibhav Jain <vaibhav@linux.ibm.com> wrote:
-
-> When stop state 5 is enabled, reading the core_fir during an HMI can
-> result in a xscom read error with xscom_read() returning the
-> OPAL_XSCOM_PARTIAL_GOOD error code and core_fir value of all FFs. At
-> present this return error code is not handled in decode_core_fir()
-> hence the invalid core_fir value is sent to the kernel where it
-> interprets it as a FATAL hmi causing a system check-stop.
-> 
-> This can be prevented by forcing the core to wake-up using before
-> reading the core_fir. Hence this patch wraps the call to
-> read_core_fir() within calls to dctl_set_special_wakeup() and
-> dctl_clear_special_wakeup().
-
-Would it be feasible to enumerate the ranges of scoms that require
-special wakeup and check for those in xscom_read/write, and warn if
-spwkup was not set?
-
-Thanks,
-Nick
-
-> 
-> Suggested-by: Michael Neuling <mikey@neuling.org>
-> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
-> Signed-off-by: Mahesh J Salgaonkar <mahesh@linux.vnet.ibm.com>
-> ---
->  core/hmi.c | 25 +++++++++++++++++--------
->  1 file changed, 17 insertions(+), 8 deletions(-)
-> 
-> diff --git a/core/hmi.c b/core/hmi.c
-> index 1f665a2f..67c520a0 100644
-> --- a/core/hmi.c
-> +++ b/core/hmi.c
-> @@ -379,7 +379,7 @@ static bool decode_core_fir(struct cpu_thread *cpu,
->  {
->  	uint64_t core_fir;
->  	uint32_t core_id;
-> -	int i;
-> +	int i, swkup_rc = OPAL_UNSUPPORTED;
->  	bool found = false;
->  	int64_t ret;
->  	const char *loc;
-> @@ -390,14 +390,15 @@ static bool decode_core_fir(struct cpu_thread *cpu,
->  
->  	core_id = pir_to_core_id(cpu->pir);
->  
-> +	/* Force the core to wakeup, otherwise reading core_fir is unrealiable
-> +	 * if stop-state 5 is enabled.
-> +	 */
-> +	swkup_rc = dctl_set_special_wakeup(cpu);
-> +
->  	/* Get CORE FIR register value. */
->  	ret = read_core_fir(cpu->chip_id, core_id, &core_fir);
->  
-> -	if (ret == OPAL_HARDWARE) {
-> -		prerror("XSCOM error reading CORE FIR\n");
-> -		/* If the FIR can't be read, we should checkstop. */
-> -		return true;
-> -	} else if (ret == OPAL_WRONG_STATE) {
-> +	if (ret == OPAL_WRONG_STATE) {
->  		/*
->  		 * CPU is asleep, so it probably didn't cause the checkstop.
->  		 * If no other HMI cause is found a "catchall" checkstop
-> @@ -407,11 +408,16 @@ static bool decode_core_fir(struct cpu_thread *cpu,
->  		prlog(PR_DEBUG,
->  		      "FIR read failed, chip %d core %d asleep\n",
->  		      cpu->chip_id, core_id);
-> -		return false;
-> +		goto out;
-> +	} else if (ret != OPAL_SUCCESS) {
-> +		prerror("XSCOM error reading CORE FIR\n");
-> +		/* If the FIR can't be read, we should checkstop. */
-> +		found = true;
-> +		goto out;
->  	}
->  
->  	if (!core_fir)
-> -		return false;
-> +		goto out;
->  
->  	loc = chip_loc_code(cpu->chip_id);
->  	prlog(PR_INFO, "[Loc: %s]: CHIP ID: %x, CORE ID: %x, FIR: %016llx\n",
-> @@ -426,6 +432,9 @@ static bool decode_core_fir(struct cpu_thread *cpu,
->  						|= xstop_bits[i].reason;
->  		}
->  	}
-> +out:
-> +	if (!swkup_rc)
-> +		dctl_clear_special_wakeup(cpu);
->  	return found;
->  }
->  
+Lieber Freund,
+ 
+Ich bin Herr Richard Wahl der Mega-Gewinner von $ 533M In Mega Millions Jackpot spende ich an 5 zufällige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Mail nach einem Spinball ausgewählt. Ich habe den größten Teil meines Vermögens auf eine Reihe von Wohltätigkeitsorganisationen und Organisationen verteilt. Ich habe mich freiwillig dazu entschieden, Ihnen den Betrag von € 2.000.000,00 zu spenden
+eine der ausgewählten 5, um meine Gewinne zu überprüfen, finden Sie auf meiner You Tube Seite unten.
+ 
+UHR MICH HIER: https://www.youtube.com/watch?v=tne02ExNDrw
+ 
+Das ist dein Spendencode: [DF00430342018]
+ 
+Antworten Sie mit dem Spendencode auf diese E-Mail: oceanicfinancialhome@gmail.com
+ 
+Ich hoffe, Sie und Ihre Familie glücklich zu machen.
+ 
+Grüße
+Herr Richard Wahl
