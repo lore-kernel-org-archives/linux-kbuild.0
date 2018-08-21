@@ -1,34 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.hmha.gob.ec ([190.11.21.43]:45840 "EHLO mail.hmha.gob.ec"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726115AbeHUJX3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Aug 2018 05:23:29 -0400
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-by2nam03on0104.outbound.protection.outlook.com ([104.47.42.104]:62696
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726872AbeHUUVf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 21 Aug 2018 16:21:35 -0400
+Date: Tue, 21 Aug 2018 10:00:34 -0700
+From: Paul Burton <paul.burton@mips.com>
+Subject: Re: [PATCH v9 1/2] kbuild: Allow arch-specific asm/compiler.h
+Message-ID: <20180821170034.rpnwukgnpyrpxytw@pburton-laptop>
+References: <20180820183417.dejfsluih7elbclu@pburton-laptop>
+ <20180820223618.22319-1-paul.burton@mips.com>
+ <20180820223618.22319-2-paul.burton@mips.com>
+ <CAK7LNASarMBH8af=oTPoanEvJOS3zWTKx4MpGZe-AJiP2Wu41g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: =?utf-8?b?V29obHTDpHRpZ2tlaXRzc3BlbmRlIGluIEjDtmhlIHZvbiDigqwgMi4wMDAu?=
- =?utf-8?q?000=2C00_EUR?=
-From: ines_valdiviezo@hmha.gob.ec
-Date: Mon, 20 Aug 2018 17:21:55 -0700
-Reply-To: attorney.ramanala@gmail.com
-Message-Id: <20180821002158.2AA8B2125759@mail.hmha.gob.ec>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNASarMBH8af=oTPoanEvJOS3zWTKx4MpGZe-AJiP2Wu41g@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <ines_valdiviezo@hmha.gob.ec>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux-MIPS <linux-mips@linux-mips.org>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, James Hogan <jhogan@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ralf Baechle <ralf@linux-mips.org>
 
-Lieber Freund,
- 
-Ich bin Herr Richard Wahl der Mega-Gewinner von $ 533M In Mega Millions Jackpot spende ich an 5 zufällige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Mail nach einem Spinball ausgewählt. Ich habe den größten Teil meines Vermögens auf eine Reihe von Wohltätigkeitsorganisationen und Organisationen verteilt. Ich habe mich freiwillig dazu entschieden, Ihnen den Betrag von € 2.000.000,00 zu spenden
-eine der ausgewählten 5, um meine Gewinne zu überprüfen, finden Sie auf meiner You Tube Seite unten.
- 
-UHR MICH HIER: https://www.youtube.com/watch?v=tne02ExNDrw
- 
-Das ist dein Spendencode: [DF00430342018]
- 
-Antworten Sie mit dem Spendencode auf diese E-Mail: oceanicfinancialhome@gmail.com
- 
-Ich hoffe, Sie und Ihre Familie glücklich zu machen.
- 
-Grüße
-Herr Richard Wahl
+Hi Masahiro,
+
+On Tue, Aug 21, 2018 at 11:49:48AM +0900, Masahiro Yamada wrote:
+> The code diff looks good to me.
+> 
+> Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+Thanks :)
+
+> > A straightforward approach to the per-arch header is to make use of
+> > asm-generic to provide a default empty header & adjust architectures
+> > which don't need anything specific to make use of that by adding the
+> > header to generic-y. Unfortunately this doesn't work so well due to
+> > commit a95b37e20db9 ("kbuild: get <linux/compiler_types.h> out of
+> > <linux/kconfig.h>") which moved the inclusion of linux/compiler.h to
+> > cflags using the -include compiler flag.
+>
+> I doubt this statement.
+> 
+> Commit a95b37e20db9 is not the cause of the problem.
+> 
+>%
+> 
+> The change happened in commit 28128c61e08e.
+
+You're correct - I'll fix that up.
+
+> One more thing, you are not touching any makefile in this version.
+> 
+> Maybe, you can prefix the subject with "compiler.h:" or something
+> instead of "kbuild:".
+
+Will do.
+
+Thanks,
+    Paul
