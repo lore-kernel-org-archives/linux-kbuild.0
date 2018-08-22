@@ -1,66 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:40546 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728534AbeHVRQx (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:41555 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727468AbeHVVRK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 22 Aug 2018 13:16:53 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: test dead code/data elimination support in Kconfig
-Date: Wed, 22 Aug 2018 22:51:09 +0900
-Message-Id: <1534945869-17117-1-git-send-email-yamada.masahiro@socionext.com>
+        Wed, 22 Aug 2018 17:17:10 -0400
+Received: by mail-pl0-f67.google.com with SMTP id p4-v6so1180445pll.8
+        for <linux-kbuild@vger.kernel.org>; Wed, 22 Aug 2018 10:51:19 -0700 (PDT)
+Date: Wed, 22 Aug 2018 10:51:17 -0700 (PDT)
+Subject: Re: [PATCH v2] kbuild: rename LDFLAGS to KBUILD_LDFLAGS
+In-Reply-To: <1534945405-16396-1-git-send-email-yamada.masahiro@socionext.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-5d4b0f73-4c16-4111-a203-dc8076a2f3bc@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, richard@nod.at, jdike@addtoit.com, x86@kernel.org, linux-um@lists.infradead.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, rmk+kernel@armlinux.org.uk, openrisc@lists.librecores.org, linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org
 
-This config option should be enabled only when both the compiler and
-the linker support necessary flags.  Add proper dependencies to Kconfig.
+On Wed, 22 Aug 2018 06:43:25 PDT (-0700), yamada.masahiro@socionext.com wrote:
+> Commit a0f97e06a43c ("kbuild: enable 'make CFLAGS=...' to add
+> additional options to CC") renamed CFLAGS to KBUILD_CFLAGS.
+>
+> Commit 222d394d30e7 ("kbuild: enable 'make AFLAGS=...' to add
+> additional options to AS") renamed AFLAGS to KBUILD_AFLAGS.
+>
+> Commit 06c5040cdb13 ("kbuild: enable 'make CPPFLAGS=...' to add
+> additional options to CPP") renamed CPPFLAGS to KBUILD_CPPFLAGS.
+>
+> For some reason, LDFLAGS was not renamed.
+>
+> Using a well-known variable like LDFLAGS may result in accidental
+> override of the variable.
+>
+> Kbuild generally uses KBUILD_ prefixed variables for the internally
+> appended options, so here is one more conversion to sanitize the
+> naming convention.
+>
+> I did not touch Makefiles under tools/ since the tools build system
+> is a different world.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> ---
+>
+> Changes in v2:
+>   - Rebased on Linus's tree
+>
+>  Makefile                           | 6 +++---
+>  arch/arc/Makefile                  | 2 +-
+>  arch/arm/Makefile                  | 4 ++--
+>  arch/arm64/Makefile                | 4 ++--
+>  arch/c6x/Makefile                  | 3 +--
+>  arch/h8300/Makefile                | 2 +-
+>  arch/hexagon/Makefile              | 4 +---
+>  arch/m68k/Makefile                 | 2 +-
+>  arch/microblaze/Makefile           | 4 ++--
+>  arch/mips/Makefile                 | 2 +-
+>  arch/mips/boot/compressed/Makefile | 2 +-
+>  arch/mips/lasat/image/Makefile     | 2 +-
+>  arch/nds32/Makefile                | 4 ++--
+>  arch/powerpc/Makefile              | 6 +++---
+>  arch/riscv/Makefile                | 4 ++--
+>  arch/s390/Makefile                 | 2 +-
+>  arch/sh/Makefile                   | 4 ++--
+>  arch/sparc/Makefile                | 4 ++--
+>  arch/um/Makefile                   | 2 +-
+>  arch/x86/Makefile                  | 4 ++--
+>  arch/x86/Makefile.um               | 4 ++--
+>  arch/x86/boot/compressed/Makefile  | 6 +++---
+>  arch/xtensa/Makefile               | 2 +-
+>  arch/xtensa/boot/boot-elf/Makefile | 2 +-
+>  scripts/Kbuild.include             | 4 ++--
+>  scripts/Makefile.build             | 4 ++--
+>  scripts/Makefile.lib               | 2 +-
+>  scripts/Makefile.modpost           | 2 +-
+>  28 files changed, 45 insertions(+), 48 deletions(-)
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+[...]
 
- Makefile     | 8 ++------
- init/Kconfig | 2 ++
- 2 files changed, 4 insertions(+), 6 deletions(-)
+> diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+> index 9ddd88b..61ec424 100644
+> --- a/arch/riscv/Makefile
+> +++ b/arch/riscv/Makefile
+> @@ -29,7 +29,7 @@ ifeq ($(CONFIG_ARCH_RV64I),y)
+>  	KBUILD_CFLAGS	+= $(call cc-ifversion, -ge, 0500, -DCONFIG_ARCH_SUPPORTS_INT128)
+>
+>  	KBUILD_MARCH = rv64im
+> -	LDFLAGS += -melf64lriscv
+> +	KBUILD_LDFLAGS += -melf64lriscv
+>  else
+>  	BITS := 32
+>  	UTS_MACHINE := riscv32
+> @@ -37,7 +37,7 @@ else
+>  	KBUILD_CFLAGS += -mabi=ilp32
+>  	KBUILD_AFLAGS += -mabi=ilp32
+>  	KBUILD_MARCH = rv32im
+> -	LDFLAGS += -melf32lriscv
+> +	KBUILD_LDFLAGS += -melf32lriscv
+>  endif
+>
+>  KBUILD_CFLAGS += -Wall
 
-diff --git a/Makefile b/Makefile
-index 1289a01..2e2b009 100644
---- a/Makefile
-+++ b/Makefile
-@@ -790,8 +790,8 @@ KBUILD_CFLAGS += $(call cc-option, -fno-inline-functions-called-once)
- endif
- 
- ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
--KBUILD_CFLAGS_KERNEL	+= $(call cc-option,-ffunction-sections,)
--KBUILD_CFLAGS_KERNEL	+= $(call cc-option,-fdata-sections,)
-+KBUILD_CFLAGS_KERNEL += -ffunction-sections -fdata-sections
-+LDFLAGS_vmlinux += --gc-sections
- endif
- 
- # arch Makefile may override CC so keep this after arch Makefile is included
-@@ -857,10 +857,6 @@ LDFLAGS_BUILD_ID := $(call ld-option, --build-id)
- KBUILD_LDFLAGS_MODULE += $(LDFLAGS_BUILD_ID)
- LDFLAGS_vmlinux += $(LDFLAGS_BUILD_ID)
- 
--ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
--LDFLAGS_vmlinux	+= $(call ld-option, --gc-sections,)
--endif
--
- ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
- LDFLAGS_vmlinux	+= $(call ld-option, -X,)
- endif
-diff --git a/init/Kconfig b/init/Kconfig
-index 9bd50ba..21b8559 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1085,6 +1085,8 @@ config LD_DEAD_CODE_DATA_ELIMINATION
- 	bool "Dead code and data elimination (EXPERIMENTAL)"
- 	depends on HAVE_LD_DEAD_CODE_DATA_ELIMINATION
- 	depends on EXPERT
-+	depends on $(cc-option,-ffunction-sections -fdata-sections)
-+	depends on $(ld-option,--gc-sections)
- 	help
- 	  Enable this if you want to do dead code and data elimination with
- 	  the linker by compiling with -ffunction-sections -fdata-sections,
--- 
-2.7.4
+Ah, thanks -- I'd noticed this when we were messing around in here recently and 
+assumed there was some reason for the non-orthogonality.  As far as the RISC-V 
+stuff goes, feel free to add a 
+
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+
+I can deal with the inevitable merge conflicts on our end, as they'll be 
+trivial :).
