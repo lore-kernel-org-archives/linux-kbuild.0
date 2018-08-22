@@ -1,451 +1,565 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f65.google.com ([209.85.218.65]:37738 "EHLO
-        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727790AbeHVBR2 (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:56741 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728947AbeHVRKE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Aug 2018 21:17:28 -0400
-From: Rob Herring <robh@kernel.org>
-Subject: [PATCH 6/8] kbuild: consolidate Devicetree dtb build rules
-Date: Tue, 21 Aug 2018 16:55:22 -0500
-Message-Id: <20180821215524.23040-7-robh@kernel.org>
-In-Reply-To: <20180821215524.23040-1-robh@kernel.org>
-References: <20180821215524.23040-1-robh@kernel.org>
+        Wed, 22 Aug 2018 13:10:04 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v2] kbuild: rename LDFLAGS to KBUILD_LDFLAGS
+Date: Wed, 22 Aug 2018 22:43:25 +0900
+Message-Id: <1534945405-16396-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Frank Rowand <frowand.list@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@mips.com>, James Hogan <jhogan@kernel.org>, Ley Foon Tan <lftan@altera.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, linux-kbuild@vger.kernel.org, linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org, uclinux-h8-devel@lists.sourceforge.jp, linux-mips@linux-mips.org, nios2-dev@lists.rocketboards.org, linuxppc-dev@lists.ozlabs.org, linux-xtensa@linux-xtensa.org
+To: linux-kbuild@vger.kernel.org
+Cc: Richard Weinberger <richard@nod.at>, x86@kernel.org, linux-um@lists.infradead.org, linux-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, openrisc@lists.librecores.org, Jeff Dike <jdike@addtoit.com>, linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-There is nothing arch specific about building dtb files other than their
-location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
-The dependencies and supported targets are all slightly different.
-Also, a cross-compiler for each arch is needed, but really the host
-compiler preprocessor is perfectly fine for building dtbs. Move the
-build rules to a common location and remove the arch specific ones. This
-is done in a single step to avoid warnings about overriding rules.
+Commit a0f97e06a43c ("kbuild: enable 'make CFLAGS=...' to add
+additional options to CC") renamed CFLAGS to KBUILD_CFLAGS.
 
-The build dependencies had been a mixture of 'scripts' and/or 'prepare'.
-These pull in several dependencies some of which need a target compiler
-(specifically devicetable-offsets.h) and aren't needed to build dtbs.
-All that is really needed is dtc, so adjust the dependencies to only be
-dtc.
+Commit 222d394d30e7 ("kbuild: enable 'make AFLAGS=...' to add
+additional options to AS") renamed AFLAGS to KBUILD_AFLAGS.
 
-This change enables support 'dtbs_install' on some arches which were
-missing the target.
+Commit 06c5040cdb13 ("kbuild: enable 'make CPPFLAGS=...' to add
+additional options to CPP") renamed CPPFLAGS to KBUILD_CPPFLAGS.
 
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: Vineet Gupta <vgupta@synopsys.com>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-Cc: Michal Simek <monstr@monstr.eu>
-Cc: Ralf Baechle <ralf@linux-mips.org>
-Cc: Paul Burton <paul.burton@mips.com>
-Cc: James Hogan <jhogan@kernel.org>
-Cc: Ley Foon Tan <lftan@altera.com>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Chris Zankel <chris@zankel.net>
-Cc: Max Filippov <jcmvbkbc@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
-Cc: linux-snps-arc@lists.infradead.org
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: uclinux-h8-devel@lists.sourceforge.jp
-Cc: linux-mips@linux-mips.org
-Cc: nios2-dev@lists.rocketboards.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Cc: linux-xtensa@linux-xtensa.org
-Signed-off-by: Rob Herring <robh@kernel.org>
+For some reason, LDFLAGS was not renamed.
+
+Using a well-known variable like LDFLAGS may result in accidental
+override of the variable.
+
+Kbuild generally uses KBUILD_ prefixed variables for the internally
+appended options, so here is one more conversion to sanitize the
+naming convention.
+
+I did not touch Makefiles under tools/ since the tools build system
+is a different world.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- Makefile                 | 30 ++++++++++++++++++++++++++++++
- arch/arc/Makefile        |  6 ------
- arch/arm/Makefile        | 20 +-------------------
- arch/arm64/Makefile      | 17 +----------------
- arch/c6x/Makefile        |  2 --
- arch/h8300/Makefile      | 11 +----------
- arch/microblaze/Makefile |  4 +---
- arch/mips/Makefile       | 15 +--------------
- arch/nds32/Makefile      |  2 +-
- arch/nios2/Makefile      |  7 -------
- arch/nios2/boot/Makefile |  4 ----
- arch/powerpc/Makefile    |  3 ---
- arch/xtensa/Makefile     | 12 +-----------
- scripts/Makefile         |  1 -
- scripts/Makefile.lib     |  2 +-
- 15 files changed, 38 insertions(+), 98 deletions(-)
+
+Changes in v2:
+  - Rebased on Linus's tree
+
+ Makefile                           | 6 +++---
+ arch/arc/Makefile                  | 2 +-
+ arch/arm/Makefile                  | 4 ++--
+ arch/arm64/Makefile                | 4 ++--
+ arch/c6x/Makefile                  | 3 +--
+ arch/h8300/Makefile                | 2 +-
+ arch/hexagon/Makefile              | 4 +---
+ arch/m68k/Makefile                 | 2 +-
+ arch/microblaze/Makefile           | 4 ++--
+ arch/mips/Makefile                 | 2 +-
+ arch/mips/boot/compressed/Makefile | 2 +-
+ arch/mips/lasat/image/Makefile     | 2 +-
+ arch/nds32/Makefile                | 4 ++--
+ arch/powerpc/Makefile              | 6 +++---
+ arch/riscv/Makefile                | 4 ++--
+ arch/s390/Makefile                 | 2 +-
+ arch/sh/Makefile                   | 4 ++--
+ arch/sparc/Makefile                | 4 ++--
+ arch/um/Makefile                   | 2 +-
+ arch/x86/Makefile                  | 4 ++--
+ arch/x86/Makefile.um               | 4 ++--
+ arch/x86/boot/compressed/Makefile  | 6 +++---
+ arch/xtensa/Makefile               | 2 +-
+ arch/xtensa/boot/boot-elf/Makefile | 2 +-
+ scripts/Kbuild.include             | 4 ++--
+ scripts/Makefile.build             | 4 ++--
+ scripts/Makefile.lib               | 2 +-
+ scripts/Makefile.modpost           | 2 +-
+ 28 files changed, 45 insertions(+), 48 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index c13f8b85ba60..6d89e673f192 100644
+index c4d7b4b..1289a01 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1212,6 +1212,30 @@ kselftest-merge:
- 		$(srctree)/tools/testing/selftests/*/config
- 	+$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
+@@ -440,7 +440,7 @@ KBUILD_CFLAGS_KERNEL :=
+ KBUILD_AFLAGS_MODULE  := -DMODULE
+ KBUILD_CFLAGS_MODULE  := -DMODULE
+ KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
+-LDFLAGS :=
++KBUILD_LDFLAGS :=
+ GCC_PLUGINS_CFLAGS :=
  
-+# ---------------------------------------------------------------------------
-+# Devicetree files
-+
-+dtstree := $(wildcard arch/$(SRCARCH)/boot/dts)
-+
-+ifdef CONFIG_OF_EARLY_FLATTREE
-+
-+%.dtb %.dtb.S %.dtb.o: | dtc
-+	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
-+
-+PHONY += dtbs
-+dtbs: | dtc
-+	$(Q)$(MAKE) $(build)=$(dtstree)
-+
-+dtbs_install: dtbs
-+	$(Q)$(MAKE) $(dtbinst)=$(dtstree)
-+
-+all: dtbs
-+
-+dtc:
-+	$(Q)$(MAKE) $(build)=scripts/dtc
-+
-+endif
-+
- # ---------------------------------------------------------------------------
- # Modules
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
+@@ -448,7 +448,7 @@ export CPP AR NM STRIP OBJCOPY OBJDUMP KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS
+ export MAKE LEX YACC AWK GENKSYMS INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
+ export HOSTCXX KBUILD_HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
  
-@@ -1425,6 +1449,12 @@ help:
- 	@echo  '  kselftest-merge - Merge all the config dependencies of kselftest to existing'
- 	@echo  '                    .config.'
- 	@echo  ''
-+	@$(if $(dtstree), \
-+		echo 'Devicetree:'; \
-+		echo '* dtbs            - Build device tree blobs for enabled boards'; \
-+		echo '  dtbs_install    - Install dtbs to $(INSTALL_DTBS_PATH)'; \
-+		echo '')
-+
- 	@echo 'Userspace tools targets:'
- 	@echo '  use "make tools/help"'
- 	@echo '  or  "cd tools; make help"'
+-export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
++export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
+ export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE
+ export CFLAGS_KASAN CFLAGS_KASAN_NOSANITIZE CFLAGS_UBSAN
+ export KBUILD_AFLAGS AFLAGS_KERNEL AFLAGS_MODULE
+@@ -1024,7 +1024,7 @@ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
+ 
+ # Final link of vmlinux with optional arch pass after final link
+ cmd_link-vmlinux =                                                 \
+-	$(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
++	$(CONFIG_SHELL) $< $(LD) $(KBUILD_LDFLAGS) $(LDFLAGS_vmlinux) ;    \
+ 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+ 
+ vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
 diff --git a/arch/arc/Makefile b/arch/arc/Makefile
-index 6c1b20dd76ad..cbfb7a16b570 100644
+index 6c1b20d..fb02619 100644
 --- a/arch/arc/Makefile
 +++ b/arch/arc/Makefile
-@@ -132,11 +132,5 @@ boot_targets += uImage uImage.bin uImage.gz
- $(boot_targets): vmlinux
- 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
+@@ -95,7 +95,7 @@ KBUILD_CFLAGS_MODULE	+= -mlong-calls -mno-millicode
+ # Finally dump eveything into kernel build system
+ KBUILD_CFLAGS	+= $(cflags-y)
+ KBUILD_AFLAGS	+= $(KBUILD_CFLAGS)
+-LDFLAGS		+= $(ldflags-y)
++KBUILD_LDFLAGS	+= $(ldflags-y)
  
--%.dtb %.dtb.S %.dtb.o: scripts
--	$(Q)$(MAKE) $(build)=$(boot)/dts $(boot)/dts/$@
--
--dtbs: scripts
--	$(Q)$(MAKE) $(build)=$(boot)/dts
--
- archclean:
- 	$(Q)$(MAKE) $(clean)=$(boot)
+ head-y		:= arch/arc/kernel/head.o
+ 
 diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-index e7d703d8fac3..7f02ef8dfdb2 100644
+index e7d703d..360f80a 100644
 --- a/arch/arm/Makefile
 +++ b/arch/arm/Makefile
-@@ -308,12 +308,7 @@ else
- KBUILD_IMAGE := $(boot)/zImage
+@@ -43,12 +43,12 @@ ifeq ($(CONFIG_CPU_BIG_ENDIAN),y)
+ KBUILD_CPPFLAGS	+= -mbig-endian
+ CHECKFLAGS	+= -D__ARMEB__
+ AS		+= -EB
+-LDFLAGS		+= -EB
++KBUILD_LDFLAGS	+= -EB
+ else
+ KBUILD_CPPFLAGS	+= -mlittle-endian
+ CHECKFLAGS	+= -D__ARMEL__
+ AS		+= -EL
+-LDFLAGS		+= -EL
++KBUILD_LDFLAGS	+= -EL
  endif
  
--# Build the DT binary blobs if we have OF configured
--ifeq ($(CONFIG_USE_OF),y)
--KBUILD_DTBS := dtbs
--endif
--
--all:	$(notdir $(KBUILD_IMAGE)) $(KBUILD_DTBS)
-+all:	$(notdir $(KBUILD_IMAGE))
- 
- 
- archheaders:
-@@ -340,17 +335,6 @@ $(BOOT_TARGETS): vmlinux
- $(INSTALL_TARGETS):
- 	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $@
- 
--%.dtb: | scripts
--	$(Q)$(MAKE) $(build)=$(boot)/dts MACHINE=$(MACHINE) $(boot)/dts/$@
--
--PHONY += dtbs dtbs_install
--
--dtbs: prepare scripts
--	$(Q)$(MAKE) $(build)=$(boot)/dts
--
--dtbs_install:
--	$(Q)$(MAKE) $(dtbinst)=$(boot)/dts
--
- PHONY += vdso_install
- vdso_install:
- ifeq ($(CONFIG_VDSO),y)
-@@ -372,8 +356,6 @@ define archhelp
-   echo  '  uImage        - U-Boot wrapped zImage'
-   echo  '  bootpImage    - Combined zImage and initial RAM disk'
-   echo  '                  (supply initrd image via make variable INITRD=<path>)'
--  echo  '* dtbs          - Build device tree blobs for enabled boards'
--  echo  '  dtbs_install  - Install dtbs to $(INSTALL_DTBS_PATH)'
-   echo  '  install       - Install uncompressed kernel'
-   echo  '  zinstall      - Install compressed kernel'
-   echo  '  uinstall      - Install U-Boot wrapped compressed kernel'
+ #
 diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index efe61a2e4b5e..5e7320b2212d 100644
+index efe61a2..106039d 100644
 --- a/arch/arm64/Makefile
 +++ b/arch/arm64/Makefile
-@@ -113,9 +113,8 @@ core-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
- # Default target when executing plain make
- boot		:= arch/arm64/boot
- KBUILD_IMAGE	:= $(boot)/Image.gz
--KBUILD_DTBS	:= dtbs
+@@ -62,14 +62,14 @@ CHECKFLAGS	+= -D__AARCH64EB__
+ AS		+= -EB
+ # Prefer the baremetal ELF build target, but not all toolchains include
+ # it so fall back to the standard linux version if needed.
+-LDFLAGS		+= -EB $(call ld-option, -maarch64elfb, -maarch64linuxb)
++KBUILD_LDFLAGS	+= -EB $(call ld-option, -maarch64elfb, -maarch64linuxb)
+ UTS_MACHINE	:= aarch64_be
+ else
+ KBUILD_CPPFLAGS	+= -mlittle-endian
+ CHECKFLAGS	+= -D__AARCH64EL__
+ AS		+= -EL
+ # Same as above, prefer ELF but fall back to linux target if needed.
+-LDFLAGS		+= -EL $(call ld-option, -maarch64elf, -maarch64linux)
++KBUILD_LDFLAGS	+= -EL $(call ld-option, -maarch64elf, -maarch64linux)
+ UTS_MACHINE	:= aarch64
+ endif
  
--all:	Image.gz $(KBUILD_DTBS)
-+all:	Image.gz
- 
- 
- Image: vmlinux
-@@ -127,17 +126,6 @@ Image.%: Image
- zinstall install:
- 	$(Q)$(MAKE) $(build)=$(boot) $@
- 
--%.dtb: scripts
--	$(Q)$(MAKE) $(build)=$(boot)/dts $(boot)/dts/$@
--
--PHONY += dtbs dtbs_install
--
--dtbs: prepare scripts
--	$(Q)$(MAKE) $(build)=$(boot)/dts
--
--dtbs_install:
--	$(Q)$(MAKE) $(dtbinst)=$(boot)/dts
--
- PHONY += vdso_install
- vdso_install:
- 	$(Q)$(MAKE) $(build)=arch/arm64/kernel/vdso $@
-@@ -145,7 +133,6 @@ vdso_install:
- # We use MRPROPER_FILES and CLEAN_FILES now
- archclean:
- 	$(Q)$(MAKE) $(clean)=$(boot)
--	$(Q)$(MAKE) $(clean)=$(boot)/dts
- 
- # We need to generate vdso-offsets.h before compiling certain files in kernel/.
- # In order to do that, we should use the archprepare target, but we can't since
-@@ -160,8 +147,6 @@ vdso_prepare: prepare0
- define archhelp
-   echo  '* Image.gz      - Compressed kernel image (arch/$(ARCH)/boot/Image.gz)'
-   echo  '  Image         - Uncompressed kernel image (arch/$(ARCH)/boot/Image)'
--  echo  '* dtbs          - Build device tree blobs for enabled boards'
--  echo  '  dtbs_install  - Install dtbs to $(INSTALL_DTBS_PATH)'
-   echo  '  install       - Install uncompressed kernel'
-   echo  '  zinstall      - Install compressed kernel'
-   echo  '                  Install using (your) ~/bin/installkernel or'
 diff --git a/arch/c6x/Makefile b/arch/c6x/Makefile
-index 6ab942e6c534..ea4390021384 100644
+index 6ab942e..3fe8a94 100644
 --- a/arch/c6x/Makefile
 +++ b/arch/c6x/Makefile
-@@ -41,9 +41,7 @@ boot := arch/$(ARCH)/boot
- DTB:=$(subst dtbImage.,,$(filter dtbImage.%, $(MAKECMDGOALS)))
- export DTB
- 
--ifneq ($(DTB),)
- core-y	+= $(boot)/dts/
--endif
- 
- # With make 3.82 we cannot mix normal and wildcard targets
+@@ -23,8 +23,7 @@ ifdef CONFIG_CPU_BIG_ENDIAN
+ KBUILD_CFLAGS   += -mbig-endian
+ KBUILD_AFLAGS   += -mbig-endian
+ LINKFLAGS       += -mbig-endian
+-KBUILD_LDFLAGS  += -mbig-endian
+-LDFLAGS += -EB
++KBUILD_LDFLAGS  += -mbig-endian -EB
+ CHECKFLAGS	+= -D_BIG_ENDIAN
+ endif
  
 diff --git a/arch/h8300/Makefile b/arch/h8300/Makefile
-index e1c02ca230cb..b4adab9697c3 100644
+index e1c02ca..f9cbbb1 100644
 --- a/arch/h8300/Makefile
 +++ b/arch/h8300/Makefile
-@@ -27,21 +27,12 @@ CROSS_COMPILE := h8300-unknown-linux-
+@@ -20,7 +20,7 @@ KBUILD_CFLAGS += -mint32 -fno-builtin
+ KBUILD_CFLAGS += -D__linux__
+ KBUILD_CFLAGS += -DUTS_SYSNAME=\"uClinux\"
+ KBUILD_AFLAGS += $(aflags-y)
+-LDFLAGS += $(ldflags-y)
++KBUILD_LDFLAGS += $(ldflags-y)
+ 
+ ifeq ($(CROSS_COMPILE),)
+ CROSS_COMPILE := h8300-unknown-linux-
+diff --git a/arch/hexagon/Makefile b/arch/hexagon/Makefile
+index 2efaa18..4c5858b 100644
+--- a/arch/hexagon/Makefile
++++ b/arch/hexagon/Makefile
+@@ -22,9 +22,7 @@ ldflags-y += $(call cc-option,-mv${CONFIG_HEXAGON_ARCH_VERSION})
+ 
+ KBUILD_CFLAGS += $(cflags-y)
+ KBUILD_AFLAGS += $(aflags-y)
+-
+-#  no KBUILD_LDFLAGS?
+-LDFLAGS += $(ldflags-y)
++KBUILD_LDFLAGS += $(ldflags-y)
+ 
+ # Thread-info register will be r19.  This value is not configureable;
+ # it is hard-coded in several files.
+diff --git a/arch/m68k/Makefile b/arch/m68k/Makefile
+index f0dd9fc..997c9f2 100644
+--- a/arch/m68k/Makefile
++++ b/arch/m68k/Makefile
+@@ -69,7 +69,7 @@ KBUILD_CFLAGS += -D__uClinux__
+ KBUILD_AFLAGS += -D__uClinux__
  endif
  
- core-y	+= arch/$(ARCH)/kernel/ arch/$(ARCH)/mm/
--ifneq '$(CONFIG_H8300_BUILTIN_DTB)' '""'
--core-y += arch/h8300/boot/dts/
--endif
-+core-y	+= arch/$(ARCH)/boot/dts/
+-LDFLAGS := -m m68kelf
++KBUILD_LDFLAGS := -m m68kelf
+ KBUILD_LDFLAGS_MODULE += -T $(srctree)/arch/m68k/kernel/module.lds
  
- libs-y	+= arch/$(ARCH)/lib/
- 
- boot := arch/h8300/boot
- 
--%.dtb %.dtb.S %.dtb.o: | scripts
--	$(Q)$(MAKE) $(build)=arch/h8300/boot/dts arch/h8300/boot/dts/$@
--
--PHONY += dtbs
--dtbs: scripts
--	$(Q)$(MAKE) $(build)=arch/h8300/boot/dts
--
- archmrproper:
- 
- archclean:
+ ifdef CONFIG_SUN3
 diff --git a/arch/microblaze/Makefile b/arch/microblaze/Makefile
-index d269dd4b8279..3e58b2317d09 100644
+index 7333036..4f3ab57 100644
 --- a/arch/microblaze/Makefile
 +++ b/arch/microblaze/Makefile
-@@ -65,9 +65,7 @@ boot := arch/microblaze/boot
- # Are we making a simpleImage.<boardname> target? If so, crack out the boardname
- DTB:=$(subst simpleImage.,,$(filter simpleImage.%, $(MAKECMDGOALS)))
- 
--ifneq ($(DTB),)
--	core-y	+= $(boot)/dts/
--endif
-+core-y	+= $(boot)/dts/
- 
- # defines filename extension depending memory management type
- ifeq ($(CONFIG_MMU),)
-diff --git a/arch/mips/Makefile b/arch/mips/Makefile
-index 5425df002a6b..8cb5994db05a 100644
---- a/arch/mips/Makefile
-+++ b/arch/mips/Makefile
-@@ -407,18 +407,7 @@ endif
- CLEAN_FILES += vmlinux.32 vmlinux.64
- 
- # device-trees
--core-$(CONFIG_BUILTIN_DTB) += arch/mips/boot/dts/
--
--%.dtb %.dtb.S %.dtb.o: | scripts
--	$(Q)$(MAKE) $(build)=arch/mips/boot/dts arch/mips/boot/dts/$@
--
--PHONY += dtbs
--dtbs: scripts
--	$(Q)$(MAKE) $(build)=arch/mips/boot/dts
--
--PHONY += dtbs_install
--dtbs_install:
--	$(Q)$(MAKE) $(dtbinst)=arch/mips/boot/dts
-+core-y += arch/mips/boot/dts/
- 
- archprepare:
- ifdef CONFIG_MIPS32_N32
-@@ -461,8 +450,6 @@ define archhelp
- 	echo '  uImage.lzma          - U-Boot image (lzma)'
- 	echo '  uImage.lzo           - U-Boot image (lzo)'
- 	echo '  uzImage.bin          - U-Boot image (self-extracting)'
--	echo '  dtbs                 - Device-tree blobs for enabled boards'
--	echo '  dtbs_install         - Install dtbs to $(INSTALL_DTBS_PATH)'
- 	echo
- 	echo '  These will be default as appropriate for a configured platform.'
- 	echo
-diff --git a/arch/nds32/Makefile b/arch/nds32/Makefile
-index 031c676821ff..4ec91e48ad4e 100644
---- a/arch/nds32/Makefile
-+++ b/arch/nds32/Makefile
-@@ -43,7 +43,7 @@ CHECKFLAGS      += -D__NDS32_EB__
+@@ -40,11 +40,11 @@ CPUFLAGS-$(CONFIG_XILINX_MICROBLAZE0_USE_PCMP_INSTR) += -mxl-pattern-compare
+ ifdef CONFIG_CPU_BIG_ENDIAN
+ KBUILD_CFLAGS += -mbig-endian
+ KBUILD_AFLAGS += -mbig-endian
+-LDFLAGS += -EB
++KBUILD_LDFLAGS += -EB
+ else
+ KBUILD_CFLAGS += -mlittle-endian
+ KBUILD_AFLAGS += -mlittle-endian
+-LDFLAGS += -EL
++KBUILD_LDFLAGS += -EL
  endif
  
- boot := arch/nds32/boot
--core-$(BUILTIN_DTB) += $(boot)/dts/
-+core-y += $(boot)/dts/
+ CPUFLAGS-1 += $(call cc-option,-mcpu=v$(CPU_VER))
+diff --git a/arch/mips/Makefile b/arch/mips/Makefile
+index 5425df0..d74b374 100644
+--- a/arch/mips/Makefile
++++ b/arch/mips/Makefile
+@@ -309,7 +309,7 @@ endif
+ # instead of .eh_frame so we don't discard them.
+ KBUILD_CFLAGS += -fno-asynchronous-unwind-tables
  
- .PHONY: FORCE
+-LDFLAGS			+= -m $(ld-emul)
++KBUILD_LDFLAGS		+= -m $(ld-emul)
  
-diff --git a/arch/nios2/Makefile b/arch/nios2/Makefile
-index db2e78fe65c7..52c03e60b114 100644
---- a/arch/nios2/Makefile
-+++ b/arch/nios2/Makefile
-@@ -56,12 +56,6 @@ all: vmImage
- archclean:
- 	$(Q)$(MAKE) $(clean)=$(nios2-boot)
+ ifdef CONFIG_MIPS
+ CHECKFLAGS += $(shell $(CC) $(KBUILD_CFLAGS) -dM -E -x c /dev/null | \
+diff --git a/arch/mips/boot/compressed/Makefile b/arch/mips/boot/compressed/Makefile
+index abe77ad..3c453a1 100644
+--- a/arch/mips/boot/compressed/Makefile
++++ b/arch/mips/boot/compressed/Makefile
+@@ -92,7 +92,7 @@ UIMAGE_LOADADDR = $(VMLINUZ_LOAD_ADDRESS)
+ vmlinuzobjs-y += $(obj)/piggy.o
  
--%.dtb %.dtb.S %.dtb.o: | scripts
--	$(Q)$(MAKE) $(build)=$(nios2-boot)/dts $(nios2-boot)/dts/$@
--
--dtbs:
--	$(Q)$(MAKE) $(build)=$(nios2-boot)/dts
--
- $(BOOT_TARGETS): vmlinux
- 	$(Q)$(MAKE) $(build)=$(nios2-boot) $(nios2-boot)/$@
+ quiet_cmd_zld = LD      $@
+-      cmd_zld = $(LD) $(LDFLAGS) -Ttext $(VMLINUZ_LOAD_ADDRESS) -T $< $(vmlinuzobjs-y) -o $@
++      cmd_zld = $(LD) $(KBUILD_LDFLAGS) -Ttext $(VMLINUZ_LOAD_ADDRESS) -T $< $(vmlinuzobjs-y) -o $@
+ quiet_cmd_strip = STRIP	  $@
+       cmd_strip = $(STRIP) -s $@
+ vmlinuz: $(src)/ld.script $(vmlinuzobjs-y) $(obj)/calc_vmlinuz_load_addr
+diff --git a/arch/mips/lasat/image/Makefile b/arch/mips/lasat/image/Makefile
+index 9ab1326..78ce4cf 100644
+--- a/arch/mips/lasat/image/Makefile
++++ b/arch/mips/lasat/image/Makefile
+@@ -38,7 +38,7 @@ $(obj)/rom.bin: $(obj)/rom
  
-@@ -74,5 +68,4 @@ define archhelp
-   echo  '                     (your) ~/bin/$(INSTALLKERNEL) or'
-   echo  '                     (distribution) /sbin/$(INSTALLKERNEL) or'
-   echo  '                     install to $$(INSTALL_PATH)'
--  echo  '  dtbs            - Build device tree blobs for enabled boards'
- endef
-diff --git a/arch/nios2/boot/Makefile b/arch/nios2/boot/Makefile
-index 0b48f1bf086d..37dfc7e584bc 100644
---- a/arch/nios2/boot/Makefile
-+++ b/arch/nios2/boot/Makefile
-@@ -31,9 +31,5 @@ $(obj)/zImage: $(obj)/compressed/vmlinux FORCE
- $(obj)/compressed/vmlinux: $(obj)/vmlinux.gz FORCE
- 	$(Q)$(MAKE) $(build)=$(obj)/compressed $@
+ # Rule to make the bootloader
+ $(obj)/rom: $(addprefix $(obj)/,$(OBJECTS))
+-	$(LD) $(LDFLAGS) $(LDSCRIPT) -o $@ $^
++	$(LD) $(KBUILD_LDFLAGS) $(LDSCRIPT) -o $@ $^
  
--targets += $(dtb-y)
--
--$(obj)/dtbs: $(addprefix $(obj)/, $(dtb-y))
--
- install:
- 	sh $(srctree)/$(src)/install.sh $(KERNELRELEASE) $(BOOTIMAGE) System.map "$(INSTALL_PATH)"
+ $(obj)/%.o: $(obj)/%.gz
+ 	$(LD) -r -o $@ -b binary $<
+diff --git a/arch/nds32/Makefile b/arch/nds32/Makefile
+index 031c676..63f4f17 100644
+--- a/arch/nds32/Makefile
++++ b/arch/nds32/Makefile
+@@ -33,12 +33,12 @@ endif
+ ifdef CONFIG_CPU_LITTLE_ENDIAN
+ KBUILD_CFLAGS   += $(call cc-option, -EL)
+ KBUILD_AFLAGS   += $(call cc-option, -EL)
+-LDFLAGS         += $(call cc-option, -EL)
++KBUILD_LDFLAGS  += $(call cc-option, -EL)
+ CHECKFLAGS      += -D__NDS32_EL__
+ else
+ KBUILD_CFLAGS   += $(call cc-option, -EB)
+ KBUILD_AFLAGS   += $(call cc-option, -EB)
+-LDFLAGS         += $(call cc-option, -EB)
++KBUILD_LDFLAGS  += $(call cc-option, -EB)
+ CHECKFLAGS      += -D__NDS32_EB__
+ endif
+ 
 diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index 9bacffa3b72e..b5845146451b 100644
+index 8397c7b..11a1acb 100644
 --- a/arch/powerpc/Makefile
 +++ b/arch/powerpc/Makefile
-@@ -293,9 +293,6 @@ $(BOOT_TARGETS2): vmlinux
- bootwrapper_install:
- 	$(Q)$(MAKE) $(build)=$(boot) $(patsubst %,$(boot)/%,$@)
+@@ -76,14 +76,14 @@ endif
  
--%.dtb: scripts
--	$(Q)$(MAKE) $(build)=$(boot)/dts $(patsubst %,$(boot)/dts/%,$@)
--
- # Used to create 'merged defconfigs'
- # To use it $(call) it with the first argument as the base defconfig
- # and the second argument as a space separated list of .config files to merge,
+ ifdef CONFIG_CPU_LITTLE_ENDIAN
+ KBUILD_CFLAGS	+= -mlittle-endian
+-LDFLAGS		+= -EL
++KBUILD_LDFLAGS	+= -EL
+ LDEMULATION	:= lppc
+ GNUTARGET	:= powerpcle
+ MULTIPLEWORD	:= -mno-multiple
+ KBUILD_CFLAGS_MODULE += $(call cc-option,-mno-save-toc-indirect)
+ else
+ KBUILD_CFLAGS += $(call cc-option,-mbig-endian)
+-LDFLAGS		+= -EB
++KBUILD_LDFLAGS	+= -EB
+ LDEMULATION	:= ppc
+ GNUTARGET	:= powerpc
+ MULTIPLEWORD	:= -mmultiple
+@@ -108,7 +108,7 @@ aflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -mlittle-endian
+ ifeq ($(HAS_BIARCH),y)
+ KBUILD_CFLAGS	+= -m$(BITS)
+ KBUILD_AFLAGS	+= -m$(BITS) -Wl,-a$(BITS)
+-LDFLAGS		+= -m elf$(BITS)$(LDEMULATION)
++KBUILD_LDFLAGS	+= -m elf$(BITS)$(LDEMULATION)
+ KBUILD_ARFLAGS	+= --target=elf$(BITS)-$(GNUTARGET)
+ endif
+ 
+diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+index 9ddd88b..61ec424 100644
+--- a/arch/riscv/Makefile
++++ b/arch/riscv/Makefile
+@@ -29,7 +29,7 @@ ifeq ($(CONFIG_ARCH_RV64I),y)
+ 	KBUILD_CFLAGS	+= $(call cc-ifversion, -ge, 0500, -DCONFIG_ARCH_SUPPORTS_INT128)
+ 
+ 	KBUILD_MARCH = rv64im
+-	LDFLAGS += -melf64lriscv
++	KBUILD_LDFLAGS += -melf64lriscv
+ else
+ 	BITS := 32
+ 	UTS_MACHINE := riscv32
+@@ -37,7 +37,7 @@ else
+ 	KBUILD_CFLAGS += -mabi=ilp32
+ 	KBUILD_AFLAGS += -mabi=ilp32
+ 	KBUILD_MARCH = rv32im
+-	LDFLAGS += -melf32lriscv
++	KBUILD_LDFLAGS += -melf32lriscv
+ endif
+ 
+ KBUILD_CFLAGS += -Wall
+diff --git a/arch/s390/Makefile b/arch/s390/Makefile
+index ba6d122..ee65185 100644
+--- a/arch/s390/Makefile
++++ b/arch/s390/Makefile
+@@ -11,7 +11,7 @@
+ #
+ 
+ LD_BFD		:= elf64-s390
+-LDFLAGS		:= -m elf64_s390
++KBUILD_LDFLAGS	:= -m elf64_s390
+ KBUILD_AFLAGS_MODULE += -fPIC
+ KBUILD_CFLAGS_MODULE += -fPIC
+ KBUILD_AFLAGS	+= -m64
+diff --git a/arch/sh/Makefile b/arch/sh/Makefile
+index 65300193..c521ade 100644
+--- a/arch/sh/Makefile
++++ b/arch/sh/Makefile
+@@ -122,11 +122,11 @@ endif
+ ifdef CONFIG_CPU_LITTLE_ENDIAN
+ ld-bfd			:= elf32-$(UTS_MACHINE)-linux
+ LDFLAGS_vmlinux		+= --defsym jiffies=jiffies_64 --oformat $(ld-bfd)
+-LDFLAGS			+= -EL
++KBUILD_LDFLAGS		+= -EL
+ else
+ ld-bfd			:= elf32-$(UTS_MACHINE)big-linux
+ LDFLAGS_vmlinux		+= --defsym jiffies=jiffies_64+4 --oformat $(ld-bfd)
+-LDFLAGS			+= -EB
++KBUILD_LDFLAGS		+= -EB
+ endif
+ 
+ export ld-bfd BITS
+diff --git a/arch/sparc/Makefile b/arch/sparc/Makefile
+index 966a13d..8ece494 100644
+--- a/arch/sparc/Makefile
++++ b/arch/sparc/Makefile
+@@ -21,7 +21,7 @@ ifeq ($(CONFIG_SPARC32),y)
+ #
+ 
+ CHECKFLAGS     += -D__sparc__
+-LDFLAGS        := -m elf32_sparc
++KBUILD_LDFLAGS := -m elf32_sparc
+ export BITS    := 32
+ UTS_MACHINE    := sparc
+ 
+@@ -40,7 +40,7 @@ else
+ #
+ 
+ CHECKFLAGS    += -D__sparc__ -D__sparc_v9__ -D__arch64__
+-LDFLAGS       := -m elf64_sparc
++KBUILD_LDFLAGS := -m elf64_sparc
+ export BITS   := 64
+ UTS_MACHINE   := sparc64
+ 
+diff --git a/arch/um/Makefile b/arch/um/Makefile
+index 44ddc3e..ab1066c 100644
+--- a/arch/um/Makefile
++++ b/arch/um/Makefile
+@@ -133,7 +133,7 @@ export LDS_ELF_FORMAT := $(ELF_FORMAT)
+ # The wrappers will select whether using "malloc" or the kernel allocator.
+ LINK_WRAPS = -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,calloc
+ 
+-LD_FLAGS_CMDLINE = $(foreach opt,$(LDFLAGS),-Wl,$(opt))
++LD_FLAGS_CMDLINE = $(foreach opt,$(KBUILD_LDFLAGS),-Wl,$(opt))
+ 
+ # Used by link-vmlinux.sh which has special support for um link
+ export CFLAGS_vmlinux := $(LINK-y) $(LINK_WRAPS) $(LD_FLAGS_CMDLINE)
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 7e3c07d..9485924 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -219,7 +219,7 @@ sha256_ni_instr :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA2
+ KBUILD_AFLAGS += $(cfi) $(cfi-sigframe) $(cfi-sections) $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr)
+ KBUILD_CFLAGS += $(cfi) $(cfi-sigframe) $(cfi-sections) $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr)
+ 
+-LDFLAGS := -m elf_$(UTS_MACHINE)
++KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
+ 
+ #
+ # The 64-bit kernel must be aligned to 2MB.  Pass -z max-page-size=0x200000 to
+@@ -227,7 +227,7 @@ LDFLAGS := -m elf_$(UTS_MACHINE)
+ # by the linker.
+ #
+ ifdef CONFIG_X86_64
+-LDFLAGS += $(call ld-option, -z max-page-size=0x200000)
++KBUILD_LDFLAGS += $(call ld-option, -z max-page-size=0x200000)
+ endif
+ 
+ # Speed up the build
+diff --git a/arch/x86/Makefile.um b/arch/x86/Makefile.um
+index 5296f8c..91085a0 100644
+--- a/arch/x86/Makefile.um
++++ b/arch/x86/Makefile.um
+@@ -4,7 +4,7 @@ core-y += arch/x86/crypto/
+ ifeq ($(CONFIG_X86_32),y)
+ START := 0x8048000
+ 
+-LDFLAGS			+= -m elf_i386
++KBUILD_LDFLAGS		+= -m elf_i386
+ ELF_ARCH		:= i386
+ ELF_FORMAT 		:= elf32-i386
+ CHECKFLAGS	+= -D__i386__
+@@ -43,7 +43,7 @@ KBUILD_CFLAGS += -fno-builtin -m64
+ 
+ CHECKFLAGS  += -m64 -D__x86_64__
+ KBUILD_AFLAGS += -m64
+-LDFLAGS += -m elf_x86_64
++KBUILD_LDFLAGS += -m elf_x86_64
+ KBUILD_CPPFLAGS += -m64
+ 
+ ELF_ARCH := i386:x86-64
+diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+index 169c2fe..28764da 100644
+--- a/arch/x86/boot/compressed/Makefile
++++ b/arch/x86/boot/compressed/Makefile
+@@ -42,16 +42,16 @@ KBUILD_AFLAGS  := $(KBUILD_CFLAGS) -D__ASSEMBLY__
+ GCOV_PROFILE := n
+ UBSAN_SANITIZE :=n
+ 
+-LDFLAGS := -m elf_$(UTS_MACHINE)
++KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
+ # Compressed kernel should be built as PIE since it may be loaded at any
+ # address by the bootloader.
+ ifeq ($(CONFIG_X86_32),y)
+-LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
++KBUILD_LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
+ else
+ # To build 64-bit compressed kernel as PIE, we disable relocation
+ # overflow check to avoid relocation overflow error with a new linker
+ # command-line option, -z noreloc-overflow.
+-LDFLAGS += $(shell $(LD) --help 2>&1 | grep -q "\-z noreloc-overflow" \
++KBUILD_LDFLAGS += $(shell $(LD) --help 2>&1 | grep -q "\-z noreloc-overflow" \
+ 	&& echo "-z noreloc-overflow -pie --no-dynamic-linker")
+ endif
+ LDFLAGS_vmlinux := -T
 diff --git a/arch/xtensa/Makefile b/arch/xtensa/Makefile
-index 3a934b72a272..2c1b20cf75c2 100644
+index 3a934b7..295c120 100644
 --- a/arch/xtensa/Makefile
 +++ b/arch/xtensa/Makefile
-@@ -84,28 +84,18 @@ LIBGCC := $(shell $(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name)
- head-y		:= arch/xtensa/kernel/head.o
- core-y		+= arch/xtensa/kernel/ arch/xtensa/mm/
- core-y		+= $(buildvar) $(buildplf)
-+core-y 		+= arch/xtensa/boot/dts/
+@@ -49,7 +49,7 @@ KBUILD_CFLAGS += $(call cc-option,-mno-serialize-volatile,)
+ KBUILD_AFLAGS += -mlongcalls -mtext-section-literals
  
- libs-y		+= arch/xtensa/lib/ $(LIBGCC)
- drivers-$(CONFIG_OPROFILE)	+= arch/xtensa/oprofile/
+ ifneq ($(CONFIG_LD_NO_RELAX),)
+-LDFLAGS := --no-relax
++KBUILD_LDFLAGS := --no-relax
+ endif
  
--ifneq ($(CONFIG_BUILTIN_DTB),"")
--core-$(CONFIG_OF) += arch/xtensa/boot/dts/
--endif
--
- boot		:= arch/xtensa/boot
+ ifeq ($(shell echo __XTENSA_EB__ | $(CC) -E - | grep -v "\#"),1)
+diff --git a/arch/xtensa/boot/boot-elf/Makefile b/arch/xtensa/boot/boot-elf/Makefile
+index 5214719..12ae1e9 100644
+--- a/arch/xtensa/boot/boot-elf/Makefile
++++ b/arch/xtensa/boot/boot-elf/Makefile
+@@ -25,7 +25,7 @@ $(obj)/Image.o: vmlinux.bin $(OBJS)
+ 		$(OBJS) $@
  
- all Image zImage uImage: vmlinux
- 	$(Q)$(MAKE) $(build)=$(boot) $@
+ $(obj)/../Image.elf: $(obj)/Image.o $(obj)/boot.lds
+-	$(Q)$(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) \
++	$(Q)$(LD) $(KBUILD_LDFLAGS) $(LDFLAGS_vmlinux) \
+ 		-T $(obj)/boot.lds \
+ 		--build-id=none \
+ 		-o $@ $(obj)/Image.o
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 7c98f60..c75413d 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -163,8 +163,8 @@ cc-ldoption = $(call try-run,\
+ 	$(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
  
--%.dtb:
--	$(Q)$(MAKE) $(build)=$(boot)/dts $(boot)/dts/$@
--
--dtbs: scripts
--	$(Q)$(MAKE) $(build)=$(boot)/dts
--
- define archhelp
-   @echo '* Image       - Kernel ELF image with reset vector'
-   @echo '* zImage      - Compressed kernel image (arch/xtensa/boot/images/zImage.*)'
-   @echo '* uImage      - U-Boot wrapped image'
--  @echo '  dtbs        - Build device tree blobs for enabled boards'
- endef
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 61affa300d25..a716a6b10954 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -39,7 +39,6 @@ build_unifdef: $(obj)/unifdef
- subdir-$(CONFIG_MODVERSIONS) += genksyms
- subdir-y                     += mod
- subdir-$(CONFIG_SECURITY_SELINUX) += selinux
--subdir-$(CONFIG_DTC)         += dtc
- subdir-$(CONFIG_GDB_SCRIPTS) += gdb
+ # ld-option
+-# Usage: LDFLAGS += $(call ld-option, -X, -Y)
+-ld-option = $(call try-run, $(LD) $(LDFLAGS) $(1) -v,$(1),$(2),$(3))
++# Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
++ld-option = $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2),$(3))
  
- # Let clean descend into subdirs
+ # ar-option
+ # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 93b8e24..1f87e31 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -190,7 +190,7 @@ cmd_modversions_c =								\
+ 		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
+ 		    > $(@D)/.tmp_$(@F:.o=.ver);					\
+ 										\
+-		$(LD) $(LDFLAGS) -r -o $@ $(@D)/.tmp_$(@F) 			\
++		$(LD) $(KBUILD_LDFLAGS) -r -o $@ $(@D)/.tmp_$(@F) 		\
+ 			-T $(@D)/.tmp_$(@F:.o=.ver);				\
+ 		rm -f $(@D)/.tmp_$(@F) $(@D)/.tmp_$(@F:.o=.ver);		\
+ 	else									\
+@@ -394,7 +394,7 @@ cmd_modversions_S =								\
+ 		$(call cmd_gensymtypes_S,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
+ 		    > $(@D)/.tmp_$(@F:.o=.ver);					\
+ 										\
+-		$(LD) $(LDFLAGS) -r -o $@ $(@D)/.tmp_$(@F) 			\
++		$(LD) $(KBUILD_LDFLAGS) -r -o $@ $(@D)/.tmp_$(@F) 		\
+ 			-T $(@D)/.tmp_$(@F:.o=.ver);				\
+ 		rm -f $(@D)/.tmp_$(@F) $(@D)/.tmp_$(@F:.o=.ver);		\
+ 	else									\
 diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index df0fff252619..9f619f54bc90 100644
+index df0fff2..61e5966 100644
 --- a/scripts/Makefile.lib
 +++ b/scripts/Makefile.lib
-@@ -283,7 +283,7 @@ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
+@@ -162,7 +162,7 @@ a_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+ cpp_flags      = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+ 		 $(__cpp_flags)
  
- quiet_cmd_dtc = DTC     $@
- cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
--	$(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
-+	$(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
- 	$(DTC) -O dtb -o $@ -b 0 \
- 		$(addprefix -i,$(dir $<) $(DTC_INCLUDE)) $(DTC_FLAGS) \
- 		-d $(depfile).dtc.tmp $(dtc-tmp) ; \
+-ld_flags       = $(LDFLAGS) $(ldflags-y) $(LDFLAGS_$(@F))
++ld_flags       = $(KBUILD_LDFLAGS) $(ldflags-y) $(LDFLAGS_$(@F))
+ 
+ DTC_INCLUDE    := $(srctree)/scripts/dtc/include-prefixes
+ 
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index dd92dbb..7d4af0d 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -120,7 +120,7 @@ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
+ # Step 6), final link of the modules with optional arch pass after final link
+ quiet_cmd_ld_ko_o = LD [M]  $@
+       cmd_ld_ko_o =                                                     \
+-	$(LD) -r $(LDFLAGS)                                             \
++	$(LD) -r $(KBUILD_LDFLAGS)                                      \
+                  $(KBUILD_LDFLAGS_MODULE) $(LDFLAGS_MODULE)             \
+                  -o $@ $(filter-out FORCE,$^) ;                         \
+ 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
 -- 
-2.17.1
+2.7.4
