@@ -1,161 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:42673 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726165AbeHWFVx (ORCPT
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.50]:12536 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726068AbeHWKrz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 23 Aug 2018 01:21:53 -0400
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id w7N1sSBu004894
-        for <linux-kbuild@vger.kernel.org>; Thu, 23 Aug 2018 10:54:29 +0900
-Received: by mail-ua1-f45.google.com with SMTP id c12-v6so2283767uan.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 22 Aug 2018 18:54:29 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAEp-SHUdZy32X8sE68kYXwPz+xx7hwjMdAD04_zATudAhn+MYQ@mail.gmail.com>
-References: <CAEp-SHUdZy32X8sE68kYXwPz+xx7hwjMdAD04_zATudAhn+MYQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 23 Aug 2018 10:53:47 +0900
-Message-ID: <CAK7LNAQJraYp8CJ7_=HZXgoGxh2qdycPjD9V9gpyBE_mmNH1zw@mail.gmail.com>
-Subject: Re: Bug: Unnecessary, repeated, and inconsistent work done when
- rebuilding bzImage
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 23 Aug 2018 06:47:55 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: please revert commit ce8556cca6 "kbuild: verify that $DEPMOD is installed" introduced in v4.18.4.
+From: "H. Nikolaus Schaller" <hns@goldelico.com>
+In-Reply-To: <7e154505-5f73-1054-e67e-cdfb249fec43@infradead.org>
+Date: Thu, 23 Aug 2018 09:16:23 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <75BCA8F9-B649-48BD-9A30-2561AEFBB877@goldelico.com>
+References: <490A46D5-834E-46A9-9106-A31F94344F99@goldelico.com> <d5093e14-c826-9183-cd94-ecb99a799fc8@infradead.org> <CAKdAkRQ+BXezzT0JsuSa_-imHq+u-q2P5rMVMCL4=N18VYxSAw@mail.gmail.com> <7e154505-5f73-1054-e67e-cdfb249fec43@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Casey Fitzpatrick <kcghost@gmail.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>, lucas.demarchi@profusion.mobi, lucas.de.marchi@gmail.com, michal.lkml@markovi.net, jeyu@kernel.org, cwhuang@linux.org.tw, "3.8+" <stable@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Discussions about the Letux Kernel <letux-kernel@openphoenux.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi Casey,
+Hi Randy,
 
-2018-08-23 8:21 GMT+09:00 Casey Fitzpatrick <kcghost@gmail.com>:
-> I have observed that attempting to rebuild the kernel with no changes
-> to source files:
-> 1. Takes more time than I should hope is necessary; I would hope it
-> would only check timestamps and determine the target does not need
-> updating rather than do work.
-> 2. Switches between two states of determining what work is needed to do.
-> 3. Unnecessarily updates timestamp on bzImage (and maybe others)
-> despite not actually modifying the file.
->
-> I am working with v4.14.66 building from an Ubuntu 17.10 machine.
-> The following summarized output demonstrates the issue (I believe the
-> same happens with the default target).
-> Notice that despite no changes made to sources, a rebuild takes 3
-> seconds on my machine, does some work and typically updates the
-> timestamp of the target.
-> Also notice that the work is oddly inconsistent, the third time I ran
-> the same build with no changes it did different work. And in that case
-> it does not update the timestamp of the target, which is preferable.
->
-> make distclean
-> make x86_64_defconfig
-> time make -j16 bzImage
->     ...(lots of output, actually building all the sources)
->       OBJCOPY arch/x86/boot/setup.bin
->       BUILD   arch/x86/boot/bzImage
->     Setup is 15548 bytes (padded to 15872 bytes).
->     System is 7789 kB
->     CRC 5b2b5059
->     Kernel: arch/x86/boot/bzImage is ready  (#1)
->
->     real    4m15.147s
->     user    27m21.182s
->     sys 2m34.607s
-> stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->     mtime: 2018-08-22 18:57:10.000000000 -0400
-> time make -j16 bzImage
->       CHK     include/config/kernel.release
->       CHK     include/generated/uapi/linux/version.h
->       DESCEND  objtool
->       CHK     scripts/mod/devicetable-offsets.h
->       CHK     include/generated/utsrelease.h
->       CHK     include/generated/timeconst.h
->       CHK     include/generated/bounds.h
->       CHK     include/generated/asm-offsets.h
->       CALL    scripts/checksyscalls.sh
->       CHK     include/generated/compile.h
->       DATAREL arch/x86/boot/compressed/vmlinux
->       BUILD   arch/x86/boot/bzImage
->     Setup is 15548 bytes (padded to 15872 bytes).
->     System is 7789 kB
->     CRC 5b2b5059
->     Kernel: arch/x86/boot/bzImage is ready  (#1)
->
->     real    0m3.273s
->     user    0m11.260s
->     sys 0m4.727s
-> stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->     mtime: 2018-08-22 19:00:26.587233951 -0400
-> time make -j16 bzImage
->       CHK     include/config/kernel.release
->       CHK     include/generated/uapi/linux/version.h
->       DESCEND  objtool
->       CHK     include/generated/utsrelease.h
->       CHK     scripts/mod/devicetable-offsets.h
->       CHK     include/generated/timeconst.h
->       CHK     include/generated/bounds.h
->       CHK     include/generated/asm-offsets.h
->       CALL    scripts/checksyscalls.sh
->       CHK     include/generated/compile.h
->       LD      arch/x86/boot/compressed/vmlinux
->       ZOFFSET arch/x86/boot/zoffset.h
->       OBJCOPY arch/x86/boot/vmlinux.bin
->       AS      arch/x86/boot/header.o
->       LD      arch/x86/boot/setup.elf
->       OBJCOPY arch/x86/boot/setup.bin
->       BUILD   arch/x86/boot/bzImage
->     Setup is 15548 bytes (padded to 15872 bytes).
->     System is 7789 kB
->     CRC 5b2b5059
->     Kernel: arch/x86/boot/bzImage is ready  (#1)
->
->     real    0m3.136s
->     user    0m11.411s
->     sys 0m4.775s
-> stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->     mtime: 2018-08-22 19:01:11.583377706 -0400
-> time make -j16 bzImage
->       CHK     include/config/kernel.release
->       CHK     include/generated/uapi/linux/version.h
->       DESCEND  objtool
->       CHK     include/generated/utsrelease.h
->       CHK     scripts/mod/devicetable-offsets.h
->       CHK     include/generated/timeconst.h
->       CHK     include/generated/bounds.h
->       CHK     include/generated/asm-offsets.h
->       CALL    scripts/checksyscalls.sh
->       CHK     include/generated/compile.h
->       DATAREL arch/x86/boot/compressed/vmlinux
->     Kernel: arch/x86/boot/bzImage is ready  (#1)
->
->     real    0m3.118s
->     user    0m11.476s
->     sys 0m4.505s
-> stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->     mtime: 2018-08-22 19:01:11.583377706 -0400
->
-> Sincerely,
-> Casey Fitzpatrick
+> Am 23.08.2018 um 03:07 schrieb Randy Dunlap <rdunlap@infradead.org>:
+>=20
+> On 08/22/2018 05:39 PM, Dmitry Torokhov wrote:
+>> On Wed, Aug 22, 2018 at 4:35 PM Randy Dunlap <rdunlap@infradead.org> =
+wrote:
+>>>=20
+>>> On 08/22/2018 11:53 AM, H. Nikolaus Schaller wrote:
+>>>> This patch requires that /sbin/depmod is installed and installable =
+on
+>>>> the build host.
+>>>>=20
+>>>> But not all build hosts for cross compiling Linux are Linux systems
+>>>> and are able to provide a working port of depmod, especially at the
+>>>> file patch /sbin/depmod.
+>>>>=20
+>>>> I use, for example, a Darwin system to cross compile Linux and I =
+run
+>>>> depmod -a on the embedded system once, after installing a new Linux
+>>>> kernel there.
+>>>>=20
+>>>> I have no problem with seeing a warning, but aborting the build =
+process
+>>>> is IMHO a bad idea since the previous behaviour didn't harm many =
+people
+>>>> as far as I see. Probably 99% of people compiling Linux kernels do =
+that
+>>>> on Linux and 99% of those have depmod installed for optimal =
+operation of
+>>>> their build host. So IMHO printing the warning is good enough.
+>>>=20
+>>> Thanks for the report and sorry about the problem.
+>>>=20
+>>> I'm OK with changing the error to a warning.
+>>> Does the patch below work for you?
+>>=20
+>> Why would one want a warning on a host that never runs "make =
+modules_install"?
+>> Can this check be only done when we actually try to install modules?
+>=20
+>=20
+> So Nikolaus:  how do you provoke this problem that you are reporting?
+> It's not just a theoretical problem, is it?
+>=20
+> The way that I read the top-level Makefile, this check for $DEPMOD =
+only happens
+> when you run "make modules_install".
 
+Yes,
+we run on the build host
 
+ make letux_defconfig dtbs uImage =
+INSTALL_MOD_PATH=3D/tmp/kernel-modules-$$ modules modules_install
 
-Could you check if the following commit fixes the problem?
+and then scp the files from  /tmp/kernel-modules-$$ to the embedded =
+device.
+Or pack into some installable file setfor download on our server.
 
+So we run modules_install on the build host as well to copy the modules =
+into the correct hierarchy
+and give it the correct lib/modules/<kernel_release> prefix.
 
-commit 92a4728608a8fd228c572bc8ff50dd98aa0ddf2a
-Author: Kees Cook <keescook@chromium.org>
-Date:   Tue Jul 24 16:08:27 2018 -0700
+I would have to duplicate this what module_install does in some wrapper =
+script.
 
-    x86/boot: Fix if_changed build flip/flop bug
+BTW: it is a standard technique described by others:
 
+=
+http://labs.isee.biz/index.php/The_Linux_kernel#IGEP_Boards_based_on_Texas=
+_Instruments_.C2.A0Processors
 
+ make ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabihf- modules_install =
+INSTALL_MOD_PATH=3D/media/user/rootfs
 
+=
+http://en.gnublin.org/index.php/Kernel_compile_%2B_Module_installation#Com=
+pile_the_modules
 
-I am not sure whether it was back-ported to 4.14 kernel or not...
+ mkdir kernel_archiv
+ make modules_install INSTALL_MOD_PATH=3Dkernel_archiv
+ cp arch/arm/boot/zImage kernel_archiv
+ cd kernel_archiv
+ tar cfvz kernel.tar.gz zImage lib/
 
+All these descriptions will now break if run on a host without =
+/sbin/depmod installed.
 
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+BR and thanks,
+Nikolaus=
