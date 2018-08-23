@@ -1,96 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:18257 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730679AbeHWMHr (ORCPT
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48902 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730196AbeHWPCW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 23 Aug 2018 08:07:47 -0400
+        Thu, 23 Aug 2018 11:02:22 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w7NBSulq007853
+        for <linux-kbuild@vger.kernel.org>; Thu, 23 Aug 2018 07:33:03 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2m1u40tkyu-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-kbuild@vger.kernel.org>; Thu, 23 Aug 2018 07:33:03 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-kbuild@vger.kernel.org> from <vaibhav@linux.ibm.com>;
+        Thu, 23 Aug 2018 12:33:01 +0100
+From: Vaibhav Jain <vaibhav@linux.ibm.com>
+Subject: Re: [Skiboot] [PATCH] opal/hmi: Wakeup the cpu before reading core_fir
+In-Reply-To: <20180821133842.1b13e972@roar.ozlabs.ibm.com>
+References: <20180820183417.dejfsluih7elbclu@pburton-laptop> <20180820223618.22319-1-paul.burton@mips.com> <20180820223618.22319-2-paul.burton@mips.com> <20180820140605.11846-1-vaibhav@linux.ibm.com> <20180821133842.1b13e972@roar.ozlabs.ibm.com>
+Date: Thu, 23 Aug 2018 17:02:51 +0530
 MIME-Version: 1.0
-In-Reply-To: <d5093e14-c826-9183-cd94-ecb99a799fc8@infradead.org>
-References: <490A46D5-834E-46A9-9106-A31F94344F99@goldelico.com> <d5093e14-c826-9183-cd94-ecb99a799fc8@infradead.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 23 Aug 2018 17:38:27 +0900
-Message-ID: <CAK7LNAQDRj7aKMNqkTL3XxbsFHUuYwOaPn8buh=b9O9+CaKjig@mail.gmail.com>
-Subject: Re: please revert commit ce8556cca6 "kbuild: verify that $DEPMOD is
- installed" introduced in v4.18.4.
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+Message-Id: <877ekhnwrg.fsf@vajain21.in.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: "H. Nikolaus Schaller" <hns@goldelico.com>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Chih-Wei Huang <cwhuang@linux.org.tw>, stable <stable@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Discussions about the Letux Kernel <letux-kernel@openphoenux.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Nicholas Piggin <npiggin@gmail.com>, Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>
+Cc: "Gautham R . Shenoy" <ego@linux.vnet.ibm.com>, Michael Neuling <mikey@neuling.org>, Stewart Smith <stewart@linux.ibm.com>, Linux-MIPS <linux-mips@linux-mips.org>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, James Hogan <jhogan@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ralf Baechle <ralf@linux-mips.org>
 
-Hi Randy,
+Thanks for reviewing this patch Nick
 
-
-2018-08-23 8:33 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> On 08/22/2018 11:53 AM, H. Nikolaus Schaller wrote:
->> This patch requires that /sbin/depmod is installed and installable on
->> the build host.
->>
->> But not all build hosts for cross compiling Linux are Linux systems
->> and are able to provide a working port of depmod, especially at the
->> file patch /sbin/depmod.
->>
->> I use, for example, a Darwin system to cross compile Linux and I run
->> depmod -a on the embedded system once, after installing a new Linux
->> kernel there.
->>
->> I have no problem with seeing a warning, but aborting the build process
->> is IMHO a bad idea since the previous behaviour didn't harm many people
->> as far as I see. Probably 99% of people compiling Linux kernels do that
->> on Linux and 99% of those have depmod installed for optimal operation of
->> their build host. So IMHO printing the warning is good enough.
+Nicholas Piggin <npiggin@gmail.com> writes:
 >
-> Thanks for the report and sorry about the problem.
+> Would it be feasible to enumerate the ranges of scoms that require
+> special wakeup and check for those in xscom_read/write, and warn if
+> spwkup was not set?
 >
-> I'm OK with changing the error to a warning.
-> Does the patch below work for you?
->
-> thanks.
-> ---
-> From: Randy Dunlap <rdunlap@infradead.org>
->
-> When $DEPMOD is not found, only print a warning instead of exiting
-> with an error message and error status.
->
-> E.g.:
-> Warning: 'make modules_install' requires /sbin/depmod. Please install it.
-> This is probably in the kmod package.
-> ../scripts/depmod.sh: line 44: /sbin/depmod: No such file or directory
-> make[1]: *** [/home/rdunlap/lnx/lnx-418/Makefile:1244: _modinst_post] Error 127
-> make: *** [Makefile:146: sub-make] Error 2
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Reported-by: H. Nikolaus Schaller <hns@goldelico.com>
-> ---
->  scripts/depmod.sh |    3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> --- lnx-418.orig/scripts/depmod.sh
-> +++ lnx-418/scripts/depmod.sh
-> @@ -15,9 +15,8 @@ if ! test -r System.map ; then
->  fi
->
->  if [ -z $(command -v $DEPMOD) ]; then
-> -       echo "'make modules_install' requires $DEPMOD. Please install it." >&2
-> +       echo "Warning: 'make modules_install' requires $DEPMOD. Please install it." >&2
->         echo "This is probably in the kmod package." >&2
-> -       exit 1
-
-
-'exit 0' is missing here.
-
-This shell script would fail, then abort the build process.
-
-
-> ../scripts/depmod.sh: line 44: /sbin/depmod: No such file or directory
-> make[1]: *** [/home/rdunlap/lnx/lnx-418/Makefile:1244: _modinst_post] Error 127
-> make: *** [Makefile:146: sub-make] Error 2
-
-
-
-
-
+I think that might be racy (Vaidy please correct if I am wrong) as a
+core can change its state when we read its sleep state and when we do
+the actual xscom to read the core_fir.
 
 -- 
-Best Regards
-Masahiro Yamada
+Vaibhav Jain <vaibhav@linux.vnet.ibm.com>
+Linux Technology Center, IBM India Pvt. Ltd.
