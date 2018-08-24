@@ -1,244 +1,128 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:46572 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726279AbeHXFFk (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:50711 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726276AbeHXHx4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 24 Aug 2018 01:05:40 -0400
-Received: from mail-vk0-f52.google.com (mail-vk0-f52.google.com [209.85.213.52]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id w7O1XD1p022959
-        for <linux-kbuild@vger.kernel.org>; Fri, 24 Aug 2018 10:33:14 +0900
-Received: by mail-vk0-f52.google.com with SMTP id t4-v6so3557150vke.9
-        for <linux-kbuild@vger.kernel.org>; Thu, 23 Aug 2018 18:33:14 -0700 (PDT)
+        Fri, 24 Aug 2018 03:53:56 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAEp-SHWZbO6wGMSTh7VbbQfS2vsC57914LDHExOv-M_s29m0Xg@mail.gmail.com>
-References: <CAEp-SHUdZy32X8sE68kYXwPz+xx7hwjMdAD04_zATudAhn+MYQ@mail.gmail.com>
- <CAK7LNAQJraYp8CJ7_=HZXgoGxh2qdycPjD9V9gpyBE_mmNH1zw@mail.gmail.com> <CAEp-SHWZbO6wGMSTh7VbbQfS2vsC57914LDHExOv-M_s29m0Xg@mail.gmail.com>
+In-Reply-To: <4449cd91-fae5-caf1-a917-82e0c5f0aba8@infradead.org>
+References: <4449cd91-fae5-caf1-a917-82e0c5f0aba8@infradead.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 24 Aug 2018 10:32:32 +0900
-Message-ID: <CAK7LNAQ7gUL-rU398GCW17zXLPXwonUhfGm9ft5AdczGKy1zxg@mail.gmail.com>
-Subject: Re: Bug: Unnecessary, repeated, and inconsistent work done when
- rebuilding bzImage
+Date: Fri, 24 Aug 2018 13:20:02 +0900
+Message-ID: <CAK7LNASyhKFp+AWQr-RWTRbMu78=G7Uj=350xrjq_Lht8MVYzQ@mail.gmail.com>
+Subject: Re: [PATCH v3] modules_install: make missing $DEPMOD a warning
+ instead of an error
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Casey Fitzpatrick <kcghost@gmail.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable <stable@vger.kernel.org>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Chih-Wei Huang <cwhuang@linux.org.tw>, "H. Nikolaus Schaller" <hns@goldelico.com>
 
-Hi Casey,
+Hi Randy,
 
-2018-08-23 21:14 GMT+09:00 Casey Fitzpatrick <kcghost@gmail.com>:
-> Masahiro,
+
+2018-08-24 3:13 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+> From: Randy Dunlap <rdunlap@infradead.org>
 >
-> Thanks, I was not aware of that patch. That does fix the issue for the
-> most part. A rebuild now consistently does the same work, and does not
-> unnecessarily update the timestamp of bzImage as before. It still
-> takes 3 seconds, but maybe that is necessary? I don't know exactly
-> what it is doing there.
-
-Yes.  The build log looks reasonable, and some seconds
-is typical necessary for rebuilding with no update.
+> When $DEPMOD is not found, only print a warning instead of exiting
+> with an error message and error status.
 
 
+Could you add the motivation of this change
+(as Nikolaus reported) ?
+
+Without the reason recorded in git-log,
+somebody may wonder why this commit is useful.
 
 
 
-> time make -j16 bzImage
->       CHK     include/config/kernel.release
->       CHK     include/generated/uapi/linux/version.h
->       DESCEND  objtool
->       CHK     include/generated/utsrelease.h
->       CHK     scripts/mod/devicetable-offsets.h
->       CHK     include/generated/timeconst.h
->       CHK     include/generated/bounds.h
->       CHK     include/generated/asm-offsets.h
->       CALL    scripts/checksyscalls.sh
->       CHK     include/generated/compile.h
->     Kernel: arch/x86/boot/bzImage is ready  (#1)
+
+
+> Warning: 'make modules_install' requires /sbin/depmod. Please install it.
+> This is probably in the kmod package.
 >
->     real    0m3.027s
->     user    0m11.183s
->     sys 0m4.755s
-> stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->     mtime: 2018-08-23 08:04:55.551644635 -0400
-> time make -j16 bzImage
->       CHK     include/config/kernel.release
->       CHK     include/generated/uapi/linux/version.h
->       DESCEND  objtool
->       CHK     include/generated/utsrelease.h
->       CHK     scripts/mod/devicetable-offsets.h
->       CHK     include/generated/timeconst.h
->       CHK     include/generated/bounds.h
->       CHK     include/generated/asm-offsets.h
->       CALL    scripts/checksyscalls.sh
->       CHK     include/generated/compile.h
->     Kernel: arch/x86/boot/bzImage is ready  (#1)
->
->     real    0m2.966s
->     user    0m10.917s
->     sys 0m4.834s
-> stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->     mtime: 2018-08-23 08:04:55.551644635 -0400
-> time make -j16 bzImage
->       CHK     include/config/kernel.release
->       CHK     include/generated/uapi/linux/version.h
->       DESCEND  objtool
->       CHK     include/generated/utsrelease.h
->       CHK     scripts/mod/devicetable-offsets.h
->       CHK     include/generated/timeconst.h
->       CHK     include/generated/bounds.h
->       CHK     include/generated/asm-offsets.h
->       CALL    scripts/checksyscalls.sh
->       CHK     include/generated/compile.h
->     Kernel: arch/x86/boot/bzImage is ready  (#1)
->
->     real    0m2.954s
->     user    0m11.151s
->     sys 0m4.734s
-> stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->     mtime: 2018-08-23 08:04:55.551644635 -0400
->
-> Sincerely,
-> Casey Fitzpatrick
-> On Wed, Aug 22, 2018 at 9:54 PM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->>
->> Hi Casey,
->>
->> 2018-08-23 8:21 GMT+09:00 Casey Fitzpatrick <kcghost@gmail.com>:
->> > I have observed that attempting to rebuild the kernel with no changes
->> > to source files:
->> > 1. Takes more time than I should hope is necessary; I would hope it
->> > would only check timestamps and determine the target does not need
->> > updating rather than do work.
->> > 2. Switches between two states of determining what work is needed to do.
->> > 3. Unnecessarily updates timestamp on bzImage (and maybe others)
->> > despite not actually modifying the file.
->> >
->> > I am working with v4.14.66 building from an Ubuntu 17.10 machine.
->> > The following summarized output demonstrates the issue (I believe the
->> > same happens with the default target).
->> > Notice that despite no changes made to sources, a rebuild takes 3
->> > seconds on my machine, does some work and typically updates the
->> > timestamp of the target.
->> > Also notice that the work is oddly inconsistent, the third time I ran
->> > the same build with no changes it did different work. And in that case
->> > it does not update the timestamp of the target, which is preferable.
->> >
->> > make distclean
->> > make x86_64_defconfig
->> > time make -j16 bzImage
->> >     ...(lots of output, actually building all the sources)
->> >       OBJCOPY arch/x86/boot/setup.bin
->> >       BUILD   arch/x86/boot/bzImage
->> >     Setup is 15548 bytes (padded to 15872 bytes).
->> >     System is 7789 kB
->> >     CRC 5b2b5059
->> >     Kernel: arch/x86/boot/bzImage is ready  (#1)
->> >
->> >     real    4m15.147s
->> >     user    27m21.182s
->> >     sys 2m34.607s
->> > stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->> >     mtime: 2018-08-22 18:57:10.000000000 -0400
->> > time make -j16 bzImage
->> >       CHK     include/config/kernel.release
->> >       CHK     include/generated/uapi/linux/version.h
->> >       DESCEND  objtool
->> >       CHK     scripts/mod/devicetable-offsets.h
->> >       CHK     include/generated/utsrelease.h
->> >       CHK     include/generated/timeconst.h
->> >       CHK     include/generated/bounds.h
->> >       CHK     include/generated/asm-offsets.h
->> >       CALL    scripts/checksyscalls.sh
->> >       CHK     include/generated/compile.h
->> >       DATAREL arch/x86/boot/compressed/vmlinux
->> >       BUILD   arch/x86/boot/bzImage
->> >     Setup is 15548 bytes (padded to 15872 bytes).
->> >     System is 7789 kB
->> >     CRC 5b2b5059
->> >     Kernel: arch/x86/boot/bzImage is ready  (#1)
->> >
->> >     real    0m3.273s
->> >     user    0m11.260s
->> >     sys 0m4.727s
->> > stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->> >     mtime: 2018-08-22 19:00:26.587233951 -0400
->> > time make -j16 bzImage
->> >       CHK     include/config/kernel.release
->> >       CHK     include/generated/uapi/linux/version.h
->> >       DESCEND  objtool
->> >       CHK     include/generated/utsrelease.h
->> >       CHK     scripts/mod/devicetable-offsets.h
->> >       CHK     include/generated/timeconst.h
->> >       CHK     include/generated/bounds.h
->> >       CHK     include/generated/asm-offsets.h
->> >       CALL    scripts/checksyscalls.sh
->> >       CHK     include/generated/compile.h
->> >       LD      arch/x86/boot/compressed/vmlinux
->> >       ZOFFSET arch/x86/boot/zoffset.h
->> >       OBJCOPY arch/x86/boot/vmlinux.bin
->> >       AS      arch/x86/boot/header.o
->> >       LD      arch/x86/boot/setup.elf
->> >       OBJCOPY arch/x86/boot/setup.bin
->> >       BUILD   arch/x86/boot/bzImage
->> >     Setup is 15548 bytes (padded to 15872 bytes).
->> >     System is 7789 kB
->> >     CRC 5b2b5059
->> >     Kernel: arch/x86/boot/bzImage is ready  (#1)
->> >
->> >     real    0m3.136s
->> >     user    0m11.411s
->> >     sys 0m4.775s
->> > stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->> >     mtime: 2018-08-22 19:01:11.583377706 -0400
->> > time make -j16 bzImage
->> >       CHK     include/config/kernel.release
->> >       CHK     include/generated/uapi/linux/version.h
->> >       DESCEND  objtool
->> >       CHK     include/generated/utsrelease.h
->> >       CHK     scripts/mod/devicetable-offsets.h
->> >       CHK     include/generated/timeconst.h
->> >       CHK     include/generated/bounds.h
->> >       CHK     include/generated/asm-offsets.h
->> >       CALL    scripts/checksyscalls.sh
->> >       CHK     include/generated/compile.h
->> >       DATAREL arch/x86/boot/compressed/vmlinux
->> >     Kernel: arch/x86/boot/bzImage is ready  (#1)
->> >
->> >     real    0m3.118s
->> >     user    0m11.476s
->> >     sys 0m4.505s
->> > stat --printf 'mtime: %y\n' arch/x86/boot/bzImage
->> >     mtime: 2018-08-22 19:01:11.583377706 -0400
->> >
->> > Sincerely,
->> > Casey Fitzpatrick
->>
->>
->>
->> Could you check if the following commit fixes the problem?
->>
->>
->> commit 92a4728608a8fd228c572bc8ff50dd98aa0ddf2a
->> Author: Kees Cook <keescook@chromium.org>
->> Date:   Tue Jul 24 16:08:27 2018 -0700
->>
->>     x86/boot: Fix if_changed build flip/flop bug
->>
->>
->>
->>
->> I am not sure whether it was back-ported to 4.14 kernel or not...
->>
->>
->>
->>
->>
->>
->> --
->> Best Regards
->> Masahiro Yamada
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Fixes: 934193a654c1 ("kbuild: verify that $DEPMOD is installed")
+> Cc: stable@vger.kernel.org
+> Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+> Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: Jessica Yu <jeyu@kernel.org>
+> Cc: Chih-Wei Huang <cwhuang@linux.org.tw>
+> Cc: H. Nikolaus Schaller <hns@goldelico.com>
 
+Reported-by: H. Nikolaus Schaller <hns@goldelico.com>
+
+
+
+
+> ---
+> v2: add missing "exit 0" and update the commit message (no Error).
+> v3: add Fixes: and Cc: stable
+>
+>  scripts/depmod.sh |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> --- lnx-418.orig/scripts/depmod.sh
+> +++ lnx-418/scripts/depmod.sh
+> @@ -15,9 +15,9 @@ if ! test -r System.map ; then
+>  fi
+>
+>  if [ -z $(command -v $DEPMOD) ]; then
+> -       echo "'make modules_install' requires $DEPMOD. Please install it." >&2
+> +       echo "Warning: 'make modules_install' requires $DEPMOD. Please install it." >&2
+>         echo "This is probably in the kmod package." >&2
+> -       exit 1
+> +       exit 0
+>  fi
+>
+>  # older versions of depmod require the version string to start with three
+
+
+
+BTW, if System.map is missing, depmod is silently skipped.
+
+
+I think if System.map is missing, a user is doing something wrong,
+but you could do like this:
+
+$ make mrproper
+   [snip]
+$ make defconfig
+   [snip]
+$ make modules
+   [snip]
+$ make modules_install
+  INSTALL drivers/thermal/x86_pkg_temp_thermal.ko
+  INSTALL fs/efivarfs/efivarfs.ko
+  INSTALL net/ipv4/netfilter/ipt_MASQUERADE.ko
+  INSTALL net/ipv4/netfilter/iptable_nat.ko
+  INSTALL net/ipv4/netfilter/nf_log_arp.ko
+  INSTALL net/ipv4/netfilter/nf_log_ipv4.ko
+  INSTALL net/ipv4/netfilter/nf_nat_ipv4.ko
+  INSTALL net/ipv6/netfilter/nf_log_ipv6.ko
+  INSTALL net/netfilter/nf_log_common.ko
+  INSTALL net/netfilter/nf_nat.ko
+  INSTALL net/netfilter/nf_nat_ftp.ko
+  INSTALL net/netfilter/nf_nat_irc.ko
+  INSTALL net/netfilter/nf_nat_sip.ko
+  INSTALL net/netfilter/xt_LOG.ko
+  INSTALL net/netfilter/xt_addrtype.ko
+  INSTALL net/netfilter/xt_mark.ko
+  INSTALL net/netfilter/xt_nat.ko
+  DEPMOD  4.18.0+
+
+
+The log looks like all the process went well,
+but depmod is actually skipped because System.map is
+generated by "make vmlinux"
+
+
+What do you think we should do about this case?
+
+Skip depmod silently?
+Make it fail?
+Print noisy warning like missing depmod case?
 
 
 -- 
