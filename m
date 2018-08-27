@@ -1,65 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f68.google.com ([209.85.213.68]:37872 "EHLO
-        mail-vk0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726875AbeH0KmV (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Aug 2018 06:42:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58326 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726823AbeH0W7T (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 27 Aug 2018 18:59:19 -0400
+Date: Mon, 27 Aug 2018 14:11:23 -0500
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH] objtool: remove workaround for unreachable warnings from
+ old GCC
+Message-ID: <20180827191123.meeqzru5y2kwnd47@treble>
+References: <1535341183-19994-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-References: <152883965482.1936.13657625103232933481.stgit@taos> <152883969032.1936.15155267369758178246.stgit@taos>
-In-Reply-To: <152883969032.1936.15155267369758178246.stgit@taos>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 27 Aug 2018 08:56:50 +0200
-Message-ID: <CAMuHMdVf-QDAVh-vHF_xyvX73_nsO9X7RnDc=yCK_FS68i6zTw@mail.gmail.com>
-Subject: Re: [PATCH v9 2/2] iommu/amd: Add basic debugfs infrastructure for
- AMD IOMMU
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1535341183-19994-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: gary.hook@amd.com
-Cc: Linux IOMMU <iommu@lists.linux-foundation.org>, Joerg Roedel <joro@8bytes.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, x86@kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi Gary,
+On Mon, Aug 27, 2018 at 12:39:43PM +0900, Masahiro Yamada wrote:
+> Commit cafa0010cd51 ("Raise the minimum required gcc version to 4.6")
+> bumped the minimum GCC version to 4.6 for all architectures.
+> 
+> This effectively reverts commit da541b20021c ("objtool: Skip
+> unreachable warnings for GCC 4.4 and older"), which was a workaround
+> for GCC 4.4 or older.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-On Tue, Jun 12, 2018 at 11:42 PM Gary R Hook <gary.hook@amd.com> wrote:
-> Implement a skeleton framework for debugfs support in the AMD
-> IOMMU.  Add an AMD-specific Kconfig boolean that depends upon
-> general enablement of DebugFS in the IOMMU.
->
-> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+Acked-by: Josh Poimboeuf <jpoimboe@redhat.com>
 
-This is now commit 7d0f5fd3e4d68742 ("iommu/amd: Add basic debugfs
-infrastructure for AMD IOMMU").
-
-> --- a/drivers/iommu/Kconfig
-> +++ b/drivers/iommu/Kconfig
-> @@ -146,6 +146,18 @@ config AMD_IOMMU_V2
->           hardware. Select this option if you want to use devices that support
->           the PCI PRI and PASID interface.
->
-> +config AMD_IOMMU_DEBUGFS
-> +       bool "Enable AMD IOMMU internals in DebugFS"
-> +       depends on AMD_IOMMU && IOMMU_DEBUGFS
-> +       ---help---
-> +         !!!WARNING!!!  !!!WARNING!!!  !!!WARNING!!!  !!!WARNING!!!
-> +
-> +         DO NOT ENABLE THIS OPTION UNLESS YOU REALLY, -REALLY- KNOW WHAT YOU ARE DOING!!!
-> +         Exposes AMD IOMMU device internals in DebugFS.
-> +
-> +         This option is -NOT- intended for production environments, and should
-> +         not generally be enabled.
-
-If it is that bad, shouldn't this option be protected by some Kconfig
-trickery to avoid it being enabled in allmodconfig/allyesconfig builds?
-
-I forgot the way to do that, so some CCs added.
-
-Gr{oetje,eeting}s,
-
-                        Geert
+> ---
+> 
+>  scripts/Makefile.build | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 1c48572..5a2d1c9 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -246,8 +246,6 @@ objtool_args += --no-fp
+>  endif
+>  ifdef CONFIG_GCOV_KERNEL
+>  objtool_args += --no-unreachable
+> -else
+> -objtool_args += $(call cc-ifversion, -lt, 0405, --no-unreachable)
+>  endif
+>  ifdef CONFIG_RETPOLINE
+>  ifneq ($(RETPOLINE_CFLAGS),)
+> -- 
+> 2.7.4
+> 
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Josh
