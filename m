@@ -1,33 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.hmha.gob.ec ([190.11.21.43]:54338 "EHLO mail.hmha.gob.ec"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727169AbeH1Nqo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Aug 2018 09:46:44 -0400
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Received: from prv1-mh.provo.novell.com ([137.65.248.33]:37195 "EHLO
+        prv1-mh.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726807AbeH1TNW (ORCPT
+        <rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
+        Tue, 28 Aug 2018 15:13:22 -0400
+Message-Id: <5B8563A702000078001E2A82@prv1-mh.provo.novell.com>
+Date: Tue, 28 Aug 2018 09:00:55 -0600
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: [PATCH] kallsyms: reduce size a little on 64-bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: =?utf-8?b?V29obHTDpHRpZ2tlaXRzc3BlbmRlIGluIEjDtmhlIHZvbiDigqwgMi4wMDAu?=
- =?utf-8?q?000=2C00?=
-From: jose_mera@hmha.gob.ec
-Date: Tue, 28 Aug 2018 10:12:55 +0100
-Reply-To: wumt.claimservice@gmail.com
-Message-Id: <20180828091306.69DF1200A3E2@mail.hmha.gob.ec>
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <jose_mera@hmha.gob.ec>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <michal.lkml@markovi.net>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Lieber Freund,
+Both kallsyms_num_syms and kallsyms_markers[] don't really need to use
+unsigned long as their (base) types; unsigned int fully suffices.
+
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
+---
+ kernel/kallsyms.c  |    4 ++--
+ scripts/kallsyms.c |    6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+--- 4.19-rc1/kernel/kallsyms.c
++++ 4.19-rc1-kallsyms-reduce-size/kernel/kallsyms.c
+@@ -37,7 +37,7 @@ extern const u8 kallsyms_names[] __weak;
+  * Tell the compiler that the count isn't in the small data section if the arch
+  * has one (eg: FRV).
+  */
+-extern const unsigned long kallsyms_num_syms
++extern const unsigned int kallsyms_num_syms
+ __attribute__((weak, section(".rodata")));
  
-Ich bin Herr Tayeb Souami, New Jersey, Vereinigte Staaten von Amerika, der Mega-Gewinner von $ 315million In Mega Millions Jackpot, spende ich an 5 zufällige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Mail nach einem Spinball ausgewählt.Ich habe den größten Teil meines Vermögens auf eine Reihe von Wohltätigkeitsorganisationen und Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die Summe von € 2.000.000,00 an Sie als eine der ausgewählten 5 zu spenden, um meine Gewinne zu überprüfen, sehen Sie bitte meine You Tube Seite unten.
+ extern const unsigned long kallsyms_relative_base
+@@ -46,7 +46,7 @@ __attribute__((weak, section(".rodata"))
+ extern const u8 kallsyms_token_table[] __weak;
+ extern const u16 kallsyms_token_index[] __weak;
  
-UHR MICH HIER: https://www.youtube.com/watch?v=Z6ui8ZDQ6Ks
+-extern const unsigned long kallsyms_markers[] __weak;
++extern const unsigned int kallsyms_markers[] __weak;
  
-Das ist dein Spendencode: [DFC530342018]
+ /*
+  * Expand a compressed symbol data into the resulting uncompressed string,
+--- 4.19-rc1/scripts/kallsyms.c
++++ 4.19-rc1-kallsyms-reduce-size/scripts/kallsyms.c
+@@ -182,6 +182,8 @@ static int symbol_in_range(struct sym_en
+ 	for (i = 0; i < entries; ++i) {
+ 		ar = &ranges[i];
  
-Antworten Sie mit dem SPENDE-CODE an diese E-Mail: financialfundingcompany09@gmail.com
++		if (!ar->end)
++			continue;
+ 		if (s->addr >= ar->start && s->addr <= ar->end)
+ 			return 1;
+ 	}
+@@ -405,7 +407,7 @@ static void write_src(void)
+ 	}
  
-Ich hoffe, Sie und Ihre Familie glücklich zu machen.
+ 	output_label("kallsyms_num_syms");
+-	printf("\tPTR\t%u\n", table_cnt);
++	printf("\t.long\t%u\n", table_cnt);
+ 	printf("\n");
  
-Grüße
-Herr Tayeb Souami
+ 	/* table of offset markers, that give the offset in the compressed stream
+@@ -434,7 +436,7 @@ static void write_src(void)
+ 
+ 	output_label("kallsyms_markers");
+ 	for (i = 0; i < ((table_cnt + 255) >> 8); i++)
+-		printf("\tPTR\t%d\n", markers[i]);
++		printf("\t.long\t%u\n", markers[i]);
+ 	printf("\n");
+ 
+ 	free(markers);
