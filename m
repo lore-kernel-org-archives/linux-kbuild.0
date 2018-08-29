@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:39177 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728542AbeH2PcL (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:38184 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728451AbeH2PcE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 29 Aug 2018 11:32:11 -0400
-Received: by mail-wm0-f66.google.com with SMTP id q8-v6so5190206wmq.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 29 Aug 2018 04:35:42 -0700 (PDT)
+        Wed, 29 Aug 2018 11:32:04 -0400
+Received: by mail-wm0-f65.google.com with SMTP id t25-v6so5153628wmi.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 29 Aug 2018 04:35:35 -0700 (PDT)
 From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v6 08/18] khwasan: preassign tags to objects with ctors or SLAB_TYPESAFE_BY_RCU
-Date: Wed, 29 Aug 2018 13:35:12 +0200
-Message-Id: <95b5beb7ec13b7e998efe84c9a7a5c1fa49a9fe3.1535462971.git.andreyknvl@google.com>
+Subject: [PATCH v6 04/18] khwasan, arm64: adjust shadow size for CONFIG_KASAN_HW
+Date: Wed, 29 Aug 2018 13:35:08 +0200
+Message-Id: <b4ba65afa55f2fdfd2856fb03c5aba99c7a8bdd7.1535462971.git.andreyknvl@google.com>
 In-Reply-To: <cover.1535462971.git.andreyknvl@google.com>
 References: <cover.1535462971.git.andreyknvl@google.com>
 MIME-Version: 1.0
@@ -19,70 +19,55 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
 Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>
 
-An object constructor can initialize pointers within this objects based on
-the address of the object. Since the object address might be tagged, we
-need to assign a tag before calling constructor.
+KWHASAN uses 1 shadow byte for 16 bytes of kernel memory, so it requires
+1/16th of the kernel virtual address space for the shadow memory.
 
-The implemented approach is to assign tags to objects with constructors
-when a slab is allocated and call constructors once as usual. The
-downside is that such object would always have the same tag when it is
-reallocated, so we won't catch use-after-frees on it.
-
-Also pressign tags for objects from SLAB_TYPESAFE_BY_RCU caches, since
-they can be validy accessed after having been freed.
+This commit sets KASAN_SHADOW_SCALE_SHIFT to 4 when KHWASAN is enabled.
 
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- mm/slab.c | 6 +++++-
- mm/slub.c | 4 ++++
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ arch/arm64/Makefile             |  2 +-
+ arch/arm64/include/asm/memory.h | 13 +++++++++----
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/mm/slab.c b/mm/slab.c
-index 6fdca9ec2ea4..3b4227059f2e 100644
---- a/mm/slab.c
-+++ b/mm/slab.c
-@@ -403,7 +403,11 @@ static inline struct kmem_cache *virt_to_cache(const void *obj)
- static inline void *index_to_obj(struct kmem_cache *cache, struct page *page,
- 				 unsigned int idx)
- {
--	return page->s_mem + cache->size * idx;
-+	void *obj;
-+
-+	obj = page->s_mem + cache->size * idx;
-+	obj = khwasan_preset_slab_tag(cache, idx, obj);
-+	return obj;
- }
+diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+index 106039d25e2f..17047b8ab984 100644
+--- a/arch/arm64/Makefile
++++ b/arch/arm64/Makefile
+@@ -94,7 +94,7 @@ endif
+ # KASAN_SHADOW_OFFSET = VA_START + (1 << (VA_BITS - KASAN_SHADOW_SCALE_SHIFT))
+ #				 - (1 << (64 - KASAN_SHADOW_SCALE_SHIFT))
+ # in 32-bit arithmetic
+-KASAN_SHADOW_SCALE_SHIFT := 3
++KASAN_SHADOW_SCALE_SHIFT := $(if $(CONFIG_KASAN_HW), 4, 3)
+ KASAN_SHADOW_OFFSET := $(shell printf "0x%08x00000000\n" $$(( \
+ 	(0xffffffff & (-1 << ($(CONFIG_ARM64_VA_BITS) - 32))) \
+ 	+ (1 << ($(CONFIG_ARM64_VA_BITS) - 32 - $(KASAN_SHADOW_SCALE_SHIFT))) \
+diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+index b96442960aea..f5e262ee76c1 100644
+--- a/arch/arm64/include/asm/memory.h
++++ b/arch/arm64/include/asm/memory.h
+@@ -74,12 +74,17 @@
+ #define KERNEL_END        _end
  
  /*
-diff --git a/mm/slub.c b/mm/slub.c
-index 4206e1b616e7..086d6558a6b6 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -1531,12 +1531,14 @@ static bool shuffle_freelist(struct kmem_cache *s, struct page *page)
- 	/* First entry is used as the base of the freelist */
- 	cur = next_freelist_entry(s, page, &pos, start, page_limit,
- 				freelist_count);
-+	cur = khwasan_preset_slub_tag(s, cur);
- 	page->freelist = cur;
- 
- 	for (idx = 1; idx < page->objects; idx++) {
- 		setup_object(s, page, cur);
- 		next = next_freelist_entry(s, page, &pos, start, page_limit,
- 			freelist_count);
-+		next = khwasan_preset_slub_tag(s, next);
- 		set_freepointer(s, cur, next);
- 		cur = next;
- 	}
-@@ -1613,8 +1615,10 @@ static struct page *allocate_slab(struct kmem_cache *s, gfp_t flags, int node)
- 	shuffle = shuffle_freelist(s, page);
- 
- 	if (!shuffle) {
-+		start = khwasan_preset_slub_tag(s, start);
- 		for_each_object_idx(p, idx, s, start, page->objects) {
- 			setup_object(s, page, p);
-+			p = khwasan_preset_slub_tag(s, p);
- 			if (likely(idx < page->objects))
- 				set_freepointer(s, p, p + s->size);
- 			else
+- * KASAN requires 1/8th of the kernel virtual address space for the shadow
+- * region. KASAN can bloat the stack significantly, so double the (minimum)
+- * stack size when KASAN is in use.
++ * KASAN and KHWASAN require 1/8th and 1/16th of the kernel virtual address
++ * space for the shadow region respectively. They can bloat the stack
++ * significantly, so double the (minimum) stack size when they are in use.
+  */
+-#ifdef CONFIG_KASAN
++#ifdef CONFIG_KASAN_GENERIC
+ #define KASAN_SHADOW_SCALE_SHIFT 3
++#endif
++#ifdef CONFIG_KASAN_HW
++#define KASAN_SHADOW_SCALE_SHIFT 4
++#endif
++#ifdef CONFIG_KASAN
+ #define KASAN_SHADOW_SIZE	(UL(1) << (VA_BITS - KASAN_SHADOW_SCALE_SHIFT))
+ #define KASAN_THREAD_SHIFT	1
+ #else
 -- 
 2.19.0.rc0.228.g281dcd1b4d0-goog
