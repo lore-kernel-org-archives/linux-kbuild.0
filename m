@@ -1,106 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:20899 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725723AbeH2FBy (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 29 Aug 2018 01:01:54 -0400
+Received: from genki.is ([104.200.25.21]:55038 "EHLO genki.is"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725199AbeH2H1t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 29 Aug 2018 03:27:49 -0400
+Date: Tue, 28 Aug 2018 23:26:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <c9066b61-6666-5adc-1f34-f8cea91864c5@infradead.org>
-References: <4449cd91-fae5-caf1-a917-82e0c5f0aba8@infradead.org>
- <CAK7LNASyhKFp+AWQr-RWTRbMu78=G7Uj=350xrjq_Lht8MVYzQ@mail.gmail.com> <c9066b61-6666-5adc-1f34-f8cea91864c5@infradead.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 29 Aug 2018 10:06:34 +0900
-Message-ID: <CAK7LNAQPQd6DX6aXO6HtZ6kTXZk-71VH_Pwi=yE_UnhHs74yNw@mail.gmail.com>
-Subject: Re: [PATCH v3] modules_install: make missing $DEPMOD a warning
- instead of an error
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <de6839047158272d1976ab023b9a222c09679846.1535512872.git.sky@genki.is>
+From: Genki Sky <sky@genki.is>
+Subject: [PATCH] scripts/setlocalversion: git: Make -dirty check more robust
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable <stable@vger.kernel.org>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Chih-Wei Huang <cwhuang@linux.org.tw>, "H. Nikolaus Schaller" <hns@goldelico.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Christian Kujau <lists@nerdbynature.de>, Elazar Leibovich <elazar.leibovich@oracle.com>, Junio C Hamano <gitster@pobox.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Nico Schottelius <nico-linuxsetlocalversion@schottelius.org>
 
-Hi Randy
+$(git diff-index) relies on the index being refreshed. This refreshing
+of the index used to happen, but was removed in cdf2bc632ebc
+("scripts/setlocalversion on write-protected source tree", 2013-06-14)
+due to issues with a read-only filesystem.
 
-2018-08-29 4:55 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> On 08/23/2018 09:20 PM, Masahiro Yamada wrote:
->> Hi Randy,
->>
->>
->> 2018-08-24 3:13 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
->>> From: Randy Dunlap <rdunlap@infradead.org>
->>>
->>> When $DEPMOD is not found, only print a warning instead of exiting
->>> with an error message and error status.
->>
->>
->> Could you add the motivation of this change
->> (as Nikolaus reported) ?
->>
->> Without the reason recorded in git-log,
->> somebody may wonder why this commit is useful.
->>
->
-> Added for v4.
+If the index is not refreshed, one runs into problems. E.g. as
+described in [0], git stores the uid in its index, so even if just the
+uid has changed (or git is tricked into thinking so), then we will
+think the tree is dirty. So as in [1], if you package linux-git with a
+system that uses fakeroot(1), you get a "-dirty" version. Unless you
+manually $(git update-index --refresh) themselves.
 
-Thanks.
+The simplest solution seems to be $(git status --porcelain), with an
+additional flag saying "ignore untracked files". It seems clearer
+about what it does, and avoids issues regarding cached indexes and
+writable filesystems, but still has stable output for scripting.
 
+[0]: https://public-inbox.org/git/0190ae30-b6c8-2a8b-b1fb-fd9d84e6dfdf@oracle.com/
+[1]: https://bbs.archlinux.org/viewtopic.php?id=236702
 
+Signed-off-by: Genki Sky <sky@genki.is>
+---
 
+Notes:
 
->> BTW, if System.map is missing, depmod is silently skipped.
->>
->>
->> I think if System.map is missing, a user is doing something wrong,
->> but you could do like this:
->>
->> $ make mrproper
->>    [snip]
->> $ make defconfig
->>    [snip]
->> $ make modules
->>    [snip]
->> $ make modules_install
->>   INSTALL drivers/thermal/x86_pkg_temp_thermal.ko
->>   INSTALL fs/efivarfs/efivarfs.ko
->>   INSTALL net/ipv4/netfilter/ipt_MASQUERADE.ko
->>   INSTALL net/ipv4/netfilter/iptable_nat.ko
->>   INSTALL net/ipv4/netfilter/nf_log_arp.ko
->>   INSTALL net/ipv4/netfilter/nf_log_ipv4.ko
->>   INSTALL net/ipv4/netfilter/nf_nat_ipv4.ko
->>   INSTALL net/ipv6/netfilter/nf_log_ipv6.ko
->>   INSTALL net/netfilter/nf_log_common.ko
->>   INSTALL net/netfilter/nf_nat.ko
->>   INSTALL net/netfilter/nf_nat_ftp.ko
->>   INSTALL net/netfilter/nf_nat_irc.ko
->>   INSTALL net/netfilter/nf_nat_sip.ko
->>   INSTALL net/netfilter/xt_LOG.ko
->>   INSTALL net/netfilter/xt_addrtype.ko
->>   INSTALL net/netfilter/xt_mark.ko
->>   INSTALL net/netfilter/xt_nat.ko
->>   DEPMOD  4.18.0+
->>
->>
->> The log looks like all the process went well,
->> but depmod is actually skipped because System.map is
->> generated by "make vmlinux"
->>
->>
->> What do you think we should do about this case?
->>
->> Skip depmod silently?
->> Make it fail?
->> Print noisy warning like missing depmod case?
->
-> Since this shouldn't be happening, I prefer the noisy warning message
-> like the missing depmod case.
->
-> Do you want a separate patch for that?
+   Testing: I ran $(git status -uno .... && echo dirty) after each of
+   the following commands, checking sanity:
 
+     % > Makefile
+     % git checkout Makefile
+     % chmod -w .git
+     % > scripts/package/Makefile
+     % chmod +w .git
+     % git checkout scripts/package/Makefile
+     % touch new_file
+     % touch scripts/package/new_file
+     % rm new_file scripts/package/new_file
+     % mv Makefile .clang-format
+     % git checkout Makefile .clang-format
 
-Yes.  Could you send a patch?
+ scripts/setlocalversion | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index 71f39410691b..79f7dd57d571 100755
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -74,7 +74,7 @@ scm_version()
+ 		fi
 
+ 		# Check for uncommitted changes
+-		if git diff-index --name-only HEAD | grep -qv "^scripts/package"; then
++		if git status -uno --porcelain | grep -qv '^.. scripts/package'; then
+ 			printf '%s' -dirty
+ 		fi
 
--- 
-Best Regards
-Masahiro Yamada
+--
+2.18.0
