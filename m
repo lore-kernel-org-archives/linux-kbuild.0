@@ -1,70 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:46198 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727083AbeH1Xw2 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:20899 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725723AbeH2FBy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Aug 2018 19:52:28 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v4] modules_install: make missing $DEPMOD a Warning instead of
- an Error
-Message-ID: <07334982-98f0-561e-f8a1-ba42e36da80e@infradead.org>
-Date: Tue, 28 Aug 2018 12:59:10 -0700
+        Wed, 29 Aug 2018 01:01:54 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <c9066b61-6666-5adc-1f34-f8cea91864c5@infradead.org>
+References: <4449cd91-fae5-caf1-a917-82e0c5f0aba8@infradead.org>
+ <CAK7LNASyhKFp+AWQr-RWTRbMu78=G7Uj=350xrjq_Lht8MVYzQ@mail.gmail.com> <c9066b61-6666-5adc-1f34-f8cea91864c5@infradead.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 29 Aug 2018 10:06:34 +0900
+Message-ID: <CAK7LNAQPQd6DX6aXO6HtZ6kTXZk-71VH_Pwi=yE_UnhHs74yNw@mail.gmail.com>
+Subject: Re: [PATCH v3] modules_install: make missing $DEPMOD a warning
+ instead of an error
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, LKML <linux-kernel@vger.kernel.org>
-Cc: "H. Nikolaus Schaller" <hns@goldelico.com>, stable@vger.kernel.org, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Chih-Wei Huang <cwhuang@linux.org.tw>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable <stable@vger.kernel.org>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Chih-Wei Huang <cwhuang@linux.org.tw>, "H. Nikolaus Schaller" <hns@goldelico.com>
 
-From: Randy Dunlap <rdunlap@infradead.org>
+Hi Randy
 
-When $DEPMOD is not found, only print a warning instead of exiting
-with an error message and error status:
+2018-08-29 4:55 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+> On 08/23/2018 09:20 PM, Masahiro Yamada wrote:
+>> Hi Randy,
+>>
+>>
+>> 2018-08-24 3:13 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+>>> From: Randy Dunlap <rdunlap@infradead.org>
+>>>
+>>> When $DEPMOD is not found, only print a warning instead of exiting
+>>> with an error message and error status.
+>>
+>>
+>> Could you add the motivation of this change
+>> (as Nikolaus reported) ?
+>>
+>> Without the reason recorded in git-log,
+>> somebody may wonder why this commit is useful.
+>>
+>
+> Added for v4.
 
-Warning: 'make modules_install' requires /sbin/depmod. Please install it.
-This is probably in the kmod package.
+Thanks.
 
-Change the Error to a Warning because "not all build hosts for cross
-compiling Linux are Linux systems and are able to provide a working
-port of depmod, especially at the file patch /sbin/depmod."
 
-I.e., "make modules_install" may be used to copy/install the
-loadable modules files to a target directory on a build system and
-then transferred to an embedded device where /sbin/depmod is run
-instead of it being run on the build system.
 
-Fixes: 934193a654c1 ("kbuild: verify that $DEPMOD is installed")
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Reported-by: H. Nikolaus Schaller <hns@goldelico.com>
-Cc: stable@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: Jessica Yu <jeyu@kernel.org>
-Cc: Chih-Wei Huang <cwhuang@linux.org.tw>
-Cc: H. Nikolaus Schaller <hns@goldelico.com>
----
-v2: add missing "exit 0" and update the commit message (no Error).
-v3: add Fixes: and Cc: stable
-v4: add Reported-by: and more explanation for the patch.
+>> BTW, if System.map is missing, depmod is silently skipped.
+>>
+>>
+>> I think if System.map is missing, a user is doing something wrong,
+>> but you could do like this:
+>>
+>> $ make mrproper
+>>    [snip]
+>> $ make defconfig
+>>    [snip]
+>> $ make modules
+>>    [snip]
+>> $ make modules_install
+>>   INSTALL drivers/thermal/x86_pkg_temp_thermal.ko
+>>   INSTALL fs/efivarfs/efivarfs.ko
+>>   INSTALL net/ipv4/netfilter/ipt_MASQUERADE.ko
+>>   INSTALL net/ipv4/netfilter/iptable_nat.ko
+>>   INSTALL net/ipv4/netfilter/nf_log_arp.ko
+>>   INSTALL net/ipv4/netfilter/nf_log_ipv4.ko
+>>   INSTALL net/ipv4/netfilter/nf_nat_ipv4.ko
+>>   INSTALL net/ipv6/netfilter/nf_log_ipv6.ko
+>>   INSTALL net/netfilter/nf_log_common.ko
+>>   INSTALL net/netfilter/nf_nat.ko
+>>   INSTALL net/netfilter/nf_nat_ftp.ko
+>>   INSTALL net/netfilter/nf_nat_irc.ko
+>>   INSTALL net/netfilter/nf_nat_sip.ko
+>>   INSTALL net/netfilter/xt_LOG.ko
+>>   INSTALL net/netfilter/xt_addrtype.ko
+>>   INSTALL net/netfilter/xt_mark.ko
+>>   INSTALL net/netfilter/xt_nat.ko
+>>   DEPMOD  4.18.0+
+>>
+>>
+>> The log looks like all the process went well,
+>> but depmod is actually skipped because System.map is
+>> generated by "make vmlinux"
+>>
+>>
+>> What do you think we should do about this case?
+>>
+>> Skip depmod silently?
+>> Make it fail?
+>> Print noisy warning like missing depmod case?
+>
+> Since this shouldn't be happening, I prefer the noisy warning message
+> like the missing depmod case.
+>
+> Do you want a separate patch for that?
 
- scripts/depmod.sh |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
---- lnx-418.orig/scripts/depmod.sh
-+++ lnx-418/scripts/depmod.sh
-@@ -15,9 +15,9 @@ if ! test -r System.map ; then
- fi
- 
- if [ -z $(command -v $DEPMOD) ]; then
--	echo "'make modules_install' requires $DEPMOD. Please install it." >&2
-+	echo "Warning: 'make modules_install' requires $DEPMOD. Please install it." >&2
- 	echo "This is probably in the kmod package." >&2
--	exit 1
-+	exit 0
- fi
- 
- # older versions of depmod require the version string to start with three
+Yes.  Could you send a patch?
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
