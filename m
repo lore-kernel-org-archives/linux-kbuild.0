@@ -1,40 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp2.it.da.ut.ee ([193.40.5.67]:49299 "EHLO smtp2.it.da.ut.ee"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727363AbeHaOc6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 31 Aug 2018 10:32:58 -0400
-Date: Fri, 31 Aug 2018 13:26:04 +0300 (EEST)
-From: Meelis Roos <mroos@linux.ee>
-Subject: Re: [PATCH] kconfig: do not require pkg-config on make
- {menu,n}config
-In-Reply-To: <1535708095-15847-1-git-send-email-yamada.masahiro@socionext.com>
-Message-ID: <alpine.LRH.2.21.1808311325260.31140@math.ut.ee>
-References: <1535708095-15847-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:49753 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727809AbeHaSyd (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 31 Aug 2018 14:54:33 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1535620722-14689-1-git-send-email-lukas.bulwahn@gmail.com>
+References: <1535620722-14689-1-git-send-email-lukas.bulwahn@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 31 Aug 2018 23:45:58 +0900
+Message-ID: <CAK7LNAQDm+=55UvLKp3ox_a64WU=W55=2ftAQ7MmMxA5E-bXkw@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: remove a spurious self-assignment
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
+To: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-> Meelis Roos reported a {menu,n}config regression:
-> 
->  "I have libncurses devel package installed in the default system
->   location (as do 99%+ on actual developers probably) and in this
->   case, pkg-config is useless.  pkg-config is needed only when
->   libraries and headers are installed in non-default locations but
->   it is bad to require installation of pkg-config on all the machines
->   where make menuconfig would be possibly run."
-> 
-> For {menu,n}config, do not use pkg-config if it is not installed.
-> For {g,x}config, keep checking pkg-config since we really rely on it
-> for finding the installation paths of the required packages.
-> 
-> Fixes: 4ab3b80159d4 ("kconfig: check for pkg-config on make {menu,n,g,x}config")
-> Reported-by: Meelis Roos <mroos@linux.ee>
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+2018-08-30 18:18 GMT+09:00 Lukas Bulwahn <lukas.bulwahn@gmail.com>:
+> The self assignment was probably introduced by an automated code
+> refactoring in
+> commit 694c49a7c01c ("kconfig: drop localization support").
+>
+> The issue was identified by a self-assign warning when running
+> make menuconfig with clang.
+>
+> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+> ---
 
-Tested-by: Meelis Roos <mroos@linux.ee>
+Applied to linux-kbuild/fixes. Thanks!
+
+
+>  scripts/kconfig/mconf.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> index 83b5836..143c05f 100644
+> --- a/scripts/kconfig/mconf.c
+> +++ b/scripts/kconfig/mconf.c
+> @@ -490,7 +490,6 @@ static void build_conf(struct menu *menu)
+>                         switch (prop->type) {
+>                         case P_MENU:
+>                                 child_count++;
+> -                               prompt = prompt;
+>                                 if (single_menu_mode) {
+>                                         item_make("%s%*c%s",
+>                                                   menu->data ? "-->" : "++>",
+> --
+> 2.7.4
+>
+
+
 
 -- 
-Meelis Roos (mroos@linux.ee)
+Best Regards
+Masahiro Yamada
