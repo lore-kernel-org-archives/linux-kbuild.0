@@ -1,89 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:53023 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727572AbeHaUa3 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:57118 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727268AbeHaUc4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 31 Aug 2018 16:30:29 -0400
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id w7VGLuqc000702
-        for <linux-kbuild@vger.kernel.org>; Sat, 1 Sep 2018 01:21:57 +0900
-Received: by mail-ua1-f42.google.com with SMTP id f4-v6so8600919uao.10
-        for <linux-kbuild@vger.kernel.org>; Fri, 31 Aug 2018 09:21:57 -0700 (PDT)
+        Fri, 31 Aug 2018 16:32:56 -0400
 MIME-Version: 1.0
-In-Reply-To: <de6839047158272d1976ab023b9a222c09679846.1535512872.git.sky@genki.is>
-References: <de6839047158272d1976ab023b9a222c09679846.1535512872.git.sky@genki.is>
+In-Reply-To: <07334982-98f0-561e-f8a1-ba42e36da80e@infradead.org>
+References: <07334982-98f0-561e-f8a1-ba42e36da80e@infradead.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 1 Sep 2018 01:21:15 +0900
-Message-ID: <CAK7LNAS-JCL9o7kUtyyGJqwkYS-wWZtrxAMo94jHFfV+PRaX+A@mail.gmail.com>
-Subject: Re: [PATCH] scripts/setlocalversion: git: Make -dirty check more robust
+Date: Sat, 1 Sep 2018 01:23:35 +0900
+Message-ID: <CAK7LNASetukWY0fV8zu06ECfwcdm7_u0xVVxA=Q0W0VM91hmug@mail.gmail.com>
+Subject: Re: [PATCH v4] modules_install: make missing $DEPMOD a Warning
+ instead of an Error
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Genki Sky <sky@genki.is>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Christian Kujau <lists@nerdbynature.de>, Elazar Leibovich <elazar.leibovich@oracle.com>, Junio C Hamano <gitster@pobox.com>, Michal Marek <michal.lkml@markovi.net>, Nico Schottelius <nico-linuxsetlocalversion@schottelius.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "H. Nikolaus Schaller" <hns@goldelico.com>, stable <stable@vger.kernel.org>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Chih-Wei Huang <cwhuang@linux.org.tw>
 
-2018-08-29 12:26 GMT+09:00 Genki Sky <sky@genki.is>:
-> $(git diff-index) relies on the index being refreshed. This refreshing
-> of the index used to happen, but was removed in cdf2bc632ebc
-> ("scripts/setlocalversion on write-protected source tree", 2013-06-14)
-> due to issues with a read-only filesystem.
+2018-08-29 4:59 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
+> From: Randy Dunlap <rdunlap@infradead.org>
 >
-> If the index is not refreshed, one runs into problems. E.g. as
-> described in [0], git stores the uid in its index, so even if just the
-> uid has changed (or git is tricked into thinking so), then we will
-> think the tree is dirty. So as in [1], if you package linux-git with a
-> system that uses fakeroot(1), you get a "-dirty" version. Unless you
-> manually $(git update-index --refresh) themselves.
+> When $DEPMOD is not found, only print a warning instead of exiting
+> with an error message and error status:
 >
-> The simplest solution seems to be $(git status --porcelain), with an
-> additional flag saying "ignore untracked files". It seems clearer
-> about what it does, and avoids issues regarding cached indexes and
-> writable filesystems, but still has stable output for scripting.
+> Warning: 'make modules_install' requires /sbin/depmod. Please install it.
+> This is probably in the kmod package.
 >
-> [0]: https://public-inbox.org/git/0190ae30-b6c8-2a8b-b1fb-fd9d84e6dfdf@oracle.com/
-> [1]: https://bbs.archlinux.org/viewtopic.php?id=236702
+> Change the Error to a Warning because "not all build hosts for cross
+> compiling Linux are Linux systems and are able to provide a working
+> port of depmod, especially at the file patch /sbin/depmod."
 >
-> Signed-off-by: Genki Sky <sky@genki.is>
+> I.e., "make modules_install" may be used to copy/install the
+> loadable modules files to a target directory on a build system and
+> then transferred to an embedded device where /sbin/depmod is run
+> instead of it being run on the build system.
+>
+> Fixes: 934193a654c1 ("kbuild: verify that $DEPMOD is installed")
+>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Reported-by: H. Nikolaus Schaller <hns@goldelico.com>
+> Cc: stable@vger.kernel.org
+> Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+> Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: Jessica Yu <jeyu@kernel.org>
+> Cc: Chih-Wei Huang <cwhuang@linux.org.tw>
+> Cc: H. Nikolaus Schaller <hns@goldelico.com>
 > ---
 
-Applied to linux-kbuild/fixes. Thanks!
+
+Applied to linux-kbuild/fixes.  Thanks!
 
 
-> Notes:
+> v2: add missing "exit 0" and update the commit message (no Error).
+> v3: add Fixes: and Cc: stable
+> v4: add Reported-by: and more explanation for the patch.
 >
->    Testing: I ran $(git status -uno .... && echo dirty) after each of
->    the following commands, checking sanity:
+>  scripts/depmod.sh |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
->      % > Makefile
->      % git checkout Makefile
->      % chmod -w .git
->      % > scripts/package/Makefile
->      % chmod +w .git
->      % git checkout scripts/package/Makefile
->      % touch new_file
->      % touch scripts/package/new_file
->      % rm new_file scripts/package/new_file
->      % mv Makefile .clang-format
->      % git checkout Makefile .clang-format
+> --- lnx-418.orig/scripts/depmod.sh
+> +++ lnx-418/scripts/depmod.sh
+> @@ -15,9 +15,9 @@ if ! test -r System.map ; then
+>  fi
 >
->  scripts/setlocalversion | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  if [ -z $(command -v $DEPMOD) ]; then
+> -       echo "'make modules_install' requires $DEPMOD. Please install it." >&2
+> +       echo "Warning: 'make modules_install' requires $DEPMOD. Please install it." >&2
+>         echo "This is probably in the kmod package." >&2
+> -       exit 1
+> +       exit 0
+>  fi
 >
-> diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-> index 71f39410691b..79f7dd57d571 100755
-> --- a/scripts/setlocalversion
-> +++ b/scripts/setlocalversion
-> @@ -74,7 +74,7 @@ scm_version()
->                 fi
+>  # older versions of depmod require the version string to start with three
 >
->                 # Check for uncommitted changes
-> -               if git diff-index --name-only HEAD | grep -qv "^scripts/package"; then
-> +               if git status -uno --porcelain | grep -qv '^.. scripts/package'; then
->                         printf '%s' -dirty
->                 fi
->
-> --
-> 2.18.0
 >
 
 
