@@ -1,133 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:35918 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725949AbeICOnV (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 3 Sep 2018 10:43:21 -0400
-MIME-Version: 1.0
-In-Reply-To: <s5h6004hokn.wl-tiwai@suse.de>
-References: <20180627143705.5a1fed1c@kitsune.suse.cz> <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
- <20180628111623.3807fe9b@naga.suse.cz> <CAK7LNARRKU7Mfa8ZBu1qPFYFRr-5k69sjVyERM2bYcnWoBDN8g@mail.gmail.com>
- <20180806200725.4efa5d35@kitsune.suse.cz> <CAK7LNATCktToMui4NYxoUXV8ZbuDK8F0JCp_CysEWaSBPUP7NQ@mail.gmail.com>
- <s5h6004hokn.wl-tiwai@suse.de>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 3 Sep 2018 19:23:05 +0900
-Message-ID: <CAK7LNATwJsYAm_VLZKJryD2zB5OHr9qVBg2mD4hyu+ieNd+r0A@mail.gmail.com>
-Subject: Re: due to kconfig changes kernel config file is no longer sufficient
- for configuring the kernel
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Received: from prv1-mh.provo.novell.com ([137.65.248.33]:44163 "EHLO
+        prv1-mh.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726023AbeICPoJ (ORCPT
+        <rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
+        Mon, 3 Sep 2018 11:44:09 -0400
+Message-Id: <5B8D19E702000078001E487E@prv1-mh.provo.novell.com>
+Date: Mon, 03 Sep 2018 05:24:23 -0600
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: Re: [PATCH] kallsyms: reduce size a little on 64-bit
+References: <5B8563A702000078001E2A82@prv1-mh.provo.novell.com>
+ <CAK7LNAQZw88d08wEn=S7mVgEz86djuig6MYMgT_hWwBU5jzrCA@mail.gmail.com>
+In-Reply-To: <CAK7LNAQZw88d08wEn=S7mVgEz86djuig6MYMgT_hWwBU5jzrCA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Takashi Iwai <tiwai@suse.de>
-Cc: =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andreas Schwab <schwab@suse.de>, Michal Kubecek <mkubecek@suse.cz>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
 
-Hi.
-
-
-2018-08-21 3:37 GMT+09:00 Takashi Iwai <tiwai@suse.de>:
-> On Mon, 20 Aug 2018 20:15:12 +0200,
-> Masahiro Yamada wrote:
+>>> On 02.09.18 at 19:12, <yamada.masahiro@socionext.com> wrote:
+> 2018-08-29 0:00 GMT+09:00 Jan Beulich <JBeulich@suse.com>:
+>> --- 4.19-rc1/scripts/kallsyms.c
+>> +++ 4.19-rc1-kallsyms-reduce-size/scripts/kallsyms.c
+>> @@ -182,6 +182,8 @@ static int symbol_in_range(struct sym_en
+>>         for (i = 0; i < entries; ++i) {
+>>                 ar = &ranges[i];
 >>
->> 2018-08-07 3:07 GMT+09:00 Michal Such=C3=A1nek <msuchanek@suse.de>:
->> > On Mon, 30 Jul 2018 17:02:42 +0900
->> > Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
->> >
->> >> 2018-06-28 18:16 GMT+09:00 Michal Such=C3=A1nek <msuchanek@suse.de>:
->> >> > On Wed, 27 Jun 2018 23:07:21 +0900
->> >> > Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
->> >> >
->> >> >> Hi.
->> >> >>
->> >> >>
->> >> >> 2018-06-27 21:37 GMT+09:00 Michal Such=C3=A1nek <msuchanek@suse.de=
->:
->> >> >> > Hello,
->> >> >> >
->> >> >> > in the x86 Kconfig we have this:
->> >> >> >
->> >> >> > # Select 32 or 64 bit
->> >> >> > config 64BIT
->> >> >> >         bool "64-bit kernel" if "$(ARCH)" =3D "x86"
->> >> >> >         default "$(ARCH)" !=3D "i386"
->> >> >> >         ---help---
->> >> >> >           Say yes to build a 64-bit kernel - formerly known as
->> >> >> > x86_64 Say no to build a 32-bit kernel - formerly known as i386
->> >> >> >
->> >> >> > Since commit 104daea149c4 ("kconfig: reference environment
->> >> >> > variables directly and remove 'option env=3D'") the value of ARC=
-H
->> >> >> > is not saved in the kernel config.
->> >> >>
->> >> >> I think this commit is unrelated.  It was just a syntax change.
->> >> >
->> >> > This does not look like syntax only change to me:
->> >> >
->> >> > diff --git a/init/Kconfig b/init/Kconfig
->> >> > index 15aae32e0719..1217fc62ca61 100644
->> >> > --- a/init/Kconfig
->> >> > +++ b/init/Kconfig
->> >> > @@ -1,20 +1,12 @@
->> >> > -config ARCH
->> >> > -       string
->> >> > -       option env=3D"ARCH"
->> >> > -
->> >> > -config KERNELVERSION
->> >> > -       string
->> >> > -       option env=3D"KERNELVERSION"
->> >> > -
->> >>
->> >> This is just syntax change.
->> >>
->> >> 'option env=3D' was used to reference an environment variable.
->> >>
->> >> Now, $(ARCH), $(KERNELVERSION) are simpler forms.
->> >>
->> >>
->> >> >>
->> >> >> Unless I am missing something,
->> >> >> we have never saved ARCH in the .config in the past.
->> >> >
->> >> > There was a config symbol defined for it before the commit removed
->> >> > it.
->> >>
->> >> No.
->> >>
->> >> CONFIG symbols with'option env=3D'
->> >> are not written out to the .config file.
->> >>
->> >> We have never had CONFIG_ARCH or CONFIG_KERNELVERSION.
->
-> Maybe it sounds like a stupid question, but...
-> if passing ARCH=3D is almost mandatory for distinguishing the bi-arch or
-> cross-compile cases, why don't we save it in .config?
+>> +               if (!ar->end)
+>> +                       continue;
+>>                 if (s->addr >= ar->start && s->addr <= ar->end)
+>>                         return 1;
+>>         }
+> 
+> 
+> What is this hunk doing?
+> 
+> At least, I cannot understand it from the patch description.
 
+Hmm, I agree, it looks like it is addressing an unrelated issue. I'll
+re-submit with it dropped. The patch here dates back many
+years, so I suppose I noticed this other issue at the same time,
+but then forgot to split out the extra change.
 
-The .config may not exist, may not be loaded.
-
-For "make help", "make headers_install" etc.
-ARCH needs be given from the command line anyway.
-
-I do not want to obscure "when to pass ARCH".
-
-
-> The whole "regression" we've seen can be worked around by passing
-> ARCH at each time.  So, by having it in .config, everything would work
-> more easily, no?
-
-
-Recording ARCH in .config does not solve the problem
-because the .config contents depend on the compiler.
-
-
->
->
-> thanks,
->
-> Takashi
-
-
-
---=20
-Best Regards
-Masahiro Yamada
+Jan
