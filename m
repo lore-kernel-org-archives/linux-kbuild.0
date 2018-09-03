@@ -1,79 +1,146 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:36957 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727480AbeICOXB (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:17092 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727462AbeICO0c (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 3 Sep 2018 10:23:01 -0400
+        Mon, 3 Sep 2018 10:26:32 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180820233331.08dd2bfb@naga.suse.cz>
+References: <20180627143705.5a1fed1c@kitsune.suse.cz> <CAK7LNARVPNx_uC5xTrS_p9T4nMRTC79BO51T4Lytv2eU1c-ynw@mail.gmail.com>
+ <20180628111623.3807fe9b@naga.suse.cz> <CAK7LNARRKU7Mfa8ZBu1qPFYFRr-5k69sjVyERM2bYcnWoBDN8g@mail.gmail.com>
+ <20180806200725.4efa5d35@kitsune.suse.cz> <CAK7LNATCktToMui4NYxoUXV8ZbuDK8F0JCp_CysEWaSBPUP7NQ@mail.gmail.com>
+ <20180820233331.08dd2bfb@naga.suse.cz>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [RFC PATCH 1/3] kconfig: support an environment variable for non-interactive syncconfig
-Date: Mon,  3 Sep 2018 19:01:54 +0900
-Message-Id: <1535968916-9159-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1535968916-9159-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1535968916-9159-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Mon, 3 Sep 2018 19:06:00 +0900
+Message-ID: <CAK7LNAQ5Q-DPL006UJzs-dAhMo5Cdaa9P+UAD+XL67QvPw353g@mail.gmail.com>
+Subject: Re: due to kconfig changes kernel config file is no longer sufficient
+ for configuring the kernel
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Javier Martinez Canillas <javierm@redhat.com>, Laura Abbott <labbott@redhat.com>, Jiri Kosina <jkosina@suse.cz>, Ben Hutchings <ben.hutchings@codethink.co.uk>, =?UTF-8?q?Michal=20Such=8F=AB=A1nek?= <msuchanek@suse.de>, Takashi Iwai <tiwai@suse.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
+To: =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Takashi Iwai <tiwai@suse.de>, Andreas Schwab <schwab@suse.de>, Michal Kubecek <mkubecek@suse.cz>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, "David S. Miller" <davem@davemloft.net>, Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Philippe Ombredanne <pombredanne@nexb.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Jeff Mahoney <jeffm@suse.com>, "Peter Zijlstra," <peterz@infradead.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Frederic Weisbecker <frederic@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, linux-um@lists.infradead.org
 
-When Kconfig files are updated, or build environments etc. are changed,
-'make syncconfig' is invoked, which will show prompts if new config
-options are available.  Users must explicitly input values for all
-new symbols.  This is the conventional behavior for the kernel build.
+Hi,
 
-However, it would be useful to process this non-interactively in such
-cases as package building.
 
-Package maintainers create source packages with the .config configured
-on their machines.  Package builders may work on different machine
-environments, where different compilers are installed.
+2018-08-21 6:33 GMT+09:00 Michal Such=C3=A1nek <msuchanek@suse.de>:
+> Hello,
+>
+> On Tue, 21 Aug 2018 03:15:12 +0900
+> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+>
+>> 2018-08-07 3:07 GMT+09:00 Michal Such=C3=A1nek <msuchanek@suse.de>:
+>> > On Mon, 30 Jul 2018 17:02:42 +0900
+>> > Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+>> >
+>> >> 2018-06-28 18:16 GMT+09:00 Michal Such=C3=A1nek <msuchanek@suse.de>:
+>> >> > On Wed, 27 Jun 2018 23:07:21 +0900
+>> >> > Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+>> >> >
+>
+>> >>
+>> >>
+>> >>
+>> >> >>
+>> >> >> out-of-tree modules are built with exactly the same
+>> >> >> configuration as used for the kernel.
+>> >> >
+>> >> > It is not true. And that is the problem. You need the config file
+>> >> > and dump of the environment passed to the make command at
+>> >> > configuration time to get the exact same configuration. The
+>> >> > environment is not saved anywhere, though.
+>> >>
+>> >>
+>> >> Why dump of the environment?
+>> >>
+>> >>
+>> >> If you are building external modules natively
+>> >> your distribution provides /lib/modules/$(uname -r)/build,
+>> >> which contains files enough for building external modules.
+>> >>
+>> >> You can pass the directory path to M=3D... parameter.  That's it.
+>> >
+>> > No, that's not it. Since passing ARCH=3Di386 is the de-facto standard
+>> > to configure a 32bit kernel and the result of passing that was not
+>> > saved you need to pass it to make as well.
+>>
+>>
+>> If you pass ARCH=3D for the configuration phase,
+>> you need to pass the same ARCH=3D in the build phase.
+>>
+>>
+>>
+>>
+>> What I can suggest for you is:
+>>
+>>
+>> $ make ARCH=3Di386 defconfig
+>> $ make ARCH=3Di386
+>>
+>>    OR
+>>
+>> $ make i386_defconfig
+>> $ make
+>
+> Maybe you missed that but I do not want to build the defconfig. I want
+> to build a *particular* config which has been saved in a file
+> beforehand.
+>>
+>> > And you need to patch a number of
+>> > 3rd party build scripts that build a kernel module as part of a
+>> > bigger project.
+>>
+>>
+>> You do not need to patch a number of scripts.
+>>
+>> Just one liner fix.
+>> Add 'export ARCH=3Di386' in the top level script.
+>
+> And that does not work because there is no toplevel script. rpm has
+> three toplevel scripts - prep, build and install.
 
-With the recent changes in Kconfig, the .config contents depend on
-the compiler.  During package building, it is not sensible to show
-prompts for new symbols; it would be just annoys script automation.
 
-Add a new switch, KCONFIG_NONINTERACTIVE_UPDATE.  If this environment
-variable is set, Kconfig will sync the configuration non-interactively.
-All new symbols are silently set to their default values.
+OK, I understood real problem cases.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+I wrote patches to support non-interactive .config updates.
 
- Documentation/kbuild/kconfig.txt | 6 ++++++
- scripts/kconfig/conf.c           | 5 +++++
- 2 files changed, 11 insertions(+)
+For package building like rpm, deb, etc.
+the target ARCH is determined when creating a source package.
+If so, it would not hurt to hard-code to record ARCH in the spec file.
 
-diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-index 68c8291..5c29c3f 100644
---- a/Documentation/kbuild/kconfig.txt
-+++ b/Documentation/kbuild/kconfig.txt
-@@ -129,6 +129,12 @@ KCONFIG_NOSILENTUPDATE
- If this variable has a non-blank value, it prevents silent kernel
- config updates (requires explicit updates).
- 
-+KCONFIG_NONINTERACTIVE_UPDATE
-+--------------------------------------------------
-+If this variable has a non-blank value, it prevents user input prompts
-+from showing up even when new symbols are available.  All new symbols
-+are silently set to their default values.
-+
- KCONFIG_AUTOCONFIG
- --------------------------------------------------
- This environment variable can be set to specify the path & name of the
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 7b2b372..b64bbc0 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -680,6 +680,11 @@ int main(int ac, char **av)
- 	case oldconfig:
- 	case listnewconfig:
- 	case syncconfig:
-+		if (input_mode == syncconfig) {
-+			name = getenv("KCONFIG_NONINTERACTIVE_UPDATE");
-+			if (name && *name)
-+				break;
-+		}
- 		/* Update until a loop caused no more changes */
- 		do {
- 			conf_cnt = 0;
--- 
-2.7.4
+
+> Building out-of-tree module is another toplevel script.
+
+
+As I said before, the .config is not reconfigured
+when building out-of-tree modules.
+
+Out-of-tree modules are built with the .config
+that has been used to build vmlinux
+regardless of whether you pass ARCH=3Di386, ARCH=3Dx86_64, or nothing.
+
+If rpmbuild is given target option like 'rpmbuild --target i386 ...",
+it think it makes sense to propagate it to ARCH=3D.
+
+
+> And it does not suffice to 'export ARCH=3Di386'. What if it was a 64bit
+> config? How do I tell?
+>
+> With more and more options left out of the config that depend on
+> compiler features, environment variables, phase of the moon or whatnot
+> you can't even tell what kind of kernel the user is running by looking
+> at the config.
+
+
+I added non-interactive .config update.
+
+Please try it.
+
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
