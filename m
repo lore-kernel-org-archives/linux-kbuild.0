@@ -1,108 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:2871 "EHLO mga14.intel.com"
+Received: from gate.crashing.org ([63.228.1.57]:57993 "EHLO gate.crashing.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727621AbeIFDIv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Sep 2018 23:08:51 -0400
-From: Paulo Zanoni <paulo.r.zanoni@intel.com>
-Subject: [RFC 2/2] tracing/Makefile: reindent the CONFIG_FUNCTION_TRACER chunk
-Date: Wed,  5 Sep 2018 15:36:00 -0700
-Message-Id: <20180905223600.20994-2-paulo.r.zanoni@intel.com>
-In-Reply-To: <20180905223600.20994-1-paulo.r.zanoni@intel.com>
-References: <20180905223600.20994-1-paulo.r.zanoni@intel.com>
+        id S1727611AbeIFDcU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 5 Sep 2018 23:32:20 -0400
+Date: Wed, 5 Sep 2018 17:53:33 -0500
+From: Segher Boessenkool <segher@kernel.crashing.org>
+Subject: Re: [PATCH v4 07/11] kbuild: use 'include' directive to load auto.conf from top Makefile
+Message-ID: <20180905225333.GA23155@gate.crashing.org>
+References: <1532072796-7947-1-git-send-email-yamada.masahiro@socionext.com> <1532072796-7947-8-git-send-email-yamada.masahiro@socionext.com> <20180903093945.GA1195@zn.tnic> <CAK7LNAQOd-QA6E7189q4K-p_9ReRtE88UbhtuXS9600nOQTgaA@mail.gmail.com> <20180903100021.GD10249@zn.tnic>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180903100021.GD10249@zn.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Paulo Zanoni <paulo.r.zanoni@intel.com>, Steven Rostedt <rostedt@goodmis.org>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-The whole block was lacking an indent level for the
-CONFIG_FUNCTION_TRACER ifdef, which made the code a little harder to
-read. Add the missing indent level and also document the endif for
-easier reading.
+On Mon, Sep 03, 2018 at 12:00:21PM +0200, Borislav Petkov wrote:
+> On Mon, Sep 03, 2018 at 06:54:12PM +0900, Masahiro Yamada wrote:
+> > You are right - I missed this usecase,
+> > but I still want to excuse "it is rare enough".
+> 
+> Isn't there a Makefile way to check file existence before including it?
 
-At the very end some tabs were replaced with spaces. My small
-understanding of Makefiles suggests that spaces are the appropriate
-characters here.
+Sure there is, you can use $(wildcard ) .
 
-Cc: Steven Rostedt (VMware) <rostedt@goodmis.org>
-Signed-off-by: Paulo Zanoni <paulo.r.zanoni@intel.com>
----
- Makefile | 60 ++++++++++++++++++++++++++++----------------------------
- 1 file changed, 30 insertions(+), 30 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 2c8df481b4f1..dce0f7330038 100644
---- a/Makefile
-+++ b/Makefile
-@@ -755,40 +755,40 @@ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
- endif
- 
- ifdef CONFIG_FUNCTION_TRACER
--cc_flags_ftrace_ := -pg
--ifdef CONFIG_FTRACE_MCOUNT_RECORD
--  # gcc 5 supports generating the mcount tables directly
--  ifeq ($(call cc-option-yn,-mrecord-mcount),y)
--    cc_flags_ftrace_	+= -mrecord-mcount
--    export CC_USING_RECORD_MCOUNT := 1
--  endif
--  ifdef CONFIG_HAVE_NOP_MCOUNT
--    ifeq ($(call cc-option-yn, -mnop-mcount),y)
--      cc_flags_ftrace_	+= -mnop-mcount
--      CC_FLAGS_USING	+= -DCC_USING_NOP_MCOUNT
-+  cc_flags_ftrace_ := -pg
-+  ifdef CONFIG_FTRACE_MCOUNT_RECORD
-+    # gcc 5 supports generating the mcount tables directly
-+    ifeq ($(call cc-option-yn,-mrecord-mcount),y)
-+      cc_flags_ftrace_	+= -mrecord-mcount
-+      export CC_USING_RECORD_MCOUNT := 1
-+    endif
-+    ifdef CONFIG_HAVE_NOP_MCOUNT
-+      ifeq ($(call cc-option-yn, -mnop-mcount),y)
-+        cc_flags_ftrace_	+= -mnop-mcount
-+        CC_FLAGS_USING		+= -DCC_USING_NOP_MCOUNT
-+      endif
-     endif
-   endif
--endif
--ifdef CONFIG_HAVE_FENTRY
--  ifeq ($(call cc-option-yn, -mfentry),y)
--    cc_flags_ftrace_	+= -mfentry
--    CC_FLAGS_USING	+= -DCC_USING_FENTRY
-+  ifdef CONFIG_HAVE_FENTRY
-+    ifeq ($(call cc-option-yn, -mfentry),y)
-+      cc_flags_ftrace_	+= -mfentry
-+      CC_FLAGS_USING	+= -DCC_USING_FENTRY
-+    endif
-   endif
--endif
- 
--ifndef CC_FLAGS_FTRACE
--  CC_FLAGS_FTRACE := $(cc_flags_ftrace_)
--endif
--export CC_FLAGS_FTRACE
--KBUILD_CFLAGS	+= $(CC_FLAGS_FTRACE) $(CC_FLAGS_USING)
--KBUILD_AFLAGS	+= $(CC_FLAGS_USING)
--ifdef CONFIG_DYNAMIC_FTRACE
--	ifdef CONFIG_HAVE_C_RECORDMCOUNT
--		BUILD_C_RECORDMCOUNT := y
--		export BUILD_C_RECORDMCOUNT
--	endif
--endif
--endif
-+  ifndef CC_FLAGS_FTRACE
-+    CC_FLAGS_FTRACE := $(cc_flags_ftrace_)
-+  endif
-+  export CC_FLAGS_FTRACE
-+  KBUILD_CFLAGS	+= $(CC_FLAGS_FTRACE) $(CC_FLAGS_USING)
-+  KBUILD_AFLAGS	+= $(CC_FLAGS_USING)
-+  ifdef CONFIG_DYNAMIC_FTRACE
-+    ifdef CONFIG_HAVE_C_RECORDMCOUNT
-+      BUILD_C_RECORDMCOUNT := y
-+      export BUILD_C_RECORDMCOUNT
-+    endif
-+  endif
-+endif # CONFIG_FUNCTION_TRACER
- 
- # We trigger additional mismatches with less inlining
- ifdef CONFIG_DEBUG_SECTION_MISMATCH
--- 
-2.17.1
+Segher
