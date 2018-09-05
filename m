@@ -1,46 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hurricane.elijah.cs.cmu.edu ([128.2.209.191]:60296 "EHLO
-        hurricane.elijah.cs.cmu.edu" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727397AbeIEWAL (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Sep 2018 18:00:11 -0400
-Date: Wed, 5 Sep 2018 13:28:58 -0400
-From: Jan Harkes <jaharkes@cs.cmu.edu>
-Subject: Re: [PATCH 05/11] UAPI: coda: Don't use internal kernel structs in
- UAPI
-Message-ID: <20180905172858.pv2vafetjzzk5jxs@cs.cmu.edu>
+Received: from ou.quest-ce.net ([195.154.187.82]:42229 "EHLO ou.quest-ce.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726497AbeIEWF6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 5 Sep 2018 18:05:58 -0400
+Message-ID: <a1efae8d26cc5b73b180e9521d6b62590c55aa86.camel@opteya.com>
+From: Yann Droneaud <ydroneaud@opteya.com>
+Date: Wed, 05 Sep 2018 19:33:38 +0200
+In-Reply-To: <20180905165552.GB25206@kroah.com>
 References: <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk>
- <153616291029.23468.16421004714304578585.stgit@warthog.procyon.org.uk>
- <1c57005277ac723ebb670a1dc847a205f0529d53.camel@opteya.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+         <20180905165552.GB25206@kroah.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1c57005277ac723ebb670a1dc847a205f0529d53.camel@opteya.com>
+Subject: Re: [RFC] UAPI: Check headers by compiling all together as C++
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Yann Droneaud <ydroneaud@opteya.com>
-Cc: David Howells <dhowells@redhat.com>, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Greg KH <greg@kroah.com>, David Howells <dhowells@redhat.com>
+Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org, keyrings@vger.kernel.org, David Airlie <airlied@linux.ie>, linux-nilfs@vger.kernel.org, linux-nvdimm@lists.01.org, "Michael S. Tsirkin" <mst@redhat.com>, codalist@coda.cs.cmu.edu, coda@cs.cmu.edu, coreteam@netfilter.org, Rob Clark <robdclark@gmail.com>, linux-arm-msm@vger.kernel.org, Kent Overstreet <kent.overstreet@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Takashi Iwai <tiwai@suse.com>, linux-bcache@vger.kernel.org, Coly Li <colyli@suse.de>, Jaroslav Kysela <perex@perex.cz>, Jan Harkes <jaharkes@cs.cmu.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>, Jason Wang <jasowang@redhat.com>, Mat Martineau <mathew.j.martineau@linux.intel.com>, netfilter-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org, moderated for non-subscribers <alsa-devel@alsa-project.org>, freedreno@lists.freedesktop.org, linux-kernel@vger.kernel.org
 
-On Wed, Sep 05, 2018 at 07:12:37PM +0200, Yann Droneaud wrote:
-> Le mercredi 05 septembre 2018 à 16:55 +0100, David Howells a écrit :
-> > The size and layout of internal kernel structures may not be relied
-> > upon outside of the kernel and may even change in a containerised
-> > environment if a container image is frozen and shifted to another
-> > machine.
+Hi,
+
+Le mercredi 05 septembre 2018 Ã  18:55 +0200, Greg KH a Ã©crit :
+> On Wed, Sep 05, 2018 at 04:54:27PM +0100, David Howells wrote:
 > > 
-> > Excise these from Coda's upc_req struct.
-...
+> > Here's a set of patches that inserts a step into the build process to make
+> > sure that the UAPI headers can all be built together with C++ (if the
+> > compiler being used supports C++).  All but the final patch perform fixups,
+> > including:
 > 
-> This structure should not have been exposed to userspace in the first
-> place: it's unusable by userspace as it is. It was incorrect to have it
-> outside of #ifdef __KERNEL__ before commit 607ca46e97a1b ... 
-...
-> So the structure can be moved back to <linux/coda_psdev.h>.
+> Wait, why do we care?  What has recently changed to start to directly
+> import kernel uapi files into C++ code?
+> 
+> And if userspace wants to do this, can't they do the C namespace trick
+> themselves when they do the import?  That must be how they are doing it
+> today, right?
+> 
 
-I found a year old patch that clearly fell through the cracks that
-fixes this exact thing.
+They can't.
 
-    https://lkml.org/lkml/2017/8/6/186
 
-Jan
+Adding extern "C" { } doesn't magically make "class" a non keyword.
+Even if it was the case, writing C++ code using whatever->class would
+probably broke because class is a keyword in C++.
+
+-- 
+Yann Droneaud
+OPTEYA
