@@ -1,48 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ou.quest-ce.net ([195.154.187.82]:42229 "EHLO ou.quest-ce.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726497AbeIEWF6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Sep 2018 18:05:58 -0400
-Message-ID: <a1efae8d26cc5b73b180e9521d6b62590c55aa86.camel@opteya.com>
-From: Yann Droneaud <ydroneaud@opteya.com>
-Date: Wed, 05 Sep 2018 19:33:38 +0200
-In-Reply-To: <20180905165552.GB25206@kroah.com>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37176 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726497AbeIEWGm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 5 Sep 2018 18:06:42 -0400
+Date: Wed, 5 Sep 2018 13:35:29 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 03/11] UAPI: virtio_net: Fix use of C++ keywords as
+ structural members
+Message-ID: <20180905125636-mutt-send-email-mst@kernel.org>
 References: <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk>
-         <20180905165552.GB25206@kroah.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [RFC] UAPI: Check headers by compiling all together as C++
+ <153616289529.23468.7498785670556620808.stgit@warthog.procyon.org.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <153616289529.23468.7498785670556620808.stgit@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg KH <greg@kroah.com>, David Howells <dhowells@redhat.com>
-Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org, keyrings@vger.kernel.org, David Airlie <airlied@linux.ie>, linux-nilfs@vger.kernel.org, linux-nvdimm@lists.01.org, "Michael S. Tsirkin" <mst@redhat.com>, codalist@coda.cs.cmu.edu, coda@cs.cmu.edu, coreteam@netfilter.org, Rob Clark <robdclark@gmail.com>, linux-arm-msm@vger.kernel.org, Kent Overstreet <kent.overstreet@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Takashi Iwai <tiwai@suse.com>, linux-bcache@vger.kernel.org, Coly Li <colyli@suse.de>, Jaroslav Kysela <perex@perex.cz>, Jan Harkes <jaharkes@cs.cmu.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>, Jason Wang <jasowang@redhat.com>, Mat Martineau <mathew.j.martineau@linux.intel.com>, netfilter-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org, moderated for non-subscribers <alsa-devel@alsa-project.org>, freedreno@lists.freedesktop.org, linux-kernel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org
 
-Hi,
-
-Le mercredi 05 septembre 2018 à 18:55 +0200, Greg KH a écrit :
-> On Wed, Sep 05, 2018 at 04:54:27PM +0100, David Howells wrote:
-> > 
-> > Here's a set of patches that inserts a step into the build process to make
-> > sure that the UAPI headers can all be built together with C++ (if the
-> > compiler being used supports C++).  All but the final patch perform fixups,
-> > including:
+On Wed, Sep 05, 2018 at 04:54:55PM +0100, David Howells wrote:
+> The virtio_net_ctrl_hdr struct uses a C++ keyword as structural members.  Fix
+> this by inserting an anonymous union that provides an alternative name and
+> then hide the reserved name in C++.
 > 
-> Wait, why do we care?  What has recently changed to start to directly
-> import kernel uapi files into C++ code?
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: "Michael S. Tsirkin" <mst@redhat.com>
+> cc: Jason Wang <jasowang@redhat.com>
+> cc: virtualization@lists.linux-foundation.org
+> ---
 > 
-> And if userspace wants to do this, can't they do the C namespace trick
-> themselves when they do the import?  That must be how they are doing it
-> today, right?
+>  include/uapi/linux/virtio_net.h |    7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 > 
+> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+> index a3715a3224c1..967142bc0e05 100644
+> --- a/include/uapi/linux/virtio_net.h
+> +++ b/include/uapi/linux/virtio_net.h
+> @@ -150,7 +150,12 @@ struct virtio_net_hdr_mrg_rxbuf {
+>   * command goes in between.
+>   */
+>  struct virtio_net_ctrl_hdr {
+> -	__u8 class;
+> +	union {
+> +#ifndef __cplusplus
+> +		__u8 class;
+> +#endif
+> +		__u8 _class;
+> +	};
+>  	__u8 cmd;
+>  } __attribute__((packed));
 
-They can't.
 
+As long as you do not intend to use any classes, how about
+simply adding
 
-Adding extern "C" { } doesn't magically make "class" a non keyword.
-Even if it was the case, writing C++ code using whatever->class would
-probably broke because class is a keyword in C++.
+-Dclass=_class
+
+to your command line?
+
+Seems to work fine with gcc 8.1.1 on Fedora.
 
 -- 
-Yann Droneaud
-OPTEYA
+MST
