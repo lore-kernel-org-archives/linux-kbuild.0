@@ -1,61 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:46418 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726497AbeIEVZm (ORCPT
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:55511 "EHLO
+        wout2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726335AbeIEV1D (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Sep 2018 17:25:42 -0400
-Date: Wed, 5 Sep 2018 18:54:36 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 03/11] UAPI: virtio_net: Fix use of C++ keywords as
- structural members
-Message-ID: <20180905165436.GA25206@kroah.com>
+        Wed, 5 Sep 2018 17:27:03 -0400
+Date: Wed, 5 Sep 2018 18:55:52 +0200
+From: Greg KH <greg@kroah.com>
+Subject: Re: [RFC] UAPI: Check headers by compiling all together as C++
+Message-ID: <20180905165552.GB25206@kroah.com>
 References: <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk>
- <153616289529.23468.7498785670556620808.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <153616289529.23468.7498785670556620808.stgit@warthog.procyon.org.uk>
+In-Reply-To: <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: David Howells <dhowells@redhat.com>
-Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org, keyrings@vger.kernel.org, David Airlie <airlied@linux.ie>, linux-nilfs@vger.kernel.org, linux-nvdimm@lists.01.org, "Michael S. Tsirkin" <mst@redhat.com>, codalist@coda.cs.cmu.edu, coda@cs.cmu.edu, coreteam@netfilter.org, Rob Clark <robdclark@gmail.com>, linux-arm-msm@vger.kernel.org, Kent Overstreet <kent.overstreet@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Takashi Iwai <tiwai@suse.com>, linux-bcache@vger.kernel.org, Coly Li <colyli@suse.de>, Jaroslav Kysela <perex@perex.cz>, Jan Harkes <jaharkes@cs.cmu.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>, Jason Wang <jasowang@redhat.com>, Mat Martineau <mathew.j.martineau@linux.intel.com>, netfilter-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org, moderated for non-subscribers <alsa-devel@alsa-project.org>, freedreno@lists.freedesktop.org, linux-kernel@vger.kernel.org
 
-On Wed, Sep 05, 2018 at 04:54:55PM +0100, David Howells wrote:
-> The virtio_net_ctrl_hdr struct uses a C++ keyword as structural members.  Fix
-> this by inserting an anonymous union that provides an alternative name and
-> then hide the reserved name in C++.
+On Wed, Sep 05, 2018 at 04:54:27PM +0100, David Howells wrote:
 > 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: "Michael S. Tsirkin" <mst@redhat.com>
-> cc: Jason Wang <jasowang@redhat.com>
-> cc: virtualization@lists.linux-foundation.org
-> ---
-> 
->  include/uapi/linux/virtio_net.h |    7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> index a3715a3224c1..967142bc0e05 100644
-> --- a/include/uapi/linux/virtio_net.h
-> +++ b/include/uapi/linux/virtio_net.h
-> @@ -150,7 +150,12 @@ struct virtio_net_hdr_mrg_rxbuf {
->   * command goes in between.
->   */
->  struct virtio_net_ctrl_hdr {
-> -	__u8 class;
-> +	union {
-> +#ifndef __cplusplus
-> +		__u8 class;
-> +#endif
-> +		__u8 _class;
-> +	};
+> Here's a set of patches that inserts a step into the build process to make
+> sure that the UAPI headers can all be built together with C++ (if the
+> compiler being used supports C++).  All but the final patch perform fixups,
+> including:
 
-Ugh, ick, no!
+Wait, why do we care?  What has recently changed to start to directly
+import kernel uapi files into C++ code?
 
-Come on now, either put the whole C namespace stuff around the file, or
-don't care about this at all.  Doing this whack-a-mole style is a mess.
+And if userspace wants to do this, can't they do the C namespace trick
+themselves when they do the import?  That must be how they are doing it
+today, right?
 
-"class" is a fine variable name for C code, there's no reason this has
-to change here at all.
+thanks,
 
 greg k-h
