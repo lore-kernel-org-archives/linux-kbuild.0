@@ -1,54 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53584 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726497AbeIEWOT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Sep 2018 18:14:19 -0400
-Date: Wed, 5 Sep 2018 13:42:58 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [RFC] UAPI: Check headers by compiling all together as C++
-Message-ID: <20180905133711-mutt-send-email-mst@kernel.org>
+Received: from ou.quest-ce.net ([195.154.187.82]:42241 "EHLO ou.quest-ce.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726497AbeIEWOr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 5 Sep 2018 18:14:47 -0400
+Message-ID: <1c57005277ac723ebb670a1dc847a205f0529d53.camel@opteya.com>
+From: Yann Droneaud <ydroneaud@opteya.com>
+Date: Wed, 05 Sep 2018 19:12:37 +0200
+In-Reply-To: <153616291029.23468.16421004714304578585.stgit@warthog.procyon.org.uk>
 References: <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk>
- <20180905165552.GB25206@kroah.com>
- <a1efae8d26cc5b73b180e9521d6b62590c55aa86.camel@opteya.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+         <153616291029.23468.16421004714304578585.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <a1efae8d26cc5b73b180e9521d6b62590c55aa86.camel@opteya.com>
+Subject: Re: [PATCH 05/11] UAPI: coda: Don't use internal kernel structs in
+ UAPI
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Yann Droneaud <ydroneaud@opteya.com>
-Cc: Greg KH <greg@kroah.com>, David Howells <dhowells@redhat.com>, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org, keyrings@vger.kernel.org, David Airlie <airlied@linux.ie>, linux-nilfs@vger.kernel.org, linux-nvdimm@lists.01.org, codalist@coda.cs.cmu.edu, coda@cs.cmu.edu, coreteam@netfilter.org, Rob Clark <robdclark@gmail.com>, linux-arm-msm@vger.kernel.org, Kent Overstreet <kent.overstreet@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Takashi Iwai <tiwai@suse.com>, linux-bcache@vger.kernel.org, Coly Li <colyli@suse.de>, Jaroslav Kysela <perex@perex.cz>, Jan Harkes <jaharkes@cs.cmu.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>, Jason Wang <jasowang@redhat.com>, Mat Martineau <mathew.j.martineau@linux.intel.com>, netfilter-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org, moderated for non-subscribers <alsa-devel@alsa-project.org>, freedreno@lists.freedesktop.org, linux-kernel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, codalist@coda.cs.cmu.edu, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Sep 05, 2018 at 07:33:38PM +0200, Yann Droneaud wrote:
-> Hi,
+Le mercredi 05 septembre 2018 Ã  16:55 +0100, David Howells a Ã©crit :
+> The size and layout of internal kernel structures may not be relied
+> upon outside of the kernel and may even change in a containerised
+> environment if a container image is frozen and shifted to another
+> machine.
 > 
-> Le mercredi 05 septembre 2018 à 18:55 +0200, Greg KH a écrit :
-> > On Wed, Sep 05, 2018 at 04:54:27PM +0100, David Howells wrote:
-> > > 
-> > > Here's a set of patches that inserts a step into the build process to make
-> > > sure that the UAPI headers can all be built together with C++ (if the
-> > > compiler being used supports C++).  All but the final patch perform fixups,
-> > > including:
-> > 
-> > Wait, why do we care?  What has recently changed to start to directly
-> > import kernel uapi files into C++ code?
-> > 
-> > And if userspace wants to do this, can't they do the C namespace trick
-> > themselves when they do the import?  That must be how they are doing it
-> > today, right?
-> > 
+> Excise these from Coda's upc_req struct.
 > 
-> They can't.
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Jan Harkes <jaharkes@cs.cmu.edu>
+> cc: coda@cs.cmu.edu
+> cc: codalist@coda.cs.cmu.edu
+> cc: linux-fsdevel@vger.kernel.org
+> ---
 > 
+>  include/uapi/linux/coda_psdev.h |    4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> Adding extern "C" { } doesn't magically make "class" a non keyword.
-> Even if it was the case, writing C++ code using whatever->class would
-> probably broke because class is a keyword in C++.
+> diff --git a/include/uapi/linux/coda_psdev.h b/include/uapi/linux/coda_psdev.h
+> index aa6623efd2dd..9c3acde393cd 100644
+> --- a/include/uapi/linux/coda_psdev.h
+> +++ b/include/uapi/linux/coda_psdev.h
+> @@ -10,14 +10,18 @@
+>  
+>  /* messages between coda filesystem in kernel and Venus */
+>  struct upc_req {
+> +#ifdef __KERNEL__
+>  	struct list_head    uc_chain;
+> +#endif
+>  	caddr_t	            uc_data;
+>  	u_short	            uc_flags;
+>  	u_short             uc_inSize;  /* Size is at most 5000 bytes */
+>  	u_short	            uc_outSize;
+>  	u_short	            uc_opcode;  /* copied from data to save lookup */
+>  	int		    uc_unique;
+> +#ifdef __KERNEL__
+>  	wait_queue_head_t   uc_sleep;   /* process' wait queue */
+> +#endif
+>  };
+>  
 
-I think it's a bug in the language TBH.
+This structure should not have been exposed to userspace in the first
+place: it's unusable by userspace as it is. It was incorrect to have it
+outside of #ifdef __KERNEL__ before commit 607ca46e97a1b ... 
 
-> -- 
-> Yann Droneaud
-> OPTEYA
+... and it's not exchanged between kernel and userspace, see
+coda_psdev_write():
+
+        struct upc_req *req = NULL;
+
+        ...
+
+        if (copy_from_user(req->uc_data, buf, nbytes)) {
+                req->uc_flags |= CODA_REQ_ABORT;
+                wake_up(&req->uc_sleep);
+                retval = -EFAULT;
+                goto out;
+        }
+
+Only data, a caddr_t, is read from userspace.
+
+So the structure can be moved back to <linux/coda_psdev.h>.
+
+>  #define CODA_REQ_ASYNC  0x1
 > 
+
+All CODA_REQ_* defines internals to kernel side and not exchanged with userspace.
+
+Please move them back to <linux/coda_psdev.h>
+
+Regards.
+
+-- 
+Yann Droneaud
+OPTEYA
