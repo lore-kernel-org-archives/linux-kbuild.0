@@ -1,36 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from a3.inai.de ([88.198.85.195]:36498 "EHLO a3.inai.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727267AbeIFABq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Sep 2018 20:01:46 -0400
-Date: Wed, 5 Sep 2018 21:22:11 +0200 (CEST)
-From: Jan Engelhardt <jengelh@inai.de>
-Subject: Re: [RFC] UAPI: Check headers by compiling all together as C++
-In-Reply-To: <20180905165552.GB25206@kroah.com>
-Message-ID: <nycvar.YFH.7.76.1809052120510.24932@n3.vanv.qr>
-References: <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk> <20180905165552.GB25206@kroah.com>
-MIME-Version: 1.0
+Received: from mail.linuxfoundation.org ([140.211.169.12]:38826 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727069AbeIFBmd (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 5 Sep 2018 21:42:33 -0400
+Date: Wed, 5 Sep 2018 14:10:32 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v6 00/18] khwasan: kernel hardware assisted address
+ sanitizer
+Message-Id: <20180905141032.b1ddaab53d1b2b3bada95415@linux-foundation.org>
+In-Reply-To: <cover.1535462971.git.andreyknvl@google.com>
+References: <cover.1535462971.git.andreyknvl@google.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg KH <greg@kroah.com>
-Cc: David Howells <dhowells@redhat.com>, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org, keyrings@vger.kernel.org, David Airlie <airlied@linux.ie>, linux-nilfs@vger.kernel.org, linux-nvdimm@lists.01.org, "Michael S. Tsirkin" <mst@redhat.com>, codalist@coda.cs.cmu.edu, coda@cs.cmu.edu, coreteam@netfilter.org, Rob Clark <robdclark@gmail.com>, linux-arm-msm@vger.kernel.org, Kent Overstreet <kent.overstreet@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Takashi Iwai <tiwai@suse.com>, linux-bcache@vger.kernel.org, Coly Li <colyli@suse.de>, Jaroslav Kysela <perex@perex.cz>, Jan Harkes <jaharkes@cs.cmu.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>, Jason Wang <jasowang@redhat.com>, Mat Martineau <mathew.j.martineau@linux.intel.com>, netfilter-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org, moderated for non-subscribers <alsa-devel@alsa-project.org>, freedreno@lists.freedesktop.org, linux-kernel@vger.kernel.org
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-On Wednesday 2018-09-05 18:55, Greg KH wrote:
+On Wed, 29 Aug 2018 13:35:04 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
 
->On Wed, Sep 05, 2018 at 04:54:27PM +0100, David Howells wrote:
->> 
->> Here's a set of patches that inserts a step into the build process to make
->> sure that the UAPI headers can all be built together with C++ (if the
->> compiler being used supports C++).  All but the final patch perform fixups,
->> including:
->
->Wait, why do we care?  What has recently changed to start to directly
->import kernel uapi files into C++ code?
+> This patchset adds a new mode to KASAN [1], which is called KHWASAN
+> (Kernel HardWare assisted Address SANitizer).
 
-With C++11, C++ has become a much nicer language to use (for userspace, anyway).
-
->And if userspace wants to do this, can't they do the C namespace trick
->themselves when they do the import?
-
-The only trick is to use an extra C source file and extensively wrap things.
+We're at v6 and there are no reviewed-by's or acked-by's to be seen. 
+Is that a fair commentary on what has been happening, or have people
+been remiss in sending and gathering such things?
