@@ -1,41 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:39546 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727672AbeIFC1z (ORCPT
+Received: from zeniv.linux.org.uk ([195.92.253.2]:34194 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727657AbeIFCwZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Sep 2018 22:27:55 -0400
-Received: by mail-pf1-f196.google.com with SMTP id j8-v6so4155446pff.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 05 Sep 2018 14:55:46 -0700 (PDT)
+        Wed, 5 Sep 2018 22:52:25 -0400
+Date: Wed, 5 Sep 2018 23:20:05 +0100
+From: Al Viro <viro@ZenIV.linux.org.uk>
+Subject: Re: [PATCH 07/11] UAPI: nilfs2: Fix use of undefined byteswapping
+ functions
+Message-ID: <20180905222005.GS19965@ZenIV.linux.org.uk>
+References: <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk>
+ <153616292366.23468.14988166998690800938.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-References: <cover.1535462971.git.andreyknvl@google.com> <20180905141032.b1ddaab53d1b2b3bada95415@linux-foundation.org>
-In-Reply-To: <20180905141032.b1ddaab53d1b2b3bada95415@linux-foundation.org>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 5 Sep 2018 14:55:34 -0700
-Message-ID: <CAKwvOdn7fG0ykS5jjKMJsDmFoV7T3g6p=YucVLxrKgewhMT=Fw@mail.gmail.com>
-Subject: Re: [PATCH v6 00/18] khwasan: kernel hardware assisted address sanitizer
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <153616292366.23468.14988166998690800938.stgit@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: Andrey Konovalov <andreyknvl@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg KH <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: David Howells <dhowells@redhat.com>
+Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>, linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Sep 5, 2018 at 2:10 PM Andrew Morton <akpm@linux-foundation.org> wrote:
->
-> On Wed, 29 Aug 2018 13:35:04 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
->
-> > This patchset adds a new mode to KASAN [1], which is called KHWASAN
-> > (Kernel HardWare assisted Address SANitizer).
->
-> We're at v6 and there are no reviewed-by's or acked-by's to be seen.
-> Is that a fair commentary on what has been happening, or have people
-> been remiss in sending and gathering such things?
->
+On Wed, Sep 05, 2018 at 04:55:23PM +0100, David Howells wrote:
+>  nilfs_checkpoint_set_##name(struct nilfs_checkpoint *cp)		\
+>  {									\
+> -	cp->cp_flags = cpu_to_le32(le32_to_cpu(cp->cp_flags) |		\
+> +	cp->cp_flags = __cpu_to_le32(__le32_to_cpu(cp->cp_flags) |	\
+>  				   (1UL << NILFS_CHECKPOINT_##flag));	\
 
-I'm anxious to use these for Pixel Android devices.  Looks like the
-series has been aggregating changes from valuable feedback.  Maybe if
-the ARM maintainers and KASAN maintainers could Ack or Nack these, we
-could decide to merge these or what needs more work?
+How about sanitiziung the damn thing to
+	cp->cp_flags |= __cpu_to_le32(1UL << NILFS_CHECKPOINT_##flag));
 
--- 
-Thanks,
-~Nick Desaulniers
+while you are at it?  Or, perhaps, even
+#define NILFS2_CP_FLAG(flag) __cpu_to_le32(1UL << NILFS_CHECKPOINT_##flag)
+
+and cp->cp_flags |= NILFS2_CP_FLAG(flag) for this one,
+
+>  }									\
+>  static inline void							\
+>  nilfs_checkpoint_clear_##name(struct nilfs_checkpoint *cp)		\
+>  {									\
+> -	cp->cp_flags = cpu_to_le32(le32_to_cpu(cp->cp_flags) &		\
+> +	cp->cp_flags = __cpu_to_le32(__le32_to_cpu(cp->cp_flags) &	\
+>  				   ~(1UL << NILFS_CHECKPOINT_##flag));	\
+	cp->cp_flags &= ~NILFS2_CP_FLAG(flag);
+here
+
+>  }									\
+>  static inline int							\
+>  nilfs_checkpoint_##name(const struct nilfs_checkpoint *cp)		\
+>  {									\
+> -	return !!(le32_to_cpu(cp->cp_flags) &				\
+> +	return !!(__le32_to_cpu(cp->cp_flags) &				\
+>  		  (1UL << NILFS_CHECKPOINT_##flag));			\
+
+and !!(cp->cp_flags & NILFS2_CP_FLAG(flag)
+here?  Or maybe even make the damn thing bool and lose the !! here...
+
+)>  }
+>  
+
+and similar for those:
+
+> @@ -595,20 +596,20 @@ enum {
+>  static inline void							\
+>  nilfs_segment_usage_set_##name(struct nilfs_segment_usage *su)		\
+>  {									\
+> -	su->su_flags = cpu_to_le32(le32_to_cpu(su->su_flags) |		\
+> +	su->su_flags = __cpu_to_le32(__le32_to_cpu(su->su_flags) |	\
+>  				   (1UL << NILFS_SEGMENT_USAGE_##flag));\
+>  }									\
+>  static inline void							\
+>  nilfs_segment_usage_clear_##name(struct nilfs_segment_usage *su)	\
+>  {									\
+>  	su->su_flags =							\
+> -		cpu_to_le32(le32_to_cpu(su->su_flags) &			\
+> +		__cpu_to_le32(__le32_to_cpu(su->su_flags) &		\
+>  			    ~(1UL << NILFS_SEGMENT_USAGE_##flag));      \
+>  }									\
+>  static inline int							\
+>  nilfs_segment_usage_##name(const struct nilfs_segment_usage *su)	\
+>  {									\
+> -	return !!(le32_to_cpu(su->su_flags) &				\
+> +	return !!(__le32_to_cpu(su->su_flags) &				\
+>  		  (1UL << NILFS_SEGMENT_USAGE_##flag));			\
+>  }
+
+
+
+> @@ -619,15 +620,15 @@ NILFS_SEGMENT_USAGE_FNS(ERROR, error)
+>  static inline void
+>  nilfs_segment_usage_set_clean(struct nilfs_segment_usage *su)
+>  {
+> -	su->su_lastmod = cpu_to_le64(0);
+> -	su->su_nblocks = cpu_to_le32(0);
+> -	su->su_flags = cpu_to_le32(0);
+> +	su->su_lastmod = __cpu_to_le64(0);
+> +	su->su_nblocks = __cpu_to_le32(0);
+> +	su->su_flags = __cpu_to_le32(0);
+>  }
+>  
+>  static inline int
+>  nilfs_segment_usage_clean(const struct nilfs_segment_usage *su)
+>  {
+> -	return !le32_to_cpu(su->su_flags);
+> +	return !__le32_to_cpu(su->su_flags);
+
+"Check that after byteswap it becomes 0", is it?  How is that different
+from return !su->su_flags; ?
