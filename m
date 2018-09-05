@@ -1,109 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:34194 "EHLO
-        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727657AbeIFCwZ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Sep 2018 22:52:25 -0400
-Date: Wed, 5 Sep 2018 23:20:05 +0100
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: [PATCH 07/11] UAPI: nilfs2: Fix use of undefined byteswapping
- functions
-Message-ID: <20180905222005.GS19965@ZenIV.linux.org.uk>
-References: <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk>
- <153616292366.23468.14988166998690800938.stgit@warthog.procyon.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <153616292366.23468.14988166998690800938.stgit@warthog.procyon.org.uk>
+Received: from mga14.intel.com ([192.55.52.115]:2871 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727364AbeIFDIu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 5 Sep 2018 23:08:50 -0400
+From: Paulo Zanoni <paulo.r.zanoni@intel.com>
+Subject: [RFC 1/2] tracing/Makefile: fix handling redefinition of CC_FLAGS_FTRACE
+Date: Wed,  5 Sep 2018 15:35:59 -0700
+Message-Id: <20180905223600.20994-1-paulo.r.zanoni@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>, linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Paulo Zanoni <paulo.r.zanoni@intel.com>, Vasily Gorbik <gor@linux.ibm.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Tvrtko Ursulin <tvrtko.ursulin@intel.com>
 
-On Wed, Sep 05, 2018 at 04:55:23PM +0100, David Howells wrote:
->  nilfs_checkpoint_set_##name(struct nilfs_checkpoint *cp)		\
->  {									\
-> -	cp->cp_flags = cpu_to_le32(le32_to_cpu(cp->cp_flags) |		\
-> +	cp->cp_flags = __cpu_to_le32(__le32_to_cpu(cp->cp_flags) |	\
->  				   (1UL << NILFS_CHECKPOINT_##flag));	\
+As a Kernel developer, I make heavy use of "make targz-pkg" in order
+to locally compile and remotely install my development Kernels. The
+nice feature I rely on is that after a normal "make", "make targz-pkg"
+only generates the tarball without having to recompile everything.
 
-How about sanitiziung the damn thing to
-	cp->cp_flags |= __cpu_to_le32(1UL << NILFS_CHECKPOINT_##flag));
+That was true until commit f28bc3c32c05 ("tracing: Handle
+CC_FLAGS_FTRACE more accurately"). After it, running "make targz-pkg"
+after "make" will recompile the whole Kernel tree, making my
+development workflow much slower.
 
-while you are at it?  Or, perhaps, even
-#define NILFS2_CP_FLAG(flag) __cpu_to_le32(1UL << NILFS_CHECKPOINT_##flag)
+The Kernel is choosing to recompile everything because it claims the
+command line has changed. A diff of the .cmd files show a repeated
+-mfentry in one of the files. It seems that something on make
+targz-pkg triggers the double -mfentry but not the double -pg.
 
-and cp->cp_flags |= NILFS2_CP_FLAG(flag) for this one,
+So this patch attempts to deal with that problem by handling -mfentry
+and others just like we handle -pg: don't append them if
+CC_FLAGS_FTRACE is already defined. I'm not a Makefile expert and so I
+can't claim this won't break anything else, hopefully if this patch
+gets applied it will have a Reviewed-by tag from some actual Makefile
+expert. I can claim this patch fixes the specific regression I
+reported.
 
->  }									\
->  static inline void							\
->  nilfs_checkpoint_clear_##name(struct nilfs_checkpoint *cp)		\
->  {									\
-> -	cp->cp_flags = cpu_to_le32(le32_to_cpu(cp->cp_flags) &		\
-> +	cp->cp_flags = __cpu_to_le32(__le32_to_cpu(cp->cp_flags) &	\
->  				   ~(1UL << NILFS_CHECKPOINT_##flag));	\
-	cp->cp_flags &= ~NILFS2_CP_FLAG(flag);
-here
+Fixes: commit f28bc3c32c05 ("tracing: Handle CC_FLAGS_FTRACE more
+ accurately")
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Cc: Steven Rostedt (VMware) <rostedt@goodmis.org>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Tvrtko Ursulin <tvrtko.ursulin@intel.com>
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Paulo Zanoni <paulo.r.zanoni@intel.com>
+---
+ Makefile | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
->  }									\
->  static inline int							\
->  nilfs_checkpoint_##name(const struct nilfs_checkpoint *cp)		\
->  {									\
-> -	return !!(le32_to_cpu(cp->cp_flags) &				\
-> +	return !!(__le32_to_cpu(cp->cp_flags) &				\
->  		  (1UL << NILFS_CHECKPOINT_##flag));			\
-
-and !!(cp->cp_flags & NILFS2_CP_FLAG(flag)
-here?  Or maybe even make the damn thing bool and lose the !! here...
-
-)>  }
->  
-
-and similar for those:
-
-> @@ -595,20 +596,20 @@ enum {
->  static inline void							\
->  nilfs_segment_usage_set_##name(struct nilfs_segment_usage *su)		\
->  {									\
-> -	su->su_flags = cpu_to_le32(le32_to_cpu(su->su_flags) |		\
-> +	su->su_flags = __cpu_to_le32(__le32_to_cpu(su->su_flags) |	\
->  				   (1UL << NILFS_SEGMENT_USAGE_##flag));\
->  }									\
->  static inline void							\
->  nilfs_segment_usage_clear_##name(struct nilfs_segment_usage *su)	\
->  {									\
->  	su->su_flags =							\
-> -		cpu_to_le32(le32_to_cpu(su->su_flags) &			\
-> +		__cpu_to_le32(__le32_to_cpu(su->su_flags) &		\
->  			    ~(1UL << NILFS_SEGMENT_USAGE_##flag));      \
->  }									\
->  static inline int							\
->  nilfs_segment_usage_##name(const struct nilfs_segment_usage *su)	\
->  {									\
-> -	return !!(le32_to_cpu(su->su_flags) &				\
-> +	return !!(__le32_to_cpu(su->su_flags) &				\
->  		  (1UL << NILFS_SEGMENT_USAGE_##flag));			\
->  }
-
-
-
-> @@ -619,15 +620,15 @@ NILFS_SEGMENT_USAGE_FNS(ERROR, error)
->  static inline void
->  nilfs_segment_usage_set_clean(struct nilfs_segment_usage *su)
->  {
-> -	su->su_lastmod = cpu_to_le64(0);
-> -	su->su_nblocks = cpu_to_le32(0);
-> -	su->su_flags = cpu_to_le32(0);
-> +	su->su_lastmod = __cpu_to_le64(0);
-> +	su->su_nblocks = __cpu_to_le32(0);
-> +	su->su_flags = __cpu_to_le32(0);
->  }
->  
->  static inline int
->  nilfs_segment_usage_clean(const struct nilfs_segment_usage *su)
->  {
-> -	return !le32_to_cpu(su->su_flags);
-> +	return !__le32_to_cpu(su->su_flags);
-
-"Check that after byteswap it becomes 0", is it?  How is that different
-from return !su->su_flags; ?
+diff --git a/Makefile b/Makefile
+index 19948e556941..2c8df481b4f1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -755,28 +755,30 @@ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
+ endif
+ 
+ ifdef CONFIG_FUNCTION_TRACER
+-ifndef CC_FLAGS_FTRACE
+-CC_FLAGS_FTRACE := -pg
+-endif
++cc_flags_ftrace_ := -pg
+ ifdef CONFIG_FTRACE_MCOUNT_RECORD
+   # gcc 5 supports generating the mcount tables directly
+   ifeq ($(call cc-option-yn,-mrecord-mcount),y)
+-    CC_FLAGS_FTRACE	+= -mrecord-mcount
++    cc_flags_ftrace_	+= -mrecord-mcount
+     export CC_USING_RECORD_MCOUNT := 1
+   endif
+   ifdef CONFIG_HAVE_NOP_MCOUNT
+     ifeq ($(call cc-option-yn, -mnop-mcount),y)
+-      CC_FLAGS_FTRACE	+= -mnop-mcount
++      cc_flags_ftrace_	+= -mnop-mcount
+       CC_FLAGS_USING	+= -DCC_USING_NOP_MCOUNT
+     endif
+   endif
+ endif
+ ifdef CONFIG_HAVE_FENTRY
+   ifeq ($(call cc-option-yn, -mfentry),y)
+-    CC_FLAGS_FTRACE	+= -mfentry
++    cc_flags_ftrace_	+= -mfentry
+     CC_FLAGS_USING	+= -DCC_USING_FENTRY
+   endif
+ endif
++
++ifndef CC_FLAGS_FTRACE
++  CC_FLAGS_FTRACE := $(cc_flags_ftrace_)
++endif
+ export CC_FLAGS_FTRACE
+ KBUILD_CFLAGS	+= $(CC_FLAGS_FTRACE) $(CC_FLAGS_USING)
+ KBUILD_AFLAGS	+= $(CC_FLAGS_USING)
+-- 
+2.17.1
