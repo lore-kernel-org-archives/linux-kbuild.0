@@ -1,74 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45692 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725819AbeIFTiC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Sep 2018 15:38:02 -0400
-Date: Thu, 6 Sep 2018 11:02:04 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 03/11] UAPI: virtio_net: Fix use of C++ keywords as
- structural members [ver #2]
-Message-ID: <20180906104208-mutt-send-email-mst@kernel.org>
-References: <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk>
- <153622552270.14298.14568295161017777604.stgit@warthog.procyon.org.uk>
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:33666 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726506AbeIFVQW (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 6 Sep 2018 17:16:22 -0400
+Received: by mail-pl1-f195.google.com with SMTP id b30-v6so2955358pla.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 06 Sep 2018 09:40:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <153622552270.14298.14568295161017777604.stgit@warthog.procyon.org.uk>
+References: <cover.1535462971.git.andreyknvl@google.com> <20180905141032.b1ddaab53d1b2b3bada95415@linux-foundation.org>
+ <20180906100543.GI3592@arm.com> <CAAeHK+wStsNwh2oKv-KCG4kx5538FuDMQ6Yw2X=sK5LPrw2DZg@mail.gmail.com>
+In-Reply-To: <CAAeHK+wStsNwh2oKv-KCG4kx5538FuDMQ6Yw2X=sK5LPrw2DZg@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Thu, 6 Sep 2018 09:39:51 -0700
+Message-ID: <CAKwvOdk=F=kja-ZznrifTO8EASmPF0CoTPWbFxpMqLk-_KGEEQ@mail.gmail.com>
+Subject: Re: [PATCH v6 00/18] khwasan: kernel hardware assisted address sanitizer
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Will Deacon <will.deacon@arm.com>, Andrew Morton <akpm@linux-foundation.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg KH <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-On Thu, Sep 06, 2018 at 10:18:42AM +0100, David Howells wrote:
-> The virtio_net_ctrl_hdr struct uses a C++ keyword as structural members.  Fix
-> this by inserting an anonymous union that provides an alternative name and
-> then hide the reserved name in C++.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: "Michael S. Tsirkin" <mst@redhat.com>
-> cc: Jason Wang <jasowang@redhat.com>
-> cc: virtualization@lists.linux-foundation.org
-> ---
-> 
->  include/uapi/linux/virtio_net.h |    7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> index a3715a3224c1..967142bc0e05 100644
-> --- a/include/uapi/linux/virtio_net.h
-> +++ b/include/uapi/linux/virtio_net.h
-> @@ -150,7 +150,12 @@ struct virtio_net_hdr_mrg_rxbuf {
->   * command goes in between.
->   */
->  struct virtio_net_ctrl_hdr {
-> -	__u8 class;
-> +	union {
-> +#ifndef __cplusplus
-> +		__u8 class;
-> +#endif
-> +		__u8 _class;
-> +	};
->  	__u8 cmd;
->  } __attribute__((packed));
->  
+On Thu, Sep 6, 2018 at 4:06 AM Andrey Konovalov <andreyknvl@google.com> wrote:
+>
+> On Thu, Sep 6, 2018 at 12:05 PM, Will Deacon <will.deacon@arm.com> wrote:
+> > On Wed, Sep 05, 2018 at 02:10:32PM -0700, Andrew Morton wrote:
+> >> On Wed, 29 Aug 2018 13:35:04 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
+> >>
+> >> > This patchset adds a new mode to KASAN [1], which is called KHWASAN
+> >> > (Kernel HardWare assisted Address SANitizer).
+> >>
+> >> We're at v6 and there are no reviewed-by's or acked-by's to be seen.
+> >> Is that a fair commentary on what has been happening, or have people
+> >> been remiss in sending and gathering such things?
+> >
+> > I still have concerns about the consequences of merging this as anything
+> > other than a debug option [1]. Unfortunately, merging it as a debug option
+> > defeats the whole point, so I think we need to spend more effort on developing
+> > tools that can help us to find and fix the subtle bugs which will arise from
+> > enabling tagged pointers in the kernel.
+>
+> I totally don't mind calling it a debug option. Do I need to somehow
+> specify it somewhere?
+>
+> Why does it defeat the point? The point is to ease KASAN-like testing
+> on devices with limited memory.
 
-So if we are going to do this, I think I'd prefer something like:
+I don't disagree with using it strictly for debug.  When I say I want
+the series for Pixel phones, I should have been clearer that my intent
+is for a limited pool of internal testers to walk around with KHWASAN
+enabled devices; not general end users.  It's hard enough today to get
+anyone to test KASAN/ASAN on their "daily driver" due to the memory
+usage and resulting performance.
 
-struct virtio_net_ctrl_hdr_v2 {
-	__u8 cmd_class;
-  	__u8 cmd;
-};
-
-And then hide the whole old structure. This also gets rid of the packed
-keyword which we don't really need here.
-
-Only issue is virtio_net_ctrl_hdr_v2 is ugly. But oh well.
-
-And then rework at least QEMU to use the v2 of the header.
-
-Quite a bit of churn, so I don't think it makes sense to apply just this
-one in isolation - only if rest of the changes go in.
-
+We don't ship KASAN or KUBSAN on by default to end users (nor plan
+to); it's used strictly for fuzzing through syzkaller (or by brave
+"dogfooders" on the internal kernel teams).  KHWASAN would let these
+dogfooders go from being brave to fearless.
 
 -- 
-MST
+Thanks,
+~Nick Desaulniers
