@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56504 "EHLO mx1.redhat.com"
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49906 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726541AbeIFNxD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Sep 2018 09:53:03 -0400
-Subject: [PATCH 01/11] UAPI: drm: Fix use of C++ keywords as structural
+        id S1728110AbeIFNxJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 6 Sep 2018 09:53:09 -0400
+Subject: [PATCH 02/11] UAPI: keys: Fix use of C++ keywords as structural
  members [ver #2]
 From: David Howells <dhowells@redhat.com>
-Date: Thu, 06 Sep 2018 10:18:29 +0100
-Message-ID: <153622550941.14298.18224012706200881807.stgit@warthog.procyon.org.uk>
+Date: Thu, 06 Sep 2018 10:18:36 +0100
+Message-ID: <153622551617.14298.12454094039718200093.stgit@warthog.procyon.org.uk>
 In-Reply-To: <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk>
 References: <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
@@ -16,57 +16,35 @@ Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Rob Clark <robdclark@gmail.com>, David Airlie <airlied@linux.ie>, linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org, linux-kernel@vger.kernel.org, dhowells@redhat.com
+Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>, keyrings@vger.kernel.org, linux-kernel@vger.kernel.org, dhowells@redhat.com
 
-The i810 and msm drm drivers use C++ keywords as structural members.  Fix
+The keyctl_dh_params struct uses a C++ keyword as structural members.  Fix
 this by inserting an anonymous union that provides an alternative name and
 then hide the reserved name in C++.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Rob Clark <robdclark@gmail.com>
-cc: David Airlie <airlied@linux.ie>
-cc: linux-arm-msm@vger.kernel.org
-cc: dri-devel@lists.freedesktop.org
-cc: freedreno@lists.freedesktop.org
+cc: Mat Martineau <mathew.j.martineau@linux.intel.com>
+cc: keyrings@vger.kernel.org
 ---
 
- include/uapi/drm/i810_drm.h |    7 ++++++-
- include/uapi/drm/msm_drm.h  |    7 ++++++-
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ include/uapi/linux/keyctl.h |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/drm/i810_drm.h b/include/uapi/drm/i810_drm.h
-index d285d5e72e6a..617d79ec3fc5 100644
---- a/include/uapi/drm/i810_drm.h
-+++ b/include/uapi/drm/i810_drm.h
-@@ -266,7 +266,12 @@ typedef struct _drm_i810_copy_t {
- #define PR_MASK              (0x7<<18)
+diff --git a/include/uapi/linux/keyctl.h b/include/uapi/linux/keyctl.h
+index 910cc4334b21..170f015d1f25 100644
+--- a/include/uapi/linux/keyctl.h
++++ b/include/uapi/linux/keyctl.h
+@@ -65,7 +65,12 @@
  
- typedef struct drm_i810_dma {
--	void *virtual;
+ /* keyctl structures */
+ struct keyctl_dh_params {
+-	__s32 dh_private;
 +	union {
 +#ifndef __cplusplus
-+		void *virtual;
++		__s32 private;
 +#endif
-+		void *_virtual;
++		__s32 dh_private;
 +	};
- 	int request_idx;
- 	int request_size;
- 	int granted;
-diff --git a/include/uapi/drm/msm_drm.h b/include/uapi/drm/msm_drm.h
-index c06d0a5bdd80..e99bab72d58c 100644
---- a/include/uapi/drm/msm_drm.h
-+++ b/include/uapi/drm/msm_drm.h
-@@ -148,7 +148,12 @@ struct drm_msm_gem_cpu_fini {
-  */
- struct drm_msm_gem_submit_reloc {
- 	__u32 submit_offset;  /* in, offset from submit_bo */
--	__u32 or;             /* in, value OR'd with result */
-+	union {
-+#ifndef __cplusplus
-+		__u32 or;	/* in, value OR'd with result */
-+#endif
-+		__u32 _or;	/* in, value OR'd with result */
-+	};
- 	__s32 shift;          /* in, amount of left shift (can be negative) */
- 	__u32 reloc_idx;      /* in, index of reloc_bo buffer */
- 	__u64 reloc_offset;   /* in, offset from start of reloc_bo */
+ 	__s32 prime;
+ 	__s32 base;
+ };
