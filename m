@@ -1,13 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36168 "EHLO mx1.redhat.com"
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49982 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728650AbeIFNx6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Sep 2018 09:53:58 -0400
-Subject: [PATCH 09/11] UAPI: ndctl: Fix g++-unsupported initialisation in
- headers [ver #2]
+        id S1728039AbeIFNyL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 6 Sep 2018 09:54:11 -0400
+Subject: [PATCH 11/11] UAPI: Check headers build for C++ [ver #2]
 From: David Howells <dhowells@redhat.com>
-Date: Thu, 06 Sep 2018 10:19:24 +0100
-Message-ID: <153622556444.14298.5971956747198405225.stgit@warthog.procyon.org.uk>
+Date: Thu, 06 Sep 2018 10:19:37 +0100
+Message-ID: <153622557736.14298.10350496216090814292.stgit@warthog.procyon.org.uk>
 In-Reply-To: <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk>
 References: <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
@@ -16,111 +15,175 @@ Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Dan Williams <dan.j.williams@intel.com>, linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, dhowells@redhat.com
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, dhowells@redhat.com
 
-The following code in the linux/ndctl header file:
+Check that all the headers can be included from one file and built for C++,
+thereby catching the use of C++ reserved words and bits of unimplemented
+C++ in the UAPI headers.
 
-	static inline const char *nvdimm_bus_cmd_name(unsigned cmd)
-	{
-		static const char * const names[] = {
-			[ND_CMD_ARS_CAP] = "ars_cap",
-			[ND_CMD_ARS_START] = "ars_start",
-			[ND_CMD_ARS_STATUS] = "ars_status",
-			[ND_CMD_CLEAR_ERROR] = "clear_error",
-			[ND_CMD_CALL] = "cmd_call",
-		};
+Note that certain headers are excluded from the build, including:
 
-		if (cmd < ARRAY_SIZE(names) && names[cmd])
-			return names[cmd];
-		return "unknown";
-	}
+ (1) Any header ending in "_32.h", "_64.h" or "_x32.h" as these are
+     expected to be multiarch variant headers.
 
-is broken in a number of ways:
+ (2) Endianness variant headers.
 
- (1) ARRAY_SIZE() is not generally defined.
+ (3) asm-generic/ headers (they're used conditionally by the asm/ headers
+     and shouldn't be used directly).
 
- (2) g++ does not support "non-trivial" array initialisers fully yet.
-
- (3) Every file that calls this function will acquire a copy of names[].
-
-The same goes for nvdimm_cmd_name().
-
-Fix all three by converting to a switch statement where each case returns a
-string.  That way if cmd is a constant, the compiler can trivially reduce it
-and, if not, the compiler can use a shared lookup table if it thinks that is
-more efficient.
-
-A better way would be to remove these functions and their arrays from the
-header entirely.
+ (4) netfilter_ipv*/ip*t_LOG.h headers.  They emit a warning indicating
+     they're going to be removed soon.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Dan Williams <dan.j.williams@intel.com>
-cc: linux-nvdimm@lists.01.org
+cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+cc: Michal Marek <michal.lkml@markovi.net>
+cc: linux-kbuild@vger.kernel.org
 ---
 
- include/uapi/linux/ndctl.h |   48 +++++++++++++++++++-------------------------
- 1 file changed, 21 insertions(+), 27 deletions(-)
+ Makefile               |    1 
+ scripts/headers-c++.sh |  124 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 125 insertions(+)
+ create mode 100755 scripts/headers-c++.sh
 
-diff --git a/include/uapi/linux/ndctl.h b/include/uapi/linux/ndctl.h
-index 7e27070b9440..2f2c43d633c5 100644
---- a/include/uapi/linux/ndctl.h
-+++ b/include/uapi/linux/ndctl.h
-@@ -128,37 +128,31 @@ enum {
+diff --git a/Makefile b/Makefile
+index 19948e556941..38d655cb4474 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1186,6 +1186,7 @@ headers_install: __headers
+ 	  $(error Headers not exportable for the $(SRCARCH) architecture))
+ 	$(Q)$(MAKE) $(hdr-inst)=include/uapi dst=include
+ 	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi $(hdr-dst)
++	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/headers-c++.sh check
  
- static inline const char *nvdimm_bus_cmd_name(unsigned cmd)
- {
--	static const char * const names[] = {
--		[ND_CMD_ARS_CAP] = "ars_cap",
--		[ND_CMD_ARS_START] = "ars_start",
--		[ND_CMD_ARS_STATUS] = "ars_status",
--		[ND_CMD_CLEAR_ERROR] = "clear_error",
--		[ND_CMD_CALL] = "cmd_call",
--	};
--
--	if (cmd < ARRAY_SIZE(names) && names[cmd])
--		return names[cmd];
--	return "unknown";
-+	switch (cmd) {
-+	case ND_CMD_ARS_CAP:		return "ars_cap";
-+	case ND_CMD_ARS_START:		return "ars_start";
-+	case ND_CMD_ARS_STATUS:		return "ars_status";
-+	case ND_CMD_CLEAR_ERROR:	return "clear_error";
-+	case ND_CMD_CALL:		return "cmd_call";
-+	default:			return "unknown";
-+	}
- }
- 
- static inline const char *nvdimm_cmd_name(unsigned cmd)
- {
--	static const char * const names[] = {
--		[ND_CMD_SMART] = "smart",
--		[ND_CMD_SMART_THRESHOLD] = "smart_thresh",
--		[ND_CMD_DIMM_FLAGS] = "flags",
--		[ND_CMD_GET_CONFIG_SIZE] = "get_size",
--		[ND_CMD_GET_CONFIG_DATA] = "get_data",
--		[ND_CMD_SET_CONFIG_DATA] = "set_data",
--		[ND_CMD_VENDOR_EFFECT_LOG_SIZE] = "effect_size",
--		[ND_CMD_VENDOR_EFFECT_LOG] = "effect_log",
--		[ND_CMD_VENDOR] = "vendor",
--		[ND_CMD_CALL] = "cmd_call",
--	};
--
--	if (cmd < ARRAY_SIZE(names) && names[cmd])
--		return names[cmd];
--	return "unknown";
-+	switch (cmd) {
-+	case ND_CMD_SMART:			return "smart";
-+	case ND_CMD_SMART_THRESHOLD:		return "smart_thresh";
-+	case ND_CMD_DIMM_FLAGS:			return "flags";
-+	case ND_CMD_GET_CONFIG_SIZE:		return "get_size";
-+	case ND_CMD_GET_CONFIG_DATA:		return "get_data";
-+	case ND_CMD_SET_CONFIG_DATA:		return "set_data";
-+	case ND_CMD_VENDOR_EFFECT_LOG_SIZE:	return "effect_size";
-+	case ND_CMD_VENDOR_EFFECT_LOG:		return "effect_log";
-+	case ND_CMD_VENDOR:			return "vendor";
-+	case ND_CMD_CALL:			return "cmd_call";
-+	default:				return "unknown";
-+	}
- }
- 
- #define ND_IOCTL 'N'
+ PHONY += headers_check_all
+ headers_check_all: headers_install_all
+diff --git a/scripts/headers-c++.sh b/scripts/headers-c++.sh
+new file mode 100755
+index 000000000000..7e56913629f8
+--- /dev/null
++++ b/scripts/headers-c++.sh
+@@ -0,0 +1,124 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++# Run headers_$1 command for all suitable architectures
++
++# Stop on error
++set -e
++
++if ! $CC -x c++ -c - -o /dev/null </dev/null 2>/dev/null
++then
++    echo "  CHECK   C++ HEADER COMPILATION [SKIPPED]"
++    exit 0
++fi
++
++echo "  CHECK   C++ HEADER COMPILATION"
++
++mkdir -p hdr-check
++cd hdr-check
++
++mkdir -p include/sys
++mkdir -p include/arpa
++mkdir -p include/xen/interface
++echo >include/endian.h
++echo >include/limits.h
++echo >include/stdint.h
++echo >include/stdlib.h
++echo >include/stdio.h
++echo >include/string.h
++echo >include/time.h
++echo >include/unistd.h
++echo >include/arpa/inet.h
++echo >include/sys/ioctl.h
++echo >include/sys/types.h
++echo >include/sys/time.h
++echo >include/sys/socket.h
++echo >include/xen/interface/xen.h
++
++cat >test.h <<EOF
++#ifdef __cplusplus
++#define NULL nullptr
++#define _Bool bool
++#else
++#define NULL ((void *)0)
++#define bool _Bool
++#endif
++#include <linux/types.h>
++#include <linux/socket.h>
++#include <linux/time.h>
++
++typedef __s8			int8_t;
++typedef __s16			int16_t;
++typedef __s32			int32_t;
++typedef __s64			int64_t;
++typedef __u8			uint8_t;
++typedef __u16			uint16_t;
++typedef __u32			uint32_t;
++typedef __u64			uint64_t;
++typedef long int		intptr_t;
++typedef unsigned long int	uintptr_t;
++typedef unsigned short		u_short;
++typedef unsigned int		u_int;
++typedef unsigned long		u_long;
++typedef char			*caddr_t;
++
++typedef __kernel_clockid_t	clockid_t;
++typedef __kernel_ino_t		ino_t;
++typedef __kernel_pid_t		pid_t;
++typedef __kernel_sa_family_t	sa_family_t;
++typedef __kernel_size_t		size_t;
++typedef __kernel_uid_t		uid_t;
++
++typedef unsigned long		elf_greg_t;
++typedef elf_greg_t		elf_gregset_t[1];
++typedef unsigned long long	elf_fpregset_t[1];
++typedef unsigned long long	elf_fpxregset_t[1];
++
++#define INT_MIN ((int)0x80000000)
++#define INT_MAX ((int)0x7fffffff)
++
++extern size_t strlen(const char *);
++extern void *memset(void *, int, size_t);
++extern void *memcpy(void *, const void *, size_t);
++extern __u16 ntohs(__u16);
++extern __u16 htons(__u16);
++extern __u32 ntohl(__u32);
++extern __u32 htonl(__u32);
++
++typedef uint32_t		grant_ref_t;
++typedef uint16_t		domid_t;
++typedef unsigned long		xen_pfn_t;
++
++#define MSG_FIN         0x200
++
++typedef int SVGA3dMSPattern;
++typedef int SVGA3dMSQualityLevel;
++
++struct sockaddr
++{
++	sa_family_t	sa_family;
++	char		sa_data[14];
++};
++#define sockaddr_storage __kernel_sockaddr_storage
++
++#define _LINUX_PATCHKEY_H_INDIRECT
++
++EOF
++
++find ../usr/include -name '*.h' |
++    grep -v 'linux/byteorder/big_endian.h' |
++    grep -v 'linux/byteorder/little_endian.h' |
++    grep -v '_\(32\|64\|x32\)[.]h$' |
++    grep -v '/asm-generic/' |
++    # ip*t_LOG.h are deprecated
++    grep -v 'linux/netfilter_ipv4/ipt_LOG[.]h' |
++    grep -v 'linux/netfilter_ipv6/ip6t_LOG[.]h' |
++    sed -e 's!../usr/include/!#include <!' -e 's!$!>!' >>test.h
++
++echo '#include "test.h"' >test.cpp
++
++$CC -x c++ -o /dev/null -c test.cpp \
++    -nostdinc \
++    -isystem ./include \
++    -isystem ../usr/include \
++    -fpermissive \
++    -D PAGE_SIZE='#PAGE_SIZE_IS_NOT_VALID_OUTSIDE_OF_KERNEL'
