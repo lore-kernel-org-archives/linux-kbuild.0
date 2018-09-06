@@ -1,51 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-proxy003.phy.lolipop.jp ([157.7.104.44]:56018 "EHLO
-        smtp-proxy003.phy.lolipop.jp" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725885AbeIFKnh (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Sep 2018 06:43:37 -0400
-Subject: Re: [PATCH 08/11] UAPI: sound: Fix use of u32 and co. in UAPI headers
-References: <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk>
- <153616293089.23468.13515059526628668970.stgit@warthog.procyon.org.uk>
-From: Takashi Sakamoto <o-takashi@sakamocchi.jp>
-Message-ID: <ce6ac597-751c-8881-160d-28d62a898a3e@sakamocchi.jp>
-Date: Thu, 6 Sep 2018 14:59:40 +0900
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52526 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725940AbeIFLnY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 6 Sep 2018 07:43:24 -0400
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20180905125636-mutt-send-email-mst@kernel.org>
+References: <20180905125636-mutt-send-email-mst@kernel.org> <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk> <153616289529.23468.7498785670556620808.stgit@warthog.procyon.org.uk>
+Subject: Re: [PATCH 03/11] UAPI: virtio_net: Fix use of C++ keywords as structural members
 MIME-Version: 1.0
-In-Reply-To: <153616293089.23468.13515059526628668970.stgit@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <9356.1536217759.1@warthog.procyon.org.uk>
+Date: Thu, 06 Sep 2018 08:09:19 +0100
+Message-ID: <9357.1536217759@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, moderated for non-subscribers <alsa-devel@alsa-project.org>, Takashi Iwai <tiwai@suse.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: dhowells@redhat.com, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org
 
-Hi,
+Michael S. Tsirkin <mst@redhat.com> wrote:
 
-On Sep 6 2018 00:55, David Howells wrote:
-> Fix the use of u32 and co. in UAPI headers as these are not defined.  Switch
-> to using the __u32-style equivalents instead.
+> As long as you do not intend to use any classes, how about
+> simply adding
 > 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jaroslav Kysela <perex@perex.cz>
-> cc: Takashi Iwai <tiwai@suse.com>
-> cc: alsa-devel@alsa-project.org (moderated for non-subscribers)
-> ---
+> -Dclass=_class
 > 
->   include/uapi/sound/skl-tplg-interface.h |  106 ++++++++++++++++---------------
->   1 file changed, 54 insertions(+), 52 deletions(-)
+> to your command line?
 
-A similar patch was already proposed[1] and has been applied by Mark to
-his tree[2]. Your issue (3) is going to be solved soon for v4.19
-kernel.
+That kind of misses the point;-).  It's not reasonable to expect all userspace
+C++ users to do this.
 
-[1] [alsa-devel] [PATCH] uapi: fix sound/skl-tplg-interface.h userspace 
-compilation errors
-http://mailman.alsa-project.org/pipermail/alsa-devel/2018-August/139392.html
-[2] ASoC: uapi: fix sound/skl-tplg-interface.h userspace compilation errors
-https://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git/log/?h=for-4.19
-
-
-Thanks
-
-Takashi Sakamoto
+David
