@@ -1,44 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:53280 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726151AbeIFPlU (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Sep 2018 11:41:20 -0400
-Received: by mail-it0-f68.google.com with SMTP id p79-v6so14155231itp.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 06 Sep 2018 04:06:24 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180906100543.GI3592@arm.com>
-References: <cover.1535462971.git.andreyknvl@google.com> <20180905141032.b1ddaab53d1b2b3bada95415@linux-foundation.org>
- <20180906100543.GI3592@arm.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Thu, 6 Sep 2018 13:06:23 +0200
-Message-ID: <CAAeHK+wStsNwh2oKv-KCG4kx5538FuDMQ6Yw2X=sK5LPrw2DZg@mail.gmail.com>
-Subject: Re: [PATCH v6 00/18] khwasan: kernel hardware assisted address sanitizer
+Received: from ou.quest-ce.net ([195.154.187.82]:42483 "EHLO ou.quest-ce.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725929AbeIFQ1s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 6 Sep 2018 12:27:48 -0400
+Message-ID: <2e337313415a1ede1fb7a777902a0de7cb7c2602.camel@opteya.com>
+From: Yann Droneaud <ydroneaud@opteya.com>
+Date: Thu, 06 Sep 2018 13:52:29 +0200
+In-Reply-To: <9916.1536218032@warthog.procyon.org.uk>
+References: <1c57005277ac723ebb670a1dc847a205f0529d53.camel@opteya.com>
+         <153616286704.23468.584491117180383924.stgit@warthog.procyon.org.uk>
+         <153616291029.23468.16421004714304578585.stgit@warthog.procyon.org.uk>
+         <9916.1536218032@warthog.procyon.org.uk>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 05/11] UAPI: coda: Don't use internal kernel structs in
+ UAPI
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Will Deacon <will.deacon@arm.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: David Howells <dhowells@redhat.com>
+Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, codalist@coda.cs.cmu.edu, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Sep 6, 2018 at 12:05 PM, Will Deacon <will.deacon@arm.com> wrote:
-> On Wed, Sep 05, 2018 at 02:10:32PM -0700, Andrew Morton wrote:
->> On Wed, 29 Aug 2018 13:35:04 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
->>
->> > This patchset adds a new mode to KASAN [1], which is called KHWASAN
->> > (Kernel HardWare assisted Address SANitizer).
->>
->> We're at v6 and there are no reviewed-by's or acked-by's to be seen.
->> Is that a fair commentary on what has been happening, or have people
->> been remiss in sending and gathering such things?
->
-> I still have concerns about the consequences of merging this as anything
-> other than a debug option [1]. Unfortunately, merging it as a debug option
-> defeats the whole point, so I think we need to spend more effort on developing
-> tools that can help us to find and fix the subtle bugs which will arise from
-> enabling tagged pointers in the kernel.
+Hi,
 
-I totally don't mind calling it a debug option. Do I need to somehow
-specify it somewhere?
+Le jeudi 06 septembre 2018 à 08:13 +0100, David Howells a écrit :
+> Yann Droneaud <ydroneaud@opteya.com> wrote:
+> 
+> > This structure should not have been exposed to userspace in the
+> > first
+> > place: it's unusable by userspace as it is. It was incorrect to
+> > have it
+> > outside of #ifdef __KERNEL__ before commit 607ca46e97a1b ... 
+> > ...
+> > All CODA_REQ_* defines internals to kernel side and not exchanged
+> > with
+> > userspace.
+> > 
+> > Please move them back to <linux/coda_psdev.h>
+> 
+> Is there any reason coda_psdev.h needs to be in include/linux/ rather
+> than fs/coda/?
+> 
 
-Why does it defeat the point? The point is to ease KASAN-like testing
-on devices with limited memory.
+It's a valid concern.
+
+At first I thought the first lines (see below) could have been useful
+for userspace:
+
+  #define CODA_PSDEV_MAJOR 67
+  #define MAX_CODADEVS  5    /* how many do we allow */
+
+
+But the file was unsuable for a long long time so we can assume it's
+usage by userspace is deprecated, then we could remove it from UAPI,
+and moves its content back to include/linux.
+
+As one could see include/linux/coda_psdev.h is not used outside of
+fs/coda, moving the header here as you suggests seems to be the correct
+solution.
+
+Regards.
+
+-- 
+Yann Droneaud
+OPTEYA
