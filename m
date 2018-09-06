@@ -1,86 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:41204 "EHLO
-        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbeIFE0C (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:19052 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725929AbeIFFTk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Sep 2018 00:26:02 -0400
-From: Rob Herring <robh@kernel.org>
-Subject: [PATCH v2 0/9] Devicetree build consolidation
-Date: Wed,  5 Sep 2018 18:53:18 -0500
-Message-Id: <20180905235327.5996-1-robh@kernel.org>
+        Thu, 6 Sep 2018 01:19:40 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180905225333.GA23155@gate.crashing.org>
+References: <1532072796-7947-1-git-send-email-yamada.masahiro@socionext.com>
+ <1532072796-7947-8-git-send-email-yamada.masahiro@socionext.com>
+ <20180903093945.GA1195@zn.tnic> <CAK7LNAQOd-QA6E7189q4K-p_9ReRtE88UbhtuXS9600nOQTgaA@mail.gmail.com>
+ <20180903100021.GD10249@zn.tnic> <20180905225333.GA23155@gate.crashing.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 6 Sep 2018 09:46:05 +0900
+Message-ID: <CAK7LNATJ494dsB_dYu3LvvxebBJCo-ru+-9d=ctVmG_BbXr7Og@mail.gmail.com>
+Subject: Re: [PATCH v4 07/11] kbuild: use 'include' directive to load
+ auto.conf from top Makefile
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Frank Rowand <frowand.list@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@mips.com>, James Hogan <jhogan@kernel.org>, Ley Foon Tan <lftan@altera.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, linux-kbuild@vger.kernel.org, linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org, uclinux-h8-devel@lists.sourceforge.jp, linux-mips@linux-mips.org, nios2-dev@lists.rocketboards.org, linuxppc-dev@lists.ozlabs.org, linux-xtensa@linux-xtensa.org
+To: Segher Boessenkool <segher@kernel.crashing.org>
+Cc: Borislav Petkov <bp@alien8.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Dirk Gouders <dirk@gouders.net>, Ulf Magnusson <ulfalizer@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-This series addresses a couple of issues I have with building dts files.
+2018-09-06 7:53 GMT+09:00 Segher Boessenkool <segher@kernel.crashing.org>:
+> On Mon, Sep 03, 2018 at 12:00:21PM +0200, Borislav Petkov wrote:
+>> On Mon, Sep 03, 2018 at 06:54:12PM +0900, Masahiro Yamada wrote:
+>> > You are right - I missed this usecase,
+>> > but I still want to excuse "it is rare enough".
+>>
+>> Isn't there a Makefile way to check file existence before including it?
+>
+> Sure there is, you can use $(wildcard ) .
 
-First, the ability to build all the dts files in the tree. This has been
-supported on most arches for some time with powerpc being the main
-exception. The reason powerpc wasn't supported was it needed a change
-in the location built dtb files are put.
 
-Secondly, it's a pain to acquire all the cross-compilers needed to build
-dtbs for each arch. There's no reason to build with the cross compiler and
-the host compiler is perfectly fine as we only need the pre-processor.
+If you work around it by $(wildcard ),
+we need something else that terminates building
+in case auto.conf is really missing.
 
-I started addressing just those 2 problems, but kept finding small
-differences such as target dependencies and dtbs_install support across
-architectures. Instead of trying to align all these, I've consolidated the
-build targets moving them out of the arch makefiles.
 
-I'd like to take the series via the DT tree.
+I do not want to revert
 
-Rob
+commit 2063945fdc3d4c0ac8f9319d942eda720d02aabe
+Author: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date:   Fri Jul 20 16:46:36 2018 +0900
 
-v2:
- - Fix $arch/boot/dts path check for out of tree builds
- - Fix dtc dependency for building built-in dtbs
- - Fix microblaze built-in dtb building
- - Add dtbs target for microblaze
+    kbuild: remove auto.conf from prerequisite of phony targets
 
-Rob Herring (9):
-  powerpc: build .dtb files in dts directory
-  nios2: build .dtb files in dts directory
-  nios2: use common rules to build built-in dtb
-  nios2: fix building all dtbs
-  c6x: use common built-in dtb support
-  kbuild: consolidate Devicetree dtb build rules
-  powerpc: enable building all dtbs
-  c6x: enable building all dtbs
-  microblaze: enable building all dtbs
 
- Makefile                           | 32 +++++++++++++++++++
- arch/arc/Makefile                  |  6 ----
- arch/arm/Makefile                  | 20 +-----------
- arch/arm64/Makefile                | 17 +----------
- arch/c6x/Makefile                  |  2 --
- arch/c6x/boot/dts/Makefile         | 17 +++++------
- arch/c6x/boot/dts/linked_dtb.S     |  2 --
- arch/c6x/include/asm/sections.h    |  1 -
- arch/c6x/kernel/setup.c            |  4 +--
- arch/c6x/kernel/vmlinux.lds.S      | 10 ------
- arch/h8300/Makefile                | 11 +------
- arch/microblaze/Makefile           |  4 +--
- arch/microblaze/boot/dts/Makefile  |  4 +++
- arch/mips/Makefile                 | 15 +--------
- arch/nds32/Makefile                |  2 +-
- arch/nios2/Makefile                | 11 +------
- arch/nios2/boot/Makefile           | 22 --------------
- arch/nios2/boot/dts/Makefile       |  6 ++++
- arch/nios2/boot/linked_dtb.S       | 19 ------------
- arch/powerpc/Makefile              |  3 --
- arch/powerpc/boot/Makefile         | 49 ++++++++++++++----------------
- arch/powerpc/boot/dts/Makefile     |  6 ++++
- arch/powerpc/boot/dts/fsl/Makefile |  4 +++
- arch/xtensa/Makefile               | 12 +-------
- scripts/Makefile.lib               |  2 +-
- 25 files changed, 93 insertions(+), 188 deletions(-)
- delete mode 100644 arch/c6x/boot/dts/linked_dtb.S
- create mode 100644 arch/nios2/boot/dts/Makefile
- delete mode 100644 arch/nios2/boot/linked_dtb.S
- create mode 100644 arch/powerpc/boot/dts/Makefile
- create mode 100644 arch/powerpc/boot/dts/fsl/Makefile
 
---
-2.17.1
+
+
+-- 
+Best Regards
+Masahiro Yamada
