@@ -1,370 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56624 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728110AbeIFNxj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Sep 2018 09:53:39 -0400
-Subject: [PATCH 06/11] coda: Move internal defs out of include/linux/ [ver
- #2]
-From: David Howells <dhowells@redhat.com>
-Date: Thu, 06 Sep 2018 10:19:04 +0100
-Message-ID: <153622554434.14298.9218401640808986085.stgit@warthog.procyon.org.uk>
-In-Reply-To: <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk>
-References: <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk>
+Received: from foss.arm.com ([217.140.101.70]:42472 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728645AbeIFOkP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 6 Sep 2018 10:40:15 -0400
+Date: Thu, 6 Sep 2018 11:05:47 +0100
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v2 6/9] kbuild: consolidate Devicetree dtb build rules
+Message-ID: <20180906100546.GJ3592@arm.com>
+References: <20180905235327.5996-1-robh@kernel.org>
+ <20180905235327.5996-7-robh@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180905235327.5996-7-robh@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Yann Droneaud <ydroneaud@opteya.com>, Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, codalist@coda.cs.cmu.edu, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, dhowells@redhat.com
+To: Rob Herring <robh@kernel.org>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@mips.com>, James Hogan <jhogan@kernel.org>, Ley Foon Tan <lftan@altera.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, linux-kbuild@vger.kernel.org, linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org, uclinux-h8-devel@lists.sourceforge.jp, linux-mips@linux-mips.org, nios2-dev@lists.rocketboards.org, linuxppc-dev@lists.ozlabs.org, linux-xtensa@linux-xtensa.org
 
-Move include/linux/coda_psdev.h to fs/coda/ as there's nothing else that
-uses it.
+On Wed, Sep 05, 2018 at 06:53:24PM -0500, Rob Herring wrote:
+> There is nothing arch specific about building dtb files other than their
+> location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
+> The dependencies and supported targets are all slightly different.
+> Also, a cross-compiler for each arch is needed, but really the host
+> compiler preprocessor is perfectly fine for building dtbs. Move the
+> build rules to a common location and remove the arch specific ones. This
+> is done in a single step to avoid warnings about overriding rules.
+> 
+> The build dependencies had been a mixture of 'scripts' and/or 'prepare'.
+> These pull in several dependencies some of which need a target compiler
+> (specifically devicetable-offsets.h) and aren't needed to build dtbs.
+> All that is really needed is dtc, so adjust the dependencies to only be
+> dtc.
+> 
+> This change enables support 'dtbs_install' on some arches which were
+> missing the target.
+> 
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: Vineet Gupta <vgupta@synopsys.com>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+> Cc: Michal Simek <monstr@monstr.eu>
+> Cc: Ralf Baechle <ralf@linux-mips.org>
+> Cc: Paul Burton <paul.burton@mips.com>
+> Cc: James Hogan <jhogan@kernel.org>
+> Cc: Ley Foon Tan <lftan@altera.com>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Chris Zankel <chris@zankel.net>
+> Cc: Max Filippov <jcmvbkbc@gmail.com>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-snps-arc@lists.infradead.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: uclinux-h8-devel@lists.sourceforge.jp
+> Cc: linux-mips@linux-mips.org
+> Cc: nios2-dev@lists.rocketboards.org
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Cc: linux-xtensa@linux-xtensa.org
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+> Please ack so I can take the whole series via the DT tree.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Yann Droneaud <ydroneaud@opteya.com>
-cc: Jan Harkes <jaharkes@cs.cmu.edu>
-cc: coda@cs.cmu.edu
-cc: codalist@coda.cs.cmu.edu
-cc: linux-fsdevel@vger.kernel.org
----
+For arm64:
 
- fs/coda/cache.c            |    2 +
- fs/coda/cnode.c            |    2 +
- fs/coda/coda_linux.c       |    2 +
- fs/coda/coda_psdev.h       |   88 ++++++++++++++++++++++++++++++++++++++++++++
- fs/coda/dir.c              |    2 +
- fs/coda/file.c             |    3 +-
- fs/coda/inode.c            |    2 +
- fs/coda/pioctl.c           |    3 +-
- fs/coda/psdev.c            |    3 +-
- fs/coda/symlink.c          |    3 +-
- fs/coda/upcall.c           |    2 +
- include/linux/coda_psdev.h |   88 --------------------------------------------
- 12 files changed, 98 insertions(+), 102 deletions(-)
- create mode 100644 fs/coda/coda_psdev.h
- delete mode 100644 include/linux/coda_psdev.h
+Acked-by: Will Deacon <will.deacon@arm.com>
 
-diff --git a/fs/coda/cache.c b/fs/coda/cache.c
-index 201fc08a8b4f..3b8c4513118f 100644
---- a/fs/coda/cache.c
-+++ b/fs/coda/cache.c
-@@ -21,7 +21,7 @@
- #include <linux/spinlock.h>
- 
- #include <linux/coda.h>
--#include <linux/coda_psdev.h>
-+#include "coda_psdev.h"
- #include "coda_linux.h"
- #include "coda_cache.h"
- 
-diff --git a/fs/coda/cnode.c b/fs/coda/cnode.c
-index 845b5a66952a..2e5badf67f98 100644
---- a/fs/coda/cnode.c
-+++ b/fs/coda/cnode.c
-@@ -8,8 +8,8 @@
- #include <linux/time.h>
- 
- #include <linux/coda.h>
--#include <linux/coda_psdev.h>
- #include <linux/pagemap.h>
-+#include "coda_psdev.h"
- #include "coda_linux.h"
- 
- static inline int coda_fideq(struct CodaFid *fid1, struct CodaFid *fid2)
-diff --git a/fs/coda/coda_linux.c b/fs/coda/coda_linux.c
-index f3d543dd9a98..f7741e4f499a 100644
---- a/fs/coda/coda_linux.c
-+++ b/fs/coda/coda_linux.c
-@@ -18,7 +18,7 @@
- #include <linux/string.h>
- 
- #include <linux/coda.h>
--#include <linux/coda_psdev.h>
-+#include "coda_psdev.h"
- #include "coda_linux.h"
- 
- /* initialize the debugging variables */
-diff --git a/fs/coda/coda_psdev.h b/fs/coda/coda_psdev.h
-new file mode 100644
-index 000000000000..e1abfb0fc9f9
---- /dev/null
-+++ b/fs/coda/coda_psdev.h
-@@ -0,0 +1,88 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __CODA_PSDEV_H
-+#define __CODA_PSDEV_H
-+
-+#include <linux/backing-dev.h>
-+#include <linux/mutex.h>
-+#include <linux/coda_psdev.h>
-+
-+struct kstatfs;
-+
-+/* messages between coda filesystem in kernel and Venus */
-+struct upc_req {
-+	struct list_head    uc_chain;
-+	caddr_t	            uc_data;
-+	u_short	            uc_flags;
-+	u_short             uc_inSize;  /* Size is at most 5000 bytes */
-+	u_short	            uc_outSize;
-+	u_short	            uc_opcode;  /* copied from data to save lookup */
-+	int		    uc_unique;
-+	wait_queue_head_t   uc_sleep;   /* process' wait queue */
-+};
-+
-+#define CODA_REQ_ASYNC  0x1
-+#define CODA_REQ_READ   0x2
-+#define CODA_REQ_WRITE  0x4
-+#define CODA_REQ_ABORT  0x8
-+
-+/* communication pending/processing queues */
-+struct venus_comm {
-+	u_long		    vc_seq;
-+	wait_queue_head_t   vc_waitq; /* Venus wait queue */
-+	struct list_head    vc_pending;
-+	struct list_head    vc_processing;
-+	int                 vc_inuse;
-+	struct super_block *vc_sb;
-+	struct mutex	    vc_mutex;
-+};
-+
-+static inline struct venus_comm *coda_vcp(struct super_block *sb)
-+{
-+	return (struct venus_comm *)((sb)->s_fs_info);
-+}
-+
-+/* upcalls */
-+int venus_rootfid(struct super_block *sb, struct CodaFid *fidp);
-+int venus_getattr(struct super_block *sb, struct CodaFid *fid,
-+		  struct coda_vattr *attr);
-+int venus_setattr(struct super_block *, struct CodaFid *, struct coda_vattr *);
-+int venus_lookup(struct super_block *sb, struct CodaFid *fid, 
-+		 const char *name, int length, int *type, 
-+		 struct CodaFid *resfid);
-+int venus_close(struct super_block *sb, struct CodaFid *fid, int flags,
-+		kuid_t uid);
-+int venus_open(struct super_block *sb, struct CodaFid *fid, int flags,
-+	       struct file **f);
-+int venus_mkdir(struct super_block *sb, struct CodaFid *dirfid, 
-+		const char *name, int length, 
-+		struct CodaFid *newfid, struct coda_vattr *attrs);
-+int venus_create(struct super_block *sb, struct CodaFid *dirfid, 
-+		 const char *name, int length, int excl, int mode,
-+		 struct CodaFid *newfid, struct coda_vattr *attrs) ;
-+int venus_rmdir(struct super_block *sb, struct CodaFid *dirfid, 
-+		const char *name, int length);
-+int venus_remove(struct super_block *sb, struct CodaFid *dirfid, 
-+		 const char *name, int length);
-+int venus_readlink(struct super_block *sb, struct CodaFid *fid, 
-+		   char *buffer, int *length);
-+int venus_rename(struct super_block *, struct CodaFid *new_fid, 
-+		 struct CodaFid *old_fid, size_t old_length, 
-+		 size_t new_length, const char *old_name, 
-+		 const char *new_name);
-+int venus_link(struct super_block *sb, struct CodaFid *fid, 
-+		  struct CodaFid *dirfid, const char *name, int len );
-+int venus_symlink(struct super_block *sb, struct CodaFid *fid,
-+		  const char *name, int len, const char *symname, int symlen);
-+int venus_access(struct super_block *sb, struct CodaFid *fid, int mask);
-+int venus_pioctl(struct super_block *sb, struct CodaFid *fid,
-+		 unsigned int cmd, struct PioctlData *data);
-+int coda_downcall(struct venus_comm *vcp, int opcode, union outputArgs *out);
-+int venus_fsync(struct super_block *sb, struct CodaFid *fid);
-+int venus_statfs(struct dentry *dentry, struct kstatfs *sfs);
-+
-+/*
-+ * Statistics
-+ */
-+
-+extern struct venus_comm coda_comms[];
-+#endif
-diff --git a/fs/coda/dir.c b/fs/coda/dir.c
-index 00876ddadb43..b4bb34862899 100644
---- a/fs/coda/dir.c
-+++ b/fs/coda/dir.c
-@@ -23,7 +23,7 @@
- #include <linux/uaccess.h>
- 
- #include <linux/coda.h>
--#include <linux/coda_psdev.h>
-+#include "coda_psdev.h"
- #include "coda_linux.h"
- #include "coda_cache.h"
- 
-diff --git a/fs/coda/file.c b/fs/coda/file.c
-index 1cbc1f2298ee..ef135b209e18 100644
---- a/fs/coda/file.c
-+++ b/fs/coda/file.c
-@@ -22,8 +22,7 @@
- #include <linux/uaccess.h>
- 
- #include <linux/coda.h>
--#include <linux/coda_psdev.h>
--
-+#include "coda_psdev.h"
- #include "coda_linux.h"
- #include "coda_int.h"
- 
-diff --git a/fs/coda/inode.c b/fs/coda/inode.c
-index 97424cf206c0..4c512572f257 100644
---- a/fs/coda/inode.c
-+++ b/fs/coda/inode.c
-@@ -27,7 +27,7 @@
- #include <linux/vmalloc.h>
- 
- #include <linux/coda.h>
--#include <linux/coda_psdev.h>
-+#include "coda_psdev.h"
- #include "coda_linux.h"
- #include "coda_cache.h"
- 
-diff --git a/fs/coda/pioctl.c b/fs/coda/pioctl.c
-index e0c17b7dccce..644d48c12ce8 100644
---- a/fs/coda/pioctl.c
-+++ b/fs/coda/pioctl.c
-@@ -20,8 +20,7 @@
- #include <linux/uaccess.h>
- 
- #include <linux/coda.h>
--#include <linux/coda_psdev.h>
--
-+#include "coda_psdev.h"
- #include "coda_linux.h"
- 
- /* pioctl ops */
-diff --git a/fs/coda/psdev.c b/fs/coda/psdev.c
-index c5234c21b539..a13764e9bb79 100644
---- a/fs/coda/psdev.c
-+++ b/fs/coda/psdev.c
-@@ -43,8 +43,7 @@
- #include <linux/uaccess.h>
- 
- #include <linux/coda.h>
--#include <linux/coda_psdev.h>
--
-+#include "coda_psdev.h"
- #include "coda_linux.h"
- 
- #include "coda_int.h"
-diff --git a/fs/coda/symlink.c b/fs/coda/symlink.c
-index 202297d156df..8907d0508198 100644
---- a/fs/coda/symlink.c
-+++ b/fs/coda/symlink.c
-@@ -17,8 +17,7 @@
- #include <linux/pagemap.h>
- 
- #include <linux/coda.h>
--#include <linux/coda_psdev.h>
--
-+#include "coda_psdev.h"
- #include "coda_linux.h"
- 
- static int coda_symlink_filler(struct file *file, struct page *page)
-diff --git a/fs/coda/upcall.c b/fs/coda/upcall.c
-index 1175a1722411..8babd2cc647a 100644
---- a/fs/coda/upcall.c
-+++ b/fs/coda/upcall.c
-@@ -33,7 +33,7 @@
- #include <linux/vfs.h>
- 
- #include <linux/coda.h>
--#include <linux/coda_psdev.h>
-+#include "coda_psdev.h"
- #include "coda_linux.h"
- #include "coda_cache.h"
- 
-diff --git a/include/linux/coda_psdev.h b/include/linux/coda_psdev.h
-deleted file mode 100644
-index c61e70b97319..000000000000
---- a/include/linux/coda_psdev.h
-+++ /dev/null
-@@ -1,88 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef __CODA_PSDEV_H
--#define __CODA_PSDEV_H
--
--#include <linux/backing-dev.h>
--#include <linux/mutex.h>
--#include <uapi/linux/coda_psdev.h>
--
--struct kstatfs;
--
--/* messages between coda filesystem in kernel and Venus */
--struct upc_req {
--	struct list_head    uc_chain;
--	caddr_t	            uc_data;
--	u_short	            uc_flags;
--	u_short             uc_inSize;  /* Size is at most 5000 bytes */
--	u_short	            uc_outSize;
--	u_short	            uc_opcode;  /* copied from data to save lookup */
--	int		    uc_unique;
--	wait_queue_head_t   uc_sleep;   /* process' wait queue */
--};
--
--#define CODA_REQ_ASYNC  0x1
--#define CODA_REQ_READ   0x2
--#define CODA_REQ_WRITE  0x4
--#define CODA_REQ_ABORT  0x8
--
--/* communication pending/processing queues */
--struct venus_comm {
--	u_long		    vc_seq;
--	wait_queue_head_t   vc_waitq; /* Venus wait queue */
--	struct list_head    vc_pending;
--	struct list_head    vc_processing;
--	int                 vc_inuse;
--	struct super_block *vc_sb;
--	struct mutex	    vc_mutex;
--};
--
--static inline struct venus_comm *coda_vcp(struct super_block *sb)
--{
--	return (struct venus_comm *)((sb)->s_fs_info);
--}
--
--/* upcalls */
--int venus_rootfid(struct super_block *sb, struct CodaFid *fidp);
--int venus_getattr(struct super_block *sb, struct CodaFid *fid,
--		  struct coda_vattr *attr);
--int venus_setattr(struct super_block *, struct CodaFid *, struct coda_vattr *);
--int venus_lookup(struct super_block *sb, struct CodaFid *fid, 
--		 const char *name, int length, int *type, 
--		 struct CodaFid *resfid);
--int venus_close(struct super_block *sb, struct CodaFid *fid, int flags,
--		kuid_t uid);
--int venus_open(struct super_block *sb, struct CodaFid *fid, int flags,
--	       struct file **f);
--int venus_mkdir(struct super_block *sb, struct CodaFid *dirfid, 
--		const char *name, int length, 
--		struct CodaFid *newfid, struct coda_vattr *attrs);
--int venus_create(struct super_block *sb, struct CodaFid *dirfid, 
--		 const char *name, int length, int excl, int mode,
--		 struct CodaFid *newfid, struct coda_vattr *attrs) ;
--int venus_rmdir(struct super_block *sb, struct CodaFid *dirfid, 
--		const char *name, int length);
--int venus_remove(struct super_block *sb, struct CodaFid *dirfid, 
--		 const char *name, int length);
--int venus_readlink(struct super_block *sb, struct CodaFid *fid, 
--		   char *buffer, int *length);
--int venus_rename(struct super_block *, struct CodaFid *new_fid, 
--		 struct CodaFid *old_fid, size_t old_length, 
--		 size_t new_length, const char *old_name, 
--		 const char *new_name);
--int venus_link(struct super_block *sb, struct CodaFid *fid, 
--		  struct CodaFid *dirfid, const char *name, int len );
--int venus_symlink(struct super_block *sb, struct CodaFid *fid,
--		  const char *name, int len, const char *symname, int symlen);
--int venus_access(struct super_block *sb, struct CodaFid *fid, int mask);
--int venus_pioctl(struct super_block *sb, struct CodaFid *fid,
--		 unsigned int cmd, struct PioctlData *data);
--int coda_downcall(struct venus_comm *vcp, int opcode, union outputArgs *out);
--int venus_fsync(struct super_block *sb, struct CodaFid *fid);
--int venus_statfs(struct dentry *dentry, struct kstatfs *sfs);
--
--/*
-- * Statistics
-- */
--
--extern struct venus_comm coda_comms[];
--#endif
+Will
