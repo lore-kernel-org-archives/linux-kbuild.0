@@ -1,12 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49968 "EHLO mx1.redhat.com"
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45202 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726389AbeIFNyE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Sep 2018 09:54:04 -0400
-Subject: [PATCH 10/11] UAPI: ndctl: Remove use of PAGE_SIZE [ver #2]
+        id S1728650AbeIFNxv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 6 Sep 2018 09:53:51 -0400
+Subject: [PATCH 08/11] UAPI: nilfs2: Fix use of undefined byteswapping
+ functions [ver #2]
 From: David Howells <dhowells@redhat.com>
-Date: Thu, 06 Sep 2018 10:19:30 +0100
-Message-ID: <153622557095.14298.10281337300003012767.stgit@warthog.procyon.org.uk>
+Date: Thu, 06 Sep 2018 10:19:17 +0100
+Message-ID: <153622555770.14298.17748806314555967351.stgit@warthog.procyon.org.uk>
 In-Reply-To: <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk>
 References: <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
@@ -15,66 +16,102 @@ Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Dan Williams <dan.j.williams@intel.com>, linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, dhowells@redhat.com
+Cc: Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>, linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, dhowells@redhat.com
 
-The macro PAGE_SIZE isn't valid outside of the kernel, so it should not
-appear in UAPI headers.
+nilfs2 exports a load of inline functions to userspace that call kernel
+byteswapping functions that don't exist in UAPI.  Fix this by making it
+#include asm/byteorder.h and use the functions declared there.
 
-Furthermore, the actual machine page size could theoretically change from
-an application's point of view if it's running in a container that gets
-migrated to another machine (say 4K/ppc64 to 64K/ppc64).
+A better way is probably to remove these inline functions from the nilfs2
+header since they are technically broken.
 
-Fixes: f2ba5a5baecf ("libnvdimm, namespace: make min namespace size 4K")
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Dan Williams <dan.j.williams@intel.com>
-cc: linux-nvdimm@lists.01.org
+cc: Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>
+cc: linux-nilfs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
 ---
 
- include/linux/ndctl.h      |   22 ++++++++++++++++++++++
- include/uapi/linux/ndctl.h |    4 ----
- 2 files changed, 22 insertions(+), 4 deletions(-)
- create mode 100644 include/linux/ndctl.h
+ include/uapi/linux/nilfs2_ondisk.h |   28 +++++++++++-----------------
+ 1 file changed, 11 insertions(+), 17 deletions(-)
 
-diff --git a/include/linux/ndctl.h b/include/linux/ndctl.h
-new file mode 100644
-index 000000000000..cd5a293ce3ae
---- /dev/null
-+++ b/include/linux/ndctl.h
-@@ -0,0 +1,22 @@
-+/*
-+ * Copyright (c) 2014-2016, Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU Lesser General Public License,
-+ * version 2.1, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT ANY
-+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
-+ * more details.
-+ */
-+#ifndef _LINUX_NDCTL_H
-+#define _LINUX_NDCTL_H
-+
-+#include <uapi/linux/ndctl.h>
-+
-+enum {
-+	ND_MIN_NAMESPACE_SIZE = PAGE_SIZE,
-+};
-+
-+#endif /* _LINUX_NDCTL_H */
-diff --git a/include/uapi/linux/ndctl.h b/include/uapi/linux/ndctl.h
-index 2f2c43d633c5..f57c9e434d2d 100644
---- a/include/uapi/linux/ndctl.h
-+++ b/include/uapi/linux/ndctl.h
-@@ -202,10 +202,6 @@ enum nd_driver_flags {
- 	ND_DRIVER_DAX_PMEM	  = 1 << ND_DEVICE_DAX_PMEM,
- };
+diff --git a/include/uapi/linux/nilfs2_ondisk.h b/include/uapi/linux/nilfs2_ondisk.h
+index a7e66ab11d1d..47f8f596ff1c 100644
+--- a/include/uapi/linux/nilfs2_ondisk.h
++++ b/include/uapi/linux/nilfs2_ondisk.h
+@@ -29,6 +29,7 @@
  
--enum {
--	ND_MIN_NAMESPACE_SIZE = PAGE_SIZE,
--};
--
- enum ars_masks {
- 	ARS_STATUS_MASK = 0x0000FFFF,
- 	ARS_EXT_STATUS_SHIFT = 16,
+ #include <linux/types.h>
+ #include <linux/magic.h>
++#include <asm/byteorder.h>
+ 
+ 
+ #define NILFS_INODE_BMAP_SIZE	7
+@@ -533,20 +534,17 @@ enum {
+ static inline void							\
+ nilfs_checkpoint_set_##name(struct nilfs_checkpoint *cp)		\
+ {									\
+-	cp->cp_flags = cpu_to_le32(le32_to_cpu(cp->cp_flags) |		\
+-				   (1UL << NILFS_CHECKPOINT_##flag));	\
++	cp->cp_flags |= __cpu_to_le32(1UL << NILFS_CHECKPOINT_##flag);	\
+ }									\
+ static inline void							\
+ nilfs_checkpoint_clear_##name(struct nilfs_checkpoint *cp)		\
+ {									\
+-	cp->cp_flags = cpu_to_le32(le32_to_cpu(cp->cp_flags) &		\
+-				   ~(1UL << NILFS_CHECKPOINT_##flag));	\
++	cp->cp_flags &= __cpu_to_le32(~(1UL << NILFS_CHECKPOINT_##flag)); \
+ }									\
+ static inline int							\
+ nilfs_checkpoint_##name(const struct nilfs_checkpoint *cp)		\
+ {									\
+-	return !!(le32_to_cpu(cp->cp_flags) &				\
+-		  (1UL << NILFS_CHECKPOINT_##flag));			\
++	return !!(cp->cp_flags & __cpu_to_le32(1UL << NILFS_CHECKPOINT_##flag)); \
+ }
+ 
+ NILFS_CHECKPOINT_FNS(SNAPSHOT, snapshot)
+@@ -595,21 +593,17 @@ enum {
+ static inline void							\
+ nilfs_segment_usage_set_##name(struct nilfs_segment_usage *su)		\
+ {									\
+-	su->su_flags = cpu_to_le32(le32_to_cpu(su->su_flags) |		\
+-				   (1UL << NILFS_SEGMENT_USAGE_##flag));\
++	su->su_flags |= __cpu_to_le32(1UL << NILFS_SEGMENT_USAGE_##flag); \
+ }									\
+ static inline void							\
+ nilfs_segment_usage_clear_##name(struct nilfs_segment_usage *su)	\
+ {									\
+-	su->su_flags =							\
+-		cpu_to_le32(le32_to_cpu(su->su_flags) &			\
+-			    ~(1UL << NILFS_SEGMENT_USAGE_##flag));      \
++	su->su_flags &= __cpu_to_le32(~(1UL << NILFS_SEGMENT_USAGE_##flag)); \
+ }									\
+ static inline int							\
+ nilfs_segment_usage_##name(const struct nilfs_segment_usage *su)	\
+ {									\
+-	return !!(le32_to_cpu(su->su_flags) &				\
+-		  (1UL << NILFS_SEGMENT_USAGE_##flag));			\
++	return !!(su->su_flags & __cpu_to_le32(1UL << NILFS_SEGMENT_USAGE_##flag)); \
+ }
+ 
+ NILFS_SEGMENT_USAGE_FNS(ACTIVE, active)
+@@ -619,15 +613,15 @@ NILFS_SEGMENT_USAGE_FNS(ERROR, error)
+ static inline void
+ nilfs_segment_usage_set_clean(struct nilfs_segment_usage *su)
+ {
+-	su->su_lastmod = cpu_to_le64(0);
+-	su->su_nblocks = cpu_to_le32(0);
+-	su->su_flags = cpu_to_le32(0);
++	su->su_lastmod = __cpu_to_le64(0);
++	su->su_nblocks = __cpu_to_le32(0);
++	su->su_flags = __cpu_to_le32(0);
+ }
+ 
+ static inline int
+ nilfs_segment_usage_clean(const struct nilfs_segment_usage *su)
+ {
+-	return !le32_to_cpu(su->su_flags);
++	return !su->su_flags;
+ }
+ 
+ /**
