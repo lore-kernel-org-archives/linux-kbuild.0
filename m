@@ -1,30 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:24650 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726147AbeIGVaP (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:49020 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726151AbeIGVtz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Sep 2018 17:30:15 -0400
+        Fri, 7 Sep 2018 17:49:55 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAL_JsqJeTqxFPxZfuusPxuOTsVbVk_Uhue6NXwpotkwZWHrCDw@mail.gmail.com>
-References: <20180905235327.5996-1-robh@kernel.org> <20180905235327.5996-7-robh@kernel.org>
- <CAK7LNARD+_kV=XtJ66mZBU-CPMQgWF+oQtv4bGKaGGARNwzXiQ@mail.gmail.com> <CAL_JsqJeTqxFPxZfuusPxuOTsVbVk_Uhue6NXwpotkwZWHrCDw@mail.gmail.com>
+In-Reply-To: <CAL_JsqJJ6DCT8AjVYqkbFuJ+fO0VmVch24B=XRp4pJPkUQYAww@mail.gmail.com>
+References: <20180821215524.23040-1-robh@kernel.org> <20180821215524.23040-7-robh@kernel.org>
+ <CAK7LNATcYSvwh0BEEdyUuDa_Y9X-AqQAzA5MrbNhOSMmSzqhTg@mail.gmail.com> <CAL_JsqJJ6DCT8AjVYqkbFuJ+fO0VmVch24B=XRp4pJPkUQYAww@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 8 Sep 2018 01:47:24 +0900
-Message-ID: <CAK7LNATqTh4oxG5uz2Z4gk0J=kXP62UX2r3cP9Kd2aCSTXzTuA@mail.gmail.com>
-Subject: Re: [PATCH v2 6/9] kbuild: consolidate Devicetree dtb build rules
+Date: Sat, 8 Sep 2018 02:07:09 +0900
+Message-ID: <CAK7LNAR1-G+eg-dAmiDvEo3JJHoXefm2eu+Aorgjv9BP48+qvw@mail.gmail.com>
+Subject: Re: [PATCH 6/8] kbuild: consolidate Devicetree dtb build rules
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Rob Herring <robh@kernel.org>
-Cc: DTML <devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@mips.com>, James Hogan <jhogan@kernel.org>, Ley Foon Tan <lftan@altera.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Linux-MIPS <linux-mips@linux-mips.org>, nios2-dev@lists.rocketboards.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-xtensa@linux-xtensa.org
+Cc: DTML <devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@mips.com>, James Hogan <jhogan@kernel.org>, Ley Foon Tan <lftan@altera.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Linux-MIPS <linux-mips@linux-mips.org>, nios2-dev@lists.rocketboards.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-xtensa@linux-xtensa.org
 
-Hi Rob,
-
-2018-09-07 21:17 GMT+09:00 Rob Herring <robh@kernel.org>:
-> On Fri, Sep 7, 2018 at 5:33 AM Masahiro Yamada
+2018-08-27 8:56 GMT+09:00 Rob Herring <robh@kernel.org>:
+> On Sat, Aug 25, 2018 at 9:06 PM Masahiro Yamada
 > <yamada.masahiro@socionext.com> wrote:
 >>
->> 2018-09-06 8:53 GMT+09:00 Rob Herring <robh@kernel.org>:
+>> Hi Rob,
+>>
+>>
+>> 2018-08-22 6:55 GMT+09:00 Rob Herring <robh@kernel.org>:
 >> > There is nothing arch specific about building dtb files other than their
 >> > location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
 >> > The dependencies and supported targets are all slightly different.
@@ -69,47 +70,85 @@ Hi Rob,
 >> > Cc: linux-xtensa@linux-xtensa.org
 >> > Signed-off-by: Rob Herring <robh@kernel.org>
 >> > ---
->> > Please ack so I can take the whole series via the DT tree.
+>> >  Makefile                 | 30 ++++++++++++++++++++++++++++++
+>> >  arch/arc/Makefile        |  6 ------
+>> >  arch/arm/Makefile        | 20 +-------------------
+>> >  arch/arm64/Makefile      | 17 +----------------
+>> >  arch/c6x/Makefile        |  2 --
+>> >  arch/h8300/Makefile      | 11 +----------
+>> >  arch/microblaze/Makefile |  4 +---
+>> >  arch/mips/Makefile       | 15 +--------------
+>> >  arch/nds32/Makefile      |  2 +-
+>> >  arch/nios2/Makefile      |  7 -------
+>> >  arch/nios2/boot/Makefile |  4 ----
+>> >  arch/powerpc/Makefile    |  3 ---
+>> >  arch/xtensa/Makefile     | 12 +-----------
+>> >  scripts/Makefile         |  1 -
+>> >  scripts/Makefile.lib     |  2 +-
+>> >  15 files changed, 38 insertions(+), 98 deletions(-)
 >> >
->> > v2:
->> >  - Fix $arch/boot/dts path check for out of tree builds
->> >  - Fix dtc dependency for building built-in dtbs
->> >  - Fix microblaze built-in dtb building
->>
->>
->> This breaks parallel building
->> because two threads could descend into scripts/dtc
->> at the same time.
->>
->> 'all' depends on both 'scripts' and 'dtc'.
->>
->> * 'scripts' target -- descends into scripts/, then scripts/dtc
->> * 'dtc' target     -- descents into scripts/dtc directly
+>> > diff --git a/Makefile b/Makefile
+>> > index c13f8b85ba60..6d89e673f192 100644
+>> > --- a/Makefile
+>> > +++ b/Makefile
+>> > @@ -1212,6 +1212,30 @@ kselftest-merge:
+>> >                 $(srctree)/tools/testing/selftests/*/config
+>> >         +$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
+>> >
+>> > +# ---------------------------------------------------------------------------
+>> > +# Devicetree files
+>> > +
+>> > +dtstree := $(wildcard arch/$(SRCARCH)/boot/dts)
 >
-> Any suggestions for how to fix given the problem with depending on
-> scripts? I suppose I could make scripts depend on dtc instead, but I'd
-> be back to needing to fix cleaning.
+> BTW, there's an error here too. It doesn't work right with
+> KBUILD_OUTPUT set and should be:
+>
+> ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/boot/dts/),)
+> dtstree := arch/$(SRCARCH)/boot/dts
+> endif
+>
+>> > +
+>> > +ifdef CONFIG_OF_EARLY_FLATTREE
+>> > +
+>> > +%.dtb %.dtb.S %.dtb.o: | dtc
+>>
+>> I think the pipe operator is unnecessary
+>> because Kbuild will descend to $(dtstree) anyway.
+>
+> The pipe means 'order-only', right?
 
-How about making 'prepare' depend on 'dtc'?
+Yes.
 
-Then, remove
-subdir-$(CONFIG_DTC)         += dtc
-from scripts/Makefile
+> So it is just a weaker dependency
+> for things which are not input files as dtc is not. The 'dtc' here is
+> just the dtc rule below, not the actual executable. Or am I missing
+> something?
 
-but, add dtc to subdir-
+
+The pipe is used when
+
+  - we want to make sure the weaker prerequisite exists
+
+  - but, we do not want to execute the recipe
+    even if the weaker prerequisite is updated
 
 
-> Or I could just skip removing the
-> cross compiler dependency for now.
+In this case, we want to execute the recipe _all_the_time_.
 
-I want to build scripts/
-without target compiler.
+We compare the timestamp between %.dtb and %.dts in the sub-directory.
 
-modpost is a special host-program
-that depends on $(CC).
+We never know the real depenency until the following recipe is run
+     $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
 
-I will take a look at it
-when I find some time.
+
+
+PHONY += dtbs
+dtbs: | dtc
+      $(Q)$(MAKE) $(build)=$(dtstree)
+
+Here 'dtbs' is a PHONY target.
+We always want to run the recipe.
+The pipe operator is not sensible.
 
 
 -- 
