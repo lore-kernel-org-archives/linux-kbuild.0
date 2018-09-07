@@ -1,90 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51508 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726293AbeIGQ6J (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Sep 2018 12:58:09 -0400
+Received: from mail-ve1eur01on0097.outbound.protection.outlook.com ([104.47.1.97]:20505
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726591AbeIGUsN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 7 Sep 2018 16:48:13 -0400
+Subject: Re: [PATCH v6 16/18] khwasan, mm, arm64: tag non slab memory
+ allocated via pagealloc
+References: <cover.1535462971.git.andreyknvl@google.com>
+ <db103bdc2109396af0c6007f1669ebbbb63b872b.1535462971.git.andreyknvl@google.com>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Message-ID: <3f2dee71-1615-4a34-d611-3ccaf407551e@virtuozzo.com>
+Date: Fri, 7 Sep 2018 19:06:42 +0300
 MIME-Version: 1.0
-References: <20180905235327.5996-1-robh@kernel.org> <20180905235327.5996-7-robh@kernel.org>
- <CAK7LNARD+_kV=XtJ66mZBU-CPMQgWF+oQtv4bGKaGGARNwzXiQ@mail.gmail.com>
-In-Reply-To: <CAK7LNARD+_kV=XtJ66mZBU-CPMQgWF+oQtv4bGKaGGARNwzXiQ@mail.gmail.com>
-From: Rob Herring <robh@kernel.org>
-Date: Fri, 7 Sep 2018 07:17:14 -0500
-Message-ID: <CAL_JsqJeTqxFPxZfuusPxuOTsVbVk_Uhue6NXwpotkwZWHrCDw@mail.gmail.com>
-Subject: Re: [PATCH v2 6/9] kbuild: consolidate Devicetree dtb build rules
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <db103bdc2109396af0c6007f1669ebbbb63b872b.1535462971.git.andreyknvl@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: devicetree@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@mips.com>, James Hogan <jhogan@kernel.org>, Ley Foon Tan <lftan@altera.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Linux-MIPS <linux-mips@linux-mips.org>, nios2-dev@lists.rocketboards.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-xtensa@linux-xtensa.org
+To: Andrey Konovalov <andreyknvl@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
+Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-On Fri, Sep 7, 2018 at 5:33 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> 2018-09-06 8:53 GMT+09:00 Rob Herring <robh@kernel.org>:
-> > There is nothing arch specific about building dtb files other than their
-> > location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
-> > The dependencies and supported targets are all slightly different.
-> > Also, a cross-compiler for each arch is needed, but really the host
-> > compiler preprocessor is perfectly fine for building dtbs. Move the
-> > build rules to a common location and remove the arch specific ones. This
-> > is done in a single step to avoid warnings about overriding rules.
-> >
-> > The build dependencies had been a mixture of 'scripts' and/or 'prepare'.
-> > These pull in several dependencies some of which need a target compiler
-> > (specifically devicetable-offsets.h) and aren't needed to build dtbs.
-> > All that is really needed is dtc, so adjust the dependencies to only be
-> > dtc.
-> >
-> > This change enables support 'dtbs_install' on some arches which were
-> > missing the target.
-> >
-> > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > Cc: Michal Marek <michal.lkml@markovi.net>
-> > Cc: Vineet Gupta <vgupta@synopsys.com>
-> > Cc: Russell King <linux@armlinux.org.uk>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will.deacon@arm.com>
-> > Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-> > Cc: Michal Simek <monstr@monstr.eu>
-> > Cc: Ralf Baechle <ralf@linux-mips.org>
-> > Cc: Paul Burton <paul.burton@mips.com>
-> > Cc: James Hogan <jhogan@kernel.org>
-> > Cc: Ley Foon Tan <lftan@altera.com>
-> > Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> > Cc: Paul Mackerras <paulus@samba.org>
-> > Cc: Michael Ellerman <mpe@ellerman.id.au>
-> > Cc: Chris Zankel <chris@zankel.net>
-> > Cc: Max Filippov <jcmvbkbc@gmail.com>
-> > Cc: linux-kbuild@vger.kernel.org
-> > Cc: linux-snps-arc@lists.infradead.org
-> > Cc: linux-arm-kernel@lists.infradead.org
-> > Cc: uclinux-h8-devel@lists.sourceforge.jp
-> > Cc: linux-mips@linux-mips.org
-> > Cc: nios2-dev@lists.rocketboards.org
-> > Cc: linuxppc-dev@lists.ozlabs.org
-> > Cc: linux-xtensa@linux-xtensa.org
-> > Signed-off-by: Rob Herring <robh@kernel.org>
-> > ---
-> > Please ack so I can take the whole series via the DT tree.
-> >
-> > v2:
-> >  - Fix $arch/boot/dts path check for out of tree builds
-> >  - Fix dtc dependency for building built-in dtbs
-> >  - Fix microblaze built-in dtb building
->
->
-> This breaks parallel building
-> because two threads could descend into scripts/dtc
-> at the same time.
->
-> 'all' depends on both 'scripts' and 'dtc'.
->
-> * 'scripts' target -- descends into scripts/, then scripts/dtc
-> * 'dtc' target     -- descents into scripts/dtc directly
 
-Any suggestions for how to fix given the problem with depending on
-scripts? I suppose I could make scripts depend on dtc instead, but I'd
-be back to needing to fix cleaning. Or I could just skip removing the
-cross compiler dependency for now.
 
-Rob
+On 08/29/2018 02:35 PM, Andrey Konovalov wrote:
+
+>  void kasan_poison_slab(struct page *page)
+>  {
+> +	unsigned long i;
+> +
+> +	if (IS_ENABLED(CONFIG_SLAB))
+> +		page->s_mem = reset_tag(page->s_mem);
+
+Why reinitialize here, instead of single initialization in alloc_slabmgmt()?
+
+
+> +	for (i = 0; i < (1 << compound_order(page)); i++)
+> +		page_kasan_tag_reset(page + i);
+>  	kasan_poison_shadow(page_address(page),
+>  			PAGE_SIZE << compound_order(page),
+>  			KASAN_KMALLOC_REDZONE);
