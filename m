@@ -1,87 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ms.lwn.net ([45.79.88.28]:38220 "EHLO ms.lwn.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726609AbeIJBSh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 9 Sep 2018 21:18:37 -0400
-Date: Sun, 9 Sep 2018 14:27:41 -0600
-From: Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH v2] kconfig: add hardened defconfig helpers
-Message-ID: <20180909142741.3b87df76@lwn.net>
-In-Reply-To: <1536516257-30871-1-git-send-email-s.mesoraca16@gmail.com>
-References: <1536516257-30871-1-git-send-email-s.mesoraca16@gmail.com>
+Received: from condef-06.nifty.com ([202.248.20.71]:55945 "EHLO
+        condef-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725889AbeIJHOo (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 10 Sep 2018 03:14:44 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20180905235327.5996-7-robh@kernel.org>
+References: <20180905235327.5996-1-robh@kernel.org> <20180905235327.5996-7-robh@kernel.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 10 Sep 2018 08:27:35 +0900
+Message-ID: <CAK7LNAS5uEUMDpL8oCJmFWKu1YF8tof5d=2h8jzt-MLHGAEAhg@mail.gmail.com>
+Subject: Re: [PATCH v2 6/9] kbuild: consolidate Devicetree dtb build rules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Salvatore Mesoraca <s.mesoraca16@gmail.com>
-Cc: kernel-hardening@lists.openwall.com, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jann Horn <jannh@google.com>, Kees Cook <keescook@chromium.org>, Laura Abbott <labbott@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, "Eric W. Biederman" <ebiederm@xmission.com>
+To: Rob Herring <robh@kernel.org>
+Cc: DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@mips.com>, James Hogan <jhogan@kernel.org>, Ley Foon Tan <lftan@altera.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Linux-MIPS <linux-mips@linux-mips.org>, nios2-dev@lists.rocketboards.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-xtensa@linux-xtensa.org
 
-On Sun,  9 Sep 2018 20:04:17 +0200
-Salvatore Mesoraca <s.mesoraca16@gmail.com> wrote:
-
-> +===============================
-> +Hardening Configuration Options
-> +===============================
+2018-09-06 8:53 GMT+09:00 Rob Herring <robh@kernel.org>:
+> There is nothing arch specific about building dtb files other than their
+> location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
+> The dependencies and supported targets are all slightly different.
+> Also, a cross-compiler for each arch is needed, but really the host
+> compiler preprocessor is perfectly fine for building dtbs. Move the
+> build rules to a common location and remove the arch specific ones. This
+> is done in a single step to avoid warnings about overriding rules.
+>
+> The build dependencies had been a mixture of 'scripts' and/or 'prepare'.
+> These pull in several dependencies some of which need a target compiler
+> (specifically devicetable-offsets.h) and aren't needed to build dtbs.
+> All that is really needed is dtc, so adjust the dependencies to only be
+> dtc.
+>
+> This change enables support 'dtbs_install' on some arches which were
+> missing the target.
+>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: Vineet Gupta <vgupta@synopsys.com>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+> Cc: Michal Simek <monstr@monstr.eu>
+> Cc: Ralf Baechle <ralf@linux-mips.org>
+> Cc: Paul Burton <paul.burton@mips.com>
+> Cc: James Hogan <jhogan@kernel.org>
+> Cc: Ley Foon Tan <lftan@altera.com>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Chris Zankel <chris@zankel.net>
+> Cc: Max Filippov <jcmvbkbc@gmail.com>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-snps-arc@lists.infradead.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: uclinux-h8-devel@lists.sourceforge.jp
+> Cc: linux-mips@linux-mips.org
+> Cc: nios2-dev@lists.rocketboards.org
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Cc: linux-xtensa@linux-xtensa.org
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+> Please ack so I can take the whole series via the DT tree.
+>
+> v2:
+>  - Fix $arch/boot/dts path check for out of tree builds
+>  - Fix dtc dependency for building built-in dtbs
+>  - Fix microblaze built-in dtb building
+>
+>  Makefile                          | 32 +++++++++++++++++++++++++++++++
+>  arch/arc/Makefile                 |  6 ------
+>  arch/arm/Makefile                 | 20 +------------------
+>  arch/arm64/Makefile               | 17 +---------------
+>  arch/c6x/Makefile                 |  2 --
+>  arch/h8300/Makefile               | 11 +----------
+>  arch/microblaze/Makefile          |  4 +---
+>  arch/microblaze/boot/dts/Makefile |  2 ++
+>  arch/mips/Makefile                | 15 +--------------
+>  arch/nds32/Makefile               |  2 +-
+>  arch/nios2/Makefile               |  7 -------
+>  arch/nios2/boot/Makefile          |  4 ----
+>  arch/powerpc/Makefile             |  3 ---
+>  arch/xtensa/Makefile              | 12 +-----------
+>  scripts/Makefile.lib              |  2 +-
+>  15 files changed, 42 insertions(+), 97 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 2b458801ba74..bc18dbbc16c5 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1212,6 +1212,32 @@ kselftest-merge:
+>                 $(srctree)/tools/testing/selftests/*/config
+>         +$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
+>
+> +# ---------------------------------------------------------------------------
+> +# Devicetree files
 > +
-> +This is a list of configuration options that are useful for hardening purposes.
-> +These options are divided in 4 levels based on the magnitude of their negative
-> +side effects, not on their importance or usefulness:
+> +ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/boot/dts/),)
+> +dtstree := arch/$(SRCARCH)/boot/dts
+> +endif
 > +
-> +	- **Low**: Negligible performance impact. No user-space breakage.
-> +	- **Medium**: Some performance impact and/or user-space breakage for
-> +	  few users.
-> +	- **High**: Notable performance impact and/or user-space breakage for
-> +	  many users.
-> +	- **Extreme**: Big performance impact and/or user-space breakage for
-> +	  most users.
+> +ifdef CONFIG_OF_EARLY_FLATTREE
 > +
-> +In other words: **Low** level contains protections that *everybody* can and
-> +should use; **Medium** level should be usable by *most people* without issues;
-> +**High** level may cause *some trouble*, especially from a *performance*
-> +perspective; **Extreme** level contains protections that *few people* may want
-> +to enable, some people will probably *cherry-pick* some options from here based
-> +on their needs.
-> +
-> +For further details about which option is included in each level, please read
-> +the description below, for more information on any particular option refer to
-> +their help page.
-> +
-> +The content of this list is automatically translated into *config fragments*
-> +that can be used to apply the suggested hardening options to your current
-> +configuration.
-> +To use them you just need to run ``make hardened$LEVELconfig`` (e.g.
-> +``make hardenedhighconfig``).
+> +%.dtb %.dtb.S %.dtb.o: | dtc
+> +       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
 
-Some overall thoughts:
 
-- As Sam asked: who are the users of this feature?  Presumably you have
-  some real people out there in mind for each of these levels, or you would
-  not have created them?
+Hmm, I was worried about '%.dtb.o: | dtc'
+but seems working.
 
-- Who will maintain it?  The list of hardening-relevant configuration
-  options is always in high flux, as our understanding of the security
-  implications of each.  This feature will require some significant ongoing
-  attention or it will quickly become stale.  I think it needs a
-  MAINTAINERS entry.
+Compiling %.S -> %.o requires objtool for x86,
+but x86 does not support DT.
 
-- It's a little strange to see an RST document used as the input for the
-  kernel configuration process.  Assuming this is really the best way to do
-  this (and I worry about things like duplicated descriptions of kernel
-  configuration options), you should, at a minimum, carefully document the
-  format of this file at the beginning.  Otherwise people will surely break
-  it.  In fact, they'll break it anyway, so more checking in the processing
-  script seems indicated.
+If CONFIG_MODVERSIONS=y, scripts/genksyms/genksyms is required,
+%.dtb.S does not contain EXPORT_SYMBOL.
 
-  Without having thought it through in great depth, I suspect that a better
-  approach might be to find a way to mark the hardening level in the
-  Kconfig entries.
 
-- You have ordered the options alphabetically, but that is, I would argue,
-  not the best way.  My guess is that people would read this file to answer
-  the question of "just how many bullets will hardening level H put into my
-  foot?"  So I would sort them by hardening level as the primary key.
+BTW, 'dtc' should be a PHONY target.
 
-Thanks,
 
-jon
+
+-- 
+Best Regards
+Masahiro Yamada
