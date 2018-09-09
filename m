@@ -1,64 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:22569 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726641AbeIILp4 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:54124 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726447AbeIILwN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 9 Sep 2018 07:45:56 -0400
+        Sun, 9 Sep 2018 07:52:13 -0400
 MIME-Version: 1.0
-In-Reply-To: <dde798fd-9fef-6ac0-a3bc-6aa7193c5d89@infradead.org>
-References: <dde798fd-9fef-6ac0-a3bc-6aa7193c5d89@infradead.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 9 Sep 2018 15:56:26 +0900
-Message-ID: <CAK7LNAQRru9+9_EtNJAgYx-84R7qGt7hNuDqmta5Uk2dJo7CvQ@mail.gmail.com>
-Subject: Re: [PATCH v2] modules_install: warn when missing System.map file
+Date: Sun, 9 Sep 2018 16:02:50 +0900
+Message-ID: <CAK7LNAT7fEjvbBTQVHvK3k5qF6K61_k+g-TNLHjspKX2C_B7hA@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v4.19-rc3
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
 
-2018-09-07 8:37 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> From: Randy Dunlap <rdunlap@infradead.org>
->
-> If there is no System.map file for "make modules_install",
-> scripts/depmod.sh will silently exit with success, having done
-> nothing.  Since this is an unexpected situation, change it to
-> report a Warning for the missing file.  The behavior is not
-> changed except for the Warning message.
->
-> The (previous) silent success and new Warning can be reproduced
-> by:
-> $ make mrproper; make defconfig
-> $ make modules; make modules_install
->
-> and since System.map is produced by "make vmlinux", the steps
-> above omit producing the System.map file.
->
-> Reported-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
-> v2: add Yamada-san's suggestions for >&2 and Skipping depmod.
+Hi Linus,
+
+Please pull some Kbuild fixes.
+
+Thanks!
 
 
-Applied to linux-kbuild/fixes. Thanks!
 
 
->  scripts/depmod.sh |    1 +
->  1 file changed, 1 insertion(+)
->
-> --- lnx-419-rc1.orig/scripts/depmod.sh
-> +++ lnx-419-rc1/scripts/depmod.sh
-> @@ -11,6 +11,7 @@ DEPMOD=$1
->  KERNELRELEASE=$2
->
->  if ! test -r System.map ; then
-> +       echo "Warning: modules_install: missing 'System.map' file. Skipping depmod." >&2
->         exit 0
->  fi
->
->
+The following changes since commit 5b394b2ddf0347bef56e50c69a58773c94343ff3:
 
+  Linux 4.19-rc1 (2018-08-26 14:11:59 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v4.19
+
+for you to fetch changes up to f0b0d88a825149ef3b06656886bc211c71dcb852:
+
+  kbuild: modules_install: warn when missing System.map file
+(2018-09-09 09:14:07 +0900)
+
+----------------------------------------------------------------
+Kbuild fixes for v4.19
+
+ - make setlocalversion more robust about -dirty check
+
+ - loosen the pkg-config requirement for Kconfig
+
+ - change missing depmod to a warning from an error
+
+ - warn modules_install when System.map is missing
+
+----------------------------------------------------------------
+Genki Sky (1):
+      scripts/setlocalversion: git: Make -dirty check more robust
+
+Lukas Bulwahn (1):
+      kconfig: remove a spurious self-assignment
+
+Masahiro Yamada (1):
+      kconfig: do not require pkg-config on make {menu,n}config
+
+Randy Dunlap (2):
+      kbuild: make missing $DEPMOD a Warning instead of an Error
+      kbuild: modules_install: warn when missing System.map file
+
+ Documentation/process/changes.rst  |  2 +-
+ scripts/depmod.sh                  |  5 +++--
+ scripts/kconfig/Makefile           |  1 -
+ scripts/kconfig/check-pkgconfig.sh |  8 --------
+ scripts/kconfig/gconf-cfg.sh       |  7 +++++++
+ scripts/kconfig/mconf-cfg.sh       | 25 ++++++++++++++-----------
+ scripts/kconfig/mconf.c            |  1 -
+ scripts/kconfig/nconf-cfg.sh       | 25 ++++++++++++++-----------
+ scripts/kconfig/qconf-cfg.sh       |  7 +++++++
+ scripts/setlocalversion            |  2 +-
+ 10 files changed, 47 insertions(+), 36 deletions(-)
+ delete mode 100644 scripts/kconfig/check-pkgconfig.sh
 
 
 -- 
