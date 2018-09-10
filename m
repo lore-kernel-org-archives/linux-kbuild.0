@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga12.intel.com ([192.55.52.136]:44785 "EHLO mga12.intel.com"
+Received: from mga17.intel.com ([192.55.52.151]:53223 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727777AbeIJVWJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Sep 2018 17:22:09 -0400
-Date: Tue, 11 Sep 2018 00:26:49 +0800
+        id S1726603AbeIJV6X (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 10 Sep 2018 17:58:23 -0400
+Date: Tue, 11 Sep 2018 01:02:59 +0800
 From: kbuild test robot <lkp@intel.com>
 Subject: Re: [PATCH 11/11] UAPI: Check headers build for C++ [ver #2]
-Message-ID: <201809110024.LcMTw51T%fengguang.wu@intel.com>
+Message-ID: <201809110155.db1DzqZ4%fengguang.wu@intel.com>
 References: <153622557736.14298.10350496216090814292.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="45Z9DzgjV8m4Oswq"
+Content-Type: multipart/mixed; boundary="x+6KMIRAuhnl3hBn"
 Content-Disposition: inline
 In-Reply-To: <153622557736.14298.10350496216090814292.stgit@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,7 +18,7 @@ To: David Howells <dhowells@redhat.com>
 Cc: kbuild-all@01.org, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
 
---45Z9DzgjV8m4Oswq
+--x+6KMIRAuhnl3hBn
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -39,6 +39,125 @@ reproduce:
 
 All errors (new ones prefixed by >>):
 
+   In file included from test.h:225:0,
+                    from test.cpp:1:
+>> ../usr/include/linux/patchkey.h:15:2: error: #error "patchkey.h included directly"
+    #error "patchkey.h included directly"
+     ^~~~~
+   In file included from ../usr/include/asm/shmbuf.h:6:0,
+                    from test.h:83,
+                    from test.cpp:1:
+>> ../usr/include/asm-generic/shmbuf.h:26:20: error: field 'shm_perm' has incomplete type 'ipc64_perm'
+     struct ipc64_perm shm_perm; /* operation perms */
+                       ^~~~~~~~
+   ../usr/include/asm-generic/shmbuf.h:26:9: note: forward declaration of 'struct ipc64_perm'
+     struct ipc64_perm shm_perm; /* operation perms */
+            ^~~~~~~~~~
+   In file included from ../usr/include/asm/msgbuf.h:6:0,
+                    from test.h:112,
+                    from test.cpp:1:
+>> ../usr/include/asm-generic/msgbuf.h:25:20: error: field 'msg_perm' has incomplete type 'ipc64_perm'
+     struct ipc64_perm msg_perm;
+                       ^~~~~~~~
+   In file included from ../usr/include/asm/shmbuf.h:6:0,
+                    from test.h:83,
+                    from test.cpp:1:
+   ../usr/include/asm-generic/shmbuf.h:26:9: note: forward declaration of 'struct ipc64_perm'
+     struct ipc64_perm shm_perm; /* operation perms */
+            ^~~~~~~~~~
+   In file included from test.h:868:0,
+                    from test.cpp:1:
+   ../usr/include/sound/skl-tplg-interface.h:146:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 set_params:2;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:147:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 rsvd:30;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:148:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 param_id;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:149:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 max;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:166:2: error: 'u16' does not name a type; did you mean '__u16'?
+     u16 module_id;
+     ^~~
+     __u16
+   ../usr/include/sound/skl-tplg-interface.h:167:2: error: 'u16' does not name a type; did you mean '__u16'?
+     u16 instance_id;
+     ^~~
+     __u16
+   ../usr/include/sound/skl-tplg-interface.h:171:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 channels;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:172:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 freq;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:173:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 bit_depth;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:174:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 valid_bit_depth;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:175:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 ch_cfg;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:176:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 interleaving_style;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:177:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 sample_type;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:178:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 ch_map;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:182:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 set_params:2;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:183:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 rsvd:30;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:184:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 param_id;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:185:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 caps_size;
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:186:2: error: 'u32' does not name a type; did you mean '__u32'?
+     u32 caps[HDA_SST_CFG_MAX];
+     ^~~
+     __u32
+   ../usr/include/sound/skl-tplg-interface.h:190:2: error: 'u8' does not name a type; did you mean '__u8'?
+     u8 pipe_id;
+     ^~
+     __u8
+   ../usr/include/sound/skl-tplg-interface.h:191:2: error: 'u8' does not name a type; did you mean '__u8'?
+     u8 pipe_priority;
+     ^~
+     __u8
+   ../usr/include/sound/skl-tplg-interface.h:192:2: error: 'u16' does not name a type; did you mean '__u16'?
+     u16 conn_type:4;
+     ^~~
+     __u16
+   ../usr/include/sound/skl-tplg-interface.h:193:2: error: 'u16' does not name a type; did you mean '__u16'?
+     u16 rsvd:4;
+--
 >> find: '../usr/include': No such file or directory
    In file included from test.cpp:1:0:
 >> test.h:8:10: fatal error: linux/types.h: No such file or directory
@@ -52,12 +171,12 @@ All errors (new ones prefixed by >>):
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---45Z9DzgjV8m4Oswq
+--x+6KMIRAuhnl3hBn
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICG+XllsAAy5jb25maWcAlDxdc9u2su/9FZr0pZ0zaW0ndXPvHT+AJEihIgkGACXLLxzV
+H4sICFigllsAAy5jb25maWcAlDxdc9u2su/9FZr0pZ0zaW0ndXPvHT+AJEihIgkGACXLLxzV
 VlLPseVc2T5N/v3dBUASAEGlt9NpLezia7HfWPDHH35ckNeXp8fdy/3t7uHh2+Lz/rA/7l72
 d4tP9w/7/1lkfFFztaAZU78Acnl/eP3669cPl93l+8X7X87/65ezt8fbi8VqfzzsHxbp0+HT
 /edXGOD+6fDDjz/Avz9C4+MXGOv434vPt7dvf1/8lO3/vN8dFr//8g56n/9s/gDUlNc5K7o0
@@ -541,4 +660,4 @@ FuVrBqPBwhueB0D5wvOBkbN0joOjioEZX7ItmCLQnAYBKAtY2UoJeTWzUBTwAZ1AEgzIlD2W
 7ixnWMjPKkVyhr6s7XinyQtW4hrzBjKCdKd6oLbxo8f6xftkoxj543dOM5Ixpz3i61FPW1I2
 6h/6OUBjBqMBAA==
 
---45Z9DzgjV8m4Oswq--
+--x+6KMIRAuhnl3hBn--
