@@ -1,84 +1,137 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from condef-05.nifty.com ([202.248.20.70]:30428 "EHLO
-        condef-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725889AbeIJHPt (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Sep 2018 03:15:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34168 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728127AbeIJTaF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 10 Sep 2018 15:30:05 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180909191903.GA2344@ravnborg.org>
-References: <1536516257-30871-1-git-send-email-s.mesoraca16@gmail.com> <20180909191903.GA2344@ravnborg.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 10 Sep 2018 10:21:42 +0900
-Message-ID: <CAK7LNATP_3K0KYyW51K3mqHs-WiReJWMeB82Uxikh+zUqDKQ6A@mail.gmail.com>
-Subject: Re: [PATCH v2] kconfig: add hardened defconfig helpers
+References: <20180905235327.5996-1-robh@kernel.org> <20180905235327.5996-7-robh@kernel.org>
+ <CAK7LNAS5uEUMDpL8oCJmFWKu1YF8tof5d=2h8jzt-MLHGAEAhg@mail.gmail.com>
+In-Reply-To: <CAK7LNAS5uEUMDpL8oCJmFWKu1YF8tof5d=2h8jzt-MLHGAEAhg@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 10 Sep 2018 09:35:29 -0500
+Message-ID: <CAL_JsqKS+h0B5AuUh=vk0m1_7KSj4h2zZUo22rdt1w7oee=QwA@mail.gmail.com>
+Subject: Re: [PATCH v2 6/9] kbuild: consolidate Devicetree dtb build rules
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Salvatore Mesoraca <s.mesoraca16@gmail.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jann Horn <jannh@google.com>, Jonathan Corbet <corbet@lwn.net>, Kees Cook <keescook@chromium.org>, Laura Abbott <labbott@redhat.com>, Michal Marek <michal.lkml@markovi.net>, "Eric W. Biederman" <ebiederm@xmission.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: devicetree@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@mips.com>, James Hogan <jhogan@kernel.org>, Ley Foon Tan <lftan@altera.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Linux-MIPS <linux-mips@linux-mips.org>, nios2-dev@lists.rocketboards.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-xtensa@linux-xtensa.org
 
-2018-09-10 4:19 GMT+09:00 Sam Ravnborg <sam@ravnborg.org>:
-> Hi Salvatore.
+On Sun, Sep 9, 2018 at 6:28 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> On Sun, Sep 09, 2018 at 08:04:17PM +0200, Salvatore Mesoraca wrote:
->> Adds 4 new defconfig helpers (hardenedlowconfig, hardenedmediumconfig,
->> hardenedhighconfig, hardenedextremeconfig) to enable various hardening
->> features.
->> The list of config options to enable is based on KSPP's Recommended
->> Settings and on kconfig-hardened-check, with some modifications.
->> These options are divided into 4 levels (low, medium, high, extreme)
->> based on their negative side effects, not on their usefulness.
->> 'Low' level collects all those protections that have (almost) no
->> negative side effects.
->> 'Extreme' level collects those protections that may have so many
->> negative side effects that most people wouldn't want to enable them.
->> Every feature in each level is briefly documented in
->> Documentation/security/hardenedconfig.rst, this file also contain a
->> better explanation of what every level means.
->> To prevent this file from drifting from what the various defconfigs
->> actually do, it is used to dynamically generate the config fragments.
+> 2018-09-06 8:53 GMT+09:00 Rob Herring <robh@kernel.org>:
+> > There is nothing arch specific about building dtb files other than their
+> > location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
+> > The dependencies and supported targets are all slightly different.
+> > Also, a cross-compiler for each arch is needed, but really the host
+> > compiler preprocessor is perfectly fine for building dtbs. Move the
+> > build rules to a common location and remove the arch specific ones. This
+> > is done in a single step to avoid warnings about overriding rules.
+> >
+> > The build dependencies had been a mixture of 'scripts' and/or 'prepare'.
+> > These pull in several dependencies some of which need a target compiler
+> > (specifically devicetable-offsets.h) and aren't needed to build dtbs.
+> > All that is really needed is dtc, so adjust the dependencies to only be
+> > dtc.
+> >
+> > This change enables support 'dtbs_install' on some arches which were
+> > missing the target.
+> >
+> > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > Cc: Michal Marek <michal.lkml@markovi.net>
+> > Cc: Vineet Gupta <vgupta@synopsys.com>
+> > Cc: Russell King <linux@armlinux.org.uk>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Will Deacon <will.deacon@arm.com>
+> > Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+> > Cc: Michal Simek <monstr@monstr.eu>
+> > Cc: Ralf Baechle <ralf@linux-mips.org>
+> > Cc: Paul Burton <paul.burton@mips.com>
+> > Cc: James Hogan <jhogan@kernel.org>
+> > Cc: Ley Foon Tan <lftan@altera.com>
+> > Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> > Cc: Paul Mackerras <paulus@samba.org>
+> > Cc: Michael Ellerman <mpe@ellerman.id.au>
+> > Cc: Chris Zankel <chris@zankel.net>
+> > Cc: Max Filippov <jcmvbkbc@gmail.com>
+> > Cc: linux-kbuild@vger.kernel.org
+> > Cc: linux-snps-arc@lists.infradead.org
+> > Cc: linux-arm-kernel@lists.infradead.org
+> > Cc: uclinux-h8-devel@lists.sourceforge.jp
+> > Cc: linux-mips@linux-mips.org
+> > Cc: nios2-dev@lists.rocketboards.org
+> > Cc: linuxppc-dev@lists.ozlabs.org
+> > Cc: linux-xtensa@linux-xtensa.org
+> > Signed-off-by: Rob Herring <robh@kernel.org>
+> > ---
+> > Please ack so I can take the whole series via the DT tree.
+> >
+> > v2:
+> >  - Fix $arch/boot/dts path check for out of tree builds
+> >  - Fix dtc dependency for building built-in dtbs
+> >  - Fix microblaze built-in dtb building
+> >
+> >  Makefile                          | 32 +++++++++++++++++++++++++++++++
+> >  arch/arc/Makefile                 |  6 ------
+> >  arch/arm/Makefile                 | 20 +------------------
+> >  arch/arm64/Makefile               | 17 +---------------
+> >  arch/c6x/Makefile                 |  2 --
+> >  arch/h8300/Makefile               | 11 +----------
+> >  arch/microblaze/Makefile          |  4 +---
+> >  arch/microblaze/boot/dts/Makefile |  2 ++
+> >  arch/mips/Makefile                | 15 +--------------
+> >  arch/nds32/Makefile               |  2 +-
+> >  arch/nios2/Makefile               |  7 -------
+> >  arch/nios2/boot/Makefile          |  4 ----
+> >  arch/powerpc/Makefile             |  3 ---
+> >  arch/xtensa/Makefile              | 12 +-----------
+> >  scripts/Makefile.lib              |  2 +-
+> >  15 files changed, 42 insertions(+), 97 deletions(-)
+> >
+> > diff --git a/Makefile b/Makefile
+> > index 2b458801ba74..bc18dbbc16c5 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -1212,6 +1212,32 @@ kselftest-merge:
+> >                 $(srctree)/tools/testing/selftests/*/config
+> >         +$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
+> >
+> > +# ---------------------------------------------------------------------------
+> > +# Devicetree files
+> > +
+> > +ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/boot/dts/),)
+> > +dtstree := arch/$(SRCARCH)/boot/dts
+> > +endif
+> > +
+> > +ifdef CONFIG_OF_EARLY_FLATTREE
+> > +
+> > +%.dtb %.dtb.S %.dtb.o: | dtc
+> > +       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
 >
-> In the above you nicely describes what is done.
-> But there is nothing about the target group for this feature.
-> Who will benefit from this?
 >
-> With respect to the actual implmentation we now
-> have two ways to handle config fragments.
-> Current solution is to save the config fragments in kernel/configs.
-> And the new solution is to parse the config fragments from an rst file.
-> The changelog fails to mentions why we need a new way to handle
-> the config fragments.
-
-
-I agree.
-
-Another new way this patch added is,
-
- CONFIG options are now described in the ReST document,
- but our current way is to describe the detailed information
- in the 'help' section in Kconfig files.
-
-
-
-
-
-
-> If we want to go the "parse from rst file" way - can it then
-> be abstracted in a way so this is the only way to handle
-> these in-kernel config fragments?
-> And then move the current config fragment to the new way.
+> Hmm, I was worried about '%.dtb.o: | dtc'
+> but seems working.
 >
-> It most be possible with a little careful design to make this
-> a general solution and not a hardening thing only.
+> Compiling %.S -> %.o requires objtool for x86,
+> but x86 does not support DT.
+
+Well, x86 does support DT to some extent. There's 2 platforms and the
+DT unittests build and run on x86.
+
+Actually, we can remove "%.dtb.S %.dtb.o" because we don't need those
+as top-level build targets. Must have been a copy-n-paste relic from
+before having common rules.
+
 >
->         Sam
+> If CONFIG_MODVERSIONS=y, scripts/genksyms/genksyms is required,
+> %.dtb.S does not contain EXPORT_SYMBOL.
 
+Okay, but that shouldn't affect any of this. We only build *.dtb.S
+when doing built-in dtbs.
 
-Indeed.  The file format is too specific for his purpose;
-'Negative side effect level' is a key word
-that must be placed 3 lines below the CONFIG entry.
+> BTW, 'dtc' should be a PHONY target.
 
+Right, I found that too.
 
--- 
-Best Regards
-Masahiro Yamada
+Rob
