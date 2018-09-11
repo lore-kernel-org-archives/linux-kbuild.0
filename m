@@ -1,89 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga17.intel.com ([192.55.52.151]:59292 "EHLO mga17.intel.com"
+Received: from mail.kernel.org ([198.145.29.99]:54732 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726709AbeIJWz2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Sep 2018 18:55:28 -0400
-From: Paulo Zanoni <paulo.r.zanoni@intel.com>
-Subject: [PATCH v2] tracing/Makefile: fix handling redefinition of CC_FLAGS_FTRACE
-Date: Mon, 10 Sep 2018 10:59:56 -0700
-Message-Id: <20180910175956.22679-1-paulo.r.zanoni@intel.com>
-In-Reply-To: <your-ad-here.call-01536239243-ext-9397@work.hours>
-References: <your-ad-here.call-01536239243-ext-9397@work.hours>
+        id S1726981AbeIKUkO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 11 Sep 2018 16:40:14 -0400
+MIME-Version: 1.0
+References: <20180910150403.19476-1-robh@kernel.org> <20180910150403.19476-7-robh@kernel.org>
+In-Reply-To: <20180910150403.19476-7-robh@kernel.org>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 11 Sep 2018 10:40:07 -0500
+Message-ID: <CAL_Jsq+=VbdcVLiwXbOA5d+R2YY6=2Pw2bQpci-jj-JvereD1A@mail.gmail.com>
+Subject: Re: [PATCH v3 6/9] kbuild: consolidate Devicetree dtb build rules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Paulo Zanoni <paulo.r.zanoni@intel.com>, Vasily Gorbik <gor@linux.ibm.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Tvrtko Ursulin <tvrtko.ursulin@intel.com>
+To: devicetree@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Frank Rowand <frowand.list@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Linux-MIPS <linux-mips@linux-mips.org>, nios2-dev@lists.rocketboards.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-xtensa@linux-xtensa.org, Will Deacon <will.deacon@arm.com>, Paul Burton <paul.burton@mips.com>, Ley Foon Tan <ley.foon.tan@intel.com>
 
-As a Kernel developer, I make heavy use of "make targz-pkg" in order
-to locally compile and remotely install my development Kernels. The
-nice feature I rely on is that after a normal "make", "make targz-pkg"
-only generates the tarball without having to recompile everything.
+On Mon, Sep 10, 2018 at 10:04 AM Rob Herring <robh@kernel.org> wrote:
+>
+> There is nothing arch specific about building dtb files other than their
+> location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
+> The dependencies and supported targets are all slightly different.
+> Also, a cross-compiler for each arch is needed, but really the host
+> compiler preprocessor is perfectly fine for building dtbs. Move the
+> build rules to a common location and remove the arch specific ones. This
+> is done in a single step to avoid warnings about overriding rules.
+>
+> The build dependencies had been a mixture of 'scripts' and/or 'prepare'.
+> These pull in several dependencies some of which need a target compiler
+> (specifically devicetable-offsets.h) and aren't needed to build dtbs.
+> All that is really needed is dtc, so adjust the dependencies to only be
+> dtc.
+>
+> This change enables support 'dtbs_install' on some arches which were
+> missing the target.
 
-That was true until commit f28bc3c32c05 ("tracing: Handle
-CC_FLAGS_FTRACE more accurately"). After it, running "make targz-pkg"
-after "make" will recompile the whole Kernel tree, making my
-development workflow much slower.
+[...]
 
-The Kernel is choosing to recompile everything because it claims the
-command line has changed. A diff of the .cmd files show a repeated
--mfentry in one of the files. That is because "make targz-pkg" calls
-"make modules_install" and the environment is already populated with
-the exported variables, CC_FLAGS_FTRACE being one of them. Then,
--mfentry gets duplicated because it is not protected behind an ifndef
-block, like -pg.
+> @@ -1215,6 +1215,33 @@ kselftest-merge:
+>                 $(srctree)/tools/testing/selftests/*/config
+>         +$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
+>
+> +# ---------------------------------------------------------------------------
+> +# Devicetree files
+> +
+> +ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/boot/dts/),)
+> +dtstree := arch/$(SRCARCH)/boot/dts
+> +endif
+> +
+> +ifdef CONFIG_OF_EARLY_FLATTREE
 
-To complicate the problem a little bit more, architectures can define
-their own version CC_FLAGS_FTRACE, so our code not only has to
-consider recursive Makefiles, but also architecture overrides.
+This can be true when dtstree is unset. So this line should be this
+instead to fix the 0-day reported error:
 
-So in this patch we move CC_FLAGFS_FTRACE up and unconditionally
-define it to -pg. Then we let the architecture Makefiles possibly
-override it, and finally append the extra options later. This ensures
-the variable is always fully redefined at each invocation so recursive
-Makefiles don't keep appending, and hopefully it maintains the
-intended behavior on how architectures can override the defaults..
+ifneq ($(dtstree),)
 
-Thanks Steven Rostedt and Vasily Gorbik for the help on this
-regression.
-
-Fixes: commit f28bc3c32c05 ("tracing: Handle CC_FLAGS_FTRACE more
- accurately")
-Cc: Vasily Gorbik <gor@linux.ibm.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: Steven Rostedt (VMware) <rostedt@goodmis.org>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Tvrtko Ursulin <tvrtko.ursulin@intel.com>
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Paulo Zanoni <paulo.r.zanoni@intel.com>
----
- Makefile | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 4d5c883a98e5..a5ef6818157a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -616,6 +616,11 @@ CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage \
- 	$(call cc-disable-warning,maybe-uninitialized,)
- export CFLAGS_GCOV
- 
-+# The arch Makefiles can override CC_FLAGS_FTRACE. We may also append it later.
-+ifdef CONFIG_FUNCTION_TRACER
-+  CC_FLAGS_FTRACE := -pg
-+endif
-+
- # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
- # values of the respective KBUILD_* variables
- ARCH_CPPFLAGS :=
-@@ -755,9 +760,6 @@ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
- endif
- 
- ifdef CONFIG_FUNCTION_TRACER
--ifndef CC_FLAGS_FTRACE
--CC_FLAGS_FTRACE := -pg
--endif
- ifdef CONFIG_FTRACE_MCOUNT_RECORD
-   # gcc 5 supports generating the mcount tables directly
-   ifeq ($(call cc-option-yn,-mrecord-mcount),y)
--- 
-2.17.1
+> +
+> +%.dtb : scripts_dtc
+> +       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
+> +
+> +PHONY += dtbs dtbs_install
+> +dtbs: scripts_dtc
+> +       $(Q)$(MAKE) $(build)=$(dtstree)
+> +
+> +dtbs_install: dtbs
+> +       $(Q)$(MAKE) $(dtbinst)=$(dtstree)
+> +
+> +all: dtbs
+> +
+> +endif
