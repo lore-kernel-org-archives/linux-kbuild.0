@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f67.google.com ([209.85.214.67]:53855 "EHLO
-        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727409AbeILWTV (ORCPT
+Received: from mail-it0-f68.google.com ([209.85.214.68]:51906 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727774AbeILWVb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Sep 2018 18:19:21 -0400
-Received: by mail-it0-f67.google.com with SMTP id p79-v6so4078300itp.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 12 Sep 2018 10:13:53 -0700 (PDT)
+        Wed, 12 Sep 2018 18:21:31 -0400
+Received: by mail-it0-f68.google.com with SMTP id e14-v6so4095915itf.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 12 Sep 2018 10:16:01 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <f5e73b5ead3355932ad8b5fc96b141c3f5b8c16c.1535462971.git.andreyknvl@google.com>
 References: <cover.1535462971.git.andreyknvl@google.com> <f5e73b5ead3355932ad8b5fc96b141c3f5b8c16c.1535462971.git.andreyknvl@google.com>
 From: Dmitry Vyukov <dvyukov@google.com>
-Date: Wed, 12 Sep 2018 19:13:31 +0200
-Message-ID: <CACT4Y+ZwLnk7V1cY-EAHbrfXPBxs6qyynZPhxoSKZZDWSK8Fuw@mail.gmail.com>
+Date: Wed, 12 Sep 2018 19:15:39 +0200
+Message-ID: <CACT4Y+aEwYiaVN--RH_0VBh0wbCcrf-Ndz+_eOaBNi6nKxrfQA@mail.gmail.com>
 Subject: Re: [PATCH v6 15/18] khwasan, arm64: add brk handler for inline instrumentation
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -125,23 +125,16 @@ On Wed, Aug 29, 2018 at 1:35 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
 > +        * this is controlled by current->kasan_depth). All these accesses are
 > +        * detected by the tool, even though the reports for them are not
 > +        * printed.
-
-
-I am not following this part.
-Slab accesses metadata. OK.
-This is detected as bad access. OK.
-Report is not printed. OK.
-We skip BRK and resume execution.
-What is the problem?
-
-
-
 > +        *
 > +        * This is something that might be fixed at some point in the future.
 > +        */
 > +       if (!recover)
 > +               die("Oops - KHWASAN", regs, 0);
-> +
+
+Why die and not panic? Die seems to be much less used function, and it
+calls panic anyway, and we call panic in kasan_report if panic_on_warn
+is set.
+
 > +       /* If thread survives, skip over the brk instruction and continue: */
 > +       __arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
 > +       return DBG_HOOK_HANDLED;
