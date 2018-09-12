@@ -1,49 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:52579 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:52570 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725958AbeILLr0 (ORCPT
+        with ESMTP id S1725910AbeILLr1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Sep 2018 07:47:26 -0400
+        Wed, 12 Sep 2018 07:47:27 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/2] kbuild: hide most of targets when running config or mixed targets
-Date: Wed, 12 Sep 2018 15:43:29 +0900
-Message-Id: <1536734610-22173-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 2/2] kbuild: remove dead code in cmd_files calculation in top Makefile
+Date: Wed, 12 Sep 2018 15:43:30 +0900
+Message-Id: <1536734610-22173-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1536734610-22173-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1536734610-22173-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-When mixed/config targets are being processed, the top Makefile
-does not need to parse the rest of targets.
+Nobody sets 'targets' in the top-level Makefile or arch/*/Makefile,
+hence $(targets) is empty.
+
+$(wildcard .*.cmd) will do for including the .vmlinux.cmd file.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 4d5c883..4b76e22 100644
+index 4b76e22..8f6dbfc 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1615,9 +1615,6 @@ namespacecheck:
- export_report:
- 	$(PERL) $(srctree)/scripts/export_report.pl
+@@ -1721,8 +1721,7 @@ cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
+                   $(if $(KBUILD_MODULES),; rm -f $(MODVERDIR)/*)
  
--endif #ifeq ($(config-targets),1)
--endif #ifeq ($(mixed-targets),1)
+ # read all saved command lines
 -
- PHONY += checkstack kernelrelease kernelversion image_name
+-cmd_files := $(wildcard .*.cmd $(foreach f,$(sort $(targets)),$(dir $(f)).$(notdir $(f)).cmd))
++cmd_files := $(wildcard .*.cmd)
  
- # UML needs a little special treatment here.  It wants to use the host
-@@ -1732,6 +1729,8 @@ ifneq ($(cmd_files),)
-   include $(cmd_files)
- endif
- 
-+endif   # ifeq ($(config-targets),1)
-+endif   # ifeq ($(mixed-targets),1)
- endif	# skip-makefile
- 
- PHONY += FORCE
+ ifneq ($(cmd_files),)
+   $(cmd_files): ;	# Do not try to update included dependency files
 -- 
 2.7.4
