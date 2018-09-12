@@ -1,44 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:52570 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725910AbeILLr1 (ORCPT
+Received: from mail-qt0-f182.google.com ([209.85.216.182]:38132 "EHLO
+        mail-qt0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726537AbeILOuo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Sep 2018 07:47:27 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] kbuild: remove dead code in cmd_files calculation in top Makefile
-Date: Wed, 12 Sep 2018 15:43:30 +0900
-Message-Id: <1536734610-22173-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1536734610-22173-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1536734610-22173-1-git-send-email-yamada.masahiro@socionext.com>
+        Wed, 12 Sep 2018 10:50:44 -0400
+MIME-Version: 1.0
+References: <CALjTZvb4hOY_Hew-jEUtpyhkGbmh4Tgb0doPC6EaGtz_rMGt7A@mail.gmail.com>
+ <ed2459210f8043999f1197e8c063601d@SOC-EX01V.e01.socionext.com>
+In-Reply-To: <ed2459210f8043999f1197e8c063601d@SOC-EX01V.e01.socionext.com>
+From: Rui Salvaterra <rsalvaterra@gmail.com>
+Date: Wed, 12 Sep 2018 10:46:47 +0100
+Message-ID: <CALjTZvYRkhbazB4BAMF-cmmDS4rKtGqH=+CkNmFaaRDUg+zHJg@mail.gmail.com>
+Subject: Re: 4.19-rc3: bindeb-pkg target is failing on ppc64
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: yamada.masahiro@socionext.com
+Cc: michal.lkml@markovi.net, ben@decadent.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Nobody sets 'targets' in the top-level Makefile or arch/*/Makefile,
-hence $(targets) is empty.
+On Wed, 12 Sep 2018 at 10:32, <yamada.masahiro@socionext.com> wrote:
+>
+> Hi, Rui,
+>
+>
+>
+> Could you cater to =E2=80=98git bisect=E2=80=99 ?
+>
+>
+>
+> Thanks
+>
+>
+>
+>
+>
+> Greetings! I'm having trouble building the kernel on my ppc64 machine (Po=
+wer Mac G5) running Debian Sid. The make bindeb-pkg target is failing ever =
+since 4.19-rc1. Is this a known issue? If not, let me know if you need anyt=
+hing else in order to help debug this. Thanks in advance!
 
-$(wildcard .*.cmd) will do for including the .vmlinux.cmd file.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- Makefile | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 4b76e22..8f6dbfc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1721,8 +1721,7 @@ cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
-                   $(if $(KBUILD_MODULES),; rm -f $(MODVERDIR)/*)
- 
- # read all saved command lines
--
--cmd_files := $(wildcard .*.cmd $(foreach f,$(sort $(targets)),$(dir $(f)).$(notdir $(f)).cmd))
-+cmd_files := $(wildcard .*.cmd)
- 
- ifneq ($(cmd_files),)
-   $(cmd_files): ;	# Do not try to update included dependency files
--- 
-2.7.4
+Hi! I never did a git bisection before, but I'll try that and get back
+to you. Thanks!
