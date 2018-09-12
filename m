@@ -1,111 +1,130 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43848 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726552AbeILPW5 (ORCPT
+Received: from us01smtprelay-2.synopsys.com ([198.182.47.9]:59642 "EHLO
+        smtprelay.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726359AbeILRNK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Sep 2018 11:22:57 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w8CAItBT100054
-        for <linux-kbuild@vger.kernel.org>; Wed, 12 Sep 2018 06:19:04 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2mey8m4rh4-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Wed, 12 Sep 2018 06:19:04 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-kbuild@vger.kernel.org> from <gor@linux.ibm.com>;
-        Wed, 12 Sep 2018 11:19:02 +0100
-Date: Wed, 12 Sep 2018 12:18:55 +0200
-From: Vasily Gorbik <gor@linux.ibm.com>
-Subject: Re: [PATCH v2] tracing/Makefile: fix handling redefinition of
- CC_FLAGS_FTRACE
-References: <your-ad-here.call-01536239243-ext-9397@work.hours>
- <20180910175956.22679-1-paulo.r.zanoni@intel.com>
+        Wed, 12 Sep 2018 13:13:10 -0400
+From: Alexey Brodkin <Alexey.Brodkin@synopsys.com>
+Subject: defconfig fails if CROSS_COMPILE is set while cross-gcc is not
+ avaialble
+Date: Wed, 12 Sep 2018 12:08:40 +0000
+Message-ID: <0854f35e92c95e552721dc6a46f4ee2bc4020bc1.camel@synopsys.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FC6D131905B9584B98F6B5560EBC3DC2@internal.synopsys.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180910175956.22679-1-paulo.r.zanoni@intel.com>
-Message-Id: <your-ad-here.call-01536747535-ext-7211@work.hours>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paulo Zanoni <paulo.r.zanoni@intel.com>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Tvrtko Ursulin <tvrtko.ursulin@intel.com>
+To: "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>
+Cc: "keescook@chromium.org" <keescook@chromium.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-snps-arc@lists.infradead.org" <linux-snps-arc@lists.infradead.org>
 
-On Mon, Sep 10, 2018 at 10:59:56AM -0700, Paulo Zanoni wrote:
-> As a Kernel developer, I make heavy use of "make targz-pkg" in order
-> to locally compile and remotely install my development Kernels. The
-> nice feature I rely on is that after a normal "make", "make targz-pkg"
-> only generates the tarball without having to recompile everything.
-> 
-> That was true until commit f28bc3c32c05 ("tracing: Handle
-> CC_FLAGS_FTRACE more accurately"). After it, running "make targz-pkg"
-> after "make" will recompile the whole Kernel tree, making my
-> development workflow much slower.
-> 
-> The Kernel is choosing to recompile everything because it claims the
-> command line has changed. A diff of the .cmd files show a repeated
-> -mfentry in one of the files. That is because "make targz-pkg" calls
-> "make modules_install" and the environment is already populated with
-> the exported variables, CC_FLAGS_FTRACE being one of them. Then,
-> -mfentry gets duplicated because it is not protected behind an ifndef
-> block, like -pg.
-> 
-> To complicate the problem a little bit more, architectures can define
-> their own version CC_FLAGS_FTRACE, so our code not only has to
-> consider recursive Makefiles, but also architecture overrides.
-> 
-> So in this patch we move CC_FLAGFS_FTRACE up and unconditionally
-                           CC_FLAGS_FTRACE
-> define it to -pg. Then we let the architecture Makefiles possibly
-> override it, and finally append the extra options later. This ensures
-> the variable is always fully redefined at each invocation so recursive
-> Makefiles don't keep appending, and hopefully it maintains the
-> intended behavior on how architectures can override the defaults..
-> 
-> Thanks Steven Rostedt and Vasily Gorbik for the help on this
-> regression.
-> 
-> Fixes: commit f28bc3c32c05 ("tracing: Handle CC_FLAGS_FTRACE more
->  accurately")
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: Steven Rostedt (VMware) <rostedt@goodmis.org>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Tvrtko Ursulin <tvrtko.ursulin@intel.com>
-> Cc: linux-kbuild@vger.kernel.org
-> Signed-off-by: Paulo Zanoni <paulo.r.zanoni@intel.com>
-> ---
->  Makefile | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 4d5c883a98e5..a5ef6818157a 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -616,6 +616,11 @@ CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage \
->  	$(call cc-disable-warning,maybe-uninitialized,)
->  export CFLAGS_GCOV
->  
-> +# The arch Makefiles can override CC_FLAGS_FTRACE. We may also append it later.
-> +ifdef CONFIG_FUNCTION_TRACER
-> +  CC_FLAGS_FTRACE := -pg
-> +endif
-> +
->  # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
->  # values of the respective KBUILD_* variables
->  ARCH_CPPFLAGS :=
-> @@ -755,9 +760,6 @@ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
->  endif
->  
->  ifdef CONFIG_FUNCTION_TRACER
-> -ifndef CC_FLAGS_FTRACE
-> -CC_FLAGS_FTRACE := -pg
-> -endif
->  ifdef CONFIG_FTRACE_MCOUNT_RECORD
->    # gcc 5 supports generating the mcount tables directly
->    ifeq ($(call cc-option-yn,-mrecord-mcount),y)
-> -- 
-> 2.17.1
-> 
-
-Acked-by: Vasily Gorbik <gor@linux.ibm.com>
+SGVsbG8gTWFzYWhpcm8tc2FuLA0KDQpTdGFydGluZyBmcm9tIGtlcm5lbCB2NC4xNyBpdCBpcyBu
+byBsb25nZXIgcG9zc2libGUgdG8gaW5zdGFsbCBrZXJuZWwgaGVhZGVycw0KZm9yIEFSQyBhcmNo
+aXRlY3R1cmUgaWYgdGhlcmUncyBubyBjcm9zcy10b29sY2hhaW4gaW4gUEFUSC4NCg0KTm90ZSBp
+bnN0YWxsYXRpb24gb2YgaGVhZGVycyBpcyBqdXN0IG9uZSBvZiB1c2UtY2FzZXMgd2hlbiB3ZSBt
+aWdodCBub3QNCmhhdmUgY3Jvc3MtdG9vbHMgYXZhaWxhYmxlIGJ1dCBzdGlsbCB3YW50IHRvIHJ1
+biAibWFrZSB4eHhfZGVmY29uZmlnIi4NCkkuZS4gdGhlIHByb2JsZW0gaXMgIm1ha2UgeHh4X2Rl
+ZmNvbmZpZyIgd2l0aCBubyBjcm9zcy10b29sY2hhaW4uDQoNClRoYXQncyB3aGF0IEkgc2VlOg0K
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0+OC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+DQouL3NjcmlwdHMvZ2NjLXZlcnNpb24uc2g6IGxpbmUgMjY6IGFyYy1saW51eC1nY2M6IGNvbW1h
+bmQgbm90IGZvdW5kDQouL3NjcmlwdHMvZ2NjLXZlcnNpb24uc2g6IGxpbmUgMjc6IGFyYy1saW51
+eC1nY2M6IGNvbW1hbmQgbm90IGZvdW5kDQouL3NjcmlwdHMvZ2NjLXZlcnNpb24uc2g6IGxpbmUg
+MjY6IGFyYy1saW51eC1nY2M6IGNvbW1hbmQgbm90IGZvdW5kDQouL3NjcmlwdHMvZ2NjLXZlcnNp
+b24uc2g6IGxpbmUgMjc6IGFyYy1saW51eC1nY2M6IGNvbW1hbmQgbm90IGZvdW5kDQptYWtlOiBh
+cmMtbGludXgtZ2NjOiBDb21tYW5kIG5vdCBmb3VuZA0KL2Jpbi9zaDogYXJjLWxpbnV4LWdjYzog
+Y29tbWFuZCBub3QgZm91bmQNCi9iaW4vc2g6IGFyYy1saW51eC1nY2M6IGNvbW1hbmQgbm90IGZv
+dW5kDQoqKiogRGVmYXVsdCBjb25maWd1cmF0aW9uIGlzIGJhc2VkIG9uICduc2ltXzcwMF9kZWZj
+b25maWcnDQouL3NjcmlwdHMvZ2NjLXZlcnNpb24uc2g6IGxpbmUgMjY6IGFyYy1saW51eC1nY2M6
+IGNvbW1hbmQgbm90IGZvdW5kDQouL3NjcmlwdHMvZ2NjLXZlcnNpb24uc2g6IGxpbmUgMjc6IGFy
+Yy1saW51eC1nY2M6IGNvbW1hbmQgbm90IGZvdW5kDQouL3NjcmlwdHMvZ2NjLXZlcnNpb24uc2g6
+IGxpbmUgMjk6IGFyYy1saW51eC1nY2M6IGNvbW1hbmQgbm90IGZvdW5kDQouL3NjcmlwdHMvZ2Nj
+LXZlcnNpb24uc2g6IGxpbmUgMjY6IGFyYy1saW51eC1nY2M6IGNvbW1hbmQgbm90IGZvdW5kDQou
+L3NjcmlwdHMvZ2NjLXZlcnNpb24uc2g6IGxpbmUgMjc6IGFyYy1saW51eC1nY2M6IGNvbW1hbmQg
+bm90IGZvdW5kDQouL3NjcmlwdHMvZ2NjLXZlcnNpb24uc2g6IGxpbmUgMjk6IGFyYy1saW51eC1n
+Y2M6IGNvbW1hbmQgbm90IGZvdW5kDQppbml0L0tjb25maWc6MTc6IHN5bnRheCBlcnJvcg0KaW5p
+dC9LY29uZmlnOjE2OiBpbnZhbGlkIG9wdGlvbg0KLi9zY3JpcHRzL2NsYW5nLXZlcnNpb24uc2g6
+IGxpbmUgMTU6IGFyYy1saW51eC1nY2M6IGNvbW1hbmQgbm90IGZvdW5kDQouL3NjcmlwdHMvZ2Nj
+LXBsdWdpbi5zaDogbGluZSAxMTogYXJjLWxpbnV4LWdjYzogY29tbWFuZCBub3QgZm91bmQNCm1h
+a2VbMV06ICoqKiBbc2NyaXB0cy9rY29uZmlnL01ha2VmaWxlOjkxOiBkZWZjb25maWddIEVycm9y
+IDENCm1ha2U6ICoqKiBbTWFrZWZpbGU6NTMxOiBkZWZjb25maWddIEVycm9yIDINCi0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tPjgtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KDQpUaGF0
+IGRvZXNuJ3QgaGFwcGVuIGZvciBBUk0gYW5kIG90aGVyIGFyY2hlcyBzaW1wbHkgYmVjYXVzZSBm
+b3IgQVJDDQp3ZSBkZWZpbmUgQ1JPU1NfQ09NUElMRSBpZiBpdCBpcyBub3Qgc2V0IGJ5IHVzZXIs
+IHNlZToNCmh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3Rv
+cnZhbGRzL2xpbnV4LmdpdC90cmVlL2FyY2gvYXJjL01ha2VmaWxlI245DQoNClN0aWxsIGlmIENS
+T1NTX0NPTVBJTEUgaXMgc2V0IGJlZm9yZSBleGVjdXRpb24gb2YgIm1ha2UgZGVmY29uZmlnIg0K
+dGhlbiB0aGUgc2FtZSBwcm9ibGVtIGhhcHBlbnMgZm9yIG90aGVycy4NCg0KSSB3YXMgYWJsZSB0
+byBmaW5kIGEgc2VyaWVzIG9mIGNvbW1pdHMgd2hpY2ggY2F1c2UgdGhpcyBwcm9ibGVtLA0KaGVy
+ZSB0aGV5IGFyZToNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPjgtLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLQ0KNTlmNTM4NTViYWJmIC0gZ2NjLXBsdWdpbnM6IHRlc3QgcGx1Z2luIHN1
+cHBvcnQgaW4gS2NvbmZpZyBhbmQgY2xlYW4gdXAgTWFrZWZpbGUNCjQ2OWNiNzM3NmMwNiAtIGtj
+b25maWc6IGFkZCBDQ19JU19DTEFORyBhbmQgQ0xBTkdfVkVSU0lPTg0KYTQzNTM4OTg5ODBjIC0g
+a2NvbmZpZzogYWRkIENDX0lTX0dDQyBhbmQgR0NDX1ZFUlNJT04NCi0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tPjgtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KDQpXaGF0IGhhcHBlbiBp
+cyAiJChDQykiIGlzIHBhc3NlZCBhcyBhbiBhcmd1bWVudCBhbmQgaW4gaXRzIHR1cm4gQ0MgaXMN
+CiIkKENST1NTX0NPTVBJTEUpZ2NjIiwgc2VlOg0KaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIv
+c2NtL2xpbnV4L2tlcm5lbC9naXQvdG9ydmFsZHMvbGludXguZ2l0L3RyZWUvTWFrZWZpbGUjbjM4
+NQ0KDQoNClNvIGlmIEkgc3Vic3RpdHV0ZSAiQ0MiIHdpdGggIkhPU1RDQyIgaW4gYSBjb3VwbGUg
+b2YgcGxhY2VzIChzZWUgYmVsb3cpDQp0aGUgcHJvYmxlbSBnb2VzIGF3YXkuIEJ1dCBJJ20gbm90
+IHJlYWxseSBzdXJlIGlmIHdoYXQgSSBkbyBpcyBjb3JyZWN0Lg0KSS5lLiB3aGVuIHdlJ3JlIGlu
+dGVyZXN0ZWQgaW4gQ0MgZm9yIHRhcmdldCBhbmQgd2hlbiBvbmx5IGhvc3QgQ0MgaXMgb2YNCm91
+ciBpbnRlcmVzdC4NCg0KV291bGQgYmUgaW50ZXJlc3RpbmcgdG8ga25vdyB5b3VyIG9waW5pb24g
+aGVyZS4NCg0KLUFsZXhleQ0KDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LT44LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpkaWZmIC0t
+Z2l0IGEvYXJjaC9LY29uZmlnIGIvYXJjaC9LY29uZmlnDQppbmRleCBkMWYyZWQ0NjJhYzguLjUz
+YzhjNzk5NGU2YiAxMDA2NDQNCi0tLSBhL2FyY2gvS2NvbmZpZw0KKysrIGIvYXJjaC9LY29uZmln
+DQpAQCAtNDEyLDcgKzQxMiw3IEBAIHByZWZlcnJlZC1wbHVnaW4taG9zdGNjIDo9ICQoaWYtc3Vj
+Y2VzcyxbICQoZ2NjLXZlcnNpb24pIC1nZSA0MDgwMCBdLCQoSE9TVENYWCksDQogDQogY29uZmln
+IFBMVUdJTl9IT1NUQ0MNCiAgICAgICAgc3RyaW5nDQotICAgICAgIGRlZmF1bHQgIiQoc2hlbGws
+JChzcmN0cmVlKS9zY3JpcHRzL2djYy1wbHVnaW4uc2ggIiQocHJlZmVycmVkLXBsdWdpbi1ob3N0
+Y2MpIiAiJChIT1NUQ1hYKSIgIiQoQ0MpIikiDQorICAgICAgIGRlZmF1bHQgIiQoc2hlbGwsJChz
+cmN0cmVlKS9zY3JpcHRzL2djYy1wbHVnaW4uc2ggIiQocHJlZmVycmVkLXBsdWdpbi1ob3N0Y2Mp
+IiAiJChIT1NUQ1hYKSIgIiQoSE9TVENDKSIpIg0KICAgICAgICBoZWxwDQogICAgICAgICAgSG9z
+dCBjb21waWxlciB1c2VkIHRvIGJ1aWxkIEdDQyBwbHVnaW5zLiAgVGhpcyBjYW4gYmUgJChIT1NU
+Q1hYKSwNCiAgICAgICAgICAkKEhPU1RDQyksIG9yIGEgbnVsbCBzdHJpbmcgaWYgR0NDIHBsdWdp
+biBpcyB1bnN1cHBvcnRlZC4NCmRpZmYgLS1naXQgYS9pbml0L0tjb25maWcgYi9pbml0L0tjb25m
+aWcNCmluZGV4IDJhNDg4MzJmZDQwZS4uYTAwOTRkZGI4MjQ0IDEwMDY0NA0KLS0tIGEvaW5pdC9L
+Y29uZmlnDQorKysgYi9pbml0L0tjb25maWcNCkBAIC0xMyw3ICsxMyw3IEBAIGNvbmZpZyBDQ19J
+U19HQ0MNCiANCiBjb25maWcgR0NDX1ZFUlNJT04NCiAgICAgICAgaW50DQotICAgICAgIGRlZmF1
+bHQgJChzaGVsbCwkKHNyY3RyZWUpL3NjcmlwdHMvZ2NjLXZlcnNpb24uc2ggLXAgJChDQykgfCBz
+ZWQgJ3MvXjAqLy8nKSBpZiBDQ19JU19HQ0MNCisgICAgICAgZGVmYXVsdCAkKHNoZWxsLCQoc3Jj
+dHJlZSkvc2NyaXB0cy9nY2MtdmVyc2lvbi5zaCAtcCAkKEhPU1RDQykgfCBzZWQgJ3MvXjAqLy8n
+KSBpZiBDQ19JU19HQ0MNCiAgICAgICAgZGVmYXVsdCAwDQogDQogY29uZmlnIENDX0lTX0NMQU5H
+DQpAQCAtMjEsNyArMjEsNyBAQCBjb25maWcgQ0NfSVNfQ0xBTkcNCiANCiBjb25maWcgQ0xBTkdf
+VkVSU0lPTg0KICAgICAgICBpbnQNCi0gICAgICAgZGVmYXVsdCAkKHNoZWxsLCQoc3JjdHJlZSkv
+c2NyaXB0cy9jbGFuZy12ZXJzaW9uLnNoICQoQ0MpKQ0KKyAgICAgICBkZWZhdWx0ICQoc2hlbGws
+JChzcmN0cmVlKS9zY3JpcHRzL2NsYW5nLXZlcnNpb24uc2ggJChIT1NUQ0MpKQ0KIA0KIGNvbmZp
+ZyBDT05TVFJVQ1RPUlMNCiAgICAgICAgYm9vbA0KZGlmZiAtLWdpdCBhL3NjcmlwdHMvS2J1aWxk
+LmluY2x1ZGUgYi9zY3JpcHRzL0tidWlsZC5pbmNsdWRlDQppbmRleCA4NjMyMWYwNjQ2MWUuLjY4
+NGNkNjQ1ZWViMSAxMDA2NDQNCi0tLSBhL3NjcmlwdHMvS2J1aWxkLmluY2x1ZGUNCisrKyBiL3Nj
+cmlwdHMvS2J1aWxkLmluY2x1ZGUNCkBAIC0xMDksNyArMTA5LDcgQEAgYXMtaW5zdHIgPSAkKGNh
+bGwgdHJ5LXJ1bixcDQogICAgICAgIHByaW50ZiAiJWJcbiIgIiQoMSkiIHwgJChDQykgJChLQlVJ
+TERfQUZMQUdTKSAtYyAteCBhc3NlbWJsZXIgLW8gIiQkVE1QIiAtLCQoMiksJCgzKSkNCiANCiAj
+IF9fY2Mtb3B0aW9uDQotIyBVc2FnZTogTVlfQ0ZMQUdTICs9ICQoY2FsbCBfX2NjLW9wdGlvbiwk
+KENDKSwkKE1ZX0NGTEFHUyksLW1hcmNoPXdpbmNoaXAtYzYsLW1hcmNoPWk1ODYpDQorIyBVc2Fn
+ZTogTVlfQ0ZMQUdTICs9ICQoY2FsbCBfX2NjLW9wdGlvbiwkKEhPU1RDQyksJChNWV9DRkxBR1Mp
+LC1tYXJjaD13aW5jaGlwLWM2LC1tYXJjaD1pNTg2KQ0KIF9fY2Mtb3B0aW9uID0gJChjYWxsIHRy
+eS1ydW4sXA0KICAgICAgICAkKDEpIC1XZXJyb3IgJCgyKSAkKDMpIC1jIC14IGMgL2Rldi9udWxs
+IC1vICIkJFRNUCIsJCgzKSwkKDQpKQ0KIA0KQEAgLTE0MywxMSArMTQzLDExIEBAIGNjLWRpc2Fi
+bGUtd2FybmluZyA9ICQoY2FsbCB0cnktcnVuLFwNCiBjYy1uYW1lID0gJChzaGVsbCAkKENDKSAt
+diAyPiYxIHwgZ3JlcCAtcSAiY2xhbmcgdmVyc2lvbiIgJiYgZWNobyBjbGFuZyB8fCBlY2hvIGdj
+YykNCiANCiAjIGNjLXZlcnNpb24NCi1jYy12ZXJzaW9uID0gJChzaGVsbCAkKENPTkZJR19TSEVM
+TCkgJChzcmN0cmVlKS9zY3JpcHRzL2djYy12ZXJzaW9uLnNoICQoQ0MpKQ0KK2NjLXZlcnNpb24g
+PSAkKHNoZWxsICQoQ09ORklHX1NIRUxMKSAkKHNyY3RyZWUpL3NjcmlwdHMvZ2NjLXZlcnNpb24u
+c2ggJChIT1NUQ0MpKQ0KIA0KICMgY2MtZnVsbHZlcnNpb24NCiBjYy1mdWxsdmVyc2lvbiA9ICQo
+c2hlbGwgJChDT05GSUdfU0hFTEwpIFwNCi0gICAgICAgJChzcmN0cmVlKS9zY3JpcHRzL2djYy12
+ZXJzaW9uLnNoIC1wICQoQ0MpKQ0KKyAgICAgICAkKHNyY3RyZWUpL3NjcmlwdHMvZ2NjLXZlcnNp
+b24uc2ggLXAgJChIT1NUQ0MpKQ0KIA0KICMgY2MtaWZ2ZXJzaW9uDQogIyBVc2FnZTogIEVYVFJB
+X0NGTEFHUyArPSAkKGNhbGwgY2MtaWZ2ZXJzaW9uLCAtbHQsIDA0MDIsIC1PMSkNCmRpZmYgLS1n
+aXQgYS9zY3JpcHRzL0tjb25maWcuaW5jbHVkZSBiL3NjcmlwdHMvS2NvbmZpZy5pbmNsdWRlDQpp
+bmRleCBkYWQ1NTgzNDUxYWYuLjNiMjhiZjk0Y2IyNCAxMDA2NDQNCi0tLSBhL3NjcmlwdHMvS2Nv
+bmZpZy5pbmNsdWRlDQorKysgYi9zY3JpcHRzL0tjb25maWcuaW5jbHVkZQ0KQEAgLTI3LDQgKzI3
+LDQgQEAgY2Mtb3B0aW9uID0gJChzdWNjZXNzLCQoQ0MpIC1XZXJyb3IgJCgxKSAtRSAteCBjIC9k
+ZXYvbnVsbCAtbyAvZGV2L251bGwpDQogbGQtb3B0aW9uID0gJChzdWNjZXNzLCQoTEQpIC12ICQo
+MSkpDQogDQogIyBnY2MgdmVyc2lvbiBpbmNsdWRpbmcgcGF0Y2ggbGV2ZWwNCi1nY2MtdmVyc2lv
+biA6PSAkKHNoZWxsLCQoc3JjdHJlZSkvc2NyaXB0cy9nY2MtdmVyc2lvbi5zaCAtcCAkKENDKSB8
+IHNlZCAncy9eMCovLycpDQorZ2NjLXZlcnNpb24gOj0gJChzaGVsbCwkKHNyY3RyZWUpL3Njcmlw
+dHMvZ2NjLXZlcnNpb24uc2ggLXAgJChIT1NUQ0MpIHwgc2VkICdzL14wKi8vJykNCi0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPjgtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0NCg==
