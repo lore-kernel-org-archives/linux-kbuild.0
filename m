@@ -1,130 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:62451 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726359AbeILR6j (ORCPT
+Received: from smtprelay.synopsys.com ([198.182.60.111]:41958 "EHLO
+        smtprelay.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726606AbeILSru (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Sep 2018 13:58:39 -0400
-MIME-Version: 1.0
-In-Reply-To: <0854f35e92c95e552721dc6a46f4ee2bc4020bc1.camel@synopsys.com>
+        Wed, 12 Sep 2018 14:47:50 -0400
+From: Alexey Brodkin <Alexey.Brodkin@synopsys.com>
+Subject: Re: defconfig fails if CROSS_COMPILE is set while cross-gcc is not
+ avaialble
+Date: Wed, 12 Sep 2018 13:43:09 +0000
+Message-ID: <2c5d00f99db07df1a8cc5168d62d5764544fb83e.camel@synopsys.com>
 References: <0854f35e92c95e552721dc6a46f4ee2bc4020bc1.camel@synopsys.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 12 Sep 2018 21:53:19 +0900
-Message-ID: <CAK7LNAR0ghuhDXUqJ=nX0dtbtoOvFff9Eeu-hHWLkTONG09GAQ@mail.gmail.com>
-Subject: Re: defconfig fails if CROSS_COMPILE is set while cross-gcc is not avaialble
-Content-Type: text/plain; charset="UTF-8"
+         <CAK7LNAR0ghuhDXUqJ=nX0dtbtoOvFff9Eeu-hHWLkTONG09GAQ@mail.gmail.com>
+In-Reply-To: <CAK7LNAR0ghuhDXUqJ=nX0dtbtoOvFff9Eeu-hHWLkTONG09GAQ@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <37A93BA9001833478BA89F779B85B8EE@internal.synopsys.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexey Brodkin <Alexey.Brodkin@synopsys.com>
+To: "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>
 Cc: "keescook@chromium.org" <keescook@chromium.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-snps-arc@lists.infradead.org" <linux-snps-arc@lists.infradead.org>
 
-Hi Alexey.
-
-2018-09-12 21:08 GMT+09:00 Alexey Brodkin <Alexey.Brodkin@synopsys.com>:
-> Hello Masahiro-san,
->
-> Starting from kernel v4.17 it is no longer possible to install kernel headers
-> for ARC architecture if there's no cross-toolchain in PATH.
-
-
-Really?
-
-I can do 'make ARCH=arc headers_install'
-with the latest Linus' tree.
-
-I see the following warnings, but possible to install kernel headers.
-
-./scripts/gcc-version.sh: line 26: arc-linux-gcc: command not found
-./scripts/gcc-version.sh: line 27: arc-linux-gcc: command not found
-
-
-If ARC compiler is not found in PATH,
-those warnings are displayed with v4.16 or older as well.
-
-I do not see much difference in the behavior.
-
-
-I am trying to fix even those warnings
-by eliminating unneeded compiler invocation.  It is WIP.
-
-
-
-> Note installation of headers is just one of use-cases when we might not
-> have cross-tools available but still want to run "make xxx_defconfig".
-> I.e. the problem is "make xxx_defconfig" with no cross-toolchain.
->
-> That's what I see:
-> ----------------------------->8--------------------------
-> ./scripts/gcc-version.sh: line 26: arc-linux-gcc: command not found
-> ./scripts/gcc-version.sh: line 27: arc-linux-gcc: command not found
-> ./scripts/gcc-version.sh: line 26: arc-linux-gcc: command not found
-> ./scripts/gcc-version.sh: line 27: arc-linux-gcc: command not found
-> make: arc-linux-gcc: Command not found
-> /bin/sh: arc-linux-gcc: command not found
-> /bin/sh: arc-linux-gcc: command not found
-> *** Default configuration is based on 'nsim_700_defconfig'
-> ./scripts/gcc-version.sh: line 26: arc-linux-gcc: command not found
-> ./scripts/gcc-version.sh: line 27: arc-linux-gcc: command not found
-> ./scripts/gcc-version.sh: line 29: arc-linux-gcc: command not found
-> ./scripts/gcc-version.sh: line 26: arc-linux-gcc: command not found
-> ./scripts/gcc-version.sh: line 27: arc-linux-gcc: command not found
-> ./scripts/gcc-version.sh: line 29: arc-linux-gcc: command not found
-> init/Kconfig:17: syntax error
-> init/Kconfig:16: invalid option
-> ./scripts/clang-version.sh: line 15: arc-linux-gcc: command not found
-> ./scripts/gcc-plugin.sh: line 11: arc-linux-gcc: command not found
-> make[1]: *** [scripts/kconfig/Makefile:91: defconfig] Error 1
-> make: *** [Makefile:531: defconfig] Error 2
-> ----------------------------->8--------------------------
->
-> That doesn't happen for ARM and other arches simply because for ARC
-> we define CROSS_COMPILE if it is not set by user, see:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/arc/Makefile#n9
-
-I do not think it is a good practice
-to forcibly set CROSS_COMPILE that users may not have.
-
-arch/m68k/Makefile uses cc-cross-prefix helper
-to set the first found compiler.
-
-
-> Still if CROSS_COMPILE is set before execution of "make defconfig"
-> then the same problem happens for others.
->
-> I was able to find a series of commits which cause this problem,
-> here they are:
-> ----------------------------->8--------------------------
-> 59f53855babf - gcc-plugins: test plugin support in Kconfig and clean up Makefile
-> 469cb7376c06 - kconfig: add CC_IS_CLANG and CLANG_VERSION
-> a4353898980c - kconfig: add CC_IS_GCC and GCC_VERSION
-> ----------------------------->8--------------------------
->
-> What happen is "$(CC)" is passed as an argument and in its turn CC is
-> "$(CROSS_COMPILE)gcc", see:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Makefile#n385
->
->
-> So if I substitute "CC" with "HOSTCC" in a couple of places (see below)
-> the problem goes away. But I'm not really sure if what I do is correct.
-> I.e. when we're interested in CC for target and when only host CC is of
-> our interest.
-
-I think the log of commit 316d55d55f49eca44
-is a good source to know the background of this change.
-
-Now Kconfig requires the target compiler.
-So, it does not make sense to
-do defconfig with non-existing compiler.
-
-
-
-> Would be interesting to know your opinion here.
-
-I'd recommend to not hard-code CROSS_COMPILE.
-
-
-
-Thanks.
-
--- 
-Best Regards
-Masahiro Yamada
+SGkgTWFzYWhpcm8sDQoNCk9uIFdlZCwgMjAxOC0wOS0xMiBhdCAyMTo1MyArMDkwMCwgTWFzYWhp
+cm8gWWFtYWRhIHdyb3RlOg0KPiBIaSBBbGV4ZXkuDQo+IA0KPiAyMDE4LTA5LTEyIDIxOjA4IEdN
+VCswOTowMCBBbGV4ZXkgQnJvZGtpbiA8QWxleGV5LkJyb2RraW5Ac3lub3BzeXMuY29tPjoNCj4g
+PiBIZWxsbyBNYXNhaGlyby1zYW4sDQo+ID4gDQo+ID4gU3RhcnRpbmcgZnJvbSBrZXJuZWwgdjQu
+MTcgaXQgaXMgbm8gbG9uZ2VyIHBvc3NpYmxlIHRvIGluc3RhbGwga2VybmVsIGhlYWRlcnMNCj4g
+PiBmb3IgQVJDIGFyY2hpdGVjdHVyZSBpZiB0aGVyZSdzIG5vIGNyb3NzLXRvb2xjaGFpbiBpbiBQ
+QVRILg0KPiANCj4gDQo+IFJlYWxseT8NCj4gDQo+IEkgY2FuIGRvICdtYWtlIEFSQ0g9YXJjIGhl
+YWRlcnNfaW5zdGFsbCcNCj4gd2l0aCB0aGUgbGF0ZXN0IExpbnVzJyB0cmVlLg0KDQpJbmRlZWQg
+ImhlYWRlcnNfaW5zdGFsbCIgd29ya3MgdGhhdCB3YXkgYnV0IGlzIGl0IE9LIHRvIGluc3RhbGwg
+aGVhZGVycw0Kd2l0aG91dCBwcmV2aW91cyBjb25maWd1cmF0aW9uLiBJbiBteSBleHBlcmltZW50
+IEkgZG9uJ3Qgc2VlIGFueSBkaWZmZXJlbmNlcw0KdGhvdWdoIGZvciBleGFtcGxlIE9wZW5FbWJl
+ZGRlZCBvbiBjb25maWd1cmF0aW9uIHN0ZXAgb2YgImxpbnV4LWxpYmMtaGVhZGVycyINCmRvICJB
+UkNIPXh4eCBtYWtlIGFsbG5vY29uZmlnIiwgc2VlIA0KaHR0cHM6Ly9naXRodWIuY29tL29wZW5l
+bWJlZGRlZC9vcGVuZW1iZWRkZWQtY29yZS9ibG9iL21hc3Rlci9tZXRhL3JlY2lwZXMta2VybmVs
+L2xpbnV4LWxpYmMtaGVhZGVycy9saW51eC1saWJjLWhlYWRlcnMuaW5jI0w1Nw0KDQpUaGF0IG1p
+Z2h0IGJlIHNvbWUgbGVnYWN5IGJ1dCBJJ20gbm90IHJlYWxseSBzdXJlLA0Kd29ydGggYXNraW5n
+IE9FIHBlb3BsZS4NCg0KRm9yIHRoZSByZWNvcmQgaW4gQnVpbGRyb290IG5vIGNvbmZpZ3VyYXRp
+b24gaGFwcGVucyBmb3IgTGludXggaGVhZGVycywNCnNlZSBodHRwczovL2dpdC5idWlsZHJvb3Qu
+b3JnL2J1aWxkcm9vdC90cmVlL3BhY2thZ2UvbGludXgtaGVhZGVycy9saW51eC1oZWFkZXJzLm1r
+I24xMDYNCg0KPiBJIHNlZSB0aGUgZm9sbG93aW5nIHdhcm5pbmdzLCBidXQgcG9zc2libGUgdG8g
+aW5zdGFsbCBrZXJuZWwgaGVhZGVycy4NCj4gDQo+IC4vc2NyaXB0cy9nY2MtdmVyc2lvbi5zaDog
+bGluZSAyNjogYXJjLWxpbnV4LWdjYzogY29tbWFuZCBub3QgZm91bmQNCj4gLi9zY3JpcHRzL2dj
+Yy12ZXJzaW9uLnNoOiBsaW5lIDI3OiBhcmMtbGludXgtZ2NjOiBjb21tYW5kIG5vdCBmb3VuZA0K
+DQpSaWdodC4uLiB0aGF0IGhhcHBlbnMgYmVjYXVzZSB3ZSdyZSBkb2luZyAyIGhhY2tpc2ggdGhp
+bmdzOg0KMS4gQ2hlY2tpbmcgaWYgY3VycmVudCB0b29sY2hhaW4gaXMgY29uZmlndXJlZCBmb3Ig
+QVJDb21wYWN0IChBUkN2MSkgSVNBDQogICBvciBBUkN2Mi4gVGhhdCdzIGJlY2F1c2Ugd2UgdXNl
+IHRvb2xjaGFpbidzIGxpYmdjYyBhbmQgc28gd2Ugd2FudCB0byB3YXJuDQogICBhIHVzZXIgaWYg
+d3JvbmcgdG9vbGNoYWluIGlzIHVzZWQgZWFybHkgaW5zdGVhZCBvZiBsZWF2aW5nIGhpbSB0byBk
+ZWFsIHdpdGgNCiAgIGZpbmFsIGxpbmthZ2UgZmFpbHVyZS4NCiAgIFNlZTogaHR0cHM6Ly9naXQu
+a2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvdG9ydmFsZHMvbGludXguZ2l0L3Ry
+ZWUvYXJjaC9hcmMvTWFrZWZpbGUjbjIzDQoNCjIuIEFza2luZyBDQyBmb3IgYSBwYXRoIHRvIGxp
+YmdjYw0KICAgU2VlOiBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVs
+L2dpdC90b3J2YWxkcy9saW51eC5naXQvdHJlZS9hcmNoL2FyYy9NYWtlZmlsZSNuODINCg0KW3Nu
+aXBdDQoNCj4gSSBhbSB0cnlpbmcgdG8gZml4IGV2ZW4gdGhvc2Ugd2FybmluZ3MNCj4gYnkgZWxp
+bWluYXRpbmcgdW5uZWVkZWQgY29tcGlsZXIgaW52b2NhdGlvbi4gIEl0IGlzIFdJUC4NCg0KQW5k
+IGlmICgxKSBpcyBub3Qgc3VwZXIgaW1wb3J0YW50IChpbiBmYWN0IHdlIHVzZWQgdG8gbGl2ZSB3
+aXRob3V0IGl0IGZvciB5ZWFycykNCigyKSByZXF1aXJlcyBpbXBsZW1lbnRhdGlvbiBvZiBsaWJn
+Y2MgaW4ga2VybmVsIHNvdXJjZXMgKHdoaWNoIEJUVyB3aWxsIG1ha2UgKDEpDQpvYnNvbGV0ZSBp
+bW1lZGlhdGVseSkuIFdlIGRvIGhhdmUgaXQgb24gb3VyIHRvZG8gbGlzdCB0aG91Z2guLi4NCg0K
+W3NuaXBdDQoNCj4gPiBUaGF0IGRvZXNuJ3QgaGFwcGVuIGZvciBBUk0gYW5kIG90aGVyIGFyY2hl
+cyBzaW1wbHkgYmVjYXVzZSBmb3IgQVJDDQo+ID4gd2UgZGVmaW5lIENST1NTX0NPTVBJTEUgaWYg
+aXQgaXMgbm90IHNldCBieSB1c2VyLCBzZWU6DQo+ID4gDQpodHRwczovL3VybGRlZmVuc2UucHJv
+b2Zwb2ludC5jb20vdjIvdXJsP3U9aHR0cHMtM0FfX2dpdC5rZXJuZWwub3JnX3B1Yl9zY21fbGlu
+dXhfa2VybmVsX2dpdF90b3J2YWxkc19saW51eC5naXRfdHJlZV9hcmNoX2FyY19NYWtlZmlsZS0y
+M245JmQ9RHdJQmFRJmM9RFBMNl9YXzZKa1hGeDdBWFdxQjB0ZyZyPWxxZGVlU1NFZXMwR0ZERGw2
+NTZlVmlYTzdicmVTNTV5dFdraHBrNVI4MUkmbT16SnNhNU1yQXREaVlFV3I1UFpOUzFhR2syMUVU
+YS1xWHpMUElkZHd2b1FJJnM9QlUwbHRQUG9STG4zbnBfYmE0SFJIZkg5aTE0MXVaam9TOGpzSnJn
+OFNOYyZlPQ0KPiANCj4gSSBkbyBub3QgdGhpbmsgaXQgaXMgYSBnb29kIHByYWN0aWNlDQo+IHRv
+IGZvcmNpYmx5IHNldCBDUk9TU19DT01QSUxFIHRoYXQgdXNlcnMgbWF5IG5vdCBoYXZlLg0KDQpN
+YXliZSBzby4gU3RpbGwgc29tZSBhcmNoZXMgb3IgcmFuZG9tIHBsYXRmb3JtcyBkbyB0aGF0Lg0K
+DQo+IGFyY2gvbTY4ay9NYWtlZmlsZSB1c2VzIGNjLWNyb3NzLXByZWZpeCBoZWxwZXINCj4gdG8g
+c2V0IHRoZSBmaXJzdCBmb3VuZCBjb21waWxlci4NCg0KV2VsbCBJJ20gbm90IHJlYWxseSBzdXJl
+IHdlIG5lZWQgdG8gbWVzcyB3aXRoIENST1NTX0NPTVBJTEUgaW4ga2VybmVsLg0KSS5lLiB0aGVy
+ZSBtaWdodCBiZSB0b25zIG9mIHZhcmlhdGlvbnMgZGVwZW5kaW5nIG9uIHdobyB0b29sY2hhaW4g
+d2FzIGJ1aWx0DQpldGMuIFNvIEknZCBiZXR0ZXIgZ2V0IHJpZCBvZiBDUk9TU19DT01QSUxFIHNl
+dHVwIGluIG91ciBNYWtlZmlsZS4NCg0KPiA+IFN0aWxsIGlmIENST1NTX0NPTVBJTEUgaXMgc2V0
+IGJlZm9yZSBleGVjdXRpb24gb2YgIm1ha2UgZGVmY29uZmlnIg0KPiA+IHRoZW4gdGhlIHNhbWUg
+cHJvYmxlbSBoYXBwZW5zIGZvciBvdGhlcnMuDQo+ID4gDQo+ID4gSSB3YXMgYWJsZSB0byBmaW5k
+IGEgc2VyaWVzIG9mIGNvbW1pdHMgd2hpY2ggY2F1c2UgdGhpcyBwcm9ibGVtLA0KPiA+IGhlcmUg
+dGhleSBhcmU6DQo+ID4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0+OC0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tDQo+ID4gNTlmNTM4NTViYWJmIC0gZ2NjLXBsdWdpbnM6IHRlc3QgcGx1
+Z2luIHN1cHBvcnQgaW4gS2NvbmZpZyBhbmQgY2xlYW4gdXAgTWFrZWZpbGUNCj4gPiA0NjljYjcz
+NzZjMDYgLSBrY29uZmlnOiBhZGQgQ0NfSVNfQ0xBTkcgYW5kIENMQU5HX1ZFUlNJT04NCj4gPiBh
+NDM1Mzg5ODk4MGMgLSBrY29uZmlnOiBhZGQgQ0NfSVNfR0NDIGFuZCBHQ0NfVkVSU0lPTg0KPiA+
+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPjgtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQ0KPiA+IA0KPiA+IFdoYXQgaGFwcGVuIGlzICIkKENDKSIgaXMgcGFzc2VkIGFzIGFuIGFyZ3Vt
+ZW50IGFuZCBpbiBpdHMgdHVybiBDQyBpcw0KPiA+ICIkKENST1NTX0NPTVBJTEUpZ2NjIiwgc2Vl
+Og0KPiA+IA0KaHR0cHM6Ly91cmxkZWZlbnNlLnByb29mcG9pbnQuY29tL3YyL3VybD91PWh0dHBz
+LTNBX19naXQua2VybmVsLm9yZ19wdWJfc2NtX2xpbnV4X2tlcm5lbF9naXRfdG9ydmFsZHNfbGlu
+dXguZ2l0X3RyZWVfTWFrZWZpbGUtMjNuMzg1JmQ9RHdJQmFRJmM9RFBMNl9YXzZKa1hGeDdBWFdx
+QjB0ZyZyPWxxZGVlU1NFZXMwR0ZERGw2NTZlVmlYTzdicmVTNTV5dFdraHBrNVI4MUkmbT16SnNh
+NU1yQXREaVlFV3I1UFpOUzFhR2syMUVUYS1xWHpMUElkZHd2b1FJJnM9Uzd6ZUhCcElwMVA5NFhi
+eW9Nc2FTbkpXUnFER242OXlHeWVvYi1qek1KNCZlPQ0KPiA+IA0KPiA+IA0KPiA+IFNvIGlmIEkg
+c3Vic3RpdHV0ZSAiQ0MiIHdpdGggIkhPU1RDQyIgaW4gYSBjb3VwbGUgb2YgcGxhY2VzIChzZWUg
+YmVsb3cpDQo+ID4gdGhlIHByb2JsZW0gZ29lcyBhd2F5LiBCdXQgSSdtIG5vdCByZWFsbHkgc3Vy
+ZSBpZiB3aGF0IEkgZG8gaXMgY29ycmVjdC4NCj4gPiBJLmUuIHdoZW4gd2UncmUgaW50ZXJlc3Rl
+ZCBpbiBDQyBmb3IgdGFyZ2V0IGFuZCB3aGVuIG9ubHkgaG9zdCBDQyBpcyBvZg0KPiA+IG91ciBp
+bnRlcmVzdC4NCj4gDQo+IEkgdGhpbmsgdGhlIGxvZyBvZiBjb21taXQgMzE2ZDU1ZDU1ZjQ5ZWNh
+NDQNCj4gaXMgYSBnb29kIHNvdXJjZSB0byBrbm93IHRoZSBiYWNrZ3JvdW5kIG9mIHRoaXMgY2hh
+bmdlLg0KPiANCj4gTm93IEtjb25maWcgcmVxdWlyZXMgdGhlIHRhcmdldCBjb21waWxlci4NCj4g
+U28sIGl0IGRvZXMgbm90IG1ha2Ugc2Vuc2UgdG8NCj4gZG8gZGVmY29uZmlnIHdpdGggbm9uLWV4
+aXN0aW5nIGNvbXBpbGVyLg0KDQpBZ3JlZSwgc28gSSdsbCBjaGVjayB3aXRoIE9wZW5FbWJlZGRl
+ZCBwZW9wbGUgaWYgdGhlcmUncyBhIHJlYXNvbiB0byBkbyAibWFrZSBhbGxub2NvbmZpZyINCmlm
+IGl0J3MganVzdCBhIGxlZ2FjeSBjb2RlIHdlJ2xsIGZpeCBpdCB0aGVyZS4NCg0KVGhhbmtzIGEg
+bG90IGZvciBhbGwgdGhlIGlucHV0LCBtdWNoIGFwcHJlY2lhdGVkIQ0KDQotQWxleGV5DQo=
