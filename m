@@ -1,59 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:36184 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727365AbeIMU7S (ORCPT
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:44246 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727730AbeIMVCO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 13 Sep 2018 16:59:18 -0400
-Message-ID: <0dbcdd4d81ed965915ccf2471dd4d5a3d025c93b.camel@decadent.org.uk>
-Subject: Re: 4.19-rc3: bindeb-pkg target is failing on ppc64
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Thu, 13 Sep 2018 16:48:59 +0100
-In-Reply-To: <CALjTZvYcKOycB=XeF-Eqtmq3ADh2be+gfWGiw0jbSgEUo6q8Dw@mail.gmail.com>
-References: <CALjTZvb4hOY_Hew-jEUtpyhkGbmh4Tgb0doPC6EaGtz_rMGt7A@mail.gmail.com>
-         <eb1fe15c9ced6950d6a38c901278b8196ae4938d.camel@decadent.org.uk>
-         <CALjTZvYcKOycB=XeF-Eqtmq3ADh2be+gfWGiw0jbSgEUo6q8Dw@mail.gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-EuXEQRX8XeOMxJgw3rwr"
-Mime-Version: 1.0
+        Thu, 13 Sep 2018 17:02:14 -0400
+MIME-Version: 1.0
+References: <20180910150403.19476-1-robh@kernel.org> <20180910150403.19476-7-robh@kernel.org>
+ <CAL_Jsq+=VbdcVLiwXbOA5d+R2YY6=2Pw2bQpci-jj-JvereD1A@mail.gmail.com> <CAK7LNAQFqhWw+LwDoypGG=OP6tH4qf2tT=LvtchK2GoiNyzDXg@mail.gmail.com>
+In-Reply-To: <CAK7LNAQFqhWw+LwDoypGG=OP6tH4qf2tT=LvtchK2GoiNyzDXg@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 13 Sep 2018 17:51:55 +0200
+Message-ID: <CAMuHMdWEnoh97_jiDWMq=ke4PrhSFbToYnx91CPLBuq3mOGzoQ@mail.gmail.com>
+Subject: Re: [PATCH v3 6/9] kbuild: consolidate Devicetree dtb build rules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rui Salvaterra <rsalvaterra@gmail.com>
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Rob Herring <robh@kernel.org>, "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, nios2-dev@lists.rocketboards.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-xtensa@linux-xtensa.org, Will Deacon <will.deacon@arm.com>, Paul Burton <paul.burton@mips.com>, ley.foon.tan@intel.com
 
+Hi Yamada-san,
 
---=-EuXEQRX8XeOMxJgw3rwr
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, Sep 12, 2018 at 3:02 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> 2018-09-12 0:40 GMT+09:00 Rob Herring <robh@kernel.org>:
+> > On Mon, Sep 10, 2018 at 10:04 AM Rob Herring <robh@kernel.org> wrote:
+> >> There is nothing arch specific about building dtb files other than their
+> >> location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
+> >> The dependencies and supported targets are all slightly different.
+> >> Also, a cross-compiler for each arch is needed, but really the host
+> >> compiler preprocessor is perfectly fine for building dtbs. Move the
+> >> build rules to a common location and remove the arch specific ones. This
+> >> is done in a single step to avoid warnings about overriding rules.
+> >>
+> >> The build dependencies had been a mixture of 'scripts' and/or 'prepare'.
+> >> These pull in several dependencies some of which need a target compiler
+> >> (specifically devicetable-offsets.h) and aren't needed to build dtbs.
+> >> All that is really needed is dtc, so adjust the dependencies to only be
+> >> dtc.
+> >>
+> >> This change enables support 'dtbs_install' on some arches which were
+> >> missing the target.
+> >
+> > [...]
+> >
+> >> @@ -1215,6 +1215,33 @@ kselftest-merge:
+> >>                 $(srctree)/tools/testing/selftests/*/config
+> >>         +$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
+> >>
+> >> +# ---------------------------------------------------------------------------
+> >> +# Devicetree files
+> >> +
+> >> +ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/boot/dts/),)
+> >> +dtstree := arch/$(SRCARCH)/boot/dts
+> >> +endif
+> >> +
+> >> +ifdef CONFIG_OF_EARLY_FLATTREE
+> >
+> > This can be true when dtstree is unset. So this line should be this
+> > instead to fix the 0-day reported error:
+> >
+> > ifneq ($(dtstree),)
+> >
+> >> +
+> >> +%.dtb : scripts_dtc
+> >> +       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
+> >> +
+> >> +PHONY += dtbs dtbs_install
+> >> +dtbs: scripts_dtc
+> >> +       $(Q)$(MAKE) $(build)=$(dtstree)
+> >> +
+> >> +dtbs_install: dtbs
+> >> +       $(Q)$(MAKE) $(dtbinst)=$(dtstree)
+> >> +
+> >> +all: dtbs
+> >> +
+> >> +endif
+>
+>
+> Ah, right.
+> Even x86 can enable OF and OF_UNITTEST.
+>
+>
+>
+> Another solution might be,
+> guard it by 'depends on ARCH_SUPPORTS_OF'.
+>
+>
+>
+> This is actually what ACPI does.
+>
+> menuconfig ACPI
+>         bool "ACPI (Advanced Configuration and Power Interface) Support"
+>         depends on ARCH_SUPPORTS_ACPI
+>          ...
 
-Like I said, please send the error messages; we're not going to guess.
+ACPI is a real platform feature, as it depends on firmware.
 
-Ben.
+CONFIG_OF can be enabled, and DT overlays can be loaded, on any platform,
+even if it has ACPI ;-)
 
---=20
-Ben Hutchings
-Computers are not intelligent.	They only think they are.
+Gr{oetje,eeting}s,
 
+                        Geert
 
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
---=-EuXEQRX8XeOMxJgw3rwr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAluahusACgkQ57/I7JWG
-EQk0EQ/+OCis/y+/5+30XmLUwlPKs/KjCNXUukH62UdlowoVJEo5XhGvGoXUBSh0
-guieQGa9adyMyI9vEgAY6QrtxduvCBuAx2CZmTi6lFFCnBP1zKyXOQ1TI07lPz/1
-mEZBDFTC52E8tWcC00jWO9/1IKrZ8tMVhDRRYqq0xvXQFNirL2eXcfv6hPm+9hsf
-bDeGmEEHZAeLNdJCXN02KsOnyAqLRiXqPQaEWvrlBwBb6+L8iuqOccwtC5l6ShGD
-JBMxXAmWg21MREnPkOXwMIMoJ1nzDdhvg8Xfv/O9d+u49nRXCCX8KFOtfCIR50Jy
-0sDXAKOycxw3Yojc00D2cvT5NMz0jEt9lQ9jvRfMpcIHWAo1Z7ii61e9beLXhLXT
-pYHtCqEeHsjzI5hwvu8B0SElyxWLcPXgBfESSvHHBfGIsEfXIGMnHlqcqEUdKAtK
-uzww5vB+/ZYYBkQjjER/PmX5Gcshm2LOS1GXB7sYD+Pv298BcbUCZkKGEdjWCsCg
-qXyAUysS0g5KBKPDFww1a6pE+qjxqglSa/rRnzAszS1BdVGBS5tATcAsWI3dQerN
-/UBhruBFXtvu+mZ7eveYjndo2n81zEmoDBKzSPUTfOX0QzQGbRyMk8kxAMctydvq
-+SAny8x2E6b1G99hYWxBMyo3XOQkUroHlbDyimts8OgI+RR8AK4=
-=LS6u
------END PGP SIGNATURE-----
-
---=-EuXEQRX8XeOMxJgw3rwr--
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
