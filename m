@@ -1,65 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:24653 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726308AbeIMN3R (ORCPT
+Received: from mail-it0-f65.google.com ([209.85.214.65]:38926 "EHLO
+        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726839AbeIMNps (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 13 Sep 2018 09:29:17 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: remove unneeded link_multi_deps
-Date: Thu, 13 Sep 2018 17:20:41 +0900
-Message-Id: <1536826841-4458-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 13 Sep 2018 09:45:48 -0400
+Received: by mail-it0-f65.google.com with SMTP id h1-v6so6706771itj.4
+        for <linux-kbuild@vger.kernel.org>; Thu, 13 Sep 2018 01:37:21 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAG48ez2oT1dtDcH8SfPLnoX5F8d6Pd=M-eOKHhYJ83EuL_j6wQ@mail.gmail.com>
+References: <cover.1535462971.git.andreyknvl@google.com> <f5e73b5ead3355932ad8b5fc96b141c3f5b8c16c.1535462971.git.andreyknvl@google.com>
+ <CACT4Y+aEwYiaVN--RH_0VBh0wbCcrf-Ndz+_eOaBNi6nKxrfQA@mail.gmail.com> <CAG48ez2oT1dtDcH8SfPLnoX5F8d6Pd=M-eOKHhYJ83EuL_j6wQ@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Thu, 13 Sep 2018 10:37:00 +0200
+Message-ID: <CACT4Y+avu_68GoQcc32zpcOpAu-Pw7m71VmuKtEkOw=vKgxi7w@mail.gmail.com>
+Subject: Re: [PATCH v6 15/18] khwasan, arm64: add brk handler for inline instrumentation
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Jann Horn <jannh@google.com>
+Cc: Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W. Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, kernel list <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux-MM <linux-mm@kvack.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-Since commit c8589d1e9e01 ("kbuild: handle multi-objs dependency
-appropriately"), $^ really represents all the prerequisite of the
-composite object being built.
+On Wed, Sep 12, 2018 at 7:39 PM, Jann Horn <jannh@google.com> wrote:
+> On Wed, Sep 12, 2018 at 7:16 PM Dmitry Vyukov <dvyukov@google.com> wrote:
+>> On Wed, Aug 29, 2018 at 1:35 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
+> [...]
+>> > +static int khwasan_handler(struct pt_regs *regs, unsigned int esr)
+>> > +{
+>> > +       bool recover = esr & KHWASAN_ESR_RECOVER;
+>> > +       bool write = esr & KHWASAN_ESR_WRITE;
+>> > +       size_t size = KHWASAN_ESR_SIZE(esr);
+>> > +       u64 addr = regs->regs[0];
+>> > +       u64 pc = regs->pc;
+>> > +
+>> > +       if (user_mode(regs))
+>> > +               return DBG_HOOK_ERROR;
+>> > +
+>> > +       kasan_report(addr, size, write, pc);
+>> > +
+>> > +       /*
+>> > +        * The instrumentation allows to control whether we can proceed after
+>> > +        * a crash was detected. This is done by passing the -recover flag to
+>> > +        * the compiler. Disabling recovery allows to generate more compact
+>> > +        * code.
+>> > +        *
+>> > +        * Unfortunately disabling recovery doesn't work for the kernel right
+>> > +        * now. KHWASAN reporting is disabled in some contexts (for example when
+>> > +        * the allocator accesses slab object metadata; same is true for KASAN;
+>> > +        * this is controlled by current->kasan_depth). All these accesses are
+>> > +        * detected by the tool, even though the reports for them are not
+>> > +        * printed.
+>> > +        *
+>> > +        * This is something that might be fixed at some point in the future.
+>> > +        */
+>> > +       if (!recover)
+>> > +               die("Oops - KHWASAN", regs, 0);
+>>
+>> Why die and not panic? Die seems to be much less used function, and it
+>> calls panic anyway, and we call panic in kasan_report if panic_on_warn
+>> is set.
+>
+> die() is vaguely equivalent to BUG(); die() and BUG() normally only
+> terminate the current process, which may or may not leave the system
+> somewhat usable, while panic() always brings down the whole system.
+> AFAIK panic() shouldn't be used unless you're in some very low-level
+> code where you know that trying to just kill the current process can't
+> work and the entire system is broken beyond repair.
+>
+> If KASAN traps on some random memory access, there's a good chance
+> that just killing the current process will allow at least parts of the
+> system to continue. I'm not sure whether BUG() or die() is more
+> appropriate here, but I think it definitely should not be a panic().
 
-Hence, $(filter-out FORCE,$^) contains all the objects to link
-together, which is much simpler than link_multi_deps calculation.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- scripts/Makefile.build | 20 ++------------------
- 1 file changed, 2 insertions(+), 18 deletions(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index cb03774..d7fa203 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -485,28 +485,12 @@ targets += $(obj)/lib-ksyms.o
- 
- endif
- 
--#
--# Rule to link composite objects
--#
--#  Composite objects are specified in kbuild makefile as follows:
--#    <composite-object>-objs := <list of .o files>
--#  or
--#    <composite-object>-y    := <list of .o files>
--#  or
--#    <composite-object>-m    := <list of .o files>
--#  The -m syntax only works if <composite object> is a module
--link_multi_deps =                     \
--$(filter $(addprefix $(obj)/,         \
--$($(subst $(obj)/,,$(@:.o=-objs)))    \
--$($(subst $(obj)/,,$(@:.o=-y)))       \
--$($(subst $(obj)/,,$(@:.o=-m)))), $^)
--
- quiet_cmd_link_multi-m = LD [M]  $@
--cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
-+cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(filter-out FORCE,$^) $(cmd_secanalysis)
- 
- $(multi-used-m): FORCE
- 	$(call if_changed,link_multi-m)
--	@{ echo $(@:.o=.ko); echo $(link_multi_deps); \
-+	@{ echo $(@:.o=.ko); echo $(filter-out FORCE,$^); \
- 	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
- $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
- 
--- 
-2.7.4
+Nick, do you know if die() will be enough to catch problems on Android
+phones? panic_on_warn would turn this into panic, but I guess one does
+not want panic_on_warn on a canary phone.
