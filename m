@@ -1,111 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua1-f67.google.com ([209.85.222.67]:44246 "EHLO
-        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727730AbeIMVCO (ORCPT
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:40682 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727628AbeIMXU2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 13 Sep 2018 17:02:14 -0400
+        Thu, 13 Sep 2018 19:20:28 -0400
+Received: by mail-pf1-f195.google.com with SMTP id s13-v6so3028361pfi.7
+        for <linux-kbuild@vger.kernel.org>; Thu, 13 Sep 2018 11:09:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <20180910150403.19476-1-robh@kernel.org> <20180910150403.19476-7-robh@kernel.org>
- <CAL_Jsq+=VbdcVLiwXbOA5d+R2YY6=2Pw2bQpci-jj-JvereD1A@mail.gmail.com> <CAK7LNAQFqhWw+LwDoypGG=OP6tH4qf2tT=LvtchK2GoiNyzDXg@mail.gmail.com>
-In-Reply-To: <CAK7LNAQFqhWw+LwDoypGG=OP6tH4qf2tT=LvtchK2GoiNyzDXg@mail.gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 13 Sep 2018 17:51:55 +0200
-Message-ID: <CAMuHMdWEnoh97_jiDWMq=ke4PrhSFbToYnx91CPLBuq3mOGzoQ@mail.gmail.com>
-Subject: Re: [PATCH v3 6/9] kbuild: consolidate Devicetree dtb build rules
+References: <cover.1535462971.git.andreyknvl@google.com> <f5e73b5ead3355932ad8b5fc96b141c3f5b8c16c.1535462971.git.andreyknvl@google.com>
+ <CACT4Y+aEwYiaVN--RH_0VBh0wbCcrf-Ndz+_eOaBNi6nKxrfQA@mail.gmail.com>
+ <CAG48ez2oT1dtDcH8SfPLnoX5F8d6Pd=M-eOKHhYJ83EuL_j6wQ@mail.gmail.com> <CACT4Y+avu_68GoQcc32zpcOpAu-Pw7m71VmuKtEkOw=vKgxi7w@mail.gmail.com>
+In-Reply-To: <CACT4Y+avu_68GoQcc32zpcOpAu-Pw7m71VmuKtEkOw=vKgxi7w@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Thu, 13 Sep 2018 11:09:39 -0700
+Message-ID: <CAKwvOdns=3bktpXLEpo6o0J8OQPym6YE+x6Dvs_kYSBsuJKtSw@mail.gmail.com>
+Subject: Re: [PATCH v6 15/18] khwasan, arm64: add brk handler for inline instrumentation
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Rob Herring <robh@kernel.org>, "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, nios2-dev@lists.rocketboards.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-xtensa@linux-xtensa.org, Will Deacon <will.deacon@arm.com>, Paul Burton <paul.burton@mips.com>, ley.foon.tan@intel.com
+To: Dmitry Vyukov <dvyukov@google.com>
+Cc: Jann Horn <jannh@google.com>, Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg KH <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-Hi Yamada-san,
-
-On Wed, Sep 12, 2018 at 3:02 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2018-09-12 0:40 GMT+09:00 Rob Herring <robh@kernel.org>:
-> > On Mon, Sep 10, 2018 at 10:04 AM Rob Herring <robh@kernel.org> wrote:
-> >> There is nothing arch specific about building dtb files other than their
-> >> location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
-> >> The dependencies and supported targets are all slightly different.
-> >> Also, a cross-compiler for each arch is needed, but really the host
-> >> compiler preprocessor is perfectly fine for building dtbs. Move the
-> >> build rules to a common location and remove the arch specific ones. This
-> >> is done in a single step to avoid warnings about overriding rules.
-> >>
-> >> The build dependencies had been a mixture of 'scripts' and/or 'prepare'.
-> >> These pull in several dependencies some of which need a target compiler
-> >> (specifically devicetable-offsets.h) and aren't needed to build dtbs.
-> >> All that is really needed is dtc, so adjust the dependencies to only be
-> >> dtc.
-> >>
-> >> This change enables support 'dtbs_install' on some arches which were
-> >> missing the target.
-> >
+On Thu, Sep 13, 2018 at 1:37 AM Dmitry Vyukov <dvyukov@google.com> wrote:
+>
+> On Wed, Sep 12, 2018 at 7:39 PM, Jann Horn <jannh@google.com> wrote:
+> > On Wed, Sep 12, 2018 at 7:16 PM Dmitry Vyukov <dvyukov@google.com> wrote:
+> >> On Wed, Aug 29, 2018 at 1:35 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
 > > [...]
-> >
-> >> @@ -1215,6 +1215,33 @@ kselftest-merge:
-> >>                 $(srctree)/tools/testing/selftests/*/config
-> >>         +$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
+> >> > +static int khwasan_handler(struct pt_regs *regs, unsigned int esr)
+> >> > +{
+> >> > +       bool recover = esr & KHWASAN_ESR_RECOVER;
+> >> > +       bool write = esr & KHWASAN_ESR_WRITE;
+> >> > +       size_t size = KHWASAN_ESR_SIZE(esr);
+> >> > +       u64 addr = regs->regs[0];
+> >> > +       u64 pc = regs->pc;
+> >> > +
+> >> > +       if (user_mode(regs))
+> >> > +               return DBG_HOOK_ERROR;
+> >> > +
+> >> > +       kasan_report(addr, size, write, pc);
+> >> > +
+> >> > +       /*
+> >> > +        * The instrumentation allows to control whether we can proceed after
+> >> > +        * a crash was detected. This is done by passing the -recover flag to
+> >> > +        * the compiler. Disabling recovery allows to generate more compact
+> >> > +        * code.
+> >> > +        *
+> >> > +        * Unfortunately disabling recovery doesn't work for the kernel right
+> >> > +        * now. KHWASAN reporting is disabled in some contexts (for example when
+> >> > +        * the allocator accesses slab object metadata; same is true for KASAN;
+> >> > +        * this is controlled by current->kasan_depth). All these accesses are
+> >> > +        * detected by the tool, even though the reports for them are not
+> >> > +        * printed.
+> >> > +        *
+> >> > +        * This is something that might be fixed at some point in the future.
+> >> > +        */
+> >> > +       if (!recover)
+> >> > +               die("Oops - KHWASAN", regs, 0);
 > >>
-> >> +# ---------------------------------------------------------------------------
-> >> +# Devicetree files
-> >> +
-> >> +ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/boot/dts/),)
-> >> +dtstree := arch/$(SRCARCH)/boot/dts
-> >> +endif
-> >> +
-> >> +ifdef CONFIG_OF_EARLY_FLATTREE
+> >> Why die and not panic? Die seems to be much less used function, and it
+> >> calls panic anyway, and we call panic in kasan_report if panic_on_warn
+> >> is set.
 > >
-> > This can be true when dtstree is unset. So this line should be this
-> > instead to fix the 0-day reported error:
+> > die() is vaguely equivalent to BUG(); die() and BUG() normally only
+> > terminate the current process, which may or may not leave the system
+> > somewhat usable, while panic() always brings down the whole system.
+> > AFAIK panic() shouldn't be used unless you're in some very low-level
+> > code where you know that trying to just kill the current process can't
+> > work and the entire system is broken beyond repair.
 > >
-> > ifneq ($(dtstree),)
-> >
-> >> +
-> >> +%.dtb : scripts_dtc
-> >> +       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
-> >> +
-> >> +PHONY += dtbs dtbs_install
-> >> +dtbs: scripts_dtc
-> >> +       $(Q)$(MAKE) $(build)=$(dtstree)
-> >> +
-> >> +dtbs_install: dtbs
-> >> +       $(Q)$(MAKE) $(dtbinst)=$(dtstree)
-> >> +
-> >> +all: dtbs
-> >> +
-> >> +endif
+> > If KASAN traps on some random memory access, there's a good chance
+> > that just killing the current process will allow at least parts of the
+> > system to continue. I'm not sure whether BUG() or die() is more
+> > appropriate here, but I think it definitely should not be a panic().
 >
 >
-> Ah, right.
-> Even x86 can enable OF and OF_UNITTEST.
->
->
->
-> Another solution might be,
-> guard it by 'depends on ARCH_SUPPORTS_OF'.
->
->
->
-> This is actually what ACPI does.
->
-> menuconfig ACPI
->         bool "ACPI (Advanced Configuration and Power Interface) Support"
->         depends on ARCH_SUPPORTS_ACPI
->          ...
+> Nick, do you know if die() will be enough to catch problems on Android
+> phones? panic_on_warn would turn this into panic, but I guess one does
+> not want panic_on_warn on a canary phone.
 
-ACPI is a real platform feature, as it depends on firmware.
+die() has arch specific implementations, so looking at:
 
-CONFIG_OF can be enabled, and DT overlays can be loaded, on any platform,
-even if it has ACPI ;-)
+arch/arm64/kernel/traps.c:196#die
 
-Gr{oetje,eeting}s,
+it looks like panic is invoked if in_interrupt() or panic_on_oops(),
+which is a configure option.  So maybe the config for KHWASAN should
+also enable that? Otherwise seems easy to forget.  But maybe that
+should remain configurable separately?
 
-                        Geert
+Looking at the kernel configs for the Pixel 2, it does seem like
+CONFIG_PANIC_ON_OOPS=y is already enabled.
+https://android.googlesource.com/kernel/msm/+/android-msm-wahoo-4.4-pie/arch/arm64/configs/wahoo_defconfig#746
 
+Specifically to catch problems on Android, our internal debug builds
+can report on panics, but not oops, IIUC.
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Thanks,
+~Nick Desaulniers
