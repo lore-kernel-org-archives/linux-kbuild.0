@@ -1,97 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:36889 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727383AbeINAeb (ORCPT
+Received: from mail-io1-f66.google.com ([209.85.166.66]:45073 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726898AbeINKYQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 13 Sep 2018 20:34:31 -0400
-Message-ID: <455ac03b7e23c8361b197a62a8f4dcbfde2d1452.camel@decadent.org.uk>
-Subject: Re: 4.19-rc3: bindeb-pkg target is failing on ppc64
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Thu, 13 Sep 2018 20:23:26 +0100
-In-Reply-To: <CALjTZvZFT5Ku+e8CD6mQv5Pbo5TU9cWQfmEnxJ_atRrfaoM94g@mail.gmail.com>
-References: <CALjTZvb4hOY_Hew-jEUtpyhkGbmh4Tgb0doPC6EaGtz_rMGt7A@mail.gmail.com>
-         <eb1fe15c9ced6950d6a38c901278b8196ae4938d.camel@decadent.org.uk>
-         <CALjTZvYcKOycB=XeF-Eqtmq3ADh2be+gfWGiw0jbSgEUo6q8Dw@mail.gmail.com>
-         <0dbcdd4d81ed965915ccf2471dd4d5a3d025c93b.camel@decadent.org.uk>
-         <CALjTZvZFT5Ku+e8CD6mQv5Pbo5TU9cWQfmEnxJ_atRrfaoM94g@mail.gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-DMIUeLyXeFMGsNn3e7S5"
-Mime-Version: 1.0
+        Fri, 14 Sep 2018 06:24:16 -0400
+Received: by mail-io1-f66.google.com with SMTP id e12-v6so5010172iok.12
+        for <linux-kbuild@vger.kernel.org>; Thu, 13 Sep 2018 22:11:30 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAKwvOdns=3bktpXLEpo6o0J8OQPym6YE+x6Dvs_kYSBsuJKtSw@mail.gmail.com>
+References: <cover.1535462971.git.andreyknvl@google.com> <f5e73b5ead3355932ad8b5fc96b141c3f5b8c16c.1535462971.git.andreyknvl@google.com>
+ <CACT4Y+aEwYiaVN--RH_0VBh0wbCcrf-Ndz+_eOaBNi6nKxrfQA@mail.gmail.com>
+ <CAG48ez2oT1dtDcH8SfPLnoX5F8d6Pd=M-eOKHhYJ83EuL_j6wQ@mail.gmail.com>
+ <CACT4Y+avu_68GoQcc32zpcOpAu-Pw7m71VmuKtEkOw=vKgxi7w@mail.gmail.com> <CAKwvOdns=3bktpXLEpo6o0J8OQPym6YE+x6Dvs_kYSBsuJKtSw@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Fri, 14 Sep 2018 07:11:09 +0200
+Message-ID: <CACT4Y+ahqiUrcfqfLjy1CKsG=NYMLZNOtQW6ofRYXh6ZHjpkrw@mail.gmail.com>
+Subject: Re: [PATCH v6 15/18] khwasan, arm64: add brk handler for inline instrumentation
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rui Salvaterra <rsalvaterra@gmail.com>
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Jann Horn <jannh@google.com>, Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg KH <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
+On Thu, Sep 13, 2018 at 8:09 PM, 'Nick Desaulniers' via kasan-dev
+<kasan-dev@googlegroups.com> wrote:
+> On Thu, Sep 13, 2018 at 1:37 AM Dmitry Vyukov <dvyukov@google.com> wrote:
+>>
+>> On Wed, Sep 12, 2018 at 7:39 PM, Jann Horn <jannh@google.com> wrote:
+>> > On Wed, Sep 12, 2018 at 7:16 PM Dmitry Vyukov <dvyukov@google.com> wrote:
+>> >> On Wed, Aug 29, 2018 at 1:35 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
+>> > [...]
+>> >> > +static int khwasan_handler(struct pt_regs *regs, unsigned int esr)
+>> >> > +{
+>> >> > +       bool recover = esr & KHWASAN_ESR_RECOVER;
+>> >> > +       bool write = esr & KHWASAN_ESR_WRITE;
+>> >> > +       size_t size = KHWASAN_ESR_SIZE(esr);
+>> >> > +       u64 addr = regs->regs[0];
+>> >> > +       u64 pc = regs->pc;
+>> >> > +
+>> >> > +       if (user_mode(regs))
+>> >> > +               return DBG_HOOK_ERROR;
+>> >> > +
+>> >> > +       kasan_report(addr, size, write, pc);
+>> >> > +
+>> >> > +       /*
+>> >> > +        * The instrumentation allows to control whether we can proceed after
+>> >> > +        * a crash was detected. This is done by passing the -recover flag to
+>> >> > +        * the compiler. Disabling recovery allows to generate more compact
+>> >> > +        * code.
+>> >> > +        *
+>> >> > +        * Unfortunately disabling recovery doesn't work for the kernel right
+>> >> > +        * now. KHWASAN reporting is disabled in some contexts (for example when
+>> >> > +        * the allocator accesses slab object metadata; same is true for KASAN;
+>> >> > +        * this is controlled by current->kasan_depth). All these accesses are
+>> >> > +        * detected by the tool, even though the reports for them are not
+>> >> > +        * printed.
+>> >> > +        *
+>> >> > +        * This is something that might be fixed at some point in the future.
+>> >> > +        */
+>> >> > +       if (!recover)
+>> >> > +               die("Oops - KHWASAN", regs, 0);
+>> >>
+>> >> Why die and not panic? Die seems to be much less used function, and it
+>> >> calls panic anyway, and we call panic in kasan_report if panic_on_warn
+>> >> is set.
+>> >
+>> > die() is vaguely equivalent to BUG(); die() and BUG() normally only
+>> > terminate the current process, which may or may not leave the system
+>> > somewhat usable, while panic() always brings down the whole system.
+>> > AFAIK panic() shouldn't be used unless you're in some very low-level
+>> > code where you know that trying to just kill the current process can't
+>> > work and the entire system is broken beyond repair.
+>> >
+>> > If KASAN traps on some random memory access, there's a good chance
+>> > that just killing the current process will allow at least parts of the
+>> > system to continue. I'm not sure whether BUG() or die() is more
+>> > appropriate here, but I think it definitely should not be a panic().
+>>
+>>
+>> Nick, do you know if die() will be enough to catch problems on Android
+>> phones? panic_on_warn would turn this into panic, but I guess one does
+>> not want panic_on_warn on a canary phone.
+>
+> die() has arch specific implementations, so looking at:
+>
+> arch/arm64/kernel/traps.c:196#die
+>
+> it looks like panic is invoked if in_interrupt() or panic_on_oops(),
+> which is a configure option.  So maybe the config for KHWASAN should
+> also enable that? Otherwise seems easy to forget.  But maybe that
+> should remain configurable separately?
+>
+> Looking at the kernel configs for the Pixel 2, it does seem like
+> CONFIG_PANIC_ON_OOPS=y is already enabled.
+> https://android.googlesource.com/kernel/msm/+/android-msm-wahoo-4.4-pie/arch/arm64/configs/wahoo_defconfig#746
 
---=-DMIUeLyXeFMGsNn3e7S5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Then I think we are good here.
 
-On Thu, 2018-09-13 at 19:32 +0100, Rui Salvaterra wrote:
-> On Thu, 13 Sep 2018 at 16:49, Ben Hutchings <ben@decadent.org.uk> wrote:
-> >=20
-> > Like I said, please send the error messages; we're not going to guess.
-> >=20
-> > Ben.
-> >=20
-> > --
-> > Ben Hutchings
-> > Computers are not intelligent.  They only think they are.
->=20
-> I'm an idiot. Turns out it's something completely unrelated. Here's
-> the relevant part of the build failure:
->=20
-> [snip]
->=20
-> In file included from arch/powerpc/boot/../../../lib/decompress_unxz.c:23=
-3,
->                  from arch/powerpc/boot/decompress.c:42:
-> arch/powerpc/boot/../../../lib/xz/xz_crc32.c:18:10: fatal error:
-> linux/crc32poly.h: No such file or directory
->  #include <linux/crc32poly.h>
->           ^~~~~~~~~~~~~~~~~~~
-> compilation terminated.
-> make[4]: *** [arch/powerpc/boot/Makefile:217:
-> arch/powerpc/boot/decompress.o] Error 1
-> make[3]: *** [arch/powerpc/Makefile:288: zImage] Error 2
->=20
-> [snip]
->=20
-> It's the xz kernel compression option which is failing, gzip builds
-> fine (but it's still pointless, powerpc kernels seem to be always
-> installed uncompressed). Broken .config attached, if relevant.
->=20
-> Sorry for the misdirection.
-
-Oh right, I totally forgot about that breakage.  This is fixed by <
-https://patchwork.ozlabs.org/patch/963258/>.
-
-Ben.
-
---=20
-Ben Hutchings
-Computers are not intelligent.	They only think they are.
-
-
---=-DMIUeLyXeFMGsNn3e7S5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAluauS4ACgkQ57/I7JWG
-EQlnSA//edXE/okED4iMMMhvZ5fLBd5USlSZE5s9QXYTswfyIp4WyzD62F+78cAv
-M9IlP4tlPmO4ZUlXf+oAFLpidU+Q39heF6egkdYJ1dAQqPdkm6T3tPshXeqPWQBS
-Psvp1t4jLp16JoHeQFBRZAVvbZFCAVVZ5VbmMItQ+pozAZ4hZMM+d5Czn6CZcwML
-opXcvbeo0y8NaCdLb7DBjbEMOy0B3NbhxBgxKoiRCeQKkLdHtRsnUkHVzrjiIV2k
-vwYVDOxfoG6yXhQmaGASWPtWVgZU60foBmjBXEerpdo4HicjuOzN9EWNCwrKMPeI
-m7z38yYJZDNd5NxMNi3ik1awnZROPmfWKOLL1XbGQztt+kALL1upwJrKNdOgh7+G
-dFk0Vjq+6FuYEADuLO79SPHLu+KVSXynvpAYKIO2WVQvFoh9ufURRhXCz4xhlLol
-nLuHaUrMrkY1Y8NsLkpC2W3fXwO1u3o+HbDD7++I+jdeezWRgxzuOHHpZ6sGEqBV
-Y4LQt8FA3VFcGQiGj2va+n3tntunJL2bT+1smgFbthFUDJ5ht5M8DKoUkQZofUX6
-E1uO4Bey85gpaAUgLXqm7TeBJ9pnFPdRzYbir+dx1v35Cm0M3LZHHFnSBZ/M370T
-pYmsdJVNgn5hPYxbwAT4hLeqWLIexaPqGK7TcTtBy+QFfrquNoo=
-=FaQL
------END PGP SIGNATURE-----
-
---=-DMIUeLyXeFMGsNn3e7S5--
+> Specifically to catch problems on Android, our internal debug builds
+> can report on panics, but not oops, IIUC.
