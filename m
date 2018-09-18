@@ -1,53 +1,149 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f66.google.com ([209.85.214.66]:36736 "EHLO
-        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730234AbeISAQv (ORCPT
+Received: from ex13-edg-ou-001.vmware.com ([208.91.0.189]:56760 "EHLO
+        EX13-EDG-OU-001.vmware.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730295AbeISDFE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Sep 2018 20:16:51 -0400
-Received: by mail-it0-f66.google.com with SMTP id u13-v6so4392868iti.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 18 Sep 2018 11:42:58 -0700 (PDT)
+        Tue, 18 Sep 2018 23:05:04 -0400
+From: Nadav Amit <namit@vmware.com>
+Subject: [PATCH v8 02/10] Makefile: Prepare for using macros for inline asm
+Date: Tue, 18 Sep 2018 14:28:39 -0700
+Message-ID: <20180918212847.199085-3-namit@vmware.com>
+In-Reply-To: <20180918212847.199085-1-namit@vmware.com>
+References: <20180918212847.199085-1-namit@vmware.com>
 MIME-Version: 1.0
-In-Reply-To: <CACT4Y+a0A1n+FjbiQSEh4UMUPkq4KnqEOEXkfo-X+EwsVFZxMg@mail.gmail.com>
-References: <cover.1535462971.git.andreyknvl@google.com> <1a3b3030b6ee01931b397583b69f3af94e2a2308.1535462971.git.andreyknvl@google.com>
- <CACT4Y+a0A1n+FjbiQSEh4UMUPkq4KnqEOEXkfo-X+EwsVFZxMg@mail.gmail.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Tue, 18 Sep 2018 20:42:56 +0200
-Message-ID: <CAAeHK+wDhpX_E7cL8D4-BnM4WCT_Bb2Gp6wfqk7+P-4XAoiMOg@mail.gmail.com>
-Subject: Re: [PATCH v6 17/18] khwasan: update kasan documentation
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dmitry Vyukov <dvyukov@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux-MM <linux-mm@kvack.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: Ingo Molnar <mingo@redhat.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, Nadav Amit <namit@vmware.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
 
-On Wed, Sep 12, 2018 at 8:39 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
-> On Wed, Aug 29, 2018 at 1:35 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
->> This patch updates KASAN documentation to reflect the addition of KHWASAN.
+Using macros for inline assembly improves both readability and
+compilation decisions that are distorted by big assembly blocks that use
+alternative sections. Compile macros.S and use it to assemble all C
+files. Currently, only x86 will use it.
 
->> -Currently KASAN is supported only for the x86_64 and arm64 architectures.
->> +KASAN uses compile-time instrumentation to insert validity checks before every
->> +memory access, and therefore requires a compiler version that supports that.
->> +For classic KASAN you need GCC version 4.9.2 or later. GCC 5.0 or later is
->> +required for detection of out-of-bounds accesses on stack and global variables.
->> +KHWASAN in turns is only supported in clang and requires revision 330044 or
->
-> in turn?
->
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: x86@kernel.org
+Cc: linux-kbuild@vger.kernel.org
+Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Signed-off-by: Nadav Amit <namit@vmware.com>
+---
+ Makefile                 |  9 +++++++--
+ arch/x86/Makefile        | 11 +++++++++--
+ arch/x86/kernel/macros.S |  7 +++++++
+ scripts/Kbuild.include   |  4 +++-
+ scripts/mod/Makefile     |  2 ++
+ 5 files changed, 28 insertions(+), 5 deletions(-)
+ create mode 100644 arch/x86/kernel/macros.S
 
->> -and choose between CONFIG_KASAN_OUTLINE and CONFIG_KASAN_INLINE. Outline and
->> -inline are compiler instrumentation types. The former produces smaller binary
->> -the latter is 1.1 - 2 times faster. Inline instrumentation requires a GCC
->> +and choose between CONFIG_KASAN_GENERIC (to enable classic KASAN) and
->> +CONFIG_KASAN_HW (to enabled KHWASAN). You also need to choose choose between
->
-> to enable
->
-
->> +     print_address_description+0x73/0x280 mm/kasan/report.c:254
->
->
-> KASAN does not print line numbers per se.
-> I think we need to show unmodified output to not confuse readers
-> (probably remove the useless ? lines).
-
-Will fix all in v7.
+diff --git a/Makefile b/Makefile
+index f03a1e062503..af5dba613533 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1071,7 +1071,7 @@ scripts: scripts_basic asm-generic gcc-plugins $(autoksyms_h)
+ # version.h and scripts_basic is processed / created.
+ 
+ # Listed in dependency order
+-PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
++PHONY += prepare archprepare macroprepare prepare0 prepare1 prepare2 prepare3
+ 
+ # prepare3 is used to check if we are building in a separate output directory,
+ # and if so do:
+@@ -1094,7 +1094,9 @@ prepare2: prepare3 outputmakefile asm-generic
+ prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h
+ 	$(cmd_crmodverdir)
+ 
+-archprepare: archheaders archscripts prepare1 scripts_basic
++macroprepare: prepare1 archmacros
++
++archprepare: archheaders archscripts macroprepare scripts_basic
+ 
+ prepare0: archprepare gcc-plugins
+ 	$(Q)$(MAKE) $(build)=.
+@@ -1162,6 +1164,9 @@ archheaders:
+ PHONY += archscripts
+ archscripts:
+ 
++PHONY += archmacros
++archmacros:
++
+ PHONY += __headers
+ __headers: $(version_h) scripts_basic uapi-asm-generic archheaders archscripts
+ 	$(Q)$(MAKE) $(build)=scripts build_unifdef
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 8f6e7eb8ae9f..944fa3bc9376 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -214,8 +214,8 @@ ifdef CONFIG_X86_64
+ KBUILD_LDFLAGS += $(call ld-option, -z max-page-size=0x200000)
+ endif
+ 
+-# Speed up the build
+-KBUILD_CFLAGS += -pipe
++# We cannot use -pipe flag since we give an additional .s file to the compiler
++#KBUILD_CFLAGS += -pipe
+ # Workaround for a gcc prelease that unfortunately was shipped in a suse release
+ KBUILD_CFLAGS += -Wno-sign-compare
+ #
+@@ -237,6 +237,13 @@ archscripts: scripts_basic
+ archheaders:
+ 	$(Q)$(MAKE) $(build)=arch/x86/entry/syscalls all
+ 
++archmacros:
++	$(Q)$(MAKE) $(build)=arch/x86/kernel arch/x86/kernel/macros.s
++
++ASM_MACRO_FLAGS = -Wa,arch/x86/kernel/macros.s
++export ASM_MACRO_FLAGS
++KBUILD_CFLAGS += $(ASM_MACRO_FLAGS)
++
+ ###
+ # Kernel objects
+ 
+diff --git a/arch/x86/kernel/macros.S b/arch/x86/kernel/macros.S
+new file mode 100644
+index 000000000000..cfc1c7d1a6eb
+--- /dev/null
++++ b/arch/x86/kernel/macros.S
+@@ -0,0 +1,7 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++/*
++ * This file includes headers whose assembly part includes macros which are
++ * commonly used. The macros are precompiled into assmebly file which is later
++ * assembled together with each compiled file.
++ */
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index ce53639a864a..8aeb60eb6ee3 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -115,7 +115,9 @@ __cc-option = $(call try-run,\
+ 
+ # Do not attempt to build with gcc plugins during cc-option tests.
+ # (And this uses delayed resolution so the flags will be up to date.)
+-CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
++# In addition, do not include the asm macros which are built later.
++CC_OPTION_FILTERED = $(GCC_PLUGINS_CFLAGS) $(ASM_MACRO_FLAGS)
++CC_OPTION_CFLAGS = $(filter-out $(CC_OPTION_FILTERED),$(KBUILD_CFLAGS))
+ 
+ # cc-option
+ # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
+diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
+index 42c5d50f2bcc..a5b4af47987a 100644
+--- a/scripts/mod/Makefile
++++ b/scripts/mod/Makefile
+@@ -4,6 +4,8 @@ OBJECT_FILES_NON_STANDARD := y
+ hostprogs-y	:= modpost mk_elfconfig
+ always		:= $(hostprogs-y) empty.o
+ 
++CFLAGS_REMOVE_empty.o := $(ASM_MACRO_FLAGS)
++
+ modpost-objs	:= modpost.o file2alias.o sumversion.o
+ 
+ devicetable-offsets-file := devicetable-offsets.h
+-- 
+2.17.1
