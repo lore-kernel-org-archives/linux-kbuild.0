@@ -1,51 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:30279 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726972AbeISMf7 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Sep 2018 08:35:59 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:63681 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727990AbeISPIa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 19 Sep 2018 11:08:30 -0400
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: How to define some additional KBUILD_CFLAGS after building
+ include/generated/asm-offsets.h ?
+Message-ID: <e1b65467-7497-5db4-aa93-1ad00d12af3f@c-s.fr>
+Date: Tue, 18 Sep 2018 23:41:33 +0000
 MIME-Version: 1.0
-In-Reply-To: <2024081.XhWFmWp6tJ@blindfold>
-References: <1537243113-1710-1-git-send-email-yamada.masahiro@socionext.com> <2024081.XhWFmWp6tJ@blindfold>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 19 Sep 2018 15:58:40 +0900
-Message-ID: <CAK7LNAQrOhJpkUf=zxvwcbf8oWTAhKiWxemweHz8QPT55H+R-g@mail.gmail.com>
-Subject: Re: [PATCH] samples: disable CONFIG_SAMPLES for UML
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Weinberger <richard@nod.at>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jeff Dike <jdike@addtoit.com>, linux-um@lists.infradead.org, David Howells <dhowells@redhat.com>, Bjorn Andersson <bjorn.andersson@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andy Gross <andy.gross@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Segher Boessenkool <segher@kernel.crashing.org>
+Cc: LKML <linux-kernel@vger.kernel.org>
 
-Hi.
+I'm trying to implement TLS based stack protector in the Linux Kernel.
+For that I need to give to GCC the offset at which it will find the 
+canary (register r2 is pointing to the current task struct).
 
-2018-09-18 17:21 GMT+09:00 Richard Weinberger <richard@nod.at>:
-> Am Dienstag, 18. September 2018, 05:58:33 CEST schrieb Masahiro Yamada:
->> Some samples require headers installation, so commit 3fca1700c4c3
->> ("kbuild: make samples really depend on headers_install") added
->> such dependency in the top Makefile.  However, UML fails to build
->> with CONFIG_SAMPLES=y because UML does not support headers_install.
->>
->> Fixes: 3fca1700c4c3 ("kbuild: make samples really depend on headers_install")
->> Reported-by: Kees Cook <keescook@chromium.org>
->> Cc: David Howells <dhowells@redhat.com>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->
-> Is there anything UML can do better?
-> Not sure whether an arch like is supposed to install headers at all,
-> I guess no. :)
+I have been able to do it with the below patch, but it only works when 
+include/generated/asm-offsets.h already exists from the start of the build.
 
-I just thought suppressing CONFIG_SAMPLES was a big hammer.
+Is there a way to evaluate CANARY_OFFSET and add the stack-protector 
+flags to KBUILD_FLAGS only after include/generated/asm-offsets.h is built ?
 
-We could install host-arch headers for UML if we like,
-but I am not sure whether is is sensible...
+Or another way of add -mstack-protector-guard-offset=offsetof(struct 
+task_struct, stack_canary) ?
 
-Wait for comments in case somebody has a better solution.
+diff --git a/arch/powerpc/kernel/asm-offsets.c 
+b/arch/powerpc/kernel/asm-offsets.c
+index 89cf15566c4e..b25483946921 100644
+--- a/arch/powerpc/kernel/asm-offsets.c
++++ b/arch/powerpc/kernel/asm-offsets.c
+@@ -89,6 +89,9 @@ int main(void)
+         DEFINE(THREAD_INFO_GAP, _ALIGN_UP(sizeof(struct thread_info), 16));
+         OFFSET(KSP_LIMIT, thread_struct, ksp_limit);
+  #endif /* CONFIG_PPC64 */
++#ifdef CONFIG_STACKPROTECTOR
++       DEFINE(TSK_STACK_CANARY, offsetof(struct task_struct, 
+stack_canary));
++#endif
+
+  #ifdef CONFIG_LIVEPATCH
+         OFFSET(TI_livepatch_sp, thread_info, livepatch_sp);
+diff --git a/arch/powerpc/kernel/entry_32.S b/arch/powerpc/kernel/entry_32.S
+index e58c3f467db5..051b907b5c02 100644
+[root@pc16082vm linux-powerpc]# git diff
+diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
+index 748e34e81a03..7b5a23a8afe8 100644
+--- a/arch/powerpc/Makefile
++++ b/arch/powerpc/Makefile
+@@ -113,7 +113,8 @@ KBUILD_ARFLAGS      += --target=elf$(BITS)-$(GNUTARGET)
+  endif
+
+  ifdef CONFIG_STACKPROTECTOR
+-KBUILD_CFLAGS  += -mstack-protector-guard=global
++CANARY_OFFSET := $(shell awk '{if ($$2 == "TSK_STACK_CANARY") print 
+$$3;}' include/generated/asm-offsets.h)
++KBUILD_CFLAGS  += -mstack-protector-guard=tls 
+-mstack-protector-guard-reg=r2 
+-mstack-protector-guard-offset=$(CANARY_OFFSET)
+  endif
+
+  LDFLAGS_vmlinux-y := -Bstatic
 
 
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Thanks
+Christophe
