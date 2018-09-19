@@ -1,25 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp217t.alice.it ([82.57.200.120]:37407 "EHLO
-        smtp217t.alice.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726825AbeISLhp (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:30279 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726972AbeISMf7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Sep 2018 07:37:45 -0400
-Message-ID: <5B9BBE5E009691F8@smtp217t.alice.it> (added by postmaster@tim.it)
-Reply-To: <dancha8n@gmail.com>
-From: "Danny Chan" <killer94@alice.it>
-Subject: Hello Friend
-Date: Wed, 19 Sep 2018 13:01:13 +0700
+        Wed, 19 Sep 2018 08:35:59 -0400
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <2024081.XhWFmWp6tJ@blindfold>
+References: <1537243113-1710-1-git-send-email-yamada.masahiro@socionext.com> <2024081.XhWFmWp6tJ@blindfold>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 19 Sep 2018 15:58:40 +0900
+Message-ID: <CAK7LNAQrOhJpkUf=zxvwcbf8oWTAhKiWxemweHz8QPT55H+R-g@mail.gmail.com>
+Subject: Re: [PATCH] samples: disable CONFIG_SAMPLES for UML
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Richard Weinberger <richard@nod.at>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jeff Dike <jdike@addtoit.com>, linux-um@lists.infradead.org, David Howells <dhowells@redhat.com>, Bjorn Andersson <bjorn.andersson@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andy Gross <andy.gross@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Dear,
+Hi.
 
-I am working in financial firm in Asia. I have a business to transfer the sum of $19.000.000.00 of abandon fund in my office.
-If you are,interested in the transaction reply on my email for more details.
+2018-09-18 17:21 GMT+09:00 Richard Weinberger <richard@nod.at>:
+> Am Dienstag, 18. September 2018, 05:58:33 CEST schrieb Masahiro Yamada:
+>> Some samples require headers installation, so commit 3fca1700c4c3
+>> ("kbuild: make samples really depend on headers_install") added
+>> such dependency in the top Makefile.  However, UML fails to build
+>> with CONFIG_SAMPLES=y because UML does not support headers_install.
+>>
+>> Fixes: 3fca1700c4c3 ("kbuild: make samples really depend on headers_install")
+>> Reported-by: Kees Cook <keescook@chromium.org>
+>> Cc: David Howells <dhowells@redhat.com>
+>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>
+> Is there anything UML can do better?
+> Not sure whether an arch like is supposed to install headers at all,
+> I guess no. :)
 
-Best Regards,
-Danny Chan.
+I just thought suppressing CONFIG_SAMPLES was a big hammer.
+
+We could install host-arch headers for UML if we like,
+but I am not sure whether is is sensible...
+
+Wait for comments in case somebody has a better solution.
+
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
