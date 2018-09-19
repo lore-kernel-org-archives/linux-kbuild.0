@@ -1,22 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f51.google.com ([209.85.214.51]:52569 "EHLO
-        mail-it0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732049AbeITAgT (ORCPT
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45299 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387527AbeITAeg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Sep 2018 20:36:19 -0400
-Received: by mail-it0-f51.google.com with SMTP id h3-v6so9785730ita.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 19 Sep 2018 11:57:04 -0700 (PDT)
-MIME-Version: 1.0
+        Wed, 19 Sep 2018 20:34:36 -0400
+Received: by mail-wr1-f65.google.com with SMTP id 20-v6so6862619wrb.12
+        for <linux-kbuild@vger.kernel.org>; Wed, 19 Sep 2018 11:55:20 -0700 (PDT)
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: [PATCH v8 10/20] mm: move obj_to_index to include/linux/slab_def.h
+Date: Wed, 19 Sep 2018 20:54:49 +0200
+Message-Id: <d306ffa81d2416a26d17586e8196367f8e9d6102.1537383101.git.andreyknvl@google.com>
 In-Reply-To: <cover.1537383101.git.andreyknvl@google.com>
 References: <cover.1537383101.git.andreyknvl@google.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Wed, 19 Sep 2018 20:57:03 +0200
-Message-ID: <CAAeHK+xB-4vzQSt-Wznjof7yq-at2PsQNMA9qR0U=H0Uhdan+A@mail.gmail.com>
-Subject: Re: [PATCH v8 00/20] kasan: add software tag-based mode for arm64
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
 Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>
 
-Accidentally marked the series as v8 instead of v7, I hope that is not an issue.
+While with SLUB we can actually preassign tags for caches with contructors
+and store them in pointers in the freelist, SLAB doesn't allow that since
+the freelist is stored as an array of indexes, so there are no pointers to
+store the tags.
+
+Instead we compute the tag twice, once when a slab is created before
+calling the constructor and then again each time when an object is
+allocated with kmalloc. Tag is computed simply by taking the lowest byte of
+the index that corresponds to the object. However in kasan_kmalloc we only
+have access to the objects pointer, so we need a way to find out which
+index this object corresponds to.
+
+This patch moves obj_to_index from slab.c to include/linux/slab_def.h to
+be reused by KASAN.
+
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+---
+ include/linux/slab_def.h | 13 +++++++++++++
+ mm/slab.c                | 13 -------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/include/linux/slab_def.h b/include/linux/slab_def.h
+index 3485c58cfd1c..9a5eafb7145b 100644
+--- a/include/linux/slab_def.h
++++ b/include/linux/slab_def.h
+@@ -104,4 +104,17 @@ static inline void *nearest_obj(struct kmem_cache *cache, struct page *page,
+ 		return object;
+ }
+ 
++/*
++ * We want to avoid an expensive divide : (offset / cache->size)
++ *   Using the fact that size is a constant for a particular cache,
++ *   we can replace (offset / cache->size) by
++ *   reciprocal_divide(offset, cache->reciprocal_buffer_size)
++ */
++static inline unsigned int obj_to_index(const struct kmem_cache *cache,
++					const struct page *page, void *obj)
++{
++	u32 offset = (obj - page->s_mem);
++	return reciprocal_divide(offset, cache->reciprocal_buffer_size);
++}
++
+ #endif	/* _LINUX_SLAB_DEF_H */
+diff --git a/mm/slab.c b/mm/slab.c
+index fe0ddf08aa2c..6d8de7630944 100644
+--- a/mm/slab.c
++++ b/mm/slab.c
+@@ -406,19 +406,6 @@ static inline void *index_to_obj(struct kmem_cache *cache, struct page *page,
+ 	return page->s_mem + cache->size * idx;
+ }
+ 
+-/*
+- * We want to avoid an expensive divide : (offset / cache->size)
+- *   Using the fact that size is a constant for a particular cache,
+- *   we can replace (offset / cache->size) by
+- *   reciprocal_divide(offset, cache->reciprocal_buffer_size)
+- */
+-static inline unsigned int obj_to_index(const struct kmem_cache *cache,
+-					const struct page *page, void *obj)
+-{
+-	u32 offset = (obj - page->s_mem);
+-	return reciprocal_divide(offset, cache->reciprocal_buffer_size);
+-}
+-
+ #define BOOT_CPUCACHE_ENTRIES	1
+ /* internal cache of cache description objs */
+ static struct kmem_cache kmem_cache_boot = {
+-- 
+2.19.0.397.gdd90340f6a-goog
