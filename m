@@ -1,125 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io1-f68.google.com ([209.85.166.68]:44116 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731337AbeISRcA (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:41706 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731594AbeISUeA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Sep 2018 13:32:00 -0400
-Received: by mail-io1-f68.google.com with SMTP id 75-v6so4207993iou.11
-        for <linux-kbuild@vger.kernel.org>; Wed, 19 Sep 2018 04:54:25 -0700 (PDT)
+        Wed, 19 Sep 2018 16:34:00 -0400
 MIME-Version: 1.0
-In-Reply-To: <CACT4Y+YicYhmzrKf84=oJJErdFKSNM70cmoN3m_zzERcUQ_-Fg@mail.gmail.com>
-References: <cover.1535462971.git.andreyknvl@google.com> <4267d0903e0fdf9c261b91cf8a2bf0f71047a43c.1535462971.git.andreyknvl@google.com>
- <CACT4Y+YicYhmzrKf84=oJJErdFKSNM70cmoN3m_zzERcUQ_-Fg@mail.gmail.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Wed, 19 Sep 2018 13:54:23 +0200
-Message-ID: <CAAeHK+xMjDwZkKDn_0aVWERkjv6B-hFKjn0coGo4LbcPBds4Ew@mail.gmail.com>
-Subject: Re: [PATCH v6 14/18] khwasan: add hooks implementation
+In-Reply-To: <CAKwvOd=d4FdFzqimdq1os4gkk2JeeC4_-_ZbxVdkkPwd3KmuuQ@mail.gmail.com>
+References: <20180917073754.24048-1-joel@jms.id.au> <CAKwvOd=d4FdFzqimdq1os4gkk2JeeC4_-_ZbxVdkkPwd3KmuuQ@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 19 Sep 2018 23:54:44 +0900
+Message-ID: <CAK7LNAT9L==YS0a7FwuHTVaft2ONGd1b=GVExRrCYeLzW0sasw@mail.gmail.com>
+Subject: Re: [PATCH] ftrace: Build with CPPFLAGS to get -Qunused-arguments
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dmitry Vyukov <dvyukov@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux-MM <linux-mm@kvack.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Joel Stanley <joel@jms.id.au>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Wed, Sep 12, 2018 at 8:30 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
-> On Wed, Aug 29, 2018 at 1:35 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
-
->>  void kasan_unpoison_shadow(const void *address, size_t size)
->>  {
->> -       kasan_poison_shadow(address, size, 0);
->> +       u8 tag = get_tag(address);
->> +
->> +       /* Perform shadow offset calculation based on untagged address */
->
-> The comment is not super-useful. It would be more useful to say why we
-> need to do this.
-> Most callers explicitly untag pointer passed to this function, for
-> some it's unclear if the pointer contains tag or not.
-> For example, __hwasan_tag_memory -- what does it accept? Tagged or untagged?
-
-There are some callers that pass tagged pointers to this functions,
-e.g. ksize or kasan_unpoison_object_data. I'll expand the comment.
-
->
->
->> +       address = reset_tag(address);
->> +
->> +       kasan_poison_shadow(address, size, tag);
+2018-09-18 2:24 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
+> On Mon, Sep 17, 2018 at 12:38 AM Joel Stanley <joel@jms.id.au> wrote:
 >>
->>         if (size & KASAN_SHADOW_MASK) {
->>                 u8 *shadow = (u8 *)kasan_mem_to_shadow(address + size);
->> -               *shadow = size & KASAN_SHADOW_MASK;
->> +
->> +               if (IS_ENABLED(CONFIG_KASAN_HW))
->> +                       *shadow = tag;
->> +               else
->> +                       *shadow = size & KASAN_SHADOW_MASK;
->>         }
->>  }
+>> When building to record the mcount locations the kernel uses
+>> KBUILD_CFLAGS but not KBUILD_CPPFLAGS. This means it lacks
+>> -Qunused-arguments when building with clang, resulting in a lot of
+>> noisy warnings.
+>>
+>> Signed-off-by: Joel Stanley <joel@jms.id.au>
+>> ---
+>> Not sure why -Qunused-arguments is in CPP instead of KBUILD_CFLAGS. We
+>> could instead put it in KBUILD_CFLAGS, and not need this patch.
 >
+> The preprocessor has flags that can change the definitions of macros.
+> So there might be unused flags there.  I'm not a fan of covering up
+> those warnings via -Qunused-arguments; the flags should be feature
+> detected via cc-option and friends rather than always added then
+> silenced if excessive.  That hides flags that are long dead/unused.
 >
-> It seems that this function is just different for kasan and khwasan.
-> Currently for kasan we have:
+> Thanks for this patch!
+> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 >
-> kasan_poison_shadow(address, size, tag);
-> if (size & KASAN_SHADOW_MASK) {
->         u8 *shadow = (u8 *)kasan_mem_to_shadow(address + size);
->         *shadow = size & KASAN_SHADOW_MASK;
-> }
->
-> But what we want to say for khwasan is:
->
-> kasan_poison_shadow(address, round_up(size, KASAN_SHADOW_SCALE_SIZE),
-> get_tag(address));
->
-> Not sure if we want to keep a common implementation or just have
-> separate implementations...
-
-As per offline discussion leaving as is.
+>>
+>>  scripts/Makefile.build | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
 
 
->>  void kasan_free_pages(struct page *page, unsigned int order)
->> @@ -235,6 +248,7 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
->>                         slab_flags_t *flags)
->>  {
->>         unsigned int orig_size = *size;
->> +       unsigned int redzone_size = 0;
->
-> This variable seems to be always initialized below. We don't general
-> initialize local variables in this case.
+Applied to linux-kbuild/fixes. Thanks!
 
-Will fix in v7.
 
->>  void check_memory_region(unsigned long addr, size_t size, bool write,
->>                                 unsigned long ret_ip)
->>  {
->> +       u8 tag;
->> +       u8 *shadow_first, *shadow_last, *shadow;
->> +       void *untagged_addr;
->> +
->> +       tag = get_tag((const void *)addr);
->> +
->> +       /* Ignore accesses for pointers tagged with 0xff (native kernel
->
-> /* on a separate line
-
-Will fix in v7.
-
->
->> +        * pointer tag) to suppress false positives caused by kmap.
->> +        *
->> +        * Some kernel code was written to account for archs that don't keep
->> +        * high memory mapped all the time, but rather map and unmap particular
->> +        * pages when needed. Instead of storing a pointer to the kernel memory,
->> +        * this code saves the address of the page structure and offset within
->> +        * that page for later use. Those pages are then mapped and unmapped
->> +        * with kmap/kunmap when necessary and virt_to_page is used to get the
->> +        * virtual address of the page. For arm64 (that keeps the high memory
->> +        * mapped all the time), kmap is turned into a page_address call.
->> +
->> +        * The issue is that with use of the page_address + virt_to_page
->> +        * sequence the top byte value of the original pointer gets lost (gets
->> +        * set to KHWASAN_TAG_KERNEL (0xFF).
->
-> Missed closing bracket.
-
-Will fix in v7.
+-- 
+Best Regards
+Masahiro Yamada
