@@ -1,105 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:49838 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732079AbeISUga (ORCPT
+Received: from mail-it0-f67.google.com ([209.85.214.67]:56251 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732724AbeISXGs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Sep 2018 16:36:30 -0400
+        Wed, 19 Sep 2018 19:06:48 -0400
+Received: by mail-it0-f67.google.com with SMTP id d10-v6so9360104itj.5
+        for <linux-kbuild@vger.kernel.org>; Wed, 19 Sep 2018 10:27:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAKwvOd=CRw+5T6Us-Pw+t02PYWFEh=SM49C+28x7_oH+hcPOzQ@mail.gmail.com>
-References: <20180918023157.23951-1-stefan@agner.ch> <CAKwvOd=CRw+5T6Us-Pw+t02PYWFEh=SM49C+28x7_oH+hcPOzQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 19 Sep 2018 23:57:05 +0900
-Message-ID: <CAK7LNASvCQ-uPYXFv4u4a0kk_yXoBWwHPmA-ggOr_NpQxz7Xrg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: allow to use GCC toolchain not in Clang search path
+In-Reply-To: <CACT4Y+Z4zLSBdXGtk-6nH64UpOVA8s5TJZSpokAqEu4pE8LpCA@mail.gmail.com>
+References: <cover.1535462971.git.andreyknvl@google.com> <b4ba65afa55f2fdfd2856fb03c5aba99c7a8bdd7.1535462971.git.andreyknvl@google.com>
+ <CACT4Y+Z4zLSBdXGtk-6nH64UpOVA8s5TJZSpokAqEu4pE8LpCA@mail.gmail.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Wed, 19 Sep 2018 19:27:52 +0200
+Message-ID: <CAAeHK+ySaS_jUe_wNQ192kE4bUgZUOMdSyQeRp5Tx2nCD41vBQ@mail.gmail.com>
+Subject: Re: [PATCH v6 04/18] khwasan, arm64: adjust shadow size for CONFIG_KASAN_HW
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Stefan Agner <stefan@agner.ch>, Michal Marek <michal.lkml@markovi.net>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Stephen Hines <srhines@google.com>
+To: Dmitry Vyukov <dvyukov@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux-MM <linux-mm@kvack.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-2018-09-19 2:16 GMT+09:00 Nick Desaulniers <ndesaulniers@google.com>:
-> On Mon, Sep 17, 2018 at 7:32 PM Stefan Agner <stefan@agner.ch> wrote:
->>
->> When using a GCC cross toolchain which is not in a compiled in
->> Clang search path, Clang reverts to the system assembler and
->> linker. This leads to assembler or linker errors, depending on
->> which tool is first used for a given architecture.
->>
->> It seems that Clang is not searching $PATH for a matching
->> assembler or linker.
->
-> Yes, Clang uses what's called a sysroot, which is meant to be more
-> hygenic than $PATH, IIUC.  This is surprising to folks familiar with
-> $PATH, but really helps include the correct headers and use the
-> correct toolchain when cross compiling, at the cost of freedom to put
-> the cross toolchain wherever in the filesystem. (this is my
-> understanding of sysroot, I just learned about it yesterday, so take
-> this with a grain of salt).
->
->>
->> Make sure that Clang picks up the correct assembler or linker by
->> passing the cross compilers bin directory as search path.
->>
->> This allows to use Clang provided by distributions with GCC
->> toolchains not in /usr/bin.
->
-> IIUC, its just utilities in binutils we're using (as, bfd.ld,
-> objcopy), not GCC, but maybe that's just being pedantic.
->
->>
->> Link: https://github.com/ClangBuiltLinux/linux/issues/78
->> Signed-off-by: Stefan Agner <stefan@agner.ch>
->> ---
->> Nick, I removed your Reviewed-by since I had to change variable
->> assignment slightly...
->
-> Yes, thank you, that's the right thing to do.
->
->>
->>  Makefile | 8 +++++---
->>  1 file changed, 5 insertions(+), 3 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index 4d5c883a98e5..d5de2db4b549 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -495,13 +495,15 @@ endif
->>  ifeq ($(cc-name),clang)
->>  ifneq ($(CROSS_COMPILE),)
->>  CLANG_TARGET   := --target=$(notdir $(CROSS_COMPILE:%-=%))
->> -GCC_TOOLCHAIN  := $(realpath $(dir $(shell which $(LD)))/..)
->> +GCC_TOOLCHAIN_DIR := $(dir $(shell which $(LD)))
->> +CLANG_PREFIX   := --prefix=$(GCC_TOOLCHAIN_DIR)
->
-> Yep: https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-b-dir
->
->> +GCC_TOOLCHAIN  := $(realpath $(GCC_TOOLCHAIN_DIR)/..)
->>  endif
->>  ifneq ($(GCC_TOOLCHAIN),)
->>  CLANG_GCC_TC   := --gcc-toolchain=$(GCC_TOOLCHAIN)
->>  endif
->> -KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
->> -KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
->> +KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
->> +KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
->>  KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
->>  KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
->>  endif
->> --
->> 2.19.0
->>
->
-> Thanks for this patch Stefan.
-> Reviewed-and-tested-by: Nick Desaulniers <ndesaulniers@google.com>
-> --
-> Thanks,
-> ~Nick Desaulniers
+On Wed, Sep 12, 2018 at 4:54 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
+> On Wed, Aug 29, 2018 at 1:35 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
 
+>>  /*
+>> - * KASAN requires 1/8th of the kernel virtual address space for the shadow
+>> - * region. KASAN can bloat the stack significantly, so double the (minimum)
+>> - * stack size when KASAN is in use.
+>> + * KASAN and KHWASAN require 1/8th and 1/16th of the kernel virtual address
+>
+>
+> I am somewhat confused by the terminology.
+> "KASAN" is not actually "CONFIG_KASAN" below, it is actually
+> "CONFIG_KASAN_GENERIC". While "KHWASAN" translates to "KASAN_HW" few
+> lines later.
+> I think we need some consistent terminology for comments and config
+> names until it's too late.
+>
 
-
-
-Applied to linux-kbuild/fixes. Thanks!
-
--- 
-Best Regards
-Masahiro Yamada
+As per offline discussion will rename in v7.
