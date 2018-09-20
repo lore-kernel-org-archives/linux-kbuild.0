@@ -1,29 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:50721 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731355AbeITAkp (ORCPT
+Received: from 4.mo1.mail-out.ovh.net ([46.105.76.26]:33628 "EHLO
+        4.mo1.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387557AbeITS7P (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Sep 2018 20:40:45 -0400
-Received: by mail-it0-f65.google.com with SMTP id j81-v6so9835935ite.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 19 Sep 2018 12:01:28 -0700 (PDT)
+        Thu, 20 Sep 2018 14:59:15 -0400
+Received: from player690.ha.ovh.net (unknown [10.109.160.54])
+        by mo1.mail-out.ovh.net (Postfix) with ESMTP id A68DC12B9D8
+        for <linux-kbuild@vger.kernel.org>; Thu, 20 Sep 2018 14:36:35 +0200 (CEST)
+From: =?UTF-8?Q?Piotr_Kr=c3=b3l?= <piotr.krol@3mdeb.com>
+Subject: Multi-threaded build on 4.14.122 return code 2 for some
+ configurations
+Message-ID: <5c391704-3404-987e-0f56-f3274c310edc@3mdeb.com>
+Date: Thu, 20 Sep 2018 14:36:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <cover.1537383101.git.andreyknvl@google.com>
-References: <cover.1537383101.git.andreyknvl@google.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Wed, 19 Sep 2018 21:01:27 +0200
-Message-ID: <CAAeHK+yScE0fN2BsC_xS2TBgW+anunkOLY8P8e17V8vkT+ZKgg@mail.gmail.com>
-Subject: Re: [PATCH v8 00/20] kasan: add software tag-based mode for arm64
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, Maciej Pijanowski <maciej.pijanowski@3mdeb.com>
 
-On Wed, Sep 19, 2018 at 8:54 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
-> This patchset adds a new software tag-based mode to KASAN [1].
-> (Initially this mode was called KHWASAN, but it got renamed,
->  see the naming rationale at the end of this section).
+Hi all,
+I'm trying to automate longterm stable compilation for validation needs,
+but facing issue with mutli-threaded compilation of 4.14.122 (and other
+version).
 
-Andrey, I remember you giving a Reviewed-by to this patchset, but
-since there are somewhat significant naming related changes in the
-last version, could you take another look? Thanks!
+Reproduction procedure:
+wget https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.9.122.tar.gz
+tar xvf linux-4.9.122.tar.gz
+cd linux-4.9.122
+make mrproper
+wget
+https://raw.githubusercontent.com/pcengines/apu2-documentation/master/configs/config-4.14.59
+-O .config
+make olddefconfig
+make -j$(nproc) deb-pkg bzImage
+echo $?
+
+I'm getting 2 despite all components built correctly. When I do not
+define jobs:
+make deb-pkg bzImage
+
+Return code is 0. I have this effect not only for my custom config -
+looks like x86_64_defconfig also have similar problem.
+
+In failing case (for my config) in logs I see something like:
+
+(...)
+ld: cannot find arch/x86/kernel/cpu/mshyperv.o: No such file or
+directory
+
+make[3]: *** [scripts/Makefile.build:449:
+arch/x86/kernel/cpu/built-in.o] Error 1
+
+
+make[2]: *** [scripts/Makefile.build:547: arch/x86/kernel/cpu] Error 2
+
+
+  LD      drivers/xen/built-in.o
+
+
+make[1]: *** [scripts/Makefile.build:547: arch/x86/kernel] Error 2
+
+
+make: *** [Makefile:1008: arch/x86] Error 2
+
+
+make: *** Waiting for unfinished jobs....
+
+
+ld: cannot find drivers/xen/cpu_hotplug.o: No such file or directory
+
+
+ld: cannot find drivers/xen/fallback.o: No such file or directory
+
+
+ld: cannot find drivers/xen/grant-table.o: No such file or directory
+
+
+ld: cannot find drivers/xen/features.o: No such file or directory
+
+
+ld: cannot find drivers/xen/balloon.o: No such file or directory
+
+
+ld: cannot find drivers/xen/manage.o: No such file or directory
+
+
+ld: cannot find drivers/xen/preempt.o: No such file or directory
+
+
+ld: cannot find drivers/xen/time.o: No such file or directory
+
+
+make[2]: *** [scripts/Makefile.build:449: drivers/xen/built-in.o] Error
+1
+
+make[1]: *** [scripts/Makefile.build:547: drivers/xen] Error 2
+
+
+make: *** [Makefile:1008: drivers] Error 2
+make KBUILD_SRC=
+
+So it looks like build system tries to link objects which are not built
+yet. What would be best way to fix that behavior?
+
+Make version:
+GNU Make 4.2.1
+Built for x86_64-pc-linux-gnu
+
+gcc:
+gcc (Debian 8.2.0-7) 8.2.0
+
+ld:
+GNU ld (GNU Binutils for Debian) 2.31.1
+
+Full log with errors for make defconfig: https://pastebin.com/hMadtLeU
+Full log with errors for my custom config: https://pastebin.com/Kmbjm0qJ
+
+Best Regards,
+-- 
+Piotr Król
+Embedded Systems Consultant
+https://3mdeb.com | @3mdeb_com
