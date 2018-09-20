@@ -1,126 +1,146 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 4.mo1.mail-out.ovh.net ([46.105.76.26]:33628 "EHLO
-        4.mo1.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387557AbeITS7P (ORCPT
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45556 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726799AbeITXH5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Sep 2018 14:59:15 -0400
-Received: from player690.ha.ovh.net (unknown [10.109.160.54])
-        by mo1.mail-out.ovh.net (Postfix) with ESMTP id A68DC12B9D8
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Sep 2018 14:36:35 +0200 (CEST)
-From: =?UTF-8?Q?Piotr_Kr=c3=b3l?= <piotr.krol@3mdeb.com>
-Subject: Multi-threaded build on 4.14.122 return code 2 for some
- configurations
-Message-ID: <5c391704-3404-987e-0f56-f3274c310edc@3mdeb.com>
-Date: Thu, 20 Sep 2018 14:36:30 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        Thu, 20 Sep 2018 19:07:57 -0400
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Subject: [PATCH v5 00/15] Compiler Attributes
+Date: Thu, 20 Sep 2018 19:22:46 +0200
+Message-Id: <20180920172301.21868-1-miguel.ojeda.sandonis@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.com>, Maciej Pijanowski <maciej.pijanowski@3mdeb.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-kernel@vger.kernel.org, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S . Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi all,
-I'm trying to automate longterm stable compilation for validation needs,
-but facing issue with mutli-threaded compilation of 4.14.122 (and other
-version).
+The Compiler Attributes series is an effort to disentangle
+the include/linux/compiler*.h headers and bring them up to date.
 
-Reproduction procedure:
-wget https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.9.122.tar.gz
-tar xvf linux-4.9.122.tar.gz
-cd linux-4.9.122
-make mrproper
-wget
-https://raw.githubusercontent.com/pcengines/apu2-documentation/master/configs/config-4.14.59
--O .config
-make olddefconfig
-make -j$(nproc) deb-pkg bzImage
-echo $?
+The main idea behind the series is to use feature checking macros
+(i.e. __has_attribute) instead of compiler version checks (e.g. GCC_VERSION),
+which are compiler-agnostic (so they can be shared, reducing the size
+of compiler-specific headers) and version-agnostic.
 
-I'm getting 2 despite all components built correctly. When I do not
-define jobs:
-make deb-pkg bzImage
+Other related improvements have been performed in the headers as well,
+which on top of the use of __has_attribute it has amounted to a significant
+simplification of these headers (e.g. GCC_VERSION is now only guarding 4
+non-attribute macros).
 
-Return code is 0. I have this effect not only for my custom config -
-looks like x86_64_defconfig also have similar problem.
+This series should also help the efforts to support compiling the kernel
+with clang and icc. A fair amount of documentation and comments have also
+been added, clarified or removed; and the headers are now more readable,
+which should help kernel developers in general.
 
-In failing case (for my config) in logs I see something like:
+The series was triggered due to the move to gcc >= 4.6. In turn, this series
+has also triggered Sparse to gain the ability to recognize __has_attribute
+on its own.
 
-(...)
-ld: cannot find arch/x86/kernel/cpu/mshyperv.o: No such file or
-directory
+Finally, the nonstring variable attribute series has been applied on top
+of this one.
 
-make[3]: *** [scripts/Makefile.build:449:
-arch/x86/kernel/cpu/built-in.o] Error 1
+You can also fetch it from:
 
+  https://github.com/ojeda/linux/tree/compiler-attributes-v5
 
-make[2]: *** [scripts/Makefile.build:547: arch/x86/kernel/cpu] Error 2
+Enjoy!
 
+Cheers,
+Miguel
 
-  LD      drivers/xen/built-in.o
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Cc: Olof Johansson <olof@lxom.net>
+Cc: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: Paul Lawrence <paullawrence@google.com>
+Cc: Sandipan Das <sandipan@linux.vnet.ibm.com>
+Cc: Andrey Konovalov <andreyknvl@google.com>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Philippe Ombredanne <pombredanne@nexb.com>
+Cc: Paul Burton <paul.burton@mips.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Willy Tarreau <w@1wt.eu>
+Cc: Martin Sebor <msebor@gmail.com>
+Cc: Christopher Li <sparse@chrisli.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Joe Perches <joe@perches.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Dominique Martinet <asmadeus@codewreck.org>
+Cc: Stefan Agner <stefan@agner.ch>
+Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-doc@vger.kernel.org
+Cc: linux-ext4@vger.kernel.org
+Cc: linux-sparse@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
+v4 -> v5
 
-make[1]: *** [scripts/Makefile.build:547: arch/x86/kernel] Error 2
+  * Removed the 2 __naked patches, since Greg just applied them to master;
+    and rebased on top of that. The only change in the range-diff is in
+    "Compiler Attributes: always use the extra-underscores syntax" due
+    to the move of __naked to compiler_types.h.
 
+  * Applied the nonstring series on top of this one (last 4 patches).
+    Rationale:
+      - the nonstring series would anyway be modified again by this one
+        (so it has been rebased after the general cleanup).
+      - ext4's "local" nonstring was merged
+      - easier to manage (and easier to see the end result)
 
-make: *** [Makefile:1008: arch/x86] Error 2
+    The first 2 patches of the last 4 add the warning back at W=1 and
+    add the __nonstring attribute. The other two serve as an example
+    of usage and as a cleanup.
 
+  * Cc lists removed from each commit; using a single list in the cover letter;
+    and a new, revised list of Cc (wider audience).
 
-make: *** Waiting for unfinished jobs....
+Miguel Ojeda (15):
+  Compiler Attributes: remove unused attributes
+  Compiler Attributes: always use the extra-underscores syntax
+  Compiler Attributes: remove unneeded tests
+  Compiler Attributes: homogenize __must_be_array
+  Compiler Attributes: remove unneeded sparse (__CHECKER__) tests
+  Compiler Attributes: add missing SPDX ID in compiler_types.h
+  Compiler Attributes: use feature checks instead of version checks
+  Compiler Attributes: KENTRY used twice the "used" attribute
+  Compiler Attributes: remove uses of __attribute__ from compiler.h
+  Compiler Attributes: add Doc/process/programming-language.rst
+  Compiler Attributes: add MAINTAINERS entry
+  Compiler Attributes: add support for __nonstring (gcc >= 8)
+  Compiler Attributes: enable -Wstringop-truncation on W=1 (gcc >= 8)
+  Compiler Attributes: auxdisplay: panel: use __nonstring
+  Compiler Attributes: ext4: remove local __nonstring definition
 
+ Documentation/process/index.rst               |   1 +
+ .../process/programming-language.rst          |  45 +++
+ MAINTAINERS                                   |   5 +
+ drivers/auxdisplay/panel.c                    |   7 +-
+ fs/ext4/ext4.h                                |   9 -
+ include/linux/compiler-clang.h                |   5 -
+ include/linux/compiler-gcc.h                  |  70 +----
+ include/linux/compiler-intel.h                |   9 -
+ include/linux/compiler.h                      |  19 +-
+ include/linux/compiler_attributes.h           | 258 ++++++++++++++++++
+ include/linux/compiler_types.h                | 101 +------
+ scripts/Makefile.extrawarn                    |   1 +
+ 12 files changed, 341 insertions(+), 189 deletions(-)
+ create mode 100644 Documentation/process/programming-language.rst
+ create mode 100644 include/linux/compiler_attributes.h
 
-ld: cannot find drivers/xen/cpu_hotplug.o: No such file or directory
-
-
-ld: cannot find drivers/xen/fallback.o: No such file or directory
-
-
-ld: cannot find drivers/xen/grant-table.o: No such file or directory
-
-
-ld: cannot find drivers/xen/features.o: No such file or directory
-
-
-ld: cannot find drivers/xen/balloon.o: No such file or directory
-
-
-ld: cannot find drivers/xen/manage.o: No such file or directory
-
-
-ld: cannot find drivers/xen/preempt.o: No such file or directory
-
-
-ld: cannot find drivers/xen/time.o: No such file or directory
-
-
-make[2]: *** [scripts/Makefile.build:449: drivers/xen/built-in.o] Error
-1
-
-make[1]: *** [scripts/Makefile.build:547: drivers/xen] Error 2
-
-
-make: *** [Makefile:1008: drivers] Error 2
-make KBUILD_SRC=
-
-So it looks like build system tries to link objects which are not built
-yet. What would be best way to fix that behavior?
-
-Make version:
-GNU Make 4.2.1
-Built for x86_64-pc-linux-gnu
-
-gcc:
-gcc (Debian 8.2.0-7) 8.2.0
-
-ld:
-GNU ld (GNU Binutils for Debian) 2.31.1
-
-Full log with errors for make defconfig: https://pastebin.com/hMadtLeU
-Full log with errors for my custom config: https://pastebin.com/Kmbjm0qJ
-
-Best Regards,
 -- 
-Piotr Król
-Embedded Systems Consultant
-https://3mdeb.com | @3mdeb_com
+2.17.1
