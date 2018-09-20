@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40155 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727476AbeITXIU (ORCPT
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34984 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388191AbeITXIX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Sep 2018 19:08:20 -0400
+        Thu, 20 Sep 2018 19:08:23 -0400
 From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Subject: [PATCH v5 11/15] Compiler Attributes: add MAINTAINERS entry
-Date: Thu, 20 Sep 2018 19:22:57 +0200
-Message-Id: <20180920172301.21868-12-miguel.ojeda.sandonis@gmail.com>
+Subject: [PATCH v5 12/15] Compiler Attributes: add support for __nonstring (gcc >= 8)
+Date: Thu, 20 Sep 2018 19:22:58 +0200
+Message-Id: <20180920172301.21868-13-miguel.ojeda.sandonis@gmail.com>
 In-Reply-To: <20180920172301.21868-1-miguel.ojeda.sandonis@gmail.com>
 References: <20180920172301.21868-1-miguel.ojeda.sandonis@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,28 +15,83 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: linux-kernel@vger.kernel.org, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S . Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Reviewed-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+From the GCC manual:
+
+  nonstring
+
+    The nonstring variable attribute specifies that an object or member
+    declaration with type array of char, signed char, or unsigned char,
+    or pointer to such a type is intended to store character arrays that
+    do not necessarily contain a terminating NUL. This is useful in detecting
+    uses of such arrays or pointers with functions that expect NUL-terminated
+    strings, and to avoid warnings when such an array or pointer is used as
+    an argument to a bounded string manipulation function such as strncpy.
+
+  https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html
+
+This attribute can be used for documentation purposes (i.e. replacing
+comments), but it is most helpful when the following warnings are enabled:
+
+  -Wstringop-overflow
+
+    Warn for calls to string manipulation functions such as memcpy and
+    strcpy that are determined to overflow the destination buffer.
+
+    [...]
+
+  -Wstringop-truncation
+
+    Warn for calls to bounded string manipulation functions such as
+    strncat, strncpy, and stpncpy that may either truncate the copied
+    string or leave the destination unchanged.
+
+    [...]
+
+    In situations where a character array is intended to store a sequence
+    of bytes with no terminating NUL such an array may be annotated with
+    attribute nonstring to avoid this warning. Such arrays, however,
+    are not suitable arguments to functions that expect NUL-terminated
+    strings. To help detect accidental misuses of such arrays GCC issues
+    warnings unless it can prove that the use is safe.
+
+  https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
+
 Signed-off-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
 ---
- MAINTAINERS | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/linux/compiler_attributes.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e993064637ca..74419b8d00ac 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3722,6 +3722,11 @@ L:	platform-driver-x86@vger.kernel.org
- S:	Maintained
- F:	drivers/platform/x86/compal-laptop.c
+diff --git a/include/linux/compiler_attributes.h b/include/linux/compiler_attributes.h
+index f0f9fc398440..6b28c1b7310c 100644
+--- a/include/linux/compiler_attributes.h
++++ b/include/linux/compiler_attributes.h
+@@ -34,6 +34,7 @@
+ # define __GCC4_has_attribute___externally_visible__  1
+ # define __GCC4_has_attribute___noclone__             1
+ # define __GCC4_has_attribute___optimize__            1
++# define __GCC4_has_attribute___nonstring__           0
+ # define __GCC4_has_attribute___no_sanitize_address__ (__GNUC_MINOR__ >= 8)
+ #endif
  
-+COMPILER ATTRIBUTES
-+M:	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-+S:	Maintained
-+F:	include/linux/compiler_attributes.h
+@@ -181,6 +182,19 @@
+  */
+ #define   noinline                      __attribute__((__noinline__))
+ 
++/*
++ * Optional: only supported since gcc >= 8
++ * Optional: not supported by clang
++ * Optional: not supported by icc
++ *
++ *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-nonstring-variable-attribute
++ */
++#if __has_attribute(__nonstring__)
++# define __nonstring                    __attribute__((__nonstring__))
++#else
++# define __nonstring
++#endif
 +
- CONEXANT ACCESSRUNNER USB DRIVER
- L:	accessrunner-general@lists.sourceforge.net
- W:	http://accessrunner.sourceforge.net/
+ /*
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-noreturn-function-attribute
+  * clang: https://clang.llvm.org/docs/AttributeReference.html#noreturn
 -- 
 2.17.1
