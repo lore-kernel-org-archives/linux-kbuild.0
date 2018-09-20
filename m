@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f54.google.com ([209.85.128.54]:36715 "EHLO
-        mail-wm1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727556AbeITXIJ (ORCPT
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:44024 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732794AbeITXIN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Sep 2018 19:08:09 -0400
+        Thu, 20 Sep 2018 19:08:13 -0400
 From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Subject: [PATCH v5 06/15] Compiler Attributes: add missing SPDX ID in compiler_types.h
-Date: Thu, 20 Sep 2018 19:22:52 +0200
-Message-Id: <20180920172301.21868-7-miguel.ojeda.sandonis@gmail.com>
+Subject: [PATCH v5 08/15] Compiler Attributes: KENTRY used twice the "used" attribute
+Date: Thu, 20 Sep 2018 19:22:54 +0200
+Message-Id: <20180920172301.21868-9-miguel.ojeda.sandonis@gmail.com>
 In-Reply-To: <20180920172301.21868-1-miguel.ojeda.sandonis@gmail.com>
 References: <20180920172301.21868-1-miguel.ojeda.sandonis@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,17 +19,21 @@ Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 Reviewed-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 Signed-off-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
 ---
- include/linux/compiler_types.h | 1 +
- 1 file changed, 1 insertion(+)
+ include/linux/compiler.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-index a3eceb3ad1b3..ed7c0e4a180e 100644
---- a/include/linux/compiler_types.h
-+++ b/include/linux/compiler_types.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
- #ifndef __LINUX_COMPILER_TYPES_H
- #define __LINUX_COMPILER_TYPES_H
+diff --git a/include/linux/compiler.h b/include/linux/compiler.h
+index 4030a2940d6b..17ee9165ca51 100644
+--- a/include/linux/compiler.h
++++ b/include/linux/compiler.h
+@@ -146,7 +146,7 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
+ 	extern typeof(sym) sym;					\
+ 	static const unsigned long __kentry_##sym		\
+ 	__used							\
+-	__attribute__((__section__("___kentry" "+" #sym ), used))	\
++	__attribute__((__section__("___kentry" "+" #sym )))	\
+ 	= (unsigned long)&sym;
+ #endif
  
 -- 
 2.17.1
