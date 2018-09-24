@@ -1,156 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:32801 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727525AbeIXOrr (ORCPT
+Received: from mail-it1-f195.google.com ([209.85.166.195]:33996 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728353AbeIXPUp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Sep 2018 10:47:47 -0400
+        Mon, 24 Sep 2018 11:20:45 -0400
+Received: by mail-it1-f195.google.com with SMTP id o72-v6so3293453ita.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 24 Sep 2018 02:19:38 -0700 (PDT)
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Mon, 24 Sep 2018 10:46:44 +0200
-Message-ID: <CA+icZUW+N4V-bLEX0217dMYTrfzmgLZkbif8w3-zRQXnd7VYSQ@mail.gmail.com>
-Subject: [PATCH v5 00/15] Compiler Attributes
+In-Reply-To: <CAAeHK+zBh0BiYq65QDxD-nxkHHF0QL6UQx8fs40K39R6XJJfzA@mail.gmail.com>
+References: <cover.1537383101.git.andreyknvl@google.com> <d74e710797323db0e43f047ea698fbc85060fc57.1537383101.git.andreyknvl@google.com>
+ <CACT4Y+aoFSySFTd9FzA0xzRYQXSbs-wzX7B67hD3jTGAQEXBOA@mail.gmail.com> <CAAeHK+zBh0BiYq65QDxD-nxkHHF0QL6UQx8fs40K39R6XJJfzA@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Mon, 24 Sep 2018 11:19:17 +0200
+Message-ID: <CACT4Y+b6qe1S_4dAhYGPm0r1nFWW4Fn1rCNbSZW-7w7jMpcTtQ@mail.gmail.com>
+Subject: Re: [PATCH v8 09/20] kasan: preassign tags to objects with ctors or SLAB_TYPESAFE_BY_RCU
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux-MM <linux-mm@kvack.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-[ Please CC me I am not subcribed to this ML ]
+On Fri, Sep 21, 2018 at 2:24 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
+> On Fri, Sep 21, 2018 at 1:25 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
+>> On Wed, Sep 19, 2018 at 8:54 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
+>
+>>>         if (!shuffle) {
+>>>                 for_each_object_idx(p, idx, s, start, page->objects) {
+>>> -                       setup_object(s, page, p);
+>>> -                       if (likely(idx < page->objects))
+>>> -                               set_freepointer(s, p, p + s->size);
+>>> -                       else
+>>> +                       if (likely(idx < page->objects)) {
+>>> +                               next = p + s->size;
+>>> +                               next = setup_object(s, page, next);
+>>> +                               set_freepointer(s, p, next);
+>>> +                       } else
+>>>                                 set_freepointer(s, p, NULL);
+>>>                 }
+>>> -               page->freelist = fixup_red_left(s, start);
+>>> +               start = fixup_red_left(s, start);
+>>> +               start = setup_object(s, page, start);
+>>> +               page->freelist = start;
+>>>         }
+>>
+>> Just want to double-check that this is correct.
+>> We now do an additional setup_object call after the loop, but we do 1
+>> less in the loop. So total number of calls should be the same, right?
+>> However, after the loop we call setup_object for the first object (?),
+>> but inside of the loop we skip the call for the last object (?). Am I
+>> missing something, or we call ctor twice for the last object and don't
+>> call it for the first one?
+>
+> Inside the loop we call setup_object for the "next" object. So we
+> start iterating on the first one, but call setup_object for the
+> second. Then the loop moves on to the second one and calls
+> setup_object for the third. And so on. So the loop calls setup_object
+> for every object (including the last one) except for the first one.
+>
+> The idea is that we want the freelist pointer that is stored in the
+> current object to have a tagged pointer to the next one, so we need to
+> assign a tag to the next object before storing the pointer in the
+> current one.
 
-Quote from <https://lkml.org/lkml/2018/9/20/901>:
-
-The Compiler Attributes series is an effort to disentangle
-the include/linux/compiler*.h headers and bring them up to date.
-
-The main idea behind the series is to use feature checking macros
-(i.e. __has_attribute) instead of compiler version checks (e.g. GCC_VERSION),
-which are compiler-agnostic (so they can be shared, reducing the size
-of compiler-specific headers) and version-agnostic.
-
-Other related improvements have been performed in the headers as well,
-which on top of the use of __has_attribute it has amounted to a significant
-simplification of these headers (e.g. GCC_VERSION is now only guarding 4
-non-attribute macros).
-
-This series should also help the efforts to support compiling the kernel
-with clang and icc. A fair amount of documentation and comments have also
-been added, clarified or removed; and the headers are now more readable,
-which should help kernel developers in general.
-
-The series was triggered due to the move to gcc >= 4.6. In turn, this series
-has also triggered Sparse to gain the ability to recognize __has_attribute
-on its own.
-
-Finally, the nonstring variable attribute series has been applied on top
-of this one.
-
-You can also fetch it from:
-
-  https://github.com/ojeda/linux/tree/compiler-attributes-v5
-
-Enjoy!
-
-Cheers,
-Miguel
-
-Cc: Andreas Dilger <adilger.kernel@dilger.ca>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Cc: Olof Johansson <olof@lxom.net>
-Cc: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@kernel.org>
-Cc: Paul Lawrence <paullawrence@google.com>
-Cc: Sandipan Das <sandipan@linux.vnet.ibm.com>
-Cc: Andrey Konovalov <andreyknvl@google.com>
-Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Philippe Ombredanne <pombredanne@nexb.com>
-Cc: Paul Burton <paul.burton@mips.com>
-Cc: David Rientjes <rientjes@google.com>
-Cc: Willy Tarreau <w@1wt.eu>
-Cc: Martin Sebor <msebor@gmail.com>
-Cc: Christopher Li <sparse@chrisli.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Theodore Ts'o <tytso@mit.edu>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Joe Perches <joe@perches.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Dominique Martinet <asmadeus@codewreck.org>
-Cc: Stefan Agner <stefan@agner.ch>
-Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-doc@vger.kernel.org
-Cc: linux-ext4@vger.kernel.org
-Cc: linux-sparse@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org
-
-v4 -> v5
-
-  * Removed the 2 __naked patches, since Greg just applied them to master;
-    and rebased on top of that. The only change in the range-diff is in
-    "Compiler Attributes: always use the extra-underscores syntax" due
-    to the move of __naked to compiler_types.h.
-
-  * Applied the nonstring series on top of this one (last 4 patches).
-    Rationale:
-      - the nonstring series would anyway be modified again by this one
-        (so it has been rebased after the general cleanup).
-      - ext4's "local" nonstring was merged
-      - easier to manage (and easier to see the end result)
-
-    The first 2 patches of the last 4 add the warning back at W=1 and
-    add the __nonstring attribute. The other two serve as an example
-    of usage and as a cleanup.
-
-  * Cc lists removed from each commit; using a single list in the cover letter;
-    and a new, revised list of Cc (wider audience).
-
-Miguel Ojeda (15):
-  Compiler Attributes: remove unused attributes
-  Compiler Attributes: always use the extra-underscores syntax
-  Compiler Attributes: remove unneeded tests
-  Compiler Attributes: homogenize __must_be_array
-  Compiler Attributes: remove unneeded sparse (__CHECKER__) tests
-  Compiler Attributes: add missing SPDX ID in compiler_types.h
-  Compiler Attributes: use feature checks instead of version checks
-  Compiler Attributes: KENTRY used twice the "used" attribute
-  Compiler Attributes: remove uses of __attribute__ from compiler.h
-  Compiler Attributes: add Doc/process/programming-language.rst
-  Compiler Attributes: add MAINTAINERS entry
-  Compiler Attributes: add support for __nonstring (gcc >= 8)
-  Compiler Attributes: enable -Wstringop-truncation on W=1 (gcc >= 8)
-  Compiler Attributes: auxdisplay: panel: use __nonstring
-  Compiler Attributes: ext4: remove local __nonstring definition
-
- Documentation/process/index.rst               |   1 +
- .../process/programming-language.rst          |  45 +++
- MAINTAINERS                                   |   5 +
- drivers/auxdisplay/panel.c                    |   7 +-
- fs/ext4/ext4.h                                |   9 -
- include/linux/compiler-clang.h                |   5 -
- include/linux/compiler-gcc.h                  |  70 +----
- include/linux/compiler-intel.h                |   9 -
- include/linux/compiler.h                      |  19 +-
- include/linux/compiler_attributes.h           | 258 ++++++++++++++++++
- include/linux/compiler_types.h                | 101 +------
- scripts/Makefile.extrawarn                    |   1 +
- 12 files changed, 341 insertions(+), 189 deletions(-)
- create mode 100644 Documentation/process/programming-language.rst
- create mode 100644 include/linux/compiler_attributes.h
-
--- 
-2.17.1
-
-Tested-by: Sedat Dilek <sedat.dilek@gmail.com> (against Linux
-v4.19-rc5 and built with LLVM/Clang v7)
+Ah, OK, then false alarm.
