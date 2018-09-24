@@ -1,54 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:39527 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729094AbeIXSMY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Sep 2018 14:12:24 -0400
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: How to define some additional KBUILD_CFLAGS after building include/generated/asm-offsets.h ?
-In-Reply-To: <e1b65467-7497-5db4-aa93-1ad00d12af3f@c-s.fr>
-References: <e1b65467-7497-5db4-aa93-1ad00d12af3f@c-s.fr>
-Date: Mon, 24 Sep 2018 22:10:29 +1000
-Message-ID: <87mus75c5m.fsf@concordia.ellerman.id.au>
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:41133 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726350AbeIXUim (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 24 Sep 2018 16:38:42 -0400
+Date: Mon, 24 Sep 2018 16:36:10 +0200
+From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH v5 00/15] Compiler Attributes
+Message-ID: <20180924143608.aiyehiibgc7isk7k@ltop.local>
+References: <20180920172301.21868-1-miguel.ojeda.sandonis@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180920172301.21868-1-miguel.ojeda.sandonis@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christophe Leroy <christophe.leroy@c-s.fr>, linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Segher Boessenkool <segher@kernel.crashing.org>
-Cc: LKML <linux-kernel@vger.kernel.org>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S . Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Christophe Leroy <christophe.leroy@c-s.fr> writes:
+On Thu, Sep 20, 2018 at 07:22:46PM +0200, Miguel Ojeda wrote:
+> The Compiler Attributes series is an effort to disentangle
+> the include/linux/compiler*.h headers and bring them up to date.
+> 
+> The main idea behind the series is to use feature checking macros
+> (i.e. __has_attribute) instead of compiler version checks (e.g. GCC_VERSION),
+> which are compiler-agnostic (so they can be shared, reducing the size
+> of compiler-specific headers) and version-agnostic.
+> 
+> Other related improvements have been performed in the headers as well,
+> which on top of the use of __has_attribute it has amounted to a significant
+> simplification of these headers (e.g. GCC_VERSION is now only guarding 4
+> non-attribute macros).
+> 
+> This series should also help the efforts to support compiling the kernel
+> with clang and icc. A fair amount of documentation and comments have also
+> been added, clarified or removed; and the headers are now more readable,
+> which should help kernel developers in general.
+> 
+> The series was triggered due to the move to gcc >= 4.6. In turn, this series
+> has also triggered Sparse to gain the ability to recognize __has_attribute
+> on its own.
+> 
+> Finally, the nonstring variable attribute series has been applied on top
+> of this one.
 
-> I'm trying to implement TLS based stack protector in the Linux Kernel.
-> For that I need to give to GCC the offset at which it will find the 
-> canary (register r2 is pointing to the current task struct).
->
-> I have been able to do it with the below patch, but it only works when 
-> include/generated/asm-offsets.h already exists from the start of the build.
->
-> Is there a way to evaluate CANARY_OFFSET and add the stack-protector 
-> flags to KBUILD_FLAGS only after include/generated/asm-offsets.h is built ?
->
-> Or another way of add -mstack-protector-guard-offset=offsetof(struct 
-> task_struct, stack_canary) ?
+Hi Miguel,
+Feel free to add my
+  Reviewed-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+on patches 11-15 (I think the others ones already have it).
 
-This seems to work, at least I see the value in CFLAGS:
-
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index 07d9dce..39ee113 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -404,6 +394,11 @@ archclean:
- 
- archprepare: checkbin
- 
-+prepare: stack_protector_prepare
-+
-+stack_protector_prepare: prepare0
-+	$(eval KBUILD_CFLAGS += -mstack-protector-guard-offset=$(shell awk '{if ($$2 == "TSK_STACK_CANARY") print $$3;}' include/generated/asm-offsets.h))
-+
- # Use the file '.tmp_gas_check' for binutils tests, as gas won't output
- # to stdout and these checks are run even on install targets.
- TOUT	:= .tmp_gas_check
-
-
-cheers
+-- Luc
