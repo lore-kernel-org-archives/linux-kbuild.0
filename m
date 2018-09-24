@@ -1,113 +1,156 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:24618 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725810AbeIWQ3Q (ORCPT
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:32801 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727525AbeIXOrr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 23 Sep 2018 12:29:16 -0400
+        Mon, 24 Sep 2018 10:47:47 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdWEnoh97_jiDWMq=ke4PrhSFbToYnx91CPLBuq3mOGzoQ@mail.gmail.com>
-References: <20180910150403.19476-1-robh@kernel.org> <20180910150403.19476-7-robh@kernel.org>
- <CAL_Jsq+=VbdcVLiwXbOA5d+R2YY6=2Pw2bQpci-jj-JvereD1A@mail.gmail.com>
- <CAK7LNAQFqhWw+LwDoypGG=OP6tH4qf2tT=LvtchK2GoiNyzDXg@mail.gmail.com> <CAMuHMdWEnoh97_jiDWMq=ke4PrhSFbToYnx91CPLBuq3mOGzoQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 23 Sep 2018 06:31:14 -0400
-Message-ID: <CAK7LNATkkOiYPj2RLubcgZ_z59Bhz4GkgWqPMbnaHBk7EisXLg@mail.gmail.com>
-Subject: Re: [PATCH v3 6/9] kbuild: consolidate Devicetree dtb build rules
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Mon, 24 Sep 2018 10:46:44 +0200
+Message-ID: <CA+icZUW+N4V-bLEX0217dMYTrfzmgLZkbif8w3-zRQXnd7VYSQ@mail.gmail.com>
+Subject: [PATCH v5 00/15] Compiler Attributes
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Rob Herring <robh@kernel.org>, "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, nios2-dev@lists.rocketboards.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-xtensa@linux-xtensa.org, Will Deacon <will.deacon@arm.com>, Paul Burton <paul.burton@mips.com>, Ley Foon Tan <ley.foon.tan@intel.com>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-2018-09-13 11:51 GMT-04:00 Geert Uytterhoeven <geert@linux-m68k.org>:
-> Hi Yamada-san,
->
-> On Wed, Sep 12, 2018 at 3:02 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> 2018-09-12 0:40 GMT+09:00 Rob Herring <robh@kernel.org>:
->> > On Mon, Sep 10, 2018 at 10:04 AM Rob Herring <robh@kernel.org> wrote:
->> >> There is nothing arch specific about building dtb files other than their
->> >> location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
->> >> The dependencies and supported targets are all slightly different.
->> >> Also, a cross-compiler for each arch is needed, but really the host
->> >> compiler preprocessor is perfectly fine for building dtbs. Move the
->> >> build rules to a common location and remove the arch specific ones. This
->> >> is done in a single step to avoid warnings about overriding rules.
->> >>
->> >> The build dependencies had been a mixture of 'scripts' and/or 'prepare'.
->> >> These pull in several dependencies some of which need a target compiler
->> >> (specifically devicetable-offsets.h) and aren't needed to build dtbs.
->> >> All that is really needed is dtc, so adjust the dependencies to only be
->> >> dtc.
->> >>
->> >> This change enables support 'dtbs_install' on some arches which were
->> >> missing the target.
->> >
->> > [...]
->> >
->> >> @@ -1215,6 +1215,33 @@ kselftest-merge:
->> >>                 $(srctree)/tools/testing/selftests/*/config
->> >>         +$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
->> >>
->> >> +# ---------------------------------------------------------------------------
->> >> +# Devicetree files
->> >> +
->> >> +ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/boot/dts/),)
->> >> +dtstree := arch/$(SRCARCH)/boot/dts
->> >> +endif
->> >> +
->> >> +ifdef CONFIG_OF_EARLY_FLATTREE
->> >
->> > This can be true when dtstree is unset. So this line should be this
->> > instead to fix the 0-day reported error:
->> >
->> > ifneq ($(dtstree),)
->> >
->> >> +
->> >> +%.dtb : scripts_dtc
->> >> +       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
->> >> +
->> >> +PHONY += dtbs dtbs_install
->> >> +dtbs: scripts_dtc
->> >> +       $(Q)$(MAKE) $(build)=$(dtstree)
->> >> +
->> >> +dtbs_install: dtbs
->> >> +       $(Q)$(MAKE) $(dtbinst)=$(dtstree)
->> >> +
->> >> +all: dtbs
->> >> +
->> >> +endif
->>
->>
->> Ah, right.
->> Even x86 can enable OF and OF_UNITTEST.
->>
->>
->>
->> Another solution might be,
->> guard it by 'depends on ARCH_SUPPORTS_OF'.
->>
->>
->>
->> This is actually what ACPI does.
->>
->> menuconfig ACPI
->>         bool "ACPI (Advanced Configuration and Power Interface) Support"
->>         depends on ARCH_SUPPORTS_ACPI
->>          ...
->
-> ACPI is a real platform feature, as it depends on firmware.
->
-> CONFIG_OF can be enabled, and DT overlays can be loaded, on any platform,
-> even if it has ACPI ;-)
->
+[ Please CC me I am not subcribed to this ML ]
 
-OK, understood.
+Quote from <https://lkml.org/lkml/2018/9/20/901>:
 
-Thanks!
+The Compiler Attributes series is an effort to disentangle
+the include/linux/compiler*.h headers and bring them up to date.
 
+The main idea behind the series is to use feature checking macros
+(i.e. __has_attribute) instead of compiler version checks (e.g. GCC_VERSION),
+which are compiler-agnostic (so they can be shared, reducing the size
+of compiler-specific headers) and version-agnostic.
 
+Other related improvements have been performed in the headers as well,
+which on top of the use of __has_attribute it has amounted to a significant
+simplification of these headers (e.g. GCC_VERSION is now only guarding 4
+non-attribute macros).
+
+This series should also help the efforts to support compiling the kernel
+with clang and icc. A fair amount of documentation and comments have also
+been added, clarified or removed; and the headers are now more readable,
+which should help kernel developers in general.
+
+The series was triggered due to the move to gcc >= 4.6. In turn, this series
+has also triggered Sparse to gain the ability to recognize __has_attribute
+on its own.
+
+Finally, the nonstring variable attribute series has been applied on top
+of this one.
+
+You can also fetch it from:
+
+  https://github.com/ojeda/linux/tree/compiler-attributes-v5
+
+Enjoy!
+
+Cheers,
+Miguel
+
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Cc: Olof Johansson <olof@lxom.net>
+Cc: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: Paul Lawrence <paullawrence@google.com>
+Cc: Sandipan Das <sandipan@linux.vnet.ibm.com>
+Cc: Andrey Konovalov <andreyknvl@google.com>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Philippe Ombredanne <pombredanne@nexb.com>
+Cc: Paul Burton <paul.burton@mips.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Willy Tarreau <w@1wt.eu>
+Cc: Martin Sebor <msebor@gmail.com>
+Cc: Christopher Li <sparse@chrisli.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Joe Perches <joe@perches.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Dominique Martinet <asmadeus@codewreck.org>
+Cc: Stefan Agner <stefan@agner.ch>
+Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-doc@vger.kernel.org
+Cc: linux-ext4@vger.kernel.org
+Cc: linux-sparse@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
+
+v4 -> v5
+
+  * Removed the 2 __naked patches, since Greg just applied them to master;
+    and rebased on top of that. The only change in the range-diff is in
+    "Compiler Attributes: always use the extra-underscores syntax" due
+    to the move of __naked to compiler_types.h.
+
+  * Applied the nonstring series on top of this one (last 4 patches).
+    Rationale:
+      - the nonstring series would anyway be modified again by this one
+        (so it has been rebased after the general cleanup).
+      - ext4's "local" nonstring was merged
+      - easier to manage (and easier to see the end result)
+
+    The first 2 patches of the last 4 add the warning back at W=1 and
+    add the __nonstring attribute. The other two serve as an example
+    of usage and as a cleanup.
+
+  * Cc lists removed from each commit; using a single list in the cover letter;
+    and a new, revised list of Cc (wider audience).
+
+Miguel Ojeda (15):
+  Compiler Attributes: remove unused attributes
+  Compiler Attributes: always use the extra-underscores syntax
+  Compiler Attributes: remove unneeded tests
+  Compiler Attributes: homogenize __must_be_array
+  Compiler Attributes: remove unneeded sparse (__CHECKER__) tests
+  Compiler Attributes: add missing SPDX ID in compiler_types.h
+  Compiler Attributes: use feature checks instead of version checks
+  Compiler Attributes: KENTRY used twice the "used" attribute
+  Compiler Attributes: remove uses of __attribute__ from compiler.h
+  Compiler Attributes: add Doc/process/programming-language.rst
+  Compiler Attributes: add MAINTAINERS entry
+  Compiler Attributes: add support for __nonstring (gcc >= 8)
+  Compiler Attributes: enable -Wstringop-truncation on W=1 (gcc >= 8)
+  Compiler Attributes: auxdisplay: panel: use __nonstring
+  Compiler Attributes: ext4: remove local __nonstring definition
+
+ Documentation/process/index.rst               |   1 +
+ .../process/programming-language.rst          |  45 +++
+ MAINTAINERS                                   |   5 +
+ drivers/auxdisplay/panel.c                    |   7 +-
+ fs/ext4/ext4.h                                |   9 -
+ include/linux/compiler-clang.h                |   5 -
+ include/linux/compiler-gcc.h                  |  70 +----
+ include/linux/compiler-intel.h                |   9 -
+ include/linux/compiler.h                      |  19 +-
+ include/linux/compiler_attributes.h           | 258 ++++++++++++++++++
+ include/linux/compiler_types.h                | 101 +------
+ scripts/Makefile.extrawarn                    |   1 +
+ 12 files changed, 341 insertions(+), 189 deletions(-)
+ create mode 100644 Documentation/process/programming-language.rst
+ create mode 100644 include/linux/compiler_attributes.h
 
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
+
+Tested-by: Sedat Dilek <sedat.dilek@gmail.com> (against Linux
+v4.19-rc5 and built with LLVM/Clang v7)
