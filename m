@@ -1,64 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:54511 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728289AbeIYSrC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Sep 2018 14:47:02 -0400
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: How to define some additional KBUILD_CFLAGS after building include/generated/asm-offsets.h ?
-In-Reply-To: <87bm8m5qbs.fsf@concordia.ellerman.id.au>
-References: <e1b65467-7497-5db4-aa93-1ad00d12af3f@c-s.fr> <87mus75c5m.fsf@concordia.ellerman.id.au> <56227965-464a-d972-1c25-d6a4d190e1a1@c-s.fr> <87bm8m5qbs.fsf@concordia.ellerman.id.au>
-Date: Tue, 25 Sep 2018 22:39:36 +1000
-Message-ID: <875zyt4upj.fsf@concordia.ellerman.id.au>
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:38614 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726706AbeIZC1V (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 25 Sep 2018 22:27:21 -0400
+Received: by mail-ot1-f66.google.com with SMTP id h15-v6so2040666otj.5
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Sep 2018 13:18:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+References: <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk>
+ <153622557095.14298.10281337300003012767.stgit@warthog.procyon.org.uk>
+In-Reply-To: <153622557095.14298.10281337300003012767.stgit@warthog.procyon.org.uk>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Tue, 25 Sep 2018 13:17:54 -0700
+Message-ID: <CAPcyv4gmMwRAG=VxWNyeacxdsPCsaT+BtR+27+bHT=6heAZ3sQ@mail.gmail.com>
+Subject: Re: [PATCH 10/11] UAPI: ndctl: Remove use of PAGE_SIZE [ver #2]
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christophe LEROY <christophe.leroy@c-s.fr>, linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Segher Boessenkool <segher@kernel.crashing.org>
-Cc: LKML <linux-kernel@vger.kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Linux API <linux-api@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-nvdimm <linux-nvdimm@lists.01.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Michael Ellerman <mpe@ellerman.id.au> writes:
-> Christophe LEROY <christophe.leroy@c-s.fr> writes:
->> Le 24/09/2018 à 14:10, Michael Ellerman a écrit :
->>> Christophe Leroy <christophe.leroy@c-s.fr> writes:
->>>> I'm trying to implement TLS based stack protector in the Linux Kernel.
->>>> For that I need to give to GCC the offset at which it will find the
->>>> canary (register r2 is pointing to the current task struct).
->>>>
->>>> I have been able to do it with the below patch, but it only works when
->>>> include/generated/asm-offsets.h already exists from the start of the build.
->>>>
->>>> Is there a way to evaluate CANARY_OFFSET and add the stack-protector
->>>> flags to KBUILD_FLAGS only after include/generated/asm-offsets.h is built ?
->>>>
->>>> Or another way of add -mstack-protector-guard-offset=offsetof(struct
->>>> task_struct, stack_canary) ?
->>> 
->>> This seems to work, at least I see the value in CFLAGS:
->>> 
->>> diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
->>> index 07d9dce..39ee113 100644
->>> --- a/arch/powerpc/Makefile
->>> +++ b/arch/powerpc/Makefile
->>> @@ -404,6 +394,11 @@ archclean:
->>>   
->>>   archprepare: checkbin
->>>   
->>> +prepare: stack_protector_prepare
->>> +
->>> +stack_protector_prepare: prepare0
->>> +	$(eval KBUILD_CFLAGS += -mstack-protector-guard-offset=$(shell awk '{if ($$2 == "TSK_STACK_CANARY") print $$3;}' include/generated/asm-offsets.h))
->>> +
->>
->> Great, it works !
->> Thanks, I have sent v3 of the patches.
+On Thu, Sep 6, 2018 at 2:19 AM David Howells <dhowells@redhat.com> wrote:
 >
-> Cool.
+> The macro PAGE_SIZE isn't valid outside of the kernel, so it should not
+> appear in UAPI headers.
 >
-> It would be good to here from someone who knows Kbuild better than me if
-                      ^
-                      hear
+> Furthermore, the actual machine page size could theoretically change from
+> an application's point of view if it's running in a container that gets
+> migrated to another machine (say 4K/ppc64 to 64K/ppc64).
+>
+> Fixes: f2ba5a5baecf ("libnvdimm, namespace: make min namespace size 4K")
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Dan Williams <dan.j.williams@intel.com>
 
-Still learning English.
+Acked-by: Dan Williams <dan.j.williams@intel.com>
 
-cheers
+Let me know if you want me to pick this up for 4.20.
