@@ -1,60 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:39581 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726802AbeIZPKJ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Sep 2018 11:10:09 -0400
-Received: by mail-lf1-f66.google.com with SMTP id w21-v6so8538350lff.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 26 Sep 2018 01:58:14 -0700 (PDT)
+Received: from mail-eopbgr720072.outbound.protection.outlook.com ([40.107.72.72]:39264
+        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727280AbeI0AKz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 26 Sep 2018 20:10:55 -0400
+From: Nadav Amit <namit@vmware.com>
 Subject: Re: [PATCH v8 02/10] Makefile: Prepare for using macros for inline
  asm
+Date: Wed, 26 Sep 2018 17:56:06 +0000
+Message-ID: <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com>
 References: <20180918212847.199085-1-namit@vmware.com>
  <20180918212847.199085-3-namit@vmware.com>
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Message-ID: <1aa5a1f3-ef3d-5cd3-831c-2202d73d3c9e@rasmusvillemoes.dk>
-Date: Wed, 26 Sep 2018 10:58:11 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180918212847.199085-3-namit@vmware.com>
-Content-Type: text/plain; charset=utf-8
+ <1aa5a1f3-ef3d-5cd3-831c-2202d73d3c9e@rasmusvillemoes.dk>
+In-Reply-To: <1aa5a1f3-ef3d-5cd3-831c-2202d73d3c9e@rasmusvillemoes.dk>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D04A32E8904B7F4982D807F1D11DF753@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nadav Amit <namit@vmware.com>, Ingo Molnar <mingo@redhat.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Ingo Molnar <mingo@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-On 2018-09-18 23:28, Nadav Amit wrote:
-
-> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-> index 8f6e7eb8ae9f..944fa3bc9376 100644
-> --- a/arch/x86/Makefile
-> +++ b/arch/x86/Makefile
-> @@ -214,8 +214,8 @@ ifdef CONFIG_X86_64
->  KBUILD_LDFLAGS += $(call ld-option, -z max-page-size=0x200000)
->  endif
->  
-> -# Speed up the build
-> -KBUILD_CFLAGS += -pipe
-> +# We cannot use -pipe flag since we give an additional .s file to the compiler
-> +#KBUILD_CFLAGS += -pipe
-
-Is this really necessary? The gas manual says that one can use -- to
-name stdin, though that's probably a typo and should just be - . Doing
-
-gcc -pipe -Wa,foo.s -Wa,-
-
-does seem to work as expected (and would also make it possible to append
-some .s file should that ever be required).
->  
-> +archmacros:
-> +	$(Q)$(MAKE) $(build)=arch/x86/kernel arch/x86/kernel/macros.s
-> +
-> +ASM_MACRO_FLAGS = -Wa,arch/x86/kernel/macros.s
-> +export ASM_MACRO_FLAGS
-> +KBUILD_CFLAGS += $(ASM_MACRO_FLAGS)
-How does this affect what gets rebuilt when one of the asm/foo.h files
-going into macros.s changes? Does that cause a global rebuild because
-everything depends on macros.s, or do we still only rebuild the files
-that actually include asm/foo.h?
-
-Rasmus
+YXQgMTo1OCBBTSwgUmFzbXVzIFZpbGxlbW9lcyA8bGludXhAcmFzbXVzdmlsbGVtb2VzLmRrPiB3
+cm90ZToNCg0KPiBPbiAyMDE4LTA5LTE4IDIzOjI4LCBOYWRhdiBBbWl0IHdyb3RlOg0KPiANCj4+
+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9NYWtlZmlsZSBiL2FyY2gveDg2L01ha2VmaWxlDQo+PiBp
+bmRleCA4ZjZlN2ViOGFlOWYuLjk0NGZhM2JjOTM3NiAxMDA2NDQNCj4+IC0tLSBhL2FyY2gveDg2
+L01ha2VmaWxlDQo+PiArKysgYi9hcmNoL3g4Ni9NYWtlZmlsZQ0KPj4gQEAgLTIxNCw4ICsyMTQs
+OCBAQCBpZmRlZiBDT05GSUdfWDg2XzY0DQo+PiBLQlVJTERfTERGTEFHUyArPSAkKGNhbGwgbGQt
+b3B0aW9uLCAteiBtYXgtcGFnZS1zaXplPTB4MjAwMDAwKQ0KPj4gZW5kaWYNCj4+IA0KPj4gLSMg
+U3BlZWQgdXAgdGhlIGJ1aWxkDQo+PiAtS0JVSUxEX0NGTEFHUyArPSAtcGlwZQ0KPj4gKyMgV2Ug
+Y2Fubm90IHVzZSAtcGlwZSBmbGFnIHNpbmNlIHdlIGdpdmUgYW4gYWRkaXRpb25hbCAucyBmaWxl
+IHRvIHRoZSBjb21waWxlcg0KPj4gKyNLQlVJTERfQ0ZMQUdTICs9IC1waXBlDQo+IA0KPiBJcyB0
+aGlzIHJlYWxseSBuZWNlc3Nhcnk/IFRoZSBnYXMgbWFudWFsIHNheXMgdGhhdCBvbmUgY2FuIHVz
+ZSAtLSB0bw0KPiBuYW1lIHN0ZGluLCB0aG91Z2ggdGhhdCdzIHByb2JhYmx5IGEgdHlwbyBhbmQg
+c2hvdWxkIGp1c3QgYmUgLSAuIERvaW5nDQo+IA0KPiBnY2MgLXBpcGUgLVdhLGZvby5zIC1XYSwt
+DQoNCkdvb2QgaWRlYS4gSSBkaWRu4oCZdCB0aGluayBvZiBpdC4gWWVzLCB0aGlzIGNhbiBkbyB0
+aGUgdHJpY2suIEnigJlsbCBkbyBpdCBpbg0KdjkuDQoNCj4gZG9lcyBzZWVtIHRvIHdvcmsgYXMg
+ZXhwZWN0ZWQgKGFuZCB3b3VsZCBhbHNvIG1ha2UgaXQgcG9zc2libGUgdG8gYXBwZW5kDQo+IHNv
+bWUgLnMgZmlsZSBzaG91bGQgdGhhdCBldmVyIGJlIHJlcXVpcmVkKS4NCj4+ICthcmNobWFjcm9z
+Og0KPj4gKwkkKFEpJChNQUtFKSAkKGJ1aWxkKT1hcmNoL3g4Ni9rZXJuZWwgYXJjaC94ODYva2Vy
+bmVsL21hY3Jvcy5zDQo+PiArDQo+PiArQVNNX01BQ1JPX0ZMQUdTID0gLVdhLGFyY2gveDg2L2tl
+cm5lbC9tYWNyb3Mucw0KPj4gK2V4cG9ydCBBU01fTUFDUk9fRkxBR1MNCj4+ICtLQlVJTERfQ0ZM
+QUdTICs9ICQoQVNNX01BQ1JPX0ZMQUdTKQ0KPiBIb3cgZG9lcyB0aGlzIGFmZmVjdCB3aGF0IGdl
+dHMgcmVidWlsdCB3aGVuIG9uZSBvZiB0aGUgYXNtL2Zvby5oIGZpbGVzDQo+IGdvaW5nIGludG8g
+bWFjcm9zLnMgY2hhbmdlcz8gRG9lcyB0aGF0IGNhdXNlIGEgZ2xvYmFsIHJlYnVpbGQgYmVjYXVz
+ZQ0KPiBldmVyeXRoaW5nIGRlcGVuZHMgb24gbWFjcm9zLnMsIG9yIGRvIHdlIHN0aWxsIG9ubHkg
+cmVidWlsZCB0aGUgZmlsZXMNCj4gdGhhdCBhY3R1YWxseSBpbmNsdWRlIGFzbS9mb28uaD8NCg0K
+VGhlcmUgd2lsbCBub3QgYmUgYSBnbG9iYWwgcmVidWlsZC4gQW55IHNvdXJjZSBmaWxlIHRoYXQg
+dXNlcyB0aGUgaGVhZGVyDQpmaWxlcyB0aGF0IGFyZSBpbmNsdWRlZCBpbiBtYWNyb3MuUyB3aWxs
+IGJlIHJlYnVpbHQuDQoNCkJ1dCB5b3VyIHF1ZXN0aW9uIGFjdHVhbGx5IHJhaXNlcyB0d28gaXNz
+dWVzOg0KDQoxLiBJZiBtYWNyb3MuUyBjaGFuZ2VzLCB0aGVyZSAqc2hvdWxkKiBiZSBhIGdsb2Jh
+bCByZWJ1aWxkLCBhbmQgY3VycmVudGx5DQp0aGVyZSB3b3VsZG7igJl0IGJlIG9uZS4gRG8geW91
+IGhhcHBlbiB0byBrbm93IHdoYXQgd291bGQgYmUgdGhlIGFwcHJvcHJpYXRlDQp3YXkgdG8gdHJp
+Z2dlciBvbmU/DQoNCjIuIFNvbWVvbmUgbWlnaHQgbWlzdGFrZW5seSB1c2UgdGhlIG1hY3JvcyB0
+aHJvdWdoIGlubGluZSBhc3NlbWJseSB3aXRob3V0DQppbmNsdWRpbmcgdGhlIGhlYWRlciBmaWxl
+LiBJdCB3b3VsZCBiZSBiZXR0ZXIgdG8gZGV0ZWN0IHN1Y2ggY2FzZXMgYW5kIGZhaWwNCnRoZSBi
+dWlsZC4gSSBtYXkgYmUgYWJsZSB0byBjcmVhdGUgYW5vdGhlciBhc20gbWFjcm8gaW4gdGhlIEMg
+cGFydCBvZiB0aGUNCmhlYWRlciB0aGF0IHdvdWxkIGNhdXNlIHRoZSBidWlsZCB0byBmYWlsLiBC
+dXQgbGV0IG1lIGtub3cgaWYgeW91IGFueQ0KYmV0dGVyIGlkZWEuDQoNClJlZ2FyZHMsDQpOYWRh
+dg0KDQo=
