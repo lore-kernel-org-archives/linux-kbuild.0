@@ -1,76 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:34886 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726934AbeI0OJu (ORCPT
+Received: from mail-oi1-f169.google.com ([209.85.167.169]:36652 "EHLO
+        mail-oi1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725972AbeI1FEv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Sep 2018 10:09:50 -0400
-Received: by mail-lf1-f68.google.com with SMTP id r191-v6so1375265lff.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 27 Sep 2018 00:52:53 -0700 (PDT)
-Subject: Re: [PATCH v8 02/10] Makefile: Prepare for using macros for inline
- asm
-References: <20180918212847.199085-1-namit@vmware.com>
- <20180918212847.199085-3-namit@vmware.com>
- <1aa5a1f3-ef3d-5cd3-831c-2202d73d3c9e@rasmusvillemoes.dk>
- <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com>
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Message-ID: <4d3684d6-f415-09b3-0a4f-6eca173bfd37@rasmusvillemoes.dk>
-Date: Thu, 27 Sep 2018 09:52:50 +0200
+        Fri, 28 Sep 2018 01:04:51 -0400
 MIME-Version: 1.0
-In-Reply-To: <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Fri, 28 Sep 2018 00:44:04 +0200
+Message-ID: <CAFkk2KQ-sC=bAd9fCkOVPNmZn8m+EZfpZtirE+J5VpvW120sxQ@mail.gmail.com>
+Subject: [ANNOUNCE] Kconfiglib menuconfig and documentation generation updates
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nadav Amit <namit@vmware.com>, Ingo Molnar <mingo@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>
 
-On 2018-09-26 19:56, Nadav Amit wrote:
-> at 1:58 AM, Rasmus Villemoes <linux@rasmusvillemoes.dk> wrote:
-> 
->>> +ASM_MACRO_FLAGS = -Wa,arch/x86/kernel/macros.s
->>> +export ASM_MACRO_FLAGS
->>> +KBUILD_CFLAGS += $(ASM_MACRO_FLAGS)
->> How does this affect what gets rebuilt when one of the asm/foo.h files
->> going into macros.s changes? Does that cause a global rebuild because
->> everything depends on macros.s, or do we still only rebuild the files
->> that actually include asm/foo.h?
-> 
-> There will not be a global rebuild. Any source file that uses the header
-> files that are included in macros.S will be rebuilt.
-> 
-> But your question actually raises two issues:
-> 
-> 1. If macros.S changes, there *should* be a global rebuild, and currently
-> there wouldn’t be one. Do you happen to know what would be the appropriate
-> way to trigger one?
+Hello,
 
-Hm, that's a question for Kbuild folks, I think. Maybe one could just
-ensure macros.s gets written into the dependency file for each
-translation unit (maybe fixdep already has support for that). But if we
-do that, we probably want macros.s to be generated with some if_changed
-makefile magic, so that changes in one of the asm/ headers that do not
-actually change macros.s does not cause a global rebuild (it would still
-rebuild the files that actually inclue that asm/ header, of course).
+Here's two small Kconfiglib (https://github.com/ulfalizer/kconfiglib) updates.
 
-> 2. Someone might mistakenly use the macros through inline assembly without
-> including the header file.
+First, I've made it a lot easier to try out the menuconfig implementation on
+the kernel. This will work now, in the kernel root:
 
-That's rather unlikely, I think. An open-coded asm("SOME_MACRO ...")
-would hopefully be caught in review. But yeah...
+  $ git clone https://github.com/ulfalizer/Kconfiglib.git
+  $ git am Kconfiglib/makefile.patch
+  $ make kmenuconfig
 
-> It would be better to detect such cases and fail
-> the build. I may be able to create another asm macro in the C part of the
-> header that would cause the build to fail. But let me know if you any
-> better idea.
+Here's an animation that demonstrates various menuconfig features:
+https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/menuconfig.gif
 
-The best I can think of (and I'm not suggesting to do this, or that it
-would actually work): In asm/foo.h, inside its cpp include guard, and
-inside a guard that excludes this piece when building macros.s itself,
-have a 'asm("___asm_foo_included__ = 1\n")'. Then inside each asm macro
-defined in asm/foo.h, have a ".ifndef ___asm_foo_included___\n.error
-...\n.endif". That latter part might be macrofied itself so that it's
-just one line, "CHECK_INCLUDE ___asm_foo_included___\n", with
-CHECK_INCLUDE being defined in macros.S.
+Secondly, there's now a handy cross-referenced documentation generation script
+available.
 
-Rasmus
+Example documentation output (warning: heavy page, lots of symbols):
+https://docs.zephyrproject.org/latest/reference/kconfig/index.html
+
+The script that generates the documentation:
+https://github.com/zephyrproject-rtos/zephyr/blob/master/doc/scripts/genrest.py
+
+The recently added Kconfig preprocessor has been implemented for a while now,
+along with an extension that allows preprocessor functions to be defined in
+Python.
+
+I've also fixed some broken/incomplete behavior from the C tools, like not
+being able to add symbols to choices by giving them a name and defining them in
+multiple locations (though I think projects sometimes overdo multiple
+definitions :). This is actually just a menuconfig hack that aggregates the
+menu nodes from all choice definition locations when you enter a choice.
+
+Zephyr and several smaller projects now use Kconfiglib exclusively.
+
+Feedback appreciated!
+
+Cheers,
+Ulf
