@@ -1,68 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:54297 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726590AbeI0Msb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Sep 2018 08:48:31 -0400
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: How to define some additional KBUILD_CFLAGS after building include/generated/asm-offsets.h ?
-In-Reply-To: <CAK7LNAQA2JyK9aOp9QQF32bwsz2MitaZ5HrqSVjdEvRdCQpO3g@mail.gmail.com>
-References: <e1b65467-7497-5db4-aa93-1ad00d12af3f@c-s.fr> <87mus75c5m.fsf@concordia.ellerman.id.au> <56227965-464a-d972-1c25-d6a4d190e1a1@c-s.fr> <87bm8m5qbs.fsf@concordia.ellerman.id.au> <CAK7LNAQA2JyK9aOp9QQF32bwsz2MitaZ5HrqSVjdEvRdCQpO3g@mail.gmail.com>
-Date: Thu, 27 Sep 2018 16:31:48 +1000
-Message-ID: <87ftxvv4bv.fsf@concordia.ellerman.id.au>
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:34886 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726934AbeI0OJu (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 27 Sep 2018 10:09:50 -0400
+Received: by mail-lf1-f68.google.com with SMTP id r191-v6so1375265lff.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 27 Sep 2018 00:52:53 -0700 (PDT)
+Subject: Re: [PATCH v8 02/10] Makefile: Prepare for using macros for inline
+ asm
+References: <20180918212847.199085-1-namit@vmware.com>
+ <20180918212847.199085-3-namit@vmware.com>
+ <1aa5a1f3-ef3d-5cd3-831c-2202d73d3c9e@rasmusvillemoes.dk>
+ <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com>
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Message-ID: <4d3684d6-f415-09b3-0a4f-6eca173bfd37@rasmusvillemoes.dk>
+Date: Thu, 27 Sep 2018 09:52:50 +0200
 MIME-Version: 1.0
+In-Reply-To: <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Christophe LEROY <christophe.leroy@c-s.fr>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Segher Boessenkool <segher@kernel.crashing.org>, LKML <linux-kernel@vger.kernel.org>
+To: Nadav Amit <namit@vmware.com>, Ingo Molnar <mingo@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-Masahiro Yamada <yamada.masahiro@socionext.com> writes:
-> 2018-09-25 10:16 GMT+09:00 Michael Ellerman <mpe@ellerman.id.au>:
->> Christophe LEROY <christophe.leroy@c-s.fr> writes:
->>
->>> Le 24/09/2018 à 14:10, Michael Ellerman a écrit :
->>>> Christophe Leroy <christophe.leroy@c-s.fr> writes:
->>>>
->>>>> I'm trying to implement TLS based stack protector in the Linux Kernel.
->>>>> For that I need to give to GCC the offset at which it will find the
->>>>> canary (register r2 is pointing to the current task struct).
->>>>>
->>>>> I have been able to do it with the below patch, but it only works when
->>>>> include/generated/asm-offsets.h already exists from the start of the build.
->>>>>
->>>>> Is there a way to evaluate CANARY_OFFSET and add the stack-protector
->>>>> flags to KBUILD_FLAGS only after include/generated/asm-offsets.h is built ?
->>>>>
->>>>> Or another way of add -mstack-protector-guard-offset=offsetof(struct
->>>>> task_struct, stack_canary) ?
->>>>
->>>> This seems to work, at least I see the value in CFLAGS:
->>>>
->>>> diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
->>>> index 07d9dce..39ee113 100644
->>>> --- a/arch/powerpc/Makefile
->>>> +++ b/arch/powerpc/Makefile
->>>> @@ -404,6 +394,11 @@ archclean:
->>>>
->>>>   archprepare: checkbin
->>>>
->>>> +prepare: stack_protector_prepare
->>>> +
->>>> +stack_protector_prepare: prepare0
->>>> +    $(eval KBUILD_CFLAGS += -mstack-protector-guard-offset=$(shell awk '{if ($$2 == "TSK_STACK_CANARY") print $$3;}' include/generated/asm-offsets.h))
->>>> +
->>>
->>> Great, it works !
->>> Thanks, I have sent v3 of the patches.
->>
->> Cool.
->>
->> It would be good to here from someone who knows Kbuild better than me if
->> this is acceptable or just a gross hack :)
->
-> I am fine with this solution.
+On 2018-09-26 19:56, Nadav Amit wrote:
+> at 1:58 AM, Rasmus Villemoes <linux@rasmusvillemoes.dk> wrote:
+> 
+>>> +ASM_MACRO_FLAGS = -Wa,arch/x86/kernel/macros.s
+>>> +export ASM_MACRO_FLAGS
+>>> +KBUILD_CFLAGS += $(ASM_MACRO_FLAGS)
+>> How does this affect what gets rebuilt when one of the asm/foo.h files
+>> going into macros.s changes? Does that cause a global rebuild because
+>> everything depends on macros.s, or do we still only rebuild the files
+>> that actually include asm/foo.h?
+> 
+> There will not be a global rebuild. Any source file that uses the header
+> files that are included in macros.S will be rebuilt.
+> 
+> But your question actually raises two issues:
+> 
+> 1. If macros.S changes, there *should* be a global rebuild, and currently
+> there wouldn’t be one. Do you happen to know what would be the appropriate
+> way to trigger one?
 
-Thanks.
+Hm, that's a question for Kbuild folks, I think. Maybe one could just
+ensure macros.s gets written into the dependency file for each
+translation unit (maybe fixdep already has support for that). But if we
+do that, we probably want macros.s to be generated with some if_changed
+makefile magic, so that changes in one of the asm/ headers that do not
+actually change macros.s does not cause a global rebuild (it would still
+rebuild the files that actually inclue that asm/ header, of course).
 
-cheers
+> 2. Someone might mistakenly use the macros through inline assembly without
+> including the header file.
+
+That's rather unlikely, I think. An open-coded asm("SOME_MACRO ...")
+would hopefully be caught in review. But yeah...
+
+> It would be better to detect such cases and fail
+> the build. I may be able to create another asm macro in the C part of the
+> header that would cause the build to fail. But let me know if you any
+> better idea.
+
+The best I can think of (and I'm not suggesting to do this, or that it
+would actually work): In asm/foo.h, inside its cpp include guard, and
+inside a guard that excludes this piece when building macros.s itself,
+have a 'asm("___asm_foo_included__ = 1\n")'. Then inside each asm macro
+defined in asm/foo.h, have a ".ifndef ___asm_foo_included___\n.error
+...\n.endif". That latter part might be macrofied itself so that it's
+just one line, "CHECK_INCLUDE ___asm_foo_included___\n", with
+CHECK_INCLUDE being defined in macros.S.
+
+Rasmus
