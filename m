@@ -1,49 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:31762 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726060AbeI1IoG (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 28 Sep 2018 04:44:06 -0400
+Received: from ozlabs.org ([203.11.71.1]:56037 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726121AbeI1LOT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 28 Sep 2018 07:14:19 -0400
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v6] selftests: add headers_install to lib.mk
+In-Reply-To: <20180904104721.27535-1-anders.roxell@linaro.org>
+References: <20180809080402.24469-1-anders.roxell@linaro.org> <20180904104721.27535-1-anders.roxell@linaro.org>
+Date: Fri, 28 Sep 2018 14:52:22 +1000
+Message-ID: <87y3bmte9l.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-References: <20180815142749.18804-1-linux@rasmusvillemoes.dk> <CAKwiHFj5yGtsR+s0Ukjy0Pe1pDpd_euyT0MRZdTt0H3ssXqYXQ@mail.gmail.com>
-In-Reply-To: <CAKwiHFj5yGtsR+s0Ukjy0Pe1pDpd_euyT0MRZdTt0H3ssXqYXQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 28 Sep 2018 11:21:41 +0900
-Message-ID: <CAK7LNATmw1Tic2mDybRd-5CbZK_6J1+=3j31q8K9hONVoRHrdA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Kbuild: Some fixdep tweaks
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Anders Roxell <anders.roxell@linaro.org>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, shuah@kernel.org, bamv2005@gmail.com, brgl@bgdev.pl, pbonzini@redhat.com, akpm@linux-foundation.org, rppt@linux.vnet.ibm.com, aarcange@redhat.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-Hi Rasmus,
+[ + linuxppc-dev ]
 
-
-2018=E5=B9=B49=E6=9C=8827=E6=97=A5(=E6=9C=A8) 3:58 Rasmus Villemoes <linux@=
-rasmusvillemoes.dk>:
+Anders Roxell <anders.roxell@linaro.org> writes:
+> If the kernel headers aren't installed we can't build all the tests.
+> Add a new make target rule 'khdr' in the file lib.mk to generate the
+> kernel headers and that gets include for every test-dir Makefile that
+> includes lib.mk If the testdir in turn have its own sub-dirs the
+> top_srcdir needs to be set to the linux-rootdir to be able to generate
+> the kernel headers.
 >
-> On 15 August 2018 at 16:27, Rasmus Villemoes <linux@rasmusvillemoes.dk> w=
-rote:
-> > These patches eliminate two (albeit tiny and shortlived) processes
-> > from the cmd_and_fixdep rule, i.e. from every TU being
-> > compiled. Whether the diffstat below is worth it I'll leave to Kbuild
-> > maintainers to decide.
+> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+> Reviewed-by: Fathi Boudra <fathi.boudra@linaro.org>
+> ---
 >
-> Ping.
+> I sent this (v5) a month ago and wondered if it got lost. Resending
+> unchanged.
+>
+> Cheers,
+> Anders
+>
+>  Makefile                                           | 14 +-------------
+>  scripts/subarch.include                            | 13 +++++++++++++
+>  tools/testing/selftests/android/Makefile           |  2 +-
+>  tools/testing/selftests/android/ion/Makefile       |  2 ++
+>  tools/testing/selftests/futex/functional/Makefile  |  1 +
+>  tools/testing/selftests/gpio/Makefile              |  7 ++-----
+>  tools/testing/selftests/kvm/Makefile               |  7 ++-----
+>  tools/testing/selftests/lib.mk                     | 12 ++++++++++++
+>  tools/testing/selftests/net/Makefile               |  1 +
+>  .../selftests/networking/timestamping/Makefile     |  1 +
+>  tools/testing/selftests/vm/Makefile                |  4 ----
+>  11 files changed, 36 insertions(+), 28 deletions(-)
+>  create mode 100644 scripts/subarch.include
 
+This broke all the powerpc selftests :(
 
-Sorry for delay.
-As far as I tested, the performance improvement was not noticeable level.
+Why did it go in at rc5?
 
-This patch set actually sits on the fence.
-I tend to choose not-apply when I cannot make up my mind.
-
-
-If you have something more to convince me, please let me know.
-
-
---=20
-Best Regards
-Masahiro Yamada
+cheers
