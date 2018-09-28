@@ -1,56 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f169.google.com ([209.85.167.169]:36652 "EHLO
-        mail-oi1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725972AbeI1FEv (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:31762 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726060AbeI1IoG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 28 Sep 2018 01:04:51 -0400
+        Fri, 28 Sep 2018 04:44:06 -0400
 MIME-Version: 1.0
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Fri, 28 Sep 2018 00:44:04 +0200
-Message-ID: <CAFkk2KQ-sC=bAd9fCkOVPNmZn8m+EZfpZtirE+J5VpvW120sxQ@mail.gmail.com>
-Subject: [ANNOUNCE] Kconfiglib menuconfig and documentation generation updates
+References: <20180815142749.18804-1-linux@rasmusvillemoes.dk> <CAKwiHFj5yGtsR+s0Ukjy0Pe1pDpd_euyT0MRZdTt0H3ssXqYXQ@mail.gmail.com>
+In-Reply-To: <CAKwiHFj5yGtsR+s0Ukjy0Pe1pDpd_euyT0MRZdTt0H3ssXqYXQ@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 28 Sep 2018 11:21:41 +0900
+Message-ID: <CAK7LNATmw1Tic2mDybRd-5CbZK_6J1+=3j31q8K9hONVoRHrdA@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Kbuild: Some fixdep tweaks
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hello,
+Hi Rasmus,
 
-Here's two small Kconfiglib (https://github.com/ulfalizer/kconfiglib) updates.
 
-First, I've made it a lot easier to try out the menuconfig implementation on
-the kernel. This will work now, in the kernel root:
+2018=E5=B9=B49=E6=9C=8827=E6=97=A5(=E6=9C=A8) 3:58 Rasmus Villemoes <linux@=
+rasmusvillemoes.dk>:
+>
+> On 15 August 2018 at 16:27, Rasmus Villemoes <linux@rasmusvillemoes.dk> w=
+rote:
+> > These patches eliminate two (albeit tiny and shortlived) processes
+> > from the cmd_and_fixdep rule, i.e. from every TU being
+> > compiled. Whether the diffstat below is worth it I'll leave to Kbuild
+> > maintainers to decide.
+>
+> Ping.
 
-  $ git clone https://github.com/ulfalizer/Kconfiglib.git
-  $ git am Kconfiglib/makefile.patch
-  $ make kmenuconfig
 
-Here's an animation that demonstrates various menuconfig features:
-https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/menuconfig.gif
+Sorry for delay.
+As far as I tested, the performance improvement was not noticeable level.
 
-Secondly, there's now a handy cross-referenced documentation generation script
-available.
+This patch set actually sits on the fence.
+I tend to choose not-apply when I cannot make up my mind.
 
-Example documentation output (warning: heavy page, lots of symbols):
-https://docs.zephyrproject.org/latest/reference/kconfig/index.html
 
-The script that generates the documentation:
-https://github.com/zephyrproject-rtos/zephyr/blob/master/doc/scripts/genrest.py
+If you have something more to convince me, please let me know.
 
-The recently added Kconfig preprocessor has been implemented for a while now,
-along with an extension that allows preprocessor functions to be defined in
-Python.
 
-I've also fixed some broken/incomplete behavior from the C tools, like not
-being able to add symbols to choices by giving them a name and defining them in
-multiple locations (though I think projects sometimes overdo multiple
-definitions :). This is actually just a menuconfig hack that aggregates the
-menu nodes from all choice definition locations when you enter a choice.
-
-Zephyr and several smaller projects now use Kconfiglib exclusively.
-
-Feedback appreciated!
-
-Cheers,
-Ulf
+--=20
+Best Regards
+Masahiro Yamada
