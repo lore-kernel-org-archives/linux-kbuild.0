@@ -1,51 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:42394 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726337AbeI2CBq (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 28 Sep 2018 22:01:46 -0400
+Received: from ozlabs.org ([203.11.71.1]:45407 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727418AbeI2N1s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 29 Sep 2018 09:27:48 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH] modpost: remove leftover symbol prefix handling for module device table
+In-Reply-To: <1538115715-10078-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1538115715-10078-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Sat, 29 Sep 2018 16:30:22 +0930
+Message-ID: <87bm8giy9l.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-References: <1538117388-11945-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1538117388-11945-1-git-send-email-yamada.masahiro@socionext.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Fri, 28 Sep 2018 21:36:14 +0200
-Message-ID: <CAK8P3a16pR5e1js7JiGreqHqxv5RNJZZY=JLFwLRE8i3nbg5hQ@mail.gmail.com>
-Subject: Re: [PATCH] samples: run headers_install for host arch instead of
- target arch
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, David Howells <dhowells@redhat.com>, Kees Cook <keescook@chromium.org>, Richard Weinberger <richard@nod.at>, Jeff Dike <jdike@addtoit.com>, Bjorn Andersson <bjorn.andersson@linaro.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Andy Gross <andy.gross@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, Jessica Yu <jeyu@kernel.org>
 
-On Fri, Sep 28, 2018 at 8:51 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+Please send this to the module maintainer (CC'd).
+
+Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+> Blackfin and metag were the only architectures that prefix symbols with
+> an underscore.  They were removed by commit 4ba66a976072 ("arch: remove
+> blackfin port"), commit bb6fb6dfcc17 ("metag: Remove arch/metag/"),
+> respectively.
 >
-> Some samples search headers in $(objtree)/usr/include, which is made
-> available by "make headers_install".  It is not kernel-space code but
-> host programs that need this header search path.
+> It is no longer necessary to handle <prefix> part of module device
+> table symbols.
 >
-> Commit 3fca1700c4c3 ("kbuild: make samples really depend on
-> headers_install") is wrong because it installs headers of the target
-> architecture.  Besides, UML fails to build with CONFIG_SAMPLES=y
-> because UML does not support headers_install.
->
-> Invoke "make headers_install" for the _host_ architecture in the
-> prepare stage.  Introduce CONFIG_HOST_HEADERS_INSTALL so that this
-> happens only for samples that need it.
->
-> I also removed 'Documentation/: headers_install', which I guess is
-> stale code.
->
-> Fixes: 3fca1700c4c3 ("kbuild: make samples really depend on headers_install")
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: David Howells <dhowells@redhat.com>
-
-I don't understand this one. Why would we want to build the samples for
-the host architecture rather than the target architecture?
-
-I would think that the bug is that we try to build them using
-HOSTCC, and they end up being unusable on the target as
-a consequence.
-
-        Arnd
+> ---
+>
+>  scripts/mod/file2alias.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+> index 7be4369..ba4ebc4 100644
+> --- a/scripts/mod/file2alias.c
+> +++ b/scripts/mod/file2alias.c
+> @@ -1415,11 +1415,10 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
+>  	if (ELF_ST_TYPE(sym->st_info) != STT_OBJECT)
+>  		return;
+>  
+> -	/* All our symbols are of form <prefix>__mod_<name>__<identifier>_device_table. */
+> -	name = strstr(symname, "__mod_");
+> -	if (!name)
+> +	/* All our symbols are of form __mod_<name>__<identifier>_device_table. */
+> +	if (strncmp(symname, "__mod_", strlen("__mod_")))
+>  		return;
+> -	name += strlen("__mod_");
+> +	name = symname + strlen("__mod_");
+>  	namelen = strlen(name);
+>  	if (namelen < strlen("_device_table"))
+>  		return;
+> -- 
+> 2.7.4
