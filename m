@@ -1,31 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f171.google.com ([209.85.160.171]:44653 "EHLO
-        mail-qt1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728144AbeI3RuV (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:32097 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728310AbeI3USb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 30 Sep 2018 13:50:21 -0400
+        Sun, 30 Sep 2018 16:18:31 -0400
 MIME-Version: 1.0
-References: <20180920172301.21868-1-miguel.ojeda.sandonis@gmail.com>
- <20180920172301.21868-14-miguel.ojeda.sandonis@gmail.com> <CAGXu5jKZYEK7Asy4KwtfVVxHLFbpeqpWWEOM-60h7h4gj3JZrw@mail.gmail.com>
-In-Reply-To: <CAGXu5jKZYEK7Asy4KwtfVVxHLFbpeqpWWEOM-60h7h4gj3JZrw@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sun, 30 Sep 2018 13:17:33 +0200
-Message-ID: <CANiq72nvZZAF445cBTiLCX-4EOLD6OsRo0TP8eXgwvBAzakgOA@mail.gmail.com>
-Subject: Re: [PATCH v5 13/15] Compiler Attributes: enable -Wstringop-truncation
- on W=1 (gcc >= 8)
+References: <1536826841-4458-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1536826841-4458-1-git-send-email-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 30 Sep 2018 22:44:36 +0900
+Message-ID: <CAK7LNATVDHfS==P0r7tX6Q41HN3=4VfujZVdYOPsvXPR=Ers_Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: remove unneeded link_multi_deps
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Greg KH <gregkh@linuxfoundation.org>, linux-kernel <linux-kernel@vger.kernel.org>, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Ted Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, Sep 20, 2018 at 9:56 PM Kees Cook <keescook@chromium.org> wrote:
+2018=E5=B9=B49=E6=9C=8813=E6=97=A5(=E6=9C=A8) 17:22 Masahiro Yamada <yamada=
+.masahiro@socionext.com>:
 >
-> Yessss. :)
+> Since commit c8589d1e9e01 ("kbuild: handle multi-objs dependency
+> appropriately"), $^ really represents all the prerequisite of the
+> composite object being built.
 >
-> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Hence, $(filter-out FORCE,$^) contains all the objects to link
+> together, which is much simpler than link_multi_deps calculation.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 
-Done! Thanks! :)
+Applied to linux-kbuild.
 
-Cheers,
-Miguel
+
+>  scripts/Makefile.build | 20 ++------------------
+>  1 file changed, 2 insertions(+), 18 deletions(-)
+>
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index cb03774..d7fa203 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -485,28 +485,12 @@ targets +=3D $(obj)/lib-ksyms.o
+>
+>  endif
+>
+> -#
+> -# Rule to link composite objects
+> -#
+> -#  Composite objects are specified in kbuild makefile as follows:
+> -#    <composite-object>-objs :=3D <list of .o files>
+> -#  or
+> -#    <composite-object>-y    :=3D <list of .o files>
+> -#  or
+> -#    <composite-object>-m    :=3D <list of .o files>
+> -#  The -m syntax only works if <composite object> is a module
+> -link_multi_deps =3D                     \
+> -$(filter $(addprefix $(obj)/,         \
+> -$($(subst $(obj)/,,$(@:.o=3D-objs)))    \
+> -$($(subst $(obj)/,,$(@:.o=3D-y)))       \
+> -$($(subst $(obj)/,,$(@:.o=3D-m)))), $^)
+> -
+>  quiet_cmd_link_multi-m =3D LD [M]  $@
+> -cmd_link_multi-m =3D $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd=
+_secanalysis)
+> +cmd_link_multi-m =3D $(LD) $(ld_flags) -r -o $@ $(filter-out FORCE,$^) $=
+(cmd_secanalysis)
+>
+>  $(multi-used-m): FORCE
+>         $(call if_changed,link_multi-m)
+> -       @{ echo $(@:.o=3D.ko); echo $(link_multi_deps); \
+> +       @{ echo $(@:.o=3D.ko); echo $(filter-out FORCE,$^); \
+>            $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=3D.mod)
+>  $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
+>
+> --
+> 2.7.4
+>
+
+
+--=20
+Best Regards
+Masahiro Yamada
