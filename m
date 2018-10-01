@@ -1,107 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:33511 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729516AbeJAWDx (ORCPT
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:34344 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726118AbeJAX4L (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 1 Oct 2018 18:03:53 -0400
-From: Rob Herring <robh@kernel.org>
-Subject: [PATCH v4 0/9] Devicetree build consolidation
-Date: Mon,  1 Oct 2018 10:25:22 -0500
-Message-Id: <20181001152531.3385-1-robh@kernel.org>
+        Mon, 1 Oct 2018 19:56:11 -0400
+Received: by mail-pg1-f195.google.com with SMTP id g12-v6so4254570pgs.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 01 Oct 2018 10:17:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <1538387078-21892-1-git-send-email-yamada.masahiro@socionext.com> <1538387078-21892-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1538387078-21892-3-git-send-email-yamada.masahiro@socionext.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 1 Oct 2018 10:17:12 -0700
+Message-ID: <CAKwvOd=R1FN_nmR4Wkpb=nTt+v2f2+uWOcQCFoB+B1hWzCXCXA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] kbuild: add -Wno-unused-but-set-variable compiler
+ flag unconditionally
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Frank Rowand <frowand.list@gmail.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, linux-kbuild@vger.kernel.org, linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org, uclinux-h8-devel@lists.sourceforge.jp, linux-mips@linux-mips.org, nios2-dev@lists.rocketboards.org, linuxppc-dev@lists.ozlabs.org, linux-xtensa@linux-xtensa.org, Will Deacon <will.deacon@arm.com>, Paul Burton <paul.burton@mips.com>, Ley Foon Tan <ley.foon.tan@intel.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
 
-This series addresses a couple of issues I have with building dts files.
+On Mon, Oct 1, 2018 at 2:45 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> We have raised the compiler requirement from time to time.
+> With commit cafa0010cd51 ("Raise the minimum required gcc version
+> to 4.6"), the minimum for GCC is 4.6 now.
+>
+> This flag was added by GCC 4.6, and it is recognized by Clang and
+> ICC as well.
 
-First, the ability to build all the dts files in the tree. This has been
-supported on most arches for some time with powerpc being the main
-exception. The reason powerpc wasn't supported was it needed a change
-in the location built dtb files are put.
+This doesn't seem to be the case for Clang:
+https://godbolt.org/z/qesF5o
 
-Secondly, it's a pain to acquire all the cross-compilers needed to build
-dtbs for each arch. There's no reason to build with the cross compiler and
-the host compiler is perfectly fine as we only need the pre-processor.
-
-I started addressing just those 2 problems, but kept finding small
-differences such as target dependencies and dtbs_install support across
-architectures. Instead of trying to align all these, I've consolidated the
-build targets moving them out of the arch makefiles.
-
-I'd like to take the series via the DT tree.
-
-PPC maintainers, really need you review/ack on this especially patch 1.
-
-Rob
+Nacked-by: Nick Desaulniers <ndesaulniers@google.com>
 
 
-v4:
- - Make dtbs and %.dtb rules depend on arch/$ARCH/boot/dts path rather than
-   CONFIG_OF_EARLY_FLATTREE
- - Fix install path missing kernel version for dtbs_install
- - Fix "make CONFIG_OF_ALL_DTBS=y" for arches like ARM which selectively
-   enable CONFIG_OF (and therefore dtc)
+>
+> Let's rip off the cc-disable-warning switch, and see if somebody
+> complains about it.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 8a23fee..2627266 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -716,7 +716,7 @@ else
+>
+>  # These warnings generated too much noise in a regular build.
+>  # Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+> +KBUILD_CFLAGS += -Wno-unused-but-set-variable
+>  endif
+>
+>  KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+> --
+> 2.7.4
+>
 
-v3:
- - Rework dtc dependency to avoid 2 entry paths to scripts/dtc/. Essentially,
-   I copied 'scripts_basic'.
- - Add missing scripts_basic dependency for dtc and missing PHONY tag.
- - Drop the '|' order only from dependencies
- - Drop %.dtb.S and %.dtb.o as top-level targets
- - PPC: remove duplicate mpc5200 dtbs from image-y targets
 
-v2:
- - Fix $arch/boot/dts path check for out of tree builds
- - Fix dtc dependency for building built-in dtbs
- - Fix microblaze built-in dtb building
- - Add dtbs target for microblaze
-
-
-Rob Herring (9):
-  powerpc: build .dtb files in dts directory
-  nios2: build .dtb files in dts directory
-  nios2: use common rules to build built-in dtb
-  nios2: fix building all dtbs
-  c6x: use common built-in dtb support
-  kbuild: consolidate Devicetree dtb build rules
-  powerpc: enable building all dtbs
-  c6x: enable building all dtbs
-  microblaze: enable building all dtbs
-
- Makefile                           | 37 +++++++++++++++++++-
- arch/arc/Makefile                  |  6 ----
- arch/arm/Makefile                  | 20 +----------
- arch/arm64/Makefile                | 17 +--------
- arch/c6x/Makefile                  |  2 --
- arch/c6x/boot/dts/Makefile         | 17 ++++-----
- arch/c6x/boot/dts/linked_dtb.S     |  2 --
- arch/c6x/include/asm/sections.h    |  1 -
- arch/c6x/kernel/setup.c            |  4 +--
- arch/c6x/kernel/vmlinux.lds.S      | 10 ------
- arch/h8300/Makefile                | 11 +-----
- arch/microblaze/Makefile           |  4 +--
- arch/microblaze/boot/dts/Makefile  |  4 +++
- arch/mips/Makefile                 | 15 +-------
- arch/nds32/Makefile                |  2 +-
- arch/nios2/Makefile                | 11 +-----
- arch/nios2/boot/Makefile           | 22 ------------
- arch/nios2/boot/dts/Makefile       |  6 ++++
- arch/nios2/boot/linked_dtb.S       | 19 -----------
- arch/powerpc/Makefile              |  3 --
- arch/powerpc/boot/Makefile         | 55 ++++++++++++++----------------
- arch/powerpc/boot/dts/Makefile     |  6 ++++
- arch/powerpc/boot/dts/fsl/Makefile |  4 +++
- arch/xtensa/Makefile               | 12 +------
- scripts/Makefile                   |  3 +-
- scripts/Makefile.lib               |  2 +-
- scripts/dtc/Makefile               |  2 +-
- 27 files changed, 102 insertions(+), 195 deletions(-)
- delete mode 100644 arch/c6x/boot/dts/linked_dtb.S
- create mode 100644 arch/nios2/boot/dts/Makefile
- delete mode 100644 arch/nios2/boot/linked_dtb.S
- create mode 100644 arch/powerpc/boot/dts/Makefile
- create mode 100644 arch/powerpc/boot/dts/fsl/Makefile
-
---
-2.17.1
+-- 
+Thanks,
+~Nick Desaulniers
