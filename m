@@ -1,89 +1,121 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:20951 "EHLO
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:50194 "EHLO
         conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726194AbeJBDOm (ORCPT
+        with ESMTP id S1726027AbeJBEmE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 1 Oct 2018 23:14:42 -0400
+        Tue, 2 Oct 2018 00:42:04 -0400
 MIME-Version: 1.0
-References: <20181001152531.3385-1-robh@kernel.org> <20181001152531.3385-7-robh@kernel.org>
-In-Reply-To: <20181001152531.3385-7-robh@kernel.org>
+References: <20180918212847.199085-1-namit@vmware.com> <20180918212847.199085-3-namit@vmware.com>
+ <1aa5a1f3-ef3d-5cd3-831c-2202d73d3c9e@rasmusvillemoes.dk> <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com>
+In-Reply-To: <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 2 Oct 2018 05:34:18 +0900
-Message-ID: <CAK7LNAQAG1pAOMbnrFd5VbmUfcN5337tcGdeFrRo92rPWkVWAg@mail.gmail.com>
-Subject: Re: [PATCH v4 6/9] kbuild: consolidate Devicetree dtb build rules
+Date: Tue, 2 Oct 2018 07:01:19 +0900
+Message-ID: <CAK7LNAT98KZrMLuypS0PZ4jUWC+uRWyYwHPiEJD6LYoYzndJhA@mail.gmail.com>
+Subject: Re: [PATCH v8 02/10] Makefile: Prepare for using macros for inline asm
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Vineet Gupta <vgupta@synopsys.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Michal Simek <monstr@monstr.eu>, Ralf Baechle <ralf@linux-mips.org>, James Hogan <jhogan@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Linux-MIPS <linux-mips@linux-mips.org>, nios2-dev@lists.rocketboards.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-xtensa@linux-xtensa.org, Will Deacon <will.deacon@arm.com>, Paul Burton <paul.burton@mips.com>, Ley Foon Tan <ley.foon.tan@intel.com>
+To: Nadav Amit <namit@vmware.com>
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Ingo Molnar <mingo@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2018=E5=B9=B410=E6=9C=882=E6=97=A5(=E7=81=AB) 0:26 Rob Herring <robh@kernel=
-.org>:
+Hi.
+
+
+
+2018=E5=B9=B49=E6=9C=8827=E6=97=A5(=E6=9C=A8) 2:57 Nadav Amit <namit@vmware=
+.com>:
 >
-> There is nothing arch specific about building dtb files other than their
-> location under /arch/*/boot/dts/. Keeping each arch aligned is a pain.
-> The dependencies and supported targets are all slightly different.
-> Also, a cross-compiler for each arch is needed, but really the host
-> compiler preprocessor is perfectly fine for building dtbs. Move the
-> build rules to a common location and remove the arch specific ones. This
-> is done in a single step to avoid warnings about overriding rules.
+> at 1:58 AM, Rasmus Villemoes <linux@rasmusvillemoes.dk> wrote:
 >
-> The build dependencies had been a mixture of 'scripts' and/or 'prepare'.
-> These pull in several dependencies some of which need a target compiler
-> (specifically devicetable-offsets.h) and aren't needed to build dtbs.
-> All that is really needed is dtc, so adjust the dependencies to only be
-> dtc.
+> > On 2018-09-18 23:28, Nadav Amit wrote:
+> >
+> >> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+> >> index 8f6e7eb8ae9f..944fa3bc9376 100644
+> >> --- a/arch/x86/Makefile
+> >> +++ b/arch/x86/Makefile
+> >> @@ -214,8 +214,8 @@ ifdef CONFIG_X86_64
+> >> KBUILD_LDFLAGS +=3D $(call ld-option, -z max-page-size=3D0x200000)
+> >> endif
+> >>
+> >> -# Speed up the build
+> >> -KBUILD_CFLAGS +=3D -pipe
+> >> +# We cannot use -pipe flag since we give an additional .s file to the=
+ compiler
+> >> +#KBUILD_CFLAGS +=3D -pipe
+> >
+> > Is this really necessary? The gas manual says that one can use -- to
+> > name stdin, though that's probably a typo and should just be - . Doing
+> >
+> > gcc -pipe -Wa,foo.s -Wa,-
 >
-> This change enables support 'dtbs_install' on some arches which were
-> missing the target.
+> Good idea. I didn=E2=80=99t think of it. Yes, this can do the trick. I=E2=
+=80=99ll do it in
+> v9.
 >
-> Acked-by: Will Deacon <will.deacon@arm.com>
-> Acked-by: Paul Burton <paul.burton@mips.com>
-> Acked-by: Ley Foon Tan <ley.foon.tan@intel.com>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-
-Please change this to
-
-Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-
-
-Thanks.
-
-
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: Vineet Gupta <vgupta@synopsys.com>
-> Cc: Russell King <linux@armlinux.org.uk>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-> Cc: Michal Simek <monstr@monstr.eu>
-> Cc: Ralf Baechle <ralf@linux-mips.org>
-> Cc: James Hogan <jhogan@kernel.org>
-> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Cc: Paul Mackerras <paulus@samba.org>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Chris Zankel <chris@zankel.net>
-> Cc: Max Filippov <jcmvbkbc@gmail.com>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: linux-snps-arc@lists.infradead.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: uclinux-h8-devel@lists.sourceforge.jp
-> Cc: linux-mips@linux-mips.org
-> Cc: nios2-dev@lists.rocketboards.org
-> Cc: linuxppc-dev@lists.ozlabs.org
-> Cc: linux-xtensa@linux-xtensa.org
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
-> v4:
->  - Make dtbs and %.dtb rules depend on arch/$ARCH/boot/dts path rather th=
-an
->    CONFIG_OF_EARLY_FLATTREE
->  - Fix install path missing kernel version for dtbs_install
->  - Fix "make CONFIG_OF_ALL_DTBS=3Dy" for arches like ARM which selectivel=
-y
->    enable CONFIG_OF (and therefore dtc)
+> > does seem to work as expected (and would also make it possible to appen=
+d
+> > some .s file should that ever be required).
+> >> +archmacros:
+> >> +    $(Q)$(MAKE) $(build)=3Darch/x86/kernel arch/x86/kernel/macros.s
+> >> +
+> >> +ASM_MACRO_FLAGS =3D -Wa,arch/x86/kernel/macros.s
+> >> +export ASM_MACRO_FLAGS
+> >> +KBUILD_CFLAGS +=3D $(ASM_MACRO_FLAGS)
+> > How does this affect what gets rebuilt when one of the asm/foo.h files
+> > going into macros.s changes? Does that cause a global rebuild because
+> > everything depends on macros.s, or do we still only rebuild the files
+> > that actually include asm/foo.h?
+>
+> There will not be a global rebuild. Any source file that uses the header
+> files that are included in macros.S will be rebuilt.
+>
+> But your question actually raises two issues:
+>
+> 1. If macros.S changes, there *should* be a global rebuild,
 
 
+Looking at this series, I can see this rule:
+"macros and inline functions that calls them are placed in the same header"=
+.
+
+
+For example,
+REFCOUNT_CHECK_LE_ZERO is defined in <asm/refcount.h>,
+and REFCOUNT_CHECK_LE_ZERO is invoked via refcount_sub_and_test() etc.
+in the same header.
+
+Therefore, all users of REFCOUNT_CHECK_LE_ZERO must have included
+<asm/refcount.h>
+
+This means all C files using REFCOUNT_CHECK_LE_ZERO
+will be appropriately recompiled as long as the rule above is observed.
+
+
+
+> and currently
+> there wouldn=E2=80=99t be one. Do you happen to know what would be the ap=
+propriate
+> way to trigger one?
+>
+> 2. Someone might mistakenly use the macros through inline assembly withou=
+t
+> including the header file.
+
+Right, it is possible to use REFCOUNT_CHECK_LE_ZERO directly.
+If this happens, my assumption breaks.
+
+It would be unlikely to happen, though...
+
+
+> It would be better to detect such cases and fail
+> the build. I may be able to create another asm macro in the C part of the
+> header that would cause the build to fail. But let me know if you any
+> better idea.
+>
+> Regards,
+> Nadav
+>
 
 
 --=20
