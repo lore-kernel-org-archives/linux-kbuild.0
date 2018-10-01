@@ -1,66 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:43075 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbeJBADn (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:49115 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725948AbeJBBlU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 1 Oct 2018 20:03:43 -0400
-Received: by mail-pg1-f195.google.com with SMTP id 80-v6so1993465pgh.10
-        for <linux-kbuild@vger.kernel.org>; Mon, 01 Oct 2018 10:24:54 -0700 (PDT)
+        Mon, 1 Oct 2018 21:41:20 -0400
 MIME-Version: 1.0
 References: <1538387078-21892-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1538387078-21892-1-git-send-email-yamada.masahiro@socionext.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 1 Oct 2018 10:24:42 -0700
-Message-ID: <CAKwvOdkefCpuvKuAo5k82rviWnHd3FJBtNPEzSiFsZ98yqmNdw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] kbuild: add -Wno-pointer-sign flag unconditionally
+ <1538387078-21892-3-git-send-email-yamada.masahiro@socionext.com> <CAKwvOd=R1FN_nmR4Wkpb=nTt+v2f2+uWOcQCFoB+B1hWzCXCXA@mail.gmail.com>
+In-Reply-To: <CAKwvOd=R1FN_nmR4Wkpb=nTt+v2f2+uWOcQCFoB+B1hWzCXCXA@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 2 Oct 2018 04:01:09 +0900
+Message-ID: <CAK7LNAT=2k=v6C9q4oGNWY3WjfswtD60NVEzgkF4ACkxNYjRug@mail.gmail.com>
+Subject: Re: [PATCH 3/3] kbuild: add -Wno-unused-but-set-variable compiler
+ flag unconditionally
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Oct 1, 2018 at 2:45 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> We have raised the compiler requirement from time to time.
-> With commit cafa0010cd51 ("Raise the minimum required gcc version
-> to 4.6"), the minimum for GCC is 4.6 now.
->
-> The -Wno-pointer-sign has been here since the pre-git era.  It is
-> documented in the GCC 4.6 manual, and it is recognized by Clang
-> and ICC as well.
->
-> Let's rip off the cc-disable-warning switch, and see if somebody
-> complains about it.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index c6d1f2f..505a324 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -800,7 +800,7 @@ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
->  KBUILD_CFLAGS += $(call cc-option,-Wdeclaration-after-statement,)
->
->  # disable pointer signed / unsigned warnings in gcc 4.0
-> -KBUILD_CFLAGS += $(call cc-disable-warning, pointer-sign)
-> +KBUILD_CFLAGS += -Wno-pointer-sign
+Hi Nick,
 
-Tested-by: Nick Desaulniers <ndesaulniers@google.com>
-https://godbolt.org/z/7vpHIf
+2018=E5=B9=B410=E6=9C=882=E6=97=A5(=E7=81=AB) 2:18 Nick Desaulniers <ndesau=
+lniers@google.com>:
+>
+> On Mon, Oct 1, 2018 at 2:45 AM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> >
+> > We have raised the compiler requirement from time to time.
+> > With commit cafa0010cd51 ("Raise the minimum required gcc version
+> > to 4.6"), the minimum for GCC is 4.6 now.
+> >
+> > This flag was added by GCC 4.6, and it is recognized by Clang and
+> > ICC as well.
+>
+> This doesn't seem to be the case for Clang:
+> https://godbolt.org/z/qesF5o
+>
+> Nacked-by: Nick Desaulniers <ndesaulniers@google.com>
+
+Hmm, I tested this patch with pre-built Clang 6.0.1 / 7.0.0
+downloaded from http://releases.llvm.org/download.html
+
+Was this option dropped by clang 8 ?
+
 
 >
->  # disable stringop warnings in gcc 8+
->  KBUILD_CFLAGS += $(call cc-disable-warning, stringop-truncation)
+> >
+> > Let's rip off the cc-disable-warning switch, and see if somebody
+> > complains about it.
+> >
+> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > ---
+> >
+> >  Makefile | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/Makefile b/Makefile
+> > index 8a23fee..2627266 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -716,7 +716,7 @@ else
+> >
+> >  # These warnings generated too much noise in a regular build.
+> >  # Use make W=3D1 to enable them (see scripts/Makefile.extrawarn)
+> > -KBUILD_CFLAGS +=3D $(call cc-disable-warning, unused-but-set-variable)
+> > +KBUILD_CFLAGS +=3D -Wno-unused-but-set-variable
+> >  endif
+> >
+> >  KBUILD_CFLAGS +=3D $(call cc-disable-warning, unused-const-variable)
+> > --
+> > 2.7.4
+> >
+>
+>
 > --
-> 2.7.4
->
+> Thanks,
+> ~Nick Desaulniers
 
 
--- 
-Thanks,
-~Nick Desaulniers
+
+--=20
+Best Regards
+Masahiro Yamada
