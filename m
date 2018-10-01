@@ -1,121 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:50194 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726027AbeJBEmE (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:42434 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725878AbeJBFEM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Oct 2018 00:42:04 -0400
+        Tue, 2 Oct 2018 01:04:12 -0400
 MIME-Version: 1.0
-References: <20180918212847.199085-1-namit@vmware.com> <20180918212847.199085-3-namit@vmware.com>
- <1aa5a1f3-ef3d-5cd3-831c-2202d73d3c9e@rasmusvillemoes.dk> <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com>
-In-Reply-To: <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com>
+References: <1538387078-21892-1-git-send-email-yamada.masahiro@socionext.com>
+ <1538387078-21892-3-git-send-email-yamada.masahiro@socionext.com>
+ <CAKwvOd=R1FN_nmR4Wkpb=nTt+v2f2+uWOcQCFoB+B1hWzCXCXA@mail.gmail.com>
+ <CAK7LNAT=2k=v6C9q4oGNWY3WjfswtD60NVEzgkF4ACkxNYjRug@mail.gmail.com> <CAKwvOdm9VA-MqM0M+m-y0On9jN3cfRZOHev_8PWc7TFTA9F3xg@mail.gmail.com>
+In-Reply-To: <CAKwvOdm9VA-MqM0M+m-y0On9jN3cfRZOHev_8PWc7TFTA9F3xg@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 2 Oct 2018 07:01:19 +0900
-Message-ID: <CAK7LNAT98KZrMLuypS0PZ4jUWC+uRWyYwHPiEJD6LYoYzndJhA@mail.gmail.com>
-Subject: Re: [PATCH v8 02/10] Makefile: Prepare for using macros for inline asm
+Date: Tue, 2 Oct 2018 07:23:27 +0900
+Message-ID: <CAK7LNARuyo89pK9Fmd4s6CG8yhjpmzmiOVrN1fGmWkSyHDbfgA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] kbuild: add -Wno-unused-but-set-variable compiler
+ flag unconditionally
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nadav Amit <namit@vmware.com>
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Ingo Molnar <mingo@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi.
-
-
-
-2018=E5=B9=B49=E6=9C=8827=E6=97=A5(=E6=9C=A8) 2:57 Nadav Amit <namit@vmware=
-.com>:
+2018=E5=B9=B410=E6=9C=882=E6=97=A5(=E7=81=AB) 4:58 Nick Desaulniers <ndesau=
+lniers@google.com>:
 >
-> at 1:58 AM, Rasmus Villemoes <linux@rasmusvillemoes.dk> wrote:
->
-> > On 2018-09-18 23:28, Nadav Amit wrote:
+> On Mon, Oct 1, 2018 at 12:02 PM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
 > >
-> >> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-> >> index 8f6e7eb8ae9f..944fa3bc9376 100644
-> >> --- a/arch/x86/Makefile
-> >> +++ b/arch/x86/Makefile
-> >> @@ -214,8 +214,8 @@ ifdef CONFIG_X86_64
-> >> KBUILD_LDFLAGS +=3D $(call ld-option, -z max-page-size=3D0x200000)
-> >> endif
-> >>
-> >> -# Speed up the build
-> >> -KBUILD_CFLAGS +=3D -pipe
-> >> +# We cannot use -pipe flag since we give an additional .s file to the=
- compiler
-> >> +#KBUILD_CFLAGS +=3D -pipe
+> > Hi Nick,
 > >
-> > Is this really necessary? The gas manual says that one can use -- to
-> > name stdin, though that's probably a typo and should just be - . Doing
+> > 2018=E5=B9=B410=E6=9C=882=E6=97=A5(=E7=81=AB) 2:18 Nick Desaulniers <nd=
+esaulniers@google.com>:
+> > >
+> > > On Mon, Oct 1, 2018 at 2:45 AM Masahiro Yamada
+> > > <yamada.masahiro@socionext.com> wrote:
+> > > >
+> > > > We have raised the compiler requirement from time to time.
+> > > > With commit cafa0010cd51 ("Raise the minimum required gcc version
+> > > > to 4.6"), the minimum for GCC is 4.6 now.
+> > > >
+> > > > This flag was added by GCC 4.6, and it is recognized by Clang and
+> > > > ICC as well.
+> > >
+> > > This doesn't seem to be the case for Clang:
+> > > https://godbolt.org/z/qesF5o
+> > >
+> > > Nacked-by: Nick Desaulniers <ndesaulniers@google.com>
 > >
-> > gcc -pipe -Wa,foo.s -Wa,-
+> > Hmm, I tested this patch with pre-built Clang 6.0.1 / 7.0.0
+> > downloaded from http://releases.llvm.org/download.html
+> >
+> > Was this option dropped by clang 8 ?
 >
-> Good idea. I didn=E2=80=99t think of it. Yes, this can do the trick. I=E2=
-=80=99ll do it in
-> v9.
->
-> > does seem to work as expected (and would also make it possible to appen=
-d
-> > some .s file should that ever be required).
-> >> +archmacros:
-> >> +    $(Q)$(MAKE) $(build)=3Darch/x86/kernel arch/x86/kernel/macros.s
-> >> +
-> >> +ASM_MACRO_FLAGS =3D -Wa,arch/x86/kernel/macros.s
-> >> +export ASM_MACRO_FLAGS
-> >> +KBUILD_CFLAGS +=3D $(ASM_MACRO_FLAGS)
-> > How does this affect what gets rebuilt when one of the asm/foo.h files
-> > going into macros.s changes? Does that cause a global rebuild because
-> > everything depends on macros.s, or do we still only rebuild the files
-> > that actually include asm/foo.h?
->
-> There will not be a global rebuild. Any source file that uses the header
-> files that are included in macros.S will be rebuilt.
->
-> But your question actually raises two issues:
->
-> 1. If macros.S changes, there *should* be a global rebuild,
+> From the Godbolt link above, it seems all versions of Clang do not
+> recognize this flag.  It doesn't look like the kernel sets
+> -Wno-unknown-warning-option to prevent this warning.  Can you please
+> triple check that compiling with Clang and this patch causes no
+> warnings?  I suspect something might be amiss then if this patch
+> doesn't produce warnings with Clang, since on the smaller Godbolt
+> example it does.
 
 
-Looking at this series, I can see this rule:
-"macros and inline functions that calls them are placed in the same header"=
-.
+I got it.
 
+Clang does NOT recognize -Wno-unused-but-set-variable.
 
-For example,
-REFCOUNT_CHECK_LE_ZERO is defined in <asm/refcount.h>,
-and REFCOUNT_CHECK_LE_ZERO is invoked via refcount_sub_and_test() etc.
-in the same header.
+But, the code I changed is not parsed for clang.
+That is why I did not see any problem with this patch.
 
-Therefore, all users of REFCOUNT_CHECK_LE_ZERO must have included
-<asm/refcount.h>
-
-This means all C files using REFCOUNT_CHECK_LE_ZERO
-will be appropriately recompiled as long as the rule above is observed.
+See the following code.
 
 
 
-> and currently
-> there wouldn=E2=80=99t be one. Do you happen to know what would be the ap=
-propriate
-> way to trigger one?
->
-> 2. Someone might mistakenly use the macros through inline assembly withou=
-t
-> including the header file.
+ifeq ($(cc-name),clang)
+KBUILD_CPPFLAGS +=3D $(call cc-option,-Qunused-arguments,)
+KBUILD_CFLAGS +=3D $(call cc-disable-warning, format-invalid-specifier)
+KBUILD_CFLAGS +=3D $(call cc-disable-warning, gnu)
+KBUILD_CFLAGS +=3D $(call cc-disable-warning, address-of-packed-member)
+# Quiet clang warning: comparison of unsigned expression < 0 is always fals=
+e
+KBUILD_CFLAGS +=3D $(call cc-disable-warning, tautological-compare)
+# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as =
+the
+# source of a reference will be _MergedGlobals and not on of the
+whitelisted names.
+# See modpost pattern 2
+KBUILD_CFLAGS +=3D $(call cc-option, -mno-global-merge,)
+KBUILD_CFLAGS +=3D $(call cc-option, -fcatch-undefined-behavior)
+else
 
-Right, it is possible to use REFCOUNT_CHECK_LE_ZERO directly.
-If this happens, my assumption breaks.
+# These warnings generated too much noise in a regular build.
+# Use make W=3D1 to enable them (see scripts/Makefile.extrawarn)
+KBUILD_CFLAGS +=3D -Wno-unused-but-set-variable
+endif
 
-It would be unlikely to happen, though...
 
 
-> It would be better to detect such cases and fail
-> the build. I may be able to create another asm macro in the C part of the
-> header that would cause the build to fail. But let me know if you any
-> better idea.
->
-> Regards,
-> Nadav
->
 
 
 --=20
