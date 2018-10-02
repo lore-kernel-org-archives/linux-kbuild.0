@@ -1,73 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:54611 "EHLO ozlabs.org"
+Received: from a3.inai.de ([88.198.85.195]:34280 "EHLO a3.inai.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727532AbeJBU4f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Oct 2018 16:56:35 -0400
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v6] selftests: add headers_install to lib.mk
-In-Reply-To: <4473d2b6-a760-1a48-68e7-9f90023b57b5@kernel.org>
-References: <20180809080402.24469-1-anders.roxell@linaro.org> <20180904104721.27535-1-anders.roxell@linaro.org> <87y3bmte9l.fsf@concordia.ellerman.id.au> <4473d2b6-a760-1a48-68e7-9f90023b57b5@kernel.org>
-Date: Wed, 03 Oct 2018 00:12:51 +1000
-Message-ID: <8736tol9ng.fsf@concordia.ellerman.id.au>
+        id S1726118AbeJBVgq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 2 Oct 2018 17:36:46 -0400
+Date: Tue, 2 Oct 2018 16:52:56 +0200 (CEST)
+From: Jan Engelhardt <jengelh@inai.de>
+Subject: Re: [PATCH 04/11] UAPI: bcache: Fix use of embedded flexible array
+In-Reply-To: <153616290368.23468.7806230605345568524.stgit@warthog.procyon.org.uk>
+Message-ID: <nycvar.YFH.7.76.1810021622320.11696@n3.vanv.qr>
+References: <153616290368.23468.7806230605345568524.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Shuah Khan <shuah@kernel.org>, Anders Roxell <anders.roxell@linaro.org>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, bamv2005@gmail.com, brgl@bgdev.pl, pbonzini@redhat.com, akpm@linux-foundation.org, rppt@linux.vnet.ibm.com, aarcange@redhat.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: David Howells <dhowells@redhat.com>
+Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Coly Li <colyli@suse.de>, Kent Overstreet <kent.overstreet@gmail.com>, linux-bcache@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Shuah Khan <shuah@kernel.org> writes:
-> On 09/27/2018 10:52 PM, Michael Ellerman wrote:
->> [ + linuxppc-dev ]
->> 
->> Anders Roxell <anders.roxell@linaro.org> writes:
->>> If the kernel headers aren't installed we can't build all the tests.
->>> Add a new make target rule 'khdr' in the file lib.mk to generate the
->>> kernel headers and that gets include for every test-dir Makefile that
->>> includes lib.mk If the testdir in turn have its own sub-dirs the
->>> top_srcdir needs to be set to the linux-rootdir to be able to generate
->>> the kernel headers.
->>>
->>> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
->>> Reviewed-by: Fathi Boudra <fathi.boudra@linaro.org>
->>> ---
->>>
->>> I sent this (v5) a month ago and wondered if it got lost. Resending
->>> unchanged.
->>>
->>> Cheers,
->>> Anders
->>>
->>>  Makefile                                           | 14 +-------------
->>>  scripts/subarch.include                            | 13 +++++++++++++
->>>  tools/testing/selftests/android/Makefile           |  2 +-
->>>  tools/testing/selftests/android/ion/Makefile       |  2 ++
->>>  tools/testing/selftests/futex/functional/Makefile  |  1 +
->>>  tools/testing/selftests/gpio/Makefile              |  7 ++-----
->>>  tools/testing/selftests/kvm/Makefile               |  7 ++-----
->>>  tools/testing/selftests/lib.mk                     | 12 ++++++++++++
->>>  tools/testing/selftests/net/Makefile               |  1 +
->>>  .../selftests/networking/timestamping/Makefile     |  1 +
->>>  tools/testing/selftests/vm/Makefile                |  4 ----
->>>  11 files changed, 36 insertions(+), 28 deletions(-)
->>>  create mode 100644 scripts/subarch.include
->> 
->> This broke all the powerpc selftests :(
+
+On Wed, 05 Sep 2018 16:55:03 +0100, David Howells wrote:
 >
-> Sorry for thr breakage.
+>The bkey struct defined by bcache is embedded in the jset struct. However,
+>this is illegal in C++ as there's a "flexible array" at the end of the struct.
+>Change this to be a 0-length struct instead.
 >
->> Why did it go in at rc5?
->
-> This patch has been in linux-next for a sometime before I decided to send this.
-> My original intent was to send this for rc2, and my schedule was messed up with
-> traveling. Since I didn't hear any issues from linux-next soaking, I made a call
-> on sending this in for rc5.
+>-	__u64	ptr[];
+>+	__u64	ptr[0];
 
-OK. And I didn't notice the breakage in linux-next because _I_ was
-travelling :)
+As per the C++ standard, it is _also_ illegal to declare an array of size zero.
 
-> On second thought I should have waited until 4.20. Sorry about that.
+"""it [the array size expression] shall be a converted constant expression of
+type std::size_t and its value shall be greater than zero."""
+—http://eel.is/c++draft/dcl.array
 
-Yeah that would have been better, no worries.
+That makes both "__u64 ptr[]" and "__u64 ptr[0]" *implementation-specific
+extensions*.
 
-cheers
+
+3rd party tooling (concerns both C and C++):
+
+Coverity Scan (IIRC) treats "__u64 ptr[0]" as an array of "definitely-zero"
+size. Writing to any element will outright flag an out-of-bounds violation.
+That is sensible, since only "ptr[]" was standardized.
+
+
+Conclusion:
+
+So please, do never use __u64 ptr[0].
