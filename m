@@ -1,26 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:35193 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728271AbeJCEB6 (ORCPT
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:36940 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727218AbeJCEuM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Oct 2018 00:01:58 -0400
-Received: by mail-pl1-f194.google.com with SMTP id f8-v6so2349280plb.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 02 Oct 2018 14:16:40 -0700 (PDT)
+        Wed, 3 Oct 2018 00:50:12 -0400
 MIME-Version: 1.0
 References: <CANiq72=rgT9cPWH64Tf_8gAU09EiH5FvGqFUdOjV=spVbM5m8Q@mail.gmail.com>
  <20181003071059.02b3fd6f@canb.auug.org.au>
 In-Reply-To: <20181003071059.02b3fd6f@canb.auug.org.au>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Tue, 2 Oct 2018 14:16:27 -0700
-Message-ID: <CAKwvOdmt4-jFv6d-ZVUH5OOvXSz38jpuNvQy-jtoSS3xEoh78A@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 3 Oct 2018 00:04:29 +0200
+Message-ID: <CANiq72nh0nybEC8SizQ9rv=RvncMuTH-dt5vciRtvQ1aFBzJcg@mail.gmail.com>
 Subject: Re: [GIT PULL linux-next] Add Compiler Attributes tree
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, linux-next@vger.kernel.org, adilger.kernel@dilger.ca, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, rostedt@goodmis.org, mchehab+samsung@kernel.org, olof@lxom.net, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, sandipan@linux.vnet.ibm.com, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, paul.burton@mips.com, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, msebor@gmail.com, sparse@chrisli.org, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, joe@perches.com, Arnd Bergmann <arnd@arndb.de>, asmadeus@codewreck.org, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, sfr@canb.auug.org.au
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, Linux-Next Mailing List <linux-next@vger.kernel.org>, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Ted Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
 
-On Tue, Oct 2, 2018 at 2:11 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+Hi Stephen,
+
+On Tue, Oct 2, 2018 at 11:11 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
 >
 > Hi Miguel,
 >
@@ -40,9 +40,10 @@ On Tue, Oct 2, 2018 at 2:11 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
 > Linux-next itself rebases every day, so snything based on it would drag
 > in a previous version of all the other trees :-(
 
-I think of this like a branch that's force pushed to.  Can't base
-other branches or trees off of it cause it's always moving/force
-rewriting history.
+I assumed you could apply changes as a diff/patches/cherry-pick, not
+as a merge, for those that went on top of others (so that at the new
+merge window, conflicts were already solved). Otherwise, why are
+next-* tags/branches provided anyway?
 
 >
 > > aligned_largest, which was removed by 9503cd9cbaba
@@ -52,10 +53,9 @@ rewriting history.
 > That commit is from Andrew's patch series which also rebases (usually
 > at least every week), so you cannot depend on it.
 
-Miguel, you should be able to drop that patch from your set then,
-since Andrew's -mm tree flows into this -next tree as well, IIUC.
-We'll take up that patch from there.
+Then who is solving the conflict?
 
--- 
-Thanks,
-~Nick Desaulniers
+Thanks!
+
+Cheers,
+Miguel
