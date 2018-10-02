@@ -1,49 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from a3.inai.de ([88.198.85.195]:34280 "EHLO a3.inai.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726118AbeJBVgq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Oct 2018 17:36:46 -0400
-Date: Tue, 2 Oct 2018 16:52:56 +0200 (CEST)
-From: Jan Engelhardt <jengelh@inai.de>
-Subject: Re: [PATCH 04/11] UAPI: bcache: Fix use of embedded flexible array
-In-Reply-To: <153616290368.23468.7806230605345568524.stgit@warthog.procyon.org.uk>
-Message-ID: <nycvar.YFH.7.76.1810021622320.11696@n3.vanv.qr>
-References: <153616290368.23468.7806230605345568524.stgit@warthog.procyon.org.uk>
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:43364 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726822AbeJCDzl (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 2 Oct 2018 23:55:41 -0400
+Received: by mail-pg1-f193.google.com with SMTP id 80-v6so509701pgh.10
+        for <linux-kbuild@vger.kernel.org>; Tue, 02 Oct 2018 14:10:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+References: <1538443943-29805-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1538443943-29805-1-git-send-email-yamada.masahiro@socionext.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Tue, 2 Oct 2018 14:10:13 -0700
+Message-ID: <CAKwvOdmUYu3Hqs1NQru8U3U8ATNc3_TT1o37tSJGzAsScRQnYg@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: add -Wno-unused-but-set-variable flag unconditionally
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Coly Li <colyli@suse.de>, Kent Overstreet <kent.overstreet@gmail.com>, linux-bcache@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
 
-
-On Wed, 05 Sep 2018 16:55:03 +0100, David Howells wrote:
+On Mon, Oct 1, 2018 at 6:33 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
->The bkey struct defined by bcache is embedded in the jset struct. However,
->this is illegal in C++ as there's a "flexible array" at the end of the struct.
->Change this to be a 0-length struct instead.
+> We have raised the compiler requirement from time to time.
+> With commit cafa0010cd51 ("Raise the minimum required gcc version
+> to 4.6"), the minimum for GCC is 4.6 now.
 >
->-	__u64	ptr[];
->+	__u64	ptr[0];
+> This flag was added by GCC 4.6, and it is recognized by ICC as well.
+>
+> It is true that Clang does not support this flag but this commit is
+> just touching the else part of the "ifeq ($(cc-name),clang)" check.
+> Hence, Clang build is not affected.
+>
+> Let's rip off the cc-disable-warning switch, and see if somebody
+> complains about it.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
+> Changes in v2:
+>   - Fix commit log
 
-As per the C++ standard, it is _also_ illegal to declare an array of size zero.
+Mashiro, thank you for this fix.
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-"""it [the array size expression] shall be a converted constant expression of
-type std::size_t and its value shall be greater than zero."""
-—http://eel.is/c++draft/dcl.array
+>
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 8a23fee..2627266 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -716,7 +716,7 @@ else
+>
+>  # These warnings generated too much noise in a regular build.
+>  # Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+> +KBUILD_CFLAGS += -Wno-unused-but-set-variable
+>  endif
+>
+>  KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+> --
+> 2.7.4
+>
 
-That makes both "__u64 ptr[]" and "__u64 ptr[0]" *implementation-specific
-extensions*.
 
-
-3rd party tooling (concerns both C and C++):
-
-Coverity Scan (IIRC) treats "__u64 ptr[0]" as an array of "definitely-zero"
-size. Writing to any element will outright flag an out-of-bounds violation.
-That is sensible, since only "ptr[]" was standardized.
-
-
-Conclusion:
-
-So please, do never use __u64 ptr[0].
+-- 
+Thanks,
+~Nick Desaulniers
