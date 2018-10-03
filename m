@@ -1,85 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0083.outbound.protection.outlook.com ([104.47.33.83]:26720
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726969AbeJDCb3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Oct 2018 22:31:29 -0400
-From: Nadav Amit <namit@vmware.com>
-Subject: Re: [PATCH v8 02/10] Makefile: Prepare for using macros for inline
- asm
-Date: Wed, 3 Oct 2018 19:41:34 +0000
-Message-ID: <B362FFD5-91AA-42ED-8401-9E9E7F6E4375@vmware.com>
-References: <20180918212847.199085-1-namit@vmware.com>
- <20180918212847.199085-3-namit@vmware.com>
- <1aa5a1f3-ef3d-5cd3-831c-2202d73d3c9e@rasmusvillemoes.dk>
- <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com>
- <CAK7LNAT98KZrMLuypS0PZ4jUWC+uRWyYwHPiEJD6LYoYzndJhA@mail.gmail.com>
-In-Reply-To: <CAK7LNAT98KZrMLuypS0PZ4jUWC+uRWyYwHPiEJD6LYoYzndJhA@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8BAFD90386788B44B2F5DCDDFF4E84D7@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from terminus.zytor.com ([198.137.202.136]:35377 "EHLO
+        mail.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726964AbeJDCd1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 3 Oct 2018 22:33:27 -0400
+Date: Wed, 03 Oct 2018 12:43:13 -0700
+In-Reply-To: <20181002105952.GA13611@gmail.com>
+References: <20180918212847.199085-1-namit@vmware.com> <20180918212847.199085-3-namit@vmware.com> <1aa5a1f3-ef3d-5cd3-831c-2202d73d3c9e@rasmusvillemoes.dk> <307823F9-DCCF-4384-9FBE-28642FAD6B4E@vmware.com> <20181002105952.GA13611@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH v8 02/10] Makefile: Prepare for using macros for inline asm
+From: hpa@zytor.com
+Message-ID: <24BB4662-B220-4295-9040-17CF4C7B8CCE@zytor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Ingo Molnar <mingo@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Ingo Molnar <mingo@kernel.org>, Nadav Amit <namit@vmware.com>
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Ingo Molnar <mingo@redhat.com>, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-YXQgMzowMSBQTSwgTWFzYWhpcm8gWWFtYWRhIDx5YW1hZGEubWFzYWhpcm9Ac29jaW9uZXh0LmNv
-bT4gd3JvdGU6DQoNCj4gSGkuDQoNClRoYW5rcyBmb3IgeW91ciByZXBseS4gWW91ciBhZHZpY2Vz
-IGFyZSBhbHdheXMgdmFsdWFibGUhDQoNCj4gDQo+IA0KPiANCj4gMjAxOOW5tDnmnIgyN+aXpSjm
-nKgpIDI6NTcgTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT46DQo+PiBhdCAxOjU4IEFNLCBS
-YXNtdXMgVmlsbGVtb2VzIDxsaW51eEByYXNtdXN2aWxsZW1vZXMuZGs+IHdyb3RlOg0KPj4gDQo+
-Pj4gT24gMjAxOC0wOS0xOCAyMzoyOCwgTmFkYXYgQW1pdCB3cm90ZToNCj4+PiANCj4+Pj4gZGlm
-ZiAtLWdpdCBhL2FyY2gveDg2L01ha2VmaWxlIGIvYXJjaC94ODYvTWFrZWZpbGUNCj4+Pj4gaW5k
-ZXggOGY2ZTdlYjhhZTlmLi45NDRmYTNiYzkzNzYgMTAwNjQ0DQo+Pj4+IC0tLSBhL2FyY2gveDg2
-L01ha2VmaWxlDQo+Pj4+ICsrKyBiL2FyY2gveDg2L01ha2VmaWxlDQo+Pj4+IEBAIC0yMTQsOCAr
-MjE0LDggQEAgaWZkZWYgQ09ORklHX1g4Nl82NA0KPj4+PiBLQlVJTERfTERGTEFHUyArPSAkKGNh
-bGwgbGQtb3B0aW9uLCAteiBtYXgtcGFnZS1zaXplPTB4MjAwMDAwKQ0KPj4+PiBlbmRpZg0KPj4+
-PiANCj4+Pj4gLSMgU3BlZWQgdXAgdGhlIGJ1aWxkDQo+Pj4+IC1LQlVJTERfQ0ZMQUdTICs9IC1w
-aXBlDQo+Pj4+ICsjIFdlIGNhbm5vdCB1c2UgLXBpcGUgZmxhZyBzaW5jZSB3ZSBnaXZlIGFuIGFk
-ZGl0aW9uYWwgLnMgZmlsZSB0byB0aGUgY29tcGlsZXINCj4+Pj4gKyNLQlVJTERfQ0ZMQUdTICs9
-IC1waXBlDQo+Pj4gDQo+Pj4gSXMgdGhpcyByZWFsbHkgbmVjZXNzYXJ5PyBUaGUgZ2FzIG1hbnVh
-bCBzYXlzIHRoYXQgb25lIGNhbiB1c2UgLS0gdG8NCj4+PiBuYW1lIHN0ZGluLCB0aG91Z2ggdGhh
-dCdzIHByb2JhYmx5IGEgdHlwbyBhbmQgc2hvdWxkIGp1c3QgYmUgLSAuIERvaW5nDQo+Pj4gDQo+
-Pj4gZ2NjIC1waXBlIC1XYSxmb28ucyAtV2EsLQ0KPj4gDQo+PiBHb29kIGlkZWEuIEkgZGlkbuKA
-mXQgdGhpbmsgb2YgaXQuIFllcywgdGhpcyBjYW4gZG8gdGhlIHRyaWNrLiBJ4oCZbGwgZG8gaXQg
-aW4NCj4+IHY5Lg0KPj4gDQo+Pj4gZG9lcyBzZWVtIHRvIHdvcmsgYXMgZXhwZWN0ZWQgKGFuZCB3
-b3VsZCBhbHNvIG1ha2UgaXQgcG9zc2libGUgdG8gYXBwZW5kDQo+Pj4gc29tZSAucyBmaWxlIHNo
-b3VsZCB0aGF0IGV2ZXIgYmUgcmVxdWlyZWQpLg0KPj4+PiArYXJjaG1hY3JvczoNCj4+Pj4gKyAg
-ICAkKFEpJChNQUtFKSAkKGJ1aWxkKT1hcmNoL3g4Ni9rZXJuZWwgYXJjaC94ODYva2VybmVsL21h
-Y3Jvcy5zDQo+Pj4+ICsNCj4+Pj4gK0FTTV9NQUNST19GTEFHUyA9IC1XYSxhcmNoL3g4Ni9rZXJu
-ZWwvbWFjcm9zLnMNCj4+Pj4gK2V4cG9ydCBBU01fTUFDUk9fRkxBR1MNCj4+Pj4gK0tCVUlMRF9D
-RkxBR1MgKz0gJChBU01fTUFDUk9fRkxBR1MpDQo+Pj4gSG93IGRvZXMgdGhpcyBhZmZlY3Qgd2hh
-dCBnZXRzIHJlYnVpbHQgd2hlbiBvbmUgb2YgdGhlIGFzbS9mb28uaCBmaWxlcw0KPj4+IGdvaW5n
-IGludG8gbWFjcm9zLnMgY2hhbmdlcz8gRG9lcyB0aGF0IGNhdXNlIGEgZ2xvYmFsIHJlYnVpbGQg
-YmVjYXVzZQ0KPj4+IGV2ZXJ5dGhpbmcgZGVwZW5kcyBvbiBtYWNyb3Mucywgb3IgZG8gd2Ugc3Rp
-bGwgb25seSByZWJ1aWxkIHRoZSBmaWxlcw0KPj4+IHRoYXQgYWN0dWFsbHkgaW5jbHVkZSBhc20v
-Zm9vLmg/DQo+PiANCj4+IFRoZXJlIHdpbGwgbm90IGJlIGEgZ2xvYmFsIHJlYnVpbGQuIEFueSBz
-b3VyY2UgZmlsZSB0aGF0IHVzZXMgdGhlIGhlYWRlcg0KPj4gZmlsZXMgdGhhdCBhcmUgaW5jbHVk
-ZWQgaW4gbWFjcm9zLlMgd2lsbCBiZSByZWJ1aWx0Lg0KPj4gDQo+PiBCdXQgeW91ciBxdWVzdGlv
-biBhY3R1YWxseSByYWlzZXMgdHdvIGlzc3VlczoNCj4+IA0KPj4gMS4gSWYgbWFjcm9zLlMgY2hh
-bmdlcywgdGhlcmUgKnNob3VsZCogYmUgYSBnbG9iYWwgcmVidWlsZCwNCj4gDQo+IA0KPiBMb29r
-aW5nIGF0IHRoaXMgc2VyaWVzLCBJIGNhbiBzZWUgdGhpcyBydWxlOg0KPiAibWFjcm9zIGFuZCBp
-bmxpbmUgZnVuY3Rpb25zIHRoYXQgY2FsbHMgdGhlbSBhcmUgcGxhY2VkIGluIHRoZSBzYW1lIGhl
-YWRlciIuDQo+IA0KPiANCj4gRm9yIGV4YW1wbGUsDQo+IFJFRkNPVU5UX0NIRUNLX0xFX1pFUk8g
-aXMgZGVmaW5lZCBpbiA8YXNtL3JlZmNvdW50Lmg+LA0KPiBhbmQgUkVGQ09VTlRfQ0hFQ0tfTEVf
-WkVSTyBpcyBpbnZva2VkIHZpYSByZWZjb3VudF9zdWJfYW5kX3Rlc3QoKSBldGMuDQo+IGluIHRo
-ZSBzYW1lIGhlYWRlci4NCj4gDQo+IFRoZXJlZm9yZSwgYWxsIHVzZXJzIG9mIFJFRkNPVU5UX0NI
-RUNLX0xFX1pFUk8gbXVzdCBoYXZlIGluY2x1ZGVkDQo+IDxhc20vcmVmY291bnQuaD4NCj4gDQo+
-IFRoaXMgbWVhbnMgYWxsIEMgZmlsZXMgdXNpbmcgUkVGQ09VTlRfQ0hFQ0tfTEVfWkVSTw0KPiB3
-aWxsIGJlIGFwcHJvcHJpYXRlbHkgcmVjb21waWxlZCBhcyBsb25nIGFzIHRoZSBydWxlIGFib3Zl
-IGlzIG9ic2VydmVkLg0KDQpZZXMuIE15IGNvbmNlcm4gaXMgbm90IHdoYXQgaGFwcGVucyBpZiBh
-bnkgb2YgdGhlIGZpbGVzIGluY2x1ZGVkIGZyb20NCm1hY3Jvcy5TIGNoYW5nZXMsIGJ1dCB3aGF0
-IGhhcHBlbnMgaWYgbWFjcm9zLlMgY2hhbmdlcyAoZS5nLiwgdG8gaW5jbHVkZQ0KYW4gYWRkaXRp
-b25hbCBoZWFkZXIpLg0KDQpNYXliZSBJIGNhbiBjcmVhdGUgc29tZSBhcnRpZmljaWFsIGRlcGVu
-ZGVuY3kgYmFzZWQgb24gX19BU1NFTUJMWV9fIC4gSeKAmWxsDQpnaXZlIGl0IGFub3RoZXIgdGhv
-dWdodC4NCg0KPj4gYW5kIGN1cnJlbnRseQ0KPj4gdGhlcmUgd291bGRu4oCZdCBiZSBvbmUuIERv
-IHlvdSBoYXBwZW4gdG8ga25vdyB3aGF0IHdvdWxkIGJlIHRoZSBhcHByb3ByaWF0ZQ0KPj4gd2F5
-IHRvIHRyaWdnZXIgb25lPw0KPj4gDQo+PiAyLiBTb21lb25lIG1pZ2h0IG1pc3Rha2VubHkgdXNl
-IHRoZSBtYWNyb3MgdGhyb3VnaCBpbmxpbmUgYXNzZW1ibHkgd2l0aG91dA0KPj4gaW5jbHVkaW5n
-IHRoZSBoZWFkZXIgZmlsZS4NCj4gDQo+IFJpZ2h0LCBpdCBpcyBwb3NzaWJsZSB0byB1c2UgUkVG
-Q09VTlRfQ0hFQ0tfTEVfWkVSTyBkaXJlY3RseS4NCj4gSWYgdGhpcyBoYXBwZW5zLCBteSBhc3N1
-bXB0aW9uIGJyZWFrcy4NCj4gDQo+IEl0IHdvdWxkIGJlIHVubGlrZWx5IHRvIGhhcHBlbiwgdGhv
-dWdoLi4uDQoNClllcy4gSeKAmWxsIGxldCBpdCBnbyBmb3Igbm93Lg0KDQpUaGFua3MsDQpOYWRh
-dg==
+On October 2, 2018 3:59:52 AM PDT, Ingo Molnar <mingo@kernel.org> wrote:
+>
+>* Nadav Amit <namit@vmware.com> wrote:
+>
+>> at 1:58 AM, Rasmus Villemoes <linux@rasmusvillemoes.dk> wrote:
+>> 
+>> > On 2018-09-18 23:28, Nadav Amit wrote:
+>> > 
+>> >> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+>> >> index 8f6e7eb8ae9f..944fa3bc9376 100644
+>> >> --- a/arch/x86/Makefile
+>> >> +++ b/arch/x86/Makefile
+>> >> @@ -214,8 +214,8 @@ ifdef CONFIG_X86_64
+>> >> KBUILD_LDFLAGS += $(call ld-option, -z max-page-size=0x200000)
+>> >> endif
+>> >> 
+>> >> -# Speed up the build
+>> >> -KBUILD_CFLAGS += -pipe
+>> >> +# We cannot use -pipe flag since we give an additional .s file to
+>the compiler
+>> >> +#KBUILD_CFLAGS += -pipe
+>> > 
+>> > Is this really necessary? The gas manual says that one can use --
+>to
+>> > name stdin, though that's probably a typo and should just be - .
+>Doing
+>> > 
+>> > gcc -pipe -Wa,foo.s -Wa,-
+>> 
+>> Good idea. I didn’t think of it. Yes, this can do the trick. I’ll do
+>it in
+>> v9.
+>
+>Ok, will wait for v9.
+>
+>Thanks,
+>
+>	Ingo
+
+Does -pipe actually win anything these days?
+-- 
+Sent from my Android device with K-9 Mail. Please excuse my brevity.
