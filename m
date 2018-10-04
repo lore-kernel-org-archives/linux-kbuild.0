@@ -1,36 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:43842 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726338AbeJDEbb (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:34180 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726661AbeJDLQu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Oct 2018 00:31:31 -0400
-MIME-Version: 1.0
-References: <CANiq72=rgT9cPWH64Tf_8gAU09EiH5FvGqFUdOjV=spVbM5m8Q@mail.gmail.com>
- <20181003071059.02b3fd6f@canb.auug.org.au> <CAKwvOdmt4-jFv6d-ZVUH5OOvXSz38jpuNvQy-jtoSS3xEoh78A@mail.gmail.com>
- <CANiq72mmxiO6RWBTQfWYDaa6gmOF01nXmN6BJNCAjAFz3QJqqA@mail.gmail.com>
- <20181002232454.GB2483@thunk.org> <CANiq72=cRpqnB3BxLsmj-rMdUGJK+pac1SRppoRgsON69ErfQg@mail.gmail.com>
- <20181003153303.GC2835@thunk.org> <CANiq72=Jq8HZ1=CsSvV4GenG+F6z3vRFmiB7Joct5VKdUFo8pA@mail.gmail.com>
-In-Reply-To: <CANiq72=Jq8HZ1=CsSvV4GenG+F6z3vRFmiB7Joct5VKdUFo8pA@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Wed, 3 Oct 2018 23:41:08 +0200
-Message-ID: <CANiq72nMu6NXg1Ovn49qJ=FP_S4_LQJSwPuS+Q_zofhOEbVZng@mail.gmail.com>
-Subject: Re: [GIT PULL linux-next] Add Compiler Attributes tree
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 4 Oct 2018 07:16:50 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v2] kbuild: remove unneeded link_multi_deps
+Date: Thu,  4 Oct 2018 13:25:19 +0900
+Message-Id: <1538627119-11346-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ted Ts'o <tytso@mit.edu>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, Linux-Next Mailing List <linux-next@vger.kernel.org>, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Wed, Oct 3, 2018 at 11:23 PM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
-> On Wed, Oct 3, 2018 at 5:33 PM Theodore Y. Ts'o <tytso@mit.edu> wrote:
-> > had done with full consideration, specifically for this reason.  Even
-> > if the definition was different, my definition *had* been fully tested
-> > with over a 27+ VM hours of regression testing, and if it turned out
+Since commit c8589d1e9e01 ("kbuild: handle multi-objs dependency
+appropriately"), $^ really represents all the prerequisite of the
+composite object being built.
 
-I forgot to mention that if the definitions were different, it could
-have caused a problem, because your definition wouldn't apply, so your
-27+ hours of testing wouldn't have mattered :-P Without the #ifndef,
-we would have at least got a redefinition warning about it.
+Hence, $(filter %.o,$^) contains all the objects to link together,
+which is much simpler than link_multi_deps calculation.
 
-Cheers,
-Miguel
+Please note $(filter-out FORCE,$^) does not work here.  When a
+single object module is turned into a multi object module, $^ will
+contain header files that were previously included for building the
+single object, and recorded in the .*.cmd file.  $(filter %.o,$^)
+should be used to filter out such headers.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+Changes in v2:
+  - Fix regression reported in linux-next.
+    https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1779047.html
+
+ scripts/Makefile.build | 20 ++------------------
+ 1 file changed, 2 insertions(+), 18 deletions(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index cb03774..f21b48d 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -485,28 +485,12 @@ targets += $(obj)/lib-ksyms.o
+ 
+ endif
+ 
+-#
+-# Rule to link composite objects
+-#
+-#  Composite objects are specified in kbuild makefile as follows:
+-#    <composite-object>-objs := <list of .o files>
+-#  or
+-#    <composite-object>-y    := <list of .o files>
+-#  or
+-#    <composite-object>-m    := <list of .o files>
+-#  The -m syntax only works if <composite object> is a module
+-link_multi_deps =                     \
+-$(filter $(addprefix $(obj)/,         \
+-$($(subst $(obj)/,,$(@:.o=-objs)))    \
+-$($(subst $(obj)/,,$(@:.o=-y)))       \
+-$($(subst $(obj)/,,$(@:.o=-m)))), $^)
+-
+ quiet_cmd_link_multi-m = LD [M]  $@
+-cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
++cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(filter %.o,$^) $(cmd_secanalysis)
+ 
+ $(multi-used-m): FORCE
+ 	$(call if_changed,link_multi-m)
+-	@{ echo $(@:.o=.ko); echo $(link_multi_deps); \
++	@{ echo $(@:.o=.ko); echo $(filter %.o,$^); \
+ 	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+ $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
+ 
+-- 
+2.7.4
