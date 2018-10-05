@@ -1,105 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:49878 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727616AbeJERrk (ORCPT
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:45622 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727581AbeJESbA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Oct 2018 13:47:40 -0400
+        Fri, 5 Oct 2018 14:31:00 -0400
 MIME-Version: 1.0
-References: <20181004200249.GL5238@garbanzo.do-not-panic.com>
-In-Reply-To: <20181004200249.GL5238@garbanzo.do-not-panic.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 5 Oct 2018 19:48:34 +0900
-Message-ID: <CAK7LNAT3NQnTtdxyz79jgoQHoUS0TxkP99yuoY-N5yALLnFO1A@mail.gmail.com>
-Subject: Re: [ANN] init-kconfig - easy way to embrace Linux's kconfig
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 5 Oct 2018 13:32:25 +0200
+Message-ID: <CANiq72kuTr09CjE0jcNFkdO-gOFCjYp+REuLPq5V9c4Y8KvWXA@mail.gmail.com>
+Subject: [GIT PULL linux-next] Add Compiler Attributes (v6) tree
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Petr Vorel <pvorel@suse.cz>, Steven Rostedt <rostedt@goodmis.org>, Johannes Berg <johannes@sipsolutions.net>, Valentin Rothberg <valentinrothberg@gmail.com>, Vegard Nossum <vegard.nossum@oracle.com>, nbd@nbd.name, kconfig-sat@googlegroups.com
+To: Stephen Rothwell <sfr@canb.auug.org.au>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, Linux-Next Mailing List <linux-next@vger.kernel.org>
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S . Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
 
-Hi,
+Hi Stephen,
 
+As discussed, here it is the Compiler Attributes series for
+linux-next. This time the original v6, based on -rc6.
 
+The changes w.r.t. v5:
 
-On Fri, Oct 5, 2018 at 5:03 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
->
-> Every now and then a project is born, and they decide to use Linux's
-> kconfig to enable configuration of their project. As it stands we *know*
-> kconfig is now used in at least over 12 different projects [0]. I myself
-> added kconfig to one as well years ago. Even research reveals that
-> kconfig has become one of the leading industrial variability modeling
-> languages [1] [2].
->
-> What is often difficult to do though is to start off using kconfig and
-> integrating it into a project. Or updating / syncing to the latest
-> kconfig from upstream Linux.
->
-> I had yet another need to use kconfig for another small project so
-> decided to make a clean template others can use and help keep it in sync.
-> This is a passive fork which aims to keep in sync with the Linux
-> kernel's latest kconfig to make it easier to keep up to date and to
-> enable new projects to use and embrace kconfig on their own.  The goal
-> is *not* to fork kconfig and evolve it separately, but rather keep in
-> sync with the evolution of kconfig on Linux to make it easier for
-> projects to use kconfig and also update their own kconfig when needed.
+  - Added latest Reviewed-by's and Tested-by's.
 
+The conflicts are trivial to solve, but if you want a reference, take
+a look at (rebased on top of next-20181005):
 
-Syncing kconfig files is easy
-since the files are collected in the single place, scripts/kconfig/.
+  https://github.com/ojeda/linux.git compiler-attributes-rebased
 
-It is true you need some efforts to introduce Kconfig in your project,
-but once established, it is just a matter of copying files
-under scripts/kconfig.
+Thanks!
 
-Copying stuff directly from Linux would be as easy as
-doing so from your init-kconfig.
+Cheers,
+Miguel
 
+The following changes since commit 17b57b1883c1285f3d0dc2266e8f79286a7bef38:
 
+  Linux 4.19-rc6 (2018-09-30 07:15:35 -0700)
 
+are available in the Git repository at:
 
-> This may also be useful if folks want to test R&D code on a smaller
-> compartamentalized codebase.
->
-> If you find this useful and you'd like to help keep it in sync, send
-> patches my way as the kernel's kconfig evolves. The code is up on
-> gitlab [3].
->
-> Do we want to document this option on Linux in case folks want to try
-> and embrace kconfig on their own for other projects?
->
-> [0] http://www.eng.uwaterloo.ca/~shshe/kconfig_semantics.pdf
-> [1] http://gsd.uwaterloo.ca/sites/default/files/vm-2013-berger.pdf
-> [2] http://gsd.uwaterloo.ca/sites/default/files/ase241-berger_0.pdf
-> [3] https://gitlab.com/mcgrof/init-kconfig
->
->   Luis
+  https://github.com/ojeda/linux.git compiler-attributes
 
+for you to fetch changes up to f0604f63033d4020f019d2aaee805c1075b1077b:
 
-Looks like init-kconfig is trying to build some objects as demo.
+  Compiler Attributes: ext4: remove local __nonstring definition
+(2018-09-30 20:14:04 +0200)
 
-obj-y = main.o
-obj-$(CONFIG_FOO) += foo.o
-obj-$(CONFIG_BAR) += bar.o
-obj-$(CONFIG_BAZ) += baz.o
-obj-$(CONFIG_ALPHA) += alpha/
+----------------------------------------------------------------
+Miguel Ojeda (15):
+      Compiler Attributes: remove unused attributes
+      Compiler Attributes: always use the extra-underscores syntax
+      Compiler Attributes: remove unneeded tests
+      Compiler Attributes: homogenize __must_be_array
+      Compiler Attributes: remove unneeded sparse (__CHECKER__) tests
+      Compiler Attributes: add missing SPDX ID in compiler_types.h
+      Compiler Attributes: use feature checks instead of version checks
+      Compiler Attributes: KENTRY used twice the "used" attribute
+      Compiler Attributes: remove uses of __attribute__ from compiler.h
+      Compiler Attributes: add Doc/process/programming-language.rst
+      Compiler Attributes: add MAINTAINERS entry
+      Compiler Attributes: add support for __nonstring (gcc >= 8)
+      Compiler Attributes: enable -Wstringop-truncation on W=1 (gcc >= 8)
+      Compiler Attributes: auxdisplay: panel: use __nonstring
+      Compiler Attributes: ext4: remove local __nonstring definition
 
-
-
-FWIW, this is something I played with some time ago.
-
-Kbuild Skeleton
-https://github.com/masahir0y/kbuild_skeleton
-
-It consists of some core Makefiles and Kconfig.
-
-
-From the time-stamp, it is already 6 years too old.
-
-I am not sure if it is useful for people,
-if so, it is pretty easy to sync up with the latest Linux.
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+ Documentation/process/index.rst                |   1 +
+ Documentation/process/programming-language.rst |  45 +++++
+ MAINTAINERS                                    |   5 +
+ drivers/auxdisplay/panel.c                     |   7 +-
+ fs/ext4/ext4.h                                 |   9 -
+ include/linux/compiler-clang.h                 |   5 -
+ include/linux/compiler-gcc.h                   |  70 +------
+ include/linux/compiler-intel.h                 |   9 -
+ include/linux/compiler.h                       |  19 +-
+ include/linux/compiler_attributes.h            | 258 +++++++++++++++++++++++++
+ include/linux/compiler_types.h                 | 101 ++--------
+ scripts/Makefile.extrawarn                     |   1 +
+ 12 files changed, 341 insertions(+), 189 deletions(-)
+ create mode 100644 Documentation/process/programming-language.rst
+ create mode 100644 include/linux/compiler_attributes.h
