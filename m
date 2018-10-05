@@ -1,49 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:34248 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727823AbeJEP74 (ORCPT
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:37885 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728433AbeJEQF2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Oct 2018 11:59:56 -0400
-Received: by mail-pf1-f193.google.com with SMTP id k19-v6so4791873pfi.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 05 Oct 2018 02:02:09 -0700 (PDT)
+        Fri, 5 Oct 2018 12:05:28 -0400
 MIME-Version: 1.0
-Reply-To: gloommunica@hotmail.com
-From: Mrs tansoba Cone <salinakah@gmail.com>
-Date: Fri, 5 Oct 2018 11:02:08 +0200
-Message-ID: <CAFLvnN9FFTVCw8aSDjN6EjcGMaW5X5HBU_CnfNdfE4fOdN4oZg@mail.gmail.com>
-Subject: Your Urgent Respond!
+References: <20180921142234.16882-1-kieran.bingham+renesas@ideasonboard.com>
+ <20181005083313.2088252-1-arnd@arndb.de> <08b190b9dabd4625ae3d636b88b43ccb@AcuMS.aculab.com>
+In-Reply-To: <08b190b9dabd4625ae3d636b88b43ccb@AcuMS.aculab.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Fri, 5 Oct 2018 11:07:22 +0200
+Message-ID: <CAK8P3a0ZWfjGfpCRzoVw9vg=xg2ov2c7et_qTi5mzd81_RParQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix kernel/bounds.c 'W=1' warning
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: David Laight <David.Laight@aculab.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>, kieran.bingham+renesas@ideasonboard.com, "# 3.4.x" <stable@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
--- 
-Good morning,
+On Fri, Oct 5, 2018 at 10:52 AM David Laight <David.Laight@aculab.com> wrote:
+>
+> From: Arnd Bergmann
+> > Sent: 05 October 2018 09:33
+> >
+> > Building any configuration with 'make W=1' produces a warning:
+> >
+> > kernel/bounds.c:16:6: warnign: no previous prototype for 'foo' [-Wmissing-prototypes]
+> >
+> > When also passing -Werror, this prevents us from building any
+> > other files. Nobody ever calls the function, but we can't make
+> > it 'static' either since we want the compiler output.
+> >
+> > Calling it 'main' instead however avoids the warning, because gcc
+> > does not insist on having a declaration for main.
+>
+> Ugg.
+> main() might be special in other ways too.
+> It wouldn't surprise me if some linkers don't do special stuff for it.
+>
+> What is wrong with just putting and extra "void foo(void);" before
+> the function?
 
-My name is Mrs.tansoba Cone I am currently the regional manager of
-CorisBank International Burkina Faso. I understand that this message must
-seem quite strange but I assure you, if my sources are correct, together we
-will be able to ensure the success of my proposal. I need your assistance
-in retrieving of my late client's funds worth (US$12.5 Million Dollars)
-deposited with my bank. Note that your surname is similar to my late
-client's family last name and that was the reason why I have contacted you
-to assist me to retrieve the unclaimed funds because the bank has issued me
-an Official mandate to submit the beneficiary's name for claim or they will
-confiscate and close the account if no response.
+Greg objected to that on the basis that we don't want declarations
+in .c files -- they should be in a shared header:
 
-If you are interested for more information regarding this mutual profit
-transaction, kindly get back to me urgently with your information. Our
-sharing ratio stands 50%-50%.
+https://lkml.org/lkml/2018/9/21/735
 
-1) Your full Name------------
-2) Phone number------------
-3) Home address------------
-4) Name of your Country------------
-5) your married status------------
-6) Your age------------
-7) your occupation------------
+I don't see what could go wrong here with calling it main(), after
+all we are just interested in the assembler output, not even
+creating an object file.
 
-I wish we can build a strong and long term business relationship with this
-Fund.
-
-Regards
-Mrs tansoba Con
+      Arnd
