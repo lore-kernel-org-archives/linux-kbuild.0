@@ -1,117 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from perceval.ideasonboard.com ([213.167.242.64]:47712 "EHLO
-        perceval.ideasonboard.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727809AbeJEQZF (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:49878 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727616AbeJERrk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Oct 2018 12:25:05 -0400
-Reply-To: kieran.bingham+renesas@ideasonboard.com
-Subject: Re: [PATCH] kbuild: fix kernel/bounds.c 'W=1' warning
-References: <20180921142234.16882-1-kieran.bingham+renesas@ideasonboard.com>
- <20181005083313.2088252-1-arnd@arndb.de>
- <08b190b9dabd4625ae3d636b88b43ccb@AcuMS.aculab.com>
- <CAK8P3a0ZWfjGfpCRzoVw9vg=xg2ov2c7et_qTi5mzd81_RParQ@mail.gmail.com>
-From: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
-Message-ID: <56169e56-2cbd-dc70-e324-44f8e511a1e7@ideasonboard.com>
-Date: Fri, 5 Oct 2018 10:27:06 +0100
+        Fri, 5 Oct 2018 13:47:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a0ZWfjGfpCRzoVw9vg=xg2ov2c7et_qTi5mzd81_RParQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+References: <20181004200249.GL5238@garbanzo.do-not-panic.com>
+In-Reply-To: <20181004200249.GL5238@garbanzo.do-not-panic.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 5 Oct 2018 19:48:34 +0900
+Message-ID: <CAK7LNAT3NQnTtdxyz79jgoQHoUS0TxkP99yuoY-N5yALLnFO1A@mail.gmail.com>
+Subject: Re: [ANN] init-kconfig - easy way to embrace Linux's kconfig
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, David Laight <David.Laight@aculab.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>, "# 3.4.x" <stable@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Petr Vorel <pvorel@suse.cz>, Steven Rostedt <rostedt@goodmis.org>, Johannes Berg <johannes@sipsolutions.net>, Valentin Rothberg <valentinrothberg@gmail.com>, Vegard Nossum <vegard.nossum@oracle.com>, nbd@nbd.name, kconfig-sat@googlegroups.com
 
-On 05/10/18 10:07, Arnd Bergmann wrote:
-> On Fri, Oct 5, 2018 at 10:52 AM David Laight <David.Laight@aculab.com> wrote:
->>
->> From: Arnd Bergmann
->>> Sent: 05 October 2018 09:33
->>>
->>> Building any configuration with 'make W=1' produces a warning:
->>>
->>> kernel/bounds.c:16:6: warnign: no previous prototype for 'foo' [-Wmissing-prototypes]
->>>
->>> When also passing -Werror, this prevents us from building any
->>> other files. Nobody ever calls the function, but we can't make
->>> it 'static' either since we want the compiler output.
->>>
->>> Calling it 'main' instead however avoids the warning, because gcc
->>> does not insist on having a declaration for main.
->>
->> Ugg.
->> main() might be special in other ways too.
->> It wouldn't surprise me if some linkers don't do special stuff for it.
-
-I worried about this but didn't think it would be too much of an issue.
-But perhaps we should check...
-
-<compile bounds.s in both configurations> as bounds.s.foo and bounds.s.main:
-
-
- diff -Nurp bounds.s.*
---- bounds.s.foo        2018-10-05 10:20:53.269941404 +0100
-+++ bounds.s.main       2018-10-05 10:20:31.375891260 +0100
-@@ -108,11 +108,12 @@
-
-        .global _mcount
- #NO_APP
-+       .section        .text.startup,"ax",@progbits
-        .align  2
-        .p2align 3,,7
--       .global foo
--       .type   foo, %function
--foo:
-+       .global main
-+       .type   main, %function
-+main:
-        stp     x29, x30, [sp, -16]!    //,,,
-        add     x29, sp, 0      //,,
- // /home/linuxembedded/iob/renesas/vsp1/sources/linux/kernel/bounds.c:17: {
-@@ -139,10 +140,11 @@ foo:
-
- .ascii "->SPINLOCK_SIZE 56 sizeof(spinlock_t)" //
- // 0 "" 2
--// /home/linuxembedded/iob/renesas/vsp1/sources/linux/kernel/bounds.c:26: }
-+// /home/linuxembedded/iob/renesas/vsp1/sources/linux/kernel/bounds.c:28: }
- #NO_APP
-+       mov     w0, 0   //,
-        ldp     x29, x30, [sp], 16      //,,,
-        ret
--       .size   foo, .-foo
-+       .size   main, .-main
-        .ident  "GCC: (Ubuntu/Linaro 7.3.0-16ubuntu3) 7.3.0"
-        .section        .note.GNU-stack,"",@progbits
+Hi,
 
 
 
-compiled with aarch64-linux-gnu-gcc, and with no debug enabled.
+On Fri, Oct 5, 2018 at 5:03 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
+>
+> Every now and then a project is born, and they decide to use Linux's
+> kconfig to enable configuration of their project. As it stands we *know*
+> kconfig is now used in at least over 12 different projects [0]. I myself
+> added kconfig to one as well years ago. Even research reveals that
+> kconfig has become one of the leading industrial variability modeling
+> languages [1] [2].
+>
+> What is often difficult to do though is to start off using kconfig and
+> integrating it into a project. Or updating / syncing to the latest
+> kconfig from upstream Linux.
+>
+> I had yet another need to use kconfig for another small project so
+> decided to make a clean template others can use and help keep it in sync.
+> This is a passive fork which aims to keep in sync with the Linux
+> kernel's latest kconfig to make it easier to keep up to date and to
+> enable new projects to use and embrace kconfig on their own.  The goal
+> is *not* to fork kconfig and evolve it separately, but rather keep in
+> sync with the evolution of kconfig on Linux to make it easier for
+> projects to use kconfig and also update their own kconfig when needed.
 
-Other than the entry point rename (and section name) and the return
-value being added, I can't see anything problematic here.
 
-And as far as I know - this file gets processed after to extract
-definitions which should be independent. This file is not executed or
-further compiled as far as I am aware.
+Syncing kconfig files is easy
+since the files are collected in the single place, scripts/kconfig/.
 
---
-Kieran
+It is true you need some efforts to introduce Kconfig in your project,
+but once established, it is just a matter of copying files
+under scripts/kconfig.
+
+Copying stuff directly from Linux would be as easy as
+doing so from your init-kconfig.
 
 
 
->>
->> What is wrong with just putting and extra "void foo(void);" before
->> the function?
-> 
-> Greg objected to that on the basis that we don't want declarations
-> in .c files -- they should be in a shared header:
-> 
-> https://lkml.org/lkml/2018/9/21/735
-> 
-> I don't see what could go wrong here with calling it main(), after
-> all we are just interested in the assembler output, not even
-> creating an object file.
-> 
->       Arnd
-> 
+
+> This may also be useful if folks want to test R&D code on a smaller
+> compartamentalized codebase.
+>
+> If you find this useful and you'd like to help keep it in sync, send
+> patches my way as the kernel's kconfig evolves. The code is up on
+> gitlab [3].
+>
+> Do we want to document this option on Linux in case folks want to try
+> and embrace kconfig on their own for other projects?
+>
+> [0] http://www.eng.uwaterloo.ca/~shshe/kconfig_semantics.pdf
+> [1] http://gsd.uwaterloo.ca/sites/default/files/vm-2013-berger.pdf
+> [2] http://gsd.uwaterloo.ca/sites/default/files/ase241-berger_0.pdf
+> [3] https://gitlab.com/mcgrof/init-kconfig
+>
+>   Luis
+
+
+Looks like init-kconfig is trying to build some objects as demo.
+
+obj-y = main.o
+obj-$(CONFIG_FOO) += foo.o
+obj-$(CONFIG_BAR) += bar.o
+obj-$(CONFIG_BAZ) += baz.o
+obj-$(CONFIG_ALPHA) += alpha/
+
+
+
+FWIW, this is something I played with some time ago.
+
+Kbuild Skeleton
+https://github.com/masahir0y/kbuild_skeleton
+
+It consists of some core Makefiles and Kconfig.
+
+
+From the time-stamp, it is already 6 years too old.
+
+I am not sure if it is useful for people,
+if so, it is pretty easy to sync up with the latest Linux.
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
