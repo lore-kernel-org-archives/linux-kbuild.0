@@ -1,70 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:35952 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbeJEHOY (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.130]:53573 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727750AbeJEPbG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Oct 2018 03:14:24 -0400
-Subject: Re: [ANN] init-kconfig - easy way to embrace Linux's kconfig
-References: <20181004200249.GL5238@garbanzo.do-not-panic.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <8487f1e3-248f-8736-90fb-5bbd87b35a44@infradead.org>
-Date: Thu, 4 Oct 2018 17:18:07 -0700
-MIME-Version: 1.0
-In-Reply-To: <20181004200249.GL5238@garbanzo.do-not-panic.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Fri, 5 Oct 2018 11:31:06 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] kbuild: fix kernel/bounds.c 'W=1' warning
+Date: Fri,  5 Oct 2018 10:33:13 +0200
+Message-Id: <20181005083313.2088252-1-arnd@arndb.de>
+In-Reply-To: <20180921142234.16882-1-kieran.bingham+renesas@ideasonboard.com>
+References: <20180921142234.16882-1-kieran.bingham+renesas@ideasonboard.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Luis Chamberlain <mcgrof@kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Petr Vorel <pvorel@suse.cz>, Steven Rostedt <rostedt@goodmis.org>, Johannes Berg <johannes@sipsolutions.net>, Valentin Rothberg <valentinrothberg@gmail.com>, Vegard Nossum <vegard.nossum@oracle.com>, Felix Fietkau <nbd@nbd.name>, kconfig-sat@googlegroups.com, Ulf Magnusson <ulfalizer@gmail.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-renesas-soc@vger.kernel.org, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, stable@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, Arnd Bergmann <arnd@arndb.de>
 
-On 10/4/18 1:02 PM, Luis Chamberlain wrote:
-> Every now and then a project is born, and they decide to use Linux's
-> kconfig to enable configuration of their project. As it stands we *know*
-> kconfig is now used in at least over 12 different projects [0]. I myself
-> added kconfig to one as well years ago. Even research reveals that
-> kconfig has become one of the leading industrial variability modeling
-> languages [1] [2].
-> 
-> What is often difficult to do though is to start off using kconfig and
-> integrating it into a project. Or updating / syncing to the latest
-> kconfig from upstream Linux.
-> 
-> I had yet another need to use kconfig for another small project so
-> decided to make a clean template others can use and help keep it in sync.
-> This is a passive fork which aims to keep in sync with the Linux
-> kernel's latest kconfig to make it easier to keep up to date and to
-> enable new projects to use and embrace kconfig on their own.  The goal
-> is *not* to fork kconfig and evolve it separately, but rather keep in
-> sync with the evolution of kconfig on Linux to make it easier for
-> projects to use kconfig and also update their own kconfig when needed.
-> 
-> This may also be useful if folks want to test R&D code on a smaller
-> compartamentalized codebase.
-> 
-> If you find this useful and you'd like to help keep it in sync, send
-> patches my way as the kernel's kconfig evolves. The code is up on
-> gitlab [3].
-> 
-> Do we want to document this option on Linux in case folks want to try
-> and embrace kconfig on their own for other projects?
->   
-> [0] http://www.eng.uwaterloo.ca/~shshe/kconfig_semantics.pdf
-> [1] http://gsd.uwaterloo.ca/sites/default/files/vm-2013-berger.pdf
-> [2] http://gsd.uwaterloo.ca/sites/default/files/ase241-berger_0.pdf
-> [3] https://gitlab.com/mcgrof/init-kconfig
-> 
->   Luis
-> 
+Building any configuration with 'make W=1' produces a warning:
 
-Hi Luis,
+kernel/bounds.c:16:6: warnign: no previous prototype for 'foo' [-Wmissing-prototypes]
 
-Any crossover with Ulf's recent announcement?
+When also passing -Werror, this prevents us from building any
+other files. Nobody ever calls the function, but we can't make
+it 'static' either since we want the compiler output.
 
-https://lore.kernel.org/lkml/CAFkk2KQ-sC=bAd9fCkOVPNmZn8m+EZfpZtirE+J5VpvW120sxQ@mail.gmail.com/
+Calling it 'main' instead however avoids the warning, because gcc
+does not insist on having a declaration for main.
 
+Reported-by: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+I have run into this problem several times before, and thought I had
+sent a fix at some point. Looking in the archives, I came across
+the suggested fix from Kieran, so I'm following up on that here.
+---
+ kernel/bounds.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-thanx,
+diff --git a/kernel/bounds.c b/kernel/bounds.c
+index c373e887c066..9795d75b09b2 100644
+--- a/kernel/bounds.c
++++ b/kernel/bounds.c
+@@ -13,7 +13,7 @@
+ #include <linux/log2.h>
+ #include <linux/spinlock_types.h>
+ 
+-void foo(void)
++int main(void)
+ {
+ 	/* The enum constants to put into include/generated/bounds.h */
+ 	DEFINE(NR_PAGEFLAGS, __NR_PAGEFLAGS);
+@@ -23,4 +23,6 @@ void foo(void)
+ #endif
+ 	DEFINE(SPINLOCK_SIZE, sizeof(spinlock_t));
+ 	/* End of constants */
++
++	return 0;
+ }
 -- 
-~Randy
+2.18.0
