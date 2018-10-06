@@ -1,196 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:45292 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729025AbeJEX6e (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Oct 2018 19:58:34 -0400
-From: Rob Herring <robh@kernel.org>
-Subject: [PATCH 07/36] kbuild: Add support for DT binding schema checks
-Date: Fri,  5 Oct 2018 11:58:19 -0500
-Message-Id: <20181005165848.3474-8-robh@kernel.org>
-In-Reply-To: <20181005165848.3474-1-robh@kernel.org>
-References: <20181005165848.3474-1-robh@kernel.org>
+Received: from ozlabs.org ([203.11.71.1]:46621 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726505AbeJFJiz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 6 Oct 2018 05:38:55 -0400
+Date: Sat, 6 Oct 2018 12:37:06 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [GIT PULL linux-next] Add Compiler Attributes (v6) tree
+Message-ID: <20181006123706.121fc6bc@canb.auug.org.au>
+In-Reply-To: <CANiq72kuTr09CjE0jcNFkdO-gOFCjYp+REuLPq5V9c4Y8KvWXA@mail.gmail.com>
+References: <CANiq72kuTr09CjE0jcNFkdO-gOFCjYp+REuLPq5V9c4Y8KvWXA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/XBsAZcgT2zZeLnpPcuNXhp1"; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Cc: Grant Likely <glikely@secretlab.ca>, Kumar Gala <kumar.gala@linaro.org>, Frank Rowand <frowand.list@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Linus Walleij <linus.walleij@linaro.org>, Olof Johansson <olof@lixom.net>, Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>, Tom Rini <trini@konsulko.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Jonathan Cameron <jic23@kernel.org>, Bjorn Andersson <bjorn.andersson@linaro.org>, Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, Linux-Next Mailing List <linux-next@vger.kernel.org>, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S . Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
 
-This adds the build infrastructure for checking DT binding schema
-documents and validating dts files using the binding schema.
+--Sig_/XBsAZcgT2zZeLnpPcuNXhp1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Check DT binding schema documents:
-make dt_binding_check
+Hi Miguel,
 
-Build dts files and check using DT binding schema:
-make dtbs_check
+On Fri, 5 Oct 2018 13:32:25 +0200 Miguel Ojeda <miguel.ojeda.sandonis@gmail=
+.com> wrote:
+>
+> As discussed, here it is the Compiler Attributes series for
+> linux-next. This time the original v6, based on -rc6.
+>=20
+> The changes w.r.t. v5:
+>=20
+>   - Added latest Reviewed-by's and Tested-by's.
+>=20
+> The conflicts are trivial to solve, but if you want a reference, take
+> a look at (rebased on top of next-20181005):
+>=20
+>   https://github.com/ojeda/linux.git compiler-attributes-rebased
+>=20
+> Thanks!
+>=20
+> Cheers,
+> Miguel
+>=20
+> The following changes since commit 17b57b1883c1285f3d0dc2266e8f79286a7bef=
+38:
+>=20
+>   Linux 4.19-rc6 (2018-09-30 07:15:35 -0700)
+>=20
+> are available in the Git repository at:
+>=20
+>   https://github.com/ojeda/linux.git compiler-attributes
 
-Currently, the validation targets are separate from a normal build to
-avoid a hard dependency on the external DT schema project and because
-there are lots of warnings generated.
+Thanks for adding your subsystem tree as a participant of linux-next.  As
+you may know, this is not a judgement of your code.  The purpose of
+linux-next is for integration testing and to lower the impact of
+conflicts between subsystems in the next merge window.=20
 
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: linux-doc@vger.kernel.org
-Cc: devicetree@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Rob Herring <robh@kernel.org>
----
- .gitignore                                   |  1 +
- Documentation/Makefile                       |  2 +-
- Documentation/devicetree/bindings/.gitignore |  2 ++
- Documentation/devicetree/bindings/Makefile   | 30 ++++++++++++++++++++
- Makefile                                     |  8 +++++-
- scripts/Makefile.lib                         | 24 ++++++++++++++--
- 6 files changed, 63 insertions(+), 4 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/.gitignore
- create mode 100644 Documentation/devicetree/bindings/Makefile
+You will need to ensure that the patches/commits in your tree/series have
+been:
+     * submitted under GPL v2 (or later) and include the Contributor's
+        Signed-off-by,
+     * posted to the relevant mailing list,
+     * reviewed by you (or another maintainer of your subsystem tree),
+     * successfully unit tested, and=20
+     * destined for the current or next Linux merge window.
 
-diff --git a/.gitignore b/.gitignore
-index 97ba6b79834c..a20ac26aa2f5 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -15,6 +15,7 @@
- *.bin
- *.bz2
- *.c.[012]*.*
-+*.dt.yaml
- *.dtb
- *.dtb.S
- *.dwo
-diff --git a/Documentation/Makefile b/Documentation/Makefile
-index 2ca77ad0f238..9786957c6a35 100644
---- a/Documentation/Makefile
-+++ b/Documentation/Makefile
-@@ -2,7 +2,7 @@
- # Makefile for Sphinx documentation
- #
- 
--subdir-y :=
-+subdir-y := devicetree/bindings/
- 
- # You can set these variables from the command line.
- SPHINXBUILD   = sphinx-build
-diff --git a/Documentation/devicetree/bindings/.gitignore b/Documentation/devicetree/bindings/.gitignore
-new file mode 100644
-index 000000000000..7e47316f1d7a
---- /dev/null
-+++ b/Documentation/devicetree/bindings/.gitignore
-@@ -0,0 +1,2 @@
-+*.example.dts
-+*.yaml.tmp
-diff --git a/Documentation/devicetree/bindings/Makefile b/Documentation/devicetree/bindings/Makefile
-new file mode 100644
-index 000000000000..b57f0dec3fab
---- /dev/null
-+++ b/Documentation/devicetree/bindings/Makefile
-@@ -0,0 +1,30 @@
-+# SPDX-License-Identifier: GPL-2.0
-+DT_DOC_CHECKER ?= dt-doc-validate
-+DT_EXTRACT_EX ?= dt-extract-example
-+
-+quiet_cmd_chk_binding = CHKDT   $<
-+      cmd_chk_binding = (set -e; \
-+                         $(DT_DOC_CHECKER) $< ; \
-+                         mkdir -p $(dir $@) ; \
-+                         $(DT_EXTRACT_EX) $< > $@ )
-+
-+$(obj)/%.example.dts: $(src)/%.yaml FORCE
-+	$(call if_changed,chk_binding)
-+
-+DT_MK_SCHEMA ?= dt-mk-schema
-+DT_TMP_SCHEMA := .schema.yaml.tmp
-+extra-y += $(DT_TMP_SCHEMA)
-+
-+quiet_cmd_mk_schema = SCHEMA  $@
-+      cmd_mk_schema = mkdir -p $(obj); \
-+                      $(DT_MK_SCHEMA) -o $@ $(srctree)/$(src)
-+
-+DT_DOCS = $(shell cd $(srctree)/$(src) && find * -name '*.yaml')
-+DTS_EXAMPLES = $(patsubst %.yaml,%.example.dts, $(DT_DOCS))
-+extra-y += $(DTS_EXAMPLES)
-+
-+DTBS = $(patsubst %.yaml,%.example.dtb, $(DT_DOCS))
-+extra-y += $(DTBS)
-+
-+$(obj)/$(DT_TMP_SCHEMA): $(addprefix $(obj)/, $(DTBS)) FORCE
-+	$(call if_changed,mk_schema)
-diff --git a/Makefile b/Makefile
-index 021e274c4b03..648f7238e883 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1227,10 +1227,13 @@ ifneq ($(dtstree),)
- %.dtb: prepare3 scripts_dtc
- 	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
- 
--PHONY += dtbs dtbs_install
-+PHONY += dtbs dtbs_install dt_binding_check
- dtbs: prepare3 scripts_dtc
- 	$(Q)$(MAKE) $(build)=$(dtstree)
- 
-+dtbs_check: prepare3 dt_binding_check
-+	$(Q)$(MAKE) $(build)=$(dtstree) CHECK_DTBS=1
-+
- dtbs_install:
- 	$(Q)$(MAKE) $(dtbinst)=$(dtstree)
- 
-@@ -1244,6 +1247,9 @@ PHONY += scripts_dtc
- scripts_dtc: scripts_basic
- 	$(Q)$(MAKE) $(build)=scripts/dtc
- 
-+dt_binding_check: scripts_dtc
-+	$(Q)$(MAKE) $(build)=Documentation/devicetree/bindings
-+
- # ---------------------------------------------------------------------------
- # Modules
- 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 8fe4468f9bda..d1c5630ba24c 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -61,6 +61,11 @@ real-obj-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))
- extra-y				+= $(dtb-y)
- extra-$(CONFIG_OF_ALL_DTBS)	+= $(dtb-)
- 
-+ifneq ($(CHECK_DTBS),)
-+extra-y += $(patsubst %.dtb,%.dt.yaml, $(dtb-y))
-+extra-$(CONFIG_OF_ALL_DTBS) += $(patsubst %.dtb,%.dt.yaml, $(dtb-))
-+endif
-+
- # Add subdir path
- 
- extra-y		:= $(addprefix $(obj)/,$(extra-y))
-@@ -284,13 +289,28 @@ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
- quiet_cmd_dtc = DTC     $@
- cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
- 	$(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
--	$(DTC) -O dtb -o $@ -b 0 \
-+	$(DTC) -O $(2) -o $@ -b 0 \
- 		$(addprefix -i,$(dir $<) $(DTC_INCLUDE)) $(DTC_FLAGS) \
- 		-d $(depfile).dtc.tmp $(dtc-tmp) ; \
- 	cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
- 
- $(obj)/%.dtb: $(src)/%.dts $(DTC) FORCE
--	$(call if_changed_dep,dtc)
-+	$(call if_changed_dep,dtc,dtb)
-+
-+DT_CHECKER ?= dt-validate
-+DT_BINDING_DIR := Documentation/devicetree/bindings
-+DT_TMP_SCHEMA := $(objtree)/$(DT_BINDING_DIR)/.schema.yaml.tmp
-+
-+quiet_cmd_dtb_check =	CHECK  $@
-+      cmd_dtb_check =	$(DT_CHECKER) -p $(DT_TMP_SCHEMA) $@ ;
-+
-+define rule_dtc_dt_yaml
-+	$(call cmd_and_fixdep,dtc,yaml)		\
-+	$(call echo-cmd,dtb_check) $(cmd_dtb_check)
-+endef
-+
-+$(obj)/%.dt.yaml: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
-+	$(call if_changed_rule,dtc_dt_yaml)
- 
- dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
- 
--- 
-2.17.1
+Basically, this should be just what you would send to Linus (or ask him
+to fetch).  It is allowed to be rebased if you deem it necessary.
+
+Just in case you are unaware, I will fetch that branch every morning
+and the merge it into linux-next, so any updates will be added without
+you having to send a new pull request.  I will send you an email if I
+find a problem.
+--=20
+Cheers,
+Stephen Rothwell=20
+sfr@canb.auug.org.au
+
+--Sig_/XBsAZcgT2zZeLnpPcuNXhp1
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlu4H9IACgkQAVBC80lX
+0Gw8Xgf/WO3e5cq2gi42DEe04GACun0MjPVUObeEaYyMIPJAWWf9N61ljSZn6kqF
+kPniwP4jklEvGQAkBYVwsArnGHKacOk28ahaZMUeIM5qIcVRVGasJ4HHMTq+8Wdn
+wYhq3q1OjEUOR+HxofUS9oFYPiikGWv7rqRHlnwnVQONqAcA+kvTmxH3wWyGRSfp
+sX978hckIPvhwNQZh6/Qy32RG7SYefa0Z3UpDbdfpWpmehWrFmC4mh6ITkMOcGCY
+bqPkGqBnHqoa0PDQMAf56OdbhKwrRAS6WF6t5/7KSUgwxWaqSMnDXfSCpYErAdA1
+5/DHCXzqxkCKto4C05UrwgUQG7l/VQ==
+=d5WN
+-----END PGP SIGNATURE-----
+
+--Sig_/XBsAZcgT2zZeLnpPcuNXhp1--
