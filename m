@@ -1,85 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f171.google.com ([209.85.167.171]:45978 "EHLO
-        mail-oi1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726792AbeJFMzN (ORCPT
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:40716 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726409AbeJFRWg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 6 Oct 2018 08:55:13 -0400
+        Sat, 6 Oct 2018 13:22:36 -0400
 MIME-Version: 1.0
-References: <20181004200249.GL5238@garbanzo.do-not-panic.com>
-In-Reply-To: <20181004200249.GL5238@garbanzo.do-not-panic.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Sat, 6 Oct 2018 07:53:02 +0200
-Message-ID: <CAFkk2KQk8ZZhjo3aC1hi2Kph5okuS-UVApboajUXEcu0JFGPOg@mail.gmail.com>
-Subject: Re: [ANN] init-kconfig - easy way to embrace Linux's kconfig
+References: <CA+icZUW+N4V-bLEX0217dMYTrfzmgLZkbif8w3-zRQXnd7VYSQ@mail.gmail.com>
+ <CANiq72mATUQeNA5uTSY2XBPwDi-S+K+H3LJJU5_UFcxUj_E8sw@mail.gmail.com> <CA+icZUXnew3JNME1UcCN0Dtc_3CHutyqcJ3yvb4d_rDBDt3jKw@mail.gmail.com>
+In-Reply-To: <CA+icZUXnew3JNME1UcCN0Dtc_3CHutyqcJ3yvb4d_rDBDt3jKw@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Sat, 6 Oct 2018 12:19:41 +0200
+Message-ID: <CANiq72mw4gPMP+j9E19o3r9+fpn=Tq0nUDWuR=3HfYdPOgN81A@mail.gmail.com>
+Subject: Re: [PATCH v5 00/15] Compiler Attributes
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R . Rodriguez" <mcgrof@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, pvorel@suse.cz, rostedt@goodmis.org, johannes@sipsolutions.net, valentinrothberg@gmail.com, vegard.nossum@oracle.com, nbd@nbd.name, kconfig-sat@googlegroups.com
+To: sedat.dilek@gmail.com
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Ted Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Thu, Oct 4, 2018 at 10:03 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+On Sat, Oct 6, 2018 at 9:13 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
 >
-> Every now and then a project is born, and they decide to use Linux's
-> kconfig to enable configuration of their project. As it stands we *know*
-> kconfig is now used in at least over 12 different projects [0]. I myself
-> added kconfig to one as well years ago. Even research reveals that
-> kconfig has become one of the leading industrial variability modeling
-> languages [1] [2].
+> Hi Miguel,
 >
-> What is often difficult to do though is to start off using kconfig and
-> integrating it into a project. Or updating / syncing to the latest
-> kconfig from upstream Linux.
->
-> I had yet another need to use kconfig for another small project so
-> decided to make a clean template others can use and help keep it in sync.
-> This is a passive fork which aims to keep in sync with the Linux
-> kernel's latest kconfig to make it easier to keep up to date and to
-> enable new projects to use and embrace kconfig on their own.  The goal
-> is *not* to fork kconfig and evolve it separately, but rather keep in
-> sync with the evolution of kconfig on Linux to make it easier for
-> projects to use kconfig and also update their own kconfig when needed.
->
-> This may also be useful if folks want to test R&D code on a smaller
-> compartamentalized codebase.
->
-> If you find this useful and you'd like to help keep it in sync, send
-> patches my way as the kernel's kconfig evolves. The code is up on
-> gitlab).) [3].
->
-> Do we want to document this option on Linux in case folks want to try
-> and embrace kconfig on their own for other projects?
->
-> [0] http://www.eng.uwaterloo.ca/~shshe/kconfig_semantics.pdf
-> [1] http://gsd.uwaterloo.ca/sites/default/files/vm-2013-berger.pdf
-> [2] http://gsd.uwaterloo.ca/sites/default/files/ase241-berger_0.pdf
-> [3] https://gitlab.com/mcgrof/init-kconfig
->
->   Luis
+> In my testoings I am booting in QEMU and on bare metal.
+> Both tests were successful.
 
-Shameless self-plug:
+Wow! I only wanted to confirm it booted and/or run for a while -- but
+having more information is always good. Thanks a *lot*!
 
-There's also a Python Kconfig implementation that's starting to get
-picked up by several projects: https://github.com/ulfalizer/kconfiglib
-
-It has a terminal menuconfig interface with a lot more features than
-mconf (a demonstration is available at
-https://raw.githubusercontent.com/ulfalizer/Kconfiglib/screenshots/screenshots/menuconfig.gif),
-and can also be used e.g. to generate cross-referenced Kconfig
-documentation that includes propagated dependencies:
-https://docs.zephyrproject.org/latest/reference/kconfig/index.html
-(note: heavy page).
-
-Kconfiglib is based around a library (an old version appears in e.g.
-U-Boot and Yocto, and a newer version in e.g. Espressif). The
-documentation generation is just a script
-(https://github.com/zephyrproject-rtos/zephyr/blob/master/doc/scripts/genrest.py),
-and the same goes for the menuconfig and the other tools. The core
-library takes part of all the trickiness related to evaluating
-symbols.
-
-I realize there would probably be massive opposition to adding a
-Python dependency to a core part of the kernel, so I'm not going for
-that. For most other projects, I think it's a good fit though.
+I will add a reference to your email in the commits.
 
 Cheers,
-Ulf
+Miguel
