@@ -1,33 +1,117 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.hmha.gob.ec ([190.11.21.43]:37184 "EHLO mail.hmha.gob.ec"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725842AbeJHNga (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Oct 2018 09:36:30 -0400
-Content-Type: text/plain; charset="utf-8"
+Received: from perceval.ideasonboard.com ([213.167.242.64]:35492 "EHLO
+        perceval.ideasonboard.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726612AbeJHRLK (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 8 Oct 2018 13:11:10 -0400
+Reply-To: kieran.bingham+renesas@ideasonboard.com
+Subject: Re: [PATCH] kbuild: fix kernel/bounds.c 'W=1' warning
+References: <20180921142234.16882-1-kieran.bingham+renesas@ideasonboard.com>
+ <20181005083313.2088252-1-arnd@arndb.de>
+ <CANiq72mHDxe9-+pFf+dDuYXRz5YeyRYi6RW65tyo9-ENNngsCw@mail.gmail.com>
+ <CAK7LNAT5h+Rku7DbD+kHGv7Kgk8FfuX4wwL_pwNOLSJbqw99MA@mail.gmail.com>
+ <CAK7LNATycNLxzB=FtrBy9M4E6m9wx4Uhk=DQ7gcCMD2J_vfmfQ@mail.gmail.com>
+From: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
+Message-ID: <5cbb504c-0506-cec8-d51b-00928cdb27fe@ideasonboard.com>
+Date: Mon, 8 Oct 2018 11:00:10 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: =?utf-8?b?V29obHTDpHRpZ2tlaXRzc3BlbmRlIGluIEjDtmhlIHZvbiDigqwgMi4wMDAu?=
- =?utf-8?q?000=2C00?=
-From: cinthia_reyes@hmha.gob.ec
-Date: Mon, 24 Sep 2018 10:37:18 +0100
-Reply-To: wumt.claimservice@gmail.com
-Message-Id: <20180924093728.8AA1F2485A41@mail.hmha.gob.ec>
+In-Reply-To: <CAK7LNATycNLxzB=FtrBy9M4E6m9wx4Uhk=DQ7gcCMD2J_vfmfQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <cinthia_reyes@hmha.gob.ec>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, miguel.ojeda.sandonis@gmail.com
+Cc: Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>, stable <stable@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Lieber Freund,
- 
-Ich bin Herr Tayeb Souami, New Jersey, Vereinigte Staaten von Amerika, der Mega-Gewinner von $ 315million In Mega Millions Jackpot, spende ich an 5 zufällige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Mail nach einem Spinball ausgewählt.Ich habe den größten Teil meines Vermögens auf eine Reihe von Wohltätigkeitsorganisationen und Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die Summe von € 2.000.000,00 an Sie als eine der ausgewählten 5 zu spenden, um meine Gewinne zu überprüfen, sehen Sie bitte meine You Tube Seite unten.
- 
-UHR MICH HIER: https://www.youtube.com/watch?v=Z6ui8ZDQ6Ks
- 
-Das ist dein Spendencode: [DFC530342018]
- 
-Antworten Sie mit dem SPENDE-CODE an diese E-Mail: financialfundingcompany09@gmail.com
- 
-Ich hoffe, Sie und Ihre Familie glücklich zu machen.
- 
-Grüße
-Herr Tayeb Souami
+On 06/10/18 23:06, Masahiro Yamada wrote:
+> On Sun, Oct 7, 2018 at 6:58 AM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>>
+>> Hi Miguel,
+>>
+>>
+>> On Sun, Oct 7, 2018 at 6:18 AM Miguel Ojeda
+>> <miguel.ojeda.sandonis@gmail.com> wrote:
+>>>
+>>> On Fri, Oct 5, 2018 at 10:35 AM Arnd Bergmann <arnd@arndb.de> wrote:
+>>>>
+>>>> Building any configuration with 'make W=1' produces a warning:
+>>>>
+>>>> kernel/bounds.c:16:6: warnign: no previous prototype for 'foo' [-Wmissing-prototypes]
+>>>>
+>>>> When also passing -Werror, this prevents us from building any
+>>>> other files. Nobody ever calls the function, but we can't make
+>>>> it 'static' either since we want the compiler output.
+>>>>
+>>>> Calling it 'main' instead however avoids the warning, because gcc
+>>>> does not insist on having a declaration for main.
+>>>
+>>> I think marking the function as static __used should do the trick and
+>>> would be less confusing.
+>>
+>>
+>>
+>>
+>> I tried __used, but I still see the warning.
+>>
+>>
+>> masahiro@grover:~/ref/linux$ git diff
+>> diff --git a/kernel/bounds.c b/kernel/bounds.c
+>> index c373e88..aee0101 100644
+>> --- a/kernel/bounds.c
+>> +++ b/kernel/bounds.c
+>> @@ -13,7 +13,7 @@
+>>  #include <linux/log2.h>
+>>  #include <linux/spinlock_types.h>
+>>
+>> -void foo(void)
+>> +void __used foo(void)
+>>  {
+>>         /* The enum constants to put into include/generated/bounds.h */
+>>         DEFINE(NR_PAGEFLAGS, __NR_PAGEFLAGS);
+>> masahiro@grover:~/ref/linux$ make W=1  prepare
+>>   CC      kernel/bounds.s
+>> kernel/bounds.c:16:13: warning: no previous prototype for ‘foo’
+>> [-Wmissing-prototypes]
+>>  void __used foo(void)
+>>              ^
+>>   CC      arch/x86/kernel/asm-offsets.s
+> 
+> 
+> 
+> Sorry, I forgot to add 'static'.
+> 
+> Adding both static and __used worked for me,
+> and I like the idea.
+> 
+
+Aha - I'd also tried converting to static in my earlier attempts, but
+didn't realise we had __used!
+
+updating as "static __used" causes the following diff:
+
+diff -Nurp bounds.s.foo bounds.s.static-used
+--- bounds.s.foo        2018-10-05 10:20:53.269941404 +0100
++++ bounds.s.static-used        2018-10-08 10:51:18.079309049 +0100
+@@ -110,7 +110,6 @@
+ #NO_APP
+        .align  2
+        .p2align 3,,7
+-       .global foo
+        .type   foo, %function
+ foo:
+        stp     x29, x30, [sp, -16]!    //,,,
+
+
+I'd say this is a pretty good alternative fix - however I see Arnd's
+version is already on it's way though akpm's tree...
+
+https://ozlabs.org/~akpm/mmots/broken-out/kbuild-fix-kernel-boundsc-w%3D1-warning.patch
+
+Anyway, as long as one of the variants gets there I'll be happy :)
+
+--
+Regards
+
+Kieran
