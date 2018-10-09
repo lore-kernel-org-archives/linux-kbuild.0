@@ -1,27 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46742 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:58970 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726468AbeJIWwq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Oct 2018 18:52:46 -0400
+        id S1726479AbeJIWxq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 9 Oct 2018 18:53:46 -0400
 From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20180928130704.kcmsnsecp6aqpk66@salvia>
-References: <20180928130704.kcmsnsecp6aqpk66@salvia> <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk> <153622555128.14298.11612304975343930534.stgit@warthog.procyon.org.uk>
-Subject: Re: [netfilter-core] [PATCH 07/11] UAPI: netfilter: Fix symbol collision issues [ver #2]
+In-Reply-To: <CAPcyv4gmMwRAG=VxWNyeacxdsPCsaT+BtR+27+bHT=6heAZ3sQ@mail.gmail.com>
+References: <CAPcyv4gmMwRAG=VxWNyeacxdsPCsaT+BtR+27+bHT=6heAZ3sQ@mail.gmail.com> <153622549721.14298.8116794954073122489.stgit@warthog.procyon.org.uk> <153622557095.14298.10281337300003012767.stgit@warthog.procyon.org.uk>
+Subject: Re: [PATCH 10/11] UAPI: ndctl: Remove use of PAGE_SIZE [ver #2]
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <17563.1539099314.1@warthog.procyon.org.uk>
-Date: Tue, 09 Oct 2018 16:35:14 +0100
-Message-ID: <17564.1539099314@warthog.procyon.org.uk>
+Content-ID: <17646.1539099374.1@warthog.procyon.org.uk>
+Date: Tue, 09 Oct 2018 16:36:14 +0100
+Message-ID: <17647.1539099374@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: dhowells@redhat.com, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, coreteam@netfilter.org, netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: dhowells@redhat.com, Linux API <linux-api@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-nvdimm <linux-nvdimm@lists.01.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+Dan Williams <dan.j.williams@intel.com> wrote:
 
-> David, may I upstream this or you will pass it to Greg? I can just
-> take this, as you prefer.
+> Let me know if you want me to pick this up for 4.20.
 
-Feel free to take it.
+If you could pick this and also 09?
 
+Thanks,
 David
