@@ -1,45 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from a3.inai.de ([88.198.85.195]:47912 "EHLO a3.inai.de"
+Received: from mail.skyhub.de ([5.9.137.197]:34070 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726418AbeJJAMh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Oct 2018 20:12:37 -0400
-Date: Tue, 9 Oct 2018 18:54:42 +0200 (CEST)
-From: Jan Engelhardt <jengelh@inai.de>
-Subject: Re: [PATCH 04/11] UAPI: bcache: Fix use of embedded flexible array
-In-Reply-To: <17992.1539099666@warthog.procyon.org.uk>
-Message-ID: <nycvar.YFH.7.76.1810091847450.9618@n3.vanv.qr>
-References: <nycvar.YFH.7.76.1810021622320.11696@n3.vanv.qr> <153616290368.23468.7806230605345568524.stgit@warthog.procyon.org.uk> <17992.1539099666@warthog.procyon.org.uk>
+        id S1725968AbeJKFrw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 11 Oct 2018 01:47:52 -0400
+From: Borislav Petkov <bp@alien8.de>
+Subject: [PATCH] kbuild: Fail the build early when no lz4 present
+Date: Thu, 11 Oct 2018 00:23:33 +0200
+Message-Id: <20181010222333.17794-1-bp@alien8.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org, Coly Li <colyli@suse.de>, Kent Overstreet <kent.overstreet@gmail.com>, linux-bcache@vger.kernel.org, linux-kernel@vger.kernel.org
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
 
-On Tuesday 2018-10-09 17:41, David Howells wrote:
+From: Borislav Petkov <bp@suse.de>
 
->Jan Engelhardt <jengelh@inai.de> wrote:
->
->> """it [the array size expression] shall be a converted constant expression of
->> type std::size_t and its value shall be greater than zero."""
->> —http://eel.is/c++draft/dcl.array
->
->Interesting.  You're not actually quoting the full sentence:
->
->	If the constant-expression is present, it shall be a converted
->	constant expression of type std​::​size_­t and its value shall be
->	greater than zero.
->
->This suggests that:
->
->	__u64 ptr[]
->
->is actually valid
+When building randconfigs, the build fails at kernel compression stage
+due to missing lz4 on the system but CONFIG_KERNEL_LZ4 has been selected
+by randconfig. The result looks somethins like this:
 
-I think that kind of validity only goes for this kind of standalone 
-decl:
+    (cat arch/x86/boot/compressed/vmlinux.bin arch/x86/boot/compressed/vmlinux.relocs | lz4c -l -c1 stdin stdout && printf \334\141\301\001) > arch/x86/boot/compressed/vmlinux.bin.lz4 || (rm -f arch/x86/boot/compressed/vmlinux.bin.lz4 ; false)
+  /bin/sh: 1: lz4c: not found
+  make[2]: *** [arch/x86/boot/compressed/Makefile:143: arch/x86/boot/compressed/vmlinux.bin.lz4] Error 1
+  make[1]: *** [arch/x86/boot/Makefile:112: arch/x86/boot/compressed/vmlinux] Error 2
+  make: *** [arch/x86/Makefile:290: bzImage] Error 2
 
-	extern int myints[];
+Fail the build much earlier by checking for lz4c presence before doing
+anything else.
 
-but not for []-inside-struct.
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org
+---
+ Makefile | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index a0c32de80482..f91de649234b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -788,6 +788,12 @@ KBUILD_CFLAGS_KERNEL += -ffunction-sections -fdata-sections
+ LDFLAGS_vmlinux += --gc-sections
+ endif
+ 
++ifdef CONFIG_KERNEL_LZ4
++ifeq ($(CONFIG_SHELL which lz4c),)
++$(error "lz4 tool not found on this system but CONFIG_KERNEL_LZ4 enabled")
++endif
++endif
++
+ # arch Makefile may override CC so keep this after arch Makefile is included
+ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
+ 
+-- 
+2.19.0.271.gfe8321ec057f
