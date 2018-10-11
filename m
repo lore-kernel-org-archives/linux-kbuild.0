@@ -1,116 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:42651 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726664AbeJKWgv (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Oct 2018 18:36:51 -0400
-MIME-Version: 1.0
-References: <20181010222333.17794-1-bp@alien8.de> <CAK7LNAT2KpYkn=hj=h1XmbMJRdtgCQ__xP0X+Rpwm3e_Xs1brQ@mail.gmail.com>
- <20181011085234.GA25435@zn.tnic>
-In-Reply-To: <20181011085234.GA25435@zn.tnic>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 12 Oct 2018 00:08:07 +0900
-Message-ID: <CAK7LNAS=Kr1W6SfwojEVdwpKy7Au9NRh-wd2Qfo5+aVQVDe9ZQ@mail.gmail.com>
+Received: from mail.skyhub.de ([5.9.137.197]:45910 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726562AbeJKXAi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 11 Oct 2018 19:00:38 -0400
+Date: Thu, 11 Oct 2018 17:32:45 +0200
+From: Borislav Petkov <bp@alien8.de>
 Subject: Re: [PATCH] kbuild: Fail the build early when no lz4 present
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20181011153245.GD25435@zn.tnic>
+References: <20181010222333.17794-1-bp@alien8.de>
+ <CAK7LNAT2KpYkn=hj=h1XmbMJRdtgCQ__xP0X+Rpwm3e_Xs1brQ@mail.gmail.com>
+ <20181011085234.GA25435@zn.tnic>
+ <CAK7LNAS=Kr1W6SfwojEVdwpKy7Au9NRh-wd2Qfo5+aVQVDe9ZQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAS=Kr1W6SfwojEVdwpKy7Au9NRh-wd2Qfo5+aVQVDe9ZQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Thu, Oct 11, 2018 at 5:54 PM Borislav Petkov <bp@alien8.de> wrote:
->
-> On Thu, Oct 11, 2018 at 01:26:23PM +0900, Masahiro Yamada wrote:
-> > So, the cause of the failure is clear enough
-> > from the build log.
->
-> Sure but it wasts unnecessary build cycles and appears only after all
-> the compilation units have been produced.
+On Fri, Oct 12, 2018 at 12:08:07AM +0900, Masahiro Yamada wrote:
+> Install lz4c, and run 'make' again.
+> Almost all objects have been built there,
+> so you will finish it soon.
 
+So when this LZ4 thing got added at the time, the lz4 package had to be
+downloaded and built and installed and it wasn't as easy as zypper in
+lz4 or apt-get install lz4.
 
-Not a waste of time.
+And I *might* install it if there were a human readable error message
+which would tell me so.
 
-Install lz4c, and run 'make' again.
-Almost all objects have been built there,
-so you will finish it soon.
+And we should strive to be as user-friendly as possible. And no, this:
 
-If you are building up a compile-test machine,
-you will probably need to install various tools anyway.
+/bin/sh: 1: lz4c: not found
+make[2]: *** [arch/x86/boot/compressed/Makefile:145: arch/x86/boot/compressed/vmlinux.bin.lz4] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [arch/x86/boot/Makefile:112: arch/x86/boot/compressed/vmlinux] Error 2
+make: *** [arch/x86/Makefile:290: bzImage] Error 2
+make: *** Waiting for unfinished jobs....
 
-I do not want to add ugly checks in random places.
+is not user-friendly.
 
+> If you are building up a compile-test machine,
+> you will probably need to install various tools anyway.
 
-> > It is weird to check only lz4c.
-> > If CONFIG_KERNEL_LZO is enabled, but lzop is not installed,
-> > I see this log
-> >
-> >   LZO     arch/x86/boot/compressed/vmlinux.bin.lzo
-> > /bin/sh: 1: lzop: not found
-> >
-> > It is still clear what to do, though.
->
-> Right, we should test for that too. Unless distros start installing it
-> by default. It is not installed by default on a debian guest here, at
-> least.
->
-> SLES15 either:
->
-> $ lzop
-> If 'lzop' is not a typo you can use command-not-found to lookup the package that contains it, like this:
->     cnf lzop
->
-> > Is it necessary to check this earlier?
->
-> Yes, see above.
->
-> > If you get this error, you just need to install the tool.
-> > Then, you can re-run the incremental build.
->
-> Actually, I'd prefer the build to fail early so that machine can
-> continue with the next build.
->
-> > BTW, this patch has a drawback.
-> >
-> > [1] Enable CONFIG_KERNEL_LZ4 on the system
-> >     without lz4c installed
-> >
-> > [2] Run 'make' and you will get the error
-> >     "lz4 tool not found on this system but CONFIG_KERNEL_LZ4 enabled"
-> >
-> > [3] Run 'make menuconfig' and
-> >     switch from CONFIG_KERNEL_LZ4 to CONFIG_KERNEL_GZIP
-> >
-> > [4] Run 'make' and you will still get the same error
-> >     even after you have chosen to use GZIP instead of LZ4.
->
-> Well, there's code in Makefile to refresh include/config/auto.conf but
-> for whatever reason that make in step 4 doesn't run it.
->
-> And *that* looks like a bug - if a user runs "make menuconfig" and
-> .config gets updated, then include/config/auto.conf better get updated
-> too. Right?
+Yes, and look how perf tool solves this. Much much better.
 
-Not a bug.
-include/config/auto.conf gets updates.
+> I do not want to add ugly checks in random places.
 
-But the top Makefile is parsed twice
-with a stale auto.conf, and with a fresh auto.conf
+That's fair.
 
-It is wrong to add $(error ...)
-in the plain context in the top Makefile.
+What would be a fitting place to add such checks and be able to issue a
+human-readable error message to people?
 
+Btw, we fail the same cryptic way when there's no openSSL headers
+installed on the system:
 
+---
+scripts/sign-file.c:25:10: fatal error: openssl/opensslv.h: No such file or directory
+ #include <openssl/opensslv.h>
+          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[1]: *** [scripts/Makefile.host:90: scripts/sign-file] Error 1
+make[1]: *** Waiting for unfinished jobs....
+scripts/extract-cert.c:21:10: fatal error: openssl/bio.h: No such file or directory
+ #include <openssl/bio.h>
+          ^~~~~~~~~~~~~~~
+compilation terminated.
+make[1]: *** [scripts/Makefile.host:90: scripts/extract-cert] Error 1
+make: *** [Makefile:1065: scripts] Error 2
+make: *** Waiting for unfinished jobs....
+---
 
-> Thx.
->
-> --
-> Regards/Gruss,
->     Boris.
->
-> Good mailing practices for 400: avoid top-posting and trim the reply.
+and all those beginners who are trying to build the kernel for the first
+time would have hard time figuring out what's expected of them.
 
+Now look at perf tool:
 
+Makefile.config:445: No sys/sdt.h found, no SDT events are defined, please install systemtap-sdt-devel or systemtap-sdt-dev
+Makefile.config:491: No libunwind found. Please install libunwind-dev[el] >= 1.1 and/or set LIBUNWIND_DIR
+Makefile.config:721: No bfd.h/libbfd found, please install binutils-dev[el]/zlib-static/libiberty-dev to gain symbol demangling
+
+Much better IMO.
+
+Thx.
 
 -- 
-Best Regards
-Masahiro Yamada
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
