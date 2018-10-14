@@ -1,104 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:32918 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726292AbeJMWry (ORCPT
+Received: from isilmar-4.linta.de ([136.243.71.142]:53640 "EHLO
+        isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726012AbeJNNmT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 13 Oct 2018 18:47:54 -0400
-From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/8] aha152x: rename the PCMCIA define
-Date: Sat, 13 Oct 2018 17:10:09 +0200
-Message-Id: <20181013151016.31674-2-hch@lst.de>
-In-Reply-To: <20181013151016.31674-1-hch@lst.de>
+        Sun, 14 Oct 2018 09:42:19 -0400
+Date: Sun, 14 Oct 2018 07:42:52 +0200
+From: Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: Re: [PATCH 5/8] pcmcia: allow PCMCIA support independent of the
+ architecture
+Message-ID: <20181014054252.GA24103@light.dominikbrodowski.net>
 References: <20181013151016.31674-1-hch@lst.de>
+ <20181013151016.31674-6-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181013151016.31674-6-hch@lst.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Matt Porter <mporter@kernel.crashing.org>, Alexandre Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, linux-kbuild@vger.kernel.org, linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Christoph Hellwig <hch@lst.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Matt Porter <mporter@kernel.crashing.org>, Alexandre Bounine <alex.bou9@gmail.com>, linux-kbuild@vger.kernel.org, linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-We plan to enable building the pcmcia core and drivers, and the
-non-prefixed PCMCIA name clashes with some arch headers.
+On Sat, Oct 13, 2018 at 05:10:13PM +0200, Christoph Hellwig wrote:
+> There is nothing architecture specific in the PCMCIA core, so allow
+> building it everywhere.  The actual host controllers will depend on ISA,
+> PCI or a specific SOC.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/aha152x.c             | 14 +++++++-------
- drivers/scsi/pcmcia/aha152x_core.c |  2 +-
- 2 files changed, 8 insertions(+), 8 deletions(-)
+Looks good to me, though I'm interested on any subtle (build) breakage when
+this gets exposure in -next. Will you push this patch upstream directly, or
+should it go in via the pcmcia tree? If it is the former, feel free to add
 
-diff --git a/drivers/scsi/aha152x.c b/drivers/scsi/aha152x.c
-index 4d7b0e0adbf7..301b3cad15f8 100644
---- a/drivers/scsi/aha152x.c
-+++ b/drivers/scsi/aha152x.c
-@@ -269,7 +269,7 @@ static LIST_HEAD(aha152x_host_list);
- /* DEFINES */
- 
- /* For PCMCIA cards, always use AUTOCONF */
--#if defined(PCMCIA) || defined(MODULE)
-+#if defined(AHA152X_PCMCIA) || defined(MODULE)
- #if !defined(AUTOCONF)
- #define AUTOCONF
- #endif
-@@ -297,7 +297,7 @@ CMD_INC_RESID(struct scsi_cmnd *cmd, int inc)
- 
- #define DELAY_DEFAULT 1000
- 
--#if defined(PCMCIA)
-+#if defined(AHA152X_PCMCIA)
- #define IRQ_MIN 0
- #define IRQ_MAX 16
- #else
-@@ -328,7 +328,7 @@ MODULE_AUTHOR("Jürgen Fischer");
- MODULE_DESCRIPTION(AHA152X_REVID);
- MODULE_LICENSE("GPL");
- 
--#if !defined(PCMCIA)
-+#if !defined(AHA152X_PCMCIA)
- #if defined(MODULE)
- static int io[] = {0, 0};
- module_param_hw_array(io, int, ioport, NULL, 0);
-@@ -391,7 +391,7 @@ static struct isapnp_device_id id_table[] = {
- MODULE_DEVICE_TABLE(isapnp, id_table);
- #endif /* ISAPNP */
- 
--#endif /* !PCMCIA */
-+#endif /* !AHA152X_PCMCIA */
- 
- static struct scsi_host_template aha152x_driver_template;
- 
-@@ -863,7 +863,7 @@ void aha152x_release(struct Scsi_Host *shpnt)
- 	if (shpnt->irq)
- 		free_irq(shpnt->irq, shpnt);
- 
--#if !defined(PCMCIA)
-+#if !defined(AHA152X_PCMCIA)
- 	if (shpnt->io_port)
- 		release_region(shpnt->io_port, IO_RANGE);
- #endif
-@@ -2924,7 +2924,7 @@ static struct scsi_host_template aha152x_driver_template = {
- 	.slave_alloc			= aha152x_adjust_queue,
- };
- 
--#if !defined(PCMCIA)
-+#if !defined(AHA152X_PCMCIA)
- static int setup_count;
- static struct aha152x_setup setup[2];
- 
-@@ -3392,4 +3392,4 @@ static int __init aha152x_setup(char *str)
- __setup("aha152x=", aha152x_setup);
- #endif
- 
--#endif /* !PCMCIA */
-+#endif /* !AHA152X_PCMCIA */
-diff --git a/drivers/scsi/pcmcia/aha152x_core.c b/drivers/scsi/pcmcia/aha152x_core.c
-index dba3716511c5..24b89228b241 100644
---- a/drivers/scsi/pcmcia/aha152x_core.c
-+++ b/drivers/scsi/pcmcia/aha152x_core.c
-@@ -1,3 +1,3 @@
--#define PCMCIA	1
-+#define AHA152X_PCMCIA 1
- #define AHA152X_STAT 1
- #include "aha152x.c"
--- 
-2.19.1
+	Acked-by: Dominik Brodowski <linux@dominikbrodowski.net>
+
+
+Thanks,
+	Dominik
