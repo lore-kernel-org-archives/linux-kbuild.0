@@ -1,38 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:33716 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726115AbeJNPUc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 14 Oct 2018 11:20:32 -0400
-Date: Sun, 14 Oct 2018 09:40:24 +0200
-From: Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 5/8] pcmcia: allow PCMCIA support independent of the
- architecture
-Message-ID: <20181014074024.GA17216@lst.de>
-References: <20181013151016.31674-1-hch@lst.de> <20181013151016.31674-6-hch@lst.de> <20181014054252.GA24103@light.dominikbrodowski.net>
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:46203 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726164AbeJOOUT (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 15 Oct 2018 10:20:19 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181014054252.GA24103@light.dominikbrodowski.net>
+References: <20181013151016.31674-1-hch@lst.de> <20181013151016.31674-3-hch@lst.de>
+In-Reply-To: <20181013151016.31674-3-hch@lst.de>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 15 Oct 2018 15:35:41 +0900
+Message-ID: <CAK7LNAQxZcBNadLJhfrmxJGj-XJFVaya3Z1eexZp20vRPwrN7A@mail.gmail.com>
+Subject: Re: [PATCH 2/8] powerpc: simplify CONFIG_PCI_QSPAN Kconfig magic
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Christoph Hellwig <hch@lst.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Matt Porter <mporter@kernel.crashing.org>, Alexandre Bounine <alex.bou9@gmail.com>, linux-kbuild@vger.kernel.org, linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Christoph Hellwig <hch@lst.de>
+Cc: mporter@kernel.crashing.org, alex.bou9@gmail.com, Dominik Brodowski <linux@dominikbrodowski.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-pci@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-On Sun, Oct 14, 2018 at 07:42:52AM +0200, Dominik Brodowski wrote:
-> On Sat, Oct 13, 2018 at 05:10:13PM +0200, Christoph Hellwig wrote:
-> > There is nothing architecture specific in the PCMCIA core, so allow
-> > building it everywhere.  The actual host controllers will depend on ISA,
-> > PCI or a specific SOC.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> 
-> Looks good to me, though I'm interested on any subtle (build) breakage when
-> this gets exposure in -next. Will you push this patch upstream directly, or
-> should it go in via the pcmcia tree? If it is the former, feel free to add
+On Sun, Oct 14, 2018 at 12:11 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> The way how CONFIG_PCI_QSPAN selects the CONFIG_PCI default is highly
+> unusual and gets in the way of moving CONFIG_PCI into
+> drivers/pci/Kconfig.  Simplify it by just having it depend on
+> CONFIG_PCI.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  arch/powerpc/Kconfig | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+> index a80669209155..6fa6f92edb7f 100644
+> --- a/arch/powerpc/Kconfig
+> +++ b/arch/powerpc/Kconfig
+> @@ -955,7 +955,6 @@ config PCI
+>         bool "PCI support" if PPC_PCI_CHOICE
+>         default y if !40x && !CPM2 && !PPC_8xx && !PPC_83xx \
+>                 && !PPC_85xx && !PPC_86xx && !GAMECUBE_COMMON
+> -       default PCI_QSPAN if PPC_8xx
+>         select GENERIC_PCI_IOMAP
+>         help
+>           Find out whether your system includes a PCI bus. PCI is the name of
+> @@ -971,7 +970,7 @@ config PCI_SYSCALL
+>
+>  config PCI_QSPAN
+>         bool "QSpan PCI"
+> -       depends on PPC_8xx
+> +       depends on PPC_8xx && PCI
+>         select PPC_I8259
+>         help
+>           Say Y here if you have a system based on a Motorola 8xx-series
+> --
+> 2.19.1
+>
 
-The patches in the series depend on each other (just in terms of
-context).  I suspect the best would be to get it into the kbuild tree.
 
-It has survived the build bot, which found some interesting issues in
-the other patches (as well as the !UML dependency), but if more issues
-show I can keep you in the loop.
+
+'git grep' did not get any other hit.
+
+masahiro@pug:~/ref/linux$ git grep PCI_QSPAN
+arch/powerpc/Kconfig:   default PCI_QSPAN if PPC_8xx
+arch/powerpc/Kconfig:config PCI_QSPAN
+
+With your patch, PCI_QSPAN will become
+a dead config option.
+
+How about removing it entirely?
+
+
+
+--
+Best Regards
+Masahiro Yamada
