@@ -1,81 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:22797 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726273AbeJORC0 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 15 Oct 2018 13:02:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52536 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726877AbeJPEoZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 16 Oct 2018 00:44:25 -0400
+Date: Mon, 15 Oct 2018 15:57:27 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+Subject: Re: [PATCH 1/8] aha152x: rename the PCMCIA define
+Message-ID: <20181015205727.GD5906@bhelgaas-glaptop.roam.corp.google.com>
+References: <20181013151016.31674-1-hch@lst.de>
+ <20181013151016.31674-2-hch@lst.de>
 MIME-Version: 1.0
-References: <20181013151016.31674-1-hch@lst.de> <20181013151016.31674-5-hch@lst.de>
- <CAK7LNAQy_NTu5=8R6C3Xc2VLrJo7tKOz-u1=3JfGtBa3Z+ZD9g@mail.gmail.com> <20181015085737.GC27159@lst.de>
-In-Reply-To: <20181015085737.GC27159@lst.de>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 15 Oct 2018 18:17:13 +0900
-Message-ID: <CAK7LNARbkmZ-Lq7W1R6r21dw0RTTyfGYNr5MLuufOVB2rqy2uQ@mail.gmail.com>
-Subject: Re: [PATCH 4/8] pci: consolidate PCI config entry in drivers/pci
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181013151016.31674-2-hch@lst.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Christoph Hellwig <hch@lst.de>
-Cc: mporter@kernel.crashing.org, Alex Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-pci@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Matt Porter <mporter@kernel.crashing.org>, Alexandre Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, linux-kbuild@vger.kernel.org, linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-On Mon, Oct 15, 2018 at 5:57 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Mon, Oct 15, 2018 at 03:37:05PM +0900, Masahiro Yamada wrote:
-> > I think HAVE_ is a preferred prefix in this case according to this doc:
-> > https://github.com/masahir0y/linux/blob/v4.19-rc4/Documentation/kbuild/kconfig-language.txt#L448
->
-> Ok, I'll switch everything to HAVE_*
->
-> > If you do this for entire powerpc,
-> > the other 'select HAS_PCI' addtions to
-> > arch/powerpc/platforms/*/Kconfig look redundant.
->
-> I'll drop them.
->
-> > > -config PCI
-> > > -       bool "PCI support"
-> > > -       select PCI_MSI
-> >
-> >
-> > I think this 'select PCI_MSI' for riscv was lost.
->
-> Indeed, fixed.
->
-> > >  menu "Bus options (PCI etc.)"
-> > >
-> > > -config PCI
-> > > -       bool "PCI support"
-> > > -       default y
-> >
-> >
-> > The default is y for x86 (and xtensa as well).
-> >
-> > With this patch, the default will be flipped.
-> >
-> > I think most of people want to use PCI for x86,
-> > and this change will make people upset.
-> >
-> > Will you update arch/{x86,xtensa}/configs/*_defconfig?
->
-> Yes.  Alternatively we could add a new ARCH_PCI_DEFAULT symbol,
-> that architectures could select if they want PCI by default.  Does
-> anyone thing this is a good idea?
+On Sat, Oct 13, 2018 at 05:10:09PM +0200, Christoph Hellwig wrote:
+> We plan to enable building the pcmcia core and drivers, and the
+> non-prefixed PCMCIA name clashes with some arch headers.
 
-
-No, I do not want to see such an ugly config option.
-
-Instead, you can use 'imply' keyword to set the default y.
-
-config X86
-       ...
-       imply    PCI
-
-
-
-But, personally, I'd like the defconfig files updated.
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+In the followup PCMCIA patch, you capitalized "PCMCIA core".
