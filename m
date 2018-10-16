@@ -1,91 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36316 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726917AbeJPKDp (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:50213 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727008AbeJPNJu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Oct 2018 06:03:45 -0400
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH] Kbuild: Hide Clang's -Wempty-body behind W=1
-Date: Mon, 15 Oct 2018 19:14:55 -0700
-Message-Id: <20181016021454.11953-1-natechancellor@gmail.com>
+        Tue, 16 Oct 2018 09:09:50 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20181013151016.31674-1-hch@lst.de> <20181013151016.31674-9-hch@lst.de>
+In-Reply-To: <20181013151016.31674-9-hch@lst.de>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 16 Oct 2018 14:20:23 +0900
+Message-ID: <CAK7LNAQwyWUq_ohVMe9QLLbyHHQdjkrkM9DPd3pgYLz8UhG6rA@mail.gmail.com>
+Subject: Re: [PATCH 8/8] kconfig: remove CONFIG_MCA leftovers
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Kees Cook <keescook@chromium.org>, Nathan Chancellor <natechancellor@gmail.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: mporter@kernel.crashing.org, Alex Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-pci@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-There are only a few instances of this warning in an arm64 allyesconfig
-build but none of them appear useful. I believe the intention of the
-warning is to avoid situations like this:
+On Sun, Oct 14, 2018 at 12:11 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-if (condition);
-        statement;
 
-where the user really intended
+Can you use "powerpc:" or something
+for the subject line?
 
-if (condition)
-        statement;
+I'd like to see "kconfig:" only for patches
+that touch the scripts/kconfig/ directory.
 
-However, these instances have already been caught by GCC's warning about
-misleading indentation so the remaining warnings are about loops that
-fall into one of three categories:
 
-1. Execute a function unconditionally (avoiding a useless variable to
-   hold the return value):
 
-drivers/isdn/hisax/hfc_pci.c:131:34: warning: if statement has empty body
-[-Wempty-body]
-        if (Read_hfc(cs, HFCPCI_INT_S1));
-                                        ^
 
-2. Advancing a value to be used later on in the function like a pointer
-   or a count:
+>  arch/powerpc/Kconfig | 4 ----
+>  drivers/scsi/Kconfig | 6 +++---
+>  2 files changed, 3 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+> index f0ea460653cd..8b9edf7caf96 100644
+> --- a/arch/powerpc/Kconfig
+> +++ b/arch/powerpc/Kconfig
+> @@ -944,10 +944,6 @@ config FSL_GTM
+>         help
+>           Freescale General-purpose Timers support
+>
+> -# Yes MCA RS/6000s exist but Linux-PPC does not currently support any
+> -config MCA
+> -       bool
+> -
+>  config PCI_DOMAINS
+>         def_bool PCI
+>
+> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
+> index 7c097006c54d..d3734c54aec9 100644
+> --- a/drivers/scsi/Kconfig
+> +++ b/drivers/scsi/Kconfig
+> @@ -535,7 +535,7 @@ config SCSI_HPTIOP
+>
+>  config SCSI_BUSLOGIC
+>         tristate "BusLogic SCSI support"
+> -       depends on (PCI || ISA || MCA) && SCSI && ISA_DMA_API && VIRT_TO_BUS
+> +       depends on (PCI || ISA) && SCSI && ISA_DMA_API && VIRT_TO_BUS
+>         ---help---
+>           This is support for BusLogic MultiMaster and FlashPoint SCSI Host
+>           Adapters. Consult the SCSI-HOWTO, available from
+> @@ -1142,12 +1142,12 @@ config SCSI_LPFC_DEBUG_FS
+>
+>  config SCSI_SIM710
+>         tristate "Simple 53c710 SCSI support (Compaq, NCR machines)"
+> -       depends on (EISA || MCA) && SCSI
+> +       depends on EISA && SCSI
+>         select SCSI_SPI_ATTRS
+>         ---help---
+>           This driver is for NCR53c710 based SCSI host adapters.
+>
+> -         It currently supports Compaq EISA cards and NCR MCA cards
+> +         It currently supports Compaq EISA cards.
+>
+>  config SCSI_DC395x
+>         tristate "Tekram DC395(U/UW/F) and DC315(U) SCSI support"
+> --
+> 2.19.1
+>
 
-drivers/atm/eni.c:244:48: warning: for loop has empty body
-[-Wempty-body]
-        for (order = 0; (1 << order) < *size; order++);
-                                                      ^
 
-3. Busy waiting:
-
-drivers/atm/zatm.c:513:7: warning: while loop has empty body
-[-Wempty-body]
-        zwait;
-             ^
-
-None of these uses are problematic or need to be addressed. Clang
-suggests moving the semi-colon to the next line to silence these
-warnings but that defeats the purpose of the compact nature of these
-constructs so just hide the warning behind W=1 so its use can still be
-audited but it won't polute a regular build.
-
-Link: https://github.com/ClangBuiltLinux/linux/issues/42
-Link: https://github.com/ClangBuiltLinux/linux/issues/66
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
----
- scripts/Makefile.extrawarn | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index cf6cd0ef6975..8709d9d6faf1 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -11,6 +11,7 @@
- # are not supported by all versions of the compiler
- # ==========================================================================
- 
-+KBUILD_CFLAGS += $(call cc-disable-warning, empty-body)
- KBUILD_CFLAGS += $(call cc-disable-warning, packed-not-aligned)
- 
- ifeq ("$(origin W)", "command line")
-@@ -32,6 +33,7 @@ warning-1 += $(call cc-option, -Wpacked-not-aligned)
- warning-1 += $(call cc-option, -Wstringop-truncation)
- warning-1 += $(call cc-disable-warning, missing-field-initializers)
- warning-1 += $(call cc-disable-warning, sign-compare)
-+warning-1 += $(call cc-option, -Wempty-body)
- 
- warning-2 := -Waggregate-return
- warning-2 += -Wcast-align
 -- 
-2.19.1
+Best Regards
+Masahiro Yamada
