@@ -1,89 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:50213 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727008AbeJPNJu (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:57571 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727032AbeJPRBh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Oct 2018 09:09:50 -0400
-MIME-Version: 1.0
-References: <20181013151016.31674-1-hch@lst.de> <20181013151016.31674-9-hch@lst.de>
-In-Reply-To: <20181013151016.31674-9-hch@lst.de>
+        Tue, 16 Oct 2018 13:01:37 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 16 Oct 2018 14:20:23 +0900
-Message-ID: <CAK7LNAQwyWUq_ohVMe9QLLbyHHQdjkrkM9DPd3pgYLz8UhG6rA@mail.gmail.com>
-Subject: Re: [PATCH 8/8] kconfig: remove CONFIG_MCA leftovers
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 1/3] kbuild: provide a new place to check necessary host tools
+Date: Tue, 16 Oct 2018 18:10:51 +0900
+Message-Id: <1539681053-24388-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1539681053-24388-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1539681053-24388-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: mporter@kernel.crashing.org, Alex Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-pci@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Ingo Molnar <mingo@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Bernd Edlinger <bernd.edlinger@hotmail.de>, Borislav Petkov <bp@suse.de>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Sun, Oct 14, 2018 at 12:11 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+Enabling CONFIG options often requires additional features, like
+target compiler capabilities, host tools, etc.
 
+As for the target compiler capabilities, Kconfig is able to add
+proper dependencies. For example,
 
-Can you use "powerpc:" or something
-for the subject line?
+  config STACKPROTECTOR
+          ...
+          depends on $(cc-option,-fstack-protector)
 
-I'd like to see "kconfig:" only for patches
-that touch the scripts/kconfig/ directory.
+The CONFIG option is simply disabled if unsupported by the compiler.
+This seems sensible since otherwise, there is no way to avoid the
+build error.
 
+In the discussion [1], doing similar for host tools was unacceptable.
+Build errors caused by missing host tools are easy to fix; just
+install them to your build machine. So, let the build fail instead
+of disabling CONFIG options silently.
 
+We already have such checks in random places in makefiles. What I
+do not like is that people tend to do that in the top Makefile.
 
+The top Makefile is too cluttered, and what is worse, $(error ...)
+functions in the top Makefile could be false positive. (Please note
+the top Makefile includes the stale include/config/auto.conf before
+syncconfig updates it.)
 
->  arch/powerpc/Kconfig | 4 ----
->  drivers/scsi/Kconfig | 6 +++---
->  2 files changed, 3 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-> index f0ea460653cd..8b9edf7caf96 100644
-> --- a/arch/powerpc/Kconfig
-> +++ b/arch/powerpc/Kconfig
-> @@ -944,10 +944,6 @@ config FSL_GTM
->         help
->           Freescale General-purpose Timers support
->
-> -# Yes MCA RS/6000s exist but Linux-PPC does not currently support any
-> -config MCA
-> -       bool
-> -
->  config PCI_DOMAINS
->         def_bool PCI
->
-> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-> index 7c097006c54d..d3734c54aec9 100644
-> --- a/drivers/scsi/Kconfig
-> +++ b/drivers/scsi/Kconfig
-> @@ -535,7 +535,7 @@ config SCSI_HPTIOP
->
->  config SCSI_BUSLOGIC
->         tristate "BusLogic SCSI support"
-> -       depends on (PCI || ISA || MCA) && SCSI && ISA_DMA_API && VIRT_TO_BUS
-> +       depends on (PCI || ISA) && SCSI && ISA_DMA_API && VIRT_TO_BUS
->         ---help---
->           This is support for BusLogic MultiMaster and FlashPoint SCSI Host
->           Adapters. Consult the SCSI-HOWTO, available from
-> @@ -1142,12 +1142,12 @@ config SCSI_LPFC_DEBUG_FS
->
->  config SCSI_SIM710
->         tristate "Simple 53c710 SCSI support (Compaq, NCR machines)"
-> -       depends on (EISA || MCA) && SCSI
-> +       depends on EISA && SCSI
->         select SCSI_SPI_ATTRS
->         ---help---
->           This driver is for NCR53c710 based SCSI host adapters.
->
-> -         It currently supports Compaq EISA cards and NCR MCA cards
-> +         It currently supports Compaq EISA cards.
->
->  config SCSI_DC395x
->         tristate "Tekram DC395(U/UW/F) and DC315(U) SCSI support"
-> --
-> 2.19.1
->
+This adds a new file scripts/Makefile.toolcheck to check additional
+tools depending on the kernel configuration. This check is run
+immediately after syncconfig, i.e., when a user attempts to build
+something with a new set of CONFIG options.
 
+[1] https://patchwork.kernel.org/patch/10516049/
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Makefile                   |  1 +
+ scripts/Makefile.toolcheck | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
+ create mode 100644 scripts/Makefile.toolcheck
+
+diff --git a/Makefile b/Makefile
+index bf3786e..23a204a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -633,6 +633,7 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
+ # include/config/auto.conf (which mirrors .config).
+ include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
++	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.toolcheck
+ else
+ # External modules and some install targets need include/generated/autoconf.h
+ # and include/config/auto.conf but do not care if they are up-to-date.
+diff --git a/scripts/Makefile.toolcheck b/scripts/Makefile.toolcheck
+new file mode 100644
+index 0000000..f3c165d
+--- /dev/null
++++ b/scripts/Makefile.toolcheck
+@@ -0,0 +1,35 @@
++# SPDX-License-Identifier: GPL-2.0
++# ===========================================================================
++# Host tools check
++# ===========================================================================
++#
++# Some additional tools might be required depending on the kernel configuration.
++# Check if they are installed on the host machine, and if missing, error out
++# with a user-friendly message.
++
++include include/config/auto.conf
++
++__toolcheck:
++	@:
++
++PHONY += $(toolcheck-y)
++__toolcheck: $(toolcheck-y)
++
++define populate_toolcheck
++__toolcheck: check_$(1)
++PHONY += check_$(1)
++check_$(1):
++	$(Q){ $(chk_$(1)); } >/dev/null 2>&1 || {	\
++		echo "*" >&2;				\
++		for msg in $(msg_$(1));			\
++		do					\
++			echo "* $$$${msg}" >&2;		\
++		done;					\
++		echo "*" >&2;				\
++		/bin/false;				\
++	}
++endef
++
++$(foreach c, $(toolcheck-y), $(eval $(call populate_toolcheck,$(c))))
++
++.PHONY: $(PHONY)
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
