@@ -1,70 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:47339 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726541AbeJPRIA (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Oct 2018 13:08:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59255 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727003AbeJPWQ0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 16 Oct 2018 18:16:26 -0400
+Date: Tue, 16 Oct 2018 09:25:40 -0500
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH 2/3] objtool: move libelf check out of top Makefile
+Message-ID: <20181016142540.pxlwu3ft6n2b4pgj@treble>
+References: <1539681053-24388-1-git-send-email-yamada.masahiro@socionext.com>
+ <1539681053-24388-3-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-References: <20181010222333.17794-1-bp@alien8.de> <CAK7LNAT2KpYkn=hj=h1XmbMJRdtgCQ__xP0X+Rpwm3e_Xs1brQ@mail.gmail.com>
- <20181011085234.GA25435@zn.tnic> <CAK7LNAS=Kr1W6SfwojEVdwpKy7Au9NRh-wd2Qfo5+aVQVDe9ZQ@mail.gmail.com>
- <20181011153245.GD25435@zn.tnic>
-In-Reply-To: <20181011153245.GD25435@zn.tnic>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 16 Oct 2018 18:17:50 +0900
-Message-ID: <CAK7LNAQv816_ViZVNrSS9rhLHQO_6Pbx9ZOMC1T1FNV3emqS=w@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Fail the build early when no lz4 present
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1539681053-24388-3-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Bernd Edlinger <bernd.edlinger@hotmail.de>, Borislav Petkov <bp@suse.de>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Fri, Oct 12, 2018 at 12:33 AM Borislav Petkov <bp@alien8.de> wrote:
->
-> On Fri, Oct 12, 2018 at 12:08:07AM +0900, Masahiro Yamada wrote:
-> > Install lz4c, and run 'make' again.
-> > Almost all objects have been built there,
-> > so you will finish it soon.
->
-> So when this LZ4 thing got added at the time, the lz4 package had to be
-> downloaded and built and installed and it wasn't as easy as zypper in
-> lz4 or apt-get install lz4.
->
-> And I *might* install it if there were a human readable error message
-> which would tell me so.
->
-> And we should strive to be as user-friendly as possible. And no, this:
->
-> /bin/sh: 1: lz4c: not found
-> make[2]: *** [arch/x86/boot/compressed/Makefile:145: arch/x86/boot/compressed/vmlinux.bin.lz4] Error 1
-> make[2]: *** Waiting for unfinished jobs....
-> make[1]: *** [arch/x86/boot/Makefile:112: arch/x86/boot/compressed/vmlinux] Error 2
-> make: *** [arch/x86/Makefile:290: bzImage] Error 2
-> make: *** Waiting for unfinished jobs....
->
-> is not user-friendly.
->
-> > If you are building up a compile-test machine,
-> > you will probably need to install various tools anyway.
->
-> Yes, and look how perf tool solves this. Much much better.
->
-> > I do not want to add ugly checks in random places.
->
-> That's fair.
->
-> What would be a fitting place to add such checks and be able to issue a
-> human-readable error message to people?
+On Tue, Oct 16, 2018 at 06:10:52PM +0900, Masahiro Yamada wrote:
+> Another behavioral change is, missing libelf for CONFIG_STACK_VALIDATION
+> was previously a warning, but now a error.
 
-Sorry for delay.
+This behavioral change should be fine.  It was already an error for
+UNWINDER_ORC, so this would only upgrade a warning to an error for
+people using STACK_VALIDATION without ORC, which should be a small
+number of people by this point.
 
-I have been thinking of this
-because I have a motivation to
-move libelf check in the top Makefile to somewhere else.
+> diff --git a/scripts/Makefile.toolcheck b/scripts/Makefile.toolcheck
+> index f3c165d..bc26fc0 100644
+> --- a/scripts/Makefile.toolcheck
+> +++ b/scripts/Makefile.toolcheck
+> @@ -12,6 +12,11 @@ include include/config/auto.conf
+>  __toolcheck:
+>  	@:
+>  
+> +chk_stack_validation = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
+> +msg_stack_validation = "libelf is necessary for building the objtool." \
+> +		       "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
+> +toolcheck-$(CONFIG_STACK_VALIDATION) += stack_validation
+> +
+>  PHONY += $(toolcheck-y)
+>  __toolcheck: $(toolcheck-y)
 
-I just made a trial.
+This is a nice improvement.
 
+It would probably be a good idea to clarify to the user which config
+option(s) are the cause for the error, by putting
+"CONFIG_STACK_VALIDATION" in the error string, for example.
+
+Though, for this particular case, it would be clearer to have a
+different error, based on which option is enabled, like we had before.
+
+Like:
+
+
+ifdef CONFIG_UNWINDER_ORC
+
+chk_unwinder_orc = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
+msg_unwinder_orc = "Cannot build objtool to generate ORC metadata for CONFIG_UNWINDER_ORC=y.  " \
+		       "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
+toolcheck-$(CONFIG_UNWINDER_ORC) += unwinder_orc
+
+else
+
+chk_stack_validation = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
+msg_stack_validation = "Cannot build objtool for CONFIG_STACK_VALIDATION=y.  " \
+		       "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
+toolcheck-$(CONFIG_STACK_VALIDATION) += stack_validation
+
+endif
+
+
+What do you think?
 
 -- 
-Best Regards
-Masahiro Yamada
+Josh
