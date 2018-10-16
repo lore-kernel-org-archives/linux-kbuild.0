@@ -1,104 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:41064 "EHLO
-        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727035AbeJPXi0 (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:18199 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727016AbeJPXn3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Oct 2018 19:38:26 -0400
-Date: Tue, 16 Oct 2018 17:47:17 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 1/3] kbuild: provide a new place to check necessary host
- tools
-Message-ID: <20181016154717.GA25717@ravnborg.org>
-References: <1539681053-24388-1-git-send-email-yamada.masahiro@socionext.com>
- <1539681053-24388-2-git-send-email-yamada.masahiro@socionext.com>
+        Tue, 16 Oct 2018 19:43:29 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1539681053-24388-2-git-send-email-yamada.masahiro@socionext.com>
+References: <1539681053-24388-1-git-send-email-yamada.masahiro@socionext.com>
+ <1539681053-24388-3-git-send-email-yamada.masahiro@socionext.com> <20181016142540.pxlwu3ft6n2b4pgj@treble>
+In-Reply-To: <20181016142540.pxlwu3ft6n2b4pgj@treble>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 17 Oct 2018 00:51:40 +0900
+Message-ID: <CAK7LNARLW4NmeY0Rq19Bj_5kOFbp6YDtsUDhNaAfVXjL85cAMg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] objtool: move libelf check out of top Makefile
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Bernd Edlinger <bernd.edlinger@hotmail.de>, Borislav Petkov <bp@suse.de>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, Bernd Edlinger <bernd.edlinger@hotmail.de>, Borislav Petkov <bp@suse.de>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi Masahiro.
+On Tue, Oct 16, 2018 at 11:25 PM Josh Poimboeuf <jpoimboe@redhat.com> wrote:
+>
+> On Tue, Oct 16, 2018 at 06:10:52PM +0900, Masahiro Yamada wrote:
+> > Another behavioral change is, missing libelf for CONFIG_STACK_VALIDATION
+> > was previously a warning, but now a error.
+>
+> This behavioral change should be fine.  It was already an error for
+> UNWINDER_ORC, so this would only upgrade a warning to an error for
+> people using STACK_VALIDATION without ORC, which should be a small
+> number of people by this point.
+>
+> > diff --git a/scripts/Makefile.toolcheck b/scripts/Makefile.toolcheck
+> > index f3c165d..bc26fc0 100644
+> > --- a/scripts/Makefile.toolcheck
+> > +++ b/scripts/Makefile.toolcheck
+> > @@ -12,6 +12,11 @@ include include/config/auto.conf
+> >  __toolcheck:
+> >       @:
+> >
+> > +chk_stack_validation = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
+> > +msg_stack_validation = "libelf is necessary for building the objtool." \
+> > +                    "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
+> > +toolcheck-$(CONFIG_STACK_VALIDATION) += stack_validation
+> > +
+> >  PHONY += $(toolcheck-y)
+> >  __toolcheck: $(toolcheck-y)
+>
+> This is a nice improvement.
+>
+> It would probably be a good idea to clarify to the user which config
+> option(s) are the cause for the error, by putting
+> "CONFIG_STACK_VALIDATION" in the error string, for example.
+>
+> Though, for this particular case, it would be clearer to have a
+> different error, based on which option is enabled, like we had before.
+>
+> Like:
+>
+>
+> ifdef CONFIG_UNWINDER_ORC
+>
+> chk_unwinder_orc = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
+> msg_unwinder_orc = "Cannot build objtool to generate ORC metadata for CONFIG_UNWINDER_ORC=y.  " \
+>                        "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
+> toolcheck-$(CONFIG_UNWINDER_ORC) += unwinder_orc
+>
+> else
+>
+> chk_stack_validation = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
+> msg_stack_validation = "Cannot build objtool for CONFIG_STACK_VALIDATION=y.  " \
+>                        "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
+> toolcheck-$(CONFIG_STACK_VALIDATION) += stack_validation
+>
+> endif
+>
+>
+> What do you think?
 
-Looks good, a few nits below.
 
-	Sam
+It is ugly.
 
-> The top Makefile is too cluttered
-So true...
+Do you need such detailed information like ORC metadata stuff here?
 
-> This adds a new file scripts/Makefile.toolcheck to check additional
-> tools depending on the kernel configuration. This check is run
-> immediately after syncconfig, i.e., when a user attempts to build
-> something with a new set of CONFIG options.
-> 
-> [1] https://patchwork.kernel.org/patch/10516049/
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-The use of toolcheck-y should be documented in Documentation/kbuild/...
+This Makefile aims to error out, showing why the build failed.
+That's it.
 
 
-> 
->  Makefile                   |  1 +
->  scripts/Makefile.toolcheck | 35 +++++++++++++++++++++++++++++++++++
->  2 files changed, 36 insertions(+)
->  create mode 100644 scripts/Makefile.toolcheck
-> 
-> diff --git a/Makefile b/Makefile
-> index bf3786e..23a204a 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -633,6 +633,7 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
->  # include/config/auto.conf (which mirrors .config).
->  include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
->  	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
-> +	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.toolcheck
->  else
->  # External modules and some install targets need include/generated/autoconf.h
->  # and include/config/auto.conf but do not care if they are up-to-date.
-> diff --git a/scripts/Makefile.toolcheck b/scripts/Makefile.toolcheck
-> new file mode 100644
-> index 0000000..f3c165d
-> --- /dev/null
-> +++ b/scripts/Makefile.toolcheck
-> @@ -0,0 +1,35 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +# ===========================================================================
-> +# Host tools check
-> +# ===========================================================================
-> +#
-> +# Some additional tools might be required depending on the kernel configuration.
-> +# Check if they are installed on the host machine, and if missing, error out
-> +# with a user-friendly message.
-> +
-> +include include/config/auto.conf
-> +
-> +__toolcheck:
-> +	@:
-> +
-> +PHONY += $(toolcheck-y)
-> +__toolcheck: $(toolcheck-y)
-> +
-> +define populate_toolcheck
-> +__toolcheck: check_$(1)
-> +PHONY += check_$(1)
-> +check_$(1):
-> +	$(Q){ $(chk_$(1)); } >/dev/null 2>&1 || {	\
-> +		echo "*" >&2;				\
-> +		for msg in $(msg_$(1));			\
-> +		do					\
-> +			echo "* $$$${msg}" >&2;		\
-> +		done;					\
-> +		echo "*" >&2;				\
-> +		/bin/false;				\
-> +	}
-Very dense, but usign if [ ... ] may result is somethign that
-is a little more readable.
 
-And maybe a litle hint on the usage...
-
-> +$(foreach c, $(toolcheck-y), $(eval $(call populate_toolcheck,$(c))))
-Good use of $(eval ...)
+-- 
+Best Regards
+Masahiro Yamada
