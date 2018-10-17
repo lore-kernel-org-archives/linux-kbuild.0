@@ -1,45 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:60869 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727672AbeJRCTR (ORCPT
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43826 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727128AbeJRDWO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Oct 2018 22:19:17 -0400
-Date: Wed, 17 Oct 2018 20:22:18 +0200 (CEST)
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH 2/3] x86/mcelog: Remove one mce_helper definition
-In-Reply-To: <20181017171034.GO22571@zn.tnic>
-Message-ID: <alpine.DEB.2.21.1810172020070.1517@nanos.tec.linutronix.de>
-References: <20181017170554.18841-1-bigeasy@linutronix.de> <20181017170554.18841-3-bigeasy@linutronix.de> <20181017171034.GO22571@zn.tnic>
+        Wed, 17 Oct 2018 23:22:14 -0400
+Date: Wed, 17 Oct 2018 21:25:02 +0200
+From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH 1/3] kbuild: Add -Wshadow to sparse
+Message-ID: <20181017192501.3yqfq77q2n4xdq7l@ltop.local>
+References: <20181017170554.18841-1-bigeasy@linutronix.de>
+ <20181017170554.18841-2-bigeasy@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181017170554.18841-2-bigeasy@linutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@suse.de>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Tony Luck <tony.luck@intel.com>, linux-edac <linux-edac@vger.kernel.org>, x86@kernel.org
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, linux-kbuild@vger.kernel.org, linux-sparse@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 
-On Wed, 17 Oct 2018, Borislav Petkov wrote:
-
-> On Wed, Oct 17, 2018 at 07:05:53PM +0200, Sebastian Andrzej Siewior wrote:
-> > Commit 5de97c9f6d85f ("x86/mce: Factor out and deprecate the /dev/mcelog
-> > driver") moved the old interface into one file including mce_helper
-> > definition as static and "extern".
-> > 
-> > Cc: Tony Luck <tony.luck@intel.com>
-> > Cc: Borislav Petkov <bp@suse.de>
-> > Cc: linux-edac <linux-edac@vger.kernel.org>
-> > Cc: x86@kernel.org
-> > Fixes:  5de97c9f6d85f ("x86/mce: Factor out and deprecate the /dev/mcelog driver")
+On Wed, Oct 17, 2018 at 07:05:52PM +0200, Sebastian Andrzej Siewior wrote:
+> I remember that `sparse' used to warn about shadowed variables but it
+> seems not to do it by default anymore. It was useful.
 > 
-> I'm not sure about the Fixes: tag - it'll trigger a flood of backporting
-> for no reason AFAICT.
+> Enable `-Wshadow' while invoking sparse.
 
-Not when there is no Cc: stable. If the stable folks pick up stuff
-nevertheless, shrug.
+Hi,
 
-The fixes tag is interesting even for stuff which does not go into stable
-because you can extract it properly and look at relations between original
-commit and fix.
+I made a quick test and I saw it would add a lot of noise because of
+(valid) warnings coming from macros using a statement expression
+redeclaring variables like '__u', 'tmp', ...
 
-Thanks,
+BTW, as far as I can see, sparse never had it enabled by default.
 
-	tglx
+Kind regards,
+-- Luc Van Oostenryck
