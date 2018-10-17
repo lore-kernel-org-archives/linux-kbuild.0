@@ -1,77 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:33012 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726644AbeJRHOZ (ORCPT
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:41925 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726706AbeJRHQu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Oct 2018 03:14:25 -0400
+        Thu, 18 Oct 2018 03:16:50 -0400
 MIME-Version: 1.0
-References: <20181017000834.GA21330@WindFlash> <20181017060151.GA1105@gmail.com>
- <CALCETrXxGKAHam6Q=q949XnudEkMRZbH-jnHCp3Egfe1sNexnQ@mail.gmail.com>
-In-Reply-To: <CALCETrXxGKAHam6Q=q949XnudEkMRZbH-jnHCp3Egfe1sNexnQ@mail.gmail.com>
+References: <20181017000809.GA21292@WindFlash> <716d591a-a0da-e048-a00d-0fe7dabdc4f1@koikeco.de>
+In-Reply-To: <716d591a-a0da-e048-a00d-0fe7dabdc4f1@koikeco.de>
 From: Leonardo Bras <leobras.c@gmail.com>
-Date: Wed, 17 Oct 2018 20:16:14 -0300
-Message-ID: <CADvQ+rFBeyhxLp21SON5h4BP1T-rW6FMCyU-JZ_d_0EKOHQgdw@mail.gmail.com>
-Subject: Re: [PATCH 2/4] Renames variable to fix shadow warning.
+Date: Wed, 17 Oct 2018 20:18:37 -0300
+Message-ID: <CADvQ+rGoxSHuVjA1-wbYW=bvb5sUjJS1EZSKdkHU2dwzjgDxow@mail.gmail.com>
+Subject: Re: [Lkcamp] [PATCH 1/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Lutomirski <luto@kernel.org>
-Cc: mingo@kernel.org, lkcamp@lists.libreplanetbr.org, Matthew Wilcox <willy6545@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: helen@koikeco.de
+Cc: lkcamp@lists.libreplanetbr.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Matthew Wilcox <willy6545@gmail.com>, linux-kernel <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>
 
-Hello Andy,
-Thanks for the suggestion.
-I renamed them as suggested and it will be available on v2.
+Hello Helen,
+
+On Wed, Oct 17, 2018 at 1:32 AM Helen Koike <helen@koikeco.de> wrote:
+>
+> Hi Leonardo,
+>
+> Thanks for the patch.
+>
+> On 10/16/18 9:08 PM, Leonardo Br=C3=A1s wrote:
+> > Adds -Wshadow=3Dlocal on KBUILD_HOSTCFLAGS to show shadow warnings
+> > on tools built for HOST.
+> >
+> > Signed-off-by: Leonardo Br=C3=A1s <leobras.c@gmail.com>
+> > ---
+> >  Makefile | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/Makefile b/Makefile
+> > index e8b599b4dcde..fb0a9ac195e7 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -360,7 +360,7 @@ HOST_LFS_LIBS :=3D $(shell getconf LFS_LIBS 2>/dev/=
+null)
+> >
+> >  HOSTCC       =3D gcc
+> >  HOSTCXX      =3D g++
+> > -KBUILD_HOSTCFLAGS   :=3D -Wall -Wmissing-prototypes -Wstrict-prototype=
+s -O2 \
+> > +KBUILD_HOSTCFLAGS   :=3D -Wall -Wshadow=3Dlocal -Wmissing-prototypes -=
+Wstrict-prototypes -O2 \
+> >               -fomit-frame-pointer -std=3Dgnu89 $(HOST_LFS_CFLAGS) \
+> >               $(HOSTCFLAGS)
+> >  KBUILD_HOSTCXXFLAGS :=3D -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
+> >
+>
+> I believe this should be the last patch on this series and not the first
+> one to avoid commits in between where we have those warnings.
+>
+
+You are right, I will change the order for v2.
+Thanks!
+
+> Regards
+> Helen
 
 Regards,
-
 Leonardo
-
-On Wed, Oct 17, 2018 at 2:54 PM Andy Lutomirski <luto@kernel.org> wrote:
->
-> On Tue, Oct 16, 2018 at 11:01 PM Ingo Molnar <mingo@kernel.org> wrote:
-> >
-> >
-> > * Leonardo Br=C3=A1s <leobras.c@gmail.com> wrote:
-> >
-> > > Renames the char variable to avoid shadowing a variable previously
-> > > declared on this function.
-> > >
-> > > Signed-off-by: Leonardo Br=C3=A1s <leobras.c@gmail.com>
-> > > ---
-> > >  arch/x86/entry/vdso/vdso2c.h | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/arch/x86/entry/vdso/vdso2c.h b/arch/x86/entry/vdso/vdso2=
-c.h
-> > > index fa847a620f40..9466998d0f28 100644
-> > > --- a/arch/x86/entry/vdso/vdso2c.h
-> > > +++ b/arch/x86/entry/vdso/vdso2c.h
-> > > @@ -93,11 +93,11 @@ static void BITSFUNC(go)(void *raw_addr, size_t r=
-aw_len,
-> > >               int k;
-> > >               ELF(Sym) *sym =3D raw_addr + GET_LE(&symtab_hdr->sh_off=
-set) +
-> > >                       GET_LE(&symtab_hdr->sh_entsize) * i;
-> > > -             const char *name =3D raw_addr + GET_LE(&strtab_hdr->sh_=
-offset) +
-> > > +             const char *name2 =3D raw_addr + GET_LE(&strtab_hdr->sh=
-_offset) +
-> > >                       GET_LE(&sym->st_name);
-> > >
-> > >               for (k =3D 0; k < NSYMS; k++) {
-> > > -                     if (!strcmp(name, required_syms[k].name)) {
-> > > +                     if (!strcmp(name2, required_syms[k].name)) {
-> > >                               if (syms[k]) {
-> > >                                       fail("duplicate symbol %s\n",
-> > >                                            required_syms[k].name);
-> >
-> > NAK.
-> >
-> > Please read and understand the code and rename both variables to
-> > meaningful names, not just a mindless name/name2 ...
-> >
->
-> Maybe image_name and sym_name?
->
-> --Andy
