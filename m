@@ -1,61 +1,237 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:47074 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726168AbeJQMjq (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:34794 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726168AbeJQMnR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Oct 2018 08:39:46 -0400
-Subject: Re: [Lkcamp] [PATCH 0/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
-References: <20181017000722.GA20892@WindFlash>
-From: Helen Koike <helen@koikeco.de>
-Message-ID: <00beb3a2-e68d-4f6c-d69a-8413acc214c4@koikeco.de>
-Date: Wed, 17 Oct 2018 01:45:54 -0300
+        Wed, 17 Oct 2018 08:43:17 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181017000722.GA20892@WindFlash>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20181016021454.11953-1-natechancellor@gmail.com>
+In-Reply-To: <20181016021454.11953-1-natechancellor@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 17 Oct 2018 13:48:46 +0900
+Message-ID: <CAK7LNATO+L4-0SpuWrCnYEUVbxmcQkjOQvMB6PEsFv1b-heJOA@mail.gmail.com>
+Subject: Re: [PATCH] Kbuild: Hide Clang's -Wempty-body behind W=1
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Leonardo_Br=c3=a1s?= <leobras.c@gmail.com>, lkcamp@lists.libreplanetbr.org
-Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, Matthew Wilcox <willy6545@gmail.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Kees Cook <keescook@chromium.org>
 
-Hi Leonardo,
+Hi Nathan,
 
-Thanks for the patches.
 
-On 10/16/18 9:07 PM, Leonardo Brás wrote:
-> This patchset add -Wshadow=local on KBUILD_HOSTCFLAGS and fixes 
-> all code that show this warning.
-> 
-> The third patch was already submitted, but was not merged yet.
-> I like to think it's part of this patchset, but if it was 
-> already merged, please ignore it.
+On Tue, Oct 16, 2018 at 11:15 AM Nathan Chancellor
+<natechancellor@gmail.com> wrote:
+>
+> There are only a few instances of this warning in an arm64 allyesconfig
+> build but none of them appear useful. I believe the intention of the
+> warning is to avoid situations like this:
+>
+> if (condition);
+>         statement;
+>
+> where the user really intended
+>
+> if (condition)
+>         statement;
+>
+> However, these instances have already been caught by GCC's warning about
+> misleading indentation
 
-You can check if it was merged in the maintainers' tree, if it is not
-there then it is not merged :)
 
-imho, I would prefer if you submitted it as a v2 with an explanation of
-what changed since v1 (e.g. new commits) or even stating that nothing
-has changed and you just regrouped it.
-Or better, you could also not re-submit it and just point out that this
-series depends on a previous commit (with a link to it).
+Right, the example above is caught by -Wmisleading-indentation.
 
-> 
-> Leonardo Brás (4):
->   Adds -Wshadow=local on KBUILD_HOSTCFLAGS
->   Renames variable to fix shadow warning.
->   kbuild: Removes unnecessary shadowed local variable and optimize
->     testing.
->   Changes macro usage to avoid shadowing a variable.
-> 
->  Makefile                     |  2 +-
->  arch/x86/entry/vdso/vdso2c.h |  4 ++--
->  scripts/asn1_compiler.c      |  7 +++----
->  scripts/mod/file2alias.c     | 14 ++++++++------
->  4 files changed, 14 insertions(+), 13 deletions(-)
-> 
+However, the following is not.
 
-I hope this helps.
+   if (condition)
+          ;
 
-Regards,
-Helen
+
+
+So, -Wempty-body is a kind of different thing,
+and still useful in my opinion.
+
+
+
+> so the remaining warnings are about loops that
+> fall into one of three categories:
+>
+> 1. Execute a function unconditionally (avoiding a useless variable to
+>    hold the return value):
+>
+> drivers/isdn/hisax/hfc_pci.c:131:34: warning: if statement has empty body
+> [-Wempty-body]
+>         if (Read_hfc(cs, HFCPCI_INT_S1));
+
+
+I think this is a real bug,
+then -Wempty-body finally caught it.
+(but -Wmisleading-indentation cannot catch it.)
+
+
+
+It is wrong to enclose a non-effective statement with 'if ();'
+just for suppressing another warning.
+
+
+
+     Read_hfc(cs, HFCPCI_INT_S1);
+
+would emit this warning.
+
+
+In file included from drivers/isdn/hisax/hfc_pci.c:20:0:
+drivers/isdn/hisax/hfc_pci.c: In function =E2=80=98reset_hfcpci=E2=80=99:
+drivers/isdn/hisax/hfc_pci.h:232:25: warning: statement with no effect
+[-Wunused-value]
+ #define Read_hfc(a, b) (*(((u_char *)a->hw.hfcpci.pci_io) + b))
+                        ~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/isdn/hisax/hfc_pci.c:131:2: note: in expansion of macro =E2=80=98Re=
+ad_hfc=E2=80=99
+  Read_hfc(cs, HFCPCI_INT_S1);
+  ^~~~~~~~
+
+
+
+The root cause is missing 'volatile'
+while Read_hfc() is supposed to read out a HW register.
+
+
+
+#define Read_hfc(a, b) (*(((volatile u_char *)a->hw.hfcpci.pci_io) + b))
+
+will be a correct fix.
+(or just use a standard accessor like readb(), ioread8(), etc.)
+
+
+
+
+if (Read_hfc(cs, HFCPCI_INT_S1));
+
+is optimized out by the compiler, so it is not working as expected.
+
+
+
+>
+> 2. Advancing a value to be used later on in the function like a pointer
+>    or a count:
+>
+> drivers/atm/eni.c:244:48: warning: for loop has empty body
+> [-Wempty-body]
+>         for (order =3D 0; (1 << order) < *size; order++);
+>                                                       ^
+
+As you noted in the commit log,
+Clang's -Wempty-body cares the location of a semi-colon,
+while GCC's one does not.
+
+
+
+
+
+   for (order =3D 0; (1 << order) < *size; order++)
+             ;
+
+is fine, and more readable in my opinion.
+
+
+
+
+> 3. Busy waiting:
+>
+> drivers/atm/zatm.c:513:7: warning: while loop has empty body
+> [-Wempty-body]
+>         zwait;
+>              ^
+
+
+Again, Clang is fine with an empty body in while() loop,
+but just picky about the semi-colon location.
+
+For this particular case, how about something like this?
+
+
+#define zwait  do {} while (zin(CMR) & uPD98401_BUSY)
+
+
+
+
+
+I think an even better fix is
+
+#define zwait()  do {} while (zin(CMR) & uPD98401_BUSY)
+
+
+
+then, fix-up all
+
+   zwait;
+
+to
+
+   zwait();
+
+
+
+
+
+
+> None of these uses are problematic or need to be addressed.
+
+
+The first pattern is really problematic, and need to be addressed.
+
+I want to keep -Wempty-body enabled
+to find out potential issues.
+
+Please let me know if you see other patterns difficult to fix.
+
+
+
+
+
+> Clang
+> suggests moving the semi-colon to the next line to silence these
+> warnings but that defeats the purpose of the compact nature of these
+> constructs so just hide the warning behind W=3D1 so its use can still be
+> audited but it won't polute a regular build.
+>
+> Link: https://github.com/ClangBuiltLinux/linux/issues/42
+> Link: https://github.com/ClangBuiltLinux/linux/issues/66
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+> ---
+>  scripts/Makefile.extrawarn | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+> index cf6cd0ef6975..8709d9d6faf1 100644
+> --- a/scripts/Makefile.extrawarn
+> +++ b/scripts/Makefile.extrawarn
+> @@ -11,6 +11,7 @@
+>  # are not supported by all versions of the compiler
+>  # =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+>
+> +KBUILD_CFLAGS +=3D $(call cc-disable-warning, empty-body)
+>  KBUILD_CFLAGS +=3D $(call cc-disable-warning, packed-not-aligned)
+>
+>  ifeq ("$(origin W)", "command line")
+> @@ -32,6 +33,7 @@ warning-1 +=3D $(call cc-option, -Wpacked-not-aligned)
+>  warning-1 +=3D $(call cc-option, -Wstringop-truncation)
+>  warning-1 +=3D $(call cc-disable-warning, missing-field-initializers)
+>  warning-1 +=3D $(call cc-disable-warning, sign-compare)
+> +warning-1 +=3D $(call cc-option, -Wempty-body)
+>
+>  warning-2 :=3D -Waggregate-return
+>  warning-2 +=3D -Wcast-align
+> --
+> 2.19.1
+>
+
+
+--=20
+Best Regards
+Masahiro Yamada
