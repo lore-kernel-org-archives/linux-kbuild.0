@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:37239 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726210AbeJQM0C (ORCPT
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:47074 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726168AbeJQMjq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Oct 2018 08:26:02 -0400
-Subject: Re: [Lkcamp] [PATCH 1/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
-References: <20181017000809.GA21292@WindFlash>
+        Wed, 17 Oct 2018 08:39:46 -0400
+Subject: Re: [Lkcamp] [PATCH 0/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
+References: <20181017000722.GA20892@WindFlash>
 From: Helen Koike <helen@koikeco.de>
-Message-ID: <716d591a-a0da-e048-a00d-0fe7dabdc4f1@koikeco.de>
-Date: Wed, 17 Oct 2018 01:32:12 -0300
+Message-ID: <00beb3a2-e68d-4f6c-d69a-8413acc214c4@koikeco.de>
+Date: Wed, 17 Oct 2018 01:45:54 -0300
 MIME-Version: 1.0
-In-Reply-To: <20181017000809.GA21292@WindFlash>
+In-Reply-To: <20181017000722.GA20892@WindFlash>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -21,34 +21,41 @@ Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, Matthew Wilcox <willy6545@gmai
 
 Hi Leonardo,
 
-Thanks for the patch.
+Thanks for the patches.
 
-On 10/16/18 9:08 PM, Leonardo Brás wrote:
-> Adds -Wshadow=local on KBUILD_HOSTCFLAGS to show shadow warnings
-> on tools built for HOST.
+On 10/16/18 9:07 PM, Leonardo Brás wrote:
+> This patchset add -Wshadow=local on KBUILD_HOSTCFLAGS and fixes 
+> all code that show this warning.
 > 
-> Signed-off-by: Leonardo Brás <leobras.c@gmail.com>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The third patch was already submitted, but was not merged yet.
+> I like to think it's part of this patchset, but if it was 
+> already merged, please ignore it.
+
+You can check if it was merged in the maintainers' tree, if it is not
+there then it is not merged :)
+
+imho, I would prefer if you submitted it as a v2 with an explanation of
+what changed since v1 (e.g. new commits) or even stating that nothing
+has changed and you just regrouped it.
+Or better, you could also not re-submit it and just point out that this
+series depends on a previous commit (with a link to it).
+
 > 
-> diff --git a/Makefile b/Makefile
-> index e8b599b4dcde..fb0a9ac195e7 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -360,7 +360,7 @@ HOST_LFS_LIBS := $(shell getconf LFS_LIBS 2>/dev/null)
->  
->  HOSTCC       = gcc
->  HOSTCXX      = g++
-> -KBUILD_HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
-> +KBUILD_HOSTCFLAGS   := -Wall -Wshadow=local -Wmissing-prototypes -Wstrict-prototypes -O2 \
->  		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS) \
->  		$(HOSTCFLAGS)
->  KBUILD_HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
+> Leonardo Brás (4):
+>   Adds -Wshadow=local on KBUILD_HOSTCFLAGS
+>   Renames variable to fix shadow warning.
+>   kbuild: Removes unnecessary shadowed local variable and optimize
+>     testing.
+>   Changes macro usage to avoid shadowing a variable.
+> 
+>  Makefile                     |  2 +-
+>  arch/x86/entry/vdso/vdso2c.h |  4 ++--
+>  scripts/asn1_compiler.c      |  7 +++----
+>  scripts/mod/file2alias.c     | 14 ++++++++------
+>  4 files changed, 14 insertions(+), 13 deletions(-)
 > 
 
-I believe this should be the last patch on this series and not the first
-one to avoid commits in between where we have those warnings.
+I hope this helps.
 
-Regards
+Regards,
 Helen
