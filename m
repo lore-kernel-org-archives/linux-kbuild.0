@@ -1,39 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:35695 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726853AbeJRHJB (ORCPT
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:38005 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727246AbeJRHKw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Oct 2018 03:09:01 -0400
+        Thu, 18 Oct 2018 03:10:52 -0400
 MIME-Version: 1.0
-References: <20181017000834.GA21330@WindFlash> <b17297ec-9044-d0c4-ee0e-664b53713020@koikeco.de>
-In-Reply-To: <b17297ec-9044-d0c4-ee0e-664b53713020@koikeco.de>
+References: <20181017000834.GA21330@WindFlash> <20181017060151.GA1105@gmail.com>
+In-Reply-To: <20181017060151.GA1105@gmail.com>
 From: Leonardo Bras <leobras.c@gmail.com>
-Date: Wed, 17 Oct 2018 20:10:50 -0300
-Message-ID: <CADvQ+rH5FTzgQN==EwQn_MogDeGR1hnScd=pyuRqHXB=QKYo_Q@mail.gmail.com>
-Subject: Re: [Lkcamp] [PATCH 2/4] Renames variable to fix shadow warning.
+Date: Wed, 17 Oct 2018 20:12:39 -0300
+Message-ID: <CADvQ+rHD5kAam7kOc2UBUd9Pw6QW3dGhUjQj=es37NfgMeLcyA@mail.gmail.com>
+Subject: Re: [PATCH 2/4] Renames variable to fix shadow warning.
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: helen@koikeco.de
-Cc: lkcamp@lists.libreplanetbr.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Matthew Wilcox <willy6545@gmail.com>, linux-kernel <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>
+To: mingo@kernel.org
+Cc: lkcamp@lists.libreplanetbr.org, Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Hello Helen,
-Thanks for the suggestions!
-
-On Tue, Oct 16, 2018 at 11:57 PM Helen Koike <helen@koikeco.de> wrote:
+Thanks Ingo,
+On Wed, Oct 17, 2018 at 3:01 AM Ingo Molnar <mingo@kernel.org> wrote:
 >
-> Hi Leonardo,
 >
-> Thanks for the patch, just some small comments below.
+> * Leonardo Br=C3=A1s <leobras.c@gmail.com> wrote:
 >
-> Please, check previous log messages with git log
-> arch/x86/entry/vdso/vdso2c.h, you will see that most patches had the
-> prefix "x86/vdso:" in the commit message.
-Ok, added! This change will be available on v2.
-
->
-> On 10/16/18 9:08 PM, Leonardo Br=C3=A1s wrote:
 > > Renames the char variable to avoid shadowing a variable previously
 > > declared on this function.
 > >
@@ -58,15 +48,6 @@ fset) +
 > > +             const char *name2 =3D raw_addr + GET_LE(&strtab_hdr->sh_o=
 ffset) +
 > >                       GET_LE(&sym->st_name);
->
-> Could you please use a more meaningful name instead of name2 please? I
-> believe sym_name should be fine.
-
-Ok, I renamed as you suggested.
-Also, I renamed the "name" variable to "image_name" as Andy suggested.
-This change will be available on v2.
-
->
 > >
 > >               for (k =3D 0; k < NSYMS; k++) {
 > > -                     if (!strcmp(name, required_syms[k].name)) {
@@ -74,10 +55,18 @@ This change will be available on v2.
 > >                               if (syms[k]) {
 > >                                       fail("duplicate symbol %s\n",
 > >                                            required_syms[k].name);
-> >
 >
-> Regards
-> Helen
+> NAK.
+>
+> Please read and understand the code and rename both variables to
+> meaningful names, not just a mindless name/name2 ...
+>
+
+It's changed! This change will be available on v2.
+
+> Thanks,
+>
+>         Ingo
 
 Regards,
-Leonardo Bras
+Leonardo
