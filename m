@@ -1,74 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51608 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727061AbeJQAGt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Oct 2018 20:06:49 -0400
-Date: Tue, 16 Oct 2018 11:15:36 -0500
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH 2/3] objtool: move libelf check out of top Makefile
-Message-ID: <20181016161536.pnek3dnyem6mspwr@treble>
-References: <1539681053-24388-1-git-send-email-yamada.masahiro@socionext.com>
- <1539681053-24388-3-git-send-email-yamada.masahiro@socionext.com>
- <20181016142540.pxlwu3ft6n2b4pgj@treble>
- <CAK7LNARLW4NmeY0Rq19Bj_5kOFbp6YDtsUDhNaAfVXjL85cAMg@mail.gmail.com>
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:35019 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727171AbeJQIAW (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 17 Oct 2018 04:00:22 -0400
+Date: Tue, 16 Oct 2018 21:07:22 -0300
+From: Leonardo =?utf-8?B?QnLDoXM=?= <leobras.c@gmail.com>
+Subject: [PATCH 0/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
+Message-ID: <20181017000722.GA20892@WindFlash>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAK7LNARLW4NmeY0Rq19Bj_5kOFbp6YDtsUDhNaAfVXjL85cAMg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, Bernd Edlinger <bernd.edlinger@hotmail.de>, Borislav Petkov <bp@suse.de>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: lkcamp@lists.libreplanetbr.org
+Cc: Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wed, Oct 17, 2018 at 12:51:40AM +0900, Masahiro Yamada wrote:
-> > ifdef CONFIG_UNWINDER_ORC
-> >
-> > chk_unwinder_orc = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
-> > msg_unwinder_orc = "Cannot build objtool to generate ORC metadata for CONFIG_UNWINDER_ORC=y.  " \
-> >                        "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
-> > toolcheck-$(CONFIG_UNWINDER_ORC) += unwinder_orc
-> >
-> > else
-> >
-> > chk_stack_validation = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
-> > msg_stack_validation = "Cannot build objtool for CONFIG_STACK_VALIDATION=y.  " \
-> >                        "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
-> > toolcheck-$(CONFIG_STACK_VALIDATION) += stack_validation
-> >
-> > endif
-> >
-> >
-> > What do you think?
-> 
-> 
-> It is ugly.
-> 
-> Do you need such detailed information like ORC metadata stuff here?
-> 
-> This Makefile aims to error out, showing why the build failed.
-> That's it.
+This patchset add -Wshadow=local on KBUILD_HOSTCFLAGS and fixes 
+all code that show this warning.
 
-Yeah, it is kind of ugly.  But the "showing why the build failed" part
-is important.  I was trying to give the user a clear error message,
-similar to what we have today.
+The third patch was already submitted, but was not merged yet.
+I like to think it's part of this patchset, but if it was 
+already merged, please ignore it.
 
-Without context, the user won't know what objtool is, or why it needs to
-be built.
+Leonardo Brás (4):
+  Adds -Wshadow=local on KBUILD_HOSTCFLAGS
+  Renames variable to fix shadow warning.
+  kbuild: Removes unnecessary shadowed local variable and optimize
+    testing.
+  Changes macro usage to avoid shadowing a variable.
 
-If we have just a single error message for all cases, it should at least
-mention the config option.  Like
-
-   "Cannot build objtool for CONFIG_STACK_VALIDATION."
-
-But then, most users will only have that enabled because of ORC.  So an
-ORC-specific message would be more appropriate in most cases.
-
-So maybe it can just be something more vague:
-
-msg_stack_validation = "Cannot build objtool for CONFIG_UNWINDER_ORC and/or CONFIG_STACK_VALIDATION.  " \
-		       "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
-
-That would probably be good enough.  Then we could drop the ugly ifdef.
+ Makefile                     |  2 +-
+ arch/x86/entry/vdso/vdso2c.h |  4 ++--
+ scripts/asn1_compiler.c      |  7 +++----
+ scripts/mod/file2alias.c     | 14 ++++++++------
+ 4 files changed, 14 insertions(+), 13 deletions(-)
 
 -- 
-Josh
+2.19.1
