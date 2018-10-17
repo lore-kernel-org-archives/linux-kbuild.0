@@ -1,64 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52894 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727434AbeJRBDO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Oct 2018 21:03:14 -0400
-Subject: Re: [PATCH 3/3] kvm: don't redefine flags as something else
+Received: from mx2.suse.de ([195.135.220.15]:53794 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727053AbeJRBHP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 17 Oct 2018 21:07:15 -0400
+Date: Wed, 17 Oct 2018 19:10:34 +0200
+From: Borislav Petkov <bp@suse.de>
+Subject: Re: [PATCH 2/3] x86/mcelog: Remove one mce_helper definition
+Message-ID: <20181017171034.GO22571@zn.tnic>
 References: <20181017170554.18841-1-bigeasy@linutronix.de>
- <20181017170554.18841-4-bigeasy@linutronix.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4270a987-e88f-11d6-fb27-c2f79009e0f1@redhat.com>
-Date: Wed, 17 Oct 2018 19:06:33 +0200
+ <20181017170554.18841-3-bigeasy@linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20181017170554.18841-4-bigeasy@linutronix.de>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181017170554.18841-3-bigeasy@linutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, linux-kernel@vger.kernel.org
-Cc: tglx@linutronix.de, linux-kbuild@vger.kernel.org, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, kvm@vger.kernel.org
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, linux-kbuild@vger.kernel.org, Tony Luck <tony.luck@intel.com>, linux-edac <linux-edac@vger.kernel.org>, x86@kernel.org
 
-On 17/10/2018 19:05, Sebastian Andrzej Siewior wrote:
-> The function irqfd_wakeup() has flags defined as __poll_t and then it
-> has additional flags which is used for irqflags.
+On Wed, Oct 17, 2018 at 07:05:53PM +0200, Sebastian Andrzej Siewior wrote:
+> Commit 5de97c9f6d85f ("x86/mce: Factor out and deprecate the /dev/mcelog
+> driver") moved the old interface into one file including mce_helper
+> definition as static and "extern".
 > 
-> Redefine the inner flags variable as iflags so it does not shadow the
-> outer flags.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  virt/kvm/eventfd.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-> index b20b751286fc6..d15a51622d53e 100644
-> --- a/virt/kvm/eventfd.c
-> +++ b/virt/kvm/eventfd.c
-> @@ -214,9 +214,9 @@ irqfd_wakeup(wait_queue_entry_t *wait, unsigned mode, int sync, void *key)
->  
->  	if (flags & EPOLLHUP) {
->  		/* The eventfd is closing, detach from KVM */
-> -		unsigned long flags;
-> +		unsigned long iflags;
->  
-> -		spin_lock_irqsave(&kvm->irqfds.lock, flags);
-> +		spin_lock_irqsave(&kvm->irqfds.lock, iflags);
->  
->  		/*
->  		 * We must check if someone deactivated the irqfd before
-> @@ -230,7 +230,7 @@ irqfd_wakeup(wait_queue_entry_t *wait, unsigned mode, int sync, void *key)
->  		if (irqfd_is_active(irqfd))
->  			irqfd_deactivate(irqfd);
->  
-> -		spin_unlock_irqrestore(&kvm->irqfds.lock, flags);
-> +		spin_unlock_irqrestore(&kvm->irqfds.lock, iflags);
->  	}
->  
->  	return 0;
-> 
+> Cc: Tony Luck <tony.luck@intel.com>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: linux-edac <linux-edac@vger.kernel.org>
+> Cc: x86@kernel.org
+> Fixes:  5de97c9f6d85f ("x86/mce: Factor out and deprecate the /dev/mcelog driver")
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+I'm not sure about the Fixes: tag - it'll trigger a flood of backporting
+for no reason AFAICT.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
