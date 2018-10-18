@@ -1,86 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:39105 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727299AbeJRKCb (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35383 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727331AbeJRNqk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Oct 2018 06:02:31 -0400
+        Thu, 18 Oct 2018 09:46:40 -0400
+Date: Thu, 18 Oct 2018 07:47:18 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH 2/4] Renames variable to fix shadow warning.
+Message-ID: <20181018054718.GB62071@gmail.com>
+References: <20181017000834.GA21330@WindFlash>
+ <20181017060151.GA1105@gmail.com>
+ <CADvQ+rHD5kAam7kOc2UBUd9Pw6QW3dGhUjQj=es37NfgMeLcyA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20181017000912.GA21339@WindFlash> <d3185020-b1aa-3eeb-b8e7-ecaefd624236@koikeco.de>
-In-Reply-To: <d3185020-b1aa-3eeb-b8e7-ecaefd624236@koikeco.de>
-From: Leonardo Bras <leobras.c@gmail.com>
-Date: Wed, 17 Oct 2018 23:03:46 -0300
-Message-ID: <CADvQ+rGwns4nFjA8wMRC-mY69_Rr8wwdM8dezx0vpdjUymKqSQ@mail.gmail.com>
-Subject: Re: [Lkcamp] [PATCH 3/4] kbuild: Removes unnecessary shadowed local
- variable and optimize testing.
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADvQ+rHD5kAam7kOc2UBUd9Pw6QW3dGhUjQj=es37NfgMeLcyA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: helen@koikeco.de
-Cc: lkcamp@lists.libreplanetbr.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Matthew Wilcox <willy6545@gmail.com>, linux-kernel <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>
+To: Leonardo Bras <leobras.c@gmail.com>
+Cc: lkcamp@lists.libreplanetbr.org, Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Hello Helen,
 
-On Wed, Oct 17, 2018 at 12:06 AM Helen Koike <helen@koikeco.de> wrote:
->
-> Hi Leonardo,
->
-> On 10/16/18 9:09 PM, Leonardo Br=C3=A1s wrote:
-> >     Removes an unnecessary shadowed local variable (start).
-> >     Optimize test of isdigit:
-> >     - If isalpha returns true, isdigit will return false, so no need to=
- test.
->
-> This patch does two different things, it should be in two separated patch=
-es.
-Sure, no problem.
+* Leonardo Bras <leobras.c@gmail.com> wrote:
 
->
+> Thanks Ingo,
+> On Wed, Oct 17, 2018 at 3:01 AM Ingo Molnar <mingo@kernel.org> wrote:
 > >
-> > Signed-off-by: Leonardo Br=C3=A1s <leobras.c@gmail.com>
-> > ---
-> >  scripts/asn1_compiler.c | 7 +++----
-> >  1 file changed, 3 insertions(+), 4 deletions(-)
 > >
-> > diff --git a/scripts/asn1_compiler.c b/scripts/asn1_compiler.c
-> > index c146020fc783..08bb6e5fd6ad 100644
-> > --- a/scripts/asn1_compiler.c
-> > +++ b/scripts/asn1_compiler.c
-> > @@ -413,7 +413,7 @@ static void tokenise(char *buffer, char *end)
+> > * Leonardo Brás <leobras.c@gmail.com> wrote:
 > >
-> >                       /* Handle string tokens */
-> >                       if (isalpha(*p)) {
-> > -                             const char **dir, *start =3D p;
-> > +                             const char **dir;
+> > > Renames the char variable to avoid shadowing a variable previously
+> > > declared on this function.
+> > >
+> > > Signed-off-by: Leonardo Brás <leobras.c@gmail.com>
+> > > ---
+> > >  arch/x86/entry/vdso/vdso2c.h | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/arch/x86/entry/vdso/vdso2c.h b/arch/x86/entry/vdso/vdso2c.h
+> > > index fa847a620f40..9466998d0f28 100644
+> > > --- a/arch/x86/entry/vdso/vdso2c.h
+> > > +++ b/arch/x86/entry/vdso/vdso2c.h
+> > > @@ -93,11 +93,11 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
+> > >               int k;
+> > >               ELF(Sym) *sym = raw_addr + GET_LE(&symtab_hdr->sh_offset) +
+> > >                       GET_LE(&symtab_hdr->sh_entsize) * i;
+> > > -             const char *name = raw_addr + GET_LE(&strtab_hdr->sh_offset) +
+> > > +             const char *name2 = raw_addr + GET_LE(&strtab_hdr->sh_offset) +
+> > >                       GET_LE(&sym->st_name);
+> > >
+> > >               for (k = 0; k < NSYMS; k++) {
+> > > -                     if (!strcmp(name, required_syms[k].name)) {
+> > > +                     if (!strcmp(name2, required_syms[k].name)) {
+> > >                               if (syms[k]) {
+> > >                                       fail("duplicate symbol %s\n",
+> > >                                            required_syms[k].name);
 > >
-> >                               /* Can be a directive, type name or eleme=
-nt
-> >                                * name.  Find the end of the name.
-> > @@ -454,10 +454,9 @@ static void tokenise(char *buffer, char *end)
+> > NAK.
 > >
-> >                               tokens[tix++].token_type =3D TOKEN_TYPE_N=
-AME;
-> >                               continue;
-> > -                     }
-> > +                     } else if (isdigit(*p)) {
-> > +                             /* Handle numbers */
->
-> Actually you can't do that, p is being altered in the first if statement.
-
-Yeah, you are right. I will remove this logic for v2.
-
->
+> > Please read and understand the code and rename both variables to
+> > meaningful names, not just a mindless name/name2 ...
 > >
-> > -                     /* Handle numbers */
-> > -                     if (isdigit(*p)) {
-> >                               /* Find the end of the number */
-> >                               q =3D p + 1;
-> >                               while (q < nl && (isdigit(*q)))
-> >
->
-> Regards
-> Helen
+> 
+> It's changed! This change will be available on v2.
 
 Thanks!
 
-Leonardo Br=C3=A1s
+	Ingo
