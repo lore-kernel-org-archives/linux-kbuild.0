@@ -1,67 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:41925 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726706AbeJRHQu (ORCPT
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:32827 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726644AbeJRIfH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Oct 2018 03:16:50 -0400
+        Thu, 18 Oct 2018 04:35:07 -0400
 MIME-Version: 1.0
-References: <20181017000809.GA21292@WindFlash> <716d591a-a0da-e048-a00d-0fe7dabdc4f1@koikeco.de>
-In-Reply-To: <716d591a-a0da-e048-a00d-0fe7dabdc4f1@koikeco.de>
+References: <20181017000809.GA21292@WindFlash> <20181017081115.GA22535@zn.tnic>
+ <CAK7LNASVn7CB5uL9tCtNC2u4Ary5eb-vyiB_sS2ey5AZNweKAA@mail.gmail.com>
+In-Reply-To: <CAK7LNASVn7CB5uL9tCtNC2u4Ary5eb-vyiB_sS2ey5AZNweKAA@mail.gmail.com>
 From: Leonardo Bras <leobras.c@gmail.com>
-Date: Wed, 17 Oct 2018 20:18:37 -0300
-Message-ID: <CADvQ+rGoxSHuVjA1-wbYW=bvb5sUjJS1EZSKdkHU2dwzjgDxow@mail.gmail.com>
-Subject: Re: [Lkcamp] [PATCH 1/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
+Date: Wed, 17 Oct 2018 21:36:38 -0300
+Message-ID: <CADvQ+rGVLG85p82O-joY6yU4maMdP0RsyJr-JGPNCrfjy4-WbA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: helen@koikeco.de
-Cc: lkcamp@lists.libreplanetbr.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Matthew Wilcox <willy6545@gmail.com>, linux-kernel <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Borislav Petkov <bp@alien8.de>, lkcamp@lists.libreplanetbr.org, Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Hello Helen,
-
-On Wed, Oct 17, 2018 at 1:32 AM Helen Koike <helen@koikeco.de> wrote:
+On Wed, Oct 17, 2018 at 5:21 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> Hi Leonardo,
->
-> Thanks for the patch.
->
-> On 10/16/18 9:08 PM, Leonardo Br=C3=A1s wrote:
-> > Adds -Wshadow=3Dlocal on KBUILD_HOSTCFLAGS to show shadow warnings
-> > on tools built for HOST.
+> On Wed, Oct 17, 2018 at 5:11 PM Borislav Petkov <bp@alien8.de> wrote:
 > >
-> > Signed-off-by: Leonardo Br=C3=A1s <leobras.c@gmail.com>
-> > ---
-> >  Makefile | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > On Tue, Oct 16, 2018 at 09:08:09PM -0300, Leonardo Br=C3=A1s wrote:
+> > > Adds -Wshadow=3Dlocal on KBUILD_HOSTCFLAGS to show shadow warnings
+> > > on tools built for HOST.
+> > >
+> > > Signed-off-by: Leonardo Br=C3=A1s <leobras.c@gmail.com>
+> > > ---
+> > >  Makefile | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/Makefile b/Makefile
+> > > index e8b599b4dcde..fb0a9ac195e7 100644
+> > > --- a/Makefile
+> > > +++ b/Makefile
+> > > @@ -360,7 +360,7 @@ HOST_LFS_LIBS :=3D $(shell getconf LFS_LIBS 2>/de=
+v/null)
+> > >
+> > >  HOSTCC       =3D gcc
+> > >  HOSTCXX      =3D g++
+> > > -KBUILD_HOSTCFLAGS   :=3D -Wall -Wmissing-prototypes -Wstrict-prototy=
+pes -O2 \
+> > > +KBUILD_HOSTCFLAGS   :=3D -Wall -Wshadow=3Dlocal -Wmissing-prototypes=
+ -Wstrict-prototypes -O2 \
+> > >               -fomit-frame-pointer -std=3Dgnu89 $(HOST_LFS_CFLAGS) \
+> > >               $(HOSTCFLAGS)
+> > >  KBUILD_HOSTCXXFLAGS :=3D -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
+> > > --
 > >
-> > diff --git a/Makefile b/Makefile
-> > index e8b599b4dcde..fb0a9ac195e7 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -360,7 +360,7 @@ HOST_LFS_LIBS :=3D $(shell getconf LFS_LIBS 2>/dev/=
-null)
-> >
-> >  HOSTCC       =3D gcc
-> >  HOSTCXX      =3D g++
-> > -KBUILD_HOSTCFLAGS   :=3D -Wall -Wmissing-prototypes -Wstrict-prototype=
-s -O2 \
-> > +KBUILD_HOSTCFLAGS   :=3D -Wall -Wshadow=3Dlocal -Wmissing-prototypes -=
-Wstrict-prototypes -O2 \
-> >               -fomit-frame-pointer -std=3Dgnu89 $(HOST_LFS_CFLAGS) \
-> >               $(HOSTCFLAGS)
-> >  KBUILD_HOSTCXXFLAGS :=3D -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
-> >
+> > You might wanna take a look at scripts/Makefile.extrawarn which already
+> > has -Wshadow.
 >
-> I believe this should be the last patch on this series and not the first
-> one to avoid commits in between where we have those warnings.
+>
+> scripts/Makefile.extrawarn provides options for the target compiler (CC),
+> whereas this patch adds -Wshadow=3Dlocal for the host compiler (HOSTCC).
+>
 >
 
-You are right, I will change the order for v2.
-Thanks!
 
-> Regards
-> Helen
+Thanks for helping, :)
 
-Regards,
-Leonardo
+Leonardo Bras
+
+>
+> --
+> Best Regards
+> Masahiro Yamada
