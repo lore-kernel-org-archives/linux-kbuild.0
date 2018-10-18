@@ -1,71 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:32827 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726644AbeJRIfH (ORCPT
+Received: from mail-ot1-f42.google.com ([209.85.210.42]:42577 "EHLO
+        mail-ot1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726644AbeJRIjW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Oct 2018 04:35:07 -0400
+        Thu, 18 Oct 2018 04:39:22 -0400
 MIME-Version: 1.0
 References: <20181017000809.GA21292@WindFlash> <20181017081115.GA22535@zn.tnic>
- <CAK7LNASVn7CB5uL9tCtNC2u4Ary5eb-vyiB_sS2ey5AZNweKAA@mail.gmail.com>
-In-Reply-To: <CAK7LNASVn7CB5uL9tCtNC2u4Ary5eb-vyiB_sS2ey5AZNweKAA@mail.gmail.com>
+ <CAK7LNASVn7CB5uL9tCtNC2u4Ary5eb-vyiB_sS2ey5AZNweKAA@mail.gmail.com> <20181017083126.GB22535@zn.tnic>
+In-Reply-To: <20181017083126.GB22535@zn.tnic>
 From: Leonardo Bras <leobras.c@gmail.com>
-Date: Wed, 17 Oct 2018 21:36:38 -0300
-Message-ID: <CADvQ+rGVLG85p82O-joY6yU4maMdP0RsyJr-JGPNCrfjy4-WbA@mail.gmail.com>
+Date: Wed, 17 Oct 2018 21:40:53 -0300
+Message-ID: <CADvQ+rFa=XEuxLb=yPmtJE2QepBNjCVzjEY5urVzCaSF1tJBYw@mail.gmail.com>
 Subject: Re: [PATCH 1/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Borislav Petkov <bp@alien8.de>, lkcamp@lists.libreplanetbr.org, Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Borislav Petkov <bp@alien8.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, lkcamp@lists.libreplanetbr.org, Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Wed, Oct 17, 2018 at 5:21 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> On Wed, Oct 17, 2018 at 5:11 PM Borislav Petkov <bp@alien8.de> wrote:
-> >
-> > On Tue, Oct 16, 2018 at 09:08:09PM -0300, Leonardo Br=C3=A1s wrote:
-> > > Adds -Wshadow=3Dlocal on KBUILD_HOSTCFLAGS to show shadow warnings
-> > > on tools built for HOST.
-> > >
-> > > Signed-off-by: Leonardo Br=C3=A1s <leobras.c@gmail.com>
-> > > ---
-> > >  Makefile | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/Makefile b/Makefile
-> > > index e8b599b4dcde..fb0a9ac195e7 100644
-> > > --- a/Makefile
-> > > +++ b/Makefile
-> > > @@ -360,7 +360,7 @@ HOST_LFS_LIBS :=3D $(shell getconf LFS_LIBS 2>/de=
-v/null)
-> > >
-> > >  HOSTCC       =3D gcc
-> > >  HOSTCXX      =3D g++
-> > > -KBUILD_HOSTCFLAGS   :=3D -Wall -Wmissing-prototypes -Wstrict-prototy=
-pes -O2 \
-> > > +KBUILD_HOSTCFLAGS   :=3D -Wall -Wshadow=3Dlocal -Wmissing-prototypes=
- -Wstrict-prototypes -O2 \
-> > >               -fomit-frame-pointer -std=3Dgnu89 $(HOST_LFS_CFLAGS) \
-> > >               $(HOSTCFLAGS)
-> > >  KBUILD_HOSTCXXFLAGS :=3D -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
-> > > --
-> >
-> > You might wanna take a look at scripts/Makefile.extrawarn which already
-> > has -Wshadow.
->
->
-> scripts/Makefile.extrawarn provides options for the target compiler (CC),
-> whereas this patch adds -Wshadow=3Dlocal for the host compiler (HOSTCC).
->
->
+Hello Boris,
 
 
-Thanks for helping, :)
+> Next question: why not -Wshadow simply?
 
+Good question. I can change it to -Wshadow and fix stuff for v2.
+
+>
+> Also, -Wshadow for the target compiler is an extra warning (W=2). Why is
+> it enabled by default here?
+
+The idea was to put it as default and fix all the shadowing warnings.
+What do you think?  I am open to suggestions.
+
+Thank you,
 Leonardo Bras
 
->
+
 > --
-> Best Regards
-> Masahiro Yamada
+> Regards/Gruss,
+>     Boris.
+>
+> Good mailing practices for 400: avoid top-posting and trim the reply.
