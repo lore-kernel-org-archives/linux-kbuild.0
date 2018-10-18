@@ -1,37 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([5.9.137.197]:57216 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727439AbeJSAxN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Oct 2018 20:53:13 -0400
-Date: Thu, 18 Oct 2018 18:50:57 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH 1/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
-Message-ID: <20181018165057.GH20831@zn.tnic>
-References: <20181017000809.GA21292@WindFlash>
- <20181017081115.GA22535@zn.tnic>
- <CAK7LNASVn7CB5uL9tCtNC2u4Ary5eb-vyiB_sS2ey5AZNweKAA@mail.gmail.com>
- <20181017083126.GB22535@zn.tnic>
- <CADvQ+rFa=XEuxLb=yPmtJE2QepBNjCVzjEY5urVzCaSF1tJBYw@mail.gmail.com>
- <20181018091606.GA20831@zn.tnic>
- <CAK7LNAQq7aE_2QYwqei7M9fg8Yen7-ucjz-t2E_hq2xkznKsQw@mail.gmail.com>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:40860 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727509AbeJSA7v (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 18 Oct 2018 20:59:51 -0400
+Subject: Re: [PATCH 2/4] kernel hacking: new config NO_AUTO_INLINE to disable
+ compiler auto-inline optimizations
+References: <20181018162548.6399-1-changbin.du@gmail.com>
+ <20181018162548.6399-3-changbin.du@gmail.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Message-ID: <62bcdf3d-87be-407f-b971-5a53dbb1e4b8@arm.com>
+Date: Thu, 18 Oct 2018 17:57:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQq7aE_2QYwqei7M9fg8Yen7-ucjz-t2E_hq2xkznKsQw@mail.gmail.com>
+In-Reply-To: <20181018162548.6399-3-changbin.du@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Leonardo =?utf-8?B?QnLDoXM=?= <leobras.c@gmail.com>, lkcamp@lists.libreplanetbr.org, Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Du Changbin <changbin.du@gmail.com>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org
+Cc: linux-kbuild@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, rostedt@goodmis.org, Changbin Du <changbin.du@intel.com>, linux-sparse@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-On Fri, Oct 19, 2018 at 01:39:21AM +0900, Masahiro Yamada wrote:
-> It is not realistic to enable this warning option by default.
+On 18/10/18 17:25, Du Changbin wrote:
+> From: Changbin Du <changbin.du@intel.com>
+> 
+> This patch add a new kernel hacking option NO_AUTO_INLINE. Selecting
+> this option will prevent the compiler from optimizing the kernel by
+> auto-inlining functions not marked with the inline keyword.
+> 
+> With this option, only functions explicitly marked with "inline" will
+> be inlined. This will allow the function tracer to trace more functions
+> because it only traces functions that the compiler has not inlined.
+> 
+> Signed-off-by: Changbin Du <changbin.du@intel.com>
+> Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+> ---
+>   Makefile          |  6 ++++++
+>   lib/Kconfig.debug | 25 +++++++++++++++++++++++++
+>   2 files changed, 31 insertions(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index e8b599b4dcde..757d6507cb5c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -749,6 +749,12 @@ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
+>   		   $(call cc-option,-fno-var-tracking)
+>   endif
+>   
+> +ifdef CONFIG_NO_AUTO_INLINE
+> +KBUILD_CFLAGS   += $(call cc-option, -fno-inline-functions) \
+> +		   $(call cc-option, -fno-inline-small-functions) \
+> +		   $(call cc-option, -fno-inline-functions-called-once)
+> +endif
+> +
+>   ifdef CONFIG_FUNCTION_TRACER
+>   ifdef CONFIG_FTRACE_MCOUNT_RECORD
+>     # gcc 5 supports generating the mcount tables directly
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 4966c4fbe7f7..0f9b4fa78b1c 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -211,6 +211,31 @@ config GDB_SCRIPTS
+>   	  instance. See Documentation/dev-tools/gdb-kernel-debugging.rst
+>   	  for further details.
+>   
+> +config NO_AUTO_INLINE
+> +	bool "Disable compiler auto-inline optimizations"
+> +	help
+> +	  This will prevent the compiler from optimizing the kernel by
+> +	  auto-inlining functions not marked with the inline keyword.
+> +	  With this option, only functions explicitly marked with
+> +	  "inline" will be inlined. This will allow the function tracer
+> +	  to trace more functions because it only traces functions that
+> +	  the compiler has not inlined.
+> +
+> +	  Enabling this function can help debugging a kernel if using
+> +	  the function tracer. But it can also change how the kernel
+> +	  works, because inlining functions may change the timing,
+> +	  which could make it difficult while debugging race conditions.
+> +
+> +	  If unsure, select N.
+> +
+> +config ENABLE_WARN_DEPRECATED
 
-I believe the question is whether to enable that warning by default in
-KBUILD_HOSTCFLAGS. Enabling it by default for the target kernel is of
-course, too noisy. That's why it is hidden behind W=2 there.
+This part doesn't look like it belongs in this patch, and judging by the 
+commit message in 771c035372a0 wouldn't be welcome back anyway.
 
--- 
-Regards/Gruss,
-    Boris.
+Robin.
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
+> +	bool "Enable __deprecated logic"
+> +	default y
+> +	help
+> +	  Enable the __deprecated logic in the kernel build.
+> +	  Disable this to suppress the "warning: 'foo' is deprecated
+> +	  (declared at kernel/power/somefile.c:1234)" messages.
+> +
+>   config ENABLE_MUST_CHECK
+>   	bool "Enable __must_check logic"
+>   	default y
+> 
