@@ -1,26 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:40860 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727509AbeJSA7v (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Oct 2018 20:59:51 -0400
-Subject: Re: [PATCH 2/4] kernel hacking: new config NO_AUTO_INLINE to disable
- compiler auto-inline optimizations
-References: <20181018162548.6399-1-changbin.du@gmail.com>
- <20181018162548.6399-3-changbin.du@gmail.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Message-ID: <62bcdf3d-87be-407f-b971-5a53dbb1e4b8@arm.com>
-Date: Thu, 18 Oct 2018 17:57:56 +0100
-MIME-Version: 1.0
+Received: from mail.kernel.org ([198.145.29.99]:36602 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727492AbeJSBBm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 18 Oct 2018 21:01:42 -0400
+Date: Thu, 18 Oct 2018 12:59:48 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH 2/4] kernel hacking: new config NO_AUTO_INLINE to
+ disable compiler auto-inline optimizations
+Message-ID: <20181018125948.789c72de@gandalf.local.home>
 In-Reply-To: <20181018162548.6399-3-changbin.du@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+References: <20181018162548.6399-1-changbin.du@gmail.com>
+        <20181018162548.6399-3-changbin.du@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Du Changbin <changbin.du@gmail.com>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org
-Cc: linux-kbuild@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, rostedt@goodmis.org, Changbin Du <changbin.du@intel.com>, linux-sparse@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Du Changbin <changbin.du@gmail.com>
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, Changbin Du <changbin.du@intel.com>
 
-On 18/10/18 17:25, Du Changbin wrote:
+On Thu, 18 Oct 2018 16:25:46 +0000
+Du Changbin <changbin.du@gmail.com> wrote:
+
 > From: Changbin Du <changbin.du@intel.com>
 > 
 > This patch add a new kernel hacking option NO_AUTO_INLINE. Selecting
@@ -33,60 +34,13 @@ On 18/10/18 17:25, Du Changbin wrote:
 > 
 > Signed-off-by: Changbin Du <changbin.du@intel.com>
 > Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-> ---
->   Makefile          |  6 ++++++
->   lib/Kconfig.debug | 25 +++++++++++++++++++++++++
->   2 files changed, 31 insertions(+)
-> 
-> diff --git a/Makefile b/Makefile
-> index e8b599b4dcde..757d6507cb5c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -749,6 +749,12 @@ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
->   		   $(call cc-option,-fno-var-tracking)
->   endif
->   
-> +ifdef CONFIG_NO_AUTO_INLINE
-> +KBUILD_CFLAGS   += $(call cc-option, -fno-inline-functions) \
-> +		   $(call cc-option, -fno-inline-small-functions) \
-> +		   $(call cc-option, -fno-inline-functions-called-once)
-> +endif
-> +
->   ifdef CONFIG_FUNCTION_TRACER
->   ifdef CONFIG_FTRACE_MCOUNT_RECORD
->     # gcc 5 supports generating the mcount tables directly
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index 4966c4fbe7f7..0f9b4fa78b1c 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -211,6 +211,31 @@ config GDB_SCRIPTS
->   	  instance. See Documentation/dev-tools/gdb-kernel-debugging.rst
->   	  for further details.
->   
-> +config NO_AUTO_INLINE
-> +	bool "Disable compiler auto-inline optimizations"
-> +	help
-> +	  This will prevent the compiler from optimizing the kernel by
-> +	  auto-inlining functions not marked with the inline keyword.
-> +	  With this option, only functions explicitly marked with
-> +	  "inline" will be inlined. This will allow the function tracer
-> +	  to trace more functions because it only traces functions that
-> +	  the compiler has not inlined.
-> +
-> +	  Enabling this function can help debugging a kernel if using
-> +	  the function tracer. But it can also change how the kernel
-> +	  works, because inlining functions may change the timing,
-> +	  which could make it difficult while debugging race conditions.
-> +
-> +	  If unsure, select N.
-> +
+
+I have acked patch this before, but this particular patch has extra
+changes that I have not acked.
+
+
+
 > +config ENABLE_WARN_DEPRECATED
-
-This part doesn't look like it belongs in this patch, and judging by the 
-commit message in 771c035372a0 wouldn't be welcome back anyway.
-
-Robin.
-
 > +	bool "Enable __deprecated logic"
 > +	default y
 > +	help
@@ -94,7 +48,7 @@ Robin.
 > +	  Disable this to suppress the "warning: 'foo' is deprecated
 > +	  (declared at kernel/power/somefile.c:1234)" messages.
 > +
->   config ENABLE_MUST_CHECK
->   	bool "Enable __must_check logic"
->   	default y
-> 
+
+What is that?
+
+-- Steve
