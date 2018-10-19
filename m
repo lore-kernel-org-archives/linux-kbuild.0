@@ -1,102 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:61551 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726663AbeJSKtF (ORCPT
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:41244 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725934AbeJSKzL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Oct 2018 06:49:05 -0400
+        Fri, 19 Oct 2018 06:55:11 -0400
 MIME-Version: 1.0
-References: <20181017000912.GA21339@WindFlash> <d3185020-b1aa-3eeb-b8e7-ecaefd624236@koikeco.de>
- <CADvQ+rGwns4nFjA8wMRC-mY69_Rr8wwdM8dezx0vpdjUymKqSQ@mail.gmail.com>
-In-Reply-To: <CADvQ+rGwns4nFjA8wMRC-mY69_Rr8wwdM8dezx0vpdjUymKqSQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 19 Oct 2018 11:44:06 +0900
-Message-ID: <CAK7LNAQ58ZMjFmyNDNmtE+KaQE_LAqo1aRQ-4WpnUsgJSjNT6g@mail.gmail.com>
-Subject: Re: [Lkcamp] [PATCH 3/4] kbuild: Removes unnecessary shadowed local
- variable and optimize testing.
+References: <20181017000809.GA21292@WindFlash> <20181017081115.GA22535@zn.tnic>
+ <CAK7LNASVn7CB5uL9tCtNC2u4Ary5eb-vyiB_sS2ey5AZNweKAA@mail.gmail.com>
+ <20181017083126.GB22535@zn.tnic> <CADvQ+rFa=XEuxLb=yPmtJE2QepBNjCVzjEY5urVzCaSF1tJBYw@mail.gmail.com>
+ <20181018091606.GA20831@zn.tnic> <CAK7LNAQq7aE_2QYwqei7M9fg8Yen7-ucjz-t2E_hq2xkznKsQw@mail.gmail.com>
+ <20181018165057.GH20831@zn.tnic> <CAK7LNAQhbn-qZg_Bywk8rf0+oZhVbDjJ=PtcKGCL+k4Fp-ijSw@mail.gmail.com>
+In-Reply-To: <CAK7LNAQhbn-qZg_Bywk8rf0+oZhVbDjJ=PtcKGCL+k4Fp-ijSw@mail.gmail.com>
+From: Leonardo Bras <leobras.c@gmail.com>
+Date: Thu, 18 Oct 2018 23:50:57 -0300
+Message-ID: <CADvQ+rHRaoAME=tJBzkTg74K237SNm2hFN8mxFemDwa3CKQibA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Leonardo_Br=C3=A1s?= <leobras.c@gmail.com>
-Cc: helen@koikeco.de, lkcamp@lists.libreplanetbr.org, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Matthew Wilcox <willy6545@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Borislav Petkov <bp@alien8.de>, lkcamp@lists.libreplanetbr.org, Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Thu, Oct 18, 2018 at 11:04 AM Leonardo Bras <leobras.c@gmail.com> wrote:
->
-> Hello Helen,
->
-> On Wed, Oct 17, 2018 at 12:06 AM Helen Koike <helen@koikeco.de> wrote:
-> >
-> > Hi Leonardo,
-> >
-> > On 10/16/18 9:09 PM, Leonardo Br=C3=A1s wrote:
-> > >     Removes an unnecessary shadowed local variable (start).
-> > >     Optimize test of isdigit:
-> > >     - If isalpha returns true, isdigit will return false, so no need =
-to test.
-> >
-> > This patch does two different things, it should be in two separated pat=
-ches.
-> Sure, no problem.
->
-> >
-> > >
-> > > Signed-off-by: Leonardo Br=C3=A1s <leobras.c@gmail.com>
-> > > ---
-> > >  scripts/asn1_compiler.c | 7 +++----
-> > >  1 file changed, 3 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/scripts/asn1_compiler.c b/scripts/asn1_compiler.c
-> > > index c146020fc783..08bb6e5fd6ad 100644
-> > > --- a/scripts/asn1_compiler.c
-> > > +++ b/scripts/asn1_compiler.c
-> > > @@ -413,7 +413,7 @@ static void tokenise(char *buffer, char *end)
-> > >
-> > >                       /* Handle string tokens */
-> > >                       if (isalpha(*p)) {
-> > > -                             const char **dir, *start =3D p;
-> > > +                             const char **dir;
-> > >
-> > >                               /* Can be a directive, type name or ele=
-ment
-> > >                                * name.  Find the end of the name.
-> > > @@ -454,10 +454,9 @@ static void tokenise(char *buffer, char *end)
-> > >
-> > >                               tokens[tix++].token_type =3D TOKEN_TYPE=
-_NAME;
-> > >                               continue;
-> > > -                     }
-> > > +                     } else if (isdigit(*p)) {
-> > > +                             /* Handle numbers */
-> >
-> > Actually you can't do that, p is being altered in the first if statemen=
-t.
->
-> Yeah, you are right. I will remove this logic for v2.
+On Thu, Oct 18, 2018 at 11:42 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> Adding -Wshadow to KBUILD_HOSTCFLAGS emits another warning in Kconfig.
+> Of course, it is easy to fix.
+For v2, I already replaced '-Wshadow=local' for '-Wshadow' and fixed this
+warning.
 
+> But, I just started to think this option is a kind of harsh...
 
-I drop v1 from my tree.
+The v2 it's almost done. You think it will be useful, or should I drop it?
 
-Please send v2.
-
-
-> >
-> > >
-> > > -                     /* Handle numbers */
-> > > -                     if (isdigit(*p)) {
-> > >                               /* Find the end of the number */
-> > >                               q =3D p + 1;
-> > >                               while (q < nl && (isdigit(*q)))
-> > >
-> >
-> > Regards
-> > Helen
->
-> Thanks!
->
-> Leonardo Br=C3=A1s
-
-
-
---=20
-Best Regards
-Masahiro Yamada
+Regards,
+Leonardo Bras
