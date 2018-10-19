@@ -1,79 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:35463 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727189AbeJSUzh (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:47664 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727241AbeJSVD1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Oct 2018 16:55:37 -0400
-From: Du Changbin <changbin.du@gmail.com>
-Subject: [PATCH v2 2/4] kernel hacking: new config NO_AUTO_INLINE to disable compiler auto-inline optimizations
-Date: Fri, 19 Oct 2018 12:49:19 +0000
-Message-Id: <20181019124921.13780-3-changbin.du@gmail.com>
-In-Reply-To: <20181019124921.13780-1-changbin.du@gmail.com>
-References: <20181019124921.13780-1-changbin.du@gmail.com>
+        Fri, 19 Oct 2018 17:03:27 -0400
+MIME-Version: 1.0
+References: <20181019120952.32763-1-hch@lst.de> <20181019120952.32763-3-hch@lst.de>
+In-Reply-To: <20181019120952.32763-3-hch@lst.de>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 19 Oct 2018 21:56:34 +0900
+Message-ID: <CAK7LNATc54ZMaKLzabW=NqCQ+WSr-3C7PNAGL6OmOnQf_kgOyQ@mail.gmail.com>
+Subject: Re: [PATCH 2/9] arm: remove EISA kconfig option
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org
-Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Du Changbin <changbin.du@gmail.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: mporter@kernel.crashing.org, Alex Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-pci@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Russell King <linux@armlinux.org.uk>
 
-This patch add a new kernel hacking option NO_AUTO_INLINE. Selecting
-this option will prevent the compiler from optimizing the kernel by
-auto-inlining functions not marked with the inline keyword.
+On Fri, Oct 19, 2018 at 9:10 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> No arm config enables EISA, and arm does not include drivers/eisa/Kconfig
+> which provides support for things like PCI to EISA bridges, so it is most
+> likely dead.
+>
+> If this is wrong we will be able to resurrect it easily by selecting
+> HAVE_EISA for the right arm configs after this series.
 
-With this option, only functions explicitly marked with "inline" will
-be inlined. This will allow the function tracer to trace more functions
-because it only traces functions that the compiler has not inlined.
+What is your concern?
 
-Signed-off-by: Du Changbin <changbin.du@gmail.com>
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
----
- Makefile          |  6 ++++++
- lib/Kconfig.debug | 17 +++++++++++++++++
- 2 files changed, 23 insertions(+)
+This absolutely looks dead to me.
 
-diff --git a/Makefile b/Makefile
-index e8b599b4dcde..757d6507cb5c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -749,6 +749,12 @@ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
- 		   $(call cc-option,-fno-var-tracking)
- endif
- 
-+ifdef CONFIG_NO_AUTO_INLINE
-+KBUILD_CFLAGS   += $(call cc-option, -fno-inline-functions) \
-+		   $(call cc-option, -fno-inline-small-functions) \
-+		   $(call cc-option, -fno-inline-functions-called-once)
-+endif
-+
- ifdef CONFIG_FUNCTION_TRACER
- ifdef CONFIG_FTRACE_MCOUNT_RECORD
-   # gcc 5 supports generating the mcount tables directly
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 4966c4fbe7f7..c7c28ee01dfc 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -211,6 +211,23 @@ config GDB_SCRIPTS
- 	  instance. See Documentation/dev-tools/gdb-kernel-debugging.rst
- 	  for further details.
- 
-+config NO_AUTO_INLINE
-+	bool "Disable compiler auto-inline optimizations"
-+	help
-+	  This will prevent the compiler from optimizing the kernel by
-+	  auto-inlining functions not marked with the inline keyword.
-+	  With this option, only functions explicitly marked with
-+	  "inline" will be inlined. This will allow the function tracer
-+	  to trace more functions because it only traces functions that
-+	  the compiler has not inlined.
-+
-+	  Enabling this function can help debugging a kernel if using
-+	  the function tracer. But it can also change how the kernel
-+	  works, because inlining functions may change the timing,
-+	  which could make it difficult while debugging race conditions.
-+
-+	  If unsure, select N.
-+
- config ENABLE_MUST_CHECK
- 	bool "Enable __must_check logic"
- 	default y
+
+> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  arch/arm/Kconfig | 15 ---------------
+>  1 file changed, 15 deletions(-)
+>
+> diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+> index e8cd55a5b04c..e33735ce1c14 100644
+> --- a/arch/arm/Kconfig
+> +++ b/arch/arm/Kconfig
+> @@ -165,21 +165,6 @@ config HAVE_PROC_CPU
+>  config NO_IOPORT_MAP
+>         bool
+>
+> -config EISA
+> -       bool
+
+There is no prompt for this symbol.
+Hence, there is no way for a user to enable this directly.
+
+'select EISA' is the only way to enable it.
+
+git grep 'select EISA'
+gave no hit.
+
+So, we can say it is dead.
+
+
+
+
+
+> -       ---help---
+> -         The Extended Industry Standard Architecture (EISA) bus was
+> -         developed as an open alternative to the IBM MicroChannel bus.
+> -
+> -         The EISA bus provided some of the features of the IBM MicroChannel
+> -         bus while maintaining backward compatibility with cards made for
+> -         the older ISA bus.  The EISA bus saw limited use between 1988 and
+> -         1995 when it was made obsolete by the PCI bus.
+> -
+> -         Say Y here if you are building a kernel for an EISA-based machine.
+> -
+> -         Otherwise, say N.
+> -
+>  config SBUS
+>         bool
+
+
+
+I guess the situation is the same as powerpc.
+
+The difference between arm and powerpc is the presence of help.
+
+You fold the powerpc change in 9/9.
+
+
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
