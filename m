@@ -1,40 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw1-f66.google.com ([209.85.161.66]:43885 "EHLO
-        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726924AbeJSNYr (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:48608 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726816AbeJSOKE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Oct 2018 09:24:47 -0400
+        Fri, 19 Oct 2018 10:10:04 -0400
 MIME-Version: 1.0
-References: <20181017080201.10866-1-hch@lst.de> <20181017080201.10866-5-hch@lst.de>
-In-Reply-To: <20181017080201.10866-5-hch@lst.de>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 18 Oct 2018 22:19:51 -0700
-Message-ID: <CAMo8BfKOqAKLPEXatPZQ4bCAAzQLx_vAHscmxDJPC9PGsoJqtA@mail.gmail.com>
-Subject: Re: [PATCH 4/8] PCI: consolidate PCI config entry in drivers/pci
+References: <1539681053-24388-1-git-send-email-yamada.masahiro@socionext.com>
+ <1539681053-24388-3-git-send-email-yamada.masahiro@socionext.com>
+ <20181016142540.pxlwu3ft6n2b4pgj@treble> <CAK7LNARLW4NmeY0Rq19Bj_5kOFbp6YDtsUDhNaAfVXjL85cAMg@mail.gmail.com>
+ <20181016161536.pnek3dnyem6mspwr@treble>
+In-Reply-To: <20181016161536.pnek3dnyem6mspwr@treble>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 19 Oct 2018 15:04:22 +0900
+Message-ID: <CAK7LNASjcmdHx-ZYuGQBV7WckVPS-3Rp7gmjx5r7yyp3bOc_Sw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] objtool: move libelf check out of top Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, mporter@kernel.crashing.org, alex.bou9@gmail.com, linux@dominikbrodowski.net, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linuxppc-dev@lists.ozlabs.org
+To: Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, Bernd Edlinger <bernd.edlinger@hotmail.de>, Borislav Petkov <bp@suse.de>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi Christoph,
+Hi Josh,
 
-On Wed, Oct 17, 2018 at 1:03 AM Christoph Hellwig <hch@lst.de> wrote:
-> diff --git a/arch/xtensa/configs/iss_defconfig b/arch/xtensa/configs/iss_defconfig
-> index 4bb5b76d9524..818849bb7736 100644
-> --- a/arch/xtensa/configs/iss_defconfig
-> +++ b/arch/xtensa/configs/iss_defconfig
-> @@ -4,7 +4,7 @@ CONFIG_EXPERT=y
->  CONFIG_SYSCTL_SYSCALL=y
->  # CONFIG_IOSCHED_DEADLINE is not set
->  # CONFIG_IOSCHED_CFQ is not set
-> -# CONFIG_PCI is not set
-> +CONFIG_PCI=y
 
-This change doesn't make sense as there's no PCI hardware in the Xtensa ISS.
-Otherwise for the Xtensa part:
-Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+On Wed, Oct 17, 2018 at 1:16 AM Josh Poimboeuf <jpoimboe@redhat.com> wrote:
+>
+> On Wed, Oct 17, 2018 at 12:51:40AM +0900, Masahiro Yamada wrote:
+> > > ifdef CONFIG_UNWINDER_ORC
+> > >
+> > > chk_unwinder_orc = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
+> > > msg_unwinder_orc = "Cannot build objtool to generate ORC metadata for CONFIG_UNWINDER_ORC=y.  " \
+> > >                        "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
+> > > toolcheck-$(CONFIG_UNWINDER_ORC) += unwinder_orc
+> > >
+> > > else
+> > >
+> > > chk_stack_validation = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
+> > > msg_stack_validation = "Cannot build objtool for CONFIG_STACK_VALIDATION=y.  " \
+> > >                        "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
+> > > toolcheck-$(CONFIG_STACK_VALIDATION) += stack_validation
+> > >
+> > > endif
+> > >
+> > >
+> > > What do you think?
+> >
+> >
+> > It is ugly.
+> >
+> > Do you need such detailed information like ORC metadata stuff here?
+> >
+> > This Makefile aims to error out, showing why the build failed.
+> > That's it.
+>
+> Yeah, it is kind of ugly.  But the "showing why the build failed" part
+> is important.  I was trying to give the user a clear error message,
+> similar to what we have today.
+>
+> Without context, the user won't know what objtool is, or why it needs to
+> be built.
+>
+> If we have just a single error message for all cases, it should at least
+> mention the config option.  Like
+>
+>    "Cannot build objtool for CONFIG_STACK_VALIDATION."
+>
+> But then, most users will only have that enabled because of ORC.  So an
+> ORC-specific message would be more appropriate in most cases.
+>
+> So maybe it can just be something more vague:
+>
+> msg_stack_validation = "Cannot build objtool for CONFIG_UNWINDER_ORC and/or CONFIG_STACK_VALIDATION.  " \
+>                        "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
+>
+> That would probably be good enough.  Then we could drop the ugly ifdef.
+
+
+Fair point, but I am confused by the current
+STACK_VALIDATION / UNWINDER_ORC logic.
+
+In my understanding, objtool is
+an all-in-one object check/manipulation tool.
+
+STACK_VALIDATION and UNWINDER_ORC
+is a selection of a sub-command, 'check' or 'orc generate'.
+
+(Correct me if am wrong.)
+
+
+However, STACK_VALIDATION is still used to
+decide whether or not to compile the objtool.
+
+
+Adding a new symbol OBJTOOL would clarify the logic.
+
+
+
+config OBJTOOL
+        bool
+
+config STACK_VALIDATION
+        bool "Compile-time stack metadata validation"
+        depends on HAVE_STACK_VALIDATION
+        select OBJTOOL
+        ...
+
+
+config UNWINDER_ORC
+        bool "ORC unwinder"
+        depends on X86_64
+        select OBJTOOL
+        ...
+
+
+
 
 -- 
-Thanks.
--- Max
+Best Regards
+Masahiro Yamada
