@@ -1,120 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:48608 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726816AbeJSOKE (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Oct 2018 10:10:04 -0400
+Received: from verein.lst.de ([213.95.11.211]:43660 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726465AbeJSPEt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Oct 2018 11:04:49 -0400
+Date: Fri, 19 Oct 2018 09:00:01 +0200
+From: Christoph Hellwig <hch@lst.de>
+Subject: Re: move bus (PCI, PCMCIA, EISA, rapdio) config to drivers/ v2
+Message-ID: <20181019070001.GA30556@lst.de>
+References: <20181017080201.10866-1-hch@lst.de> <CAMuHMdWMtxxu8iivcnT=uWTMHsp=iSq_QzXqDWQut5OHwTU8Sg@mail.gmail.com>
 MIME-Version: 1.0
-References: <1539681053-24388-1-git-send-email-yamada.masahiro@socionext.com>
- <1539681053-24388-3-git-send-email-yamada.masahiro@socionext.com>
- <20181016142540.pxlwu3ft6n2b4pgj@treble> <CAK7LNARLW4NmeY0Rq19Bj_5kOFbp6YDtsUDhNaAfVXjL85cAMg@mail.gmail.com>
- <20181016161536.pnek3dnyem6mspwr@treble>
-In-Reply-To: <20181016161536.pnek3dnyem6mspwr@treble>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 19 Oct 2018 15:04:22 +0900
-Message-ID: <CAK7LNASjcmdHx-ZYuGQBV7WckVPS-3Rp7gmjx5r7yyp3bOc_Sw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] objtool: move libelf check out of top Makefile
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdWMtxxu8iivcnT=uWTMHsp=iSq_QzXqDWQut5OHwTU8Sg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, Bernd Edlinger <bernd.edlinger@hotmail.de>, Borislav Petkov <bp@suse.de>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Christoph Hellwig <hch@lst.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Matt Porter <mporter@kernel.crashing.org>, Alex Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-pci <linux-pci@vger.kernel.org>, scsi <linux-scsi@vger.kernel.org>, Linux-Arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-Hi Josh,
+On Wed, Oct 17, 2018 at 10:30:49AM +0200, Geert Uytterhoeven wrote:
+> Please use "git format-patch -v<N> --cover" to prepare patch series
+> for sending with git-send-email.
+> 
+>   "-v<N>" to prefix all patches with version number <N>,
+>   "--cover" to have a "[PATCH 0/<M>]" prefix in the cover letter.
 
-
-On Wed, Oct 17, 2018 at 1:16 AM Josh Poimboeuf <jpoimboe@redhat.com> wrote:
->
-> On Wed, Oct 17, 2018 at 12:51:40AM +0900, Masahiro Yamada wrote:
-> > > ifdef CONFIG_UNWINDER_ORC
-> > >
-> > > chk_unwinder_orc = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
-> > > msg_unwinder_orc = "Cannot build objtool to generate ORC metadata for CONFIG_UNWINDER_ORC=y.  " \
-> > >                        "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
-> > > toolcheck-$(CONFIG_UNWINDER_ORC) += unwinder_orc
-> > >
-> > > else
-> > >
-> > > chk_stack_validation = echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -
-> > > msg_stack_validation = "Cannot build objtool for CONFIG_STACK_VALIDATION=y.  " \
-> > >                        "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
-> > > toolcheck-$(CONFIG_STACK_VALIDATION) += stack_validation
-> > >
-> > > endif
-> > >
-> > >
-> > > What do you think?
-> >
-> >
-> > It is ugly.
-> >
-> > Do you need such detailed information like ORC metadata stuff here?
-> >
-> > This Makefile aims to error out, showing why the build failed.
-> > That's it.
->
-> Yeah, it is kind of ugly.  But the "showing why the build failed" part
-> is important.  I was trying to give the user a clear error message,
-> similar to what we have today.
->
-> Without context, the user won't know what objtool is, or why it needs to
-> be built.
->
-> If we have just a single error message for all cases, it should at least
-> mention the config option.  Like
->
->    "Cannot build objtool for CONFIG_STACK_VALIDATION."
->
-> But then, most users will only have that enabled because of ORC.  So an
-> ORC-specific message would be more appropriate in most cases.
->
-> So maybe it can just be something more vague:
->
-> msg_stack_validation = "Cannot build objtool for CONFIG_UNWINDER_ORC and/or CONFIG_STACK_VALIDATION.  " \
->                        "Please install libelf-dev, libelf-devel or elfutils-libelf-devel."
->
-> That would probably be good enough.  Then we could drop the ugly ifdef.
-
-
-Fair point, but I am confused by the current
-STACK_VALIDATION / UNWINDER_ORC logic.
-
-In my understanding, objtool is
-an all-in-one object check/manipulation tool.
-
-STACK_VALIDATION and UNWINDER_ORC
-is a selection of a sub-command, 'check' or 'orc generate'.
-
-(Correct me if am wrong.)
-
-
-However, STACK_VALIDATION is still used to
-decide whether or not to compile the objtool.
-
-
-Adding a new symbol OBJTOOL would clarify the logic.
-
-
-
-config OBJTOOL
-        bool
-
-config STACK_VALIDATION
-        bool "Compile-time stack metadata validation"
-        depends on HAVE_STACK_VALIDATION
-        select OBJTOOL
-        ...
-
-
-config UNWINDER_ORC
-        bool "ORC unwinder"
-        depends on X86_64
-        select OBJTOOL
-        ...
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+We had that discussion before and I strongly disagree with messing
+up the subject lines like that.  The git-send-email defaults are
+perfectly fine.
