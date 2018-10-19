@@ -1,36 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:41244 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725934AbeJSKzL (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:54322 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726542AbeJSMvw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Oct 2018 06:55:11 -0400
+        Fri, 19 Oct 2018 08:51:52 -0400
 MIME-Version: 1.0
-References: <20181017000809.GA21292@WindFlash> <20181017081115.GA22535@zn.tnic>
- <CAK7LNASVn7CB5uL9tCtNC2u4Ary5eb-vyiB_sS2ey5AZNweKAA@mail.gmail.com>
- <20181017083126.GB22535@zn.tnic> <CADvQ+rFa=XEuxLb=yPmtJE2QepBNjCVzjEY5urVzCaSF1tJBYw@mail.gmail.com>
- <20181018091606.GA20831@zn.tnic> <CAK7LNAQq7aE_2QYwqei7M9fg8Yen7-ucjz-t2E_hq2xkznKsQw@mail.gmail.com>
- <20181018165057.GH20831@zn.tnic> <CAK7LNAQhbn-qZg_Bywk8rf0+oZhVbDjJ=PtcKGCL+k4Fp-ijSw@mail.gmail.com>
-In-Reply-To: <CAK7LNAQhbn-qZg_Bywk8rf0+oZhVbDjJ=PtcKGCL+k4Fp-ijSw@mail.gmail.com>
-From: Leonardo Bras <leobras.c@gmail.com>
-Date: Thu, 18 Oct 2018 23:50:57 -0300
-Message-ID: <CADvQ+rHRaoAME=tJBzkTg74K237SNm2hFN8mxFemDwa3CKQibA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
+References: <20181017080201.10866-1-hch@lst.de> <20181017080201.10866-8-hch@lst.de>
+In-Reply-To: <20181017080201.10866-8-hch@lst.de>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 19 Oct 2018 13:46:50 +0900
+Message-ID: <CAK7LNAT0pzpMZC+X5KiofPCUH89hr716WCKQkNYronQa3byT9w@mail.gmail.com>
+Subject: Re: [PATCH 7/8] eisa: consolidate EISA Kconfig entry in drivers/eisa
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Borislav Petkov <bp@alien8.de>, lkcamp@lists.libreplanetbr.org, Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Christoph Hellwig <hch@lst.de>
+Cc: mporter@kernel.crashing.org, Alex Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-pci@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-On Thu, Oct 18, 2018 at 11:42 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Adding -Wshadow to KBUILD_HOSTCFLAGS emits another warning in Kconfig.
-> Of course, it is easy to fix.
-For v2, I already replaced '-Wshadow=local' for '-Wshadow' and fixed this
-warning.
+On Wed, Oct 17, 2018 at 5:03 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Let architectures opt into EISA support by selecting HAS_EISA and
+> handle everything else in drivers/eisa.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
 
-> But, I just started to think this option is a kind of harsh...
 
-The v2 it's almost done. You think it will be useful, or should I drop it?
+> index 60e37b9a715d..c90a1a4d6079 100644
+> --- a/arch/arm/Kconfig
+> +++ b/arch/arm/Kconfig
+> @@ -59,6 +59,7 @@ config ARM
+>         select HAVE_ARCH_TRACEHOOK
+>         select HAVE_ARM_SMCCC if CPU_V7
+>         select HAVE_EBPF_JIT if !CPU_ENDIAN_BE32
+> +       select HAVE_EISA
 
-Regards,
-Leonardo Bras
+I doubt this.
+
+arch/arm/Kconfig previously did not include
+driver/eisa/Kconfig.
+
+No ARM platform enabled CONFIG_EISA either.
+
+
+>         select HAVE_CONTEXT_TRACKING
+>         select HAVE_C_RECORDMCOUNT
+>         select HAVE_DEBUG_KMEMLEAK
+> @@ -162,21 +163,6 @@ config HAVE_PROC_CPU
+>  config NO_IOPORT_MAP
+>         bool
+>
+> -config EISA
+> -       bool
+> -       ---help---
+> -         The Extended Industry Standard Architecture (EISA) bus was
+> -         developed as an open alternative to the IBM MicroChannel bus.
+> -
+> -         The EISA bus provided some of the features of the IBM MicroChannel
+> -         bus while maintaining backward compatibility with cards made for
+> -         the older ISA bus.  The EISA bus saw limited use between 1988 and
+> -         1995 when it was made obsolete by the PCI bus.
+> -
+> -         Say Y here if you are building a kernel for an EISA-based machine.
+> -
+> -         Otherwise, say N.
+> -
+>  config SBUS
+>         bool
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
