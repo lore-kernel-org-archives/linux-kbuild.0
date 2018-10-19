@@ -1,59 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay8-d.mail.gandi.net ([217.70.183.201]:57849 "EHLO
-        relay8-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726664AbeJSXRD (ORCPT
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:35610 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727160AbeJTCZe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Oct 2018 19:17:03 -0400
-Date: Fri, 19 Oct 2018 08:10:23 -0700
-From: Josh Triplett <josh@joshtriplett.org>
-Subject: Re: [PATCH 5/9] powerpc: PCI_MSI needs PCI
-Message-ID: <20181019151019.GA5618@localhost>
-References: <20181019120952.32763-1-hch@lst.de>
- <20181019120952.32763-6-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181019120952.32763-6-hch@lst.de>
+        Fri, 19 Oct 2018 22:25:34 -0400
+Received: by mail-pf1-f195.google.com with SMTP id l17-v6so16833813pff.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 19 Oct 2018 11:18:23 -0700 (PDT)
+Date: Fri, 19 Oct 2018 11:18:22 -0700 (PDT)
+Subject: Re: [PATCH 6/9] PCI: consolidate PCI config entry in drivers/pci
+In-Reply-To: <20181019120952.32763-7-hch@lst.de>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-153e4e0b-8fe9-4712-849f-f01455ef56f4@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Christoph Hellwig <hch@lst.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Matt Porter <mporter@kernel.crashing.org>, Alexandre Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc: yamada.masahiro@socionext.com, mporter@kernel.crashing.org, alex.bou9@gmail.com, linux@dominikbrodowski.net, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-On Fri, Oct 19, 2018 at 02:09:48PM +0200, Christoph Hellwig wrote:
-> Various powerpc boards select the PCI_MSI config option without selecting
-> PCI, resulting in potentially not compilable configurations if the by
-> default enabled PCI option is disabled.  Explicitly select PCI to ensure
-> we always have valid configs.
-[...]
-> --- a/arch/powerpc/platforms/44x/Kconfig
-> +++ b/arch/powerpc/platforms/44x/Kconfig
-> @@ -24,6 +24,7 @@ config BLUESTONE
->  	default n
->  	select PPC44x_SIMPLE
->  	select APM821xx
-> +	select PCI
->  	select PCI_MSI
->  	select PPC4xx_MSI
->  	select PPC4xx_PCI_EXPRESS
-> @@ -78,6 +79,7 @@ config KATMAI
->  	select 440SPe
->  	select PCI
->  	select PPC4xx_PCI_EXPRESS
-> +	select PCI
->  	select PCI_MSI
+On Fri, 19 Oct 2018 05:09:49 PDT (-0700), Christoph Hellwig wrote:
+> There is no good reason to duplicate the PCI menu in every architecture.
+> Instead provide a selectable HAVE_PCI symbol that indicates availability
+> of PCI support and the handle the rest in drivers/pci.
+>
+> Note that for powerpc we now select HAVE_PCI globally instead of the
+> convoluted mess of conditional or or non-conditional support per board,
+> similar to what we do e.g. on x86.  For alpha PCI is selected for the
+> non-jensen configs as it was the default before, and a lot of code does
+> not compile without PCI enabled.  On other architectures with limited
+> PCI support that wasn't as complicated I've left the selection as-is.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+> Acked-by: Thomas Gleixner <tglx@linutronix.de>
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 
-This case already had PCI selected a couple of lines above.
+...
 
->  	select PPC4xx_MSI
->  	help
-> @@ -219,6 +221,7 @@ config AKEBONO
->  	select SWIOTLB
->  	select 476FPE
->  	select PPC4xx_PCI_EXPRESS
-> +	select PCI
->  	select PCI_MSI
->  	select PPC4xx_HSTA_MSI
->  	select I2C
-> -- 
-> 2.19.1
-> 
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index a344980287a5..071952cd4cae 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -39,8 +39,10 @@ config RISCV
+>  	select SPARSE_IRQ
+>  	select SYSCTL_EXCEPTION_TRACE
+>  	select HAVE_ARCH_TRACEHOOK
+> +	select HAVE_PCI
+>  	select MODULES_USE_ELF_RELA if MODULES
+>  	select THREAD_INFO_IN_TASK
+> +	select PCI_MSI if PCI
+>  	select RISCV_TIMER
+>  	select GENERIC_IRQ_MULTI_HANDLER
+>  	select ARCH_HAS_PTE_SPECIAL
+> @@ -216,28 +218,12 @@ source "kernel/Kconfig.hz"
+>
+>  endmenu
+>
+> -menu "Bus support"
+> -
+> -config PCI
+> -	bool "PCI support"
+> -	select PCI_MSI
+> -	help
+> -	  This feature enables support for PCI bus system. If you say Y
+> -	  here, the kernel will include drivers and infrastructure code
+> -	  to support PCI bus devices.
+> -
+> -	  If you don't know what to do here, say Y.
+> -
+>  config PCI_DOMAINS
+>  	def_bool PCI
+>
+>  config PCI_DOMAINS_GENERIC
+>  	def_bool PCI
+>
+> -source "drivers/pci/Kconfig"
+> -
+> -endmenu
+> -
+>  menu "Power management options"
+>
+>  source kernel/power/Kconfig
+
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+
+I'm assuming this will go in via PCI tree of some sort, so I'm not going to 
+touch it any further.
+
+Thanks for cleaning this up!
