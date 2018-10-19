@@ -1,161 +1,125 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:50086 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726867AbeJSU2e (ORCPT
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:45710 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727387AbeJSUza (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Oct 2018 16:28:34 -0400
-Date: Fri, 19 Oct 2018 13:22:28 +0100
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH 6/9] PCI: consolidate PCI config entry in drivers/pci
-Message-ID: <20181019122228.GJ30658@n2100.armlinux.org.uk>
-References: <20181019120952.32763-1-hch@lst.de>
- <20181019120952.32763-7-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181019120952.32763-7-hch@lst.de>
+        Fri, 19 Oct 2018 16:55:30 -0400
+From: Du Changbin <changbin.du@gmail.com>
+Subject: [PATCH v2 0/4] kernel hacking: GCC optimization for better debug experience (-Og)
+Date: Fri, 19 Oct 2018 12:49:17 +0000
+Message-Id: <20181019124921.13780-1-changbin.du@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arch@vger.kernel.org, linux-scsi@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, Dominik Brodowski <linux@dominikbrodowski.net>, Alexandre Bounine <alex.bou9@gmail.com>, Matt Porter <mporter@kernel.crashing.org>, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org
+Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Du Changbin <changbin.du@gmail.com>
 
-On Fri, Oct 19, 2018 at 02:09:49PM +0200, Christoph Hellwig wrote:
-> diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-> index e33735ce1c14..7495d0a0aa31 100644
-> --- a/arch/arm/Kconfig
-> +++ b/arch/arm/Kconfig
-> @@ -149,9 +149,6 @@ config ARM_DMA_IOMMU_ALIGNMENT
->  
->  endif
->  
-> -config MIGHT_HAVE_PCI
-> -	bool
-> -
->  config SYS_SUPPORTS_APM_EMULATION
->  	bool
->  
-> @@ -320,7 +317,7 @@ config ARCH_MULTIPLATFORM
->  	select COMMON_CLK
->  	select GENERIC_CLOCKEVENTS
->  	select GENERIC_IRQ_MULTI_HANDLER
-> -	select MIGHT_HAVE_PCI
-> +	select HAVE_PCI
->  	select PCI_DOMAINS if PCI
->  	select SPARSE_IRQ
->  	select USE_OF
-> @@ -436,7 +433,7 @@ config ARCH_IXP4XX
->  	select DMABOUNCE if PCI
->  	select GENERIC_CLOCKEVENTS
->  	select GPIOLIB
-> -	select MIGHT_HAVE_PCI
-> +	select HAVE_PCI
->  	select NEED_MACH_IO_H
->  	select USB_EHCI_BIG_ENDIAN_DESC
->  	select USB_EHCI_BIG_ENDIAN_MMIO
-> @@ -449,7 +446,7 @@ config ARCH_DOVE
->  	select GENERIC_CLOCKEVENTS
->  	select GENERIC_IRQ_MULTI_HANDLER
->  	select GPIOLIB
-> -	select MIGHT_HAVE_PCI
-> +	select HAVE_PCI
->  	select MVEBU_MBUS
->  	select PINCTRL
->  	select PINCTRL_DOVE
-> @@ -1216,14 +1213,6 @@ config ISA_DMA
->  config ISA_DMA_API
->  	bool
->  
-> -config PCI
-> -	bool "PCI support" if MIGHT_HAVE_PCI
-> -	help
-> -	  Find out whether you have a PCI motherboard. PCI is the name of a
-> -	  bus system, i.e. the way the CPU talks to the other stuff inside
-> -	  your box. Other bus systems are ISA, EISA, MicroChannel (MCA) or
-> -	  VESA. If you have PCI, say Y, otherwise N.
-> -
->  config PCI_DOMAINS
->  	bool "Support for multiple PCI domains"
->  	depends on PCI
-> @@ -1252,8 +1241,6 @@ config PCI_HOST_ITE8152
->  	default y
->  	select DMABOUNCE
->  
-> -source "drivers/pci/Kconfig"
-> -
->  source "drivers/pcmcia/Kconfig"
->  
->  endmenu
-> diff --git a/arch/arm/mach-ks8695/Kconfig b/arch/arm/mach-ks8695/Kconfig
-> index a545976bdbd6..b3185c05fffa 100644
-> --- a/arch/arm/mach-ks8695/Kconfig
-> +++ b/arch/arm/mach-ks8695/Kconfig
-> @@ -4,7 +4,7 @@ menu "Kendin/Micrel KS8695 Implementations"
->  
->  config MACH_KS8695
->  	bool "KS8695 development board"
-> -	select MIGHT_HAVE_PCI
-> +	select HAVE_PCI
->  	help
->  	  Say 'Y' here if you want your kernel to run on the original
->  	  Kendin-Micrel KS8695 development board.
-> @@ -52,7 +52,7 @@ config MACH_CM4002
->  
->  config MACH_CM4008
->  	bool "OpenGear CM4008"
-> -	select MIGHT_HAVE_PCI
-> +	select HAVE_PCI
->  	help
->  	  Say 'Y' here if you want your kernel to support the OpenGear
->  	  CM4008 Console Server. See http://www.opengear.com for more
-> @@ -60,7 +60,7 @@ config MACH_CM4008
->  
->  config MACH_CM41xx
->  	bool "OpenGear CM41xx"
-> -	select MIGHT_HAVE_PCI
-> +	select HAVE_PCI
->  	help
->  	  Say 'Y' here if you want your kernel to support the OpenGear
->  	  CM4016 or CM4048 Console Servers. See http://www.opengear.com for
-> @@ -68,7 +68,7 @@ config MACH_CM41xx
->  
->  config MACH_IM4004
->  	bool "OpenGear IM4004"
-> -	select MIGHT_HAVE_PCI
-> +	select HAVE_PCI
->  	help
->  	  Say 'Y' here if you want your kernel to support the OpenGear
->  	  IM4004 Secure Access Server. See http://www.opengear.com for
-> @@ -76,7 +76,7 @@ config MACH_IM4004
->  
->  config MACH_IM42xx
->  	bool "OpenGear IM42xx"
-> -	select MIGHT_HAVE_PCI
-> +	select HAVE_PCI
->  	help
->  	  Say 'Y' here if you want your kernel to support the OpenGear
->  	  IM4216 or IM4248 Console Servers. See http://www.opengear.com for
-> diff --git a/arch/arm/mach-pxa/Kconfig b/arch/arm/mach-pxa/Kconfig
-> index a68b34183107..b185794549be 100644
-> --- a/arch/arm/mach-pxa/Kconfig
-> +++ b/arch/arm/mach-pxa/Kconfig
-> @@ -125,7 +125,7 @@ config MACH_ARMCORE
->  	bool "CompuLab CM-X255/CM-X270 modules"
->  	select ARCH_HAS_DMA_SET_COHERENT_MASK if PCI
->  	select IWMMXT
-> -	select MIGHT_HAVE_PCI
-> +	select HAVE_PCI
->  	select NEED_MACH_IO_H if PCI
->  	select PXA25x
->  	select PXA27x
+Hi all,
+I have posted this series several months ago but interrupted by personal
+affairs. Now I get time to complete this task. Thanks for all of the
+reviewers.
 
-This is wrong.  "MIGHT_HAVE_PCI" is _not_ the same as "HAVE_PCI" - we
-have a bunch of platforms that mandatorily have PCI and these select
-PCI directly.  "MIGHT_HAVE_PCI" controls the _visibility_ of the PCI
-menu option, but does not prevent it being selected.  Your patch will
-cause Kconfig to complain for those which mandatorily have PCI but
-do not set HAVE_PCI.
+I know some kernel developers was searching for a method to dissable GCC
+optimizations, probably they want to apply GCC '-O0' option. But since Linux
+kernel relies on GCC optimization to remove some dead code, so '-O0' just
+breaks the build. They do need this because they want to debug kernel with
+qemu, simics, kgtp or kgdb.
+
+Thanks for the GCC '-Og' optimization level introduced in GCC 4.8, which
+offers a reasonable level of optimization while maintaining fast compilation
+and a good debugging experience. It is similar to '-O1' while perferring to
+keep debug ability over runtime speed. With '-Og', we can build a kernel with
+better debug ability and little performance drop after some simple change.
+
+In this series, firstly introduce a new config CONFIG_NO_AUTO_INLINE after two
+fixes for this new option. With this option, only functions explicitly marked
+with "inline" will  be inlined. This will allow the function tracer to trace
+more functions because it only traces functions that the compiler has not
+inlined.
+
+Then introduce new config CC_OPTIMIZE_FOR_DEBUGGING which apply '-Og'
+optimization level for whole kernel, with a simple fix in fix_to_virt().
+Currently I have only tested this option on x86 and ARM platform. Other
+platforms should also work but probably need some compiling fixes as what
+having done in this series. I leave that to who want to try this debug
+option.
+
+Comparison of vmlinux size: a bit smaller.
+
+    w/o CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ size vmlinux
+       text    data     bss     dec     hex filename
+    22665554   9709674  2920908 35296136        21a9388 vmlinux
+
+    w/ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ size vmlinux
+       text    data     bss     dec     hex filename
+    21499032   10102758 2920908 34522698        20ec64a vmlinux
+
+
+Comparison of system performance: a bit drop (~6%).
+    This benchmark of kernel compilation is suggested by Ingo Molnar.
+    https://lkml.org/lkml/2018/5/2/74
+
+    Preparation: Set cpufreq to 'performance'.
+    for ((cpu=0; cpu<120; cpu++)); do
+      G=/sys/devices/system/cpu/cpu$cpu/cpufreq/scaling_governor
+      [ -f $G ] && echo performance > $G
+    done
+
+    w/o CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ perf stat --repeat 5 --null --pre                 '\
+        cp -a kernel ../kernel.copy.$(date +%s);         \
+        rm -rf *;                                        \
+        git checkout .;                                  \
+        echo 1 > /proc/sys/vm/drop_caches;               \
+        find ../kernel* -type f | xargs cat >/dev/null;  \
+        make -j kernel >/dev/null;                       \
+        make clean >/dev/null 2>&1;                      \
+        sync                                            '\
+                                                         \
+        make -j8 >/dev/null
+
+     Performance counter stats for 'make -j8' (5 runs):
+
+        219.764246652 seconds time elapsed                   ( +-  0.78% )
+
+    w/ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ perf stat --repeat 5 --null --pre                 '\
+        cp -a kernel ../kernel.copy.$(date +%s);         \
+        rm -rf *;                                        \
+        git checkout .;                                  \
+        echo 1 > /proc/sys/vm/drop_caches;               \
+        find ../kernel* -type f | xargs cat >/dev/null;  \
+        make -j kernel >/dev/null;                       \
+        make clean >/dev/null 2>&1;                      \
+        sync                                            '\
+                                                         \
+        make -j8 >/dev/null
+
+    Performance counter stats for 'make -j8' (5 runs):
+
+         233.574187771 seconds time elapsed                  ( +-  0.19% )
+
+
+Du Changbin (4):
+  x86/mm: surround level4_kernel_pgt with #ifdef
+    CONFIG_X86_5LEVEL...#endif
+  kernel hacking: new config NO_AUTO_INLINE to disable compiler
+    auto-inline optimizations
+  ARM: mm: fix build error in fix_to_virt with
+    CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+  kernel hacking: new config CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og
+    optimization
+
+ Makefile                          | 11 +++++++++++
+ arch/arm/mm/mmu.c                 |  2 +-
+ arch/x86/include/asm/pgtable_64.h |  2 ++
+ arch/x86/kernel/head64.c          | 13 ++++++-------
+ include/linux/compiler-gcc.h      |  2 +-
+ include/linux/compiler.h          |  2 +-
+ init/Kconfig                      | 19 +++++++++++++++++++
+ lib/Kconfig.debug                 | 17 +++++++++++++++++
+ 8 files changed, 58 insertions(+), 10 deletions(-)
 
 -- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 12.1Mbps down 622kbps up
-According to speedtest.net: 11.9Mbps down 500kbps up
+2.17.1
