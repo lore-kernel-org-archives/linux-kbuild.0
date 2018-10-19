@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:44462 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:44702 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726784AbeJSUQM (ORCPT
+        with ESMTP id S1726784AbeJSUQW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Oct 2018 16:16:12 -0400
+        Fri, 19 Oct 2018 16:16:22 -0400
 From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 3/9] powerpc: remove CONFIG_PCI_QSPAN
-Date: Fri, 19 Oct 2018 14:09:46 +0200
-Message-Id: <20181019120952.32763-4-hch@lst.de>
+Subject: [PATCH 5/9] powerpc: PCI_MSI needs PCI
+Date: Fri, 19 Oct 2018 14:09:48 +0200
+Message-Id: <20181019120952.32763-6-hch@lst.de>
 In-Reply-To: <20181019120952.32763-1-hch@lst.de>
 References: <20181019120952.32763-1-hch@lst.de>
 MIME-Version: 1.0
@@ -17,40 +17,57 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Matt Porter <mporter@kernel.crashing.org>, Alexandre Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-This option isn't actually used anywhere.
+Various powerpc boards select the PCI_MSI config option without selecting
+PCI, resulting in potentially not compilable configurations if the by
+default enabled PCI option is disabled.  Explicitly select PCI to ensure
+we always have valid configs.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Acked-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- arch/powerpc/Kconfig | 9 ---------
- 1 file changed, 9 deletions(-)
+ arch/powerpc/platforms/40x/Kconfig | 1 +
+ arch/powerpc/platforms/44x/Kconfig | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index a80669209155..e8c8970248bc 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -955,7 +955,6 @@ config PCI
- 	bool "PCI support" if PPC_PCI_CHOICE
- 	default y if !40x && !CPM2 && !PPC_8xx && !PPC_83xx \
- 		&& !PPC_85xx && !PPC_86xx && !GAMECUBE_COMMON
--	default PCI_QSPAN if PPC_8xx
- 	select GENERIC_PCI_IOMAP
+diff --git a/arch/powerpc/platforms/40x/Kconfig b/arch/powerpc/platforms/40x/Kconfig
+index 60254a321a91..d5361e63e0bb 100644
+--- a/arch/powerpc/platforms/40x/Kconfig
++++ b/arch/powerpc/platforms/40x/Kconfig
+@@ -33,6 +33,7 @@ config KILAUEA
+ 	select 405EX
+ 	select PPC40x_SIMPLE
+ 	select PPC4xx_PCI_EXPRESS
++	select PCI
+ 	select PCI_MSI
+ 	select PPC4xx_MSI
  	help
- 	  Find out whether your system includes a PCI bus. PCI is the name of
-@@ -969,14 +968,6 @@ config PCI_DOMAINS
- config PCI_SYSCALL
- 	def_bool PCI
- 
--config PCI_QSPAN
--	bool "QSpan PCI"
--	depends on PPC_8xx
--	select PPC_I8259
--	help
--	  Say Y here if you have a system based on a Motorola 8xx-series
--	  embedded processor with a QSPAN PCI interface, otherwise say N.
--
- config PCI_8260
- 	bool
- 	depends on PCI && 8260
+diff --git a/arch/powerpc/platforms/44x/Kconfig b/arch/powerpc/platforms/44x/Kconfig
+index a6011422b861..70856a213663 100644
+--- a/arch/powerpc/platforms/44x/Kconfig
++++ b/arch/powerpc/platforms/44x/Kconfig
+@@ -24,6 +24,7 @@ config BLUESTONE
+ 	default n
+ 	select PPC44x_SIMPLE
+ 	select APM821xx
++	select PCI
+ 	select PCI_MSI
+ 	select PPC4xx_MSI
+ 	select PPC4xx_PCI_EXPRESS
+@@ -78,6 +79,7 @@ config KATMAI
+ 	select 440SPe
+ 	select PCI
+ 	select PPC4xx_PCI_EXPRESS
++	select PCI
+ 	select PCI_MSI
+ 	select PPC4xx_MSI
+ 	help
+@@ -219,6 +221,7 @@ config AKEBONO
+ 	select SWIOTLB
+ 	select 476FPE
+ 	select PPC4xx_PCI_EXPRESS
++	select PCI
+ 	select PCI_MSI
+ 	select PPC4xx_HSTA_MSI
+ 	select I2C
 -- 
 2.19.1
