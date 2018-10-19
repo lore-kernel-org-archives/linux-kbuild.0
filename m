@@ -1,12 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([5.9.137.197]:59606 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726609AbeJSQOT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Oct 2018 12:14:19 -0400
-Date: Fri, 19 Oct 2018 10:08:53 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH 1/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
-Message-ID: <20181019080853.GA28610@zn.tnic>
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:22885 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726609AbeJSTd7 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Oct 2018 15:33:59 -0400
+From: David Laight <David.Laight@ACULAB.COM>
+Subject: RE: [PATCH 1/4] Adds -Wshadow=local on KBUILD_HOSTCFLAGS
+Date: Fri, 19 Oct 2018 11:28:19 +0000
+Message-ID: <7b87404e2a0347968013e024e52e4cb2@AcuMS.aculab.com>
 References: <20181017000809.GA21292@WindFlash>
  <20181017081115.GA22535@zn.tnic>
  <CAK7LNASVn7CB5uL9tCtNC2u4Ary5eb-vyiB_sS2ey5AZNweKAA@mail.gmail.com>
@@ -14,29 +15,41 @@ References: <20181017000809.GA21292@WindFlash>
  <CADvQ+rFa=XEuxLb=yPmtJE2QepBNjCVzjEY5urVzCaSF1tJBYw@mail.gmail.com>
  <20181018091606.GA20831@zn.tnic>
  <CAK7LNAQq7aE_2QYwqei7M9fg8Yen7-ucjz-t2E_hq2xkznKsQw@mail.gmail.com>
- <20181018165057.GH20831@zn.tnic>
- <CAK7LNAQhbn-qZg_Bywk8rf0+oZhVbDjJ=PtcKGCL+k4Fp-ijSw@mail.gmail.com>
+In-Reply-To: <CAK7LNAQq7aE_2QYwqei7M9fg8Yen7-ucjz-t2E_hq2xkznKsQw@mail.gmail.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQhbn-qZg_Bywk8rf0+oZhVbDjJ=PtcKGCL+k4Fp-ijSw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Leonardo =?utf-8?B?QnLDoXM=?= <leobras.c@gmail.com>, lkcamp@lists.libreplanetbr.org, Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: 'Masahiro Yamada' <yamada.masahiro@socionext.com>, Borislav Petkov <bp@alien8.de>
+Cc: =?utf-8?B?TGVvbmFyZG8gQnLDoXM=?= <leobras.c@gmail.com>, "lkcamp@lists.libreplanetbr.org" <lkcamp@lists.libreplanetbr.org>, Matthew Wilcox <willy6545@gmail.com>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, Oct 19, 2018 at 11:41:31AM +0900, Masahiro Yamada wrote:
-> Adding -Wshadow to KBUILD_HOSTCFLAGS emits another warning in Kconfig.
-> Of course, it is easy to fix.
-> But, I just started to think this option is a kind of harsh...
-
-What is more, if we added -Wshadow to KBUILD_HOSTCFLAGS, then there'll
-be a difference in build options between host and target kernel in that
-the host kernel build will be stricter wrt shadowing. Thus, it is a
-maintainer decision, IMHO.
-
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+RnJvbTogTWFzYWhpcm8gWWFtYWRhDQo+IFNlbnQ6IDE4IE9jdG9iZXIgMjAxOCAxNzozOQ0KPiAN
+Cj4gT24gVGh1LCBPY3QgMTgsIDIwMTggYXQgNjoxOCBQTSBCb3Jpc2xhdiBQZXRrb3YgPGJwQGFs
+aWVuOC5kZT4gd3JvdGU6DQo+ID4NCj4gPiBPbiBXZWQsIE9jdCAxNywgMjAxOCBhdCAwOTo0MDo1
+M1BNIC0wMzAwLCBMZW9uYXJkbyBCcmFzIHdyb3RlOg0KPiA+ID4gVGhlIGlkZWEgd2FzIHRvIHB1
+dCBpdCBhcyBkZWZhdWx0IGFuZCBmaXggYWxsIHRoZSBzaGFkb3dpbmcgd2FybmluZ3MuDQo+ID4g
+PiBXaGF0IGRvIHlvdSB0aGluaz8gIEkgYW0gb3BlbiB0byBzdWdnZXN0aW9ucy4NCj4gPg0KPiA+
+IFRoYXQncyBNYXNhaGlybydzIGNhbGwuIEluIHRoZSByZXN0IG9mIHRoZSBrZXJuZWwsIHRob3Nl
+IHdhcm5pbmdzIGFyZSBiZWhpbmQNCj4gPiB0aGUgVz0yIHN3aXRjaCAtIGkuZS4sIG5vdCBlbmFi
+bGVkIGJ5IGRlZmF1bHQuDQo+IA0KPiANCj4gSXQgaXMgbm90IHJlYWxpc3RpYyB0byBlbmFibGUg
+dGhpcyB3YXJuaW5nIG9wdGlvbiBieSBkZWZhdWx0Lg0KPiBFdmVuIC1Xc2hhZG93PWxvY2FsIGVt
+aXRzIHRvbnMgb2Ygd2FybmluZ3MuDQo+IChNb3JlIHdpdGggLVdzaGFkb3cpDQoNClRoZSBxdWVz
+dGlvbiBpcywgaG93IG1hbnkgb2YgdGhlbSBhcmUgYWN0dWFsIGJ1Z3MuDQpJTUhPIC1Xc2hhZG93
+IGlzIGEgZ29vZCBpZGVhLg0KDQo+IFRoZSBwcm9ibGVtIG9mIHRoaXMgZmxhZyBpcywNCj4gaXQg
+aXMgZmFsc2UgcG9zaXRpdmUgaW4gbWFjcm8gZXhwYW5zaW9ucy4NCg0KUmlnaHQsIGJ1dCBtYWNy
+byBleHBhbnNpb25zIGluc2lkZSBtYWNybyBkZWZpbml0aW9ucyBjb3VsZCBhY2NpZGVudGFsbHkN
+CnVzZSB0aGUgc2FtZSBsb2NhbCB2YXJpYWJsZSAtIGxlYWRpbmcgdG8gY2hvYXMuDQoNCj4gRm9y
+IGV4YW1wbGUsIEkgdGhpbmsgdGhlIGZvbGxvd2luZyBpcyBhIGxlZ2l0aW1hdGUgY2FzZS4NCi4u
+Lg0KPiBhcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYzo3MTM6Mjogbm90ZTogaW4gZXhwYW5zaW9u
+IG9mIG1hY3JvIOKAmHdyaXRlX3N5c3JlZ+KAmQ0KPiAgIHdyaXRlX3N5c3JlZyhyZWFkX3N5c3Jl
+ZyhDUEFDUl9FTDEpIHwgQ1BBQ1JfRUwxX1pFTl9FTDFFTiwgQ1BBQ1JfRUwxKTsNCj4gICBefn5+
+fn5+fn5+fn4NCg0KRWFzaWx5IGZpeGVkIGJ5IHVzaW5nIGRpZmZlcmVudCBuYW1lZCB0ZW1wb3Jh
+cmllcyBpbiB0aGUgdHdvIG1hY3Jvcy4NClRoZXJlIHByb2JhYmx5IGFyZW4ndCB0aGF0IG1hbnkg
+bWFjcm8gcGFpcnMgd2hlcmUgdGhhdCBoYXBwZW5zLg0KRXNwZWNpYWxseSBzaW5jZSBtYW55IGFy
+ZSBub3cgaW5saW5lZCBmdW5jdGlvbnMuDQoNCkl0IG1pZ2h0IGJlIHRoYXQgYSBzbWFsbCBudW1i
+ZXIgb2YgY2hhbmdlcyBnZXQgcmlkIG9mIG1vc3Qgb2YgdGhlIHdhcm5pbmdzLg0KDQoJRGF2aWQN
+Cg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZh
+cm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYg
+KFdhbGVzKQ0K
