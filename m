@@ -1,113 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44438 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727321AbeJTVaN (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:56421 "EHLO
+        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727341AbeJTW0G (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 20 Oct 2018 17:30:13 -0400
-Received: by mail-wr1-f68.google.com with SMTP id q6-v6so3838459wrw.11
-        for <linux-kbuild@vger.kernel.org>; Sat, 20 Oct 2018 06:19:45 -0700 (PDT)
-From: Paul Walmsley <paul.walmsley@sifive.com>
-Subject: [PATCH 2/2] modpost: skip ELF local symbols by default during section mismatch check
-Date: Sat, 20 Oct 2018 06:19:14 -0700
-Message-Id: <20181020131911.22443-3-paul.walmsley@sifive.com>
-In-Reply-To: <20181020131911.22443-1-paul.walmsley@sifive.com>
+        Sat, 20 Oct 2018 18:26:06 -0400
+Date: Sat, 20 Oct 2018 16:08:35 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 0/2] modpost: skip section mismatch warnings on ELF local
+ symbols by default
+Message-ID: <20181020140835.GA3351@ravnborg.org>
 References: <20181020131911.22443-1-paul.walmsley@sifive.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181020131911.22443-1-paul.walmsley@sifive.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, Russell King <linux@armlinux.org.uk>, Jim Wilson <jimw@sifive.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Paul Walmsley <paul@pwsan.com>
+To: Paul Walmsley <paul.walmsley@sifive.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Russell King <linux@armlinux.org.uk>, Jim Wilson <jimw@sifive.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 
-During development of a serial console driver with a RISC-V toolchain,
-the following modpost warning appeared:
+Hi Paul.
 
-----
-WARNING: vmlinux.o(.data+0x19b10): Section mismatch in reference from the variable .LANCHOR1 to the function .init.text:sifive_serial_console_setup()
-The variable .LANCHOR1 references
-the function __init sifive_serial_console_setup()
-If the reference is valid then annotate the
-variable with __init* or __refdata (see linux/init.h) or name the variable:
-*_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console
-----
+> modpost: skip section mismatch warnings on ELF local symbols by default
+> 
+> modpost, by default, reports section mismatch warnings on ELF local
+> symbols.  This caused false positive warnings to be reported for a
+> local symbol name that would otherwise be elided by matching against a
+> name pattern.  This was observed using a RISC-V toolchain that generates
+> section anchors.
+> 
+> To avoid this noise in the common case, this patch series disables
+> section mismatch warnings on ELF local symbols by default.
+This part is fine.
 
-".LANCHOR1" is an ELF local symbol, automatically created by gcc's section
-anchor generation code:
+> It also
+> adds a modpost command line switch to re-enable these warnings, since
+> I wasn't able to convince myself that section mismatch warnings on ELF
+> local symbols were completely useless; just mostly useless :-)
+modpost is not supposed to be used outside the kernel build.
+And therefore if we introduce a new option then the infrastructure
+to enable that option should also be in place.
+In this particular case I cannot see why we should add the possibility
+to include local symbols, in other words do not add the option.
+Wait a few days before you kill it, maybe others see the usefulness of it.
 
-https://gcc.gnu.org/onlinedocs/gccint/Anchored-Addresses.html
+I checked if there were any options supported by modpost that
+was not configurable in makefile.modpost.
+And I could see that the -M and -K options in getopt() was leftovers.
+The code that used these option was was dropped in:
+a8773769d1a1e08d0ca15f890515401ab3860637 ("Kbuild: clear marker out of modpost")
 
-https://gcc.gnu.org/git/?p=gcc.git;a=blob;f=gcc/varasm.c;h=cd9591a45617464946dcf9a126dde277d9de9804;hb=9fb89fa845c1b2e0a18d85ada0b077c84508ab78#l7473
+Could you add a patch that delete these on top of what you already have.
 
-This was verified by compiling the kernel with -fno-section-anchors.
-The serial driver code idiom triggering the warning is standard serial
-driver practice, and one that has a specific whitelist inclusion in
-modpost.c.
-
-I'm neither a modpost nor an ELF expert, but naively, it doesn't seem
-useful for modpost to report section mismatch warnings caused by ELF
-local symbols by default.  Local symbols have compiler-generated
-names, and thus bypass modpost's whitelisting algorithm, which relies
-on the presence of a non-autogenerated symbol name.  This increases
-the likelihood that false positive warnings will be generated (as in
-the above case).
-
-Thus, disable section mismatch reporting on ELF local symbols by
-default.  The rationale here is similar to that of commit
-2e3a10a1551d6ceea005e6a62ca58183b8976217 ("ARM: avoid ARM binutils
-leaking ELF local symbols") and of similar code already present in
-modpost.c:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/scripts/mod/modpost.c?h=v4.19-rc4&id=7876320f88802b22d4e2daf7eb027dd14175a0f8#n1256
-
-Since it might be useful for some static analysis runs to detect
-whether any new symbols have been added that result in any section
-mismatches, even from ELF local symbols, this change can be disabled
-(along with other tests that can often generate false positives) by
-passing the '-P' switch on the modpost command line.
-
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: Jim Wilson <jimw@sifive.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Paul Walmsley <paul.walmsley@sifive.com>
-Signed-off-by: Paul Walmsley <paul@pwsan.com>
----
- scripts/mod/modpost.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 38fc1bd47926..2b8c960ece66 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1255,6 +1255,17 @@ static inline int is_arm_mapping_symbol(const char *str)
- 	       && (str[2] == '\0' || str[2] == '.');
- }
- 
-+/*
-+ * If a symbol name follows the convention for ELF-local symbols (i.e., the
-+ * name begins with a ".L"), return true; otherwise false.  This is used to
-+ * skip section mismatch reporting on ELF-local symbols, due to the risk of
-+ * false positives.
-+ */
-+static inline int is_local_symbol(const char *str)
-+{
-+	return str[0] == '.' && str[1] == 'L';
-+}
-+
- /*
-  * If there's no name there, ignore it; likewise, ignore it if it's
-  * one of the magic symbols emitted used by current ARM tools.
-@@ -1537,6 +1548,9 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
- 	if (strstarts(fromsym, "reference___initcall"))
- 		return;
- 
-+	if (!accept_falsepos_risk && is_local_symbol(fromsym))
-+		return;
-+
- 	tosec = sec_name(elf, get_secindex(elf, sym));
- 	to = find_elf_symbol(elf, r->r_addend, sym);
- 	tosym = sym_name(elf, to);
--- 
-2.19.1
+	Sam
