@@ -1,84 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:33643 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726939AbeJWEQn (ORCPT
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:43762 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727063AbeJWFTk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Oct 2018 00:16:43 -0400
-Received: by mail-pg1-f196.google.com with SMTP id z2-v6so3111165pgp.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 22 Oct 2018 12:56:49 -0700 (PDT)
+        Tue, 23 Oct 2018 01:19:40 -0400
 MIME-Version: 1.0
 References: <20181021171414.22674-1-miguel.ojeda.sandonis@gmail.com>
  <20181021171414.22674-2-miguel.ojeda.sandonis@gmail.com> <20181021222712.GI1617@thunk.org>
- <8fb78062-b6d4-6f2d-d943-44bec6b95ff0@petrovitsch.priv.at>
- <20181022102743.nua5fgbscyeymzal@mwanda> <1474d995-1b5a-2efb-f077-33eb4a5d9e31@petrovitsch.priv.at>
- <20181022105314.j6djkrpwbnokhai5@mwanda> <CANiq72=ioYcRA-yq38+Z4i6iVDNm6C2-+b4feRmnvEiekuR7dA@mail.gmail.com>
- <3cbb5345-0270-5575-7563-6ad37d888e42@petrovitsch.priv.at>
- <CAKwvOdnWkPi_2UJ7VKYZ6cuWi+BDgpEUf+tcrfZLUYawbm+grw@mail.gmail.com> <9c52827b-4783-8f39-9030-a166d5436f05@petrovitsch.priv.at>
-In-Reply-To: <9c52827b-4783-8f39-9030-a166d5436f05@petrovitsch.priv.at>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 22 Oct 2018 12:56:37 -0700
-Message-ID: <CAKwvOd=_mnxnG3cFb6qBhO5KLFxjrgsavoQ37asY3O1B4LLkwA@mail.gmail.com>
+ <CANiq72mXV6WTyHXNZJDTfFOpPrXD0zD6cB30bGOuKO44AvRiog@mail.gmail.com>
+ <CAGXu5jKb-0H+smRAW6ngQKDZ-PbTThhMwhmu34iB8vjTa-4H8Q@mail.gmail.com>
+ <CANiq72n4+HDXPqr7xySSGx49g8vEcXaxO7a-By9cSg7YSxOS_A@mail.gmail.com>
+ <CANiq72kNnrhi8OPbF7P+Rw4SGYu=JuvhDKtzGtG2J5AOoC1-Dw@mail.gmail.com> <CAKwvOdn1TOzZYg_i0zB0rU+K3jaQQ8XmWnLXz01NCG9V+8PxHw@mail.gmail.com>
+In-Reply-To: <CAKwvOdn1TOzZYg_i0zB0rU+K3jaQQ8XmWnLXz01NCG9V+8PxHw@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 22 Oct 2018 22:59:16 +0200
+Message-ID: <CANiq72kUJOSrR=h2=2jXfkBPLrR=DrN8X4OoKOqAte4sMLxkdQ@mail.gmail.com>
 Subject: Re: [PATCH 1/2] Compiler Attributes: add support for __fallthrough
  (gcc >= 7.1)
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: bernd@petrovitsch.priv.at
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Kees Cook <keescook@chromium.org>, "Gustavo A. R. Silva" <gustavo@embeddedor.com>, Ted Ts'o <tytso@mit.edu>, Greg KH <gregkh@linuxfoundation.org>, linux-kernel <linux-kernel@vger.kernel.org>, Dan <dan.carpenter@oracle.com>, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Mon, Oct 22, 2018 at 11:15 AM Bernd Petrovitsch
-<bernd@petrovitsch.priv.at> wrote:
+On Mon, Oct 22, 2018 at 7:17 PM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
 >
-> Hi all!
+> On Mon, Oct 22, 2018 at 2:43 AM Miguel Ojeda
+> <miguel.ojeda.sandonis@gmail.com> wrote:
+> >
+> > On Mon, Oct 22, 2018 at 11:41 AM Miguel Ojeda
+> > <miguel.ojeda.sandonis@gmail.com> wrote:
+> > >
+> > >   * clang does *not* support the attribute in C.
+> >
+> > ...nor the warning at all, by the way (which is why this is OK).
+> >
+> > Cheers,
+> > Miguel
 >
-> On 22/10/18 19:54, Nick Desaulniers wrote:
-> > On Mon, Oct 22, 2018 at 10:50 AM Bernd Petrovitsch
-> > <bernd@petrovitsch.priv.at> wrote:
-> [...]
-> >> PS: clang++ errors with "fallthrough annotation in unreachable code" if
-> >>     [[fallthrough]] is after an assert(). clang-devs there, please, the
-> >>     fallthrough doesn't really generated code (I hope;-).
-> [...]
-> > Can you send me a link to a simple reproducer in godbolt (godbolt.org)
-> > and we'll take a look?
+> Oh? We're going through and annotating all of Android's C++ source
+> right now with it.
+> https://clang.llvm.org/docs/DiagnosticsReference.html#wimplicit-fallthrough
 >
-> Does https://godbolt.org/z/2Y4zIo do it - I'm a godbolt-newbie?
 
-Moving the kernel folks to bcc, since we don't need to be discussing
-C++ on LKML.
-https://godbolt.org/z/B1fo9Z shows that this works as intended, for
-cases that cannot be statically proven.  I guess I'm looking for a
-more realistic code sample to show why putting a `break;` statement
-there is untenable?
+Sure, but I am talking about the C mode only. Please read the previous
+messages in the thread :-)
 
+> Though it looks like the attribute syntax I like from GCC is not yet
+> supported in Clang.
+
+Indeed, that is what I explained in the last message.
+
+> https://bugs.llvm.org/show_bug.cgi?id=37135
+> https://github.com/ClangBuiltLinux/linux/issues/235
+> I'll take a look at adding support.
 >
-> For
-> ----  snip  ----
-> #include <cassert>
->
-> int main(void)
-> {
->   switch (1) {
->   default:
->     assert(0);
->     [[fallthrough]];
->   case 1:
->     ;
->   }
->   return 0;
-> }
-> ----  snip  ----
-> Just "clang++ -Wimplicit-fallthrough -Werror" it .....
->
-> MfG,
->         Bernd
-> --
-> "I dislike type abstraction if it has no real reason. And saving
-> on typing is not a good reason - if your typing speed is the main
-> issue when you're coding, you're doing something seriously wrong."
->     - Linus Torvalds
+> So Kees sent me this embarrassing example:
+> https://godbolt.org/z/gV_c9_
+> (try changing the language from C++ to C; it works)!  That's embarrassing!
 
+Yup, that is what I have been testing yesterday -- see the linked
+thread in the commit message for the summary of the results.
 
+> https://bugs.llvm.org/show_bug.cgi?id=39382
+> https://github.com/ClangBuiltLinux/linux/issues/236
+> Will get these both fixed up.
 
--- 
-Thanks,
-~Nick Desaulniers
+Cheers,
+Miguel
