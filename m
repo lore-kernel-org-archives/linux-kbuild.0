@@ -1,78 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:41452 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728660AbeJWBmt (ORCPT
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:35451 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728732AbeJWBpg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 22 Oct 2018 21:42:49 -0400
-Received: by mail-pf1-f193.google.com with SMTP id m77-v6so20245923pfi.8
-        for <linux-kbuild@vger.kernel.org>; Mon, 22 Oct 2018 10:23:26 -0700 (PDT)
+        Mon, 22 Oct 2018 21:45:36 -0400
+Received: by mail-pf1-f195.google.com with SMTP id l17-v6so20251142pff.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 22 Oct 2018 10:26:12 -0700 (PDT)
 MIME-Version: 1.0
 References: <20181021171414.22674-1-miguel.ojeda.sandonis@gmail.com>
  <20181021171414.22674-2-miguel.ojeda.sandonis@gmail.com> <20181021222712.GI1617@thunk.org>
- <CANiq72mXV6WTyHXNZJDTfFOpPrXD0zD6cB30bGOuKO44AvRiog@mail.gmail.com>
-In-Reply-To: <CANiq72mXV6WTyHXNZJDTfFOpPrXD0zD6cB30bGOuKO44AvRiog@mail.gmail.com>
+ <8fb78062-b6d4-6f2d-d943-44bec6b95ff0@petrovitsch.priv.at>
+ <20181022102743.nua5fgbscyeymzal@mwanda> <1474d995-1b5a-2efb-f077-33eb4a5d9e31@petrovitsch.priv.at>
+ <20181022105314.j6djkrpwbnokhai5@mwanda>
+In-Reply-To: <20181022105314.j6djkrpwbnokhai5@mwanda>
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 22 Oct 2018 10:23:14 -0700
-Message-ID: <CAKwvOdm7Ts1ZpYV2qw1YLSg8ntjPekY8Gu=Q1CbSq_7==ekUMw@mail.gmail.com>
+Date: Mon, 22 Oct 2018 10:26:00 -0700
+Message-ID: <CAKwvOd=SUTqfASs-_5--GYFx79bETMcjCzBacw5ujMsxGwU5SQ@mail.gmail.com>
 Subject: Re: [PATCH 1/2] Compiler Attributes: add support for __fallthrough
  (gcc >= 7.1)
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Theodore Ts'o <tytso@mit.edu>, Greg KH <gregkh@linuxfoundation.org>, LKML <linux-kernel@vger.kernel.org>, dan.carpenter@oracle.com, adilger.kernel@dilger.ca, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, rostedt@goodmis.org, mchehab+samsung@kernel.org, olof@lxom.net, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, sandipan@linux.vnet.ibm.com, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, paul.burton@mips.com, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, msebor@gmail.com, sparse@chrisli.org, Jonathan Corbet <corbet@lwn.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, joe@perches.com, Arnd Bergmann <arnd@arndb.de>, asmadeus@codewreck.org, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Colin Ian King <colin.king@canonical.com>
+To: dan.carpenter@oracle.com
+Cc: bernd@petrovitsch.priv.at, Theodore Ts'o <tytso@mit.edu>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, LKML <linux-kernel@vger.kernel.org>, adilger.kernel@dilger.ca, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, rostedt@goodmis.org, mchehab+samsung@kernel.org, olof@lxom.net, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, sandipan@linux.vnet.ibm.com, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, paul.burton@mips.com, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, msebor@gmail.com, sparse@chrisli.org, Jonathan Corbet <corbet@lwn.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, joe@perches.com, Arnd Bergmann <arnd@arndb.de>, asmadeus@codewreck.org, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mon, Oct 22, 2018 at 2:26 AM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
+On Mon, Oct 22, 2018 at 3:54 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
 >
-> On Mon, Oct 22, 2018 at 12:27 AM Theodore Y. Ts'o <tytso@mit.edu> wrote:
+> On Mon, Oct 22, 2018 at 12:45:03PM +0200, Bernd Petrovitsch wrote:
+> > It's more like
+> > ----  snip  ----
+> >       case 3:
+> >               frob();
+> >               __fall_through;
+> >               /* no break - fall through */
+> >       case 4:
+> > ----  snip  ----
+> > as "eclipse" doesn't accept anything else.
 > >
-> > On Sun, Oct 21, 2018 at 07:14:13PM +0200, Miguel Ojeda wrote:
-> > > From the GCC manual:
-> > >
-> > >   fallthrough
-> > >
-> > >     The fallthrough attribute with a null statement serves as a
-> > >     fallthrough statement. It hints to the compiler that a statement
-> > >     that falls through to another case label, or user-defined label
-> > >     in a switch statement is intentional and thus the -Wimplicit-fallthrough
-> > >     warning must not trigger. The fallthrough attribute may appear
-> > >     at most once in each attribute list, and may not be mixed with
-> > >     other attributes. It can only be used in a switch statement
-> > >     (the compiler will issue an error otherwise), after a preceding
-> > >     statement and before a logically succeeding case label,
-> > >     or user-defined label.
-> > >
-> > >   https://gcc.gnu.org/onlinedocs/gcc/Statement-Attributes.html
+> > And yes, it's far from "beautiful" but I hadn't time to dig into
+> > eclipses innards to fix that.
 > >
-> > Do we know if coverity understands the fallthrough attribute?  One of
-> > the reasons why I started using /* fallthrough */ is because it kept
-> > Coverity happy.
 >
-> If Coverity is like gcc, they should be doing both (i.e. I see the
-> comment parsing as an "extra" that gcc did, but the "basic stuff" is
-> the attribute -- and I would guess it is way easier for them to
-> support than the comment parsing).
->
-> But I cannot test it myself :-( Someone, please?
+> Doing both is super ugly.  Let's just do comments until Eclipse gets
+> updated.
 
-+ Colin, who has been running Coverity on the kernel, and sending patches.
+Eclipse as in the IDE?
+https://bugs.eclipse.org/bugs/
 
 >
-> However, if I understood Greg correctly in his reply to the cover
-> letter, he replied that Coverity knows about it (?).
+> I had wanted to move to the attribute because that would simplify things
+> in Smatch but it's not a huge deal to delay for another year.
 >
-> >
-> > If the conversion from /* fallthrough */ to the __fallthrough__
-> > attribute means that we start gethting a lot of Coverity warnings,
-> > that would be unfortunate.  OTOH, if this is getting standardized,
-> > maybe we can get Coverity to understand this attribute?
+> regards,
+> dan carpenter
 >
-> Indeed! That would be the best for everyone, including Coverity customers.
->
-> Cheers,
-> Miguel
-
 
 
 -- 
