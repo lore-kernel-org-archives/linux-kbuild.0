@@ -1,46 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp2130.oracle.com ([156.151.31.86]:43654 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727256AbeJVNq1 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 22 Oct 2018 09:46:27 -0400
-Date: Mon, 22 Oct 2018 08:27:01 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH 0/2] Compiler Attributes: __fallthrough
-Message-ID: <20181022052700.a6v3d6t43kot6yso@mwanda>
+Received: from imap.thunk.org ([74.207.234.97]:43514 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726784AbeJVPQP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 22 Oct 2018 11:16:15 -0400
+Date: Mon, 22 Oct 2018 02:58:00 -0400
+From: "Theodore Y. Ts'o" <tytso@mit.edu>
+Subject: Re: [PATCH 1/2] Compiler Attributes: add support for __fallthrough
+ (gcc >= 7.1)
+Message-ID: <20181022065800.GK1617@thunk.org>
 References: <20181021171414.22674-1-miguel.ojeda.sandonis@gmail.com>
- <20181021182926.GB6683@kroah.com>
- <d56762f8856201f520a3ee5553276621237e8e27.camel@perches.com>
+ <20181021171414.22674-2-miguel.ojeda.sandonis@gmail.com>
+ <20181022004217.GA4941@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary="ikeVEW9yuYc//A+q"
 Content-Disposition: inline
-In-Reply-To: <d56762f8856201f520a3ee5553276621237e8e27.camel@perches.com>
+In-Reply-To: <20181022004217.GA4941@bombadil.infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, linux-kernel@vger.kernel.org, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S . Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org, Dan Carpenter <dan.carpenter@oracle.com>, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S . Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Sun, Oct 21, 2018 at 11:52:21AM -0700, Joe Perches wrote:
-> On Sun, 2018-10-21 at 19:29 +0100, Greg Kroah-Hartman wrote:i
-> > On Sun, Oct 21, 2018 at 07:14:12PM +0200, Miguel Ojeda wrote:
-> > > These are two patches are meant to go on top of the rest of the compiler
-> > > attributes series on:
-> > > 
-> > >   https://github.com/ojeda/linux/tree/compiler-attributes
-> > > 
-> > > which will be sent to Greg for the next merge window.
-> > > 
-> > > Please review them and let me know! (specially if someone is against
-> > > __fallthrough for some reason :-).
-> > 
-> > Will this work with all of the static tools that are currently looking
-> > for the comment instead?
+
+--ikeVEW9yuYc//A+q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Sun, Oct 21, 2018 at 05:42:18PM -0700, Matthew Wilcox wrote:
+> On Sun, Oct 21, 2018 at 07:14:13PM +0200, Miguel Ojeda wrote:
+> > +#if __has_attribute(__fallthrough__)
+> > +# define __fallthrough                  __attribute__((__fallthrough__))
+> > +#else
+> > +# define __fallthrough
+> > +#endif
 > 
-> Does anyone have a list of the static tools that
-> use comment style fallthrough notations?
+> Why is the #else not:
 > 
+> # define __fallthrough		/* fallthrough */
+> 
+> Would this solve the Coverity problem, or does Coverity look at the raw
+> source code before preprocessing?
 
-It would only be CPPcheck I think.
+Wouldn't the "/* ... */" be eaten by the preprocessor before defining
+the __fallthrough cpp macro?  (e.g., try running the attached script)
 
-regards,
-dan carpenter
+						- Ted
+
+
+
+
+--ikeVEW9yuYc//A+q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename=foo
+
+#!/bin/bash
+
+cat << EOF > /tmp/test$$.c
+#define foobar quux /* foobar */
+
+foobar
+EOF
+gcc -E /tmp/test$$.c
+rm -f /tmp/test$$.c
+
+--ikeVEW9yuYc//A+q--
