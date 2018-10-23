@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:33505 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726992AbeJXFjy (ORCPT
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:52861 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725859AbeJXGBH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Oct 2018 01:39:54 -0400
+        Wed, 24 Oct 2018 02:01:07 -0400
 Subject: Re: [PATCH v2 3/5] Creates macro to avoid variable shadowing
 References: <20181023011042.GA6582@WindFlash>
 From: Helen Koike <helen@koikeco.de>
-Message-ID: <8872be37-0ef3-7498-a846-bac3c38ee948@koikeco.de>
-Date: Tue, 23 Oct 2018 18:14:41 -0300
+Message-ID: <fe54aafc-1dbc-d4a1-96b5-37455595956e@koikeco.de>
+Date: Tue, 23 Oct 2018 18:35:49 -0300
 MIME-Version: 1.0
 In-Reply-To: <20181023011042.GA6582@WindFlash>
 Content-Type: text/plain; charset=utf-8
@@ -20,8 +20,6 @@ To: =?UTF-8?Q?Leonardo_Br=c3=a1s?= <leobras.c@gmail.com>, lkcamp@lists.libreplan
 Cc: Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Leonardo,
-
-Thanks for your patch.
 
 On 10/22/18 11:10 PM, Leonardo Brás wrote:
 > Creates DEF_FIELD_ADDR_VAR as a more generic version of the DEF_FIELD_ADD
@@ -49,12 +47,6 @@ On 10/22/18 11:10 PM, Leonardo Brás wrote:
 > + */
 > +#define DEF_FIELD_ADDR_VAR(m, devid, f, v) \
 > +	typeof(((struct devid *)0)->f) *v = ((m) + OFF_##devid##_##f)
-
-You created this macro but you don't use it below, maybe you forgot to
-update the patch? Please check.
-
-Helen
-
 > +
 >  /* Define a variable f that holds the address of field f of struct devid
 >   * based at address m.  Due to the way typeof works, for a field of type
@@ -77,6 +69,19 @@ Helen
 >  		unsigned int j;
 > -		DEF_FIELD_ADDR(symval + i*id_size, pnp_card_device_id, devs);
 > +		devs_last = devs + i * id_size;
+
+Instead of doing all these changes, you could just modify here with
+		DEF_FIELD_ADDR_VAR(symval + i*id_size, pnp_card_device_id, devs,
+devs_aux);
+
+Like this you are not changing the logic in this file, you are just
+renaming the variable which is more then enough to solve the -Wshadow
+warning.
+I don't it is worthy changing the logic.
+
+Regards,
+Helen.
+
 >  
 >  		for (j = 0; j < PNP_MAX_DEVICES; j++) {
 > -			const char *id = (char *)(*devs)[j].id;
