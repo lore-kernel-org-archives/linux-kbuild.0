@@ -1,40 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:42789 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726438AbeJWKfG (ORCPT
+Received: from userp2130.oracle.com ([156.151.31.86]:36076 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726837AbeJWOGv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Oct 2018 06:35:06 -0400
-Received: by mail-pg1-f195.google.com with SMTP id i4-v6so19894493pgq.9
-        for <linux-kbuild@vger.kernel.org>; Mon, 22 Oct 2018 19:13:55 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v2 1/5] x86/vdso: Renames variable to fix shadow warning.
-From: Andy Lutomirski <luto@amacapital.net>
-In-Reply-To: <20181023011022.GA6574@WindFlash>
-Date: Mon, 22 Oct 2018 19:13:53 -0700
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <93692F0D-D25B-4225-B127-4988E43B4CE1@amacapital.net>
-References: <20181023011022.GA6574@WindFlash>
+        Tue, 23 Oct 2018 10:06:51 -0400
+Date: Tue, 23 Oct 2018 08:43:06 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH 0/2] Compiler Attributes: __fallthrough
+Message-ID: <20181023054306.wbmcg6vigc4jlb25@mwanda>
+References: <20181021171414.22674-1-miguel.ojeda.sandonis@gmail.com>
+ <20181021182926.GB6683@kroah.com>
+ <CANiq72kOE0a4M0oCmmiWO9xTFJsybEirwUyb_ZTXpJJhc7O_TA@mail.gmail.com>
+ <CAKwvOdn9hOcF01eOmwfnrH_ciFZ4fPaspSzMPiY68o3B0En-VQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKwvOdn9hOcF01eOmwfnrH_ciFZ4fPaspSzMPiY68o3B0En-VQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?utf-8?Q?Leonardo_Br=C3=A1s?= <leobras.c@gmail.com>
-Cc: lkcamp@lists.libreplanetbr.org, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, helen@koikeco.de, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, LKML <linux-kernel@vger.kernel.org>, adilger.kernel@dilger.ca, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, rostedt@goodmis.org, mchehab+samsung@kernel.org, olof@lxom.net, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, "David S. Miller" <davem@davemloft.net>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, sandipan@linux.vnet.ibm.com, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, paul.burton@mips.com, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, msebor@gmail.com, sparse@chrisli.org, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, joe@perches.com, Arnd Bergmann <arnd@arndb.de>, asmadeus@codewreck.org, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
+On Mon, Oct 22, 2018 at 09:54:27AM -0700, Nick Desaulniers wrote:
+> On Mon, Oct 22, 2018 at 2:48 AM Miguel Ojeda
+> <miguel.ojeda.sandonis@gmail.com> wrote:
+> >
+> > On Sun, Oct 21, 2018 at 8:29 PM Greg Kroah-Hartman
+> > <gregkh@linuxfoundation.org> wrote:
+> > >
+> > > Will this work with all of the static tools that are currently looking
+> > > for the comment instead?  I know coverity handles that, what about
+> > > others?
+> >
+> > I will also contact the different tools about this.
+> 
+> Let's contact the authors of these tools if they don't parse the
+> attribute.  I prefer to have the attributes rather than specifically
+> formatted comments.
+> 
+> I do think this may be tricky to provide backwards support for though;
+> Miguel, do you have info on which versions of GCC support comments vs
+> attribute?
 
+None.  GCC 7.1 added support for the warning, the comment parsing and
+the attribute so it's fine.
 
-> On Oct 22, 2018, at 6:10 PM, Leonardo Br=C3=A1s <leobras.c@gmail.com> wrot=
-e:
->=20
-> Renames the char variable to avoid shadowing a variable previously
-> declared on this function.
+The only thing that we know for sure is an issue is Eclipse.
 
-How about =E2=80=9CThe go32() and go64() functions has an argument and a loc=
-al variable called =E2=80=98name=E2=80=99.  Rename both to clarify the code a=
-nd to fix a warning with -Wshadow.=E2=80=9D
+We need to test Coverity but it should work in theory.  And we don't
+know about CPPcheck.
 
-Other than that, Acked-by: Andy Lutomirski <luto@kernel.org>
-
-Ingo or Thomas, it probably makes sense to just apply this to tip:x86/vdso, s=
-ince it=E2=80=99s an improvement regardless of the fate of the rest of the s=
-eries.
+regards,
+dan carpenter
