@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:41941 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725883AbeJWJbt (ORCPT
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:42465 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725883AbeJWJb6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Oct 2018 05:31:49 -0400
-Date: Mon, 22 Oct 2018 22:10:42 -0300
+        Tue, 23 Oct 2018 05:31:58 -0400
+Date: Mon, 22 Oct 2018 22:10:52 -0300
 From: Leonardo =?utf-8?B?QnLDoXM=?= <leobras.c@gmail.com>
-Subject: [PATCH v2 3/5] Creates macro to avoid variable shadowing
-Message-ID: <20181023011042.GA6582@WindFlash>
+Subject: [PATCH v2 4/5] modpost: Changes parameter name to avoid shadowing.
+Message-ID: <20181023011052.GA6584@WindFlash>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
@@ -17,75 +17,32 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: lkcamp@lists.libreplanetbr.org
 Cc: Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, helen@koikeco.de, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Creates DEF_FIELD_ADDR_VAR as a more generic version of the DEF_FIELD_ADD
-macro, allowing usage of a variable name other than the struct element name.
-Also, sets DEF_FIELD_ADDR as a specific usage of DEF_FILD_ADDR_VAR in which
-the var name is the same as the struct element name.
+Changes the parameter name to avoid shadowing a variable.
 
 Signed-off-by: Leonardo Brás <leobras.c@gmail.com>
 ---
- scripts/mod/file2alias.c | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ scripts/mod/modpost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index 7be43697ff84..3015c0bdecb2 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -95,12 +95,20 @@ extern struct devtable *__start___devtable[], *__stop___devtable[];
-  */
- #define DEF_FIELD(m, devid, f) \
- 	typeof(((struct devid *)0)->f) f = TO_NATIVE(*(typeof(f) *)((m) + OFF_##devid##_##f))
-+
-+/* Define a variable v that holds the address of field f of struct devid
-+ * based at address m.  Due to the way typeof works, for a field of type
-+ * T[N] the variable has type T(*)[N], _not_ T*.
-+ */
-+#define DEF_FIELD_ADDR_VAR(m, devid, f, v) \
-+	typeof(((struct devid *)0)->f) *v = ((m) + OFF_##devid##_##f)
-+
- /* Define a variable f that holds the address of field f of struct devid
-  * based at address m.  Due to the way typeof works, for a field of type
-  * T[N] the variable has type T(*)[N], _not_ T*.
-  */
- #define DEF_FIELD_ADDR(m, devid, f) \
--	typeof(((struct devid *)0)->f) *f = ((m) + OFF_##devid##_##f)
-+	DEF_FIELD_ADDR_VAR(m, devid, f, f)
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 0d998c54564d..368fe42340df 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2228,13 +2228,13 @@ static int add_versions(struct buffer *b, struct module *mod)
+ }
  
- /* Add a table entry.  We test function type matches while we're here. */
- #define ADD_TO_DEVTABLE(device_id, type, function) \
-@@ -641,25 +649,27 @@ static void do_pnp_card_entries(void *symval, unsigned long size,
- 	unsigned int i;
+ static void add_depends(struct buffer *b, struct module *mod,
+-			struct module *modules)
++			struct module *module_list)
+ {
+ 	struct symbol *s;
+ 	struct module *m;
+ 	int first = 1;
  
- 	device_id_check(mod->name, "pnp", size, id_size, symval);
-+	DEF_FIELD_ADDR(symval, pnp_card_device_id, devs);
-+	typeof(devs) devs_last;
+-	for (m = modules; m; m = m->next)
++	for (m = module_list; m; m = m->next)
+ 		m->seen = is_vmlinux(m->name);
  
- 	for (i = 0; i < count; i++) {
- 		unsigned int j;
--		DEF_FIELD_ADDR(symval + i*id_size, pnp_card_device_id, devs);
-+		devs_last = devs + i * id_size;
- 
- 		for (j = 0; j < PNP_MAX_DEVICES; j++) {
--			const char *id = (char *)(*devs)[j].id;
--			int i2, j2;
-+			const char *id = (char *)(*devs_last)[j].id;
-+			int j2;
- 			int dup = 0;
- 
- 			if (!id[0])
- 				break;
- 
- 			/* find duplicate, already added value */
--			for (i2 = 0; i2 < i && !dup; i2++) {
--				DEF_FIELD_ADDR(symval + i2*id_size, pnp_card_device_id, devs);
-+			while ((devs_last -= id_size) >= devs && !dup) {
- 
- 				for (j2 = 0; j2 < PNP_MAX_DEVICES; j2++) {
--					const char *id2 = (char *)(*devs)[j2].id;
-+					const char *id2 =
-+						(char *)(*devs_last)[j2].id;
- 
- 					if (!id2[0])
- 						break;
+ 	buf_printf(b, "\n");
 -- 
 2.19.1
