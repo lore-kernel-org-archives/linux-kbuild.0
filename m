@@ -1,108 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:52861 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725859AbeJXGBH (ORCPT
+Received: from mail-pg1-f201.google.com ([209.85.215.201]:36663 "EHLO
+        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725985AbeJXGlC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Oct 2018 02:01:07 -0400
-Subject: Re: [PATCH v2 3/5] Creates macro to avoid variable shadowing
-References: <20181023011042.GA6582@WindFlash>
-From: Helen Koike <helen@koikeco.de>
-Message-ID: <fe54aafc-1dbc-d4a1-96b5-37455595956e@koikeco.de>
-Date: Tue, 23 Oct 2018 18:35:49 -0300
-MIME-Version: 1.0
-In-Reply-To: <20181023011042.GA6582@WindFlash>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        Wed, 24 Oct 2018 02:41:02 -0400
+Received: by mail-pg1-f201.google.com with SMTP id a13-v6so1492332pgw.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Oct 2018 15:15:42 -0700 (PDT)
+Date: Tue, 23 Oct 2018 15:15:35 -0700
+Message-Id: <20181023221535.4740-1-samitolvanen@google.com>
+Mime-Version: 1.0
+Subject: [PATCH] modpost: validate symbol names also in find_elf_symbol
+From: Sami Tolvanen <samitolvanen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Leonardo_Br=c3=a1s?= <leobras.c@gmail.com>, lkcamp@lists.libreplanetbr.org
-Cc: Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sami Tolvanen <samitolvanen@google.com>
 
-Hi Leonardo,
+If an ARM mapping symbol shares an address with a valid symbol,
+find_elf_symbol can currently return the mapping symbol instead, as the
+symbol is not validated. This can result in confusing warnings:
 
-On 10/22/18 11:10 PM, Leonardo Brás wrote:
-> Creates DEF_FIELD_ADDR_VAR as a more generic version of the DEF_FIELD_ADD
-> macro, allowing usage of a variable name other than the struct element name.
-> Also, sets DEF_FIELD_ADDR as a specific usage of DEF_FILD_ADDR_VAR in which
-> the var name is the same as the struct element name.
-> 
-> Signed-off-by: Leonardo Brás <leobras.c@gmail.com>
-> ---
->  scripts/mod/file2alias.c | 24 +++++++++++++++++-------
->  1 file changed, 17 insertions(+), 7 deletions(-)
-> 
-> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-> index 7be43697ff84..3015c0bdecb2 100644
-> --- a/scripts/mod/file2alias.c
-> +++ b/scripts/mod/file2alias.c
-> @@ -95,12 +95,20 @@ extern struct devtable *__start___devtable[], *__stop___devtable[];
->   */
->  #define DEF_FIELD(m, devid, f) \
->  	typeof(((struct devid *)0)->f) f = TO_NATIVE(*(typeof(f) *)((m) + OFF_##devid##_##f))
-> +
-> +/* Define a variable v that holds the address of field f of struct devid
-> + * based at address m.  Due to the way typeof works, for a field of type
-> + * T[N] the variable has type T(*)[N], _not_ T*.
-> + */
-> +#define DEF_FIELD_ADDR_VAR(m, devid, f, v) \
-> +	typeof(((struct devid *)0)->f) *v = ((m) + OFF_##devid##_##f)
-> +
->  /* Define a variable f that holds the address of field f of struct devid
->   * based at address m.  Due to the way typeof works, for a field of type
->   * T[N] the variable has type T(*)[N], _not_ T*.
->   */
->  #define DEF_FIELD_ADDR(m, devid, f) \
-> -	typeof(((struct devid *)0)->f) *f = ((m) + OFF_##devid##_##f)
-> +	DEF_FIELD_ADDR_VAR(m, devid, f, f)
->  
->  /* Add a table entry.  We test function type matches while we're here. */
->  #define ADD_TO_DEVTABLE(device_id, type, function) \
-> @@ -641,25 +649,27 @@ static void do_pnp_card_entries(void *symval, unsigned long size,
->  	unsigned int i;
->  
->  	device_id_check(mod->name, "pnp", size, id_size, symval);
-> +	DEF_FIELD_ADDR(symval, pnp_card_device_id, devs);
-> +	typeof(devs) devs_last;
->  
->  	for (i = 0; i < count; i++) {
->  		unsigned int j;
-> -		DEF_FIELD_ADDR(symval + i*id_size, pnp_card_device_id, devs);
-> +		devs_last = devs + i * id_size;
+  WARNING: vmlinux.o(.text+0x18f4028): Section mismatch in reference
+  from the function set_reset_devices() to the variable .init.text:$x.0
 
-Instead of doing all these changes, you could just modify here with
-		DEF_FIELD_ADDR_VAR(symval + i*id_size, pnp_card_device_id, devs,
-devs_aux);
+This change adds a call to is_valid_name to find_elf_symbol, similarly
+to how it's already used in find_elf_symbol2.
 
-Like this you are not changing the logic in this file, you are just
-renaming the variable which is more then enough to solve the -Wshadow
-warning.
-I don't it is worthy changing the logic.
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+---
+ scripts/mod/modpost.c | 50 ++++++++++++++++++++++---------------------
+ 1 file changed, 26 insertions(+), 24 deletions(-)
 
-Regards,
-Helen.
-
->  
->  		for (j = 0; j < PNP_MAX_DEVICES; j++) {
-> -			const char *id = (char *)(*devs)[j].id;
-> -			int i2, j2;
-> +			const char *id = (char *)(*devs_last)[j].id;
-> +			int j2;
->  			int dup = 0;
->  
->  			if (!id[0])
->  				break;
->  
->  			/* find duplicate, already added value */
-> -			for (i2 = 0; i2 < i && !dup; i2++) {
-> -				DEF_FIELD_ADDR(symval + i2*id_size, pnp_card_device_id, devs);
-> +			while ((devs_last -= id_size) >= devs && !dup) {
->  
->  				for (j2 = 0; j2 < PNP_MAX_DEVICES; j2++) {
-> -					const char *id2 = (char *)(*devs)[j2].id;
-> +					const char *id2 =
-> +						(char *)(*devs_last)[j2].id;
->  
->  					if (!id2[0])
->  						break;
-> 
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 0d998c54564d..b709b2e623d6 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1204,6 +1204,30 @@ static int secref_whitelist(const struct sectioncheck *mismatch,
+ 	return 1;
+ }
+ 
++static inline int is_arm_mapping_symbol(const char *str)
++{
++	return str[0] == '$' && strchr("axtd", str[1])
++	       && (str[2] == '\0' || str[2] == '.');
++}
++
++/*
++ * If there's no name there, ignore it; likewise, ignore it if it's
++ * one of the magic symbols emitted used by current ARM tools.
++ *
++ * Otherwise if find_symbols_between() returns those symbols, they'll
++ * fail the whitelist tests and cause lots of false alarms ... fixable
++ * only by merging __exit and __init sections into __text, bloating
++ * the kernel (which is especially evil on embedded platforms).
++ */
++static inline int is_valid_name(struct elf_info *elf, Elf_Sym *sym)
++{
++	const char *name = elf->strtab + sym->st_name;
++
++	if (!name || !strlen(name))
++		return 0;
++	return !is_arm_mapping_symbol(name);
++}
++
+ /**
+  * Find symbol based on relocation record info.
+  * In some cases the symbol supplied is a valid symbol so
+@@ -1229,6 +1253,8 @@ static Elf_Sym *find_elf_symbol(struct elf_info *elf, Elf64_Sword addr,
+ 			continue;
+ 		if (ELF_ST_TYPE(sym->st_info) == STT_SECTION)
+ 			continue;
++		if (!is_valid_name(elf, sym))
++			continue;
+ 		if (sym->st_value == addr)
+ 			return sym;
+ 		/* Find a symbol nearby - addr are maybe negative */
+@@ -1247,30 +1273,6 @@ static Elf_Sym *find_elf_symbol(struct elf_info *elf, Elf64_Sword addr,
+ 		return NULL;
+ }
+ 
+-static inline int is_arm_mapping_symbol(const char *str)
+-{
+-	return str[0] == '$' && strchr("axtd", str[1])
+-	       && (str[2] == '\0' || str[2] == '.');
+-}
+-
+-/*
+- * If there's no name there, ignore it; likewise, ignore it if it's
+- * one of the magic symbols emitted used by current ARM tools.
+- *
+- * Otherwise if find_symbols_between() returns those symbols, they'll
+- * fail the whitelist tests and cause lots of false alarms ... fixable
+- * only by merging __exit and __init sections into __text, bloating
+- * the kernel (which is especially evil on embedded platforms).
+- */
+-static inline int is_valid_name(struct elf_info *elf, Elf_Sym *sym)
+-{
+-	const char *name = elf->strtab + sym->st_name;
+-
+-	if (!name || !strlen(name))
+-		return 0;
+-	return !is_arm_mapping_symbol(name);
+-}
+-
+ /*
+  * Find symbols before or equal addr and after addr - in the section sec.
+  * If we find two symbols with equal offset prefer one with a valid name.
+-- 
+2.19.1.568.g152ad8e336-goog
