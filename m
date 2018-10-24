@@ -1,78 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:44986 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726449AbeJXMaZ (ORCPT
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:46653 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726898AbeJXMaj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Oct 2018 08:30:25 -0400
+        Wed, 24 Oct 2018 08:30:39 -0400
 From: Leonardo Bras <leobras.c@gmail.com>
-Subject: [PATCH v3 1/5] x86/vdso: Renames variable to fix shadow warning.
-Date: Wed, 24 Oct 2018 01:03:50 -0300
-Message-Id: <20181024040354.24879-2-leobras.c@gmail.com>
+Subject: [PATCH v3 4/5] modpost: Changes parameter name to avoid shadowing.
+Date: Wed, 24 Oct 2018 01:03:53 -0300
+Message-Id: <20181024040354.24879-5-leobras.c@gmail.com>
 In-Reply-To: <20181024040354.24879-1-leobras.c@gmail.com>
 References: <20181024040354.24879-1-leobras.c@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: lkcamp@lists.libreplanetbr.org
 Cc: Leonardo Bras <leobras.c@gmail.com>, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, helen@koikeco.de, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The go32() and go64() functions have an argument and a local variable
-called ‘name’.  Rename both to clarify the code and to fix a warning
-with -Wshadow.
+Changes the parameter name to avoid shadowing a variable.
 
 Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
 ---
- arch/x86/entry/vdso/vdso2c.h | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ scripts/mod/modpost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/entry/vdso/vdso2c.h b/arch/x86/entry/vdso/vdso2c.h
-index fa847a620f40..a20b134de2a8 100644
---- a/arch/x86/entry/vdso/vdso2c.h
-+++ b/arch/x86/entry/vdso/vdso2c.h
-@@ -7,7 +7,7 @@
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 0d998c54564d..368fe42340df 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2228,13 +2228,13 @@ static int add_versions(struct buffer *b, struct module *mod)
+ }
  
- static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
- 			 void *stripped_addr, size_t stripped_len,
--			 FILE *outfile, const char *name)
-+			 FILE *outfile, const char *image_name)
+ static void add_depends(struct buffer *b, struct module *mod,
+-			struct module *modules)
++			struct module *module_list)
  {
- 	int found_load = 0;
- 	unsigned long load_size = -1;  /* Work around bogus warning */
-@@ -93,11 +93,12 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
- 		int k;
- 		ELF(Sym) *sym = raw_addr + GET_LE(&symtab_hdr->sh_offset) +
- 			GET_LE(&symtab_hdr->sh_entsize) * i;
--		const char *name = raw_addr + GET_LE(&strtab_hdr->sh_offset) +
--			GET_LE(&sym->st_name);
-+		const char *sym_name = raw_addr +
-+				       GET_LE(&strtab_hdr->sh_offset) +
-+				       GET_LE(&sym->st_name);
+ 	struct symbol *s;
+ 	struct module *m;
+ 	int first = 1;
  
- 		for (k = 0; k < NSYMS; k++) {
--			if (!strcmp(name, required_syms[k].name)) {
-+			if (!strcmp(sym_name, required_syms[k].name)) {
- 				if (syms[k]) {
- 					fail("duplicate symbol %s\n",
- 					     required_syms[k].name);
-@@ -134,7 +135,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
- 	if (syms[sym_vvar_start] % 4096)
- 		fail("vvar_begin must be a multiple of 4096\n");
+-	for (m = modules; m; m = m->next)
++	for (m = module_list; m; m = m->next)
+ 		m->seen = is_vmlinux(m->name);
  
--	if (!name) {
-+	if (!image_name) {
- 		fwrite(stripped_addr, stripped_len, 1, outfile);
- 		return;
- 	}
-@@ -157,7 +158,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
- 	}
- 	fprintf(outfile, "\n};\n\n");
- 
--	fprintf(outfile, "const struct vdso_image %s = {\n", name);
-+	fprintf(outfile, "const struct vdso_image %s = {\n", image_name);
- 	fprintf(outfile, "\t.data = raw_data,\n");
- 	fprintf(outfile, "\t.size = %lu,\n", mapping_size);
- 	if (alt_sec) {
+ 	buf_printf(b, "\n");
 -- 
 2.19.1
