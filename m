@@ -1,36 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:41742 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725896AbeJXL4i (ORCPT
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:44471 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725996AbeJXMaU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Oct 2018 07:56:38 -0400
-MIME-Version: 1.0
-References: <20181023011022.GA6574@WindFlash> <93692F0D-D25B-4225-B127-4988E43B4CE1@amacapital.net>
-In-Reply-To: <93692F0D-D25B-4225-B127-4988E43B4CE1@amacapital.net>
+        Wed, 24 Oct 2018 08:30:20 -0400
 From: Leonardo Bras <leobras.c@gmail.com>
-Date: Tue, 23 Oct 2018 21:39:33 -0300
-Message-ID: <CADvQ+rEk-VE4uLZ_iRi26BnuEWFzCNZxdcdHRgWW6YbKS4R_tA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/5] x86/vdso: Renames variable to fix shadow warning.
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: [PATCH v3 0/5] Adds -Wshadow on KBUILD_HOSTCFLAGS and fix warnings
+Date: Wed, 24 Oct 2018 01:03:49 -0300
+Message-Id: <20181024040354.24879-1-leobras.c@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: luto@amacapital.net
-Cc: lkcamp@lists.libreplanetbr.org, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, helen@koikeco.de, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
+To: lkcamp@lists.libreplanetbr.org
+Cc: Leonardo Bras <leobras.c@gmail.com>, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, helen@koikeco.de, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello Andy,
+This patchset add -Wshadow on KBUILD_HOSTCFLAGS and fixes
+all code that show this warning.
 
-Yeah, it's much better. I will replace this part of the commit message.
-It will be fixed for v3.
+Changes in v3:
+- Better Cover letter
+- Better commit message for patch 1/5.
+- Fixes what should change on patch 3/5
+- Removes accent of my second name (better for searching at lkml.org)
 
-Thank you!
 
+v2: https://lkml.org/lkml/2018/10/23/151
+v1: https://lkml.org/lkml/2018/10/17/169
 
-On Mon, Oct 22, 2018 at 11:13 PM Andy Lutomirski <luto@amacapital.net> wrot=
-e:
+Leonardo Bras (5):
+  x86/vdso: Renames variable to fix shadow warning.
+  kbuild: Removes unnecessary shadowed local variable.
+  Creates macro to avoid variable shadowing
+  modpost: Changes parameter name to avoid shadowing.
+  Adds -Wshadow on KBUILD_HOSTCFLAGS
 
-> How about =E2=80=9CThe go32() and go64() functions has an argument and a =
-local variable called =E2=80=98name=E2=80=99.  Rename both to clarify the c=
-ode and to fix a warning with -Wshadow.=E2=80=9D
->
-> Other than that, Acked-by: Andy Lutomirski <luto@kernel.org
+ Makefile                     |  2 +-
+ arch/x86/entry/vdso/vdso2c.h | 13 +++++++------
+ scripts/asn1_compiler.c      |  2 +-
+ scripts/mod/file2alias.c     | 19 +++++++++++++++----
+ scripts/mod/modpost.c        |  4 ++--
+ 5 files changed, 26 insertions(+), 14 deletions(-)
+
+-- 
+2.19.1
