@@ -1,62 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:48540 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726692AbeJ2BWI (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:64017 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbeJ1Vyw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 21:22:08 -0400
+        Sun, 28 Oct 2018 17:54:52 -0400
 MIME-Version: 1.0
-References: <20181024040354.24879-1-leobras.c@gmail.com> <20181024040354.24879-3-leobras.c@gmail.com>
-In-Reply-To: <20181024040354.24879-3-leobras.c@gmail.com>
+References: <20181019124921.13780-1-changbin.du@gmail.com> <20181019124921.13780-5-changbin.du@gmail.com>
+ <CAK7LNARW0=0d7m5DAgZOir=h0Y4tssqZoQRGasnGPNnvNf_+pg@mail.gmail.com> <20181028125106.azcn2dxia3snplin@mail.google.com>
+In-Reply-To: <20181028125106.azcn2dxia3snplin@mail.google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 29 Oct 2018 01:36:20 +0900
-Message-ID: <CAK7LNASfo=hw6r6GtdcLdkKCGVFpXUASvSst6WO5tcFbaZ-X0Q@mail.gmail.com>
-Subject: Re: [PATCH v3 2/5] kbuild: Removes unnecessary shadowed local variable.
+Date: Sun, 28 Oct 2018 22:09:21 +0900
+Message-ID: <CAK7LNARr7bE=DVuzim5771heuN5os0=5-D+jXfUyBb2e1xYoRA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] kernel hacking: new config CC_OPTIMIZE_FOR_DEBUGGING
+ to apply GCC -Og optimization
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Leonardo_Br=C3=A1s?= <leobras.c@gmail.com>
-Cc: lkcamp@lists.libreplanetbr.org, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, helen@koikeco.de, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Changbin Du <changbin.du@gmail.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Steven Rostedt <rostedt@goodmis.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
 
-On Wed, Oct 24, 2018 at 1:04 PM Leonardo Bras <leobras.c@gmail.com> wrote:
->
-> Removes an unnecessary shadowed local variable (start).
-> It was used only once, with the same value it was started before
-> the if block.
->
-> Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
+Hi Changbin,
 
+On Sun, Oct 28, 2018 at 9:52 PM Changbin Du <changbin.du@gmail.com> wrote:
 
-
-Applied to linux-kbuild
-with some fixups in the subject.
-
-Please do not add a period to the end of the subject.
+> >
+> Thanks for pointing this out and kind suggestions. I have tested with your
+> modification. Will update patch serias soon.
 
 
+I have one more request.
+
+The patch subject
+"kernel hacking: new config CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og
+optimization"
+is too long (83 characters)
 
 
+I'd like the subject to be within 70 columns or so.
+
+Thanks.
 
 
-> ---
->  scripts/asn1_compiler.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/asn1_compiler.c b/scripts/asn1_compiler.c
-> index c146020fc783..1b28787028d3 100644
-> --- a/scripts/asn1_compiler.c
-> +++ b/scripts/asn1_compiler.c
-> @@ -413,7 +413,7 @@ static void tokenise(char *buffer, char *end)
->
->                         /* Handle string tokens */
->                         if (isalpha(*p)) {
-> -                               const char **dir, *start = p;
-> +                               const char **dir;
->
->                                 /* Can be a directive, type name or element
->                                  * name.  Find the end of the name.
-> --
-> 2.19.1
->
 
 
 -- 
