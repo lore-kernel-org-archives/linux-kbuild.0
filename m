@@ -1,200 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:40387 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726548AbeJ1VzL (ORCPT
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43993 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726734AbeJ1Vjy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 17:55:11 -0400
-From: Changbin Du <changbin.du@gmail.com>
-Subject: [PATCH v3 4/4] kernel hacking: new config CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og optimization
-Date: Sun, 28 Oct 2018 13:09:45 +0000
-Message-Id: <20181028130945.23581-5-changbin.du@gmail.com>
-In-Reply-To: <20181028130945.23581-1-changbin.du@gmail.com>
-References: <20181028130945.23581-1-changbin.du@gmail.com>
+        Sun, 28 Oct 2018 17:39:54 -0400
+Received: by mail-wr1-f68.google.com with SMTP id t10-v6so5729890wrn.10
+        for <linux-kbuild@vger.kernel.org>; Sun, 28 Oct 2018 05:55:19 -0700 (PDT)
+From: Petr Vorel <petr.vorel@gmail.com>
+Subject: [PATCH 1/1] merge_config.sh: Replace prefix CONFIG_ with any prefix
+Date: Sun, 28 Oct 2018 13:55:10 +0100
+Message-Id: <20181028125510.9346-1-petr.vorel@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org, gregkh@linuxfoundation.org
-Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Changbin Du <changbin.du@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Petr Vorel <petr.vorel@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Marcel Patzlaff <m.patzlaff@pilz.de>, Nasser Afshin <afshin.nasser@gmail.com>, Angelo Compagnucci <angelo.compagnucci@gmail.com>, Arnout Vandecappelle <arnout@mind.be>, Matthew Weber <matthew.weber@rockwellcollins.com>, John Stultz <john.stultz@linaro.org>
 
-This will apply GCC '-Og' optimization level which is supported
-since GCC 4.8. This optimization level offers a reasonable level
-of optimization while maintaining fast compilation and a good
-debugging experience. It is similar to '-O1' while perferring
-to keep debug ability over runtime speed.
+merge_config.sh expect prefix from kernel: CONFIG_.
+There some other projects using kconfig with different prefixes
+(e.g. buildroot: BR2_ prefix). While there could be some option
+to specify config prefix [1] [2], IMHO it's better to not specify
+prefix (expect just any prefix).
 
-If enabling this option breaks your kernel, you should either
-disable this or find a fix (mostly in the arch code). Currently
-this option has only been tested on x86_64 and arm platform.
+[1] http://patchwork.ozlabs.org/patch/824051/
+[2] https://patchwork.ozlabs.org/patch/988890/
 
-This option can satisfy people who was searching for a method
-to disable compiler optimizations so to achieve better kernel
-debugging experience with kgdb or qemu.
-
-The main problem of '-Og' is we must not use __attribute__((error(msg))).
-The compiler will report error though the call to error function
-still can be optimize out. So we must fallback to array tricky.
-
-Comparison of vmlinux size: a bit smaller.
-
-    w/o CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-    $ size vmlinux
-       text    data     bss     dec     hex filename
-    22665554   9709674  2920908 35296136        21a9388 vmlinux
-
-    w/ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-    $ size vmlinux
-       text    data     bss     dec     hex filename
-    21499032   10102758 2920908 34522698        20ec64a vmlinux
-
-Comparison of system performance: a bit drop (~6%).
-    This benchmark of kernel compilation is suggested by Ingo Molnar.
-    https://lkml.org/lkml/2018/5/2/74
-
-    Preparation: Set cpufreq to 'performance'.
-    for ((cpu=0; cpu<120; cpu++)); do
-      G=/sys/devices/system/cpu/cpu$cpu/cpufreq/scaling_governor
-      [ -f $G ] && echo performance > $G
-    done
-
-    w/o CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-    $ perf stat --repeat 5 --null --pre                 '\
-        cp -a kernel ../kernel.copy.$(date +%s);         \
-        rm -rf *;                                        \
-        git checkout .;                                  \
-        echo 1 > /proc/sys/vm/drop_caches;               \
-        find ../kernel* -type f | xargs cat >/dev/null;  \
-        make -j kernel >/dev/null;                       \
-        make clean >/dev/null 2>&1;                      \
-        sync                                            '\
-                                                         \
-        make -j8 >/dev/null
-
-    Performance counter stats for 'make -j8' (5 runs):
-
-        219.764246652 seconds time elapsed                   ( +-  0.78% )
-
-    w/ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-    $ perf stat --repeat 5 --null --pre                 '\
-        cp -a kernel ../kernel.copy.$(date +%s);         \
-        rm -rf *;                                        \
-        git checkout .;                                  \
-        echo 1 > /proc/sys/vm/drop_caches;               \
-        find ../kernel* -type f | xargs cat >/dev/null;  \
-        make -j kernel >/dev/null;                       \
-        make clean >/dev/null 2>&1;                      \
-        sync                                            '\
-                                                         \
-        make -j8 >/dev/null
-
-    Performance counter stats for 'make -j8' (5 runs):
-
-         233.574187771 seconds time elapsed                  ( +-  0.19% )
-
-Signed-off-by: Changbin Du <changbin.du@gmail.com>
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-
+Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
+Suggested-by: Marcel Patzlaff <m.patzlaff@pilz.de>
 ---
-v3:
-  o make CC_OPTIMIZE_FOR_DEBUGGING depends on $(cc-option,-Og)
-  o reflect CONFIG_CC_OPTIMIZE_FOR_DEBUGGING in tiny.config
----
- Makefile                     |  5 +++++
- include/linux/compiler-gcc.h |  2 +-
- include/linux/compiler.h     |  2 +-
- init/Kconfig                 | 20 ++++++++++++++++++++
- kernel/configs/tiny.config   |  1 +
- 5 files changed, 28 insertions(+), 2 deletions(-)
+NOTE: I deliberately left prefix CONFIG_ in comment:
+# allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
 
-diff --git a/Makefile b/Makefile
-index 04beb822ddfc..10de245a3325 100644
---- a/Makefile
-+++ b/Makefile
-@@ -657,6 +657,10 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
- KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
- KBUILD_CFLAGS	+= $(call cc-disable-warning, int-in-bool-context)
+Kind regards,
+Petr
+---
+ scripts/kconfig/merge_config.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index 67d131447631..538222848bcf 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -99,7 +99,7 @@ if [ ! -r "$INITFILE" ]; then
+ fi
  
-+ifdef CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-+KBUILD_CFLAGS	+= -Og
-+KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
-+else
- ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
- KBUILD_CFLAGS	+= $(call cc-option,-Oz,-Os)
- KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
-@@ -667,6 +671,7 @@ else
- KBUILD_CFLAGS   += -O2
- endif
- endif
-+endif
+ MERGE_LIST=$*
+-SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/p"
++SED_CONFIG_EXP="s/^\(# \)\{0,1\}\([A-Z0-9_]\+_[a-zA-Z0-9_]*\)[= ].*/\2/p"
+ TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
  
- KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
- 			$(call cc-disable-warning,maybe-uninitialized,))
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index 90ddfefb6c2b..4832c98c7885 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -85,7 +85,7 @@
- 
- #define __compiletime_object_size(obj) __builtin_object_size(obj, 0)
- 
--#ifndef __CHECKER__
-+#if !defined(__CHECKER__) && !defined(CONFIG_CC_OPTIMIZE_FOR_DEBUGGING)
- #define __compiletime_warning(message) __attribute__((warning(message)))
- #define __compiletime_error(message) __attribute__((error(message)))
- 
-diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-index 1921545c6351..3836397bf477 100644
---- a/include/linux/compiler.h
-+++ b/include/linux/compiler.h
-@@ -350,7 +350,7 @@ static inline void *offset_to_ptr(const int *off)
-  * sparse see a constant array size without breaking compiletime_assert on old
-  * versions of GCC (e.g. 4.2.4), so hide the array from sparse altogether.
-  */
--# ifndef __CHECKER__
-+# if !defined(__CHECKER__) && !defined(CONFIG_CC_OPTIMIZE_FOR_DEBUGGING)
- #  define __compiletime_error_fallback(condition) \
- 	do { ((void)sizeof(char[1 - 2 * condition])); } while (0)
- # endif
-diff --git a/init/Kconfig b/init/Kconfig
-index a4112e95724a..0fb9c0b5f1a1 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1105,6 +1105,26 @@ config CC_OPTIMIZE_FOR_SIZE
- 
- 	  If unsure, say N.
- 
-+config CC_OPTIMIZE_FOR_DEBUGGING
-+	bool "Optimize for better debugging experience (-Og)"
-+	depends on $(cc-option,-Og)
-+	select NO_AUTO_INLINE
-+	help
-+	  This will apply GCC '-Og' optimization level which is supported
-+	  since GCC 4.8. This optimization level offers a reasonable level
-+	  of optimization while maintaining fast compilation and a good
-+	  debugging experience. It is similar to '-O1' while preferring to
-+	  keep debug ability over runtime speed. The overall performance
-+	  will drop a bit (~6%).
-+
-+	  Use only if you want to debug the kernel, especially if you want
-+	  to have better kernel debugging experience with gdb facilities
-+	  like kgdb or qemu. If enabling this option breaks your kernel,
-+	  you should either disable this or find a fix (mostly in the arch
-+	  code).
-+
-+	  If unsure, select N.
-+
- endchoice
- 
- config HAVE_LD_DEAD_CODE_DATA_ELIMINATION
-diff --git a/kernel/configs/tiny.config b/kernel/configs/tiny.config
-index 7fa0c4ae6394..599ea86b0800 100644
---- a/kernel/configs/tiny.config
-+++ b/kernel/configs/tiny.config
-@@ -1,5 +1,6 @@
- # CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE is not set
- CONFIG_CC_OPTIMIZE_FOR_SIZE=y
-+# CONFIG_CC_OPTIMIZE_FOR_DEBUGGING is not set
- # CONFIG_KERNEL_GZIP is not set
- # CONFIG_KERNEL_BZIP2 is not set
- # CONFIG_KERNEL_LZMA is not set
+ echo "Using $INITFILE as base"
 -- 
-2.17.1
+2.19.1
