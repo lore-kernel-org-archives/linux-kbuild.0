@@ -1,44 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:43267 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726548AbeJ1VzF (ORCPT
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:35562 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726692AbeJ2CJT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 17:55:05 -0400
-From: Changbin Du <changbin.du@gmail.com>
-Subject: [PATCH v3 1/4] x86/mm: declare check_la57_support() as inline
-Date: Sun, 28 Oct 2018 13:09:42 +0000
-Message-Id: <20181028130945.23581-2-changbin.du@gmail.com>
-In-Reply-To: <20181028130945.23581-1-changbin.du@gmail.com>
-References: <20181028130945.23581-1-changbin.du@gmail.com>
+        Sun, 28 Oct 2018 22:09:19 -0400
+Received: by mail-pg1-f195.google.com with SMTP id 32-v6so2752753pgu.2
+        for <linux-kbuild@vger.kernel.org>; Sun, 28 Oct 2018 10:24:04 -0700 (PDT)
+Date: Sun, 28 Oct 2018 10:24:01 -0700
+From: Kees Cook <keescook@chromium.org>
+Subject: [GIT PULL] VLA removal for v4.20-rc1
+Message-ID: <20181028172401.GA41102@beast>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org, gregkh@linuxfoundation.org
-Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Changbin Du <changbin.du@gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Airlie <airlied@linux.ie>, dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Nick Desaulniers <ndesaulniers@google.com>
 
-The level4_kernel_pgt is only defined when X86_5LEVEL is enabled.
-So declare check_la57_support() as inline to make sure the code
-referring to level4_kernel_pgt is optimized out. This is a preparation
-for CONFIG_CC_OPTIMIZE_FOR_DEBUGGING.
+Hi Linus,
 
-Signed-off-by: Changbin Du <changbin.du@gmail.com>
-Cc: Steven Rostedt (VMware) <rostedt@goodmis.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
----
- arch/x86/kernel/head64.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Please pull these VLA removal changes for v4.20-rc1. This turns on "-Wvla"
+globally now that the last few trees with their VLA removals have landed
+(crypto, block, net, and powerpc). Arnd mentioned that there may be a
+couple more VLAs hiding in hard-to-find randconfigs, but nothing big has
+shaken out in the last month or so in linux-next. We should be basically
+VLA-free now! Wheee. :)
 
-diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-index 5dc377dc9d7b..5ae682f2aa83 100644
---- a/arch/x86/kernel/head64.c
-+++ b/arch/x86/kernel/head64.c
-@@ -98,7 +98,7 @@ static bool __head check_la57_support(unsigned long physaddr)
- 	return true;
- }
- #else
--static bool __head check_la57_support(unsigned long physaddr)
-+static inline bool __head check_la57_support(unsigned long physaddr)
- {
- 	return false;
- }
+Thanks!
+
+-Kees
+
+The following changes since commit 57361846b52bc686112da6ca5368d11210796804:
+
+  Linux 4.19-rc2 (2018-09-02 14:37:30 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git tags/vla-v4.20-rc1
+
+for you to fetch changes up to 0bb95f80a38f82884693194ea720e9cca5e12ada:
+
+  Makefile: Globally enable VLA warning (2018-10-11 08:17:50 -0700)
+
+----------------------------------------------------------------
+Globally warn on VLA use
+
+- Remove unused fallback for BUILD_BUG_ON (which technically contains a VLA)
+- Lift -Wvla to the top-level Makefile
+
+----------------------------------------------------------------
+Kees Cook (1):
+      Makefile: Globally enable VLA warning
+
+Masahiro Yamada (1):
+      compiler.h: give up __compiletime_assert_fallback()
+
+ Makefile                      |  3 +++
+ drivers/gpu/drm/i915/Makefile |  2 +-
+ include/linux/compiler.h      | 17 +----------------
+ lib/Makefile                  |  2 ++
+ scripts/Makefile.extrawarn    |  1 -
+ 5 files changed, 7 insertions(+), 18 deletions(-)
+
 -- 
-2.17.1
+Kees Cook
