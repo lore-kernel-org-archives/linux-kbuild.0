@@ -1,35 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:42556 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726556AbeJ2FOD (ORCPT
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:43267 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbeJ1VzF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Oct 2018 01:14:03 -0400
-Received: by mail-lf1-f68.google.com with SMTP id q6-v6so4483224lfh.9
-        for <linux-kbuild@vger.kernel.org>; Sun, 28 Oct 2018 13:28:18 -0700 (PDT)
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com. [209.85.208.178])
-        by smtp.gmail.com with ESMTPSA id p13-v6sm1824133ljh.31.2018.10.28.13.28.15
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 28 Oct 2018 13:28:15 -0700 (PDT)
-Received: by mail-lj1-f178.google.com with SMTP id u21-v6so5789220lja.8
-        for <linux-kbuild@vger.kernel.org>; Sun, 28 Oct 2018 13:28:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20181028172401.GA41102@beast>
-In-Reply-To: <20181028172401.GA41102@beast>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sun, 28 Oct 2018 13:27:59 -0700
-Message-ID: <CAHk-=wjrKjE_RsPmGv70Z1kN8tk2Rqv0EZczBB0BmcdPpqud1w@mail.gmail.com>
-Subject: Re: [GIT PULL] VLA removal for v4.20-rc1
-Content-Type: text/plain; charset="UTF-8"
+        Sun, 28 Oct 2018 17:55:05 -0400
+From: Changbin Du <changbin.du@gmail.com>
+Subject: [PATCH v3 1/4] x86/mm: declare check_la57_support() as inline
+Date: Sun, 28 Oct 2018 13:09:42 +0000
+Message-Id: <20181028130945.23581-2-changbin.du@gmail.com>
+In-Reply-To: <20181028130945.23581-1-changbin.du@gmail.com>
+References: <20181028130945.23581-1-changbin.du@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, airlied@linux.ie, dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, Nick Desaulniers <ndesaulniers@google.com>
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org, gregkh@linuxfoundation.org
+Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Changbin Du <changbin.du@gmail.com>
 
-On Sun, Oct 28, 2018 at 10:24 AM Kees Cook <keescook@chromium.org> wrote:
->
-> Please pull these VLA removal changes for v4.20-rc1.
+The level4_kernel_pgt is only defined when X86_5LEVEL is enabled.
+So declare check_la57_support() as inline to make sure the code
+referring to level4_kernel_pgt is optimized out. This is a preparation
+for CONFIG_CC_OPTIMIZE_FOR_DEBUGGING.
 
-Pulled,
+Signed-off-by: Changbin Du <changbin.du@gmail.com>
+Cc: Steven Rostedt (VMware) <rostedt@goodmis.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+ arch/x86/kernel/head64.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-                   Linus
+diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+index 5dc377dc9d7b..5ae682f2aa83 100644
+--- a/arch/x86/kernel/head64.c
++++ b/arch/x86/kernel/head64.c
+@@ -98,7 +98,7 @@ static bool __head check_la57_support(unsigned long physaddr)
+ 	return true;
+ }
+ #else
+-static bool __head check_la57_support(unsigned long physaddr)
++static inline bool __head check_la57_support(unsigned long physaddr)
+ {
+ 	return false;
+ }
+-- 
+2.17.1
