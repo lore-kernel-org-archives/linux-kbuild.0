@@ -1,128 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:39588 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726548AbeJ1VzD (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:47511 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727150AbeJ2BUz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 17:55:03 -0400
-From: Changbin Du <changbin.du@gmail.com>
-Subject: [PATCH v3 0/4] kernel hacking: GCC optimization for better debug experience (-Og)
-Date: Sun, 28 Oct 2018 13:09:41 +0000
-Message-Id: <20181028130945.23581-1-changbin.du@gmail.com>
+        Sun, 28 Oct 2018 21:20:55 -0400
+MIME-Version: 1.0
+References: <20181024040354.24879-1-leobras.c@gmail.com> <20181024040354.24879-2-leobras.c@gmail.com>
+In-Reply-To: <20181024040354.24879-2-leobras.c@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 29 Oct 2018 01:34:52 +0900
+Message-ID: <CAK7LNAR1OQsou-i85JLuWG2GdGx17fqhh9GN36QgahMm9N+DTw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/5] x86/vdso: Renames variable to fix shadow warning.
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org, gregkh@linuxfoundation.org
-Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Changbin Du <changbin.du@gmail.com>
+To: =?UTF-8?Q?Leonardo_Br=C3=A1s?= <leobras.c@gmail.com>, Ingo Molnar <mingo@kernel.org>
+Cc: lkcamp@lists.libreplanetbr.org, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, helen@koikeco.de, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi all,
-I have posted this series several months ago but interrupted by personal
-affairs. Now I get time to complete this task. Thanks for all of the
-reviewers.
-
-I know some kernel developers was searching for a method to dissable GCC
-optimizations, probably they want to apply GCC '-O0' option. But since Linux
-kernel relies on GCC optimization to remove some dead code, so '-O0' just
-breaks the build. They do need this because they want to debug kernel with
-qemu, simics, kgtp or kgdb.
-
-Thanks for the GCC '-Og' optimization level introduced in GCC 4.8, which
-offers a reasonable level of optimization while maintaining fast compilation
-and a good debugging experience. It is similar to '-O1' while perferring to
-keep debug ability over runtime speed. With '-Og', we can build a kernel with
-better debug ability and little performance drop after some simple change.
-
-In this series, firstly introduce a new config CONFIG_NO_AUTO_INLINE after two
-fixes for this new option. With this option, only functions explicitly marked
-with "inline" will  be inlined. This will allow the function tracer to trace
-more functions because it only traces functions that the compiler has not
-inlined.
-
-Then introduce new config CC_OPTIMIZE_FOR_DEBUGGING which apply '-Og'
-optimization level for whole kernel, with a simple fix in fix_to_virt().
-Currently I have only tested this option on x86 and ARM platform. Other
-platforms should also work but probably need some compiling fixes as what
-having done in this series. I leave that to who want to try this debug
-option.
-
-Comparison of vmlinux size: a bit smaller.
-
-    w/o CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-    $ size vmlinux
-       text    data     bss     dec     hex filename
-    22665554   9709674  2920908 35296136        21a9388 vmlinux
-
-    w/ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-    $ size vmlinux
-       text    data     bss     dec     hex filename
-    21499032   10102758 2920908 34522698        20ec64a vmlinux
+Hi Ingo,
 
 
-Comparison of system performance: a bit drop (~6%).
-    This benchmark of kernel compilation is suggested by Ingo Molnar.
-    https://lkml.org/lkml/2018/5/2/74
+On Wed, Oct 24, 2018 at 1:04 PM Leonardo Bras <leobras.c@gmail.com> wrote:
+>
+> The go32() and go64() functions have an argument and a local variable
+> called =E2=80=98name=E2=80=99.  Rename both to clarify the code and to fi=
+x a warning
+> with -Wshadow.
+>
+> Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
 
-    Preparation: Set cpufreq to 'performance'.
-    for ((cpu=0; cpu<120; cpu++)); do
-      G=/sys/devices/system/cpu/cpu$cpu/cpufreq/scaling_governor
-      [ -f $G ] && echo performance > $G
-    done
 
-    w/o CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-    $ perf stat --repeat 5 --null --pre                 '\
-        cp -a kernel ../kernel.copy.$(date +%s);         \
-        rm -rf *;                                        \
-        git checkout .;                                  \
-        echo 1 > /proc/sys/vm/drop_caches;               \
-        find ../kernel* -type f | xargs cat >/dev/null;  \
-        make -j kernel >/dev/null;                       \
-        make clean >/dev/null 2>&1;                      \
-        sync                                            '\
-                                                         \
-        make -j8 >/dev/null
+Please take care of this in x86 tree instead of kbuild.
 
-     Performance counter stats for 'make -j8' (5 runs):
 
-        219.764246652 seconds time elapsed                   ( +-  0.78% )
+Thanks.
 
-    w/ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-    $ perf stat --repeat 5 --null --pre                 '\
-        cp -a kernel ../kernel.copy.$(date +%s);         \
-        rm -rf *;                                        \
-        git checkout .;                                  \
-        echo 1 > /proc/sys/vm/drop_caches;               \
-        find ../kernel* -type f | xargs cat >/dev/null;  \
-        make -j kernel >/dev/null;                       \
-        make clean >/dev/null 2>&1;                      \
-        sync                                            '\
-                                                         \
-        make -j8 >/dev/null
 
-    Performance counter stats for 'make -j8' (5 runs):
+> ---
+>  arch/x86/entry/vdso/vdso2c.h | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/entry/vdso/vdso2c.h b/arch/x86/entry/vdso/vdso2c.h
+> index fa847a620f40..a20b134de2a8 100644
+> --- a/arch/x86/entry/vdso/vdso2c.h
+> +++ b/arch/x86/entry/vdso/vdso2c.h
+> @@ -7,7 +7,7 @@
+>
+>  static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
+>                          void *stripped_addr, size_t stripped_len,
+> -                        FILE *outfile, const char *name)
+> +                        FILE *outfile, const char *image_name)
+>  {
+>         int found_load =3D 0;
+>         unsigned long load_size =3D -1;  /* Work around bogus warning */
+> @@ -93,11 +93,12 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_l=
+en,
+>                 int k;
+>                 ELF(Sym) *sym =3D raw_addr + GET_LE(&symtab_hdr->sh_offse=
+t) +
+>                         GET_LE(&symtab_hdr->sh_entsize) * i;
+> -               const char *name =3D raw_addr + GET_LE(&strtab_hdr->sh_of=
+fset) +
+> -                       GET_LE(&sym->st_name);
+> +               const char *sym_name =3D raw_addr +
+> +                                      GET_LE(&strtab_hdr->sh_offset) +
+> +                                      GET_LE(&sym->st_name);
+>
+>                 for (k =3D 0; k < NSYMS; k++) {
+> -                       if (!strcmp(name, required_syms[k].name)) {
+> +                       if (!strcmp(sym_name, required_syms[k].name)) {
+>                                 if (syms[k]) {
+>                                         fail("duplicate symbol %s\n",
+>                                              required_syms[k].name);
+> @@ -134,7 +135,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_l=
+en,
+>         if (syms[sym_vvar_start] % 4096)
+>                 fail("vvar_begin must be a multiple of 4096\n");
+>
+> -       if (!name) {
+> +       if (!image_name) {
+>                 fwrite(stripped_addr, stripped_len, 1, outfile);
+>                 return;
+>         }
+> @@ -157,7 +158,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_l=
+en,
+>         }
+>         fprintf(outfile, "\n};\n\n");
+>
+> -       fprintf(outfile, "const struct vdso_image %s =3D {\n", name);
+> +       fprintf(outfile, "const struct vdso_image %s =3D {\n", image_name=
+);
+>         fprintf(outfile, "\t.data =3D raw_data,\n");
+>         fprintf(outfile, "\t.size =3D %lu,\n", mapping_size);
+>         if (alt_sec) {
+> --
+> 2.19.1
+>
 
-         233.574187771 seconds time elapsed                  ( +-  0.19% )
 
-v3:
-  o Take suggestions from Masahiro Yamada.
-v2:
-  o rebase on top of mainline.
-
-Changbin Du (4):
-  x86/mm: declare check_la57_support() as inline
-  kernel hacking: new config NO_AUTO_INLINE to disable compiler
-    auto-inline optimizations
-  ARM: mm: fix build error in fix_to_virt with
-    CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-  kernel hacking: new config CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og
-    optimization
-
- Makefile                     | 11 +++++++++++
- arch/arm/mm/mmu.c            |  2 +-
- arch/x86/kernel/head64.c     |  2 +-
- include/linux/compiler-gcc.h |  2 +-
- include/linux/compiler.h     |  2 +-
- init/Kconfig                 | 20 ++++++++++++++++++++
- kernel/configs/tiny.config   |  1 +
- lib/Kconfig.debug            | 17 +++++++++++++++++
- 8 files changed, 53 insertions(+), 4 deletions(-)
-
--- 
-2.17.1
+--=20
+Best Regards
+Masahiro Yamada
