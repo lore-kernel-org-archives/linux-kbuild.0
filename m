@@ -1,67 +1,128 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:35562 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726692AbeJ2CJT (ORCPT
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:39588 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbeJ1VzD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 22:09:19 -0400
-Received: by mail-pg1-f195.google.com with SMTP id 32-v6so2752753pgu.2
-        for <linux-kbuild@vger.kernel.org>; Sun, 28 Oct 2018 10:24:04 -0700 (PDT)
-Date: Sun, 28 Oct 2018 10:24:01 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: [GIT PULL] VLA removal for v4.20-rc1
-Message-ID: <20181028172401.GA41102@beast>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+        Sun, 28 Oct 2018 17:55:03 -0400
+From: Changbin Du <changbin.du@gmail.com>
+Subject: [PATCH v3 0/4] kernel hacking: GCC optimization for better debug experience (-Og)
+Date: Sun, 28 Oct 2018 13:09:41 +0000
+Message-Id: <20181028130945.23581-1-changbin.du@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Airlie <airlied@linux.ie>, dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Nick Desaulniers <ndesaulniers@google.com>
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org, gregkh@linuxfoundation.org
+Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Changbin Du <changbin.du@gmail.com>
 
-Hi Linus,
+Hi all,
+I have posted this series several months ago but interrupted by personal
+affairs. Now I get time to complete this task. Thanks for all of the
+reviewers.
 
-Please pull these VLA removal changes for v4.20-rc1. This turns on "-Wvla"
-globally now that the last few trees with their VLA removals have landed
-(crypto, block, net, and powerpc). Arnd mentioned that there may be a
-couple more VLAs hiding in hard-to-find randconfigs, but nothing big has
-shaken out in the last month or so in linux-next. We should be basically
-VLA-free now! Wheee. :)
+I know some kernel developers was searching for a method to dissable GCC
+optimizations, probably they want to apply GCC '-O0' option. But since Linux
+kernel relies on GCC optimization to remove some dead code, so '-O0' just
+breaks the build. They do need this because they want to debug kernel with
+qemu, simics, kgtp or kgdb.
 
-Thanks!
+Thanks for the GCC '-Og' optimization level introduced in GCC 4.8, which
+offers a reasonable level of optimization while maintaining fast compilation
+and a good debugging experience. It is similar to '-O1' while perferring to
+keep debug ability over runtime speed. With '-Og', we can build a kernel with
+better debug ability and little performance drop after some simple change.
 
--Kees
+In this series, firstly introduce a new config CONFIG_NO_AUTO_INLINE after two
+fixes for this new option. With this option, only functions explicitly marked
+with "inline" will  be inlined. This will allow the function tracer to trace
+more functions because it only traces functions that the compiler has not
+inlined.
 
-The following changes since commit 57361846b52bc686112da6ca5368d11210796804:
+Then introduce new config CC_OPTIMIZE_FOR_DEBUGGING which apply '-Og'
+optimization level for whole kernel, with a simple fix in fix_to_virt().
+Currently I have only tested this option on x86 and ARM platform. Other
+platforms should also work but probably need some compiling fixes as what
+having done in this series. I leave that to who want to try this debug
+option.
 
-  Linux 4.19-rc2 (2018-09-02 14:37:30 -0700)
+Comparison of vmlinux size: a bit smaller.
 
-are available in the Git repository at:
+    w/o CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ size vmlinux
+       text    data     bss     dec     hex filename
+    22665554   9709674  2920908 35296136        21a9388 vmlinux
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git tags/vla-v4.20-rc1
+    w/ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ size vmlinux
+       text    data     bss     dec     hex filename
+    21499032   10102758 2920908 34522698        20ec64a vmlinux
 
-for you to fetch changes up to 0bb95f80a38f82884693194ea720e9cca5e12ada:
 
-  Makefile: Globally enable VLA warning (2018-10-11 08:17:50 -0700)
+Comparison of system performance: a bit drop (~6%).
+    This benchmark of kernel compilation is suggested by Ingo Molnar.
+    https://lkml.org/lkml/2018/5/2/74
 
-----------------------------------------------------------------
-Globally warn on VLA use
+    Preparation: Set cpufreq to 'performance'.
+    for ((cpu=0; cpu<120; cpu++)); do
+      G=/sys/devices/system/cpu/cpu$cpu/cpufreq/scaling_governor
+      [ -f $G ] && echo performance > $G
+    done
 
-- Remove unused fallback for BUILD_BUG_ON (which technically contains a VLA)
-- Lift -Wvla to the top-level Makefile
+    w/o CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ perf stat --repeat 5 --null --pre                 '\
+        cp -a kernel ../kernel.copy.$(date +%s);         \
+        rm -rf *;                                        \
+        git checkout .;                                  \
+        echo 1 > /proc/sys/vm/drop_caches;               \
+        find ../kernel* -type f | xargs cat >/dev/null;  \
+        make -j kernel >/dev/null;                       \
+        make clean >/dev/null 2>&1;                      \
+        sync                                            '\
+                                                         \
+        make -j8 >/dev/null
 
-----------------------------------------------------------------
-Kees Cook (1):
-      Makefile: Globally enable VLA warning
+     Performance counter stats for 'make -j8' (5 runs):
 
-Masahiro Yamada (1):
-      compiler.h: give up __compiletime_assert_fallback()
+        219.764246652 seconds time elapsed                   ( +-  0.78% )
 
- Makefile                      |  3 +++
- drivers/gpu/drm/i915/Makefile |  2 +-
- include/linux/compiler.h      | 17 +----------------
- lib/Makefile                  |  2 ++
- scripts/Makefile.extrawarn    |  1 -
- 5 files changed, 7 insertions(+), 18 deletions(-)
+    w/ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ perf stat --repeat 5 --null --pre                 '\
+        cp -a kernel ../kernel.copy.$(date +%s);         \
+        rm -rf *;                                        \
+        git checkout .;                                  \
+        echo 1 > /proc/sys/vm/drop_caches;               \
+        find ../kernel* -type f | xargs cat >/dev/null;  \
+        make -j kernel >/dev/null;                       \
+        make clean >/dev/null 2>&1;                      \
+        sync                                            '\
+                                                         \
+        make -j8 >/dev/null
+
+    Performance counter stats for 'make -j8' (5 runs):
+
+         233.574187771 seconds time elapsed                  ( +-  0.19% )
+
+v3:
+  o Take suggestions from Masahiro Yamada.
+v2:
+  o rebase on top of mainline.
+
+Changbin Du (4):
+  x86/mm: declare check_la57_support() as inline
+  kernel hacking: new config NO_AUTO_INLINE to disable compiler
+    auto-inline optimizations
+  ARM: mm: fix build error in fix_to_virt with
+    CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+  kernel hacking: new config CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og
+    optimization
+
+ Makefile                     | 11 +++++++++++
+ arch/arm/mm/mmu.c            |  2 +-
+ arch/x86/kernel/head64.c     |  2 +-
+ include/linux/compiler-gcc.h |  2 +-
+ include/linux/compiler.h     |  2 +-
+ init/Kconfig                 | 20 ++++++++++++++++++++
+ kernel/configs/tiny.config   |  1 +
+ lib/Kconfig.debug            | 17 +++++++++++++++++
+ 8 files changed, 53 insertions(+), 4 deletions(-)
 
 -- 
-Kees Cook
+2.17.1
