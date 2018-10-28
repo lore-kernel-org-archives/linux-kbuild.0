@@ -1,55 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43993 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726734AbeJ1Vjy (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:60784 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726692AbeJ2BXp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 17:39:54 -0400
-Received: by mail-wr1-f68.google.com with SMTP id t10-v6so5729890wrn.10
-        for <linux-kbuild@vger.kernel.org>; Sun, 28 Oct 2018 05:55:19 -0700 (PDT)
-From: Petr Vorel <petr.vorel@gmail.com>
-Subject: [PATCH 1/1] merge_config.sh: Replace prefix CONFIG_ with any prefix
-Date: Sun, 28 Oct 2018 13:55:10 +0100
-Message-Id: <20181028125510.9346-1-petr.vorel@gmail.com>
+        Sun, 28 Oct 2018 21:23:45 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20181023011042.GA6582@WindFlash>
+In-Reply-To: <20181023011042.GA6582@WindFlash>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 29 Oct 2018 01:37:44 +0900
+Message-ID: <CAK7LNAT4uJiR8Nm1agBQwjGFDY81_7O0o6fxuqh=55WizwvhYQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] Creates macro to avoid variable shadowing
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Petr Vorel <petr.vorel@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Marcel Patzlaff <m.patzlaff@pilz.de>, Nasser Afshin <afshin.nasser@gmail.com>, Angelo Compagnucci <angelo.compagnucci@gmail.com>, Arnout Vandecappelle <arnout@mind.be>, Matthew Weber <matthew.weber@rockwellcollins.com>, John Stultz <john.stultz@linaro.org>
+To: =?UTF-8?Q?Leonardo_Br=C3=A1s?= <leobras.c@gmail.com>
+Cc: lkcamp@lists.libreplanetbr.org, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, helen@koikeco.de, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-merge_config.sh expect prefix from kernel: CONFIG_.
-There some other projects using kconfig with different prefixes
-(e.g. buildroot: BR2_ prefix). While there could be some option
-to specify config prefix [1] [2], IMHO it's better to not specify
-prefix (expect just any prefix).
+On Tue, Oct 23, 2018 at 10:11 AM Leonardo Br=C3=A1s <leobras.c@gmail.com> w=
+rote:
+>
+> Creates DEF_FIELD_ADDR_VAR as a more generic version of the DEF_FIELD_ADD
+> macro, allowing usage of a variable name other than the struct element na=
+me.
+> Also, sets DEF_FIELD_ADDR as a specific usage of DEF_FILD_ADDR_VAR in whi=
+ch
+> the var name is the same as the struct element name.
+>
+> Signed-off-by: Leonardo Br=C3=A1s <leobras.c@gmail.com>
+> ---
 
-[1] http://patchwork.ozlabs.org/patch/824051/
-[2] https://patchwork.ozlabs.org/patch/988890/
 
-Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
-Suggested-by: Marcel Patzlaff <m.patzlaff@pilz.de>
----
-NOTE: I deliberately left prefix CONFIG_ in comment:
-# allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
+Applied to linux-kbuild.
 
-Kind regards,
-Petr
----
- scripts/kconfig/merge_config.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 67d131447631..538222848bcf 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -99,7 +99,7 @@ if [ ! -r "$INITFILE" ]; then
- fi
- 
- MERGE_LIST=$*
--SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/p"
-+SED_CONFIG_EXP="s/^\(# \)\{0,1\}\([A-Z0-9_]\+_[a-zA-Z0-9_]*\)[= ].*/\2/p"
- TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
- 
- echo "Using $INITFILE as base"
--- 
-2.19.1
+
+>  scripts/mod/file2alias.c | 24 +++++++++++++++++-------
+>  1 file changed, 17 insertions(+), 7 deletions(-)
+>
+> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+> index 7be43697ff84..3015c0bdecb2 100644
+> --- a/scripts/mod/file2alias.c
+> +++ b/scripts/mod/file2alias.c
+> @@ -95,12 +95,20 @@ extern struct devtable *__start___devtable[], *__stop=
+___devtable[];
+>   */
+>  #define DEF_FIELD(m, devid, f) \
+>         typeof(((struct devid *)0)->f) f =3D TO_NATIVE(*(typeof(f) *)((m)=
+ + OFF_##devid##_##f))
+> +
+> +/* Define a variable v that holds the address of field f of struct devid
+> + * based at address m.  Due to the way typeof works, for a field of type
+> + * T[N] the variable has type T(*)[N], _not_ T*.
+> + */
+> +#define DEF_FIELD_ADDR_VAR(m, devid, f, v) \
+> +       typeof(((struct devid *)0)->f) *v =3D ((m) + OFF_##devid##_##f)
+> +
+>  /* Define a variable f that holds the address of field f of struct devid
+>   * based at address m.  Due to the way typeof works, for a field of type
+>   * T[N] the variable has type T(*)[N], _not_ T*.
+>   */
+>  #define DEF_FIELD_ADDR(m, devid, f) \
+> -       typeof(((struct devid *)0)->f) *f =3D ((m) + OFF_##devid##_##f)
+> +       DEF_FIELD_ADDR_VAR(m, devid, f, f)
+>
+>  /* Add a table entry.  We test function type matches while we're here. *=
+/
+>  #define ADD_TO_DEVTABLE(device_id, type, function) \
+> @@ -641,25 +649,27 @@ static void do_pnp_card_entries(void *symval, unsig=
+ned long size,
+>         unsigned int i;
+>
+>         device_id_check(mod->name, "pnp", size, id_size, symval);
+> +       DEF_FIELD_ADDR(symval, pnp_card_device_id, devs);
+> +       typeof(devs) devs_last;
+>
+>         for (i =3D 0; i < count; i++) {
+>                 unsigned int j;
+> -               DEF_FIELD_ADDR(symval + i*id_size, pnp_card_device_id, de=
+vs);
+> +               devs_last =3D devs + i * id_size;
+>
+>                 for (j =3D 0; j < PNP_MAX_DEVICES; j++) {
+> -                       const char *id =3D (char *)(*devs)[j].id;
+> -                       int i2, j2;
+> +                       const char *id =3D (char *)(*devs_last)[j].id;
+> +                       int j2;
+>                         int dup =3D 0;
+>
+>                         if (!id[0])
+>                                 break;
+>
+>                         /* find duplicate, already added value */
+> -                       for (i2 =3D 0; i2 < i && !dup; i2++) {
+> -                               DEF_FIELD_ADDR(symval + i2*id_size, pnp_c=
+ard_device_id, devs);
+> +                       while ((devs_last -=3D id_size) >=3D devs && !dup=
+) {
+>
+>                                 for (j2 =3D 0; j2 < PNP_MAX_DEVICES; j2++=
+) {
+> -                                       const char *id2 =3D (char *)(*dev=
+s)[j2].id;
+> +                                       const char *id2 =3D
+> +                                               (char *)(*devs_last)[j2].=
+id;
+>
+>                                         if (!id2[0])
+>                                                 break;
+> --
+> 2.19.1
+>
+
+
+--=20
+Best Regards
+Masahiro Yamada
