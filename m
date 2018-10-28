@@ -1,94 +1,200 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:60589 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726492AbeJ2B57 (ORCPT
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:40387 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbeJ1VzL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 21:57:59 -0400
-MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 29 Oct 2018 02:12:01 +0900
-Message-ID: <CAK7LNASZO0gOaLG2kmiAMaCQe3NYNsvW4FVm4sn5ESdRK5CDNA@mail.gmail.com>
-Subject: [GIT PULL] Kbuild updates for v4.20
-Content-Type: text/plain; charset="UTF-8"
+        Sun, 28 Oct 2018 17:55:11 -0400
+From: Changbin Du <changbin.du@gmail.com>
+Subject: [PATCH v3 4/4] kernel hacking: new config CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og optimization
+Date: Sun, 28 Oct 2018 13:09:45 +0000
+Message-Id: <20181028130945.23581-5-changbin.du@gmail.com>
+In-Reply-To: <20181028130945.23581-1-changbin.du@gmail.com>
+References: <20181028130945.23581-1-changbin.du@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org, gregkh@linuxfoundation.org
+Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Changbin Du <changbin.du@gmail.com>
 
-Hi Linus,
+This will apply GCC '-Og' optimization level which is supported
+since GCC 4.8. This optimization level offers a reasonable level
+of optimization while maintaining fast compilation and a good
+debugging experience. It is similar to '-O1' while perferring
+to keep debug ability over runtime speed.
 
-Please pull Kbuild updates for v4.20
+If enabling this option breaks your kernel, you should either
+disable this or find a fix (mostly in the arch code). Currently
+this option has only been tested on x86_64 and arm platform.
 
-Thanks!
+This option can satisfy people who was searching for a method
+to disable compiler optimizations so to achieve better kernel
+debugging experience with kgdb or qemu.
 
+The main problem of '-Og' is we must not use __attribute__((error(msg))).
+The compiler will report error though the call to error function
+still can be optimize out. So we must fallback to array tricky.
 
+Comparison of vmlinux size: a bit smaller.
 
-The following changes since commit 11da3a7f84f19c26da6f86af878298694ede0804:
+    w/o CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ size vmlinux
+       text    data     bss     dec     hex filename
+    22665554   9709674  2920908 35296136        21a9388 vmlinux
 
-  Linux 4.19-rc3 (2018-09-09 17:26:43 -0700)
+    w/ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ size vmlinux
+       text    data     bss     dec     hex filename
+    21499032   10102758 2920908 34522698        20ec64a vmlinux
 
-are available in the git repository at:
+Comparison of system performance: a bit drop (~6%).
+    This benchmark of kernel compilation is suggested by Ingo Molnar.
+    https://lkml.org/lkml/2018/5/2/74
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-v4.20
+    Preparation: Set cpufreq to 'performance'.
+    for ((cpu=0; cpu<120; cpu++)); do
+      G=/sys/devices/system/cpu/cpu$cpu/cpufreq/scaling_governor
+      [ -f $G ] && echo performance > $G
+    done
 
-for you to fetch changes up to c2b1a9226fe7c1cee8f0ae42496f3eb282d73ebb:
+    w/o CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ perf stat --repeat 5 --null --pre                 '\
+        cp -a kernel ../kernel.copy.$(date +%s);         \
+        rm -rf *;                                        \
+        git checkout .;                                  \
+        echo 1 > /proc/sys/vm/drop_caches;               \
+        find ../kernel* -type f | xargs cat >/dev/null;  \
+        make -j kernel >/dev/null;                       \
+        make clean >/dev/null 2>&1;                      \
+        sync                                            '\
+                                                         \
+        make -j8 >/dev/null
 
-  modpost: Create macro to avoid variable shadowing (2018-10-29 00:41:41 +0900)
+    Performance counter stats for 'make -j8' (5 runs):
 
-----------------------------------------------------------------
-Kbuild updates for v4.20
+        219.764246652 seconds time elapsed                   ( +-  0.78% )
 
-- optimize kallsyms slightly
+    w/ CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+    $ perf stat --repeat 5 --null --pre                 '\
+        cp -a kernel ../kernel.copy.$(date +%s);         \
+        rm -rf *;                                        \
+        git checkout .;                                  \
+        echo 1 > /proc/sys/vm/drop_caches;               \
+        find ../kernel* -type f | xargs cat >/dev/null;  \
+        make -j kernel >/dev/null;                       \
+        make clean >/dev/null 2>&1;                      \
+        sync                                            '\
+                                                         \
+        make -j8 >/dev/null
 
-- remove check for old CFLAGS usage
+    Performance counter stats for 'make -j8' (5 runs):
 
-- add some compiler flags unconditionally instead of evaluating
-  $(call cc-option,...)
+         233.574187771 seconds time elapsed                  ( +-  0.19% )
 
-- fix variable shadowing in host tools
+Signed-off-by: Changbin Du <changbin.du@gmail.com>
+Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-- refactor scripts/mkmakefile
+---
+v3:
+  o make CC_OPTIMIZE_FOR_DEBUGGING depends on $(cc-option,-Og)
+  o reflect CONFIG_CC_OPTIMIZE_FOR_DEBUGGING in tiny.config
+---
+ Makefile                     |  5 +++++
+ include/linux/compiler-gcc.h |  2 +-
+ include/linux/compiler.h     |  2 +-
+ init/Kconfig                 | 20 ++++++++++++++++++++
+ kernel/configs/tiny.config   |  1 +
+ 5 files changed, 28 insertions(+), 2 deletions(-)
 
-- refactor various makefiles
-
-----------------------------------------------------------------
-Jan Beulich (1):
-      kallsyms: reduce size a little on 64-bit
-
-Leonardo Bras (2):
-      ASN.1: Remove unnecessary shadowed local variable
-      modpost: Create macro to avoid variable shadowing
-
-Masahiro Yamada (16):
-      kallsyms: remove left-over Blackfin code
-      kbuild: prefix Makefile.dtbinst path with $(srctree) unconditionally
-      kbuild: remove old check for CFLAGS use
-      kbuild: hide most of targets when running config or mixed targets
-      kbuild: remove dead code in cmd_files calculation in top Makefile
-      kbuild: add --include-dir flag only for out-of-tree build
-      kbuild: remove VERSION and PATCHLEVEL from $(objtree)/Makefile
-      kbuild: remove user ID check in scripts/mkmakefile
-      kbuild: do not pass $(objtree) to scripts/mkmakefile
-      kbuild: simplify command line creation in scripts/mkmakefile
-      modpost: remove leftover symbol prefix handling for module device table
-      kbuild: add -Wno-pointer-sign flag unconditionally
-      kbuild: add -Wdeclaration-after-statement flag unconditionally
-      kbuild: add -Wno-unused-but-set-variable flag unconditionally
-      kbuild: remove unneeded link_multi_deps
-      kbuild: use 'else ifeq' for checksrc to improve readability
-
- Makefile                 | 31 +++++++++++++++++--------------
- kernel/kallsyms.c        |  4 ++--
- scripts/Kbuild.include   |  2 +-
- scripts/Makefile.build   | 44 ++++++++------------------------------------
- scripts/asn1_compiler.c  |  2 +-
- scripts/kallsyms.c       |  6 ++----
- scripts/mkmakefile       | 22 ++++------------------
- scripts/mod/file2alias.c | 26 ++++++++++++++++++--------
- 8 files changed, 53 insertions(+), 84 deletions(-)
-
-
+diff --git a/Makefile b/Makefile
+index 04beb822ddfc..10de245a3325 100644
+--- a/Makefile
++++ b/Makefile
+@@ -657,6 +657,10 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning, int-in-bool-context)
+ 
++ifdef CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
++KBUILD_CFLAGS	+= -Og
++KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
++else
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+ KBUILD_CFLAGS	+= $(call cc-option,-Oz,-Os)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
+@@ -667,6 +671,7 @@ else
+ KBUILD_CFLAGS   += -O2
+ endif
+ endif
++endif
+ 
+ KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
+ 			$(call cc-disable-warning,maybe-uninitialized,))
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index 90ddfefb6c2b..4832c98c7885 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -85,7 +85,7 @@
+ 
+ #define __compiletime_object_size(obj) __builtin_object_size(obj, 0)
+ 
+-#ifndef __CHECKER__
++#if !defined(__CHECKER__) && !defined(CONFIG_CC_OPTIMIZE_FOR_DEBUGGING)
+ #define __compiletime_warning(message) __attribute__((warning(message)))
+ #define __compiletime_error(message) __attribute__((error(message)))
+ 
+diff --git a/include/linux/compiler.h b/include/linux/compiler.h
+index 1921545c6351..3836397bf477 100644
+--- a/include/linux/compiler.h
++++ b/include/linux/compiler.h
+@@ -350,7 +350,7 @@ static inline void *offset_to_ptr(const int *off)
+  * sparse see a constant array size without breaking compiletime_assert on old
+  * versions of GCC (e.g. 4.2.4), so hide the array from sparse altogether.
+  */
+-# ifndef __CHECKER__
++# if !defined(__CHECKER__) && !defined(CONFIG_CC_OPTIMIZE_FOR_DEBUGGING)
+ #  define __compiletime_error_fallback(condition) \
+ 	do { ((void)sizeof(char[1 - 2 * condition])); } while (0)
+ # endif
+diff --git a/init/Kconfig b/init/Kconfig
+index a4112e95724a..0fb9c0b5f1a1 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1105,6 +1105,26 @@ config CC_OPTIMIZE_FOR_SIZE
+ 
+ 	  If unsure, say N.
+ 
++config CC_OPTIMIZE_FOR_DEBUGGING
++	bool "Optimize for better debugging experience (-Og)"
++	depends on $(cc-option,-Og)
++	select NO_AUTO_INLINE
++	help
++	  This will apply GCC '-Og' optimization level which is supported
++	  since GCC 4.8. This optimization level offers a reasonable level
++	  of optimization while maintaining fast compilation and a good
++	  debugging experience. It is similar to '-O1' while preferring to
++	  keep debug ability over runtime speed. The overall performance
++	  will drop a bit (~6%).
++
++	  Use only if you want to debug the kernel, especially if you want
++	  to have better kernel debugging experience with gdb facilities
++	  like kgdb or qemu. If enabling this option breaks your kernel,
++	  you should either disable this or find a fix (mostly in the arch
++	  code).
++
++	  If unsure, select N.
++
+ endchoice
+ 
+ config HAVE_LD_DEAD_CODE_DATA_ELIMINATION
+diff --git a/kernel/configs/tiny.config b/kernel/configs/tiny.config
+index 7fa0c4ae6394..599ea86b0800 100644
+--- a/kernel/configs/tiny.config
++++ b/kernel/configs/tiny.config
+@@ -1,5 +1,6 @@
+ # CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE is not set
+ CONFIG_CC_OPTIMIZE_FOR_SIZE=y
++# CONFIG_CC_OPTIMIZE_FOR_DEBUGGING is not set
+ # CONFIG_KERNEL_GZIP is not set
+ # CONFIG_KERNEL_BZIP2 is not set
+ # CONFIG_KERNEL_LZMA is not set
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
