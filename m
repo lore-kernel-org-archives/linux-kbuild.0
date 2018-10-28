@@ -1,128 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:35872 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726379AbeJ1Vay (ORCPT
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:42512 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbeJ1VzJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 17:30:54 -0400
-Date: Sun, 28 Oct 2018 12:46:18 +0000
+        Sun, 28 Oct 2018 17:55:09 -0400
 From: Changbin Du <changbin.du@gmail.com>
-Subject: Re: [PATCH v2 1/4] x86/mm: surround level4_kernel_pgt with #ifdef
- CONFIG_X86_5LEVEL...#endif
-Message-ID: <20181028124507.4n2sfkm7iteyoud5@mail.google.com>
-References: <20181019124921.13780-1-changbin.du@gmail.com>
- <20181019124921.13780-2-changbin.du@gmail.com>
- <CAK7LNAQJxVDWU5GPY4O6x+z_Pkmh4KuHiTpkY_LDJwNYO-eCBw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQJxVDWU5GPY4O6x+z_Pkmh4KuHiTpkY_LDJwNYO-eCBw@mail.gmail.com>
+Subject: [PATCH v3 3/4] ARM: mm: fix build error in fix_to_virt with CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+Date: Sun, 28 Oct 2018 13:09:44 +0000
+Message-Id: <20181028130945.23581-4-changbin.du@gmail.com>
+In-Reply-To: <20181028130945.23581-1-changbin.du@gmail.com>
+References: <20181028130945.23581-1-changbin.du@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: changbin.du@gmail.com, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Steven Rostedt <rostedt@goodmis.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org, gregkh@linuxfoundation.org
+Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Changbin Du <changbin.du@gmail.com>
 
-On Sun, Oct 28, 2018 at 10:44:46AM +0900, Masahiro Yamada wrote:
-> On Fri, Oct 19, 2018 at 9:50 PM Du Changbin <changbin.du@gmail.com> wrote:
-> >
-> > The level4_kernel_pgt is only defined when X86_5LEVEL is enabled. So
-> > surround level4_kernel_pgt with #ifdef CONFIG_X86_5LEVEL...#endif to
-> > make code correct.
-> 
-> For clarification, is it better to mention
-> that this is a preparation for CONFIG_CC_OPTIMIZE_FOR_DEBUGGING ?
->
-yes, I will update the commit msg.
+With '-Og' optimization level, GCC would not optimize a count for a loop
+as a constant value. But BUILD_BUG_ON() only accept compile-time constant
+values. Let's use __fix_to_virt() to avoid the error.
 
-> 
-> > Signed-off-by: Du Changbin <changbin.du@gmail.com>
-> > Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-> > ---
-> >  arch/x86/include/asm/pgtable_64.h |  2 ++
-> >  arch/x86/kernel/head64.c          | 13 ++++++-------
-> >  2 files changed, 8 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/pgtable_64.h b/arch/x86/include/asm/pgtable_64.h
-> > index 9c85b54bf03c..9333f7fa5bdb 100644
-> > --- a/arch/x86/include/asm/pgtable_64.h
-> > +++ b/arch/x86/include/asm/pgtable_64.h
-> > @@ -16,7 +16,9 @@
-> >  #include <linux/threads.h>
-> >  #include <asm/fixmap.h>
-> >
-> > +#ifdef CONFIG_X86_5LEVEL
-> >  extern p4d_t level4_kernel_pgt[512];
-> > +#endif
-> 
-> 
-> Is this #ifdef  necessary?
-> 
-> It is harmless to declaring unused stuff.
-> 
-> 
-> 
-> >  extern p4d_t level4_ident_pgt[512];
-> >  extern pud_t level3_kernel_pgt[512];
-> >  extern pud_t level3_ident_pgt[512];
-> > diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-> > index ddee1f0870c4..4a59ef93c258 100644
-> > --- a/arch/x86/kernel/head64.c
-> > +++ b/arch/x86/kernel/head64.c
-> > @@ -151,16 +151,15 @@ unsigned long __head __startup_64(unsigned long physaddr,
-> >
-> >         pgd = fixup_pointer(&early_top_pgt, physaddr);
-> >         p = pgd + pgd_index(__START_KERNEL_map);
-> > -       if (la57)
-> > -               *p = (unsigned long)level4_kernel_pgt;
-> > -       else
-> > -               *p = (unsigned long)level3_kernel_pgt;
-> > -       *p += _PAGE_TABLE_NOENC - __START_KERNEL_map + load_delta;
-> > -
-> > +#ifdef CONFIG_X86_5LEVEL
-> >         if (la57) {
-> > +               *p = (unsigned long)level4_kernel_pgt;
-> >                 p4d = fixup_pointer(&level4_kernel_pgt, physaddr);
-> >                 p4d[511] += load_delta;
-> > -       }
-> > +       } else
-> > +#endif
-> > +               *p = (unsigned long)level3_kernel_pgt;
-> > +       *p += _PAGE_TABLE_NOENC - __START_KERNEL_map + load_delta;
-> >
-> >         pud = fixup_pointer(&level3_kernel_pgt, physaddr);
-> >         pud[510] += load_delta;
-> > --
-> > 2.17.1
-> >
-> 
-> 
-> Hmm, this code looks a bit ugly...
-> 
-> Does the following one liner work with CONFIG_CC_OPTIMIZE_FOR_DEBUGGING ?
-> 
-> 
-> diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-> index 8047379..579847f 100644
-> --- a/arch/x86/kernel/head64.c
-> +++ b/arch/x86/kernel/head64.c
-> @@ -97,7 +97,7 @@ static bool __head check_la57_support(unsigned long physaddr)
->         return true;
->  }
->  #else
-> -static bool __head check_la57_support(unsigned long physaddr)
-> +static __always_inline bool __head check_la57_support(unsigned long physaddr)
->  {
->         return false;
->  }
-> 
-This is much better. I just declared it as 'inline'. Thanks for your suggestion.
+arch/arm/mm/mmu.o: In function `fix_to_virt':
+/home/changbin/work/linux/./include/asm-generic/fixmap.h:31: undefined reference to `__compiletime_assert_31'
+Makefile:1051: recipe for target 'vmlinux' failed
+make: *** [vmlinux] Error 1
 
-> 
-> 
-> 
-> --
-> Best Regards
-> Masahiro Yamada
+Signed-off-by: Changbin Du <changbin.du@gmail.com>
+Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+---
+ arch/arm/mm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/arch/arm/mm/mmu.c b/arch/arm/mm/mmu.c
+index e46a6a446cdd..c08d74e76714 100644
+--- a/arch/arm/mm/mmu.c
++++ b/arch/arm/mm/mmu.c
+@@ -1599,7 +1599,7 @@ static void __init early_fixmap_shutdown(void)
+ 		pte_t *pte;
+ 		struct map_desc map;
+ 
+-		map.virtual = fix_to_virt(i);
++		map.virtual = __fix_to_virt(i);
+ 		pte = pte_offset_early_fixmap(pmd_off_k(map.virtual), map.virtual);
+ 
+ 		/* Only i/o device mappings are supported ATM */
 -- 
-Thanks,
-Changbin Du
+2.17.1
