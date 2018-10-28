@@ -1,60 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:44918 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726379AbeJ1V7Q (ORCPT
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:38346 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725920AbeJ2FJg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 17:59:16 -0400
-Date: Sun, 28 Oct 2018 13:14:36 +0000
-From: Changbin Du <changbin.du@gmail.com>
-Subject: Re: [PATCH v2 4/4] kernel hacking: new config
- CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og optimization
-Message-ID: <20181028131357.parhzj32feapxncb@mail.google.com>
-References: <20181019124921.13780-1-changbin.du@gmail.com>
- <20181019124921.13780-5-changbin.du@gmail.com>
- <CAK7LNARW0=0d7m5DAgZOir=h0Y4tssqZoQRGasnGPNnvNf_+pg@mail.gmail.com>
- <20181028125106.azcn2dxia3snplin@mail.google.com>
- <CAK7LNARr7bE=DVuzim5771heuN5os0=5-D+jXfUyBb2e1xYoRA@mail.gmail.com>
+        Mon, 29 Oct 2018 01:09:36 -0400
+Received: by mail-lj1-f194.google.com with SMTP id k11-v6so5803073lja.5
+        for <linux-kbuild@vger.kernel.org>; Sun, 28 Oct 2018 13:23:52 -0700 (PDT)
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com. [209.85.167.52])
+        by smtp.gmail.com with ESMTPSA id x29-v6sm1427022ljb.69.2018.10.28.13.23.49
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 28 Oct 2018 13:23:50 -0700 (PDT)
+Received: by mail-lf1-f52.google.com with SMTP id p11-v6so4491558lfc.6
+        for <linux-kbuild@vger.kernel.org>; Sun, 28 Oct 2018 13:23:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARr7bE=DVuzim5771heuN5os0=5-D+jXfUyBb2e1xYoRA@mail.gmail.com>
+References: <CAK7LNASZO0gOaLG2kmiAMaCQe3NYNsvW4FVm4sn5ESdRK5CDNA@mail.gmail.com>
+In-Reply-To: <CAK7LNASZO0gOaLG2kmiAMaCQe3NYNsvW4FVm4sn5ESdRK5CDNA@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sun, 28 Oct 2018 13:23:33 -0700
+Message-ID: <CAHk-=wgg0NQUxPut0vw8JjM=ZAGc6cHjRcU0xwn+B6Wb47b1ag@mail.gmail.com>
+Subject: Re: [GIT PULL] Kbuild updates for v4.20
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Changbin Du <changbin.du@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Steven Rostedt <rostedt@goodmis.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
+To: yamada.masahiro@socionext.com
+Cc: linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-On Sun, Oct 28, 2018 at 10:09:21PM +0900, Masahiro Yamada wrote:
-> Hi Changbin,
-> 
-> On Sun, Oct 28, 2018 at 9:52 PM Changbin Du <changbin.du@gmail.com> wrote:
-> 
-> > >
-> > Thanks for pointing this out and kind suggestions. I have tested with your
-> > modification. Will update patch serias soon.
-> 
-> 
-> I have one more request.
-> 
-> The patch subject
-> "kernel hacking: new config CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og
-> optimization"
-> is too long (83 characters)
-> 
-> 
-> I'd like the subject to be within 70 columns or so.
-> 
-oh, I just sent new version. Could me update the title if there are more
-suggestions then?
+On Sun, Oct 28, 2018 at 10:12 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> Please pull Kbuild updates for v4.20
 
-> Thanks.
-> 
-> 
-> 
-> 
-> -- 
-> Best Regards
-> Masahiro Yamada
+Pulled,
 
--- 
-Thanks,
-Changbin Du
+                      Linus
