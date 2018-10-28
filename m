@@ -1,47 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:42512 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726548AbeJ1VzJ (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:60589 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726492AbeJ2B57 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 17:55:09 -0400
-From: Changbin Du <changbin.du@gmail.com>
-Subject: [PATCH v3 3/4] ARM: mm: fix build error in fix_to_virt with CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
-Date: Sun, 28 Oct 2018 13:09:44 +0000
-Message-Id: <20181028130945.23581-4-changbin.du@gmail.com>
-In-Reply-To: <20181028130945.23581-1-changbin.du@gmail.com>
-References: <20181028130945.23581-1-changbin.du@gmail.com>
+        Sun, 28 Oct 2018 21:57:59 -0400
+MIME-Version: 1.0
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 29 Oct 2018 02:12:01 +0900
+Message-ID: <CAK7LNASZO0gOaLG2kmiAMaCQe3NYNsvW4FVm4sn5ESdRK5CDNA@mail.gmail.com>
+Subject: [GIT PULL] Kbuild updates for v4.20
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org, gregkh@linuxfoundation.org
-Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Changbin Du <changbin.du@gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-With '-Og' optimization level, GCC would not optimize a count for a loop
-as a constant value. But BUILD_BUG_ON() only accept compile-time constant
-values. Let's use __fix_to_virt() to avoid the error.
+Hi Linus,
 
-arch/arm/mm/mmu.o: In function `fix_to_virt':
-/home/changbin/work/linux/./include/asm-generic/fixmap.h:31: undefined reference to `__compiletime_assert_31'
-Makefile:1051: recipe for target 'vmlinux' failed
-make: *** [vmlinux] Error 1
+Please pull Kbuild updates for v4.20
 
-Signed-off-by: Changbin Du <changbin.du@gmail.com>
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
----
- arch/arm/mm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks!
 
-diff --git a/arch/arm/mm/mmu.c b/arch/arm/mm/mmu.c
-index e46a6a446cdd..c08d74e76714 100644
---- a/arch/arm/mm/mmu.c
-+++ b/arch/arm/mm/mmu.c
-@@ -1599,7 +1599,7 @@ static void __init early_fixmap_shutdown(void)
- 		pte_t *pte;
- 		struct map_desc map;
- 
--		map.virtual = fix_to_virt(i);
-+		map.virtual = __fix_to_virt(i);
- 		pte = pte_offset_early_fixmap(pmd_off_k(map.virtual), map.virtual);
- 
- 		/* Only i/o device mappings are supported ATM */
+
+
+The following changes since commit 11da3a7f84f19c26da6f86af878298694ede0804:
+
+  Linux 4.19-rc3 (2018-09-09 17:26:43 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-v4.20
+
+for you to fetch changes up to c2b1a9226fe7c1cee8f0ae42496f3eb282d73ebb:
+
+  modpost: Create macro to avoid variable shadowing (2018-10-29 00:41:41 +0900)
+
+----------------------------------------------------------------
+Kbuild updates for v4.20
+
+- optimize kallsyms slightly
+
+- remove check for old CFLAGS usage
+
+- add some compiler flags unconditionally instead of evaluating
+  $(call cc-option,...)
+
+- fix variable shadowing in host tools
+
+- refactor scripts/mkmakefile
+
+- refactor various makefiles
+
+----------------------------------------------------------------
+Jan Beulich (1):
+      kallsyms: reduce size a little on 64-bit
+
+Leonardo Bras (2):
+      ASN.1: Remove unnecessary shadowed local variable
+      modpost: Create macro to avoid variable shadowing
+
+Masahiro Yamada (16):
+      kallsyms: remove left-over Blackfin code
+      kbuild: prefix Makefile.dtbinst path with $(srctree) unconditionally
+      kbuild: remove old check for CFLAGS use
+      kbuild: hide most of targets when running config or mixed targets
+      kbuild: remove dead code in cmd_files calculation in top Makefile
+      kbuild: add --include-dir flag only for out-of-tree build
+      kbuild: remove VERSION and PATCHLEVEL from $(objtree)/Makefile
+      kbuild: remove user ID check in scripts/mkmakefile
+      kbuild: do not pass $(objtree) to scripts/mkmakefile
+      kbuild: simplify command line creation in scripts/mkmakefile
+      modpost: remove leftover symbol prefix handling for module device table
+      kbuild: add -Wno-pointer-sign flag unconditionally
+      kbuild: add -Wdeclaration-after-statement flag unconditionally
+      kbuild: add -Wno-unused-but-set-variable flag unconditionally
+      kbuild: remove unneeded link_multi_deps
+      kbuild: use 'else ifeq' for checksrc to improve readability
+
+ Makefile                 | 31 +++++++++++++++++--------------
+ kernel/kallsyms.c        |  4 ++--
+ scripts/Kbuild.include   |  2 +-
+ scripts/Makefile.build   | 44 ++++++++------------------------------------
+ scripts/asn1_compiler.c  |  2 +-
+ scripts/kallsyms.c       |  6 ++----
+ scripts/mkmakefile       | 22 ++++------------------
+ scripts/mod/file2alias.c | 26 ++++++++++++++++++--------
+ 8 files changed, 53 insertions(+), 84 deletions(-)
+
+
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
