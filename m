@@ -1,79 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:33333 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726548AbeJ1VzH (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:17018 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727604AbeJ2B3G (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Oct 2018 17:55:07 -0400
-From: Changbin Du <changbin.du@gmail.com>
-Subject: [PATCH v3 2/4] kernel hacking: new config NO_AUTO_INLINE to disable compiler auto-inline optimizations
-Date: Sun, 28 Oct 2018 13:09:43 +0000
-Message-Id: <20181028130945.23581-3-changbin.du@gmail.com>
-In-Reply-To: <20181028130945.23581-1-changbin.du@gmail.com>
-References: <20181028130945.23581-1-changbin.du@gmail.com>
+        Sun, 28 Oct 2018 21:29:06 -0400
+MIME-Version: 1.0
+References: <20181024040354.24879-1-leobras.c@gmail.com> <20181024040354.24879-5-leobras.c@gmail.com>
+In-Reply-To: <20181024040354.24879-5-leobras.c@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 29 Oct 2018 01:42:57 +0900
+Message-ID: <CAK7LNAQzgdFPpwHEtfDazLd2jAhNy8=f_4mvOQMWfOWCb07E1Q@mail.gmail.com>
+Subject: Re: [PATCH v3 4/5] modpost: Changes parameter name to avoid shadowing.
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, tglx@linutronix.de, mingo@redhat.com, linux@armlinux.org.uk, akpm@linux-foundation.org, gregkh@linuxfoundation.org
-Cc: rostedt@goodmis.org, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, robin.murphy@arm.com, Changbin Du <changbin.du@gmail.com>
+To: =?UTF-8?Q?Leonardo_Br=C3=A1s?= <leobras.c@gmail.com>
+Cc: lkcamp@lists.libreplanetbr.org, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, helen@koikeco.de, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-This patch add a new kernel hacking option NO_AUTO_INLINE. Selecting
-this option will prevent the compiler from optimizing the kernel by
-auto-inlining functions not marked with the inline keyword.
+On Wed, Oct 24, 2018 at 1:05 PM Leonardo Bras <leobras.c@gmail.com> wrote:
+>
+> Changes the parameter name to avoid shadowing a variable.
+>
+> Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
 
-With this option, only functions explicitly marked with "inline" will
-be inlined. This will allow the function tracer to trace more functions
-because it only traces functions that the compiler has not inlined.
 
-Signed-off-by: Changbin Du <changbin.du@gmail.com>
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
----
- Makefile          |  6 ++++++
- lib/Kconfig.debug | 17 +++++++++++++++++
- 2 files changed, 23 insertions(+)
+For this one, I'd rather like to see code refactoring
+than renaming the variable.
 
-diff --git a/Makefile b/Makefile
-index 7d4ba5196010..04beb822ddfc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -749,6 +749,12 @@ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
- 		   $(call cc-option,-fno-var-tracking)
- endif
- 
-+ifdef CONFIG_NO_AUTO_INLINE
-+KBUILD_CFLAGS   += $(call cc-option, -fno-inline-functions) \
-+		   $(call cc-option, -fno-inline-small-functions) \
-+		   $(call cc-option, -fno-inline-functions-called-once)
-+endif
-+
- ifdef CONFIG_FUNCTION_TRACER
- ifdef CONFIG_FTRACE_MCOUNT_RECORD
-   # gcc 5 supports generating the mcount tables directly
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 04adfc3b185e..d50711b41dad 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -211,6 +211,23 @@ config GDB_SCRIPTS
- 	  instance. See Documentation/dev-tools/gdb-kernel-debugging.rst
- 	  for further details.
- 
-+config NO_AUTO_INLINE
-+	bool "Disable compiler auto-inline optimizations"
-+	help
-+	  This will prevent the compiler from optimizing the kernel by
-+	  auto-inlining functions not marked with the inline keyword.
-+	  With this option, only functions explicitly marked with
-+	  "inline" will be inlined. This will allow the function tracer
-+	  to trace more functions because it only traces functions that
-+	  the compiler has not inlined.
-+
-+	  Enabling this function can help debugging a kernel if using
-+	  the function tracer. But it can also change how the kernel
-+	  works, because inlining functions may change the timing,
-+	  which could make it difficult while debugging race conditions.
-+
-+	  If unsure, select N.
-+
- config ENABLE_MUST_CHECK
- 	bool "Enable __must_check logic"
- 	default y
+I will take a closer look.
+
+
+
+
+> ---
+>  scripts/mod/modpost.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 0d998c54564d..368fe42340df 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -2228,13 +2228,13 @@ static int add_versions(struct buffer *b, struct module *mod)
+>  }
+>
+>  static void add_depends(struct buffer *b, struct module *mod,
+> -                       struct module *modules)
+> +                       struct module *module_list)
+>  {
+>         struct symbol *s;
+>         struct module *m;
+>         int first = 1;
+>
+> -       for (m = modules; m; m = m->next)
+> +       for (m = module_list; m; m = m->next)
+>                 m->seen = is_vmlinux(m->name);
+>
+>         buf_printf(b, "\n");
+> --
+> 2.19.1
+>
+
+
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
