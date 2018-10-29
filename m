@@ -1,96 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:51980 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725971AbeJ2Vwy (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:29707 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725943AbeJ2VyM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Oct 2018 17:52:54 -0400
+        Mon, 29 Oct 2018 17:54:12 -0400
 MIME-Version: 1.0
-References: <20181028130945.23581-1-changbin.du@gmail.com> <20181028130945.23581-3-changbin.du@gmail.com>
-In-Reply-To: <20181028130945.23581-3-changbin.du@gmail.com>
+References: <20181028130945.23581-1-changbin.du@gmail.com> <20181028130945.23581-2-changbin.du@gmail.com>
+ <20181028140911.21d49629@vmware.local.home>
+In-Reply-To: <20181028140911.21d49629@vmware.local.home>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 29 Oct 2018 22:03:38 +0900
-Message-ID: <CAK7LNASiGPar_Aj1KDu8E+S=NKRf7mEJ8gwe2=OMUGggZmtfNQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/4] kernel hacking: new config NO_AUTO_INLINE to
- disable compiler auto-inline optimizations
+Date: Mon, 29 Oct 2018 22:04:46 +0900
+Message-ID: <CAK7LNATixykqHqdu5W3NpfXqBXMNsP0OLKjNdsFc_EzJ_diOxA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/4] x86/mm: declare check_la57_support() as inline
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Changbin Du <changbin.du@gmail.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt <rostedt@goodmis.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Changbin Du <changbin.du@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
 
-On Sun, Oct 28, 2018 at 10:13 PM Changbin Du <changbin.du@gmail.com> wrote:
+On Mon, Oct 29, 2018 at 3:09 AM Steven Rostedt <rostedt@goodmis.org> wrote:
 >
-> This patch add a new kernel hacking option NO_AUTO_INLINE. Selecting
+> On Sun, 28 Oct 2018 13:09:42 +0000
+> Changbin Du <changbin.du@gmail.com> wrote:
+>
+> > The level4_kernel_pgt is only defined when X86_5LEVEL is enabled.
+> > So declare check_la57_support() as inline to make sure the code
+> > referring to level4_kernel_pgt is optimized out. This is a preparation
+> > for CONFIG_CC_OPTIMIZE_FOR_DEBUGGING.
+> >
+> > Signed-off-by: Changbin Du <changbin.du@gmail.com>
+>
+> Reviewed-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+>
+> -- Steve
+>
 
 
-I fixed "This patch add ..." to "This patch adds ..."
-then applied to linux-kbuild.
-
-
-
-
-> this option will prevent the compiler from optimizing the kernel by
-> auto-inlining functions not marked with the inline keyword.
->
-> With this option, only functions explicitly marked with "inline" will
-> be inlined. This will allow the function tracer to trace more functions
-> because it only traces functions that the compiler has not inlined.
->
-> Signed-off-by: Changbin Du <changbin.du@gmail.com>
-> Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-> ---
->  Makefile          |  6 ++++++
->  lib/Kconfig.debug | 17 +++++++++++++++++
->  2 files changed, 23 insertions(+)
->
-> diff --git a/Makefile b/Makefile
-> index 7d4ba5196010..04beb822ddfc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -749,6 +749,12 @@ KBUILD_CFLAGS      += $(call cc-option, -femit-struct-debug-baseonly) \
->                    $(call cc-option,-fno-var-tracking)
->  endif
->
-> +ifdef CONFIG_NO_AUTO_INLINE
-> +KBUILD_CFLAGS   += $(call cc-option, -fno-inline-functions) \
-> +                  $(call cc-option, -fno-inline-small-functions) \
-> +                  $(call cc-option, -fno-inline-functions-called-once)
-> +endif
-> +
->  ifdef CONFIG_FUNCTION_TRACER
->  ifdef CONFIG_FTRACE_MCOUNT_RECORD
->    # gcc 5 supports generating the mcount tables directly
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index 04adfc3b185e..d50711b41dad 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -211,6 +211,23 @@ config GDB_SCRIPTS
->           instance. See Documentation/dev-tools/gdb-kernel-debugging.rst
->           for further details.
->
-> +config NO_AUTO_INLINE
-> +       bool "Disable compiler auto-inline optimizations"
-> +       help
-> +         This will prevent the compiler from optimizing the kernel by
-> +         auto-inlining functions not marked with the inline keyword.
-> +         With this option, only functions explicitly marked with
-> +         "inline" will be inlined. This will allow the function tracer
-> +         to trace more functions because it only traces functions that
-> +         the compiler has not inlined.
-> +
-> +         Enabling this function can help debugging a kernel if using
-> +         the function tracer. But it can also change how the kernel
-> +         works, because inlining functions may change the timing,
-> +         which could make it difficult while debugging race conditions.
-> +
-> +         If unsure, select N.
-> +
->  config ENABLE_MUST_CHECK
->         bool "Enable __must_check logic"
->         default y
-> --
-> 2.17.1
->
+Applied to linux-kbuild.
 
 
 -- 
