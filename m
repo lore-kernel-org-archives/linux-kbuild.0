@@ -1,87 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:38699 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726035AbeJ2Xp6 (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:53892 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726445AbeJ3AMW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Oct 2018 19:45:58 -0400
-Date: Mon, 29 Oct 2018 14:56:56 +0000
-From: Changbin Du <changbin.du@gmail.com>
-Subject: Re: [PATCH v2 4/4] kernel hacking: new config
- CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og optimization
-Message-ID: <20181029145655.vzlhz7dipzmpw52m@mail.google.com>
-References: <20181019124921.13780-1-changbin.du@gmail.com>
- <20181019124921.13780-5-changbin.du@gmail.com>
- <CAK7LNARW0=0d7m5DAgZOir=h0Y4tssqZoQRGasnGPNnvNf_+pg@mail.gmail.com>
- <20181028125106.azcn2dxia3snplin@mail.google.com>
- <CAK7LNARr7bE=DVuzim5771heuN5os0=5-D+jXfUyBb2e1xYoRA@mail.gmail.com>
- <20181028131357.parhzj32feapxncb@mail.google.com>
- <CAK7LNAQ0iZDHP8zQZ_Ws4Wy4H6rwiV5p-A0bM1yVJLP51sqQeg@mail.gmail.com>
+        Mon, 29 Oct 2018 20:12:22 -0400
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id w9TFN72f011531
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Oct 2018 00:23:08 +0900
+Received: by mail-vs1-f52.google.com with SMTP id 124so5476861vsp.12
+        for <linux-kbuild@vger.kernel.org>; Mon, 29 Oct 2018 08:23:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQ0iZDHP8zQZ_Ws4Wy4H6rwiV5p-A0bM1yVJLP51sqQeg@mail.gmail.com>
+References: <20181028125510.9346-1-petr.vorel@gmail.com>
+In-Reply-To: <20181028125510.9346-1-petr.vorel@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 30 Oct 2018 00:22:30 +0900
+Message-ID: <CAK7LNARccwZNM=4jOEoHNiZ-x4FrzNDG6uZtEXhQMA0z7Pnunw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] merge_config.sh: Replace prefix CONFIG_ with any prefix
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Changbin Du <changbin.du@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Steven Rostedt <rostedt@goodmis.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
+To: Petr Vorel <petr.vorel@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, m.patzlaff@pilz.de, afshin.nasser@gmail.com, angelo.compagnucci@gmail.com, Arnout Vandecappelle <arnout@mind.be>, Matthew Weber <matthew.weber@rockwellcollins.com>, John Stultz <john.stultz@linaro.org>
 
-On Mon, Oct 29, 2018 at 10:01:44PM +0900, Masahiro Yamada wrote:
-> Hi.
-> 
-> 
-> On Sun, Oct 28, 2018 at 10:14 PM Changbin Du <changbin.du@gmail.com> wrote:
-> >
-> > On Sun, Oct 28, 2018 at 10:09:21PM +0900, Masahiro Yamada wrote:
-> > > Hi Changbin,
-> > >
-> > > On Sun, Oct 28, 2018 at 9:52 PM Changbin Du <changbin.du@gmail.com> wrote:
-> > >
-> > > > >
-> > > > Thanks for pointing this out and kind suggestions. I have tested with your
-> > > > modification. Will update patch serias soon.
-> > >
-> > >
-> > > I have one more request.
-> > >
-> > > The patch subject
-> > > "kernel hacking: new config CC_OPTIMIZE_FOR_DEBUGGING to apply GCC -Og
-> > > optimization"
-> > > is too long (83 characters)
-> > >
-> > >
-> > > I'd like the subject to be within 70 columns or so.
-> > >
-> > oh, I just sent new version. Could me update the title if there are more
-> > suggestions then?
-> 
-> 
-> 
-> How about this?
-> 
-> 2/4: kernel hacking: add a config option to disable compiler auto-inlining
-> 3/4: ARM: mm: fix build error in fix_to_virt with -Og optimization level
-> 4/4: kernel hacking: support building kernel with -Og optimization level
-> 
-> (The CONFIG name is so long that the subject
-> would easily exceeds 80-columns with it.)
-> 
-> 
-> I applied this series to linux-kbuild,
-> and will send another pull request in this MW.
-> 
-> 
-> If you come up with better patch titles,
-> please let me know.
-> I will fix them up locally.
+On Sun, Oct 28, 2018 at 9:55 PM Petr Vorel <petr.vorel@gmail.com> wrote:
 >
-I am just fine with these new titles. Thanks.
+> merge_config.sh expect prefix from kernel: CONFIG_.
+> There some other projects using kconfig with different prefixes
+> (e.g. buildroot: BR2_ prefix). While there could be some option
+> to specify config prefix [1] [2], IMHO it's better to not specify
+> prefix (expect just any prefix).
+>
+> [1] http://patchwork.ozlabs.org/patch/824051/
+> [2] https://patchwork.ozlabs.org/patch/988890/
+>
+> Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
+> Suggested-by: Marcel Patzlaff <m.patzlaff@pilz.de>
+> ---
+> NOTE: I deliberately left prefix CONFIG_ in comment:
+> # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
 
-> 
-> 
-> -- 
-> Best Regards
-> Masahiro Yamada
 
--- 
-Thanks,
-Changbin Du
+I'd like to filter "CONFIG_", "BR2_", or whatever specified prefix.
+
+Some fragment files (e.g. arch/x86/configs/xen.config)
+have comment lines.
+
+Matching '# ' + arbitrary string
+might hit comment lines accidentally.
+
+
+
+The kconfig binary checks the environment variable 'CONFIG_'
+to override the default prefix:
+https://github.com/torvalds/linux/blob/v4.19/scripts/kconfig/lkc.h#L28
+
+
+For similarity, how about doing in the same way in merge_config.sh ?
+
+
+Does the following work for you ?
+(you can pass CONFIG_=BR2_ to merge_config.sh)
+
+
+
+
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index 67d1314..391ee6c 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -90,6 +90,10 @@ if [ -z "$KCONFIG_CONFIG" ]; then
+        fi
+ fi
+
++# Check the environment variable "CONFIG_" for the config option prefix.
++# If unset, the default is "CONFIG_".
++: ${CONFIG_=CONFIG_}
++
+ INITFILE=$1
+ shift;
+
+@@ -99,7 +103,7 @@ if [ ! -r "$INITFILE" ]; then
+ fi
+
+ MERGE_LIST=$*
+-SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/p"
++SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(${CONFIG_}[a-zA-Z0-9_]*\)[= ].*/\2/p"
+ TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
+
+ echo "Using $INITFILE as base"
+
+
+
+
+
+
+--
+Best Regards
+Masahiro Yamada
