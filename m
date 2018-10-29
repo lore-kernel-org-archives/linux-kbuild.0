@@ -1,43 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:27695 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725915AbeJ2VzM (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:20503 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726029AbeJ2WF1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Oct 2018 17:55:12 -0400
+        Mon, 29 Oct 2018 18:05:27 -0400
 MIME-Version: 1.0
-References: <20181028130945.23581-1-changbin.du@gmail.com> <20181028130945.23581-4-changbin.du@gmail.com>
-In-Reply-To: <20181028130945.23581-4-changbin.du@gmail.com>
+References: <20181028130945.23581-1-changbin.du@gmail.com> <20181028130945.23581-5-changbin.du@gmail.com>
+In-Reply-To: <20181028130945.23581-5-changbin.du@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 29 Oct 2018 22:05:44 +0900
-Message-ID: <CAK7LNAQP6SgtbYcxZ7ApGg006omEZErNcDAVtPR=2RibxN8Ruw@mail.gmail.com>
-Subject: Re: [PATCH v3 3/4] ARM: mm: fix build error in fix_to_virt with CONFIG_CC_OPTIMIZE_FOR_DEBUGGING
+Date: Mon, 29 Oct 2018 22:16:02 +0900
+Message-ID: <CAK7LNAS8UPXBbOpG9Zy_aP7an2jbq5H7uQGymUAn+hv46WQ4Bw@mail.gmail.com>
+Subject: Re: [PATCH v3 4/4] kernel hacking: new config CC_OPTIMIZE_FOR_DEBUGGING
+ to apply GCC -Og optimization
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Changbin Du <changbin.du@gmail.com>
 Cc: Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt <rostedt@goodmis.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
 
-On Sun, Oct 28, 2018 at 10:13 PM Changbin Du <changbin.du@gmail.com> wrote:
+On Sun, Oct 28, 2018 at 10:11 PM Changbin Du <changbin.du@gmail.com> wrote:
 >
-> With '-Og' optimization level, GCC would not optimize a count for a loop
-> as a constant value. But BUILD_BUG_ON() only accept compile-time constant
-> values. Let's use __fix_to_virt() to avoid the error.
+> This will apply GCC '-Og' optimization level which is supported
+> since GCC 4.8. This optimization level offers a reasonable level
+> of optimization while maintaining fast compilation and a good
+> debugging experience. It is similar to '-O1' while perferring
+> to keep debug ability over runtime speed.
 >
-> arch/arm/mm/mmu.o: In function `fix_to_virt':
-> /home/changbin/work/linux/./include/asm-generic/fixmap.h:31: undefined reference to `__compiletime_assert_31'
-> Makefile:1051: recipe for target 'vmlinux' failed
-> make: *** [vmlinux] Error 1
+> If enabling this option breaks your kernel, you should either
+> disable this or find a fix (mostly in the arch code). Currently
+> this option has only been tested on x86_64 and arm platform.
 >
-> Signed-off-by: Changbin Du <changbin.du@gmail.com>
-> Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-> ---
+> This option can satisfy people who was searching for a method
+> to disable compiler optimizations so to achieve better kernel
+> debugging experience with kgdb or qemu.
+>
+> The main problem of '-Og' is we must not use __attribute__((error(msg))).
+> The compiler will report error though the call to error function
+> still can be optimize out. So we must fallback to array tricky.
 
-Applied to linux-kbuild
+
+I removed the sentence "So we must fallback to array tricky."
+
+Commit 81b45683487a51b0f4d3b29d37f20d6d078544e4
+killed the fallback to the negative array trick.
 
 
+I also resolved a conflict.
+
+Your series is now available in the following branch.
+
+git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild kbuild
 
 
+Please double check if I did it correctly.
 
--- 
+
+--
 Best Regards
 Masahiro Yamada
