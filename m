@@ -1,79 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37006 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727491AbeJ3A3U (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:25348 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727666AbeJ3Aax (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Oct 2018 20:29:20 -0400
-Received: by mail-wm1-f68.google.com with SMTP id p2-v6so8396673wmc.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Oct 2018 08:40:11 -0700 (PDT)
-Date: Mon, 29 Oct 2018 16:40:07 +0100
-From: Petr Vorel <petr.vorel@gmail.com>
-Subject: Re: [PATCH 1/1] merge_config.sh: Replace prefix CONFIG_ with any
- prefix
-Message-ID: <20181029154006.GC14084@x230>
-Reply-To: Petr Vorel <petr.vorel@gmail.com>
-References: <20181028125510.9346-1-petr.vorel@gmail.com>
- <CAK7LNARccwZNM=4jOEoHNiZ-x4FrzNDG6uZtEXhQMA0z7Pnunw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARccwZNM=4jOEoHNiZ-x4FrzNDG6uZtEXhQMA0z7Pnunw@mail.gmail.com>
+        Mon, 29 Oct 2018 20:30:53 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/2] kconfig: remove oldnoconfig target
+Date: Tue, 30 Oct 2018 00:41:27 +0900
+Message-Id: <1540827688-15999-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, m.patzlaff@pilz.de, afshin.nasser@gmail.com, angelo.compagnucci@gmail.com, Arnout Vandecappelle <arnout@mind.be>, Matthew Weber <matthew.weber@rockwellcollins.com>, John Stultz <john.stultz@linaro.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Hi Masahiro,
+As commit 312ee68752fa ("kconfig: announce removal of oldnoconfig if
+used") announced, it is time for the removal.
 
-thanks for a quick review and patch.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-> I'd like to filter "CONFIG_", "BR2_", or whatever specified prefix.
+ scripts/kconfig/Makefile | 9 +--------
+ scripts/kconfig/conf.c   | 7 -------
+ 2 files changed, 1 insertion(+), 15 deletions(-)
 
-> Some fragment files (e.g. arch/x86/configs/xen.config)
-> have comment lines.
-
-> Matching '# ' + arbitrary string
-> might hit comment lines accidentally.
-Make sense.
-
-> The kconfig binary checks the environment variable 'CONFIG_'
-> to override the default prefix:
-> https://github.com/torvalds/linux/blob/v4.19/scripts/kconfig/lkc.h#L28
-What a crazy variable name. But we're not going to change it.
-
-> For similarity, how about doing in the same way in merge_config.sh ?
-Make sense to keep the same approach.
-
-> Does the following work for you ?
-> (you can pass CONFIG_=BR2_ to merge_config.sh)
-Patch is good (with one note bellow).
-
-Reviewed-by: Petr Vorel <petr.vorel@gmail.com>
-
-Could you push your patch into your tree?
-Or going to post a patch? If not here is mine:
-
-
-> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-> index 67d1314..391ee6c 100755
-> --- a/scripts/kconfig/merge_config.sh
-> +++ b/scripts/kconfig/merge_config.sh
-> @@ -90,6 +90,10 @@ if [ -z "$KCONFIG_CONFIG" ]; then
->         fi
->  fi
-
-> +# Check the environment variable "CONFIG_" for the config option prefix.
-> +# If unset, the default is "CONFIG_".
-> +: ${CONFIG_=CONFIG_}
-Although I guess this could be less cryptic:
-CONFIG_="${CONFIG_:-CONFIG_}"
-but too verbose, so I'm for your variant.
-
-...
->  MERGE_LIST=$*
-> -SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/p"
-> +SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(${CONFIG_}[a-zA-Z0-9_]*\)[= ].*/\2/p"
->  TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
-
-Kind regards,
-Petr
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 67ed9f6..5d37a60 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -68,14 +68,7 @@ PHONY += $(simple-targets)
+ $(simple-targets): $(obj)/conf
+ 	$< $(silent) --$@ $(Kconfig)
+ 
+-PHONY += oldnoconfig silentoldconfig savedefconfig defconfig
+-
+-# oldnoconfig is an alias of olddefconfig, because people already are dependent
+-# on its behavior (sets new symbols to their default value but not 'n') with the
+-# counter-intuitive name.
+-oldnoconfig: olddefconfig
+-	@echo "  WARNING: \"oldnoconfig\" target will be removed after Linux 4.19"
+-	@echo "            Please use \"olddefconfig\" instead, which is an alias."
++PHONY += silentoldconfig savedefconfig defconfig
+ 
+ # We do not expect manual invokcation of "silentoldcofig" (or "syncconfig").
+ silentoldconfig: syncconfig
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 7b2b372..98e0c7a 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -460,12 +460,6 @@ static struct option long_opts[] = {
+ 	{"randconfig",      no_argument,       NULL, randconfig},
+ 	{"listnewconfig",   no_argument,       NULL, listnewconfig},
+ 	{"olddefconfig",    no_argument,       NULL, olddefconfig},
+-	/*
+-	 * oldnoconfig is an alias of olddefconfig, because people already
+-	 * are dependent on its behavior(sets new symbols to their default
+-	 * value but not 'n') with the counter-intuitive name.
+-	 */
+-	{"oldnoconfig",     no_argument,       NULL, olddefconfig},
+ 	{NULL, 0, NULL, 0}
+ };
+ 
+@@ -480,7 +474,6 @@ static void conf_usage(const char *progname)
+ 	printf("  --syncconfig            Similar to oldconfig but generates configuration in\n"
+ 	       "                          include/{generated/,config/}\n");
+ 	printf("  --olddefconfig          Same as oldconfig but sets new symbols to their default value\n");
+-	printf("  --oldnoconfig           An alias of olddefconfig\n");
+ 	printf("  --defconfig <file>      New config with default defined in <file>\n");
+ 	printf("  --savedefconfig <file>  Save the minimal current configuration to <file>\n");
+ 	printf("  --allnoconfig           New config where all options are answered with no\n");
+-- 
+2.7.4
