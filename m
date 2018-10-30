@@ -1,60 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:33569 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725971AbeJ3NNo (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:56537 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725913AbeJ3NYo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Oct 2018 09:13:44 -0400
+        Tue, 30 Oct 2018 09:24:44 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] kbuild: remove cc-name variable
-Date: Tue, 30 Oct 2018 13:21:33 +0900
-Message-Id: <1540873293-29817-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1540873293-29817-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1540873293-29817-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: consolidate single targets
+Date: Tue, 30 Oct 2018 13:32:45 +0900
+Message-Id: <1540873965-31342-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-There is one more user of $(cc-name) in the top Makefile. It is supposed
-to detect Clang before invoking Kconfig, so it should still be there
-in the $(shell ...) form. All the other users of $(cc-name) have been
-replaced with $(CONFIG_CC_IS_CLANG). Hence, scripts/Kbuild.include does
-not need to define cc-name any more.
+Instead of specifying target/source pairs, let's list patterns that we
+want to handle as single targets. This slightly changes the behavior;
+the top Makefile previously checked the presence of a source file,
+now Kbuild will descend into a subdirectory anyway to find out what to
+do there.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile               | 2 +-
- scripts/Kbuild.include | 4 ----
- 2 files changed, 1 insertion(+), 5 deletions(-)
+ Makefile | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index bd93bc3..430f7de 100644
+index be76e6e..7d13add 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -485,7 +485,7 @@ ifneq ($(KBUILD_SRC),)
- 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile $(srctree)
+@@ -1713,21 +1713,7 @@ else
+         target-dir = $(if $(KBUILD_EXTMOD),$(dir $<),$(dir $@))
  endif
  
--ifeq ($(cc-name),clang)
-+ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
- ifneq ($(CROSS_COMPILE),)
- CLANG_TARGET	:= --target=$(notdir $(CROSS_COMPILE:%-=%))
- GCC_TOOLCHAIN_DIR := $(dir $(shell which $(LD)))
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index ca21a35..51703ae 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -140,10 +140,6 @@ cc-option-yn = $(call try-run,\
- cc-disable-warning = $(call try-run,\
- 	$(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
+-%.s: %.c prepare scripts FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.i: %.c prepare scripts FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.o: %.c prepare scripts FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.lst: %.c prepare scripts FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.s: %.S prepare scripts FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.o: %.S prepare scripts FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.symtypes: %.c prepare scripts FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.ll: %.c prepare scripts FORCE
++%.i %.ll %.lst %.o %.s %.symtypes: prepare scripts FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
  
--# cc-name
--# Expands to either gcc or clang
--cc-name = $(shell $(CC) -v 2>&1 | grep -q "clang version" && echo clang || echo gcc)
--
- # cc-version
- cc-version = $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-version.sh $(CC))
- 
+ # Modules
 -- 
 2.7.4
