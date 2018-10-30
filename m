@@ -1,62 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:36013 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:38426 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727650AbeJ3WUW (ORCPT
+        with ESMTP id S1726925AbeJ3WWC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Oct 2018 18:20:22 -0400
+        Tue, 30 Oct 2018 18:22:02 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 2/2] kbuild: remove cc-name variable
-Date: Tue, 30 Oct 2018 22:26:34 +0900
-Message-Id: <1540905994-6073-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1540905994-6073-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1540905994-6073-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 1/2] kbuild: replace cc-name test with CONFIG_CC_IS_CLANG
+Date: Tue, 30 Oct 2018 22:26:33 +0900
+Message-Id: <1540905994-6073-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-mips@linux-mips.org, James Hogan <jhogan@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Paul Mackerras <paulus@samba.org>, Paul Burton <paul.burton@mips.com>, Ralf Baechle <ralf@linux-mips.org>, linuxppc-dev@lists.ozlabs.org
 
-There is one more user of $(cc-name) in the top Makefile. It is supposed
-to detect Clang before invoking Kconfig, so it should still be there
-in the $(shell ...) form. All the other users of $(cc-name) have been
-replaced with $(CONFIG_CC_IS_CLANG). Hence, scripts/Kbuild.include does
-not need to define cc-name any more.
+Evaluating cc-name invokes the compiler every time even when you are
+not compiling anything, like 'make help'. This is not efficient.
+
+The compiler type has been already detected in the Kconfig stage.
+Use CONFIG_CC_IS_CLANG, instead.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 ---
 
-Changes in v2: None
+Changes in v2:
+ - Use ifdef/ifndef insteaed of ifeq/ifneq
 
- Makefile               | 2 +-
- scripts/Kbuild.include | 4 ----
- 2 files changed, 1 insertion(+), 5 deletions(-)
+ Makefile                   | 2 +-
+ arch/mips/Makefile         | 2 +-
+ arch/mips/vdso/Makefile    | 2 +-
+ arch/powerpc/Makefile      | 4 ++--
+ scripts/Makefile.extrawarn | 2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 1c0696d..25b1518 100644
+index 0a42d06..1c0696d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -485,7 +485,7 @@ ifneq ($(KBUILD_SRC),)
- 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile $(srctree)
- endif
+@@ -707,7 +707,7 @@ stackp-flags-$(CONFIG_STACKPROTECTOR_STRONG)      := -fstack-protector-strong
+ 
+ KBUILD_CFLAGS += $(stackp-flags-y)
  
 -ifeq ($(cc-name),clang)
-+ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
- ifneq ($(CROSS_COMPILE),)
- CLANG_TARGET	:= --target=$(notdir $(CROSS_COMPILE:%-=%))
- GCC_TOOLCHAIN_DIR := $(dir $(shell which $(LD)))
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index ca21a35..51703ae 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -140,10 +140,6 @@ cc-option-yn = $(call try-run,\
- cc-disable-warning = $(call try-run,\
- 	$(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
++ifdef CONFIG_CC_IS_CLANG
+ KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+ KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+ KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+diff --git a/arch/mips/Makefile b/arch/mips/Makefile
+index 15a84cf..6841049 100644
+--- a/arch/mips/Makefile
++++ b/arch/mips/Makefile
+@@ -128,7 +128,7 @@ cflags-y += -ffreestanding
+ # clang's output will be based upon the build machine. So for clang we simply
+ # unconditionally specify -EB or -EL as appropriate.
+ #
+-ifeq ($(cc-name),clang)
++ifdef CONFIG_CC_IS_CLANG
+ cflags-$(CONFIG_CPU_BIG_ENDIAN)		+= -EB
+ cflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -EL
+ else
+diff --git a/arch/mips/vdso/Makefile b/arch/mips/vdso/Makefile
+index 34605ca..58a0315 100644
+--- a/arch/mips/vdso/Makefile
++++ b/arch/mips/vdso/Makefile
+@@ -10,7 +10,7 @@ ccflags-vdso := \
+ 	$(filter -march=%,$(KBUILD_CFLAGS)) \
+ 	-D__VDSO__
  
--# cc-name
--# Expands to either gcc or clang
--cc-name = $(shell $(CC) -v 2>&1 | grep -q "clang version" && echo clang || echo gcc)
--
- # cc-version
- cc-version = $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-version.sh $(CC))
+-ifeq ($(cc-name),clang)
++ifdef CONFIG_CC_IS_CLANG
+ ccflags-vdso += $(filter --target=%,$(KBUILD_CFLAGS))
+ endif
  
+diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
+index 17be664..8a2ce14 100644
+--- a/arch/powerpc/Makefile
++++ b/arch/powerpc/Makefile
+@@ -96,7 +96,7 @@ aflags-$(CONFIG_CPU_BIG_ENDIAN)		+= $(call cc-option,-mabi=elfv1)
+ aflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -mabi=elfv2
+ endif
+ 
+-ifneq ($(cc-name),clang)
++ifndef CONFIG_CC_IS_CLANG
+   cflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -mno-strict-align
+ endif
+ 
+@@ -175,7 +175,7 @@ endif
+ # Work around gcc code-gen bugs with -pg / -fno-omit-frame-pointer in gcc <= 4.8
+ # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=44199
+ # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52828
+-ifneq ($(cc-name),clang)
++ifndef CONFIG_CC_IS_CLANG
+ CC_FLAGS_FTRACE	+= $(call cc-ifversion, -lt, 0409, -mno-sched-epilog)
+ endif
+ endif
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 24b2fb1..800a10f 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -64,7 +64,7 @@ endif
+ KBUILD_CFLAGS += $(warning)
+ else
+ 
+-ifeq ($(cc-name),clang)
++ifdef CONFIG_CC_IS_CLANG
+ KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
+ KBUILD_CFLAGS += $(call cc-disable-warning, format)
 -- 
 2.7.4
