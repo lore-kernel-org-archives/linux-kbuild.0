@@ -1,67 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53110 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726016AbeJ3GBd (ORCPT
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:39664 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725840AbeJ3JXD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Oct 2018 02:01:33 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 189-v6so9711153wmw.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Oct 2018 14:11:06 -0700 (PDT)
-From: Petr Vorel <petr.vorel@gmail.com>
-Subject: [PATCH v2 1/1] merge_config.sh: Allow to define config prefix
-Date: Mon, 29 Oct 2018 22:10:58 +0100
-Message-Id: <20181029211058.7062-1-petr.vorel@gmail.com>
+        Tue, 30 Oct 2018 05:23:03 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20181024040354.24879-1-leobras.c@gmail.com> <20181024040354.24879-3-leobras.c@gmail.com>
+ <CAK7LNASfo=hw6r6GtdcLdkKCGVFpXUASvSst6WO5tcFbaZ-X0Q@mail.gmail.com>
+In-Reply-To: <CAK7LNASfo=hw6r6GtdcLdkKCGVFpXUASvSst6WO5tcFbaZ-X0Q@mail.gmail.com>
+From: Leonardo Bras <leobras.c@gmail.com>
+Date: Mon, 29 Oct 2018 21:31:41 -0300
+Message-ID: <CADvQ+rHLKvjBCBfbeLHrX_2johcAYAef-pNwpgDndv9inmPWww@mail.gmail.com>
+Subject: Re: [PATCH v3 2/5] kbuild: Removes unnecessary shadowed local variable.
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Petr Vorel <petr.vorel@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Marcel Patzlaff <m.patzlaff@pilz.de>, Nasser Afshin <afshin.nasser@gmail.com>, Angelo Compagnucci <angelo.compagnucci@gmail.com>, Arnout Vandecappelle <arnout@mind.be>, Matthew Weber <matthew.weber@rockwellcollins.com>, John Stultz <john.stultz@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: lkcamp@lists.libreplanetbr.org, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, Helen Koike <helen@koikeco.de>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
 
-with CONFIG_ environment variable.
+Sorry, I will take care next time.
 
-merge_config.sh uses CONFIG_ which is used in kernel and other projects.
-There are some projects which use kconfig with different prefixes (e.g.
-buildroot: BR2_ prefix). CONFIG_ variable is already used for this
-purpose in kconfig binary (scripts/kconfig/lkc.h), let's use the same
-rule for in merge_config.sh.
+Thank you,
 
-Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
-Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
- scripts/kconfig/merge_config.sh | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Leonardo Bras
 
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 67d131447631..7067a9fe0fa3 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -26,6 +26,8 @@ clean_up() {
- }
- trap clean_up HUP INT TERM
- 
-+CONFIG_PREFIX=${CONFIG_-CONFIG_}
-+
- usage() {
- 	echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
- 	echo "  -h    display this help text"
-@@ -33,6 +35,8 @@ usage() {
- 	echo "  -n    use allnoconfig instead of alldefconfig"
- 	echo "  -r    list redundant entries when merging fragments"
- 	echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
-+	echo
-+	echo "Used prefix: '$CONFIG_PREFIX'. You can redefine it with \$CONFIG_ environment variable."
- }
- 
- RUNMAKE=true
-@@ -99,7 +103,8 @@ if [ ! -r "$INITFILE" ]; then
- fi
- 
- MERGE_LIST=$*
--SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/p"
-+SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(${CONFIG_PREFIX}[a-zA-Z0-9_]*\)[= ].*/\2/p"
-+
- TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
- 
- echo "Using $INITFILE as base"
--- 
-2.19.1
+On Sun, Oct 28, 2018 at 1:37 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> On Wed, Oct 24, 2018 at 1:04 PM Leonardo Bras <leobras.c@gmail.com> wrote:
+> >
+> > Removes an unnecessary shadowed local variable (start).
+> > It was used only once, with the same value it was started before
+> > the if block.
+> >
+> > Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
+>
+>
+>
+> Applied to linux-kbuild
+> with some fixups in the subject.
+>
+> Please do not add a period to the end of the subject.
+>
+>
+>
+>
+>
+>
+> > ---
+> >  scripts/asn1_compiler.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/scripts/asn1_compiler.c b/scripts/asn1_compiler.c
+> > index c146020fc783..1b28787028d3 100644
+> > --- a/scripts/asn1_compiler.c
+> > +++ b/scripts/asn1_compiler.c
+> > @@ -413,7 +413,7 @@ static void tokenise(char *buffer, char *end)
+> >
+> >                         /* Handle string tokens */
+> >                         if (isalpha(*p)) {
+> > -                               const char **dir, *start = p;
+> > +                               const char **dir;
+> >
+> >                                 /* Can be a directive, type name or element
+> >                                  * name.  Find the end of the name.
+> > --
+> > 2.19.1
+> >
+>
+>
+> --
+> Best Regards
+> Masahiro Yamada
