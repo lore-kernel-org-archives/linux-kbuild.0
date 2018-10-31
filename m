@@ -1,39 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:40369 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725743AbeJaGGj (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:43616 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728048AbeKABEs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Oct 2018 02:06:39 -0400
+        Wed, 31 Oct 2018 21:04:48 -0400
 MIME-Version: 1.0
-References: <1540905994-6073-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1540905994-6073-1-git-send-email-yamada.masahiro@socionext.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Wed, 31 Oct 2018 07:41:21 +1030
-Message-ID: <CACPK8Xf4+M9Q1zC5GBC0PBJBZnim14m_s5HoQJQOn5Dc-uCDag@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kbuild: replace cc-name test with CONFIG_CC_IS_CLANG
+References: <20181019120952.32763-1-hch@lst.de> <20181019120952.32763-7-hch@lst.de>
+ <20181019122228.GJ30658@n2100.armlinux.org.uk> <CAK7LNATZ8LagrTrTae_QCQbSuTW7_y6sDrdTHfTyONPrsYDs4A@mail.gmail.com>
+In-Reply-To: <CAK7LNATZ8LagrTrTae_QCQbSuTW7_y6sDrdTHfTyONPrsYDs4A@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 1 Nov 2018 01:05:26 +0900
+Message-ID: <CAK7LNASUArREw1AWUzcOoQCe5=4jyifbs+x2CdCK+qXJ+woAdw@mail.gmail.com>
+Subject: Re: [PATCH 6/9] PCI: consolidate PCI config entry in drivers/pci
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, linux-mips@linux-mips.org, Michal Marek <michal.lkml@markovi.net>, jhogan@kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, ralf@linux-mips.org, paul.burton@mips.com, Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-arch <linux-arch@vger.kernel.org>, linux-scsi <linux-scsi@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-pci@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Alex Bounine <alex.bou9@gmail.com>, mporter@kernel.crashing.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Russell King <linux@armlinux.org.uk>
 
-On Tue, 30 Oct 2018 at 23:58, Masahiro Yamada
+Hi Christoph,
+
+
+On Fri, Oct 19, 2018 at 9:58 PM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
-> Evaluating cc-name invokes the compiler every time even when you are
-> not compiling anything, like 'make help'. This is not efficient.
+> On Fri, Oct 19, 2018 at 9:23 PM Russell King - ARM Linux
+> <linux@armlinux.org.uk> wrote:
 >
-> The compiler type has been already detected in the Kconfig stage.
-> Use CONFIG_CC_IS_CLANG, instead.
-
-Thanks, I didn't know about this.
-
+> > > index a68b34183107..b185794549be 100644
+> > > --- a/arch/arm/mach-pxa/Kconfig
+> > > +++ b/arch/arm/mach-pxa/Kconfig
+> > > @@ -125,7 +125,7 @@ config MACH_ARMCORE
+> > >       bool "CompuLab CM-X255/CM-X270 modules"
+> > >       select ARCH_HAS_DMA_SET_COHERENT_MASK if PCI
+> > >       select IWMMXT
+> > > -     select MIGHT_HAVE_PCI
+> > > +     select HAVE_PCI
+> > >       select NEED_MACH_IO_H if PCI
+> > >       select PXA25x
+> > >       select PXA27x
+> >
+> > This is wrong.  "MIGHT_HAVE_PCI" is _not_ the same as "HAVE_PCI" - we
+> > have a bunch of platforms that mandatorily have PCI and these select
+> > PCI directly.  "MIGHT_HAVE_PCI" controls the _visibility_ of the PCI
+> > menu option, but does not prevent it being selected.  Your patch will
+> > cause Kconfig to complain for those which mandatorily have PCI but
+> > do not set HAVE_PCI.
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+>
+> Good catch!
+> But, adding a bunch of 'select HAVE_PCI' along with 'select PCI' is ugly.
+>
+> Do you have any suggestion?
+>
+> How about letting CONFIG_ARM to select HAVE_PCI ?
+>
 
-Acked-by: Joel Stanley <joel@jms.id.au>
 
-Cheers,
+I applied 1/9, 3/9, 4/9, 5/9.
+(I think 2/9 should be squashed to 9/9)
 
-Joel
+As Russell pointed out, we need to avoid
+the unmet dependency.
+
+
+Are you planning to send
+the updated version for 6/9 through - 9/9 ?
+
+If so, could you please rebase 6/9
+so that it is cleanly applicable ?
+
+
+Thanks.
+
+
+--
+Best Regards
+Masahiro Yamada
