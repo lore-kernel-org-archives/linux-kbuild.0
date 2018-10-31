@@ -1,41 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr730136.outbound.protection.outlook.com ([40.107.73.136]:13984
-        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727561AbeJaBqS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Oct 2018 21:46:18 -0400
-From: Paul Burton <paul.burton@mips.com>
-Subject: Re: [PATCH v2 1/2] kbuild: replace cc-name test with
- CONFIG_CC_IS_CLANG
-Date: Tue, 30 Oct 2018 16:51:58 +0000
-Message-ID: <20181030165156.k6blbpbxh2fmiiay@pburton-laptop>
-References: <1540905994-6073-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1540905994-6073-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <256788EA86DFB442B581ECDC903CFAAF@namprd22.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:39122 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726476AbeKAAcQ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 31 Oct 2018 20:32:16 -0400
 MIME-Version: 1.0
+References: <20181019120952.32763-1-hch@lst.de> <20181019120952.32763-6-hch@lst.de>
+ <20181019151019.GA5618@localhost>
+In-Reply-To: <20181019151019.GA5618@localhost>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 1 Nov 2018 00:33:04 +0900
+Message-ID: <CAK7LNARa7xqG1iyQb9PE271L8QTC7nsaVXSAofm0hzku8T5Xvg@mail.gmail.com>
+Subject: Re: [PATCH 5/9] powerpc: PCI_MSI needs PCI
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-mips@linux-mips.org" <linux-mips@linux-mips.org>, James Hogan <jhogan@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Paul Mackerras <paulus@samba.org>, Ralf Baechle <ralf@linux-mips.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+To: Josh Triplett <josh@joshtriplett.org>
+Cc: Christoph Hellwig <hch@lst.de>, mporter@kernel.crashing.org, Alex Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-pci@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-Hi Masahiro,
+On Sat, Oct 20, 2018 at 12:10 AM Josh Triplett <josh@joshtriplett.org> wrote:
+>
+> On Fri, Oct 19, 2018 at 02:09:48PM +0200, Christoph Hellwig wrote:
+> > Various powerpc boards select the PCI_MSI config option without selecting
+> > PCI, resulting in potentially not compilable configurations if the by
+> > default enabled PCI option is disabled.  Explicitly select PCI to ensure
+> > we always have valid configs.
+> [...]
+> > --- a/arch/powerpc/platforms/44x/Kconfig
+> > +++ b/arch/powerpc/platforms/44x/Kconfig
+> > @@ -24,6 +24,7 @@ config BLUESTONE
+> >       default n
+> >       select PPC44x_SIMPLE
+> >       select APM821xx
+> > +     select PCI
+> >       select PCI_MSI
+> >       select PPC4xx_MSI
+> >       select PPC4xx_PCI_EXPRESS
+> > @@ -78,6 +79,7 @@ config KATMAI
+> >       select 440SPe
+> >       select PCI
+> >       select PPC4xx_PCI_EXPRESS
+> > +     select PCI
+> >       select PCI_MSI
+>
+> This case already had PCI selected a couple of lines above.
 
-On Tue, Oct 30, 2018 at 10:26:33PM +0900, Masahiro Yamada wrote:
-> Evaluating cc-name invokes the compiler every time even when you are
-> not compiling anything, like 'make help'. This is not efficient.
->=20
-> The compiler type has been already detected in the Kconfig stage.
-> Use CONFIG_CC_IS_CLANG, instead.
->=20
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 
-Looks good to me:
+Good catch!
 
-    Acked-by: Paul Burton <paul.burton@mips.com> (MIPS)
+I dropped this hunk,
+and applied to linux-kbuild.
 
-Thanks,
-    Paul
+
+
+
+
+> >       select PPC4xx_MSI
+> >       help
+> > @@ -219,6 +221,7 @@ config AKEBONO
+> >       select SWIOTLB
+> >       select 476FPE
+> >       select PPC4xx_PCI_EXPRESS
+> > +     select PCI
+> >       select PCI_MSI
+> >       select PPC4xx_HSTA_MSI
+> >       select I2C
+> > --
+> > 2.19.1
+> >
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
