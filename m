@@ -1,76 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:65062 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728128AbeKABMs (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:32965 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727638AbeKAA0p (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Oct 2018 21:12:48 -0400
+        Wed, 31 Oct 2018 20:26:45 -0400
 MIME-Version: 1.0
-References: <20181031111444.3472-1-malat@debian.org> <CANiq72mj_iHvxqAEqhGoLT61Tc04-zN6f7Gv1jyNeb6d0R2LGw@mail.gmail.com>
-In-Reply-To: <CANiq72mj_iHvxqAEqhGoLT61Tc04-zN6f7Gv1jyNeb6d0R2LGw@mail.gmail.com>
+References: <20181019120952.32763-1-hch@lst.de> <20181019120952.32763-4-hch@lst.de>
+In-Reply-To: <20181019120952.32763-4-hch@lst.de>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 1 Nov 2018 01:13:19 +0900
-Message-ID: <CAK7LNARyykVuHT1YQ_UWVMFRG-K3VQwEXtjGQxQE4Fgu4wQtDg@mail.gmail.com>
-Subject: Re: [PATCH] remove old GCC version implementation
+Date: Thu, 1 Nov 2018 00:27:30 +0900
+Message-ID: <CAK7LNATPnn=8B2jisxfwOg5KWr1YSkBJEtiquzK9GQ8s-D2Q9g@mail.gmail.com>
+Subject: Re: [PATCH 3/9] powerpc: remove CONFIG_PCI_QSPAN
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Mathieu Malaterre <malat@debian.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: mporter@kernel.crashing.org, Alex Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-pci@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-On Wed, Oct 31, 2018 at 8:28 PM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
+On Fri, Oct 19, 2018 at 9:10 PM Christoph Hellwig <hch@lst.de> wrote:
 >
-> On Wed, Oct 31, 2018 at 12:18 PM Mathieu Malaterre <malat@debian.org> wrote:
-> >
-> > GCC 4.6 is the minimum supported now.
-> >
-> > Signed-off-by: Mathieu Malaterre <malat@debian.org>
-> > ---
-> >  scripts/mod/file2alias.c | 6 +-----
-> >  1 file changed, 1 insertion(+), 5 deletions(-)
-> >
-> > diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-> > index 28a61665bb9c..4b59564d4706 100644
-> > --- a/scripts/mod/file2alias.c
-> > +++ b/scripts/mod/file2alias.c
-> > @@ -83,11 +83,7 @@ extern struct devtable *__start___devtable[], *__stop___devtable[];
-> >  #endif /* __MACH__ */
-> >
-> >  #if !defined(__used)
-> > -# if __GNUC__ == 3 && __GNUC_MINOR__ < 3
-> > -#  define __used                       __attribute__((__unused__))
-> > -# else
-> > -#  define __used                       __attribute__((__used__))
-> > -# endif
-> > +#define __used                 __attribute__((__used__))
-> >  #endif
-> >
+> This option isn't actually used anywhere.
 >
-> Acked-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> ---
+
+
+Applied to linux-kbuild.
+
+
+
+
+>  arch/powerpc/Kconfig | 9 ---------
+>  1 file changed, 9 deletions(-)
 >
-> By the way, is it possible that scripts/ and similar stuff uses
-> directly include/linux/compiler_attributes.h (whenever it hits
-> mainline, see https://github.com/ojeda/linux/blob/compiler-attributes/include/linux/compiler_attributes.h
-> )? It is a header that does not depend on anything, so it could easily
-> be shared; and would avoid having to maintain two sets of attributes.
-> Let me know, I can take a look at it if you think it is a good idea.
-
-No.
-I want to share a header file between kernel and host-tools
-only when we need to do so.
-
-
-In this case, it is wrong to use the linker magic for the host tool
-if you look at the so ugly #if defined(__MACH__) part.
-
-
-
-
-
-
-> Cheers,
-> Miguel
-
+> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+> index a80669209155..e8c8970248bc 100644
+> --- a/arch/powerpc/Kconfig
+> +++ b/arch/powerpc/Kconfig
+> @@ -955,7 +955,6 @@ config PCI
+>         bool "PCI support" if PPC_PCI_CHOICE
+>         default y if !40x && !CPM2 && !PPC_8xx && !PPC_83xx \
+>                 && !PPC_85xx && !PPC_86xx && !GAMECUBE_COMMON
+> -       default PCI_QSPAN if PPC_8xx
+>         select GENERIC_PCI_IOMAP
+>         help
+>           Find out whether your system includes a PCI bus. PCI is the name of
+> @@ -969,14 +968,6 @@ config PCI_DOMAINS
+>  config PCI_SYSCALL
+>         def_bool PCI
+>
+> -config PCI_QSPAN
+> -       bool "QSpan PCI"
+> -       depends on PPC_8xx
+> -       select PPC_I8259
+> -       help
+> -         Say Y here if you have a system based on a Motorola 8xx-series
+> -         embedded processor with a QSPAN PCI interface, otherwise say N.
+> -
+>  config PCI_8260
+>         bool
+>         depends on PCI && 8260
+> --
+> 2.19.1
+>
 
 
 -- 
