@@ -1,84 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:39650 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728649AbeKAAa5 (ORCPT
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:42080 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729429AbeKAIY1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Oct 2018 20:30:57 -0400
-MIME-Version: 1.0
-References: <20181019120952.32763-1-hch@lst.de> <20181019120952.32763-5-hch@lst.de>
-In-Reply-To: <20181019120952.32763-5-hch@lst.de>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 1 Nov 2018 00:31:27 +0900
-Message-ID: <CAK7LNAQb3PkB_z6-3D=qotWExHGAedA5i-_ZNr83=mC6q1JtwQ@mail.gmail.com>
-Subject: Re: [PATCH 4/9] powerpc: remove CONFIG_MCA leftovers
+        Thu, 1 Nov 2018 04:24:27 -0400
+Message-ID: <16b6518d7b36787e1813d62336b661bf603d54b2.camel@gmail.com>
+Subject: Re: [PATCH v3 4/5] modpost: Changes parameter name to avoid
+ shadowing.
+From: Leonardo Bras <leobras.c@gmail.com>
+Date: Wed, 31 Oct 2018 20:24:01 -0300
+In-Reply-To: <CAK7LNAQzgdFPpwHEtfDazLd2jAhNy8=f_4mvOQMWfOWCb07E1Q@mail.gmail.com>
+References: <20181024040354.24879-1-leobras.c@gmail.com>
+         <20181024040354.24879-5-leobras.c@gmail.com>
+         <CAK7LNAQzgdFPpwHEtfDazLd2jAhNy8=f_4mvOQMWfOWCb07E1Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: mporter@kernel.crashing.org, Alex Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-pci@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: lkcamp@lists.libreplanetbr.org, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, helen@koikeco.de, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Oct 19, 2018 at 9:12 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: Thomas Gleixner <tglx@linutronix.de>
-> ---
-
-Applied to linux-kbuild.
-
-
-
->  arch/powerpc/Kconfig | 4 ----
->  drivers/scsi/Kconfig | 6 +++---
->  2 files changed, 3 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-> index e8c8970248bc..d4e97469a5f0 100644
-> --- a/arch/powerpc/Kconfig
-> +++ b/arch/powerpc/Kconfig
-> @@ -941,10 +941,6 @@ config FSL_GTM
->         help
->           Freescale General-purpose Timers support
->
-> -# Yes MCA RS/6000s exist but Linux-PPC does not currently support any
-> -config MCA
-> -       bool
-> -
->  # Platforms that what PCI turned unconditionally just do select PCI
->  # in their config node.  Platforms that want to choose at config
->  # time should select PPC_PCI_CHOICE
-> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-> index 7c097006c54d..d3734c54aec9 100644
-> --- a/drivers/scsi/Kconfig
-> +++ b/drivers/scsi/Kconfig
-> @@ -535,7 +535,7 @@ config SCSI_HPTIOP
->
->  config SCSI_BUSLOGIC
->         tristate "BusLogic SCSI support"
-> -       depends on (PCI || ISA || MCA) && SCSI && ISA_DMA_API && VIRT_TO_BUS
-> +       depends on (PCI || ISA) && SCSI && ISA_DMA_API && VIRT_TO_BUS
->         ---help---
->           This is support for BusLogic MultiMaster and FlashPoint SCSI Host
->           Adapters. Consult the SCSI-HOWTO, available from
-> @@ -1142,12 +1142,12 @@ config SCSI_LPFC_DEBUG_FS
->
->  config SCSI_SIM710
->         tristate "Simple 53c710 SCSI support (Compaq, NCR machines)"
-> -       depends on (EISA || MCA) && SCSI
-> +       depends on EISA && SCSI
->         select SCSI_SPI_ATTRS
->         ---help---
->           This driver is for NCR53c710 based SCSI host adapters.
->
-> -         It currently supports Compaq EISA cards and NCR MCA cards
-> +         It currently supports Compaq EISA cards.
->
->  config SCSI_DC395x
->         tristate "Tekram DC395(U/UW/F) and DC315(U) SCSI support"
-> --
-> 2.19.1
->
+Em seg, 2018-10-29 às 01:42 +0900, Masahiro Yamada escreveu:
+> On Wed, Oct 24, 2018 at 1:05 PM Leonardo Bras <leobras.c@gmail.com>
+> wrote:
+> > Changes the parameter name to avoid shadowing a variable.
+> > 
+> > Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
+> 
+> For this one, I'd rather like to see code refactoring
+> than renaming the variable.
+> 
+> I will take a closer look.
 
 
--- 
-Best Regards
-Masahiro Yamada
+What do you suggest to refactor?
+I volunteer for this work.
+
+Leonardo Bras
