@@ -1,89 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:38072 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725843AbeKBCQt (ORCPT
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:39089 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727429AbeKBFTy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Nov 2018 22:16:49 -0400
-Received: by mail-lf1-f68.google.com with SMTP id p86so12529384lfg.5
-        for <linux-kbuild@vger.kernel.org>; Thu, 01 Nov 2018 10:12:57 -0700 (PDT)
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com. [209.85.208.176])
-        by smtp.gmail.com with ESMTPSA id c20sm476066lfj.67.2018.11.01.10.12.55
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 01 Nov 2018 10:12:55 -0700 (PDT)
-Received: by mail-lj1-f176.google.com with SMTP id a28-v6so15709478ljd.6
-        for <linux-kbuild@vger.kernel.org>; Thu, 01 Nov 2018 10:12:55 -0700 (PDT)
+        Fri, 2 Nov 2018 01:19:54 -0400
 MIME-Version: 1.0
-References: <20181022105944.GA1411@gmail.com>
-In-Reply-To: <20181022105944.GA1411@gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 1 Nov 2018 10:06:28 -0700
-Message-ID: <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
+References: <20181022105944.GA1411@gmail.com> <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
+In-Reply-To: <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Thu, 1 Nov 2018 21:15:12 +0100
+Message-ID: <CANiq72=Cz8XiYc=FGMwrNBFq2uiO55JBmoNc+NSDXYr_awosKw@mail.gmail.com>
 Subject: Re: [GIT PULL] Compiler Attributes for v4.20-rc1
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: dan.carpenter@oracle.com, adilger.kernel@dilger.ca, yamada.masahiro@socionext.com, michal.lkml@markovi.net, rostedt@goodmis.org, mchehab+samsung@kernel.org, olof@lxom.net, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Kees Cook <keescook@chromium.org>, tglx@linutronix.de, Ingo Molnar <mingo@kernel.org>, paullawrence@google.com, sandipan@linux.vnet.ibm.com, andreyknvl@google.com, dwmw2@infradead.org, will.deacon@arm.com, pombredanne@nexb.com, paul.burton@mips.com, rientjes@google.com, w@1wt.eu, msebor@gmail.com, sparse@chrisli.org, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, joe@perches.com, Arnd Bergmann <arnd@arndb.de>, asmadeus@codewreck.org, stefan@agner.ch, luc.vanoostenryck@gmail.com, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Dan <dan.carpenter@oracle.com>, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Ted Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, gor@linux.ibm.com, schwidefsky@de.ibm.com
 
-On Mon, Oct 22, 2018 at 3:59 AM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
+On Thu, Nov 1, 2018 at 6:06 PM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> Here it is the Compiler Attributes series/tree, which tries to disentangle
-> the include/linux/compiler*.h headers and bring them up to date.
+> I'm not sure how much that matters (maybe the original check for 4.9.2
+> was just a random pick by Andrey? Added to cc), but together with the
+> movement to <linux/compiler_attributes.h> that looks like it also
+> wouldn't want the CONFIG_KASAN tests, I wonder what the right merge
+> resolution would be.
 
-I've finally emptied the "normal" pull queues, and am looking at the
-odd ones that I felt I needed to review more in-depth.
+Good catch. I don't recall any special logic when I did that change,
+so most likely I simply did like for the rest of the attributes and
+took a look at when it was first supported (and documentation in gcc's
+docs) in order to implement __has_attribute by hand.
 
-This looked fine to me, and I already pulled, but when looking at the
-conflict for __no_sanitize_address_or_inline, I also noticed that you
-actually changed the gcc version logic.
+But indeed, it *may* be that there is an (undocumented) problem
+between 4.8 <= gcc < 4.9.2 with it. If so, we should document it down
+and fix it. Andrey?
 
-The logic for using __no_sanitize_address *used* to be
+> Yes, I see the resolution in linux-next, and I think that one is odd
+> and dubious, and now it *mixes* that old test of gcc-4.9.2 with the
+> different test in compiler-attributes.
 
-    #if GCC_VERSION >= 40902
+I missed that conflict completely, my bad (I did not miss all of them,
+at least; one required fixing).
 
-but you have changed it to
+Hm.... at a quick look, why is it only on compiler-gcc.h? It should
+either have a corresponding #define elsewhere or just be put directly
+in another common header, no? (Adding Vasily & Martin to CC.)
 
-  # define __GCC4_has_attribute___no_sanitize_address__ (__GNUC_MINOR__ >= 8)
+> But I'm also unsure whether you meant for the "__has_attribute()" test
+> to be usable outside the linux/compiler_attributes.h file, in which
+> case I could just do
+>
+>   #if defined(CONFIG_KASAN) && __has_attribute(__no_sanitize_address__)
+>
+> instead.
 
-so now it's gcc-4.8+ rather than gcc-4.9.2+.
+I think that (using __has_attribute() outside) may be a good idea: I
+wanted to keep compiler_attributes.h as simple as possible by avoiding
+#ifdefs inside that header (except for __has_attribute itself), as an
+attempt to avoid going back to the mess of #ifdefs we had previously.
+Basically, keeping the attributes in compiler_attributes.h that do not
+depend on complex logic. So using __has_attribute *outside* the header
+actually goes well with that principle, because it helps keeping stuff
+out of it if they depend on other config options; without having to
+rely on GCC_VERSION either.
 
-I'm not sure how much that matters (maybe the original check for 4.9.2
-was just a random pick by Andrey? Added to cc), but together with the
-movement to <linux/compiler_attributes.h> that looks like it also
-wouldn't want the CONFIG_KASAN tests, I wonder what the right merge
-resolution would be.
+[By the way, in case it clarifies: note that "optional" in that file
+actually is a bit of a misnomer. I meant to say "optional" as in "not
+supported by all compilers, so conditionally defined" ("optionally"
+defined); rather than "optional" in the sense of "code still works
+without the attribute". It caught Rasmus in one of his patches sent a
+few days ago on top of this tree, so I want to change it or explain it
+to avoid confusion.]
 
-Yes, I see the resolution in linux-next, and I think that one is odd
-and dubious, and now it *mixes* that old test of gcc-4.9.2 with the
-different test in compiler-attributes.
-
-I'm _inclined_ to just do
-
-#ifdef CONFIG_KASAN
- #define __no_sanitize_address_or_inline \
-  __no_sanitize_address __maybe_unused notrace
-#else
- #define __no_sanitize_address_or_inline inline
-#endif
-
-without any compiler versions at all, because I don't think it matters
-(maybe we won't get address sanitation, and we will not get inlining
-either, but do we care?).
-
-But I'm also unsure whether you meant for the "__has_attribute()" test
-to be usable outside the linux/compiler_attributes.h file, in which
-case I could just do
-
-  #if defined(CONFIG_KASAN) && __has_attribute(__no_sanitize_address__)
-
-instead.
-
-End result: it's not the merge resolution itself that raises
-questions, it's just semantics in general.
-
-So I've dropped this for now, in the hope that you/Andrey can answer
-these questions.
-
-                   Linus
+Cheers,
+Miguel
