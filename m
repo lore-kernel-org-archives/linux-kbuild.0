@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f169.google.com ([209.85.160.169]:36020 "EHLO
-        mail-qt1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726327AbeKAMUu (ORCPT
+Received: from mail-qt1-f174.google.com ([209.85.160.174]:42906 "EHLO
+        mail-qt1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726095AbeKAMbt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Nov 2018 08:20:50 -0400
+        Thu, 1 Nov 2018 08:31:49 -0400
 From: Leonardo Bras <leobras.c@gmail.com>
-Subject: [PATCH 1/3] modpost: Refactor and removes global variable *modules
-Date: Thu,  1 Nov 2018 00:19:40 -0300
-Message-Id: <20181101031940.23119-1-leobras.c@gmail.com>
+Subject: [PATCH 1/1] modpost: Refactor and removes global variable *modules
+Date: Thu,  1 Nov 2018 00:30:38 -0300
+Message-Id: <20181101033038.24142-1-leobras.c@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
