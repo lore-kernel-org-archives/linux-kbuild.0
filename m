@@ -1,54 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:43804 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726095AbeKAMc4 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Nov 2018 08:32:56 -0400
-Message-ID: <0c600eb1a48f7ad1b903a9497b1104b172607dc3.camel@gmail.com>
-Subject: Re: [PATCH v3 4/5] modpost: Changes parameter name to avoid
- shadowing.
-From: Leonardo Bras <leobras.c@gmail.com>
-Date: Thu, 01 Nov 2018 00:31:44 -0300
-In-Reply-To: <16b6518d7b36787e1813d62336b661bf603d54b2.camel@gmail.com>
-References: <20181024040354.24879-1-leobras.c@gmail.com>
-         <20181024040354.24879-5-leobras.c@gmail.com>
-         <CAK7LNAQzgdFPpwHEtfDazLd2jAhNy8=f_4mvOQMWfOWCb07E1Q@mail.gmail.com>
-         <16b6518d7b36787e1813d62336b661bf603d54b2.camel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from verein.lst.de ([213.95.11.211]:42421 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727533AbeKAOuC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 1 Nov 2018 10:50:02 -0400
+Date: Thu, 1 Nov 2018 06:48:31 +0100
+From: Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 6/9] PCI: consolidate PCI config entry in drivers/pci
+Message-ID: <20181101054831.GA4589@lst.de>
+References: <20181019120952.32763-1-hch@lst.de> <20181019120952.32763-7-hch@lst.de> <20181019122228.GJ30658@n2100.armlinux.org.uk> <CAK7LNATZ8LagrTrTae_QCQbSuTW7_y6sDrdTHfTyONPrsYDs4A@mail.gmail.com> <CAK7LNASUArREw1AWUzcOoQCe5=4jyifbs+x2CdCK+qXJ+woAdw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNASUArREw1AWUzcOoQCe5=4jyifbs+x2CdCK+qXJ+woAdw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: lkcamp@lists.libreplanetbr.org, Borislav Petkov <bp@alien8.de>, David.Laight@aculab.com, Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>, helen@koikeco.de, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, linux-arch <linux-arch@vger.kernel.org>, linux-scsi <linux-scsi@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-pci@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Alex Bounine <alex.bou9@gmail.com>, mporter@kernel.crashing.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Russell King <linux@armlinux.org.uk>
 
-Em qua, 2018-10-31 às 20:24 -0300, Leonardo Bras escreveu:
-> Em seg, 2018-10-29 às 01:42 +0900, Masahiro Yamada escreveu:
-> > On Wed, Oct 24, 2018 at 1:05 PM Leonardo Bras <leobras.c@gmail.com>
-> > wrote:
-> > > Changes the parameter name to avoid shadowing a variable.
-> > > 
-> > > Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
-> > 
-> > For this one, I'd rather like to see code refactoring
-> > than renaming the variable.
-> > 
-> > I will take a closer look.
+On Thu, Nov 01, 2018 at 01:05:26AM +0900, Masahiro Yamada wrote:
+> > How about letting CONFIG_ARM to select HAVE_PCI ?
+> >
 > 
-> What do you suggest to refactor?
-> I volunteer for this work.
 > 
-> Leonardo Bras
+> I applied 1/9, 3/9, 4/9, 5/9.
+> (I think 2/9 should be squashed to 9/9)
 > 
+> As Russell pointed out, we need to avoid
+> the unmet dependency.
 
-I refactored the code to move the global variable *modules to a local
-context at function main, and changed the functions to accept *modules
-as a parameter.
+Yes, I think the HAVE_PCI is probably the nicest way, but we'll
+need to wait what Russell as the maintainer wants.
 
-Is that what you had in mind?
+> Are you planning to send
+> the updated version for 6/9 through - 9/9 ?
+> 
+> If so, could you please rebase 6/9
+> so that it is cleanly applicable ?
 
-https://lkml.org/lkml/2018/11/1/725
-
-Thanks for reading,
-
-Leonardo Bras
+Will do once I find some time after rc1.
