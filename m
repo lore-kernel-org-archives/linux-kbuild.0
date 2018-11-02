@@ -1,89 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:1044 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725935AbeKBSvO (ORCPT
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:44261 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbeKBTUH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Nov 2018 14:51:14 -0400
-Subject: Re: [PATCH] kbuild: consolidate single targets
-References: <1540873965-31342-1-git-send-email-yamada.masahiro@socionext.com>
-From: Jon Hunter <jonathanh@nvidia.com>
-Message-ID: <945484cd-50b4-74df-f091-d796264e5643@nvidia.com>
-Date: Fri, 2 Nov 2018 09:44:36 +0000
+        Fri, 2 Nov 2018 15:20:07 -0400
 MIME-Version: 1.0
-In-Reply-To: <1540873965-31342-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20181022105944.GA1411@gmail.com> <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
+ <CAHk-=widcG7zGELniGoqjPyBZAHehA_Gyi2n1aRO94G7SBzwNQ@mail.gmail.com>
+In-Reply-To: <CAHk-=widcG7zGELniGoqjPyBZAHehA_Gyi2n1aRO94G7SBzwNQ@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 2 Nov 2018 11:13:15 +0100
+Message-ID: <CANiq72=jj6J0BmykqcExC2P4f1W82YPLmtRHztPmRMmNY9Zvqg@mail.gmail.com>
+Subject: Re: [GIT PULL] Compiler Attributes for v4.20-rc1
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Dan <dan.carpenter@oracle.com>, Andreas Dilger <adilger.kernel@dilger.ca>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Steven Rostedt <rostedt@goodmis.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Olof Johansson <olof@lxom.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Kees Cook <keescook@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Sandipan Das <sandipan@linux.vnet.ibm.com>, Andrey Konovalov <andreyknvl@google.com>, David Woodhouse <dwmw2@infradead.org>, Will Deacon <will.deacon@arm.com>, Philippe Ombredanne <pombredanne@nexb.com>, Paul Burton <paul.burton@mips.com>, David Rientjes <rientjes@google.com>, Willy Tarreau <w@1wt.eu>, Martin Sebor <msebor@gmail.com>, Christopher Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Ted Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>, Dominique Martinet <asmadeus@codewreck.org>, Stefan Agner <stefan@agner.ch>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
 
+On Fri, Nov 2, 2018 at 2:52 AM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> Anyway, I decided to do the merge by just getting rid of the
+> GCC_VERSION check around __no_sanitize_address_or_inline entirely. If
+> you enable KASAN, then a function with that marking just won't be
+> marked inline.
 
-On 30/10/2018 04:32, Masahiro Yamada wrote:
-> Instead of specifying target/source pairs, let's list patterns that we
-> want to handle as single targets. This slightly changes the behavior;
-> the top Makefile previously checked the presence of a source file,
-> now Kbuild will descend into a subdirectory anyway to find out what to
-> do there.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
->  Makefile | 16 +---------------
->  1 file changed, 1 insertion(+), 15 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index be76e6e..7d13add 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1713,21 +1713,7 @@ else
->          target-dir = $(if $(KBUILD_EXTMOD),$(dir $<),$(dir $@))
->  endif
->  
-> -%.s: %.c prepare scripts FORCE
-> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-> -%.i: %.c prepare scripts FORCE
-> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-> -%.o: %.c prepare scripts FORCE
-> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-> -%.lst: %.c prepare scripts FORCE
-> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-> -%.s: %.S prepare scripts FORCE
-> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-> -%.o: %.S prepare scripts FORCE
-> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-> -%.symtypes: %.c prepare scripts FORCE
-> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-> -%.ll: %.c prepare scripts FORCE
-> +%.i %.ll %.lst %.o %.s %.symtypes: prepare scripts FORCE
->  	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
->  
->  # Modules
+I was a bit confused when reading the gcc bug reports, i.e. why gcc
+did *not* complain in 4.9 but it did in 5.1 (when it was supposed to
+complain also in 4.9). It turns out that gcc 5.1 takes into account
+who is the actual caller due to this change:
 
-On one of my build machines (an older ubuntu 14.04 machine), this is
-commit is causing 'make mrproper' or 'make distclean' to fail. Reverting
-this commit fixes the problem.
++  cgraph_node *caller = e->caller->global.inlined_to
++                       ? e->caller->global.inlined_to : e->caller;
+...
+-  else if (!sanitize_attrs_match_for_inline_p (e->caller->decl, callee->decl))
++  else if (!sanitize_attrs_match_for_inline_p (caller->decl, callee->decl))
 
-$ make mrproper
-Error: kernelrelease not valid - run 'make prepare' to update it
-  CC      kernel/bounds.s
-In file included from <command-line>:0:0:
-././include/linux/kconfig.h:5:32: fatal error: generated/autoconf.h: No
-such file or directory
- #include <generated/autoconf.h>
-                                ^
-compilation terminated.
-make[1]: *** [kernel/bounds.s] Error 1
-make: *** [prepare0] Error 2
+change; e.g. this:
 
-FWIW, this machine has ...
+#define really_inline inline __attribute__((always_inline))
+#define no_sanitize __attribute__((no_sanitize_address))
 
-$ make --version
-GNU Make 3.81
+really_inline void f() {}
+really_inline void g() { f(); }
+no_sanitize void h() { g(); }
 
-Cheers
-Jon
+Complains in gcc 4.9 -O0, 5.1 -O0 and 5.1 -O2; but *not* in 4.9 -O2.
+https://godbolt.org/z/kNApqk
 
--- 
-nvpublic
+Anyway, this is orthogonal but in case it clarifies that for someone else...
+
+> Miguel, please do double-check the merge (it's not pushed out yet, I'm
+> doing the usual build tests etc first).
+
+I was sleeping, didn't manage to see it (in your GitHub, I guess?).
+
+I did the merge myself, and arrived at the same thing as you. I
+quickly inspected the rest and seems fine. By the way, I spotted an
+extra space at:
+
++ * we do one or the other.
+
+Cheers,
+Miguel
