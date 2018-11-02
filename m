@@ -1,52 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([5.9.137.197]:49754 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726469AbeKBUeZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Nov 2018 16:34:25 -0400
-Date: Fri, 2 Nov 2018 12:27:29 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v3 1/4] x86/mm: declare check_la57_support() as inline
-Message-ID: <20181102112728.GC14602@zn.tnic>
-References: <20181028130945.23581-1-changbin.du@gmail.com>
- <20181028130945.23581-2-changbin.du@gmail.com>
- <20181028140911.21d49629@vmware.local.home>
- <CAK7LNATixykqHqdu5W3NpfXqBXMNsP0OLKjNdsFc_EzJ_diOxA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATixykqHqdu5W3NpfXqBXMNsP0OLKjNdsFc_EzJ_diOxA@mail.gmail.com>
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:43783 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726041AbeKBUs2 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 2 Nov 2018 16:48:28 -0400
+Received: by mail-lf1-f66.google.com with SMTP id u18so1100656lff.10
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Nov 2018 04:41:33 -0700 (PDT)
+From: Anders Roxell <anders.roxell@linaro.org>
+Subject: [PATCH] scripts/kconfig/merge_config: don't redefine 'y' to 'm'
+Date: Fri,  2 Nov 2018 12:41:19 +0100
+Message-Id: <20181102114119.23859-1-anders.roxell@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>, Changbin Du <changbin.du@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
+To: yamada.masahiro@socionext.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dvhart@infradead.org, arnd@arndb.de, Anders Roxell <anders.roxell@linaro.org>
 
-On Mon, Oct 29, 2018 at 10:04:46PM +0900, Masahiro Yamada wrote:
-> On Mon, Oct 29, 2018 at 3:09 AM Steven Rostedt <rostedt@goodmis.org> wrote:
-> >
-> > On Sun, 28 Oct 2018 13:09:42 +0000
-> > Changbin Du <changbin.du@gmail.com> wrote:
-> >
-> > > The level4_kernel_pgt is only defined when X86_5LEVEL is enabled.
-> > > So declare check_la57_support() as inline to make sure the code
-> > > referring to level4_kernel_pgt is optimized out. This is a preparation
-> > > for CONFIG_CC_OPTIMIZE_FOR_DEBUGGING.
-> > >
-> > > Signed-off-by: Changbin Du <changbin.du@gmail.com>
-> >
-> > Reviewed-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-> >
-> > -- Steve
-> >
-> 
-> Applied to linux-kbuild.
+In today's merge_config.sh the order of the config fragment files dictates
+the output of a config option. With this approach we will get different
+.config files depending on the order of the config fragment files.
+Adding a switch to add precedence for builtin over modules, this will
+make the .config file the same
 
-Next time, before you route a patch through your tree, please get an x86
-maintainer's ACK first.
+Suggested-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+---
+ scripts/kconfig/merge_config.sh | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-Thx.
-
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index da66e7742282..902a60b45614 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -32,6 +32,7 @@ usage() {
+ 	echo "  -m    only merge the fragments, do not execute the make command"
+ 	echo "  -n    use allnoconfig instead of alldefconfig"
+ 	echo "  -r    list redundant entries when merging fragments"
++	echo "  -y    make builtin have precedence over modules"
+ 	echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
+ 	echo
+ 	echo "Used prefix: '$CONFIG_PREFIX'. You can redefine it with \$CONFIG_ environment variable."
+@@ -40,6 +41,7 @@ usage() {
+ RUNMAKE=true
+ ALLTARGET=alldefconfig
+ WARNREDUN=false
++BUILTIN=false
+ OUTPUT=.
+ CONFIG_PREFIX=${CONFIG_-CONFIG_}
+ 
+@@ -64,6 +66,11 @@ while true; do
+ 		shift
+ 		continue
+ 		;;
++	"-y")
++		BUILTIN=true
++		shift
++		continue
++		;;
+ 	"-O")
+ 		if [ -d $2 ];then
+ 			OUTPUT=$(echo $2 | sed 's/\/*$//')
+@@ -122,7 +129,13 @@ for MERGE_FILE in $MERGE_LIST ; do
+ 		grep -q -w $CFG $TMP_FILE || continue
+ 		PREV_VAL=$(grep -w $CFG $TMP_FILE)
+ 		NEW_VAL=$(grep -w $CFG $MERGE_FILE)
+-		if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
++		if test "$BUILTIN" = "true" && echo $PREV_VAL |grep -Eq '^\w+=y' && echo $NEW_VAL |grep -Eq '^\w+=m' ; then
++			echo Value of $CFG is \'y\' and we don\'t want to redefine the fragment $MERGE_FILE:
++			echo Previous  value: $PREV_VAL
++			echo New value:       $NEW_VAL
++			echo Will use previous value.
++			echo
++		elif [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
+ 			echo Value of $CFG is redefined by fragment $MERGE_FILE:
+ 			echo Previous  value: $PREV_VAL
+ 			echo New value:       $NEW_VAL
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+2.11.0
