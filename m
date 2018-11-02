@@ -1,68 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:43138 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725987AbeKBK7q (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:56757 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727551AbeKBQ7L (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Nov 2018 06:59:46 -0400
-Received: by mail-lf1-f66.google.com with SMTP id u18so265635lff.10
-        for <linux-kbuild@vger.kernel.org>; Thu, 01 Nov 2018 18:54:22 -0700 (PDT)
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com. [209.85.167.42])
-        by smtp.gmail.com with ESMTPSA id j25-v6sm242979lji.77.2018.11.01.18.54.20
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 01 Nov 2018 18:54:21 -0700 (PDT)
-Received: by mail-lf1-f42.google.com with SMTP id b20so261633lfa.12
-        for <linux-kbuild@vger.kernel.org>; Thu, 01 Nov 2018 18:54:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20181022105944.GA1411@gmail.com> <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
-In-Reply-To: <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 1 Nov 2018 18:46:17 -0700
-Message-ID: <CAHk-=widcG7zGELniGoqjPyBZAHehA_Gyi2n1aRO94G7SBzwNQ@mail.gmail.com>
-Subject: Re: [GIT PULL] Compiler Attributes for v4.20-rc1
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 2 Nov 2018 12:59:11 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kconfig: merge_config: avoid false positive matches from comment lines
+Date: Fri,  2 Nov 2018 16:52:31 +0900
+Message-Id: <1541145151-7319-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: dan.carpenter@oracle.com, adilger.kernel@dilger.ca, yamada.masahiro@socionext.com, michal.lkml@markovi.net, rostedt@goodmis.org, mchehab+samsung@kernel.org, olof@lxom.net, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Kees Cook <keescook@chromium.org>, tglx@linutronix.de, Ingo Molnar <mingo@kernel.org>, paullawrence@google.com, sandipan@linux.vnet.ibm.com, andreyknvl@google.com, David Woodhouse <dwmw2@infradead.org>, will.deacon@arm.com, Philippe Ombredanne <pombredanne@nexb.com>, paul.burton@mips.com, rientjes@google.com, w@1wt.eu, msebor@gmail.com, sparse@chrisli.org, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, joe@perches.com, Arnd Bergmann <arnd@arndb.de>, asmadeus@codewreck.org, stefan@agner.ch, luc.vanoostenryck@gmail.com, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Petr Vorel <petr.vorel@gmail.com>, Nasser <afshin.nasser@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Thu, Nov 1, 2018 at 10:06 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> The logic for using __no_sanitize_address *used* to be
->
->     #if GCC_VERSION >= 40902
+The current SED_CONFIG_EXP could match to comment lines in config
+fragment files, especially when CONFIG_PREFIX_ is empty. For example,
+Buildroot uses empty prefixing; starting symbols with BR2_ is just
+convention.
 
-Ok, looking around, I think this has less to do with the attribute
-being recognized, and simply just being because KASAN itself wants
-gcc-4.9.2.
+Make the sed expression more robust against false positives from
+comment lines. The new sed expression matches to config options
+followed by '=' or ' is not set'.
 
-I'm actually not seeing that KASAN dependency in the Kconfig scripts
-(and it probably _should_ be now that we can just add compiler version
-dependencies there), but that explains why the gcc version check is
-different from "gcc supports the attribute".
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Anyway, I decided to do the merge by just getting rid of the
-GCC_VERSION check around __no_sanitize_address_or_inline entirely. If
-you enable KASAN, then a function with that marking just won't be
-marked inline.
+ scripts/kconfig/merge_config.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-End result: pulled. I'm as confused as you are as to why
-__no_sanitize_address_or_inline is in the gcc header, but I guess it
-ends up being the same issue: KASAN depends on gcc even if that
-dependency doesn't seem to be spelled out in lib/Kconfig.kasan.
-
-So I _think_ the KASAN config should have a
-
-    depends on CC_IS_GCC && GCC_VERSION >= 40902
-
-on it, but maybe there is something I'm missing.
-
-But from a pull standpoint, I don't want to mess with those
-(unrelated) issues, so I just kept the merge resolution as simple and
-straightforward as possible.
-
-Miguel, please do double-check the merge (it's not pushed out yet, I'm
-doing the usual build tests etc first).
-
-                    Linus
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index 7067a9f..180b523 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -103,7 +103,7 @@ if [ ! -r "$INITFILE" ]; then
+ fi
+ 
+ MERGE_LIST=$*
+-SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(${CONFIG_PREFIX}[a-zA-Z0-9_]*\)[= ].*/\2/p"
++SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(${CONFIG_PREFIX}[a-zA-Z0-9_]*\)\(=.*\| is not set$\)/\2/p"
+ 
+ TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
+ 
+-- 
+2.7.4
