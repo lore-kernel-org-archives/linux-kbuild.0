@@ -1,78 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:43783 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726041AbeKBUs2 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Nov 2018 16:48:28 -0400
-Received: by mail-lf1-f66.google.com with SMTP id u18so1100656lff.10
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Nov 2018 04:41:33 -0700 (PDT)
-From: Anders Roxell <anders.roxell@linaro.org>
-Subject: [PATCH] scripts/kconfig/merge_config: don't redefine 'y' to 'm'
-Date: Fri,  2 Nov 2018 12:41:19 +0100
-Message-Id: <20181102114119.23859-1-anders.roxell@linaro.org>
+Received: from relay.sw.ru ([185.231.240.75]:40638 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726104AbeKBWYB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 2 Nov 2018 18:24:01 -0400
+Subject: Re: [GIT PULL] Compiler Attributes for v4.20-rc1
+References: <20181022105944.GA1411@gmail.com>
+ <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
+ <CAHk-=widcG7zGELniGoqjPyBZAHehA_Gyi2n1aRO94G7SBzwNQ@mail.gmail.com>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Message-ID: <06d822ab-5bc8-2d63-05be-f694c699658d@virtuozzo.com>
+Date: Fri, 2 Nov 2018 16:17:23 +0300
+MIME-Version: 1.0
+In-Reply-To: <CAHk-=widcG7zGELniGoqjPyBZAHehA_Gyi2n1aRO94G7SBzwNQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dvhart@infradead.org, arnd@arndb.de, Anders Roxell <anders.roxell@linaro.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: dan.carpenter@oracle.com, adilger.kernel@dilger.ca, yamada.masahiro@socionext.com, michal.lkml@markovi.net, rostedt@goodmis.org, mchehab+samsung@kernel.org, olof@lxom.net, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Kees Cook <keescook@chromium.org>, tglx@linutronix.de, Ingo Molnar <mingo@kernel.org>, paullawrence@google.com, sandipan@linux.vnet.ibm.com, andreyknvl@google.com, David Woodhouse <dwmw2@infradead.org>, will.deacon@arm.com, Philippe Ombredanne <pombredanne@nexb.com>, paul.burton@mips.com, rientjes@google.com, w@1wt.eu, msebor@gmail.com, sparse@chrisli.org, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, joe@perches.com, Arnd Bergmann <arnd@arndb.de>, asmadeus@codewreck.org, stefan@agner.ch, luc.vanoostenryck@gmail.com, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-In today's merge_config.sh the order of the config fragment files dictates
-the output of a config option. With this approach we will get different
-.config files depending on the order of the config fragment files.
-Adding a switch to add precedence for builtin over modules, this will
-make the .config file the same
 
-Suggested-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
----
- scripts/kconfig/merge_config.sh | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index da66e7742282..902a60b45614 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -32,6 +32,7 @@ usage() {
- 	echo "  -m    only merge the fragments, do not execute the make command"
- 	echo "  -n    use allnoconfig instead of alldefconfig"
- 	echo "  -r    list redundant entries when merging fragments"
-+	echo "  -y    make builtin have precedence over modules"
- 	echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
- 	echo
- 	echo "Used prefix: '$CONFIG_PREFIX'. You can redefine it with \$CONFIG_ environment variable."
-@@ -40,6 +41,7 @@ usage() {
- RUNMAKE=true
- ALLTARGET=alldefconfig
- WARNREDUN=false
-+BUILTIN=false
- OUTPUT=.
- CONFIG_PREFIX=${CONFIG_-CONFIG_}
- 
-@@ -64,6 +66,11 @@ while true; do
- 		shift
- 		continue
- 		;;
-+	"-y")
-+		BUILTIN=true
-+		shift
-+		continue
-+		;;
- 	"-O")
- 		if [ -d $2 ];then
- 			OUTPUT=$(echo $2 | sed 's/\/*$//')
-@@ -122,7 +129,13 @@ for MERGE_FILE in $MERGE_LIST ; do
- 		grep -q -w $CFG $TMP_FILE || continue
- 		PREV_VAL=$(grep -w $CFG $TMP_FILE)
- 		NEW_VAL=$(grep -w $CFG $MERGE_FILE)
--		if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
-+		if test "$BUILTIN" = "true" && echo $PREV_VAL |grep -Eq '^\w+=y' && echo $NEW_VAL |grep -Eq '^\w+=m' ; then
-+			echo Value of $CFG is \'y\' and we don\'t want to redefine the fragment $MERGE_FILE:
-+			echo Previous  value: $PREV_VAL
-+			echo New value:       $NEW_VAL
-+			echo Will use previous value.
-+			echo
-+		elif [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
- 			echo Value of $CFG is redefined by fragment $MERGE_FILE:
- 			echo Previous  value: $PREV_VAL
- 			echo New value:       $NEW_VAL
--- 
-2.11.0
+On 11/02/2018 04:46 AM, Linus Torvalds wrote:
+> On Thu, Nov 1, 2018 at 10:06 AM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>>
+>> The logic for using __no_sanitize_address *used* to be
+>>
+>>     #if GCC_VERSION >= 40902
+> 
+> Ok, looking around, I think this has less to do with the attribute
+> being recognized, and simply just being because KASAN itself wants
+> gcc-4.9.2.
+> 
+> I'm actually not seeing that KASAN dependency in the Kconfig scripts
+> (and it probably _should_ be now that we can just add compiler version
+> dependencies there), but that explains why the gcc version check is
+> different from "gcc supports the attribute".
+> 
+> Anyway, I decided to do the merge by just getting rid of the
+> GCC_VERSION check around __no_sanitize_address_or_inline entirely. If
+> you enable KASAN, then a function with that marking just won't be
+> marked inline.
+> 
+> End result: pulled. I'm as confused as you are as to why
+> __no_sanitize_address_or_inline is in the gcc header, but I guess it
+> ends up being the same issue: KASAN depends on gcc even if that
+> dependency doesn't seem to be spelled out in lib/Kconfig.kasan.
+> 
+> So I _think_ the KASAN config should have a
+> 
+>     depends on CC_IS_GCC && GCC_VERSION >= 40902
+> 
+> on it, but maybe there is something I'm missing.
+> 
+
+I'd rather use cc-option instead of version check, since we also support clang.
+
+It should be possible to express compiler requirements for subfeatures
+like stack/inline instrumentation in Kconfig. But that would be not that trivial, 
+see the scripts/Makefile.kasan
+
+> But from a pull standpoint, I don't want to mess with those
+> (unrelated) issues, so I just kept the merge resolution as simple and
+> straightforward as possible.
+> 
+> Miguel, please do double-check the merge (it's not pushed out yet, I'm
+> doing the usual build tests etc first).
+> 
+>                     Linus
+> 
