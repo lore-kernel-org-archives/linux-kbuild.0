@@ -1,46 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:33894 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726260AbeKCBRb (ORCPT
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:46977 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726085AbeKCB0R (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Nov 2018 21:17:31 -0400
-Received: by mail-lj1-f195.google.com with SMTP id u6-v6so2243633ljd.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Nov 2018 09:09:53 -0700 (PDT)
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com. [209.85.208.169])
-        by smtp.gmail.com with ESMTPSA id 4-v6sm2312961ljw.84.2018.11.02.09.09.51
+        Fri, 2 Nov 2018 21:26:17 -0400
+Received: by mail-lf1-f67.google.com with SMTP id o2-v6so1690241lfl.13
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Nov 2018 09:18:37 -0700 (PDT)
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com. [209.85.167.47])
+        by smtp.gmail.com with ESMTPSA id t4-v6sm5169188lft.77.2018.11.02.09.18.35
         for <linux-kbuild@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Nov 2018 09:09:52 -0700 (PDT)
-Received: by mail-lj1-f169.google.com with SMTP id j4-v6so2194049ljc.12
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Nov 2018 09:09:51 -0700 (PDT)
+        Fri, 02 Nov 2018 09:18:35 -0700 (PDT)
+Received: by mail-lf1-f47.google.com with SMTP id p17so1719781lfh.4
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Nov 2018 09:18:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <20181022105944.GA1411@gmail.com> <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
- <29dba7c2-f612-7b35-d665-9939d7e10eb8@virtuozzo.com>
-In-Reply-To: <29dba7c2-f612-7b35-d665-9939d7e10eb8@virtuozzo.com>
+ <CAHk-=widcG7zGELniGoqjPyBZAHehA_Gyi2n1aRO94G7SBzwNQ@mail.gmail.com> <06d822ab-5bc8-2d63-05be-f694c699658d@virtuozzo.com>
+In-Reply-To: <06d822ab-5bc8-2d63-05be-f694c699658d@virtuozzo.com>
 From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 2 Nov 2018 09:09:32 -0700
-Message-ID: <CAHk-=wj2AEQbmhto6FwxaxLEwvh3GG8FD8p8UptOsh5bE7jcuQ@mail.gmail.com>
+Date: Fri, 2 Nov 2018 09:11:16 -0700
+Message-ID: <CAHk-=wgYQHheoc1A6np=yHy6mxgfmu0pdu-+-eRKbOjrywFZ2Q@mail.gmail.com>
 Subject: Re: [GIT PULL] Compiler Attributes for v4.20-rc1
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Vasily Gorbik <gor@linux.ibm.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>
 Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, dan.carpenter@oracle.com, adilger.kernel@dilger.ca, yamada.masahiro@socionext.com, michal.lkml@markovi.net, rostedt@goodmis.org, mchehab+samsung@kernel.org, olof@lxom.net, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Kees Cook <keescook@chromium.org>, tglx@linutronix.de, Ingo Molnar <mingo@kernel.org>, paullawrence@google.com, sandipan@linux.vnet.ibm.com, andreyknvl@google.com, David Woodhouse <dwmw2@infradead.org>, will.deacon@arm.com, Philippe Ombredanne <pombredanne@nexb.com>, paul.burton@mips.com, rientjes@google.com, w@1wt.eu, msebor@gmail.com, Chris Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, joe@perches.com, Arnd Bergmann <arnd@arndb.de>, asmadeus@codewreck.org, stefan@agner.ch, luc.vanoostenryck@gmail.com, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Nov 2, 2018 at 2:43 AM Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
+On Fri, Nov 2, 2018 at 6:16 AM Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
 >
-> You're right, version checks shouldn't matter here. But __no_sanitize_address_or_inline
-> shouldn't have been added in the first place, because we already have almost the same
->__no_kasan_or_inline:
+> On 11/02/2018 04:46 AM, Linus Torvalds wrote:
+> >
+> > So I _think_ the KASAN config should have a
+> >
+> >     depends on CC_IS_GCC && GCC_VERSION >= 40902
+> >
+> > on it, but maybe there is something I'm missing.
+>
+> I'd rather use cc-option instead of version check, since we also support clang.
 
-Ahh, very good.
+That would be even better, but I thought the requirement for 4.9.2
+came not from the option existing, but because of some bugs getting
+fixed?
 
-Vasily, Martin - since __no_sanitize_address_or_inline was added just
-for s390, would you mind replacing it with __no_kasan_or_inline
-instead, and testing that in whatever failed before?
+But if we can do it without version checks, that would be lovely.
 
-Then we can just remove that unnecessary symbol #define entirely..
-
-Thanks,
-
-                 Linus
+                    Linus
