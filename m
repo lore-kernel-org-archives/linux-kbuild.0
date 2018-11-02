@@ -1,89 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp2120.oracle.com ([156.151.31.85]:33810 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725935AbeKBUcw (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Nov 2018 16:32:52 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:49754 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726469AbeKBUeZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 2 Nov 2018 16:34:25 -0400
+Date: Fri, 2 Nov 2018 12:27:29 +0100
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v3 1/4] x86/mm: declare check_la57_support() as inline
+Message-ID: <20181102112728.GC14602@zn.tnic>
+References: <20181028130945.23581-1-changbin.du@gmail.com>
+ <20181028130945.23581-2-changbin.du@gmail.com>
+ <20181028140911.21d49629@vmware.local.home>
+ <CAK7LNATixykqHqdu5W3NpfXqBXMNsP0OLKjNdsFc_EzJ_diOxA@mail.gmail.com>
 MIME-Version: 1.0
-Message-ID: <3e40ec15-3a8c-444d-8d32-35ef587f3980@default>
-Date: Fri, 2 Nov 2018 04:25:54 -0700 (PDT)
-From: Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Subject: [PATCH] kbuild: rpm-pkg: fix two build breaks when O= is used
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <CAK7LNATixykqHqdu5W3NpfXqBXMNsP0OLKjNdsFc_EzJ_diOxA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Srinivas REDDY Eeda <srinivas.eeda@oracle.com>, yamada.masahiro@socionext.com, michal.lkml@markovi.net
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Changbin Du <changbin.du@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
 
-Running 'make O=3D/build/kernel binrpm-pkg' failed with below two errors.
+On Mon, Oct 29, 2018 at 10:04:46PM +0900, Masahiro Yamada wrote:
+> On Mon, Oct 29, 2018 at 3:09 AM Steven Rostedt <rostedt@goodmis.org> wrote:
+> >
+> > On Sun, 28 Oct 2018 13:09:42 +0000
+> > Changbin Du <changbin.du@gmail.com> wrote:
+> >
+> > > The level4_kernel_pgt is only defined when X86_5LEVEL is enabled.
+> > > So declare check_la57_support() as inline to make sure the code
+> > > referring to level4_kernel_pgt is optimized out. This is a preparation
+> > > for CONFIG_CC_OPTIMIZE_FOR_DEBUGGING.
+> > >
+> > > Signed-off-by: Changbin Du <changbin.du@gmail.com>
+> >
+> > Reviewed-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+> >
+> > -- Steve
+> >
+> 
+> Applied to linux-kbuild.
 
-Makefile:600: include/config/auto.conf: No such file or directory
+Next time, before you route a patch through your tree, please get an x86
+maintainer's ACK first.
 
-+ cp make -C /mnt/root/kernel O=3D/build/kernel image_name make -f
-/mnt/root/kernel/Makefile ...
-cp: invalid option -- 'C'
-Try 'cp --help' for more information.
+Thx.
 
-Export KBUILD_OUTPUT when O=3D is used so that it could be used in locating
-include/config/auto.conf
+-- 
+Regards/Gruss,
+    Boris.
 
-Use $srctree to locate source dir when generating image name, no matter
-if O=3D is used.
-
-Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
----
- Makefile               | 5 +++++
- scripts/package/mkspec | 4 ++--
- 2 files changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 9aa352b..df316e5 100644
---- a/Makefile
-+++ b/Makefile
-@@ -135,6 +135,7 @@ KBUILD_OUTPUT :=3D $(shell mkdir -p $(KBUILD_OUTPUT) &&=
- cd $(KBUILD_OUTPUT) \
- $(if $(KBUILD_OUTPUT),, \
-      $(error failed to create output directory "$(saved-output)"))
-=20
-+export KBUILD_OUTPUT
- # Look for make include files relative to root of kernel src
- #
- # This does not become effective immediately because MAKEFLAGS is re-parse=
-d
-@@ -597,7 +598,11 @@ virt-y=09=09:=3D virt/
- endif # KBUILD_EXTMOD
-=20
- ifeq ($(dot-config),1)
-+ifeq ($(KBUILD_OUTPUT),)
- include include/config/auto.conf
-+else
-+include $(KBUILD_OUTPUT)/include/config/auto.conf
-+endif
- endif
-=20
- # The all: target is the default when no target is given on the
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index e05646d..3b4e5e4 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -84,10 +84,10 @@ $S
- =09mkdir -p %{buildroot}/boot
- =09%ifarch ia64
- =09mkdir -p %{buildroot}/boot/efi
--=09cp \$(make image_name) %{buildroot}/boot/efi/vmlinuz-$KERNELRELEASE
-+=09cp \$(make -C \$srctree image_name) %{buildroot}/boot/efi/vmlinuz-$KERN=
-ELRELEASE
- =09ln -s efi/vmlinuz-$KERNELRELEASE %{buildroot}/boot/
- =09%else
--=09cp \$(make image_name) %{buildroot}/boot/vmlinuz-$KERNELRELEASE
-+=09cp \$(make -C \$srctree image_name) %{buildroot}/boot/vmlinuz-$KERNELRE=
-LEASE
- =09%endif
- $M=09make %{?_smp_mflags} INSTALL_MOD_PATH=3D%{buildroot} KBUILD_SRC=3D mo=
-dules_install
- =09make %{?_smp_mflags} INSTALL_HDR_PATH=3D%{buildroot}/usr KBUILD_SRC=3D =
-headers_install
---=20
-1.8.3.1
+Good mailing practices for 400: avoid top-posting and trim the reply.
