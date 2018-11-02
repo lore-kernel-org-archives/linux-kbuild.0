@@ -1,99 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay.sw.ru ([185.231.240.75]:33754 "EHLO relay.sw.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725935AbeKBSuF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Nov 2018 14:50:05 -0400
-Subject: Re: [GIT PULL] Compiler Attributes for v4.20-rc1
-References: <20181022105944.GA1411@gmail.com>
- <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <29dba7c2-f612-7b35-d665-9939d7e10eb8@virtuozzo.com>
-Date: Fri, 2 Nov 2018 12:44:01 +0300
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:1044 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725935AbeKBSvO (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 2 Nov 2018 14:51:14 -0400
+Subject: Re: [PATCH] kbuild: consolidate single targets
+References: <1540873965-31342-1-git-send-email-yamada.masahiro@socionext.com>
+From: Jon Hunter <jonathanh@nvidia.com>
+Message-ID: <945484cd-50b4-74df-f091-d796264e5643@nvidia.com>
+Date: Fri, 2 Nov 2018 09:44:36 +0000
 MIME-Version: 1.0
-In-Reply-To: <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1540873965-31342-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: dan.carpenter@oracle.com, adilger.kernel@dilger.ca, yamada.masahiro@socionext.com, michal.lkml@markovi.net, rostedt@goodmis.org, mchehab+samsung@kernel.org, olof@lxom.net, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Kees Cook <keescook@chromium.org>, tglx@linutronix.de, Ingo Molnar <mingo@kernel.org>, paullawrence@google.com, sandipan@linux.vnet.ibm.com, andreyknvl@google.com, dwmw2@infradead.org, will.deacon@arm.com, pombredanne@nexb.com, paul.burton@mips.com, rientjes@google.com, w@1wt.eu, msebor@gmail.com, sparse@chrisli.org, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, joe@perches.com, Arnd Bergmann <arnd@arndb.de>, asmadeus@codewreck.org, stefan@agner.ch, luc.vanoostenryck@gmail.com, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On 11/01/2018 08:06 PM, Linus Torvalds wrote:
-> On Mon, Oct 22, 2018 at 3:59 AM Miguel Ojeda
-> <miguel.ojeda.sandonis@gmail.com> wrote:
->>
->> Here it is the Compiler Attributes series/tree, which tries to disentangle
->> the include/linux/compiler*.h headers and bring them up to date.
-> 
-> I've finally emptied the "normal" pull queues, and am looking at the
-> odd ones that I felt I needed to review more in-depth.
-> 
-> This looked fine to me, and I already pulled, but when looking at the
-> conflict for __no_sanitize_address_or_inline, I also noticed that you
-> actually changed the gcc version logic.
-> 
-> The logic for using __no_sanitize_address *used* to be
-> 
->     #if GCC_VERSION >= 40902
-> 
-> but you have changed it to
-> 
->   # define __GCC4_has_attribute___no_sanitize_address__ (__GNUC_MINOR__ >= 8)
-> 
-> so now it's gcc-4.8+ rather than gcc-4.9.2+.
 
-As you said in other email - "this has less to do with the attribute
-being recognized, and simply just being because KASAN itself wants
-gcc-4.9.2."
-
-gcc < 4.9.2 simply doesn't have -fsanitize=kernel-address.
-But no_sanitize attribute originally comes with user space ASAN (-fsanitize=address)
-which exist in earlier GCCs like 4.8.
-Checking against 4.8 gcc should be fine. If we compile the kernel with gcc 4.8
-it will be compiled without instrumentation, so the attribute won't have any effect.
-
+On 30/10/2018 04:32, Masahiro Yamada wrote:
+> Instead of specifying target/source pairs, let's list patterns that we
+> want to handle as single targets. This slightly changes the behavior;
+> the top Makefile previously checked the presence of a source file,
+> now Kbuild will descend into a subdirectory anyway to find out what to
+> do there.
 > 
-> I'm not sure how much that matters (maybe the original check for 4.9.2
-> was just a random pick by Andrey? Added to cc), but together with the
-> movement to <linux/compiler_attributes.h> that looks like it also
-> wouldn't want the CONFIG_KASAN tests, I wonder what the right merge
-> resolution would be.
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 > 
-> Yes, I see the resolution in linux-next, and I think that one is odd
-> and dubious, and now it *mixes* that old test of gcc-4.9.2 with the
-> different test in compiler-attributes.
+>  Makefile | 16 +---------------
+>  1 file changed, 1 insertion(+), 15 deletions(-)
 > 
-> I'm _inclined_ to just do
-> 
-> #ifdef CONFIG_KASAN
->  #define __no_sanitize_address_or_inline \
->   __no_sanitize_address __maybe_unused notrace
-> #else
->  #define __no_sanitize_address_or_inline inline
-> #endif
-> 
-> without any compiler versions at all, because I don't think it matters
-> (maybe we won't get address sanitation, and we will not get inlining
-> either, but do we care?).
+> diff --git a/Makefile b/Makefile
+> index be76e6e..7d13add 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1713,21 +1713,7 @@ else
+>          target-dir = $(if $(KBUILD_EXTMOD),$(dir $<),$(dir $@))
+>  endif
+>  
+> -%.s: %.c prepare scripts FORCE
+> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.i: %.c prepare scripts FORCE
+> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.o: %.c prepare scripts FORCE
+> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.lst: %.c prepare scripts FORCE
+> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.s: %.S prepare scripts FORCE
+> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.o: %.S prepare scripts FORCE
+> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.symtypes: %.c prepare scripts FORCE
+> -	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.ll: %.c prepare scripts FORCE
+> +%.i %.ll %.lst %.o %.s %.symtypes: prepare scripts FORCE
+>  	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+>  
+>  # Modules
 
-You're right, version checks shouldn't matter here. But __no_sanitize_address_or_inline
-shouldn't have been added in the first place, because we already have almost the same __no_kasan_or_inline:
+On one of my build machines (an older ubuntu 14.04 machine), this is
+commit is causing 'make mrproper' or 'make distclean' to fail. Reverting
+this commit fixes the problem.
 
-#ifdef CONFIG_KASAN
-/*
- * We can't declare function 'inline' because __no_sanitize_address confilcts
- * with inlining. Attempt to inline it may cause a build failure.
- * 	https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67368
- * '__maybe_unused' allows us to avoid defined-but-not-used warnings.
- */
-# define __no_kasan_or_inline __no_sanitize_address __maybe_unused
-#else
-# define __no_kasan_or_inline __always_inline
-#endif
+$ make mrproper
+Error: kernelrelease not valid - run 'make prepare' to update it
+  CC      kernel/bounds.s
+In file included from <command-line>:0:0:
+././include/linux/kconfig.h:5:32: fatal error: generated/autoconf.h: No
+such file or directory
+ #include <generated/autoconf.h>
+                                ^
+compilation terminated.
+make[1]: *** [kernel/bounds.s] Error 1
+make: *** [prepare0] Error 2
 
-There are small differences like absence of notrace, but notrace could be added
-to the function together with __no_kasan_or_inline.
-And inline is *not* redefined to __always_inline  only on x86 when CONFIG_OPTIMIZE_INLINING=y
+FWIW, this machine has ...
 
-So there is absolutely no reason to have both __no_kasan_or_inline and __no_sanitize_address_or_inline.
+$ make --version
+GNU Make 3.81
+
+Cheers
+Jon
+
+-- 
+nvpublic
