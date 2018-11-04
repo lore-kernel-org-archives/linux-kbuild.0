@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:36638 "EHLO
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:38028 "EHLO
         mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730484AbeKEI2o (ORCPT
+        with ESMTP id S1730484AbeKEI2y (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Nov 2018 03:28:44 -0500
+        Mon, 5 Nov 2018 03:28:54 -0500
 From: Joel Stanley <joel@jms.id.au>
-Subject: [PATCH 1/2] Makefile: Export clang toolchain variables
-Date: Mon,  5 Nov 2018 09:41:32 +1030
-Message-Id: <20181104231133.30848-2-joel@jms.id.au>
+Subject: [PATCH 2/2] powerpc/boot: Set target when cross-compiling for clang
+Date: Mon,  5 Nov 2018 09:41:33 +1030
+Message-Id: <20181104231133.30848-3-joel@jms.id.au>
 In-Reply-To: <20181104231133.30848-1-joel@jms.id.au>
 References: <20181104231133.30848-1-joel@jms.id.au>
 MIME-Version: 1.0
@@ -17,26 +17,32 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michael Ellerman <mpe@ellerman.id.au>, Nick Desaulniers <ndesaulniers@google.com>
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-The powerpc makefile will use these in it's boot wrapper.
+Clang needs to be told which target it is building for when cross
+compiling.
 
+Link: https://github.com/ClangBuiltLinux/linux/issues/259
 Signed-off-by: Joel Stanley <joel@jms.id.au>
 ---
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/powerpc/boot/Makefile | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 9aa352b38815..a2db3c885b38 100644
---- a/Makefile
-+++ b/Makefile
-@@ -495,6 +495,9 @@ endif
- ifneq ($(GCC_TOOLCHAIN),)
- CLANG_GCC_TC	:= --gcc-toolchain=$(GCC_TOOLCHAIN)
+diff --git a/arch/powerpc/boot/Makefile b/arch/powerpc/boot/Makefile
+index 39354365f54a..8fdb1890f09a 100644
+--- a/arch/powerpc/boot/Makefile
++++ b/arch/powerpc/boot/Makefile
+@@ -55,6 +55,13 @@ BOOTAFLAGS	:= -D__ASSEMBLY__ $(BOOTCFLAGS) -traditional -nostdinc
+ 
+ BOOTARFLAGS	:= -cr$(KBUILD_ARFLAGS)
+ 
++ifdef CONFIG_CC_IS_CLANG
++BOOTCFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
++BOOTAFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
++BOOTCFLAGS += $(call cc-option, -no-integrated-as)
++BOOTAFLAGS += $(call cc-option, -no-integrated-as)
++endif
++
+ ifdef CONFIG_DEBUG_INFO
+ BOOTCFLAGS	+= -g
  endif
-+export CLANG_TARGET
-+export CLANG_GCC_TC
-+export CLANG_PREFIX
- KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
- KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
- KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
 -- 
 2.19.1
