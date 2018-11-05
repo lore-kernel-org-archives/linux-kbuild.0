@@ -1,58 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35884 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728890AbeKEPVN (ORCPT
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:43396 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729601AbeKEJ1r (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Nov 2018 10:21:13 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wA55wYts143526
-        for <linux-kbuild@vger.kernel.org>; Mon, 5 Nov 2018 01:03:13 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2njen1b0n3-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Mon, 05 Nov 2018 01:03:13 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-kbuild@vger.kernel.org> from <schwidefsky@de.ibm.com>;
-        Mon, 5 Nov 2018 06:03:11 -0000
-Date: Mon, 5 Nov 2018 07:02:56 +0100
-From: Martin Schwidefsky <schwidefsky@de.ibm.com>
-Subject: Re: [GIT PULL] Compiler Attributes for v4.20-rc1
-In-Reply-To: <CAHk-=wj2AEQbmhto6FwxaxLEwvh3GG8FD8p8UptOsh5bE7jcuQ@mail.gmail.com>
-References: <20181022105944.GA1411@gmail.com>
-        <CAHk-=whpBiV5sVTvPsWOVx5WYOouxbNG1fWeCdpK4oFiaH0Zqg@mail.gmail.com>
-        <29dba7c2-f612-7b35-d665-9939d7e10eb8@virtuozzo.com>
-        <CAHk-=wj2AEQbmhto6FwxaxLEwvh3GG8FD8p8UptOsh5bE7jcuQ@mail.gmail.com>
+        Mon, 5 Nov 2018 04:27:47 -0500
+Received: by mail-qk1-f193.google.com with SMTP id r71so11955917qkr.10
+        for <linux-kbuild@vger.kernel.org>; Sun, 04 Nov 2018 16:10:57 -0800 (PST)
+From: Daniel Axtens <dja@axtens.net>
+Subject: Re: [PATCH 1/2] Makefile: Export clang toolchain variables
+In-Reply-To: <20181104231133.30848-2-joel@jms.id.au>
+References: <20181104231133.30848-1-joel@jms.id.au> <20181104231133.30848-2-joel@jms.id.au>
+Date: Mon, 05 Nov 2018 11:10:49 +1100
+Message-ID: <87ftwg4c52.fsf@linkitivity.dja.id.au>
 MIME-Version: 1.0
-Message-Id: <20181105070256.52c6fd8f@mschwideX1>
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Vasily Gorbik <gor@linux.ibm.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, dan.carpenter@oracle.com, adilger.kernel@dilger.ca, yamada.masahiro@socionext.com, michal.lkml@markovi.net, rostedt@goodmis.org, mchehab+samsung@kernel.org, olof@lxom.net, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, David Miller <davem@davemloft.net>, Kees Cook <keescook@chromium.org>, tglx@linutronix.de, Ingo Molnar <mingo@kernel.org>, paullawrence@google.com, sandipan@linux.vnet.ibm.com, andreyknvl@google.com, David Woodhouse <dwmw2@infradead.org>, will.deacon@arm.com, Philippe Ombredanne <pombredanne@nexb.com>, paul.burton@mips.com, rientjes@google.com, w@1wt.eu, msebor@gmail.com, Chris Li <sparse@chrisli.org>, Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, joe@perches.com, Arnd Bergmann <arnd@arndb.de>, asmadeus@codewreck.org, stefan@agner.ch, luc.vanoostenryck@gmail.com, Nick Desaulniers <ndesaulniers@google.com>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, linux-doc@vger.kernel.org, linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Joel Stanley <joel@jms.id.au>, Michael Ellerman <mpe@ellerman.id.au>, Nick Desaulniers <ndesaulniers@google.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-On Fri, 2 Nov 2018 09:09:32 -0700
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+Hi Joel,
 
-> On Fri, Nov 2, 2018 at 2:43 AM Andrey Ryabinin <aryabinin@virtuozzo.com> wrote:
-> >
-> > You're right, version checks shouldn't matter here. But __no_sanitize_address_or_inline
-> > shouldn't have been added in the first place, because we already have almost the same
-> >__no_kasan_or_inline:  
-> 
-> Ahh, very good.
-> 
-> Vasily, Martin - since __no_sanitize_address_or_inline was added just
-> for s390, would you mind replacing it with __no_kasan_or_inline
-> instead, and testing that in whatever failed before?
-> 
-> Then we can just remove that unnecessary symbol #define entirely..
+Thanks!
 
-Ok, will do.
+Tested-by: Daniel Axtens <dja@axtens.net> # powerpc 64-bit BE
 
--- 
-blue skies,
-   Martin.
+Regards,
+Daniel
 
-"Reality continues to ruin my life." - Calvin.
+> The powerpc makefile will use these in it's boot wrapper.
+>
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> ---
+>  Makefile | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/Makefile b/Makefile
+> index 9aa352b38815..a2db3c885b38 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -495,6 +495,9 @@ endif
+>  ifneq ($(GCC_TOOLCHAIN),)
+>  CLANG_GCC_TC	:= --gcc-toolchain=$(GCC_TOOLCHAIN)
+>  endif
+> +export CLANG_TARGET
+> +export CLANG_GCC_TC
+> +export CLANG_PREFIX
+>  KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
+>  KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
+>  KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+> -- 
+> 2.19.1
