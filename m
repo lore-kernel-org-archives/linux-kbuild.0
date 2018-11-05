@@ -1,93 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:33023 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387652AbeKFDUK (ORCPT
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:35718 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387983AbeKFH7x (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Nov 2018 22:20:10 -0500
-Received: by mail-pf1-f195.google.com with SMTP id v68-v6so1201040pfk.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 05 Nov 2018 09:59:21 -0800 (PST)
+        Tue, 6 Nov 2018 02:59:53 -0500
+Received: by mail-pl1-f194.google.com with SMTP id n4-v6so5163674plp.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Nov 2018 14:37:56 -0800 (PST)
 MIME-Version: 1.0
-References: <1541386099-13118-1-git-send-email-yamada.masahiro@socionext.com>
- <a55e4534ef759585088a037e4cfd8468@agner.ch> <CAK7LNAT3ftcuNDfEhecMnfjG0Fkkh42wR7XQ1R9Tkr9OMrzAng@mail.gmail.com>
-In-Reply-To: <CAK7LNAT3ftcuNDfEhecMnfjG0Fkkh42wR7XQ1R9Tkr9OMrzAng@mail.gmail.com>
+References: <20181104231133.30848-1-joel@jms.id.au>
+In-Reply-To: <20181104231133.30848-1-joel@jms.id.au>
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 5 Nov 2018 09:59:09 -0800
-Message-ID: <CAKwvOdn1Shqc3nW6z0Ji_=4uMrOimhUbX3TRG7fQuysja64zog@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: consolidate Clang compiler flags
+Date: Mon, 5 Nov 2018 14:37:44 -0800
+Message-ID: <CAKwvOdm8WZTeB_wxkO2nN7PW=v=2z7tdVapTq-TiB18nZZfS=A@mail.gmail.com>
+Subject: Re: [PATCH 0/2] poewrpc/Boot: Fix cross compiling with clang
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Stefan Agner <stefan@agner.ch>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Matthias Kaehlcke <mka@chromium.org>, Chris Fries <cfries@google.com>, joel@jms.id.au, dja@axtens.net, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
+To: joel@jms.id.au
+Cc: mpe@ellerman.id.au, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linuxppc-dev@lists.ozlabs.org
 
-On Mon, Nov 5, 2018 at 1:19 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Sun, Nov 4, 2018 at 3:11 PM Joel Stanley <joel@jms.id.au> wrote:
 >
-> On Mon, Nov 5, 2018 at 6:10 PM Stefan Agner <stefan@agner.ch> wrote:
-> >
-> > On 05.11.2018 03:48, Masahiro Yamada wrote:
-> > > Add basic options for Clang such as --target, --prefix, --gcc-toolchain,
-> > > -no-integrated-as to a single variable CLANG_FLAGS.
-> > >
-> > > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > > ---
-> > >
-> > >  Makefile | 13 ++++++-------
-> > >  1 file changed, 6 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/Makefile b/Makefile
-> > > index 93315eb..58c838a 100644
-> > > --- a/Makefile
-> > > +++ b/Makefile
-> > > @@ -487,18 +487,17 @@ endif
-> > >
-> > >  ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
-> > >  ifneq ($(CROSS_COMPILE),)
-> > > -CLANG_TARGET := --target=$(notdir $(CROSS_COMPILE:%-=%))
-> > > +CLANG_FLAGS  = --target=$(notdir $(CROSS_COMPILE:%-=%))
-> > >  GCC_TOOLCHAIN_DIR := $(dir $(shell which $(LD)))
-> > > -CLANG_PREFIX := --prefix=$(GCC_TOOLCHAIN_DIR)
-> > > +CLANG_FLAGS  += --prefix=$(GCC_TOOLCHAIN_DIR)
-> >
-> > So this will expand later now, is this ok?
-> >
-> > --
-> > Stefan
-> >
-> > >  GCC_TOOLCHAIN        := $(realpath $(GCC_TOOLCHAIN_DIR)/..)
-> > >  endif
-> > >  ifneq ($(GCC_TOOLCHAIN),)
-> > > -CLANG_GCC_TC := --gcc-toolchain=$(GCC_TOOLCHAIN)
-> > > +CLANG_FLAGS  += --gcc-toolchain=$(GCC_TOOLCHAIN)
-> > >  endif
-> > > -KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
-> > > -KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
-> > > -KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
-> > > -KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
-> > > +CLANG_FLAGS  += $(call cc-option, -no-integrated-as)
-> > > +KBUILD_CFLAGS        += $(CLANG_FLAGS)
-> > > +KBUILD_AFLAGS        += $(CLANG_FLAGS)
+> Hello,
 >
->
-> CLANG_FLAGS is expanded here because KBUILD_CFLAGS and KBUILD_AFLAGS
-> are defined by using :=
->
-> So, it should be OK, but turning CLANG_FLAGS into a simple variable
-> will be a little more efficient since $(call cc-option, -no-integrated-as)
-> is evaluated just once.
->
-> (Or, this cc-option may not be necessary any longer.)
->
-> Will send v2.
+> These patches allow clang to cross-compile the powerpc boot wrapper.
+> The boot wrapper constructs it's own compiler flags as it may not be
+> built for the same arch as the kernel.
 
-If the ultimate goal is not evaluate cc-option more than once,
-removing cc-option from both KBUILD_CFLAGS and KBUILD_AFLAGS for clang
-is the better approach; we always want those for clang
-unconditionally. And if you by chance have an ancient version of clang
-that doesn't support those flags, you wont be able to compile a kernel
-anyways.  Eventually we want to get Clang's integrated assembler in
-shape to be used to assemble the kernel, but I think we're a ways off
-there still.
+Hi Joel, thanks for the series!  I'm just curious, how does the boot
+wrapper run on a different arch than the kernel?
+
+>
+> The powerpc64le kernel builds natively with clang and with this patch it
+> can cross compile too.
+>
+> Joel Stanley (2):
+>   Makefile: Export clang toolchain variables
+>   powerpc/boot: Set target when cross-compiling for clang
+>
+>  Makefile                   | 3 +++
+>  arch/powerpc/boot/Makefile | 7 +++++++
+>  2 files changed, 10 insertions(+)
+>
+> --
+> 2.19.1
+>
 
 
 -- 
