@@ -1,40 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:37991 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725839AbeKFJ7C (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:54209 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727448AbeKFM3j (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Nov 2018 04:59:02 -0500
-MIME-Version: 1.0
-References: <20181104231133.30848-1-joel@jms.id.au> <CAKwvOdm8WZTeB_wxkO2nN7PW=v=2z7tdVapTq-TiB18nZZfS=A@mail.gmail.com>
-In-Reply-To: <CAKwvOdm8WZTeB_wxkO2nN7PW=v=2z7tdVapTq-TiB18nZZfS=A@mail.gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Tue, 6 Nov 2018 11:06:24 +1030
-Message-ID: <CACPK8XeoBufr6ScXcdESsZEg9LQBHyx5V1T2WKbTbSDCaqFYfA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] poewrpc/Boot: Fix cross compiling with clang
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 6 Nov 2018 07:29:39 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v2 1/2] kbuild: add -no-integrated-as Clang option unconditionally
+Date: Tue,  6 Nov 2018 12:04:54 +0900
+Message-Id: <1541473495-25262-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, Paul Mackerras <paulus@samba.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev@lists.ozlabs.org
+To: linux-kbuild@vger.kernel.org
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Stefan Agner <stefan@agner.ch>, Matthias Kaehlcke <mka@chromium.org>, Joel Stanley <joel@jms.id.au>, linuxppc-dev@lists.ozlabs.org, Michael Ellerman <mpe@ellerman.id.au>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Tue, 6 Nov 2018 at 09:07, Nick Desaulniers <ndesaulniers@google.com> wrote:
->
-> On Sun, Nov 4, 2018 at 3:11 PM Joel Stanley <joel@jms.id.au> wrote:
-> >
-> > Hello,
-> >
-> > These patches allow clang to cross-compile the powerpc boot wrapper.
-> > The boot wrapper constructs it's own compiler flags as it may not be
-> > built for the same arch as the kernel.
->
-> Hi Joel, thanks for the series!  I'm just curious, how does the boot
-> wrapper run on a different arch than the kernel?
+We are still a way off the Clang's integrated assembler support for
+the kernel. Hence, -no-integrated-as is mandatory to build the kernel
+with Clang. If you had an ancient version of Clang that does not
+recognize this option, you would not be able to compile the kernel
+anyway.
 
-The kernel can have a ppc32 boot wrapper for a ppc64 kernel. There's
-some rationale in the boot wrapper's Makefile:
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
- https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/boot/Makefile#n10
+Changes in v2:
+  - New patch
 
-Cheers,
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Joel
+diff --git a/Makefile b/Makefile
+index 93315eb..da11700 100644
+--- a/Makefile
++++ b/Makefile
+@@ -497,8 +497,8 @@ CLANG_GCC_TC	:= --gcc-toolchain=$(GCC_TOOLCHAIN)
+ endif
+ KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
+ KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
+-KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+-KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
++KBUILD_CFLAGS += -no-integrated-as
++KBUILD_AFLAGS += -no-integrated-as
+ endif
+ 
+ RETPOLINE_CFLAGS_GCC := -mindirect-branch=thunk-extern -mindirect-branch-register
+-- 
+2.7.4
