@@ -1,120 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yb1-f193.google.com ([209.85.219.193]:43429 "EHLO
-        mail-yb1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388560AbeKFXXO (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:40526 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730448AbeKGC5B (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Nov 2018 18:23:14 -0500
-Received: by mail-yb1-f193.google.com with SMTP id h187-v6so2993186ybg.10
-        for <linux-kbuild@vger.kernel.org>; Tue, 06 Nov 2018 05:57:52 -0800 (PST)
+        Tue, 6 Nov 2018 21:57:01 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b203-v6so12991845wme.5
+        for <linux-kbuild@vger.kernel.org>; Tue, 06 Nov 2018 09:30:44 -0800 (PST)
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: [PATCH v10 02/22] kasan, slub: handle pointer tags in early_kmem_cache_node_alloc
+Date: Tue,  6 Nov 2018 18:30:17 +0100
+Message-Id: <76e40ec9137224352051f1e3ebcd8e8ee95044e1.1541525354.git.andreyknvl@google.com>
+In-Reply-To: <cover.1541525354.git.andreyknvl@google.com>
+References: <cover.1541525354.git.andreyknvl@google.com>
 MIME-Version: 1.0
-References: <20181102114119.23859-1-anders.roxell@linaro.org> <CAK7LNARda14b9_8Yh7vC2PFa_w=yw+qD0YTriAVQ_Aw5PoXkNw@mail.gmail.com>
-In-Reply-To: <CAK7LNARda14b9_8Yh7vC2PFa_w=yw+qD0YTriAVQ_Aw5PoXkNw@mail.gmail.com>
-From: Anders Roxell <anders.roxell@linaro.org>
-Date: Tue, 6 Nov 2018 14:57:40 +0100
-Message-ID: <CADYN=9L2kEVJMiVRBUBU7z4B4_YrvkNefCE5FO3qjACgm=FugA@mail.gmail.com>
-Subject: Re: [PATCH] scripts/kconfig/merge_config: don't redefine 'y' to 'm'
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, dvhart@infradead.org, Arnd Bergmann <arnd@arndb.de>
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
+Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>
 
-On Mon, 5 Nov 2018 at 09:35, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Hi Anders,
->
-> On Fri, Nov 2, 2018 at 8:41 PM Anders Roxell <anders.roxell@linaro.org> wrote:
-> >
-> > In today's merge_config.sh the order of the config fragment files dictates
-> > the output of a config option. With this approach we will get different
-> > .config files depending on the order of the config fragment files.
-> > Adding a switch to add precedence for builtin over modules, this will
-> > make the .config file the same
-> >
-> > Suggested-by: Arnd Bergmann <arnd@arndb.de>
-> > Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
-> > ---
->
-> I think this patch makes sense.
->
-> Just in case, could you please provide me the context of the discussion?
+The previous patch updated KASAN hooks signatures and their usage in SLAB
+and SLUB code, except for the early_kmem_cache_node_alloc function. This
+patch handles that function separately, as it requires to reorder some of
+the initialization code to correctly propagate a tagged pointer in case a
+tag is assigned by kasan_kmalloc.
 
-For instance we don't want to force X86 from DRM=y to DRM=m, when
-enabling selftest, that would surely break somebody's setup and you also
-don't want to force ARM64 from DRM=m to DRM=y, that seems
-unnecessary for a big subsystem like DRM.
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+---
+ mm/slub.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
->
-> Does the real problem exist in the kernel tree,
-
-Not that I'm aware about.
-
-Cheers,
-Anders
-
-> or for local fragment files?
->
->
-> Thanks.
->
->
->
-> >  scripts/kconfig/merge_config.sh | 15 ++++++++++++++-
-> >  1 file changed, 14 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-> > index da66e7742282..902a60b45614 100755
-> > --- a/scripts/kconfig/merge_config.sh
-> > +++ b/scripts/kconfig/merge_config.sh
-> > @@ -32,6 +32,7 @@ usage() {
-> >         echo "  -m    only merge the fragments, do not execute the make command"
-> >         echo "  -n    use allnoconfig instead of alldefconfig"
-> >         echo "  -r    list redundant entries when merging fragments"
-> > +       echo "  -y    make builtin have precedence over modules"
-> >         echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
-> >         echo
-> >         echo "Used prefix: '$CONFIG_PREFIX'. You can redefine it with \$CONFIG_ environment variable."
-> > @@ -40,6 +41,7 @@ usage() {
-> >  RUNMAKE=true
-> >  ALLTARGET=alldefconfig
-> >  WARNREDUN=false
-> > +BUILTIN=false
-> >  OUTPUT=.
-> >  CONFIG_PREFIX=${CONFIG_-CONFIG_}
-> >
-> > @@ -64,6 +66,11 @@ while true; do
-> >                 shift
-> >                 continue
-> >                 ;;
-> > +       "-y")
-> > +               BUILTIN=true
-> > +               shift
-> > +               continue
-> > +               ;;
-> >         "-O")
-> >                 if [ -d $2 ];then
-> >                         OUTPUT=$(echo $2 | sed 's/\/*$//')
-> > @@ -122,7 +129,13 @@ for MERGE_FILE in $MERGE_LIST ; do
-> >                 grep -q -w $CFG $TMP_FILE || continue
-> >                 PREV_VAL=$(grep -w $CFG $TMP_FILE)
-> >                 NEW_VAL=$(grep -w $CFG $MERGE_FILE)
-> > -               if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
-> > +               if test "$BUILTIN" = "true" && echo $PREV_VAL |grep -Eq '^\w+=y' && echo $NEW_VAL |grep -Eq '^\w+=m' ; then
-> > +                       echo Value of $CFG is \'y\' and we don\'t want to redefine the fragment $MERGE_FILE:
-> > +                       echo Previous  value: $PREV_VAL
-> > +                       echo New value:       $NEW_VAL
-> > +                       echo Will use previous value.
-> > +                       echo
-> > +               elif [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
-> >                         echo Value of $CFG is redefined by fragment $MERGE_FILE:
-> >                         echo Previous  value: $PREV_VAL
-> >                         echo New value:       $NEW_VAL
-> > --
-> > 2.11.0
-> >
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+diff --git a/mm/slub.c b/mm/slub.c
+index fdd4a86aa882..8561a32910dd 100644
+--- a/mm/slub.c
++++ b/mm/slub.c
+@@ -3364,16 +3364,16 @@ static void early_kmem_cache_node_alloc(int node)
+ 
+ 	n = page->freelist;
+ 	BUG_ON(!n);
+-	page->freelist = get_freepointer(kmem_cache_node, n);
+-	page->inuse = 1;
+-	page->frozen = 0;
+-	kmem_cache_node->node[node] = n;
+ #ifdef CONFIG_SLUB_DEBUG
+ 	init_object(kmem_cache_node, n, SLUB_RED_ACTIVE);
+ 	init_tracking(kmem_cache_node, n);
+ #endif
+-	kasan_kmalloc(kmem_cache_node, n, sizeof(struct kmem_cache_node),
++	n = kasan_kmalloc(kmem_cache_node, n, sizeof(struct kmem_cache_node),
+ 		      GFP_KERNEL);
++	page->freelist = get_freepointer(kmem_cache_node, n);
++	page->inuse = 1;
++	page->frozen = 0;
++	kmem_cache_node->node[node] = n;
+ 	init_kmem_cache_node(n);
+ 	inc_slabs_node(kmem_cache_node, node, page->objects);
+ 
+-- 
+2.19.1.930.g4563a0d9d0-goog
