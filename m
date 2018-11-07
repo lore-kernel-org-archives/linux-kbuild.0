@@ -1,101 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:54442 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727546AbeKHCZ6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Nov 2018 21:25:58 -0500
-Date: Wed, 7 Nov 2018 16:54:38 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v10 06/22] kasan, arm64: adjust shadow size for tag-based
- mode
-Message-ID: <20181107165438.34kb5ufoe5ve2f6i@lakrids.cambridge.arm.com>
-References: <cover.1541525354.git.andreyknvl@google.com>
- <86d1b17c755d8bfd6e44e6869a16f4a409e7bd06.1541525354.git.andreyknvl@google.com>
+Received: from bombadil.infradead.org ([198.137.202.133]:56422 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726068AbeKHESp (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 7 Nov 2018 23:18:45 -0500
+Date: Wed, 7 Nov 2018 10:47:05 -0800
+From: Darren Hart <dvhart@infradead.org>
+Subject: Re: [PATCH] scripts/kconfig/merge_config: don't redefine 'y' to 'm'
+Message-ID: <20181107184705.GA95239@fedora.eng.vmware.com>
+References: <20181102114119.23859-1-anders.roxell@linaro.org>
+ <CAK7LNARda14b9_8Yh7vC2PFa_w=yw+qD0YTriAVQ_Aw5PoXkNw@mail.gmail.com>
+ <CADYN=9L2kEVJMiVRBUBU7z4B4_YrvkNefCE5FO3qjACgm=FugA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86d1b17c755d8bfd6e44e6869a16f4a409e7bd06.1541525354.git.andreyknvl@google.com>
+In-Reply-To: <CADYN=9L2kEVJMiVRBUBU7z4B4_YrvkNefCE5FO3qjACgm=FugA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: Anders Roxell <anders.roxell@linaro.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>
 
-Hi Andrey,
-
-On Tue, Nov 06, 2018 at 06:30:21PM +0100, Andrey Konovalov wrote:
-> Tag-based KASAN uses 1 shadow byte for 16 bytes of kernel memory, so it
-> requires 1/16th of the kernel virtual address space for the shadow memory.
+On Tue, Nov 06, 2018 at 02:57:40PM +0100, Anders Roxell wrote:
+> On Mon, 5 Nov 2018 at 09:35, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> >
+> > Hi Anders,
+> >
+> > On Fri, Nov 2, 2018 at 8:41 PM Anders Roxell <anders.roxell@linaro.org> wrote:
+> > >
+> > > In today's merge_config.sh the order of the config fragment files dictates
+> > > the output of a config option. With this approach we will get different
+> > > .config files depending on the order of the config fragment files.
+> > > Adding a switch to add precedence for builtin over modules, this will
+> > > make the .config file the same
+> > >
+> > > Suggested-by: Arnd Bergmann <arnd@arndb.de>
+> > > Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+> > > ---
+> >
+> > I think this patch makes sense.
+> >
+> > Just in case, could you please provide me the context of the discussion?
 > 
-> This commit sets KASAN_SHADOW_SCALE_SHIFT to 4 when the tag-based KASAN
-> mode is enabled.
+> For instance we don't want to force X86 from DRM=y to DRM=m, when
+> enabling selftest, that would surely break somebody's setup and you also
+> don't want to force ARM64 from DRM=m to DRM=y, that seems
+> unnecessary for a big subsystem like DRM.
 > 
-> Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> ---
->  arch/arm64/Makefile             |  2 +-
->  arch/arm64/include/asm/memory.h | 13 +++++++++----
->  2 files changed, 10 insertions(+), 5 deletions(-)
+> >
+> > Does the real problem exist in the kernel tree,
 > 
-> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-> index 6cb9fc7e9382..9887492381d9 100644
-> --- a/arch/arm64/Makefile
-> +++ b/arch/arm64/Makefile
-> @@ -94,7 +94,7 @@ endif
->  # KASAN_SHADOW_OFFSET = VA_START + (1 << (VA_BITS - KASAN_SHADOW_SCALE_SHIFT))
->  #				 - (1 << (64 - KASAN_SHADOW_SCALE_SHIFT))
->  # in 32-bit arithmetic
-> -KASAN_SHADOW_SCALE_SHIFT := 3
-> +KASAN_SHADOW_SCALE_SHIFT := $(if $(CONFIG_KASAN_SW_TAGS), 4, 3)
-
-
-We could make this something like:
-
-ifeq ($(CONFIG_KASAN_SW_TAGS), y)
-KASAN_SHADOW_SCALE_SHIFT := 4
-else
-KASAN_SHADOW_SCALE_SHIFT := 3
-endif
-
-KBUILD_CFLAGS += -DKASAN_SHADOW_SCALE_SHIFT=$(KASAN_SHADOW_SCALE_SHIFT)
-
->  KASAN_SHADOW_OFFSET := $(shell printf "0x%08x00000000\n" $$(( \
->  	(0xffffffff & (-1 << ($(CONFIG_ARM64_VA_BITS) - 32))) \
->  	+ (1 << ($(CONFIG_ARM64_VA_BITS) - 32 - $(KASAN_SHADOW_SCALE_SHIFT))) \
-> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-> index b96442960aea..0f1e024a951f 100644
-> --- a/arch/arm64/include/asm/memory.h
-> +++ b/arch/arm64/include/asm/memory.h
-> @@ -74,12 +74,17 @@
->  #define KERNEL_END        _end
->  
->  /*
-> - * KASAN requires 1/8th of the kernel virtual address space for the shadow
-> - * region. KASAN can bloat the stack significantly, so double the (minimum)
-> - * stack size when KASAN is in use.
-> + * Generic and tag-based KASAN require 1/8th and 1/16th of the kernel virtual
-> + * address space for the shadow region respectively. They can bloat the stack
-> + * significantly, so double the (minimum) stack size when they are in use.
->   */
-> -#ifdef CONFIG_KASAN
-> +#ifdef CONFIG_KASAN_GENERIC
->  #define KASAN_SHADOW_SCALE_SHIFT 3
-> +#endif
-> +#ifdef CONFIG_KASAN_SW_TAGS
-> +#define KASAN_SHADOW_SCALE_SHIFT 4
-> +#endif
-> +#ifdef CONFIG_KASAN
-
-... and remove the constant entirely here, avoiding duplication.
-
-Maybe factor that into a Makefile.kasan if things are going to get much
-more complicated.
-
-Thanks,
-Mark.
-
->  #define KASAN_SHADOW_SIZE	(UL(1) << (VA_BITS - KASAN_SHADOW_SCALE_SHIFT))
->  #define KASAN_THREAD_SHIFT	1
->  #else
-> -- 
-> 2.19.1.930.g4563a0d9d0-goog
+> Not that I'm aware about.
 > 
+> Cheers,
+> Anders
+> 
+> > or for local fragment files?
+
+This is really about ordering of fragment files and not "making a symbol
+'less'", I think were Arnd's words.
+
+So, doing something like:
+
+$ make arm64-selftest.config drm.config
+
+where arm64-selftest.config defines DRM=y and drm.config defines DRM=m, the
+result should be "DRM=y".
+
+So the first step is to make merge_config.sh support it. A follow up step would
+be to integrate this into the kernel Makefile system if we determine this is the
+correct behavior, or to provide a parameter if we don't want to change the
+default behavior.
+
+
+-- 
+Darren Hart
+VMware Open Source Technology Center
