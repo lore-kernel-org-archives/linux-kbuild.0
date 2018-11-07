@@ -1,48 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:56604 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726356AbeKHD6K (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Nov 2018 22:58:10 -0500
-Date: Wed, 7 Nov 2018 18:26:27 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v10 12/22] kasan, arm64: fix up fault handling logic
-Message-ID: <20181107182626.GD255021@arrakis.emea.arm.com>
-References: <cover.1541525354.git.andreyknvl@google.com>
- <4891a504adf61c0daf1e83642b6f7519328dfd5f.1541525354.git.andreyknvl@google.com>
+Received: from bombadil.infradead.org ([198.137.202.133]:47980 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725724AbeKHFId (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 8 Nov 2018 00:08:33 -0500
+Date: Wed, 7 Nov 2018 11:36:43 -0800
+From: Darren Hart <dvhart@infradead.org>
+Subject: Re: [PATCH] scripts/kconfig/merge_config: don't redefine 'y' to 'm'
+Message-ID: <20181107193643.GB95239@fedora.eng.vmware.com>
+References: <20181102114119.23859-1-anders.roxell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4891a504adf61c0daf1e83642b6f7519328dfd5f.1541525354.git.andreyknvl@google.com>
+In-Reply-To: <20181102114119.23859-1-anders.roxell@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Vishwath Mohan <vishwath@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
+To: Anders Roxell <anders.roxell@linaro.org>
+Cc: yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, arnd@arndb.de
 
-On Tue, Nov 06, 2018 at 06:30:27PM +0100, Andrey Konovalov wrote:
-> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> index 7d9571f4ae3d..d9a84d6f3343 100644
-> --- a/arch/arm64/mm/fault.c
-> +++ b/arch/arm64/mm/fault.c
-> @@ -32,6 +32,7 @@
->  #include <linux/perf_event.h>
->  #include <linux/preempt.h>
->  #include <linux/hugetlb.h>
-> +#include <linux/kasan.h>
->  
->  #include <asm/bug.h>
->  #include <asm/cmpxchg.h>
-> @@ -141,6 +142,8 @@ void show_pte(unsigned long addr)
->  	pgd_t *pgdp;
->  	pgd_t pgd;
->  
-> +	addr = (unsigned long)kasan_reset_tag((void *)addr);
-> +
->  	if (addr < TASK_SIZE) {
->  		/* TTBR0 */
->  		mm = current->active_mm;
+On Fri, Nov 02, 2018 at 12:41:19PM +0100, Anders Roxell wrote:
+> In today's merge_config.sh the order of the config fragment files dictates
+> the output of a config option. With this approach we will get different
+> .config files depending on the order of the config fragment files.
+> Adding a switch to add precedence for builtin over modules, this will
+> make the .config file the same
+> 
+> Suggested-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
 
-I think we should clear the tag earlier on in the fault handling code,
-before reaching show_pte().
+Thanks for the patch Anders!
+
+> ---
+>  scripts/kconfig/merge_config.sh | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+> index da66e7742282..902a60b45614 100755
+> --- a/scripts/kconfig/merge_config.sh
+> +++ b/scripts/kconfig/merge_config.sh
+> @@ -32,6 +32,7 @@ usage() {
+>  	echo "  -m    only merge the fragments, do not execute the make command"
+>  	echo "  -n    use allnoconfig instead of alldefconfig"
+>  	echo "  -r    list redundant entries when merging fragments"
+> +	echo "  -y    make builtin have precedence over modules"
+>  	echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
+>  	echo
+>  	echo "Used prefix: '$CONFIG_PREFIX'. You can redefine it with \$CONFIG_ environment variable."
+> @@ -40,6 +41,7 @@ usage() {
+>  RUNMAKE=true
+>  ALLTARGET=alldefconfig
+>  WARNREDUN=false
+> +BUILTIN=false
+>  OUTPUT=.
+>  CONFIG_PREFIX=${CONFIG_-CONFIG_}
+>  
+> @@ -64,6 +66,11 @@ while true; do
+>  		shift
+>  		continue
+>  		;;
+> +	"-y")
+> +		BUILTIN=true
+> +		shift
+> +		continue
+> +		;;
+>  	"-O")
+>  		if [ -d $2 ];then
+>  			OUTPUT=$(echo $2 | sed 's/\/*$//')
+> @@ -122,7 +129,13 @@ for MERGE_FILE in $MERGE_LIST ; do
+>  		grep -q -w $CFG $TMP_FILE || continue
+>  		PREV_VAL=$(grep -w $CFG $TMP_FILE)
+>  		NEW_VAL=$(grep -w $CFG $MERGE_FILE)
+> -		if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
+> +		if test "$BUILTIN" = "true" && echo $PREV_VAL |grep -Eq '^\w+=y' && echo $NEW_VAL |grep -Eq '^\w+=m' ; then
+
+I think we can avoid the rather lengthy/forky "echo | grep" mechanism
+with POSIX substring parameter expansion (should work in bash, dash,
+etc.).
+
+http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_06_02
+
+We can also be more consistent with the other tests in the script, consider:
+
+		if [ "$BUILTIN" = "true" ] && [ "${NEW_VAL#CONFIG_*=}" = "m" ] && [ "${PREV_VAL#CONFIG_*=}" = "y" ]; then
+
+
+> +			echo Value of $CFG is \'y\' and we don\'t want to redefine the fragment $MERGE_FILE:
+
+I think we can drop the above and perhaps update the last line with...
+
+> +			echo Previous  value: $PREV_VAL
+> +			echo New value:       $NEW_VAL
+> +			echo Will use previous value.
+
+echo "-y passed, will not demote y to m"
+
+Or something along those lines.
+
+> +			echo
+> +		elif [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
+>  			echo Value of $CFG is redefined by fragment $MERGE_FILE:
+>  			echo Previous  value: $PREV_VAL
+>  			echo New value:       $NEW_VAL
+> -- 
+> 2.11.0
+> 
+> 
 
 -- 
-Catalin
+Darren Hart
+VMware Open Source Technology Center
