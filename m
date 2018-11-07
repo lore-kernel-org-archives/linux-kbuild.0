@@ -1,111 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:47980 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725724AbeKHFId (ORCPT
+Received: from mail-oi1-f177.google.com ([209.85.167.177]:45129 "EHLO
+        mail-oi1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725945AbeKHFTF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Nov 2018 00:08:33 -0500
-Date: Wed, 7 Nov 2018 11:36:43 -0800
-From: Darren Hart <dvhart@infradead.org>
-Subject: Re: [PATCH] scripts/kconfig/merge_config: don't redefine 'y' to 'm'
-Message-ID: <20181107193643.GB95239@fedora.eng.vmware.com>
-References: <20181102114119.23859-1-anders.roxell@linaro.org>
+        Thu, 8 Nov 2018 00:19:05 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181102114119.23859-1-anders.roxell@linaro.org>
+From: Mathieu Malaterre <malat@debian.org>
+Date: Wed, 7 Nov 2018 20:47:03 +0100
+Message-ID: <CA+7wUsw9a3ecPHtPsMF71zjzmNqyASFP-X6Z_DVa108akVcN-g@mail.gmail.com>
+Subject: Makefile:611: include/config/auto.conf: No such file or directory
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anders Roxell <anders.roxell@linaro.org>
-Cc: yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, arnd@arndb.de
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Fri, Nov 02, 2018 at 12:41:19PM +0100, Anders Roxell wrote:
-> In today's merge_config.sh the order of the config fragment files dictates
-> the output of a config option. With this approach we will get different
-> .config files depending on the order of the config fragment files.
-> Adding a switch to add precedence for builtin over modules, this will
-> make the .config file the same
-> 
-> Suggested-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+Hi Yamada-san,
 
-Thanks for the patch Anders!
+Since commit:
 
-> ---
->  scripts/kconfig/merge_config.sh | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-> index da66e7742282..902a60b45614 100755
-> --- a/scripts/kconfig/merge_config.sh
-> +++ b/scripts/kconfig/merge_config.sh
-> @@ -32,6 +32,7 @@ usage() {
->  	echo "  -m    only merge the fragments, do not execute the make command"
->  	echo "  -n    use allnoconfig instead of alldefconfig"
->  	echo "  -r    list redundant entries when merging fragments"
-> +	echo "  -y    make builtin have precedence over modules"
->  	echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
->  	echo
->  	echo "Used prefix: '$CONFIG_PREFIX'. You can redefine it with \$CONFIG_ environment variable."
-> @@ -40,6 +41,7 @@ usage() {
->  RUNMAKE=true
->  ALLTARGET=alldefconfig
->  WARNREDUN=false
-> +BUILTIN=false
->  OUTPUT=.
->  CONFIG_PREFIX=${CONFIG_-CONFIG_}
->  
-> @@ -64,6 +66,11 @@ while true; do
->  		shift
->  		continue
->  		;;
-> +	"-y")
-> +		BUILTIN=true
-> +		shift
-> +		continue
-> +		;;
->  	"-O")
->  		if [ -d $2 ];then
->  			OUTPUT=$(echo $2 | sed 's/\/*$//')
-> @@ -122,7 +129,13 @@ for MERGE_FILE in $MERGE_LIST ; do
->  		grep -q -w $CFG $TMP_FILE || continue
->  		PREV_VAL=$(grep -w $CFG $TMP_FILE)
->  		NEW_VAL=$(grep -w $CFG $MERGE_FILE)
-> -		if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
-> +		if test "$BUILTIN" = "true" && echo $PREV_VAL |grep -Eq '^\w+=y' && echo $NEW_VAL |grep -Eq '^\w+=m' ; then
+80463f1b7bf9 kbuild: add --include-dir flag only for out-of-tree build
 
-I think we can avoid the rather lengthy/forky "echo | grep" mechanism
-with POSIX substring parameter expansion (should work in bash, dash,
-etc.).
+I can no longer run the bindeb-pkg rule. For example:
 
-http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_06_02
+$ make O=wii ARCH=powerpc wii_defconfig
+$ make -j8 O=wii ARCH=powerpc CROSS_COMPILE=powerpc-linux-gnu- bindeb-pkg
+...
+  WRAP    arch/powerpc/boot/dtbImage.wii
+INFO: Uncompressed kernel (size 0x89aa8c) overlaps the address of the
+wrapper(0x600000)
+INFO: Fixing the link_address of wrapper to (0x900000)
+rm arch/powerpc/boot/wii.dtb
+ fakeroot -u debian/rules binary
+make KERNELRELEASE=4.19.0-rc3-wii+ ARCH=powerpc KBUILD_SRC= intdeb-pkg
+/bin/bash ../scripts/package/builddeb
+Makefile:611: include/config/auto.conf: No such file or directory
+***
+*** Configuration file ".config" not found!
+***
+*** Please run some configurator (e.g. "make oldconfig" or
+*** "make menuconfig" or "make xconfig").
+***
+make[11]: *** [syncconfig] Error 1
+make[10]: *** [syncconfig] Error 2
+make[9]: *** [include/config/auto.conf] Error 2
+make[8]: *** [__sub-make] Error 2
+cp: cannot stat '/tmp/linux/scripts/kconfig/Makefile:69: recipe for
+target '\''syncconfig'\'' failed'$'\n''/tmp/linux/Makefile:555: recipe
+for target '\''syncconfig'\'' failed'$'\n''Makefile:646: recipe for
+target '\''include/config/auto.conf'\'' failed'$'\n''Makefile:24:
+recipe for target '\''__sub-make'\'' failed': No such file or
+directory
 
-We can also be more consistent with the other tests in the script, consider:
+Would you be able to provide a patch to fix this ?
 
-		if [ "$BUILTIN" = "true" ] && [ "${NEW_VAL#CONFIG_*=}" = "m" ] && [ "${PREV_VAL#CONFIG_*=}" = "y" ]; then
-
-
-> +			echo Value of $CFG is \'y\' and we don\'t want to redefine the fragment $MERGE_FILE:
-
-I think we can drop the above and perhaps update the last line with...
-
-> +			echo Previous  value: $PREV_VAL
-> +			echo New value:       $NEW_VAL
-> +			echo Will use previous value.
-
-echo "-y passed, will not demote y to m"
-
-Or something along those lines.
-
-> +			echo
-> +		elif [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
->  			echo Value of $CFG is redefined by fragment $MERGE_FILE:
->  			echo Previous  value: $PREV_VAL
->  			echo New value:       $NEW_VAL
-> -- 
-> 2.11.0
-> 
-> 
-
--- 
-Darren Hart
-VMware Open Source Technology Center
+Thanks much,
