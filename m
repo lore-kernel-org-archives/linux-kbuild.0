@@ -1,138 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:47482 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726097AbeKGTJz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Nov 2018 14:09:55 -0500
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [RFC PATCH 2/4] arm64: lse: expose dependency on gas via Kconfig
-Date: Wed,  7 Nov 2018 09:40:06 +0000
-Message-Id: <1541583608-26375-3-git-send-email-vladimir.murzin@arm.com>
-In-Reply-To: <1541583608-26375-1-git-send-email-vladimir.murzin@arm.com>
-References: <1541583608-26375-1-git-send-email-vladimir.murzin@arm.com>
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:35612 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726670AbeKHAH1 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 7 Nov 2018 19:07:27 -0500
+From: Rob Herring <robh@kernel.org>
+Subject: [PATCH] builddeb: Fix inclusion of dtbs in debian package
+Date: Wed,  7 Nov 2018 08:36:46 -0600
+Message-Id: <20181107143646.27675-1-robh@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: yamada.masahiro@socionext.com, linux-crypto@vger.kernel.org, linux-kbuild@vger.kernel.org, kbuild-all@01.org, Will Deacon <will.deacon@arm.com>
+To: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, =?UTF-8?q?Nuno=20Gon=C3=A7alves?= <nunojpg@gmail.com>
 
-So we can simply hide LSE support if dependency is not satisfied.
+Commit 37c8a5fafa3b ("kbuild: consolidate Devicetree dtb build rules")
+moved the location of 'dtbs_install' target which caused dtbs to not be
+installed when building debian package with 'bindeb-pkg' target. Update
+the builddeb script to use the same logic that determines if there's a
+'dtbs_install' target which is presence of the arch dts directory. Also,
+use CONFIG_OF_EARLY_FLATTREE instead of CONFIG_OF as that's a better
+indication of whether we are building dtbs.
 
-Cc: Will Deacon <will.deacon@arm.com>
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+This commit will also have the side effect of installing dtbs on any
+arch that has dts files. Previously, it was dependent on whether the
+arch defined 'dtbs_install'.
+
+Fixes: 37c8a5fafa3b ("kbuild: consolidate Devicetree dtb build rules")
+Reported-by: Nuno Gonçalves <nunojpg@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Rob Herring <robh@kernel.org>
 ---
- arch/arm64/Kconfig              |  1 +
- arch/arm64/Makefile             | 13 ++-----------
- arch/arm64/include/asm/atomic.h |  2 +-
- arch/arm64/include/asm/lse.h    |  6 +++---
- arch/arm64/kernel/cpufeature.c  |  4 ++--
- 5 files changed, 9 insertions(+), 17 deletions(-)
+ scripts/package/builddeb | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 964f682..7978aee 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1072,6 +1072,7 @@ config ARM64_PAN
- config ARM64_LSE_ATOMICS
- 	bool "Atomic instructions"
- 	default y
-+	depends on $(as-instr,.arch_extension lse)
- 	help
- 	  As part of the Large System Extensions, ARMv8.1 introduces new
- 	  atomic instructions that are designed specifically to scale in
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index b4e994c..3054757 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -32,15 +32,6 @@ endif
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 90c9a8ac7adb..594b626d83d6 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -83,9 +83,9 @@ else
+ fi
+ cp "$($MAKE -s image_name)" "$tmpdir/$installed_image_path"
  
- KBUILD_DEFCONFIG := defconfig
- 
--# Check for binutils support for specific extensions
--lseinstr := $(call as-instr,.arch_extension lse,-DCONFIG_AS_LSE=1)
--
--ifeq ($(CONFIG_ARM64_LSE_ATOMICS), y)
--  ifeq ($(lseinstr),)
--$(warning LSE atomics not supported by binutils)
--  endif
--endif
--
- ifeq ($(CONFIG_ARM64), y)
- brokengasinst := $(call as-instr,1:\n.inst 0\n.rept . - 1b\n\nnop\n.endr\n,,-DCONFIG_BROKEN_GAS_INST=1)
- 
-@@ -49,9 +40,9 @@ $(warning Detected assembler with broken .inst; disassembly will be unreliable)
-   endif
- endif
- 
--KBUILD_CFLAGS	+= -mgeneral-regs-only $(lseinstr) $(brokengasinst)
-+KBUILD_CFLAGS	+= -mgeneral-regs-only $(brokengasinst)
- KBUILD_CFLAGS	+= -fno-asynchronous-unwind-tables
--KBUILD_AFLAGS	+= $(lseinstr) $(brokengasinst)
-+KBUILD_AFLAGS	+= $(brokengasinst)
- 
- KBUILD_CFLAGS	+= $(call cc-option,-mabi=lp64)
- KBUILD_AFLAGS	+= $(call cc-option,-mabi=lp64)
-diff --git a/arch/arm64/include/asm/atomic.h b/arch/arm64/include/asm/atomic.h
-index 9bca54d..9d8d029 100644
---- a/arch/arm64/include/asm/atomic.h
-+++ b/arch/arm64/include/asm/atomic.h
-@@ -30,7 +30,7 @@
- 
- #define __ARM64_IN_ATOMIC_IMPL
- 
--#if defined(CONFIG_ARM64_LSE_ATOMICS) && defined(CONFIG_AS_LSE)
-+#ifdef CONFIG_ARM64_LSE_ATOMICS
- #include <asm/atomic_lse.h>
- #else
- #include <asm/atomic_ll_sc.h>
-diff --git a/arch/arm64/include/asm/lse.h b/arch/arm64/include/asm/lse.h
-index 8262325..1fd31c7 100644
---- a/arch/arm64/include/asm/lse.h
-+++ b/arch/arm64/include/asm/lse.h
-@@ -2,7 +2,7 @@
- #ifndef __ASM_LSE_H
- #define __ASM_LSE_H
- 
--#if defined(CONFIG_AS_LSE) && defined(CONFIG_ARM64_LSE_ATOMICS)
-+#ifdef CONFIG_ARM64_LSE_ATOMICS
- 
- #include <linux/compiler_types.h>
- #include <linux/export.h>
-@@ -36,7 +36,7 @@
- 	ALTERNATIVE(llsc, lse, ARM64_HAS_LSE_ATOMICS)
- 
- #endif	/* __ASSEMBLER__ */
--#else	/* CONFIG_AS_LSE && CONFIG_ARM64_LSE_ATOMICS */
-+#else	/* CONFIG_ARM64_LSE_ATOMICS */
- 
- #ifdef __ASSEMBLER__
- 
-@@ -53,5 +53,5 @@
- #define ARM64_LSE_ATOMIC_INSN(llsc, lse)	llsc
- 
- #endif	/* __ASSEMBLER__ */
--#endif	/* CONFIG_AS_LSE && CONFIG_ARM64_LSE_ATOMICS */
-+#endif	/* CONFIG_ARM64_LSE_ATOMICS */
- #endif	/* __ASM_LSE_H */
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 74e9dcb..46f1bac 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1170,7 +1170,7 @@ static void cpu_clear_disr(const struct arm64_cpu_capabilities *__unused)
- 		.cpu_enable = cpu_enable_pan,
- 	},
- #endif /* CONFIG_ARM64_PAN */
--#if defined(CONFIG_AS_LSE) && defined(CONFIG_ARM64_LSE_ATOMICS)
-+#ifdef CONFIG_ARM64_LSE_ATOMICS
- 	{
- 		.desc = "LSE atomic instructions",
- 		.capability = ARM64_HAS_LSE_ATOMICS,
-@@ -1181,7 +1181,7 @@ static void cpu_clear_disr(const struct arm64_cpu_capabilities *__unused)
- 		.sign = FTR_UNSIGNED,
- 		.min_field_value = 2,
- 	},
--#endif /* CONFIG_AS_LSE && CONFIG_ARM64_LSE_ATOMICS */
-+#endif /* CONFIG_ARM64_LSE_ATOMICS */
- 	{
- 		.desc = "Software prefetching using PRFM",
- 		.capability = ARM64_HAS_NO_HW_PREFETCH,
+-if grep -q "^CONFIG_OF=y" $KCONFIG_CONFIG ; then
++if grep -q "^CONFIG_OF_EARLY_FLATTREE=y" $KCONFIG_CONFIG ; then
+ 	# Only some architectures with OF support have this target
+-	if grep -q dtbs_install "${srctree}/arch/$SRCARCH/Makefile"; then
++	if [ -d "${srctree}/arch/$SRCARCH/boot/dts" ]; then
+ 		$MAKE KBUILD_SRC= INSTALL_DTBS_PATH="$tmpdir/usr/lib/$packagename" dtbs_install
+ 	fi
+ fi
 -- 
-1.9.1
+2.19.1
