@@ -1,50 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:47470 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726097AbeKGTJx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Nov 2018 14:09:53 -0500
+Received: from foss.arm.com ([217.140.101.70]:47458 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726097AbeKGTJw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 7 Nov 2018 14:09:52 -0500
 From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [RFC PATCH 1/4] kconfig: add as-instr macro to scripts/Kconfig.include
-Date: Wed,  7 Nov 2018 09:40:05 +0000
-Message-Id: <1541583608-26375-2-git-send-email-vladimir.murzin@arm.com>
-In-Reply-To: <1541583608-26375-1-git-send-email-vladimir.murzin@arm.com>
-References: <1541583608-26375-1-git-send-email-vladimir.murzin@arm.com>
+Subject: [RFC PATCH 0/4] Minor improvements over handling dependency on GAS
+Date: Wed,  7 Nov 2018 09:40:04 +0000
+Message-Id: <1541583608-26375-1-git-send-email-vladimir.murzin@arm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-arm-kernel@lists.infradead.org
-Cc: yamada.masahiro@socionext.com, linux-crypto@vger.kernel.org, linux-kbuild@vger.kernel.org, kbuild-all@01.org, Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: yamada.masahiro@socionext.com, linux-crypto@vger.kernel.org, linux-kbuild@vger.kernel.org, kbuild-all@01.org
 
-There are cases where the whole feature, for instance arm64/lse or
-arm/crypto, can depend on assembler. Current practice is to report
-buildtime that selected feature is not supported, which can be quite
-annoying...
+With recent changes in Kconfig processing it is now possible to expose
+dependency on specific tools and supported options via Kconfig rather
+than bury it deep in Makefile.
 
-It'd nicer if we can check assembler first and opt-in feature
-visibility in Kconfig.
+This small series try to address the case where the whole feature, for
+instance arm64/lse or arm/crypto, depends on GAS.
 
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
----
- scripts/Kconfig.include | 4 ++++
- 1 file changed, 4 insertions(+)
+Vladimir Murzin (4):
+  kconfig: add as-instr macro to scripts/Kconfig.include
+  arm64: lse: expose dependency on gas via Kconfig
+  arm64: turn "broken gas inst" into real config option
+  ARM: crypto: expose dependency on gas via Kconfig
 
-diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
-index dad5583..07c145c 100644
---- a/scripts/Kconfig.include
-+++ b/scripts/Kconfig.include
-@@ -22,6 +22,10 @@ success = $(if-success,$(1),y,n)
- # Return y if the compiler supports <flag>, n otherwise
- cc-option = $(success,$(CC) -Werror $(1) -E -x c /dev/null -o /dev/null)
- 
-+# $(as-instr,<instr>)
-+# Return y if the assembler supports <instr>, n otherwise
-+as-instr = $(success,printf "%b\n" "$(1)" | $(CC) -Werror -c -x assembler -o /dev/null -)
-+
- # $(ld-option,<flag>)
- # Return y if the linker supports <flag>, n otherwise
- ld-option = $(success,$(LD) -v $(1))
+ arch/arm/crypto/Kconfig         | 31 +++++++++++++++++++++----------
+ arch/arm/crypto/Makefile        | 31 ++++++-------------------------
+ arch/arm64/Kconfig              |  4 ++++
+ arch/arm64/Makefile             | 18 ++----------------
+ arch/arm64/include/asm/atomic.h |  2 +-
+ arch/arm64/include/asm/lse.h    |  6 +++---
+ arch/arm64/kernel/cpufeature.c  |  4 ++--
+ scripts/Kconfig.include         |  4 ++++
+ 8 files changed, 43 insertions(+), 57 deletions(-)
+
 -- 
 1.9.1
