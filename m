@@ -1,105 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:54368 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727676AbeKHCXX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Nov 2018 21:23:23 -0500
-Date: Wed, 7 Nov 2018 16:52:00 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v10 08/22] kasan, arm64: untag address in __kimg_to_phys
- and _virt_addr_is_linear
-Message-ID: <20181107165200.oaou6cx2lmjzmjyl@lakrids.cambridge.arm.com>
-References: <cover.1541525354.git.andreyknvl@google.com>
- <b2aa056b65b8f1a410379bf2f6ef439d5d99e8eb.1541525354.git.andreyknvl@google.com>
+Received: from mail-co1nam03on0082.outbound.protection.outlook.com ([104.47.40.82]:26879
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726185AbeKHPw3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 8 Nov 2018 10:52:29 -0500
+From: Nadav Amit <namit@vmware.com>
+Subject: Re: [PATCH v9 02/10] Makefile: Prepare for using macros for inline
+ asm
+Date: Thu, 8 Nov 2018 06:18:33 +0000
+Message-ID: <3B824A03-AB76-4B34-B1CA-F27C0F1B0575@vmware.com>
+References: <20181003213100.189959-1-namit@vmware.com>
+ <20181003213100.189959-3-namit@vmware.com>
+ <89262174-6f15-6116-e67f-436f7c1bfe99@deltatee.com>
+ <6651971B-E3AB-4CDD-868C-2338593F7D83@vmware.com>
+ <d0812681-4a8f-8cc4-24ce-d02002ee34d2@deltatee.com>
+ <DC1EA50F-FAC3-4750-BCF7-0622D1FB4756@vmware.com>
+ <a3902c4c-64b1-9c49-02fb-d5e4c9b04314@deltatee.com>
+ <192946CF-8543-4CF5-B2A3-93674FCD07E2@vmware.com>
+ <7bc80811-8ab3-d26a-6fb3-b7aeebcfce43@deltatee.com>
+ <85B77A64-5FF3-4B82-8A07-E045E259C985@zytor.com>
+In-Reply-To: <85B77A64-5FF3-4B82-8A07-E045E259C985@zytor.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <0CC1A880DE192E4F8367B16E11070D19@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b2aa056b65b8f1a410379bf2f6ef439d5d99e8eb.1541525354.git.andreyknvl@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: "hpa@zytor.com" <hpa@zytor.com>, Logan Gunthorpe <logang@deltatee.com>, Ingo Molnar <mingo@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Stephen Bates <sbates@raithlin.com>
 
-Hi Andrey,
+From: hpa@zytor.com
+Sent: November 7, 2018 at 9:50:28 PM GMT
+> To: Logan Gunthorpe <logang@deltatee.com>, Nadav Amit <namit@vmware.com>,=
+ Ingo Molnar <mingo@redhat.com>
+> Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Rav=
+nborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gl=
+eixner <tglx@linutronix.de>, Linux Kbuild mailing list <linux-kbuild@vger.k=
+ernel.org>, Stephen Bates <sbates@raithlin.com>
+> Subject: Re: [PATCH v9 02/10] Makefile: Prepare for using macros for inli=
+ne asm
+>=20
+>=20
+> On November 7, 2018 1:43:39 PM PST, Logan Gunthorpe <logang@deltatee.com>=
+ wrote:
+>> On 2018-11-07 11:56 a.m., Nadav Amit wrote:
+>>> HPA indicated more than once that this is wrong (and that was indeed
+>> my
+>>> initial solution), since it is not guaranteed that the compiler would
+>> put
+>>> the macro assembly before its use.
+>>=20
+>> Hmm, that's very unfortunate. I don't really understand why the
+>> compiler
+>> would not put the macro assembly in the same order as it appears in the
+>> code and it would be in the correct order there.
+>>=20
+>> In any case, I've submitted a couple of issues to icecc[1] and
+>> distcc[2]
+>> to see if they have any ideas about supporting this on their sides.
+>>=20
+>> Thanks,
+>>=20
+>> Logan
+>>=20
+>> [1] https://na01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fg=
+ithub.com%2Ficecc%2Ficecream%2Fissues%2F428&amp;data=3D02%7C01%7Cnamit%40vm=
+ware.com%7C30ab3751343b49f869ab08d644fb1d8c%7Cb39138ca3cee4b4aa4d6cd83d9dd6=
+2f0%7C1%7C0%7C636772242666772528&amp;sdata=3DdXKTR79LkFDQ9IXxYw9XYt0VPFa4MX=
+rMUcc86w5uy%2Fk%3D&amp;reserved=3D0
+>> [2] https://na01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fg=
+ithub.com%2Fdistcc%2Fdistcc%2Fissues%2F312&amp;data=3D02%7C01%7Cnamit%40vmw=
+are.com%7C30ab3751343b49f869ab08d644fb1d8c%7Cb39138ca3cee4b4aa4d6cd83d9dd62=
+f0%7C1%7C0%7C636772242666772528&amp;sdata=3DXynZ1bFbKAb8V2eoPQbXudEJ%2B%2Bu=
+8QA3mM4Sr4E%2FTzWs%3D&amp;reserved=3D0
+>=20
+> Apparently gcc will treat them like basic blocks and possibly move them a=
+round.
 
-On Tue, Nov 06, 2018 at 06:30:23PM +0100, Andrey Konovalov wrote:
-> __kimg_to_phys (which is used by virt_to_phys) and _virt_addr_is_linear
-> (which is used by virt_addr_valid) assume that the top byte of the address
-> is 0xff, which isn't always the case with tag-based KASAN.
+Maybe it is possible to break the compilation of each object into two
+stages: first, compile the source without assembly, and then take the
+generated .s file and assemble it with the .s file of the macros.
 
-I'm confused by this. Why/when do kimg address have a non-default tag?
-
-Any kimg address is part of the static kernel image, so it's not obvious
-to me how a kimg address would gain a tag. Could you please explain how
-this happens in the commit message?
-
-> This patch resets the tag in those macros.
-> 
-> Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> ---
->  arch/arm64/include/asm/memory.h | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-> index 0f1e024a951f..3226a0218b0b 100644
-> --- a/arch/arm64/include/asm/memory.h
-> +++ b/arch/arm64/include/asm/memory.h
-> @@ -92,6 +92,15 @@
->  #define KASAN_THREAD_SHIFT	0
->  #endif
->  
-> +#ifdef CONFIG_KASAN_SW_TAGS
-> +#define KASAN_TAG_SHIFTED(tag)		((unsigned long)(tag) << 56)
-> +#define KASAN_SET_TAG(addr, tag)	(((addr) & ~KASAN_TAG_SHIFTED(0xff)) | \
-> +						KASAN_TAG_SHIFTED(tag))
-> +#define KASAN_RESET_TAG(addr)		KASAN_SET_TAG(addr, 0xff)
-> +#else
-> +#define KASAN_RESET_TAG(addr)		addr
-> +#endif
-
-Nit: the rest of the helper macros in this file are lower-case, with
-specialised helpers prefixed with several underscores. Could we please
-stick with that convention?
-
-e.g. have __tag_set() and __tag_reset() helpers.
-
-> +
->  #define MIN_THREAD_SHIFT	(14 + KASAN_THREAD_SHIFT)
->  
->  /*
-> @@ -232,7 +241,7 @@ static inline unsigned long kaslr_offset(void)
->  #define __is_lm_address(addr)	(!!((addr) & BIT(VA_BITS - 1)))
->  
->  #define __lm_to_phys(addr)	(((addr) & ~PAGE_OFFSET) + PHYS_OFFSET)
-> -#define __kimg_to_phys(addr)	((addr) - kimage_voffset)
-> +#define __kimg_to_phys(addr)	(KASAN_RESET_TAG(addr) - kimage_voffset)
-
-IIUC You need to adjust __lm_to_phys() too, since that could be passed
-an address from SLAB.
-
-Maybe that's done in a later patch, but if so it's confusing to split it
-out that way. It would be nicer to fix all the *_to_*() helpers in one
-go.
-
->  
->  #define __virt_to_phys_nodebug(x) ({					\
->  	phys_addr_t __x = (phys_addr_t)(x);				\
-> @@ -308,7 +317,8 @@ static inline void *phys_to_virt(phys_addr_t x)
->  #endif
->  #endif
->  
-> -#define _virt_addr_is_linear(kaddr)	(((u64)(kaddr)) >= PAGE_OFFSET)
-> +#define _virt_addr_is_linear(kaddr)	(KASAN_RESET_TAG((u64)(kaddr)) >= \
-> +						PAGE_OFFSET)
-
-This is painful to read. Could you please split this like:
-
-#define _virt_addr_is_linear(kaddr) \
-	(__tag_reset((u64)(kaddr)) >= PAGE_OFFSET)
-
-... and we could reformat virt_addr_valid() in the same way while we're
-at it.
-
-Thanks,
-Mark.
+Does it sounds as something that may work? I guess it should only be done
+when distcc is used.
