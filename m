@@ -1,62 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:59318 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728103AbeKIIX0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Nov 2018 03:23:26 -0500
-Date: Thu, 8 Nov 2018 16:45:41 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-Subject: Re: [PATCH 6/9] PCI: consolidate PCI config entry in drivers/pci
-Message-ID: <20181108224540.GG41183@google.com>
-References: <20181019120952.32763-1-hch@lst.de>
- <20181019120952.32763-7-hch@lst.de>
+Received: from mail-io1-f46.google.com ([209.85.166.46]:37085 "EHLO
+        mail-io1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727016AbeKIJUB (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 9 Nov 2018 04:20:01 -0500
+Received: by mail-io1-f46.google.com with SMTP id k17-v6so37510ioc.4
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Nov 2018 15:42:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181019120952.32763-7-hch@lst.de>
+In-Reply-To: <CAHmME9r=Zm4QzoRRdA88R0R56e3EJb+Psm7YeX6y2+ZhEjwYQg@mail.gmail.com>
+References: <CAHmME9r=Zm4QzoRRdA88R0R56e3EJb+Psm7YeX6y2+ZhEjwYQg@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 9 Nov 2018 00:42:05 +0100
+Message-ID: <CAKv+Gu8VDT0Z7j3dFAnWA_ruBHdQ9S7dZe=6Nym=sLsftLozYg@mail.gmail.com>
+Subject: Re: .S_shipped unnecessary?
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Matt Porter <mporter@kernel.crashing.org>, Alexandre Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Eric Biggers <ebiggers@google.com>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 
-On Fri, Oct 19, 2018 at 02:09:49PM +0200, Christoph Hellwig wrote:
-> There is no good reason to duplicate the PCI menu in every architecture.
-> Instead provide a selectable HAVE_PCI symbol that indicates availability
-> of PCI support and the handle the rest in drivers/pci.
-> 
-> Note that for powerpc we now select HAVE_PCI globally instead of the
-> convoluted mess of conditional or or non-conditional support per board,
-> similar to what we do e.g. on x86.  For alpha PCI is selected for the
-> non-jensen configs as it was the default before, and a lot of code does
-> not compile without PCI enabled.  On other architectures with limited
-> PCI support that wasn't as complicated I've left the selection as-is.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: Max Filippov <jcmvbkbc@gmail.com>
-> Acked-by: Thomas Gleixner <tglx@linutronix.de>
-> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+(+ Masahiro, kbuild ml)
 
-Sounds like Masahiro plans to take this series and I'm fine with that.
-Minor typo below, since it sounds like there's another revision coming.
+On 8 November 2018 at 21:37, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> Hi Ard, Eric, and others,
+>
+> As promised, the next Zinc patchset will have less generated code! After a
+> bit of work with Andy and Samuel, I'll be bundling the perlasm.
+>
 
-> --- a/drivers/pci/Kconfig
-> +++ b/drivers/pci/Kconfig
-> @@ -3,6 +3,18 @@
->  # PCI configuration
->  #
->  
-> +config HAVE_PCI
-> +	bool
-> +
-> +menuconfig PCI
-> +	bool "PCI support"
-> +	depends on HAVE_PCI
-> +
-> +	help
-> +	  This option enables support for the PCI local bus, including
-> +	  support for PCI-X and the fundations for PCI Express support.
+Wonderful! Any problems doing that for x86_64 ?
 
-s/fundations/foundations/
+> One thing I'm wondering about, though, is the wisdom behind the current
+> .S_shipped pattern. Usually the _shipped is for big firmware blobs that are
+> hard (or impossible) to build independently. But in this case, the .S is
+> generated from the .pl significantly faster than gcc even compiles a basic
+> C file. And, since perl is needed to build the kernel anyway, it's not like
+> it will be impossible to find the right tools. Rather than clutter up commits
+> with the .pl _and_ the .S_shipped, what would you think if I just generated
+> the .S each time as an ordinary build artifact. AFAICT, this is fairly usual,
+> and it's hard to see downsides. Hence, why I'm writing this email: are there
+> any downsides to that?
+>
 
-> +	  Say 'Y' here unless you know what you are doing.
-> +
->  source "drivers/pci/pcie/Kconfig"
+I agree 100%. When I added this the first time, it was at the request
+of the ARM maintainer, who was reluctant to rely on Perl for some
+reason.
+
+Recently, we have had to add a kludge to prevent spurious rebuilds of
+the .S_shipped files as well.
+
+I'd be perfectly happy to get rid of this entirely, and always
+generate the .S from the .pl, which to me is kind of the point of
+carrying these files in the first place.
+
+Masahiro: do you see any problems with this?
