@@ -1,49 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:25847 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726469AbeKIBDI (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Nov 2018 20:03:08 -0500
+Received: from ale.deltatee.com ([207.54.116.67]:56500 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726583AbeKICvm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 8 Nov 2018 21:51:42 -0500
+References: <20181003213100.189959-1-namit@vmware.com>
+ <20181003213100.189959-3-namit@vmware.com>
+ <89262174-6f15-6116-e67f-436f7c1bfe99@deltatee.com>
+ <6651971B-E3AB-4CDD-868C-2338593F7D83@vmware.com>
+ <d0812681-4a8f-8cc4-24ce-d02002ee34d2@deltatee.com>
+ <DC1EA50F-FAC3-4750-BCF7-0622D1FB4756@vmware.com>
+ <a3902c4c-64b1-9c49-02fb-d5e4c9b04314@deltatee.com>
+ <192946CF-8543-4CF5-B2A3-93674FCD07E2@vmware.com>
+ <7bc80811-8ab3-d26a-6fb3-b7aeebcfce43@deltatee.com>
+ <85B77A64-5FF3-4B82-8A07-E045E259C985@zytor.com>
+ <3B824A03-AB76-4B34-B1CA-F27C0F1B0575@vmware.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <2c022676-9299-bb5f-023b-5c114cd79f81@deltatee.com>
+Date: Thu, 8 Nov 2018 10:14:58 -0700
 MIME-Version: 1.0
-References: <20181107143646.27675-1-robh@kernel.org>
-In-Reply-To: <20181107143646.27675-1-robh@kernel.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 9 Nov 2018 00:26:07 +0900
-Message-ID: <CAK7LNATcs4bZv6Q1BEkb+V_SdiBek-fawO1RWKuh68uPN7ymUA@mail.gmail.com>
-Subject: Re: [PATCH] builddeb: Fix inclusion of dtbs in debian package
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <3B824A03-AB76-4B34-B1CA-F27C0F1B0575@vmware.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v9 02/10] Makefile: Prepare for using macros for inline
+ asm
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, nunojpg@gmail.com
-
-On Wed, Nov 7, 2018 at 11:37 PM Rob Herring <robh@kernel.org> wrote:
->
-> Commit 37c8a5fafa3b ("kbuild: consolidate Devicetree dtb build rules")
-> moved the location of 'dtbs_install' target which caused dtbs to not be
-> installed when building debian package with 'bindeb-pkg' target. Update
-> the builddeb script to use the same logic that determines if there's a
-> 'dtbs_install' target which is presence of the arch dts directory. Also,
-> use CONFIG_OF_EARLY_FLATTREE instead of CONFIG_OF as that's a better
-> indication of whether we are building dtbs.
->
-> This commit will also have the side effect of installing dtbs on any
-> arch that has dts files. Previously, it was dependent on whether the
-> arch defined 'dtbs_install'.
->
-> Fixes: 37c8a5fafa3b ("kbuild: consolidate Devicetree dtb build rules")
-> Reported-by: Nuno Gon=C3=A7alves <nunojpg@gmail.com>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: linux-kbuild@vger.kernel.org
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
-
-Applied to linux-kbuild/fixes.
-Thanks!
+To: Nadav Amit <namit@vmware.com>, "hpa@zytor.com" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Stephen Bates <sbates@raithlin.com>
 
 
---=20
-Best Regards
-Masahiro Yamada
+
+On 2018-11-07 11:18 p.m., Nadav Amit wrote:
+>> Apparently gcc will treat them like basic blocks and possibly move them around.
+> 
+> Maybe it is possible to break the compilation of each object into two
+> stages: first, compile the source without assembly, and then take the
+> generated .s file and assemble it with the .s file of the macros.
+> 
+> Does it sounds as something that may work? I guess it should only be done
+> when distcc is used.
+
+In theory it would at least allow the compile step to be distributed,
+the assembly step would still have to be done locally... It'd be better
+than nothing, I guess.
+
+It'd also be difficult to know when distribution is being done and that
+it's necessary to split the steps. We'd have to add an environment
+variable or something and users would need to know they have to set it
+when using a distributed compile.
+
+Logan
