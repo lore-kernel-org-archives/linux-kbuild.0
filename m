@@ -1,76 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:43003 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727087AbeKIPvE (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:51611 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727781AbeKJAow (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Nov 2018 10:51:04 -0500
+        Fri, 9 Nov 2018 19:44:52 -0500
 MIME-Version: 1.0
-References: <CAHmME9r=Zm4QzoRRdA88R0R56e3EJb+Psm7YeX6y2+ZhEjwYQg@mail.gmail.com>
- <CAKv+Gu8VDT0Z7j3dFAnWA_ruBHdQ9S7dZe=6Nym=sLsftLozYg@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8VDT0Z7j3dFAnWA_ruBHdQ9S7dZe=6Nym=sLsftLozYg@mail.gmail.com>
+References: <20181105151719.4552-1-changbin.du@gmail.com>
+In-Reply-To: <20181105151719.4552-1-changbin.du@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 9 Nov 2018 15:11:20 +0900
-Message-ID: <CAK7LNASTDPX24KD+fxpLk29AVzw6Foay9XmG=7Rw49jhmiYL+g@mail.gmail.com>
-Subject: Re: .S_shipped unnecessary?
+Date: Sat, 10 Nov 2018 00:03:13 +0900
+Message-ID: <CAK7LNARFMPn2SN5vShCWX94UbTGF5WY6fjnVnS8ZFmFpXj-TpQ@mail.gmail.com>
+Subject: Re: [PATCH] init/Kconfig: make CC_OPTIMIZE_FOR_DEBUGGING visible only
+ for GCC
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Jason@zx2c4.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, ebiggers@google.com, linux-crypto@vger.kernel.org
+To: Changbin Du <changbin.du@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, Nov 9, 2018 at 8:42 AM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+On Tue, Nov 6, 2018 at 12:18 AM Changbin Du <changbin.du@gmail.com> wrote:
 >
-> (+ Masahiro, kbuild ml)
+> Currently CC_OPTIMIZE_FOR_DEBUGGING is only able to build with GCC.
+> For clang, -Og optimization level could break kernel build. So make
+> CC_OPTIMIZE_FOR_DEBUGGING visible only for GCC.
 >
-> On 8 November 2018 at 21:37, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> > Hi Ard, Eric, and others,
-> >
-> > As promised, the next Zinc patchset will have less generated code! After a
-> > bit of work with Andy and Samuel, I'll be bundling the perlasm.
-> >
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Changbin Du <changbin.du@gmail.com>
+> ---
+
+I squashed this into the previous patch in the kbuild tree.
+
+Thanks!
+
+
+>  init/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> Wonderful! Any problems doing that for x86_64 ?
+> diff --git a/init/Kconfig b/init/Kconfig
+> index 0fb9c0b5f1a1..d5fb0ee1400a 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -1107,6 +1107,7 @@ config CC_OPTIMIZE_FOR_SIZE
 >
-> > One thing I'm wondering about, though, is the wisdom behind the current
-> > .S_shipped pattern. Usually the _shipped is for big firmware blobs that are
-> > hard (or impossible) to build independently. But in this case, the .S is
-> > generated from the .pl significantly faster than gcc even compiles a basic
-> > C file. And, since perl is needed to build the kernel anyway, it's not like
-> > it will be impossible to find the right tools. Rather than clutter up commits
-> > with the .pl _and_ the .S_shipped, what would you think if I just generated
-> > the .S each time as an ordinary build artifact. AFAICT, this is fairly usual,
-> > and it's hard to see downsides. Hence, why I'm writing this email: are there
-> > any downsides to that?
-> >
+>  config CC_OPTIMIZE_FOR_DEBUGGING
+>         bool "Optimize for better debugging experience (-Og)"
+> +       depends on CC_IS_GCC
+>         depends on $(cc-option,-Og)
+>         select NO_AUTO_INLINE
+>         help
+> --
+> 2.17.1
 >
-> I agree 100%. When I added this the first time, it was at the request
-> of the ARM maintainer, who was reluctant to rely on Perl for some
-> reason.
->
-> Recently, we have had to add a kludge to prevent spurious rebuilds of
-> the .S_shipped files as well.
->
-> I'd be perfectly happy to get rid of this entirely, and always
-> generate the .S from the .pl, which to me is kind of the point of
-> carrying these files in the first place.
->
-> Masahiro: do you see any problems with this?
 
 
-No problem.
-
-
-Documentation/process/changes.rst says the following:
-
-You will need perl 5 and the following modules: ``Getopt::Long``,
-``Getopt::Std``, ``File::Basename``, and ``File::Find`` to build the kernel.
-
-
-
-We can assume perl is installed on the user's build machine.
-
-
-
---
+-- 
 Best Regards
 Masahiro Yamada
