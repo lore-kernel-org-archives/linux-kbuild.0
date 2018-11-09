@@ -1,100 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:44106 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727828AbeKJCBR (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:56693 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727845AbeKJCCz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Nov 2018 21:01:17 -0500
+        Fri, 9 Nov 2018 21:02:55 -0500
 MIME-Version: 1.0
-References: <1541404309-30210-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1541404309-30210-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1541405976-13747-1-git-send-email-yamada.masahiro@socionext.com> <68478c42-2703-0d24-bf6b-8d75d024722a@mind.be>
+In-Reply-To: <68478c42-2703-0d24-bf6b-8d75d024722a@mind.be>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 10 Nov 2018 01:19:11 +0900
-Message-ID: <CAK7LNARxO-wawD6pOoFNyJ8Sh1=XucX=K5ACOuksKKBTzdxMiQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: rpm-pkg: fix binrpm-pkg breakage when O= is used
+Date: Sat, 10 Nov 2018 01:20:44 +0900
+Message-ID: <CAK7LNARK1B=yjjWyK9QfOPSQMnWSzhpDxewV6wBCByGn46G-Dg@mail.gmail.com>
+Subject: Re: [PATCH v2] kconfig: merge_config: avoid false positive matches
+ from comment lines
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: zhenzhong.duan@oracle.com, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Arnout Vandecappelle <arnout@mind.be>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Petr Vorel <petr.vorel@gmail.com>, nasser afshin <afshin.nasser@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Nov 5, 2018 at 4:52 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Mon, Nov 5, 2018 at 6:35 PM Arnout Vandecappelle <arnout@mind.be> wrote:
 >
-> Zhenzhong Duan reported that running 'make O=/build/kernel binrpm-pkg'
-> failed with the following errors:
 >
->   Running 'make O=/build/kernel binrpm-pkg' failed with below two errors.
 >
->   Makefile:600: include/config/auto.conf: No such file or directory
+> On 05/11/18 09:19, Masahiro Yamada wrote:
+> > The current SED_CONFIG_EXP could match to comment lines in config
+> > fragment files, especially when CONFIG_PREFIX_ is empty. For example,
+> > Buildroot uses empty prefixing; starting symbols with BR2_ is just
+> > convention.
+> >
+> > Make the sed expression more robust against false positives from
+> > comment lines. The new sed expression matches to only valid patterns.
+> >
+> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > Reviewed-by: Petr Vorel <petr.vorel@gmail.com>
 >
->   + cp make -C /mnt/root/kernel O=/build/kernel image_name make -f
->   /mnt/root/kernel/Makefile ...
->   cp: invalid option -- 'C'
->   Try 'cp --help' for more information.
+> Reviewed-by: Arnout Vandecappelle (Essensium/Mind) <arnout@mind.be>
 >
-> Prior to commit 80463f1b7bf9 ("kbuild: add --include-dir flag only
-> for out-of-tree build"), both objtree and srctree were added to
-> --include-dir, and the wrong code 'make image_name' was working
-> relying on that. Now, the potential issue that had previously been
-> hidden just showed up.
->
-> 'make image_name' recurses to the generated $(objtree)/Makefile and
-> ends up with running in srctree, which is incorrect. It should be
-> invoked with '-f $srctree/Makefile' (or KBUILD_SRC=) to be executed
-> in objtree.
->
-> Fixes: 80463f1b7bf9 ("kbuild: add --include-dir flag only for out-of-tree build")
-> Reported-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+>  Regards,
+>  Arnout
 
-Applied to linux-kbuild/fixes.
+
+Applied to linux-kbuild.
 
 
 
->  scripts/package/mkspec | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-> index e05646d..009147d 100755
-> --- a/scripts/package/mkspec
-> +++ b/scripts/package/mkspec
-> @@ -12,6 +12,7 @@
->  # how we were called determines which rpms we build and how we build them
->  if [ "$1" = prebuilt ]; then
->         S=DEL
-> +       MAKE="$MAKE -f $srctree/Makefile"
->  else
->         S=
->  fi
-> @@ -78,19 +79,19 @@ $S  %prep
->  $S     %setup -q
->  $S
->  $S     %build
-> -$S     make %{?_smp_mflags} KBUILD_BUILD_VERSION=%{release}
-> +$S     $MAKE %{?_smp_mflags} KBUILD_BUILD_VERSION=%{release}
->  $S
->         %install
->         mkdir -p %{buildroot}/boot
->         %ifarch ia64
->         mkdir -p %{buildroot}/boot/efi
-> -       cp \$(make image_name) %{buildroot}/boot/efi/vmlinuz-$KERNELRELEASE
-> +       cp \$($MAKE image_name) %{buildroot}/boot/efi/vmlinuz-$KERNELRELEASE
->         ln -s efi/vmlinuz-$KERNELRELEASE %{buildroot}/boot/
->         %else
-> -       cp \$(make image_name) %{buildroot}/boot/vmlinuz-$KERNELRELEASE
-> +       cp \$($MAKE image_name) %{buildroot}/boot/vmlinuz-$KERNELRELEASE
->         %endif
-> -$M     make %{?_smp_mflags} INSTALL_MOD_PATH=%{buildroot} KBUILD_SRC= modules_install
-> -       make %{?_smp_mflags} INSTALL_HDR_PATH=%{buildroot}/usr KBUILD_SRC= headers_install
-> +$M     $MAKE %{?_smp_mflags} INSTALL_MOD_PATH=%{buildroot} modules_install
-> +       $MAKE %{?_smp_mflags} INSTALL_HDR_PATH=%{buildroot}/usr headers_install
->         cp System.map %{buildroot}/boot/System.map-$KERNELRELEASE
->         cp .config %{buildroot}/boot/config-$KERNELRELEASE
->         bzip2 -9 --keep vmlinux
-> --
-> 2.7.4
->
+> > ---
+> >
+> > Changes in v2:
+> >   - Another (more precise) implementation approach
+> >     based on the option from Arnout Vandecappelle.
+> >     This is still easier to read, but adds a bit duplication.
+> >
+> >  scripts/kconfig/merge_config.sh | 7 ++++---
+> >  1 file changed, 4 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+> > index da66e77..0ef9064 100755
+> > --- a/scripts/kconfig/merge_config.sh
+> > +++ b/scripts/kconfig/merge_config.sh
+> > @@ -102,7 +102,8 @@ if [ ! -r "$INITFILE" ]; then
+> >  fi
+> >
+> >  MERGE_LIST=$*
+> > -SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(${CONFIG_PREFIX}[a-zA-Z0-9_]*\)[= ].*/\2/p"
+> > +SED_CONFIG_EXP1="s/^\(${CONFIG_PREFIX}[a-zA-Z0-9_]*\)=.*/\1/p"
+> > +SED_CONFIG_EXP2="s/^# \(${CONFIG_PREFIX}[a-zA-Z0-9_]*\) is not set$/\1/p"
+> >
+> >  TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
+> >
+> > @@ -116,7 +117,7 @@ for MERGE_FILE in $MERGE_LIST ; do
+> >               echo "The merge file '$MERGE_FILE' does not exist.  Exit." >&2
+> >               exit 1
+> >       fi
+> > -     CFG_LIST=$(sed -n "$SED_CONFIG_EXP" $MERGE_FILE)
+> > +     CFG_LIST=$(sed -n -e "$SED_CONFIG_EXP1" -e "$SED_CONFIG_EXP2" $MERGE_FILE)
+> >
+> >       for CFG in $CFG_LIST ; do
+> >               grep -q -w $CFG $TMP_FILE || continue
+> > @@ -159,7 +160,7 @@ make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
+> >
+> >
+> >  # Check all specified config values took (might have missed-dependency issues)
+> > -for CFG in $(sed -n "$SED_CONFIG_EXP" $TMP_FILE); do
+> > +for CFG in $(sed -n -e "$SED_CONFIG_EXP1" -e "$SED_CONFIG_EXP2" $TMP_FILE); do
+> >
+> >       REQUESTED_VAL=$(grep -w -e "$CFG" $TMP_FILE)
+> >       ACTUAL_VAL=$(grep -w -e "$CFG" "$KCONFIG_CONFIG")
+> >
+
 
 
 -- 
