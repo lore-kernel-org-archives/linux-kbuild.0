@@ -1,73 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:33259 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727955AbeKJCJf (ORCPT
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:44812 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728026AbeKJDur (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Nov 2018 21:09:35 -0500
+        Fri, 9 Nov 2018 22:50:47 -0500
+Received: by mail-pg1-f195.google.com with SMTP id w3-v6so1155695pgs.11
+        for <linux-kbuild@vger.kernel.org>; Fri, 09 Nov 2018 10:09:05 -0800 (PST)
 MIME-Version: 1.0
-References: <20181028130945.23581-1-changbin.du@gmail.com> <20181028130945.23581-2-changbin.du@gmail.com>
- <20181028140911.21d49629@vmware.local.home> <CAK7LNATixykqHqdu5W3NpfXqBXMNsP0OLKjNdsFc_EzJ_diOxA@mail.gmail.com>
- <20181102112728.GC14602@zn.tnic>
-In-Reply-To: <20181102112728.GC14602@zn.tnic>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 10 Nov 2018 01:27:29 +0900
-Message-ID: <CAK7LNAQcdpU+_LOYQ8X+4K4sxd3D-+Z7k6BuBjUOJ9LR0j+zfA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/4] x86/mm: declare check_la57_support() as inline
+References: <1541473495-25262-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1541473495-25262-1-git-send-email-yamada.masahiro@socionext.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Fri, 9 Nov 2018 10:08:53 -0800
+Message-ID: <CAKwvOdkfGZDWr5vjNTvn707+Muna3JNKObwOfjjvS2-tAXK2QA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] kbuild: add -no-integrated-as Clang option unconditionally
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Steven Rostedt <rostedt@goodmis.org>, Changbin Du <changbin.du@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Stefan Agner <stefan@agner.ch>, Matthias Kaehlcke <mka@chromium.org>, joel@jms.id.au, linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
 
-On Fri, Nov 2, 2018 at 8:28 PM Borislav Petkov <bp@alien8.de> wrote:
+On Mon, Nov 5, 2018 at 7:05 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> On Mon, Oct 29, 2018 at 10:04:46PM +0900, Masahiro Yamada wrote:
-> > On Mon, Oct 29, 2018 at 3:09 AM Steven Rostedt <rostedt@goodmis.org> wrote:
-> > >
-> > > On Sun, 28 Oct 2018 13:09:42 +0000
-> > > Changbin Du <changbin.du@gmail.com> wrote:
-> > >
-> > > > The level4_kernel_pgt is only defined when X86_5LEVEL is enabled.
-> > > > So declare check_la57_support() as inline to make sure the code
-> > > > referring to level4_kernel_pgt is optimized out. This is a preparation
-> > > > for CONFIG_CC_OPTIMIZE_FOR_DEBUGGING.
-> > > >
-> > > > Signed-off-by: Changbin Du <changbin.du@gmail.com>
-> > >
-> > > Reviewed-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-> > >
-> > > -- Steve
-> > >
-> >
-> > Applied to linux-kbuild.
+> We are still a way off the Clang's integrated assembler support for
+> the kernel. Hence, -no-integrated-as is mandatory to build the kernel
+> with Clang. If you had an ancient version of Clang that does not
+> recognize this option, you would not be able to compile the kernel
+> anyway.
 >
-> Next time, before you route a patch through your tree, please get an x86
-> maintainer's ACK first.
-
-
-I changed my mind, and did not include this in my previous pull request
-because this series is causing many warnings.
-
-Now, it is aiming for v5.0-rc1
-
-So, it is not too late.
-
-If x86 maintainers issue Acked-by,
-I am happy to add it.
-
-
-
-
-> Thx.
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 >
+> Changes in v2:
+>   - New patch
+>
+>  Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 93315eb..da11700 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -497,8 +497,8 @@ CLANG_GCC_TC        := --gcc-toolchain=$(GCC_TOOLCHAIN)
+>  endif
+>  KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
+>  KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
+> -KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
+> -KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+> +KBUILD_CFLAGS += -no-integrated-as
+> +KBUILD_AFLAGS += -no-integrated-as
+
+Sorry for the delay in review.
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+
+>  endif
+>
+>  RETPOLINE_CFLAGS_GCC := -mindirect-branch=thunk-extern -mindirect-branch-register
 > --
-> Regards/Gruss,
->     Boris.
+> 2.7.4
 >
-> Good mailing practices for 400: avoid top-posting and trim the reply.
-
 
 
 -- 
-Best Regards
-Masahiro Yamada
+Thanks,
+~Nick Desaulniers
