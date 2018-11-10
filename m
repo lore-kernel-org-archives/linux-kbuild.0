@@ -1,84 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:44599 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728108AbeKJEQM (ORCPT
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:43968 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728082AbeKJLYf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Nov 2018 23:16:12 -0500
-Received: by mail-pg1-f194.google.com with SMTP id w3-v6so1184431pgs.11
-        for <linux-kbuild@vger.kernel.org>; Fri, 09 Nov 2018 10:34:25 -0800 (PST)
-Subject: Re: [PATCH v2 2/2] kbuild: consolidate Clang compiler flags
-References: <1541473495-25262-1-git-send-email-yamada.masahiro@socionext.com>
- <1541473495-25262-2-git-send-email-yamada.masahiro@socionext.com>
- <CAKwvOd=JwjVu=uk3egVJxTm9vPcF=Jx2Bexx1Wx=Z-PC38X3Uw@mail.gmail.com>
-From: Greg Hackmann <ghackmann@google.com>
-Message-ID: <9c4868dd-82fa-aa5c-843e-e1f78ffbc7e2@google.com>
-Date: Fri, 9 Nov 2018 10:34:22 -0800
+        Sat, 10 Nov 2018 06:24:35 -0500
+Date: Sat, 10 Nov 2018 09:41:12 +0800
+From: Changbin Du <changbin.du@gmail.com>
+Subject: Re: [PATCH v3 1/4] x86/mm: declare check_la57_support() as inline
+Message-ID: <20181110010708.d3nayrzuy5d3lrkd@mail.google.com>
+References: <20181028130945.23581-1-changbin.du@gmail.com>
+ <20181028130945.23581-2-changbin.du@gmail.com>
+ <20181028140911.21d49629@vmware.local.home>
+ <CAK7LNATixykqHqdu5W3NpfXqBXMNsP0OLKjNdsFc_EzJ_diOxA@mail.gmail.com>
+ <20181102112728.GC14602@zn.tnic>
+ <CAK7LNAQcdpU+_LOYQ8X+4K4sxd3D-+Z7k6BuBjUOJ9LR0j+zfA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKwvOd=JwjVu=uk3egVJxTm9vPcF=Jx2Bexx1Wx=Z-PC38X3Uw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAQcdpU+_LOYQ8X+4K4sxd3D-+Z7k6BuBjUOJ9LR0j+zfA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Stefan Agner <stefan@agner.ch>, Matthias Kaehlcke <mka@chromium.org>, joel@jms.id.au, linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Borislav Petkov <bp@alien8.de>, Steven Rostedt <rostedt@goodmis.org>, Changbin Du <changbin.du@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
 
-On 11/09/2018 10:29 AM, Nick Desaulniers wrote:
-> On Mon, Nov 5, 2018 at 7:05 PM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->>
->> Collect basic Clang options such as --target, --prefix, --gcc-toolchain,
->> -no-integrated-as into a single variable CLANG_FLAGS so that it can be
->> easily reused in other parts of Makefile.
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->>
->> Changes in v2:
->>   - Use := flavor instead of = because $(CLANG_FLAGS) is expanded soon anyway
->>
->>   Makefile | 13 ++++++-------
->>   1 file changed, 6 insertions(+), 7 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index da11700..e173a73 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -487,18 +487,17 @@ endif
->>
->>   ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
->>   ifneq ($(CROSS_COMPILE),)
->> -CLANG_TARGET   := --target=$(notdir $(CROSS_COMPILE:%-=%))
->> +CLANG_FLAGS    := --target=$(notdir $(CROSS_COMPILE:%-=%))
->>   GCC_TOOLCHAIN_DIR := $(dir $(shell which $(LD)))
->> -CLANG_PREFIX   := --prefix=$(GCC_TOOLCHAIN_DIR)
->> +CLANG_FLAGS    += --prefix=$(GCC_TOOLCHAIN_DIR)
->>   GCC_TOOLCHAIN  := $(realpath $(GCC_TOOLCHAIN_DIR)/..)
->>   endif
->>   ifneq ($(GCC_TOOLCHAIN),)
->> -CLANG_GCC_TC   := --gcc-toolchain=$(GCC_TOOLCHAIN)
->> +CLANG_FLAGS    += --gcc-toolchain=$(GCC_TOOLCHAIN)
->>   endif
->> -KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
->> -KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
->> -KBUILD_CFLAGS += -no-integrated-as
->> -KBUILD_AFLAGS += -no-integrated-as
->> +CLANG_FLAGS    += -no-integrated-as
->> +KBUILD_CFLAGS  += $(CLANG_FLAGS)
->> +KBUILD_AFLAGS  += $(CLANG_FLAGS)
->>   endif
->>
->>   RETPOLINE_CFLAGS_GCC := -mindirect-branch=thunk-extern -mindirect-branch-register
->> --
->> 2.7.4
->>
+On Sat, Nov 10, 2018 at 01:27:29AM +0900, Masahiro Yamada wrote:
+> On Fri, Nov 2, 2018 at 8:28 PM Borislav Petkov <bp@alien8.de> wrote:
+> >
+> > On Mon, Oct 29, 2018 at 10:04:46PM +0900, Masahiro Yamada wrote:
+> > > On Mon, Oct 29, 2018 at 3:09 AM Steven Rostedt <rostedt@goodmis.org> wrote:
+> > > >
+> > > > On Sun, 28 Oct 2018 13:09:42 +0000
+> > > > Changbin Du <changbin.du@gmail.com> wrote:
+> > > >
+> > > > > The level4_kernel_pgt is only defined when X86_5LEVEL is enabled.
+> > > > > So declare check_la57_support() as inline to make sure the code
+> > > > > referring to level4_kernel_pgt is optimized out. This is a preparation
+> > > > > for CONFIG_CC_OPTIMIZE_FOR_DEBUGGING.
+> > > > >
+> > > > > Signed-off-by: Changbin Du <changbin.du@gmail.com>
+> > > >
+> > > > Reviewed-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+> > > >
+> > > > -- Steve
+> > > >
+> > >
+> > > Applied to linux-kbuild.
+> >
+> > Next time, before you route a patch through your tree, please get an x86
+> > maintainer's ACK first.
 > 
-> Thanks for this patch, Masahiro, it's a good simplification.
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-> Tested-by: Nick Desaulniers <ndesaulniers@google.com>
 > 
-> Would you mind waiting for a tested-by from Stefan, and maybe an ack
-> from Greg (added to cc)?
-> 
+> I changed my mind, and did not include this in my previous pull request
+> because this series is causing many warnings.
+>
+Most of the new warnings are false warnings. Since this series didn't change any
+code where the warnings happen. I'll make patches to make gcc happy.
 
-Acked-by: Greg Hackmann <ghackmann@google.com>
+> Now, it is aiming for v5.0-rc1
+> 
+> So, it is not too late.
+> 
+> If x86 maintainers issue Acked-by,
+> I am happy to add it.
+> 
+> 
+> 
+> 
+> > Thx.
+> >
+> > --
+> > Regards/Gruss,
+> >     Boris.
+> >
+> > Good mailing practices for 400: avoid top-posting and trim the reply.
+> 
+> 
+> 
+> -- 
+> Best Regards
+> Masahiro Yamada
+
+-- 
+Thanks,
+Changbin Du
