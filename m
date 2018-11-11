@@ -1,169 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:59170 "EHLO
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:39791 "EHLO
         conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727334AbeKKOao (ORCPT
+        with ESMTP id S1728091AbeKKXw6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Nov 2018 09:30:44 -0500
+        Sun, 11 Nov 2018 18:52:58 -0500
 MIME-Version: 1.0
-References: <20181108194434.16568-1-anders.roxell@linaro.org>
-In-Reply-To: <20181108194434.16568-1-anders.roxell@linaro.org>
+References: <1541473495-25262-1-git-send-email-yamada.masahiro@socionext.com>
+ <1541473495-25262-2-git-send-email-yamada.masahiro@socionext.com>
+ <CAKwvOd=JwjVu=uk3egVJxTm9vPcF=Jx2Bexx1Wx=Z-PC38X3Uw@mail.gmail.com> <9c4868dd-82fa-aa5c-843e-e1f78ffbc7e2@google.com>
+In-Reply-To: <9c4868dd-82fa-aa5c-843e-e1f78ffbc7e2@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 11 Nov 2018 13:42:31 +0900
-Message-ID: <CAK7LNATU+h3_ytHx4TSUf_breGfxLzHfsOKbGTFprNxYHh9-0g@mail.gmail.com>
-Subject: Re: [PATCH v2] scripts/kconfig/merge_config: don't redefine 'y' to 'm'
+Date: Sun, 11 Nov 2018 23:03:33 +0900
+Message-ID: <CAK7LNAR32=QWy4jss3M3VSNj0XY=tvgWWTG5ajVEpyYD2J+Z1Q@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] kbuild: consolidate Clang compiler flags
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anders Roxell <anders.roxell@linaro.org>
-Cc: dvhart@infradead.org, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Greg Hackmann <ghackmann@google.com>, Joel Stanley <joel@jms.id.au>, Nick Desaulniers <ndesaulniers@google.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Stefan Agner <stefan@agner.ch>, Matthias Kaehlcke <mka@chromium.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>
 
-On Fri, Nov 9, 2018 at 4:45 AM Anders Roxell <anders.roxell@linaro.org> wrote:
+On Sat, Nov 10, 2018 at 3:35 AM Greg Hackmann <ghackmann@google.com> wrote:
 >
-> In today's merge_config.sh the order of the config fragment files dictates
-> the output of a config option. With this approach we will get different
-> .config files depending on the order of the config fragment files.
+> On 11/09/2018 10:29 AM, Nick Desaulniers wrote:
+> > On Mon, Nov 5, 2018 at 7:05 PM Masahiro Yamada
+> > <yamada.masahiro@socionext.com> wrote:
+> >>
+> >> Collect basic Clang options such as --target, --prefix, --gcc-toolchain,
+> >> -no-integrated-as into a single variable CLANG_FLAGS so that it can be
+> >> easily reused in other parts of Makefile.
+> >>
+> >> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> >> ---
+> >>
+> >> Changes in v2:
+> >>   - Use := flavor instead of = because $(CLANG_FLAGS) is expanded soon anyway
+> >>
+> >>   Makefile | 13 ++++++-------
+> >>   1 file changed, 6 insertions(+), 7 deletions(-)
+> >>
+> >> diff --git a/Makefile b/Makefile
+> >> index da11700..e173a73 100644
+> >> --- a/Makefile
+> >> +++ b/Makefile
+> >> @@ -487,18 +487,17 @@ endif
+> >>
+> >>   ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
+> >>   ifneq ($(CROSS_COMPILE),)
+> >> -CLANG_TARGET   := --target=$(notdir $(CROSS_COMPILE:%-=%))
+> >> +CLANG_FLAGS    := --target=$(notdir $(CROSS_COMPILE:%-=%))
+> >>   GCC_TOOLCHAIN_DIR := $(dir $(shell which $(LD)))
+> >> -CLANG_PREFIX   := --prefix=$(GCC_TOOLCHAIN_DIR)
+> >> +CLANG_FLAGS    += --prefix=$(GCC_TOOLCHAIN_DIR)
+> >>   GCC_TOOLCHAIN  := $(realpath $(GCC_TOOLCHAIN_DIR)/..)
+> >>   endif
+> >>   ifneq ($(GCC_TOOLCHAIN),)
+> >> -CLANG_GCC_TC   := --gcc-toolchain=$(GCC_TOOLCHAIN)
+> >> +CLANG_FLAGS    += --gcc-toolchain=$(GCC_TOOLCHAIN)
+> >>   endif
+> >> -KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
+> >> -KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC) $(CLANG_PREFIX)
+> >> -KBUILD_CFLAGS += -no-integrated-as
+> >> -KBUILD_AFLAGS += -no-integrated-as
+> >> +CLANG_FLAGS    += -no-integrated-as
+> >> +KBUILD_CFLAGS  += $(CLANG_FLAGS)
+> >> +KBUILD_AFLAGS  += $(CLANG_FLAGS)
+> >>   endif
+> >>
+> >>   RETPOLINE_CFLAGS_GCC := -mindirect-branch=thunk-extern -mindirect-branch-register
+> >> --
+> >> 2.7.4
+> >>
+> >
+> > Thanks for this patch, Masahiro, it's a good simplification.
+> > Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+> > Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+> >
+> > Would you mind waiting for a tested-by from Stefan, and maybe an ack
+> > from Greg (added to cc)?
+> >
 >
-> So doing something like:
-> $ ./merge/kconfig/merge_config.sh selftest.config drm.config
->
-> Where selftest.config defines DRM=y and drm.config defines DRM=m, the
-> result will be "DRM=m".
->
-> Rework to add a switch to get builtin '=y' precedence over modules '=m',
-> this will result in "DRM=y". If we do something like this:
->
-> $ ./merge/kconfig/merge_config.sh -y selftest.config drm.config
->
-> Suggested-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
-> ---
->  scripts/kconfig/merge_config.sh | 34 +++++++++++++++++++++++++++------
->  1 file changed, 28 insertions(+), 6 deletions(-)
->
-> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-> index da66e7742282..fcd18f642fc7 100755
-> --- a/scripts/kconfig/merge_config.sh
-> +++ b/scripts/kconfig/merge_config.sh
-> @@ -22,6 +22,7 @@
->
->  clean_up() {
->         rm -f $TMP_FILE
-> +       rm -f $MERGE_FILE
->         exit
->  }
->  trap clean_up HUP INT TERM
-> @@ -32,6 +33,7 @@ usage() {
->         echo "  -m    only merge the fragments, do not execute the make command"
->         echo "  -n    use allnoconfig instead of alldefconfig"
->         echo "  -r    list redundant entries when merging fragments"
-> +       echo "  -y    make builtin have precedence over modules"
->         echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
->         echo
->         echo "Used prefix: '$CONFIG_PREFIX'. You can redefine it with \$CONFIG_ environment variable."
-> @@ -40,6 +42,8 @@ usage() {
->  RUNMAKE=true
->  ALLTARGET=alldefconfig
->  WARNREDUN=false
-> +BUILTIN=false
-> +BUILTIN_FLAG=false
+> Acked-by: Greg Hackmann <ghackmann@google.com>
 
 
-Could you move the initialization of BUILTIN_FLAG
-into the inner for-loop ?
+Thanks for your review!
+
+
+So, how to organize this series, and Joel's one together?
+
+I'd like Joel to use this series as a base for his work.
+(https://lore.kernel.org/patchwork/patch/1006696/)
+
+It will be much cleaner.
+
+
+Shall I merge all the patches to kbuild tree, or
+maybe will they go through powerpc tree?
 
 
 
->  OUTPUT=.
->  CONFIG_PREFIX=${CONFIG_-CONFIG_}
->
-> @@ -64,6 +68,11 @@ while true; do
->                 shift
->                 continue
->                 ;;
-> +       "-y")
-> +               BUILTIN=true
-> +               shift
-> +               continue
-> +               ;;
->         "-O")
->                 if [ -d $2 ];then
->                         OUTPUT=$(echo $2 | sed 's/\/*$//')
-> @@ -105,13 +114,15 @@ MERGE_LIST=$*
->  SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(${CONFIG_PREFIX}[a-zA-Z0-9_]*\)[= ].*/\2/p"
->
->  TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
-> +MERGE_FILE=$(mktemp ./.merge_tmp.config.XXXXXXXXXX)
->
->  echo "Using $INITFILE as base"
->  cat $INITFILE > $TMP_FILE
->
->  # Merge files, printing warnings on overridden values
-> -for MERGE_FILE in $MERGE_LIST ; do
-> -       echo "Merging $MERGE_FILE"
-> +for ORIG_MERGE_FILE in $MERGE_LIST ; do
-> +       cat $ORIG_MERGE_FILE > $MERGE_FILE
 
-
-This 'cat' should be moved after the check
-of the presence of '$ORIG_MERGE_FILE'.
-
-
-> +       echo "Merging $ORIG_MERGE_FILE"
->         if [ ! -r "$MERGE_FILE" ]; then
-
-This check always returns false now.
-
-
->                 echo "The merge file '$MERGE_FILE' does not exist.  Exit." >&2
->                 exit 1
-> @@ -122,15 +133,26 @@ for MERGE_FILE in $MERGE_LIST ; do
->                 grep -q -w $CFG $TMP_FILE || continue
->                 PREV_VAL=$(grep -w $CFG $TMP_FILE)
->                 NEW_VAL=$(grep -w $CFG $MERGE_FILE)
-
-Could you add 'BUILTIN_FLAG=false' here?
-
-
-
-> -               if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
-> -                       echo Value of $CFG is redefined by fragment $MERGE_FILE:
-> +               if [ "$BUILTIN" = "true" ] && [ "${NEW_VAL#CONFIG_*=}" = "m" ] && [ "${PREV_VAL#CONFIG_*=}" = "y" ]; then
-> +                       echo Previous  value: $PREV_VAL
-> +                       echo New value:       $NEW_VAL
-> +                       echo -y passed, will not demote y to m
-> +                       echo
-> +                       BUILTIN_FLAG=true
-> +               elif [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
-> +                       echo Value of $CFG is redefined by fragment $ORIG_MERGE_FILE:
->                         echo Previous  value: $PREV_VAL
->                         echo New value:       $NEW_VAL
->                         echo
->                 elif [ "$WARNREDUN" = "true" ]; then
-> -                       echo Value of $CFG is redundant by fragment $MERGE_FILE:
-> +                       echo Value of $CFG is redundant by fragment $ORIG_MERGE_FILE:
-> +               fi
-> +               if [ "$BUILTIN_FLAG" = "false" ]; then
-> +                       sed -i "/$CFG[ =]/d" $TMP_FILE
-> +               else
-> +                       sed -i "/$CFG[ =]/d" $MERGE_FILE
-> +                       BUILTIN_FLAG=false
-
-
-Then this 'BUILTIN_FLAG=false' can go away.
-
-Thanks.
-
-
->                 fi
-> -               sed -i "/$CFG[ =]/d" $TMP_FILE
->         done
->         cat $MERGE_FILE >> $TMP_FILE
->  done
-> --
-> 2.19.1
->
-
-
--- 
+--
 Best Regards
 Masahiro Yamada
