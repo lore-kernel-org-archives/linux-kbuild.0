@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from ex13-edg-ou-001.vmware.com ([208.91.0.189]:41305 "EHLO
         EX13-EDG-OU-001.vmware.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730539AbeKMIPF (ORCPT
+        by vger.kernel.org with ESMTP id S1730567AbeKMIPF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 13 Nov 2018 03:15:05 -0500
 From: Nadav Amit <namit@vmware.com>
-Subject: [PATCH 2/2] x86: set a dependency on macros.S
-Date: Mon, 12 Nov 2018 07:02:15 -0800
-Message-ID: <20181112150215.508-3-namit@vmware.com>
+Subject: [PATCH 1/2] Makefile: Fix distcc compilation with x86 macros
+Date: Mon, 12 Nov 2018 07:02:14 -0800
+Message-ID: <20181112150215.508-2-namit@vmware.com>
 In-Reply-To: <20181112150215.508-1-namit@vmware.com>
 References: <20181112150215.508-1-namit@vmware.com>
 MIME-Version: 1.0
@@ -17,33 +17,107 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Ingo Molnar <mingo@redhat.com>
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Nadav Amit <namit@vmware.com>
 
-Changes in macros.S should trigger the recompilation of all C files, as
-the macros might need to affect their compilation.
+Introducing the use of asm macros in c-code broke distcc, since it only
+sends the preprocessed source file. The solution is to break the
+compilation into two separate phases of compilation and assembly, and
+between the two concatanate the assembly macros and the compiled (yet
+not assembled) source file. Since this is less efficient, this
+compilation mode is only used when make is called with the "DISTCC=y"
+parameter.
 
+Note that the assembly stage should also be distributed, if distcc is
+configured using "CFLAGS=-DENABLE_REMOTE_ASSEMBLE".
+
+Reported-by: Logan Gunthorpe <logang@deltatee.com>
 Signed-off-by: Nadav Amit <namit@vmware.com>
 ---
- scripts/Makefile.build | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ Makefile               |  4 +++-
+ arch/x86/Makefile      |  7 +++++--
+ scripts/Makefile.build | 29 +++++++++++++++++++++++++++--
+ 3 files changed, 35 insertions(+), 5 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 9fce8b91c15f..c07349fc38c7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -743,7 +743,9 @@ KBUILD_CFLAGS   += $(call cc-option, -gsplit-dwarf, -g)
+ else
+ KBUILD_CFLAGS	+= -g
+ endif
+-KBUILD_AFLAGS	+= -Wa,-gdwarf-2
++AFLAGS_DEBUG_INFO = -Wa,-gdwarf-2
++export AFLAGS_DEBUG_INFO
++KBUILD_AFLAGS	+= $(AFLAGS_DEBUG_INFO)
+ endif
+ ifdef CONFIG_DEBUG_INFO_DWARF4
+ KBUILD_CFLAGS	+= $(call cc-option, -gdwarf-4,)
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index f5d7f4134524..b5953cbcc9c8 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -235,10 +235,13 @@ archscripts: scripts_basic
+ archheaders:
+ 	$(Q)$(MAKE) $(build)=arch/x86/entry/syscalls all
+ 
++ASM_MACRO_FILE = arch/x86/kernel/macros.s
++export ASM_MACRO_FILE
++
+ archmacros:
+-	$(Q)$(MAKE) $(build)=arch/x86/kernel arch/x86/kernel/macros.s
++	$(Q)$(MAKE) $(build)=arch/x86/kernel $(ASM_MACRO_FILE)
+ 
+-ASM_MACRO_FLAGS = -Wa,arch/x86/kernel/macros.s
++ASM_MACRO_FLAGS = -Wa,$(ASM_MACRO_FILE)
+ export ASM_MACRO_FLAGS
+ KBUILD_CFLAGS += $(ASM_MACRO_FLAGS)
+ 
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d2213b041408..ffe3e1a01210 100644
+index 6a6be9f440cf..d2213b041408 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -312,13 +312,13 @@ cmd_undef_syms = echo
- endif
+@@ -155,8 +155,33 @@ $(obj)/%.ll: $(src)/%.c FORCE
  
- # Built-in and composite module parts
--$(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
-+$(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) $(ASM_MACRO_FILE:.s=.S) FORCE
- 	$(call cmd,force_checksrc)
- 	$(call if_changed_rule,cc_o_c)
+ quiet_cmd_cc_o_c = CC $(quiet_modtag)  $@
  
- # Single-part modules are special since we need to mark them in $(MODVERDIR)
++# If distcc is used, then when an assembly macro files is needed, the
++# compilation stage and the assembly stage need to be separated. Providing
++# "DISTCC=y" option enables the separate compilation and assembly.
++cmd_cc_o_c_direct = $(CC) $(c_flags) -c -o $(1) $<
++
++ifeq ($(DISTCC),y)
++a_flags_no_debug = $(filter-out $(AFLAGS_DEBUG_INFO), $(a_flags))
++c_flags_no_macros = $(filter-out $(ASM_MACRO_FLAGS), $(c_flags))
++
++cmd_cc_o_c_two_steps =							\
++	$(CC) $(c_flags_no_macros) $(DISABLE_LTO) -fverbose-asm -S 	\
++		-o $(@D)/.$(@F:.o=.s) $< ;				\
++	cat $(ASM_MACRO_FILE) $(@D)/.$(@F:.o=.s) > 			\
++		$(@D)/.tmp_$(@F:.o=.s);					\
++	$(CC) $(a_flags_no_debug) -c -o $(1) $(@D)/.tmp_$(@F:.o=.s) ; 	\
++	rm -f $(@D)/.$(@F:.o=.s) $(@D)/.tmp_$(@F:.o=.s)			\
++
++cmd_cc_o_c_helper =    							\
++	$(if $(findstring $(ASM_MACRO_FLAGS),$(c_flags)),		\
++		$(call cmd_cc_o_c_two_steps, $(1)),			\
++		$(call cmd_cc_o_c_direct, $(1)))
++else
++cmd_cc_o_c_helper = $(call cmd_cc_o_c_direct, $(1))
++endif
++
+ ifndef CONFIG_MODVERSIONS
+-cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
++cmd_cc_o_c = $(call cmd_cc_o_c_helper,$@)
  
--$(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
-+$(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) $(ASM_MACRO_FILE:.s=.S) FORCE
- 	$(call cmd,force_checksrc)
- 	$(call if_changed_rule,cc_o_c)
- 	@{ echo $(@:.o=.ko); echo $@; \
+ else
+ # When module versioning is enabled the following steps are executed:
+@@ -171,7 +196,7 @@ else
+ #   replace the unresolved symbols __crc_exported_symbol with
+ #   the actual value of the checksum generated by genksyms
+ 
+-cmd_cc_o_c = $(CC) $(c_flags) -c -o $(@D)/.tmp_$(@F) $<
++cmd_cc_o_c = $(call cmd_cc_o_c_helper,$(@D)/.tmp_$(@F))
+ 
+ cmd_modversions_c =								\
+ 	if $(OBJDUMP) -h $(@D)/.tmp_$(@F) | grep -q __ksymtab; then		\
 -- 
 2.17.1
