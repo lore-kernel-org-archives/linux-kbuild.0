@@ -1,101 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it1-f193.google.com ([209.85.166.193]:39888 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727247AbeKMEQT (ORCPT
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:44503 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727712AbeKMEuf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Nov 2018 23:16:19 -0500
-Received: by mail-it1-f193.google.com with SMTP id m15so14575022itl.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Nov 2018 10:21:55 -0800 (PST)
+        Mon, 12 Nov 2018 23:50:35 -0500
+Received: by mail-pf1-f196.google.com with SMTP id b81-v6so4243412pfe.11
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Nov 2018 10:56:05 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181107170458.jirk2b3tszrcagbt@lakrids.cambridge.arm.com>
-References: <cover.1541525354.git.andreyknvl@google.com> <ea8f0391d7befab4afec34d2a009028cd9e0f326.1541525354.git.andreyknvl@google.com>
- <20181107170458.jirk2b3tszrcagbt@lakrids.cambridge.arm.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Mon, 12 Nov 2018 19:21:54 +0100
-Message-ID: <CAAeHK+zgaNtWsGUF1h1zu9NpZBinyEKNuUUYe14TkMXWRRFhdQ@mail.gmail.com>
-Subject: Re: [PATCH v10 05/22] kasan: add CONFIG_KASAN_GENERIC and CONFIG_KASAN_SW_TAGS
+References: <20181112042116.5271-1-joel@jms.id.au> <20181112042116.5271-2-joel@jms.id.au>
+In-Reply-To: <20181112042116.5271-2-joel@jms.id.au>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 12 Nov 2018 10:55:53 -0800
+Message-ID: <CAKwvOdnBMFYXvS+GH0cUiczgkpLWtBinPRjkTJBQGrKjxktUUg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] Makefile: Export clang toolchain variables
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: joel@jms.id.au
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, mpe@ellerman.id.au, Michal Marek <michal.lkml@markovi.net>, dja@axtens.net, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linuxppc-dev@lists.ozlabs.org
 
-On Wed, Nov 7, 2018 at 6:04 PM, Mark Rutland <mark.rutland@arm.com> wrote:
-> On Tue, Nov 06, 2018 at 06:30:20PM +0100, Andrey Konovalov wrote:
->> This commit splits the current CONFIG_KASAN config option into two:
->> 1. CONFIG_KASAN_GENERIC, that enables the generic KASAN mode (the one
->>    that exists now);
->> 2. CONFIG_KASAN_SW_TAGS, that enables the software tag-based KASAN mode.
->>
->> The name CONFIG_KASAN_SW_TAGS is chosen as in the future we will have
->> another hardware tag-based KASAN mode, that will rely on hardware memory
->> tagging support in arm64.
->>
->> With CONFIG_KASAN_SW_TAGS enabled, compiler options are changed to
->> instrument kernel files with -fsantize=kernel-hwaddress (except the ones
->> for which KASAN_SANITIZE := n is set).
->>
->> Both CONFIG_KASAN_GENERIC and CONFIG_KASAN_SW_TAGS support both
->> CONFIG_KASAN_INLINE and CONFIG_KASAN_OUTLINE instrumentation modes.
->>
->> This commit also adds empty placeholder (for now) implementation of
->> tag-based KASAN specific hooks inserted by the compiler and adjusts
->> common hooks implementation to compile correctly with each of the
->> config options.
->>
->> Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
->> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
->> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
->> ---
->>  arch/arm64/Kconfig                  |  1 +
->>  include/linux/compiler-clang.h      |  5 +-
->>  include/linux/compiler-gcc.h        |  6 ++
->>  include/linux/compiler_attributes.h | 13 -----
->>  include/linux/kasan.h               | 16 ++++--
->>  lib/Kconfig.kasan                   | 87 +++++++++++++++++++++++------
->>  mm/kasan/Makefile                   |  6 +-
->>  mm/kasan/generic.c                  |  2 +-
->>  mm/kasan/kasan.h                    |  3 +-
->>  mm/kasan/tags.c                     | 75 +++++++++++++++++++++++++
->>  mm/slub.c                           |  2 +-
->>  scripts/Makefile.kasan              | 27 ++++++++-
->>  12 files changed, 201 insertions(+), 42 deletions(-)
->>  create mode 100644 mm/kasan/tags.c
->>
->> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
->> index 787d7850e064..8b331dcfb48e 100644
->> --- a/arch/arm64/Kconfig
->> +++ b/arch/arm64/Kconfig
->> @@ -111,6 +111,7 @@ config ARM64
->>       select HAVE_ARCH_JUMP_LABEL
->>       select HAVE_ARCH_JUMP_LABEL_RELATIVE
->>       select HAVE_ARCH_KASAN if !(ARM64_16K_PAGES && ARM64_VA_BITS_48)
->> +     select HAVE_ARCH_KASAN_SW_TAGS if !(ARM64_16K_PAGES && ARM64_VA_BITS_48)
+On Sun, Nov 11, 2018 at 8:21 PM Joel Stanley <joel@jms.id.au> wrote:
 >
-> Given this relies on a compiler feature, can we please gate this on
-> compiler feature detection? e.g. in some common Kconfig have:
+> The powerpc makefile will use these in it's boot wrapper.
 >
->         select CC_HAS_ASAN_HWADDRESS if $(cc-option -fsanitize=kernel-hwaddress)
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> ---
+>  Makefile | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> ... and on arm64 we can do:
->
->         select HAVE_ARCH_KASAN_SW_TAGS if !(ARM64_16K_PAGES && ARM64_VA_BITS_48)
->
-> ... and core KASAN Kconfig can have:
->
-> config KASAN_SW_TAGS
->         depends on HAVE_ARCH_KASAN_SW_TAGS
->         depends on CC_HAS_ASAN_HWADDRESS
->
-> [...]
->
->> +ifeq ($(call cc-option, $(CFLAGS_KASAN) -Werror),)
->> +    ifneq ($(CONFIG_COMPILE_TEST),y)
->> +        $(warning Cannot use CONFIG_KASAN_SW_TAGS: \
->> +            -fsanitize=hwaddress is not supported by compiler)
->> +    endif
->> +endif
->
-> ... and then this warning shouldn't be possible, and can go.
+> diff --git a/Makefile b/Makefile
+> index 09278330282d..840efe6eb54c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -495,6 +495,7 @@ endif
+>  ifneq ($(GCC_TOOLCHAIN),)
+>  CLANG_FLAGS    += --gcc-toolchain=$(GCC_TOOLCHAIN)
+>  endif
+> +export CLANG_FLAGS
+>  CLANG_FLAGS    += -no-integrated-as
 
-Will do in v11, thanks!
+Does this export CLANG_FLAGS before `-no-integrated-as` is set?
+Either way, I think it would be clearer to export this after all the
+relevant flags are set.
+
+>  KBUILD_CFLAGS  += $(CLANG_FLAGS)
+>  KBUILD_AFLAGS  += $(CLANG_FLAGS)
+> --
+> 2.19.1
+>
+
+
+-- 
+Thanks,
+~Nick Desaulniers
