@@ -1,144 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it1-f193.google.com ([209.85.166.193]:56236 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726717AbeKLWrl (ORCPT
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:46429 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727033AbeKMA3q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Nov 2018 17:47:41 -0500
-Received: by mail-it1-f193.google.com with SMTP id o19so3186077itg.5
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Nov 2018 04:54:31 -0800 (PST)
+        Mon, 12 Nov 2018 19:29:46 -0500
+Received: by mail-pg1-f193.google.com with SMTP id w7so4147977pgp.13
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Nov 2018 06:36:14 -0800 (PST)
+Date: Mon, 12 Nov 2018 22:36:06 +0800
+From: Changbin Du <changbin.du@gmail.com>
+Subject: Re: [kbuild-all] [kbuild:kbuild 2/4]
+ arch/openrisc/include/asm/spr.h:20:27: error: impossible constraint in 'asm'
+Message-ID: <20181112143605.a6evj3jrsnwpnush@mail.google.com>
+References: <201811120258.np3G1anC%fengguang.wu@intel.com>
+ <CAAfxs76Qe7ORo7RFqSXc28bY15DR3zCy6rUAvg9T76xWS1TsWw@mail.gmail.com>
+ <CAAfxs76m4uk0VDah1AsMQMxtKUimc7LFKcuEGMtQbEQ_1xw9gQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <CAMBOaT3wpJ3RTX8XQeLkK2v9sxKUCUqe++ULAbYAOCrsjqDihg@mail.gmail.com>
- <CAK7LNATLXejPyzkypC+e-mm4WLCDDi1quEMJCtOmX-nGRZ+JFg@mail.gmail.com>
-In-Reply-To: <CAK7LNATLXejPyzkypC+e-mm4WLCDDi1quEMJCtOmX-nGRZ+JFg@mail.gmail.com>
-From: Mikolaj Ch <mikich7777@gmail.com>
-Date: Mon, 12 Nov 2018 13:54:20 +0100
-Message-ID: <CAMBOaT0QqSPZUV6-RThEiTWqVdTsmUDJuyDjxKe8+MRnFq5dKg@mail.gmail.com>
-Subject: Re: scripts/Makefile.modinst: removing module path M from module
- destination is not working for some cases
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAfxs76m4uk0VDah1AsMQMxtKUimc7LFKcuEGMtQbEQ_1xw9gQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com
-Cc: michal.lkml@markovi.net, linux-kbuild@vger.kernel.org
+To: Stafford Horne <shorne@gmail.com>
+Cc: kbuild test robot <lkp@intel.com>, Changbin Du <changbin.du@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, kbuild-all@01.org, linux-kbuild@vger.kernel.org
 
-Yes, the result is the same as in example you given.
-There is a difference in the path in *.mod file (created during module
-compile time) and M given to install.
-But the situation is a more real one. I compile external module
-outside of kernel tree and then I'm not using make M=<dir> modules at
-all.
-For me external module path can change so the M given to install is a
-symbolic link. It can also be a path created by by build script so it
-can include double slash (so yes, I'm giving non-normalized path to
-make modules_install).
-But still I think this is a problem because we should not assume that
-the path given to install is normalized one and the same as given for
-compilation.
-If we can find the module to be installed we should also install it in
-a correct path.
-On Mon, Nov 12, 2018 at 6:32 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> On Thu, Nov 8, 2018 at 8:27 PM Mikolaj Ch <mikich7777@gmail.com> wrote:
+On Mon, Nov 12, 2018 at 06:51:57AM +0900, Stafford Horne wrote:
+> Again, in plain text mode:
+> 
+> Did something change with the compiler setup?  The error here says gcc
+> 6.0.0.  however the version in the make.cross tool is 5.4.0, which is
+> strange.  Fyi, We have binaries for 7.2.0 and 9.x which can be used.
+> 
+> Also our toolchain is all upstream as of last week.
+> 
+> On Mon, Nov 12, 2018 at 6:03 AM Stafford Horne <shorne@gmail.com> wrote:
 > >
-> > Hi,
+> > Hello,
 > >
-> > I noticed a problem while installing external module with command:
-> > make M=dir modules_install
+> > Did something change with the compiler setup?  The error here says gcc 6.0.0.  however the version in the make.cross tool is 5.4.0, which is strange.  Fyi, We have binaries for 7.2.0 and 9.x which can be used.
 > >
-> > For me it appeared in two separate cases:
-> > - when 'dir' includes symbolic link
-> > - when 'dir' includes double slash.
+> > Also our toolchain is all upstream as of last week.
 > >
-> > For this two cases module is installed to:
-> > lib/modules/<kernel_version>/extra/<'dir>'/<module_name>.ko
-> > instead of
-> > lib/modules/<kernel_version/extra/<module_name>.ko
+> > -stafford
 > >
-> > I've traced the problem and it appeared to be in:
-> > scripts/Makefile.modinst in line:
-> >
-> > in line 12 the path to module is taken from MODVERDIR/*.mod file:
-> > __modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard
-> > $(MODVERDIR)/*.mod)))
-> >
-> > and then directory part of this path is going to be removed with subst
-> > function in line 30:
-> > ext-mod-dir = $(INSTALL_MOD_DIR)$(subst $(patsubst
-> > %/,%,$(KBUILD_EXTMOD)),,$(@D))
-> >
-> > but it fails since KBUILD_EXTMOD is not evaluated path (can include
-> > symlink or double slash) and @D is direct/evaluated path from *.mod
-> > file.
-> > -------------------------
-> > the same in more details:
-> > -------------------------
-> >
-> > In kernel Makefile the following variables are set:
-> > KBUILD_EXTMOD = $M
-> > MODVERDIR = $KBUILD_EXTMOD/.tmp_versions
-> >
-> >
-> > in scripts/Makefile.modinst in lines:
-> > __modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard
-> > $(MODVERDIR)/*.mod)))
-> > modules := $(patsubst %.o,%.ko,$(wildcard $(__modules:.ko=.o)))
-> >
-> > The path in $MODVERDIR is evaluated correctly by shell (symbolic link
-> > is followed and double slash is interpreted as single slash)
-> > and the path to the module $modules is taken form $(MODVERDIR)/*.mod file).
->
->
-> I tested it, but it did not happen to me.
->
-> The path in $(MODVERDIR) reflects
-> the directory path given via M= option for 'make modules'.
->
->
-> I guess you passed a normalized path to
-> 'make M=<dir> modules'
-> then, a non-normalized path to
-> 'make M=<dir> modules_install'
-> Didn't you ?
->
->
->
-> > The $modules is then passed to __modinst function as $@ where in line:
-> > ext-mod-dir = $(INSTALL_MOD_DIR)$(subst $(patsubst
-> > %/,%,$(KBUILD_EXTMOD)),,$(@D))
-> >
-> > subst function substitutes text from $KBUILD_EXTMOD to empty string in
-> > directory part of $@ (@D) but here KBUILD_EXTMOD is different then @D.
-> >
-> >
-> > Can't directory part be remove differently if using absolute paths to
-> > avoid such problems ?
->
->
-> I think  this is a hypothetical problem, like
->    What if a user passed different passes for
->   'make modules' and 'make modules_install' ?
->
->
->
->          $ make -C <path_to_kernel_src> M=$PWD
->
-> is the idiom to build external modules.
->
-> M=$PWD will do a good job for you.
->
->
-> See Documentation/kbuild/modules.txt
->
->
->
->
->
-> > Regards,
-> >   Mikolaj Chadzynski
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+I added a patch which disables gcc auto-inlining by '-fno-inline-functions 
+-fno-inline-small-functions -fno-inline-functions-called-once' (but default
+option is false).
+
+See series https://lkml.org/lkml/2018/5/9/213.
+
+I am trying to make gcc happy for this corner case. Thanks!
+
+> > On Mon, Nov 12, 2018, 3:17 AM kbuild test robot <lkp@intel.com wrote:
+> >>
+> >> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
+> >> head:   e73c4f947acbe6ff12d1f1711d6a8c0ad1c9483a
+> >> commit: cc2b86bb90b2d045b82d45a6dbe7c9285e0f00b9 [2/4] kernel hacking: add a config option to disable compiler auto-inlining
+> >> config: openrisc-allyesconfig (attached as .config)
+> >> compiler: or1k-linux-gcc (GCC) 6.0.0 20160327 (experimental)
+> >> reproduce:
+> >>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+> >>         chmod +x ~/bin/make.cross
+> >>         git checkout cc2b86bb90b2d045b82d45a6dbe7c9285e0f00b9
+> >>         # save the attached .config to linux build tree
+> >>         make.cross ARCH=openrisc
+> >>
+> >> All errors (new ones prefixed by >>):
+> >>
+> >>    In file included from arch/openrisc/mm/cache.c:17:0:
+> >>    arch/openrisc/mm/cache.c: In function 'cache_loop':
+> >>    arch/openrisc/include/asm/spr.h:20:27: warning: asm operand 0 probably doesn't match constraints
+> >>     #define mtspr(_spr, _val) __asm__ __volatile__ (  \
+> >>                               ^
+> >>    arch/openrisc/mm/cache.c:29:3: note: in expansion of macro 'mtspr'
+> >>       mtspr(reg, line);
+> >>       ^~~~~
+> >> >> arch/openrisc/include/asm/spr.h:20:27: error: impossible constraint in 'asm'
+> >>     #define mtspr(_spr, _val) __asm__ __volatile__ (  \
+> >>                               ^
+> >>    arch/openrisc/mm/cache.c:29:3: note: in expansion of macro 'mtspr'
+> >>       mtspr(reg, line);
+> >>       ^~~~~
+> >>
+> >> vim +/asm +20 arch/openrisc/include/asm/spr.h
+> >>
+> >> 58e0166a4 Jonas Bonn 2011-06-04  19
+> >> 58e0166a4 Jonas Bonn 2011-06-04 @20  #define mtspr(_spr, _val) __asm__ __volatile__ (           \
+> >> 58e0166a4 Jonas Bonn 2011-06-04  21     "l.mtspr r0,%1,%0"                                      \
+> >> 58e0166a4 Jonas Bonn 2011-06-04  22     : : "K" (_spr), "r" (_val))
+> >> 58e0166a4 Jonas Bonn 2011-06-04  23  #define mtspr_off(_spr, _off, _val) __asm__ __volatile__ ( \
+> >> 58e0166a4 Jonas Bonn 2011-06-04  24     "l.mtspr %0,%1,%2"                                      \
+> >> 58e0166a4 Jonas Bonn 2011-06-04  25     : : "r" (_off), "r" (_val), "K" (_spr))
+> >> 58e0166a4 Jonas Bonn 2011-06-04  26
+> >>
+> >> :::::: The code at line 20 was first introduced by commit
+> >> :::::: 58e0166a4772aaeb10c9b0f6d59f19099d2047df OpenRISC: Headers
+> >>
+> >> :::::: TO: Jonas Bonn <jonas@southpole.se>
+> >> :::::: CC: Jonas Bonn <jonas@southpole.se>
+> >>
+> >> ---
+> >> 0-DAY kernel test infrastructure                Open Source Technology Center
+> >> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+> >> _______________________________________________
+> >> kbuild-all mailing list
+> >> kbuild-all@lists.01.org
+> >> https://lists.01.org/mailman/listinfo/kbuild-all
+
+-- 
+Cheers,
+Changbin Du
