@@ -1,28 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:50352 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390315AbeKLJAM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Nov 2018 04:00:12 -0500
-Subject: Re: [GIT PULL] Kbuild fixes for v4.20-rc2
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAK7LNASb25Js1sDLmRsfKrEyimat7-fETn-MEDGJtfQ9EfgUbw@mail.gmail.com>
-References: <CAK7LNASb25Js1sDLmRsfKrEyimat7-fETn-MEDGJtfQ9EfgUbw@mail.gmail.com>
-Message-Id: <20181111231003.12478.13842.pr-tracker-bot-e12e00e388dee1d2a86e9b90f79a69f9acd2c9b0@pdx-korg-gitolite-1.ci.codeaurora.org>
-Date: Sun, 11 Nov 2018 23:10:03 +0000
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:43362 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730481AbeKLOMu (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 12 Nov 2018 09:12:50 -0500
+From: Joel Stanley <joel@jms.id.au>
+Subject: [PATCH v2 0/2] powerpc/boot: Fix cross compiling with clang
+Date: Mon, 12 Nov 2018 14:51:14 +1030
+Message-Id: <20181112042116.5271-1-joel@jms.id.au>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Ellerman <mpe@ellerman.id.au>
+Cc: Michal Marek <michal.lkml@markovi.net>, Daniel Axtens <dja@axtens.net>, Nick Desaulniers <ndesaulniers@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-The pull request you sent on Mon, 12 Nov 2018 02:00:27 +0900:
+v2: rebase on "kbuild: consolidate Clang compiler flags"
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-fixes-v4.20
+These patches allow clang to cross-compile the powerpc boot wrapper.
+The boot wrapper constructs it's own compiler flags as it may not be
+built for the same arch as the kernel.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e12e00e388dee1d2a86e9b90f79a69f9acd2c9b0
+The powerpc64le kernel builds natively with clang and with this patch it
+can cross compile too.
 
-Thank you!
+Joel Stanley (2):
+  Makefile: Export clang toolchain variables
+  powerpc/boot: Set target when cross-compiling for clang
+
+ Makefile                   | 1 +
+ arch/powerpc/boot/Makefile | 5 +++++
+ 2 files changed, 6 insertions(+)
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+2.19.1
