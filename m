@@ -1,83 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr790087.outbound.protection.outlook.com ([40.107.79.87]:33952
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726659AbeKNEeC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Nov 2018 23:34:02 -0500
-From: Nadav Amit <namit@vmware.com>
-Subject: Re: [PATCH 1/2] Makefile: Fix distcc compilation with x86 macros
-Date: Tue, 13 Nov 2018 18:34:39 +0000
-Message-ID: <48577A3F-0F76-4CCA-A959-965344D7259F@vmware.com>
-References: <20181112150215.508-1-namit@vmware.com>
- <20181112150215.508-2-namit@vmware.com> <20181113113000.GB4788@gmail.com>
- <40E4E1B4-EF5F-43A1-B42C-C4CF6349FC62@vmware.com>
-In-Reply-To: <40E4E1B4-EF5F-43A1-B42C-C4CF6349FC62@vmware.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <40926D1688691E4786CEC86ED85F4D8B@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:41704 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725748AbeKNGcT (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 14 Nov 2018 01:32:19 -0500
+Received: by mail-pf1-f195.google.com with SMTP id e22-v6so6642294pfn.8
+        for <linux-kbuild@vger.kernel.org>; Tue, 13 Nov 2018 12:32:31 -0800 (PST)
+Date: Wed, 14 Nov 2018 05:32:27 +0900
+From: Stafford Horne <shorne@gmail.com>
+Subject: Re: [kbuild-all] [kbuild:kbuild 2/4]
+ arch/openrisc/include/asm/spr.h:20:27: error: impossible constraint in 'asm'
+Message-ID: <20181113203227.GD2718@lianli.shorne-pla.net>
+References: <201811120258.np3G1anC%fengguang.wu@intel.com>
+ <CAAfxs76Qe7ORo7RFqSXc28bY15DR3zCy6rUAvg9T76xWS1TsWw@mail.gmail.com>
+ <CAAfxs76m4uk0VDah1AsMQMxtKUimc7LFKcuEGMtQbEQ_1xw9gQ@mail.gmail.com>
+ <d8261318-27a8-aa28-bcc6-bc324cb711aa@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d8261318-27a8-aa28-bcc6-bc324cb711aa@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: Ingo Molnar <mingo@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Logan Gunthorpe <logang@deltatee.com>
+To: Rong Chen <rong.a.chen@intel.com>
+Cc: kbuild test robot <lkp@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, kbuild-all@01.org, Changbin Du <changbin.du@gmail.com>
 
-RnJvbTogTmFkYXYgQW1pdA0KU2VudDogTm92ZW1iZXIgMTMsIDIwMTggYXQgNTo1NTozNCBQTSBH
-TVQNCj4gVG86IEluZ28gTW9sbmFyIDxtaW5nb0BrZXJuZWwub3JnPg0KPiBDYzogSW5nbyBNb2xu
-YXIgPG1pbmdvQHJlZGhhdC5jb20+LCBNYXNhaGlybyBZYW1hZGEgPHlhbWFkYS5tYXNhaGlyb0Bz
-b2Npb25leHQuY29tPiwgTWljaGFsIE1hcmVrIDxtaWNoYWwubGttbEBtYXJrb3ZpLm5ldD4sIFRo
-b21hcyBHbGVpeG5lciA8dGdseEBsaW51dHJvbml4LmRlPiwgQm9yaXNsYXYgUGV0a292IDxicEBh
-bGllbjguZGU+LCBILiBQZXRlciBBbnZpbiA8aHBhQHp5dG9yLmNvbT4sIFg4NiBNTCA8eDg2QGtl
-cm5lbC5vcmc+LCBMaW51eCBLYnVpbGQgbWFpbGluZyBsaXN0IDxsaW51eC1rYnVpbGRAdmdlci5r
-ZXJuZWwub3JnPiwgTEtNTCA8bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZz4sIExvZ2FuIEd1
-bnRob3JwZSA8bG9nYW5nQGRlbHRhdGVlLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCAxLzJd
-IE1ha2VmaWxlOiBGaXggZGlzdGNjIGNvbXBpbGF0aW9uIHdpdGggeDg2IG1hY3Jvcw0KPiANCj4g
-DQo+IEZyb206IEluZ28gTW9sbmFyDQo+IFNlbnQ6IE5vdmVtYmVyIDEzLCAyMDE4IGF0IDExOjMw
-OjAwIEFNIEdNVA0KPj4gVG86IE5hZGF2IEFtaXQgPG5hbWl0QHZtd2FyZS5jb20+DQo+PiBDYzog
-SW5nbyBNb2xuYXIgPG1pbmdvQHJlZGhhdC5jb20+LCBNYXNhaGlybyBZYW1hZGEgPHlhbWFkYS5t
-YXNhaGlyb0Bzb2Npb25leHQuY29tPiwgTWljaGFsIE1hcmVrIDxtaWNoYWwubGttbEBtYXJrb3Zp
-Lm5ldD4sIFRob21hcyBHbGVpeG5lciA8dGdseEBsaW51dHJvbml4LmRlPiwgQm9yaXNsYXYgUGV0
-a292IDxicEBhbGllbjguZGU+LCBILiBQZXRlciBBbnZpbiA8aHBhQHp5dG9yLmNvbT4sIHg4NkBr
-ZXJuZWwub3JnLCBsaW51eC1rYnVpbGRAdmdlci5rZXJuZWwub3JnLCBsaW51eC1rZXJuZWxAdmdl
-ci5rZXJuZWwub3JnDQo+PiBTdWJqZWN0OiBSZTogW1BBVENIIDEvMl0gTWFrZWZpbGU6IEZpeCBk
-aXN0Y2MgY29tcGlsYXRpb24gd2l0aCB4ODYgbWFjcm9zDQo+PiANCj4+IA0KPj4gDQo+PiAqIE5h
-ZGF2IEFtaXQgPG5hbWl0QHZtd2FyZS5jb20+IHdyb3RlOg0KPj4gDQo+Pj4gSW50cm9kdWNpbmcg
-dGhlIHVzZSBvZiBhc20gbWFjcm9zIGluIGMtY29kZSBicm9rZSBkaXN0Y2MsIHNpbmNlIGl0IG9u
-bHkNCj4+PiBzZW5kcyB0aGUgcHJlcHJvY2Vzc2VkIHNvdXJjZSBmaWxlLiBUaGUgc29sdXRpb24g
-aXMgdG8gYnJlYWsgdGhlDQo+Pj4gY29tcGlsYXRpb24gaW50byB0d28gc2VwYXJhdGUgcGhhc2Vz
-IG9mIGNvbXBpbGF0aW9uIGFuZCBhc3NlbWJseSwgYW5kDQo+Pj4gYmV0d2VlbiB0aGUgdHdvIGNv
-bmNhdGFuYXRlIHRoZSBhc3NlbWJseSBtYWNyb3MgYW5kIHRoZSBjb21waWxlZCAoeWV0DQo+PiAN
-Cj4+IHMvY29uY2F0ZW5hdGUNCj4+IA0KPj4+IG5vdCBhc3NlbWJsZWQpIHNvdXJjZSBmaWxlLiBT
-aW5jZSB0aGlzIGlzIGxlc3MgZWZmaWNpZW50LCB0aGlzDQo+Pj4gY29tcGlsYXRpb24gbW9kZSBp
-cyBvbmx5IHVzZWQgd2hlbiBtYWtlIGlzIGNhbGxlZCB3aXRoIHRoZSAiRElTVENDPXkiDQo+Pj4g
-cGFyYW1ldGVyLg0KPj4+IA0KPj4+IE5vdGUgdGhhdCB0aGUgYXNzZW1ibHkgc3RhZ2Ugc2hvdWxk
-IGFsc28gYmUgZGlzdHJpYnV0ZWQsIGlmIGRpc3RjYyBpcw0KPj4+IGNvbmZpZ3VyZWQgdXNpbmcg
-IkNGTEFHUz0tREVOQUJMRV9SRU1PVEVfQVNTRU1CTEUiLg0KPj4gDQo+PiBJdCdzIGEgYml0IHNh
-ZCB0aGF0IHdlIHJlZ3Jlc3NlZCBkaXN0Y2MgcGVyZm9ybWFuY2Ug4oCmDQo+IA0KPiBJIGRvbuKA
-mXQga25vdyB3aGF0IHRoZSBhY3R1YWwgaW1wYWN0IGlzLCBidXQgTG9nYW4sIHdobyByZXBvcnRl
-ZCB0aGUgYnVnIHNheXMNCj4gdGhlcmUgaXMgYW4gYWx0ZXJuYXRpdmUgc29sdXRpb24gZm9yIHdo
-ZW4gZGlzdGNjLXB1bXAgaXMgdXNlZCAod2hpY2gNCj4gcHJlc3VtYWJseSB3b3VsZCBoYXZlIH56
-ZXJvIHBlcmZvcm1hbmNlIGRlZ3JhZGF0aW9uKS4gZGlzdGNjIGlzIHJlYWxseQ0KPiBmcmFnaWxl
-IElNSE8gLSBpdOKAmXMgZW5vdWdoIHRoYXQgaXQgZmluZHMgd2hhdCBsb29rcyBsaWtlIHR3byBz
-b3VyY2UgZmlsZXMgaW4NCj4gdGhlIGNvbXBpbGVyIGNvbW1hbmQgYXJndW1lbnRzIGZvciBpdCB0
-byBmYWxsIGJhY2sgdG8gbG9jYWwgY29tcGlsYXRpb24uDQo+IA0KPiBbIEluIHRoaXMgcmVnYXJk
-LCB0aGUgZGlzdGNjLXB1bXAgc29sdXRpb24gd291bGQgKm5vdCogd29yayBpZiBkaXN0Y2MgaXMN
-Cj4gYnVpbHQgd2l0aCBzdXBwb3J0IGZvciBkaXN0cmlidXRlZCBhc3NlbWJseSwgc2luY2UgaXQg
-d2lsbCBjb25zaWRlciB0aGUgLnMNCj4gZmlsZSBhcyBhIHNlY29uZCBzb3VyY2UgZmlsZS4gXQ0K
-PiANCj4+PiArIyBJZiBkaXN0Y2MgaXMgdXNlZCwgdGhlbiB3aGVuIGFuIGFzc2VtYmx5IG1hY3Jv
-IGZpbGVzIGlzIG5lZWRlZCwgdGhlDQo+Pj4gKyMgY29tcGlsYXRpb24gc3RhZ2UgYW5kIHRoZSBh
-c3NlbWJseSBzdGFnZSBuZWVkIHRvIGJlIHNlcGFyYXRlZC4gUHJvdmlkaW5nDQo+Pj4gKyMgIkRJ
-U1RDQz15IiBvcHRpb24gZW5hYmxlcyB0aGUgc2VwYXJhdGUgY29tcGlsYXRpb24gYW5kIGFzc2Vt
-Ymx5Lg0KPj4gDQo+PiBMZXQncyBmaXggdGhlIHZhcmlvdXMgdHlwb3M6DQo+PiANCj4+PiArIyBJ
-ZiBkaXN0Y2MgaXMgdXNlZCwgYW5kIHdoZW4gYXNzZW1ibHkgbWFjcm8gZmlsZXMgYXJlIG5lZWRl
-ZCwgdGhlDQo+Pj4gKyMgY29tcGlsYXRpb24gc3RhZ2UgYW5kIHRoZSBhc3NlbWJseSBzdGFnZSBu
-ZWVkcyB0byBiZSBzZXBhcmF0ZWQuIA0KPj4+ICsjIFByb3ZpZGluZyB0aGUgIkRJU1RDQz15IiBv
-cHRpb24gZW5hYmxlcyBzZXBhcmF0ZSBjb21waWxhdGlvbiBhbmQgDQo+Pj4gKyMgYXNzZW1ibHku
-DQo+IA0KPiBUaGF04oCZcyBncmFtbWFyLCBub3QgdHlwb3MgOy0pDQo+IA0KPiBTb3JyeSBmb3Ig
-dGhhdCAtIEkgd2lsbCBmaXggaXQgYW4gc2VuZCB2MiAoYXMgd2VsbCBhcyB0aGUgd2hpdGVzcGFj
-ZSBub2lzZSkuDQoNCkp1c3Qgb25lIHF1ZXN0aW9uIGJlZm9yZSBJIHNlbmQgdjIsIHNpbmNlIEkg
-aGF2ZSBzZWNvbmQgdGhvdWdodHMuIERvZXMgaXQNCm1ha2Ugc2Vuc2UgdG8gcmVxdWlyZSB0aGUg
-4oCcRElTVEND4oCdIG1ha2UgcGFyYW1ldGVyLCBvciBzaG91bGQgaXQgYmUgc2V0IGluDQp0aGUg
-S2NvbmZpZz8gSXQgY2FuIGJlIGRldGVjdGVkIGF1dG9tYXRpY2FsbHksIHRoZSBzYW1lIHdheSBn
-Y2MvY2xhbmcgYXJlDQpkZXRlY3RlZCBvciBtYW51YWxseSB0aHJvdWdoIGEgY29uZmlnIG9wdGlv
-bi4NCg0K
+On Tue, Nov 13, 2018 at 08:09:00AM +0800, Rong Chen wrote:
+> Hi Atafford,
+> 
+> I do apologise for troubling you, we have updated the make.cross,
+> you could use "GCC_VERSION=6.0.0 make.cross ARCH=openrisc" to reproduce.
+
+Thanks, that explains it.  I see that Du Changbin has addressed the actualy
+issue as well.
+
+-Stafford
