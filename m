@@ -1,96 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it1-f195.google.com ([209.85.166.195]:51348 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728818AbeKNBAB (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Nov 2018 20:00:01 -0500
-Received: by mail-it1-f195.google.com with SMTP id m34-v6so18605062iti.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 13 Nov 2018 07:01:28 -0800 (PST)
+Received: from mail-eopbgr700088.outbound.protection.outlook.com ([40.107.70.88]:55770
+        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731537AbeKNDyu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Nov 2018 22:54:50 -0500
+From: Nadav Amit <namit@vmware.com>
+Subject: Re: [PATCH 1/2] Makefile: Fix distcc compilation with x86 macros
+Date: Tue, 13 Nov 2018 17:55:36 +0000
+Message-ID: <40E4E1B4-EF5F-43A1-B42C-C4CF6349FC62@vmware.com>
+References: <20181112150215.508-1-namit@vmware.com>
+ <20181112150215.508-2-namit@vmware.com> <20181113113000.GB4788@gmail.com>
+In-Reply-To: <20181113113000.GB4788@gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7350B89C4D60EB41A074B7F28CBABEE8@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20181108122228.xqwhpkjritrvqneq@lakrids.cambridge.arm.com>
-References: <cover.1541525354.git.andreyknvl@google.com> <4891a504adf61c0daf1e83642b6f7519328dfd5f.1541525354.git.andreyknvl@google.com>
- <20181108122228.xqwhpkjritrvqneq@lakrids.cambridge.arm.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Tue, 13 Nov 2018 16:01:27 +0100
-Message-ID: <CAAeHK+xPkbg_9P9oCkS-iB8S81vTxD3p5SbyWHy-vrp2ybkKmg@mail.gmail.com>
-Subject: Re: [PATCH v10 12/22] kasan, arm64: fix up fault handling logic
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Ingo Molnar <mingo@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Logan Gunthorpe <logang@deltatee.com>
 
-On Thu, Nov 8, 2018 at 1:22 PM, Mark Rutland <mark.rutland@arm.com> wrote:
-> On Tue, Nov 06, 2018 at 06:30:27PM +0100, Andrey Konovalov wrote:
->> show_pte in arm64 fault handling relies on the fact that the top byte of
->> a kernel pointer is 0xff, which isn't always the case with tag-based
->> KASAN.
->
-> That's for the TTBR1 check, right?
->
-> i.e. for the following to work:
->
->         if (addr >= VA_START)
->
-> ... we need the tag bits to be an extension of bit 55...
->
->>
->> This patch resets the top byte in show_pte.
->>
->> Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
->> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
->> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
->> ---
->>  arch/arm64/mm/fault.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
->> index 7d9571f4ae3d..d9a84d6f3343 100644
->> --- a/arch/arm64/mm/fault.c
->> +++ b/arch/arm64/mm/fault.c
->> @@ -32,6 +32,7 @@
->>  #include <linux/perf_event.h>
->>  #include <linux/preempt.h>
->>  #include <linux/hugetlb.h>
->> +#include <linux/kasan.h>
->>
->>  #include <asm/bug.h>
->>  #include <asm/cmpxchg.h>
->> @@ -141,6 +142,8 @@ void show_pte(unsigned long addr)
->>       pgd_t *pgdp;
->>       pgd_t pgd;
->>
->> +     addr = (unsigned long)kasan_reset_tag((void *)addr);
->
-> ... but this ORs in (0xffUL << 56), which is not correct for addresses
-> which aren't TTBR1 addresses to begin with, where bit 55 is clear, and
-> throws away useful information.
->
-> We could use untagged_addr() here, but that wouldn't be right for
-> kernels which don't use TBI1, and we'd erroneously report addresses
-> under the TTBR1 range as being in the TTBR1 range.
->
-> I also see that the entry assembly for el{1,0}_{da,ia} clears the tag
-> for EL0 addresses.
->
-> So we could have:
->
-> static inline bool is_ttbr0_addr(unsigned long addr)
-> {
->         /* entry assembly clears tags for TTBR0 addrs */
->         return addr < TASK_SIZE_64;
-> }
->
-> static inline bool is_ttbr1_addr(unsigned long addr)
-> {
->         /* TTBR1 addresses may have a tag if HWKASAN is in use */
->         return arch_kasan_reset_tag(addr) >= VA_START;
-> }
->
-> ... and use those in the conditionals, leaving the addr as-is for
-> reporting purposes.
-
-Actually it looks like 276e9327 ("arm64: entry: improve data abort
-handling of tagged pointers") already takes care of both user and
-kernel fault addresses and correctly removes tags from them. So I
-think we need to drop this patch.
+RnJvbTogSW5nbyBNb2xuYXINClNlbnQ6IE5vdmVtYmVyIDEzLCAyMDE4IGF0IDExOjMwOjAwIEFN
+IEdNVA0KPiBUbzogTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT4NCj4gQ2M6IEluZ28gTW9s
+bmFyIDxtaW5nb0ByZWRoYXQuY29tPiwgTWFzYWhpcm8gWWFtYWRhIDx5YW1hZGEubWFzYWhpcm9A
+c29jaW9uZXh0LmNvbT4sIE1pY2hhbCBNYXJlayA8bWljaGFsLmxrbWxAbWFya292aS5uZXQ+LCBU
+aG9tYXMgR2xlaXhuZXIgPHRnbHhAbGludXRyb25peC5kZT4sIEJvcmlzbGF2IFBldGtvdiA8YnBA
+YWxpZW44LmRlPiwgSC4gUGV0ZXIgQW52aW4gPGhwYUB6eXRvci5jb20+LCB4ODZAa2VybmVsLm9y
+ZywgbGludXgta2J1aWxkQHZnZXIua2VybmVsLm9yZywgbGludXgta2VybmVsQHZnZXIua2VybmVs
+Lm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDEvMl0gTWFrZWZpbGU6IEZpeCBkaXN0Y2MgY29t
+cGlsYXRpb24gd2l0aCB4ODYgbWFjcm9zDQo+IA0KPiANCj4gDQo+ICogTmFkYXYgQW1pdCA8bmFt
+aXRAdm13YXJlLmNvbT4gd3JvdGU6DQo+IA0KPj4gSW50cm9kdWNpbmcgdGhlIHVzZSBvZiBhc20g
+bWFjcm9zIGluIGMtY29kZSBicm9rZSBkaXN0Y2MsIHNpbmNlIGl0IG9ubHkNCj4+IHNlbmRzIHRo
+ZSBwcmVwcm9jZXNzZWQgc291cmNlIGZpbGUuIFRoZSBzb2x1dGlvbiBpcyB0byBicmVhayB0aGUN
+Cj4+IGNvbXBpbGF0aW9uIGludG8gdHdvIHNlcGFyYXRlIHBoYXNlcyBvZiBjb21waWxhdGlvbiBh
+bmQgYXNzZW1ibHksIGFuZA0KPj4gYmV0d2VlbiB0aGUgdHdvIGNvbmNhdGFuYXRlIHRoZSBhc3Nl
+bWJseSBtYWNyb3MgYW5kIHRoZSBjb21waWxlZCAoeWV0DQo+IA0KPiBzL2NvbmNhdGVuYXRlDQo+
+IA0KPj4gbm90IGFzc2VtYmxlZCkgc291cmNlIGZpbGUuIFNpbmNlIHRoaXMgaXMgbGVzcyBlZmZp
+Y2llbnQsIHRoaXMNCj4+IGNvbXBpbGF0aW9uIG1vZGUgaXMgb25seSB1c2VkIHdoZW4gbWFrZSBp
+cyBjYWxsZWQgd2l0aCB0aGUgIkRJU1RDQz15Ig0KPj4gcGFyYW1ldGVyLg0KPj4gDQo+PiBOb3Rl
+IHRoYXQgdGhlIGFzc2VtYmx5IHN0YWdlIHNob3VsZCBhbHNvIGJlIGRpc3RyaWJ1dGVkLCBpZiBk
+aXN0Y2MgaXMNCj4+IGNvbmZpZ3VyZWQgdXNpbmcgIkNGTEFHUz0tREVOQUJMRV9SRU1PVEVfQVNT
+RU1CTEUiLg0KPiANCj4gSXQncyBhIGJpdCBzYWQgdGhhdCB3ZSByZWdyZXNzZWQgZGlzdGNjIHBl
+cmZvcm1hbmNlIOKApg0KDQpJIGRvbuKAmXQga25vdyB3aGF0IHRoZSBhY3R1YWwgaW1wYWN0IGlz
+LCBidXQgTG9nYW4sIHdobyByZXBvcnRlZCB0aGUgYnVnIHNheXMNCnRoZXJlIGlzIGFuIGFsdGVy
+bmF0aXZlIHNvbHV0aW9uIGZvciB3aGVuIGRpc3RjYy1wdW1wIGlzIHVzZWQgKHdoaWNoDQpwcmVz
+dW1hYmx5IHdvdWxkIGhhdmUgfnplcm8gcGVyZm9ybWFuY2UgZGVncmFkYXRpb24pLiBkaXN0Y2Mg
+aXMgcmVhbGx5DQpmcmFnaWxlIElNSE8gLSBpdOKAmXMgZW5vdWdoIHRoYXQgaXQgZmluZHMgd2hh
+dCBsb29rcyBsaWtlIHR3byBzb3VyY2UgZmlsZXMgaW4NCnRoZSBjb21waWxlciBjb21tYW5kIGFy
+Z3VtZW50cyBmb3IgaXQgdG8gZmFsbCBiYWNrIHRvIGxvY2FsIGNvbXBpbGF0aW9uLg0KDQpbIElu
+IHRoaXMgcmVnYXJkLCB0aGUgZGlzdGNjLXB1bXAgc29sdXRpb24gd291bGQgKm5vdCogd29yayBp
+ZiBkaXN0Y2MgaXMNCmJ1aWx0IHdpdGggc3VwcG9ydCBmb3IgZGlzdHJpYnV0ZWQgYXNzZW1ibHks
+IHNpbmNlIGl0IHdpbGwgY29uc2lkZXIgdGhlIC5zDQpmaWxlIGFzIGEgc2Vjb25kIHNvdXJjZSBm
+aWxlLiBdDQoNCj4+ICsjIElmIGRpc3RjYyBpcyB1c2VkLCB0aGVuIHdoZW4gYW4gYXNzZW1ibHkg
+bWFjcm8gZmlsZXMgaXMgbmVlZGVkLCB0aGUNCj4+ICsjIGNvbXBpbGF0aW9uIHN0YWdlIGFuZCB0
+aGUgYXNzZW1ibHkgc3RhZ2UgbmVlZCB0byBiZSBzZXBhcmF0ZWQuIFByb3ZpZGluZw0KPj4gKyMg
+IkRJU1RDQz15IiBvcHRpb24gZW5hYmxlcyB0aGUgc2VwYXJhdGUgY29tcGlsYXRpb24gYW5kIGFz
+c2VtYmx5Lg0KPiANCj4gTGV0J3MgZml4IHRoZSB2YXJpb3VzIHR5cG9zOg0KPiANCj4+ICsjIElm
+IGRpc3RjYyBpcyB1c2VkLCBhbmQgd2hlbiBhc3NlbWJseSBtYWNybyBmaWxlcyBhcmUgbmVlZGVk
+LCB0aGUNCj4+ICsjIGNvbXBpbGF0aW9uIHN0YWdlIGFuZCB0aGUgYXNzZW1ibHkgc3RhZ2UgbmVl
+ZHMgdG8gYmUgc2VwYXJhdGVkLiANCj4+ICsjIFByb3ZpZGluZyB0aGUgIkRJU1RDQz15IiBvcHRp
+b24gZW5hYmxlcyBzZXBhcmF0ZSBjb21waWxhdGlvbiBhbmQgDQo+PiArIyBhc3NlbWJseS4NCg0K
+VGhhdOKAmXMgZ3JhbW1hciwgbm90IHR5cG9zIDstKQ0KDQpTb3JyeSBmb3IgdGhhdCAtIEkgd2ls
+bCBmaXggaXQgYW4gc2VuZCB2MiAoYXMgd2VsbCBhcyB0aGUgd2hpdGVzcGFjZSBub2lzZSkuDQoN
+ClJlZ2FyZHMsDQpOYWRhdg==
