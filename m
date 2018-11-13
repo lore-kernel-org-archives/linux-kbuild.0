@@ -1,62 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:59672 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726111AbeKMOw5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Nov 2018 09:52:57 -0500
-References: <20181003213100.189959-1-namit@vmware.com>
- <20181003213100.189959-3-namit@vmware.com>
- <89262174-6f15-6116-e67f-436f7c1bfe99@deltatee.com>
- <6651971B-E3AB-4CDD-868C-2338593F7D83@vmware.com>
- <d0812681-4a8f-8cc4-24ce-d02002ee34d2@deltatee.com>
- <DC1EA50F-FAC3-4750-BCF7-0622D1FB4756@vmware.com>
- <a3902c4c-64b1-9c49-02fb-d5e4c9b04314@deltatee.com>
- <192946CF-8543-4CF5-B2A3-93674FCD07E2@vmware.com>
- <7bc80811-8ab3-d26a-6fb3-b7aeebcfce43@deltatee.com>
- <85B77A64-5FF3-4B82-8A07-E045E259C985@zytor.com>
- <3B824A03-AB76-4B34-B1CA-F27C0F1B0575@vmware.com>
- <2c022676-9299-bb5f-023b-5c114cd79f81@deltatee.com>
- <080748A5-2588-47C9-BC2A-E643630FB9A7@vmware.com>
- <3ae6dd1f-9b59-8552-f438-c40b08771226@deltatee.com>
- <C0187502-9FC0-4FE2-BCD3-81B8B992F3A2@vmware.com>
- <88901B62-7D98-45A2-8881-352A31802933@vmware.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <258e793a-a7a6-526d-6be5-edba1c701a24@deltatee.com>
-Date: Mon, 12 Nov 2018 21:56:09 -0700
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:44720 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726111AbeKMPNt (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Nov 2018 10:13:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <88901B62-7D98-45A2-8881-352A31802933@vmware.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v9 02/10] Makefile: Prepare for using macros for inline
- asm
+References: <20181112042116.5271-1-joel@jms.id.au> <20181112042116.5271-2-joel@jms.id.au>
+ <CAKwvOdnBMFYXvS+GH0cUiczgkpLWtBinPRjkTJBQGrKjxktUUg@mail.gmail.com>
+In-Reply-To: <CAKwvOdnBMFYXvS+GH0cUiczgkpLWtBinPRjkTJBQGrKjxktUUg@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 13 Nov 2018 14:16:40 +0900
+Message-ID: <CAK7LNASE=xCaE-q_Jke5aDd9aF=dJ+ThUjORLa0i_m3e6UzUig@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] Makefile: Export clang toolchain variables
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nadav Amit <namit@vmware.com>, "hpa@zytor.com" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Stephen Bates <sbates@raithlin.com>, Masami Hiramatsu <mhiramat@kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Joel Stanley <joel@jms.id.au>, Michael Ellerman <mpe@ellerman.id.au>, Michal Marek <michal.lkml@markovi.net>, dja@axtens.net, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+
+On Tue, Nov 13, 2018 at 3:56 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+>
+> On Sun, Nov 11, 2018 at 8:21 PM Joel Stanley <joel@jms.id.au> wrote:
+> >
+> > The powerpc makefile will use these in it's boot wrapper.
+> >
+> > Signed-off-by: Joel Stanley <joel@jms.id.au>
+> > ---
+> >  Makefile | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/Makefile b/Makefile
+> > index 09278330282d..840efe6eb54c 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -495,6 +495,7 @@ endif
+> >  ifneq ($(GCC_TOOLCHAIN),)
+> >  CLANG_FLAGS    += --gcc-toolchain=$(GCC_TOOLCHAIN)
+> >  endif
+> > +export CLANG_FLAGS
+> >  CLANG_FLAGS    += -no-integrated-as
+>
+> Does this export CLANG_FLAGS before `-no-integrated-as` is set?
+
+This does not matter.
+
+For example, KBUILD_CFLAGS accumulates several compiler flags
+after it is marked as 'export'.
+
+
+> Either way, I think it would be clearer to export this after all the
+> relevant flags are set.
+
+OK. It is just a matter of preference,
+but I will move the export line below
+when I pick up this patch set.
 
 
 
-On 10/11/18 03:04 PM, Nadav Amit wrote:
-> Err.. I hate makefiles and distcc doesn’t make life easier. For instance, if
-> it sees two source files on the command-line, it freaks out and compiles it
-> locally. It also has an option to distribute assembly, but it is not enabled
-> by default.
-> 
-> Anyhow, can you try the following patch?
+> >  KBUILD_CFLAGS  += $(CLANG_FLAGS)
+> >  KBUILD_AFLAGS  += $(CLANG_FLAGS)
+> > --
+> > 2.19.1
+> >
+>
+>
+> --
+> Thanks,
+> ~Nick Desaulniers
 
-Very nice, great work! It works as expected. I tested with both distcc
-and icecc and both work well with DISTCC=y.
 
-Also worth noting, is that distcc has a patch to work without DISTCC=y
-in pump mode (though pump mode doesn't work super great with the kernel
-as some of the include processing takes a long time). When I have some
-free time, I may also try to patch icecc to work with it, as in my
-experience, it performs better.
 
-Regardless, I think your patch would be very valuable to be in upstream
-so there's at least some way to use the existing versions of distcc and
-icecc.
-
-Thanks!
-
-Logan
+-- 
+Best Regards
+Masahiro Yamada
