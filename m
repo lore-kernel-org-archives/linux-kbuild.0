@@ -1,139 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:50526 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725756AbeKOGWW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Nov 2018 01:22:22 -0500
-Date: Wed, 14 Nov 2018 20:17:39 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v10 12/22] kasan, arm64: fix up fault handling logic
-Message-ID: <20181114201738.sb2lla7umljsx3qx@blommer>
-References: <cover.1541525354.git.andreyknvl@google.com>
- <4891a504adf61c0daf1e83642b6f7519328dfd5f.1541525354.git.andreyknvl@google.com>
- <20181108122228.xqwhpkjritrvqneq@lakrids.cambridge.arm.com>
- <CAAeHK+xPkbg_9P9oCkS-iB8S81vTxD3p5SbyWHy-vrp2ybkKmg@mail.gmail.com>
- <20181113220728.2h3kz67b2bz36wty@blommer>
- <CAAeHK+xe5LqbyWnYSDv2+QrLR=GK0JMzniAZBfL8kjXRwJravA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+xe5LqbyWnYSDv2+QrLR=GK0JMzniAZBfL8kjXRwJravA@mail.gmail.com>
+Received: from mail.kernel.org ([198.145.29.99]:37496 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726774AbeKOIaT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 15 Nov 2018 03:30:19 -0500
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.18 58/59] kbuild: deb-pkg: fix too low build version number
+Date: Wed, 14 Nov 2018 17:23:30 -0500
+Message-Id: <20181114222335.99339-58-sashal@kernel.org>
+In-Reply-To: <20181114222335.99339-1-sashal@kernel.org>
+References: <20181114222335.99339-1-sashal@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
 
-On Wed, Nov 14, 2018 at 09:06:23PM +0100, Andrey Konovalov wrote:
-> On Tue, Nov 13, 2018 at 11:07 PM, Mark Rutland <mark.rutland@arm.com> wrote:
-> > On Tue, Nov 13, 2018 at 04:01:27PM +0100, Andrey Konovalov wrote:
-> >> On Thu, Nov 8, 2018 at 1:22 PM, Mark Rutland <mark.rutland@arm.com> wrote:
-> >> > On Tue, Nov 06, 2018 at 06:30:27PM +0100, Andrey Konovalov wrote:
-> >> >> show_pte in arm64 fault handling relies on the fact that the top byte of
-> >> >> a kernel pointer is 0xff, which isn't always the case with tag-based
-> >> >> KASAN.
-> >> >
-> >> > That's for the TTBR1 check, right?
-> >> >
-> >> > i.e. for the following to work:
-> >> >
-> >> >         if (addr >= VA_START)
-> >> >
-> >> > ... we need the tag bits to be an extension of bit 55...
-> >> >
-> >> >>
-> >> >> This patch resets the top byte in show_pte.
-> >> >>
-> >> >> Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-> >> >> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
-> >> >> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> >> >> ---
-> >> >>  arch/arm64/mm/fault.c | 3 +++
-> >> >>  1 file changed, 3 insertions(+)
-> >> >>
-> >> >> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> >> >> index 7d9571f4ae3d..d9a84d6f3343 100644
-> >> >> --- a/arch/arm64/mm/fault.c
-> >> >> +++ b/arch/arm64/mm/fault.c
-> >> >> @@ -32,6 +32,7 @@
-> >> >>  #include <linux/perf_event.h>
-> >> >>  #include <linux/preempt.h>
-> >> >>  #include <linux/hugetlb.h>
-> >> >> +#include <linux/kasan.h>
-> >> >>
-> >> >>  #include <asm/bug.h>
-> >> >>  #include <asm/cmpxchg.h>
-> >> >> @@ -141,6 +142,8 @@ void show_pte(unsigned long addr)
-> >> >>       pgd_t *pgdp;
-> >> >>       pgd_t pgd;
-> >> >>
-> >> >> +     addr = (unsigned long)kasan_reset_tag((void *)addr);
-> >> >
-> >> > ... but this ORs in (0xffUL << 56), which is not correct for addresses
-> >> > which aren't TTBR1 addresses to begin with, where bit 55 is clear, and
-> >> > throws away useful information.
-> >> >
-> >> > We could use untagged_addr() here, but that wouldn't be right for
-> >> > kernels which don't use TBI1, and we'd erroneously report addresses
-> >> > under the TTBR1 range as being in the TTBR1 range.
-> >> >
-> >> > I also see that the entry assembly for el{1,0}_{da,ia} clears the tag
-> >> > for EL0 addresses.
-> >> >
-> >> > So we could have:
-> >> >
-> >> > static inline bool is_ttbr0_addr(unsigned long addr)
-> >> > {
-> >> >         /* entry assembly clears tags for TTBR0 addrs */
-> >> >         return addr < TASK_SIZE_64;
-> >> > }
-> >> >
-> >> > static inline bool is_ttbr1_addr(unsigned long addr)
-> >> > {
-> >> >         /* TTBR1 addresses may have a tag if HWKASAN is in use */
-> >> >         return arch_kasan_reset_tag(addr) >= VA_START;
-> >> > }
-> >> >
-> >> > ... and use those in the conditionals, leaving the addr as-is for
-> >> > reporting purposes.
-> >>
-> >> Actually it looks like 276e9327 ("arm64: entry: improve data abort
-> >> handling of tagged pointers") already takes care of both user and
-> >> kernel fault addresses and correctly removes tags from them. So I
-> >> think we need to drop this patch.
-> >
-> > The clear_address_tag macro added in that commit only removes tags from TTBR0
-> > addresses, so that's not sufficient if the kernel is used tagged addresses
-> > (which will be in the TTBR1 range).
-> 
-> Do I understand correctly that TTBR0 means user space addresses and
-> TTBR1 means kernel addresses? 
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Effectively, yes. The address space is split into two halves (with a gap in the
-middle). The high half (where we map the kernel) is covered by TTBR1, and the
-low half (where we map userspace) is covered by TTBR0.
+[ Upstream commit bbcde0a7241261cd0ca8d8e6b94a4113a4b71443 ]
 
-The TTBRs are the Translation Table Base Registers -- the two halves have
-separate page tables.
+Since commit b41d920acff8 ("kbuild: deb-pkg: split generating packaging
+and build"), the build version of the kernel contained in a deb package
+is too low by 1.
 
-> In that commit I see that the clear_address_tag() macro is used in el0_da and
-> in el1_da, which means that it untags both user and kernel addresses (on data
-> aborts). Do I misunderstand something?
+Prior to the bad commit, the kernel was built first, then the number
+in .version file was read out, and written into the debian control file.
 
-It's called for faults taken from EL0 and EL1, but it only removes the tags
-from addresses covered by TTBR0. The logic is:
+Now, the debian control file is created before the kernel is actually
+compiled, which is causing the version number mismatch.
 
-	.macro  clear_address_tag, dst, addr
-	tst     \addr, #(1 << 55)
-	bic     \dst, \addr, #(0xff << 56)
-	csel    \dst, \dst, \addr, eq
-	.endm
+Let the mkdebian script pass KBUILD_BUILD_VERSION=${revision} to require
+the build system to use the specified version number.
 
-... which in C would be:
+Fixes: b41d920acff8 ("kbuild: deb-pkg: split generating packaging and build")
+Reported-by: Doug Smythies <dsmythies@telus.net>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Tested-by: Doug Smythies <dsmythies@telus.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ scripts/package/mkdebian | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-	if (!(addr & (1UL << 55))) {
-		addr &= ~(0xffUL << 56);
-	}
-
-... and therefore does not affect TTBR1 addresses.
-
-Thanks,
-Mark.
+diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+index 985d72d1ab34..d2c4365c189f 100755
+--- a/scripts/package/mkdebian
++++ b/scripts/package/mkdebian
+@@ -56,6 +56,7 @@ set_debarch() {
+ version=$KERNELRELEASE
+ if [ -n "$KDEB_PKGVERSION" ]; then
+ 	packageversion=$KDEB_PKGVERSION
++	revision=${packageversion##*-}
+ else
+ 	revision=$(cat .version 2>/dev/null||echo 1)
+ 	packageversion=$version-$revision
+@@ -173,10 +174,12 @@ cat <<EOF > debian/rules
+ #!$(command -v $MAKE) -f
+ 
+ build:
+-	\$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} KBUILD_SRC=
++	\$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} \
++	KBUILD_BUILD_VERSION=${revision} KBUILD_SRC=
+ 
+ binary-arch:
+-	\$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} KBUILD_SRC= intdeb-pkg
++	\$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} \
++	KBUILD_BUILD_VERSION=${revision} KBUILD_SRC= intdeb-pkg
+ 
+ clean:
+ 	rm -rf debian/*tmp debian/files
+-- 
+2.17.1
