@@ -1,118 +1,140 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr740042.outbound.protection.outlook.com ([40.107.74.42]:45088
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727576AbeKODyB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Nov 2018 22:54:01 -0500
-From: Nadav Amit <namit@vmware.com>
-Subject: Re: [PATCH 1/2] Makefile: Fix distcc compilation with x86 macros
-Date: Wed, 14 Nov 2018 17:46:53 +0000
-Message-ID: <7072A2D8-30F8-45CB-AB0C-B1BE4A30259A@vmware.com>
-References: <20181112150215.508-1-namit@vmware.com>
- <20181112150215.508-2-namit@vmware.com> <20181113113000.GB4788@gmail.com>
- <40E4E1B4-EF5F-43A1-B42C-C4CF6349FC62@vmware.com>
- <48577A3F-0F76-4CCA-A959-965344D7259F@vmware.com>
- <7ff5de62-d1df-9a67-1c86-497ce00a4de4@deltatee.com>
-In-Reply-To: <7ff5de62-d1df-9a67-1c86-497ce00a4de4@deltatee.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9AC4BD521730244AAB06835F19EA0000@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from mail-it1-f195.google.com ([209.85.166.195]:54230 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725775AbeKOFY2 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 15 Nov 2018 00:24:28 -0500
+Received: by mail-it1-f195.google.com with SMTP id r12-v6so25679136ita.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 14 Nov 2018 11:19:59 -0800 (PST)
 MIME-Version: 1.0
+In-Reply-To: <20181107172306.3w2pjecaggsvl5z2@lakrids.cambridge.arm.com>
+References: <cover.1541525354.git.andreyknvl@google.com> <b8c56d36b79eecf0c331a0a7a2df12632aefccc9.1541525354.git.andreyknvl@google.com>
+ <20181107172306.3w2pjecaggsvl5z2@lakrids.cambridge.arm.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Wed, 14 Nov 2018 20:19:57 +0100
+Message-ID: <CAAeHK+wDCtL4PGmE4-XJj=wqpSHsuemKABYwpuU-=DpULtJvzA@mail.gmail.com>
+Subject: Re: [PATCH v10 09/22] kasan: add tag related helper functions
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Logan Gunthorpe <logang@deltatee.com>, Ingo Molnar <mingo@kernel.org>
-Cc: Ingo Molnar <mingo@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-RnJvbTogTG9nYW4gR3VudGhvcnBlDQpTZW50OiBOb3ZlbWJlciAxNCwgMjAxOCBhdCA3OjI5OjM4
-IEFNIEdNVA0KPiBUbzogTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT4sIEluZ28gTW9sbmFy
-IDxtaW5nb0BrZXJuZWwub3JnPg0KPiBDYzogSW5nbyBNb2xuYXIgPG1pbmdvQHJlZGhhdC5jb20+
-LCBNYXNhaGlybyBZYW1hZGEgPHlhbWFkYS5tYXNhaGlyb0Bzb2Npb25leHQuY29tPiwgTWljaGFs
-IE1hcmVrIDxtaWNoYWwubGttbEBtYXJrb3ZpLm5ldD4sIFRob21hcyBHbGVpeG5lciA8dGdseEBs
-aW51dHJvbml4LmRlPiwgQm9yaXNsYXYgUGV0a292IDxicEBhbGllbjguZGU+LCBILiBQZXRlciBB
-bnZpbiA8aHBhQHp5dG9yLmNvbT4sIFg4NiBNTCA8eDg2QGtlcm5lbC5vcmc+LCBMaW51eCBLYnVp
-bGQgbWFpbGluZyBsaXN0IDxsaW51eC1rYnVpbGRAdmdlci5rZXJuZWwub3JnPiwgTEtNTCA8bGlu
-dXgta2VybmVsQHZnZXIua2VybmVsLm9yZz4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCAxLzJdIE1h
-a2VmaWxlOiBGaXggZGlzdGNjIGNvbXBpbGF0aW9uIHdpdGggeDg2IG1hY3Jvcw0KPiANCj4gDQo+
-IA0KPiANCj4gT24gMTMvMTEvMTggMTE6MzQgQU0sIE5hZGF2IEFtaXQgd3JvdGU6DQo+PiBKdXN0
-IG9uZSBxdWVzdGlvbiBiZWZvcmUgSSBzZW5kIHYyLCBzaW5jZSBJIGhhdmUgc2Vjb25kIHRob3Vn
-aHRzLiBEb2VzIGl0DQo+PiBtYWtlIHNlbnNlIHRvIHJlcXVpcmUgdGhlIOKAnERJU1RDQ+KAnSBt
-YWtlIHBhcmFtZXRlciwgb3Igc2hvdWxkIGl0IGJlIHNldCBpbg0KPj4gdGhlIEtjb25maWc/IEl0
-IGNhbiBiZSBkZXRlY3RlZCBhdXRvbWF0aWNhbGx5LCB0aGUgc2FtZSB3YXkgZ2NjL2NsYW5nIGFy
-ZQ0KPj4gZGV0ZWN0ZWQgb3IgbWFudWFsbHkgdGhyb3VnaCBhIGNvbmZpZyBvcHRpb24uDQo+IA0K
-PiBJIHZlcnkgbXVjaCBwcmVmZXIgdGhlIG1ha2UgdmFyaWFibGUgYXMgaXQgY2FuIGJlIHNldCBp
-biB0aGUgZW52aXJvbm1lbnQNCj4gd2l0aG91dCBoYXZpbmcgdG8gY2hhbmdlIHRoZSBLY29uZmln
-Lg0KDQpBY3R1YWxseSwgd2UgY2FuIGp1c3QgZmlndXJlIG91dCB3aGV0aGVyIGRpc3RjYyBvciBp
-Y2VjYyBhcmUgdXNlZCBpbiB0aGUNCk1ha2VmaWxlIGFjY29yZGluZyB0byB0aGUg4oCcdmVyc2lv
-buKAnSwgc2ltaWxhcmx5IHRvIHRoZSB3YXkgY2xhbmcgaXMgZGV0ZWN0ZWQuDQpUaGlzIHdvdWxk
-IG5laXRoZXIgcmVxdWlyZSBuZXcgTWFrZWZpbGUgYXJndW1lbnRzIG9yIEtjb25maWcgb3B0aW9u
-cy4NCg0KV2hhdCBkbyB5b3Ugc2F5IGFib3V0IHRoZSBmb2xsb3dpbmc/DQoNCi0tID44IC0tDQoN
-ClN1YmplY3Q6IFtQQVRDSF0gTWFrZWZpbGU6IEZpeCBkaXN0Y2MgY29tcGlsYXRpb24gd2l0aCB4
-ODYgbWFjcm9zDQoNCkludHJvZHVjaW5nIHRoZSB1c2Ugb2YgYXNtIG1hY3JvcyBpbiBjLWNvZGUg
-YnJva2UgZGlzdGNjLCBzaW5jZSBpdCBvbmx5DQpzZW5kcyB0aGUgcHJlcHJvY2Vzc2VkIHNvdXJj
-ZSBmaWxlLiBUaGUgc29sdXRpb24gaXMgdG8gYnJlYWsgdGhlDQpjb21waWxhdGlvbiBpbnRvIHR3
-byBzZXBhcmF0ZSBwaGFzZXMgb2YgY29tcGlsYXRpb24gYW5kIGFzc2VtYmx5LCBhbmQNCmJldHdl
-ZW4gdGhlIHR3byBjb25jYXRlbmF0ZSB0aGUgYXNzZW1ibHkgbWFjcm9zIGFuZCB0aGUgY29tcGls
-ZWQgKHlldA0Kbm90IGFzc2VtYmxlZCkgc291cmNlIGZpbGUuIFNpbmNlIHRoaXMgaXMgbGVzcyBl
-ZmZpY2llbnQsIHRoaXMNCmNvbXBpbGF0aW9uIG1vZGUgaXMgb25seSB1c2VkIHdoZW4gZGlzdGNj
-IG9yIGljZWNjIGFyZSB1c2VkLg0KDQpOb3RlIHRoYXQgdGhlIGFzc2VtYmx5IHN0YWdlIHNob3Vs
-ZCBhbHNvIGJlIGRpc3RyaWJ1dGVkLCBpZiBkaXN0Y2MgaXMNCmNvbmZpZ3VyZWQgdXNpbmcgIkNG
-TEFHUz0tREVOQUJMRV9SRU1PVEVfQVNTRU1CTEUiLg0KDQpSZXBvcnRlZC1ieTogTG9nYW4gR3Vu
-dGhvcnBlIDxsb2dhbmdAZGVsdGF0ZWUuY29tPg0KU2lnbmVkLW9mZi1ieTogTmFkYXYgQW1pdCA8
-bmFtaXRAdm13YXJlLmNvbT4NCi0tLQ0KIE1ha2VmaWxlICAgICAgICAgICAgICAgfCAgNCArKyst
-DQogYXJjaC94ODYvTWFrZWZpbGUgICAgICB8ICA3ICsrKysrLS0NCiBzY3JpcHRzL01ha2VmaWxl
-LmJ1aWxkIHwgMzAgKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tDQogMyBmaWxlcyBjaGFu
-Z2VkLCAzNiBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvTWFr
-ZWZpbGUgYi9NYWtlZmlsZQ0KaW5kZXggOWZjZThiOTFjMTVmLi5jMDczNDlmYzM4YzcgMTAwNjQ0
-DQotLS0gYS9NYWtlZmlsZQ0KKysrIGIvTWFrZWZpbGUNCkBAIC03NDMsNyArNzQzLDkgQEAgS0JV
-SUxEX0NGTEFHUyAgICs9ICQoY2FsbCBjYy1vcHRpb24sIC1nc3BsaXQtZHdhcmYsIC1nKQ0KIGVs
-c2UNCiBLQlVJTERfQ0ZMQUdTCSs9IC1nDQogZW5kaWYNCi1LQlVJTERfQUZMQUdTCSs9IC1XYSwt
-Z2R3YXJmLTINCitBRkxBR1NfREVCVUdfSU5GTyA9IC1XYSwtZ2R3YXJmLTINCitleHBvcnQgQUZM
-QUdTX0RFQlVHX0lORk8NCitLQlVJTERfQUZMQUdTCSs9ICQoQUZMQUdTX0RFQlVHX0lORk8pDQog
-ZW5kaWYNCiBpZmRlZiBDT05GSUdfREVCVUdfSU5GT19EV0FSRjQNCiBLQlVJTERfQ0ZMQUdTCSs9
-ICQoY2FsbCBjYy1vcHRpb24sIC1nZHdhcmYtNCwpDQpkaWZmIC0tZ2l0IGEvYXJjaC94ODYvTWFr
-ZWZpbGUgYi9hcmNoL3g4Ni9NYWtlZmlsZQ0KaW5kZXggZjVkN2Y0MTM0NTI0Li5iNTk1M2NiY2M5
-YzggMTAwNjQ0DQotLS0gYS9hcmNoL3g4Ni9NYWtlZmlsZQ0KKysrIGIvYXJjaC94ODYvTWFrZWZp
-bGUNCkBAIC0yMzUsMTAgKzIzNSwxMyBAQCBhcmNoc2NyaXB0czogc2NyaXB0c19iYXNpYw0KIGFy
-Y2hoZWFkZXJzOg0KIAkkKFEpJChNQUtFKSAkKGJ1aWxkKT1hcmNoL3g4Ni9lbnRyeS9zeXNjYWxs
-cyBhbGwNCiANCitBU01fTUFDUk9fRklMRSA9IGFyY2gveDg2L2tlcm5lbC9tYWNyb3Mucw0KK2V4
-cG9ydCBBU01fTUFDUk9fRklMRQ0KKw0KIGFyY2htYWNyb3M6DQotCSQoUSkkKE1BS0UpICQoYnVp
-bGQpPWFyY2gveDg2L2tlcm5lbCBhcmNoL3g4Ni9rZXJuZWwvbWFjcm9zLnMNCisJJChRKSQoTUFL
-RSkgJChidWlsZCk9YXJjaC94ODYva2VybmVsICQoQVNNX01BQ1JPX0ZJTEUpDQogDQotQVNNX01B
-Q1JPX0ZMQUdTID0gLVdhLGFyY2gveDg2L2tlcm5lbC9tYWNyb3Mucw0KK0FTTV9NQUNST19GTEFH
-UyA9IC1XYSwkKEFTTV9NQUNST19GSUxFKQ0KIGV4cG9ydCBBU01fTUFDUk9fRkxBR1MNCiBLQlVJ
-TERfQ0ZMQUdTICs9ICQoQVNNX01BQ1JPX0ZMQUdTKQ0KIA0KZGlmZiAtLWdpdCBhL3NjcmlwdHMv
-TWFrZWZpbGUuYnVpbGQgYi9zY3JpcHRzL01ha2VmaWxlLmJ1aWxkDQppbmRleCA2YTZiZTlmNDQw
-Y2YuLmJhYzc2MWMwN2JmOCAxMDA2NDQNCi0tLSBhL3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQNCisr
-KyBiL3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQNCkBAIC0xNTUsOCArMTU1LDM0IEBAICQob2JqKS8l
-LmxsOiAkKHNyYykvJS5jIEZPUkNFDQogDQogcXVpZXRfY21kX2NjX29fYyA9IENDICQocXVpZXRf
-bW9kdGFnKSAgJEANCiANCisjIElmIGRpc3RjYyBpcyB1c2VkLCBhbmQgd2hlbiBhc3NlbWJseSBt
-YWNybyBmaWxlcyBhcmUgbmVlZGVkLCB0aGUgY29tcGlsYXRpb24NCisjIHN0YWdlIGFuZCB0aGUg
-YXNzZW1ibHkgc3RhZ2UgbmVlZHMgdG8gYmUgc2VwYXJhdGVkLiBQcm92aWRpbmcgdGhlICJESVNU
-Q0M9eSINCisjIG9wdGlvbiBlbmFibGVzIHNlcGFyYXRlIGNvbXBpbGF0aW9uIGFuZCBhc3NlbWJs
-eS4NCisNCitjbWRfY2Nfb19jX2RpcmVjdCA9ICQoQ0MpICQoY19mbGFncykgLWMgLW8gJCgxKSAk
-PA0KKw0KK2lmbmVxICgkKHNoZWxsICQoQ0MpIC0tdmVyc2lvbiAyPiYxIHwgaGVhZCAtbiAxIHwg
-Z3JlcCAtRSAnZGlzdGNjfGljZWNjJyksKQ0KK2FfZmxhZ3Nfbm9fZGVidWcgPSAkKGZpbHRlci1v
-dXQgJChBRkxBR1NfREVCVUdfSU5GTyksICQoYV9mbGFncykpDQorY19mbGFnc19ub19tYWNyb3Mg
-PSAkKGZpbHRlci1vdXQgJChBU01fTUFDUk9fRkxBR1MpLCAkKGNfZmxhZ3MpKQ0KKw0KK2NtZF9j
-Y19vX2NfdHdvX3N0ZXBzID0JCQkJCQkJXA0KKwkkKENDKSAkKGNfZmxhZ3Nfbm9fbWFjcm9zKSAk
-KERJU0FCTEVfTFRPKSAtZnZlcmJvc2UtYXNtIC1TCVwNCisJCS1vICQoQEQpLy4kKEBGOi5vPS5z
-KSAkPDsJCQkJXA0KKwljYXQgJChBU01fTUFDUk9fRklMRSkgJChARCkvLiQoQEY6Lm89LnMpID4J
-CQlcDQorCQkkKEBEKS8udG1wXyQoQEY6Lm89LnMpOwkJCQkJXA0KKwkkKENDKSAkKGFfZmxhZ3Nf
-bm9fZGVidWcpIC1jIC1vICQoMSkgJChARCkvLnRtcF8kKEBGOi5vPS5zKTsJXA0KKwlybSAtZiAk
-KEBEKS8uJChARjoubz0ucykgJChARCkvLnRtcF8kKEBGOi5vPS5zKQkJCVwNCisNCitjbWRfY2Nf
-b19jX2hlbHBlciA9CQkJCQkJCVwNCisJJChpZiAkKGZpbmRzdHJpbmcgJChBU01fTUFDUk9fRkxB
-R1MpLCQoY19mbGFncykpLAkJXA0KKwkJJChjYWxsIGNtZF9jY19vX2NfdHdvX3N0ZXBzLCAkKDEp
-KSwJCQlcDQorCQkkKGNhbGwgY21kX2NjX29fY19kaXJlY3QsICQoMSkpKQ0KK2Vsc2UNCitjbWRf
-Y2Nfb19jX2hlbHBlciA9ICQoY2FsbCBjbWRfY2Nfb19jX2RpcmVjdCwgJCgxKSkNCitlbmRpZg0K
-Kw0KIGlmbmRlZiBDT05GSUdfTU9EVkVSU0lPTlMNCi1jbWRfY2Nfb19jID0gJChDQykgJChjX2Zs
-YWdzKSAtYyAtbyAkQCAkPA0KK2NtZF9jY19vX2MgPSAkKGNhbGwgY21kX2NjX29fY19oZWxwZXIs
-JEApDQogDQogZWxzZQ0KICMgV2hlbiBtb2R1bGUgdmVyc2lvbmluZyBpcyBlbmFibGVkIHRoZSBm
-b2xsb3dpbmcgc3RlcHMgYXJlIGV4ZWN1dGVkOg0KQEAgLTE3MSw3ICsxOTcsNyBAQCBlbHNlDQog
-IyAgIHJlcGxhY2UgdGhlIHVucmVzb2x2ZWQgc3ltYm9scyBfX2NyY19leHBvcnRlZF9zeW1ib2wg
-d2l0aA0KICMgICB0aGUgYWN0dWFsIHZhbHVlIG9mIHRoZSBjaGVja3N1bSBnZW5lcmF0ZWQgYnkg
-Z2Vua3N5bXMNCiANCi1jbWRfY2Nfb19jID0gJChDQykgJChjX2ZsYWdzKSAtYyAtbyAkKEBEKS8u
-dG1wXyQoQEYpICQ8DQorY21kX2NjX29fYyA9ICQoY2FsbCBjbWRfY2Nfb19jX2hlbHBlciwkKEBE
-KS8udG1wXyQoQEYpKQ0KIA0KIGNtZF9tb2R2ZXJzaW9uc19jID0JCQkJCQkJCVwNCiAJaWYgJChP
-QkpEVU1QKSAtaCAkKEBEKS8udG1wXyQoQEYpIHwgZ3JlcCAtcSBfX2tzeW10YWI7IHRoZW4JCVwN
-Ci0tIA0KMi4xNy4xDQoNCiANCg0K
+On Wed, Nov 7, 2018 at 6:23 PM, Mark Rutland <mark.rutland@arm.com> wrote:
+> On Tue, Nov 06, 2018 at 06:30:24PM +0100, Andrey Konovalov wrote:
+>> This commit adds a few helper functions, that are meant to be used to
+>> work with tags embedded in the top byte of kernel pointers: to set, to
+>> get or to reset (set to 0xff) the top byte.
+>>
+>> Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+>> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
+>> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+>> ---
+>>  arch/arm64/mm/kasan_init.c |  2 ++
+>>  include/linux/kasan.h      | 13 +++++++++
+>>  mm/kasan/kasan.h           | 55 ++++++++++++++++++++++++++++++++++++++
+>>  mm/kasan/tags.c            | 37 +++++++++++++++++++++++++
+>>  4 files changed, 107 insertions(+)
+>>
+>> diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
+>> index 18ebc8994a7b..370b19d0e2fb 100644
+>> --- a/arch/arm64/mm/kasan_init.c
+>> +++ b/arch/arm64/mm/kasan_init.c
+>> @@ -249,6 +249,8 @@ void __init kasan_init(void)
+>>       memset(kasan_zero_page, KASAN_SHADOW_INIT, PAGE_SIZE);
+>>       cpu_replace_ttbr1(lm_alias(swapper_pg_dir));
+>>
+>> +     kasan_init_tags();
+>> +
+>>       /* At this point kasan is fully initialized. Enable error messages */
+>>       init_task.kasan_depth = 0;
+>>       pr_info("KernelAddressSanitizer initialized\n");
+>> diff --git a/include/linux/kasan.h b/include/linux/kasan.h
+>> index 7f6574c35c62..4c9d6f9029f2 100644
+>> --- a/include/linux/kasan.h
+>> +++ b/include/linux/kasan.h
+>> @@ -169,6 +169,19 @@ static inline void kasan_cache_shutdown(struct kmem_cache *cache) {}
+>>
+>>  #define KASAN_SHADOW_INIT 0xFF
+>>
+>> +void kasan_init_tags(void);
+>> +
+>> +void *kasan_reset_tag(const void *addr);
+>> +
+>> +#else /* CONFIG_KASAN_SW_TAGS */
+>> +
+>> +static inline void kasan_init_tags(void) { }
+>> +
+>> +static inline void *kasan_reset_tag(const void *addr)
+>> +{
+>> +     return (void *)addr;
+>> +}
+>> +
+>
+>> +#ifdef CONFIG_KASAN_SW_TAGS
+>> +
+>> +#define KASAN_PTR_TAG_SHIFT 56
+>> +#define KASAN_PTR_TAG_MASK (0xFFUL << KASAN_PTR_TAG_SHIFT)
+>> +
+>> +u8 random_tag(void);
+>> +
+>> +static inline void *set_tag(const void *addr, u8 tag)
+>> +{
+>> +     u64 a = (u64)addr;
+>> +
+>> +     a &= ~KASAN_PTR_TAG_MASK;
+>> +     a |= ((u64)tag << KASAN_PTR_TAG_SHIFT);
+>> +
+>> +     return (void *)a;
+>> +}
+>> +
+>> +static inline u8 get_tag(const void *addr)
+>> +{
+>> +     return (u8)((u64)addr >> KASAN_PTR_TAG_SHIFT);
+>> +}
+>> +
+>> +static inline void *reset_tag(const void *addr)
+>> +{
+>> +     return set_tag(addr, KASAN_TAG_KERNEL);
+>> +}
+>
+> We seem to be duplicating this functionality in several places.
+>
+> Could we please make it so that the arch code defines macros:
+>
+> arch_kasan_set_tag(addr, tag)
+> arch_kasan_get_tag(addr)
+> arch_kasan_reset_tag(addr)
+>
+> ... and use thoses consistently rather than open-coding them?
+>
+>> +
+>> +#else /* CONFIG_KASAN_SW_TAGS */
+>> +
+>> +static inline u8 random_tag(void)
+>> +{
+>> +     return 0;
+>> +}
+>> +
+>> +static inline void *set_tag(const void *addr, u8 tag)
+>> +{
+>> +     return (void *)addr;
+>> +}
+>> +
+>> +static inline u8 get_tag(const void *addr)
+>> +{
+>> +     return 0;
+>> +}
+>> +
+>> +static inline void *reset_tag(const void *addr)
+>> +{
+>> +     return (void *)addr;
+>> +}
+>
+> ... these can be defined in linux/kasan.h as:
+>
+> #define arch_kasan_set_tag(addr, tag)   (addr)
+> #define arch_kasan_get_tag(addr)        0
+> #define arch_kasan_reset_tag(addr)      (addr)
+
+Will do in v11, thanks!
