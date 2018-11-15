@@ -1,46 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:43235 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726169AbeKOKyT (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:38732 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726379AbeKOKy1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Nov 2018 05:54:19 -0500
-Received: by mail-pf1-f194.google.com with SMTP id g7-v6so8767435pfo.10
-        for <linux-kbuild@vger.kernel.org>; Wed, 14 Nov 2018 16:48:43 -0800 (PST)
-From: Paul Walmsley <paul.walmsley@sifive.com>
-Date: Wed, 14 Nov 2018 16:48:41 -0800 (PST)
-Subject: Re: [PATCH 0/2] modpost: skip section mismatch warnings on ELF local
- symbols by default
-In-Reply-To: <20181020140835.GA3351@ravnborg.org>
-Message-ID: <alpine.DEB.2.21.9999.1811141647190.22938@viisi.sifive.com>
-References: <20181020131911.22443-1-paul.walmsley@sifive.com> <20181020140835.GA3351@ravnborg.org>
+        Thu, 15 Nov 2018 05:54:27 -0500
+Subject: Re: hidden string Kconfig ?
+References: <20181114223211.b4a2gjmt5pvtg2bh@zorba>
+ <6c9ff44b-5f27-15d0-c48f-cfd1e2ed33e4@infradead.org>
+ <20181115000756.k2fsgzmswdbikpfb@zorba>
+ <c13367b1-c28b-b889-ed91-233090f1410c@infradead.org>
+ <20181115004706.r6azcyjd2fhtktio@zorba>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <3d1cc558-17bf-d2b4-4121-33fff0625e22@infradead.org>
+Date: Wed, 14 Nov 2018 16:48:51 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+In-Reply-To: <20181115004706.r6azcyjd2fhtktio@zorba>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Russell King <linux@armlinux.org.uk>, Jim Wilson <jimw@sifive.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+To: Daniel Walker <danielwa@cisco.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
-Hi Sam,
+On 11/14/18 4:47 PM, Daniel Walker wrote:
+> On Wed, Nov 14, 2018 at 04:37:43PM -0800, Randy Dunlap wrote:
+>> On 11/14/18 4:07 PM, Daniel Walker wrote:
+>>> On Wed, Nov 14, 2018 at 03:16:17PM -0800, Randy Dunlap wrote:
+>>>> Hi,
+>>>>
+>>>> There are several "string" Kconfig symbols in init/Kconfig that do not have
+>>>> a prompt string after them.  I believe that these do what you are asking about.
+>>>> If not, please provide your example that is not working.
+>>>>
+>>>> Or:  this one works for me:
+>>>>
+>>>> ---
+>>>>  init/Kconfig |    4 ++++
+>>>>  1 file changed, 4 insertions(+)
+>>>>
+>>>> --- linux-next-20181114.orig/init/Kconfig
+>>>> +++ linux-next-20181114/init/Kconfig
+>>>> @@ -1858,6 +1858,10 @@ config CMDLINE
+>>>>  
+>>>>  endif
+>>>>  
+>>>> +config SPECIAL_STRING
+>>>> +	string
+>>>> +	default "special"
+>>>> +
+>>>>  endmenu		# General setup
+>>>>  
+>>>>  source "arch/Kconfig"
+>>>>
+>>>>
+>>>> and "make oldconfig" gives me a .config file that contains:
+>>>> CONFIG_SPECIAL_STRING="special"
+>>>
+>>> I have this (in init/Kconfig),
+>>>
+>>> config CMDLINE
+>>>         string
+>>>
+>>> then inside my .config I have this,
+>>> CONFIG_CMDLINE="console=ttyS0"
+>>>
+>>> if you run  "make menuconfig", and change something then save. The
+>>> CONFIG_CMDLINE is gone.
+>>>
+>>> What I would want is for that option to remain untouched.
+>>
+>> Interesting.  I guess luckily for me I was testing with today's linux-next,
+>> which contains the CMDLINE Kconfig symbols in init/Kconfig, including this one:
+>>
+>> config CMDLINE
+>> 	string ""
+>>
+>>
+>> and that does work with your "console=ttyS0" + make oldconfig or make xconfig.
+>>
+>> But apparently the string does need to have a prompt ("").
+>> Without that (as you listed it), the value does disappear.
+> 
+> Yeah, the patch your talking about is from my -next tree. I'm trying to get rid
+> of the prompt .. There is no description, and no one should be setting that.
+> It's only there so that people don't lose their old CONFIG_CMDLINE.
 
-On Sat, 20 Oct 2018, Sam Ravnborg wrote:
+Yeah, not surprised to hear that.
 
-> modpost is not supposed to be used outside the kernel build.
-> And therefore if we introduce a new option then the infrastructure
-> to enable that option should also be in place.
-> In this particular case I cannot see why we should add the possibility
-> to include local symbols, in other words do not add the option.
-> Wait a few days before you kill it, maybe others see the usefulness of it.
+> It seems like Kconfig should be able to handle this because you may have an
+> obsolete string option which you may want to retain silently in the Kconfig.
 
-I've dropped the optionality from the patch set.
+OK, I'll let the kconfig maintainer comment on that.
 
-> I checked if there were any options supported by modpost that
-> was not configurable in makefile.modpost.
-> And I could see that the -M and -K options in getopt() was leftovers.
-> The code that used these option was was dropped in:
-> a8773769d1a1e08d0ca15f890515401ab3860637 ("Kbuild: clear marker out of modpost")
->
-> Could you add a patch that delete these on top of what you already have.
-
-Done.  This patch is now in the v2 set which should appear shortly.
-
-- Paul
+-- 
+~Randy
