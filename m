@@ -1,54 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:52245 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:52830 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728519AbeKOSgO (ORCPT
+        with ESMTP id S1728673AbeKOSgc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Nov 2018 13:36:14 -0500
+        Thu, 15 Nov 2018 13:36:32 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/8] kbuild: remove redundant 'set -e' from filechk_* defines
-Date: Thu, 15 Nov 2018 17:27:08 +0900
-Message-Id: <1542270435-11181-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 0/8] kbuild: clean-up modversion, TRIM_UNUSED_KSYMS, if_changed_rule, etc.
+Date: Thu, 15 Nov 2018 17:27:07 +0900
+Message-Id: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-um@lists.infradead.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Richard Weinberger <richard@nod.at>, Jeff Dike <jdike@addtoit.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arch@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>, linux-um@lists.infradead.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Richard Weinberger <richard@nod.at>, Will Deacon <will.deacon@arm.com>, Ingo Molnar <mingo@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Jeff Dike <jdike@addtoit.com>
 
-The filechk macro in scripts/Kbuild.include already sets 'set -e'.
+As a Kbuild maintainer, I always struggle to keep the core makefiles
+clean because people tend to squeeze more and more clutter code into
+the kbuild core in order to do what they want to do.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+The biggest step forward in this series is to re-implement
+the build trick of CONFIG_TRIM_UNUSED_KSYMS in a cleaner way.
+scripts/Kbuild.include now looks nice again.
+Also, in my rough estimation, building with CONFIG_TRIM_UNUSED_KSYMS
+became 40-50 % faster.
 
- arch/um/Makefile     | 2 +-
- scripts/Makefile.lib | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Besides those, nice cleanups are here and there.
 
-diff --git a/arch/um/Makefile b/arch/um/Makefile
-index ab1066c..71ff3d0 100644
---- a/arch/um/Makefile
-+++ b/arch/um/Makefile
-@@ -152,7 +152,7 @@ $(HOST_DIR)/um/user-offsets.s: __headers FORCE
- 	$(Q)$(MAKE) $(build)=$(HOST_DIR)/um $@
- 
- define filechk_gen-asm-offsets
--        (set -e; \
-+        ( \
-          echo "/*"; \
-          echo " * DO NOT MODIFY."; \
-          echo " *"; \
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 8fe4468..ae3ae97 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -406,7 +406,7 @@ endef
- # Use filechk to avoid rebuilds when a header changes, but the resulting file
- # does not
- define filechk_offsets
--	(set -e; \
-+	( \
- 	 echo "#ifndef $2"; \
- 	 echo "#define $2"; \
- 	 echo "/*"; \
+
+
+Masahiro Yamada (8):
+  kbuild: remove redundant 'set -e' from filechk_* defines
+  kbuild: remove redundant 'set -e' from sub_cmd_record_mcount
+  kbuild: refactor modversions build rules
+  kbuild: simplify dependency generation for CONFIG_TRIM_UNUSED_KSYMS
+  kbuild: change if_changed_rule to accept multi-line recipe
+  kbuild: remove trailing semicolon from cmd_* passed to if_changed_rule
+  kbuild: refactor if_changed and if_changed_dep
+  kbuild: remove redundant 'set -e' from cmd_* defines
+
+ arch/um/Makefile             |  2 +-
+ include/asm-generic/export.h | 13 +++---
+ include/linux/export.h       | 18 ++++----
+ scripts/Kbuild.include       | 44 +++-----------------
+ scripts/Makefile.build       | 98 +++++++++++++++++++-------------------------
+ scripts/Makefile.lib         |  2 +-
+ scripts/basic/fixdep.c       | 31 ++------------
+ scripts/gen_ksymdeps.sh      | 25 +++++++++++
+ scripts/package/Makefile     |  1 -
+ 9 files changed, 96 insertions(+), 138 deletions(-)
+ create mode 100755 scripts/gen_ksymdeps.sh
+
 -- 
 2.7.4
