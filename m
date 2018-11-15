@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:33524 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:33022 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388928AbeKPFPP (ORCPT
+        with ESMTP id S2388909AbeKPFPM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Nov 2018 00:15:15 -0500
+        Fri, 16 Nov 2018 00:15:12 -0500
 From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 8/9] rapidio: consolidate RAPIDIO config entry in drivers/rapidio
-Date: Thu, 15 Nov 2018 20:05:36 +0100
-Message-Id: <20181115190538.17016-9-hch@lst.de>
+Subject: [PATCH 6/9] PCI: consolidate the PCI_SYSCALL symbol
+Date: Thu, 15 Nov 2018 20:05:34 +0100
+Message-Id: <20181115190538.17016-7-hch@lst.de>
 In-Reply-To: <20181115190538.17016-1-hch@lst.de>
 References: <20181115190538.17016-1-hch@lst.de>
 MIME-Version: 1.0
@@ -17,205 +17,209 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Matt Porter <mporter@kernel.crashing.org>, Alexandre Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-alpha@vger.kernel.org, linux-mips@linux-mips.org
 
-There is no good reason to duplicate the RAPIDIO menu in various
-architectures.  Instead provide a selectable HAVE_RAPIDIO symbol
-that indicates native availability of RAPIDIO support and the handle
-the rest in drivers/pci.  This also means we now provide support
-for PCI(e) to Rapidio bridges for every architecture instead of a
-limited subset.
+Let architectures select the syscall support instead of duplicating the
+kconfig entry.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- arch/mips/Kconfig                   | 15 +--------------
- arch/powerpc/Kconfig                | 14 +-------------
- arch/powerpc/platforms/85xx/Kconfig |  8 ++++----
- arch/powerpc/platforms/86xx/Kconfig |  4 ++--
- arch/x86/Kconfig                    |  9 ---------
- drivers/Kconfig                     |  1 +
- drivers/rapidio/Kconfig             | 11 +++++++++++
- 7 files changed, 20 insertions(+), 42 deletions(-)
+ arch/alpha/Kconfig      | 4 +---
+ arch/arc/Kconfig        | 4 +---
+ arch/arm/Kconfig        | 4 +---
+ arch/arm64/Kconfig      | 4 +---
+ arch/ia64/Kconfig       | 4 +---
+ arch/microblaze/Kconfig | 4 +---
+ arch/powerpc/Kconfig    | 4 +---
+ arch/sparc/Kconfig      | 4 +---
+ drivers/pci/Kconfig     | 3 +++
+ 9 files changed, 11 insertions(+), 24 deletions(-)
 
-diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
-index 3912250ff813..67fbd4952ff4 100644
---- a/arch/mips/Kconfig
-+++ b/arch/mips/Kconfig
-@@ -892,7 +892,7 @@ config CAVIUM_OCTEON_SOC
- 	bool "Cavium Networks Octeon SoC based boards"
- 	select CEVT_R4K
- 	select ARCH_HAS_PHYS_TO_DMA
--	select HAS_RAPIDIO
-+	select HAVE_RAPIDIO
- 	select PHYS_ADDR_T_64BIT
- 	select SYS_SUPPORTS_64BIT_KERNEL
- 	select SYS_SUPPORTS_BIG_ENDIAN
-@@ -3107,19 +3107,6 @@ config ZONE_DMA
- config ZONE_DMA32
+diff --git a/arch/alpha/Kconfig b/arch/alpha/Kconfig
+index 2bf98e581684..1f679508bc34 100644
+--- a/arch/alpha/Kconfig
++++ b/arch/alpha/Kconfig
+@@ -8,6 +8,7 @@ config ALPHA
+ 	select ARCH_USE_CMPXCHG_LOCKREF
+ 	select FORCE_PCI if !ALPHA_JENSEN
+ 	select PCI_DOMAINS if PCI
++	select PCI_SYSCALL if PCI
+ 	select HAVE_AOUT
+ 	select HAVE_IDE
+ 	select HAVE_OPROFILE
+@@ -322,9 +323,6 @@ config ISA_DMA_API
  	bool
- 
--config HAS_RAPIDIO
--	bool
--	default n
--
--config RAPIDIO
--	tristate "RapidIO support"
--	depends on HAS_RAPIDIO || PCI
--	help
--	  If you say Y here, the kernel will include drivers and
--	  infrastructure code to support RapidIO interconnect devices.
--
--source "drivers/rapidio/Kconfig"
--
- endmenu
- 
- config TRAD_SIGNALS
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index cc8435d87949..f2f70cc2bd44 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -939,26 +939,14 @@ config PCI_8260
- 	select PPC_INDIRECT_PCI
  	default y
  
--config HAS_RAPIDIO
--	bool
+-config PCI_SYSCALL
+-	def_bool PCI
 -
--config RAPIDIO
--	tristate "RapidIO support"
--	depends on HAS_RAPIDIO || PCI
--	help
--	  If you say Y here, the kernel will include drivers and
--	  infrastructure code to support RapidIO interconnect devices.
+ config ALPHA_NONAME
+ 	bool
+ 	depends on ALPHA_BOOK1 || ALPHA_NONAME_CH
+diff --git a/arch/arc/Kconfig b/arch/arc/Kconfig
+index 5d2dde4b04cd..54d618960a14 100644
+--- a/arch/arc/Kconfig
++++ b/arch/arc/Kconfig
+@@ -46,6 +46,7 @@ config ARC
+ 	select OF
+ 	select OF_EARLY_FLATTREE
+ 	select OF_RESERVED_MEM
++	select PCI_SYSCALL if PCI
+ 	select PERF_USE_VMALLOC if ARC_CACHE_VIPT_ALIASING
+ 
+ config ARCH_HAS_CACHE_LINE_SIZE
+@@ -550,7 +551,4 @@ config FORCE_MAX_ZONEORDER
+ 	default "12" if ARC_HUGEPAGE_16M
+ 	default "11"
+ 
+-config PCI_SYSCALL
+-	def_bool PCI
 -
- config FSL_RIO
- 	bool "Freescale Embedded SRIO Controller support"
--	depends on RAPIDIO = y && HAS_RAPIDIO
-+	depends on RAPIDIO = y && HAVE_RAPIDIO
- 	default "n"
- 	---help---
- 	  Include support for RapidIO controller on Freescale embedded
- 	  processors (MPC8548, MPC8641, etc).
+ source "kernel/power/Kconfig"
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 5eab9f943723..73d0f5e9feb7 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -103,6 +103,7 @@ config ARM
+ 	select OF_RESERVED_MEM if OF
+ 	select OLD_SIGACTION
+ 	select OLD_SIGSUSPEND3
++	select PCI_SYSCALL if PCI
+ 	select PERF_USE_VMALLOC
+ 	select REFCOUNT_FULL
+ 	select RTC_LIB
+@@ -1218,9 +1219,6 @@ config PCI_NANOENGINE
+ 	help
+ 	  Enable PCI on the BSE nanoEngine board.
  
--source "drivers/rapidio/Kconfig"
+-config PCI_SYSCALL
+-	def_bool PCI
 -
- endmenu
+ config PCI_HOST_ITE8152
+ 	bool
+ 	depends on PCI && MACH_ARMCORE
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 0eba26143350..8db186f8442b 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -166,6 +166,7 @@ config ARM64
+ 	select OF_RESERVED_MEM
+ 	select PCI_DOMAINS_GENERIC if PCI
+ 	select PCI_ECAM if ACPI
++	select PCI_SYSCALL if PCI
+ 	select POWER_RESET
+ 	select POWER_SUPPLY
+ 	select REFCOUNT_FULL
+@@ -289,9 +290,6 @@ config ARCH_PROC_KCORE_TEXT
  
- config NONSTATIC_KERNEL
-diff --git a/arch/powerpc/platforms/85xx/Kconfig b/arch/powerpc/platforms/85xx/Kconfig
-index ba0ea84ce578..d1af0ee2f8c8 100644
---- a/arch/powerpc/platforms/85xx/Kconfig
-+++ b/arch/powerpc/platforms/85xx/Kconfig
-@@ -66,7 +66,7 @@ config MPC85xx_CDS
- 	bool "Freescale MPC85xx CDS"
- 	select DEFAULT_UIMAGE
- 	select PPC_I8259
--	select HAS_RAPIDIO
-+	select HAVE_RAPIDIO
- 	help
- 	  This option enables support for the MPC85xx CDS board
+ source "arch/arm64/Kconfig.platforms"
  
-@@ -74,7 +74,7 @@ config MPC85xx_MDS
- 	bool "Freescale MPC85xx MDS"
- 	select DEFAULT_UIMAGE
- 	select PHYLIB if NETDEVICES
--	select HAS_RAPIDIO
-+	select HAVE_RAPIDIO
- 	select SWIOTLB
- 	help
- 	  This option enables support for the MPC85xx MDS board
-@@ -219,7 +219,7 @@ config PPA8548
- 	help
- 	  This option enables support for the Prodrive PPA8548 board.
- 	select DEFAULT_UIMAGE
--	select HAS_RAPIDIO
-+	select HAVE_RAPIDIO
- 
- config GE_IMP3A
- 	bool "GE Intelligent Platforms IMP3A"
-@@ -277,7 +277,7 @@ config CORENET_GENERIC
- 	select SWIOTLB
- 	select GPIOLIB
- 	select GPIO_MPC8XXX
--	select HAS_RAPIDIO
-+	select HAVE_RAPIDIO
- 	select PPC_EPAPR_HV_PIC
- 	help
- 	  This option enables support for the FSL CoreNet based boards.
-diff --git a/arch/powerpc/platforms/86xx/Kconfig b/arch/powerpc/platforms/86xx/Kconfig
-index a4fa31a40502..413837a63242 100644
---- a/arch/powerpc/platforms/86xx/Kconfig
-+++ b/arch/powerpc/platforms/86xx/Kconfig
-@@ -15,7 +15,7 @@ config MPC8641_HPCN
- 	select PPC_I8259
- 	select DEFAULT_UIMAGE
- 	select FSL_ULI1575 if PCI
--	select HAS_RAPIDIO
-+	select HAVE_RAPIDIO
- 	select SWIOTLB
- 	help
- 	  This option enables support for the MPC8641 HPCN board.
-@@ -57,7 +57,7 @@ config GEF_SBC610
- 	select MMIO_NVRAM
- 	select GPIOLIB
- 	select GE_FPGA
--	select HAS_RAPIDIO
-+	select HAVE_RAPIDIO
- 	help
- 	  This option enables support for the GE SBC610.
- 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 659d59d7f033..4c8052a7c3f9 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -2811,15 +2811,6 @@ config AMD_NB
- 	def_bool y
- 	depends on CPU_SUP_AMD && PCI
- 
--config RAPIDIO
--	tristate "RapidIO support"
--	depends on PCI
--	help
--	  If enabled this option will include drivers and the core
--	  infrastructure code to support RapidIO interconnect devices.
+-config PCI_SYSCALL
+-	def_bool PCI
 -
--source "drivers/rapidio/Kconfig"
+ menu "Kernel Features"
+ 
+ menu "ARM errata workarounds via the alternatives framework"
+diff --git a/arch/ia64/Kconfig b/arch/ia64/Kconfig
+index 7cf4b8bd779f..8f18d90c933d 100644
+--- a/arch/ia64/Kconfig
++++ b/arch/ia64/Kconfig
+@@ -16,6 +16,7 @@ config IA64
+ 	select ARCH_MIGHT_HAVE_ACPI_PDC if ACPI
+ 	select FORCE_PCI if (!IA64_HP_SIM)
+ 	select PCI_DOMAINS if PCI
++	select PCI_SYSCALL if PCI
+ 	select HAVE_UNSTABLE_SCHED_CLOCK
+ 	select HAVE_EXIT_THREAD
+ 	select HAVE_IDE
+@@ -545,9 +546,6 @@ if !IA64_HP_SIM
+ 
+ menu "Bus options (PCI, PCMCIA)"
+ 
+-config PCI_SYSCALL
+-	def_bool PCI
 -
- config X86_SYSFB
- 	bool "Mark VGA/VBE/EFI FB as generic system framebuffer"
- 	help
-diff --git a/drivers/Kconfig b/drivers/Kconfig
-index 58ee88c36cf5..065d308fcb00 100644
---- a/drivers/Kconfig
-+++ b/drivers/Kconfig
-@@ -6,6 +6,7 @@ menu "Device Drivers"
- source "drivers/amba/Kconfig"
- source "drivers/pci/Kconfig"
  source "drivers/pcmcia/Kconfig"
-+source "drivers/rapidio/Kconfig"
  
+ endmenu
+diff --git a/arch/microblaze/Kconfig b/arch/microblaze/Kconfig
+index 551252d5c561..b3012bb4e2b2 100644
+--- a/arch/microblaze/Kconfig
++++ b/arch/microblaze/Kconfig
+@@ -37,6 +37,7 @@ config MICROBLAZE
+ 	select OF
+ 	select OF_EARLY_FLATTREE
+ 	select PCI_DOMAINS_GENERIC if PCI
++	select PCI_SYSCALL if PCI
+ 	select TRACING_SUPPORT
+ 	select VIRT_TO_BUS
+ 	select CPU_NO_EFFICIENT_FFS
+@@ -268,9 +269,6 @@ endmenu
  
- source "drivers/base/Kconfig"
-diff --git a/drivers/rapidio/Kconfig b/drivers/rapidio/Kconfig
-index d6d2f20c4597..e3d8fe41b50c 100644
---- a/drivers/rapidio/Kconfig
-+++ b/drivers/rapidio/Kconfig
-@@ -1,6 +1,17 @@
- #
- # RapidIO configuration
- #
-+
-+config HAVE_RAPIDIO
+ menu "Bus Options"
+ 
+-config PCI_SYSCALL
+-	def_bool PCI
+-
+ config PCI_XILINX
+ 	bool "Xilinx PCI host bridge support"
+ 	depends on PCI
+diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+index edd3686eec28..cbdcd1c0b1e0 100644
+--- a/arch/powerpc/Kconfig
++++ b/arch/powerpc/Kconfig
+@@ -237,6 +237,7 @@ config PPC
+ 	select OLD_SIGACTION			if PPC32
+ 	select OLD_SIGSUSPEND
+ 	select PCI_DOMAINS			if PCI
++	select PCI_SYSCALL			if PCI
+ 	select RTC_LIB
+ 	select SPARSE_IRQ
+ 	select SYSCTL_EXCEPTION_TRACE
+@@ -932,9 +933,6 @@ config FSL_GTM
+ 	help
+ 	  Freescale General-purpose Timers support
+ 
+-config PCI_SYSCALL
+-	def_bool PCI
+-
+ config PCI_8260
+ 	bool
+ 	depends on PCI && 8260
+diff --git a/arch/sparc/Kconfig b/arch/sparc/Kconfig
+index d2b760b4d2d2..20417b8b12a5 100644
+--- a/arch/sparc/Kconfig
++++ b/arch/sparc/Kconfig
+@@ -39,6 +39,7 @@ config SPARC
+ 	select GENERIC_STRNCPY_FROM_USER
+ 	select GENERIC_STRNLEN_USER
+ 	select MODULES_USE_ELF_RELA
++	select PCI_SYSCALL if PCI
+ 	select ODD_RT_SIGACTION
+ 	select OLD_SIGSUSPEND
+ 	select ARCH_HAS_SG_CHAIN
+@@ -474,9 +475,6 @@ config SUN_LDOMS
+ 	  Say Y here is you want to support virtual devices via
+ 	  Logical Domains.
+ 
+-config PCI_SYSCALL
+-	def_bool PCI
+-
+ config PCIC_PCI
+ 	bool
+ 	depends on PCI && SPARC32 && !SPARC_LEON
+diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+index 95812fc4958c..904847d173de 100644
+--- a/drivers/pci/Kconfig
++++ b/drivers/pci/Kconfig
+@@ -30,6 +30,9 @@ config PCI_DOMAINS_GENERIC
+ 	select PCI_DOMAINS
+ 	bool
+ 
++config PCI_SYSCALL
 +	bool
 +
-+menuconfig RAPIDIO
-+	tristate "RapidIO support"
-+	depends on HAVE_RAPIDIO || PCI
-+	help
-+	  If you say Y here, the kernel will include drivers and
-+	  infrastructure code to support RapidIO interconnect devices.
-+
- source "drivers/rapidio/devices/Kconfig"
+ source "drivers/pci/pcie/Kconfig"
  
- config RAPIDIO_DISC_TIMEOUT
+ config PCI_MSI
 -- 
 2.19.1
