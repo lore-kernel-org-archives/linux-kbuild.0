@@ -1,51 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it1-f196.google.com ([209.85.166.196]:40601 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387989AbeKOXu6 (ORCPT
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:39412 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729034AbeKPC24 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Nov 2018 18:50:58 -0500
-Received: by mail-it1-f196.google.com with SMTP id e11so29255987itl.5
-        for <linux-kbuild@vger.kernel.org>; Thu, 15 Nov 2018 05:43:03 -0800 (PST)
+        Thu, 15 Nov 2018 21:28:56 -0500
+Received: by mail-oi1-f195.google.com with SMTP id 192-v6so17206848oii.6
+        for <linux-kbuild@vger.kernel.org>; Thu, 15 Nov 2018 08:20:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAAeHK+yAve4fBg_UZQsNdVJ5W-7v8tQnRa=amQMyBeE_yHcq5g@mail.gmail.com>
-References: <cover.1541525354.git.andreyknvl@google.com> <b2aa056b65b8f1a410379bf2f6ef439d5d99e8eb.1541525354.git.andreyknvl@google.com>
- <20181107165200.oaou6cx2lmjzmjyl@lakrids.cambridge.arm.com> <CAAeHK+yAve4fBg_UZQsNdVJ5W-7v8tQnRa=amQMyBeE_yHcq5g@mail.gmail.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Thu, 15 Nov 2018 14:43:02 +0100
-Message-ID: <CAAeHK+yaYc4gOxWdvJALwUffAFDVwQe7+4Rwx=Ux936c_LtBFw@mail.gmail.com>
-Subject: Re: [PATCH v10 08/22] kasan, arm64: untag address in __kimg_to_phys
- and _virt_addr_is_linear
+References: <20181114223211.b4a2gjmt5pvtg2bh@zorba> <6c9ff44b-5f27-15d0-c48f-cfd1e2ed33e4@infradead.org>
+ <20181115000756.k2fsgzmswdbikpfb@zorba> <c13367b1-c28b-b889-ed91-233090f1410c@infradead.org>
+ <20181115004706.r6azcyjd2fhtktio@zorba> <3d1cc558-17bf-d2b4-4121-33fff0625e22@infradead.org>
+ <CAK7LNASk2NrsWkQs-pFAKFLG1-aDm29SQJJg378Voifqb320bw@mail.gmail.com> <20181115132516.o5eiomuhk4tq5cmr@zorba>
+In-Reply-To: <20181115132516.o5eiomuhk4tq5cmr@zorba>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Thu, 15 Nov 2018 17:20:16 +0100
+Message-ID: <CAFkk2KRS0+7moW9VKjrBaNuXCVkowrQGymGcAFeNz64Yq6hUCg@mail.gmail.com>
+Subject: Re: hidden string Kconfig ?
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: danielwa@cisco.com
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Wed, Nov 14, 2018 at 8:23 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
-> On Wed, Nov 7, 2018 at 5:52 PM, Mark Rutland <mark.rutland@arm.com> wrote:
->>>  /*
->>> @@ -232,7 +241,7 @@ static inline unsigned long kaslr_offset(void)
->>>  #define __is_lm_address(addr)        (!!((addr) & BIT(VA_BITS - 1)))
->>>
->>>  #define __lm_to_phys(addr)   (((addr) & ~PAGE_OFFSET) + PHYS_OFFSET)
->>> -#define __kimg_to_phys(addr) ((addr) - kimage_voffset)
->>> +#define __kimg_to_phys(addr) (KASAN_RESET_TAG(addr) - kimage_voffset)
->>
->> IIUC You need to adjust __lm_to_phys() too, since that could be passed
->> an address from SLAB.
->>
->> Maybe that's done in a later patch, but if so it's confusing to split it
->> out that way. It would be nicer to fix all the *_to_*() helpers in one
->> go.
+On Thu, Nov 15, 2018 at 2:25 PM Daniel Walker <danielwa@cisco.com> wrote:
 >
-> __lm_to_phys() does & ~PAGE_OFFSET, so it resets the tag by itself. I
-> can add an explicit __tag_reset() if you think it makes sense.
+> On Thu, Nov 15, 2018 at 11:50:56AM +0900, Masahiro Yamada wrote:
+> >
+> >
+> > In current Kconfig, a 'string' type symbol is written to the .config when
+> >
+> > [1] it has a visible prompt
+> >     https://github.com/masahir0y/linux/blob/v4.19/scripts/kconfig/symbol.c#L364
+> >
+> >    or
+> >
+> > [2] it has a default property
+> >     https://github.com/masahir0y/linux/blob/v4.19/scripts/kconfig/symbol.c#L421
+> >
+>
+> Ok.
+>
+>
+> >
+> > I am open to changing the behavior
+> > as long as it keeps grammatical consistency, though.
+> >
+> >
+> > As far as I understood this particular case,
+> > CONFIG_CMDLINE will go away after the GENERIC_CMDLINE migration is done.
+> >
+> > (At least, upstream x86 and powerpc defconfig files seem complete).
+> >
+> >
+> >
+> > Perhaps, some prompt for migration could be useful?
+> >
+> > config CMDLINE
+> >         string "(LEGACY) Please make this empty and use CMDLINE_PREPEND instead"
+>
+> I think it would be confusing to leave it. The reason I wanted to have it in
+> there silently is so I can print a warning, or BUILD_BUG_ON (which is what I
+> currently do). Just so that people 1) don't lose those options, and 2) So that I
+> can remind or catch people when they don't notice there was a change. Russell
+> (ARM32 maintainer) complained in this regard.
+>
+> I'll look into the Kconfig code and see if I can make something acceptable.
+>
+> Daniel
 
-Hi Mark,
+Note that it'd be inconsistent for string symbols to respect user
+values (values from .config files) when they don't have a prompt. A
+prompt says that the symbol can be assigned a value by the user.
+Assigning a symbol a value in a .config file is the same as assigning
+it a value in the menuconfig interface.
 
-I think I've addressed all of your comments except for this one. Do
-you think it makes sense to add explicit __tag_reset() calls to
-__lm_to_phys() and a few other macros, that already set the tag to 0
-by doing & ~PAGE_OFFSET?
+(See my previous message for why promptless symbol still end up in
+.config. The assignments to promptless symbols don't influence the
+symbol's value on the Kconfig side.)
 
-Thanks!
+I wonder if having an exception for a one-off like this is really
+worth it. It might make the Kconfig semantics harder to understand.
+The rule now is that symbols without prompts always derive their value
+from other symbols (via defaults, in this case).
+
+See https://docs.zephyrproject.org/latest/application/kconfig-tips.html#optional-prompts
+for a way to make prompts optional. Not sure if it'd be helpful here
+though.
+
+Cheers,
+Ulf
