@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:50789 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:50702 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729052AbeKOSf1 (ORCPT
+        with ESMTP id S1728519AbeKOSfY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Nov 2018 13:35:27 -0500
+        Thu, 15 Nov 2018 13:35:24 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 5/8] kbuild: change if_changed_rule to accept multi-line recipe
-Date: Thu, 15 Nov 2018 17:27:12 +0900
-Message-Id: <1542270435-11181-6-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 6/8] kbuild: remove trailing semicolon from cmd_* passed to if_changed_rule
+Date: Thu, 15 Nov 2018 17:27:13 +0900
+Message-Id: <1542270435-11181-7-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,115 +15,86 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-GNU Make supports 'define' ... 'endef' directive, which can describe
-a recipe that consists of multiple lines.
+All commands passed into rule_cc_o_c / rule_as_o_S needed to end with
+a semicolon because the old if_changed_rule implementation only
+accepted a single shell command. To pass in multiple shell commands,
+they must be concatenated with '; \'.
 
-For example,
-
-    all:
-            @echo hello
-            @echo world
-
-... can be written as:
-
-    define greeting
-            @echo hello
-            @echo world
-    endif
-
-    all:
-            $(greeting)
-
-This is useful to confine a series of shell commands into a single
-macro, keeping readability.
-
-However, if_changed_rule cannot accept multi-line recipe. As you see
-rule_cc_o_c and rule_as_o_S in scripts/Makefile.build, it must be
-written like this:
-
-  define rule_cc_o_c
-          @[action1] ; \
-          [action2] ; \
-          [action3]
-  endef
-
-This does not actually exploit the benefits of 'define' ... 'endef'
-form. All shell commands must be concatenated with '; \' so that it
-looks like a single command from the Makefile point of view. '@' can
-only appear before the first action.
-
-The root cause of this misfortune is the '@set -e;' in if_changed_rule.
-It is easily solvable by moving '@set -e' to the 'cmd' macro.
-
-The combo of $(call echo-cmd,*) $(cmd_*) in rule_cc_o_c and rule_as_o_S
-were replaced with $(call cmd,*). The tailing back-slashes went away.
+With the if_changed_rule change in the last commit, this restriction
+does not exist any more. Rip off unneeded semicolons.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/Kbuild.include |  6 ++----
- scripts/Makefile.build | 22 +++++++++++-----------
- 2 files changed, 13 insertions(+), 15 deletions(-)
+ scripts/Makefile.build | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 1eafc85..5e47bf6 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -215,7 +215,7 @@ echo-cmd = $(if $($(quiet)cmd_$(1)),\
- 	echo '  $(call escsq,$($(quiet)cmd_$(1)))$(echo-why)';)
- 
- # printing commands
--cmd = @$(echo-cmd) $(cmd_$(1))
-+cmd = @set -e; $(echo-cmd) $(cmd_$(1))
- 
- # Add $(obj)/ for paths that are not absolute
- objectify = $(foreach o,$(1),$(if $(filter /%,$(o)),$(o),$(obj)/$(o)))
-@@ -269,9 +269,7 @@ cmd_and_fixdep =                                                             \
- # Usage: $(call if_changed_rule,foo)
- # Will check if $(cmd_foo) or any of the prerequisites changed,
- # and if so will execute $(rule_foo).
--if_changed_rule = $(if $(strip $(any-prereq) $(arg-check) ),                 \
--	@set -e;                                                             \
--	$(rule_$(1)), @:)
-+if_changed_rule = $(if $(strip $(any-prereq) $(arg-check)), $(rule_$(1)), @:)
- 
- ###
- # why - tell why a target got built
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index e5ba9b1..5528a6a 100644
+index 5528a6a..78e647f 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -263,20 +263,20 @@ cmd_gen_ksymdeps = \
+@@ -75,14 +75,14 @@ __build: $(if $(KBUILD_BUILTIN),$(builtin-target) $(lib-target) $(extra-y)) \
+ # Linus' kernel sanity checking tool
+ ifeq ($(KBUILD_CHECKSRC),1)
+   quiet_cmd_checksrc       = CHECK   $<
+-        cmd_checksrc       = $(CHECK) $(CHECKFLAGS) $(c_flags) $< ;
++        cmd_checksrc       = $(CHECK) $(CHECKFLAGS) $(c_flags) $<
+ else ifeq ($(KBUILD_CHECKSRC),2)
+   quiet_cmd_force_checksrc = CHECK   $<
+-        cmd_force_checksrc = $(CHECK) $(CHECKFLAGS) $(c_flags) $< ;
++        cmd_force_checksrc = $(CHECK) $(CHECKFLAGS) $(c_flags) $<
  endif
  
- define rule_cc_o_c
--	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
--	$(call cmd_and_fixdep,cc_o_c)					  \
--	$(cmd_gen_ksymdeps)						  \
--	$(cmd_checkdoc)							  \
--	$(call echo-cmd,objtool) $(cmd_objtool)				  \
--	$(cmd_modversions_c)						  \
--	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
-+	$(call cmd,checksrc)
-+	@$(call cmd_and_fixdep,cc_o_c)
-+	$(call cmd,gen_ksymdeps)
-+	$(call cmd,checkdoc)
-+	$(call cmd,objtool)
-+	$(call cmd,modversions_c)
-+	$(call cmd,record_mcount)
- endef
+ ifneq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),)
+-  cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $< ;
++  cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $<
+ endif
  
- define rule_as_o_S
--	$(call cmd_and_fixdep,as_o_S)					  \
--	$(cmd_gen_ksymdeps)						  \
--	$(call echo-cmd,objtool) $(cmd_objtool)				  \
--	$(cmd_modversions_S)
-+	@$(call cmd_and_fixdep,as_o_S)
-+	$(call cmd,gen_ksymdeps)
-+	$(call cmd,objtool)
-+	$(call cmd,modversions_S)
- endef
+ # Do section mismatch analysis for each module/built-in.a
+@@ -178,7 +178,7 @@ cmd_modversions_c =								\
+ 			-T $(@D)/.tmp_$(@F:.o=.ver);				\
+ 		mv -f $(@D)/.tmp_$(@F) $@;					\
+ 		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
+-	fi;
++	fi
+ endif
  
- # List module undefined symbols (or empty line if not enabled)
+ ifdef CONFIG_FTRACE_MCOUNT_RECORD
+@@ -211,7 +211,7 @@ cmd_record_mcount =						\
+ 	if [ "$(findstring $(CC_FLAGS_FTRACE),$(_c_flags))" =	\
+ 	     "$(CC_FLAGS_FTRACE)" ]; then			\
+ 		$(sub_cmd_record_mcount)			\
+-	fi;
++	fi
+ endif # CC_USING_RECORD_MCOUNT
+ endif # CONFIG_FTRACE_MCOUNT_RECORD
+ 
+@@ -241,7 +241,7 @@ endif
+ # 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
+ cmd_objtool = $(if $(patsubst y%,, \
+ 	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
+-	$(__objtool_obj) $(objtool_args) $@;)
++	$(__objtool_obj) $(objtool_args) $@)
+ objtool_obj = $(if $(patsubst y%,, \
+ 	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
+ 	$(__objtool_obj))
+@@ -258,7 +258,7 @@ ifdef CONFIG_TRIM_UNUSED_KSYMS
+ cmd_gen_ksymdeps = \
+ 	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ > $(dot-target).tmp; \
+ 	cat $(dot-target).tmp >> $(dot-target).cmd; \
+-	rm -f $(dot-target).tmp;
++	rm -f $(dot-target).tmp
+ 
+ endif
+ 
+@@ -375,7 +375,7 @@ cmd_modversions_S =								\
+ 			-T $(@D)/.tmp_$(@F:.o=.ver);				\
+ 		mv -f $(@D)/.tmp_$(@F) $@;					\
+ 		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
+-	fi;
++	fi
+ endif
+ endif
+ 
 -- 
 2.7.4
