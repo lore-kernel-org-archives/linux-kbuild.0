@@ -1,69 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:41924 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728699AbeKOTTS (ORCPT
+Received: from rcdn-iport-9.cisco.com ([173.37.86.80]:21732 "EHLO
+        rcdn-iport-9.cisco.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732953AbeKOXdJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Nov 2018 14:19:18 -0500
-Received: by mail-ed1-f66.google.com with SMTP id 14so6894416eds.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 15 Nov 2018 01:12:21 -0800 (PST)
-Subject: Re: [PATCH 5/8] kbuild: change if_changed_rule to accept multi-line
- recipe
-References: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com>
- <1542270435-11181-6-git-send-email-yamada.masahiro@socionext.com>
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Message-ID: <6ee62b52-5d6d-c540-5f01-f522b6986c4d@rasmusvillemoes.dk>
-Date: Thu, 15 Nov 2018 10:12:18 +0100
+        Thu, 15 Nov 2018 18:33:09 -0500
+Date: Thu, 15 Nov 2018 05:25:16 -0800
+From: Daniel Walker <danielwa@cisco.com>
+Subject: Re: hidden string Kconfig ?
+Message-ID: <20181115132516.o5eiomuhk4tq5cmr@zorba>
+References: <20181114223211.b4a2gjmt5pvtg2bh@zorba>
+ <6c9ff44b-5f27-15d0-c48f-cfd1e2ed33e4@infradead.org>
+ <20181115000756.k2fsgzmswdbikpfb@zorba>
+ <c13367b1-c28b-b889-ed91-233090f1410c@infradead.org>
+ <20181115004706.r6azcyjd2fhtktio@zorba>
+ <3d1cc558-17bf-d2b4-4121-33fff0625e22@infradead.org>
+ <CAK7LNASk2NrsWkQs-pFAKFLG1-aDm29SQJJg378Voifqb320bw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1542270435-11181-6-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNASk2NrsWkQs-pFAKFLG1-aDm29SQJJg378Voifqb320bw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 15/11/2018 09.27, Masahiro Yamada wrote:
-> GNU Make supports 'define' ... 'endef' directive, which can describe
-> a recipe that consists of multiple lines.
+On Thu, Nov 15, 2018 at 11:50:56AM +0900, Masahiro Yamada wrote:
 > 
->   endef
 > 
-> This does not actually exploit the benefits of 'define' ... 'endef'
-> form. All shell commands must be concatenated with '; \' so that it
-> looks like a single command from the Makefile point of view. '@' can
-> only appear before the first action.
+> In current Kconfig, a 'string' type symbol is written to the .config when
 > 
-> The root cause of this misfortune is the '@set -e;' in if_changed_rule.
-> It is easily solvable by moving '@set -e' to the 'cmd' macro.
+> [1] it has a visible prompt
+>     https://github.com/masahir0y/linux/blob/v4.19/scripts/kconfig/symbol.c#L364
 > 
-> The combo of $(call echo-cmd,*) $(cmd_*) in rule_cc_o_c and rule_as_o_S
-> were replaced with $(call cmd,*). The tailing back-slashes went away.
+>    or
 > 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->  
->  define rule_cc_o_c
-> -	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
-> -	$(call cmd_and_fixdep,cc_o_c)					  \
-> -	$(cmd_gen_ksymdeps)						  \
-> -	$(cmd_checkdoc)							  \
-> -	$(call echo-cmd,objtool) $(cmd_objtool)				  \
-> -	$(cmd_modversions_c)						  \
-> -	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
-> +	$(call cmd,checksrc)
-> +	@$(call cmd_and_fixdep,cc_o_c)
-> +	$(call cmd,gen_ksymdeps)
-> +	$(call cmd,checkdoc)
-> +	$(call cmd,objtool)
-> +	$(call cmd,modversions_c)
-> +	$(call cmd,record_mcount)
->  endef
+> [2] it has a default property
+>     https://github.com/masahir0y/linux/blob/v4.19/scripts/kconfig/symbol.c#L421
+> 
+ 
+Ok.
 
-Does this mean that Make now spawns a new shell for each of these
-commands, and if so, what's the performance impact? Or am I just
-misreading things? If this does change the semantics (one shell instance
-versus many), I think that's worth mentioning explicitly in the
-changelog, regardless of whether there's no measuarable performance impact.
 
-Rasmus
+> 
+> I am open to changing the behavior
+> as long as it keeps grammatical consistency, though.
+> 
+> 
+> As far as I understood this particular case,
+> CONFIG_CMDLINE will go away after the GENERIC_CMDLINE migration is done.
+> 
+> (At least, upstream x86 and powerpc defconfig files seem complete).
+> 
+> 
+> 
+> Perhaps, some prompt for migration could be useful?
+> 
+> config CMDLINE
+>         string "(LEGACY) Please make this empty and use CMDLINE_PREPEND instead"
+
+I think it would be confusing to leave it. The reason I wanted to have it in
+there silently is so I can print a warning, or BUILD_BUG_ON (which is what I
+currently do). Just so that people 1) don't lose those options, and 2) So that I
+can remind or catch people when they don't notice there was a change. Russell
+(ARM32 maintainer) complained in this regard.
+
+I'll look into the Kconfig code and see if I can make something acceptable.
+
+Daniel
