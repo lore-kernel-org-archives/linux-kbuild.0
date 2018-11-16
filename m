@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr680070.outbound.protection.outlook.com ([40.107.68.70]:62997
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-eopbgr770087.outbound.protection.outlook.com ([40.107.77.87]:35232
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725763AbeKQGcx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 17 Nov 2018 01:32:53 -0500
+        id S1725819AbeKQHPu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 17 Nov 2018 02:15:50 -0500
 From: Nadav Amit <namit@vmware.com>
-Subject: Re: [PATCH v2 2/2] x86: set a dependency on macros.S
-Date: Fri, 16 Nov 2018 20:18:58 +0000
-Message-ID: <C359F0E6-2920-428F-B93E-7C76E564C1BA@vmware.com>
+Subject: Re: [PATCH v2 1/2] Makefile: Fix distcc compilation with x86 macros
+Date: Fri, 16 Nov 2018 21:01:34 +0000
+Message-ID: <1C316B94-8F27-439C-B049-9947DC329780@vmware.com>
 References: <20181114204309.18645-1-namit@vmware.com>
- <20181114204309.18645-3-namit@vmware.com>
- <CAK7LNAR30CVQHBTXzY-cFcpa-mw2QSpqUZHEAs7n0Jn64dLBFw@mail.gmail.com>
-In-Reply-To: <CAK7LNAR30CVQHBTXzY-cFcpa-mw2QSpqUZHEAs7n0Jn64dLBFw@mail.gmail.com>
+ <20181114204309.18645-2-namit@vmware.com>
+ <CAK7LNAREF_Pcejq1LJ=3K7h0M4o4oSRLfbeJc73O+8HV420Ziw@mail.gmail.com>
+In-Reply-To: <CAK7LNAREF_Pcejq1LJ=3K7h0M4o4oSRLfbeJc73O+8HV420Ziw@mail.gmail.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <EB0AF2066A1B464A8FF40E7ACA58E272@namprd05.prod.outlook.com>
+Content-ID: <5A20752D87B6F749848D09EE097DD717@namprd05.prod.outlook.com>
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -22,26 +22,41 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-RnJvbTogTWFzYWhpcm8gWWFtYWRhDQpTZW50OiBOb3ZlbWJlciAxNiwgMjAxOCBhdCA3OjM3OjQ2
+RnJvbTogTWFzYWhpcm8gWWFtYWRhDQpTZW50OiBOb3ZlbWJlciAxNiwgMjAxOCBhdCA3OjQ1OjQ1
 IEFNIEdNVA0KPiBUbzogTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT4NCj4gQ2M6IEluZ28g
 TW9sbmFyIDxtaW5nb0ByZWRoYXQuY29tPiwgTWljaGFsIE1hcmVrIDxtaWNoYWwubGttbEBtYXJr
 b3ZpLm5ldD4sIFRob21hcyBHbGVpeG5lciA8dGdseEBsaW51dHJvbml4LmRlPiwgQm9yaXNsYXYg
 UGV0a292IDxicEBhbGllbjguZGU+LCBILiBQZXRlciBBbnZpbiA8aHBhQHp5dG9yLmNvbT4sIFg4
 NiBNTCA8eDg2QGtlcm5lbC5vcmc+LCBMaW51eCBLYnVpbGQgbWFpbGluZyBsaXN0IDxsaW51eC1r
 YnVpbGRAdmdlci5rZXJuZWwub3JnPiwgTGludXggS2VybmVsIE1haWxpbmcgTGlzdCA8bGludXgt
-a2VybmVsQHZnZXIua2VybmVsLm9yZz4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAyLzJdIHg4
-Njogc2V0IGEgZGVwZW5kZW5jeSBvbiBtYWNyb3MuUw0KPiANCj4gDQo+IE9uIFRodSwgTm92IDE1
-LCAyMDE4IGF0IDE6MDEgUE0gTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT4gd3JvdGU6DQo+
-PiBDaGFuZ2VzIGluIG1hY3Jvcy5TIHNob3VsZCB0cmlnZ2VyIHRoZSByZWNvbXBpbGF0aW9uIG9m
-IGFsbCBDIGZpbGVzLCBhcw0KPj4gdGhlIG1hY3JvcyBtaWdodCBuZWVkIHRvIGFmZmVjdCB0aGVp
-ciBjb21waWxhdGlvbi4NCj4+IA0KPj4gQWNrZWQtYnk6IEluZ28gTW9sbmFyIDxtaW5nb0BrZXJu
-ZWwub3JnPg0KPj4gU2lnbmVkLW9mZi1ieTogTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT4N
-Cj4+IC0tLQ0KPiANCj4gV2hlbiB3ZSB0YWxrZWQgYWJvdXQgdGhpcyBsYXN0IHRpbWUsDQo+IHdl
-IGFncmVlZCB0byBub3QgZG8gdGhpcw0KPiBiZWNhdXNlIGEgc2luZ2xlIGxpbmUgY2hhbmdlIGlu
-IGFzbSBoZWFkZXJzDQo+IHdvdWxkIGNhdXNlIGdsb2JhbCByZWJ1aWxkaW5nLg0KPiANCj4gRGlk
-IHlvdSBjaGFuZ2UgeW91ciBtaW5kPw0KDQpJIHdhcyB3cm9uZyAoYW5kIHlvdSB3ZXJlIHJpZ2h0
-PyBJIGRvbuKAmXQgcXVpdGUgcmVtZW1iZXIpLiBBbnlob3csIGFub3RoZXINCnBhdGNoIEkgd29y
-ayBvbiBtYWRlIG1lIHJlYWxpemUgaG93IHdyb25nIEkgd2FzLg0KDQpJZiByZXF1aXJlZCwgd2Ug
-Y2FuIGV4dHJhY3QgdGhlIG1hY3JvcyBmcm9tIHNvbWUgb2YgdGhlIGhlYWRlciBmaWxlcyBpbnRv
-DQpzZXBhcmF0ZSBoZWFkZXIgZmlsZXMgdG8gcHJldmVudCB1bm5lY2Vzc2FyeSByZWJ1aWxkcy4N
-Cg0KVGhhbmtzLA0KTmFkYXY=
+a2VybmVsQHZnZXIua2VybmVsLm9yZz4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAxLzJdIE1h
+a2VmaWxlOiBGaXggZGlzdGNjIGNvbXBpbGF0aW9uIHdpdGggeDg2IG1hY3Jvcw0KPiANCj4gDQo+
+IE9uIFRodSwgTm92IDE1LCAyMDE4IGF0IDE6MDEgUE0gTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJl
+LmNvbT4gd3JvdGU6DQo+PiBJbnRyb2R1Y2luZyB0aGUgdXNlIG9mIGFzbSBtYWNyb3MgaW4gYy1j
+b2RlIGJyb2tlIGRpc3RjYywgc2luY2UgaXQgb25seQ0KPj4gc2VuZHMgdGhlIHByZXByb2Nlc3Nl
+ZCBzb3VyY2UgZmlsZS4gVGhlIHNvbHV0aW9uIGlzIHRvIGJyZWFrIHRoZQ0KPj4gY29tcGlsYXRp
+b24gaW50byB0d28gc2VwYXJhdGUgcGhhc2VzIG9mIGNvbXBpbGF0aW9uIGFuZCBhc3NlbWJseSwg
+YW5kDQo+PiBiZXR3ZWVuIHRoZSB0d28gY29uY2F0ZW5hdGUgdGhlIGFzc2VtYmx5IG1hY3JvcyBh
+bmQgdGhlIGNvbXBpbGVkICh5ZXQNCj4+IG5vdCBhc3NlbWJsZWQpIHNvdXJjZSBmaWxlLiBTaW5j
+ZSB0aGlzIGlzIGxlc3MgZWZmaWNpZW50LCB0aGlzDQo+PiBjb21waWxhdGlvbiBtb2RlIGlzIG9u
+bHkgdXNlZCB3aGVuIGRpc3RjYyBvciBpY2VjYyBhcmUgdXNlZC4NCj4+IA0KPj4gTm90ZSB0aGF0
+IHRoZSBhc3NlbWJseSBzdGFnZSBzaG91bGQgYWxzbyBiZSBkaXN0cmlidXRlZCwgaWYgZGlzdGNj
+IGlzDQo+PiBjb25maWd1cmVkIHVzaW5nICJDRkxBR1M9LURFTkFCTEVfUkVNT1RFX0FTU0VNQkxF
+Ii4NCj4+IA0KPj4gUmVwb3J0ZWQtYnk6IExvZ2FuIEd1bnRob3JwZSA8bG9nYW5nQGRlbHRhdGVl
+LmNvbT4NCj4+IFNpZ25lZC1vZmYtYnk6IE5hZGF2IEFtaXQgPG5hbWl0QHZtd2FyZS5jb20+DQo+
+IA0KPiANCj4gV293LCB0aGlzIGlzIHNvIHVnbHkuDQoNCkluZGVlZCwgaXQgaXMgbm90IHByZXR0
+eSBmcm9tIHRoZSBNYWtlZmlsZSBzeXN0ZW0gcG9pbnQgb2Ygdmlldy4NCg0KQnV0IGl0IGRvZXMg
+aGF2ZSBtZXJpdHMgd2hlbiBpdCBjb21lcyB0byB0aGUgYWN0dWFsIHVzZSAoYnkgZGV2ZWxvcGVy
+cykuIElmDQp5b3UgbG9vayBvbiB4ODYsIHRoZXJlIGFyZSBhIGxvdCBvZiBkdXBsaWNhdGVkIGlt
+cGxlbWVudGF0aW9uIGZvciBDIGFuZCBBc20NCmFuZCBjcmF6eSBDIG1hY3JvcywgZm9yIGV4YW1w
+bGUgZm9yIFBWIGZ1bmN0aW9uIGNhbGwgb3IgdGhlIGFsdGVybmF0aXZlDQptZWNoYW5pc20uIFRo
+ZSBjb2RlIGlzIGFsc28gbGVzcyByZWFkYWJsZSBpbiBpdHMgY3VycmVudCBmb3JtLg0KDQo+IEkg
+cmVhbGl6ZWQgaG93IG11Y2ggSSBoYXRlZCB0aGlzIGJ5IG5vdy4NCj4gDQo+IE15IHF1ZXN0aW9u
+IGlzLCBob3cgbG9uZyBkbyB3ZSBuZWVkIHRvIGNhcnJ5IHRoaXM/DQoNCklmIGl0IGlzIHB1cmVs
+eSBhYm91dCBwZXJmb3JtYW5jZSwgSSBhbSBub3Qgc3VyZSBpdCB3b3VsZCBtYWtlIHNlbnNlIHRv
+DQpwdXQgaXQgaW4sIGFzIGl0IHdpbGwgaW5kZWVkIGJlIChldmVudHVhbGx5KSBzb2x2ZWQgYnkg
+dGhlIGNvbXBpbGVyLCBhbmQNCnRoZSBwZW5hbHR5IGlzIG5vdCB0b28gZ3JlYXQuDQoNClRoZXJl
+IGlzIGFsc28gYW4gYWR2YW50YWdlIGZvciBoYXZpbmcgYXNzZW1ibHkgbWFjcm9zIHRoYXQgY2Fu
+IG92ZXJyaWRlIHRoZQ0KZ2VuZXJhdGVkIGFzc2VtYmx5IHRoYXQgd2FzIGdlbmVyYXRlZCBieSB0
+aGUgY29tcGlsZXIuIEkgdGhpbmsgSFBBIChjY+KAmWQpDQpsb29rcyBpbiB0aGlzIGRpcmVjdGlv
+biAoYW5kIHNvIGRvIEkpLg0KDQpSZWdhcmRzLA0KTmFkYXY=
