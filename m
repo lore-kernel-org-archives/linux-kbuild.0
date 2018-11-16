@@ -1,128 +1,130 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:37599 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726518AbeKPLsZ (ORCPT
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:36351 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727326AbeKPPYH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Nov 2018 06:48:25 -0500
+        Fri, 16 Nov 2018 10:24:07 -0500
+Received: by mail-qk1-f195.google.com with SMTP id o125so35643197qkf.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 15 Nov 2018 21:13:15 -0800 (PST)
+Date: Fri, 16 Nov 2018 00:13:10 -0500 (EST)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH 4/8] kbuild: simplify dependency generation for
+ CONFIG_TRIM_UNUSED_KSYMS
+In-Reply-To: <1542270435-11181-5-git-send-email-yamada.masahiro@socionext.com>
+Message-ID: <nycvar.YSQ.7.76.1811152346510.1993@knanqh.ubzr>
+References: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com> <1542270435-11181-5-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-References: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com>
- <1542270435-11181-6-git-send-email-yamada.masahiro@socionext.com> <6ee62b52-5d6d-c540-5f01-f522b6986c4d@rasmusvillemoes.dk>
-In-Reply-To: <6ee62b52-5d6d-c540-5f01-f522b6986c4d@rasmusvillemoes.dk>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 16 Nov 2018 10:37:18 +0900
-Message-ID: <CAK7LNAS5CKoT_4jk6BB5zs_EtXtj2HNjZ76FeOFBRA01nrQhUQ@mail.gmail.com>
-Subject: Re: [PATCH 5/8] kbuild: change if_changed_rule to accept multi-line recipe
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-arch@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Will Deacon <will.deacon@arm.com>, Ingo Molnar <mingo@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On Thu, Nov 15, 2018 at 6:12 PM Rasmus Villemoes
-<linux@rasmusvillemoes.dk> wrote:
->
-> On 15/11/2018 09.27, Masahiro Yamada wrote:
-> > GNU Make supports 'define' ... 'endef' directive, which can describe
-> > a recipe that consists of multiple lines.
-> >
-> >   endef
-> >
-> > This does not actually exploit the benefits of 'define' ... 'endef'
-> > form. All shell commands must be concatenated with '; \' so that it
-> > looks like a single command from the Makefile point of view. '@' can
-> > only appear before the first action.
-> >
-> > The root cause of this misfortune is the '@set -e;' in if_changed_rule.
-> > It is easily solvable by moving '@set -e' to the 'cmd' macro.
-> >
-> > The combo of $(call echo-cmd,*) $(cmd_*) in rule_cc_o_c and rule_as_o_S
-> > were replaced with $(call cmd,*). The tailing back-slashes went away.
-> >
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > ---
-> >
-> >  define rule_cc_o_c
-> > -     $(call echo-cmd,checksrc) $(cmd_checksrc)                         \
-> > -     $(call cmd_and_fixdep,cc_o_c)                                     \
-> > -     $(cmd_gen_ksymdeps)                                               \
-> > -     $(cmd_checkdoc)                                                   \
-> > -     $(call echo-cmd,objtool) $(cmd_objtool)                           \
-> > -     $(cmd_modversions_c)                                              \
-> > -     $(call echo-cmd,record_mcount) $(cmd_record_mcount)
-> > +     $(call cmd,checksrc)
-> > +     @$(call cmd_and_fixdep,cc_o_c)
-> > +     $(call cmd,gen_ksymdeps)
-> > +     $(call cmd,checkdoc)
-> > +     $(call cmd,objtool)
-> > +     $(call cmd,modversions_c)
-> > +     $(call cmd,record_mcount)
-> >  endef
->
-> Does this mean that Make now spawns a new shell for each of these
-> commands,
+On Thu, 15 Nov 2018, Masahiro Yamada wrote:
+
+> My main motivation of this commit is to clean up scripts/Kbuild.include
+> and scripts/Makefile.build.
+> 
+> Currently, CONFIG_TRIM_UNUSED_KSYMS works with a tricky gimmick;
+> possibly exported symbols are detected by letting $(CPP) replace
+> EXPORT_SYMBOL* with a special string '=== __KSYM_*===', which is
+> post-processed by sed, and passed to fixdep. The extra preprocessing
+> is costly, and hacking cmd_and_fixdep is ugly.
+> 
+> I came up with a new way to find exported symbols; insert a dummy
+> symbol __ksym_marker_* to each potentially exported symbol. Those
+> dummy symbols are picked up by $(NM), post-processed by sed, then
+> appended to .*.cmd files. I collected the post-process part to a
+> new shell script scripts/gen_ksymdeps.sh for readability. The dummy
+> symbols are put into the .discard.* section so that the linker
+> script rips them off the final vmlinux or modules.
+
+Brilliant!  I really like it.
+
+Minor comments below.
+
+> diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
+> index 4d73e6e..294d6ae 100644
+> --- a/include/asm-generic/export.h
+> +++ b/include/asm-generic/export.h
+> @@ -59,16 +59,19 @@ __kcrctab_\name:
+>  .endm
+>  #undef __put
+>  
+> -#if defined(__KSYM_DEPS__)
+> -
+> -#define __EXPORT_SYMBOL(sym, val, sec)	=== __KSYM_##sym ===
+> -
+> -#elif defined(CONFIG_TRIM_UNUSED_KSYMS)
+> +#if defined(CONFIG_TRIM_UNUSED_KSYMS)
+>  
+>  #include <linux/kconfig.h>
+>  #include <generated/autoksyms.h>
+>  
+> +.macro __ksym_marker sym
+> +	.section ".discard.ksym","a"
+> +__ksym_marker_\sym:
+> +	 .previous
+
+Does this work as intended? I have vague memories about having problems 
+with sections being discarded when they don't allocate any space.
+
+> +.endm
+> +
+>  #define __EXPORT_SYMBOL(sym, val, sec)				\
+> +	__ksym_marker sym;					\
+>  	__cond_export_sym(sym, val, sec, __is_defined(__KSYM_##sym))
+>  #define __cond_export_sym(sym, val, sec, conf)			\
+>  	___cond_export_sym(sym, val, sec, conf)
+> diff --git a/include/linux/export.h b/include/linux/export.h
+> index ce764a5..0413a3d 100644
+> --- a/include/linux/export.h
+> +++ b/include/linux/export.h
+> @@ -92,22 +92,22 @@ struct kernel_symbol {
+>   */
+>  #define __EXPORT_SYMBOL(sym, sec)
+>  
+> -#elif defined(__KSYM_DEPS__)
+> +#elif defined(CONFIG_TRIM_UNUSED_KSYMS)
+> +
+> +#include <generated/autoksyms.h>
+>  
+>  /*
+>   * For fine grained build dependencies, we want to tell the build system
+>   * about each possible exported symbol even if they're not actually exported.
+> - * We use a string pattern that is unlikely to be valid code that the build
+> - * system filters out from the preprocessor output (see ksym_dep_filter
+> - * in scripts/Kbuild.include).
+> + * We use a symbol pattern __ksym_marker_<symbol> that the build system filters
+> + * from the $(NM) output (see scripts/gen_ksymdep.sh). These symbols are
+> + * discarded in the final link stage.
+>   */
+> -#define __EXPORT_SYMBOL(sym, sec)	=== __KSYM_##sym ===
+> -
+> -#elif defined(CONFIG_TRIM_UNUSED_KSYMS)
+> -
+> -#include <generated/autoksyms.h>
+> +#define __ksym_marker(sym)	\
+> +	static int __ksym_marker_##sym[0] __section(".discard.ksym") __used
+
+Even if this is discarded during the final link, maybe this could save 
+a tiny amount of disk space by using a char instead?
+
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 7f3ca6e..e5ba9b1 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -254,9 +254,18 @@ objtool_dep = $(objtool_obj)					\
+>  	      $(wildcard include/config/orc/unwinder.h		\
+>  			 include/config/stack/validation.h)
+>  
+> +ifdef CONFIG_TRIM_UNUSED_KSYMS
+> +cmd_gen_ksymdeps = \
+> +	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ > $(dot-target).tmp; \
+> +	cat $(dot-target).tmp >> $(dot-target).cmd; \
+> +	rm -f $(dot-target).tmp;
+
+Why don't you append to $(dot-target).cmd directly?
 
 
-Yes and No.
-
-Basically, each line is run in an independent sub-shell,
-but things are a little bit complex.
-
-GNU Make, if possible, runs the command directly
-instead of forking a shell process.
-
-That is what I understood according to the following document:
-
-
-http://wanderinghorse.net/computing/make/book/ManagingProjectsWithGNUMake-3.1.3.pdf
-
-See "chapter 7: commands"
-  ---------->8----------
-  Commands are essentially one-line shell scripts.
-  In effect, make grabs each line and passes it to a subshell for execution.
-  In fact, make can optimize this (relatively) expensive fork/exec algorithm
-  if it can guarantee that omitting the shell will not change the behavior of
-  the program. It checks this by scanning each command line for shell special
-  characters, such as wildcard characters and i/o redirection. If none are
-  found, make directly executes the command without passing it to a subshell.
-  ---------->8----------
-
-
-
-
-
-> and if so, what's the performance impact? Or am I just
-> misreading things? If this does change the semantics (one shell instance
-> versus many), I think that's worth mentioning explicitly in the
-> changelog, regardless of whether there's no measuarable performance impact.
-
-
-Last night, I checked 'perf stat' of x86 defconfig build,
-which enables cmd_objtool.
-
-
-
-Without this commit:
-
-
- Performance counter stats for 'make -j8' (10 runs):
-
-     125.499068713 seconds time elapsed
-          ( +-  0.10% )
-
-
-With this commit:
-
- Performance counter stats for 'make -j8' (10 runs):
-
-     125.618321667 seconds time elapsed
-          ( +-  0.24% )
-
-
-
-I did not get noticeable performance regression.
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Nicolas
