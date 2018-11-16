@@ -1,169 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:44804 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729136AbeKQEDW (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:58684 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725804AbeKQGFd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Nov 2018 23:03:22 -0500
-Received: by mail-qk1-f194.google.com with SMTP id n12so38721200qkh.11
-        for <linux-kbuild@vger.kernel.org>; Fri, 16 Nov 2018 09:50:00 -0800 (PST)
-Date: Fri, 16 Nov 2018 12:49:56 -0500 (EST)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH 4/8] kbuild: simplify dependency generation for
- CONFIG_TRIM_UNUSED_KSYMS
-In-Reply-To: <CAK7LNATT7PYvH-z572MGSjXbCybAW0TcNebz9CgGM4J07aMOvw@mail.gmail.com>
-Message-ID: <nycvar.YSQ.7.76.1811161234160.1993@knanqh.ubzr>
-References: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com> <1542270435-11181-5-git-send-email-yamada.masahiro@socionext.com> <nycvar.YSQ.7.76.1811152346510.1993@knanqh.ubzr>
- <CAK7LNATT7PYvH-z572MGSjXbCybAW0TcNebz9CgGM4J07aMOvw@mail.gmail.com>
+        Sat, 17 Nov 2018 01:05:33 -0500
+Date: Fri, 16 Nov 2018 20:51:37 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH v2 1/2] modpost: drop unused command line switches
+Message-ID: <20181116195137.GA15240@ravnborg.org>
+References: <20181115005602.30746-1-paul.walmsley@sifive.com>
+ <20181115005602.30746-2-paul.walmsley@sifive.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181115005602.30746-2-paul.walmsley@sifive.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Will Deacon <will.deacon@arm.com>, Ingo Molnar <mingo@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Paul Walmsley <paul.walmsley@sifive.com>
+Cc: linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, Paul Walmsley <paul@pwsan.com>
 
-On Fri, 16 Nov 2018, Masahiro Yamada wrote:
-
-> On Fri, Nov 16, 2018 at 2:13 PM Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
-> >
-> > On Thu, 15 Nov 2018, Masahiro Yamada wrote:
-> >
-> > > My main motivation of this commit is to clean up scripts/Kbuild.include
-> > > and scripts/Makefile.build.
-> > >
-> > > Currently, CONFIG_TRIM_UNUSED_KSYMS works with a tricky gimmick;
-> > > possibly exported symbols are detected by letting $(CPP) replace
-> > > EXPORT_SYMBOL* with a special string '=== __KSYM_*===', which is
-> > > post-processed by sed, and passed to fixdep. The extra preprocessing
-> > > is costly, and hacking cmd_and_fixdep is ugly.
-> > >
-> > > I came up with a new way to find exported symbols; insert a dummy
-> > > symbol __ksym_marker_* to each potentially exported symbol. Those
-> > > dummy symbols are picked up by $(NM), post-processed by sed, then
-> > > appended to .*.cmd files. I collected the post-process part to a
-> > > new shell script scripts/gen_ksymdeps.sh for readability. The dummy
-> > > symbols are put into the .discard.* section so that the linker
-> > > script rips them off the final vmlinux or modules.
-> >
-> > Brilliant!  I really like it.
-> >
-> > Minor comments below.
-> >
-> > > diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
-> > > index 4d73e6e..294d6ae 100644
-> > > --- a/include/asm-generic/export.h
-> > > +++ b/include/asm-generic/export.h
-> > > @@ -59,16 +59,19 @@ __kcrctab_\name:
-> > >  .endm
-> > >  #undef __put
-> > >
-> > > -#if defined(__KSYM_DEPS__)
-> > > -
-> > > -#define __EXPORT_SYMBOL(sym, val, sec)       === __KSYM_##sym ===
-> > > -
-> > > -#elif defined(CONFIG_TRIM_UNUSED_KSYMS)
-> > > +#if defined(CONFIG_TRIM_UNUSED_KSYMS)
-> > >
-> > >  #include <linux/kconfig.h>
-> > >  #include <generated/autoksyms.h>
-> > >
-> > > +.macro __ksym_marker sym
-> > > +     .section ".discard.ksym","a"
-> > > +__ksym_marker_\sym:
-> > > +      .previous
-> >
-> > Does this work as intended? I have vague memories about having problems
-> > with sections being discarded when they don't allocate any space.
+On Wed, Nov 14, 2018 at 04:56:01PM -0800, Paul Walmsley wrote:
+> Drop modpost command line switches that are no longer used by
+> makefile.modpost, upon request from Sam Ravnborg <sam@ravnborg.org>,
+> who wrote:
 > 
-> What I can tell is, this patch produces the same size kernel
-> (after dropping debug info by 'strip' command).
+>     modpost is not supposed to be used outside the kernel build. [...]
+>     I checked if there were any options supported by modpost that
+>     was not configurable in makefile.modpost.
+>     And I could see that the -M and -K options in getopt() was leftovers.
+>     The code that used these option was was dropped in:
+>     commit a8773769d1a1 ("Kbuild: clear marker out of modpost")
 > 
+>     Could you add a patch that delete these on top of what you already have.
 > 
-> > > +.endm
-> > > +
-> > >  #define __EXPORT_SYMBOL(sym, val, sec)                               \
-> > > +     __ksym_marker sym;                                      \
-> > >       __cond_export_sym(sym, val, sec, __is_defined(__KSYM_##sym))
-> > >  #define __cond_export_sym(sym, val, sec, conf)                       \
-> > >       ___cond_export_sym(sym, val, sec, conf)
-> > > diff --git a/include/linux/export.h b/include/linux/export.h
-> > > index ce764a5..0413a3d 100644
-> > > --- a/include/linux/export.h
-> > > +++ b/include/linux/export.h
-> > > @@ -92,22 +92,22 @@ struct kernel_symbol {
-> > >   */
-> > >  #define __EXPORT_SYMBOL(sym, sec)
-> > >
-> > > -#elif defined(__KSYM_DEPS__)
-> > > +#elif defined(CONFIG_TRIM_UNUSED_KSYMS)
-> > > +
-> > > +#include <generated/autoksyms.h>
-> > >
-> > >  /*
-> > >   * For fine grained build dependencies, we want to tell the build system
-> > >   * about each possible exported symbol even if they're not actually exported.
-> > > - * We use a string pattern that is unlikely to be valid code that the build
-> > > - * system filters out from the preprocessor output (see ksym_dep_filter
-> > > - * in scripts/Kbuild.include).
-> > > + * We use a symbol pattern __ksym_marker_<symbol> that the build system filters
-> > > + * from the $(NM) output (see scripts/gen_ksymdep.sh). These symbols are
-> > > + * discarded in the final link stage.
-> > >   */
-> > > -#define __EXPORT_SYMBOL(sym, sec)    === __KSYM_##sym ===
-> > > -
-> > > -#elif defined(CONFIG_TRIM_UNUSED_KSYMS)
-> > > -
-> > > -#include <generated/autoksyms.h>
-> > > +#define __ksym_marker(sym)   \
-> > > +     static int __ksym_marker_##sym[0] __section(".discard.ksym") __used
-> >
-> > Even if this is discarded during the final link, maybe this could save
-> > a tiny amount of disk space by using a char instead?
+> https://lore.kernel.org/lkml/20181020140835.GA3351@ravnborg.org/
 > 
+> Cc: Sam Ravnborg <sam@ravnborg.org>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Paul Walmsley <paul.walmsley@sifive.com>
+> Signed-off-by: Paul Walmsley <paul@pwsan.com>
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
+
+
+> ---
+>  scripts/mod/modpost.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I am afraid you missed '[0]' after the symbol name.
-> This is actually zero-length array.
-
-Ah, indeed.
-
-> No memory allocated for this dummy section.
-
-Right, and that makes it identical to the assembly case.
-
-> As far as I tested, this is working.
-
-Yes, it does.
-
-The problem I was alluding to has to do with symbols generated by the 
-linker directly which for some reason behaves differently in that case.
-
-> > > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> > > index 7f3ca6e..e5ba9b1 100644
-> > > --- a/scripts/Makefile.build
-> > > +++ b/scripts/Makefile.build
-> > > @@ -254,9 +254,18 @@ objtool_dep = $(objtool_obj)                                     \
-> > >             $(wildcard include/config/orc/unwinder.h          \
-> > >                        include/config/stack/validation.h)
-> > >
-> > > +ifdef CONFIG_TRIM_UNUSED_KSYMS
-> > > +cmd_gen_ksymdeps = \
-> > > +     $(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ > $(dot-target).tmp; \
-> > > +     cat $(dot-target).tmp >> $(dot-target).cmd; \
-> > > +     rm -f $(dot-target).tmp;
-> >
-> > Why don't you append to $(dot-target).cmd directly?
-> 
-> 
-> If scripts/gen_ksymdeps.sh fails for some reasons,
-> it will error out immediately thanks to 'set -e' flag.
-> 
-> Appending incomplete portion might end up with a corrupted .*.cmd file.
-> 
-> Probably, that would not happen, but I just wanted to ensure it.
-
-Well, strictly speaking, if scripts/gen_ksymdeps.sh fails and its output 
-isn't appended at all to the .*.cmd file, then that .*.cmd file is 
-already corrupted as it is missing necessary dependencies. Would be 
-better to delete the .*.cmd file entirely in that case.
-
-
-Nicolas
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 0d998c54564d..85bd93c63180 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -2416,7 +2416,7 @@ int main(int argc, char **argv)
+>  	struct ext_sym_list *extsym_iter;
+>  	struct ext_sym_list *extsym_start = NULL;
+>  
+> -	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awM:K:E")) != -1) {
+> +	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awE")) != -1) {
+>  		switch (opt) {
+>  		case 'i':
+>  			kernel_read = optarg;
+> -- 
+> 2.19.1
