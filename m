@@ -1,41 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:58805 "EHLO
-        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725753AbeKQGPB (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 17 Nov 2018 01:15:01 -0500
-Date: Fri, 16 Nov 2018 21:01:09 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 3/8] kbuild: refactor modversions build rules
-Message-ID: <20181116200109.GC15240@ravnborg.org>
-References: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com>
- <1542270435-11181-4-git-send-email-yamada.masahiro@socionext.com>
+Received: from mail-eopbgr680070.outbound.protection.outlook.com ([40.107.68.70]:62997
+        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725763AbeKQGcx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 17 Nov 2018 01:32:53 -0500
+From: Nadav Amit <namit@vmware.com>
+Subject: Re: [PATCH v2 2/2] x86: set a dependency on macros.S
+Date: Fri, 16 Nov 2018 20:18:58 +0000
+Message-ID: <C359F0E6-2920-428F-B93E-7C76E564C1BA@vmware.com>
+References: <20181114204309.18645-1-namit@vmware.com>
+ <20181114204309.18645-3-namit@vmware.com>
+ <CAK7LNAR30CVQHBTXzY-cFcpa-mw2QSpqUZHEAs7n0Jn64dLBFw@mail.gmail.com>
+In-Reply-To: <CAK7LNAR30CVQHBTXzY-cFcpa-mw2QSpqUZHEAs7n0Jn64dLBFw@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EB0AF2066A1B464A8FF40E7ACA58E272@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1542270435-11181-4-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Nicolas Pitre <nicolas.pitre@linaro.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi Masahiro
-
-On Thu, Nov 15, 2018 at 05:27:10PM +0900, Masahiro Yamada wrote:
-> Let $(CC) compile objects into normal files *.o instead of .tmp_*.o
-> whether CONFIG_MODVERSIONS is enabled or not. This will help simplify
-> build rules a lot.
-
-Another approach would be to move more of the build stuff to
-one or a few build scripts.
-
-Using build scripts makes is much easier to add comments and
-still keep it readable.
-And when the build logic list a set of serialized actions
-they thay can be included in a build script nicely.
-
-But that said - I also like the simplifications you made.
-Everytime you trim the core kbuild files it is a win for
-readability.
-
-	Sam
+RnJvbTogTWFzYWhpcm8gWWFtYWRhDQpTZW50OiBOb3ZlbWJlciAxNiwgMjAxOCBhdCA3OjM3OjQ2
+IEFNIEdNVA0KPiBUbzogTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT4NCj4gQ2M6IEluZ28g
+TW9sbmFyIDxtaW5nb0ByZWRoYXQuY29tPiwgTWljaGFsIE1hcmVrIDxtaWNoYWwubGttbEBtYXJr
+b3ZpLm5ldD4sIFRob21hcyBHbGVpeG5lciA8dGdseEBsaW51dHJvbml4LmRlPiwgQm9yaXNsYXYg
+UGV0a292IDxicEBhbGllbjguZGU+LCBILiBQZXRlciBBbnZpbiA8aHBhQHp5dG9yLmNvbT4sIFg4
+NiBNTCA8eDg2QGtlcm5lbC5vcmc+LCBMaW51eCBLYnVpbGQgbWFpbGluZyBsaXN0IDxsaW51eC1r
+YnVpbGRAdmdlci5rZXJuZWwub3JnPiwgTGludXggS2VybmVsIE1haWxpbmcgTGlzdCA8bGludXgt
+a2VybmVsQHZnZXIua2VybmVsLm9yZz4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAyLzJdIHg4
+Njogc2V0IGEgZGVwZW5kZW5jeSBvbiBtYWNyb3MuUw0KPiANCj4gDQo+IE9uIFRodSwgTm92IDE1
+LCAyMDE4IGF0IDE6MDEgUE0gTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT4gd3JvdGU6DQo+
+PiBDaGFuZ2VzIGluIG1hY3Jvcy5TIHNob3VsZCB0cmlnZ2VyIHRoZSByZWNvbXBpbGF0aW9uIG9m
+IGFsbCBDIGZpbGVzLCBhcw0KPj4gdGhlIG1hY3JvcyBtaWdodCBuZWVkIHRvIGFmZmVjdCB0aGVp
+ciBjb21waWxhdGlvbi4NCj4+IA0KPj4gQWNrZWQtYnk6IEluZ28gTW9sbmFyIDxtaW5nb0BrZXJu
+ZWwub3JnPg0KPj4gU2lnbmVkLW9mZi1ieTogTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT4N
+Cj4+IC0tLQ0KPiANCj4gV2hlbiB3ZSB0YWxrZWQgYWJvdXQgdGhpcyBsYXN0IHRpbWUsDQo+IHdl
+IGFncmVlZCB0byBub3QgZG8gdGhpcw0KPiBiZWNhdXNlIGEgc2luZ2xlIGxpbmUgY2hhbmdlIGlu
+IGFzbSBoZWFkZXJzDQo+IHdvdWxkIGNhdXNlIGdsb2JhbCByZWJ1aWxkaW5nLg0KPiANCj4gRGlk
+IHlvdSBjaGFuZ2UgeW91ciBtaW5kPw0KDQpJIHdhcyB3cm9uZyAoYW5kIHlvdSB3ZXJlIHJpZ2h0
+PyBJIGRvbuKAmXQgcXVpdGUgcmVtZW1iZXIpLiBBbnlob3csIGFub3RoZXINCnBhdGNoIEkgd29y
+ayBvbiBtYWRlIG1lIHJlYWxpemUgaG93IHdyb25nIEkgd2FzLg0KDQpJZiByZXF1aXJlZCwgd2Ug
+Y2FuIGV4dHJhY3QgdGhlIG1hY3JvcyBmcm9tIHNvbWUgb2YgdGhlIGhlYWRlciBmaWxlcyBpbnRv
+DQpzZXBhcmF0ZSBoZWFkZXIgZmlsZXMgdG8gcHJldmVudCB1bm5lY2Vzc2FyeSByZWJ1aWxkcy4N
+Cg0KVGhhbmtzLA0KTmFkYXY=
