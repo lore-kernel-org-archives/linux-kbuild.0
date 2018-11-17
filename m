@@ -1,54 +1,153 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:35626 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725849AbeKQSQd (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 17 Nov 2018 13:16:33 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:47875 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725849AbeKQSwd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 17 Nov 2018 13:52:33 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 4b245c89
+        for <linux-kbuild@vger.kernel.org>;
+        Sat, 17 Nov 2018 08:30:52 +0000 (UTC)
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 94894646 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
+        for <linux-kbuild@vger.kernel.org>;
+        Sat, 17 Nov 2018 08:30:51 +0000 (UTC)
+Received: by mail-oi1-f176.google.com with SMTP id u18so3396636oie.10
+        for <linux-kbuild@vger.kernel.org>; Sat, 17 Nov 2018 00:36:34 -0800 (PST)
 MIME-Version: 1.0
-References: <20181031111444.3472-1-malat@debian.org> <CANiq72mj_iHvxqAEqhGoLT61Tc04-zN6f7Gv1jyNeb6d0R2LGw@mail.gmail.com>
- <CAK7LNARyykVuHT1YQ_UWVMFRG-K3VQwEXtjGQxQE4Fgu4wQtDg@mail.gmail.com>
-In-Reply-To: <CAK7LNARyykVuHT1YQ_UWVMFRG-K3VQwEXtjGQxQE4Fgu4wQtDg@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sat, 17 Nov 2018 09:00:29 +0100
-Message-ID: <CANiq72=UbXHZNDzqOJe7MQ5vZ1tiSD_YJNESG9g6-dcQ409BdQ@mail.gmail.com>
-Subject: Re: [PATCH] remove old GCC version implementation
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Fri, 16 Nov 2018 18:52:25 -0800
+Message-ID: <CAHmME9riFHZc9zBtFamPOd1N1D=BZoYM9yp+x+o5naerg3wRAA@mail.gmail.com>
+Subject: Automatic secondary intermediate target deduction
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: malat@debian.org, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: yamada.masahiro@socionext.com
 
-On Wed, Oct 31, 2018 at 5:14 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> On Wed, Oct 31, 2018 at 8:28 PM Miguel Ojeda
-> <miguel.ojeda.sandonis@gmail.com> wrote:
-> >
-> > By the way, is it possible that scripts/ and similar stuff uses
-> > directly include/linux/compiler_attributes.h (whenever it hits
-> > mainline, see https://github.com/ojeda/linux/blob/compiler-attributes/include/linux/compiler_attributes.h
-> > )? It is a header that does not depend on anything, so it could easily
-> > be shared; and would avoid having to maintain two sets of attributes.
-> > Let me know, I can take a look at it if you think it is a good idea.
+Hello,
 
-Landed a couple of weeks ago.
+The tree used to put patterns in the .PRECIOUS target to prevent make
+from cleaning up intermediate files. Masahiro realized this was wrong
+and moved this to the .SECONDARY target instead, while also generally
+ensuring things wind up in the $(targets) variable, which is nice
+because it means those intermediate files are correctly cleaned up by
+`make clean`. This is great, but it comes with some issues, which I've
+now worked around, but I wanted to run the whole reasoning and
+solution by you.
 
-> No.
-> I want to share a header file between kernel and host-tools
-> only when we need to do so.
->
-> In this case, it is wrong to use the linker magic for the host tool
-> if you look at the so ugly #if defined(__MACH__) part.
+A great thing about the build system is that you can write "widgets-y
++= acmelib.o", and it will automatically figure out whether that
+should be built from a .c or a .o or from something else. But what if
+the chain is actually .pl -> .S -> .o? In that case it's standard to
+add a rule for that in the subdirectory's makefile:
 
-Do you mean this line?
+quiet_cmd_perlasm = PERLASM $@
+     cmd_perlasm = $(PERL) $< > $@
+%.S: %.pl
+       $(call cmd,perlasm)
 
-  #define SECTION(name)   __attribute__((section("__TEXT, " #name)))
+This works fine and is boring and standard, but we still need to add
+those intermediate .S files to $(targets).
 
-I would say having exceptions is fine, i.e. the idea was to reduce
-"duplicated" definitions. In this case, the #define has a different
-name and style, so I would say it is clear.
+Consider a general structure of a makefile like this:
 
-Anyway, if the policy is not sharing headers at all, that is fine!
+widgeter_snickers-y := snickers/snickers.o
+widgeter_snickers-$(CONFIG_SNICKER_MEGA) += snickers/snickers-mega.o
+widgeter_snickers-$(CONFIG_SNICKER_TINY) += snickers/snickers-tiny.o
+obj-$(CONFIG_SNICKERVILLE) += widgeter_snickers.o
 
-Cheers,
-Miguel
+widgeter_skittles-y := skittles/skittles.o
+widgeter_skittles-$(CONFIG_SKITTLE_BLUE) += skittles/skittles-blue.o
+widgeter_skittles-$(CONFIG_SKITTLE_RED) += skittles/skittles-red.o
+widgeter_skittles-$(CONFIG_SKITTLE_GREEN) += skittles/skittles-green.o
+obj-$(CONFIG_SKITTLEMESA) += widgeter_skittles.o
+
+Some of those .o might come from .c, others from .S, and others from
+.pl->.S->.o. Our goal is to compute a list of all of the file's .S
+that come from .pl. It's important that we allow this to work both
+when the CONFIG_* variables are present (Makefile.build) and when the
+CONFIG_* variables aren't present, since Makefile.clean doesn't
+include auto.conf. Here's how we're going to do it:
+
+1. Expand obj-*, remove the .o suffix, and treat as a variable, and
+then expand the -* of those variables:
+
+part1 := $(foreach t,$(patsubst %.o,%,$(obj-) $(obj-m)
+$(obj-y)),$($(t)-) $($(t)-y))
+
+Now $(part1) contains all of the *.o files we wrote into the above file.
+
+2. Replace all of the *.o files with a corresponding *.pl and tack on
+the full path:
+
+part2 := $(patsubst %.o,$(srctree)/$(src)/%.pl,$(part1))
+
+Now $(part2) contains full paths of potential .pl files.
+
+3. Remove from the list all *.pl files that don't actually exist
+(since the .o might be coming from a .c or directly a .S instead):
+
+part3 := $(wildcard $(part2))
+
+Now $(part3) contains full paths of existing .pl files that correspond
+to the makefile's explicitly listed .o files.
+
+4. Remove the full path prefix and change the .pl suffix to a .S
+suffix, so that it represents the intermediate file:
+
+part4 := $(patsubst $(srctree)/$(src)/%.pl,%.S,$(part3))
+
+Now $(part4) contains all of the intermediate .S targets that
+correspond with .pl sources and .o destinations. We can now add that
+to $(targets);
+
+targets += $(part4)
+
+And after this everything works perfectly. Putting it all together, we
+can simply add this single line to the makefile and everything
+functions exactly as expected:
+
+targets += $(patsubst $(srctree)/$(src)/%.pl,%.S,$(wildcard $(patsubst
+%.o,$(srctree)/$(src)/%.pl,$(foreach t,$(patsubst %.o,%,$(obj-)
+$(obj-m) $(obj-y)),$($(t)-) $($(t)-y)))))
+
+Cool! I mean, sort of. I really love make, and so this whole exercise
+is perversely enjoyable for me (maybe I should quit kernels and write
+lisp instead?), but I realize this isn't exactly a simple solution.
+It's sitting in my repo right now with a big comment, but I'm sort of
+hesitant to submit it. If that's okay with you, I'll send it upstream
+as part of something else I'm working on. But if these types of
+shenanigans don't really sit well, there are a few alternatives I can
+think of that you might weigh in on:
+
+a. The solution above, which achieves all objectives, but results in a
+sort of obtuse line.
+
+b. The solution above, but I split that line up into a few
+intermediate stages to make it more clear.
+
+c. I list the .pl files explicitly instead of depending on automatic
+inference like the above. This is simple, but not as slick and another
+thing developers have to remember to do when adding. But it's probably
+the least controversial and most obvious.
+
+d. Rather than going .pl -> .S, I go .perlasm.pl -> .perlasm.S, and
+then add the filetype to Makefile.build, where it has stanzas like
+"$(call intermediate_targets, .asn1.o, .asn1.c .asn1.h)". One
+significant downside of this is that I don't see any such stanzas in
+Makefile.clean, so I'm not sure that intermediate targets generated
+this way are getting cleaned up.
+
+e. I quit trying to be clever by ensuring that the .S in $(targets)
+corresponds with both a .pl and a .o listed in the tree of $(obj-*),
+and instead just wildcard my way to the relevant *.pl files with
+something like: targets += $(patsubst
+$(srctree)/$(src)/%.pl,%.S,$(wildcard $(srctree)/$(src)/*/*.pl)). This
+is slightly simpler than (a) and (b), but usually wildcard'ing on
+actual directories isn't the most bug-free way of using make.
+
+f. Something else?
+
+The answer is probably "just use (c)", but in case the topic interests
+you, I'm happy to discuss the various alternatives.
+
+Thanks,
+Jason
