@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:47875 "EHLO frisell.zx2c4.com"
+Received: from frisell.zx2c4.com ([192.95.5.64]:55661 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725849AbeKQSwd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 17 Nov 2018 13:52:33 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 4b245c89
+        id S1725930AbeKQVWi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 17 Nov 2018 16:22:38 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id e0625d41
         for <linux-kbuild@vger.kernel.org>;
-        Sat, 17 Nov 2018 08:30:52 +0000 (UTC)
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 94894646 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
+        Sat, 17 Nov 2018 11:00:33 +0000 (UTC)
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7fca5a84 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
         for <linux-kbuild@vger.kernel.org>;
-        Sat, 17 Nov 2018 08:30:51 +0000 (UTC)
-Received: by mail-oi1-f176.google.com with SMTP id u18so3396636oie.10
-        for <linux-kbuild@vger.kernel.org>; Sat, 17 Nov 2018 00:36:34 -0800 (PST)
+        Sat, 17 Nov 2018 11:00:32 +0000 (UTC)
+Received: by mail-oi1-f174.google.com with SMTP id y23so12620006oia.4
+        for <linux-kbuild@vger.kernel.org>; Sat, 17 Nov 2018 03:06:16 -0800 (PST)
 MIME-Version: 1.0
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Fri, 16 Nov 2018 18:52:25 -0800
-Message-ID: <CAHmME9riFHZc9zBtFamPOd1N1D=BZoYM9yp+x+o5naerg3wRAA@mail.gmail.com>
+Date: Sat, 17 Nov 2018 03:06:04 -0800
+Message-ID: <CAHmME9ruRShDz=Pyva4NuMfwfh4UbEvFEYuPSx4cMO38i+uBAQ@mail.gmail.com>
 Subject: Automatic secondary intermediate target deduction
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
