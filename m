@@ -1,76 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:47513 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725855AbeKROez (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:24940 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725855AbeKROkW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Nov 2018 09:34:55 -0500
+        Sun, 18 Nov 2018 09:40:22 -0500
 MIME-Version: 1.0
-References: <1541404309-30210-1-git-send-email-yamada.masahiro@socionext.com> <17334806.ITFQqvuZkQ@avalon>
-In-Reply-To: <17334806.ITFQqvuZkQ@avalon>
+References: <20181114204309.18645-1-namit@vmware.com> <20181114204309.18645-2-namit@vmware.com>
+ <CAK7LNAREF_Pcejq1LJ=3K7h0M4o4oSRLfbeJc73O+8HV420Ziw@mail.gmail.com> <1C316B94-8F27-439C-B049-9947DC329780@vmware.com>
+In-Reply-To: <1C316B94-8F27-439C-B049-9947DC329780@vmware.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 18 Nov 2018 13:15:16 +0900
-Message-ID: <CAK7LNAQ=Mj+P46=Y2uMr0AiP9nohoRWbKA5kdvL+domZQncBYA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: rpm-pkg: fix binrpm-pkg breakage when O= is used
+Date: Sun, 18 Nov 2018 13:20:39 +0900
+Message-ID: <CAK7LNATFVHnPXh-uEA+T9QNw3OnSvkLLKMuJ_tF1v8bEveStSg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] Makefile: Fix distcc compilation with x86 macros
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, zhenzhong.duan@oracle.com, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Nadav Amit <namit@vmware.com>
+Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi Laurent,
-
-On Sun, Nov 18, 2018 at 4:22 AM Laurent Pinchart
-<laurent.pinchart@ideasonboard.com> wrote:
+On Sat, Nov 17, 2018 at 6:02 AM Nadav Amit <namit@vmware.com> wrote:
 >
-> Hi Yamada-san,
+> From: Masahiro Yamada
+> Sent: November 16, 2018 at 7:45:45 AM GMT
+> > To: Nadav Amit <namit@vmware.com>
+> > Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.n=
+et>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, =
+H. Peter Anvin <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild maili=
+ng list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-ke=
+rnel@vger.kernel.org>
+> > Subject: Re: [PATCH v2 1/2] Makefile: Fix distcc compilation with x86 m=
+acros
+> >
+> >
+> > On Thu, Nov 15, 2018 at 1:01 PM Nadav Amit <namit@vmware.com> wrote:
+> >> Introducing the use of asm macros in c-code broke distcc, since it onl=
+y
+> >> sends the preprocessed source file. The solution is to break the
+> >> compilation into two separate phases of compilation and assembly, and
+> >> between the two concatenate the assembly macros and the compiled (yet
+> >> not assembled) source file. Since this is less efficient, this
+> >> compilation mode is only used when distcc or icecc are used.
+> >>
+> >> Note that the assembly stage should also be distributed, if distcc is
+> >> configured using "CFLAGS=3D-DENABLE_REMOTE_ASSEMBLE".
+> >>
+> >> Reported-by: Logan Gunthorpe <logang@deltatee.com>
+> >> Signed-off-by: Nadav Amit <namit@vmware.com>
+> >
+> >
+> > Wow, this is so ugly.
 >
-> On Monday, 5 November 2018 09:51:49 EET Masahiro Yamada wrote:
-> > Zhenzhong Duan reported that running 'make O=/build/kernel binrpm-pkg'
-> > failed with the following errors:
-> >
-> >   Running 'make O=/build/kernel binrpm-pkg' failed with below two errors.
-> >
-> >   Makefile:600: include/config/auto.conf: No such file or directory
-> >
-> >   + cp make -C /mnt/root/kernel O=/build/kernel image_name make -f
-> >   /mnt/root/kernel/Makefile ...
-> >   cp: invalid option -- 'C'
-> >   Try 'cp --help' for more information.
-> >
-> > Prior to commit 80463f1b7bf9 ("kbuild: add --include-dir flag only
-> > for out-of-tree build"), both objtree and srctree were added to
-> > --include-dir, and the wrong code 'make image_name' was working
-> > relying on that. Now, the potential issue that had previously been
-> > hidden just showed up.
-> >
-> > 'make image_name' recurses to the generated $(objtree)/Makefile and
-> > ends up with running in srctree, which is incorrect. It should be
-> > invoked with '-f $srctree/Makefile' (or KBUILD_SRC=) to be executed
-> > in objtree.
+> Indeed, it is not pretty from the Makefile system point of view.
 >
-> I (painfully) found out that a similar problem occurs with 'make bindeb-pkg'.
+> But it does have merits when it comes to the actual use (by developers). =
+If
+> you look on x86, there are a lot of duplicated implementation for C and A=
+sm
+> and crazy C macros, for example for PV function call or the alternative
+> mechanism. The code is also less readable in its current form.
 >
-> After spending half a day unsuccessfully trying to debug and fix the problem I
-> ran across this patch. The naive approach of mimicking the solution and adding
-> 'MAKE="$MAKE -f $srctree/Makefile"' at the top of scripts/package/builddeb
-> didn't work. Reverting commit 80463f1b7bf9 fixed the problem.
+> > I realized how much I hated this by now.
+> >
+> > My question is, how long do we need to carry this?
 >
-> Would you be able to give it a look ? I'm afraid my limited skills related to
-> the kernel build system don't allow me to submit a fix :-S
-
-I fixed bindeb-pkg as well for v4.20-rc2
-
-commit 02826a6ba301b72461c3706e1cc66d5571cd327e
-Author: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date:   Mon Nov 5 16:52:34 2018 +0900
-
-    kbuild: deb-pkg: fix bindeb-pkg breakage when O= is used
+> If it is purely about performance, I am not sure it would make sense to
+> put it in, as it will indeed be (eventually) solved by the compiler, and
+> the penalty is not too great.
 
 
-If you still see a problem, please let me know.
+It is unfortunate to mess up the code
+by having two different ways to achieve the same goal.
+
+When GCC with asm inline support is shipped,
+would you revert 77b0bf55 ?
 
 
 
--- 
+> There is also an advantage for having assembly macros that can override t=
+he
+> generated assembly that was generated by the compiler. I think HPA (cc=E2=
+=80=99d)
+> looks in this direction (and so do I).
+>
+> Regards,
+> Nadav
+
+
+
+--=20
 Best Regards
 Masahiro Yamada
