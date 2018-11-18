@@ -1,93 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:24940 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725855AbeKROkW (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:49952 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725942AbeKRPUb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Nov 2018 09:40:22 -0500
+        Sun, 18 Nov 2018 10:20:31 -0500
 MIME-Version: 1.0
-References: <20181114204309.18645-1-namit@vmware.com> <20181114204309.18645-2-namit@vmware.com>
- <CAK7LNAREF_Pcejq1LJ=3K7h0M4o4oSRLfbeJc73O+8HV420Ziw@mail.gmail.com> <1C316B94-8F27-439C-B049-9947DC329780@vmware.com>
-In-Reply-To: <1C316B94-8F27-439C-B049-9947DC329780@vmware.com>
+References: <1542270435-11181-1-git-send-email-yamada.masahiro@socionext.com>
+ <1542270435-11181-4-git-send-email-yamada.masahiro@socionext.com> <20181116200109.GC15240@ravnborg.org>
+In-Reply-To: <20181116200109.GC15240@ravnborg.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 18 Nov 2018 13:20:39 +0900
-Message-ID: <CAK7LNATFVHnPXh-uEA+T9QNw3OnSvkLLKMuJ_tF1v8bEveStSg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] Makefile: Fix distcc compilation with x86 macros
+Date: Sun, 18 Nov 2018 14:00:31 +0900
+Message-ID: <CAK7LNATefLJcb52N0=p2qAk-N_0hEQDOQinw5+kUiKo7oWFRnQ@mail.gmail.com>
+Subject: Re: [PATCH 3/8] kbuild: refactor modversions build rules
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nadav Amit <namit@vmware.com>
-Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Sat, Nov 17, 2018 at 6:02 AM Nadav Amit <namit@vmware.com> wrote:
+Hi Sam,
+
+
+On Sat, Nov 17, 2018 at 5:01 AM Sam Ravnborg <sam@ravnborg.org> wrote:
 >
-> From: Masahiro Yamada
-> Sent: November 16, 2018 at 7:45:45 AM GMT
-> > To: Nadav Amit <namit@vmware.com>
-> > Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.n=
-et>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, =
-H. Peter Anvin <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild maili=
-ng list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-ke=
-rnel@vger.kernel.org>
-> > Subject: Re: [PATCH v2 1/2] Makefile: Fix distcc compilation with x86 m=
-acros
-> >
-> >
-> > On Thu, Nov 15, 2018 at 1:01 PM Nadav Amit <namit@vmware.com> wrote:
-> >> Introducing the use of asm macros in c-code broke distcc, since it onl=
-y
-> >> sends the preprocessed source file. The solution is to break the
-> >> compilation into two separate phases of compilation and assembly, and
-> >> between the two concatenate the assembly macros and the compiled (yet
-> >> not assembled) source file. Since this is less efficient, this
-> >> compilation mode is only used when distcc or icecc are used.
-> >>
-> >> Note that the assembly stage should also be distributed, if distcc is
-> >> configured using "CFLAGS=3D-DENABLE_REMOTE_ASSEMBLE".
-> >>
-> >> Reported-by: Logan Gunthorpe <logang@deltatee.com>
-> >> Signed-off-by: Nadav Amit <namit@vmware.com>
-> >
-> >
-> > Wow, this is so ugly.
+> Hi Masahiro
 >
-> Indeed, it is not pretty from the Makefile system point of view.
+> On Thu, Nov 15, 2018 at 05:27:10PM +0900, Masahiro Yamada wrote:
+> > Let $(CC) compile objects into normal files *.o instead of .tmp_*.o
+> > whether CONFIG_MODVERSIONS is enabled or not. This will help simplify
+> > build rules a lot.
 >
-> But it does have merits when it comes to the actual use (by developers). =
-If
-> you look on x86, there are a lot of duplicated implementation for C and A=
-sm
-> and crazy C macros, for example for PV function call or the alternative
-> mechanism. The code is also less readable in its current form.
+> Another approach would be to move more of the build stuff to
+> one or a few build scripts.
+
+Shifting code from Makefile to a shell script
+will be another clean-up.
+
+
+This patch is addressing a different problem.
+
+See this code in Malefile.build
+
+ifdef CONFIG_MODVERSIONS
+objtool_o = $(@D)/.tmp_$(@F)
+else
+objtool_o = $(@)
+endif
+
+
+
+cmd_cc_o_c writes an object into a different file name
+depending CONFIG_MODVERSIONS, which makes difficult
+for other actions to manipulate the object in a
+consistent manner.
+
+I will clarify this in the commit log in v2.
+
+Thanks.
+
+
+
+
+
+> Using build scripts makes is much easier to add comments and
+> still keep it readable.
+> And when the build logic list a set of serialized actions
+> they thay can be included in a build script nicely.
 >
-> > I realized how much I hated this by now.
-> >
-> > My question is, how long do we need to carry this?
+> But that said - I also like the simplifications you made.
+> Everytime you trim the core kbuild files it is a win for
+> readability.
 >
-> If it is purely about performance, I am not sure it would make sense to
-> put it in, as it will indeed be (eventually) solved by the compiler, and
-> the penalty is not too great.
-
-
-It is unfortunate to mess up the code
-by having two different ways to achieve the same goal.
-
-When GCC with asm inline support is shipped,
-would you revert 77b0bf55 ?
+>         Sam
 
 
 
-> There is also an advantage for having assembly macros that can override t=
-he
-> generated assembly that was generated by the compiler. I think HPA (cc=E2=
-=80=99d)
-> looks in this direction (and so do I).
->
-> Regards,
-> Nadav
-
-
-
---=20
+-- 
 Best Regards
 Masahiro Yamada
