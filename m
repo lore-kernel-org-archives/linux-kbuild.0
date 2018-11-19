@@ -1,69 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37458 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404452AbeKTDvV (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Nov 2018 22:51:21 -0500
-Received: by mail-wr1-f68.google.com with SMTP id j10so18732323wru.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 19 Nov 2018 09:26:57 -0800 (PST)
-From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v11 04/24] kasan: rename source files to reflect the new naming scheme
-Date: Mon, 19 Nov 2018 18:26:20 +0100
-Message-Id: <9cd2f3cc890932e8d3ae5eb2ac24458d39d87960.1542648335.git.andreyknvl@google.com>
-In-Reply-To: <cover.1542648335.git.andreyknvl@google.com>
-References: <cover.1542648335.git.andreyknvl@google.com>
+Received: from mail-eopbgr760048.outbound.protection.outlook.com ([40.107.76.48]:33867
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2404730AbeKTDmd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 19 Nov 2018 22:42:33 -0500
+From: Nadav Amit <namit@vmware.com>
+Subject: Re: [PATCH v2 1/2] Makefile: Fix distcc compilation with x86 macros
+Date: Mon, 19 Nov 2018 17:18:06 +0000
+Message-ID: <1F17E69E-06E8-4A5A-A434-1DCD6C6F0259@vmware.com>
+References: <20181114204309.18645-1-namit@vmware.com>
+ <20181114204309.18645-2-namit@vmware.com>
+ <CAK7LNAREF_Pcejq1LJ=3K7h0M4o4oSRLfbeJc73O+8HV420Ziw@mail.gmail.com>
+ <1C316B94-8F27-439C-B049-9947DC329780@vmware.com>
+ <CAK7LNATFVHnPXh-uEA+T9QNw3OnSvkLLKMuJ_tF1v8bEveStSg@mail.gmail.com>
+In-Reply-To: <CAK7LNATFVHnPXh-uEA+T9QNw3OnSvkLLKMuJ_tF1v8bEveStSg@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8C6E82CD31B0FD4EADBEAE4658B8D0FE@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
-Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-We now have two KASAN modes: generic KASAN and tag-based KASAN. Rename
-kasan.c to generic.c to reflect that. Also rename kasan_init.c to init.c
-as it contains initialization code for both KASAN modes.
-
-Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
----
- mm/kasan/Makefile                 | 8 ++++----
- mm/kasan/{kasan.c => generic.c}   | 0
- mm/kasan/{kasan_init.c => init.c} | 0
- 3 files changed, 4 insertions(+), 4 deletions(-)
- rename mm/kasan/{kasan.c => generic.c} (100%)
- rename mm/kasan/{kasan_init.c => init.c} (100%)
-
-diff --git a/mm/kasan/Makefile b/mm/kasan/Makefile
-index a6df14bffb6b..d643530b24aa 100644
---- a/mm/kasan/Makefile
-+++ b/mm/kasan/Makefile
-@@ -1,14 +1,14 @@
- # SPDX-License-Identifier: GPL-2.0
- KASAN_SANITIZE := n
- UBSAN_SANITIZE_common.o := n
--UBSAN_SANITIZE_kasan.o := n
-+UBSAN_SANITIZE_generic.o := n
- KCOV_INSTRUMENT := n
- 
--CFLAGS_REMOVE_kasan.o = -pg
-+CFLAGS_REMOVE_generic.o = -pg
- # Function splitter causes unnecessary splits in __asan_load1/__asan_store1
- # see: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63533
- 
- CFLAGS_common.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
--CFLAGS_kasan.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
-+CFLAGS_generic.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
- 
--obj-y := common.o kasan.o report.o kasan_init.o quarantine.o
-+obj-y := common.o generic.o report.o init.o quarantine.o
-diff --git a/mm/kasan/kasan.c b/mm/kasan/generic.c
-similarity index 100%
-rename from mm/kasan/kasan.c
-rename to mm/kasan/generic.c
-diff --git a/mm/kasan/kasan_init.c b/mm/kasan/init.c
-similarity index 100%
-rename from mm/kasan/kasan_init.c
-rename to mm/kasan/init.c
--- 
-2.19.1.1215.g8438c0b245-goog
+YXQgODoyMCBQTSwgTWFzYWhpcm8gWWFtYWRhIDx5YW1hZGEubWFzYWhpcm9Ac29jaW9uZXh0LmNv
+bT4gd3JvdGU6DQoNCj4gT24gU2F0LCBOb3YgMTcsIDIwMTggYXQgNjowMiBBTSBOYWRhdiBBbWl0
+IDxuYW1pdEB2bXdhcmUuY29tPiB3cm90ZToNCj4+IEZyb206IE1hc2FoaXJvIFlhbWFkYQ0KPj4g
+U2VudDogTm92ZW1iZXIgMTYsIDIwMTggYXQgNzo0NTo0NSBBTSBHTVQNCj4+PiBUbzogTmFkYXYg
+QW1pdCA8bmFtaXRAdm13YXJlLmNvbT4NCj4+PiBDYzogSW5nbyBNb2xuYXIgPG1pbmdvQHJlZGhh
+dC5jb20+LCBNaWNoYWwgTWFyZWsgPG1pY2hhbC5sa21sQG1hcmtvdmkubmV0PiwgVGhvbWFzIEds
+ZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+LCBCb3Jpc2xhdiBQZXRrb3YgPGJwQGFsaWVuOC5k
+ZT4sIEguIFBldGVyIEFudmluIDxocGFAenl0b3IuY29tPiwgWDg2IE1MIDx4ODZAa2VybmVsLm9y
+Zz4sIExpbnV4IEtidWlsZCBtYWlsaW5nIGxpc3QgPGxpbnV4LWtidWlsZEB2Z2VyLmtlcm5lbC5v
+cmc+LCBMaW51eCBLZXJuZWwgTWFpbGluZyBMaXN0IDxsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwu
+b3JnPg0KPj4+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMS8yXSBNYWtlZmlsZTogRml4IGRpc3Rj
+YyBjb21waWxhdGlvbiB3aXRoIHg4NiBtYWNyb3MNCj4+PiANCj4+PiANCj4+PiBPbiBUaHUsIE5v
+diAxNSwgMjAxOCBhdCAxOjAxIFBNIE5hZGF2IEFtaXQgPG5hbWl0QHZtd2FyZS5jb20+IHdyb3Rl
+Og0KPj4+PiBJbnRyb2R1Y2luZyB0aGUgdXNlIG9mIGFzbSBtYWNyb3MgaW4gYy1jb2RlIGJyb2tl
+IGRpc3RjYywgc2luY2UgaXQgb25seQ0KPj4+PiBzZW5kcyB0aGUgcHJlcHJvY2Vzc2VkIHNvdXJj
+ZSBmaWxlLiBUaGUgc29sdXRpb24gaXMgdG8gYnJlYWsgdGhlDQo+Pj4+IGNvbXBpbGF0aW9uIGlu
+dG8gdHdvIHNlcGFyYXRlIHBoYXNlcyBvZiBjb21waWxhdGlvbiBhbmQgYXNzZW1ibHksIGFuZA0K
+Pj4+PiBiZXR3ZWVuIHRoZSB0d28gY29uY2F0ZW5hdGUgdGhlIGFzc2VtYmx5IG1hY3JvcyBhbmQg
+dGhlIGNvbXBpbGVkICh5ZXQNCj4+Pj4gbm90IGFzc2VtYmxlZCkgc291cmNlIGZpbGUuIFNpbmNl
+IHRoaXMgaXMgbGVzcyBlZmZpY2llbnQsIHRoaXMNCj4+Pj4gY29tcGlsYXRpb24gbW9kZSBpcyBv
+bmx5IHVzZWQgd2hlbiBkaXN0Y2Mgb3IgaWNlY2MgYXJlIHVzZWQuDQo+Pj4+IA0KPj4+PiBOb3Rl
+IHRoYXQgdGhlIGFzc2VtYmx5IHN0YWdlIHNob3VsZCBhbHNvIGJlIGRpc3RyaWJ1dGVkLCBpZiBk
+aXN0Y2MgaXMNCj4+Pj4gY29uZmlndXJlZCB1c2luZyAiQ0ZMQUdTPS1ERU5BQkxFX1JFTU9URV9B
+U1NFTUJMRSIuDQo+Pj4+IA0KPj4+PiBSZXBvcnRlZC1ieTogTG9nYW4gR3VudGhvcnBlIDxsb2dh
+bmdAZGVsdGF0ZWUuY29tPg0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBOYWRhdiBBbWl0IDxuYW1pdEB2
+bXdhcmUuY29tPg0KPj4+IA0KPj4+IA0KPj4+IFdvdywgdGhpcyBpcyBzbyB1Z2x5Lg0KPj4gDQo+
+PiBJbmRlZWQsIGl0IGlzIG5vdCBwcmV0dHkgZnJvbSB0aGUgTWFrZWZpbGUgc3lzdGVtIHBvaW50
+IG9mIHZpZXcuDQo+PiANCj4+IEJ1dCBpdCBkb2VzIGhhdmUgbWVyaXRzIHdoZW4gaXQgY29tZXMg
+dG8gdGhlIGFjdHVhbCB1c2UgKGJ5IGRldmVsb3BlcnMpLiBJZg0KPj4geW91IGxvb2sgb24geDg2
+LCB0aGVyZSBhcmUgYSBsb3Qgb2YgZHVwbGljYXRlZCBpbXBsZW1lbnRhdGlvbiBmb3IgQyBhbmQg
+QXNtDQo+PiBhbmQgY3JhenkgQyBtYWNyb3MsIGZvciBleGFtcGxlIGZvciBQViBmdW5jdGlvbiBj
+YWxsIG9yIHRoZSBhbHRlcm5hdGl2ZQ0KPj4gbWVjaGFuaXNtLiBUaGUgY29kZSBpcyBhbHNvIGxl
+c3MgcmVhZGFibGUgaW4gaXRzIGN1cnJlbnQgZm9ybS4NCj4+IA0KPj4+IEkgcmVhbGl6ZWQgaG93
+IG11Y2ggSSBoYXRlZCB0aGlzIGJ5IG5vdy4NCj4+PiANCj4+PiBNeSBxdWVzdGlvbiBpcywgaG93
+IGxvbmcgZG8gd2UgbmVlZCB0byBjYXJyeSB0aGlzPw0KPj4gDQo+PiBJZiBpdCBpcyBwdXJlbHkg
+YWJvdXQgcGVyZm9ybWFuY2UsIEkgYW0gbm90IHN1cmUgaXQgd291bGQgbWFrZSBzZW5zZSB0bw0K
+Pj4gcHV0IGl0IGluLCBhcyBpdCB3aWxsIGluZGVlZCBiZSAoZXZlbnR1YWxseSkgc29sdmVkIGJ5
+IHRoZSBjb21waWxlciwgYW5kDQo+PiB0aGUgcGVuYWx0eSBpcyBub3QgdG9vIGdyZWF0Lg0KPiAN
+Cj4gDQo+IEl0IGlzIHVuZm9ydHVuYXRlIHRvIG1lc3MgdXAgdGhlIGNvZGUNCj4gYnkgaGF2aW5n
+IHR3byBkaWZmZXJlbnQgd2F5cyB0byBhY2hpZXZlIHRoZSBzYW1lIGdvYWwuDQoNCkluZGVlZCwg
+YnV0IEkgZmFpbCB0byBzZWUgaG93IHRoaXMgc3RhdGVtZW50IGZpdHMgd2l0aCB0aGUgbmV4dCBz
+ZW50ZW5jZS4NCg0KPiBXaGVuIEdDQyB3aXRoIGFzbSBpbmxpbmUgc3VwcG9ydCBpcyBzaGlwcGVk
+LA0KPiB3b3VsZCB5b3UgcmV2ZXJ0IDc3YjBiZjU1ID8NCg0KVGhpcyBwYXRjaCBhbmQgdGhlIGZv
+bGxvd2luZyBvbmVzIHdlcmUgbm90IHdyaXR0ZW4gdG8gYmUgcmV2ZXJ0ZWQsIGkuZS4sDQpyZXZl
+cnRpbmcgdGhlbSBsYXRlciBtYXkgbm90IGJlIGVhc3kgc2luY2UgdGhleSByZW1vdmUgcmVkdW5k
+YW50IEMgaW5saW5lDQphc3NlbWJseSBjaHVua3MuDQoNClNpbmNlIGdjYyB3aWxsIHNvbHZlIHRo
+ZSBpbmxpbmUgYXNzZW1ibHkgaXNzdWVzLCB0aGUgdmFsdWUgb2YgdGhlc2UgcGF0Y2hlcw0KaXMg
+aW4gdW5pZnlpbmcgdGhlIGFzc2VtYmx5IHRoYXQgaXMgdXNlZCBpbiAuYyBhbmQgLlMgZmlsZXMu
+IER1ZSB0byB0aGUgbGFjaw0Kb2YgbTQtbGlrZSBwcmVwcm9jZXNzb3IgaW4gdGhlIExpbnV4IG1h
+a2Utc3lzdGVtLCB0aGUgc29sdXRpb24gaXMgYSBiaXQNCuKAnGhhY2t54oCdIChpbiBvdGhlciB3
+b3JkcywgSSBkb27igJl0IHNlZSBhIHJlYXNvbmFibGUgYWx0ZXJuYXRpdmUgc29sdXRpb24pLg0K
+DQpTbyB0aGVyZSBpcyBhIGRvd25zaWRlIGluIHRoZSBmb3JtIG9mIHBlcmZvcm1hbmNlIGRlZ3Jh
+ZGF0aW9uIG9mIGRpc3RjYywgYW5kDQpoYWNreSAobm90IHRvbyBoYWNreT8pIE1ha2VmaWxlIGNo
+YW5nZXMuIE9uIHRoZSB1cHNpZGUsIGV4Y2VwdCBhZGRyZXNzaW5nDQp0aGUgZ2NjIHN0YXRlbWVu
+dCBjb3N0IGNvbXB1dGF0aW9uIChpbmxpbmUpIGlzc3VlLCB0aGUgcGF0Y2ggcmVtb3Zlcw0KcmVk
+dW5kYW50IGNvZGUsIGFuZCBpbXByb3ZlcyBhc3NlbWJseSBjb2RlIHJlYWRhYmlsaXR5LiBJbiBh
+ZGRpdGlvbiwgaXQNCnByb3ZpZGVzIHRoZSBvcHRpb24gdG8gbWFrZSBhc3NlbWJseSBtYW5pcHVs
+YXRpb25zIGFmdGVyIGNvbXBpbGF0aW9uLCB3aGljaA0KSFBBIGFuZCBvdGhlcnMgKG1lKSBsb29r
+IGludG8uDQoNChBBbnlob3csIGlmIGFmdGVyIGFsbCwgdGhlIGRvd25zaWRlIGlzIGNvbnNpZGVy
+ZWQgZ3JlYXRlciB0aGFuIHRoZSB1cHNpZGUsDQppdCBpcyBiZXN0IHRvIHJlbW92ZSB0aGUgcGF0
+Y2hlcyBzb29uZXIgdGhhbiBsYXRlciwgYXMgYSByZXZlcnQgbGF0ZXIgd2lsbA0KYmUgbW9yZSBw
+YWluZnVsLg0KDQpSZWdhcmRzLA0KTmFkYXY=
