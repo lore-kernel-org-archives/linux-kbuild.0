@@ -1,37 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:41214 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730797AbeKTHQP (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Nov 2018 02:16:15 -0500
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: netfilter Kconfig question
-Message-ID: <e1a6228d-1341-6264-d97a-e2bd52a65c82@infradead.org>
-Date: Mon, 19 Nov 2018 12:50:49 -0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Received: from mail-eopbgr760091.outbound.protection.outlook.com ([40.107.76.91]:61333
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730755AbeKTH1L (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 20 Nov 2018 02:27:11 -0500
+From: Paul Burton <paul.burton@mips.com>
+Subject: Re: [PATCH 3/9] MIPS: remove the HT_PCI config option
+Date: Mon, 19 Nov 2018 21:01:42 +0000
+Message-ID: <20181119210141.nissqr6zaldt23xg@pburton-laptop>
+References: <20181115190538.17016-1-hch@lst.de>
+ <20181115190538.17016-4-hch@lst.de>
+In-Reply-To: <20181115190538.17016-4-hch@lst.de>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <40C8AC8315647748863615FE4C97EE3C@namprd22.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: Taehee Yoo <ap420073@gmail.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Matt Porter <mporter@kernel.crashing.org>, Alexandre Bounine <alex.bou9@gmail.com>, Dominik Brodowski <linux@dominikbrodowski.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "linux-alpha@vger.kernel.org" <linux-alpha@vger.kernel.org>, "linux-mips@linux-mips.org" <linux-mips@linux-mips.org>
 
-Hi Yamada-san,
+Hi Christoph,
 
-There was recently a netfilter build error in linux-next for which
-a patch was posted by Taehee Yoo.  The patch works (fixes the build
-error) but I don't see how or why.
+On Thu, Nov 15, 2018 at 08:05:31PM +0100, Christoph Hellwig wrote:
+> This option is always selected from LOONGSON_MACH3X.  Switch to just
+> seleting PCI from that option and definining LOONGSON_PCIIO_BASE based
+> on CONFIG_LOONGSON_MACH3X.
+>=20
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  arch/mips/Kconfig                                | 11 -----------
+>  arch/mips/include/asm/mach-loongson64/loongson.h |  2 +-
+>  arch/mips/loongson64/Kconfig                     |  2 +-
+>  3 files changed, 2 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
+> index 8272ea4c7264..7d28c9dd75d0 100644
+> --- a/arch/mips/Kconfig
+> +++ b/arch/mips/Kconfig
+> @@ -3040,17 +3040,6 @@ config PCI
+>  	  your box. Other bus systems are ISA, EISA, or VESA. If you have PCI,
+>  	  say Y, otherwise N.
+> =20
+> -config HT_PCI
+> -	bool "Support for HT-linked PCI"
+> -	default y
+> -	depends on CPU_LOONGSON3
+> -	select PCI
+> -	select PCI_DOMAINS
+> -	help
+> -	  Loongson family machines use Hyper-Transport bus for inter-core
+> -	  connection and device connection. The PCI bus is a subordinate
+> -	  linked at HT. Choose Y for Loongson-3 based machines.
+> -
+>  config PCI_DOMAINS
+>  	bool
+> =20
+> diff --git a/arch/mips/loongson64/Kconfig b/arch/mips/loongson64/Kconfig
+> index c865b4b9b775..781a5156ab21 100644
+> --- a/arch/mips/loongson64/Kconfig
+> +++ b/arch/mips/loongson64/Kconfig
+> @@ -76,7 +76,7 @@ config LOONGSON_MACH3X
+>  	select CPU_HAS_WB
+>  	select HW_HAS_PCI
+>  	select ISA
+> -	select HT_PCI
+> +	select PCI
+>  	select I8259
+>  	select IRQ_MIPS_CPU
+>  	select NR_CPUS_DEFAULT_4
 
-My build error report is here:
-https://lore.kernel.org/lkml/fa7a7824-44df-c058-dba2-ec29c5028361@infradead.org/T/#u
+Should this also select PCI_DOMAINS to preserve the existing behavior?
 
+If not, could you explain why in the commit message?
 
-Would you take a look at it and try to explain why the patch works?
-
-The patch's email thread begins here:
-https://www.spinics.net/lists/netfilter-devel/msg56985.html
-
-Thanks.
--- 
-~Randy
+Thanks,
+    Paul
