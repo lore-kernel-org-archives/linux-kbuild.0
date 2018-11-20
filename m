@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:34066 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:34065 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732092AbeKTLdO (ORCPT
+        with ESMTP id S1732058AbeKTLdO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 20 Nov 2018 06:33:14 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 1/9] kbuild: let fixdep directly write to .*.cmd files
-Date: Tue, 20 Nov 2018 10:05:22 +0900
-Message-Id: <1542675930-21114-2-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 6/9] kbuild: change if_changed_rule for multi-line recipe
+Date: Tue, 20 Nov 2018 10:05:27 +0900
+Message-Id: <1542675930-21114-7-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1542675930-21114-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1542675930-21114-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,139 +15,136 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Currently, fixdep writes dependencies to .*.tmp, which is renamed to
-.*.cmd after everything succeeds. This is a very safe way to avoid
-corrupted .*.cmd files. The if_changed_dep has carried this safety
-mechanism since it was added in 2002.
+The 'define' ... 'endef' directive can describe a recipe that consists
+of multiple lines. For example,
 
-If fixdep fails for some reasons or a user terminates the build while
-fixdep is running, the incomplete output from the fixdep could be
-troublesome.
+    all:
+            @echo hello
+            @echo world
 
-This is my insight about some bad scenarios:
+... can be written as:
 
-[1] If the compiler succeeds to generate *.o file, but fixdep fails
-    to write necessary dependencies to .*.cmd file, Make will miss
-    to rebuild the object when headers or CONFIG options are changed.
-    In this case, fixdep should not generate .*.cmd file at all so
-    that 'arg-check' will surely trigger the rebuild of the object.
+    define greeting
+            @echo hello
+            @echo world
+    endif
 
-[2] A partially constructed .*.cmd file may not be a syntactically
-    correct makefile. The next time Make runs, it would include it,
-    then fail to parse it. Once this happens, 'make clean' is be the
-    only way to fix it.
+    all:
+            $(greeting)
 
-In fact, [1] is no longer a problem since 9c2af1c7377a ("kbuild: add
-.DELETE_ON_ERROR special target"). Make deletes a target file on any
-failure in its recipe. Because fixdep is a part of the recipe of *.o
-target, if it fails, the *.o is deleted anyway. However, I am a bit
-worried about the slight possibility of [2].
+This is useful to confine a series of shell commands into a single
+macro without losing readability.
 
-So, here is a solution. Let fixdep directly write to a .*.cmd file,
-but allow makefiles to include it only when its corresponding target
-exists.
+However, rule_cc_o_c and rule_as_o_S in scripts/Makefile.build are
+written like this (with a trailing semicolon in each cmd_*):
 
-This effectively reverts commit 2982c953570b ("kbuild: remove redundant
-$(wildcard ...) for cmd_files calculation"), and commit 00d78ab2ba75
-("kbuild: remove dead code in cmd_files calculation in top Makefile")
-because now we must check the presence of targets.
+  define rule_cc_o_c
+          [action1] ; \
+          [action2] ; \
+          [action3] ;
+  endef
+
+All shell commands are concatenated with '; \' so that it looks like
+a single command from the Makefile point of view. This does not
+exploit the benefits of 'define' ... 'endef' form because a single
+shell command can be simply written, like this:
+
+  rule_cc_o_c = \
+          [action1] ; \
+          [action2] ; \
+          [action3] ;
+
+I guess the intention for the command concatenation was to let the
+'@set -e' in if_changed_rule cover all the commands.
+
+We can improve the readability by moving '@set -e' to the 'cmd' macro.
+The combo of $(call echo-cmd,*) $(cmd_*) in rule_cc_o_c and rule_as_o_S
+have been replaced with $(call cmd,*). The trailing back-slashes have
+been removed.
+
+Here is a note about the performance: the commands in rule_cc_o_c and
+rule_as_o_S were previously executed all together in a single subshell,
+but now each line in a separate subshell. This means Make will spawn
+extra subshells [1]. I measured the build performance for
+  x86_64_defconfig + CONFIG_MODVERSIONS + CONFIG_TRIM_UNUSED_KSYMS
+and I saw slight performance regression, but I believe code readability
+and maintainability wins.
+
+[1] Precisely, GNU Make may optimize this by executing the command
+    directly instead of forking a subshell, if no shell special
+    characters are found in the command line and omitting the subshell
+    will not change the behavior.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v2:
-  - New patch
+  - Rewrite commit message more precisely, and mention about the
+    build performance
 
- Makefile               | 13 +++++++------
- scripts/Kbuild.include | 10 ++++------
- scripts/Makefile.build | 10 ++++------
- 3 files changed, 15 insertions(+), 18 deletions(-)
+ scripts/Kbuild.include |  6 ++----
+ scripts/Makefile.build | 22 +++++++++++-----------
+ 2 files changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index ddbf627..b78cc97 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1039,6 +1039,8 @@ ifdef CONFIG_GDB_SCRIPTS
- endif
- 	+$(call if_changed,link-vmlinux)
- 
-+targets := vmlinux
-+
- # Build samples along the rest of the kernel. This needs headers_install.
- ifdef CONFIG_SAMPLES
- vmlinux-dirs += samples
-@@ -1760,13 +1762,12 @@ quiet_cmd_depmod = DEPMOD  $(KERNELRELEASE)
- cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
-                   $(if $(KBUILD_MODULES),; rm -f $(MODVERDIR)/*)
- 
--# read all saved command lines
--cmd_files := $(wildcard .*.cmd)
-+# read saved command lines for existing targets
-+exist-targets := $(wildcard $(sort $(targets)))
- 
--ifneq ($(cmd_files),)
--  $(cmd_files): ;	# Do not try to update included dependency files
--  include $(cmd_files)
--endif
-+cmd_files := $(foreach f,$(exist-targets),$(dir $(f)).$(notdir $(f)).cmd)
-+$(cmd_files): ;	# Do not try to update included dependency files
-+-include $(cmd_files)
- 
- endif   # ifeq ($(config-targets),1)
- endif   # ifeq ($(mixed-targets),1)
 diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index bb01555..6cf6a8b 100644
+index 4b943f4..978d72b 100644
 --- a/scripts/Kbuild.include
 +++ b/scripts/Kbuild.include
-@@ -264,9 +264,8 @@ ifndef CONFIG_TRIM_UNUSED_KSYMS
+@@ -215,7 +215,7 @@ echo-cmd = $(if $($(quiet)cmd_$(1)),\
+ 	echo '  $(call escsq,$($(quiet)cmd_$(1)))$(echo-why)';)
  
- cmd_and_fixdep =                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
--	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
--	rm -f $(depfile);                                                    \
--	mv -f $(dot-target).tmp $(dot-target).cmd;
-+	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).cmd;\
-+	rm -f $(depfile);
+ # printing commands
+-cmd = @$(echo-cmd) $(cmd_$(1))
++cmd = @set -e; $(echo-cmd) $(cmd_$(1))
  
- else
+ # Add $(obj)/ for paths that are not absolute
+ objectify = $(foreach o,$(1),$(if $(filter /%,$(o)),$(o),$(obj)/$(o)))
+@@ -268,9 +268,7 @@ cmd_and_fixdep =                                                             \
+ # Usage: $(call if_changed_rule,foo)
+ # Will check if $(cmd_foo) or any of the prerequisites changed,
+ # and if so will execute $(rule_foo).
+-if_changed_rule = $(if $(strip $(any-prereq) $(arg-check) ),                 \
+-	@set -e;                                                             \
+-	$(rule_$(1)), @:)
++if_changed_rule = $(if $(strip $(any-prereq) $(arg-check)), $(rule_$(1)), @:)
  
-@@ -289,9 +288,8 @@ cmd_and_fixdep =                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
- 	$(ksym_dep_filter) |                                                 \
- 		scripts/basic/fixdep -e $(depfile) $@ '$(make-cmd)'          \
--			> $(dot-target).tmp;	                             \
--	rm -f $(depfile);                                                    \
--	mv -f $(dot-target).tmp $(dot-target).cmd;
-+			> $(dot-target).cmd;	                             \
-+	rm -f $(depfile);
- 
- endif
- 
+ ###
+ # why - tell why a target got built
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index a8e7ba9..c909588 100644
+index c23ee45..e445b3e 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -529,17 +529,15 @@ FORCE:
- # optimization, we don't need to read them if the target does not
- # exist, we will rebuild anyway in that case.
+@@ -260,20 +260,20 @@ cmd_gen_ksymdeps = \
+ endif
  
--cmd_files := $(wildcard $(foreach f,$(sort $(targets)),$(dir $(f)).$(notdir $(f)).cmd))
-+exist-targets := $(wildcard $(sort $(targets)))
+ define rule_cc_o_c
+-	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
+-	$(call cmd_and_fixdep,cc_o_c)					  \
+-	$(cmd_gen_ksymdeps)						  \
+-	$(cmd_checkdoc)							  \
+-	$(call echo-cmd,objtool) $(cmd_objtool)				  \
+-	$(cmd_modversions_c)						  \
+-	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
++	$(call cmd,checksrc)
++	@$(call cmd_and_fixdep,cc_o_c)
++	$(call cmd,gen_ksymdeps)
++	$(call cmd,checkdoc)
++	$(call cmd,objtool)
++	$(call cmd,modversions_c)
++	$(call cmd,record_mcount)
+ endef
  
--ifneq ($(cmd_files),)
--  include $(cmd_files)
--endif
-+-include $(foreach f,$(exist-targets),$(dir $(f)).$(notdir $(f)).cmd)
+ define rule_as_o_S
+-	$(call cmd_and_fixdep,as_o_S)					  \
+-	$(cmd_gen_ksymdeps)						  \
+-	$(call echo-cmd,objtool) $(cmd_objtool)				  \
+-	$(cmd_modversions_S)
++	@$(call cmd_and_fixdep,as_o_S)
++	$(call cmd,gen_ksymdeps)
++	$(call cmd,objtool)
++	$(call cmd,modversions_S)
+ endef
  
- ifneq ($(KBUILD_SRC),)
- # Create directories for object files if they do not exist
- obj-dirs := $(sort $(obj) $(patsubst %/,%, $(dir $(targets))))
--# If cmd_files exist, their directories apparently exist.  Skip mkdir.
--exist-dirs := $(sort $(patsubst %/,%, $(dir $(cmd_files))))
-+# If targets exist, their directories apparently exist. Skip mkdir.
-+exist-dirs := $(sort $(patsubst %/,%, $(dir $(exist-targets))))
- obj-dirs := $(strip $(filter-out $(exist-dirs), $(obj-dirs)))
- ifneq ($(obj-dirs),)
- $(shell mkdir -p $(obj-dirs))
+ # List module undefined symbols (or empty line if not enabled)
 -- 
 2.7.4
