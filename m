@@ -1,25 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.bootlin.com ([62.4.15.54]:58270 "EHLO mail.bootlin.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725917AbeKUBio (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Nov 2018 20:38:44 -0500
-Date: Tue, 20 Nov 2018 16:09:05 +0100
-From: Boris Brezillon <boris.brezillon@bootlin.com>
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:44472 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727592AbeKUCzn (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 20 Nov 2018 21:55:43 -0500
+Date: Tue, 20 Nov 2018 08:25:43 -0800
+From: Guenter Roeck <linux@roeck-us.net>
 Subject: Re: [PATCH] kbuild: announce removal of SUBDIRS if used
-Message-ID: <20181120160905.5fc4ba4a@bbrezillon>
-In-Reply-To: <1542726258-8418-1-git-send-email-yamada.masahiro@socionext.com>
+Message-ID: <20181120162543.GB4765@roeck-us.net>
 References: <1542726258-8418-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1542726258-8418-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Marek Vasut <marek.vasut@gmail.com>, Guenter Roeck <linux@roeck-us.net>, linux-watchdog@vger.kernel.org, Wim Van Sebroeck <wim@linux-watchdog.org>, linux-doc@vger.kernel.org, Jim Cromie <jim.cromie@gmail.com>, Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Brian Norris <computersforpeace@gmail.com>, Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org, David Woodhouse <dwmw2@infradead.org>
+Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Marek Vasut <marek.vasut@gmail.com>, linux-watchdog@vger.kernel.org, Wim Van Sebroeck <wim@linux-watchdog.org>, linux-doc@vger.kernel.org, Jim Cromie <jim.cromie@gmail.com>, Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Brian Norris <computersforpeace@gmail.com>, Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org, David Woodhouse <dwmw2@infradead.org>, Boris Brezillon <boris.brezillon@bootlin.com>
 
-On Wed, 21 Nov 2018 00:04:18 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-
+On Wed, Nov 21, 2018 at 12:04:18AM +0900, Masahiro Yamada wrote:
 > SUBDIRS has been kept as a backward compatibility since
 > commit ("[PATCH] kbuild: external module support") in 2002.
 > 
@@ -40,12 +39,12 @@ Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 >  Documentation/kbuild/kbuild.txt    | 7 +------
 >  Makefile                           | 4 ++++
 >  drivers/mtd/maps/scx200_docflash.c | 7 -------
-
-For the docflash driver
-
-Acked-by: Boris Brezillon <boris.brezillon@bootlin.com>
-
 >  drivers/watchdog/scx200_wdt.c      | 7 -------
+
+For watchdog:
+
+Acked-by: Guenter Roeck <linux@roeck-us.net>
+
 >  samples/connector/Makefile         | 2 +-
 >  5 files changed, 6 insertions(+), 21 deletions(-)
 > 
@@ -122,3 +121,6 @@ Acked-by: Boris Brezillon <boris.brezillon@bootlin.com>
 >  modules clean:
 > -	$(MAKE) -C ../.. SUBDIRS=$(CURDIR) $@
 > +	$(MAKE) -C ../.. M=$(CURDIR) $@
+> -- 
+> 2.7.4
+> 
