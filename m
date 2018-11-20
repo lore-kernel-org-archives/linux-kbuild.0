@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:34012 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:34015 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726146AbeKTLdM (ORCPT
+        with ESMTP id S1730154AbeKTLdN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Nov 2018 06:33:12 -0500
+        Tue, 20 Nov 2018 06:33:13 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 8/9] kbuild: refactor if_changed and if_changed_dep
-Date: Tue, 20 Nov 2018 10:05:29 +0900
-Message-Id: <1542675930-21114-9-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 4/9] kbuild: refactor modversions build rules
+Date: Tue, 20 Nov 2018 10:05:25 +0900
+Message-Id: <1542675930-21114-5-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1542675930-21114-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1542675930-21114-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,63 +15,138 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-'@set -e; $(echo-cmd) $(cmd_$(1)' can be replaced with '$(cmd)'.
+Let $(CC) compile objects into normal files *.o instead of .tmp_*.o
+whether CONFIG_MODVERSIONS is enabled or not. With this, the input
+file for objtool is always *.o so objtool_o can go away.
+
+I guess the reason of using .tmp_*.o for intermediate objects was
+to avoid leaving incomplete *.o file (, whose timestamp says it is
+up-to-date) when the genksyms tool failed for some reasons.
+
+It no longer matters because any targets are deleted on errors since
+commit 9c2af1c7377a ("kbuild: add .DELETE_ON_ERROR special target").
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-Changes in v2: None
+Changes in v2:
+ - Clarify the benefit of this patch
+   It is nice to delete objtool_o and ease the following commits
 
- scripts/Kbuild.include | 9 +++------
- scripts/Makefile.build | 4 ++--
- 2 files changed, 5 insertions(+), 8 deletions(-)
+ scripts/Makefile.build | 54 ++++++++++++++++----------------------------------
+ 1 file changed, 17 insertions(+), 37 deletions(-)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 79c4875..33aacca 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -251,17 +251,14 @@ any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
- 
- # Execute command if command has changed or prerequisite(s) are updated.
- if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
--	@set -e;                                                             \
--	$(echo-cmd) $(cmd_$(1));                                             \
-+	$(cmd);                                                              \
- 	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
- 
- # Execute the command and also postprocess generated .d dependencies file.
--if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
--	@set -e;                                                             \
--	$(cmd_and_fixdep), @:)
-+if_changed_dep = $(if $(strip $(any-prereq) $(arg-check)), $(cmd_and_fixdep), @:)
- 
- cmd_and_fixdep =                                                             \
--	$(echo-cmd) $(cmd_$(1));                                             \
-+	$(cmd);                                                              \
- 	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).cmd;\
- 	rm -f $(depfile)
- 
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index ffd2fe4..3bad2aa 100644
+index 032ca24..4f94579 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -261,7 +261,7 @@ endif
+@@ -154,35 +154,30 @@ $(obj)/%.ll: $(src)/%.c FORCE
+ # (See cmd_cc_o_c + relevant part of rule_cc_o_c)
  
- define rule_cc_o_c
- 	$(call cmd,checksrc)
--	@$(call cmd_and_fixdep,cc_o_c)
-+	$(call cmd_and_fixdep,cc_o_c)
- 	$(call cmd,gen_ksymdeps)
- 	$(call cmd,checkdoc)
- 	$(call cmd,objtool)
-@@ -270,7 +270,7 @@ define rule_cc_o_c
- endef
+ quiet_cmd_cc_o_c = CC $(quiet_modtag)  $@
++      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
  
- define rule_as_o_S
--	@$(call cmd_and_fixdep,as_o_S)
-+	$(call cmd_and_fixdep,as_o_S)
- 	$(call cmd,gen_ksymdeps)
- 	$(call cmd,objtool)
- 	$(call cmd,modversions_S)
+-ifndef CONFIG_MODVERSIONS
+-cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
+-
+-else
++ifdef CONFIG_MODVERSIONS
+ # When module versioning is enabled the following steps are executed:
+-# o compile a .tmp_<file>.o from <file>.c
+-# o if .tmp_<file>.o doesn't contain a __ksymtab version, i.e. does
+-#   not export symbols, we just rename .tmp_<file>.o to <file>.o and
+-#   are done.
++# o compile a <file>.o from <file>.c
++# o if <file>.o doesn't contain a __ksymtab version, i.e. does
++#   not export symbols, it's done.
+ # o otherwise, we calculate symbol versions using the good old
+ #   genksyms on the preprocessed source and postprocess them in a way
+ #   that they are usable as a linker script
+-# o generate <file>.o from .tmp_<file>.o using the linker to
++# o generate .tmp_<file>.o from <file>.o using the linker to
+ #   replace the unresolved symbols __crc_exported_symbol with
+ #   the actual value of the checksum generated by genksyms
+-
+-cmd_cc_o_c = $(CC) $(c_flags) -c -o $(@D)/.tmp_$(@F) $<
++# o remove .tmp_<file>.o to <file>.o
+ 
+ cmd_modversions_c =								\
+-	if $(OBJDUMP) -h $(@D)/.tmp_$(@F) | grep -q __ksymtab; then		\
++	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
+ 		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
+ 		    > $(@D)/.tmp_$(@F:.o=.ver);					\
+ 										\
+-		$(LD) $(KBUILD_LDFLAGS) -r -o $@ $(@D)/.tmp_$(@F) 		\
++		$(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@ 		\
+ 			-T $(@D)/.tmp_$(@F:.o=.ver);				\
+-		rm -f $(@D)/.tmp_$(@F) $(@D)/.tmp_$(@F:.o=.ver);		\
+-	else									\
+ 		mv -f $(@D)/.tmp_$(@F) $@;					\
++		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
+ 	fi;
+ endif
+ 
+@@ -241,19 +236,12 @@ ifneq ($(RETPOLINE_CFLAGS),)
+ endif
+ endif
+ 
+-
+-ifdef CONFIG_MODVERSIONS
+-objtool_o = $(@D)/.tmp_$(@F)
+-else
+-objtool_o = $(@)
+-endif
+-
+ # 'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
+ # 'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
+ # 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
+ cmd_objtool = $(if $(patsubst y%,, \
+ 	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
+-	$(__objtool_obj) $(objtool_args) "$(objtool_o)";)
++	$(__objtool_obj) $(objtool_args) $@;)
+ objtool_obj = $(if $(patsubst y%,, \
+ 	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
+ 	$(__objtool_obj))
+@@ -357,34 +345,26 @@ $(obj)/%.s: $(src)/%.S FORCE
+ 	$(call if_changed_dep,cpp_s_S)
+ 
+ quiet_cmd_as_o_S = AS $(quiet_modtag)  $@
++      cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
+ 
+-ifndef CONFIG_MODVERSIONS
+-cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
+-
+-else
++ifdef CONFIG_MODVERSIONS
+ 
+ ASM_PROTOTYPES := $(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/asm-prototypes.h)
+ 
+-ifeq ($(ASM_PROTOTYPES),)
+-cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
+-
+-else
++ifneq ($(ASM_PROTOTYPES),)
+ 
+ # versioning matches the C process described above, with difference that
+ # we parse asm-prototypes.h C header to get function definitions.
+ 
+-cmd_as_o_S = $(CC) $(a_flags) -c -o $(@D)/.tmp_$(@F) $<
+-
+ cmd_modversions_S =								\
+-	if $(OBJDUMP) -h $(@D)/.tmp_$(@F) | grep -q __ksymtab; then		\
++	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
+ 		$(call cmd_gensymtypes_S,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
+ 		    > $(@D)/.tmp_$(@F:.o=.ver);					\
+ 										\
+-		$(LD) $(KBUILD_LDFLAGS) -r -o $@ $(@D)/.tmp_$(@F) 		\
++		$(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@ 		\
+ 			-T $(@D)/.tmp_$(@F:.o=.ver);				\
+-		rm -f $(@D)/.tmp_$(@F) $(@D)/.tmp_$(@F:.o=.ver);		\
+-	else									\
+ 		mv -f $(@D)/.tmp_$(@F) $@;					\
++		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
+ 	fi;
+ endif
+ endif
 -- 
 2.7.4
