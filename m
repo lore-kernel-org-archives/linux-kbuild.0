@@ -1,416 +1,302 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:50306 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404833AbeKTDvy (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:34850 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730331AbeKTLdg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Nov 2018 22:51:54 -0500
-Received: by mail-wm1-f68.google.com with SMTP id 125so4152279wmh.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 19 Nov 2018 09:27:27 -0800 (PST)
-From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v11 19/24] kasan: add hooks implementation for tag-based mode
-Date: Mon, 19 Nov 2018 18:26:35 +0100
-Message-Id: <1ca66e212e466d2d8c2a16c2bbba981d0ab8ec9b.1542648335.git.andreyknvl@google.com>
-In-Reply-To: <cover.1542648335.git.andreyknvl@google.com>
-References: <cover.1542648335.git.andreyknvl@google.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Tue, 20 Nov 2018 06:33:36 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v2 5/9] kbuild: simplify dependency generation for CONFIG_TRIM_UNUSED_KSYMS
+Date: Tue, 20 Nov 2018 10:05:26 +0900
+Message-Id: <1542675930-21114-6-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1542675930-21114-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1542675930-21114-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
-Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arch@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Morton <akpm@linux-foundation.org>
 
-This commit adds tag-based KASAN specific hooks implementation and
-adjusts common generic and tag-based KASAN ones.
+My main motivation of this commit is to clean up scripts/Kbuild.include
+and scripts/Makefile.build.
 
-1. When a new slab cache is created, tag-based KASAN rounds up the size of
-   the objects in this cache to KASAN_SHADOW_SCALE_SIZE (== 16).
+Currently, CONFIG_TRIM_UNUSED_KSYMS works with a tricky gimmick;
+possibly exported symbols are detected by letting $(CPP) replace
+EXPORT_SYMBOL* with a special string '=== __KSYM_*===', which is
+post-processed by sed, and passed to fixdep. The extra preprocessing
+is costly, and hacking cmd_and_fixdep is ugly.
 
-2. On each kmalloc tag-based KASAN generates a random tag, sets the shadow
-   memory, that corresponds to this object to this tag, and embeds this
-   tag value into the top byte of the returned pointer.
+I came up with a new way to find exported symbols; insert a dummy
+symbol __ksym_marker_* to each potentially exported symbol. Those
+dummy symbols are picked up by $(NM), post-processed by sed, then
+appended to .*.cmd files. I collected the post-process part to a
+new shell script scripts/gen_ksymdeps.sh for readability. The dummy
+symbols are put into the .discard.* section so that the linker
+script rips them off the final vmlinux or modules.
 
-3. On each kfree tag-based KASAN poisons the shadow memory with a random
-   tag to allow detection of use-after-free bugs.
+A nice side-effect is building with CONFIG_TRIM_UNUSED_KSYMS will
+be much faster.
 
-The rest of the logic of the hook implementation is very much similar to
-the one provided by generic KASAN. Tag-based KASAN saves allocation and
-free stack metadata to the slab object the same way generic KASAN does.
-
-Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
- mm/kasan/common.c | 116 ++++++++++++++++++++++++++++++++++++++--------
- mm/kasan/kasan.h  |   8 ++++
- mm/kasan/tags.c   |  48 +++++++++++++++++++
- 3 files changed, 153 insertions(+), 19 deletions(-)
 
-diff --git a/mm/kasan/common.c b/mm/kasan/common.c
-index 7134e75447ff..27f0cae336c9 100644
---- a/mm/kasan/common.c
-+++ b/mm/kasan/common.c
-@@ -140,6 +140,13 @@ void kasan_poison_shadow(const void *address, size_t size, u8 value)
- {
- 	void *shadow_start, *shadow_end;
+Changes in v2:
+  - Let gen_ksymdeps.sh add dependencies to .*.cmd file directly
+  - Fix typos
+
+ include/asm-generic/export.h | 13 ++++++++-----
+ include/linux/export.h       | 18 +++++++++---------
+ scripts/Kbuild.include       | 28 ----------------------------
+ scripts/Makefile.build       |  7 +++++++
+ scripts/basic/fixdep.c       | 31 ++++---------------------------
+ scripts/gen_ksymdeps.sh      | 25 +++++++++++++++++++++++++
+ 6 files changed, 53 insertions(+), 69 deletions(-)
+ create mode 100755 scripts/gen_ksymdeps.sh
+
+diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
+index 4d73e6e..294d6ae 100644
+--- a/include/asm-generic/export.h
++++ b/include/asm-generic/export.h
+@@ -59,16 +59,19 @@ __kcrctab_\name:
+ .endm
+ #undef __put
  
-+	/*
-+	 * Perform shadow offset calculation based on untagged address, as
-+	 * some of the callers (e.g. kasan_poison_object_data) pass tagged
-+	 * addresses to this function.
-+	 */
-+	address = reset_tag(address);
+-#if defined(__KSYM_DEPS__)
+-
+-#define __EXPORT_SYMBOL(sym, val, sec)	=== __KSYM_##sym ===
+-
+-#elif defined(CONFIG_TRIM_UNUSED_KSYMS)
++#if defined(CONFIG_TRIM_UNUSED_KSYMS)
+ 
+ #include <linux/kconfig.h>
+ #include <generated/autoksyms.h>
+ 
++.macro __ksym_marker sym
++	.section ".discard.ksym","a"
++__ksym_marker_\sym:
++	 .previous
++.endm
 +
- 	shadow_start = kasan_mem_to_shadow(address);
- 	shadow_end = kasan_mem_to_shadow(address + size);
- 
-@@ -148,11 +155,24 @@ void kasan_poison_shadow(const void *address, size_t size, u8 value)
- 
- void kasan_unpoison_shadow(const void *address, size_t size)
- {
--	kasan_poison_shadow(address, size, 0);
-+	u8 tag = get_tag(address);
-+
-+	/*
-+	 * Perform shadow offset calculation based on untagged address, as
-+	 * some of the callers (e.g. kasan_unpoison_object_data) pass tagged
-+	 * addresses to this function.
-+	 */
-+	address = reset_tag(address);
-+
-+	kasan_poison_shadow(address, size, tag);
- 
- 	if (size & KASAN_SHADOW_MASK) {
- 		u8 *shadow = (u8 *)kasan_mem_to_shadow(address + size);
--		*shadow = size & KASAN_SHADOW_MASK;
-+
-+		if (IS_ENABLED(CONFIG_KASAN_SW_TAGS))
-+			*shadow = tag;
-+		else
-+			*shadow = size & KASAN_SHADOW_MASK;
- 	}
- }
- 
-@@ -200,8 +220,9 @@ void kasan_unpoison_stack_above_sp_to(const void *watermark)
- 
- void kasan_alloc_pages(struct page *page, unsigned int order)
- {
--	if (likely(!PageHighMem(page)))
--		kasan_unpoison_shadow(page_address(page), PAGE_SIZE << order);
-+	if (unlikely(PageHighMem(page)))
-+		return;
-+	kasan_unpoison_shadow(page_address(page), PAGE_SIZE << order);
- }
- 
- void kasan_free_pages(struct page *page, unsigned int order)
-@@ -218,6 +239,9 @@ void kasan_free_pages(struct page *page, unsigned int order)
+ #define __EXPORT_SYMBOL(sym, val, sec)				\
++	__ksym_marker sym;					\
+ 	__cond_export_sym(sym, val, sec, __is_defined(__KSYM_##sym))
+ #define __cond_export_sym(sym, val, sec, conf)			\
+ 	___cond_export_sym(sym, val, sec, conf)
+diff --git a/include/linux/export.h b/include/linux/export.h
+index ce764a5..fd8711e 100644
+--- a/include/linux/export.h
++++ b/include/linux/export.h
+@@ -92,22 +92,22 @@ struct kernel_symbol {
   */
- static inline unsigned int optimal_redzone(unsigned int object_size)
- {
-+	if (IS_ENABLED(CONFIG_KASAN_SW_TAGS))
-+		return 0;
+ #define __EXPORT_SYMBOL(sym, sec)
+ 
+-#elif defined(__KSYM_DEPS__)
++#elif defined(CONFIG_TRIM_UNUSED_KSYMS)
 +
- 	return
- 		object_size <= 64        - 16   ? 16 :
- 		object_size <= 128       - 32   ? 32 :
-@@ -232,6 +256,7 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
- 			slab_flags_t *flags)
- {
- 	unsigned int orig_size = *size;
-+	unsigned int redzone_size;
- 	int redzone_adjust;
- 
- 	/* Add alloc meta. */
-@@ -239,20 +264,20 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
- 	*size += sizeof(struct kasan_alloc_meta);
- 
- 	/* Add free meta. */
--	if (cache->flags & SLAB_TYPESAFE_BY_RCU || cache->ctor ||
--	    cache->object_size < sizeof(struct kasan_free_meta)) {
-+	if (IS_ENABLED(CONFIG_KASAN_GENERIC) &&
-+	    (cache->flags & SLAB_TYPESAFE_BY_RCU || cache->ctor ||
-+	     cache->object_size < sizeof(struct kasan_free_meta))) {
- 		cache->kasan_info.free_meta_offset = *size;
- 		*size += sizeof(struct kasan_free_meta);
- 	}
--	redzone_adjust = optimal_redzone(cache->object_size) -
--		(*size - cache->object_size);
- 
-+	redzone_size = optimal_redzone(cache->object_size);
-+	redzone_adjust = redzone_size -	(*size - cache->object_size);
- 	if (redzone_adjust > 0)
- 		*size += redzone_adjust;
- 
- 	*size = min_t(unsigned int, KMALLOC_MAX_SIZE,
--			max(*size, cache->object_size +
--					optimal_redzone(cache->object_size)));
-+			max(*size, cache->object_size + redzone_size));
- 
- 	/*
- 	 * If the metadata doesn't fit, don't enable KASAN at all.
-@@ -265,6 +290,8 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
- 		return;
- 	}
- 
-+	cache->align = round_up(cache->align, KASAN_SHADOW_SCALE_SIZE);
-+
- 	*flags |= SLAB_KASAN;
- }
- 
-@@ -309,6 +336,32 @@ void kasan_poison_object_data(struct kmem_cache *cache, void *object)
- 			KASAN_KMALLOC_REDZONE);
- }
- 
-+/*
-+ * Since it's desirable to only call object contructors once during slab
-+ * allocation, we preassign tags to all such objects. Also preassign tags for
-+ * SLAB_TYPESAFE_BY_RCU slabs to avoid use-after-free reports.
-+ * For SLAB allocator we can't preassign tags randomly since the freelist is
-+ * stored as an array of indexes instead of a linked list. Assign tags based
-+ * on objects indexes, so that objects that are next to each other get
-+ * different tags.
-+ * After a tag is assigned, the object always gets allocated with the same tag.
-+ * The reason is that we can't change tags for objects with constructors on
-+ * reallocation (even for non-SLAB_TYPESAFE_BY_RCU), because the constructor
-+ * code can save the pointer to the object somewhere (e.g. in the object
-+ * itself). Then if we retag it, the old saved pointer will become invalid.
-+ */
-+static u8 assign_tag(struct kmem_cache *cache, const void *object, bool new)
-+{
-+	if (!cache->ctor && !(cache->flags & SLAB_TYPESAFE_BY_RCU))
-+		return new ? KASAN_TAG_KERNEL : random_tag();
-+
-+#ifdef CONFIG_SLAB
-+	return (u8)obj_to_index(cache, virt_to_page(object), (void *)object);
-+#else
-+	return new ? random_tag() : get_tag(object);
-+#endif
-+}
-+
- void *kasan_init_slab_obj(struct kmem_cache *cache, const void *object)
- {
- 	struct kasan_alloc_meta *alloc_info;
-@@ -319,6 +372,9 @@ void *kasan_init_slab_obj(struct kmem_cache *cache, const void *object)
- 	alloc_info = get_alloc_info(cache, object);
- 	__memset(alloc_info, 0, sizeof(*alloc_info));
- 
-+	if (IS_ENABLED(CONFIG_KASAN_SW_TAGS))
-+		object = set_tag(object, assign_tag(cache, object, true));
-+
- 	return (void *)object;
- }
- 
-@@ -327,15 +383,30 @@ void *kasan_slab_alloc(struct kmem_cache *cache, void *object, gfp_t flags)
- 	return kasan_kmalloc(cache, object, cache->object_size, flags);
- }
- 
-+static inline bool shadow_invalid(u8 tag, s8 shadow_byte)
-+{
-+	if (IS_ENABLED(CONFIG_KASAN_GENERIC))
-+		return shadow_byte < 0 ||
-+			shadow_byte >= KASAN_SHADOW_SCALE_SIZE;
-+	else
-+		return tag != (u8)shadow_byte;
-+}
-+
- static bool __kasan_slab_free(struct kmem_cache *cache, void *object,
- 			      unsigned long ip, bool quarantine)
- {
- 	s8 shadow_byte;
-+	u8 tag;
-+	void *tagged_object;
- 	unsigned long rounded_up_size;
- 
-+	tag = get_tag(object);
-+	tagged_object = object;
-+	object = reset_tag(object);
-+
- 	if (unlikely(nearest_obj(cache, virt_to_head_page(object), object) !=
- 	    object)) {
--		kasan_report_invalid_free(object, ip);
-+		kasan_report_invalid_free(tagged_object, ip);
- 		return true;
- 	}
- 
-@@ -344,20 +415,22 @@ static bool __kasan_slab_free(struct kmem_cache *cache, void *object,
- 		return false;
- 
- 	shadow_byte = READ_ONCE(*(s8 *)kasan_mem_to_shadow(object));
--	if (shadow_byte < 0 || shadow_byte >= KASAN_SHADOW_SCALE_SIZE) {
--		kasan_report_invalid_free(object, ip);
-+	if (shadow_invalid(tag, shadow_byte)) {
-+		kasan_report_invalid_free(tagged_object, ip);
- 		return true;
- 	}
- 
- 	rounded_up_size = round_up(cache->object_size, KASAN_SHADOW_SCALE_SIZE);
- 	kasan_poison_shadow(object, rounded_up_size, KASAN_KMALLOC_FREE);
- 
--	if (!quarantine || unlikely(!(cache->flags & SLAB_KASAN)))
-+	if ((IS_ENABLED(CONFIG_KASAN_GENERIC) && !quarantine) ||
-+			unlikely(!(cache->flags & SLAB_KASAN)))
- 		return false;
- 
- 	set_track(&get_alloc_info(cache, object)->free_track, GFP_NOWAIT);
- 	quarantine_put(get_free_info(cache, object), cache);
--	return true;
-+
-+	return IS_ENABLED(CONFIG_KASAN_GENERIC);
- }
- 
- bool kasan_slab_free(struct kmem_cache *cache, void *object, unsigned long ip)
-@@ -370,6 +443,7 @@ void *kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
- {
- 	unsigned long redzone_start;
- 	unsigned long redzone_end;
-+	u8 tag;
- 
- 	if (gfpflags_allow_blocking(flags))
- 		quarantine_reduce();
-@@ -382,14 +456,18 @@ void *kasan_kmalloc(struct kmem_cache *cache, const void *object, size_t size,
- 	redzone_end = round_up((unsigned long)object + cache->object_size,
- 				KASAN_SHADOW_SCALE_SIZE);
- 
--	kasan_unpoison_shadow(object, size);
-+	if (IS_ENABLED(CONFIG_KASAN_SW_TAGS))
-+		tag = assign_tag(cache, object, false);
-+
-+	/* Tag is ignored in set_tag without CONFIG_KASAN_SW_TAGS */
-+	kasan_unpoison_shadow(set_tag(object, tag), size);
- 	kasan_poison_shadow((void *)redzone_start, redzone_end - redzone_start,
- 		KASAN_KMALLOC_REDZONE);
- 
- 	if (cache->flags & SLAB_KASAN)
- 		set_track(&get_alloc_info(cache, object)->alloc_track, flags);
- 
--	return (void *)object;
-+	return set_tag(object, tag);
- }
- EXPORT_SYMBOL(kasan_kmalloc);
- 
-@@ -439,7 +517,7 @@ void kasan_poison_kfree(void *ptr, unsigned long ip)
- 	page = virt_to_head_page(ptr);
- 
- 	if (unlikely(!PageSlab(page))) {
--		if (ptr != page_address(page)) {
-+		if (reset_tag(ptr) != page_address(page)) {
- 			kasan_report_invalid_free(ptr, ip);
- 			return;
- 		}
-@@ -452,7 +530,7 @@ void kasan_poison_kfree(void *ptr, unsigned long ip)
- 
- void kasan_kfree_large(void *ptr, unsigned long ip)
- {
--	if (ptr != page_address(virt_to_head_page(ptr)))
-+	if (reset_tag(ptr) != page_address(virt_to_head_page(ptr)))
- 		kasan_report_invalid_free(ptr, ip);
- 	/* The object will be poisoned by page_alloc. */
- }
-diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
-index 86fc18a21664..5758af10ebe4 100644
---- a/mm/kasan/kasan.h
-+++ b/mm/kasan/kasan.h
-@@ -12,10 +12,18 @@
- #define KASAN_TAG_INVALID	0xFE /* inaccessible memory tag */
- #define KASAN_TAG_MAX		0xFD /* maximum value for random tags */
- 
-+#ifdef CONFIG_KASAN_GENERIC
- #define KASAN_FREE_PAGE         0xFF  /* page was freed */
- #define KASAN_PAGE_REDZONE      0xFE  /* redzone for kmalloc_large allocations */
- #define KASAN_KMALLOC_REDZONE   0xFC  /* redzone inside slub object */
- #define KASAN_KMALLOC_FREE      0xFB  /* object was freed (kmem_cache_free/kfree) */
-+#else
-+#define KASAN_FREE_PAGE         KASAN_TAG_INVALID
-+#define KASAN_PAGE_REDZONE      KASAN_TAG_INVALID
-+#define KASAN_KMALLOC_REDZONE   KASAN_TAG_INVALID
-+#define KASAN_KMALLOC_FREE      KASAN_TAG_INVALID
-+#endif
-+
- #define KASAN_GLOBAL_REDZONE    0xFA  /* redzone for global variable */
++#include <generated/autoksyms.h>
  
  /*
-diff --git a/mm/kasan/tags.c b/mm/kasan/tags.c
-index 1c4e7ce2e6fe..1d1b79350e28 100644
---- a/mm/kasan/tags.c
-+++ b/mm/kasan/tags.c
-@@ -78,15 +78,60 @@ void *kasan_reset_tag(const void *addr)
- void check_memory_region(unsigned long addr, size_t size, bool write,
- 				unsigned long ret_ip)
+  * For fine grained build dependencies, we want to tell the build system
+  * about each possible exported symbol even if they're not actually exported.
+- * We use a string pattern that is unlikely to be valid code that the build
+- * system filters out from the preprocessor output (see ksym_dep_filter
+- * in scripts/Kbuild.include).
++ * We use a symbol pattern __ksym_marker_<symbol> that the build system filters
++ * from the $(NM) output (see scripts/gen_ksymdeps.sh). These symbols are
++ * discarded in the final link stage.
+  */
+-#define __EXPORT_SYMBOL(sym, sec)	=== __KSYM_##sym ===
+-
+-#elif defined(CONFIG_TRIM_UNUSED_KSYMS)
+-
+-#include <generated/autoksyms.h>
++#define __ksym_marker(sym)	\
++	static int __ksym_marker_##sym[0] __section(".discard.ksym") __used
+ 
+ #define __EXPORT_SYMBOL(sym, sec)				\
++	__ksym_marker(sym);					\
+ 	__cond_export_sym(sym, sec, __is_defined(__KSYM_##sym))
+ #define __cond_export_sym(sym, sec, conf)			\
+ 	___cond_export_sym(sym, sec, conf)
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 6cf6a8b..4b943f4 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -260,39 +260,11 @@ if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
+ 	@set -e;                                                             \
+ 	$(cmd_and_fixdep), @:)
+ 
+-ifndef CONFIG_TRIM_UNUSED_KSYMS
+-
+ cmd_and_fixdep =                                                             \
+ 	$(echo-cmd) $(cmd_$(1));                                             \
+ 	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).cmd;\
+ 	rm -f $(depfile);
+ 
+-else
+-
+-# Filter out exported kernel symbol names from the preprocessor output.
+-# See also __KSYM_DEPS__ in include/linux/export.h.
+-# We disable the depfile generation here, so as not to overwrite the existing
+-# depfile while fixdep is parsing it.
+-flags_nodeps = $(filter-out -Wp$(comma)-M%, $($(1)))
+-ksym_dep_filter =                                                            \
+-	case "$(1)" in                                                       \
+-	  cc_*_c|cpp_i_c)                                                    \
+-	    $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;        \
+-	  as_*_S|cpp_s_S)                                                    \
+-	    $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;        \
+-	  boot*|build*|cpp_its_S|*cpp_lds_S|dtc|host*|vdso*) : ;;            \
+-	  *) echo "Don't know how to preprocess $(1)" >&2; false ;;          \
+-	esac | tr ";" "\n" | sed -n 's/^.*=== __KSYM_\(.*\) ===.*$$/_\1/p'
+-
+-cmd_and_fixdep =                                                             \
+-	$(echo-cmd) $(cmd_$(1));                                             \
+-	$(ksym_dep_filter) |                                                 \
+-		scripts/basic/fixdep -e $(depfile) $@ '$(make-cmd)'          \
+-			> $(dot-target).cmd;	                             \
+-	rm -f $(depfile);
+-
+-endif
+-
+ # Usage: $(call if_changed_rule,foo)
+ # Will check if $(cmd_foo) or any of the prerequisites changed,
+ # and if so will execute $(rule_foo).
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 4f94579..c23ee45 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -254,9 +254,15 @@ objtool_dep = $(objtool_obj)					\
+ 	      $(wildcard include/config/orc/unwinder.h		\
+ 			 include/config/stack/validation.h)
+ 
++ifdef CONFIG_TRIM_UNUSED_KSYMS
++cmd_gen_ksymdeps = \
++	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd;
++endif
++
+ define rule_cc_o_c
+ 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
+ 	$(call cmd_and_fixdep,cc_o_c)					  \
++	$(cmd_gen_ksymdeps)						  \
+ 	$(cmd_checkdoc)							  \
+ 	$(call echo-cmd,objtool) $(cmd_objtool)				  \
+ 	$(cmd_modversions_c)						  \
+@@ -265,6 +271,7 @@ endef
+ 
+ define rule_as_o_S
+ 	$(call cmd_and_fixdep,as_o_S)					  \
++	$(cmd_gen_ksymdeps)						  \
+ 	$(call echo-cmd,objtool) $(cmd_objtool)				  \
+ 	$(cmd_modversions_S)
+ endef
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index 850966f3..facbd60 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -105,8 +105,7 @@
+ 
+ static void usage(void)
  {
-+	u8 tag;
-+	u8 *shadow_first, *shadow_last, *shadow;
-+	void *untagged_addr;
-+
-+	if (unlikely(size == 0))
-+		return;
-+
-+	tag = get_tag((const void *)addr);
-+
-+	/*
-+	 * Ignore accesses for pointers tagged with 0xff (native kernel
-+	 * pointer tag) to suppress false positives caused by kmap.
-+	 *
-+	 * Some kernel code was written to account for archs that don't keep
-+	 * high memory mapped all the time, but rather map and unmap particular
-+	 * pages when needed. Instead of storing a pointer to the kernel memory,
-+	 * this code saves the address of the page structure and offset within
-+	 * that page for later use. Those pages are then mapped and unmapped
-+	 * with kmap/kunmap when necessary and virt_to_page is used to get the
-+	 * virtual address of the page. For arm64 (that keeps the high memory
-+	 * mapped all the time), kmap is turned into a page_address call.
-+
-+	 * The issue is that with use of the page_address + virt_to_page
-+	 * sequence the top byte value of the original pointer gets lost (gets
-+	 * set to KASAN_TAG_KERNEL (0xFF)).
-+	 */
-+	if (tag == KASAN_TAG_KERNEL)
-+		return;
-+
-+	untagged_addr = reset_tag((const void *)addr);
-+	if (unlikely(untagged_addr <
-+			kasan_shadow_to_mem((void *)KASAN_SHADOW_START))) {
-+		kasan_report(addr, size, write, ret_ip);
-+		return;
-+	}
-+	shadow_first = kasan_mem_to_shadow(untagged_addr);
-+	shadow_last = kasan_mem_to_shadow(untagged_addr + size - 1);
-+	for (shadow = shadow_first; shadow <= shadow_last; shadow++) {
-+		if (*shadow != tag) {
-+			kasan_report(addr, size, write, ret_ip);
-+			return;
-+		}
-+	}
+-	fprintf(stderr, "Usage: fixdep [-e] <depfile> <target> <cmdline>\n");
+-	fprintf(stderr, " -e  insert extra dependencies given on stdin\n");
++	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
+ 	exit(1);
  }
  
- #define DEFINE_HWASAN_LOAD_STORE(size)					\
- 	void __hwasan_load##size##_noabort(unsigned long addr)		\
- 	{								\
-+		check_memory_region(addr, size, false, _RET_IP_);	\
- 	}								\
- 	EXPORT_SYMBOL(__hwasan_load##size##_noabort);			\
- 	void __hwasan_store##size##_noabort(unsigned long addr)		\
- 	{								\
-+		check_memory_region(addr, size, true, _RET_IP_);	\
- 	}								\
- 	EXPORT_SYMBOL(__hwasan_store##size##_noabort)
- 
-@@ -98,15 +143,18 @@ DEFINE_HWASAN_LOAD_STORE(16);
- 
- void __hwasan_loadN_noabort(unsigned long addr, unsigned long size)
- {
-+	check_memory_region(addr, size, false, _RET_IP_);
+@@ -131,21 +130,6 @@ static void print_dep(const char *m, int slen, const char *dir)
+ 	printf(".h) \\\n");
  }
- EXPORT_SYMBOL(__hwasan_loadN_noabort);
  
- void __hwasan_storeN_noabort(unsigned long addr, unsigned long size)
+-static void do_extra_deps(void)
+-{
+-	char buf[80];
+-
+-	while (fgets(buf, sizeof(buf), stdin)) {
+-		int len = strlen(buf);
+-
+-		if (len < 2 || buf[len - 1] != '\n') {
+-			fprintf(stderr, "fixdep: bad data on stdin\n");
+-			exit(1);
+-		}
+-		print_dep(buf, len - 1, "include/ksym");
+-	}
+-}
+-
+ struct item {
+ 	struct item	*next;
+ 	unsigned int	len;
+@@ -293,7 +277,7 @@ static int is_ignored_file(const char *s, int len)
+  * assignments are parsed not only by make, but also by the rather simple
+  * parser in scripts/mod/sumversion.c.
+  */
+-static void parse_dep_file(char *m, const char *target, int insert_extra_deps)
++static void parse_dep_file(char *m, const char *target)
  {
-+	check_memory_region(addr, size, true, _RET_IP_);
- }
- EXPORT_SYMBOL(__hwasan_storeN_noabort);
+ 	char *p;
+ 	int is_last, is_target;
+@@ -369,9 +353,6 @@ static void parse_dep_file(char *m, const char *target, int insert_extra_deps)
+ 		exit(1);
+ 	}
  
- void __hwasan_tag_memory(unsigned long addr, u8 tag, unsigned long size)
- {
-+	kasan_poison_shadow((void *)addr, size, tag);
+-	if (insert_extra_deps)
+-		do_extra_deps();
+-
+ 	printf("\n%s: $(deps_%s)\n\n", target, target);
+ 	printf("$(deps_%s):\n", target);
  }
- EXPORT_SYMBOL(__hwasan_tag_memory);
+@@ -379,13 +360,9 @@ static void parse_dep_file(char *m, const char *target, int insert_extra_deps)
+ int main(int argc, char *argv[])
+ {
+ 	const char *depfile, *target, *cmdline;
+-	int insert_extra_deps = 0;
+ 	void *buf;
+ 
+-	if (argc == 5 && !strcmp(argv[1], "-e")) {
+-		insert_extra_deps = 1;
+-		argv++;
+-	} else if (argc != 4)
++	if (argc != 4)
+ 		usage();
+ 
+ 	depfile = argv[1];
+@@ -395,7 +372,7 @@ int main(int argc, char *argv[])
+ 	printf("cmd_%s := %s\n\n", target, cmdline);
+ 
+ 	buf = read_file(depfile);
+-	parse_dep_file(buf, target, insert_extra_deps);
++	parse_dep_file(buf, target);
+ 	free(buf);
+ 
+ 	return 0;
+diff --git a/scripts/gen_ksymdeps.sh b/scripts/gen_ksymdeps.sh
+new file mode 100755
+index 0000000..1324986
+--- /dev/null
++++ b/scripts/gen_ksymdeps.sh
+@@ -0,0 +1,25 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++
++set -e
++
++# List of exported symbols
++ksyms=$($NM $1 | sed -n 's/.*__ksym_marker_\(.*\)/\1/p' | tr A-Z a-z)
++
++if [ -z "$ksyms" ]; then
++	exit 0
++fi
++
++echo
++echo "ksymdeps_$1 := \\"
++
++for s in $ksyms
++do
++	echo $s | sed -e 's:^_*:    $(wildcard include/ksym/:' \
++			-e 's:__*:/:g' -e 's/$/.h) \\/'
++done
++
++echo
++echo "$1: \$(ksymdeps_$1)"
++echo
++echo "\$(ksymdeps_$1):"
 -- 
-2.19.1.1215.g8438c0b245-goog
+2.7.4
