@@ -1,126 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:44472 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727592AbeKUCzn (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:35503 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726426AbeKUDnw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Nov 2018 21:55:43 -0500
-Date: Tue, 20 Nov 2018 08:25:43 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [PATCH] kbuild: announce removal of SUBDIRS if used
-Message-ID: <20181120162543.GB4765@roeck-us.net>
-References: <1542726258-8418-1-git-send-email-yamada.masahiro@socionext.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1542726258-8418-1-git-send-email-yamada.masahiro@socionext.com>
+        Tue, 20 Nov 2018 22:43:52 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: move modpost out of 'scripts' target
+Date: Wed, 21 Nov 2018 02:13:24 +0900
+Message-Id: <1542734004-2673-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Marek Vasut <marek.vasut@gmail.com>, linux-watchdog@vger.kernel.org, Wim Van Sebroeck <wim@linux-watchdog.org>, linux-doc@vger.kernel.org, Jim Cromie <jim.cromie@gmail.com>, Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Brian Norris <computersforpeace@gmail.com>, Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org, David Woodhouse <dwmw2@infradead.org>, Boris Brezillon <boris.brezillon@bootlin.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Wed, Nov 21, 2018 at 12:04:18AM +0900, Masahiro Yamada wrote:
-> SUBDIRS has been kept as a backward compatibility since
-> commit ("[PATCH] kbuild: external module support") in 2002.
-> 
-> We do not need multiple ways to do the same thing, so I will remove
-> SUBDIRS after the Linux 5.3 release. I cleaned up in-tree code, and
-> updated the document so that nobody would try to use it.
-> 
-> Meanwhile, display the following warning if SUBDIRS is used.
-> 
-> Makefile:189: ================= WARNING ================
-> Makefile:190: 'SUBDIRS' will be removed after Linux 5.3
-> Makefile:191: Please use 'M=' or 'KBUILD_EXTMOD' instead
-> Makefile:192: ==========================================
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
->  Documentation/kbuild/kbuild.txt    | 7 +------
->  Makefile                           | 4 ++++
->  drivers/mtd/maps/scx200_docflash.c | 7 -------
->  drivers/watchdog/scx200_wdt.c      | 7 -------
+I am eagar to build under the scripts/ directory only with $(HOSTCC),
+but scripts/mod/ highly depends on the $(CC) and target arch headers.
+That it why the 'scripts' target must depend on 'asm-generic',
+'gcc-plugins', and $(autoksyms_h).
 
-For watchdog:
+Move it to the 'prepare0' stage. I know this is a cheesy workaround,
+but better than the current situation.
 
-Acked-by: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
->  samples/connector/Makefile         | 2 +-
->  5 files changed, 6 insertions(+), 21 deletions(-)
-> 
-> diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-> index 8390c36..c9e3d93 100644
-> --- a/Documentation/kbuild/kbuild.txt
-> +++ b/Documentation/kbuild/kbuild.txt
-> @@ -81,12 +81,7 @@ KBUILD_EXTMOD
->  --------------------------------------------------
->  Set the directory to look for the kernel source when building external
->  modules.
-> -The directory can be specified in several ways:
-> -1) Use "M=..." on the command line
-> -2) Environment variable KBUILD_EXTMOD
-> -3) Environment variable SUBDIRS
-> -The possibilities are listed in the order they take precedence.
-> -Using "M=..." will always override the others.
-> +Setting "M=..." takes precedence over KBUILD_EXTMOD.
->  
->  KBUILD_OUTPUT
->  --------------------------------------------------
-> diff --git a/Makefile b/Makefile
-> index 370d13b..57be5fb 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -186,6 +186,10 @@ endif
->  # Old syntax make ... SUBDIRS=$PWD is still supported
->  # Setting the environment variable KBUILD_EXTMOD take precedence
->  ifdef SUBDIRS
-> +  $(warning ================= WARNING ================)
-> +  $(warning 'SUBDIRS' will be removed after Linux 5.3)
-> +  $(warning Please use 'M=' or 'KBUILD_EXTMOD' instead)
-> +  $(warning ==========================================)
->    KBUILD_EXTMOD ?= $(SUBDIRS)
->  endif
->  
-> diff --git a/drivers/mtd/maps/scx200_docflash.c b/drivers/mtd/maps/scx200_docflash.c
-> index f1c1f73..7f1a0e6 100644
-> --- a/drivers/mtd/maps/scx200_docflash.c
-> +++ b/drivers/mtd/maps/scx200_docflash.c
-> @@ -216,10 +216,3 @@ static void __exit cleanup_scx200_docflash(void)
->  
->  module_init(init_scx200_docflash);
->  module_exit(cleanup_scx200_docflash);
-> -
-> -/*
-> -    Local variables:
-> -        compile-command: "make -k -C ../../.. SUBDIRS=drivers/mtd/maps modules"
-> -        c-basic-offset: 8
-> -    End:
-> -*/
-> diff --git a/drivers/watchdog/scx200_wdt.c b/drivers/watchdog/scx200_wdt.c
-> index 836377c..ec4063e 100644
-> --- a/drivers/watchdog/scx200_wdt.c
-> +++ b/drivers/watchdog/scx200_wdt.c
-> @@ -262,10 +262,3 @@ static void __exit scx200_wdt_cleanup(void)
->  
->  module_init(scx200_wdt_init);
->  module_exit(scx200_wdt_cleanup);
-> -
-> -/*
-> -    Local variables:
-> -	compile-command: "make -k -C ../.. SUBDIRS=drivers/char modules"
-> -	c-basic-offset: 8
-> -    End:
-> -*/
-> diff --git a/samples/connector/Makefile b/samples/connector/Makefile
-> index fe3c854..6ad7162 100644
-> --- a/samples/connector/Makefile
-> +++ b/samples/connector/Makefile
-> @@ -14,4 +14,4 @@ HOSTCFLAGS_ucon.o += -I$(objtree)/usr/include
->  all: modules
->  
->  modules clean:
-> -	$(MAKE) -C ../.. SUBDIRS=$(CURDIR) $@
-> +	$(MAKE) -C ../.. M=$(CURDIR) $@
-> -- 
-> 2.7.4
-> 
+ Makefile             | 3 ++-
+ scripts/Makefile     | 3 +--
+ scripts/mod/Makefile | 2 --
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index b78cc97..21a7729 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1073,7 +1073,7 @@ include/config/kernel.release: $(srctree)/Makefile FORCE
+ # Carefully list dependencies so we do not try to build scripts twice
+ # in parallel
+ PHONY += scripts
+-scripts: scripts_basic scripts_dtc asm-generic gcc-plugins $(autoksyms_h)
++scripts: scripts_basic scripts_dtc
+ 	$(Q)$(MAKE) $(build)=$(@)
+ 
+ # Things we need to do before we recursively start building the kernel
+@@ -1111,6 +1111,7 @@ macroprepare: prepare1 archmacros
+ archprepare: archheaders archscripts macroprepare scripts_basic
+ 
+ prepare0: archprepare gcc-plugins
++	$(Q)$(MAKE) $(build)=scripts/mod
+ 	$(Q)$(MAKE) $(build)=.
+ 
+ # All the preparing..
+diff --git a/scripts/Makefile b/scripts/Makefile
+index ece52ff..b48259d 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -37,9 +37,8 @@ build_unifdef: $(obj)/unifdef
+ 	@:
+ 
+ subdir-$(CONFIG_MODVERSIONS) += genksyms
+-subdir-y                     += mod
+ subdir-$(CONFIG_SECURITY_SELINUX) += selinux
+ subdir-$(CONFIG_GDB_SCRIPTS) += gdb
+ 
+ # Let clean descend into subdirs
+-subdir-	+= basic dtc kconfig package gcc-plugins
++subdir-	+= basic dtc kconfig mod package gcc-plugins
+diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
+index a5b4af4..42c5d50 100644
+--- a/scripts/mod/Makefile
++++ b/scripts/mod/Makefile
+@@ -4,8 +4,6 @@ OBJECT_FILES_NON_STANDARD := y
+ hostprogs-y	:= modpost mk_elfconfig
+ always		:= $(hostprogs-y) empty.o
+ 
+-CFLAGS_REMOVE_empty.o := $(ASM_MACRO_FLAGS)
+-
+ modpost-objs	:= modpost.o file2alias.o sumversion.o
+ 
+ devicetable-offsets-file := devicetable-offsets.h
+-- 
+2.7.4
