@@ -1,82 +1,137 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:35503 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726426AbeKUDnw (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:39528 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725949AbeKUNUX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Nov 2018 22:43:52 -0500
+        Wed, 21 Nov 2018 08:20:23 -0500
+MIME-Version: 1.0
+References: <20181114204309.18645-1-namit@vmware.com> <20181114204309.18645-2-namit@vmware.com>
+ <CAK7LNAREF_Pcejq1LJ=3K7h0M4o4oSRLfbeJc73O+8HV420Ziw@mail.gmail.com>
+ <1C316B94-8F27-439C-B049-9947DC329780@vmware.com> <CAK7LNATFVHnPXh-uEA+T9QNw3OnSvkLLKMuJ_tF1v8bEveStSg@mail.gmail.com>
+ <1F17E69E-06E8-4A5A-A434-1DCD6C6F0259@vmware.com>
+In-Reply-To: <1F17E69E-06E8-4A5A-A434-1DCD6C6F0259@vmware.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: move modpost out of 'scripts' target
-Date: Wed, 21 Nov 2018 02:13:24 +0900
-Message-Id: <1542734004-2673-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Wed, 21 Nov 2018 11:47:19 +0900
+Message-ID: <CAK7LNATCmMTTEZUBhSVawVM_+r6KsuYnBCdxX_p3GqbKBH3DEw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] Makefile: Fix distcc compilation with x86 macros
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Nadav Amit <namit@vmware.com>
+Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-I am eagar to build under the scripts/ directory only with $(HOSTCC),
-but scripts/mod/ highly depends on the $(CC) and target arch headers.
-That it why the 'scripts' target must depend on 'asm-generic',
-'gcc-plugins', and $(autoksyms_h).
+On Tue, Nov 20, 2018 at 2:21 AM Nadav Amit <namit@vmware.com> wrote:
+>
+> at 8:20 PM, Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+>
+> > On Sat, Nov 17, 2018 at 6:02 AM Nadav Amit <namit@vmware.com> wrote:
+> >> From: Masahiro Yamada
+> >> Sent: November 16, 2018 at 7:45:45 AM GMT
+> >>> To: Nadav Amit <namit@vmware.com>
+> >>> Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi=
+.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>=
+, H. Peter Anvin <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mai=
+ling list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-=
+kernel@vger.kernel.org>
+> >>> Subject: Re: [PATCH v2 1/2] Makefile: Fix distcc compilation with x86=
+ macros
+> >>>
+> >>>
+> >>> On Thu, Nov 15, 2018 at 1:01 PM Nadav Amit <namit@vmware.com> wrote:
+> >>>> Introducing the use of asm macros in c-code broke distcc, since it o=
+nly
+> >>>> sends the preprocessed source file. The solution is to break the
+> >>>> compilation into two separate phases of compilation and assembly, an=
+d
+> >>>> between the two concatenate the assembly macros and the compiled (ye=
+t
+> >>>> not assembled) source file. Since this is less efficient, this
+> >>>> compilation mode is only used when distcc or icecc are used.
+> >>>>
+> >>>> Note that the assembly stage should also be distributed, if distcc i=
+s
+> >>>> configured using "CFLAGS=3D-DENABLE_REMOTE_ASSEMBLE".
+> >>>>
+> >>>> Reported-by: Logan Gunthorpe <logang@deltatee.com>
+> >>>> Signed-off-by: Nadav Amit <namit@vmware.com>
+> >>>
+> >>>
+> >>> Wow, this is so ugly.
+> >>
+> >> Indeed, it is not pretty from the Makefile system point of view.
+> >>
+> >> But it does have merits when it comes to the actual use (by developers=
+). If
+> >> you look on x86, there are a lot of duplicated implementation for C an=
+d Asm
+> >> and crazy C macros, for example for PV function call or the alternativ=
+e
+> >> mechanism. The code is also less readable in its current form.
+> >>
+> >>> I realized how much I hated this by now.
+> >>>
+> >>> My question is, how long do we need to carry this?
+> >>
+> >> If it is purely about performance, I am not sure it would make sense t=
+o
+> >> put it in, as it will indeed be (eventually) solved by the compiler, a=
+nd
+> >> the penalty is not too great.
+> >
+> >
+> > It is unfortunate to mess up the code
+> > by having two different ways to achieve the same goal.
+>
+> Indeed, but I fail to see how this statement fits with the next sentence.
 
-Move it to the 'prepare0' stage. I know this is a cheesy workaround,
-but better than the current situation.
+I am not tracking the progress on GCC side.
+I just did not sure if the 'asm inline' work was on the right track.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- Makefile             | 3 ++-
- scripts/Makefile     | 3 +--
- scripts/mod/Makefile | 2 --
- 3 files changed, 3 insertions(+), 5 deletions(-)
+> > When GCC with asm inline support is shipped,
+> > would you revert 77b0bf55 ?
+>
+> This patch and the following ones were not written to be reverted, i.e.,
+> reverting them later may not be easy since they remove redundant C inline
+> assembly chunks.
+>
+> Since gcc will solve the inline assembly issues, the value of these patch=
+es
+> is in unifying the assembly that is used in .c and .S files. Due to the l=
+ack
+> of m4-like preprocessor in the Linux make-system, the solution is a bit
+> =E2=80=9Chacky=E2=80=9D (in other words, I don=E2=80=99t see a reasonable=
+ alternative solution).
+>
+> So there is a downside in the form of performance degradation of distcc, =
+and
+> hacky (not too hacky?) Makefile changes. On the upside, except addressing
+> the gcc statement cost computation (inline) issue, the patch removes
+> redundant code, and improves assembly code readability.
 
-diff --git a/Makefile b/Makefile
-index b78cc97..21a7729 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1073,7 +1073,7 @@ include/config/kernel.release: $(srctree)/Makefile FORCE
- # Carefully list dependencies so we do not try to build scripts twice
- # in parallel
- PHONY += scripts
--scripts: scripts_basic scripts_dtc asm-generic gcc-plugins $(autoksyms_h)
-+scripts: scripts_basic scripts_dtc
- 	$(Q)$(MAKE) $(build)=$(@)
- 
- # Things we need to do before we recursively start building the kernel
-@@ -1111,6 +1111,7 @@ macroprepare: prepare1 archmacros
- archprepare: archheaders archscripts macroprepare scripts_basic
- 
- prepare0: archprepare gcc-plugins
-+	$(Q)$(MAKE) $(build)=scripts/mod
- 	$(Q)$(MAKE) $(build)=.
- 
- # All the preparing..
-diff --git a/scripts/Makefile b/scripts/Makefile
-index ece52ff..b48259d 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -37,9 +37,8 @@ build_unifdef: $(obj)/unifdef
- 	@:
- 
- subdir-$(CONFIG_MODVERSIONS) += genksyms
--subdir-y                     += mod
- subdir-$(CONFIG_SECURITY_SELINUX) += selinux
- subdir-$(CONFIG_GDB_SCRIPTS) += gdb
- 
- # Let clean descend into subdirs
--subdir-	+= basic dtc kconfig package gcc-plugins
-+subdir-	+= basic dtc kconfig mod package gcc-plugins
-diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
-index a5b4af4..42c5d50 100644
---- a/scripts/mod/Makefile
-+++ b/scripts/mod/Makefile
-@@ -4,8 +4,6 @@ OBJECT_FILES_NON_STANDARD := y
- hostprogs-y	:= modpost mk_elfconfig
- always		:= $(hostprogs-y) empty.o
- 
--CFLAGS_REMOVE_empty.o := $(ASM_MACRO_FLAGS)
--
- modpost-objs	:= modpost.o file2alias.o sumversion.o
- 
- devicetable-offsets-file := devicetable-offsets.h
--- 
-2.7.4
+It is true that the assembly part itself is readable
+but the readability as a whole is worse IMHO.
+
+Each macro implementation was split into "asm volatile" (in C) +
+".macro" (in ASM) parts.
+
+
+> In addition, it
+> provides the option to make assembly manipulations after compilation, whi=
+ch
+> HPA and others (me) look into.
+>
+>  Anyhow, if after all, the downside is considered greater than the upside=
+,
+> it is best to remove the patches sooner than later, as a revert later wil=
+l
+> be more painful.
+
+Then, I'd be happier with the revert now.
+
+
+
+--
+Best Regards
+Masahiro Yamada
