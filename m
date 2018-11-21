@@ -1,73 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:50096 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726004AbeKVBOi (ORCPT
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:46059 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732467AbeKVE2Q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Nov 2018 20:14:38 -0500
+        Wed, 21 Nov 2018 23:28:16 -0500
+Received: by mail-pl1-f195.google.com with SMTP id a14so6523367plm.12
+        for <linux-kbuild@vger.kernel.org>; Wed, 21 Nov 2018 09:52:54 -0800 (PST)
+From: Paul Walmsley <paul.walmsley@sifive.com>
+Date: Wed, 21 Nov 2018 09:52:52 -0800 (PST)
+Subject: Re: [PATCH v2 2/2] modpost: skip ELF local symbols by default during
+ section mismatch check
+In-Reply-To: <CAK7LNAQqpzJcxZBvZY1Bd2sVUwTLg7eD2mq61hDOw6Ek=akdfw@mail.gmail.com>
+Message-ID: <alpine.DEB.2.21.9999.1811210950100.18372@viisi.sifive.com>
+References: <20181115005602.30746-1-paul.walmsley@sifive.com> <20181115005602.30746-3-paul.walmsley@sifive.com> <CAK7LNAQqpzJcxZBvZY1Bd2sVUwTLg7eD2mq61hDOw6Ek=akdfw@mail.gmail.com>
 MIME-Version: 1.0
-References: <1542675930-21114-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1542675930-21114-1-git-send-email-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 21 Nov 2018 23:39:13 +0900
-Message-ID: <CAK7LNAReYwYAgGfxsHX2uRxXrYizM9C0rmq7V_ck-V+dc+oN4A@mail.gmail.com>
-Subject: Re: [PATCH v2 0/9] kbuild: clean-up modversion, TRIM_UNUSED_KSYMS,
- if_changed_rule, etc.
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>, linux-um@lists.infradead.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Richard Weinberger <richard@nod.at>, Andrew Morton <akpm@linux-foundation.org>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Jeff Dike <jdike@addtoit.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: paul.walmsley@sifive.com, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Russell King <linux@armlinux.org.uk>, jimw@sifive.com, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Paul Walmsley <paul@pwsan.com>
 
-On Tue, Nov 20, 2018 at 10:11 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+Hello Masahiro,
+
+On Wed, 21 Nov 2018, Masahiro Yamada wrote:
+
+> I think this is almost good.
+> Just a nit.
 >
-> As a Kbuild maintainer, I always struggle to keep the core makefiles
-> clean because people tend to squeeze more and more clutter code into
-> the kbuild core in order to do what they want to do.
+> Maybe, putting this check in secref_whitelist()
+> (with a comment "Pattern 6:")
+> could look more consistency.
 >
-> The biggest step forward in this series is to re-implement
-> the build trick of CONFIG_TRIM_UNUSED_KSYMS in a cleaner way.
-> scripts/Kbuild.include now looks nice again.
-> Also, in my rough estimation, building with CONFIG_TRIM_UNUSED_KSYMS
-> became 40-50 % faster.
 >
-> Besides those, nice cleanups are here and there.
+> Also, if you use strstart() helper,
+> you can remove is_local_symbol() function.
 >
-> Masahiro Yamada (9):
->   kbuild: let fixdep directly write to .*.cmd files
->   kbuild: remove redundant 'set -e' from filechk_* defines
->   kbuild: remove redundant 'set -e' from sub_cmd_record_mcount
->   kbuild: refactor modversions build rules
->   kbuild: simplify dependency generation for CONFIG_TRIM_UNUSED_KSYMS
->   kbuild: change if_changed_rule for multi-line recipe
->   kbuild: remove trailing semicolon from cmd_* passed to if_changed_rule
->   kbuild: refactor if_changed and if_changed_dep
->   kbuild: remove redundant 'set -e' from cmd_* defines
-
-Series, applied to linux-kbuild.
-
-
-
-
-
->  Makefile                     |  13 +++---
->  arch/um/Makefile             |   2 +-
->  include/asm-generic/export.h |  13 +++---
->  include/linux/export.h       |  18 ++++----
->  scripts/Kbuild.include       |  49 +++-----------------
->  scripts/Makefile.build       | 105 ++++++++++++++++++-------------------------
->  scripts/Makefile.lib         |   2 +-
->  scripts/basic/fixdep.c       |  31 ++-----------
->  scripts/gen_ksymdeps.sh      |  25 +++++++++++
->  scripts/package/Makefile     |   1 -
->  10 files changed, 106 insertions(+), 153 deletions(-)
->  create mode 100755 scripts/gen_ksymdeps.sh
 >
-> --
-> 2.7.4
+>        /* Check for pattern 6 */
+>        if (strstarts(fromsym, ".L"))
+>                return 0;
 >
 
+Thank you for your suggestion.  This change is a definite improvement. 
+The patch has been updated, and I will repost the patch after it's been 
+tested.
 
--- 
-Best Regards
-Masahiro Yamada
+Best regards,
+
+- Paul
