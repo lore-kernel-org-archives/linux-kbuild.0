@@ -1,137 +1,141 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:39528 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725949AbeKUNUX (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:23129 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725995AbeKUQrq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Nov 2018 08:20:23 -0500
+        Wed, 21 Nov 2018 11:47:46 -0500
 MIME-Version: 1.0
-References: <20181114204309.18645-1-namit@vmware.com> <20181114204309.18645-2-namit@vmware.com>
- <CAK7LNAREF_Pcejq1LJ=3K7h0M4o4oSRLfbeJc73O+8HV420Ziw@mail.gmail.com>
- <1C316B94-8F27-439C-B049-9947DC329780@vmware.com> <CAK7LNATFVHnPXh-uEA+T9QNw3OnSvkLLKMuJ_tF1v8bEveStSg@mail.gmail.com>
- <1F17E69E-06E8-4A5A-A434-1DCD6C6F0259@vmware.com>
-In-Reply-To: <1F17E69E-06E8-4A5A-A434-1DCD6C6F0259@vmware.com>
+References: <20181115005602.30746-1-paul.walmsley@sifive.com> <20181115005602.30746-3-paul.walmsley@sifive.com>
+In-Reply-To: <20181115005602.30746-3-paul.walmsley@sifive.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 21 Nov 2018 11:47:19 +0900
-Message-ID: <CAK7LNATCmMTTEZUBhSVawVM_+r6KsuYnBCdxX_p3GqbKBH3DEw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] Makefile: Fix distcc compilation with x86 macros
+Date: Wed, 21 Nov 2018 15:13:56 +0900
+Message-ID: <CAK7LNAQqpzJcxZBvZY1Bd2sVUwTLg7eD2mq61hDOw6Ek=akdfw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] modpost: skip ELF local symbols by default during
+ section mismatch check
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nadav Amit <namit@vmware.com>
-Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: paul.walmsley@sifive.com
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Russell King <linux@armlinux.org.uk>, jimw@sifive.com, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Paul Walmsley <paul@pwsan.com>
 
-On Tue, Nov 20, 2018 at 2:21 AM Nadav Amit <namit@vmware.com> wrote:
+Hi Paul,
+
+
+On Thu, Nov 15, 2018 at 9:57 AM Paul Walmsley <paul.walmsley@sifive.com> wrote:
 >
-> at 8:20 PM, Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+> During development of a serial console driver with a gcc 8.2.0
+> toolchain for RISC-V, the following modpost warning appeared:
 >
-> > On Sat, Nov 17, 2018 at 6:02 AM Nadav Amit <namit@vmware.com> wrote:
-> >> From: Masahiro Yamada
-> >> Sent: November 16, 2018 at 7:45:45 AM GMT
-> >>> To: Nadav Amit <namit@vmware.com>
-> >>> Cc: Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi=
-.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>=
-, H. Peter Anvin <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mai=
-ling list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-=
-kernel@vger.kernel.org>
-> >>> Subject: Re: [PATCH v2 1/2] Makefile: Fix distcc compilation with x86=
- macros
-> >>>
-> >>>
-> >>> On Thu, Nov 15, 2018 at 1:01 PM Nadav Amit <namit@vmware.com> wrote:
-> >>>> Introducing the use of asm macros in c-code broke distcc, since it o=
-nly
-> >>>> sends the preprocessed source file. The solution is to break the
-> >>>> compilation into two separate phases of compilation and assembly, an=
-d
-> >>>> between the two concatenate the assembly macros and the compiled (ye=
-t
-> >>>> not assembled) source file. Since this is less efficient, this
-> >>>> compilation mode is only used when distcc or icecc are used.
-> >>>>
-> >>>> Note that the assembly stage should also be distributed, if distcc i=
-s
-> >>>> configured using "CFLAGS=3D-DENABLE_REMOTE_ASSEMBLE".
-> >>>>
-> >>>> Reported-by: Logan Gunthorpe <logang@deltatee.com>
-> >>>> Signed-off-by: Nadav Amit <namit@vmware.com>
-> >>>
-> >>>
-> >>> Wow, this is so ugly.
-> >>
-> >> Indeed, it is not pretty from the Makefile system point of view.
-> >>
-> >> But it does have merits when it comes to the actual use (by developers=
-). If
-> >> you look on x86, there are a lot of duplicated implementation for C an=
-d Asm
-> >> and crazy C macros, for example for PV function call or the alternativ=
-e
-> >> mechanism. The code is also less readable in its current form.
-> >>
-> >>> I realized how much I hated this by now.
-> >>>
-> >>> My question is, how long do we need to carry this?
-> >>
-> >> If it is purely about performance, I am not sure it would make sense t=
-o
-> >> put it in, as it will indeed be (eventually) solved by the compiler, a=
-nd
-> >> the penalty is not too great.
-> >
-> >
-> > It is unfortunate to mess up the code
-> > by having two different ways to achieve the same goal.
+> ----
+> WARNING: vmlinux.o(.data+0x19b10): Section mismatch in reference from the variable .LANCHOR1 to the function .init.text:sifive_serial_console_setup()
+> The variable .LANCHOR1 references
+> the function __init sifive_serial_console_setup()
+> If the reference is valid then annotate the
+> variable with __init* or __refdata (see linux/init.h) or name the variable:
+> *_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console
+> ----
 >
-> Indeed, but I fail to see how this statement fits with the next sentence.
-
-I am not tracking the progress on GCC side.
-I just did not sure if the 'asm inline' work was on the right track.
-
-
-> > When GCC with asm inline support is shipped,
-> > would you revert 77b0bf55 ?
+> ".LANCHOR1" is an ELF local symbol, automatically created by gcc's section
+> anchor generation code:
 >
-> This patch and the following ones were not written to be reverted, i.e.,
-> reverting them later may not be easy since they remove redundant C inline
-> assembly chunks.
+> https://gcc.gnu.org/onlinedocs/gccint/Anchored-Addresses.html
 >
-> Since gcc will solve the inline assembly issues, the value of these patch=
-es
-> is in unifying the assembly that is used in .c and .S files. Due to the l=
-ack
-> of m4-like preprocessor in the Linux make-system, the solution is a bit
-> =E2=80=9Chacky=E2=80=9D (in other words, I don=E2=80=99t see a reasonable=
- alternative solution).
+> https://gcc.gnu.org/git/?p=gcc.git;a=blob;f=gcc/varasm.c;h=cd9591a45617464946dcf9a126dde277d9de9804;hb=9fb89fa845c1b2e0a18d85ada0b077c84508ab78#l7473
 >
-> So there is a downside in the form of performance degradation of distcc, =
-and
-> hacky (not too hacky?) Makefile changes. On the upside, except addressing
-> the gcc statement cost computation (inline) issue, the patch removes
-> redundant code, and improves assembly code readability.
-
-It is true that the assembly part itself is readable
-but the readability as a whole is worse IMHO.
-
-Each macro implementation was split into "asm volatile" (in C) +
-".macro" (in ASM) parts.
-
-
-> In addition, it
-> provides the option to make assembly manipulations after compilation, whi=
-ch
-> HPA and others (me) look into.
+> This was verified by compiling the kernel with -fno-section-anchors.
+> The serial driver code idiom triggering the warning is standard serial
+> driver practice, and one that has a specific whitelist inclusion in
+> modpost.c.
 >
->  Anyhow, if after all, the downside is considered greater than the upside=
-,
-> it is best to remove the patches sooner than later, as a revert later wil=
-l
-> be more painful.
+> I'm neither a modpost nor an ELF expert, but naively, it doesn't seem
+> useful for modpost to report section mismatch warnings caused by ELF
+> local symbols by default.  Local symbols have compiler-generated
+> names, and thus bypass modpost's whitelisting algorithm, which relies
+> on the presence of a non-autogenerated symbol name.  This increases
+> the likelihood that false positive warnings will be generated (as in
+> the above case).
+>
+> Thus, disable section mismatch reporting on ELF local symbols.  The
+> rationale here is similar to that of commit 2e3a10a1551d ("ARM: avoid
+> ARM binutils leaking ELF local symbols") and of similar code already
+> present in modpost.c:
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/scripts/mod/modpost.c?h=v4.19-rc4&id=7876320f88802b22d4e2daf7eb027dd14175a0f8#n1256
+>
+> This second version of the patch drops the option to keep section
+> mismatch warnings for local sections, based on feedback from Sam
+> Ravnborg <sam@ravnborg.org>; and clarifies that these warnings
+> appear with gcc 8.2.0.
+>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: Jim Wilson <jimw@sifive.com>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: Sam Ravnborg <sam@ravnborg.org>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Paul Walmsley <paul.walmsley@sifive.com>
+> Signed-off-by: Paul Walmsley <paul@pwsan.com>
+> ---
+>  scripts/mod/modpost.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 85bd93c63180..0fb148171b78 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -1253,6 +1253,17 @@ static inline int is_arm_mapping_symbol(const char *str)
+>                && (str[2] == '\0' || str[2] == '.');
+>  }
+>
+> +/*
+> + * If a symbol name follows the convention for ELF-local symbols (i.e., the
+> + * name begins with a ".L"), return true; otherwise false.  This is used to
+> + * skip section mismatch reporting on ELF-local symbols, due to the risk of
+> + * false positives.
+> + */
+> +static inline int is_local_symbol(const char *str)
+> +{
+> +       return str[0] == '.' && str[1] == 'L';
+> +}
+> +
+>  /*
+>   * If there's no name there, ignore it; likewise, ignore it if it's
+>   * one of the magic symbols emitted used by current ARM tools.
+> @@ -1535,6 +1546,9 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
+>         if (strstarts(fromsym, "reference___initcall"))
+>                 return;
+>
+> +       if (is_local_symbol(fromsym))
+> +               return;
+> +
+>         tosec = sec_name(elf, get_secindex(elf, sym));
+>         to = find_elf_symbol(elf, r->r_addend, sym);
+>         tosym = sym_name(elf, to);
+> --
+> 2.19.1
+>
 
-Then, I'd be happier with the revert now.
+
+I think this is almost good.
+Just a nit.
+
+Maybe, putting this check in secref_whitelist()
+(with a comment "Pattern 6:")
+could look more consistency.
+
+
+Also, if you use strstart() helper,
+you can remove is_local_symbol() function.
+
+
+        /* Check for pattern 6 */
+        if (strstarts(fromsym, ".L"))
+                return 0;
 
 
 
---
+
+-- 
 Best Regards
 Masahiro Yamada
