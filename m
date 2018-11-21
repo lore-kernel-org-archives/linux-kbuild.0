@@ -1,68 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45398 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726665AbeKUTjr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Nov 2018 14:39:47 -0500
-Date: Wed, 21 Nov 2018 10:06:03 +0100
-From: Jean Delvare <jdelvare@suse.de>
-Subject: Re: Backed up kernels
-Message-ID: <20181121100603.5afd53ed@endymion>
-In-Reply-To: <CAK7LNATyF4GvvoMz0FphfBu739Qvy7L1KzdFcNyj5HhFsYK53Q@mail.gmail.com>
-References: <20181120144007.016e4998@endymion>
-        <CAK7LNATyF4GvvoMz0FphfBu739Qvy7L1KzdFcNyj5HhFsYK53Q@mail.gmail.com>
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:50096 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726004AbeKVBOi (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 21 Nov 2018 20:14:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <1542675930-21114-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1542675930-21114-1-git-send-email-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 21 Nov 2018 23:39:13 +0900
+Message-ID: <CAK7LNAReYwYAgGfxsHX2uRxXrYizM9C0rmq7V_ck-V+dc+oN4A@mail.gmail.com>
+Subject: Re: [PATCH v2 0/9] kbuild: clean-up modversion, TRIM_UNUSED_KSYMS,
+ if_changed_rule, etc.
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, martin.wilck@suse.com, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>, linux-um@lists.infradead.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Richard Weinberger <richard@nod.at>, Andrew Morton <akpm@linux-foundation.org>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Jeff Dike <jdike@addtoit.com>
 
-Hi Masahiro,
+On Tue, Nov 20, 2018 at 10:11 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> As a Kbuild maintainer, I always struggle to keep the core makefiles
+> clean because people tend to squeeze more and more clutter code into
+> the kbuild core in order to do what they want to do.
+>
+> The biggest step forward in this series is to re-implement
+> the build trick of CONFIG_TRIM_UNUSED_KSYMS in a cleaner way.
+> scripts/Kbuild.include now looks nice again.
+> Also, in my rough estimation, building with CONFIG_TRIM_UNUSED_KSYMS
+> became 40-50 % faster.
+>
+> Besides those, nice cleanups are here and there.
+>
+> Masahiro Yamada (9):
+>   kbuild: let fixdep directly write to .*.cmd files
+>   kbuild: remove redundant 'set -e' from filechk_* defines
+>   kbuild: remove redundant 'set -e' from sub_cmd_record_mcount
+>   kbuild: refactor modversions build rules
+>   kbuild: simplify dependency generation for CONFIG_TRIM_UNUSED_KSYMS
+>   kbuild: change if_changed_rule for multi-line recipe
+>   kbuild: remove trailing semicolon from cmd_* passed to if_changed_rule
+>   kbuild: refactor if_changed and if_changed_dep
+>   kbuild: remove redundant 'set -e' from cmd_* defines
 
-On Wed, 21 Nov 2018 15:59:49 +0900, Masahiro Yamada wrote:
-> On Tue, Nov 20, 2018 at 10:40 PM Jean Delvare <jdelvare@suse.de> wrote:
-> > Therefore I am asking, can we change "make install" so that it does NOT
-> > create a backup copy of an existing kernel?  
-> 
-> I think your suggestion makes sense,
-> but "make install" is basically implemented
-> by arch-specific shell script.
-> (For example, arch/x86/boot/install.sh)
+Series, applied to linux-kbuild.
 
-Thanks for the pointer. However I have a hard time believing that the
-script above is what is run when I call "make install". It looks pretty
-old, doesn't support kernel files with version strings, and only knows
-of lilo as a boot loader.
 
-But I see there is a hook at the beginning for a user or distribution
-provided install script:
 
-if [ -x ~/bin/${INSTALLKERNEL} ]; then exec ~/bin/${INSTALLKERNEL} "$@"; fi
-if [ -x /sbin/${INSTALLKERNEL} ]; then exec /sbin/${INSTALLKERNEL} "$@"; fi
 
-So I guess that what I really care about is the /sbin/installkernel
-script on my system, which is part of the dracut package. Which means I
-must talk to the dracut package maintainer of my distribution.
 
-> Will you talk to the maintainers
-> of architecture you are interested in?
-> 
-> (or send it to linux-arch@vger.kernel.org)
+>  Makefile                     |  13 +++---
+>  arch/um/Makefile             |   2 +-
+>  include/asm-generic/export.h |  13 +++---
+>  include/linux/export.h       |  18 ++++----
+>  scripts/Kbuild.include       |  49 +++-----------------
+>  scripts/Makefile.build       | 105 ++++++++++++++++++-------------------------
+>  scripts/Makefile.lib         |   2 +-
+>  scripts/basic/fixdep.c       |  31 ++-----------
+>  scripts/gen_ksymdeps.sh      |  25 +++++++++++
+>  scripts/package/Makefile     |   1 -
+>  10 files changed, 106 insertions(+), 153 deletions(-)
+>  create mode 100755 scripts/gen_ksymdeps.sh
+>
+> --
+> 2.7.4
+>
 
-It doesn't seem x86-specific, as apparently a lot of code was
-copy-and-pasted across architectures over time. It probably doesn't
-make sense to change it on one architecture and not on the others.
 
-Also, if anyone is using these basic kernel-provided installation
-scripts, then keeping a backup may actually make sense, because the
-kernel files have no version strings, so a new kernel would always
-overwrite the previous one, only leaving one kernel in place. If that
-kernel doesn't boot for whatever reason, then game over.
-
-So I think we should leave things as is on the kernel side.
-
-Thanks again,
 -- 
-Jean Delvare
-SUSE L3 Support
+Best Regards
+Masahiro Yamada
