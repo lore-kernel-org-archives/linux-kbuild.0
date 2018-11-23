@@ -1,89 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:40273 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390614AbeKWVgE (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Nov 2018 16:36:04 -0500
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:49888 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2437062AbeKXEXA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 23 Nov 2018 23:23:00 -0500
+Date: Fri, 23 Nov 2018 17:37:39 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v11 09/24] arm64: move untagged_addr macro from uaccess.h
+ to memory.h
+Message-ID: <20181123173739.osgvnnhmptdgtlnl@lakrids.cambridge.arm.com>
+References: <cover.1542648335.git.andreyknvl@google.com>
+ <0288334225edc99d98d70c896494e19c3bd9361a.1542648335.git.andreyknvl@google.com>
 MIME-Version: 1.0
-References: <1542726258-8418-1-git-send-email-yamada.masahiro@socionext.com> <87d7d90bf8779a997b17c917680995abc455cf11.camel@infradead.org>
-In-Reply-To: <87d7d90bf8779a997b17c917680995abc455cf11.camel@infradead.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 23 Nov 2018 19:51:26 +0900
-Message-ID: <CAK7LNAQVV4hcVOvG8Yu6GFVEH=Shv=v=PkGkMghDBJbGBNSE1Q@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: announce removal of SUBDIRS if used
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0288334225edc99d98d70c896494e19c3bd9361a.1542648335.git.andreyknvl@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, =?UTF-8?B?TWFyZWsgVmHFoXV0?= <marek.vasut@gmail.com>, Guenter Roeck <linux@roeck-us.net>, linux-watchdog@vger.kernel.org, wim@linux-watchdog.org, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Jim Cromie <jim.cromie@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Brian Norris <computersforpeace@gmail.com>, Richard Weinberger <richard@nod.at>, linux-mtd <linux-mtd@lists.infradead.org>, Boris Brezillon <boris.brezillon@bootlin.com>
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-On Fri, Nov 23, 2018 at 5:04 PM David Woodhouse <dwmw2@infradead.org> wrote=
-:
->
-> On Wed, 2018-11-21 at 00:04 +0900, Masahiro Yamada wrote:
-> > SUBDIRS has been kept as a backward compatibility since
-> > commit ("[PATCH] kbuild: external module support") in 2002.
-> >
-> > We do not need multiple ways to do the same thing, so I will remove
-> > SUBDIRS after the Linux 5.3 release. I cleaned up in-tree code, and
-> > updated the document so that nobody would try to use it.
-> >
-> > Meanwhile, display the following warning if SUBDIRS is used.
-> >
-> > Makefile:189: =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D WARNI=
-NG =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > Makefile:190: 'SUBDIRS' will be removed after Linux 5.3
-> > Makefile:191: Please use 'M=3D' or 'KBUILD_EXTMOD' instead
-> > Makefile:192: =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->
-> No, please don't do this. This is effectively a kernel=E2=86=90=E2=86=92u=
-ser ABI.
+On Mon, Nov 19, 2018 at 06:26:25PM +0100, Andrey Konovalov wrote:
+> Move the untagged_addr() macro from arch/arm64/include/asm/uaccess.h
+> to arch/arm64/include/asm/memory.h to be later reused by KASAN.
+> 
+> Also make the untagged_addr() macro accept all kinds of address types
+> (void *, unsigned long, etc.). This allows not to specify type casts in
+> each place where the macro is used. This is done by using __typeof__.
+> 
+> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> ---
+>  arch/arm64/include/asm/memory.h  | 8 ++++++++
+>  arch/arm64/include/asm/uaccess.h | 7 -------
+>  2 files changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> index 05fbc7ffcd31..deb95be44392 100644
+> --- a/arch/arm64/include/asm/memory.h
+> +++ b/arch/arm64/include/asm/memory.h
+> @@ -73,6 +73,14 @@
+>  #define KERNEL_START      _text
+>  #define KERNEL_END        _end
+>  
+> +/*
+> + * When dealing with data aborts, watchpoints, or instruction traps we may end
+> + * up with a tagged userland pointer. Clear the tag to get a sane pointer to
+> + * pass on to access_ok(), for instance.
+> + */
+> +#define untagged_addr(addr)	\
+> +	(__typeof__(addr))sign_extend64((__u64)(addr), 55)
 
+Minor nits:
 
-External modules are just downstream kernel code.
+* s/__u64/u64/ (or s/__u64/unsigned long/), since this isn't a UAPI
+  header.
 
-There is no guarantee for eternal backward compatibility.
+* Please move this down into the #ifndef __ASSEMBLY__ block, after we
+  include <linux/bitops.h>, which is necessary for sign_extend64().
 
+With those fixed up, this patch looks sound to me:
 
-Actually, kernel headers and APIs are always changing.
+Acked-by: Mark Rutland <mark.rutland@arm.com>
 
-We are not allowed to break the upstream code during API migration,
-but we do not care about external modules.
+Thanks,
+Mark.
 
-
-If you want to compile external modules
-with a new version of the kernel,
-you need to adjust various parts of the code anyway.
-Is it a problem to ask one-liner fix in a build script?
-
-
-> The instructions for building a kernel module have been this, for
-> *ages*:
->
->  echo 'obj-m :=3D mymod.o' > Makefile
->  make -C /lib/modules/`uname -r`/build SUBDIRS=3D`pwd`
-
-
-It has been *ages* since the external module build
-was improved in the current way.
-
-Since then, M=3D<...> is a preferred way over SUBDIRS.
-
-This case is even nicer.
-I set a one-year grace period with a clear warning message.
-
-
-> People have muscle memory, they have it encoded into various of their
-> own makefiles and build scripts. Please don't make it stop working
-> unless there's actually a really good reason to do so.
-
-Dumping old code is a good reason.
-
-
---
-Best Regards
-Masahiro Yamada
+> +
+>  /*
+>   * Generic and tag-based KASAN require 1/8th and 1/16th of the kernel virtual
+>   * address space for the shadow region respectively. They can bloat the stack
+> diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
+> index 07c34087bd5e..281a1e47263d 100644
+> --- a/arch/arm64/include/asm/uaccess.h
+> +++ b/arch/arm64/include/asm/uaccess.h
+> @@ -96,13 +96,6 @@ static inline unsigned long __range_ok(const void __user *addr, unsigned long si
+>  	return ret;
+>  }
+>  
+> -/*
+> - * When dealing with data aborts, watchpoints, or instruction traps we may end
+> - * up with a tagged userland pointer. Clear the tag to get a sane pointer to
+> - * pass on to access_ok(), for instance.
+> - */
+> -#define untagged_addr(addr)		sign_extend64(addr, 55)
+> -
+>  #define access_ok(type, addr, size)	__range_ok(addr, size)
+>  #define user_addr_max			get_fs
+>  
+> -- 
+> 2.19.1.1215.g8438c0b245-goog
+> 
