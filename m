@@ -1,75 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:49080 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730451AbeKWPe6 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:56787 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730451AbeKWPqP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Nov 2018 10:34:58 -0500
+        Fri, 23 Nov 2018 10:46:15 -0500
+MIME-Version: 1.0
+References: <1542734004-2673-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1542734004-2673-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] kbuild: descend into scripts/gcc-plugins/ via scripts/Makefile
-Date: Fri, 23 Nov 2018 13:51:27 +0900
-Message-Id: <1542948687-7326-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1542948687-7326-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1542948687-7326-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Fri, 23 Nov 2018 14:02:40 +0900
+Message-ID: <CAK7LNAT35jjpRr_n7p-mUTXj9fCtBzyGcwQfwZdbL8_CtUA9mg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: move modpost out of 'scripts' target
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, kernel-hardening@lists.openwall.com, Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Now that 'prepare0' depends on 'scripts', building GCC plugins can
-go into scripts/Makefile, which is a more standard way.
+On Wed, Nov 21, 2018 at 2:16 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> I am eagar to build under the scripts/ directory only with $(HOSTCC),
+> but scripts/mod/ highly depends on the $(CC) and target arch headers.
+> That it why the 'scripts' target must depend on 'asm-generic',
+> 'gcc-plugins', and $(autoksyms_h).
+>
+> Move it to the 'prepare0' stage. I know this is a cheesy workaround,
+> but better than the current situation.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- Makefile                     | 2 +-
- scripts/Makefile             | 3 ++-
- scripts/Makefile.gcc-plugins | 8 --------
- 3 files changed, 3 insertions(+), 10 deletions(-)
+Applied to linux-kbuild.
 
-diff --git a/Makefile b/Makefile
-index cee4cec..a8bbe68 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1114,7 +1114,7 @@ macroprepare: prepare1 archmacros
- 
- archprepare: archheaders archscripts macroprepare scripts_basic
- 
--prepare0: scripts archprepare gcc-plugins
-+prepare0: scripts archprepare
- 	$(Q)$(MAKE) $(build)=scripts/mod
- 	$(Q)$(MAKE) $(build)=.
- 
-diff --git a/scripts/Makefile b/scripts/Makefile
-index b48259d..feb1f71 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -36,9 +36,10 @@ PHONY += build_unifdef
- build_unifdef: $(obj)/unifdef
- 	@:
- 
-+subdir-$(CONFIG_GCC_PLUGINS) += gcc-plugins
- subdir-$(CONFIG_MODVERSIONS) += genksyms
- subdir-$(CONFIG_SECURITY_SELINUX) += selinux
- subdir-$(CONFIG_GDB_SCRIPTS) += gdb
- 
- # Let clean descend into subdirs
--subdir-	+= basic dtc kconfig mod package gcc-plugins
-+subdir-	+= basic dtc kconfig mod package
-diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-index 46c5c68..c36f199 100644
---- a/scripts/Makefile.gcc-plugins
-+++ b/scripts/Makefile.gcc-plugins
-@@ -49,11 +49,3 @@ KBUILD_CFLAGS += $(GCC_PLUGINS_CFLAGS)
- # All enabled GCC plugins are collected here for building below.
- GCC_PLUGIN := $(gcc-plugin-y)
- export GCC_PLUGIN
--
--# Actually do the build, if requested.
--PHONY += gcc-plugins
--gcc-plugins: scripts_basic
--ifdef CONFIG_GCC_PLUGINS
--	$(Q)$(MAKE) $(build)=scripts/gcc-plugins
--endif
--	@:
+
+
+> ---
+>
+>  Makefile             | 3 ++-
+>  scripts/Makefile     | 3 +--
+>  scripts/mod/Makefile | 2 --
+>  3 files changed, 3 insertions(+), 5 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index b78cc97..21a7729 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1073,7 +1073,7 @@ include/config/kernel.release: $(srctree)/Makefile FORCE
+>  # Carefully list dependencies so we do not try to build scripts twice
+>  # in parallel
+>  PHONY += scripts
+> -scripts: scripts_basic scripts_dtc asm-generic gcc-plugins $(autoksyms_h)
+> +scripts: scripts_basic scripts_dtc
+>         $(Q)$(MAKE) $(build)=$(@)
+>
+>  # Things we need to do before we recursively start building the kernel
+> @@ -1111,6 +1111,7 @@ macroprepare: prepare1 archmacros
+>  archprepare: archheaders archscripts macroprepare scripts_basic
+>
+>  prepare0: archprepare gcc-plugins
+> +       $(Q)$(MAKE) $(build)=scripts/mod
+>         $(Q)$(MAKE) $(build)=.
+>
+>  # All the preparing..
+> diff --git a/scripts/Makefile b/scripts/Makefile
+> index ece52ff..b48259d 100644
+> --- a/scripts/Makefile
+> +++ b/scripts/Makefile
+> @@ -37,9 +37,8 @@ build_unifdef: $(obj)/unifdef
+>         @:
+>
+>  subdir-$(CONFIG_MODVERSIONS) += genksyms
+> -subdir-y                     += mod
+>  subdir-$(CONFIG_SECURITY_SELINUX) += selinux
+>  subdir-$(CONFIG_GDB_SCRIPTS) += gdb
+>
+>  # Let clean descend into subdirs
+> -subdir-        += basic dtc kconfig package gcc-plugins
+> +subdir-        += basic dtc kconfig mod package gcc-plugins
+> diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
+> index a5b4af4..42c5d50 100644
+> --- a/scripts/mod/Makefile
+> +++ b/scripts/mod/Makefile
+> @@ -4,8 +4,6 @@ OBJECT_FILES_NON_STANDARD := y
+>  hostprogs-y    := modpost mk_elfconfig
+>  always         := $(hostprogs-y) empty.o
+>
+> -CFLAGS_REMOVE_empty.o := $(ASM_MACRO_FLAGS)
+> -
+>  modpost-objs   := modpost.o file2alias.o sumversion.o
+>
+>  devicetable-offsets-file := devicetable-offsets.h
+> --
+> 2.7.4
+>
+
+
 -- 
-2.7.4
+Best Regards
+Masahiro Yamada
