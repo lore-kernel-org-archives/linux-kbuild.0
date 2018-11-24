@@ -1,114 +1,143 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:27554 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728649AbeKXLjS (ORCPT
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:41670 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726048AbeKXRiw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 24 Nov 2018 06:39:18 -0500
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id wAO0qnc3006973
-        for <linux-kbuild@vger.kernel.org>; Sat, 24 Nov 2018 09:52:50 +0900
-Received: by mail-vs1-f51.google.com with SMTP id x1so8086815vsc.10
-        for <linux-kbuild@vger.kernel.org>; Fri, 23 Nov 2018 16:52:50 -0800 (PST)
+        Sat, 24 Nov 2018 12:38:52 -0500
+Received: by mail-lf1-f67.google.com with SMTP id c16so10030118lfj.8
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Nov 2018 22:51:32 -0800 (PST)
 MIME-Version: 1.0
 References: <CA+icZUUPaoEf0JzXJO6T5xBBrr8tcw2NmNXBk4=HD6WBbLtEdw@mail.gmail.com>
- <CA+icZUWrbTPk7ws+LBjzMSKsbfwbZODjCoBt7uQU0Z4ykzd6mw@mail.gmail.com>
-In-Reply-To: <CA+icZUWrbTPk7ws+LBjzMSKsbfwbZODjCoBt7uQU0Z4ykzd6mw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 24 Nov 2018 09:52:13 +0900
-Message-ID: <CAK7LNAQ_8RYQaLbouR84=HH+xoxvVGX=gN5z-vQqu0=PCVzOuQ@mail.gmail.com>
+ <CA+icZUWrbTPk7ws+LBjzMSKsbfwbZODjCoBt7uQU0Z4ykzd6mw@mail.gmail.com> <CAK7LNAQ_8RYQaLbouR84=HH+xoxvVGX=gN5z-vQqu0=PCVzOuQ@mail.gmail.com>
+In-Reply-To: <CAK7LNAQ_8RYQaLbouR84=HH+xoxvVGX=gN5z-vQqu0=PCVzOuQ@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Sat, 24 Nov 2018 07:51:19 +0100
+Message-ID: <CA+icZUXU8z_zke=3HCkceZo_becUL2Q=5j=QtAKkqYn8o-5-vw@mail.gmail.com>
 Subject: Re: builddeb: Missing arch/x86/kernel/macros.s when building modules
  with dkms
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sedat.dilek@gmail.com
-Cc: Ben Hutchings <ben@decadent.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild@vger.kernel.org
 
-Hi Sedat,
-
-Sorry, I missed your email.
-
-
-
-On Fri, Nov 23, 2018 at 6:25 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+On Sat, Nov 24, 2018 at 1:53 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> On Tue, Nov 13, 2018 at 3:46 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> Hi Sedat,
+>
+> Sorry, I missed your email.
+>
+>
+>
+> On Fri, Nov 23, 2018 at 6:25 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> >
+> > On Tue, Nov 13, 2018 at 3:46 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> > >
+> > > Hi,
+> > >
+> > > I wanted to compile acpi-call-dkms on Debian/testing AMD64 with
+> > > clang-8/experimental.
+> > >
+> > > When doing a...
+> > >
+> > > # LC_ALL=C dkms install -m acpi-call -v 1.1.0 -k 4.20.0-rc2-2-amd64-cbl
+> > >
+> > > ...I saw that arch/x86/kernel/macros.s file was missing.
+> > >
+> > > My workaround was...
+> > >
+> > > $ cd $BUILD_DIR
+> > > $ sudo cp -av arch/x86/kernel/macros.s
+> > > /usr/src/linux-headers-4.20.0-rc2-2-amd64-cbl/arch/x86/kernel/
+> > >
+> > > I guess the generated linux-headers debian package is missing this file.
+> > >
+> > > I wanted to let you and others know.
+> > >
 > >
 > > Hi,
 > >
-> > I wanted to compile acpi-call-dkms on Debian/testing AMD64 with
-> > clang-8/experimental.
+> > where is the right place to put a cp-line to copy the missing
+> > arch/x86/kernel/macro.s file?
 > >
-> > When doing a...
+> > In the section of [1]?
 > >
-> > # LC_ALL=C dkms install -m acpi-call -v 1.1.0 -k 4.20.0-rc2-2-amd64-cbl
+> > [ scripts/package/builddeb ]
 > >
-> > ...I saw that arch/x86/kernel/macros.s file was missing.
+> > # Build kernel header package
+> > (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name
+> > \*.pl) > "$objtree/debian/hdrsrcfiles"
+> > (cd $srctree; find arch/*/include include scripts -type f -o -type l)
+> > >> "$objtree/debian/hdrsrcfiles"
+> > (cd $srctree; find arch/$SRCARCH -name module.lds -o -name
+> > Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfi
 > >
-> > My workaround was...
+> > Is the macro.s file only generated for x86 arch only or also for other archs?
+>
+>
+> Only for x86.
+>
+> > Thanks for your feedback.
 > >
-> > $ cd $BUILD_DIR
-> > $ sudo cp -av arch/x86/kernel/macros.s
-> > /usr/src/linux-headers-4.20.0-rc2-2-amd64-cbl/arch/x86/kernel/
+> > Regards,
+> > - Sedat -
 > >
-> > I guess the generated linux-headers debian package is missing this file.
-> >
-> > I wanted to let you and others know.
-> >
+> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/scripts/package/builddeb#n156
 >
-> Hi,
+> Yes, this section.
 >
-> where is the right place to put a cp-line to copy the missing
-> arch/x86/kernel/macro.s file?
 >
-> In the section of [1]?
+> Maybe like this?
 >
-> [ scripts/package/builddeb ]
 >
-> # Build kernel header package
-> (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name
-> \*.pl) > "$objtree/debian/hdrsrcfiles"
-> (cd $srctree; find arch/*/include include scripts -type f -o -type l)
-> >> "$objtree/debian/hdrsrcfiles"
-> (cd $srctree; find arch/$SRCARCH -name module.lds -o -name
-> Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfi
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index f43a274..4cf5a5c 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -165,6 +165,9 @@ fi
+>  if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
+>         (cd $objtree; find scripts/gcc-plugins -name \*.so -o -name
+> gcc-common.h) >> "$objtree/debian/hdrobjfiles"
+>  fi
+> +if [ -r arch/$SRCARCH/kernel/macros.s ]; then
+> +       echo arch/$SRCARCH/kernel/macros.s >> "$objtree/debian/hdrobjfiles"
+> +fi
+>  destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+>  mkdir -p "$destdir"
+>  (cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd
+> $destdir; tar -xf -)
 >
-> Is the macro.s file only generated for x86 arch only or also for other archs?
-
-
-Only for x86.
-
-> Thanks for your feedback.
 >
-> Regards,
-> - Sedat -
->
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/scripts/package/builddeb#n156
+> --
+> Best Regards
+> Masahiro Yamada
 
-Yes, this section.
+Hi Masahiro Yamada,
 
+thanks, that fixes here the problem with building DKMS kernel modules:
 
-Maybe like this?
+# find /usr/src/linux-headers-4.20.0-rc3-7-amd64-cbl -name macros.s
+/usr/src/linux-headers-4.20.0-rc3-7-amd64-cbl/arch/x86/kernel/macros.
 
+I guess commit...
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index f43a274..4cf5a5c 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -165,6 +165,9 @@ fi
- if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
-        (cd $objtree; find scripts/gcc-plugins -name \*.so -o -name
-gcc-common.h) >> "$objtree/debian/hdrobjfiles"
- fi
-+if [ -r arch/$SRCARCH/kernel/macros.s ]; then
-+       echo arch/$SRCARCH/kernel/macros.s >> "$objtree/debian/hdrobjfiles"
-+fi
- destdir=$kernel_headers_dir/usr/src/linux-headers-$version
- mkdir -p "$destdir"
- (cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd
-$destdir; tar -xf -)
+77b0bf55bc67 kbuild/Makefile: Prepare for using macros in inline
+assembly code to work around asm() related GCC inlining bugs
 
+...is the root cause (mention as a "Fixes:" tag in a future patch)?
 
---
-Best Regards
-Masahiro Yamada
+Not sure if the according script for building Linux RPM packages needs
+the same fix, too.
+
+I can send a fix for the builddeb part or if you want to do it, it's OK for me.
+
+I highly appreciate to see a fix in Linux v4.20-rcN if possible.
+
+Thanks.
+
+Kind regards,
+- Sedat -
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=77b0bf55bc67
