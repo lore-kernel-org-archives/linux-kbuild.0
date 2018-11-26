@@ -1,27 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:35743 "EHLO
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:36726 "EHLO
         conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726210AbeK0Bsf (ORCPT
+        with ESMTP id S1726203AbeK0BtZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 26 Nov 2018 20:48:35 -0500
+        Mon, 26 Nov 2018 20:49:25 -0500
 MIME-Version: 1.0
-References: <1542860922-9730-1-git-send-email-yamada.masahiro@socionext.com> <1542860922-9730-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1542860922-9730-2-git-send-email-yamada.masahiro@socionext.com>
+References: <1542948687-7326-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1542948687-7326-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 26 Nov 2018 23:53:30 +0900
-Message-ID: <CAK7LNAR7vGAjHbXSeE6yh4u8Dcr+ZZpADmxvBN9Co2=42=gXzg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] modpost: file2alias: check prototype of handler
+Date: Mon, 26 Nov 2018 23:54:22 +0900
+Message-ID: <CAK7LNAT9oQteb2pr3yR7FYitXviFH2JPCuOQNS_OoxQUb9RMKg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: make 'scripts' depend on 'prepare0'
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Jessica Yu <jeyu@kernel.org>, Rusty Russell <rusty@rustcorp.com.au>, Mathieu Malaterre <malat@debian.org>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Nov 23, 2018 at 1:51 AM Masahiro Yamada
+On Sat, Nov 24, 2018 at 4:57 PM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
-> Use specific prototype instead of an opaque pointer so that the
-> compiler can catch incompatible pointer type.
+> Before start descending, Kbuild needs to run 'prepare' and 'scripts',
+> which were orthogonal to each other prior to this commit.
+>
+> Let's consider 'scripts' is a part of the preparation. This will allow
+> more cleanups.
+>
+> Move 'scripts' to the prerequisite of 'prepare0', which starts compiling
+> target *.c files.
 >
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
@@ -30,45 +36,99 @@ Applied to linux-kbuild.
 
 
 
->  scripts/mod/file2alias.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
 >
-> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-> index 7e4aede..a37af7d 100644
-> --- a/scripts/mod/file2alias.c
-> +++ b/scripts/mod/file2alias.c
-> @@ -47,7 +47,7 @@ typedef struct {
->  struct devtable {
->         const char *device_id; /* name of table, __mod_<name>__*_device_table. */
->         unsigned long id_size;
-> -       void *function;
-> +       int (*do_entry)(const char *filename, void *symval, char *alias);
->  };
+>  Makefile | 32 +++++++++++++++-----------------
+>  1 file changed, 15 insertions(+), 17 deletions(-)
 >
->  /* Define a variable f that holds the value of field f of struct devid
-> @@ -1299,12 +1299,11 @@ static bool sym_is(const char *name, unsigned namelen, const char *symbol)
->  static void do_table(void *symval, unsigned long size,
->                      unsigned long id_size,
->                      const char *device_id,
-> -                    void *function,
-> +                    int (*do_entry)(const char *filename, void *symval, char *alias),
->                      struct module *mod)
->  {
->         unsigned int i;
->         char alias[500];
-> -       int (*do_entry)(const char *, void *entry, char *alias) = function;
+> diff --git a/Makefile b/Makefile
+> index 36f3f0e..cee4cec 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1062,7 +1062,7 @@ $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
+>  # Error messages still appears in the original language
 >
->         device_id_check(mod->name, device_id, size, id_size, symval);
->         /* Leave last one: it's the terminator. */
-> @@ -1420,7 +1419,7 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
+>  PHONY += $(vmlinux-dirs)
+> -$(vmlinux-dirs): prepare scripts
+> +$(vmlinux-dirs): prepare
+>         $(Q)$(MAKE) $(build)=$@ need-builtin=1
 >
->                         if (sym_is(name, namelen, p->device_id)) {
->                                 do_table(symval, sym->st_size, p->id_size,
-> -                                        p->device_id, p->function, mod);
-> +                                        p->device_id, p->do_entry, mod);
->                                 break;
->                         }
->                 }
+>  define filechk_kernel.release
+> @@ -1114,7 +1114,7 @@ macroprepare: prepare1 archmacros
+>
+>  archprepare: archheaders archscripts macroprepare scripts_basic
+>
+> -prepare0: archprepare gcc-plugins
+> +prepare0: scripts archprepare gcc-plugins
+>         $(Q)$(MAKE) $(build)=scripts/mod
+>         $(Q)$(MAKE) $(build)=.
+>
+> @@ -1286,7 +1286,7 @@ modules.builtin: $(vmlinux-dirs:%=%/modules.builtin)
+>
+>  # Target to prepare building external modules
+>  PHONY += modules_prepare
+> -modules_prepare: prepare scripts
+> +modules_prepare: prepare
+>
+>  # Target to install modules
+>  PHONY += modules_install
+> @@ -1604,11 +1604,9 @@ help:
+>         @echo  '  clean           - remove generated files in module directory only'
+>         @echo  ''
+>
+> -# Dummies...
+> -PHONY += prepare scripts
+> +PHONY += prepare
+>  prepare:
+>         $(cmd_crmodverdir)
+> -scripts: ;
+>  endif # KBUILD_EXTMOD
+>
+>  clean: $(clean-dirs)
+> @@ -1712,33 +1710,33 @@ else
+>          target-dir = $(if $(KBUILD_EXTMOD),$(dir $<),$(dir $@))
+>  endif
+>
+> -%.s: %.c prepare scripts FORCE
+> +%.s: %.c prepare FORCE
+>         $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.i: %.c prepare scripts FORCE
+> +%.i: %.c prepare FORCE
+>         $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.o: %.c prepare scripts FORCE
+> +%.o: %.c prepare FORCE
+>         $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.lst: %.c prepare scripts FORCE
+> +%.lst: %.c prepare FORCE
+>         $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.s: %.S prepare scripts FORCE
+> +%.s: %.S prepare FORCE
+>         $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.o: %.S prepare scripts FORCE
+> +%.o: %.S prepare FORCE
+>         $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.symtypes: %.c prepare scripts FORCE
+> +%.symtypes: %.c prepare FORCE
+>         $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> -%.ll: %.c prepare scripts FORCE
+> +%.ll: %.c prepare FORCE
+>         $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+>
+>  # Modules
+> -/: prepare scripts FORCE
+> +/: prepare FORCE
+>         $(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1) \
+>         $(build)=$(build-dir)
+>  # Make sure the latest headers are built for Documentation
+>  Documentation/ samples/: headers_install
+> -%/: prepare scripts FORCE
+> +%/: prepare FORCE
+>         $(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1) \
+>         $(build)=$(build-dir)
+> -%.ko: prepare scripts FORCE
+> +%.ko: prepare FORCE
+>         $(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1)   \
+>         $(build)=$(build-dir) $(@:.ko=.o)
+>         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
 > --
 > 2.7.4
 >
