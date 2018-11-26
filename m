@@ -1,94 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:38339 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726154AbeKZSRy (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:57026 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726147AbeKZSYW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 26 Nov 2018 13:17:54 -0500
+        Mon, 26 Nov 2018 13:24:22 -0500
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id wAQ7UkA1023000
+        for <linux-kbuild@vger.kernel.org>; Mon, 26 Nov 2018 16:30:46 +0900
+Received: by mail-vs1-f47.google.com with SMTP id x64so10668491vsa.5
+        for <linux-kbuild@vger.kernel.org>; Sun, 25 Nov 2018 23:30:46 -0800 (PST)
+MIME-Version: 1.0
+References: <e1a6228d-1341-6264-d97a-e2bd52a65c82@infradead.org>
+In-Reply-To: <e1a6228d-1341-6264-d97a-e2bd52a65c82@infradead.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] kconfig: tests: test reverse dependency with tristate if-conditional
-Date: Mon, 26 Nov 2018 16:22:49 +0900
-Message-Id: <1543216969-2227-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1543216969-2227-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1543216969-2227-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Mon, 26 Nov 2018 16:30:09 +0900
+Message-ID: <CAK7LNARKuFj=YhSHg2fKw2yuWHOaTMUVQA75=3W8Hxdn0Y8Uuw@mail.gmail.com>
+Subject: Re: netfilter Kconfig question
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Taehee Yoo <ap420073@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Taehee Yoo <ap420073@gmail.com>
 
-Add a test-case for the fixed reverse dependency handling.
+Hi Randy,
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- .../kconfig/tests/revdep_with_tristate_if/Kconfig   | 21 +++++++++++++++++++++
- .../tests/revdep_with_tristate_if/__init__.py       | 14 ++++++++++++++
- .../tests/revdep_with_tristate_if/expected_config   |  9 +++++++++
- 3 files changed, 44 insertions(+)
- create mode 100644 scripts/kconfig/tests/revdep_with_tristate_if/Kconfig
- create mode 100644 scripts/kconfig/tests/revdep_with_tristate_if/__init__.py
- create mode 100644 scripts/kconfig/tests/revdep_with_tristate_if/expected_config
+On Tue, Nov 20, 2018 at 5:51 AM Randy Dunlap <rdunlap@infradead.org> wrote:
+>
+> Hi Yamada-san,
+>
+> There was recently a netfilter build error in linux-next for which
+> a patch was posted by Taehee Yoo.  The patch works (fixes the build
+> error) but I don't see how or why.
+>
+> My build error report is here:
+> https://lore.kernel.org/lkml/fa7a7824-44df-c058-dba2-ec29c5028361@infradead.org/T/#u
+>
+>
+> Would you take a look at it and try to explain why the patch works?
+>
+> The patch's email thread begins here:
+> https://www.spinics.net/lists/netfilter-devel/msg56985.html
 
-diff --git a/scripts/kconfig/tests/revdep_with_tristate_if/Kconfig b/scripts/kconfig/tests/revdep_with_tristate_if/Kconfig
-new file mode 100644
-index 0000000..2bd1141
---- /dev/null
-+++ b/scripts/kconfig/tests/revdep_with_tristate_if/Kconfig
-@@ -0,0 +1,21 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+config MODULES
-+	def_bool y
-+	option modules
-+
-+config A
-+	tristate
-+
-+config B
-+	tristate "b"
-+	default y
-+	select A if C
-+	imply D if C
-+
-+config C
-+	tristate "c"
-+	default m
-+
-+config D
-+	tristate "d"
-diff --git a/scripts/kconfig/tests/revdep_with_tristate_if/__init__.py b/scripts/kconfig/tests/revdep_with_tristate_if/__init__.py
-new file mode 100644
-index 0000000..ad95cec
---- /dev/null
-+++ b/scripts/kconfig/tests/revdep_with_tristate_if/__init__.py
-@@ -0,0 +1,14 @@
-+# SPDX-License-Identifier: GPL-2.0
-+"""
-+select/imply property with tristate if-conditional
-+
-+The reverse dependencies (select/imply) are used to define a lower limit
-+of another symbol. The current value of the selector is set to the lower
-+limit of the selectee. This did not handled correctly in the past when the
-+property has a tristate if-conditional.
-+"""
-+
-+
-+def test(conf):
-+    assert conf.alldefconfig() == 0
-+    assert conf.config_matches('expected_config')
-diff --git a/scripts/kconfig/tests/revdep_with_tristate_if/expected_config b/scripts/kconfig/tests/revdep_with_tristate_if/expected_config
-new file mode 100644
-index 0000000..9826223
---- /dev/null
-+++ b/scripts/kconfig/tests/revdep_with_tristate_if/expected_config
-@@ -0,0 +1,9 @@
-+#
-+# Automatically generated file; DO NOT EDIT.
-+# Main menu
-+#
-+CONFIG_MODULES=y
-+CONFIG_A=y
-+CONFIG_B=y
-+CONFIG_C=m
-+CONFIG_D=y
+
+I think this is a bug of Kconfig.
+
+I sent a patch.
+https://patchwork.kernel.org/patch/10697637/
+
+
 -- 
-2.7.4
+Best Regards
+Masahiro Yamada
