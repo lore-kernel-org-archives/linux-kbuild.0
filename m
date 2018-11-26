@@ -1,54 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:24784 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726089AbeKZBmr (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:38329 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726158AbeKZSRy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 25 Nov 2018 20:42:47 -0500
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id wAPEpBpA009427
-        for <linux-kbuild@vger.kernel.org>; Sun, 25 Nov 2018 23:51:12 +0900
-Received: by mail-ua1-f50.google.com with SMTP id j3so5476856uap.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 25 Nov 2018 06:51:12 -0800 (PST)
-MIME-Version: 1.0
-References: <201811242107.q8RCw4pQ%fengguang.wu@intel.com>
-In-Reply-To: <201811242107.q8RCw4pQ%fengguang.wu@intel.com>
+        Mon, 26 Nov 2018 13:17:54 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 25 Nov 2018 23:50:34 +0900
-Message-ID: <CAK7LNARFoMReFpVnQp+tpfqkE7C_h7_dEoDW7GWYRCdrYhi6_Q@mail.gmail.com>
-Subject: Re: [kbuild:kbuild 13/24] fixdep: error opening file:
- fs/xfs/.xfs_ioctl.o.d: No such file or directory
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 1/2] kconfig: fix reverse dependency with tristate if-conditional
+Date: Mon, 26 Nov 2018 16:22:48 +0900
+Message-Id: <1543216969-2227-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Taehee Yoo <ap420073@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Sat, Nov 24, 2018 at 10:13 PM kbuild test robot <lkp@intel.com> wrote:
->
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
-> head:   9a1006b7aba40da544f7d138c90222b904f5c7ab
-> commit: b6062bbfc43f6b217548e76000cf1dd959cff7bb [13/24] kbuild: change if_changed_rule for multi-line recipe
-> config: sh-sdk7786_defconfig (attached as .config)
-> compiler: sh4-linux-gnu-gcc (Debian 7.2.0-11) 7.2.0
-> reproduce:
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         git checkout b6062bbfc43f6b217548e76000cf1dd959cff7bb
->         # save the attached .config to linux build tree
->         GCC_VERSION=7.2.0 make.cross ARCH=sh
->
-> Note: the kbuild/kbuild HEAD 9a1006b7aba40da544f7d138c90222b904f5c7ab builds fine.
->       It only hurts bisectibility.
+A Kconfig property can have an optional if-expression, which describes
+its visibility. The property is visible when the if-expression part is
+evaluated to 'y' or 'm'.
 
+The 'select' and 'imply' properties are internally converted to reverse
+dependencies, but they are wrongly converted if they have a tristate
+if-expression.
 
-I locally fixed up the kbuild branch
-to get back the bisectability.
+Example:
 
+  config A
+          tristate "a"
 
-Thanks for the report.
+  config B
+          tristate "b"
+          select A if C
 
+  config C
+          tristate "c"
 
+Currently, the reverse dependency of 'A' results in 'B && C'.
+It is incorrect because the combination of B=y and C=m allows
+'A' to become 'm', while its lower limit must be 'y'.
 
+The reverse dependency should be 'B && C != n'.
+
+Randy Dunlap reported that people are trying to fix an individual
+Kconfig file [1], and I also found another example in the past,
+commit 9d9c98e89ee2 ("pcmcia: fix yenta dependency on PCCARD_NONSTATIC")
+but I suspect this is a bug of Kconfig itself.
+
+[1] https://www.spinics.net/lists/netfilter-devel/msg56985.html
+
+Reported-by: Taehee Yoo <ap420073@gmail.com>
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ scripts/kconfig/menu.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 4cf15d4..2b18833 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -401,11 +401,13 @@ void menu_finalize(struct menu *parent)
+ 				if (prop->type == P_SELECT) {
+ 					struct symbol *es = prop_get_symbol(prop);
+ 					es->rev_dep.expr = expr_alloc_or(es->rev_dep.expr,
+-							expr_alloc_and(expr_alloc_symbol(menu->sym), expr_copy(dep)));
++							expr_alloc_and(expr_alloc_symbol(menu->sym),
++									expr_trans_compare(dep, E_UNEQUAL, &symbol_no)));
+ 				} else if (prop->type == P_IMPLY) {
+ 					struct symbol *es = prop_get_symbol(prop);
+ 					es->implied.expr = expr_alloc_or(es->implied.expr,
+-							expr_alloc_and(expr_alloc_symbol(menu->sym), expr_copy(dep)));
++							expr_alloc_and(expr_alloc_symbol(menu->sym),
++									expr_trans_compare(dep, E_UNEQUAL, &symbol_no)));
+ 				}
+ 			}
+ 		}
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
