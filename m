@@ -1,75 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:43465 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726138AbeKZVeu (ORCPT
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:34451 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726138AbeKZViU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 26 Nov 2018 16:34:50 -0500
+        Mon, 26 Nov 2018 16:38:20 -0500
 MIME-Version: 1.0
-References: <1542860922-9730-1-git-send-email-yamada.masahiro@socionext.com> <1542860922-9730-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1542860922-9730-2-git-send-email-yamada.masahiro@socionext.com>
+References: <20181031111444.3472-1-malat@debian.org>
+In-Reply-To: <20181031111444.3472-1-malat@debian.org>
 From: Mathieu Malaterre <malat@debian.org>
-Date: Mon, 26 Nov 2018 11:40:55 +0100
-Message-ID: <CA+7wUsz6amd-Kp3Gf4fK5VyuwAB8ZkJpgKkAy+DYJxvfaLEczQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] modpost: file2alias: check prototype of handler
+Date: Mon, 26 Nov 2018 11:44:25 +0100
+Message-ID: <CA+7wUsxQEeFrPaSYymwrH31e0po0_5b7zCQG=6yKM064LikGiQ@mail.gmail.com>
+Subject: Re: [PATCH] remove old GCC version implementation
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Jessica Yu <jeyu@kernel.org>, rusty@rustcorp.com.au, miguel.ojeda.sandonis@gmail.com, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Thu, Nov 22, 2018 at 5:29 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Wed, Oct 31, 2018 at 12:15 PM Mathieu Malaterre <malat@debian.org> wrote:
 >
-> Use specific prototype instead of an opaque pointer so that the
-> compiler can catch incompatible pointer type.
+> GCC 4.6 is the minimum supported now.
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Mathieu Malaterre <malat@debian.org>
 > ---
->
->  scripts/mod/file2alias.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+>  scripts/mod/file2alias.c | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
 >
 > diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-> index 7e4aede..a37af7d 100644
+> index 28a61665bb9c..4b59564d4706 100644
 > --- a/scripts/mod/file2alias.c
 > +++ b/scripts/mod/file2alias.c
-> @@ -47,7 +47,7 @@ typedef struct {
->  struct devtable {
->         const char *device_id; /* name of table, __mod_<name>__*_device_table. */
->         unsigned long id_size;
-> -       void *function;
-> +       int (*do_entry)(const char *filename, void *symval, char *alias);
->  };
+> @@ -83,11 +83,7 @@ extern struct devtable *__start___devtable[], *__stop___devtable[];
+>  #endif /* __MACH__ */
+>
+>  #if !defined(__used)
+> -# if __GNUC__ == 3 && __GNUC_MINOR__ < 3
+> -#  define __used                       __attribute__((__unused__))
+> -# else
+> -#  define __used                       __attribute__((__used__))
+> -# endif
+> +#define __used                 __attribute__((__used__))
+>  #endif
 
-It makes sense to do this cleanup.
+Superseded by:
 
-Reviewed-by: Mathieu Malaterre <malat@debian.org>
-
+https://patchwork.kernel.org/patch/10693483/
 
 >  /* Define a variable f that holds the value of field f of struct devid
-> @@ -1299,12 +1299,11 @@ static bool sym_is(const char *name, unsigned namelen, const char *symbol)
->  static void do_table(void *symval, unsigned long size,
->                      unsigned long id_size,
->                      const char *device_id,
-> -                    void *function,
-> +                    int (*do_entry)(const char *filename, void *symval, char *alias),
->                      struct module *mod)
->  {
->         unsigned int i;
->         char alias[500];
-> -       int (*do_entry)(const char *, void *entry, char *alias) = function;
->
->         device_id_check(mod->name, device_id, size, id_size, symval);
->         /* Leave last one: it's the terminator. */
-> @@ -1420,7 +1419,7 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
->
->                         if (sym_is(name, namelen, p->device_id)) {
->                                 do_table(symval, sym->st_size, p->id_size,
-> -                                        p->device_id, p->function, mod);
-> +                                        p->device_id, p->do_entry, mod);
->                                 break;
->                         }
->                 }
 > --
-> 2.7.4
+> 2.11.0
 >
