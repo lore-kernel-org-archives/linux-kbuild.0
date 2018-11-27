@@ -1,32 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:36627 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726535AbeK0M3y (ORCPT
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:42459 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727631AbeK0Sbv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Nov 2018 07:29:54 -0500
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id wAR1XbZA029551
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 10:33:37 +0900
-Received: by mail-vs1-f43.google.com with SMTP id h18so12717445vsj.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 26 Nov 2018 17:33:37 -0800 (PST)
+        Tue, 27 Nov 2018 13:31:51 -0500
+Received: by mail-ot1-f65.google.com with SMTP id v23so13827120otk.9
+        for <linux-kbuild@vger.kernel.org>; Mon, 26 Nov 2018 23:34:52 -0800 (PST)
 MIME-Version: 1.0
 References: <e1a6228d-1341-6264-d97a-e2bd52a65c82@infradead.org>
  <CAK7LNARKuFj=YhSHg2fKw2yuWHOaTMUVQA75=3W8Hxdn0Y8Uuw@mail.gmail.com>
- <CAFkk2KSiFq16vXeCfYO8G_J5c4Kf59JeqqtRh-=g+NbjwGXAjg@mail.gmail.com> <CAFkk2KRUOEC3kWt18YGOenqgNxWbinF3xs_ohb8a8rc7QpGF-A@mail.gmail.com>
-In-Reply-To: <CAFkk2KRUOEC3kWt18YGOenqgNxWbinF3xs_ohb8a8rc7QpGF-A@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 27 Nov 2018 10:33:00 +0900
-Message-ID: <CAK7LNAQL+1RuyecrOCsMwagtrioTQWsZqQzCN7dbODtC072nRw@mail.gmail.com>
+ <CAFkk2KSiFq16vXeCfYO8G_J5c4Kf59JeqqtRh-=g+NbjwGXAjg@mail.gmail.com> <CAK7LNATLwdmFMvB1ZWA404zkqtMwB-f96adYESLDgxBNsMiMJQ@mail.gmail.com>
+In-Reply-To: <CAK7LNATLwdmFMvB1ZWA404zkqtMwB-f96adYESLDgxBNsMiMJQ@mail.gmail.com>
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Date: Tue, 27 Nov 2018 08:34:40 +0100
+Message-ID: <CAFkk2KR4hKXqZcVXvh6xP4DJ8F1Oz7CS5M8J=KaQp1ob8QHLaA@mail.gmail.com>
 Subject: Re: netfilter Kconfig question
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Taehee Yoo <ap420073@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, ap420073@gmail.com
 
-On Tue, Nov 27, 2018 at 5:51 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
+On Tue, Nov 27, 2018 at 2:33 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> On Mon, Nov 26, 2018 at 8:49 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> On Tue, Nov 27, 2018 at 4:49 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
 > >
 > > On Mon, Nov 26, 2018 at 8:31 AM Masahiro Yamada
 > > <yamada.masahiro@socionext.com> wrote:
@@ -72,62 +70,51 @@ On Tue, Nov 27, 2018 at 5:51 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
 > > then FOO_HELPERS must be y. If FOO is m, then it's fine for
 > > FOO_HELPERS to be m (but not n), because it can be loaded as needed
 > > whenever FOO is.
-> >
+>
+> If we find such an example, it should be rewritten to:
+>
+>
+> config FOO
+>         tristate "foo"
+>         select FOO_HELPERS
+
+Yup, almost always cleaner ways to do it.
+
+>
+>
+>
+>
 > > Forcing FOO_HELPERS to y would remove the possibility to compile it as
-> > a module. I suspect some things rely on this (and that some other
-> > symbols just automagically act in a reasonable way even though it
-> > wasn't planned).
-> >
-> > And yeah, there might be better ways to handle that particular case,
-> > but going for concepts. :)
-> >
-> > Cheers,
-> > Ulf
+> > a module.
 >
-> A random real-life example is SND_SOC_ALL_CODECS
-> (sound/soc/codecs/Kconfig). It has stuff like 'select SND_SOC_AK4458
-> if I2C', where SND_SOC_AK4458 also has a 'depends on I2C' (the 'if' on
-> the select is just there to avoid selecting a symbol with unsatisfied
-> dependencies).
-
-It should be written to:
-
-config SND_SOC_ALL_CODECS
-        tristate "Build all ASoC CODEC drivers"
-        depends on COMPILE_TEST
-        imply SND_SOC_88PM860X
-        imply SND_SOC_L3
-        imply SND_SOC_AB8500_CODEC
-        imply SND_SOC_AC97_CODEC
-        imply SND_SOC_AD1836
-        imply SND_SOC_AD193X_SPI
-        imply SND_SOC_AD193X_I2C
-        imply SND_SOC_AD1980
-        ...
-
-
-This is more concise because
-we can drop redundant 'if ...' parts.
-
-
-
-
-
-> If the behavior of 'select' was changed so that SND_SOC_AK4458 would
-> get set to y instead of m when I2C is m, then you'd be y-selecting a
-> symbol with m dependencies, which would generate a warning and
-> probably break the build, as I2C isn't compiled-in.
+> This depends on the selector if you write like this:
 >
-> The behavior makes sense I think, though it can be a bit unexpected.
-> It makes a lot of stuff magically do the right thing.
 >
-> People tend to overuse select though. :)
+> config OTHER_OPTION
+>        tristate "?"
+>        select FOO_HELPERS if FOO
 >
-> Cheers,
-> Ulf
+>
+> although "FOO_HELPERS >= FOO" is not met.
 
+Yeah, that's why I mentioned "high-level arch symbol", because it gets
+more confusing for other symbols. Think boards and the like too.
 
+If you think of 'config A ... select C if B' as "A needs C if B", then
+the current behavior still does the right thing in all cases:
 
--- 
-Best Regards
-Masahiro Yamada
+  A B     | C
+  --------+-----
+  n n/m/y | n(+)  (A not enabled, irrelevant)
+  m n     | n(+)  (B not enabled, irrelevant)
+  m m     | m(+)  (Fine, C can be loaded if A and B are)
+  m y     | m(+)  (Ditto)
+  y n     | n(+)  (B not enabled, irrelevant)
+  y m     | m(+)  (Fine, C can be loaded if B is)
+  y y     | y     (Fine, C is available whenever B is)
+
+The big if there is whether you think of select that way. Just trying
+to show why I think it was designed that way.
+
+Cheers,
+Ulf
