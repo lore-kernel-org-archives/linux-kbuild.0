@@ -1,120 +1,149 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:42459 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727631AbeK0Sbv (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:47955 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728921AbeK0Spk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Nov 2018 13:31:51 -0500
-Received: by mail-ot1-f65.google.com with SMTP id v23so13827120otk.9
-        for <linux-kbuild@vger.kernel.org>; Mon, 26 Nov 2018 23:34:52 -0800 (PST)
+        Tue, 27 Nov 2018 13:45:40 -0500
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id wAR7mP6a015374
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 16:48:25 +0900
+Received: by mail-vs1-f51.google.com with SMTP id x1so13128177vsc.10
+        for <linux-kbuild@vger.kernel.org>; Mon, 26 Nov 2018 23:48:25 -0800 (PST)
 MIME-Version: 1.0
 References: <e1a6228d-1341-6264-d97a-e2bd52a65c82@infradead.org>
  <CAK7LNARKuFj=YhSHg2fKw2yuWHOaTMUVQA75=3W8Hxdn0Y8Uuw@mail.gmail.com>
- <CAFkk2KSiFq16vXeCfYO8G_J5c4Kf59JeqqtRh-=g+NbjwGXAjg@mail.gmail.com> <CAK7LNATLwdmFMvB1ZWA404zkqtMwB-f96adYESLDgxBNsMiMJQ@mail.gmail.com>
-In-Reply-To: <CAK7LNATLwdmFMvB1ZWA404zkqtMwB-f96adYESLDgxBNsMiMJQ@mail.gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Tue, 27 Nov 2018 08:34:40 +0100
-Message-ID: <CAFkk2KR4hKXqZcVXvh6xP4DJ8F1Oz7CS5M8J=KaQp1ob8QHLaA@mail.gmail.com>
+ <CAFkk2KSiFq16vXeCfYO8G_J5c4Kf59JeqqtRh-=g+NbjwGXAjg@mail.gmail.com>
+ <CAK7LNATLwdmFMvB1ZWA404zkqtMwB-f96adYESLDgxBNsMiMJQ@mail.gmail.com> <CAFkk2KR4hKXqZcVXvh6xP4DJ8F1Oz7CS5M8J=KaQp1ob8QHLaA@mail.gmail.com>
+In-Reply-To: <CAFkk2KR4hKXqZcVXvh6xP4DJ8F1Oz7CS5M8J=KaQp1ob8QHLaA@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 27 Nov 2018 16:47:47 +0900
+Message-ID: <CAK7LNATphkaDHozY2scesMVNAgdT6WM7j6-1cRsc7DatmnY16A@mail.gmail.com>
 Subject: Re: netfilter Kconfig question
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, ap420073@gmail.com
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Taehee Yoo <ap420073@gmail.com>
 
-On Tue, Nov 27, 2018 at 2:33 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Tue, Nov 27, 2018 at 4:36 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
 >
-> On Tue, Nov 27, 2018 at 4:49 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> On Tue, Nov 27, 2018 at 2:33 AM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
 > >
-> > On Mon, Nov 26, 2018 at 8:31 AM Masahiro Yamada
-> > <yamada.masahiro@socionext.com> wrote:
+> > On Tue, Nov 27, 2018 at 4:49 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
 > > >
-> > > Hi Randy,
-> > >
-> > >
-> > > On Tue, Nov 20, 2018 at 5:51 AM Randy Dunlap <rdunlap@infradead.org> wrote:
+> > > On Mon, Nov 26, 2018 at 8:31 AM Masahiro Yamada
+> > > <yamada.masahiro@socionext.com> wrote:
 > > > >
-> > > > Hi Yamada-san,
-> > > >
-> > > > There was recently a netfilter build error in linux-next for which
-> > > > a patch was posted by Taehee Yoo.  The patch works (fixes the build
-> > > > error) but I don't see how or why.
-> > > >
-> > > > My build error report is here:
-> > > > https://lore.kernel.org/lkml/fa7a7824-44df-c058-dba2-ec29c5028361@infradead.org/T/#u
+> > > > Hi Randy,
 > > > >
 > > > >
-> > > > Would you take a look at it and try to explain why the patch works?
+> > > > On Tue, Nov 20, 2018 at 5:51 AM Randy Dunlap <rdunlap@infradead.org> wrote:
+> > > > >
+> > > > > Hi Yamada-san,
+> > > > >
+> > > > > There was recently a netfilter build error in linux-next for which
+> > > > > a patch was posted by Taehee Yoo.  The patch works (fixes the build
+> > > > > error) but I don't see how or why.
+> > > > >
+> > > > > My build error report is here:
+> > > > > https://lore.kernel.org/lkml/fa7a7824-44df-c058-dba2-ec29c5028361@infradead.org/T/#u
+> > > > >
+> > > > >
+> > > > > Would you take a look at it and try to explain why the patch works?
+> > > > >
+> > > > > The patch's email thread begins here:
+> > > > > https://www.spinics.net/lists/netfilter-devel/msg56985.html
 > > > >
-> > > > The patch's email thread begins here:
-> > > > https://www.spinics.net/lists/netfilter-devel/msg56985.html
+> > > >
+> > > > I think this is a bug of Kconfig.
+> > > >
+> > > > I sent a patch.
+> > > > https://patchwork.kernel.org/patch/10697637/
+> > > >
+> > > >
+> > > > --
+> > > > Best Regards
+> > > > Masahiro Yamada
 > > >
+> > > I always understood this behavior as intentional.
 > > >
-> > > I think this is a bug of Kconfig.
+> > > Say that a high-level arch symbol has 'select FOO_HELPERS if FOO' for
+> > > example, where both FOO and FOO_HELPERS can be compiled as modules.
 > > >
-> > > I sent a patch.
-> > > https://patchwork.kernel.org/patch/10697637/
-> > >
-> > >
-> > > --
-> > > Best Regards
-> > > Masahiro Yamada
+> > > The intention there is probably to make sure that FOO_HELPERS is
+> > > available whenever FOO is (FOO_HELPERS must be >= FOO). If FOO is y,
+> > > then FOO_HELPERS must be y. If FOO is m, then it's fine for
+> > > FOO_HELPERS to be m (but not n), because it can be loaded as needed
+> > > whenever FOO is.
 > >
-> > I always understood this behavior as intentional.
+> > If we find such an example, it should be rewritten to:
 > >
-> > Say that a high-level arch symbol has 'select FOO_HELPERS if FOO' for
-> > example, where both FOO and FOO_HELPERS can be compiled as modules.
 > >
-> > The intention there is probably to make sure that FOO_HELPERS is
-> > available whenever FOO is (FOO_HELPERS must be >= FOO). If FOO is y,
-> > then FOO_HELPERS must be y. If FOO is m, then it's fine for
-> > FOO_HELPERS to be m (but not n), because it can be loaded as needed
-> > whenever FOO is.
+> > config FOO
+> >         tristate "foo"
+> >         select FOO_HELPERS
 >
-> If we find such an example, it should be rewritten to:
+> Yup, almost always cleaner ways to do it.
 >
+> >
+> >
+> >
+> >
+> > > Forcing FOO_HELPERS to y would remove the possibility to compile it as
+> > > a module.
+> >
+> > This depends on the selector if you write like this:
+> >
+> >
+> > config OTHER_OPTION
+> >        tristate "?"
+> >        select FOO_HELPERS if FOO
+> >
+> >
+> > although "FOO_HELPERS >= FOO" is not met.
 >
-> config FOO
->         tristate "foo"
->         select FOO_HELPERS
+> Yeah, that's why I mentioned "high-level arch symbol", because it gets
+> more confusing for other symbols. Think boards and the like too.
+>
+> If you think of 'config A ... select C if B' as "A needs C if B", then
+> the current behavior still does the right thing in all cases:
+>
+>   A B     | C
+>   --------+-----
+>   n n/m/y | n(+)  (A not enabled, irrelevant)
+>   m n     | n(+)  (B not enabled, irrelevant)
+>   m m     | m(+)  (Fine, C can be loaded if A and B are)
+>   m y     | m(+)  (Ditto)
+>   y n     | n(+)  (B not enabled, irrelevant)
+>   y m     | m(+)  (Fine, C can be loaded if B is)
+>   y y     | y     (Fine, C is available whenever B is)
+>
+> The big if there is whether you think of select that way. Just trying
+> to show why I think it was designed that way.
 
-Yup, almost always cleaner ways to do it.
 
->
->
->
->
-> > Forcing FOO_HELPERS to y would remove the possibility to compile it as
-> > a module.
->
-> This depends on the selector if you write like this:
->
->
-> config OTHER_OPTION
->        tristate "?"
->        select FOO_HELPERS if FOO
->
->
-> although "FOO_HELPERS >= FOO" is not met.
+No.
 
-Yeah, that's why I mentioned "high-level arch symbol", because it gets
-more confusing for other symbols. Think boards and the like too.
 
-If you think of 'config A ... select C if B' as "A needs C if B", then
-the current behavior still does the right thing in all cases:
 
-  A B     | C
-  --------+-----
-  n n/m/y | n(+)  (A not enabled, irrelevant)
-  m n     | n(+)  (B not enabled, irrelevant)
-  m m     | m(+)  (Fine, C can be loaded if A and B are)
-  m y     | m(+)  (Ditto)
-  y n     | n(+)  (B not enabled, irrelevant)
   y m     | m(+)  (Fine, C can be loaded if B is)
-  y y     | y     (Fine, C is available whenever B is)
 
-The big if there is whether you think of select that way. Just trying
-to show why I think it was designed that way.
 
-Cheers,
-Ulf
+is not fine.
+
+
+
+If 'A' is builtin, 'C' must be builtin as well.
+
+
+
+How can 'A' resolve references to 'C'
+for the combination A=y and C=m ?
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
