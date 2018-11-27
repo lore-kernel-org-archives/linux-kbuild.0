@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:38844 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731689AbeK1Dyo (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35191 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731521AbeK1Dy1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Nov 2018 22:54:44 -0500
-Received: by mail-wm1-f66.google.com with SMTP id k198so23065154wmd.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 08:56:11 -0800 (PST)
+        Tue, 27 Nov 2018 22:54:27 -0500
+Received: by mail-wm1-f68.google.com with SMTP id c126so22906206wmh.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 08:55:56 -0800 (PST)
 From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v12 12/25] kasan: preassign tags to objects with ctors or SLAB_TYPESAFE_BY_RCU
-Date: Tue, 27 Nov 2018 17:55:30 +0100
-Message-Id: <b2c17b6674f1737f981ffa6dca7fdfc059a88435.1543337629.git.andreyknvl@google.com>
+Subject: [PATCH v12 04/25] kasan: rename source files to reflect the new naming scheme
+Date: Tue, 27 Nov 2018 17:55:22 +0100
+Message-Id: <a6cd5acdc334d532754279a7d2d770e2be96419d.1543337629.git.andreyknvl@google.com>
 In-Reply-To: <cover.1543337629.git.andreyknvl@google.com>
 References: <cover.1543337629.git.andreyknvl@google.com>
 MIME-Version: 1.0
@@ -19,112 +19,51 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
 Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>
 
-An object constructor can initialize pointers within this objects based on
-the address of the object. Since the object address might be tagged, we
-need to assign a tag before calling constructor.
-
-The implemented approach is to assign tags to objects with constructors
-when a slab is allocated and call constructors once as usual. The
-downside is that such object would always have the same tag when it is
-reallocated, so we won't catch use-after-frees on it.
-
-Also pressign tags for objects from SLAB_TYPESAFE_BY_RCU caches, since
-they can be validy accessed after having been freed.
+We now have two KASAN modes: generic KASAN and tag-based KASAN. Rename
+kasan.c to generic.c to reflect that. Also rename kasan_init.c to init.c
+as it contains initialization code for both KASAN modes.
 
 Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- mm/slab.c |  2 +-
- mm/slub.c | 24 ++++++++++++++----------
- 2 files changed, 15 insertions(+), 11 deletions(-)
+ mm/kasan/Makefile                 | 8 ++++----
+ mm/kasan/{kasan.c => generic.c}   | 0
+ mm/kasan/{kasan_init.c => init.c} | 0
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+ rename mm/kasan/{kasan.c => generic.c} (100%)
+ rename mm/kasan/{kasan_init.c => init.c} (100%)
 
-diff --git a/mm/slab.c b/mm/slab.c
-index 26f60a22e5e0..27859fb39889 100644
---- a/mm/slab.c
-+++ b/mm/slab.c
-@@ -2574,7 +2574,7 @@ static void cache_init_objs(struct kmem_cache *cachep,
+diff --git a/mm/kasan/Makefile b/mm/kasan/Makefile
+index a6df14bffb6b..d643530b24aa 100644
+--- a/mm/kasan/Makefile
++++ b/mm/kasan/Makefile
+@@ -1,14 +1,14 @@
+ # SPDX-License-Identifier: GPL-2.0
+ KASAN_SANITIZE := n
+ UBSAN_SANITIZE_common.o := n
+-UBSAN_SANITIZE_kasan.o := n
++UBSAN_SANITIZE_generic.o := n
+ KCOV_INSTRUMENT := n
  
- 	for (i = 0; i < cachep->num; i++) {
- 		objp = index_to_obj(cachep, page, i);
--		kasan_init_slab_obj(cachep, objp);
-+		objp = kasan_init_slab_obj(cachep, objp);
+-CFLAGS_REMOVE_kasan.o = -pg
++CFLAGS_REMOVE_generic.o = -pg
+ # Function splitter causes unnecessary splits in __asan_load1/__asan_store1
+ # see: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63533
  
- 		/* constructor could break poison info */
- 		if (DEBUG == 0 && cachep->ctor) {
-diff --git a/mm/slub.c b/mm/slub.c
-index e739d46600b9..08740c3f3745 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -1451,16 +1451,17 @@ static inline bool slab_free_freelist_hook(struct kmem_cache *s,
- #endif
- }
+ CFLAGS_common.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
+-CFLAGS_kasan.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
++CFLAGS_generic.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
  
--static void setup_object(struct kmem_cache *s, struct page *page,
-+static void *setup_object(struct kmem_cache *s, struct page *page,
- 				void *object)
- {
- 	setup_object_debug(s, page, object);
--	kasan_init_slab_obj(s, object);
-+	object = kasan_init_slab_obj(s, object);
- 	if (unlikely(s->ctor)) {
- 		kasan_unpoison_object_data(s, object);
- 		s->ctor(object);
- 		kasan_poison_object_data(s, object);
- 	}
-+	return object;
- }
- 
- /*
-@@ -1568,16 +1569,16 @@ static bool shuffle_freelist(struct kmem_cache *s, struct page *page)
- 	/* First entry is used as the base of the freelist */
- 	cur = next_freelist_entry(s, page, &pos, start, page_limit,
- 				freelist_count);
-+	cur = setup_object(s, page, cur);
- 	page->freelist = cur;
- 
- 	for (idx = 1; idx < page->objects; idx++) {
--		setup_object(s, page, cur);
- 		next = next_freelist_entry(s, page, &pos, start, page_limit,
- 			freelist_count);
-+		next = setup_object(s, page, next);
- 		set_freepointer(s, cur, next);
- 		cur = next;
- 	}
--	setup_object(s, page, cur);
- 	set_freepointer(s, cur, NULL);
- 
- 	return true;
-@@ -1599,7 +1600,7 @@ static struct page *allocate_slab(struct kmem_cache *s, gfp_t flags, int node)
- 	struct page *page;
- 	struct kmem_cache_order_objects oo = s->oo;
- 	gfp_t alloc_gfp;
--	void *start, *p;
-+	void *start, *p, *next;
- 	int idx, order;
- 	bool shuffle;
- 
-@@ -1651,13 +1652,16 @@ static struct page *allocate_slab(struct kmem_cache *s, gfp_t flags, int node)
- 
- 	if (!shuffle) {
- 		for_each_object_idx(p, idx, s, start, page->objects) {
--			setup_object(s, page, p);
--			if (likely(idx < page->objects))
--				set_freepointer(s, p, p + s->size);
--			else
-+			if (likely(idx < page->objects)) {
-+				next = p + s->size;
-+				next = setup_object(s, page, next);
-+				set_freepointer(s, p, next);
-+			} else
- 				set_freepointer(s, p, NULL);
- 		}
--		page->freelist = fixup_red_left(s, start);
-+		start = fixup_red_left(s, start);
-+		start = setup_object(s, page, start);
-+		page->freelist = start;
- 	}
- 
- 	page->inuse = page->objects;
+-obj-y := common.o kasan.o report.o kasan_init.o quarantine.o
++obj-y := common.o generic.o report.o init.o quarantine.o
+diff --git a/mm/kasan/kasan.c b/mm/kasan/generic.c
+similarity index 100%
+rename from mm/kasan/kasan.c
+rename to mm/kasan/generic.c
+diff --git a/mm/kasan/kasan_init.c b/mm/kasan/init.c
+similarity index 100%
+rename from mm/kasan/kasan_init.c
+rename to mm/kasan/init.c
 -- 
 2.20.0.rc0.387.gc7a69e6b6c-goog
