@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f45.google.com ([209.85.128.45]:35829 "EHLO
-        mail-wm1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731860AbeK1DzJ (ORCPT
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55759 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731741AbeK1Dyz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Nov 2018 22:55:09 -0500
-Received: by mail-wm1-f45.google.com with SMTP id c126so22909041wmh.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 08:56:36 -0800 (PST)
+        Tue, 27 Nov 2018 22:54:55 -0500
+Received: by mail-wm1-f67.google.com with SMTP id y139so22468253wmc.5
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 08:56:22 -0800 (PST)
 From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v12 25/25] kasan: add SPDX-License-Identifier mark to source files
-Date: Tue, 27 Nov 2018 17:55:43 +0100
-Message-Id: <8e26a568b12ea02e11c35b681f3c36aff2fc1d77.1543337629.git.andreyknvl@google.com>
+Subject: [PATCH v12 18/25] mm: move obj_to_index to include/linux/slab_def.h
+Date: Tue, 27 Nov 2018 17:55:36 +0100
+Message-Id: <b68796c554fba66d5285274ea6356e642e18a9e5.1543337629.git.andreyknvl@google.com>
 In-Reply-To: <cover.1543337629.git.andreyknvl@google.com>
 References: <cover.1543337629.git.andreyknvl@google.com>
 MIME-Version: 1.0
@@ -19,94 +19,75 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
 Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>
 
-This patch adds a "SPDX-License-Identifier: GPL-2.0" mark to all source
-files under mm/kasan.
+While with SLUB we can actually preassign tags for caches with contructors
+and store them in pointers in the freelist, SLAB doesn't allow that since
+the freelist is stored as an array of indexes, so there are no pointers to
+store the tags.
 
+Instead we compute the tag twice, once when a slab is created before
+calling the constructor and then again each time when an object is
+allocated with kmalloc. Tag is computed simply by taking the lowest byte of
+the index that corresponds to the object. However in kasan_kmalloc we only
+have access to the objects pointer, so we need a way to find out which
+index this object corresponds to.
+
+This patch moves obj_to_index from slab.c to include/linux/slab_def.h to
+be reused by KASAN.
+
+Acked-by: Christoph Lameter <cl@linux.com>
 Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- mm/kasan/common.c         | 1 +
- mm/kasan/generic.c        | 1 +
- mm/kasan/generic_report.c | 1 +
- mm/kasan/init.c           | 1 +
- mm/kasan/quarantine.c     | 1 +
- mm/kasan/report.c         | 1 +
- mm/kasan/tags.c           | 1 +
- mm/kasan/tags_report.c    | 1 +
- 8 files changed, 8 insertions(+)
+ include/linux/slab_def.h | 13 +++++++++++++
+ mm/slab.c                | 13 -------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/mm/kasan/common.c b/mm/kasan/common.c
-index 1144e741feb6..03d5d1374ca7 100644
---- a/mm/kasan/common.c
-+++ b/mm/kasan/common.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains common generic and tag-based KASAN code.
-  *
-diff --git a/mm/kasan/generic.c b/mm/kasan/generic.c
-index b8de6d33c55c..ccb6207276e3 100644
---- a/mm/kasan/generic.c
-+++ b/mm/kasan/generic.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains core generic KASAN code.
-  *
-diff --git a/mm/kasan/generic_report.c b/mm/kasan/generic_report.c
-index a4604cceae59..5e12035888f2 100644
---- a/mm/kasan/generic_report.c
-+++ b/mm/kasan/generic_report.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains generic KASAN specific error reporting code.
-  *
-diff --git a/mm/kasan/init.c b/mm/kasan/init.c
-index 2b21d3717d62..34afad56497b 100644
---- a/mm/kasan/init.c
-+++ b/mm/kasan/init.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains some kasan initialization code.
-  *
-diff --git a/mm/kasan/quarantine.c b/mm/kasan/quarantine.c
-index b209dbaefde8..57334ef2d7ef 100644
---- a/mm/kasan/quarantine.c
-+++ b/mm/kasan/quarantine.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * KASAN quarantine.
-  *
-diff --git a/mm/kasan/report.c b/mm/kasan/report.c
-index 214d85035f99..ca9418fe9232 100644
---- a/mm/kasan/report.c
-+++ b/mm/kasan/report.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains common generic and tag-based KASAN error reporting code.
-  *
-diff --git a/mm/kasan/tags.c b/mm/kasan/tags.c
-index 1d1b79350e28..0777649e07c4 100644
---- a/mm/kasan/tags.c
-+++ b/mm/kasan/tags.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains core tag-based KASAN code.
-  *
-diff --git a/mm/kasan/tags_report.c b/mm/kasan/tags_report.c
-index 573c51d20d09..8eaf5f722271 100644
---- a/mm/kasan/tags_report.c
-+++ b/mm/kasan/tags_report.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * This file contains tag-based KASAN specific error reporting code.
-  *
+diff --git a/include/linux/slab_def.h b/include/linux/slab_def.h
+index 3485c58cfd1c..9a5eafb7145b 100644
+--- a/include/linux/slab_def.h
++++ b/include/linux/slab_def.h
+@@ -104,4 +104,17 @@ static inline void *nearest_obj(struct kmem_cache *cache, struct page *page,
+ 		return object;
+ }
+ 
++/*
++ * We want to avoid an expensive divide : (offset / cache->size)
++ *   Using the fact that size is a constant for a particular cache,
++ *   we can replace (offset / cache->size) by
++ *   reciprocal_divide(offset, cache->reciprocal_buffer_size)
++ */
++static inline unsigned int obj_to_index(const struct kmem_cache *cache,
++					const struct page *page, void *obj)
++{
++	u32 offset = (obj - page->s_mem);
++	return reciprocal_divide(offset, cache->reciprocal_buffer_size);
++}
++
+ #endif	/* _LINUX_SLAB_DEF_H */
+diff --git a/mm/slab.c b/mm/slab.c
+index 27859fb39889..d2f827316dfc 100644
+--- a/mm/slab.c
++++ b/mm/slab.c
+@@ -406,19 +406,6 @@ static inline void *index_to_obj(struct kmem_cache *cache, struct page *page,
+ 	return page->s_mem + cache->size * idx;
+ }
+ 
+-/*
+- * We want to avoid an expensive divide : (offset / cache->size)
+- *   Using the fact that size is a constant for a particular cache,
+- *   we can replace (offset / cache->size) by
+- *   reciprocal_divide(offset, cache->reciprocal_buffer_size)
+- */
+-static inline unsigned int obj_to_index(const struct kmem_cache *cache,
+-					const struct page *page, void *obj)
+-{
+-	u32 offset = (obj - page->s_mem);
+-	return reciprocal_divide(offset, cache->reciprocal_buffer_size);
+-}
+-
+ #define BOOT_CPUCACHE_ENTRIES	1
+ /* internal cache of cache description objs */
+ static struct kmem_cache kmem_cache_boot = {
 -- 
 2.20.0.rc0.387.gc7a69e6b6c-goog
