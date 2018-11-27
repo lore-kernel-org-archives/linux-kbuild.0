@@ -1,26 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:44813 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727180AbeK0HpM (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:19230 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726535AbeK0M3F (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Nov 2018 02:45:12 -0500
-Received: by mail-oi1-f196.google.com with SMTP id m6so5543403oig.11
-        for <linux-kbuild@vger.kernel.org>; Mon, 26 Nov 2018 12:49:51 -0800 (PST)
+        Tue, 27 Nov 2018 07:29:05 -0500
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id wAR1Wmw5030310
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 10:32:49 +0900
+Received: by mail-vk1-f174.google.com with SMTP id 197so4675141vkf.4
+        for <linux-kbuild@vger.kernel.org>; Mon, 26 Nov 2018 17:32:49 -0800 (PST)
 MIME-Version: 1.0
 References: <e1a6228d-1341-6264-d97a-e2bd52a65c82@infradead.org>
  <CAK7LNARKuFj=YhSHg2fKw2yuWHOaTMUVQA75=3W8Hxdn0Y8Uuw@mail.gmail.com> <CAFkk2KSiFq16vXeCfYO8G_J5c4Kf59JeqqtRh-=g+NbjwGXAjg@mail.gmail.com>
 In-Reply-To: <CAFkk2KSiFq16vXeCfYO8G_J5c4Kf59JeqqtRh-=g+NbjwGXAjg@mail.gmail.com>
-From: Ulf Magnusson <ulfalizer@gmail.com>
-Date: Mon, 26 Nov 2018 21:49:39 +0100
-Message-ID: <CAFkk2KRUOEC3kWt18YGOenqgNxWbinF3xs_ohb8a8rc7QpGF-A@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 27 Nov 2018 10:32:11 +0900
+Message-ID: <CAK7LNATLwdmFMvB1ZWA404zkqtMwB-f96adYESLDgxBNsMiMJQ@mail.gmail.com>
 Subject: Re: netfilter Kconfig question
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, ap420073@gmail.com
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Taehee Yoo <ap420073@gmail.com>
 
-On Mon, Nov 26, 2018 at 8:49 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
+On Tue, Nov 27, 2018 at 4:49 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
 >
 > On Mon, Nov 26, 2018 at 8:31 AM Masahiro Yamada
 > <yamada.masahiro@socionext.com> wrote:
@@ -66,9 +69,33 @@ On Mon, Nov 26, 2018 at 8:49 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
 > then FOO_HELPERS must be y. If FOO is m, then it's fine for
 > FOO_HELPERS to be m (but not n), because it can be loaded as needed
 > whenever FOO is.
->
+
+If we find such an example, it should be rewritten to:
+
+
+config FOO
+        tristate "foo"
+        select FOO_HELPERS
+
+
+
+
 > Forcing FOO_HELPERS to y would remove the possibility to compile it as
-> a module. I suspect some things rely on this (and that some other
+> a module.
+
+This depends on the selector if you write like this:
+
+
+config OTHER_OPTION
+       tristate "?"
+       select FOO_HELPERS if FOO
+
+
+although "FOO_HELPERS >= FOO" is not met.
+
+
+
+> I suspect some things rely on this (and that some other
 > symbols just automagically act in a reasonable way even though it
 > wasn't planned).
 >
@@ -78,21 +105,8 @@ On Mon, Nov 26, 2018 at 8:49 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
 > Cheers,
 > Ulf
 
-A random real-life example is SND_SOC_ALL_CODECS
-(sound/soc/codecs/Kconfig). It has stuff like 'select SND_SOC_AK4458
-if I2C', where SND_SOC_AK4458 also has a 'depends on I2C' (the 'if' on
-the select is just there to avoid selecting a symbol with unsatisfied
-dependencies).
 
-If the behavior of 'select' was changed so that SND_SOC_AK4458 would
-get set to y instead of m when I2C is m, then you'd be y-selecting a
-symbol with m dependencies, which would generate a warning and
-probably break the build, as I2C isn't compiled-in.
 
-The behavior makes sense I think, though it can be a bit unexpected.
-It makes a lot of stuff magically do the right thing.
-
-People tend to overuse select though. :)
-
-Cheers,
-Ulf
+-- 
+Best Regards
+Masahiro Yamada
