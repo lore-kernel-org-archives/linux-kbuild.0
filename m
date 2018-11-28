@@ -1,201 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:17260 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726539AbeK1MMX (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Nov 2018 07:12:23 -0500
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id wAS1CNUl023719
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Nov 2018 10:12:24 +0900
-Received: by mail-vk1-f181.google.com with SMTP id t132so4778873vkc.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 17:12:23 -0800 (PST)
+Received: from ale.deltatee.com ([207.54.116.67]:48018 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726586AbeK2KMb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 29 Nov 2018 05:12:31 -0500
+References: <20181112150215.508-1-namit@vmware.com>
+ <20181112150215.508-2-namit@vmware.com> <20181113113000.GB4788@gmail.com>
+ <40E4E1B4-EF5F-43A1-B42C-C4CF6349FC62@vmware.com>
+ <48577A3F-0F76-4CCA-A959-965344D7259F@vmware.com>
+ <7ff5de62-d1df-9a67-1c86-497ce00a4de4@deltatee.com>
+ <7072A2D8-30F8-45CB-AB0C-B1BE4A30259A@vmware.com>
+ <db8293cf-9abc-e899-8f43-6e42039006d9@deltatee.com>
+ <521458D7-A27C-4112-81ED-1974EFE96A76@vmware.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <be24a6eb-ebf0-8d9f-0051-681f0da66109@deltatee.com>
+Date: Wed, 28 Nov 2018 16:09:07 -0700
 MIME-Version: 1.0
-References: <e1a6228d-1341-6264-d97a-e2bd52a65c82@infradead.org>
- <CAK7LNARKuFj=YhSHg2fKw2yuWHOaTMUVQA75=3W8Hxdn0Y8Uuw@mail.gmail.com>
- <CAFkk2KSiFq16vXeCfYO8G_J5c4Kf59JeqqtRh-=g+NbjwGXAjg@mail.gmail.com>
- <CAK7LNATLwdmFMvB1ZWA404zkqtMwB-f96adYESLDgxBNsMiMJQ@mail.gmail.com>
- <CAFkk2KR4hKXqZcVXvh6xP4DJ8F1Oz7CS5M8J=KaQp1ob8QHLaA@mail.gmail.com>
- <CAK7LNATphkaDHozY2scesMVNAgdT6WM7j6-1cRsc7DatmnY16A@mail.gmail.com>
- <CAFkk2KSREjX_aTAvCb65bpU_YL1E-dXtsYqfu_4zgErq1fQqrA@mail.gmail.com>
- <CAFkk2KR=-v3PjLRfq77vhW3JL=NKYyE=r3T_=UL3nP_RsO1PQQ@mail.gmail.com>
- <CAK7LNAQ-+L8zebrfdptbU5UW2BAvp4XTf6wcRze6sNW2bm2Zcw@mail.gmail.com> <CAFkk2KSnHOeLp8521VcS_1zRLfkPPu_oKbkZ_GrTtDFHDrvWZA@mail.gmail.com>
-In-Reply-To: <CAFkk2KSnHOeLp8521VcS_1zRLfkPPu_oKbkZ_GrTtDFHDrvWZA@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 28 Nov 2018 10:11:46 +0900
-Message-ID: <CAK7LNARR+doyJhWKe=JCBVo1tx35vJEDBx0F4skkCjp4-rcLRA@mail.gmail.com>
-Subject: Re: netfilter Kconfig question
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <521458D7-A27C-4112-81ED-1974EFE96A76@vmware.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 1/2] Makefile: Fix distcc compilation with x86 macros
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Taehee Yoo <ap420073@gmail.com>
-
-On Tue, Nov 27, 2018 at 6:10 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
->
-> On Tue, Nov 27, 2018 at 9:32 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> >
-> > On Tue, Nov 27, 2018 at 5:26 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> > >
-> > > On Tue, Nov 27, 2018 at 9:07 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> > > >
-> > > > On Tue, Nov 27, 2018 at 8:48 AM Masahiro Yamada
-> > > > <yamada.masahiro@socionext.com> wrote:
-> > > > >
-> > > > > On Tue, Nov 27, 2018 at 4:36 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> > > > > >
-> > > > > > On Tue, Nov 27, 2018 at 2:33 AM Masahiro Yamada
-> > > > > > <yamada.masahiro@socionext.com> wrote:
-> > > > > > >
-> > > > > > > On Tue, Nov 27, 2018 at 4:49 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
-> > > > > > > >
-> > > > > > > > On Mon, Nov 26, 2018 at 8:31 AM Masahiro Yamada
-> > > > > > > > <yamada.masahiro@socionext.com> wrote:
-> > > > > > > > >
-> > > > > > > > > Hi Randy,
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > On Tue, Nov 20, 2018 at 5:51 AM Randy Dunlap <rdunlap@infradead.org> wrote:
-> > > > > > > > > >
-> > > > > > > > > > Hi Yamada-san,
-> > > > > > > > > >
-> > > > > > > > > > There was recently a netfilter build error in linux-next for which
-> > > > > > > > > > a patch was posted by Taehee Yoo.  The patch works (fixes the build
-> > > > > > > > > > error) but I don't see how or why.
-> > > > > > > > > >
-> > > > > > > > > > My build error report is here:
-> > > > > > > > > > https://lore.kernel.org/lkml/fa7a7824-44df-c058-dba2-ec29c5028361@infradead.org/T/#u
-> > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > Would you take a look at it and try to explain why the patch works?
-> > > > > > > > > >
-> > > > > > > > > > The patch's email thread begins here:
-> > > > > > > > > > https://www.spinics.net/lists/netfilter-devel/msg56985.html
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > I think this is a bug of Kconfig.
-> > > > > > > > >
-> > > > > > > > > I sent a patch.
-> > > > > > > > > https://patchwork.kernel.org/patch/10697637/
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > --
-> > > > > > > > > Best Regards
-> > > > > > > > > Masahiro Yamada
-> > > > > > > >
-> > > > > > > > I always understood this behavior as intentional.
-> > > > > > > >
-> > > > > > > > Say that a high-level arch symbol has 'select FOO_HELPERS if FOO' for
-> > > > > > > > example, where both FOO and FOO_HELPERS can be compiled as modules.
-> > > > > > > >
-> > > > > > > > The intention there is probably to make sure that FOO_HELPERS is
-> > > > > > > > available whenever FOO is (FOO_HELPERS must be >= FOO). If FOO is y,
-> > > > > > > > then FOO_HELPERS must be y. If FOO is m, then it's fine for
-> > > > > > > > FOO_HELPERS to be m (but not n), because it can be loaded as needed
-> > > > > > > > whenever FOO is.
-> > > > > > >
-> > > > > > > If we find such an example, it should be rewritten to:
-> > > > > > >
-> > > > > > >
-> > > > > > > config FOO
-> > > > > > >         tristate "foo"
-> > > > > > >         select FOO_HELPERS
-> > > > > >
-> > > > > > Yup, almost always cleaner ways to do it.
-> > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > > > Forcing FOO_HELPERS to y would remove the possibility to compile it as
-> > > > > > > > a module.
-> > > > > > >
-> > > > > > > This depends on the selector if you write like this:
-> > > > > > >
-> > > > > > >
-> > > > > > > config OTHER_OPTION
-> > > > > > >        tristate "?"
-> > > > > > >        select FOO_HELPERS if FOO
-> > > > > > >
-> > > > > > >
-> > > > > > > although "FOO_HELPERS >= FOO" is not met.
-> > > > > >
-> > > > > > Yeah, that's why I mentioned "high-level arch symbol", because it gets
-> > > > > > more confusing for other symbols. Think boards and the like too.
-> > > > > >
-> > > > > > If you think of 'config A ... select C if B' as "A needs C if B", then
-> > > > > > the current behavior still does the right thing in all cases:
-> > > > > >
-> > > > > >   A B     | C
-> > > > > >   --------+-----
-> > > > > >   n n/m/y | n(+)  (A not enabled, irrelevant)
-> > > > > >   m n     | n(+)  (B not enabled, irrelevant)
-> > > > > >   m m     | m(+)  (Fine, C can be loaded if A and B are)
-> > > > > >   m y     | m(+)  (Ditto)
-> > > > > >   y n     | n(+)  (B not enabled, irrelevant)
-> > > > > >   y m     | m(+)  (Fine, C can be loaded if B is)
-> > > > > >   y y     | y     (Fine, C is available whenever B is)
-> > > > > >
-> > > > > > The big if there is whether you think of select that way. Just trying
-> > > > > > to show why I think it was designed that way.
-> > > > >
-> > > > >
-> > > > > No.
-> > > > >
-> > > > >
-> > > > >
-> > > > >   y m     | m(+)  (Fine, C can be loaded if B is)
-> > > > >
-> > > > >
-> > > > > is not fine.
-> > > > >
-> > > > >
-> > > > >
-> > > > > If 'A' is builtin, 'C' must be builtin as well.
-> > > > >
-> > > > >
-> > > > >
-> > > > > How can 'A' resolve references to 'C'
-> > > > > for the combination A=y and C=m ?
-> > > >
-> > > > If A needs to resolve references to C even when it's a module, then
-> > > > that's a different kind of dependency: A needs C if B != n.
-> > >
-> > > Even when B is a module that is.
-> >
-> >
-> > 'A needs C' absolutely requires 'C >= A'.
-> >
-> > Why is it loosened when B is a module?
->
-> Because I read 'select C if B' as "C must be available whenever B is available".
->
-> You restrict "available" down to "compiled-in". I take "available" as
-> either compiled-in or a module (so that C be made available, if
-> needed).
-
-
-Right. I am talking about "compile-in"
-
-For the case A=y, C=m,
-functions in 'A' cannot call functions provided by 'C'.
-
-"dangling function pointers will be resolved after you load modules"
-does not work in Linux.
-
-
-> If you assume that there'll always a compile-time dependency between C
-> and A (like in the NF_DUP_IPV6 case, and usually in Linux), then it
-> makes sense. Otherwise, it's restricting generality.
->
-
-Yes, this is checked compile-time by scripts/mod/modpost.
+To: Nadav Amit <namit@vmware.com>, Ingo Molnar <mingo@kernel.org>
+Cc: Ingo Molnar <mingo@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
 
 
+On 2018-11-14 6:57 p.m., Nadav Amit wrote:
+> Eventually, if you get a fix into icecc, we will need to change the
+> Makefile, consider the version number and act accordingly.
 
+I got a fix pulled into icecc[1] and it works quite well. It ought to be
+included in the next version of icecc. And distcc (with pump at least)
+has a patch too. In my experience, icecc does a much better job
+distributing the kernel build though.
 
+Logan
 
--- 
-Best Regards
-Masahiro Yamada
+[1] https://github.com/icecc/icecream/pull/430
