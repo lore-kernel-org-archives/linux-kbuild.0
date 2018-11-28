@@ -1,99 +1,201 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yb1-f195.google.com ([209.85.219.195]:44664 "EHLO
-        mail-yb1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726299AbeK1JBv (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:17260 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726539AbeK1MMX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Nov 2018 04:01:51 -0500
-Received: by mail-yb1-f195.google.com with SMTP id p144-v6so9742648yba.11
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 14:02:32 -0800 (PST)
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com. [209.85.219.171])
-        by smtp.gmail.com with ESMTPSA id j186sm1229925ywg.36.2018.11.27.14.02.29
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Nov 2018 14:02:29 -0800 (PST)
-Received: by mail-yb1-f171.google.com with SMTP id u103-v6so9761721ybi.5
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 14:02:29 -0800 (PST)
+        Wed, 28 Nov 2018 07:12:23 -0500
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id wAS1CNUl023719
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Nov 2018 10:12:24 +0900
+Received: by mail-vk1-f181.google.com with SMTP id t132so4778873vkc.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Nov 2018 17:12:23 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1542948687-7326-2-git-send-email-yamada.masahiro@socionext.com>
-References: <1542948687-7326-1-git-send-email-yamada.masahiro@socionext.com> <1542948687-7326-2-git-send-email-yamada.masahiro@socionext.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 27 Nov 2018 14:02:28 -0800
-Message-ID: <CAGXu5jLkcd3p+Hra_1_zD4M66N1eFBPkU_ee=eXpp6NPOfoV9A@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: descend into scripts/gcc-plugins/ via scripts/Makefile
+References: <e1a6228d-1341-6264-d97a-e2bd52a65c82@infradead.org>
+ <CAK7LNARKuFj=YhSHg2fKw2yuWHOaTMUVQA75=3W8Hxdn0Y8Uuw@mail.gmail.com>
+ <CAFkk2KSiFq16vXeCfYO8G_J5c4Kf59JeqqtRh-=g+NbjwGXAjg@mail.gmail.com>
+ <CAK7LNATLwdmFMvB1ZWA404zkqtMwB-f96adYESLDgxBNsMiMJQ@mail.gmail.com>
+ <CAFkk2KR4hKXqZcVXvh6xP4DJ8F1Oz7CS5M8J=KaQp1ob8QHLaA@mail.gmail.com>
+ <CAK7LNATphkaDHozY2scesMVNAgdT6WM7j6-1cRsc7DatmnY16A@mail.gmail.com>
+ <CAFkk2KSREjX_aTAvCb65bpU_YL1E-dXtsYqfu_4zgErq1fQqrA@mail.gmail.com>
+ <CAFkk2KR=-v3PjLRfq77vhW3JL=NKYyE=r3T_=UL3nP_RsO1PQQ@mail.gmail.com>
+ <CAK7LNAQ-+L8zebrfdptbU5UW2BAvp4XTf6wcRze6sNW2bm2Zcw@mail.gmail.com> <CAFkk2KSnHOeLp8521VcS_1zRLfkPPu_oKbkZ_GrTtDFHDrvWZA@mail.gmail.com>
+In-Reply-To: <CAFkk2KSnHOeLp8521VcS_1zRLfkPPu_oKbkZ_GrTtDFHDrvWZA@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 28 Nov 2018 10:11:46 +0900
+Message-ID: <CAK7LNARR+doyJhWKe=JCBVo1tx35vJEDBx0F4skkCjp4-rcLRA@mail.gmail.com>
+Subject: Re: netfilter Kconfig question
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Kernel Hardening <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>
+To: Ulf Magnusson <ulfalizer@gmail.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Taehee Yoo <ap420073@gmail.com>
 
-On Thu, Nov 22, 2018 at 8:51 PM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Now that 'prepare0' depends on 'scripts', building GCC plugins can
-> go into scripts/Makefile, which is a more standard way.
+On Tue, Nov 27, 2018 at 6:10 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> On Tue, Nov 27, 2018 at 9:32 AM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> >
+> > On Tue, Nov 27, 2018 at 5:26 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> > >
+> > > On Tue, Nov 27, 2018 at 9:07 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> > > >
+> > > > On Tue, Nov 27, 2018 at 8:48 AM Masahiro Yamada
+> > > > <yamada.masahiro@socionext.com> wrote:
+> > > > >
+> > > > > On Tue, Nov 27, 2018 at 4:36 PM Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> > > > > >
+> > > > > > On Tue, Nov 27, 2018 at 2:33 AM Masahiro Yamada
+> > > > > > <yamada.masahiro@socionext.com> wrote:
+> > > > > > >
+> > > > > > > On Tue, Nov 27, 2018 at 4:49 AM Ulf Magnusson <ulfalizer@gmail.com> wrote:
+> > > > > > > >
+> > > > > > > > On Mon, Nov 26, 2018 at 8:31 AM Masahiro Yamada
+> > > > > > > > <yamada.masahiro@socionext.com> wrote:
+> > > > > > > > >
+> > > > > > > > > Hi Randy,
+> > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > On Tue, Nov 20, 2018 at 5:51 AM Randy Dunlap <rdunlap@infradead.org> wrote:
+> > > > > > > > > >
+> > > > > > > > > > Hi Yamada-san,
+> > > > > > > > > >
+> > > > > > > > > > There was recently a netfilter build error in linux-next for which
+> > > > > > > > > > a patch was posted by Taehee Yoo.  The patch works (fixes the build
+> > > > > > > > > > error) but I don't see how or why.
+> > > > > > > > > >
+> > > > > > > > > > My build error report is here:
+> > > > > > > > > > https://lore.kernel.org/lkml/fa7a7824-44df-c058-dba2-ec29c5028361@infradead.org/T/#u
+> > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > Would you take a look at it and try to explain why the patch works?
+> > > > > > > > > >
+> > > > > > > > > > The patch's email thread begins here:
+> > > > > > > > > > https://www.spinics.net/lists/netfilter-devel/msg56985.html
+> > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > I think this is a bug of Kconfig.
+> > > > > > > > >
+> > > > > > > > > I sent a patch.
+> > > > > > > > > https://patchwork.kernel.org/patch/10697637/
+> > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > --
+> > > > > > > > > Best Regards
+> > > > > > > > > Masahiro Yamada
+> > > > > > > >
+> > > > > > > > I always understood this behavior as intentional.
+> > > > > > > >
+> > > > > > > > Say that a high-level arch symbol has 'select FOO_HELPERS if FOO' for
+> > > > > > > > example, where both FOO and FOO_HELPERS can be compiled as modules.
+> > > > > > > >
+> > > > > > > > The intention there is probably to make sure that FOO_HELPERS is
+> > > > > > > > available whenever FOO is (FOO_HELPERS must be >= FOO). If FOO is y,
+> > > > > > > > then FOO_HELPERS must be y. If FOO is m, then it's fine for
+> > > > > > > > FOO_HELPERS to be m (but not n), because it can be loaded as needed
+> > > > > > > > whenever FOO is.
+> > > > > > >
+> > > > > > > If we find such an example, it should be rewritten to:
+> > > > > > >
+> > > > > > >
+> > > > > > > config FOO
+> > > > > > >         tristate "foo"
+> > > > > > >         select FOO_HELPERS
+> > > > > >
+> > > > > > Yup, almost always cleaner ways to do it.
+> > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > > Forcing FOO_HELPERS to y would remove the possibility to compile it as
+> > > > > > > > a module.
+> > > > > > >
+> > > > > > > This depends on the selector if you write like this:
+> > > > > > >
+> > > > > > >
+> > > > > > > config OTHER_OPTION
+> > > > > > >        tristate "?"
+> > > > > > >        select FOO_HELPERS if FOO
+> > > > > > >
+> > > > > > >
+> > > > > > > although "FOO_HELPERS >= FOO" is not met.
+> > > > > >
+> > > > > > Yeah, that's why I mentioned "high-level arch symbol", because it gets
+> > > > > > more confusing for other symbols. Think boards and the like too.
+> > > > > >
+> > > > > > If you think of 'config A ... select C if B' as "A needs C if B", then
+> > > > > > the current behavior still does the right thing in all cases:
+> > > > > >
+> > > > > >   A B     | C
+> > > > > >   --------+-----
+> > > > > >   n n/m/y | n(+)  (A not enabled, irrelevant)
+> > > > > >   m n     | n(+)  (B not enabled, irrelevant)
+> > > > > >   m m     | m(+)  (Fine, C can be loaded if A and B are)
+> > > > > >   m y     | m(+)  (Ditto)
+> > > > > >   y n     | n(+)  (B not enabled, irrelevant)
+> > > > > >   y m     | m(+)  (Fine, C can be loaded if B is)
+> > > > > >   y y     | y     (Fine, C is available whenever B is)
+> > > > > >
+> > > > > > The big if there is whether you think of select that way. Just trying
+> > > > > > to show why I think it was designed that way.
+> > > > >
+> > > > >
+> > > > > No.
+> > > > >
+> > > > >
+> > > > >
+> > > > >   y m     | m(+)  (Fine, C can be loaded if B is)
+> > > > >
+> > > > >
+> > > > > is not fine.
+> > > > >
+> > > > >
+> > > > >
+> > > > > If 'A' is builtin, 'C' must be builtin as well.
+> > > > >
+> > > > >
+> > > > >
+> > > > > How can 'A' resolve references to 'C'
+> > > > > for the combination A=y and C=m ?
+> > > >
+> > > > If A needs to resolve references to C even when it's a module, then
+> > > > that's a different kind of dependency: A needs C if B != n.
+> > >
+> > > Even when B is a module that is.
+> >
+> >
+> > 'A needs C' absolutely requires 'C >= A'.
+> >
+> > Why is it loosened when B is a module?
+>
+> Because I read 'select C if B' as "C must be available whenever B is available".
+>
+> You restrict "available" down to "compiled-in". I take "available" as
+> either compiled-in or a module (so that C be made available, if
+> needed).
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
 
--Kees
+Right. I am talking about "compile-in"
 
-> ---
+For the case A=y, C=m,
+functions in 'A' cannot call functions provided by 'C'.
+
+"dangling function pointers will be resolved after you load modules"
+does not work in Linux.
+
+
+> If you assume that there'll always a compile-time dependency between C
+> and A (like in the NF_DUP_IPV6 case, and usually in Linux), then it
+> makes sense. Otherwise, it's restricting generality.
 >
->  Makefile                     | 2 +-
->  scripts/Makefile             | 3 ++-
->  scripts/Makefile.gcc-plugins | 8 --------
->  3 files changed, 3 insertions(+), 10 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index cee4cec..a8bbe68 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1114,7 +1114,7 @@ macroprepare: prepare1 archmacros
->
->  archprepare: archheaders archscripts macroprepare scripts_basic
->
-> -prepare0: scripts archprepare gcc-plugins
-> +prepare0: scripts archprepare
->         $(Q)$(MAKE) $(build)=scripts/mod
->         $(Q)$(MAKE) $(build)=.
->
-> diff --git a/scripts/Makefile b/scripts/Makefile
-> index b48259d..feb1f71 100644
-> --- a/scripts/Makefile
-> +++ b/scripts/Makefile
-> @@ -36,9 +36,10 @@ PHONY += build_unifdef
->  build_unifdef: $(obj)/unifdef
->         @:
->
-> +subdir-$(CONFIG_GCC_PLUGINS) += gcc-plugins
->  subdir-$(CONFIG_MODVERSIONS) += genksyms
->  subdir-$(CONFIG_SECURITY_SELINUX) += selinux
->  subdir-$(CONFIG_GDB_SCRIPTS) += gdb
->
->  # Let clean descend into subdirs
-> -subdir-        += basic dtc kconfig mod package gcc-plugins
-> +subdir-        += basic dtc kconfig mod package
-> diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-> index 46c5c68..c36f199 100644
-> --- a/scripts/Makefile.gcc-plugins
-> +++ b/scripts/Makefile.gcc-plugins
-> @@ -49,11 +49,3 @@ KBUILD_CFLAGS += $(GCC_PLUGINS_CFLAGS)
->  # All enabled GCC plugins are collected here for building below.
->  GCC_PLUGIN := $(gcc-plugin-y)
->  export GCC_PLUGIN
-> -
-> -# Actually do the build, if requested.
-> -PHONY += gcc-plugins
-> -gcc-plugins: scripts_basic
-> -ifdef CONFIG_GCC_PLUGINS
-> -       $(Q)$(MAKE) $(build)=scripts/gcc-plugins
-> -endif
-> -       @:
-> --
-> 2.7.4
->
+
+Yes, this is checked compile-time by scripts/mod/modpost.
+
+
+
 
 
 
 -- 
-Kees Cook
+Best Regards
+Masahiro Yamada
