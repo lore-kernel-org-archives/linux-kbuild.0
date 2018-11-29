@@ -1,141 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:38852 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:35511 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726954AbeK2OFO (ORCPT
+        with ESMTP id S1727098AbeK2PBG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Nov 2018 09:05:14 -0500
+        Thu, 29 Nov 2018 10:01:06 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: fix UML build error with CONFIG_GCC_PLUGINS
-Date: Thu, 29 Nov 2018 11:58:50 +0900
-Message-Id: <1543460330-2219-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 1/2] kbuild: make 'archprepare' depend on 'scripts'
+Date: Thu, 29 Nov 2018 12:56:30 +0900
+Message-Id: <1543463791-18391-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, linux-um@lists.infradead.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <michal.lkml@markovi.net>, Richard Weinberger <richard@nod.at>, Ingo Molnar <mingo@redhat.com>, Jeff Dike <jdike@addtoit.com>
+Cc: Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-UML fails to build with CONFIG_GCC_PLUGINS=y.
+Before start descending, Kbuild needs to run 'prepare' and 'scripts',
+which has been orthogonal to each other.
 
-$ make -s ARCH=um mrproper
-$ make -s ARCH=um allmodconfig
-$ make ARCH=um
-  UPD     include/generated/uapi/linux/version.h
-  WRAP    arch/x86/include/generated/uapi/asm/bpf_perf_event.h
-  WRAP    arch/x86/include/generated/uapi/asm/poll.h
-  WRAP    arch/x86/include/generated/asm/dma-contiguous.h
-  WRAP    arch/x86/include/generated/asm/early_ioremap.h
-  WRAP    arch/x86/include/generated/asm/export.h
-  WRAP    arch/x86/include/generated/asm/mcs_spinlock.h
-  WRAP    arch/x86/include/generated/asm/mm-arch-hooks.h
-  SYSTBL  arch/x86/include/generated/asm/syscalls_32.h
-  SYSHDR  arch/x86/include/generated/asm/unistd_32_ia32.h
-  SYSHDR  arch/x86/include/generated/asm/unistd_64_x32.h
-  SYSTBL  arch/x86/include/generated/asm/syscalls_64.h
-  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_32.h
-  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_64.h
-  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_x32.h
-  HOSTCC  scripts/unifdef
-  CC      arch/x86/um/user-offsets.s
-cc1: error: cannot load plugin ./scripts/gcc-plugins/cyc_complexity_plugin.so
-./scripts/gcc-plugins/cyc_complexity_plugin.so: cannot open shared object file: No such file or directory
-cc1: error: cannot load plugin ./scripts/gcc-plugins/structleak_plugin.so
-./scripts/gcc-plugins/structleak_plugin.so: cannot open shared object file: No such file or directory
-cc1: error: cannot load plugin ./scripts/gcc-plugins/latent_entropy_plugin.so
-./scripts/gcc-plugins/latent_entropy_plugin.so: cannot open shared object file: No such file or directory
-cc1: error: cannot load plugin ./scripts/gcc-plugins/randomize_layout_plugin.so
-./scripts/gcc-plugins/randomize_layout_plugin.so: cannot open shared object file: No such file or directory
-make[1]: *** [scripts/Makefile.build;119: arch/x86/um/user-offsets.s] Error 1
-make: *** [arch/um/Makefile;152: arch/x86/um/user-offsets.s] Error 2
+Going forward, let's consider 'scripts' is a part of the preparation.
+This will allow more cleanups.
 
-Change the order of the preparation stage (with cleanups) to make sure
-gcc-plugins is built before descending to arch/x86/um/.
+Move 'scripts' to the prerequisite of 'archprepare', where UML starts
+compiling target *.c files.
 
-Reported-by: kbuild test robot <lkp@intel.com>
-Fixes: 6b90bd4ba40b ("GCC plugin infrastructure")
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-I will pick up this to kbuild tree to avoid conflicts.
-Ack from UML people is appreciated, though.
+Changes in v2:
+  - It turned out UML + CONFIG_GCC_PLUGINS is broken for a long time.
+    https://patchwork.kernel.org/patch/10703853/
+    Rebased on the top of the fix-up
 
-
- Makefile             |  4 ++--
- arch/um/Makefile     | 24 ++----------------------
- arch/x86/um/Makefile |  4 +++-
- 3 files changed, 7 insertions(+), 25 deletions(-)
+ Makefile | 32 +++++++++++++++-----------------
+ 1 file changed, 15 insertions(+), 17 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 0ce4e29..a066dab 100644
+index f7cc3ee..9eb3f4f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1106,9 +1106,9 @@ prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h
+@@ -1062,7 +1062,7 @@ $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
+ # Error messages still appears in the original language
+ 
+ PHONY += $(vmlinux-dirs)
+-$(vmlinux-dirs): prepare scripts
++$(vmlinux-dirs): prepare
+ 	$(Q)$(MAKE) $(build)=$@ need-builtin=1
+ 
+ define filechk_kernel.release
+@@ -1112,7 +1112,7 @@ prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h
  
  macroprepare: prepare1 archmacros
  
--archprepare: archheaders archscripts macroprepare scripts_basic
-+archprepare: archheaders archscripts macroprepare scripts_basic gcc-plugins
+-archprepare: archheaders archscripts macroprepare scripts_basic gcc-plugins
++archprepare: archheaders archscripts macroprepare scripts gcc-plugins
  
--prepare0: archprepare gcc-plugins
-+prepare0: archprepare
- 	$(Q)$(MAKE) $(build)=.
+ prepare0: archprepare
+ 	$(Q)$(MAKE) $(build)=scripts/mod
+@@ -1286,7 +1286,7 @@ modules.builtin: $(vmlinux-dirs:%=%/modules.builtin)
  
- # All the preparing..
-diff --git a/arch/um/Makefile b/arch/um/Makefile
-index ab1066c..c080359 100644
---- a/arch/um/Makefile
-+++ b/arch/um/Makefile
-@@ -116,7 +116,8 @@ endef
- archheaders:
- 	$(Q)$(MAKE) -f $(srctree)/Makefile ARCH=$(HEADER_ARCH) asm-generic archheaders
+ # Target to prepare building external modules
+ PHONY += modules_prepare
+-modules_prepare: prepare scripts
++modules_prepare: prepare
  
--archprepare: include/generated/user_constants.h
-+archprepare:
-+	$(Q)$(MAKE) $(build)=$(HOST_DIR)/um include/generated/user_constants.h
+ # Target to install modules
+ PHONY += modules_install
+@@ -1604,11 +1604,9 @@ help:
+ 	@echo  '  clean           - remove generated files in module directory only'
+ 	@echo  ''
  
- LINK-$(CONFIG_LD_SCRIPT_STATIC) += -static
- LINK-$(CONFIG_LD_SCRIPT_DYN) += -Wl,-rpath,/lib $(call cc-option, -no-pie)
-@@ -146,25 +147,4 @@ archclean:
- 	@find . \( -name '*.bb' -o -name '*.bbg' -o -name '*.da' \
- 		-o -name '*.gcov' \) -type f -print | xargs rm -f
+-# Dummies...
+-PHONY += prepare scripts
++PHONY += prepare
+ prepare:
+ 	$(cmd_crmodverdir)
+-scripts: ;
+ endif # KBUILD_EXTMOD
  
--# Generated files
--
--$(HOST_DIR)/um/user-offsets.s: __headers FORCE
--	$(Q)$(MAKE) $(build)=$(HOST_DIR)/um $@
--
--define filechk_gen-asm-offsets
--        (set -e; \
--         echo "/*"; \
--         echo " * DO NOT MODIFY."; \
--         echo " *"; \
--         echo " * This file was generated by arch/$(ARCH)/Makefile"; \
--         echo " *"; \
--         echo " */"; \
--         echo ""; \
--         sed -ne "/^->/{s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; s:->::; p;}" < $<; \
--         echo ""; )
--endef
--
--include/generated/user_constants.h: $(HOST_DIR)/um/user-offsets.s
--	$(call filechk,gen-asm-offsets)
--
- export HEADER_ARCH SUBARCH USER_CFLAGS CFLAGS_NO_HARDENING OS DEV_NULL_PATH
-diff --git a/arch/x86/um/Makefile b/arch/x86/um/Makefile
-index c2d3d7c..1792464 100644
---- a/arch/x86/um/Makefile
-+++ b/arch/x86/um/Makefile
-@@ -36,10 +36,12 @@ subarch-$(CONFIG_MODULES) += ../kernel/module.o
+ clean: $(clean-dirs)
+@@ -1712,33 +1710,33 @@ else
+         target-dir = $(if $(KBUILD_EXTMOD),$(dir $<),$(dir $@))
+ endif
  
- USER_OBJS := bugs_$(BITS).o ptrace_user.o fault.o
+-%.s: %.c prepare scripts FORCE
++%.s: %.c prepare FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.i: %.c prepare scripts FORCE
++%.i: %.c prepare FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.o: %.c prepare scripts FORCE
++%.o: %.c prepare FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.lst: %.c prepare scripts FORCE
++%.lst: %.c prepare FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.s: %.S prepare scripts FORCE
++%.s: %.S prepare FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.o: %.S prepare scripts FORCE
++%.o: %.S prepare FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.symtypes: %.c prepare scripts FORCE
++%.symtypes: %.c prepare FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.ll: %.c prepare scripts FORCE
++%.ll: %.c prepare FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
  
--extra-y += user-offsets.s
- $(obj)/user-offsets.s: c_flags = -Wp,-MD,$(depfile) $(USER_CFLAGS) \
- 	-Iarch/x86/include/generated
- 
-+include/generated/user_constants.h: $(obj)/user-offsets.s
-+	$(call filechk,offsets,__USER_CONSTANT_H__)
-+
- UNPROFILE_OBJS := stub_segv.o
- CFLAGS_stub_segv.o := $(CFLAGS_NO_HARDENING)
- 
+ # Modules
+-/: prepare scripts FORCE
++/: prepare FORCE
+ 	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1) \
+ 	$(build)=$(build-dir)
+ # Make sure the latest headers are built for Documentation
+ Documentation/ samples/: headers_install
+-%/: prepare scripts FORCE
++%/: prepare FORCE
+ 	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1) \
+ 	$(build)=$(build-dir)
+-%.ko: prepare scripts FORCE
++%.ko: prepare FORCE
+ 	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1)   \
+ 	$(build)=$(build-dir) $(@:.ko=.o)
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
 -- 
 2.7.4
