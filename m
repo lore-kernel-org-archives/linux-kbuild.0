@@ -1,81 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:35915 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727098AbeK2PBV (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Nov 2018 10:01:21 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 2/2] kbuild: descend into scripts/gcc-plugins/ via scripts/Makefile
-Date: Thu, 29 Nov 2018 12:56:31 +0900
-Message-Id: <1543463791-18391-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1543463791-18391-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1543463791-18391-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from ale.deltatee.com ([207.54.116.67]:56506 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729388AbeK3DtN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 29 Nov 2018 22:49:13 -0500
+References: <20181112150215.508-1-namit@vmware.com>
+ <20181112150215.508-2-namit@vmware.com> <20181113113000.GB4788@gmail.com>
+ <40E4E1B4-EF5F-43A1-B42C-C4CF6349FC62@vmware.com>
+ <48577A3F-0F76-4CCA-A959-965344D7259F@vmware.com>
+ <7ff5de62-d1df-9a67-1c86-497ce00a4de4@deltatee.com>
+ <7072A2D8-30F8-45CB-AB0C-B1BE4A30259A@vmware.com>
+ <db8293cf-9abc-e899-8f43-6e42039006d9@deltatee.com>
+ <521458D7-A27C-4112-81ED-1974EFE96A76@vmware.com>
+ <be24a6eb-ebf0-8d9f-0051-681f0da66109@deltatee.com>
+ <5682CCB4-B7D3-4DDC-81BB-2D4DCE968A3D@vmware.com>
+ <336cf7d8-6495-b112-8d3a-c146222fda78@deltatee.com>
+ <1CAF7187-4732-4BC9-8F7F-93EB16ED14E9@vmware.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <7602f831-72db-888b-4b99-14763a2a3ac5@deltatee.com>
+Date: Thu, 29 Nov 2018 09:43:10 -0700
+MIME-Version: 1.0
+In-Reply-To: <1CAF7187-4732-4BC9-8F7F-93EB16ED14E9@vmware.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/2] Makefile: Fix distcc compilation with x86 macros
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, kernel-hardening@lists.openwall.com, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
+To: Nadav Amit <namit@vmware.com>
+Cc: Ingo Molnar <mingo@kernel.org>, Ingo Molnar <mingo@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-Now that 'archprepare' depends on 'scripts', Kbuild can descend into
-scripts/gcc-plugins in a more standard way.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
----
 
-Changes in v2:
-  - It turned out UML + CONFIG_GCC_PLUGINS is broken for a long time.
-    https://patchwork.kernel.org/patch/10703853/
-    Rebased on the top of the fix-up
+On 2018-11-28 6:31 p.m., Nadav Amit wrote:
+>> On Nov 28, 2018, at 4:49 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
+>>
+>>
+>>
+>> On 2018-11-28 5:38 p.m., Nadav Amit wrote:
+>>> So what’s your take? Would you think this patch is still needed? Should it
+>>> only be enabled automatically for distcc and not for distcc-pump?
+>>
+>> Not sure. The patch will probably slow things down a lot (seeing
+>> assembly is always done locally and there are twice as many compile
+>> steps) and will create some confusion once it's possible to disable it
+>> for the new versions. Maybe hold off and see if anyone else complains?
+>>
+>> I don't really know how you'd detect whether pump is in use or not and
+>> I'm uncertain as to whether any of the auto detection can actually be
+>> made to be reliable.
+> 
+> A silly `$(CC) —version | grep pump ` test.
 
- Makefile                     | 2 +-
- scripts/Makefile             | 3 ++-
- scripts/Makefile.gcc-plugins | 8 --------
- 3 files changed, 3 insertions(+), 10 deletions(-)
+Actually I'm not sure that's going to work in all cases. If CC="distcc
+gcc", then "$(CC) --version" just looks like "gcc --version"...
 
-diff --git a/Makefile b/Makefile
-index 9eb3f4f..c1f87cf 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1112,7 +1112,7 @@ prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h
- 
- macroprepare: prepare1 archmacros
- 
--archprepare: archheaders archscripts macroprepare scripts gcc-plugins
-+archprepare: archheaders archscripts macroprepare scripts
- 
- prepare0: archprepare
- 	$(Q)$(MAKE) $(build)=scripts/mod
-diff --git a/scripts/Makefile b/scripts/Makefile
-index b48259d..feb1f71 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -36,9 +36,10 @@ PHONY += build_unifdef
- build_unifdef: $(obj)/unifdef
- 	@:
- 
-+subdir-$(CONFIG_GCC_PLUGINS) += gcc-plugins
- subdir-$(CONFIG_MODVERSIONS) += genksyms
- subdir-$(CONFIG_SECURITY_SELINUX) += selinux
- subdir-$(CONFIG_GDB_SCRIPTS) += gdb
- 
- # Let clean descend into subdirs
--subdir-	+= basic dtc kconfig mod package gcc-plugins
-+subdir-	+= basic dtc kconfig mod package
-diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-index 46c5c68..c36f199 100644
---- a/scripts/Makefile.gcc-plugins
-+++ b/scripts/Makefile.gcc-plugins
-@@ -49,11 +49,3 @@ KBUILD_CFLAGS += $(GCC_PLUGINS_CFLAGS)
- # All enabled GCC plugins are collected here for building below.
- GCC_PLUGIN := $(gcc-plugin-y)
- export GCC_PLUGIN
--
--# Actually do the build, if requested.
--PHONY += gcc-plugins
--gcc-plugins: scripts_basic
--ifdef CONFIG_GCC_PLUGINS
--	$(Q)$(MAKE) $(build)=scripts/gcc-plugins
--endif
--	@:
--- 
-2.7.4
+Logan
