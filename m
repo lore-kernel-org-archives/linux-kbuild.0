@@ -1,47 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr810071.outbound.protection.outlook.com ([40.107.81.71]:39072
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726786AbeK2MfI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Nov 2018 07:35:08 -0500
-From: Nadav Amit <namit@vmware.com>
-Subject: Re: [PATCH 1/2] Makefile: Fix distcc compilation with x86 macros
-Date: Thu, 29 Nov 2018 01:31:27 +0000
-Message-ID: <1CAF7187-4732-4BC9-8F7F-93EB16ED14E9@vmware.com>
-References: <20181112150215.508-1-namit@vmware.com>
- <20181112150215.508-2-namit@vmware.com> <20181113113000.GB4788@gmail.com>
- <40E4E1B4-EF5F-43A1-B42C-C4CF6349FC62@vmware.com>
- <48577A3F-0F76-4CCA-A959-965344D7259F@vmware.com>
- <7ff5de62-d1df-9a67-1c86-497ce00a4de4@deltatee.com>
- <7072A2D8-30F8-45CB-AB0C-B1BE4A30259A@vmware.com>
- <db8293cf-9abc-e899-8f43-6e42039006d9@deltatee.com>
- <521458D7-A27C-4112-81ED-1974EFE96A76@vmware.com>
- <be24a6eb-ebf0-8d9f-0051-681f0da66109@deltatee.com>
- <5682CCB4-B7D3-4DDC-81BB-2D4DCE968A3D@vmware.com>
- <336cf7d8-6495-b112-8d3a-c146222fda78@deltatee.com>
-In-Reply-To: <336cf7d8-6495-b112-8d3a-c146222fda78@deltatee.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <51092CDFA830E44589A437910A7D3571@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:24218 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726893AbeK2NCo (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 29 Nov 2018 08:02:44 -0500
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id wAT1wmlb024797
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Nov 2018 10:58:48 +0900
+Received: by mail-vk1-f173.google.com with SMTP id w72so75355vkd.5
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Nov 2018 17:58:48 -0800 (PST)
 MIME-Version: 1.0
+References: <201811271709.pD0m16c2%fengguang.wu@intel.com>
+In-Reply-To: <201811271709.pD0m16c2%fengguang.wu@intel.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 29 Nov 2018 10:58:11 +0900
+Message-ID: <CAK7LNARQL_CmXek4+Dzy-ZZrpA6tv6qj3bC6AoJCUQjMqrutRw@mail.gmail.com>
+Subject: Re: [kbuild:kbuild 24/24] cc1: error: cannot load plugin ./scripts/gcc-plugins/randomize_layout_plugin.so
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Ingo Molnar <mingo@kernel.org>, Ingo Molnar <mingo@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: kbuild test robot <lkp@intel.com>
+Cc: kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-PiBPbiBOb3YgMjgsIDIwMTgsIGF0IDQ6NDkgUE0sIExvZ2FuIEd1bnRob3JwZSA8bG9nYW5nQGRl
-bHRhdGVlLmNvbT4gd3JvdGU6DQo+IA0KPiANCj4gDQo+IE9uIDIwMTgtMTEtMjggNTozOCBwLm0u
-LCBOYWRhdiBBbWl0IHdyb3RlOg0KPj4gU28gd2hhdOKAmXMgeW91ciB0YWtlPyBXb3VsZCB5b3Ug
-dGhpbmsgdGhpcyBwYXRjaCBpcyBzdGlsbCBuZWVkZWQ/IFNob3VsZCBpdA0KPj4gb25seSBiZSBl
-bmFibGVkIGF1dG9tYXRpY2FsbHkgZm9yIGRpc3RjYyBhbmQgbm90IGZvciBkaXN0Y2MtcHVtcD8N
-Cj4gDQo+IE5vdCBzdXJlLiBUaGUgcGF0Y2ggd2lsbCBwcm9iYWJseSBzbG93IHRoaW5ncyBkb3du
-IGEgbG90IChzZWVpbmcNCj4gYXNzZW1ibHkgaXMgYWx3YXlzIGRvbmUgbG9jYWxseSBhbmQgdGhl
-cmUgYXJlIHR3aWNlIGFzIG1hbnkgY29tcGlsZQ0KPiBzdGVwcykgYW5kIHdpbGwgY3JlYXRlIHNv
-bWUgY29uZnVzaW9uIG9uY2UgaXQncyBwb3NzaWJsZSB0byBkaXNhYmxlIGl0DQo+IGZvciB0aGUg
-bmV3IHZlcnNpb25zLiBNYXliZSBob2xkIG9mZiBhbmQgc2VlIGlmIGFueW9uZSBlbHNlIGNvbXBs
-YWlucz8NCj4gDQo+IEkgZG9uJ3QgcmVhbGx5IGtub3cgaG93IHlvdSdkIGRldGVjdCB3aGV0aGVy
-IHB1bXAgaXMgaW4gdXNlIG9yIG5vdCBhbmQNCj4gSSdtIHVuY2VydGFpbiBhcyB0byB3aGV0aGVy
-IGFueSBvZiB0aGUgYXV0byBkZXRlY3Rpb24gY2FuIGFjdHVhbGx5IGJlDQo+IG1hZGUgdG8gYmUg
-cmVsaWFibGUuDQoNCkEgc2lsbHkgYCQoQ0MpIOKAlHZlcnNpb24gfCBncmVwIHB1bXAgYCB0ZXN0
-Lg0KDQpBbnlob3csIGl0IGlzIHVwIHRvIE1hc2FoaXJvLg0KDQo=
+On Tue, Nov 27, 2018 at 6:38 PM kbuild test robot <lkp@intel.com> wrote:
+>
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
+> head:   9645b546a2d7d726770f2fd301108c732b707d33
+> commit: 9645b546a2d7d726770f2fd301108c732b707d33 [24/24] kbuild: descend into scripts/gcc-plugins/ via scripts/Makefile
+> config: um-allyesconfig (attached as .config)
+> compiler: gcc-7 (Debian 7.3.0-1) 7.3.0
+> reproduce:
+>         git checkout 9645b546a2d7d726770f2fd301108c732b707d33
+>         # save the attached .config to linux build tree
+>         make ARCH=um
+>
+> All errors (new ones prefixed by >>):
+>
+> >> cc1: error: cannot load plugin ./scripts/gcc-plugins/randomize_layout_plugin.so
+>       ./scripts/gcc-plugins/randomize_layout_plugin.so: file too short
+>    make[2]: *** [arch/x86/um/user-offsets.s] Error 1
+>    make[1]: *** [arch/x86/um/user-offsets.s] Error 2
+>    make[1]: Target 'prepare' not remade because of errors.
+>    make: *** [sub-make] Error 2
+
+
+I will fix it, but I do not think this is a new error.
+
+The parallel building for ARCH=um + CONFIG_GCC_PLUGINS
+has been broken already for a long time.
+
+
+
+> ---
+> 0-DAY kernel test infrastructure                Open Source Technology Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
