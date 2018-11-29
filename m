@@ -1,62 +1,141 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:24218 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726893AbeK2NCo (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:38852 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726954AbeK2OFO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Nov 2018 08:02:44 -0500
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id wAT1wmlb024797
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Nov 2018 10:58:48 +0900
-Received: by mail-vk1-f173.google.com with SMTP id w72so75355vkd.5
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Nov 2018 17:58:48 -0800 (PST)
-MIME-Version: 1.0
-References: <201811271709.pD0m16c2%fengguang.wu@intel.com>
-In-Reply-To: <201811271709.pD0m16c2%fengguang.wu@intel.com>
+        Thu, 29 Nov 2018 09:05:14 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 29 Nov 2018 10:58:11 +0900
-Message-ID: <CAK7LNARQL_CmXek4+Dzy-ZZrpA6tv6qj3bC6AoJCUQjMqrutRw@mail.gmail.com>
-Subject: Re: [kbuild:kbuild 24/24] cc1: error: cannot load plugin ./scripts/gcc-plugins/randomize_layout_plugin.so
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kbuild: fix UML build error with CONFIG_GCC_PLUGINS
+Date: Thu, 29 Nov 2018 11:58:50 +0900
+Message-Id: <1543460330-2219-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, linux-um@lists.infradead.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <michal.lkml@markovi.net>, Richard Weinberger <richard@nod.at>, Ingo Molnar <mingo@redhat.com>, Jeff Dike <jdike@addtoit.com>
 
-On Tue, Nov 27, 2018 at 6:38 PM kbuild test robot <lkp@intel.com> wrote:
->
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
-> head:   9645b546a2d7d726770f2fd301108c732b707d33
-> commit: 9645b546a2d7d726770f2fd301108c732b707d33 [24/24] kbuild: descend into scripts/gcc-plugins/ via scripts/Makefile
-> config: um-allyesconfig (attached as .config)
-> compiler: gcc-7 (Debian 7.3.0-1) 7.3.0
-> reproduce:
->         git checkout 9645b546a2d7d726770f2fd301108c732b707d33
->         # save the attached .config to linux build tree
->         make ARCH=um
->
-> All errors (new ones prefixed by >>):
->
-> >> cc1: error: cannot load plugin ./scripts/gcc-plugins/randomize_layout_plugin.so
->       ./scripts/gcc-plugins/randomize_layout_plugin.so: file too short
->    make[2]: *** [arch/x86/um/user-offsets.s] Error 1
->    make[1]: *** [arch/x86/um/user-offsets.s] Error 2
->    make[1]: Target 'prepare' not remade because of errors.
->    make: *** [sub-make] Error 2
+UML fails to build with CONFIG_GCC_PLUGINS=y.
+
+$ make -s ARCH=um mrproper
+$ make -s ARCH=um allmodconfig
+$ make ARCH=um
+  UPD     include/generated/uapi/linux/version.h
+  WRAP    arch/x86/include/generated/uapi/asm/bpf_perf_event.h
+  WRAP    arch/x86/include/generated/uapi/asm/poll.h
+  WRAP    arch/x86/include/generated/asm/dma-contiguous.h
+  WRAP    arch/x86/include/generated/asm/early_ioremap.h
+  WRAP    arch/x86/include/generated/asm/export.h
+  WRAP    arch/x86/include/generated/asm/mcs_spinlock.h
+  WRAP    arch/x86/include/generated/asm/mm-arch-hooks.h
+  SYSTBL  arch/x86/include/generated/asm/syscalls_32.h
+  SYSHDR  arch/x86/include/generated/asm/unistd_32_ia32.h
+  SYSHDR  arch/x86/include/generated/asm/unistd_64_x32.h
+  SYSTBL  arch/x86/include/generated/asm/syscalls_64.h
+  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_32.h
+  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_64.h
+  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_x32.h
+  HOSTCC  scripts/unifdef
+  CC      arch/x86/um/user-offsets.s
+cc1: error: cannot load plugin ./scripts/gcc-plugins/cyc_complexity_plugin.so
+./scripts/gcc-plugins/cyc_complexity_plugin.so: cannot open shared object file: No such file or directory
+cc1: error: cannot load plugin ./scripts/gcc-plugins/structleak_plugin.so
+./scripts/gcc-plugins/structleak_plugin.so: cannot open shared object file: No such file or directory
+cc1: error: cannot load plugin ./scripts/gcc-plugins/latent_entropy_plugin.so
+./scripts/gcc-plugins/latent_entropy_plugin.so: cannot open shared object file: No such file or directory
+cc1: error: cannot load plugin ./scripts/gcc-plugins/randomize_layout_plugin.so
+./scripts/gcc-plugins/randomize_layout_plugin.so: cannot open shared object file: No such file or directory
+make[1]: *** [scripts/Makefile.build;119: arch/x86/um/user-offsets.s] Error 1
+make: *** [arch/um/Makefile;152: arch/x86/um/user-offsets.s] Error 2
+
+Change the order of the preparation stage (with cleanups) to make sure
+gcc-plugins is built before descending to arch/x86/um/.
+
+Reported-by: kbuild test robot <lkp@intel.com>
+Fixes: 6b90bd4ba40b ("GCC plugin infrastructure")
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+I will pick up this to kbuild tree to avoid conflicts.
+Ack from UML people is appreciated, though.
 
 
-I will fix it, but I do not think this is a new error.
+ Makefile             |  4 ++--
+ arch/um/Makefile     | 24 ++----------------------
+ arch/x86/um/Makefile |  4 +++-
+ 3 files changed, 7 insertions(+), 25 deletions(-)
 
-The parallel building for ARCH=um + CONFIG_GCC_PLUGINS
-has been broken already for a long time.
-
-
-
-> ---
-> 0-DAY kernel test infrastructure                Open Source Technology Center
-> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
-
-
-
+diff --git a/Makefile b/Makefile
+index 0ce4e29..a066dab 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1106,9 +1106,9 @@ prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h
+ 
+ macroprepare: prepare1 archmacros
+ 
+-archprepare: archheaders archscripts macroprepare scripts_basic
++archprepare: archheaders archscripts macroprepare scripts_basic gcc-plugins
+ 
+-prepare0: archprepare gcc-plugins
++prepare0: archprepare
+ 	$(Q)$(MAKE) $(build)=.
+ 
+ # All the preparing..
+diff --git a/arch/um/Makefile b/arch/um/Makefile
+index ab1066c..c080359 100644
+--- a/arch/um/Makefile
++++ b/arch/um/Makefile
+@@ -116,7 +116,8 @@ endef
+ archheaders:
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile ARCH=$(HEADER_ARCH) asm-generic archheaders
+ 
+-archprepare: include/generated/user_constants.h
++archprepare:
++	$(Q)$(MAKE) $(build)=$(HOST_DIR)/um include/generated/user_constants.h
+ 
+ LINK-$(CONFIG_LD_SCRIPT_STATIC) += -static
+ LINK-$(CONFIG_LD_SCRIPT_DYN) += -Wl,-rpath,/lib $(call cc-option, -no-pie)
+@@ -146,25 +147,4 @@ archclean:
+ 	@find . \( -name '*.bb' -o -name '*.bbg' -o -name '*.da' \
+ 		-o -name '*.gcov' \) -type f -print | xargs rm -f
+ 
+-# Generated files
+-
+-$(HOST_DIR)/um/user-offsets.s: __headers FORCE
+-	$(Q)$(MAKE) $(build)=$(HOST_DIR)/um $@
+-
+-define filechk_gen-asm-offsets
+-        (set -e; \
+-         echo "/*"; \
+-         echo " * DO NOT MODIFY."; \
+-         echo " *"; \
+-         echo " * This file was generated by arch/$(ARCH)/Makefile"; \
+-         echo " *"; \
+-         echo " */"; \
+-         echo ""; \
+-         sed -ne "/^->/{s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; s:->::; p;}" < $<; \
+-         echo ""; )
+-endef
+-
+-include/generated/user_constants.h: $(HOST_DIR)/um/user-offsets.s
+-	$(call filechk,gen-asm-offsets)
+-
+ export HEADER_ARCH SUBARCH USER_CFLAGS CFLAGS_NO_HARDENING OS DEV_NULL_PATH
+diff --git a/arch/x86/um/Makefile b/arch/x86/um/Makefile
+index c2d3d7c..1792464 100644
+--- a/arch/x86/um/Makefile
++++ b/arch/x86/um/Makefile
+@@ -36,10 +36,12 @@ subarch-$(CONFIG_MODULES) += ../kernel/module.o
+ 
+ USER_OBJS := bugs_$(BITS).o ptrace_user.o fault.o
+ 
+-extra-y += user-offsets.s
+ $(obj)/user-offsets.s: c_flags = -Wp,-MD,$(depfile) $(USER_CFLAGS) \
+ 	-Iarch/x86/include/generated
+ 
++include/generated/user_constants.h: $(obj)/user-offsets.s
++	$(call filechk,offsets,__USER_CONSTANT_H__)
++
+ UNPROFILE_OBJS := stub_segv.o
+ CFLAGS_stub_segv.o := $(CFLAGS_NO_HARDENING)
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
