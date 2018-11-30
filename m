@@ -1,160 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:52877 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:53049 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726467AbeK3UZs (ORCPT
+        with ESMTP id S1726641AbeK3UZx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 30 Nov 2018 15:25:48 -0500
+        Fri, 30 Nov 2018 15:25:53 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 4/5] kconfig: remove S_OTHER symbol type and correct dependency tracking
-Date: Fri, 30 Nov 2018 18:15:51 +0900
-Message-Id: <1543569352-4899-4-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1543569352-4899-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1543569352-4899-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 1/5] kconfig: remove unneeded setsym label in conf_read_simple()
+Date: Fri, 30 Nov 2018 18:15:48 +0900
+Message-Id: <1543569352-4899-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-The S_OTHER type could be set only when conf_read_simple() is reading
-include/config/auto.conf file.
+The two 'goto setsym' statements are reachable only when sym == NULL.
 
-For example, CONFIG_FOO=y exists in include/config/auto.conf but it is
-missing from the currently parsed Kconfig files, sym_lookup() allocates
-a new symbol, and sets its type to S_OTHER.
+The code below the 'setsym:' label does nothing when sym == NULL
+since there is just one if-block guarded by 'if (sym && ...)'.
 
-Strangely, it will be set to S_STRING by conf_set_sym_val() a few lines
-below while it is obviously bool or tristate type. On the other hand,
-when CONFIG_BAR="bar" is being dropped from include/config/auto.conf,
-its type remains S_OTHER. Because for_all_symbols() omits S_OTHER
-symbols, conf_touch_deps() misses to touch include/config/bar.h
-
-This behavior has been a pretty mystery for me, and digging the git
-histroy did not help. At least, touching depfiles is broken for string
-type symbols.
-
-I removed S_OTHER entirely, and reimplemented it more simply.
-
-If CONFIG_FOO was visible in the previous syncconfig, but is missing
-now, what we want to do is quite simple; just call conf_touch_dep()
-to touch include/config/foo.h instead of allocating a new symbol data.
+Hence, 'goto setsym' can be replaced with 'continue'.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/kconfig/confdata.c | 33 ++++++++++++++-------------------
- scripts/kconfig/expr.h     |  4 ++--
- scripts/kconfig/symbol.c   |  3 ---
- 3 files changed, 16 insertions(+), 24 deletions(-)
+ scripts/kconfig/confdata.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 7263b83..800fb16 100644
+index 91d0a5c..1e35529 100644
 --- a/scripts/kconfig/confdata.c
 +++ b/scripts/kconfig/confdata.c
-@@ -227,14 +227,6 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
- 			conf_warning("symbol value '%s' invalid for %s",
- 				     p, sym->name);
- 		return 1;
--	case S_OTHER:
--		if (*p != '"') {
--			for (p2 = p; *p2 && !isspace(*p2); p2++)
--				;
--			sym->type = S_STRING;
--			goto done;
--		}
--		/* fall through */
- 	case S_STRING:
- 		if (*p++ != '"')
- 			break;
-@@ -253,7 +245,6 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
- 		/* fall through */
- 	case S_INT:
- 	case S_HEX:
--	done:
- 		if (sym_string_valid(sym, p)) {
- 			sym->def[def].val = xstrdup(p);
- 			sym->flags |= def_flags;
-@@ -434,17 +425,22 @@ int conf_read_simple(const char *name, int def)
- 				if (*p2 == '\r')
- 					*p2 = 0;
- 			}
--			if (def == S_DEF_USER) {
--				sym = sym_find(line + strlen(CONFIG_));
--				if (!sym) {
-+
-+			sym = sym_find(line + strlen(CONFIG_));
-+			if (!sym) {
-+				if (def == S_DEF_AUTO)
-+					/*
-+					 * Reading from include/config/auto.conf
-+					 * If CONFIG_FOO previously existed in
-+					 * auto.conf but it is missing now,
-+					 * include/config/foo.h must be touched.
-+					 */
-+					conf_touch_dep(line + strlen(CONFIG_));
-+				else
+@@ -363,7 +363,7 @@ int conf_read_simple(const char *name, int def)
+ 				sym = sym_find(line + 2 + strlen(CONFIG_));
+ 				if (!sym) {
  					sym_add_change_count(1);
--					continue;
--				}
--			} else {
--				sym = sym_lookup(line + strlen(CONFIG_), 0);
--				if (sym->type == S_UNKNOWN)
--					sym->type = S_OTHER;
-+				continue;
- 			}
+-					goto setsym;
++					continue;
+ 				}
+ 			} else {
+ 				sym = sym_lookup(line + 2 + strlen(CONFIG_), 0);
+@@ -397,7 +397,7 @@ int conf_read_simple(const char *name, int def)
+ 				sym = sym_find(line + strlen(CONFIG_));
+ 				if (!sym) {
+ 					sym_add_change_count(1);
+-					goto setsym;
++					continue;
+ 				}
+ 			} else {
+ 				sym = sym_lookup(line + strlen(CONFIG_), 0);
+@@ -416,7 +416,7 @@ int conf_read_simple(const char *name, int def)
+ 
+ 			continue;
+ 		}
+-setsym:
 +
- 			if (sym->flags & def_flags) {
- 				conf_warning("override: reassigning to symbol %s", sym->name);
- 			}
-@@ -710,7 +706,6 @@ static void conf_write_symbol(FILE *fp, struct symbol *sym,
- 	const char *str;
- 
- 	switch (sym->type) {
--	case S_OTHER:
- 	case S_UNKNOWN:
- 		break;
- 	case S_STRING:
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index 7c329e1..2b7e222 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -62,7 +62,7 @@ struct symbol_value {
- };
- 
- enum symbol_type {
--	S_UNKNOWN, S_BOOLEAN, S_TRISTATE, S_INT, S_HEX, S_STRING, S_OTHER
-+	S_UNKNOWN, S_BOOLEAN, S_TRISTATE, S_INT, S_HEX, S_STRING
- };
- 
- /* enum values are used as index to symbol.def[] */
-@@ -131,7 +131,7 @@ struct symbol {
- 	struct expr_value implied;
- };
- 
--#define for_all_symbols(i, sym) for (i = 0; i < SYMBOL_HASHSIZE; i++) for (sym = symbol_hash[i]; sym; sym = sym->next) if (sym->type != S_OTHER)
-+#define for_all_symbols(i, sym) for (i = 0; i < SYMBOL_HASHSIZE; i++) for (sym = symbol_hash[i]; sym; sym = sym->next)
- 
- #define SYMBOL_CONST      0x0001  /* symbol is const */
- #define SYMBOL_CHECK      0x0008  /* used during dependency checking */
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 703b9b8..2e6bf36 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -61,8 +61,6 @@ const char *sym_type_name(enum symbol_type type)
- 		return "string";
- 	case S_UNKNOWN:
- 		return "unknown";
--	case S_OTHER:
--		break;
- 	}
- 	return "???";
- }
-@@ -757,7 +755,6 @@ const char *sym_get_string_default(struct symbol *sym)
- 		return str;
- 	case S_STRING:
- 		return str;
--	case S_OTHER:
- 	case S_UNKNOWN:
- 		break;
- 	}
+ 		if (sym && sym_is_choice_value(sym)) {
+ 			struct symbol *cs = prop_get_symbol(sym_get_choice_prop(sym));
+ 			switch (sym->def[def].tri) {
 -- 
 2.7.4
