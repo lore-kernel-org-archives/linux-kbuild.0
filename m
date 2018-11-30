@@ -1,73 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:53045 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726467AbeK3UZx (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:27093 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726499AbeK3VDZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 30 Nov 2018 15:25:53 -0500
+        Fri, 30 Nov 2018 16:03:25 -0500
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id wAU9sUMB011900
+        for <linux-kbuild@vger.kernel.org>; Fri, 30 Nov 2018 18:54:31 +0900
+Received: by mail-vs1-f44.google.com with SMTP id r14so2953849vsc.13
+        for <linux-kbuild@vger.kernel.org>; Fri, 30 Nov 2018 01:54:31 -0800 (PST)
+MIME-Version: 1.0
+References: <CA+icZUUPaoEf0JzXJO6T5xBBrr8tcw2NmNXBk4=HD6WBbLtEdw@mail.gmail.com>
+ <CA+icZUWrbTPk7ws+LBjzMSKsbfwbZODjCoBt7uQU0Z4ykzd6mw@mail.gmail.com>
+ <CAK7LNAQ_8RYQaLbouR84=HH+xoxvVGX=gN5z-vQqu0=PCVzOuQ@mail.gmail.com>
+ <CA+icZUXU8z_zke=3HCkceZo_becUL2Q=5j=QtAKkqYn8o-5-vw@mail.gmail.com> <5db14c4980ab9d8d23606b2a336a6b8dbbb255d0.camel@decadent.org.uk>
+In-Reply-To: <5db14c4980ab9d8d23606b2a336a6b8dbbb255d0.camel@decadent.org.uk>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 5/5] kconfig: remove k_invalid from expr_parse_string() return type
-Date: Fri, 30 Nov 2018 18:15:52 +0900
-Message-Id: <1543569352-4899-5-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1543569352-4899-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1543569352-4899-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Fri, 30 Nov 2018 18:53:54 +0900
+Message-ID: <CAK7LNAQ7UtVBNqShtgmLJxNgkJc1wdzwCtWZz_LHe+iaZiWx+g@mail.gmail.com>
+Subject: Re: builddeb: Missing arch/x86/kernel/macros.s when building modules
+ with dkms
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: sedat.dilek@gmail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-The only possibility of k_invalid being returned was when
-expr_parse_sting() parsed S_OTHER type symbol. This actually never
-happened, and this is even clearer since S_OTHER has gone.
+On Sun, Nov 25, 2018 at 2:51 AM Ben Hutchings <ben@decadent.org.uk> wrote:
+>
+> On Sat, 2018-11-24 at 07:51 +0100, Sedat Dilek wrote:
+> > On Sat, Nov 24, 2018 at 1:53 AM Masahiro Yamada
+> > <yamada.masahiro@socionext.com> wrote:
+> [...]
+> > > Maybe like this?
+> > >
+> > >
+> > > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> > > index f43a274..4cf5a5c 100755
+> > > --- a/scripts/package/builddeb
+> > > +++ b/scripts/package/builddeb
+> > > @@ -165,6 +165,9 @@ fi
+> > >  if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
+> > >         (cd $objtree; find scripts/gcc-plugins -name \*.so -o -name
+> > > gcc-common.h) >> "$objtree/debian/hdrobjfiles"
+> > >  fi
+> > > +if [ -r arch/$SRCARCH/kernel/macros.s ]; then
+> > > +       echo arch/$SRCARCH/kernel/macros.s >> "$objtree/debian/hdrobjfiles"
+> > > +fi
+> > >  destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+> > >  mkdir -p "$destdir"
+> > >  (cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd
+> > > $destdir; tar -xf -)
+> > >
+> > >
+> > > --
+> > > Best Regards
+> > > Masahiro Yamada
+> >
+> > Hi Masahiro Yamada,
+> >
+> > thanks, that fixes here the problem with building DKMS kernel modules:
+> >
+> > # find /usr/src/linux-headers-4.20.0-rc3-7-amd64-cbl -name macros.s
+> > /usr/src/linux-headers-4.20.0-rc3-7-amd64-cbl/arch/x86/kernel/macros.
+> >
+> > I guess commit...
+> >
+> > 77b0bf55bc67 kbuild/Makefile: Prepare for using macros in inline
+> > assembly code to work around asm() related GCC inlining bugs
+> >
+> > ...is the root cause (mention as a "Fixes:" tag in a future patch)?
+> >
+> > Not sure if the according script for building Linux RPM packages needs
+> > the same fix, too.
+> >
+> > I can send a fix for the builddeb part or if you want to do it, it's OK for me.
+> >
+> > I highly appreciate to see a fix in Linux v4.20-rcN if possible.
+>
+> Perhaps it would make more sense to move this file under
+> arch/x86/include/generated, so there's no need to add a special case to
+> the packaging rules.
 
-Clean up unreachable code.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Yeah, moving the file under include/ would be nicer.
 
- scripts/kconfig/expr.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
+But, I am asking if they are fine with reverting the commits causing
+the problems.
+(https://lkml.org/lkml/2018/11/29/910)
 
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index e1a39e9..57ebf71 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -980,7 +980,6 @@ enum string_value_kind {
- 	k_string,
- 	k_signed,
- 	k_unsigned,
--	k_invalid
- };
- 
- union string_value {
-@@ -1011,13 +1010,10 @@ static enum string_value_kind expr_parse_string(const char *str,
- 		val->u = strtoull(str, &tail, 16);
- 		kind = k_unsigned;
- 		break;
--	case S_STRING:
--	case S_UNKNOWN:
-+	default:
- 		val->s = strtoll(str, &tail, 0);
- 		kind = k_signed;
- 		break;
--	default:
--		return k_invalid;
- 	}
- 	return !errno && !*tail && tail > str && isxdigit(tail[-1])
- 	       ? kind : k_string;
-@@ -1073,13 +1069,7 @@ tristate expr_calc_value(struct expr *e)
- 
- 	if (k1 == k_string || k2 == k_string)
- 		res = strcmp(str1, str2);
--	else if (k1 == k_invalid || k2 == k_invalid) {
--		if (e->type != E_EQUAL && e->type != E_UNEQUAL) {
--			printf("Cannot compare \"%s\" and \"%s\"\n", str1, str2);
--			return no;
--		}
--		res = strcmp(str1, str2);
--	} else if (k1 == k_unsigned || k2 == k_unsigned)
-+	else if (k1 == k_unsigned || k2 == k_unsigned)
- 		res = (lval.u > rval.u) - (lval.u < rval.u);
- 	else /* if (k1 == k_signed && k2 == k_signed) */
- 		res = (lval.s > rval.s) - (lval.s < rval.s);
+Please give me time to decide what to do.
+
+
 -- 
-2.7.4
+Best Regards
+Masahiro Yamada
