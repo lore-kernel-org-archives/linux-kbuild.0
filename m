@@ -1,43 +1,160 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:42314 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726019AbeK3FH3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 30 Nov 2018 00:07:29 -0500
-Date: Thu, 29 Nov 2018 18:01:35 +0000
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v12 23/25] kasan, arm64: select HAVE_ARCH_KASAN_SW_TAGS
-Message-ID: <20181129180134.GA4318@arm.com>
-References: <cover.1543337629.git.andreyknvl@google.com>
- <996c9b3898bb3c5de977d00215ddc4bf8cf154c1.1543337629.git.andreyknvl@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <996c9b3898bb3c5de977d00215ddc4bf8cf154c1.1543337629.git.andreyknvl@google.com>
+Received: from conuserg-09.nifty.com ([210.131.2.76]:52877 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726467AbeK3UZs (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 30 Nov 2018 15:25:48 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 4/5] kconfig: remove S_OTHER symbol type and correct dependency tracking
+Date: Fri, 30 Nov 2018 18:15:51 +0900
+Message-Id: <1543569352-4899-4-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1543569352-4899-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1543569352-4899-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Tue, Nov 27, 2018 at 05:55:41PM +0100, Andrey Konovalov wrote:
-> Now, that all the necessary infrastructure code has been introduced,
-> select HAVE_ARCH_KASAN_SW_TAGS for arm64 to enable software tag-based
-> KASAN mode.
-> 
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> ---
->  arch/arm64/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 787d7850e064..8b331dcfb48e 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -111,6 +111,7 @@ config ARM64
->  	select HAVE_ARCH_JUMP_LABEL
->  	select HAVE_ARCH_JUMP_LABEL_RELATIVE
->  	select HAVE_ARCH_KASAN if !(ARM64_16K_PAGES && ARM64_VA_BITS_48)
-> +	select HAVE_ARCH_KASAN_SW_TAGS if !(ARM64_16K_PAGES && ARM64_VA_BITS_48)
+The S_OTHER type could be set only when conf_read_simple() is reading
+include/config/auto.conf file.
 
-Can you do if HAVE_ARCH_KASAN instead?
+For example, CONFIG_FOO=y exists in include/config/auto.conf but it is
+missing from the currently parsed Kconfig files, sym_lookup() allocates
+a new symbol, and sets its type to S_OTHER.
 
-Will
+Strangely, it will be set to S_STRING by conf_set_sym_val() a few lines
+below while it is obviously bool or tristate type. On the other hand,
+when CONFIG_BAR="bar" is being dropped from include/config/auto.conf,
+its type remains S_OTHER. Because for_all_symbols() omits S_OTHER
+symbols, conf_touch_deps() misses to touch include/config/bar.h
+
+This behavior has been a pretty mystery for me, and digging the git
+histroy did not help. At least, touching depfiles is broken for string
+type symbols.
+
+I removed S_OTHER entirely, and reimplemented it more simply.
+
+If CONFIG_FOO was visible in the previous syncconfig, but is missing
+now, what we want to do is quite simple; just call conf_touch_dep()
+to touch include/config/foo.h instead of allocating a new symbol data.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ scripts/kconfig/confdata.c | 33 ++++++++++++++-------------------
+ scripts/kconfig/expr.h     |  4 ++--
+ scripts/kconfig/symbol.c   |  3 ---
+ 3 files changed, 16 insertions(+), 24 deletions(-)
+
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 7263b83..800fb16 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -227,14 +227,6 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 			conf_warning("symbol value '%s' invalid for %s",
+ 				     p, sym->name);
+ 		return 1;
+-	case S_OTHER:
+-		if (*p != '"') {
+-			for (p2 = p; *p2 && !isspace(*p2); p2++)
+-				;
+-			sym->type = S_STRING;
+-			goto done;
+-		}
+-		/* fall through */
+ 	case S_STRING:
+ 		if (*p++ != '"')
+ 			break;
+@@ -253,7 +245,6 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 		/* fall through */
+ 	case S_INT:
+ 	case S_HEX:
+-	done:
+ 		if (sym_string_valid(sym, p)) {
+ 			sym->def[def].val = xstrdup(p);
+ 			sym->flags |= def_flags;
+@@ -434,17 +425,22 @@ int conf_read_simple(const char *name, int def)
+ 				if (*p2 == '\r')
+ 					*p2 = 0;
+ 			}
+-			if (def == S_DEF_USER) {
+-				sym = sym_find(line + strlen(CONFIG_));
+-				if (!sym) {
++
++			sym = sym_find(line + strlen(CONFIG_));
++			if (!sym) {
++				if (def == S_DEF_AUTO)
++					/*
++					 * Reading from include/config/auto.conf
++					 * If CONFIG_FOO previously existed in
++					 * auto.conf but it is missing now,
++					 * include/config/foo.h must be touched.
++					 */
++					conf_touch_dep(line + strlen(CONFIG_));
++				else
+ 					sym_add_change_count(1);
+-					continue;
+-				}
+-			} else {
+-				sym = sym_lookup(line + strlen(CONFIG_), 0);
+-				if (sym->type == S_UNKNOWN)
+-					sym->type = S_OTHER;
++				continue;
+ 			}
++
+ 			if (sym->flags & def_flags) {
+ 				conf_warning("override: reassigning to symbol %s", sym->name);
+ 			}
+@@ -710,7 +706,6 @@ static void conf_write_symbol(FILE *fp, struct symbol *sym,
+ 	const char *str;
+ 
+ 	switch (sym->type) {
+-	case S_OTHER:
+ 	case S_UNKNOWN:
+ 		break;
+ 	case S_STRING:
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 7c329e1..2b7e222 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -62,7 +62,7 @@ struct symbol_value {
+ };
+ 
+ enum symbol_type {
+-	S_UNKNOWN, S_BOOLEAN, S_TRISTATE, S_INT, S_HEX, S_STRING, S_OTHER
++	S_UNKNOWN, S_BOOLEAN, S_TRISTATE, S_INT, S_HEX, S_STRING
+ };
+ 
+ /* enum values are used as index to symbol.def[] */
+@@ -131,7 +131,7 @@ struct symbol {
+ 	struct expr_value implied;
+ };
+ 
+-#define for_all_symbols(i, sym) for (i = 0; i < SYMBOL_HASHSIZE; i++) for (sym = symbol_hash[i]; sym; sym = sym->next) if (sym->type != S_OTHER)
++#define for_all_symbols(i, sym) for (i = 0; i < SYMBOL_HASHSIZE; i++) for (sym = symbol_hash[i]; sym; sym = sym->next)
+ 
+ #define SYMBOL_CONST      0x0001  /* symbol is const */
+ #define SYMBOL_CHECK      0x0008  /* used during dependency checking */
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 703b9b8..2e6bf36 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -61,8 +61,6 @@ const char *sym_type_name(enum symbol_type type)
+ 		return "string";
+ 	case S_UNKNOWN:
+ 		return "unknown";
+-	case S_OTHER:
+-		break;
+ 	}
+ 	return "???";
+ }
+@@ -757,7 +755,6 @@ const char *sym_get_string_default(struct symbol *sym)
+ 		return str;
+ 	case S_STRING:
+ 		return str;
+-	case S_OTHER:
+ 	case S_UNKNOWN:
+ 		break;
+ 	}
+-- 
+2.7.4
