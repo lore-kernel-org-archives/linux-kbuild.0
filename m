@@ -1,79 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:33103 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726577AbeLBCHe (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:21183 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726577AbeLBCIw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 1 Dec 2018 21:07:34 -0500
+        Sat, 1 Dec 2018 21:08:52 -0500
 MIME-Version: 1.0
-References: <1542959843-16145-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1542959843-16145-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1543220141-13744-1-git-send-email-yamada.masahiro@socionext.com> <20181126083633.GA10604@light.dominikbrodowski.net>
+In-Reply-To: <20181126083633.GA10604@light.dominikbrodowski.net>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 1 Dec 2018 23:54:11 +0900
-Message-ID: <CAK7LNARvHtW9S6R7FdM10purUjWFNCFkfxDnYwnr4hB-xcMf7Q@mail.gmail.com>
-Subject: Re: [PATCH 1/3] modpost: refactor seen flag clearing in add_depends()
+Date: Sat, 1 Dec 2018 23:55:22 +0900
+Message-ID: <CAK7LNASVcFj2-ooroLsyZgpVyv_xW1RJCkVtayg7sNxVjvHN=A@mail.gmail.com>
+Subject: Re: [PATCH] pcmcia: remove per-arch PCMCIA config entry
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: =?UTF-8?Q?Leonardo_Br=C3=A1s?= <leobras.c@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, linux-s390 <linux-s390@vger.kernel.org>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-um@lists.infradead.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Richard Weinberger <richard@nod.at>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Jeff Dike <jdike@addtoit.com>
 
-On Sat, Nov 24, 2018 at 5:08 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Mon, Nov 26, 2018 at 6:24 PM Dominik Brodowski
+<linux@dominikbrodowski.net> wrote:
 >
-> You do not need to iterate over all modules for resetting ->seen flag
-> because add_depends() is only interested in modules that export symbols
-> referenced from the given 'mod'.
+> On Mon, Nov 26, 2018 at 05:15:41PM +0900, Masahiro Yamada wrote:
+> > Now that all architectures include drivers/pcmcia/Kconfig where
+> > the PCMCIA config is defined, the PCMCIA config entries in per-arch
+> > Kconfig files are redundant.
+> >
+> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > ---
+> >
+> > I will queue this up to my kbuild tree
+> > along with Christoph's clean-up patch set.
 >
-> This also avoids shadowing the 'modules' parameter of add_depends().
+> Acked-by: Dominik Brodowski <linux@dominikbrodowski.net>
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-
+> Thanks,
+>         Dominik
 
 Applied to linux-kbuild.
-
-
-
->  scripts/mod/modpost.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index c64066d..39432c2 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -2229,15 +2229,15 @@ static int add_versions(struct buffer *b, struct module *mod)
->         return err;
->  }
->
-> -static void add_depends(struct buffer *b, struct module *mod,
-> -                       struct module *modules)
-> +static void add_depends(struct buffer *b, struct module *mod)
->  {
->         struct symbol *s;
-> -       struct module *m;
->         int first = 1;
->
-> -       for (m = modules; m; m = m->next)
-> -               m->seen = is_vmlinux(m->name);
-> +       /* Clear ->seen flag of modules that own symbols needed by this. */
-> +       for (s = mod->unres; s; s = s->next)
-> +               if (s->module)
-> +                       s->module->seen = is_vmlinux(s->module->name);
->
->         buf_printf(b, "\n");
->         buf_printf(b, "static const char __module_depends[]\n");
-> @@ -2506,7 +2506,7 @@ int main(int argc, char **argv)
->                 add_retpoline(&buf);
->                 add_staging_flag(&buf, mod->name);
->                 err |= add_versions(&buf, mod);
-> -               add_depends(&buf, mod, modules);
-> +               add_depends(&buf, mod);
->                 add_moddevtable(&buf, mod);
->                 add_srcversion(&buf, mod);
->
-> --
-> 2.7.4
->
 
 
 -- 
