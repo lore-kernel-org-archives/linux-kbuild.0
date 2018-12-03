@@ -1,51 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:60227 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:60611 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725845AbeLCHvp (ORCPT
+        with ESMTP id S1725952AbeLCHv6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 3 Dec 2018 02:51:45 -0500
+        Mon, 3 Dec 2018 02:51:58 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 5/7] microblaze: add linux.bin* and simpleImage.* to PHONY
-Date: Mon,  3 Dec 2018 16:50:55 +0900
-Message-Id: <1543823457-32478-6-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 0/7] microblaze: fix various problems in building boot images
+Date: Mon,  3 Dec 2018 16:50:50 +0900
+Message-Id: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Simek <monstr@monstr.eu>
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>
 
-linux.bin, linux.bin.gz, and linux.bin.ub are phony targets to
-generate a corresponding image under arch/microblaze/boot/.
+This patch set fixes various issues in microblaze Makefiles.
 
-simpleImage.% also works like a PHONY target, but a pattern that
-contains '%' cannot be a PHONY target. I renamed it to equivalent
-simpleImage.$(DTB).
+BTW, "simpleImage.<dt>" works like a phony target to generate the
+following four images, where the first three are just aliases.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+ - arch/microblaze/boot/simpleImage.<dt>:
+         identical to arch/microblaze/boot/linux.bin
 
- arch/microblaze/Makefile | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ - arch/microblaze/boot/simpleImage.<dt>.unstrip:
+         identical to vmlinux
 
-diff --git a/arch/microblaze/Makefile b/arch/microblaze/Makefile
-index c5d5b0e..7a5df02 100644
---- a/arch/microblaze/Makefile
-+++ b/arch/microblaze/Makefile
-@@ -79,11 +79,13 @@ all: linux.bin
- archclean:
- 	$(Q)$(MAKE) $(clean)=$(boot)
- 
-+PHONY += linux.bin linux.bin.gz linux.bin.ub
- linux.bin linux.bin.gz linux.bin.ub: vmlinux
- 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
- 	@echo 'Kernel: $(boot)/$@ is ready' ' (#'`cat .version`')'
- 
--simpleImage.%: vmlinux
-+PHONY += simpleImage.$(DTB)
-+simpleImage.$(DTB): vmlinux
- 	$(Q)$(MAKE) $(build)=$(boot) simple_images
- 	@echo 'Kernel: $(boot)/$@ is ready' ' (#'`cat .version`')'
- 
+ - arch/microblaze/boot/simpleImage.<dt>.ub:
+         identical to arch/microblaze/boot/linux.bin.ub
+
+ - arch/microblaze/boot/simpleImage.<dt>.strip:
+         stripped vmlinux
+
+I am not sure how much useful those copies are,
+but, I tried my best to keep the same behavior.
+
+IMHO, I guess DTB=<dt> would be more sensible,
+but it is up to Michal.
+
+
+
+Masahiro Yamada (7):
+  microblaze: fix cleaning of boot images
+  microblaze: adjust the help to the real behavior
+  microblaze: move "... is ready" message to arch/microblaze/Makefile
+  microblaze: fix multiple bugs in arch/microblaze/boot/Makefile
+  microblaze: add linux.bin* and simpleImage.* to PHONY
+  microblaze: fix race condition in building boot images
+  microblaze: remove the unneeded code just in case file copy fails
+
+ arch/microblaze/Makefile          | 14 +++++++++-----
+ arch/microblaze/boot/Makefile     | 33 +++++++++++++++++----------------
+ arch/microblaze/boot/dts/Makefile |  5 +----
+ 3 files changed, 27 insertions(+), 25 deletions(-)
+
 -- 
 2.7.4
