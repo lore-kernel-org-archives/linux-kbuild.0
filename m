@@ -1,94 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:58256 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726866AbeLEL3W (ORCPT
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:36442 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727240AbeLEPky (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Dec 2018 06:29:22 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/3] kbuild: generate asm-generic wrappers if mandatory headers are missing
-Date: Wed,  5 Dec 2018 20:28:05 +0900
-Message-Id: <1544009286-15705-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1544009286-15705-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1544009286-15705-1-git-send-email-yamada.masahiro@socionext.com>
+        Wed, 5 Dec 2018 10:40:54 -0500
+Received: by mail-wm1-f67.google.com with SMTP id a18so13429068wmj.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 05 Dec 2018 07:40:52 -0800 (PST)
+Reply-To: monstr@monstr.eu
+Subject: Re: [PATCH 2/7] microblaze: adjust the help to the real behavior
+References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
+ <1543823457-32478-3-git-send-email-yamada.masahiro@socionext.com>
+From: Michal Simek <monstr@monstr.eu>
+Message-ID: <80bf0f6e-8f1f-314e-b22d-6e786cf15e45@monstr.eu>
+Date: Wed, 5 Dec 2018 16:40:46 +0100
+MIME-Version: 1.0
+In-Reply-To: <1543823457-32478-3-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="RvVwhLGJR5KStavD1M5BS65DxOMkrsxrD"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Some time ago, Sam pointed out a certain degree of overwrap between
-generic-y and mandatory-y. (https://lkml.org/lkml/2017/7/10/121)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RvVwhLGJR5KStavD1M5BS65DxOMkrsxrD
+Content-Type: multipart/mixed; boundary="0TWQ9qg9x5W2c9yQU2nS8dvfBdZ2NwlMm";
+ protected-headers="v1"
+From: Michal Simek <monstr@monstr.eu>
+Reply-To: monstr@monstr.eu
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <80bf0f6e-8f1f-314e-b22d-6e786cf15e45@monstr.eu>
+Subject: Re: [PATCH 2/7] microblaze: adjust the help to the real behavior
+References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
+ <1543823457-32478-3-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1543823457-32478-3-git-send-email-yamada.masahiro@socionext.com>
 
-I a bit tweaked the meaning of mandatory-y; now it defines the minimum
-set of ASM headers that all architectures must have.
+--0TWQ9qg9x5W2c9yQU2nS8dvfBdZ2NwlMm
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-If arch does not have specific implementation of a mandatory header,
-Kbuild will let it fallback to the asm-generic one by automatically
-generating a wrapper. This will allow to drop lots of redundant
-generic-y defines.
+On 03. 12. 18 8:50, Masahiro Yamada wrote:
+> "make ARCH=3Dmicroblaze help" mentions simpleImage.<dt>.unstrip,
+> but it never works because Makefile assumes "system.unstrip" is
+> the name of DT.
+>=20
+> $ make ARCH=3Dmicroblaze CROSS_COMPILE=3Dmicroblaze-linux- simpleImage.=
+system.unstrip
+>   [ snip ]
+> make[1]: *** No rule to make target 'arch/microblaze/boot/dts/system.un=
+strip.dtb', needed by 'arch/microblaze/boot/dts/system.dtb'.  Stop.
+> make: *** [Makefile;1060: arch/microblaze/boot/dts] Error 2
+> make: *** Waiting for unfinished jobs....
+>=20
+> Rip off the never-working target.
+>=20
+> In my understanding, simpleImage.<dt> works like a phony target that
+> generates multiple images. Reflect the behavior to the help message.
+>=20
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>=20
+>  arch/microblaze/Makefile | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>=20
+> diff --git a/arch/microblaze/Makefile b/arch/microblaze/Makefile
+> index 0823d29..97e1384 100644
+> --- a/arch/microblaze/Makefile
+> +++ b/arch/microblaze/Makefile
+> @@ -89,9 +89,7 @@ define archhelp
+>    echo '* linux.bin    - Create raw binary'
+>    echo '  linux.bin.gz - Create compressed raw binary'
+>    echo '  linux.bin.ub - Create U-Boot wrapped raw binary'
+> -  echo '  simpleImage.<dt> - ELF image with $(arch)/boot/dts/<dt>.dts =
+linked in'
+> -  echo '                   - stripped elf with fdt blob'
+> -  echo '  simpleImage.<dt>.unstrip - full ELF image with fdt blob'
+> +  echo '  simpleImage.<dt> - Create images with $(arch)/boot/dts/<dt>.=
+dts linked in'
+>    echo '  *_defconfig      - Select default config from arch/microblaz=
+e/configs'
+>    echo ''
+>    echo '  Targets with <dt> embed a device tree blob inside the image'=
 
-Previously, "mandatory" was used in the context of UAPI, but I guess
-this can be extended to kernel space ASM headers.
+>=20
 
-Suggested-by: Sam Ravnborg <sam@ravnborg.org>
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+I understand what you are trying to say but I would still like to keep
+information about unstrip file.
+It is correct that it is not build target. It is just generated file and
+message above was used for description what it is.
+Definitely agree that this should be the part of targets but it should
+be in description.
+The same is for missing description for simpleImage.<dt>.strip and
+simpleImage.<dt>.ub files.
 
- Documentation/kbuild/makefiles.txt | 9 ++++++---
- scripts/Makefile.asm-generic       | 3 +++
- scripts/Makefile.headersinst       | 7 -------
- 3 files changed, 9 insertions(+), 10 deletions(-)
+Thanks,
+Michal
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 8da26c6..bf28c47 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -1296,9 +1296,12 @@ See subsequent chapter for the syntax of the Kbuild file.
- 
- --- 7.4 mandatory-y
- 
--	mandatory-y is essentially used by include/uapi/asm-generic/Kbuild.asm
--	to define the minimum set of headers that must be exported in
--	include/asm.
-+	mandatory-y is essentially used by include/(uapi/)asm-generic/Kbuild.asm
-+	to define the minimum set of ASM headers that all architectures must have.
-+
-+	This works like optional generic-y. If a mandatory header is missing
-+	in arch/$(ARCH)/include/(uapi/)/asm, Kbuild will automatically generate
-+	a wrapper of the asm-generic one.
- 
- 	The convention is to list one subdir per line and
- 	preferably in alphabetic order.
-diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
-index 760323e..c7cd23d 100644
---- a/scripts/Makefile.asm-generic
-+++ b/scripts/Makefile.asm-generic
-@@ -14,6 +14,9 @@ src := $(subst /generated,,$(obj))
- 
- include scripts/Kbuild.include
- 
-+# If arch does not implement mandatory headers, fallback to asm-generic ones.
-+generic-y   += $(foreach f, $(mandatory-y), $(if $(wildcard $(srctree)/$(src)/$(f)),,$(f)))
-+
- generic-y   := $(addprefix $(obj)/, $(generic-y))
- generated-y := $(addprefix $(obj)/, $(generated-y))
- 
-diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-index d5e1314..0d4a96d 100644
---- a/scripts/Makefile.headersinst
-+++ b/scripts/Makefile.headersinst
-@@ -57,13 +57,6 @@ check-file    := $(installdir)/.check
- all-files     := $(header-files) $(genhdr-files)
- output-files  := $(addprefix $(installdir)/, $(all-files))
- 
--ifneq ($(mandatory-y),)
--missing       := $(filter-out $(all-files),$(mandatory-y))
--ifneq ($(missing),)
--$(error Some mandatory headers ($(missing)) are missing in $(obj))
--endif
--endif
--
- # Work out what needs to be removed
- oldheaders    := $(patsubst $(installdir)/%,%,$(wildcard $(installdir)/*.h))
- unwanted      := $(filter-out $(all-files),$(oldheaders))
--- 
-2.7.4
+--=20
+Michal Simek, Ing. (M.Eng), OpenPGP -> KeyID: FE3D1F91
+w: www.monstr.eu p: +42-0-721842854
+Maintainer of Linux kernel - Xilinx Microblaze
+Maintainer of Linux kernel - Xilinx Zynq ARM and ZynqMP ARM64 SoCs
+U-Boot custodian - Xilinx Microblaze/Zynq/ZynqMP/Versal SoCs
+
+
+
+--0TWQ9qg9x5W2c9yQU2nS8dvfBdZ2NwlMm--
+
+--RvVwhLGJR5KStavD1M5BS65DxOMkrsxrD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iEYEARECAAYFAlwH8X4ACgkQykllyylKDCE/EgCfdwk8ZvSbDnR0bg+6p7+pCprL
++4QAn2Fg2Mk9GMy8BR1PhSuGNeMUQBag
+=PyP9
+-----END PGP SIGNATURE-----
+
+--RvVwhLGJR5KStavD1M5BS65DxOMkrsxrD--
