@@ -1,44 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:60898 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727128AbeLEHh7 (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:26153 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726820AbeLEHil (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Dec 2018 02:37:59 -0500
+        Wed, 5 Dec 2018 02:38:41 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: remove a special handling for *.agh in Makefile.headersinst
-Date: Wed,  5 Dec 2018 16:37:53 +0900
-Message-Id: <1543995473-25080-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: exploit parallel building for CONFIG_HEADERS_CHECK
+Date: Wed,  5 Dec 2018 16:38:35 +0900
+Message-Id: <1543995515-25178-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-scripts/Makefile.headersinst takes care of *.agh just for
+When CONFIG_HEADERS_CHECK is enabled, the headers_check is executed
+as a serialized task in the vmlinux recipe.
 
-  arch/cris/include/uapi/arch-v10/arch/sv_addr.agh
-
-because renaming exported headers is difficult (or impossible).
-
-This code is no longer necessary thanks to commit c690eddc2f3b ("CRIS:
-Drop support for the CRIS port").
+Make it independent of vmlinux so that parallel building can process
+the headers_check and other build targets simultaneously.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/Makefile.headersinst | 1 -
- 1 file changed, 1 deletion(-)
+ Makefile | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-index 0d4a96d..3d1ebaa 100644
---- a/scripts/Makefile.headersinst
-+++ b/scripts/Makefile.headersinst
-@@ -44,7 +44,6 @@ kbuild-file := $(srctree)/$(obj)/Kbuild
- installdir    := $(INSTALL_HDR_PATH)/$(dst)
- gendir        := $(objtree)/$(subst include/,include/generated/,$(obj))
- header-files  := $(notdir $(wildcard $(srcdir)/*.h))
--header-files  += $(notdir $(wildcard $(srcdir)/*.agh))
- header-files  := $(filter-out $(no-export-headers), $(header-files))
- genhdr-files  := $(notdir $(wildcard $(gendir)/*.h))
- genhdr-files  := $(filter-out $(header-files), $(genhdr-files))
+diff --git a/Makefile b/Makefile
+index 3af0379..2808a7d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1035,9 +1035,6 @@ cmd_link-vmlinux =                                                 \
+ 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+ 
+ vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
+-ifdef CONFIG_HEADERS_CHECK
+-	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
+-endif
+ ifdef CONFIG_GDB_SCRIPTS
+ 	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
+ endif
+@@ -1208,6 +1205,10 @@ headers_check: headers_install
+ 	$(Q)$(MAKE) $(hdr-inst)=include/uapi dst=include HDRCHECK=1
+ 	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi $(hdr-dst) HDRCHECK=1
+ 
++ifdef CONFIG_HEADERS_CHECK
++all: headers_check
++endif
++
+ # ---------------------------------------------------------------------------
+ # Kernel selftest
+ 
 -- 
 2.7.4
