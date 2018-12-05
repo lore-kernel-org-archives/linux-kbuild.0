@@ -1,95 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46289 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727955AbeLEP5P (ORCPT
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34336 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727927AbeLEP77 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Dec 2018 10:57:15 -0500
-Received: by mail-wr1-f68.google.com with SMTP id l9so20217015wrt.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 05 Dec 2018 07:57:13 -0800 (PST)
+        Wed, 5 Dec 2018 10:59:59 -0500
+Received: by mail-wm1-f65.google.com with SMTP id y185so12096416wmd.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 05 Dec 2018 07:59:58 -0800 (PST)
 Reply-To: monstr@monstr.eu
-Subject: Re: [PATCH 4/7] microblaze: fix multiple bugs in
- arch/microblaze/boot/Makefile
+Subject: Re: [PATCH 5/7] microblaze: add linux.bin* and simpleImage.* to PHONY
 References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
- <1543823457-32478-5-git-send-email-yamada.masahiro@socionext.com>
+ <1543823457-32478-6-git-send-email-yamada.masahiro@socionext.com>
 From: Michal Simek <monstr@monstr.eu>
-Message-ID: <16f2f621-d051-a2e3-c2f3-e69c82140c46@monstr.eu>
-Date: Wed, 5 Dec 2018 16:57:08 +0100
+Message-ID: <c3717811-87a4-ab24-6640-056bc3c8a77a@monstr.eu>
+Date: Wed, 5 Dec 2018 16:59:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <1543823457-32478-5-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1543823457-32478-6-git-send-email-yamada.masahiro@socionext.com>
 Content-Type: multipart/signed; micalg=pgp-sha1;
  protocol="application/pgp-signature";
- boundary="BnUkCeNLXoVlnWtd6lIn4oDFv7lu0YjFw"
+ boundary="uyCVXhwLCEOvIEONP6Ia7tsWex3mhiKOc"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BnUkCeNLXoVlnWtd6lIn4oDFv7lu0YjFw
-Content-Type: multipart/mixed; boundary="PCP2oxlQHJk1kGZWltWivnfGenSpx3ymf";
+--uyCVXhwLCEOvIEONP6Ia7tsWex3mhiKOc
+Content-Type: multipart/mixed; boundary="leWRSohRb4VxEz7A6urp6hzKox5qpLkPr";
  protected-headers="v1"
 From: Michal Simek <monstr@monstr.eu>
 Reply-To: monstr@monstr.eu
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <16f2f621-d051-a2e3-c2f3-e69c82140c46@monstr.eu>
-Subject: Re: [PATCH 4/7] microblaze: fix multiple bugs in
- arch/microblaze/boot/Makefile
+Message-ID: <c3717811-87a4-ab24-6640-056bc3c8a77a@monstr.eu>
+Subject: Re: [PATCH 5/7] microblaze: add linux.bin* and simpleImage.* to PHONY
 References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
- <1543823457-32478-5-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1543823457-32478-5-git-send-email-yamada.masahiro@socionext.com>
+ <1543823457-32478-6-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1543823457-32478-6-git-send-email-yamada.masahiro@socionext.com>
 
---PCP2oxlQHJk1kGZWltWivnfGenSpx3ymf
+--leWRSohRb4VxEz7A6urp6hzKox5qpLkPr
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 03. 12. 18 8:50, Masahiro Yamada wrote:
-> This Makefile is wrong in multiple ways.
+> linux.bin, linux.bin.gz, and linux.bin.ub are phony targets to
+> generate a corresponding image under arch/microblaze/boot/.
 >=20
-> The first issue is the breakage of 'linux.bin.ub' target since commit
-> ece97f3a5fb5 ("microblaze: Fix simpleImage format generation")
-> because the addition of UIMAGE_{IN,OUT} obviously affected it.
+> simpleImage.% also works like a PHONY target, but a pattern that
+> contains '%' cannot be a PHONY target. I renamed it to equivalent
+> simpleImage.$(DTB).
 >=20
-> make ARCH=3Dmicroblaze CROSS_COMPILE=3Dmicroblaze-linux- linux.bin.ub
->   [ snip ]
->   OBJCOPY arch/microblaze/boot/linux.bin
->   UIMAGE  arch/microblaze/boot/linux.bin.ub.ub
-> /usr/bin/mkimage: Can't open arch/microblaze/boot/linux.bin.ub: No such=
- file or directory
-> make[1]: *** [arch/microblaze/boot/Makefile;14: arch/microblaze/boot/li=
-nux.bin.ub] Error 1
-> make: *** [arch/microblaze/Makefile;83: linux.bin.ub] Error 2
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 >=20
-> The second issue is the use of the "if_changed" multiple times for
-> the same target.
+>  arch/microblaze/Makefile | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >=20
-> As commit 92a4728608a8 ("x86/boot: Fix if_changed build flip/flop bug")=
-
-> pointed out, this never works properly. Moreover, generating multiple
-> images as a side-effect is extremely confusing and wrong.
+> diff --git a/arch/microblaze/Makefile b/arch/microblaze/Makefile
+> index c5d5b0e..7a5df02 100644
+> --- a/arch/microblaze/Makefile
+> +++ b/arch/microblaze/Makefile
+> @@ -79,11 +79,13 @@ all: linux.bin
+>  archclean:
+>  	$(Q)$(MAKE) $(clean)=3D$(boot)
+> =20
+> +PHONY +=3D linux.bin linux.bin.gz linux.bin.ub
+>  linux.bin linux.bin.gz linux.bin.ub: vmlinux
+>  	$(Q)$(MAKE) $(build)=3D$(boot) $(boot)/$@
+>  	@echo 'Kernel: $(boot)/$@ is ready' ' (#'`cat .version`')'
+> =20
+> -simpleImage.%: vmlinux
+> +PHONY +=3D simpleImage.$(DTB)
+> +simpleImage.$(DTB): vmlinux
+>  	$(Q)$(MAKE) $(build)=3D$(boot) simple_images
+>  	@echo 'Kernel: $(boot)/$@ is ready' ' (#'`cat .version`')'
+> =20
 >=20
-> As far as I understood, "simpleImage.<dt>" works like a phony target
-> to generate the following four images.
->=20
->  - arch/microblaze/boot/simpleImage.<dt>:
->        identical to arch/microblaze/boot/linux.bin
->=20
->  - arch/microblaze/boot/simpleImage.<dt>.unstrip:
->        identical to vmlinux
->=20
->  - arch/microblaze/boot/simpleImage.<dt>.ub:
->        identical to arch/microblaze/boot/linux.bin.ub
->=20
->  - arch/microblaze/boot/simpleImage.<dt>.strip:
->        stripped vmlinux
-
-Your understanding is correct. It always worked like that
-simpleImage.<dt> was generating 4 files.
-I have wired that long time ago because I wanted to boot image in U-Boot
-that's why .ub was also generated.
-Definitely simpleImage.<dt>.ub can be another target and not
-automatically generated by simpleImage.<dt>
 
 Acked-by: Michal Simek <michal.simek@xilinx.com>
 
@@ -106,9 +92,9 @@ U-Boot custodian - Xilinx Microblaze/Zynq/ZynqMP/Versal SoCs
 
 
 
---PCP2oxlQHJk1kGZWltWivnfGenSpx3ymf--
+--leWRSohRb4VxEz7A6urp6hzKox5qpLkPr--
 
---BnUkCeNLXoVlnWtd6lIn4oDFv7lu0YjFw
+--uyCVXhwLCEOvIEONP6Ia7tsWex3mhiKOc
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -116,9 +102,9 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2.0.22 (GNU/Linux)
 
-iEYEARECAAYFAlwH9VQACgkQykllyylKDCGLuwCgmViAYSvhdEOBuYUZqq0/eRcY
-RSgAnA8W8k7xFoUbE5vFy6JD1ipy3BbV
-=qR2K
+iEYEARECAAYFAlwH9fgACgkQykllyylKDCFX4QCgj+2iYBi8MuKZ/y/c6hoa8ImI
+eSIAn2BJ/U1Px8ydCqoYpHTgLcDhTHgY
+=nXPn
 -----END PGP SIGNATURE-----
 
---BnUkCeNLXoVlnWtd6lIn4oDFv7lu0YjFw--
+--uyCVXhwLCEOvIEONP6Ia7tsWex3mhiKOc--
