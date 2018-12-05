@@ -1,54 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:26153 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726820AbeLEHil (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:57972 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726937AbeLEL3L (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Dec 2018 02:38:41 -0500
+        Wed, 5 Dec 2018 06:29:11 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: exploit parallel building for CONFIG_HEADERS_CHECK
-Date: Wed,  5 Dec 2018 16:38:35 +0900
-Message-Id: <1543995515-25178-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 1/3] kbuild: refactor Makefile.asm-generic
+Date: Wed,  5 Dec 2018 20:28:04 +0900
+Message-Id: <1544009286-15705-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-When CONFIG_HEADERS_CHECK is enabled, the headers_check is executed
-as a serialized task in the vmlinux recipe.
+ - Use conventional $(MAKE) $(asm-generic)=<dir> style
+   for directory descending
 
-Make it independent of vmlinux so that parallel building can process
-the headers_check and other build targets simultaneously.
+ - Remove unneeded FORCE since "all" is a phony target
+
+ - Remove unneeded "_dummy :=" assignment
+
+ - Skip $(shell mkdir ...) when headers exist in the directory
+
+ - Misc cleanups
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ Makefile                     |  8 ++++----
+ scripts/Makefile.asm-generic | 37 +++++++++++++++++++------------------
+ 2 files changed, 23 insertions(+), 22 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 3af0379..2808a7d 100644
+index ab38eb2..3af0379 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1035,9 +1035,6 @@ cmd_link-vmlinux =                                                 \
- 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+@@ -1122,13 +1122,13 @@ prepare0: archprepare
+ prepare: prepare0 prepare-objtool
  
- vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
--ifdef CONFIG_HEADERS_CHECK
--	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
--endif
- ifdef CONFIG_GDB_SCRIPTS
- 	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
- endif
-@@ -1208,6 +1205,10 @@ headers_check: headers_install
- 	$(Q)$(MAKE) $(hdr-inst)=include/uapi dst=include HDRCHECK=1
- 	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi $(hdr-dst) HDRCHECK=1
+ # Support for using generic headers in asm-generic
++asm-generic := -f $(srctree)/scripts/Makefile.asm-generic obj
++
+ PHONY += asm-generic uapi-asm-generic
+ asm-generic: uapi-asm-generic
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
+-	            src=asm obj=arch/$(SRCARCH)/include/generated/asm
++	$(Q)$(MAKE) $(asm-generic)=arch/$(SRCARCH)/include/generated/asm
+ uapi-asm-generic:
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
+-	            src=uapi/asm obj=arch/$(SRCARCH)/include/generated/uapi/asm
++	$(Q)$(MAKE) $(asm-generic)=arch/$(SRCARCH)/include/generated/uapi/asm
  
-+ifdef CONFIG_HEADERS_CHECK
-+all: headers_check
+ PHONY += prepare-objtool
+ prepare-objtool: $(objtool_target)
+diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
+index 32ad8e9..760323e 100644
+--- a/scripts/Makefile.asm-generic
++++ b/scripts/Makefile.asm-generic
+@@ -2,41 +2,42 @@
+ # include/asm-generic contains a lot of files that are used
+ # verbatim by several architectures.
+ #
+-# This Makefile reads the file arch/$(SRCARCH)/include/$(src)/Kbuild
++# This Makefile reads the file arch/$(SRCARCH)/include/(uapi/)/asm/Kbuild
+ # and for each file listed in this file with generic-y creates
+-# a small wrapper file in $(obj) (arch/$(SRCARCH)/include/generated/$(src))
++# a small wrapper file in arch/$(SRCARCH)/include/generated/(uapi/)/asm.
+ 
+ PHONY := all
+ all:
+ 
+-kbuild-file := $(srctree)/arch/$(SRCARCH)/include/$(src)/Kbuild
+--include $(kbuild-file)
++src := $(subst /generated,,$(obj))
++-include $(src)/Kbuild
+ 
+ include scripts/Kbuild.include
+ 
+-# Create output directory if not already present
+-_dummy := $(shell [ -d $(obj) ] || mkdir -p $(obj))
++generic-y   := $(addprefix $(obj)/, $(generic-y))
++generated-y := $(addprefix $(obj)/, $(generated-y))
+ 
+-# Stale wrappers when the corresponding files are removed from generic-y
+-# need removing.
+-generated-y   := $(generic-y) $(generated-y)
+-all-files     := $(patsubst %, $(obj)/%, $(generated-y))
+-old-headers   := $(wildcard $(obj)/*.h)
+-unwanted      := $(filter-out $(all-files),$(old-headers))
++# Remove stale wrappers when the corresponding files are removed from generic-y
++old-headers := $(wildcard $(obj)/*.h)
++unwanted    := $(filter-out $(generic-y) $(generated-y),$(old-headers))
+ 
+ quiet_cmd_wrap = WRAP    $@
+-cmd_wrap = echo "\#include <asm-generic/$*.h>" >$@
++      cmd_wrap = echo "\#include <asm-generic/$*.h>" > $@
+ 
+ quiet_cmd_remove = REMOVE  $(unwanted)
+-cmd_remove = rm -f $(unwanted)
++      cmd_remove = rm -f $(unwanted)
+ 
+-all: $(patsubst %, $(obj)/%, $(generic-y)) FORCE
+-	$(if $(unwanted),$(call cmd,remove),)
++all: $(generic-y)
++	$(if $(unwanted),$(call cmd,remove))
+ 	@:
+ 
+ $(obj)/%.h:
+ 	$(call cmd,wrap)
+ 
+-PHONY += FORCE
++# Create output directory. Skip it if at least one old header exists
++# since we know the output directory already exists.
++ifeq ($(old-headers),)
++$(shell mkdir -p $(obj))
 +endif
 +
- # ---------------------------------------------------------------------------
- # Kernel selftest
- 
+ .PHONY: $(PHONY)
+-FORCE: ;
 -- 
 2.7.4
