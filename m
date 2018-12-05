@@ -1,112 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:34996 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727103AbeLEPsG (ORCPT
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46289 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727955AbeLEP5P (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Dec 2018 10:48:06 -0500
-Received: by mail-wm1-f68.google.com with SMTP id c126so13365616wmh.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 05 Dec 2018 07:48:05 -0800 (PST)
+        Wed, 5 Dec 2018 10:57:15 -0500
+Received: by mail-wr1-f68.google.com with SMTP id l9so20217015wrt.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 05 Dec 2018 07:57:13 -0800 (PST)
 Reply-To: monstr@monstr.eu
-Subject: Re: [PATCH 3/7] microblaze: move "... is ready" message to
- arch/microblaze/Makefile
+Subject: Re: [PATCH 4/7] microblaze: fix multiple bugs in
+ arch/microblaze/boot/Makefile
 References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
- <1543823457-32478-4-git-send-email-yamada.masahiro@socionext.com>
+ <1543823457-32478-5-git-send-email-yamada.masahiro@socionext.com>
 From: Michal Simek <monstr@monstr.eu>
-Message-ID: <35d05327-e500-2f1a-a8d2-e1683ce190f2@monstr.eu>
-Date: Wed, 5 Dec 2018 16:47:58 +0100
+Message-ID: <16f2f621-d051-a2e3-c2f3-e69c82140c46@monstr.eu>
+Date: Wed, 5 Dec 2018 16:57:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <1543823457-32478-4-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1543823457-32478-5-git-send-email-yamada.masahiro@socionext.com>
 Content-Type: multipart/signed; micalg=pgp-sha1;
  protocol="application/pgp-signature";
- boundary="2sChAx3aDyzugjkRfWmrGilKbT141aqHz"
+ boundary="BnUkCeNLXoVlnWtd6lIn4oDFv7lu0YjFw"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2sChAx3aDyzugjkRfWmrGilKbT141aqHz
-Content-Type: multipart/mixed; boundary="EHR9gT7UoLF2R3wCKPwwnCcrdsaEnMyWo";
+--BnUkCeNLXoVlnWtd6lIn4oDFv7lu0YjFw
+Content-Type: multipart/mixed; boundary="PCP2oxlQHJk1kGZWltWivnfGenSpx3ymf";
  protected-headers="v1"
 From: Michal Simek <monstr@monstr.eu>
 Reply-To: monstr@monstr.eu
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <35d05327-e500-2f1a-a8d2-e1683ce190f2@monstr.eu>
-Subject: Re: [PATCH 3/7] microblaze: move "... is ready" message to
- arch/microblaze/Makefile
+Message-ID: <16f2f621-d051-a2e3-c2f3-e69c82140c46@monstr.eu>
+Subject: Re: [PATCH 4/7] microblaze: fix multiple bugs in
+ arch/microblaze/boot/Makefile
 References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
- <1543823457-32478-4-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1543823457-32478-4-git-send-email-yamada.masahiro@socionext.com>
+ <1543823457-32478-5-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1543823457-32478-5-git-send-email-yamada.masahiro@socionext.com>
 
---EHR9gT7UoLF2R3wCKPwwnCcrdsaEnMyWo
+--PCP2oxlQHJk1kGZWltWivnfGenSpx3ymf
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 03. 12. 18 8:50, Masahiro Yamada wrote:
-> To prepare for more fixes, move this to arch/microblaze/Makefile.
-> Otherwise, the same "... is ready" would be printed multiple times.
+> This Makefile is wrong in multiple ways.
 >=20
-> (Another solution would be, to remove these messages entirely unless
-> people persist with them.)
+> The first issue is the breakage of 'linux.bin.ub' target since commit
+> ece97f3a5fb5 ("microblaze: Fix simpleImage format generation")
+> because the addition of UIMAGE_{IN,OUT} obviously affected it.
 >=20
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+> make ARCH=3Dmicroblaze CROSS_COMPILE=3Dmicroblaze-linux- linux.bin.ub
+>   [ snip ]
+>   OBJCOPY arch/microblaze/boot/linux.bin
+>   UIMAGE  arch/microblaze/boot/linux.bin.ub.ub
+> /usr/bin/mkimage: Can't open arch/microblaze/boot/linux.bin.ub: No such=
+ file or directory
+> make[1]: *** [arch/microblaze/boot/Makefile;14: arch/microblaze/boot/li=
+nux.bin.ub] Error 1
+> make: *** [arch/microblaze/Makefile;83: linux.bin.ub] Error 2
 >=20
->  arch/microblaze/Makefile      | 2 ++
->  arch/microblaze/boot/Makefile | 4 ----
->  2 files changed, 2 insertions(+), 4 deletions(-)
+> The second issue is the use of the "if_changed" multiple times for
+> the same target.
 >=20
-> diff --git a/arch/microblaze/Makefile b/arch/microblaze/Makefile
-> index 97e1384..cfd7bfca 100644
-> --- a/arch/microblaze/Makefile
-> +++ b/arch/microblaze/Makefile
-> @@ -81,9 +81,11 @@ archclean:
-> =20
->  linux.bin linux.bin.gz linux.bin.ub: vmlinux
->  	$(Q)$(MAKE) $(build)=3D$(boot) $(boot)/$@
-> +	@echo 'Kernel: $(boot)/$@ is ready' ' (#'`cat .version`')'
-> =20
->  simpleImage.%: vmlinux
->  	$(Q)$(MAKE) $(build)=3D$(boot) $(boot)/$@
-> +	@echo 'Kernel: $(boot)/$@ is ready' ' (#'`cat .version`')'
-> =20
->  define archhelp
->    echo '* linux.bin    - Create raw binary'
-> diff --git a/arch/microblaze/boot/Makefile b/arch/microblaze/boot/Makef=
-ile
-> index e8684a2..c2579a7 100644
-> --- a/arch/microblaze/boot/Makefile
-> +++ b/arch/microblaze/boot/Makefile
-> @@ -9,15 +9,12 @@ OBJCOPYFLAGS :=3D -R .note -R .comment -R .note.gnu.b=
-uild-id -O binary
-> =20
->  $(obj)/linux.bin: vmlinux FORCE
->  	$(call if_changed,objcopy)
-> -	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
-> =20
->  $(obj)/linux.bin.ub: $(obj)/linux.bin FORCE
->  	$(call if_changed,uimage)
-> -	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
-> =20
->  $(obj)/linux.bin.gz: $(obj)/linux.bin FORCE
->  	$(call if_changed,gzip)
-> -	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
-> =20
->  quiet_cmd_cp =3D CP      $< $@$2
->  	cmd_cp =3D cat $< >$@$2 || (rm -f $@ && echo false)
-> @@ -35,6 +32,5 @@ $(obj)/simpleImage.%: vmlinux FORCE
->  	$(call if_changed,objcopy)
->  	$(call if_changed,uimage)
->  	$(call if_changed,strip,.strip)
-> -	@echo 'Kernel: $(UIMAGE_OUT) is ready' ' (#'`cat .version`')'
-> =20
->  clean-files +=3D simpleImage.*
->=20
+> As commit 92a4728608a8 ("x86/boot: Fix if_changed build flip/flop bug")=
 
-TBH I can't see this problematic but if this is aligned with others I
-have no problem with it.
+> pointed out, this never works properly. Moreover, generating multiple
+> images as a side-effect is extremely confusing and wrong.
+>=20
+> As far as I understood, "simpleImage.<dt>" works like a phony target
+> to generate the following four images.
+>=20
+>  - arch/microblaze/boot/simpleImage.<dt>:
+>        identical to arch/microblaze/boot/linux.bin
+>=20
+>  - arch/microblaze/boot/simpleImage.<dt>.unstrip:
+>        identical to vmlinux
+>=20
+>  - arch/microblaze/boot/simpleImage.<dt>.ub:
+>        identical to arch/microblaze/boot/linux.bin.ub
+>=20
+>  - arch/microblaze/boot/simpleImage.<dt>.strip:
+>        stripped vmlinux
+
+Your understanding is correct. It always worked like that
+simpleImage.<dt> was generating 4 files.
+I have wired that long time ago because I wanted to boot image in U-Boot
+that's why .ub was also generated.
+Definitely simpleImage.<dt>.ub can be another target and not
+automatically generated by simpleImage.<dt>
+
+Acked-by: Michal Simek <michal.simek@xilinx.com>
 
 Thanks,
 Michal
@@ -121,9 +106,9 @@ U-Boot custodian - Xilinx Microblaze/Zynq/ZynqMP/Versal SoCs
 
 
 
---EHR9gT7UoLF2R3wCKPwwnCcrdsaEnMyWo--
+--PCP2oxlQHJk1kGZWltWivnfGenSpx3ymf--
 
---2sChAx3aDyzugjkRfWmrGilKbT141aqHz
+--BnUkCeNLXoVlnWtd6lIn4oDFv7lu0YjFw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -131,9 +116,9 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2.0.22 (GNU/Linux)
 
-iEYEARECAAYFAlwH8y4ACgkQykllyylKDCGsSgCfYlS4C4PPijmst3FQjB/x3eur
-GAYAn2uEk4cEZwFHCJsXqHC+tUSqMiP5
-=ayiA
+iEYEARECAAYFAlwH9VQACgkQykllyylKDCGLuwCgmViAYSvhdEOBuYUZqq0/eRcY
+RSgAnA8W8k7xFoUbE5vFy6JD1ipy3BbV
+=qR2K
 -----END PGP SIGNATURE-----
 
---2sChAx3aDyzugjkRfWmrGilKbT141aqHz--
+--BnUkCeNLXoVlnWtd6lIn4oDFv7lu0YjFw--
