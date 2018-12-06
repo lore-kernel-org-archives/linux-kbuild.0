@@ -1,124 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:27082 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728294AbeLFF2f (ORCPT
+Received: from mail-it1-f194.google.com ([209.85.166.194]:36687 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728764AbeLFKTR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Dec 2018 00:28:35 -0500
+        Thu, 6 Dec 2018 05:19:17 -0500
+Received: by mail-it1-f194.google.com with SMTP id c9so554821itj.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 06 Dec 2018 02:19:16 -0800 (PST)
 MIME-Version: 1.0
-References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
- <1543823457-32478-3-git-send-email-yamada.masahiro@socionext.com> <80bf0f6e-8f1f-314e-b22d-6e786cf15e45@monstr.eu>
-In-Reply-To: <80bf0f6e-8f1f-314e-b22d-6e786cf15e45@monstr.eu>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 6 Dec 2018 14:27:50 +0900
-Message-ID: <CAK7LNAQBFfaJbFXf5h9LX689RUwA4kSeqPrimVOWDWq0XAVJ_Q@mail.gmail.com>
-Subject: Re: [PATCH 2/7] microblaze: adjust the help to the real behavior
+References: <cover.1543337629.git.andreyknvl@google.com> <20728567aae93b5eb88a6636c94c1af73db7cdbc.1543337629.git.andreyknvl@google.com>
+ <CAMo8BfK5aEGae--xvboLxMXTe1orA7kmLR_uFNCqC6M-a=Om5Q@mail.gmail.com>
+In-Reply-To: <CAMo8BfK5aEGae--xvboLxMXTe1orA7kmLR_uFNCqC6M-a=Om5Q@mail.gmail.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Thu, 6 Dec 2018 11:19:04 +0100
+Message-ID: <CAAeHK+zprEaJMexWRZj1QbuygL0dOC5LqJRok8cairfLw=VVvw@mail.gmail.com>
+Subject: Re: [PATCH v12 05/25] kasan: add CONFIG_KASAN_GENERIC and CONFIG_KASAN_SW_TAGS
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Simek <monstr@monstr.eu>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-Hi Michal,
-
-On Thu, Dec 6, 2018 at 12:41 AM Michal Simek <monstr@monstr.eu> wrote:
+On Tue, Dec 4, 2018 at 11:24 PM Max Filippov <jcmvbkbc@gmail.com> wrote:
 >
-> On 03. 12. 18 8:50, Masahiro Yamada wrote:
-> > "make ARCH=microblaze help" mentions simpleImage.<dt>.unstrip,
-> > but it never works because Makefile assumes "system.unstrip" is
-> > the name of DT.
-> >
-> > $ make ARCH=microblaze CROSS_COMPILE=microblaze-linux- simpleImage.system.unstrip
-> >   [ snip ]
-> > make[1]: *** No rule to make target 'arch/microblaze/boot/dts/system.unstrip.dtb', needed by 'arch/microblaze/boot/dts/system.dtb'.  Stop.
-> > make: *** [Makefile;1060: arch/microblaze/boot/dts] Error 2
-> > make: *** Waiting for unfinished jobs....
-> >
-> > Rip off the never-working target.
-> >
-> > In my understanding, simpleImage.<dt> works like a phony target that
-> > generates multiple images. Reflect the behavior to the help message.
-> >
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > ---
-> >
-> >  arch/microblaze/Makefile | 4 +---
-> >  1 file changed, 1 insertion(+), 3 deletions(-)
-> >
-> > diff --git a/arch/microblaze/Makefile b/arch/microblaze/Makefile
-> > index 0823d29..97e1384 100644
-> > --- a/arch/microblaze/Makefile
-> > +++ b/arch/microblaze/Makefile
-> > @@ -89,9 +89,7 @@ define archhelp
-> >    echo '* linux.bin    - Create raw binary'
-> >    echo '  linux.bin.gz - Create compressed raw binary'
-> >    echo '  linux.bin.ub - Create U-Boot wrapped raw binary'
-> > -  echo '  simpleImage.<dt> - ELF image with $(arch)/boot/dts/<dt>.dts linked in'
-> > -  echo '                   - stripped elf with fdt blob'
-> > -  echo '  simpleImage.<dt>.unstrip - full ELF image with fdt blob'
-> > +  echo '  simpleImage.<dt> - Create images with $(arch)/boot/dts/<dt>.dts linked in'
-> >    echo '  *_defconfig      - Select default config from arch/microblaze/configs'
-> >    echo ''
-> >    echo '  Targets with <dt> embed a device tree blob inside the image'
-> >
+> Hello,
 >
-> I understand what you are trying to say but I would still like to keep
-> information about unstrip file.
-> It is correct that it is not build target. It is just generated file and
-> message above was used for description what it is.
-> Definitely agree that this should be the part of targets but it should
-> be in description.
-> The same is for missing description for simpleImage.<dt>.strip and
-> simpleImage.<dt>.ub files.
+> On Tue, Nov 27, 2018 at 9:00 AM Andrey Konovalov <andreyknvl@google.com> wrote:
+> >
+> > This commit splits the current CONFIG_KASAN config option into two:
+> > 1. CONFIG_KASAN_GENERIC, that enables the generic KASAN mode (the one
+> >    that exists now);
+> > 2. CONFIG_KASAN_SW_TAGS, that enables the software tag-based KASAN mode.
 >
-> Thanks,
-> Michal
+> [...]
 >
+> > --- a/lib/Kconfig.kasan
+> > +++ b/lib/Kconfig.kasan
+> > @@ -1,35 +1,95 @@
+> > +# This config refers to the generic KASAN mode.
+> >  config HAVE_ARCH_KASAN
+> >         bool
+> >
+> > +config HAVE_ARCH_KASAN_SW_TAGS
+> > +       bool
+> > +
+> > +config CC_HAS_KASAN_GENERIC
+> > +       def_bool $(cc-option, -fsanitize=kernel-address)
+> > +
+> > +config CC_HAS_KASAN_SW_TAGS
+> > +       def_bool $(cc-option, -fsanitize=kernel-hwaddress)
+> > +
+> >  if HAVE_ARCH_KASAN
+> >
+> >  config KASAN
+> > -       bool "KASan: runtime memory debugger"
+> > +       bool "KASAN: runtime memory debugger"
+> > +       help
+> > +         Enables KASAN (KernelAddressSANitizer) - runtime memory debugger,
+> > +         designed to find out-of-bounds accesses and use-after-free bugs.
+> > +         See Documentation/dev-tools/kasan.rst for details.
+>
+> Perhaps KASAN should depend on
+> CC_HAS_KASAN_GENERIC || CC_HAS_KASAN_SW_TAGS,
+> otherwise make all*config may enable KASAN
+> for a compiler that does not have any -fsanitize=kernel-*address
+> support, resulting in build failures like this:
+>   http://kisskb.ellerman.id.au/kisskb/buildresult/13606170/log/
 
-If we want to be precise to the current behavior,
-we could describe more.
-(Is it too much?)
+Will fix in v13, thanks!
 
-
-Architecture specific targets (microblaze):
-* linux.bin    - Create raw binary
-  linux.bin.gz - Create compressed raw binary
-  linux.bin.ub - Create U-Boot wrapped raw binary
-  simpleImage.<dt> - Create the following images with
-arch/macroblaze/boot/dts/<dt>.dts linked in
-                     simpleImage.<dt>        : raw image
-                     simpleImage.<dt>.ub     : raw image with U-Boot header
-                     simpleImage.<dt>.unstrip: ELF (identical to vmlinux)
-                     simpleImage.<dt>.strip  : stripped ELF
-  *_defconfig      - Select default config from arch/microblaze/configs
-
-
-
-
-If you want to modify as you like,
-I will not touch it though.
-
-
-
-
-
-BTW, "make ARCH=microblaze help" looks like follows:
-
-* linux.bin    - Create raw binary
-  linux.bin.gz - Create compressed raw binary
-  linux.bin.ub - Create U-Boot wrapped raw binary
-  simpleImage.<dt> - ELF image with /boot/dts/<dt>.dts linked in
-                   - stripped elf with fdt blob
-  simpleImage.<dt>.unstrip - full ELF image with fdt blob
-  *_defconfig      - Select default config from arch/microblaze/configs
-
-
-
-
-Since "arch" is not set anywhere, $(arch) is empty,
-"ELF image with /boot/dts/<dt>.dts linked in" looks strange.
-
-
-
---
-Best Regards
-Masahiro Yamada
+>
+> --
+> Thanks.
+> -- Max
+>
+> --
+> You received this message because you are subscribed to the Google Groups "kasan-dev" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to kasan-dev+unsubscribe@googlegroups.com.
+> To post to this group, send email to kasan-dev@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/kasan-dev/CAMo8BfK5aEGae--xvboLxMXTe1orA7kmLR_uFNCqC6M-a%3DOm5Q%40mail.gmail.com.
+> For more options, visit https://groups.google.com/d/optout.
