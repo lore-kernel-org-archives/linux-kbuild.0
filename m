@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43410 "EHLO
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46407 "EHLO
         mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729699AbeLFMZM (ORCPT
+        with ESMTP id S1729641AbeLFMZH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Dec 2018 07:25:12 -0500
-Received: by mail-wr1-f66.google.com with SMTP id r10so266808wrs.10
-        for <linux-kbuild@vger.kernel.org>; Thu, 06 Dec 2018 04:25:10 -0800 (PST)
+        Thu, 6 Dec 2018 07:25:07 -0500
+Received: by mail-wr1-f66.google.com with SMTP id l9so244667wrt.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 06 Dec 2018 04:25:05 -0800 (PST)
 From: Andrey Konovalov <andreyknvl@google.com>
-Subject: [PATCH v13 13/25] kasan, arm64: fix up fault handling logic
-Date: Thu,  6 Dec 2018 13:24:31 +0100
-Message-Id: <3f349b0e9e48b5df3298a6b4ae0634332274494a.1544099024.git.andreyknvl@google.com>
+Subject: [PATCH v13 10/25] kasan: add tag related helper functions
+Date: Thu,  6 Dec 2018 13:24:28 +0100
+Message-Id: <f6c6437bb8e143bc44f42c3c259c62e734be7935.1544099024.git.andreyknvl@google.com>
 In-Reply-To: <cover.1544099024.git.andreyknvl@google.com>
 References: <cover.1544099024.git.andreyknvl@google.com>
 MIME-Version: 1.0
@@ -19,132 +19,199 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
 Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>
 
-Right now arm64 fault handling code removes pointer tags from addresses
-covered by TTBR0 in faults taken from both EL0 and EL1, but doesn't do
-that for pointers covered by TTBR1.
+This commit adds a few helper functions, that are meant to be used to
+work with tags embedded in the top byte of kernel pointers: to set, to
+get or to reset the top byte.
 
-This patch adds two helper functions is_ttbr0_addr() and is_ttbr1_addr(),
-where the latter one accounts for the fact that TTBR1 pointers might be
-tagged when tag-based KASAN is in use, and uses these helper functions to
-perform pointer checks in arch/arm64/mm/fault.c.
-
-Suggested-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- arch/arm64/mm/fault.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/kasan.h  |  8 +++++--
+ arch/arm64/include/asm/memory.h | 12 +++++++++++
+ arch/arm64/mm/kasan_init.c      |  2 ++
+ include/linux/kasan.h           | 13 ++++++++++++
+ mm/kasan/kasan.h                | 31 +++++++++++++++++++++++++++
+ mm/kasan/tags.c                 | 37 +++++++++++++++++++++++++++++++++
+ 6 files changed, 101 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index 7d9571f4ae3d..c1d98f0a3086 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -40,6 +40,7 @@
- #include <asm/daifflags.h>
- #include <asm/debug-monitors.h>
- #include <asm/esr.h>
-+#include <asm/kasan.h>
- #include <asm/sysreg.h>
- #include <asm/system_misc.h>
- #include <asm/pgtable.h>
-@@ -132,6 +133,18 @@ static void mem_abort_decode(unsigned int esr)
- 		data_abort_decode(esr);
- }
+diff --git a/arch/arm64/include/asm/kasan.h b/arch/arm64/include/asm/kasan.h
+index 8758bb008436..b52aacd2c526 100644
+--- a/arch/arm64/include/asm/kasan.h
++++ b/arch/arm64/include/asm/kasan.h
+@@ -4,12 +4,16 @@
  
-+static inline bool is_ttbr0_addr(unsigned long addr)
-+{
-+	/* entry assembly clears tags for TTBR0 addrs */
-+	return addr < TASK_SIZE;
-+}
+ #ifndef __ASSEMBLY__
+ 
+-#ifdef CONFIG_KASAN
+-
+ #include <linux/linkage.h>
+ #include <asm/memory.h>
+ #include <asm/pgtable-types.h>
+ 
++#define arch_kasan_set_tag(addr, tag)	__tag_set(addr, tag)
++#define arch_kasan_reset_tag(addr)	__tag_reset(addr)
++#define arch_kasan_get_tag(addr)	__tag_get(addr)
 +
-+static inline bool is_ttbr1_addr(unsigned long addr)
-+{
-+	/* TTBR1 addresses may have a tag if KASAN_SW_TAGS is in use */
-+	return arch_kasan_reset_tag(addr) >= VA_START;
-+}
++#ifdef CONFIG_KASAN
 +
  /*
-  * Dump out the page tables associated with 'addr' in the currently active mm.
-  */
-@@ -141,7 +154,7 @@ void show_pte(unsigned long addr)
- 	pgd_t *pgdp;
- 	pgd_t pgd;
+  * KASAN_SHADOW_START: beginning of the kernel virtual addresses.
+  * KASAN_SHADOW_END: KASAN_SHADOW_START + 1/N of kernel virtual addresses,
+diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+index e2c9857157f2..83c1366a1233 100644
+--- a/arch/arm64/include/asm/memory.h
++++ b/arch/arm64/include/asm/memory.h
+@@ -219,6 +219,18 @@ static inline unsigned long kaslr_offset(void)
+ #define untagged_addr(addr)	\
+ 	((__typeof__(addr))sign_extend64((u64)(addr), 55))
  
--	if (addr < TASK_SIZE) {
-+	if (is_ttbr0_addr(addr)) {
- 		/* TTBR0 */
- 		mm = current->active_mm;
- 		if (mm == &init_mm) {
-@@ -149,7 +162,7 @@ void show_pte(unsigned long addr)
- 				 addr);
- 			return;
- 		}
--	} else if (addr >= VA_START) {
-+	} else if (is_ttbr1_addr(addr)) {
- 		/* TTBR1 */
- 		mm = &init_mm;
- 	} else {
-@@ -254,7 +267,7 @@ static inline bool is_el1_permission_fault(unsigned long addr, unsigned int esr,
- 	if (fsc_type == ESR_ELx_FSC_PERM)
- 		return true;
++#ifdef CONFIG_KASAN_SW_TAGS
++#define __tag_shifted(tag)	((u64)(tag) << 56)
++#define __tag_set(addr, tag)	(__typeof__(addr))( \
++		((u64)(addr) & ~__tag_shifted(0xff)) | __tag_shifted(tag))
++#define __tag_reset(addr)	untagged_addr(addr)
++#define __tag_get(addr)		(__u8)((u64)(addr) >> 56)
++#else
++#define __tag_set(addr, tag)	(addr)
++#define __tag_reset(addr)	(addr)
++#define __tag_get(addr)		0
++#endif
++
+ /*
+  * Physical vs virtual RAM address space conversion.  These are
+  * private definitions which should NOT be used outside memory.h
+diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
+index 7a4a0904cac8..1df536bdabcb 100644
+--- a/arch/arm64/mm/kasan_init.c
++++ b/arch/arm64/mm/kasan_init.c
+@@ -253,6 +253,8 @@ void __init kasan_init(void)
+ 	memset(kasan_early_shadow_page, KASAN_SHADOW_INIT, PAGE_SIZE);
+ 	cpu_replace_ttbr1(lm_alias(swapper_pg_dir));
  
--	if (addr < TASK_SIZE && system_uses_ttbr0_pan())
-+	if (is_ttbr0_addr(addr) && system_uses_ttbr0_pan())
- 		return fsc_type == ESR_ELx_FSC_FAULT &&
- 			(regs->pstate & PSR_PAN_BIT);
++	kasan_init_tags();
++
+ 	/* At this point kasan is fully initialized. Enable error messages */
+ 	init_task.kasan_depth = 0;
+ 	pr_info("KernelAddressSanitizer initialized\n");
+diff --git a/include/linux/kasan.h b/include/linux/kasan.h
+index c56af24bd3e7..a477ce2abdc9 100644
+--- a/include/linux/kasan.h
++++ b/include/linux/kasan.h
+@@ -169,6 +169,19 @@ static inline void kasan_cache_shutdown(struct kmem_cache *cache) {}
  
-@@ -319,7 +332,7 @@ static void set_thread_esr(unsigned long address, unsigned int esr)
- 	 * type", so we ignore this wrinkle and just return the translation
- 	 * fault.)
- 	 */
--	if (current->thread.fault_address >= TASK_SIZE) {
-+	if (!is_ttbr0_addr(current->thread.fault_address)) {
- 		switch (ESR_ELx_EC(esr)) {
- 		case ESR_ELx_EC_DABT_LOW:
- 			/*
-@@ -455,7 +468,7 @@ static int __kprobes do_page_fault(unsigned long addr, unsigned int esr,
- 		mm_flags |= FAULT_FLAG_WRITE;
- 	}
+ #define KASAN_SHADOW_INIT 0xFF
  
--	if (addr < TASK_SIZE && is_el1_permission_fault(addr, esr, regs)) {
-+	if (is_ttbr0_addr(addr) && is_el1_permission_fault(addr, esr, regs)) {
- 		/* regs->orig_addr_limit may be 0 if we entered from EL0 */
- 		if (regs->orig_addr_limit == KERNEL_DS)
- 			die_kernel_fault("access to user memory with fs=KERNEL_DS",
-@@ -603,7 +616,7 @@ static int __kprobes do_translation_fault(unsigned long addr,
- 					  unsigned int esr,
- 					  struct pt_regs *regs)
++void kasan_init_tags(void);
++
++void *kasan_reset_tag(const void *addr);
++
++#else /* CONFIG_KASAN_SW_TAGS */
++
++static inline void kasan_init_tags(void) { }
++
++static inline void *kasan_reset_tag(const void *addr)
++{
++	return (void *)addr;
++}
++
+ #endif /* CONFIG_KASAN_SW_TAGS */
+ 
+ #endif /* LINUX_KASAN_H */
+diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
+index 19b950eaccff..b080b8d92812 100644
+--- a/mm/kasan/kasan.h
++++ b/mm/kasan/kasan.h
+@@ -8,6 +8,10 @@
+ #define KASAN_SHADOW_SCALE_SIZE (1UL << KASAN_SHADOW_SCALE_SHIFT)
+ #define KASAN_SHADOW_MASK       (KASAN_SHADOW_SCALE_SIZE - 1)
+ 
++#define KASAN_TAG_KERNEL	0xFF /* native kernel pointers tag */
++#define KASAN_TAG_INVALID	0xFE /* inaccessible memory tag */
++#define KASAN_TAG_MAX		0xFD /* maximum value for random tags */
++
+ #define KASAN_FREE_PAGE         0xFF  /* page was freed */
+ #define KASAN_PAGE_REDZONE      0xFE  /* redzone for kmalloc_large allocations */
+ #define KASAN_KMALLOC_REDZONE   0xFC  /* redzone inside slub object */
+@@ -126,6 +130,33 @@ static inline void quarantine_reduce(void) { }
+ static inline void quarantine_remove_cache(struct kmem_cache *cache) { }
+ #endif
+ 
++#ifdef CONFIG_KASAN_SW_TAGS
++
++u8 random_tag(void);
++
++#else
++
++static inline u8 random_tag(void)
++{
++	return 0;
++}
++
++#endif
++
++#ifndef arch_kasan_set_tag
++#define arch_kasan_set_tag(addr, tag)	((void *)(addr))
++#endif
++#ifndef arch_kasan_reset_tag
++#define arch_kasan_reset_tag(addr)	((void *)(addr))
++#endif
++#ifndef arch_kasan_get_tag
++#define arch_kasan_get_tag(addr)	0
++#endif
++
++#define set_tag(addr, tag)	((void *)arch_kasan_set_tag((addr), (tag)))
++#define reset_tag(addr)		((void *)arch_kasan_reset_tag(addr))
++#define get_tag(addr)		arch_kasan_get_tag(addr)
++
+ /*
+  * Exported functions for interfaces called from assembly or from generated
+  * code. Declarations here to avoid warning about missing declarations.
+diff --git a/mm/kasan/tags.c b/mm/kasan/tags.c
+index 04194923c543..1c4e7ce2e6fe 100644
+--- a/mm/kasan/tags.c
++++ b/mm/kasan/tags.c
+@@ -38,6 +38,43 @@
+ #include "kasan.h"
+ #include "../slab.h"
+ 
++static DEFINE_PER_CPU(u32, prng_state);
++
++void kasan_init_tags(void)
++{
++	int cpu;
++
++	for_each_possible_cpu(cpu)
++		per_cpu(prng_state, cpu) = get_random_u32();
++}
++
++/*
++ * If a preemption happens between this_cpu_read and this_cpu_write, the only
++ * side effect is that we'll give a few allocated in different contexts objects
++ * the same tag. Since tag-based KASAN is meant to be used a probabilistic
++ * bug-detection debug feature, this doesn't have significant negative impact.
++ *
++ * Ideally the tags use strong randomness to prevent any attempts to predict
++ * them during explicit exploit attempts. But strong randomness is expensive,
++ * and we did an intentional trade-off to use a PRNG. This non-atomic RMW
++ * sequence has in fact positive effect, since interrupts that randomly skew
++ * PRNG at unpredictable points do only good.
++ */
++u8 random_tag(void)
++{
++	u32 state = this_cpu_read(prng_state);
++
++	state = 1664525 * state + 1013904223;
++	this_cpu_write(prng_state, state);
++
++	return (u8)(state % (KASAN_TAG_MAX + 1));
++}
++
++void *kasan_reset_tag(const void *addr)
++{
++	return reset_tag(addr);
++}
++
+ void check_memory_region(unsigned long addr, size_t size, bool write,
+ 				unsigned long ret_ip)
  {
--	if (addr < TASK_SIZE)
-+	if (is_ttbr0_addr(addr))
- 		return do_page_fault(addr, esr, regs);
- 
- 	do_bad_area(addr, esr, regs);
-@@ -758,7 +771,7 @@ asmlinkage void __exception do_el0_ia_bp_hardening(unsigned long addr,
- 	 * re-enabled IRQs. If the address is a kernel address, apply
- 	 * BP hardening prior to enabling IRQs and pre-emption.
- 	 */
--	if (addr > TASK_SIZE)
-+	if (!is_ttbr0_addr(addr))
- 		arm64_apply_bp_hardening();
- 
- 	local_daif_restore(DAIF_PROCCTX);
-@@ -771,7 +784,7 @@ asmlinkage void __exception do_sp_pc_abort(unsigned long addr,
- 					   struct pt_regs *regs)
- {
- 	if (user_mode(regs)) {
--		if (instruction_pointer(regs) > TASK_SIZE)
-+		if (!is_ttbr0_addr(instruction_pointer(regs)))
- 			arm64_apply_bp_hardening();
- 		local_daif_restore(DAIF_PROCCTX);
- 	}
-@@ -825,7 +838,7 @@ asmlinkage int __exception do_debug_exception(unsigned long addr,
- 	if (interrupts_enabled(regs))
- 		trace_hardirqs_off();
- 
--	if (user_mode(regs) && instruction_pointer(regs) > TASK_SIZE)
-+	if (user_mode(regs) && !is_ttbr0_addr(instruction_pointer(regs)))
- 		arm64_apply_bp_hardening();
- 
- 	if (!inf->fn(addr, esr, regs)) {
 -- 
 2.20.0.rc1.387.gf8505762e3-goog
