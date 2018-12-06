@@ -1,164 +1,124 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:17092 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728489AbeLFFJm (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:27082 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728294AbeLFF2f (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Dec 2018 00:09:42 -0500
+        Thu, 6 Dec 2018 00:28:35 -0500
 MIME-Version: 1.0
-References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com> <dd726c23-7c37-2b38-5b9f-a4edc391511d@monstr.eu>
-In-Reply-To: <dd726c23-7c37-2b38-5b9f-a4edc391511d@monstr.eu>
+References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
+ <1543823457-32478-3-git-send-email-yamada.masahiro@socionext.com> <80bf0f6e-8f1f-314e-b22d-6e786cf15e45@monstr.eu>
+In-Reply-To: <80bf0f6e-8f1f-314e-b22d-6e786cf15e45@monstr.eu>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 6 Dec 2018 14:08:48 +0900
-Message-ID: <CAK7LNARtiP2xnB3hK92QJ_GadnViCG7kxXW73RmjzQAxJM4GKQ@mail.gmail.com>
-Subject: Re: [PATCH 0/7] microblaze: fix various problems in building boot images
+Date: Thu, 6 Dec 2018 14:27:50 +0900
+Message-ID: <CAK7LNAQBFfaJbFXf5h9LX689RUwA4kSeqPrimVOWDWq0XAVJ_Q@mail.gmail.com>
+Subject: Re: [PATCH 2/7] microblaze: adjust the help to the real behavior
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Simek <monstr@monstr.eu>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
 Hi Michal,
 
-On Thu, Dec 6, 2018 at 1:41 AM Michal Simek <monstr@monstr.eu> wrote:
+On Thu, Dec 6, 2018 at 12:41 AM Michal Simek <monstr@monstr.eu> wrote:
 >
 > On 03. 12. 18 8:50, Masahiro Yamada wrote:
-> > This patch set fixes various issues in microblaze Makefiles.
+> > "make ARCH=microblaze help" mentions simpleImage.<dt>.unstrip,
+> > but it never works because Makefile assumes "system.unstrip" is
+> > the name of DT.
 > >
-> > BTW, "simpleImage.<dt>" works like a phony target to generate the
-> > following four images, where the first three are just aliases.
+> > $ make ARCH=microblaze CROSS_COMPILE=microblaze-linux- simpleImage.system.unstrip
+> >   [ snip ]
+> > make[1]: *** No rule to make target 'arch/microblaze/boot/dts/system.unstrip.dtb', needed by 'arch/microblaze/boot/dts/system.dtb'.  Stop.
+> > make: *** [Makefile;1060: arch/microblaze/boot/dts] Error 2
+> > make: *** Waiting for unfinished jobs....
 > >
-> >  - arch/microblaze/boot/simpleImage.<dt>:
-> >          identical to arch/microblaze/boot/linux.bin
->
-> It is not - fdt section should be empty.
-> simpleImage has this section filled.
->
+> > Rip off the never-working target.
 > >
-> >  - arch/microblaze/boot/simpleImage.<dt>.unstrip:
-> >          identical to vmlinux
->
-> The same here with filled section.
-
-
-vmlinux is built anyway
-for whatever target you are building.
-
-What is the point of making a copy of vmlinux?
-They are the same.
-You can confirm it by 'diff'
-
-$ export CROSS_COMPILE=microblaze-linux-
-$ make ARCH=microblaze  defconfig
-$ make -j8 ARCH=microblaze   simpleImage.system
-$ diff arch/microblaze/boot/simpleImage.system.unstrip  vmlinux
-
-
-
-
-
-
+> > In my understanding, simpleImage.<dt> works like a phony target that
+> > generates multiple images. Reflect the behavior to the help message.
 > >
-> >  - arch/microblaze/boot/simpleImage.<dt>.ub:
-> >          identical to arch/microblaze/boot/linux.bin.ub
->
-> as above.
->
+> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > ---
 > >
-> >  - arch/microblaze/boot/simpleImage.<dt>.strip:
-> >          stripped vmlinux
->
-> And this is there because unstrip version is quite huge and for early
-> issues you need to know only some symbols that's why debugger is not
-> overflow with stuff which none needs.
-> Maybe this is not an issue now but that strip version is used a lot.
->
->
+> >  arch/microblaze/Makefile | 4 +---
+> >  1 file changed, 1 insertion(+), 3 deletions(-)
 > >
-> > I am not sure how much useful those copies are,
-> > but, I tried my best to keep the same behavior.
+> > diff --git a/arch/microblaze/Makefile b/arch/microblaze/Makefile
+> > index 0823d29..97e1384 100644
+> > --- a/arch/microblaze/Makefile
+> > +++ b/arch/microblaze/Makefile
+> > @@ -89,9 +89,7 @@ define archhelp
+> >    echo '* linux.bin    - Create raw binary'
+> >    echo '  linux.bin.gz - Create compressed raw binary'
+> >    echo '  linux.bin.ub - Create U-Boot wrapped raw binary'
+> > -  echo '  simpleImage.<dt> - ELF image with $(arch)/boot/dts/<dt>.dts linked in'
+> > -  echo '                   - stripped elf with fdt blob'
+> > -  echo '  simpleImage.<dt>.unstrip - full ELF image with fdt blob'
+> > +  echo '  simpleImage.<dt> - Create images with $(arch)/boot/dts/<dt>.dts linked in'
+> >    echo '  *_defconfig      - Select default config from arch/microblaze/configs'
+> >    echo ''
+> >    echo '  Targets with <dt> embed a device tree blob inside the image'
 > >
-> > IMHO, I guess DTB=<dt> would be more sensible,
-> > but it is up to Michal.
 >
-> What do you mean by this exactly?
-
-
-As I showed above,
-arch/microblaze/boot/simpleImage.system.unstrip
-is exactly the same as vmlinux.
-
-
-
-arch/microblaze/boot/simpleImage.<dt>
-is objcopy'ed binary of vmlinux.
-
-arch/microblaze/boot/simpleImage.<dt>.ub
-is objcopy'ed binary of vmlinux, with u-boot header prepended.
-
-You have already build-rules for them.
-
-
-
-It is true that the stripped image only exist in simpleImage,
-but I think "arch/microblaze/boot/vmlinux.strip"
-is a more sensible name.
-
-
-
-What I want to point out is:
-    "Which file should be compiled in",
-    is a part of the configuration.
-    We generally do not change the final
-    target name just for the difference of
-    configuration.
-    For example, ARM just uses "vmlinux", "Image", "zImage", etc.
-    Never duplicate target-specific copies depending on configuration.
-
-
-Why does microblaze create copies for each DT
-instead of using generic image like linux.bin, linux.bin.ub, etc. ?
-
-If using generic image names is acceptable,
-"make simpleImage.<dt>" is just a shorthand of
-"make DTB=<dt> vmlinux linux.bin linux.bin.ub vmlinux.strip"
-
-
-Only the benefit of this approach is,
-you can keep all images for multiple boards at the same time.
-
-$ make ARCH=microblaze simpleImage.board1
-$ make ARCH=microblaze simpleImage.board2
-$ make ARCH=microblaze simpleImage.board3
-
-
-
-
-Since I do not know how many users rely on this usage,
-I said "it is up to you".
-
-
-
-
-
-
-
-
-
-> Definitely thanks for looking at this.
+> I understand what you are trying to say but I would still like to keep
+> information about unstrip file.
+> It is correct that it is not build target. It is just generated file and
+> message above was used for description what it is.
+> Definitely agree that this should be the part of targets but it should
+> be in description.
+> The same is for missing description for simpleImage.<dt>.strip and
+> simpleImage.<dt>.ub files.
+>
+> Thanks,
 > Michal
 >
->
->
-> --
-> Michal Simek, Ing. (M.Eng), OpenPGP -> KeyID: FE3D1F91
-> w: www.monstr.eu p: +42-0-721842854
-> Maintainer of Linux kernel - Xilinx Microblaze
-> Maintainer of Linux kernel - Xilinx Zynq ARM and ZynqMP ARM64 SoCs
-> U-Boot custodian - Xilinx Microblaze/Zynq/ZynqMP/Versal SoCs
->
->
+
+If we want to be precise to the current behavior,
+we could describe more.
+(Is it too much?)
 
 
--- 
+Architecture specific targets (microblaze):
+* linux.bin    - Create raw binary
+  linux.bin.gz - Create compressed raw binary
+  linux.bin.ub - Create U-Boot wrapped raw binary
+  simpleImage.<dt> - Create the following images with
+arch/macroblaze/boot/dts/<dt>.dts linked in
+                     simpleImage.<dt>        : raw image
+                     simpleImage.<dt>.ub     : raw image with U-Boot header
+                     simpleImage.<dt>.unstrip: ELF (identical to vmlinux)
+                     simpleImage.<dt>.strip  : stripped ELF
+  *_defconfig      - Select default config from arch/microblaze/configs
+
+
+
+
+If you want to modify as you like,
+I will not touch it though.
+
+
+
+
+
+BTW, "make ARCH=microblaze help" looks like follows:
+
+* linux.bin    - Create raw binary
+  linux.bin.gz - Create compressed raw binary
+  linux.bin.ub - Create U-Boot wrapped raw binary
+  simpleImage.<dt> - ELF image with /boot/dts/<dt>.dts linked in
+                   - stripped elf with fdt blob
+  simpleImage.<dt>.unstrip - full ELF image with fdt blob
+  *_defconfig      - Select default config from arch/microblaze/configs
+
+
+
+
+Since "arch" is not set anywhere, $(arch) is empty,
+"ELF image with /boot/dts/<dt>.dts linked in" looks strange.
+
+
+
+--
 Best Regards
 Masahiro Yamada
