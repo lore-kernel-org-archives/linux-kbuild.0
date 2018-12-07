@@ -1,9 +1,9 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:41839 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725986AbeLGJvM (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:17062 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725985AbeLGKWN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Dec 2018 04:51:12 -0500
+        Fri, 7 Dec 2018 05:22:13 -0500
 MIME-Version: 1.0
 References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
  <1543823457-32478-3-git-send-email-yamada.masahiro@socionext.com>
@@ -11,8 +11,8 @@ References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
  <c8283f39-2d68-f7f7-82ee-c0da75755e5b@monstr.eu>
 In-Reply-To: <c8283f39-2d68-f7f7-82ee-c0da75755e5b@monstr.eu>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 7 Dec 2018 18:50:29 +0900
-Message-ID: <CAK7LNASLxKgBJ7m9+02ODZ_Cq8D7KRejPwnHNmzTxd-HGa5Rdw@mail.gmail.com>
+Date: Fri, 7 Dec 2018 19:21:31 +0900
+Message-ID: <CAK7LNAROT8u5P1c4cXnDZwxZ-9RDGX_n2Xrbfu0TaPG68-EGzQ@mail.gmail.com>
 Subject: Re: [PATCH 2/7] microblaze: adjust the help to the real behavior
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -93,26 +93,20 @@ On Thu, Dec 6, 2018 at 9:54 PM Michal Simek <monstr@monstr.eu> wrote:
 >
 > type - microblaze
 > maybe <dtb> here.
->
-> >                      simpleImage.<dt>        : raw image
-> >                      simpleImage.<dt>.ub     : raw image with U-Boot header
-> >                      simpleImage.<dt>.unstrip: ELF (identical to vmlinux)
-> >                      simpleImage.<dt>.strip  : stripped ELF
-> >   *_defconfig      - Select default config from arch/microblaze/configs
-> >
-> >
-> >
-> >
-> > If you want to modify as you like,
-> > I will not touch it though.
->
-> what you have above is fine for me.
 
 
-OK, I will send v2
-with the typo fixed.
+I will keep <dt> as is.
 
-Thanks.
+I see more <dt> references a few lines below:
+
+
+  echo '  Targets with <dt> embed a device tree blob inside the image'
+  echo '  These targets support board with firmware that does not'
+  echo '  support passing a device tree directly. Replace <dt> with the'
+  echo '  name of a dts file from the arch/microblaze/boot/dts/ directory'
+  echo '  (minus the .dts extension).'
+
+
 
 
 
