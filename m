@@ -1,166 +1,273 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr790044.outbound.protection.outlook.com ([40.107.79.44]:15280
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+Received: from mail-eopbgr40082.outbound.protection.outlook.com ([40.107.4.82]:52002
+        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726034AbeLGPUJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Dec 2018 10:20:09 -0500
-Subject: Re: [PATCH 0/7] microblaze: fix various problems in building boot
- images
-From: Michal Simek <michal.simek@xilinx.com>
-References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
- <19c7bdab-8df8-f7c6-7921-9a4d43dbca64@monstr.eu>
- <CAK7LNATWSNqZ8uE+teMW+uvDCLXfq6zMTqh_7=ssrPquCLJz8A@mail.gmail.com>
- <938f1368-5e07-0178-5b99-d8331ce216f8@xilinx.com>
-Message-ID: <18fb7c8b-2b47-eb39-d80b-7137e7db466b@xilinx.com>
-Date: Fri, 7 Dec 2018 16:19:41 +0100
-MIME-Version: 1.0
-In-Reply-To: <938f1368-5e07-0178-5b99-d8331ce216f8@xilinx.com>
-Content-Type: text/plain; charset="utf-8"
+        id S1726072AbeLGShM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 7 Dec 2018 13:37:12 -0500
+From: Leonard Crestez <leonard.crestez@nxp.com>
+Subject: [RFC] ARM: dts: Introduce wilddt function instead of listing imx
+ boards
+Date: Fri, 7 Dec 2018 18:35:13 +0000
+Message-ID: <044dced6439a8ac35cf03336dcef64297e204fc4.1544206368.git.leonard.crestez@nxp.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Simek <monstr@monstr.eu>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Michal Simek <michal.simek@xilinx.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Rob Herring <robh+dt@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>, Shawn Guo <shawnguo@kernel.org>
+Cc: Fabio Estevam <fabio.estevam@nxp.com>, Michal Marek <michal.lkml@markovi.net>, Mark Rutland <mark.rutland@arm.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, moderated for non-subscribers <linux-arm-kernel@lists.infradead.org>, dl-linux-imx <linux-imx@nxp.com>, "kernel@pengutronix.de" <kernel@pengutronix.de>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On 07. 12. 18 14:29, Michal Simek wrote:
-> On 07. 12. 18 12:29, Masahiro Yamada wrote:
->> On Thu, Dec 6, 2018 at 11:55 PM Michal Simek <monstr@monstr.eu> wrote:
->>>
->>> On 03. 12. 18 8:50, Masahiro Yamada wrote:
->>>> This patch set fixes various issues in microblaze Makefiles.
->>>>
->>>> BTW, "simpleImage.<dt>" works like a phony target to generate the
->>>> following four images, where the first three are just aliases.
->>>>
->>>>  - arch/microblaze/boot/simpleImage.<dt>:
->>>>          identical to arch/microblaze/boot/linux.bin
->>>>
->>>>  - arch/microblaze/boot/simpleImage.<dt>.unstrip:
->>>>          identical to vmlinux
->>>>
->>>>  - arch/microblaze/boot/simpleImage.<dt>.ub:
->>>>          identical to arch/microblaze/boot/linux.bin.ub
->>>>
->>>>  - arch/microblaze/boot/simpleImage.<dt>.strip:
->>>>          stripped vmlinux
->>>>
->>>> I am not sure how much useful those copies are,
->>>> but, I tried my best to keep the same behavior.
->>>>
->>>> IMHO, I guess DTB=<dt> would be more sensible,
->>>> but it is up to Michal.
->>>>
->>>>
->>>>
->>>> Masahiro Yamada (7):
->>>>   microblaze: fix cleaning of boot images
->>>>   microblaze: adjust the help to the real behavior
->>>>   microblaze: move "... is ready" message to arch/microblaze/Makefile
->>>>   microblaze: fix multiple bugs in arch/microblaze/boot/Makefile
->>>>   microblaze: add linux.bin* and simpleImage.* to PHONY
->>>>   microblaze: fix race condition in building boot images
->>>>   microblaze: remove the unneeded code just in case file copy fails
->>>>
->>>>  arch/microblaze/Makefile          | 14 +++++++++-----
->>>>  arch/microblaze/boot/Makefile     | 33 +++++++++++++++++----------------
->>>>  arch/microblaze/boot/dts/Makefile |  5 +----
->>>>  3 files changed, 27 insertions(+), 25 deletions(-)
->>>>
->>>
->>> One more thing I have in my mind for a while is that will be good to
->>> configure kernel build flags from DT and completely get rid of these
->>> symbols.
->>>
->>> XILINX_MICROBLAZE0_USE_MSR_INSTR
->>> XILINX_MICROBLAZE0_USE_PCMP_INSTR
->>> XILINX_MICROBLAZE0_USE_BARREL
->>> XILINX_MICROBLAZE0_USE_DIV
->>> XILINX_MICROBLAZE0_USE_HW_MUL
->>> XILINX_MICROBLAZE0_USE_FPU
->>>
->>> It means setup CPUFLAGS based on extracting that values from DT that it
->>> all the time match the hardware.
->>> It will also simplify all the CPUFLAGS logic which is in
->>> arch/microblaze/Makefile.
->>>
->>> Do you have any idea how this can be done?
->>
->>
->> I have no idea.
->>
->> Parsing DTS with sed or something would be possible, but ugly.
->>
->> In my opinion, the kernel should be multi platform image,
->> in other words, it is the least common denominator
->> of supported platforms.
->>
->> So, the kernel should enable all features that may or may not be used
->> depending on platform.
->>
->> I do not know if this works for MB.
-> 
-> Microblaze is soft core CPU where you can select if you want to have it
-> with multiplier, divider, barrel shifter, etc.
-> You can of course say that you don't have them and you have "universal"
-> kernel but very slow.
-> That's why user has to setup these configs which are converted to cflags
-> to say GCC what can be used.
-> And these configs can be simply parsed from dt.
-> 
-> For example like this based on dtb (quick hack)
-> 
-> for i in `echo use-msr-instr use-pcmp-instr use-barrel use-div
-> use-hw-mul use-fpu`; do
-> 	UPPER=`echo $i | tr '-' '_' | tr '[a-z]' '[A-Z}'`
-> 	echo $i $UPPER;
-> 
-> 	VAR=`fdtget -t i $FILE/arch/microblaze/boot/dts/system.dtb /cpus/cpu@0/
-> xlnx,$i`
-> 	FLAGS+="CONFIG_XILINX_MICROBLAZE0_${UPPER}=${VAR} "
-> done
-> 
-> make $FLAGS
-> 
-> 
-> When simpleImage is requested dt could be parsed to setup proper build
-> flags.
+The dts makefiles go through a lot of pointless churn when boards are
+added. Many SOCs (such as imx) have very simple naming conventions for
+all boards using a certain SOC and board listings can be easily
+collapsed using wildcards.
 
-One more thing I found is that I have done these changes
+Add a "wilddt" function and use it for imx6/7
 
-diff --git a/arch/microblaze/kernel/setup.c b/arch/microblaze/kernel/setup.c
-index bbd6968ce55b..dc6a6fee3ae2 100644
---- a/arch/microblaze/kernel/setup.c
-+++ b/arch/microblaze/kernel/setup.c
-@@ -153,11 +153,13 @@ void __init machine_early_init(const char
-*cmdline, unsigned int ram,
- #endif
+Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
 
- #if CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR
-+#error MSR is enabled
-        if (msr) {
-                pr_info("!!!Your kernel has setup MSR instruction but ");
-                pr_cont("CPU don't have it %x\n", msr);
-        }
- #else
-+#error MSR is not enabled
-        if (!msr) {
-                pr_info("!!!Your kernel not setup MSR instruction but ");
-                pr_cont("CPU have it %x\n", msr);
+---
+ arch/arm/boot/dts/Makefile | 203 ++++---------------------------------
+ 1 file changed, 19 insertions(+), 184 deletions(-)
 
-and run MSR with 1
-make defconfig && make CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR=1
-arch/microblaze/kernel/setup.o
-it errors #error MSR is enabled
-and all is good.
+If useful in v2 the wilddt function can be split into a separate patch
+for "scripts/Makefile.lib"
 
-And when I run MSR with 0
-make defconfig && make CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR=0
-arch/microblaze/kernel/setup.o
-also getting #error MSR is enabled
-which is wrong.
+A few other arches also have DT wildcards but not on a per-soc basis, in
+theory they could $(call wilddt,*)
 
-Is there any rule what can be setup at compilation time?
+I'm not sure if $dtstree is used correctly here?
 
-Thanks,
-Michal
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index b0e966d625b9..42e6ba453adf 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -1,6 +1,15 @@
+ # SPDX-License-Identifier: GPL-2.0
++
++dtstree	:=3D $(srctree)/$(src)
++
++# return list of .dtb for all .dts matching $1 in current directory
++# Example usage: dtb-$CONFIG_SOC_ABC123 +=3D $(call wilddt,abc123-*)
++define wilddt
++	$(patsubst $(dtstree)/%.dts,%.dtb, $(wildcard $(dtstree)/$(1).dts))
++endef
++
+ dtb-$(CONFIG_ARCH_ALPINE) +=3D \
+ 	alpine-db.dtb
+ dtb-$(CONFIG_MACH_ARTPEC6) +=3D \
+ 	artpec6-devboard.dtb
+ dtb-$(CONFIG_MACH_ASM9260) +=3D \
+@@ -384,199 +393,25 @@ dtb-$(CONFIG_SOC_IMX53) +=3D \
+ 	imx53-tx53-x03x.dtb \
+ 	imx53-tx53-x13x.dtb \
+ 	imx53-usbarmory.dtb \
+ 	imx53-voipac-bsb.dtb
+ dtb-$(CONFIG_SOC_IMX6Q) +=3D \
+-	imx6dl-apf6dev.dtb \
+-	imx6dl-aristainetos_4.dtb \
+-	imx6dl-aristainetos_7.dtb \
+-	imx6dl-aristainetos2_4.dtb \
+-	imx6dl-aristainetos2_7.dtb \
+-	imx6dl-colibri-eval-v3.dtb \
+-	imx6dl-cubox-i.dtb \
+-	imx6dl-cubox-i-emmc-som-v15.dtb \
+-	imx6dl-cubox-i-som-v15.dtb \
+-	imx6dl-dfi-fs700-m60.dtb \
+-	imx6dl-gw51xx.dtb \
+-	imx6dl-gw52xx.dtb \
+-	imx6dl-gw53xx.dtb \
+-	imx6dl-gw54xx.dtb \
+-	imx6dl-gw551x.dtb \
+-	imx6dl-gw552x.dtb \
+-	imx6dl-gw553x.dtb \
+-	imx6dl-gw560x.dtb \
+-	imx6dl-gw5903.dtb \
+-	imx6dl-gw5904.dtb \
+-	imx6dl-hummingboard.dtb \
+-	imx6dl-hummingboard-emmc-som-v15.dtb \
+-	imx6dl-hummingboard-som-v15.dtb \
+-	imx6dl-hummingboard2.dtb \
+-	imx6dl-hummingboard2-emmc-som-v15.dtb \
+-	imx6dl-hummingboard2-som-v15.dtb \
+-	imx6dl-icore.dtb \
+-	imx6dl-icore-mipi.dtb \
+-	imx6dl-icore-rqs.dtb \
+-	imx6dl-mamoj.dtb \
+-	imx6dl-nit6xlite.dtb \
+-	imx6dl-nitrogen6x.dtb \
+-	imx6dl-phytec-mira-rdk-nand.dtb \
+-	imx6dl-phytec-pbab01.dtb \
+-	imx6dl-rex-basic.dtb \
+-	imx6dl-riotboard.dtb \
+-	imx6dl-sabreauto.dtb \
+-	imx6dl-sabrelite.dtb \
+-	imx6dl-sabresd.dtb \
+-	imx6dl-savageboard.dtb \
+-	imx6dl-ts4900.dtb \
+-	imx6dl-ts7970.dtb \
+-	imx6dl-tx6dl-comtft.dtb \
+-	imx6dl-tx6s-8034.dtb \
+-	imx6dl-tx6s-8034-mb7.dtb \
+-	imx6dl-tx6s-8035.dtb \
+-	imx6dl-tx6s-8035-mb7.dtb \
+-	imx6dl-tx6u-801x.dtb \
+-	imx6dl-tx6u-80xx-mb7.dtb \
+-	imx6dl-tx6u-8033.dtb \
+-	imx6dl-tx6u-8033-mb7.dtb \
+-	imx6dl-tx6u-811x.dtb \
+-	imx6dl-tx6u-81xx-mb7.dtb \
+-	imx6dl-udoo.dtb \
+-	imx6dl-wandboard.dtb \
+-	imx6dl-wandboard-revb1.dtb \
+-	imx6dl-wandboard-revd1.dtb \
+-	imx6q-apalis-eval.dtb \
+-	imx6q-apalis-ixora.dtb \
+-	imx6q-apalis-ixora-v1.1.dtb \
+-	imx6q-apf6dev.dtb \
+-	imx6q-arm2.dtb \
+-	imx6q-b450v3.dtb \
+-	imx6q-b650v3.dtb \
+-	imx6q-b850v3.dtb \
+-	imx6q-cm-fx6.dtb \
+-	imx6q-cubox-i.dtb \
+-	imx6q-cubox-i-emmc-som-v15.dtb \
+-	imx6q-cubox-i-som-v15.dtb \
+-	imx6q-dfi-fs700-m60.dtb \
+-	imx6q-dhcom-pdk2.dtb \
+-	imx6q-display5-tianma-tm070-1280x768.dtb \
+-	imx6q-dmo-edmqmx6.dtb \
+-	imx6q-dms-ba16.dtb \
+-	imx6q-evi.dtb \
+-	imx6q-gk802.dtb \
+-	imx6q-gw51xx.dtb \
+-	imx6q-gw52xx.dtb \
+-	imx6q-gw53xx.dtb \
+-	imx6q-gw5400-a.dtb \
+-	imx6q-gw54xx.dtb \
+-	imx6q-gw551x.dtb \
+-	imx6q-gw552x.dtb \
+-	imx6q-gw553x.dtb \
+-	imx6q-gw560x.dtb \
+-	imx6q-gw5903.dtb \
+-	imx6q-gw5904.dtb \
+-	imx6q-h100.dtb \
+-	imx6q-hummingboard.dtb \
+-	imx6q-hummingboard-emmc-som-v15.dtb \
+-	imx6q-hummingboard-som-v15.dtb \
+-	imx6q-hummingboard2.dtb \
+-	imx6q-hummingboard2-emmc-som-v15.dtb \
+-	imx6q-hummingboard2-som-v15.dtb \
+-	imx6q-icore.dtb \
+-	imx6q-icore-mipi.dtb \
+-	imx6q-icore-ofcap10.dtb \
+-	imx6q-icore-ofcap12.dtb \
+-	imx6q-icore-rqs.dtb \
+-	imx6q-kp-tpc.dtb \
+-	imx6q-marsboard.dtb \
+-	imx6q-mccmon6.dtb \
+-	imx6q-nitrogen6x.dtb \
+-	imx6q-nitrogen6_max.dtb \
+-	imx6q-nitrogen6_som2.dtb \
+-	imx6q-novena.dtb \
+-	imx6q-phytec-mira-rdk-emmc.dtb \
+-	imx6q-phytec-mira-rdk-nand.dtb \
+-	imx6q-phytec-pbab01.dtb \
+-	imx6q-pistachio.dtb \
+-	imx6q-rex-pro.dtb \
+-	imx6q-sabreauto.dtb \
+-	imx6q-sabrelite.dtb \
+-	imx6q-sabresd.dtb \
+-	imx6q-savageboard.dtb \
+-	imx6q-sbc6x.dtb \
+-	imx6q-tbs2910.dtb \
+-	imx6q-ts4900.dtb \
+-	imx6q-ts7970.dtb \
+-	imx6q-tx6q-1010.dtb \
+-	imx6q-tx6q-1010-comtft.dtb \
+-	imx6q-tx6q-1020.dtb \
+-	imx6q-tx6q-1020-comtft.dtb \
+-	imx6q-tx6q-1036.dtb \
+-	imx6q-tx6q-1036-mb7.dtb \
+-	imx6q-tx6q-10x0-mb7.dtb \
+-	imx6q-tx6q-1110.dtb \
+-	imx6q-tx6q-11x0-mb7.dtb \
+-	imx6q-udoo.dtb \
+-	imx6q-utilite-pro.dtb \
+-	imx6q-var-dt6customboard.dtb \
+-	imx6q-wandboard.dtb \
+-	imx6q-wandboard-revb1.dtb \
+-	imx6q-wandboard-revd1.dtb \
+-	imx6q-zii-rdu2.dtb \
+-	imx6qp-nitrogen6_max.dtb \
+-	imx6qp-nitrogen6_som2.dtb \
+-	imx6qp-phytec-mira-rdk-nand.dtb \
+-	imx6qp-sabreauto.dtb \
+-	imx6qp-sabresd.dtb \
+-	imx6qp-tx6qp-8037.dtb \
+-	imx6qp-tx6qp-8037-mb7.dtb \
+-	imx6qp-tx6qp-8137.dtb \
+-	imx6qp-tx6qp-8137-mb7.dtb \
+-	imx6qp-wandboard-revd1.dtb \
+-	imx6qp-zii-rdu2.dtb
++	$(call wilddt,imx6dl-*) \
++	$(call wilddt,imx6q-*) \
++	$(call wilddt,imx6qp-*)
+ dtb-$(CONFIG_SOC_IMX6SL) +=3D \
+-	imx6sl-evk.dtb \
+-	imx6sl-warp.dtb
++	$(call wilddt,imx6sl-*)
+ dtb-$(CONFIG_SOC_IMX6SLL) +=3D \
+-	imx6sll-evk.dtb
++	$(call wilddt,imx6sll-*)
+ dtb-$(CONFIG_SOC_IMX6SX) +=3D \
+-	imx6sx-nitrogen6sx.dtb \
+-	imx6sx-sabreauto.dtb \
+-	imx6sx-sdb-reva.dtb \
+-	imx6sx-sdb-sai.dtb \
+-	imx6sx-sdb.dtb \
+-	imx6sx-softing-vining-2000.dtb \
+-	imx6sx-udoo-neo-basic.dtb \
+-	imx6sx-udoo-neo-extended.dtb \
+-	imx6sx-udoo-neo-full.dtb
++	$(call wilddt,imx6sx-*)
+ dtb-$(CONFIG_SOC_IMX6UL) +=3D \
+-	imx6ul-14x14-evk.dtb \
+-	imx6ul-ccimx6ulsbcexpress.dtb \
+-	imx6ul-ccimx6ulsbcpro.dtb \
+-	imx6ul-geam.dtb \
+-	imx6ul-isiot-emmc.dtb \
+-	imx6ul-isiot-nand.dtb \
+-	imx6ul-liteboard.dtb \
+-	imx6ul-opos6uldev.dtb \
+-	imx6ul-pico-hobbit.dtb \
+-	imx6ul-tx6ul-0010.dtb \
+-	imx6ul-tx6ul-0011.dtb \
+-	imx6ul-tx6ul-mainboard.dtb \
+-	imx6ull-14x14-evk.dtb \
+-	imx6ull-colibri-eval-v3.dtb \
+-	imx6ull-colibri-wifi-eval-v3.dtb \
+-	imx6ulz-14x14-evk.dtb
++	$(call wilddt,imx6ul-*) \
++	$(call wilddt,imx6ull-*) \
++	$(call wilddt,imx6ulz-*)
+ dtb-$(CONFIG_SOC_IMX7D) +=3D \
+-	imx7d-cl-som-imx7.dtb \
+-	imx7d-colibri-emmc-eval-v3.dtb \
+-	imx7d-colibri-eval-v3.dtb \
+-	imx7d-nitrogen7.dtb \
+-	imx7d-pico-pi.dtb \
+-	imx7d-sbc-imx7.dtb \
+-	imx7d-sdb.dtb \
+-	imx7d-sdb-sht11.dtb \
+-	imx7s-colibri-eval-v3.dtb \
+-	imx7s-warp.dtb
++	$(call wilddt,imx7[ds]-*)
+ dtb-$(CONFIG_SOC_LS1021A) +=3D \
+ 	ls1021a-moxa-uc-8410a.dtb \
+ 	ls1021a-qds.dtb \
+ 	ls1021a-twr.dtb
+ dtb-$(CONFIG_SOC_VF610) +=3D \
+--=20
+2.17.1
