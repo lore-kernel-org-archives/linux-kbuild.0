@@ -1,184 +1,182 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:46397 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726170AbeLJI1s (ORCPT
+Received: from mail-it1-f195.google.com ([209.85.166.195]:53891 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727497AbeLJMMg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Dec 2018 03:27:48 -0500
-Received: by mail-lj1-f193.google.com with SMTP id v15-v6so8739412ljh.13
-        for <linux-kbuild@vger.kernel.org>; Mon, 10 Dec 2018 00:27:45 -0800 (PST)
-Received: from turska (dtpyyyyyyyyyyyyyd89ft-3.rev.dnainternet.fi. [2001:14ba:8300::3:e749])
-        by smtp.gmail.com with ESMTPSA id q2sm2051589lfa.63.2018.12.10.00.27.43
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 10 Dec 2018 00:27:43 -0800 (PST)
-Date: Mon, 10 Dec 2018 10:27:41 +0200
-From: Tomi salminen <tlsalmin@gmail.com>
-Subject: Re: [PATCH 1/1] kconfig/conf.c: Added optional colorization of
- output.
-Message-ID: <20181210082741.GA7408@turska>
-References: <20181208202640.GA28712@turska>
+        Mon, 10 Dec 2018 07:12:36 -0500
+Received: by mail-it1-f195.google.com with SMTP id g85so16991014ita.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 10 Dec 2018 04:12:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181208202640.GA28712@turska>
+References: <cover.1544099024.git.andreyknvl@google.com> <5cc1b789aad7c99cf4f3ec5b328b147ad53edb40.1544099024.git.andreyknvl@google.com>
+ <CAP=VYLo-o8vpGrpM_+0jdvxLC9uxw+F7_OtsSfRyq24HR1dDwA@mail.gmail.com>
+In-Reply-To: <CAP=VYLo-o8vpGrpM_+0jdvxLC9uxw+F7_OtsSfRyq24HR1dDwA@mail.gmail.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Mon, 10 Dec 2018 13:12:23 +0100
+Message-ID: <CAAeHK+wWRG6kp7mn-bNpYQ5cV8ygbXKnwS9f0mDCAnwiTqEoMg@mail.gmail.com>
+Subject: Re: [PATCH v13 08/25] kasan: initialize shadow to 0xff for tag-based mode
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: paul.gortmaker@windriver.com
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Linux-Next Mailing List <linux-next@vger.kernel.org>
 
-> From: Tomi Salminen <tlsalmin@gmail.com>
+On Mon, Dec 10, 2018 at 2:35 AM Paul Gortmaker
+<paul.gortmaker@windriver.com> wrote:
+>
+> On Thu, Dec 6, 2018 at 7:25 AM Andrey Konovalov <andreyknvl@google.com> w=
+rote:
+>>
+>> A tag-based KASAN shadow memory cell contains a memory tag, that
+>> corresponds to the tag in the top byte of the pointer, that points to th=
+at
+>> memory. The native top byte value of kernel pointers is 0xff, so with
+>> tag-based KASAN we need to initialize shadow memory to 0xff.
+>>
+>> Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+>> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
+>> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+>> ---
+>>  arch/arm64/mm/kasan_init.c | 15 +++++++++++++--
+>>  include/linux/kasan.h      |  8 ++++++++
+>
+>
+> The version of this in  linux-next breaks arm64 allmodconfig for me:
+>
+> mm/kasan/common.c: In function =E2=80=98kasan_module_alloc=E2=80=99:
+> mm/kasan/common.c:481:17: error: =E2=80=98KASAN_SHADOW_INIT=E2=80=99 unde=
+clared (first use in this function)
+>    __memset(ret, KASAN_SHADOW_INIT, shadow_size);
+>                  ^
+> mm/kasan/common.c:481:17: note: each undeclared identifier is reported on=
+ly once for each function it appears in
+> make[3]: *** [mm/kasan/common.o] Error 1
+> make[3]: *** Waiting for unfinished jobs....
+> make[2]: *** [mm/kasan] Error 2
+> make[2]: *** Waiting for unfinished jobs....
+> make[1]: *** [mm/] Error 2
+> make: *** [sub-make] Error 2
 
-Hey. Sorry but the last patch count was bogus. It's supposed to be 1/1
-not 001/123.
+Hi Paul,
 
-On Sat, Dec 08, 2018 at 10:26:40PM +0200, Tomi Salminen wrote:
-> From: Tomi Salminen <tlsalmin@gmail.com>
-> 
-> Added option COLORIZE=1 for oldconfig, coloring the tristate options to
-> yes=green, no=red, module=blue and boolean variables to true=green,
-> false=red.
-> 
-> Signed-off-by: Tomi Salminen <tlsalmin@gmail.com>
-> ---
->  scripts/kconfig/Makefile |  9 +++++++-
->  scripts/kconfig/conf.c   | 45 ++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 51 insertions(+), 3 deletions(-)
-> 
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index 63b609243d03..22cc1257f8a4 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -56,6 +56,11 @@ localyesconfig localmodconfig: $(obj)/conf
->  	fi
->  	$(Q)rm -f .tmp.config
->  
-> +
-> +MAYBECOLORIZE=
-> +ifeq ($(COLORIZE),1)
-> +  MAYBECOLORIZE="-c"
-> +endif
->  # These targets map 1:1 to the commandline options of 'conf'
->  #
->  # Note:
-> @@ -66,7 +71,7 @@ simple-targets := oldconfig allnoconfig allyesconfig allmodconfig \
->  PHONY += $(simple-targets)
->  
->  $(simple-targets): $(obj)/conf
-> -	$< $(silent) --$@ $(Kconfig)
-> +	$< $(silent) $(MAYBECOLORIZE) --$@ $(Kconfig)
->  
->  PHONY += savedefconfig defconfig
->  
-> @@ -140,6 +145,8 @@ help:
->  	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
->  	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
->  	@echo  '  testconfig	  - Run Kconfig unit tests (requires python3 and pytest)'
-> +	@echo  'Options for targets:'
-> +	@echo  '  COLORIZE=1	  - Colorize option output (no=red, green=yes, blue=mod)'
->  
->  # ===========================================================================
->  # Shared Makefile for the various kconfig executables:
-> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-> index 98e0c7a34699..6253a473292b 100644
-> --- a/scripts/kconfig/conf.c
-> +++ b/scripts/kconfig/conf.c
-> @@ -42,6 +42,7 @@ static int sync_kconfig;
->  static int conf_cnt;
->  static char line[PATH_MAX];
->  static struct menu *rootEntry;
-> +static int colorize; // Colorizes output lines according to option default.
->  
->  static void print_help(struct menu *menu)
->  {
-> @@ -53,6 +54,40 @@ static void print_help(struct menu *menu)
->  	str_free(&help);
->  }
->  
-> +static void colorize_reset(void)
-> +{
-> +	if (colorize) {
-> +		const char *reset = "\x1B[37m";
-> +
-> +		printf("%s", reset);
-> +	}
-> +}
-> +
-> +static void colorize_line(struct symbol *sym)
-> +{
-> +	if (colorize) {
-> +		enum symbol_type type = sym_get_type(sym);
-> +		const char *red = "\x1B[31m", *green = "\x1B[32m", *blue =
-> +		    "\x1B[34m";
-> +
-> +		if (type == S_BOOLEAN || type == S_TRISTATE) {
-> +			switch (sym_get_tristate_value(sym)) {
-> +				{
-> +			case no:
-> +					printf("%s", red);
-> +					break;
-> +			case yes:
-> +					printf("%s", green);
-> +					break;
-> +			case mod:
-> +					printf("%s", blue);
-> +					break;
-> +				}
-> +			}
-> +		}
-> +	}
-> +}
-> +
->  static void strip(char *str)
->  {
->  	char *p = str;
-> @@ -166,6 +201,7 @@ static int conf_sym(struct menu *menu)
->  
->  	while (1) {
->  		printf("%*s%s ", indent - 1, "", menu->prompt->text);
-> +		colorize_line(sym);
->  		if (sym->name)
->  			printf("(%s) ", sym->name);
->  		putchar('[');
-> @@ -188,6 +224,7 @@ static int conf_sym(struct menu *menu)
->  		if (oldval != yes && sym_tristate_within_range(sym, yes))
->  			printf("/y");
->  		printf("/?] ");
-> +		colorize_reset();
->  		if (!conf_askvalue(sym, sym_get_string_value(sym)))
->  			return 0;
->  		strip(line);
-> @@ -466,7 +503,7 @@ static struct option long_opts[] = {
->  static void conf_usage(const char *progname)
->  {
->  
-> -	printf("Usage: %s [-s] [option] <kconfig-file>\n", progname);
-> +	printf("Usage: %s [-s] [-c] [option] <kconfig-file>\n", progname);
->  	printf("[option] is _one_ of the following:\n");
->  	printf("  --listnewconfig         List new options\n");
->  	printf("  --oldaskconfig          Start a new configuration using a line-oriented program\n");
-> @@ -481,6 +518,8 @@ static void conf_usage(const char *progname)
->  	printf("  --allmodconfig          New config where all options are answered with mod\n");
->  	printf("  --alldefconfig          New config with all symbols set to default\n");
->  	printf("  --randconfig            New config with random answer to all options\n");
-> +	printf("Modifiers:\n");
-> +	printf("  -c                      Output colorized lines for default option.\n");
->  }
->  
->  int main(int ac, char **av)
-> @@ -493,10 +532,12 @@ int main(int ac, char **av)
->  
->  	tty_stdio = isatty(0) && isatty(1);
->  
-> -	while ((opt = getopt_long(ac, av, "s", long_opts, NULL)) != -1) {
-> +	while ((opt = getopt_long(ac, av, "sc", long_opts, NULL)) != -1) {
->  		if (opt == 's') {
->  			conf_set_message_callback(NULL);
->  			continue;
-> +		} else if (opt == 'c') {
-> +			colorize = 1;
->  		}
->  		input_mode = (enum input_mode)opt;
->  		switch (opt) {
-> -- 
-> 2.19.2
+This is my bad, this should be fixed in v13 of this patchset, which is
+in mm right now but not in linux-next yet as it seems.
 
--- 
+Thanks!
+
+>
+> An automated git bisect-run points at this:
+>
+> 5c36287813721999e79ac76f637f1ba7e5054402 is the first bad commit
+> commit 5c36287813721999e79ac76f637f1ba7e5054402
+> Author: Andrey Konovalov <andreyknvl@google.com>
+> Date:   Wed Dec 5 11:13:21 2018 +1100
+>
+>     kasan: initialize shadow to 0xff for tag-based mode
+>
+> A quick look at the commit makes me think that the case where the
+> "# CONFIG_KASAN_GENERIC is not set" has not been handled.
+>
+> I'm using an older gcc 4.8.3 - only used for build testing.
+>
+> Paul.
+> --
+>
+>>  mm/kasan/common.c          |  3 ++-
+>>  3 files changed, 23 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
+>> index 4ebc19422931..7a4a0904cac8 100644
+>> --- a/arch/arm64/mm/kasan_init.c
+>> +++ b/arch/arm64/mm/kasan_init.c
+>> @@ -43,6 +43,15 @@ static phys_addr_t __init kasan_alloc_zeroed_page(int=
+ node)
+>>         return __pa(p);
+>>  }
+>>
+>> +static phys_addr_t __init kasan_alloc_raw_page(int node)
+>> +{
+>> +       void *p =3D memblock_alloc_try_nid_raw(PAGE_SIZE, PAGE_SIZE,
+>> +                                               __pa(MAX_DMA_ADDRESS),
+>> +                                               MEMBLOCK_ALLOC_ACCESSIBL=
+E,
+>> +                                               node);
+>> +       return __pa(p);
+>> +}
+>> +
+>>  static pte_t *__init kasan_pte_offset(pmd_t *pmdp, unsigned long addr, =
+int node,
+>>                                       bool early)
+>>  {
+>> @@ -92,7 +101,9 @@ static void __init kasan_pte_populate(pmd_t *pmdp, un=
+signed long addr,
+>>         do {
+>>                 phys_addr_t page_phys =3D early ?
+>>                                 __pa_symbol(kasan_early_shadow_page)
+>> -                                       : kasan_alloc_zeroed_page(node);
+>> +                                       : kasan_alloc_raw_page(node);
+>> +               if (!early)
+>> +                       memset(__va(page_phys), KASAN_SHADOW_INIT, PAGE_=
+SIZE);
+>>                 next =3D addr + PAGE_SIZE;
+>>                 set_pte(ptep, pfn_pte(__phys_to_pfn(page_phys), PAGE_KER=
+NEL));
+>>         } while (ptep++, addr =3D next, addr !=3D end && pte_none(READ_O=
+NCE(*ptep)));
+>> @@ -239,7 +250,7 @@ void __init kasan_init(void)
+>>                         pfn_pte(sym_to_pfn(kasan_early_shadow_page),
+>>                                 PAGE_KERNEL_RO));
+>>
+>> -       memset(kasan_early_shadow_page, 0, PAGE_SIZE);
+>> +       memset(kasan_early_shadow_page, KASAN_SHADOW_INIT, PAGE_SIZE);
+>>         cpu_replace_ttbr1(lm_alias(swapper_pg_dir));
+>>
+>>         /* At this point kasan is fully initialized. Enable error messag=
+es */
+>> diff --git a/include/linux/kasan.h b/include/linux/kasan.h
+>> index ec22d548d0d7..c56af24bd3e7 100644
+>> --- a/include/linux/kasan.h
+>> +++ b/include/linux/kasan.h
+>> @@ -153,6 +153,8 @@ static inline size_t kasan_metadata_size(struct kmem=
+_cache *cache) { return 0; }
+>>
+>>  #ifdef CONFIG_KASAN_GENERIC
+>>
+>> +#define KASAN_SHADOW_INIT 0
+>> +
+>>  void kasan_cache_shrink(struct kmem_cache *cache);
+>>  void kasan_cache_shutdown(struct kmem_cache *cache);
+>>
+>> @@ -163,4 +165,10 @@ static inline void kasan_cache_shutdown(struct kmem=
+_cache *cache) {}
+>>
+>>  #endif /* CONFIG_KASAN_GENERIC */
+>>
+>> +#ifdef CONFIG_KASAN_SW_TAGS
+>> +
+>> +#define KASAN_SHADOW_INIT 0xFF
+>> +
+>> +#endif /* CONFIG_KASAN_SW_TAGS */
+>> +
+>>  #endif /* LINUX_KASAN_H */
+>> diff --git a/mm/kasan/common.c b/mm/kasan/common.c
+>> index 5f68c93734ba..7134e75447ff 100644
+>> --- a/mm/kasan/common.c
+>> +++ b/mm/kasan/common.c
+>> @@ -473,11 +473,12 @@ int kasan_module_alloc(void *addr, size_t size)
+>>
+>>         ret =3D __vmalloc_node_range(shadow_size, 1, shadow_start,
+>>                         shadow_start + shadow_size,
+>> -                       GFP_KERNEL | __GFP_ZERO,
+>> +                       GFP_KERNEL,
+>>                         PAGE_KERNEL, VM_NO_GUARD, NUMA_NO_NODE,
+>>                         __builtin_return_address(0));
+>>
+>>         if (ret) {
+>> +               __memset(ret, KASAN_SHADOW_INIT, shadow_size);
+>>                 find_vm_area(addr)->flags |=3D VM_KASAN;
+>>                 kmemleak_ignore(ret);
+>>                 return 0;
+>> --
+>> 2.20.0.rc1.387.gf8505762e3-goog
+>>
