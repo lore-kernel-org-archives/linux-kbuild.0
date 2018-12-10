@@ -1,182 +1,253 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it1-f195.google.com ([209.85.166.195]:53891 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727497AbeLJMMg (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Dec 2018 07:12:36 -0500
-Received: by mail-it1-f195.google.com with SMTP id g85so16991014ita.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 10 Dec 2018 04:12:35 -0800 (PST)
+Received: from mail.kernel.org ([198.145.29.99]:41942 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728187AbeLJPzW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 10 Dec 2018 10:55:22 -0500
 MIME-Version: 1.0
-References: <cover.1544099024.git.andreyknvl@google.com> <5cc1b789aad7c99cf4f3ec5b328b147ad53edb40.1544099024.git.andreyknvl@google.com>
- <CAP=VYLo-o8vpGrpM_+0jdvxLC9uxw+F7_OtsSfRyq24HR1dDwA@mail.gmail.com>
-In-Reply-To: <CAP=VYLo-o8vpGrpM_+0jdvxLC9uxw+F7_OtsSfRyq24HR1dDwA@mail.gmail.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Mon, 10 Dec 2018 13:12:23 +0100
-Message-ID: <CAAeHK+wWRG6kp7mn-bNpYQ5cV8ygbXKnwS9f0mDCAnwiTqEoMg@mail.gmail.com>
-Subject: Re: [PATCH v13 08/25] kasan: initialize shadow to 0xff for tag-based mode
+References: <20181203213223.16986-1-robh@kernel.org> <20181203213223.16986-2-robh@kernel.org>
+ <CAK7LNARgyL+Pq+SCkUUKnMny4nDw1L4zEevdzqbyGGAoE+BXUA@mail.gmail.com>
+In-Reply-To: <CAK7LNARgyL+Pq+SCkUUKnMny4nDw1L4zEevdzqbyGGAoE+BXUA@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 10 Dec 2018 09:55:08 -0600
+Message-ID: <CAL_JsqLhNq2LWffT5XK9nd+p_7oYacMmsQidP_cmjkd7DsNmNQ@mail.gmail.com>
+Subject: Re: [PATCH v2 01/34] kbuild: Add support for DT binding schema checks
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: paul.gortmaker@windriver.com
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Linux-Next Mailing List <linux-next@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: devicetree@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Sean Hudson <darknighte@darknighte.com>, Frank Rowand <frowand.list@gmail.com>, "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Grant Likely <grant.likely@arm.com>, Kumar Gala <kumar.gala@linaro.org>, ARM-SoC Maintainers <arm@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Mark Rutland <mark.rutland@arm.com>, Michal Marek <michal.lkml@markovi.net>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mon, Dec 10, 2018 at 2:35 AM Paul Gortmaker
-<paul.gortmaker@windriver.com> wrote:
+On Fri, Dec 7, 2018 at 10:47 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> On Thu, Dec 6, 2018 at 7:25 AM Andrey Konovalov <andreyknvl@google.com> w=
-rote:
->>
->> A tag-based KASAN shadow memory cell contains a memory tag, that
->> corresponds to the tag in the top byte of the pointer, that points to th=
-at
->> memory. The native top byte value of kernel pointers is 0xff, so with
->> tag-based KASAN we need to initialize shadow memory to 0xff.
->>
->> Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
->> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
->> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
->> ---
->>  arch/arm64/mm/kasan_init.c | 15 +++++++++++++--
->>  include/linux/kasan.h      |  8 ++++++++
+> Hi Rob,
 >
 >
-> The version of this in  linux-next breaks arm64 allmodconfig for me:
+> On Tue, Dec 4, 2018 at 6:32 AM Rob Herring <robh@kernel.org> wrote:
+> >
+> > This adds the build infrastructure for checking DT binding schema
+> > documents and validating dts files using the binding schema.
+> >
+> > Check DT binding schema documents:
+> > make dt_binding_check
+> >
+> > Build dts files and check using DT binding schema:
+> > make dtbs_check
+> >
+> > Optionally, DT_SCHEMA_FILES can passed in with a schema file(s) to use
+> > for validation. This makes it easier to find and fix errors generated by
+> > a specific schema.
+> >
+> > Currently, the validation targets are separate from a normal build to
+> > avoid a hard dependency on the external DT schema project and because
+> > there are lots of warnings generated.
+> >
+> > Cc: Jonathan Corbet <corbet@lwn.net>
+> > Cc: Mark Rutland <mark.rutland@arm.com>
+> > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > Cc: Michal Marek <michal.lkml@markovi.net>
+> > Cc: linux-doc@vger.kernel.org
+> > Cc: devicetree@vger.kernel.org
+> > Cc: linux-kbuild@vger.kernel.org
+> > Signed-off-by: Rob Herring <robh@kernel.org>
+> > ---
+> >  .gitignore                                   |  1 +
+> >  Documentation/Makefile                       |  2 +-
+> >  Documentation/devicetree/bindings/.gitignore |  1 +
+> >  Documentation/devicetree/bindings/Makefile   | 33 ++++++++++++++++++++
+> >  Makefile                                     | 11 +++++--
+> >  scripts/Makefile.lib                         | 24 ++++++++++++--
+> >  6 files changed, 67 insertions(+), 5 deletions(-)
+> >  create mode 100644 Documentation/devicetree/bindings/.gitignore
+> >  create mode 100644 Documentation/devicetree/bindings/Makefile
+> >
+> > diff --git a/.gitignore b/.gitignore
+> > index 97ba6b79834c..a20ac26aa2f5 100644
+> > --- a/.gitignore
+> > +++ b/.gitignore
+> > @@ -15,6 +15,7 @@
+> >  *.bin
+> >  *.bz2
+> >  *.c.[012]*.*
+> > +*.dt.yaml
+> >  *.dtb
+> >  *.dtb.S
+> >  *.dwo
+> > diff --git a/Documentation/Makefile b/Documentation/Makefile
+> > index 2ca77ad0f238..9786957c6a35 100644
+> > --- a/Documentation/Makefile
+> > +++ b/Documentation/Makefile
+> > @@ -2,7 +2,7 @@
+> >  # Makefile for Sphinx documentation
+> >  #
+> >
+> > -subdir-y :=
+> > +subdir-y := devicetree/bindings/
+> >
+> >  # You can set these variables from the command line.
+> >  SPHINXBUILD   = sphinx-build
+> > diff --git a/Documentation/devicetree/bindings/.gitignore b/Documentation/devicetree/bindings/.gitignore
+> > new file mode 100644
+> > index 000000000000..d9194c02dd08
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/.gitignore
+> > @@ -0,0 +1 @@
+> > +*.example.dts
+> > diff --git a/Documentation/devicetree/bindings/Makefile b/Documentation/devicetree/bindings/Makefile
+> > new file mode 100644
+> > index 000000000000..ee0110dd8131
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/Makefile
+> > @@ -0,0 +1,33 @@
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +DT_DOC_CHECKER ?= dt-doc-validate
+> > +DT_EXTRACT_EX ?= dt-extract-example
+> > +DT_MK_SCHEMA ?= dt-mk-schema
+> > +DT_MK_SCHEMA_FLAGS := $(if $(DT_SCHEMA_FILES), -u)
+> > +
+> > +quiet_cmd_chk_binding = CHKDT   $<
+> > +      cmd_chk_binding = (set -e; \
+> > +                         $(DT_DOC_CHECKER) $< ; \
+> > +                         mkdir -p $(dir $@) ; \
+> > +                         $(DT_EXTRACT_EX) $< > $@ )
+> > +
+> > +$(obj)/%.example.dts: $(src)/%.yaml FORCE
+> > +       $(call if_changed,chk_binding)
+> > +
+> > +DT_TMP_SCHEMA := .schema.yaml.tmp
+> > +extra-y += $(DT_TMP_SCHEMA)
+> > +
+> > +quiet_cmd_mk_schema = SCHEMA  $@
+> > +      cmd_mk_schema = mkdir -p $(obj); \
+> > +                      rm -f $@; \
+> > +                      $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@ $<
 >
-> mm/kasan/common.c: In function =E2=80=98kasan_module_alloc=E2=80=99:
-> mm/kasan/common.c:481:17: error: =E2=80=98KASAN_SHADOW_INIT=E2=80=99 unde=
-clared (first use in this function)
->    __memset(ret, KASAN_SHADOW_INIT, shadow_size);
->                  ^
-> mm/kasan/common.c:481:17: note: each undeclared identifier is reported on=
-ly once for each function it appears in
-> make[3]: *** [mm/kasan/common.o] Error 1
-> make[3]: *** Waiting for unfinished jobs....
-> make[2]: *** [mm/kasan] Error 2
-> make[2]: *** Waiting for unfinished jobs....
-> make[1]: *** [mm/] Error 2
-> make: *** [sub-make] Error 2
+>
+> I think '$<' is wrong.
+>
+> '$<' is replaced with the first prerequisite.
 
-Hi Paul,
+Indeed.
 
-This is my bad, this should be fixed in v13 of this patchset, which is
-in mm right now but not in linux-next yet as it seems.
+> You can easily check what is happening here.
+>
+> $ cat   Documentation/devicetree/bindings/..schema.yaml.tmp.cmd
+> cmd_Documentation/devicetree/bindings/.schema.yaml.tmp := mkdir -p
+> Documentation/devicetree/bindings; rm -f
+> Documentation/devicetree/bindings/.schema.yaml.tmp; dt-mk-schema  -o
+> Documentation/devicetree/bindings/.schema.yaml.tmp
+> Documentation/devicetree/bindings/arm/ti/ti,davinci.yaml
+>
+>
+> So, the dt-validater will check only binding from ti,davinci.yaml,
+> which is almost useless.
+>
+>
+>
+> If I understand it correctly,
+> .schema.yaml.tmp should contain all binding yaml.
+>
+>
+> I fixed it up like follows:
+>
+> diff --git a/Documentation/devicetree/bindings/Makefile
+> b/Documentation/devicetree/bindings/Makefile
+> index ee0110d..267458f 100644
+> --- a/Documentation/devicetree/bindings/Makefile
+> +++ b/Documentation/devicetree/bindings/Makefile
+> @@ -19,7 +19,7 @@ extra-y += $(DT_TMP_SCHEMA)
+>  quiet_cmd_mk_schema = SCHEMA  $@
+>        cmd_mk_schema = mkdir -p $(obj); \
+>                        rm -f $@; \
+> -                      $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@ $<
+> +                      $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@
+> $(filter-out FORCE, $^)
 
-Thanks!
+Thanks, I incorporated this fix.
 
 >
-> An automated git bisect-run points at this:
+>  DT_DOCS = $(shell cd $(srctree)/$(src) && find * -name '*.yaml')
+>  DT_SCHEMA_FILES ?= $(addprefix $(src)/,$(DT_DOCS))
 >
-> 5c36287813721999e79ac76f637f1ba7e5054402 is the first bad commit
-> commit 5c36287813721999e79ac76f637f1ba7e5054402
-> Author: Andrey Konovalov <andreyknvl@google.com>
-> Date:   Wed Dec 5 11:13:21 2018 +1100
 >
->     kasan: initialize shadow to 0xff for tag-based mode
 >
-> A quick look at the commit makes me think that the case where the
-> "# CONFIG_KASAN_GENERIC is not set" has not been handled.
+> Then, I see another error.
+
+I fixed this with this change:
+
+@@ -27,7 +27,7 @@ DT_SCHEMA_FILES ?= $(addprefix $(src)/,$(DT_DOCS))
+ extra-y += $(patsubst $(src)/%.yaml,%.example.dts, $(DT_SCHEMA_FILES))
+ extra-y += $(patsubst $(src)/%.yaml,%.example.dtb, $(DT_SCHEMA_FILES))
+
+-$(obj)/$(DT_TMP_SCHEMA): $(addprefix $(obj)/,$(patsubst
+$(src)/%.yaml,%.example.dtb, $(DT_SCHEMA_FILES)))
++$(obj)/$(DT_TMP_SCHEMA): | $(addprefix $(obj)/,$(patsubst
+$(src)/%.yaml,%.example.dtb, $(DT_SCHEMA_FILES)))
+
+ $(obj)/$(DT_TMP_SCHEMA): $(addprefix $(srctree)/, $(DT_SCHEMA_FILES)) FORCE
+        $(call if_changed,mk_schema)
+
 >
-> I'm using an older gcc 4.8.3 - only used for build testing.
 >
-> Paul.
-> --
+>   SCHEMA  Documentation/devicetree/bindings/.schema.yaml.tmp
+> Traceback (most recent call last):
+>   File "/home/masahiro/ref/yaml-bindings/tools/dt-mk-schema", line 32,
+> in <module>
+>     schemas = dtschema.process_schemas(args.schemas, core_schema=(not
+> args.useronly))
+>   File "/usr/local/lib/python3.5/dist-packages/dtschema-0.0.1-py3.5.egg/dtschema/lib.py",
+> line 359, in process_schemas
+>     sch = process_schema(os.path.abspath(filename))
+>   File "/usr/local/lib/python3.5/dist-packages/dtschema-0.0.1-py3.5.egg/dtschema/lib.py",
+> line 314, in process_schema
+>     schema = load_schema(filename)
+>   File "/usr/local/lib/python3.5/dist-packages/dtschema-0.0.1-py3.5.egg/dtschema/lib.py",
+> line 80, in load_schema
+>     return yaml.load(f.read())
+>   File "/usr/lib/python3.5/codecs.py", line 321, in decode
+>     (result, consumed) = self._buffer_decode(data, self.errors, final)
+> UnicodeDecodeError: 'utf-8' codec can't decode byte 0xd0 in position
+> 0: invalid continuation byte
+> Documentation/devicetree/bindings/Makefile:33: recipe for target
+> 'Documentation/devicetree/bindings/.schema.yaml.tmp' failed
+> make[1]: *** [Documentation/devicetree/bindings/.schema.yaml.tmp] Error 1
+> Makefile:1278: recipe for target 'dt_binding_check' failed
+> make: *** [dt_binding_check] Error 2
 >
->>  mm/kasan/common.c          |  3 ++-
->>  3 files changed, 23 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
->> index 4ebc19422931..7a4a0904cac8 100644
->> --- a/arch/arm64/mm/kasan_init.c
->> +++ b/arch/arm64/mm/kasan_init.c
->> @@ -43,6 +43,15 @@ static phys_addr_t __init kasan_alloc_zeroed_page(int=
- node)
->>         return __pa(p);
->>  }
->>
->> +static phys_addr_t __init kasan_alloc_raw_page(int node)
->> +{
->> +       void *p =3D memblock_alloc_try_nid_raw(PAGE_SIZE, PAGE_SIZE,
->> +                                               __pa(MAX_DMA_ADDRESS),
->> +                                               MEMBLOCK_ALLOC_ACCESSIBL=
-E,
->> +                                               node);
->> +       return __pa(p);
->> +}
->> +
->>  static pte_t *__init kasan_pte_offset(pmd_t *pmdp, unsigned long addr, =
-int node,
->>                                       bool early)
->>  {
->> @@ -92,7 +101,9 @@ static void __init kasan_pte_populate(pmd_t *pmdp, un=
-signed long addr,
->>         do {
->>                 phys_addr_t page_phys =3D early ?
->>                                 __pa_symbol(kasan_early_shadow_page)
->> -                                       : kasan_alloc_zeroed_page(node);
->> +                                       : kasan_alloc_raw_page(node);
->> +               if (!early)
->> +                       memset(__va(page_phys), KASAN_SHADOW_INIT, PAGE_=
-SIZE);
->>                 next =3D addr + PAGE_SIZE;
->>                 set_pte(ptep, pfn_pte(__phys_to_pfn(page_phys), PAGE_KER=
-NEL));
->>         } while (ptep++, addr =3D next, addr !=3D end && pte_none(READ_O=
-NCE(*ptep)));
->> @@ -239,7 +250,7 @@ void __init kasan_init(void)
->>                         pfn_pte(sym_to_pfn(kasan_early_shadow_page),
->>                                 PAGE_KERNEL_RO));
->>
->> -       memset(kasan_early_shadow_page, 0, PAGE_SIZE);
->> +       memset(kasan_early_shadow_page, KASAN_SHADOW_INIT, PAGE_SIZE);
->>         cpu_replace_ttbr1(lm_alias(swapper_pg_dir));
->>
->>         /* At this point kasan is fully initialized. Enable error messag=
-es */
->> diff --git a/include/linux/kasan.h b/include/linux/kasan.h
->> index ec22d548d0d7..c56af24bd3e7 100644
->> --- a/include/linux/kasan.h
->> +++ b/include/linux/kasan.h
->> @@ -153,6 +153,8 @@ static inline size_t kasan_metadata_size(struct kmem=
-_cache *cache) { return 0; }
->>
->>  #ifdef CONFIG_KASAN_GENERIC
->>
->> +#define KASAN_SHADOW_INIT 0
->> +
->>  void kasan_cache_shrink(struct kmem_cache *cache);
->>  void kasan_cache_shutdown(struct kmem_cache *cache);
->>
->> @@ -163,4 +165,10 @@ static inline void kasan_cache_shutdown(struct kmem=
-_cache *cache) {}
->>
->>  #endif /* CONFIG_KASAN_GENERIC */
->>
->> +#ifdef CONFIG_KASAN_SW_TAGS
->> +
->> +#define KASAN_SHADOW_INIT 0xFF
->> +
->> +#endif /* CONFIG_KASAN_SW_TAGS */
->> +
->>  #endif /* LINUX_KASAN_H */
->> diff --git a/mm/kasan/common.c b/mm/kasan/common.c
->> index 5f68c93734ba..7134e75447ff 100644
->> --- a/mm/kasan/common.c
->> +++ b/mm/kasan/common.c
->> @@ -473,11 +473,12 @@ int kasan_module_alloc(void *addr, size_t size)
->>
->>         ret =3D __vmalloc_node_range(shadow_size, 1, shadow_start,
->>                         shadow_start + shadow_size,
->> -                       GFP_KERNEL | __GFP_ZERO,
->> +                       GFP_KERNEL,
->>                         PAGE_KERNEL, VM_NO_GUARD, NUMA_NO_NODE,
->>                         __builtin_return_address(0));
->>
->>         if (ret) {
->> +               __memset(ret, KASAN_SHADOW_INIT, shadow_size);
->>                 find_vm_area(addr)->flags |=3D VM_KASAN;
->>                 kmemleak_ignore(ret);
->>                 return 0;
->> --
->> 2.20.0.rc1.387.gf8505762e3-goog
->>
+>
+>
+>
+>
+>
+>
+> BTW, I cannot build *.dt.yaml
+>
+>
+>
+>   DTC     arch/arm/boot/dts/alpine-db.dt.yaml
+> FATAL ERROR: Unknown output format "yaml"
+> scripts/Makefile.lib:313: recipe for target
+> 'arch/arm/boot/dts/alpine-db.dt.yaml' failed
+> make[1]: *** [arch/arm/boot/dts/alpine-db.dt.yaml] Error 1
+> make[1]: *** Deleting file 'arch/arm/boot/dts/alpine-db.dt.yaml'
+> Makefile:1262: recipe for target 'dtbs_check' failed
+>
+>
+>
+>
+> I use linux-next.
+>
+>
+> script/dtc/dtc does not understand '-O yaml'
+>
+>
+> I also tried the upstream DTC project with no success.
+>
+>
+> Where can I get dtc with yaml support?
+
+You need libyaml and its headers. I'll try to make this a better error
+message. For now, libyaml is optional so we don't break everyone just
+building dtbs.
+
+Rob
