@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:36638 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:36641 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726432AbeLKLBm (ORCPT
+        with ESMTP id S1726541AbeLKLBm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 11 Dec 2018 06:01:42 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 05/27] kconfig: refactor pattern matching in STRING state
-Date: Tue, 11 Dec 2018 20:00:48 +0900
-Message-Id: <1544526070-16690-6-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 08/27] kconfig: warn no new line at end of file
+Date: Tue, 11 Dec 2018 20:00:51 +0900
+Message-Id: <1544526070-16690-9-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,54 +15,67 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Here, similar matching patters are duplicated in order to look ahead
-the '\n' character. If the next character is '\n', the lexer returns
-T_WORD_QUOTE because it must be prepared to return T_EOL at the next
-match.
+It would be nice to warn if a new line is missing at end of file.
 
-Use unput('\n') trick to reduce the code duplication.
+We could do this by checkpatch.pl for arbitrary files, but new line
+is rather essential as a statement terminator in Kconfig.
+
+The warning message looks like this:
+
+  kernel/Kconfig.preempt:60:warning: no new line at end of file
+
+Currently, kernel/Kconfig.preempt is the only file with no new line
+at end of file. Fix it.
+
+I know there are some false negative cases. For example, no warning
+is displayed when the last line contains some whitespaces/comments,
+but no new line. Yet, this commit works well for most cases.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/kconfig/zconf.l | 14 +++-----------
- 1 file changed, 3 insertions(+), 11 deletions(-)
+ kernel/Kconfig.preempt  |  2 +-
+ scripts/kconfig/zconf.l | 10 ++++++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
+diff --git a/kernel/Kconfig.preempt b/kernel/Kconfig.preempt
+index cd16551..0fee5fe 100644
+--- a/kernel/Kconfig.preempt
++++ b/kernel/Kconfig.preempt
+@@ -57,4 +57,4 @@ config PREEMPT
+ endchoice
+ 
+ config PREEMPT_COUNT
+-       bool
+\ No newline at end of file
++       bool
 diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 709b774..b7bc164 100644
+index 9038e97..5046d3c 100644
 --- a/scripts/kconfig/zconf.l
 +++ b/scripts/kconfig/zconf.l
-@@ -182,19 +182,9 @@ n	[A-Za-z0-9_-]
+@@ -78,6 +78,13 @@ static void warn_ignored_character(char chr)
+ 	        "%s:%d:warning: ignoring unsupported character '%c'\n",
+ 	        current_file->name, yylineno, chr);
+ }
++
++static void warn_no_newline(void)
++{
++	fprintf(stderr, "%s:%d:warning: no new line at end of file\n",
++	        current_file->name, yylineno);
++}
++
+ %}
  
- <STRING>{
- 	"$".*	append_expanded_string(yytext);
--	[^$'"\\\n]+/\n	{
--		append_string(yytext, yyleng);
--		yylval.string = text;
--		return T_WORD_QUOTE;
--	}
- 	[^$'"\\\n]+	{
- 		append_string(yytext, yyleng);
- 	}
--	\\.?/\n	{
--		append_string(yytext + 1, yyleng - 1);
--		yylval.string = text;
--		return T_WORD_QUOTE;
--	}
- 	\\.?	{
- 		append_string(yytext + 1, yyleng - 1);
- 	}
-@@ -210,8 +200,10 @@ n	[A-Za-z0-9_-]
- 		fprintf(stderr,
- 			"%s:%d:warning: multi-line strings not supported\n",
- 			zconf_curname(), zconf_lineno());
-+		unput('\n');
- 		BEGIN(INITIAL);
--		return T_EOL;
-+		yylval.string = text;
-+		return T_WORD_QUOTE;
- 	}
- 	<<EOF>>	{
- 		BEGIN(INITIAL);
+ n	[A-Za-z0-9_-]
+@@ -261,6 +268,9 @@ n	[A-Za-z0-9_-]
+ <<EOF>>	{
+ 	BEGIN(INITIAL);
+ 
++	if (prev_token != T_EOL && prev_token != T_HELPTEXT)
++		warn_no_newline();
++
+ 	if (current_file) {
+ 		zconf_endfile();
+ 		return T_EOL;
 -- 
 2.7.4
