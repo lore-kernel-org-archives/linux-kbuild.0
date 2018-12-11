@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:36714 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:36639 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726618AbeLKLBn (ORCPT
+        with ESMTP id S1726469AbeLKLBm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Dec 2018 06:01:43 -0500
+        Tue, 11 Dec 2018 06:01:42 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 13/27] kconfig: loosen the order of "visible" and "depends on" in menu entry
-Date: Tue, 11 Dec 2018 20:00:56 +0900
-Message-Id: <1544526070-16690-14-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 09/27] kconfig: remove grammatically ambiguous "unexpected option" diagnostic
+Date: Tue, 11 Dec 2018 20:00:52 +0900
+Message-Id: <1544526070-16690-10-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,70 +15,85 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Currently, "visible" and "depends on", if defined in a menu entry,
-must appear in that order.
+This commit decreases 15 shift/reduce conflicts.
 
-The real example is in drivers/media/tuners/Kconfig:
+The location of this error recovery is ambiguous.
 
-  menu "Customize TV tuners"
-          visible if <expr1>
-          depends on <expr2>
+For example, there are two ways to interpret the following code:
 
-... is fine, but you cannot change the property order like this:
+  1 config FOO
+  2         bool "foo"
 
-  menu "Customize TV tuners"
-          depends on <expr2>
-          visible if <expr1>
+ [A] Both lines are reduced together into a config_stmt.
 
-Kconfig does not require a specific order of properties. In this case,
-menu_add_visibility(() and menu_add_dep() are orthogonal.
+ [B] The only line 1 is reduced into a config_stmt, and the line 2
+     matches to "option_name error T_EOL"
 
-Loosen this unreasonable restriction.
+Of course, we expect [A], but [B] could be grammatically possible.
+
+Kconfig has no terminator for a config block. So, we cannot detect its
+end until we see non-property keywords. People often insert a blank
+line between two config blocks, but it is just a coding convention.
+Blank lines are actually allowed anywhere in Kconfig files.
+
+The real error is when a property keyword appears right after "endif",
+"endchoice", "endmenu",  "source", "comment", or variable assignments.
+
+Instead of fixing the grammatical ambiguity, I chose to simply remove
+this error recovery.
+
+The difference is
+
+  unexpected option "bool"
+
+... is turned into a more generic message:
+
+  invalid statement
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/kconfig/zconf.y | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ scripts/kconfig/zconf.y | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
 diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index eeb449b..7cc8244 100644
+index 02bfc62..cef6123 100644
 --- a/scripts/kconfig/zconf.y
 +++ b/scripts/kconfig/zconf.y
-@@ -341,7 +341,7 @@ menu: T_MENU prompt T_EOL
- 	printd(DEBUG_PARSE, "%s:%d:menu\n", zconf_curname(), zconf_lineno());
- };
+@@ -31,7 +31,7 @@ struct symbol *symbol_hash[SYMBOL_HASHSIZE];
+ static struct menu *current_menu, *current_entry;
  
--menu_entry: menu visibility_list depends_list
-+menu_entry: menu menu_option_list
+ %}
+-%expect 21
++%expect 6
+ 
+ %union
  {
- 	$$ = menu_add_menu();
- };
-@@ -357,6 +357,12 @@ menu_end: end
- menu_stmt: menu_entry stmt_list menu_end
+@@ -94,7 +94,6 @@ static struct menu *current_menu, *current_entry;
+ %type <expr> expr
+ %type <expr> if_expr
+ %type <id> end
+-%type <id> option_name
+ %type <menu> if_entry menu_entry choice_entry
+ %type <string> symbol_option_arg word_opt assign_val
+ 
+@@ -127,17 +126,9 @@ stmt_list:
+ 	| stmt_list menu_stmt
+ 	| stmt_list end			{ zconf_error("unexpected end statement"); }
+ 	| stmt_list T_WORD error T_EOL	{ zconf_error("unknown statement \"%s\"", $2); }
+-	| stmt_list option_name error T_EOL
+-{
+-	zconf_error("unexpected option \"%s\"", $2->name);
+-}
+ 	| stmt_list error T_EOL		{ zconf_error("invalid statement"); }
  ;
  
-+menu_option_list:
-+	  /* empty */
-+	| menu_option_list visible
-+	| menu_option_list depends
-+;
-+
- source_stmt: T_SOURCE prompt T_EOL
- {
- 	printd(DEBUG_PARSE, "%s:%d:source %s\n", zconf_curname(), zconf_lineno(), $2);
-@@ -414,12 +420,6 @@ depends: T_DEPENDS T_ON expr T_EOL
- };
- 
- /* visibility option */
--
--visibility_list:
--	  /* empty */
--	| visibility_list visible
+-option_name:
+-	T_DEPENDS | T_PROMPT | T_TYPE | T_SELECT | T_IMPLY | T_OPTIONAL | T_RANGE | T_DEFAULT | T_VISIBLE
 -;
 -
- visible: T_VISIBLE if_expr T_EOL
- {
- 	menu_add_visibility($2);
+ common_stmt:
+ 	  if_stmt
+ 	| comment_stmt
 -- 
 2.7.4
