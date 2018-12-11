@@ -1,41 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:34042 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726436AbeLKMCL (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:30117 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726203AbeLKNAO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Dec 2018 07:02:11 -0500
+        Tue, 11 Dec 2018 08:00:14 -0500
+MIME-Version: 1.0
+References: <1544009286-15705-1-git-send-email-yamada.masahiro@socionext.com>
+ <1544009286-15705-2-git-send-email-yamada.masahiro@socionext.com> <20181206150325.GA2726@infradead.org>
+In-Reply-To: <20181206150325.GA2726@infradead.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 4/4] kbuild: handle part-of-module correctly for *.ll and *.symtypes
-Date: Tue, 11 Dec 2018 21:01:56 +0900
-Message-Id: <1544529716-4917-4-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1544529716-4917-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1544529716-4917-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Tue, 11 Dec 2018 21:59:26 +0900
+Message-ID: <CAK7LNAS7hh4f8mYoZc7RUWStnchhftUN0nU5MJ_trjyNJx50Lw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] kbuild: generate asm-generic wrappers if mandatory
+ headers are missing
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
 
-The single targets *.ll and *.symtypes never treated as a module.
-Fix this.
+Hi Christoph,
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- scripts/Makefile.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Fri, Dec 7, 2018 at 12:04 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Wed, Dec 05, 2018 at 08:28:05PM +0900, Masahiro Yamada wrote:
+> > Some time ago, Sam pointed out a certain degree of overwrap between
+> > generic-y and mandatory-y. (https://lkml.org/lkml/2017/7/10/121)
+> >
+> > I a bit tweaked the meaning of mandatory-y; now it defines the minimum
+> > set of ASM headers that all architectures must have.
+> >
+> > If arch does not have specific implementation of a mandatory header,
+> > Kbuild will let it fallback to the asm-generic one by automatically
+> > generating a wrapper. This will allow to drop lots of redundant
+> > generic-y defines.
+> >
+> > Previously, "mandatory" was used in the context of UAPI, but I guess
+> > this can be extended to kernel space ASM headers.
+>
+> How useful is it to keep the generic-y behavior around at all vs making
+> everything useful mandatory?
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 321b5b7..795fedc 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -94,7 +94,7 @@ endif
- # ---------------------------------------------------------------------------
- 
- # Default is built-in, unless we know otherwise
--$(foreach x, i lst o s, $(patsubst %.o,%.$(x),$(real-obj-m))): \
-+$(foreach x, i ll lst o s symtypes, $(patsubst %.o,%.$(x),$(real-obj-m))): \
- 	part-of-module := y
- 
- modkern_cflags =                                          \
+
+What I can tell is not all architectures
+support kvm_para.h, ucontext.h
+
+I guess they will stay as arch-specific generic-y,
+but I am not an expert in this area.
+
+
+kvm_para.h is missing csky, nds32, riscv.
+
+ucontext.h is missing in alpha, arm, m68k, parisc, sparc, xtensa
+
+
+
+bpf_perf_event.h could be promoted to mandatory-y ?
+All architectures have it.
+
+
 -- 
-2.7.4
+Best Regards
+Masahiro Yamada
