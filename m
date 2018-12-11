@@ -1,67 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:52176 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727686AbeLKQWw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Dec 2018 11:22:52 -0500
-Subject: Re: [PATCH v13 19/25] kasan: add hooks implementation for tag-based
- mode
-References: <cover.1544099024.git.andreyknvl@google.com>
- <bda78069e3b8422039794050ddcb2d53d053ed41.1544099024.git.andreyknvl@google.com>
-From: Vincenzo Frascino <vincenzo.frascino@arm.com>
-Message-ID: <2bf7415e-2724-b3c3-9571-20c8b6d43b92@arm.com>
-Date: Tue, 11 Dec 2018 16:22:43 +0000
-MIME-Version: 1.0
-In-Reply-To: <bda78069e3b8422039794050ddcb2d53d053ed41.1544099024.git.andreyknvl@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:45573 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726760AbeLKQ34 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 11 Dec 2018 11:29:56 -0500
+Received: by mail-pf1-f195.google.com with SMTP id g62so7357119pfd.12
+        for <linux-kbuild@vger.kernel.org>; Tue, 11 Dec 2018 08:29:55 -0800 (PST)
+Date: Tue, 11 Dec 2018 08:29:53 -0800 (PST)
+Subject: Re: [PATCH 2/3] kbuild: generate asm-generic wrappers if mandatory headers are missing
+In-Reply-To: <CAK7LNAS7hh4f8mYoZc7RUWStnchhftUN0nU5MJ_trjyNJx50Lw@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-f63eb098-71bf-411a-9583-388234647f1e@palmer-si-x1c4>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
-Cc: Vishwath Mohan <vishwath@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgeniy Stepanov <eugenis@google.com>
+To: yamada.masahiro@socionext.com
+Cc: Christoph Hellwig <hch@infradead.org>, linux-kbuild@vger.kernel.org, sam@ravnborg.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, corbet@lwn.net, michal.lkml@markovi.net
 
-Hi Andrey,
-
-On 06/12/2018 12:24, Andrey Konovalov wrote:
-> This commit adds tag-based KASAN specific hooks implementation and
-> adjusts common generic and tag-based KASAN ones.
-> 
-> 1. When a new slab cache is created, tag-based KASAN rounds up the size of
->    the objects in this cache to KASAN_SHADOW_SCALE_SIZE (== 16).
-> 
-> 2. On each kmalloc tag-based KASAN generates a random tag, sets the shadow
->    memory, that corresponds to this object to this tag, and embeds this
->    tag value into the top byte of the returned pointer.
-> 
-> 3. On each kfree tag-based KASAN poisons the shadow memory with a random
->    tag to allow detection of use-after-free bugs.
-> 
-> The rest of the logic of the hook implementation is very much similar to
-> the one provided by generic KASAN. Tag-based KASAN saves allocation and
-> free stack metadata to the slab object the same way generic KASAN does.
-> 
-> Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> ---
->  mm/kasan/common.c | 116 ++++++++++++++++++++++++++++++++++++++--------
->  mm/kasan/kasan.h  |   8 ++++
->  mm/kasan/tags.c   |  48 +++++++++++++++++++
->  3 files changed, 153 insertions(+), 19 deletions(-)
+On Tue, 11 Dec 2018 04:59:26 PST (-0800), yamada.masahiro@socionext.com wrote:
+> Hi Christoph,
 >
+>
+> On Fri, Dec 7, 2018 at 12:04 AM Christoph Hellwig <hch@infradead.org> wrote:
+>>
+>> On Wed, Dec 05, 2018 at 08:28:05PM +0900, Masahiro Yamada wrote:
+>> > Some time ago, Sam pointed out a certain degree of overwrap between
+>> > generic-y and mandatory-y. (https://lkml.org/lkml/2017/7/10/121)
+>> >
+>> > I a bit tweaked the meaning of mandatory-y; now it defines the minimum
+>> > set of ASM headers that all architectures must have.
+>> >
+>> > If arch does not have specific implementation of a mandatory header,
+>> > Kbuild will let it fallback to the asm-generic one by automatically
+>> > generating a wrapper. This will allow to drop lots of redundant
+>> > generic-y defines.
+>> >
+>> > Previously, "mandatory" was used in the context of UAPI, but I guess
+>> > this can be extended to kernel space ASM headers.
+>>
+>> How useful is it to keep the generic-y behavior around at all vs making
+>> everything useful mandatory?
+>
+>
+> What I can tell is not all architectures
+> support kvm_para.h, ucontext.h
+>
+> I guess they will stay as arch-specific generic-y,
+> but I am not an expert in this area.
+>
+>
+> kvm_para.h is missing csky, nds32, riscv.
 
+It looks like RISC-V missed it and everyone else copied us.  I don't see any 
+reason why the generic version wouldn't work on RISC-V, as it just has failures 
+for all the calls.
 
-[...]
-
-> @@ -265,6 +290,8 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
->  		return;
->  	}
->  
-> +	cache->align = round_up(cache->align, KASAN_SHADOW_SCALE_SIZE);
-> +
-
-Did you consider to set ARCH_SLAB_MINALIGN instead of this round up?
-
--- 
-Regards,
-Vincenzo
+> ucontext.h is missing in alpha, arm, m68k, parisc, sparc, xtensa
+>
+>
+>
+> bpf_perf_event.h could be promoted to mandatory-y ?
+> All architectures have it.
