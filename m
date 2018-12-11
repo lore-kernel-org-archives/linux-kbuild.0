@@ -1,28 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:30117 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726203AbeLKNAO (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:35098 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726531AbeLKNBu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Dec 2018 08:00:14 -0500
+        Tue, 11 Dec 2018 08:01:50 -0500
 MIME-Version: 1.0
 References: <1544009286-15705-1-git-send-email-yamada.masahiro@socionext.com>
- <1544009286-15705-2-git-send-email-yamada.masahiro@socionext.com> <20181206150325.GA2726@infradead.org>
-In-Reply-To: <20181206150325.GA2726@infradead.org>
+ <1544009286-15705-2-git-send-email-yamada.masahiro@socionext.com> <20181206180459.GA19166@ravnborg.org>
+In-Reply-To: <20181206180459.GA19166@ravnborg.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 11 Dec 2018 21:59:26 +0900
-Message-ID: <CAK7LNAS7hh4f8mYoZc7RUWStnchhftUN0nU5MJ_trjyNJx50Lw@mail.gmail.com>
+Date: Tue, 11 Dec 2018 22:01:09 +0900
+Message-ID: <CAK7LNAQ8RjUkc57CWi_rnLopGSQQBtgerYJO+F7_0MD+p=NFxA@mail.gmail.com>
 Subject: Re: [PATCH 2/3] kbuild: generate asm-generic wrappers if mandatory
  headers are missing
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
 
-Hi Christoph,
+Hi Sam,
 
 
-On Fri, Dec 7, 2018 at 12:04 AM Christoph Hellwig <hch@infradead.org> wrote:
+On Fri, Dec 7, 2018 at 3:06 AM Sam Ravnborg <sam@ravnborg.org> wrote:
 >
 > On Wed, Dec 05, 2018 at 08:28:05PM +0900, Masahiro Yamada wrote:
 > > Some time ago, Sam pointed out a certain degree of overwrap between
@@ -38,28 +38,27 @@ On Fri, Dec 7, 2018 at 12:04 AM Christoph Hellwig <hch@infradead.org> wrote:
 > >
 > > Previously, "mandatory" was used in the context of UAPI, but I guess
 > > this can be extended to kernel space ASM headers.
+> >
+> > Suggested-by: Sam Ravnborg <sam@ravnborg.org>
+> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 >
-> How useful is it to keep the generic-y behavior around at all vs making
-> everything useful mandatory?
+> Nice work!
+>
+> For the full series:
+> Acked-by: Sam Ravnborg <sam@ravnborg.org>
+>
+> Have you considered to warn if generic-y contains a header listed
+> in mandatory-y - to prevent that they sneak back in.
+> And to catch when we lift a header from available to mandatory.
 
 
-What I can tell is not all architectures
-support kvm_para.h, ucontext.h
-
-I guess they will stay as arch-specific generic-y,
-but I am not an expert in this area.
-
-
-kvm_para.h is missing csky, nds32, riscv.
-
-ucontext.h is missing in alpha, arm, m68k, parisc, sparc, xtensa
+Yes, I also thought of this,
+and probably we should do it.
 
 
 
-bpf_perf_event.h could be promoted to mandatory-y ?
-All architectures have it.
 
 
--- 
+--
 Best Regards
 Masahiro Yamada
