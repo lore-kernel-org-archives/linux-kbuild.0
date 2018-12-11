@@ -1,64 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:35098 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726531AbeLKNBu (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:50362 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726231AbeLKOoA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Dec 2018 08:01:50 -0500
+        Tue, 11 Dec 2018 09:44:00 -0500
+Date: Tue, 11 Dec 2018 15:43:54 +0100
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH 21/27] treewide: surround file paths in Kconfig files
+ with double quotes
+Message-ID: <20181211144354.GA89489@gmail.com>
+References: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
+ <1544526070-16690-22-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-References: <1544009286-15705-1-git-send-email-yamada.masahiro@socionext.com>
- <1544009286-15705-2-git-send-email-yamada.masahiro@socionext.com> <20181206180459.GA19166@ravnborg.org>
-In-Reply-To: <20181206180459.GA19166@ravnborg.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 11 Dec 2018 22:01:09 +0900
-Message-ID: <CAK7LNAQ8RjUkc57CWi_rnLopGSQQBtgerYJO+F7_0MD+p=NFxA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] kbuild: generate asm-generic wrappers if mandatory
- headers are missing
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1544526070-16690-22-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
-
-Hi Sam,
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org, linux-arch <linux-arch@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, David Howells <dhowells@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will.deacon@arm.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Ingo Molnar <mingo@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Herbert Xu <herbert@gondor.apana.org.au>, linux-arm-kernel@lists.infradead.org
 
 
-On Fri, Dec 7, 2018 at 3:06 AM Sam Ravnborg <sam@ravnborg.org> wrote:
->
-> On Wed, Dec 05, 2018 at 08:28:05PM +0900, Masahiro Yamada wrote:
-> > Some time ago, Sam pointed out a certain degree of overwrap between
-> > generic-y and mandatory-y. (https://lkml.org/lkml/2017/7/10/121)
-> >
-> > I a bit tweaked the meaning of mandatory-y; now it defines the minimum
-> > set of ASM headers that all architectures must have.
-> >
-> > If arch does not have specific implementation of a mandatory header,
-> > Kbuild will let it fallback to the asm-generic one by automatically
-> > generating a wrapper. This will allow to drop lots of redundant
-> > generic-y defines.
-> >
-> > Previously, "mandatory" was used in the context of UAPI, but I guess
-> > this can be extended to kernel space ASM headers.
-> >
-> > Suggested-by: Sam Ravnborg <sam@ravnborg.org>
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->
-> Nice work!
->
-> For the full series:
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
->
-> Have you considered to warn if generic-y contains a header listed
-> in mandatory-y - to prevent that they sneak back in.
-> And to catch when we lift a header from available to mandatory.
+* Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
+> The Kconfig lexer supports special characters such as '.' and '/' in
+> the parameter context. In my understanding, the reason is just to
+> support bare file paths in the source statement.
+> 
+> I do not see a good reason to complicate Kconfig for the room of
+> ambiguity.
+> 
+> The majority of code already surround file paths with double quotes,
+> and it makes sense since the included file paths are constant string
+> literals.
+> 
+> Make it treewide consistent now.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Yes, I also thought of this,
-and probably we should do it.
+Acked-by: Ingo Molnar <mingo@kernel.org>
 
+Thanks for doing all this Kconfig language work!
 
+Thanks,
 
-
-
---
-Best Regards
-Masahiro Yamada
+	Ingo
