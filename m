@@ -1,61 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:37555 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726417AbeLKP2r (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Dec 2018 10:28:47 -0500
-Date: Tue, 11 Dec 2018 16:28:41 +0100
-From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v13 05/25] kasan: add CONFIG_KASAN_GENERIC and
- CONFIG_KASAN_SW_TAGS
-Message-ID: <20181211152840.ezjujzpyz5z6fd2d@ltop.local>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:51058 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726762AbeLKP75 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 11 Dec 2018 10:59:57 -0500
+Date: Tue, 11 Dec 2018 16:00:19 +0000
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v13 00/25] kasan: add software tag-based mode for arm64
+Message-ID: <20181211160018.GA12597@edgewater-inn.cambridge.arm.com>
 References: <cover.1544099024.git.andreyknvl@google.com>
- <b2550106eb8a68b10fefbabce820910b115aa853.1544099024.git.andreyknvl@google.com>
+ <20181211151829.GB11718@edgewater-inn.cambridge.arm.com>
+ <CAAeHK+xxNsOfaUZhcErc+fjEEv0YZ-dbQ0fTXzQUO4dZbM-GgA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b2550106eb8a68b10fefbabce820910b115aa853.1544099024.git.andreyknvl@google.com>
+In-Reply-To: <CAAeHK+xxNsOfaUZhcErc+fjEEv0YZ-dbQ0fTXzQUO4dZbM-GgA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: Andrey Konovalov <andreyknvl@google.com>, akpm@linux-foundation.org
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-On Thu, Dec 06, 2018 at 01:24:23PM +0100, Andrey Konovalov wrote:
-> diff --git a/include/linux/compiler-clang.h b/include/linux/compiler-clang.h
-> index 3e7dafb3ea80..39f668d5066b 100644
-> --- a/include/linux/compiler-clang.h
-> +++ b/include/linux/compiler-clang.h
-> @@ -16,9 +16,13 @@
->  /* all clang versions usable with the kernel support KASAN ABI version 5 */
->  #define KASAN_ABI_VERSION 5
->  
-> +#if __has_feature(address_sanitizer) || __has_feature(hwaddress_sanitizer)
->  /* emulate gcc's __SANITIZE_ADDRESS__ flag */
-> -#if __has_feature(address_sanitizer)
->  #define __SANITIZE_ADDRESS__
-> +#define __no_sanitize_address \
-> +		__attribute__((no_sanitize("address", "hwaddress")))
-> +#else
-> +#define __no_sanitize_address
->  #endif
->  
->  /*
-> diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-> index 2010493e1040..5776da43da97 100644
-> --- a/include/linux/compiler-gcc.h
-> +++ b/include/linux/compiler-gcc.h
-> @@ -143,6 +143,12 @@
->  #define KASAN_ABI_VERSION 3
->  #endif
->  
-> +#if __has_attribute(__no_sanitize_address__)
-> +#define __no_sanitize_address __attribute__((no_sanitize_address))
-> +#else
-> +#define __no_sanitize_address
-> +#endif
+[moving akpm to To:]
 
-Not really important but it's the name with leading and trailing
-underscores that is tested with __has_attribute() but then it's
-the naked 'no_sanitize_address' that is used in the attribute.
+On Tue, Dec 11, 2018 at 04:57:27PM +0100, Andrey Konovalov wrote:
+> On Tue, Dec 11, 2018 at 4:18 PM Will Deacon <will.deacon@arm.com> wrote:
+> > On Thu, Dec 06, 2018 at 01:24:18PM +0100, Andrey Konovalov wrote:
+> > > This patchset adds a new software tag-based mode to KASAN [1].
+> > > (Initially this mode was called KHWASAN, but it got renamed,
+> > >  see the naming rationale at the end of this section).
+> > >
+> > > The plan is to implement HWASan [2] for the kernel with the incentive,
+> > > that it's going to have comparable to KASAN performance, but in the same
+> > > time consume much less memory, trading that off for somewhat imprecise
+> > > bug detection and being supported only for arm64.
+> >
+> > For the arm64 parts:
+> >
+> > Acked-by: Will Deacon <will.deacon@arm.com>
+> >
+> > I assume that you plan to replace the current patches in -mm with this
+> > series?
+> >
+> > Cheers,
+> >
+> > Will
+> 
+> Hi Will,
+> 
+> Yes, that was the intention of sending v13. Should have I sent a
+> separate patch with v12->v13 fixes instead? I don't know what's the
+> usual way to make changes to the patchset once it's in the mm tree.
 
--- Luc
+No, I was just checking that the intention was for akpm to pick this up in
+preference to the old stuff! That works for me, and the minor conflict with
+arm64 in next was already resolved by Stephen.
+
+Will
