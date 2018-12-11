@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:36701 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:36708 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726584AbeLKLBn (ORCPT
+        with ESMTP id S1726609AbeLKLBn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 11 Dec 2018 06:01:43 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 10/27] kconfig: remove grammatically ambiguous option_error
-Date: Tue, 11 Dec 2018 20:00:53 +0900
-Message-Id: <1544526070-16690-11-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 16/27] kconfig: use distinct tokens for type and default properties
+Date: Tue, 11 Dec 2018 20:00:59 +0900
+Message-Id: <1544526070-16690-17-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,90 +15,192 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-This commit decreases 6 shift/reduce conflicts, and finally achieves
-conflict-free parser.
+This commit removes kconf_id::stype to prepare for the entire
+removal of kconf_id.c
 
-Since Kconfig has no terminator for a config block, detecting the end
-of config_stmt is not easy.
-
-For example, there are two ways for handling the error in the following
-code:
-
-  1 config FOO
-  2         =
-
- [A] Print "unknown option" error, assuming the line 2 is a part of
-     config_option_list
-
- [B] Print "invalid statement", assuming the line 1 is reduced into
-     a config_stmt by itself
-
-Bison actually chooses [A] because it performs the shift rather than
-the reduction where both are possible.
-
-However, there is no reason to choose one over the other since the
-code above can be written as follows:
-
- 1 config FOO
- 2
- 3 =
-
-Remove the option_error, and let it fall back to [B].
+To simplify the lexer, I want keywords straight-mapped to tokens.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/kconfig/zconf.y | 10 ----------
- 1 file changed, 10 deletions(-)
+ scripts/kconfig/kconf_id.c | 16 ++++++------
+ scripts/kconfig/lkc.h      |  1 -
+ scripts/kconfig/zconf.y    | 62 +++++++++++++++++++++++++++++-----------------
+ 3 files changed, 47 insertions(+), 32 deletions(-)
 
+diff --git a/scripts/kconfig/kconf_id.c b/scripts/kconfig/kconf_id.c
+index b3e0ea0..ec2c011 100644
+--- a/scripts/kconfig/kconf_id.c
++++ b/scripts/kconfig/kconf_id.c
+@@ -15,15 +15,15 @@ static struct kconf_id kconf_id_array[] = {
+ 	{ "endif",		T_ENDIF,		TF_COMMAND },
+ 	{ "depends",		T_DEPENDS,		TF_COMMAND },
+ 	{ "optional",		T_OPTIONAL,		TF_COMMAND },
+-	{ "default",		T_DEFAULT,		TF_COMMAND, S_UNKNOWN },
++	{ "default",		T_DEFAULT,		TF_COMMAND },
++	{ "def_bool",		T_DEF_BOOL,		TF_COMMAND },
++	{ "def_tristate",	T_DEF_TRISTATE,		TF_COMMAND },
+ 	{ "prompt",		T_PROMPT,		TF_COMMAND },
+-	{ "tristate",		T_TYPE,			TF_COMMAND, S_TRISTATE },
+-	{ "def_tristate",	T_DEFAULT,		TF_COMMAND, S_TRISTATE },
+-	{ "bool",		T_TYPE,			TF_COMMAND, S_BOOLEAN },
+-	{ "def_bool",		T_DEFAULT,		TF_COMMAND, S_BOOLEAN },
+-	{ "int",		T_TYPE,			TF_COMMAND, S_INT },
+-	{ "hex",		T_TYPE,			TF_COMMAND, S_HEX },
+-	{ "string",		T_TYPE,			TF_COMMAND, S_STRING },
++	{ "bool",		T_BOOL,			TF_COMMAND },
++	{ "tristate",		T_TRISTATE,		TF_COMMAND },
++	{ "int",		T_INT,			TF_COMMAND },
++	{ "hex",		T_HEX,			TF_COMMAND },
++	{ "string",		T_STRING,		TF_COMMAND },
+ 	{ "select",		T_SELECT,		TF_COMMAND },
+ 	{ "imply",		T_IMPLY,		TF_COMMAND },
+ 	{ "range",		T_RANGE,		TF_COMMAND },
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index 9eb7c83..b6bbcd1 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -50,7 +50,6 @@ struct kconf_id {
+ 	const char *name;
+ 	int token;
+ 	unsigned int flags;
+-	enum symbol_type stype;
+ };
+ 
+ extern int yylineno;
 diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index cef6123..a92f167 100644
+index 020454b..4345f9f 100644
 --- a/scripts/kconfig/zconf.y
 +++ b/scripts/kconfig/zconf.y
-@@ -31,7 +31,6 @@ struct symbol *symbol_hash[SYMBOL_HASHSIZE];
- static struct menu *current_menu, *current_entry;
+@@ -40,6 +40,7 @@ static struct menu *current_menu, *current_entry;
+ 	struct expr *expr;
+ 	struct menu *menu;
+ 	const struct kconf_id *id;
++	enum symbol_type type;
+ 	enum variable_flavor flavor;
+ }
  
- %}
--%expect 6
- 
- %union
- {
-@@ -138,12 +137,6 @@ common_stmt:
- 	| assignment_stmt
- ;
- 
--option_error:
--	  T_WORD error T_EOL		{ zconf_error("unknown option \"%s\"", $1); }
--	| error T_EOL			{ zconf_error("invalid option"); }
--;
--
--
- /* config/menuconfig entry */
- 
- config_entry_start: T_CONFIG nonconst_symbol T_EOL
-@@ -180,7 +173,6 @@ config_option_list:
- 	| config_option_list symbol_option
- 	| config_option_list depends
+@@ -59,8 +60,6 @@ static struct menu *current_menu, *current_entry;
+ %token <id>T_DEPENDS
+ %token <id>T_OPTIONAL
+ %token <id>T_PROMPT
+-%token <id>T_TYPE
+-%token <id>T_DEFAULT
+ %token <id>T_SELECT
+ %token <id>T_IMPLY
+ %token <id>T_RANGE
+@@ -69,8 +68,16 @@ static struct menu *current_menu, *current_entry;
+ %token <id>T_ON
+ %token <string> T_WORD
+ %token <string> T_WORD_QUOTE
++%token T_BOOL
+ %token T_CLOSE_PAREN
++%token T_DEFAULT
++%token T_DEF_BOOL
++%token T_DEF_TRISTATE
++%token T_HEX
++%token T_INT
+ %token T_OPEN_PAREN
++%token T_STRING
++%token T_TRISTATE
+ %token T_EOL
+ %token <string> T_VARIABLE
+ %token <flavor> T_ASSIGN
+@@ -85,6 +92,7 @@ static struct menu *current_menu, *current_entry;
+ %type <string> prompt
+ %type <symbol> nonconst_symbol
+ %type <symbol> symbol
++%type <type> type bool_or_tri default
+ %type <expr> expr
+ %type <expr> if_expr
+ %type <id> end
+@@ -169,12 +177,12 @@ config_option_list:
  	| config_option_list help
--	| config_option_list option_error
  ;
  
- config_option: T_TYPE prompt_stmt_opt T_EOL
-@@ -280,7 +272,6 @@ choice_option_list:
- 	| choice_option_list choice_option
- 	| choice_option_list depends
- 	| choice_option_list help
--	| choice_option_list option_error
- ;
+-config_option: T_TYPE prompt_stmt_opt T_EOL
++config_option: type prompt_stmt_opt T_EOL
+ {
+-	menu_set_type($1->stype);
++	menu_set_type($1);
+ 	printd(DEBUG_PARSE, "%s:%d:type(%u)\n",
+ 		zconf_curname(), zconf_lineno(),
+-		$1->stype);
++		$1);
+ };
  
- choice_option: T_PROMPT prompt if_expr T_EOL
-@@ -429,7 +420,6 @@ help: help_start T_HELPTEXT
- depends_list:
+ config_option: T_PROMPT prompt if_expr T_EOL
+@@ -183,14 +191,14 @@ config_option: T_PROMPT prompt if_expr T_EOL
+ 	printd(DEBUG_PARSE, "%s:%d:prompt\n", zconf_curname(), zconf_lineno());
+ };
+ 
+-config_option: T_DEFAULT expr if_expr T_EOL
++config_option: default expr if_expr T_EOL
+ {
+ 	menu_add_expr(P_DEFAULT, $2, $3);
+-	if ($1->stype != S_UNKNOWN)
+-		menu_set_type($1->stype);
++	if ($1 != S_UNKNOWN)
++		menu_set_type($1);
+ 	printd(DEBUG_PARSE, "%s:%d:default(%u)\n",
+ 		zconf_curname(), zconf_lineno(),
+-		$1->stype);
++		$1);
+ };
+ 
+ config_option: T_SELECT nonconst_symbol if_expr T_EOL
+@@ -274,15 +282,11 @@ choice_option: T_PROMPT prompt if_expr T_EOL
+ 	printd(DEBUG_PARSE, "%s:%d:prompt\n", zconf_curname(), zconf_lineno());
+ };
+ 
+-choice_option: T_TYPE prompt_stmt_opt T_EOL
++choice_option: bool_or_tri prompt_stmt_opt T_EOL
+ {
+-	if ($1->stype == S_BOOLEAN || $1->stype == S_TRISTATE) {
+-		menu_set_type($1->stype);
+-		printd(DEBUG_PARSE, "%s:%d:type(%u)\n",
+-			zconf_curname(), zconf_lineno(),
+-			$1->stype);
+-	} else
+-		YYERROR;
++	menu_set_type($1);
++	printd(DEBUG_PARSE, "%s:%d:type(%u)\n",
++	       zconf_curname(), zconf_lineno(), $1);
+ };
+ 
+ choice_option: T_OPTIONAL T_EOL
+@@ -293,14 +297,26 @@ choice_option: T_OPTIONAL T_EOL
+ 
+ choice_option: T_DEFAULT nonconst_symbol if_expr T_EOL
+ {
+-	if ($1->stype == S_UNKNOWN) {
+-		menu_add_symbol(P_DEFAULT, $2, $3);
+-		printd(DEBUG_PARSE, "%s:%d:default\n",
+-			zconf_curname(), zconf_lineno());
+-	} else
+-		YYERROR;
++	menu_add_symbol(P_DEFAULT, $2, $3);
++	printd(DEBUG_PARSE, "%s:%d:default\n",
++	       zconf_curname(), zconf_lineno());
+ };
+ 
++type:
++	  bool_or_tri
++	| T_INT			{ $$ = S_INT; }
++	| T_HEX			{ $$ = S_HEX; }
++	| T_STRING		{ $$ = S_STRING; }
++
++bool_or_tri:
++	  T_BOOL		{ $$ = S_BOOLEAN; }
++	| T_TRISTATE		{ $$ = S_TRISTATE; }
++
++default:
++	  T_DEFAULT		{ $$ = S_UNKNOWN; }
++	| T_DEF_BOOL		{ $$ = S_BOOLEAN; }
++	| T_DEF_TRISTATE	{ $$ = S_TRISTATE; }
++
+ choice_block:
  	  /* empty */
- 	| depends_list depends
--	| depends_list option_error
- ;
- 
- depends: T_DEPENDS T_ON expr T_EOL
+ 	| choice_block common_stmt
 -- 
 2.7.4
