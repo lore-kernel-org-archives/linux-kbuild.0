@@ -1,51 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk1-f195.google.com ([209.85.221.195]:34668 "EHLO
-        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726281AbeLKL0N (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:34040 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726251AbeLKMCK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Dec 2018 06:26:13 -0500
-MIME-Version: 1.0
-References: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com> <1544526070-16690-22-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1544526070-16690-22-git-send-email-yamada.masahiro@socionext.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 11 Dec 2018 12:25:59 +0100
-Message-ID: <CAMuHMdUcyzoMkiu-XaD5hM3uxhh+G3wMWWkVrFRNBkv5GbDGmA@mail.gmail.com>
-Subject: Re: [PATCH 21/27] treewide: surround file paths in Kconfig files with
- double quotes
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 11 Dec 2018 07:02:10 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/4] kbuild: remove redundant quiet_modtag for $(obj-m)
+Date: Tue, 11 Dec 2018 21:01:53 +0900
+Message-Id: <1544529716-4917-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linux-Arch <linux-arch@vger.kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Will Deacon <will.deacon@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Howells <dhowells@redhat.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, "David S. Miller" <davem@davemloft.net>, Linux ARM <linux-arm-kernel@lists.infradead.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Tue, Dec 11, 2018 at 12:03 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> The Kconfig lexer supports special characters such as '.' and '/' in
-> the parameter context. In my understanding, the reason is just to
-> support bare file paths in the source statement.
->
-> I do not see a good reason to complicate Kconfig for the room of
-> ambiguity.
->
-> The majority of code already surround file paths with double quotes,
-> and it makes sense since the included file paths are constant string
-> literals.
->
-> Make it treewide consistent now.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+All objects in $(obj-m) are included in $(real-obj-m) as well.
 
->  arch/m68k/Kconfig            |  6 +++---
+It is true composite objects are only contained in $(obj-m),
+but [M] is hard-coded in quiet_cmd_link_multi-m.
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+This line is redundant.
 
-Gr{oetje,eeting}s,
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-                        Geert
+ scripts/Makefile.build | 2 --
+ 1 file changed, 2 deletions(-)
 
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 6a6be9f..5a4fd82 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -110,8 +110,6 @@ $(real-obj-m:.o=.i)  : quiet_modtag := [M]
+ $(real-obj-m:.o=.s)  : quiet_modtag := [M]
+ $(real-obj-m:.o=.lst): quiet_modtag := [M]
+ 
+-$(obj-m)             : quiet_modtag := [M]
+-
+ quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
+ cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
+ 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+2.7.4
