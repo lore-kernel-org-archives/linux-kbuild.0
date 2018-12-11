@@ -1,70 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it1-f194.google.com ([209.85.166.194]:35487 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730663AbeLKQCz (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:26017 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730552AbeLKQED (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Dec 2018 11:02:55 -0500
-Received: by mail-it1-f194.google.com with SMTP id p197so4650257itp.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 11 Dec 2018 08:02:54 -0800 (PST)
+        Tue, 11 Dec 2018 11:04:03 -0500
 MIME-Version: 1.0
-References: <cover.1544099024.git.andreyknvl@google.com> <b2550106eb8a68b10fefbabce820910b115aa853.1544099024.git.andreyknvl@google.com>
- <20181211152840.ezjujzpyz5z6fd2d@ltop.local>
-In-Reply-To: <20181211152840.ezjujzpyz5z6fd2d@ltop.local>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Tue, 11 Dec 2018 17:02:42 +0100
-Message-ID: <CAAeHK+y0AzO8r21L=9HftHuoTXMuTjkZYJOZ6hKZqCEQOjygHQ@mail.gmail.com>
-Subject: Re: [PATCH v13 05/25] kasan: add CONFIG_KASAN_GENERIC and CONFIG_KASAN_SW_TAGS
+References: <20181210203225.11179-1-robh@kernel.org> <CAK7LNAThtAOy4PQiYZ2X0oWrHdcLi7on8ctSXJ=bfT0HNh7NFQ@mail.gmail.com>
+ <CAL_JsqL7n2sjLbJVieVDQ4YtKMi2COCaijO9ZNu7ggzmXXxLEg@mail.gmail.com>
+In-Reply-To: <CAL_JsqL7n2sjLbJVieVDQ4YtKMi2COCaijO9ZNu7ggzmXXxLEg@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 12 Dec 2018 01:02:58 +0900
+Message-ID: <CAK7LNARkr-g9ae+74QE6GMuxLM0JPgEqYOkwb0njXcb9-=nBdQ@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: Add support for DT binding schema checks
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: Rob Herring <robh@kernel.org>
+Cc: DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, darknighte@darknighte.com, Frank Rowand <frowand.list@gmail.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, grant.likely@arm.com, Kumar Gala <kumar.gala@linaro.org>, arm-soc <arm@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Mark Rutland <mark.rutland@arm.com>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, Dec 11, 2018 at 4:28 PM Luc Van Oostenryck
-<luc.vanoostenryck@gmail.com> wrote:
+On Wed, Dec 12, 2018 at 12:13 AM Rob Herring <robh@kernel.org> wrote:
+
 >
-> On Thu, Dec 06, 2018 at 01:24:23PM +0100, Andrey Konovalov wrote:
-> > diff --git a/include/linux/compiler-clang.h b/include/linux/compiler-clang.h
-> > index 3e7dafb3ea80..39f668d5066b 100644
-> > --- a/include/linux/compiler-clang.h
-> > +++ b/include/linux/compiler-clang.h
-> > @@ -16,9 +16,13 @@
-> >  /* all clang versions usable with the kernel support KASAN ABI version 5 */
-> >  #define KASAN_ABI_VERSION 5
+> > > +$(obj)/%.example.dts: $(src)/%.yaml FORCE
+> > > +       $(call if_changed,chk_binding)
+> > > +
+> > > +DT_TMP_SCHEMA := .schema.yaml.tmp
 > >
-> > +#if __has_feature(address_sanitizer) || __has_feature(hwaddress_sanitizer)
-> >  /* emulate gcc's __SANITIZE_ADDRESS__ flag */
-> > -#if __has_feature(address_sanitizer)
-> >  #define __SANITIZE_ADDRESS__
-> > +#define __no_sanitize_address \
-> > +             __attribute__((no_sanitize("address", "hwaddress")))
-> > +#else
-> > +#define __no_sanitize_address
-> >  #endif
 > >
-> >  /*
-> > diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-> > index 2010493e1040..5776da43da97 100644
-> > --- a/include/linux/compiler-gcc.h
-> > +++ b/include/linux/compiler-gcc.h
-> > @@ -143,6 +143,12 @@
-> >  #define KASAN_ABI_VERSION 3
-> >  #endif
-> >
-> > +#if __has_attribute(__no_sanitize_address__)
-> > +#define __no_sanitize_address __attribute__((no_sanitize_address))
-> > +#else
-> > +#define __no_sanitize_address
-> > +#endif
+> > BTW, why does this file start with a period?
+> > What is the meaning of '.tmp' extension?
 >
-> Not really important but it's the name with leading and trailing
-> underscores that is tested with __has_attribute() but then it's
-> the naked 'no_sanitize_address' that is used in the attribute.
+> Nothing really. Just named it something so it gets cleaned and ignored by git.
 
-Hi Luc,
 
-You're right. This shouldn't be important though, since "__" in
-attribute names are optional AFAIK. It might make sense to fix it as a
-separate patch when this series is merged.
+It is cleaned whatever file name you use.
 
-Thanks!
+
+See scripts/Makefile.clean
+
+__clean-files   := $(extra-y) $(extra-m) $(extra-)       \
+                   $(always) $(targets) $(clean-files)   \
+                   $(hostprogs-y) $(hostprogs-m) $(hostprogs-) \
+                   $(hostlibs-y) $(hostlibs-m) $(hostlibs-) \
+                   $(hostcxxlibs-y) $(hostcxxlibs-m)
+
+
+$(extra-y) is cleaned.
+
+
+
+You are adding *.example.dts to .gitignore
+
+Why not "schema.yaml" ?
+
+
+
+
+> > > +extra-y += $(DT_TMP_SCHEMA)
+> > > +
+> > > +quiet_cmd_mk_schema = SCHEMA  $@
+> > > +      cmd_mk_schema = mkdir -p $(obj); \
+> > > +                      rm -f $@; \
+> > > +                      $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@ $(filter-out FORCE, $^)
+> >
+> >
+> > "mkdir -p $(obj)" is redundant.
+> >
+> >
+> > Why is 'rm -f $@' necessary ?
+> > Can't dt-mk-schema overwrite the output file?
+>
+> It is for error case when the output file is not generated. I can
+> handle this within dt-mk-schema instead.
+> > > +DT_DOCS = $(shell cd $(srctree)/$(src) && find * -name '*.yaml')
+> > > +DT_SCHEMA_FILES ?= $(addprefix $(src)/,$(DT_DOCS))
+> > > +
+> > > +extra-y += $(patsubst $(src)/%.yaml,%.example.dts, $(DT_SCHEMA_FILES))
+> > > +extra-y += $(patsubst $(src)/%.yaml,%.example.dtb, $(DT_SCHEMA_FILES))
+> >
+> >
+> >
+> > I assume you intentionally did not do like this:
+> >
+> > extra-y += $(patsubst %.yaml,%.example.dtb, $(DT_DOCS))
+> >
+> > From the commit description, DT_SCHEMA_FILES might be overridden by a user.
+> > So, I think this is OK.
+> >
+> >
+> >
+> >
+> > > +$(obj)/$(DT_TMP_SCHEMA): | $(addprefix $(obj)/,$(patsubst $(src)/%.yaml,%.example.dtb, $(DT_SCHEMA_FILES)))
+> >
+> > I do not understand this line.
+> > Why is it necessary?
+> >
+> > *.example.dtb files are generated anyway
+> > since they are listed in extra-y.
+>
+> It is enforcing the ordering. Without it, the binding checks and
+> building .schema.yaml.tmp happen in parallel because both only have
+> the source files as dependencies. The '|' keeps the dependencies out
+> of the dependency list($^).
+
+
+What kind problem would you see if
+the binding checks and building .schema.yaml.tmp
+happen in parallel?
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
