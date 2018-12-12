@@ -1,228 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:43146 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726228AbeLLOWZ (ORCPT
+Received: from mail-it1-f173.google.com ([209.85.166.173]:37391 "EHLO
+        mail-it1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727747AbeLLPEd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Dec 2018 09:22:25 -0500
+        Wed, 12 Dec 2018 10:04:33 -0500
+Received: by mail-it1-f173.google.com with SMTP id b5so10249192iti.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 12 Dec 2018 07:04:32 -0800 (PST)
 MIME-Version: 1.0
-References: <1543823457-32478-1-git-send-email-yamada.masahiro@socionext.com>
- <19c7bdab-8df8-f7c6-7921-9a4d43dbca64@monstr.eu> <CAK7LNATWSNqZ8uE+teMW+uvDCLXfq6zMTqh_7=ssrPquCLJz8A@mail.gmail.com>
- <938f1368-5e07-0178-5b99-d8331ce216f8@xilinx.com> <18fb7c8b-2b47-eb39-d80b-7137e7db466b@xilinx.com>
- <CAK7LNAT-RuvvwGy5Tf01_rWk4EtD0H+y4UPF=aa7B3YB8v692g@mail.gmail.com>
- <44c60aca-c9de-8459-aefa-5d95111f8e8e@xilinx.com> <CAK7LNAStadqOeS90pa_V0RarW8ePmp0YhvZPq_Y5-hwnRDVg4Q@mail.gmail.com>
-In-Reply-To: <CAK7LNAStadqOeS90pa_V0RarW8ePmp0YhvZPq_Y5-hwnRDVg4Q@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 12 Dec 2018 23:21:23 +0900
-Message-ID: <CAK7LNAQZ14CJ5cEY2zfvipRa2v7QT52Db=fPZBXF3HQrMJi8nQ@mail.gmail.com>
-Subject: Re: [PATCH 0/7] microblaze: fix various problems in building boot images
+References: <cover.1544099024.git.andreyknvl@google.com> <bda78069e3b8422039794050ddcb2d53d053ed41.1544099024.git.andreyknvl@google.com>
+ <2bf7415e-2724-b3c3-9571-20c8b6d43b92@arm.com>
+In-Reply-To: <2bf7415e-2724-b3c3-9571-20c8b6d43b92@arm.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Wed, 12 Dec 2018 16:04:20 +0100
+Message-ID: <CAAeHK+xc6R_p26-tu--9W1L1PvUAFb70J23ByiEukKz3uVC3EQ@mail.gmail.com>
+Subject: Re: [PATCH v13 19/25] kasan: add hooks implementation for tag-based mode
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Simek <michal.simek@xilinx.com>
-Cc: Michal Simek <monstr@monstr.eu>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+To: Vincenzo Frascino <vincenzo.frascino@arm.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Vishwath Mohan <vishwath@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgenii Stepanov <eugenis@google.com>
 
-On Wed, Dec 12, 2018 at 11:11 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Tue, Dec 11, 2018 at 5:22 PM Vincenzo Frascino
+<vincenzo.frascino@arm.com> wrote:
 >
-> On Wed, Dec 12, 2018 at 10:50 PM Michal Simek <michal.simek@xilinx.com> wrote:
+> Hi Andrey,
+>
+> On 06/12/2018 12:24, Andrey Konovalov wrote:
+> > This commit adds tag-based KASAN specific hooks implementation and
+> > adjusts common generic and tag-based KASAN ones.
 > >
-> > On 08. 12. 18 7:14, Masahiro Yamada wrote:
-> > > On Sat, Dec 8, 2018 at 12:20 AM Michal Simek <michal.simek@xilinx.com> wrote:
-> > >>
-> > >> On 07. 12. 18 14:29, Michal Simek wrote:
-> > >>> On 07. 12. 18 12:29, Masahiro Yamada wrote:
-> > >>>> On Thu, Dec 6, 2018 at 11:55 PM Michal Simek <monstr@monstr.eu> wrote:
-> > >>>>>
-> > >>>>> On 03. 12. 18 8:50, Masahiro Yamada wrote:
-> > >>>>>> This patch set fixes various issues in microblaze Makefiles.
-> > >>>>>>
-> > >>>>>> BTW, "simpleImage.<dt>" works like a phony target to generate the
-> > >>>>>> following four images, where the first three are just aliases.
-> > >>>>>>
-> > >>>>>>  - arch/microblaze/boot/simpleImage.<dt>:
-> > >>>>>>          identical to arch/microblaze/boot/linux.bin
-> > >>>>>>
-> > >>>>>>  - arch/microblaze/boot/simpleImage.<dt>.unstrip:
-> > >>>>>>          identical to vmlinux
-> > >>>>>>
-> > >>>>>>  - arch/microblaze/boot/simpleImage.<dt>.ub:
-> > >>>>>>          identical to arch/microblaze/boot/linux.bin.ub
-> > >>>>>>
-> > >>>>>>  - arch/microblaze/boot/simpleImage.<dt>.strip:
-> > >>>>>>          stripped vmlinux
-> > >>>>>>
-> > >>>>>> I am not sure how much useful those copies are,
-> > >>>>>> but, I tried my best to keep the same behavior.
-> > >>>>>>
-> > >>>>>> IMHO, I guess DTB=<dt> would be more sensible,
-> > >>>>>> but it is up to Michal.
-> > >>>>>>
-> > >>>>>>
-> > >>>>>>
-> > >>>>>> Masahiro Yamada (7):
-> > >>>>>>   microblaze: fix cleaning of boot images
-> > >>>>>>   microblaze: adjust the help to the real behavior
-> > >>>>>>   microblaze: move "... is ready" message to arch/microblaze/Makefile
-> > >>>>>>   microblaze: fix multiple bugs in arch/microblaze/boot/Makefile
-> > >>>>>>   microblaze: add linux.bin* and simpleImage.* to PHONY
-> > >>>>>>   microblaze: fix race condition in building boot images
-> > >>>>>>   microblaze: remove the unneeded code just in case file copy fails
-> > >>>>>>
-> > >>>>>>  arch/microblaze/Makefile          | 14 +++++++++-----
-> > >>>>>>  arch/microblaze/boot/Makefile     | 33 +++++++++++++++++----------------
-> > >>>>>>  arch/microblaze/boot/dts/Makefile |  5 +----
-> > >>>>>>  3 files changed, 27 insertions(+), 25 deletions(-)
-> > >>>>>>
-> > >>>>>
-> > >>>>> One more thing I have in my mind for a while is that will be good to
-> > >>>>> configure kernel build flags from DT and completely get rid of these
-> > >>>>> symbols.
-> > >>>>>
-> > >>>>> XILINX_MICROBLAZE0_USE_MSR_INSTR
-> > >>>>> XILINX_MICROBLAZE0_USE_PCMP_INSTR
-> > >>>>> XILINX_MICROBLAZE0_USE_BARREL
-> > >>>>> XILINX_MICROBLAZE0_USE_DIV
-> > >>>>> XILINX_MICROBLAZE0_USE_HW_MUL
-> > >>>>> XILINX_MICROBLAZE0_USE_FPU
-> > >>>>>
-> > >>>>> It means setup CPUFLAGS based on extracting that values from DT that it
-> > >>>>> all the time match the hardware.
-> > >>>>> It will also simplify all the CPUFLAGS logic which is in
-> > >>>>> arch/microblaze/Makefile.
-> > >>>>>
-> > >>>>> Do you have any idea how this can be done?
-> > >>>>
-> > >>>>
-> > >>>> I have no idea.
-> > >>>>
-> > >>>> Parsing DTS with sed or something would be possible, but ugly.
-> > >>>>
-> > >>>> In my opinion, the kernel should be multi platform image,
-> > >>>> in other words, it is the least common denominator
-> > >>>> of supported platforms.
-> > >>>>
-> > >>>> So, the kernel should enable all features that may or may not be used
-> > >>>> depending on platform.
-> > >>>>
-> > >>>> I do not know if this works for MB.
-> > >>>
-> > >>> Microblaze is soft core CPU where you can select if you want to have it
-> > >>> with multiplier, divider, barrel shifter, etc.
-> > >>> You can of course say that you don't have them and you have "universal"
-> > >>> kernel but very slow.
-> > >>> That's why user has to setup these configs which are converted to cflags
-> > >>> to say GCC what can be used.
-> > >>> And these configs can be simply parsed from dt.
-> > >>>
-> > >>> For example like this based on dtb (quick hack)
-> > >>>
-> > >>> for i in `echo use-msr-instr use-pcmp-instr use-barrel use-div
-> > >>> use-hw-mul use-fpu`; do
-> > >>>       UPPER=`echo $i | tr '-' '_' | tr '[a-z]' '[A-Z}'`
-> > >>>       echo $i $UPPER;
-> > >>>
-> > >>>       VAR=`fdtget -t i $FILE/arch/microblaze/boot/dts/system.dtb /cpus/cpu@0/
-> > >>> xlnx,$i`
-> > >>>       FLAGS+="CONFIG_XILINX_MICROBLAZE0_${UPPER}=${VAR} "
-> > >>> done
-> > >>>
-> > >>> make $FLAGS
-> > >>>
-> > >>>
-> > >>> When simpleImage is requested dt could be parsed to setup proper build
-> > >>> flags.
-> > >>
-> > >> One more thing I found is that I have done these changes
-> > >>
-> > >> diff --git a/arch/microblaze/kernel/setup.c b/arch/microblaze/kernel/setup.c
-> > >> index bbd6968ce55b..dc6a6fee3ae2 100644
-> > >> --- a/arch/microblaze/kernel/setup.c
-> > >> +++ b/arch/microblaze/kernel/setup.c
-> > >> @@ -153,11 +153,13 @@ void __init machine_early_init(const char
-> > >> *cmdline, unsigned int ram,
-> > >>  #endif
-> > >>
-> > >>  #if CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR
-> > >> +#error MSR is enabled
-> > >>         if (msr) {
-> > >>                 pr_info("!!!Your kernel has setup MSR instruction but ");
-> > >>                 pr_cont("CPU don't have it %x\n", msr);
-> > >>         }
-> > >>  #else
-> > >> +#error MSR is not enabled
-> > >>         if (!msr) {
-> > >>                 pr_info("!!!Your kernel not setup MSR instruction but ");
-> > >>                 pr_cont("CPU have it %x\n", msr);
-> > >>
-> > >> and run MSR with 1
-> > >> make defconfig && make CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR=1
-> > >> arch/microblaze/kernel/setup.o
-> > >> it errors #error MSR is enabled
-> > >> and all is good.
-> > >>
-> > >> And when I run MSR with 0
-> > >> make defconfig && make CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR=0
-> > >> arch/microblaze/kernel/setup.o
-> > >> also getting #error MSR is enabled
-> > >> which is wrong.
-> > >>
-> > >> Is there any rule what can be setup at compilation time?
-> > >
-> > > You are trying to do very specific things,
-> > > I do not have a clean solution.
-> > >
-> > > I do not mind whatever you do in arch-Makefile.
+> > 1. When a new slab cache is created, tag-based KASAN rounds up the size of
+> >    the objects in this cache to KASAN_SHADOW_SCALE_SIZE (== 16).
 > >
-> > ok.
+> > 2. On each kmalloc tag-based KASAN generates a random tag, sets the shadow
+> >    memory, that corresponds to this object to this tag, and embeds this
+> >    tag value into the top byte of the returned pointer.
 > >
-> > >
-> > > If you look at stack_protector_prepare in arch/powerpc/Makefile,
-> > > it is parsing a file with awk to setup compiler flags.
+> > 3. On each kfree tag-based KASAN poisons the shadow memory with a random
+> >    tag to allow detection of use-after-free bugs.
 > >
-> > Ok. Will do more experiments with it.
+> > The rest of the logic of the hook implementation is very much similar to
+> > the one provided by generic KASAN. Tag-based KASAN saves allocation and
+> > free stack metadata to the slab object the same way generic KASAN does.
 > >
-> > Can you please at least confirm me that config options passed via
-> > command line as above should be used instead of that one in .config?
-> > (Just want to understand why USE_MSR is so special that it is not
-> > working properly).
+> > Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+> > Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
+> > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> > ---
+> >  mm/kasan/common.c | 116 ++++++++++++++++++++++++++++++++++++++--------
+> >  mm/kasan/kasan.h  |   8 ++++
+> >  mm/kasan/tags.c   |  48 +++++++++++++++++++
+> >  3 files changed, 153 insertions(+), 19 deletions(-)
+> >
 >
 >
+> [...]
 >
+> > @@ -265,6 +290,8 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
+> >               return;
+> >       }
+> >
+> > +     cache->align = round_up(cache->align, KASAN_SHADOW_SCALE_SIZE);
+> > +
 >
-> make defconfig && make CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR=1
->
-> does not work.
->
-> It overrides only references in Makefiles.
->
->
->
-> C files still refer to include/generated/autoconf.h
-> which is created based on Kconfig.
->
->
-> KBUILD_CPPFLAGS +=
-> -DCONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR=$(CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR)
->
-> might work although it is ugly.
->
-> (At least, CONFIG_ prefix should be ripped off)
+> Did you consider to set ARCH_SLAB_MINALIGN instead of this round up?
 
+I didn't know about this macro. Looks like we can use it to do the
+same thing. Do you think it's a better solution to redefine
+ARCH_SLAB_MINALIGN to KASAN_SHADOW_SCALE_SIZE for arm64 when tag-based
+KASAN is enabled instead of adjusting cache->align in
+kasan_cache_create?
 
-
-Perhaps, another idea might be merge_config.
-
-
-arch/mips/Makefile manipulates .config
-by using scripts/kconfig/merge_config.sh
-
-
-You can enable/disable CONFIG_XILINX_MICROBLAZE0_USE*
-based on the information extracted from DT.
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+>
+> --
+> Regards,
+> Vincenzo
+>
+> --
+> You received this message because you are subscribed to the Google Groups "kasan-dev" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to kasan-dev+unsubscribe@googlegroups.com.
+> To post to this group, send email to kasan-dev@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/kasan-dev/2bf7415e-2724-b3c3-9571-20c8b6d43b92%40arm.com.
+> For more options, visit https://groups.google.com/d/optout.
