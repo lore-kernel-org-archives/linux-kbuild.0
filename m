@@ -1,32 +1,135 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:37866 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726136AbeLKVpA (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:60473 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726333AbeLLDFf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Dec 2018 16:45:00 -0500
-Date: Tue, 11 Dec 2018 13:44:57 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v13 00/25] kasan: add software tag-based mode for arm64
-Message-Id: <20181211134457.2eff4a98b13ceda564ab9b37@linux-foundation.org>
-In-Reply-To: <20181211160018.GA12597@edgewater-inn.cambridge.arm.com>
-References: <cover.1544099024.git.andreyknvl@google.com>
-        <20181211151829.GB11718@edgewater-inn.cambridge.arm.com>
-        <CAAeHK+xxNsOfaUZhcErc+fjEEv0YZ-dbQ0fTXzQUO4dZbM-GgA@mail.gmail.com>
-        <20181211160018.GA12597@edgewater-inn.cambridge.arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Tue, 11 Dec 2018 22:05:35 -0500
+MIME-Version: 1.0
+References: <20181210203225.11179-1-robh@kernel.org> <CAK7LNAThtAOy4PQiYZ2X0oWrHdcLi7on8ctSXJ=bfT0HNh7NFQ@mail.gmail.com>
+ <CAL_JsqL7n2sjLbJVieVDQ4YtKMi2COCaijO9ZNu7ggzmXXxLEg@mail.gmail.com>
+ <CAK7LNARkr-g9ae+74QE6GMuxLM0JPgEqYOkwb0njXcb9-=nBdQ@mail.gmail.com> <CAL_JsqJ_1RukAZx5tCpp+X8mdNuOT6LTAdYOzN5UyhRK6SAo2Q@mail.gmail.com>
+In-Reply-To: <CAL_JsqJ_1RukAZx5tCpp+X8mdNuOT6LTAdYOzN5UyhRK6SAo2Q@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 12 Dec 2018 12:04:37 +0900
+Message-ID: <CAK7LNATn+oTpHUj-BkMrmEYKTyL1yez1DYUhVib=t5NG3OejhQ@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: Add support for DT binding schema checks
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Will Deacon <will.deacon@arm.com>
-Cc: Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgenii Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: Rob Herring <robh@kernel.org>
+Cc: DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, darknighte@darknighte.com, Frank Rowand <frowand.list@gmail.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, grant.likely@arm.com, Kumar Gala <kumar.gala@linaro.org>, arm-soc <arm@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Mark Rutland <mark.rutland@arm.com>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, 11 Dec 2018 16:00:19 +0000 Will Deacon <will.deacon@arm.com> wrote:
+On Wed, Dec 12, 2018 at 3:36 AM Rob Herring <robh@kernel.org> wrote:
+>
+> On Tue, Dec 11, 2018 at 10:03 AM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> >
+> > On Wed, Dec 12, 2018 at 12:13 AM Rob Herring <robh@kernel.org> wrote:
+> >
+> > >
+> > > > > +$(obj)/%.example.dts: $(src)/%.yaml FORCE
+> > > > > +       $(call if_changed,chk_binding)
+> > > > > +
+> > > > > +DT_TMP_SCHEMA := .schema.yaml.tmp
+> > > >
+> > > >
+> > > > BTW, why does this file start with a period?
+> > > > What is the meaning of '.tmp' extension?
+> > >
+> > > Nothing really. Just named it something so it gets cleaned and ignored by git.
+> >
+> >
+> > It is cleaned whatever file name you use.
+> >
+> >
+> > See scripts/Makefile.clean
+> >
+> > __clean-files   := $(extra-y) $(extra-m) $(extra-)       \
+> >                    $(always) $(targets) $(clean-files)   \
+> >                    $(hostprogs-y) $(hostprogs-m) $(hostprogs-) \
+> >                    $(hostlibs-y) $(hostlibs-m) $(hostlibs-) \
+> >                    $(hostcxxlibs-y) $(hostcxxlibs-m)
+> >
+> >
+> > $(extra-y) is cleaned.
+>
+> True.
+>
+> >
+> >
+> > You are adding *.example.dts to .gitignore
+> >
+> > Why not "schema.yaml" ?
+>
+> Okay. I'll do "processed-schema.yaml" to give a bit better name of
+> what it contains.
+>
+> >
+> > > > > +extra-y += $(DT_TMP_SCHEMA)
+> > > > > +
+> > > > > +quiet_cmd_mk_schema = SCHEMA  $@
+> > > > > +      cmd_mk_schema = mkdir -p $(obj); \
+> > > > > +                      rm -f $@; \
+> > > > > +                      $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@ $(filter-out FORCE, $^)
+> > > >
+> > > >
+> > > > "mkdir -p $(obj)" is redundant.
+> > > >
+> > > >
+> > > > Why is 'rm -f $@' necessary ?
+> > > > Can't dt-mk-schema overwrite the output file?
+> > >
+> > > It is for error case when the output file is not generated. I can
+> > > handle this within dt-mk-schema instead.
+> > > > > +DT_DOCS = $(shell cd $(srctree)/$(src) && find * -name '*.yaml')
+> > > > > +DT_SCHEMA_FILES ?= $(addprefix $(src)/,$(DT_DOCS))
+> > > > > +
+> > > > > +extra-y += $(patsubst $(src)/%.yaml,%.example.dts, $(DT_SCHEMA_FILES))
+> > > > > +extra-y += $(patsubst $(src)/%.yaml,%.example.dtb, $(DT_SCHEMA_FILES))
+> > > >
+> > > >
+> > > >
+> > > > I assume you intentionally did not do like this:
+> > > >
+> > > > extra-y += $(patsubst %.yaml,%.example.dtb, $(DT_DOCS))
+> > > >
+> > > > From the commit description, DT_SCHEMA_FILES might be overridden by a user.
+> > > > So, I think this is OK.
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > > +$(obj)/$(DT_TMP_SCHEMA): | $(addprefix $(obj)/,$(patsubst $(src)/%.yaml,%.example.dtb, $(DT_SCHEMA_FILES)))
+> > > >
+> > > > I do not understand this line.
+> > > > Why is it necessary?
+> > > >
+> > > > *.example.dtb files are generated anyway
+> > > > since they are listed in extra-y.
+> > >
+> > > It is enforcing the ordering. Without it, the binding checks and
+> > > building .schema.yaml.tmp happen in parallel because both only have
+> > > the source files as dependencies. The '|' keeps the dependencies out
+> > > of the dependency list($^).
+> >
+> >
+> > What kind problem would you see if
+> > the binding checks and building .schema.yaml.tmp
+> > happen in parallel?
+>
+> In case of no errors in the binding docs, it doesn't matter. If there
+> are errors, I don't want the dtbs validation to run if any schema
+> doesn't validate. However, I played around with this a bit more and it
+> seems like having the examples' dts/dtb in extra-y prevents that from
+> happening. Does that match your expections?
 
-> > Yes, that was the intention of sending v13. Should have I sent a
-> > separate patch with v12->v13 fixes instead? I don't know what's the
-> > usual way to make changes to the patchset once it's in the mm tree.
+Exactly.
 
-I usually convert replacement patches into deltas so people can see
-what changed.  In this case it got messy so I dropped v12 and remerged
-v13 wholesale.
+If any error occurs in Documentation/devicetree/bindings/Makefile,
+Make terminates before proceeding to the dtbs_check stage.
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
