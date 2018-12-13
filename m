@@ -1,93 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:36374 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727403AbeLMKsK (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:50342 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728104AbeLMKwG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 13 Dec 2018 05:48:10 -0500
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id wBDAlna6005879
-        for <linux-kbuild@vger.kernel.org>; Thu, 13 Dec 2018 19:47:49 +0900
-Received: by mail-vk1-f172.google.com with SMTP id n126so329906vke.12
-        for <linux-kbuild@vger.kernel.org>; Thu, 13 Dec 2018 02:47:49 -0800 (PST)
+        Thu, 13 Dec 2018 05:52:06 -0500
+Date: Thu, 13 Dec 2018 11:51:46 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH] kbuild, x86: revert macros in extended asm workarounds
+Message-ID: <20181213105146.GH5289@hirez.programming.kicks-ass.net>
+References: <1544692661-9455-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-References: <20181213080711.8907-1-riku.voipio@linaro.org>
-In-Reply-To: <20181213080711.8907-1-riku.voipio@linaro.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 13 Dec 2018 19:47:12 +0900
-Message-ID: <CAK7LNAT9DMyLRfYSb8MZdubFoQVSwY0PuqCncuiEp-K3t8uOUg@mail.gmail.com>
-Subject: Re: [PATCH] deb-pkg: generate correct build dependencies
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1544692661-9455-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, manivannan.sadhasivam@linaro.org, debian-kernel <debian-kernel@lists.debian.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Richard Biener <rguenther@suse.de>, Nadav Amit <namit@vmware.com>, Logan Gunthorpe <logang@deltatee.com>, Sedat Dilek <sedat.dilek@gmail.com>, Segher Boessenkool <segher@kernel.crashing.org>, linux-arch@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, Michal Marek <michal.lkml@markovi.net>, linux-sparse@vger.kernel.org, Alok Kataria <akataria@vmware.com>, Juergen Gross <jgross@suse.com>, Andy Lutomirski <luto@kernel.org>, linux-kbuild@vger.kernel.org
 
-On Thu, Dec 13, 2018 at 5:07 PM <riku.voipio@linaro.org> wrote:
->
-> From: Riku Voipio <riku.voipio@linaro.org>
+On Thu, Dec 13, 2018 at 06:17:41PM +0900, Masahiro Yamada wrote:
+> Revert the following commits:
+> 
+> - 5bdcd510c2ac9efaf55c4cbd8d46421d8e2320cd
+>   ("x86/jump-labels: Macrofy inline assembly code to work around GCC inlining bugs")
+> 
+> - d5a581d84ae6b8a4a740464b80d8d9cf1e7947b2
+>   ("x86/cpufeature: Macrofy inline assembly code to work around GCC inlining bugs")
+> 
+> - 0474d5d9d2f7f3b11262f7bf87d0e7314ead9200.
+>   ("x86/extable: Macrofy inline assembly code to work around GCC inlining bugs")
+> 
+> - 494b5168f2de009eb80f198f668da374295098dd.
+>   ("x86/paravirt: Work around GCC inlining bugs when compiling paravirt ops")
+> 
+> - f81f8ad56fd1c7b99b2ed1c314527f7d9ac447c6.
+>   ("x86/bug: Macrofy the BUG table section handling, to work around GCC inlining bugs")
+> 
+> - 77f48ec28e4ccff94d2e5f4260a83ac27a7f3099.
+>   ("x86/alternatives: Macrofy lock prefixes to work around GCC inlining bugs")
+> 
+> - 9e1725b410594911cc5981b6c7b4cea4ec054ca8.
+>   ("x86/refcount: Work around GCC inlining bug")
+>   (Conflicts: arch/x86/include/asm/refcount.h)
+> 
+> - c06c4d8090513f2974dfdbed2ac98634357ac475.
+>   ("x86/objtool: Use asm macros to work around GCC inlining bugs")
+> 
+> - 77b0bf55bc675233d22cd5df97605d516d64525e.
+>   ("kbuild/Makefile: Prepare for using macros in inline assembly code to work around asm() related GCC inlining bugs")
+> 
 
+I don't think we want to blindly revert all that. Some of them actually
+made sense and did clean up things irrespective of the asm-inline issue.
 
-The code looks good to me.
+In particular I like the jump-label one. The cpufeature one OTOh, yeah,
+I'd love to get that reverted.
 
-Just a comment about the commit log.
+And as a note; the normal commit quoting style is:
 
-
-> bison/flex is now needed always for building since genksyms is always
-> generated.
-
-I do not think this is true.
-
-genksyms is built when CONFIG_MODVERSIONS=y
-(See scripts/Makefile)
-
-Rather, bison/flex is always needed for kconfig.
-
-
-
-
-
-> Some build dependencies depend on kernel configuration,
-> enable them as needed:
->
-> - libelf-dev when UNWINDER_ORC is set
-> - libssl-dev for SYSTEM_TRUSTED_KEYRING
->
-> Since the libssl-dev is needed for extract_cert binary, denote with
-> :native to install the libssl-dev for the build machines architecture,
-> rather than for the architecture of the kernel being built.
->
-> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-> ---
->  scripts/package/mkdebian | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-> index edcad61fe3cd..c858abf4569e 100755
-> --- a/scripts/package/mkdebian
-> +++ b/scripts/package/mkdebian
-> @@ -134,6 +134,8 @@ fi
->
->  mkdir -p debian/
->  echo $debarch > debian/arch
-> +extra_build_depends=", $(if_enabled_echo UNWINDER_ORC libelf-dev)"
-> +extra_build_depends="$extra_build_depends, $(if_enabled_echo SYSTEM_TRUSTED_KEYRING libssl-dev:native)"
->
->  # Generate a simple changelog template
->  cat <<EOF > debian/changelog
-> @@ -170,7 +172,7 @@ Source: $sourcename
->  Section: kernel
->  Priority: optional
->  Maintainer: $maintainer
-> -Build-Depends: bc, kmod, cpio
-> +Build-Depends: bc, kmod, cpio, bison, flex $extra_build_depends
->  Homepage: http://www.kernel.org/
->
->  Package: $packagename
-> --
-> 2.19.2
->
-
-
--- 
-Best Regards
-Masahiro Yamada
+  d5a581d84ae6 ("x86/cpufeature: Macrofy inline assembly code to work around GCC inlining bugs")
