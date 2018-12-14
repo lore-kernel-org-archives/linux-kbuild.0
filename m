@@ -1,18 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:43690 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730623AbeLNS3O (ORCPT
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:35967 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730123AbeLNSeD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Dec 2018 13:29:14 -0500
-Received: by mail-pg1-f196.google.com with SMTP id v28so3050891pgk.10
-        for <linux-kbuild@vger.kernel.org>; Fri, 14 Dec 2018 10:29:13 -0800 (PST)
+        Fri, 14 Dec 2018 13:34:03 -0500
+Received: by mail-pl1-f194.google.com with SMTP id g9so3105454plo.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 14 Dec 2018 10:34:03 -0800 (PST)
 MIME-Version: 1.0
-References: <1544774739-13471-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1544774739-13471-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1544774739-13471-1-git-send-email-yamada.masahiro@socionext.com> <1544774739-13471-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1544774739-13471-2-git-send-email-yamada.masahiro@socionext.com>
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Fri, 14 Dec 2018 10:29:02 -0800
-Message-ID: <CAKwvOdk9GVtaChCg0LhjyzY5zrqc3+cDdUpF-ui_+s8ZXzZ=Vw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] kbuild: add -fno-PIE flag unconditionally
+Date: Fri, 14 Dec 2018 10:33:51 -0800
+Message-ID: <CAKwvOdkSSb-EECgCmYnW40Mbd4ibSf22wqUBqaT_X7g7Sn_9UQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] kbuild: add -Werror=strict-prototype flag unconditionally
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -22,46 +22,52 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mich
 On Fri, Dec 14, 2018 at 12:06 AM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
-> This flag is documented in the GCC 4.6 manual, and recognized by
-> Clang as well. Let's rip off the cc-option switch.
+> -Wstrict-prototype is added to KBUILD_CFLAGS first, then overridden
 
-The oldest GCC build that godbolt has (4.1) even recognizes it.
-https://godbolt.org/z/buDBUr
+-Wstrict-prototypes (plural)
+
+> by -Werror=strict-prototype later.
+
+-Werror=strict-prototypes (plural)
+
+LGTM: https://godbolt.org/z/DyEpmU
+
+If you would mind updating the commit message (and subject), then:
 Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
+>
+> Let's add -Werror=strict-prototypes unconditionally because it is
+> supported by GCC 4.6, and also by Clang.
 >
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
 >
->  Makefile | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
+>  Makefile | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 >
 > diff --git a/Makefile b/Makefile
-> index f2c3423..3bbc16a 100644
+> index 3bbc16a..bcb943e 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -422,9 +422,9 @@ LINUXINCLUDE    := \
->                 -I$(objtree)/include \
+> @@ -423,7 +423,7 @@ LINUXINCLUDE    := \
 >                 $(USERINCLUDE)
 >
-> -KBUILD_AFLAGS   := -D__ASSEMBLY__
-> +KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
->  KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
-> -                  -fno-strict-aliasing -fno-common -fshort-wchar \
-> +                  -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
+>  KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
+> -KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+> +KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
+>                    -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
 >                    -Werror-implicit-function-declaration \
 >                    -Wno-format-security \
->                    -std=gnu89
-> @@ -510,9 +510,6 @@ RETPOLINE_VDSO_CFLAGS := $(call cc-option,$(RETPOLINE_VDSO_CFLAGS_GCC),$(call cc
->  export RETPOLINE_CFLAGS
->  export RETPOLINE_VDSO_CFLAGS
+> @@ -828,9 +828,6 @@ KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
+>  # disallow errors like 'EXPORT_GPL(foo);' with missing header
+>  KBUILD_CFLAGS   += $(call cc-option,-Werror=implicit-int)
 >
-> -KBUILD_CFLAGS  += $(call cc-option,-fno-PIE)
-> -KBUILD_AFLAGS  += $(call cc-option,-fno-PIE)
+> -# require functions to have arguments in prototypes, not empty 'int foo()'
+> -KBUILD_CFLAGS   += $(call cc-option,-Werror=strict-prototypes)
 > -
->  # check for 'asm goto'
->  ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
->    CC_HAVE_ASM_GOTO := 1
+>  # Prohibit date/time macros, which would make the build non-deterministic
+>  KBUILD_CFLAGS   += $(call cc-option,-Werror=date-time)
+>
 > --
 > 2.7.4
 >
