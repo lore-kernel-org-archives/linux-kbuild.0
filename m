@@ -1,89 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:42416 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726609AbeLOAwE (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:18725 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728731AbeLOJis (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Dec 2018 19:52:04 -0500
+        Sat, 15 Dec 2018 04:38:48 -0500
 MIME-Version: 1.0
-References: <1544692661-9455-1-git-send-email-yamada.masahiro@socionext.com> <20181213105146.GH5289@hirez.programming.kicks-ass.net>
-In-Reply-To: <20181213105146.GH5289@hirez.programming.kicks-ass.net>
+References: <20181206222318.218157-1-tmroeder@google.com>
+In-Reply-To: <20181206222318.218157-1-tmroeder@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 15 Dec 2018 09:51:12 +0900
-Message-ID: <CAK7LNASB=HvU8DwUQQkz_r3sY1DN8Vv-qfNa54-ZDXSpfvEYpg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild, x86: revert macros in extended asm workarounds
+Date: Sat, 15 Dec 2018 18:37:49 +0900
+Message-ID: <CAK7LNATZm6T9bjcAxB_WQw-um-Hjkhiew6qg8CRLayr8qYzLeQ@mail.gmail.com>
+Subject: Re: [PATCH] scripts: add a tool to produce a compile_commands.json file
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Richard Biener <rguenther@suse.de>, Nadav Amit <namit@vmware.com>, Logan Gunthorpe <logang@deltatee.com>, Sedat Dilek <sedat.dilek@gmail.com>, Segher Boessenkool <segher@kernel.crashing.org>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, Michal Marek <michal.lkml@markovi.net>, linux-sparse@vger.kernel.org, Alok Kataria <akataria@vmware.com>, Juergen Gross <jgross@suse.com>, Andy Lutomirski <luto@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Tom Roeder <tmroeder@google.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi Peter,
-
-On Thu, Dec 13, 2018 at 7:53 PM Peter Zijlstra <peterz@infradead.org> wrote:
+On Fri, Dec 7, 2018 at 7:24 AM Tom Roeder <tmroeder@google.com> wrote:
 >
-> On Thu, Dec 13, 2018 at 06:17:41PM +0900, Masahiro Yamada wrote:
-> > Revert the following commits:
-> >
-> > - 5bdcd510c2ac9efaf55c4cbd8d46421d8e2320cd
-> >   ("x86/jump-labels: Macrofy inline assembly code to work around GCC inlining bugs")
-> >
-> > - d5a581d84ae6b8a4a740464b80d8d9cf1e7947b2
-> >   ("x86/cpufeature: Macrofy inline assembly code to work around GCC inlining bugs")
-> >
-> > - 0474d5d9d2f7f3b11262f7bf87d0e7314ead9200.
-> >   ("x86/extable: Macrofy inline assembly code to work around GCC inlining bugs")
-> >
-> > - 494b5168f2de009eb80f198f668da374295098dd.
-> >   ("x86/paravirt: Work around GCC inlining bugs when compiling paravirt ops")
-> >
-> > - f81f8ad56fd1c7b99b2ed1c314527f7d9ac447c6.
-> >   ("x86/bug: Macrofy the BUG table section handling, to work around GCC inlining bugs")
-> >
-> > - 77f48ec28e4ccff94d2e5f4260a83ac27a7f3099.
-> >   ("x86/alternatives: Macrofy lock prefixes to work around GCC inlining bugs")
-> >
-> > - 9e1725b410594911cc5981b6c7b4cea4ec054ca8.
-> >   ("x86/refcount: Work around GCC inlining bug")
-> >   (Conflicts: arch/x86/include/asm/refcount.h)
-> >
-> > - c06c4d8090513f2974dfdbed2ac98634357ac475.
-> >   ("x86/objtool: Use asm macros to work around GCC inlining bugs")
-> >
-> > - 77b0bf55bc675233d22cd5df97605d516d64525e.
-> >   ("kbuild/Makefile: Prepare for using macros in inline assembly code to work around asm() related GCC inlining bugs")
-> >
+> The LLVM/Clang project provides many tools for analyzing C source code.
+> Many of these tools are based on LibTooling
+> (https://clang.llvm.org/docs/LibTooling.html), which depends on a
+> database of compiler flags. The standard container for this database is
+> compile_commands.json, which consists of a list of JSON objects, each
+> with "directory", "file", and "command" fields.
 >
-> I don't think we want to blindly revert all that. Some of them actually
-> made sense and did clean up things irrespective of the asm-inline issue.
+> Some build systems, like cmake or bazel, produce this compilation
+> information directly. Naturally, Makefiles don't. However, the kernel
+> makefiles already create .<target>.o.cmd files that contain all the
+> information needed to build a compile_commands.json file.
 >
-> In particular I like the jump-label one.
-
-[1] The #error message is unnecessary.
-
-[2] keep STATC_BRANCH_NOP/JMP instead of STATIC_JUMP_IF_TRUE/FALSE
-
-
-
-In v2, I will make sure to not re-add [1].
-I am not sure about [2].
-
-
-Do you mean only [1],
-or both of them?
-
-
-
-> The cpufeature one OTOh, yeah,
-> I'd love to get that reverted.
+> So, this commit adds scripts/gen_compile_commands.py, which recursively
+> searches through a directory for .<target>.o.cmd files and extracts
+> appropriate compile commands from them. It writes a
+> compile_commands.json file that LibTooling-based tools can use.
 >
-> And as a note; the normal commit quoting style is:
+> By default, gen_compile_commands.py starts its search in its working
+> directory and (over)writes compile_commands.json in the working
+> directory. However, it also supports --output and --directory flags for
+> out-of-tree use.
 >
->   d5a581d84ae6 ("x86/cpufeature: Macrofy inline assembly code to work around GCC inlining bugs")
+> Note that while gen_compile_commands.py enables the use of clang-based
+> tools, it does not require the kernel to be compiled with clang. E.g.,
+> the following sequence of commands produces a compile_commands.json file
+> that works correctly with LibTooling.
+>
+> make defconfig
+> make
+> scripts/gen_compile_commands.py
+>
+> Also note that this script is written to work correctly in both Python 2
+> and Python 3, so it does not specify the Python version in its first
+> line.
+>
+> For an example of the utility of this script: after running
+> gen_compile_commands.json on the latest kernel version, I was able to
+> use Vim + the YouCompleteMe pluging + clangd to automatically jump to
+> definitions and declarations. Obviously, cscope and ctags provide some
+> of this functionality; the advantage of supporting LibTooling is that it
+> opens the door to many other clang-based tools that understand the code
+> directly and do not rely on regular expressions and heuristics.
+>
+> Tested: Built several recent kernel versions and ran the script against
+> them, testing tools like clangd (for editor/LSP support) and clang-check
+> (for static analysis). Also extracted some test .cmd files from a kernel
+> build and wrote a test script to check that the script behaved correctly
+> with all permutations of the --output and --directory flags.
+>
+> Signed-off-by: Tom Roeder <tmroeder@google.com>
 
 
-OK. I will do so in v2.
+I am fine with this,
+but I have one question.
+
+The generated compile_commands.json
+contains $(pound)
+
+How is it handled?
+Should it be replaced with '\#' ?
 
 
---
+
+
+
+-- 
 Best Regards
 Masahiro Yamada
