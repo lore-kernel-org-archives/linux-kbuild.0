@@ -1,41 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:21201 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729029AbeLOKpE (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 15 Dec 2018 05:45:04 -0500
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id wBFAigqf029878
-        for <linux-kbuild@vger.kernel.org>; Sat, 15 Dec 2018 19:44:42 +0900
-Received: by mail-ua1-f51.google.com with SMTP id n7so2900789uao.7
-        for <linux-kbuild@vger.kernel.org>; Sat, 15 Dec 2018 02:44:42 -0800 (PST)
+Received: from mail-eopbgr730061.outbound.protection.outlook.com ([40.107.73.61]:44550
+        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727395AbeLPCdv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 15 Dec 2018 21:33:51 -0500
+From: Nadav Amit <namit@vmware.com>
+Subject: Re: [PATCH] kbuild, x86: revert macros in extended asm workarounds
+Date: Sun, 16 Dec 2018 02:33:39 +0000
+Message-ID: <07BE39B2-1F99-4AE4-97F3-0871A39C5E7D@vmware.com>
+References: <1544692661-9455-1-git-send-email-yamada.masahiro@socionext.com>
+ <20181213105146.GH5289@hirez.programming.kicks-ass.net>
+ <CAK7LNASB=HvU8DwUQQkz_r3sY1DN8Vv-qfNa54-ZDXSpfvEYpg@mail.gmail.com>
+In-Reply-To: <CAK7LNASB=HvU8DwUQQkz_r3sY1DN8Vv-qfNa54-ZDXSpfvEYpg@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <85A242CF1B9B20409566BB977F231D11@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20181208202640.GA28712@turska>
-In-Reply-To: <20181208202640.GA28712@turska>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 15 Dec 2018 19:44:05 +0900
-Message-ID: <CAK7LNASRkfbi5Vfr5a5aNa3Dt4vN5r9kB69-5XUziFozH_iVGQ@mail.gmail.com>
-Subject: Re: [PATCH 001/123] kconfig/conf.c: Added optional colorization of output.
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tomi Salminen <tlsalmin@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Richard Biener <rguenther@suse.de>, Logan Gunthorpe <logang@deltatee.com>, Sedat Dilek <sedat.dilek@gmail.com>, Segher Boessenkool <segher@kernel.crashing.org>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, Michal Marek <michal.lkml@markovi.net>, "linux-sparse@vger.kernel.org" <linux-sparse@vger.kernel.org>, Alok Kataria <akataria@vmware.com>, Juergen Gross <jgross@suse.com>, Andy Lutomirski <luto@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Sun, Dec 9, 2018 at 5:27 AM Tomi Salminen <tlsalmin@gmail.com> wrote:
->
-> From: Tomi Salminen <tlsalmin@gmail.com>
->
-> Added option COLORIZE=1 for oldconfig, coloring the tristate options to
-> yes=green, no=red, module=blue and boolean variables to true=green,
-> false=red.
-
-Hmm, I do not know if this is useful.
-I tried this, but I thought
-it was irritating to my eyes.
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+PiBPbiBEZWMgMTQsIDIwMTgsIGF0IDQ6NTEgUE0sIE1hc2FoaXJvIFlhbWFkYSA8eWFtYWRhLm1h
+c2FoaXJvQHNvY2lvbmV4dC5jb20+IHdyb3RlOg0KPiANCj4gSGkgUGV0ZXIsDQo+IA0KPiBPbiBU
+aHUsIERlYyAxMywgMjAxOCBhdCA3OjUzIFBNIFBldGVyIFppamxzdHJhIDxwZXRlcnpAaW5mcmFk
+ZWFkLm9yZz4gd3JvdGU6DQo+PiBPbiBUaHUsIERlYyAxMywgMjAxOCBhdCAwNjoxNzo0MVBNICsw
+OTAwLCBNYXNhaGlybyBZYW1hZGEgd3JvdGU6DQo+Pj4gUmV2ZXJ0IHRoZSBmb2xsb3dpbmcgY29t
+bWl0czoNCj4+PiANCj4+PiAtIDViZGNkNTEwYzJhYzllZmFmNTVjNGNiZDhkNDY0MjFkOGUyMzIw
+Y2QNCj4+PiAgKCJ4ODYvanVtcC1sYWJlbHM6IE1hY3JvZnkgaW5saW5lIGFzc2VtYmx5IGNvZGUg
+dG8gd29yayBhcm91bmQgR0NDIGlubGluaW5nIGJ1Z3MiKQ0KPj4+IA0KPj4+IC0gZDVhNTgxZDg0
+YWU2YjhhNGE3NDA0NjRiODBkOGQ5Y2YxZTc5NDdiMg0KPj4+ICAoIng4Ni9jcHVmZWF0dXJlOiBN
+YWNyb2Z5IGlubGluZSBhc3NlbWJseSBjb2RlIHRvIHdvcmsgYXJvdW5kIEdDQyBpbmxpbmluZyBi
+dWdzIikNCj4+PiANCj4+PiAtIDA0NzRkNWQ5ZDJmN2YzYjExMjYyZjdiZjg3ZDBlNzMxNGVhZDky
+MDAuDQo+Pj4gICgieDg2L2V4dGFibGU6IE1hY3JvZnkgaW5saW5lIGFzc2VtYmx5IGNvZGUgdG8g
+d29yayBhcm91bmQgR0NDIGlubGluaW5nIGJ1Z3MiKQ0KPj4+IA0KPj4+IC0gNDk0YjUxNjhmMmRl
+MDA5ZWI4MGYxOThmNjY4ZGEzNzQyOTUwOThkZC4NCj4+PiAgKCJ4ODYvcGFyYXZpcnQ6IFdvcmsg
+YXJvdW5kIEdDQyBpbmxpbmluZyBidWdzIHdoZW4gY29tcGlsaW5nIHBhcmF2aXJ0IG9wcyIpDQo+
+Pj4gDQo+Pj4gLSBmODFmOGFkNTZmZDFjN2I5OWIyZWQxYzMxNDUyN2Y3ZDlhYzQ0N2M2Lg0KPj4+
+ICAoIng4Ni9idWc6IE1hY3JvZnkgdGhlIEJVRyB0YWJsZSBzZWN0aW9uIGhhbmRsaW5nLCB0byB3
+b3JrIGFyb3VuZCBHQ0MgaW5saW5pbmcgYnVncyIpDQo+Pj4gDQo+Pj4gLSA3N2Y0OGVjMjhlNGNj
+ZmY5NGQyZTVmNDI2MGE4M2FjMjdhN2YzMDk5Lg0KPj4+ICAoIng4Ni9hbHRlcm5hdGl2ZXM6IE1h
+Y3JvZnkgbG9jayBwcmVmaXhlcyB0byB3b3JrIGFyb3VuZCBHQ0MgaW5saW5pbmcgYnVncyIpDQo+
+Pj4gDQo+Pj4gLSA5ZTE3MjViNDEwNTk0OTExY2M1OTgxYjZjN2I0Y2VhNGVjMDU0Y2E4Lg0KPj4+
+ICAoIng4Ni9yZWZjb3VudDogV29yayBhcm91bmQgR0NDIGlubGluaW5nIGJ1ZyIpDQo+Pj4gIChD
+b25mbGljdHM6IGFyY2gveDg2L2luY2x1ZGUvYXNtL3JlZmNvdW50LmgpDQo+Pj4gDQo+Pj4gLSBj
+MDZjNGQ4MDkwNTEzZjI5NzRkZmRiZWQyYWM5ODYzNDM1N2FjNDc1Lg0KPj4+ICAoIng4Ni9vYmp0
+b29sOiBVc2UgYXNtIG1hY3JvcyB0byB3b3JrIGFyb3VuZCBHQ0MgaW5saW5pbmcgYnVncyIpDQo+
+Pj4gDQo+Pj4gLSA3N2IwYmY1NWJjNjc1MjMzZDIyY2Q1ZGY5NzYwNWQ1MTZkNjQ1MjVlLg0KPj4+
+ICAoImtidWlsZC9NYWtlZmlsZTogUHJlcGFyZSBmb3IgdXNpbmcgbWFjcm9zIGluIGlubGluZSBh
+c3NlbWJseSBjb2RlIHRvIHdvcmsgYXJvdW5kIGFzbSgpIHJlbGF0ZWQgR0NDIGlubGluaW5nIGJ1
+Z3MiKQ0KPj4gDQo+PiBJIGRvbid0IHRoaW5rIHdlIHdhbnQgdG8gYmxpbmRseSByZXZlcnQgYWxs
+IHRoYXQuIFNvbWUgb2YgdGhlbSBhY3R1YWxseQ0KPj4gbWFkZSBzZW5zZSBhbmQgZGlkIGNsZWFu
+IHVwIHRoaW5ncyBpcnJlc3BlY3RpdmUgb2YgdGhlIGFzbS1pbmxpbmUgaXNzdWUuDQo+PiANCj4+
+IEluIHBhcnRpY3VsYXIgSSBsaWtlIHRoZSBqdW1wLWxhYmVsIG9uZS4NCj4gDQo+IFsxXSBUaGUg
+I2Vycm9yIG1lc3NhZ2UgaXMgdW5uZWNlc3NhcnkuDQo+IA0KPiBbMl0ga2VlcCBTVEFUQ19CUkFO
+Q0hfTk9QL0pNUCBpbnN0ZWFkIG9mIFNUQVRJQ19KVU1QX0lGX1RSVUUvRkFMU0UNCj4gDQo+IA0K
+PiANCj4gSW4gdjIsIEkgd2lsbCBtYWtlIHN1cmUgdG8gbm90IHJlLWFkZCBbMV0uDQo+IEkgYW0g
+bm90IHN1cmUgYWJvdXQgWzJdLg0KPiANCj4gDQo+IERvIHlvdSBtZWFuIG9ubHkgWzFdLA0KPiBv
+ciBib3RoIG9mIHRoZW0/DQo+IA0KPiANCj4gDQo+PiBUaGUgY3B1ZmVhdHVyZSBvbmUgT1RPaCwg
+eWVhaCwNCj4+IEknZCBsb3ZlIHRvIGdldCB0aGF0IHJldmVydGVkLg0KPj4gDQo+PiBBbmQgYXMg
+YSBub3RlOyB0aGUgbm9ybWFsIGNvbW1pdCBxdW90aW5nIHN0eWxlIGlzOg0KPj4gDQo+PiAgZDVh
+NTgxZDg0YWU2ICgieDg2L2NwdWZlYXR1cmU6IE1hY3JvZnkgaW5saW5lIGFzc2VtYmx5IGNvZGUg
+dG8gd29yayBhcm91bmQgR0NDIGlubGluaW5nIGJ1Z3MiKQ0KPiANCj4gDQo+IE9LLiBJIHdpbGwg
+ZG8gc28gaW4gdjIuDQoNCkkgcmVjb21tZW5kIHRvIGRvIHRoZSBmb2xsb3dpbmcgZm9yIHYyOg0K
+DQoxLiBSdW4gc29tZSBzdGF0aWMgbWVhc3VyZW1lbnRzIChlLmcuLCBmdW5jdGlvbiBzaXplcywg
+bnVtYmVyIG9mIGZ1bmN0aW9uDQpzeW1ib2xzKSB0byBlbnN1cmUgdGhhdCBHQ0Mgd29ya3MgYXMg
+aXQgc2hvdWxkLiBJZiBwb3NzaWJsZSwgcnVuIHNtYWxsDQpwZXJmb3JtYW5jZSBldmFsdWF0aW9u
+cy4gSUlSQywgSSBzYXcgc21hbGwgYnV0IGNvbnNpc3RlbnQgcGVyZm9ybWFuY2UNCmRpZmZlcmVu
+Y2Ugd2hlbiBJIHJhbiBhIGxvb3Agd2l0aCBtcHJvdGVjdCgpIHRoYXQga2VwdCBjaGFuZ2luZyBw
+ZXJtaXNzaW9ucy4NClRoaXMgd2FzIGR1ZSB0byBQViBNTVUgZnVuY3Rpb25zIHRoYXQgY2F1c2Vk
+IGlubGluaW5nIG1lc3MuDQoNCjIuIEJyZWFrIHRoZSBwYXRjaCBpbnRvIHNlcGFyYXRlIHBhdGNo
+ZXMsIGJhc2VkIG9uIHRoZSBvcmlnaW5hbCBwYXRjaC1zZXQNCm9yZGVyIChyZXZlcnNlZCkuIFRo
+aXMgaXMgdGhlIGNvbW1vbiBwcmFjdGljZSwgd2hpY2ggYWxsb3dzIHBlb3BsZSB0byByZXZpZXcN
+CnBhdGNoZXMsIHBlcmZvcm0gYmlzZWN0aW9ucywgYW5kIHJldmVydCB3aGVuIG5lZWRlZC4NCg0K
+My4gQ2MgdGhlIHJlbGV2YW50IHBlb3BsZSB3aG8gYWNrJ2QgdGhlIG9yaWdpbmFsIHBhdGNoZXMs
+IGUuZy4sIEtlZXMgQ29vaywNCndob+KAmXMgb24gdG9wIG9mIHRoZSByZWZlcmVuY2UtY291bnRl
+cnMgYW5kIExpbnVzLCB3aG8gcHJvcG9zZWQgdGhpcw0KYXBwcm9hY2guDQoNCkluIGdlbmVyYWws
+IEkgdGhpbmsgdGhhdCBmcm9tIHRoZSBzdGFydCBpdCB3YXMgY2xlYXIgdGhhdCB0aGUgbW90aXZh
+dGlvbiBmb3INCnRoZSBwYXRjaC1zZXQgaXMgbm90IGp1c3QgcGVyZm9ybWFuY2UgYW5kIGFsc28g
+YmV0dGVyIGNvZGUuIEZvciBleGFtcGxlLCBJDQpzZWUgbm8gcmVhc29uIHRvIHJldmVydCB0aGUg
+UFYtY2hhbmdlcyBvciB0aGUgbG9jay1wcmVmaXggY2hhbmdlcyB0aGF0DQppbXByb3ZlZCB0aGUg
+Y29kZSByZWFkYWJpbGl0eS4NCg0KUmVnYXJkcywNCk5hZGF2
