@@ -1,41 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:21905 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730181AbeLPPZ1 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:53861 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729822AbeLPPcN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 16 Dec 2018 10:25:27 -0500
+        Sun, 16 Dec 2018 10:32:13 -0500
 MIME-Version: 1.0
-References: <1544009286-15705-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1544009286-15705-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1544774739-13471-1-git-send-email-yamada.masahiro@socionext.com>
+ <1544774739-13471-2-git-send-email-yamada.masahiro@socionext.com> <CAKwvOdkSSb-EECgCmYnW40Mbd4ibSf22wqUBqaT_X7g7Sn_9UQ@mail.gmail.com>
+In-Reply-To: <CAKwvOdkSSb-EECgCmYnW40Mbd4ibSf22wqUBqaT_X7g7Sn_9UQ@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 17 Dec 2018 00:24:42 +0900
-Message-ID: <CAK7LNATKMZiN=NdhXbCLwxkKtM34cetfV5Z9bw9t2KsxZc49zg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] kbuild: refactor Makefile.asm-generic
+Date: Mon, 17 Dec 2018 00:31:30 +0900
+Message-ID: <CAK7LNATMRvsyiQH3+S==r8xObv5uedQmqnj6zZyv8uwFrt0p+Q@mail.gmail.com>
+Subject: Re: [PATCH 2/3] kbuild: add -Werror=strict-prototype flag unconditionally
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
 
-On Wed, Dec 5, 2018 at 8:29 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Sat, Dec 15, 2018 at 3:34 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
 >
->  - Use conventional $(MAKE) $(asm-generic)=<dir> style
->    for directory descending
+> On Fri, Dec 14, 2018 at 12:06 AM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> >
+> > -Wstrict-prototype is added to KBUILD_CFLAGS first, then overridden
 >
->  - Remove unneeded FORCE since "all" is a phony target
+> -Wstrict-prototypes (plural)
 >
->  - Remove unneeded "_dummy :=" assignment
+> > by -Werror=strict-prototype later.
 >
->  - Skip $(shell mkdir ...) when headers exist in the directory
+> -Werror=strict-prototypes (plural)
 >
->  - Misc cleanups
+> LGTM: https://godbolt.org/z/DyEpmU
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> If you would mind updating the commit message (and subject), then:
+> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-1/3 applied to linux-kbuild.
 
-I will send v2 for the rest in the series later.
+Thanks for checking this.
+
+I will locally fix those typos (including the one in the subject).
 
 
 
