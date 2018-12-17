@@ -1,152 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:28169 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726657AbeLQQWX (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Dec 2018 11:22:23 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 09/12] Revert "kbuild/Makefile: Prepare for using macros in inline assembly code to work around asm() related GCC inlining bugs"
-Date: Tue, 18 Dec 2018 01:03:24 +0900
-Message-Id: <1545062607-8599-10-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1545062607-8599-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1545062607-8599-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from mx1.redhat.com ([209.132.183.28]:37066 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728009AbeLQRDJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 17 Dec 2018 12:03:09 -0500
+Date: Mon, 17 Dec 2018 11:03:05 -0600
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH] kbuild: error for CONFIG_ORC_UNWINDER is too much
+Message-ID: <20181217170305.chni6e5vmev7hp4r@treble>
+References: <869bc700-1d6d-b950-76c7-5d0fc589152c@lca.pw>
+ <20181217161728.6875-1-cai@lca.pw>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181217161728.6875-1-cai@lca.pw>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>
-Cc: Richard Biener <rguenther@suse.de>, Segher Boessenkool <segher@kernel.crashing.org>, Peter Zijlstra <peterz@infradead.org>, Juergen Gross <jgross@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@chromium.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Logan Gunthorpe <logang@deltatee.com>, Nadav Amit <namit@vmware.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
+To: Qian Cai <cai@lca.pw>
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, mingo@kernel.org, bp@alien8.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Paul Gortmaker <paul.gortmaker@windriver.com>
 
-This reverts commit 77b0bf55bc675233d22cd5df97605d516d64525e.
+On Mon, Dec 17, 2018 at 11:17:28AM -0500, Qian Cai wrote:
+> Since ifdef will be evaluated immediately in the first phrase of the
+> Makefile read-in, there is no guarantee that the value for
+> CONFIG_ORC_UNWINDER will be up-to-date until in the second phrase that
+> this recipe is ran.
+> 
+> include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
+> 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
+> 
+> Hence, change error to warning as this is essentially a best guess. The
+> original bug can be reproduced this way,
 
-A few days after the patch set applied, discussion started to solve
-the issue more elegantly with the help of compiler:
+But this still doesn't fix the root of the problem, that the check
+relies on a stale auto.conf.
 
-  https://lkml.org/lkml/2018/10/7/92
-
-The new syntax "asm inline" was implemented by Segher Boessenkool, and
-now queued up for GCC 9. (People were positive even for back-porting it
-to older compilers).
-
-Since the in-kernel workarounds merged, some issues have been reported.
-The current urgent issue is distro packages for module building. More
-fundamentally, we cannot build external modules after 'make clean'
-because *.s files are globally removed.
-
-We could fix those in Makefiles, but I do not want to mess up the build
-system any more.
-
-Given that this issue will be solved in a cleaner way sooner or later,
-let's revert the in-kernel workarounds, and wait for GCC 9.
-
-Link: https://lkml.org/lkml/2018/11/15/467
-Link: https://marc.info/?t=154212770600037&r=1&w=2
-Reported-by: Sedat Dilek <sedat.dilek@gmail.com> # deb/rpm package
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Logan Gunthorpe <logang@deltatee.com>
-Cc: Nadav Amit <namit@vmware.com>
-Cc: Segher Boessenkool <segher@kernel.crashing.org>
----
-
-
- Makefile                 | 9 ++-------
- arch/x86/Makefile        | 7 -------
- arch/x86/kernel/macros.S | 7 -------
- scripts/Kbuild.include   | 4 +---
- scripts/mod/Makefile     | 2 --
- 5 files changed, 3 insertions(+), 26 deletions(-)
- delete mode 100644 arch/x86/kernel/macros.S
-
-diff --git a/Makefile b/Makefile
-index 56d5270..885c74b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1081,7 +1081,7 @@ scripts: scripts_basic scripts_dtc asm-generic gcc-plugins $(autoksyms_h)
- # version.h and scripts_basic is processed / created.
- 
- # Listed in dependency order
--PHONY += prepare archprepare macroprepare prepare0 prepare1 prepare2 prepare3
-+PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
- 
- # prepare3 is used to check if we are building in a separate output directory,
- # and if so do:
-@@ -1104,9 +1104,7 @@ prepare2: prepare3 outputmakefile asm-generic
- prepare1: prepare2 $(version_h) $(autoksyms_h) include/generated/utsrelease.h
- 	$(cmd_crmodverdir)
- 
--macroprepare: prepare1 archmacros
--
--archprepare: archheaders archscripts macroprepare scripts_basic
-+archprepare: archheaders archscripts prepare1 scripts_basic
- 
- prepare0: archprepare gcc-plugins
- 	$(Q)$(MAKE) $(build)=.
-@@ -1174,9 +1172,6 @@ archheaders:
- PHONY += archscripts
- archscripts:
- 
--PHONY += archmacros
--archmacros:
--
- PHONY += __headers
- __headers: $(version_h) scripts_basic uapi-asm-generic archheaders archscripts
- 	$(Q)$(MAKE) $(build)=scripts build_unifdef
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 75ef499..85a66c4 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -232,13 +232,6 @@ archscripts: scripts_basic
- archheaders:
- 	$(Q)$(MAKE) $(build)=arch/x86/entry/syscalls all
- 
--archmacros:
--	$(Q)$(MAKE) $(build)=arch/x86/kernel arch/x86/kernel/macros.s
--
--ASM_MACRO_FLAGS = -Wa,arch/x86/kernel/macros.s
--export ASM_MACRO_FLAGS
--KBUILD_CFLAGS += $(ASM_MACRO_FLAGS)
--
- ###
- # Kernel objects
- 
-diff --git a/arch/x86/kernel/macros.S b/arch/x86/kernel/macros.S
-deleted file mode 100644
-index cfc1c7d..0000000
---- a/arch/x86/kernel/macros.S
-+++ /dev/null
-@@ -1,7 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--
--/*
-- * This file includes headers whose assembly part includes macros which are
-- * commonly used. The macros are precompiled into assmebly file which is later
-- * assembled together with each compiled file.
-- */
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index bb01555..3d09844 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -115,9 +115,7 @@ __cc-option = $(call try-run,\
- 
- # Do not attempt to build with gcc plugins during cc-option tests.
- # (And this uses delayed resolution so the flags will be up to date.)
--# In addition, do not include the asm macros which are built later.
--CC_OPTION_FILTERED = $(GCC_PLUGINS_CFLAGS) $(ASM_MACRO_FLAGS)
--CC_OPTION_CFLAGS = $(filter-out $(CC_OPTION_FILTERED),$(KBUILD_CFLAGS))
-+CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
- 
- # cc-option
- # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
-diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
-index a5b4af4..42c5d50 100644
---- a/scripts/mod/Makefile
-+++ b/scripts/mod/Makefile
-@@ -4,8 +4,6 @@ OBJECT_FILES_NON_STANDARD := y
- hostprogs-y	:= modpost mk_elfconfig
- always		:= $(hostprogs-y) empty.o
- 
--CFLAGS_REMOVE_empty.o := $(ASM_MACRO_FLAGS)
--
- modpost-objs	:= modpost.o file2alias.o sumversion.o
- 
- devicetable-offsets-file := devicetable-offsets.h
 -- 
-2.7.4
+Josh
