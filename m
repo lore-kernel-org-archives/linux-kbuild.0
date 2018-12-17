@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.univ-sba.dz ([193.194.79.133]:52082 "EHLO mail.univ-sba.dz"
+Received: from mail.univ-sba.dz ([193.194.79.133]:53542 "EHLO mail.univ-sba.dz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730920AbeLQAiL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 16 Dec 2018 19:38:11 -0500
-Date: Mon, 17 Dec 2018 01:20:20 +0100 (CET)
+        id S1729842AbeLQAqR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 16 Dec 2018 19:46:17 -0500
+Date: Mon, 17 Dec 2018 01:19:26 +0100 (CET)
 From: Tayeb Souami <amar.tilmatine@univ-sba.dz>
 Reply-To: Tayeb souami <tayebsouam.spende@gmail.com>
-Message-ID: <1530985023.38252.1545006020678.JavaMail.zimbra@univ-sba.dz>
+Message-ID: <1197344878.37915.1545005966170.JavaMail.zimbra@univ-sba.dz>
 Subject: =?utf-8?Q?wohlt=C3=A4tige_Spende_von_2.000.000_euro?=
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
