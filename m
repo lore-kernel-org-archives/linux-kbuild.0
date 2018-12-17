@@ -1,111 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:65254 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388235AbeLQQLQ (ORCPT
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:33352 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726667AbeLQQRs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Dec 2018 11:11:16 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 00/12] x86, kbuild: revert macrofying inline assembly code
-Date: Tue, 18 Dec 2018 01:03:15 +0900
-Message-Id: <1545062607-8599-1-git-send-email-yamada.masahiro@socionext.com>
+        Mon, 17 Dec 2018 11:17:48 -0500
+Received: by mail-qt1-f196.google.com with SMTP id l11so14713760qtp.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Dec 2018 08:17:47 -0800 (PST)
+From: Qian Cai <cai@lca.pw>
+Subject: [PATCH] kbuild: error for CONFIG_ORC_UNWINDER is too much
+Date: Mon, 17 Dec 2018 11:17:28 -0500
+Message-Id: <20181217161728.6875-1-cai@lca.pw>
+In-Reply-To: <869bc700-1d6d-b950-76c7-5d0fc589152c@lca.pw>
+References: <869bc700-1d6d-b950-76c7-5d0fc589152c@lca.pw>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>
-Cc: Richard Biener <rguenther@suse.de>, Segher Boessenkool <segher@kernel.crashing.org>, Peter Zijlstra <peterz@infradead.org>, Juergen Gross <jgross@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@chromium.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Arnd Bergmann <arnd@arndb.de>, Andrey Ryabinin <aryabinin@virtuozzo.com>, virtualization@lists.linux-foundation.org, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Alok Kataria <akataria@vmware.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Jann Horn <jannh@google.com>, linux-arch@vger.kernel.org, Alexey Dobriyan <adobriyan@gmail.com>, linux-sparse@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Yonghong Song <yhs@fb.com>, Michal Marek <michal.lkml@markovi.net>, Arnaldo Carvalho de Melo <acme@redhat.com>, Jan Beulich <JBeulich@suse.com>, Nadav Amit <namit@vmware.com>, David Woodhouse <dwmw@amazon.co.uk>, Alexei Starovoitov <ast@kernel.org>, linux-kernel@vger.kernel.org
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: jpoimboe@redhat.com, mingo@kernel.org, bp@alien8.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Qian Cai <cai@lca.pw>
 
-This series reverts the in-kernel workarounds for inlining issues.
+Since ifdef will be evaluated immediately in the first phrase of the
+Makefile read-in, there is no guarantee that the value for
+CONFIG_ORC_UNWINDER will be up-to-date until in the second phrase that
+this recipe is ran.
 
-The commit description of 77b0bf55bc67 mentioned
-"We also hope that GCC will eventually get fixed,..."
+include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
+	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
 
-Now, GCC provides a solution.
+Hence, change error to warning as this is essentially a best guess. The
+original bug can be reproduced this way,
 
-https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html
-explains the new "asm inline" syntax.
+* make sure none of libelf-dev, libelf-devel or elfutils-libelf-devel
+installed.
 
-The performance issue will be eventually solved.
+ # make distclean
 
-[About Code cleanups]
+* generate a default .config where CONFIG_UNWINDER_ORC is enabled by
+default.
+ # make menuconfig (exit -> save)
 
-I know Nadam Amit is opposed to the full revert.
-He also claims his motivation for macrofying was not only
-performance, but also cleanups.
+ # grep CONFIG_UNWINDER_ORC .config
+CONFIG_UNWINDER_ORC=y
 
-IIUC, the criticism addresses the code duplication between C and ASM.
+ # make menuconfig (deselect CONFIG_UNWINDER_ORC)
 
-If so, I'd like to suggest a different approach for cleanups.
-Please see the last 3 patches.
-IMHO, preprocessor approach is more straight-forward, and readable.
-Basically, this idea should work because it is what we already do for
-__ASM_FORM() etc.
+ # grep CONFIG_UNWINDER_ORC .config
+ # CONFIG_UNWINDER_ORC is not set
 
-[Quick Test of "asm inline" of GCC 9]
+ # make
+Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, please install
+libelf-dev, libelf-devel or elfutils-libelf-devel
 
-If you want to try "asm inline" feature, the patch is available:
-https://lore.kernel.org/patchwork/patch/1024590/
+ # grep CONFIG_UNWINDER_ORC include/config/auto.conf
+CONFIG_UNWINDER_ORC=y
 
-The number of symbols for arch/x86/configs/x86_64_defconfig:
+Fixes: 3dd40cb320f (objtool: Upgrade libelf-devel warning to error for
+CONFIG_ORC_UNWINDER)
+Signed-off-by: Qian Cai <cai@lca.pw>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-                            nr_symbols
-  [1]    v4.20-rc7       :   96502
-  [2]    [1]+full revert :   96705   (+203)
-  [3]    [2]+"asm inline":   96568   (-137)
-
-[3]: apply my patch, then replace "asm" -> "asm_inline"
-    for _BUG_FLAGS(), refcount_add(), refcount_inc(), refcount_dec(),
-        annotate_reachable(), annotate_unreachable()
-
-
-Changes in v3:
-  - Split into per-commit revert (per Nadav Amit)
-  - Add some cleanups with preprocessor approach
-
-Changes in v2:
-  - Revive clean-ups made by 5bdcd510c2ac (per Peter Zijlstra)
-  - Fix commit quoting style (per Peter Zijlstra)
-
-Masahiro Yamada (12):
-  Revert "x86/jump-labels: Macrofy inline assembly code to work around
-    GCC inlining bugs"
-  Revert "x86/cpufeature: Macrofy inline assembly code to work around
-    GCC inlining bugs"
-  Revert "x86/extable: Macrofy inline assembly code to work around GCC
-    inlining bugs"
-  Revert "x86/paravirt: Work around GCC inlining bugs when compiling
-    paravirt ops"
-  Revert "x86/bug: Macrofy the BUG table section handling, to work
-    around GCC inlining bugs"
-  Revert "x86/alternatives: Macrofy lock prefixes to work around GCC
-    inlining bugs"
-  Revert "x86/refcount: Work around GCC inlining bug"
-  Revert "x86/objtool: Use asm macros to work around GCC inlining bugs"
-  Revert "kbuild/Makefile: Prepare for using macros in inline assembly
-    code to work around asm() related GCC inlining bugs"
-  linux/linkage: add ASM() macro to reduce duplication between C/ASM
-    code
-  x86/alternatives: consolidate LOCK_PREFIX macro
-  x86/asm: consolidate ASM_EXTABLE_* macros
-
- Makefile                                  |  9 +--
- arch/x86/Makefile                         |  7 ---
- arch/x86/include/asm/alternative-asm.h    | 22 +------
- arch/x86/include/asm/alternative-common.h | 47 +++++++++++++++
- arch/x86/include/asm/alternative.h        | 30 +---------
- arch/x86/include/asm/asm.h                | 46 +++++----------
- arch/x86/include/asm/bug.h                | 98 +++++++++++++------------------
- arch/x86/include/asm/cpufeature.h         | 82 +++++++++++---------------
- arch/x86/include/asm/jump_label.h         | 22 +++++--
- arch/x86/include/asm/paravirt_types.h     | 56 +++++++++---------
- arch/x86/include/asm/refcount.h           | 81 +++++++++++--------------
- arch/x86/kernel/macros.S                  | 16 -----
- include/asm-generic/bug.h                 |  8 +--
- include/linux/compiler.h                  | 56 ++++--------------
- include/linux/linkage.h                   |  8 +++
- scripts/Kbuild.include                    |  4 +-
- scripts/mod/Makefile                      |  2 -
- 17 files changed, 249 insertions(+), 345 deletions(-)
- create mode 100644 arch/x86/include/asm/alternative-common.h
- delete mode 100644 arch/x86/kernel/macros.S
-
+diff --git a/Makefile b/Makefile
+index 56d5270f22f8..eeb4ec49d393 100644
+--- a/Makefile
++++ b/Makefile
+@@ -963,7 +963,7 @@ ifdef CONFIG_STACK_VALIDATION
+     objtool_target := tools/objtool FORCE
+   else
+     ifdef CONFIG_UNWINDER_ORC
+-      $(error "Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, please install libelf-dev, libelf-devel or elfutils-libelf-devel")
++      $(warning "Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, please install libelf-dev, libelf-devel or elfutils-libelf-devel")
+     else
+       $(warning "Cannot use CONFIG_STACK_VALIDATION=y, please install libelf-dev, libelf-devel or elfutils-libelf-devel")
+     endif
 -- 
-2.7.4
+2.17.2 (Apple Git-113)
