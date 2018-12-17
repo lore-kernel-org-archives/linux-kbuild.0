@@ -1,76 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:36114 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732263AbeLQSL5 (ORCPT
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:37426 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726763AbeLQTdz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Dec 2018 13:11:57 -0500
-Received: by mail-qt1-f196.google.com with SMTP id t13so15170931qtn.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 17 Dec 2018 10:11:56 -0800 (PST)
-Message-ID: <1545070314.18411.19.camel@lca.pw>
-Subject: Re: [PATCH] kbuild: error for CONFIG_ORC_UNWINDER is too much
-From: Qian Cai <cai@lca.pw>
-Date: Mon, 17 Dec 2018 13:11:54 -0500
-In-Reply-To: <20181217174936.ouhelssdkshclrr6@treble>
-References: <869bc700-1d6d-b950-76c7-5d0fc589152c@lca.pw>
-         <20181217161728.6875-1-cai@lca.pw> <20181217170305.chni6e5vmev7hp4r@treble>
-         <1545066839.18411.17.camel@lca.pw> <20181217174936.ouhelssdkshclrr6@treble>
+        Mon, 17 Dec 2018 14:33:55 -0500
+Received: by mail-pg1-f194.google.com with SMTP id c25so5087239pgb.4
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Dec 2018 11:33:54 -0800 (PST)
+MIME-Version: 1.0
+References: <cover.1544099024.git.andreyknvl@google.com> <bda78069e3b8422039794050ddcb2d53d053ed41.1544099024.git.andreyknvl@google.com>
+ <2bf7415e-2724-b3c3-9571-20c8b6d43b92@arm.com> <CAAeHK+xc6R_p26-tu--9W1L1PvUAFb70J23ByiEukKz3uVC3EQ@mail.gmail.com>
+ <b99b331d-22ca-b9db-8677-4896c427ef10@arm.com>
+In-Reply-To: <b99b331d-22ca-b9db-8677-4896c427ef10@arm.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Mon, 17 Dec 2018 20:33:42 +0100
+Message-ID: <CAAeHK+w2jppKbb26bBk6uP9ydZeHrtNc6b2CVv4xbvt6ecVooA@mail.gmail.com>
+Subject: Re: [PATCH v13 19/25] kasan: add hooks implementation for tag-based mode
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, mingo@kernel.org, bp@alien8.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Paul Gortmaker <paul.gortmaker@windriver.com>
+To: Vincenzo Frascino <vincenzo.frascino@arm.com>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Vishwath Mohan <vishwath@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgenii Stepanov <eugenis@google.com>
 
-On Mon, 2018-12-17 at 11:49 -0600, Josh Poimboeuf wrote:
-> On Mon, Dec 17, 2018 at 12:13:59PM -0500, Qian Cai wrote:
-> > On Mon, 2018-12-17 at 11:03 -0600, Josh Poimboeuf wrote:
-> > > On Mon, Dec 17, 2018 at 11:17:28AM -0500, Qian Cai wrote:
-> > > > Since ifdef will be evaluated immediately in the first phrase of the
-> > > > Makefile read-in, there is no guarantee that the value for
-> > > > CONFIG_ORC_UNWINDER will be up-to-date until in the second phrase that
-> > > > this recipe is ran.
-> > > > 
-> > > > include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
-> > > > 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
-> > > > 
-> > > > Hence, change error to warning as this is essentially a best guess. The
-> > > > original bug can be reproduced this way,
-> > > 
-> > > But this still doesn't fix the root of the problem, that the check
-> > > relies on a stale auto.conf.
-> > > 
-> > 
-> > Yes, but it at least let people to be able to continue compiling kernel
-> > without
-> > prematurely being terminated incorrectly. The good thing is that that check
-> > will
-> > be triggered again to print out the right message once auto.conf has been
-> > synced
-> > up.
-> > 
-> > # make
-> > Makefile:966: "Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y,
-> > please
-> > install libelf-dev, libelf-devel or elfutils-libelf-devel"
-> >   HOSTCC  scripts/kconfig/conf.o
-> >   HOSTLD  scripts/kconfig/conf
-> > scripts/kconfig/conf  --syncconfig Kconfig
-> > Makefile:968: "Cannot use CONFIG_STACK_VALIDATION=y, please install libelf-
-> > dev,
-> > libelf-devel or elfutils-libelf-devel"
-> 
-> Instead of giving false (or silent) warnings, why not just fix the real
-> problem?
+On Fri, Dec 14, 2018 at 1:34 PM Vincenzo Frascino
+<vincenzo.frascino@arm.com> wrote:
+>
+> On 12/12/18 3:04 PM, Andrey Konovalov wrote:
+> > On Tue, Dec 11, 2018 at 5:22 PM Vincenzo Frascino
+> > <vincenzo.frascino@arm.com> wrote:
+> >>
+> >> Hi Andrey,
+> >>
+> >> On 06/12/2018 12:24, Andrey Konovalov wrote:
+> >>> This commit adds tag-based KASAN specific hooks implementation and
+> >>> adjusts common generic and tag-based KASAN ones.
+> >>>
+> >>> 1. When a new slab cache is created, tag-based KASAN rounds up the size of
+> >>>    the objects in this cache to KASAN_SHADOW_SCALE_SIZE (== 16).
+> >>>
+> >>> 2. On each kmalloc tag-based KASAN generates a random tag, sets the shadow
+> >>>    memory, that corresponds to this object to this tag, and embeds this
+> >>>    tag value into the top byte of the returned pointer.
+> >>>
+> >>> 3. On each kfree tag-based KASAN poisons the shadow memory with a random
+> >>>    tag to allow detection of use-after-free bugs.
+> >>>
+> >>> The rest of the logic of the hook implementation is very much similar to
+> >>> the one provided by generic KASAN. Tag-based KASAN saves allocation and
+> >>> free stack metadata to the slab object the same way generic KASAN does.
+> >>>
+> >>> Reviewed-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+> >>> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
+> >>> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> >>> ---
+> >>>  mm/kasan/common.c | 116 ++++++++++++++++++++++++++++++++++++++--------
+> >>>  mm/kasan/kasan.h  |   8 ++++
+> >>>  mm/kasan/tags.c   |  48 +++++++++++++++++++
+> >>>  3 files changed, 153 insertions(+), 19 deletions(-)
+> >>>
+> >>
+> >>
+> >> [...]
+> >>
+> >>> @@ -265,6 +290,8 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
+> >>>               return;
+> >>>       }
+> >>>
+> >>> +     cache->align = round_up(cache->align, KASAN_SHADOW_SCALE_SIZE);
+> >>> +
+> >>
+> >> Did you consider to set ARCH_SLAB_MINALIGN instead of this round up?
+> >
+> > I didn't know about this macro. Looks like we can use it to do the
+> > same thing. Do you think it's a better solution to redefine
+> > ARCH_SLAB_MINALIGN to KASAN_SHADOW_SCALE_SIZE for arm64 when tag-based
+> > KASAN is enabled instead of adjusting cache->align in
+> > kasan_cache_create?
+> >
+>
+> Yes, I think it is better because in this way we do not need to add extra code
+> to do the rounding.
+>
+> Curiosity, did you try your patches with SLUB red zoning enabled?
+> Since the area used for the Redzone is just after the payload, aligning the
+> object_size independently from the allocator could have side effects, at least
+> if I understand well how the mechanism works.
+>
+> Setting ARCH_SLAB_MINALIGN should avoid this as well.
+>
+> What do you think?
 
-The purpose of this patch here is to fix or revert the regression introduced by
-3dd40cb320f (objtool: Upgrade libelf-devel warning to error for
-CONFIG_ORC_UNWINDER).
+Sounds good to me.
 
-> 
-> Also the error exists for a reason: if the user misses the warning then
-> the ORC unwinder is broken and oops stack dumps are much less useful.
-> 
+Andrew, how should proceed with this? Send another fixup patch or
+resend the whole series?
 
-This is a separate issue. I am all ears if anyone has a better ideal to fix both
-issues at the same time.
+>
+> >>
+> >> --
+> >> Regards,
+> >> Vincenzo
+> >>
+> >> --
+> >> You received this message because you are subscribed to the Google Groups "kasan-dev" group.
+> >> To unsubscribe from this group and stop receiving emails from it, send an email to kasan-dev+unsubscribe@googlegroups.com.
+> >> To post to this group, send email to kasan-dev@googlegroups.com.
+> >> To view this discussion on the web visit https://groups.google.com/d/msgid/kasan-dev/2bf7415e-2724-b3c3-9571-20c8b6d43b92%40arm.com.
+> >> For more options, visit https://groups.google.com/d/optout.
+>
+> --
+> Regards,
+> Vincenzo
+>
+> --
+> You received this message because you are subscribed to the Google Groups "kasan-dev" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to kasan-dev+unsubscribe@googlegroups.com.
+> To post to this group, send email to kasan-dev@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/kasan-dev/b99b331d-22ca-b9db-8677-4896c427ef10%40arm.com.
+> For more options, visit https://groups.google.com/d/optout.
