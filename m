@@ -1,74 +1,236 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:60046 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726422AbeLRUzc (ORCPT
+Received: from mail-qk1-f202.google.com ([209.85.222.202]:49319 "EHLO
+        mail-qk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726744AbeLRWtZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Dec 2018 15:55:32 -0500
-Date: Tue, 18 Dec 2018 12:54:53 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH mm] kasan, arm64: use ARCH_SLAB_MINALIGN instead of
- manual aligning
-Message-Id: <20181218125453.4c5e6c056d31ccaa3a73d4a5@linux-foundation.org>
-In-Reply-To: <706da77adfceb0c324e824d03b52d58a752577ea.1545139710.git.andreyknvl@google.com>
-References: <706da77adfceb0c324e824d03b52d58a752577ea.1545139710.git.andreyknvl@google.com>
+        Tue, 18 Dec 2018 17:49:25 -0500
+Received: by mail-qk1-f202.google.com with SMTP id a193so21051781qkg.16
+        for <linux-kbuild@vger.kernel.org>; Tue, 18 Dec 2018 14:49:24 -0800 (PST)
+Date: Tue, 18 Dec 2018 14:49:07 -0800
+Message-Id: <20181218224907.1274-1-tmroeder@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH v2] scripts: add a tool to produce a compile_commands.json file
+From: Tom Roeder <tmroeder@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Tom Roeder <tmroeder@google.com>
 
-On Tue, 18 Dec 2018 14:30:33 +0100 Andrey Konovalov <andreyknvl@google.com> wrote:
+The LLVM/Clang project provides many tools for analyzing C source code.
+Many of these tools are based on LibTooling
+(https://clang.llvm.org/docs/LibTooling.html), which depends on a
+database of compiler flags. The standard container for this database is
+compile_commands.json, which consists of a list of JSON objects, each
+with "directory", "file", and "command" fields.
 
-> Instead of changing cache->align to be aligned to KASAN_SHADOW_SCALE_SIZE
-> in kasan_cache_create() we can reuse the ARCH_SLAB_MINALIGN macro.
-> 
-> ...
->
-> --- a/arch/arm64/include/asm/kasan.h
-> +++ b/arch/arm64/include/asm/kasan.h
-> @@ -36,6 +36,10 @@
->  #define KASAN_SHADOW_OFFSET     (KASAN_SHADOW_END - (1ULL << \
->  					(64 - KASAN_SHADOW_SCALE_SHIFT)))
->  
-> +#ifdef CONFIG_KASAN_SW_TAGS
-> +#define ARCH_SLAB_MINALIGN	(1ULL << KASAN_SHADOW_SCALE_SHIFT)
-> +#endif
-> +
->  void kasan_init(void);
->  void kasan_copy_shadow(pgd_t *pgdir);
->  asmlinkage void kasan_early_init(void);
+Some build systems, like cmake or bazel, produce this compilation
+information directly. Naturally, Makefiles don't. However, the kernel
+makefiles already create .<target>.o.cmd files that contain all the
+information needed to build a compile_commands.json file.
 
-This looks unreliable.  include/linux/slab.h has
+So, this commit adds scripts/gen_compile_commands.py, which recursively
+searches through a directory for .<target>.o.cmd files and extracts
+appropriate compile commands from them. It writes a
+compile_commands.json file that LibTooling-based tools can use.
 
-/*
- * Setting ARCH_SLAB_MINALIGN in arch headers allows a different alignment.
- * Intended for arches that get misalignment faults even for 64 bit integer
- * aligned buffers.
- */
-#ifndef ARCH_SLAB_MINALIGN
-#define ARCH_SLAB_MINALIGN __alignof__(unsigned long long)
-#endif
+By default, gen_compile_commands.py starts its search in its working
+directory and (over)writes compile_commands.json in the working
+directory. However, it also supports --output and --directory flags for
+out-of-tree use.
 
-so if a .c file includes arch/arm64/include/asm/kasan.h after
-include/linux/slab.h, it can get a macro-redefined warning.  If the .c
-file includes those headers in the other order, ARCH_SLAB_MINALIGN will
-get a different value compared to other .c files.
+Note that while gen_compile_commands.py enables the use of clang-based
+tools, it does not require the kernel to be compiled with clang. E.g.,
+the following sequence of commands produces a compile_commands.json file
+that works correctly with LibTooling.
 
-Or something like that.
+make defconfig
+make
+scripts/gen_compile_commands.py
 
-Different architectures define ARCH_SLAB_MINALIGN in different place:
+Also note that this script is written to work correctly in both Python 2
+and Python 3, so it does not specify the Python version in its first
+line.
 
-./arch/microblaze/include/asm/page.h:#define ARCH_SLAB_MINALIGN L1_CACHE_BYTES
-./arch/arm/include/asm/cache.h:#define ARCH_SLAB_MINALIGN 8
-./arch/sh/include/asm/page.h:#define ARCH_SLAB_MINALIGN 8
-./arch/c6x/include/asm/cache.h:#define ARCH_SLAB_MINALIGN       L1_CACHE_BYTES
-./arch/sparc/include/asm/cache.h:#define ARCH_SLAB_MINALIGN     __alignof__(unsigned long long)
-./arch/xtensa/include/asm/processor.h:#define ARCH_SLAB_MINALIGN STACK_ALIGN
+For an example of the utility of this script: after running
+gen_compile_commands.json on the latest kernel version, I was able to
+use Vim + the YouCompleteMe pluging + clangd to automatically jump to
+definitions and declarations. Obviously, cscope and ctags provide some
+of this functionality; the advantage of supporting LibTooling is that it
+opens the door to many other clang-based tools that understand the code
+directly and do not rely on regular expressions and heuristics.
 
-which is rather bad of us.
+Tested: Built several recent kernel versions and ran the script against
+them, testing tools like clangd (for editor/LSP support) and clang-check
+(for static analysis). Also extracted some test .cmd files from a kernel
+build and wrote a test script to check that the script behaved correctly
+with all permutations of the --output and --directory flags.
 
-But still.  I think your definition should occur in an arch header file
-which is reliably included from slab.h.  And kasan code should get its
-definition of ARCH_SLAB_MINALIGN by including slab.h.
+Signed-off-by: Tom Roeder <tmroeder@google.com>
+---
+Changelog since v1:
+- Add simple string replacement to unescape the pound sign.
+
+ scripts/gen_compile_commands.py | 151 ++++++++++++++++++++++++++++++++
+ 1 file changed, 151 insertions(+)
+ create mode 100755 scripts/gen_compile_commands.py
+
+diff --git a/scripts/gen_compile_commands.py b/scripts/gen_compile_commands.py
+new file mode 100755
+index 000000000000..7915823b92a5
+--- /dev/null
++++ b/scripts/gen_compile_commands.py
+@@ -0,0 +1,151 @@
++#!/usr/bin/env python
++# SPDX-License-Identifier: GPL-2.0
++#
++# Copyright (C) Google LLC, 2018
++#
++# Author: Tom Roeder <tmroeder@google.com>
++#
++"""A tool for generating compile_commands.json in the Linux kernel."""
++
++import argparse
++import json
++import logging
++import os
++import re
++
++_DEFAULT_OUTPUT = 'compile_commands.json'
++_DEFAULT_LOG_LEVEL = 'WARNING'
++
++_FILENAME_PATTERN = r'^\..*\.cmd$'
++_LINE_PATTERN = r'^cmd_[^ ]*\.o := (.* )([^ ]*\.c)$'
++_VALID_LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
++
++# A kernel build generally has over 2000 entries in its compile_commands.json
++# database. If this code finds 500 or fewer, then warn the user that they might
++# not have all the .cmd files, and they might need to compile the kernel.
++_LOW_COUNT_THRESHOLD = 500
++
++
++def parse_arguments():
++    """Sets up and parses command-line arguments.
++
++    Returns:
++        log_level: A logging level to filter log output.
++        directory: The directory to search for .cmd files.
++        output: Where to write the compile-commands JSON file.
++    """
++    usage = 'Creates a compile_commands.json database from kernel .cmd files'
++    parser = argparse.ArgumentParser(description=usage)
++
++    directory_help = ('Path to the kernel source directory to search '
++                      '(defaults to the working directory)')
++    parser.add_argument('-d', '--directory', type=str, help=directory_help)
++
++    output_help = ('The location to write compile_commands.json (defaults to '
++                   'compile_commands.json in the search directory)')
++    parser.add_argument('-o', '--output', type=str, help=output_help)
++
++    log_level_help = ('The level of log messages to produce (one of ' +
++                      ', '.join(_VALID_LOG_LEVELS) + '; defaults to ' +
++                      _DEFAULT_LOG_LEVEL + ')')
++    parser.add_argument(
++        '--log_level', type=str, default=_DEFAULT_LOG_LEVEL,
++        help=log_level_help)
++
++    args = parser.parse_args()
++
++    log_level = args.log_level
++    if log_level not in _VALID_LOG_LEVELS:
++        raise ValueError('%s is not a valid log level' % log_level)
++
++    directory = args.directory or os.getcwd()
++    output = args.output or os.path.join(directory, _DEFAULT_OUTPUT)
++    directory = os.path.abspath(directory)
++
++    return log_level, directory, output
++
++
++def process_line(root_directory, file_directory, command_prefix, relative_path):
++    """Extracts information from a .cmd line and creates an entry from it.
++
++    Args:
++        root_directory: The directory that was searched for .cmd files. Usually
++            used directly in the "directory" entry in compile_commands.json.
++        file_directory: The path to the directory the .cmd file was found in.
++        command_prefix: The extracted command line, up to the last element.
++        relative_path: The .c file from the end of the extracted command.
++            Usually relative to root_directory, but sometimes relative to
++            file_directory and sometimes neither.
++
++    Returns:
++        An entry to append to compile_commands.
++
++    Raises:
++        ValueError: Could not find the extracted file based on relative_path and
++            root_directory or file_directory.
++    """
++    # The .cmd files are intended to be included directly by Make, so they
++    # escape the pound sign '#', either as '\#' or '$(pound)' (depending on the
++    # kernel version). The compile_commands.json file is not interepreted
++    # by Make, so this code replaces the escaped version with '#'.
++    prefix = command_prefix.replace('\#', '#').replace('$(pound)', '#')
++
++    cur_dir = root_directory
++    expected_path = os.path.join(cur_dir, relative_path)
++    if not os.path.exists(expected_path):
++        # Try using file_directory instead. Some of the tools have a different
++        # style of .cmd file than the kernel.
++        cur_dir = file_directory
++        expected_path = os.path.join(cur_dir, relative_path)
++        if not os.path.exists(expected_path):
++            raise ValueError('File %s not in %s or %s' %
++                             (relative_path, root_directory, file_directory))
++    return {
++        'directory': cur_dir,
++        'file': relative_path,
++        'command': prefix + relative_path,
++    }
++
++
++def main():
++    """Walks through the directory and finds and parses .cmd files."""
++    log_level, directory, output = parse_arguments()
++
++    level = getattr(logging, log_level)
++    logging.basicConfig(format='%(levelname)s: %(message)s', level=level)
++
++    filename_matcher = re.compile(_FILENAME_PATTERN)
++    line_matcher = re.compile(_LINE_PATTERN)
++
++    compile_commands = []
++    for dirpath, _, filenames in os.walk(directory):
++        for filename in filenames:
++            if not filename_matcher.match(filename):
++                continue
++            filepath = os.path.join(dirpath, filename)
++
++            with open(filepath, 'rt') as f:
++                for line in f:
++                    result = line_matcher.match(line)
++                    if not result:
++                        continue
++
++                    try:
++                        entry = process_line(directory, dirpath,
++                                             result.group(1), result.group(2))
++                        compile_commands.append(entry)
++                    except ValueError as err:
++                        logging.info('Could not add line from %s: %s',
++                                     filepath, err)
++
++    with open(output, 'wt') as f:
++        json.dump(compile_commands, f, indent=2, sort_keys=True)
++
++    count = len(compile_commands)
++    if count < _LOW_COUNT_THRESHOLD:
++        logging.warning(
++            'Found %s entries. Have you compiled the kernel?', count)
++
++
++if __name__ == '__main__':
++    main()
+-- 
+2.20.0.405.gbc1bbc6f85-goog
