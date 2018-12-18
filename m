@@ -1,50 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35133 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726536AbeLRNbt (ORCPT
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:42036 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726541AbeLROeL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Dec 2018 08:31:49 -0500
-Received: by mail-pf1-f196.google.com with SMTP id z9so8155915pfi.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 18 Dec 2018 05:31:49 -0800 (PST)
-MIME-Version: 1.0
-References: <cover.1544099024.git.andreyknvl@google.com> <bda78069e3b8422039794050ddcb2d53d053ed41.1544099024.git.andreyknvl@google.com>
- <2bf7415e-2724-b3c3-9571-20c8b6d43b92@arm.com> <CAAeHK+xc6R_p26-tu--9W1L1PvUAFb70J23ByiEukKz3uVC3EQ@mail.gmail.com>
- <b99b331d-22ca-b9db-8677-4896c427ef10@arm.com> <CAAeHK+w2jppKbb26bBk6uP9ydZeHrtNc6b2CVv4xbvt6ecVooA@mail.gmail.com>
- <20181217123847.492b9ae4934bd0d95b0bbbdc@linux-foundation.org>
-In-Reply-To: <20181217123847.492b9ae4934bd0d95b0bbbdc@linux-foundation.org>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Tue, 18 Dec 2018 14:31:37 +0100
-Message-ID: <CAAeHK+yiGcu4u7rvugfY7wGUiHug7C1wvSuygXN6L5-wWMHtyw@mail.gmail.com>
-Subject: Re: [PATCH v13 19/25] kasan: add hooks implementation for tag-based mode
+        Tue, 18 Dec 2018 09:34:11 -0500
+Received: by mail-qt1-f196.google.com with SMTP id d19so18330426qtq.9
+        for <linux-kbuild@vger.kernel.org>; Tue, 18 Dec 2018 06:34:11 -0800 (PST)
+Message-ID: <1545143648.18411.20.camel@lca.pw>
+Subject: Re: [PATCH] kbuild: fix false positive warning/error about missing
+ libelf
+From: Qian Cai <cai@lca.pw>
+Date: Tue, 18 Dec 2018 09:34:08 -0500
+In-Reply-To: <1545110741-10761-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1545110741-10761-1-git-send-email-yamada.masahiro@socionext.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Vincenzo Frascino <vincenzo.frascino@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Vishwath Mohan <vishwath@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Jacob Bramley <Jacob.Bramley@arm.com>, Jann Horn <jannh@google.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Lee Smith <Lee.Smith@arm.com>, Kostya Serebryany <kcc@google.com>, Mark Brand <markbrand@google.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Evgenii Stepanov <eugenis@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Paul Gortmaker <paul.gortmaker@windriver.com>, Bernd Edlinger <bernd.edlinger@hotmail.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Mon, Dec 17, 2018 at 9:38 PM Andrew Morton <akpm@linux-foundation.org> wrote:
->
-> On Mon, 17 Dec 2018 20:33:42 +0100 Andrey Konovalov <andreyknvl@google.com> wrote:
->
-> > > Curiosity, did you try your patches with SLUB red zoning enabled?
-> > > Since the area used for the Redzone is just after the payload, aligning the
-> > > object_size independently from the allocator could have side effects, at least
-> > > if I understand well how the mechanism works.
-> > >
-> > > Setting ARCH_SLAB_MINALIGN should avoid this as well.
-> > >
-> > > What do you think?
-> >
-> > Sounds good to me.
-> >
-> > Andrew, how should proceed with this? Send another fixup patch or
-> > resend the whole series?
->
-> It depends on how extensive the changes are.  I prefer a fixup, but at
-> some point it's time to drop it all and start again.
+On Tue, 2018-12-18 at 14:25 +0900, Masahiro Yamada wrote:
+> For the same reason as commit 25896d073d8a ("x86/build: Fix compiler
+> support check for CONFIG_RETPOLINE"), you cannot put this $(error ...)
+> into the parse stage of the top Makefile.
+> 
+> Perhaps I'd propose a more sophisticated solution later, but this is
+> the best I can do for now.
+> 
+> Link: https://lkml.org/lkml/2017/12/25/211
+> Reported-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+> Reported-by: Bernd Edlinger <bernd.edlinger@hotmail.de>
+> Reported-by: Qian Cai <cai@lca.pw>
+> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
 
-The fixup in only a few lines, so I just sent it as a separate patch
-named "[PATCH mm] kasan, arm64: use ARCH_SLAB_MINALIGN instead of
-manual aligning".
+Tested-by: Qian Cai <cai@lca.pw>
 
-Thanks!
+>  Makefile | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 56d5270..d45856f 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -962,11 +962,6 @@ ifdef CONFIG_STACK_VALIDATION
+>    ifeq ($(has_libelf),1)
+>      objtool_target := tools/objtool FORCE
+>    else
+> -    ifdef CONFIG_UNWINDER_ORC
+> -      $(error "Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, please
+> install libelf-dev, libelf-devel or elfutils-libelf-devel")
+> -    else
+> -      $(warning "Cannot use CONFIG_STACK_VALIDATION=y, please install libelf-
+> dev, libelf-devel or elfutils-libelf-devel")
+> -    endif
+>      SKIP_STACK_VALIDATION := 1
+>      export SKIP_STACK_VALIDATION
+>    endif
+> @@ -1125,6 +1120,14 @@ uapi-asm-generic:
+>  
+>  PHONY += prepare-objtool
+>  prepare-objtool: $(objtool_target)
+> +ifeq ($(SKIP_STACK_VALIDATION),1)
+> +ifdef CONFIG_UNWINDER_ORC
+> +	@echo "error: Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y,
+> please install libelf-dev, libelf-devel or elfutils-libelf-devel" >&2
+> +	@false
+> +else
+> +	@echo "warning: Cannot use CONFIG_STACK_VALIDATION=y, please install
+> libelf-dev, libelf-devel or elfutils-libelf-devel" >&2
+> +endif
+> +endif
+>  
+>  # Generate some files
+>  # ---------------------------------------------------------------------------
