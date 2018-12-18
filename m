@@ -1,147 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:45742 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727029AbeLRRBC (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Dec 2018 12:01:02 -0500
-Received: by mail-pl1-f194.google.com with SMTP id a14so8080134plm.12
-        for <linux-kbuild@vger.kernel.org>; Tue, 18 Dec 2018 09:01:02 -0800 (PST)
-Date: Tue, 18 Dec 2018 09:00:55 -0800
-From: Tom Roeder <tmroeder@google.com>
-Subject: Re: [PATCH] scripts: add a tool to produce a compile_commands.json
- file
-Message-ID: <20181218170055.GA7794@google.com>
-References: <20181206222318.218157-1-tmroeder@google.com>
- <CAK7LNATZm6T9bjcAxB_WQw-um-Hjkhiew6qg8CRLayr8qYzLeQ@mail.gmail.com>
- <20181217214022.GA38778@google.com>
- <CAK7LNATG9y04UdJ-Z5AwLHXUcnbWo5Butee0pkL+MFzds04wCA@mail.gmail.com>
+Received: from mail-eopbgr710060.outbound.protection.outlook.com ([40.107.71.60]:12925
+        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726740AbeLRTdM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 18 Dec 2018 14:33:12 -0500
+From: Nadav Amit <namit@vmware.com>
+Subject: Re: [PATCH] kbuild, x86: revert macros in extended asm workarounds
+Date: Tue, 18 Dec 2018 19:33:07 +0000
+Message-ID: <A6321F73-0084-423B-8BEE-C23BF6BD1544@vmware.com>
+References: <1544692661-9455-1-git-send-email-yamada.masahiro@socionext.com>
+ <CA+icZUUnkGBp-3pJxE_s_Oc+pdNBrVc_ngYUwpv7zLEbtE_eVg@mail.gmail.com>
+In-Reply-To: <CA+icZUUnkGBp-3pJxE_s_Oc+pdNBrVc_ngYUwpv7zLEbtE_eVg@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9A9EC197CE14A34A9CB0F37FE152FCC3@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATG9y04UdJ-Z5AwLHXUcnbWo5Butee0pkL+MFzds04wCA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Richard Biener <rguenther@suse.de>, Peter Zijlstra <peterz@infradead.org>, Logan Gunthorpe <logang@deltatee.com>, Segher Boessenkool <segher@kernel.crashing.org>, linux-arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, Michal Marek <michal.lkml@markovi.net>, "linux-sparse@vger.kernel.org" <linux-sparse@vger.kernel.org>, Alok Kataria <akataria@vmware.com>, Juergen Gross <jgross@suse.com>, Andy Lutomirski <luto@kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-On Tue, Dec 18, 2018 at 11:17:35AM +0900, Masahiro Yamada wrote:
-> On Tue, Dec 18, 2018 at 8:21 AM Tom Roeder <tmroeder@google.com> wrote:
-> >
-> > On Sat, Dec 15, 2018 at 06:37:49PM +0900, Masahiro Yamada wrote:
-> > > On Fri, Dec 7, 2018 at 7:24 AM Tom Roeder <tmroeder@google.com> wrote:
-> > > >
-> > > > The LLVM/Clang project provides many tools for analyzing C source code.
-> > > > Many of these tools are based on LibTooling
-> > > > (https://clang.llvm.org/docs/LibTooling.html), which depends on a
-> > > > database of compiler flags. The standard container for this database is
-> > > > compile_commands.json, which consists of a list of JSON objects, each
-> > > > with "directory", "file", and "command" fields.
-> > > >
-> > > > Some build systems, like cmake or bazel, produce this compilation
-> > > > information directly. Naturally, Makefiles don't. However, the kernel
-> > > > makefiles already create .<target>.o.cmd files that contain all the
-> > > > information needed to build a compile_commands.json file.
-> > > >
-> > > > So, this commit adds scripts/gen_compile_commands.py, which recursively
-> > > > searches through a directory for .<target>.o.cmd files and extracts
-> > > > appropriate compile commands from them. It writes a
-> > > > compile_commands.json file that LibTooling-based tools can use.
-> > > >
-> > > > By default, gen_compile_commands.py starts its search in its working
-> > > > directory and (over)writes compile_commands.json in the working
-> > > > directory. However, it also supports --output and --directory flags for
-> > > > out-of-tree use.
-> > > >
-> > > > Note that while gen_compile_commands.py enables the use of clang-based
-> > > > tools, it does not require the kernel to be compiled with clang. E.g.,
-> > > > the following sequence of commands produces a compile_commands.json file
-> > > > that works correctly with LibTooling.
-> > > >
-> > > > make defconfig
-> > > > make
-> > > > scripts/gen_compile_commands.py
-> > > >
-> > > > Also note that this script is written to work correctly in both Python 2
-> > > > and Python 3, so it does not specify the Python version in its first
-> > > > line.
-> > > >
-> > > > For an example of the utility of this script: after running
-> > > > gen_compile_commands.json on the latest kernel version, I was able to
-> > > > use Vim + the YouCompleteMe pluging + clangd to automatically jump to
-> > > > definitions and declarations. Obviously, cscope and ctags provide some
-> > > > of this functionality; the advantage of supporting LibTooling is that it
-> > > > opens the door to many other clang-based tools that understand the code
-> > > > directly and do not rely on regular expressions and heuristics.
-> > > >
-> > > > Tested: Built several recent kernel versions and ran the script against
-> > > > them, testing tools like clangd (for editor/LSP support) and clang-check
-> > > > (for static analysis). Also extracted some test .cmd files from a kernel
-> > > > build and wrote a test script to check that the script behaved correctly
-> > > > with all permutations of the --output and --directory flags.
-> > > >
-> > > > Signed-off-by: Tom Roeder <tmroeder@google.com>
-> > >
-> > >
-> > > I am fine with this,
-> > > but I have one question.
-> > >
-> > > The generated compile_commands.json
-> > > contains $(pound)
-> >
-> > To make sure we're talking about the same thing: the instances that I've
-> > seen of "#" occur in macro definitions in the "command" field in some of
-> > the JSON objects. For example, I see things like
-> > -D\"KBUILD_STR(s)=\\#s\".
-> 
-> 
-> 
-> When I ran this tool against the latest kernel
-> (specifically, since commit 9564a8cf)
-> I saw the following in "command" field.
-> 
-> -D\"BUILD_STR(s)=$(pound)s\"
-> 
-> 
-> I am not sure whether it is a problem or not.
-
-Thanks! I can reproduce this; I see this happening in, e.g., objtool's
-.cmd files. I guess I failed to test recent enough versions of the
-kernel or didn't notice this case. It looks like that commit changes the
-handling of the pound sign in .cmd files, so it's highly relevant.
-
-> 
-> I do not care about this tool much.
-> I will queue up this patch shortly if it is OK with you.
-
-I'd like this tool to work properly on those files, so please don't
-queue up the patch yet. I'll get it to handle the "$(pound)" case and
-send a revised patch.
-
-> 
-> 
-> Thanks.
-> 
-> 
-> > >
-> > > How is it handled?
-> >
-> > The Python json module takes care of escaping the output to make a valid
-> > JSON string for the "command" field. The gen_compile_commands.py script
-> > doesn't take any special action for that or any other character in its
-> > output.
-> >
-> > > Should it be replaced with '\#' ?
-> >
-> > I don't think it needs to be changed, given my experience with this
-> > script and its testing so far: the output seems to work for me. However,
-> > are you running into problems due to the presence of this character or
-> > inadequate escaping? Please let me know, and I'd be happy to look into
-> > it.
-> >
-> > Tom
-> 
-> 
-> 
-> --
-> Best Regards
-> Masahiro Yamada
+PiBPbiBEZWMgMTcsIDIwMTgsIGF0IDE6MTYgQU0sIFNlZGF0IERpbGVrIDxzZWRhdC5kaWxla0Bn
+bWFpbC5jb20+IHdyb3RlOg0KPiANCj4gT24gVGh1LCBEZWMgMTMsIDIwMTggYXQgMTA6MTkgQU0g
+TWFzYWhpcm8gWWFtYWRhDQo+IDx5YW1hZGEubWFzYWhpcm9Ac29jaW9uZXh0LmNvbT4gd3JvdGU6
+DQo+PiBSZXZlcnQgdGhlIGZvbGxvd2luZyBjb21taXRzOg0KPj4gDQo+PiAtIDViZGNkNTEwYzJh
+YzllZmFmNTVjNGNiZDhkNDY0MjFkOGUyMzIwY2QNCj4+ICAoIng4Ni9qdW1wLWxhYmVsczogTWFj
+cm9meSBpbmxpbmUgYXNzZW1ibHkgY29kZSB0byB3b3JrIGFyb3VuZCBHQ0MgaW5saW5pbmcgYnVn
+cyIpDQo+PiANCj4+IC0gZDVhNTgxZDg0YWU2YjhhNGE3NDA0NjRiODBkOGQ5Y2YxZTc5NDdiMg0K
+Pj4gICgieDg2L2NwdWZlYXR1cmU6IE1hY3JvZnkgaW5saW5lIGFzc2VtYmx5IGNvZGUgdG8gd29y
+ayBhcm91bmQgR0NDIGlubGluaW5nIGJ1Z3MiKQ0KPj4gDQo+PiAtIDA0NzRkNWQ5ZDJmN2YzYjEx
+MjYyZjdiZjg3ZDBlNzMxNGVhZDkyMDAuDQo+PiAgKCJ4ODYvZXh0YWJsZTogTWFjcm9meSBpbmxp
+bmUgYXNzZW1ibHkgY29kZSB0byB3b3JrIGFyb3VuZCBHQ0MgaW5saW5pbmcgYnVncyIpDQo+PiAN
+Cj4+IC0gNDk0YjUxNjhmMmRlMDA5ZWI4MGYxOThmNjY4ZGEzNzQyOTUwOThkZC4NCj4+ICAoIng4
+Ni9wYXJhdmlydDogV29yayBhcm91bmQgR0NDIGlubGluaW5nIGJ1Z3Mgd2hlbiBjb21waWxpbmcg
+cGFyYXZpcnQgb3BzIikNCj4+IA0KPj4gLSBmODFmOGFkNTZmZDFjN2I5OWIyZWQxYzMxNDUyN2Y3
+ZDlhYzQ0N2M2Lg0KPj4gICgieDg2L2J1ZzogTWFjcm9meSB0aGUgQlVHIHRhYmxlIHNlY3Rpb24g
+aGFuZGxpbmcsIHRvIHdvcmsgYXJvdW5kIEdDQyBpbmxpbmluZyBidWdzIikNCj4+IA0KPj4gLSA3
+N2Y0OGVjMjhlNGNjZmY5NGQyZTVmNDI2MGE4M2FjMjdhN2YzMDk5Lg0KPj4gICgieDg2L2FsdGVy
+bmF0aXZlczogTWFjcm9meSBsb2NrIHByZWZpeGVzIHRvIHdvcmsgYXJvdW5kIEdDQyBpbmxpbmlu
+ZyBidWdzIikNCj4+IA0KPj4gLSA5ZTE3MjViNDEwNTk0OTExY2M1OTgxYjZjN2I0Y2VhNGVjMDU0
+Y2E4Lg0KPj4gICgieDg2L3JlZmNvdW50OiBXb3JrIGFyb3VuZCBHQ0MgaW5saW5pbmcgYnVnIikN
+Cj4+ICAoQ29uZmxpY3RzOiBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9yZWZjb3VudC5oKQ0KPj4gDQo+
+PiAtIGMwNmM0ZDgwOTA1MTNmMjk3NGRmZGJlZDJhYzk4NjM0MzU3YWM0NzUuDQo+PiAgKCJ4ODYv
+b2JqdG9vbDogVXNlIGFzbSBtYWNyb3MgdG8gd29yayBhcm91bmQgR0NDIGlubGluaW5nIGJ1Z3Mi
+KQ0KPj4gDQo+PiAtIDc3YjBiZjU1YmM2NzUyMzNkMjJjZDVkZjk3NjA1ZDUxNmQ2NDUyNWUuDQo+
+PiAgKCJrYnVpbGQvTWFrZWZpbGU6IFByZXBhcmUgZm9yIHVzaW5nIG1hY3JvcyBpbiBpbmxpbmUg
+YXNzZW1ibHkgY29kZSB0byB3b3JrIGFyb3VuZCBhc20oKSByZWxhdGVkIEdDQyBpbmxpbmluZyBi
+dWdzIikNCj4+IA0KPj4gQSBmZXcgZGF5cyBhZnRlciB0aG9zZSBjb21taXRzIGFwcGxpZWQsIGRp
+c2N1c3Npb24gc3RhcnRlZCB0byBzb2x2ZQ0KPj4gdGhlIGlzc3VlIG1vcmUgZWxlZ2FudGx5IG9u
+IHRoZSBjb21waWxlciBzaWRlOg0KPj4gDQo+PiAgaHR0cHM6Ly9uYTAxLnNhZmVsaW5rcy5wcm90
+ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0cHMlM0ElMkYlMkZsa21sLm9yZyUyRmxrbWwlMkYy
+MDE4JTJGMTAlMkY3JTJGOTImYW1wO2RhdGE9MDIlN0MwMSU3Q25hbWl0JTQwdm13YXJlLmNvbSU3
+QzQwYjVkZjhhMzhlNTRmMzEwYWI3MDhkNjY0MDA1ZWUwJTdDYjM5MTM4Y2EzY2VlNGI0YWE0ZDZj
+ZDgzZDlkZDYyZjAlN0MwJTdDMSU3QzYzNjgwNjM1MDExMzEzNjIyMyZhbXA7c2RhdGE9UmxZWFN5
+aHpNNkhMUXVLQzJOdXlEcXZrZTlxWjExdHZNRE5kMzJOaUYyVSUzRCZhbXA7cmVzZXJ2ZWQ9MA0K
+Pj4gDQo+PiBUaGUgImFzbSBpbmxpbmUiIHdhcyBpbXBsZW1lbnRlZCBieSBTZWdoZXIgQm9lc3Nl
+bmtvb2wsIGFuZCBub3cgcXVldWVkDQo+PiB1cCBmb3IgR0NDIDkuIChQZW9wbGUgd2VyZSBwb3Np
+dGl2ZSBldmVuIGZvciBiYWNrLXBvcnRpbmcgaXQgdG8gb2xkZXINCj4+IGNvbXBpbGVycykuDQo+
+PiANCj4+IFNpbmNlIHRoZSBpbi1rZXJuZWwgd29ya2Fyb3VuZHMgbWVyZ2VkLCBzb21lIGlzc3Vl
+cyBoYXZlIGJlZW4gcmVwb3J0ZWQ6DQo+PiBicmVha2FnZSBvZiBidWlsZGluZyB3aXRoIGRpc3Rj
+Yy9pY2VjYywgYnJlYWthZ2Ugb2YgZGlzdHJvIHBhY2thZ2VzIGZvcg0KPj4gbW9kdWxlIGJ1aWxk
+aW5nLiAoTW9yZSBmdW5kYW1lbnRhbGx5LCB3ZSBjYW5ub3QgYnVpbGQgZXh0ZXJuYWwgbW9kdWxl
+cw0KPj4gYWZ0ZXIgJ21ha2UgY2xlYW4nKQ0KPj4gDQo+PiBQYXRjaGluZyBhcm91bmQgdGhlIGJ1
+aWxkIHN5c3RlbSB3b3VsZCBtYWtlIHRoZSBjb2RlIGV2ZW4gdWdsaWVyLg0KPj4gDQo+PiBHaXZl
+biB0aGF0IHRoaXMgaXNzdWUgd2lsbCBiZSBzb2x2ZWQgaW4gYSBjbGVhbmVyIHdheSBzb29uZXIg
+b3IgbGF0ZXIsDQo+PiBsZXQncyByZXZlcnQgdGhlIGluLWtlcm5lbCB3b3JrYXJvdW5kcywgYW5k
+IHdhaXQgZm9yIEdDQyA5Lg0KPj4gDQo+PiBSZXBvcnRlZC1ieTogTG9nYW4gR3VudGhvcnBlIDxs
+b2dhbmdAZGVsdGF0ZWUuY29tPiAjIGRpc3RjYw0KPj4gUmVwb3J0ZWQtYnk6IFNlZGF0IERpbGVr
+IDxzZWRhdC5kaWxla0BnbWFpbC5jb20+ICMgZGViaWFuL3JwbSBwYWNrYWdlDQo+IA0KPiBIaSwN
+Cj4gDQo+IEkgcmVwb3J0ZWQgdGhlIGlzc3VlIHdpdGggZGViaWFuIHBhY2thZ2UgYnJlYWthZ2Ug
+aW4gWzFdLg0KPiANCj4gSSBhbSBub3Qgc3Vic2NyaWJlZCB0byBhbnkgaW52b2x2ZWQgbWFpbGlu
+Zy1saXN0IGFuZCBub3QgZm9sbG93aW5nIGFsbA0KPiB0aGUgZGlzY3Vzc2lvbnMuDQo+IEkgc2Vl
+IHRoZSBzaXR1YXRpb24gaXMgbm90IGVhc3kgYXMgdGhlcmUgaXMgZXNwZWNpYWxseSBsaW51eC1r
+YnVpbGQNCj4gYW5kIGxpbnV4L3g4NiBpbnZvbHZlZCBhbmQgbWF5YmUgb3RoZXIgaW50ZXJlc3Rz
+Lg0KPiBCdXQgSSBhbSBpbnRlcmVzdGVkIGluIGhhdmluZyBhIGZpeCBpbiB2NC4yMCBmaW5hbCBh
+bmQgaG9wZSB0aGlzIGFsbA0KPiBzdGlsbCB3b3JrcyB3aXRoIExMVk0vQ2xhbmcuDQo+IA0KPiBJ
+IGNhbiBvZmZlciBteSBoZWxwIGluIHRlc3RpbmcgLSBhZ2FpbnN0IExpbnV4IHY0LjIwLXJjNy4N
+Cj4gTm90IHN1cmUgaWYgYWxsIGRpc2N1c3NlZCBtYXRlcmlhbCBpcyBpbiB1cHN0cmVhbSBvciBl
+bHNld2hlcmUuDQo+IFdoYXQgaXMgeW91ciBzdWdnZXN0aW9uIGZvciBtZSBhcyBhIHRlc3Rlcj8N
+Cj4gDQo+IFdpbGwgd2UgaGF2ZSBhIHNvbHV0aW9uIGluIExpbnV4IHY0LjIwIGZpbmFsPw0KDQpU
+aGFua3MgZm9yIHRoZSByZWZlcmVuY2UuIEkgc2VlIHNvbHV0aW9ucyBoYXZlIGFscmVhZHkgYmVl
+biBkZXZlbG9wZWQuIFNvDQppdOKAmXMgTWFzYWhpcm/igJlzIGNhbGwuDQoNCg==
