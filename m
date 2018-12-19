@@ -1,142 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:34405 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727028AbeLRWxi (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:37561 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726537AbeLSDUF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Dec 2018 17:53:38 -0500
-Received: by mail-pf1-f196.google.com with SMTP id h3so8842501pfg.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 18 Dec 2018 14:53:37 -0800 (PST)
-Date: Tue, 18 Dec 2018 14:53:31 -0800
-From: Tom Roeder <tmroeder@google.com>
-Subject: Re: [PATCH] scripts: add a tool to produce a compile_commands.json
- file
-Message-ID: <20181218225331.GA232743@google.com>
-References: <20181206222318.218157-1-tmroeder@google.com>
- <CAK7LNATZm6T9bjcAxB_WQw-um-Hjkhiew6qg8CRLayr8qYzLeQ@mail.gmail.com>
- <20181217214022.GA38778@google.com>
- <CAK7LNATG9y04UdJ-Z5AwLHXUcnbWo5Butee0pkL+MFzds04wCA@mail.gmail.com>
+        Tue, 18 Dec 2018 22:20:05 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATG9y04UdJ-Z5AwLHXUcnbWo5Butee0pkL+MFzds04wCA@mail.gmail.com>
+References: <1545062607-8599-1-git-send-email-yamada.masahiro@socionext.com> <C6D4A9B6-EED6-4DF7-8085-B1D3D221D25A@vmware.com>
+In-Reply-To: <C6D4A9B6-EED6-4DF7-8085-B1D3D221D25A@vmware.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 19 Dec 2018 12:19:13 +0900
+Message-ID: <CAK7LNAR-uayGwbzmvezVO1w6N4AJaLe07ctYt-P6VHQv3PczZw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/12] x86, kbuild: revert macrofying inline assembly code
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Nadav Amit <namit@vmware.com>, X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>
+Cc: Richard Biener <rguenther@suse.de>, Segher Boessenkool <segher@kernel.crashing.org>, Peter Zijlstra <peterz@infradead.org>, Juergen Gross <jgross@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@chromium.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Andrey Ryabinin <aryabinin@virtuozzo.com>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Alok Kataria <akataria@vmware.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Jann Horn <jannh@google.com>, linux-arch <linux-arch@vger.kernel.org>, Alexey Dobriyan <adobriyan@gmail.com>, "linux-sparse@vger.kernel.org" <linux-sparse@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Yonghong Song <yhs@fb.com>, Michal Marek <michal.lkml@markovi.net>, Arnaldo Carvalho de Melo <acme@redhat.com>, Jan Beulich <JBeulich@suse.com>, David Woodhouse <dwmw@amazon.co.uk>, Alexei Starovoitov <ast@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Tue, Dec 18, 2018 at 11:17:35AM +0900, Masahiro Yamada wrote:
-> On Tue, Dec 18, 2018 at 8:21 AM Tom Roeder <tmroeder@google.com> wrote:
+On Wed, Dec 19, 2018 at 5:26 AM Nadav Amit <namit@vmware.com> wrote:
+>
+> > On Dec 17, 2018, at 8:03 AM, Masahiro Yamada <yamada.masahiro@socionext=
+.com> wrote:
 > >
-> > On Sat, Dec 15, 2018 at 06:37:49PM +0900, Masahiro Yamada wrote:
-> > > On Fri, Dec 7, 2018 at 7:24 AM Tom Roeder <tmroeder@google.com> wrote:
-> > > >
-> > > > The LLVM/Clang project provides many tools for analyzing C source code.
-> > > > Many of these tools are based on LibTooling
-> > > > (https://clang.llvm.org/docs/LibTooling.html), which depends on a
-> > > > database of compiler flags. The standard container for this database is
-> > > > compile_commands.json, which consists of a list of JSON objects, each
-> > > > with "directory", "file", and "command" fields.
-> > > >
-> > > > Some build systems, like cmake or bazel, produce this compilation
-> > > > information directly. Naturally, Makefiles don't. However, the kernel
-> > > > makefiles already create .<target>.o.cmd files that contain all the
-> > > > information needed to build a compile_commands.json file.
-> > > >
-> > > > So, this commit adds scripts/gen_compile_commands.py, which recursively
-> > > > searches through a directory for .<target>.o.cmd files and extracts
-> > > > appropriate compile commands from them. It writes a
-> > > > compile_commands.json file that LibTooling-based tools can use.
-> > > >
-> > > > By default, gen_compile_commands.py starts its search in its working
-> > > > directory and (over)writes compile_commands.json in the working
-> > > > directory. However, it also supports --output and --directory flags for
-> > > > out-of-tree use.
-> > > >
-> > > > Note that while gen_compile_commands.py enables the use of clang-based
-> > > > tools, it does not require the kernel to be compiled with clang. E.g.,
-> > > > the following sequence of commands produces a compile_commands.json file
-> > > > that works correctly with LibTooling.
-> > > >
-> > > > make defconfig
-> > > > make
-> > > > scripts/gen_compile_commands.py
-> > > >
-> > > > Also note that this script is written to work correctly in both Python 2
-> > > > and Python 3, so it does not specify the Python version in its first
-> > > > line.
-> > > >
-> > > > For an example of the utility of this script: after running
-> > > > gen_compile_commands.json on the latest kernel version, I was able to
-> > > > use Vim + the YouCompleteMe pluging + clangd to automatically jump to
-> > > > definitions and declarations. Obviously, cscope and ctags provide some
-> > > > of this functionality; the advantage of supporting LibTooling is that it
-> > > > opens the door to many other clang-based tools that understand the code
-> > > > directly and do not rely on regular expressions and heuristics.
-> > > >
-> > > > Tested: Built several recent kernel versions and ran the script against
-> > > > them, testing tools like clangd (for editor/LSP support) and clang-check
-> > > > (for static analysis). Also extracted some test .cmd files from a kernel
-> > > > build and wrote a test script to check that the script behaved correctly
-> > > > with all permutations of the --output and --directory flags.
-> > > >
-> > > > Signed-off-by: Tom Roeder <tmroeder@google.com>
-> > >
-> > >
-> > > I am fine with this,
-> > > but I have one question.
-> > >
-> > > The generated compile_commands.json
-> > > contains $(pound)
+> > This series reverts the in-kernel workarounds for inlining issues.
 > >
-> > To make sure we're talking about the same thing: the instances that I've
-> > seen of "#" occur in macro definitions in the "command" field in some of
-> > the JSON objects. For example, I see things like
-> > -D\"KBUILD_STR(s)=\\#s\".
-> 
-> 
-> 
-> When I ran this tool against the latest kernel
-> (specifically, since commit 9564a8cf)
-> I saw the following in "command" field.
-> 
-> -D\"BUILD_STR(s)=$(pound)s\"
-> 
-> 
-> I am not sure whether it is a problem or not.
-> 
-> I do not care about this tool much.
-> I will queue up this patch shortly if it is OK with you.
+> > The commit description of 77b0bf55bc67 mentioned
+> > "We also hope that GCC will eventually get fixed,..."
+> >
+> > Now, GCC provides a solution.
+> >
+> > https://na01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgcc.=
+gnu.org%2Fonlinedocs%2Fgcc%2FExtended-Asm.html&amp;data=3D02%7C01%7Cnamit%4=
+0vmware.com%7Cc43f433d8c6244de15f108d6643a49e4%7Cb39138ca3cee4b4aa4d6cd83d9=
+dd62f0%7C0%7C0%7C636806598899962669&amp;sdata=3D88UJ25RoiHik9vTCJKZV6%2F7xp=
+zCGsvKb9LFg1kfEYL0%3D&amp;reserved=3D0
+> > explains the new "asm inline" syntax.
+> >
+> > The performance issue will be eventually solved.
+> >
+> > [About Code cleanups]
+> >
+> > I know Nadam Amit is opposed to the full revert.
+>
+> My name is Nadav.
 
-Fixed now and sent out in a v2 patch. I'm new to the kernel mailing
-lists, and I don't know if I'm supposed to link the v2 patch to this
-thread. From a glance at the archives, it looked to me like new versions
-of patches start their own threads, so that's what I've done here.
 
-> 
-> 
-> Thanks.
-> 
-> 
-> > >
-> > > How is it handled?
-> >
-> > The Python json module takes care of escaping the output to make a valid
-> > JSON string for the "command" field. The gen_compile_commands.py script
-> > doesn't take any special action for that or any other character in its
-> > output.
-> >
-> > > Should it be replaced with '\#' ?
-> >
-> > I don't think it needs to be changed, given my experience with this
-> > script and its testing so far: the output seems to work for me. However,
-> > are you running into problems due to the presence of this character or
-> > inadequate escaping? Please let me know, and I'd be happy to look into
-> > it.
-> >
-> > Tom
-> 
-> 
-> 
-> --
-> Best Regards
-> Masahiro Yamada
+Sorry about that.
+
+(I relied on a spell checker. I should be careful about typos in people's n=
+ame.)
+
+
+
+> > He also claims his motivation for macrofying was not only
+> > performance, but also cleanups.
+>
+> Masahiro, I understand your concerns and criticism, and indeed various
+> alternative solutions exist. I do have my reservations about the one you
+> propose, since it makes coding more complicated to simplify the Make syst=
+em.
+> Yet, more important, starting this discussion suddenly now after RC7 is
+> strange.
+
+
+
+I did not think this was so sudden.
+
+When I suggested the revert a few weeks ago,
+Borislav was for it.
+I did not hear from the other x86 maintainers.
+
+Anyway, it is true we are running out of time for the release.
+
+
+> Anyhow, since it=E2=80=99s obviously not my call, please don=E2=80=99t ma=
+ke it
+> sound as if I am a side in the decision.
+>
+
+Not my call, either.
+
+That's why I put the x86 maintainers in the TO list,
+and other people in CC.
+
+The original patch set went in via x86 tree.
+So, its revert set, if we want,
+should go in the same path.
+
+
+
+Anyway, we have to do something for v4.20.
+Maybe, discussing short-term / long-term solutions
+separately could move things forward.
+
+
+[1] Solution for v4.20
+
+[2] Solution for future kernel
+
+
+
+If we do not want to see the revert for [1],
+the best I can suggest is to copy arch/x86/kernel/macros.s
+to include/generated/macros.h
+so that it is kept for the external module build.
+(It is not literally included by anyone, but should work at least.)
+
+
+
+For [2], what do we want to see?
+
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
