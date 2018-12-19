@@ -1,240 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:37666 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728689AbeLSOer (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:40671 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729665AbeLSOps (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Dec 2018 09:34:47 -0500
+        Wed, 19 Dec 2018 09:45:48 -0500
 MIME-Version: 1.0
-References: <1545062607-8599-1-git-send-email-yamada.masahiro@socionext.com> <20181219112028.GA38175@gmail.com>
-In-Reply-To: <20181219112028.GA38175@gmail.com>
+References: <20181218224907.1274-1-tmroeder@google.com>
+In-Reply-To: <20181218224907.1274-1-tmroeder@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 19 Dec 2018 23:33:59 +0900
-Message-ID: <CAK7LNAQjZP8mYD02+=uvzO135fTB5GyU7_snV7ymFAjMBsep8w@mail.gmail.com>
-Subject: Re: [PATCH v3 00/12] x86, kbuild: revert macrofying inline assembly code
+Date: Wed, 19 Dec 2018 23:45:06 +0900
+Message-ID: <CAK7LNAR3iZ0P_ttL4CTwZX7dhzeGB4oJ6wyXVwMtaaMovi2_XQ@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts: add a tool to produce a compile_commands.json file
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>, Richard Biener <rguenther@suse.de>, Segher Boessenkool <segher@kernel.crashing.org>, Peter Zijlstra <peterz@infradead.org>, Juergen Gross <jgross@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@chromium.org>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Andrey Ryabinin <aryabinin@virtuozzo.com>, virtualization@lists.linux-foundation.org, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Alok Kataria <akataria@vmware.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Jann Horn <jannh@google.com>, linux-arch <linux-arch@vger.kernel.org>, Alexey Dobriyan <adobriyan@gmail.com>, linux-sparse@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Yonghong Song <yhs@fb.com>, Michal Marek <michal.lkml@markovi.net>, Arnaldo Carvalho de Melo <acme@redhat.com>, Jan Beulich <JBeulich@suse.com>, Nadav Amit <namit@vmware.com>, David Woodhouse <dwmw@amazon.co.uk>, Alexei Starovoitov <ast@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Tom Roeder <tmroeder@google.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Dec 19, 2018 at 9:44 PM Ingo Molnar <mingo@kernel.org> wrote:
+On Wed, Dec 19, 2018 at 8:40 AM Tom Roeder <tmroeder@google.com> wrote:
 >
+> The LLVM/Clang project provides many tools for analyzing C source code.
+> Many of these tools are based on LibTooling
+> (https://clang.llvm.org/docs/LibTooling.html), which depends on a
+> database of compiler flags. The standard container for this database is
+> compile_commands.json, which consists of a list of JSON objects, each
+> with "directory", "file", and "command" fields.
 >
-> * Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+> Some build systems, like cmake or bazel, produce this compilation
+> information directly. Naturally, Makefiles don't. However, the kernel
+> makefiles already create .<target>.o.cmd files that contain all the
+> information needed to build a compile_commands.json file.
 >
-> > This series reverts the in-kernel workarounds for inlining issues.
-> >
-> > The commit description of 77b0bf55bc67 mentioned
-> > "We also hope that GCC will eventually get fixed,..."
-> >
-> > Now, GCC provides a solution.
-> >
-> > https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html
-> > explains the new "asm inline" syntax.
-> >
-> > The performance issue will be eventually solved.
-> >
-> > [About Code cleanups]
-> >
-> > I know Nadam Amit is opposed to the full revert.
-> > He also claims his motivation for macrofying was not only
-> > performance, but also cleanups.
-> >
-> > IIUC, the criticism addresses the code duplication between C and ASM.
-> >
-> > If so, I'd like to suggest a different approach for cleanups.
-> > Please see the last 3 patches.
-> > IMHO, preprocessor approach is more straight-forward, and readable.
-> > Basically, this idea should work because it is what we already do for
-> > __ASM_FORM() etc.
-> >
-> > [Quick Test of "asm inline" of GCC 9]
-> >
-> > If you want to try "asm inline" feature, the patch is available:
-> > https://lore.kernel.org/patchwork/patch/1024590/
-> >
-> > The number of symbols for arch/x86/configs/x86_64_defconfig:
-> >
-> >                             nr_symbols
-> >   [1]    v4.20-rc7       :   96502
-> >   [2]    [1]+full revert :   96705   (+203)
-> >   [3]    [2]+"asm inline":   96568   (-137)
-> >
-> > [3]: apply my patch, then replace "asm" -> "asm_inline"
-> >     for _BUG_FLAGS(), refcount_add(), refcount_inc(), refcount_dec(),
-> >         annotate_reachable(), annotate_unreachable()
-> >
-> >
-> > Changes in v3:
-> >   - Split into per-commit revert (per Nadav Amit)
-> >   - Add some cleanups with preprocessor approach
-> >
-> > Changes in v2:
-> >   - Revive clean-ups made by 5bdcd510c2ac (per Peter Zijlstra)
-> >   - Fix commit quoting style (per Peter Zijlstra)
-> >
-> > Masahiro Yamada (12):
-> >   Revert "x86/jump-labels: Macrofy inline assembly code to work around
-> >     GCC inlining bugs"
-> >   Revert "x86/cpufeature: Macrofy inline assembly code to work around
-> >     GCC inlining bugs"
-> >   Revert "x86/extable: Macrofy inline assembly code to work around GCC
-> >     inlining bugs"
-> >   Revert "x86/paravirt: Work around GCC inlining bugs when compiling
-> >     paravirt ops"
-> >   Revert "x86/bug: Macrofy the BUG table section handling, to work
-> >     around GCC inlining bugs"
-> >   Revert "x86/alternatives: Macrofy lock prefixes to work around GCC
-> >     inlining bugs"
-> >   Revert "x86/refcount: Work around GCC inlining bug"
-> >   Revert "x86/objtool: Use asm macros to work around GCC inlining bugs"
-> >   Revert "kbuild/Makefile: Prepare for using macros in inline assembly
-> >     code to work around asm() related GCC inlining bugs"
-> >   linux/linkage: add ASM() macro to reduce duplication between C/ASM
-> >     code
-> >   x86/alternatives: consolidate LOCK_PREFIX macro
-> >   x86/asm: consolidate ASM_EXTABLE_* macros
-> >
-> >  Makefile                                  |  9 +--
-> >  arch/x86/Makefile                         |  7 ---
-> >  arch/x86/include/asm/alternative-asm.h    | 22 +------
-> >  arch/x86/include/asm/alternative-common.h | 47 +++++++++++++++
-> >  arch/x86/include/asm/alternative.h        | 30 +---------
-> >  arch/x86/include/asm/asm.h                | 46 +++++----------
-> >  arch/x86/include/asm/bug.h                | 98 +++++++++++++------------------
-> >  arch/x86/include/asm/cpufeature.h         | 82 +++++++++++---------------
-> >  arch/x86/include/asm/jump_label.h         | 22 +++++--
-> >  arch/x86/include/asm/paravirt_types.h     | 56 +++++++++---------
-> >  arch/x86/include/asm/refcount.h           | 81 +++++++++++--------------
-> >  arch/x86/kernel/macros.S                  | 16 -----
-> >  include/asm-generic/bug.h                 |  8 +--
-> >  include/linux/compiler.h                  | 56 ++++--------------
-> >  include/linux/linkage.h                   |  8 +++
-> >  scripts/Kbuild.include                    |  4 +-
-> >  scripts/mod/Makefile                      |  2 -
-> >  17 files changed, 249 insertions(+), 345 deletions(-)
-> >  create mode 100644 arch/x86/include/asm/alternative-common.h
-> >  delete mode 100644 arch/x86/kernel/macros.S
+> So, this commit adds scripts/gen_compile_commands.py, which recursively
+> searches through a directory for .<target>.o.cmd files and extracts
+> appropriate compile commands from them. It writes a
+> compile_commands.json file that LibTooling-based tools can use.
 >
-> I absolutely agree that this needs to be resolved in v4.20.
+> By default, gen_compile_commands.py starts its search in its working
+> directory and (over)writes compile_commands.json in the working
+> directory. However, it also supports --output and --directory flags for
+> out-of-tree use.
 >
-> So I did the 1-9 reverts manually myself as well, because I think the
-> first commit should be reverted fully to get as close to the starting
-> point as possible (we are late in the cycle) - and came to the attached
-> interdiff between your series and mine.
+> Note that while gen_compile_commands.py enables the use of clang-based
+> tools, it does not require the kernel to be compiled with clang. E.g.,
+> the following sequence of commands produces a compile_commands.json file
+> that works correctly with LibTooling.
 >
-> Does this approach look OK to you, or did I miss something?
+> make defconfig
+> make
+> scripts/gen_compile_commands.py
+>
+> Also note that this script is written to work correctly in both Python 2
+> and Python 3, so it does not specify the Python version in its first
+> line.
+>
+> For an example of the utility of this script: after running
+> gen_compile_commands.json on the latest kernel version, I was able to
+> use Vim + the YouCompleteMe pluging + clangd to automatically jump to
+> definitions and declarations. Obviously, cscope and ctags provide some
+> of this functionality; the advantage of supporting LibTooling is that it
+> opens the door to many other clang-based tools that understand the code
+> directly and do not rely on regular expressions and heuristics.
+>
+> Tested: Built several recent kernel versions and ran the script against
+> them, testing tools like clangd (for editor/LSP support) and clang-check
+> (for static analysis). Also extracted some test .cmd files from a kernel
+> build and wrote a test script to check that the script behaved correctly
+> with all permutations of the --output and --directory flags.
+>
+> Signed-off-by: Tom Roeder <tmroeder@google.com>
+> ---
+> Changelog since v1:
+> - Add simple string replacement to unescape the pound sign.
 
 
-It looks OK to me.
-
-I thought the diff was a good cleanup part,
-but we can deal with it later on,
-so I do not mind it.
-
-Thanks!
-
-
-
-> Thanks,
->
->         Ingo
->
-> =============>
->
->  entry/calling.h          |    2 -
->  include/asm/jump_label.h |   50 ++++++++++++++++++++++++++++++++++-------------
->  2 files changed, 38 insertions(+), 14 deletions(-)
->
-> diff --git a/arch/x86/entry/calling.h b/arch/x86/entry/calling.h
-> index 25e5a6bda8c3..20d0885b00fb 100644
-> --- a/arch/x86/entry/calling.h
-> +++ b/arch/x86/entry/calling.h
-> @@ -352,7 +352,7 @@ For 32-bit we have the following conventions - kernel is built with
->  .macro CALL_enter_from_user_mode
->  #ifdef CONFIG_CONTEXT_TRACKING
->  #ifdef HAVE_JUMP_LABEL
-> -       STATIC_BRANCH_JMP l_yes=.Lafter_call_\@, key=context_tracking_enabled, branch=1
-> +       STATIC_JUMP_IF_FALSE .Lafter_call_\@, context_tracking_enabled, def=0
->  #endif
->         call enter_from_user_mode
->  .Lafter_call_\@:
-> diff --git a/arch/x86/include/asm/jump_label.h b/arch/x86/include/asm/jump_label.h
-> index cf88ebf9a4ca..21efc9d07ed9 100644
-> --- a/arch/x86/include/asm/jump_label.h
-> +++ b/arch/x86/include/asm/jump_label.h
-> @@ -2,6 +2,19 @@
->  #ifndef _ASM_X86_JUMP_LABEL_H
->  #define _ASM_X86_JUMP_LABEL_H
->
-> +#ifndef HAVE_JUMP_LABEL
-> +/*
-> + * For better or for worse, if jump labels (the gcc extension) are missing,
-> + * then the entire static branch patching infrastructure is compiled out.
-> + * If that happens, the code in here will malfunction.  Raise a compiler
-> + * error instead.
-> + *
-> + * In theory, jump labels and the static branch patching infrastructure
-> + * could be decoupled to fix this.
-> + */
-> +#error asm/jump_label.h included on a non-jump-label kernel
-> +#endif
-> +
->  #define JUMP_LABEL_NOP_SIZE 5
->
->  #ifdef CONFIG_X86_64
-> @@ -53,26 +66,37 @@ static __always_inline bool arch_static_branch_jump(struct static_key *key, bool
->
->  #else  /* __ASSEMBLY__ */
->
-> -.macro STATIC_BRANCH_NOP l_yes:req key:req branch:req
-> -.Lstatic_branch_nop_\@:
-> -       .byte STATIC_KEY_INIT_NOP
-> -.Lstatic_branch_no_after_\@:
-> +.macro STATIC_JUMP_IF_TRUE target, key, def
-> +.Lstatic_jump_\@:
-> +       .if \def
-> +       /* Equivalent to "jmp.d32 \target" */
-> +       .byte           0xe9
-> +       .long           \target - .Lstatic_jump_after_\@
-> +.Lstatic_jump_after_\@:
-> +       .else
-> +       .byte           STATIC_KEY_INIT_NOP
-> +       .endif
->         .pushsection __jump_table, "aw"
->         _ASM_ALIGN
-> -       .long           .Lstatic_branch_nop_\@ - ., \l_yes - .
-> -       _ASM_PTR        \key + \branch - .
-> +       .long           .Lstatic_jump_\@ - ., \target - .
-> +       _ASM_PTR        \key - .
->         .popsection
->  .endm
->
-> -.macro STATIC_BRANCH_JMP l_yes:req key:req branch:req
-> -.Lstatic_branch_jmp_\@:
-> -       .byte 0xe9
-> -       .long \l_yes - .Lstatic_branch_jmp_after_\@
-> -.Lstatic_branch_jmp_after_\@:
-> +.macro STATIC_JUMP_IF_FALSE target, key, def
-> +.Lstatic_jump_\@:
-> +       .if \def
-> +       .byte           STATIC_KEY_INIT_NOP
-> +       .else
-> +       /* Equivalent to "jmp.d32 \target" */
-> +       .byte           0xe9
-> +       .long           \target - .Lstatic_jump_after_\@
-> +.Lstatic_jump_after_\@:
-> +       .endif
->         .pushsection __jump_table, "aw"
->         _ASM_ALIGN
-> -       .long           .Lstatic_branch_jmp_\@ - ., \l_yes - .
-> -       _ASM_PTR        \key + \branch - .
-> +       .long           .Lstatic_jump_\@ - ., \target - .
-> +       _ASM_PTR        \key + 1 - .
->         .popsection
->  .endm
->
->
+Applied to linux-kbuild. Thanks!
 
 
 -- 
