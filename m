@@ -1,76 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:50823 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728436AbeLSO7s (ORCPT
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:35545 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727959AbeLSQBN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Dec 2018 09:59:48 -0500
+        Wed, 19 Dec 2018 11:01:13 -0500
+Received: by mail-lj1-f193.google.com with SMTP id x85-v6so17870785ljb.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 19 Dec 2018 08:01:11 -0800 (PST)
 MIME-Version: 1.0
-References: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 19 Dec 2018 23:59:06 +0900
-Message-ID: <CAK7LNAQigp+cnH18w6iYKjix3oZtOOjOF=e1RKiJPdBFr3TwPw@mail.gmail.com>
-Subject: Re: [PATCH 00/27] kconfig: remove all reduce/shift conflicts,
- refactor lexer, fix various issues
+References: <CA+icZUUPaoEf0JzXJO6T5xBBrr8tcw2NmNXBk4=HD6WBbLtEdw@mail.gmail.com>
+ <CA+icZUWrbTPk7ws+LBjzMSKsbfwbZODjCoBt7uQU0Z4ykzd6mw@mail.gmail.com>
+ <CAK7LNAQ_8RYQaLbouR84=HH+xoxvVGX=gN5z-vQqu0=PCVzOuQ@mail.gmail.com>
+ <CA+icZUXU8z_zke=3HCkceZo_becUL2Q=5j=QtAKkqYn8o-5-vw@mail.gmail.com>
+ <5db14c4980ab9d8d23606b2a336a6b8dbbb255d0.camel@decadent.org.uk> <CAK7LNAQ7UtVBNqShtgmLJxNgkJc1wdzwCtWZz_LHe+iaZiWx+g@mail.gmail.com>
+In-Reply-To: <CAK7LNAQ7UtVBNqShtgmLJxNgkJc1wdzwCtWZz_LHe+iaZiWx+g@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Wed, 19 Dec 2018 17:00:59 +0100
+Message-ID: <CA+icZUXfM_ZsTeo=On_MDm794svHiyfC27ymoKCRpW=hnmt1vw@mail.gmail.com>
+Subject: Re: builddeb: Missing arch/x86/kernel/macros.s when building modules
+ with dkms
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, David Howells <dhowells@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will.deacon@arm.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Ingo Molnar <mingo@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Herbert Xu <herbert@gondor.apana.org.au>, Michal Simek <monstr@monstr.eu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Ben Hutchings <ben@decadent.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, Dec 11, 2018 at 8:04 PM Masahiro Yamada
+On Fri, Nov 30, 2018 at 10:54 AM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
+> On Sun, Nov 25, 2018 at 2:51 AM Ben Hutchings <ben@decadent.org.uk> wrote:
+> >
+> > On Sat, 2018-11-24 at 07:51 +0100, Sedat Dilek wrote:
+> > > On Sat, Nov 24, 2018 at 1:53 AM Masahiro Yamada
+> > > <yamada.masahiro@socionext.com> wrote:
+> > [...]
+> > > > Maybe like this?
+> > > >
+> > > >
+> > > > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> > > > index f43a274..4cf5a5c 100755
+> > > > --- a/scripts/package/builddeb
+> > > > +++ b/scripts/package/builddeb
+> > > > @@ -165,6 +165,9 @@ fi
+> > > >  if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
+> > > >         (cd $objtree; find scripts/gcc-plugins -name \*.so -o -name
+> > > > gcc-common.h) >> "$objtree/debian/hdrobjfiles"
+> > > >  fi
+> > > > +if [ -r arch/$SRCARCH/kernel/macros.s ]; then
+> > > > +       echo arch/$SRCARCH/kernel/macros.s >> "$objtree/debian/hdrobjfiles"
+> > > > +fi
+> > > >  destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+> > > >  mkdir -p "$destdir"
+> > > >  (cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd
+> > > > $destdir; tar -xf -)
+> > > >
+> > > >
+> > > > --
+> > > > Best Regards
+> > > > Masahiro Yamada
+> > >
+> > > Hi Masahiro Yamada,
+> > >
+> > > thanks, that fixes here the problem with building DKMS kernel modules:
+> > >
+> > > # find /usr/src/linux-headers-4.20.0-rc3-7-amd64-cbl -name macros.s
+> > > /usr/src/linux-headers-4.20.0-rc3-7-amd64-cbl/arch/x86/kernel/macros.
+> > >
+> > > I guess commit...
+> > >
+> > > 77b0bf55bc67 kbuild/Makefile: Prepare for using macros in inline
+> > > assembly code to work around asm() related GCC inlining bugs
+> > >
+> > > ...is the root cause (mention as a "Fixes:" tag in a future patch)?
+> > >
+> > > Not sure if the according script for building Linux RPM packages needs
+> > > the same fix, too.
+> > >
+> > > I can send a fix for the builddeb part or if you want to do it, it's OK for me.
+> > >
+> > > I highly appreciate to see a fix in Linux v4.20-rcN if possible.
+> >
+> > Perhaps it would make more sense to move this file under
+> > arch/x86/include/generated, so there's no need to add a special case to
+> > the packaging rules.
 >
-> When I tryed to change something, I was often hit by annoying
-> shift/reduce conflicts in the parser.
 >
-> The lexer and parser are too cluttered.
+> Yeah, moving the file under include/ would be nicer.
 >
-> So, I decided to clean-up now.
+> But, I am asking if they are fine with reverting the commits causing
+> the problems.
+> (https://lkml.org/lkml/2018/11/29/910)
 >
->   - Fix all shift/reduce conflicts in the parser
+> Please give me time to decide what to do.
 >
->   - Rewrite the lexer. The linear keyword search was removed.
->     The number of states descreased from 6 to 4.
->
->   - Fix various subtle issues
->
->
->
-> Masahiro Yamada (27):
->   kconfig: fix file name and line number of warn_ignored_character()
->   kconfig: fix memory leak when EOF is encountered in quotation
->   kconfig: require T_EOL to reduce visible statement
->   kconfig: remove unneeded pattern matching to whitespaces
->   kconfig: refactor pattern matching in STRING state
->   kconfig: fix ambiguous grammar in terms of new lines
->   kconfig: clean up EOF handling in the lexer
->   kconfig: warn no new line at end of file
->   kconfig: remove grammatically ambiguous "unexpected option" diagnostic
->   kconfig: remove grammatically ambiguous option_error
->   kconfig: remove redundant if_block rule
->   kconfig: remove redundant menu_block rule
->   kconfig: loosen the order of "visible" and "depends on" in menu entry
->   kconfig: rename depends_list to comment_option_list
->   kconfig: remove redundant token defines
->   kconfig: use distinct tokens for type and default properties
->   kconfig: refactor scanning and parsing "option" properties
->   kconfig: use specific tokens instead of T_ASSIGN for assignments
->   kconfig: use T_WORD instead of T_VARIABLE for variables
->   microblaze: surround string default in Kconfig with double quotes
->   treewide: surround file paths in Kconfig files with double quotes
->   kconfig: ban the use of '.' and '/' in unquoted words
->   kconfig: refactor end token rules
->   kconfig: stop associating kconf_id with yylval
->   kconfig: switch to ASSIGN_VAL state in the second lexer
->   kconfig: update current_pos in the second lexer
->   kconfig: remove keyword lookup table entirely
 
+I see Ingo reverted patches in tip.git#x86/urgent.
 
-Series, applied to kbuild/kconfig.
+- Sedat -
 
-
--- 
-Best Regards
-Masahiro Yamada
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/log/?h=x86/urgent
