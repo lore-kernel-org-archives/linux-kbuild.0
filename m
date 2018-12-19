@@ -1,80 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:40671 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729665AbeLSOps (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:50823 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728436AbeLSO7s (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Dec 2018 09:45:48 -0500
+        Wed, 19 Dec 2018 09:59:48 -0500
 MIME-Version: 1.0
-References: <20181218224907.1274-1-tmroeder@google.com>
-In-Reply-To: <20181218224907.1274-1-tmroeder@google.com>
+References: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1544526070-16690-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 19 Dec 2018 23:45:06 +0900
-Message-ID: <CAK7LNAR3iZ0P_ttL4CTwZX7dhzeGB4oJ6wyXVwMtaaMovi2_XQ@mail.gmail.com>
-Subject: Re: [PATCH v2] scripts: add a tool to produce a compile_commands.json file
+Date: Wed, 19 Dec 2018 23:59:06 +0900
+Message-ID: <CAK7LNAQigp+cnH18w6iYKjix3oZtOOjOF=e1RKiJPdBFr3TwPw@mail.gmail.com>
+Subject: Re: [PATCH 00/27] kconfig: remove all reduce/shift conflicts,
+ refactor lexer, fix various issues
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tom Roeder <tmroeder@google.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, David Howells <dhowells@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will.deacon@arm.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Ingo Molnar <mingo@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Herbert Xu <herbert@gondor.apana.org.au>, Michal Simek <monstr@monstr.eu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 
-On Wed, Dec 19, 2018 at 8:40 AM Tom Roeder <tmroeder@google.com> wrote:
+On Tue, Dec 11, 2018 at 8:04 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> The LLVM/Clang project provides many tools for analyzing C source code.
-> Many of these tools are based on LibTooling
-> (https://clang.llvm.org/docs/LibTooling.html), which depends on a
-> database of compiler flags. The standard container for this database is
-> compile_commands.json, which consists of a list of JSON objects, each
-> with "directory", "file", and "command" fields.
 >
-> Some build systems, like cmake or bazel, produce this compilation
-> information directly. Naturally, Makefiles don't. However, the kernel
-> makefiles already create .<target>.o.cmd files that contain all the
-> information needed to build a compile_commands.json file.
+> When I tryed to change something, I was often hit by annoying
+> shift/reduce conflicts in the parser.
 >
-> So, this commit adds scripts/gen_compile_commands.py, which recursively
-> searches through a directory for .<target>.o.cmd files and extracts
-> appropriate compile commands from them. It writes a
-> compile_commands.json file that LibTooling-based tools can use.
+> The lexer and parser are too cluttered.
 >
-> By default, gen_compile_commands.py starts its search in its working
-> directory and (over)writes compile_commands.json in the working
-> directory. However, it also supports --output and --directory flags for
-> out-of-tree use.
+> So, I decided to clean-up now.
 >
-> Note that while gen_compile_commands.py enables the use of clang-based
-> tools, it does not require the kernel to be compiled with clang. E.g.,
-> the following sequence of commands produces a compile_commands.json file
-> that works correctly with LibTooling.
+>   - Fix all shift/reduce conflicts in the parser
 >
-> make defconfig
-> make
-> scripts/gen_compile_commands.py
+>   - Rewrite the lexer. The linear keyword search was removed.
+>     The number of states descreased from 6 to 4.
 >
-> Also note that this script is written to work correctly in both Python 2
-> and Python 3, so it does not specify the Python version in its first
-> line.
+>   - Fix various subtle issues
 >
-> For an example of the utility of this script: after running
-> gen_compile_commands.json on the latest kernel version, I was able to
-> use Vim + the YouCompleteMe pluging + clangd to automatically jump to
-> definitions and declarations. Obviously, cscope and ctags provide some
-> of this functionality; the advantage of supporting LibTooling is that it
-> opens the door to many other clang-based tools that understand the code
-> directly and do not rely on regular expressions and heuristics.
 >
-> Tested: Built several recent kernel versions and ran the script against
-> them, testing tools like clangd (for editor/LSP support) and clang-check
-> (for static analysis). Also extracted some test .cmd files from a kernel
-> build and wrote a test script to check that the script behaved correctly
-> with all permutations of the --output and --directory flags.
 >
-> Signed-off-by: Tom Roeder <tmroeder@google.com>
-> ---
-> Changelog since v1:
-> - Add simple string replacement to unescape the pound sign.
+> Masahiro Yamada (27):
+>   kconfig: fix file name and line number of warn_ignored_character()
+>   kconfig: fix memory leak when EOF is encountered in quotation
+>   kconfig: require T_EOL to reduce visible statement
+>   kconfig: remove unneeded pattern matching to whitespaces
+>   kconfig: refactor pattern matching in STRING state
+>   kconfig: fix ambiguous grammar in terms of new lines
+>   kconfig: clean up EOF handling in the lexer
+>   kconfig: warn no new line at end of file
+>   kconfig: remove grammatically ambiguous "unexpected option" diagnostic
+>   kconfig: remove grammatically ambiguous option_error
+>   kconfig: remove redundant if_block rule
+>   kconfig: remove redundant menu_block rule
+>   kconfig: loosen the order of "visible" and "depends on" in menu entry
+>   kconfig: rename depends_list to comment_option_list
+>   kconfig: remove redundant token defines
+>   kconfig: use distinct tokens for type and default properties
+>   kconfig: refactor scanning and parsing "option" properties
+>   kconfig: use specific tokens instead of T_ASSIGN for assignments
+>   kconfig: use T_WORD instead of T_VARIABLE for variables
+>   microblaze: surround string default in Kconfig with double quotes
+>   treewide: surround file paths in Kconfig files with double quotes
+>   kconfig: ban the use of '.' and '/' in unquoted words
+>   kconfig: refactor end token rules
+>   kconfig: stop associating kconf_id with yylval
+>   kconfig: switch to ASSIGN_VAL state in the second lexer
+>   kconfig: update current_pos in the second lexer
+>   kconfig: remove keyword lookup table entirely
 
 
-Applied to linux-kbuild. Thanks!
+Series, applied to kbuild/kconfig.
 
 
 -- 
