@@ -1,118 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:45941 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728835AbeLTUSG (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Dec 2018 15:18:06 -0500
-Reply-To: alex.popov@linux.com
-Subject: Re: 10e9ae9fab ("gcc-plugins: Add STACKLEAK plugin for tracking .."):
- WARNING: can't dereference registers at (null) for ip
- entry_SYSCALL_64_after_hwframe
-References: <5c18828f.VHbQvL3kBXAW0ohl%lkp@intel.com>
-From: Alexander Popov <alex.popov@linux.com>
-Message-ID: <532c3a5b-3358-6f70-b0e8-c2b4afbbbab3@linux.com>
-Date: Thu, 20 Dec 2018 23:18:01 +0300
+Received: from mx2.suse.de ([195.135.220.15]:51648 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730700AbeLTVsC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 20 Dec 2018 16:48:02 -0500
+Subject: Re: [PATCH] kbuild: use -flive-patching when CONFIG_LIVEPATCH is
+ enabled
+References: <20181219141744.32392-1-mbenes@suse.cz>
+ <20181219165428.5udrppedpdvf2u7k@treble>
+ <nycvar.YFH.7.76.1812191756450.17216@cbobk.fhfr.pm>
+ <20181219172127.o753af7pkrsttcgl@treble>
+ <nycvar.YFH.7.76.1812191909490.17216@cbobk.fhfr.pm>
+ <alpine.LSU.2.21.1812200919210.28185@pobox.suse.cz>
+From: Joao Moreira <jmoreira@suse.de>
+Message-ID: <3fec8358-f64c-57e4-fa7f-1ee91a45be9b@suse.de>
+Date: Thu, 20 Dec 2018 13:47:53 -0800
 MIME-Version: 1.0
-In-Reply-To: <5c18828f.VHbQvL3kBXAW0ohl%lkp@intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <alpine.LSU.2.21.1812200919210.28185@pobox.suse.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kernel test robot <lkp@intel.com>, Kees Cook <keescook@chromium.org>
-Cc: LKP <lkp@01.org>, kernel-hardening@lists.openwall.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Miroslav Benes <mbenes@suse.cz>, Jiri Kosina <jikos@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, jeyu@kernel.org, pmladek@suse.com, linux-kbuild@vger.kernel.org, live-patching@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello everyone,
-
-I've carefully worked with this report, let me share the results.
-
-On 18.12.2018 8:15, kernel test robot wrote:
-> Greetings,
+On 12/20/18 12:33 AM, Miroslav Benes wrote:
+> On Wed, 19 Dec 2018, Jiri Kosina wrote:
 > 
-> 0day kernel testing robot got the below dmesg and the first bad commit is
+>> On Wed, 19 Dec 2018, Josh Poimboeuf wrote:
+>>
+>>> Also the commit message needs an analysis of the performance impacts.
+>>
+>> Agreed. Especially as it's expected (*) to be completely in the noise
+>> particularly for the kernel, it'd be good to have that documented in the
+>> changelog.
+>>
+>> (*) actually measured already for some subset of the IPA optimizations
 > 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+> Ok, we can do that. I don't expect the results to be different from the
+> last measurement as Jiri mentions. The sets of disabled optimizations are
+> similar.
 > 
-> commit 10e9ae9fabaf96c8e5227c1cd4827d58b3aa406d
->     gcc-plugins: Add STACKLEAK plugin for tracking the kernel stack
+> I'll add it to v2.
+> 
+> On Wed, 19 Dec 2018, Jiri Kosina wrote:
+> 
+>> On Wed, 19 Dec 2018, Josh Poimboeuf wrote:
+>>
+>>>>> This option only makes sense for source-based patch generation, so isn't
+>>>>> it a bit premature to make this change without proper source-based patch
+>>>>> tooling?
+>>>>
+>>>> The reality is though that before the full-fledged patch tooling exists,
+>>>> people are actually already writing livepatches by hand, so this option is
+>>>> useful for them.
+>>>
+>>> Fair enough.
+> 
+> Yes, that was the reason I sent it. It would not make sense to wait for
+> the tooling in this case, because -flive-patching is useful even now,
+> since there is a way to prepare livepatches without any tooling.
+> 
+>>> Though, upstream, almost everybody seems to use kpatch-build, for which
+>>> this patch doesn't help.  And people will continue to do so until we
+>>> have decent source-based tooling.  Will the klp-convert patches be
+>>> revived soon?
+>>
+>> Let me add Joao, who's working on that.
+>>
+>> Joao, I think you had something basically ready for upstream exposure,
+>> right?
+> 
+> I think that when Joao posted it a long time ago, the conclusion was that
+> it would be better to wait for the source-based tooling and have the
+> complete solution. I may misremember though.
 
-This bot has been running trinity at the following points:
+Your memories match mine, Miroslav.
 
-> afaef01c00  x86/entry: Add STACKLEAK erasing the kernel stack at the end of syscalls
-> 10e9ae9fab  gcc-plugins: Add STACKLEAK plugin for tracking the kernel stack
+FTR, we recently integrated klp-convert to SLE. There were some fixes in 
+comparison with the version which was submitted upstream, thus a v2 of 
+the patches is necessary.
 
-    just after stackleak was merged into 4.20-rc1
+> 
+> If Josh thinks that it would be acceptable to have klp-convert merged even
+> without the tooling, I'm all for it.
+> 
+Of course I can work on that and I'll be glad to do so / submit this new 
+version, if this is now something considered useful.
 
-> 1a9430db28  ima: cleanup the match_token policy code
-
-    near 4.20-rc7 (Dec 17)
-
-> 6648e120dd  Add linux-next specific files for 20181217
-
-    rc + next (Dec 17)
-
-> +---------------------------------------------------------------+------------+------------+------------+---------------+
-> |                                                               | afaef01c00 | 10e9ae9fab | 1a9430db28 | next-20181217 |
-> +---------------------------------------------------------------+------------+------------+------------+---------------+
-> | boot_successes                                                | 386        | 141        | 134        | 135           |
-> | boot_failures                                                 | 68         | 9          | 16         | 8             |
-
-The following oopses happened on 4.20-rc1 and disappeared on 4.20-rc7:
-
-> | RIP:trace                                                     | 37         |            |            |               |
-> | WARNING:stack_recursion                                       | 36         |            |            |               |
-> | WARNING:at(____ptrval____)for_ip_syscall_return_via_sysret/0x | 37         |            |            |               |
-> | Kernel_panic-not_syncing:Machine_halted                       | 37         |            |            |               |
-> | PANIC:double_fault                                            | 27         |            |            |               |
-
-They are caused by stackleak issues with ftrace and kprobes, that are fixed
-in these commits:
-    e9c7d656610e
-    ef1a84093489
-
-I've double-checked that now stackleak works properly with function tracing,
-function_graph tracing and kprobes.
-
-> | Mem-Info                                                      | 2          | 0          | 1          |               |
-> | invoked_oom-killer:gfp_mask=0x                                | 1          | 0          | 1          |               |
-> | RIP:__put_user_4                                              | 1          |            |            |               |
-
-These 3 lines are not meaningful to me.
-
-> | BUG:KASAN:stack-out-of-bounds_in_u                            | 25         | 8          | 12         | 7             |
-
-This is interesting. How does KASAN work with stackleak? I tested it using
-test_kasan.ko -- it works properly both for KASAN outline and inline
-instrumentation.
-
-However I noticed that stackleak lkdtm test sometimes reports that kernel
-stack is not properly erased in case of KASAN outline instrumentation.
-I think it happens because KASAN increases kernel stack usage, so
-CONFIG_STACKLEAK_TRACK_MIN_SIZE should be adjusted. I will investigate
-that later.
-
-> | RIP:__x86_indirect_thunk_rdx                                  | 26         | 9          | 12         | 7             |
-> | INFO:rcu_preempt_detected_stalls_on_CPUs/tasks                | 3          | 0          | 3          |               |
-> | RIP:arch_local_irq_enable                                     | 1          |            |            |               |
-> | RIP:mntput_no_expire                                          | 1          |            |            |               |
-> | RIP:arch_local_irq_restore                                    | 1          |            |            |               |
-> | RIP:compound_head                                             | 1          |            |            |               |
-> | RIP:rcu_read_lock                                             | 1          |            |            |               |
-> | RIP:check_kill_permission                                     | 1          |            |            |               |
-> | RIP:radix_tree_load_root                                      | 1          |            |            |               |
-> | WARNING:at(null)for_ip_entry_SYSCALL_64_after_hwframe/0x      | 0          | 7          | 11         | 7             |
-> | WARNING:at(null)for_ip_async_page_fault/0x                    | 0          | 1          | 1          |               |
-> | WARNING:at_kernel/locking/lockdep.c:#lock_downgrade           | 0          | 0          | 2          |               |
-> | RIP:lock_downgrade                                            | 0          | 0          | 2          |               |
-> | RIP:xa_is_node                                                | 0          | 0          | 1          |               |
-> | BUG:kernel_reboot-without-warning_in_test_stage               | 0          | 0          | 0          | 1             |
-> +---------------------------------------------------------------+------------+------------+------------+---------------+
-
-Unfortunately, I can't extract anything useful from these lines.
-And trinity doesn't provide reproducers...
-
-Anyway, I've created exactly the same trinity setup and have been running
-it for 2 days (900 tests) on 4.20-rc7 -- no kernel crashes were hit.
-
-Best regards,
-Alexander
+> We're about to start using it at SUSE and staying close to upstream would
+> definitely be better.
+> 
+> Miroslav
+> 
