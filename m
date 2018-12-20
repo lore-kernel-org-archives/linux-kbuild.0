@@ -1,55 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:33360 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730884AbeLTNNt (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Dec 2018 08:13:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51414 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732874AbeLTOq3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 20 Dec 2018 09:46:29 -0500
+Date: Thu, 20 Dec 2018 08:46:26 -0600
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH] kbuild: use -flive-patching when CONFIG_LIVEPATCH is
+ enabled
+Message-ID: <20181220144626.2uwuzsmdowbrmxxq@treble>
+References: <20181219141744.32392-1-mbenes@suse.cz>
+ <20181219165428.5udrppedpdvf2u7k@treble>
+ <nycvar.YFH.7.76.1812191756450.17216@cbobk.fhfr.pm>
+ <20181219172127.o753af7pkrsttcgl@treble>
+ <nycvar.YFH.7.76.1812191909490.17216@cbobk.fhfr.pm>
+ <alpine.LSU.2.21.1812200919210.28185@pobox.suse.cz>
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 20 Dec 2018 22:12:44 +0900
-Message-ID: <CAK7LNAQHKJzY9giP-A5Q5+tp_JuH_bnDTzgbGnBCiAMbCVVevw@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v4.20
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.LSU.2.21.1812200919210.28185@pobox.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
+To: Miroslav Benes <mbenes@suse.cz>
+Cc: Jiri Kosina <jikos@kernel.org>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, jeyu@kernel.org, pmladek@suse.com, linux-kbuild@vger.kernel.org, live-patching@vger.kernel.org, linux-kernel@vger.kernel.org, Joao Moreira <jmoreira@suse.de>
 
-Hi Linus,
+On Thu, Dec 20, 2018 at 09:33:05AM +0100, Miroslav Benes wrote:
+> > > Though, upstream, almost everybody seems to use kpatch-build, for which
+> > > this patch doesn't help.  And people will continue to do so until we
+> > > have decent source-based tooling.  Will the klp-convert patches be
+> > > revived soon?
+> >
+> > Let me add Joao, who's working on that.
+> > 
+> > Joao, I think you had something basically ready for upstream exposure, 
+> > right?
+> 
+> I think that when Joao posted it a long time ago, the conclusion was that 
+> it would be better to wait for the source-based tooling and have the 
+> complete solution. I may misremember though.
+> 
+> If Josh thinks that it would be acceptable to have klp-convert merged even 
+> without the tooling, I'm all for it.
+> 
+> We're about to start using it at SUSE and staying close to upstream would 
+> definitely be better.
 
-Please pull one fix for v4.20 release.
+A complete toolchain should definitely be the end goal.
 
-Thanks!
+But as a usable first step, only *some* of the tooling is required,
+since some of the steps can be done manually, right?
 
+So starting out, for something usable, I believe the following would be
+the bare minimum:
 
+  * -flive-patching
 
-The following changes since commit ccda4af0f4b92f7b4c308d3acc262f4a7e3affad:
+  * The analysis tool which analyzes the -fdump-ipa-clones files
 
-  Linux 4.20-rc2 (2018-11-11 17:12:31 -0600)
+  * klp-convert
 
-are available in the git repository at:
+  * Documentation describing the end-to-end patch creation process,
+    including the manual steps and how to use the above tools
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v4.20-2
+Did I miss anything?
 
-for you to fetch changes up to ef7cfd00b2caf6edeb7f169682b64be2d0a798cf:
-
-  kbuild: fix false positive warning/error about missing libelf
-(2018-12-20 00:04:15 +0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v4.20 (2nd)
-
- - fix false positive warning/error about missing library for objtool
-
-----------------------------------------------------------------
-Masahiro Yamada (1):
-      kbuild: fix false positive warning/error about missing libelf
-
- Makefile | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
+Then over time we can fill in the gaps (manual steps) with automation.
 
 -- 
-Best Regards
-Masahiro Yamada
+Josh
