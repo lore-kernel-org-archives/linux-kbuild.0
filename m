@@ -1,69 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51414 "EHLO mx1.redhat.com"
+Received: from mail.kernel.org ([198.145.29.99]:42564 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732874AbeLTOq3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Dec 2018 09:46:29 -0500
-Date: Thu, 20 Dec 2018 08:46:26 -0600
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH] kbuild: use -flive-patching when CONFIG_LIVEPATCH is
- enabled
-Message-ID: <20181220144626.2uwuzsmdowbrmxxq@treble>
-References: <20181219141744.32392-1-mbenes@suse.cz>
- <20181219165428.5udrppedpdvf2u7k@treble>
- <nycvar.YFH.7.76.1812191756450.17216@cbobk.fhfr.pm>
- <20181219172127.o753af7pkrsttcgl@treble>
- <nycvar.YFH.7.76.1812191909490.17216@cbobk.fhfr.pm>
- <alpine.LSU.2.21.1812200919210.28185@pobox.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <alpine.LSU.2.21.1812200919210.28185@pobox.suse.cz>
+        id S1732195AbeLTQKD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 20 Dec 2018 11:10:03 -0500
+Subject: Re: [GIT PULL] Kbuild fixes for v4.20
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAK7LNAQHKJzY9giP-A5Q5+tp_JuH_bnDTzgbGnBCiAMbCVVevw@mail.gmail.com>
+References: <CAK7LNAQHKJzY9giP-A5Q5+tp_JuH_bnDTzgbGnBCiAMbCVVevw@mail.gmail.com>
+Message-Id: <20181220161002.12746.58201.pr-tracker-bot@pdx-korg-gitolite-1.ci.codeaurora.org>
+Date: Thu, 20 Dec 2018 16:10:02 +0000
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miroslav Benes <mbenes@suse.cz>
-Cc: Jiri Kosina <jikos@kernel.org>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, jeyu@kernel.org, pmladek@suse.com, linux-kbuild@vger.kernel.org, live-patching@vger.kernel.org, linux-kernel@vger.kernel.org, Joao Moreira <jmoreira@suse.de>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
 
-On Thu, Dec 20, 2018 at 09:33:05AM +0100, Miroslav Benes wrote:
-> > > Though, upstream, almost everybody seems to use kpatch-build, for which
-> > > this patch doesn't help.  And people will continue to do so until we
-> > > have decent source-based tooling.  Will the klp-convert patches be
-> > > revived soon?
-> >
-> > Let me add Joao, who's working on that.
-> > 
-> > Joao, I think you had something basically ready for upstream exposure, 
-> > right?
-> 
-> I think that when Joao posted it a long time ago, the conclusion was that 
-> it would be better to wait for the source-based tooling and have the 
-> complete solution. I may misremember though.
-> 
-> If Josh thinks that it would be acceptable to have klp-convert merged even 
-> without the tooling, I'm all for it.
-> 
-> We're about to start using it at SUSE and staying close to upstream would 
-> definitely be better.
+The pull request you sent on Thu, 20 Dec 2018 22:12:44 +0900:
 
-A complete toolchain should definitely be the end goal.
+> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-fixes-v4.20-2
 
-But as a usable first step, only *some* of the tooling is required,
-since some of the steps can be done manually, right?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/c0f3ece4657fe2205c1e59c5c27547d6e8cba34a
 
-So starting out, for something usable, I believe the following would be
-the bare minimum:
-
-  * -flive-patching
-
-  * The analysis tool which analyzes the -fdump-ipa-clones files
-
-  * klp-convert
-
-  * Documentation describing the end-to-end patch creation process,
-    including the manual steps and how to use the above tools
-
-Did I miss anything?
-
-Then over time we can fill in the gaps (manual steps) with automation.
+Thank you!
 
 -- 
-Josh
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
