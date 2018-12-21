@@ -1,102 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:38271 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387770AbeLUId3 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Dec 2018 03:33:29 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/5] kconfig: split the lexer out of zconf.y
-Date: Fri, 21 Dec 2018 17:33:05 +0900
-Message-Id: <1545381188-514-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1545381188-514-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1545381188-514-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from mx2.suse.de ([195.135.220.15]:41684 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1733247AbeLUJpw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 21 Dec 2018 04:45:52 -0500
+Date: Fri, 21 Dec 2018 10:45:49 +0100 (CET)
+From: Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH] kbuild: use -flive-patching when CONFIG_LIVEPATCH is
+ enabled
+In-Reply-To: <20181220144626.2uwuzsmdowbrmxxq@treble>
+Message-ID: <alpine.LSU.2.21.1812211045400.3002@pobox.suse.cz>
+References: <20181219141744.32392-1-mbenes@suse.cz> <20181219165428.5udrppedpdvf2u7k@treble> <nycvar.YFH.7.76.1812191756450.17216@cbobk.fhfr.pm> <20181219172127.o753af7pkrsttcgl@treble> <nycvar.YFH.7.76.1812191909490.17216@cbobk.fhfr.pm>
+ <alpine.LSU.2.21.1812200919210.28185@pobox.suse.cz> <20181220144626.2uwuzsmdowbrmxxq@treble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Jiri Kosina <jikos@kernel.org>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, jeyu@kernel.org, pmladek@suse.com, linux-kbuild@vger.kernel.org, live-patching@vger.kernel.org, linux-kernel@vger.kernel.org, Joao Moreira <jmoreira@suse.de>
 
-Compile zconf.lex.c independently of the other files.
+On Thu, 20 Dec 2018, Josh Poimboeuf wrote:
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+> On Thu, Dec 20, 2018 at 09:33:05AM +0100, Miroslav Benes wrote:
+> > > > Though, upstream, almost everybody seems to use kpatch-build, for which
+> > > > this patch doesn't help.  And people will continue to do so until we
+> > > > have decent source-based tooling.  Will the klp-convert patches be
+> > > > revived soon?
+> > >
+> > > Let me add Joao, who's working on that.
+> > > 
+> > > Joao, I think you had something basically ready for upstream exposure, 
+> > > right?
+> > 
+> > I think that when Joao posted it a long time ago, the conclusion was that 
+> > it would be better to wait for the source-based tooling and have the 
+> > complete solution. I may misremember though.
+> > 
+> > If Josh thinks that it would be acceptable to have klp-convert merged even 
+> > without the tooling, I'm all for it.
+> > 
+> > We're about to start using it at SUSE and staying close to upstream would 
+> > definitely be better.
+> 
+> A complete toolchain should definitely be the end goal.
+> 
+> But as a usable first step, only *some* of the tooling is required,
+> since some of the steps can be done manually, right?
+> 
+> So starting out, for something usable, I believe the following would be
+> the bare minimum:
+> 
+>   * -flive-patching
+> 
+>   * The analysis tool which analyzes the -fdump-ipa-clones files
+> 
+>   * klp-convert
+> 
+>   * Documentation describing the end-to-end patch creation process,
+>     including the manual steps and how to use the above tools
+> 
+> Did I miss anything?
+> 
+> Then over time we can fill in the gaps (manual steps) with automation.
 
- scripts/kconfig/Makefile | 8 ++------
- scripts/kconfig/lkc.h    | 3 +++
- scripts/kconfig/zconf.l  | 1 +
- scripts/kconfig/zconf.y  | 2 --
- 4 files changed, 6 insertions(+), 8 deletions(-)
+Agreed.
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index d3bd687..65cdf8c 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -143,11 +143,9 @@ help:
- 
- # ===========================================================================
- # object files used by all kconfig flavours
--common-objs	:= confdata.o expr.o symbol.o preprocess.o zconf.tab.o
-+common-objs	:= confdata.o expr.o symbol.o preprocess.o zconf.lex.o zconf.tab.o
- 
--targets		+= zconf.lex.c
--
--# generated files seem to need this to find local include files
-+$(obj)/zconf.lex.o: $(obj)/zconf.tab.h
- HOSTCFLAGS_zconf.lex.o	:= -I$(src)
- HOSTCFLAGS_zconf.tab.o	:= -I$(src)
- 
-@@ -202,8 +200,6 @@ HOSTCFLAGS_gconf.o  = $(shell . $(obj)/.gconf-cfg && echo $$cflags)
- 
- $(obj)/gconf.o: $(obj)/.gconf-cfg
- 
--$(obj)/zconf.tab.o: $(obj)/zconf.lex.c
--
- # check if necessary packages are available, and configure build flags
- define filechk_conf_cfg
- 	$(CONFIG_SHELL) $<
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index 160a931..531ff7c 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -90,6 +90,9 @@ void *xrealloc(void *p, size_t size);
- char *xstrdup(const char *s);
- char *xstrndup(const char *s, size_t n);
- 
-+/* zconf.l */
-+int yylex(void);
-+
- struct gstr {
- 	size_t len;
- 	char  *s;
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 960e6c6..a9a83eb 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -15,6 +15,7 @@
- #include <unistd.h>
- 
- #include "lkc.h"
-+#include "zconf.tab.h"
- 
- #define YY_DECL		static int yylex1(void)
- 
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 32be913..07719a7 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -20,7 +20,6 @@
- 
- int cdebug = PRINTD;
- 
--int yylex(void);
- static void yyerror(const char *err);
- static void zconfprint(const char *err, ...);
- static void zconf_error(const char *err, ...);
-@@ -728,6 +727,5 @@ void zconfdump(FILE *out)
- 	}
- }
- 
--#include "zconf.lex.c"
- #include "util.c"
- #include "menu.c"
--- 
-2.7.4
+Miroslav
