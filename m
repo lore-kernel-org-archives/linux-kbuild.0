@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:41962 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:38514 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729470AbeLZWlb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Dec 2018 17:41:31 -0500
+        id S1728724AbeLZWiP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 26 Dec 2018 17:38:15 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.14 52/59] kbuild: fix false positive warning/error about missing libelf
-Date: Wed, 26 Dec 2018 17:38:32 -0500
-Message-Id: <20181226223839.150262-52-sashal@kernel.org>
-In-Reply-To: <20181226223839.150262-1-sashal@kernel.org>
-References: <20181226223839.150262-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 82/97] kbuild: fix false positive warning/error about missing libelf
+Date: Wed, 26 Dec 2018 17:35:42 -0500
+Message-Id: <20181226223557.149329-82-sashal@kernel.org>
+In-Reply-To: <20181226223557.149329-1-sashal@kernel.org>
+References: <20181226223557.149329-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -40,7 +40,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 280c7193e246..f72fb4b403b7 100644
+index 9770f29a690a..b64adbc154e4 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -954,11 +954,6 @@ ifdef CONFIG_STACK_VALIDATION
@@ -55,7 +55,7 @@ index 280c7193e246..f72fb4b403b7 100644
      SKIP_STACK_VALIDATION := 1
      export SKIP_STACK_VALIDATION
    endif
-@@ -1102,6 +1097,14 @@ uapi-asm-generic:
+@@ -1115,6 +1110,14 @@ uapi-asm-generic:
  
  PHONY += prepare-objtool
  prepare-objtool: $(objtool_target)
@@ -68,7 +68,7 @@ index 280c7193e246..f72fb4b403b7 100644
 +endif
 +endif
  
- # Check for CONFIG flags that require compiler support. Abort the build
- # after .config has been processed, but before the kernel build starts.
+ # Generate some files
+ # ---------------------------------------------------------------------------
 -- 
 2.19.1
