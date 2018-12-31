@@ -1,157 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:31627 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:31572 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727151AbeLaIYg (ORCPT
+        with ESMTP id S1726033AbeLaIYc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 31 Dec 2018 03:24:36 -0500
+        Mon, 31 Dec 2018 03:24:32 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/4] kbuild: change filechk to surround the given command with { }
-Date: Mon, 31 Dec 2018 17:24:09 +0900
-Message-Id: <1546244651-10447-2-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 4/4] kbuild: make LINUX_VERSION_CODE in <linux/version.h> more readable
+Date: Mon, 31 Dec 2018 17:24:11 +0900
+Message-Id: <1546244651-10447-4-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1546244651-10447-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1546244651-10447-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-s390@vger.kernel.org, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-filechk_* rules often consist of multiple 'echo' lines. They must be
-surrounded with { } or ( ) to work correctly. Otherwise, only the
-string from the last 'echo' would be written into the target.
+Makefile does not need to calculate LINUX_VERSION_CODE.
+Let's leave it to the preprocessor.
 
-Let's take care of that in the 'filechk' in scripts/Kbuild.include
-to clean up filechk_* rules.
+This commit changes include/generated/uapi/linux/version.h as follows:
+
+Before:
+
+  #define LINUX_VERSION_CODE 267264
+  #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+
+After:
+
+  #define LINUX_VERSION_CODE KERNEL_VERSION(4, 20, 0)
+  #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+
+The latter is more human-readable in my opinion.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Kbuild                   | 2 +-
- Makefile                 | 6 +++---
- arch/s390/tools/Makefile | 2 +-
- firmware/Makefile        | 5 ++---
- kernel/Makefile          | 6 +++++-
- scripts/Kbuild.include   | 2 +-
- scripts/Makefile.lib     | 3 +--
- 7 files changed, 14 insertions(+), 12 deletions(-)
+ Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/Kbuild b/Kbuild
-index 414ae6d..06b801e 100644
---- a/Kbuild
-+++ b/Kbuild
-@@ -27,7 +27,7 @@ timeconst-file := include/generated/timeconst.h
- targets += $(timeconst-file)
- 
- define filechk_gentimeconst
--	(echo $(CONFIG_HZ) | bc -q $< )
-+	echo $(CONFIG_HZ) | bc -q $<
- endef
- 
- $(timeconst-file): kernel/time/timeconst.bc FORCE
 diff --git a/Makefile b/Makefile
-index 04a8578..437d603 100644
+index 437d603..1ebf5ed 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1127,13 +1127,13 @@ define filechk_utsrelease.h
- 	  echo '"$(KERNELRELEASE)" exceeds $(uts_len) characters' >&2;    \
- 	  exit 1;                                                         \
- 	fi;                                                               \
--	(echo \#define UTS_RELEASE \"$(KERNELRELEASE)\";)
-+	echo \#define UTS_RELEASE \"$(KERNELRELEASE)\"
+@@ -1131,8 +1131,7 @@ define filechk_utsrelease.h
  endef
  
  define filechk_version.h
--	(echo \#define LINUX_VERSION_CODE $(shell                         \
-+	echo \#define LINUX_VERSION_CODE $(shell                         \
- 	expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 0$(SUBLEVEL)); \
--	echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))';)
-+	echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))'
+-	echo \#define LINUX_VERSION_CODE $(shell                         \
+-	expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 0$(SUBLEVEL)); \
++	echo '#define LINUX_VERSION_CODE KERNEL_VERSION($(VERSION), $(PATCHLEVEL), $(SUBLEVEL))'; \
+ 	echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))'
  endef
  
- $(version_h): FORCE
-diff --git a/arch/s390/tools/Makefile b/arch/s390/tools/Makefile
-index 48cdac1..cf4846a 100644
---- a/arch/s390/tools/Makefile
-+++ b/arch/s390/tools/Makefile
-@@ -25,7 +25,7 @@ define filechk_facility-defs.h
- endef
- 
- define filechk_dis-defs.h
--	( $(obj)/gen_opcode_table < $(srctree)/arch/$(ARCH)/tools/opcodes.txt )
-+	$(obj)/gen_opcode_table < $(srctree)/arch/$(ARCH)/tools/opcodes.txt
- endef
- 
- $(kapi)/facility-defs.h: $(obj)/gen_facilities FORCE
-diff --git a/firmware/Makefile b/firmware/Makefile
-index e2f7dd2..37e5ae3 100644
---- a/firmware/Makefile
-+++ b/firmware/Makefile
-@@ -13,7 +13,7 @@ ASM_WORD  = $(if $(CONFIG_64BIT),.quad,.long)
- ASM_ALIGN = $(if $(CONFIG_64BIT),3,2)
- PROGBITS  = $(if $(CONFIG_ARM),%,@)progbits
- 
--filechk_fwbin = { \
-+filechk_fwbin = \
- 	echo "/* Generated by $(src)/Makefile */"		;\
- 	echo "    .section .rodata"				;\
- 	echo "    .p2align $(ASM_ALIGN)"			;\
-@@ -28,8 +28,7 @@ filechk_fwbin = { \
- 	echo "    .p2align $(ASM_ALIGN)"			;\
- 	echo "    $(ASM_WORD) _fw_$(FWSTR)_name"		;\
- 	echo "    $(ASM_WORD) _fw_$(FWSTR)_bin"			;\
--	echo "    $(ASM_WORD) _fw_end - _fw_$(FWSTR)_bin"	;\
--}
-+	echo "    $(ASM_WORD) _fw_end - _fw_$(FWSTR)_bin"
- 
- $(obj)/%.gen.S: FORCE
- 	$(call filechk,fwbin)
-diff --git a/kernel/Makefile b/kernel/Makefile
-index cde93d5..6aa7543 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -122,7 +122,11 @@ targets += config_data.gz
- $(obj)/config_data.gz: $(KCONFIG_CONFIG) FORCE
- 	$(call if_changed,gzip)
- 
--      filechk_ikconfiggz = (echo "static const char kernel_config_data[] __used = MAGIC_START"; cat $< | scripts/bin2c; echo "MAGIC_END;")
-+filechk_ikconfiggz = \
-+	echo "static const char kernel_config_data[] __used = MAGIC_START"; \
-+	cat $< | scripts/bin2c; \
-+	echo "MAGIC_END;"
-+
- targets += config_data.h
- $(obj)/config_data.h: $(obj)/config_data.gz FORCE
- 	$(call filechk,ikconfiggz)
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 46bf1a0..74a3fe7 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -56,7 +56,7 @@ kecho := $($(quiet)kecho)
- define filechk
- 	$(Q)set -e;				\
- 	mkdir -p $(dir $@);			\
--	$(filechk_$(1)) > $@.tmp;		\
-+	{ $(filechk_$(1)); } > $@.tmp;		\
- 	if [ -r $@ ] && cmp -s $@ $@.tmp; then	\
- 		rm -f $@.tmp;			\
- 	else					\
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 390957f..12b88d0 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -417,7 +417,6 @@ endef
- # Use filechk to avoid rebuilds when a header changes, but the resulting file
- # does not
- define filechk_offsets
--	( \
- 	 echo "#ifndef $2"; \
- 	 echo "#define $2"; \
- 	 echo "/*"; \
-@@ -428,5 +427,5 @@ define filechk_offsets
- 	 echo ""; \
- 	 sed -ne $(sed-offsets) < $<; \
- 	 echo ""; \
--	 echo "#endif" )
-+	 echo "#endif"
- endef
 -- 
 2.7.4
