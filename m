@@ -1,50 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:34394 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725997AbeLaBFT (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:25856 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726096AbeLaEJ3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 30 Dec 2018 20:05:19 -0500
+        Sun, 30 Dec 2018 23:09:29 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: remove UIMAGE_IN and UIMAGE_OUT
-Date: Mon, 31 Dec 2018 10:05:01 +0900
-Message-Id: <1546218301-14163-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: clean up rule_dtc_dt_yaml
+Date: Mon, 31 Dec 2018 13:09:00 +0900
+Message-Id: <1546229340-19309-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The only/last user of UIMAGE_IN/OUT was removed by commit 4722a3e6b716
-("microblaze: fix multiple bugs in arch/microblaze/boot/Makefile").
+Commit 3a2429e1faf4 ("kbuild: change if_changed_rule for multi-line
+recipe") and commit 4f0e3a57d6eb ("kbuild: Add support for DT binding
+schema checks") came in via different sub-systems.
 
-The input and output should always be $< and $@.
+This is a follow-up cleanup.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/Makefile.lib | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ scripts/Makefile.lib | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 3ceaa2e..05a3e40 100644
+index ed1f83d..b44ae6c 100644
 --- a/scripts/Makefile.lib
 +++ b/scripts/Makefile.lib
-@@ -371,15 +371,13 @@ UIMAGE_TYPE ?= kernel
- UIMAGE_LOADADDR ?= arch_must_set_this
- UIMAGE_ENTRYADDR ?= $(UIMAGE_LOADADDR)
- UIMAGE_NAME ?= 'Linux-$(KERNELRELEASE)'
--UIMAGE_IN ?= $<
--UIMAGE_OUT ?= $@
+@@ -304,8 +304,8 @@ quiet_cmd_dtb_check =	CHECK   $@
+       cmd_dtb_check =	$(DT_CHECKER) -p $(DT_TMP_SCHEMA) $@ ;
  
--quiet_cmd_uimage = UIMAGE  $(UIMAGE_OUT)
-+quiet_cmd_uimage = UIMAGE  $@
-       cmd_uimage = $(CONFIG_SHELL) $(MKIMAGE) -A $(UIMAGE_ARCH) -O linux \
- 			-C $(UIMAGE_COMPRESSION) $(UIMAGE_OPTS-y) \
- 			-T $(UIMAGE_TYPE) \
- 			-a $(UIMAGE_LOADADDR) -e $(UIMAGE_ENTRYADDR) \
--			-n $(UIMAGE_NAME) -d $(UIMAGE_IN) $(UIMAGE_OUT)
-+			-n $(UIMAGE_NAME) -d $< $@
+ define rule_dtc_dt_yaml
+-	$(call cmd_and_fixdep,dtc,yaml)		\
+-	$(call echo-cmd,dtb_check) $(cmd_dtb_check)
++	$(call cmd_and_fixdep,dtc,yaml)
++	$(call cmd,dtb_check)
+ endef
  
- # XZ
- # ---------------------------------------------------------------------------
+ $(obj)/%.dt.yaml: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
 -- 
 2.7.4
