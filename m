@@ -1,50 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from walmailout08.yourhostingaccount.com ([65.254.253.237]:35403
-        "EHLO walmailout08.yourhostingaccount.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726321AbeL3V6w (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:34394 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725997AbeLaBFT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 30 Dec 2018 16:58:52 -0500
-Message-ID: <50c93b3076c932b39d207530cd2409be.squirrel@email.fatcow.com>
-Date: Sun, 30 Dec 2018 16:28:24 -0500
-Subject: ALLIANCE LOAN OFFER/PROJECT FUNDING
-From: "FUND ALLIANCE INTERNATIONAL" <info@cent.org>
-Reply-To: olistin001@gmail.com
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+        Sun, 30 Dec 2018 20:05:19 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: remove UIMAGE_IN and UIMAGE_OUT
+Date: Mon, 31 Dec 2018 10:05:01 +0900
+Message-Id: <1546218301-14163-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
+The only/last user of UIMAGE_IN/OUT was removed by commit 4722a3e6b716
+("microblaze: fix multiple bugs in arch/microblaze/boot/Makefile").
 
+The input and output should always be $< and $@.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Good Day,
+ scripts/Makefile.lib | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-I'm Olivia Austin a consultant from Fund Alliance International, We are
-currently offering 95% Non-Recourse Loan with our BG Leased Monetization
-Program for trade finance, constructions, credit enhancement, government
-funding, property investment and all-round range of funding, with 2%
-interest rate per annul for a period of 10-years + 1 year grace period
-with no pre-payment penalties. .
-
-    TERMS:
-
-    2 % INTEREST RATE YEARLY
-    10 YEARS DURATION
-    1M-50B USD / EUR REQUIREMENT:
-
-    1.      CLIENT MUST OWN OR REPRESENT A COMPANY.
-
-    2.      CLIENT MUST BE ABLE TO PROVIDE BUSINESS PLAN OR EXECUTIVE
-SUMMARY OR SUMMARY PURPOSE OF THE LOAN.
-
-Let us know if you are interested in our services and meet up with the
-requirements? so as to provide you with more information.
-
-Regards,
-Olivia Austin
-Fund Alliance
-Lutzowplatz 17 10785, Berlin
-Germany
-Phone: +49 (322) 2109 7890
-Email:olistin001@gmail.com
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 3ceaa2e..05a3e40 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -371,15 +371,13 @@ UIMAGE_TYPE ?= kernel
+ UIMAGE_LOADADDR ?= arch_must_set_this
+ UIMAGE_ENTRYADDR ?= $(UIMAGE_LOADADDR)
+ UIMAGE_NAME ?= 'Linux-$(KERNELRELEASE)'
+-UIMAGE_IN ?= $<
+-UIMAGE_OUT ?= $@
+ 
+-quiet_cmd_uimage = UIMAGE  $(UIMAGE_OUT)
++quiet_cmd_uimage = UIMAGE  $@
+       cmd_uimage = $(CONFIG_SHELL) $(MKIMAGE) -A $(UIMAGE_ARCH) -O linux \
+ 			-C $(UIMAGE_COMPRESSION) $(UIMAGE_OPTS-y) \
+ 			-T $(UIMAGE_TYPE) \
+ 			-a $(UIMAGE_LOADADDR) -e $(UIMAGE_ENTRYADDR) \
+-			-n $(UIMAGE_NAME) -d $(UIMAGE_IN) $(UIMAGE_OUT)
++			-n $(UIMAGE_NAME) -d $< $@
+ 
+ # XZ
+ # ---------------------------------------------------------------------------
+-- 
+2.7.4
