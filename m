@@ -1,63 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:42510 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729041AbfABJXI (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Jan 2019 04:23:08 -0500
-Received: by mail-lj1-f193.google.com with SMTP id l15-v6so26468094lja.9
-        for <linux-kbuild@vger.kernel.org>; Wed, 02 Jan 2019 01:23:06 -0800 (PST)
-From: riku.voipio@linaro.org
-Subject: [PATCH v2] deb-pkg: generate correct build dependencies
-Date: Wed,  2 Jan 2019 11:23:04 +0200
-Message-Id: <20190102092304.27262-1-riku.voipio@linaro.org>
+Received: from ozlabs.org ([203.11.71.1]:50619 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726762AbfABLWl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 2 Jan 2019 06:22:41 -0500
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH] jump_label: move 'asm goto' support test to Kconfig
+In-Reply-To: <1546182855-24290-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1546182855-24290-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Wed, 02 Jan 2019 22:22:44 +1100
+Message-ID: <87imz7xq0r.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, manivannan.sadhasivam@linaro.org, debian-kernel@lists.debian.org, Riku Voipio <riku.voipio@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: masahiroy@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, linux-kernel@vger.kernel.org, Will Deacon <will.deacon@arm.com>, "David S . Miller" <davem@davemloft.net>, Max Filippov <jcmvbkbc@gmail.com>, linux-arch@vger.kernel.org, linux-xtensa@linux-xtensa.org, linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org, linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
 
-From: Riku Voipio <riku.voipio@linaro.org>
+Masahiro Yamada <yamada.masahiro@socionext.com> writes:
 
-bison/flex is now needed always for building for kconfig. Some build
-dependencies depend on kernel configuration, enable them as needed:
+> Currently, CONFIG_JUMP_LABEL just means "I _want_ to use jump label".
+>
+> The jump label is controlled by HAVE_JUMP_LABEL, which is defined
+> like this:
+>
+>   #if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
+>   # define HAVE_JUMP_LABEL
+>   #endif
+>
+> We can improve this by testing 'asm goto' support in Kconfig, then
+> make JUMP_LABEL depend on CC_HAS_ASM_GOTO.
+>
+> Ugly #ifdef HAVE_JUMP_LABEL will go away, and CONFIG_JUMP_LABEL will
+> match to the real kernel capability.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
+> This is a trivial conversion from the build system PoV.
+> I want to queue this up to kbuild tree.
+>
+>
+>  Makefile                                          |  7 -------
+>  arch/Kconfig                                      |  1 +
+>  arch/arm/kernel/jump_label.c                      |  4 ----
+>  arch/arm64/kernel/jump_label.c                    |  4 ----
+>  arch/mips/kernel/jump_label.c                     |  4 ----
+>  arch/powerpc/include/asm/asm-prototypes.h         |  2 +-
+>  arch/powerpc/kernel/jump_label.c                  |  2 --
+>  arch/powerpc/platforms/powernv/opal-tracepoints.c |  2 +-
+>  arch/powerpc/platforms/powernv/opal-wrappers.S    |  2 +-
+>  arch/powerpc/platforms/pseries/hvCall.S           |  4 ++--
+>  arch/powerpc/platforms/pseries/lpar.c             |  2 +-
 
-- libelf-dev when UNWINDER_ORC is set
-- libssl-dev for SYSTEM_TRUSTED_KEYRING
+Looks OK to me.
 
-Since the libssl-dev is needed for extract_cert binary, denote with
-:native to install the libssl-dev for the build machines architecture,
-rather than for the architecture of the kernel being built.
+If there's any odd build errors they should get caught in linux-next.
 
-Tested-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
----
-v2: commit message updated
----
- scripts/package/mkdebian | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index edcad61fe3cd..c858abf4569e 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -134,6 +134,8 @@ fi
- 
- mkdir -p debian/
- echo $debarch > debian/arch
-+extra_build_depends=", $(if_enabled_echo UNWINDER_ORC libelf-dev)"
-+extra_build_depends="$extra_build_depends, $(if_enabled_echo SYSTEM_TRUSTED_KEYRING libssl-dev:native)"
- 
- # Generate a simple changelog template
- cat <<EOF > debian/changelog
-@@ -170,7 +172,7 @@ Source: $sourcename
- Section: kernel
- Priority: optional
- Maintainer: $maintainer
--Build-Depends: bc, kmod, cpio
-+Build-Depends: bc, kmod, cpio, bison, flex $extra_build_depends
- Homepage: http://www.kernel.org/
- 
- Package: $packagename
--- 
-2.19.2
+cheers
