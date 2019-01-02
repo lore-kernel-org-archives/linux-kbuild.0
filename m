@@ -1,75 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([88.198.36.42]:35113 "EHLO baikonur.stro.at"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725984AbfABUDR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Jan 2019 15:03:17 -0500
-Date: Wed, 2 Jan 2019 20:52:41 +0100
-From: maximilian attems <maks@stro.at>
-Subject: Re: [PATCH v2] deb-pkg: generate correct build dependencies
-Message-ID: <20190102195240.GA9246@gravitino>
-References: <20190102092304.27262-1-riku.voipio@linaro.org>
- <f1334713b98ce0133988f5ff590ee90b81cf30d9.camel@decadent.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f1334713b98ce0133988f5ff590ee90b81cf30d9.camel@decadent.org.uk>
+Received: from mail.linuxfoundation.org ([140.211.169.12]:44590 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726253AbfABUOk (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 2 Jan 2019 15:14:40 -0500
+Date: Wed, 2 Jan 2019 12:14:36 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v2 1/3] kasan, arm64: use ARCH_SLAB_MINALIGN instead of
+ manual aligning
+Message-Id: <20190102121436.5c2b72d1b0ec49affadc9692@linux-foundation.org>
+In-Reply-To: <b16c90197bb2c06c780e6e981c40345e03fda465.1546450432.git.andreyknvl@google.com>
+References: <cover.1546450432.git.andreyknvl@google.com>
+        <b16c90197bb2c06c780e6e981c40345e03fda465.1546450432.git.andreyknvl@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: riku.voipio@linaro.org
-Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, manivannan.sadhasivam@linaro.org, debian-kernel@lists.debian.org
+To: Andrey Konovalov <andreyknvl@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-On Wed, Jan 02, 2019 at 07:48:12PM +0000, Ben Hutchings wrote:
-> On Wed, 2019-01-02 at 11:23 +0200, riku.voipio@linaro.org wrote:
-> > From: Riku Voipio <riku.voipio@linaro.org>
-> > 
-> > bison/flex is now needed always for building for kconfig. Some build
-> > dependencies depend on kernel configuration, enable them as needed:
-> > 
-> > - libelf-dev when UNWINDER_ORC is set
-> > - libssl-dev for SYSTEM_TRUSTED_KEYRING
-> > 
-> > Since the libssl-dev is needed for extract_cert binary, denote with
-> > :native to install the libssl-dev for the build machines
-> > architecture,
-> > rather than for the architecture of the kernel being built.
-> > 
-> > Tested-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-> > Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-> 
-> Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
+On Wed,  2 Jan 2019 18:36:06 +0100 Andrey Konovalov <andreyknvl@google.com> wrote:
 
-Acked-by: maximilian attems <maks@stro.at>
- 
-> > ---
-> > v2: commit message updated
-> > ---
-> >  scripts/package/mkdebian | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-> > index edcad61fe3cd..c858abf4569e 100755
-> > --- a/scripts/package/mkdebian
-> > +++ b/scripts/package/mkdebian
-> > @@ -134,6 +134,8 @@ fi
-> >  
-> >  mkdir -p debian/
-> >  echo $debarch > debian/arch
-> > +extra_build_depends=", $(if_enabled_echo UNWINDER_ORC libelf-dev)"
-> > +extra_build_depends="$extra_build_depends, $(if_enabled_echo SYSTEM_TRUSTED_KEYRING libssl-dev:native)"
-> >  
-> >  # Generate a simple changelog template
-> >  cat <<EOF > debian/changelog
-> > @@ -170,7 +172,7 @@ Source: $sourcename
-> >  Section: kernel
-> >  Priority: optional
-> >  Maintainer: $maintainer
-> > -Build-Depends: bc, kmod, cpio
-> > +Build-Depends: bc, kmod, cpio, bison, flex $extra_build_depends
-> >  Homepage: http://www.kernel.org/
-> >  
-> >  Package: $packagename
-> -- 
-> Ben Hutchings
-> Absolutum obsoletum. (If it works, it's out of date.) - Stafford Beer
+> Instead of changing cache->align to be aligned to KASAN_SHADOW_SCALE_SIZE
+> in kasan_cache_create() we can reuse the ARCH_SLAB_MINALIGN macro.
 > 
-> 
+> ...
+>
+> --- a/arch/arm64/include/asm/kasan.h
+> +++ b/arch/arm64/include/asm/kasan.h
+> @@ -36,6 +36,10 @@
+>  #define KASAN_SHADOW_OFFSET     (KASAN_SHADOW_END - (1ULL << \
+>  					(64 - KASAN_SHADOW_SCALE_SHIFT)))
+>  
+> +#ifdef CONFIG_KASAN_SW_TAGS
+> +#define ARCH_SLAB_MINALIGN	(1ULL << KASAN_SHADOW_SCALE_SHIFT)
+> +#endif
+> +
+>  void kasan_init(void);
+>  void kasan_copy_shadow(pgd_t *pgdir);
+>  asmlinkage void kasan_early_init(void);
+> diff --git a/include/linux/slab.h b/include/linux/slab.h
+> index 11b45f7ae405..d87f913ab4e8 100644
+> --- a/include/linux/slab.h
+> +++ b/include/linux/slab.h
+> @@ -16,6 +16,7 @@
+>  #include <linux/overflow.h>
+>  #include <linux/types.h>
+>  #include <linux/workqueue.h>
+> +#include <linux/kasan.h>
+>  
+
+This still seems unadvisable.  Like other architectures, arm defines
+ARCH_SLAB_MINALIGN in arch/arm/include/asm/cache.h. 
+arch/arm/include/asm64/cache.h doesn't define ARCH_SLAB_MINALIGN
+afaict.
+
+If arch/arm/include/asm64/cache.h later gets a definition of
+ARCH_SLAB_MINALIGN then we again face the risk that different .c files
+will see different values of ARCH_SLAB_MINALIGN depending on which
+headers they include.
+
+So what to say about this?  The architecture's ARCH_SLAB_MINALIGN
+should be defined in the architecture's cache.h, end of story.  Not in
+slab.h, not in kasan.h.
