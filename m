@@ -1,54 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57922 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730063AbfACHhC (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 3 Jan 2019 02:37:02 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id x037Xwfl038437
-        for <linux-kbuild@vger.kernel.org>; Thu, 3 Jan 2019 02:37:01 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2psdtngp2m-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Thu, 03 Jan 2019 02:37:01 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-kbuild@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
-        Thu, 3 Jan 2019 07:36:58 -0000
-Date: Thu, 3 Jan 2019 08:36:52 +0100
-From: Heiko Carstens <heiko.carstens@de.ibm.com>
-Subject: Re: [PATCH] kbuild: use assignment instead of define ... endef for
- filechk_* rules
-References: <1546478214-20394-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:51926 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727699AbfACPwb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 3 Jan 2019 10:52:31 -0500
+Date: Thu, 3 Jan 2019 15:52:30 +0000
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v2 1/3] kasan, arm64: use ARCH_SLAB_MINALIGN instead of
+ manual aligning
+Message-ID: <20190103155230.GA10070@edgewater-inn.cambridge.arm.com>
+References: <cover.1546450432.git.andreyknvl@google.com>
+ <b16c90197bb2c06c780e6e981c40345e03fda465.1546450432.git.andreyknvl@google.com>
+ <20190102121436.5c2b72d1b0ec49affadc9692@linux-foundation.org>
 MIME-Version: 1.0
-In-Reply-To: <1546478214-20394-1-git-send-email-yamada.masahiro@socionext.com>
-Message-Id: <20190103073652.GA3957@osiris>
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
+In-Reply-To: <20190102121436.5c2b72d1b0ec49affadc9692@linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
 
-On Thu, Jan 03, 2019 at 10:16:54AM +0900, Masahiro Yamada wrote:
-> You do not have to use define ... endef for filechk_* rules.
+On Wed, Jan 02, 2019 at 12:14:36PM -0800, Andrew Morton wrote:
+> On Wed,  2 Jan 2019 18:36:06 +0100 Andrey Konovalov <andreyknvl@google.com> wrote:
 > 
-> For simple cases, the use of assignment looks cleaner, IMHO.
+> > Instead of changing cache->align to be aligned to KASAN_SHADOW_SCALE_SIZE
+> > in kasan_cache_create() we can reuse the ARCH_SLAB_MINALIGN macro.
+> > 
+> > ...
+> >
+> > --- a/arch/arm64/include/asm/kasan.h
+> > +++ b/arch/arm64/include/asm/kasan.h
+> > @@ -36,6 +36,10 @@
+> >  #define KASAN_SHADOW_OFFSET     (KASAN_SHADOW_END - (1ULL << \
+> >  					(64 - KASAN_SHADOW_SCALE_SHIFT)))
+> >  
+> > +#ifdef CONFIG_KASAN_SW_TAGS
+> > +#define ARCH_SLAB_MINALIGN	(1ULL << KASAN_SHADOW_SCALE_SHIFT)
+> > +#endif
+> > +
+> >  void kasan_init(void);
+> >  void kasan_copy_shadow(pgd_t *pgdir);
+> >  asmlinkage void kasan_early_init(void);
+> > diff --git a/include/linux/slab.h b/include/linux/slab.h
+> > index 11b45f7ae405..d87f913ab4e8 100644
+> > --- a/include/linux/slab.h
+> > +++ b/include/linux/slab.h
+> > @@ -16,6 +16,7 @@
+> >  #include <linux/overflow.h>
+> >  #include <linux/types.h>
+> >  #include <linux/workqueue.h>
+> > +#include <linux/kasan.h>
+> >  
 > 
-> I updated the usage for scripts/Kbuild.include in case somebody
-> misunderstands the 'define ... endif' is the requirement.
+> This still seems unadvisable.  Like other architectures, arm defines
+> ARCH_SLAB_MINALIGN in arch/arm/include/asm/cache.h. 
+> arch/arm/include/asm64/cache.h doesn't define ARCH_SLAB_MINALIGN
+> afaict.
 > 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+> If arch/arm/include/asm64/cache.h later gets a definition of
+> ARCH_SLAB_MINALIGN then we again face the risk that different .c files
+> will see different values of ARCH_SLAB_MINALIGN depending on which
+> headers they include.
 > 
->  Kbuild                             |  4 +---
->  Makefile                           |  3 +--
->  arch/s390/kernel/syscalls/Makefile | 12 +++---------
->  arch/s390/tools/Makefile           |  7 ++-----
->  scripts/Kbuild.include             |  8 ++++----
->  scripts/kconfig/Makefile           |  4 +---
->  6 files changed, 12 insertions(+), 26 deletions(-)
+> So what to say about this?  The architecture's ARCH_SLAB_MINALIGN
+> should be defined in the architecture's cache.h, end of story.  Not in
+> slab.h, not in kasan.h.
 
-For the s390 bits:
-Acked-by: Heiko Carstens <heiko.carstens@de.ibm.com>
+Agreed. Also, as far as I can tell, this patch isn't actually a fix (unlike
+the other two in this series) so it should be harmless to drop it for now.
+
+Will
