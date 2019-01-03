@@ -1,76 +1,145 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:24115 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726049AbfACBPU (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:41567 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726049AbfACBRR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Jan 2019 20:15:20 -0500
-MIME-Version: 1.0
-References: <1546244651-10447-1-git-send-email-yamada.masahiro@socionext.com> <1546244651-10447-4-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1546244651-10447-4-git-send-email-yamada.masahiro@socionext.com>
+        Wed, 2 Jan 2019 20:17:17 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 3 Jan 2019 10:14:30 +0900
-Message-ID: <CAK7LNAThpS+W_aUr3V9EN7V5A67mjvhOWAU1XZGDvS4ByBfeVg@mail.gmail.com>
-Subject: Re: [PATCH 4/4] kbuild: make LINUX_VERSION_CODE in <linux/version.h>
- more readable
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kbuild: use assignment instead of define ... endef for filechk_* rules
+Date: Thu,  3 Jan 2019 10:16:54 +0900
+Message-Id: <1546478214-20394-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-s390@vger.kernel.org, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
 
-On Mon, Dec 31, 2018 at 5:25 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Makefile does not need to calculate LINUX_VERSION_CODE.
-> Let's leave it to the preprocessor.
->
-> This commit changes include/generated/uapi/linux/version.h as follows:
->
-> Before:
->
->   #define LINUX_VERSION_CODE 267264
->   #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
->
-> After:
->
->   #define LINUX_VERSION_CODE KERNEL_VERSION(4, 20, 0)
->   #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
->
-> The latter is more human-readable in my opinion.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+You do not have to use define ... endef for filechk_* rules.
 
+For simple cases, the use of assignment looks cleaner, IMHO.
 
-I retract this patch
-because it would cause a build error.
+I updated the usage for scripts/Kbuild.include in case somebody
+misunderstands the 'define ... endif' is the requirement.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ Kbuild                             |  4 +---
+ Makefile                           |  3 +--
+ arch/s390/kernel/syscalls/Makefile | 12 +++---------
+ arch/s390/tools/Makefile           |  7 ++-----
+ scripts/Kbuild.include             |  8 ++++----
+ scripts/kconfig/Makefile           |  4 +---
+ 6 files changed, 12 insertions(+), 26 deletions(-)
 
-
-> ---
->
->  Makefile | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 437d603..1ebf5ed 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1131,8 +1131,7 @@ define filechk_utsrelease.h
->  endef
->
->  define filechk_version.h
-> -       echo \#define LINUX_VERSION_CODE $(shell                         \
-> -       expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 0$(SUBLEVEL)); \
-> +       echo '#define LINUX_VERSION_CODE KERNEL_VERSION($(VERSION), $(PATCHLEVEL), $(SUBLEVEL))'; \
->         echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))'
->  endef
->
-> --
-> 2.7.4
->
-
-
+diff --git a/Kbuild b/Kbuild
+index 06b801e..65db5be 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -26,9 +26,7 @@ timeconst-file := include/generated/timeconst.h
+ 
+ targets += $(timeconst-file)
+ 
+-define filechk_gentimeconst
+-	echo $(CONFIG_HZ) | bc -q $<
+-endef
++filechk_gentimeconst = echo $(CONFIG_HZ) | bc -q $<
+ 
+ $(timeconst-file): kernel/time/timeconst.bc FORCE
+ 	$(call filechk,gentimeconst)
+diff --git a/Makefile b/Makefile
+index 62c9890..39355d1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1041,9 +1041,8 @@ PHONY += $(vmlinux-dirs)
+ $(vmlinux-dirs): prepare
+ 	$(Q)$(MAKE) $(build)=$@ need-builtin=1
+ 
+-define filechk_kernel.release
++filechk_kernel.release = \
+ 	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
+-endef
+ 
+ # Store (new) KERNELRELEASE string in include/config/kernel.release
+ include/config/kernel.release: $(srctree)/Makefile FORCE
+diff --git a/arch/s390/kernel/syscalls/Makefile b/arch/s390/kernel/syscalls/Makefile
+index 4d929ed..b98f250 100644
+--- a/arch/s390/kernel/syscalls/Makefile
++++ b/arch/s390/kernel/syscalls/Makefile
+@@ -24,17 +24,11 @@ uapi:	$(uapi-hdrs-y)
+ _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)') \
+ 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
+ 
+-define filechk_syshdr
+-	$(CONFIG_SHELL) '$(systbl)' -H -a $(syshdr_abi_$(basetarget)) -f "$2" < $<
+-endef
++filechk_syshdr = $(CONFIG_SHELL) '$(systbl)' -H -a $(syshdr_abi_$(basetarget)) -f "$2" < $<
+ 
+-define filechk_sysnr
+-	$(CONFIG_SHELL) '$(systbl)' -N -a $(sysnr_abi_$(basetarget)) < $<
+-endef
++filechk_sysnr = $(CONFIG_SHELL) '$(systbl)' -N -a $(sysnr_abi_$(basetarget)) < $<
+ 
+-define filechk_syscalls
+-	$(CONFIG_SHELL) '$(systbl)' -S < $<
+-endef
++filechk_syscalls = $(CONFIG_SHELL) '$(systbl)' -S < $<
+ 
+ syshdr_abi_unistd_32 := common,32
+ $(uapi)/unistd_32.h: $(syscall) FORCE
+diff --git a/arch/s390/tools/Makefile b/arch/s390/tools/Makefile
+index cf4846a..2342b84 100644
+--- a/arch/s390/tools/Makefile
++++ b/arch/s390/tools/Makefile
+@@ -20,13 +20,10 @@ HOSTCFLAGS_gen_opcode_table.o += -Wall $(LINUXINCLUDE)
+ # Ensure output directory exists
+ _dummy := $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
+ 
+-define filechk_facility-defs.h
+-	$(obj)/gen_facilities
+-endef
++filechk_facility-defs.h = $(obj)/gen_facilities
+ 
+-define filechk_dis-defs.h
++filechk_dis-defs.h = \
+ 	$(obj)/gen_opcode_table < $(srctree)/arch/$(ARCH)/tools/opcodes.txt
+-endef
+ 
+ $(kapi)/facility-defs.h: $(obj)/gen_facilities FORCE
+ 	$(call filechk,facility-defs.h)
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 74a3fe7..525bff6 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -41,11 +41,11 @@ kecho := $($(quiet)kecho)
+ ###
+ # filechk is used to check if the content of a generated file is updated.
+ # Sample usage:
+-# define filechk_sample
+-#	echo $KERNELRELEASE
+-# endef
+-# version.h : Makefile
++#
++# filechk_sample = echo $(KERNELRELEASE)
++# version.h: FORCE
+ #	$(call filechk,sample)
++#
+ # The rule defined shall write to stdout the content of the new file.
+ # The existing file will be compared with the new one.
+ # - If no file exist it is created
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index ec204fa..679e62e 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -201,9 +201,7 @@ HOSTCFLAGS_gconf.o  = $(shell . $(obj)/.gconf-cfg && echo $$cflags)
+ $(obj)/gconf.o: $(obj)/.gconf-cfg
+ 
+ # check if necessary packages are available, and configure build flags
+-define filechk_conf_cfg
+-	$(CONFIG_SHELL) $<
+-endef
++filechk_conf_cfg = $(CONFIG_SHELL) $<
+ 
+ $(obj)/.%conf-cfg: $(src)/%conf-cfg.sh FORCE
+ 	$(call filechk,conf_cfg)
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
