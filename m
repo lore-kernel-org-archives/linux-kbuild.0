@@ -1,145 +1,143 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:41567 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726049AbfACBRR (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:54038 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726830AbfACBdD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Jan 2019 20:17:17 -0500
+        Wed, 2 Jan 2019 20:33:03 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: use assignment instead of define ... endef for filechk_* rules
-Date: Thu,  3 Jan 2019 10:16:54 +0900
-Message-Id: <1546478214-20394-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2] kbuild: remove unnecessary in-subshell execution
+Date: Thu,  3 Jan 2019 10:32:38 +0900
+Message-Id: <1546479159-7611-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-s390@vger.kernel.org, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-You do not have to use define ... endef for filechk_* rules.
-
-For simple cases, the use of assignment looks cleaner, IMHO.
-
-I updated the usage for scripts/Kbuild.include in case somebody
-misunderstands the 'define ... endif' is the requirement.
+The commands surrounded by ( ) are executed in a subshell, but in
+most cases, we do not need to spawn an extra subshell.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Kbuild                             |  4 +---
- Makefile                           |  3 +--
- arch/s390/kernel/syscalls/Makefile | 12 +++---------
- arch/s390/tools/Makefile           |  7 ++-----
- scripts/Kbuild.include             |  8 ++++----
- scripts/kconfig/Makefile           |  4 +---
- 6 files changed, 12 insertions(+), 26 deletions(-)
+Changes in v2:
+ - fix build error of CONFIG_MODVERSIONS
 
-diff --git a/Kbuild b/Kbuild
-index 06b801e..65db5be 100644
---- a/Kbuild
-+++ b/Kbuild
-@@ -26,9 +26,7 @@ timeconst-file := include/generated/timeconst.h
+ scripts/Makefile.build |  4 ++--
+ scripts/Makefile.lib   | 28 ++++++++++++++--------------
+ scripts/mkcompile_h    |  4 ++--
+ 3 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index fd03d60..778e4fb 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -312,11 +312,11 @@ $(real-obj-m:.o=.s): modkern_aflags := $(KBUILD_AFLAGS_MODULE) $(AFLAGS_MODULE)
+ #
+ # These mirror gensymtypes_c and co above, keep them in synch.
+ cmd_gensymtypes_S =                                                         \
+-    (echo "\#include <linux/kernel.h>" ;                                    \
++   { echo "\#include <linux/kernel.h>" ;                                    \
+      echo "\#include <asm/asm-prototypes.h>" ;                              \
+     $(CPP) $(a_flags) $< |                                                  \
+      grep "\<___EXPORT_SYMBOL\>" |                                          \
+-     sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ) | \
++     sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ; } | \
+     $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
+     $(GENKSYMS) $(if $(1), -T $(2))                                         \
+      $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 12b88d0..b44ae6c 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -270,7 +270,7 @@ DTC_FLAGS += $(DTC_FLAGS_$(basetarget))
+ # Generate an assembly file to wrap the output of the device tree compiler
+ quiet_cmd_dt_S_dtb= DTB     $@
+ cmd_dt_S_dtb=						\
+-(							\
++{							\
+ 	echo '\#include <asm-generic/vmlinux.lds.h>'; 	\
+ 	echo '.section .dtb.init.rodata,"a"';		\
+ 	echo '.balign STRUCT_ALIGNMENT';		\
+@@ -280,7 +280,7 @@ cmd_dt_S_dtb=						\
+ 	echo '__dtb_$(subst -,_,$(*F))_end:';		\
+ 	echo '.global __dtb_$(subst -,_,$(*F))_end';	\
+ 	echo '.balign STRUCT_ALIGNMENT'; 		\
+-) > $@
++} > $@
  
- targets += $(timeconst-file)
+ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
+ 	$(call if_changed,dt_S_dtb)
+@@ -334,23 +334,23 @@ printf "%08x\n" $$dec_size |						\
+ )
  
--define filechk_gentimeconst
--	echo $(CONFIG_HZ) | bc -q $<
--endef
-+filechk_gentimeconst = echo $(CONFIG_HZ) | bc -q $<
+ quiet_cmd_bzip2 = BZIP2   $@
+-cmd_bzip2 = (cat $(filter-out FORCE,$^) | \
+-	bzip2 -9 && $(call size_append, $(filter-out FORCE,$^))) > $@
++      cmd_bzip2 = cat $(filter-out FORCE,$^) | \
++	bzip2 -9 && $(call size_append, $(filter-out FORCE,$^)) > $@
  
- $(timeconst-file): kernel/time/timeconst.bc FORCE
- 	$(call filechk,gentimeconst)
-diff --git a/Makefile b/Makefile
-index 62c9890..39355d1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1041,9 +1041,8 @@ PHONY += $(vmlinux-dirs)
- $(vmlinux-dirs): prepare
- 	$(Q)$(MAKE) $(build)=$@ need-builtin=1
+ # Lzma
+ # ---------------------------------------------------------------------------
  
--define filechk_kernel.release
-+filechk_kernel.release = \
- 	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
--endef
+ quiet_cmd_lzma = LZMA    $@
+-cmd_lzma = (cat $(filter-out FORCE,$^) | \
+-	lzma -9 && $(call size_append, $(filter-out FORCE,$^))) > $@
++      cmd_lzma = cat $(filter-out FORCE,$^) | \
++	lzma -9 && $(call size_append, $(filter-out FORCE,$^)) > $@
  
- # Store (new) KERNELRELEASE string in include/config/kernel.release
- include/config/kernel.release: $(srctree)/Makefile FORCE
-diff --git a/arch/s390/kernel/syscalls/Makefile b/arch/s390/kernel/syscalls/Makefile
-index 4d929ed..b98f250 100644
---- a/arch/s390/kernel/syscalls/Makefile
-+++ b/arch/s390/kernel/syscalls/Makefile
-@@ -24,17 +24,11 @@ uapi:	$(uapi-hdrs-y)
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)') \
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
+ quiet_cmd_lzo = LZO     $@
+-cmd_lzo = (cat $(filter-out FORCE,$^) | \
+-	lzop -9 && $(call size_append, $(filter-out FORCE,$^))) > $@
++      cmd_lzo = cat $(filter-out FORCE,$^) | \
++	lzop -9 && $(call size_append, $(filter-out FORCE,$^)) > $@
  
--define filechk_syshdr
--	$(CONFIG_SHELL) '$(systbl)' -H -a $(syshdr_abi_$(basetarget)) -f "$2" < $<
--endef
-+filechk_syshdr = $(CONFIG_SHELL) '$(systbl)' -H -a $(syshdr_abi_$(basetarget)) -f "$2" < $<
+ quiet_cmd_lz4 = LZ4     $@
+-cmd_lz4 = (cat $(filter-out FORCE,$^) | \
+-	lz4c -l -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@
++      cmd_lz4 = cat $(filter-out FORCE,$^) | \
++	lz4c -l -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^)) > $@
  
--define filechk_sysnr
--	$(CONFIG_SHELL) '$(systbl)' -N -a $(sysnr_abi_$(basetarget)) < $<
--endef
-+filechk_sysnr = $(CONFIG_SHELL) '$(systbl)' -N -a $(sysnr_abi_$(basetarget)) < $<
+ # U-Boot mkimage
+ # ---------------------------------------------------------------------------
+@@ -392,13 +392,13 @@ quiet_cmd_uimage = UIMAGE  $@
+ # big dictionary would increase the memory usage too much in the multi-call
+ # decompression mode. A BCJ filter isn't used either.
+ quiet_cmd_xzkern = XZKERN  $@
+-cmd_xzkern = (cat $(filter-out FORCE,$^) | \
++      cmd_xzkern = cat $(filter-out FORCE,$^) | \
+ 	sh $(srctree)/scripts/xz_wrap.sh && \
+-	$(call size_append, $(filter-out FORCE,$^))) > $@
++	$(call size_append, $(filter-out FORCE,$^)) > $@
  
--define filechk_syscalls
--	$(CONFIG_SHELL) '$(systbl)' -S < $<
--endef
-+filechk_syscalls = $(CONFIG_SHELL) '$(systbl)' -S < $<
+ quiet_cmd_xzmisc = XZMISC  $@
+-cmd_xzmisc = (cat $(filter-out FORCE,$^) | \
+-	xz --check=crc32 --lzma2=dict=1MiB) > $@
++      cmd_xzmisc = cat $(filter-out FORCE,$^) | \
++	xz --check=crc32 --lzma2=dict=1MiB > $@
  
- syshdr_abi_unistd_32 := common,32
- $(uapi)/unistd_32.h: $(syscall) FORCE
-diff --git a/arch/s390/tools/Makefile b/arch/s390/tools/Makefile
-index cf4846a..2342b84 100644
---- a/arch/s390/tools/Makefile
-+++ b/arch/s390/tools/Makefile
-@@ -20,13 +20,10 @@ HOSTCFLAGS_gen_opcode_table.o += -Wall $(LINUXINCLUDE)
- # Ensure output directory exists
- _dummy := $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
+ # ASM offsets
+ # ---------------------------------------------------------------------------
+diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+index 87f1fc9..2339f86 100755
+--- a/scripts/mkcompile_h
++++ b/scripts/mkcompile_h
+@@ -62,7 +62,7 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
  
--define filechk_facility-defs.h
--	$(obj)/gen_facilities
--endef
-+filechk_facility-defs.h = $(obj)/gen_facilities
+ # Generate a temporary compile.h
  
--define filechk_dis-defs.h
-+filechk_dis-defs.h = \
- 	$(obj)/gen_opcode_table < $(srctree)/arch/$(ARCH)/tools/opcodes.txt
--endef
+-( echo /\* This file is auto generated, version $VERSION \*/
++{ echo /\* This file is auto generated, version $VERSION \*/
+   if [ -n "$CONFIG_FLAGS" ] ; then echo "/* $CONFIG_FLAGS */"; fi
  
- $(kapi)/facility-defs.h: $(obj)/gen_facilities FORCE
- 	$(call filechk,facility-defs.h)
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 74a3fe7..525bff6 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -41,11 +41,11 @@ kecho := $($(quiet)kecho)
- ###
- # filechk is used to check if the content of a generated file is updated.
- # Sample usage:
--# define filechk_sample
--#	echo $KERNELRELEASE
--# endef
--# version.h : Makefile
-+#
-+# filechk_sample = echo $(KERNELRELEASE)
-+# version.h: FORCE
- #	$(call filechk,sample)
-+#
- # The rule defined shall write to stdout the content of the new file.
- # The existing file will be compared with the new one.
- # - If no file exist it is created
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index ec204fa..679e62e 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -201,9 +201,7 @@ HOSTCFLAGS_gconf.o  = $(shell . $(obj)/.gconf-cfg && echo $$cflags)
- $(obj)/gconf.o: $(obj)/.gconf-cfg
+   echo \#define UTS_MACHINE \"$ARCH\"
+@@ -73,7 +73,7 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
+   echo \#define LINUX_COMPILE_HOST \"`echo $LINUX_COMPILE_HOST | $UTS_TRUNCATE`\"
  
- # check if necessary packages are available, and configure build flags
--define filechk_conf_cfg
--	$(CONFIG_SHELL) $<
--endef
-+filechk_conf_cfg = $(CONFIG_SHELL) $<
+   echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | grep ' version ' | sed 's/[[:space:]]*$//'`\"
+-) > .tmpcompile
++} > .tmpcompile
  
- $(obj)/.%conf-cfg: $(src)/%conf-cfg.sh FORCE
- 	$(call filechk,conf_cfg)
+ # Only replace the real compile.h if the new one is different,
+ # in order to preserve the timestamp and avoid unnecessary
 -- 
 2.7.4
