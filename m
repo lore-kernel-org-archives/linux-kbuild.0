@@ -1,64 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:19857 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727237AbfACAgb (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:24280 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729155AbfACBL0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Jan 2019 19:36:31 -0500
-MIME-Version: 1.0
-References: <CA+icZUU=1S0Xg3+zWNU-60eknfWyL2kjEPm2BNNTK8Eu-tkTEg@mail.gmail.com>
-In-Reply-To: <CA+icZUU=1S0Xg3+zWNU-60eknfWyL2kjEPm2BNNTK8Eu-tkTEg@mail.gmail.com>
+        Wed, 2 Jan 2019 20:11:26 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 3 Jan 2019 09:35:49 +0900
-Message-ID: <CAK7LNASWScb7Qt0kmV8RyBdix2GPA24gv=eRNYVWu5dGGePbfQ@mail.gmail.com>
-Subject: Re: jump_label: move 'asm goto' support test to Kconfig
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 1/5] riscv: remove redundant kernel-space generic-y
+Date: Thu,  3 Jan 2019 10:10:36 +0900
+Message-Id: <1546477840-14278-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, "David S . Miller" <davem@davemloft.net>, Max Filippov <jcmvbkbc@gmail.com>, linux-arch <linux-arch@vger.kernel.org>, linux-xtensa@linux-xtensa.org, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, X86 ML <x86@kernel.org>, linux-s390 <linux-s390@vger.kernel.org>, sparclinux <sparclinux@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-On Wed, Jan 2, 2019 at 9:14 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
->
-> Hi,
->
-> I was not aware that CONFIG_JUMP_LABEL Kconfig setting depends on the
-> support of asm-goto.
->
-> Currently, I am doing experiments with clang-7 and a snapshot of
-> clang-8 on Linux/x86.
-> These compilers have no asm-goto support.
->
-> What is your recommendation for Linux >= v4.20?
-> I am asking as it is possible to set CONFIG_JUMP_LABEL=y when
-> compiling with clang - which has no effect.
-> This is confusing.
->
-> Thanks, this patch makes things clearer and protects users from
-> setting "wrong" in the sense of non-functional settings.
->
-> I have tested this against recent Linus tree where kbuild/kconfig Git
-> pulls were latest commits.
->
-> Tested-by: Sedat Dilek <sedat.dilek@gmail.com> [ x86 with LLVM/Clang
-> v7 and v8 (snapshot) ]
+This commit removes redundant generic-y defines in
+arch/riscv/include/asm/Kbuild.
 
+[1] It is redundant to define the same generic-y in both
+    arch/$(ARCH)/include/asm/Kbuild and
+    arch/$(ARCH)/include/uapi/asm/Kbuild.
 
-Which part was tested?
+    Remove the following generic-y:
 
-x86 kernel cannot be compiled with Clang
-since it lacks the asm-goto support.
+      errno.h
+      fcntl.h
+      ioctl.h
+      ioctls.h
+      ipcbuf.h
+      mman.h
+      msgbuf.h
+      param.h
+      poll.h
+      posix_types.h
+      resource.h
+      sembuf.h
+      setup.h
+      shmbuf.h
+      signal.h
+      socket.h
+      sockios.h
+      stat.h
+      statfs.h
+      swab.h
+      termbits.h
+      termios.h
+      types.h
 
+[2] It is redundant to define generic-y when arch-specific
+    implementation exists in arch/$(ARCH)/include/asm/*.h
 
-$ make CC=clang
-Compiler lacks asm-goto support.
-arch/x86/Makefile:293: recipe for target 'checkbin' failed
-make: *** [checkbin] Error 1
+    Remove the following generic-y:
 
+      cacheflush.h
+      module.h
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+Changes in v2:
+  - rebase on Linus' tree
 
+ arch/riscv/include/asm/Kbuild | 25 -------------------------
+ 1 file changed, 25 deletions(-)
 
-
+diff --git a/arch/riscv/include/asm/Kbuild b/arch/riscv/include/asm/Kbuild
+index 6a646d9..cccd12c 100644
+--- a/arch/riscv/include/asm/Kbuild
++++ b/arch/riscv/include/asm/Kbuild
+@@ -1,5 +1,4 @@
+ generic-y += bugs.h
+-generic-y += cacheflush.h
+ generic-y += checksum.h
+ generic-y += compat.h
+ generic-y += cputime.h
+@@ -9,16 +8,11 @@ generic-y += dma.h
+ generic-y += dma-contiguous.h
+ generic-y += dma-mapping.h
+ generic-y += emergency-restart.h
+-generic-y += errno.h
+ generic-y += exec.h
+ generic-y += fb.h
+-generic-y += fcntl.h
+ generic-y += hardirq.h
+ generic-y += hash.h
+ generic-y += hw_irq.h
+-generic-y += ioctl.h
+-generic-y += ioctls.h
+-generic-y += ipcbuf.h
+ generic-y += irq_regs.h
+ generic-y += irq_work.h
+ generic-y += kdebug.h
+@@ -27,34 +21,15 @@ generic-y += kvm_para.h
+ generic-y += local.h
+ generic-y += local64.h
+ generic-y += mm-arch-hooks.h
+-generic-y += mman.h
+-generic-y += module.h
+-generic-y += msgbuf.h
+ generic-y += mutex.h
+-generic-y += param.h
+ generic-y += percpu.h
+-generic-y += poll.h
+-generic-y += posix_types.h
+ generic-y += preempt.h
+-generic-y += resource.h
+ generic-y += scatterlist.h
+ generic-y += sections.h
+-generic-y += sembuf.h
+ generic-y += serial.h
+-generic-y += setup.h
+-generic-y += shmbuf.h
+ generic-y += shmparam.h
+-generic-y += signal.h
+-generic-y += socket.h
+-generic-y += sockios.h
+-generic-y += stat.h
+-generic-y += statfs.h
+-generic-y += swab.h
+-generic-y += termbits.h
+-generic-y += termios.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+-generic-y += types.h
+ generic-y += unaligned.h
+ generic-y += user.h
+ generic-y += vga.h
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
