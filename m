@@ -1,100 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:24316 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729232AbfACBLc (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:24115 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726049AbfACBPU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Jan 2019 20:11:32 -0500
+        Wed, 2 Jan 2019 20:15:20 -0500
+MIME-Version: 1.0
+References: <1546244651-10447-1-git-send-email-yamada.masahiro@socionext.com> <1546244651-10447-4-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1546244651-10447-4-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 3/5] kbuild: generate asm-generic wrappers if mandatory headers are missing
-Date: Thu,  3 Jan 2019 10:10:38 +0900
-Message-Id: <1546477840-14278-3-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1546477840-14278-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1546477840-14278-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Thu, 3 Jan 2019 10:14:30 +0900
+Message-ID: <CAK7LNAThpS+W_aUr3V9EN7V5A67mjvhOWAU1XZGDvS4ByBfeVg@mail.gmail.com>
+Subject: Re: [PATCH 4/4] kbuild: make LINUX_VERSION_CODE in <linux/version.h>
+ more readable
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Some time ago, Sam pointed out a certain degree of overwrap between
-generic-y and mandatory-y. (https://lkml.org/lkml/2017/7/10/121)
+On Mon, Dec 31, 2018 at 5:25 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> Makefile does not need to calculate LINUX_VERSION_CODE.
+> Let's leave it to the preprocessor.
+>
+> This commit changes include/generated/uapi/linux/version.h as follows:
+>
+> Before:
+>
+>   #define LINUX_VERSION_CODE 267264
+>   #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+>
+> After:
+>
+>   #define LINUX_VERSION_CODE KERNEL_VERSION(4, 20, 0)
+>   #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+>
+> The latter is more human-readable in my opinion.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-I tweaked the meaning of mandatory-y a little bit; now it defines the
-minimum set of ASM headers that all architectures must have.
 
-If arch does not have specific implementation of a mandatory header,
-Kbuild will let it fallback to the asm-generic one by automatically
-generating a wrapper. This will allow to drop lots of redundant
-generic-y defines.
+I retract this patch
+because it would cause a build error.
 
-Previously, "mandatory" was used in the context of UAPI, but I guess
-this can be extended to kernel space ASM headers.
 
-Suggested-by: Sam Ravnborg <sam@ravnborg.org>
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
----
 
-Changes in v2:
-  - Filter-out $(generiated-y) from $(mandatory-y) because
-    ARCH may generate mandatory headers by other means
 
- Documentation/kbuild/makefiles.txt | 9 ++++++---
- scripts/Makefile.asm-generic       | 4 ++++
- scripts/Makefile.headersinst       | 7 -------
- 3 files changed, 10 insertions(+), 10 deletions(-)
+> ---
+>
+>  Makefile | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 437d603..1ebf5ed 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1131,8 +1131,7 @@ define filechk_utsrelease.h
+>  endef
+>
+>  define filechk_version.h
+> -       echo \#define LINUX_VERSION_CODE $(shell                         \
+> -       expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 0$(SUBLEVEL)); \
+> +       echo '#define LINUX_VERSION_CODE KERNEL_VERSION($(VERSION), $(PATCHLEVEL), $(SUBLEVEL))'; \
+>         echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))'
+>  endef
+>
+> --
+> 2.7.4
+>
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 8da26c6..bf28c47 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -1296,9 +1296,12 @@ See subsequent chapter for the syntax of the Kbuild file.
- 
- --- 7.4 mandatory-y
- 
--	mandatory-y is essentially used by include/uapi/asm-generic/Kbuild.asm
--	to define the minimum set of headers that must be exported in
--	include/asm.
-+	mandatory-y is essentially used by include/(uapi/)asm-generic/Kbuild.asm
-+	to define the minimum set of ASM headers that all architectures must have.
-+
-+	This works like optional generic-y. If a mandatory header is missing
-+	in arch/$(ARCH)/include/(uapi/)/asm, Kbuild will automatically generate
-+	a wrapper of the asm-generic one.
- 
- 	The convention is to list one subdir per line and
- 	preferably in alphabetic order.
-diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
-index 760323e..a62d282 100644
---- a/scripts/Makefile.asm-generic
-+++ b/scripts/Makefile.asm-generic
-@@ -14,6 +14,10 @@ src := $(subst /generated,,$(obj))
- 
- include scripts/Kbuild.include
- 
-+# If arch does not implement mandatory headers, fallback to asm-generic ones.
-+mandatory-y := $(filter-out $(generated-y), $(mandatory-y))
-+generic-y   += $(foreach f, $(mandatory-y), $(if $(wildcard $(srctree)/$(src)/$(f)),,$(f)))
-+
- generic-y   := $(addprefix $(obj)/, $(generic-y))
- generated-y := $(addprefix $(obj)/, $(generated-y))
- 
-diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-index 45927fc..3d1ebaa 100644
---- a/scripts/Makefile.headersinst
-+++ b/scripts/Makefile.headersinst
-@@ -56,13 +56,6 @@ check-file    := $(installdir)/.check
- all-files     := $(header-files) $(genhdr-files)
- output-files  := $(addprefix $(installdir)/, $(all-files))
- 
--ifneq ($(mandatory-y),)
--missing       := $(filter-out $(all-files),$(mandatory-y))
--ifneq ($(missing),)
--$(error Some mandatory headers ($(missing)) are missing in $(obj))
--endif
--endif
--
- # Work out what needs to be removed
- oldheaders    := $(patsubst $(installdir)/%,%,$(wildcard $(installdir)/*.h))
- unwanted      := $(filter-out $(all-files),$(oldheaders))
+
 -- 
-2.7.4
+Best Regards
+Masahiro Yamada
