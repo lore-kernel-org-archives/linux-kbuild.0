@@ -1,80 +1,131 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:40897 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726332AbfACSqc (ORCPT
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:44709 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726069AbfADNQJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 3 Jan 2019 13:46:32 -0500
-Received: by mail-pg1-f196.google.com with SMTP id z10so16351758pgp.7
-        for <linux-kbuild@vger.kernel.org>; Thu, 03 Jan 2019 10:46:31 -0800 (PST)
+        Fri, 4 Jan 2019 08:16:09 -0500
 MIME-Version: 1.0
-References: <cover.1546450432.git.andreyknvl@google.com> <b16c90197bb2c06c780e6e981c40345e03fda465.1546450432.git.andreyknvl@google.com>
- <20190102121436.5c2b72d1b0ec49affadc9692@linux-foundation.org>
-In-Reply-To: <20190102121436.5c2b72d1b0ec49affadc9692@linux-foundation.org>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Thu, 3 Jan 2019 19:46:20 +0100
-Message-ID: <CAAeHK+yE38g0dSbL7LiVPSgECgdcJ5w7+kwaiBaRYr5YkHtbjQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] kasan, arm64: use ARCH_SLAB_MINALIGN instead of
- manual aligning
+References: <20180413090351.25662-1-anders.roxell@linaro.org>
+ <20180607110911.12252-1-anders.roxell@linaro.org> <CADYN=9J=hSFb2wCZ1+dXL=023p9y05MEGUPvH48WfPX7XDZvwQ@mail.gmail.com>
+ <f222aa8d-88b8-140c-30ed-83fd908bfd09@kernel.org> <CADYN=9LSA60E4mFwrbeY-RGi4kZV6hO0ygz0-C6QB3+KKaoxQg@mail.gmail.com>
+ <3f332e65-0b33-9952-6aba-f9c8953a1f26@kernel.org> <CAK7LNAQ6hNmjmZc8J54KWCtR6x4Megn3mbdzprGgSZL5Zk9GCg@mail.gmail.com>
+ <CADYN=9+mrrNN3m5FNCfiNC1ENe-aViYuGvmKsFOYdqMC2hMfAg@mail.gmail.com>
+In-Reply-To: <CADYN=9+mrrNN3m5FNCfiNC1ENe-aViYuGvmKsFOYdqMC2hMfAg@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 4 Jan 2019 14:15:55 +0100
+Message-ID: <CAMuHMdXeA0XBv-OTvcChCs3CHszkNB15R0FpOXMgQfjpfDcs-g@mail.gmail.com>
+Subject: Re: [PATCH v4] selftests: add headers_install to lib.mk
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, kasan-dev <kasan-dev@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-sparse@vger.kernel.org, Linux Memory Management List <linux-mm@kvack.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>
+To: Anders Roxell <anders.roxell@linaro.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Shuah Khan <shuah@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Bamvor Zhang <bamv2005@gmail.com>, Bartosz Golaszewski <brgl@bgdev.pl>, Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Andrea Arcangeli <aarcange@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Networking <netdev@vger.kernel.org>
 
-On Wed, Jan 2, 2019 at 9:14 PM Andrew Morton <akpm@linux-foundation.org> wrote:
->
-> On Wed,  2 Jan 2019 18:36:06 +0100 Andrey Konovalov <andreyknvl@google.com> wrote:
->
-> > Instead of changing cache->align to be aligned to KASAN_SHADOW_SCALE_SIZE
-> > in kasan_cache_create() we can reuse the ARCH_SLAB_MINALIGN macro.
-> >
-> > ...
-> >
-> > --- a/arch/arm64/include/asm/kasan.h
-> > +++ b/arch/arm64/include/asm/kasan.h
-> > @@ -36,6 +36,10 @@
-> >  #define KASAN_SHADOW_OFFSET     (KASAN_SHADOW_END - (1ULL << \
-> >                                       (64 - KASAN_SHADOW_SCALE_SHIFT)))
-> >
-> > +#ifdef CONFIG_KASAN_SW_TAGS
-> > +#define ARCH_SLAB_MINALIGN   (1ULL << KASAN_SHADOW_SCALE_SHIFT)
-> > +#endif
-> > +
-> >  void kasan_init(void);
-> >  void kasan_copy_shadow(pgd_t *pgdir);
-> >  asmlinkage void kasan_early_init(void);
-> > diff --git a/include/linux/slab.h b/include/linux/slab.h
-> > index 11b45f7ae405..d87f913ab4e8 100644
-> > --- a/include/linux/slab.h
-> > +++ b/include/linux/slab.h
-> > @@ -16,6 +16,7 @@
-> >  #include <linux/overflow.h>
-> >  #include <linux/types.h>
-> >  #include <linux/workqueue.h>
-> > +#include <linux/kasan.h>
-> >
->
-> This still seems unadvisable.  Like other architectures, arm defines
-> ARCH_SLAB_MINALIGN in arch/arm/include/asm/cache.h.
-> arch/arm/include/asm64/cache.h doesn't define ARCH_SLAB_MINALIGN
-> afaict.
->
-> If arch/arm/include/asm64/cache.h later gets a definition of
-> ARCH_SLAB_MINALIGN then we again face the risk that different .c files
-> will see different values of ARCH_SLAB_MINALIGN depending on which
-> headers they include.
->
-> So what to say about this?  The architecture's ARCH_SLAB_MINALIGN
-> should be defined in the architecture's cache.h, end of story.  Not in
-> slab.h, not in kasan.h.
+Hi Anders,
 
-Done in v3, thanks!
+On Wed, Aug 8, 2018 at 12:46 PM Anders Roxell <anders.roxell@linaro.org> wrote:
+> On Tue, 7 Aug 2018 at 04:33, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> > 2018-08-07 2:03 GMT+09:00 Shuah Khan <shuah@kernel.org>:
+> > > On 07/25/2018 10:08 AM, Anders Roxell wrote:
+> > >> On Tue, 24 Jul 2018 at 19:11, Shuah Khan <shuah@kernel.org> wrote:
+> > >>> On 07/23/2018 02:49 PM, Anders Roxell wrote:
+> > >>>> On Thu, 7 Jun 2018 at 13:09, Anders Roxell <anders.roxell@linaro.org> wrote:
+> > >>>>>
+> > >>>>> If the kernel headers aren't installed we can't build all the tests.
+> > >>>>> Add a new make target rule 'khdr' in the file lib.mk to generate the
+> > >>>>> kernel headers and that gets include for every test-dir Makefile that
+> > >>>>> includes lib.mk If the testdir in turn have its own sub-dirs the
+> > >>>>> top_srcdir needs to be set to the linux-rootdir to be able to generate
+> > >>>>> the kernel headers.
+> > >>>>>
+> > >>>>> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+> > >>>>> Reviewed-by: Fathi Boudra <fathi.boudra@linaro.org>
+> > >>>>> ---
+> > >>>>>  Makefile                                           | 14 +-------------
+> > >>>>>  scripts/subarch.include                            | 13 +++++++++++++
+> > >>>>>  tools/testing/selftests/android/Makefile           |  2 +-
+> > >>>>>  tools/testing/selftests/android/ion/Makefile       |  2 ++
+> > >>>>>  tools/testing/selftests/futex/functional/Makefile  |  1 +
+> > >>>>>  tools/testing/selftests/gpio/Makefile              |  7 ++-----
+> > >>>>>  tools/testing/selftests/kvm/Makefile               |  7 ++-----
+> > >>>>>  tools/testing/selftests/lib.mk                     | 12 ++++++++++++
+> > >>>>>  tools/testing/selftests/net/Makefile               |  1 +
+> > >>>>>  .../selftests/networking/timestamping/Makefile     |  1 +
+> > >>>>>  tools/testing/selftests/vm/Makefile                |  4 ----
+> > >>>>>  11 files changed, 36 insertions(+), 28 deletions(-)
+> > >>>>>  create mode 100644 scripts/subarch.include
+> > >>>>>
+> > >>>>> diff --git a/Makefile b/Makefile
+> > >>>>> index 6b9aea95ae3a..8050072300fa 100644
+> > >>>>> --- a/Makefile
+> > >>>>> +++ b/Makefile
+> > >>>>> @@ -286,19 +286,7 @@ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+> > >>>>>  KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+> > >>>>>  export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
+> > >>>>>
+> > >>>>> -# SUBARCH tells the usermode build what the underlying arch is.  That is set
+> > >>>>> -# first, and if a usermode build is happening, the "ARCH=um" on the command
+> > >>>>> -# line overrides the setting of ARCH below.  If a native build is happening,
+> > >>>>> -# then ARCH is assigned, getting whatever value it gets normally, and
+> > >>>>> -# SUBARCH is subsequently ignored.
+> > >>>>> -
+> > >>>>> -SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+> > >>>>> -                                 -e s/sun4u/sparc64/ \
+> > >>>>> -                                 -e s/arm.*/arm/ -e s/sa110/arm/ \
+> > >>>>> -                                 -e s/s390x/s390/ -e s/parisc64/parisc/ \
+> > >>>>> -                                 -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
+> > >>>>> -                                 -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ \
+> > >>>>> -                                 -e s/riscv.*/riscv/)
+> > >>>>> +include scripts/subarch.include
+> > >>>
+> > >>> What is the reason for this SUBARCH block move to to scripts/subarch.include?
+> > >>> Is this necessary for adding headers install dependency to lib.mk?
+> > >>
+> > >> This is needed to create headers for cross build.
+> > >
+> > > I am sorry for the delay on this patch. I am going to get this into 4.19.
+> > > If anybody has objections, please let me.
+> > >
+> > > Anders! Will be able to rebase the patch and send me the latest. I think
+> > > I have Acks from kvm, android, and vm so far.
+> >
+> > I may be missing something about the tools/ directory,
+> > but why isn't it like this?
+> >
+> >
+> > kselftest: headers_install
+> >         $(Q)$(MAKE) -C $(srctree)/tools/testing/selftests run_tests
+>
+> That wont work if you cross compile, since you wont run the tests
+> where you build them.
 
->
->
-> --
-> You received this message because you are subscribed to the Google Groups "kasan-dev" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to kasan-dev+unsubscribe@googlegroups.com.
-> To post to this group, send email to kasan-dev@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/kasan-dev/20190102121436.5c2b72d1b0ec49affadc9692%40linux-foundation.org.
-> For more options, visit https://groups.google.com/d/optout.
+So why does a similar dependency work for samples in the main Makefile
+(even listed twice!)?
+
+    Documentation/ samples/: headers_install
+
+    samples: headers_install
+
+Or perhaps this also doesn't work?
+
+> Then you can argue that we should break it up in a build and run rule.
+> However, my understanding how people just build and run the the tests
+> for that particular subsystem that they develop for, like:
+> make -C tools/testing/selftests/<subsystem>/
+
+I'm still a bit puzzled: how can you "build and run" the tests when
+cross-compiling, as you don't run the tests where you build them?
+
+Thanks!
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
