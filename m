@@ -1,75 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:40903 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726354AbfAESfp (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:43041 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726296AbfAEUjL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 5 Jan 2019 13:35:45 -0500
-Received: by mail-lf1-f65.google.com with SMTP id v5so27502394lfe.7
-        for <linux-kbuild@vger.kernel.org>; Sat, 05 Jan 2019 10:35:42 -0800 (PST)
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com. [209.85.208.178])
-        by smtp.gmail.com with ESMTPSA id p21sm11818496lfj.10.2019.01.05.10.35.40
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 05 Jan 2019 10:35:40 -0800 (PST)
-Received: by mail-lj1-f178.google.com with SMTP id t18-v6so34986554ljd.4
-        for <linux-kbuild@vger.kernel.org>; Sat, 05 Jan 2019 10:35:40 -0800 (PST)
-MIME-Version: 1.0
-References: <CAK7LNAQzEHv7Y69xFTPDEhyMP6JX4ghb96UMqMdxYyVyah6-VA@mail.gmail.com>
-In-Reply-To: <CAK7LNAQzEHv7Y69xFTPDEhyMP6JX4ghb96UMqMdxYyVyah6-VA@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 5 Jan 2019 10:35:23 -0800
-Message-ID: <CAHk-=whg49nn5q_2QVMGN0u4rQFBmRKywtqJUSk+5=rBzTk1kg@mail.gmail.com>
+        Sat, 5 Jan 2019 15:39:11 -0500
+Date: Sat, 5 Jan 2019 21:39:06 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [GIT PULL 1/4] Kbuild updates for v4.21
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190105203906.GA22423@ravnborg.org>
+References: <CAK7LNAQzEHv7Y69xFTPDEhyMP6JX4ghb96UMqMdxYyVyah6-VA@mail.gmail.com>
+ <CAHk-=whg49nn5q_2QVMGN0u4rQFBmRKywtqJUSk+5=rBzTk1kg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=whg49nn5q_2QVMGN0u4rQFBmRKywtqJUSk+5=rBzTk1kg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-Masahiro,
- this isn't really related to the your request, but to just another
-pull request that caused much more of a rebuild than I expected.
+Hi Linus.
 
-Doing a "make --debug", I see that the cause was that it touched
-include/uapi/linux/elf-em.h, and make says things like
+> But the reason for this email to you is simply to ask whether you
+> use/have any tools for seeing these kinds of deep include chains.
 
-     Prerequisite 'include/uapi/linux/elf-em.h' is newer than target
-'drivers/net/ethernet/sfc/falcon/efx.o'.
-    Must remake target 'drivers/net/ethernet/sfc/falcon/efx.o'.
+Not exactly what you ask for - but we have make V=2
 
-which is obviously true, but was unexpected.
+Example:
 
-The chain seems to be
+$ touch include/uapi/linux/elf-em.h
+$ make V=2
+  CALL    scripts/checksyscalls.sh - due to target missing
+  DESCEND  objtool
+  CC      init/main.o - due to: include/uapi/linux/elf-em.h
+  CHK     include/generated/compile.h
+  CC      init/version.o - due to: include/uapi/linux/elf-em.h
+  CC      init/do_mounts.o - due to: include/uapi/linux/elf-em.h
+  CC      init/do_mounts_initrd.o - due to: include/uapi/linux/elf-em.h
+  CC      init/do_mounts_md.o - due to: include/uapi/linux/elf-em.h
+...
 
-  <linux/module.h> ->
-    <linux/elf.h> ->
-      <uapi/linux/elf.h> ->
-        <linux/elf-em.h>
+With V=2 kbuild will try to tell you why a target is rebuild.
+This can sometimes be useful.
 
-or similar, and the reason <linux/module.h> does that is it wants some
-of the elf types (ie code like this:
+Here kbuild will tell you: - due to: include/uapi/linux/elf-em.h
+Which may be a good clue.
 
-struct mod_kallsyms {
-        Elf_Sym *symtab;
-        unsigned int num_symtab;
-        char *strtab;
-};
+But you need to figure out yourself why a certain file
+depends on include/uapi/linux/elf-em.h
 
-and for declarations of module_bug_finalize() etc.
+One way is to look at the .cmd file for a target:
 
-Fine, fine. I can see why everybody includes <linux/module.h>, and I
-can see why module.h in turn wants the elf information.
+$ cat init/.do_mounts_md.o.cmd
+...
+  include/linux/module.h \
+    $(wildcard include/config/modules/tree/lookup.h) \
+    $(wildcard include/config/module/sig.h) \
+    $(wildcard include/config/module/unload.h) \
+    $(wildcard include/config/constructors.h) \
+    $(wildcard include/config/function/error/injection.h) \
+  include/linux/kmod.h \
+  include/linux/umh.h \
+  include/linux/elf.h \
+  arch/x86/include/asm/elf.h \
+  arch/x86/include/asm/user.h \
+  arch/x86/include/asm/user_64.h \
+  arch/x86/include/asm/fsgsbase.h \
+  arch/x86/include/asm/msr-index.h \
+  arch/x86/include/asm/vdso.h \
+    $(wildcard include/config/x86/x32.h) \
+  include/uapi/linux/elf.h \
+  include/uapi/linux/elf-em.h \
+...
 
-And I think I can see a way to avoid this chain, particularly with
-lots of those things really being internal to kernel/module.h and
-shouldn't be visible to random <linux/module.h> users.
+In the above all the $(wildcard ...) is the CONFIG_ symbols
+in the files that trigger a possible dependency on a file
+representing the CONFIG_ symbol.
 
-But the reason for this email to you is simply to ask whether you
-use/have any tools for seeing these kinds of deep include chains.
-Getting rid of some of the deep chains of header includes would likely
-speed up kernel builds even when a rebuild is forced, and when it's
-something like "we really shouldn't have rebuilt that file at all" the
-speedup is obviously even bigger than just a "the compiler saw much
-too much unnecessary header contents".
+We can see that the target depends on elf-em.h and if we follow
+it back we end up with module.h included from do_mounts_md.c
 
-                 Linus
+	Sam
