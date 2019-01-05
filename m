@@ -1,115 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:27337 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726202AbfAEDCV (ORCPT
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:40903 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726354AbfAESfp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 4 Jan 2019 22:02:21 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kconfig: rename generated .*conf-cfg to *conf-cfg
-Date: Sat,  5 Jan 2019 12:01:51 +0900
-Message-Id: <1546657311-24661-1-git-send-email-yamada.masahiro@socionext.com>
+        Sat, 5 Jan 2019 13:35:45 -0500
+Received: by mail-lf1-f65.google.com with SMTP id v5so27502394lfe.7
+        for <linux-kbuild@vger.kernel.org>; Sat, 05 Jan 2019 10:35:42 -0800 (PST)
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com. [209.85.208.178])
+        by smtp.gmail.com with ESMTPSA id p21sm11818496lfj.10.2019.01.05.10.35.40
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 05 Jan 2019 10:35:40 -0800 (PST)
+Received: by mail-lj1-f178.google.com with SMTP id t18-v6so34986554ljd.4
+        for <linux-kbuild@vger.kernel.org>; Sat, 05 Jan 2019 10:35:40 -0800 (PST)
+MIME-Version: 1.0
+References: <CAK7LNAQzEHv7Y69xFTPDEhyMP6JX4ghb96UMqMdxYyVyah6-VA@mail.gmail.com>
+In-Reply-To: <CAK7LNAQzEHv7Y69xFTPDEhyMP6JX4ghb96UMqMdxYyVyah6-VA@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 5 Jan 2019 10:35:23 -0800
+Message-ID: <CAHk-=whg49nn5q_2QVMGN0u4rQFBmRKywtqJUSk+5=rBzTk1kg@mail.gmail.com>
+Subject: Re: [GIT PULL 1/4] Kbuild updates for v4.21
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-Remove the dot-prefixing since it is just a matter of the
-.gitignore file.
+Masahiro,
+ this isn't really related to the your request, but to just another
+pull request that caused much more of a rebuild than I expected.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Doing a "make --debug", I see that the cause was that it touched
+include/uapi/linux/elf-em.h, and make says things like
 
- scripts/kconfig/.gitignore |  1 +
- scripts/kconfig/Makefile   | 36 ++++++++++++++++++------------------
- 2 files changed, 19 insertions(+), 18 deletions(-)
+     Prerequisite 'include/uapi/linux/elf-em.h' is newer than target
+'drivers/net/ethernet/sfc/falcon/efx.o'.
+    Must remake target 'drivers/net/ethernet/sfc/falcon/efx.o'.
 
-diff --git a/scripts/kconfig/.gitignore b/scripts/kconfig/.gitignore
-index 0aabc1d..b5bf92f 100644
---- a/scripts/kconfig/.gitignore
-+++ b/scripts/kconfig/.gitignore
-@@ -2,6 +2,7 @@
- # Generated files
- #
- *.moc
-+*conf-cfg
- 
- #
- # configuration programs
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 679e62e..c05ab00 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -157,53 +157,53 @@ conf-objs	:= conf.o $(common-objs)
- hostprogs-y	+= nconf
- nconf-objs	:= nconf.o nconf.gui.o $(common-objs)
- 
--HOSTLDLIBS_nconf	= $(shell . $(obj)/.nconf-cfg && echo $$libs)
--HOSTCFLAGS_nconf.o	= $(shell . $(obj)/.nconf-cfg && echo $$cflags)
--HOSTCFLAGS_nconf.gui.o	= $(shell . $(obj)/.nconf-cfg && echo $$cflags)
-+HOSTLDLIBS_nconf	= $(shell . $(obj)/nconf-cfg && echo $$libs)
-+HOSTCFLAGS_nconf.o	= $(shell . $(obj)/nconf-cfg && echo $$cflags)
-+HOSTCFLAGS_nconf.gui.o	= $(shell . $(obj)/nconf-cfg && echo $$cflags)
- 
--$(obj)/nconf.o $(obj)/nconf.gui.o: $(obj)/.nconf-cfg
-+$(obj)/nconf.o $(obj)/nconf.gui.o: $(obj)/nconf-cfg
- 
- # mconf: Used for the menuconfig target based on lxdialog
- hostprogs-y	+= mconf
- lxdialog	:= checklist.o inputbox.o menubox.o textbox.o util.o yesno.o
- mconf-objs	:= mconf.o $(addprefix lxdialog/, $(lxdialog)) $(common-objs)
- 
--HOSTLDLIBS_mconf = $(shell . $(obj)/.mconf-cfg && echo $$libs)
-+HOSTLDLIBS_mconf = $(shell . $(obj)/mconf-cfg && echo $$libs)
- $(foreach f, mconf.o $(lxdialog), \
--  $(eval HOSTCFLAGS_$f = $$(shell . $(obj)/.mconf-cfg && echo $$$$cflags)))
-+  $(eval HOSTCFLAGS_$f = $$(shell . $(obj)/mconf-cfg && echo $$$$cflags)))
- 
--$(obj)/mconf.o: $(obj)/.mconf-cfg
--$(addprefix $(obj)/lxdialog/, $(lxdialog)): $(obj)/.mconf-cfg
-+$(obj)/mconf.o: $(obj)/mconf-cfg
-+$(addprefix $(obj)/lxdialog/, $(lxdialog)): $(obj)/mconf-cfg
- 
- # qconf: Used for the xconfig target based on Qt
- hostprogs-y	+= qconf
- qconf-cxxobjs	:= qconf.o
- qconf-objs	:= images.o $(common-objs)
- 
--HOSTLDLIBS_qconf	= $(shell . $(obj)/.qconf-cfg && echo $$libs)
--HOSTCXXFLAGS_qconf.o	= $(shell . $(obj)/.qconf-cfg && echo $$cflags)
-+HOSTLDLIBS_qconf	= $(shell . $(obj)/qconf-cfg && echo $$libs)
-+HOSTCXXFLAGS_qconf.o	= $(shell . $(obj)/qconf-cfg && echo $$cflags)
- 
--$(obj)/qconf.o: $(obj)/.qconf-cfg $(obj)/qconf.moc
-+$(obj)/qconf.o: $(obj)/qconf-cfg $(obj)/qconf.moc
- 
- quiet_cmd_moc = MOC     $@
--      cmd_moc = $(shell . $(obj)/.qconf-cfg && echo $$moc) -i $< -o $@
-+      cmd_moc = $(shell . $(obj)/qconf-cfg && echo $$moc) -i $< -o $@
- 
--$(obj)/%.moc: $(src)/%.h $(obj)/.qconf-cfg
-+$(obj)/%.moc: $(src)/%.h $(obj)/qconf-cfg
- 	$(call cmd,moc)
- 
- # gconf: Used for the gconfig target based on GTK+
- hostprogs-y	+= gconf
- gconf-objs	:= gconf.o images.o $(common-objs)
- 
--HOSTLDLIBS_gconf    = $(shell . $(obj)/.gconf-cfg && echo $$libs)
--HOSTCFLAGS_gconf.o  = $(shell . $(obj)/.gconf-cfg && echo $$cflags)
-+HOSTLDLIBS_gconf    = $(shell . $(obj)/gconf-cfg && echo $$libs)
-+HOSTCFLAGS_gconf.o  = $(shell . $(obj)/gconf-cfg && echo $$cflags)
- 
--$(obj)/gconf.o: $(obj)/.gconf-cfg
-+$(obj)/gconf.o: $(obj)/gconf-cfg
- 
- # check if necessary packages are available, and configure build flags
- filechk_conf_cfg = $(CONFIG_SHELL) $<
- 
--$(obj)/.%conf-cfg: $(src)/%conf-cfg.sh FORCE
-+$(obj)/%conf-cfg: $(src)/%conf-cfg.sh FORCE
- 	$(call filechk,conf_cfg)
- 
--clean-files += .*conf-cfg
-+clean-files += conf-cfg
--- 
-2.7.4
+which is obviously true, but was unexpected.
+
+The chain seems to be
+
+  <linux/module.h> ->
+    <linux/elf.h> ->
+      <uapi/linux/elf.h> ->
+        <linux/elf-em.h>
+
+or similar, and the reason <linux/module.h> does that is it wants some
+of the elf types (ie code like this:
+
+struct mod_kallsyms {
+        Elf_Sym *symtab;
+        unsigned int num_symtab;
+        char *strtab;
+};
+
+and for declarations of module_bug_finalize() etc.
+
+Fine, fine. I can see why everybody includes <linux/module.h>, and I
+can see why module.h in turn wants the elf information.
+
+And I think I can see a way to avoid this chain, particularly with
+lots of those things really being internal to kernel/module.h and
+shouldn't be visible to random <linux/module.h> users.
+
+But the reason for this email to you is simply to ask whether you
+use/have any tools for seeing these kinds of deep include chains.
+Getting rid of some of the deep chains of header includes would likely
+speed up kernel builds even when a rebuild is forced, and when it's
+something like "we really shouldn't have rebuilt that file at all" the
+speedup is obviously even bigger than just a "the compiler saw much
+too much unnecessary header contents".
+
+                 Linus
