@@ -1,52 +1,145 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:63729 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726368AbfAFBDx (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:18030 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726368AbfAFB5o (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 5 Jan 2019 20:03:53 -0500
+        Sat, 5 Jan 2019 20:57:44 -0500
 MIME-Version: 1.0
-References: <CAK7LNAQzEHv7Y69xFTPDEhyMP6JX4ghb96UMqMdxYyVyah6-VA@mail.gmail.com>
- <CAHk-=whg49nn5q_2QVMGN0u4rQFBmRKywtqJUSk+5=rBzTk1kg@mail.gmail.com>
- <20190105203906.GA22423@ravnborg.org> <CAHk-=wh0rrLKYOxW6hAVaQ8rFGno7Q=XKrd13mfLXyd__WnTPw@mail.gmail.com>
-In-Reply-To: <CAHk-=wh0rrLKYOxW6hAVaQ8rFGno7Q=XKrd13mfLXyd__WnTPw@mail.gmail.com>
+References: <1546477840-14278-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1546477840-14278-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 6 Jan 2019 10:03:12 +0900
-Message-ID: <CAK7LNAQjCdt1Ts7t=+92YRK_ThhLaE0Af5W-S9yEg1Br2DvmTA@mail.gmail.com>
-Subject: Re: [GIT PULL 1/4] Kbuild updates for v4.21
+Date: Sun, 6 Jan 2019 10:56:55 +0900
+Message-ID: <CAK7LNATS79a=vBdjvy18oE4XNOvCTPWwh3=BN4fV2No+VUV3oQ@mail.gmail.com>
+Subject: Re: [PATCH 1/5] riscv: remove redundant kernel-space generic-y
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, linux-riscv@lists.infradead.org
 
-Hi Linus,
-
-
-On Sun, Jan 6, 2019 at 5:44 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
+On Thu, Jan 3, 2019 at 10:32 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> On Sat, Jan 5, 2019 at 12:39 PM Sam Ravnborg <sam@ravnborg.org> wrote:
-> >
-> > Not exactly what you ask for - but we have make V=2
+> This commit removes redundant generic-y defines in
+> arch/riscv/include/asm/Kbuild.
 >
-> Yeah, that's certainly more convenient than "make --debug".
+> [1] It is redundant to define the same generic-y in both
+>     arch/$(ARCH)/include/asm/Kbuild and
+>     arch/$(ARCH)/include/uapi/asm/Kbuild.
 >
-> That said, I was more thinking of not any particular "oh, it's
-> recompiling everything" situation (by then it's too late, obviously),
-> but if somebody has been looking at tools for finding and maybe
-> breaking some of our deeper include chains.
+>     Remove the following generic-y:
 >
-> I know it has come up before (the x86 people did the
-> <linux/schedule.h> split some years ago) and then it was all manual.
-> But I was kind of hoping that maybe some of the kbuild people had
-> looked at this?
+>       errno.h
+>       fcntl.h
+>       ioctl.h
+>       ioctls.h
+>       ipcbuf.h
+>       mman.h
+>       msgbuf.h
+>       param.h
+>       poll.h
+>       posix_types.h
+>       resource.h
+>       sembuf.h
+>       setup.h
+>       shmbuf.h
+>       signal.h
+>       socket.h
+>       sockios.h
+>       stat.h
+>       statfs.h
+>       swab.h
+>       termbits.h
+>       termios.h
+>       types.h
+>
+> [2] It is redundant to define generic-y when arch-specific
+>     implementation exists in arch/$(ARCH)/include/asm/*.h
+>
+>     Remove the following generic-y:
+>
+>       cacheflush.h
+>       module.h
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
+> Changes in v2:
+>   - rebase on Linus' tree
 
 
-Sorry, I do not know more information than Sam provided.
+Patch 1-4, applied to linux-kbuild.
 
-I got rid of some unneeded header inclusions in the past,
-but my work was also manual.
 
+
+>  arch/riscv/include/asm/Kbuild | 25 -------------------------
+>  1 file changed, 25 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/Kbuild b/arch/riscv/include/asm/Kbuild
+> index 6a646d9..cccd12c 100644
+> --- a/arch/riscv/include/asm/Kbuild
+> +++ b/arch/riscv/include/asm/Kbuild
+> @@ -1,5 +1,4 @@
+>  generic-y += bugs.h
+> -generic-y += cacheflush.h
+>  generic-y += checksum.h
+>  generic-y += compat.h
+>  generic-y += cputime.h
+> @@ -9,16 +8,11 @@ generic-y += dma.h
+>  generic-y += dma-contiguous.h
+>  generic-y += dma-mapping.h
+>  generic-y += emergency-restart.h
+> -generic-y += errno.h
+>  generic-y += exec.h
+>  generic-y += fb.h
+> -generic-y += fcntl.h
+>  generic-y += hardirq.h
+>  generic-y += hash.h
+>  generic-y += hw_irq.h
+> -generic-y += ioctl.h
+> -generic-y += ioctls.h
+> -generic-y += ipcbuf.h
+>  generic-y += irq_regs.h
+>  generic-y += irq_work.h
+>  generic-y += kdebug.h
+> @@ -27,34 +21,15 @@ generic-y += kvm_para.h
+>  generic-y += local.h
+>  generic-y += local64.h
+>  generic-y += mm-arch-hooks.h
+> -generic-y += mman.h
+> -generic-y += module.h
+> -generic-y += msgbuf.h
+>  generic-y += mutex.h
+> -generic-y += param.h
+>  generic-y += percpu.h
+> -generic-y += poll.h
+> -generic-y += posix_types.h
+>  generic-y += preempt.h
+> -generic-y += resource.h
+>  generic-y += scatterlist.h
+>  generic-y += sections.h
+> -generic-y += sembuf.h
+>  generic-y += serial.h
+> -generic-y += setup.h
+> -generic-y += shmbuf.h
+>  generic-y += shmparam.h
+> -generic-y += signal.h
+> -generic-y += socket.h
+> -generic-y += sockios.h
+> -generic-y += stat.h
+> -generic-y += statfs.h
+> -generic-y += swab.h
+> -generic-y += termbits.h
+> -generic-y += termios.h
+>  generic-y += topology.h
+>  generic-y += trace_clock.h
+> -generic-y += types.h
+>  generic-y += unaligned.h
+>  generic-y += user.h
+>  generic-y += vga.h
+> --
+> 2.7.4
+>
 
 
 -- 
