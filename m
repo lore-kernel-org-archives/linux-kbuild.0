@@ -1,108 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:47223 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726246AbfAGEdv (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 6 Jan 2019 23:33:51 -0500
-MIME-Version: 1.0
-References: <CAK7LNARQggM3aKEPRKJqa4tunFAfmfErMZuS-rrnRv6UB1VpPQ@mail.gmail.com>
- <CAHk-=wiLt3rgeyM3BWAd5VJrKcnxxuHybwoQiDGMgyspo6oXDg@mail.gmail.com>
-In-Reply-To: <CAHk-=wiLt3rgeyM3BWAd5VJrKcnxxuHybwoQiDGMgyspo6oXDg@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 7 Jan 2019 13:32:56 +0900
-Message-ID: <CAK7LNASpO86yNe4BWBYnfd+r82=d_ofxYybLi_aM+4+dgf46+A@mail.gmail.com>
-Subject: Re: [GIT PULL 2/4] Kbuild updates for v4.21 part2
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail-eopbgr10078.outbound.protection.outlook.com ([40.107.1.78]:25466
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726934AbfAGTbc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 7 Jan 2019 14:31:32 -0500
+From: Leonard Crestez <leonard.crestez@nxp.com>
+Subject: [PATCH 0/3] kbuild: Add wilddt function instead of listing dtbs
+Date: Mon, 7 Jan 2019 19:31:25 +0000
+Message-ID: <cover.1546888138.git.leonard.crestez@nxp.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Changbin Du <changbin.du@gmail.com>, Arnd Bergmann <arnd@arndb.de>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Rob Herring <robh+dt@kernel.org>, Olof Johansson <olof@lixom.net>, Shawn Guo <shawnguo@kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Fabio Estevam <fabio.estevam@nxp.com>, Mark Rutland <mark.rutland@arm.com>, Aisheng Dong <aisheng.dong@nxp.com>, Leo Li <leoyang.li@nxp.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, dl-linux-imx <linux-imx@nxp.com>, "kernel@pengutronix.de" <kernel@pengutronix.de>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-(+CC Changbin Du, Arnd Bergmann)
+The dts makefiles go through a lot of pointless churn when boards are
+added. Many SOCs (such as imx) have very simple naming conventions for
+all boards using a certain chip and board listings can be easily
+collapsed using wildcards.
 
+Add a "wilddt" function and use it for imx6/7/8 and layerscape. This can
+be applied to many other soc families later.
 
+Previously sent as RFC: https://lore.kernel.org/patchwork/patch/1022737/
 
-On Sun, Dec 30, 2018 at 6:01 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Fri, Dec 28, 2018 at 8:00 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> >
-> > Introduce a new option CONFIG_NO_AUTO_INLINE as well. With this option,
-> > only functions explicitly marked with "inline" will be inlined. This
-> > will allow the function tracer to trace more functions.
->
-> Ugh. This causes new and bogus warnings, because gcc doesn't see some
-> of the checks.
->
-> For example, the x86 emulate_vsyscall() function now warns that
->
->     warning: =E2=80=98syscall_nr=E2=80=99 may be used uninitialized in th=
-is function
->
-> because addr_to_vsyscall_nr() isn't inlined any more, so gcc doesn't
-> see that the return value is always smaller than three (and then it
-> doesn't see that we handle all the cases in the switch statement
-> later).
->
-> So honestly, these "debugging improvements" have a rather nasty side
-> effect. I'm not at all convinced that we should do this.  It is *not*
-> worth causing extra development pain with a totally pointless option
-> that changes code generation radically like this. It's going to cause
-> lots of extra churn.
+Changes since RFC:
+ * Split into 3-part series
+ * Move the wilddt to Kbuild.include so that it's available everywhere
+ * Use $(srctree)/$(src) instead of $(dtstree)
+ * Also use wilddt in arm64/boot/dts/freescale
 
+Series is against next-20190107, conflicts are to be expected as board
+list keeps changing.
 
+Leonard Crestez (3):
+  kbuild: Add wilddt function
+  ARM: dts: imx: Use wilddt function
+  arm64: dts: freescale: Use wilddt function
 
-Sorry for late reply.
-
-I know this series was rejected,
-but I felt guilty about being completely silent.
-
-So, here is just my two cents.
-
-
-For addr_to_vsyscall_nr(), we can fix it by marking it as 'inline'
-(or __always_inline).
-
-
-IMHO, it is not so bad to tell the compiler what we want.
-
-In most cases, it is just a matter of 'inline' marker,
-although I admit this process is kind of painful...
-
-
-
-> This branch already added a couple of extra inline markers just to
-> make code work reasonably. How many tens (or hundreds) got missed just
-> because the build still works, but the lack of inlining means that we
-> generate completely garbage code?
-
-
-I do not have the exact number, but
-my impression was "not so many".
-
-Changbin and Arnd might have better insight.
-They were trying to eliminate potential problems beforehand.
-
-For example,
-7e17916b
-412dd15c
-08813e0e
-
-
-
-
-> I'm going to skip this pull request.
->
-> We have basically always required a certain level of competence from
-> the compiler, and this basically says that the compiler can do stupid
-> things and we'd have to fix those stupidities by hand.
->
->              Linus
-
-
+ arch/arm/boot/dts/Makefile             | 201 ++-----------------------
+ arch/arm64/boot/dts/freescale/Makefile |  25 +--
+ scripts/Kbuild.include                 |   6 +
+ 3 files changed, 21 insertions(+), 211 deletions(-)
 
 --=20
-Best Regards
-Masahiro Yamada
+2.17.1
