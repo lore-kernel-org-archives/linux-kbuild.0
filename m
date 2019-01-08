@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:43966 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:43940 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732193AbfAHTfK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Jan 2019 14:35:10 -0500
+        id S1732144AbfAHTfJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 8 Jan 2019 14:35:09 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.4 16/28] kconfig: fix memory leak when EOF is encountered in quotation
-Date: Tue,  8 Jan 2019 14:34:33 -0500
-Message-Id: <20190108193445.124251-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 15/28] kconfig: fix file name and line number of warn_ignored_character()
+Date: Tue,  8 Jan 2019 14:34:32 -0500
+Message-Id: <20190108193445.124251-15-sashal@kernel.org>
 In-Reply-To: <20190108193445.124251-1-sashal@kernel.org>
 References: <20190108193445.124251-1-sashal@kernel.org>
 MIME-Version: 1.0
@@ -18,64 +18,55 @@ Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.
 
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-[ Upstream commit fbac5977d81cb2b2b7e37b11c459055d9585273c ]
+[ Upstream commit 77c1c0fa8b1477c5799bdad65026ea5ff676da44 ]
 
-An unterminated string literal followed by new line is passed to the
-parser (with "multi-line strings not supported" warning shown), then
-handled properly there.
+Currently, warn_ignore_character() displays invalid file name and
+line number.
 
-On the other hand, an unterminated string literal at end of file is
-never passed to the parser, then results in memory leak.
+The lexer should use current_file->name and yylineno, while the parser
+should use zconf_curname() and zconf_lineno().
+
+This difference comes from that the lexer is always going ahead
+of the parser. The parser needs to look ahead one token to make a
+shift/reduce decision, so the lexer is requested to scan more text
+from the input file.
+
+This commit fixes the warning message from warn_ignored_character().
 
 [Test Code]
 
-  ----------(Kconfig begin)----------
-  source "Kconfig.inc"
+  ----(Kconfig begin)----
+  /
+  -----(Kconfig end)-----
 
-  config A
-          bool "a"
-  -----------(Kconfig end)-----------
-
-  --------(Kconfig.inc begin)--------
-  config B
-          bool "b\No new line at end of file
-  ---------(Kconfig.inc end)---------
-
-[Summary from Valgrind]
+[Output]
 
   Before the fix:
 
-    LEAK SUMMARY:
-       definitely lost: 16 bytes in 1 blocks
-       ...
+  <none>:0:warning: ignoring unsupported character '/'
 
   After the fix:
 
-    LEAK SUMMARY:
-       definitely lost: 0 bytes in 0 blocks
-       ...
-
-Eliminate the memory leak path by handling this case. Of course, such
-a Kconfig file is wrong already, so I will add an error message later.
+  Kconfig:1:warning: ignoring unsupported character '/'
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- scripts/kconfig/zconf.l | 2 ++
- 1 file changed, 2 insertions(+)
+ scripts/kconfig/zconf.l | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 6534dc5ac803..0c7800112ff5 100644
+index c410d257da06..6534dc5ac803 100644
 --- a/scripts/kconfig/zconf.l
 +++ b/scripts/kconfig/zconf.l
-@@ -191,6 +191,8 @@ n	[A-Za-z0-9_-]
- 	}
- 	<<EOF>>	{
- 		BEGIN(INITIAL);
-+		yylval.string = text;
-+		return T_WORD_QUOTE;
- 	}
+@@ -71,7 +71,7 @@ static void warn_ignored_character(char chr)
+ {
+ 	fprintf(stderr,
+ 	        "%s:%d:warning: ignoring unsupported character '%c'\n",
+-	        zconf_curname(), zconf_lineno(), chr);
++	        current_file->name, yylineno, chr);
  }
+ %}
  
 -- 
 2.19.1
