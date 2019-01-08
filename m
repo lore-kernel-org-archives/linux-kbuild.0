@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:39358 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:35528 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731039AbfAHTbS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Jan 2019 14:31:18 -0500
+        id S1730040AbfAHT21 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 8 Jan 2019 14:28:27 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.19 54/97] kconfig: fix memory leak when EOF is encountered in quotation
-Date: Tue,  8 Jan 2019 14:29:03 -0500
-Message-Id: <20190108192949.122407-54-sashal@kernel.org>
-In-Reply-To: <20190108192949.122407-1-sashal@kernel.org>
-References: <20190108192949.122407-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 068/117] kconfig: fix memory leak when EOF is encountered in quotation
+Date: Tue,  8 Jan 2019 14:25:36 -0500
+Message-Id: <20190108192628.121270-68-sashal@kernel.org>
+In-Reply-To: <20190108192628.121270-1-sashal@kernel.org>
+References: <20190108192628.121270-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
