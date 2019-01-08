@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:39334 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:42004 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731012AbfAHTbR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Jan 2019 14:31:17 -0500
+        id S1731571AbfAHTdL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 8 Jan 2019 14:33:11 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.19 53/97] kconfig: fix file name and line number of warn_ignored_character()
-Date: Tue,  8 Jan 2019 14:29:02 -0500
-Message-Id: <20190108192949.122407-53-sashal@kernel.org>
-In-Reply-To: <20190108192949.122407-1-sashal@kernel.org>
-References: <20190108192949.122407-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 29/53] kconfig: fix file name and line number of warn_ignored_character()
+Date: Tue,  8 Jan 2019 14:31:57 -0500
+Message-Id: <20190108193222.123316-29-sashal@kernel.org>
+In-Reply-To: <20190108193222.123316-1-sashal@kernel.org>
+References: <20190108193222.123316-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -56,10 +56,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 25bd2b89fe3f..eeac64ccc730 100644
+index c410d257da06..6534dc5ac803 100644
 --- a/scripts/kconfig/zconf.l
 +++ b/scripts/kconfig/zconf.l
-@@ -73,7 +73,7 @@ static void warn_ignored_character(char chr)
+@@ -71,7 +71,7 @@ static void warn_ignored_character(char chr)
  {
  	fprintf(stderr,
  	        "%s:%d:warning: ignoring unsupported character '%c'\n",
