@@ -1,104 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:57819 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730920AbfAKKVU (ORCPT
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44000 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732827AbfAKNrs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Jan 2019 05:21:20 -0500
+        Fri, 11 Jan 2019 08:47:48 -0500
+Received: by mail-wr1-f68.google.com with SMTP id r10so15238130wrs.10
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Jan 2019 05:47:45 -0800 (PST)
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: [PATCH] kasan, arm64: remove redundant ARCH_SLAB_MINALIGN define
+Date: Fri, 11 Jan 2019 14:47:40 +0100
+Message-Id: <7f36be5fdf491259d6c8100232fa93ff40edf841.1547214440.git.andreyknvl@google.com>
 MIME-Version: 1.0
-References: <1547200321-17120-1-git-send-email-yamada.masahiro@socionext.com> <20190111095924.GA555@kroah.com>
-In-Reply-To: <20190111095924.GA555@kroah.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 11 Jan 2019 19:20:32 +0900
-Message-ID: <CAK7LNAQQdmVpL5_v+6Tw+o0A3_mPWafMfGF5j9imXBuXMHTuDA@mail.gmail.com>
-Subject: Re: [PATCH] firmware_loader: move firmware/ to drivers/base/firmware_loader/builtin/
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, "Rafael J. Wysocki" <rafael@kernel.org>
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>, Mark Rutland <mark.rutland@arm.com>, Nick Desaulniers <ndesaulniers@google.com>, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Eric W . Biederman" <ebiederm@xmission.com>, Ingo Molnar <mingo@kernel.org>, Paul Lawrence <paullawrence@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kate Stewart <kstewart@linuxfoundation.org>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sparse@vger.kernel.org, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
+Cc: Kostya Serebryany <kcc@google.com>, Evgeniy Stepanov <eugenis@google.com>, Lee Smith <Lee.Smith@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>, Jann Horn <jannh@google.com>, Mark Brand <markbrand@google.com>, Chintan Pandya <cpandya@codeaurora.org>, Vishwath Mohan <vishwath@google.com>, Andrey Konovalov <andreyknvl@google.com>
 
-On Fri, Jan 11, 2019 at 6:59 PM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> On Fri, Jan 11, 2019 at 06:52:00PM +0900, Masahiro Yamada wrote:
-> > Currently, the 'firmware' directory only contains a single Makefile
-> > to embed extra firmware into the kernel.
-> >
-> > Move it to the more relevant place.
->
-> So this moves any "build in" firmware to need to be placed in
-> drivers/base/firmare_loader/builtin/ instead of firmware/builtin/ ?
+Defining ARCH_SLAB_MINALIGN in arch/arm64/include/asm/cache.h when KASAN
+is off is not needed, as it is defined in defined in include/linux/slab.h
+as ifndef.
 
-Nope.
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+---
+ arch/arm64/include/asm/cache.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-The build system searches extra firmware in the directory specified
-by CONFIG_EXTRA_FIRMWARE_DIR.  (default is /lib/firmware)
-
-
-See drivers/base/firmware_loader/Kconfig:
-
-config EXTRA_FIRMWARE_DIR
-        string "Firmware blobs root directory"
-        depends on EXTRA_FIRMWARE != ""
-        default "/lib/firmware"
-        help
-          This option controls the directory in which the kernel build system
-          looks for the firmware files listed in the EXTRA_FIRMWARE option.
-
-
-
->  If
-> so, why?  That seems like a lot of extra work for people now.  And
-> burrying it down in the drivers/base/ directory is not obvious at all.
-
-
-The firmware search path is a different thing.
-
-
-I am just moving the Makefile
-because all the other stuff (C files, Kconfig)
-has been moved into drivers/base/firmware_loader/.
-
-And, this is the last piece work in order to
-make drivers/base/firmware_loader self-contained.
-
-
-
-Just a reminder of previous commits you applied:
-
-
-commit 06bfd3c8ab1dbf0031022d056a90ace682f6a94c
-Author: Luis R. Rodriguez <mcgrof@kernel.org>
-Date:   Thu May 10 13:08:43 2018 -0700
-
-    firmware_loader: move kconfig FW_LOADER entries to its own file
-
-    This will make it easier to track and easier to understand
-    what components and features are part of the FW_LOADER. There
-    are some components related to firmware which have *nothing* to
-    do with the FW_LOADER, souch as PREVENT_FIRMWARE_BUILD.
-
-    Reviewed-by: Kees Cook <keescook@chromium.org>
-    Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
-    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
-
-commit 5d6d1ddd27301dc85b13b794262c8bcececf88f1
-Author: Luis R. Rodriguez <mcgrof@kernel.org>
-Date:   Sat Mar 10 06:14:50 2018 -0800
-
-    firmware: move firmware loader into its own directory
-
-    This will make it much easier to manage as we manage to
-    keep trimming componnents down into their own files to more
-    easily manage and maintain this codebase.
-
-    Suggested-by: Kees Cook <keescook@chromium.org>
-    Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
-    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
-
-
+diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+index eb43e09c1980..926434f413fa 100644
+--- a/arch/arm64/include/asm/cache.h
++++ b/arch/arm64/include/asm/cache.h
+@@ -60,8 +60,6 @@
+ 
+ #ifdef CONFIG_KASAN_SW_TAGS
+ #define ARCH_SLAB_MINALIGN	(1ULL << KASAN_SHADOW_SCALE_SHIFT)
+-#else
+-#define ARCH_SLAB_MINALIGN	__alignof__(unsigned long long)
+ #endif
+ 
+ #ifndef __ASSEMBLY__
 -- 
-Best Regards
-Masahiro Yamada
+2.20.1.97.g81188d93c3-goog
