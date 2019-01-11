@@ -1,124 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:42548 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732392AbfAKRUp (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Jan 2019 12:20:45 -0500
-Received: by mail-vs1-f66.google.com with SMTP id b74so9655929vsd.9
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Jan 2019 09:20:44 -0800 (PST)
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com. [209.85.217.45])
-        by smtp.gmail.com with ESMTPSA id g203sm24776692vsd.19.2019.01.11.09.20.42
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 11 Jan 2019 09:20:43 -0800 (PST)
-Received: by mail-vs1-f45.google.com with SMTP id z3so9654587vsf.7
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Jan 2019 09:20:42 -0800 (PST)
+Received: from mail-eopbgr690115.outbound.protection.outlook.com ([40.107.69.115]:49344
+        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1732319AbfAKTGr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 11 Jan 2019 14:06:47 -0500
+From: Paul Burton <paul.burton@mips.com>
+Subject: [PATCH v2] kbuild: Disable LD_DEAD_CODE_DATA_ELIMINATION with ftrace
+ & GCC <= 4.7
+Date: Fri, 11 Jan 2019 19:06:44 +0000
+Message-ID: <20190111190538.6744-1-paul.burton@mips.com>
+References: <CAK7LNAS-r4gZOxdJCNaQwHtOYbxHbdupu57qncWkE+bhGfb_7g@mail.gmail.com>
+In-Reply-To: <CAK7LNAS-r4gZOxdJCNaQwHtOYbxHbdupu57qncWkE+bhGfb_7g@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <1547198328-26359-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1547198328-26359-1-git-send-email-yamada.masahiro@socionext.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Fri, 11 Jan 2019 09:20:25 -0800
-Message-ID: <CAGXu5jJzkqvyhZbCiQFHDZ3v36j2bM3_y_RMCof97rA35Z6opw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: clean up hostprogs rules with hostld_flags
- and hostld_libs
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Kernel Hardening <kernel-hardening@lists.openwall.com>, Emese Revfy <re.emese@gmail.com>, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
+To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+Cc: "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Paul Burton <pburton@wavecomp.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Nicholas Piggin <npiggin@gmail.com>, "stable@vger.kernel.org" <stable@vger.kernel.org>
 
-On Fri, Jan 11, 2019 at 1:19 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Add hostld_flags and hostld_libs shorthands. No function change.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+When building using GCC 4.7 or older, -ffunction-sections & the -pg flag
+used by ftrace are incompatible. This causes warnings or build failures
+(where -Werror applies) such as the following:
 
-Acked-by: Kees Cook <keescook@chromium.org>
+  arch/mips/generic/init.c:
+    error: -ffunction-sections disabled; it makes profiling impossible
 
--Kees
+This used to be taken into account by the ordering of calls to cc-option
+from within the top-level Makefile, which was introduced by commit
+90ad4052e85c ("kbuild: avoid conflict between -ffunction-sections and
+-pg on gcc-4.7"). Unfortunately this was broken when the
+CONFIG_LD_DEAD_CODE_DATA_ELIMINATION cc-option check was moved to
+Kconfig in commit e85d1d65cd8a ("kbuild: test dead code/data elimination
+support in Kconfig"), because the flags used by this check no longer
+include -pg.
 
-> ---
->
->  scripts/Makefile.host | 23 +++++++++++++----------
->  1 file changed, 13 insertions(+), 10 deletions(-)
->
-> diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-> index 0393f75..f2e15de 100644
-> --- a/scripts/Makefile.host
-> +++ b/scripts/Makefile.host
-> @@ -78,23 +78,26 @@ endif
->  hostc_flags    = -Wp,-MD,$(depfile) $(__hostc_flags)
->  hostcxx_flags  = -Wp,-MD,$(depfile) $(__hostcxx_flags)
->
-> +hostld_flags   = $(KBUILD_HOSTLDFLAGS)
-> +hostld_libs    = $(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
-> +
->  #####
->  # Compile programs on the host
->
->  # Create executable from a single .c file
->  # host-csingle -> Executable
->  quiet_cmd_host-csingle         = HOSTCC  $@
-> -      cmd_host-csingle = $(HOSTCC) $(hostc_flags) $(KBUILD_HOSTLDFLAGS) -o $@ $< \
-> -               $(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
-> +      cmd_host-csingle = $(HOSTCC) $(hostc_flags) $(hostld_flags) -o $@ $< \
-> +               $(hostld_libs)
->  $(host-csingle): $(obj)/%: $(src)/%.c FORCE
->         $(call if_changed_dep,host-csingle)
->
->  # Link an executable based on list of .o files, all plain c
->  # host-cmulti -> executable
->  quiet_cmd_host-cmulti  = HOSTLD  $@
-> -      cmd_host-cmulti  = $(HOSTCC) $(KBUILD_HOSTLDFLAGS) -o $@ \
-> +      cmd_host-cmulti  = $(HOSTCC) $(hostld_flags) -o $@ \
->                           $(addprefix $(obj)/,$($(@F)-objs)) \
-> -                         $(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
-> +                         $(hostld_libs)
->  $(host-cmulti): FORCE
->         $(call if_changed,host-cmulti)
->  $(call multi_depend, $(host-cmulti), , -objs)
-> @@ -109,10 +112,10 @@ $(host-cobjs): $(obj)/%.o: $(src)/%.c FORCE
->  # Link an executable based on list of .o files, a mixture of .c and .cc
->  # host-cxxmulti -> executable
->  quiet_cmd_host-cxxmulti        = HOSTLD  $@
-> -      cmd_host-cxxmulti        = $(HOSTCXX) $(KBUILD_HOSTLDFLAGS) -o $@ \
-> +      cmd_host-cxxmulti        = $(HOSTCXX) $(hostld_flags) -o $@ \
->                           $(foreach o,objs cxxobjs,\
->                           $(addprefix $(obj)/,$($(@F)-$(o)))) \
-> -                         $(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
-> +                         $(hostld_libs)
->  $(host-cxxmulti): FORCE
->         $(call if_changed,host-cxxmulti)
->  $(call multi_depend, $(host-cxxmulti), , -objs -cxxobjs)
-> @@ -143,9 +146,9 @@ $(host-cxxshobjs): $(obj)/%.o: $(src)/%.c FORCE
->  # Link a shared library, based on position independent .o files
->  # *.o -> .so shared library (host-cshlib)
->  quiet_cmd_host-cshlib  = HOSTLLD -shared $@
-> -      cmd_host-cshlib  = $(HOSTCC) $(KBUILD_HOSTLDFLAGS) -shared -o $@ \
-> +      cmd_host-cshlib  = $(HOSTCC) $(hostld_flags) -shared -o $@ \
->                           $(addprefix $(obj)/,$($(@F:.so=-objs))) \
-> -                         $(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
-> +                         $(hostld_libs)
->  $(host-cshlib): FORCE
->         $(call if_changed,host-cshlib)
->  $(call multi_depend, $(host-cshlib), .so, -objs)
-> @@ -153,9 +156,9 @@ $(call multi_depend, $(host-cshlib), .so, -objs)
->  # Link a shared library, based on position independent .o files
->  # *.o -> .so shared library (host-cxxshlib)
->  quiet_cmd_host-cxxshlib        = HOSTLLD -shared $@
-> -      cmd_host-cxxshlib        = $(HOSTCXX) $(KBUILD_HOSTLDFLAGS) -shared -o $@ \
-> +      cmd_host-cxxshlib        = $(HOSTCXX) $(hostld_flags) -shared -o $@ \
->                           $(addprefix $(obj)/,$($(@F:.so=-objs))) \
-> -                         $(KBUILD_HOSTLDLIBS) $(HOSTLDLIBS_$(@F))
-> +                         $(hostld_libs)
->  $(host-cxxshlib): FORCE
->         $(call if_changed,host-cxxshlib)
->  $(call multi_depend, $(host-cxxshlib), .so, -objs)
-> --
-> 2.7.4
->
+Fix this by not allowing CONFIG_LD_DEAD_CODE_DATA_ELIMINATION to be
+enabled at the same time as ftrace/CONFIG_FUNCTION_TRACER when building
+using GCC 4.7 or older.
 
+Signed-off-by: Paul Burton <paul.burton@mips.com>
+Fixes: e85d1d65cd8a ("kbuild: test dead code/data elimination support in Kc=
+onfig")
+Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>
+Cc: stable@vger.kernel.org # v4.19+
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-mips@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+Changes in v2:
+- Invert the dependency as Masahiro suggested.
+---
+ init/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
--- 
-Kees Cook
+diff --git a/init/Kconfig b/init/Kconfig
+index d47cb77a220e..513fa544a134 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1124,6 +1124,7 @@ config LD_DEAD_CODE_DATA_ELIMINATION
+ 	bool "Dead code and data elimination (EXPERIMENTAL)"
+ 	depends on HAVE_LD_DEAD_CODE_DATA_ELIMINATION
+ 	depends on EXPERT
++	depends on !(FUNCTION_TRACER && CC_IS_GCC && GCC_VERSION < 40800)
+ 	depends on $(cc-option,-ffunction-sections -fdata-sections)
+ 	depends on $(ld-option,--gc-sections)
+ 	help
+--=20
+2.20.1
