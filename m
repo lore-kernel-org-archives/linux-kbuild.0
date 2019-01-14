@@ -1,39 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:25547 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726482AbfAMD4F (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:30387 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726622AbfANDQy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 12 Jan 2019 22:56:05 -0500
-MIME-Version: 1.0
-References: <1547175108-14744-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1547175108-14744-1-git-send-email-yamada.masahiro@socionext.com>
+        Sun, 13 Jan 2019 22:16:54 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 13 Jan 2019 12:55:05 +0900
-Message-ID: <CAK7LNAT6fB=97RMmxNxEc4vAJL8+3pS4SSpa8ntKXGqRAvPUSA@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: clean generated *conf-cfg files
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kbuild: remove unused baseprereq
+Date: Mon, 14 Jan 2019 12:16:45 +0900
+Message-Id: <1547435805-8110-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Fri, Jan 11, 2019 at 2:12 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> I accidentally dropped '*' in the previous renaming patch.
->
-> Revive it so that 'make mrproper' can clean the generated files.
->
-> Fixes: d86271af6460 ("kconfig: rename generated .*conf-cfg to *conf-cfg")
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+Commit eea199b445f6 ("kbuild: remove unnecessary LEX_PREFIX and
+YACC_PREFIX") removed the last users of this macro.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Applied to linux-kbuild/fixes.
+ scripts/Kbuild.include | 4 ----
+ 1 file changed, 4 deletions(-)
 
-
-
-
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 525bff6..3081603 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -24,10 +24,6 @@ depfile = $(subst $(comma),_,$(dot-target).d)
+ basetarget = $(basename $(notdir $@))
+ 
+ ###
+-# filename of first prerequisite with directory and extension stripped
+-baseprereq = $(basename $(notdir $<))
+-
+-###
+ # Escape single quote for use in echo statements
+ escsq = $(subst $(squote),'\$(squote)',$1)
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
