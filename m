@@ -1,27 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:43898 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727307AbfAOO7G (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:23066 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729474AbfAOPBw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Jan 2019 09:59:06 -0500
+        Tue, 15 Jan 2019 10:01:52 -0500
 MIME-Version: 1.0
-References: <1547536740-1572-1-git-send-email-yamada.masahiro@socionext.com> <CA+7wUsz5_6JqATZ4sAdUOWfr5sgeTjo8q7ArPL6nTmYK818E4Q@mail.gmail.com>
-In-Reply-To: <CA+7wUsz5_6JqATZ4sAdUOWfr5sgeTjo8q7ArPL6nTmYK818E4Q@mail.gmail.com>
+References: <1547536740-1572-1-git-send-email-yamada.masahiro@socionext.com> <54f84ad6-279f-aa64-8c2c-59becd64a6ad@ozlabs.ru>
+In-Reply-To: <54f84ad6-279f-aa64-8c2c-59becd64a6ad@ozlabs.ru>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 15 Jan 2019 23:58:03 +0900
-Message-ID: <CAK7LNAS+YAfHQkSWDEnuLv869VTy3iaXoYpmZSOBbPrVAaF0Cw@mail.gmail.com>
+Date: Wed, 16 Jan 2019 00:01:08 +0900
+Message-ID: <CAK7LNAS8xkZCK5keS9SEdNTUsVRb+_hac4yvBG=1HebrkheAqw@mail.gmail.com>
 Subject: Re: [PATCH] kbuild: mark prepare0 as PHONY to fix external module build
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mathieu Malaterre <malat@debian.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Samuel Holland <samuel@sholland.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, LKML <linux-kernel@vger.kernel.org>, "linux-stable # v4 . 20" <stable@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Samuel Holland <samuel@sholland.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>, "linux-stable # v4 . 20" <stable@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Jan 15, 2019 at 7:35 PM Mathieu Malaterre <malat@debian.org> wrote:
+On Tue, Jan 15, 2019 at 7:45 PM Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 >
-> On Tue, Jan 15, 2019 at 8:22 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> >
+>
+>
+> On 15/01/2019 18:19, Masahiro Yamada wrote:
 > > Commit c3ff2a5193fa ("powerpc/32: add stack protector support")
 > > caused kernel panic on PowerPC if an external module is used with
 > > CONFIG_STACKPROTECTOR because the 'prepare' target was not executed
@@ -53,45 +53,36 @@ On Tue, Jan 15, 2019 at 7:35 PM Mathieu Malaterre <malat@debian.org> wrote:
 > > Reported-by: Samuel Holland <samuel@sholland.org>
 > > Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > ---
-> >
-> >  Makefile | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/Makefile b/Makefile
-> > index 499b968..789b332 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -955,6 +955,7 @@ ifdef CONFIG_STACK_VALIDATION
-> >    endif
-> >  endif
-> >
-> > +PHONY += prepare0
-> >
-> >  ifeq ($(KBUILD_EXTMOD),)
-> >  core-y         += kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
-> > @@ -1061,8 +1062,7 @@ scripts: scripts_basic scripts_dtc
-> >  # archprepare is used in arch Makefiles and when processed asm symlink,
-> >  # version.h and scripts_basic is processed / created.
-> >
-> > -# Listed in dependency order
 >
-> The above comment may need to be tweaked a bit
+>
+> Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>
+> Thanks for fixing this! Out of curiosity - how does this work?
+> arch/powerpc/Makefile's stack_protector_prepare still depends on
+> prepare0 which is still defined only if KBUILD_EXTMOD=="" but somehow it
+> does not bother ./Makefile? Thanks,
 
-The comment is wrong irrespective of this patch,
-and less important.
 
-Do you have any suggestion how to tweak it?
+Missing phony targets are ignored.
 
 
-> > -PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
-> > +PHONY += prepare archprepare prepare1 prepare2 prepare3
-> >
-> >  # prepare3 is used to check if we are building in a separate output directory,
-> >  # and if so do:
-> > --
-> > 2.7.4
-> >
+I do not know if it is officially documented,
+but GNU Make works like that.
+
+Is the following test code helpful?
+
+
+[Test Makefile]
+
+prepare: prepare0
+        @echo hello world
+
+.PHONY: prepare prepare0
+
+
+[Result]
+$ make
+hello world
 
 
 
