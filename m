@@ -1,35 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:39858 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727494AbfAOHPq (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:46279 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726055AbfAOHVH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Jan 2019 02:15:46 -0500
-Date: Tue, 15 Jan 2019 17:15:39 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: remove top-level built-in.a
-References: <1547436479-10491-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1547436479-10491-1-git-send-email-yamada.masahiro@socionext.com>
-MIME-Version: 1.0
-Message-Id: <1547536378.afs6amsrzj.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        Tue, 15 Jan 2019 02:21:07 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: mark prepare0 as PHONY to fix external module build
+Date: Tue, 15 Jan 2019 16:19:00 +0900
+Message-Id: <1547536740-1572-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>
+To: linux-kbuild@vger.kernel.org
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Samuel Holland <samuel@sholland.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org, Michael Ellerman <mpe@ellerman.id.au>, Masahiro Yamada <yamada.masahiro@socionext.com>, "linux-stable # v4 . 20" <stable@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Masahiro Yamada's on January 14, 2019 1:27 pm:
-> The symbol table in the final archive is unneeded because it is passed
-> to the linker after the --whole-archive option. Every object file in
-> the archive is included in the link anyway.
->=20
-> Pass thin archives from subdirectories directly to the linker, and
-> remove the final archiving step.
+Commit c3ff2a5193fa ("powerpc/32: add stack protector support")
+caused kernel panic on PowerPC if an external module is used with
+CONFIG_STACKPROTECTOR because the 'prepare' target was not executed
+for the external module build.
 
-This seems like a good improvement. As far as I remember, it was slower=20
-to do the final link without the index built. Maybe I was testing it=20
-in a revision before moving those files into --whole-archive? If there
-is no slowdown, then I have no objection.
+Commit e07db28eea38 ("kbuild: fix single target build for external
+module") turned it into a build error because the 'prepare' target is
+now executed but the 'prepare0' target is missing for the external
+module build.
 
-Acked-by: Nicholas Piggin <npiggin@gmail.com>
-=
+External module on arm/arm64 with CONFIG_STACKPROTECTOR_PER_TASK is
+also broken in the same way.
+
+Move 'PHONY += prepare0' to the common place. Make is fine with missing
+rule for phony targets.
+
+I minimize the change so it can be easily backported to 4.20.x
+
+To fix v4.20 for external modules of PowerPC, please backport
+e07db28eea38 ("kbuild: fix single target build for external module"),
+and then this commit.
+
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=201891
+Fixes: e07db28eea38 ("kbuild: fix single target build for external module")
+Fixes: c3ff2a5193fa ("powerpc/32: add stack protector support")
+Fixes: 189af4657186 ("ARM: smp: add support for per-task stack canaries")
+Fixes: 0a1213fa7432 ("arm64: enable per-task stack canaries")
+Cc: linux-stable <stable@vger.kernel.org> # v4.20
+Reported-by: Samuel Holland <samuel@sholland.org>
+Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 499b968..789b332 100644
+--- a/Makefile
++++ b/Makefile
+@@ -955,6 +955,7 @@ ifdef CONFIG_STACK_VALIDATION
+   endif
+ endif
+ 
++PHONY += prepare0
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+ core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
+@@ -1061,8 +1062,7 @@ scripts: scripts_basic scripts_dtc
+ # archprepare is used in arch Makefiles and when processed asm symlink,
+ # version.h and scripts_basic is processed / created.
+ 
+-# Listed in dependency order
+-PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
++PHONY += prepare archprepare prepare1 prepare2 prepare3
+ 
+ # prepare3 is used to check if we are building in a separate output directory,
+ # and if so do:
+-- 
+2.7.4
