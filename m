@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:59864 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:56292 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730657AbfAOQmh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Jan 2019 11:42:37 -0500
+        id S1732520AbfAOQkC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 15 Jan 2019 11:40:02 -0500
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.19 05/50] x86, modpost: Replace last remnants of RETPOLINE with CONFIG_RETPOLINE
-Date: Tue, 15 Jan 2019 17:35:41 +0100
-Message-Id: <20190115154910.305214268@linuxfoundation.org>
-In-Reply-To: <20190115154909.933241945@linuxfoundation.org>
-References: <20190115154909.933241945@linuxfoundation.org>
+Subject: [PATCH 4.14 02/27] x86, modpost: Replace last remnants of RETPOLINE with CONFIG_RETPOLINE
+Date: Tue, 15 Jan 2019 17:35:51 +0100
+Message-Id: <20190115154901.327470125@linuxfoundation.org>
+In-Reply-To: <20190115154901.189747728@linuxfoundation.org>
+References: <20190115154901.189747728@linuxfoundation.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -17,7 +17,7 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, WANG Chao <chao.wang@ucloud.cn>, Borislav Petkov <bp@suse.de>, Zhenzhong Duan <zhenzhong.duan@oracle.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, "H. Peter Anvin" <hpa@zytor.com>, Andi Kleen <ak@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Daniel Borkmann <daniel@iogearbox.net>, David Woodhouse <dwmw@amazon.co.uk>, Geert Uytterhoeven <geert@linux-m68k.org>, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jkosina@suse.cz>, Kees Cook <keescook@chromium.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Tim Chen <tim.c.chen@linux.intel.com>, Vasily Gorbik <gor@linux.ibm.com>, linux-kbuild@vger.kernel.org, srinivas.eeda@oracle.com, x86-ml <x86@kernel.org>
 
-4.19-stable review patch.  If anyone has any objections, please let me know.
+4.14-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -73,7 +73,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/arch/x86/kernel/cpu/bugs.c
 +++ b/arch/x86/kernel/cpu/bugs.c
-@@ -213,7 +213,7 @@ static enum spectre_v2_mitigation spectr
+@@ -212,7 +212,7 @@ static enum spectre_v2_mitigation spectr
  static enum spectre_v2_user_mitigation spectre_v2_user __ro_after_init =
  	SPECTRE_V2_USER_NONE;
  
@@ -84,9 +84,9 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  bool retpoline_module_ok(bool has_retpoline)
 --- a/include/linux/compiler-gcc.h
 +++ b/include/linux/compiler-gcc.h
-@@ -75,7 +75,7 @@
- #define __must_be_array(a)	BUILD_BUG_ON_ZERO(__same_type((a), &(a)[0]))
- #endif
+@@ -108,7 +108,7 @@
+ #define __weak		__attribute__((weak))
+ #define __alias(symbol)	__attribute__((alias(#symbol)))
  
 -#ifdef RETPOLINE
 +#ifdef CONFIG_RETPOLINE
@@ -95,7 +95,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  
 --- a/include/linux/module.h
 +++ b/include/linux/module.h
-@@ -818,7 +818,7 @@ static inline void module_bug_finalize(c
+@@ -794,7 +794,7 @@ static inline void module_bug_finalize(c
  static inline void module_bug_cleanup(struct module *mod) {}
  #endif	/* CONFIG_GENERIC_BUG */
  
@@ -106,7 +106,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  static inline bool retpoline_module_ok(bool has_retpoline)
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2157,7 +2157,7 @@ static void add_intree_flag(struct buffe
+@@ -2168,7 +2168,7 @@ static void add_intree_flag(struct buffe
  /* Cannot check for assembler */
  static void add_retpoline(struct buffer *b)
  {
