@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:34384 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:59864 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728306AbfAOQov (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Jan 2019 11:44:51 -0500
+        id S1730657AbfAOQmh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 15 Jan 2019 11:42:37 -0500
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.20 08/57] x86, modpost: Replace last remnants of RETPOLINE with CONFIG_RETPOLINE
-Date: Tue, 15 Jan 2019 17:35:49 +0100
-Message-Id: <20190115154911.193525782@linuxfoundation.org>
-In-Reply-To: <20190115154910.734892368@linuxfoundation.org>
-References: <20190115154910.734892368@linuxfoundation.org>
+Subject: [PATCH 4.19 05/50] x86, modpost: Replace last remnants of RETPOLINE with CONFIG_RETPOLINE
+Date: Tue, 15 Jan 2019 17:35:41 +0100
+Message-Id: <20190115154910.305214268@linuxfoundation.org>
+In-Reply-To: <20190115154909.933241945@linuxfoundation.org>
+References: <20190115154909.933241945@linuxfoundation.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -17,7 +17,7 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, WANG Chao <chao.wang@ucloud.cn>, Borislav Petkov <bp@suse.de>, Zhenzhong Duan <zhenzhong.duan@oracle.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, "H. Peter Anvin" <hpa@zytor.com>, Andi Kleen <ak@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Daniel Borkmann <daniel@iogearbox.net>, David Woodhouse <dwmw@amazon.co.uk>, Geert Uytterhoeven <geert@linux-m68k.org>, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jkosina@suse.cz>, Kees Cook <keescook@chromium.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Tim Chen <tim.c.chen@linux.intel.com>, Vasily Gorbik <gor@linux.ibm.com>, linux-kbuild@vger.kernel.org, srinivas.eeda@oracle.com, x86-ml <x86@kernel.org>
 
-4.20-stable review patch.  If anyone has any objections, please let me know.
+4.19-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -84,18 +84,18 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  bool retpoline_module_ok(bool has_retpoline)
 --- a/include/linux/compiler-gcc.h
 +++ b/include/linux/compiler-gcc.h
-@@ -68,7 +68,7 @@
-  */
- #define uninitialized_var(x) x = x
+@@ -75,7 +75,7 @@
+ #define __must_be_array(a)	BUILD_BUG_ON_ZERO(__same_type((a), &(a)[0]))
+ #endif
  
 -#ifdef RETPOLINE
 +#ifdef CONFIG_RETPOLINE
- #define __noretpoline __attribute__((__indirect_branch__("keep")))
+ #define __noretpoline __attribute__((indirect_branch("keep")))
  #endif
  
 --- a/include/linux/module.h
 +++ b/include/linux/module.h
-@@ -817,7 +817,7 @@ static inline void module_bug_finalize(c
+@@ -818,7 +818,7 @@ static inline void module_bug_finalize(c
  static inline void module_bug_cleanup(struct module *mod) {}
  #endif	/* CONFIG_GENERIC_BUG */
  
