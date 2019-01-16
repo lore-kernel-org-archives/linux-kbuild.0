@@ -1,95 +1,131 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:49547 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727883AbfAPC50 (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:55518 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387533AbfAPOeS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Jan 2019 21:57:26 -0500
+        Wed, 16 Jan 2019 09:34:18 -0500
+MIME-Version: 1.0
+References: <1546657311-24661-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1546657311-24661-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] kbuild: add -I$(srctree)/$(src) automatically for hostprogs with O=
-Date: Wed, 16 Jan 2019 11:56:41 +0900
-Message-Id: <1547607401-20118-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1547607401-20118-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1547607401-20118-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Wed, 16 Jan 2019 23:33:12 +0900
+Message-ID: <CAK7LNAReq2wmuOOV3f2VxOsZpmatJXqPoDz4htoiVYq-oM8QsQ@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: rename generated .*conf-cfg to *conf-cfg
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: devicetree@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Mauro Rossi <issor.oruam@gmail.com>, Rob Herring <robh+dt@kernel.org>, Frank Rowand <frowand.list@gmail.com>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-When building kernel objects with the O= option, scripts/Makefile.lib
-automatically adds both -I$(srctree)/$(src) and -I$(obj) so each
-Makefile does not need to add them explicitly.
+On Sat, Jan 5, 2019 at 12:02 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> Remove the dot-prefixing since it is just a matter of the
+> .gitignore file.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 
-In contrast, scripts/Makefile.host adds only -I$(obj) when building
-host programs with the O= option. As a result, each Makefile must add
-the extra option to include checkin headers from generated C files.
+Applied to linux-kbuild/fixes.
 
-Let's cater to this in the build system for consistency, and drop
-extra options from the kconfig, dtc, genksyms Makefiles.
+>
+>  scripts/kconfig/.gitignore |  1 +
+>  scripts/kconfig/Makefile   | 36 ++++++++++++++++++------------------
+>  2 files changed, 19 insertions(+), 18 deletions(-)
+>
+> diff --git a/scripts/kconfig/.gitignore b/scripts/kconfig/.gitignore
+> index 0aabc1d..b5bf92f 100644
+> --- a/scripts/kconfig/.gitignore
+> +++ b/scripts/kconfig/.gitignore
+> @@ -2,6 +2,7 @@
+>  # Generated files
+>  #
+>  *.moc
+> +*conf-cfg
+>
+>  #
+>  # configuration programs
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index 679e62e..c05ab00 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -157,53 +157,53 @@ conf-objs := conf.o $(common-objs)
+>  hostprogs-y    += nconf
+>  nconf-objs     := nconf.o nconf.gui.o $(common-objs)
+>
+> -HOSTLDLIBS_nconf       = $(shell . $(obj)/.nconf-cfg && echo $$libs)
+> -HOSTCFLAGS_nconf.o     = $(shell . $(obj)/.nconf-cfg && echo $$cflags)
+> -HOSTCFLAGS_nconf.gui.o = $(shell . $(obj)/.nconf-cfg && echo $$cflags)
+> +HOSTLDLIBS_nconf       = $(shell . $(obj)/nconf-cfg && echo $$libs)
+> +HOSTCFLAGS_nconf.o     = $(shell . $(obj)/nconf-cfg && echo $$cflags)
+> +HOSTCFLAGS_nconf.gui.o = $(shell . $(obj)/nconf-cfg && echo $$cflags)
+>
+> -$(obj)/nconf.o $(obj)/nconf.gui.o: $(obj)/.nconf-cfg
+> +$(obj)/nconf.o $(obj)/nconf.gui.o: $(obj)/nconf-cfg
+>
+>  # mconf: Used for the menuconfig target based on lxdialog
+>  hostprogs-y    += mconf
+>  lxdialog       := checklist.o inputbox.o menubox.o textbox.o util.o yesno.o
+>  mconf-objs     := mconf.o $(addprefix lxdialog/, $(lxdialog)) $(common-objs)
+>
+> -HOSTLDLIBS_mconf = $(shell . $(obj)/.mconf-cfg && echo $$libs)
+> +HOSTLDLIBS_mconf = $(shell . $(obj)/mconf-cfg && echo $$libs)
+>  $(foreach f, mconf.o $(lxdialog), \
+> -  $(eval HOSTCFLAGS_$f = $$(shell . $(obj)/.mconf-cfg && echo $$$$cflags)))
+> +  $(eval HOSTCFLAGS_$f = $$(shell . $(obj)/mconf-cfg && echo $$$$cflags)))
+>
+> -$(obj)/mconf.o: $(obj)/.mconf-cfg
+> -$(addprefix $(obj)/lxdialog/, $(lxdialog)): $(obj)/.mconf-cfg
+> +$(obj)/mconf.o: $(obj)/mconf-cfg
+> +$(addprefix $(obj)/lxdialog/, $(lxdialog)): $(obj)/mconf-cfg
+>
+>  # qconf: Used for the xconfig target based on Qt
+>  hostprogs-y    += qconf
+>  qconf-cxxobjs  := qconf.o
+>  qconf-objs     := images.o $(common-objs)
+>
+> -HOSTLDLIBS_qconf       = $(shell . $(obj)/.qconf-cfg && echo $$libs)
+> -HOSTCXXFLAGS_qconf.o   = $(shell . $(obj)/.qconf-cfg && echo $$cflags)
+> +HOSTLDLIBS_qconf       = $(shell . $(obj)/qconf-cfg && echo $$libs)
+> +HOSTCXXFLAGS_qconf.o   = $(shell . $(obj)/qconf-cfg && echo $$cflags)
+>
+> -$(obj)/qconf.o: $(obj)/.qconf-cfg $(obj)/qconf.moc
+> +$(obj)/qconf.o: $(obj)/qconf-cfg $(obj)/qconf.moc
+>
+>  quiet_cmd_moc = MOC     $@
+> -      cmd_moc = $(shell . $(obj)/.qconf-cfg && echo $$moc) -i $< -o $@
+> +      cmd_moc = $(shell . $(obj)/qconf-cfg && echo $$moc) -i $< -o $@
+>
+> -$(obj)/%.moc: $(src)/%.h $(obj)/.qconf-cfg
+> +$(obj)/%.moc: $(src)/%.h $(obj)/qconf-cfg
+>         $(call cmd,moc)
+>
+>  # gconf: Used for the gconfig target based on GTK+
+>  hostprogs-y    += gconf
+>  gconf-objs     := gconf.o images.o $(common-objs)
+>
+> -HOSTLDLIBS_gconf    = $(shell . $(obj)/.gconf-cfg && echo $$libs)
+> -HOSTCFLAGS_gconf.o  = $(shell . $(obj)/.gconf-cfg && echo $$cflags)
+> +HOSTLDLIBS_gconf    = $(shell . $(obj)/gconf-cfg && echo $$libs)
+> +HOSTCFLAGS_gconf.o  = $(shell . $(obj)/gconf-cfg && echo $$cflags)
+>
+> -$(obj)/gconf.o: $(obj)/.gconf-cfg
+> +$(obj)/gconf.o: $(obj)/gconf-cfg
+>
+>  # check if necessary packages are available, and configure build flags
+>  filechk_conf_cfg = $(CONFIG_SHELL) $<
+>
+> -$(obj)/.%conf-cfg: $(src)/%conf-cfg.sh FORCE
+> +$(obj)/%conf-cfg: $(src)/%conf-cfg.sh FORCE
+>         $(call filechk,conf_cfg)
+>
+> -clean-files += .*conf-cfg
+> +clean-files += conf-cfg
+> --
+> 2.7.4
+>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- scripts/Makefile.host     | 4 ++--
- scripts/dtc/Makefile      | 4 ----
- scripts/genksyms/Makefile | 4 ----
- scripts/kconfig/Makefile  | 2 --
- 4 files changed, 2 insertions(+), 12 deletions(-)
-
-diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-index a115259..c41d5a1d 100644
---- a/scripts/Makefile.host
-+++ b/scripts/Makefile.host
-@@ -72,8 +72,8 @@ __hostcxx_flags	= $(_hostcxx_flags)
- 
- ifeq ($(KBUILD_EXTMOD),)
- ifneq ($(KBUILD_SRC),)
--__hostc_flags	= -I$(obj) $(call flags,_hostc_flags)
--__hostcxx_flags	= -I$(obj) $(call flags,_hostcxx_flags)
-+__hostc_flags	= -I $(srctree)/$(src) -I $(obj) $(call flags,_hostc_flags)
-+__hostcxx_flags	= -I $(srctree)/$(src) -I $(obj) $(call flags,_hostcxx_flags)
- endif
- endif
- 
-diff --git a/scripts/dtc/Makefile b/scripts/dtc/Makefile
-index 5f227d8..72d3fa4 100644
---- a/scripts/dtc/Makefile
-+++ b/scripts/dtc/Makefile
-@@ -22,9 +22,5 @@ dtc-objs	+= yamltree.o
- HOSTLDLIBS_dtc	:= -lyaml
- endif
- 
--# Generated files need one more search path to include headers in source tree
--HOSTCFLAGS_dtc-lexer.lex.o := -I$(src)
--HOSTCFLAGS_dtc-parser.tab.o := -I$(src)
--
- # dependencies on generated files need to be listed explicitly
- $(obj)/dtc-lexer.lex.o: $(obj)/dtc-parser.tab.h
-diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
-index 03b7ce9..ae5953d 100644
---- a/scripts/genksyms/Makefile
-+++ b/scripts/genksyms/Makefile
-@@ -30,9 +30,5 @@ $(obj)/parse.tab.h: $(src)/parse.y FORCE
- 
- endif
- 
--# -I needed for generated C source (shipped source)
--HOSTCFLAGS_parse.tab.o := -I$(src)
--HOSTCFLAGS_lex.lex.o := -I$(src)
--
- # dependencies on generated files need to be listed explicitly
- $(obj)/lex.lex.o: $(obj)/parse.tab.h
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 1819735..12cb5eb 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -146,8 +146,6 @@ help:
- common-objs	:= confdata.o expr.o symbol.o preprocess.o zconf.lex.o zconf.tab.o
- 
- $(obj)/zconf.lex.o: $(obj)/zconf.tab.h
--HOSTCFLAGS_zconf.lex.o	:= -I$(src)
--HOSTCFLAGS_zconf.tab.o	:= -I$(src)
- 
- # conf: Used for defconfig, oldconfig and related targets
- hostprogs-y	+= conf
 -- 
-2.7.4
+Best Regards
+Masahiro Yamada
