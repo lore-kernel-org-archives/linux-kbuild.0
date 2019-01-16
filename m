@@ -1,86 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:39380 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387533AbfAPOeg (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:64705 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387533AbfAPOfV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 Jan 2019 09:34:36 -0500
+        Wed, 16 Jan 2019 09:35:21 -0500
 MIME-Version: 1.0
-References: <1547536740-1572-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1547536740-1572-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1547454569-27319-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1547454569-27319-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 16 Jan 2019 23:33:36 +0900
-Message-ID: <CAK7LNAQKuW8f7BgX8q-Eqa480o6Ch_mZsHyY52h96kifnYepHg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: mark prepare0 as PHONY to fix external module build
+Date: Wed, 16 Jan 2019 23:34:32 +0900
+Message-ID: <CAK7LNASKFbynGoie6Pox8nZhikeobMDBk-V8gz=Z6cj3_ieKCQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: remove unused archmrproper
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Samuel Holland <samuel@sholland.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>, "linux-stable # v4 . 20" <stable@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>, Yoshinori Sato <ysato@users.sourceforge.jp>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Tue, Jan 15, 2019 at 5:07 PM Masahiro Yamada
+On Mon, Jan 14, 2019 at 5:30 PM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
-> Commit c3ff2a5193fa ("powerpc/32: add stack protector support")
-> caused kernel panic on PowerPC if an external module is used with
-> CONFIG_STACKPROTECTOR because the 'prepare' target was not executed
-> for the external module build.
+> No one uses archmrproper.
 >
-> Commit e07db28eea38 ("kbuild: fix single target build for external
-> module") turned it into a build error because the 'prepare' target is
-> now executed but the 'prepare0' target is missing for the external
-> module build.
->
-> External module on arm/arm64 with CONFIG_STACKPROTECTOR_PER_TASK is
-> also broken in the same way.
->
-> Move 'PHONY += prepare0' to the common place. Make is fine with missing
-> rule for phony targets.
->
-> I minimize the change so it can be easily backported to 4.20.x
->
-> To fix v4.20 for external modules of PowerPC, please backport
-> e07db28eea38 ("kbuild: fix single target build for external module"),
-> and then this commit.
->
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=201891
-> Fixes: e07db28eea38 ("kbuild: fix single target build for external module")
-> Fixes: c3ff2a5193fa ("powerpc/32: add stack protector support")
-> Fixes: 189af4657186 ("ARM: smp: add support for per-task stack canaries")
-> Fixes: 0a1213fa7432 ("arm64: enable per-task stack canaries")
-> Cc: linux-stable <stable@vger.kernel.org> # v4.20
-> Reported-by: Samuel Holland <samuel@sholland.org>
-> Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
 
+
 Applied to linux-kbuild/fixes.
 
-
->  Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>  Makefile            | 4 ++--
+>  arch/h8300/Makefile | 2 --
+>  2 files changed, 2 insertions(+), 4 deletions(-)
 >
 > diff --git a/Makefile b/Makefile
-> index 499b968..789b332 100644
+> index 68898cc..a9c54e1 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -955,6 +955,7 @@ ifdef CONFIG_STACK_VALIDATION
->    endif
->  endif
+> @@ -1360,11 +1360,11 @@ mrproper: rm-dirs  := $(wildcard $(MRPROPER_DIRS))
+>  mrproper: rm-files := $(wildcard $(MRPROPER_FILES))
+>  mrproper-dirs      := $(addprefix _mrproper_,scripts)
 >
-> +PHONY += prepare0
+> -PHONY += $(mrproper-dirs) mrproper archmrproper
+> +PHONY += $(mrproper-dirs) mrproper
+>  $(mrproper-dirs):
+>         $(Q)$(MAKE) $(clean)=$(patsubst _mrproper_%,%,$@)
 >
->  ifeq ($(KBUILD_EXTMOD),)
->  core-y         += kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
-> @@ -1061,8 +1062,7 @@ scripts: scripts_basic scripts_dtc
->  # archprepare is used in arch Makefiles and when processed asm symlink,
->  # version.h and scripts_basic is processed / created.
+> -mrproper: clean archmrproper $(mrproper-dirs)
+> +mrproper: clean $(mrproper-dirs)
+>         $(call cmd,rmdirs)
+>         $(call cmd,rmfiles)
 >
-> -# Listed in dependency order
-> -PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
-> +PHONY += prepare archprepare prepare1 prepare2 prepare3
+> diff --git a/arch/h8300/Makefile b/arch/h8300/Makefile
+> index 4003ddc..f801f37 100644
+> --- a/arch/h8300/Makefile
+> +++ b/arch/h8300/Makefile
+> @@ -37,8 +37,6 @@ libs-y        += arch/$(ARCH)/lib/
 >
->  # prepare3 is used to check if we are building in a separate output directory,
->  # and if so do:
+>  boot := arch/h8300/boot
+>
+> -archmrproper:
+> -
+>  archclean:
+>         $(Q)$(MAKE) $(clean)=$(boot)
+>
 > --
 > 2.7.4
 >
