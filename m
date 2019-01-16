@@ -1,117 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56292 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732520AbfAOQkC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Jan 2019 11:40:02 -0500
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.14 02/27] x86, modpost: Replace last remnants of RETPOLINE with CONFIG_RETPOLINE
-Date: Tue, 15 Jan 2019 17:35:51 +0100
-Message-Id: <20190115154901.327470125@linuxfoundation.org>
-In-Reply-To: <20190115154901.189747728@linuxfoundation.org>
-References: <20190115154901.189747728@linuxfoundation.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from conuserg-10.nifty.com ([210.131.2.77]:48887 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727883AbfAPC5O (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 15 Jan 2019 21:57:14 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/2] kbuild: skip 'addtree' and 'flags' magic for external module build
+Date: Wed, 16 Jan 2019 11:56:40 +0900
+Message-Id: <1547607401-20118-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, WANG Chao <chao.wang@ucloud.cn>, Borislav Petkov <bp@suse.de>, Zhenzhong Duan <zhenzhong.duan@oracle.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, "H. Peter Anvin" <hpa@zytor.com>, Andi Kleen <ak@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Daniel Borkmann <daniel@iogearbox.net>, David Woodhouse <dwmw@amazon.co.uk>, Geert Uytterhoeven <geert@linux-m68k.org>, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jkosina@suse.cz>, Kees Cook <keescook@chromium.org>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Tim Chen <tim.c.chen@linux.intel.com>, Vasily Gorbik <gor@linux.ibm.com>, linux-kbuild@vger.kernel.org, srinivas.eeda@oracle.com, x86-ml <x86@kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: devicetree@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-4.14-stable review patch.  If anyone has any objections, please let me know.
+When building an external module, $(obj) is the absolute path to it.
 
-------------------
+The header search paths from ccflags-y etc. should not be tweaked.
 
-From: WANG Chao <chao.wang@ucloud.cn>
-
-commit e4f358916d528d479c3c12bd2fd03f2d5a576380 upstream.
-
-Commit
-
-  4cd24de3a098 ("x86/retpoline: Make CONFIG_RETPOLINE depend on compiler support")
-
-replaced the RETPOLINE define with CONFIG_RETPOLINE checks. Remove the
-remaining pieces.
-
- [ bp: Massage commit message. ]
-
-Fixes: 4cd24de3a098 ("x86/retpoline: Make CONFIG_RETPOLINE depend on compiler support")
-Signed-off-by: WANG Chao <chao.wang@ucloud.cn>
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Reviewed-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Andi Kleen <ak@linux.intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Andy Lutomirski <luto@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: David Woodhouse <dwmw@amazon.co.uk>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Jessica Yu <jeyu@kernel.org>
-Cc: Jiri Kosina <jkosina@suse.cz>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Tim Chen <tim.c.chen@linux.intel.com>
-Cc: Vasily Gorbik <gor@linux.ibm.com>
-Cc: linux-kbuild@vger.kernel.org
-Cc: srinivas.eeda@oracle.com
-Cc: stable <stable@vger.kernel.org>
-Cc: x86-ml <x86@kernel.org>
-Link: https://lkml.kernel.org/r/20181210163725.95977-1-chao.wang@ucloud.cn
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
- arch/x86/kernel/cpu/bugs.c   |    2 +-
- include/linux/compiler-gcc.h |    2 +-
- include/linux/module.h       |    2 +-
- scripts/mod/modpost.c        |    2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
 
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -212,7 +212,7 @@ static enum spectre_v2_mitigation spectr
- static enum spectre_v2_user_mitigation spectre_v2_user __ro_after_init =
- 	SPECTRE_V2_USER_NONE;
+ scripts/Makefile.host |  6 ++++--
+ scripts/Makefile.lib  | 11 ++++++-----
+ 2 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/scripts/Makefile.host b/scripts/Makefile.host
+index 0393f75..a115259 100644
+--- a/scripts/Makefile.host
++++ b/scripts/Makefile.host
+@@ -67,13 +67,15 @@ _hostc_flags   = $(KBUILD_HOSTCFLAGS)   $(HOST_EXTRACFLAGS)   \
+ _hostcxx_flags = $(KBUILD_HOSTCXXFLAGS) $(HOST_EXTRACXXFLAGS) \
+                  $(HOSTCXXFLAGS_$(basetarget).o)
  
--#ifdef RETPOLINE
-+#ifdef CONFIG_RETPOLINE
- static bool spectre_v2_bad_module;
+-ifeq ($(KBUILD_SRC),)
+ __hostc_flags	= $(_hostc_flags)
+ __hostcxx_flags	= $(_hostcxx_flags)
+-else
++
++ifeq ($(KBUILD_EXTMOD),)
++ifneq ($(KBUILD_SRC),)
+ __hostc_flags	= -I$(obj) $(call flags,_hostc_flags)
+ __hostcxx_flags	= -I$(obj) $(call flags,_hostcxx_flags)
+ endif
++endif
  
- bool retpoline_module_ok(bool has_retpoline)
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -108,7 +108,7 @@
- #define __weak		__attribute__((weak))
- #define __alias(symbol)	__attribute__((alias(#symbol)))
+ hostc_flags    = -Wp,-MD,$(depfile) $(__hostc_flags)
+ hostcxx_flags  = -Wp,-MD,$(depfile) $(__hostcxx_flags)
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 12b88d0..ecad15b 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -137,14 +137,14 @@ _c_flags += $(if $(patsubst n%,, \
+ 	$(CFLAGS_KCOV))
+ endif
  
--#ifdef RETPOLINE
-+#ifdef CONFIG_RETPOLINE
- #define __noretpoline __attribute__((indirect_branch("keep")))
- #endif
+-# If building the kernel in a separate objtree expand all occurrences
+-# of -Idir to -I$(srctree)/dir except for absolute paths (starting with '/').
+-
+-ifeq ($(KBUILD_SRC),)
+ __c_flags	= $(_c_flags)
+ __a_flags	= $(_a_flags)
+ __cpp_flags     = $(_cpp_flags)
+-else
++
++# If building the kernel in a separate objtree expand all occurrences
++# of -Idir to -I$(srctree)/dir except for absolute paths (starting with '/').
++ifeq ($(KBUILD_EXTMOD),)
++ifneq ($(KBUILD_SRC),)
  
---- a/include/linux/module.h
-+++ b/include/linux/module.h
-@@ -794,7 +794,7 @@ static inline void module_bug_finalize(c
- static inline void module_bug_cleanup(struct module *mod) {}
- #endif	/* CONFIG_GENERIC_BUG */
+ # -I$(obj) locates generated .h files
+ # $(call addtree,-I$(obj)) locates .h files in srctree, from generated .c files
+@@ -155,6 +155,7 @@ __c_flags	= $(if $(obj),$(call addtree,-I$(src)) -I$(obj)) \
+ __a_flags	= $(call flags,_a_flags)
+ __cpp_flags     = $(call flags,_cpp_flags)
+ endif
++endif
  
--#ifdef RETPOLINE
-+#ifdef CONFIG_RETPOLINE
- extern bool retpoline_module_ok(bool has_retpoline);
- #else
- static inline bool retpoline_module_ok(bool has_retpoline)
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2168,7 +2168,7 @@ static void add_intree_flag(struct buffe
- /* Cannot check for assembler */
- static void add_retpoline(struct buffer *b)
- {
--	buf_printf(b, "\n#ifdef RETPOLINE\n");
-+	buf_printf(b, "\n#ifdef CONFIG_RETPOLINE\n");
- 	buf_printf(b, "MODULE_INFO(retpoline, \"Y\");\n");
- 	buf_printf(b, "#endif\n");
- }
+ c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+ 		 -include $(srctree)/include/linux/compiler_types.h       \
+-- 
+2.7.4
