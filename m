@@ -1,82 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:48887 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:49547 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727883AbfAPC5O (ORCPT
+        with ESMTP id S1727883AbfAPC50 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Jan 2019 21:57:14 -0500
+        Tue, 15 Jan 2019 21:57:26 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/2] kbuild: skip 'addtree' and 'flags' magic for external module build
-Date: Wed, 16 Jan 2019 11:56:40 +0900
-Message-Id: <1547607401-20118-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 2/2] kbuild: add -I$(srctree)/$(src) automatically for hostprogs with O=
+Date: Wed, 16 Jan 2019 11:56:41 +0900
+Message-Id: <1547607401-20118-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1547607401-20118-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1547607401-20118-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: devicetree@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: devicetree@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Mauro Rossi <issor.oruam@gmail.com>, Rob Herring <robh+dt@kernel.org>, Frank Rowand <frowand.list@gmail.com>
 
-When building an external module, $(obj) is the absolute path to it.
+When building kernel objects with the O= option, scripts/Makefile.lib
+automatically adds both -I$(srctree)/$(src) and -I$(obj) so each
+Makefile does not need to add them explicitly.
 
-The header search paths from ccflags-y etc. should not be tweaked.
+In contrast, scripts/Makefile.host adds only -I$(obj) when building
+host programs with the O= option. As a result, each Makefile must add
+the extra option to include checkin headers from generated C files.
+
+Let's cater to this in the build system for consistency, and drop
+extra options from the kconfig, dtc, genksyms Makefiles.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/Makefile.host |  6 ++++--
- scripts/Makefile.lib  | 11 ++++++-----
- 2 files changed, 10 insertions(+), 7 deletions(-)
+ scripts/Makefile.host     | 4 ++--
+ scripts/dtc/Makefile      | 4 ----
+ scripts/genksyms/Makefile | 4 ----
+ scripts/kconfig/Makefile  | 2 --
+ 4 files changed, 2 insertions(+), 12 deletions(-)
 
 diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-index 0393f75..a115259 100644
+index a115259..c41d5a1d 100644
 --- a/scripts/Makefile.host
 +++ b/scripts/Makefile.host
-@@ -67,13 +67,15 @@ _hostc_flags   = $(KBUILD_HOSTCFLAGS)   $(HOST_EXTRACFLAGS)   \
- _hostcxx_flags = $(KBUILD_HOSTCXXFLAGS) $(HOST_EXTRACXXFLAGS) \
-                  $(HOSTCXXFLAGS_$(basetarget).o)
+@@ -72,8 +72,8 @@ __hostcxx_flags	= $(_hostcxx_flags)
  
--ifeq ($(KBUILD_SRC),)
- __hostc_flags	= $(_hostc_flags)
- __hostcxx_flags	= $(_hostcxx_flags)
--else
-+
-+ifeq ($(KBUILD_EXTMOD),)
-+ifneq ($(KBUILD_SRC),)
- __hostc_flags	= -I$(obj) $(call flags,_hostc_flags)
- __hostcxx_flags	= -I$(obj) $(call flags,_hostcxx_flags)
+ ifeq ($(KBUILD_EXTMOD),)
+ ifneq ($(KBUILD_SRC),)
+-__hostc_flags	= -I$(obj) $(call flags,_hostc_flags)
+-__hostcxx_flags	= -I$(obj) $(call flags,_hostcxx_flags)
++__hostc_flags	= -I $(srctree)/$(src) -I $(obj) $(call flags,_hostc_flags)
++__hostcxx_flags	= -I $(srctree)/$(src) -I $(obj) $(call flags,_hostcxx_flags)
  endif
-+endif
- 
- hostc_flags    = -Wp,-MD,$(depfile) $(__hostc_flags)
- hostcxx_flags  = -Wp,-MD,$(depfile) $(__hostcxx_flags)
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 12b88d0..ecad15b 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -137,14 +137,14 @@ _c_flags += $(if $(patsubst n%,, \
- 	$(CFLAGS_KCOV))
  endif
  
--# If building the kernel in a separate objtree expand all occurrences
--# of -Idir to -I$(srctree)/dir except for absolute paths (starting with '/').
+diff --git a/scripts/dtc/Makefile b/scripts/dtc/Makefile
+index 5f227d8..72d3fa4 100644
+--- a/scripts/dtc/Makefile
++++ b/scripts/dtc/Makefile
+@@ -22,9 +22,5 @@ dtc-objs	+= yamltree.o
+ HOSTLDLIBS_dtc	:= -lyaml
+ endif
+ 
+-# Generated files need one more search path to include headers in source tree
+-HOSTCFLAGS_dtc-lexer.lex.o := -I$(src)
+-HOSTCFLAGS_dtc-parser.tab.o := -I$(src)
 -
--ifeq ($(KBUILD_SRC),)
- __c_flags	= $(_c_flags)
- __a_flags	= $(_a_flags)
- __cpp_flags     = $(_cpp_flags)
--else
-+
-+# If building the kernel in a separate objtree expand all occurrences
-+# of -Idir to -I$(srctree)/dir except for absolute paths (starting with '/').
-+ifeq ($(KBUILD_EXTMOD),)
-+ifneq ($(KBUILD_SRC),)
+ # dependencies on generated files need to be listed explicitly
+ $(obj)/dtc-lexer.lex.o: $(obj)/dtc-parser.tab.h
+diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
+index 03b7ce9..ae5953d 100644
+--- a/scripts/genksyms/Makefile
++++ b/scripts/genksyms/Makefile
+@@ -30,9 +30,5 @@ $(obj)/parse.tab.h: $(src)/parse.y FORCE
  
- # -I$(obj) locates generated .h files
- # $(call addtree,-I$(obj)) locates .h files in srctree, from generated .c files
-@@ -155,6 +155,7 @@ __c_flags	= $(if $(obj),$(call addtree,-I$(src)) -I$(obj)) \
- __a_flags	= $(call flags,_a_flags)
- __cpp_flags     = $(call flags,_cpp_flags)
  endif
-+endif
  
- c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
- 		 -include $(srctree)/include/linux/compiler_types.h       \
+-# -I needed for generated C source (shipped source)
+-HOSTCFLAGS_parse.tab.o := -I$(src)
+-HOSTCFLAGS_lex.lex.o := -I$(src)
+-
+ # dependencies on generated files need to be listed explicitly
+ $(obj)/lex.lex.o: $(obj)/parse.tab.h
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 1819735..12cb5eb 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -146,8 +146,6 @@ help:
+ common-objs	:= confdata.o expr.o symbol.o preprocess.o zconf.lex.o zconf.tab.o
+ 
+ $(obj)/zconf.lex.o: $(obj)/zconf.tab.h
+-HOSTCFLAGS_zconf.lex.o	:= -I$(src)
+-HOSTCFLAGS_zconf.tab.o	:= -I$(src)
+ 
+ # conf: Used for defconfig, oldconfig and related targets
+ hostprogs-y	+= conf
 -- 
 2.7.4
