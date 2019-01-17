@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:44582 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727756AbfAPXsU (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:16423 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728211AbfAQALK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 Jan 2019 18:48:20 -0500
+        Wed, 16 Jan 2019 19:11:10 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 1/2] kbuild: remove top-level built-in.a
-Date: Thu, 17 Jan 2019 08:47:24 +0900
-Message-Id: <1547682445-15114-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v3 1/2] kbuild: remove top-level built-in.a
+Date: Thu, 17 Jan 2019 09:10:03 +0900
+Message-Id: <1547683804-17956-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -26,6 +26,7 @@ Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Acked-by: Nicholas Piggin <npiggin@gmail.com>
 ---
 
+Changes in v3: None
 Changes in v2:
  - Update the document and comments
  - Add Nicholas' Ack
