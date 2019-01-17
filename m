@@ -1,21 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.iiests.ac.in ([14.139.223.185]:52156 "EHLO
-        mail.iiests.ac.in" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725888AbfAQAnj (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:22827 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728525AbfAQELF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 Jan 2019 19:43:39 -0500
-Date: Thu, 17 Jan 2019 04:21:31 +0530 (IST)
-From: friedrich mayrhofer <sanat@math.iiests.ac.in>
-Reply-To: friedrich mayrhofer <friedrichmayrhofer.spende@gmail.com>
-Message-ID: <602862938.15308.1547679091749.JavaMail.zimbra@math.iiests.ac.in>
-Subject: =?utf-8?Q?wohlt=C3=A4tige_Spende_von_2.800.000_euro?=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+        Wed, 16 Jan 2019 23:11:05 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/3] kbuild: simplify rules of data compression with size appending
+Date: Thu, 17 Jan 2019 13:10:29 +0900
+Message-Id: <1547698231-20985-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
+All the callers of size_append pass $(filter-out FORCE,$^).
+Move $(filter-out FORCE,$^) to the definition of size_append.
 
+This makes the callers cleaner because $(call ...) can be omitted
+to expand a macro with no argument.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Mein Name ist Friedrich Mayrhofer, meine Frau und ich haben im Dezember 2015 eine Jackpot-Lotterie in Höhe von 50 Millionen Dollar gewonnen. Wir spenden die Summe von 2.800.000 Millionen Euro an 5 glückliche Personen, von denen Sie einer der Begünstigten sind. und wir spenden 2.800.000,00 an Sie, .kontaktieren Sie mich über meine Stiftung bei friedrichmayrhofer.spende@gmail.com
+ scripts/Makefile.lib | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index ecad15b..ebaa348 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -321,7 +321,7 @@ dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
+ # append the size as a 32-bit littleendian number as gzip does.
+ size_append = printf $(shell						\
+ dec_size=0;								\
+-for F in $1; do								\
++for F in $(filter-out FORCE,$^); do					\
+ 	fsize=$$($(CONFIG_SHELL) $(srctree)/scripts/file-size.sh $$F);	\
+ 	dec_size=$$(expr $$dec_size + $$fsize);				\
+ done;									\
+@@ -335,23 +335,20 @@ printf "%08x\n" $$dec_size |						\
+ )
+ 
+ quiet_cmd_bzip2 = BZIP2   $@
+-cmd_bzip2 = (cat $(filter-out FORCE,$^) | \
+-	bzip2 -9 && $(call size_append, $(filter-out FORCE,$^))) > $@
++      cmd_bzip2 = (cat $(filter-out FORCE,$^) | bzip2 -9 && $(size_append)) > $@
+ 
+ # Lzma
+ # ---------------------------------------------------------------------------
+ 
+ quiet_cmd_lzma = LZMA    $@
+-cmd_lzma = (cat $(filter-out FORCE,$^) | \
+-	lzma -9 && $(call size_append, $(filter-out FORCE,$^))) > $@
++      cmd_lzma = (cat $(filter-out FORCE,$^) | lzma -9 && $(size_append)) > $@
+ 
+ quiet_cmd_lzo = LZO     $@
+-cmd_lzo = (cat $(filter-out FORCE,$^) | \
+-	lzop -9 && $(call size_append, $(filter-out FORCE,$^))) > $@
++      cmd_lzo = (cat $(filter-out FORCE,$^) | lzop -9 && $(size_append)) > $@
+ 
+ quiet_cmd_lz4 = LZ4     $@
+-cmd_lz4 = (cat $(filter-out FORCE,$^) | \
+-	lz4c -l -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@
++      cmd_lz4 = (cat $(filter-out FORCE,$^) | lz4c -l -c1 stdin stdout && \
++                  $(size_append)) > $@
+ 
+ # U-Boot mkimage
+ # ---------------------------------------------------------------------------
+@@ -394,8 +391,7 @@ quiet_cmd_uimage = UIMAGE  $@
+ # decompression mode. A BCJ filter isn't used either.
+ quiet_cmd_xzkern = XZKERN  $@
+ cmd_xzkern = (cat $(filter-out FORCE,$^) | \
+-	sh $(srctree)/scripts/xz_wrap.sh && \
+-	$(call size_append, $(filter-out FORCE,$^))) > $@
++	sh $(srctree)/scripts/xz_wrap.sh && $(size_append)) > $@
+ 
+ quiet_cmd_xzmisc = XZMISC  $@
+ cmd_xzmisc = (cat $(filter-out FORCE,$^) | \
+-- 
+2.7.4
