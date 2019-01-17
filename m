@@ -1,30 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:38574 "EHLO newverein.lst.de"
+Received: from mail.kernel.org ([198.145.29.99]:40442 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728971AbfAQRJL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 Jan 2019 12:09:11 -0500
-Date: Thu, 17 Jan 2019 18:09:09 +0100
-From: Christoph Hellwig <hch@lst.de>
-Subject: Re: SUBDIRS= replacement
-Message-ID: <20190117170909.GB31280@lst.de>
-References: <20190117145531.GA21429@lst.de> <20190117162921.GB31768@ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190117162921.GB31768@ravnborg.org>
+        id S1725967AbfAQSfC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 17 Jan 2019 13:35:02 -0500
+Subject: Re: [GIT PULL] Kbuild fixes for v5.0-rc3
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAK7LNAS1ZHH6DdB5wvyBA3m2HFrnY6GRmQG+OX_Pd7t9CyJ6nQ@mail.gmail.com>
+References: <CAK7LNAS1ZHH6DdB5wvyBA3m2HFrnY6GRmQG+OX_Pd7t9CyJ6nQ@mail.gmail.com>
+Message-Id: <154775010234.11520.5164430259271044705.pr-tracker-bot@kernel.org>
+Date: Thu, 17 Jan 2019 18:35:02 +0000
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Christoph Hellwig <hch@lst.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-On Thu, Jan 17, 2019 at 05:29:21PM +0100, Sam Ravnborg wrote:
-> Try:
-> 
-> make -j4 fs/xfs/
-> 
-> This is the recommend way to do so.
-> Let us know if you see problem with this approach.
+The pull request you sent on Thu, 17 Jan 2019 23:47:55 +0900:
 
-Yes, that seems to work.  I think the warning should suggest that as
-well, as it probably is the more common use compare to building
-external modules.
+> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-fixes-v5.0
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/e4484a495586dddf989380f89a7c16d43db6790b
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
