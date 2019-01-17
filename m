@@ -1,60 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:43047 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725868AbfAQNjQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 Jan 2019 08:39:16 -0500
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH] kbuild: mark prepare0 as PHONY to fix external module build
-In-Reply-To: <CAK7LNAQKuW8f7BgX8q-Eqa480o6Ch_mZsHyY52h96kifnYepHg@mail.gmail.com>
-References: <1547536740-1572-1-git-send-email-yamada.masahiro@socionext.com> <CAK7LNAQKuW8f7BgX8q-Eqa480o6Ch_mZsHyY52h96kifnYepHg@mail.gmail.com>
-Date: Fri, 18 Jan 2019 00:39:13 +1100
-Message-ID: <87imyn4d4u.fsf@concordia.ellerman.id.au>
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:29325 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727083AbfAQOsg (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 17 Jan 2019 09:48:36 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 17 Jan 2019 23:47:55 +0900
+Message-ID: <CAK7LNAS1ZHH6DdB5wvyBA3m2HFrnY6GRmQG+OX_Pd7t9CyJ6nQ@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v5.0-rc3
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Samuel Holland <samuel@sholland.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, "linux-stable # v4 . 20" <stable@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-Masahiro Yamada <yamada.masahiro@socionext.com> writes:
-> On Tue, Jan 15, 2019 at 5:07 PM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->>
->> Commit c3ff2a5193fa ("powerpc/32: add stack protector support")
->> caused kernel panic on PowerPC if an external module is used with
->> CONFIG_STACKPROTECTOR because the 'prepare' target was not executed
->> for the external module build.
->>
->> Commit e07db28eea38 ("kbuild: fix single target build for external
->> module") turned it into a build error because the 'prepare' target is
->> now executed but the 'prepare0' target is missing for the external
->> module build.
->>
->> External module on arm/arm64 with CONFIG_STACKPROTECTOR_PER_TASK is
->> also broken in the same way.
->>
->> Move 'PHONY += prepare0' to the common place. Make is fine with missing
->> rule for phony targets.
->>
->> I minimize the change so it can be easily backported to 4.20.x
->>
->> To fix v4.20 for external modules of PowerPC, please backport
->> e07db28eea38 ("kbuild: fix single target build for external module"),
->> and then this commit.
->>
->> Link: https://bugzilla.kernel.org/show_bug.cgi?id=201891
->> Fixes: e07db28eea38 ("kbuild: fix single target build for external module")
->> Fixes: c3ff2a5193fa ("powerpc/32: add stack protector support")
->> Fixes: 189af4657186 ("ARM: smp: add support for per-task stack canaries")
->> Fixes: 0a1213fa7432 ("arm64: enable per-task stack canaries")
->> Cc: linux-stable <stable@vger.kernel.org> # v4.20
->> Reported-by: Samuel Holland <samuel@sholland.org>
->> Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->
-> Applied to linux-kbuild/fixes.
+Hi Linus,
 
-Thanks.
+Please pull some Kbuild fixes.
+Thanks!
 
-cheers
+The following changes since commit 1c7fc5cbc33980acd13d668f1c8f0313d6ae9fd8:
+
+  Linux 5.0-rc2 (2019-01-14 10:41:12 +1200)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v5.0
+
+for you to fetch changes up to e00d8880481497474792d28c14479a9fb6752046:
+
+  kbuild: mark prepare0 as PHONY to fix external module build
+(2019-01-17 23:42:59 +0900)
+
+----------------------------------------------------------------
+Kbuild fixes for v5.0
+
+ - clean generated files in scripts/kconfig/ by 'make mrproper'
+
+ - fix conflict between dead code elimination and ftrace for GCC <= 4.7
+
+ - fix external module build with CONFIG_STACKPROTECTOR
+
+ - remove unused code
+
+----------------------------------------------------------------
+Masahiro Yamada (7):
+      kconfig: clean generated *conf-cfg files
+      kbuild: remove unused baseprereq
+      kbuild: remove unused archmrproper
+      ia64: remove redundant 'export AWK'
+      nds32: remove unneeded code in arch/nds32/Makefile
+      openrisc: remove unneeded code in arch/openrisc/Makefile
+      kbuild: mark prepare0 as PHONY to fix external module build
+
+Paul Burton (1):
+      kbuild: Disable LD_DEAD_CODE_DATA_ELIMINATION with ftrace & GCC <= 4.7
+
+ Makefile                 | 8 ++++----
+ arch/h8300/Makefile      | 2 --
+ arch/ia64/Makefile       | 2 --
+ arch/nds32/Makefile      | 8 --------
+ arch/openrisc/Makefile   | 3 ---
+ init/Kconfig             | 1 +
+ scripts/Kbuild.include   | 4 ----
+ scripts/kconfig/Makefile | 2 +-
+ 8 files changed, 6 insertions(+), 24 deletions(-)
+
+
+-- 
+Best Regards
+Masahiro Yamada
