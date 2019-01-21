@@ -1,136 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it1-f194.google.com ([209.85.166.194]:52115 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726683AbfAUJgh (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 Jan 2019 04:36:37 -0500
-Received: by mail-it1-f194.google.com with SMTP id w18so15596623ite.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 21 Jan 2019 01:36:36 -0800 (PST)
+Received: from mail.skyhub.de ([5.9.137.197]:56608 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727240AbfAUJxm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 21 Jan 2019 04:53:42 -0500
+From: Borislav Petkov <bp@alien8.de>
+Subject: [PATCH] kbuild: Disable extra debugging info in .s output
+Date: Mon, 21 Jan 2019 10:53:38 +0100
+Message-Id: <20190121095338.8565-1-bp@alien8.de>
 MIME-Version: 1.0
-References: <CAKcZhuW-ozJp-MVU3gw=uhuSc9+HTMVJza8QRUL3TaRrbqjJew@mail.gmail.com>
- <CACT4Y+aJADsj37Y8jPAV7PASqKm_L-iJ=MDv68yPUO0TFvhdRg@mail.gmail.com>
- <CACT4Y+ZxgzdbCeFquYmKThfiTGg3pZhn90X_Fk3yRXGYfepU4Q@mail.gmail.com> <CAKcZhuWE_2+D_AP_U0XZP-bjb=8Eec1Ku3KD8qO8K0zDGo98Ow@mail.gmail.com>
-In-Reply-To: <CAKcZhuWE_2+D_AP_U0XZP-bjb=8Eec1Ku3KD8qO8K0zDGo98Ow@mail.gmail.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Mon, 21 Jan 2019 10:36:25 +0100
-Message-ID: <CACT4Y+Ye+0bBV5sB1F3wVbCC1guyA=RdsRnYHgrar=AhftGtQA@mail.gmail.com>
-Subject: Re: [RESEND BUG REPORT] System hung! Due to ftrace or KASAN?
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Zenghui Yu <zenghuiyu96@gmail.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, linux-trace-devel@vger.kernel.org, kasan-dev <kasan-dev@googlegroups.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will.deacon@arm.com>
+To: linux-kbuild@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 
-On Sun, Jan 20, 2019 at 7:29 PM Zenghui Yu <zenghuiyu96@gmail.com> wrote:
-> > > > Hi, All!
-> > > >
-> > > > I compiled the latest kernel and installed it on my old laptop (Hardware name:
-> > > > Hewlett-Packard HP ProBook 440 G2/2247, BIOS M74 Ver. 01.02 06/17/2014).  But
-> > > > when I tried to enable function tracer via debugfs, the system went _hung_!
-> > > > Compared with the last kernel compiling process, the only change I have made
-> > > > is that I enabled KASAN configuration this time.
-> > > >
-> > > > Reproducing this issue is simple as below:
-> > > >
-> > > >         0. `uname -a` shows:
-> > > >                 Linux ubuntuu 5.0.0-rc2+ #9 SMP Fri Jan 18 03:04:01 CST 2019
-> > > >                 x86_64 x86_64 x86_64 GNU/Linux
-> > > >
-> > > >         1. `make menuconfig` to enable KASAN configuration:
-> > > >                 Kernel hacking ---> Memory Debugging --->
-> > > >                 KASAN: runtime memory debugger
-> > > >
-> > > >            compile, install, reboot, then `dmesg | grep kasan` shows:
-> > > >                 [    0.342882] kasan: KernelAddressSanitizer initialized
-> > > >
-> > > >         2. enable function tracer
-> > > >                 `echo function > /sys/kernel/debug/tracing/current_tracer`
-> > > >            (then my poor laptop was locked and didn't respond to me ...)
-> > > >
-> > > > What's more, enabling function graph tracer will suffer from the same problem.
-> > > > I have no idea about what wrong thing had happened inside kernel --
-> > > > about ftrace,
-> > > > or about KASAN?  So I report it to you and waiting for your solution!
-> > > >
-> > > > I have provided my *.config* file as attachment for those who're interested in
-> > > > this issue.  But sorry for that I can't provide any useful call trace
-> > > > because the
-> > > > system went down so quickly.
-> > > >
-> > > > P.S. I'm a newcomer for KASAN. If any mis-configuration or
-> > > > mis-understand, please
-> > > > fix me up and let me know :).
-> > >
-> > > Hi Zenghui,
-> > >
-> > > I've tried to reproduce this, but kernel crashes during boot with this
-> > > config for me.
-> > > I am commit 2339e91d0e6609e17943a0ab3c3c8c4044760c05, the config is
-> > > basically yours but updated for newer compiler and with builtin
-> > > modules:
-> > > https://gist.githubusercontent.com/dvyukov/9af234617749aa4eada67ba8c2e4f46c/raw/d0e09ddf255962313a82bb552c3fc0d832fa6844/gistfile1.txt
-> >
-> > I've commented out the warning locally for now and can reproduce the
-> > hang. You need this commit, it fixes the hang:
-> > https://groups.google.com/forum/#!topic/kasan-dev/g8A8PLKCyoE
->
-> Thanks Dmitry! I'll try to test this commit tomorrow.
->
-> BTW, I have bisect-ed and tested for this issue today. Finally it turned out
-> that
->         bffa986c6f80e39d9903015fc7d0d99a66bbf559 is the first bad commit.
-> So I'm wondering if anywhere need to be fixed in commit bffa986c6f80 ("kasan:
-> move common generic and tag-based code to common.c").
+From: Borislav Petkov <bp@suse.de>
 
-Thanks for bisecting. I think we have understanding of what happens
-here and it's exactly this that needs to be fixed:
-https://groups.google.com/d/msg/kasan-dev/g8A8PLKCyoE/vXnirYEnCAAJ
-And this commit already fixes it.
+Modern gcc adds view assignments, reset assertion checking in .loc
+directives and a couple more additional debug markers, which clutters
+the asm output unnecessarily:
 
-> > > TITLE: WARNING in note_page
-> > > MAINTAINERS: [dave.hansen@linux.intel.com luto@kernel.org
-> > > peterz@infradead.org tglx@linutronix.de mingo@redhat.com bp@alien8.de
-> > > hpa@zytor.com x86@kernel.org linux-kernel@vger.kernel.org]
-> > >
-> > > ------------[ cut here ]------------
-> > > x86/mm: Found insecure W+X mapping at address native_usergs_sysret64+0x0/0x10
-> > > WARNING: CPU: 3 PID: 1 at arch/x86/mm/dump_pagetables.c:263 note_wx
-> > > arch/x86/mm/dump_pagetables.c:262 [inline]
-> > > WARNING: CPU: 3 PID: 1 at arch/x86/mm/dump_pagetables.c:263
-> > > note_page+0x800/0xaf0 arch/x86/mm/dump_pagetables.c:302
-> > > Kernel panic - not syncing: panic_on_warn set ...
-> > > CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.0.0-rc2+ #16
-> > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
-> > > Call Trace:
-> > >  __dump_stack lib/dump_stack.c:77 [inline]
-> > >  dump_stack+0x7b/0xb5 lib/dump_stack.c:113
-> > >  panic+0x18e/0x351 kernel/panic.c:214
-> > >  __warn+0x13c/0x140 kernel/panic.c:571
-> > >  report_bug+0xd7/0x140 lib/bug.c:186
-> > >  fixup_bug.part.11+0x2d/0x60 arch/x86/kernel/traps.c:178
-> > >  fixup_bug arch/x86/include/asm/paravirt.h:776 [inline]
-> > >  do_error_trap+0xb6/0xc0 arch/x86/kernel/traps.c:271
-> > >  do_invalid_op+0x3b/0x50 arch/x86/kernel/traps.c:290
-> > >  invalid_op+0x14/0x20 arch/x86/entry/entry_64.S:973
-> > > RIP: 0010:note_wx arch/x86/mm/dump_pagetables.c:262 [inline]
-> > > RIP: 0010:note_page+0x800/0xaf0 arch/x86/mm/dump_pagetables.c:302
-> > > Code: 4d 32 00 4c 89 7b 28 48 c7 43 30 00 00 00 00 e9 46 fc ff ff 4c
-> > > 89 ee 48 c7 c7 a0 35 c5 ae c6 05 02 81 1e 02 01 e8 50 93 01 00 <0f> 0b
-> > > 48 8b 7d 90 e8 75 4c 32 00 48 8b 43 20 48 89 45 c8 e9 72 f9
-> > > RSP: 0000:ffff88805d5c7d18 EFLAGS: 00010286
-> > > RAX: 0000000000000000 RBX: ffff88805d5c7e58 RCX: ffffffffae7f11db
-> > > RDX: 0000000000000001 RSI: 0000000000000004 RDI: 0000000000000246
-> > > RBP: ffff88805d5c7da0 R08: ffffed100bab8f5c R09: ffffed100bab8f5c
-> > > R10: 0000000000000002 R11: ffffed100bab8f5c R12: 0000000000000000
-> > > R13: ffffffffae800000 R14: 0000000000000004 R15: 0000000000000000
-> > >  walk_pmd_level arch/x86/mm/dump_pagetables.c:428 [inline]
-> > >  walk_pud_level arch/x86/mm/dump_pagetables.c:459 [inline]
-> > >  walk_p4d_level arch/x86/mm/dump_pagetables.c:484 [inline]
-> > >  ptdump_walk_pgd_level_core+0x566/0x6e0 arch/x86/mm/dump_pagetables.c:552
-> > >  ptdump_walk_user_pgd_level_checkwx+0x4e/0x50 arch/x86/mm/dump_pagetables.c:600
-> > >  pti_finalize+0x27/0xaf arch/x86/mm/pti.c:682
-> > >  kernel_init+0x3e/0x130 init/main.c:1066
-> > >  ret_from_fork+0x35/0x40 arch/x86/entry/entry_64.S:352
-> > > Kernel Offset: 0x2c800000 from 0xffffffff81000000 (relocation range:
-> > > 0xffffffff80000000-0xffffffffbfffffff)
-> > > Rebooting in 86400 seconds..
+For example:
+
+  bsp_resume:
+  .LFB3466:
+          .loc 1 1868 1 is_stmt 1 view -0
+          .cfi_startproc
+          .loc 1 1869 2 view .LVU73
+  # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
+          .loc 1 1869 14 is_stmt 0 view .LVU74
+          movq    this_cpu(%rip), %rax    # this_cpu, this_cpu
+          movq    64(%rax), %rax  # this_cpu.94_1->c_bsp_resume, _2
+  # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
+          .loc 1 1869 5 view .LVU75
+          testq   %rax, %rax      # _2
+          je      .L8     #,
+          .loc 1 1870 3 is_stmt 1 view .LVU76
+          movq    $boot_cpu_data, %rdi    #,
+          jmp     __x86_indirect_thunk_rax
+
+or
+  	.loc 2 57 9 view .LVU478
+  	.loc 2 57 9 view .LVU479
+  	.loc 2 57 9 view .LVU480
+  	.loc 2 57 9 view .LVU481
+  .LBB1385:
+  .LBB1383:
+  .LBB1379:
+  .LBB1377:
+  .LBB1375:
+  	.loc 2 57 9 view .LVU482
+  	.loc 2 57 9 view .LVU483
+  	movl	%edi, %edx	# cpu, cpu
+  .LVL87:
+  	.loc 2 57 9 is_stmt 0 view .LVU484
+
+That MOV in there is drowned in debugging information and latter makes
+it hard to follow the asm. And that DWARF info is not really needed for
+asm output staring.
+
+Disable the debug information generation which clutters the asm output
+unnecessarily:
+
+  bsp_resume:
+  .LFB3466:
+          .loc 1 1868 1
+  # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
+          .loc 1 1869 14
+          movq    this_cpu(%rip), %rax    # this_cpu, this_cpu
+          movq    64(%rax), %rax  # this_cpu.94_1->c_bsp_resume, _2
+  # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
+          .loc 1 1869 5
+          testq   %rax, %rax      # _2
+          je      .L8     #,
+  # arch/x86/kernel/cpu/common.c:1870:            this_cpu->c_bsp_resume(&boot_cpu_data);
+          .loc 1 1870 3
+          movq    $boot_cpu_data, %rdi    #,
+          jmp     __x86_indirect_thunk_rax
+
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org
+---
+ scripts/Makefile.build | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index fd03d60f6c5a..4f33fdab89d2 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -103,8 +103,12 @@ modkern_cflags =                                          \
+ 		$(KBUILD_CFLAGS_KERNEL) $(CFLAGS_KERNEL))
+ quiet_modtag = $(if $(part-of-module),[M],   )
+ 
++disable_extra_cc_dbg := $(call cc-option,-gno-as-locview-support)
++disable_extra_cc_dbg += $(call cc-option,-fno-dwarf2-cfi-asm)
++disable_extra_cc_dbg += $(call cc-option,-feliminate-unused-debug-symbols)
++disable_extra_cc_dbg += $(call cc-option,-gno-statement-frontiers)
+ quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
+-cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
++cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) $(disable_extra_cc_dbg) -fverbose-asm -S -o $@ $<
+ 
+ $(obj)/%.s: $(src)/%.c FORCE
+ 	$(call if_changed_dep,cc_s_c)
+-- 
+2.19.1
