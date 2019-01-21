@@ -1,32 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33688 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727169AbfAUHTF (ORCPT
+Received: from mail-it1-f194.google.com ([209.85.166.194]:52115 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726683AbfAUJgh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 Jan 2019 02:19:05 -0500
+        Mon, 21 Jan 2019 04:36:37 -0500
+Received: by mail-it1-f194.google.com with SMTP id w18so15596623ite.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 21 Jan 2019 01:36:36 -0800 (PST)
 MIME-Version: 1.0
 References: <CAKcZhuW-ozJp-MVU3gw=uhuSc9+HTMVJza8QRUL3TaRrbqjJew@mail.gmail.com>
  <CACT4Y+aJADsj37Y8jPAV7PASqKm_L-iJ=MDv68yPUO0TFvhdRg@mail.gmail.com>
  <CACT4Y+ZxgzdbCeFquYmKThfiTGg3pZhn90X_Fk3yRXGYfepU4Q@mail.gmail.com> <CAKcZhuWE_2+D_AP_U0XZP-bjb=8Eec1Ku3KD8qO8K0zDGo98Ow@mail.gmail.com>
 In-Reply-To: <CAKcZhuWE_2+D_AP_U0XZP-bjb=8Eec1Ku3KD8qO8K0zDGo98Ow@mail.gmail.com>
-From: Zenghui Yu <zenghuiyu96@gmail.com>
-Date: Mon, 21 Jan 2019 08:23:12 +0800
-Message-ID: <CAKcZhuUh7jqLnRwfROcryEGHvUNqGhz751uPP54yg3WcwYCWwQ@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Mon, 21 Jan 2019 10:36:25 +0100
+Message-ID: <CACT4Y+Ye+0bBV5sB1F3wVbCC1guyA=RdsRnYHgrar=AhftGtQA@mail.gmail.com>
 Subject: Re: [RESEND BUG REPORT] System hung! Due to ftrace or KASAN?
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dmitry Vyukov <dvyukov@google.com>, Dave Hansen <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>, linux-trace-devel@vger.kernel.org, kasan-dev <kasan-dev@googlegroups.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrey Konovalov <andreyknvl@google.com>, aryabinin@virtuozzo.com, akpm@linux-foundation.org, torvalds@linux-foundation.org, cl@linux.com, mark.rutland@arm.com, will.deacon@arm.com
+To: Zenghui Yu <zenghuiyu96@gmail.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, linux-trace-devel@vger.kernel.org, kasan-dev <kasan-dev@googlegroups.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will.deacon@arm.com>
 
-On Mon, Jan 21, 2019 at 2:28 AM Zenghui Yu <zenghuiyu96@gmail.com> wrote:
->
-> On Sun, Jan 20, 2019 at 12:45 AM Dmitry Vyukov <dvyukov@google.com> wrote:
-> >
-> > On Sat, Jan 19, 2019 at 5:37 PM Dmitry Vyukov <dvyukov@google.com> wrote:
-> > >
-> > > On Fri, Jan 18, 2019 at 6:45 PM Zenghui Yu <zenghuiyu96@gmail.com> wrote:
-> > > >
+On Sun, Jan 20, 2019 at 7:29 PM Zenghui Yu <zenghuiyu96@gmail.com> wrote:
 > > > > Hi, All!
 > > > >
 > > > > I compiled the latest kernel and installed it on my old laptop (Hardware name:
@@ -80,24 +75,18 @@ On Mon, Jan 21, 2019 at 2:28 AM Zenghui Yu <zenghuiyu96@gmail.com> wrote:
 > > https://groups.google.com/forum/#!topic/kasan-dev/g8A8PLKCyoE
 >
 > Thanks Dmitry! I'll try to test this commit tomorrow.
-
-And this commit really works fine to me! Thanks Dmitry again!
-
-
-Zenghui
-
 >
 > BTW, I have bisect-ed and tested for this issue today. Finally it turned out
 > that
 >         bffa986c6f80e39d9903015fc7d0d99a66bbf559 is the first bad commit.
 > So I'm wondering if anywhere need to be fixed in commit bffa986c6f80 ("kasan:
 > move common generic and tag-based code to common.c").
->
->
-> Thanks!
-> Zenghui
->
-> >
+
+Thanks for bisecting. I think we have understanding of what happens
+here and it's exactly this that needs to be fixed:
+https://groups.google.com/d/msg/kasan-dev/g8A8PLKCyoE/vXnirYEnCAAJ
+And this commit already fixes it.
+
 > > > TITLE: WARNING in note_page
 > > > MAINTAINERS: [dave.hansen@linux.intel.com luto@kernel.org
 > > > peterz@infradead.org tglx@linutronix.de mingo@redhat.com bp@alien8.de
