@@ -1,61 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:36806 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729712AbfAUPxT (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 Jan 2019 10:53:19 -0500
-Date: Mon, 21 Jan 2019 09:53:17 -0600
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v2 3/4] kbuild: add real-prereqs shorthand for
- $(filter-out FORCE,$^)
-Message-ID: <20190121155317.GA7426@bogus>
-References: <1547719364-18849-1-git-send-email-yamada.masahiro@socionext.com>
- <1547719364-18849-3-git-send-email-yamada.masahiro@socionext.com>
+Received: from mail-eopbgr10047.outbound.protection.outlook.com ([40.107.1.47]:32373
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729413AbfAUQRA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 21 Jan 2019 11:17:00 -0500
+From: Leonard Crestez <leonard.crestez@nxp.com>
+Subject: Re: [PATCH 0/3] kbuild: Add wilddt function instead of listing dtbs
+Date: Mon, 21 Jan 2019 16:16:55 +0000
+Message-ID: <VI1PR04MB553355D6D5EBC2604E1AD256EE9F0@VI1PR04MB5533.eurprd04.prod.outlook.com>
+References: <cover.1546888138.git.leonard.crestez@nxp.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1547719364-18849-3-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Martin Schwidefsky <schwidefsky@de.ibm.com>, linux-s390@vger.kernel.org, Borislav Petkov <bp@alien8.de>, linux-mips@vger.kernel.org, James Hogan <jhogan@kernel.org>, x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ralf Baechle <ralf@linux-mips.org>, devicetree@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Paul Burton <paul.burton@mips.com>, Ingo Molnar <mingo@redhat.com>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>, Mark Rutland <mark.rutland@arm.com>, linuxppc-dev@lists.ozlabs.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Olof Johansson <olof@lixom.net>
+Cc: Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Fabio Estevam <fabio.estevam@nxp.com>, Mark Rutland <mark.rutland@arm.com>, Aisheng Dong <aisheng.dong@nxp.com>, Leo Li <leoyang.li@nxp.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Thu, Jan 17, 2019 at 07:02:43PM +0900, Masahiro Yamada wrote:
-> In Kbuild, if_changed and friends must have FORCE as a prerequisite.
-> 
-> Hence, $(filter-out FORCE,$^) or $(filter-out $(PHONY),$^) is a common
-> pattern to get the names of all the prerequisites except phony targets.
-> 
-> Add real-prereqs as a shorthand.
-> 
-> Note:
-> We cannot replace $(filter %.o,$^) in cmd_link_multi-m because $^ may
-> include auto-generated dependencies from the .*.cmd file when a single
-> object module is changed into a multi object module. Refer to commit
-> 69ea912fda74 ("kbuild: remove unneeded link_multi_deps"). I added some
-> comment to avoid accidental breakage.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
-> The patch context depends on some other ones.
-> Please use 'git am -C1' if you want to test this
-> on Linus' tree.
-> 
-> 
-> Changes in v2:
->   - clean up arch/s390/boot/Makefile as well
-> 
->  Documentation/devicetree/bindings/Makefile |  2 +-
-
-Acked-by: Rob Herring <robh@kernel.org>
-
->  arch/mips/boot/Makefile                    |  2 +-
->  arch/powerpc/boot/Makefile                 |  2 +-
->  arch/s390/boot/Makefile                    |  2 +-
->  arch/x86/realmode/rm/Makefile              |  3 +--
->  scripts/Kbuild.include                     |  4 ++++
->  scripts/Makefile.build                     |  9 ++++++---
->  scripts/Makefile.lib                       | 18 +++++++++---------
->  scripts/Makefile.modpost                   |  2 +-
->  9 files changed, 25 insertions(+), 19 deletions(-)
+On 1/7/2019 9:31 PM, Leonard Crestez wrote:=0A=
+> The dts makefiles go through a lot of pointless churn when boards are=0A=
+> added. Many SOCs (such as imx) have very simple naming conventions for=0A=
+> all boards using a certain chip and board listings can be easily=0A=
+> collapsed using wildcards.=0A=
+> =0A=
+> Add a "wilddt" function and use it for imx6/7/8 and layerscape. This can=
+=0A=
+> be applied to many other soc families later.=0A=
+> =0A=
+> Previously sent as RFC: https://lore.kernel.org/patchwork/patch/1022737/=
+=0A=
+=0A=
+Any feedback? This should be reviewed by kbuild and arm-soc=0A=
+=0A=
+I think this is a worthwhile cleanup, are there any corner cases or more =
+=0A=
+exotic setup I should try in order to validate this series?=0A=
+=0A=
+--=0A=
+Regards,=0A=
+Leonard=0A=
