@@ -1,108 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([5.9.137.197]:56608 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727240AbfAUJxm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 Jan 2019 04:53:42 -0500
-From: Borislav Petkov <bp@alien8.de>
-Subject: [PATCH] kbuild: Disable extra debugging info in .s output
-Date: Mon, 21 Jan 2019 10:53:38 +0100
-Message-Id: <20190121095338.8565-1-bp@alien8.de>
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:36806 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729712AbfAUPxT (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 21 Jan 2019 10:53:19 -0500
+Date: Mon, 21 Jan 2019 09:53:17 -0600
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v2 3/4] kbuild: add real-prereqs shorthand for
+ $(filter-out FORCE,$^)
+Message-ID: <20190121155317.GA7426@bogus>
+References: <1547719364-18849-1-git-send-email-yamada.masahiro@socionext.com>
+ <1547719364-18849-3-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1547719364-18849-3-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Martin Schwidefsky <schwidefsky@de.ibm.com>, linux-s390@vger.kernel.org, Borislav Petkov <bp@alien8.de>, linux-mips@vger.kernel.org, James Hogan <jhogan@kernel.org>, x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ralf Baechle <ralf@linux-mips.org>, devicetree@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Paul Burton <paul.burton@mips.com>, Ingo Molnar <mingo@redhat.com>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>, Mark Rutland <mark.rutland@arm.com>, linuxppc-dev@lists.ozlabs.org
 
-From: Borislav Petkov <bp@suse.de>
+On Thu, Jan 17, 2019 at 07:02:43PM +0900, Masahiro Yamada wrote:
+> In Kbuild, if_changed and friends must have FORCE as a prerequisite.
+> 
+> Hence, $(filter-out FORCE,$^) or $(filter-out $(PHONY),$^) is a common
+> pattern to get the names of all the prerequisites except phony targets.
+> 
+> Add real-prereqs as a shorthand.
+> 
+> Note:
+> We cannot replace $(filter %.o,$^) in cmd_link_multi-m because $^ may
+> include auto-generated dependencies from the .*.cmd file when a single
+> object module is changed into a multi object module. Refer to commit
+> 69ea912fda74 ("kbuild: remove unneeded link_multi_deps"). I added some
+> comment to avoid accidental breakage.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
+> The patch context depends on some other ones.
+> Please use 'git am -C1' if you want to test this
+> on Linus' tree.
+> 
+> 
+> Changes in v2:
+>   - clean up arch/s390/boot/Makefile as well
+> 
+>  Documentation/devicetree/bindings/Makefile |  2 +-
 
-Modern gcc adds view assignments, reset assertion checking in .loc
-directives and a couple more additional debug markers, which clutters
-the asm output unnecessarily:
+Acked-by: Rob Herring <robh@kernel.org>
 
-For example:
-
-  bsp_resume:
-  .LFB3466:
-          .loc 1 1868 1 is_stmt 1 view -0
-          .cfi_startproc
-          .loc 1 1869 2 view .LVU73
-  # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
-          .loc 1 1869 14 is_stmt 0 view .LVU74
-          movq    this_cpu(%rip), %rax    # this_cpu, this_cpu
-          movq    64(%rax), %rax  # this_cpu.94_1->c_bsp_resume, _2
-  # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
-          .loc 1 1869 5 view .LVU75
-          testq   %rax, %rax      # _2
-          je      .L8     #,
-          .loc 1 1870 3 is_stmt 1 view .LVU76
-          movq    $boot_cpu_data, %rdi    #,
-          jmp     __x86_indirect_thunk_rax
-
-or
-  	.loc 2 57 9 view .LVU478
-  	.loc 2 57 9 view .LVU479
-  	.loc 2 57 9 view .LVU480
-  	.loc 2 57 9 view .LVU481
-  .LBB1385:
-  .LBB1383:
-  .LBB1379:
-  .LBB1377:
-  .LBB1375:
-  	.loc 2 57 9 view .LVU482
-  	.loc 2 57 9 view .LVU483
-  	movl	%edi, %edx	# cpu, cpu
-  .LVL87:
-  	.loc 2 57 9 is_stmt 0 view .LVU484
-
-That MOV in there is drowned in debugging information and latter makes
-it hard to follow the asm. And that DWARF info is not really needed for
-asm output staring.
-
-Disable the debug information generation which clutters the asm output
-unnecessarily:
-
-  bsp_resume:
-  .LFB3466:
-          .loc 1 1868 1
-  # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
-          .loc 1 1869 14
-          movq    this_cpu(%rip), %rax    # this_cpu, this_cpu
-          movq    64(%rax), %rax  # this_cpu.94_1->c_bsp_resume, _2
-  # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
-          .loc 1 1869 5
-          testq   %rax, %rax      # _2
-          je      .L8     #,
-  # arch/x86/kernel/cpu/common.c:1870:            this_cpu->c_bsp_resume(&boot_cpu_data);
-          .loc 1 1870 3
-          movq    $boot_cpu_data, %rdi    #,
-          jmp     __x86_indirect_thunk_rax
-
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org
----
- scripts/Makefile.build | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index fd03d60f6c5a..4f33fdab89d2 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -103,8 +103,12 @@ modkern_cflags =                                          \
- 		$(KBUILD_CFLAGS_KERNEL) $(CFLAGS_KERNEL))
- quiet_modtag = $(if $(part-of-module),[M],   )
- 
-+disable_extra_cc_dbg := $(call cc-option,-gno-as-locview-support)
-+disable_extra_cc_dbg += $(call cc-option,-fno-dwarf2-cfi-asm)
-+disable_extra_cc_dbg += $(call cc-option,-feliminate-unused-debug-symbols)
-+disable_extra_cc_dbg += $(call cc-option,-gno-statement-frontiers)
- quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
--cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
-+cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) $(disable_extra_cc_dbg) -fverbose-asm -S -o $@ $<
- 
- $(obj)/%.s: $(src)/%.c FORCE
- 	$(call if_changed_dep,cc_s_c)
--- 
-2.19.1
+>  arch/mips/boot/Makefile                    |  2 +-
+>  arch/powerpc/boot/Makefile                 |  2 +-
+>  arch/s390/boot/Makefile                    |  2 +-
+>  arch/x86/realmode/rm/Makefile              |  3 +--
+>  scripts/Kbuild.include                     |  4 ++++
+>  scripts/Makefile.build                     |  9 ++++++---
+>  scripts/Makefile.lib                       | 18 +++++++++---------
+>  scripts/Makefile.modpost                   |  2 +-
+>  9 files changed, 25 insertions(+), 19 deletions(-)
