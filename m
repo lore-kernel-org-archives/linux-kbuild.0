@@ -1,42 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr10047.outbound.protection.outlook.com ([40.107.1.47]:32373
-        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729413AbfAUQRA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 Jan 2019 11:17:00 -0500
-From: Leonard Crestez <leonard.crestez@nxp.com>
-Subject: Re: [PATCH 0/3] kbuild: Add wilddt function instead of listing dtbs
-Date: Mon, 21 Jan 2019 16:16:55 +0000
-Message-ID: <VI1PR04MB553355D6D5EBC2604E1AD256EE9F0@VI1PR04MB5533.eurprd04.prod.outlook.com>
-References: <cover.1546888138.git.leonard.crestez@nxp.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:39129 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727633AbfAUSUA (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 21 Jan 2019 13:20:00 -0500
+Received: by mail-wm1-f68.google.com with SMTP id y8so11728658wmi.4
+        for <linux-kbuild@vger.kernel.org>; Mon, 21 Jan 2019 10:19:59 -0800 (PST)
 MIME-Version: 1.0
+Reply-To: mercykings2000@gmail.com
+From: Mercy Kings <mercykings01@gmail.com>
+Date: Mon, 21 Jan 2019 18:19:58 +0000
+Message-ID: <CALnHs9rTqOGMeUJt4U6Pat3_eR7=Gkd2Ohzw8X=uDpj+9RFi2w@mail.gmail.com>
+Subject: Dearest Friend
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Olof Johansson <olof@lixom.net>
-Cc: Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Fabio Estevam <fabio.estevam@nxp.com>, Mark Rutland <mark.rutland@arm.com>, Aisheng Dong <aisheng.dong@nxp.com>, Leo Li <leoyang.li@nxp.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On 1/7/2019 9:31 PM, Leonard Crestez wrote:=0A=
-> The dts makefiles go through a lot of pointless churn when boards are=0A=
-> added. Many SOCs (such as imx) have very simple naming conventions for=0A=
-> all boards using a certain chip and board listings can be easily=0A=
-> collapsed using wildcards.=0A=
-> =0A=
-> Add a "wilddt" function and use it for imx6/7/8 and layerscape. This can=
-=0A=
-> be applied to many other soc families later.=0A=
-> =0A=
-> Previously sent as RFC: https://lore.kernel.org/patchwork/patch/1022737/=
-=0A=
-=0A=
-Any feedback? This should be reviewed by kbuild and arm-soc=0A=
-=0A=
-I think this is a worthwhile cleanup, are there any corner cases or more =
-=0A=
-exotic setup I should try in order to validate this series?=0A=
-=0A=
---=0A=
-Regards,=0A=
-Leonard=0A=
+Dearest One
+
+First i thanks your attention to me, I am mercy kings My parents
+Mr.and Mrs.kings were assassinated here in IVORY COAST. Before my
+Before my father's death he had (USD $5.9M) Five Million Nine Hundred
+Thousand United State Dollars deposited in a bank here in Abidjan. I
+want you to do me a favour to receive these funds to a safe account
+in your country or any safer place as the beneficiary. I want to come
+over to your country for the safety of my life from the hands of this
+wicked assassins.I have plans to do investment in your country, like
+real estate and industrial production This is my reason for writing to
+you.
+
+Your sister mercy kings.
