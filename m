@@ -1,53 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53058 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727179AbfAUW7A (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 Jan 2019 17:59:00 -0500
-Date: Mon, 21 Jan 2019 17:58:42 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [RESEND BUG REPORT] System hung! Due to ftrace or KASAN?
-Message-ID: <20190121175842.0f526757@vmware.local.home>
-In-Reply-To: <CACT4Y+Ye+0bBV5sB1F3wVbCC1guyA=RdsRnYHgrar=AhftGtQA@mail.gmail.com>
-References: <CAKcZhuW-ozJp-MVU3gw=uhuSc9+HTMVJza8QRUL3TaRrbqjJew@mail.gmail.com>
-        <CACT4Y+aJADsj37Y8jPAV7PASqKm_L-iJ=MDv68yPUO0TFvhdRg@mail.gmail.com>
-        <CACT4Y+ZxgzdbCeFquYmKThfiTGg3pZhn90X_Fk3yRXGYfepU4Q@mail.gmail.com>
-        <CAKcZhuWE_2+D_AP_U0XZP-bjb=8Eec1Ku3KD8qO8K0zDGo98Ow@mail.gmail.com>
-        <CACT4Y+Ye+0bBV5sB1F3wVbCC1guyA=RdsRnYHgrar=AhftGtQA@mail.gmail.com>
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:41780 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726191AbfAWI0t (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 23 Jan 2019 03:26:49 -0500
+Date: Wed, 23 Jan 2019 18:26:35 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: remove top-level built-in.a
+References: <1547436479-10491-1-git-send-email-yamada.masahiro@socionext.com>
+        <1547536378.afs6amsrzj.astroid@bobo.none>
+        <CAK7LNAREyw=qhRO-Cvg4O2fOnbV=zVJDE_mRZcVTkKG+B1gkRQ@mail.gmail.com>
+In-Reply-To: <CAK7LNAREyw=qhRO-Cvg4O2fOnbV=zVJDE_mRZcVTkKG+B1gkRQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Message-Id: <1548231946.lwdxf373y2.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dmitry Vyukov <dvyukov@google.com>
-Cc: Zenghui Yu <zenghuiyu96@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, linux-trace-devel@vger.kernel.org, kasan-dev <kasan-dev@googlegroups.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will.deacon@arm.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On Mon, 21 Jan 2019 10:36:25 +0100
-Dmitry Vyukov <dvyukov@google.com> wrote:
+Masahiro Yamada's on January 15, 2019 7:01 pm:
+> Hi Nicholas,
+>=20
+>=20
+> On Tue, Jan 15, 2019 at 5:07 PM Nicholas Piggin <npiggin@gmail.com> wrote=
+:
+>>
+>> Masahiro Yamada's on January 14, 2019 1:27 pm:
+>> > The symbol table in the final archive is unneeded because it is passed
+>> > to the linker after the --whole-archive option. Every object file in
+>> > the archive is included in the link anyway.
+>> >
+>> > Pass thin archives from subdirectories directly to the linker, and
+>> > remove the final archiving step.
+>>
+>> This seems like a good improvement. As far as I remember, it was slower
+>> to do the final link without the index built. Maybe I was testing it
+>> in a revision before moving those files into --whole-archive? If there
+>> is no slowdown, then I have no objection.
+>=20
+>=20
+> Thanks for the review.
+>=20
+>=20
+> I measured the performance of scripts/link-vmlinux.sh with 'perf stat'.
+> (20 times for each)
+>=20
+>=20
+>=20
+> Before this patch:
+>=20
+>  Performance counter stats for 'make vmlinux' (20 runs):
+>=20
+>        5.266796537 seconds time elapsed
+>           ( +-  0.12% )
+>=20
+>=20
+>=20
+> After this patch:
+>=20
+>  Performance counter stats for 'make vmlinux' (20 runs):
+>=20
+>        4.945576395 seconds time elapsed
+>=20
+>=20
+>=20
+>=20
+> So, the performance is slightly better.
+>=20
+> Maybe, does omitting the 'ar' save some time?
 
-> > BTW, I have bisect-ed and tested for this issue today. Finally it turned out
-> > that
-> >         bffa986c6f80e39d9903015fc7d0d99a66bbf559 is the first bad commit.
-> > So I'm wondering if anywhere need to be fixed in commit bffa986c6f80 ("kasan:
-> > move common generic and tag-based code to common.c").  
-> 
-> Thanks for bisecting. I think we have understanding of what happens
-> here and it's exactly this that needs to be fixed:
-> https://groups.google.com/d/msg/kasan-dev/g8A8PLKCyoE/vXnirYEnCAAJ
-> And this commit already fixes it.
+Wow yeah that's a good speedup and simplification to boot. Thanks for=20
+checking it.
 
-I just got a chance to look at that commit, and I knew exactly what the
-bug was when looking at the broken commit. And yes, the fix is the
-correct fix for the issue.
+> Anyway, this commit is good.
 
-KASAN can be triggered by parts of the function tracer that is outside
-of the recursion protection. If that part of KASAN is also traced by
-the function tracer, it will cause a infinite recursion and crash the
-system.
+Yes, it's a good improvement.
 
-Seeing that code that was moved out of the "-pg" removal into a file
-that is compiled with "-pg" (which is what causes function tracer to
-trace functions in that file), was going to cause issues.
-
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-
--- Steve
+Thanks,
+Nick
+=
