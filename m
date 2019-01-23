@@ -1,83 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:41780 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726191AbfAWI0t (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:64803 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726313AbfAWJZy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 Jan 2019 03:26:49 -0500
-Date: Wed, 23 Jan 2019 18:26:35 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: remove top-level built-in.a
-References: <1547436479-10491-1-git-send-email-yamada.masahiro@socionext.com>
-        <1547536378.afs6amsrzj.astroid@bobo.none>
-        <CAK7LNAREyw=qhRO-Cvg4O2fOnbV=zVJDE_mRZcVTkKG+B1gkRQ@mail.gmail.com>
-In-Reply-To: <CAK7LNAREyw=qhRO-Cvg4O2fOnbV=zVJDE_mRZcVTkKG+B1gkRQ@mail.gmail.com>
+        Wed, 23 Jan 2019 04:25:54 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: minimal version requirement for ld
+Message-ID: <4bec5d62-6033-b3be-d4b2-30d72d381c34@cn.fujitsu.com>
+Date: Wed, 23 Jan 2019 17:23:11 +0800
 MIME-Version: 1.0
-Message-Id: <1548231946.lwdxf373y2.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Nicholas Piggin <npiggin@gmail.com>
 
-Masahiro Yamada's on January 15, 2019 7:01 pm:
-> Hi Nicholas,
->=20
->=20
-> On Tue, Jan 15, 2019 at 5:07 PM Nicholas Piggin <npiggin@gmail.com> wrote=
-:
->>
->> Masahiro Yamada's on January 14, 2019 1:27 pm:
->> > The symbol table in the final archive is unneeded because it is passed
->> > to the linker after the --whole-archive option. Every object file in
->> > the archive is included in the link anyway.
->> >
->> > Pass thin archives from subdirectories directly to the linker, and
->> > remove the final archiving step.
->>
->> This seems like a good improvement. As far as I remember, it was slower
->> to do the final link without the index built. Maybe I was testing it
->> in a revision before moving those files into --whole-archive? If there
->> is no slowdown, then I have no objection.
->=20
->=20
-> Thanks for the review.
->=20
->=20
-> I measured the performance of scripts/link-vmlinux.sh with 'perf stat'.
-> (20 times for each)
->=20
->=20
->=20
-> Before this patch:
->=20
->  Performance counter stats for 'make vmlinux' (20 runs):
->=20
->        5.266796537 seconds time elapsed
->           ( +-  0.12% )
->=20
->=20
->=20
-> After this patch:
->=20
->  Performance counter stats for 'make vmlinux' (20 runs):
->=20
->        4.945576395 seconds time elapsed
->=20
->=20
->=20
->=20
-> So, the performance is slightly better.
->=20
-> Maybe, does omitting the 'ar' save some time?
+Hi,
+(Not sure I am sending the right place)
 
-Wow yeah that's a good speedup and simplification to boot. Thanks for=20
-checking it.
+Documentation/process/changes.rst says the minimal version for binutils
+is 2.20. I am trying the binutils-2.20.51.0.2-5.48.el6.x86_64.rpm of
+Centos6 on Fedora28, and it give me:
 
-> Anyway, this commit is good.
+  HOSTCC  scripts/basic/fixdep
+/usr/bin/ld: unrecognized option '-plugin'
+/usr/bin/ld: use the --help option for usage information
+collect2: error: ld returned 1 exit status
+make[2]: *** [scripts/Makefile.host:90: scripts/basic/fixdep] Error 1
+make[1]: *** [Makefile:464: scripts_basic] Error 2
+make: *** No rule to make target 'include/config/auto.conf', needed by
+'include/config/kernel.release'.  Stop.
+make: *** Waiting for unfinished jobs....
+  HOSTCC  scripts/basic/fixdep
+/usr/bin/ld: unrecognized option '-plugin'
+/usr/bin/ld: use the --help option for usage information
+collect2: error: ld returned 1 exit status
+make[1]: *** [scripts/Makefile.host:90: scripts/basic/fixdep] Error 1
+make: *** [Makefile:464: scripts_basic] Error 2
 
-Yes, it's a good improvement.
+Then I tried adding:
 
-Thanks,
-Nick
-=
+    HOSTCFLAGS_fixdep.o := -fno-use-linker-plugin
+
+in scripts/basic/Makefile, and it give me:
+
+  HOSTCC  scripts/basic/fixdep
+/usr/bin/ld: BFD version 2.20.51.0.2-5.48.el6 20100205 internal error,
+aborting at reloc.c line 443 in bfd_get_reloc_size
+
+/usr/bin/ld: Please report this bug.
+
+collect2: error: ld returned 1 exit status
+make[2]: *** [scripts/Makefile.host:90: scripts/basic/fixdep] Error 1
+make[1]: *** [Makefile:464: scripts_basic] Error 2
+make: *** No rule to make target 'include/config/auto.conf', needed by
+'include/config/kernel.release'.  Stop.
+
+Any idea on this problem? Or anyone has ever tried ld 2.20 successfully?
+-- 
+Sincerely,
+Cao jin
