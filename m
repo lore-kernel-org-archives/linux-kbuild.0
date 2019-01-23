@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:47729 "EHLO mga02.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:50595 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727110AbfAWOPz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 Jan 2019 09:15:55 -0500
+        id S1726126AbfAWOWB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 23 Jan 2019 09:22:01 -0500
 From: Jani Nikula <jani.nikula@linux.intel.com>
 Subject: Re: [Intel-gfx] [PATCH 1/3] treewide: Lift switch variables out of switches
-In-Reply-To: <20190123115829.GA31385@kroah.com>
-References: <20190123110349.35882-1-keescook@chromium.org> <20190123110349.35882-2-keescook@chromium.org> <20190123115829.GA31385@kroah.com>
-Date: Wed, 23 Jan 2019 16:17:30 +0200
-Message-ID: <874l9z31c5.fsf@intel.com>
+In-Reply-To: <874l9z31c5.fsf@intel.com>
+References: <20190123110349.35882-1-keescook@chromium.org> <20190123110349.35882-2-keescook@chromium.org> <20190123115829.GA31385@kroah.com> <874l9z31c5.fsf@intel.com>
+Date: Wed, 23 Jan 2019 16:23:39 +0200
+Message-ID: <871s53311w.fsf@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
@@ -17,60 +17,69 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Greg KH <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>
 Cc: dev@openvswitch.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, netdev@vger.kernel.org, intel-gfx@lists.freedesktop.org, linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-mm@kvack.org, linux-security-module@vger.kernel.org, kernel-hardening@lists.openwall.com, intel-wired-lan@lists.osuosl.org, linux-fsdevel@vger.kernel.org, xen-devel@lists.xenproject.org, Laura Abbott <labbott@redhat.com>, linux-kbuild@vger.kernel.org, Alexander Popov <alex.popov@linux.com>
 
-On Wed, 23 Jan 2019, Greg KH <gregkh@linuxfoundation.org> wrote:
-> On Wed, Jan 23, 2019 at 03:03:47AM -0800, Kees Cook wrote:
->> Variables declared in a switch statement before any case statements
->> cannot be initialized, so move all instances out of the switches.
->> After this, future always-initialized stack variables will work
->> and not throw warnings like this:
->> 
->> fs/fcntl.c: In function ‘send_sigio_to_task’:
->> fs/fcntl.c:738:13: warning: statement will never be executed [-Wswitch-unreachable]
->>    siginfo_t si;
->>              ^~
+On Wed, 23 Jan 2019, Jani Nikula <jani.nikula@linux.intel.com> wrote:
+> On Wed, 23 Jan 2019, Greg KH <gregkh@linuxfoundation.org> wrote:
+>> On Wed, Jan 23, 2019 at 03:03:47AM -0800, Kees Cook wrote:
+>>> Variables declared in a switch statement before any case statements
+>>> cannot be initialized, so move all instances out of the switches.
+>>> After this, future always-initialized stack variables will work
+>>> and not throw warnings like this:
+>>> 
+>>> fs/fcntl.c: In function ‘send_sigio_to_task’:
+>>> fs/fcntl.c:738:13: warning: statement will never be executed [-Wswitch-unreachable]
+>>>    siginfo_t si;
+>>>              ^~
+>>
+>> That's a pain, so this means we can't have any new variables in { }
+>> scope except for at the top of a function?
+>>
+>> That's going to be a hard thing to keep from happening over time, as
+>> this is valid C :(
 >
-> That's a pain, so this means we can't have any new variables in { }
-> scope except for at the top of a function?
+> Not all valid C is meant to be used! ;)
 >
-> That's going to be a hard thing to keep from happening over time, as
-> this is valid C :(
+> Anyway, I think you're mistaking the limitation to arbitrary blocks
+> while it's only about the switch block IIUC.
+>
+> Can't have:
+>
+> 	switch (i) {
+> 		int j;
+> 	case 0:
+>         	/* ... */
+> 	}
+>
+> because it can't be turned into:
+>
+> 	switch (i) {
+> 		int j = 0; /* not valid C */
+> 	case 0:
+>         	/* ... */
+> 	}
+>
+> but can have e.g.:
+>
+> 	switch (i) {
+> 	case 0:
+> 		{
+> 			int j = 0;
+> 	        	/* ... */
+> 		}
+> 	}
+>
+> I think Kees' approach of moving such variable declarations to the
+> enclosing block scope is better than adding another nesting block.
 
-Not all valid C is meant to be used! ;)
+PS. The patch is
 
-Anyway, I think you're mistaking the limitation to arbitrary blocks
-while it's only about the switch block IIUC.
+Reviewed-by: Jani Nikula <jani.nikula@intel.com>
 
-Can't have:
+and the drivers/gpu/drm/i915/* parts are
 
-	switch (i) {
-		int j;
-	case 0:
-        	/* ... */
-	}
+Acked-by: Jani Nikula <jani.nikula@intel.com>
 
-because it can't be turned into:
-
-	switch (i) {
-		int j = 0; /* not valid C */
-	case 0:
-        	/* ... */
-	}
-
-but can have e.g.:
-
-	switch (i) {
-	case 0:
-		{
-			int j = 0;
-	        	/* ... */
-		}
-	}
-
-I think Kees' approach of moving such variable declarations to the
-enclosing block scope is better than adding another nesting block.
-
-BR,
-Jani.
+for merging via whichever tree is appropriate. (There'll be minor
+conflicts with in-flight work in our -next tree, but no biggie.)
 
 
 -- 
