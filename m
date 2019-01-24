@@ -1,55 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:54386 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726046AbfAXIK2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 24 Jan 2019 03:10:28 -0500
-Date: Thu, 24 Jan 2019 09:10:24 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [Intel-gfx] [PATCH 1/3] treewide: Lift switch variables out of
- switches
-Message-ID: <20190124081024.GA1108@kroah.com>
-References: <20190123110349.35882-1-keescook@chromium.org>
- <20190123110349.35882-2-keescook@chromium.org>
- <20190123115829.GA31385@kroah.com>
- <874l9z31c5.fsf@intel.com>
- <000001d4b32a$845e06e0$8d1a14a0$@211mainstreet.net>
- <87va2f1int.fsf@intel.com>
- <CAGXu5jJUxHtFq0rBJ9FwzMcZDWnusPUauC_=MaOz7H0_PF25jQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGXu5jJUxHtFq0rBJ9FwzMcZDWnusPUauC_=MaOz7H0_PF25jQ@mail.gmail.com>
+Received: from conuserg-11.nifty.com ([210.131.2.78]:45475 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726337AbfAXKsV (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 24 Jan 2019 05:48:21 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/2] kconfig: rename zconf.l to lexer.l
+Date: Thu, 24 Jan 2019 19:47:29 +0900
+Message-Id: <1548326850-13660-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Jani Nikula <jani.nikula@linux.intel.com>, Edwin Zimmerman <edwin@211mainstreet.net>, dev@openvswitch.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Network Development <netdev@vger.kernel.org>, intel-gfx@lists.freedesktop.org, linux-usb@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Maling list - DRI developers <dri-devel@lists.freedesktop.org>, Linux-MM <linux-mm@kvack.org>, linux-security-module <linux-security-module@vger.kernel.org>, Kernel Hardening <kernel-hardening@lists.openwall.com>, intel-wired-lan@lists.osuosl.org, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, xen-devel <xen-devel@lists.xenproject.org>, Laura Abbott <labbott@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Alexander Popov <alex.popov@linux.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Thu, Jan 24, 2019 at 07:55:51AM +1300, Kees Cook wrote:
-> On Thu, Jan 24, 2019 at 4:44 AM Jani Nikula <jani.nikula@linux.intel.com> wrote:
-> >
-> > On Wed, 23 Jan 2019, Edwin Zimmerman <edwin@211mainstreet.net> wrote:
-> > > On Wed, 23 Jan 2019, Jani Nikula <jani.nikula@linux.intel.com> wrote:
-> > >> On Wed, 23 Jan 2019, Greg KH <gregkh@linuxfoundation.org> wrote:
-> > >> > On Wed, Jan 23, 2019 at 03:03:47AM -0800, Kees Cook wrote:
-> > >> >> Variables declared in a switch statement before any case statements
-> > >> >> cannot be initialized, so move all instances out of the switches.
-> > >> >> After this, future always-initialized stack variables will work
-> > >> >> and not throw warnings like this:
-> > >> >>
-> > >> >> fs/fcntl.c: In function ‘send_sigio_to_task’:
-> > >> >> fs/fcntl.c:738:13: warning: statement will never be executed [-Wswitch-unreachable]
-> > >> >>    siginfo_t si;
-> > >> >>              ^~
-> > >> >
-> > >> > That's a pain, so this means we can't have any new variables in { }
-> > >> > scope except for at the top of a function?
-> 
-> Just in case this wasn't clear: no, it's just the switch statement
-> before the first "case". I cannot imagine how bad it would be if we
-> couldn't have block-scoped variables! Heh. :)
+Use a more logcal name.
 
-Sorry, it was not clear at first glance.  So no more objection from me
-for this change.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-greg k-h
+ scripts/kconfig/Makefile             | 6 +++---
+ scripts/kconfig/{zconf.l => lexer.l} | 0
+ scripts/kconfig/lkc.h                | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+ rename scripts/kconfig/{zconf.l => lexer.l} (100%)
+
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 1819735..9278519 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -143,10 +143,10 @@ help:
+ 
+ # ===========================================================================
+ # object files used by all kconfig flavours
+-common-objs	:= confdata.o expr.o symbol.o preprocess.o zconf.lex.o zconf.tab.o
++common-objs	:= confdata.o expr.o lexer.lex.o preprocess.o symbol.o zconf.tab.o
+ 
+-$(obj)/zconf.lex.o: $(obj)/zconf.tab.h
+-HOSTCFLAGS_zconf.lex.o	:= -I$(src)
++$(obj)/lexer.lex.o: $(obj)/zconf.tab.h
++HOSTCFLAGS_lexer.lex.o	:= -I$(src)
+ HOSTCFLAGS_zconf.tab.o	:= -I$(src)
+ 
+ # conf: Used for defconfig, oldconfig and related targets
+diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/lexer.l
+similarity index 100%
+rename from scripts/kconfig/zconf.l
+rename to scripts/kconfig/lexer.l
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index 531ff7c..d871539 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -90,7 +90,7 @@ void *xrealloc(void *p, size_t size);
+ char *xstrdup(const char *s);
+ char *xstrndup(const char *s, size_t n);
+ 
+-/* zconf.l */
++/* lexer.l */
+ int yylex(void);
+ 
+ struct gstr {
+-- 
+2.7.4
