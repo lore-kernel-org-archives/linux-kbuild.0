@@ -1,101 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:39860 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726249AbfAXE31 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 Jan 2019 23:29:27 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54386 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726046AbfAXIK2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 24 Jan 2019 03:10:28 -0500
+Date: Thu, 24 Jan 2019 09:10:24 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [Intel-gfx] [PATCH 1/3] treewide: Lift switch variables out of
+ switches
+Message-ID: <20190124081024.GA1108@kroah.com>
+References: <20190123110349.35882-1-keescook@chromium.org>
+ <20190123110349.35882-2-keescook@chromium.org>
+ <20190123115829.GA31385@kroah.com>
+ <874l9z31c5.fsf@intel.com>
+ <000001d4b32a$845e06e0$8d1a14a0$@211mainstreet.net>
+ <87va2f1int.fsf@intel.com>
+ <CAGXu5jJUxHtFq0rBJ9FwzMcZDWnusPUauC_=MaOz7H0_PF25jQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <1547607401-20118-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1547607401-20118-1-git-send-email-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 24 Jan 2019 13:28:35 +0900
-Message-ID: <CAK7LNASPGoBLqGbujYA5uvEDzLXdzU919_+jgJaD5Vwr++8tPw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: skip 'addtree' and 'flags' magic for external
- module build
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGXu5jJUxHtFq0rBJ9FwzMcZDWnusPUauC_=MaOz7H0_PF25jQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: DTML <devicetree@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jani Nikula <jani.nikula@linux.intel.com>, Edwin Zimmerman <edwin@211mainstreet.net>, dev@openvswitch.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Network Development <netdev@vger.kernel.org>, intel-gfx@lists.freedesktop.org, linux-usb@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Maling list - DRI developers <dri-devel@lists.freedesktop.org>, Linux-MM <linux-mm@kvack.org>, linux-security-module <linux-security-module@vger.kernel.org>, Kernel Hardening <kernel-hardening@lists.openwall.com>, intel-wired-lan@lists.osuosl.org, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, xen-devel <xen-devel@lists.xenproject.org>, Laura Abbott <labbott@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Alexander Popov <alex.popov@linux.com>
 
-On Thu, Jan 17, 2019 at 1:18 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> When building an external module, $(obj) is the absolute path to it.
->
-> The header search paths from ccflags-y etc. should not be tweaked.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+On Thu, Jan 24, 2019 at 07:55:51AM +1300, Kees Cook wrote:
+> On Thu, Jan 24, 2019 at 4:44 AM Jani Nikula <jani.nikula@linux.intel.com> wrote:
+> >
+> > On Wed, 23 Jan 2019, Edwin Zimmerman <edwin@211mainstreet.net> wrote:
+> > > On Wed, 23 Jan 2019, Jani Nikula <jani.nikula@linux.intel.com> wrote:
+> > >> On Wed, 23 Jan 2019, Greg KH <gregkh@linuxfoundation.org> wrote:
+> > >> > On Wed, Jan 23, 2019 at 03:03:47AM -0800, Kees Cook wrote:
+> > >> >> Variables declared in a switch statement before any case statements
+> > >> >> cannot be initialized, so move all instances out of the switches.
+> > >> >> After this, future always-initialized stack variables will work
+> > >> >> and not throw warnings like this:
+> > >> >>
+> > >> >> fs/fcntl.c: In function ‘send_sigio_to_task’:
+> > >> >> fs/fcntl.c:738:13: warning: statement will never be executed [-Wswitch-unreachable]
+> > >> >>    siginfo_t si;
+> > >> >>              ^~
+> > >> >
+> > >> > That's a pain, so this means we can't have any new variables in { }
+> > >> > scope except for at the top of a function?
+> 
+> Just in case this wasn't clear: no, it's just the switch statement
+> before the first "case". I cannot imagine how bad it would be if we
+> couldn't have block-scoped variables! Heh. :)
 
-Applied to linux-kbuild.
+Sorry, it was not clear at first glance.  So no more objection from me
+for this change.
 
-(2/2 was discarded.)
-
-
->  scripts/Makefile.host |  6 ++++--
->  scripts/Makefile.lib  | 11 ++++++-----
->  2 files changed, 10 insertions(+), 7 deletions(-)
->
-> diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-> index 0393f75..a115259 100644
-> --- a/scripts/Makefile.host
-> +++ b/scripts/Makefile.host
-> @@ -67,13 +67,15 @@ _hostc_flags   = $(KBUILD_HOSTCFLAGS)   $(HOST_EXTRACFLAGS)   \
->  _hostcxx_flags = $(KBUILD_HOSTCXXFLAGS) $(HOST_EXTRACXXFLAGS) \
->                   $(HOSTCXXFLAGS_$(basetarget).o)
->
-> -ifeq ($(KBUILD_SRC),)
->  __hostc_flags  = $(_hostc_flags)
->  __hostcxx_flags        = $(_hostcxx_flags)
-> -else
-> +
-> +ifeq ($(KBUILD_EXTMOD),)
-> +ifneq ($(KBUILD_SRC),)
->  __hostc_flags  = -I$(obj) $(call flags,_hostc_flags)
->  __hostcxx_flags        = -I$(obj) $(call flags,_hostcxx_flags)
->  endif
-> +endif
->
->  hostc_flags    = -Wp,-MD,$(depfile) $(__hostc_flags)
->  hostcxx_flags  = -Wp,-MD,$(depfile) $(__hostcxx_flags)
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 12b88d0..ecad15b 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -137,14 +137,14 @@ _c_flags += $(if $(patsubst n%,, \
->         $(CFLAGS_KCOV))
->  endif
->
-> -# If building the kernel in a separate objtree expand all occurrences
-> -# of -Idir to -I$(srctree)/dir except for absolute paths (starting with '/').
-> -
-> -ifeq ($(KBUILD_SRC),)
->  __c_flags      = $(_c_flags)
->  __a_flags      = $(_a_flags)
->  __cpp_flags     = $(_cpp_flags)
-> -else
-> +
-> +# If building the kernel in a separate objtree expand all occurrences
-> +# of -Idir to -I$(srctree)/dir except for absolute paths (starting with '/').
-> +ifeq ($(KBUILD_EXTMOD),)
-> +ifneq ($(KBUILD_SRC),)
->
->  # -I$(obj) locates generated .h files
->  # $(call addtree,-I$(obj)) locates .h files in srctree, from generated .c files
-> @@ -155,6 +155,7 @@ __c_flags   = $(if $(obj),$(call addtree,-I$(src)) -I$(obj)) \
->  __a_flags      = $(call flags,_a_flags)
->  __cpp_flags     = $(call flags,_cpp_flags)
->  endif
-> +endif
->
->  c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
->                  -include $(srctree)/include/linux/compiler_types.h       \
-> --
-> 2.7.4
->
-
-
--- 
-Best Regards
-Masahiro Yamada
+greg k-h
