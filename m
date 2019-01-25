@@ -1,60 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:55498 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727980AbfAXQEh (ORCPT
+Received: from mail-io1-f66.google.com ([209.85.166.66]:44550 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726689AbfAYN3w (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 24 Jan 2019 11:04:37 -0500
+        Fri, 25 Jan 2019 08:29:52 -0500
+Received: by mail-io1-f66.google.com with SMTP id r200so7696607iod.11
+        for <linux-kbuild@vger.kernel.org>; Fri, 25 Jan 2019 05:29:51 -0800 (PST)
 MIME-Version: 1.0
-References: <cover.1546888138.git.leonard.crestez@nxp.com> <VI1PR04MB553355D6D5EBC2604E1AD256EE9F0@VI1PR04MB5533.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR04MB553355D6D5EBC2604E1AD256EE9F0@VI1PR04MB5533.eurprd04.prod.outlook.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 25 Jan 2019 01:03:46 +0900
-Message-ID: <CAK7LNAQ+eNhkfNsjGEdAg+j2ButQ8R6NyZ10SckCGSP5MZ4jtg@mail.gmail.com>
-Subject: Re: [PATCH 0/3] kbuild: Add wilddt function instead of listing dtbs
+References: <1547765160-15502-1-git-send-email-eugene.loh@oracle.com> <CAKv+Gu8BeYsq-_7KiANOjSN2fp25BP=71uLqKnkkYYJdhD2Bfw@mail.gmail.com>
+In-Reply-To: <CAKv+Gu8BeYsq-_7KiANOjSN2fp25BP=71uLqKnkkYYJdhD2Bfw@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 25 Jan 2019 14:29:40 +0100
+Message-ID: <CAKv+Gu_6_K0ZrRLMST6bYxqgSfhDJACoiArQg+K3pFaYjJxQsA@mail.gmail.com>
+Subject: Re: [PATCH] Kbuild: Handle too long symbols in kallsyms.c
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Leonard Crestez <leonard.crestez@nxp.com>
-Cc: Olof Johansson <olof@lixom.net>, Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Fabio Estevam <fabio.estevam@nxp.com>, Mark Rutland <mark.rutland@arm.com>, Aisheng Dong <aisheng.dong@nxp.com>, Leo Li <leoyang.li@nxp.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: eugene.loh@oracle.com, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andi Kleen <ak@linux.intel.com>, andi@firstfloor.org
 
-On Tue, Jan 22, 2019 at 1:17 AM Leonard Crestez <leonard.crestez@nxp.com> wrote:
+(+ masahiro)
+
+On Fri, 25 Jan 2019 at 14:28, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
 >
-> On 1/7/2019 9:31 PM, Leonard Crestez wrote:
-> > The dts makefiles go through a lot of pointless churn when boards are
-> > added. Many SOCs (such as imx) have very simple naming conventions for
-> > all boards using a certain chip and board listings can be easily
-> > collapsed using wildcards.
+> On Thu, 17 Jan 2019 at 23:46, <eugene.loh@oracle.com> wrote:
 > >
-> > Add a "wilddt" function and use it for imx6/7/8 and layerscape. This can
-> > be applied to many other soc families later.
+> > From: Eugene Loh <eugene.loh@oracle.com>
 > >
-> > Previously sent as RFC: https://lore.kernel.org/patchwork/patch/1022737/
+> > When checking for symbols with excessively long names,
+> > account for null terminating character.
+> >
+> > Fixes: f3462aa952cf ("Kbuild: Handle longer symbols in kallsyms.c")
+> > Signed-off-by: Eugene Loh <eugene.loh@oracle.com>
 >
-> Any feedback? This should be reviewed by kbuild and arm-soc
+> Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 >
-> I think this is a worthwhile cleanup, are there any corner cases or more
-> exotic setup I should try in order to validate this series?
-
-
-
-Personally, I prefer explicit listing
-because I can browse the Makefile to get a quick idea
-of which boards are compiled.
-
-I like this to be consistent.
-
-
- - Exploit wildcard for all platforms
-
-    or
-
-- Do not do this at all
-
-
-But, I am pessimistic about the former
-when I look at AT91 platform.
-
-
--- 
-Best Regards
-Masahiro Yamada
+> > ---
+> >  scripts/kallsyms.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> > index 77cebad..f75e7bd 100644
+> > --- a/scripts/kallsyms.c
+> > +++ b/scripts/kallsyms.c
+> > @@ -118,8 +118,8 @@ static int read_symbol(FILE *in, struct sym_entry *s)
+> >                         fprintf(stderr, "Read error or end of file.\n");
+> >                 return -1;
+> >         }
+> > -       if (strlen(sym) > KSYM_NAME_LEN) {
+> > -               fprintf(stderr, "Symbol %s too long for kallsyms (%zu vs %d).\n"
+> > +       if (strlen(sym) >= KSYM_NAME_LEN) {
+> > +               fprintf(stderr, "Symbol %s too long for kallsyms (%zu >= %d).\n"
+> >                                 "Please increase KSYM_NAME_LEN both in kernel and kallsyms.c\n",
+> >                         sym, strlen(sym), KSYM_NAME_LEN);
+> >                 return -1;
+> > --
+> > 1.8.3.1
+> >
