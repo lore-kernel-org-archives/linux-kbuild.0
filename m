@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:32930 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:56140 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389235AbfA1QY1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 Jan 2019 11:24:27 -0500
+        id S2388852AbfA1QUh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 28 Jan 2019 11:20:37 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.4 17/80] modpost: validate symbol names also in find_elf_symbol
-Date: Mon, 28 Jan 2019 11:22:58 -0500
-Message-Id: <20190128162401.58841-17-sashal@kernel.org>
-In-Reply-To: <20190128162401.58841-1-sashal@kernel.org>
-References: <20190128162401.58841-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 019/107] modpost: validate symbol names also in find_elf_symbol
+Date: Mon, 28 Jan 2019 11:18:19 -0500
+Message-Id: <20190128161947.57405-19-sashal@kernel.org>
+In-Reply-To: <20190128161947.57405-1-sashal@kernel.org>
+References: <20190128161947.57405-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -38,10 +38,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 26 insertions(+), 24 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 064fbfbbb22c..81b1c02a76fa 100644
+index 88b3dc19bbae..fdf5bbfd00cd 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -1197,6 +1197,30 @@ static int secref_whitelist(const struct sectioncheck *mismatch,
+@@ -1198,6 +1198,30 @@ static int secref_whitelist(const struct sectioncheck *mismatch,
  	return 1;
  }
  
@@ -72,7 +72,7 @@ index 064fbfbbb22c..81b1c02a76fa 100644
  /**
   * Find symbol based on relocation record info.
   * In some cases the symbol supplied is a valid symbol so
-@@ -1222,6 +1246,8 @@ static Elf_Sym *find_elf_symbol(struct elf_info *elf, Elf64_Sword addr,
+@@ -1223,6 +1247,8 @@ static Elf_Sym *find_elf_symbol(struct elf_info *elf, Elf64_Sword addr,
  			continue;
  		if (ELF_ST_TYPE(sym->st_info) == STT_SECTION)
  			continue;
@@ -81,7 +81,7 @@ index 064fbfbbb22c..81b1c02a76fa 100644
  		if (sym->st_value == addr)
  			return sym;
  		/* Find a symbol nearby - addr are maybe negative */
-@@ -1240,30 +1266,6 @@ static Elf_Sym *find_elf_symbol(struct elf_info *elf, Elf64_Sword addr,
+@@ -1241,30 +1267,6 @@ static Elf_Sym *find_elf_symbol(struct elf_info *elf, Elf64_Sword addr,
  		return NULL;
  }
  
