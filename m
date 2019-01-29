@@ -1,45 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:36358 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726772AbfA2AMb (ORCPT
+Received: from mail-it1-f194.google.com ([209.85.166.194]:33091 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726117AbfA2NQ5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 Jan 2019 19:12:31 -0500
-Reply-To: alex.popov@linux.com
-Subject: Re: [PATCH 0/3] gcc-plugins: Introduce stackinit plugin
-References: <20190123110349.35882-1-keescook@chromium.org>
-From: Alexander Popov <alex.popov@linux.com>
-Message-ID: <874b8c23-068b-f8e7-2168-12947c06e145@linux.com>
-Date: Tue, 29 Jan 2019 03:12:24 +0300
+        Tue, 29 Jan 2019 08:16:57 -0500
+Received: by mail-it1-f194.google.com with SMTP id m8so13812768itk.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 29 Jan 2019 05:16:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190123110349.35882-1-keescook@chromium.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CAKcZhuW-ozJp-MVU3gw=uhuSc9+HTMVJza8QRUL3TaRrbqjJew@mail.gmail.com>
+ <CACT4Y+aJADsj37Y8jPAV7PASqKm_L-iJ=MDv68yPUO0TFvhdRg@mail.gmail.com>
+ <CACT4Y+ZxgzdbCeFquYmKThfiTGg3pZhn90X_Fk3yRXGYfepU4Q@mail.gmail.com>
+ <CAKcZhuWE_2+D_AP_U0XZP-bjb=8Eec1Ku3KD8qO8K0zDGo98Ow@mail.gmail.com>
+ <CACT4Y+Ye+0bBV5sB1F3wVbCC1guyA=RdsRnYHgrar=AhftGtQA@mail.gmail.com> <20190121175842.0f526757@vmware.local.home>
+In-Reply-To: <20190121175842.0f526757@vmware.local.home>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Tue, 29 Jan 2019 14:16:43 +0100
+Message-ID: <CACT4Y+Y7PJ1=dv6wzDTVRkFJCnrtDYyksmYp6UibW9a8_ob0Nw@mail.gmail.com>
+Subject: Re: [RESEND BUG REPORT] System hung! Due to ftrace or KASAN?
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laura Abbott <labbott@redhat.com>, xen-devel@lists.xenproject.org, dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, linux-usb@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, dev@openvswitch.org, linux-kbuild@vger.kernel.org, linux-security-module@vger.kernel.org, kernel-hardening@lists.openwall.com, Greg KH <gregkh@linuxfoundation.org>, Jann Horn <jannh@google.com>, William Kucharski <william.kucharski@oracle.com>, Jani Nikula <jani.nikula@linux.intel.com>, Edwin Zimmerman <edwin@211mainstreet.net>, Matthew Wilcox <willy@infradead.org>, Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>
+Cc: Zenghui Yu <zenghuiyu96@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, linux-trace-devel@vger.kernel.org, kasan-dev <kasan-dev@googlegroups.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Linus Torvalds <torvalds@linux-foundation.org>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>
 
-On 23.01.2019 14:03, Kees Cook wrote:
-> This adds a new plugin "stackinit" that attempts to perform unconditional
-> initialization of all stack variables
+On Tue, Jan 29, 2019 at 1:27 AM Andrew Morton <akpm@linux-foundation.org> wrote:
+>
+> On Mon, 21 Jan 2019 10:36:25 +0100 Dmitry Vyukov <dvyukov@google.com> wrote:
+>
+> > > Thanks Dmitry! I'll try to test this commit tomorrow.
+> > >
+> > > BTW, I have bisect-ed and tested for this issue today. Finally it turned out
+> > > that
+> > >         bffa986c6f80e39d9903015fc7d0d99a66bbf559 is the first bad commit.
+> > > So I'm wondering if anywhere need to be fixed in commit bffa986c6f80 ("kasan:
+> > > move common generic and tag-based code to common.c").
+> >
+> > Thanks for bisecting. I think we have understanding of what happens
+> > here and it's exactly this that needs to be fixed:
+> > https://groups.google.com/d/msg/kasan-dev/g8A8PLKCyoE/vXnirYEnCAAJ
+> > And this commit already fixes it.
+>
+> Has that been sent in my direction?  I can't find it.
+>
+> If sending it please add
+>
+> Tested-by: Dmitry Vyukov <dvyukov@google.com>
+> Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
 
-Hello Kees! Hello everyone!
 
-I was curious about the performance impact of the initialization of all stack
-variables. So I did a very brief test with this plugin on top of 4.20.5.
+Yes, it's here (State: New):
+https://lore.kernel.org/patchwork/patch/1024393/
 
-hackbench on Intel Core i7-4770 showed ~0.7% slowdown.
-hackbench on Kirin 620 (ARM Cortex-A53 Octa-core 1.2GHz) showed ~1.3% slowdown.
+This page says it was mailed to linux-mm mailing list too:
+https://groups.google.com/forum/#!topic/kasan-dev/g8A8PLKCyoE
 
-This test involves the kernel scheduler and allocator. I can't say whether they
-use stack aggressively. Maybe performance tests of other subsystems (e.g.
-network subsystem) can show different numbers. Did you try?
+But I can't find linux-mm archives here:
+http://vger.kernel.org/vger-lists.html
 
-I've heard a hypothesis that the initialization of all stack variables would
-pollute CPU caches, which is critical for some types of computations. Maybe some
-micro-benchmarks can disprove/confirm that?
+How can I add a tag to an existing change under review? Patchwork does
+not show something like "add Tested-by: me tag" to me on the patch
+page.
 
-Thanks!
-Best regards,
-Alexander
+Patchwork shows Todo list on the main page with "Your todo list
+contains patches that have been delegated to you". But I don't see an
+option to delegate this patch to you either...
