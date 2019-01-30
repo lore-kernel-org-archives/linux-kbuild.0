@@ -1,66 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it1-f194.google.com ([209.85.166.194]:33091 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726117AbfA2NQ5 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Jan 2019 08:16:57 -0500
-Received: by mail-it1-f194.google.com with SMTP id m8so13812768itk.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 29 Jan 2019 05:16:56 -0800 (PST)
+Received: from mga04.intel.com ([192.55.52.120]:11612 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726548AbfA3LPN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 30 Jan 2019 06:15:13 -0500
+From: Vladimir Kondratiev <vladimir.kondratiev@linux.intel.com>
+Subject: [PATCH] kbuild: gitignore output directory
+Date: Wed, 30 Jan 2019 13:14:47 +0200
+Message-Id: <20190130111447.26032-1-vladimir.kondratiev@linux.intel.com>
 MIME-Version: 1.0
-References: <CAKcZhuW-ozJp-MVU3gw=uhuSc9+HTMVJza8QRUL3TaRrbqjJew@mail.gmail.com>
- <CACT4Y+aJADsj37Y8jPAV7PASqKm_L-iJ=MDv68yPUO0TFvhdRg@mail.gmail.com>
- <CACT4Y+ZxgzdbCeFquYmKThfiTGg3pZhn90X_Fk3yRXGYfepU4Q@mail.gmail.com>
- <CAKcZhuWE_2+D_AP_U0XZP-bjb=8Eec1Ku3KD8qO8K0zDGo98Ow@mail.gmail.com>
- <CACT4Y+Ye+0bBV5sB1F3wVbCC1guyA=RdsRnYHgrar=AhftGtQA@mail.gmail.com> <20190121175842.0f526757@vmware.local.home>
-In-Reply-To: <20190121175842.0f526757@vmware.local.home>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Tue, 29 Jan 2019 14:16:43 +0100
-Message-ID: <CACT4Y+Y7PJ1=dv6wzDTVRkFJCnrtDYyksmYp6UibW9a8_ob0Nw@mail.gmail.com>
-Subject: Re: [RESEND BUG REPORT] System hung! Due to ftrace or KASAN?
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>
-Cc: Zenghui Yu <zenghuiyu96@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, linux-trace-devel@vger.kernel.org, kasan-dev <kasan-dev@googlegroups.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Linus Torvalds <torvalds@linux-foundation.org>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: Vladimir Kondratiev <vladimir.kondratiev@linux.intel.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Jan 29, 2019 at 1:27 AM Andrew Morton <akpm@linux-foundation.org> wrote:
->
-> On Mon, 21 Jan 2019 10:36:25 +0100 Dmitry Vyukov <dvyukov@google.com> wrote:
->
-> > > Thanks Dmitry! I'll try to test this commit tomorrow.
-> > >
-> > > BTW, I have bisect-ed and tested for this issue today. Finally it turned out
-> > > that
-> > >         bffa986c6f80e39d9903015fc7d0d99a66bbf559 is the first bad commit.
-> > > So I'm wondering if anywhere need to be fixed in commit bffa986c6f80 ("kasan:
-> > > move common generic and tag-based code to common.c").
-> >
-> > Thanks for bisecting. I think we have understanding of what happens
-> > here and it's exactly this that needs to be fixed:
-> > https://groups.google.com/d/msg/kasan-dev/g8A8PLKCyoE/vXnirYEnCAAJ
-> > And this commit already fixes it.
->
-> Has that been sent in my direction?  I can't find it.
->
-> If sending it please add
->
-> Tested-by: Dmitry Vyukov <dvyukov@google.com>
-> Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+When compiling into output directory using O=, many files
+created under KBUILD_OUTPUT that git considers
+as new ones; git clients, ex. "git gui" lists it, and it clutters
+file list making it difficult to see what was really changed
 
+Generate .gitignore in output directory that ignores all
+its content
 
-Yes, it's here (State: New):
-https://lore.kernel.org/patchwork/patch/1024393/
+Signed-off-by: Vladimir Kondratiev <vladimir.kondratiev@linux.intel.com>
+---
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
-This page says it was mailed to linux-mm mailing list too:
-https://groups.google.com/forum/#!topic/kasan-dev/g8A8PLKCyoE
-
-But I can't find linux-mm archives here:
-http://vger.kernel.org/vger-lists.html
-
-How can I add a tag to an existing change under review? Patchwork does
-not show something like "add Tested-by: me tag" to me on the patch
-page.
-
-Patchwork shows Todo list on the main page with "Your todo list
-contains patches that have been delegated to you". But I don't see an
-option to delegate this patch to you either...
+diff --git a/Makefile b/Makefile
+index 141653226f3c..ee66ea28869b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -483,10 +483,13 @@ PHONY += outputmakefile
+ # outputmakefile generates a Makefile in the output directory, if using a
+ # separate output directory. This allows convenient use of make in the
+ # output directory.
++# At the same time when output Makefile generated, generate .gitignore to
++# ignore whole output directory
+ outputmakefile:
+ ifneq ($(KBUILD_SRC),)
+ 	$(Q)ln -fsn $(srctree) source
+ 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile $(srctree)
++	echo "# this is build directory, ignore it\n*" > .gitignore
+ endif
+ 
+ ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
+-- 
+2.19.1
