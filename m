@@ -1,38 +1,118 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:31115 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725876AbfBAEW7 (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:53269 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726893AbfBAEvZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 Jan 2019 23:22:59 -0500
-MIME-Version: 1.0
-References: <1548326850-13660-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1548326850-13660-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 31 Jan 2019 23:51:25 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 1 Feb 2019 13:22:14 +0900
-Message-ID: <CAK7LNATmrNRqLWZXLZ27cF7yvSF6QsyuLhyVJFJf0e9Ubp44tg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kconfig: rename zconf.l to lexer.l
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] modpost: always show verbose warning for section mismatch
+Date: Fri,  1 Feb 2019 13:50:45 +0900
+Message-Id: <1548996645-16962-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Thu, Jan 24, 2019 at 7:48 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Use a more logcal name.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+Unless CONFIG_DEBUG_SECTION_MISMATCH is enabled, modpost only shows
+the number of section mismatches.
 
+If you want to know the symbols causing the issue, you need to rebuild
+with CONFIG_DEBUG_SECTION_MISMATCH. It is tedious.
 
-Both, applied to linux-kbuild/kconfig.
+I think it is fine to show annoying warning when a new section mismatch
+comes in.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ scripts/Makefile.modpost |  1 -
+ scripts/mod/modpost.c    | 27 +++++----------------------
+ 2 files changed, 5 insertions(+), 23 deletions(-)
 
-
-
-
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index c0b7f52..6b7f354 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -77,7 +77,6 @@ modpost = scripts/mod/modpost                    \
+  $(if $(KBUILD_EXTMOD),-I $(modulesymfile))      \
+  $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
+  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
+- $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
+  $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
+  $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
+ 
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 26bf886..0b0d108 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -35,7 +35,6 @@ static int vmlinux_section_warnings = 1;
+ static int warn_unresolved = 0;
+ /* How a symbol is exported */
+ static int sec_mismatch_count = 0;
+-static int sec_mismatch_verbose = 1;
+ static int sec_mismatch_fatal = 0;
+ /* ignore missing files */
+ static int ignore_missing_files;
+@@ -1406,8 +1405,6 @@ static void report_sec_mismatch(const char *modname,
+ 	char *prl_to;
+ 
+ 	sec_mismatch_count++;
+-	if (!sec_mismatch_verbose)
+-		return;
+ 
+ 	get_pretty_name(from_is_func, &from, &from_p);
+ 	get_pretty_name(to_is_func, &to, &to_p);
+@@ -1655,9 +1652,7 @@ static void extable_mismatch_handler(const char* modname, struct elf_info *elf,
+ 
+ 	sec_mismatch_count++;
+ 
+-	if (sec_mismatch_verbose)
+-		report_extable_warnings(modname, elf, mismatch, r, sym,
+-					fromsec, tosec);
++	report_extable_warnings(modname, elf, mismatch, r, sym, fromsec, tosec);
+ 
+ 	if (match(tosec, mismatch->bad_tosec))
+ 		fatal("The relocation at %s+0x%lx references\n"
+@@ -2433,7 +2428,7 @@ int main(int argc, char **argv)
+ 	struct ext_sym_list *extsym_iter;
+ 	struct ext_sym_list *extsym_start = NULL;
+ 
+-	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awE")) != -1) {
++	while ((opt = getopt(argc, argv, "i:I:e:mnsT:o:awE")) != -1) {
+ 		switch (opt) {
+ 		case 'i':
+ 			kernel_read = optarg;
+@@ -2465,9 +2460,6 @@ int main(int argc, char **argv)
+ 		case 's':
+ 			vmlinux_section_warnings = 0;
+ 			break;
+-		case 'S':
+-			sec_mismatch_verbose = 0;
+-			break;
+ 		case 'T':
+ 			files_source = optarg;
+ 			break;
+@@ -2525,18 +2517,9 @@ int main(int argc, char **argv)
+ 	}
+ 	if (dump_write)
+ 		write_dump(dump_write);
+-	if (sec_mismatch_count) {
+-		if (!sec_mismatch_verbose) {
+-			warn("modpost: Found %d section mismatch(es).\n"
+-			     "To see full details build your kernel with:\n"
+-			     "'make CONFIG_DEBUG_SECTION_MISMATCH=y'\n",
+-			     sec_mismatch_count);
+-		}
+-		if (sec_mismatch_fatal) {
+-			fatal("modpost: Section mismatches detected.\n"
+-			      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
+-		}
+-	}
++	if (sec_mismatch_count && sec_mismatch_fatal)
++		fatal("modpost: Section mismatches detected.\n"
++		      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
+ 	free(buf.p);
+ 
+ 	return err;
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
