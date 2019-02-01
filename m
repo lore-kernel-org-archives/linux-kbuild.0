@@ -1,47 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([5.9.137.197]:54818 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727734AbfBAJmX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Feb 2019 04:42:23 -0500
-Date: Fri, 1 Feb 2019 10:42:17 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] kbuild: Disable extra debugging info in .s output
-Message-ID: <20190201094217.GB31854@zn.tnic>
-References: <20190121095338.8565-1-bp@alien8.de>
- <20190131115820.GF6749@zn.tnic>
- <CAK7LNATGUs0PPssA=WfHojEEPuztDcNHf0NdH6ohOdf8k8PZOQ@mail.gmail.com>
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:48712 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728828AbfBALEZ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 1 Feb 2019 06:04:25 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATGUs0PPssA=WfHojEEPuztDcNHf0NdH6ohOdf8k8PZOQ@mail.gmail.com>
+References: <20190121095338.8565-1-bp@alien8.de> <20190131115820.GF6749@zn.tnic>
+ <CAK7LNATGUs0PPssA=WfHojEEPuztDcNHf0NdH6ohOdf8k8PZOQ@mail.gmail.com>
+ <20190201094217.GB31854@zn.tnic> <CAK7LNARPq7Bj+zp7bYyH_uPOyJ9a1-hD-aSq6GDLb8YdqbA-+A@mail.gmail.com>
+ <20190201102332.GD31854@zn.tnic>
+In-Reply-To: <20190201102332.GD31854@zn.tnic>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 1 Feb 2019 20:03:43 +0900
+Message-ID: <CAK7LNARQbJH_cScJ+feCSCFGbHr+EiaKcYLLxsvVn+WVCOoRbg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Disable extra debugging info in .s output
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Borislav Petkov <bp@alien8.de>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Fri, Feb 01, 2019 at 12:06:13PM +0900, Masahiro Yamada wrote:
-> This would make the build speed slower
-> because the compiler is invoked to check those flags in every directory.
-> 
-> I tested this patch with x86_64_defconfig and GCC 8.2
-> (on ubuntu 18.10 in docker)
-> but I saw no effect of this patch.
+On Fri, Feb 1, 2019 at 7:25 PM Borislav Petkov <bp@alien8.de> wrote:
+>
+> On Fri, Feb 01, 2019 at 07:09:36PM +0900, Masahiro Yamada wrote:
+> > Why should the normal build affected by the debugging aid?
+>
+> Hmm, ok, so then that target really is being used during the normal
+> build. I don't know why yet so I'll have to do some more staring.
+>
+> > One more thing, you did not answer my question.
+> >
+> > If you are complaining about the DWARF info
+> > enabled by CONFIG_DEBUG_INFO,
+> > I recommend to turn off CONFIG_DEBUG_INFO.
+>
+> Yes but I don't want to be changing .config just so that I can look at
+> the asm output.
 
-Yes, because that's the .s target which is meant to be used to convert
-only a *single* .c file to assembly in order to stare at the resulting
-asm. For example:
 
-make arch/x86/kernel/cpu/common.s
+Generally speaking, the build system should do what was
+requested by a set of CONFIG options.
 
-It is a debugging aid - and a very basic and important one - and is not
-usually used during a normal kernel build. AFAIK.
+If you want to turn off DWARF info,
+you should disable the corresponding CONFIG.
 
-So we shouldn't worry about any slowdowns here.
 
-Thx.
+If you want to tweak the behavior from the command line,
+KCFLAGS is available though.
+
+
+make arch/x86/kernel/cpu/common.s KCFLAGS="-gno-as-locview-support
+-fno-dwarf2-cfi-asm -feliminate-unused-debug-symbols
+-gno-statement-frontiers"
+
+
+
+> I'll think about a better solution.
+>
+> Thx.
+>
+> --
+> Regards/Gruss,
+>     Boris.
+>
+> Good mailing practices for 400: avoid top-posting and trim the reply.
+
+
 
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Best Regards
+Masahiro Yamada
