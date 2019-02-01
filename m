@@ -1,57 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([5.9.137.197]:47442 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728193AbfBAPLu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Feb 2019 10:11:50 -0500
-Date: Fri, 1 Feb 2019 16:11:39 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] kbuild: Disable extra debugging info in .s output
-Message-ID: <20190201151139.GK31854@zn.tnic>
-References: <20190121095338.8565-1-bp@alien8.de>
- <20190131115820.GF6749@zn.tnic>
- <CAK7LNATGUs0PPssA=WfHojEEPuztDcNHf0NdH6ohOdf8k8PZOQ@mail.gmail.com>
- <20190201094217.GB31854@zn.tnic>
- <CAK7LNARPq7Bj+zp7bYyH_uPOyJ9a1-hD-aSq6GDLb8YdqbA-+A@mail.gmail.com>
- <20190201103038.GE31854@zn.tnic>
- <20190201103648.GF31854@zn.tnic>
- <CAK7LNAQ4juLxrdMoPumQQ-96fMorf+wfAqkNxq1X1k=0i_R4vQ@mail.gmail.com>
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:37618 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725803AbfBAVKV (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 1 Feb 2019 16:10:21 -0500
+Received: by mail-pf1-f194.google.com with SMTP id y126so3822363pfb.4
+        for <linux-kbuild@vger.kernel.org>; Fri, 01 Feb 2019 13:10:20 -0800 (PST)
+From: jflat@chromium.org
+Subject: [PATCH] kbuild, LLVMLinux: Don't suppress format warnings
+Date: Fri,  1 Feb 2019 13:08:53 -0800
+Message-Id: <20190201210853.244043-1-jflat@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQ4juLxrdMoPumQQ-96fMorf+wfAqkNxq1X1k=0i_R4vQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net, Jon Flatley <jflat@chromium.org>
 
-On Fri, Feb 01, 2019 at 08:58:13PM +0900, Masahiro Yamada wrote:
-> Variables assigned with ':=' are evaluated just on parsing Makefile.
-> 
-> The scripts/Makefile.build is parsed over and over again,
-> so the compiler is invoked hundreds times to test these four options
-> even when you are not actually building any new objects.
-> 
-> It is mitigated by replacing ':=' with '=',
-> but they are still evaluated multiple times when generating asm-offset.
+From: Jon Flatley <jflat@chromium.org>
 
-Now that you mention it, how about ?=
+gcc produces format warnings that clang suppresses. To keep behavior
+consistent between gcc and clang, don't suppress format warnings in
+clang.
 
-disable_extra_cc_dbg ?= $(call cc-option,-gno-as-locview-support)
-disable_extra_cc_dbg += $(call cc-option,-fno-dwarf2-cfi-asm)
-disable_extra_cc_dbg += $(call cc-option,-feliminate-unused-debug-symbols)
-disable_extra_cc_dbg += $(call cc-option,-gno-statement-frontiers)
+Signed-off-by: Jon Flatley <jflat@chromium.org>
+---
+ scripts/Makefile.extrawarn | 1 -
+ 1 file changed, 1 deletion(-)
 
-With it, the slowdown of the incremental build is ~0.2s (on an old laptop):
-
-defconfig without:	9.6128 +- 0.0327 seconds time elapsed  ( +-  0.34% )
-
-vs
-
-defconfig with:		9.8483 +- 0.0273 seconds time elapsed  ( +-  0.28% )
-
-
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 768306add591..94daf4e1fc73 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -68,7 +68,6 @@ else
+ ifdef CONFIG_CC_IS_CLANG
+ KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
+-KBUILD_CFLAGS += $(call cc-disable-warning, format)
+ KBUILD_CFLAGS += $(call cc-disable-warning, sign-compare)
+ KBUILD_CFLAGS += $(call cc-disable-warning, format-zero-length)
+ KBUILD_CFLAGS += $(call cc-disable-warning, uninitialized)
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+2.20.1.611.gfbb209baf1-goog
