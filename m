@@ -1,118 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:53269 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726893AbfBAEvZ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 Jan 2019 23:51:25 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] modpost: always show verbose warning for section mismatch
-Date: Fri,  1 Feb 2019 13:50:45 +0900
-Message-Id: <1548996645-16962-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from mail.skyhub.de ([5.9.137.197]:54818 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727734AbfBAJmX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 1 Feb 2019 04:42:23 -0500
+Date: Fri, 1 Feb 2019 10:42:17 +0100
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH] kbuild: Disable extra debugging info in .s output
+Message-ID: <20190201094217.GB31854@zn.tnic>
+References: <20190121095338.8565-1-bp@alien8.de>
+ <20190131115820.GF6749@zn.tnic>
+ <CAK7LNATGUs0PPssA=WfHojEEPuztDcNHf0NdH6ohOdf8k8PZOQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAK7LNATGUs0PPssA=WfHojEEPuztDcNHf0NdH6ohOdf8k8PZOQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-Unless CONFIG_DEBUG_SECTION_MISMATCH is enabled, modpost only shows
-the number of section mismatches.
+On Fri, Feb 01, 2019 at 12:06:13PM +0900, Masahiro Yamada wrote:
+> This would make the build speed slower
+> because the compiler is invoked to check those flags in every directory.
+> 
+> I tested this patch with x86_64_defconfig and GCC 8.2
+> (on ubuntu 18.10 in docker)
+> but I saw no effect of this patch.
 
-If you want to know the symbols causing the issue, you need to rebuild
-with CONFIG_DEBUG_SECTION_MISMATCH. It is tedious.
+Yes, because that's the .s target which is meant to be used to convert
+only a *single* .c file to assembly in order to stare at the resulting
+asm. For example:
 
-I think it is fine to show annoying warning when a new section mismatch
-comes in.
+make arch/x86/kernel/cpu/common.s
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+It is a debugging aid - and a very basic and important one - and is not
+usually used during a normal kernel build. AFAIK.
 
- scripts/Makefile.modpost |  1 -
- scripts/mod/modpost.c    | 27 +++++----------------------
- 2 files changed, 5 insertions(+), 23 deletions(-)
+So we shouldn't worry about any slowdowns here.
 
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index c0b7f52..6b7f354 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -77,7 +77,6 @@ modpost = scripts/mod/modpost                    \
-  $(if $(KBUILD_EXTMOD),-I $(modulesymfile))      \
-  $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
-  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
-- $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
-  $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
-  $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
- 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 26bf886..0b0d108 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -35,7 +35,6 @@ static int vmlinux_section_warnings = 1;
- static int warn_unresolved = 0;
- /* How a symbol is exported */
- static int sec_mismatch_count = 0;
--static int sec_mismatch_verbose = 1;
- static int sec_mismatch_fatal = 0;
- /* ignore missing files */
- static int ignore_missing_files;
-@@ -1406,8 +1405,6 @@ static void report_sec_mismatch(const char *modname,
- 	char *prl_to;
- 
- 	sec_mismatch_count++;
--	if (!sec_mismatch_verbose)
--		return;
- 
- 	get_pretty_name(from_is_func, &from, &from_p);
- 	get_pretty_name(to_is_func, &to, &to_p);
-@@ -1655,9 +1652,7 @@ static void extable_mismatch_handler(const char* modname, struct elf_info *elf,
- 
- 	sec_mismatch_count++;
- 
--	if (sec_mismatch_verbose)
--		report_extable_warnings(modname, elf, mismatch, r, sym,
--					fromsec, tosec);
-+	report_extable_warnings(modname, elf, mismatch, r, sym, fromsec, tosec);
- 
- 	if (match(tosec, mismatch->bad_tosec))
- 		fatal("The relocation at %s+0x%lx references\n"
-@@ -2433,7 +2428,7 @@ int main(int argc, char **argv)
- 	struct ext_sym_list *extsym_iter;
- 	struct ext_sym_list *extsym_start = NULL;
- 
--	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awE")) != -1) {
-+	while ((opt = getopt(argc, argv, "i:I:e:mnsT:o:awE")) != -1) {
- 		switch (opt) {
- 		case 'i':
- 			kernel_read = optarg;
-@@ -2465,9 +2460,6 @@ int main(int argc, char **argv)
- 		case 's':
- 			vmlinux_section_warnings = 0;
- 			break;
--		case 'S':
--			sec_mismatch_verbose = 0;
--			break;
- 		case 'T':
- 			files_source = optarg;
- 			break;
-@@ -2525,18 +2517,9 @@ int main(int argc, char **argv)
- 	}
- 	if (dump_write)
- 		write_dump(dump_write);
--	if (sec_mismatch_count) {
--		if (!sec_mismatch_verbose) {
--			warn("modpost: Found %d section mismatch(es).\n"
--			     "To see full details build your kernel with:\n"
--			     "'make CONFIG_DEBUG_SECTION_MISMATCH=y'\n",
--			     sec_mismatch_count);
--		}
--		if (sec_mismatch_fatal) {
--			fatal("modpost: Section mismatches detected.\n"
--			      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
--		}
--	}
-+	if (sec_mismatch_count && sec_mismatch_fatal)
-+		fatal("modpost: Section mismatches detected.\n"
-+		      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
- 	free(buf.p);
- 
- 	return err;
+Thx.
+
 -- 
-2.7.4
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
