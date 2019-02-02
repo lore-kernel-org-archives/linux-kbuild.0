@@ -1,77 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:37514 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727627AbfBBLwj (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:30299 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727952AbfBBNsp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 2 Feb 2019 06:52:39 -0500
+        Sat, 2 Feb 2019 08:48:45 -0500
 MIME-Version: 1.0
-References: <CAKcZhuW-ozJp-MVU3gw=uhuSc9+HTMVJza8QRUL3TaRrbqjJew@mail.gmail.com>
- <CACT4Y+aJADsj37Y8jPAV7PASqKm_L-iJ=MDv68yPUO0TFvhdRg@mail.gmail.com>
- <CACT4Y+ZxgzdbCeFquYmKThfiTGg3pZhn90X_Fk3yRXGYfepU4Q@mail.gmail.com>
- <CAKcZhuWE_2+D_AP_U0XZP-bjb=8Eec1Ku3KD8qO8K0zDGo98Ow@mail.gmail.com>
- <CACT4Y+Ye+0bBV5sB1F3wVbCC1guyA=RdsRnYHgrar=AhftGtQA@mail.gmail.com>
- <20190121175842.0f526757@vmware.local.home> <CACT4Y+Y7PJ1=dv6wzDTVRkFJCnrtDYyksmYp6UibW9a8_ob0Nw@mail.gmail.com>
-In-Reply-To: <CACT4Y+Y7PJ1=dv6wzDTVRkFJCnrtDYyksmYp6UibW9a8_ob0Nw@mail.gmail.com>
-From: Zenghui Yu <zenghuiyu96@gmail.com>
-Date: Sat, 2 Feb 2019 19:52:24 +0800
-Message-ID: <CAKcZhuXfgXvpb2YNVanA_TZHzHWj59_sB2YYwyTsoXKeW2bG2g@mail.gmail.com>
-Subject: Re: [RESEND BUG REPORT] System hung! Due to ftrace or KASAN?
+References: <20190121095338.8565-1-bp@alien8.de> <20190131115820.GF6749@zn.tnic>
+ <CAK7LNATGUs0PPssA=WfHojEEPuztDcNHf0NdH6ohOdf8k8PZOQ@mail.gmail.com>
+ <20190201094217.GB31854@zn.tnic> <CAK7LNARPq7Bj+zp7bYyH_uPOyJ9a1-hD-aSq6GDLb8YdqbA-+A@mail.gmail.com>
+ <20190201103038.GE31854@zn.tnic> <20190201103648.GF31854@zn.tnic>
+ <CAK7LNAQ4juLxrdMoPumQQ-96fMorf+wfAqkNxq1X1k=0i_R4vQ@mail.gmail.com> <20190201151139.GK31854@zn.tnic>
+In-Reply-To: <20190201151139.GK31854@zn.tnic>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 2 Feb 2019 22:48:00 +0900
+Message-ID: <CAK7LNATVeX=6Mmn6A4+EGmZ9OSf=ePwbQWV1m1c=e=_LiebdNQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Disable extra debugging info in .s output
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>
-Cc: Linux-MM <linux-mm@kvack.org>, Dave Hansen <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, linux-trace-devel@vger.kernel.org, kasan-dev <kasan-dev@googlegroups.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrey Konovalov <andreyknvl@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Linus Torvalds <torvalds@linux-foundation.org>, Christoph Lameter <cl@linux.com>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Tue, Jan 29, 2019 at 9:16 PM Dmitry Vyukov <dvyukov@google.com> wrote:
+On Sat, Feb 2, 2019 at 12:12 AM Borislav Petkov <bp@alien8.de> wrote:
 >
-> On Tue, Jan 29, 2019 at 1:27 AM Andrew Morton <akpm@linux-foundation.org> wrote:
+> On Fri, Feb 01, 2019 at 08:58:13PM +0900, Masahiro Yamada wrote:
+> > Variables assigned with ':=' are evaluated just on parsing Makefile.
 > >
-> > On Mon, 21 Jan 2019 10:36:25 +0100 Dmitry Vyukov <dvyukov@google.com> wrote:
+> > The scripts/Makefile.build is parsed over and over again,
+> > so the compiler is invoked hundreds times to test these four options
+> > even when you are not actually building any new objects.
 > >
-> > > > Thanks Dmitry! I'll try to test this commit tomorrow.
-> > > >
-> > > > BTW, I have bisect-ed and tested for this issue today. Finally it turned out
-> > > > that
-> > > >         bffa986c6f80e39d9903015fc7d0d99a66bbf559 is the first bad commit.
-> > > > So I'm wondering if anywhere need to be fixed in commit bffa986c6f80 ("kasan:
-> > > > move common generic and tag-based code to common.c").
-> > >
-> > > Thanks for bisecting. I think we have understanding of what happens
-> > > here and it's exactly this that needs to be fixed:
-> > > https://groups.google.com/d/msg/kasan-dev/g8A8PLKCyoE/vXnirYEnCAAJ
-> > > And this commit already fixes it.
-> >
-> > Has that been sent in my direction?  I can't find it.
-> >
-> > If sending it please add
-> >
-> > Tested-by: Dmitry Vyukov <dvyukov@google.com>
-> > Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+> > It is mitigated by replacing ':=' with '=',
+> > but they are still evaluated multiple times when generating asm-offset.
 >
+> Now that you mention it, how about ?=
 
-Also,
-
-Tested-by: Zenghui Yu <zenghuiyu96@gmail.com>
-
-on x86 machines, if need :)
+'?=' is the same as '=' here.
 
 
-Thanks!
 
+
+> disable_extra_cc_dbg ?= $(call cc-option,-gno-as-locview-support)
+> disable_extra_cc_dbg += $(call cc-option,-fno-dwarf2-cfi-asm)
+> disable_extra_cc_dbg += $(call cc-option,-feliminate-unused-debug-symbols)
+> disable_extra_cc_dbg += $(call cc-option,-gno-statement-frontiers)
 >
-> Yes, it's here (State: New):
-> https://lore.kernel.org/patchwork/patch/1024393/
+> With it, the slowdown of the incremental build is ~0.2s (on an old laptop):
 >
-> This page says it was mailed to linux-mm mailing list too:
-> https://groups.google.com/forum/#!topic/kasan-dev/g8A8PLKCyoE
+> defconfig without:      9.6128 +- 0.0327 seconds time elapsed  ( +-  0.34% )
 >
-> But I can't find linux-mm archives here:
-> http://vger.kernel.org/vger-lists.html
+> vs
 >
-> How can I add a tag to an existing change under review? Patchwork does
-> not show something like "add Tested-by: me tag" to me on the patch
-> page.
+> defconfig with:         9.8483 +- 0.0273 seconds time elapsed  ( +-  0.28% )
 >
-> Patchwork shows Todo list on the main page with "Your todo list
-> contains patches that have been delegated to you". But I don't see an
-> option to delegate this patch to you either...
+>
+> --
+> Regards/Gruss,
+>     Boris.
+>
+> Good mailing practices for 400: avoid top-posting and trim the reply.
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
