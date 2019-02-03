@@ -1,39 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([5.9.137.197]:37196 "EHLO mail.skyhub.de"
+Received: from mga02.intel.com ([134.134.136.20]:9690 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727426AbfBBOmi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 2 Feb 2019 09:42:38 -0500
-Date: Sat, 2 Feb 2019 15:42:27 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] kbuild: Disable extra debugging info in .s output
-Message-ID: <20190202144227.GC27822@zn.tnic>
-References: <20190121095338.8565-1-bp@alien8.de>
- <20190131115820.GF6749@zn.tnic>
- <CAK7LNATGUs0PPssA=WfHojEEPuztDcNHf0NdH6ohOdf8k8PZOQ@mail.gmail.com>
- <20190201094217.GB31854@zn.tnic>
- <CAK7LNARPq7Bj+zp7bYyH_uPOyJ9a1-hD-aSq6GDLb8YdqbA-+A@mail.gmail.com>
- <20190201103038.GE31854@zn.tnic>
- <20190201103648.GF31854@zn.tnic>
- <CAK7LNAQ4juLxrdMoPumQQ-96fMorf+wfAqkNxq1X1k=0i_R4vQ@mail.gmail.com>
- <20190201151139.GK31854@zn.tnic>
- <CAK7LNATVeX=6Mmn6A4+EGmZ9OSf=ePwbQWV1m1c=e=_LiebdNQ@mail.gmail.com>
+        id S1727289AbfBCIt1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 3 Feb 2019 03:49:27 -0500
+From: Vladimir Kondratiev <vladimir.kondratiev@intel.com>
+Subject: [PATCH v2] kbuild: gitignore output directory
+Date: Sun,  3 Feb 2019 10:48:40 +0200
+Message-Id: <20190203084840.6113-1-vladimir.kondratiev@intel.com>
+In-Reply-To: <CAK7LNAS8g3g3OTtqTN8begMxzbSS82Wn0CqY8u6vuELEZaLo3g@mail.gmail.com>
+References: <CAK7LNAS8g3g3OTtqTN8begMxzbSS82Wn0CqY8u6vuELEZaLo3g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATVeX=6Mmn6A4+EGmZ9OSf=ePwbQWV1m1c=e=_LiebdNQ@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: Vladimir Kondratiev <vladimir.kondratiev@linux.intel.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, Feb 02, 2019 at 10:48:00PM +0900, Masahiro Yamada wrote:
-> '?=' is the same as '=' here.
+From: Vladimir Kondratiev <vladimir.kondratiev@linux.intel.com>
 
-Sure but if the slowdown disappears, then make does something else for
-'?=' apparently vs for '='.
+When compiling into output directory using O=, many files
+created under KBUILD_OUTPUT that git considers
+as new ones; git clients, ex. "git gui" lists it, and it clutters
+file list making it difficult to see what was really changed
 
+Generate .gitignore in output directory that ignores all
+its content
+
+Signed-off-by: Vladimir Kondratiev <vladimir.kondratiev@linux.intel.com>
+---
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 141653226f3c..b1d651e822b1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -483,10 +483,13 @@ PHONY += outputmakefile
+ # outputmakefile generates a Makefile in the output directory, if using a
+ # separate output directory. This allows convenient use of make in the
+ # output directory.
++# At the same time when output Makefile generated, generate .gitignore to
++# ignore whole output directory
+ outputmakefile:
+ ifneq ($(KBUILD_SRC),)
+ 	$(Q)ln -fsn $(srctree) source
+ 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile $(srctree)
++	$(Q){ echo "# this is build directory, ignore it"; echo "*"; } > .gitignore
+ endif
+ 
+ ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
 -- 
-Regards/Gruss,
-    Boris.
+2.19.1
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
+---------------------------------------------------------------------
+Intel Israel (74) Limited
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
