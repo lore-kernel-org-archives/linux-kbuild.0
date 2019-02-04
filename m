@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:39829 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:19831 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726502AbfBDI4b (ORCPT
+        with ESMTP id S1726320AbfBDJLf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Feb 2019 03:56:31 -0500
+        Mon, 4 Feb 2019 04:11:35 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] sh: fix build error for empty CONFIG_BUILTIN_DTB_SOURCE again
-Date: Mon,  4 Feb 2019 17:55:26 +0900
-Message-Id: <1549270526-17230-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2] sh: fix build error for invisible CONFIG_BUILTIN_DTB_SOURCE
+Date: Mon,  4 Feb 2019 18:10:55 +0900
+Message-Id: <1549271455-19292-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-sh@vger.kernel.org, devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-kernel@vger.kernel.org, Rich Felker <dalias@libc.org>, Mark Rutland <mark.rutland@arm.com>
 
-I fixed this build error in commit 1b1e4ee86e00 ("sh: fix build error
-for empty CONFIG_BUILTIN_DTB_SOURCE"), but it came back again.
+I fixed a similar build error in commit 1b1e4ee86e00 ("sh: fix build
+error for empty CONFIG_BUILTIN_DTB_SOURCE"), but it came back again.
 
 Since commit 37c8a5fafa3b ("kbuild: consolidate Devicetree dtb
 build rules"), the combination of CONFIG_OF_EARLY_FLATTREE=y and
@@ -30,9 +30,11 @@ CONFIG_USE_BUILTIN_DTB:
   core-$(CONFIG_USE_BUILTIN_DTB)  += arch/sh/boot/dts/
 
 Now, there is another path to descend there from the top Makefile
-when CONFIG_OF_EARLY_FLATTREE=y. Add obj-$(CONFIG_USE_BUILTIN_DTB)
-guard in case CONFIG_BUILTIN_DTB_SOURCE is hidden due to the unmet
-'depends on'.
+when CONFIG_OF_EARLY_FLATTREE=y. If CONFIG_USE_BUILTIN_DTB is disabled,
+CONFIG_BUILTIN_DTB_SOURCE is invisible instead of defined as "".
+
+Add obj-$(CONFIG_USE_BUILTIN_DTB) guard to avoid the attempt to build
+the non-existing file.
 
 Fixes: 37c8a5fafa3b ("kbuild: consolidate Devicetree dtb build rules")
 Reported-by: kbuild test robot <lkp@intel.com>
@@ -53,6 +55,9 @@ For some reasons, I will postpone it by the next development cycle.
 For now, I want to fix this sh build error first because kbuild test
 robot is still complaining about it.
 
+
+Changes in v2:
+  - Change the subject a bit because the cause of the error is different
 
  arch/sh/boot/dts/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
