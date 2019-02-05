@@ -1,59 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:25446 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725898AbfBEI0s (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Feb 2019 03:26:48 -0500
+Received: from mx.kolk.cc ([212.83.177.64]:57872 "EHLO mx.kolk.cc"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725947AbfBEMqg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 5 Feb 2019 07:46:36 -0500
+From: =?UTF-8?q?Kacper=20Ko=C5=82odziej?= <kacper@kolodziej.it>
+Subject: [PATCH] kbuild: [bin]deb-pkg: add DPKG_FLAGS variable
+Date: Tue,  5 Feb 2019 13:37:52 +0100
+Message-Id: <20190205123752.25432-1-kacper@kolodziej.it>
 MIME-Version: 1.0
-References: <20190201210853.244043-1-jflat@chromium.org>
-In-Reply-To: <20190201210853.244043-1-jflat@chromium.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 5 Feb 2019 17:26:05 +0900
-Message-ID: <CAK7LNAS5j6+o+wb8WL=8WP4r4fgqY1MDSGe0_u9Nri81_Eb3xw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild, LLVMLinux: Don't suppress format warnings
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: jflat@chromium.org
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kacper@kolodziej.it
 
-On Sat, Feb 2, 2019 at 6:10 AM <jflat@chromium.org> wrote:
->
-> From: Jon Flatley <jflat@chromium.org>
->
-> gcc produces format warnings that clang suppresses. To keep behavior
-> consistent between gcc and clang, don't suppress format warnings in
-> clang.
->
-> Signed-off-by: Jon Flatley <jflat@chromium.org>
-> ---
+DPKG_FLAGS variable lets user to add more flags to dpkg-buildpackage
+command in deb-pkg and bindeb-pkg.
 
-Applied to linux-kbuild.
-Thanks.
+Signed-off-by: Kacper Kołodziej <kacper@kolodziej.it>
+---
+ scripts/package/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-
-
->  scripts/Makefile.extrawarn | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> index 768306add591..94daf4e1fc73 100644
-> --- a/scripts/Makefile.extrawarn
-> +++ b/scripts/Makefile.extrawarn
-> @@ -68,7 +68,6 @@ else
->  ifdef CONFIG_CC_IS_CLANG
->  KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
->  KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, format)
->  KBUILD_CFLAGS += $(call cc-disable-warning, sign-compare)
->  KBUILD_CFLAGS += $(call cc-disable-warning, format-zero-length)
->  KBUILD_CFLAGS += $(call cc-disable-warning, uninitialized)
-> --
-> 2.20.1.611.gfbb209baf1-goog
->
-
-
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 453fecee62f0..6963eacb323c 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -72,11 +72,11 @@ deb-pkg: FORCE
+ 	$(call cmd,src_tar,$(KDEB_SOURCENAME))
+ 	origversion=$$(dpkg-parsechangelog -SVersion |sed 's/-[^-]*$$//');\
+ 		mv $(KDEB_SOURCENAME).tar.gz ../$(KDEB_SOURCENAME)_$${origversion}.orig.tar.gz
+-	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) -i.git -us -uc
++	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -i.git -us -uc
+ 
+ bindeb-pkg: FORCE
+ 	$(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
+-	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) -b -nc -uc
++	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -b -nc -uc
+ 
+ intdeb-pkg: FORCE
+ 	+$(CONFIG_SHELL) $(srctree)/scripts/package/builddeb
 -- 
-Best Regards
-Masahiro Yamada
+2.20.1
