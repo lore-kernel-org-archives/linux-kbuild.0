@@ -1,80 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:32747 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725934AbfBEHd4 (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:48051 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725934AbfBEIPz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Feb 2019 02:33:56 -0500
+        Tue, 5 Feb 2019 03:15:55 -0500
+MIME-Version: 1.0
+References: <CAK7LNAS8g3g3OTtqTN8begMxzbSS82Wn0CqY8u6vuELEZaLo3g@mail.gmail.com>
+ <20190203084840.6113-1-vladimir.kondratiev@intel.com>
+In-Reply-To: <20190203084840.6113-1-vladimir.kondratiev@intel.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: move archive command to scripts/Makefile.lib
-Date: Tue,  5 Feb 2019 16:33:37 +0900
-Message-Id: <1549352017-3503-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Tue, 5 Feb 2019 17:15:11 +0900
+Message-ID: <CAK7LNAS0XOch3SuCJAh8Mq0s9Y9FGNJaESbYHD8yNywnzVkg2Q@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: gitignore output directory
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>
+To: Vladimir Kondratiev <vladimir.kondratiev@intel.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Vladimir Kondratiev <vladimir.kondratiev@linux.intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-scripts/Makefile.build and arch/s390/boot/Makefile use the same
-command (thin archiving with symbol table creation).
+On Sun, Feb 3, 2019 at 5:50 PM Vladimir Kondratiev
+<vladimir.kondratiev@intel.com> wrote:
+>
+> From: Vladimir Kondratiev <vladimir.kondratiev@linux.intel.com>
+>
+> When compiling into output directory using O=, many files
+> created under KBUILD_OUTPUT that git considers
+> as new ones; git clients, ex. "git gui" lists it, and it clutters
+> file list making it difficult to see what was really changed
+>
+> Generate .gitignore in output directory that ignores all
+> its content
+>
+> Signed-off-by: Vladimir Kondratiev <vladimir.kondratiev@linux.intel.com>
+> ---
 
-Avoid the code duplication, and move it to scripts/Makefile.lib.
+Applied to linux-kbuild.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Thanks.
 
- arch/s390/boot/Makefile | 3 ---
- scripts/Makefile.build  | 6 +-----
- scripts/Makefile.lib    | 6 ++++++
- 3 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/s390/boot/Makefile b/arch/s390/boot/Makefile
-index 11ca879..c844eaf 100644
---- a/arch/s390/boot/Makefile
-+++ b/arch/s390/boot/Makefile
-@@ -57,9 +57,6 @@ $(obj)/section_cmp%: vmlinux $(obj)/compressed/vmlinux FORCE
- $(obj)/compressed/vmlinux: $(obj)/startup.a FORCE
- 	$(Q)$(MAKE) $(build)=$(obj)/compressed $@
- 
--quiet_cmd_ar = AR      $@
--      cmd_ar = rm -f $@; $(AR) rcsTP$(KBUILD_ARFLAGS) $@ $(real-prereqs)
--
- $(obj)/startup.a: $(OBJECTS) FORCE
- 	$(call if_changed,ar)
- 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f8e2794..99be01c 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -424,13 +424,9 @@ $(modorder-target): $(subdir-ym) FORCE
- # Rule to compile a set of .o files into one .a file (with symbol table)
- #
- ifdef lib-target
--quiet_cmd_link_l_target = AR      $@
--
--# lib target archives do get a symbol table and index
--cmd_link_l_target = rm -f $@; $(AR) rcsTP$(KBUILD_ARFLAGS) $@ $(real-prereqs)
- 
- $(lib-target): $(lib-y) FORCE
--	$(call if_changed,link_l_target)
-+	$(call if_changed,ar)
- 
- targets += $(lib-target)
- 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index c0abd9a..8a1f64f 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -233,6 +233,12 @@ $(obj)/%: $(src)/%_shipped
- quiet_cmd_ld = LD      $@
-       cmd_ld = $(LD) $(ld_flags) $(real-prereqs) -o $@
- 
-+# Archive
-+# ---------------------------------------------------------------------------
-+
-+quiet_cmd_ar = AR      $@
-+      cmd_ar = rm -f $@; $(AR) rcsTP$(KBUILD_ARFLAGS) $@ $(real-prereqs)
-+
- # Objcopy
- # ---------------------------------------------------------------------------
- 
+>  Makefile | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/Makefile b/Makefile
+> index 141653226f3c..b1d651e822b1 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -483,10 +483,13 @@ PHONY += outputmakefile
+>  # outputmakefile generates a Makefile in the output directory, if using a
+>  # separate output directory. This allows convenient use of make in the
+>  # output directory.
+> +# At the same time when output Makefile generated, generate .gitignore to
+> +# ignore whole output directory
+>  outputmakefile:
+>  ifneq ($(KBUILD_SRC),)
+>         $(Q)ln -fsn $(srctree) source
+>         $(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile $(srctree)
+> +       $(Q){ echo "# this is build directory, ignore it"; echo "*"; } > .gitignore
+>  endif
+>
+>  ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
+> --
+> 2.19.1
+>
+> ---------------------------------------------------------------------
+> Intel Israel (74) Limited
+>
+> This e-mail and any attachments may contain confidential material for
+> the sole use of the intended recipient(s). Any review or distribution
+> by others is strictly prohibited. If you are not the intended
+> recipient, please contact the sender and delete all copies.
+>
+
+
 -- 
-2.7.4
+Best Regards
+Masahiro Yamada
