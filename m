@@ -1,75 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:19831 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726320AbfBDJLf (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:32747 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725934AbfBEHd4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Feb 2019 04:11:35 -0500
+        Tue, 5 Feb 2019 02:33:56 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2] sh: fix build error for invisible CONFIG_BUILTIN_DTB_SOURCE
-Date: Mon,  4 Feb 2019 18:10:55 +0900
-Message-Id: <1549271455-19292-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: move archive command to scripts/Makefile.lib
+Date: Tue,  5 Feb 2019 16:33:37 +0900
+Message-Id: <1549352017-3503-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-sh@vger.kernel.org, devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-kernel@vger.kernel.org, Rich Felker <dalias@libc.org>, Mark Rutland <mark.rutland@arm.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>
 
-I fixed a similar build error in commit 1b1e4ee86e00 ("sh: fix build
-error for empty CONFIG_BUILTIN_DTB_SOURCE"), but it came back again.
+scripts/Makefile.build and arch/s390/boot/Makefile use the same
+command (thin archiving with symbol table creation).
 
-Since commit 37c8a5fafa3b ("kbuild: consolidate Devicetree dtb
-build rules"), the combination of CONFIG_OF_EARLY_FLATTREE=y and
-CONFIG_USE_BUILTIN_DTB=n results in the following build error:
+Avoid the code duplication, and move it to scripts/Makefile.lib.
 
-make[1]: *** No rule to make target 'arch/sh/boot/dts/.dtb.o', needed by 'arch/sh/boot/dts/built-in.a'.  Stop.
-make: *** [Makefile;1727: arch/sh/boot/dts/] Error 2
-
-Prior to that commit, there was only one path to descend into
-arch/sh/boot/dts/, and arch/sh/Makefile correctly guards it with
-CONFIG_USE_BUILTIN_DTB:
-
-  core-$(CONFIG_USE_BUILTIN_DTB)  += arch/sh/boot/dts/
-
-Now, there is another path to descend there from the top Makefile
-when CONFIG_OF_EARLY_FLATTREE=y. If CONFIG_USE_BUILTIN_DTB is disabled,
-CONFIG_BUILTIN_DTB_SOURCE is invisible instead of defined as "".
-
-Add obj-$(CONFIG_USE_BUILTIN_DTB) guard to avoid the attempt to build
-the non-existing file.
-
-Fixes: 37c8a5fafa3b ("kbuild: consolidate Devicetree dtb build rules")
-Reported-by: kbuild test robot <lkp@intel.com>
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-Observant reviewers may point out another problem.
-There is a race condition when CONFIG_OF_EARLY_FLATTREE=y.
+ arch/s390/boot/Makefile | 3 ---
+ scripts/Makefile.build  | 6 +-----
+ scripts/Makefile.lib    | 6 ++++++
+ 3 files changed, 7 insertions(+), 8 deletions(-)
 
-Some architectures (sh, xtensa, etc.) embed a DTB in vmlinux,
-so there are two paths to descend into arch/*/boot/dts/.
-For parallel build with -j<N> option, two threads may build
-under arch/*/boot/dts/ simultaneously.
-
-Yes, this is a problem, and it is in my TODO list.
-For some reasons, I will postpone it by the next development cycle.
-
-For now, I want to fix this sh build error first because kbuild test
-robot is still complaining about it.
-
-
-Changes in v2:
-  - Change the subject a bit because the cause of the error is different
-
- arch/sh/boot/dts/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/sh/boot/dts/Makefile b/arch/sh/boot/dts/Makefile
-index 01d0f7f..2563d1e 100644
---- a/arch/sh/boot/dts/Makefile
-+++ b/arch/sh/boot/dts/Makefile
-@@ -1,3 +1,3 @@
- ifneq ($(CONFIG_BUILTIN_DTB_SOURCE),"")
--obj-y += $(patsubst "%",%,$(CONFIG_BUILTIN_DTB_SOURCE)).dtb.o
-+obj-$(CONFIG_USE_BUILTIN_DTB) += $(patsubst "%",%,$(CONFIG_BUILTIN_DTB_SOURCE)).dtb.o
- endif
+diff --git a/arch/s390/boot/Makefile b/arch/s390/boot/Makefile
+index 11ca879..c844eaf 100644
+--- a/arch/s390/boot/Makefile
++++ b/arch/s390/boot/Makefile
+@@ -57,9 +57,6 @@ $(obj)/section_cmp%: vmlinux $(obj)/compressed/vmlinux FORCE
+ $(obj)/compressed/vmlinux: $(obj)/startup.a FORCE
+ 	$(Q)$(MAKE) $(build)=$(obj)/compressed $@
+ 
+-quiet_cmd_ar = AR      $@
+-      cmd_ar = rm -f $@; $(AR) rcsTP$(KBUILD_ARFLAGS) $@ $(real-prereqs)
+-
+ $(obj)/startup.a: $(OBJECTS) FORCE
+ 	$(call if_changed,ar)
+ 
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index f8e2794..99be01c 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -424,13 +424,9 @@ $(modorder-target): $(subdir-ym) FORCE
+ # Rule to compile a set of .o files into one .a file (with symbol table)
+ #
+ ifdef lib-target
+-quiet_cmd_link_l_target = AR      $@
+-
+-# lib target archives do get a symbol table and index
+-cmd_link_l_target = rm -f $@; $(AR) rcsTP$(KBUILD_ARFLAGS) $@ $(real-prereqs)
+ 
+ $(lib-target): $(lib-y) FORCE
+-	$(call if_changed,link_l_target)
++	$(call if_changed,ar)
+ 
+ targets += $(lib-target)
+ 
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index c0abd9a..8a1f64f 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -233,6 +233,12 @@ $(obj)/%: $(src)/%_shipped
+ quiet_cmd_ld = LD      $@
+       cmd_ld = $(LD) $(ld_flags) $(real-prereqs) -o $@
+ 
++# Archive
++# ---------------------------------------------------------------------------
++
++quiet_cmd_ar = AR      $@
++      cmd_ar = rm -f $@; $(AR) rcsTP$(KBUILD_ARFLAGS) $@ $(real-prereqs)
++
+ # Objcopy
+ # ---------------------------------------------------------------------------
+ 
 -- 
 2.7.4
