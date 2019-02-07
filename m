@@ -1,44 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.135]:59325 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726442AbfBGQlU (ORCPT
+Received: from mail-pf1-f170.google.com ([209.85.210.170]:43575 "EHLO
+        mail-pf1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726832AbfBGVDN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Feb 2019 11:41:20 -0500
-From: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Subject: [PATCH 1/4] Makefile: add kernelarch rule that prints the kernel architecture and localversion
-Date: Thu,  7 Feb 2019 17:40:56 +0100
-Message-Id: <1549557659-19137-2-git-send-email-info@metux.net>
-In-Reply-To: <1549557659-19137-1-git-send-email-info@metux.net>
-References: <1549557659-19137-1-git-send-email-info@metux.net>
+        Thu, 7 Feb 2019 16:03:13 -0500
+Received: by mail-pf1-f170.google.com with SMTP id w73so526586pfk.10
+        for <linux-kbuild@vger.kernel.org>; Thu, 07 Feb 2019 13:03:13 -0800 (PST)
+MIME-Version: 1.0
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Thu, 7 Feb 2019 13:03:01 -0800
+Message-ID: <CAKwvOdkkJ48d_a1K-LPRsTweDXgpGX51NH=nuWK5weNfQ_8RBw@mail.gmail.com>
+Subject: CONFIG_CC_IS_CLANG
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, kernel-janitors@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Nathan Chancellor <natechancellor@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-trivial rule to print out the kernel arch and localversion, so external tools,
-like distro packagers, can easily get it.
+Masahiro,
+I was looking into sprucing up Kbuild for improved LLD support.  One
+thing I was curious about was the different checks for clang in the
+top level Makefile.
 
-Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
----
- Makefile | 6 ++++++
- 1 file changed, 6 insertions(+)
-
+How come a change like:
 diff --git a/Makefile b/Makefile
-index 3142e67..2719907 100644
+index 3142e67d03f1..525b3fef7d27 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1664,6 +1664,12 @@ kernelrelease:
- kernelversion:
- 	@echo $(KERNELVERSION)
- 
-+kernellocalversion:
-+	@$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree) | sed -e 's~^\-~~'
-+
-+kernelarch:
-+	@echo $(ARCH)
-+
- image_name:
- 	@echo $(KBUILD_IMAGE)
- 
+@@ -489,7 +489,7 @@ ifneq ($(KBUILD_SRC),)
+  $(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile $(srctree)
+ endif
+
+-ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
++ifdef CONFIG_CC_IS_CLANG
+ ifneq ($(CROSS_COMPILE),)
+ CLANG_FLAGS := --target=$(notdir $(CROSS_COMPILE:%-=%))
+ GCC_TOOLCHAIN_DIR := $(dir $(shell which $(LD)))
+
+
+doesn't work?  It's odd that later on in the top level Makefile, we
+have that kind of check.  I was hoping to do something similar for
+LLD, but it seems that the config options are not defined for that
+particular make target?  Does this have to do with config-targets?
+
 -- 
-1.9.1
+Thanks,
+~Nick Desaulniers
