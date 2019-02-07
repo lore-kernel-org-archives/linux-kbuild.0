@@ -1,46 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.133]:54605 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.134]:58183 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726171AbfBGQlT (ORCPT
+        with ESMTP id S1726270AbfBGQlT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 7 Feb 2019 11:41:19 -0500
 From: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Subject: RFC: refactoring the deb build
-Date: Thu,  7 Feb 2019 17:40:55 +0100
-Message-Id: <1549557659-19137-1-git-send-email-info@metux.net>
+Subject: [PATCH 4/4] debian: add generic rule file
+Date: Thu,  7 Feb 2019 17:40:59 +0100
+Message-Id: <1549557659-19137-5-git-send-email-info@metux.net>
+In-Reply-To: <1549557659-19137-1-git-send-email-info@metux.net>
+References: <1549557659-19137-1-git-send-email-info@metux.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, kernel-janitors@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net
 
-Hello folks,
+Adding a generic debian rule file, so we can build the directly
+via usual Debian package build tools (eg. git-buildpackage,
+dck-buildpackage, etc). It expects the .config file already
+placed in the source tree.
 
+The rule file contains a rule for creating debian/control and
+other metadata - this is done similar to the 'deb-pkg' make rule,
+scripts/packaging/mkdebian.
+---
+ .gitignore   |  1 +
+ debian/rules | 26 ++++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
+ create mode 100755 debian/rules
 
-here are some patches for build process that allow building debian packages
-right the usual canonical way (eg. via dpkg-buildpackage or dck-buildpackage),
-instead 'manually' setting up the build environment and calling make.
-So, from a debian native perspective, turning it from head onto feet ;-)
-
-dpkg-buildpackage + friends expect the debian/rules file being present in
-the unpacked source tree and driving the actual build (the 'deb-pkg' make
-target does that quite the opposite way). Obviously, 'make deb-pkg' can't
-be used directly, as it would destroy our debian/rules file ...
-
-To archieve this, I've done several things:
-
-* place .config file to the source tree (not in this patch queue)
-* add some helper targets to the toplevel makefile, so we can just ask
-  for certain things, eg. version, arch, etc, that we need later
-* fix some missing dependencies in the generated debian/control file
-* change scripts/package/mkdebian so that the name of the generated rules
-  file name can be changed via environment
-* a generic debian/rules file for driving the build
-
-The last patch isn't really meant to be merged yet (need to change the
-deb-pkg rule to not overwrite debian/rules anymore) - just including it
-for illustration.
-
-What do you think about this ?
-
-
---mtx
+diff --git a/.gitignore b/.gitignore
+index a20ac26..2d8081f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -68,6 +68,7 @@ modules.builtin
+ # Debian directory (make deb-pkg)
+ #
+ /debian/
++!/debian/rules
+ 
+ #
+ # Snap directory (make snap-pkg)
+diff --git a/debian/rules b/debian/rules
+new file mode 100755
+index 0000000..eeb58f7
+--- /dev/null
++++ b/debian/rules
+@@ -0,0 +1,26 @@
++#!/usr/bin/make -f
++
++export MAKE
++export KERNELARCH           = $(shell $(MAKE) kernelarch)
++export KERNELRELEASE        = $(shell $(MAKE) kernelrelease)
++export KBUILD_DEBARCH       = $(shell dpkg-architecture -qDEB_HOST_ARCH)
++export KBUILD_BUILD_VERSION = $(shell $(MAKE) kernellocalversion)
++export KDEB_RULES           = debian/rules.auto
++export KDEB_SOURCENAME      = linux-source
++export ARCH                 = $(KERNELARCH)
++
++debian/control debian/changelong debian/arch debian/copyright:
++debian/control:
++	./scripts/package/mkdebian
++
++build:	debian/control
++	$(MAKE) KERNELRELEASE=$(KERNELRELEASE) ARCH=$(KERNELARCH) KBUILD_BUILD_VERSION=$(KBUILD_BUILD_VERSION) KBUILD_SRC=
++
++binary-arch:	debian/control
++	$(MAKE) KERNELRELEASE=$(KERNELRELEASE) ARCH=$(KERNELARCH) KBUILD_BUILD_VERSION=$(KBUILD_BUILD_VERSION) KBUILD_SRC= intdeb-pkg
++
++clean:
++	rm -rf debian/*tmp debian/files debian/changelog debian/control debian/copyright debian/rules.auto debian/arch
++	$(MAKE) clean
++
++binary: binary-arch
+-- 
+1.9.1
