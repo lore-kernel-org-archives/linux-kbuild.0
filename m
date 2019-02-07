@@ -1,62 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from proxy04.fsdata.se ([89.221.252.227]:50327 "EHLO
-        mail-gw01.fsdata.se" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727125AbfBGMqK (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.133]:54605 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726171AbfBGQlT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Feb 2019 07:46:10 -0500
-From: Mattias Jacobsson <2pi@mok.nu>
-Subject: [PATCH] modpost: file2alias: define size of alias
-Date: Thu, 7 Feb 2019 13:30:22 +0100
-Message-ID: <20190207123022.7961-1-2pi@mok.nu>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type: text/plain; charset=US-ASCII
+        Thu, 7 Feb 2019 11:41:19 -0500
+From: "Enrico Weigelt, metux IT consult" <info@metux.net>
+Subject: RFC: refactoring the deb build
+Date: Thu,  7 Feb 2019 17:40:55 +0100
+Message-Id: <1549557659-19137-1-git-send-email-info@metux.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
-Cc: 2pi@mok.nu, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, kernel-janitors@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net
 
-The size of the variable alias provided to do_entry functions are
-currently not readily available. Thus hindering do_entry functions to
-perform bounds checking.
+Hello folks,
 
-Define the macro ALIAS_SIZE containing the size of the variable alias.
 
-Signed-off-by: Mattias Jacobsson <2pi@mok.nu>
----
+here are some patches for build process that allow building debian packages
+right the usual canonical way (eg. via dpkg-buildpackage or dck-buildpackage),
+instead 'manually' setting up the build environment and calling make.
+So, from a debian native perspective, turning it from head onto feet ;-)
 
-Related discussion: [1] and [2] (around the first answer line)
+dpkg-buildpackage + friends expect the debian/rules file being present in
+the unpacked source tree and driving the actual build (the 'deb-pkg' make
+target does that quite the opposite way). Obviously, 'make deb-pkg' can't
+be used directly, as it would destroy our debian/rules file ...
 
-[1]: https://lore.kernel.org/lkml/20190128150909.4r3tje5l34u5t2xs@mok.nu/
-[2]: https://lore.kernel.org/lkml/CAHp75VcLizx+jtMrbc3Ev-HcJVEjH2naFC0sj=7fX5nZSCGc8Q@mail.gmail.com/
+To archieve this, I've done several things:
 
----
+* place .config file to the source tree (not in this patch queue)
+* add some helper targets to the toplevel makefile, so we can just ask
+  for certain things, eg. version, arch, etc, that we need later
+* fix some missing dependencies in the generated debian/control file
+* change scripts/package/mkdebian so that the name of the generated rules
+  file name can be changed via environment
+* a generic debian/rules file for driving the build
 
- scripts/mod/file2alias.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+The last patch isn't really meant to be merged yet (need to change the
+deb-pkg rule to not overwrite debian/rules anymore) - just including it
+for illustration.
 
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index a37af7d71973..afe22af20d7d 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -50,6 +50,9 @@ struct devtable {
- 	int (*do_entry)(const char *filename, void *symval, char *alias);
- };
- 
-+/* Size of alias provided to do_entry functions */
-+#define ALIAS_SIZE 500
-+
- /* Define a variable f that holds the value of field f of struct devid
-  * based at address m.
-  */
-@@ -1303,7 +1306,7 @@ static void do_table(void *symval, unsigned long size,
- 		     struct module *mod)
- {
- 	unsigned int i;
--	char alias[500];
-+	char alias[ALIAS_SIZE];
- 
- 	device_id_check(mod->name, device_id, size, id_size, symval);
- 	/* Leave last one: it's the terminator. */
--- 
-2.20.1
+What do you think about this ?
+
+
+--mtx
