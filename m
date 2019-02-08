@@ -1,61 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:44190 "EHLO
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:41485 "EHLO
         mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725940AbfBHFpd (ORCPT
+        with ESMTP id S1725940AbfBHFvD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Feb 2019 00:45:33 -0500
-Date: Thu, 7 Feb 2019 22:45:28 -0700
+        Fri, 8 Feb 2019 00:51:03 -0500
+Date: Thu, 7 Feb 2019 22:50:59 -0700
 From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: [PATCH 2/4] Makefile: clang: choose GCC_TOOLCHAIN_DIR not on LD
-Message-ID: <20190208054528.GC9647@archlinux-ryzen>
+Subject: Re: [PATCH 3/4] Makefile: lld: tell clang to use lld
+Message-ID: <20190208055059.GD9647@archlinux-ryzen>
 References: <20190207220155.81351-1-ndesaulniers@google.com>
- <20190207220155.81351-2-ndesaulniers@google.com>
+ <20190207220155.81351-3-ndesaulniers@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190207220155.81351-2-ndesaulniers@google.com>
+In-Reply-To: <20190207220155.81351-3-ndesaulniers@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: ndesaulniers@google.com
 Cc: yamada.masahiro@socionext.com, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Feb 07, 2019 at 02:01:50PM -0800, ndesaulniers@google.com wrote:
-> This causes an issue when trying to build with `make LD=ld.lld` if
-> ld.lld and the rest of your cross tools aren't in the same directory
-> (ex. /usr/local/bin) (as is the case for Android's build system), as the
-> GCC_TOOLCHAIN_DIR then gets set based on `which $(LD)` which will point
-> where LLVM tools are, not GCC/binutils tools are located.
+On Thu, Feb 07, 2019 at 02:01:51PM -0800, ndesaulniers@google.com wrote:
+> This is needed because clang doesn't select which linker to use based on
+> $LD but rather -fuse-ld=$(LD). This is problematic especially for
+> cc-ldoption, which checks for linker flag support via invoking the
+> compiler, rather than the linker.
 > 
-> Instead, select the GCC_TOOLCHAIN_DIR based on another tool provided by
-> binutils for which LLVM does not provide a substitute for, such as
-> elfedit.
-> 
-> Fixes commit 785f11aa595b ("kbuild: Add better clang cross build support")
-> 
-> Link: https://github.com/ClangBuiltLinux/linux/issues/341
+> Link: https://github.com/ClangBuiltLinux/linux/issues/342
 > Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
 > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> ---
+>  Makefile | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index 0eae4277206e..6307c17259ea 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -502,6 +502,9 @@ endif
+>  CLANG_FLAGS	+= -no-integrated-as
+>  KBUILD_CFLAGS	+= $(CLANG_FLAGS)
+>  KBUILD_AFLAGS	+= $(CLANG_FLAGS)
+> +ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
+> +CLANG_FLAGS	+= -fuse-ld=lld
+> +endif
+
+This section needs to be moved up above KBUILD_CFLAGS otherwise it never
+actually gets passed along.
+
+With that change, please add:
 
 Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
 Tested-by: Nathan Chancellor <natechancellor@gmail.com>
 
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 3142e67d03f1..0eae4277206e 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -492,7 +492,7 @@ endif
->  ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
->  ifneq ($(CROSS_COMPILE),)
->  CLANG_FLAGS	:= --target=$(notdir $(CROSS_COMPILE:%-=%))
-> -GCC_TOOLCHAIN_DIR := $(dir $(shell which $(LD)))
-> +GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
->  CLANG_FLAGS	+= --prefix=$(GCC_TOOLCHAIN_DIR)
->  GCC_TOOLCHAIN	:= $(realpath $(GCC_TOOLCHAIN_DIR)/..)
+>  export CLANG_FLAGS
 >  endif
+>  
 > -- 
 > 2.20.1.791.gb4d0f1c61a-goog
 > 
