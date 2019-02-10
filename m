@@ -1,85 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:45174 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726869AbfBHRp6 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:58726 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725899AbfBJGvm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Feb 2019 12:45:58 -0500
-Date: Fri, 8 Feb 2019 10:45:53 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: [PATCH 3/4] Makefile: lld: tell clang to use lld
-Message-ID: <20190208174553.GA14762@archlinux-ryzen>
-References: <20190207220155.81351-1-ndesaulniers@google.com>
- <20190207220155.81351-3-ndesaulniers@google.com>
- <20190208055059.GD9647@archlinux-ryzen>
- <CAKwvOd=ytsXYDzVZHUEjokHmW5kpqmCq4cnToOFJ4gwz8j7W=Q@mail.gmail.com>
+        Sun, 10 Feb 2019 01:51:42 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOd=ytsXYDzVZHUEjokHmW5kpqmCq4cnToOFJ4gwz8j7W=Q@mail.gmail.com>
+References: <20190131115820.GF6749@zn.tnic> <CAK7LNATGUs0PPssA=WfHojEEPuztDcNHf0NdH6ohOdf8k8PZOQ@mail.gmail.com>
+ <20190201094217.GB31854@zn.tnic> <CAK7LNARPq7Bj+zp7bYyH_uPOyJ9a1-hD-aSq6GDLb8YdqbA-+A@mail.gmail.com>
+ <20190201103038.GE31854@zn.tnic> <20190201103648.GF31854@zn.tnic>
+ <CAK7LNAQ4juLxrdMoPumQQ-96fMorf+wfAqkNxq1X1k=0i_R4vQ@mail.gmail.com>
+ <20190201151139.GK31854@zn.tnic> <CAK7LNATVeX=6Mmn6A4+EGmZ9OSf=ePwbQWV1m1c=e=_LiebdNQ@mail.gmail.com>
+ <20190202144227.GC27822@zn.tnic> <20190206104729.GC7314@zn.tnic>
+In-Reply-To: <20190206104729.GC7314@zn.tnic>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 10 Feb 2019 15:51:01 +0900
+Message-ID: <CAK7LNAT+GhbEwP7v7NWd2kqW76qbXM1mtKhc21YXkp7BUJjzKQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Disable extra debugging info in .s output
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, sedat.dilek@gmail.com
+To: Borislav Petkov <bp@alien8.de>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Fri, Feb 08, 2019 at 09:27:19AM -0800, Nick Desaulniers wrote:
-> On Thu, Feb 7, 2019 at 9:51 PM Nathan Chancellor
-> <natechancellor@gmail.com> wrote:
+On Wed, Feb 6, 2019 at 7:49 PM Borislav Petkov <bp@alien8.de> wrote:
+>
+> On Sat, Feb 02, 2019 at 03:42:27PM +0100, Borislav Petkov wrote:
+> > On Sat, Feb 02, 2019 at 10:48:00PM +0900, Masahiro Yamada wrote:
+> > > '?=' is the same as '=' here.
 > >
-> > On Thu, Feb 07, 2019 at 02:01:51PM -0800, ndesaulniers@google.com wrote:
-> > > This is needed because clang doesn't select which linker to use based on
-> > > $LD but rather -fuse-ld=$(LD). This is problematic especially for
-> > > cc-ldoption, which checks for linker flag support via invoking the
-> > > compiler, rather than the linker.
-> > >
-> > > Link: https://github.com/ClangBuiltLinux/linux/issues/342
-> > > Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
-> > > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> > > ---
-> > >  Makefile | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > >
-> > > diff --git a/Makefile b/Makefile
-> > > index 0eae4277206e..6307c17259ea 100644
-> > > --- a/Makefile
-> > > +++ b/Makefile
-> > > @@ -502,6 +502,9 @@ endif
-> > >  CLANG_FLAGS  += -no-integrated-as
-> > >  KBUILD_CFLAGS        += $(CLANG_FLAGS)
-> > >  KBUILD_AFLAGS        += $(CLANG_FLAGS)
-> > > +ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
-> > > +CLANG_FLAGS  += -fuse-ld=lld
-> 
-> Sorry, Sedat reports [0] that this is not quite correct; if $(LD)
-> matches LLD, then we need to set -fuse-ld=$(LD), not -fuse-ld=lld,
-> since you may have lld installed as lld-7 or lld-8, for example:
-> https://github.com/ClangBuiltLinux/linux/issues/358
-> 
+> > Sure but if the slowdown disappears, then make does something else for
+> > '?=' apparently vs for '='.
 
-We'll need to make sure that it is compatible with the way that Clang
-expects arguments to '-fuse-ld=' because it looks like 'ld.' is
-automatically appended.
+'=' and '?=' are the same in the sense that
+the right-hand side is evaluated when it is used.
 
-https://github.com/llvm/llvm-project/blob/5be3dbdb082ffba4f846e3572ea802d156dd8d34/clang/lib/Driver/ToolChain.cpp#L438-L468
 
-> > > +endif
-> >
-> > This section needs to be moved up above KBUILD_CFLAGS otherwise it never
-> > actually gets passed along.
-> >
-> > With that change, please add:
-> >
-> > Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> > Tested-by: Nathan Chancellor <natechancellor@gmail.com>
-> >
-> > >  export CLANG_FLAGS
-> > >  endif
-> > >
-> > > --
-> > > 2.20.1.791.gb4d0f1c61a-goog
-> > >
-> 
-> 
-> 
-> -- 
-> Thanks,
-> ~Nick Desaulniers
+> Ok, let me ask a different question then: would a separate target which
+> will be used to generate only clean asm for debugging purposes ala
+>
+> make <path-to-file>.asm
+
+Sorry, I do not like to duplicate the code.
+
+
+
+I do not understand why you need to test such complicated
+compiler flags in order to negate CONFIG_DEBUG_INFO.
+
+
+I am still wondering,
+but if this is really worth doing in upstream code,
+I think the following is a simpler idea.
+
+
+
+
+diff --git a/Makefile b/Makefile
+index 3142e67..131164a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -729,25 +729,28 @@ KBUILD_CFLAGS     += -fomit-frame-pointer
+ endif
+ endif
+
+-KBUILD_CFLAGS   += $(call cc-option, -fno-var-tracking-assignments)
++DEBUG_CFLAGS    := $(call cc-option, -fno-var-tracking-assignments)
+
+ ifdef CONFIG_DEBUG_INFO
+ ifdef CONFIG_DEBUG_INFO_SPLIT
+-KBUILD_CFLAGS   += $(call cc-option, -gsplit-dwarf, -g)
++DEBUG_CFLAGS    += $(call cc-option, -gsplit-dwarf, -g)
+ else
+-KBUILD_CFLAGS  += -g
++DEBUG_CFLAGS   += -g
+ endif
+ KBUILD_AFLAGS  += -Wa,-gdwarf-2
+ endif
+ ifdef CONFIG_DEBUG_INFO_DWARF4
+-KBUILD_CFLAGS  += $(call cc-option, -gdwarf-4,)
++DEBUG_CFLAGS   += $(call cc-option, -gdwarf-4,)
+ endif
+
+ ifdef CONFIG_DEBUG_INFO_REDUCED
+-KBUILD_CFLAGS  += $(call cc-option, -femit-struct-debug-baseonly) \
++DEBUG_CFLAGS   += $(call cc-option, -femit-struct-debug-baseonly) \
+                   $(call cc-option,-fno-var-tracking)
+ endif
+
++KBUILD_CFLAGS += $(DEBUG_CFLAGS)
++export DEBUG_CFLAGS
++
+ ifdef CONFIG_FUNCTION_TRACER
+ ifdef CONFIG_FTRACE_MCOUNT_RECORD
+   # gcc 5 supports generating the mcount tables directly
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index fd03d60..bc8e0ae 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -104,7 +104,7 @@ modkern_cflags =                                          \
+ quiet_modtag = $(if $(part-of-module),[M],   )
+
+ quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
+-cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
++cmd_cc_s_c = $(CC) $(filter-out $(DEBUG_CFLAGS), $(c_flags))
+$(DISABLE_LTO) -fverbose-asm -S -o $@ $<
+
+ $(obj)/%.s: $(src)/%.c FORCE
+        $(call if_changed_dep,cc_s_c)
+
+
+
+
+> or so be an acceptable approach?
+>
+> Thx.
+>
+> --
+> Regards/Gruss,
+>     Boris.
+>
+> Good mailing practices for 400: avoid top-posting and trim the reply.
+
+--
+Best Regards
+Masahiro Yamada
