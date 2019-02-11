@@ -1,64 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:32848 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728015AbfBKQFg (ORCPT
+Received: from mail-vk1-f202.google.com ([209.85.221.202]:39856 "EHLO
+        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729872AbfBKTae (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Feb 2019 11:05:36 -0500
-MIME-Version: 1.0
-References: <20190207220155.81351-1-ndesaulniers@google.com>
- <20190207220155.81351-3-ndesaulniers@google.com> <20190208055059.GD9647@archlinux-ryzen>
- <CAKwvOd=ytsXYDzVZHUEjokHmW5kpqmCq4cnToOFJ4gwz8j7W=Q@mail.gmail.com> <CAK7LNAQD=ZVcbn3cz2bcW0KrkL9ZOU44SHrmf2aRZwhYdmQrqQ@mail.gmail.com>
-In-Reply-To: <CAK7LNAQD=ZVcbn3cz2bcW0KrkL9ZOU44SHrmf2aRZwhYdmQrqQ@mail.gmail.com>
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Mon, 11 Feb 2019 17:05:22 +0100
-Message-ID: <CA+icZUV2NnXQxu57PeQgOjiQm_LMjfDKY+AJKn-K9i7gG6PAfQ@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Makefile: lld: tell clang to use lld
+        Mon, 11 Feb 2019 14:30:34 -0500
+Received: by mail-vk1-f202.google.com with SMTP id k8so30403vke.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 Feb 2019 11:30:34 -0800 (PST)
+Date: Mon, 11 Feb 2019 11:30:03 -0800
+Message-Id: <20190211193008.24101-1-ndesaulniers@google.com>
+Mime-Version: 1.0
+Subject: [PATCH v2 1/4] init/Kconfig: add config support for detecting linker
+From: ndesaulniers@google.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: yamada.masahiro@socionext.com
+Cc: natechancellor@gmail.com, sedat.dilek@gmail.com, keescook@chromium.org, samitolvanen@google.com, michal.lkml@markovi.net, akpm@linux-foundation.org, hannes@cmpxchg.org, peterz@infradead.org, linux@dominikbrodowski.net, npiggin@gmail.com, mathieu.desnoyers@efficios.com, gor@linux.ibm.com, adrian@lisas.de, rgb@redhat.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>
 
-On Mon, Feb 11, 2019 at 4:33 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-[ ... ]
-> > > > Link: https://github.com/ClangBuiltLinux/linux/issues/342
-> > > > Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
-> > > > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> > > > ---
-> > > >  Makefile | 3 +++
-> > > >  1 file changed, 3 insertions(+)
-> > > >
-> > > > diff --git a/Makefile b/Makefile
-> > > > index 0eae4277206e..6307c17259ea 100644
-> > > > --- a/Makefile
-> > > > +++ b/Makefile
-> > > > @@ -502,6 +502,9 @@ endif
-> > > >  CLANG_FLAGS  += -no-integrated-as
-> > > >  KBUILD_CFLAGS        += $(CLANG_FLAGS)
-> > > >  KBUILD_AFLAGS        += $(CLANG_FLAGS)
-> > > > +ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
-> > > > +CLANG_FLAGS  += -fuse-ld=lld
-> >
-> > Sorry, Sedat reports [0] that this is not quite correct; if $(LD)
-> > matches LLD, then we need to set -fuse-ld=$(LD), not -fuse-ld=lld,
-> > since you may have lld installed as lld-7 or lld-8, for example:
-> > https://github.com/ClangBuiltLinux/linux/issues/358
->
->
-> Hmm, $(LD) might be a full path.
->
-> Looks like Clang can take a full-path for -fuse-ld=,
-> but does it work for GCC?
->
+Similar to how we differentiate between CONFIG_CC_IS_GCC and
+CONFIG_CC_IS_CLANG, add CONFIG_LD_IS_BFD, CONFIG_LD_IS_GOLD, and
+CONFIG_LD_IS_LLD.
 
-Nope. GCC expects "-fuse-ld={bfd,gold,lld} ".
-Adding suffix "$-VER" was not recognized while building a
-llvm-toolchain, so I guess this will be the same for the Linux kernel
-side.
+This simiplifies patches to Makefiles that need to do different things
+for different linkers.
 
-- Sedat -
+Cc: Sami Tolvanen <samitolvanen@google.com>
+Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+Changes V1->V2:
+* Add suggested, reviewed, and tested by tags.
 
-[1] https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
-[2] https://github.com/ClangBuiltLinux/linux/issues/358
+ init/Kconfig | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/init/Kconfig b/init/Kconfig
+index c9386a365eea..b6046dcf7794 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -26,6 +26,15 @@ config CLANG_VERSION
+ config CC_HAS_ASM_GOTO
+ 	def_bool $(success,$(srctree)/scripts/gcc-goto.sh $(CC))
+ 
++config LD_IS_BFD
++	def_bool $(success,$(LD) --version | head -n 1 | grep -q 'GNU ld')
++
++config LD_IS_GOLD
++	def_bool $(success,$(LD) --version | head -n 1 | grep -q 'GNU gold')
++
++config LD_IS_LLD
++	def_bool $(success,$(LD) --version | head -n 1 | grep -q 'LLD')
++
+ config CONSTRUCTORS
+ 	bool
+ 	depends on !UML
+-- 
+2.20.1.791.gb4d0f1c61a-goog
