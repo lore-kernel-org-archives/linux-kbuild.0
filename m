@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.134]:42547 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.131]:43347 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726243AbfBKMDt (ORCPT
+        with ESMTP id S1726943AbfBKMDs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Feb 2019 07:03:49 -0500
+        Mon, 11 Feb 2019 07:03:48 -0500
 From: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Subject: [PATCH 3/3] scripts: mkdebian: fix dependencies
-Date: Mon, 11 Feb 2019 13:03:36 +0100
-Message-Id: <1549886616-12609-4-git-send-email-info@metux.net>
+Subject: [PATCH 2/3] scripts: mkdebian: allow renaming generated debian/rules
+Date: Mon, 11 Feb 2019 13:03:35 +0100
+Message-Id: <1549886616-12609-3-git-send-email-info@metux.net>
 In-Reply-To: <1549886616-12609-1-git-send-email-info@metux.net>
 References: <1549886616-12609-1-git-send-email-info@metux.net>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,25 +15,37 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: michal.lkml@markovi.net, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org
 
-We missed some build dependencies in the generated debian/control file.
+Add new environment variable KDEB_RULES for controlling where the
+generated debian rules are written to. By defaults, it's debian/rules,
+but packagers might override it for providing their own rules file.
 
 Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
 ---
- scripts/package/mkdebian | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/package/mkdebian | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index ff226be..1caaf0b 100755
+index edcad61..ff226be 100755
 --- a/scripts/package/mkdebian
 +++ b/scripts/package/mkdebian
-@@ -173,7 +173,7 @@ Source: $sourcename
- Section: kernel
- Priority: optional
- Maintainer: $maintainer
--Build-Depends: bc, kmod, cpio
-+Build-Depends: bc, kmod, cpio, bison, libelf-dev, libssl-dev, flex
- Homepage: http://www.kernel.org/
+@@ -99,6 +99,9 @@ kernel_headers_packagename=linux-headers-$version
+ dbg_packagename=$packagename-dbg
+ debarch=
+ set_debarch
++if [ -z "$KDEB_RULES" ]; then
++    KDEB_RULES=debian/rules
++fi
  
- Package: $packagename
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+@@ -202,7 +205,7 @@ Description: Linux kernel debugging symbols for $version
+  all the necessary debug symbols for the kernel and its modules.
+ EOF
+ 
+-cat <<EOF > debian/rules
++cat <<EOF > $KDEB_RULES
+ #!$(command -v $MAKE) -f
+ 
+ build:
 -- 
 1.9.1
