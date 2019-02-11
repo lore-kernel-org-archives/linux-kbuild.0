@@ -1,51 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.131]:43347 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726943AbfBKMDs (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:18510 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390340AbfBKPGL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Feb 2019 07:03:48 -0500
-From: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Subject: [PATCH 2/3] scripts: mkdebian: allow renaming generated debian/rules
-Date: Mon, 11 Feb 2019 13:03:35 +0100
-Message-Id: <1549886616-12609-3-git-send-email-info@metux.net>
-In-Reply-To: <1549886616-12609-1-git-send-email-info@metux.net>
-References: <1549886616-12609-1-git-send-email-info@metux.net>
+        Mon, 11 Feb 2019 10:06:11 -0500
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id x1BF64eO032046
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Feb 2019 00:06:05 +0900
+Received: by mail-vs1-f42.google.com with SMTP id b20so5108143vsl.9
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 Feb 2019 07:06:05 -0800 (PST)
+MIME-Version: 1.0
+References: <CAKwvOdkkJ48d_a1K-LPRsTweDXgpGX51NH=nuWK5weNfQ_8RBw@mail.gmail.com>
+In-Reply-To: <CAKwvOdkkJ48d_a1K-LPRsTweDXgpGX51NH=nuWK5weNfQ_8RBw@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 12 Feb 2019 00:05:27 +0900
+Message-ID: <CAK7LNATD_4vVK-iKFgM1YrrGDdbMV+givsxS4w=YABnri_WS4Q@mail.gmail.com>
+Subject: Re: CONFIG_CC_IS_CLANG
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: michal.lkml@markovi.net, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Nathan Chancellor <natechancellor@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Add new environment variable KDEB_RULES for controlling where the
-generated debian rules are written to. By defaults, it's debian/rules,
-but packagers might override it for providing their own rules file.
+On Fri, Feb 8, 2019 at 6:04 AM Nick Desaulniers <ndesaulniers@google.com> wrote:
+>
+> Masahiro,
+> I was looking into sprucing up Kbuild for improved LLD support.  One
+> thing I was curious about was the different checks for clang in the
+> top level Makefile.
+>
+> How come a change like:
+> diff --git a/Makefile b/Makefile
+> index 3142e67d03f1..525b3fef7d27 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -489,7 +489,7 @@ ifneq ($(KBUILD_SRC),)
+>   $(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile $(srctree)
+>  endif
+>
+> -ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
+> +ifdef CONFIG_CC_IS_CLANG
+>  ifneq ($(CROSS_COMPILE),)
+>  CLANG_FLAGS := --target=$(notdir $(CROSS_COMPILE:%-=%))
+>  GCC_TOOLCHAIN_DIR := $(dir $(shell which $(LD)))
+>
+>
+> doesn't work?  It's odd that later on in the top level Makefile, we
+> have that kind of check.  I was hoping to do something similar for
+> LLD, but it seems that the config options are not defined for that
+> particular make target?  Does this have to do with config-targets?
 
-Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
----
- scripts/package/mkdebian | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+include/config/auto.conf is included at line 594 of top Makefile.
 
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index edcad61..ff226be 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -99,6 +99,9 @@ kernel_headers_packagename=linux-headers-$version
- dbg_packagename=$packagename-dbg
- debarch=
- set_debarch
-+if [ -z "$KDEB_RULES" ]; then
-+    KDEB_RULES=debian/rules
-+fi
- 
- if [ "$ARCH" = "um" ] ; then
- 	packagename=user-mode-linux-$version
-@@ -202,7 +205,7 @@ Description: Linux kernel debugging symbols for $version
-  all the necessary debug symbols for the kernel and its modules.
- EOF
- 
--cat <<EOF > debian/rules
-+cat <<EOF > $KDEB_RULES
- #!$(command -v $MAKE) -f
- 
- build:
+'ifdef CONFIG_CC_IS_CLANG' is always false here.
+
+
+
+
 -- 
-1.9.1
+Best Regards
+Masahiro Yamada
