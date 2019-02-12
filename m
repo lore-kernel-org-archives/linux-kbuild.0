@@ -1,53 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:40664 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731174AbfBKT1d (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:50716 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727012AbfBLMWo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Feb 2019 14:27:33 -0500
-Received: by mail-pf1-f194.google.com with SMTP id h1so21241pfo.7
-        for <linux-kbuild@vger.kernel.org>; Mon, 11 Feb 2019 11:27:33 -0800 (PST)
+        Tue, 12 Feb 2019 07:22:44 -0500
+Date: Tue, 12 Feb 2019 13:22:21 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v2 4/4] Makefile: lld: set -O2 linker flag when linking
+ with LLD
+Message-ID: <20190212122221.GF32494@hirez.programming.kicks-ass.net>
+References: <20190211193008.24101-1-ndesaulniers@google.com>
+ <20190211193008.24101-4-ndesaulniers@google.com>
 MIME-Version: 1.0
-References: <20190207220155.81351-1-ndesaulniers@google.com>
- <20190207220155.81351-3-ndesaulniers@google.com> <20190208055059.GD9647@archlinux-ryzen>
- <CAKwvOd=ytsXYDzVZHUEjokHmW5kpqmCq4cnToOFJ4gwz8j7W=Q@mail.gmail.com> <CAK7LNAQD=ZVcbn3cz2bcW0KrkL9ZOU44SHrmf2aRZwhYdmQrqQ@mail.gmail.com>
-In-Reply-To: <CAK7LNAQD=ZVcbn3cz2bcW0KrkL9ZOU44SHrmf2aRZwhYdmQrqQ@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 11 Feb 2019 11:27:20 -0800
-Message-ID: <CAKwvOdn1BDsYCrjUVDqKyiZA8pvENOWaOvkYN3kcVfWZof9Esw@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Makefile: lld: tell clang to use lld
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190211193008.24101-4-ndesaulniers@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Sedat Dilek <sedat.dilek@gmail.com>
+To: ndesaulniers@google.com
+Cc: yamada.masahiro@socionext.com, natechancellor@gmail.com, sedat.dilek@gmail.com, keescook@chromium.org, samitolvanen@google.com, michal.lkml@markovi.net, akpm@linux-foundation.org, hannes@cmpxchg.org, linux@dominikbrodowski.net, npiggin@gmail.com, mathieu.desnoyers@efficios.com, gor@linux.ibm.com, adrian@lisas.de, rgb@redhat.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Rui Ueyama <ruiu@google.com>
 
-On Mon, Feb 11, 2019 at 7:33 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> On Sat, Feb 9, 2019 at 2:27 AM Nick Desaulniers <ndesaulniers@google.com> wrote:
-> >
-> > On Thu, Feb 7, 2019 at 9:51 PM Nathan Chancellor
-> > <natechancellor@gmail.com> wrote:
-> > >
-> > > On Thu, Feb 07, 2019 at 02:01:51PM -0800, ndesaulniers@google.com wrote:
-> > > > This is needed because clang doesn't select which linker to use based on
-> > > > $LD but rather -fuse-ld=$(LD). This is problematic especially for
-> > > > cc-ldoption, which checks for linker flag support via invoking the
-> > > > compiler, rather than the linker.
->
-> What do you mean by 'problematic' ?
->
-> I see no build error in
-> arch/arm64/kernel/vdso/Makefile, at least.
->
-> Clang uses BFD linker by default,
-> which may not match to the $(LD) passed in.
->
-> Is this what you mean?
+On Mon, Feb 11, 2019 at 11:30:06AM -0800, ndesaulniers@google.com wrote:
+> For arm64:
+> 0.34% size improvement with lld -O2 over lld for vmlinux.
+> 3.3% size improvement with lld -O2 over lld for Image.lz4-dtb.
 
-Right, when using a linker other than BFD, we want cc-ldoption to tell
-us whether that linker supports a linker flag or not.
+The Changelog is utterly failing to explain what it does.
 
--- 
-Thanks,
-~Nick Desaulniers
+> Link: https://github.com/ClangBuiltLinux/linux/issues/343
+
+That is irrelevant crap.
+
+> Suggested-by: Rui Ueyama <ruiu@google.com>
+> Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
+> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> ---
+> Changes V1->V2:
+> * add tested and reviewed by tags.
+> 
+>  Makefile | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index 00e8e01d23fc..8011555745aa 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -718,6 +718,10 @@ else
+>  KBUILD_CFLAGS += -Wno-unused-but-set-variable
+>  endif
+>  
+> +ifdef CONFIG_LD_IS_LLD
+> +KBUILD_LDFLAGS += -O2
+> +endif
+> +
+>  KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+>  ifdef CONFIG_FRAME_POINTER
+>  KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
+> -- 
+> 2.20.1.791.gb4d0f1c61a-goog
+> 
