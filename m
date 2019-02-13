@@ -1,63 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vs1-f67.google.com ([209.85.217.67]:45817 "EHLO
-        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726480AbfBLRyx (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:30709 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733098AbfBMO7M (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Feb 2019 12:54:53 -0500
-Received: by mail-vs1-f67.google.com with SMTP id u64so2104797vsc.12
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Feb 2019 09:54:53 -0800 (PST)
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com. [209.85.217.54])
-        by smtp.gmail.com with ESMTPSA id b144sm2673059vka.34.2019.02.12.09.54.50
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Feb 2019 09:54:51 -0800 (PST)
-Received: by mail-vs1-f54.google.com with SMTP id e10so2164092vsp.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Feb 2019 09:54:50 -0800 (PST)
+        Wed, 13 Feb 2019 09:59:12 -0500
 MIME-Version: 1.0
-References: <20190123110349.35882-1-keescook@chromium.org> <874b8c23-068b-f8e7-2168-12947c06e145@linux.com>
-In-Reply-To: <874b8c23-068b-f8e7-2168-12947c06e145@linux.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 12 Feb 2019 09:54:38 -0800
-Message-ID: <CAGXu5j+xz8_wkY2rVRML_iq1o7ZoF1jVp2mi73LjxaKuMNw1cw@mail.gmail.com>
-Subject: Re: [PATCH 0/3] gcc-plugins: Introduce stackinit plugin
+References: <20190211193008.24101-1-ndesaulniers@google.com> <20190211193008.24101-3-ndesaulniers@google.com>
+In-Reply-To: <20190211193008.24101-3-ndesaulniers@google.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 13 Feb 2019 23:58:18 +0900
+Message-ID: <CAK7LNATZY-K4g81LLvXpjp=+oMSY8L0wQoVXgHt-Bjrb2WXnNg@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] Makefile: lld: tell clang to use lld
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Popov <alex.popov@linux.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laura Abbott <labbott@redhat.com>, xen-devel <xen-devel@lists.xenproject.org>, Maling list - DRI developers <dri-devel@lists.freedesktop.org>, intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org, Network Development <netdev@vger.kernel.org>, linux-usb@vger.kernel.org, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Linux-MM <linux-mm@kvack.org>, dev@openvswitch.org, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-security-module <linux-security-module@vger.kernel.org>, Kernel Hardening <kernel-hardening@lists.openwall.com>, Greg KH <gregkh@linuxfoundation.org>, Jann Horn <jannh@google.com>, William Kucharski <william.kucharski@oracle.com>, Jani Nikula <jani.nikula@linux.intel.com>, Edwin Zimmerman <edwin@211mainstreet.net>, Matthew Wilcox <willy@infradead.org>, Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Nathan Chancellor <natechancellor@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Kees Cook <keescook@chromium.org>, Sami Tolvanen <samitolvanen@google.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner <hannes@cmpxchg.org>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Vasily Gorbik <gor@linux.ibm.com>, Adrian Reber <adrian@lisas.de>, Richard Guy Briggs <rgb@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Jan 28, 2019 at 4:12 PM Alexander Popov <alex.popov@linux.com> wrote:
+On Tue, Feb 12, 2019 at 5:42 AM <ndesaulniers@google.com> wrote:
 >
-> On 23.01.2019 14:03, Kees Cook wrote:
-> > This adds a new plugin "stackinit" that attempts to perform unconditional
-> > initialization of all stack variables
+> This is needed because clang doesn't select which linker to use based on
+> $LD but rather -fuse-ld=lld. This is problematic especially for
+> cc-ldoption, which checks for linker flag support via invoking the
+> compiler, rather than the linker.
+
+
+Sorry, please explain what kind of problem
+this patch solves.
+
+
+
+[1] $(LD) is used to link vmlinux, modules, etc.
+
+[2] $(CC) is used to link vdso, etc.
+    and -fuse-ld= selects which linker is invoked from $(CC)
+
+
+Is it a problem to use a different
+type of linker for [1] and [2] ?
+
+
+Thanks.
+
+
+
+
+
+> Link: https://github.com/ClangBuiltLinux/linux/issues/342
+> Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
+> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> ---
+> Changes V1->V2:
+> * add reviewed and tested by tags.
+> * move this addition up 2 statments so that it's properly added to
+>   KBUILD_*FLAGS as per Nathan.
 >
-> Hello Kees! Hello everyone!
+>  Makefile | 3 +++
+>  1 file changed, 3 insertions(+)
 >
-> I was curious about the performance impact of the initialization of all stack
-> variables. So I did a very brief test with this plugin on top of 4.20.5.
+> diff --git a/Makefile b/Makefile
+> index d3b65e96d183..00e8e01d23fc 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -500,6 +500,9 @@ ifneq ($(GCC_TOOLCHAIN),)
+>  CLANG_FLAGS    += --gcc-toolchain=$(GCC_TOOLCHAIN)
+>  endif
+>  CLANG_FLAGS    += -no-integrated-as
+> +ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
+> +CLANG_FLAGS    += -fuse-ld=lld
+> +endif
+>  KBUILD_CFLAGS  += $(CLANG_FLAGS)
+>  KBUILD_AFLAGS  += $(CLANG_FLAGS)
+>  export CLANG_FLAGS
+> --
+> 2.20.1.791.gb4d0f1c61a-goog
 >
-> hackbench on Intel Core i7-4770 showed ~0.7% slowdown.
-> hackbench on Kirin 620 (ARM Cortex-A53 Octa-core 1.2GHz) showed ~1.3% slowdown.
 
-Thanks for looking at this! I'll be including my hackbench
-measurements for the v2 here in a moment.
 
-> This test involves the kernel scheduler and allocator. I can't say whether they
-> use stack aggressively. Maybe performance tests of other subsystems (e.g.
-> network subsystem) can show different numbers. Did you try?
-
-I haven't found a stable network test yet. If someone can find a
-reasonable workload, I'd love to hear about it.
-
-> I've heard a hypothesis that the initialization of all stack variables would
-> pollute CPU caches, which is critical for some types of computations. Maybe some
-> micro-benchmarks can disprove/confirm that?
-
-I kind of think micro-benchmarks aren't so useful because they don't
-represent a real-world workload. I've heard people talk about SAP-HANA
-as a good test, but I can't get my hands on it. I wonder if anyone has
-tried "mysqlslap"?
-
--- 
-Kees Cook
+--
+Best Regards
+Masahiro Yamada
