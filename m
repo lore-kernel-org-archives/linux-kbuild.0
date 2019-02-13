@@ -1,84 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:30709 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733098AbfBMO7M (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:38408 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389327AbfBMRkT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Feb 2019 09:59:12 -0500
+        Wed, 13 Feb 2019 12:40:19 -0500
+From: Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 01/11] powerpc: remove dead ifdefs in <asm/checksum.h>
+Date: Wed, 13 Feb 2019 18:39:55 +0100
+Message-Id: <20190213174005.28785-2-hch@lst.de>
+In-Reply-To: <20190213174005.28785-1-hch@lst.de>
+References: <20190213174005.28785-1-hch@lst.de>
 MIME-Version: 1.0
-References: <20190211193008.24101-1-ndesaulniers@google.com> <20190211193008.24101-3-ndesaulniers@google.com>
-In-Reply-To: <20190211193008.24101-3-ndesaulniers@google.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 13 Feb 2019 23:58:18 +0900
-Message-ID: <CAK7LNATZY-K4g81LLvXpjp=+oMSY8L0wQoVXgHt-Bjrb2WXnNg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] Makefile: lld: tell clang to use lld
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Nathan Chancellor <natechancellor@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Kees Cook <keescook@chromium.org>, Sami Tolvanen <samitolvanen@google.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner <hannes@cmpxchg.org>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Vasily Gorbik <gor@linux.ibm.com>, Adrian Reber <adrian@lisas.de>, Richard Guy Briggs <rgb@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, linux-xtensa@linux-xtensa.org, linux-kernel@vger.kernel.org
 
-On Tue, Feb 12, 2019 at 5:42 AM <ndesaulniers@google.com> wrote:
->
-> This is needed because clang doesn't select which linker to use based on
-> $LD but rather -fuse-ld=lld. This is problematic especially for
-> cc-ldoption, which checks for linker flag support via invoking the
-> compiler, rather than the linker.
+__KERNEL__ is never not defined for non-uapi headers, and GENERIC_CSUM
+isn't ever set for powerpc either.
 
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ arch/powerpc/include/asm/checksum.h | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-Sorry, please explain what kind of problem
-this patch solves.
-
-
-
-[1] $(LD) is used to link vmlinux, modules, etc.
-
-[2] $(CC) is used to link vdso, etc.
-    and -fuse-ld= selects which linker is invoked from $(CC)
-
-
-Is it a problem to use a different
-type of linker for [1] and [2] ?
-
-
-Thanks.
-
-
-
-
-
-> Link: https://github.com/ClangBuiltLinux/linux/issues/342
-> Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
-> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> Tested-by: Nathan Chancellor <natechancellor@gmail.com>
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> ---
-> Changes V1->V2:
-> * add reviewed and tested by tags.
-> * move this addition up 2 statments so that it's properly added to
->   KBUILD_*FLAGS as per Nathan.
->
->  Makefile | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/Makefile b/Makefile
-> index d3b65e96d183..00e8e01d23fc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -500,6 +500,9 @@ ifneq ($(GCC_TOOLCHAIN),)
->  CLANG_FLAGS    += --gcc-toolchain=$(GCC_TOOLCHAIN)
->  endif
->  CLANG_FLAGS    += -no-integrated-as
-> +ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
-> +CLANG_FLAGS    += -fuse-ld=lld
-> +endif
->  KBUILD_CFLAGS  += $(CLANG_FLAGS)
->  KBUILD_AFLAGS  += $(CLANG_FLAGS)
->  export CLANG_FLAGS
-> --
-> 2.20.1.791.gb4d0f1c61a-goog
->
-
-
---
-Best Regards
-Masahiro Yamada
+diff --git a/arch/powerpc/include/asm/checksum.h b/arch/powerpc/include/asm/checksum.h
+index a78a57e5058d..37c309500260 100644
+--- a/arch/powerpc/include/asm/checksum.h
++++ b/arch/powerpc/include/asm/checksum.h
+@@ -1,6 +1,5 @@
+ #ifndef _ASM_POWERPC_CHECKSUM_H
+ #define _ASM_POWERPC_CHECKSUM_H
+-#ifdef __KERNEL__
+ 
+ /*
+  * This program is free software; you can redistribute it and/or
+@@ -9,9 +8,6 @@
+  * 2 of the License, or (at your option) any later version.
+  */
+ 
+-#ifdef CONFIG_GENERIC_CSUM
+-#include <asm-generic/checksum.h>
+-#else
+ #include <linux/bitops.h>
+ #include <linux/in6.h>
+ /*
+@@ -217,6 +213,4 @@ __sum16 csum_ipv6_magic(const struct in6_addr *saddr,
+ 			const struct in6_addr *daddr,
+ 			__u32 len, __u8 proto, __wsum sum);
+ 
+-#endif
+-#endif /* __KERNEL__ */
+-#endif
++#endif /* _ASM_POWERPC_CHECKSUM_H */
+-- 
+2.20.1
