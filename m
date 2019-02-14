@@ -1,66 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:64821 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:64386 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393851AbfBNDGS (ORCPT
+        with ESMTP id S2393527AbfBNDGG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Feb 2019 22:06:18 -0500
+        Wed, 13 Feb 2019 22:06:06 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 4/8] kbuild: turn '/' into an alias of './'
-Date: Thu, 14 Feb 2019 12:05:17 +0900
-Message-Id: <1550113521-23577-4-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 8/8] kbuild: simplify single targets
+Date: Thu, 14 Feb 2019 12:05:21 +0900
+Message-Id: <1550113521-23577-8-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1550113521-23577-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1550113521-23577-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Commit 06300b21f4c7 ("kbuild: support building individual files for
-external modules") introduced the '/' target. It works only for
-external modules to build all .o files, but skip the modpost stage.
+The dependency will be checked anyway after Kbuild descends into a
+sub-directory. Skip object/source dependency checks in top Makefile.
 
-However, 'make /' looks a bit weird to me. 'make ./' is more sensible
-if you want to build all objects under the current directory, and it
-works as expected.
+VPATH can be simpler since the top Makefile no longer checks the
+preprense of the source file, which is located in in the external
+module directory.
 
-Let's change '/' into a phony target that is an alias of './', but
-I may feel like deprecating it in the future.
+[Pros]
+
+- Code is cleaner
+
+- It can compile an object from a generated source file
+
+For example,
+
+  $ make crypto/rsapubkey.asn1.o
+    ...
+  ASN.1   crypto/rsapubkey.asn1.c
+  CC      crypto/rsapubkey.asn1.o
+
+[Cons]
+
+- The top Makefile does not let it fail immediately when a user tries
+  to build a wrong object.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Documentation/kbuild/modules.txt | 2 +-
- Makefile                         | 5 +++--
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ Makefile | 38 +++++++++-----------------------------
+ 1 file changed, 9 insertions(+), 29 deletions(-)
 
-diff --git a/Documentation/kbuild/modules.txt b/Documentation/kbuild/modules.txt
-index 3fb39e0..80295c6 100644
---- a/Documentation/kbuild/modules.txt
-+++ b/Documentation/kbuild/modules.txt
-@@ -140,7 +140,7 @@ executed to make module versioning work.
- 		make -C $KDIR M=$PWD bar.lst
- 		make -C $KDIR M=$PWD baz.o
- 		make -C $KDIR M=$PWD foo.ko
--		make -C $KDIR M=$PWD /
-+		make -C $KDIR M=$PWD ./
- 
- 
- === 3. Creating a Kbuild File for an External Module
 diff --git a/Makefile b/Makefile
-index fe62de3..3956e93 100644
+index f7f1aa1..8bf0ed6 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1709,8 +1709,9 @@ endif
- 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+@@ -219,7 +219,7 @@ objtree		:= .
+ src		:= $(srctree)
+ obj		:= $(objtree)
+ 
+-VPATH		:= $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
++VPATH		:= $(srctree)
+ 
+ export srctree objtree VPATH
+ 
+@@ -1686,31 +1686,14 @@ tools/%: FORCE
+ #  target-dir => where to store outputfile
+ #  build-dir  => directory in kernel source tree to use
+ 
+-ifeq ($(KBUILD_EXTMOD),)
+-        build-dir  = $(patsubst %/,%,$(dir $@))
+-        target-dir = $(dir $@)
+-else
+-        zap-slash=$(filter-out .,$(patsubst %/,%,$(dir $@)))
+-        build-dir  = $(KBUILD_EXTMOD)$(if $(zap-slash),/$(zap-slash))
+-        target-dir = $(if $(KBUILD_EXTMOD),$(dir $<),$(dir $@))
+-endif
+-
+-%.s: %.c prepare FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.i: %.c prepare FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.o: %.c prepare FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.lst: %.c prepare FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.s: %.S prepare FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.o: %.S prepare FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.symtypes: %.c prepare FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+-%.ll: %.c prepare FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
++build-target = $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD)/)$@
++build-dir = $(patsubst %/,%,$(dir $(build-target)))
++
++%.i %.ll %.lst %.o %.s %.symtypes: prepare FORCE
++	$(Q)$(MAKE) $(build)=$(build-dir) $(build-target)
++
++%.ko: %.o
++	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
  
  # Modules
--/: prepare FORCE
--	$(Q)$(MAKE) KBUILD_MODULES=1 $(build)=$(build-dir)
-+PHONY += /
-+/: ./
-+
- # Make sure the latest headers are built for Documentation
+ PHONY += /
+@@ -1720,9 +1703,6 @@ PHONY += /
  Documentation/ samples/: headers_install
  %/: prepare FORCE
+ 	$(Q)$(MAKE) KBUILD_MODULES=1 $(build)=$(build-dir)
+-%.ko: prepare FORCE
+-	$(Q)$(MAKE) $(build)=$(build-dir) $(@:.ko=.o)
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 
+ # FIXME Should go into a make.lib or something
+ # ===========================================================================
 -- 
 2.7.4
