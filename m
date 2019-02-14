@@ -1,42 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:64388 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388324AbfBNDGF (ORCPT
+Received: from mail-vs1-f65.google.com ([209.85.217.65]:34130 "EHLO
+        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728829AbfBNIK1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Feb 2019 22:06:05 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/8] kbuild: generate modules.order only when CONFIG_MODULES=y
-Date: Thu, 14 Feb 2019 12:05:15 +0900
-Message-Id: <1550113521-23577-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1550113521-23577-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1550113521-23577-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 14 Feb 2019 03:10:27 -0500
+MIME-Version: 1.0
+References: <20190213174005.28785-1-hch@lst.de> <20190213174005.28785-4-hch@lst.de>
+In-Reply-To: <20190213174005.28785-4-hch@lst.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 14 Feb 2019 09:10:14 +0100
+Message-ID: <CAMuHMdWRPm0_u2EX5OXeraZdKL602RJvbO5aKm09Sf-HKMGzjg@mail.gmail.com>
+Subject: Re: [PATCH 03/11] kernel/locks: consolidate RWSEM_GENERIC_* options
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Christoph Hellwig <hch@lst.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-riscv@lists.infradead.org, linux-s390 <linux-s390@vger.kernel.org>, linux-xtensa@linux-xtensa.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Do not generate pointless modules.order when the module support is
-disabled.
+On Thu, Feb 14, 2019 at 12:08 AM Christoph Hellwig <hch@lst.de> wrote:
+> Introduce one central definition of RWSEM_XCHGADD_ALGORITHM and
+> RWSEM_GENERIC_SPINLOCK in kernel/Kconfig.locks and let architectures
+> select RWSEM_XCHGADD_ALGORITHM if they want it, otherwise default to
+> the spinlock version.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+>  arch/m68k/Kconfig       | 7 -------
 
- scripts/Makefile.build | 2 ++
- 1 file changed, 2 insertions(+)
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 99be01c..89debbe 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -63,7 +63,9 @@ ifneq ($(strip $(real-obj-y) $(need-builtin)),)
- builtin-target := $(obj)/built-in.a
- endif
- 
-+ifdef CONFIG_MODULES
- modorder-target := $(obj)/modules.order
-+endif
- 
- # We keep a list of all modules in $(MODVERDIR)
- 
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.7.4
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
