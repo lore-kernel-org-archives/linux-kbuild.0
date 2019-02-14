@@ -1,31 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54262 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726160AbfBNRYn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Feb 2019 12:24:43 -0500
-Subject: Re: [PATCH 03/11] kernel/locks: consolidate RWSEM_GENERIC_* options
-References: <20190213174005.28785-1-hch@lst.de>
- <20190213174005.28785-4-hch@lst.de>
- <CAMuHMdW4C1McxL-e7ZSiSOiiE5D=xbBK8FZOwuJ1w0kK3CR1Hg@mail.gmail.com>
- <d9aeeedd-ce72-f58f-d858-3e340c073414@redhat.com>
- <20190214170440.GB32441@lst.de>
-From: Waiman Long <longman@redhat.com>
-Message-ID: <ac30d526-eb58-a95a-0e7f-e9da5f5cd64a@redhat.com>
-Date: Thu, 14 Feb 2019 12:24:41 -0500
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.23]:36748 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387702AbfBNVUv (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 14 Feb 2019 16:20:51 -0500
+From: Robin Meijboom <robin@meijboom.info>
+Subject: [PATCH] objtool: remove generated files with make clean
+Message-ID: <bca6deb0-ba70-12af-9381-72ae7d94c0c5@meijboom.info>
+Date: Thu, 14 Feb 2019 22:08:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190214170440.GB32441@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-riscv@lists.infradead.org, linux-s390 <linux-s390@vger.kernel.org>, linux-xtensa@linux-xtensa.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux-Arch <linux-arch@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>
 
-On 02/14/2019 12:04 PM, Christoph Hellwig wrote:
-> On Thu, Feb 14, 2019 at 10:26:52AM -0500, Waiman Long wrote:
->> Would you mind dropping just patch 3 from your series?
-> Sure, we can just drop this patch.
+Make clean currently does not remove the generated files for objtool:
+tools/objtool/objtool, tools/objtool/fixdep, and
+tools/objtool/arch/x86/lib/inat-tables.c.
 
-Thanks,
-Longman
+Clean these files up as part of make clean.
+
+Fixes: b9ab5ebb14ec ("objtool: Add CONFIG_STACK_VALIDATION option") and
+bug report 199485 (https://bugzilla.kernel.org/show_bug.cgi?id=199485).
+
+Signed-off-by: Robin Meijboom <robin@meijboom.info>
+---
+In the discussions I didn't find a reason for keeping the files, so I
+assume it is an oversight. Otherwise I would have expected them to be
+removed at least by make distconfig (which they are not).
+
+Tested by compiling, cleaning, compiling again, and booting on x86_64.
+
+diff --git a/Makefile b/Makefile
+index 141653226f3c..81a8149a805f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1328,6 +1328,8 @@ endif # CONFIG_MODULES
+
+  # Directories & files removed with 'make clean'
+  CLEAN_DIRS  += $(MODVERDIR) include/ksym
++CLEAN_FILES += tools/objtool/objtool tools/objtool/fixdep \
++           tools/objtool/arch/$(ARCH)/lib/inat-tables.c
+
+  # Directories & files removed with 'make mrproper'
+  MRPROPER_DIRS  += include/config usr/include include/generated          \
