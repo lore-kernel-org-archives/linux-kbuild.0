@@ -1,49 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.23]:36748 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387702AbfBNVUv (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:18986 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730765AbfBOHRa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Feb 2019 16:20:51 -0500
-From: Robin Meijboom <robin@meijboom.info>
-Subject: [PATCH] objtool: remove generated files with make clean
-Message-ID: <bca6deb0-ba70-12af-9381-72ae7d94c0c5@meijboom.info>
-Date: Thu, 14 Feb 2019 22:08:38 +0100
+        Fri, 15 Feb 2019 02:17:30 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20190213174005.28785-1-hch@lst.de> <20190213174005.28785-7-hch@lst.de>
+In-Reply-To: <20190213174005.28785-7-hch@lst.de>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 15 Feb 2019 16:16:49 +0900
+Message-ID: <CAK7LNAQZm2TXO1gxif2LZQzwYae2AiqgZnNGJBxBjiPwoZLqig@mail.gmail.com>
+Subject: Re: [PATCH 06/11] lockdep: consolidate the LOCKDEP_SUPPORT symbol
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xtensa@linux-xtensa.org, linux-s390 <linux-s390@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-riscv@lists.infradead.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Greentime Hu <green.hu@gmail.com>, Vincent Chen <deanbo422@gmail.com>
 
-Make clean currently does not remove the generated files for objtool:
-tools/objtool/objtool, tools/objtool/fixdep, and
-tools/objtool/arch/x86/lib/inat-tables.c.
++CC Greentime Hu
++CC Vincent Chen
 
-Clean these files up as part of make clean.
 
-Fixes: b9ab5ebb14ec ("objtool: Add CONFIG_STACK_VALIDATION option") and
-bug report 199485 (https://bugzilla.kernel.org/show_bug.cgi?id=199485).
+On Thu, Feb 14, 2019 at 2:40 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Add one definition to lib/Kconfig.debug and let the architectures
+> select if it supported.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Robin Meijboom <robin@meijboom.info>
----
-In the discussions I didn't find a reason for keeping the files, so I
-assume it is an oversight. Otherwise I would have expected them to be
-removed at least by make distconfig (which they are not).
 
-Tested by compiling, cleaning, compiling again, and booting on x86_64.
+This changes the behavior of nds32.
 
-diff --git a/Makefile b/Makefile
-index 141653226f3c..81a8149a805f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1328,6 +1328,8 @@ endif # CONFIG_MODULES
+So please leave a note in the commit description.
+(Ideally, we want Ack of a NDS32 maintainer)
 
-  # Directories & files removed with 'make clean'
-  CLEAN_DIRS  += $(MODVERDIR) include/ksym
-+CLEAN_FILES += tools/objtool/objtool tools/objtool/fixdep \
-+           tools/objtool/arch/$(ARCH)/lib/inat-tables.c
+Also, please do compile test for NDS32.
 
-  # Directories & files removed with 'make mrproper'
-  MRPROPER_DIRS  += include/config usr/include include/generated          \
+
+-------------------------
+This commit changes CONFIG_LOCKDEP_SUPPORT to y for nds32.
+
+NDS32 selects LOCKEP_SUPPORT, but there was previously
+no config entry of LOCKDEP_SUPPORT in nds32.
+
+It is now available in lib/Kconfig.debug,
+so this commit enables LOCKDEP_SUPPORT for nds32.
+-------------------------
+
+
+
+
+
+
+--
+Best Regards
+Masahiro Yamada
