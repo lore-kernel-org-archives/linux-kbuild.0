@@ -1,62 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:18004 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393007AbfBOJcs (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:59129 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727509AbfBPC4k (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Feb 2019 04:32:48 -0500
+        Fri, 15 Feb 2019 21:56:40 -0500
 MIME-Version: 1.0
-References: <20190213174005.28785-1-hch@lst.de> <20190213174005.28785-3-hch@lst.de>
-In-Reply-To: <20190213174005.28785-3-hch@lst.de>
+References: <20190211193008.24101-1-ndesaulniers@google.com> <20190211193008.24101-4-ndesaulniers@google.com>
+In-Reply-To: <20190211193008.24101-4-ndesaulniers@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 15 Feb 2019 18:32:07 +0900
-Message-ID: <CAK7LNAQFSQN=42X1dqt5io+gOG8mUpwXhLmspqryvmzakUCSWw@mail.gmail.com>
-Subject: Re: [PATCH 02/11] riscv: remove the HAVE_KPROBES option
+Date: Sat, 16 Feb 2019 11:55:52 +0900
+Message-ID: <CAK7LNARbCfB9pW8f5B-1YmSw41ExWohhRT=y0m5Osb++9cZCFg@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] Makefile: lld: set -O2 linker flag when linking
+ with LLD
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-xtensa@linux-xtensa.org, linux-s390 <linux-s390@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-riscv@lists.infradead.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Nathan Chancellor <natechancellor@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Kees Cook <keescook@chromium.org>, Sami Tolvanen <samitolvanen@google.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner <hannes@cmpxchg.org>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Nicholas Piggin <npiggin@gmail.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Vasily Gorbik <gor@linux.ibm.com>, Adrian Reber <adrian@lisas.de>, Richard Guy Briggs <rgb@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Rui Ueyama <ruiu@google.com>
 
-On Thu, Feb 14, 2019 at 2:40 AM Christoph Hellwig <hch@lst.de> wrote:
+On Tue, Feb 12, 2019 at 5:42 AM <ndesaulniers@google.com> wrote:
 >
-> HAVE_KPROBES is defined genericly in arch/Kconfig and architectures
-> should just select it if supported.
+> For arm64:
+> 0.34% size improvement with lld -O2 over lld for vmlinux.
+> 3.3% size improvement with lld -O2 over lld for Image.lz4-dtb.
 >
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Do you want this patch picked up by me?
-
-Or, by Palmer?
-
-
-
+> Link: https://github.com/ClangBuiltLinux/linux/issues/343
+> Suggested-by: Rui Ueyama <ruiu@google.com>
+> Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
+> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 > ---
->  arch/riscv/Kconfig | 3 ---
->  1 file changed, 3 deletions(-)
+> Changes V1->V2:
+> * add tested and reviewed by tags.
 >
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index 515fc3cc9687..b60f4e3e36f4 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -94,9 +94,6 @@ config PGTABLE_LEVELS
->         default 3 if 64BIT
->         default 2
+>  Makefile | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
-> -config HAVE_KPROBES
-> -       def_bool n
-> -
->  menu "Platform type"
+> diff --git a/Makefile b/Makefile
+> index 00e8e01d23fc..8011555745aa 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -718,6 +718,10 @@ else
+>  KBUILD_CFLAGS += -Wno-unused-but-set-variable
+>  endif
 >
->  choice
-> --
-> 2.20.1
->
->
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
+> +ifdef CONFIG_LD_IS_LLD
+> +KBUILD_LDFLAGS += -O2
+> +endif
+> +
 
+
+I wondered why this option should be added only for lld,
+and I found the answer in the "Link:"
+
+"for bfd, didn't seem to change the size at all (I can't recall if
+this was arm64 or x86 I had tested with though)."
+
+
+Hmm, I see.
+My 'man ld' says it is currently effective only for shared libraries.
+
+
+       -O level
+           If level is a numeric values greater than zero ld optimizes the
+           output.  This might take significantly longer and therefore
+           probably should only be enabled for the final binary.  At the
+           moment this option only affects ELF shared library generation.
+           Future releases of the linker may make more use of this option.
+           Also currently there is no difference in the linker's behaviour for
+           different non-zero values of this option.  Again this may change
+           with future releases.
+
+
+
+I am fine with adding it unconditionally
+as long as it is harmless for bfd, gold.
+
+
+
+
+
+
+>  KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+>  ifdef CONFIG_FRAME_POINTER
+>  KBUILD_CFLAGS  += -fno-omit-frame-pointer -fno-optimize-sibling-calls
+> --
+> 2.20.1.791.gb4d0f1c61a-goog
+>
 
 
 -- 
