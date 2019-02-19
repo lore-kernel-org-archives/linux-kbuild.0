@@ -1,64 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:52939 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:52743 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725763AbfBSJdf (ORCPT
+        with ESMTP id S1728116AbfBSJd2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Feb 2019 04:33:35 -0500
+        Tue, 19 Feb 2019 04:33:28 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 5/5] scripts/gdb: refactor rules for symlink creation
-Date: Tue, 19 Feb 2019 18:33:06 +0900
-Message-Id: <1550568787-18710-5-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1550568787-18710-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1550568787-18710-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 1/5] scripts/gdb: delay generation of gdb constants.py
+Date: Tue, 19 Feb 2019 18:33:02 +0900
+Message-Id: <1550568787-18710-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Kieran Bingham <kbingham@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Jan Kiszka <jan.kiszka@siemens.com>, linux-kernel@vger.kernel.org
+Cc: Kieran Bingham <kbingham@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org
 
-gdb-scripts is not a real object, but (ab)used like a phony target.
+scripts/gdb/linux/constants.py is never used in the kernel build
+process. There is no good reason to create it so early.
 
-Rewrite the code in a more Kbuild-ish way. Add symlinks to extra-y
-and use if_changed.
+Get it out of the 'prepare' stage.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/gdb/linux/Makefile | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ Kbuild   | 10 ----------
+ Makefile | 11 +++++++++++
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/scripts/gdb/linux/Makefile b/scripts/gdb/linux/Makefile
-index 7545806..3df395a 100644
---- a/scripts/gdb/linux/Makefile
-+++ b/scripts/gdb/linux/Makefile
-@@ -1,13 +1,17 @@
- # SPDX-License-Identifier: GPL-2.0
--always := gdb-scripts
+diff --git a/Kbuild b/Kbuild
+index 65db5be..4cebcc7 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -6,7 +6,6 @@
+ # 2) Generate timeconst.h
+ # 3) Generate asm-offsets.h (may need bounds.h and timeconst.h)
+ # 4) Check for missing system calls
+-# 5) Generate constants.py (may need bounds.h)
  
--SRCTREE := $(abspath $(srctree))
+ #####
+ # 1) Generate bounds.h
+@@ -58,14 +57,5 @@ quiet_cmd_syscalls = CALL    $<
+ missing-syscalls: scripts/checksyscalls.sh $(offsets-file) FORCE
+ 	$(call cmd,syscalls)
+ 
+-#####
+-# 5) Generate constants for Python GDB integration
+-#
 -
--$(obj)/gdb-scripts:
- ifneq ($(KBUILD_SRC),)
--	$(Q)ln -fsn $(SRCTREE)/$(obj)/*.py $(objtree)/$(obj)
-+
-+symlinks := $(patsubst $(srctree)/$(src)/%,%,$(wildcard $(srctree)/$(src)/*.py))
-+
-+quiet_cmd_symlink = SYMLINK $@
-+      cmd_symlink = ln -fsn $(patsubst $(obj)/%,$(abspath $(srctree))/$(src)/%,$@) $@
-+
-+extra-y += $(symlinks)
-+$(addprefix $(obj)/, $(symlinks)): FORCE
-+	$(call if_changed,symlink)
-+
- endif
--	@:
+-extra-$(CONFIG_GDB_SCRIPTS) += build_constants_py
+-
+-build_constants_py: $(timeconst-file) $(bounds-file)
+-	@$(MAKE) $(build)=scripts/gdb/linux $@
+-
+ # Keep these three files during make clean
+ no-clean-files := $(bounds-file) $(offsets-file) $(timeconst-file)
+diff --git a/Makefile b/Makefile
+index 88db36b..26dbcb7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1513,6 +1513,17 @@ PHONY += $(DOC_TARGETS)
+ $(DOC_TARGETS): scripts_basic FORCE
+ 	$(Q)$(MAKE) $(build)=Documentation $@
  
- quiet_cmd_gen_constants_py = GEN     $@
-       cmd_gen_constants_py = \
-@@ -18,4 +22,4 @@ extra-y += constants.py
- $(obj)/constants.py: $(src)/constants.py.in FORCE
- 	$(call if_changed_dep,gen_constants_py)
++# Misc
++# ---------------------------------------------------------------------------
++
++PHONY += scripts_gdb
++scripts_gdb: prepare
++	$(Q)$(MAKE) $(build)=scripts/gdb/linux build_constants_py
++
++ifdef CONFIG_GDB_SCRIPTS
++all: scripts_gdb
++endif
++
+ else # KBUILD_EXTMOD
  
--clean-files := *.pyc *.pyo $(if $(KBUILD_SRC),*.py)
-+clean-files := *.pyc *.pyo
+ ###
 -- 
 2.7.4
