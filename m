@@ -1,33 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:52511 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727233AbfBSPSB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Feb 2019 10:18:01 -0500
-Date: Tue, 19 Feb 2019 16:17:59 +0100
-From: Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 02/11] riscv: remove the HAVE_KPROBES option
-Message-ID: <20190219151759.GD4121@lst.de>
-References: <20190213174005.28785-1-hch@lst.de> <20190213174005.28785-3-hch@lst.de> <CAK7LNAQFSQN=42X1dqt5io+gOG8mUpwXhLmspqryvmzakUCSWw@mail.gmail.com>
+Received: from route-level1.fsdata.se ([89.221.252.216]:58009 "EHLO
+        route-level1.fsdata.se" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726110AbfBSUIy (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 19 Feb 2019 15:08:54 -0500
+Date: Tue, 19 Feb 2019 21:08:37 +0100
+From: Mattias Jacobsson <2pi@mok.nu>
+Subject: Re: [PATCH] modpost: file2alias: define size of alias
+Message-ID: <20190219200837.d34cxg2d7gqxlvhs@mok.nu>
+References: <20190207123022.7961-1-2pi@mok.nu>
+ <CAK7LNAQZ7PDZ4+uZu-FT4V8yw9oUGz6e++9xSshWJvALj3gN0Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <CAK7LNAQFSQN=42X1dqt5io+gOG8mUpwXhLmspqryvmzakUCSWw@mail.gmail.com>
+In-Reply-To: <CAK7LNAQZ7PDZ4+uZu-FT4V8yw9oUGz6e++9xSshWJvALj3gN0Q@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-xtensa@linux-xtensa.org, linux-s390 <linux-s390@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-riscv@lists.infradead.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 2pi@mok.nu
 
-On Fri, Feb 15, 2019 at 06:32:07PM +0900, Masahiro Yamada wrote:
-> On Thu, Feb 14, 2019 at 2:40 AM Christoph Hellwig <hch@lst.de> wrote:
-> >
-> > HAVE_KPROBES is defined genericly in arch/Kconfig and architectures
-> > should just select it if supported.
-> >
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> 
-> Do you want this patch picked up by me?
-> 
-> Or, by Palmer?
+Hi Masahiro,
 
-Given that I don't think I'll have the rest of this series respun in time
-for this merge window:  Palmer, can you pick it up?
+On 2019-02-18, Masahiro Yamada wrote:
+> Hi Mattias,
+> 
+> On Thu, Feb 7, 2019 at 9:31 PM Mattias Jacobsson <2pi@mok.nu> wrote:
+> >
+> > The size of the variable alias provided to do_entry functions are
+> > currently not readily available. Thus hindering do_entry functions to
+> > perform bounds checking.
+> >
+> > Define the macro ALIAS_SIZE containing the size of the variable alias.
+> >
+> > Signed-off-by: Mattias Jacobsson <2pi@mok.nu>
+> 
+> 
+> Sorry for late reply.
+> 
+> I can apply this to my kbuild tree shortly, but
+> it looks like a prerequisite for your
+> "platform/x86: wmi: use MODULE_DEVICE_TABLE() instead of MODULE_ALIAS()"
+> 
+> 
+> If you want all the patches to go through x86 platform-driver tree,
+> I am fine with that too.
+
+I don't mind either way, however I've asked the x86 platform-driver
+maintainers if they have a preference in this matter. You should have
+received that mail otherwise see [1].
+
+[1]: https://lkml.kernel.org/r/082d3d38b7dde6050b6b3e518ada439eade65b2c.1550603967.git.2pi@mok.nu
+
+> 
+> Please let me know what you want.
+> 
+> Thanks.
+> 
+> 
+> 
+> -- 
+> Best Regards
+> Masahiro Yamada
+
+Thanks,
+Mattias
