@@ -1,73 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46342 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729125AbfBSWnR (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:64632 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726405AbfBSXrs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Feb 2019 17:43:17 -0500
-Received: by mail-pf1-f194.google.com with SMTP id g6so10882334pfh.13
-        for <linux-kbuild@vger.kernel.org>; Tue, 19 Feb 2019 14:43:16 -0800 (PST)
+        Tue, 19 Feb 2019 18:47:48 -0500
 MIME-Version: 1.0
-References: <20190219214940.391081-1-arnd@arndb.de> <1550614664.6911.45.camel@lca.pw>
-In-Reply-To: <1550614664.6911.45.camel@lca.pw>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Tue, 19 Feb 2019 14:43:04 -0800
-Message-ID: <CAKwvOdn+MJxYc+ykvyf-WhEzzDn0zEusjpQuksknnf8bPb=Q6g@mail.gmail.com>
-Subject: Re: [PATCH] kasan: turn off asan-stack for clang-8 and earlier
+References: <20190207123022.7961-1-2pi@mok.nu> <CAK7LNAQZ7PDZ4+uZu-FT4V8yw9oUGz6e++9xSshWJvALj3gN0Q@mail.gmail.com>
+ <20190219200837.d34cxg2d7gqxlvhs@mok.nu>
+In-Reply-To: <20190219200837.d34cxg2d7gqxlvhs@mok.nu>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 20 Feb 2019 08:47:01 +0900
+Message-ID: <CAK7LNASU=Jf7aYnnn_7DWgxLz4sf4=x1HZaoGQW2rSXVbFO9Bg@mail.gmail.com>
+Subject: Re: [PATCH] modpost: file2alias: define size of alias
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Qian Cai <cai@lca.pw>
-Cc: Arnd Bergmann <arnd@arndb.de>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>, Mark Brown <broonie@kernel.org>, Alexander Potapenko <glider@google.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Christoph Lameter <cl@linux.com>, Andrey Konovalov <andreyknvl@google.com>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, Evgenii Stepanov <eugenis@google.com>, Kostya Serebryany <kcc@google.com>
+To: Mattias Jacobsson <2pi@mok.nu>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-+ Evgenii, Kostya for KASAN
-
-On Tue, Feb 19, 2019 at 2:17 PM Qian Cai <cai@lca.pw> wrote:
+On Wed, Feb 20, 2019 at 5:09 AM Mattias Jacobsson <2pi@mok.nu> wrote:
 >
-> On Tue, 2019-02-19 at 22:49 +0100, Arnd Bergmann wrote:
-> > Building an arm64 allmodconfig kernel with clang results in over 140 warnings
-> > about overly large stack frames, the worst ones being:
-> >
-> > drivers/gpu/drm/panel/panel-sitronix-st7789v.c:196:12: error: stack frame size
-> > of 20224 bytes in function 'st7789v_prepare'
-> > drivers/video/fbdev/omap2/omapfb/displays/panel-tpo-td028ttec1.c:196:12:
-> > error: stack frame size of 13120 bytes in function 'td028ttec1_panel_enable'
-> > drivers/usb/host/max3421-hcd.c:1395:1: error: stack frame size of 10048 bytes
-> > in function 'max3421_spi_thread'
-> > drivers/net/wan/slic_ds26522.c:209:12: error: stack frame size of 9664 bytes
-> > in function 'slic_ds26522_probe'
-> > drivers/crypto/ccp/ccp-ops.c:2434:5: error: stack frame size of 8832 bytes in
-> > function 'ccp_run_cmd'
-> > drivers/media/dvb-frontends/stv0367.c:1005:12: error: stack frame size of 7840
-> > bytes in function 'stv0367ter_algo'
-> >
-> > None of these happen with gcc today, and almost all of these are the result
-> > of a single known bug in llvm.  Hopefully it will eventually get fixed with
-> > the
-> > clang-9 release.
-
-Would it be better to disable outright if CC_IS_CLANG, then go back
-and adjust it once we know explicitly which version it lands in?
-(Maybe I'm being too pessimistic about when it may be fixed).
-
-> >
-> > In the meantime, the best idea I have is to turn off asan-stack for clang-8
-> > and earlier, so we can produce a kernel that is safe to run.
-> >
-> > I have posted three patches that address the frame overflow warnings that are
-> > not addressed by turning off asan-stack, so in combination with this change,
-> > we get much closer to a clean allmodconfig build, which in turn is necessary
-> > to do meaningful build regression testing.
+> Hi Masahiro,
 >
-> Well, I am using clang 8.0 on arm64 and running the kernel just fine for a few
-> weeks now and never trigger a single stack overflow (THREAD_SHIFT = 15) because
-> I never use any of those drivers you mentioned above. I don't think it is a good
-> idea to blankly remove the testing coverage here and affect people don't use all
-> those offensive functions at all.
+> On 2019-02-18, Masahiro Yamada wrote:
+> > Hi Mattias,
+> >
+> > On Thu, Feb 7, 2019 at 9:31 PM Mattias Jacobsson <2pi@mok.nu> wrote:
+> > >
+> > > The size of the variable alias provided to do_entry functions are
+> > > currently not readily available. Thus hindering do_entry functions to
+> > > perform bounds checking.
+> > >
+> > > Define the macro ALIAS_SIZE containing the size of the variable alias.
+> > >
+> > > Signed-off-by: Mattias Jacobsson <2pi@mok.nu>
+> >
+> >
+> > Sorry for late reply.
+> >
+> > I can apply this to my kbuild tree shortly, but
+> > it looks like a prerequisite for your
+> > "platform/x86: wmi: use MODULE_DEVICE_TABLE() instead of MODULE_ALIAS()"
+> >
+> >
+> > If you want all the patches to go through x86 platform-driver tree,
+> > I am fine with that too.
+>
+> I don't mind either way, however I've asked the x86 platform-driver
+> maintainers if they have a preference in this matter. You should have
+> received that mail otherwise see [1].
+>
+> [1]: https://lkml.kernel.org/r/082d3d38b7dde6050b6b3e518ada439eade65b2c.1550603967.git.2pi@mok.nu
 
-Thanks for the patch, Arnd!  Hopefully we can fix that up in Clang
-soon.  Qian, I guess the alternative would be to add `-mllvm
--asan-stack=0` on potentially up to 140 Makefiles?
+
+I saw it.  The 2/8 uses ALIAS_SIZE.
+
+So, I think it will be better to include this one in your series.
+If necessary, please feel free to add
+
+Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+
+> >
+> > Please let me know what you want.
+> >
+> > Thanks.
+> >
+> >
+> >
+> > --
+> > Best Regards
+> > Masahiro Yamada
+>
+> Thanks,
+> Mattias
+
+
 
 -- 
-Thanks,
-~Nick Desaulniers
+Best Regards
+Masahiro Yamada
