@@ -1,85 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gateway23.websitewelcome.com ([192.185.50.107]:32471 "EHLO
-        gateway23.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726009AbfBRSkb (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Feb 2019 13:40:31 -0500
-Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
-        by gateway23.websitewelcome.com (Postfix) with ESMTP id 89EB6C5AA
-        for <linux-kbuild@vger.kernel.org>; Mon, 18 Feb 2019 11:50:04 -0600 (CST)
-References: <20180524225928.GA19570@embeddedor.com>
- <20180613114059.DAC95601D2@smtp.codeaurora.org>
- <87zhqwuggt.fsf_-_@kamboji.qca.qualcomm.com>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: Re: -Wimplicit-fallthrough not working with ccache
-Message-ID: <18320143-188a-8940-1830-1955e279952a@embeddedor.com>
-Date: Mon, 18 Feb 2019 11:49:59 -0600
-MIME-Version: 1.0
-In-Reply-To: <87zhqwuggt.fsf_-_@kamboji.qca.qualcomm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Received: from mga02.intel.com ([134.134.136.20]:43100 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732665AbfBSBki (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Feb 2019 20:40:38 -0500
+Message-ID: <1550540432.2534.1.camel@intel.com>
+Subject: Re: [PATCH 05/11] tracing: consolidate the TRACE_IRQFLAGS_SUPPORT
+ symbol
+From: Ley Foon Tan <ley.foon.tan@intel.com>
+Date: Tue, 19 Feb 2019 09:40:32 +0800
+In-Reply-To: <CAK7LNARDdPabSOq6vHvxTPPWaMguJUEtok=dNrfnLEz=UtHO+w@mail.gmail.com>
+References: <20190213174005.28785-1-hch@lst.de>
+         <20190213174005.28785-6-hch@lst.de>
+         <CAK7LNARDdPabSOq6vHvxTPPWaMguJUEtok=dNrfnLEz=UtHO+w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kalle Valo <kvalo@codeaurora.org>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org, ath10k@lists.infradead.org, "David S. Miller" <davem@davemloft.net>, linux-kbuild@vger.kernel.org, Kees Cook <keescook@chromium.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Christoph Hellwig <hch@lst.de>
+Cc: linux-xtensa@linux-xtensa.org, linux-s390 <linux-s390@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-riscv@lists.infradead.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Ley Foon Tan <lftan@altera.com>, nios2-dev@lists.rocketboards.org
 
-Hi Kalle,
-
-On 2/16/19 5:21 AM, Kalle Valo wrote:
-> (replying to an old thread but renaming it)
+On Fri, 2019-02-15 at 16:55 +0900, Masahiro Yamada wrote:
+> +CC: Ley Foon Tan <lftan@altera.com>
+> +CC: nios2-dev@lists.rocketboards.org
 > 
-> Kalle Valo <kvalo@codeaurora.org> writes:
 > 
->> "Gustavo A. R. Silva" <gustavo@embeddedor.com> wrote:
->>
->>> In preparation to enabling -Wimplicit-fallthrough, mark switch cases
->>> where we are expecting to fall through.
->>>
->>> Notice that in this particular case, I replaced "pass through" with
->>> a proper "fall through" comment, which is what GCC is expecting
->>> to find.
->>>
->>> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
->>> Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
->>
->> Patch applied to ath-next branch of ath.git, thanks.
->>
->> f1d270ae10ff ath10k: htt_tx: mark expected switch fall-throughs
+> On Thu, Feb 14, 2019 at 2:40 AM Christoph Hellwig <hch@lst.de> wrote:
 > 
-> Gustavo, I enabled W=1 on my ath10k build checks and it took me a while
-> to figure out why GCC was warning about fall through annotations missing
-> even I knew you had fixed them. Finally I figured out that the reason
-> was ccache, which I need because I work with different branches and need
-> to recompile the kernel quite often.
+> > 
+> > diff --git a/arch/nios2/Kconfig b/arch/nios2/Kconfig
+> > index 715e6c09b4a5..3b50689007f5 100644
+> > --- a/arch/nios2/Kconfig
+> > +++ b/arch/nios2/Kconfig
+> > @@ -20,6 +20,7 @@ config NIOS2
+> >         select OF_EARLY_FLATTREE
+> >         select SOC_BUS
+> >         select SPARSE_IRQ
+> > +       select TRACE_IRQFLAGS_SUPPORT
 > 
-> If the plan is to enable -Wimplicit-fallthrough by default in the kernel
-> IMHO this might become an issue, as otherwise people using ccache start
-> seeing lots of invalid warnings. Apparently CCACHE_COMMENTS=1 will fix
-> that but my version of ccache doesn't support it, and how would everyone
-> learn that trick anyway? Or maybe CCACHE_COMMENTS can enabled through
-> kernel Makefile?
+> This is a behavior change of nios2.
 > 
+> TRACE_IRQFLAGS_SUPPORT was previously 'n',
+> and this commit is changing it to 'y'.
+> 
+> 
+> 
+> 
+> Strangely, nios2 defines TRACE_IRQFLAGS_SUPPORT twice
+> with different default values.
+> 
+> In Kconfig, the first one becomes effective.
+> 
+> In this case, 'def_bool n' in arch/nios2/Kconfig is used.
+> 'def_bool y' in arch/nios2/Kconfig.debug is dead code.
+> 
+> 
+> I think this select should be dropped
+> to keep the current behavior,
+> but I hope the NIOS2 maintainer will give us
+> some comments just in case.
+> 
+Yes, please drop this patch to keep original behavior.
+Thanks.
 
-Can you share with me the warning messages you get?
-
-I just see the following warnings with linux-next:
-
-$ make CC="ccache gcc" W=1 drivers/net/wireless/ath/ath10k/htt_tx.o
-  CC [M]  drivers/net/wireless/ath/ath10k/htt_tx.o
-In file included from drivers/net/wireless/ath/ath10k/htt_tx.c:19:
-drivers/net/wireless/ath/ath10k/htt.h:1727:1: warning: alignment 1 of ‘struct ath10k_htt_txbuf_32’ is less than 4 [-Wpacked-not-aligned]
- } __packed;
- ^
-drivers/net/wireless/ath/ath10k/htt.h:1734:1: warning: alignment 1 of ‘struct ath10k_htt_txbuf_64’ is less than 4 [-Wpacked-not-aligned]
- } __packed;
- ^
-
-In my Makefile I have:
-
-KBUILD_CFLAGS  += $(call cc-option,-Wimplicit-fallthrough=3,)
-
-
-Thanks
---
-Gustavo
+Regards
+Ley Foon
+> 
+> 
+> 
+> > 
+> >         select USB_ARCH_HAS_HCD if USB_SUPPORT
+> >         select CPU_NO_EFFICIENT_FFS
+> >         select ARCH_DISCARD_MEMBLOCK
+> > @@ -39,9 +40,6 @@ config NO_IOPORT_MAP
+> >  config FPU
+> >         def_bool n
+> > 
+> > -config TRACE_IRQFLAGS_SUPPORT
+> > -       def_bool n
+> > -
+> >  menu "Kernel features"
+> > 
+> >  source "kernel/Kconfig.hz"
+> > diff --git a/arch/nios2/Kconfig.debug b/arch/nios2/Kconfig.debug
+> > index f1da8a7b17ff..a8bc06e96ef5 100644
+> > --- a/arch/nios2/Kconfig.debug
+> > +++ b/arch/nios2/Kconfig.debug
+> > @@ -1,8 +1,5 @@
+> >  # SPDX-License-Identifier: GPL-2.0
+> > 
+> > -config TRACE_IRQFLAGS_SUPPORT
+> > -       def_bool y
+> > -
+> >  config EARLY_PRINTK
+> >         bool "Activate early kernel debugging"
+> >         default y
+> --
+> Best Regards
+> Masahiro Yamada
+> 
+> ________________________________
+> 
+> Confidentiality Notice.
+> This message may contain information that is confidential or
+> otherwise protected from disclosure. If you are not the intended
+> recipient, you are hereby notified that any use, disclosure,
+> dissemination, distribution, or copying of this message, or any
+> attachments, is strictly prohibited. If you have received this
+> message in error, please advise the sender by reply e-mail, and
+> delete the message and any attachments. Thank you.
