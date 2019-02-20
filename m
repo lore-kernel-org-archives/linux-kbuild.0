@@ -1,95 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:41817 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726312AbfBTDil (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:23127 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727085AbfBTDmA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Feb 2019 22:38:41 -0500
+        Tue, 19 Feb 2019 22:42:00 -0500
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id x1K3fooj015212
+        for <linux-kbuild@vger.kernel.org>; Wed, 20 Feb 2019 12:41:51 +0900
+Received: by mail-vk1-f179.google.com with SMTP id l136so5231458vke.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 19 Feb 2019 19:41:51 -0800 (PST)
+MIME-Version: 1.0
+References: <20190102092304.27262-1-riku.voipio@linaro.org>
+ <CAK7LNARFAth+L_b7i4aR4mPtVTSfDgq2zvvMJah4WR0s97Ny2A@mail.gmail.com>
+ <CAK7LNASOqwrJqHLDKwT4xRU6jrFchavvWFjxqcPd_ZSmiEtsQQ@mail.gmail.com>
+ <CAK7LNASiyMiCB2Ko0_aWOhB_3t6FEVhQ1xpnn-NQ=yV0X11SMg@mail.gmail.com>
+ <ab49b0582ef12b14b1a68877263b81813e2492a2.camel@decadent.org.uk> <CAK7LNAQmOsGqLLjYho2=_3Bx+dAjhunSjcQbdTXmHMgX1dC+ww@mail.gmail.com>
+In-Reply-To: <CAK7LNAQmOsGqLLjYho2=_3Bx+dAjhunSjcQbdTXmHMgX1dC+ww@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: hardcode genksyms path and remove GENKSYMS variable
-Date: Wed, 20 Feb 2019 12:38:31 +0900
-Message-Id: <1550633911-11741-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Wed, 20 Feb 2019 12:41:14 +0900
+Message-ID: <CAK7LNAQq4f_4YBDxGZxG36z+O1a0-UP=wY8qF4o2MuYWEX3oMg@mail.gmail.com>
+Subject: Re: [PATCH v2] deb-pkg: generate correct build dependencies
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, debian-kernel <debian-kernel@lists.debian.org>, Ben Hutchings <ben@decadent.org.uk>
 
-The genksyms source was integrated into the kernel tree in 2003.
+Hi Riku,
 
-I do not expect anybody still using the external /sbin/genksyms.
-Kbuild does not need to provide the ability to override GENKSYMS.
 
-Let's remove the GENKSYMS variable, and use the hardcoded path.
+On Tue, Feb 19, 2019 at 11:15 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 
-Since it occurred in the pre-git era, I attached the commit message
-in case somebody is interested in the historical background.
+> > The way we dealt with this in Debian before flex was fixed was (c): use
+> > "flex:native".  But for reasons I don't understand that *isn't*
+> > compatible with (b), so to be compatible with both old and new versions
+> > of flex you should build-depend on:
+> >
+> >    flex | flex:native
+>
+> Yes, it worked with this fix.
+>
 
-  | Author: Kai Germaschewski <kai@tp1.ruhr-uni-bochum.de>
-  | Date:   Wed Feb 19 04:17:28 2003 -0600
-  |
-  | kbuild: [PATCH] put genksyms in scripts dir
-  |
-  | This puts genksyms into scripts/genksyms/.
-  |
-  | genksyms used to be maintained externally, though the only possible user
-  | was the kernel build. Moving it into the kernel sources makes it easier to
-  | keep it uptodate, like for example updating it to generate linker scripts
-  | directly instead of postprocessing the generated header file fragments
-  | with sed, as we do currently.
-  |
-  | Also, genksyms does not handle __typeof__, which needs to be fixed since
-  | some of the exported symbol in the kernel are defined using __typeof__.
-  |
-  | (Rusty Russell/me)
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Could you please send v3?
 
- Makefile               | 3 +--
- scripts/Makefile.build | 4 ++--
- 2 files changed, 3 insertions(+), 4 deletions(-)
+Thanks.
 
-diff --git a/Makefile b/Makefile
-index def7c79..e19a3e3 100644
---- a/Makefile
-+++ b/Makefile
-@@ -390,7 +390,6 @@ OBJDUMP		= $(CROSS_COMPILE)objdump
- LEX		= flex
- YACC		= bison
- AWK		= awk
--GENKSYMS	= scripts/genksyms/genksyms
- INSTALLKERNEL  := installkernel
- DEPMOD		= /sbin/depmod
- PERL		= perl
-@@ -443,7 +442,7 @@ GCC_PLUGINS_CFLAGS :=
- 
- export ARCH SRCARCH CONFIG_SHELL HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
- export CPP AR NM STRIP OBJCOPY OBJDUMP KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS
--export MAKE LEX YACC AWK GENKSYMS INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
-+export MAKE LEX YACC AWK INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
- export HOSTCXX KBUILD_HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
- 
- export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 89debbe..f013182 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -120,7 +120,7 @@ $(obj)/%.i: $(src)/%.c FORCE
- # These mirror gensymtypes_S and co below, keep them in synch.
- cmd_gensymtypes_c =                                                         \
-     $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
--    $(GENKSYMS) $(if $(1), -T $(2))                                         \
-+    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
-      $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
-      $(if $(KBUILD_PRESERVE),-p)                                            \
-      -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
-@@ -320,7 +320,7 @@ cmd_gensymtypes_S =                                                         \
-      grep "\<___EXPORT_SYMBOL\>" |                                          \
-      sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ; } | \
-     $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
--    $(GENKSYMS) $(if $(1), -T $(2))                                         \
-+    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
-      $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
-      $(if $(KBUILD_PRESERVE),-p)                                            \
-      -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
+
 -- 
-2.7.4
+Best Regards
+Masahiro Yamada
