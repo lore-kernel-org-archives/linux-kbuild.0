@@ -1,40 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:28027 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726757AbfBTGLZ (ORCPT
+Received: from mail-it1-f196.google.com ([209.85.166.196]:33696 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726660AbfBTGoP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Feb 2019 01:11:25 -0500
+        Wed, 20 Feb 2019 01:44:15 -0500
+Received: by mail-it1-f196.google.com with SMTP id g137so5372067ita.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 19 Feb 2019 22:44:14 -0800 (PST)
 MIME-Version: 1.0
-References: <1547706826-16833-1-git-send-email-yamada.masahiro@socionext.com>
- <CAKwvOdkzSTyiiBmpwGFj6K=1Ang6nsVVahaQstk_GkPAcyBZOg@mail.gmail.com> <CABC7LbQSxB=WuUz22uunWW=YahNd2-By8LKxLcZYo0L17P---A@mail.gmail.com>
-In-Reply-To: <CABC7LbQSxB=WuUz22uunWW=YahNd2-By8LKxLcZYo0L17P---A@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 20 Feb 2019 15:10:23 +0900
-Message-ID: <CAK7LNATY8-hJ6QouGjO4wvsw8+W60HhLfNk60RZWyNz4s5fv_w@mail.gmail.com>
-Subject: Re: [RFC PATCH] kbuild: support llvm-ar
+References: <20190219214940.391081-1-arnd@arndb.de> <1550614664.6911.45.camel@lca.pw>
+ <CAKwvOdn+MJxYc+ykvyf-WhEzzDn0zEusjpQuksknnf8bPb=Q6g@mail.gmail.com> <CAN=P9pgC8EzawtxMzp6d3AsMPkSpTd0Ry6j+Jn+YgC_XP2Fd_w@mail.gmail.com>
+In-Reply-To: <CAN=P9pgC8EzawtxMzp6d3AsMPkSpTd0Ry6j+Jn+YgC_XP2Fd_w@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Wed, 20 Feb 2019 07:44:02 +0100
+Message-ID: <CACT4Y+ZxCs57qkO7n5tYU4v-J6E9MZsT_FLbXwbQ=B5btHTmwQ@mail.gmail.com>
+Subject: Re: [PATCH] kasan: turn off asan-stack for clang-8 and earlier
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jordan Rupprecht <rupprecht@google.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Dmitry Golovin <dima@golovin.in>, Stephen Rothwell <sfr@canb.auug.org.au>, Arnd Bergmann <arnd@arndb.de>, Nicholas Piggin <npiggin@gmail.com>, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
+To: Kostya Serebryany <kcc@google.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Qian Cai <cai@lca.pw>, Arnd Bergmann <arnd@arndb.de>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Mark Brown <broonie@kernel.org>, Alexander Potapenko <glider@google.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Christoph Lameter <cl@linux.com>, Andrey Konovalov <andreyknvl@google.com>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, Evgenii Stepanov <eugenis@google.com>
 
-Hi Jordan,
-
-
-On Thu, Feb 7, 2019 at 9:56 AM Jordan Rupprecht <rupprecht@google.com> wrote:
+On Wed, Feb 20, 2019 at 1:34 AM Kostya Serebryany <kcc@google.com> wrote:
 >
-> I have a patch up for review that fixes the second case of chopping
-> off the directory when nesting thin archives:
-> https://reviews.llvm.org/D57842. I'll commit it tomorrow if there are
-> no more comments.
+> On Tue, Feb 19, 2019 at 2:43 PM Nick Desaulniers
+> <ndesaulniers@google.com> wrote:
+> >
+> > + Evgenii, Kostya for KASAN
+> >
+> > On Tue, Feb 19, 2019 at 2:17 PM Qian Cai <cai@lca.pw> wrote:
+> > >
+> > > On Tue, 2019-02-19 at 22:49 +0100, Arnd Bergmann wrote:
+> > > > Building an arm64 allmodconfig kernel with clang results in over 14=
+0 warnings
+> > > > about overly large stack frames, the worst ones being:
+> > > >
+> > > > drivers/gpu/drm/panel/panel-sitronix-st7789v.c:196:12: error: stack=
+ frame size
+> > > > of 20224 bytes in function 'st7789v_prepare'
+> > > > drivers/video/fbdev/omap2/omapfb/displays/panel-tpo-td028ttec1.c:19=
+6:12:
+> > > > error: stack frame size of 13120 bytes in function 'td028ttec1_pane=
+l_enable'
+> > > > drivers/usb/host/max3421-hcd.c:1395:1: error: stack frame size of 1=
+0048 bytes
+> > > > in function 'max3421_spi_thread'
+> > > > drivers/net/wan/slic_ds26522.c:209:12: error: stack frame size of 9=
+664 bytes
+> > > > in function 'slic_ds26522_probe'
+> > > > drivers/crypto/ccp/ccp-ops.c:2434:5: error: stack frame size of 883=
+2 bytes in
+> > > > function 'ccp_run_cmd'
+> > > > drivers/media/dvb-frontends/stv0367.c:1005:12: error: stack frame s=
+ize of 7840
+> > > > bytes in function 'stv0367ter_algo'
+> > > >
+> > > > None of these happen with gcc today, and almost all of these are th=
+e result
+> > > > of a single known bug in llvm.  Hopefully it will eventually get fi=
+xed with
+> > > > the
+> > > > clang-9 release.
+>
+> I am not confident we can fix this in clang.
+> The difference between gcc and clang, AFAICT, is not in the asan
+> instrumentation, but in inining.
+> Looking at the reproducer from https://bugs.llvm.org/show_bug.cgi?id=3D38=
+809#c4,
+> if I change ltv350qv_write_reg to always inline, gcc also produces a
+> huge 10K stack frame,
+> and making it noinline fixes the stack frame for both gcc and clang.
 
+Does your gcc have fix for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D8=
+1715 ?
 
-Sorry for late reply.
+For me gcc rejects to inline it:
 
-Now I tested the latest llvm-ar, and it worked perfectly for kbuild.
-Thanks for your work!
+gcc version 7.3.0 (Debian 7.3.0-5)
 
-
--- 
-Best Regards
-Masahiro Yamada
+$ gcc /tmp/test.c -Wframe-larger-than=3D128 -c -fsanitize=3Dkernel-address
+-O2 --param asan-stack=3D1
+/tmp/test.c:23:13: warning: always_inline function might not be
+inlinable [-Wattributes]
+ static void ltv350qv_write_reg(void) {
+             ^~~~~~~~~~~~~~~~~~
+/tmp/test.c: In function =E2=80=98ltv350qv_power_on=E2=80=99:
+/tmp/test.c:57:1: warning: the frame size of 416 bytes is larger than
+128 bytes [-Wframe-larger-than=3D]
+ }
+ ^
