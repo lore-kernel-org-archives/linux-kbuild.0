@@ -1,45 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 41-204-38-3-dedicated.4u.com.gh ([41.204.38.3]:52934 "EHLO
-	mail.kpoly.edu.gh" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1751134Ab2BTC5G convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Feb 2012 21:57:06 -0500
-Content-Type: text/plain; charset=US-ASCII
+Received: from [117.6.64.29] ([117.6.64.29]:36779 "EHLO namdan.gov.vn"
+	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750707Ab2BTFBp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 20 Feb 2012 00:01:45 -0500
+Received: from dgml by namdan.gov.vn (MDaemon PRO v9.6.5)
+	with ESMTP id md50000037032.msg
+	for <linux-kbuild@vger.kernel.org>; Mon, 20 Feb 2012 11:42:57 +0700
+Reply-To: <1330609072@qq.com>
+Message-ID: <20190220104753281073@namdan.gov.vn>
+From: =?utf-8?B?5LuFMzAw5YWD77yM5paw5bm05LyY5oOg?= <admin@namdan.gov.vn>
+Subject: =?utf-8?B?5pyA5pawQjJC6K+i55uY5Lmw5a6244CB5bGV5Lya5Lmw5a62LOa1t+WFs+aVsOaNriw=?=
+	=?utf-8?B?576k5Y+R6L2v5Lu277yM5bm/5Lqk5Lya5Lmw5a62IOWFsTEwMDDkuIcg5LuFMw==?=
+	=?utf-8?B?MDDlhYMh?=
+Date: Wed, 20 Feb 2019 10:47:45 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Description: Mail message body
-Subject: Transfer Notice!!
-From: "Western Union Outlet" <westernunion@wu.com>
-Date: Sun, 19 Feb 2012 23:14:49 +0100
-Reply-To: westernunionpaycenter@fastservice.com
-Message-Id: <20120219221533.43FF85DE8203@mail.kpoly.edu.gh>
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <westernunion@wu.com>
+To: linlienator@gmail.c, linnayelp@163.com, linqiao1629@163.com, linshixiang2002@yahoo.com.cn, linsong8030@yahoo.com.cn, linsta2002@hotmail.com, linux-kbuild@vger.kernel.org, 24@yahoo.com.cn, linxi00721@yahoo.com.cn, linxi3369@126.com, linxiafei@yahoo.com.cn
 
-Dear Beneficiary.
+MjAwOC0yMDEx5bm0OOWxiuW5v+S6pOS8muaVsOaNru+8jDIwMTDmtbflhbPmj5DljZVwaWVyc+eJ
+iDEwMDDkuIfmlbDmja7vvIzlhY3otLnmm7TmlrAyMDEy5bm05bm/5Lqk5Lya5Lmw5a625pWw5o2u
+44CCDQoNCuS4gOWFsTEw5Liq5YyFKOaVsOaNruaYr+WFqOihjOS4mueahO+8jOaMieeFp+ihjOS4
+muWIhuWlveexu++8jOW5tuS4lOWPr+S7peaMieeFp+WFs+mUruivjeaPkOWPluWHuuadpeeahCnv
+vJogDQox77yMMjAxMeeni+WtoyvmmKXlraPlub/kuqTkvJrkubDlrrbnjrDlnLror6Lnm5jmlbDm
+ja7lupPmlrDpspzlh7rngonvvIzotoXnuqfmlrDpspzkubDlrrbvvIzmlrDpspzmlbDmja7vvIzl
+rrnmmJPmiJDljZXvvIEgDQoy77yM6LSt5Lmw5ZCO5Y+v5Lul5YWN6LS55pu05pawMjAxMuaYpeWt
+o+W5v+S6pOS8misyMDEy56eL5a2j5bm/5Lqk5Lya5Lmw5a625pWw5o2u44CC5aSq6LaF5YC85LqG
+44CCDQoz77yMMjAxMuacgOaWsOWFqOeQg+WxleS8mueOsOWcuuS5sOWutuW6kyjkuI7otLjlj5Hl
+kIzmraUpLOWFsTQ25LiH5p2h5pWw5o2u44CCICjmjInnhafooYzkuJrliIbnsbspDQo077yMMjAx
+MOW5tCwyMDA55bm0LDIwMDjlubQg5pil5a2jK+eni+Wto+W5v+S6pOS8muS5sOWutuWQjeW9le+8
+jDEwMyAxMDQgMTA1IDEwNiAxMDcgMTA4IOWFseWFreWxiiDlhbExMjAuNuS4h+aVsOaNruOAgg0K
+Ne+8jDQ4LjY45LiH5p2h5pyA5paw5Lmw5a626K+i55uY77yM6YO95bim5pyJRW1haWzvvIzmnIDm
+nInku7flgLznmoTor6Lnm5jjgIINCjbvvIwyMDEx5pyA5pawIEIyQiDoi7Hmloflm73pmYXnq5k2
+MOS4h+W4puiBlOe7nOaWueW8j+ivouebmCDmnIDmnInku7flgLzor6Lnm5jkuYvkuIAuDQo377yM
+MjAxMOa1t+WFs+aPkOWNlXBpZXJz54mIMTAwMOS4h+aVsOaNri4NCjjvvIwyMDEx5bm05Yiw6aaZ
+5riv6YeH6LSt55qE5Zu95aSW5a6i5Lq65ZCN5b2VKOmmmea4r+i0uOWPkeWxgOaPkOS+mynvvIzo
+toXnuqfph43opoHnmoTkubDlrrbjgIINCjnvvIwyMDEx5bm05paw5aKe5Yqg55qELee+juWbvUIy
+QiB0aG9tYXNuZXQg6YeH6LSt5ZWG5ZCN5Y2V44CCDQoxMO+8jOe+pOWPkei9r+S7tuWuieijheS4
+jumDqOe9suacjeWKoeOAgg0KDQrov5nkupvlhajmnInvvIzlhbExMjgw5LiHIOaVsOaNruOAgg0K
+DQogDQropoHnmoTmipPntKfogZTns7tRUTogMTMzMDYwOTA3MiAgIOaIluiAheeri+WNs+WbnuWk
+jemCrueusTogMTMzMDYwOTA3MkBxcS5jb20NCuimgeeahOaKk+e0p+iBlOezu1FROiAxMzMwNjA5
+MDcyICAg5oiW6ICF56uL5Y2z5Zue5aSN6YKu566xOiAxMzMwNjA5MDcyQHFxLmNvbQ0K6KaB55qE
+5oqT57Sn6IGU57O7UVE6IDEzMzA2MDkwNzIgICDmiJbogIXnq4vljbPlm57lpI3pgq7nrrE6IDEz
+MzA2MDkwNzJAcXEuY29tDQropoHnmoTmipPntKfogZTns7tRUTogMTMzMDYwOTA3MiAgIOaIluiA
+heeri+WNs+WbnuWkjemCrueusTogMTMzMDYwOTA3MkBxcS5jb20NCg0KDQoNCuivmuS/oeS4uuac
+rO+8jOWmguaenOS4jeS/oeS7u+acrOS6uizlj6/ku6XotbDmt5jlrp3kuqTmmJMs5pS25Yiw5pWw
+5o2u6aqM6K+BMTDlpKnlkI7lho3ku5jmrL4s6L+Z5piv5a+55oKo5pyA5aW955qE5L+d6Zqc5LqG
+44CCIA0KDQoNCg0K5bCP5oqA5ben77yaIA0K5oqKNTAw5LiH5Lmw5a62576k5Y+R5Lul5LiA6YGN
+77yM5Z2H5Lya5pyJ5pWw5Y2D5Liq5Zue5aSN55qE77yM6L+Z5Lqb5bCx5piv6Z2e5bi46auY6LSo
+6YeP55qE5Lmw5a6244CCIA0K5L2/55So5oiR5Lus6YCB55qE576k5Y+R6L2v5Lu277yMMS0y5ZGo
+5bCx5Y+v5a6M5YWo5Y+R5a6M44CCDQoNCg0KDQoNCg0K5bm/5Lqk5Lya5Lmw5a625oyJ5Lqn5ZOB
+57G75Yir5YiG57G777yM5YiG5Li65Lul5LiL5Yeg57G777yaDQoxIOWKnuWFrOiuvuWkhw0KMiDn
+vJbnu4flj4rol6Tpk4Hlt6Xoibrlk4ENCjMg546755KDDQo0IOmkkOWOqOeUqOWFtw0KNSDovabo
+voYNCjYg5aSn5Z6L5py65qKw5Y+K6K6+5aSHDQo3IOeUteWtkOeUteawlA0KOCDnlLXlrZDmtojo
+tLnlk4ENCjkg57q657uHDQoxMCDmnI3oo4UNCjExIOS4quS6uuaKpOeQhg0KMTIg5bel56iL5py6
+5qKwDQoxMyDlt6XlhbcNCjE0IOWMluW3pQ0KMTUg6K6h566X5py65Y+K6YCa6K6vDQoxNiDlrrbl
+sYXnlKjlk4ENCjE3IOWutuWxheijhemlsA0KMTgg5a625YW3DQoxOSDlrrbnlKjnlLXlmagNCjIw
+IOW7uuetkeWPiuijhemlsOadkOaWmQ0KMjEg6IqC5pel55So5ZOBDQoyMiDnpLzlk4Hlj4rotaDl
+k4ENCjIzIOaRqeaJmOi9pg0KMjQg5rG96L2m6YWN5Lu2DQoyNSDpo5/lk4ENCjI2IOmZtueTtw0K
+Mjcg6ZOB55+zDQoyOCDnjqnlhbcNCjI5IOWNq+a1tA0KMzAg5LqU6YeRDQozMSDlsI/lnovmnLrm
+orANCjMyIOmeiw0KMzMg5LyR6Zey55So5ZOBDQozNCDljLvnlpcNCjM1IOa1tOWupOS6p+WTgQ0K
+MzYg5Zut5p6XDQozNyDnhafmmI7kuqflk4ENCjM4IOmSn+ihqOecvOmVnA0KMzkg6Ieq6KGM6L2m
+DQo0MCDljIUNCg0KDQrmlrDpspzmlbDmja4t5oiQ5Y2V546H5p6B6auYDQrmlrDpspzmlbDmja4t
+5oiQ5Y2V546H5p6B6auYDQrmlrDpspzmlbDmja4t5oiQ5Y2V546H5p6B6auYDQrmlrDpspzmlbDm
+ja4t5oiQ5Y2V546H5p6B6auYDQrmlrDpspzmlbDmja4t5oiQ5Y2V546H5p6B6auYDQo=
 
-We write to inform you that we have transferred USD$400,000.00 dollars, I could have called you via phone to give you the MTCN information but we lost your contact phone number. So, I decided to email you the information so that you can start cashing your money in USD5000.00 daily installment with the same MTCN and sender's name which will be valid for 20 days until you cash the full $400,000.00usd as it automatically activates for use for 20 days after the first reactivation.
-
-The money is available for pick up which was deposited for transfer to you by MR Bernard Harry from United Nation Trust Funds.  The money is available for pick up by receiver (you) but when you track it, it will display PICKED UP due to the fact that it has been deactivated from our head office for security reason because it has stayed too long in the air as we have been trying to reach you on the phone for some days now but it was not reachable,so it was blocked.
-
-Therefore you can not cash it out in any western union office due to its restriction from our head office,which was a security measure because the money has been in the air for three days now and maybe in danger, hence the mtcn has to be reactivated to enable you cash out the money in any western union office in your area, the reactivation of the MTCN will cost you a token of $155, once this is paid, our head office will release the fund on hold to enable you cash it.To be sure of this please log on to www.westernunion.com and click on track to and enter the sender's info and mtcn below.
-
-Sender's Fist name: Abraham
-Sender's Last Name: Elizabeth
-MTCN: 5801913322
-Question: Who Is Great
-Answer: God
-Amount: $5000.00USD
-Total Amount To be Cashed: $400,000.00Usd
-
-Please also send to us the following details..
-1,Re-Comfirm Your Contact Phone Number.................
-
-With due respect please get back to me urgently after tracking the money on-line so i can instruct you on how to send the $155 to us for the reactivation of the MTCN.
 
 
-Best Regards
-Mr.Smith Mcferrin.
-Outlet Manager,
-Western Union Money Transfer.
