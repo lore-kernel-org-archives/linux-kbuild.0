@@ -1,186 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:62278 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728164AbfBSX4F (ORCPT
+Received: from mail-it1-f196.google.com ([209.85.166.196]:50586 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726986AbfBTAeC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Feb 2019 18:56:05 -0500
+        Tue, 19 Feb 2019 19:34:02 -0500
+Received: by mail-it1-f196.google.com with SMTP id m137so11196675ita.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 19 Feb 2019 16:34:01 -0800 (PST)
 MIME-Version: 1.0
-References: <20190201103648.GF31854@zn.tnic> <CAK7LNAQ4juLxrdMoPumQQ-96fMorf+wfAqkNxq1X1k=0i_R4vQ@mail.gmail.com>
- <20190201151139.GK31854@zn.tnic> <CAK7LNATVeX=6Mmn6A4+EGmZ9OSf=ePwbQWV1m1c=e=_LiebdNQ@mail.gmail.com>
- <20190202144227.GC27822@zn.tnic> <20190206104729.GC7314@zn.tnic>
- <CAK7LNAT+GhbEwP7v7NWd2kqW76qbXM1mtKhc21YXkp7BUJjzKQ@mail.gmail.com>
- <20190210123923.GA14948@zn.tnic> <20190218083008.GB4265@zn.tnic>
- <CAK7LNAQ_UfHcin1G_fqEX0qZ-AFe7=GHfnHZ2QZu1oe=dZW-aA@mail.gmail.com> <20190218143145.GF4265@zn.tnic>
-In-Reply-To: <20190218143145.GF4265@zn.tnic>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 20 Feb 2019 08:55:16 +0900
-Message-ID: <CAK7LNATUcHwiy1btn7sgLmP0jx_OghRn4VNrK_A+4RcQNP4WmQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Disable extra debugging info in .s output
+References: <20190219214940.391081-1-arnd@arndb.de> <1550614664.6911.45.camel@lca.pw>
+ <CAKwvOdn+MJxYc+ykvyf-WhEzzDn0zEusjpQuksknnf8bPb=Q6g@mail.gmail.com>
+In-Reply-To: <CAKwvOdn+MJxYc+ykvyf-WhEzzDn0zEusjpQuksknnf8bPb=Q6g@mail.gmail.com>
+From: Kostya Serebryany <kcc@google.com>
+Date: Tue, 19 Feb 2019 16:33:49 -0800
+Message-ID: <CAN=P9pgC8EzawtxMzp6d3AsMPkSpTd0Ry6j+Jn+YgC_XP2Fd_w@mail.gmail.com>
+Subject: Re: [PATCH] kasan: turn off asan-stack for clang-8 and earlier
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Qian Cai <cai@lca.pw>, Arnd Bergmann <arnd@arndb.de>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>, Mark Brown <broonie@kernel.org>, Alexander Potapenko <glider@google.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Christoph Lameter <cl@linux.com>, Andrey Konovalov <andreyknvl@google.com>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, Evgenii Stepanov <eugenis@google.com>
 
-On Mon, Feb 18, 2019 at 11:32 PM Borislav Petkov <bp@alien8.de> wrote:
+On Tue, Feb 19, 2019 at 2:43 PM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
 >
-> On Mon, Feb 18, 2019 at 06:10:57PM +0900, Masahiro Yamada wrote:
-> > Could you send v2 as I suggested?
-> > Your commit log describes your motivation perfectly.
+> + Evgenii, Kostya for KASAN
+>
+> On Tue, Feb 19, 2019 at 2:17 PM Qian Cai <cai@lca.pw> wrote:
 > >
-> > (I lost the applicable patch because
-> > I just modified the code locally and pasted it
-> > into the previous email.)
->
-> Sure, here it is.
->
-> Thx.
+> > On Tue, 2019-02-19 at 22:49 +0100, Arnd Bergmann wrote:
+> > > Building an arm64 allmodconfig kernel with clang results in over 140 warnings
+> > > about overly large stack frames, the worst ones being:
+> > >
+> > > drivers/gpu/drm/panel/panel-sitronix-st7789v.c:196:12: error: stack frame size
+> > > of 20224 bytes in function 'st7789v_prepare'
+> > > drivers/video/fbdev/omap2/omapfb/displays/panel-tpo-td028ttec1.c:196:12:
+> > > error: stack frame size of 13120 bytes in function 'td028ttec1_panel_enable'
+> > > drivers/usb/host/max3421-hcd.c:1395:1: error: stack frame size of 10048 bytes
+> > > in function 'max3421_spi_thread'
+> > > drivers/net/wan/slic_ds26522.c:209:12: error: stack frame size of 9664 bytes
+> > > in function 'slic_ds26522_probe'
+> > > drivers/crypto/ccp/ccp-ops.c:2434:5: error: stack frame size of 8832 bytes in
+> > > function 'ccp_run_cmd'
+> > > drivers/media/dvb-frontends/stv0367.c:1005:12: error: stack frame size of 7840
+> > > bytes in function 'stv0367ter_algo'
+> > >
+> > > None of these happen with gcc today, and almost all of these are the result
+> > > of a single known bug in llvm.  Hopefully it will eventually get fixed with
+> > > the
+> > > clang-9 release.
+
+I am not confident we can fix this in clang.
+The difference between gcc and clang, AFAICT, is not in the asan
+instrumentation, but in inining.
+Looking at the reproducer from https://bugs.llvm.org/show_bug.cgi?id=38809#c4,
+if I change ltv350qv_write_reg to always inline, gcc also produces a
+huge 10K stack frame,
+and making it noinline fixes the stack frame for both gcc and clang.
 
 
-Applied to linux-kbuild.
-
-Thanks.
-
-
-> ---
-> From: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Date: Sun, 25 Nov 2018 23:58:00 +0100
-> Subject: [PATCH] kbuild: Disable extra debugging info in .s output
 >
-> Modern gcc adds view assignments, reset assertion checking in .loc
-> directives and a couple more additional debug markers, which clutters
-> the asm output unnecessarily:
+> Would it be better to disable outright if CC_IS_CLANG, then go back
+> and adjust it once we know explicitly which version it lands in?
+> (Maybe I'm being too pessimistic about when it may be fixed).
 >
-> For example:
+> > >
+> > > In the meantime, the best idea I have is to turn off asan-stack for clang-8
+> > > and earlier, so we can produce a kernel that is safe to run.
+> > >
+> > > I have posted three patches that address the frame overflow warnings that are
+> > > not addressed by turning off asan-stack, so in combination with this change,
+> > > we get much closer to a clean allmodconfig build, which in turn is necessary
+> > > to do meaningful build regression testing.
+> >
+> > Well, I am using clang 8.0 on arm64 and running the kernel just fine for a few
+> > weeks now and never trigger a single stack overflow (THREAD_SHIFT = 15) because
+> > I never use any of those drivers you mentioned above. I don't think it is a good
+> > idea to blankly remove the testing coverage here and affect people don't use all
+> > those offensive functions at all.
 >
->   bsp_resume:
->   .LFB3466:
->           .loc 1 1868 1 is_stmt 1 view -0
->           .cfi_startproc
->           .loc 1 1869 2 view .LVU73
->   # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
->           .loc 1 1869 14 is_stmt 0 view .LVU74
->           movq    this_cpu(%rip), %rax    # this_cpu, this_cpu
->           movq    64(%rax), %rax  # this_cpu.94_1->c_bsp_resume, _2
->   # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
->           .loc 1 1869 5 view .LVU75
->           testq   %rax, %rax      # _2
->           je      .L8     #,
->           .loc 1 1870 3 is_stmt 1 view .LVU76
->           movq    $boot_cpu_data, %rdi    #,
->           jmp     __x86_indirect_thunk_rax
->
-> or
->         .loc 2 57 9 view .LVU478
->         .loc 2 57 9 view .LVU479
->         .loc 2 57 9 view .LVU480
->         .loc 2 57 9 view .LVU481
->   .LBB1385:
->   .LBB1383:
->   .LBB1379:
->   .LBB1377:
->   .LBB1375:
->         .loc 2 57 9 view .LVU482
->         .loc 2 57 9 view .LVU483
->         movl    %edi, %edx      # cpu, cpu
->   .LVL87:
->         .loc 2 57 9 is_stmt 0 view .LVU484
->
-> That MOV in there is drowned in debugging information and latter makes
-> it hard to follow the asm. And that DWARF info is not really needed for
-> asm output staring.
->
-> Disable the debug information generation which clutters the asm output
-> unnecessarily:
->
->   bsp_resume:
->   # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
->           movq    this_cpu(%rip), %rax    # this_cpu, this_cpu
->           movq    64(%rax), %rax  # this_cpu.94_1->c_bsp_resume, _2
->   # arch/x86/kernel/cpu/common.c:1869:    if (this_cpu->c_bsp_resume)
->           testq   %rax, %rax      # _2
->           je      .L8     #,
->   # arch/x86/kernel/cpu/common.c:1870:            this_cpu->c_bsp_resume(&boot_cpu_data);
->           movq    $boot_cpu_data, %rdi    #,
->           jmp     __x86_indirect_thunk_rax
->   .L8:
->   # arch/x86/kernel/cpu/common.c:1871: }
->           rep ret
->           .size   bsp_resume, .-bsp_resume
->
->   [ bp: write commit message. ]
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Borislav Petkov <bp@suse.de>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: linux-kbuild@vger.kernel.org
-> ---
->  Makefile               | 13 ++++++++-----
->  scripts/Makefile.build |  2 +-
->  2 files changed, 9 insertions(+), 6 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 96c5335e7ee4..c5e7d3ac8bd2 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -729,25 +729,28 @@ KBUILD_CFLAGS     += -fomit-frame-pointer
->  endif
->  endif
->
-> -KBUILD_CFLAGS   += $(call cc-option, -fno-var-tracking-assignments)
-> +DEBUG_CFLAGS   := $(call cc-option, -fno-var-tracking-assignments)
->
->  ifdef CONFIG_DEBUG_INFO
->  ifdef CONFIG_DEBUG_INFO_SPLIT
-> -KBUILD_CFLAGS   += $(call cc-option, -gsplit-dwarf, -g)
-> +DEBUG_CFLAGS   += $(call cc-option, -gsplit-dwarf, -g)
->  else
-> -KBUILD_CFLAGS  += -g
-> +DEBUG_CFLAGS   += -g
->  endif
->  KBUILD_AFLAGS  += -Wa,-gdwarf-2
->  endif
->  ifdef CONFIG_DEBUG_INFO_DWARF4
-> -KBUILD_CFLAGS  += $(call cc-option, -gdwarf-4,)
-> +DEBUG_CFLAGS   += $(call cc-option, -gdwarf-4,)
->  endif
->
->  ifdef CONFIG_DEBUG_INFO_REDUCED
-> -KBUILD_CFLAGS  += $(call cc-option, -femit-struct-debug-baseonly) \
-> +DEBUG_CFLAGS   += $(call cc-option, -femit-struct-debug-baseonly) \
->                    $(call cc-option,-fno-var-tracking)
->  endif
->
-> +KBUILD_CFLAGS += $(DEBUG_CFLAGS)
-> +export DEBUG_CFLAGS
-> +
->  ifdef CONFIG_FUNCTION_TRACER
->  ifdef CONFIG_FTRACE_MCOUNT_RECORD
->    # gcc 5 supports generating the mcount tables directly
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index fd03d60f6c5a..8f5c86da77b1 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -104,7 +104,7 @@ modkern_cflags =                                          \
->  quiet_modtag = $(if $(part-of-module),[M],   )
->
->  quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
-> -cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
-> +cmd_cc_s_c       = $(CC) $(filter-out $(DEBUG_CFLAGS), $(c_flags)) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
->
->  $(obj)/%.s: $(src)/%.c FORCE
->         $(call if_changed_dep,cc_s_c)
-> --
-> 2.19.1
+> Thanks for the patch, Arnd!  Hopefully we can fix that up in Clang
+> soon.  Qian, I guess the alternative would be to add `-mllvm
+> -asan-stack=0` on potentially up to 140 Makefiles?
 >
 > --
-> Regards/Gruss,
->     Boris.
->
-> Good mailing practices for 400: avoid top-posting and trim the reply.
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+> Thanks,
+> ~Nick Desaulniers
