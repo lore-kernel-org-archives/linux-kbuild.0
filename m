@@ -1,44 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:43592 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726214AbfBTBZ1 (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:41817 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726312AbfBTDil (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Feb 2019 20:25:27 -0500
-Received: by mail-qt1-f195.google.com with SMTP id y4so25525369qtc.10
-        for <linux-kbuild@vger.kernel.org>; Tue, 19 Feb 2019 17:25:26 -0800 (PST)
-Subject: Re: [PATCH] kasan: turn off asan-stack for clang-8 and earlier
-References: <20190219214940.391081-1-arnd@arndb.de>
- <1550614664.6911.45.camel@lca.pw>
- <CAKwvOdn+MJxYc+ykvyf-WhEzzDn0zEusjpQuksknnf8bPb=Q6g@mail.gmail.com>
- <CAN=P9pgC8EzawtxMzp6d3AsMPkSpTd0Ry6j+Jn+YgC_XP2Fd_w@mail.gmail.com>
-From: Qian Cai <cai@lca.pw>
-Message-ID: <d925ca37-ff0d-adba-6e1e-a7eaa47404b0@lca.pw>
-Date: Tue, 19 Feb 2019 20:25:23 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAN=P9pgC8EzawtxMzp6d3AsMPkSpTd0Ry6j+Jn+YgC_XP2Fd_w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Tue, 19 Feb 2019 22:38:41 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: hardcode genksyms path and remove GENKSYMS variable
+Date: Wed, 20 Feb 2019 12:38:31 +0900
+Message-Id: <1550633911-11741-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kostya Serebryany <kcc@google.com>, Nick Desaulniers <ndesaulniers@google.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>, Mark Brown <broonie@kernel.org>, Alexander Potapenko <glider@google.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Christoph Lameter <cl@linux.com>, Andrey Konovalov <andreyknvl@google.com>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, Evgenii Stepanov <eugenis@google.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
+The genksyms source was integrated into the kernel tree in 2003.
 
+I do not expect anybody still using the external /sbin/genksyms.
+Kbuild does not need to provide the ability to override GENKSYMS.
 
-On 2/19/19 7:33 PM, Kostya Serebryany wrote:
->>> Well, I am using clang 8.0 on arm64 and running the kernel just fine for a few
->>> weeks now and never trigger a single stack overflow (THREAD_SHIFT = 15) because
->>> I never use any of those drivers you mentioned above. I don't think it is a good
->>> idea to blankly remove the testing coverage here and affect people don't use all
->>> those offensive functions at all.
->>
->> Thanks for the patch, Arnd!  Hopefully we can fix that up in Clang
->> soon.  Qian, I guess the alternative would be to add `-mllvm
->> -asan-stack=0` on potentially up to 140 Makefiles?
+Let's remove the GENKSYMS variable, and use the hardcoded path.
 
-Depends on the exact stack consumption of those 140 functions. For example, I
-don't care if you turn-off -asan-stack if the current stack size is < 32k.
+Since it occurred in the pre-git era, I attached the commit message
+in case somebody is interested in the historical background.
 
-For those functions always consume like a lot of stack like 8k or more, fix them
-in Makefile if not too many of them.
+  | Author: Kai Germaschewski <kai@tp1.ruhr-uni-bochum.de>
+  | Date:   Wed Feb 19 04:17:28 2003 -0600
+  |
+  | kbuild: [PATCH] put genksyms in scripts dir
+  |
+  | This puts genksyms into scripts/genksyms/.
+  |
+  | genksyms used to be maintained externally, though the only possible user
+  | was the kernel build. Moving it into the kernel sources makes it easier to
+  | keep it uptodate, like for example updating it to generate linker scripts
+  | directly instead of postprocessing the generated header file fragments
+  | with sed, as we do currently.
+  |
+  | Also, genksyms does not handle __typeof__, which needs to be fixed since
+  | some of the exported symbol in the kernel are defined using __typeof__.
+  |
+  | (Rusty Russell/me)
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Makefile               | 3 +--
+ scripts/Makefile.build | 4 ++--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index def7c79..e19a3e3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -390,7 +390,6 @@ OBJDUMP		= $(CROSS_COMPILE)objdump
+ LEX		= flex
+ YACC		= bison
+ AWK		= awk
+-GENKSYMS	= scripts/genksyms/genksyms
+ INSTALLKERNEL  := installkernel
+ DEPMOD		= /sbin/depmod
+ PERL		= perl
+@@ -443,7 +442,7 @@ GCC_PLUGINS_CFLAGS :=
+ 
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS
+-export MAKE LEX YACC AWK GENKSYMS INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
++export MAKE LEX YACC AWK INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
+ export HOSTCXX KBUILD_HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+ 
+ export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 89debbe..f013182 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -120,7 +120,7 @@ $(obj)/%.i: $(src)/%.c FORCE
+ # These mirror gensymtypes_S and co below, keep them in synch.
+ cmd_gensymtypes_c =                                                         \
+     $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
+-    $(GENKSYMS) $(if $(1), -T $(2))                                         \
++    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
+      $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+      $(if $(KBUILD_PRESERVE),-p)                                            \
+      -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
+@@ -320,7 +320,7 @@ cmd_gensymtypes_S =                                                         \
+      grep "\<___EXPORT_SYMBOL\>" |                                          \
+      sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ; } | \
+     $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
+-    $(GENKSYMS) $(if $(1), -T $(2))                                         \
++    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
+      $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+      $(if $(KBUILD_PRESERVE),-p)                                            \
+      -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
+-- 
+2.7.4
