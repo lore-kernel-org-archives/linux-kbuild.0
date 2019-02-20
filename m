@@ -1,237 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34176 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726019AbfBTPuN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Feb 2019 10:50:13 -0500
-Date: Wed, 20 Feb 2019 16:50:08 +0100 (CET)
-From: Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH v2 6/8] modpost: Add modinfo flag to livepatch modules
-In-Reply-To: <20190130165446.19479-7-jmoreira@suse.de>
-Message-ID: <alpine.LSU.2.21.1902201648310.26855@pobox.suse.cz>
-References: <20190130165446.19479-1-jmoreira@suse.de> <20190130165446.19479-7-jmoreira@suse.de>
+Received: from relay.sw.ru ([185.231.240.75]:46554 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725801AbfBTRAZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 20 Feb 2019 12:00:25 -0500
+Subject: Re: [PATCH] kasan: turn off asan-stack for clang-8 and earlier
+References: <20190219214940.391081-1-arnd@arndb.de>
+ <CAAeHK+xSpsu0tNmeq0wKXfT=0HuORnvU+XzLswDzhbtfZVa4Hw@mail.gmail.com>
+ <CAK8P3a1NfHohd1xT7iHK85L2PGnD95RJvwFi-2cWrFpipQzqwg@mail.gmail.com>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Message-ID: <b109ad0d-6995-8ca2-5426-7e2627d2032c@virtuozzo.com>
+Date: Wed, 20 Feb 2019 20:00:37 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAK8P3a1NfHohd1xT7iHK85L2PGnD95RJvwFi-2cWrFpipQzqwg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joao Moreira <jmoreira@suse.de>
-Cc: live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>, Andrey Konovalov <andreyknvl@google.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Mark Brown <broonie@kernel.org>, Qian Cai <cai@lca.pw>, Alexander Potapenko <glider@google.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Christoph Lameter <cl@linux.com>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>
 
-Adding CCs...
 
-On Wed, 30 Jan 2019, Joao Moreira wrote:
 
-> From: Miroslav Benes <mbenes@suse.cz>
+On 2/20/19 5:51 PM, Arnd Bergmann wrote:
+> On Wed, Feb 20, 2019 at 3:45 PM Andrey Konovalov <andreyknvl@google.com> wrote:
+>>
+>> On Tue, Feb 19, 2019 at 10:49 PM Arnd Bergmann <arnd@arndb.de> wrote:
+>>>
+>>> Building an arm64 allmodconfig kernel with clang results in over 140 warnings
+>>> about overly large stack frames, the worst ones being:
+>>>
+>>> drivers/gpu/drm/panel/panel-sitronix-st7789v.c:196:12: error: stack frame size of 20224 bytes in function 'st7789v_prepare'
+>>> drivers/video/fbdev/omap2/omapfb/displays/panel-tpo-td028ttec1.c:196:12: error: stack frame size of 13120 bytes in function 'td028ttec1_panel_enable'
+>>> drivers/usb/host/max3421-hcd.c:1395:1: error: stack frame size of 10048 bytes in function 'max3421_spi_thread'
+>>> drivers/net/wan/slic_ds26522.c:209:12: error: stack frame size of 9664 bytes in function 'slic_ds26522_probe'
+>>> drivers/crypto/ccp/ccp-ops.c:2434:5: error: stack frame size of 8832 bytes in function 'ccp_run_cmd'
+>>> drivers/media/dvb-frontends/stv0367.c:1005:12: error: stack frame size of 7840 bytes in function 'stv0367ter_algo'
+>>>
+>>> None of these happen with gcc today, and almost all of these are the result
+>>> of a single known bug in llvm.  Hopefully it will eventually get fixed with the
+>>> clang-9 release.
+>>>
+>>> In the meantime, the best idea I have is to turn off asan-stack for clang-8
+>>> and earlier, so we can produce a kernel that is safe to run.
+>>
+>> Hi Arnd,
+>>
+>> I don't think it's good to disable KASAN stack instrumentation for the
+>> whole kernel by default with clang. It makes more sense to disable
+>> stack instrumentation only for these few drivers.
 > 
-> Currently, livepatch infrastructure in the kernel relies on
-> MODULE_INFO(livepatch, "Y") statement in a livepatch module. Then the
-> kernel module loader knows a module is indeed livepatch module and can
-> behave accordingly.
+> Do you mean just the 114 files that we get warnings for in allmodconfig,
+> or also those that run into the same bug but stay below the warning limit,
+> and the ones that don't warn in allmodconfig but do warn in other
+> configurations?
 > 
-> klp-convert, on the other hand relies on LIVEPATCH_* statement in the
-> module's Makefile for exactly the same reason.
-> 
-> Remove dependency on modinfo and generate MODULE_INFO flag
-> automatically in modpost when LIVEPATCH_* is defined in the module's
-> Makefile. Generate a list of all built livepatch modules based on
-> the .livepatch file and store it in (MODVERDIR)/livepatchmods. Give
-> this list as an argument for modpost which will use it to identify
-> livepatch modules.
-> 
-> As MODULE_INFO is no longer needed, remove it.
-> 
-> [jmoreira:
-> * fix modpost.c (add_livepatch_flag) to update module structure with
-> livepatch flag and prevent modpost from breaking due to unresolved
-> symbols]
-> 
-> Signed-off-by: Miroslav Benes <mbenes@suse.cz>
-> Signed-off-by: Joao Moreira <jmoreira@suse.de>
-> ---
->  samples/livepatch/livepatch-sample.c |  1 -
->  scripts/Makefile.modpost             |  8 +++-
->  scripts/mod/modpost.c                | 84 +++++++++++++++++++++++++++++++++---
->  3 files changed, 85 insertions(+), 8 deletions(-)
-> 
-> diff --git a/samples/livepatch/livepatch-sample.c b/samples/livepatch/livepatch-sample.c
-> index 2d554dd930e2..20a5891ebf7b 100644
-> --- a/samples/livepatch/livepatch-sample.c
-> +++ b/samples/livepatch/livepatch-sample.c
-> @@ -90,4 +90,3 @@ static void livepatch_exit(void)
->  module_init(livepatch_init);
->  module_exit(livepatch_exit);
->  MODULE_LICENSE("GPL");
-> -MODULE_INFO(livepatch, "Y");
+> I would have to some more research, but I expect several hundred
+> patches before we get to a clean randconfig build with a broken
+> compiler.
 
-Again, we shoud do the same for the other samples we have in 
-samples/livepatch/ directory.
+Manually maintaining asan-stack parameter for the sake of one broken compiler isn't a great idea either.
 
-> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> index da779a185218..0149a72ea7ae 100644
-> --- a/scripts/Makefile.modpost
-> +++ b/scripts/Makefile.modpost
-> @@ -65,6 +65,11 @@ MODLISTCMD := find $(MODVERDIR) -name '*.mod' | xargs -r grep -h '\.ko$$' | sort
->  __modules := $(shell $(MODLISTCMD))
->  modules   := $(patsubst %.o,%.ko, $(wildcard $(__modules:.ko=.o)))
->  
-> +# find all .livepatch files listed in $(MODVERDIR)/
-> +ifdef CONFIG_LIVEPATCH
-> +$(shell find $(MODVERDIR) -name '*.livepatch' | xargs -r -I{} basename {} .livepatch > $(MODVERDIR)/livepatchmods)
-> +endif
-> +
->  # Stop after building .o files if NOFINAL is set. Makes compile tests quicker
->  _modpost: $(if $(KBUILD_MODPOST_NOFINAL), $(modules:.ko:.o),$(modules))
->  
-> @@ -79,7 +84,8 @@ modpost = scripts/mod/modpost                    \
->   $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
->   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
->   $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
-> - $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
-> + $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w) \
-> + $(if $(CONFIG_LIVEPATCH),-l $(MODVERDIR)/livepatchmods)
->  
->  MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
->  
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 1dfc34d8b668..2fd1d409ca5a 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -1979,10 +1979,6 @@ static void read_symbols(const char *modname)
->  		license = get_next_modinfo(&info, "license", license);
->  	}
->  
-> -	/* Livepatch modules have unresolved symbols resolved by klp-convert */
-> -	if (get_modinfo(info.modinfo, info.modinfo_len, "livepatch"))
-> -		mod->livepatch = 1;
-> -
->  	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
->  		symname = remove_dot(info.strtab + sym->st_name);
->  
-> @@ -2421,6 +2417,76 @@ static void write_dump(const char *fname)
->  	free(buf.p);
->  }
->  
-> +struct livepatch_mod_list {
-> +	struct livepatch_mod_list *next;
-> +	char *livepatch_mod;
-> +};
-> +
-> +static struct livepatch_mod_list *load_livepatch_mods(const char *fname)
-> +{
-> +	struct livepatch_mod_list *list_iter, *list_start = NULL;
-> +	unsigned long size, pos = 0;
-> +	void *file = grab_file(fname, &size);
-> +	char *line;
-> +
-> +	if (!file)
-> +		return NULL;
-> +
-> +	while ((line = get_next_line(&pos, file, size))) {
-> +		list_iter = NOFAIL(malloc(sizeof(*list_iter)));
-> +		list_iter->next = list_start;
-> +		list_iter->livepatch_mod = NOFAIL(strdup(line));
-> +		list_start = list_iter;
-> +	}
-> +	release_file(file, size);
-> +
-> +	return list_start;
-> +}
-> +
-> +static void free_livepatch_mods(struct livepatch_mod_list *list_start)
-> +{
-> +	struct livepatch_mod_list *list_iter;
-> +
-> +	while (list_start) {
-> +		list_iter = list_start->next;
-> +		free(list_start->livepatch_mod);
-> +		free(list_start);
-> +		list_start = list_iter;
-> +	}
-> +}
-> +
-> +static int is_livepatch_mod(const char *modname,
-> +		struct livepatch_mod_list *list)
-> +{
-> +	const char *myname;
-> +
-> +	if (!list)
-> +		return 0;
-> +
-> +	myname = strrchr(modname, '/');
-> +	if (myname)
-> +		myname++;
-> +	else
-> +		myname = modname;
-> +
-> +	while (list) {
-> +		if (!strcmp(myname, list->livepatch_mod))
-> +			return 1;
-> +		list = list->next;
-> +	}
-> +	return 0;
-> +}
-> +
-> +static void add_livepatch_flag(struct buffer *b, struct module *mod,
-> +		struct livepatch_mod_list *list)
-> +{
-> +	if (is_livepatch_mod(mod->name, list)) {
-> +		buf_printf(b, "\nMODULE_INFO(livepatch, \"Y\");\n");
-> +		mod->livepatch = 1;
-> +	}
-> +}
-> +
-> +
->  struct ext_sym_list {
->  	struct ext_sym_list *next;
->  	const char *file;
-> @@ -2436,8 +2502,9 @@ int main(int argc, char **argv)
->  	int err;
->  	struct ext_sym_list *extsym_iter;
->  	struct ext_sym_list *extsym_start = NULL;
-> +	struct livepatch_mod_list *livepatch_mods = NULL;
->  
-> -	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awE")) != -1) {
-> +	while ((opt = getopt(argc, argv, "i:I:e:l:mnsST:o:awM:K:E")) != -1) {
->  		switch (opt) {
->  		case 'i':
->  			kernel_read = optarg;
-> @@ -2454,6 +2521,9 @@ int main(int argc, char **argv)
->  			extsym_iter->file = optarg;
->  			extsym_start = extsym_iter;
->  			break;
-> +		case 'l':
-> +			livepatch_mods = load_livepatch_mods(optarg);
-> +			break;
->  		case 'm':
->  			modversions = 1;
->  			break;
-> @@ -2514,15 +2584,16 @@ int main(int argc, char **argv)
->  		buf.pos = 0;
->  
->  		err |= check_modname_len(mod);
-> -		err |= check_exports(mod);
->  		add_header(&buf, mod);
->  		add_intree_flag(&buf, !external_module);
->  		add_retpoline(&buf);
->  		add_staging_flag(&buf, mod->name);
-> +		add_livepatch_flag(&buf, mod, livepatch_mods);
->  		err |= add_versions(&buf, mod);
->  		add_depends(&buf, mod);
->  		add_moddevtable(&buf, mod);
->  		add_srcversion(&buf, mod);
-> +		err |= check_exports(mod);
->  
->  		sprintf(fname, "%s.mod.c", mod->name);
->  		write_if_changed(&buf, fname);
-> @@ -2541,6 +2612,7 @@ int main(int argc, char **argv)
->  			      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
->  		}
->  	}
-> +	free_livepatch_mods(livepatch_mods);
->  	free(buf.p);
->  
->  	return err;
-> -- 
-> 2.16.4
-> 
+Couple alternative suggestions:
 
-Miroslav
+1) If we can't fix the problem or the cost of fixing is too high, maybe just hide it? Disable -Wframe-larger-then on pre clang-9 compilers.
+
+2) Fallback cflags. The idea is to try to compile every the file with "-mllvm -asan-stack=1 -Wframe-larger-than=2048 -Werror" at first,
+ and fallback to "-mllvm -asan-stack=0" if failed. So it would be something similar to $(call cc-option, -mllvm -asan-stack=1 -Wframe-larger-than=2048 -Werror, -mllvm -asan-stack=0)
+ except that "cc-option" tries options only once on some code example while  we need to try options on every file that we actually compile.
+ Honestly, I'm not sure that it's worthy to hack Kbuild engine for that particular use-case.
+ 
