@@ -1,56 +1,153 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:33379 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726271AbfBTOvd (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Feb 2019 09:51:33 -0500
+Received: from mx2.suse.de ([195.135.220.15]:60130 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725865AbfBTPgQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 20 Feb 2019 10:36:16 -0500
+Date: Wed, 20 Feb 2019 16:36:13 +0100 (CET)
+From: Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH v2 5/8] modpost: Integrate klp-convert
+In-Reply-To: <20190130165446.19479-6-jmoreira@suse.de>
+Message-ID: <alpine.LSU.2.21.1902201635570.26855@pobox.suse.cz>
+References: <20190130165446.19479-1-jmoreira@suse.de> <20190130165446.19479-6-jmoreira@suse.de>
 MIME-Version: 1.0
-References: <20190219214940.391081-1-arnd@arndb.de> <CAAeHK+xSpsu0tNmeq0wKXfT=0HuORnvU+XzLswDzhbtfZVa4Hw@mail.gmail.com>
-In-Reply-To: <CAAeHK+xSpsu0tNmeq0wKXfT=0HuORnvU+XzLswDzhbtfZVa4Hw@mail.gmail.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 20 Feb 2019 15:51:14 +0100
-Message-ID: <CAK8P3a1NfHohd1xT7iHK85L2PGnD95RJvwFi-2cWrFpipQzqwg@mail.gmail.com>
-Subject: Re: [PATCH] kasan: turn off asan-stack for clang-8 and earlier
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Konovalov <andreyknvl@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Mark Brown <broonie@kernel.org>, Qian Cai <cai@lca.pw>, Alexander Potapenko <glider@google.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Christoph Lameter <cl@linux.com>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>
+To: Joao Moreira <jmoreira@suse.de>
+Cc: live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org
 
-On Wed, Feb 20, 2019 at 3:45 PM Andrey Konovalov <andreyknvl@google.com> wrote:
->
-> On Tue, Feb 19, 2019 at 10:49 PM Arnd Bergmann <arnd@arndb.de> wrote:
-> >
-> > Building an arm64 allmodconfig kernel with clang results in over 140 warnings
-> > about overly large stack frames, the worst ones being:
-> >
-> > drivers/gpu/drm/panel/panel-sitronix-st7789v.c:196:12: error: stack frame size of 20224 bytes in function 'st7789v_prepare'
-> > drivers/video/fbdev/omap2/omapfb/displays/panel-tpo-td028ttec1.c:196:12: error: stack frame size of 13120 bytes in function 'td028ttec1_panel_enable'
-> > drivers/usb/host/max3421-hcd.c:1395:1: error: stack frame size of 10048 bytes in function 'max3421_spi_thread'
-> > drivers/net/wan/slic_ds26522.c:209:12: error: stack frame size of 9664 bytes in function 'slic_ds26522_probe'
-> > drivers/crypto/ccp/ccp-ops.c:2434:5: error: stack frame size of 8832 bytes in function 'ccp_run_cmd'
-> > drivers/media/dvb-frontends/stv0367.c:1005:12: error: stack frame size of 7840 bytes in function 'stv0367ter_algo'
-> >
-> > None of these happen with gcc today, and almost all of these are the result
-> > of a single known bug in llvm.  Hopefully it will eventually get fixed with the
-> > clang-9 release.
-> >
-> > In the meantime, the best idea I have is to turn off asan-stack for clang-8
-> > and earlier, so we can produce a kernel that is safe to run.
->
-> Hi Arnd,
->
-> I don't think it's good to disable KASAN stack instrumentation for the
-> whole kernel by default with clang. It makes more sense to disable
-> stack instrumentation only for these few drivers.
+Adding CCs...
 
-Do you mean just the 114 files that we get warnings for in allmodconfig,
-or also those that run into the same bug but stay below the warning limit,
-and the ones that don't warn in allmodconfig but do warn in other
-configurations?
+On Wed, 30 Jan 2019, Joao Moreira wrote:
 
-I would have to some more research, but I expect several hundred
-patches before we get to a clean randconfig build with a broken
-compiler.
+> From: Josh Poimboeuf <jpoimboe@redhat.com>
+> 
+> Create cmd_klp_convert and hook it into scripts/Makefile.modpost.
+> cmd_klp_convert invokes klp-convert with the right arguments for the
+> conversion of unresolved symbols inside a livepatch.
+> 
+> [khlebnikov:
+> * save cmd_ld_ko_o into .module.cmd, if_changed_rule doesn't do that
+> * fix bashisms for debian where /bin/sh is a symlink to /bin/dash
+> * rename rule_link_module to rule_ld_ko_o, otherwise arg-check inside
+>   if_changed_rule compares cmd_link_module and cmd_ld_ko_o
+> * check modinfo -F livepatch only if CONFIG_LIVEPATCH is true
+> ]
+> 
+> [mbenes:
+> * remove modinfo call. LIVEPATCH_ in Makefiled
+> ]
+> 
+> [jmoreira:
+> * split up: move the .livepatch file-based scheme for identifying
+> livepatches to a previous patch, as it was required for correctly
+> building Symbols.list there.
+> ]
+> 
+> Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
+> Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+> Signed-off-by: Miroslav Benes <mbenes@suse.cz>
+> Signed-off-by: Joao Moreira <jmoreira@suse.de>
 
-     Arnd
+I'm definitely not an expert on this topic (and we talked about it in the 
+past off-list), but I'd simplify the SoB chain. At least you don't need my 
+SoB there. I'm happy that you took the code and transformed it.
+
+> ---
+>  scripts/Kbuild.include   |  4 +++-
+>  scripts/Makefile.modpost | 16 +++++++++++++++-
+>  scripts/mod/modpost.c    |  6 +++++-
+>  scripts/mod/modpost.h    |  1 +
+>  4 files changed, 24 insertions(+), 3 deletions(-)
+> 
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index 30816037036e..c30a8573c816 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -239,6 +239,8 @@ endif
+>  # (needed for the shell)
+>  make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
+>  
+> +save-cmd = printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
+> +
+>  # Find any prerequisites that is newer than target or that does not exist.
+>  # PHONY targets skipped in both cases.
+>  any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
+> @@ -246,7 +248,7 @@ any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
+>  # Execute command if command has changed or prerequisite(s) are updated.
+>  if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
+>  	$(cmd);                                                              \
+> -	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
+> +	$(save-cmd), @:)
+>  
+>  # Execute the command and also postprocess generated .d dependencies file.
+>  if_changed_dep = $(if $(strip $(any-prereq) $(arg-check)),$(cmd_and_fixdep),@:)
+> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+> index 7d4af0d0accb..da779a185218 100644
+> --- a/scripts/Makefile.modpost
+> +++ b/scripts/Makefile.modpost
+> @@ -125,8 +125,22 @@ quiet_cmd_ld_ko_o = LD [M]  $@
+>                   -o $@ $(filter-out FORCE,$^) ;                         \
+>  	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+>  
+> +SLIST = $(objtree)/Symbols.list
+> +KLP_CONVERT = scripts/livepatch/klp-convert
+> +quiet_cmd_klp_convert = KLP $@
+> +      cmd_klp_convert = mv $@ $(@:.ko=.klp.o);				\
+> +			$(KLP_CONVERT) $(SLIST) $(@:.ko=.klp.o) $@
+> +
+> +define rule_ld_ko_o
+> +	$(call cmd,ld_ko_o) $(cmd_ld_ko_o) ;				\
+> +	$(call save-cmd,ld_ko_o) ;					\
+> +	$(if $(CONFIG_LIVEPATCH),					\
+> +	  $(if $(wildcard $(MODVERDIR)/$(basetarget).livepatch),	\
+> +	    $(call echo-cmd,klp_convert) $(cmd_klp_convert) ))
+> +endef
+> +
+>  $(modules): %.ko :%.o %.mod.o FORCE
+> -	+$(call if_changed,ld_ko_o)
+> +	+$(call if_changed_rule,ld_ko_o)
+>  
+>  targets += $(modules)
+>  
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 26bf886bd168..1dfc34d8b668 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -1979,6 +1979,10 @@ static void read_symbols(const char *modname)
+>  		license = get_next_modinfo(&info, "license", license);
+>  	}
+>  
+> +	/* Livepatch modules have unresolved symbols resolved by klp-convert */
+> +	if (get_modinfo(info.modinfo, info.modinfo_len, "livepatch"))
+> +		mod->livepatch = 1;
+> +
+>  	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
+>  		symname = remove_dot(info.strtab + sym->st_name);
+>  
+> @@ -2106,7 +2110,7 @@ static int check_exports(struct module *mod)
+>  		const char *basename;
+>  		exp = find_symbol(s->name);
+>  		if (!exp || exp->module == mod) {
+> -			if (have_vmlinux && !s->weak) {
+> +			if (have_vmlinux && !s->weak && !mod->livepatch) {
+>  				if (warn_unresolved) {
+>  					warn("\"%s\" [%s.ko] undefined!\n",
+>  					     s->name, mod->name);
+> diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+> index 8453d6ac2f77..2acfaae064ec 100644
+> --- a/scripts/mod/modpost.h
+> +++ b/scripts/mod/modpost.h
+> @@ -118,6 +118,7 @@ struct module {
+>  	int skip;
+>  	int has_init;
+>  	int has_cleanup;
+> +	int livepatch;
+>  	struct buffer dev_table_buf;
+>  	char	     srcversion[25];
+>  	int is_dot_o;
+> -- 
+> 2.16.4
+> 
+
+Miroslav
