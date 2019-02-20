@@ -1,193 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44402 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726177AbfBTOJI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Feb 2019 09:09:08 -0500
-Date: Wed, 20 Feb 2019 15:09:04 +0100 (CET)
-From: Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
-In-Reply-To: <20190130165446.19479-3-jmoreira@suse.de>
-Message-ID: <alpine.LSU.2.21.1902201508550.26855@pobox.suse.cz>
-References: <20190130165446.19479-1-jmoreira@suse.de> <20190130165446.19479-3-jmoreira@suse.de>
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:36411 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725865AbfBTOo3 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 20 Feb 2019 09:44:29 -0500
+Received: by mail-pf1-f196.google.com with SMTP id n22so12023091pfa.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 20 Feb 2019 06:44:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20190219214940.391081-1-arnd@arndb.de>
+In-Reply-To: <20190219214940.391081-1-arnd@arndb.de>
+From: Andrey Konovalov <andreyknvl@google.com>
+Date: Wed, 20 Feb 2019 15:44:16 +0100
+Message-ID: <CAAeHK+xSpsu0tNmeq0wKXfT=0HuORnvU+XzLswDzhbtfZVa4Hw@mail.gmail.com>
+Subject: Re: [PATCH] kasan: turn off asan-stack for clang-8 and earlier
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joao Moreira <jmoreira@suse.de>
-Cc: live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Mark Brown <broonie@kernel.org>, Qian Cai <cai@lca.pw>, Alexander Potapenko <glider@google.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Christoph Lameter <cl@linux.com>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>
 
-More CCs added. I'd give you lore.kernel.org link for the whole patch set 
-(and cover letter), but the patch set is not archived for some strange 
-reason.
+On Tue, Feb 19, 2019 at 10:49 PM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> Building an arm64 allmodconfig kernel with clang results in over 140 warnings
+> about overly large stack frames, the worst ones being:
+>
+> drivers/gpu/drm/panel/panel-sitronix-st7789v.c:196:12: error: stack frame size of 20224 bytes in function 'st7789v_prepare'
+> drivers/video/fbdev/omap2/omapfb/displays/panel-tpo-td028ttec1.c:196:12: error: stack frame size of 13120 bytes in function 'td028ttec1_panel_enable'
+> drivers/usb/host/max3421-hcd.c:1395:1: error: stack frame size of 10048 bytes in function 'max3421_spi_thread'
+> drivers/net/wan/slic_ds26522.c:209:12: error: stack frame size of 9664 bytes in function 'slic_ds26522_probe'
+> drivers/crypto/ccp/ccp-ops.c:2434:5: error: stack frame size of 8832 bytes in function 'ccp_run_cmd'
+> drivers/media/dvb-frontends/stv0367.c:1005:12: error: stack frame size of 7840 bytes in function 'stv0367ter_algo'
+>
+> None of these happen with gcc today, and almost all of these are the result
+> of a single known bug in llvm.  Hopefully it will eventually get fixed with the
+> clang-9 release.
+>
+> In the meantime, the best idea I have is to turn off asan-stack for clang-8
+> and earlier, so we can produce a kernel that is safe to run.
 
-On Wed, 30 Jan 2019, Joao Moreira wrote:
+Hi Arnd,
 
-> For automatic resolution of livepatch relocations, a file called
-> Symbols.list is used. This file maps symbols within every compiled
-> kernel object allowing the identification of symbols whose name is
-> unique, thus relocation can be automatically inferred, or providing
-> information that helps developers when code annotation is required for
-> solving the matter.
-> 
-> Add support for creating Symbols.list in the main Makefile. First,
-> ensure that built-in is compiled when CONFIG_LIVEPATCH is enabled (as
-> required to achieve a complete Symbols.list file). Define the command to
-> build Symbols.list (cmd_klp_map) and hook it in the modules rule.
-> 
-> As it is undesirable to have symbols from livepatch objects inside
-> Symbols.list, make livepatches discernible by modifying
-> scripts/Makefile.build to create a .livepatch file for each livepatch
-> in $(MODVERDIR). This file then used by cmd_klp_map to identify and
-> bypass livepatches.
-> 
-> For identifying livepatches during the build process, a flag variable
-> LIVEPATCH_$(basetarget).o is considered in scripts/Makefile.build. This
-> way, set this flag for the livepatch sample Makefile in
-> samples/livepatch/Makefile.
-> 
-> Finally, Add a clean rule to ensure that Symbols.list is removed during
-> clean.
-> 
-> Notes:
-> 
-> To achieve a correct Symbols.list file, all kernel objects must be
-> considered, thus, its construction require these objects to be priorly
-> built. On the other hand, invoking scripts/Makefile.modpost without
-> having a complete Symbols.list in place would occasionally lead to
-> in-tree livepatches being post-processed incorrectly. To prevent this
-> from becoming a circular dependency, the construction of Symbols.list
-> uses non-post-processed kernel objects and such does not cause harm as
-> the symbols normally referenced from within livepatches are visible at
-> this stage. Also due to these requirements, the spot in-between modules
-> compilation and the invocation of scripts/Makefile.modpost was picked
-> for hooking cmd_klp_map.
-> 
-> The approach based on .livepatch files was proposed as an alternative
-> to using MODULE_INFO statementes. This approach was originally
-> proposed by Miroslav Benes as a workaround for identifying livepathces
-> without depending on modinfo during the modpost stage. It was moved to
-> this patch as the approach also shown to be useful while building
-> Symbols.list.
+I don't think it's good to disable KASAN stack instrumentation for the
+whole kernel by default with clang. It makes more sense to disable
+stack instrumentation only for these few drivers.
 
-If I remember correctly, the approach was originally proposed by Michal 
-Marek. I only wanted to avoid modinfo.
+Thanks!
 
-> Signed-off-by: Joao Moreira <jmoreira@suse.de>
+
+>
+> I have posted three patches that address the frame overflow warnings that are
+> not addressed by turning off asan-stack, so in combination with this change,
+> we get much closer to a clean allmodconfig build, which in turn is necessary
+> to do meaningful build regression testing.
+>
+> Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
+> Cc: Dmitry Vyukov <dvyukov@google.com>
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Qian Cai <cai@lca.pw>
+> Link: https://bugs.llvm.org/show_bug.cgi?id=38809
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->  .gitignore                 |  1 +
->  Makefile                   | 28 +++++++++++++++++++++++++---
->  samples/livepatch/Makefile |  1 +
->  scripts/Makefile.build     |  6 ++++++
->  4 files changed, 33 insertions(+), 3 deletions(-)
-> 
-> diff --git a/.gitignore b/.gitignore
-> index a20ac26aa2f5..5cd5758f5ffe 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -45,6 +45,7 @@
->  *.xz
->  Module.symvers
->  modules.builtin
-> +Symbols.list
->  
->  #
->  # Top-level generic files
-> diff --git a/Makefile b/Makefile
-> index f5b1d0d168e0..8903d72793b4 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -560,10 +560,13 @@ KBUILD_BUILTIN := 1
->  # If we have only "make modules", don't compile built-in objects.
->  # When we're building modules with modversions, we need to consider
->  # the built-in objects during the descend as well, in order to
-> -# make sure the checksums are up to date before we record them.
-> +# make sure the checksums are up to date before we record them. The
-> +# same applies for building livepatches, as built-in objects may hold
-> +# symbols which are referenced from livepatches and are required by
-> +# klp-convert post-processing tool for resolving these cases.
->  
->  ifeq ($(MAKECMDGOALS),modules)
-> -  KBUILD_BUILTIN := $(if $(CONFIG_MODVERSIONS),1)
-> +  KBUILD_BUILTIN := $(if $(or $(CONFIG_MODVERSIONS), $(CONFIG_LIVEPATCH)),1)
+>  lib/Kconfig.kasan      | 13 +++++++++++++
+>  scripts/Makefile.kasan |  2 +-
+>  2 files changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/lib/Kconfig.kasan b/lib/Kconfig.kasan
+> index 67d7d1309c52..219cddc913ac 100644
+> --- a/lib/Kconfig.kasan
+> +++ b/lib/Kconfig.kasan
+> @@ -103,6 +103,19 @@ config KASAN_INLINE
+>
+>  endchoice
+>
+> +config KASAN_STACK
+> +       int
+> +       default 0 if CC_IS_CLANG && (CLANG_VERSION < 90000)
+> +       default 1
+> +       help
+> +         The LLVM stack address sanitizer has a know bug that
+> +         causes excessive stack usage in a lot of functions, see
+> +         https://bugs.llvm.org/show_bug.cgi?id=38809
+> +         Disabling asan-stack makes it safe to run kernels build
+> +         with clang-8 with KASAN enabled, though it loses some of
+> +         the functionality.  We assume that clang-9 will have a fix,
+> +         so the feature can be used.
+> +
+>  config KASAN_S390_4_LEVEL_PAGING
+>         bool "KASan: use 4-level paging"
+>         depends on KASAN && S390
+> diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+> index f1fb8e502657..6410bd22fe38 100644
+> --- a/scripts/Makefile.kasan
+> +++ b/scripts/Makefile.kasan
+> @@ -26,7 +26,7 @@ else
+>         CFLAGS_KASAN := $(CFLAGS_KASAN_SHADOW) \
+>          $(call cc-param,asan-globals=1) \
+>          $(call cc-param,asan-instrumentation-with-call-threshold=$(call_threshold)) \
+> -        $(call cc-param,asan-stack=1) \
+> +        $(call cc-param,asan-stack=$(CONFIG_KASAN_STACK)) \
+>          $(call cc-param,asan-instrument-allocas=1)
 >  endif
->  
->  # If we have "make <whatever> modules", compile modules
-> @@ -1255,9 +1258,25 @@ all: modules
->  # duplicate lines in modules.order files.  Those are removed
->  # using awk while concatenating to the final file.
->  
-> +quiet_cmd_klp_map = KLP	Symbols.list
-> +SLIST = $(objtree)/Symbols.list
-> +
-> +define cmd_klp_map
-> +	$(shell echo "klp-convert-symbol-data.0.1" > $(SLIST))				\
-> +	$(shell echo "*vmlinux" >> $(SLIST))						\
-> +	$(shell nm -f posix $(objtree)/vmlinux | cut -d\  -f1 >> $(SLIST))		\
-> +	$(foreach m, $(wildcard $(MODVERDIR)/*.mod),					\
-> +		$(eval mod = $(patsubst %.ko,%.o,$(shell head -n1 $(m))))		\
-> +		$(if $(wildcard $(MODVERDIR)/$(shell basename -s .o $(mod)).livepatch),,\
-> +			$(eval fmod = $(subst $(quote),_,$(subst -,_,$(mod))))		\
-> +			$(shell echo "*$(shell basename -s .o $(fmod))" >> $(SLIST))	\
-> +			$(shell nm -f posix $(mod) | cut -d\  -f1 >> $(SLIST))))
-> +endef
-> +
->  PHONY += modules
->  modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux) modules.builtin
->  	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
-> +	$(if $(CONFIG_LIVEPATCH), $(call cmd,klp_map))
->  	@$(kecho) '  Building modules, stage 2.';
->  	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
->  
-> @@ -1352,7 +1371,10 @@ vmlinuxclean:
->  	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-vmlinux.sh clean
->  	$(Q)$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) clean)
->  
-> -clean: archclean vmlinuxclean
-> +klpclean:
-> +	$(Q) rm -f $(objtree)/Symbols.list
-> +
-> +clean: archclean vmlinuxclean klpclean
->  
->  # mrproper - Delete all generated files, including .config
->  #
-> diff --git a/samples/livepatch/Makefile b/samples/livepatch/Makefile
-> index 2472ce39a18d..9705df7f9a86 100644
-> --- a/samples/livepatch/Makefile
-> +++ b/samples/livepatch/Makefile
-> @@ -1,3 +1,4 @@
-> +LIVEPATCH_livepatch-sample.o := y
->  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-sample.o
->  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-mod.o
->  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-fix1.o
-
-We should eventually add the same flag even for the rest of samples.
-
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index fd03d60f6c5a..1e28ad21314c 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -247,6 +247,11 @@ cmd_gen_ksymdeps = \
->  	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
->  endif
->  
-> +ifdef CONFIG_LIVEPATCH
-> +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o),			\
-> +	$(shell touch $(MODVERDIR)/$(basetarget).livepatch))
-> +endif
-> +
->  define rule_cc_o_c
->  	$(call cmd,checksrc)
->  	$(call cmd_and_fixdep,cc_o_c)
-> @@ -283,6 +288,7 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) F
->  	$(call if_changed_rule,cc_o_c)
->  	@{ echo $(@:.o=.ko); echo $@; \
->  	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
-> +	$(call cmd_livepatch)
->  
->  quiet_cmd_cc_lst_c = MKLST   $@
->        cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
-> -- 
-> 2.16.4
-> 
-
-Miroslav
+>
+> --
+> 2.20.0
+>
