@@ -1,137 +1,146 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it1-f195.google.com ([209.85.166.195]:54915 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbfBTXrG (ORCPT
+Received: from mail-it1-f194.google.com ([209.85.166.194]:55119 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725804AbfBUAEv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Feb 2019 18:47:06 -0500
-Received: by mail-it1-f195.google.com with SMTP id f10so19753846ita.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Feb 2019 15:47:05 -0800 (PST)
+        Wed, 20 Feb 2019 19:04:51 -0500
+Received: by mail-it1-f194.google.com with SMTP id f10so19838916ita.4
+        for <linux-kbuild@vger.kernel.org>; Wed, 20 Feb 2019 16:04:50 -0800 (PST)
 MIME-Version: 1.0
-References: <20190219214940.391081-1-arnd@arndb.de> <CAAeHK+xSpsu0tNmeq0wKXfT=0HuORnvU+XzLswDzhbtfZVa4Hw@mail.gmail.com>
- <CAK8P3a1NfHohd1xT7iHK85L2PGnD95RJvwFi-2cWrFpipQzqwg@mail.gmail.com>
- <b109ad0d-6995-8ca2-5426-7e2627d2032c@virtuozzo.com> <CAK8P3a0tg1WRLK=fs9S+X4TPB7sR55ZsjMbBVX07AtAfguXCsw@mail.gmail.com>
- <CAKwvOd=XrNNb=r3qgsT8O6JNzL4hg4pqfJJFcY2DzA0Ooc=E3w@mail.gmail.com>
- <20190220184408.GG9878@sirena.org.uk> <CAKwvOdne3aE5bUsQF-2C-L2Xezqq9qb=NqF8FA+B7nvqXKAXFA@mail.gmail.com>
- <CAK8P3a1pop4WqWxV=-R4n1Lh3FYG0mb4iJk4=saq6CgzpsPe4A@mail.gmail.com>
- <CAK8P3a0z7Y-uLgc8pWrdt712ic4R2nLbceg_zTCAC=ctG9LK9Q@mail.gmail.com> <CAN=P9pi1J8fORxyp9H4WiEWWDANj0EmFOVGttDMPthUavToHBQ@mail.gmail.com>
-In-Reply-To: <CAN=P9pi1J8fORxyp9H4WiEWWDANj0EmFOVGttDMPthUavToHBQ@mail.gmail.com>
-From: Kostya Serebryany <kcc@google.com>
-Date: Wed, 20 Feb 2019 15:46:51 -0800
-Message-ID: <CAN=P9pi08jaq0jbFcDssBfw0QrX7AnJfgwCvP5zO0Zf6atFEag@mail.gmail.com>
-Subject: Re: [PATCH] kasan: turn off asan-stack for clang-8 and earlier
-Content-Type: text/plain; charset="UTF-8"
+References: <1547706826-16833-1-git-send-email-yamada.masahiro@socionext.com>
+ <CAKwvOdkzSTyiiBmpwGFj6K=1Ang6nsVVahaQstk_GkPAcyBZOg@mail.gmail.com>
+ <CABC7LbQSxB=WuUz22uunWW=YahNd2-By8LKxLcZYo0L17P---A@mail.gmail.com> <CAK7LNATY8-hJ6QouGjO4wvsw8+W60HhLfNk60RZWyNz4s5fv_w@mail.gmail.com>
+In-Reply-To: <CAK7LNATY8-hJ6QouGjO4wvsw8+W60HhLfNk60RZWyNz4s5fv_w@mail.gmail.com>
+From: Jordan Rupprecht <rupprecht@google.com>
+Date: Wed, 20 Feb 2019 16:04:22 -0800
+Message-ID: <CABC7LbQ5ooG-K2Fyob1LonJG-=3s_wfYwpxr4A-u3gBKGsOL4Q@mail.gmail.com>
+Subject: Re: [RFC PATCH] kbuild: support llvm-ar
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="0000000000001f940505825c3945"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Mark Brown <broonie@kernel.org>, Evgenii Stepanov <eugenis@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Andrey Konovalov <andreyknvl@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>, Qian Cai <cai@lca.pw>, Alexander Potapenko <glider@google.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Christoph Lameter <cl@linux.com>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Dmitry Golovin <dima@golovin.in>, Stephen Rothwell <sfr@canb.auug.org.au>, Arnd Bergmann <arnd@arndb.de>, Nicholas Piggin <npiggin@gmail.com>, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
 
-On Wed, Feb 20, 2019 at 2:12 PM Kostya Serebryany <kcc@google.com> wrote:
+--0000000000001f940505825c3945
+Content-Type: text/plain; charset="UTF-8"
+
+Great to hear! If you discover anything later, let me know.
+
+On Tue, Feb 19, 2019 at 10:11 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> On Wed, Feb 20, 2019 at 1:40 PM Arnd Bergmann <arnd@arndb.de> wrote:
+> Hi Jordan,
+>
+>
+> On Thu, Feb 7, 2019 at 9:56 AM Jordan Rupprecht <rupprecht@google.com> wrote:
 > >
-> > On Wed, Feb 20, 2019 at 10:13 PM Arnd Bergmann <arnd@arndb.de> wrote:
-> > >
-> > > In the example in https://bugs.llvm.org/show_bug.cgi?id=38809#c12
-> > > (https://godbolt.org/z/ylsGSQ) there is no inlining, yet clang uses
-> > > over ten times as much stack space as gcc, for reasons I still
-> > > can't explain. My assumption right now is that the underlying bug
-> > > causes most of the problems with excessive stack usage in
-> > > allmodconfig kernels.
-> >
-> > Here is an even more minimal example:
-> >
-> > struct s { int i[5]; } f(void);
-> > void g(void) { f(); f();}
->
-> On this example I can see some stupidity that clang/asan is doing.
-> Let me try fixing it and see if it helps bigger cases.
-> Thanks for reducing the case!
->
-> This is the input we get in the asan instrumentation:
->
-> ; Function Attrs: noinline nounwind optnone sanitize_address uwtable
-> define dso_local void @g() #0 {
-> entry:
->   %tmp = alloca %struct.s, align 4  <<<<<<<<<<<<<<<<<<<<<<<
->   %tmp1 = alloca %struct.s, align 4
->   %0 = bitcast %struct.s* %tmp to i8*
->   call void @llvm.lifetime.start.p0i8(i64 20, i8* %0) #3
->   call void @f(%struct.s* sret %tmp)
->   %1 = bitcast %struct.s* %tmp to i8* <<<<<<<<<<<<<<<<<<<<<
->   call void @llvm.lifetime.end.p0i8(i64 20, i8* %1) #3
->   %2 = bitcast %struct.s* %tmp1 to i8*
->   call void @llvm.lifetime.start.p0i8(i64 20, i8* %2) #3  <<<<<<<<<<<<<
->   call void @f(%struct.s* sret %tmp1)
->   %3 = bitcast %struct.s* %tmp1 to i8*
->   call void @llvm.lifetime.end.p0i8(i64 20, i8* %3) #3
->   ret void
-> }
-
-Err.. taking my words back.
-These allocas *are* used other then in lifetime markers, since they
-are passed to f() as 'sret'.
-And we can not drop instrumentation for such allocas. Example:
-
-static volatile int zero = 0;
-typedef struct {
-  int ar[5];
-} S;
-S foo() {
-  S s;
-  s.ar[zero + 6] = 42;
-  return s;
-}
-int main(int argc, char **argv) {
-  S s = foo();
-  return s.ar[argc];
-}
-
-% clang -g  -O1  -fsanitize=address  sret.c && ./a.out
-
-==5822==ERROR: AddressSanitizer: stack-buffer-overflow on address
-0x7ffcad027f78 at pc 0x0000004f878d bp 0x7ffcad027f20 sp
-0x7ffcad027f18
-WRITE of size 4 at 0x7ffcad027f78 thread T0
-    #0 0x4f878c in foo sret.c:7:18
-    #1 0x4f8838 in main sret.c:11:9
-Address 0x7ffcad027f78 is located in stack of thread T0 at offset 56 in frame
-    #0 0x4f879f in main sret.c:10
-
-  This frame has 1 object(s):
-    [32, 52) 's' (line 11) <== Memory access at offset 56 overflows
-this variable
-
-Here we have a struct return that needs to be instrumented inside main
-so that a buffer overflow in foo() is detected.
-
-Now, I am also not confident that the reduced case reflects the real problem.
-
---kcc
-
-
-
-
-
-
-
-
-
->
-> the stack variables are not *really* used, but since they are "used"
-> inside the lifetime markers they are not eliminated by asan,
-> and so asan instruments them, after which no one can remove them any more...
+> > I have a patch up for review that fixes the second case of chopping
+> > off the directory when nesting thin archives:
+> > https://reviews.llvm.org/D57842. I'll commit it tomorrow if there are
+> > no more comments.
 >
 >
+> Sorry for late reply.
+>
+> Now I tested the latest llvm-ar, and it worked perfectly for kbuild.
+> Thanks for your work!
 >
 >
-> >
-> > https://godbolt.org/z/d_KWkh
-> >
-> > It's clear that clang does /something/ here when asan-stack=1 is
-> > set, but I fail to see what it is, or why that is necessary.
-> >
-> > The output of clang with asan-stack=0 is the expected
-> > code, and basically identical to what gcc produces with or
-> > without asan-stack.
-> >
-> >       Arnd
+> --
+> Best Regards
+> Masahiro Yamada
+
+--0000000000001f940505825c3945
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIS7QYJKoZIhvcNAQcCoIIS3jCCEtoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ghBTMIIEXDCCA0SgAwIBAgIOSBtqDm4P/739RPqw/wcwDQYJKoZIhvcNAQELBQAwZDELMAkGA1UE
+BhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYtc2ExOjA4BgNVBAMTMUdsb2JhbFNpZ24gUGVy
+c29uYWxTaWduIFBhcnRuZXJzIENBIC0gU0hBMjU2IC0gRzIwHhcNMTYwNjE1MDAwMDAwWhcNMjEw
+NjE1MDAwMDAwWjBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEiMCAG
+A1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBALR23lKtjlZW/17kthzYcMHHKFgywfc4vLIjfq42NmMWbXkNUabIgS8KX4PnIFsTlD6F
+GO2fqnsTygvYPFBSMX4OCFtJXoikP2CQlEvO7WooyE94tqmqD+w0YtyP2IB5j4KvOIeNv1Gbnnes
+BIUWLFxs1ERvYDhmk+OrvW7Vd8ZfpRJj71Rb+QQsUpkyTySaqALXnyztTDp1L5d1bABJN/bJbEU3
+Hf5FLrANmognIu+Npty6GrA6p3yKELzTsilOFmYNWg7L838NS2JbFOndl+ce89gM36CW7vyhszi6
+6LqqzJL8MsmkP53GGhf11YMP9EkmawYouMDP/PwQYhIiUO0CAwEAAaOCASIwggEeMA4GA1UdDwEB
+/wQEAwIBBjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwEgYDVR0TAQH/BAgwBgEB/wIB
+ADAdBgNVHQ4EFgQUyzgSsMeZwHiSjLMhleb0JmLA4D8wHwYDVR0jBBgwFoAUJiSSix/TRK+xsBtt
+r+500ox4AAMwSwYDVR0fBEQwQjBAoD6gPIY6aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9ncy9n
+c3BlcnNvbmFsc2lnbnB0bnJzc2hhMmcyLmNybDBMBgNVHSAERTBDMEEGCSsGAQQBoDIBKDA0MDIG
+CCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzANBgkqhkiG
+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
+QAYIKwYBBQUHMAKGNGh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzaHZzbWlt
+ZWNhMS5jcnQwHQYDVR0OBBYEFEzRyLdWAOnD/r5t2oxq71oqZrNuMB8GA1UdIwQYMBaAFMs4ErDH
+mcB4koyzIZXm9CZiwOA/MEwGA1UdIARFMEMwQQYJKwYBBAGgMgEoMDQwMgYIKwYBBQUHAgEWJmh0
+dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMDsGA1UdHwQ0MDIwMKAuoCyGKmh0
+dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NodnNtaW1lY2ExLmNybDAOBgNVHQ8BAf8EBAMCBaAw
+HQYDVR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBCwUAA4IBAQBJgcZICXH9
+7aPN8CWWfdcTGvINItDpd2QzUxJ1QgRSypCd0qXBevDhmEyJiSe2yK3G9ZTjxdY3jweCFpmNoaSG
+exz1OSbBBkqR4yVvoaU7vTGg/h7aE0B38UdyLSQpjMaaj/m62h1uZPDFLpzm0W3ZHXvVgcElmR6P
+2E3v71/17oqehAv6tOyHq4qpghOkAWbGTS0lArjiRSkP5AtKQHaDqmrUSekn4bO1sx4GcS8C+oWP
+tcQ9TZC94SbqpVBmGV0lm58buObjoGy/YDIuffcRzv2edbQRwJ7iFlfGatsbgalYzfRTRNS56BOm
+GpqFnR+eKUmZe66ThjUoY1QtIKVjMYICXjCCAloCAQEwXDBMMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEiMCAGA1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMQIM
+Z45BjBNFrislm5V5MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCC03tMQ6nd63qP5
+QOgNg13JDkjyDoozQ+DxjX8QcukqKDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3
+DQEJBTEPFw0xOTAyMjEwMDA0NTBaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCG
+SAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEB
+BzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEApw+b9z7qPayB5K6JcoJ9kN5WaO6y0yob
+HJkQLi7GYk9r4ysqQG96CMV9rTYNZXPgLNxGTk/mapX0Zl5bjZM4kNOFHYETyD0ueuo3P0VUH+dH
+f2oc4vrlMtGa1VAAtXtWmKZm5LNTdxy+hVuBHodlE8oTMhCs3/Lo3EElXAkf2ACBRC+LsHxBAF6B
+i1EPwzXwtLcC54QICyRkCj5UnaBWpDldwgAeE8tsbpgtx335afTi2CDA6xhI6IejenACAjgmobS0
+lFg/4n0ktCCs+dbjeVJ7XAxUcbaa1/aNBcVU9SLyJntbGewPLDeYjO7RoL84++FA/O/n8plVoBt8
+MBsOLw==
+--0000000000001f940505825c3945--
