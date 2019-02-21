@@ -1,168 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:46464 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726121AbfBUA0x (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:25464 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726974AbfBUEPI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Feb 2019 19:26:53 -0500
-Received: by mail-pg1-f195.google.com with SMTP id 196so917116pgf.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Feb 2019 16:26:52 -0800 (PST)
-From: Daniel Axtens <dja@axtens.net>
-Subject: Re: [PATCH v2] powerpc/prom_init: add __init markers to all functions
-In-Reply-To: <1550641996-21937-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1550641996-21937-1-git-send-email-yamada.masahiro@socionext.com>
-Date: Thu, 21 Feb 2019 11:26:47 +1100
-Message-ID: <87d0nm9ebc.fsf@linkitivity.dja.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Wed, 20 Feb 2019 23:15:08 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: compute false-positive -Wmaybe-uninitialized cases in Kconfig
+Date: Thu, 21 Feb 2019 13:13:38 +0900
+Message-Id: <1550722418-9189-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Michael Ellerman <mpe@ellerman.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>, Mathieu Malaterre <malat@debian.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <natechancellor@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, Ingo Molnar <mingo@redhat.com>
 
-Hi Masahiro,
+Since -Wmaybe-uninitialized was introduced by GCC 4.7, we have patched
+various false positives:
 
-> It is fragile to rely on the compiler's optimization to avoid the
-> section mismatch. Some functions may not be necessarily inlined
-> when the compiler's inlining heuristic changes.
->
-> Add __init markers consistently.
->
+ - commit e74fc973b6e5 ("Turn off -Wmaybe-uninitialized when building
+   with -Os") turned off this option for -Os.
 
-Are you doing this with some sort of static analysis, or manually?
+ - commit 815eb71e7149 ("Kbuild: disable 'maybe-uninitialized' warning
+   for CONFIG_PROFILE_ALL_BRANCHES") turned off this option for
+   CONFIG_PROFILE_ALL_BRANCHES
 
-Regards,
-Daniel
+ - commit a76bcf557ef4 ("Kbuild: enable -Wmaybe-uninitialized warning
+   for "make W=1"") turned off this option for GCC < 4.9
+   Arnd provided more explanation in https://lkml.org/lkml/2017/3/14/903
 
-> As for prom_getprop() and prom_getproplen(), they are marked as
-> 'inline', so inlining is guaranteed because PowerPC never enables
-> CONFIG_OPTIMIZE_INLINING. However, it would be better to leave the
-> inlining decision to the compiler. I replaced 'inline' with __init.
-> I added __maybe_unused to prom_getproplen() because it is currently
-> relying on the side-effect of 'inline'; GCC does not report
-> -Wunused-function warnings for functions with 'inline' marker.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
-> Changes in v2:
->   - Add __maybe_unsed to prom_getproplen()
->   - Add __init to enter_prom() as well
->
->  arch/powerpc/kernel/prom_init.c | 29 +++++++++++++++--------------
->  1 file changed, 15 insertions(+), 14 deletions(-)
->
-> diff --git a/arch/powerpc/kernel/prom_init.c b/arch/powerpc/kernel/prom_init.c
-> index f33ff41..1bad0ac 100644
-> --- a/arch/powerpc/kernel/prom_init.c
-> +++ b/arch/powerpc/kernel/prom_init.c
-> @@ -138,9 +138,9 @@ extern void __start(unsigned long r3, unsigned long r4, unsigned long r5,
->  		    unsigned long r9);
->  
->  #ifdef CONFIG_PPC64
-> -extern int enter_prom(struct prom_args *args, unsigned long entry);
-> +extern int __init enter_prom(struct prom_args *args, unsigned long entry);
->  #else
-> -static inline int enter_prom(struct prom_args *args, unsigned long entry)
-> +static int __init enter_prom(struct prom_args *args, unsigned long entry)
->  {
->  	return ((int (*)(struct prom_args *))entry)(args);
->  }
-> @@ -501,19 +501,20 @@ static int __init prom_next_node(phandle *nodep)
->  	}
->  }
->  
-> -static inline int prom_getprop(phandle node, const char *pname,
-> +static int __init prom_getprop(phandle node, const char *pname,
->  			       void *value, size_t valuelen)
->  {
->  	return call_prom("getprop", 4, 1, node, ADDR(pname),
->  			 (u32)(unsigned long) value, (u32) valuelen);
->  }
->  
-> -static inline int prom_getproplen(phandle node, const char *pname)
-> +static int __init __maybe_unused prom_getproplen(phandle node,
-> +						 const char *pname)
->  {
->  	return call_prom("getproplen", 2, 1, node, ADDR(pname));
->  }
->  
-> -static void add_string(char **str, const char *q)
-> +static void __init add_string(char **str, const char *q)
->  {
->  	char *p = *str;
->  
-> @@ -523,7 +524,7 @@ static void add_string(char **str, const char *q)
->  	*str = p;
->  }
->  
-> -static char *tohex(unsigned int x)
-> +static char __init *tohex(unsigned int x)
->  {
->  	static const char digits[] __initconst = "0123456789abcdef";
->  	static char result[9] __prombss;
-> @@ -570,7 +571,7 @@ static int __init prom_setprop(phandle node, const char *nodename,
->  #define islower(c)	('a' <= (c) && (c) <= 'z')
->  #define toupper(c)	(islower(c) ? ((c) - 'a' + 'A') : (c))
->  
-> -static unsigned long prom_strtoul(const char *cp, const char **endp)
-> +static unsigned long __init prom_strtoul(const char *cp, const char **endp)
->  {
->  	unsigned long result = 0, base = 10, value;
->  
-> @@ -595,7 +596,7 @@ static unsigned long prom_strtoul(const char *cp, const char **endp)
->  	return result;
->  }
->  
-> -static unsigned long prom_memparse(const char *ptr, const char **retptr)
-> +static unsigned long __init prom_memparse(const char *ptr, const char **retptr)
->  {
->  	unsigned long ret = prom_strtoul(ptr, retptr);
->  	int shift = 0;
-> @@ -2924,7 +2925,7 @@ static void __init fixup_device_tree_pasemi(void)
->  	prom_setprop(iob, name, "device_type", "isa", sizeof("isa"));
->  }
->  #else	/* !CONFIG_PPC_PASEMI_NEMO */
-> -static inline void fixup_device_tree_pasemi(void) { }
-> +static void __init fixup_device_tree_pasemi(void) { }
->  #endif
->  
->  static void __init fixup_device_tree(void)
-> @@ -2986,15 +2987,15 @@ static void __init prom_check_initrd(unsigned long r3, unsigned long r4)
->  
->  #ifdef CONFIG_PPC64
->  #ifdef CONFIG_RELOCATABLE
-> -static void reloc_toc(void)
-> +static void __init reloc_toc(void)
->  {
->  }
->  
-> -static void unreloc_toc(void)
-> +static void __init unreloc_toc(void)
->  {
->  }
->  #else
-> -static void __reloc_toc(unsigned long offset, unsigned long nr_entries)
-> +static void __init __reloc_toc(unsigned long offset, unsigned long nr_entries)
->  {
->  	unsigned long i;
->  	unsigned long *toc_entry;
-> @@ -3008,7 +3009,7 @@ static void __reloc_toc(unsigned long offset, unsigned long nr_entries)
->  	}
->  }
->  
-> -static void reloc_toc(void)
-> +static void __init reloc_toc(void)
->  {
->  	unsigned long offset = reloc_offset();
->  	unsigned long nr_entries =
-> @@ -3019,7 +3020,7 @@ static void reloc_toc(void)
->  	mb();
->  }
->  
-> -static void unreloc_toc(void)
-> +static void __init unreloc_toc(void)
->  {
->  	unsigned long offset = reloc_offset();
->  	unsigned long nr_entries =
-> -- 
-> 2.7.4
+I think this looks better by shifting the logic from Makefile to Kconfig.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Makefile             | 10 +++-------
+ init/Kconfig         | 17 +++++++++++++++++
+ kernel/trace/Kconfig |  1 +
+ 3 files changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1bb0535..b21aa2e3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -656,17 +656,13 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, int-in-bool-context)
+ 
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+ KBUILD_CFLAGS	+= $(call cc-option,-Oz,-Os)
+-KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
+-else
+-ifdef CONFIG_PROFILE_ALL_BRANCHES
+-KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)
+ else
+ KBUILD_CFLAGS   += -O2
+ endif
+-endif
+ 
+-KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
+-			$(call cc-disable-warning,maybe-uninitialized,))
++ifdef CONFIG_CC_DISABLE_WARN_MAYBE_UNINITIALIZED
++KBUILD_CFLAGS   += -Wno-maybe-uninitialized
++endif
+ 
+ # Tell gcc to never replace conditional load with a non-conditional one
+ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+diff --git a/init/Kconfig b/init/Kconfig
+index c9386a3..1f05a88 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -26,6 +26,22 @@ config CLANG_VERSION
+ config CC_HAS_ASM_GOTO
+ 	def_bool $(success,$(srctree)/scripts/gcc-goto.sh $(CC))
+ 
++config CC_HAS_WARN_MAYBE_UNINITIALIZED
++	def_bool $(cc-option,-Wmaybe-uninitialized)
++	help
++	  GCC >= 4.7 supports this option.
++
++config CC_DISABLE_WARN_MAYBE_UNINITIALIZED
++	bool
++	depends on CC_HAS_WARN_MAYBE_UNINITIALIZED
++	default CC_IS_GCC && GCC_VERSION < 40900  # unreliable for GCC < 4.9
++	help
++	  GCC's -Wmaybe-uninitialized is not reliable by definition.
++	  Lots of false positive warnings are produced in some cases.
++
++	  If this option is enabled, -Wno-maybe-uninitialzed is passed
++	  to the compiler to suppress maybe-uninitialized warnings.
++
+ config CONSTRUCTORS
+ 	bool
+ 	depends on !UML
+@@ -1113,6 +1129,7 @@ config CC_OPTIMIZE_FOR_PERFORMANCE
+ 
+ config CC_OPTIMIZE_FOR_SIZE
+ 	bool "Optimize for size"
++	imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
+ 	help
+ 	  Enabling this option will pass "-Os" instead of "-O2" to
+ 	  your compiler resulting in a smaller kernel.
+diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
+index fa8b1fe..8bd1d6d 100644
+--- a/kernel/trace/Kconfig
++++ b/kernel/trace/Kconfig
+@@ -370,6 +370,7 @@ config PROFILE_ANNOTATED_BRANCHES
+ config PROFILE_ALL_BRANCHES
+ 	bool "Profile all if conditionals" if !FORTIFY_SOURCE
+ 	select TRACE_BRANCH_PROFILING
++	imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
+ 	help
+ 	  This tracer profiles all branch conditions. Every if ()
+ 	  taken in the kernel is recorded whether it hit or miss.
+-- 
+2.7.4
