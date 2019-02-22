@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:53327 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:53324 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726303AbfBVHkW (ORCPT
+        with ESMTP id S1726313AbfBVHkW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 22 Feb 2019 02:40:22 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 3/6] kbuild: remove empty rules for makefiles
-Date: Fri, 22 Feb 2019 16:40:08 +0900
-Message-Id: <1550821211-30324-3-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 5/6] kbuild: invoke syncconfig if include/config/auto.conf.cmd is missing
+Date: Fri, 22 Feb 2019 16:40:10 +0900
+Message-Id: <1550821211-30324-5-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1550821211-30324-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1550821211-30324-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,70 +15,72 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The previous commit made 'MAKEFLAGS += -rR' effective in the top
-Makefile regardless of O= option, GNU Make versions.
+If include/config/auto.conf.cmd is lost for some reasons, it is not
+self-healing, so the top Makefile misses to run syncconfig.
+Move include/config/auto.conf.cmd to the target side.
 
-The top Makefile does not need to cancel implicit rules for makefiles.
+I used a pattern rule instead of a normal rule here although it is
+a bit gross.
 
-There is still one place where an empty rule is useful. Since -rR is
-effective only after sub-make, GNU Make would try implicit rules to
-update the top Makefile. Although it is not a big overhead, cancel it
-just in case.
+If the rule were written with a normal rule like this,
+
+  include/config/auto.conf \
+  include/config/auto.conf.cmd \
+  include/config/tristate.conf: $(KCONFIG_CONFIG)
+          $(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
+
+... syncconfig would be executed per target.
+
+Using a pattern rule makes sure that syncconfig is executed just once
+because Make assumes the recipe will create all of the targets.
+
+Here is a quote from the GNU Make manual [1]:
+
+"Pattern rules may have more than one target. Unlike normal rules,
+this does not act as many different rules with the same prerequisites
+and recipe. If a pattern rule has multiple targets, make knows that
+the rule's recipe is responsible for making all of the targets. The
+recipe is executed only once to make all the targets. When searching
+for a pattern rule to match a target, the target patterns of a rule
+other than the one that matches the target in need of a rule are
+incidental: make worries only about giving a recipe and prerequisites
+to the file presently in question. However, when this file's recipe is
+run, the other targets are marked as having been updated themselves."
+
+[1]: https://www.gnu.org/software/make/manual/html_node/Pattern-Intro.html
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v2:
-  - Revive  empty rule for
-    $(KCONFIG_CONFIG) include/config/auto.conf.cmd
+  - New patch
 
- Makefile | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ Makefile | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index f0bc078..538a4f1 100644
+index 4d8516e..aa9ff68 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -37,6 +37,10 @@ ifneq ($(sub-make-done),1)
- # (this increases performance and avoids hard-to-debug behaviour)
- MAKEFLAGS += -rR
+@@ -629,12 +629,17 @@ ifeq ($(may-sync-config),1)
+ -include include/config/auto.conf.cmd
  
-+# 'MAKEFLAGS += -rR' does not become immediately effective for old
-+# GNU Make versions. Cancel implicit rules for this Makefile.
-+$(lastword $(MAKEFILE_LIST)): ;
-+
- # Avoid funny character set dependencies
- unexport LC_ALL
- LC_COLLATE=C
-@@ -120,9 +124,6 @@ ifeq ("$(origin O)", "command line")
-   KBUILD_OUTPUT := $(O)
- endif
+ # To avoid any implicit rule to kick in, define an empty command
+-$(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
++$(KCONFIG_CONFIG): ;
  
--# Cancel implicit rules on top Makefile
--$(CURDIR)/Makefile Makefile: ;
--
- ifneq ($(words $(subst :, ,$(CURDIR))), 1)
-   $(error main directory cannot contain spaces nor colons)
- endif
-@@ -303,8 +304,6 @@ __build_one_by_one:
- 
+ # The actual configuration files used during the build are stored in
+ # include/generated/ and include/config/. Update them if .config is newer than
+ # include/config/auto.conf (which mirrors .config).
+-include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
++#
++# This exploits the 'multi-target pattern rule' trick.
++# The syncconfig should be executed only once to make all the targets.
++include/config/auto.% \
++include/config/auto.%.cmd \
++include/config/tristate.%: $(KCONFIG_CONFIG)
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
  else
- 
--# We need some generic definitions (do not try to remake the file).
--scripts/Kbuild.include: ;
- include scripts/Kbuild.include
- 
- # Read KERNELRELEASE from include/config/kernel.release (if it exists)
-@@ -1764,9 +1763,7 @@ cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
- # read saved command lines for existing targets
- existing-targets := $(wildcard $(sort $(targets)))
- 
--cmd_files := $(foreach f,$(existing-targets),$(dir $(f)).$(notdir $(f)).cmd)
--$(cmd_files): ;	# Do not try to update included dependency files
---include $(cmd_files)
-+-include $(foreach f,$(existing-targets),$(dir $(f)).$(notdir $(f)).cmd)
- 
- endif   # ifeq ($(config-targets),1)
- endif   # ifeq ($(mixed-targets),1)
+ # External modules and some install targets need include/generated/autoconf.h
 -- 
 2.7.4
