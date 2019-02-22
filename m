@@ -1,64 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from imap.cs.msu.ru ([188.44.42.39]:59044 "EHLO mail.cs.msu.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726893AbfBUWTg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 Feb 2019 17:19:36 -0500
-From: Arseny Maslennikov <ar@cs.msu.ru>
-Date: Fri, 22 Feb 2019 00:58:58 +0300
-Message-Id: <20190221215901.23970-2-ar@cs.msu.ru>
-In-Reply-To: <20190221215901.23970-1-ar@cs.msu.ru>
-References: <20190221215901.23970-1-ar@cs.msu.ru>
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:51255 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726215AbfBVAaL (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 21 Feb 2019 19:30:11 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [PATCH] scripts/kconfig/Makefile: use KCONFIG_CONFIG if set
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 22 Feb 2019 09:29:27 +0900
+Message-ID: <CAK7LNATwe3NwhApYFQyCob4+xSrr4a9zUY34EX-QN8pWoocvoA@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v5.0(-rc8)
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Arseny Maslennikov <ar@cs.msu.ru>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Petr Vorel <pvorel@suse.cz>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-In a kernel source tree:
+Hi Linus,
 
-% make mrproper
-% make KCONFIG_CONFIG=.myconfig kvmconfig'
-  HOSTCC  scripts/basic/fixdep
-  HOSTCC  scripts/kconfig/conf.o
-  HOSTCC  scripts/kconfig/confdata.o
-  HOSTCC  scripts/kconfig/expr.o
-  HOSTCC  scripts/kconfig/symbol.o
-  HOSTCC  scripts/kconfig/preprocess.o
-  LEX     scripts/kconfig/zconf.lex.c
-  YACC    scripts/kconfig/zconf.tab.h
-  HOSTCC  scripts/kconfig/zconf.lex.o
-  YACC    scripts/kconfig/zconf.tab.c
-  HOSTCC  scripts/kconfig/zconf.tab.o
-  HOSTLD  scripts/kconfig/conf
-The base file '.config' does not exist.  Exit.
-make[1]: *** [scripts/kconfig/Makefile:96: kvm_guest.config] Error 1
-make: *** [Makefile:538: kvmconfig] Error 2
+Please pull a little more Kbuild fixes.
 
-Essentially `make kvmconfig' (and probably other similar targets)
-did ignore KCONFIG_CONFIG set to a different filename.
+Thanks.
 
-If KCONFIG_CONFIG is set, use it; otherwise behave as if it was set
-to `.config'.
 
-Signed-off-by: Arseny Maslennikov <ar@cs.msu.ru>
----
- scripts/kconfig/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 181973509a05..1c7ac07def4d 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -93,7 +93,7 @@ configfiles=$(wildcard $(srctree)/kernel/configs/$@ $(srctree)/arch/$(SRCARCH)/c
- 
- %.config: $(obj)/conf
- 	$(if $(call configfiles),, $(error No configuration exists for this target on this architecture))
--	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m .config $(configfiles)
-+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m $(KCONFIG_CONFIG) $(configfiles)
- 	+$(Q)yes "" | $(MAKE) -f $(srctree)/Makefile oldconfig
- 
- PHONY += kvmconfig
+
+The following changes since commit f17b5f06cb92ef2250513a1e154c47b78df07d40:
+
+  Linux 5.0-rc4 (2019-01-27 15:18:05 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v5.0-2
+
+for you to fetch changes up to 207a369e3c085799e7836221f64e7a7329985fb6:
+
+  sh: fix build error for invisible CONFIG_BUILTIN_DTB_SOURCE
+(2019-02-13 23:29:42 +0900)
+
+----------------------------------------------------------------
+Kbuild fixes for v5.0 (2nd)
+
+ - fix scripts/kallsyms.c to correctly check too long symbol names
+
+ - fix sh build error for the combination of CONFIG_OF_EARLY_FLATTREE=y
+   and CONFIG_USE_BUILTIN_DTB=n
+
+----------------------------------------------------------------
+Eugene Loh (1):
+      kallsyms: Handle too long symbols in kallsyms.c
+
+Masahiro Yamada (1):
+      sh: fix build error for invisible CONFIG_BUILTIN_DTB_SOURCE
+
+ arch/sh/boot/dts/Makefile | 2 +-
+ scripts/kallsyms.c        | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+
 -- 
-2.20.1
+Best Regards
+Masahiro Yamada
