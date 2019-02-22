@@ -1,63 +1,136 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:51255 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726215AbfBVAaL (ORCPT
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:33443 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726067AbfBVAxJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 Feb 2019 19:30:11 -0500
+        Thu, 21 Feb 2019 19:53:09 -0500
+Received: by mail-pl1-f195.google.com with SMTP id y10so272149plp.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 21 Feb 2019 16:53:09 -0800 (PST)
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 22 Feb 2019 09:29:27 +0900
-Message-ID: <CAK7LNATwe3NwhApYFQyCob4+xSrr4a9zUY34EX-QN8pWoocvoA@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v5.0(-rc8)
+References: <1550722418-9189-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1550722418-9189-1-git-send-email-yamada.masahiro@socionext.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Thu, 21 Feb 2019 16:52:55 -0800
+Message-ID: <CAKwvOd=YBsupApffP_5QUB5dbQr8k-43DgKhckqkcsGiuXK=MA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: compute false-positive -Wmaybe-uninitialized
+ cases in Kconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Ingo Molnar <mingo@redhat.com>
 
-Hi Linus,
+On Wed, Feb 20, 2019 at 8:14 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> Since -Wmaybe-uninitialized was introduced by GCC 4.7, we have patched
+> various false positives:
+>
+>  - commit e74fc973b6e5 ("Turn off -Wmaybe-uninitialized when building
+>    with -Os") turned off this option for -Os.
+>
+>  - commit 815eb71e7149 ("Kbuild: disable 'maybe-uninitialized' warning
+>    for CONFIG_PROFILE_ALL_BRANCHES") turned off this option for
+>    CONFIG_PROFILE_ALL_BRANCHES
+>
+>  - commit a76bcf557ef4 ("Kbuild: enable -Wmaybe-uninitialized warning
+>    for "make W=1"") turned off this option for GCC < 4.9
+>    Arnd provided more explanation in https://lkml.org/lkml/2017/3/14/903
+>
+> I think this looks better by shifting the logic from Makefile to Kconfig.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Please pull a little more Kbuild fixes.
+I verified that mainline+this patch did not regression arm64
+allyesconfig clang build.
+Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+Thanks for the patch! Would you mind adding a link tag to:
+Link: https://github.com/ClangBuiltLinux/linux/issues/350
 
-Thanks.
-
-
-
-
-The following changes since commit f17b5f06cb92ef2250513a1e154c47b78df07d40:
-
-  Linux 5.0-rc4 (2019-01-27 15:18:05 -0800)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v5.0-2
-
-for you to fetch changes up to 207a369e3c085799e7836221f64e7a7329985fb6:
-
-  sh: fix build error for invisible CONFIG_BUILTIN_DTB_SOURCE
-(2019-02-13 23:29:42 +0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v5.0 (2nd)
-
- - fix scripts/kallsyms.c to correctly check too long symbol names
-
- - fix sh build error for the combination of CONFIG_OF_EARLY_FLATTREE=y
-   and CONFIG_USE_BUILTIN_DTB=n
-
-----------------------------------------------------------------
-Eugene Loh (1):
-      kallsyms: Handle too long symbols in kallsyms.c
-
-Masahiro Yamada (1):
-      sh: fix build error for invisible CONFIG_BUILTIN_DTB_SOURCE
-
- arch/sh/boot/dts/Makefile | 2 +-
- scripts/kallsyms.c        | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> ---
+>
+>  Makefile             | 10 +++-------
+>  init/Kconfig         | 17 +++++++++++++++++
+>  kernel/trace/Kconfig |  1 +
+>  3 files changed, 21 insertions(+), 7 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 1bb0535..b21aa2e3 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -656,17 +656,13 @@ KBUILD_CFLAGS     += $(call cc-disable-warning, int-in-bool-context)
+>
+>  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+>  KBUILD_CFLAGS  += $(call cc-option,-Oz,-Os)
+> -KBUILD_CFLAGS  += $(call cc-disable-warning,maybe-uninitialized,)
+> -else
+> -ifdef CONFIG_PROFILE_ALL_BRANCHES
+> -KBUILD_CFLAGS  += -O2 $(call cc-disable-warning,maybe-uninitialized,)
+>  else
+>  KBUILD_CFLAGS   += -O2
+>  endif
+> -endif
+>
+> -KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
+> -                       $(call cc-disable-warning,maybe-uninitialized,))
+> +ifdef CONFIG_CC_DISABLE_WARN_MAYBE_UNINITIALIZED
+> +KBUILD_CFLAGS   += -Wno-maybe-uninitialized
+> +endif
+>
+>  # Tell gcc to never replace conditional load with a non-conditional one
+>  KBUILD_CFLAGS  += $(call cc-option,--param=allow-store-data-races=0)
+> diff --git a/init/Kconfig b/init/Kconfig
+> index c9386a3..1f05a88 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -26,6 +26,22 @@ config CLANG_VERSION
+>  config CC_HAS_ASM_GOTO
+>         def_bool $(success,$(srctree)/scripts/gcc-goto.sh $(CC))
+>
+> +config CC_HAS_WARN_MAYBE_UNINITIALIZED
+> +       def_bool $(cc-option,-Wmaybe-uninitialized)
+> +       help
+> +         GCC >= 4.7 supports this option.
+> +
+> +config CC_DISABLE_WARN_MAYBE_UNINITIALIZED
+> +       bool
+> +       depends on CC_HAS_WARN_MAYBE_UNINITIALIZED
+> +       default CC_IS_GCC && GCC_VERSION < 40900  # unreliable for GCC < 4.9
+> +       help
+> +         GCC's -Wmaybe-uninitialized is not reliable by definition.
+> +         Lots of false positive warnings are produced in some cases.
+> +
+> +         If this option is enabled, -Wno-maybe-uninitialzed is passed
+> +         to the compiler to suppress maybe-uninitialized warnings.
+> +
+>  config CONSTRUCTORS
+>         bool
+>         depends on !UML
+> @@ -1113,6 +1129,7 @@ config CC_OPTIMIZE_FOR_PERFORMANCE
+>
+>  config CC_OPTIMIZE_FOR_SIZE
+>         bool "Optimize for size"
+> +       imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
+>         help
+>           Enabling this option will pass "-Os" instead of "-O2" to
+>           your compiler resulting in a smaller kernel.
+> diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
+> index fa8b1fe..8bd1d6d 100644
+> --- a/kernel/trace/Kconfig
+> +++ b/kernel/trace/Kconfig
+> @@ -370,6 +370,7 @@ config PROFILE_ANNOTATED_BRANCHES
+>  config PROFILE_ALL_BRANCHES
+>         bool "Profile all if conditionals" if !FORTIFY_SOURCE
+>         select TRACE_BRANCH_PROFILING
+> +       imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
+>         help
+>           This tracer profiles all branch conditions. Every if ()
+>           taken in the kernel is recorded whether it hit or miss.
+> --
+> 2.7.4
+>
 
 
 -- 
-Best Regards
-Masahiro Yamada
+Thanks,
+~Nick Desaulniers
