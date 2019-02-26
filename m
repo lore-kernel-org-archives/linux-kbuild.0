@@ -1,48 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from heliosphere.sirena.org.uk ([172.104.155.198]:41850 "EHLO
-        heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728173AbfBYQxd (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 25 Feb 2019 11:53:33 -0500
-Date: Mon, 25 Feb 2019 16:53:14 +0000
-From: Mark Brown <broonie@kernel.org>
+Received: from relay.sw.ru ([185.231.240.75]:37852 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726553AbfBZQUk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 26 Feb 2019 11:20:40 -0500
 Subject: Re: [PATCH] [v2] kasan: turn off asan-stack for clang-8 and earlier
-Message-ID: <20190225165314.GC13898@sirena.org.uk>
 References: <20190222222950.3997333-1-arnd@arndb.de>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Message-ID: <6cf9d8ee-1dca-b886-4eaa-ce0c25bf6459@virtuozzo.com>
+Date: Tue, 26 Feb 2019 19:20:49 +0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="f0KYrhQ4vYSV2aJu"
-Content-Disposition: inline
 In-Reply-To: <20190222222950.3997333-1-arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Qian Cai <cai@lca.pw>, Kostya Serebryany <kcc@google.com>, Andrey Konovalov <andreyknvl@google.com>, Alexander Potapenko <glider@google.com>, linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Dmitry Vyukov <dvyukov@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Mark Brown <broonie@kernel.org>, Qian Cai <cai@lca.pw>, Kostya Serebryany <kcc@google.com>, Andrey Konovalov <andreyknvl@google.com>, Alexander Potapenko <glider@google.com>, linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org
 
 
---f0KYrhQ4vYSV2aJu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-On Fri, Feb 22, 2019 at 11:29:10PM +0100, Arnd Bergmann wrote:
+On 2/23/19 1:29 AM, Arnd Bergmann wrote:
 > Building an arm64 allmodconfig kernel with clang results in over 140 warnings
 > about overly large stack frames, the worst ones being:
+> 
+> drivers/gpu/drm/panel/panel-sitronix-st7789v.c:196:12: error: stack frame size of 20224 bytes in function 'st7789v_prepare'
+> drivers/video/fbdev/omap2/omapfb/displays/panel-tpo-td028ttec1.c:196:12: error: stack frame size of 13120 bytes in function 'td028ttec1_panel_enable'
+> drivers/usb/host/max3421-hcd.c:1395:1: error: stack frame size of 10048 bytes in function 'max3421_spi_thread'
+> drivers/net/wan/slic_ds26522.c:209:12: error: stack frame size of 9664 bytes in function 'slic_ds26522_probe'
+> drivers/crypto/ccp/ccp-ops.c:2434:5: error: stack frame size of 8832 bytes in function 'ccp_run_cmd'
+> drivers/media/dvb-frontends/stv0367.c:1005:12: error: stack frame size of 7840 bytes in function 'stv0367ter_algo'
+> 
+> None of these happen with gcc today, and almost all of these are the result
+> of a single known issue in llvm.  Hopefully it will eventually get fixed with
+> the clang-9 release.
+> 
+> In the meantime, the best idea I have is to turn off asan-stack for clang-8
+> and earlier, so we can produce a kernel that is safe to run.
+> 
+> I have posted three patches that address the frame overflow warnings that are
+> not addressed by turning off asan-stack, so in combination with this change,
+> we get much closer to a clean allmodconfig build, which in turn is necessary
+> to do meaningful build regression testing.
+> 
+> It is still possible to turn on the CONFIG_ASAN_STACK option on all versions
+> of clang, and it's always enabled for gcc, but when CONFIG_COMPILE_TEST is
+> set, the option remains invisible, so allmodconfig and randconfig builds
+> (which are normally done with a forced CONFIG_COMPILE_TEST) will still result
+> in a mostly clean build.
+> 
+> Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
+> Cc: Dmitry Vyukov <dvyukov@google.com>
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Qian Cai <cai@lca.pw>
+> Cc: Kostya Serebryany <kcc@google.com>
+> Cc: Andrey Konovalov <andreyknvl@google.com>
+> Link: https://bugs.llvm.org/show_bug.cgi?id=38809
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
---f0KYrhQ4vYSV2aJu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAlx0HXkACgkQJNaLcl1U
-h9DxnAf/V+F2ebTkIHA0IRg4ScHkk50z/xCZpeaBXpk9t8DTI49Ih9Vd0DvsiHik
-VWhvyGOVDr5Rth/JKnY22vICnYzL6IspKHLOtNeGamI7xvgT17dVpoiijht7vlyX
-/tzpD8c++a8DcpEkSmMAJSKX3fJpPbljmzyRNCpAVy97WYUBq6wfvpf/KT8b3PIe
-PdZxRoBSMPcGzHi2rD/6Pl7xdXcgavH0ywMEdgC7joTD62MHOl7Xv3jN26gRTiYJ
-4ynuCsf8pdM3SaDp1f2eJqgD/Jgo0UKmRjmj1B4qcmVMVqxn97TNBSEC2y2CNBMw
-ppDkjsJn6uLnP8k9gZSqt+I1MczF7w==
-=2CZ+
------END PGP SIGNATURE-----
-
---f0KYrhQ4vYSV2aJu--
+Acked-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
