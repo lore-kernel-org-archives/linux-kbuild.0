@@ -1,63 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay.sw.ru ([185.231.240.75]:37852 "EHLO relay.sw.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726553AbfBZQUk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Feb 2019 11:20:40 -0500
-Subject: Re: [PATCH] [v2] kasan: turn off asan-stack for clang-8 and earlier
-References: <20190222222950.3997333-1-arnd@arndb.de>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <6cf9d8ee-1dca-b886-4eaa-ce0c25bf6459@virtuozzo.com>
-Date: Tue, 26 Feb 2019 19:20:49 +0300
+Received: from perceval.ideasonboard.com ([213.167.242.64]:40702 "EHLO
+        perceval.ideasonboard.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726128AbfB0LcB (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 27 Feb 2019 06:32:01 -0500
+Reply-To: kieran.bingham@ideasonboard.com
+Subject: Re: [PATCH 1/5] scripts/gdb: delay generation of gdb constants.py
+References: <1550568787-18710-1-git-send-email-yamada.masahiro@socionext.com>
+From: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Message-ID: <67ed9090-2b9e-8e3f-e036-1e9f783cf523@ideasonboard.com>
+Date: Wed, 27 Feb 2019 11:31:56 +0000
 MIME-Version: 1.0
-In-Reply-To: <20190222222950.3997333-1-arnd@arndb.de>
+In-Reply-To: <1550568787-18710-1-git-send-email-yamada.masahiro@socionext.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>
-Cc: Dmitry Vyukov <dvyukov@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Mark Brown <broonie@kernel.org>, Qian Cai <cai@lca.pw>, Kostya Serebryany <kcc@google.com>, Andrey Konovalov <andreyknvl@google.com>, Alexander Potapenko <glider@google.com>, linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Michal Marek <michal.lkml@markovi.net>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org
 
+Hi Yamada-san
 
+Thank you for the patch,
 
-On 2/23/19 1:29 AM, Arnd Bergmann wrote:
-> Building an arm64 allmodconfig kernel with clang results in over 140 warnings
-> about overly large stack frames, the worst ones being:
+On 19/02/2019 09:33, Masahiro Yamada wrote:
+> scripts/gdb/linux/constants.py is never used in the kernel build
+> process. There is no good reason to create it so early.
 > 
-> drivers/gpu/drm/panel/panel-sitronix-st7789v.c:196:12: error: stack frame size of 20224 bytes in function 'st7789v_prepare'
-> drivers/video/fbdev/omap2/omapfb/displays/panel-tpo-td028ttec1.c:196:12: error: stack frame size of 13120 bytes in function 'td028ttec1_panel_enable'
-> drivers/usb/host/max3421-hcd.c:1395:1: error: stack frame size of 10048 bytes in function 'max3421_spi_thread'
-> drivers/net/wan/slic_ds26522.c:209:12: error: stack frame size of 9664 bytes in function 'slic_ds26522_probe'
-> drivers/crypto/ccp/ccp-ops.c:2434:5: error: stack frame size of 8832 bytes in function 'ccp_run_cmd'
-> drivers/media/dvb-frontends/stv0367.c:1005:12: error: stack frame size of 7840 bytes in function 'stv0367ter_algo'
+
+I agree, I originally put it here to ensure it was only built after
+bounds.h (following the asm-offsets.h example I expect). It has no
+requirement to be built in this stage itself.
+
+Depending on the prepare stage instead sounds a lot more reasonable.
+
+Thanks
+
+Reviewed-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+
+> Get it out of the 'prepare' stage.
 > 
-> None of these happen with gcc today, and almost all of these are the result
-> of a single known issue in llvm.  Hopefully it will eventually get fixed with
-> the clang-9 release.
-> 
-> In the meantime, the best idea I have is to turn off asan-stack for clang-8
-> and earlier, so we can produce a kernel that is safe to run.
-> 
-> I have posted three patches that address the frame overflow warnings that are
-> not addressed by turning off asan-stack, so in combination with this change,
-> we get much closer to a clean allmodconfig build, which in turn is necessary
-> to do meaningful build regression testing.
-> 
-> It is still possible to turn on the CONFIG_ASAN_STACK option on all versions
-> of clang, and it's always enabled for gcc, but when CONFIG_COMPILE_TEST is
-> set, the option remains invisible, so allmodconfig and randconfig builds
-> (which are normally done with a forced CONFIG_COMPILE_TEST) will still result
-> in a mostly clean build.
-> 
-> Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
-> Cc: Dmitry Vyukov <dvyukov@google.com>
-> Cc: Nick Desaulniers <ndesaulniers@google.com>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: Qian Cai <cai@lca.pw>
-> Cc: Kostya Serebryany <kcc@google.com>
-> Cc: Andrey Konovalov <andreyknvl@google.com>
-> Link: https://bugs.llvm.org/show_bug.cgi?id=38809
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
+> 
+>  Kbuild   | 10 ----------
+>  Makefile | 11 +++++++++++
+>  2 files changed, 11 insertions(+), 10 deletions(-)
+> 
+> diff --git a/Kbuild b/Kbuild
+> index 65db5be..4cebcc7 100644
+> --- a/Kbuild
+> +++ b/Kbuild
+> @@ -6,7 +6,6 @@
+>  # 2) Generate timeconst.h
+>  # 3) Generate asm-offsets.h (may need bounds.h and timeconst.h)
+>  # 4) Check for missing system calls
+> -# 5) Generate constants.py (may need bounds.h)
+>  
+>  #####
+>  # 1) Generate bounds.h
+> @@ -58,14 +57,5 @@ quiet_cmd_syscalls = CALL    $<
+>  missing-syscalls: scripts/checksyscalls.sh $(offsets-file) FORCE
+>  	$(call cmd,syscalls)
+>  
+> -#####
+> -# 5) Generate constants for Python GDB integration
+> -#
+> -
+> -extra-$(CONFIG_GDB_SCRIPTS) += build_constants_py
+> -
+> -build_constants_py: $(timeconst-file) $(bounds-file)
+> -	@$(MAKE) $(build)=scripts/gdb/linux $@
+> -
+>  # Keep these three files during make clean
+>  no-clean-files := $(bounds-file) $(offsets-file) $(timeconst-file)
+> diff --git a/Makefile b/Makefile
+> index 88db36b..26dbcb7 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1513,6 +1513,17 @@ PHONY += $(DOC_TARGETS)
+>  $(DOC_TARGETS): scripts_basic FORCE
+>  	$(Q)$(MAKE) $(build)=Documentation $@
+>  
+> +# Misc
+> +# ---------------------------------------------------------------------------
+> +
+> +PHONY += scripts_gdb
+> +scripts_gdb: prepare
+> +	$(Q)$(MAKE) $(build)=scripts/gdb/linux build_constants_py
+> +
+> +ifdef CONFIG_GDB_SCRIPTS
+> +all: scripts_gdb
+> +endif
+> +
+>  else # KBUILD_EXTMOD
+>  
+>  ###
+> 
 
-Acked-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+
+-- 
+Regards
+--
+Kieran
