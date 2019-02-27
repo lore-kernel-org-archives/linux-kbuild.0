@@ -1,115 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:30419 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729645AbfB0MdJ (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:43806 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726419AbfB0Mja (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Feb 2019 07:33:09 -0500
+        Wed, 27 Feb 2019 07:39:30 -0500
 MIME-Version: 1.0
 References: <1550568787-18710-1-git-send-email-yamada.masahiro@socionext.com>
- <1550568787-18710-5-git-send-email-yamada.masahiro@socionext.com> <acfea6b8-0986-3fc2-86a6-2553c9ef11e0@ideasonboard.com>
-In-Reply-To: <acfea6b8-0986-3fc2-86a6-2553c9ef11e0@ideasonboard.com>
+ <1550568787-18710-3-git-send-email-yamada.masahiro@socionext.com> <b7edc974-ab67-44ee-3aaa-8cac3d9bd82b@ideasonboard.com>
+In-Reply-To: <b7edc974-ab67-44ee-3aaa-8cac3d9bd82b@ideasonboard.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 27 Feb 2019 21:32:08 +0900
-Message-ID: <CAK7LNATtUnSV-OKnrH+xvmWU1scJCCFr-EH-qJ_5djhgwf8BpA@mail.gmail.com>
-Subject: Re: [PATCH 5/5] scripts/gdb: refactor rules for symlink creation
+Date: Wed, 27 Feb 2019 21:38:49 +0900
+Message-ID: <CAK7LNARD-kVxntRx8hHfRXExafqZsMJp0L8gXpY6gvQZO3m2-w@mail.gmail.com>
+Subject: Re: [PATCH 3/5] scripts/gdb: do not descend into scripts/gdb from scripts
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kieran.bingham@ideasonboard.com
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jan Kiszka <jan.kiszka@siemens.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Jan Kiszka <jan.kiszka@siemens.com>
 
 Hi Kieran,
 
-
-On Wed, Feb 27, 2019 at 8:56 PM Kieran Bingham
+On Wed, Feb 27, 2019 at 8:46 PM Kieran Bingham
 <kieran.bingham@ideasonboard.com> wrote:
 >
 > Hi Yamada-san,
 >
 > On 19/02/2019 09:33, Masahiro Yamada wrote:
-> > gdb-scripts is not a real object, but (ab)used like a phony target.
+> > Currently, Kbuild descends from scripts/Makefile to scripts/gdb/Makefile
+> > just for creating symbolic links, but it does not need to do it so early.
 > >
-> > Rewrite the code in a more Kbuild-ish way. Add symlinks to extra-y
-> > and use if_changed.
+> > Merge the two descending paths to simplify the code.
 > >
 > > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > > ---
 > >
-> >  scripts/gdb/linux/Makefile | 18 +++++++++++-------
-> >  1 file changed, 11 insertions(+), 7 deletions(-)
+> >  Makefile                   | 2 +-
+> >  scripts/Makefile           | 3 +--
+> >  scripts/gdb/linux/Makefile | 9 +++------
+> >  3 files changed, 5 insertions(+), 9 deletions(-)
 > >
+> > diff --git a/Makefile b/Makefile
+> > index 26dbcb7..a5762c6 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -1518,7 +1518,7 @@ $(DOC_TARGETS): scripts_basic FORCE
+> >
+> >  PHONY += scripts_gdb
+> >  scripts_gdb: prepare
+> > -     $(Q)$(MAKE) $(build)=scripts/gdb/linux build_constants_py
+> > +     $(Q)$(MAKE) $(build)=scripts/gdb
+> >
+> >  ifdef CONFIG_GDB_SCRIPTS
+> >  all: scripts_gdb
+> > diff --git a/scripts/Makefile b/scripts/Makefile
+> > index feb1f71..9d442ee 100644
+> > --- a/scripts/Makefile
+> > +++ b/scripts/Makefile
+> > @@ -39,7 +39,6 @@ build_unifdef: $(obj)/unifdef
+> >  subdir-$(CONFIG_GCC_PLUGINS) += gcc-plugins
+> >  subdir-$(CONFIG_MODVERSIONS) += genksyms
+> >  subdir-$(CONFIG_SECURITY_SELINUX) += selinux
+> > -subdir-$(CONFIG_GDB_SCRIPTS) += gdb
+> >
+> >  # Let clean descend into subdirs
+> > -subdir-      += basic dtc kconfig mod package
+> > +subdir-      += basic dtc gdb kconfig mod package
 > > diff --git a/scripts/gdb/linux/Makefile b/scripts/gdb/linux/Makefile
-> > index 7545806..3df395a 100644
+> > index aba23be..7545806 100644
 > > --- a/scripts/gdb/linux/Makefile
 > > +++ b/scripts/gdb/linux/Makefile
-> > @@ -1,13 +1,17 @@
-> >  # SPDX-License-Identifier: GPL-2.0
-> > -always := gdb-scripts
+> > @@ -14,11 +14,8 @@ quiet_cmd_gen_constants_py = GEN     $@
+> >       $(CPP) -E -x c -P $(c_flags) $< > $@ ;\
+> >       sed -i '1,/<!-- end-c-headers -->/d;' $@
 > >
-> > -SRCTREE := $(abspath $(srctree))
-> > -
-> > -$(obj)/gdb-scripts:
-> >  ifneq ($(KBUILD_SRC),)
-> > -     $(Q)ln -fsn $(SRCTREE)/$(obj)/*.py $(objtree)/$(obj)
-> > +
-> > +symlinks := $(patsubst $(srctree)/$(src)/%,%,$(wildcard $(srctree)/$(src)/*.py))
-> > +
-> > +quiet_cmd_symlink = SYMLINK $@
-> > +      cmd_symlink = ln -fsn $(patsubst $(obj)/%,$(abspath $(srctree))/$(src)/%,$@) $@
-> > +
-> > +extra-y += $(symlinks)
-> > +$(addprefix $(obj)/, $(symlinks)): FORCE
-> > +     $(call if_changed,symlink)
-> > +
-> >  endif
-> > -     @:
-> >
-> >  quiet_cmd_gen_constants_py = GEN     $@
-> >        cmd_gen_constants_py = \
-> > @@ -18,4 +22,4 @@ extra-y += constants.py
-> >  $(obj)/constants.py: $(src)/constants.py.in FORCE
+> > -targets += constants.py
+> > -$(obj)/constants.py: $(SRCTREE)/$(obj)/constants.py.in FORCE
+> > +extra-y += constants.py
+> > +$(obj)/constants.py: $(src)/constants.py.in FORCE
 > >       $(call if_changed_dep,gen_constants_py)
 > >
-> > -clean-files := *.pyc *.pyo $(if $(KBUILD_SRC),*.py)
-> > +clean-files := *.pyc *.pyo
+> > -build_constants_py: $(obj)/constants.py
+> > -     @:
+> > -
+> > -clean-files := *.pyc *.pyo $(if $(KBUILD_SRC),*.py) $(obj)/constants.py
+> > +clean-files := *.pyc *.pyo $(if $(KBUILD_SRC),*.py)
 >
-> Perhaps this answers my earlier question.
-> I guess the extra-y hook is somehow handling the clean up of these files?
 >
-> Aha - yes, I've just found it in
+> This looks like the generated file will no longer be cleaned on
+> distclean, if the build is 'in-tree'... Is that right? Or OK if so?
+
+
+As you noticed in 5/5, files listed in $(extra-y) are cleaned up.
+
+So, I removed the now redundant $(obj)/constants.py from 'clean-files'.
+
+
+
+> Perhaps I'm mis-understanding the "$(if $(KBUILD_SRC),*.py)" statement
+> intent?
+
+
+$(if $(KBUILD_SRC),*.py) will clean *.py only for out-of-tree build.
+
+'*.py' files in the build directory are symbolic links.
+
+'*.py' files in the source directory are check-in source files.
+
+
+
+> As long as you're content with the result, and it's understood:
 >
-> Documentation/kbuild/makefiles.txt:
-> > === 5 Kbuild clean infrastructure
-> > ...
-> > Kbuild knows targets listed in $(hostprogs-y), $(hostprogs-m), $(always), $(extra-y) and $(targets). They are all deleted during "make clean".
->
-> Perfect, so this is much better.
-
-Exactly.
-
-If you are interested in the real code,
-see scripts/Makefile.clean
-
-
-__clean-files   := $(extra-y) $(extra-m) $(extra-)       \
-                   $(always) $(targets) $(clean-files)   \
-                   $(hostprogs-y) $(hostprogs-m) $(hostprogs-) \
-                   $(hostlibs-y) $(hostlibs-m) $(hostlibs-) \
-                   $(hostcxxlibs-y) $(hostcxxlibs-m)
-
-
-
-
-
 > Reviewed-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
->
-> --
-> Regards
-> --
-> Kieran
 
 
 
--- 
+--
 Best Regards
+
 Masahiro Yamada
