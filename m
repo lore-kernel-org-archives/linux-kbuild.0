@@ -1,147 +1,131 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:29073 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726062AbfB0MpB (ORCPT
+Received: from perceval.ideasonboard.com ([213.167.242.64]:42228 "EHLO
+        perceval.ideasonboard.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725881AbfB0NCR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Feb 2019 07:45:01 -0500
+        Wed, 27 Feb 2019 08:02:17 -0500
+Reply-To: kieran.bingham@ideasonboard.com
+Subject: Re: [PATCH 5/5] scripts/gdb: refactor rules for symlink creation
+References: <1550568787-18710-1-git-send-email-yamada.masahiro@socionext.com>
+ <1550568787-18710-5-git-send-email-yamada.masahiro@socionext.com>
+ <acfea6b8-0986-3fc2-86a6-2553c9ef11e0@ideasonboard.com>
+ <CAK7LNATtUnSV-OKnrH+xvmWU1scJCCFr-EH-qJ_5djhgwf8BpA@mail.gmail.com>
+From: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Message-ID: <ae17de18-a839-f2dd-cf45-bb4fd5a6a7ee@ideasonboard.com>
+Date: Wed, 27 Feb 2019 13:02:11 +0000
 MIME-Version: 1.0
-References: <1550722418-9189-1-git-send-email-yamada.masahiro@socionext.com> <CAKwvOd=YBsupApffP_5QUB5dbQr8k-43DgKhckqkcsGiuXK=MA@mail.gmail.com>
-In-Reply-To: <CAKwvOd=YBsupApffP_5QUB5dbQr8k-43DgKhckqkcsGiuXK=MA@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 27 Feb 2019 21:44:11 +0900
-Message-ID: <CAK7LNAQyOhFq+xxDtHvdbuNH6tV6VU-MOyOdQm5vfp6Ufd0nWQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: compute false-positive -Wmaybe-uninitialized
- cases in Kconfig
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNATtUnSV-OKnrH+xvmWU1scJCCFr-EH-qJ_5djhgwf8BpA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Ingo Molnar <mingo@redhat.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jan Kiszka <jan.kiszka@siemens.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Feb 22, 2019 at 9:53 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
->
-> On Wed, Feb 20, 2019 at 8:14 PM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> >
-> > Since -Wmaybe-uninitialized was introduced by GCC 4.7, we have patched
-> > various false positives:
-> >
-> >  - commit e74fc973b6e5 ("Turn off -Wmaybe-uninitialized when building
-> >    with -Os") turned off this option for -Os.
-> >
-> >  - commit 815eb71e7149 ("Kbuild: disable 'maybe-uninitialized' warning
-> >    for CONFIG_PROFILE_ALL_BRANCHES") turned off this option for
-> >    CONFIG_PROFILE_ALL_BRANCHES
-> >
-> >  - commit a76bcf557ef4 ("Kbuild: enable -Wmaybe-uninitialized warning
-> >    for "make W=1"") turned off this option for GCC < 4.9
-> >    Arnd provided more explanation in https://lkml.org/lkml/2017/3/14/903
-> >
-> > I think this looks better by shifting the logic from Makefile to Kconfig.
-> >
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->
-> I verified that mainline+this patch did not regression arm64
-> allyesconfig clang build.
-> Tested-by: Nick Desaulniers <ndesaulniers@google.com>
-> Thanks for the patch! Would you mind adding a link tag to:
-> Link: https://github.com/ClangBuiltLinux/linux/issues/350
+Hi Yamada-san,
 
-I added the tags, and applied to linux-kbuild.
+On 27/02/2019 12:32, Masahiro Yamada wrote:
+> Hi Kieran,
+> 
+> 
+> On Wed, Feb 27, 2019 at 8:56 PM Kieran Bingham
+> <kieran.bingham@ideasonboard.com> wrote:
+>>
+>> Hi Yamada-san,
+>>
+>> On 19/02/2019 09:33, Masahiro Yamada wrote:
+>>> gdb-scripts is not a real object, but (ab)used like a phony target.
+>>>
+>>> Rewrite the code in a more Kbuild-ish way. Add symlinks to extra-y
+>>> and use if_changed.
+>>>
+>>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>>> ---
+>>>
+>>>  scripts/gdb/linux/Makefile | 18 +++++++++++-------
+>>>  1 file changed, 11 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/scripts/gdb/linux/Makefile b/scripts/gdb/linux/Makefile
+>>> index 7545806..3df395a 100644
+>>> --- a/scripts/gdb/linux/Makefile
+>>> +++ b/scripts/gdb/linux/Makefile
+>>> @@ -1,13 +1,17 @@
+>>>  # SPDX-License-Identifier: GPL-2.0
+>>> -always := gdb-scripts
+>>>
+>>> -SRCTREE := $(abspath $(srctree))
+>>> -
+>>> -$(obj)/gdb-scripts:
+>>>  ifneq ($(KBUILD_SRC),)
+>>> -     $(Q)ln -fsn $(SRCTREE)/$(obj)/*.py $(objtree)/$(obj)
+>>> +
+>>> +symlinks := $(patsubst $(srctree)/$(src)/%,%,$(wildcard $(srctree)/$(src)/*.py))
+>>> +
+>>> +quiet_cmd_symlink = SYMLINK $@
+>>> +      cmd_symlink = ln -fsn $(patsubst $(obj)/%,$(abspath $(srctree))/$(src)/%,$@) $@
+>>> +
+>>> +extra-y += $(symlinks)
+>>> +$(addprefix $(obj)/, $(symlinks)): FORCE
+>>> +     $(call if_changed,symlink)
+>>> +
+>>>  endif
+>>> -     @:
+>>>
+>>>  quiet_cmd_gen_constants_py = GEN     $@
+>>>        cmd_gen_constants_py = \
+>>> @@ -18,4 +22,4 @@ extra-y += constants.py
+>>>  $(obj)/constants.py: $(src)/constants.py.in FORCE
+>>>       $(call if_changed_dep,gen_constants_py)
+>>>
+>>> -clean-files := *.pyc *.pyo $(if $(KBUILD_SRC),*.py)
+>>> +clean-files := *.pyc *.pyo
+>>
+>> Perhaps this answers my earlier question.
+>> I guess the extra-y hook is somehow handling the clean up of these files?
+>>
+>> Aha - yes, I've just found it in
+>>
+>> Documentation/kbuild/makefiles.txt:
+>>> === 5 Kbuild clean infrastructure
+>>> ...
+>>> Kbuild knows targets listed in $(hostprogs-y), $(hostprogs-m), $(always), $(extra-y) and $(targets). They are all deleted during "make clean".
+>>
+>> Perfect, so this is much better.
+> 
+> Exactly.
+> 
+> If you are interested in the real code,
+> see scripts/Makefile.clean
+> 
+> 
+> __clean-files   := $(extra-y) $(extra-m) $(extra-)       \
+>                    $(always) $(targets) $(clean-files)   \
+>                    $(hostprogs-y) $(hostprogs-m) $(hostprogs-) \
+>                    $(hostlibs-y) $(hostlibs-m) $(hostlibs-) \
+>                    $(hostcxxlibs-y) $(hostcxxlibs-m)
+> 
 
+Thank you - that makes it very clear.
 
+Thanks again for you work :)
 
-> > ---
-> >
-> >  Makefile             | 10 +++-------
-> >  init/Kconfig         | 17 +++++++++++++++++
-> >  kernel/trace/Kconfig |  1 +
-> >  3 files changed, 21 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/Makefile b/Makefile
-> > index 1bb0535..b21aa2e3 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -656,17 +656,13 @@ KBUILD_CFLAGS     += $(call cc-disable-warning, int-in-bool-context)
-> >
-> >  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
-> >  KBUILD_CFLAGS  += $(call cc-option,-Oz,-Os)
-> > -KBUILD_CFLAGS  += $(call cc-disable-warning,maybe-uninitialized,)
-> > -else
-> > -ifdef CONFIG_PROFILE_ALL_BRANCHES
-> > -KBUILD_CFLAGS  += -O2 $(call cc-disable-warning,maybe-uninitialized,)
-> >  else
-> >  KBUILD_CFLAGS   += -O2
-> >  endif
-> > -endif
-> >
-> > -KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
-> > -                       $(call cc-disable-warning,maybe-uninitialized,))
-> > +ifdef CONFIG_CC_DISABLE_WARN_MAYBE_UNINITIALIZED
-> > +KBUILD_CFLAGS   += -Wno-maybe-uninitialized
-> > +endif
-> >
-> >  # Tell gcc to never replace conditional load with a non-conditional one
-> >  KBUILD_CFLAGS  += $(call cc-option,--param=allow-store-data-races=0)
-> > diff --git a/init/Kconfig b/init/Kconfig
-> > index c9386a3..1f05a88 100644
-> > --- a/init/Kconfig
-> > +++ b/init/Kconfig
-> > @@ -26,6 +26,22 @@ config CLANG_VERSION
-> >  config CC_HAS_ASM_GOTO
-> >         def_bool $(success,$(srctree)/scripts/gcc-goto.sh $(CC))
-> >
-> > +config CC_HAS_WARN_MAYBE_UNINITIALIZED
-> > +       def_bool $(cc-option,-Wmaybe-uninitialized)
-> > +       help
-> > +         GCC >= 4.7 supports this option.
-> > +
-> > +config CC_DISABLE_WARN_MAYBE_UNINITIALIZED
-> > +       bool
-> > +       depends on CC_HAS_WARN_MAYBE_UNINITIALIZED
-> > +       default CC_IS_GCC && GCC_VERSION < 40900  # unreliable for GCC < 4.9
-> > +       help
-> > +         GCC's -Wmaybe-uninitialized is not reliable by definition.
-> > +         Lots of false positive warnings are produced in some cases.
-> > +
-> > +         If this option is enabled, -Wno-maybe-uninitialzed is passed
-> > +         to the compiler to suppress maybe-uninitialized warnings.
-> > +
-> >  config CONSTRUCTORS
-> >         bool
-> >         depends on !UML
-> > @@ -1113,6 +1129,7 @@ config CC_OPTIMIZE_FOR_PERFORMANCE
-> >
-> >  config CC_OPTIMIZE_FOR_SIZE
-> >         bool "Optimize for size"
-> > +       imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
-> >         help
-> >           Enabling this option will pass "-Os" instead of "-O2" to
-> >           your compiler resulting in a smaller kernel.
-> > diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
-> > index fa8b1fe..8bd1d6d 100644
-> > --- a/kernel/trace/Kconfig
-> > +++ b/kernel/trace/Kconfig
-> > @@ -370,6 +370,7 @@ config PROFILE_ANNOTATED_BRANCHES
-> >  config PROFILE_ALL_BRANCHES
-> >         bool "Profile all if conditionals" if !FORTIFY_SOURCE
-> >         select TRACE_BRANCH_PROFILING
-> > +       imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
-> >         help
-> >           This tracer profiles all branch conditions. Every if ()
-> >           taken in the kernel is recorded whether it hit or miss.
-> > --
-> > 2.7.4
-> >
->
->
-> --
-> Thanks,
-> ~Nick Desaulniers
+--
+Kieran
 
 
+> 
+>> Reviewed-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+>>
+>> --
+>> Regards
+>> --
+>> Kieran
+> 
+> 
+> 
 
 -- 
-Best Regards
-Masahiro Yamada
+Regards
+--
+Kieran
