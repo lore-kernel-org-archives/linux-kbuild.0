@@ -1,69 +1,248 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:17374 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727316AbfB0N2b (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Feb 2019 08:28:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46328 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730131AbfB1EF7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 27 Feb 2019 23:05:59 -0500
+Date: Wed, 27 Feb 2019 22:05:53 -0600
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH v2 6/8] modpost: Add modinfo flag to livepatch modules
+Message-ID: <20190228040553.oenweqfivepfrhkv@treble>
+References: <20190130165446.19479-1-jmoreira@suse.de>
+ <20190130165446.19479-7-jmoreira@suse.de>
+ <alpine.LSU.2.21.1902201648310.26855@pobox.suse.cz>
 MIME-Version: 1.0
-References: <1550821211-30324-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1550821211-30324-1-git-send-email-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 27 Feb 2019 22:27:42 +0900
-Message-ID: <CAK7LNAQy=nf6n11_dNQYCe-pq3t99ENyQASziVQFOA0KTtU68g@mail.gmail.com>
-Subject: Re: [PATCH v2 1/6] kbuild: move tools_silent to a more relevant place
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.LSU.2.21.1902201648310.26855@pobox.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Miroslav Benes <mbenes@suse.cz>
+Cc: Joao Moreira <jmoreira@suse.de>, live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org
 
-On Fri, Feb 22, 2019 at 4:40 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> This would disturb the change the sub-make part. Move it near the
-> tools/ target.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+On Wed, Feb 20, 2019 at 04:50:08PM +0100, Miroslav Benes wrote:
+> Adding CCs...
 
-Series, applied to linux-kbuild.
+Where was this posted?  I don't see it on lkml.  It would be good to be
+able to see the whole series for review.
 
-
-
-> Changes in v2: None
->
->  Makefile | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index bf4e77b..82091b8 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -90,7 +90,6 @@ endif
->
->  ifneq ($(findstring s,$(filter-out --%,$(MAKEFLAGS))),)
->    quiet=silent_
-> -  tools_silent=s
->  endif
->
->  export quiet Q KBUILD_VERBOSE
-> @@ -1678,6 +1677,11 @@ image_name:
->         @echo $(KBUILD_IMAGE)
->
->  # Clear a bunch of variables before executing the submake
-> +
-> +ifeq ($(quiet),silent_)
-> +tools_silent=s
-> +endif
-> +
->  tools/: FORCE
->         $(Q)mkdir -p $(objtree)/tools
->         $(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(abspath $(objtree)) subdir=tools -C $(src)/tools/
-> --
-> 2.7.4
->
-
+> 
+> On Wed, 30 Jan 2019, Joao Moreira wrote:
+> 
+> > From: Miroslav Benes <mbenes@suse.cz>
+> > 
+> > Currently, livepatch infrastructure in the kernel relies on
+> > MODULE_INFO(livepatch, "Y") statement in a livepatch module. Then the
+> > kernel module loader knows a module is indeed livepatch module and can
+> > behave accordingly.
+> > 
+> > klp-convert, on the other hand relies on LIVEPATCH_* statement in the
+> > module's Makefile for exactly the same reason.
+> > 
+> > Remove dependency on modinfo and generate MODULE_INFO flag
+> > automatically in modpost when LIVEPATCH_* is defined in the module's
+> > Makefile. Generate a list of all built livepatch modules based on
+> > the .livepatch file and store it in (MODVERDIR)/livepatchmods. Give
+> > this list as an argument for modpost which will use it to identify
+> > livepatch modules.
+> > 
+> > As MODULE_INFO is no longer needed, remove it.
+> > 
+> > [jmoreira:
+> > * fix modpost.c (add_livepatch_flag) to update module structure with
+> > livepatch flag and prevent modpost from breaking due to unresolved
+> > symbols]
+> > 
+> > Signed-off-by: Miroslav Benes <mbenes@suse.cz>
+> > Signed-off-by: Joao Moreira <jmoreira@suse.de>
+> > ---
+> >  samples/livepatch/livepatch-sample.c |  1 -
+> >  scripts/Makefile.modpost             |  8 +++-
+> >  scripts/mod/modpost.c                | 84 +++++++++++++++++++++++++++++++++---
+> >  3 files changed, 85 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/samples/livepatch/livepatch-sample.c b/samples/livepatch/livepatch-sample.c
+> > index 2d554dd930e2..20a5891ebf7b 100644
+> > --- a/samples/livepatch/livepatch-sample.c
+> > +++ b/samples/livepatch/livepatch-sample.c
+> > @@ -90,4 +90,3 @@ static void livepatch_exit(void)
+> >  module_init(livepatch_init);
+> >  module_exit(livepatch_exit);
+> >  MODULE_LICENSE("GPL");
+> > -MODULE_INFO(livepatch, "Y");
+> 
+> Again, we shoud do the same for the other samples we have in 
+> samples/livepatch/ directory.
+> 
+> > diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+> > index da779a185218..0149a72ea7ae 100644
+> > --- a/scripts/Makefile.modpost
+> > +++ b/scripts/Makefile.modpost
+> > @@ -65,6 +65,11 @@ MODLISTCMD := find $(MODVERDIR) -name '*.mod' | xargs -r grep -h '\.ko$$' | sort
+> >  __modules := $(shell $(MODLISTCMD))
+> >  modules   := $(patsubst %.o,%.ko, $(wildcard $(__modules:.ko=.o)))
+> >  
+> > +# find all .livepatch files listed in $(MODVERDIR)/
+> > +ifdef CONFIG_LIVEPATCH
+> > +$(shell find $(MODVERDIR) -name '*.livepatch' | xargs -r -I{} basename {} .livepatch > $(MODVERDIR)/livepatchmods)
+> > +endif
+> > +
+> >  # Stop after building .o files if NOFINAL is set. Makes compile tests quicker
+> >  _modpost: $(if $(KBUILD_MODPOST_NOFINAL), $(modules:.ko:.o),$(modules))
+> >  
+> > @@ -79,7 +84,8 @@ modpost = scripts/mod/modpost                    \
+> >   $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
+> >   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
+> >   $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
+> > - $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
+> > + $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w) \
+> > + $(if $(CONFIG_LIVEPATCH),-l $(MODVERDIR)/livepatchmods)
+> >  
+> >  MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
+> >  
+> > diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> > index 1dfc34d8b668..2fd1d409ca5a 100644
+> > --- a/scripts/mod/modpost.c
+> > +++ b/scripts/mod/modpost.c
+> > @@ -1979,10 +1979,6 @@ static void read_symbols(const char *modname)
+> >  		license = get_next_modinfo(&info, "license", license);
+> >  	}
+> >  
+> > -	/* Livepatch modules have unresolved symbols resolved by klp-convert */
+> > -	if (get_modinfo(info.modinfo, info.modinfo_len, "livepatch"))
+> > -		mod->livepatch = 1;
+> > -
+> >  	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
+> >  		symname = remove_dot(info.strtab + sym->st_name);
+> >  
+> > @@ -2421,6 +2417,76 @@ static void write_dump(const char *fname)
+> >  	free(buf.p);
+> >  }
+> >  
+> > +struct livepatch_mod_list {
+> > +	struct livepatch_mod_list *next;
+> > +	char *livepatch_mod;
+> > +};
+> > +
+> > +static struct livepatch_mod_list *load_livepatch_mods(const char *fname)
+> > +{
+> > +	struct livepatch_mod_list *list_iter, *list_start = NULL;
+> > +	unsigned long size, pos = 0;
+> > +	void *file = grab_file(fname, &size);
+> > +	char *line;
+> > +
+> > +	if (!file)
+> > +		return NULL;
+> > +
+> > +	while ((line = get_next_line(&pos, file, size))) {
+> > +		list_iter = NOFAIL(malloc(sizeof(*list_iter)));
+> > +		list_iter->next = list_start;
+> > +		list_iter->livepatch_mod = NOFAIL(strdup(line));
+> > +		list_start = list_iter;
+> > +	}
+> > +	release_file(file, size);
+> > +
+> > +	return list_start;
+> > +}
+> > +
+> > +static void free_livepatch_mods(struct livepatch_mod_list *list_start)
+> > +{
+> > +	struct livepatch_mod_list *list_iter;
+> > +
+> > +	while (list_start) {
+> > +		list_iter = list_start->next;
+> > +		free(list_start->livepatch_mod);
+> > +		free(list_start);
+> > +		list_start = list_iter;
+> > +	}
+> > +}
+> > +
+> > +static int is_livepatch_mod(const char *modname,
+> > +		struct livepatch_mod_list *list)
+> > +{
+> > +	const char *myname;
+> > +
+> > +	if (!list)
+> > +		return 0;
+> > +
+> > +	myname = strrchr(modname, '/');
+> > +	if (myname)
+> > +		myname++;
+> > +	else
+> > +		myname = modname;
+> > +
+> > +	while (list) {
+> > +		if (!strcmp(myname, list->livepatch_mod))
+> > +			return 1;
+> > +		list = list->next;
+> > +	}
+> > +	return 0;
+> > +}
+> > +
+> > +static void add_livepatch_flag(struct buffer *b, struct module *mod,
+> > +		struct livepatch_mod_list *list)
+> > +{
+> > +	if (is_livepatch_mod(mod->name, list)) {
+> > +		buf_printf(b, "\nMODULE_INFO(livepatch, \"Y\");\n");
+> > +		mod->livepatch = 1;
+> > +	}
+> > +}
+> > +
+> > +
+> >  struct ext_sym_list {
+> >  	struct ext_sym_list *next;
+> >  	const char *file;
+> > @@ -2436,8 +2502,9 @@ int main(int argc, char **argv)
+> >  	int err;
+> >  	struct ext_sym_list *extsym_iter;
+> >  	struct ext_sym_list *extsym_start = NULL;
+> > +	struct livepatch_mod_list *livepatch_mods = NULL;
+> >  
+> > -	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awE")) != -1) {
+> > +	while ((opt = getopt(argc, argv, "i:I:e:l:mnsST:o:awM:K:E")) != -1) {
+> >  		switch (opt) {
+> >  		case 'i':
+> >  			kernel_read = optarg;
+> > @@ -2454,6 +2521,9 @@ int main(int argc, char **argv)
+> >  			extsym_iter->file = optarg;
+> >  			extsym_start = extsym_iter;
+> >  			break;
+> > +		case 'l':
+> > +			livepatch_mods = load_livepatch_mods(optarg);
+> > +			break;
+> >  		case 'm':
+> >  			modversions = 1;
+> >  			break;
+> > @@ -2514,15 +2584,16 @@ int main(int argc, char **argv)
+> >  		buf.pos = 0;
+> >  
+> >  		err |= check_modname_len(mod);
+> > -		err |= check_exports(mod);
+> >  		add_header(&buf, mod);
+> >  		add_intree_flag(&buf, !external_module);
+> >  		add_retpoline(&buf);
+> >  		add_staging_flag(&buf, mod->name);
+> > +		add_livepatch_flag(&buf, mod, livepatch_mods);
+> >  		err |= add_versions(&buf, mod);
+> >  		add_depends(&buf, mod);
+> >  		add_moddevtable(&buf, mod);
+> >  		add_srcversion(&buf, mod);
+> > +		err |= check_exports(mod);
+> >  
+> >  		sprintf(fname, "%s.mod.c", mod->name);
+> >  		write_if_changed(&buf, fname);
+> > @@ -2541,6 +2612,7 @@ int main(int argc, char **argv)
+> >  			      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
+> >  		}
+> >  	}
+> > +	free_livepatch_mods(livepatch_mods);
+> >  	free(buf.p);
+> >  
+> >  	return err;
+> > -- 
+> > 2.16.4
+> > 
+> 
+> Miroslav
 
 -- 
-Best Regards
-Masahiro Yamada
+Josh
