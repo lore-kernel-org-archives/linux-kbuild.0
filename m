@@ -1,34 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sonic302-20.consmr.mail.sg3.yahoo.com ([106.10.242.140]:36740
-        "EHLO sonic302-20.consmr.mail.sg3.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726275AbfCCMxL (ORCPT
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:37615 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726046AbfCDMzg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 3 Mar 2019 07:53:11 -0500
-Date: Sun, 3 Mar 2019 12:53:05 +0000 (UTC)
-From: "Mrs. Elia Rodrigues" <albiz@freemail.gr>
-Reply-To: "Mrs. Elia Rodrigues" <eliarodrigues@yahoo.com>
-Message-ID: <1141171476.7769008.1551617585564@mail.yahoo.com>
-Subject: From Mrs. Elia Rodrigues,
+        Mon, 4 Mar 2019 07:55:36 -0500
+From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: [PATCH] kbuild: use -Werror=implicit-... instead of -Werror-implicit-...
+Date: Mon,  4 Mar 2019 13:55:20 +0100
+Message-Id: <20190304125520.17794-1-luc.vanoostenryck@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <1141171476.7769008.1551617585564.ref@mail.yahoo.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 
+The flag '-Werror-implicit-function-declaration', present in GCC 2.95,
+stopped to be documented in GCC 4.3, replaced by the more generic
+'-Werror=...' form.
 
+So, use the equivalent '-Werror=implicit-function-declaration' instead.
 
-Hello 
+Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I am Mrs. Elia Rodrigues I have been diagnosed with cancer. It has defied all forms of medical treatment, and right now I have only about a few months to live, according to medical experts. I have not particularly lived my life so well, as I never really cared for anyone (not even myself) but my business. Though I am very rich, I was never generous. I was always hostile to People and only focused on my business as that was the only thing I cared for. But now I regret all this as I now know that there is more to life than just wanting to have or make all the money in the world. I believe when God gives me a second chance to come to this world I would live my life a different way from how I have lived it.
-
-I would want to have a Personal and Trustworthy Relationship with you, as I intend and willing to empower the change of ownership for the transfer of my Deposits to your personal possession for Charity Disbursement to the Less Privilege and Homeless. I want this fund to be used in liberation work Activities like, help to Orphanages, and Christian schools, helping widows and up keeping of the Churches and propagating the word of God and to endeavor that the house of God is maintained. I am not afraid of death hence I know where I am going. I know that I am going to be in the bosom of the Lord. Exodus 14 vs 14 says that the lord will fight my case and I shall hold my peace.
-Because of my health condition when i try to speak it leads to a serious coughing out of blood. I will send you the photos of me,
-
-As soon as I receive your reply I shall give you the details on how to contact the bank directly for onward transfer. I will also issue you an authority letter that will prove you as the present beneficiary of my funds. I want you and your family to always pray for me but the lord is my shepherd.
-
-Thank you for your due consideration. God be with you
-
-Yours Sister in the Lord.
-
-Mrs. Elia Rodrigues
+diff --git a/Makefile b/Makefile
+index d5713e7b1e50..253e5ede92e7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -429,7 +429,7 @@ LINUXINCLUDE    := \
+ KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
+ KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
+ 		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
+-		   -Werror-implicit-function-declaration -Werror=implicit-int \
++		   -Werror=implicit-function-declaration -Werror=implicit-int \
+ 		   -Wno-format-security \
+ 		   -std=gnu89
+ KBUILD_CPPFLAGS := -D__KERNEL__
+-- 
+2.21.0
