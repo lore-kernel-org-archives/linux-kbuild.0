@@ -1,117 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39928 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726069AbfCEQgO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Mar 2019 11:36:14 -0500
-Date: Tue, 5 Mar 2019 10:36:09 -0600
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH 3/3] objtool: move tools/objtool/ to scripts/objtool/
-Message-ID: <20190305163609.gz2cvpj7bxrnzdvm@treble>
-References: <1551764896-8453-1-git-send-email-yamada.masahiro@socionext.com>
- <1551764896-8453-3-git-send-email-yamada.masahiro@socionext.com>
- <20190305144625.bjmkr6ebufbly5ba@treble>
- <CAK7LNAS=K2Hp+idOsHQBCYwk5YndzSdHL=GmJZRxsF6De3isNA@mail.gmail.com>
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:40549 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726836AbfCEQqf (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 5 Mar 2019 11:46:35 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAS=K2Hp+idOsHQBCYwk5YndzSdHL=GmJZRxsF6De3isNA@mail.gmail.com>
+References: <20190304201930.1622839-1-arnd@arndb.de> <20190304201930.1622839-2-arnd@arndb.de>
+ <a94c3c6a-481e-96a5-74e1-8c3299c74129@metux.net> <CAK8P3a0vdhCTNTF-K0mXjRWkPvv0qr3nf_52=8n6zTa7p3ELLw@mail.gmail.com>
+ <54a7d035-155f-c47b-1db1-acb851b3aec6@metux.net>
+In-Reply-To: <54a7d035-155f-c47b-1db1-acb851b3aec6@metux.net>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Tue, 5 Mar 2019 17:46:17 +0100
+Message-ID: <CAK8P3a1-AYWtNEqwb4ZMpXKDwGB_ZGLj==uBakh0+L=5g=BQQw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] x86: apuv2: fix input dependencies
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Douglas Anderson <dianders@chromium.org>, Robin Meijboom <robin@meijboom.info>, Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Cc: Darren Hart <dvhart@infradead.org>, Andy Shevchenko <andy@infradead.org>, Linus Walleij <linusw@kernel.org>, Enrico Weigelt <info@metux.net>, Andy Shevchenko <andy.shevchenko@gmail.com>, "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>, Platform Driver <platform-driver-x86@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Wed, Mar 06, 2019 at 01:08:27AM +0900, Masahiro Yamada wrote:
-> > I do see the benefits.  In many ways objtool is a more natural fit in
-> > the scripts dir.  But there are also some downsides to this change:
-> >
-> > - This will make it harder to package objtool as a standalone tool.  It
-> >   has a lot of functionality that could be useful to other non-kernel
-> >   projects.
-> 
-> 
-> If it is really useful for other projects,
-> I'd like to see it as a real standalone tool,
-> i.e. split as a separate project.
+On Tue, Mar 5, 2019 at 2:50 PM Enrico Weigelt, metux IT consult
+<lkml@metux.net> wrote:
+>
+> On 05.03.19 09:23, Arnd Bergmann wrote:
+>
+> hmm, if circular deps happen, wouldn't that mean we've got some deeper
+> problems in here ? IMHO, dependencies should always form a DAG (except
+> for some really rare cases).
+>
+> Do you recall any actual problem w/ input vs gpio vs. drivers ?
+> I'd like to have a closer look at it.
 
-Fine, but who's going to do it?  I don't have time for creating such a
-project anytime soon.  And anyway, moving the code to scripts in the
-meantime would just make that harder when we do it eventually.
+Not with gpio. Most of the circular dependencies I've seen tend to
+revolve around drivers/gpu/drm, which uses more 'select' statements
+than most other subsystems. Those dependencies often touch
+backlight, acpi, fbdev and other things then.
 
-> > - It shares libsubcmd with perf.  Including the subcmd .c files from
-> >   tools is hacky.
-> 
-> Yes, hacky. We are shifting the ugliness between C and Build system.
-> 
-> But, this hack can be solved; if subcmd library is useful, you can copy
-> only necessary code into the objtool directory. You do not need all
-> helpers from libsubcmd.
-
-But then we are duplicating code...
-
-> > - It's disruptive: it will break all the out-of-tree distro kernel
-> >   packaging scripts which now look for objtool in tools.
-> 
-> All artifacts under scripts/ should be contained in the package.
-> So, it should work.
-
-It *will* break distro scripts which already expect objtool to be
-located at tools/objtool/objtool.
-
-> > You're right that objtool isn't a natural fit in tools, because it's
-> > also used as part of the build.  But it's not a natural fit in scripts
-> > either.  I think we've resolved most of those issues and it seems to be
-> > working well these days.
-> >
-> > So instead of disrupting everything because "make mrproper" doesn't
-> > work, I think I'd rather just do the following:
-> >
-> > diff --git a/Makefile b/Makefile
-> > index ac5ac28a24e9..7e6696c9b862 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -1364,7 +1364,7 @@ PHONY += $(mrproper-dirs) mrproper
-> >  $(mrproper-dirs):
-> >         $(Q)$(MAKE) $(clean)=$(patsubst _mrproper_%,%,$@)
-> >
-> > -mrproper: clean $(mrproper-dirs)
-> > +mrproper: clean $(mrproper-dirs) tools/objtool_clean
-> >         $(call cmd,rmdirs)
-> >         $(call cmd,rmfiles)
-> >
-> 
-> Works, and the clean log is also brilliant.
-> 
-> I see the same log even when
-> there is nothing to clean.
-> 
-> 
-> masahiro@grover:~/ref/linux$ make mrproper
->   CLEAN   .
->   CLEAN   arch/x86/entry/vdso
->   CLEAN   usr
->   CLEAN   arch/x86/tools
->   CLEAN   .tmp_versions
->   CLEAN   scripts/basic
->   CLEAN   scripts/kconfig
->   CLEAN   scripts/mod
->   CLEAN   scripts/selinux/genheaders
->   CLEAN   scripts/selinux/mdp
->   CLEAN   scripts
->   DESCEND  objtool
->   CLEAN    objtool
->   CLEAN   include/config include/generated arch/x86/include/generated
->   CLEAN   .config
-> masahiro@grover:~/ref/linux$ make mrproper
->   DESCEND  objtool
->   CLEAN    objtool
-> masahiro@grover:~/ref/linux$ make mrproper
->   DESCEND  objtool
->   CLEAN    objtool
-
-Ok, but I'm sure that could be fixed.  That's hardly a justification to
-move objtool.
-
-Anyway I would like to hear what Ingo and Peter think about moving it.
-
--- 
-Josh
+       Arnd
