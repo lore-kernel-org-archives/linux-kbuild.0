@@ -1,45 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:36726 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727751AbfCEN41 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Mar 2019 08:56:27 -0500
+Received: from ms.lwn.net ([45.79.88.28]:39732 "EHLO ms.lwn.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727721AbfCEOoP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 5 Mar 2019 09:44:15 -0500
+Date: Tue, 5 Mar 2019 07:44:13 -0700
+From: Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH 2/3] objtool: move stack-validation.txt to
+ Documentation/
+Message-ID: <20190305074413.5f72ecc1@lwn.net>
+In-Reply-To: <1551764896-8453-2-git-send-email-yamada.masahiro@socionext.com>
+References: <1551764896-8453-1-git-send-email-yamada.masahiro@socionext.com>
+        <1551764896-8453-2-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-References: <20190304201930.1622839-1-arnd@arndb.de> <20190304201930.1622839-2-arnd@arndb.de>
- <a94c3c6a-481e-96a5-74e1-8c3299c74129@metux.net> <CAK8P3a0vdhCTNTF-K0mXjRWkPvv0qr3nf_52=8n6zTa7p3ELLw@mail.gmail.com>
- <54a7d035-155f-c47b-1db1-acb851b3aec6@metux.net>
-In-Reply-To: <54a7d035-155f-c47b-1db1-acb851b3aec6@metux.net>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Tue, 5 Mar 2019 15:56:15 +0200
-Message-ID: <CAHp75Vcd0eNCBtxb1huMBGFF9JXmropHv2YA1eh-yK3iMFfuFQ@mail.gmail.com>
-Subject: Re: [PATCH 2/3] x86: apuv2: fix input dependencies
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Cc: Arnd Bergmann <arnd@arndb.de>, Darren Hart <dvhart@infradead.org>, Andy Shevchenko <andy@infradead.org>, Linus Walleij <linusw@kernel.org>, Enrico Weigelt <info@metux.net>, "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>, Platform Driver <platform-driver-x86@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Ingo Molnar <mingo@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Douglas Anderson <dianders@chromium.org>, Robin Meijboom <robin@meijboom.info>, Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Mar 5, 2019 at 3:50 PM Enrico Weigelt, metux IT consult
-<lkml@metux.net> wrote:
-> On 05.03.19 09:23, Arnd Bergmann wrote:
+On Tue,  5 Mar 2019 14:48:15 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-> > 1. try to use 'depends on' if you can
->
-> Well, this has the unpleasant side effect that we often have to enable
-> a lot of things, just to even see the individual driver. For people who
-> just wanna configure a kernel for their board, this is a bit nasty.
->
-> But, okay, I'm going to do this w/ my own tool - I've written a small
-> tool that allows easy kernel reconfiguration on a higher level: you
-> can just pick some board templates and enable high level features like
-> eth, gpu, etc - it automatically creates a .config for you. I'm going
-> announce it on lkml soon.
+> Move the document to the standard Documentation/ directory instead of
+> creating the same directory structure under objtool/.
 
-Darren gave a talk about merging kernel configs to get something like
-you want to.
-This tool is quite long already lying around. merge_config.sh in your
-kernel source tree.
+This seems like a good idea to me, but can I make a couple of requests?
 
--- 
-With Best Regards,
-Andy Shevchenko
+ - Convert it to RST while you're at it?  It's 99% there already.
+
+ - Let's not add it to the top-level Documentation/ mess; I'm slowly
+   trying to bring some order there.  Perhaps a better home would be
+   Documentation/kbuild/ ?
+
+Thanks,
+
+jon
