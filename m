@@ -1,29 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:37942 "EHLO
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:37902 "EHLO
         shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726585AbfCFVCA (ORCPT
+        by vger.kernel.org with ESMTP id S1726216AbfCFU7f (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Mar 2019 16:02:00 -0500
-Message-ID: <5760e0a210c7c39b486aa932ccbe7f3f2c210d62.camel@decadent.org.uk>
+        Wed, 6 Mar 2019 15:59:35 -0500
+Message-ID: <bc3f60f43fc7973dfffcf63aa037439462a6ce38.camel@decadent.org.uk>
 Subject: Re: [PATCH] kbuild: add workaround for Debian make-kpkg
 From: Ben Hutchings <ben@decadent.org.uk>
-Date: Wed, 06 Mar 2019 21:01:49 +0000
+Date: Wed, 06 Mar 2019 20:59:28 +0000
 In-Reply-To: <1551888035-13329-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1551888035-13329-1-git-send-email-yamada.masahiro@socionext.com>
 Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-3foCDG+6ZtH2f72oUuhy"
+        protocol="application/pgp-signature"; boundary="=-w5+o3n/XPmwSrq8p9zRZ"
 MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, Manoj Srivastava <manoj.srivastava.1962@gmail.com>
+Cc: Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, Manoj Srivastava <srivasta@debian.org>
 
 
---=-3foCDG+6ZtH2f72oUuhy
+--=-w5+o3n/XPmwSrq8p9zRZ
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-
-[Trying again with an alternate address for Manoj.]
 
 kernel-package is maintained by Manoj Srivastava (cc'd), not by the
 Debian kernel team.
@@ -46,8 +44,7 @@ On Thu, 2019-03-07 at 01:00 +0900, Masahiro Yamada wrote:
 > hard to guarantee the behavior when the kernel Makefile is included
 > by another Makefile from a different project.
 >=20
-> Looks like Debian Stretch stopped providing make-kpkg (except
-> PowerPC).
+> Looks like Debian Stretch stopped providing make-kpkg (except PowerPC).
 
 kernel-package is not included in stretch at all.  I'm not sure where
 you're seeing it as being present on powerpc - that architecture wasn't
@@ -71,26 +68,25 @@ Ben Hutchings
 friends: People who know you well, but like you anyway.
 
 
-
---=-3foCDG+6ZtH2f72oUuhy
+--=-w5+o3n/XPmwSrq8p9zRZ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAlyANT0ACgkQ57/I7JWG
-EQkRsQ/+Ph2M0eSA6fshi/nueiBYnTirKrdWIQPXSLa4w1R4TB00qO561Sev/XCU
-DYXrW4wTgmooI1TFVK25yK/3A0ysZwXSwvjMcXnl2ENaCmKJylJObqpsJi3nPIpR
-AqKDmochmB/1DZ1qNNqAHp/hqwWAkuyjvw2DBtcwKybtTCRoe2HAxlV1+1shYM6e
-wIxPILJS/MzakPsn/BZExwuB0SbvrgMXmYJHVWnEnHR9APa1jJmJYx+m92zU5aP0
-iVmvKvTco7JL097spmT/wGGC4FymmAnkIt6ZDUfeafFbU+1zVbAURrH1PVSXVvr+
-q1nlcyxW83XeSM8tmX3GEJiheMo6lIitY0jvMDxfD4fR6FSmZxKECV6n0mz2eMQa
-8rF3MnV4RNu8zUNFw+jvRqGOdB01L4VNDyRSh0v9xK6naeofEw9SFLpur0VYmn4k
-iaU4RunSzI+QH8vHYlbjqIb+OPqlY5NsRD1xGObV8Ic8PNYNww5nfShyAwFhlFPX
-EWqMgAN+rWV4DJUFyKRakvYYJe8ZQGcQWMLpboQM/xfegtjfgKqryJuzyyWkpF3O
-MsCEU7prX+MzQQq9Uq65Gg/CtjbYK3ik+SxTmmXg7EYGbsV3x2LTjG02xj9+eyzW
-Sp72TvO0jniBCPwIH/sa/khD0H3QA/epj0FuvcBZJD67lcFKN6E=
-=7G9C
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAlyANLAACgkQ57/I7JWG
+EQlq4BAAs3PVO6fnoDn8YsrVsdvzsI6iC3Uykah/CIHhz0BL+HpGBR9rNDIBLPDO
+sTe0RMsq38fps+zKtKVk5AyNtlvyyvo+VXIStv15FFNLfGJJi4ZbCSgJRN6IxNpX
+bfjd6yXCkBVzzaY/5qqEMgcn0wHD8VUtHDNXpqm6OuGNpOBx4j7C1Ge76RTGeyAj
+MLc7PSkFYnOdD8aztSt8vAEtm/9vr4dutplyqe0l+s1jkzfwqk2oRVSgCRFt3+eB
+NQ6dhZqwBg/GV4WIxQTiw3azQcxNcobZyd5RziHRAMAE6STE5TJRTtw+AU0Vr9C+
+N0B71F1vxXMEg7I7wix6wCj/b3ZXP+CZ6USM0JCqU/tte2w7O5loYi5sKaJh2q3V
+LMw6cenZNKUSJHWXYbF6TNwKflb0Gz8ulOWbgA+81F56Sa/RMUviMi5hQxRIMy2+
+ZWxgbgNRkC0fd8gMbc/n7ryOy18+NdgaYDLkmTCz5xdszgm4dK66t5UUOzCmqU67
+vgYszrPhZoI0K7mJerIMsUs9uuxHPEun2LFZ+fc4ZaUUgivjbTYjhOdeQQltRMnT
+GgGTY1KDx6dHZWod/Q0EytURaGu6T+NfYTFYcXDxehjr8Wu4sVJ1C3aecxJRMEvV
+mTTE6mv7NtAVwdKQF6EHGCam1ospdHv8O02Yn3e8DXx6BYJkw10=
+=u0KM
 -----END PGP SIGNATURE-----
 
---=-3foCDG+6ZtH2f72oUuhy--
+--=-w5+o3n/XPmwSrq8p9zRZ--
