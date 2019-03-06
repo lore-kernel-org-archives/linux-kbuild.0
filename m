@@ -1,186 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from monster.unsafe.ru ([5.9.28.80]:53618 "EHLO mail.unsafe.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726722AbfCFREN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Mar 2019 12:04:13 -0500
-Date: Wed, 6 Mar 2019 17:54:25 +0100
-From: Alexey Gladkov <gladkov.alexey@gmail.com>
-Subject: [PATCH v1] moduleparam: Save information about built-in modules in
- separate file
-Message-ID: <20190306165425.GD14017@MacBook-PC.fortress>
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:37942 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726585AbfCFVCA (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 6 Mar 2019 16:02:00 -0500
+Message-ID: <5760e0a210c7c39b486aa932ccbe7f3f2c210d62.camel@decadent.org.uk>
+Subject: Re: [PATCH] kbuild: add workaround for Debian make-kpkg
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Wed, 06 Mar 2019 21:01:49 +0000
+In-Reply-To: <1551888035-13329-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1551888035-13329-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-3foCDG+6ZtH2f72oUuhy"
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="0OWHXb1mYLuhj1Ox"
-Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-api@vger.kernel.org
-Cc: "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, Manoj Srivastava <manoj.srivastava.1962@gmail.com>
 
 
---0OWHXb1mYLuhj1Ox
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--=-3foCDG+6ZtH2f72oUuhy
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Problem:
+[Trying again with an alternate address for Manoj.]
 
-When a kernel module is compiled as a separate module, some important
-information about the kernel module is available via .modinfo section of
-the module.  In contrast, when the kernel module is compiled into the
-kernel, that information is not available.
+kernel-package is maintained by Manoj Srivastava (cc'd), not by the
+Debian kernel team.
 
-Information about built-in modules is necessary in the following cases:
+On Thu, 2019-03-07 at 01:00 +0900, Masahiro Yamada wrote:
+> Since commit 3812b8c5c5d5 ("kbuild: make -r/-R effective in top
+> Makefile for old Make versions"), make-kpkg is not working.
+>=20
+> make-kpkg directly includes the top Makefile of Linux kernel, and
+> appends some debian_* targets.
+>=20
+>   /usr/share/kernel-package/ruleset/kernel_version.mk:
+>=20
+>     # Include the kernel makefile
+>     override dot-config :=3D 1
+>     include Makefile
+>     dot-config :=3D 1
+>=20
+> I did not know the kernel Makefile was used in that way, and it is
+> hard to guarantee the behavior when the kernel Makefile is included
+> by another Makefile from a different project.
+>=20
+> Looks like Debian Stretch stopped providing make-kpkg (except
+> PowerPC).
 
-1. When it is necessary to find out what additional parameters can be
-passed to the kernel at boot time.
+kernel-package is not included in stretch at all.  I'm not sure where
+you're seeing it as being present on powerpc - that architecture wasn't
+included in the stretch release.
 
-2. When you need to know which module names and their aliases are in
-the kernel. This is very useful for creating an initrd image.
+> Maybe it is obsolete and being replaced with 'make deb-pkg' etc.
+> but still widely used.
+[...]
 
-Proposal:
+kernel-package is currently planned to be included in the next release,
+though I'm not sure whether it should be.
 
-The proposed patch does not remove .modinfo section with module
-information from the vmlinux at the build time and saves it into a
-separate file after kernel linking. So, the kernel does not increase in
-size and no additional information remains in it. Information is stored
-in the same format as in the separate modules (null-terminated string
-array). Because the .modinfo section is already exported with a separate
-modules, we are not creating a new API.
+There is another bug report about kernel-package with current kernel
+versions <https://bugs.debian.org/890817> but I don't know whether it
+has been worked around already.
 
-It can be easily read in the userspace:
+Ben.
 
-$ tr '\0' '\n' < kernel.builtin.modinfo
-ext4.softdep=3Dpre: crc32c
-ext4.license=3DGPL
-ext4.description=3DFourth Extended Filesystem
-ext4.author=3DRemy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Th=
-eodore Ts'o and others
-ext4.alias=3Dfs-ext4
-ext4.alias=3Dext3
-ext4.alias=3Dfs-ext3
-ext4.alias=3Dext2
-ext4.alias=3Dfs-ext2
-md_mod.alias=3Dblock-major-9-*
-md_mod.alias=3Dmd
-md_mod.description=3DMD RAID framework
-md_mod.license=3DGPL
-md_mod.parmtype=3Dcreate_on_open:bool
-md_mod.parmtype=3Dstart_dirty_degraded:int
-=2E..
-
-Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
-Signed-off-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
----
- Makefile                    |  1 +
- include/linux/moduleparam.h | 12 +++++-------
- scripts/link-vmlinux.sh     |  8 ++++++++
- 3 files changed, 14 insertions(+), 7 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index d5713e7b1e50..971102194c92 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1288,6 +1288,7 @@ _modinst_:
- 	fi
- 	@cp -f $(objtree)/modules.order $(MODLIB)/
- 	@cp -f $(objtree)/modules.builtin $(MODLIB)/
-+	@cp -f $(objtree)/kernel.builtin.modinfo $(MODLIB)/
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
-=20
- # This depmod is only for convenience to give the initial
-diff --git a/include/linux/moduleparam.h b/include/linux/moduleparam.h
-index ba36506db4fb..5ba250d9172a 100644
---- a/include/linux/moduleparam.h
-+++ b/include/linux/moduleparam.h
-@@ -10,23 +10,21 @@
-    module name. */
- #ifdef MODULE
- #define MODULE_PARAM_PREFIX /* empty */
-+#define __MODULE_INFO_PREFIX /* empty */
- #else
- #define MODULE_PARAM_PREFIX KBUILD_MODNAME "."
-+/* We cannot use MODULE_PARAM_PREFIX because some modules override it. */
-+#define __MODULE_INFO_PREFIX KBUILD_MODNAME "."
- #endif
-=20
- /* Chosen so that structs with an unsigned long line up. */
- #define MAX_PARAM_PREFIX_LEN (64 - sizeof(unsigned long))
-=20
--#ifdef MODULE
- #define __MODULE_INFO(tag, name, info)					  \
- static const char __UNIQUE_ID(name)[]					  \
-   __used __attribute__((section(".modinfo"), unused, aligned(1)))	  \
--  =3D __stringify(tag) "=3D" info
--#else  /* !MODULE */
--/* This struct is here for syntactic coherency, it is not used */
--#define __MODULE_INFO(tag, name, info)					  \
--  struct __UNIQUE_ID(name) {}
--#endif
-+  =3D __MODULE_INFO_PREFIX __stringify(tag) "=3D" info
-+
- #define __MODULE_PARM_TYPE(name, _type)					  \
-   __MODULE_INFO(parmtype, name##type, #name ":" _type)
-=20
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index c8cf45362bd6..399d7e4d11ec 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -258,10 +258,12 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
-=20
- 	# step 1
- 	vmlinux_link "" .tmp_vmlinux1
-+	"${OBJCOPY}" -R .modinfo .tmp_vmlinux1
- 	kallsyms .tmp_vmlinux1 .tmp_kallsyms1.o
-=20
- 	# step 2
- 	vmlinux_link .tmp_kallsyms1.o .tmp_vmlinux2
-+	"${OBJCOPY}" -R .modinfo .tmp_vmlinux2
- 	kallsyms .tmp_vmlinux2 .tmp_kallsyms2.o
-=20
- 	# step 3
-@@ -273,6 +275,7 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
- 		kallsyms_vmlinux=3D.tmp_vmlinux3
-=20
- 		vmlinux_link .tmp_kallsyms2.o .tmp_vmlinux3
-+		"${OBJCOPY}" -R .modinfo .tmp_vmlinux3
-=20
- 		kallsyms .tmp_vmlinux3 .tmp_kallsyms3.o
- 	fi
-@@ -281,6 +284,11 @@ fi
- info LD vmlinux
- vmlinux_link "${kallsymso}" vmlinux
-=20
-+info MODINFO kernel.builtin.modinfo
-+"${OBJCOPY}" -j .modinfo -O binary vmlinux kernel.builtin.modinfo
-+chmod 444 kernel.builtin.modinfo
-+"${OBJCOPY}" -R .modinfo vmlinux
-+
- if [ -n "${CONFIG_BUILDTIME_EXTABLE_SORT}" ]; then
- 	info SORTEX vmlinux
- 	sortextable vmlinux
 --=20
-2.19.2
+Ben Hutchings
+friends: People who know you well, but like you anyway.
 
 
---0OWHXb1mYLuhj1Ox
+
+--=-3foCDG+6ZtH2f72oUuhy
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBAgAGBQJcf/s1AAoJEKRaulRM/9Q0u+oP/1vxXnWlVM43EVSoQes8LsAd
-P9mLCkEWPWdAyTnlCgcPwOetr2drGfh1rX8mhC4YLM0zCZ4LVUJybXLZbZU1K7Ue
-pGfywG5ac3+ux4d/tcemShRfoiEbt4pfAwNoDJmeFBRct9wjXVjPwiLckEmOSk6f
-Rp7aEIr/qtThhofAqe4ycSp+FW4V39pa+qg5DpmYiPxjqGsMcPW5jUUBP0d/j1u5
-Ojo+ExKnYy7WLXI212fH3XuHCAyoTUPn9uYRyYwiZ2XLdPtEQzf5jI8MAxbU7HLF
-oDxPBITOFLlqTWYm0M29aGNsx2HFNSFHKzKbjV0CuOonVJql2kl1zIzEBfGJ1bPd
-WKyX/XhIZpF8p2nKSylbad985t+24SpCDFonriduaesMFgyyTORxoW6HF6QDjo27
-i4/RqxYGNanTDn/FV70+zbyhu5r0/Ph+i/bKc+BSWcvuTFTSgzEjkZ+GsLIzjE3J
-2P5jJQa8QFboJLiN0iMrUQE4UbiWscCf/4azeWndnNlDiMtAkNt0q5eqhqo4qbAK
-NQJLkjNjuBBYeC+XeoNdE5sE/8ieC870yGS0GTTyilKUNCbZllXvertrVZ5H1c0Q
-ImI9/10n1CxOqe/ssHrKi/C1nsDdZ+Gr8uG3PhdgTZLOFroFhZDVzC2BPoGSGQ2t
-d2EdYqiSg1WbF8cOfXLY
-=bKn9
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAlyANT0ACgkQ57/I7JWG
+EQkRsQ/+Ph2M0eSA6fshi/nueiBYnTirKrdWIQPXSLa4w1R4TB00qO561Sev/XCU
+DYXrW4wTgmooI1TFVK25yK/3A0ysZwXSwvjMcXnl2ENaCmKJylJObqpsJi3nPIpR
+AqKDmochmB/1DZ1qNNqAHp/hqwWAkuyjvw2DBtcwKybtTCRoe2HAxlV1+1shYM6e
+wIxPILJS/MzakPsn/BZExwuB0SbvrgMXmYJHVWnEnHR9APa1jJmJYx+m92zU5aP0
+iVmvKvTco7JL097spmT/wGGC4FymmAnkIt6ZDUfeafFbU+1zVbAURrH1PVSXVvr+
+q1nlcyxW83XeSM8tmX3GEJiheMo6lIitY0jvMDxfD4fR6FSmZxKECV6n0mz2eMQa
+8rF3MnV4RNu8zUNFw+jvRqGOdB01L4VNDyRSh0v9xK6naeofEw9SFLpur0VYmn4k
+iaU4RunSzI+QH8vHYlbjqIb+OPqlY5NsRD1xGObV8Ic8PNYNww5nfShyAwFhlFPX
+EWqMgAN+rWV4DJUFyKRakvYYJe8ZQGcQWMLpboQM/xfegtjfgKqryJuzyyWkpF3O
+MsCEU7prX+MzQQq9Uq65Gg/CtjbYK3ik+SxTmmXg7EYGbsV3x2LTjG02xj9+eyzW
+Sp72TvO0jniBCPwIH/sa/khD0H3QA/epj0FuvcBZJD67lcFKN6E=
+=7G9C
 -----END PGP SIGNATURE-----
 
---0OWHXb1mYLuhj1Ox--
+--=-3foCDG+6ZtH2f72oUuhy--
