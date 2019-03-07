@@ -1,72 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:36155 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726059AbfCGGVU (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:41554 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726342AbfCGGhA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Mar 2019 01:21:20 -0500
+        Thu, 7 Mar 2019 01:37:00 -0500
+Message-ID: <788870e550cb3cecafd9db14c081ddb0225edfde.camel@decadent.org.uk>
+Subject: Re: [PATCH] kbuild: add workaround for Debian make-kpkg
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Thu, 07 Mar 2019 06:36:40 +0000
+In-Reply-To: <CAK7LNAQFWWzki-MvmhDpAn46XkDAu4_EGCQotbi5qAk5oJrgUQ@mail.gmail.com>
+References: <1551888035-13329-1-git-send-email-yamada.masahiro@socionext.com>
+         <5760e0a210c7c39b486aa932ccbe7f3f2c210d62.camel@decadent.org.uk>
+         <CAK7LNAQFWWzki-MvmhDpAn46XkDAu4_EGCQotbi5qAk5oJrgUQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-o6KqZAJ/ZnD7AtDiZPrq"
 MIME-Version: 1.0
-References: <20190207123022.7961-1-2pi@mok.nu> <CAK7LNAQZ7PDZ4+uZu-FT4V8yw9oUGz6e++9xSshWJvALj3gN0Q@mail.gmail.com>
- <20190219200837.d34cxg2d7gqxlvhs@mok.nu> <CAK7LNASU=Jf7aYnnn_7DWgxLz4sf4=x1HZaoGQW2rSXVbFO9Bg@mail.gmail.com>
- <20190223195749.7yswuedfv4qbiyik@mok.nu> <20190307060926.GE44339@wrath> <20190307061700.GF44339@wrath>
-In-Reply-To: <20190307061700.GF44339@wrath>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 7 Mar 2019 15:20:29 +0900
-Message-ID: <CAK7LNAQWzKNPFDa8GEWHkGVc6zT+iJo2RCdzg5OysnqwwWJzog@mail.gmail.com>
-Subject: Re: [PATCH] modpost: file2alias: define size of alias
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Darren Hart <dvhart@infradead.org>
-Cc: Mattias Jacobsson <2pi@mok.nu>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-
-Hi Darren,
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Manoj Srivastava <manoj.srivastava.1962@gmail.com>
 
 
-On Thu, Mar 7, 2019 at 3:17 PM Darren Hart <dvhart@infradead.org> wrote:
->
-> On Wed, Mar 06, 2019 at 10:09:26PM -0800, Darren Hart wrote:
-> > On Sat, Feb 23, 2019 at 08:57:50PM +0100, Mattias Jacobsson wrote:
-> > > On 2019-02-20, Masahiro Yamada wrote:
-> >
-> > > > > > If you want all the patches to go through x86 platform-driver tree,
-> > > > > > I am fine with that too.
-> > > > >
-> > > > > I don't mind either way, however I've asked the x86 platform-driver
-> > > > > maintainers if they have a preference in this matter. You should have
-> > > > > received that mail otherwise see [1].
-> > > > >
-> > > > > [1]: https://lkml.kernel.org/r/082d3d38b7dde6050b6b3e518ada439eade65b2c.1550603967.git.2pi@mok.nu
-> > > >
-> > > >
-> > > > I saw it.  The 2/8 uses ALIAS_SIZE.
-> > > >
-> > > > So, I think it will be better to include this one in your series.
-> > > > If necessary, please feel free to add
-> > > >
-> > > > Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > > >
-> > >
-> > > Okey, will do. Thanks!
-> >
-> >
-> > Agree, I'll pull it in.
->
-> Masahiro, may I include your Acked-by on the 2/8 patch as well?
+--=-o6KqZAJ/ZnD7AtDiZPrq
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 2019-03-07 at 13:03 +0900, Masahiro Yamada wrote:
+[...]
+> If make-kpkg will still be included in the future Debian releases,
+> I'd like to change make-kpkg to make it work more reliably.
+>=20
+>=20
+> The git URL in the control file
+> "https://anonscm.debian.org/git/users/srivasta/debian/kernel-package.git"
+> seems stale.
+>=20
+> Anyway, I found it in a new place:
+>=20
+> $ git clone  https://salsa.debian.org/srivasta/kernel-package
+>=20
+>=20
+> Hmm, the last commit was three years ago.
+>=20
+> So, it is almost unmaintained, I guess...
+[...]
+
+Yes, though there was a more recent bug fix by another Debian
+developer:
+https://tracker.debian.org/news/857223/accepted-kernel-package-13018nmu1-so=
+urce-into-unstable/
+
+Ben.
+
+--=20
+Ben Hutchings
+friends: People who know you well, but like you anyway.
 
 
-Sure.  Please go ahead.
+--=-o6KqZAJ/ZnD7AtDiZPrq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAlyAu/gACgkQ57/I7JWG
+EQnr4hAAzSU6SAe/6oZ3zOTVMCX0u6aRfQ56X/3pC0UXsim3Zt5A7R6Ittl8BBOj
+QbgzW2idWiCNmxUW9nUyoYY9eJtG98uv0cH/DBvrnw3XPscVBdjgIHycoClVJw8p
+6T5DAZOLzYcrkCUPAFSaxSQQ4qF7VFKvpIG8Gkka+4YN3nPUSXKz0XT9e3VgMyB3
+ONXwUz6TAzEDfATHM+aWOERFAriVGVDmwqnEPQFxJCh3WPCe4e4w/d+bv8I7gf1W
+djem7TO+4Juh3DK+JQr+HbZrjC2Zm43LVadzblNmCXxp297QrhNRZWqhwjjM//hl
+niMDAQ+Modd7RpCg4Fb4CbfUYL3QGjlVTgxb3WombCD6EAZEcbAsuAc5WnvGuNX0
+lxGEA2O8rrJw49PKV/l9g67Uf8k3ZbifC/9Bt0DpD6gTPbBSz+NaMmtfAkTngeQb
+QsuuVSfy74QIyvODPRCZ2PM75ly4SK11Bos0cmvkkOYadjV6Q2X53llU1rYZt5Xg
+UTfctRneNL4a9vniAh4cO5RXq/gQNcqy1U2CRXQHGWTaB5pS4yMA1A4NXebtovB5
+btEmx1gE8Mcf+eLAcbd0fPTVs08b76moi4XgkfraZmKf/C9Ib2ognGU9d0RAf0Y+
+L18mA4lE+hAywak8AofdrTVM7QZze06MqMCtU7j1G3XnIBAIJFI=
+=F4f5
+-----END PGP SIGNATURE-----
 
-
-> platform/x86: wmi: add WMI support to MODULE_DEVICE_TABLE()
->
-> --
-> Darren Hart
-> VMware Open Source Technology Center
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+--=-o6KqZAJ/ZnD7AtDiZPrq--
