@@ -1,60 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([217.72.192.75]:50847 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725790AbfCGAKa (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:42268 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726196AbfCGEEJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Mar 2019 19:10:30 -0500
-Subject: Re: [PATCH 2/3] x86: apuv2: fix input dependencies
-References: <20190304201930.1622839-1-arnd@arndb.de>
- <20190304201930.1622839-2-arnd@arndb.de>
- <a94c3c6a-481e-96a5-74e1-8c3299c74129@metux.net>
- <CAK8P3a0vdhCTNTF-K0mXjRWkPvv0qr3nf_52=8n6zTa7p3ELLw@mail.gmail.com>
- <54a7d035-155f-c47b-1db1-acb851b3aec6@metux.net>
- <CAHp75Vcd0eNCBtxb1huMBGFF9JXmropHv2YA1eh-yK3iMFfuFQ@mail.gmail.com>
-From: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Message-ID: <82c978b2-e9c4-e178-e4b7-621729c2cee4@metux.net>
-Date: Thu, 7 Mar 2019 01:10:13 +0100
+        Wed, 6 Mar 2019 23:04:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAHp75Vcd0eNCBtxb1huMBGFF9JXmropHv2YA1eh-yK3iMFfuFQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1551888035-13329-1-git-send-email-yamada.masahiro@socionext.com> <5760e0a210c7c39b486aa932ccbe7f3f2c210d62.camel@decadent.org.uk>
+In-Reply-To: <5760e0a210c7c39b486aa932ccbe7f3f2c210d62.camel@decadent.org.uk>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 7 Mar 2019 13:03:14 +0900
+Message-ID: <CAK7LNAQFWWzki-MvmhDpAn46XkDAu4_EGCQotbi5qAk5oJrgUQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: add workaround for Debian make-kpkg
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Darren Hart <dvhart@infradead.org>, Andy Shevchenko <andy@infradead.org>, Linus Walleij <linusw@kernel.org>, Enrico Weigelt <info@metux.net>, "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>, Platform Driver <platform-driver-x86@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Manoj Srivastava <manoj.srivastava.1962@gmail.com>
 
-On 05.03.19 14:56, Andy Shevchenko wrote:
-> 
-> Darren gave a talk about merging kernel configs to get something like
-> you want to.
-> This tool is quite long already lying around. merge_config.sh in your
-> kernel source tree.
+On Thu, Mar 7, 2019 at 6:02 AM Ben Hutchings <ben@decadent.org.uk> wrote:
+>
+> [Trying again with an alternate address for Manoj.]
+>
+> kernel-package is maintained by Manoj Srivastava (cc'd), not by the
+> Debian kernel team.
+>
+> On Thu, 2019-03-07 at 01:00 +0900, Masahiro Yamada wrote:
+> > Since commit 3812b8c5c5d5 ("kbuild: make -r/-R effective in top
+> > Makefile for old Make versions"), make-kpkg is not working.
+> >
+> > make-kpkg directly includes the top Makefile of Linux kernel, and
+> > appends some debian_* targets.
+> >
+> >   /usr/share/kernel-package/ruleset/kernel_version.mk:
+> >
+> >     # Include the kernel makefile
+> >     override dot-config := 1
+> >     include Makefile
+> >     dot-config := 1
+> >
+> > I did not know the kernel Makefile was used in that way, and it is
+> > hard to guarantee the behavior when the kernel Makefile is included
+> > by another Makefile from a different project.
+> >
+> > Looks like Debian Stretch stopped providing make-kpkg (except
+> > PowerPC).
+>
+> kernel-package is not included in stretch at all.  I'm not sure where
+> you're seeing it as being present on powerpc - that architecture wasn't
+> included in the stretch release.
 
-Yes, that's similar to how some distros (eg. yocto) do it.
 
-But my requirements are a bit more complex:
-
-In my final meta-config, I just wanna say:
-
-* i have board A (possibly multiple boards)
-* i need features X, Y, Z (eg. eth, display, can, ext4, acl, ...)
-
-And that shall be all to generate a minimal config for exactly those
-requirements.
-
-Doing that by just putting config snippets together, quickly turns into
-a maintenance hell. At least you'd need recursive dependencies and some
-if/else logic.
-
-That's why I've written kmct:
-
-https://github.com/metux/kmct
+Actually, I have not checked the powerpc part by myself.
 
 
---mtx
+I just read the following page:
 
--- 
-Enrico Weigelt, metux IT consult
-Free software and Linux embedded engineering
-info@metux.net -- +49-151-27565287
+https://unix.stackexchange.com/questions/238469/difference-between-make-kpkg-and-make-deb-pkg
+
+
+"make-kpkg is included in wheezy and jessie but stretch (current
+stable) only contains it for powerpc.
+
+Powerpc is no longer supported in buster (testing)"
+
+
+
+I will drop the PowerPC part.
+
+
+
+
+> > Maybe it is obsolete and being replaced with 'make deb-pkg' etc.
+> > but still widely used.
+> [...]
+>
+> kernel-package is currently planned to be included in the next release,
+> though I'm not sure whether it should be.
+
+Hmm, OK.
+
+I checked debian:buster in Docker,
+and I see it.
+
+
+root@3382de16960a:/home/foo# apt-file search  make-kpkg
+kernel-package: /usr/bin/make-kpkg
+kernel-package: /usr/share/man/man1/make-kpkg.1.gz
+zsh-common: /usr/share/zsh/functions/Completion/Debian/_make-kpkg
+
+
+
+
+If make-kpkg will still be included in the future Debian releases,
+I'd like to change make-kpkg to make it work more reliably.
+
+
+The git URL in the control file
+"https://anonscm.debian.org/git/users/srivasta/debian/kernel-package.git"
+seems stale.
+
+Anyway, I found it in a new place:
+
+$ git clone  https://salsa.debian.org/srivasta/kernel-package
+
+
+Hmm, the last commit was three years ago.
+
+So, it is almost unmaintained, I guess...
+
+
+> There is another bug report about kernel-package with current kernel
+> versions <https://bugs.debian.org/890817> but I don't know whether it
+> has been worked around already.
+
+Probably, not fixed.
+
+It is not stalled actually.
+I guess make-kpkg is hiding messages sent to stdout for some reasons.
+If you continue pressing "Enter" key,
+it will move on to the build stage.
+
+I will take a look if it should be maintained.
+
+
+
+Anyway, I want to hear from Manoj.
+
+
+--
+Best Regards
+Masahiro Yamada
