@@ -1,132 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:42268 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726196AbfCGEEJ (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:52132 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726028AbfCGGJc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Mar 2019 23:04:09 -0500
+        Thu, 7 Mar 2019 01:09:32 -0500
+Date: Wed, 6 Mar 2019 22:09:26 -0800
+From: Darren Hart <dvhart@infradead.org>
+Subject: Re: [PATCH] modpost: file2alias: define size of alias
+Message-ID: <20190307060926.GE44339@wrath>
+References: <20190207123022.7961-1-2pi@mok.nu>
+ <CAK7LNAQZ7PDZ4+uZu-FT4V8yw9oUGz6e++9xSshWJvALj3gN0Q@mail.gmail.com>
+ <20190219200837.d34cxg2d7gqxlvhs@mok.nu>
+ <CAK7LNASU=Jf7aYnnn_7DWgxLz4sf4=x1HZaoGQW2rSXVbFO9Bg@mail.gmail.com>
+ <20190223195749.7yswuedfv4qbiyik@mok.nu>
 MIME-Version: 1.0
-References: <1551888035-13329-1-git-send-email-yamada.masahiro@socionext.com> <5760e0a210c7c39b486aa932ccbe7f3f2c210d62.camel@decadent.org.uk>
-In-Reply-To: <5760e0a210c7c39b486aa932ccbe7f3f2c210d62.camel@decadent.org.uk>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 7 Mar 2019 13:03:14 +0900
-Message-ID: <CAK7LNAQFWWzki-MvmhDpAn46XkDAu4_EGCQotbi5qAk5oJrgUQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: add workaround for Debian make-kpkg
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190223195749.7yswuedfv4qbiyik@mok.nu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Manoj Srivastava <manoj.srivastava.1962@gmail.com>
+To: Mattias Jacobsson <2pi@mok.nu>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, Mar 7, 2019 at 6:02 AM Ben Hutchings <ben@decadent.org.uk> wrote:
->
-> [Trying again with an alternate address for Manoj.]
->
-> kernel-package is maintained by Manoj Srivastava (cc'd), not by the
-> Debian kernel team.
->
-> On Thu, 2019-03-07 at 01:00 +0900, Masahiro Yamada wrote:
-> > Since commit 3812b8c5c5d5 ("kbuild: make -r/-R effective in top
-> > Makefile for old Make versions"), make-kpkg is not working.
-> >
-> > make-kpkg directly includes the top Makefile of Linux kernel, and
-> > appends some debian_* targets.
-> >
-> >   /usr/share/kernel-package/ruleset/kernel_version.mk:
-> >
-> >     # Include the kernel makefile
-> >     override dot-config := 1
-> >     include Makefile
-> >     dot-config := 1
-> >
-> > I did not know the kernel Makefile was used in that way, and it is
-> > hard to guarantee the behavior when the kernel Makefile is included
-> > by another Makefile from a different project.
-> >
-> > Looks like Debian Stretch stopped providing make-kpkg (except
-> > PowerPC).
->
-> kernel-package is not included in stretch at all.  I'm not sure where
-> you're seeing it as being present on powerpc - that architecture wasn't
-> included in the stretch release.
+On Sat, Feb 23, 2019 at 08:57:50PM +0100, Mattias Jacobsson wrote:
+> On 2019-02-20, Masahiro Yamada wrote:
+
+> > > > If you want all the patches to go through x86 platform-driver tree,
+> > > > I am fine with that too.
+> > >
+> > > I don't mind either way, however I've asked the x86 platform-driver
+> > > maintainers if they have a preference in this matter. You should have
+> > > received that mail otherwise see [1].
+> > >
+> > > [1]: https://lkml.kernel.org/r/082d3d38b7dde6050b6b3e518ada439eade65b2c.1550603967.git.2pi@mok.nu
+> > 
+> > 
+> > I saw it.  The 2/8 uses ALIAS_SIZE.
+> > 
+> > So, I think it will be better to include this one in your series.
+> > If necessary, please feel free to add
+> > 
+> > Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > 
+> 
+> Okey, will do. Thanks!
 
 
-Actually, I have not checked the powerpc part by myself.
+Agree, I'll pull it in.
 
 
-I just read the following page:
-
-https://unix.stackexchange.com/questions/238469/difference-between-make-kpkg-and-make-deb-pkg
-
-
-"make-kpkg is included in wheezy and jessie but stretch (current
-stable) only contains it for powerpc.
-
-Powerpc is no longer supported in buster (testing)"
-
-
-
-I will drop the PowerPC part.
-
-
-
-
-> > Maybe it is obsolete and being replaced with 'make deb-pkg' etc.
-> > but still widely used.
-> [...]
->
-> kernel-package is currently planned to be included in the next release,
-> though I'm not sure whether it should be.
-
-Hmm, OK.
-
-I checked debian:buster in Docker,
-and I see it.
-
-
-root@3382de16960a:/home/foo# apt-file search  make-kpkg
-kernel-package: /usr/bin/make-kpkg
-kernel-package: /usr/share/man/man1/make-kpkg.1.gz
-zsh-common: /usr/share/zsh/functions/Completion/Debian/_make-kpkg
-
-
-
-
-If make-kpkg will still be included in the future Debian releases,
-I'd like to change make-kpkg to make it work more reliably.
-
-
-The git URL in the control file
-"https://anonscm.debian.org/git/users/srivasta/debian/kernel-package.git"
-seems stale.
-
-Anyway, I found it in a new place:
-
-$ git clone  https://salsa.debian.org/srivasta/kernel-package
-
-
-Hmm, the last commit was three years ago.
-
-So, it is almost unmaintained, I guess...
-
-
-> There is another bug report about kernel-package with current kernel
-> versions <https://bugs.debian.org/890817> but I don't know whether it
-> has been worked around already.
-
-Probably, not fixed.
-
-It is not stalled actually.
-I guess make-kpkg is hiding messages sent to stdout for some reasons.
-If you continue pressing "Enter" key,
-it will move on to the build stage.
-
-I will take a look if it should be maintained.
-
-
-
-Anyway, I want to hear from Manoj.
-
-
---
-Best Regards
-Masahiro Yamada
+-- 
+Darren Hart
+VMware Open Source Technology Center
