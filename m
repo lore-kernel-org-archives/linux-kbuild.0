@@ -1,30 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua1-f66.google.com ([209.85.222.66]:37828 "EHLO
-        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726428AbfCGRMK (ORCPT
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:40613 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726161AbfCGShp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Mar 2019 12:12:10 -0500
-Received: by mail-ua1-f66.google.com with SMTP id x1so10434317uaj.4
-        for <linux-kbuild@vger.kernel.org>; Thu, 07 Mar 2019 09:12:09 -0800 (PST)
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com. [209.85.222.47])
-        by smtp.gmail.com with ESMTPSA id s38sm749845uad.17.2019.03.07.09.12.06
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Mar 2019 09:12:06 -0800 (PST)
-Received: by mail-ua1-f47.google.com with SMTP id j7so10433877uak.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 07 Mar 2019 09:12:06 -0800 (PST)
+        Thu, 7 Mar 2019 13:37:45 -0500
+Received: by mail-pf1-f196.google.com with SMTP id h1so12100207pfo.7
+        for <linux-kbuild@vger.kernel.org>; Thu, 07 Mar 2019 10:37:44 -0800 (PST)
 MIME-Version: 1.0
 References: <20190307133514.44378-1-glider@google.com> <20190307133514.44378-2-glider@google.com>
 In-Reply-To: <20190307133514.44378-2-glider@google.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Thu, 7 Mar 2019 09:11:54 -0800
-Message-ID: <CAGXu5jJM4RNOUUSu5YnT_csdHjra=qJv3kiC6qh1aZTLCKvxdw@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Thu, 7 Mar 2019 10:37:32 -0800
+Message-ID: <CAKwvOdnRNyANL4T3CZxWiE_s+mKTYBBXbczeei8Ne6Sy7jb+og@mail.gmail.com>
 Subject: Re: [PATCH 1/1] RFC: initmem: introduce CONFIG_INIT_ALL_MEMORY and CONFIG_INIT_ALL_STACK
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Alexander Potapenko <glider@google.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, linux-security-module <linux-security-module@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Kees Cook <keescook@chromium.org>, sspatil@android.com
 
 On Thu, Mar 7, 2019 at 5:35 AM Alexander Potapenko <glider@google.com> wrote:
 >
@@ -35,23 +28,7 @@ On Thu, Mar 7, 2019 at 5:35 AM Alexander Potapenko <glider@google.com> wrote:
 >
 > CONFIG_INIT_ALL_MEMORY is going to be an umbrella config for options
 > that force heap and stack initialization.
-
-We have some level of control over the heap portions already with the
-poisoning options, but they currently require command-line enabling.
-
-For the slab allocator:
-CONFIG_SLUB_DEBUG=y
-and boot with "slub_debug=P"
-
-For the page allocator:
-CONFIG_PAGE_POISONING=y
-CONFIG_PAGE_POISONING_NO_SANITY=y
-CONFIG_PAGE_POISONING_ZERO=y
-and boot with "page_poison=1"
-
-So I think it would make sense to wire up the boot defaults and
-continue some of the benchmarking work to improve the performance hit.
-
+>
 > CONFIG_INIT_ALL_STACK turns on stack initialization based on the
 > -ftrivial-auto-var-init Clang flag.
 >
@@ -62,26 +39,31 @@ continue some of the benchmarking work to improve the performance hit.
 > It has three possible values:
 >   pattern - uninitialized locals are filled with a fixed pattern
 >     (mostly 0xAA on 64-bit platforms, see https://reviews.llvm.org/D54604
+
+Hopefully the disagreements there about "defining a new dialect of
+C++" don't apply to us in the kernel.  We'd like to have this feature;
+our dialect of C is already quite far from what ISO has specified,
+both through the explicit use of `-f` compiler flags and use of most
+GNU C extensions.  We already have our own dialect of C for the
+kernel, it's too late for that.  But maybe I should go bikeshed in
+cfe-dev...
+
+Thanks for this patch.  I'll take a closer look once Kees' feedback
+has been addressed.
+
 >     for more details) likely to cause crashes when uninitialized value is
 >     used;
 >   zero (it's still debated whether this flag makes it to the official
 >     Clang release) - uninitialized locals are filled with zeroes;
 >   uninitialized (default) - uninitialized locals are left intact.
-
-This should get wired up to CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL in
-the GCC case.
-
+>
 > The proposed config builds the kernel with
 > -ftrivial-auto-var-init=pattern.
 >
 > Developers have the possibility to opt-out of this feature on a
 > per-file (by using the INIT_ALL_MEMORY_ Makefile prefix) or per-variable
 > (by using __attribute__((uninitialized))) basis.
-
-I would like a clean way to offer a paranoid "true init all memory"
-config that will ignore the attribute. Also, BYREF_ALL needs to gain
-the attribute knowledge.
-
+>
 > Signed-off-by: Alexander Potapenko <glider@google.com>
 > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
 > Cc: James Morris <jmorris@namei.org>
@@ -146,10 +128,6 @@ the attribute knowledge.
 > +            -ftrivial-auto-var-init is not supported by compiler)
 > +   endif
 > +endif
-
-This should be done in the Kconfig (see how stack protector is
-handled), rather than the Makefile. See below.
-
 > +
 > +endif
 > diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
@@ -196,33 +174,12 @@ handled), rather than the Makefile. See below.
 > +         Enforce memory initialization to mitigate infoleaks and make
 > +         the control-flow bugs depending on uninitialized values more
 > +         deterministic.
-
-See my notes about enabling page/slab poisoning via this option (which
-should probably be a separate HEAP option).
-
 > +
 > +if INIT_ALL_MEMORY
 > +
 > +config INIT_ALL_STACK
 > +       bool "Initialize all stack"
 > +       depends on INIT_ALL_MEMORY
-
-For example of doing this in Kconfig:
-
-config CC_HAS_AUTO_VAR_INIT
-        def_bool $(cc-option,-ftrivial-auto-var-init=pattern)
-
-config INIT_ALL_STACK
-        bool "Initialize all stack"
-        depends on CC_HAS_AUTO_VAR_INIT || HAVE_GCC_PLUGINS
-        select GCC_PLUGINS if !CC_HAS_AUTO_VAR_INIT
-        select GCC_PLUGIN_STRUCTLEAK if !CC_HAS_AUTO_VAR_INIT
-        select GCC_PLUGIN_STRUCTLEAK_BYREF_ALL if !CC_HAS_AUTO_VAR_INIT
-
-probably GCC_PLUGINS needs to be "default y" so this select mess is
-less crazy. I already started work on reorganizing the Kconfig there:
-https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/commit/?h=kspp/gcc-plugin/structleak&id=81a56f6dcd20325607d6008f4bb560c96f4c821a
-
 > +       default y
 > +       help
 > +         Initialize uninitialized stack data with a 0xAA pattern.
@@ -234,5 +191,7 @@ https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/commit/?h=kspp/gc
 > 2.21.0.352.gf09ad66450-goog
 >
 
+
 -- 
-Kees Cook
+Thanks,
+~Nick Desaulniers
