@@ -1,89 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:41463 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726207AbfCGPad (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:65019 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726207AbfCGPdJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Mar 2019 10:30:33 -0500
+        Thu, 7 Mar 2019 10:33:09 -0500
 MIME-Version: 1.0
-References: <20190221215901.23970-1-ar@cs.msu.ru> <20190221215901.23970-3-ar@cs.msu.ru>
-In-Reply-To: <20190221215901.23970-3-ar@cs.msu.ru>
+References: <20190221215901.23970-1-ar@cs.msu.ru>
+In-Reply-To: <20190221215901.23970-1-ar@cs.msu.ru>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 8 Mar 2019 00:29:50 +0900
-Message-ID: <CAK7LNATez-USGytbyEG=So47JQPGvsJOSqd==q6MuBoj9DJTFw@mail.gmail.com>
-Subject: Re: [PATCH] scripts/package/mkdebian: expose KCONFIG_CONFIG to debian/rules
+Date: Fri, 8 Mar 2019 00:32:11 +0900
+Message-ID: <CAK7LNAQrN1e1GYRd760pWiAdgY9_7Jda3QD_zozTNHpHOim4Xg@mail.gmail.com>
+Subject: Re: [PATCH] scripts/package/Makefile: put proper config in source tarball
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arseny Maslennikov <ar@cs.msu.ru>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Riku Voipio <riku.voipio@linaro.org>
 
-On Fri, Feb 22, 2019 at 7:21 AM Arseny Maslennikov <ar@cs.msu.ru> wrote:
+On Fri, Feb 22, 2019 at 7:19 AM Arseny Maslennikov <ar@cs.msu.ru> wrote:
 >
-> If KCONFIG_CONFIG is passed to `make deb-pkg` as a makeflag or
-> environment variable, the source tarball produced contains whatever
-> specified by that variable instead of the usual `.config'.
+> It is widely known that one can build a kernel without a .config in the
+> source tree
+
+"without a .config in the source file"  means
+KCONFIG_CONFIG will probably contain '..' or absolute path.
+
+
+
+ex1)  KCONFIG_CONFIG=../my_dir/.config
+
+ex2)  KCONFIG_CONFIG=/absolute/pass/to/my/.config
+
+
+
+
+
+> by setting KCONFIG_CONFIG equal to the actual configuration
+> file path.
 >
-> While `make deb-pkg' yields a correct Debian binary package (at least
-> on amd64), the generated source package's debian/rules does not pass
-> KCONFIG_CONFIG to make(1), thus rendering the source package unable to
-> be rebuilt.
->
-> Steps to reproduce the kind of failure being fixed:
-> 1)  Produce a source and binary package with:
->         % KCONFIG_CONFIG=my.config make deb-pkg
-> 2)  In the parent directory:
->         % dpkg-source -x linux-*.dsc
-> 3)  In the unpacked source directory:
->         % debuild -i -us -uc
->
-> Here is an excerpt from an example output of `debuild -i -us -uc':
->
-> make[2]: *** No rule to make target '.config', needed by 'kernel/config_data.gz'.  Stop.
-> make[1]: *** [Makefile:1043: kernel] Error 2
-> make[1]: Leaving directory '/home/ar/linux-kernel/deb/linux-5.0.0-rc5-tks-gitd6ff78479ec5-57-5.0.0-rc5-tks-gitd6ff78479ec5-57'
-> make: *** [debian/rules:4: build] Error 2
-> dpkg-buildpackage: error: debian/rules build subprocess returned exit status 2
-> debuild: fatal error at line 1182:
-> dpkg-buildpackage -us -uc -ui -i failed
+> When making a *-pkg target, make(1) prepares a source tarball and tries
+> to pack `.config' in there regardless of the value of KCONFIG_CONFIG,
+> failing spectacularly if .config is absent and packing the wrong config
+> if it exists.
+> Let's fix that.
 
 
+Did you notice the log 'Removing leading ...' from tar
+for case ex1), ex2) ?
 
-I am not convinced with this patch.
 
-People would be upset if they got a source package and
-they  did not find the .config in the standard location.
+masahiro@grover:~/ref/linux$ make -j8  KCONFIG_CONFIG=../.config  deb-pkg
+make clean
+/bin/bash ./scripts/package/mkdebian
+  TAR     linux-5.0.0+.tar.gz
+tar: Removing leading `../' from member names
+   ...
 
-It is difficult to notice the .config has been moved
-to somewhere until they check debian/rules.
 
-Why do we need to create such a strange package?
+Even if I apply 3/3, it will produce a broken source package
+since the tar will rip off the leading directory path,
+then it mismatches to KCONFIG_CONFIG recorded in debian/rules.
 
+A simple case like KCONFIG_CONFIG=my.config will work,
+but I am not convinced with 3/3.
 
 
 
 
 > Signed-off-by: Arseny Maslennikov <ar@cs.msu.ru>
 > ---
->  scripts/package/mkdebian | 2 ++
->  1 file changed, 2 insertions(+)
+>  scripts/package/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-> index edcad61fe3cd..130d3f6696eb 100755
-> --- a/scripts/package/mkdebian
-> +++ b/scripts/package/mkdebian
-> @@ -207,10 +207,12 @@ cat <<EOF > debian/rules
+> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+> index 453fecee62f0..100a0d28ad25 100644
+> --- a/scripts/package/Makefile
+> +++ b/scripts/package/Makefile
+> @@ -27,7 +27,7 @@ KDEB_SOURCENAME ?= linux-$(KERNELRELEASE)
+>  KBUILD_PKG_ROOTCMD ?="fakeroot -u"
+>  export KDEB_SOURCENAME
+>  # Include only those top-level files that are needed by make, plus the GPL copy
+> -TAR_CONTENT := $(KBUILD_ALLDIRS) .config .scmversion Makefile \
+> +TAR_CONTENT := $(KBUILD_ALLDIRS) $(KCONFIG_CONFIG) .scmversion Makefile \
+>                 Kbuild Kconfig COPYING $(wildcard localversion*)
+>  MKSPEC     := $(srctree)/scripts/package/mkspec
 >
->  build:
->         \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} \
-> +       KCONFIG_CONFIG=${KCONFIG_CONFIG} \
->         KBUILD_BUILD_VERSION=${revision} KBUILD_SRC=
->
->  binary-arch:
->         \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} \
-> +       KCONFIG_CONFIG=${KCONFIG_CONFIG} \
->         KBUILD_BUILD_VERSION=${revision} KBUILD_SRC= intdeb-pkg
->
->  clean:
 > --
 > 2.20.1
 >
