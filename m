@@ -1,81 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:41554 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726342AbfCGGhA (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:55912 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726015AbfCGHDk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Mar 2019 01:37:00 -0500
-Message-ID: <788870e550cb3cecafd9db14c081ddb0225edfde.camel@decadent.org.uk>
-Subject: Re: [PATCH] kbuild: add workaround for Debian make-kpkg
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Thu, 07 Mar 2019 06:36:40 +0000
-In-Reply-To: <CAK7LNAQFWWzki-MvmhDpAn46XkDAu4_EGCQotbi5qAk5oJrgUQ@mail.gmail.com>
-References: <1551888035-13329-1-git-send-email-yamada.masahiro@socionext.com>
-         <5760e0a210c7c39b486aa932ccbe7f3f2c210d62.camel@decadent.org.uk>
-         <CAK7LNAQFWWzki-MvmhDpAn46XkDAu4_EGCQotbi5qAk5oJrgUQ@mail.gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-o6KqZAJ/ZnD7AtDiZPrq"
+        Thu, 7 Mar 2019 02:03:40 -0500
+Date: Wed, 6 Mar 2019 23:03:36 -0800
+From: Darren Hart <dvhart@infradead.org>
+Subject: Re: [PATCH 2/3] x86: apuv2: fix input dependencies
+Message-ID: <20190307070336.GI44339@wrath>
+References: <20190304201930.1622839-1-arnd@arndb.de>
+ <20190304201930.1622839-2-arnd@arndb.de>
+ <a94c3c6a-481e-96a5-74e1-8c3299c74129@metux.net>
+ <CAK8P3a0vdhCTNTF-K0mXjRWkPvv0qr3nf_52=8n6zTa7p3ELLw@mail.gmail.com>
+ <54a7d035-155f-c47b-1db1-acb851b3aec6@metux.net>
+ <CAHp75Vcd0eNCBtxb1huMBGFF9JXmropHv2YA1eh-yK3iMFfuFQ@mail.gmail.com>
+ <82c978b2-e9c4-e178-e4b7-621729c2cee4@metux.net>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <82c978b2-e9c4-e178-e4b7-621729c2cee4@metux.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Manoj Srivastava <manoj.srivastava.1962@gmail.com>
+To: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Andy Shevchenko <andy@infradead.org>, Linus Walleij <linusw@kernel.org>, Enrico Weigelt <info@metux.net>, "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>, Platform Driver <platform-driver-x86@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
+On Thu, Mar 07, 2019 at 01:10:13AM +0100, Enrico Weigelt, metux IT consult wrote:
+> On 05.03.19 14:56, Andy Shevchenko wrote:
+> > 
+> > Darren gave a talk about merging kernel configs to get something like
+> > you want to.
+> > This tool is quite long already lying around. merge_config.sh in your
+> > kernel source tree.
+> 
+> Yes, that's similar to how some distros (eg. yocto) do it.
+> 
 
---=-o6KqZAJ/ZnD7AtDiZPrq
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I wrote merge_config.sh to replace and simplify some of the yocto
+tooling. With merge_config upstream, Yocto now uses it directly.
 
-On Thu, 2019-03-07 at 13:03 +0900, Masahiro Yamada wrote:
-[...]
-> If make-kpkg will still be included in the future Debian releases,
-> I'd like to change make-kpkg to make it work more reliably.
->=20
->=20
-> The git URL in the control file
-> "https://anonscm.debian.org/git/users/srivasta/debian/kernel-package.git"
-> seems stale.
->=20
-> Anyway, I found it in a new place:
->=20
-> $ git clone  https://salsa.debian.org/srivasta/kernel-package
->=20
->=20
-> Hmm, the last commit was three years ago.
->=20
-> So, it is almost unmaintained, I guess...
-[...]
+> But my requirements are a bit more complex:
+> 
+> In my final meta-config, I just wanna say:
+> 
+> * i have board A (possibly multiple boards)
+> * i need features X, Y, Z (eg. eth, display, can, ext4, acl, ...)
+> 
+> And that shall be all to generate a minimal config for exactly those
+> requirements.
 
-Yes, though there was a more recent bug fix by another Debian
-developer:
-https://tracker.debian.org/news/857223/accepted-kernel-package-13018nmu1-so=
-urce-into-unstable/
+That's also the goal of the Yocto configuration fragments, and is
+possible with merge_config with a set of defined fragments.
 
-Ben.
+> 
+> Doing that by just putting config snippets together, quickly turns into
+> a maintenance hell. At least you'd need recursive dependencies and some
+> if/else logic.
+> 
+> That's why I've written kmct:
+> 
+> https://github.com/metux/kmct
 
---=20
-Ben Hutchings
-friends: People who know you well, but like you anyway.
+I had a look, the README could benefit from a basic usage example.
+Digging through it further, it appears that you are creating yaml files
+which contain CONFIGs. The problem with this in my opinion is these are
+kernel version specific, so you know have a lot of boiler plate yaml
+wrapping kernel version specific CONFIG options which will slowly get
+out of sync over time. This is the usual argument for keeping config
+fragments together with the kernel - and why we do that in arch/*/config
+for example.
 
+Perhaps I'm missing your desired workflow though. I tend to find the
+options I need and record them in a fragment, and save it off for later
+to quickly be able to "make defconfig fragA.config fragB.config" etc. Is
+what you're trying to do different?
 
---=-o6KqZAJ/ZnD7AtDiZPrq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAlyAu/gACgkQ57/I7JWG
-EQnr4hAAzSU6SAe/6oZ3zOTVMCX0u6aRfQ56X/3pC0UXsim3Zt5A7R6Ittl8BBOj
-QbgzW2idWiCNmxUW9nUyoYY9eJtG98uv0cH/DBvrnw3XPscVBdjgIHycoClVJw8p
-6T5DAZOLzYcrkCUPAFSaxSQQ4qF7VFKvpIG8Gkka+4YN3nPUSXKz0XT9e3VgMyB3
-ONXwUz6TAzEDfATHM+aWOERFAriVGVDmwqnEPQFxJCh3WPCe4e4w/d+bv8I7gf1W
-djem7TO+4Juh3DK+JQr+HbZrjC2Zm43LVadzblNmCXxp297QrhNRZWqhwjjM//hl
-niMDAQ+Modd7RpCg4Fb4CbfUYL3QGjlVTgxb3WombCD6EAZEcbAsuAc5WnvGuNX0
-lxGEA2O8rrJw49PKV/l9g67Uf8k3ZbifC/9Bt0DpD6gTPbBSz+NaMmtfAkTngeQb
-QsuuVSfy74QIyvODPRCZ2PM75ly4SK11Bos0cmvkkOYadjV6Q2X53llU1rYZt5Xg
-UTfctRneNL4a9vniAh4cO5RXq/gQNcqy1U2CRXQHGWTaB5pS4yMA1A4NXebtovB5
-btEmx1gE8Mcf+eLAcbd0fPTVs08b76moi4XgkfraZmKf/C9Ib2ognGU9d0RAf0Y+
-L18mA4lE+hAywak8AofdrTVM7QZze06MqMCtU7j1G3XnIBAIJFI=
-=F4f5
------END PGP SIGNATURE-----
-
---=-o6KqZAJ/ZnD7AtDiZPrq--
+-- 
+Darren Hart
+VMware Open Source Technology Center
