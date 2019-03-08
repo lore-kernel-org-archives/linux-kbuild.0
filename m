@@ -1,78 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:46648 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726224AbfCGV4Y (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:56172 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725308AbfCHFa6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Mar 2019 16:56:24 -0500
-Message-ID: <c93a7273c89c649373761f2ba26a6ef05787d08d.camel@decadent.org.uk>
-Subject: Re: [PATCH] kbuild: add workaround for Debian make-kpkg
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Thu, 07 Mar 2019 21:56:05 +0000
-In-Reply-To: <CABkpOEUqJWn62VZoTA5UEnbDieiYR9y3diRQhZuOVe6hOoBNhA@mail.gmail.com>
-References: <1551888035-13329-1-git-send-email-yamada.masahiro@socionext.com>
-         <5760e0a210c7c39b486aa932ccbe7f3f2c210d62.camel@decadent.org.uk>
-         <CAK7LNAQFWWzki-MvmhDpAn46XkDAu4_EGCQotbi5qAk5oJrgUQ@mail.gmail.com>
-         <788870e550cb3cecafd9db14c081ddb0225edfde.camel@decadent.org.uk>
-         <CABkpOEUqJWn62VZoTA5UEnbDieiYR9y3diRQhZuOVe6hOoBNhA@mail.gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-q9c6TjJS+ntCCGTvch+Y"
-MIME-Version: 1.0
+        Fri, 8 Mar 2019 00:30:58 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] unicore32: simplify linker script generation for decompressor
+Date: Fri,  8 Mar 2019 14:30:35 +0900
+Message-Id: <1552023035-29826-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Manoj Srivastava <manoj.srivastava.1962@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Guan Xuetao <gxt@pku.edu.cn>
 
+When I was searching for unneeded $(KCONFIG_CONFIG) usages, I noticed
+this strange build dependency.
 
---=-q9c6TjJS+ntCCGTvch+Y
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+It can use $(call if_changed,...) in case ZTEXTADDR and ZBSSADDR are
+changed, but even a simpler way is to use the pattern rule in
+scripts/Makefile.build. This is what arch/arm/boot/compressed/Makefile
+does.
 
-On Wed, 2019-03-06 at 22:48 -0800, Manoj Srivastava wrote:
-> Hi,
->=20
->   Does this have any users? I can take a stand at making it work, but I a=
-m
-> unsure of there are enough people interested in make-kpkg anymore to make
-> it worthwhile.
->=20
->   There is a man pager that might be of minor interest, but that can be
-> taken over by the kernel team if they want
-[...]
+I did only build test. I confirmed equivalent vmlinux.lds was generated.
 
-I assume you're referring to kernel-img.conf.  I would be happy to add
-that to linux-base, with some clarification of which settings are
-understood by which packages.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-I take it that you don't want kernel-package to be included in buster,
-so can you open an RC bug to say so?
+ arch/unicore32/boot/compressed/Makefile                          | 5 +----
+ arch/unicore32/boot/compressed/{vmlinux.lds.in => vmlinux.lds.S} | 0
+ 2 files changed, 1 insertion(+), 4 deletions(-)
+ rename arch/unicore32/boot/compressed/{vmlinux.lds.in => vmlinux.lds.S} (100%)
 
-Ben.
-
---=20
-Ben Hutchings
-friends: People who know you well, but like you anyway.
-
-
-
---=-q9c6TjJS+ntCCGTvch+Y
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAlyBk3UACgkQ57/I7JWG
-EQlN6RAAkRzm+OKmLh9eRxcev5TUquwnx7X9Qm9errUM8/cqJHbl9NfSNn7uQbjw
-xp2sKQXcYFDrD+yKrc1VSI5kyRQ/mCuwlw3zobwJ/bmVA2M2H/UsAPt9CfIK36if
-QVraGdnayOYqM1uHOhfjmixkT/zx30P5bzjRpOQgQYy15BN4JXiOfXWBeaWf/4Pj
-Mup+EjSZ0Fa3JFrs5joNFjo0bG/RpSWQ/CQewVQ/cDU9LrVUgOTK+nnXYjkHhb3k
-U3NGVDEB4b1j7qR5WIKuF1Ukht0L61rGPOECXATwtHeYBKSLslv1vIOrFnRFqT8D
-9v3scJAr1W1yIWSANSdv3QndJIZ8rG2KGRh9IPz5rmlW2VR8+aMS5nPY5yOLA5EN
-nL0Iv7Pbc7oWihweD6iiINNjpq9qO4NoowlzqSAEIWj/JmCMqfoLM2RNqXR/bi2V
-bComH2YEC0hXnOKnf2tfyuaL/wAlYdr6gGdSI0YMBOjLvU7yjLKYApXPzBIreXbd
-Pls8YMRK2aSejsrnHP8Rm+PXj54FfSzD8dliK5AHS7/Uayu9R6oMDBsF+VDKs4bF
-yt+AXGa8QKMiQZkeNMrN8iY8786K2VihH00S7/ZZZm+TvM47Qsaga+DVQNrRHxCX
-2JAzSW9y0nrylzlhl0PJT8yHJ8XaGwhau0oVTA5geSc60y3netg=
-=+6F+
------END PGP SIGNATURE-----
-
---=-q9c6TjJS+ntCCGTvch+Y--
+diff --git a/arch/unicore32/boot/compressed/Makefile b/arch/unicore32/boot/compressed/Makefile
+index 9aecdd3..150fafc 100644
+--- a/arch/unicore32/boot/compressed/Makefile
++++ b/arch/unicore32/boot/compressed/Makefile
+@@ -61,7 +61,4 @@ $(obj)/vmlinux: $(obj)/vmlinux.lds $(obj)/head.o $(obj)/piggy.o \
+ ZTEXTADDR	:= 0x03000000
+ ZBSSADDR	:= ALIGN(4)
+ 
+-SEDFLAGS_lds	= s/TEXT_START/$(ZTEXTADDR)/;s/BSS_START/$(ZBSSADDR)/
+-$(obj)/vmlinux.lds: $(obj)/vmlinux.lds.in arch/unicore32/boot/Makefile $(KCONFIG_CONFIG)
+-	@sed "$(SEDFLAGS_lds)" < $< > $@
+-
++CPPFLAGS_vmlinux.lds = -DTEXT_START="$(ZTEXTADDR)" -DBSS_START="$(ZBSSADDR)"
+diff --git a/arch/unicore32/boot/compressed/vmlinux.lds.in b/arch/unicore32/boot/compressed/vmlinux.lds.S
+similarity index 100%
+rename from arch/unicore32/boot/compressed/vmlinux.lds.in
+rename to arch/unicore32/boot/compressed/vmlinux.lds.S
+-- 
+2.7.4
