@@ -1,51 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.187]:38875 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726249AbfCHMpJ (ORCPT
+Received: from mail-yw1-f74.google.com ([209.85.161.74]:56275 "EHLO
+        mail-yw1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726171AbfCHN1H (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Mar 2019 07:45:09 -0500
-From: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Subject: [PATCH v1 2/5] scripts: mkdebian: allow renaming generated debian/rules via env
-Date: Fri,  8 Mar 2019 13:44:21 +0100
-Message-Id: <1552049064-32044-3-git-send-email-info@metux.net>
-In-Reply-To: <1552049064-32044-1-git-send-email-info@metux.net>
-References: <1552049064-32044-1-git-send-email-info@metux.net>
+        Fri, 8 Mar 2019 08:27:07 -0500
+Received: by mail-yw1-f74.google.com with SMTP id j64so27389659ywg.22
+        for <linux-kbuild@vger.kernel.org>; Fri, 08 Mar 2019 05:27:06 -0800 (PST)
+Date: Fri,  8 Mar 2019 14:26:59 +0100
+Message-Id: <20190308132701.133598-1-glider@google.com>
+Mime-Version: 1.0
+Subject: [PATCH v2 0/2] RFC: introduce CONFIG_INIT_ALL_MEMORY
+From: Alexander Potapenko <glider@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, info@metux.net, apw@canonical.com, joe@perches.com, linux-kbuild@vger.kernel.org, linux-riscv@lists.infradead.org
+To: yamada.masahiro@socionext.com, jmorris@namei.org, serge@hallyn.com
+Cc: linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org, ndesaulniers@google.com, kcc@google.com, dvyukov@google.com, keescook@chromium.org, sspatil@android.com, kernel-hardening@lists.openwall.com
 
-Add new environment variable KDEB_RULES for controlling where the
-generated debian rules are written to. By defaults, it's debian/rules,
-but packagers might override it for providing their own rules file.
+This patch is a part of a bigger initiative to allow initializing
+heap/stack memory in the Linux kernels by default.
+The rationale behind doing so is to reduce the severity of bugs caused
+by using uninitialized memory.
 
-Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
----
- scripts/package/mkdebian | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Over the last two years KMSAN (https://github.com/google/kmsan/) has
+found more than a hundred bugs running in a really moderate setup (orders
+of magnitude less CPU/months than KASAN). Some of those bugs led to
+information leaks if uninitialized memory was copied to the userspace,
+other could cause DoS because of subverted control flow.
+A lot more bugs remain uncovered, so we want to provide the distros and OS
+vendors with a last resort measure to mitigate such bugs.
 
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index edcad61..ff226be 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -99,6 +99,9 @@ kernel_headers_packagename=linux-headers-$version
- dbg_packagename=$packagename-dbg
- debarch=
- set_debarch
-+if [ -z "$KDEB_RULES" ]; then
-+    KDEB_RULES=debian/rules
-+fi
- 
- if [ "$ARCH" = "um" ] ; then
- 	packagename=user-mode-linux-$version
-@@ -202,7 +205,7 @@ Description: Linux kernel debugging symbols for $version
-  all the necessary debug symbols for the kernel and its modules.
- EOF
- 
--cat <<EOF > debian/rules
-+cat <<EOF > $KDEB_RULES
- #!$(command -v $MAKE) -f
- 
- build:
+Our plan is to introduce configuration flags to force initialization of
+stack and heap variables with a fixed pattern.
+This is going to render information leaks inefficient (as we'll only leak
+pattern data) and make uses of uninitialized values in conditions more
+deterministic and discoverable.
+
+The stack instrumentation part is based on Clang's -ftrivial-auto-var-init
+(see https://reviews.llvm.org/D54604 ; there's also a GCC feature request
+for a similar flag: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=87210)
+or GCC's -fplugin-arg-structleak_plugin-byref-all
+The heap initialization part is compiler-agnostic and is based on the
+existing CONFIG_SLUB_DEBUG and CONFIG_PAGE_POISONING.
+
+Alexander Potapenko (2):
+  initmem: introduce CONFIG_INIT_ALL_MEMORY and CONFIG_INIT_ALL_STACK
+  initmem: introduce CONFIG_INIT_ALL_HEAP
+
+ Makefile                 |  3 ++-
+ mm/page_poison.c         |  5 +++++
+ mm/slub.c                |  2 ++
+ scripts/Makefile.initmem | 10 ++++++++++
+ scripts/Makefile.lib     |  6 ++++++
+ security/Kconfig         |  1 +
+ security/Kconfig.initmem | 40 ++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 66 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/Makefile.initmem
+ create mode 100644 security/Kconfig.initmem
+
 -- 
-1.9.1
+2.21.0.360.g471c308f928-goog
