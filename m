@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.131]:59563 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.187]:38875 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726592AbfCHMpN (ORCPT
+        with ESMTP id S1726249AbfCHMpJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Mar 2019 07:45:13 -0500
+        Fri, 8 Mar 2019 07:45:09 -0500
 From: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Subject: [PATCH v1 5/5] debian: add generic rule file
-Date: Fri,  8 Mar 2019 13:44:24 +0100
-Message-Id: <1552049064-32044-6-git-send-email-info@metux.net>
+Subject: [PATCH v1 2/5] scripts: mkdebian: allow renaming generated debian/rules via env
+Date: Fri,  8 Mar 2019 13:44:21 +0100
+Message-Id: <1552049064-32044-3-git-send-email-info@metux.net>
 In-Reply-To: <1552049064-32044-1-git-send-email-info@metux.net>
 References: <1552049064-32044-1-git-send-email-info@metux.net>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,84 +15,37 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, info@metux.net, apw@canonical.com, joe@perches.com, linux-kbuild@vger.kernel.org, linux-riscv@lists.infradead.org
 
-Adding a generic debian rule file, so we can build the directly
-via usual Debian package build tools (eg. git-buildpackage,
-dck-buildpackage, etc). It expects the .config file already
-placed in the source tree.
-
-The rule file contains a rule for creating debian/control and
-other metadata - this is done similar to the 'deb-pkg' make rule,
-scripts/packaging/mkdebian.
+Add new environment variable KDEB_RULES for controlling where the
+generated debian rules are written to. By defaults, it's debian/rules,
+but packagers might override it for providing their own rules file.
 
 Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
 ---
- .gitignore   |  1 +
- MAINTAINERS  |  6 ++++++
- debian/rules | 27 +++++++++++++++++++++++++++
- 3 files changed, 34 insertions(+)
- create mode 100755 debian/rules
+ scripts/package/mkdebian | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/.gitignore b/.gitignore
-index a20ac26..2d8081f 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -68,6 +68,7 @@ modules.builtin
- # Debian directory (make deb-pkg)
- #
- /debian/
-+!/debian/rules
+diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+index edcad61..ff226be 100755
+--- a/scripts/package/mkdebian
++++ b/scripts/package/mkdebian
+@@ -99,6 +99,9 @@ kernel_headers_packagename=linux-headers-$version
+ dbg_packagename=$packagename-dbg
+ debarch=
+ set_debarch
++if [ -z "$KDEB_RULES" ]; then
++    KDEB_RULES=debian/rules
++fi
  
- #
- # Snap directory (make snap-pkg)
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 09d47cd..1edc169 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4363,6 +4363,12 @@ F:	include/uapi/linux/dccp.h
- F:	include/linux/tfrc.h
- F:	net/dccp/
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+@@ -202,7 +205,7 @@ Description: Linux kernel debugging symbols for $version
+  all the necessary debug symbols for the kernel and its modules.
+ EOF
  
-+DEBIAN PACKAGING FILES
-+M:	Enrico Weigelt <info@metux.net>
-+L:	linux-kbuild@vger.kernel.org
-+S:	Maintained
-+F:	debian/
-+
- DECnet NETWORK LAYER
- W:	http://linux-decnet.sourceforge.net
- L:	linux-decnet-user@lists.sourceforge.net
-diff --git a/debian/rules b/debian/rules
-new file mode 100755
-index 0000000..c2f0319
---- /dev/null
-+++ b/debian/rules
-@@ -0,0 +1,27 @@
-+#!/usr/bin/make -f
-+# SPDX-License-Identifier: GPL-2.0
-+
-+export MAKE
-+export KERNELARCH           = $(shell $(MAKE) kernelarch)
-+export KERNELRELEASE        = $(shell $(MAKE) kernelrelease)
-+export KBUILD_DEBARCH       = $(shell dpkg-architecture -qDEB_HOST_ARCH)
-+export KBUILD_BUILD_VERSION = $(shell $(MAKE) kernellocalversion)
-+export KDEB_RULES           = debian/rules.auto
-+export KDEB_SOURCENAME      = linux-source
-+export ARCH                 = $(KERNELARCH)
-+
-+debian/control debian/changelong debian/arch debian/copyright:
-+debian/control:
-+	./scripts/package/mkdebian
-+
-+build:	debian/control
-+	$(MAKE) KERNELRELEASE=$(KERNELRELEASE) ARCH=$(KERNELARCH) KBUILD_BUILD_VERSION=$(KBUILD_BUILD_VERSION) KBUILD_SRC=
-+
-+binary-arch:	debian/control
-+	$(MAKE) KERNELRELEASE=$(KERNELRELEASE) ARCH=$(KERNELARCH) KBUILD_BUILD_VERSION=$(KBUILD_BUILD_VERSION) KBUILD_SRC= intdeb-pkg
-+
-+clean:
-+	rm -rf debian/*tmp debian/files debian/changelog debian/control debian/copyright debian/rules.auto debian/arch
-+	$(MAKE) clean
-+
-+binary: binary-arch
+-cat <<EOF > debian/rules
++cat <<EOF > $KDEB_RULES
+ #!$(command -v $MAKE) -f
+ 
+ build:
 -- 
 1.9.1
