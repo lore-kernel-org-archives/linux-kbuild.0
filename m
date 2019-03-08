@@ -1,52 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:56172 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:49044 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725308AbfCHFa6 (ORCPT
+        with ESMTP id S1725497AbfCHFuq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Mar 2019 00:30:58 -0500
+        Fri, 8 Mar 2019 00:50:46 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] unicore32: simplify linker script generation for decompressor
-Date: Fri,  8 Mar 2019 14:30:35 +0900
-Message-Id: <1552023035-29826-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: source include/config/auto.conf instead of ${KCONFIG_CONFIG}
+Date: Fri,  8 Mar 2019 14:49:10 +0900
+Message-Id: <1552024150-9831-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Guan Xuetao <gxt@pku.edu.cn>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Nicholas Piggin <npiggin@gmail.com>, Michael Forney <forney@google.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@sifive.com>, Nicolas Pitre <nicolas.pitre@linaro.org>
 
-When I was searching for unneeded $(KCONFIG_CONFIG) usages, I noticed
-this strange build dependency.
+As commit 423a8155facf ("kbuild: Fix reading of .config in
+link-vmlinux.sh") addressed, some shells fail to perform '.' if
+${KCONFIG_CONFIG} does not contain a slash at all.
 
-It can use $(call if_changed,...) in case ZTEXTADDR and ZBSSADDR are
-changed, but even a simpler way is to use the pattern rule in
-scripts/Makefile.build. This is what arch/arm/boot/compressed/Makefile
-does.
+Instead, we can source include/config/auto.conf, which obviously
+contain slashes, and we do not expect its file path overridden by
+a user. Perhaps, the performance might be slightly better since
+unset CONFIG options are stripped from include/config/auto.conf.
 
-I did only build test. I confirmed equivalent vmlinux.lds was generated.
+scripts/setlocalversion already works this way.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- arch/unicore32/boot/compressed/Makefile                          | 5 +----
- arch/unicore32/boot/compressed/{vmlinux.lds.in => vmlinux.lds.S} | 0
- 2 files changed, 1 insertion(+), 4 deletions(-)
- rename arch/unicore32/boot/compressed/{vmlinux.lds.in => vmlinux.lds.S} (100%)
+ scripts/adjust_autoksyms.sh | 9 +--------
+ scripts/link-vmlinux.sh     | 9 +--------
+ 2 files changed, 2 insertions(+), 16 deletions(-)
 
-diff --git a/arch/unicore32/boot/compressed/Makefile b/arch/unicore32/boot/compressed/Makefile
-index 9aecdd3..150fafc 100644
---- a/arch/unicore32/boot/compressed/Makefile
-+++ b/arch/unicore32/boot/compressed/Makefile
-@@ -61,7 +61,4 @@ $(obj)/vmlinux: $(obj)/vmlinux.lds $(obj)/head.o $(obj)/piggy.o \
- ZTEXTADDR	:= 0x03000000
- ZBSSADDR	:= ALIGN(4)
+diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+index 6e6d639..84bf6b5 100755
+--- a/scripts/adjust_autoksyms.sh
++++ b/scripts/adjust_autoksyms.sh
+@@ -39,14 +39,7 @@ case "$KBUILD_VERBOSE" in
+ esac
  
--SEDFLAGS_lds	= s/TEXT_START/$(ZTEXTADDR)/;s/BSS_START/$(ZBSSADDR)/
--$(obj)/vmlinux.lds: $(obj)/vmlinux.lds.in arch/unicore32/boot/Makefile $(KCONFIG_CONFIG)
--	@sed "$(SEDFLAGS_lds)" < $< > $@
--
-+CPPFLAGS_vmlinux.lds = -DTEXT_START="$(ZTEXTADDR)" -DBSS_START="$(ZBSSADDR)"
-diff --git a/arch/unicore32/boot/compressed/vmlinux.lds.in b/arch/unicore32/boot/compressed/vmlinux.lds.S
-similarity index 100%
-rename from arch/unicore32/boot/compressed/vmlinux.lds.in
-rename to arch/unicore32/boot/compressed/vmlinux.lds.S
+ # We need access to CONFIG_ symbols
+-case "${KCONFIG_CONFIG}" in
+-*/*)
+-	. "${KCONFIG_CONFIG}"
+-	;;
+-*)
+-	# Force using a file from the current directory
+-	. "./${KCONFIG_CONFIG}"
+-esac
++. include/config/auto.conf
+ 
+ # Generate a new ksym list file with symbols needed by the current
+ # set of modules.
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index bc7f1fc..dc0e8c5 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -171,14 +171,7 @@ if [ "$1" = "clean" ]; then
+ fi
+ 
+ # We need access to CONFIG_ symbols
+-case "${KCONFIG_CONFIG}" in
+-*/*)
+-	. "${KCONFIG_CONFIG}"
+-	;;
+-*)
+-	# Force using a file from the current directory
+-	. "./${KCONFIG_CONFIG}"
+-esac
++. include/config/auto.conf
+ 
+ # Update version
+ info GEN .version
 -- 
 2.7.4
