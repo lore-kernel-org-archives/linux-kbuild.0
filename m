@@ -1,86 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.131]:50389 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726357AbfCHVKl (ORCPT
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:34238 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726332AbfCHVZm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Mar 2019 16:10:41 -0500
-Subject: Re: Debian build polishing
-References: <1552049064-32044-1-git-send-email-info@metux.net>
- <20190308175703.GA7178@lambda>
-From: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Message-ID: <fe53cd84-5953-786a-3a4f-6eac652a1cdd@metux.net>
-Date: Fri, 8 Mar 2019 22:10:19 +0100
+        Fri, 8 Mar 2019 16:25:42 -0500
+Received: by mail-pg1-f196.google.com with SMTP id i130so15114929pgd.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 08 Mar 2019 13:25:41 -0800 (PST)
+From: Douglas Anderson <dianders@chromium.org>
+Subject: [PATCH] kbuild: Speed up install, modules_install and kernelrelease
+Date: Fri,  8 Mar 2019 13:25:23 -0800
+Message-Id: <20190308212524.121126-1-dianders@chromium.org>
 MIME-Version: 1.0
-In-Reply-To: <20190308175703.GA7178@lambda>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>, "Enrico Weigelt, metux IT consult" <info@metux.net>, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net, apw@canonical.com, joe@perches.com, linux-kbuild@vger.kernel.org, linux-riscv@lists.infradead.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: groeck@chromium.org, briannorris@chromium.org, swboyd@chromium.org, Douglas Anderson <dianders@chromium.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 08.03.19 18:57, Theodore Ts'o wrote:
-> On Fri, Mar 08, 2019 at 01:44:19PM +0100, Enrico Weigelt, metux IT consult wrote:
->> One point still puzzling me: once the debian/rules is applied and
->> somebody calls `make deb-pkg`, he'll end up w/ unclean tree, as
->> now a git-tracked file is changed.
-> 
-> This is not something I've noticed, but I build my Debian packages
-> like this:
-> 
-> make O=/build/linux-build bindeb-pkg
+As per the description of the old commit 3298b690b21c ("kbuild: Add a
+cache for generated variables"), calling the C compiler lots of times
+during the parsing stage of the Makefile can be a little slow.  If you
+happen to have a C compiler whose fork/exec time isn't optimized
+(perhaps it was linked dynamically, or perhaps it's called through
+several wrappers, or ...) then this can be more than a little slow, it
+can be very slow.
 
-This doesn't work for my environment:
+The above slowness was addressed with the old Makefile cache, but the
+cache was reverted in commit e08d6de4e532 ("kbuild: remove kbuild
+cache").  That commit indicated that we expected to get the speed
+gains back because "the result of compiler tests will be naturally
+cached in the .config file", but as of the latest mainline there are
+still lots of direct calls to the C compiler that happen in the
+Makefile parsing stage.
 
-The requirement is that every debian source tree has a ./debian/rules
-file (w/ the standard rules like binary, clean, ...). This is called by
-upper level build machinery (git-buildpackage, dpkg-buildpackage, ...)
+Perhaps we could try re-introducing the Makefile cache and fix the
+problems it was causing, but this patch codes up another solution that
+gets some of the speed gains back, perhaps with less complexity.
 
-The idea behind is building all packages exactly the same way - one
-standard workflow, that just takes a source tree (from git) and spits
-out some .deb files.
+Specifically I observed that by timing the parsing stage of the
+Makefile by adding statements like this to the beginning and end of
+the Makefile:
+  ZZZ := $(shell echo "$$(date '+%T.%N'): ..." >> /tmp/timing.txt)
 
-> So I really hope your patches don't break this.  
+...that three targets were spending 3 seconds each parsing the
+Makefile in my environment (building a Chrome OS kernel with clang)
+when it felt like they ought to be quick.  These were: install,
+modules_install and kernelrelease
 
-It shouldn't (at least I dont intend to). Haven't tried where exactly
-the generated debian/rules file lands in your case.
+I saw timings that looked like:
+  09:23:08.903204451: Parsing Makefile, goals: install
+  09:23:11.960515772: Done parsing Makefile, goals: install
 
-> Also, are there any changes the performance of building the Debian
-> packages before and after your changes?  And are there any differences 
-> in the packages in terms of any pre-or-post install/removal scripts?
+Given that the kbuild system doesn't sync the config for any of these
+options I believe it is safe to say that it can't compile any code.
+Thus if we can avoid the C compiler invocation here we'll save time.
 
-I don't think so. In essence I just replace the generated rules file by
-a fixed one. Okay, it will take *a little* bit longer, as the rules file
-now calls `make kernelarch`, `make kernelrelease` and `make
-kernellocalversion`, before starting actual build. But that shouldn't be
-the big deal, IMHO.
+The simplest way to accomplish this is to neuter all the calls to the
+compiler by stubbing them out.  After doing so (AKA applying this
+change) the same timing looks like:
+  09:28:04.929252271: Parsing Makefile, goals: install
+  09:28:05.107468449: Done parsing Makefile, goals: install
 
-> There are a lot of things I really dislike about the "official" Debian
-> kernel build processes (they're optimzied for distribution release
-> engineers, not kernel developers), 
+During an incremental kernel build/install on Chrome OS we call
+install once, modules_install twice (once to keep unstripped), and
+kernelrelease once.  Thus this saves ~12 seconds on an incremental
+kernel build/install.  With my current setup, this brings it from ~40
+seconds to ~28 seconds.  Re-introducing the Makefile cache would
+likely save us an extra ~3 seconds since we'd avoid the parsing in the
+compile stage.
 
-I try to bring these two world a bit closer together.
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+---
 
-> so I'm really hoping that making
-> things more like the "official Debian way" doesn't break some of the
-> things I really like about the existing "make bindeb-pkg" build
-> system.
+ Makefile | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-I intend not to.
-
-Actually, the official Debian way for Kernel build is entirely
-different, and that's really complicated and hard to really understand
-(that's why I'm  doing this here).
-
-But here I'm just coping w/ the first entry point into the build
-process, which now becomes `./debian/rules binary` instead of
-`make bindeb-pkg`. The final result (in the .deb files) should be
-the time (unless I did something wrong).
-
-
---mtx
-
+diff --git a/Makefile b/Makefile
+index f070e0d65186..5f7532d9be65 100644
+--- a/Makefile
++++ b/Makefile
+@@ -304,6 +304,20 @@ else
+ scripts/Kbuild.include: ;
+ include scripts/Kbuild.include
+ 
++# If we can't sync the config then we know we can't compile code.
++# Replace the slow option-testing commands with stubs to significantly
++# speed up the Makefile parsing stage of the build.
++ifeq ($(may-sync-config),0)
++	ar-option :=
++	as-option :=
++	cc-disable-warning :=
++	cc-ifversion :=
++	cc-ldoption :=
++	cc-option :=
++	cc-option-yn := n
++	ld-option :=
++endif
++
+ # Read KERNELRELEASE from include/config/kernel.release (if it exists)
+ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+ KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
 -- 
-Enrico Weigelt, metux IT consult
-Free software and Linux embedded engineering
-info@metux.net -- +49-151-27565287
+2.21.0.360.g471c308f928-goog
