@@ -1,64 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from imap.cs.msu.ru ([188.44.42.39]:57027 "EHLO mail.cs.msu.ru"
+Received: from imap.cs.msu.ru ([188.44.42.39]:50712 "EHLO mail.cs.msu.ru"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726233AbfCINNC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 9 Mar 2019 08:13:02 -0500
+        id S1726286AbfCIPns (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 9 Mar 2019 10:43:48 -0500
 From: Arseny Maslennikov <ar@cs.msu.ru>
-Date: Sat,  9 Mar 2019 16:12:35 +0300
-Message-Id: <20190309131235.31823-1-ar@cs.msu.ru>
+Date: Sat,  9 Mar 2019 18:43:07 +0300
+Message-Id: <20190309154307.23039-3-ar@cs.msu.ru>
+In-Reply-To: <20190309154307.23039-1-ar@cs.msu.ru>
+References: <20190309154307.23039-1-ar@cs.msu.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [PATCH] scripts/kconfig/Makefile: kvmconfig: use KCONFIG_CONFIG if set
+Subject: [PATCH v2 3/3] package: {mkdebian,Makefile}: ignore .config in dpkg-source diffs
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Arseny Maslennikov <ar@cs.msu.ru>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Petr Vorel <pvorel@suse.cz>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Arseny Maslennikov <ar@cs.msu.ru>, Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>
 
-In a kernel source tree:
+* We'd like to make dpkg-source ignore certain filepath patterns while
+  producing the .diff.gz as part of a Debian source package.
+  The relationship between dpkg-source's -i and --extend-diff-ignore
+  options is quite complicated[1]. It's thus not very convenient to
+  specify file path patterns to ignore on dpkg-buildpackage's command
+  line (they do not end up in the source package as well), so we turn
+  `-i.git' into a record in debian/source/options.
+  Besides, the dot in `-i.git' is a metacharacter and matches a tad
+  too much.
 
-% make mrproper
-% make KCONFIG_CONFIG=.myconfig kvmconfig
-  HOSTCC  scripts/basic/fixdep
-  HOSTCC  scripts/kconfig/conf.o
-  HOSTCC  scripts/kconfig/confdata.o
-  HOSTCC  scripts/kconfig/expr.o
-  HOSTCC  scripts/kconfig/symbol.o
-  HOSTCC  scripts/kconfig/preprocess.o
-  LEX     scripts/kconfig/zconf.lex.c
-  YACC    scripts/kconfig/zconf.tab.h
-  HOSTCC  scripts/kconfig/zconf.lex.o
-  YACC    scripts/kconfig/zconf.tab.c
-  HOSTCC  scripts/kconfig/zconf.tab.o
-  HOSTLD  scripts/kconfig/conf
-The base file '.config' does not exist.  Exit.
-make[1]: *** [scripts/kconfig/Makefile:96: kvm_guest.config] Error 1
-make: *** [Makefile:538: kvmconfig] Error 2
+* In cases where a .config exists in the source tree, but the .config
+  in the source tarball is provided by wherever KCONFIG_CONFIG pointed
+  to, dpkg-source would attempt to replace the second, proper one with
+  the first one, which is undesirable and nullifies the effort made
+  to put the proper config in the source tarball.
+  To prevent this, force dpkg-source to ignore /^[.]config$/ as well.
 
-Essentially `make kvmconfig' (and probably other similar targets)
-did ignore KCONFIG_CONFIG set to a different filename.
+This makes it possible to build working Debian source packages with a
+redefined KCONFIG_CONFIG:
+ - that file is put in the source tarball at its traditional place,
+   and the diff.gz does not dare touch it;
+ - when the source package is rebuilt, debian/rules initiates the build
+   process with the desired config already in the standard location.
 
-If KCONFIG_CONFIG is set, use it; otherwise behave as if it was set
-to `.config'.
+[1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=625789#22
 
 Signed-off-by: Arseny Maslennikov <ar@cs.msu.ru>
-Reviewed-by: Petr Vorel <pvorel@suse.cz>
-Tested-by: Petr Vorel <pvorel@suse.cz>
 ---
- scripts/kconfig/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/package/Makefile | 2 +-
+ scripts/package/mkdebian | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 181973509a05..1c7ac07def4d 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -93,7 +93,7 @@ configfiles=$(wildcard $(srctree)/kernel/configs/$@ $(srctree)/arch/$(SRCARCH)/c
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 134cefee068d..f2fca7e7d9fa 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -73,7 +73,7 @@ deb-pkg: FORCE
+ 	$(call cmd,src_tar,$(KDEB_SOURCENAME))
+ 	origversion=$$(dpkg-parsechangelog -SVersion |sed 's/-[^-]*$$//');\
+ 		mv $(KDEB_SOURCENAME).tar.gz ../$(KDEB_SOURCENAME)_$${origversion}.orig.tar.gz
+-	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -i.git -us -uc
++	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -us -uc
  
- %.config: $(obj)/conf
- 	$(if $(call configfiles),, $(error No configuration exists for this target on this architecture))
--	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m .config $(configfiles)
-+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m $(KCONFIG_CONFIG) $(configfiles)
- 	+$(Q)yes "" | $(MAKE) -f $(srctree)/Makefile oldconfig
+ bindeb-pkg: FORCE
+ 	$(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
+diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+index d276eb671a27..74158c7f28ea 100755
+--- a/scripts/package/mkdebian
++++ b/scripts/package/mkdebian
+@@ -135,6 +135,12 @@ fi
+ mkdir -p debian/source/
+ echo "1.0" > debian/source/format
  
- PHONY += kvmconfig
++cat <<EOF > debian/source/options
++# The regexes are matched against paths from the source tree.
++diff-ignore = "[.]git"
++extend-diff-ignore = "^[.]config$"
++EOF
++
+ echo $debarch > debian/arch
+ 
+ # Generate a simple changelog template
 -- 
 2.20.1
