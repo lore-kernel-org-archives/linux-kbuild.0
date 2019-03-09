@@ -1,141 +1,162 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:34403 "EHLO
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:30375 "EHLO
         conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726307AbfCIA4d (ORCPT
+        with ESMTP id S1726338AbfCIBcd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Mar 2019 19:56:33 -0500
+        Fri, 8 Mar 2019 20:32:33 -0500
 MIME-Version: 1.0
-References: <20190308212524.121126-1-dianders@chromium.org>
- <CABXOdTe6hGWCsRpQcc_coB-whvJR2XfPfdLuc9QHMMvoXDNW=w@mail.gmail.com> <CAD=FV=VGL-Z93WtU8LTQXeJtdUU085T+Vd_MXNuuvWnJ6-eyDw@mail.gmail.com>
-In-Reply-To: <CAD=FV=VGL-Z93WtU8LTQXeJtdUU085T+Vd_MXNuuvWnJ6-eyDw@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 9 Mar 2019 09:55:46 +0900
-Message-ID: <CAK7LNAQEYiowBS9tKC7ND5sjB2qrVy28=bzE=5Bt5R9rfR_LXg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Speed up install, modules_install and kernelrelease
+Date: Sat, 9 Mar 2019 10:31:35 +0900
+Message-ID: <CAK7LNAS2zf1yEmZhTa9h+73hk3ZMHMgBLHhzwS8-zu2fZ+MeAA@mail.gmail.com>
+Subject: [GIT PULL] Kbuild updates for v5.1
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Doug Anderson <dianders@chromium.org>
-Cc: Guenter Roeck <groeck@google.com>, Michal Marek <michal.lkml@markovi.net>, Guenter Roeck <groeck@chromium.org>, Brian Norris <briannorris@chromium.org>, Stephen Boyd <swboyd@chromium.org>, linux-kernel <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
 
-On Sat, Mar 9, 2019 at 7:34 AM Doug Anderson <dianders@chromium.org> wrote:
->
-> Hi,
->
-> On Fri, Mar 8, 2019 at 2:29 PM Guenter Roeck <groeck@google.com> wrote:
-> >
-> > On Fri, Mar 8, 2019 at 1:25 PM Douglas Anderson <dianders@chromium.org> wrote:
-> > >
-> > > As per the description of the old commit 3298b690b21c ("kbuild: Add a
-> > > cache for generated variables"), calling the C compiler lots of times
-> > > during the parsing stage of the Makefile can be a little slow.  If you
-> > > happen to have a C compiler whose fork/exec time isn't optimized
-> > > (perhaps it was linked dynamically, or perhaps it's called through
-> > > several wrappers, or ...) then this can be more than a little slow, it
-> > > can be very slow.
-> > >
-> > > The above slowness was addressed with the old Makefile cache, but the
-> > > cache was reverted in commit e08d6de4e532 ("kbuild: remove kbuild
-> > > cache").  That commit indicated that we expected to get the speed
-> > > gains back because "the result of compiler tests will be naturally
-> > > cached in the .config file", but as of the latest mainline there are
-> > > still lots of direct calls to the C compiler that happen in the
-> > > Makefile parsing stage.
-> > >
-> > > Perhaps we could try re-introducing the Makefile cache and fix the
-> > > problems it was causing, but this patch codes up another solution that
-> > > gets some of the speed gains back, perhaps with less complexity.
-> > >
-> > > Specifically I observed that by timing the parsing stage of the
-> > > Makefile by adding statements like this to the beginning and end of
-> > > the Makefile:
-> > >   ZZZ := $(shell echo "$$(date '+%T.%N'): ..." >> /tmp/timing.txt)
-> > >
-> > > ...that three targets were spending 3 seconds each parsing the
-> > > Makefile in my environment (building a Chrome OS kernel with clang)
-> > > when it felt like they ought to be quick.  These were: install,
-> > > modules_install and kernelrelease
-> > >
-> > > I saw timings that looked like:
-> > >   09:23:08.903204451: Parsing Makefile, goals: install
-> > >   09:23:11.960515772: Done parsing Makefile, goals: install
-> > >
-> > > Given that the kbuild system doesn't sync the config for any of these
-> > > options I believe it is safe to say that it can't compile any code.
-> > > Thus if we can avoid the C compiler invocation here we'll save time.
-> > >
-> > > The simplest way to accomplish this is to neuter all the calls to the
-> > > compiler by stubbing them out.  After doing so (AKA applying this
-> > > change) the same timing looks like:
-> > >   09:28:04.929252271: Parsing Makefile, goals: install
-> > >   09:28:05.107468449: Done parsing Makefile, goals: install
-> > >
-> > > During an incremental kernel build/install on Chrome OS we call
-> > > install once, modules_install twice (once to keep unstripped), and
-> > > kernelrelease once.  Thus this saves ~12 seconds on an incremental
-> > > kernel build/install.  With my current setup, this brings it from ~40
-> > > seconds to ~28 seconds.  Re-introducing the Makefile cache would
-> > > likely save us an extra ~3 seconds since we'd avoid the parsing in the
-> > > compile stage.
-> > >
-> > > Signed-off-by: Douglas Anderson <dianders@chromium.org>
-> > > ---
-> > >
-> > >  Makefile | 14 ++++++++++++++
-> > >  1 file changed, 14 insertions(+)
-> > >
-> > > diff --git a/Makefile b/Makefile
-> > > index f070e0d65186..5f7532d9be65 100644
-> > > --- a/Makefile
-> > > +++ b/Makefile
-> > > @@ -304,6 +304,20 @@ else
-> > >  scripts/Kbuild.include: ;
-> > >  include scripts/Kbuild.include
-> > >
-> > > +# If we can't sync the config then we know we can't compile code.
-> > > +# Replace the slow option-testing commands with stubs to significantly
-> > > +# speed up the Makefile parsing stage of the build.
-> > > +ifeq ($(may-sync-config),0)
-> >
-> > I think that breaks KBUILD_EXTMOD, which sets the variable to 0.
->
-> Yup, thanks for catching--I should have realized that from the code
-> but somehow skimmed over the KBUILD_EXTMOD bits.  I confirmed that
-> this is broken.
->
-> I can certainly add an extra check to confirm that '$(KBUILD_EXTMOD)'
-> is unset and I'll do that in a v2 if I don't hear anything, but before
-> sending that I'll give folks a little bit of time to smack down my
-> general approach.  To be honest my approach is a bit of a hack so if
-> others can think of better ways to avoid all the unnecessary work
-> during install / modules_install / kernelrelease then I'm all ears!
-> :-)
+Hi Linus,
+
+Please pull Kbuild updates for v5.1
 
 
-I think 3 sec is better than your previous report.
+You will see a merge conflict in ./Kbuild
 
-I do not think the current situation is painful level
-for other general users.
-The parse stage takes less than 0.5 sec even on my
-old, cheap machine.
-
-Upstream code will continue to improve, but the progress
-will be slow.
-
-Given that this pain comes from wrapping CC with script,
-may I ask you to solve this on Chrome OS side meanwhile?
+The fixup is available in linux-next.
 
 
-For example, pass cc-option= from the command line etc.
-
-
- make modules_install cc-option=
-
-
-will give you better result.
+Thanks!
 
 
 
---
+
+
+The following changes since commit f17b5f06cb92ef2250513a1e154c47b78df07d40=
+:
+
+  Linux 5.0-rc4 (2019-01-27 15:18:05 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-v5.1
+
+for you to fetch changes up to 9250d20e9ecedab6aa331a127fbfc1272383ed72:
+
+  kbuild: remove scripts/basic/% build target (2019-03-05 02:02:44 +0900)
+
+----------------------------------------------------------------
+Kbuild updates for v5.1
+
+ - do not generate unneeded top-level built-in.a
+
+ - let git ignore O=3D directory entirely
+
+ - optimize scripts/kallsyms slightly
+
+ - exclude DWARF info from *.s regardless of config options
+
+ - fix GCC toolchain search path for Clang to prepare ld.lld support
+
+ - do not generate modules.order when CONFIG_MODULES is disabled
+
+ - simplify single target rules and remove VPATH for external module build
+
+ - allow to add optional flags to dpkg-buildpackage when building deb-pkg
+
+ - move some compiler option tests from Makefile to Kconfig
+
+ - various Makefile cleanups
+
+----------------------------------------------------------------
+Kacper Ko=C5=82odziej (1):
+      kbuild: [bin]deb-pkg: add DPKG_FLAGS variable
+
+Luc Van Oostenryck (1):
+      kbuild: use -Werror=3Dimplicit-... instead of -Werror-implicit-...
+
+Masahiro Yamada (36):
+      kbuild: skip 'addtree' and 'flags' magic for external module build
+      kbuild: remove top-level built-in.a
+      kbuild: merge KBUILD_VMLINUX_{INIT,MAIN} into KBUILD_VMLINUX_OBJS
+      kbuild: simplify rules of data compression with size appending
+      s390: make built-in.a not directly depend on *.o.chkbss files
+      kbuild: add real-prereqs shorthand for $(filter-out FORCE,$^)
+      kbuild: remove unnecessary in-subshell execution
+      kbuild: remove meaningless prepare2 target
+      kallsyms: add static qualifiers where missing
+      kallsyms: remove unneeded memset() calls
+      kallsyms: include <asm/bitsperlong.h> instead of <asm/types.h>
+      kbuild: Disable extra debugging info in .s output
+      kbuild: pkg: use -f $(srctree)/Makefile to recurse to top Makefile
+      kbuild: generate modules.order only when CONFIG_MODULES=3Dy
+      kbuild: set KBUILD_MODULES=3D1 all the time for single target %/
+      kbuild: turn '/' into an alias of './'
+      scripts/gdb: delay generation of gdb constants.py
+      kbuild: remove unimportant comments from ./Kbuild
+      scripts/gdb: do not descend into scripts/gdb from scripts
+      kbuild: create symlink to vmlinux-gdb.py in scripts_gdb target
+      scripts/gdb: refactor rules for symlink creation
+      kbuild: hardcode genksyms path and remove GENKSYMS variable
+      kbuild: refactor cc-cross-prefix implementation
+      kbuild: compute false-positive -Wmaybe-uninitialized cases in Kconfig
+      kbuild: move tools_silent to a more relevant place
+      kbuild: make -r/-R effective in top Makefile for old Make versions
+      kbuild: remove empty rules for makefiles
+      kbuild: simplify single target rules
+      kbuild: invoke syncconfig if include/config/auto.conf.cmd is missing
+      kbuild: move ".config not found!" message from Kconfig to Makefile
+      kbuild: move -gsplit-dwarf, -gdwarf-4 option tests to Kconfig
+      kbuild: remove commented-out INITRD_COMPRESS
+      kbuild: update comment block of scripts/clang-version.sh
+      kbuild: remove cc-version macro
+      kbuild: clean up scripts/gcc-version.sh
+      kbuild: remove scripts/basic/% build target
+
+Nick Desaulniers (1):
+      kbuild: clang: choose GCC_TOOLCHAIN_DIR not on LD
+
+Vladimir Kondratiev (1):
+      kbuild: gitignore output directory
+
+ Documentation/devicetree/bindings/Makefile |   2 +-
+ Documentation/kbuild/kbuild.txt            |  15 ++--
+ Documentation/kbuild/makefiles.txt         |  26 +------
+ Documentation/kbuild/modules.txt           |   2 +-
+ Kbuild                                     |  25 +------
+ Makefile                                   | 219
+++++++++++++++++++++++++++----------------------------
+ arch/mips/boot/Makefile                    |   2 +-
+ arch/powerpc/boot/Makefile                 |   2 +-
+ arch/s390/boot/Makefile                    |   6 +-
+ arch/s390/boot/compressed/Makefile         |   4 +-
+ arch/s390/scripts/Makefile.chkbss          |  25 +++----
+ arch/x86/realmode/rm/Makefile              |   3 +-
+ init/Kconfig                               |  19 ++++-
+ kernel/trace/Kconfig                       |   1 +
+ lib/Kconfig.debug                          |   2 +
+ scripts/Kbuild.include                     |  21 +++---
+ scripts/Kconfig.include                    |   2 +-
+ scripts/Makefile                           |   3 +-
+ scripts/Makefile.build                     |  29 ++++----
+ scripts/Makefile.host                      |   6 +-
+ scripts/Makefile.lib                       |  42 +++++------
+ scripts/Makefile.modpost                   |   2 +-
+ scripts/clang-version.sh                   |  10 +--
+ scripts/gcc-version.sh                     |  27 ++-----
+ scripts/gdb/linux/Makefile                 |  25 ++++---
+ scripts/kallsyms.c                         |  13 ++--
+ scripts/kconfig/conf.c                     |  13 ----
+ scripts/link-vmlinux.sh                    |  46 +++---------
+ scripts/mkcompile_h                        |   4 +-
+ scripts/package/Makefile                   |   8 +-
+ scripts/package/builddeb                   |  10 +--
+ scripts/package/buildtar                   |   2 +-
+ scripts/package/mkdebian                   |   6 +-
+ 33 files changed, 262 insertions(+), 360 deletions(-)
+
+
+--=20
 Best Regards
 Masahiro Yamada
