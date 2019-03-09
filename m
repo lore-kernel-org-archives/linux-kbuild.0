@@ -1,162 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:30375 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726338AbfCIBcd (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Mar 2019 20:32:33 -0500
+Received: from imap.cs.msu.ru ([188.44.42.39]:59799 "EHLO mail.cs.msu.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726235AbfCINMY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 9 Mar 2019 08:12:24 -0500
+Date: Sat, 9 Mar 2019 16:12:13 +0300
+From: Arseny Maslennikov <ar@cs.msu.ru>
+Message-ID: <20190309131213.GC25561@cello>
+References: <20190221215901.23970-2-ar@cs.msu.ru>
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 9 Mar 2019 10:31:35 +0900
-Message-ID: <CAK7LNAS2zf1yEmZhTa9h+73hk3ZMHMgBLHhzwS8-zu2fZ+MeAA@mail.gmail.com>
-Subject: [GIT PULL] Kbuild updates for v5.1
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="raC6veAxrt5nqIoY"
+Content-Disposition: inline
+In-Reply-To: <20190221215901.23970-2-ar@cs.msu.ru>
+Subject: Re: [PATCH] scripts/kconfig/Makefile: use KCONFIG_CONFIG if set
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
-
-Hi Linus,
-
-Please pull Kbuild updates for v5.1
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer@gmail.com>, Petr Vorel <pvorel@suse.cz>
 
 
-You will see a merge conflict in ./Kbuild
+--raC6veAxrt5nqIoY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The fixup is available in linux-next.
+On Fri, Feb 22, 2019 at 12:58:58AM +0300, Arseny Maslennikov wrote:
+> In a kernel source tree:
+>=20
+> % make mrproper
+> % make KCONFIG_CONFIG=3D.myconfig kvmconfig
+>   HOSTCC  scripts/basic/fixdep
+>   HOSTCC  scripts/kconfig/conf.o
+>   HOSTCC  scripts/kconfig/confdata.o
+>   HOSTCC  scripts/kconfig/expr.o
+>   HOSTCC  scripts/kconfig/symbol.o
+>   HOSTCC  scripts/kconfig/preprocess.o
+>   LEX     scripts/kconfig/zconf.lex.c
+>   YACC    scripts/kconfig/zconf.tab.h
+>   HOSTCC  scripts/kconfig/zconf.lex.o
+>   YACC    scripts/kconfig/zconf.tab.c
+>   HOSTCC  scripts/kconfig/zconf.tab.o
+>   HOSTLD  scripts/kconfig/conf
+> The base file '.config' does not exist.  Exit.
+> make[1]: *** [scripts/kconfig/Makefile:96: kvm_guest.config] Error 1
+> make: *** [Makefile:538: kvmconfig] Error 2
+>=20
+> Essentially `make kvmconfig' (and probably other similar targets)
+> did ignore KCONFIG_CONFIG set to a different filename.
+>=20
+> If KCONFIG_CONFIG is set, use it; otherwise behave as if it was set
+> to `.config'.
+>=20
+> Signed-off-by: Arseny Maslennikov <ar@cs.msu.ru>
 
+Since this patch has nothing to do with debian packaging and thus with
+the rest of the thread, I'll resend it separately.
 
-Thanks!
+> ---
+>  scripts/kconfig/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index 181973509a05..1c7ac07def4d 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -93,7 +93,7 @@ configfiles=3D$(wildcard $(srctree)/kernel/configs/$@ $=
+(srctree)/arch/$(SRCARCH)/c
+> =20
+>  %.config: $(obj)/conf
+>  	$(if $(call configfiles),, $(error No configuration exists for this tar=
+get on this architecture))
+> -	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m .conf=
+ig $(configfiles)
+> +	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m $(KCO=
+NFIG_CONFIG) $(configfiles)
+>  	+$(Q)yes "" | $(MAKE) -f $(srctree)/Makefile oldconfig
+> =20
+>  PHONY +=3D kvmconfig
+> --=20
+> 2.20.1
+>=20
 
+--raC6veAxrt5nqIoY
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAABCgAdFiEE56JD3UKTLEu/ddrm9dQjyAYL01AFAlyDu6YACgkQ9dQjyAYL
+01Aa2A//Zy2lbgKQX4IPGbOJj8Id1ouZtRYqx9nKi073Qgy5U8fYNt7UA1LVbJg+
+SPnXzPfVDY2+ugYFy5tAMWKSj+OLlzGtQ3i3/Tl/hAqc6D6awqnZCDHz3l7KQLMx
+Jc4JDOZRqyy3Y64ZxCFE2neFGHTnKDs0qv6D5XNeYSqjy+JITiNF9krJN5rK5YjJ
+uXu9Sl08gWMN32vKOcjhfOA1WzBmKxIn7H2Er2fHjTvB1ty3onevG7+q8+nR+ZPE
+qZGs24oqvVJvEJluDNGZjU/fMNlDW+xGP0dHuCW7er6vbHruOsLPeLb2sbJuwRQu
+dycfL21r3x3NCXAfyEftPQ7Annwoz1zTfqNqFihd7rjyPALFEi/sjN12F4DxLpLX
+T3BLI+PmnLYvBmR1zlvVe8R3vCzlSZOuihpizrxNafYyashPqiL5G+f0AiFRDNQM
+GaqQLk5tJgLoQqPkYgrRsX11088vnV6WKSdXSGpS7vRBEhEbJM1I8iKRf4zdBQA5
+qfnGhWPBNXCyKradLtcVm4MAVaUvMzObFSG3wVbikq5qoLRvffks2nh7pHo/2YdL
+XO30uJtIMoJKt0IQ6SKmJ0TrJkZr0y3Z06wyEl7xo3CMFw8F2y7HdzAJWjgvBEYb
+B+b4lU3figN176Rs5nwgjx2HqeptQ4Yt2asONJ72F9H5eKArAhc=
+=cfQe
+-----END PGP SIGNATURE-----
 
-
-The following changes since commit f17b5f06cb92ef2250513a1e154c47b78df07d40=
-:
-
-  Linux 5.0-rc4 (2019-01-27 15:18:05 -0800)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-v5.1
-
-for you to fetch changes up to 9250d20e9ecedab6aa331a127fbfc1272383ed72:
-
-  kbuild: remove scripts/basic/% build target (2019-03-05 02:02:44 +0900)
-
-----------------------------------------------------------------
-Kbuild updates for v5.1
-
- - do not generate unneeded top-level built-in.a
-
- - let git ignore O=3D directory entirely
-
- - optimize scripts/kallsyms slightly
-
- - exclude DWARF info from *.s regardless of config options
-
- - fix GCC toolchain search path for Clang to prepare ld.lld support
-
- - do not generate modules.order when CONFIG_MODULES is disabled
-
- - simplify single target rules and remove VPATH for external module build
-
- - allow to add optional flags to dpkg-buildpackage when building deb-pkg
-
- - move some compiler option tests from Makefile to Kconfig
-
- - various Makefile cleanups
-
-----------------------------------------------------------------
-Kacper Ko=C5=82odziej (1):
-      kbuild: [bin]deb-pkg: add DPKG_FLAGS variable
-
-Luc Van Oostenryck (1):
-      kbuild: use -Werror=3Dimplicit-... instead of -Werror-implicit-...
-
-Masahiro Yamada (36):
-      kbuild: skip 'addtree' and 'flags' magic for external module build
-      kbuild: remove top-level built-in.a
-      kbuild: merge KBUILD_VMLINUX_{INIT,MAIN} into KBUILD_VMLINUX_OBJS
-      kbuild: simplify rules of data compression with size appending
-      s390: make built-in.a not directly depend on *.o.chkbss files
-      kbuild: add real-prereqs shorthand for $(filter-out FORCE,$^)
-      kbuild: remove unnecessary in-subshell execution
-      kbuild: remove meaningless prepare2 target
-      kallsyms: add static qualifiers where missing
-      kallsyms: remove unneeded memset() calls
-      kallsyms: include <asm/bitsperlong.h> instead of <asm/types.h>
-      kbuild: Disable extra debugging info in .s output
-      kbuild: pkg: use -f $(srctree)/Makefile to recurse to top Makefile
-      kbuild: generate modules.order only when CONFIG_MODULES=3Dy
-      kbuild: set KBUILD_MODULES=3D1 all the time for single target %/
-      kbuild: turn '/' into an alias of './'
-      scripts/gdb: delay generation of gdb constants.py
-      kbuild: remove unimportant comments from ./Kbuild
-      scripts/gdb: do not descend into scripts/gdb from scripts
-      kbuild: create symlink to vmlinux-gdb.py in scripts_gdb target
-      scripts/gdb: refactor rules for symlink creation
-      kbuild: hardcode genksyms path and remove GENKSYMS variable
-      kbuild: refactor cc-cross-prefix implementation
-      kbuild: compute false-positive -Wmaybe-uninitialized cases in Kconfig
-      kbuild: move tools_silent to a more relevant place
-      kbuild: make -r/-R effective in top Makefile for old Make versions
-      kbuild: remove empty rules for makefiles
-      kbuild: simplify single target rules
-      kbuild: invoke syncconfig if include/config/auto.conf.cmd is missing
-      kbuild: move ".config not found!" message from Kconfig to Makefile
-      kbuild: move -gsplit-dwarf, -gdwarf-4 option tests to Kconfig
-      kbuild: remove commented-out INITRD_COMPRESS
-      kbuild: update comment block of scripts/clang-version.sh
-      kbuild: remove cc-version macro
-      kbuild: clean up scripts/gcc-version.sh
-      kbuild: remove scripts/basic/% build target
-
-Nick Desaulniers (1):
-      kbuild: clang: choose GCC_TOOLCHAIN_DIR not on LD
-
-Vladimir Kondratiev (1):
-      kbuild: gitignore output directory
-
- Documentation/devicetree/bindings/Makefile |   2 +-
- Documentation/kbuild/kbuild.txt            |  15 ++--
- Documentation/kbuild/makefiles.txt         |  26 +------
- Documentation/kbuild/modules.txt           |   2 +-
- Kbuild                                     |  25 +------
- Makefile                                   | 219
-++++++++++++++++++++++++++----------------------------
- arch/mips/boot/Makefile                    |   2 +-
- arch/powerpc/boot/Makefile                 |   2 +-
- arch/s390/boot/Makefile                    |   6 +-
- arch/s390/boot/compressed/Makefile         |   4 +-
- arch/s390/scripts/Makefile.chkbss          |  25 +++----
- arch/x86/realmode/rm/Makefile              |   3 +-
- init/Kconfig                               |  19 ++++-
- kernel/trace/Kconfig                       |   1 +
- lib/Kconfig.debug                          |   2 +
- scripts/Kbuild.include                     |  21 +++---
- scripts/Kconfig.include                    |   2 +-
- scripts/Makefile                           |   3 +-
- scripts/Makefile.build                     |  29 ++++----
- scripts/Makefile.host                      |   6 +-
- scripts/Makefile.lib                       |  42 +++++------
- scripts/Makefile.modpost                   |   2 +-
- scripts/clang-version.sh                   |  10 +--
- scripts/gcc-version.sh                     |  27 ++-----
- scripts/gdb/linux/Makefile                 |  25 ++++---
- scripts/kallsyms.c                         |  13 ++--
- scripts/kconfig/conf.c                     |  13 ----
- scripts/link-vmlinux.sh                    |  46 +++---------
- scripts/mkcompile_h                        |   4 +-
- scripts/package/Makefile                   |   8 +-
- scripts/package/builddeb                   |  10 +--
- scripts/package/buildtar                   |   2 +-
- scripts/package/mkdebian                   |   6 +-
- 33 files changed, 262 insertions(+), 360 deletions(-)
-
-
---=20
-Best Regards
-Masahiro Yamada
+--raC6veAxrt5nqIoY--
