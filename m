@@ -1,119 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:40955 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726000AbfCJQNi (ORCPT
+Received: from mout.kundenserver.de ([217.72.192.74]:49851 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726803AbfCJSuo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 10 Mar 2019 12:13:38 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kconfig: fix 'Save As' menu of xconfig
-Date: Mon, 11 Mar 2019 01:13:15 +0900
-Message-Id: <1552234395-7699-1-git-send-email-yamada.masahiro@socionext.com>
+        Sun, 10 Mar 2019 14:50:44 -0400
+Subject: Re: Debian build polishing
+References: <1552049064-32044-1-git-send-email-info@metux.net>
+ <20190308175703.GA7178@lambda>
+ <fe53cd84-5953-786a-3a4f-6eac652a1cdd@metux.net>
+ <20190308215724.GA22319@mit.edu>
+From: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Message-ID: <341b78ca-9901-78f0-f404-59194f3da503@metux.net>
+Date: Sun, 10 Mar 2019 19:50:19 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190308215724.GA22319@mit.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Theodore Ts'o <tytso@mit.edu>, "Enrico Weigelt, metux IT consult" <info@metux.net>, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net, apw@canonical.com, joe@perches.com, linux-kbuild@vger.kernel.org, linux-riscv@lists.infradead.org
 
-The 'Save As' menu of xconfig is not working; it always saves the
-kernel configuration into the default file irrespective of the file
-chosen in the dialog box.
+On 08.03.19 22:57, Theodore Ts'o wrote:
 
-The 'Save' menu always writes into the default file, but it would
-make more sense to write into the file previously chosen by 'Load'
-or 'Save As'.
+> The full debian directory lands in the O= directory.  So presumably
+> you could make it work for use case if there was a "make O=/build/dir
+> debian-prepare" which copies the necessary debian/ files into the
+> build directory and then someone could cd into /build/dir and run
+> "dpkg-buildpackage"?
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Didn't touch these rules at all, so it should still work as it used to.
 
- scripts/kconfig/qconf.cc | 42 +++++++++++++++++++++++++++++++++++-------
- scripts/kconfig/qconf.h  |  1 +
- 2 files changed, 36 insertions(+), 7 deletions(-)
+I thought about changing the old deb rules to just call the new
+debian/rules file, but haven't done so yet.
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 8be8a70..ce7fc87 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -1392,6 +1392,8 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	conf_set_changed_callback(conf_changed);
- 	// Set saveAction's initial state
- 	conf_changed();
-+	configname = xstrdup(conf_get_configname());
-+
- 	QAction *saveAsAction = new QAction("Save &As...", this);
- 	  connect(saveAsAction, SIGNAL(triggered(bool)), SLOT(saveConfigAs()));
- 	QAction *searchAction = new QAction("&Find", this);
-@@ -1520,17 +1522,29 @@ ConfigMainWindow::ConfigMainWindow(void)
- 
- void ConfigMainWindow::loadConfig(void)
- {
--	QString s = QFileDialog::getOpenFileName(this, "", conf_get_configname());
--	if (s.isNull())
-+	QString str;
-+	QByteArray ba;
-+	const char *name;
-+
-+	str = QFileDialog::getOpenFileName(this, "", configname);
-+	if (str.isNull())
- 		return;
--	if (conf_read(QFile::encodeName(s)))
-+
-+	ba = str.toLocal8Bit();
-+	name = ba.data();
-+
-+	if (conf_read(name))
- 		QMessageBox::information(this, "qconf", "Unable to load configuration!");
-+
-+	free(configname);
-+	configname = xstrdup(name);
-+
- 	ConfigView::updateListAll();
- }
- 
- bool ConfigMainWindow::saveConfig(void)
- {
--	if (conf_write(NULL)) {
-+	if (conf_write(configname)) {
- 		QMessageBox::information(this, "qconf", "Unable to save configuration!");
- 		return false;
- 	}
-@@ -1541,10 +1555,24 @@ bool ConfigMainWindow::saveConfig(void)
- 
- void ConfigMainWindow::saveConfigAs(void)
- {
--	QString s = QFileDialog::getSaveFileName(this, "", conf_get_configname());
--	if (s.isNull())
-+	QString str;
-+	QByteArray ba;
-+	const char *name;
-+
-+	str = QFileDialog::getSaveFileName(this, "", configname);
-+	if (str.isNull())
- 		return;
--	saveConfig();
-+
-+	ba = str.toLocal8Bit();
-+	name = ba.data();
-+
-+	if (conf_write(name)) {
-+		QMessageBox::information(this, "qconf", "Unable to save configuration!");
-+	}
-+	conf_write_autoconf(0);
-+
-+	free(configname);
-+	configname = xstrdup(name);
- }
- 
- void ConfigMainWindow::searchConfig(void)
-diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index 41df466..45bfe9b 100644
---- a/scripts/kconfig/qconf.h
-+++ b/scripts/kconfig/qconf.h
-@@ -291,6 +291,7 @@ public slots:
- class ConfigMainWindow : public QMainWindow {
- 	Q_OBJECT
- 
-+	char *configname;
- 	static QAction *saveAction;
- 	static void conf_changed(void);
- public:
+Maybe you could find some time to test whether my approach also
+works for you ?
+
+
+--mtx
+
 -- 
-2.7.4
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
