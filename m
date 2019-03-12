@@ -1,70 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:26883 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729977AbfCLRYL (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.133]:34329 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726339AbfCLSww (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Mar 2019 13:24:11 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] deb-pkg: generate correct build dependencies
-Date: Wed, 13 Mar 2019 02:23:24 +0900
-Message-Id: <1552411404-32271-1-git-send-email-yamada.masahiro@socionext.com>
+        Tue, 12 Mar 2019 14:52:52 -0400
+From: "Enrico Weigelt, metux IT consult" <info@metux.net>
+Subject: Standalone version of Kconfig
+Message-ID: <088f45cb-204e-4fa4-1062-5574ef97cb8a@metux.net>
+Date: Tue, 12 Mar 2019 19:52:46 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-From: Riku Voipio <riku.voipio@linaro.org>
-
-bison/flex is now needed always for building for kconfig. Some build
-dependencies depend on kernel configuration, enable them as needed:
-
-- libelf-dev when UNWINDER_ORC is set
-- libssl-dev for SYSTEM_TRUSTED_KEYRING
-
-Since the libssl-dev is needed for extract_cert binary, denote with
-:native to install the libssl-dev for the build machines architecture,
-rather than for the architecture of the kernel being built.
-
-Tested-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
-Acked-by: maximilian attems <maks@stro.at>
-[masahiro.yamada: add change 'flex' to 'flex | flex:native' ]
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
-Hi Riku,
-
-I did not get your update, but anyway I changed
-'flex' to 'flex | flex:native'.
-
-With this change, now I am able to cross-compile deb-pkg.
+Hello folks,
 
 
- scripts/package/mkdebian | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+YFYI: I've started a standalone version of Kconfig, which can be used
+other programs. There have been some attempts to do so, but none seem
+to be still alive.
 
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index f030961..110cd8d 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -134,6 +134,8 @@ fi
- 
- mkdir -p debian/
- echo $debarch > debian/arch
-+extra_build_depends=", $(if_enabled_echo UNWINDER_ORC libelf-dev)"
-+extra_build_depends="$extra_build_depends, $(if_enabled_echo SYSTEM_TRUSTED_KEYRING libssl-dev:native)"
- 
- # Generate a simple changelog template
- cat <<EOF > debian/changelog
-@@ -170,7 +172,7 @@ Source: $sourcename
- Section: kernel
- Priority: optional
- Maintainer: $maintainer
--Build-Depends: bc, kmod, cpio
-+Build-Depends: bc, kmod, cpio, bison, flex | flex:native $extra_build_depends
- Homepage: http://www.kernel.org/
- 
- Package: $packagename
+I intend to keep it alive for a long time and sync it w/ the kernel
+regularily. The program is meant to be installed just as any other
+program (not as part as some other, like it already is in the kernel
+or busybox, etc) and I'm going to package it to some distros, too.
+
+At the moment, I'm just supporting menuconfig (other versions follow).
+Later, I'll also makefile includes for common stuff (eg. handle module
+targets like we do in the kernel, etc).
+
+I'll yet have to find a decent way for syncing w/ the kernel, while
+retaining history. Maybe some filter-branch + rebase voodoo ;-)
+
+Feel free to play around :)
+
+https://github.com/metux/kconfig
+
+--mtx
+
 -- 
-2.7.4
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
