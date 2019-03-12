@@ -1,47 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.133]:34329 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726339AbfCLSww (ORCPT
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:38429 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726485AbfCLVxT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Mar 2019 14:52:52 -0400
-From: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Subject: Standalone version of Kconfig
-Message-ID: <088f45cb-204e-4fa4-1062-5574ef97cb8a@metux.net>
-Date: Tue, 12 Mar 2019 19:52:46 +0100
+        Tue, 12 Mar 2019 17:53:19 -0400
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: [PATCH] Makefile: Add '-fno-builtin-bcmp' to CLANG_FLAGS
+Date: Tue, 12 Mar 2019 14:52:04 -0700
+Message-Id: <20190312215203.27643-1-natechancellor@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Arnd Bergmann <arnd@arndb.de>, James Y Knight <jyknight@google.com>, clang-built-linux@googlegroups.com, Nathan Chancellor <natechancellor@gmail.com>, stable@vger.kernel.org
 
-Hello folks,
+After LLVM revision r355672 [1], all known working kernel configurations
+fail to link [2]:
 
+ld: init/do_mounts.o: in function `prepare_namespace':
+do_mounts.c:(.init.text+0x5ca): undefined reference to `bcmp'
+ld: do_mounts.c:(.init.text+0x5e6): undefined reference to `bcmp'
+ld: init/initramfs.o: in function `do_header':
+initramfs.c:(.init.text+0x6e0): undefined reference to `bcmp'
+ld: initramfs.c:(.init.text+0x6f8): undefined reference to `bcmp'
+ld: arch/x86/kernel/setup.o: in function `setup_arch':
+setup.c:(.init.text+0x21d): undefined reference to `bcmp'
 
-YFYI: I've started a standalone version of Kconfig, which can be used
-other programs. There have been some attempts to do so, but none seem
-to be still alive.
+Commit 6edfba1b33c7 ("[PATCH] x86_64: Don't define string functions to
+builtin") removed '-ffreestanding' globally and the kernel doesn't
+provide a bcmp definition so the linker cannot find a reference to it.
 
-I intend to keep it alive for a long time and sync it w/ the kernel
-regularily. The program is meant to be installed just as any other
-program (not as part as some other, like it already is in the kernel
-or busybox, etc) and I'm going to package it to some distros, too.
+Fix this by explicitly telling LLVM through Clang not to emit bcmp
+references. This flag does not need to be behind 'cc-option' because all
+working versions of Clang support this flag.
 
-At the moment, I'm just supporting menuconfig (other versions follow).
-Later, I'll also makefile includes for common stuff (eg. handle module
-targets like we do in the kernel, etc).
+[1]: https://github.com/llvm/llvm-project/commit/8e16d73346f8091461319a7dfc4ddd18eedcff13
+[2]: https://travis-ci.com/ClangBuiltLinux/continuous-integration/builds/104027249
 
-I'll yet have to find a decent way for syncing w/ the kernel, while
-retaining history. Maybe some filter-branch + rebase voodoo ;-)
+Link: https://github.com/ClangBuiltLinux/linux/issues/416
+Link: https://bugs.llvm.org/show_bug.cgi?id=41035
+Cc: stable@vger.kernel.org
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-Feel free to play around :)
-
-https://github.com/metux/kconfig
-
---mtx
-
+diff --git a/Makefile b/Makefile
+index 9ef547fc7ffe..6645a274b6e3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -501,6 +501,7 @@ ifneq ($(GCC_TOOLCHAIN),)
+ CLANG_FLAGS	+= --gcc-toolchain=$(GCC_TOOLCHAIN)
+ endif
+ CLANG_FLAGS	+= -no-integrated-as
++CLANG_FLAGS	+= -fno-builtin-bcmp
+ KBUILD_CFLAGS	+= $(CLANG_FLAGS)
+ KBUILD_AFLAGS	+= $(CLANG_FLAGS)
+ export CLANG_FLAGS
 -- 
-Enrico Weigelt, metux IT consult
-Free software and Linux embedded engineering
-info@metux.net -- +49-151-27565287
+2.21.0
