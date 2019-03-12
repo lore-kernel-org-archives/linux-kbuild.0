@@ -1,117 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:48324 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726641AbfCKRno (ORCPT
+Received: from mail-wm1-f45.google.com ([209.85.128.45]:34672 "EHLO
+        mail-wm1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725890AbfCLJNS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Mar 2019 13:43:44 -0400
+        Tue, 12 Mar 2019 05:13:18 -0400
+Received: by mail-wm1-f45.google.com with SMTP id o10so1624245wmc.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Mar 2019 02:13:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190309154307.23039-1-ar@cs.msu.ru>
-In-Reply-To: <20190309154307.23039-1-ar@cs.msu.ru>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 12 Mar 2019 02:43:03 +0900
-Message-ID: <CAK7LNAT4sM+pnQyxNVpE2O3ChEirpUq6LjLnvT6xhJ7LuFGKHQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] scripts/package/Makefile: put proper config in
- source tarball
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Tue, 12 Mar 2019 10:13:05 +0100
+Message-ID: <CA+icZUVsc8fjxj1KGMWCQVPnaG+_W79HQ8xky=0Qd_vY55GU2Q@mail.gmail.com>
+Subject: Fix and simplify -z noreloc-overflow" linker check in arch/x86/boot/compressed/Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arseny Maslennikov <ar@cs.msu.ru>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org
 
-On Sun, Mar 10, 2019 at 12:44 AM Arseny Maslennikov <ar@cs.msu.ru> wrote:
->
-> It is widely known that one can build a kernel without a .config in the
-> source tree by setting KCONFIG_CONFIG equal to the actual configuration
-> file path.
->
-> When making a *-pkg target, make(1) prepares a source tarball and tries
-> to pack `.config' in there regardless of the value of KCONFIG_CONFIG,
-> failing spectacularly if .config is absent and packing the wrong config
-> if it exists.
-> Let's fix that by including whatever KCONFIG_CONFIG points to in the
-> archive under the traditional name `.config'.
->
-> We have to pass --absolute-names to tar, since it seems to trim the
-> paths of archive members first and only then consider --transform, which
-> breaks KCONFIG_CONFIG=../../some.config, as well as absolute paths.
->
-> Signed-off-by: Arseny Maslennikov <ar@cs.msu.ru>
+Hi Masahiro Yamada,
 
+do you have an idea how to fix this properly - as for example LLD
+hasn't this option?
+Speaking of the shell-line.
+I mean use the method "call ld-option".
 
-rpm-pkg will work in a strange way.
-(probably snap-pkg too).
+The below should be if $linker supports z noreloc-overflow then set
+-pie together with --no-dynamic-linker.
+AFAICS this is for x86-64-only?
 
-rpm package is compiled in $(HOME)/rpmbuild/BUILD.
-The source package will contain the .config in the standard location,
-but KCONFIG_CONFIG will point to a different path.
+Is it possible to simplify and have have one single line...?
 
-Rather, I'd like to stop the build.
+KBUILD_LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
 
+[ arch/x86/boot/compressed/Makefile ]
 
-quiet_cmd_src_tar = TAR     $(2).tar.gz
-      cmd_src_tar = \
-if test "$(objtree)" != "$(srctree)"; then \
-        echo >&2; \
-        echo >&2 "  ERROR:"; \
-        echo >&2 "  Building source tarball is not possible outside the"; \
-        echo >&2 "  kernel source tree. Don't set KBUILD_OUTPUT, or use the"; \
-        echo >&2 "  binrpm-pkg or bindeb-pkg target instead."; \
-        echo >&2; \
-        false; \
-fi ; \
-if test "$(KCONFIG_CONFIG)" != .config; then \
-        echo >&2; \
-        echo >&2 "  ERROR:"; \
-        echo >&2 "  Please do not override KCONFIG_CONFIG"; \
-        echo >&2 "  for source package build"; \
-        echo >&2; \
-        false; \
-fi ; \
-$(srctree)/scripts/setlocalversion --save-scmversion; \
-tar -cz $(RCS_TAR_IGNORE) -f $(2).tar.gz \
---transform 's:^:$(2)/:S' $(TAR_CONTENT) $(3); \
-rm -f $(objtree)/.scmversion
+KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
+# Compressed kernel should be built as PIE since it may be loaded at any
+# address by the bootloader.
+ifeq ($(CONFIG_X86_32),y)
+KBUILD_LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
+else
+# To build 64-bit compressed kernel as PIE, we disable relocation
+# overflow check to avoid relocation overflow error with a new linker
+# command-line option, -z noreloc-overflow.
+KBUILD_LDFLAGS += $(shell $(LD) --help 2>&1 | grep -q "\-z noreloc-overflow" \
+        && echo "-z noreloc-overflow -pie --no-dynamic-linker")
+endif
+LDFLAGS_vmlinux := -T
 
+If you need more infos let me know.
 
+Thanks.
 
-I am included to do the opposite;
-replace KCONFIG_CONFIG with the hard-coded .config
+Regards,
+- Sedat -
 
-KCONFIG_CONFIG does not work.
-It is half-baked at best.
-
-
-
-> ---
->  scripts/package/Makefile | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-> index 2c6de21e5152..134cefee068d 100644
-> --- a/scripts/package/Makefile
-> +++ b/scripts/package/Makefile
-> @@ -27,7 +27,7 @@ KDEB_SOURCENAME ?= linux-$(KERNELRELEASE)
->  KBUILD_PKG_ROOTCMD ?="fakeroot -u"
->  export KDEB_SOURCENAME
->  # Include only those top-level files that are needed by make, plus the GPL copy
-> -TAR_CONTENT := $(KBUILD_ALLDIRS) .config .scmversion Makefile \
-> +TAR_CONTENT := $(KBUILD_ALLDIRS) $(KCONFIG_CONFIG) .scmversion Makefile \
->                 Kbuild Kconfig COPYING $(wildcard localversion*)
->  MKSPEC     := $(srctree)/scripts/package/mkspec
->
-> @@ -44,6 +44,7 @@ if test "$(objtree)" != "$(srctree)"; then \
->  fi ; \
->  $(srctree)/scripts/setlocalversion --save-scmversion; \
->  tar -cz $(RCS_TAR_IGNORE) -f $(2).tar.gz \
-> +       --absolute-names --transform 's:^$(KCONFIG_CONFIG)$$:.config:S' \
->         --transform 's:^:$(2)/:S' $(TAR_CONTENT) $(3); \
->  rm -f $(objtree)/.scmversion
->
-> --
-> 2.20.1
->
-
-
--- 
-Best Regards
-Masahiro Yamada
+Link: https://github.com/ClangBuiltLinux/linux/issues/411
