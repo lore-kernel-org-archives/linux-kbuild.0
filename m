@@ -1,82 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:56174 "EHLO
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:38168 "EHLO
         conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725887AbfCLQGX (ORCPT
+        with ESMTP id S1726255AbfCLQjx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Mar 2019 12:06:23 -0400
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id x2CG6CLk009856
-        for <linux-kbuild@vger.kernel.org>; Wed, 13 Mar 2019 01:06:13 +0900
-Received: by mail-vk1-f175.google.com with SMTP id p190so451617vke.4
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Mar 2019 09:06:13 -0700 (PDT)
+        Tue, 12 Mar 2019 12:39:53 -0400
 MIME-Version: 1.0
-References: <CA+icZUVsc8fjxj1KGMWCQVPnaG+_W79HQ8xky=0Qd_vY55GU2Q@mail.gmail.com>
-In-Reply-To: <CA+icZUVsc8fjxj1KGMWCQVPnaG+_W79HQ8xky=0Qd_vY55GU2Q@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 13 Mar 2019 01:05:36 +0900
-Message-ID: <CAK7LNASFcbPn2zaYTLhDMnhAQi9KRLnNT1hegXnGTdn=eiCKkw@mail.gmail.com>
-Subject: Re: Fix and simplify -z noreloc-overflow" linker check in arch/x86/boot/compressed/Makefile
+Date: Wed, 13 Mar 2019 01:39:04 +0900
+Message-ID: <CAK7LNASa-XsGj9ESee+RF4SMQxpxD49oKz9C86etYQV2gQPxDQ@mail.gmail.com>
+Subject: [GIT PULL] Kconfig updates for v5.1
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
 
-On Tue, Mar 12, 2019 at 6:13 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
->
-> Hi Masahiro Yamada,
->
-> do you have an idea how to fix this properly - as for example LLD
-> hasn't this option?
-> Speaking of the shell-line.
-> I mean use the method "call ld-option".
->
-> The below should be if $linker supports z noreloc-overflow then set
-> -pie together with --no-dynamic-linker.
-> AFAICS this is for x86-64-only?
->
-> Is it possible to simplify and have have one single line...?
+Hi Linus,
 
 
-Sorry, I do not understand.
-
-Could you clarify what you want to achieve?
-
+Please pull Kconfig updates for v5.1.
 
 Thanks.
 
 
 
+The following changes since commit f17b5f06cb92ef2250513a1e154c47b78df07d40:
 
+  Linux 5.0-rc4 (2019-01-27 15:18:05 -0800)
 
+are available in the git repository at:
 
-> KBUILD_LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
->
-> [ arch/x86/boot/compressed/Makefile ]
->
-> KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
-> # Compressed kernel should be built as PIE since it may be loaded at any
-> # address by the bootloader.
-> ifeq ($(CONFIG_X86_32),y)
-> KBUILD_LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
-> else
-> # To build 64-bit compressed kernel as PIE, we disable relocation
-> # overflow check to avoid relocation overflow error with a new linker
-> # command-line option, -z noreloc-overflow.
-> KBUILD_LDFLAGS += $(shell $(LD) --help 2>&1 | grep -q "\-z noreloc-overflow" \
->         && echo "-z noreloc-overflow -pie --no-dynamic-linker")
-> endif
-> LDFLAGS_vmlinux := -T
->
-> If you need more infos let me know.
->
-> Thanks.
->
-> Regards,
-> - Sedat -
->
-> Link: https://github.com/ClangBuiltLinux/linux/issues/411
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kconfig-v5.1
 
+for you to fetch changes up to 8741908b3e29d35a33eeab6de60175958db8e54b:
+
+  kconfig: fix 'Save As' menu of xconfig (2019-03-12 02:50:24 +0900)
+
+----------------------------------------------------------------
+Kconfig updates for v5.1
+
+ - rename lexer and parse files
+
+ - fix 'Save as' menu of xconfig
+
+----------------------------------------------------------------
+Masahiro Yamada (3):
+      kconfig: rename zconf.l to lexer.l
+      kconfig: rename zconf.y to parser.y
+      kconfig: fix 'Save As' menu of xconfig
+
+ scripts/kconfig/Makefile              |  9 ++++----
+ scripts/kconfig/expr.h                |  2 +-
+ scripts/kconfig/{zconf.l => lexer.l}  |  2 +-
+ scripts/kconfig/lkc.h                 |  2 +-
+ scripts/kconfig/{zconf.y => parser.y} |  0
+ scripts/kconfig/qconf.cc              | 42 +++++++++++++++++++++++++++++------
+ scripts/kconfig/qconf.h               |  1 +
+ 7 files changed, 44 insertions(+), 14 deletions(-)
+ rename scripts/kconfig/{zconf.l => lexer.l} (99%)
+ rename scripts/kconfig/{zconf.y => parser.y} (100%)
 
 
 -- 
