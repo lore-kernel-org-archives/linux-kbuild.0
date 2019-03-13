@@ -1,83 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:21809 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725876AbfCMRoW (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:37516 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725876AbfCMRpn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Mar 2019 13:44:22 -0400
+        Wed, 13 Mar 2019 13:45:43 -0400
 MIME-Version: 1.0
-References: <1552411404-32271-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1552411404-32271-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1552036419-924-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1552036419-924-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 14 Mar 2019 02:43:32 +0900
-Message-ID: <CAK7LNARXpg-LwbNnZMySGJHFFjUKes5tCcKx1=mpygpyX3GEJQ@mail.gmail.com>
-Subject: Re: [PATCH] deb-pkg: generate correct build dependencies
+Date: Thu, 14 Mar 2019 02:44:55 +0900
+Message-ID: <CAK7LNATeqmC3daAxTk9J0r0YHB425gTFYLave2aMth6rmejREQ@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: add workaround for Debian make-kpkg
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Manoj Srivastava <srivasta@debian.org>, Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Manoj Srivastava <manoj.srivastava.1962@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Mar 13, 2019 at 2:24 AM Masahiro Yamada
+On Fri, Mar 8, 2019 at 6:15 PM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
-> From: Riku Voipio <riku.voipio@linaro.org>
+> Since commit 3812b8c5c5d5 ("kbuild: make -r/-R effective in top
+> Makefile for old Make versions"), make-kpkg is not working.
 >
-> bison/flex is now needed always for building for kconfig. Some build
-> dependencies depend on kernel configuration, enable them as needed:
+> make-kpkg directly includes the top Makefile of Linux kernel, and
+> appends some debian_* targets.
 >
-> - libelf-dev when UNWINDER_ORC is set
-> - libssl-dev for SYSTEM_TRUSTED_KEYRING
+>   /usr/share/kernel-package/ruleset/kernel_version.mk:
 >
-> Since the libssl-dev is needed for extract_cert binary, denote with
-> :native to install the libssl-dev for the build machines architecture,
-> rather than for the architecture of the kernel being built.
+>     # Include the kernel makefile
+>     override dot-config := 1
+>     include Makefile
+>     dot-config := 1
 >
-> Tested-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-> Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
-> Acked-by: maximilian attems <maks@stro.at>
-> [masahiro.yamada: add change 'flex' to 'flex | flex:native' ]
+> I did not know the kernel Makefile was used in that way, and it is
+> hard to guarantee the behavior when the kernel Makefile is included
+> by another Makefile from a different project.
+>
+> It looks like Debian Stretch stopped providing make-kpkg. Maybe it is
+> obsolete and being replaced with 'make deb-pkg' etc. but still widely
+> used.
+>
+> This commit adds a workaround; if the top Makefile is included by
+> another Makefile, skip sub-make in order to make the main part visible.
+> 'MAKEFLAGS += -rR' does not become effective for GNU Make < 4.0, but
+> Debian/Ubuntu is already using newer versions.
+>
+> The effect of this commit:
+>
+>   Debian 8 (Jessie)  : Fixed
+>   Debian 9 (Stretch) : make-kpkg (kernel-package) is not provided
+>   Ubuntu 14.04 LTS   : NOT Fixed
+>   Ubuntu 16.04 LTS   : Fixed
+>   Ubuntu 18.04 LTS   : Fixed
+>
+> This commit cannot fix Ubuntu 14.04 because it installs GNU Make 3.81,
+> but its support will end in Apr 2019, which is before the Linux v5.1
+> release.
+>
+> I added warning so that nobody would try to include the top Makefile.
+>
+> Fixes: 3812b8c5c5d5 ("kbuild: make -r/-R effective in top Makefile for old Make versions")
+> Reported-by: Liz Zhang <lizzha@microsoft.com>
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Tested-by: Lili Deng <v-lide@microsoft.com>
+> Cc: Manoj Srivastava <srivasta@debian.org>
 > ---
->
-
 
 Applied to linux-kbuild.
 
 
-> Hi Riku,
+> Changes in v2:
+>   - Drop the unimportant comment about PowerPC
 >
-> I did not get your update, but anyway I changed
-> 'flex' to 'flex | flex:native'.
+>  Makefile | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 >
-> With this change, now I am able to cross-compile deb-pkg.
+> diff --git a/Makefile b/Makefile
+> index 4fb8896..6039685 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -31,6 +31,16 @@ _all:
+>  # descending is started. They are now explicitly listed as the
+>  # prepare rule.
 >
+> +# Ugly workaround for Debian make-kpkg:
+> +# make-kpkg directly includes the top Makefile of Linux kernel. In such a case,
+> +# skip sub-make to support debian_* targets in ruleset/kernel_version.mk, but
+> +# displays warning to discourage such abusage.
+> +ifneq ($(word 2, $(MAKEFILE_LIST)),)
+> +$(warning Do not include top Makefile of Linux Kernel)
+> +sub-make-done := 1
+> +MAKEFLAGS += -rR
+> +endif
+> +
+>  ifneq ($(sub-make-done),1)
 >
->  scripts/package/mkdebian | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-> index f030961..110cd8d 100755
-> --- a/scripts/package/mkdebian
-> +++ b/scripts/package/mkdebian
-> @@ -134,6 +134,8 @@ fi
->
->  mkdir -p debian/
->  echo $debarch > debian/arch
-> +extra_build_depends=", $(if_enabled_echo UNWINDER_ORC libelf-dev)"
-> +extra_build_depends="$extra_build_depends, $(if_enabled_echo SYSTEM_TRUSTED_KEYRING libssl-dev:native)"
->
->  # Generate a simple changelog template
->  cat <<EOF > debian/changelog
-> @@ -170,7 +172,7 @@ Source: $sourcename
->  Section: kernel
->  Priority: optional
->  Maintainer: $maintainer
-> -Build-Depends: bc, kmod, cpio
-> +Build-Depends: bc, kmod, cpio, bison, flex | flex:native $extra_build_depends
->  Homepage: http://www.kernel.org/
->
->  Package: $packagename
+>  # Do not use make's built-in rules and variables
 > --
 > 2.7.4
 >
