@@ -1,132 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:38272 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726039AbfCMR1R (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:49036 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726336AbfCMRmV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Mar 2019 13:27:17 -0400
-Received: by mail-pg1-f193.google.com with SMTP id m2so2002882pgl.5
-        for <linux-kbuild@vger.kernel.org>; Wed, 13 Mar 2019 10:27:17 -0700 (PDT)
+        Wed, 13 Mar 2019 13:42:21 -0400
 MIME-Version: 1.0
-References: <20190312215203.27643-1-natechancellor@gmail.com>
- <80fb5b7f-42f9-4fd1-00cf-bfa7965ff8f7@rasmusvillemoes.dk> <20190313134447.GA19066@archlinux-ryzen>
- <CAK8P3a344k=MDAX-d21U4+H+mv7Vcd9YhAN4NPEJm1CXv76tkw@mail.gmail.com>
- <20190313153209.GA14098@archlinux-ryzen> <CAKwvOd=UYEtQC9T2K=O0rxrDKug4XzsA6dHjSKmogFa7whE7Zw@mail.gmail.com>
-In-Reply-To: <CAKwvOd=UYEtQC9T2K=O0rxrDKug4XzsA6dHjSKmogFa7whE7Zw@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 13 Mar 2019 10:27:05 -0700
-Message-ID: <CAKwvOd=8rAZi3ZT8qEupmS6xY2U10cKT7kPtB=gYfWsJEJ0GSQ@mail.gmail.com>
-Subject: Re: [PATCH] Makefile: Add '-fno-builtin-bcmp' to CLANG_FLAGS
+References: <1552023035-29826-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1552023035-29826-1-git-send-email-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 14 Mar 2019 02:41:39 +0900
+Message-ID: <CAK7LNATpy6aAKqhM3ef05Oi2zYHVM2A+7x5y7tx-Z1q6BA=bvg@mail.gmail.com>
+Subject: Re: [PATCH] unicore32: simplify linker script generation for decompressor
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nathan Chancellor <natechancellor@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, James Y Knight <jyknight@google.com>, clang-built-linux@googlegroups.com, "# 3.4.x" <stable@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Guan Xuetao <gxt@pku.edu.cn>
 
-On Wed, Mar 13, 2019 at 10:21 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
+On Fri, Mar 8, 2019 at 2:31 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> On Wed, Mar 13, 2019 at 8:32 AM Nathan Chancellor
-> <natechancellor@gmail.com> wrote:
-> >
-> > On Wed, Mar 13, 2019 at 02:48:49PM +0100, Arnd Bergmann wrote:
-> > > On Wed, Mar 13, 2019 at 2:44 PM Nathan Chancellor
-> > > <natechancellor@gmail.com> wrote:
-> > > > On Wed, Mar 13, 2019 at 09:13:11AM +0100, Rasmus Villemoes wrote:
-> > > > > Wouldn't it be better to just define bcmp as an alias for memcmp? They
-> > > > > seem to have compatible prototypes, and then somebody might someday sit
-> > > > > down and implement some word-at-a-time version of bcmp making use of the
-> > > > > weaker guarantees about the return value to gain some performance. But I
-> > > > > suppose that can also be done later.
-> > > >
-> > > > Thank you much for the review, I didn't even realize this was possible :)
-> > > >
-> > > > I'd certainly like to explore it as that is what glibc does. How would
-> > > > you suggest going about it here?
-> > >
-> > > I suggested a possible implementation (likely contains bugs) and
-> > > an alias for architectures that require strict alignment, see
-> > > https://bugs.llvm.org/show_bug.cgi?id=41035#c11
-> > >
-> > > We could start out with just the alias.
-> > >
-> > >        Arnd
-> >
-> > So I've been messing around with this for a bit (forgive me, I'm still
-> > learning all of the intricacies around here) and this is what I came up
-> > with for when __ARCH_HAVE_MEMCMP is unset (not particularly difficult
-> > obviously). I can compile, link, and boot an x86 in QEMU.
-> >
-> > However, I am not sure how to handle memcmp definitions that are written
-> > in assembly like arm64, as the alias attribute only works when the alias
-> > is defined in the same translation unit. Thoughts?
+> When I was searching for unneeded $(KCONFIG_CONFIG) usages, I noticed
+> this strange build dependency.
 >
-> I hit this, too:
-> ./arch/arm64/include/asm/string.h:40:15: error: alias must point to a
-> defined variable
->       or function
+> It can use $(call if_changed,...) in case ZTEXTADDR and ZBSSADDR are
+> changed, but even a simpler way is to use the pattern rule in
+> scripts/Makefile.build. This is what arch/arm/boot/compressed/Makefile
+> does.
 >
-> since memcmp is only declared (not defined) in that header, clang is
-> not happy to alias to memcmp.  If __HAVE_ARCH_MEMCMP is defined, then
-> we can just return a call to memcmp.  Thoughts (I need to add comments
-> above bcmp, anything else)?  Do we like the typeof trick (stolen from
-> glibc) or no?
+> I did only build test. I confirmed equivalent vmlinux.lds was generated.
 >
-> diff --git a/lib/string.c b/lib/string.c
-> index 38e4ca08e757..e6c1954f2716 100644
-> --- a/lib/string.c
-> +++ b/lib/string.c
-> @@ -845,7 +845,13 @@ void *memmove(void *dest, const void *src, size_t count)
->  EXPORT_SYMBOL(memmove);
->  #endif
->
-> -#ifndef __HAVE_ARCH_MEMCMP
-> +#ifdef __HAVE_ARCH_MEMCMP
-> +int bcmp(const void *cs, const void *ct, size_t n)
-> +{
-> +       return memcmp(cs, ct, n);
-> +}
-> +EXPORT_SYMBOL(bcmp);
-> +#else
->  /**
->   * memcmp - Compare two areas of memory
->   * @cs: One area of memory
-> @@ -864,6 +870,8 @@ __visible int memcmp(const void *cs, const void
-> *ct, size_t count)
->         return res;
->  }
->  EXPORT_SYMBOL(memcmp);
-> +__weak __alias(memcmp) typeof(memcmp) bcmp;
-> +EXPORT_SYMBOL(bcmp);
->  #endif
->
->  #ifndef __HAVE_ARCH_MEMSCAN
-
-Alternatively, just not worrying about __alias makes this simpler and
-seems to work (need to add comments, thoughts?):
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 
 
-diff --git a/lib/string.c b/lib/string.c
-index 38e4ca08e757..2112108ecc35 100644
---- a/lib/string.c
-+++ b/lib/string.c
-@@ -866,6 +866,15 @@ __visible int memcmp(const void *cs, const void
-*ct, size_t count)
- EXPORT_SYMBOL(memcmp);
- #endif
+Applied to linux-kbuild.
 
-+#ifndef __HAVE_ARCH_BCMP
-+#undef bcmp
-+int bcmp(const void *cs, const void *ct, size_t count)
-+{
-+       return memcmp(cs, ct, count);
-+}
-+EXPORT_SYMBOL(bcmp);
-+#endif
-+
- #ifndef __HAVE_ARCH_MEMSCAN
- /**
-  * memscan - Find a character in an area of memory.
+
+
+>  arch/unicore32/boot/compressed/Makefile                          | 5 +----
+>  arch/unicore32/boot/compressed/{vmlinux.lds.in => vmlinux.lds.S} | 0
+>  2 files changed, 1 insertion(+), 4 deletions(-)
+>  rename arch/unicore32/boot/compressed/{vmlinux.lds.in => vmlinux.lds.S} (100%)
+>
+> diff --git a/arch/unicore32/boot/compressed/Makefile b/arch/unicore32/boot/compressed/Makefile
+> index 9aecdd3..150fafc 100644
+> --- a/arch/unicore32/boot/compressed/Makefile
+> +++ b/arch/unicore32/boot/compressed/Makefile
+> @@ -61,7 +61,4 @@ $(obj)/vmlinux: $(obj)/vmlinux.lds $(obj)/head.o $(obj)/piggy.o \
+>  ZTEXTADDR      := 0x03000000
+>  ZBSSADDR       := ALIGN(4)
+>
+> -SEDFLAGS_lds   = s/TEXT_START/$(ZTEXTADDR)/;s/BSS_START/$(ZBSSADDR)/
+> -$(obj)/vmlinux.lds: $(obj)/vmlinux.lds.in arch/unicore32/boot/Makefile $(KCONFIG_CONFIG)
+> -       @sed "$(SEDFLAGS_lds)" < $< > $@
+> -
+> +CPPFLAGS_vmlinux.lds = -DTEXT_START="$(ZTEXTADDR)" -DBSS_START="$(ZBSSADDR)"
+> diff --git a/arch/unicore32/boot/compressed/vmlinux.lds.in b/arch/unicore32/boot/compressed/vmlinux.lds.S
+> similarity index 100%
+> rename from arch/unicore32/boot/compressed/vmlinux.lds.in
+> rename to arch/unicore32/boot/compressed/vmlinux.lds.S
+> --
+> 2.7.4
+>
+
 
 -- 
-Thanks,
-~Nick Desaulniers
+Best Regards
+Masahiro Yamada
