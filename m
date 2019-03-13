@@ -1,130 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:41680 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725876AbfCMRne (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:21809 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725876AbfCMRoW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Mar 2019 13:43:34 -0400
+        Wed, 13 Mar 2019 13:44:22 -0400
 MIME-Version: 1.0
-References: <1548996645-16962-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1548996645-16962-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1552411404-32271-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1552411404-32271-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 14 Mar 2019 02:42:35 +0900
-Message-ID: <CAK7LNAQicqVtx-b-qvm37U6Hq8AFztHULFuABLFVvb7i7urL3w@mail.gmail.com>
-Subject: Re: [PATCH] modpost: always show verbose warning for section mismatch
+Date: Thu, 14 Mar 2019 02:43:32 +0900
+Message-ID: <CAK7LNARXpg-LwbNnZMySGJHFFjUKes5tCcKx1=mpygpyX3GEJQ@mail.gmail.com>
+Subject: Re: [PATCH] deb-pkg: generate correct build dependencies
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Feb 1, 2019 at 2:26 PM Masahiro Yamada
+On Wed, Mar 13, 2019 at 2:24 AM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
-> Unless CONFIG_DEBUG_SECTION_MISMATCH is enabled, modpost only shows
-> the number of section mismatches.
+> From: Riku Voipio <riku.voipio@linaro.org>
 >
-> If you want to know the symbols causing the issue, you need to rebuild
-> with CONFIG_DEBUG_SECTION_MISMATCH. It is tedious.
+> bison/flex is now needed always for building for kconfig. Some build
+> dependencies depend on kernel configuration, enable them as needed:
 >
-> I think it is fine to show annoying warning when a new section mismatch
-> comes in.
+> - libelf-dev when UNWINDER_ORC is set
+> - libssl-dev for SYSTEM_TRUSTED_KEYRING
 >
+> Since the libssl-dev is needed for extract_cert binary, denote with
+> :native to install the libssl-dev for the build machines architecture,
+> rather than for the architecture of the kernel being built.
+>
+> Tested-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+> Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
+> Acked-by: maximilian attems <maks@stro.at>
+> [masahiro.yamada: add change 'flex' to 'flex | flex:native' ]
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
+>
 
 
 Applied to linux-kbuild.
 
+
+> Hi Riku,
 >
->  scripts/Makefile.modpost |  1 -
->  scripts/mod/modpost.c    | 27 +++++----------------------
->  2 files changed, 5 insertions(+), 23 deletions(-)
+> I did not get your update, but anyway I changed
+> 'flex' to 'flex | flex:native'.
 >
-> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> index c0b7f52..6b7f354 100644
-> --- a/scripts/Makefile.modpost
-> +++ b/scripts/Makefile.modpost
-> @@ -77,7 +77,6 @@ modpost = scripts/mod/modpost                    \
->   $(if $(KBUILD_EXTMOD),-I $(modulesymfile))      \
->   $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
->   $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
-> - $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
->   $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
->   $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
+> With this change, now I am able to cross-compile deb-pkg.
 >
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 26bf886..0b0d108 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -35,7 +35,6 @@ static int vmlinux_section_warnings = 1;
->  static int warn_unresolved = 0;
->  /* How a symbol is exported */
->  static int sec_mismatch_count = 0;
-> -static int sec_mismatch_verbose = 1;
->  static int sec_mismatch_fatal = 0;
->  /* ignore missing files */
->  static int ignore_missing_files;
-> @@ -1406,8 +1405,6 @@ static void report_sec_mismatch(const char *modname,
->         char *prl_to;
 >
->         sec_mismatch_count++;
-> -       if (!sec_mismatch_verbose)
-> -               return;
+>  scripts/package/mkdebian | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
->         get_pretty_name(from_is_func, &from, &from_p);
->         get_pretty_name(to_is_func, &to, &to_p);
-> @@ -1655,9 +1652,7 @@ static void extable_mismatch_handler(const char* modname, struct elf_info *elf,
+> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+> index f030961..110cd8d 100755
+> --- a/scripts/package/mkdebian
+> +++ b/scripts/package/mkdebian
+> @@ -134,6 +134,8 @@ fi
 >
->         sec_mismatch_count++;
+>  mkdir -p debian/
+>  echo $debarch > debian/arch
+> +extra_build_depends=", $(if_enabled_echo UNWINDER_ORC libelf-dev)"
+> +extra_build_depends="$extra_build_depends, $(if_enabled_echo SYSTEM_TRUSTED_KEYRING libssl-dev:native)"
 >
-> -       if (sec_mismatch_verbose)
-> -               report_extable_warnings(modname, elf, mismatch, r, sym,
-> -                                       fromsec, tosec);
-> +       report_extable_warnings(modname, elf, mismatch, r, sym, fromsec, tosec);
+>  # Generate a simple changelog template
+>  cat <<EOF > debian/changelog
+> @@ -170,7 +172,7 @@ Source: $sourcename
+>  Section: kernel
+>  Priority: optional
+>  Maintainer: $maintainer
+> -Build-Depends: bc, kmod, cpio
+> +Build-Depends: bc, kmod, cpio, bison, flex | flex:native $extra_build_depends
+>  Homepage: http://www.kernel.org/
 >
->         if (match(tosec, mismatch->bad_tosec))
->                 fatal("The relocation at %s+0x%lx references\n"
-> @@ -2433,7 +2428,7 @@ int main(int argc, char **argv)
->         struct ext_sym_list *extsym_iter;
->         struct ext_sym_list *extsym_start = NULL;
->
-> -       while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awE")) != -1) {
-> +       while ((opt = getopt(argc, argv, "i:I:e:mnsT:o:awE")) != -1) {
->                 switch (opt) {
->                 case 'i':
->                         kernel_read = optarg;
-> @@ -2465,9 +2460,6 @@ int main(int argc, char **argv)
->                 case 's':
->                         vmlinux_section_warnings = 0;
->                         break;
-> -               case 'S':
-> -                       sec_mismatch_verbose = 0;
-> -                       break;
->                 case 'T':
->                         files_source = optarg;
->                         break;
-> @@ -2525,18 +2517,9 @@ int main(int argc, char **argv)
->         }
->         if (dump_write)
->                 write_dump(dump_write);
-> -       if (sec_mismatch_count) {
-> -               if (!sec_mismatch_verbose) {
-> -                       warn("modpost: Found %d section mismatch(es).\n"
-> -                            "To see full details build your kernel with:\n"
-> -                            "'make CONFIG_DEBUG_SECTION_MISMATCH=y'\n",
-> -                            sec_mismatch_count);
-> -               }
-> -               if (sec_mismatch_fatal) {
-> -                       fatal("modpost: Section mismatches detected.\n"
-> -                             "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
-> -               }
-> -       }
-> +       if (sec_mismatch_count && sec_mismatch_fatal)
-> +               fatal("modpost: Section mismatches detected.\n"
-> +                     "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
->         free(buf.p);
->
->         return err;
+>  Package: $packagename
 > --
 > 2.7.4
 >
