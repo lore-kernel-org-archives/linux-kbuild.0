@@ -1,41 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:33755 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726712AbfCNJ42 (ORCPT
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44238 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726337AbfCNLAE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Mar 2019 05:56:28 -0400
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH v4] lib/string.c: implement a basic bcmp
-Date: Thu, 14 Mar 2019 09:57:05 +0000
-Message-ID: <953400721b6c4b869b9278c44e0aa796@AcuMS.aculab.com>
-References: <7549EE7E-4172-467D-815A-63664A33D410@goodmis.org>
- <20190313211335.165605-1-ndesaulniers@google.com>
-In-Reply-To: <20190313211335.165605-1-ndesaulniers@google.com>
-Content-Language: en-US
+        Thu, 14 Mar 2019 07:00:04 -0400
+Received: by mail-wr1-f65.google.com with SMTP id w2so5306345wrt.11
+        for <linux-kbuild@vger.kernel.org>; Thu, 14 Mar 2019 04:00:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Thu, 14 Mar 2019 11:59:50 +0100
+Message-ID: <CA+icZUXM2NPGc+yfTCjXHyBnPT=PwO+j20GKeRDrdVPOCF9GwQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: deb-pkg: set executable bit for debian/rules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: 'Nick Desaulniers' <ndesaulniers@google.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>
-Cc: "clang-built-linux@googlegroups.com" <clang-built-linux@googlegroups.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Adhemerval Zanella <adhemerval.zanella@linaro.org>, Arnd Bergmann <arnd@arndb.de>, James Y Knight <jyknight@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Steven Rostedt <rostedt@goodmis.org>, Namhyung Kim <namhyung@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Dan Williams <dan.j.williams@intel.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Mathieu Malaterre <malat@debian.org>
+Cc: linux-kbuild@vger.kernel.org
 
-RnJvbTogTmljayBEZXNhdWxuaWVycw0KPiBTZW50OiAxMyBNYXJjaCAyMDE5IDIxOjE0DQouLi4N
-Cj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvc3RyaW5nLmggYi9pbmNsdWRlL2xpbnV4L3N0
-cmluZy5oDQo+IGluZGV4IDc5MjdiODc1ZjgwYy4uNmFiMGE2ZmE1MTJlIDEwMDY0NA0KPiAtLS0g
-YS9pbmNsdWRlL2xpbnV4L3N0cmluZy5oDQo+ICsrKyBiL2luY2x1ZGUvbGludXgvc3RyaW5nLmgN
-Cj4gQEAgLTE1MCw2ICsxNTAsOSBAQCBleHRlcm4gdm9pZCAqIG1lbXNjYW4odm9pZCAqLGludCxf
-X2tlcm5lbF9zaXplX3QpOw0KPiAgI2lmbmRlZiBfX0hBVkVfQVJDSF9NRU1DTVANCj4gIGV4dGVy
-biBpbnQgbWVtY21wKGNvbnN0IHZvaWQgKixjb25zdCB2b2lkICosX19rZXJuZWxfc2l6ZV90KTsN
-Cj4gICNlbmRpZg0KPiArI2lmbmRlZiBfX0hBVkVfQVJDSF9CQ01QDQo+ICtleHRlcm4gaW50IGJj
-bXAoY29uc3Qgdm9pZCAqLGNvbnN0IHZvaWQgKixfX2tlcm5lbF9zaXplX3QpOw0KPiArI2VuZGlm
-DQoNClNob3VsZG4ndCB0aGF0IHByb3RvdHlwZSBhbHdheXMgYmUgcHJlc2VudD8NCkFueSBhcmNo
-aXRlY3R1cmUgc3BlY2lmaWMgaW1wbGVtZW50YXRpb24gYmV0dGVyIGhhdmUgdGhlIHNhbWUgZGVm
-aW5pdGlvbi4NClRoaXMgaXMgcGFydGljdWxhcmx5IHRydWUgaGVyZSBzaW5jZSB0aGUgY29tcGls
-ZXIgaXMgZ29pbmcgdG8gYXNzdW1lDQp0aGUgZGVmYXVsdCBjYWxsaW5nIGNvbnZlbnRpb24uDQoN
-ClRoZSBvbmx5IHRpbWUgeW91IHdvdWxkbid0IHdhbnQgaXQgaXMgd2hlbiB0aGUgYXJjaGl0ZWN0
-dXJlIHNwZWNpZmljDQppbXBsZW1lbnRhdGlvbiBpcyBpbmxpbmUgYXNtLg0KSWYgdGhhdCB3ZXJl
-IGFuIG9wdGlvbiB0aGUgZGVmYXVsdCBpbXBsZW1lbnRhdGlvbiB3b3VsZCBuZWVkIHRvIGJlDQpl
-eGNsdWRlZCB1c2luZyBhIGRpZmZlcmVudCAjZGVmaW5lLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0
-ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBL
-ZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
+[ CC me I am not subscribed to this ML ]
+
+[ QUOTE ]
+This will remove the warning:
+
+  dpkg-buildpackage: warning: debian/rules is not executable; fixing that
+
+Signed-off-by: Mathieu Malaterre <malat@debian.org>
+---
+ scripts/package/mkdebian | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+index f030961c5165..3c6c82f28cac 100755
+--- a/scripts/package/mkdebian
++++ b/scripts/package/mkdebian
+@@ -221,5 +221,6 @@ clean:
+
+ binary: binary-arch
+ EOF
++chmod +x debian/rules
+[/QUOTE ]
+
+I have seen this a million time in my logs as a warning.
+Thanks for fixing this up Mathieu.
+
+- Sedat -
+
+Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
+Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
