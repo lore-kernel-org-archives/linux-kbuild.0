@@ -1,36 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:39763 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726141AbfCNDPg (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:24677 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726204AbfCNFBV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Mar 2019 23:15:36 -0400
-Date: Wed, 13 Mar 2019 20:15:30 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: [PATCH v4] lib/string.c: implement a basic bcmp
-Message-ID: <20190314031530.GA9264@archlinux-ryzen>
-References: <7549EE7E-4172-467D-815A-63664A33D410@goodmis.org>
- <20190313211335.165605-1-ndesaulniers@google.com>
+        Thu, 14 Mar 2019 01:01:21 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <7549EE7E-4172-467D-815A-63664A33D410@goodmis.org> <20190313211335.165605-1-ndesaulniers@google.com>
 In-Reply-To: <20190313211335.165605-1-ndesaulniers@google.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 14 Mar 2019 14:00:29 +0900
+Message-ID: <CAK7LNASS4T3r94yWXWvgCFcrfh=pp=p7oqA7=sN88XrJ5UT7uw@mail.gmail.com>
+Subject: Re: [PATCH v4] lib/string.c: implement a basic bcmp
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: akpm@linux-foundation.org, clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org, stable@vger.kernel.org, Adhemerval Zanella <adhemerval.zanella@linaro.org>, Arnd Bergmann <arnd@arndb.de>, James Y Knight <jyknight@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Steven Rostedt <rostedt@goodmis.org>, Namhyung Kim <namhyung@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Dan Williams <dan.j.williams@intel.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, linux-kernel@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>, clang-built-linux@googlegroups.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, stable <stable@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Adhemerval Zanella <adhemerval.zanella@linaro.org>, Arnd Bergmann <arnd@arndb.de>, James Y Knight <jyknight@google.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Steven Rostedt <rostedt@goodmis.org>, Namhyung Kim <namhyung@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Dan Williams <dan.j.williams@intel.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Mar 13, 2019 at 02:13:31PM -0700, Nick Desaulniers wrote:
+On Thu, Mar 14, 2019 at 6:13 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+>
 > A recent optimization in Clang (r355672) lowers comparisons of the
 > return value of memcmp against zero to comparisons of the return value
 > of bcmp against zero.  This helps some platforms that implement bcmp
 > more efficiently than memcmp. glibc simply aliases bcmp to memcmp, but
 > an optimized implementation is in the works.
-> 
+>
 > This results in linkage failures for all targets with Clang due to the
 > undefined symbol.  For now, just implement bcmp as a tailcail to memcmp
 > to unbreak the build.  This routine can be further optimized in the
 > future.
-> 
+>
 > Other ideas discussed:
 > * A weak alias was discussed, but breaks for architectures that define
 > their own implementations of memcmp since aliases to declarations are
@@ -38,7 +38,7 @@ On Wed, Mar 13, 2019 at 02:13:31PM -0700, Nick Desaulniers wrote:
 > typically declare memcmp in C headers, but implement them in assembly.
 > * -ffreestanding also is used sporadically throughout the kernel.
 > * -fno-builtin-bcmp doesn't work when doing LTO.
-> 
+>
 > Link: https://bugs.llvm.org/show_bug.cgi?id=41035
 > Link: https://code.woboq.org/userspace/glibc/string/memcmp.c.html#bcmp
 > Link: https://github.com/llvm/llvm-project/commit/8e16d73346f8091461319a7dfc4ddd18eedcff13
@@ -54,10 +54,11 @@ On Wed, Mar 13, 2019 at 02:13:31PM -0700, Nick Desaulniers wrote:
 > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 > Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
 
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-Tested-by: Nathan Chancellor <natechancellor@gmail.com>
 
-Thanks for fixing this better than I did (or tried to)!
+Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+
+
 
 > ---
 > Changes V3 -> V4:
@@ -69,11 +70,11 @@ Thanks for fixing this better than I did (or tried to)!
 > Changes V1 -> V2:
 > * Add declaration to include/linux/string.h.
 > * Reword comment above bcmp.
-> 
+>
 >  include/linux/string.h |  3 +++
 >  lib/string.c           | 20 ++++++++++++++++++++
 >  2 files changed, 23 insertions(+)
-> 
+>
 > diff --git a/include/linux/string.h b/include/linux/string.h
 > index 7927b875f80c..6ab0a6fa512e 100644
 > --- a/include/linux/string.h
@@ -95,7 +96,7 @@ Thanks for fixing this better than I did (or tried to)!
 > @@ -866,6 +866,26 @@ __visible int memcmp(const void *cs, const void *ct, size_t count)
 >  EXPORT_SYMBOL(memcmp);
 >  #endif
->  
+>
 > +#ifndef __HAVE_ARCH_BCMP
 > +/**
 > + * bcmp - returns 0 if and only if the buffers have identical contents.
@@ -111,7 +112,7 @@ Thanks for fixing this better than I did (or tried to)!
 > +#undef bcmp
 > +int bcmp(const void *a, const void *b, size_t len)
 > +{
-> +	return memcmp(a, b, len);
+> +       return memcmp(a, b, len);
 > +}
 > +EXPORT_SYMBOL(bcmp);
 > +#endif
@@ -119,6 +120,11 @@ Thanks for fixing this better than I did (or tried to)!
 >  #ifndef __HAVE_ARCH_MEMSCAN
 >  /**
 >   * memscan - Find a character in an area of memory.
-> -- 
+> --
 > 2.21.0.360.g471c308f928-goog
-> 
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
