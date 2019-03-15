@@ -1,76 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:42719 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726097AbfCOPTi (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:27436 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726842AbfCOP2l (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Mar 2019 11:19:38 -0400
-Received: by mail-vs1-f66.google.com with SMTP id c189so5586341vsd.9
-        for <linux-kbuild@vger.kernel.org>; Fri, 15 Mar 2019 08:19:37 -0700 (PDT)
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com. [209.85.221.175])
-        by smtp.gmail.com with ESMTPSA id r23sm1474103vke.36.2019.03.15.08.19.35
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Mar 2019 08:19:35 -0700 (PDT)
-Received: by mail-vk1-f175.google.com with SMTP id l17so2287327vke.7
-        for <linux-kbuild@vger.kernel.org>; Fri, 15 Mar 2019 08:19:35 -0700 (PDT)
+        Fri, 15 Mar 2019 11:28:41 -0400
 MIME-Version: 1.0
-References: <20190314175705.11671-1-dianders@chromium.org> <CAK7LNATvfVD8RfZN37fXGKJeEuawM_7BuVrJ4xw1pZmuz5f_aw@mail.gmail.com>
-In-Reply-To: <CAK7LNATvfVD8RfZN37fXGKJeEuawM_7BuVrJ4xw1pZmuz5f_aw@mail.gmail.com>
-From: Doug Anderson <dianders@chromium.org>
-Date: Fri, 15 Mar 2019 08:19:24 -0700
-Message-ID: <CAD=FV=V=s8e12W7XiMGxwzi9gqkvAqRfKqYBv_ePhh4y77ZkUQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: If the module stripping command fails the build
- should abort
+References: <20190314234159.191745-1-dianders@chromium.org>
+In-Reply-To: <20190314234159.191745-1-dianders@chromium.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 16 Mar 2019 00:27:43 +0900
+Message-ID: <CAK7LNATa+TnXb+a6on-sx2mjNoAiORe-WeZ8UusETHdSrXowuw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Make NOSTDINC_FLAGS a simply expanded variable
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Douglas Anderson <dianders@chromium.org>
 Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi,
-
-On Fri, Mar 15, 2019 at 7:11 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Fri, Mar 15, 2019 at 8:42 AM Douglas Anderson <dianders@chromium.org> wrote:
 >
-> On Fri, Mar 15, 2019 at 2:59 AM Douglas Anderson <dianders@chromium.org> wrote:
-> >
-> > If the call to strip returns an error code then it makes sense for the
-> > build to fail.  Currently we'll just chug along and ship unstripped
-> > modules.
-> >
-> > Fixes: e2a666d52b48 ("kbuild: sign the modules at install time")
-> > Signed-off-by: Douglas Anderson <dianders@chromium.org>
+> During a simple no-op (nothing changed) build I saw 39 invocations of
+> the C compiler with the argument "-print-file-name=include".  We don't
+> need to call the C compiler 39 times for this--one time will suffice.
 >
+> Let's change NOSTDINC_FLAGS to a simply expanded variable to avoid
+> this since there doesn't appear to be any reason it should be
+> recursively expanded.
 >
-> Did you see this problem in the latest kernel?
+> On my build this shaved ~400 ms off my "no-op" build.
 >
-> Since commit q,
-> $(call cmd,...) is run with 'set -e'.
+> Note that the recursive expansion seems to date back to the (really
+> old) commit e8f5bdb02ce0 ("[PATCH] Makefile include path ordering").
+> It's a little unclear to me if the point of that patch was to switch
+> the variable to be recursively expanded (which it did) or to avoid
+> directly assigning to NOSTDINC_FLAGS (AKA to switch to +=) because
+> someone else (out of tree?) was setting it.  I presume later since if
+> the only goal was to switch to recursive expansion the patch would
+> have just removed the ":".
 >
-> Any failure in a series of commands will let the build fail.
+> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+
+Applied to linux-kbuild.
+Thanks.
+
+
+
+> ---
 >
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> If you have the problem in old versions ( < 4.20),
-
-Ah!  I was in 4.19 when I saw the problem.  I then confirmed that the
-code in mainline was the same and that the new version built fine with
-my patch, but I didn't go back and confirm the problem there.
-
-OK, I just checked linux/master and can confirm there's no problem
-there.  Sorry for the noise then...
-
-I wonder if perhaps we should revert commit caf6fe91ddf6 ("modsign:
-Abort modules_install when signing fails") then to be consistent?
-
-> I do not mind this patch for linux-stable.
-
-It's probably not worth it.  In general I prefer linux-stable to be as
-just cherry-picks of mainline as much as possible.  When it starts
-forking then future picks get harder.  Sure in this case it's unlikely
-that someone will get tripped up by an "&&" vs a ";" when picking
-future changes, but given that it's not super urgent I guess I'd vote
-that we skip it.
+> diff --git a/Makefile b/Makefile
+> index 9ef547fc7ffe..3034ba66ad51 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -402,7 +402,7 @@ CHECK               = sparse
+>
+>  CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
+>                   -Wbitwise -Wno-return-void -Wno-unknown-attribute $(CF)
+> -NOSTDINC_FLAGS  =
+> +NOSTDINC_FLAGS :=
+>  CFLAGS_MODULE   =
+>  AFLAGS_MODULE   =
+>  LDFLAGS_MODULE  =
+> --
+> 2.21.0.360.g471c308f928-goog
+>
 
 
--Doug
--Doug
+-- 
+Best Regards
+Masahiro Yamada
