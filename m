@@ -1,161 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:45917 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726812AbfCQQAf (ORCPT
+Received: from mail-lf1-f46.google.com ([209.85.167.46]:45502 "EHLO
+        mail-lf1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbfCQQfY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 Mar 2019 12:00:35 -0400
+        Sun, 17 Mar 2019 12:35:24 -0400
+Received: by mail-lf1-f46.google.com with SMTP id f16so9944711lfk.12
+        for <linux-kbuild@vger.kernel.org>; Sun, 17 Mar 2019 09:35:23 -0700 (PDT)
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com. [209.85.208.180])
+        by smtp.gmail.com with ESMTPSA id s14sm1732727ljh.0.2019.03.17.09.35.19
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 17 Mar 2019 09:35:19 -0700 (PDT)
+Received: by mail-lj1-f180.google.com with SMTP id j89so448957ljb.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 17 Mar 2019 09:35:19 -0700 (PDT)
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 18 Mar 2019 00:59:54 +0900
-Message-ID: <CAK7LNATgAf-xiFFtMHYvOR91iNwQbiWaZxZCN-EKPKRpK57XuA@mail.gmail.com>
-Subject: [GIT PULL] more Kbuild updates for v5.1
+References: <0000000000008a1bce057ede3d13@google.com> <0000000000009950e1058447ef43@google.com>
+In-Reply-To: <0000000000009950e1058447ef43@google.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sun, 17 Mar 2019 09:35:02 -0700
+Message-ID: <CAHk-=wjUrznUSUKN1AXQA9kCStQ3MHFY95ZmeTZ5zYDcvMhBiQ@mail.gmail.com>
+Subject: Re: KASAN: slab-out-of-bounds Read in bacpy
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
+To: syzbot <syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com>
+Cc: David Miller <davem@davemloft.net>, Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux List Kernel Mailing <linux-kernel@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>, mmarek@suse.com, Netdev <netdev@vger.kernel.org>, syzkaller-bugs@googlegroups.com
 
-Hi Linus,
+On Sun, Mar 17, 2019 at 3:43 AM syzbot
+<syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com> wrote:
+>
+> syzbot has bisected this bug to:
+>
+> commit c470abd4fde40ea6a0846a2beab642a578c0b8cd
+> Author: Linus Torvalds <torvalds@linux-foundation.org>
+> Date:   Sun Feb 19 22:34:00 2017 +0000
 
-Here are late Kbuild updates for v5.1-rc1
-Please pull!
+Heh. Yeah, I doubt it.
 
+It would probably be good if syzbot did some confidence testing before
+bisecting.
 
+Don't get me wrong, "git bisect" is absolutely wonderful and has done
+a ton to help us fix bugs, but bisection has one major downside: if
+the bug you are bisecting isn't 100% repeatable, the bisection will go
+off into the random weeds and give completely nonsensical results.
+They won't even be *close*. What makes bisection so powerful is also
+what makes it then completely random if there's even *one* mistaken
+bisection point.
 
-The following changes since commit 5453a3df2a5eb49bc24615d4cf0d66b2aae05e5f:
+So it would probably be good to test each bisection point at least
+twice, and if they don't agree, report it as being unbisectable rather
+than give a random "this is what introduced the problem".
 
-  Merge tag 'kconfig-v5.1' of
-git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild
-(2019-03-13 10:06:28 -0700)
+Hmm?
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-v5.1-2
-
-for you to fetch changes up to c71bb9f8666602a22aee9df36a2df35e47edd8cc:
-
-  kconfig: remove stale lxdialog/.gitignore (2019-03-17 15:47:02 +0900)
-
-----------------------------------------------------------------
-Kbuild updates for v5.1 (2nd)
-
- - add more Build-Depends to Debian source package
-
- - prefix header search paths with $(srctree)/
-
- - make modpost show verbose section mismatch warnings
-
- - avoid hard-coded CROSS_COMPILE for h8300
-
- - fix regression for Debian make-kpkg command
-
- - add semantic patch to detect missing put_device()
-
- - fix some warnings of 'make deb-pkg'
-
- - optimize NOSTDINC_FLAGS evaluation
-
- - add warnings about redundant generic-y
-
- - clean up Makefiles and scripts
-
-----------------------------------------------------------------
-Arseny Maslennikov (1):
-      kbuild: deb-pkg: avoid implicit effects
-
-Douglas Anderson (2):
-      kbuild: Make NOSTDINC_FLAGS a simply expanded variable
-      Revert "modsign: Abort modules_install when signing fails"
-
-Masahiro Yamada (14):
-      libfdt: prefix header search paths with $(srctree)/
-      ia64: prefix header search path with $(srctree)/
-      modpost: always show verbose warning for section mismatch
-      kbuild: move archive command to scripts/Makefile.lib
-      h8300: use cc-cross-prefix instead of hardcoding h8300-unknown-linux-
-      unicore32: simplify linker script generation for decompressor
-      kbuild: source include/config/auto.conf instead of ${KCONFIG_CONFIG}
-      kbuild: add workaround for Debian make-kpkg
-      kbuild: deb-pkg: add CONFIG_ prefix to kernel config options
-      kbuild: deb-pkg: introduce is_enabled and if_enabled_echo to builddeb
-      kbuild: pkg: grep include/config/auto.conf instead of $KCONFIG_CONFIG
-      kbuild: warn redundant generic-y
-      kbuild: force all architectures except um to include mandatory-y
-      kconfig: remove stale lxdialog/.gitignore
-
-Riku Voipio (1):
-      deb-pkg: generate correct build dependencies
-
-Wen Yang (1):
-      coccinelle: semantic code search for missing put_device()
-
- Documentation/kbuild/makefiles.txt                      |  2 +-
- Makefile                                                | 18 ++++++--
- arch/alpha/include/uapi/asm/Kbuild                      |  2 -
- arch/arc/include/uapi/asm/Kbuild                        |  2 -
- arch/arm/include/asm/Kbuild                             |  1 -
- arch/arm/include/uapi/asm/Kbuild                        |  1 -
- arch/arm64/include/uapi/asm/Kbuild                      |  1 -
- arch/c6x/include/uapi/asm/Kbuild                        |  2 -
- arch/csky/include/uapi/asm/Kbuild                       |  2 -
- arch/h8300/Makefile                                     |  2 +-
- arch/h8300/include/asm/Kbuild                           |  1 -
- arch/h8300/include/uapi/asm/Kbuild                      |  2 -
- arch/hexagon/include/uapi/asm/Kbuild                    |  2 -
- arch/ia64/include/uapi/asm/Kbuild                       |  3 --
- arch/ia64/sn/kernel/Makefile                            |  2 +-
- arch/ia64/sn/kernel/sn2/Makefile                        |  2 -
- arch/ia64/sn/pci/Makefile                               |  2 -
- arch/ia64/sn/pci/pcibr/Makefile                         |  2 +-
- arch/m68k/include/uapi/asm/Kbuild                       |  2 -
- arch/microblaze/include/uapi/asm/Kbuild                 |  2 -
- arch/mips/include/uapi/asm/Kbuild                       |  2 -
- arch/nds32/include/uapi/asm/Kbuild                      |  2 -
- arch/nios2/include/uapi/asm/Kbuild                      |  2 -
- arch/openrisc/include/asm/Kbuild                        |  2 -
- arch/openrisc/include/uapi/asm/Kbuild                   |  2 -
- arch/parisc/include/asm/Kbuild                          |  2 -
- arch/parisc/include/uapi/asm/Kbuild                     |  2 -
- arch/powerpc/include/asm/Kbuild                         |  1 -
- arch/powerpc/include/uapi/asm/Kbuild                    |  2 -
- arch/riscv/include/uapi/asm/Kbuild                      |  1 -
- arch/s390/boot/Makefile                                 |  3 --
- arch/s390/include/asm/Kbuild                            |  1 -
- arch/s390/include/uapi/asm/Kbuild                       |  2 -
- arch/sh/include/uapi/asm/Kbuild                         |  1 -
- arch/sparc/include/uapi/asm/Kbuild                      |  2 -
- arch/unicore32/boot/compressed/Makefile                 |  5 +--
- .../boot/compressed/{vmlinux.lds.in => vmlinux.lds.S}   |  0
- arch/unicore32/include/uapi/asm/Kbuild                  |  2 -
- arch/x86/include/uapi/asm/Kbuild                        |  3 --
- arch/xtensa/include/asm/Kbuild                          |  1 -
- arch/xtensa/include/uapi/asm/Kbuild                     |  3 --
- include/asm-generic/Kbuild                              |  5 +++
- include/uapi/asm-generic/{Kbuild.asm => Kbuild}         |  4 +-
- lib/Makefile                                            |  2 +-
- scripts/Makefile.asm-generic                            | 11 +++++
- scripts/Makefile.build                                  |  6 +--
- scripts/Makefile.lib                                    |  6 +++
- scripts/Makefile.modinst                                |  2 +-
- scripts/Makefile.modpost                                |  1 -
- scripts/adjust_autoksyms.sh                             |  9 +---
- scripts/coccinelle/free/put_device.cocci                | 56
-++++++++++++++++++++++++
- scripts/kconfig/lxdialog/.gitignore                     |  4 --
- scripts/link-vmlinux.sh                                 |  9 +---
- scripts/mod/modpost.c                                   | 27 +++---------
- scripts/package/builddeb                                | 32 ++++++++------
- scripts/package/buildtar                                |  2 +-
- scripts/package/mkdebian                                | 39 ++++++++++-------
- 57 files changed, 153 insertions(+), 156 deletions(-)
- rename arch/unicore32/boot/compressed/{vmlinux.lds.in => vmlinux.lds.S} (100%)
- create mode 100644 include/asm-generic/Kbuild
- rename include/uapi/asm-generic/{Kbuild.asm => Kbuild} (87%)
- create mode 100644 scripts/coccinelle/free/put_device.cocci
- delete mode 100644 scripts/kconfig/lxdialog/.gitignore
-
-
--- 
-Best Regards
-Masahiro Yamada
+            Linus
