@@ -1,28 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:39832 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726452AbfCQUuQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 Mar 2019 16:50:16 -0400
-Subject: Re: [GIT PULL] more Kbuild updates for v5.1
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAK7LNATgAf-xiFFtMHYvOR91iNwQbiWaZxZCN-EKPKRpK57XuA@mail.gmail.com>
-References: <CAK7LNATgAf-xiFFtMHYvOR91iNwQbiWaZxZCN-EKPKRpK57XuA@mail.gmail.com>
-Message-Id: <155285581557.27250.8615626753344662639.pr-tracker-bot@kernel.org>
-Date: Sun, 17 Mar 2019 20:50:15 +0000
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:48378 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726678AbfCRIqZ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Mar 2019 04:46:25 -0400
+MIME-Version: 1.0
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 18 Mar 2019 17:45:46 +0900
+Message-ID: <CAK7LNAS5-e6QcJqSg_c2NBS=11ZZ-KFWLqDZYxWTu0wPFHg=cQ@mail.gmail.com>
+Subject: Enabling -Wint-in-bool-context
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
 
-The pull request you sent on Mon, 18 Mar 2019 00:59:54 +0900:
+Hi Arnd,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-v5.1-2
+I saw several commits from you
+fixing -Wint-in-bool-context warnings.
+Thanks!
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/28d747f266fb73cd28a1b9a174cc3738fc177b00
 
-Thank you!
+I guess we are almost ready to remove
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+KBUILD_CFLAGS   += $(call cc-disable-warning, int-in-bool-context)
+
+
+In there any concern about re-enabling
+this warning?
+
+
+When I asked 0-day bot to test it some days ago,
+I just got a report
+for drivers/net/ethernet/mellanox/mlxsw/.
+
+Perhaps, you may have better test coverage
+and have noticed more warnings, though.
+
+--
+Best Regards
+Masahiro Yamada
