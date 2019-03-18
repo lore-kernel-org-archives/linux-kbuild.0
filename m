@@ -1,105 +1,181 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34822 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:40158 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726953AbfCRTSr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Mar 2019 15:18:47 -0400
-Date: Mon, 18 Mar 2019 15:18:43 -0400
+        id S1726861AbfCRTT3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Mar 2019 15:19:29 -0400
+Date: Mon, 18 Mar 2019 15:19:26 -0400
 From: Joe Lawrence <joe.lawrence@redhat.com>
-Subject: Re: [PATCH v2 0/8] klp-convert
-Message-ID: <20190318191843.GA22702@redhat.com>
+Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
+Message-ID: <20190318191926.GA23138@redhat.com>
 References: <20190301141313.15057-1-jmoreira@suse.de>
+ <20190301141313.15057-3-jmoreira@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190301141313.15057-1-jmoreira@suse.de>
+In-Reply-To: <20190301141313.15057-3-jmoreira@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Joao Moreira <jmoreira@suse.de>
 Cc: live-patching@vger.kernel.org, mbenes@suse.cz, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
-On Fri, Mar 01, 2019 at 11:13:05AM -0300, Joao Moreira wrote:
-> Livepatches may use symbols which are not contained in its own scope,
-> and, because of that, may end up compiled with relocations that will
-> only be resolved during module load. Yet, when the referenced symbols are
-> not exported, solving this relocation requires information on the object
-> that holds the symbol (either vmlinux or modules) and its position inside
-> the object, as an object may contain multiple symbols with the same name.
-> Providing such information must be done accordingly to what is specified
-> in Documentation/livepatch/module-elf-format.txt.
+On Fri, Mar 01, 2019 at 11:13:07AM -0300, Joao Moreira wrote:
+> For automatic resolution of livepatch relocations, a file called
+> Symbols.list is used. This file maps symbols within every compiled
+> kernel object allowing the identification of symbols whose name is
+> unique, thus relocation can be automatically inferred, or providing
+> information that helps developers when code annotation is required for
+> solving the matter.
 > 
-> Currently, there is no trivial way to embed the required information as
-> requested in the final livepatch elf object. klp-convert solves this
-> problem in two different forms: (i) by relying on a symbol map, which is
-> built during kernel compilation, to automatically infers the relocation
-> targeted symbol, and, when such inference is not possible (ii) by using
-> annotations in the elf object to convert the relocation accordingly to
-> the specification, enabling it to be handled by the livepatch loader.
+> Add support for creating Symbols.list in the main Makefile. First,
+> ensure that built-in is compiled when CONFIG_LIVEPATCH is enabled (as
+> required to achieve a complete Symbols.list file). Define the command to
+> build Symbols.list (cmd_klp_map) and hook it in the modules rule.
 > 
-> Given the above, add support for symbol mapping in the form of
-> Symbols.list file; add klp-convert tool; integrate klp-convert tool into
-> kbuild; make livepatch modules discernible during kernel compilation
-> pipeline; add data-structure and macros to enable users to annotate
-> livepatch source code; make modpost stage compatible with livepatches;
-> update livepatch-sample and update documentation.
+> As it is undesirable to have symbols from livepatch objects inside
+> Symbols.list, make livepatches discernible by modifying
+> scripts/Makefile.build to create a .livepatch file for each livepatch
+> in $(MODVERDIR). This file then used by cmd_klp_map to identify and
+> bypass livepatches.
 > 
-> The patch was tested under three use-cases:
+> For identifying livepatches during the build process, a flag variable
+> LIVEPATCH_$(basetarget).o is considered in scripts/Makefile.build. This
+> way, set this flag for the livepatch sample Makefile in
+> samples/livepatch/Makefile.
 > 
-> use-case 1: There is a relocation in the lp that can be automatically
-> resolved by klp-convert (tested by removing the annotations from
-> samples/livepatch/livepatch-annotated-sample.c)
+> Finally, Add a clean rule to ensure that Symbols.list is removed during
+> clean.
 > 
-> use-case 2: There is a relocation in the lp that cannot be automatically
-> resolved, as the name of the respective symbol appears in multiple
-> objects. The livepatch contains an annotation to enable a correct
-> relocation - reproducible with this livepatch sample:
-> www.livewire.com.br/suse/klp/livepatch-sample.1.c
+> Notes:
 > 
-> use-case 3: There is a relocation in the lp that cannot be automatically
-> resolved similarly as 2, but no annotation was provided in the livepatch,
-> triggering an error during compilation - reproducible with this livepatch
-> sample: www.livewire.com.br/suse/klp/livepatch-sample.2.c
+> To achieve a correct Symbols.list file, all kernel objects must be
+> considered, thus, its construction require these objects to be priorly
+> built. On the other hand, invoking scripts/Makefile.modpost without
+> having a complete Symbols.list in place would occasionally lead to
+> in-tree livepatches being post-processed incorrectly. To prevent this
+> from becoming a circular dependency, the construction of Symbols.list
+> uses non-post-processed kernel objects and such does not cause harm as
+> the symbols normally referenced from within livepatches are visible at
+> this stage. Also due to these requirements, the spot in-between modules
+> compilation and the invocation of scripts/Makefile.modpost was picked
+> for hooking cmd_klp_map.
 > 
-> In comparison with v1, this version of the patch-set:
-> - was rebased to kernel 4.19
-> - adds a Symbols.list versioning information
-> - brings bug fixes and code improvements to klp-convert sources
+> The approach based on .livepatch files was proposed as an alternative
+> to using MODULE_INFO statementes. This approach was originally
+                       ^^^^^^^^^^^
+nit: s/statementes/statements
+
+> proposed by Miroslav Benes as a workaround for identifying livepathces
+                                                             ^^^^^^^^^^^
+nit: s/livepathces/livepatches
+
+> without depending on modinfo during the modpost stage. It was moved to
+> this patch as the approach also shown to be useful while building
+> Symbols.list.
 > 
-> This is a patch-set repost, given that a typo in a mail address prevented
-> the original submission from being posted to lkml.
+> Signed-off-by: Joao Moreira <jmoreira@suse.de>
+> ---
+>  .gitignore                 |  1 +
+>  Makefile                   | 28 +++++++++++++++++++++++++---
+>  samples/livepatch/Makefile |  1 +
+>  scripts/Makefile.build     |  6 ++++++
+>  4 files changed, 33 insertions(+), 3 deletions(-)
 > 
 > [ ... snip ... ]
+> diff --git a/Makefile b/Makefile
+> index 9ef547fc7ffe..b28eba2cad01 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -561,10 +561,13 @@ KBUILD_BUILTIN := 1
+>  # If we have only "make modules", don't compile built-in objects.
+>  # When we're building modules with modversions, we need to consider
+>  # the built-in objects during the descend as well, in order to
+> -# make sure the checksums are up to date before we record them.
+> +# make sure the checksums are up to date before we record them. The
+> +# same applies for building livepatches, as built-in objects may hold
+> +# symbols which are referenced from livepatches and are required by
+> +# klp-convert post-processing tool for resolving these cases.
+>  
+>  ifeq ($(MAKECMDGOALS),modules)
+> -  KBUILD_BUILTIN := $(if $(CONFIG_MODVERSIONS),1)
+> +  KBUILD_BUILTIN := $(if $(or $(CONFIG_MODVERSIONS), $(CONFIG_LIVEPATCH)),1)
+>  endif
+>  
+>  # If we have "make <whatever> modules", compile modules
+> @@ -1244,9 +1247,25 @@ all: modules
+>  # duplicate lines in modules.order files.  Those are removed
+>  # using awk while concatenating to the final file.
+>  
+> +quiet_cmd_klp_map = KLP	Symbols.list
 
-Hi Joao,
+Nit: the tab between "KLP" and "Symbols.list" doesn't match the same
+alignment as other build commands:
 
-Apologies for taking so long to get to this patchset, but I finally
-spent last week reviewing and testing.  My goal was to write a klp
-self-test based on the implementation and your sample module.  Along the
-way I spotted a few minor bugs and other small suggestions.  Instead of
-dumping a bunch of code or patch content in my replies, I posted my
-rebase and modified branch here:
+  [squash] kbuild: align KLP prefix 
+  https://github.com/torvalds/linux/commit/6419a05560731eb1306e441aadcaa2dfd9f9f935
 
-  https://github.com/joe-lawrence/linux/tree/klp-convert-v2-rebase-review
+> [ ... snip ... ]
+> @@ -1341,7 +1360,10 @@ vmlinuxclean:
+>  	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-vmlinux.sh clean
+>  	$(Q)$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) clean)
+>  
+> -clean: archclean vmlinuxclean
+> +klpclean:
+> +	$(Q) rm -f $(objtree)/Symbols.list
+> +
+> +clean: archclean vmlinuxclean klpclean
 
-I added subject line [squash] tags to individual commits that should be
-considered fixups for patches in this set.  Those commit logs also
-contain [joe: description] tags and my sign-offs for that purpose as
-well.
+Another nit, but the klpclean target doesn't create a klpclean file, so
+we should add it to PHONY:
 
-Hopefully this form of feedback will be easy to digest.  I'll reply to
-the individual patchs here with high-level comments and a pointer to the
-corresponding github patch.  Let me know if there are any questions.  If
-it is easier to simply repost as a v3 with those changes, I can do that
-as well -- whichever method is easier for you.
+  [squash] kbuild: add klpclean to PHONY 
+  https://github.com/torvalds/linux/commit/7a8b0bea2177c8150ead4848c4498a6081b4a5ae
 
-I'll also take comments on my work-in-progress self-test for
-klp-convert:
+> [ ... snip ... ]
+> diff --git a/samples/livepatch/Makefile b/samples/livepatch/Makefile
+> index 2472ce39a18d..9705df7f9a86 100644
+> --- a/samples/livepatch/Makefile
+> +++ b/samples/livepatch/Makefile
+> @@ -1,3 +1,4 @@
+> +LIVEPATCH_livepatch-sample.o := y
+>  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-sample.o
+>  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-mod.o
+>  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-fix1.o
 
-  [new] livepatch/selftests: add klp-convert 
-  https://github.com/torvalds/linux/commit/b0d858b9356d3c909096509a0f18e092b739b44f
+Would this change be better located in [PATCH 6/8] modpost: Add modinfo
+flag to livepatch modules?  Or was it needed to test-drive the rest of
+this patch?
 
-At the moment, it consists of two livepatch modules (I'd prefer to
-consolidate, but ran into an issue with klp-convert and multiple object
-files) and verifies that livepatch can correctly resolve sympos of 0/1,
-2 for unique/non-uniquely named strings and functions.
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index fd03d60f6c5a..1e28ad21314c 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -247,6 +247,11 @@ cmd_gen_ksymdeps = \
+>  	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
+>  endif
+>  
+> +ifdef CONFIG_LIVEPATCH
+> +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o),			\
+> +	$(shell touch $(MODVERDIR)/$(basetarget).livepatch))
+> +endif
+> +
+>  define rule_cc_o_c
+>  	$(call cmd,checksrc)
+>  	$(call cmd_and_fixdep,cc_o_c)
+> @@ -283,6 +288,7 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) F
+>  	$(call if_changed_rule,cc_o_c)
+>  	@{ echo $(@:.o=.ko); echo $@; \
+>  	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+> +	$(call cmd_livepatch)
+>  
+>  quiet_cmd_cc_lst_c = MKLST   $@
+>        cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+
+Since cmd_livepatch is only called for single-used-m, does this mean
+that we can only klp-convert single object file livepatch modules?
+
+I stumbled upon this when trying to create a self-test module that
+incorporated two object files.  I tried adding a $(call cmd_livepatch)
+in the recipe for $(obj)/%.o, but that didn't help.  My kbuild foo
+wasn't good enough to figure this one out.
 
 -- Joe
