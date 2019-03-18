@@ -1,171 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36013 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727066AbfCRJtp (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Mar 2019 05:49:45 -0400
-Received: by mail-wm1-f66.google.com with SMTP id h18so3574328wml.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 18 Mar 2019 02:49:43 -0700 (PDT)
+Received: from mx2.suse.de ([195.135.220.15]:34262 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726933AbfCRKAL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Mar 2019 06:00:11 -0400
+From: Andreas Schwab <schwab@suse.de>
+Subject: Re: [PATCH v2] kbuild: add workaround for Debian make-kpkg
+References: <1552036419-924-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Mon, 18 Mar 2019 11:00:08 +0100
+In-Reply-To: <1552036419-924-1-git-send-email-yamada.masahiro@socionext.com>
+        (Masahiro Yamada's message of "Fri, 8 Mar 2019 18:13:39 +0900")
+Message-ID: <mvm7ecwqz87.fsf@suse.de>
 MIME-Version: 1.0
-References: <CA+icZUVsc8fjxj1KGMWCQVPnaG+_W79HQ8xky=0Qd_vY55GU2Q@mail.gmail.com>
- <CAK7LNASFcbPn2zaYTLhDMnhAQi9KRLnNT1hegXnGTdn=eiCKkw@mail.gmail.com>
- <CA+icZUWQwuOH_GTRdSG0wo-dAi-JwZph9eTQphrrwytOMw=Awg@mail.gmail.com> <CAK7LNAQoBs5_0t_FUqRCBm4ir4PuhyW1gSL+xmoM8_uPHrBP1Q@mail.gmail.com>
-In-Reply-To: <CAK7LNAQoBs5_0t_FUqRCBm4ir4PuhyW1gSL+xmoM8_uPHrBP1Q@mail.gmail.com>
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Mon, 18 Mar 2019 10:49:31 +0100
-Message-ID: <CA+icZUU8=fqNSLFviK2OpDN9piLPck9X3D5-fUtr0Y6SpxrgVg@mail.gmail.com>
-Subject: Re: Fix and simplify -z noreloc-overflow" linker check in arch/x86/boot/compressed/Makefile
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Manoj Srivastava <srivasta@debian.org>, Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Manoj Srivastava <manoj.srivastava.1962@gmail.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Mon, Mar 18, 2019 at 10:46 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Hi Sedat,
->
->
-> On Wed, Mar 13, 2019 at 5:52 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> >
-> > On Tue, Mar 12, 2019 at 5:06 PM Masahiro Yamada
-> > <yamada.masahiro@socionext.com> wrote:
-> > >
-> > > On Tue, Mar 12, 2019 at 6:13 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> > > >
-> > > > Hi Masahiro Yamada,
-> > > >
-> > > > do you have an idea how to fix this properly - as for example LLD
-> > > > hasn't this option?
-> > > > Speaking of the shell-line.
-> > > > I mean use the method "call ld-option".
-> > > >
-> > > > The below should be if $linker supports z noreloc-overflow then set
-> > > > -pie together with --no-dynamic-linker.
-> > > > AFAICS this is for x86-64-only?
-> > > >
-> > > > Is it possible to simplify and have have one single line...?
-> > >
-> > >
-> > > Sorry, I do not understand.
-> > >
-> > > Could you clarify what you want to achieve?
-> > >
-> > >
-> > > Thanks.
-> > >
-> > >
-> > >
-> > >
-> > >
-> > >
-> > > > KBUILD_LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
-> > > >
-> > > > [ arch/x86/boot/compressed/Makefile ]
-> > > >
-> > > > KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
-> > > > # Compressed kernel should be built as PIE since it may be loaded at any
-> > > > # address by the bootloader.
-> > > > ifeq ($(CONFIG_X86_32),y)
-> > > > KBUILD_LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
-> >
-> > See below.
-> >
-> > > > else
-> > > > # To build 64-bit compressed kernel as PIE, we disable relocation
-> > > > # overflow check to avoid relocation overflow error with a new linker
-> > > > # command-line option, -z noreloc-overflow.
-> >
-> > > > KBUILD_LDFLAGS += $(shell $(LD) --help 2>&1 | grep -q "\-z noreloc-overflow" \
-> > > >         && echo "-z noreloc-overflow -pie --no-dynamic-linker")
-> >
-> > First of all, I would like to have the "-z noreloc-overflow" checked
-> > via "call ld-option".
-> > Where I have problems is how to check the following, "-pie
-> > --no-dynamic-linker" shall be set if "-z noreloc-overflow" is
-> > available.
-> > According to the comments, this is for the  CONFIG_X86_64 case.
-> >
-> > ifeq ($(CONFIG_X86_64),y)
-> > KBUILD_LDFLAGS += $(call ld-option, -z noreloc-overflow)
->
->
-> Is this equivalent to
->    $(LD) --help 2>&1 | grep -q "\-z noreloc-overflow" ... ?
->
->
->
->
->
-> > if z-noreloc-oevrflow-ld-option-is-available
-> > KBUILD_LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
-> > endif # z-noreloc-oevrflow-ld-option-is-available
-> > endif # CONFIG_X86_64
-> >
-> > As we have the 2nd check for the CONFIG_X86_32 case already, I asked
-> > myself if it is possible to use it at one single place.
-> >
-> > KBUILD_LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
->
->
-> If you want to factor out the -pie --no-dynamic-linker tests,
-> the following may work.
->
-> It is not very clean...
->
+On Mär 08 2019, Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-Hehe.
-Thanks for taking care!
+> +$(warning Do not include top Makefile of Linux Kernel)
 
-- sed@ -
+So how do I add additional targets then?  Currently I create
+GNUmakefile, include Makefile, then add the targets I need.  It seems
+this is now broken.
 
->
-> ifeq ($(CONFIG_X86_64),y)
-> KBUILD_LDFLAGS = $(shell $(LD) --help 2>&1 | grep -q "\-z noreloc-overflow" \
->        && echo "-z noreloc-overflow")
-> endif
->
-> ifneq ($(filter noreloc-overflow,$(KBUILD_LDFLAGS))$(CONFIG_X86_32),)
-> KBUILD_LDFLAGS += $(call ld-option, -pie) $(call ld-option, --no-dynamic-linker)
-> endif
->
->
->
->
-> Perhaps, testing flags in Kconfig might make it a bit cleaner,
-> but I am not sure.
->
->
-> Masahiro
->
->
-> > Is this now clearer?
-> >
-> > Regards,
-> > - Sedat -
-> >
-> > > > endif
-> > > > LDFLAGS_vmlinux := -T
-> > > >
-> > > > If you need more infos let me know.
-> > > >
-> > > > Thanks.
-> > > >
-> > > > Regards,
-> > > > - Sedat -
-> > > >
-> > > > Link: https://github.com/ClangBuiltLinux/linux/issues/411
-> > >
-> > >
-> > >
-> > > --
-> > > Best Regards
-> > > Masahiro Yamada
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+Andreas.
+
+-- 
+Andreas Schwab, SUSE Labs, schwab@suse.de
+GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
+"And now for something completely different."
