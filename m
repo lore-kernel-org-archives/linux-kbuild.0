@@ -1,95 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44386 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:41380 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726777AbfCRTVR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Mar 2019 15:21:17 -0400
-Date: Mon, 18 Mar 2019 15:21:13 -0400
+        id S1726777AbfCRTVb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Mar 2019 15:21:31 -0400
+Date: Mon, 18 Mar 2019 15:21:27 -0400
 From: Joe Lawrence <joe.lawrence@redhat.com>
-Subject: Re: [PATCH v2 7/8] livepatch: Add sample livepatch module
-Message-ID: <20190318192113.GA23220@redhat.com>
+Subject: Re: [PATCH v2 8/8] documentation: Update on livepatch elf format
+Message-ID: <20190318192127.GA23238@redhat.com>
 References: <20190301141313.15057-1-jmoreira@suse.de>
- <20190301141313.15057-8-jmoreira@suse.de>
+ <20190301141313.15057-9-jmoreira@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190301141313.15057-8-jmoreira@suse.de>
+In-Reply-To: <20190301141313.15057-9-jmoreira@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Joao Moreira <jmoreira@suse.de>
 Cc: live-patching@vger.kernel.org, mbenes@suse.cz, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
-On Fri, Mar 01, 2019 at 11:13:12AM -0300, Joao Moreira wrote:
-> From: Josh Poimboeuf <jpoimboe@redhat.com>
+On Fri, Mar 01, 2019 at 11:13:13AM -0300, Joao Moreira wrote:
+> Add a section to Documentation/livepatch/module-elf-format.txt
+> describing how klp-convert works for fixing relocations.
 > 
-> Add a new livepatch sample in samples/livepatch/ to make use of
-> symbols that must be post-processed to enable load-time relocation
-> resolution. As the new sample is to be used as an example, it is
-> annotated with KLP_MODULE_RELOC and with KLP_SYMPOS macros.
-> 
-> The livepatch sample updates the function cmdline_proc_show to
-> print the string referenced by the symbol saved_command_line
-> appended by the string "livepatch=1".
-> 
-> Update livepatch-sample.c to remove livepatch MODULE_INFO
-> statement.
-> 
-> [jmoreira:
-> * update module to use KLP_SYMPOS
-> * Comments on symbol resolution scheme
-> * Update Makefile
-> * Remove MODULE_INFO statement
-> * Changelog
-> ]
-> 
-> Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 > Signed-off-by: Joao Moreira <jmoreira@suse.de>
 > ---
->  samples/livepatch/Makefile                     |   2 +
->  samples/livepatch/livepatch-annotated-sample.c | 113 +++++++++++++++++++++++++
->  2 files changed, 115 insertions(+)
->  create mode 100644 samples/livepatch/livepatch-annotated-sample.c
+>  Documentation/livepatch/module-elf-format.txt | 47 ++++++++++++++++++++++++---
+>  1 file changed, 42 insertions(+), 5 deletions(-)
 > 
+> diff --git a/Documentation/livepatch/module-elf-format.txt b/Documentation/livepatch/module-elf-format.txt
+> index f21a5289a09c..6b0259dfab49 100644
+> --- a/Documentation/livepatch/module-elf-format.txt
+> +++ b/Documentation/livepatch/module-elf-format.txt
+> @@ -2,7 +2,8 @@
+>  Livepatch module Elf format
+>  ===========================
+>  
 > [ ... snip ... ]
 >
-> diff --git a/samples/livepatch/livepatch-annotated-sample.c b/samples/livepatch/livepatch-annotated-sample.c
-> new file mode 100644
-> index 000000000000..44d9e9542db1
-> --- /dev/null
-> +++ b/samples/livepatch/livepatch-annotated-sample.c
+> +--------------------------------------------------
+> +4.  Automatic conversion of unresolved relocations
+> +--------------------------------------------------
+> +Sometimes livepatches may operate on symbols which are not self-contained nor
+> +exported. When this happens, these symbols remain unresolved in the elf object
+> +and will trigger an error during the livepatch instantiation.
+> +
+> +Whenever possible, the kernel building infrastructure solves this problem
+> +automatically. First, a symbol database containing information on all compiled
+> +objects is built. Second, this database - a file named Symbols.list, placed in
+> +the kernel source root directory - is used to identify targets for unresolved
+> +relocations, converting them in the livepatch elf accordingly to the
+> +specifications above-described. While the first staged is fully handled by the
+                                                   ^^^^^^
+nit: s/staged/stage
 
-Super small nit, but I shuffled the annotated-sample code around so it
-better matched the original sample.  This minimized the diff when I
-compared the two versions to see what was added for sympos annotation:
-
-  [squash] livepatch: adjust annotated sample formatting 
-  https://github.com/torvalds/linux/commit/ce49c70e85cf87e513de3bcf64953de191c3c6d7
-
+> +building system, the second is done by a tool called klp-convert, which can be
+> +found in "scripts/livepatch".
+> +
+> +When an unresolved relocation has as target a symbol whose name is also used by
+> +different symbols throughout the kernel, the relocation cannot be resolved
+> +automatically. In these cases, the livepatch developer must add annotations to
+> +the livepatch, making it possible for the system to identify which is the
+> +correct target amongst multiple homonymous symbols. Such annotations must be
+> +done through a data structure as follows:
+> +
+> +struct KLP_MODULE_RELOC(object) data_structure_name[] = {
+> +	KLP_SYMPOS(symbol, pos)
+> +};
+> +
+> +In the above example, object refers to the object file which contains the
+> +symbol, being vmlinux or a module; symbol refers to the symbol name that will
+> +be relocated and pos is its position in the object.
 > [ ... snip ... ]
->
-> +static int livepatch_init(void)
-> +{
-> +	int ret;
-> +
-> +	ret = klp_register_patch(&patch);
-> +	if (ret)
-> +		return ret;
-> +	ret = klp_enable_patch(&patch);
-> +	if (ret) {
-> +		WARN_ON(klp_unregister_patch(&patch));
-> +		return ret;
-> +	}
-> +	return 0;
-> +}
-> +
-> +static void livepatch_exit(void)
-> +{
-> +	WARN_ON(klp_unregister_patch(&patch));
-> +}
 
-v5.0 deprecates klp_register_patch(), klp_unregister_patch(), and
-klp_disable_patch(), so adjust the sample accordingly:
-
-  [squash] livepatch: rebase the annotated sample 
-  https://github.com/torvalds/linux/commit/fc04952376cfd8281eb663bd2ce18fec27eb42b2
+Should we be explicit about how position is counted?  First = 1, second
+= 2, etc?  See the off-by-one bug I pointed out in the "livepatch: Add
+klp-convert tool" patch earlier.
 
 -- Joe
