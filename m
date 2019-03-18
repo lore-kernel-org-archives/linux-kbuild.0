@@ -1,34 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34262 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726933AbfCRKAL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Mar 2019 06:00:11 -0400
-From: Andreas Schwab <schwab@suse.de>
-Subject: Re: [PATCH v2] kbuild: add workaround for Debian make-kpkg
-References: <1552036419-924-1-git-send-email-yamada.masahiro@socionext.com>
-Date: Mon, 18 Mar 2019 11:00:08 +0100
-In-Reply-To: <1552036419-924-1-git-send-email-yamada.masahiro@socionext.com>
-        (Masahiro Yamada's message of "Fri, 8 Mar 2019 18:13:39 +0900")
-Message-ID: <mvm7ecwqz87.fsf@suse.de>
+Received: from mail-wm1-f47.google.com ([209.85.128.47]:51379 "EHLO
+        mail-wm1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726697AbfCRLvT (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Mar 2019 07:51:19 -0400
+Received: by mail-wm1-f47.google.com with SMTP id n19so12675646wmi.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 18 Mar 2019 04:51:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+References: <CA+icZUVsc8fjxj1KGMWCQVPnaG+_W79HQ8xky=0Qd_vY55GU2Q@mail.gmail.com>
+ <CAK7LNASFcbPn2zaYTLhDMnhAQi9KRLnNT1hegXnGTdn=eiCKkw@mail.gmail.com>
+ <CA+icZUWQwuOH_GTRdSG0wo-dAi-JwZph9eTQphrrwytOMw=Awg@mail.gmail.com> <CAK7LNAQoBs5_0t_FUqRCBm4ir4PuhyW1gSL+xmoM8_uPHrBP1Q@mail.gmail.com>
+In-Reply-To: <CAK7LNAQoBs5_0t_FUqRCBm4ir4PuhyW1gSL+xmoM8_uPHrBP1Q@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Mon, 18 Mar 2019 12:51:05 +0100
+Message-ID: <CA+icZUV1k-MX8PYyN4pEXdsiRrXiC4Qg7vb-kamj1XBAN4j7sg@mail.gmail.com>
+Subject: Re: Fix and simplify -z noreloc-overflow" linker check in arch/x86/boot/compressed/Makefile
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Manoj Srivastava <srivasta@debian.org>, Liz Zhang <lizzha@microsoft.com>, Lili Deng <v-lide@microsoft.com>, Manoj Srivastava <manoj.srivastava.1962@gmail.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mär 08 2019, Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+On Mon, Mar 18, 2019 at 10:46 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+[ ... ]
+> > ifeq ($(CONFIG_X86_64),y)
+> > KBUILD_LDFLAGS += $(call ld-option, -z noreloc-overflow)
+>
+>
+> Is this equivalent to
+>    $(LD) --help 2>&1 | grep -q "\-z noreloc-overflow" ... ?
 
-> +$(warning Do not include top Makefile of Linux Kernel)
+I tried with BFD (option exists and is set) and LLD (option does not
+exist, is not set).
 
-So how do I add additional targets then?  Currently I create
-GNUmakefile, include Makefile, then add the targets I need.  It seems
-this is now broken.
+You do not think it is equivalent?
 
-Andreas.
-
--- 
-Andreas Schwab, SUSE Labs, schwab@suse.de
-GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
-"And now for something completely different."
+- sed@ -
