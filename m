@@ -1,83 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:16724 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726326AbfCSAyH (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:42725 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725290AbfCSEDB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 Mar 2019 20:54:07 -0400
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id x2J0s0cg012430
-        for <linux-kbuild@vger.kernel.org>; Tue, 19 Mar 2019 09:54:00 +0900
-Received: by mail-vk1-f170.google.com with SMTP id d15so1689854vka.8
-        for <linux-kbuild@vger.kernel.org>; Mon, 18 Mar 2019 17:54:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <CA+icZUVsc8fjxj1KGMWCQVPnaG+_W79HQ8xky=0Qd_vY55GU2Q@mail.gmail.com>
- <CAK7LNASFcbPn2zaYTLhDMnhAQi9KRLnNT1hegXnGTdn=eiCKkw@mail.gmail.com>
- <CA+icZUWQwuOH_GTRdSG0wo-dAi-JwZph9eTQphrrwytOMw=Awg@mail.gmail.com>
- <CAK7LNAQoBs5_0t_FUqRCBm4ir4PuhyW1gSL+xmoM8_uPHrBP1Q@mail.gmail.com> <CA+icZUV1k-MX8PYyN4pEXdsiRrXiC4Qg7vb-kamj1XBAN4j7sg@mail.gmail.com>
-In-Reply-To: <CA+icZUV1k-MX8PYyN4pEXdsiRrXiC4Qg7vb-kamj1XBAN4j7sg@mail.gmail.com>
+        Tue, 19 Mar 2019 00:03:01 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 19 Mar 2019 09:53:23 +0900
-Message-ID: <CAK7LNATbTGXTVTJjnB3uCjyga+hgwPefvjTt8g1L5JL0sDUtVw@mail.gmail.com>
-Subject: Re: Fix and simplify -z noreloc-overflow" linker check in arch/x86/boot/compressed/Makefile
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kbuild: skip sub-make for in-tree build with GNU Make 4.x
+Date: Tue, 19 Mar 2019 13:02:36 +0900
+Message-Id: <1552968156-3920-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Andreas Schwab <schwab@suse.de>, David Howells <dhowells@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Mon, Mar 18, 2019 at 8:51 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
->
-> On Mon, Mar 18, 2019 at 10:46 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> [ ... ]
-> > > ifeq ($(CONFIG_X86_64),y)
-> > > KBUILD_LDFLAGS += $(call ld-option, -z noreloc-overflow)
-> >
-> >
-> > Is this equivalent to
-> >    $(LD) --help 2>&1 | grep -q "\-z noreloc-overflow" ... ?
->
-> I tried with BFD (option exists and is set) and LLD (option does not
-> exist, is not set).
->
-> You do not think it is equivalent?
+Commit 2b50f7ab6368 ("kbuild: add workaround for Debian make-kpkg")
+annoyed people who want to wrap the top Makefile with GNUmakefile
+or something in order to customize it for their use.
 
+On second thought, we do not need to run the sub-make for in-tree
+build with Make 4.x because the 'MAKEFLAGS += -rR' issue only happens
+on GNU Make 3.x.
 
-How about BFD (option does not exist) ?
+With this commit, people will get back the workflow, and the Debian
+make-kpkg will still work.
 
-cc-option, ld-option, and friends
-check whether the exit code is zero or not.
+Fixes: 2b50f7ab6368 ("kbuild: add workaround for Debian make-kpkg")
+Reported-by: Andreas Schwab <schwab@suse.de>
+Reported-by: David Howells <dhowells@redhat.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ Makefile | 31 +++++++++++++++----------------
+ 1 file changed, 15 insertions(+), 16 deletions(-)
 
-ld shows a warning for unsupported "-v ...",
-but returns 0 somehow.
-
-But, it correctly returns 1 for the other
-unsupported options.
-
-I do not know why.
-
-
-$ ld -v
-GNU ld (GNU Binutils for Ubuntu) 2.26.1
-$ ld --help 2>&1 | grep -q "\-z noreloc-overflow"
-$ echo $?
-1
-$ ld -z noreloc-overflow -v
-ld: warning: -z noreloc-overflow ignored.
-GNU ld (GNU Binutils for Ubuntu) 2.26.1
-$ echo $?
-0
-$ ld -mmy-machine -v
-ld: unrecognised emulation mode: my-machine
-Supported emulations: elf_x86_64 elf32_x86_64 elf_i386 elf_iamcu
-i386linux elf_l1om elf_k1om i386pep i386pe
-$ echo $?
-1
-
-
-
-
+diff --git a/Makefile b/Makefile
+index 99c0530..d9591f2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -31,26 +31,12 @@ _all:
+ # descending is started. They are now explicitly listed as the
+ # prepare rule.
+ 
+-# Ugly workaround for Debian make-kpkg:
+-# make-kpkg directly includes the top Makefile of Linux kernel. In such a case,
+-# skip sub-make to support debian_* targets in ruleset/kernel_version.mk, but
+-# displays warning to discourage such abusage.
+-ifneq ($(word 2, $(MAKEFILE_LIST)),)
+-$(warning Do not include top Makefile of Linux Kernel)
+-sub-make-done := 1
+-MAKEFLAGS += -rR
+-endif
+-
+ ifneq ($(sub-make-done),1)
+ 
+ # Do not use make's built-in rules and variables
+ # (this increases performance and avoids hard-to-debug behaviour)
+ MAKEFLAGS += -rR
+ 
+-# 'MAKEFLAGS += -rR' does not become immediately effective for old
+-# GNU Make versions. Cancel implicit rules for this Makefile.
+-$(lastword $(MAKEFILE_LIST)): ;
+-
+ # Avoid funny character set dependencies
+ unexport LC_ALL
+ LC_COLLATE=C
+@@ -153,6 +139,7 @@ $(if $(KBUILD_OUTPUT),, \
+ # 'sub-make' below.
+ MAKEFLAGS += --include-dir=$(CURDIR)
+ 
++need-sub-make := 1
+ else
+ 
+ # Do not print "Entering directory ..." at all for in-tree build.
+@@ -160,6 +147,15 @@ MAKEFLAGS += --no-print-directory
+ 
+ endif # ifneq ($(KBUILD_OUTPUT),)
+ 
++ifneq ($(filter 3.%,$(MAKE_VERSION)),)
++# 'MAKEFLAGS += -rR' does not immediately become effective for GNU Make 3.x
++# We need to run sub-make to avoid implicit rules in the top Makefile.
++need-sub-make := 1
++# Cancel implicit rules for this Makefile.
++$(lastword $(MAKEFILE_LIST)): ;
++endif
++
++ifeq ($(need-sub-make),1)
+ PHONY += $(MAKECMDGOALS) sub-make
+ 
+ $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
+@@ -171,8 +167,11 @@ sub-make:
+ 	$(if $(KBUILD_OUTPUT),-C $(KBUILD_OUTPUT) KBUILD_SRC=$(CURDIR)) \
+ 	-f $(CURDIR)/Makefile $(filter-out _all sub-make,$(MAKECMDGOALS))
+ 
+-else # sub-make-done
++endif # need-sub-make
++endif # sub-make-done
++
+ # We process the rest of the Makefile if this is the final invocation of make
++ifeq ($(need-sub-make),)
+ 
+ # Do not print "Entering directory ...",
+ # but we want to display it when entering to the output directory
+@@ -1757,7 +1756,7 @@ existing-targets := $(wildcard $(sort $(targets)))
+ 
+ endif   # ifeq ($(config-targets),1)
+ endif   # ifeq ($(mixed-targets),1)
+-endif   # sub-make-done
++endif   # need-sub-make
+ 
+ PHONY += FORCE
+ FORCE:
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
