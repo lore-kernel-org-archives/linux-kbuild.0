@@ -1,95 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:41577 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726935AbfCSN1s (ORCPT
+Received: from so254-39.mailgun.net ([198.61.254.39]:53257 "EHLO
+        so254-39.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726876AbfCSPBh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Mar 2019 09:27:48 -0400
-Received: by mail-ed1-f65.google.com with SMTP id a25so9373342edc.8
-        for <linux-kbuild@vger.kernel.org>; Tue, 19 Mar 2019 06:27:46 -0700 (PDT)
+        Tue, 19 Mar 2019 11:01:37 -0400
+From: Major Hayden <major@redhat.com>
+Subject: [PATCH] scripts/package/Makefile: Add source RPM target
+Date: Tue, 19 Mar 2019 09:56:08 -0500
+Message-Id: <20190319145608.18636-1-major@redhat.com>
 MIME-Version: 1.0
-References: <0000000000008a1bce057ede3d13@google.com> <0000000000009950e1058447ef43@google.com>
- <CAHk-=wjUrznUSUKN1AXQA9kCStQ3MHFY95ZmeTZ5zYDcvMhBiQ@mail.gmail.com>
- <CACT4Y+YOWaU8s90joeGB4G1oc-GxrQSDnjpuFOuE4eJd5FHK3g@mail.gmail.com> <CAHk-=wj_+ObTogs75N++EigJ5RPpu8GL2ma0jasgJxG+t3oPPQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wj_+ObTogs75N++EigJ5RPpu8GL2ma0jasgJxG+t3oPPQ@mail.gmail.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Tue, 19 Mar 2019 14:27:32 +0100
-Message-ID: <CACT4Y+ZA4L-x6cZWV6ZaG-2Z-V4MB9PkBQ1gfCCv5Qu=FFejFQ@mail.gmail.com>
-Subject: Re: KASAN: slab-out-of-bounds Read in bacpy
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: syzbot <syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com>, David Miller <davem@davemloft.net>, Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux List Kernel Mailing <linux-kernel@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>, Michal Marek <mmarek@suse.com>, Netdev <netdev@vger.kernel.org>, syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+To: linux-kbuild@vger.kernel.org, michal.lkml@markovi.net, yamada.masahiro@socionext.com
+Cc: Major Hayden <major@redhat.com>
 
-On Sun, Mar 17, 2019 at 9:41 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Sun, Mar 17, 2019 at 10:12 AM Dmitry Vyukov <dvyukov@google.com> wrote:
-> >
-> > Please see https://github.com/google/syzkaller/blob/master/docs/syzbot.md#bisection
-> > it should answer all of your questions. It does 2 and more.
-> > And in this case it seems to be working as intended bisecting it to a
-> > release tag.
->
-> No, it's definitely not working as intended.
->
-> You can see it in the bisect log - you don't actually have a single
-> "git bisect bad" outside of the initial one that you start bisecting
-> with. That's a pretty good sign of bisection being completely broken.
-> Yes, it can happen in theory, but in general with a good bisection,
-> you should see about as many "good" results as "bad".
->
-> I bet that what's going on is that your initial "let's test every
-> release" uses a _different_ process than the actual bisection itself
-> does.
->
-> So if I were you, I'd look at what syzbot does differently during
-> bisection vs what it does for that initial "test each release". For
-> example, does it do "make clean" in between each build in one case,
-> but not the other? Does it do "make oldconfig" vs a fixed config
-> generated from scratch every time? Because the fact that you first
-> tested 4.10 bad using the "test each release", and then when you do
-> bisection, the very commit *before* 4.10 is good (the only difference
-> being the EXTRAVERSION and the tag) shows that something went wrong.
+Some developers use external build systems to compile kernels and these
+build systems may accept a source RPM as an input. This patch adds a
+quick method for developers to build a source RPM using `make srpm-pkg`.
 
+Signed-off-by: Major Hayden <major@redhat.com>
+---
+ scripts/package/Makefile | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Well, this is intended behavior for some definition of intended.
-The root cause of what happened here is that syzbot has to disable
-CONFIG_USBIP_VHCI_HCD/CONFIG_BT_HCIVHCI when it crosses v4.10
-boundary. It fixes boot on the release and otherwise no bisection will
-succeed at all.
-It's just happened so that this particular bug is dependent on these
-exact configs and was introduced before v4.10. So it was bisected to
-v4.10. And in this sense it is working as intended.
-
-How would you define intended bisection behavior for the situation
-when kernel is build/boot/test broken most of the time, even on
-releases and even on recent releases? ;)
-I guess the 100% fair answer is "the bug happens as far as we could
-test (which is not too far)". And that's what I did initially, but the
-result was way less useful than what we have now.
-
-This and other details of the process are described here:
-https://github.com/google/syzkaller/blob/master/docs/syzbot.md#bisection
-This was the first attempt at giving more transparency into the process.
-
-I see 2 potential improvements:
-1. (simpler) noting in the bisection log things like disabled configs,
-cherry-picked fixes and other things necessary to repair kernel.
-2. (harder) try to figure out that the bug actually depends on the
-disabled config
-I've added this to https://github.com/google/syzkaller/issues/1051
-But for (2) I would first like to see that this is a common enough
-problem rather then a one-off thing, because it's easier to say than
-to implement that reliably and this can affect bugs completely
-unrelated to the disabled configs due to unavoidable kernel crash
-flakes (and then somebody will need to explain what happened to all
-people asking).
-
-And obviously doing some real testing before merging each commit into
-any kernel tree would help tremendously with bisection long term ;)
-
-Even v5.0 is boot broken if I try to enable more configs. So we will
-need to disable more configs in bisection in future as we onboard them
-to syzbot. The current points in time we need to disable various
-configs suspiciously resemble when they were added to syzbot config...
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 2c6de21e5152..8329d6dfe3d8 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -47,6 +47,14 @@ tar -cz $(RCS_TAR_IGNORE) -f $(2).tar.gz \
+ 	--transform 's:^:$(2)/:S' $(TAR_CONTENT) $(3); \
+ rm -f $(objtree)/.scmversion
+ 
++# srpm-pkg
++# ---------------------------------------------------------------------------
++srpm-pkg: FORCE
++	$(MAKE) clean
++	$(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
++	$(call cmd,src_tar,$(KERNELPATH),kernel.spec)
++	+rpmbuild $(RPMOPTS) -ts $(KERNELPATH).tar.gz
++
+ # rpm-pkg
+ # ---------------------------------------------------------------------------
+ rpm-pkg: FORCE
+@@ -140,6 +148,7 @@ perf-%pkg: FORCE
+ help: FORCE
+ 	@echo '  rpm-pkg             - Build both source and binary RPM kernel packages'
+ 	@echo '  binrpm-pkg          - Build only the binary kernel RPM package'
++	@echo '  srpm-pkg            - Build only the source kernel RPM package'
+ 	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
+ 	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
+ 	@echo '  snap-pkg            - Build only the binary kernel snap package (will connect to external hosts)'
+-- 
+2.20.1
