@@ -1,97 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41718 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726437AbfCTQDL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Mar 2019 12:03:11 -0400
-Date: Wed, 20 Mar 2019 11:03:08 -0500
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH v2] objtool: query pkg-config for libelf location
-Message-ID: <20190320160308.hdhd7ko4hquanmqc@treble>
-References: <3381642.TeJ1gWjbju@devpool35>
- <20190320153701.7wym7btpjshdujpz@treble>
- <13279932.E8cnC9vheV@devpool35>
- <13510794.yptIvAPcpm@devpool35>
+Received: from mx2.suse.de ([195.135.220.15]:52182 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726006AbfCTTIH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 20 Mar 2019 15:08:07 -0400
+Date: Wed, 20 Mar 2019 20:08:05 +0100 (CET)
+From: Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
+In-Reply-To: <20190318191926.GA23138@redhat.com>
+Message-ID: <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz>
+References: <20190301141313.15057-1-jmoreira@suse.de> <20190301141313.15057-3-jmoreira@suse.de> <20190318191926.GA23138@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <13510794.yptIvAPcpm@devpool35>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rolf Eike Beer <eb@emlix.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: Joao Moreira <jmoreira@suse.de>, live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
-On Wed, Mar 20, 2019 at 04:58:26PM +0100, Rolf Eike Beer wrote:
-> If it is not in the default location compilation would fail at several points.
+> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> > index fd03d60f6c5a..1e28ad21314c 100644
+> > --- a/scripts/Makefile.build
+> > +++ b/scripts/Makefile.build
+> > @@ -247,6 +247,11 @@ cmd_gen_ksymdeps = \
+> >  	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
+> >  endif
+> >  
+> > +ifdef CONFIG_LIVEPATCH
+> > +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o),			\
+> > +	$(shell touch $(MODVERDIR)/$(basetarget).livepatch))
+> > +endif
+> > +
+> >  define rule_cc_o_c
+> >  	$(call cmd,checksrc)
+> >  	$(call cmd_and_fixdep,cc_o_c)
+> > @@ -283,6 +288,7 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) F
+> >  	$(call if_changed_rule,cc_o_c)
+> >  	@{ echo $(@:.o=.ko); echo $@; \
+> >  	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+> > +	$(call cmd_livepatch)
+> >  
+> >  quiet_cmd_cc_lst_c = MKLST   $@
+> >        cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
 > 
-> Signed-off-by: Rolf Eike Beer <eb@emlix.com>
-
-Looks fine to me.  If the kbuild folks don't have any comments, I'll
-send it along to the -tip tree soonish.
-
-> ---
-> Changes in v2:
->   -also hide stderr when querying cflags
->   -use ":=" assignment as in other places in that file
+> Since cmd_livepatch is only called for single-used-m, does this mean
+> that we can only klp-convert single object file livepatch modules?
 > 
->  Makefile               | 4 +++-
->  tools/objtool/Makefile | 7 +++++--
->  2 files changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 99c0530489ef..32caf30e0d79 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -950,9 +950,11 @@ mod_sign_cmd = true
->  endif
->  export mod_sign_cmd
->  
-> +HOST_LIBELF_LIBS = $(shell pkg-config libelf --libs 2>/dev/null || echo -lelf)
-> +
->  ifdef CONFIG_STACK_VALIDATION
->    has_libelf := $(call try-run,\
-> -		echo "int main() {}" | $(HOSTCC) -xc -o /dev/null -lelf -,1,0)
-> +		echo "int main() {}" | $(HOSTCC) -xc -o /dev/null $(HOST_LIBELF_LIBS) -,1,0)
->    ifeq ($(has_libelf),1)
->      objtool_target := tools/objtool FORCE
->    else
-> diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
-> index c9d038f91af6..53f8be0f4a1f 100644
-> --- a/tools/objtool/Makefile
-> +++ b/tools/objtool/Makefile
-> @@ -25,14 +25,17 @@ LIBSUBCMD		= $(LIBSUBCMD_OUTPUT)libsubcmd.a
->  OBJTOOL    := $(OUTPUT)objtool
->  OBJTOOL_IN := $(OBJTOOL)-in.o
->  
-> +LIBELF_FLAGS := $(shell pkg-config libelf --cflags 2>/dev/null)
-> +LIBELF_LIBS  := $(shell pkg-config libelf --libs 2>/dev/null || echo -lelf)
-> +
->  all: $(OBJTOOL)
->  
->  INCLUDES := -I$(srctree)/tools/include \
->  	    -I$(srctree)/tools/arch/$(HOSTARCH)/include/uapi \
->  	    -I$(srctree)/tools/objtool/arch/$(ARCH)/include
->  WARNINGS := $(EXTRA_WARNINGS) -Wno-switch-default -Wno-switch-enum -Wno-packed
-> -CFLAGS   += -Werror $(WARNINGS) $(KBUILD_HOSTCFLAGS) -g $(INCLUDES)
-> -LDFLAGS  += -lelf $(LIBSUBCMD) $(KBUILD_HOSTLDFLAGS)
-> +CFLAGS   += -Werror $(WARNINGS) $(KBUILD_HOSTCFLAGS) -g $(INCLUDES) $(LIBELF_FLAGS)
-> +LDFLAGS  += $(LIBELF_LIBS) $(LIBSUBCMD) $(KBUILD_HOSTLDFLAGS)
->  
->  # Allow old libelf to be used:
->  elfshdr := $(shell echo '$(pound)include <libelf.h>' | $(CC) $(CFLAGS) -x c -E - | grep elf_getshdr)
-> -- 
-> 2.21.0
-> 
-> -- 
-> Rolf Eike Beer, emlix GmbH, http://www.emlix.com
-> Fon +49 551 30664-0, Fax +49 551 30664-11
-> Gothaer Platz 3, 37083 Göttingen, Germany
-> Sitz der Gesellschaft: Göttingen, Amtsgericht Göttingen HR B 3160
-> Geschäftsführung: Heike Jordan, Dr. Uwe Kracke – Ust-IdNr.: DE 205 198 055
-> 
-> emlix - smart embedded open source
+> I stumbled upon this when trying to create a self-test module that
+> incorporated two object files.  I tried adding a $(call cmd_livepatch)
+> in the recipe for $(obj)/%.o, but that didn't help.  My kbuild foo
+> wasn't good enough to figure this one out.
 
+I looked at my original code and it is a bit different there. I placed it 
+under rule_cc_o_c right after objtool command. If I remember correctly 
+this is the correct recipe for .c->.o. Unfortunately I forgot the details 
+and there is of course nothing about it in my notes.
 
+Does it help?
 
--- 
-Josh
+Joao, is there a reason you moved it elsewhere?
+
+Miroslav
