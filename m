@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:52182 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:55856 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726006AbfCTTIH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Mar 2019 15:08:07 -0400
-Date: Wed, 20 Mar 2019 20:08:05 +0100 (CET)
+        id S1726006AbfCTThC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 20 Mar 2019 15:37:02 -0400
+Date: Wed, 20 Mar 2019 20:36:59 +0100 (CET)
 From: Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
-In-Reply-To: <20190318191926.GA23138@redhat.com>
-Message-ID: <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz>
-References: <20190301141313.15057-1-jmoreira@suse.de> <20190301141313.15057-3-jmoreira@suse.de> <20190318191926.GA23138@redhat.com>
+Subject: Re: [PATCH v2 3/8] livepatch: Add klp-convert tool
+In-Reply-To: <20190318192011.GA23157@redhat.com>
+Message-ID: <alpine.LSU.2.21.1903202021570.29796@pobox.suse.cz>
+References: <20190301141313.15057-1-jmoreira@suse.de> <20190301141313.15057-4-jmoreira@suse.de> <20190318192011.GA23157@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,46 +16,115 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Joe Lawrence <joe.lawrence@redhat.com>
 Cc: Joao Moreira <jmoreira@suse.de>, live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
-> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> > index fd03d60f6c5a..1e28ad21314c 100644
-> > --- a/scripts/Makefile.build
-> > +++ b/scripts/Makefile.build
-> > @@ -247,6 +247,11 @@ cmd_gen_ksymdeps = \
-> >  	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
-> >  endif
-> >  
-> > +ifdef CONFIG_LIVEPATCH
-> > +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o),			\
-> > +	$(shell touch $(MODVERDIR)/$(basetarget).livepatch))
-> > +endif
+> > [ ... snip ... ]
 > > +
-> >  define rule_cc_o_c
-> >  	$(call cmd,checksrc)
-> >  	$(call cmd_and_fixdep,cc_o_c)
-> > @@ -283,6 +288,7 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) F
-> >  	$(call if_changed_rule,cc_o_c)
-> >  	@{ echo $(@:.o=.ko); echo $@; \
-> >  	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
-> > +	$(call cmd_livepatch)
-> >  
-> >  quiet_cmd_cc_lst_c = MKLST   $@
-> >        cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+> > +/* Checks if sympos is valid, otherwise prints valid sympos list */
+> > +static bool valid_sympos(struct sympos *sp)
+> > +{
+> > +	struct symbol_entry *e;
+> > +	int counter = 0;
+> > +
+> > +	list_for_each_entry(e, &symbols, list) {
+> > +		if ((strcmp(e->symbol_name, sp->symbol_name) == 0) &&
+> > +		    (strcmp(e->object_name, sp->object_name) == 0)) {
+> > +			if (counter == sp->pos)
+> > +				return true;
+> > +			counter++;
+> > +		}
+> > +	}
+> > +
+> > +	WARN("Provided KLP_SYMPOS does not match a symbol: %s.%s,%d",
+> > +			sp->object_name, sp->symbol_name, sp->pos);
+> > +	print_valid_module_relocs(sp->symbol_name);
+> > +
+> > +	return false;
+> > +}
 > 
-> Since cmd_livepatch is only called for single-used-m, does this mean
-> that we can only klp-convert single object file livepatch modules?
+> I believe there is an off-by-one error condition either here, or in
+> livepatch kernel core sympos disambiguator code (in which case, external
+> tools like kpatch-build would also need to be adjusted).
 > 
-> I stumbled upon this when trying to create a self-test module that
-> incorporated two object files.  I tried adding a $(call cmd_livepatch)
-> in the recipe for $(obj)/%.o, but that didn't help.  My kbuild foo
-> wasn't good enough to figure this one out.
+> The scenarios that I've observed using klp-convert and kpatch-build:
+> 
+>   sympos == 0, uniquely named symbol
+>   sympos == 1, non-unique symbol name, first instance
+>   sympos == 2, non-unique symbol name, second instance
+>   ...
 
-I looked at my original code and it is a bit different there. I placed it 
-under rule_cc_o_c right after objtool command. If I remember correctly 
-this is the correct recipe for .c->.o. Unfortunately I forgot the details 
-and there is of course nothing about it in my notes.
+Yes, that is exactly how we defined it back then.
+ 
+> When I built a klp-convert selftest, I made sure that the target module
+> contained multiple symbols of the same name across two .o files.
+> However, when I tried to use a KLP_MODULE_RELOC annotation in the
+> livepatch to resolve to the second (ie, last) symbol, using a sympos=2,
+> klp-convert kept telling me that the only valid KLP_SYMPOS were 0 and 1.
+> 
+> The following code adjusts klp-convert to match the sympos logic, as I
+> understand it in livepatch/core.c and kpatch-build;
+> 
+>   [squash] livepatch/klp-convert: fix klp-convert off-by-one sympos 
+>   https://github.com/torvalds/linux/commit/1ed8e5baa98f7920bbbaa562278b3ed44552e01f
+> 
+> This change also adds a check that sympos == 0 is in fact a uniquely
+> named symbol.
 
-Does it help?
+Looks good to me. Maybe we can even make it simpler and use similar 
+approach as in klp_find_callback() and klp_find_object_symbol() from 
+kernel/livepatch/core.c. On the other hand, given that we want to print 
+useful output in all cases, the code might happen to be more complicated 
+and definitely ugly. 
+ 
+> > [ ... snip ... ]
+> > +
+> > +int main(int argc, const char **argv)
+> > +{
+> > +	const char *klp_in_module, *klp_out_module, *symbols_list;
+> > +	struct rela *rela, *tmprela;
+> > +	struct section *sec, *aux;
+> > +	struct sympos sp;
+> > +	struct elf *klp_elf;
+> > +
+> > +	if (argc != 4) {
+> > +		WARN("Usage: %s <Symbols.list> <input.ko> <out.ko>", argv[0]);
+> > +		return -1;
+> > +	}
+> > +
+> > +	symbols_list = argv[1];
+> > +	klp_in_module = argv[2];
+> > +	klp_out_module = argv[3];
+> > +
+> > +	klp_elf = elf_open(klp_in_module);
+> > +	if (!klp_elf) {
+> > +		WARN("Unable to read elf file %s\n", klp_in_module);
+> > +		return -1;
+> > +	}
+> > +
+> > +	if (!load_syms_lists(symbols_list))
+> > +		return -1;
+> > +
+> > +	if (!load_usr_symbols(klp_elf)) {
+> > +		WARN("Unable to load user-provided sympos");
+> > +		return -1;
+> > +	}
+> > +
+> > +	list_for_each_entry_safe(sec, aux, &klp_elf->sections, list) {
+> > +		if (!is_rela_section(sec))
+> > +			continue;
+> > +
+> > +		list_for_each_entry_safe(rela, tmprela, &sec->relas, list) {
+> > +			if (!must_convert(rela->sym))
+> > +				continue;
+> > +
+> > +			if (!find_missing_position(rela->sym, &sp)) {
+> > +				WARN("Unable to find missing symbol");
+> 
+> A really minor suggestion, but I found it useful to tell the user
+> exactly which symbol was missing:
+> 
+>   [squash] livepatch/klp-convert: add missing symbol name to warning 
+>   https://github.com/torvalds/linux/commit/7a41a8f3d9b9e11f0c75914cb925af1486c1ecc6
 
-Joao, is there a reason you moved it elsewhere?
+I think that Joao has exactly the same hunk staged somewhere 
+already. You are right. The message is not much informative.
 
 Miroslav
