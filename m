@@ -1,64 +1,131 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:58880 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726438AbfCTT6J (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Mar 2019 15:58:09 -0400
-Date: Wed, 20 Mar 2019 20:58:06 +0100 (CET)
-From: Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH v2 8/8] documentation: Update on livepatch elf format
-In-Reply-To: <20190318192127.GA23238@redhat.com>
-Message-ID: <alpine.LSU.2.21.1903202054350.29796@pobox.suse.cz>
-References: <20190301141313.15057-1-jmoreira@suse.de> <20190301141313.15057-9-jmoreira@suse.de> <20190318192127.GA23238@redhat.com>
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:51084 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726914AbfCUBRw (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 20 Mar 2019 21:17:52 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <1552968156-3920-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1552968156-3920-1-git-send-email-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 21 Mar 2019 10:16:53 +0900
+Message-ID: <CAK7LNARuyLG52m1oe_2MeuoThR4qur9HgE3ZCz4=jyuvrqew+g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: skip sub-make for in-tree build with GNU Make 4.x
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Lawrence <joe.lawrence@redhat.com>
-Cc: Joao Moreira <jmoreira@suse.de>, live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Andreas Schwab <schwab@suse.de>, David Howells <dhowells@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+
+On Tue, Mar 19, 2019 at 1:03 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> Commit 2b50f7ab6368 ("kbuild: add workaround for Debian make-kpkg")
+> annoyed people who want to wrap the top Makefile with GNUmakefile
+> or something in order to customize it for their use.
+>
+> On second thought, we do not need to run the sub-make for in-tree
+> build with Make 4.x because the 'MAKEFLAGS += -rR' issue only happens
+> on GNU Make 3.x.
+>
+> With this commit, people will get back the workflow, and the Debian
+> make-kpkg will still work.
+>
+> Fixes: 2b50f7ab6368 ("kbuild: add workaround for Debian make-kpkg")
+> Reported-by: Andreas Schwab <schwab@suse.de>
+> Reported-by: David Howells <dhowells@redhat.com>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+
+Applied to linux-kbuild/fixes.
 
 
-> > +building system, the second is done by a tool called klp-convert, which can be
-> > +found in "scripts/livepatch".
-> > +
-> > +When an unresolved relocation has as target a symbol whose name is also used by
-> > +different symbols throughout the kernel, the relocation cannot be resolved
-> > +automatically. In these cases, the livepatch developer must add annotations to
-> > +the livepatch, making it possible for the system to identify which is the
-> > +correct target amongst multiple homonymous symbols. Such annotations must be
-> > +done through a data structure as follows:
-> > +
-> > +struct KLP_MODULE_RELOC(object) data_structure_name[] = {
-> > +	KLP_SYMPOS(symbol, pos)
-> > +};
-> > +
-> > +In the above example, object refers to the object file which contains the
-> > +symbol, being vmlinux or a module; symbol refers to the symbol name that will
-> > +be relocated and pos is its position in the object.
-> > [ ... snip ... ]
-> 
-> Should we be explicit about how position is counted?  First = 1, second
-> = 2, etc?  See the off-by-one bug I pointed out in the "livepatch: Add
-> klp-convert tool" patch earlier.
+>
+>  Makefile | 31 +++++++++++++++----------------
+>  1 file changed, 15 insertions(+), 16 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 99c0530..d9591f2 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -31,26 +31,12 @@ _all:
+>  # descending is started. They are now explicitly listed as the
+>  # prepare rule.
+>
+> -# Ugly workaround for Debian make-kpkg:
+> -# make-kpkg directly includes the top Makefile of Linux kernel. In such a case,
+> -# skip sub-make to support debian_* targets in ruleset/kernel_version.mk, but
+> -# displays warning to discourage such abusage.
+> -ifneq ($(word 2, $(MAKEFILE_LIST)),)
+> -$(warning Do not include top Makefile of Linux Kernel)
+> -sub-make-done := 1
+> -MAKEFLAGS += -rR
+> -endif
+> -
+>  ifneq ($(sub-make-done),1)
+>
+>  # Do not use make's built-in rules and variables
+>  # (this increases performance and avoids hard-to-debug behaviour)
+>  MAKEFLAGS += -rR
+>
+> -# 'MAKEFLAGS += -rR' does not become immediately effective for old
+> -# GNU Make versions. Cancel implicit rules for this Makefile.
+> -$(lastword $(MAKEFILE_LIST)): ;
+> -
+>  # Avoid funny character set dependencies
+>  unexport LC_ALL
+>  LC_COLLATE=C
+> @@ -153,6 +139,7 @@ $(if $(KBUILD_OUTPUT),, \
+>  # 'sub-make' below.
+>  MAKEFLAGS += --include-dir=$(CURDIR)
+>
+> +need-sub-make := 1
+>  else
+>
+>  # Do not print "Entering directory ..." at all for in-tree build.
+> @@ -160,6 +147,15 @@ MAKEFLAGS += --no-print-directory
+>
+>  endif # ifneq ($(KBUILD_OUTPUT),)
+>
+> +ifneq ($(filter 3.%,$(MAKE_VERSION)),)
+> +# 'MAKEFLAGS += -rR' does not immediately become effective for GNU Make 3.x
+> +# We need to run sub-make to avoid implicit rules in the top Makefile.
+> +need-sub-make := 1
+> +# Cancel implicit rules for this Makefile.
+> +$(lastword $(MAKEFILE_LIST)): ;
+> +endif
+> +
+> +ifeq ($(need-sub-make),1)
+>  PHONY += $(MAKECMDGOALS) sub-make
+>
+>  $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
+> @@ -171,8 +167,11 @@ sub-make:
+>         $(if $(KBUILD_OUTPUT),-C $(KBUILD_OUTPUT) KBUILD_SRC=$(CURDIR)) \
+>         -f $(CURDIR)/Makefile $(filter-out _all sub-make,$(MAKECMDGOALS))
+>
+> -else # sub-make-done
+> +endif # need-sub-make
+> +endif # sub-make-done
+> +
+>  # We process the rest of the Makefile if this is the final invocation of make
+> +ifeq ($(need-sub-make),)
+>
+>  # Do not print "Entering directory ...",
+>  # but we want to display it when entering to the output directory
+> @@ -1757,7 +1756,7 @@ existing-targets := $(wildcard $(sort $(targets)))
+>
+>  endif   # ifeq ($(config-targets),1)
+>  endif   # ifeq ($(mixed-targets),1)
+> -endif   # sub-make-done
+> +endif   # need-sub-make
+>
+>  PHONY += FORCE
+>  FORCE:
+> --
+> 2.7.4
+>
 
-We could, but I would add it to a general section somewhere and just add a 
-reference here.
 
-Documentation/livepatch/livepatch.txt says
-"As an optional parameter, the symbol position in the kallsyms database 
-can be used to disambiguate functions of the same name. This is not the 
-absolute position in the database, but rather the order it has been found 
-only for a particular object ( vmlinux or a kernel module )."
-
-We can improve it.
-
-Documentation/livepatch/module-elf-format.txt says
-"[D] The position of the symbol in the object (as according to kallsyms)
-    This is used to differentiate duplicate symbols within the same
-    object. The symbol position is expressed numerically (0, 1, 2...).
-    The symbol position of a unique symbol is 0."
-
-It may even confuse someone.
-
-So yes, I'd be for a change here and there.
-
-Miroslav
+-- 
+Best Regards
+Masahiro Yamada
