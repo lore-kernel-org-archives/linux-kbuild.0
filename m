@@ -1,26 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 06d01.mspz3.gob.ec ([186.46.60.180]:47884 "EHLO
-        06d01.mspz3.gob.ec" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731030AbfCaBAc (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 30 Mar 2019 21:00:32 -0400
+Received: from stars.com.ua ([207.154.231.91]:52676 "EHLO stars.com.ua"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725832AbfCaGLN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 31 Mar 2019 02:11:13 -0400
 Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: quoted-printable
 Content-Description: Mail message body
-Subject: Re:Hello
-From: Mr Wong <ps.cachachuyug@06d01.mspz3.gob.ec>
-Date: Sat, 30 Mar 2019 09:26:03 -0700
-Reply-To: wongcheng1122@gmail.com
-Message-Id: <20190330164202.227DC2B6292D@06d01.mspz3.gob.ec>
+Subject: PRIVATE...
+From: svetlana@stars.com.ua
+Date: Mon, 25 Mar 2019 06:52:30 +0000
+Reply-To: mrmichealwuu17@yahoo.com.hk
+Message-Id: <E1h8JTH-0004fh-A3@stars.com.ua>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <ps.cachachuyug@06d01.mspz3.gob.ec>
+To: Recipients <svetlana@stars.com.ua>
 
-Hello this is Mr Wong again from hongkong,Can we send the Swift as discuss best regards.
-
-Mr Wong Cheng
-
----
-This email has been checked for viruses by Avast antivirus software.
-https://www.avast.com/antivirus
+I have a business Proposal that will be of benefit to the both of us.Kindly=
+ contact me on mrmichealwuu17@yahoo.com.hk should this be of interest to yo=
+u.
