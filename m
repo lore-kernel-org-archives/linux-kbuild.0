@@ -1,203 +1,177 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from monster.unsafe.ru ([5.9.28.80]:45694 "EHLO mail.unsafe.ru"
+Received: from mx1.redhat.com ([209.132.183.28]:41910 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731873AbfCZRYW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Mar 2019 13:24:22 -0400
-Date: Tue, 26 Mar 2019 18:24:12 +0100
-From: Alexey Gladkov <gladkov.alexey@gmail.com>
-Subject: Re: [RESEND PATCH v1] moduleparam: Save information about built-in
- modules in separate file
-Message-ID: <20190326172411.GA15936@Legion-PC.fortress>
-References: <20190315101013.GN8455@Legion-PC.fortress>
- <CAK7LNATsm23e_CuyfFw7_CR8xZQ3HnwNHCXhEm_zQZU2PUGK5A@mail.gmail.com>
+        id S1732431AbfCZRdQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 26 Mar 2019 13:33:16 -0400
+Date: Tue, 26 Mar 2019 13:33:08 -0400
+From: Joe Lawrence <joe.lawrence@redhat.com>
+Subject: [PATCH v2] kbuild: strip whitespace in cmd_record_mcount findstring
+Message-ID: <20190326173308.GA26546@redhat.com>
+References: <20190325160438.8982-1-joe.lawrence@redhat.com>
+ <CAK7LNARyD=tG0JhwN_mjdyDRSPAF8UoZKvqAT3Ah_v7GfymCPg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK7LNATsm23e_CuyfFw7_CR8xZQ3HnwNHCXhEm_zQZU2PUGK5A@mail.gmail.com>
+In-Reply-To: <CAK7LNARyD=tG0JhwN_mjdyDRSPAF8UoZKvqAT3Ah_v7GfymCPg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-api@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>, Jessica Yu <jeyu@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Nicholas Piggin <npiggin@gmail.com>, Steven Rostedt <rostedt@goodmis.org>
 
-On Fri, Mar 22, 2019 at 02:34:12PM +0900, Masahiro Yamada wrote:
-> Hi.
-> 
-> (added some people to CC)
-> 
-> 
-> On Fri, Mar 15, 2019 at 7:10 PM Alexey Gladkov <gladkov.alexey@gmail.com> wrote:
+On Tue, Mar 26, 2019 at 02:29:47PM +0900, Masahiro Yamada wrote:
+> On Tue, Mar 26, 2019 at 1:05 AM Joe Lawrence <joe.lawrence@redhat.com> wrote:
 > >
-> > Problem:
+> > CC_FLAGS_FTRACE may contain trailing whitespace that interferes with
+> > findstring.
 > >
-> > When a kernel module is compiled as a separate module, some important
-> > information about the kernel module is available via .modinfo section of
-> > the module.  In contrast, when the kernel module is compiled into the
-> > kernel, that information is not available.
-> 
-> 
-> I might be missing something, but
-> vmlinux provides info of builtin modules
-> in /sys/module/.
-
-No. There are definitely not all modules. I have a builtin sha256_generic,
-but I can't find him in the /sys/module.
-
-> (Looks like currently only module_param and MODULE_VERSION)
-> 
-> This patch is not exactly the same, but I see a kind of overwrap.
-> I'd like to be sure if we want this new scheme.
-
-The /sys/module is only for running kernel. One of my use cases is
-to create an initrd for a new kernel.
-
-> 
-> > Information about built-in modules is necessary in the following cases:
+> > For example, commit 6977f95e63b9 ("powerpc: avoid -mno-sched-epilog on
+> > GCC 4.9 and newer") introduced a change such that on my ppc64le box,
+> > CC_FLAGS_FTRACE="-pg -mprofile-kernel ".  (Note the trailing space.)
+> > When cmd_record_mcount is now invoked, findstring fails as the ftrace
+> > flags were found at very end of _c_flags, without the trailing space.
 > >
-> > 1. When it is necessary to find out what additional parameters can be
-> > passed to the kernel at boot time.
-> 
-> 
-> Actually, /sys/module/<module>/parameters/
-> exposes this information.
-> 
-> Doesn't it work for your purpose?
-
-No, since creating an initrd needs to know all the modalias before
-I get the sysfs for new kernel. Also there are no modalias at all.
-
-> > 2. When you need to know which module names and their aliases are in
-> > the kernel. This is very useful for creating an initrd image.
+> >   _c_flags=" ... -pg -mprofile-kernel"
+> >   CC_FLAGS_FTRACE="-pg -mprofile-kernel "
+> >                                        ^
+> >     findstring is looking for this extra space
 > >
-> > Proposal:
+> > Remove the redundant whitespaces from CC_FLAGS_FTRACE in
+> > cmd_record_mcount to avoid this problem.
 > >
-> > The proposed patch does not remove .modinfo section with module
-> > information from the vmlinux at the build time and saves it into a
-> > separate file after kernel linking. So, the kernel does not increase in
-> > size and no additional information remains in it. Information is stored
-> > in the same format as in the separate modules (null-terminated string
-> > array). Because the .modinfo section is already exported with a separate
-> > modules, we are not creating a new API.
-> >
-> > It can be easily read in the userspace:
-> >
-> > $ tr '\0' '\n' < kernel.builtin.modinfo
-> > ext4.softdep=pre: crc32c
-> > ext4.license=GPL
-> > ext4.description=Fourth Extended Filesystem
-> > ext4.author=Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others
-> > ext4.alias=fs-ext4
-> > ext4.alias=ext3
-> > ext4.alias=fs-ext3
-> > ext4.alias=ext2
-> > ext4.alias=fs-ext2
-> > md_mod.alias=block-major-9-*
-> > md_mod.alias=md
-> > md_mod.description=MD RAID framework
-> > md_mod.license=GPL
-> > md_mod.parmtype=create_on_open:bool
-> > md_mod.parmtype=start_dirty_degraded:int
-> > ...
-> >
-> > Co-Developed-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
-> > Signed-off-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
-> > Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+> > Fixes: 6977f95e63b9 ("powerpc: avoid -mno-sched-epilog on GCC 4.9 and newer").
+> > Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
 > > ---
-> >  Makefile                    |  1 +
-> >  include/linux/moduleparam.h | 12 +++++-------
-> >  scripts/link-vmlinux.sh     |  8 ++++++++
-> >  3 files changed, 14 insertions(+), 7 deletions(-)
 > >
-> > diff --git a/Makefile b/Makefile
-> > index d5713e7b1e50..971102194c92 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -1288,6 +1288,7 @@ _modinst_:
+> > Standard disclaimer: I'm not a kbuild expert, but this works around the
+> > problem I reported where ftrace and livepatch self-tests were failing as
+> > specified object files were not run through the recordmcount.pl script:
+> >
+> > ppc64le: ftrace self-tests and $(CC_FLAGS_FTRACE) broken?
+> > https://lists.ozlabs.org/pipermail/linuxppc-dev/2019-March/187298.html
+> >
+> >  scripts/Makefile.build | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> > index 2554a15ecf2b..74d402b5aa3c 100644
+> > --- a/scripts/Makefile.build
+> > +++ b/scripts/Makefile.build
+> > @@ -199,10 +199,10 @@ sub_cmd_record_mcount = perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+> >         "$(if $(part-of-module),1,0)" "$(@)";
+> >  recordmcount_source := $(srctree)/scripts/recordmcount.pl
+> >  endif # BUILD_C_RECORDMCOUNT
+> > -cmd_record_mcount =                                            \
+> > -       if [ "$(findstring $(CC_FLAGS_FTRACE),$(_c_flags))" =   \
+> > -            "$(CC_FLAGS_FTRACE)" ]; then                       \
+> > -               $(sub_cmd_record_mcount)                        \
+> > +cmd_record_mcount =                                                    \
+> > +       if [ "$(findstring $(strip $(CC_FLAGS_FTRACE)),$(_c_flags))" =  \
+> > +            "$(strip $(CC_FLAGS_FTRACE))" ]; then                      \
+> > +               $(sub_cmd_record_mcount)                                \
 > >         fi
-> >         @cp -f $(objtree)/modules.order $(MODLIB)/
-> >         @cp -f $(objtree)/modules.builtin $(MODLIB)/
-> > +       @cp -f $(objtree)/kernel.builtin.modinfo $(MODLIB)/
-> >         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
-> >
-> >  # This depmod is only for convenience to give the initial
-> > diff --git a/include/linux/moduleparam.h b/include/linux/moduleparam.h
-> > index ba36506db4fb..5ba250d9172a 100644
-> > --- a/include/linux/moduleparam.h
-> > +++ b/include/linux/moduleparam.h
-> > @@ -10,23 +10,21 @@
-> >     module name. */
-> >  #ifdef MODULE
-> >  #define MODULE_PARAM_PREFIX /* empty */
-> > +#define __MODULE_INFO_PREFIX /* empty */
-> >  #else
-> >  #define MODULE_PARAM_PREFIX KBUILD_MODNAME "."
-> > +/* We cannot use MODULE_PARAM_PREFIX because some modules override it. */
-> > +#define __MODULE_INFO_PREFIX KBUILD_MODNAME "."
-> >  #endif
-> >
-> >  /* Chosen so that structs with an unsigned long line up. */
-> >  #define MAX_PARAM_PREFIX_LEN (64 - sizeof(unsigned long))
-> >
-> > -#ifdef MODULE
-> >  #define __MODULE_INFO(tag, name, info)                                   \
-> >  static const char __UNIQUE_ID(name)[]                                    \
-> >    __used __attribute__((section(".modinfo"), unused, aligned(1)))        \
-> > -  = __stringify(tag) "=" info
-> > -#else  /* !MODULE */
-> > -/* This struct is here for syntactic coherency, it is not used */
-> > -#define __MODULE_INFO(tag, name, info)                                   \
-> > -  struct __UNIQUE_ID(name) {}
-> > -#endif
-> > +  = __MODULE_INFO_PREFIX __stringify(tag) "=" info
-> > +
-> >  #define __MODULE_PARM_TYPE(name, _type)                                          \
-> >    __MODULE_INFO(parmtype, name##type, #name ":" _type)
-> >
-> > diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-> > index c8cf45362bd6..399d7e4d11ec 100755
-> > --- a/scripts/link-vmlinux.sh
-> > +++ b/scripts/link-vmlinux.sh
-> > @@ -258,10 +258,12 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
-> >
-> >         # step 1
-> >         vmlinux_link "" .tmp_vmlinux1
-> > +       "${OBJCOPY}" -R .modinfo .tmp_vmlinux1
-> >         kallsyms .tmp_vmlinux1 .tmp_kallsyms1.o
-> >
-> >         # step 2
-> >         vmlinux_link .tmp_kallsyms1.o .tmp_vmlinux2
-> > +       "${OBJCOPY}" -R .modinfo .tmp_vmlinux2
-> >         kallsyms .tmp_vmlinux2 .tmp_kallsyms2.o
-> >
-> >         # step 3
-> > @@ -273,6 +275,7 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
-> >                 kallsyms_vmlinux=.tmp_vmlinux3
-> >
-> >                 vmlinux_link .tmp_kallsyms2.o .tmp_vmlinux3
-> > +               "${OBJCOPY}" -R .modinfo .tmp_vmlinux3
-> >
-> >                 kallsyms .tmp_vmlinux3 .tmp_kallsyms3.o
-> >         fi
-> > @@ -281,6 +284,11 @@ fi
-> >  info LD vmlinux
-> >  vmlinux_link "${kallsymso}" vmlinux
-> >
-> > +info MODINFO kernel.builtin.modinfo
-> > +"${OBJCOPY}" -j .modinfo -O binary vmlinux kernel.builtin.modinfo
-> > +chmod 444 kernel.builtin.modinfo
-> > +"${OBJCOPY}" -R .modinfo vmlinux
-> > +
-> >  if [ -n "${CONFIG_BUILDTIME_EXTABLE_SORT}" ]; then
-> >         info SORTEX vmlinux
-> >         sortextable vmlinux
+> >  endif # CC_USING_RECORD_MCOUNT
+> >  endif # CONFIG_FTRACE_MCOUNT_RECORD
 > > --
-> > 2.19.2
+> > 2.20.1
 > >
 > 
 > 
-> -- 
-> Best Regards
-> Masahiro Yamada
+> 
+> I do not see a point in using the shell command here
+> in the first place.
+> 
+> Instead of adding crappy workarounds,
+> I guess the following simple code should work:
+> 
+> 
+> index 2554a15..5f13021 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -199,11 +199,8 @@ sub_cmd_record_mcount = perl
+> $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+>         "$(if $(part-of-module),1,0)" "$(@)";
+>  recordmcount_source := $(srctree)/scripts/recordmcount.pl
+>  endif # BUILD_C_RECORDMCOUNT
+> -cmd_record_mcount =                                            \
+> -       if [ "$(findstring $(CC_FLAGS_FTRACE),$(_c_flags))" =   \
+> -            "$(CC_FLAGS_FTRACE)" ]; then                       \
+> -               $(sub_cmd_record_mcount)                        \
+> -       fi
+> +cmd_record_mcount = $(if $(findstring $(CC_FLAGS_FTRACE),$(_c_flags)),\
+> +                 $(sub_cmd_record_mcount))
+>  endif # CC_USING_RECORD_MCOUNT
+>  endif # CONFIG_FTRACE_MCOUNT_RECORD
 > 
 
+Hi Masahiro,
+
+Agreed on the shell command ugliness, however I still think we need to
+strip the search pattern here.  With your suggestion:
+
+% rm -f kernel/trace/trace_selftest_dynamic.o 
+% make kernel/trace/trace_selftest_dynamic.o
+  CALL    scripts/checksyscalls.sh
+  CALL    scripts/atomic/check-atomics.sh
+  CC      kernel/trace/trace_selftest_dynamic.o
+
+% eu-readelf --sections kernel/trace/trace_selftest_dynamic.o | grep mcount
+(nothing)
+
+Adding it back as, as below, restores those sections and the self tests
+work again.
+
+Regards,
+
+-- Joe
+
+-->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8--
+
+From 6a85e8ecf4179b3e80601a327ec43d8d49f0e3cd Mon Sep 17 00:00:00 2001
+From: Joe Lawrence <joe.lawrence@redhat.com>
+Date: Tue, 26 Mar 2019 10:50:28 -0400
+Subject: [PATCH v2] kbuild: strip whitespace in cmd_record_mcount findstring
+
+CC_FLAGS_FTRACE may contain trailing whitespace that interferes with
+findstring.
+
+For example, commit 6977f95e63b9 ("powerpc: avoid -mno-sched-epilog on
+GCC 4.9 and newer") introduced a change such that on my ppc64le box,
+CC_FLAGS_FTRACE="-pg -mprofile-kernel ".  (Note the trailing space.)
+When cmd_record_mcount is now invoked, findstring fails as the ftrace
+flags were found at very end of _c_flags, without the trailing space.
+
+  _c_flags=" ... -pg -mprofile-kernel"
+  CC_FLAGS_FTRACE="-pg -mprofile-kernel "
+                                       ^
+    findstring is looking for this extra space
+
+Remove the redundant whitespaces from CC_FLAGS_FTRACE in
+cmd_record_mcount to avoid this problem.
+
+Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com> (refactoring)
+Fixes: 6977f95e63b9 ("powerpc: avoid -mno-sched-epilog on GCC 4.9 and newer").
+Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
+---
+ scripts/Makefile.build | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 2554a15ecf2b..76ca30cc4791 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -199,11 +199,8 @@ sub_cmd_record_mcount = perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+ 	"$(if $(part-of-module),1,0)" "$(@)";
+ recordmcount_source := $(srctree)/scripts/recordmcount.pl
+ endif # BUILD_C_RECORDMCOUNT
+-cmd_record_mcount =						\
+-	if [ "$(findstring $(CC_FLAGS_FTRACE),$(_c_flags))" =	\
+-	     "$(CC_FLAGS_FTRACE)" ]; then			\
+-		$(sub_cmd_record_mcount)			\
+-	fi
++cmd_record_mcount = $(if $(findstring $(strip $(CC_FLAGS_FTRACE)),$(_c_flags)),	\
++	$(sub_cmd_record_mcount))
+ endif # CC_USING_RECORD_MCOUNT
+ endif # CONFIG_FTRACE_MCOUNT_RECORD
+ 
 -- 
-Rgrds, legion
+2.20.1
