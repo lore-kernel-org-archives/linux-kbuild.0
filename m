@@ -1,51 +1,140 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr20104.outbound.protection.outlook.com ([40.107.2.104]:27879
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+Received: from mx2.suse.de ([195.135.220.15]:46786 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726175AbfCZJ6n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Mar 2019 05:58:43 -0400
-From: "Wiebe, Wladislav (Nokia - DE/Ulm)" <wladislav.wiebe@nokia.com>
-Subject: [PATCH] modpost: make KBUILD_MODPOST_WARN also configurable for
- external modules
-Date: Tue, 26 Mar 2019 09:58:39 +0000
-Message-ID: <HE1PR0701MB2652FC3F5D8E46EA93AF033AFA5F0@HE1PR0701MB2652.eurprd07.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726111AbfCZOlb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 26 Mar 2019 10:41:31 -0400
+Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
+References: <20190301141313.15057-1-jmoreira@suse.de>
+ <20190301141313.15057-3-jmoreira@suse.de> <20190318191926.GA23138@redhat.com>
+ <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz>
+From: Joao Moreira <jmoreira@suse.de>
+Message-ID: <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de>
+Date: Tue, 26 Mar 2019 11:40:55 -0300
 MIME-Version: 1.0
+In-Reply-To: <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>, "michal.lkml@markovi.net" <michal.lkml@markovi.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Miroslav Benes <mbenes@suse.cz>, Joe Lawrence <joe.lawrence@redhat.com>
+Cc: live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
-Commit ea837f1c0503 ("kbuild: make modpost processing configurable")
-was intended to give KBUILD_MODPOST_WARN flexibility to be configurable.
-Right now KBUILD_MODPOST_WARN gets just ignored when KBUILD_EXTMOD is
-set which happens per default when building modules out of the tree.
 
-This change gives the opportunity to define module build behaving also
-in case of out of tree builds and default will become exit on error.
-Errors which can be detected by the build should be trapped out of the box
-there, unless somebody wants to notice broken stuff later at runtime.
 
-Signed-off-by: Wladislav Wiebe <wladislav.wiebe@nokia.com>
----
- scripts/Makefile.modpost | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 3/20/19 4:08 PM, Miroslav Benes wrote:
+>>> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+>>> index fd03d60f6c5a..1e28ad21314c 100644
+>>> --- a/scripts/Makefile.build
+>>> +++ b/scripts/Makefile.build
+>>> @@ -247,6 +247,11 @@ cmd_gen_ksymdeps = \
+>>>   	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
+>>>   endif
+>>>   
+>>> +ifdef CONFIG_LIVEPATCH
+>>> +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o),			\
+>>> +	$(shell touch $(MODVERDIR)/$(basetarget).livepatch))
+>>> +endif
+>>> +
+>>>   define rule_cc_o_c
+>>>   	$(call cmd,checksrc)
+>>>   	$(call cmd_and_fixdep,cc_o_c)
+>>> @@ -283,6 +288,7 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) F
+>>>   	$(call if_changed_rule,cc_o_c)
+>>>   	@{ echo $(@:.o=.ko); echo $@; \
+>>>   	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+>>> +	$(call cmd_livepatch)
+>>>   
+>>>   quiet_cmd_cc_lst_c = MKLST   $@
+>>>         cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+>>
+>> Since cmd_livepatch is only called for single-used-m, does this mean
+>> that we can only klp-convert single object file livepatch modules?
+>>
+>> I stumbled upon this when trying to create a self-test module that
+>> incorporated two object files.  I tried adding a $(call cmd_livepatch)
+>> in the recipe for $(obj)/%.o, but that didn't help.  My kbuild foo
+>> wasn't good enough to figure this one out.
+> 
+> I looked at my original code and it is a bit different there. I placed it
+> under rule_cc_o_c right after objtool command. If I remember correctly
+> this is the correct recipe for .c->.o. Unfortunately I forgot the details
+> and there is of course nothing about it in my notes.
+> 
+> Does it help?
+> 
+> Joao, is there a reason you moved it elsewhere?
 
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 6b7f354f189a..fec6ec2ffa47 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -78,7 +78,7 @@ modpost =3D scripts/mod/modpost                    \
-  $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))=
-) \
-  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
-  $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
-- $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
-+ $(if $(KBUILD_MODPOST_WARN),-w)
-=20
- MODPOST_OPT=3D$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
-=20
---=20
-2.19.2
+Hi,
+
+Unfortunately I can't remember why the chunk was moved to where it is in 
+this version of the patch, sorry. Yet, I did try to move this into the 
+rule cc_o_c and it seemed to work with not damage.
+
+Joe, would you kindly verify and squash properly the patch below, which 
+places cmd_livepatch in rule_cc_o_c?
+
+Thank you.
+
+Subject: [PATCH] Move cmd_klp_convert to the right place 
+
+ 
+
+Signed-off-by: Joao Moreira <jmoreira@suse.de> 
+
+--- 
+
+  scripts/Makefile.build | 2 +- 
+
+  1 file changed, 1 insertion(+), 1 deletion(-) 
+
+ 
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build 
+
+index 1e28ad21314c..5f66106a47d6 100644 
+
+--- a/scripts/Makefile.build 
+
++++ b/scripts/Makefile.build 
+
+@@ -260,6 +260,7 @@ define rule_cc_o_c 
+
+         $(call cmd,objtool) 
+
+         $(call cmd,modversions_c) 
+
+         $(call cmd,record_mcount) 
+
++       $(call cmd,livepatch) 
+
+  endef 
+
+ 
+
+  define rule_as_o_S 
+
+@@ -288,7 +289,6 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c 
+$(recordmcount_source) $(objtool_dep) F
+         $(call if_changed_rule,cc_o_c) 
+
+         @{ echo $(@:.o=.ko); echo $@; \ 
+
+            $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod) 
+
+-       $(call cmd_livepatch) 
+
+ 
+
+  quiet_cmd_cc_lst_c = MKLST   $@ 
+
+        cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \ 
+
+-- 
+
+2.16.4
+
+
+> 
+> Miroslav
+> 
