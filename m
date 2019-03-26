@@ -1,177 +1,265 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41910 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732431AbfCZRdQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Mar 2019 13:33:16 -0400
-Date: Tue, 26 Mar 2019 13:33:08 -0400
-From: Joe Lawrence <joe.lawrence@redhat.com>
-Subject: [PATCH v2] kbuild: strip whitespace in cmd_record_mcount findstring
-Message-ID: <20190326173308.GA26546@redhat.com>
-References: <20190325160438.8982-1-joe.lawrence@redhat.com>
- <CAK7LNARyD=tG0JhwN_mjdyDRSPAF8UoZKvqAT3Ah_v7GfymCPg@mail.gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:58054 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1732064AbfCZSNk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 26 Mar 2019 14:13:40 -0400
+Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
+References: <20190301141313.15057-1-jmoreira@suse.de>
+ <20190301141313.15057-3-jmoreira@suse.de> <20190318191926.GA23138@redhat.com>
+ <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz>
+ <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de>
+ <ae018181-fd8a-03b2-69bf-e9302172bfeb@redhat.com>
+From: Joao Moreira <jmoreira@suse.de>
+Message-ID: <699e78da-36ba-8217-c509-2e9b443bd380@suse.de>
+Date: Tue, 26 Mar 2019 15:13:29 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARyD=tG0JhwN_mjdyDRSPAF8UoZKvqAT3Ah_v7GfymCPg@mail.gmail.com>
+In-Reply-To: <ae018181-fd8a-03b2-69bf-e9302172bfeb@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Nicholas Piggin <npiggin@gmail.com>, Steven Rostedt <rostedt@goodmis.org>
+To: Joe Lawrence <joe.lawrence@redhat.com>, Miroslav Benes <mbenes@suse.cz>
+Cc: live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
-On Tue, Mar 26, 2019 at 02:29:47PM +0900, Masahiro Yamada wrote:
-> On Tue, Mar 26, 2019 at 1:05 AM Joe Lawrence <joe.lawrence@redhat.com> wrote:
-> >
-> > CC_FLAGS_FTRACE may contain trailing whitespace that interferes with
-> > findstring.
-> >
-> > For example, commit 6977f95e63b9 ("powerpc: avoid -mno-sched-epilog on
-> > GCC 4.9 and newer") introduced a change such that on my ppc64le box,
-> > CC_FLAGS_FTRACE="-pg -mprofile-kernel ".  (Note the trailing space.)
-> > When cmd_record_mcount is now invoked, findstring fails as the ftrace
-> > flags were found at very end of _c_flags, without the trailing space.
-> >
-> >   _c_flags=" ... -pg -mprofile-kernel"
-> >   CC_FLAGS_FTRACE="-pg -mprofile-kernel "
-> >                                        ^
-> >     findstring is looking for this extra space
-> >
-> > Remove the redundant whitespaces from CC_FLAGS_FTRACE in
-> > cmd_record_mcount to avoid this problem.
-> >
-> > Fixes: 6977f95e63b9 ("powerpc: avoid -mno-sched-epilog on GCC 4.9 and newer").
-> > Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
-> > ---
-> >
-> > Standard disclaimer: I'm not a kbuild expert, but this works around the
-> > problem I reported where ftrace and livepatch self-tests were failing as
-> > specified object files were not run through the recordmcount.pl script:
-> >
-> > ppc64le: ftrace self-tests and $(CC_FLAGS_FTRACE) broken?
-> > https://lists.ozlabs.org/pipermail/linuxppc-dev/2019-March/187298.html
-> >
-> >  scripts/Makefile.build | 8 ++++----
-> >  1 file changed, 4 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> > index 2554a15ecf2b..74d402b5aa3c 100644
-> > --- a/scripts/Makefile.build
-> > +++ b/scripts/Makefile.build
-> > @@ -199,10 +199,10 @@ sub_cmd_record_mcount = perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
-> >         "$(if $(part-of-module),1,0)" "$(@)";
-> >  recordmcount_source := $(srctree)/scripts/recordmcount.pl
-> >  endif # BUILD_C_RECORDMCOUNT
-> > -cmd_record_mcount =                                            \
-> > -       if [ "$(findstring $(CC_FLAGS_FTRACE),$(_c_flags))" =   \
-> > -            "$(CC_FLAGS_FTRACE)" ]; then                       \
-> > -               $(sub_cmd_record_mcount)                        \
-> > +cmd_record_mcount =                                                    \
-> > +       if [ "$(findstring $(strip $(CC_FLAGS_FTRACE)),$(_c_flags))" =  \
-> > +            "$(strip $(CC_FLAGS_FTRACE))" ]; then                      \
-> > +               $(sub_cmd_record_mcount)                                \
-> >         fi
-> >  endif # CC_USING_RECORD_MCOUNT
-> >  endif # CONFIG_FTRACE_MCOUNT_RECORD
-> > --
-> > 2.20.1
-> >
+
+
+On 3/26/19 1:15 PM, Joe Lawrence wrote:
+> On 3/26/19 10:40 AM, Joao Moreira wrote:
+>>
+>>
+>> On 3/20/19 4:08 PM, Miroslav Benes wrote:
+>>>>> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+>>>>> index fd03d60f6c5a..1e28ad21314c 100644
+>>>>> --- a/scripts/Makefile.build
+>>>>> +++ b/scripts/Makefile.build
+>>>>> @@ -247,6 +247,11 @@ cmd_gen_ksymdeps = \
+>>>>>        $(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> 
+>>>>> $(dot-target).cmd
+>>>>>    endif
+>>>>> +ifdef CONFIG_LIVEPATCH
+>>>>> +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o),            \
+>>>>> +    $(shell touch $(MODVERDIR)/$(basetarget).livepatch))
+>>>>> +endif
+>>>>> +
+>>>>>    define rule_cc_o_c
+>>>>>        $(call cmd,checksrc)
+>>>>>        $(call cmd_and_fixdep,cc_o_c)
+>>>>> @@ -283,6 +288,7 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c 
+>>>>> $(recordmcount_source) $(objtool_dep) F
+>>>>>        $(call if_changed_rule,cc_o_c)
+>>>>>        @{ echo $(@:.o=.ko); echo $@; \
+>>>>>           $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+>>>>> +    $(call cmd_livepatch)
+>>>>>    quiet_cmd_cc_lst_c = MKLST   $@
+>>>>>          cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+>>>>
+>>>> Since cmd_livepatch is only called for single-used-m, does this mean
+>>>> that we can only klp-convert single object file livepatch modules?
+>>>>
+>>>> I stumbled upon this when trying to create a self-test module that
+>>>> incorporated two object files.  I tried adding a $(call cmd_livepatch)
+>>>> in the recipe for $(obj)/%.o, but that didn't help.  My kbuild foo
+>>>> wasn't good enough to figure this one out.
+>>>
+>>> I looked at my original code and it is a bit different there. I 
+>>> placed it
+>>> under rule_cc_o_c right after objtool command. If I remember correctly
+>>> this is the correct recipe for .c->.o. Unfortunately I forgot the 
+>>> details
+>>> and there is of course nothing about it in my notes.
+>>>
+>>> Does it help?
+>>>
+>>> Joao, is there a reason you moved it elsewhere?
+>>
+>> Hi,
+>>
+>> Unfortunately I can't remember why the chunk was moved to where it is in
+>> this version of the patch, sorry. Yet, I did try to move this into the
+>> rule cc_o_c and it seemed to work with not damage.
+>>
+>> Joe, would you kindly verify and squash properly the patch below, which
+>> places cmd_livepatch in rule_cc_o_c?
+>>
+>> Thank you.
+>>
+>> Subject: [PATCH] Move cmd_klp_convert to the right place
+>>
+>>
+>> Signed-off-by: Joao Moreira <jmoreira@suse.de>
+>>
+>> ---
+>>
+>>    scripts/Makefile.build | 2 +-
+>>
+>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>>
+>> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+>> index 1e28ad21314c..5f66106a47d6 100644
+>> --- a/scripts/Makefile.build
+>> +++ b/scripts/Makefile.build
+>> @@ -260,6 +260,7 @@ define rule_cc_o_c
+>>           $(call cmd,objtool)
+>>           $(call cmd,modversions_c)
+>>           $(call cmd,record_mcount)
+>> +       $(call cmd,livepatch)
+>>    endef
+>>    define rule_as_o_S
+>> @@ -288,7 +289,6 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c
+>> $(recordmcount_source) $(objtool_dep) F
+>>           $(call if_changed_rule,cc_o_c)
+>>           @{ echo $(@:.o=.ko); echo $@; \
+>>              $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+>> -       $(call cmd_livepatch)
+>>    quiet_cmd_cc_lst_c = MKLST   $@
+>>          cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
 > 
+> Hi Joao,
 > 
-> 
-> I do not see a point in using the shell command here
-> in the first place.
-> 
-> Instead of adding crappy workarounds,
-> I guess the following simple code should work:
-> 
-> 
-> index 2554a15..5f13021 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -199,11 +199,8 @@ sub_cmd_record_mcount = perl
-> $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
->         "$(if $(part-of-module),1,0)" "$(@)";
->  recordmcount_source := $(srctree)/scripts/recordmcount.pl
->  endif # BUILD_C_RECORDMCOUNT
-> -cmd_record_mcount =                                            \
-> -       if [ "$(findstring $(CC_FLAGS_FTRACE),$(_c_flags))" =   \
-> -            "$(CC_FLAGS_FTRACE)" ]; then                       \
-> -               $(sub_cmd_record_mcount)                        \
-> -       fi
-> +cmd_record_mcount = $(if $(findstring $(CC_FLAGS_FTRACE),$(_c_flags)),\
-> +                 $(sub_cmd_record_mcount))
->  endif # CC_USING_RECORD_MCOUNT
->  endif # CONFIG_FTRACE_MCOUNT_RECORD
+> This change seems to work okay for (again) single object modules, but 
+> I'm having issues with multi-object modules.
 > 
 
-Hi Masahiro,
+Hi Joe, thanks for the sources, this made everything much easier in my 
+side :)
 
-Agreed on the shell command ugliness, however I still think we need to
-strip the search pattern here.  With your suggestion:
+In the patch below I change a little bit the interface used to inform 
+kbuild that a module is a livepatch. Instead of defining the flag 
+LIVEPATCH_ per .o file, we define it per module (what actually makes 
+much more sense). We later use $(basetarget) in the Makefile for 
+checking the flags. By doing so, and invoking cmd_livepatch both from 
+the $(single-used-m) and $(multi-used-m) we ensure that the .livepatch 
+file is created for each module, what later in the pipeline flags the 
+invocation of klp-convert.
 
-% rm -f kernel/trace/trace_selftest_dynamic.o 
-% make kernel/trace/trace_selftest_dynamic.o
-  CALL    scripts/checksyscalls.sh
-  CALL    scripts/atomic/check-atomics.sh
-  CC      kernel/trace/trace_selftest_dynamic.o
+I tested the following patch with the sources you provided (with little 
+modifications, removing the .o from the LIVEPATCH_ definitions and using 
+the module name instead of the object names), achieving successful 
+compilation and conversion. I also tested against the sample 
+livepatches, thus I think it might be ok now.
 
-% eu-readelf --sections kernel/trace/trace_selftest_dynamic.o | grep mcount
-(nothing)
+Do you think we can go this way to solve the problem in v3?
 
-Adding it back as, as below, restores those sections and the self tests
-work again.
+-- PATCH --
 
-Regards,
+Subject: [PATCH] Fix cmd_livepatch for multi-object modules 
 
--- Joe
-
--->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8--
-
-From 6a85e8ecf4179b3e80601a327ec43d8d49f0e3cd Mon Sep 17 00:00:00 2001
-From: Joe Lawrence <joe.lawrence@redhat.com>
-Date: Tue, 26 Mar 2019 10:50:28 -0400
-Subject: [PATCH v2] kbuild: strip whitespace in cmd_record_mcount findstring
-
-CC_FLAGS_FTRACE may contain trailing whitespace that interferes with
-findstring.
-
-For example, commit 6977f95e63b9 ("powerpc: avoid -mno-sched-epilog on
-GCC 4.9 and newer") introduced a change such that on my ppc64le box,
-CC_FLAGS_FTRACE="-pg -mprofile-kernel ".  (Note the trailing space.)
-When cmd_record_mcount is now invoked, findstring fails as the ftrace
-flags were found at very end of _c_flags, without the trailing space.
-
-  _c_flags=" ... -pg -mprofile-kernel"
-  CC_FLAGS_FTRACE="-pg -mprofile-kernel "
-                                       ^
-    findstring is looking for this extra space
-
-Remove the redundant whitespaces from CC_FLAGS_FTRACE in
-cmd_record_mcount to avoid this problem.
-
-Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com> (refactoring)
-Fixes: 6977f95e63b9 ("powerpc: avoid -mno-sched-epilog on GCC 4.9 and newer").
-Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
----
- scripts/Makefile.build | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 2554a15ecf2b..76ca30cc4791 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -199,11 +199,8 @@ sub_cmd_record_mcount = perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
- 	"$(if $(part-of-module),1,0)" "$(@)";
- recordmcount_source := $(srctree)/scripts/recordmcount.pl
- endif # BUILD_C_RECORDMCOUNT
--cmd_record_mcount =						\
--	if [ "$(findstring $(CC_FLAGS_FTRACE),$(_c_flags))" =	\
--	     "$(CC_FLAGS_FTRACE)" ]; then			\
--		$(sub_cmd_record_mcount)			\
--	fi
-+cmd_record_mcount = $(if $(findstring $(strip $(CC_FLAGS_FTRACE)),$(_c_flags)),	\
-+	$(sub_cmd_record_mcount))
- endif # CC_USING_RECORD_MCOUNT
- endif # CONFIG_FTRACE_MCOUNT_RECORD
  
+
+Signed-off-by: Joao Moreira <jmoreira@suse.de> 
+
+--- 
+
+  samples/livepatch/Makefile | 10 +++++----- 
+
+  scripts/Makefile.build     |  5 +++-- 
+
+  2 files changed, 8 insertions(+), 7 deletions(-) 
+
+ 
+
+diff --git a/samples/livepatch/Makefile b/samples/livepatch/Makefile 
+
+index 93725c434f4f..dea530840725 100644 
+
+--- a/samples/livepatch/Makefile 
+
++++ b/samples/livepatch/Makefile 
+
+@@ -1,8 +1,8 @@ 
+
+-LIVEPATCH_livepatch-sample.o := y 
+
+-LIVEPATCH_livepatch-shadow-fix1.o := y 
+
+-LIVEPATCH_livepatch-shadow-fix2.o := y 
+
+-LIVEPATCH_livepatch-callbacks-demo.o := y 
+
+-LIVEPATCH_livepatch-annotated-sample.o := y 
+
++LIVEPATCH_livepatch-sample := y 
+
++LIVEPATCH_livepatch-shadow-fix1 := y 
+
++LIVEPATCH_livepatch-shadow-fix2 := y 
+
++LIVEPATCH_livepatch-callbacks-demo := y 
+
++LIVEPATCH_livepatch-annotated-sample := y 
+
+ 
+
+  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-sample.o 
+
+  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-mod.o 
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build 
+
+index dba89e605eab..52e69b4084d5 100644 
+
+--- a/scripts/Makefile.build 
+
++++ b/scripts/Makefile.build 
+
+@@ -250,7 +250,7 @@ cmd_gen_ksymdeps = \ 
+
+  endif 
+
+ 
+
+  ifdef CONFIG_LIVEPATCH 
+
+-cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o), 
+\
++cmd_livepatch = $(if $(LIVEPATCH_$(basetarget)), 
+\
+         $(shell touch $(MODVERDIR)/$(basetarget).livepatch)) 
+
+  endif 
+
+ 
+
+@@ -288,9 +288,9 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) 
+$(objtool_dep) FORCE
+  $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) 
+$(objtool_dep) FORCE
+         $(call cmd,force_checksrc) 
+
+         $(call if_changed_rule,cc_o_c) 
+
++       $(call cmd,livepatch) 
+
+         @{ echo $(@:.o=.ko); echo $@; \ 
+
+            $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod) 
+
+-       $(call cmd_livepatch) 
+
+ 
+
+  quiet_cmd_cc_lst_c = MKLST   $@ 
+
+        cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \ 
+
+@@ -469,6 +469,7 @@ cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ 
+$(filter %.o,$^) $(cmd_secanalysis
+ 
+
+  $(multi-used-m): FORCE 
+
+         $(call if_changed,link_multi-m) 
+
++       $(call cmd,livepatch) 
+
+         @{ echo $(@:.o=.ko); echo $(filter %.o,$^); \ 
+
+            $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod) 
+
+  $(call multi_depend, $(multi-used-m), .o, -objs -y -m) 
+
 -- 
-2.20.1
+
+2.16.4
