@@ -1,173 +1,203 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52798 "EHLO mx1.redhat.com"
+Received: from monster.unsafe.ru ([5.9.28.80]:45694 "EHLO mail.unsafe.ru"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726111AbfCZQPb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Mar 2019 12:15:31 -0400
-Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
-References: <20190301141313.15057-1-jmoreira@suse.de>
- <20190301141313.15057-3-jmoreira@suse.de> <20190318191926.GA23138@redhat.com>
- <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz>
- <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de>
-From: Joe Lawrence <joe.lawrence@redhat.com>
-Message-ID: <ae018181-fd8a-03b2-69bf-e9302172bfeb@redhat.com>
-Date: Tue, 26 Mar 2019 12:15:28 -0400
+        id S1731873AbfCZRYW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 26 Mar 2019 13:24:22 -0400
+Date: Tue, 26 Mar 2019 18:24:12 +0100
+From: Alexey Gladkov <gladkov.alexey@gmail.com>
+Subject: Re: [RESEND PATCH v1] moduleparam: Save information about built-in
+ modules in separate file
+Message-ID: <20190326172411.GA15936@Legion-PC.fortress>
+References: <20190315101013.GN8455@Legion-PC.fortress>
+ <CAK7LNATsm23e_CuyfFw7_CR8xZQ3HnwNHCXhEm_zQZU2PUGK5A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNATsm23e_CuyfFw7_CR8xZQ3HnwNHCXhEm_zQZU2PUGK5A@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joao Moreira <jmoreira@suse.de>, Miroslav Benes <mbenes@suse.cz>
-Cc: live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-api@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>, Jessica Yu <jeyu@kernel.org>
 
-On 3/26/19 10:40 AM, Joao Moreira wrote:
+On Fri, Mar 22, 2019 at 02:34:12PM +0900, Masahiro Yamada wrote:
+> Hi.
+> 
+> (added some people to CC)
 > 
 > 
-> On 3/20/19 4:08 PM, Miroslav Benes wrote:
->>>> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
->>>> index fd03d60f6c5a..1e28ad21314c 100644
->>>> --- a/scripts/Makefile.build
->>>> +++ b/scripts/Makefile.build
->>>> @@ -247,6 +247,11 @@ cmd_gen_ksymdeps = \
->>>>    	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
->>>>    endif
->>>>    
->>>> +ifdef CONFIG_LIVEPATCH
->>>> +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o),			\
->>>> +	$(shell touch $(MODVERDIR)/$(basetarget).livepatch))
->>>> +endif
->>>> +
->>>>    define rule_cc_o_c
->>>>    	$(call cmd,checksrc)
->>>>    	$(call cmd_and_fixdep,cc_o_c)
->>>> @@ -283,6 +288,7 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) F
->>>>    	$(call if_changed_rule,cc_o_c)
->>>>    	@{ echo $(@:.o=.ko); echo $@; \
->>>>    	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
->>>> +	$(call cmd_livepatch)
->>>>    
->>>>    quiet_cmd_cc_lst_c = MKLST   $@
->>>>          cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
->>>
->>> Since cmd_livepatch is only called for single-used-m, does this mean
->>> that we can only klp-convert single object file livepatch modules?
->>>
->>> I stumbled upon this when trying to create a self-test module that
->>> incorporated two object files.  I tried adding a $(call cmd_livepatch)
->>> in the recipe for $(obj)/%.o, but that didn't help.  My kbuild foo
->>> wasn't good enough to figure this one out.
->>
->> I looked at my original code and it is a bit different there. I placed it
->> under rule_cc_o_c right after objtool command. If I remember correctly
->> this is the correct recipe for .c->.o. Unfortunately I forgot the details
->> and there is of course nothing about it in my notes.
->>
->> Does it help?
->>
->> Joao, is there a reason you moved it elsewhere?
+> On Fri, Mar 15, 2019 at 7:10 PM Alexey Gladkov <gladkov.alexey@gmail.com> wrote:
+> >
+> > Problem:
+> >
+> > When a kernel module is compiled as a separate module, some important
+> > information about the kernel module is available via .modinfo section of
+> > the module.  In contrast, when the kernel module is compiled into the
+> > kernel, that information is not available.
 > 
-> Hi,
 > 
-> Unfortunately I can't remember why the chunk was moved to where it is in
-> this version of the patch, sorry. Yet, I did try to move this into the
-> rule cc_o_c and it seemed to work with not damage.
+> I might be missing something, but
+> vmlinux provides info of builtin modules
+> in /sys/module/.
+
+No. There are definitely not all modules. I have a builtin sha256_generic,
+but I can't find him in the /sys/module.
+
+> (Looks like currently only module_param and MODULE_VERSION)
 > 
-> Joe, would you kindly verify and squash properly the patch below, which
-> places cmd_livepatch in rule_cc_o_c?
+> This patch is not exactly the same, but I see a kind of overwrap.
+> I'd like to be sure if we want this new scheme.
+
+The /sys/module is only for running kernel. One of my use cases is
+to create an initrd for a new kernel.
+
 > 
-> Thank you.
+> > Information about built-in modules is necessary in the following cases:
+> >
+> > 1. When it is necessary to find out what additional parameters can be
+> > passed to the kernel at boot time.
 > 
-> Subject: [PATCH] Move cmd_klp_convert to the right place
 > 
->   
+> Actually, /sys/module/<module>/parameters/
+> exposes this information.
 > 
-> Signed-off-by: Joao Moreira <jmoreira@suse.de>
+> Doesn't it work for your purpose?
+
+No, since creating an initrd needs to know all the modalias before
+I get the sysfs for new kernel. Also there are no modalias at all.
+
+> > 2. When you need to know which module names and their aliases are in
+> > the kernel. This is very useful for creating an initrd image.
+> >
+> > Proposal:
+> >
+> > The proposed patch does not remove .modinfo section with module
+> > information from the vmlinux at the build time and saves it into a
+> > separate file after kernel linking. So, the kernel does not increase in
+> > size and no additional information remains in it. Information is stored
+> > in the same format as in the separate modules (null-terminated string
+> > array). Because the .modinfo section is already exported with a separate
+> > modules, we are not creating a new API.
+> >
+> > It can be easily read in the userspace:
+> >
+> > $ tr '\0' '\n' < kernel.builtin.modinfo
+> > ext4.softdep=pre: crc32c
+> > ext4.license=GPL
+> > ext4.description=Fourth Extended Filesystem
+> > ext4.author=Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others
+> > ext4.alias=fs-ext4
+> > ext4.alias=ext3
+> > ext4.alias=fs-ext3
+> > ext4.alias=ext2
+> > ext4.alias=fs-ext2
+> > md_mod.alias=block-major-9-*
+> > md_mod.alias=md
+> > md_mod.description=MD RAID framework
+> > md_mod.license=GPL
+> > md_mod.parmtype=create_on_open:bool
+> > md_mod.parmtype=start_dirty_degraded:int
+> > ...
+> >
+> > Co-Developed-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
+> > Signed-off-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
+> > Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+> > ---
+> >  Makefile                    |  1 +
+> >  include/linux/moduleparam.h | 12 +++++-------
+> >  scripts/link-vmlinux.sh     |  8 ++++++++
+> >  3 files changed, 14 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/Makefile b/Makefile
+> > index d5713e7b1e50..971102194c92 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -1288,6 +1288,7 @@ _modinst_:
+> >         fi
+> >         @cp -f $(objtree)/modules.order $(MODLIB)/
+> >         @cp -f $(objtree)/modules.builtin $(MODLIB)/
+> > +       @cp -f $(objtree)/kernel.builtin.modinfo $(MODLIB)/
+> >         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
+> >
+> >  # This depmod is only for convenience to give the initial
+> > diff --git a/include/linux/moduleparam.h b/include/linux/moduleparam.h
+> > index ba36506db4fb..5ba250d9172a 100644
+> > --- a/include/linux/moduleparam.h
+> > +++ b/include/linux/moduleparam.h
+> > @@ -10,23 +10,21 @@
+> >     module name. */
+> >  #ifdef MODULE
+> >  #define MODULE_PARAM_PREFIX /* empty */
+> > +#define __MODULE_INFO_PREFIX /* empty */
+> >  #else
+> >  #define MODULE_PARAM_PREFIX KBUILD_MODNAME "."
+> > +/* We cannot use MODULE_PARAM_PREFIX because some modules override it. */
+> > +#define __MODULE_INFO_PREFIX KBUILD_MODNAME "."
+> >  #endif
+> >
+> >  /* Chosen so that structs with an unsigned long line up. */
+> >  #define MAX_PARAM_PREFIX_LEN (64 - sizeof(unsigned long))
+> >
+> > -#ifdef MODULE
+> >  #define __MODULE_INFO(tag, name, info)                                   \
+> >  static const char __UNIQUE_ID(name)[]                                    \
+> >    __used __attribute__((section(".modinfo"), unused, aligned(1)))        \
+> > -  = __stringify(tag) "=" info
+> > -#else  /* !MODULE */
+> > -/* This struct is here for syntactic coherency, it is not used */
+> > -#define __MODULE_INFO(tag, name, info)                                   \
+> > -  struct __UNIQUE_ID(name) {}
+> > -#endif
+> > +  = __MODULE_INFO_PREFIX __stringify(tag) "=" info
+> > +
+> >  #define __MODULE_PARM_TYPE(name, _type)                                          \
+> >    __MODULE_INFO(parmtype, name##type, #name ":" _type)
+> >
+> > diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+> > index c8cf45362bd6..399d7e4d11ec 100755
+> > --- a/scripts/link-vmlinux.sh
+> > +++ b/scripts/link-vmlinux.sh
+> > @@ -258,10 +258,12 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
+> >
+> >         # step 1
+> >         vmlinux_link "" .tmp_vmlinux1
+> > +       "${OBJCOPY}" -R .modinfo .tmp_vmlinux1
+> >         kallsyms .tmp_vmlinux1 .tmp_kallsyms1.o
+> >
+> >         # step 2
+> >         vmlinux_link .tmp_kallsyms1.o .tmp_vmlinux2
+> > +       "${OBJCOPY}" -R .modinfo .tmp_vmlinux2
+> >         kallsyms .tmp_vmlinux2 .tmp_kallsyms2.o
+> >
+> >         # step 3
+> > @@ -273,6 +275,7 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
+> >                 kallsyms_vmlinux=.tmp_vmlinux3
+> >
+> >                 vmlinux_link .tmp_kallsyms2.o .tmp_vmlinux3
+> > +               "${OBJCOPY}" -R .modinfo .tmp_vmlinux3
+> >
+> >                 kallsyms .tmp_vmlinux3 .tmp_kallsyms3.o
+> >         fi
+> > @@ -281,6 +284,11 @@ fi
+> >  info LD vmlinux
+> >  vmlinux_link "${kallsymso}" vmlinux
+> >
+> > +info MODINFO kernel.builtin.modinfo
+> > +"${OBJCOPY}" -j .modinfo -O binary vmlinux kernel.builtin.modinfo
+> > +chmod 444 kernel.builtin.modinfo
+> > +"${OBJCOPY}" -R .modinfo vmlinux
+> > +
+> >  if [ -n "${CONFIG_BUILDTIME_EXTABLE_SORT}" ]; then
+> >         info SORTEX vmlinux
+> >         sortextable vmlinux
+> > --
+> > 2.19.2
+> >
 > 
-> ---
 > 
->    scripts/Makefile.build | 2 +-
+> -- 
+> Best Regards
+> Masahiro Yamada
 > 
->    1 file changed, 1 insertion(+), 1 deletion(-)
-> 
->   
-> 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 1e28ad21314c..5f66106a47d6 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -260,6 +260,7 @@ define rule_cc_o_c
->           $(call cmd,objtool)
->           $(call cmd,modversions_c)
->           $(call cmd,record_mcount)
-> +       $(call cmd,livepatch)
->    endef
->   
->    define rule_as_o_S
-> @@ -288,7 +289,6 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c
-> $(recordmcount_source) $(objtool_dep) F
->           $(call if_changed_rule,cc_o_c)
->           @{ echo $(@:.o=.ko); echo $@; \
->              $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
-> -       $(call cmd_livepatch)
->   
->    quiet_cmd_cc_lst_c = MKLST   $@
->          cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
 
-Hi Joao,
-
-This change seems to work okay for (again) single object modules, but 
-I'm having issues with multi-object modules.
-
-Here are my sources:
-
-% head -n100 *
-==> Makefile <==
-KDIR := /lib/modules/$(shell uname -r)/build
-PWD := $(shell pwd)
-
-LIVEPATCH_test_mod_a.o := y
-LIVEPATCH_test_mod_b.o := y
-
-obj-m += test_mod.o
-
-test_mod-y := \
-         test_mod_a.o \
-         test_mod_b.o
-
-default:
-         $(MAKE) -C $(KDIR) M=$(PWD)
-clean:
-         @rm -rf .tmp_versions/
-         @rm -f .*.cmd *.o *.mod.* *.ko modules.order Module.symvers
-
-==> test_mod_a.c <==
-#include <linux/module.h>
-__used static void function(void) { }
-MODULE_LICENSE("GPL");
-
-==> test_mod_b.c <==
-__used static void function(void) { }
-
-
-
-But when I build, I don't see klp-convert invoked for any of the object 
-files:
-
-% make
-make -C /lib/modules/5.0.0+/build M=/home/cloud-user/klp-convert-modtest
-make[1]: Entering directory '/home/cloud-user/disk/linux'
-   CC [M]  /home/cloud-user/klp-convert-modtest/test_mod_a.o
-   CC [M]  /home/cloud-user/klp-convert-modtest/test_mod_b.o
-   LD [M]  /home/cloud-user/klp-convert-modtest/test_mod.o
-   Building modules, stage 2.
-   MODPOST 1 modules
-   CC      /home/cloud-user/klp-convert-modtest/test_mod.mod.o
-   LD [M]  /home/cloud-user/klp-convert-modtest/test_mod.ko
-make[1]: Leaving directory '/home/cloud-user/disk/linux'
-
-However, if I modify the Makefile to build test_mod_a.o into its own 
-module, I see "KLP 
-/home/cloud-user/klp-convert-modtest/test_mod_a.ko" in the build output.
-
--- Joe
+-- 
+Rgrds, legion
