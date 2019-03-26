@@ -1,140 +1,173 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46786 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726111AbfCZOlb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Mar 2019 10:41:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52798 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726111AbfCZQPb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 26 Mar 2019 12:15:31 -0400
 Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
 References: <20190301141313.15057-1-jmoreira@suse.de>
  <20190301141313.15057-3-jmoreira@suse.de> <20190318191926.GA23138@redhat.com>
  <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz>
-From: Joao Moreira <jmoreira@suse.de>
-Message-ID: <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de>
-Date: Tue, 26 Mar 2019 11:40:55 -0300
+ <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de>
+From: Joe Lawrence <joe.lawrence@redhat.com>
+Message-ID: <ae018181-fd8a-03b2-69bf-e9302172bfeb@redhat.com>
+Date: Tue, 26 Mar 2019 12:15:28 -0400
 MIME-Version: 1.0
-In-Reply-To: <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz>
+In-Reply-To: <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miroslav Benes <mbenes@suse.cz>, Joe Lawrence <joe.lawrence@redhat.com>
+To: Joao Moreira <jmoreira@suse.de>, Miroslav Benes <mbenes@suse.cz>
 Cc: live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
-
-
-On 3/20/19 4:08 PM, Miroslav Benes wrote:
->>> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
->>> index fd03d60f6c5a..1e28ad21314c 100644
->>> --- a/scripts/Makefile.build
->>> +++ b/scripts/Makefile.build
->>> @@ -247,6 +247,11 @@ cmd_gen_ksymdeps = \
->>>   	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
->>>   endif
->>>   
->>> +ifdef CONFIG_LIVEPATCH
->>> +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o),			\
->>> +	$(shell touch $(MODVERDIR)/$(basetarget).livepatch))
->>> +endif
->>> +
->>>   define rule_cc_o_c
->>>   	$(call cmd,checksrc)
->>>   	$(call cmd_and_fixdep,cc_o_c)
->>> @@ -283,6 +288,7 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) F
->>>   	$(call if_changed_rule,cc_o_c)
->>>   	@{ echo $(@:.o=.ko); echo $@; \
->>>   	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
->>> +	$(call cmd_livepatch)
->>>   
->>>   quiet_cmd_cc_lst_c = MKLST   $@
->>>         cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+On 3/26/19 10:40 AM, Joao Moreira wrote:
+> 
+> 
+> On 3/20/19 4:08 PM, Miroslav Benes wrote:
+>>>> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+>>>> index fd03d60f6c5a..1e28ad21314c 100644
+>>>> --- a/scripts/Makefile.build
+>>>> +++ b/scripts/Makefile.build
+>>>> @@ -247,6 +247,11 @@ cmd_gen_ksymdeps = \
+>>>>    	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
+>>>>    endif
+>>>>    
+>>>> +ifdef CONFIG_LIVEPATCH
+>>>> +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o),			\
+>>>> +	$(shell touch $(MODVERDIR)/$(basetarget).livepatch))
+>>>> +endif
+>>>> +
+>>>>    define rule_cc_o_c
+>>>>    	$(call cmd,checksrc)
+>>>>    	$(call cmd_and_fixdep,cc_o_c)
+>>>> @@ -283,6 +288,7 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) F
+>>>>    	$(call if_changed_rule,cc_o_c)
+>>>>    	@{ echo $(@:.o=.ko); echo $@; \
+>>>>    	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+>>>> +	$(call cmd_livepatch)
+>>>>    
+>>>>    quiet_cmd_cc_lst_c = MKLST   $@
+>>>>          cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+>>>
+>>> Since cmd_livepatch is only called for single-used-m, does this mean
+>>> that we can only klp-convert single object file livepatch modules?
+>>>
+>>> I stumbled upon this when trying to create a self-test module that
+>>> incorporated two object files.  I tried adding a $(call cmd_livepatch)
+>>> in the recipe for $(obj)/%.o, but that didn't help.  My kbuild foo
+>>> wasn't good enough to figure this one out.
 >>
->> Since cmd_livepatch is only called for single-used-m, does this mean
->> that we can only klp-convert single object file livepatch modules?
+>> I looked at my original code and it is a bit different there. I placed it
+>> under rule_cc_o_c right after objtool command. If I remember correctly
+>> this is the correct recipe for .c->.o. Unfortunately I forgot the details
+>> and there is of course nothing about it in my notes.
 >>
->> I stumbled upon this when trying to create a self-test module that
->> incorporated two object files.  I tried adding a $(call cmd_livepatch)
->> in the recipe for $(obj)/%.o, but that didn't help.  My kbuild foo
->> wasn't good enough to figure this one out.
+>> Does it help?
+>>
+>> Joao, is there a reason you moved it elsewhere?
 > 
-> I looked at my original code and it is a bit different there. I placed it
-> under rule_cc_o_c right after objtool command. If I remember correctly
-> this is the correct recipe for .c->.o. Unfortunately I forgot the details
-> and there is of course nothing about it in my notes.
+> Hi,
 > 
-> Does it help?
+> Unfortunately I can't remember why the chunk was moved to where it is in
+> this version of the patch, sorry. Yet, I did try to move this into the
+> rule cc_o_c and it seemed to work with not damage.
 > 
-> Joao, is there a reason you moved it elsewhere?
-
-Hi,
-
-Unfortunately I can't remember why the chunk was moved to where it is in 
-this version of the patch, sorry. Yet, I did try to move this into the 
-rule cc_o_c and it seemed to work with not damage.
-
-Joe, would you kindly verify and squash properly the patch below, which 
-places cmd_livepatch in rule_cc_o_c?
-
-Thank you.
-
-Subject: [PATCH] Move cmd_klp_convert to the right place 
-
- 
-
-Signed-off-by: Joao Moreira <jmoreira@suse.de> 
-
---- 
-
-  scripts/Makefile.build | 2 +- 
-
-  1 file changed, 1 insertion(+), 1 deletion(-) 
-
- 
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build 
-
-index 1e28ad21314c..5f66106a47d6 100644 
-
---- a/scripts/Makefile.build 
-
-+++ b/scripts/Makefile.build 
-
-@@ -260,6 +260,7 @@ define rule_cc_o_c 
-
-         $(call cmd,objtool) 
-
-         $(call cmd,modversions_c) 
-
-         $(call cmd,record_mcount) 
-
-+       $(call cmd,livepatch) 
-
-  endef 
-
- 
-
-  define rule_as_o_S 
-
-@@ -288,7 +289,6 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c 
-$(recordmcount_source) $(objtool_dep) F
-         $(call if_changed_rule,cc_o_c) 
-
-         @{ echo $(@:.o=.ko); echo $@; \ 
-
-            $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod) 
-
--       $(call cmd_livepatch) 
-
- 
-
-  quiet_cmd_cc_lst_c = MKLST   $@ 
-
-        cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \ 
-
--- 
-
-2.16.4
-
-
+> Joe, would you kindly verify and squash properly the patch below, which
+> places cmd_livepatch in rule_cc_o_c?
 > 
-> Miroslav
+> Thank you.
 > 
+> Subject: [PATCH] Move cmd_klp_convert to the right place
+> 
+>   
+> 
+> Signed-off-by: Joao Moreira <jmoreira@suse.de>
+> 
+> ---
+> 
+>    scripts/Makefile.build | 2 +-
+> 
+>    1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+>   
+> 
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 1e28ad21314c..5f66106a47d6 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -260,6 +260,7 @@ define rule_cc_o_c
+>           $(call cmd,objtool)
+>           $(call cmd,modversions_c)
+>           $(call cmd,record_mcount)
+> +       $(call cmd,livepatch)
+>    endef
+>   
+>    define rule_as_o_S
+> @@ -288,7 +289,6 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c
+> $(recordmcount_source) $(objtool_dep) F
+>           $(call if_changed_rule,cc_o_c)
+>           @{ echo $(@:.o=.ko); echo $@; \
+>              $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+> -       $(call cmd_livepatch)
+>   
+>    quiet_cmd_cc_lst_c = MKLST   $@
+>          cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+
+Hi Joao,
+
+This change seems to work okay for (again) single object modules, but 
+I'm having issues with multi-object modules.
+
+Here are my sources:
+
+% head -n100 *
+==> Makefile <==
+KDIR := /lib/modules/$(shell uname -r)/build
+PWD := $(shell pwd)
+
+LIVEPATCH_test_mod_a.o := y
+LIVEPATCH_test_mod_b.o := y
+
+obj-m += test_mod.o
+
+test_mod-y := \
+         test_mod_a.o \
+         test_mod_b.o
+
+default:
+         $(MAKE) -C $(KDIR) M=$(PWD)
+clean:
+         @rm -rf .tmp_versions/
+         @rm -f .*.cmd *.o *.mod.* *.ko modules.order Module.symvers
+
+==> test_mod_a.c <==
+#include <linux/module.h>
+__used static void function(void) { }
+MODULE_LICENSE("GPL");
+
+==> test_mod_b.c <==
+__used static void function(void) { }
+
+
+
+But when I build, I don't see klp-convert invoked for any of the object 
+files:
+
+% make
+make -C /lib/modules/5.0.0+/build M=/home/cloud-user/klp-convert-modtest
+make[1]: Entering directory '/home/cloud-user/disk/linux'
+   CC [M]  /home/cloud-user/klp-convert-modtest/test_mod_a.o
+   CC [M]  /home/cloud-user/klp-convert-modtest/test_mod_b.o
+   LD [M]  /home/cloud-user/klp-convert-modtest/test_mod.o
+   Building modules, stage 2.
+   MODPOST 1 modules
+   CC      /home/cloud-user/klp-convert-modtest/test_mod.mod.o
+   LD [M]  /home/cloud-user/klp-convert-modtest/test_mod.ko
+make[1]: Leaving directory '/home/cloud-user/disk/linux'
+
+However, if I modify the Makefile to build test_mod_a.o into its own 
+module, I see "KLP 
+/home/cloud-user/klp-convert-modtest/test_mod_a.ko" in the build output.
+
+-- Joe
