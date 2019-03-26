@@ -1,265 +1,150 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:58054 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:47302 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732064AbfCZSNk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Mar 2019 14:13:40 -0400
-Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
+        id S1726207AbfCZUOH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 26 Mar 2019 16:14:07 -0400
+Subject: Re: [PATCH v2 3/8] livepatch: Add klp-convert tool
 References: <20190301141313.15057-1-jmoreira@suse.de>
- <20190301141313.15057-3-jmoreira@suse.de> <20190318191926.GA23138@redhat.com>
- <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz>
- <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de>
- <ae018181-fd8a-03b2-69bf-e9302172bfeb@redhat.com>
+ <20190301141313.15057-4-jmoreira@suse.de> <20190318192011.GA23157@redhat.com>
+ <alpine.LSU.2.21.1903202021570.29796@pobox.suse.cz>
 From: Joao Moreira <jmoreira@suse.de>
-Message-ID: <699e78da-36ba-8217-c509-2e9b443bd380@suse.de>
-Date: Tue, 26 Mar 2019 15:13:29 -0300
+Message-ID: <04f6c9c4-88c6-41b3-fbf8-2409b3822e0b@suse.de>
+Date: Tue, 26 Mar 2019 17:13:57 -0300
 MIME-Version: 1.0
-In-Reply-To: <ae018181-fd8a-03b2-69bf-e9302172bfeb@redhat.com>
+In-Reply-To: <alpine.LSU.2.21.1903202021570.29796@pobox.suse.cz>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Lawrence <joe.lawrence@redhat.com>, Miroslav Benes <mbenes@suse.cz>
+To: Miroslav Benes <mbenes@suse.cz>, Joe Lawrence <joe.lawrence@redhat.com>
 Cc: live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
 
 
-On 3/26/19 1:15 PM, Joe Lawrence wrote:
-> On 3/26/19 10:40 AM, Joao Moreira wrote:
+On 3/20/19 4:36 PM, Miroslav Benes wrote:
+>>> [ ... snip ... ]
+>>> +
+>>> +/* Checks if sympos is valid, otherwise prints valid sympos list */
+>>> +static bool valid_sympos(struct sympos *sp)
+>>> +{
+>>> +	struct symbol_entry *e;
+>>> +	int counter = 0;
+>>> +
+>>> +	list_for_each_entry(e, &symbols, list) {
+>>> +		if ((strcmp(e->symbol_name, sp->symbol_name) == 0) &&
+>>> +		    (strcmp(e->object_name, sp->object_name) == 0)) {
+>>> +			if (counter == sp->pos)
+>>> +				return true;
+>>> +			counter++;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	WARN("Provided KLP_SYMPOS does not match a symbol: %s.%s,%d",
+>>> +			sp->object_name, sp->symbol_name, sp->pos);
+>>> +	print_valid_module_relocs(sp->symbol_name);
+>>> +
+>>> +	return false;
+>>> +}
 >>
+>> I believe there is an off-by-one error condition either here, or in
+>> livepatch kernel core sympos disambiguator code (in which case, external
+>> tools like kpatch-build would also need to be adjusted).
 >>
->> On 3/20/19 4:08 PM, Miroslav Benes wrote:
->>>>> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
->>>>> index fd03d60f6c5a..1e28ad21314c 100644
->>>>> --- a/scripts/Makefile.build
->>>>> +++ b/scripts/Makefile.build
->>>>> @@ -247,6 +247,11 @@ cmd_gen_ksymdeps = \
->>>>>        $(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> 
->>>>> $(dot-target).cmd
->>>>>    endif
->>>>> +ifdef CONFIG_LIVEPATCH
->>>>> +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o),            \
->>>>> +    $(shell touch $(MODVERDIR)/$(basetarget).livepatch))
->>>>> +endif
->>>>> +
->>>>>    define rule_cc_o_c
->>>>>        $(call cmd,checksrc)
->>>>>        $(call cmd_and_fixdep,cc_o_c)
->>>>> @@ -283,6 +288,7 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c 
->>>>> $(recordmcount_source) $(objtool_dep) F
->>>>>        $(call if_changed_rule,cc_o_c)
->>>>>        @{ echo $(@:.o=.ko); echo $@; \
->>>>>           $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
->>>>> +    $(call cmd_livepatch)
->>>>>    quiet_cmd_cc_lst_c = MKLST   $@
->>>>>          cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
->>>>
->>>> Since cmd_livepatch is only called for single-used-m, does this mean
->>>> that we can only klp-convert single object file livepatch modules?
->>>>
->>>> I stumbled upon this when trying to create a self-test module that
->>>> incorporated two object files.  I tried adding a $(call cmd_livepatch)
->>>> in the recipe for $(obj)/%.o, but that didn't help.  My kbuild foo
->>>> wasn't good enough to figure this one out.
->>>
->>> I looked at my original code and it is a bit different there. I 
->>> placed it
->>> under rule_cc_o_c right after objtool command. If I remember correctly
->>> this is the correct recipe for .c->.o. Unfortunately I forgot the 
->>> details
->>> and there is of course nothing about it in my notes.
->>>
->>> Does it help?
->>>
->>> Joao, is there a reason you moved it elsewhere?
+>> The scenarios that I've observed using klp-convert and kpatch-build:
 >>
->> Hi,
->>
->> Unfortunately I can't remember why the chunk was moved to where it is in
->> this version of the patch, sorry. Yet, I did try to move this into the
->> rule cc_o_c and it seemed to work with not damage.
->>
->> Joe, would you kindly verify and squash properly the patch below, which
->> places cmd_livepatch in rule_cc_o_c?
->>
->> Thank you.
->>
->> Subject: [PATCH] Move cmd_klp_convert to the right place
->>
->>
->> Signed-off-by: Joao Moreira <jmoreira@suse.de>
->>
->> ---
->>
->>    scripts/Makefile.build | 2 +-
->>
->>    1 file changed, 1 insertion(+), 1 deletion(-)
->>
->>
->> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
->> index 1e28ad21314c..5f66106a47d6 100644
->> --- a/scripts/Makefile.build
->> +++ b/scripts/Makefile.build
->> @@ -260,6 +260,7 @@ define rule_cc_o_c
->>           $(call cmd,objtool)
->>           $(call cmd,modversions_c)
->>           $(call cmd,record_mcount)
->> +       $(call cmd,livepatch)
->>    endef
->>    define rule_as_o_S
->> @@ -288,7 +289,6 @@ $(single-used-m): $(obj)/%.o: $(src)/%.c
->> $(recordmcount_source) $(objtool_dep) F
->>           $(call if_changed_rule,cc_o_c)
->>           @{ echo $(@:.o=.ko); echo $@; \
->>              $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
->> -       $(call cmd_livepatch)
->>    quiet_cmd_cc_lst_c = MKLST   $@
->>          cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+>>    sympos == 0, uniquely named symbol
+>>    sympos == 1, non-unique symbol name, first instance
+>>    sympos == 2, non-unique symbol name, second instance
+>>    ...
 > 
-> Hi Joao,
-> 
-> This change seems to work okay for (again) single object modules, but 
-> I'm having issues with multi-object modules.
+> Yes, that is exactly how we defined it back then.
+>   
+>> When I built a klp-convert selftest, I made sure that the target module
+>> contained multiple symbols of the same name across two .o files.
+>> However, when I tried to use a KLP_MODULE_RELOC annotation in the
+>> livepatch to resolve to the second (ie, last) symbol, using a sympos=2,
+>> klp-convert kept telling me that the only valid KLP_SYMPOS were 0 and 1.
+>>
+>> The following code adjusts klp-convert to match the sympos logic, as I
+>> understand it in livepatch/core.c and kpatch-build;
+>>
+>>    [squash] livepatch/klp-convert: fix klp-convert off-by-one sympos
+>>    https://github.com/torvalds/linux/commit/1ed8e5baa98f7920bbbaa562278b3ed44552e01f
+>>
+>> This change also adds a check that sympos == 0 is in fact a uniquely
+>> named symbol.
 > 
 
-Hi Joe, thanks for the sources, this made everything much easier in my 
-side :)
+Nice catch, thanks for it. All looks good to me.
 
-In the patch below I change a little bit the interface used to inform 
-kbuild that a module is a livepatch. Instead of defining the flag 
-LIVEPATCH_ per .o file, we define it per module (what actually makes 
-much more sense). We later use $(basetarget) in the Makefile for 
-checking the flags. By doing so, and invoking cmd_livepatch both from 
-the $(single-used-m) and $(multi-used-m) we ensure that the .livepatch 
-file is created for each module, what later in the pipeline flags the 
-invocation of klp-convert.
+> Looks good to me. Maybe we can even make it simpler and use similar
+> approach as in klp_find_callback() and klp_find_object_symbol() from
+> kernel/livepatch/core.c. On the other hand, given that we want to print
+> useful output in all cases, the code might happen to be more complicated
+> and definitely ugly.
 
-I tested the following patch with the sources you provided (with little 
-modifications, removing the .o from the LIVEPATCH_ definitions and using 
-the module name instead of the object names), achieving successful 
-compilation and conversion. I also tested against the sample 
-livepatches, thus I think it might be ok now.
+I don't have an opinion here.
 
-Do you think we can go this way to solve the problem in v3?
+>   
+>>> [ ... snip ... ]
+>>> +
+>>> +int main(int argc, const char **argv)
+>>> +{
+>>> +	const char *klp_in_module, *klp_out_module, *symbols_list;
+>>> +	struct rela *rela, *tmprela;
+>>> +	struct section *sec, *aux;
+>>> +	struct sympos sp;
+>>> +	struct elf *klp_elf;
+>>> +
+>>> +	if (argc != 4) {
+>>> +		WARN("Usage: %s <Symbols.list> <input.ko> <out.ko>", argv[0]);
+>>> +		return -1;
+>>> +	}
+>>> +
+>>> +	symbols_list = argv[1];
+>>> +	klp_in_module = argv[2];
+>>> +	klp_out_module = argv[3];
+>>> +
+>>> +	klp_elf = elf_open(klp_in_module);
+>>> +	if (!klp_elf) {
+>>> +		WARN("Unable to read elf file %s\n", klp_in_module);
+>>> +		return -1;
+>>> +	}
+>>> +
+>>> +	if (!load_syms_lists(symbols_list))
+>>> +		return -1;
+>>> +
+>>> +	if (!load_usr_symbols(klp_elf)) {
+>>> +		WARN("Unable to load user-provided sympos");
+>>> +		return -1;
+>>> +	}
+>>> +
+>>> +	list_for_each_entry_safe(sec, aux, &klp_elf->sections, list) {
+>>> +		if (!is_rela_section(sec))
+>>> +			continue;
+>>> +
+>>> +		list_for_each_entry_safe(rela, tmprela, &sec->relas, list) {
+>>> +			if (!must_convert(rela->sym))
+>>> +				continue;
+>>> +
+>>> +			if (!find_missing_position(rela->sym, &sp)) {
+>>> +				WARN("Unable to find missing symbol");
+>>
+>> A really minor suggestion, but I found it useful to tell the user
+>> exactly which symbol was missing:
+>>
+>>    [squash] livepatch/klp-convert: add missing symbol name to warning
+>>    https://github.com/torvalds/linux/commit/7a41a8f3d9b9e11f0c75914cb925af1486c1ecc6
+> 
+> I think that Joao has exactly the same hunk staged somewhere
+> already. You are right. The message is not much informative.
+> 
 
--- PATCH --
+Yes, someone had the same idea for the klp-convert which we use inside 
+SUSE. But it did not make it to this patch-set.
 
-Subject: [PATCH] Fix cmd_livepatch for multi-object modules 
+Nice that Joe added it here :)
 
- 
-
-Signed-off-by: Joao Moreira <jmoreira@suse.de> 
-
---- 
-
-  samples/livepatch/Makefile | 10 +++++----- 
-
-  scripts/Makefile.build     |  5 +++-- 
-
-  2 files changed, 8 insertions(+), 7 deletions(-) 
-
- 
-
-diff --git a/samples/livepatch/Makefile b/samples/livepatch/Makefile 
-
-index 93725c434f4f..dea530840725 100644 
-
---- a/samples/livepatch/Makefile 
-
-+++ b/samples/livepatch/Makefile 
-
-@@ -1,8 +1,8 @@ 
-
--LIVEPATCH_livepatch-sample.o := y 
-
--LIVEPATCH_livepatch-shadow-fix1.o := y 
-
--LIVEPATCH_livepatch-shadow-fix2.o := y 
-
--LIVEPATCH_livepatch-callbacks-demo.o := y 
-
--LIVEPATCH_livepatch-annotated-sample.o := y 
-
-+LIVEPATCH_livepatch-sample := y 
-
-+LIVEPATCH_livepatch-shadow-fix1 := y 
-
-+LIVEPATCH_livepatch-shadow-fix2 := y 
-
-+LIVEPATCH_livepatch-callbacks-demo := y 
-
-+LIVEPATCH_livepatch-annotated-sample := y 
-
- 
-
-  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-sample.o 
-
-  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-mod.o 
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build 
-
-index dba89e605eab..52e69b4084d5 100644 
-
---- a/scripts/Makefile.build 
-
-+++ b/scripts/Makefile.build 
-
-@@ -250,7 +250,7 @@ cmd_gen_ksymdeps = \ 
-
-  endif 
-
- 
-
-  ifdef CONFIG_LIVEPATCH 
-
--cmd_livepatch = $(if $(LIVEPATCH_$(basetarget).o), 
-\
-+cmd_livepatch = $(if $(LIVEPATCH_$(basetarget)), 
-\
-         $(shell touch $(MODVERDIR)/$(basetarget).livepatch)) 
-
-  endif 
-
- 
-
-@@ -288,9 +288,9 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) 
-$(objtool_dep) FORCE
-  $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) 
-$(objtool_dep) FORCE
-         $(call cmd,force_checksrc) 
-
-         $(call if_changed_rule,cc_o_c) 
-
-+       $(call cmd,livepatch) 
-
-         @{ echo $(@:.o=.ko); echo $@; \ 
-
-            $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod) 
-
--       $(call cmd_livepatch) 
-
- 
-
-  quiet_cmd_cc_lst_c = MKLST   $@ 
-
-        cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \ 
-
-@@ -469,6 +469,7 @@ cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ 
-$(filter %.o,$^) $(cmd_secanalysis
- 
-
-  $(multi-used-m): FORCE 
-
-         $(call if_changed,link_multi-m) 
-
-+       $(call cmd,livepatch) 
-
-         @{ echo $(@:.o=.ko); echo $(filter %.o,$^); \ 
-
-            $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod) 
-
-  $(call multi_depend, $(multi-used-m), .o, -objs -y -m) 
-
--- 
-
-2.16.4
+> Miroslav
+> 
