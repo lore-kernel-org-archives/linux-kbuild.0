@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:45978 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:56490 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731961AbfCZGe6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Mar 2019 02:34:58 -0400
+        id S1732360AbfCZGkQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 26 Mar 2019 02:40:16 -0400
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.14 26/41] x86/unwind: Add hardcoded ORC entry for NULL
-Date: Tue, 26 Mar 2019 15:30:03 +0900
-Message-Id: <20190326042651.358404094@linuxfoundation.org>
-In-Reply-To: <20190326042649.889479098@linuxfoundation.org>
-References: <20190326042649.889479098@linuxfoundation.org>
+Subject: [PATCH 5.0 48/52] x86/unwind: Add hardcoded ORC entry for NULL
+Date: Tue, 26 Mar 2019 15:30:35 +0900
+Message-Id: <20190326042703.541084024@linuxfoundation.org>
+In-Reply-To: <20190326042700.963224437@linuxfoundation.org>
+References: <20190326042700.963224437@linuxfoundation.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -17,7 +17,7 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Jann Horn <jannh@google.com>, Thomas Gleixner <tglx@linutronix.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Borislav Petkov <bp@alien8.de>, Andrew Morton <akpm@linux-foundation.org>, syzbot <syzbot+ca95b2b7aef9e7cbd6ab@syzkaller.appspotmail.com>, "H. Peter Anvin" <hpa@zytor.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
 
-4.14-stable review patch.  If anyone has any objections, please let me know.
+5.0-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -76,7 +76,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/arch/x86/kernel/unwind_orc.c
 +++ b/arch/x86/kernel/unwind_orc.c
-@@ -74,11 +74,28 @@ static struct orc_entry *orc_module_find
+@@ -113,6 +113,20 @@ static struct orc_entry *orc_ftrace_find
  }
  #endif
  
@@ -96,6 +96,8 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 +
  static struct orc_entry *orc_find(unsigned long ip)
  {
+ 	static struct orc_entry *orc;
+@@ -120,6 +134,9 @@ static struct orc_entry *orc_find(unsign
  	if (!orc_init)
  		return NULL;
  
