@@ -1,86 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:54430 "EHLO mail.kernel.org"
+Received: from foss.arm.com ([217.140.101.70]:34074 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389130AbfC0SMC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:12:02 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.19 054/192] kbuild: invoke syncconfig if include/config/auto.conf.cmd is missing
-Date: Wed, 27 Mar 2019 14:08:06 -0400
-Message-Id: <20190327181025.13507-54-sashal@kernel.org>
-In-Reply-To: <20190327181025.13507-1-sashal@kernel.org>
-References: <20190327181025.13507-1-sashal@kernel.org>
+        id S1727796AbfC0TU3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 27 Mar 2019 15:20:29 -0400
+Date: Wed, 27 Mar 2019 19:20:21 +0000
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH] kbuild: do not overwrite .gitignore in output directory
+Message-ID: <20190327192021.5d676019@donnerap.cambridge.arm.com>
+In-Reply-To: <1553574418-21033-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1553574418-21033-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Vladimir Kondratiev <vladimir.kondratiev@linux.intel.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
+On Tue, 26 Mar 2019 13:26:58 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-[ Upstream commit 9390dff66a52d1a60c6e517d8fa6cdbdffc83cb1 ]
+Masahiro,
 
-If include/config/auto.conf.cmd is lost for some reasons, it is not
-self-healing, so the top Makefile misses to run syncconfig.
-Move include/config/auto.conf.cmd to the target side.
+> Commit 3a51ff344204 ("kbuild: gitignore output directory") seemed to
+> bother people who version-control output directories.
 
-I used a pattern rule instead of a normal rule here although it is
-a bit gross.
+Thanks a lot for the patch, that works for me.
 
-If the rule were written with a normal rule like this,
+> Andre Przywara says:
+> "Unfortunately this breaks my setup, because I keep a totally separate
+> git repository in my build directories to track (various versions of)
+> .config. So .gitignore there is carefully crafted to ignore most build
+> artefacts, but not .config, for instance."
+> 
+> Link: https://lkml.org/lkml/2019/3/22/1819
+> Reported-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-  include/config/auto.conf \
-  include/config/auto.conf.cmd \
-  include/config/tristate.conf: $(KCONFIG_CONFIG)
-          $(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
+Tested-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-... syncconfig would be executed per target.
+Cheers,
+Andre.
 
-Using a pattern rule makes sure that syncconfig is executed just once
-because Make assumes the recipe will create all of the targets.
-
-Here is a quote from the GNU Make manual [1]:
-
-"Pattern rules may have more than one target. Unlike normal rules,
-this does not act as many different rules with the same prerequisites
-and recipe. If a pattern rule has multiple targets, make knows that
-the rule's recipe is responsible for making all of the targets. The
-recipe is executed only once to make all the targets. When searching
-for a pattern rule to match a target, the target patterns of a rule
-other than the one that matches the target in need of a rule are
-incidental: make worries only about giving a recipe and prerequisites
-to the file presently in question. However, when this file's recipe is
-run, the other targets are marked as having been updated themselves."
-
-[1]: https://www.gnu.org/software/make/manual/html_node/Pattern-Intro.html
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- Makefile | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 3b1c6cff6700..c35c1b0aa661 100644
---- a/Makefile
-+++ b/Makefile
-@@ -626,12 +626,15 @@ ifeq ($(may-sync-config),1)
- -include include/config/auto.conf.cmd
- 
- # To avoid any implicit rule to kick in, define an empty command
--$(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
-+$(KCONFIG_CONFIG): ;
- 
- # The actual configuration files used during the build are stored in
- # include/generated/ and include/config/. Update them if .config is newer than
- # include/config/auto.conf (which mirrors .config).
--include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
-+#
-+# This exploits the 'multi-target pattern rule' trick.
-+# The syncconfig should be executed only once to make all the targets.
-+%/auto.conf %/auto.conf.cmd %/tristate.conf: $(KCONFIG_CONFIG)
- 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
- else
- # External modules and some install targets need include/generated/autoconf.h
--- 
-2.19.1
+> ---
+> 
+>  Makefile | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 5fe5431..70fc778 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -499,7 +499,8 @@ outputmakefile:
+>  ifneq ($(KBUILD_SRC),)
+>  	$(Q)ln -fsn $(srctree) source
+>  	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile $(srctree)
+> -	$(Q){ echo "# this is build directory, ignore it"; echo "*"; } > .gitignore
+> +	$(Q)test -e .gitignore || \
+> +	{ echo "# this is build directory, ignore it"; echo "*"; } > .gitignore
+>  endif
+>  
+>  ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
