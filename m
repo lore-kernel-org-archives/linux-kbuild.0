@@ -1,69 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ste-pvt-msa2.bahnhof.se ([213.80.101.71]:5962 "EHLO
-        ste-pvt-msa2.bahnhof.se" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387881AbfC0SNA (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:13:00 -0400
-Date: Wed, 27 Mar 2019 19:12:50 +0100
-From: Fredrik Noring <noring@nocrew.org>
-Subject: [PATCH v2] kbuild: modversions: Fix relative CRC byte order
- interpretation
-Message-ID: <20190327181250.GA2563@sx9>
-References: <20190323184618.GA4916@sx9>
- <20190324063019.GA2555@sx9>
- <CAK7LNARM++Agci9Sg0P4XJ6NrRHG2JDEyp341cV2+vNwNeShaQ@mail.gmail.com>
+Received: from mail.kernel.org ([198.145.29.99]:54430 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389130AbfC0SMC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 27 Mar 2019 14:12:02 -0400
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 054/192] kbuild: invoke syncconfig if include/config/auto.conf.cmd is missing
+Date: Wed, 27 Mar 2019 14:08:06 -0400
+Message-Id: <20190327181025.13507-54-sashal@kernel.org>
+In-Reply-To: <20190327181025.13507-1-sashal@kernel.org>
+References: <20190327181025.13507-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARM++Agci9Sg0P4XJ6NrRHG2JDEyp341cV2+vNwNeShaQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Maciej W. Rozycki" <macro@linux-mips.org>
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
 
-Fix commit 56067812d5b0 ("kbuild: modversions: add infrastructure for
-emitting relative CRCs") where CRCs are interpreted in host byte order
-rather than proper kernel byte order. The bug is conditional on
-CONFIG_MODULE_REL_CRCS.
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-For example, when loading a BE module into a BE kernel compiled with a LE
-system, the error "disagrees about version of symbol module_layout" is
-produced. A message such as "Found checksum D7FA6856 vs module 5668FAD7"
-will be given with debug enabled, which indicates an obvious endian
-problem within __kcrctab within the kernel image.
+[ Upstream commit 9390dff66a52d1a60c6e517d8fa6cdbdffc83cb1 ]
 
-The general solution is to use the macro TO_NATIVE, as is done in
-similar cases throughout modpost.c. With this correction it has been
-verified that a BE kernel compiled with a LE system accepts BE modules.
+If include/config/auto.conf.cmd is lost for some reasons, it is not
+self-healing, so the top Makefile misses to run syncconfig.
+Move include/config/auto.conf.cmd to the target side.
 
-This change has also been verified with a LE kernel compiled with a LE
-system, in which case TO_NATIVE returns its value unmodified since the
-byte orders match. This is by far the common case.
+I used a pattern rule instead of a normal rule here although it is
+a bit gross.
 
-Fixes: 56067812d5b0 ("kbuild: modversions: add infrastructure for emitting relative CRCs")
-Signed-off-by: Fredrik Noring <noring@nocrew.org>
-Cc: stable@vger.kernel.org
+If the rule were written with a normal rule like this,
+
+  include/config/auto.conf \
+  include/config/auto.conf.cmd \
+  include/config/tristate.conf: $(KCONFIG_CONFIG)
+          $(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
+
+... syncconfig would be executed per target.
+
+Using a pattern rule makes sure that syncconfig is executed just once
+because Make assumes the recipe will create all of the targets.
+
+Here is a quote from the GNU Make manual [1]:
+
+"Pattern rules may have more than one target. Unlike normal rules,
+this does not act as many different rules with the same prerequisites
+and recipe. If a pattern rule has multiple targets, make knows that
+the rule's recipe is responsible for making all of the targets. The
+recipe is executed only once to make all the targets. When searching
+for a pattern rule to match a target, the target patterns of a rule
+other than the one that matches the target in need of a rule are
+incidental: make worries only about giving a recipe and prerequisites
+to the file presently in question. However, when this file's recipe is
+run, the other targets are marked as having been updated themselves."
+
+[1]: https://www.gnu.org/software/make/manual/html_node/Pattern-Intro.html
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Thank you for your review, Masahiro,
+ Makefile | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Changes in v2:
-- Fix subject spelling mistake.
-- Note that the bug is conditional on CONFIG_MODULE_REL_CRCS.
-- Clarify kernel image and __kcrctab compilation details.
-- Mention verification of matching LE byte order common case.
-
-Fredrik
----
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 0b0d1080b1c5..f277e116e0eb 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -639,7 +639,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- 			       info->sechdrs[sym->st_shndx].sh_offset -
- 			       (info->hdr->e_type != ET_REL ?
- 				info->sechdrs[sym->st_shndx].sh_addr : 0);
--			crc = *crcp;
-+			crc = TO_NATIVE(*crcp);
- 		}
- 		sym_update_crc(symname + strlen("__crc_"), mod, crc,
- 				export);
+diff --git a/Makefile b/Makefile
+index 3b1c6cff6700..c35c1b0aa661 100644
+--- a/Makefile
++++ b/Makefile
+@@ -626,12 +626,15 @@ ifeq ($(may-sync-config),1)
+ -include include/config/auto.conf.cmd
+ 
+ # To avoid any implicit rule to kick in, define an empty command
+-$(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
++$(KCONFIG_CONFIG): ;
+ 
+ # The actual configuration files used during the build are stored in
+ # include/generated/ and include/config/. Update them if .config is newer than
+ # include/config/auto.conf (which mirrors .config).
+-include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
++#
++# This exploits the 'multi-target pattern rule' trick.
++# The syncconfig should be executed only once to make all the targets.
++%/auto.conf %/auto.conf.cmd %/tristate.conf: $(KCONFIG_CONFIG)
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
+ else
+ # External modules and some install targets need include/generated/autoconf.h
+-- 
+2.19.1
