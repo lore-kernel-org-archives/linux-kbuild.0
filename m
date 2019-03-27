@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:44852 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:44838 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733210AbfC0SEQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:04:16 -0400
+        id S1733197AbfC0SEP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 27 Mar 2019 14:04:15 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.0 075/262] kbuild: make -r/-R effective in top Makefile for old Make versions
-Date: Wed, 27 Mar 2019 13:58:50 -0400
-Message-Id: <20190327180158.10245-75-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.0 074/262] kbuild: invoke syncconfig if include/config/auto.conf.cmd is missing
+Date: Wed, 27 Mar 2019 13:58:49 -0400
+Message-Id: <20190327180158.10245-74-sashal@kernel.org>
 In-Reply-To: <20190327180158.10245-1-sashal@kernel.org>
 References: <20190327180158.10245-1-sashal@kernel.org>
 MIME-Version: 1.0
@@ -18,146 +18,69 @@ Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.
 
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-[ Upstream commit 3812b8c5c5d527239ac015f1f2c7654da7fcfbba ]
+[ Upstream commit 9390dff66a52d1a60c6e517d8fa6cdbdffc83cb1 ]
 
-Adding -rR to MAKEFLAGS is important because we do not want to
-be bothered by built-in implicit rules or variables.
+If include/config/auto.conf.cmd is lost for some reasons, it is not
+self-healing, so the top Makefile misses to run syncconfig.
+Move include/config/auto.conf.cmd to the target side.
 
-One problem that used to exist in older GNU Make versions is
+I used a pattern rule instead of a normal rule here although it is
+a bit gross.
 
-  MAKEFLAGS += -rR
+If the rule were written with a normal rule like this,
 
-... does not become effective in the current Makefile. When you are
-building with O= option, it becomes effective in the top Makefile
-since it recurses via 'sub-make' target. Otherwise, the top Makefile
-tries implicit rules. That is why we explicitly add empty rules for
-Makefiles, but we often miss to do that.
+  include/config/auto.conf \
+  include/config/auto.conf.cmd \
+  include/config/tristate.conf: $(KCONFIG_CONFIG)
+          $(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
 
-In fact, adding -d option to older GNU Make versions shows it is
-trying a bunch of implicit pattern rules.
+... syncconfig would be executed per target.
 
- Considering target file `scripts/Makefile.kcov'.
-  Looking for an implicit rule for `scripts/Makefile.kcov'.
-  Trying pattern rule with stem `Makefile.kcov'.
-  Trying implicit prerequisite `scripts/Makefile.kcov.o'.
-  Trying pattern rule with stem `Makefile.kcov'.
-  Trying implicit prerequisite `scripts/Makefile.kcov.c'.
-  Trying pattern rule with stem `Makefile.kcov'.
-  Trying implicit prerequisite `scripts/Makefile.kcov.cc'.
-  Trying pattern rule with stem `Makefile.kcov'.
-  Trying implicit prerequisite `scripts/Makefile.kcov.C'.
-  ...
+Using a pattern rule makes sure that syncconfig is executed just once
+because Make assumes the recipe will create all of the targets.
 
-This issue was fixed by GNU Make commit 58dae243526b ("[Savannah #20501]
-Handle adding -r/-R to MAKEFLAGS in the makefile"). So, it is no longer
-a problem if you use GNU Make 4.0 or later. However, older versions are
-still widely used.
+Here is a quote from the GNU Make manual [1]:
 
-So, I decided to patch the kernel Makefile to invoke sub-make regardless
-of O= option. This will allow further cleanups.
+"Pattern rules may have more than one target. Unlike normal rules,
+this does not act as many different rules with the same prerequisites
+and recipe. If a pattern rule has multiple targets, make knows that
+the rule's recipe is responsible for making all of the targets. The
+recipe is executed only once to make all the targets. When searching
+for a pattern rule to match a target, the target patterns of a rule
+other than the one that matches the target in need of a rule are
+incidental: make worries only about giving a recipe and prerequisites
+to the file presently in question. However, when this file's recipe is
+run, the other targets are marked as having been updated themselves."
+
+[1]: https://www.gnu.org/software/make/manual/html_node/Pattern-Intro.html
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- Makefile | 48 ++++++++++++++++++++++++++----------------------
- 1 file changed, 26 insertions(+), 22 deletions(-)
+ Makefile | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 89af52ca0ba5..efec82635ac5 100644
+index 06fda21614bc..89af52ca0ba5 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -15,19 +15,6 @@ NAME = Shy Crocodile
- PHONY := _all
- _all:
+@@ -625,12 +625,15 @@ ifeq ($(may-sync-config),1)
+ -include include/config/auto.conf.cmd
  
--# Do not use make's built-in rules and variables
--# (this increases performance and avoids hard-to-debug behaviour)
--MAKEFLAGS += -rR
--
--# Avoid funny character set dependencies
--unexport LC_ALL
--LC_COLLATE=C
--LC_NUMERIC=C
--export LC_COLLATE LC_NUMERIC
--
--# Avoid interference with shell env settings
--unexport GREP_OPTIONS
--
- # We are using a recursive build, so we need to do a little thinking
- # to get the ordering right.
- #
-@@ -44,6 +31,21 @@ unexport GREP_OPTIONS
- # descending is started. They are now explicitly listed as the
- # prepare rule.
+ # To avoid any implicit rule to kick in, define an empty command
+-$(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
++$(KCONFIG_CONFIG): ;
  
-+ifneq ($(sub-make-done),1)
-+
-+# Do not use make's built-in rules and variables
-+# (this increases performance and avoids hard-to-debug behaviour)
-+MAKEFLAGS += -rR
-+
-+# Avoid funny character set dependencies
-+unexport LC_ALL
-+LC_COLLATE=C
-+LC_NUMERIC=C
-+export LC_COLLATE LC_NUMERIC
-+
-+# Avoid interference with shell env settings
-+unexport GREP_OPTIONS
-+
- # Beautify output
- # ---------------------------------------------------------------------------
- #
-@@ -112,7 +114,6 @@ export quiet Q KBUILD_VERBOSE
- 
- # KBUILD_SRC is not intended to be used by the regular user (for now),
- # it is set on invocation of make with KBUILD_OUTPUT or O= specified.
--ifeq ($(KBUILD_SRC),)
- 
- # OK, Make called in directory where kernel src resides
- # Do we want to locate output files in a separate directory?
-@@ -142,6 +143,13 @@ $(if $(KBUILD_OUTPUT),, \
- # 'sub-make' below.
- MAKEFLAGS += --include-dir=$(CURDIR)
- 
-+else
-+
-+# Do not print "Entering directory ..." at all for in-tree build.
-+MAKEFLAGS += --no-print-directory
-+
-+endif # ifneq ($(KBUILD_OUTPUT),)
-+
- PHONY += $(MAKECMDGOALS) sub-make
- 
- $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
-@@ -149,16 +157,12 @@ $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
- 
- # Invoke a second make in the output directory, passing relevant variables
- sub-make:
--	$(Q)$(MAKE) -C $(KBUILD_OUTPUT) KBUILD_SRC=$(CURDIR) \
-+	$(Q)$(MAKE) sub-make-done=1 \
-+	$(if $(KBUILD_OUTPUT),-C $(KBUILD_OUTPUT) KBUILD_SRC=$(CURDIR)) \
- 	-f $(CURDIR)/Makefile $(filter-out _all sub-make,$(MAKECMDGOALS))
- 
--# Leave processing to above invocation of make
--skip-makefile := 1
--endif # ifneq ($(KBUILD_OUTPUT),)
--endif # ifeq ($(KBUILD_SRC),)
--
-+else # sub-make-done
- # We process the rest of the Makefile if this is the final invocation of make
--ifeq ($(skip-makefile),)
- 
- # Do not print "Entering directory ...",
- # but we want to display it when entering to the output directory
-@@ -1757,7 +1761,7 @@ $(cmd_files): ;	# Do not try to update included dependency files
- 
- endif   # ifeq ($(config-targets),1)
- endif   # ifeq ($(mixed-targets),1)
--endif	# skip-makefile
-+endif   # sub-make-done
- 
- PHONY += FORCE
- FORCE:
+ # The actual configuration files used during the build are stored in
+ # include/generated/ and include/config/. Update them if .config is newer than
+ # include/config/auto.conf (which mirrors .config).
+-include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
++#
++# This exploits the 'multi-target pattern rule' trick.
++# The syncconfig should be executed only once to make all the targets.
++%/auto.conf %/auto.conf.cmd %/tristate.conf: $(KCONFIG_CONFIG)
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
+ else
+ # External modules and some install targets need include/generated/autoconf.h
 -- 
 2.19.1
