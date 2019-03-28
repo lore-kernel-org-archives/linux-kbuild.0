@@ -1,46 +1,188 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:40856 "EHLO mail.kernel.org"
+Received: from mx1.redhat.com ([209.132.183.28]:56122 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725828AbfC1Spu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Mar 2019 14:45:50 -0400
-Date: Thu, 28 Mar 2019 19:45:46 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [RESEND PATCH v1] moduleparam: Save information about built-in
- modules in separate file
-Message-ID: <20190328184546.GB23800@kroah.com>
-References: <20190315101013.GN8455@Legion-PC.fortress>
- <CAK7LNATsm23e_CuyfFw7_CR8xZQ3HnwNHCXhEm_zQZU2PUGK5A@mail.gmail.com>
- <20190326172411.GA15936@Legion-PC.fortress>
- <20190327154025.GB23293@linux-8ccs>
- <CAKi4VA+14kihzGFbMT623BwMbZEzgYU6+jz8MpR9jqoC059oog@mail.gmail.com>
+        id S1726165AbfC1URI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 28 Mar 2019 16:17:08 -0400
+Date: Thu, 28 Mar 2019 16:17:03 -0400
+From: Joe Lawrence <joe.lawrence@redhat.com>
+Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
+Message-ID: <20190328201703.GA8658@redhat.com>
+References: <20190301141313.15057-1-jmoreira@suse.de>
+ <20190301141313.15057-3-jmoreira@suse.de>
+ <20190318191926.GA23138@redhat.com>
+ <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz>
+ <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de>
+ <ae018181-fd8a-03b2-69bf-e9302172bfeb@redhat.com>
+ <699e78da-36ba-8217-c509-2e9b443bd380@suse.de>
+ <1b6ee81b-5699-a1cc-9a85-02df0eeaed12@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKi4VA+14kihzGFbMT623BwMbZEzgYU6+jz8MpR9jqoC059oog@mail.gmail.com>
+In-Reply-To: <1b6ee81b-5699-a1cc-9a85-02df0eeaed12@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Cc: Jessica Yu <jeyu@kernel.org>, Alexey Gladkov <gladkov.alexey@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-api@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>, linux-modules <linux-modules@vger.kernel.org>
+To: Joao Moreira <jmoreira@suse.de>, Miroslav Benes <mbenes@suse.cz>
+Cc: live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
-On Thu, Mar 28, 2019 at 10:41:59AM -0700, Lucas De Marchi wrote:
-> On Wed, Mar 27, 2019 at 8:40 AM Jessica Yu <jeyu@kernel.org> wrote:
-> > >No. There are definitely not all modules. I have a builtin sha256_generic,
-> > >but I can't find him in the /sys/module.
-> >
-> > Yeah, you'll only find builtin modules under /sys/module/ if it has any module
-> > parameters, otherwise you won't find it there. As Masahiro already mentioned,
-> > if a builtin module has any parameters, they would be accessible under /sys/module/.
+On Tue, Mar 26, 2019 at 04:53:12PM -0400, Joe Lawrence wrote:
+> On 3/26/19 2:13 PM, Joao Moreira wrote:
+> > 
+> > 
+> > On 3/26/19 1:15 PM, Joe Lawrence wrote:
+> >>
+> > > Hi Joao,
+> > > 
+> > > This change seems to work okay for (again) single object modules, but
+> > > I'm having issues with multi-object modules.
+> > > 
+> > 
+> > Hi Joe, thanks for the sources, this made everything much easier in my
+> > side :)
+> > 
+> > In the patch below I change a little bit the interface used to inform
+> > kbuild that a module is a livepatch. Instead of defining the flag
+> > LIVEPATCH_ per .o file, we define it per module (what actually makes
+> > much more sense). We later use $(basetarget) in the Makefile for
+> > checking the flags. By doing so, and invoking cmd_livepatch both from
+> > the $(single-used-m) and $(multi-used-m) we ensure that the .livepatch
+> > file is created for each module, what later in the pipeline flags the
+> > invocation of klp-convert.
+> > 
+> > I tested the following patch with the sources you provided (with little
+> > modifications, removing the .o from the LIVEPATCH_ definitions and using
+> > the module name instead of the object names), achieving successful
+> > compilation and conversion. I also tested against the sample
+> > livepatches, thus I think it might be ok now.
 > 
-> Could we please change that and add the sysfs entry regardless of
-> what's being discussed here? Not having the entry there simply because
-> we don't have parameters for that module always annoyed me.
+> Cool thanks for taking a look -- I can confirm that the toy code I sent over
+> builds with those modifications and so does the sample and selftest I was
+> working on.  I'll set about refactoring that klp-convert selftest to combine
+> .o files into a more compact module.
 
-What is the sysfs directory going to show?  Will it just be empty?
+Hmm, maybe I spoke too soon.
 
-Feel free to send a patch for this, but from what I remember, it wasn't
-the easiest thing to do for some reason.  But given that the code was
-implemented before git was, I can't quite remember.
+I am having issues if I have a two-object livepatch module in which each
+object file needs to specify its own KLP_MODULE_RELOC for the same
+symbol name.
 
-thanks,
+For example: I have test_klp_convert.ko which is comprised of 
+test_klp_convert_a.o. which needs to refer to state_show,1 and 
+test_klp_convert_b.o. which needs to refer to state_show,2.
 
-greg k-h
+  % make
+  ...
+    KLP     lib/livepatch/test_klp_convert.ko
+  klp-convert: Conflicting KLP_SYMPOS definition: vmlinux.state_show,0 vs. vmlinux.state_show,1.
+  klp-convert: Unable to load user-provided sympos
+  make[2]: *** [scripts/Makefile.modpost:148: lib/livepatch/test_klp_convert.ko] Error 255
+  make[1]: *** [/home/cloud-user/disk/linux/Makefile:1282: modules] Error 2
+  make: *** [Makefile:170: sub-make] Error 2
+
+I take a closer look next week, but in the meantime, see the source
+files below.
+
+-- Joe
+
+
+==> lib/livepatch/test_klp_convert_a.c <==
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/livepatch.h>
+
+/* klp-convert symbols - vmlinux */
+extern void *state_show;
+__used void print_state_show(void)
+{
+	pr_info("%s: state_show: %p\n", __func__, state_show);
+}
+
+KLP_MODULE_RELOC(vmlinux) vmlinux_relocs_a[] = {
+	KLP_SYMPOS(state_show, 1)
+};
+
+static struct klp_func funcs[] = {
+	{
+	}, { }
+};
+
+static struct klp_object objs[] = {
+	{
+		/* name being NULL means vmlinux */
+		.funcs = funcs,
+	}, { }
+};
+
+static struct klp_patch patch = {
+	.mod = THIS_MODULE,
+	.objs = objs,
+};
+
+static int test_klp_convert_init(void)
+{
+	int ret;
+
+	ret = klp_enable_patch(&patch);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+static void test_klp_convert_exit(void)
+{
+}
+
+module_init(test_klp_convert_init);
+module_exit(test_klp_convert_exit);
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Joe Lawrence <joe.lawrence@redhat.com>");
+MODULE_DESCRIPTION("Livepatch test: klp-convert");
+
+==> lib/livepatch/test_klp_convert_b.c <==
+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/livepatch.h>
+
+/* klp-convert symbols - vmlinux */
+extern void *state_show;
+
+__used void print_state_show_b(void)
+{
+	pr_info("%s: state_show: %p\n", __func__, state_show);
+}
+
+KLP_MODULE_RELOC(vmlinux) vmlinux_relocs_b[] = {
+	KLP_SYMPOS(state_show, 2)
+};
+
+
+==> lib/livepatch/Makefile <==
+# SPDX-License-Identifier: GPL-2.0
+#
+# Makefile for livepatch test code.
+
+LIVEPATCH_test_klp_atomic_replace := y
+LIVEPATCH_test_klp_callbacks_demo := y
+LIVEPATCH_test_klp_callbacks_demo2 := y
+LIVEPATCH_test_klp_convert := y
+LIVEPATCH_test_klp_livepatch := y
+
+obj-$(CONFIG_TEST_LIVEPATCH) += test_klp_atomic_replace.o \
+				test_klp_callbacks_demo.o \
+				test_klp_callbacks_demo2.o \
+				test_klp_callbacks_busy.o \
+				test_klp_callbacks_mod.o \
+				test_klp_convert.o \
+				test_klp_livepatch.o \
+				test_klp_shadow_vars.o
+
+test_klp_convert-y := \
+	test_klp_convert_a.o \
+	test_klp_convert_b.o
+
+# Target modules to be livepatched require CC_FLAGS_FTRACE
+CFLAGS_test_klp_callbacks_busy.o	+= $(CC_FLAGS_FTRACE)
+CFLAGS_test_klp_callbacks_mod.o		+= $(CC_FLAGS_FTRACE)
+CFLAGS_test_klp_convert_mod.o		+= $(CC_FLAGS_FTRACE)
