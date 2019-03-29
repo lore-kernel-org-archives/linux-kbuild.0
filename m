@@ -1,58 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yb1-f194.google.com ([209.85.219.194]:43080 "EHLO
-        mail-yb1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728548AbfC2AA0 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:54249 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728790AbfC2HvG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Mar 2019 20:00:26 -0400
-Received: by mail-yb1-f194.google.com with SMTP id a84so229265ybg.10
-        for <linux-kbuild@vger.kernel.org>; Thu, 28 Mar 2019 17:00:26 -0700 (PDT)
+        Fri, 29 Mar 2019 03:51:06 -0400
 MIME-Version: 1.0
-Reply-To: husseinmaziq@uymail.com
-From: Hussein Maziq <husseinmaziq5@gmail.com>
-Date: Fri, 29 Mar 2019 00:00:25 +0000
-Message-ID: <CACqmXVg684A4S4VavZrwm=yxoVcsTCUyPdSaNWg3m7Vo_pEjWw@mail.gmail.com>
-Subject: =?UTF-8?Q?Oczekuj=C4=99_twojej_pilnej_odpowiedzi=2E?=
+References: <20190325151647.11581-1-changbin.du@gmail.com>
+In-Reply-To: <20190325151647.11581-1-changbin.du@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 29 Mar 2019 16:50:18 +0900
+Message-ID: <CAK7LNARkTQoAhjk7qPR4Pn0SHKvW4cvSrtC5brATQ2LbsWegtw@mail.gmail.com>
+Subject: Re: [PATCH] kconfig/[mn]conf: handle backspace (^H) key
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Changbin Du <changbin.du@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Drogi przyjacielu,
+On Tue, Mar 26, 2019 at 12:16 AM Changbin Du <changbin.du@gmail.com> wrote:
+>
+> Backspace is not working on some terminal emulators which do not send the
+> key code defined by terminfo. Terminals either send '^H' (8) or '^?' (127).
+> But currently only '$?' is handled.
 
-Prosz=C4=99, wybacz mi, je=C5=9Bli ta wiadomo=C5=9B=C4=87 dotrze do Ciebie =
-jako
-Niespodzianka. Wys=C5=82a=C5=82em ci list do ciebie miesi=C4=85c temu, ale =
-nie jestem
-pewien, czy j=C4=85 dosta=C5=82e=C5=9B, nie s=C5=82ysza=C5=82em od ciebie, =
-i to jest pow=C3=B3d, dla
-kt=C3=B3rego powtarzam W kr=C3=B3tkim wprowadzeniu nazywam si=C4=99 Hussein=
- Maziq,
-jestem prawnikiem z Afryki Zachodniej.Czy mo=C5=BCesz otrzyma=C4=87 transfe=
-r 14
-milion=C3=B3w USD na swoje osobiste konto bankowe dla naszych wsp=C3=B3lnyc=
-h
-korzy=C5=9Bci? Te pieni=C4=85dze nale=C5=BC=C4=85 do mojego zmar=C5=82ego k=
-lienta, kt=C3=B3ry ma to
-samo nazwisko z tob=C4=85, A National of your Country Kto zmar=C5=82 w wypa=
-dku
-samochodowym w My Country lata temu. Z moich licznych poszukiwa=C5=84
-dowiedzia=C5=82em si=C4=99, =C5=BCe zmar=C5=82y nosi z tob=C4=85 to samo na=
-zwisko, dlatego
-chc=C4=99, =C5=BCeby=C5=9B otrzyma=C4=87 te pieni=C4=85dze dla naszej wsp=
-=C3=B3lnej korzy=C5=9Bci.
 
-Je=C5=9Bli chcesz wsp=C3=B3=C5=82pracowa=C4=87 ze mn=C4=85, aby otrzyma=C4=
-=87 te pieni=C4=85dze,
-skontaktuj si=C4=99 ze mn=C4=85 za po=C5=9Brednictwem mojego e-maila, aby u=
-zyska=C4=87
-wi=C4=99cej informacji: husseinmaziq@uymail.com
 
-=C5=BBeby m=C3=B3c osobi=C5=9Bcie zarejestrowa=C4=87 twoje nazwisko w banku=
- jako
-najbli=C5=BCszy krewny, aby mie=C4=87 z tob=C4=85 otwart=C4=85 komunikacj=
-=C4=99.
+Shall I fix '$?' to '^?'
+if it is a typo?
 
-Oczekuj=C4=99 twojej pilnej odpowiedzi.
 
-Z powa=C5=BCaniem.
-Barr.Hussein Maziq.Esq
+
+
+> Let's also handle '^H' for those
+> terminals.
+>
+> Signed-off-by: Changbin Du <changbin.du@gmail.com>
+> ---
+>  scripts/kconfig/lxdialog/inputbox.c | 3 ++-
+>  scripts/kconfig/nconf.c             | 2 +-
+>  scripts/kconfig/nconf.gui.c         | 3 ++-
+>  3 files changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
+> index 611945611bf8..1dcfb288ee63 100644
+> --- a/scripts/kconfig/lxdialog/inputbox.c
+> +++ b/scripts/kconfig/lxdialog/inputbox.c
+> @@ -113,7 +113,8 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
+>                         case KEY_DOWN:
+>                                 break;
+>                         case KEY_BACKSPACE:
+> -                       case 127:
+> +                       case 8:   /* ^H */
+> +                       case 127: /* ^? */
+>                                 if (pos) {
+>                                         wattrset(dialog, dlg.inputbox.atr);
+>                                         if (input_x == 0) {
+> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+> index a4670f4e825a..ac92c0ded6c5 100644
+> --- a/scripts/kconfig/nconf.c
+> +++ b/scripts/kconfig/nconf.c
+> @@ -1048,7 +1048,7 @@ static int do_match(int key, struct match_state *state, int *ans)
+>                 state->match_direction = FIND_NEXT_MATCH_UP;
+>                 *ans = get_mext_match(state->pattern,
+>                                 state->match_direction);
+> -       } else if (key == KEY_BACKSPACE || key == 127) {
+> +       } else if (key == KEY_BACKSPACE || key == 8 || key == 127) {
+>                 state->pattern[strlen(state->pattern)-1] = '\0';
+>                 adj_match_dir(&state->match_direction);
+>         } else
+> diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
+> index 7be620a1fcdb..77f525a8617c 100644
+> --- a/scripts/kconfig/nconf.gui.c
+> +++ b/scripts/kconfig/nconf.gui.c
+> @@ -439,7 +439,8 @@ int dialog_inputbox(WINDOW *main_window,
+>                 case KEY_F(F_EXIT):
+>                 case KEY_F(F_BACK):
+>                         break;
+> -               case 127:
+> +               case 8:   /* ^H */
+> +               case 127: /* ^? */
+>                 case KEY_BACKSPACE:
+>                         if (cursor_position > 0) {
+>                                 memmove(&result[cursor_position-1],
+> --
+> 2.17.1
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
