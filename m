@@ -1,28 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:37060 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729771AbfC2VuM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 29 Mar 2019 17:50:12 -0400
-Subject: Re: [GIT PULL] Kbuild fixes for v5.1-rc3
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAK7LNATH0b3ANTYa59b+AqY73LKON0=Xr73NgZGuJbWYgYDSDA@mail.gmail.com>
-References: <CAK7LNATH0b3ANTYa59b+AqY73LKON0=Xr73NgZGuJbWYgYDSDA@mail.gmail.com>
-Message-Id: <155389621163.28625.3545756317419319479.pr-tracker-bot@kernel.org>
-Date: Fri, 29 Mar 2019 21:50:11 +0000
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:60294 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726132AbfC3FMe (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 30 Mar 2019 01:12:34 -0400
+MIME-Version: 1.0
+References: <1553580672-29551-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1553580672-29551-1-git-send-email-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 30 Mar 2019 14:11:49 +0900
+Message-ID: <CAK7LNARrTy7sFfO7FF=Sadrz7FygRMcfe9oG7bKbWni1PfszRg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: move RETPOLINE flags below config-targets
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, masahiroy@kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-The pull request you sent on Fri, 29 Mar 2019 23:12:30 +0900:
+On Tue, Mar 26, 2019 at 3:11 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> When you run a "make *config" target, the retpoline compiler flags
+> are evaluated for nothing because the code is located above the
+> 'ifeq ($(config-targets),1)'.
+>
+> Move it a bit below to avoid unneeded computation in the Kconfig stage.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-fixes-v5.1
+Applied to linux-kbuild.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/0e40da3efeb02ab0333d01abae20d421841db30a
 
-Thank you!
+>
+>  Makefile | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 1b361bd..66a8e04 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -519,15 +519,6 @@ KBUILD_AFLAGS      += $(CLANG_FLAGS)
+>  export CLANG_FLAGS
+>  endif
+>
+> -RETPOLINE_CFLAGS_GCC := -mindirect-branch=thunk-extern -mindirect-branch-register
+> -RETPOLINE_VDSO_CFLAGS_GCC := -mindirect-branch=thunk-inline -mindirect-branch-register
+> -RETPOLINE_CFLAGS_CLANG := -mretpoline-external-thunk
+> -RETPOLINE_VDSO_CFLAGS_CLANG := -mretpoline
+> -RETPOLINE_CFLAGS := $(call cc-option,$(RETPOLINE_CFLAGS_GCC),$(call cc-option,$(RETPOLINE_CFLAGS_CLANG)))
+> -RETPOLINE_VDSO_CFLAGS := $(call cc-option,$(RETPOLINE_VDSO_CFLAGS_GCC),$(call cc-option,$(RETPOLINE_VDSO_CFLAGS_CLANG)))
+> -export RETPOLINE_CFLAGS
+> -export RETPOLINE_VDSO_CFLAGS
+> -
+>  # The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
+>  # Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
+>  # CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
+> @@ -624,6 +615,15 @@ ifdef CONFIG_FUNCTION_TRACER
+>    CC_FLAGS_FTRACE := -pg
+>  endif
+>
+> +RETPOLINE_CFLAGS_GCC := -mindirect-branch=thunk-extern -mindirect-branch-register
+> +RETPOLINE_VDSO_CFLAGS_GCC := -mindirect-branch=thunk-inline -mindirect-branch-register
+> +RETPOLINE_CFLAGS_CLANG := -mretpoline-external-thunk
+> +RETPOLINE_VDSO_CFLAGS_CLANG := -mretpoline
+> +RETPOLINE_CFLAGS := $(call cc-option,$(RETPOLINE_CFLAGS_GCC),$(call cc-option,$(RETPOLINE_CFLAGS_CLANG)))
+> +RETPOLINE_VDSO_CFLAGS := $(call cc-option,$(RETPOLINE_VDSO_CFLAGS_GCC),$(call cc-option,$(RETPOLINE_VDSO_CFLAGS_CLANG)))
+> +export RETPOLINE_CFLAGS
+> +export RETPOLINE_VDSO_CFLAGS
+> +
+>  # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
+>  # values of the respective KBUILD_* variables
+>  ARCH_CPPFLAGS :=
+> --
+> 2.7.4
+>
+
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+Best Regards
+Masahiro Yamada
