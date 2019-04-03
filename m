@@ -1,253 +1,149 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:33901 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725956AbfDCKtD (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:53481 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725935AbfDCLbf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Apr 2019 06:49:03 -0400
+        Wed, 3 Apr 2019 07:31:35 -0400
 MIME-Version: 1.0
 References: <20190315101013.GN8455@Legion-PC.fortress> <CAK7LNATsm23e_CuyfFw7_CR8xZQ3HnwNHCXhEm_zQZU2PUGK5A@mail.gmail.com>
- <20190326172411.GA15936@Legion-PC.fortress> <CAK7LNARd75HS_aBZgH0YhR-w1kipr0rn7g1VGOjWev8giO04tg@mail.gmail.com>
-In-Reply-To: <CAK7LNARd75HS_aBZgH0YhR-w1kipr0rn7g1VGOjWev8giO04tg@mail.gmail.com>
+ <20190326172411.GA15936@Legion-PC.fortress> <20190327154025.GB23293@linux-8ccs>
+ <20190327160440.GE15936@Legion-PC.fortress>
+In-Reply-To: <20190327160440.GE15936@Legion-PC.fortress>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 3 Apr 2019 19:48:09 +0900
-Message-ID: <CAK7LNAQnPhT-C5Xzgb_x=ev3xsve_zzBQgLN+spvT8pJyv0F+A@mail.gmail.com>
+Date: Wed, 3 Apr 2019 20:30:55 +0900
+Message-ID: <CAK7LNARAMXmoWw=ZUSRSYoH=gCsHhXiN9m_yPoH+mMMhW93bxw@mail.gmail.com>
 Subject: Re: [RESEND PATCH v1] moduleparam: Save information about built-in
  modules in separate file
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Alexey Gladkov <gladkov.alexey@gmail.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-api@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>, Jessica Yu <jeyu@kernel.org>
+Cc: Jessica Yu <jeyu@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-api@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>, Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-On Wed, Apr 3, 2019 at 7:45 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Thu, Mar 28, 2019 at 1:04 AM Alexey Gladkov <gladkov.alexey@gmail.com> w=
+rote:
 >
-> Hi.
->
-> Sorry for the delay.
-> I added some comments from the
-> build system point of view.
->
->
-> On Wed, Mar 27, 2019 at 2:24 AM Alexey Gladkov <gladkov.alexey@gmail.com> wrote:
+> On Wed, Mar 27, 2019 at 04:40:25PM +0100, Jessica Yu wrote:
+> > +++ Alexey Gladkov [26/03/19 18:24 +0100]:
+> > >On Fri, Mar 22, 2019 at 02:34:12PM +0900, Masahiro Yamada wrote:
+> > >> Hi.
+> > >>
+> > >> (added some people to CC)
 > >
-> > On Fri, Mar 22, 2019 at 02:34:12PM +0900, Masahiro Yamada wrote:
-> > > Hi.
-> > >
-> > > (added some people to CC)
-> > >
-> > >
-> > > On Fri, Mar 15, 2019 at 7:10 PM Alexey Gladkov <gladkov.alexey@gmail.com> wrote:
-> > > >
-> > > > Problem:
-> > > >
-> > > > When a kernel module is compiled as a separate module, some important
-> > > > information about the kernel module is available via .modinfo section of
-> > > > the module.  In contrast, when the kernel module is compiled into the
-> > > > kernel, that information is not available.
-> > >
-> > >
-> > > I might be missing something, but
-> > > vmlinux provides info of builtin modules
-> > > in /sys/module/.
+> > (Thanks Masahiro for the CC!)
 > >
-> > No. There are definitely not all modules. I have a builtin sha256_generic,
-> > but I can't find him in the /sys/module.
-> >
-> > > (Looks like currently only module_param and MODULE_VERSION)
+> > >>
+> > >> On Fri, Mar 15, 2019 at 7:10 PM Alexey Gladkov <gladkov.alexey@gmail=
+.com> wrote:
+> > >> >
+> > >> > Problem:
+> > >> >
+> > >> > When a kernel module is compiled as a separate module, some import=
+ant
+> > >> > information about the kernel module is available via .modinfo sect=
+ion of
+> > >> > the module.  In contrast, when the kernel module is compiled into =
+the
+> > >> > kernel, that information is not available.
+> > >>
+> > >>
+> > >> I might be missing something, but
+> > >> vmlinux provides info of builtin modules
+> > >> in /sys/module/.
 > > >
-> > > This patch is not exactly the same, but I see a kind of overwrap.
-> > > I'd like to be sure if we want this new scheme.
+> > >No. There are definitely not all modules. I have a builtin sha256_gene=
+ric,
+> > >but I can't find him in the /sys/module.
 > >
-> > The /sys/module is only for running kernel. One of my use cases is
-> > to create an initrd for a new kernel.
+> > Yeah, you'll only find builtin modules under /sys/module/ if it has any=
+ module
+> > parameters, otherwise you won't find it there. As Masahiro already ment=
+ioned,
+> > if a builtin module has any parameters, they would be accessible under =
+/sys/module/.
 > >
+> > >> (Looks like currently only module_param and MODULE_VERSION)
+> > >>
+> > >> This patch is not exactly the same, but I see a kind of overwrap.
+> > >> I'd like to be sure if we want this new scheme.
 > > >
-> > > > Information about built-in modules is necessary in the following cases:
-> > > >
-> > > > 1. When it is necessary to find out what additional parameters can be
-> > > > passed to the kernel at boot time.
+> > >The /sys/module is only for running kernel. One of my use cases is
+> > >to create an initrd for a new kernel.
 > > >
+> > >>
+> > >> > Information about built-in modules is necessary in the following c=
+ases:
+> > >> >
+> > >> > 1. When it is necessary to find out what additional parameters can=
+ be
+> > >> > passed to the kernel at boot time.
+> > >>
+> > >>
+> > >> Actually, /sys/module/<module>/parameters/
+> > >> exposes this information.
+> > >>
+> > >> Doesn't it work for your purpose?
 > > >
-> > > Actually, /sys/module/<module>/parameters/
-> > > exposes this information.
+> > >No, since creating an initrd needs to know all the modalias before
+> > >I get the sysfs for new kernel. Also there are no modalias at all.
 > > >
-> > > Doesn't it work for your purpose?
+> > >> > 2. When you need to know which module names and their aliases are =
+in
+> > >> > the kernel. This is very useful for creating an initrd image.
+> > >> >
 > >
-> > No, since creating an initrd needs to know all the modalias before
-> > I get the sysfs for new kernel. Also there are no modalias at all.
-> >
-> > > > 2. When you need to know which module names and their aliases are in
-> > > > the kernel. This is very useful for creating an initrd image.
-> > > >
-> > > > Proposal:
-> > > >
-> > > > The proposed patch does not remove .modinfo section with module
-> > > > information from the vmlinux at the build time and saves it into a
-> > > > separate file after kernel linking. So, the kernel does not increase in
-> > > > size and no additional information remains in it. Information is stored
-> > > > in the same format as in the separate modules (null-terminated string
-> > > > array). Because the .modinfo section is already exported with a separate
-> > > > modules, we are not creating a new API.
-> > > >
-> > > > It can be easily read in the userspace:
-> > > >
-> > > > $ tr '\0' '\n' < kernel.builtin.modinfo
-> > > > ext4.softdep=pre: crc32c
-> > > > ext4.license=GPL
-> > > > ext4.description=Fourth Extended Filesystem
-> > > > ext4.author=Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others
-> > > > ext4.alias=fs-ext4
-> > > > ext4.alias=ext3
-> > > > ext4.alias=fs-ext3
-> > > > ext4.alias=ext2
-> > > > ext4.alias=fs-ext2
-> > > > md_mod.alias=block-major-9-*
-> > > > md_mod.alias=md
-> > > > md_mod.description=MD RAID framework
-> > > > md_mod.license=GPL
-> > > > md_mod.parmtype=create_on_open:bool
-> > > > md_mod.parmtype=start_dirty_degraded:int
-> > > > ...
-> > > >
-> > > > Co-Developed-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
-> > > > Signed-off-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
-> > > > Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
-> > > > ---
-> > > >  Makefile                    |  1 +
-> > > >  include/linux/moduleparam.h | 12 +++++-------
-> > > >  scripts/link-vmlinux.sh     |  8 ++++++++
-> > > >  3 files changed, 14 insertions(+), 7 deletions(-)
-> > > >
-> > > > diff --git a/Makefile b/Makefile
-> > > > index d5713e7b1e50..971102194c92 100644
-> > > > --- a/Makefile
-> > > > +++ b/Makefile
-> > > > @@ -1288,6 +1288,7 @@ _modinst_:
-> > > >         fi
-> > > >         @cp -f $(objtree)/modules.order $(MODLIB)/
-> > > >         @cp -f $(objtree)/modules.builtin $(MODLIB)/
-> > > > +       @cp -f $(objtree)/kernel.builtin.modinfo $(MODLIB)/
+> > Hm, I do see one possible additional use-case for preserving module ali=
+as
+> > information for built-in modules - modprobe will currently error (I thi=
+nk,
+> > correct me if I'm wrong) if we try invoking modprobe with an alias of a
+> > built-in module, simply because this information is not in modules.buil=
+tin or
+> > modules.alias.
 >
+> Yes. Patch for modprobe in my todo list. The reason I didn=E2=80=99t do i=
+t was
+> because I wasn=E2=80=99t sure that the file format was final.
 >
-> This file should be cleaned up by 'make clean'.
+> > Since kbuild already outputs modules.builtin, I would suggest outputtin=
+g
+> > something like a modules.builtin.alias file (and I guess maybe a module=
+s.builtin.param
+> > file too if that's deemed useful), in a format that is consumable by km=
+od/modprobe,
+> > so that modprobing an alias of a built-in module doesn't produce an err=
+or. I
+> > think this should be easy to do if we keep and parse the resulting .mod=
+info for
+> > builtin modules. This is just an idea, opinions welcome. I've added Luc=
+as to CC
+> > in case he has any thoughts.
 >
-> Please add CLEAN_FILES around line 1336.
->
->
-> # Directories & files removed with 'make clean'
-> CLEAN_DIRS  += $(MODVERDIR) include/ksym
-> CLEAN_FILES += ...
->
->
->
->
-> Also, shouldn't it be added to .gitignore?
->
->
->
->
-> > > >         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
-> > > >
-> > > >  # This depmod is only for convenience to give the initial
-> > > > diff --git a/include/linux/moduleparam.h b/include/linux/moduleparam.h
-> > > > index ba36506db4fb..5ba250d9172a 100644
-> > > > --- a/include/linux/moduleparam.h
-> > > > +++ b/include/linux/moduleparam.h
-> > > > @@ -10,23 +10,21 @@
-> > > >     module name. */
-> > > >  #ifdef MODULE
-> > > >  #define MODULE_PARAM_PREFIX /* empty */
-> > > > +#define __MODULE_INFO_PREFIX /* empty */
-> > > >  #else
-> > > >  #define MODULE_PARAM_PREFIX KBUILD_MODNAME "."
-> > > > +/* We cannot use MODULE_PARAM_PREFIX because some modules override it. */
-> > > > +#define __MODULE_INFO_PREFIX KBUILD_MODNAME "."
-> > > >  #endif
-> > > >
-> > > >  /* Chosen so that structs with an unsigned long line up. */
-> > > >  #define MAX_PARAM_PREFIX_LEN (64 - sizeof(unsigned long))
-> > > >
-> > > > -#ifdef MODULE
-> > > >  #define __MODULE_INFO(tag, name, info)                                   \
-> > > >  static const char __UNIQUE_ID(name)[]                                    \
-> > > >    __used __attribute__((section(".modinfo"), unused, aligned(1)))        \
-> > > > -  = __stringify(tag) "=" info
-> > > > -#else  /* !MODULE */
-> > > > -/* This struct is here for syntactic coherency, it is not used */
-> > > > -#define __MODULE_INFO(tag, name, info)                                   \
-> > > > -  struct __UNIQUE_ID(name) {}
-> > > > -#endif
-> > > > +  = __MODULE_INFO_PREFIX __stringify(tag) "=" info
-> > > > +
-> > > >  #define __MODULE_PARM_TYPE(name, _type)                                          \
-> > > >    __MODULE_INFO(parmtype, name##type, #name ":" _type)
-> > > >
-> > > > diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-> > > > index c8cf45362bd6..399d7e4d11ec 100755
-> > > > --- a/scripts/link-vmlinux.sh
-> > > > +++ b/scripts/link-vmlinux.sh
-> > > > @@ -258,10 +258,12 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
-> > > >
-> > > >         # step 1
-> > > >         vmlinux_link "" .tmp_vmlinux1
-> > > > +       "${OBJCOPY}" -R .modinfo .tmp_vmlinux1
-> > > >         kallsyms .tmp_vmlinux1 .tmp_kallsyms1.o
-> > > >
-> > > >         # step 2
-> > > >         vmlinux_link .tmp_kallsyms1.o .tmp_vmlinux2
-> > > > +       "${OBJCOPY}" -R .modinfo .tmp_vmlinux2
-> > > >         kallsyms .tmp_vmlinux2 .tmp_kallsyms2.o
-> > > >
-> > > >         # step 3
-> > > > @@ -273,6 +275,7 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
-> > > >                 kallsyms_vmlinux=.tmp_vmlinux3
-> > > >
-> > > >                 vmlinux_link .tmp_kallsyms2.o .tmp_vmlinux3
-> > > > +               "${OBJCOPY}" -R .modinfo .tmp_vmlinux3
-> > > >
-> > > >                 kallsyms .tmp_vmlinux3 .tmp_kallsyms3.o
-> > > >         fi
-> > > > @@ -281,6 +284,11 @@ fi
-> > > >  info LD vmlinux
-> > > >  vmlinux_link "${kallsymso}" vmlinux
-> > > >
-> > > > +info MODINFO kernel.builtin.modinfo
-> > > > +"${OBJCOPY}" -j .modinfo -O binary vmlinux kernel.builtin.modinfo
-> > > > +chmod 444 kernel.builtin.modinfo
-> > > > +"${OBJCOPY}" -R .modinfo vmlinux
-> > > > +
-> > > >  if [ -n "${CONFIG_BUILDTIME_EXTABLE_SORT}" ]; then
-> > > >         info SORTEX vmlinux
-> > > >         sortextable vmlinux
->
->
->
-> As I pointed out before, I see lots of warnings for powerpc.
->
-> How about extracting modinfo before linking vmlinux?
-> You can extract it from vmlinux.o instead,
-> and discard it in the linker script.
->
->
-> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-> index dc0e8c5..994cd47 100755
-> --- a/scripts/link-vmlinux.sh
-> +++ b/scripts/link-vmlinux.sh
-> @@ -193,6 +193,9 @@ modpost_link vmlinux.o
->  # modpost vmlinux.o to check for section mismatches
->  ${MAKE} -f "${srctree}/scripts/Makefile.modpost" vmlinux.o
->
-> +info MODINFO kernel.builtin.modinfo
-> +"${OBJCOPY}" -j .modinfo -O binary vmlinux kernel.builtin.modinfo
+> You don't like kernel.builtin.modinfo ?
 
-Oops, this should be:
 
-"${OBJCOPY}" -j .modinfo -O binary vmlinux.o kernel.builtin.modinfo
+Naming is often the most difficult thing. :)
+
+IMHO, 'kernel' and 'builtin' have a similar meaning here.
+Is 'kernel.builtin' unnecessarily too long?
+
+
+Perhaps, another idea is:
+
+'builtin.alias' instead of 'modules.builtin.alias'
+if we want a separate file in the same format.
+
+
+In hindsight, 'modules.builtin' should have been
+'builtin.order', I think.
 
 
 
 
--- 
+> It is much easier to create and it has almost the same format as the
+> modules. So I think it will be easier to parse in kmod.
+
+--=20
 Best Regards
 Masahiro Yamada
