@@ -1,149 +1,164 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:53481 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725935AbfDCLbf (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Apr 2019 07:31:35 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51134 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726074AbfDCMsu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 3 Apr 2019 08:48:50 -0400
+Date: Wed, 3 Apr 2019 14:48:47 +0200 (CEST)
+From: Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
+In-Reply-To: <20190401193529.GA26375@redhat.com>
+Message-ID: <alpine.LSU.2.21.1904031444020.18182@pobox.suse.cz>
+References: <20190301141313.15057-1-jmoreira@suse.de> <20190301141313.15057-3-jmoreira@suse.de> <20190318191926.GA23138@redhat.com> <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz> <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de> <ae018181-fd8a-03b2-69bf-e9302172bfeb@redhat.com>
+ <699e78da-36ba-8217-c509-2e9b443bd380@suse.de> <1b6ee81b-5699-a1cc-9a85-02df0eeaed12@redhat.com> <20190328201703.GA8658@redhat.com> <20190401193529.GA26375@redhat.com>
 MIME-Version: 1.0
-References: <20190315101013.GN8455@Legion-PC.fortress> <CAK7LNATsm23e_CuyfFw7_CR8xZQ3HnwNHCXhEm_zQZU2PUGK5A@mail.gmail.com>
- <20190326172411.GA15936@Legion-PC.fortress> <20190327154025.GB23293@linux-8ccs>
- <20190327160440.GE15936@Legion-PC.fortress>
-In-Reply-To: <20190327160440.GE15936@Legion-PC.fortress>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 3 Apr 2019 20:30:55 +0900
-Message-ID: <CAK7LNARAMXmoWw=ZUSRSYoH=gCsHhXiN9m_yPoH+mMMhW93bxw@mail.gmail.com>
-Subject: Re: [RESEND PATCH v1] moduleparam: Save information about built-in
- modules in separate file
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexey Gladkov <gladkov.alexey@gmail.com>
-Cc: Jessica Yu <jeyu@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-api@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>, Lucas De Marchi <lucas.de.marchi@gmail.com>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: Joao Moreira <jmoreira@suse.de>, live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
-On Thu, Mar 28, 2019 at 1:04 AM Alexey Gladkov <gladkov.alexey@gmail.com> w=
-rote:
->
-> On Wed, Mar 27, 2019 at 04:40:25PM +0100, Jessica Yu wrote:
-> > +++ Alexey Gladkov [26/03/19 18:24 +0100]:
-> > >On Fri, Mar 22, 2019 at 02:34:12PM +0900, Masahiro Yamada wrote:
-> > >> Hi.
-> > >>
-> > >> (added some people to CC)
+
+> > Hmm, maybe I spoke too soon.
 > >
-> > (Thanks Masahiro for the CC!)
+> > I am having issues if I have a two-object livepatch module in which each
+> > object file needs to specify its own KLP_MODULE_RELOC for the same
+> > symbol name.
 > >
-> > >>
-> > >> On Fri, Mar 15, 2019 at 7:10 PM Alexey Gladkov <gladkov.alexey@gmail=
-.com> wrote:
-> > >> >
-> > >> > Problem:
-> > >> >
-> > >> > When a kernel module is compiled as a separate module, some import=
-ant
-> > >> > information about the kernel module is available via .modinfo sect=
-ion of
-> > >> > the module.  In contrast, when the kernel module is compiled into =
-the
-> > >> > kernel, that information is not available.
-> > >>
-> > >>
-> > >> I might be missing something, but
-> > >> vmlinux provides info of builtin modules
-> > >> in /sys/module/.
-> > >
-> > >No. There are definitely not all modules. I have a builtin sha256_gene=
-ric,
-> > >but I can't find him in the /sys/module.
+> > For example: I have test_klp_convert.ko which is comprised of
+> > test_klp_convert_a.o. which needs to refer to state_show,1 and
+> > test_klp_convert_b.o. which needs to refer to state_show,2.
 > >
-> > Yeah, you'll only find builtin modules under /sys/module/ if it has any=
- module
-> > parameters, otherwise you won't find it there. As Masahiro already ment=
-ioned,
-> > if a builtin module has any parameters, they would be accessible under =
-/sys/module/.
+> >   % make
+> >   ...
+> >     KLP     lib/livepatch/test_klp_convert.ko
+> >   klp-convert: Conflicting KLP_SYMPOS definition: vmlinux.state_show,0 vs. vmlinux.state_show,1.
+> >   klp-convert: Unable to load user-provided sympos
+> >   make[2]: *** [scripts/Makefile.modpost:148: lib/livepatch/test_klp_convert.ko] Error 255
+> >   make[1]: *** [/home/cloud-user/disk/linux/Makefile:1282: modules] Error 2
+> >   make: *** [Makefile:170: sub-make] Error 2
 > >
-> > >> (Looks like currently only module_param and MODULE_VERSION)
-> > >>
-> > >> This patch is not exactly the same, but I see a kind of overwrap.
-> > >> I'd like to be sure if we want this new scheme.
-> > >
-> > >The /sys/module is only for running kernel. One of my use cases is
-> > >to create an initrd for a new kernel.
-> > >
-> > >>
-> > >> > Information about built-in modules is necessary in the following c=
-ases:
-> > >> >
-> > >> > 1. When it is necessary to find out what additional parameters can=
- be
-> > >> > passed to the kernel at boot time.
-> > >>
-> > >>
-> > >> Actually, /sys/module/<module>/parameters/
-> > >> exposes this information.
-> > >>
-> > >> Doesn't it work for your purpose?
-> > >
-> > >No, since creating an initrd needs to know all the modalias before
-> > >I get the sysfs for new kernel. Also there are no modalias at all.
-> > >
-> > >> > 2. When you need to know which module names and their aliases are =
-in
-> > >> > the kernel. This is very useful for creating an initrd image.
-> > >> >
-> >
-> > Hm, I do see one possible additional use-case for preserving module ali=
-as
-> > information for built-in modules - modprobe will currently error (I thi=
-nk,
-> > correct me if I'm wrong) if we try invoking modprobe with an alias of a
-> > built-in module, simply because this information is not in modules.buil=
-tin or
-> > modules.alias.
->
-> Yes. Patch for modprobe in my todo list. The reason I didn=E2=80=99t do i=
-t was
-> because I wasn=E2=80=99t sure that the file format was final.
->
-> > Since kbuild already outputs modules.builtin, I would suggest outputtin=
-g
-> > something like a modules.builtin.alias file (and I guess maybe a module=
-s.builtin.param
-> > file too if that's deemed useful), in a format that is consumable by km=
-od/modprobe,
-> > so that modprobing an alias of a built-in module doesn't produce an err=
-or. I
-> > think this should be easy to do if we keep and parse the resulting .mod=
-info for
-> > builtin modules. This is just an idea, opinions welcome. I've added Luc=
-as to CC
-> > in case he has any thoughts.
->
-> You don't like kernel.builtin.modinfo ?
+> > I take a closer look next week, but in the meantime, see the source
+> > files below.
+> 
+> Okay, with a fresh set of eyes today, I think the issue can be
+> summarized as:
+> 
+>   * "Special" livepatch symbols, as processed by klp-convert, require
+>     external linkage, otherwise a new local storage instance will be
+>     created and miss klp-convert altogether
+> 
+>   * When linking together two object files, their combined symbol table
+>     will include a de-duped list of uniquly named global symbols
+> 
+> So if we are to run klp-convert on the combined module object file (as
+> per v2 plus suggested changes in this thread), we are going to run into
+> problems if ...
+> 
+> 
+> Example
+> =======
+> 
+> (quoted in previous reply), test_klp_convert_a and test_klp_convert_b
+> have their own "state_show" variable in which each wishes to resolve to
+> unique symbol positions (2 and 3 accordingly).
+> 
+> 
+> test_klp_convert_a
+> ------------------
+> 
+> We get one symbol table entry and one relocation as expected.
+> 
+>   % eu-readelf --symbols lib/livepatch/test_klp_convert_a.o
+> 
+>   Symbol table [27] '.symtab' contains 38 entries:
+>    29 local symbols  String table: [28] '.strtab'
+>     Num:            Value   Size Type    Bind   Vis          Ndx Name
+>     ...
+>      30: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+>     ...
+> 
+>   % eu-readelf --relocs lib/livepatch/test_klp_convert_a.o
+> 
+>   Relocation section [12] '.rela.klp.module_relocs.vmlinux' for section [11] '.klp.module_relocs.vmlinux' at offset 0x4b8 contains 1 entry:
+>     Offset              Type            Value               Addend Name
+>     000000000000000000  X86_64_64       000000000000000000      +0 state_show
+> 
+> 
+> test_klp_convert_b
+> ------------------
+> 
+> Just like the other object file, one symbol table entry and one
+> relocation:
+> 
+>   % eu-readelf --symbols lib/livepatch/test_klp_convert_a.o
+>   Symbol table [24] '.symtab' contains 23 entries:
+>    19 local symbols  String table: [25] '.strtab'
+>     Num:            Value   Size Type    Bind   Vis          Ndx Name
+>     ...
+>      20: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+>     ...
+> 
+>   % eu-readelf --relocs lib/livepatch/test_klp_convert_b.o
+> 
+>   Relocation section [ 9] '.rela.klp.module_relocs.vmlinux' for section [ 8] '.klp.module_relocs.vmlinux' at offset 0x118 contains 1 entry:
+>     Offset              Type            Value               Addend Name
+>     000000000000000000  X86_64_64       000000000000000000      +0 state_show
+> 
+> 
+> test_klp_convert
+> ----------------
+> 
+> But the combined test_klp_convert.klp.o file has only a single
+> unresolved "state_show" symbol in its symbol table:
+> 
+>   % eu-readelf --symbols lib/livepatch/test_klp_convert.klp.o
+> 
+>   Symbol table [35] '.symtab' contains 57 entries:
+>    47 local symbols  String table: [36] '.strtab'
+>     Num:            Value   Size Type    Bind   Vis          Ndx Name
+>     ...
+>      52: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+>     ...
+> 
+> though the .rela.klp.module_relocs.vmlinux relocation section has two
+> entries:
+> 
+>   % eu-readelf --relocs lib/livepatch/test_klp_convert.klp.o
+> 
+>   Relocation section [17] '.rela.klp.module_relocs.vmlinux' for section [16] '.klp.module_relocs.vmlinux' at offset 0x446c8 contains 2 entries:
+>     Offset              Type            Value               Addend Name
+>     000000000000000000  X86_64_64       000000000000000000      +0 state_show
+>     0x0000000000000010  X86_64_64       000000000000000000      +0 state_show
+> 
+> and it looks like the combined KLP_MODULE_RELOC still contains the two
+> unique symbol position values (2 and 3):
+> 
+>   % objcopy -O binary --only-section=.klp.module_relocs.vmlinux lib/livepatch/test_klp_convert.klp.o >(hexdump -C)
+>   00000000  00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00  |................|
+>   00000010  00 00 00 00 00 00 00 00  03 00 00 00              |............|
+>   0000001c
 
+Nice :/
+ 
+> Maybe we can work around this by modifying the annotation macros and/or
+> klp-convert, or live with this for now.
 
-Naming is often the most difficult thing. :)
+The question is (and I'll check later. I cannot wrap my head around it 
+now) if it at least works if there are two references of the same symbol 
+in two different .o. It would be same state_show in this case and not two 
+different ones. If it works then I think we can live with it for a while, 
+because after all duplicate symbols are quite rare in the kernel.
 
-IMHO, 'kernel' and 'builtin' have a similar meaning here.
-Is 'kernel.builtin' unnecessarily too long?
+I think it should not be a big problem to fix it though (famous last 
+words). The information is there, so klp-convert with a changed annotation 
+macro should deal with it.
 
+> Note: I'm inclined to defer work on resolving this limitation to v4.  I
+> would like v3 to focus on collecting and squashing the feedback up to
+> now on v2.  There are a few other outstanding issues that I have run
+> across while testing this patchset, so I feel that it would be clearer
+> for folks to base comments on those off a clean v3 slate.
 
-Perhaps, another idea is:
+Makes sense to me.
 
-'builtin.alias' instead of 'modules.builtin.alias'
-if we want a separate file in the same format.
-
-
-In hindsight, 'modules.builtin' should have been
-'builtin.order', I think.
-
-
-
-
-> It is much easier to create and it has almost the same format as the
-> modules. So I think it will be easier to parse in kmod.
-
---=20
-Best Regards
-Masahiro Yamada
+Miroslav
