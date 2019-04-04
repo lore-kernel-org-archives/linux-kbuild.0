@@ -1,500 +1,488 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:38138 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730965AbfDDWKc (ORCPT
+Received: from mail-qk1-f201.google.com ([209.85.222.201]:36742 "EHLO
+        mail-qk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730755AbfDDWKW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Apr 2019 18:10:32 -0400
-Received: by mail-pl1-f202.google.com with SMTP id 4so2674313plb.5
-        for <linux-kbuild@vger.kernel.org>; Thu, 04 Apr 2019 15:10:31 -0700 (PDT)
-Date: Thu,  4 Apr 2019 15:06:47 -0700
+        Thu, 4 Apr 2019 18:10:22 -0400
+Received: by mail-qk1-f201.google.com with SMTP id y64so3466240qka.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 04 Apr 2019 15:10:21 -0700 (PDT)
+Date: Thu,  4 Apr 2019 15:06:43 -0700
 In-Reply-To: <20190404220652.19765-1-brendanhiggins@google.com>
-Message-Id: <20190404220652.19765-13-brendanhiggins@google.com>
+Message-Id: <20190404220652.19765-9-brendanhiggins@google.com>
 Mime-Version: 1.0
 References: <20190404220652.19765-1-brendanhiggins@google.com>
-Subject: [PATCH v1 12/17] kunit: tool: add Python wrappers for running KUnit tests
+Subject: [PATCH v1 08/17] kunit: test: add support for test abort
 From: Brendan Higgins <brendanhiggins@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: corbet@lwn.net, frowand.list@gmail.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, shuah@kernel.org, yamada.masahiro@socionext.com
-Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, gregkh@linuxfoundation.org, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rostedt@goodmis.org, wfg@linux.intel.com, Felix Guo <felixguoxiuping@gmail.com>, Brendan Higgins <brendanhiggins@google.com>
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, gregkh@linuxfoundation.org, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
 
-From: Felix Guo <felixguoxiuping@gmail.com>
+Add support for aborting/bailing out of test cases, which is needed for
+implementing assertions.
 
-The ultimate goal is to create minimal isolated test binaries; in the
-meantime we are using UML to provide the infrastructure to run tests, so
-define an abstract way to configure and run tests that allow us to
-change the context in which tests are built without affecting the user.
-This also makes pretty and dynamic error reporting, and a lot of other
-nice features easier.
+An assertion is like an expectation, but bails out of the test case
+early if the assertion is not met. The idea with assertions is that you
+use them to state all the preconditions for your test. Logically
+speaking, these are the premises of the test case, so if a premise isn't
+true, there is no point in continuing the test case because there are no
+conclusions that can be drawn without the premises. Whereas, the
+expectation is the thing you are trying to prove.
 
-kunit_config.py:
-  - parse .config and Kconfig files.
-
-kunit_kernel.py: provides helper functions to:
-  - configure the kernel using kunitconfig.
-  - build the kernel with the appropriate configuration.
-  - provide function to invoke the kernel and stream the output back.
-
-Signed-off-by: Felix Guo <felixguoxiuping@gmail.com>
 Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
 ---
- tools/testing/kunit/.gitignore      |   3 +
- tools/testing/kunit/kunit.py        |  78 +++++++++++++++
- tools/testing/kunit/kunit_config.py |  66 +++++++++++++
- tools/testing/kunit/kunit_kernel.py | 148 ++++++++++++++++++++++++++++
- tools/testing/kunit/kunit_parser.py | 119 ++++++++++++++++++++++
- 5 files changed, 414 insertions(+)
- create mode 100644 tools/testing/kunit/.gitignore
- create mode 100755 tools/testing/kunit/kunit.py
- create mode 100644 tools/testing/kunit/kunit_config.py
- create mode 100644 tools/testing/kunit/kunit_kernel.py
- create mode 100644 tools/testing/kunit/kunit_parser.py
+ include/kunit/test.h      |  13 ++++
+ include/kunit/try-catch.h |  91 +++++++++++++++++++++++++
+ kunit/Makefile            |   3 +-
+ kunit/test.c              | 138 +++++++++++++++++++++++++++++++++++---
+ kunit/try-catch.c         |  96 ++++++++++++++++++++++++++
+ 5 files changed, 332 insertions(+), 9 deletions(-)
+ create mode 100644 include/kunit/try-catch.h
+ create mode 100644 kunit/try-catch.c
 
-diff --git a/tools/testing/kunit/.gitignore b/tools/testing/kunit/.gitignore
+diff --git a/include/kunit/test.h b/include/kunit/test.h
+index e441270561ece..1b77caeb5d51f 100644
+--- a/include/kunit/test.h
++++ b/include/kunit/test.h
+@@ -12,6 +12,7 @@
+ #include <linux/types.h>
+ #include <linux/slab.h>
+ #include <kunit/kunit-stream.h>
++#include <kunit/try-catch.h>
+ 
+ struct kunit_resource;
+ 
+@@ -166,15 +167,27 @@ struct kunit {
+ 
+ 	/* private: internal use only. */
+ 	const char *name; /* Read only after initialization! */
++	struct kunit_try_catch try_catch;
+ 	spinlock_t lock; /* Gaurds all mutable test state. */
+ 	bool success; /* Protected by lock. */
++	bool death_test; /* Protected by lock. */
+ 	struct list_head resources; /* Protected by lock. */
+ 	void (*vprintk)(const struct kunit *test,
+ 			const char *level,
+ 			struct va_format *vaf);
+ 	void (*fail)(struct kunit *test, struct kunit_stream *stream);
++	void (*abort)(struct kunit *test);
+ };
+ 
++static inline void kunit_set_death_test(struct kunit *test, bool death_test)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&test->lock, flags);
++	test->death_test = death_test;
++	spin_unlock_irqrestore(&test->lock, flags);
++}
++
+ int kunit_init_test(struct kunit *test, const char *name);
+ 
+ int kunit_run_tests(struct kunit_module *module);
+diff --git a/include/kunit/try-catch.h b/include/kunit/try-catch.h
 new file mode 100644
-index 0000000000000..c791ff59a37a9
+index 0000000000000..e85abe044b6b5
 --- /dev/null
-+++ b/tools/testing/kunit/.gitignore
-@@ -0,0 +1,3 @@
-+# Byte-compiled / optimized / DLL files
-+__pycache__/
-+*.py[cod]
-\ No newline at end of file
-diff --git a/tools/testing/kunit/kunit.py b/tools/testing/kunit/kunit.py
-new file mode 100755
-index 0000000000000..7413ec7351a20
---- /dev/null
-+++ b/tools/testing/kunit/kunit.py
-@@ -0,0 +1,78 @@
-+#!/usr/bin/python3
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# A thin wrapper on top of the KUnit Kernel
-+#
-+# Copyright (C) 2019, Google LLC.
-+# Author: Felix Guo <felixguoxiuping@gmail.com>
-+# Author: Brendan Higgins <brendanhiggins@google.com>
++++ b/include/kunit/try-catch.h
+@@ -0,0 +1,91 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * An API to allow a function, that may fail, to be executed, and recover in a
++ * controlled manner.
++ *
++ * Copyright (C) 2019, Google LLC.
++ * Author: Brendan Higgins <brendanhiggins@google.com>
++ */
 +
-+import argparse
-+import sys
-+import os
-+import time
++#ifndef _KUNIT_TRY_CATCH_H
++#define _KUNIT_TRY_CATCH_H
 +
-+import kunit_config
-+import kunit_kernel
-+import kunit_parser
++#include <linux/types.h>
 +
-+parser = argparse.ArgumentParser(description='Runs KUnit tests.')
++typedef void (*kunit_try_catch_func_t)(void *);
 +
-+parser.add_argument('--raw_output', help='don\'t format output from kernel',
-+		    action='store_true')
++struct kunit;
 +
-+parser.add_argument('--timeout', help='maximum number of seconds to allow for '
-+		    'all tests to run. This does not include time taken to '
-+		    'build the tests.', type=int, default=300,
-+		    metavar='timeout')
++/*
++ * struct kunit_try_catch - provides a generic way to run code which might fail.
++ * @context: used to pass user data to the try and catch functions.
++ *
++ * kunit_try_catch provides a generic, architecture independent way to execute
++ * an arbitrary function of type kunit_try_catch_func_t which may bail out by
++ * calling kunit_try_catch_throw(). If kunit_try_catch_throw() is called, @try
++ * is stopped at the site of invocation and @catch is catch is called.
++ *
++ * struct kunit_try_catch provides a generic interface for the functionality
++ * needed to implement kunit->abort() which in turn is needed for implementing
++ * assertions. Assertions allow stating a precondition for a test simplifying
++ * how test cases are written and presented.
++ *
++ * Assertions are like expectations, except they abort (call
++ * kunit_try_catch_throw()) when the specified condition is not met. This is
++ * useful when you look at a test case as a logical statement about some piece
++ * of code, where assertions are the premises for the test case, and the
++ * conclusion is a set of predicates, rather expectations, that must all be
++ * true. If your premises are violated, it does not makes sense to continue.
++ */
++struct kunit_try_catch {
++	/* private: internal use only. */
++	void (*run)(struct kunit_try_catch *try_catch);
++	void __noreturn (*throw)(struct kunit_try_catch *try_catch);
++	struct kunit *test;
++	struct completion *try_completion;
++	int try_result;
++	kunit_try_catch_func_t try;
++	kunit_try_catch_func_t catch;
++	void *context;
++};
 +
-+parser.add_argument('--jobs',
-+		    help='As in the make command, "Specifies  the number of '
-+		    'jobs (commands) to run simultaneously."',
-+		    type=int, default=8, metavar='jobs')
++/*
++ * Exposed to be overridden for other architectures.
++ */
++void kunit_try_catch_init_internal(struct kunit_try_catch *try_catch);
 +
-+parser.add_argument('--build_dir',
-+		    help='As in the make command, it specifies the build '
-+		    'directory.',
-+		    type=str, default=None, metavar='build_dir')
++static inline void kunit_try_catch_init(struct kunit_try_catch *try_catch,
++					struct kunit *test,
++					kunit_try_catch_func_t try,
++					kunit_try_catch_func_t catch)
++{
++	try_catch->test = test;
++	kunit_try_catch_init_internal(try_catch);
++	try_catch->try = try;
++	try_catch->catch = catch;
++}
 +
-+cli_args = parser.parse_args()
++static inline void kunit_try_catch_run(struct kunit_try_catch *try_catch,
++				       void *context)
++{
++	try_catch->context = context;
++	try_catch->run(try_catch);
++}
 +
-+linux = kunit_kernel.LinuxSourceTree()
++static inline void __noreturn kunit_try_catch_throw(
++		struct kunit_try_catch *try_catch)
++{
++	try_catch->throw(try_catch);
++}
 +
-+build_dir = None
-+if cli_args.build_dir:
-+	build_dir = cli_args.build_dir
++static inline int kunit_try_catch_get_result(struct kunit_try_catch *try_catch)
++{
++	return try_catch->try_result;
++}
 +
-+config_start = time.time()
-+success = linux.build_reconfig(build_dir)
-+config_end = time.time()
-+if not success:
-+	quit()
++/*
++ * Exposed for testing only.
++ */
++void kunit_generic_try_catch_init(struct kunit_try_catch *try_catch);
 +
-+kunit_parser.print_with_timestamp('Building KUnit Kernel ...')
++#endif /* _KUNIT_TRY_CATCH_H */
+diff --git a/kunit/Makefile b/kunit/Makefile
+index 60a9ea6cb4697..1f7680cfa11ad 100644
+--- a/kunit/Makefile
++++ b/kunit/Makefile
+@@ -1,6 +1,7 @@
+ obj-$(CONFIG_KUNIT) +=			test.o \
+ 					string-stream.o \
+-					kunit-stream.o
++					kunit-stream.o \
++					try-catch.o
+ 
+ obj-$(CONFIG_KUNIT_TEST) +=		string-stream-test.o
+ 
+diff --git a/kunit/test.c b/kunit/test.c
+index 01e82c18b2fa6..5eace2a527a4e 100644
+--- a/kunit/test.c
++++ b/kunit/test.c
+@@ -6,10 +6,9 @@
+  * Author: Brendan Higgins <brendanhiggins@google.com>
+  */
+ 
+-#include <linux/sched.h>
+ #include <linux/sched/debug.h>
+-#include <os.h>
+ #include <kunit/test.h>
++#include <kunit/try-catch.h>
+ 
+ static bool kunit_get_success(struct kunit *test)
+ {
+@@ -32,6 +31,18 @@ static void kunit_set_success(struct kunit *test, bool success)
+ 	spin_unlock_irqrestore(&test->lock, flags);
+ }
+ 
++static bool kunit_get_death_test(struct kunit *test)
++{
++	unsigned long flags;
++	bool death_test;
 +
-+build_start = time.time()
++	spin_lock_irqsave(&test->lock, flags);
++	death_test = test->death_test;
++	spin_unlock_irqrestore(&test->lock, flags);
 +
-+success = linux.build_um_kernel(jobs=cli_args.jobs, build_dir=build_dir)
-+build_end = time.time()
-+if not success:
-+	quit()
++	return death_test;
++}
 +
-+kunit_parser.print_with_timestamp('Starting KUnit Kernel ...')
-+test_start = time.time()
+ static int kunit_vprintk_emit(const struct kunit *test,
+ 			      int level,
+ 			      const char *fmt,
+@@ -70,6 +81,21 @@ static void kunit_fail(struct kunit *test, struct kunit_stream *stream)
+ 	kunit_stream_commit(stream);
+ }
+ 
++static void __noreturn kunit_abort(struct kunit *test)
++{
++	kunit_set_death_test(test, true);
 +
-+if cli_args.raw_output:
-+	kunit_parser.raw_output(linux.run_kernel(timeout=cli_args.timeout,
-+						 build_dir=build_dir))
-+else:
-+	kunit_parser.parse_run_tests(linux.run_kernel(timeout=cli_args.timeout,
-+						      build_dir=build_dir))
++	kunit_try_catch_throw(&test->try_catch);
 +
-+test_end = time.time()
++	/*
++	 * Throw could not abort from test.
++	 *
++	 * XXX: we should never reach this line! As kunit_try_catch_throw is
++	 * marked __noreturn.
++	 */
++	WARN_ONCE(true, "Throw could not abort from test!\n");
++}
 +
-+kunit_parser.print_with_timestamp((
-+	"Elapsed time: %.3fs total, %.3fs configuring, %.3fs " +
-+	"building, %.3fs running.\n") % (test_end - config_start,
-+	config_end - config_start, build_end - build_start,
-+	test_end - test_start))
-diff --git a/tools/testing/kunit/kunit_config.py b/tools/testing/kunit/kunit_config.py
+ int kunit_init_test(struct kunit *test, const char *name)
+ {
+ 	spin_lock_init(&test->lock);
+@@ -77,6 +103,7 @@ int kunit_init_test(struct kunit *test, const char *name)
+ 	test->name = name;
+ 	test->vprintk = kunit_vprintk;
+ 	test->fail = kunit_fail;
++	test->abort = kunit_abort;
+ 
+ 	return 0;
+ }
+@@ -122,16 +149,111 @@ static void kunit_run_case_cleanup(struct kunit *test,
+ }
+ 
+ /*
+- * Performs all logic to run a test case.
++ * Handles an unexpected crash in a test case.
+  */
+-static bool kunit_run_case(struct kunit *test,
+-			   struct kunit_module *module,
+-			   struct kunit_case *test_case)
++static void kunit_handle_test_crash(struct kunit *test,
++				   struct kunit_module *module,
++				   struct kunit_case *test_case)
+ {
+-	kunit_set_success(test, true);
++	kunit_err(test, "%s crashed", test_case->name);
++	/*
++	 * TODO(brendanhiggins@google.com): This prints the stack trace up
++	 * through this frame, not up to the frame that caused the crash.
++	 */
++	show_stack(NULL, NULL);
++
++	kunit_case_internal_cleanup(test);
++}
+ 
++struct kunit_try_catch_context {
++	struct kunit *test;
++	struct kunit_module *module;
++	struct kunit_case *test_case;
++};
++
++static void kunit_try_run_case(void *data)
++{
++	struct kunit_try_catch_context *ctx = data;
++	struct kunit *test = ctx->test;
++	struct kunit_module *module = ctx->module;
++	struct kunit_case *test_case = ctx->test_case;
++
++	/*
++	 * kunit_run_case_internal may encounter a fatal error; if it does,
++	 * abort will be called, this thread will exit, and finally the parent
++	 * thread will resume control and handle any necessary clean up.
++	 */
+ 	kunit_run_case_internal(test, module, test_case);
++	/* This line may never be reached. */
+ 	kunit_run_case_cleanup(test, module, test_case);
++}
++
++static void kunit_catch_run_case(void *data)
++{
++	struct kunit_try_catch_context *ctx = data;
++	struct kunit *test = ctx->test;
++	struct kunit_module *module = ctx->module;
++	struct kunit_case *test_case = ctx->test_case;
++	int try_exit_code = kunit_try_catch_get_result(&test->try_catch);
++
++	if (try_exit_code) {
++		kunit_set_success(test, false);
++		/*
++		 * Test case could not finish, we have no idea what state it is
++		 * in, so don't do clean up.
++		 */
++		if (try_exit_code == -ETIMEDOUT)
++			kunit_err(test, "test case timed out\n");
++		/*
++		 * Unknown internal error occurred preventing test case from
++		 * running, so there is nothing to clean up.
++		 */
++		else
++			kunit_err(test, "internal error occurred preventing test case from running: %d\n",
++				  try_exit_code);
++		return;
++	}
++
++	if (kunit_get_death_test(test)) {
++		/*
++		 * EXPECTED DEATH: kunit_run_case_internal encountered
++		 * anticipated fatal error. Everything should be in a safe
++		 * state.
++		 */
++		kunit_run_case_cleanup(test, module, test_case);
++	} else {
++		/*
++		 * UNEXPECTED DEATH: kunit_run_case_internal encountered an
++		 * unanticipated fatal error. We have no idea what the state of
++		 * the test case is in.
++		 */
++		kunit_handle_test_crash(test, module, test_case);
++		kunit_set_success(test, false);
++	}
++}
++
++/*
++ * Performs all logic to run a test case. It also catches most errors that
++ * occurs in a test case and reports them as failures.
++ */
++static bool kunit_run_case_catch_errors(struct kunit *test,
++				       struct kunit_module *module,
++				       struct kunit_case *test_case)
++{
++	struct kunit_try_catch *try_catch = &test->try_catch;
++	struct kunit_try_catch_context context;
++
++	kunit_set_success(test, true);
++	kunit_set_death_test(test, false);
++
++	kunit_try_catch_init(try_catch,
++			     test,
++			     kunit_try_run_case,
++			     kunit_catch_run_case);
++	context.test = test;
++	context.module = module;
++	context.test_case = test_case;
++	kunit_try_catch_run(try_catch, &context);
+ 
+ 	return kunit_get_success(test);
+ }
+@@ -148,7 +270,7 @@ int kunit_run_tests(struct kunit_module *module)
+ 		return ret;
+ 
+ 	for (test_case = module->test_cases; test_case->run_case; test_case++) {
+-		success = kunit_run_case(&test, module, test_case);
++		success = kunit_run_case_catch_errors(&test, module, test_case);
+ 		if (!success)
+ 			all_passed = false;
+ 
+diff --git a/kunit/try-catch.c b/kunit/try-catch.c
 new file mode 100644
-index 0000000000000..167f47d9ab8e4
+index 0000000000000..c4cdb30880714
 --- /dev/null
-+++ b/tools/testing/kunit/kunit_config.py
-@@ -0,0 +1,66 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Builds a .config from a kunitconfig.
-+#
-+# Copyright (C) 2019, Google LLC.
-+# Author: Felix Guo <felixguoxiuping@gmail.com>
-+# Author: Brendan Higgins <brendanhiggins@google.com>
++++ b/kunit/try-catch.c
+@@ -0,0 +1,96 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * An API to allow a function, that may fail, to be executed, and recover in a
++ * controlled manner.
++ *
++ * Copyright (C) 2019, Google LLC.
++ * Author: Brendan Higgins <brendanhiggins@google.com>
++ */
 +
-+import collections
-+import re
++#include <kunit/try-catch.h>
++#include <kunit/test.h>
++#include <linux/completion.h>
++#include <linux/kthread.h>
 +
-+CONFIG_IS_NOT_SET_PATTERN = r'^# CONFIG_\w+ is not set$'
-+CONFIG_PATTERN = r'^CONFIG_\w+=\S+$'
++static void __noreturn kunit_generic_throw(struct kunit_try_catch *try_catch)
++{
++	try_catch->try_result = -EFAULT;
++	complete_and_exit(try_catch->try_completion, -EFAULT);
++}
 +
-+KconfigEntryBase = collections.namedtuple('KconfigEntry', ['raw_entry'])
++static int kunit_generic_run_threadfn_adapter(void *data)
++{
++	struct kunit_try_catch *try_catch = data;
 +
++	try_catch->try(try_catch->context);
 +
-+class KconfigEntry(KconfigEntryBase):
++	complete_and_exit(try_catch->try_completion, 0);
++}
 +
-+	def __str__(self) -> str:
-+		return self.raw_entry
++static void kunit_generic_run_try_catch(struct kunit_try_catch *try_catch)
++{
++	DECLARE_COMPLETION_ONSTACK(try_completion);
++	struct kunit *test = try_catch->test;
++	struct task_struct *task_struct;
++	int exit_code, status;
 +
++	try_catch->try_completion = &try_completion;
++	try_catch->try_result = 0;
++	task_struct = kthread_run(kunit_generic_run_threadfn_adapter,
++				  try_catch,
++				  "kunit_try_catch_thread");
++	if (IS_ERR(task_struct)) {
++		try_catch->catch(try_catch->context);
++		return;
++	}
 +
-+class KconfigParseError(Exception):
-+	"""Error parsing Kconfig defconfig or .config."""
++	/*
++	 * TODO(brendanhiggins@google.com): We should probably have some type of
++	 * variable timeout here. The only question is what that timeout value
++	 * should be.
++	 *
++	 * The intention has always been, at some point, to be able to label
++	 * tests with some type of size bucket (unit/small, integration/medium,
++	 * large/system/end-to-end, etc), where each size bucket would get a
++	 * default timeout value kind of like what Bazel does:
++	 * https://docs.bazel.build/versions/master/be/common-definitions.html#test.size
++	 * There is still some debate to be had on exactly how we do this. (For
++	 * one, we probably want to have some sort of test runner level
++	 * timeout.)
++	 *
++	 * For more background on this topic, see:
++	 * https://mike-bland.com/2011/11/01/small-medium-large.html
++	 */
++	status = wait_for_completion_timeout(&try_completion,
++					     300 * MSEC_PER_SEC); /* 5 min */
++	if (status < 0) {
++		kunit_err(test, "try timed out\n");
++		try_catch->try_result = -ETIMEDOUT;
++	}
 +
++	exit_code = try_catch->try_result;
 +
-+class Kconfig(object):
-+	"""Represents defconfig or .config specified using the Kconfig language."""
++	if (!exit_code)
++		return;
 +
-+	def __init__(self):
-+		self._entries = []
++	if (exit_code == -EFAULT)
++		try_catch->try_result = 0;
++	else if (exit_code == -EINTR)
++		kunit_err(test, "wake_up_process() was never called\n");
++	else if (exit_code)
++		kunit_err(test, "Unknown error: %d\n", exit_code);
 +
-+	def entries(self):
-+		return set(self._entries)
++	try_catch->catch(try_catch->context);
++}
 +
-+	def add_entry(self, entry: KconfigEntry) -> None:
-+		self._entries.append(entry)
++void kunit_generic_try_catch_init(struct kunit_try_catch *try_catch)
++{
++	try_catch->run = kunit_generic_run_try_catch;
++	try_catch->throw = kunit_generic_throw;
++}
 +
-+	def is_subset_of(self, other: "Kconfig") -> bool:
-+		return self.entries().issubset(other.entries())
-+
-+	def write_to_file(self, path: str) -> None:
-+		with open(path, 'w') as f:
-+			for entry in self.entries():
-+				f.write(str(entry) + '\n')
-+
-+	def parse_from_string(self, blob: str) -> None:
-+		"""Parses a string containing KconfigEntrys and populates this Kconfig."""
-+		self._entries = []
-+		is_not_set_matcher = re.compile(CONFIG_IS_NOT_SET_PATTERN)
-+		config_matcher = re.compile(CONFIG_PATTERN)
-+		for line in blob.split('\n'):
-+			line = line.strip()
-+			if not line:
-+				continue
-+			elif config_matcher.match(line) or is_not_set_matcher.match(line):
-+				self._entries.append(KconfigEntry(line))
-+			elif line[0] == '#':
-+				continue
-+			else:
-+				raise KconfigParseError('Failed to parse: ' + line)
-+
-+	def read_from_file(self, path: str) -> None:
-+		with open(path, 'r') as f:
-+			self.parse_from_string(f.read())
-diff --git a/tools/testing/kunit/kunit_kernel.py b/tools/testing/kunit/kunit_kernel.py
-new file mode 100644
-index 0000000000000..07c0abf2f47df
---- /dev/null
-+++ b/tools/testing/kunit/kunit_kernel.py
-@@ -0,0 +1,148 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Runs UML kernel, collects output, and handles errors.
-+#
-+# Copyright (C) 2019, Google LLC.
-+# Author: Felix Guo <felixguoxiuping@gmail.com>
-+# Author: Brendan Higgins <brendanhiggins@google.com>
-+
-+
-+import logging
-+import subprocess
-+import os
-+
-+import kunit_config
-+
-+KCONFIG_PATH = '.config'
-+
-+class ConfigError(Exception):
-+	"""Represents an error trying to configure the Linux kernel."""
-+
-+
-+class BuildError(Exception):
-+	"""Represents an error trying to build the Linux kernel."""
-+
-+
-+class LinuxSourceTreeOperations(object):
-+	"""An abstraction over command line operations performed on a source tree."""
-+
-+	def make_mrproper(self):
-+		try:
-+			subprocess.check_output(['make', 'mrproper'])
-+		except OSError as e:
-+			raise ConfigError('Could not call make command: ' + e)
-+		except subprocess.CalledProcessError as e:
-+			raise ConfigError(e.output)
-+
-+	def make_olddefconfig(self, build_dir):
-+		command = ['make', 'ARCH=um', 'olddefconfig']
-+		if build_dir:
-+			command += ['O=' + build_dir]
-+		try:
-+			subprocess.check_output(command)
-+		except OSError as e:
-+			raise ConfigError('Could not call make command: ' + e)
-+		except subprocess.CalledProcessError as e:
-+			raise ConfigError(e.output)
-+
-+	def make(self, jobs, build_dir):
-+		command = ['make', 'ARCH=um', '--jobs=' + str(jobs)]
-+		if build_dir:
-+			command += ['O=' + build_dir]
-+		try:
-+			subprocess.check_output(command)
-+		except OSError as e:
-+			raise BuildError('Could not call execute make: ' + e)
-+		except subprocess.CalledProcessError as e:
-+			raise BuildError(e.output)
-+
-+	def linux_bin(self, params, timeout, build_dir):
-+		"""Runs the Linux UML binary. Must be named 'linux'."""
-+		linux_bin = './linux'
-+		if build_dir:
-+			linux_bin = os.path.join(build_dir, 'linux')
-+		process = subprocess.Popen(
-+			[linux_bin] + params,
-+			stdin=subprocess.PIPE,
-+			stdout=subprocess.PIPE,
-+			stderr=subprocess.PIPE)
-+		process.wait(timeout=timeout)
-+		return process
-+
-+
-+def get_kconfig_path(build_dir):
-+	kconfig_path = KCONFIG_PATH
-+	if build_dir:
-+		kconfig_path = os.path.join(build_dir, KCONFIG_PATH)
-+	return kconfig_path
-+
-+class LinuxSourceTree(object):
-+	"""Represents a Linux kernel source tree with KUnit tests."""
-+
-+	def __init__(self):
-+		self._kconfig = kunit_config.Kconfig()
-+		self._kconfig.read_from_file('kunitconfig')
-+		self._ops = LinuxSourceTreeOperations()
-+
-+	def clean(self):
-+		try:
-+			self._ops.make_mrproper()
-+		except ConfigError as e:
-+			logging.error(e)
-+			return False
-+		return True
-+
-+	def build_config(self, build_dir):
-+		kconfig_path = get_kconfig_path(build_dir)
-+		if build_dir and not os.path.exists(build_dir):
-+			os.mkdir(build_dir)
-+		self._kconfig.write_to_file(kconfig_path)
-+		try:
-+			self._ops.make_olddefconfig(build_dir)
-+		except ConfigError as e:
-+			logging.error(e)
-+			return False
-+		validated_kconfig = kunit_config.Kconfig()
-+		validated_kconfig.read_from_file(kconfig_path)
-+		if not self._kconfig.is_subset_of(validated_kconfig):
-+			logging.error('Provided Kconfig is not contained in validated .config!')
-+			return False
-+		return True
-+
-+	def build_reconfig(self, build_dir):
-+		"""Creates a new .config if it is not a subset of the kunitconfig."""
-+		kconfig_path = get_kconfig_path(build_dir)
-+		if os.path.exists(kconfig_path):
-+			existing_kconfig = kunit_config.Kconfig()
-+			existing_kconfig.read_from_file(kconfig_path)
-+			if not self._kconfig.is_subset_of(existing_kconfig):
-+				print('Regenerating .config ...')
-+				os.remove(kconfig_path)
-+				return self.build_config(build_dir)
-+			else:
-+				return True
-+		else:
-+			print('Generating .config ...')
-+			return self.build_config(build_dir)
-+
-+	def build_um_kernel(self, jobs, build_dir):
-+		try:
-+			self._ops.make_olddefconfig(build_dir)
-+			self._ops.make(jobs, build_dir)
-+		except (ConfigError, BuildError) as e:
-+			logging.error(e)
-+			return False
-+		used_kconfig = kunit_config.Kconfig()
-+		used_kconfig.read_from_file(get_kconfig_path(build_dir))
-+		if not self._kconfig.is_subset_of(used_kconfig):
-+			logging.error('Provided Kconfig is not contained in final config!')
-+			return False
-+		return True
-+
-+	def run_kernel(self, args=[], timeout=None, build_dir=None):
-+		args.extend(['mem=256M'])
-+		process = self._ops.linux_bin(args, timeout, build_dir)
-+		with open('test.log', 'w') as f:
-+			for line in process.stdout:
-+				f.write(line.rstrip().decode('ascii') + '\n')
-+				yield line.rstrip().decode('ascii')
-diff --git a/tools/testing/kunit/kunit_parser.py b/tools/testing/kunit/kunit_parser.py
-new file mode 100644
-index 0000000000000..6c81d4dcfabb5
---- /dev/null
-+++ b/tools/testing/kunit/kunit_parser.py
-@@ -0,0 +1,119 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Parses test results from a kernel dmesg log.
-+#
-+# Copyright (C) 2019, Google LLC.
-+# Author: Felix Guo <felixguoxiuping@gmail.com>
-+# Author: Brendan Higgins <brendanhiggins@google.com>
-+
-+import re
-+from datetime import datetime
-+
-+kunit_start_re = re.compile('printk: console .* enabled')
-+kunit_end_re = re.compile('List of all partitions:')
-+
-+def isolate_kunit_output(kernel_output):
-+	started = False
-+	for line in kernel_output:
-+		if kunit_start_re.match(line):
-+			started = True
-+		elif kunit_end_re.match(line):
-+			break
-+		elif started:
-+			yield line
-+
-+def raw_output(kernel_output):
-+	for line in kernel_output:
-+		print(line)
-+
-+DIVIDER = "=" * 30
-+
-+RESET = '\033[0;0m'
-+
-+def red(text):
-+	return '\033[1;31m' + text + RESET
-+
-+def yellow(text):
-+	return '\033[1;33m' + text + RESET
-+
-+def green(text):
-+	return '\033[1;32m' + text + RESET
-+
-+def print_with_timestamp(message):
-+	print('[%s] %s' % (datetime.now().strftime('%H:%M:%S'), message))
-+
-+def print_log(log):
-+	for m in log:
-+		print_with_timestamp(m)
-+
-+def parse_run_tests(kernel_output):
-+	test_case_output = re.compile('^kunit .*?: (.*)$')
-+
-+	test_module_success = re.compile('^kunit .*: all tests passed')
-+	test_module_fail = re.compile('^kunit .*: one or more tests failed')
-+
-+	test_case_success = re.compile('^kunit (.*): (.*) passed')
-+	test_case_fail = re.compile('^kunit (.*): (.*) failed')
-+	test_case_crash = re.compile('^kunit (.*): (.*) crashed')
-+
-+	total_tests = set()
-+	failed_tests = set()
-+	crashed_tests = set()
-+
-+	def get_test_name(match):
-+		return match.group(1) + ":" + match.group(2)
-+
-+	current_case_log = []
-+	def end_one_test(match, log):
-+		log.clear()
-+		total_tests.add(get_test_name(match))
-+
-+	print_with_timestamp(DIVIDER)
-+	for line in isolate_kunit_output(kernel_output):
-+		# Ignore module output:
-+		if (test_module_success.match(line) or
-+		    test_module_fail.match(line)):
-+			print_with_timestamp(DIVIDER)
-+			continue
-+
-+		match = re.match(test_case_success, line)
-+		if match:
-+			print_with_timestamp(green("[PASSED] ") +
-+					     get_test_name(match))
-+			end_one_test(match, current_case_log)
-+			continue
-+
-+		match = re.match(test_case_fail, line)
-+		# Crashed tests will report as both failed and crashed. We only
-+		# want to show and count it once.
-+		if match and get_test_name(match) not in crashed_tests:
-+			failed_tests.add(get_test_name(match))
-+			print_with_timestamp(red("[FAILED] " +
-+						 get_test_name(match)))
-+			print_log(map(yellow, current_case_log))
-+			print_with_timestamp("")
-+			end_one_test(match, current_case_log)
-+			continue
-+
-+		match = re.match(test_case_crash, line)
-+		if match:
-+			crashed_tests.add(get_test_name(match))
-+			print_with_timestamp(yellow("[CRASH] " +
-+						    get_test_name(match)))
-+			print_log(current_case_log)
-+			print_with_timestamp("")
-+			end_one_test(match, current_case_log)
-+			continue
-+
-+		# Strip off the `kunit module-name:` prefix
-+		match = re.match(test_case_output, line)
-+		if match:
-+			current_case_log.append(match.group(1))
-+		else:
-+			current_case_log.append(line)
-+
-+	fmt = green if (len(failed_tests) + len(crashed_tests) == 0) else red
-+	print_with_timestamp(
-+		fmt("Testing complete. %d tests run. %d failed. %d crashed." %
-+		    (len(total_tests), len(failed_tests), len(crashed_tests))))
++void __weak kunit_try_catch_init_internal(struct kunit_try_catch *try_catch)
++{
++	kunit_generic_try_catch_init(try_catch);
++}
 +
 -- 
 2.21.0.392.gf8f6787159e-goog
