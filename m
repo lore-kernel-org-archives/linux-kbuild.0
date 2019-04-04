@@ -1,16 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk1-f201.google.com ([209.85.222.201]:41372 "EHLO
-        mail-qk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729924AbfDDWKD (ORCPT
+Received: from mail-vk1-f202.google.com ([209.85.221.202]:39590 "EHLO
+        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730842AbfDDWKZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Apr 2019 18:10:03 -0400
-Received: by mail-qk1-f201.google.com with SMTP id x18so3427028qkf.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 04 Apr 2019 15:10:02 -0700 (PDT)
-Date: Thu,  4 Apr 2019 15:06:35 -0700
-Message-Id: <20190404220652.19765-1-brendanhiggins@google.com>
+        Thu, 4 Apr 2019 18:10:25 -0400
+Received: by mail-vk1-f202.google.com with SMTP id b75so1678805vke.6
+        for <linux-kbuild@vger.kernel.org>; Thu, 04 Apr 2019 15:10:24 -0700 (PDT)
+Date: Thu,  4 Apr 2019 15:06:44 -0700
+In-Reply-To: <20190404220652.19765-1-brendanhiggins@google.com>
+Message-Id: <20190404220652.19765-10-brendanhiggins@google.com>
 Mime-Version: 1.0
-Subject: [PATCH v1 00/17] kunit: introduce KUnit, the Linux kernel unit
- testing framework
+References: <20190404220652.19765-1-brendanhiggins@google.com>
+Subject: [PATCH v1 09/17] kunit: test: add tests for kunit test abort
 From: Brendan Higgins <brendanhiggins@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,80 +19,170 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: corbet@lwn.net, frowand.list@gmail.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, shuah@kernel.org, yamada.masahiro@socionext.com
 Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, gregkh@linuxfoundation.org, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
 
-This patch set proposes KUnit, a lightweight unit testing and mocking
-framework for the Linux kernel.
+Add KUnit tests for the KUnit test abort mechanism (see preceding
+commit). Add tests both for general try catch mechanism as well as
+non-architecture specific mechanism.
 
-Unlike Autotest and kselftest, KUnit is a true unit testing framework;
-it does not require installing the kernel on a test machine or in a VM
-and does not require tests to be written in userspace running on a host
-kernel. Additionally, KUnit is fast: From invocation to completion KUnit
-can run several dozen tests in under a second. Currently, the entire
-KUnit test suite for KUnit runs in under a second from the initial
-invocation (build time excluded).
+Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+---
+ kunit/Makefile    |   3 +-
+ kunit/test-test.c | 135 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 137 insertions(+), 1 deletion(-)
+ create mode 100644 kunit/test-test.c
 
-KUnit is heavily inspired by JUnit, Python's unittest.mock, and
-Googletest/Googlemock for C++. KUnit provides facilities for defining
-unit test cases, grouping related test cases into test suites, providing
-common infrastructure for running tests, mocking, spying, and much more.
-
-## What's so special about unit testing?
-
-A unit test is supposed to test a single unit of code in isolation,
-hence the name. There should be no dependencies outside the control of
-the test; this means no external dependencies, which makes tests orders
-of magnitudes faster. Likewise, since there are no external dependencies,
-there are no hoops to jump through to run the tests. Additionally, this
-makes unit tests deterministic: a failing unit test always indicates a
-problem. Finally, because unit tests necessarily have finer granularity,
-they are able to test all code paths easily solving the classic problem
-of difficulty in exercising error handling code.
-
-## Is KUnit trying to replace other testing frameworks for the kernel?
-
-No. Most existing tests for the Linux kernel are end-to-end tests, which
-have their place. A well tested system has lots of unit tests, a
-reasonable number of integration tests, and some end-to-end tests. KUnit
-is just trying to address the unit test space which is currently not
-being addressed.
-
-## More information on KUnit
-
-There is a bunch of documentation near the end of this patch set that
-describes how to use KUnit and best practices for writing unit tests.
-For convenience I am hosting the compiled docs here:
-https://google.github.io/kunit-docs/third_party/kernel/docs/
-Additionally for convenience, I have applied these patches to a branch:
-https://kunit.googlesource.com/linux/+/kunit/rfc/v5.1-rc2/v1
-The repo may be cloned with:
-git clone https://kunit.googlesource.com/linux
-This patchset is on the kunit/rfc/v5.1-rc2/v1 branch.
-
-## Changes Since Last Version
-
-Last version was RFC v4. It seemed we were pretty much done with the RFC
-phase, so I started the numbering over again. Sorry if anyone finds that
-confusing.
-
- - Reduced usage of object oriented style of member functions as
-   suggested by Frank.
- - Did a bunch of heavy clean up of the kunit_abort stuff as suggested
-   by Frank and Stephen:
-   - Biggest change was to reduce the usage of direct calls of member
-     functions.
-   - Added a better explanation of what abort is for and further
-     explained the rationale for KUNIT_ASSERT_* vs. KUNIT_EXPECT_*
-   - Dropped BUG() usage
-   - Also moved try_catch interface to a new file since it seemed
-     obscured by being mixed in with the code that used it.
- - Fixed some other minor issues pointed out by Stephen.
- - Updated email address of one of the contributors.
- - Dropped DT unittest port since it seemed like there was a lot more
-   discussion to be had: it wasn't ready to leave the RFC phase.
-   Instead, I added a KUnit test written by Iurii for PROC SYSCTL that
-   was requested by Luis some time ago.
-
-For reference, RFC v4 can be found here:
-https://lkml.org/lkml/2019/2/14/1144
-
+diff --git a/kunit/Makefile b/kunit/Makefile
+index 1f7680cfa11ad..533355867abd2 100644
+--- a/kunit/Makefile
++++ b/kunit/Makefile
+@@ -3,6 +3,7 @@ obj-$(CONFIG_KUNIT) +=			test.o \
+ 					kunit-stream.o \
+ 					try-catch.o
+ 
+-obj-$(CONFIG_KUNIT_TEST) +=		string-stream-test.o
++obj-$(CONFIG_KUNIT_TEST) +=		test-test.o \
++					string-stream-test.o
+ 
+ obj-$(CONFIG_KUNIT_EXAMPLE_TEST) +=	example-test.o
+diff --git a/kunit/test-test.c b/kunit/test-test.c
+new file mode 100644
+index 0000000000000..c81ae6efb959f
+--- /dev/null
++++ b/kunit/test-test.c
+@@ -0,0 +1,135 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * KUnit test for core test infrastructure.
++ *
++ * Copyright (C) 2019, Google LLC.
++ * Author: Brendan Higgins <brendanhiggins@google.com>
++ */
++#include <kunit/test.h>
++
++struct kunit_try_catch_test_context {
++	struct kunit_try_catch *try_catch;
++	bool function_called;
++};
++
++void kunit_test_successful_try(void *data)
++{
++	struct kunit *test = data;
++	struct kunit_try_catch_test_context *ctx = test->priv;
++
++	ctx->function_called = true;
++}
++
++void kunit_test_no_catch(void *data)
++{
++	struct kunit *test = data;
++
++	KUNIT_FAIL(test, "Catch should not be called.\n");
++}
++
++static void kunit_test_try_catch_successful_try_no_catch(struct kunit *test)
++{
++	struct kunit_try_catch_test_context *ctx = test->priv;
++	struct kunit_try_catch *try_catch = ctx->try_catch;
++
++	kunit_try_catch_init(try_catch,
++			     test,
++			     kunit_test_successful_try,
++			     kunit_test_no_catch);
++	kunit_try_catch_run(try_catch, test);
++
++	KUNIT_EXPECT_TRUE(test, ctx->function_called);
++}
++
++void kunit_test_unsuccessful_try(void *data)
++{
++	struct kunit *test = data;
++	struct kunit_try_catch_test_context *ctx = test->priv;
++	struct kunit_try_catch *try_catch = ctx->try_catch;
++
++	kunit_try_catch_throw(try_catch);
++	KUNIT_FAIL(test, "This line should never be reached.\n");
++}
++
++void kunit_test_catch(void *data)
++{
++	struct kunit *test = data;
++	struct kunit_try_catch_test_context *ctx = test->priv;
++
++	ctx->function_called = true;
++}
++
++static void kunit_test_try_catch_unsuccessful_try_does_catch(struct kunit *test)
++{
++	struct kunit_try_catch_test_context *ctx = test->priv;
++	struct kunit_try_catch *try_catch = ctx->try_catch;
++
++	kunit_try_catch_init(try_catch,
++			     test,
++			     kunit_test_unsuccessful_try,
++			     kunit_test_catch);
++	kunit_try_catch_run(try_catch, test);
++
++	KUNIT_EXPECT_TRUE(test, ctx->function_called);
++}
++
++static void kunit_test_generic_try_catch_successful_try_no_catch(
++		struct kunit *test)
++{
++	struct kunit_try_catch_test_context *ctx = test->priv;
++	struct kunit_try_catch *try_catch = ctx->try_catch;
++
++	try_catch->test = test;
++	kunit_generic_try_catch_init(try_catch);
++	try_catch->try = kunit_test_successful_try;
++	try_catch->catch = kunit_test_no_catch;
++
++	kunit_try_catch_run(try_catch, test);
++
++	KUNIT_EXPECT_TRUE(test, ctx->function_called);
++}
++
++static void kunit_test_generic_try_catch_unsuccessful_try_does_catch(
++		struct kunit *test)
++{
++	struct kunit_try_catch_test_context *ctx = test->priv;
++	struct kunit_try_catch *try_catch = ctx->try_catch;
++
++	try_catch->test = test;
++	kunit_generic_try_catch_init(try_catch);
++	try_catch->try = kunit_test_unsuccessful_try;
++	try_catch->catch = kunit_test_catch;
++
++	kunit_try_catch_run(try_catch, test);
++
++	KUNIT_EXPECT_TRUE(test, ctx->function_called);
++}
++
++static int kunit_try_catch_test_init(struct kunit *test)
++{
++	struct kunit_try_catch_test_context *ctx;
++
++	ctx = kunit_kzalloc(test, sizeof(*ctx), GFP_KERNEL);
++	test->priv = ctx;
++
++	ctx->try_catch = kunit_kmalloc(test,
++				       sizeof(*ctx->try_catch),
++				       GFP_KERNEL);
++
++	return 0;
++}
++
++static struct kunit_case kunit_try_catch_test_cases[] = {
++	KUNIT_CASE(kunit_test_try_catch_successful_try_no_catch),
++	KUNIT_CASE(kunit_test_try_catch_unsuccessful_try_does_catch),
++	KUNIT_CASE(kunit_test_generic_try_catch_successful_try_no_catch),
++	KUNIT_CASE(kunit_test_generic_try_catch_unsuccessful_try_does_catch),
++	{},
++};
++
++static struct kunit_module kunit_try_catch_test_module = {
++	.name = "kunit-try-catch-test",
++	.init = kunit_try_catch_test_init,
++	.test_cases = kunit_try_catch_test_cases,
++};
++module_test(kunit_try_catch_test_module);
 -- 
 2.21.0.392.gf8f6787159e-goog
