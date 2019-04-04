@@ -1,16 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35374 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:45562 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387593AbfDDJO5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Apr 2019 05:14:57 -0400
-Date: Thu, 4 Apr 2019 11:14:51 +0200 (CEST)
+        id S1728345AbfDDK7e (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 4 Apr 2019 06:59:34 -0400
+Date: Thu, 4 Apr 2019 12:59:30 +0200 (CEST)
 From: Miroslav Benes <mbenes@suse.cz>
 Subject: Re: [PATCH v2 2/8] kbuild: Support for Symbols.list creation
-In-Reply-To: <651eb328-b13a-9f31-d4da-9d2e965914e3@redhat.com>
-Message-ID: <alpine.LSU.2.21.1904041113160.32428@pobox.suse.cz>
+In-Reply-To: <alpine.LSU.2.21.1904031444020.18182@pobox.suse.cz>
+Message-ID: <alpine.LSU.2.21.1904041253300.32428@pobox.suse.cz>
 References: <20190301141313.15057-1-jmoreira@suse.de> <20190301141313.15057-3-jmoreira@suse.de> <20190318191926.GA23138@redhat.com> <alpine.LSU.2.21.1903202000470.29796@pobox.suse.cz> <5f615af5-ced7-2361-5b71-71fece8b43c5@suse.de> <ae018181-fd8a-03b2-69bf-e9302172bfeb@redhat.com>
  <699e78da-36ba-8217-c509-2e9b443bd380@suse.de> <1b6ee81b-5699-a1cc-9a85-02df0eeaed12@redhat.com> <20190328201703.GA8658@redhat.com> <20190401193529.GA26375@redhat.com> <alpine.LSU.2.21.1904031444020.18182@pobox.suse.cz>
- <651eb328-b13a-9f31-d4da-9d2e965914e3@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,78 +17,151 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Joe Lawrence <joe.lawrence@redhat.com>
 Cc: Joao Moreira <jmoreira@suse.de>, live-patching@vger.kernel.org, pmladek@suse.cz, jikos@suse.cz, nstange@suse.de, jpoimboe@redhat.com, khlebnikov@yandex-team.ru, jeyu@kernel.org, matz@suse.de, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, michal.lkml@markovi.net
 
-On Wed, 3 Apr 2019, Joe Lawrence wrote:
+On Wed, 3 Apr 2019, Miroslav Benes wrote:
 
-> On 4/3/19 8:48 AM, Miroslav Benes wrote:
+> 
+> > > Hmm, maybe I spoke too soon.
+> > >
+> > > I am having issues if I have a two-object livepatch module in which each
+> > > object file needs to specify its own KLP_MODULE_RELOC for the same
+> > > symbol name.
+> > >
+> > > For example: I have test_klp_convert.ko which is comprised of
+> > > test_klp_convert_a.o. which needs to refer to state_show,1 and
+> > > test_klp_convert_b.o. which needs to refer to state_show,2.
+> > >
+> > >   % make
+> > >   ...
+> > >     KLP     lib/livepatch/test_klp_convert.ko
+> > >   klp-convert: Conflicting KLP_SYMPOS definition: vmlinux.state_show,0 vs. vmlinux.state_show,1.
+> > >   klp-convert: Unable to load user-provided sympos
+> > >   make[2]: *** [scripts/Makefile.modpost:148: lib/livepatch/test_klp_convert.ko] Error 255
+> > >   make[1]: *** [/home/cloud-user/disk/linux/Makefile:1282: modules] Error 2
+> > >   make: *** [Makefile:170: sub-make] Error 2
+> > >
+> > > I take a closer look next week, but in the meantime, see the source
+> > > files below.
 > > 
-> >> and it looks like the combined KLP_MODULE_RELOC still contains the two
-> >> unique symbol position values (2 and 3):
-> >>
-> >>    % objcopy -O binary --only-section=.klp.module_relocs.vmlinux lib/livepatch/test_klp_convert.klp.o >(hexdump -C)
-> >>    00000000  00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00  |................|
-> >>    00000010  00 00 00 00 00 00 00 00  03 00 00 00              |............|
-> >>    0000001c
+> > Okay, with a fresh set of eyes today, I think the issue can be
+> > summarized as:
 > > 
-> > Nice :/
-> >   
-> >> Maybe we can work around this by modifying the annotation macros and/or
-> >> klp-convert, or live with this for now.
+> >   * "Special" livepatch symbols, as processed by klp-convert, require
+> >     external linkage, otherwise a new local storage instance will be
+> >     created and miss klp-convert altogether
 > > 
-> > The question is (and I'll check later. I cannot wrap my head around it
-> > now) if it at least works if there are two references of the same symbol
-> > in two different .o. It would be same state_show in this case and not two
-> > different ones. If it works then I think we can live with it for a while,
-> > because after all duplicate symbols are quite rare in the kernel.
+> >   * When linking together two object files, their combined symbol table
+> >     will include a de-duped list of uniquly named global symbols
+> > 
+> > So if we are to run klp-convert on the combined module object file (as
+> > per v2 plus suggested changes in this thread), we are going to run into
+> > problems if ...
+> > 
+> > 
+> > Example
+> > =======
+> > 
+> > (quoted in previous reply), test_klp_convert_a and test_klp_convert_b
+> > have their own "state_show" variable in which each wishes to resolve to
+> > unique symbol positions (2 and 3 accordingly).
+> > 
+> > 
+> > test_klp_convert_a
+> > ------------------
+> > 
+> > We get one symbol table entry and one relocation as expected.
+> > 
+> >   % eu-readelf --symbols lib/livepatch/test_klp_convert_a.o
+> > 
+> >   Symbol table [27] '.symtab' contains 38 entries:
+> >    29 local symbols  String table: [28] '.strtab'
+> >     Num:            Value   Size Type    Bind   Vis          Ndx Name
+> >     ...
+> >      30: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+> >     ...
+> > 
+> >   % eu-readelf --relocs lib/livepatch/test_klp_convert_a.o
+> > 
+> >   Relocation section [12] '.rela.klp.module_relocs.vmlinux' for section [11] '.klp.module_relocs.vmlinux' at offset 0x4b8 contains 1 entry:
+> >     Offset              Type            Value               Addend Name
+> >     000000000000000000  X86_64_64       000000000000000000      +0 state_show
+> > 
+> > 
+> > test_klp_convert_b
+> > ------------------
+> > 
+> > Just like the other object file, one symbol table entry and one
+> > relocation:
+> > 
+> >   % eu-readelf --symbols lib/livepatch/test_klp_convert_a.o
+> >   Symbol table [24] '.symtab' contains 23 entries:
+> >    19 local symbols  String table: [25] '.strtab'
+> >     Num:            Value   Size Type    Bind   Vis          Ndx Name
+> >     ...
+> >      20: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+> >     ...
+> > 
+> >   % eu-readelf --relocs lib/livepatch/test_klp_convert_b.o
+> > 
+> >   Relocation section [ 9] '.rela.klp.module_relocs.vmlinux' for section [ 8] '.klp.module_relocs.vmlinux' at offset 0x118 contains 1 entry:
+> >     Offset              Type            Value               Addend Name
+> >     000000000000000000  X86_64_64       000000000000000000      +0 state_show
+> > 
+> > 
+> > test_klp_convert
+> > ----------------
+> > 
+> > But the combined test_klp_convert.klp.o file has only a single
+> > unresolved "state_show" symbol in its symbol table:
+> > 
+> >   % eu-readelf --symbols lib/livepatch/test_klp_convert.klp.o
+> > 
+> >   Symbol table [35] '.symtab' contains 57 entries:
+> >    47 local symbols  String table: [36] '.strtab'
+> >     Num:            Value   Size Type    Bind   Vis          Ndx Name
+> >     ...
+> >      52: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+> >     ...
+> > 
+> > though the .rela.klp.module_relocs.vmlinux relocation section has two
+> > entries:
+> > 
+> >   % eu-readelf --relocs lib/livepatch/test_klp_convert.klp.o
+> > 
+> >   Relocation section [17] '.rela.klp.module_relocs.vmlinux' for section [16] '.klp.module_relocs.vmlinux' at offset 0x446c8 contains 2 entries:
+> >     Offset              Type            Value               Addend Name
+> >     000000000000000000  X86_64_64       000000000000000000      +0 state_show
+> >     0x0000000000000010  X86_64_64       000000000000000000      +0 state_show
+> > 
+> > and it looks like the combined KLP_MODULE_RELOC still contains the two
+> > unique symbol position values (2 and 3):
+> > 
+> >   % objcopy -O binary --only-section=.klp.module_relocs.vmlinux lib/livepatch/test_klp_convert.klp.o >(hexdump -C)
+> >   00000000  00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00  |................|
+> >   00000010  00 00 00 00 00 00 00 00  03 00 00 00              |............|
+> >   0000001c
 > 
-> Possibly, but in testing that scenario I found another issue.  Check out what
-> happens to the combined .klp.module_relocs.vmlinux section for:
+> Nice :/
+>  
+> > Maybe we can work around this by modifying the annotation macros and/or
+> > klp-convert, or live with this for now.
 > 
->   test_klp_convert_a.c
->   KLP_MODULE_RELOC(vmlinux) vmlinux_relocs_a[] = {
->           KLP_SYMPOS(state_show, 2)
->           KLP_SYMPOS(joe, 10)
->           KLP_SYMPOS(joe2, 11)
->   };
-> 
->   test_klp_convert_b.c
->   KLP_MODULE_RELOC(vmlinux) vmlinux_relocs_b[] = {
->           KLP_SYMPOS(state_show, 2)
->   };
-> 
-> The second file's klp_module_reloc are not aligned with the first,
-> so I think there is additional padding to push the second set to a
-> word boundary:
-> 
->   % objcopy -O binary --only-section=.klp.module_relocs.vmlinux lib/livepatch/test_klp_convert.klp.o >(hexdump -C)
->   00000000  00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00
->             |-*sym----------------|  |--sympos-| |-*sym-----
-> 
->   00000010  00 00 00 00 0a 00 00 00  00 00 00 00 00 00 00 00
->             ----------| |--sympos-|  |-*sym----------------|
-> 
->   00000020  0b 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
->             |-sympos--|              |-*sym----------------|
-> 
->                         ^^^^^^^^^^^
->                         padding
->   00000030  02 00 00 00
->             |-sympos--|
->
-> 
-> in this case, klp-convert thought the last symbol's sympos was
-> incorrectly 0 and not 2.
+> The question is (and I'll check later. I cannot wrap my head around it 
+> now) if it at least works if there are two references of the same symbol 
+> in two different .o. It would be same state_show in this case and not two 
+> different ones. If it works then I think we can live with it for a while, 
+> because after all duplicate symbols are quite rare in the kernel.
 
-Ugh. It's getting better and better.
+I think it should work. There is only one case which causes problems. 
+There exists an ambiguous local symbol in one parent object and a 
+livepatch needs to reference two (or more) different versions of the 
+symbol. In that case there have to be more sympos records provided by a 
+user to help klp-convert distinguish between the cases. klp-convert is of 
+course confused because it currently cannot cope with that.
+
+All other cases should be fine (theoretically).
+
+So we need to come up with a solution which would help klp-convert 
+recognize the cases (symbol usage sites). Some sort of user annotation, 
+but I cannot think of anything right now.
  
-> If the packed attribute is merely a space optimization, can we
-> simply pull that (or can we specify slightly looser alignment to
-> account for the padding)?
-
-I think so.
-
-> I'll continue working on putting together v3 and add this new item
-> to the TODO list.
-
-Great job btw. Thanks.
-
 Miroslav
