@@ -1,177 +1,209 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:64933 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730512AbfDEKRj (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:48041 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730497AbfDELTN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Apr 2019 06:17:39 -0400
+        Fri, 5 Apr 2019 07:19:13 -0400
 MIME-Version: 1.0
-References: <CAK7LNAQw7nPwykOEV5i+yWjkxzgf1gPa5ewFhDxbbn8XXjwFUA@mail.gmail.com>
- <20190402070858.49597-1-ndesaulniers@google.com>
-In-Reply-To: <20190402070858.49597-1-ndesaulniers@google.com>
+References: <20190308132701.133598-1-glider@google.com> <20190308132701.133598-2-glider@google.com>
+In-Reply-To: <20190308132701.133598-2-glider@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 5 Apr 2019 19:16:50 +0900
-Message-ID: <CAK7LNAQGUe0h2ti6_u5=y9KUrNStESdd=D=8K3NOiE08tt022w@mail.gmail.com>
-Subject: Re: [PATCH v3] Makefile: lld: tell clang to use lld
-Content-Type: multipart/mixed; boundary="0000000000002794cc0585c5cb81"
+Date: Fri, 5 Apr 2019 20:18:31 +0900
+Message-ID: <CAK7LNATGJ9JZ8XxP2jQ-smDNH6igNvrSZB2TF62rykpqJBF8qg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] initmem: introduce CONFIG_INIT_ALL_MEMORY and CONFIG_INIT_ALL_STACK
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Kees Cook <keescook@chromium.org>, clang-built-linux@googlegroups.com, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Alexander Potapenko <glider@google.com>
+Cc: James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, linux-security-module@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, kcc@google.com, Dmitry Vyukov <dvyukov@google.com>, Kees Cook <keescook@chromium.org>, sspatil@android.com, Kernel Hardening <kernel-hardening@lists.openwall.com>
 
---0000000000002794cc0585c5cb81
-Content-Type: text/plain; charset="UTF-8"
+On Fri, Mar 8, 2019 at 10:27 PM Alexander Potapenko <glider@google.com> wrote:
+>
+> CONFIG_INIT_ALL_MEMORY is going to be an umbrella config for options
+> that force heap and stack initialization.
+> The rationale behind doing so is to reduce the severity of bugs caused
+> by using uninitialized memory.
+>
+> CONFIG_INIT_ALL_STACK turns on stack initialization based on
+> -ftrivial-auto-var-init in Clang builds and on
+> -fplugin-arg-structleak_plugin-byref-all in GCC builds.
+>
+> -ftrivial-auto-var-init is a Clang flag that provides trivial
+> initializers for uninitialized local variables, variable fields and
+> padding.
+>
+> It has three possible values:
+>   pattern - uninitialized locals are filled with a fixed pattern
+>     (mostly 0xAA on 64-bit platforms, see https://reviews.llvm.org/D54604
+>     for more details) likely to cause crashes when uninitialized value is
+>     used;
+>   zero (it's still debated whether this flag makes it to the official
+>     Clang release) - uninitialized locals are filled with zeroes;
+>   uninitialized (default) - uninitialized locals are left intact.
+>
+> The proposed config builds the kernel with
+> -ftrivial-auto-var-init=pattern.
+>
+> Developers have the possibility to opt-out of this feature on a
+> per-file (by using the INIT_ALL_MEMORY_ Makefile prefix)
 
-On Tue, Apr 2, 2019 at 4:09 PM Nick Desaulniers <ndesaulniers@google.com> wrote:
+Do you have a plan to use this per-file prefix?
+If so, could you elaborate which parts should opt out?
+
+
+> or per-variable
+> (by using __attribute__((uninitialized))) basis.
 >
-> This is needed because clang doesn't select which linker to use based on
-> $LD but rather -fuse-ld={bfd,gold,lld,<absolute path to linker>}.  This
-> is problematic especially for cc-ldoption, which checks for linker flag
-> support via invoking the compiler, rather than the linker.
+> For GCC builds, CONFIG_INIT_ALL_STACK is simply wired up to
+> CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL. No opt-out is possible at the
+> moment.
 >
-> Select the linker via absolute path from $PATH via `which`. This allows
-> you to build with:
->
-> $ make LD=ld.lld
-> $ make LD=ld.lld-8
-> $ make LD=/path/to/ld.lld
->
-> Add -Qunused-arguments to KBUILD_CPPFLAGS when using LLD, as otherwise
-> Clang likes to complain about -fuse-lld= being unused when compiling but
-> not linking (-c) such as when cc-option is used.
->
-> Link: https://github.com/ClangBuiltLinux/linux/issues/342
-> Link: https://github.com/ClangBuiltLinux/linux/issues/366
-> Link: https://github.com/ClangBuiltLinux/linux/issues/357
-> Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
-> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> Signed-off-by: Alexander Potapenko <glider@google.com>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: "Serge E. Hallyn" <serge@hallyn.com>
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Cc: Kostya Serebryany <kcc@google.com>
+> Cc: Dmitry Vyukov <dvyukov@google.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Sandeep Patil <sspatil@android.com>
+> Cc: linux-security-module@vger.kernel.org
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: kernel-hardening@lists.openwall.com
 > ---
-> Changes V2->V3:
-> * Use absolute path based on `which $LD` as per Masahiro.
+>  v2:
+>   - addressed Kees Cook's comments: added GCC support
+> ---
+>  Makefile                 |  3 ++-
+>  scripts/Makefile.initmem | 10 ++++++++++
+>  scripts/Makefile.lib     |  6 ++++++
+>  security/Kconfig         |  1 +
+>  security/Kconfig.initmem | 29 +++++++++++++++++++++++++++++
+>  5 files changed, 48 insertions(+), 1 deletion(-)
+>  create mode 100644 scripts/Makefile.initmem
+>  create mode 100644 security/Kconfig.initmem
+>
+> diff --git a/Makefile b/Makefile
+> index f070e0d65186..028ca37878fd 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -448,7 +448,7 @@ export HOSTCXX KBUILD_HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+>
+>  export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
+>  export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE
+> -export CFLAGS_KASAN CFLAGS_KASAN_NOSANITIZE CFLAGS_UBSAN
+> +export CFLAGS_KASAN CFLAGS_KASAN_NOSANITIZE CFLAGS_UBSAN CFLAGS_INITMEM
+>  export KBUILD_AFLAGS AFLAGS_KERNEL AFLAGS_MODULE
+>  export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
+>  export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
+> @@ -840,6 +840,7 @@ KBUILD_ARFLAGS := $(call ar-option,D)
+>  include scripts/Makefile.kasan
+>  include scripts/Makefile.extrawarn
+>  include scripts/Makefile.ubsan
+> +include scripts/Makefile.initmem
+>
+>  # Add any arch overrides and user supplied CPPFLAGS, AFLAGS and CFLAGS as the
+>  # last assignments
+> diff --git a/scripts/Makefile.initmem b/scripts/Makefile.initmem
+> new file mode 100644
+> index 000000000000..a6253d78fe35
+> --- /dev/null
+> +++ b/scripts/Makefile.initmem
+> @@ -0,0 +1,10 @@
+> +ifdef CONFIG_INIT_ALL_STACK
+> +
+> +# Clang's -ftrivial-auto-var-init=pattern flag initializes the
+> +# uninitialized parts of local variables (including fields and padding)
+> +# with a fixed pattern (0xAA in most cases).
+> +ifdef CONFIG_CC_HAS_AUTO_VAR_INIT
+> +  CFLAGS_INITMEM := -ftrivial-auto-var-init=pattern
+> +endif
+> +
+> +endif
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 12b88d09c3a4..53d18fd15c79 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -131,6 +131,12 @@ _c_flags += $(if $(patsubst n%,, \
+>                 $(CFLAGS_UBSAN))
+>  endif
+>
+> +ifeq ($(CONFIG_INIT_ALL_MEMORY),y)
+> +_c_flags += $(if $(patsubst n%,, \
+> +               $(INIT_ALL_MEMORY_$(basetarget).o)$(INIT_ALL_MEMORY)y), \
+> +               $(CFLAGS_INITMEM))
+> +endif
+> +
+>  ifeq ($(CONFIG_KCOV),y)
+>  _c_flags += $(if $(patsubst n%,, \
+>         $(KCOV_INSTRUMENT_$(basetarget).o)$(KCOV_INSTRUMENT)$(CONFIG_KCOV_INSTRUMENT_ALL)), \
+> diff --git a/security/Kconfig b/security/Kconfig
+> index e4fe2f3c2c65..cc12a39424dd 100644
+> --- a/security/Kconfig
+> +++ b/security/Kconfig
+> @@ -230,6 +230,7 @@ config STATIC_USERMODEHELPER_PATH
+>           If you wish for all usermode helper programs to be disabled,
+>           specify an empty string here (i.e. "").
+>
+> +source "security/Kconfig.initmem"
+>  source "security/selinux/Kconfig"
+>  source "security/smack/Kconfig"
+>  source "security/tomoyo/Kconfig"
+> diff --git a/security/Kconfig.initmem b/security/Kconfig.initmem
+> new file mode 100644
+> index 000000000000..27aec394365e
+> --- /dev/null
+> +++ b/security/Kconfig.initmem
+> @@ -0,0 +1,29 @@
+> +menu "Initialize all memory"
+> +
+> +config CC_HAS_AUTO_VAR_INIT
+> +       def_bool $(cc-option,-ftrivial-auto-var-init=pattern)
+> +
+> +config INIT_ALL_MEMORY
+> +       bool "Initialize all memory"
+> +       default n
+> +       help
+> +         Enforce memory initialization to mitigate infoleaks and make
+> +         the control-flow bugs depending on uninitialized values more
+> +         deterministic.
+> +
+> +if INIT_ALL_MEMORY
+> +
+> +config INIT_ALL_STACK
+> +       bool "Initialize all stack"
+> +       depends on INIT_ALL_MEMORY
+> +       depends on CC_HAS_AUTO_VAR_INIT || HAVE_GCC_PLUGINS
+> +       select GCC_PLUGINS if !CC_HAS_AUTO_VAR_INIT
+> +       select GCC_PLUGIN_STRUCTLEAK if !CC_HAS_AUTO_VAR_INIT
+> +       select GCC_PLUGIN_STRUCTLEAK_BYREF_ALL if !CC_HAS_AUTO_VAR_INIT
+> +       default y
+> +       help
+> +         Initialize uninitialized stack data with a fixed pattern
+> +         (0x00 in GCC, 0xAA in Clang).
 
-This is not what I suggested.  I wanted to say:
-"You cannot do this for GCC, so do not do it at all".
-
-I want to propose alternative solution.
-Please check the attached patches.
-
-To apply 0002, you need the following as a prerequisite:
-
-https://lore.kernel.org/patchwork/patch/1057685/
+Ugh, the logic is getting complicated.
 
 
+When I enabled INIT_ALL_MEMORY, I saw this:
 
---
+WARNING: unmet direct dependencies detected for GCC_PLUGINS
+  Depends on [n]: HAVE_GCC_PLUGINS [=y] && PLUGIN_HOSTCC [=]!=
+  Selected by [y]:
+  - INIT_ALL_STACK [=y] && INIT_ALL_MEMORY [=y] &&
+(CC_HAS_AUTO_VAR_INIT [=n] || HAVE_GCC_PLUGINS [=y]) &&
+!CC_HAS_AUTO_VAR_INIT [=n]
+
+
+
+
+> +endif # INIT_ALL_MEMORY
+> +endmenu
+> --
+> 2.21.0.360.g471c308f928-goog
+>
+
+
+-- 
 Best Regards
 Masahiro Yamada
-
---0000000000002794cc0585c5cb81
-Content-Type: application/x-patch;
-	name="0001-ARM-vdso-use-LD-instead-of-CC-to-link-VDSO.patch"
-Content-Disposition: attachment;
-	filename="0001-ARM-vdso-use-LD-instead-of-CC-to-link-VDSO.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ju3wsehm0>
-X-Attachment-Id: f_ju3wsehm0
-
-RnJvbSA3ZmNiNzgwNjk5MWQ5YjY0NDE3Mzg3OWMzYzFmY2JiZGVkNTMyNDM1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXNhaGlybyBZYW1hZGEgPHlhbWFkYS5tYXNhaGlyb0Bzb2Np
-b25leHQuY29tPgpEYXRlOiBGcmksIDUgQXByIDIwMTkgMTc6NDY6MTQgKzA5MDAKU3ViamVjdDog
-W1BBVENIIDEvMl0gQVJNOiB2ZHNvOiB1c2UgJChMRCkgaW5zdGVhZCBvZiAkKENDKSB0byBsaW5r
-IFZEU08KCldlIHVzZSAkKExEKSB0byBsaW5rIHZtbGludXgsIG1vZHVsZXMsIGRlY29tcHJlc3Nv
-cnMsIGV0Yy4KClZEU08gaXMgdGhlIG9ubHkgZXhjZXB0aW9uYWwgY2FzZSB3aGVyZSAkKENDKSBp
-cyB1c2VkIGFzIHRoZSBmcm9udGVuZApvZiBsaW5raW5nLCBidXQgSSBkbyBub3Qga25vdyB3aHku
-IFZEU08gdXNlcyBhIHNwZWNpYWwgbGlua2VyIHNjcmlwdCwKYW5kIGRvZXMgbm90IGxpbmsgc3Rh
-bmRhcmQgbGlicmFyaWVzIGF0IGFsbC4KCkkgY2hhbmdlZCB0aGUgTWFrZWZpbGUgdG8gdXNlICQo
-TEQpIHJhaHRlciB0aGFuICQoQ0MpLiBJIGNvbmZpcm1lZAp0aGUgc2FtZSB2ZHNvLnNvLnJhdyB3
-YXMgc3RpbGwgcHJvZHVjZWQuCgpVc2VycyB3aWxsIGJlIGFibGUgdG8gdXNlIHRoZWlyIGZhdm9y
-aXRlIGxpbmtlciAoZS5nLiBsbGQgaW5zdGVhZCBvZgpvZiBiZmQpIGJ5IHBhc3NpbmcgTEQ9IGZy
-b20gdGhlIGNvbW1hbmQgbGluZS4KCk15IHBsYW4gaXMgdG8gcmV3cml0ZSBhbGwgVkRTTyBNYWtl
-ZmlsZXMgdG8gdXNlICQoTEQpLCB0aGVuIGRlbGV0ZQpjYy1sZG9wdGlvbi4KClNpZ25lZC1vZmYt
-Ynk6IE1hc2FoaXJvIFlhbWFkYSA8eWFtYWRhLm1hc2FoaXJvQHNvY2lvbmV4dC5jb20+Ci0tLQog
-YXJjaC9hcm0vdmRzby9NYWtlZmlsZSB8IDIxICsrKysrKysrLS0tLS0tLS0tLS0tLQogMSBmaWxl
-IGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKSwgMTMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEv
-YXJjaC9hcm0vdmRzby9NYWtlZmlsZSBiL2FyY2gvYXJtL3Zkc28vTWFrZWZpbGUKaW5kZXggZjRl
-ZmZmOWQzYWZiLi5mYWRmNTU0ZDkzOTEgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtL3Zkc28vTWFrZWZp
-bGUKKysrIGIvYXJjaC9hcm0vdmRzby9NYWtlZmlsZQpAQCAtMTAsMTIgKzEwLDEyIEBAIG9iai12
-ZHNvIDo9ICQoYWRkcHJlZml4ICQob2JqKS8sICQob2JqLXZkc28pKQogY2NmbGFncy15IDo9IC1m
-UElDIC1mbm8tY29tbW9uIC1mbm8tYnVpbHRpbiAtZm5vLXN0YWNrLXByb3RlY3RvcgogY2NmbGFn
-cy15ICs9IC1ERElTQUJMRV9CUkFOQ0hfUFJPRklMSU5HCiAKLVZEU09fTERGTEFHUyA6PSAtV2ws
-LUJzeW1ib2xpYyAtV2wsLS1uby11bmRlZmluZWQgLVdsLC1zb25hbWU9bGludXgtdmRzby5zby4x
-Ci1WRFNPX0xERkxBR1MgKz0gLVdsLC16LG1heC1wYWdlLXNpemU9NDA5NiAtV2wsLXosY29tbW9u
-LXBhZ2Utc2l6ZT00MDk2Ci1WRFNPX0xERkxBR1MgKz0gLW5vc3RkbGliIC1zaGFyZWQKLVZEU09f
-TERGTEFHUyArPSAkKGNhbGwgY2MtbGRvcHRpb24sIC1XbCQoY29tbWEpLS1oYXNoLXN0eWxlPXN5
-c3YpCi1WRFNPX0xERkxBR1MgKz0gJChjYWxsIGNjLWxkb3B0aW9uLCAtV2wkKGNvbW1hKS0tYnVp
-bGQtaWQpCi1WRFNPX0xERkxBR1MgKz0gJChjYWxsIGNjLWxkb3B0aW9uLCAtZnVzZS1sZD1iZmQp
-CitsZGZsYWdzLXkgPSAtQnN5bWJvbGljIC0tbm8tdW5kZWZpbmVkIC1zb25hbWU9bGludXgtdmRz
-by5zby4xIFwKKwkgICAgLXogbWF4LXBhZ2Utc2l6ZT00MDk2IC16IGNvbW1vbi1wYWdlLXNpemU9
-NDA5NiBcCisJICAgIC1ub3N0ZGxpYiAtc2hhcmVkIFwKKwkgICAgJChjYWxsIGxkLW9wdGlvbiwg
-LS1oYXNoLXN0eWxlPXN5c3YpIFwKKwkgICAgJChjYWxsIGxkLW9wdGlvbiwgLS1idWlsZC1pZCkg
-XAorCSAgICAtVAogCiBvYmotJChDT05GSUdfVkRTTykgKz0gdmRzby5vCiBleHRyYS0kKENPTkZJ
-R19WRFNPKSArPSB2ZHNvLmxkcwpAQCAtMzcsOCArMzcsOCBAQCBLQ09WX0lOU1RSVU1FTlQgOj0g
-bgogJChvYmopL3Zkc28ubyA6ICQob2JqKS92ZHNvLnNvCiAKICMgTGluayBydWxlIGZvciB0aGUg
-LnNvIGZpbGUKLSQob2JqKS92ZHNvLnNvLnJhdzogJChzcmMpL3Zkc28ubGRzICQob2JqLXZkc28p
-IEZPUkNFCi0JJChjYWxsIGlmX2NoYW5nZWQsdmRzb2xkKQorJChvYmopL3Zkc28uc28ucmF3OiAk
-KG9iaikvdmRzby5sZHMgJChvYmotdmRzbykgRk9SQ0UKKwkkKGNhbGwgaWZfY2hhbmdlZCxsZCkK
-IAogJChvYmopL3Zkc28uc28uZGJnOiAkKG9iaikvdmRzby5zby5yYXcgJChvYmopL3Zkc29tdW5n
-ZSBGT1JDRQogCSQoY2FsbCBpZl9jaGFuZ2VkLHZkc29tdW5nZSkKQEAgLTQ4LDExICs0OCw2IEBA
-ICQob2JqKS8lLnNvOiBPQkpDT1BZRkxBR1MgOj0gLVMKICQob2JqKS8lLnNvOiAkKG9iaikvJS5z
-by5kYmcgRk9SQ0UKIAkkKGNhbGwgaWZfY2hhbmdlZCxvYmpjb3B5KQogCi0jIEFjdHVhbCBidWls
-ZCBjb21tYW5kcwotcXVpZXRfY21kX3Zkc29sZCA9IFZEU08gICAgJEAKLSAgICAgIGNtZF92ZHNv
-bGQgPSAkKENDKSAkKGNfZmxhZ3MpICQoVkRTT19MREZMQUdTKSBcCi0gICAgICAgICAgICAgICAg
-ICAgLVdsLC1UICQoZmlsdGVyICUubGRzLCReKSAkKGZpbHRlciAlLm8sJF4pIC1vICRACi0KIHF1
-aWV0X2NtZF92ZHNvbXVuZ2UgPSBNVU5HRSAgICRACiAgICAgICBjbWRfdmRzb211bmdlID0gJChv
-Ymp0cmVlKS8kKG9iaikvdmRzb211bmdlICQ8ICRACiAKLS0gCjIuMTcuMQoK
---0000000000002794cc0585c5cb81
-Content-Type: application/x-patch;
-	name="0002-arm64-vdso-use-LD-instead-of-CC-to-link-VDSO.patch"
-Content-Disposition: attachment;
-	filename="0002-arm64-vdso-use-LD-instead-of-CC-to-link-VDSO.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ju3wsjwn1>
-X-Attachment-Id: f_ju3wsjwn1
-
-RnJvbSBkYjkzYWJhNTA4NmViYzA1NThjMTkzMTAxZDU2YzJlNWE1ODc4ZGRhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXNhaGlybyBZYW1hZGEgPHlhbWFkYS5tYXNhaGlyb0Bzb2Np
-b25leHQuY29tPgpEYXRlOiBUaHUsIDQgQXByIDIwMTkgMjM6NDA6MTggKzA5MDAKU3ViamVjdDog
-W1BBVENIIDIvMl0gYXJtNjQ6IHZkc286IHVzZSAkKExEKSBpbnN0ZWFkIG9mICQoQ0MpIHRvIGxp
-bmsgVkRTTwoKV2UgdXNlICQoTEQpIHRvIGxpbmsgdm1saW51eCwgbW9kdWxlcywgZGVjb21wcmVz
-c29ycywgZXRjLgoKVkRTTyBpcyB0aGUgb25seSBleGNlcHRpb25hbCBjYXNlIHdoZXJlICQoQ0Mp
-IGlzIHVzZWQgYXMgdGhlIGZyb250ZW5kCm9mIGxpbmtpbmcsIGJ1dCBJIGRvIG5vdCBrbm93IHdo
-eS4gVkRTTyB1c2VzIGEgc3BlY2lhbCBsaW5rZXIgc2NyaXB0LAphbmQgZG9lcyBub3QgbGluayBz
-dGFuZGFyZCBsaWJyYXJpZXMgYXQgYWxsLgoKSSBjaGFuZ2VkIHRoZSBNYWtlZmlsZSB0byB1c2Ug
-JChMRCkgcmFodGVyIHRoYW4gJChDQykuIEkgdGVzdGVkLCBhbmQKVkRTTyBzdGlsbCB3b3JrZWQu
-CgpVc2VycyB3aWxsIGJlIGFibGUgdG8gdXNlIHRoZWlyIGZhdm9yaXRlIGxpbmtlciAoZS5nLiBs
-bGQgaW5zdGVhZCBvZgpvZiBiZmQpIGJ5IHBhc3NpbmcgTEQ9IGZyb20gdGhlIGNvbW1hbmQgbGlu
-ZS4KCk15IHBsYW4gaXMgdG8gcmV3cml0ZSBhbGwgVkRTTyBNYWtlZmlsZXMgdG8gdXNlICQoTEQp
-LCB0aGVuIGRlbGV0ZQpjYy1sZG9wdGlvbi4KClNpZ25lZC1vZmYtYnk6IE1hc2FoaXJvIFlhbWFk
-YSA8eWFtYWRhLm1hc2FoaXJvQHNvY2lvbmV4dC5jb20+Ci0tLQogYXJjaC9hcm02NC9rZXJuZWwv
-dmRzby9NYWtlZmlsZSB8IDEzICsrKy0tLS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2Vy
-dGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva2VybmVs
-L3Zkc28vTWFrZWZpbGUgYi9hcmNoL2FybTY0L2tlcm5lbC92ZHNvL01ha2VmaWxlCmluZGV4IGEw
-YWY2YmY2YzExYi4uNzQ0YjlkYmFiYTAzIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2tlcm5lbC92
-ZHNvL01ha2VmaWxlCisrKyBiL2FyY2gvYXJtNjQva2VybmVsL3Zkc28vTWFrZWZpbGUKQEAgLTEy
-LDE3ICsxMiwxMiBAQCBvYmotdmRzbyA6PSBnZXR0aW1lb2ZkYXkubyBub3RlLm8gc2lncmV0dXJu
-Lm8KIHRhcmdldHMgOj0gJChvYmotdmRzbykgdmRzby5zbyB2ZHNvLnNvLmRiZwogb2JqLXZkc28g
-Oj0gJChhZGRwcmVmaXggJChvYmopLywgJChvYmotdmRzbykpCiAKLWNjZmxhZ3MteSA6PSAtc2hh
-cmVkIC1mbm8tY29tbW9uIC1mbm8tYnVpbHRpbgotY2NmbGFncy15ICs9IC1ub3N0ZGxpYiAtV2ws
-LXNvbmFtZT1saW51eC12ZHNvLnNvLjEgXAotCQkkKGNhbGwgY2MtbGRvcHRpb24sIC1XbCQoY29t
-bWEpLS1oYXNoLXN0eWxlPXN5c3YpCitsZGZsYWdzLXkgOj0gLXNoYXJlZCAtbm9zdGRsaWIgLXNv
-bmFtZT1saW51eC12ZHNvLnNvLjEgXAorCQkkKGNhbGwgbGQtb3B0aW9uLCAtLWhhc2gtc3R5bGU9
-c3lzdikgLW4gLVQKIAogIyBEaXNhYmxlIGdjb3YgcHJvZmlsaW5nIGZvciBWRFNPIGNvZGUKIEdD
-T1ZfUFJPRklMRSA6PSBuCiAKLSMgV29ya2Fyb3VuZCBmb3IgYmFyZS1tZXRhbCAoRUxGKSB0b29s
-Y2hhaW5zIHRoYXQgbmVnbGVjdCB0byBwYXNzIC1zaGFyZWQKLSMgZG93biB0byBjb2xsZWN0Miwg
-cmVzdWx0aW5nIGluIHNpbGVudCBjb3JydXB0aW9uIG9mIHRoZSB2RFNPIGltYWdlLgotY2NmbGFn
-cy15ICs9IC1XbCwtc2hhcmVkCi0KIG9iai15ICs9IHZkc28ubwogZXh0cmEteSArPSB2ZHNvLmxk
-cwogQ1BQRkxBR1NfdmRzby5sZHMgKz0gLVAgLUMgLVUkKEFSQ0gpCkBAIC0zMiw3ICsyNyw3IEBA
-ICQob2JqKS92ZHNvLm8gOiAkKG9iaikvdmRzby5zbwogCiAjIExpbmsgcnVsZSBmb3IgdGhlIC5z
-byBmaWxlLCAubGRzIGhhcyB0byBiZSBmaXJzdAogJChvYmopL3Zkc28uc28uZGJnOiAkKG9iaikv
-dmRzby5sZHMgJChvYmotdmRzbykgRk9SQ0UKLQkkKGNhbGwgaWZfY2hhbmdlZCx2ZHNvbGQpCisJ
-JChjYWxsIGlmX2NoYW5nZWQsbGQpCiAKICMgU3RyaXAgcnVsZSBmb3IgdGhlIC5zbyBmaWxlCiAk
-KG9iaikvJS5zbzogT0JKQ09QWUZMQUdTIDo9IC1TCkBAIC01Miw4ICs0Nyw2IEBAICQob2JqLXZk
-c28pOiAlLm86ICUuUyBGT1JDRQogCSQoY2FsbCBpZl9jaGFuZ2VkX2RlcCx2ZHNvYXMpCiAKICMg
-QWN0dWFsIGJ1aWxkIGNvbW1hbmRzCi1xdWlldF9jbWRfdmRzb2xkID0gVkRTT0wgICAkQAotICAg
-ICAgY21kX3Zkc29sZCA9ICQoQ0MpICQoY19mbGFncykgLVdsLC1uIC1XbCwtVCAkKHJlYWwtcHJl
-cmVxcykgLW8gJEAKIHF1aWV0X2NtZF92ZHNvYXMgPSBWRFNPQSAgICRACiAgICAgICBjbWRfdmRz
-b2FzID0gJChDQykgJChhX2ZsYWdzKSAtYyAtbyAkQCAkPAogCi0tIAoyLjE3LjEKCg==
---0000000000002794cc0585c5cb81--
