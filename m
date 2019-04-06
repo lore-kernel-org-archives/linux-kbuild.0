@@ -1,89 +1,187 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:41012 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730492AbfDEQwW (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Apr 2019 12:52:22 -0400
-Received: by mail-pg1-f193.google.com with SMTP id f6so3367841pgs.8
-        for <linux-kbuild@vger.kernel.org>; Fri, 05 Apr 2019 09:52:22 -0700 (PDT)
+Received: from monster.unsafe.ru ([5.9.28.80]:59476 "EHLO mail.unsafe.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726310AbfDFMPJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 6 Apr 2019 08:15:09 -0400
+Date: Sat, 6 Apr 2019 14:14:47 +0200
+From: Alexey Gladkov <gladkov.alexey@gmail.com>
+Subject: [PATCH v2] moduleparam: Save information about built-in modules in
+ separate file
+Message-ID: <20190406121447.GB4047@localhost.localdomain>
 MIME-Version: 1.0
-References: <CAK7LNAQw7nPwykOEV5i+yWjkxzgf1gPa5ewFhDxbbn8XXjwFUA@mail.gmail.com>
- <20190402070858.49597-1-ndesaulniers@google.com> <CAK7LNAQGUe0h2ti6_u5=y9KUrNStESdd=D=8K3NOiE08tt022w@mail.gmail.com>
- <CAGXu5jKZUP33Kz=nDPkUSj0Ksz5FOYTuuKAxv4N6xGEtFT645A@mail.gmail.com>
-In-Reply-To: <CAGXu5jKZUP33Kz=nDPkUSj0Ksz5FOYTuuKAxv4N6xGEtFT645A@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Fri, 5 Apr 2019 09:52:10 -0700
-Message-ID: <CAKwvOd=eBWm6B24soOGhxtCk+TCeKqwra0_b-V6kTYDSHLOg_w@mail.gmail.com>
-Subject: Re: [PATCH v3] Makefile: lld: tell clang to use lld
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, clang-built-linux@googlegroups.com, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nathan Lynch <nathan_lynch@mentor.com>, Peter Smith <peter.smith@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-api@vger.kernel.org, linux-modules@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Michal Marek <michal.lkml@markovi.net>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-On Fri, Apr 5, 2019 at 9:11 AM Kees Cook <keescook@chromium.org> wrote:
->
-> On Fri, Apr 5, 2019 at 3:17 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> > I want to propose alternative solution.
-> > Please check the attached patches.
+Problem:
 
-```
-My plan is to rewrite all VDSO Makefiles to use $(LD), then delete cc-ldoption.
-```
+When a kernel module is compiled as a separate module, some important
+information about the kernel module is available via .modinfo section of
+the module.  In contrast, when the kernel module is compiled into the
+kernel, that information is not available.
 
-I agree with that as a possible solution as well; I think it's best to
-just invoke the linker directly rather than use the compiler as the
-driver.  Just small nits with the 2 attached patches, but I think they
-will also work for us.
+Information about built-in modules is necessary in the following cases:
 
-Looks like there's 15 call sites across 12 files, plus Documentation/
-and scripts/Kbuild.include; removing it seems feasible and I'd be
-happy to help if you'd welcome the patches?
+1. When it is necessary to find out what additional parameters can be
+passed to the kernel at boot time.
 
-Let's start with that series of changes, but I suspect we will
-ultimately need to revisit -fuse-ld=.  I was just thinking that even
-my proposed patch doesn't do anything for KBUILD_HOSTCFLAGS, for
-example.  I worry that bfd may still be invoked by Clang at some point
-in the build.  I will try to test in an environment with no GNU
-binutils.
+2. When you need to know which module names and their aliases are in
+the kernel. This is very useful for creating an initrd image.
 
-> In the 0001 patch of arch/arm/vdso/Makefile:
-> > ...
-> > -VDSO_LDFLAGS += $(call cc-ldoption, -fuse-ld=bfd)
-> > +ldflags-y = -Bsymbolic --no-undefined -soname=linux-vdso.so.1 \
-> > +           -z max-page-size=4096 -z common-page-size=4096 \
-> > +           -nostdlib -shared \
-> > +           $(call ld-option, --hash-style=sysv) \
+Proposal:
 
-I think the vdso's should all REQUIRE --hash-style=sysv; the kselftest
-for vdso's will fail otherwise.  I could always follow up with patches
-for that if we didn't want to conflate changes.
+The proposed patch does not remove .modinfo section with module
+information from the vmlinux at the build time and saves it into a
+separate file after kernel linking. So, the kernel does not increase in
+size and no additional information remains in it. Information is stored
+in the same format as in the separate modules (null-terminated string
+array). Because the .modinfo section is already exported with a separate
+modules, we are not creating a new API.
 
-> > +           $(call ld-option, --build-id) \
-> > +           -T
+It can be easily read in the userspace:
 
-Was it intentional to add -T standalone?  The man page for `ld` says
-it needs an additional filename to follow -T.  Or rather is optional
-if a -L flag is specified?
+$ tr '\0' '\n' < kernel.builtin
+ext4.softdep=pre: crc32c
+ext4.license=GPL
+ext4.description=Fourth Extended Filesystem
+ext4.author=Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others
+ext4.alias=fs-ext4
+ext4.alias=ext3
+ext4.alias=fs-ext3
+ext4.alias=ext2
+ext4.alias=fs-ext2
+md_mod.alias=block-major-9-*
+md_mod.alias=md
+md_mod.description=MD RAID framework
+md_mod.license=GPL
+md_mod.parmtype=create_on_open:bool
+md_mod.parmtype=start_dirty_degraded:int
+...
 
->
-> I see that "-fuse-ld=bfd" is explicitly dropped here, which could
-> reintroduce the problem fixed in d2b30cd4b722 ("ARM: 8384/1: VDSO:
-> force use of BFD linker") (and 3473f26592c1c). Does ld.gold still
-> exhibit this problem? If so, we'll need to detect gold and force bfd
-> still maybe?
+v2:
+ * Extract modinfo from vmlinux.o as suggested by Masahiro Yamada;
+ * Rename output file to kernel.builtin;
+ * Add MODULE_VERSION to modinfo that is saved to the kernel.builtin;
+ * Fix build warnings on powerpc.
 
-The arm32 vdso Makefile is an oddity in this regard.  I think what
-Kees described is best.  Rather than always set the linker to bfd
-(which harms linkers like lld), detect if gold is being used and if so
-set the linker back to bfd.
+Co-Developed-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
+Signed-off-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
+Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+---
+ .gitignore                        |  1 +
+ Makefile                          |  2 ++
+ include/asm-generic/vmlinux.lds.h |  1 +
+ include/linux/module.h            |  1 +
+ include/linux/moduleparam.h       | 12 +++++-------
+ scripts/link-vmlinux.sh           |  4 ++++
+ 6 files changed, 14 insertions(+), 7 deletions(-)
 
-For arm64, lld has this issue with -n,
-https://github.com/ClangBuiltLinux/linux/issues/340, but I think we
-can fix that in a follow up patch.  Same thoughts on --hash-style and
--T.
-
+diff --git a/.gitignore b/.gitignore
+index a20ac26aa2f5..432332fd745e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -45,6 +45,7 @@
+ *.xz
+ Module.symvers
+ modules.builtin
++kernel.builtin
+ 
+ #
+ # Top-level generic files
+diff --git a/Makefile b/Makefile
+index d5713e7b1e50..d9dc6211fbc7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1288,6 +1288,7 @@ _modinst_:
+ 	fi
+ 	@cp -f $(objtree)/modules.order $(MODLIB)/
+ 	@cp -f $(objtree)/modules.builtin $(MODLIB)/
++	@cp -f $(objtree)/kernel.builtin $(MODLIB)/
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
+ 
+ # This depmod is only for convenience to give the initial
+@@ -1328,6 +1329,7 @@ endif # CONFIG_MODULES
+ 
+ # Directories & files removed with 'make clean'
+ CLEAN_DIRS  += $(MODVERDIR) include/ksym
++CLEAN_FILES += kernel.builtin
+ 
+ # Directories & files removed with 'make mrproper'
+ MRPROPER_DIRS  += include/config usr/include include/generated          \
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index 3d7a6a9c2370..44c724bf7d3a 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -844,6 +844,7 @@
+ 	EXIT_CALL							\
+ 	*(.discard)							\
+ 	*(.discard.*)							\
++	*(.modinfo)							\
+ 	}
+ 
+ /**
+diff --git a/include/linux/module.h b/include/linux/module.h
+index f5bc4c046461..1cae28b1172a 100644
+--- a/include/linux/module.h
++++ b/include/linux/module.h
+@@ -237,6 +237,7 @@ extern typeof(name) __mod_##type##__##name##_device_table		\
+ #define MODULE_VERSION(_version) MODULE_INFO(version, _version)
+ #else
+ #define MODULE_VERSION(_version)					\
++	MODULE_INFO(version, _version);					\
+ 	static struct module_version_attribute ___modver_attr = {	\
+ 		.mattr	= {						\
+ 			.attr	= {					\
+diff --git a/include/linux/moduleparam.h b/include/linux/moduleparam.h
+index ba36506db4fb..5ba250d9172a 100644
+--- a/include/linux/moduleparam.h
++++ b/include/linux/moduleparam.h
+@@ -10,23 +10,21 @@
+    module name. */
+ #ifdef MODULE
+ #define MODULE_PARAM_PREFIX /* empty */
++#define __MODULE_INFO_PREFIX /* empty */
+ #else
+ #define MODULE_PARAM_PREFIX KBUILD_MODNAME "."
++/* We cannot use MODULE_PARAM_PREFIX because some modules override it. */
++#define __MODULE_INFO_PREFIX KBUILD_MODNAME "."
+ #endif
+ 
+ /* Chosen so that structs with an unsigned long line up. */
+ #define MAX_PARAM_PREFIX_LEN (64 - sizeof(unsigned long))
+ 
+-#ifdef MODULE
+ #define __MODULE_INFO(tag, name, info)					  \
+ static const char __UNIQUE_ID(name)[]					  \
+   __used __attribute__((section(".modinfo"), unused, aligned(1)))	  \
+-  = __stringify(tag) "=" info
+-#else  /* !MODULE */
+-/* This struct is here for syntactic coherency, it is not used */
+-#define __MODULE_INFO(tag, name, info)					  \
+-  struct __UNIQUE_ID(name) {}
+-#endif
++  = __MODULE_INFO_PREFIX __stringify(tag) "=" info
++
+ #define __MODULE_PARM_TYPE(name, _type)					  \
+   __MODULE_INFO(parmtype, name##type, #name ":" _type)
+ 
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index c8cf45362bd6..b914e026ef28 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -226,6 +226,10 @@ modpost_link vmlinux.o
+ # modpost vmlinux.o to check for section mismatches
+ ${MAKE} -f "${srctree}/scripts/Makefile.modpost" vmlinux.o
+ 
++info MODINFO kernel.builtin
++"${OBJCOPY}" -j .modinfo -O binary vmlinux.o kernel.builtin
++chmod 444 kernel.builtin
++
+ kallsymso=""
+ kallsyms_vmlinux=""
+ if [ -n "${CONFIG_KALLSYMS}" ]; then
 -- 
-Thanks,
-~Nick Desaulniers
+2.21.0
