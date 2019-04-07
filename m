@@ -1,108 +1,151 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.selfhost.de ([82.98.82.25]:40176 "EHLO
-        outgoing.selfhost.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726524AbfDFRjH (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:45431 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726245AbfDGCUn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 6 Apr 2019 13:39:07 -0400
-From: Harald Dunkel <harri@afaics.de>
-Subject: 5.0.7 regression: .config file not found
-Message-ID: <38a457e5-ed95-f71b-3f31-fb54ba1b4da7@afaics.de>
-Date: Sat, 6 Apr 2019 19:32:25 +0200
+        Sat, 6 Apr 2019 22:20:43 -0400
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------DBF556C6CA3533EB8AF5863C"
-Content-Language: en-US
+References: <CAK7LNAQw7nPwykOEV5i+yWjkxzgf1gPa5ewFhDxbbn8XXjwFUA@mail.gmail.com>
+ <20190402070858.49597-1-ndesaulniers@google.com> <CAK7LNAQGUe0h2ti6_u5=y9KUrNStESdd=D=8K3NOiE08tt022w@mail.gmail.com>
+ <CAGXu5jKZUP33Kz=nDPkUSj0Ksz5FOYTuuKAxv4N6xGEtFT645A@mail.gmail.com> <CAKwvOd=eBWm6B24soOGhxtCk+TCeKqwra0_b-V6kTYDSHLOg_w@mail.gmail.com>
+In-Reply-To: <CAKwvOd=eBWm6B24soOGhxtCk+TCeKqwra0_b-V6kTYDSHLOg_w@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 7 Apr 2019 11:20:01 +0900
+Message-ID: <CAK7LNAS+n44wBUfSJktmXWuz1=UQkuNOq3_M4K-62+ymH_V1jw@mail.gmail.com>
+Subject: Re: [PATCH v3] Makefile: lld: tell clang to use lld
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Kees Cook <keescook@chromium.org>, clang-built-linux@googlegroups.com, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nathan Lynch <nathan_lynch@mentor.com>, Peter Smith <peter.smith@linaro.org>
 
-This is a multi-part message in MIME format.
---------------DBF556C6CA3533EB8AF5863C
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-Hi folks,
-
-Since 5.0.7 I get a message at build time about a missing .config file.
-The result of make oldconfig has been lost somehow. 5.0.6 builds fine.
-
-Sample session is attached.
+Hi Kees, Nick,
 
 
-Regards
-Harri
+On Sat, Apr 6, 2019 at 1:52 AM Nick Desaulniers <ndesaulniers@google.com> wrote:
+>
+> On Fri, Apr 5, 2019 at 9:11 AM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > On Fri, Apr 5, 2019 at 3:17 AM Masahiro Yamada
+> > <yamada.masahiro@socionext.com> wrote:
+> > > I want to propose alternative solution.
+> > > Please check the attached patches.
+>
+> ```
+> My plan is to rewrite all VDSO Makefiles to use $(LD), then delete cc-ldoption.
+> ```
+>
+> I agree with that as a possible solution as well; I think it's best to
+> just invoke the linker directly rather than use the compiler as the
+> driver.  Just small nits with the 2 attached patches, but I think they
+> will also work for us.
+>
+> Looks like there's 15 call sites across 12 files, plus Documentation/
+> and scripts/Kbuild.include; removing it seems feasible and I'd be
+> happy to help if you'd welcome the patches?
 
---------------DBF556C6CA3533EB8AF5863C
-Content-Type: text/plain; charset=UTF-8;
- name="build.log.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="build.log.txt"
 
-JSBjZCAvZXhwb3J0L3dvcmsvbGludXgtc291cmNlCgolIGdpdCBsb2cgLTEKY29tbWl0IDhi
-Mjk4ZDNhMGJkNWZlZWI0NzEyOWM0ODg5MzU2YjM4Yjc4YWIyMzEgKEhFQUQgLT4gbGludXgt
-NS4wLnksIHRhZzogdjUuMC43LCBicjMuMC4wL2xpbnV4LTUuMC55KQpBdXRob3I6IEdyZWcg
-S3JvYWgtSGFydG1hbiA8Z3JlZ2toQGxpbnV4Zm91bmRhdGlvbi5vcmc+CkRhdGU6ICAgRnJp
-IEFwciA1IDIyOjM0OjU0IDIwMTkgKzAyMDAKCiAgICBMaW51eCA1LjAuNwoKCiUgY2QKJSBt
-YWtlIC1DIC9leHBvcnQvd29yay9saW51eC1zb3VyY2UgTz0vZXhwb3J0L3RtcC9idWlsZF9r
-ZXJuZWwtNS4wL2J1aWxkIG9sZGNvbmZpZwptYWtlOiBFbnRlcmluZyBkaXJlY3RvcnkgJy9l
-eHBvcnQvd29yay9saW51eC1zb3VyY2UnCm1ha2VbMV06IEVudGVyaW5nIGRpcmVjdG9yeSAn
-L2hvbWUvdG1wL2J1aWxkX2tlcm5lbC01LjAvYnVpbGQnCiAgSE9TVENDICBzY3JpcHRzL2Jh
-c2ljL2ZpeGRlcAogIEdFTiAgICAgTWFrZWZpbGUKICBIT1NUQ0MgIHNjcmlwdHMva2NvbmZp
-Zy9jb25mLm8KICBIT1NUQ0MgIHNjcmlwdHMva2NvbmZpZy9jb25mZGF0YS5vCiAgSE9TVEND
-ICBzY3JpcHRzL2tjb25maWcvZXhwci5vCiAgSE9TVENDICBzY3JpcHRzL2tjb25maWcvc3lt
-Ym9sLm8KICBIT1NUQ0MgIHNjcmlwdHMva2NvbmZpZy9wcmVwcm9jZXNzLm8KICBMRVggICAg
-IHNjcmlwdHMva2NvbmZpZy96Y29uZi5sZXguYwogIFlBQ0MgICAgc2NyaXB0cy9rY29uZmln
-L3pjb25mLnRhYi5oCiAgSE9TVENDICBzY3JpcHRzL2tjb25maWcvemNvbmYubGV4Lm8KICBZ
-QUNDICAgIHNjcmlwdHMva2NvbmZpZy96Y29uZi50YWIuYwogIEhPU1RDQyAgc2NyaXB0cy9r
-Y29uZmlnL3pjb25mLnRhYi5vCiAgSE9TVExEICBzY3JpcHRzL2tjb25maWcvY29uZgpzY3Jp
-cHRzL2tjb25maWcvY29uZiAgLS1vbGRjb25maWcgS2NvbmZpZwojCiMgY29uZmlndXJhdGlv
-biB3cml0dGVuIHRvIC5jb25maWcKIwptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSAnL2hv
-bWUvdG1wL2J1aWxkX2tlcm5lbC01LjAvYnVpbGQnCm1ha2U6IExlYXZpbmcgZGlyZWN0b3J5
-ICcvZXhwb3J0L3dvcmsvbGludXgtc291cmNlJwoKJSBtYWtlIC1DIC9leHBvcnQvd29yay9s
-aW51eC1zb3VyY2UgTz0vZXhwb3J0L3RtcC9idWlsZF9rZXJuZWwtNS4wL2J1aWxkIC1qIDQg
-YmluZGViLXBrZyBMT0NBTFZFUlNJT049LXJhdwptYWtlOiBFbnRlcmluZyBkaXJlY3Rvcnkg
-Jy9leHBvcnQvd29yay9saW51eC1zb3VyY2UnCm1ha2VbMV06IEVudGVyaW5nIGRpcmVjdG9y
-eSAnL2hvbWUvdG1wL2J1aWxkX2tlcm5lbC01LjAvYnVpbGQnCiAgVVBEICAgICBpbmNsdWRl
-L2NvbmZpZy9rZXJuZWwucmVsZWFzZQovYmluL3NoIC9leHBvcnQvd29yay9saW51eC1zb3Vy
-Y2Uvc2NyaXB0cy9wYWNrYWdlL21rZGViaWFuCmRwa2ctYnVpbGRwYWNrYWdlIC1yImZha2Vy
-b290IC11IiAtYSQoY2F0IGRlYmlhbi9hcmNoKSAtYiAtbmMgLXVjCmRwa2ctYnVpbGRwYWNr
-YWdlOiBpbmZvOiBzb3VyY2UgcGFja2FnZSBsaW51eC01LjAuNy1yYXcKZHBrZy1idWlsZHBh
-Y2thZ2U6IGluZm86IHNvdXJjZSB2ZXJzaW9uIDUuMC43LXJhdy0xCmRwa2ctYnVpbGRwYWNr
-YWdlOiBpbmZvOiBzb3VyY2UgZGlzdHJpYnV0aW9uIHNpZApkcGtnLWJ1aWxkcGFja2FnZTog
-aW5mbzogc291cmNlIGNoYW5nZWQgYnkgSGFyYWxkIER1bmtlbCA8aGFycmlAYWZhaWNzLmRl
-PgpkcGtnLWJ1aWxkcGFja2FnZTogd2FybmluZzogZGViaWFuL3J1bGVzIGlzIG5vdCBleGVj
-dXRhYmxlOyBmaXhpbmcgdGhhdAogZHBrZy1zb3VyY2UgLS1iZWZvcmUtYnVpbGQgLgpkcGtn
-LWJ1aWxkcGFja2FnZTogaW5mbzogaG9zdCBhcmNoaXRlY3R1cmUgYW1kNjQKIGRlYmlhbi9y
-dWxlcyBidWlsZAptYWtlIEtFUk5FTFJFTEVBU0U9NS4wLjctcmF3IEFSQ0g9eDg2IAlLQlVJ
-TERfQlVJTERfVkVSU0lPTj0xIEtCVUlMRF9TUkM9CnNjcmlwdHMva2NvbmZpZy9jb25mICAt
-LXN5bmNjb25maWcgS2NvbmZpZwoqKioKKioqIENvbmZpZ3VyYXRpb24gZmlsZSAiLmNvbmZp
-ZyIgbm90IGZvdW5kIQoqKioKKioqIFBsZWFzZSBydW4gc29tZSBjb25maWd1cmF0b3IgKGUu
-Zy4gIm1ha2Ugb2xkY29uZmlnIiBvcgoqKiogIm1ha2UgbWVudWNvbmZpZyIgb3IgIm1ha2Ug
-eGNvbmZpZyIpLgoqKioKbWFrZVs3XTogKioqIFtzY3JpcHRzL2tjb25maWcvTWFrZWZpbGU6
-Njk6IHN5bmNjb25maWddIEVycm9yIDEKbWFrZVs2XTogKioqIFtNYWtlZmlsZTo1NTY6IHN5
-bmNjb25maWddIEVycm9yIDIKbWFrZVs1XTogRmFpbGVkIHRvIHJlbWFrZSBtYWtlZmlsZSAn
-aW5jbHVkZS9jb25maWcvYXV0by5jb25mJy4KRXJyb3I6IGtlcm5lbHJlbGVhc2Ugbm90IHZh
-bGlkIC0gcnVuICdtYWtlIHByZXBhcmUnIHRvIHVwZGF0ZSBpdAogIFVQRCAgICAgaW5jbHVk
-ZS9jb25maWcva2VybmVsLnJlbGVhc2UKICBXUkFQICAgIGFyY2gveDg2L2luY2x1ZGUvZ2Vu
-ZXJhdGVkL3VhcGkvYXNtL2JwZl9wZXJmX2V2ZW50LmgKICBXUkFQICAgIGFyY2gveDg2L2lu
-Y2x1ZGUvZ2VuZXJhdGVkL3VhcGkvYXNtL3BvbGwuaAogIFNZU1RCTCAgYXJjaC94ODYvaW5j
-bHVkZS9nZW5lcmF0ZWQvYXNtL3N5c2NhbGxzXzMyLmgKICBTWVNIRFIgIGFyY2gveDg2L2lu
-Y2x1ZGUvZ2VuZXJhdGVkL3VhcGkvYXNtL3VuaXN0ZF8zMi5oCiAgVVBEICAgICBpbmNsdWRl
-L2dlbmVyYXRlZC91YXBpL2xpbnV4L3ZlcnNpb24uaAogIFVQRCAgICAgaW5jbHVkZS9nZW5l
-cmF0ZWQvdXRzcmVsZWFzZS5oCiAgU1lTSERSICBhcmNoL3g4Ni9pbmNsdWRlL2dlbmVyYXRl
-ZC91YXBpL2FzbS91bmlzdGRfNjQuaAogIFNZU0hEUiAgYXJjaC94ODYvaW5jbHVkZS9nZW5l
-cmF0ZWQvdWFwaS9hc20vdW5pc3RkX3gzMi5oCkNvbXBpbGVyIGxhY2tzIGFzbS1nb3RvIHN1
-cHBvcnQuCm1ha2VbNV06ICoqKiBbYXJjaC94ODYvTWFrZWZpbGU6Mjk0OiBjaGVja2Jpbl0g
-RXJyb3IgMQptYWtlWzVdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpt
-YWtlWzRdOiAqKiogW01ha2VmaWxlOjE1OiBfX3N1Yi1tYWtlXSBFcnJvciAyCm1ha2VbM106
-ICoqKiBbZGViaWFuL3J1bGVzOjQ6IGJ1aWxkXSBFcnJvciAyCmRwa2ctYnVpbGRwYWNrYWdl
-OiBlcnJvcjogZGViaWFuL3J1bGVzIGJ1aWxkIHN1YnByb2Nlc3MgcmV0dXJuZWQgZXhpdCBz
-dGF0dXMgMgptYWtlWzJdOiAqKiogWy9leHBvcnQvd29yay9saW51eC1zb3VyY2Uvc2NyaXB0
-cy9wYWNrYWdlL01ha2VmaWxlOjc5OiBiaW5kZWItcGtnXSBFcnJvciAyCm1ha2VbMV06ICoq
-KiBbL2V4cG9ydC93b3JrL2xpbnV4LXNvdXJjZS9NYWtlZmlsZToxNDEzOiBiaW5kZWItcGtn
-XSBFcnJvciAyCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5ICcvaG9tZS90bXAvYnVpbGRf
-a2VybmVsLTUuMC9idWlsZCcKbWFrZTogKioqIFtNYWtlZmlsZToxNzE6IHN1Yi1tYWtlXSBF
-cnJvciAyCm1ha2U6IExlYXZpbmcgZGlyZWN0b3J5ICcvZXhwb3J0L3dvcmsvbGludXgtc291
-cmNlJwo=
---------------DBF556C6CA3533EB8AF5863C--
+Yeah, your help is appreciated.
+
+I just worked on two Makefiles
+because I wanted to hear opinions
+before investing more efforts.
+
+
+Basically, you are positive to this approach,
+so let's go this way.
+
+
+> Let's start with that series of changes, but I suspect we will
+> ultimately need to revisit -fuse-ld=.  I was just thinking that even
+> my proposed patch doesn't do anything for KBUILD_HOSTCFLAGS, for
+> example.
+
+Host tools are not so important, but I agree.
+
+BTW, why does clang invoke bfd linker instead of
+lld by default?
+
+If we want to make llvm self-contained,
+I believe clang should use ld.lld by default.
+
+
+
+
+>  I worry that bfd may still be invoked by Clang at some point
+> in the build.  I will try to test in an environment with no GNU
+> binutils.
+>
+> > In the 0001 patch of arch/arm/vdso/Makefile:
+> > > ...
+> > > -VDSO_LDFLAGS += $(call cc-ldoption, -fuse-ld=bfd)
+> > > +ldflags-y = -Bsymbolic --no-undefined -soname=linux-vdso.so.1 \
+> > > +           -z max-page-size=4096 -z common-page-size=4096 \
+> > > +           -nostdlib -shared \
+> > > +           $(call ld-option, --hash-style=sysv) \
+>
+> I think the vdso's should all REQUIRE --hash-style=sysv; the kselftest
+> for vdso's will fail otherwise.  I could always follow up with patches
+> for that if we didn't want to conflate changes.
+>
+> > > +           $(call ld-option, --build-id) \
+> > > +           -T
+>
+> Was it intentional to add -T standalone?  The man page for `ld` says
+> it needs an additional filename to follow -T.
+
+This is because I wanted to re-use cmd_ld
+defined in scripts/Makefile.lib
+
+$(real-prereqs) contains the linker scripts and objects.
+
+
+>  Or rather is optional
+> if a -L flag is specified?
+>
+> >
+> > I see that "-fuse-ld=bfd" is explicitly dropped here, which could
+> > reintroduce the problem fixed in d2b30cd4b722 ("ARM: 8384/1: VDSO:
+> > force use of BFD linker") (and 3473f26592c1c). Does ld.gold still
+> > exhibit this problem? If so, we'll need to detect gold and force bfd
+> > still maybe?
+
+I intentionally dropped -fuse-ld=bfd.
+
+With my patch applied, users have full control
+of the linker by passing LD=.
+
+Since we cannot link vmlinux with gold,
+users should definitely pass a bfd linker.
+
+
+
+> The arm32 vdso Makefile is an oddity in this regard.  I think what
+> Kees described is best.  Rather than always set the linker to bfd
+> (which harms linkers like lld), detect if gold is being used and if so
+> set the linker back to bfd.
+>
+> For arm64, lld has this issue with -n,
+> https://github.com/ClangBuiltLinux/linux/issues/340, but I think we
+> can fix that in a follow up patch.  Same thoughts on --hash-style and
+> -T.
+
+
+If we need to add something depending on
+the linker type,
+
+I do not mind doing like this.
+
+ldflags-$(CONFIG_LD_IS_GOLD) += ...
+ldflags-$(CONFIG_LD_IS_LLD)  += ...
+
+But, it is a different issue.
+
+
+
+
+
+
+--
+Best Regards
+Masahiro Yamada
