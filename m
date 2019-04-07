@@ -1,73 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:33941 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725966AbfDGJFg (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:46794 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725988AbfDGJWJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 7 Apr 2019 05:05:36 -0400
+        Sun, 7 Apr 2019 05:22:09 -0400
 MIME-Version: 1.0
-References: <HE1PR0701MB2652FC3F5D8E46EA93AF033AFA5F0@HE1PR0701MB2652.eurprd07.prod.outlook.com>
-In-Reply-To: <HE1PR0701MB2652FC3F5D8E46EA93AF033AFA5F0@HE1PR0701MB2652.eurprd07.prod.outlook.com>
+References: <1553947458-8311-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1553947458-8311-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 7 Apr 2019 18:04:51 +0900
-Message-ID: <CAK7LNAQEQyEyj_ozkARj8xjDf7EncHeBv0GY8xoP8e_Fn-qaag@mail.gmail.com>
-Subject: Re: [PATCH] modpost: make KBUILD_MODPOST_WARN also configurable for
- external modules
+Date: Sun, 7 Apr 2019 18:21:20 +0900
+Message-ID: <CAK7LNATLHaS-i0D61+ZFP-4CsCeyf8qZsetofw8eyf=eaP3-tQ@mail.gmail.com>
+Subject: Re: [PATCH 1/6] kbuild: pass $(MAKECMDGOALS) to sub-make as is
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Wiebe, Wladislav (Nokia - DE/Ulm)" <wladislav.wiebe@nokia.com>
-Cc: "michal.lkml@markovi.net" <michal.lkml@markovi.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Jonas Gorski <jonas.gorski@gmail.com>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-(+CC Jonas Gorski)
-
-
-On Tue, Mar 26, 2019 at 6:58 PM Wiebe, Wladislav (Nokia - DE/Ulm)
-<wladislav.wiebe@nokia.com> wrote:
+On Sat, Mar 30, 2019 at 9:04 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> Commit ea837f1c0503 ("kbuild: make modpost processing configurable")
-> was intended to give KBUILD_MODPOST_WARN flexibility to be configurable.
-> Right now KBUILD_MODPOST_WARN gets just ignored when KBUILD_EXTMOD is
-> set which happens per default when building modules out of the tree.
+> Manipulating $(MAKECMDGOALS) for sub-make seems odd to me.
 >
-> This change gives the opportunity to define module build behaving also
-> in case of out of tree builds and default will become exit on error.
-> Errors which can be detected by the build should be trapped out of the box
-> there, unless somebody wants to notice broken stuff later at runtime.
-
-If an external module refers to a symbol
-provided by another external module,
-this patch will turn the warning into the error by default,
-which is probably a bad idea.
-
-
-I suggested a desired change in the following.
-https://patchwork.kernel.org/patch/9980691/
-
-I am poking Jonas Gorski
-if he plans to send v2.
-
-
-> Signed-off-by: Wladislav Wiebe <wladislav.wiebe@nokia.com>
+> [1] 'make O=foo sub-make' is turned into 'make O=foo', which builds
+> the default targets. It would make sense to terminate the build with:
+>
+>   *** No rule to make target 'sub-make'.  Stop.
+>
+> [2] 'make O=foo defconfig _all' is turned into 'make O=foo defconfig',
+> which changes the behavior.
+>
+> Let's pass $(MAKECMDGOALS) as is.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
->  scripts/Makefile.modpost | 2 +-
+
+Series, applied to linux-kbuild.
+
+
+>  Makefile | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> index 6b7f354f189a..fec6ec2ffa47 100644
-> --- a/scripts/Makefile.modpost
-> +++ b/scripts/Makefile.modpost
-> @@ -78,7 +78,7 @@ modpost = scripts/mod/modpost                    \
->   $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
->   $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
->   $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
-> - $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
-> + $(if $(KBUILD_MODPOST_WARN),-w)
+> diff --git a/Makefile b/Makefile
+> index 92ad066..9cbd367 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -168,7 +168,7 @@ $(filter-out _all sub-make $(lastword $(MAKEFILE_LIST)), $(MAKECMDGOALS)) _all:
+>  sub-make:
+>         $(Q)$(MAKE) \
+>         $(if $(KBUILD_OUTPUT),-C $(KBUILD_OUTPUT) KBUILD_SRC=$(CURDIR)) \
+> -       -f $(CURDIR)/Makefile $(filter-out _all sub-make,$(MAKECMDGOALS))
+> +       -f $(CURDIR)/Makefile $(MAKECMDGOALS)
 >
->  MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
->
+>  endif # need-sub-make
+>  endif # sub_make_done
 > --
-> 2.19.2
-
+> 2.7.4
+>
 
 
 -- 
