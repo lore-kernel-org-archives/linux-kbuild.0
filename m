@@ -1,69 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:44870 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728556AbfDHRjp (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:34870 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726343AbfDHWQA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Apr 2019 13:39:45 -0400
-Received: by mail-oi1-f193.google.com with SMTP id i21so11137553oib.11
-        for <linux-kbuild@vger.kernel.org>; Mon, 08 Apr 2019 10:39:44 -0700 (PDT)
+        Mon, 8 Apr 2019 18:16:00 -0400
+Subject: Re: [PATCH v3 1/2] initmem: introduce CONFIG_INIT_ALL_MEMORY and
+ CONFIG_INIT_ALL_STACK
+References: <20190408170418.148554-1-glider@google.com>
+ <20190408170418.148554-2-glider@google.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <adb23353-2e02-ecd2-7506-50f4db814b25@infradead.org>
+Date: Mon, 8 Apr 2019 15:15:40 -0700
 MIME-Version: 1.0
-References: <20190408170418.148554-1-glider@google.com> <20190408170418.148554-3-glider@google.com>
-In-Reply-To: <20190408170418.148554-3-glider@google.com>
-From: Jann Horn <jannh@google.com>
-Date: Mon, 8 Apr 2019 19:39:18 +0200
-Message-ID: <CAG48ez0BJNhfaCJde0UWrNLztsuAKR3QCm+d-j_Qa3R_KDSKHA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] initmem: introduce CONFIG_INIT_ALL_HEAP
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190408170418.148554-2-glider@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Potapenko <glider@google.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, linux-security-module <linux-security-module@vger.kernel.org>, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Kees Cook <keescook@chromium.org>, sspatil@android.com, Kernel Hardening <kernel-hardening@lists.openwall.com>, Laura Abbott <labbott@redhat.com>
+To: Alexander Potapenko <glider@google.com>, yamada.masahiro@socionext.com, jmorris@namei.org, serge@hallyn.com
+Cc: linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org, ndesaulniers@google.com, kcc@google.com, dvyukov@google.com, keescook@chromium.org, sspatil@android.com, kernel-hardening@lists.openwall.com
 
-On Mon, Apr 8, 2019 at 7:20 PM Alexander Potapenko <glider@google.com> wrote:
-> This config option enables CONFIG_SLUB_DEBUG and CONFIG_PAGE_POISONING
-> without the need to pass any boot parameters.
->
-> No performance optimizations are done at the moment to reduce double
-> initialization of memory regions.
-[...]
-> diff --git a/mm/page_poison.c b/mm/page_poison.c
-> index 21d4f97cb49b..a1985f33f635 100644
-> --- a/mm/page_poison.c
-> +++ b/mm/page_poison.c
-> @@ -12,9 +12,14 @@ static bool want_page_poisoning __read_mostly;
->
->  static int __init early_page_poison_param(char *buf)
->  {
-> +#ifdef CONFIG_INIT_ALL_HEAP
-> +       want_page_poisoning = true;
-> +       return 0;
-> +#else
->         if (!buf)
->                 return -EINVAL;
->         return strtobool(buf, &want_page_poisoning);
-> +#endif
->  }
->  early_param("page_poison", early_page_poison_param);
->
-> diff --git a/mm/slub.c b/mm/slub.c
-> index 1b08fbcb7e61..00e0197d3f35 100644
-> --- a/mm/slub.c
-> +++ b/mm/slub.c
-> @@ -1287,6 +1287,8 @@ static int __init setup_slub_debug(char *str)
->         if (*str == ',')
->                 slub_debug_slabs = str + 1;
->  out:
-> +       if (IS_ENABLED(CONFIG_INIT_ALL_HEAP))
-> +               slub_debug |= SLAB_POISON;
->         return 1;
->  }
+On 4/8/19 10:04 AM, Alexander Potapenko wrote:
+> diff --git a/security/Kconfig.initmem b/security/Kconfig.initmem
+> new file mode 100644
+> index 000000000000..5e49a55382ad
+> --- /dev/null
+> +++ b/security/Kconfig.initmem
+> @@ -0,0 +1,29 @@
+> +menu "Initialize all memory"
+> +
+> +config CC_HAS_AUTO_VAR_INIT
+> +	def_bool $(cc-option,-ftrivial-auto-var-init=pattern)
+> +
+> +config INIT_ALL_MEMORY
+> +	bool "Initialize all memory"
+> +	default n
+> +	help
+> +	  Enforce memory initialization to mitigate infoleaks and make
+> +	  the control-flow bugs depending on uninitialized values more
+> +	  deterministic.
+> +
+> +if INIT_ALL_MEMORY
+> +
+> +config INIT_ALL_STACK
+> +	bool "Initialize all stack"
+> +	depends on INIT_ALL_MEMORY
 
-I don't understand how this is supposed to work. As far as I can tell,
-the "slub_debug |= SLAB_POISON;" only happens if you actually pass in
-a "slub_debug" boot parameter? Same thing for "want_page_poisoning =
-true;".
+This "depends on" is redundant with the "if INIT_ALL_MEMORY" above it.
 
-Also, didn't Laura suggest in
-https://www.openwall.com/lists/kernel-hardening/2019/04/08/4 that a
-different approach might be more sensible to reduce the performance
-hit?
+Similar comment for patch 2/2 and INIT_ALL_HEAP.
+
+> +	depends on CC_HAS_AUTO_VAR_INIT || (HAVE_GCC_PLUGINS && PLUGIN_HOSTCC != "")
+> +	select GCC_PLUGINS if !CC_HAS_AUTO_VAR_INIT
+> +	select GCC_PLUGIN_STRUCTLEAK if !CC_HAS_AUTO_VAR_INIT
+> +	select GCC_PLUGIN_STRUCTLEAK_BYREF_ALL if !CC_HAS_AUTO_VAR_INIT
+> +	default y
+> +	help
+> +	  Initialize uninitialized stack data with a fixed pattern
+> +	  (0x00 in GCC, 0xAA in Clang).
+> +
+> +endif # INIT_ALL_MEMORY
+> +endmenu
+
+
+-- 
+~Randy
