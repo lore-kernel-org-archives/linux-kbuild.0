@@ -1,52 +1,118 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:39324 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727180AbfDHOkl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Apr 2019 10:40:41 -0400
-Date: Mon, 8 Apr 2019 10:40:39 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: Re: 5.0.7 regression: .config file not found
-Message-ID: <20190408144039.GE4689@sasha-vm>
-References: <38a457e5-ed95-f71b-3f31-fb54ba1b4da7@afaics.de>
- <CAK7LNATyKv3oMF7fnGr9+itBLgXEG+YGe=nAbckPz4=R=QjTWg@mail.gmail.com>
- <c00b3055-e08f-fa0f-e1c7-9172fc7e2138@afaics.de>
- <CAK7LNASb+r_ny69GtF6=wc6JT9Q74ZoB4fZmGmkNCE7icaHcxw@mail.gmail.com>
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:40467 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726851AbfDHQnR (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 8 Apr 2019 12:43:17 -0400
+Received: by mail-qt1-f196.google.com with SMTP id x12so16215777qts.7
+        for <linux-kbuild@vger.kernel.org>; Mon, 08 Apr 2019 09:43:17 -0700 (PDT)
+Subject: Re: [PATCH v2 2/2] initmem: introduce CONFIG_INIT_ALL_HEAP
+References: <20190308132701.133598-1-glider@google.com>
+ <20190308132701.133598-3-glider@google.com>
+From: Laura Abbott <labbott@redhat.com>
+Message-ID: <497b1201-b2ae-5e0c-d191-ff1830d92fc1@redhat.com>
+Date: Mon, 8 Apr 2019 09:43:13 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAK7LNASb+r_ny69GtF6=wc6JT9Q74ZoB4fZmGmkNCE7icaHcxw@mail.gmail.com>
+In-Reply-To: <20190308132701.133598-3-glider@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-stable@vger.kernel.org, Harald Dunkel <harri@afaics.de>
+To: Alexander Potapenko <glider@google.com>, yamada.masahiro@socionext.com, jmorris@namei.org, serge@hallyn.com
+Cc: linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org, ndesaulniers@google.com, kcc@google.com, dvyukov@google.com, keescook@chromium.org, sspatil@android.com, kernel-hardening@lists.openwall.com
 
-On Mon, Apr 08, 2019 at 03:10:54PM +0900, Masahiro Yamada wrote:
->Hi Greg,
->
->On Mon, Apr 8, 2019 at 3:04 PM Harald Dunkel <harri@afaics.de> wrote:
->>
->> Dear Masahiro-san,
->>
->> On 4/7/19 6:32 AM, Masahiro Yamada wrote:
->> >
->> > I think the problem will be fixed
->> > by back-porting the following commit:
->> >
->> > commit 175209cce23d6b0669ed5366add2517e26cd75cd
->> > Author: Masahiro Yamada <yamada.masahiro@socionext.com>
->>
->> Seems to work. Thanx very much for your fix.
->>
->> I wonder if this could be included in the 5.0 branch?
->
->Greg,
->We have a regression in the build system for v5.0.7
->
->Could you please backport 175209cce23d6b0669ed5366add2517e26cd75cd
->to fix the problem?
+On 3/8/19 5:27 AM, Alexander Potapenko wrote:
+> This config option enables CONFIG_SLUB_DEBUG and CONFIG_PAGE_POISONING
+> without the need to pass any boot parameters.
+> 
+> No performance optimizations are done at the moment to reduce double
+> initialization of memory regions.
+> 
+> Signed-off-by: Alexander Potapenko <glider@google.com>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: "Serge E. Hallyn" <serge@hallyn.com>
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Cc: Kostya Serebryany <kcc@google.com>
+> Cc: Dmitry Vyukov <dvyukov@google.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Sandeep Patil <sspatil@android.com>
+> Cc: linux-security-module@vger.kernel.org
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: kernel-hardening@lists.openwall.com
+> ---
+>   mm/page_poison.c         |  5 +++++
+>   mm/slub.c                |  2 ++
+>   security/Kconfig.initmem | 11 +++++++++++
+>   3 files changed, 18 insertions(+)
+> 
+> diff --git a/mm/page_poison.c b/mm/page_poison.c
+> index 21d4f97cb49b..a1985f33f635 100644
+> --- a/mm/page_poison.c
+> +++ b/mm/page_poison.c
+> @@ -12,9 +12,14 @@ static bool want_page_poisoning __read_mostly;
+>   
+>   static int __init early_page_poison_param(char *buf)
+>   {
+> +#ifdef CONFIG_INIT_ALL_HEAP
+> +	want_page_poisoning = true;
+> +	return 0;
+> +#else
+>   	if (!buf)
+>   		return -EINVAL;
+>   	return strtobool(buf, &want_page_poisoning);
+> +#endif
+>   }
+>   early_param("page_poison", early_page_poison_param);
+>   
+> diff --git a/mm/slub.c b/mm/slub.c
+> index 1b08fbcb7e61..00e0197d3f35 100644
+> --- a/mm/slub.c
+> +++ b/mm/slub.c
+> @@ -1287,6 +1287,8 @@ static int __init setup_slub_debug(char *str)
+>   	if (*str == ',')
+>   		slub_debug_slabs = str + 1;
+>   out:
+> +	if (IS_ENABLED(CONFIG_INIT_ALL_HEAP))
+> +		slub_debug |= SLAB_POISON;
+>   	return 1;
+>   }
+>   
 
-I've queued it for 5.0, thanks.
+I've looked at doing something similar in the past (failing to find
+the thread this morning...) and while this will work, it has pretty
+serious performance issues. It's not actually the poisoning which
+is expensive but that turning on debugging removes the cpu slab
+which has significant performance penalties.
 
---
+I'd rather go back to the proposal of just poisoning the slab
+at alloc/free without using SLAB_POISON.
+
 Thanks,
-Sasha
+Laura
+
+
+> diff --git a/security/Kconfig.initmem b/security/Kconfig.initmem
+> index 27aec394365e..5ce49663777a 100644
+> --- a/security/Kconfig.initmem
+> +++ b/security/Kconfig.initmem
+> @@ -13,6 +13,17 @@ config INIT_ALL_MEMORY
+>   
+>   if INIT_ALL_MEMORY
+>   
+> +config INIT_ALL_HEAP
+> +	bool "Initialize all heap"
+> +	depends on INIT_ALL_MEMORY
+> +	select CONFIG_PAGE_POISONING
+> +	select CONFIG_PAGE_POISONING_NO_SANITY
+> +	select CONFIG_PAGE_POISONING_ZERO
+> +	select CONFIG_SLUB_DEBUG
+> +	default y
+> +	help
+> +	  Enable page poisoning and slub poisoning by default.
+> +
+>   config INIT_ALL_STACK
+>   	bool "Initialize all stack"
+>   	depends on INIT_ALL_MEMORY
+> 
