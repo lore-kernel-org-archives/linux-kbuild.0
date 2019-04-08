@@ -1,49 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:17942 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725871AbfDHGLr (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Apr 2019 02:11:47 -0400
+Received: from mail-eopbgr50093.outbound.protection.outlook.com ([40.107.5.93]:1349
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725871AbfDHIDa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 8 Apr 2019 04:03:30 -0400
+From: "Wiebe, Wladislav (Nokia - DE/Ulm)" <wladislav.wiebe@nokia.com>
+Subject: Re: [PATCH] modpost: make KBUILD_MODPOST_WARN also configurable for
+ external modules
+Date: Mon, 8 Apr 2019 08:02:46 +0000
+Message-ID: <77e11884-f520-d983-3d33-ccc3043ba604@nokia.com>
+References: <HE1PR0701MB2652FC3F5D8E46EA93AF033AFA5F0@HE1PR0701MB2652.eurprd07.prod.outlook.com>
+ <CAK7LNAQEQyEyj_ozkARj8xjDf7EncHeBv0GY8xoP8e_Fn-qaag@mail.gmail.com>
+In-Reply-To: <CAK7LNAQEQyEyj_ozkARj8xjDf7EncHeBv0GY8xoP8e_Fn-qaag@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <92C5F69149506A40A03022265B94D350@eurprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <38a457e5-ed95-f71b-3f31-fb54ba1b4da7@afaics.de>
- <CAK7LNATyKv3oMF7fnGr9+itBLgXEG+YGe=nAbckPz4=R=QjTWg@mail.gmail.com> <c00b3055-e08f-fa0f-e1c7-9172fc7e2138@afaics.de>
-In-Reply-To: <c00b3055-e08f-fa0f-e1c7-9172fc7e2138@afaics.de>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 8 Apr 2019 15:10:54 +0900
-Message-ID: <CAK7LNASb+r_ny69GtF6=wc6JT9Q74ZoB4fZmGmkNCE7icaHcxw@mail.gmail.com>
-Subject: Re: 5.0.7 regression: .config file not found
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-stable@vger.kernel.org, Harald Dunkel <harri@afaics.de>, Sasha Levin <sashal@kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: "michal.lkml@markovi.net" <michal.lkml@markovi.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Jonas Gorski <jonas.gorski@gmail.com>
 
-Hi Greg,
-
-On Mon, Apr 8, 2019 at 3:04 PM Harald Dunkel <harri@afaics.de> wrote:
->
-> Dear Masahiro-san,
->
-> On 4/7/19 6:32 AM, Masahiro Yamada wrote:
-> >
-> > I think the problem will be fixed
-> > by back-porting the following commit:
-> >
-> > commit 175209cce23d6b0669ed5366add2517e26cd75cd
-> > Author: Masahiro Yamada <yamada.masahiro@socionext.com>
->
-> Seems to work. Thanx very much for your fix.
->
-> I wonder if this could be included in the 5.0 branch?
-
-Greg,
-We have a regression in the build system for v5.0.7
-
-Could you please backport 175209cce23d6b0669ed5366add2517e26cd75cd
-to fix the problem?
-
-Thanks.
-
--- 
-Best Regards
-Masahiro Yamada
+SGkhDQoNCk9uIDA3LjA0LjIwMTkgMTE6MDQsIE1hc2FoaXJvIFlhbWFkYSB3cm90ZToNCj4gKCtD
+QyBKb25hcyBHb3Jza2kpDQo+IA0KPiANCj4gT24gVHVlLCBNYXIgMjYsIDIwMTkgYXQgNjo1OCBQ
+TSBXaWViZSwgV2xhZGlzbGF2IChOb2tpYSAtIERFL1VsbSkNCj4gPHdsYWRpc2xhdi53aWViZUBu
+b2tpYS5jb20+IHdyb3RlOg0KPj4NCj4+IENvbW1pdCBlYTgzN2YxYzA1MDMgKCJrYnVpbGQ6IG1h
+a2UgbW9kcG9zdCBwcm9jZXNzaW5nIGNvbmZpZ3VyYWJsZSIpDQo+PiB3YXMgaW50ZW5kZWQgdG8g
+Z2l2ZSBLQlVJTERfTU9EUE9TVF9XQVJOIGZsZXhpYmlsaXR5IHRvIGJlIGNvbmZpZ3VyYWJsZS4N
+Cj4+IFJpZ2h0IG5vdyBLQlVJTERfTU9EUE9TVF9XQVJOIGdldHMganVzdCBpZ25vcmVkIHdoZW4g
+S0JVSUxEX0VYVE1PRCBpcw0KPj4gc2V0IHdoaWNoIGhhcHBlbnMgcGVyIGRlZmF1bHQgd2hlbiBi
+dWlsZGluZyBtb2R1bGVzIG91dCBvZiB0aGUgdHJlZS4NCj4+DQo+PiBUaGlzIGNoYW5nZSBnaXZl
+cyB0aGUgb3Bwb3J0dW5pdHkgdG8gZGVmaW5lIG1vZHVsZSBidWlsZCBiZWhhdmluZyBhbHNvDQo+
+PiBpbiBjYXNlIG9mIG91dCBvZiB0cmVlIGJ1aWxkcyBhbmQgZGVmYXVsdCB3aWxsIGJlY29tZSBl
+eGl0IG9uIGVycm9yLg0KPj4gRXJyb3JzIHdoaWNoIGNhbiBiZSBkZXRlY3RlZCBieSB0aGUgYnVp
+bGQgc2hvdWxkIGJlIHRyYXBwZWQgb3V0IG9mIHRoZSBib3gNCj4+IHRoZXJlLCB1bmxlc3Mgc29t
+ZWJvZHkgd2FudHMgdG8gbm90aWNlIGJyb2tlbiBzdHVmZiBsYXRlciBhdCBydW50aW1lLg0KPiAN
+Cj4gSWYgYW4gZXh0ZXJuYWwgbW9kdWxlIHJlZmVycyB0byBhIHN5bWJvbA0KPiBwcm92aWRlZCBi
+eSBhbm90aGVyIGV4dGVybmFsIG1vZHVsZSwNCj4gdGhpcyBwYXRjaCB3aWxsIHR1cm4gdGhlIHdh
+cm5pbmcgaW50byB0aGUgZXJyb3IgYnkgZGVmYXVsdCwNCj4gd2hpY2ggaXMgcHJvYmFibHkgYSBi
+YWQgaWRlYS4NCg0KSW5kZWVkLCBleGFjdGx5IHRoaXMgc2hvdWxkIGhhcHBlbi4gWW91IHNob3Vs
+ZCBmaXggeW91ciBleHRlcm5hbCBtb2R1bGUgDQpkZXBlbmRlbmNpZXMgYnkgcHJvdmlkaW5nIHRo
+ZWlyIHN5bWJvbHMuIFBsZWFzZSB1c2UgZS5nLiANCktCVUlMRF9FWFRSQV9TWU1CT0xTIGluc3Rl
+YWQgb2YgY29udmVydGluZyBlcnJvcnMgdG8gd2FybmluZyBhbmQgaG9waW5nIA0KdGhhdCB0aGlu
+Z3Mgd2lsbCB3b3JrLiBPciBob3cgZG8geW91IHdhbnQgdG8gbWFrZSBzdXJlIG1vZHVsZSBBIHN0
+aWxsIA0KZGVsaXZlcnMgYWxsIHN5bWJvbHMgbmVlZGVkIGJ5IG1vZHVsZSBCIGFmdGVyIGFuIHVw
+ZGF0ZS9jaGFuZ2VzPyANCk1hbnVhbGx5IGNvbXBhcmluZyB0aGUgbG9ncyBhZnRlciBhbiB1cGRh
+dGUgb3Igd2FpdGluZyB1bnRpbCBpdCB0dXJucyANCm91dCBicm9rZW4gZHVyaW5nIHJ1bi10aW1l
+PyBJIHdvdWxkbid0IHNheSB0aGlzIGlzIGEgZ29vZCBpZGVhIDotKQ0KDQoNCj4gSSBzdWdnZXN0
+ZWQgYSBkZXNpcmVkIGNoYW5nZSBpbiB0aGUgZm9sbG93aW5nLg0KPiBodHRwczovL3BhdGNod29y
+ay5rZXJuZWwub3JnL3BhdGNoLzk5ODA2OTEvDQo+IA0KPiBJIGFtIHBva2luZyBKb25hcyBHb3Jz
+a2kNCj4gaWYgaGUgcGxhbnMgdG8gc2VuZCB2Mi4NCg0KSSB3b3VsZG4ndCB2b3RlIGZvciB2MiBi
+YXNlZCBvbiBleHBsYW5hdGlvbiBhYm92ZS4NCg0KLSBXbGFkaXNsYXYNCg0KPiANCj4gDQo+PiBT
+aWduZWQtb2ZmLWJ5OiBXbGFkaXNsYXYgV2llYmUgPHdsYWRpc2xhdi53aWViZUBub2tpYS5jb20+
+DQo+PiAtLS0NCj4+ICAgc2NyaXB0cy9NYWtlZmlsZS5tb2Rwb3N0IHwgMiArLQ0KPj4gICAxIGZp
+bGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4+DQo+PiBkaWZmIC0t
+Z2l0IGEvc2NyaXB0cy9NYWtlZmlsZS5tb2Rwb3N0IGIvc2NyaXB0cy9NYWtlZmlsZS5tb2Rwb3N0
+DQo+PiBpbmRleCA2YjdmMzU0ZjE4OWEuLmZlYzZlYzJmZmE0NyAxMDA2NDQNCj4+IC0tLSBhL3Nj
+cmlwdHMvTWFrZWZpbGUubW9kcG9zdA0KPj4gKysrIGIvc2NyaXB0cy9NYWtlZmlsZS5tb2Rwb3N0
+DQo+PiBAQCAtNzgsNyArNzgsNyBAQCBtb2Rwb3N0ID0gc2NyaXB0cy9tb2QvbW9kcG9zdCAgICAg
+ICAgICAgICAgICAgICAgXA0KPj4gICAgJChpZiAkKEtCVUlMRF9FWFRSQV9TWU1CT0xTKSwgJChw
+YXRzdWJzdCAlLCAtZSAlLCQoS0JVSUxEX0VYVFJBX1NZTUJPTFMpKSkgXA0KPj4gICAgJChpZiAk
+KEtCVUlMRF9FWFRNT0QpLC1vICQobW9kdWxlc3ltZmlsZSkpICAgICAgXA0KPj4gICAgJChpZiAk
+KENPTkZJR19TRUNUSU9OX01JU01BVENIX1dBUk5fT05MWSksLC1FKSAgXA0KPj4gLSAkKGlmICQo
+S0JVSUxEX0VYVE1PRCkkKEtCVUlMRF9NT0RQT1NUX1dBUk4pLC13KQ0KPj4gKyAkKGlmICQoS0JV
+SUxEX01PRFBPU1RfV0FSTiksLXcpDQo+Pg0KPj4gICBNT0RQT1NUX09QVD0kKHN1YnN0IC1pLC1u
+LCQoZmlsdGVyIC1pLCQoTUFLRUZMQUdTKSkpDQo+Pg0KPj4gLS0NCj4+IDIuMTkuMg0KPiANCj4g
+DQo+IA0K
