@@ -1,55 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39446 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726001AbfDIHgJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Apr 2019 03:36:09 -0400
-Date: Tue, 9 Apr 2019 09:36:07 +0200
-From: Petr Mladek <pmladek@suse.com>
-Subject: Re: [PATCH v2] kbuild: use -flive-patching when CONFIG_LIVEPATCH is
- enabled
-Message-ID: <20190409073607.ms4amehc23quaio3@pathway.suse.cz>
-References: <20190404184411.1392-1-mbenes@suse.cz>
- <20190404201855.xtvtgxaaomcmowrt@treble>
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:35006 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726001AbfDII3n (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 9 Apr 2019 04:29:43 -0400
+Received: by mail-vs1-f68.google.com with SMTP id d8so9294914vsp.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 09 Apr 2019 01:29:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190404201855.xtvtgxaaomcmowrt@treble>
+References: <20190408170418.148554-1-glider@google.com> <20190408170418.148554-2-glider@google.com>
+ <adb23353-2e02-ecd2-7506-50f4db814b25@infradead.org>
+In-Reply-To: <adb23353-2e02-ecd2-7506-50f4db814b25@infradead.org>
+From: Alexander Potapenko <glider@google.com>
+Date: Tue, 9 Apr 2019 10:29:30 +0200
+Message-ID: <CAG_fn=V2aMoWnKfqC7eomEgFtjedcfmF0O2FF-ZPxC9x0aMDcg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] initmem: introduce CONFIG_INIT_ALL_MEMORY and CONFIG_INIT_ALL_STACK
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: Miroslav Benes <mbenes@suse.cz>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, jikos@kernel.org, joe.lawrence@redhat.com, ggherdovich@suse.cz, linux-kbuild@vger.kernel.org, live-patching@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitriy Vyukov <dvyukov@google.com>, Kees Cook <keescook@chromium.org>, Sandeep Patil <sspatil@android.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>
 
-On Thu 2019-04-04 15:18:55, Josh Poimboeuf wrote:
-> On Thu, Apr 04, 2019 at 08:44:11PM +0200, Miroslav Benes wrote:
-> > GCC 9 introduces a new option, -flive-patching. It disables certain
-> > optimizations which could make a compilation unsafe for later live
-> > patching of the running kernel.
-> > 
-> > The option is used only if CONFIG_LIVEPATCH is enabled and $(CC)
-> > supports it.
-> > 
-> > Performance impact of the option was measured on three different
-> > Intel machines - two bigger NUMA boxes and one smaller UMA box. Kernel
-> > intensive (IO, scheduling, networking) benchmarks were selected, plus a
-> > set of HPC workloads from NAS Parallel Benchmark. The tests were done on
-> > upstream kernel 5.0-rc8 with openSUSE Leap 15.0 userspace.
-> > 
-> > The majority of the tests is unaffected. The only significant exception
-> > is the scheduler section which suffers 1-3% degradation.
-> > 
-> > Evaluated-by: Giovanni Gherdovich <ggherdovich@suse.cz>
-> > Signed-off-by: Miroslav Benes <mbenes@suse.cz>
-> > ---
-> > The patch is based on master branch of the livepatching tree on
-> > git.kernel.org.
-> > 
-> > Many thanks to Giovanni who ran the whole testing campaign and analyzed
-> > the results. I archived the dashboard and detailed data. If anyone is
-> > interested, we could probably set up a public website somewhere.
-> 
-> Acked-by: Josh Poimboeuf <jpoimboe@redhat.com>
+On Tue, Apr 9, 2019 at 12:15 AM Randy Dunlap <rdunlap@infradead.org> wrote:
+>
+> On 4/8/19 10:04 AM, Alexander Potapenko wrote:
+> > diff --git a/security/Kconfig.initmem b/security/Kconfig.initmem
+> > new file mode 100644
+> > index 000000000000..5e49a55382ad
+> > --- /dev/null
+> > +++ b/security/Kconfig.initmem
+> > @@ -0,0 +1,29 @@
+> > +menu "Initialize all memory"
+> > +
+> > +config CC_HAS_AUTO_VAR_INIT
+> > +     def_bool $(cc-option,-ftrivial-auto-var-init=3Dpattern)
+> > +
+> > +config INIT_ALL_MEMORY
+> > +     bool "Initialize all memory"
+> > +     default n
+> > +     help
+> > +       Enforce memory initialization to mitigate infoleaks and make
+> > +       the control-flow bugs depending on uninitialized values more
+> > +       deterministic.
+> > +
+> > +if INIT_ALL_MEMORY
+> > +
+> > +config INIT_ALL_STACK
+> > +     bool "Initialize all stack"
+> > +     depends on INIT_ALL_MEMORY
+>
+> This "depends on" is redundant with the "if INIT_ALL_MEMORY" above it.
+Ack, thank you!
+> Similar comment for patch 2/2 and INIT_ALL_HEAP.
+>
+> > +     depends on CC_HAS_AUTO_VAR_INIT || (HAVE_GCC_PLUGINS && PLUGIN_HO=
+STCC !=3D "")
+> > +     select GCC_PLUGINS if !CC_HAS_AUTO_VAR_INIT
+> > +     select GCC_PLUGIN_STRUCTLEAK if !CC_HAS_AUTO_VAR_INIT
+> > +     select GCC_PLUGIN_STRUCTLEAK_BYREF_ALL if !CC_HAS_AUTO_VAR_INIT
+> > +     default y
+> > +     help
+> > +       Initialize uninitialized stack data with a fixed pattern
+> > +       (0x00 in GCC, 0xAA in Clang).
+> > +
+> > +endif # INIT_ALL_MEMORY
+> > +endmenu
+>
+>
+> --
+> ~Randy
 
-I have committed the patch into the branch for-5.2/core.
 
-Best Regards,
-Petr
+
+--=20
+Alexander Potapenko
+Software Engineer
+
+Google Germany GmbH
+Erika-Mann-Stra=C3=9Fe, 33
+80636 M=C3=BCnchen
+
+Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Halimah DeLaine Prado
+Registergericht und -nummer: Hamburg, HRB 86891
+Sitz der Gesellschaft: Hamburg
