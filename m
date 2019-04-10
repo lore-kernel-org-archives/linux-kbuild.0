@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:30576 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:8874 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387528AbfDJPvP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Apr 2019 11:51:15 -0400
+        id S2387507AbfDJPvR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 10 Apr 2019 11:51:17 -0400
 From: Joe Lawrence <joe.lawrence@redhat.com>
-Subject: [PATCH v3 7/9] livepatch: Add sample livepatch module
-Date: Wed, 10 Apr 2019 11:50:56 -0400
-Message-Id: <20190410155058.9437-8-joe.lawrence@redhat.com>
+Subject: [PATCH v3 8/9] documentation: Update on livepatch elf format
+Date: Wed, 10 Apr 2019 11:50:57 -0400
+Message-Id: <20190410155058.9437-9-joe.lawrence@redhat.com>
 In-Reply-To: <20190410155058.9437-1-joe.lawrence@redhat.com>
 References: <20190410155058.9437-1-joe.lawrence@redhat.com>
 MIME-Version: 1.0
@@ -16,153 +16,121 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Joe Lawrence <joe.lawrence@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
-From: Josh Poimboeuf <jpoimboe@redhat.com>
+From: Joao Moreira <jmoreira@suse.de>
 
-Add a new livepatch sample in samples/livepatch/ to make use of
-symbols that must be post-processed to enable load-time relocation
-resolution. As the new sample is to be used as an example, it is
-annotated with KLP_MODULE_RELOC and with KLP_SYMPOS macros.
+Add a section to Documentation/livepatch/module-elf-format.txt
+describing how klp-convert works for fixing relocations.
 
-The livepatch sample updates the function cmdline_proc_show to
-print the string referenced by the symbol saved_command_line
-appended by the string "livepatch=1".
-
-Update livepatch-sample.c to remove livepatch MODULE_INFO
-statement.
-
-Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 Signed-off-by: Joao Moreira <jmoreira@suse.de>
 Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
 ---
- samples/livepatch/Makefile                    |   2 +
- .../livepatch/livepatch-annotated-sample.c    | 102 ++++++++++++++++++
- 2 files changed, 104 insertions(+)
- create mode 100644 samples/livepatch/livepatch-annotated-sample.c
+ Documentation/livepatch/livepatch.txt         |  3 ++
+ Documentation/livepatch/module-elf-format.txt | 50 ++++++++++++++++---
+ 2 files changed, 47 insertions(+), 6 deletions(-)
 
-diff --git a/samples/livepatch/Makefile b/samples/livepatch/Makefile
-index 5fb3280bbdc4..dea530840725 100644
---- a/samples/livepatch/Makefile
-+++ b/samples/livepatch/Makefile
-@@ -2,6 +2,7 @@ LIVEPATCH_livepatch-sample := y
- LIVEPATCH_livepatch-shadow-fix1 := y
- LIVEPATCH_livepatch-shadow-fix2 := y
- LIVEPATCH_livepatch-callbacks-demo := y
-+LIVEPATCH_livepatch-annotated-sample := y
+diff --git a/Documentation/livepatch/livepatch.txt b/Documentation/livepatch/livepatch.txt
+index 4627b41ff02e..873c11aee038 100644
+--- a/Documentation/livepatch/livepatch.txt
++++ b/Documentation/livepatch/livepatch.txt
+@@ -274,6 +274,9 @@ into three levels:
+     absolute position in the database, but rather the order it has been found
+     only for a particular object ( vmlinux or a kernel module ). Note that
+     kallsyms allows for searching symbols according to the object name.
++    Uniquely named symbols may use a symbol position of 0.  Non-unique
++    symbols need to specify their object / kallsyms position, starting
++    at position 1.
  
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-sample.o
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-mod.o
-@@ -10,3 +11,4 @@ obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-fix2.o
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-callbacks-demo.o
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-callbacks-mod.o
- obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-callbacks-busymod.o
-+obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-annotated-sample.o
-diff --git a/samples/livepatch/livepatch-annotated-sample.c b/samples/livepatch/livepatch-annotated-sample.c
-new file mode 100644
-index 000000000000..556ce7e0bdab
---- /dev/null
-+++ b/samples/livepatch/livepatch-annotated-sample.c
-@@ -0,0 +1,102 @@
-+/*
-+ * livepatch-annotated-sample.c - Kernel Live Patching Sample Module
-+ *
-+ * Copyright (C) 2014 Seth Jennings <sjenning@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
+   + struct klp_object defines an array of patched functions (struct
+     klp_func) in the same object. Where the object is either vmlinux
+diff --git a/Documentation/livepatch/module-elf-format.txt b/Documentation/livepatch/module-elf-format.txt
+index f21a5289a09c..7bef8432352a 100644
+--- a/Documentation/livepatch/module-elf-format.txt
++++ b/Documentation/livepatch/module-elf-format.txt
+@@ -2,7 +2,8 @@
+ Livepatch module Elf format
+ ===========================
+ 
+-This document outlines the Elf format requirements that livepatch modules must follow.
++This document outlines the Elf format requirements that livepatch modules must
++follow.
+ 
+ -----------------
+ Table of Contents
+@@ -25,8 +26,9 @@ Table of Contents
+        3.3.2 Required name format
+        3.3.3 Example livepatch symbol names
+        3.3.4 Example `readelf --symbols` output
+-4. Architecture-specific sections
+-5. Symbol table and Elf section access
++4. Automatic conversion of unresolved relocations
++5. Architecture-specific sections
++6. Symbol table and Elf section access
+ 
+ ----------------------------
+ 0. Background and motivation
+@@ -270,7 +272,8 @@ Livepatch symbol names must conform to the following format:
+ [D] The position of the symbol in the object (as according to kallsyms)
+     This is used to differentiate duplicate symbols within the same
+     object. The symbol position is expressed numerically (0, 1, 2...).
+-    The symbol position of a unique symbol is 0.
++    The symbol position of a unique symbol is 0.  The symbol position of
++    the first non-unique symbol is 1, the second is 2, etc.
+ 
+ 3.3.3 Example livepatch symbol names:
+ -------------------------------------
+@@ -293,8 +296,43 @@ Symbol table '.symtab' contains 127 entries:
+ [*] Note that the 'Ndx' (Section index) for these symbols is SHN_LIVEPATCH (0xff20).
+     "OS" means OS-specific.
+ 
++--------------------------------------------------
++4.  Automatic conversion of unresolved relocations
++--------------------------------------------------
++Sometimes livepatches may operate on symbols which are not self-contained nor
++exported. When this happens, these symbols remain unresolved in the elf object
++and will trigger an error during the livepatch instantiation.
 +
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++Whenever possible, the kernel building infrastructure solves this problem
++automatically. First, a symbol database containing information on all compiled
++objects is built. Second, this database - a file named Symbols.list, placed in
++the kernel source root directory - is used to identify targets for unresolved
++relocations, converting them in the livepatch elf accordingly to the
++specifications above-described. While the first stage is fully handled by the
++building system, the second is done by a tool called klp-convert, which can be
++found in "scripts/livepatch".
 +
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/livepatch.h>
++When an unresolved relocation has as target a symbol whose name is also used by
++different symbols throughout the kernel, the relocation cannot be resolved
++automatically. In these cases, the livepatch developer must add annotations to
++the livepatch, making it possible for the system to identify which is the
++correct target amongst multiple homonymous symbols. Such annotations must be
++done through a data structure as follows:
 +
-+/*
-+ * This (dumb) live patch overrides the function that prints the
-+ * kernel boot cmdline when /proc/cmdline is read.
-+ *
-+ * This livepatch uses the symbol saved_command_line whose relocation
-+ * must be resolved during load time. To enable that, this module
-+ * must be post-processed by a tool called klp-convert, which embeds
-+ * information to be used by the loader to solve the relocation.
-+ *
-+ * The module is annotated with KLP_MODULE_RELOC/KLP_SYMPOS macros.
-+ * These annotations are used by klp-convert to infer that the symbol
-+ * saved_command_line is in the object vmlinux.
-+ *
-+ * As saved_command_line has no other homonimous symbol across
-+ * kernel objects, this annotation is not a requirement, and can be
-+ * suppressed with no harm to klp-convert. Yet, it is kept here as an
-+ * example on how to annotate livepatch modules that contain symbols
-+ * whose names are used in more than one kernel object.
-+ *
-+ * Example:
-+ *
-+ * $ cat /proc/cmdline
-+ * <your cmdline>
-+ *
-+ * $ insmod livepatch-sample.ko
-+ * $ cat /proc/cmdline
-+ * <your cmdline> livepatch=1
-+ *
-+ * $ echo 0 > /sys/kernel/livepatch/livepatch_sample/enabled
-+ * $ cat /proc/cmdline
-+ * <your cmdline>
-+ */
-+
-+extern char *saved_command_line;
-+
-+#include <linux/seq_file.h>
-+static int livepatch_cmdline_proc_show(struct seq_file *m, void *v)
-+{
-+	seq_printf(m, "%s livepatch=1\n", saved_command_line);
-+	return 0;
-+}
-+
-+KLP_MODULE_RELOC(vmlinux) vmlinux_relocs[] = {
-+	KLP_SYMPOS(saved_command_line, 0)
++struct KLP_MODULE_RELOC(object) data_structure_name[] = {
++	KLP_SYMPOS(symbol, pos)
 +};
 +
-+static struct klp_func funcs[] = {
-+	{
-+		.old_name = "cmdline_proc_show",
-+		.new_func = livepatch_cmdline_proc_show,
-+	}, { }
-+};
++In the above example, object refers to the object file which contains the
++symbol, being vmlinux or a module; symbol refers to the symbol name that will
++be relocated and pos is its position in the object.
 +
-+static struct klp_object objs[] = {
-+	{
-+		/* name being NULL means vmlinux */
-+		.funcs = funcs,
-+	}, { }
-+};
++When a data structure like this is added to the livepatch, the resulting elf
++will hold symbols that will be identified by klp-convert and used to solve name
++ambiguities.
 +
-+static struct klp_patch patch = {
-+	.mod = THIS_MODULE,
-+	.objs = objs,
-+};
-+
-+static int livepatch_init(void)
-+{
-+	return klp_enable_patch(&patch);
-+}
-+
-+static void livepatch_exit(void)
-+{
-+}
-+
-+module_init(livepatch_init);
-+module_exit(livepatch_exit);
-+MODULE_LICENSE("GPL");
+ ---------------------------------
+-4. Architecture-specific sections
++5. Architecture-specific sections
+ ---------------------------------
+ Architectures may override arch_klp_init_object_loaded() to perform
+ additional arch-specific tasks when a target module loads, such as applying
+@@ -305,7 +343,7 @@ be easily identified when iterating through a patch module's Elf sections
+ (See arch/x86/kernel/livepatch.c for a complete example).
+ 
+ --------------------------------------
+-5. Symbol table and Elf section access
++6. Symbol table and Elf section access
+ --------------------------------------
+ A livepatch module's symbol table is accessible through module->symtab.
+ 
 -- 
 2.20.1
