@@ -1,90 +1,198 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f202.google.com ([209.85.160.202]:33735 "EHLO
-        mail-qt1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729162AbfDJNSa (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Apr 2019 09:18:30 -0400
-Received: by mail-qt1-f202.google.com with SMTP id e31so2220872qtb.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 10 Apr 2019 06:18:29 -0700 (PDT)
-Date: Wed, 10 Apr 2019 15:17:26 +0200
-In-Reply-To: <20190410131726.250295-1-glider@google.com>
-Message-Id: <20190410131726.250295-4-glider@google.com>
-Mime-Version: 1.0
-References: <20190410131726.250295-1-glider@google.com>
-Subject: [PATCH 3/3] net: make sk_prot_alloc() work with CONFIG_INIT_ALL_HEAP
-From: Alexander Potapenko <glider@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: from mx1.redhat.com ([209.132.183.28]:17094 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387480AbfDJPvH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 10 Apr 2019 11:51:07 -0400
+From: Joe Lawrence <joe.lawrence@redhat.com>
+Subject: [PATCH v3 2/9] kbuild: Support for Symbols.list creation
+Date: Wed, 10 Apr 2019 11:50:51 -0400
+Message-Id: <20190410155058.9437-3-joe.lawrence@redhat.com>
+In-Reply-To: <20190410155058.9437-1-joe.lawrence@redhat.com>
+References: <20190410155058.9437-1-joe.lawrence@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, jmorris@namei.org, serge@hallyn.com
-Cc: linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org, ndesaulniers@google.com, kcc@google.com, dvyukov@google.com, keescook@chromium.org, sspatil@android.com, labbott@redhat.com, kernel-hardening@lists.openwall.com
+To: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Joe Lawrence <joe.lawrence@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
-Rename sk_prot_clear_nulls() to sk_prot_clear() and introduce an extra
-init_byte parameter to be passed to memset() when initializing struct sock.
-In the case CONFIG_INIT_ALL_HEAP is on, initialize newly created struct
-sock with 0xAA.
+From: Joao Moreira <jmoreira@suse.de>
 
-Signed-off-by: Alexander Potapenko <glider@google.com>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: James Morris <jmorris@namei.org>
-Cc: "Serge E. Hallyn" <serge@hallyn.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Kostya Serebryany <kcc@google.com>
-Cc: Dmitry Vyukov <dvyukov@google.com>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Sandeep Patil <sspatil@android.com>
-Cc: Laura Abbott <labbott@redhat.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>
-Cc: Jann Horn <jannh@google.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-security-module@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org
-Cc: kernel-hardening@lists.openwall.com
+For automatic resolution of livepatch relocations, a file called
+Symbols.list is used. This file maps symbols within every compiled
+kernel object allowing the identification of symbols whose name is
+unique, thus relocation can be automatically inferred, or providing
+information that helps developers when code annotation is required for
+solving the matter.
+
+Add support for creating Symbols.list in the main Makefile. First,
+ensure that built-in is compiled when CONFIG_LIVEPATCH is enabled (as
+required to achieve a complete Symbols.list file). Define the command to
+build Symbols.list (cmd_klp_map) and hook it in the modules rule.
+
+As it is undesirable to have symbols from livepatch objects inside
+Symbols.list, make livepatches discernible by modifying
+scripts/Makefile.build to create a .livepatch file for each livepatch
+in $(MODVERDIR). This file then used by cmd_klp_map to identify and
+bypass livepatches.
+
+For identifying livepatches during the build process, a flag variable
+LIVEPATCH_$(basetarget).o is considered in scripts/Makefile.build. This
+way, set this flag for the livepatch sample Makefile in
+samples/livepatch/Makefile.
+
+Finally, Add a clean rule to ensure that Symbols.list is removed during
+clean.
+
+Notes:
+
+To achieve a correct Symbols.list file, all kernel objects must be
+considered, thus, its construction require these objects to be priorly
+built. On the other hand, invoking scripts/Makefile.modpost without
+having a complete Symbols.list in place would occasionally lead to
+in-tree livepatches being post-processed incorrectly. To prevent this
+from becoming a circular dependency, the construction of Symbols.list
+uses non-post-processed kernel objects and such does not cause harm as
+the symbols normally referenced from within livepatches are visible at
+this stage. Also due to these requirements, the spot in-between modules
+compilation and the invocation of scripts/Makefile.modpost was picked
+for hooking cmd_klp_map.
+
+The approach based on .livepatch files was proposed as an alternative
+to using MODULE_INFO statements. This approach was originally
+proposed by Miroslav Benes as a workaround for identifying livepathes
+without depending on modinfo during the modpost stage. It was moved to
+this patch as the approach also shown to be useful while building
+Symbols.list.
+
+Signed-off-by: Joao Moreira <jmoreira@suse.de>
+Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
 ---
- include/net/sock.h | 8 ++++----
- net/core/sock.c    | 5 +++--
- 2 files changed, 7 insertions(+), 6 deletions(-)
+ .gitignore                 |  1 +
+ Makefile                   | 30 ++++++++++++++++++++++++++----
+ samples/livepatch/Makefile |  1 +
+ scripts/Makefile.build     |  7 +++++++
+ 4 files changed, 35 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 8de5ee258b93..a49c1f1c71c1 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1044,13 +1044,13 @@ struct module;
+diff --git a/.gitignore b/.gitignore
+index a20ac26aa2f5..5cd5758f5ffe 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -45,6 +45,7 @@
+ *.xz
+ Module.symvers
+ modules.builtin
++Symbols.list
  
- /*
-  * caches using SLAB_TYPESAFE_BY_RCU should let .next pointer from nulls nodes
-- * un-modified. Special care is taken when initializing object to zero.
-+ * un-modified. Special care is taken when initializing object.
-  */
--static inline void sk_prot_clear_nulls(struct sock *sk, int size)
-+static inline void sk_prot_clear(struct sock *sk, int size, int init_byte)
- {
- 	if (offsetof(struct sock, sk_node.next) != 0)
--		memset(sk, 0, offsetof(struct sock, sk_node.next));
--	memset(&sk->sk_node.pprev, 0,
-+		memset(sk, init_byte, offsetof(struct sock, sk_node.next));
-+	memset(&sk->sk_node.pprev, init_byte,
- 	       size - offsetof(struct sock, sk_node.pprev));
- }
+ #
+ # Top-level generic files
+diff --git a/Makefile b/Makefile
+index 15c8251d4d5e..2c07bdd87b2f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -574,10 +574,13 @@ KBUILD_BUILTIN := 1
+ # If we have only "make modules", don't compile built-in objects.
+ # When we're building modules with modversions, we need to consider
+ # the built-in objects during the descend as well, in order to
+-# make sure the checksums are up to date before we record them.
++# make sure the checksums are up to date before we record them. The
++# same applies for building livepatches, as built-in objects may hold
++# symbols which are referenced from livepatches and are required by
++# klp-convert post-processing tool for resolving these cases.
  
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 782343bb925b..1ad855e99512 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1601,8 +1601,9 @@ static struct sock *sk_prot_alloc(struct proto *prot, gfp_t priority,
- 		sk = kmem_cache_alloc(slab, priority & ~__GFP_ZERO);
- 		if (!sk)
- 			return sk;
--		if (priority & __GFP_ZERO)
--			sk_prot_clear_nulls(sk, prot->obj_size);
-+		if (GFP_INIT_ALWAYS_ON || (priority & __GFP_ZERO))
-+			sk_prot_clear(sk, prot->obj_size,
-+				      INITMEM_FILL_BYTE(priority));
- 	} else
- 		sk = kmalloc(prot->obj_size, priority);
+ ifeq ($(MAKECMDGOALS),modules)
+-  KBUILD_BUILTIN := $(if $(CONFIG_MODVERSIONS),1)
++  KBUILD_BUILTIN := $(if $(or $(CONFIG_MODVERSIONS), $(CONFIG_LIVEPATCH)),1)
+ endif
  
+ # If we have "make <whatever> modules", compile modules
+@@ -1261,9 +1264,25 @@ all: modules
+ # duplicate lines in modules.order files.  Those are removed
+ # using awk while concatenating to the final file.
+ 
++quiet_cmd_klp_map = KLP     Symbols.list
++SLIST = $(objtree)/Symbols.list
++
++define cmd_klp_map
++	$(shell echo "klp-convert-symbol-data.0.1" > $(SLIST))				\
++	$(shell echo "*vmlinux" >> $(SLIST))						\
++	$(shell nm -f posix $(objtree)/vmlinux | cut -d\  -f1 >> $(SLIST))		\
++	$(foreach m, $(wildcard $(MODVERDIR)/*.mod),					\
++		$(eval mod = $(patsubst %.ko,%.o,$(shell head -n1 $(m))))		\
++		$(if $(wildcard $(MODVERDIR)/$(shell basename -s .o $(mod)).livepatch),,\
++			$(eval fmod = $(subst $(quote),_,$(subst -,_,$(mod))))		\
++			$(shell echo "*$(shell basename -s .o $(fmod))" >> $(SLIST))	\
++			$(shell nm -f posix $(mod) | cut -d\  -f1 >> $(SLIST))))
++endef
++
+ PHONY += modules
+ modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux) modules.builtin
+ 	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
++	$(if $(CONFIG_LIVEPATCH), $(call cmd,klp_map))
+ 	@$(kecho) '  Building modules, stage 2.';
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 
+@@ -1350,7 +1369,7 @@ clean: rm-dirs  := $(CLEAN_DIRS)
+ clean: rm-files := $(CLEAN_FILES)
+ clean-dirs      := $(addprefix _clean_, . $(vmlinux-alldirs) Documentation samples)
+ 
+-PHONY += $(clean-dirs) clean archclean vmlinuxclean
++PHONY += $(clean-dirs) clean archclean vmlinuxclean klpclean
+ $(clean-dirs):
+ 	$(Q)$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
+ 
+@@ -1358,7 +1377,10 @@ vmlinuxclean:
+ 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-vmlinux.sh clean
+ 	$(Q)$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) clean)
+ 
+-clean: archclean vmlinuxclean
++klpclean:
++	$(Q) rm -f $(objtree)/Symbols.list
++
++clean: archclean vmlinuxclean klpclean
+ 
+ # mrproper - Delete all generated files, including .config
+ #
+diff --git a/samples/livepatch/Makefile b/samples/livepatch/Makefile
+index 2472ce39a18d..8b9b42a258ad 100644
+--- a/samples/livepatch/Makefile
++++ b/samples/livepatch/Makefile
+@@ -1,3 +1,4 @@
++LIVEPATCH_livepatch-sample := y
+ obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-sample.o
+ obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-mod.o
+ obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-fix1.o
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 76ca30cc4791..ca76bd2080f0 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -246,6 +246,11 @@ cmd_gen_ksymdeps = \
+ 	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
+ endif
+ 
++ifdef CONFIG_LIVEPATCH
++cmd_livepatch = $(if $(LIVEPATCH_$(basetarget)),		\
++	$(shell touch $(MODVERDIR)/$(basetarget).livepatch))
++endif
++
+ define rule_cc_o_c
+ 	$(call cmd,checksrc)
+ 	$(call cmd_and_fixdep,cc_o_c)
+@@ -280,6 +285,7 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
+ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
+ 	$(call cmd,force_checksrc)
+ 	$(call if_changed_rule,cc_o_c)
++	$(call cmd_livepatch)
+ 	@{ echo $(@:.o=.ko); echo $@; \
+ 	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+ 
+@@ -456,6 +462,7 @@ cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(filter %.o,$^) $(cmd_secanalysis
+ 
+ $(multi-used-m): FORCE
+ 	$(call if_changed,link_multi-m)
++	$(call cmd,livepatch)
+ 	@{ echo $(@:.o=.ko); echo $(filter %.o,$^); \
+ 	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+ $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
 -- 
-2.21.0.392.gf8f6787159e-goog
+2.20.1
