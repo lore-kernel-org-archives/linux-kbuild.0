@@ -1,89 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr40090.outbound.protection.outlook.com ([40.107.4.90]:63552
-        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727964AbfDJJ1L (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Apr 2019 05:27:11 -0400
-From: "Wiebe, Wladislav (Nokia - DE/Ulm)" <wladislav.wiebe@nokia.com>
-Subject: Re: [PATCH] modpost: make KBUILD_MODPOST_WARN also configurable for
- external modules
-Date: Wed, 10 Apr 2019 09:27:07 +0000
-Message-ID: <82f5a922-1dd8-50b5-551c-33aa6d9e1192@nokia.com>
-References: <HE1PR0701MB2652FC3F5D8E46EA93AF033AFA5F0@HE1PR0701MB2652.eurprd07.prod.outlook.com>
- <CAK7LNAQEQyEyj_ozkARj8xjDf7EncHeBv0GY8xoP8e_Fn-qaag@mail.gmail.com>
- <77e11884-f520-d983-3d33-ccc3043ba604@nokia.com>
- <CAK7LNAR_Py_4_pPEcxd7_ZpicoD6rnjb-iyq=_h893m=7q7kug@mail.gmail.com>
-In-Reply-To: <CAK7LNAR_Py_4_pPEcxd7_ZpicoD6rnjb-iyq=_h893m=7q7kug@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D75E4441EB95044A9CF1071AF6884FBC@eurprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+Received: from mail-yw1-f73.google.com ([209.85.161.73]:55423 "EHLO
+        mail-yw1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729162AbfDJNSQ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 10 Apr 2019 09:18:16 -0400
+Received: by mail-yw1-f73.google.com with SMTP id y9so1800285ywc.22
+        for <linux-kbuild@vger.kernel.org>; Wed, 10 Apr 2019 06:18:15 -0700 (PDT)
+Date: Wed, 10 Apr 2019 15:17:23 +0200
+Message-Id: <20190410131726.250295-1-glider@google.com>
+Mime-Version: 1.0
+Subject: [PATCH v4 0/3] RFC: introduce CONFIG_INIT_ALL_MEMORY
+From: Alexander Potapenko <glider@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: "michal.lkml@markovi.net" <michal.lkml@markovi.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Jonas Gorski <jonas.gorski@gmail.com>
+To: yamada.masahiro@socionext.com, jmorris@namei.org, serge@hallyn.com
+Cc: linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org, ndesaulniers@google.com, kcc@google.com, dvyukov@google.com, keescook@chromium.org, sspatil@android.com, labbott@redhat.com, kernel-hardening@lists.openwall.com
 
-SGksDQoNCk9uIDA5LjA0LjIwMTkgMTE6MDAsIE1hc2FoaXJvIFlhbWFkYSB3cm90ZToNCj4gSGku
-DQo+IA0KPiBPbiBNb24sIEFwciA4LCAyMDE5IGF0IDU6MDMgUE0gV2llYmUsIFdsYWRpc2xhdiAo
-Tm9raWEgLSBERS9VbG0pDQo+IDx3bGFkaXNsYXYud2llYmVAbm9raWEuY29tPiB3cm90ZToNCj4+
-DQo+PiBIaSENCj4+DQo+PiBPbiAwNy4wNC4yMDE5IDExOjA0LCBNYXNhaGlybyBZYW1hZGEgd3Jv
-dGU6DQo+Pj4gKCtDQyBKb25hcyBHb3Jza2kpDQo+Pj4NCj4+Pg0KPj4+IE9uIFR1ZSwgTWFyIDI2
-LCAyMDE5IGF0IDY6NTggUE0gV2llYmUsIFdsYWRpc2xhdiAoTm9raWEgLSBERS9VbG0pDQo+Pj4g
-PHdsYWRpc2xhdi53aWViZUBub2tpYS5jb20+IHdyb3RlOg0KPj4+Pg0KPj4+PiBDb21taXQgZWE4
-MzdmMWMwNTAzICgia2J1aWxkOiBtYWtlIG1vZHBvc3QgcHJvY2Vzc2luZyBjb25maWd1cmFibGUi
-KQ0KPj4+PiB3YXMgaW50ZW5kZWQgdG8gZ2l2ZSBLQlVJTERfTU9EUE9TVF9XQVJOIGZsZXhpYmls
-aXR5IHRvIGJlIGNvbmZpZ3VyYWJsZS4NCj4+Pj4gUmlnaHQgbm93IEtCVUlMRF9NT0RQT1NUX1dB
-Uk4gZ2V0cyBqdXN0IGlnbm9yZWQgd2hlbiBLQlVJTERfRVhUTU9EIGlzDQo+Pj4+IHNldCB3aGlj
-aCBoYXBwZW5zIHBlciBkZWZhdWx0IHdoZW4gYnVpbGRpbmcgbW9kdWxlcyBvdXQgb2YgdGhlIHRy
-ZWUuDQo+Pj4+DQo+Pj4+IFRoaXMgY2hhbmdlIGdpdmVzIHRoZSBvcHBvcnR1bml0eSB0byBkZWZp
-bmUgbW9kdWxlIGJ1aWxkIGJlaGF2aW5nIGFsc28NCj4+Pj4gaW4gY2FzZSBvZiBvdXQgb2YgdHJl
-ZSBidWlsZHMgYW5kIGRlZmF1bHQgd2lsbCBiZWNvbWUgZXhpdCBvbiBlcnJvci4NCj4+Pj4gRXJy
-b3JzIHdoaWNoIGNhbiBiZSBkZXRlY3RlZCBieSB0aGUgYnVpbGQgc2hvdWxkIGJlIHRyYXBwZWQg
-b3V0IG9mIHRoZSBib3gNCj4+Pj4gdGhlcmUsIHVubGVzcyBzb21lYm9keSB3YW50cyB0byBub3Rp
-Y2UgYnJva2VuIHN0dWZmIGxhdGVyIGF0IHJ1bnRpbWUuDQo+Pj4NCj4+PiBJZiBhbiBleHRlcm5h
-bCBtb2R1bGUgcmVmZXJzIHRvIGEgc3ltYm9sDQo+Pj4gcHJvdmlkZWQgYnkgYW5vdGhlciBleHRl
-cm5hbCBtb2R1bGUsDQo+Pj4gdGhpcyBwYXRjaCB3aWxsIHR1cm4gdGhlIHdhcm5pbmcgaW50byB0
-aGUgZXJyb3IgYnkgZGVmYXVsdCwNCj4+PiB3aGljaCBpcyBwcm9iYWJseSBhIGJhZCBpZGVhLg0K
-Pj4NCj4+IEluZGVlZCwgZXhhY3RseSB0aGlzIHNob3VsZCBoYXBwZW4uIFlvdSBzaG91bGQgZml4
-IHlvdXIgZXh0ZXJuYWwgbW9kdWxlDQo+PiBkZXBlbmRlbmNpZXMgYnkgcHJvdmlkaW5nIHRoZWly
-IHN5bWJvbHMuIFBsZWFzZSB1c2UgZS5nLg0KPj4gS0JVSUxEX0VYVFJBX1NZTUJPTFMgaW5zdGVh
-ZCBvZiBjb252ZXJ0aW5nIGVycm9ycyB0byB3YXJuaW5nIGFuZCBob3BpbmcNCj4+IHRoYXQgdGhp
-bmdzIHdpbGwgd29yay4NCj4gDQo+IEkga25vdyB0aGlzIG9wdGlvbi4NCj4gV2hhdCBJIHdhbnQg
-dG8gc2F5IGlzLCB0aGlzIHBhdGNoIGNoYW5nZXMgdGhlIGJlaGF2aW9yLCBhbmQNCj4gbWF5IGFu
-bm95IHNvbWUgcGVvcGxlLg0KPiANCj4+IE9yIGhvdyBkbyB5b3Ugd2FudCB0byBtYWtlIHN1cmUg
-bW9kdWxlIEEgc3RpbGwNCj4+IGRlbGl2ZXJzIGFsbCBzeW1ib2xzIG5lZWRlZCBieSBtb2R1bGUg
-QiBhZnRlciBhbiB1cGRhdGUvY2hhbmdlcz8NCj4+IE1hbnVhbGx5IGNvbXBhcmluZyB0aGUgbG9n
-cyBhZnRlciBhbiB1cGRhdGUgb3Igd2FpdGluZyB1bnRpbCBpdCB0dXJucw0KPj4gb3V0IGJyb2tl
-biBkdXJpbmcgcnVuLXRpbWU/IEkgd291bGRuJ3Qgc2F5IHRoaXMgaXMgYSBnb29kIGlkZWEgOi0p
-DQo+IA0KPiBPSywgc28gdGhlIGNvbW1pdCBsb2cgc2hvdWxkIHJlY29yZCBib3RoIHRoZSBiZWhh
-dmlvciBjaGFuZ2UNCj4gYW5kIHdvcmthcm91bmRzLg0KPiANCj4gLSBJZiBhbiBleHRlcm5hbCBt
-b2R1bGUgYmVpbmcgYnVpbHQgcmVmZXJzIHRvIHN5bWJvbHMNCj4gICAgaW4gYW5vdGhlciBleHRl
-cm5hbCBtb2R1bGUsIEtidWlsZCBwcmV2aW91c2x5IHNob3dlZCBhIHdhcm5pbmcsDQo+ICAgIGJ1
-dCBnb2luZyBmb3J3YXJkIGl0IHdpbGwgdHVybiBpdCBpbnRvIGFuIGVycm9yLg0KPiANCj4gLSBU
-byB3b3JrIGFyb3VuZCB0aGlzLCB5b3Ugc2hvdWxkIHBhc3MgYSBzeW1ib2wgdGFibGUgdmlhIEtC
-VUlMRF9FWFRSQV9TWU1CT0xTLA0KPiAgICBvciBLQlVJTERfRVhUUkFfU1lNQk9MUz0xIHRvIHR1
-cm4gdGhlIGVycm9yIGludG8gYSB3YXJuaW5nLg0KDQoNCk9rLCBJJ3ZlIHBvc3RlZCB2MjoNCmh0
-dHBzOi8vbG9yZS5rZXJuZWwub3JnL3BhdGNod29yay9wYXRjaC8xMDU5OTg1Lw0KDQoNClRoYW5r
-cyENCg0KLSBXbGFkaXNsYXYNCg0KDQoNCj4gVGhhbmtzLg0KPiANCj4+DQo+Pj4gSSBzdWdnZXN0
-ZWQgYSBkZXNpcmVkIGNoYW5nZSBpbiB0aGUgZm9sbG93aW5nLg0KPj4+IGh0dHBzOi8vcGF0Y2h3
-b3JrLmtlcm5lbC5vcmcvcGF0Y2gvOTk4MDY5MS8NCj4+Pg0KPj4+IEkgYW0gcG9raW5nIEpvbmFz
-IEdvcnNraQ0KPj4+IGlmIGhlIHBsYW5zIHRvIHNlbmQgdjIuDQo+Pg0KPj4gSSB3b3VsZG4ndCB2
-b3RlIGZvciB2MiBiYXNlZCBvbiBleHBsYW5hdGlvbiBhYm92ZS4NCj4+DQo+PiAtIFdsYWRpc2xh
-dg0KPj4NCj4+Pg0KPj4+DQo+Pj4+IFNpZ25lZC1vZmYtYnk6IFdsYWRpc2xhdiBXaWViZSA8d2xh
-ZGlzbGF2LndpZWJlQG5va2lhLmNvbT4NCj4+Pj4gLS0tDQo+Pj4+ICAgIHNjcmlwdHMvTWFrZWZp
-bGUubW9kcG9zdCB8IDIgKy0NCj4+Pj4gICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCsp
-LCAxIGRlbGV0aW9uKC0pDQo+Pj4+DQo+Pj4+IGRpZmYgLS1naXQgYS9zY3JpcHRzL01ha2VmaWxl
-Lm1vZHBvc3QgYi9zY3JpcHRzL01ha2VmaWxlLm1vZHBvc3QNCj4+Pj4gaW5kZXggNmI3ZjM1NGYx
-ODlhLi5mZWM2ZWMyZmZhNDcgMTAwNjQ0DQo+Pj4+IC0tLSBhL3NjcmlwdHMvTWFrZWZpbGUubW9k
-cG9zdA0KPj4+PiArKysgYi9zY3JpcHRzL01ha2VmaWxlLm1vZHBvc3QNCj4+Pj4gQEAgLTc4LDcg
-Kzc4LDcgQEAgbW9kcG9zdCA9IHNjcmlwdHMvbW9kL21vZHBvc3QgICAgICAgICAgICAgICAgICAg
-IFwNCj4+Pj4gICAgICQoaWYgJChLQlVJTERfRVhUUkFfU1lNQk9MUyksICQocGF0c3Vic3QgJSwg
-LWUgJSwkKEtCVUlMRF9FWFRSQV9TWU1CT0xTKSkpIFwNCj4+Pj4gICAgICQoaWYgJChLQlVJTERf
-RVhUTU9EKSwtbyAkKG1vZHVsZXN5bWZpbGUpKSAgICAgIFwNCj4+Pj4gICAgICQoaWYgJChDT05G
-SUdfU0VDVElPTl9NSVNNQVRDSF9XQVJOX09OTFkpLCwtRSkgIFwNCj4+Pj4gLSAkKGlmICQoS0JV
-SUxEX0VYVE1PRCkkKEtCVUlMRF9NT0RQT1NUX1dBUk4pLC13KQ0KPj4+PiArICQoaWYgJChLQlVJ
-TERfTU9EUE9TVF9XQVJOKSwtdykNCj4+Pj4NCj4+Pj4gICAgTU9EUE9TVF9PUFQ9JChzdWJzdCAt
-aSwtbiwkKGZpbHRlciAtaSwkKE1BS0VGTEFHUykpKQ0KPj4+Pg0KPj4+PiAtLQ0KPj4+PiAyLjE5
-LjINCj4+Pg0KPj4+DQo+Pj4NCj4gDQo+IA0KPiAtLQ0KPiBCZXN0IFJlZ2FyZHMNCj4gTWFzYWhp
-cm8gWWFtYWRhDQo+IA0K
+This patch is a part of a bigger initiative to allow initializing
+heap/stack memory in the Linux kernels by default.
+The rationale behind doing so is to reduce the severity of bugs caused
+by using uninitialized memory.
+
+Over the last two years KMSAN (https://github.com/google/kmsan/) has
+found more than a hundred bugs running in a really moderate setup (orders
+of magnitude less CPU/months than KASAN). Some of those bugs led to
+information leaks if uninitialized memory was copied to the userspace,
+other could cause DoS because of subverted control flow.
+A lot more bugs remain uncovered, so we want to provide the distros and OS
+vendors with a last resort measure to mitigate such bugs.
+
+Our plan is to introduce configuration flags to force initialization of
+stack and heap variables with a fixed pattern.
+This is going to render information leaks inefficient (as we'll only leak
+pattern data) and make uses of uninitialized values in conditions more
+deterministic and discoverable.
+
+The stack instrumentation part is based on Clang's -ftrivial-auto-var-init
+(see https://reviews.llvm.org/D54604 ; there's also a GCC feature request
+for a similar flag: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=87210)
+or GCC's -fplugin-arg-structleak_plugin-byref-all
+The heap initialization part is compiler-agnostic and is done in the
+places that previously checked for __GFP_ZERO to initialize the newly
+allocated memory.
+
+Alexander Potapenko (3):
+  initmem: introduce CONFIG_INIT_ALL_MEMORY and CONFIG_INIT_ALL_STACK
+  initmem: introduce CONFIG_INIT_ALL_HEAP
+  net: make sk_prot_alloc() work with CONFIG_INIT_ALL_HEAP
+
+ Makefile                               | 10 ++++++
+ arch/arm64/Kconfig                     |  1 +
+ arch/arm64/include/asm/page.h          |  1 +
+ arch/x86/Kconfig                       |  1 +
+ arch/x86/include/asm/page_64.h         | 10 ++++++
+ arch/x86/lib/clear_page_64.S           | 24 ++++++++++++++
+ drivers/infiniband/core/uverbs_ioctl.c |  4 +--
+ include/linux/gfp.h                    | 10 ++++++
+ include/linux/highmem.h                |  8 +++++
+ include/net/sock.h                     |  8 ++---
+ kernel/kexec_core.c                    |  8 +++--
+ mm/dmapool.c                           |  4 +--
+ mm/page_alloc.c                        |  9 ++++--
+ mm/slab.c                              | 19 ++++++++----
+ mm/slub.c                              | 12 ++++---
+ net/core/sock.c                        |  5 +--
+ security/Kconfig                       |  1 +
+ security/Kconfig.initmem               | 43 ++++++++++++++++++++++++++
+ 18 files changed, 154 insertions(+), 24 deletions(-)
+ create mode 100644 security/Kconfig.initmem
+
+-- 
+2.21.0.392.gf8f6787159e-goog
