@@ -1,14 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45081 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:59398 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387476AbfDJPvH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Apr 2019 11:51:07 -0400
+        id S1729535AbfDJPvF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 10 Apr 2019 11:51:05 -0400
 From: Joe Lawrence <joe.lawrence@redhat.com>
-Subject: [PATCH v3 1/9] livepatch: Create and include UAPI headers
-Date: Wed, 10 Apr 2019 11:50:50 -0400
-Message-Id: <20190410155058.9437-2-joe.lawrence@redhat.com>
-In-Reply-To: <20190410155058.9437-1-joe.lawrence@redhat.com>
-References: <20190410155058.9437-1-joe.lawrence@redhat.com>
+Subject: [PATCH v3 0/9] klp-convert livepatch build tooling
+Date: Wed, 10 Apr 2019 11:50:49 -0400
+Message-Id: <20190410155058.9437-1-joe.lawrence@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,95 +14,248 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Joe Lawrence <joe.lawrence@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
-From: Josh Poimboeuf <jpoimboe@redhat.com>
+Hi folks,
 
-Define klp prefixes in include/uapi/linux/livepatch.h, and use them for
-replacing hard-coded values in kernel/livepatch/core.c.
+This is the third installment of the klp-convert tool for generating and
+processing livepatch symbols for livepatch module builds.  For those
+following along at home, archive links to previous versions:
 
-Update MAINTAINERS.
+RFC:
+  https://lore.kernel.org/lkml/cover.1477578530.git.jpoimboe@redhat.com/
+v2:
+  https://lore.kernel.org/lkml/f52d29f7-7d1b-ad3d-050b-a9fa8878faf2@redhat.com/
 
-Note: Add defines to uapi as these are also to be used by a newly
-introduced klp-convert script.
+(Note that I don't see v2 archived at lore, but that is a link to the
+most recent subthread that lore did catch.)
 
-Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
-Signed-off-by: Joao Moreira <jmoreira@suse.de>
-Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
----
- MAINTAINERS                    |  1 +
- include/linux/livepatch.h      |  1 +
- include/uapi/linux/livepatch.h | 17 +++++++++++++++++
- kernel/livepatch/core.c        |  4 ++--
- 4 files changed, 21 insertions(+), 2 deletions(-)
+
+Livepatches may use symbols which are not contained in its own scope,
+and, because of that, may end up compiled with relocations that will
+only be resolved during module load. Yet, when the referenced symbols are
+not exported, solving this relocation requires information on the object
+that holds the symbol (either vmlinux or modules) and its position inside
+the object, as an object may contain multiple symbols with the same name.
+Providing such information must be done accordingly to what is specified
+in Documentation/livepatch/module-elf-format.txt.
+
+Currently, there is no trivial way to embed the required information as
+requested in the final livepatch elf object. klp-convert solves this
+problem in two different forms: (i) by relying on a symbol map, which is
+built during kernel compilation, to automatically infer the relocation
+targeted symbol, and, when such inference is not possible (ii) by using
+annotations in the elf object to convert the relocation accordingly to
+the specification, enabling it to be handled by the livepatch loader.
+
+Given the above, add support for symbol mapping in the form of
+Symbols.list file; add klp-convert tool; integrate klp-convert tool into
+kbuild; make livepatch modules discernible during kernel compilation
+pipeline; add data-structure and macros to enable users to annotate
+livepatch source code; make modpost stage compatible with livepatches;
+update livepatch-sample and update documentation.
+
+The patch was tested under three use-cases:
+
+use-case 1: There is a relocation in the lp that can be automatically
+resolved by klp-convert.  For example. see the saved_command_line
+variable in lib/livepatch/test_klp_convert2.c.
+
+use-case 2: There is a relocation in the lp that cannot be automatically
+resolved, as the name of the respective symbol appears in multiple
+objects. The livepatch contains an annotation to enable a correct
+relocation.  See the KLP_MODULE_RELOC / KLP_SYMPOS annotation sections
+in lib/livepatch/test_klp_convert{1,2}.c.
+
+use-case 3: There is a relocation in the lp that cannot be automatically
+resolved similarly as 2, but no annotation was provided in the
+livepatch, triggering an error during compilation.  Reproducible by
+removing the KLP_MODULE_RELOC / KLP_SYMPOS annotation sections in
+lib/livepatch/test_klp_convert{1,2}.c.
+
+
+Branches
+--------
+
+Since I spent some time tinkering with v2 and accumulated a bunch of
+fixes, I collected them up and am posting this new version.  For review
+purposes, I posted two branches up to github:
+
+  1 - an expanded branch that with changes separate from the original
+  https://github.com/joe-lawrence/linux/commits/klp-convert-v3-expanded
+
+  2 - a squashed branch of (1) that comprises v3:
+  https://github.com/joe-lawrence/linux/commits/klp-convert-v3
+
+Non-trivial commits in the expanded branch have some extra commentary
+and details for debugging in the commit message that were dropped when
+squashing into their respective parent commits.
+
+
+TODO
+----
+
+There are a few outstanding items that I came across while reviewing v2,
+but as changes started accumulating, it made sense to defer those to a
+later version.  I'll reply to this thread individual topics to start
+discussion sub-threads for those.
+
+
+Changelogs
+----------
+
+The commit changelogs were getting long, so I've moved them here for
+posterity and review purposes:
+
+livepatch: Create and include UAPI headers
+  v2:
+  - jmoreira: split up and changelog
+  v3:
+  - joe: convert to SPDX license tags
+
+kbuild: Support for Symbols.list creation
+  v3:
+  - jmoreira: adjust for multiobject livepatch
+  - joe: add klpclean to PHONY
+  - joe: align KLP prefix
+
+livepatch: Add klp-convert tool
+  v2:
+  - khlebnikov: use HOSTLOADLIBES_ instead of HOSTLDFLAGS: -lelf must be
+    at the end
+  - jmoreira: add support to automatic relocation conversion in
+    klp-convert.c, changelog
+  v3:
+  - joe: convert to SPDX license tags
+  - jmoreira: add rela symbol name to WARNs
+  - jmoreira: ignore relocations to .TOC and symbols with index 0
+  - joe: separate and fix valid_sympos() sympos=0 and sympos=1..n checks
+  - joe: fix symbol use-after-frees
+  - joe: fix remaining valgrind leak complaints (non-error paths only)
+  - joe: checkpatch nits
+  
+livepatch: Add klp-convert annotation helpers
+  v2:
+  - jmoreira: split up: move KLP_MODULE_RELOC from previous patch to
+    here, add KLP_SYMPOS, move macros from include/uapi/livepatch.h to
+    include/linux/livepatch.h
+  v3:
+  - joe: suggested by jpoimboe, KLP_MODULE_RELOC macro should 4-byte
+    align klp_module_reloc structures
+
+modpost: Integrate klp-convert
+  v2:
+  - khlebnikov: save cmd_ld_ko_o into .module.cmd, if_changed_rule
+    doesn't do that.f
+  - khlebnikov: fix bashisms for debian where /bin/sh is a symlink to
+    /bin/dash
+  - khlebnikov: rename rule_link_module to rule_ld_ko_o, otherwise
+    arg-check inside if_changed_rule compares cmd_link_module and
+    cmd_ld_ko_o.
+  - khlebnikov: check modinfo -F livepatch only if CONFIG_LIVEPATCH is
+    true.
+  - mbenes: remove modinfo call. LIVEPATCH_ in Makefile
+  - jmoreira: split up: move the .livepatch file-based scheme for
+    identifying livepatches to a previous patch, as it was required for
+    correctly building Symbols.list there.
+  v3:
+  - joe: adjust rule_ld_ko_o to call echo-cmd
+  - joe: rebase for v5.1
+  - joe: align KLP prefix
+
+modpost: Add modinfo flag to livepatch modules
+  v2:
+  - jmoreira: fix modpost.c (add_livepatch_flag) to update module
+    structure with livepatch flag and prevent modpost from breaking due to
+    unresolved symbols
+  v3:
+  - joe: adjust modpost.c::get_modinfo() call for v5.0 version
+
+livepatch: Add sample livepatch module
+  v3:
+  - joe: update all in-tree livepatches with LIVEPATCH_* modinfo flag
+
+documentation: Update on livepatch elf format
+  v2:
+  - jmoreira: update module to use KLP_SYMPOS
+  - jmoreira: Comments on symbol resolution scheme
+  - jmoreira: Update Makefile
+  - jmoreira: Remove MODULE_INFO statement
+  - jmoreira: Changelog
+  v3:
+  - joe: rebase for v5.1
+  - joe: code shuffle to better match original source file
+
+livepatch/selftests: add klp-convert
+  v3:
+  - joe: clarify sympos=0 and sympos=1..n
+
+
+And now the usual git cover-letter boilerplate...
+
+Joao Moreira (2):
+  kbuild: Support for Symbols.list creation
+  documentation: Update on livepatch elf format
+
+Joe Lawrence (1):
+  livepatch/selftests: add klp-convert
+
+Josh Poimboeuf (5):
+  livepatch: Create and include UAPI headers
+  livepatch: Add klp-convert tool
+  livepatch: Add klp-convert annotation helpers
+  modpost: Integrate klp-convert
+  livepatch: Add sample livepatch module
+
+Miroslav Benes (1):
+  modpost: Add modinfo flag to livepatch modules
+
+ .gitignore                                    |   1 +
+ Documentation/livepatch/livepatch.txt         |   3 +
+ Documentation/livepatch/module-elf-format.txt |  50 +-
+ MAINTAINERS                                   |   2 +
+ Makefile                                      |  30 +-
+ include/linux/livepatch.h                     |  13 +
+ include/uapi/linux/livepatch.h                |  22 +
+ kernel/livepatch/core.c                       |   4 +-
+ lib/livepatch/Makefile                        |  15 +
+ lib/livepatch/test_klp_atomic_replace.c       |   1 -
+ lib/livepatch/test_klp_callbacks_demo.c       |   1 -
+ lib/livepatch/test_klp_callbacks_demo2.c      |   1 -
+ lib/livepatch/test_klp_convert1.c             | 106 +++
+ lib/livepatch/test_klp_convert2.c             | 103 +++
+ lib/livepatch/test_klp_convert_mod_a.c        |  25 +
+ lib/livepatch/test_klp_convert_mod_b.c        |  13 +
+ lib/livepatch/test_klp_livepatch.c            |   1 -
+ samples/livepatch/Makefile                    |   7 +
+ .../livepatch/livepatch-annotated-sample.c    | 102 +++
+ samples/livepatch/livepatch-sample.c          |   1 -
+ scripts/Kbuild.include                        |   4 +-
+ scripts/Makefile                              |   1 +
+ scripts/Makefile.build                        |   7 +
+ scripts/Makefile.modpost                      |  24 +-
+ scripts/livepatch/.gitignore                  |   1 +
+ scripts/livepatch/Makefile                    |   7 +
+ scripts/livepatch/elf.c                       | 753 ++++++++++++++++++
+ scripts/livepatch/elf.h                       |  72 ++
+ scripts/livepatch/klp-convert.c               | 692 ++++++++++++++++
+ scripts/livepatch/klp-convert.h               |  39 +
+ scripts/livepatch/list.h                      | 391 +++++++++
+ scripts/mod/modpost.c                         |  82 +-
+ scripts/mod/modpost.h                         |   1 +
+ .../selftests/livepatch/test-livepatch.sh     |  64 ++
+ 34 files changed, 2616 insertions(+), 23 deletions(-)
  create mode 100644 include/uapi/linux/livepatch.h
+ create mode 100644 lib/livepatch/test_klp_convert1.c
+ create mode 100644 lib/livepatch/test_klp_convert2.c
+ create mode 100644 lib/livepatch/test_klp_convert_mod_a.c
+ create mode 100644 lib/livepatch/test_klp_convert_mod_b.c
+ create mode 100644 samples/livepatch/livepatch-annotated-sample.c
+ create mode 100644 scripts/livepatch/.gitignore
+ create mode 100644 scripts/livepatch/Makefile
+ create mode 100644 scripts/livepatch/elf.c
+ create mode 100644 scripts/livepatch/elf.h
+ create mode 100644 scripts/livepatch/klp-convert.c
+ create mode 100644 scripts/livepatch/klp-convert.h
+ create mode 100644 scripts/livepatch/list.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2359e12e4c41..65b4e8f481f0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9017,6 +9017,7 @@ R:	Joe Lawrence <joe.lawrence@redhat.com>
- S:	Maintained
- F:	kernel/livepatch/
- F:	include/linux/livepatch.h
-+F:	include/uapi/linux/livepatch.h
- F:	arch/x86/include/asm/livepatch.h
- F:	arch/x86/kernel/livepatch.c
- F:	Documentation/livepatch/
-diff --git a/include/linux/livepatch.h b/include/linux/livepatch.h
-index 53551f470722..16b48e8b29a2 100644
---- a/include/linux/livepatch.h
-+++ b/include/linux/livepatch.h
-@@ -25,6 +25,7 @@
- #include <linux/ftrace.h>
- #include <linux/completion.h>
- #include <linux/list.h>
-+#include <uapi/linux/livepatch.h>
- 
- #if IS_ENABLED(CONFIG_LIVEPATCH)
- 
-diff --git a/include/uapi/linux/livepatch.h b/include/uapi/linux/livepatch.h
-new file mode 100644
-index 000000000000..bb86243de805
---- /dev/null
-+++ b/include/uapi/linux/livepatch.h
-@@ -0,0 +1,17 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+/*
-+ * livepatch.h - Kernel Live Patching Core
-+ *
-+ * Copyright (C) 2016 Josh Poimboeuf <jpoimboe@redhat.com>
-+ */
-+
-+#ifndef _UAPI_LIVEPATCH_H
-+#define _UAPI_LIVEPATCH_H
-+
-+#include <linux/types.h>
-+
-+#define KLP_RELA_PREFIX		".klp.rela."
-+#define KLP_SYM_PREFIX		".klp.sym."
-+
-+#endif /* _UAPI_LIVEPATCH_H */
-diff --git a/kernel/livepatch/core.c b/kernel/livepatch/core.c
-index eb0ee10a1981..3d9ed895b252 100644
---- a/kernel/livepatch/core.c
-+++ b/kernel/livepatch/core.c
-@@ -235,7 +235,7 @@ static int klp_resolve_symbols(Elf_Shdr *relasec, struct module *pmod)
- 
- 		/* Format: .klp.sym.objname.symname,sympos */
- 		cnt = sscanf(strtab + sym->st_name,
--			     ".klp.sym.%55[^.].%127[^,],%lu",
-+			     KLP_SYM_PREFIX "%55[^.].%127[^,],%lu",
- 			     objname, symname, &sympos);
- 		if (cnt != 3) {
- 			pr_err("symbol %s has an incorrectly formatted name\n",
-@@ -281,7 +281,7 @@ static int klp_write_object_relocations(struct module *pmod,
- 		 * See comment in klp_resolve_symbols() for an explanation
- 		 * of the selected field width value.
- 		 */
--		cnt = sscanf(secname, ".klp.rela.%55[^.]", sec_objname);
-+		cnt = sscanf(secname, KLP_RELA_PREFIX "%55[^.]", sec_objname);
- 		if (cnt != 1) {
- 			pr_err("section %s has an incorrectly formatted name\n",
- 			       secname);
 -- 
 2.20.1
