@@ -1,160 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:43691 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387711AbfDJQQV (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Apr 2019 12:16:21 -0400
-Received: by mail-pl1-f193.google.com with SMTP id n8so1699862plp.10
-        for <linux-kbuild@vger.kernel.org>; Wed, 10 Apr 2019 09:16:20 -0700 (PDT)
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 2/3] kbuild: Move stackleak config to Kconfig.hardening
-Date: Wed, 10 Apr 2019 09:16:11 -0700
-Message-Id: <20190410161612.18545-3-keescook@chromium.org>
-In-Reply-To: <20190410161612.18545-1-keescook@chromium.org>
-References: <20190410161612.18545-1-keescook@chromium.org>
+Received: from mx1.redhat.com ([209.132.183.28]:56858 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727305AbfDJSSl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 10 Apr 2019 14:18:41 -0400
+Date: Wed, 10 Apr 2019 14:18:37 -0400
+From: Joe Lawrence <joe.lawrence@redhat.com>
+Subject: Re: [PATCH v3 4/9] livepatch: Add klp-convert annotation helpers
+Message-ID: <20190410181837.GA13083@redhat.com>
+References: <20190410155058.9437-1-joe.lawrence@redhat.com>
+ <20190410155058.9437-5-joe.lawrence@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190410155058.9437-5-joe.lawrence@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Kees Cook <keescook@chromium.org>, Alexander Potapenko <glider@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Alexander Popov <alpopov@ptsecurity.com>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, kernel-hardening@lists.openwall.com
+To: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
-This moves the stackleak plugin options to Kconfig.hardening's memory
-initialization menu.
+On Wed, Apr 10, 2019 at 11:50:53AM -0400, Joe Lawrence wrote:
+> From: Josh Poimboeuf <jpoimboe@redhat.com>
+> 
+> Define macros KLP_MODULE_RELOC and KLP_SYMPOS in
+> include/linux/livepatch.h to improve user-friendliness of the
+> livepatch annotation process.
+> 
+> Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
+> Signed-off-by: Joao Moreira <jmoreira@suse.de>
+> Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
+> ---
+>  include/linux/livepatch.h | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/include/linux/livepatch.h b/include/linux/livepatch.h
+> index 16b48e8b29a2..947cfc2d1980 100644
+> --- a/include/linux/livepatch.h
+> +++ b/include/linux/livepatch.h
+> @@ -236,6 +236,18 @@ void *klp_shadow_get_or_alloc(void *obj, unsigned long id,
+>  void klp_shadow_free(void *obj, unsigned long id, klp_shadow_dtor_t dtor);
+>  void klp_shadow_free_all(unsigned long id, klp_shadow_dtor_t dtor);
+>  
+> +/* Used to annotate symbol relocations in livepatches */
+> +#define KLP_MODULE_RELOC(obj)						\
+> +	struct klp_module_reloc						\
+> +	__attribute__((__section__(".klp.module_relocs." #obj)))	\
+> +	__attribute__((aligned (4)))
+> +
+> +#define KLP_SYMPOS(symbol, pos)						\
+> +	{								\
+> +		.sym = &symbol,						\
+> +		.sympos = pos,						\
+> +	},
+        ^^
+nit: if we dropped the trailing array comma delimiter from KLP_SYMPOS
+macro, the invocations would look more intuitively like an array.  For
+example:
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- scripts/gcc-plugins/Kconfig | 51 ---------------------------------
- security/Kconfig.hardening  | 57 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+), 51 deletions(-)
+  KLP_MODULE_RELOC(test_klp_convert_mod) test_klp_convert_mod_relocs_a[] = {
+  	KLP_SYMPOS(driver_name, 0),
+  	KLP_SYMPOS(homonym_string, 2),
+  	KLP_SYMPOS(get_homonym_string, 2),
+  };
 
-diff --git a/scripts/gcc-plugins/Kconfig b/scripts/gcc-plugins/Kconfig
-index 01874ef0f883..50cfcf1ed979 100644
---- a/scripts/gcc-plugins/Kconfig
-+++ b/scripts/gcc-plugins/Kconfig
-@@ -107,57 +107,6 @@ config GCC_PLUGIN_RANDSTRUCT_PERFORMANCE
- 	  in structures.  This reduces the performance hit of RANDSTRUCT
- 	  at the cost of weakened randomization.
- 
--config GCC_PLUGIN_STACKLEAK
--	bool "Erase the kernel stack before returning from syscalls"
--	depends on GCC_PLUGINS
--	depends on HAVE_ARCH_STACKLEAK
--	help
--	  This option makes the kernel erase the kernel stack before
--	  returning from system calls. That reduces the information which
--	  kernel stack leak bugs can reveal and blocks some uninitialized
--	  stack variable attacks.
--
--	  The tradeoff is the performance impact: on a single CPU system kernel
--	  compilation sees a 1% slowdown, other systems and workloads may vary
--	  and you are advised to test this feature on your expected workload
--	  before deploying it.
--
--	  This plugin was ported from grsecurity/PaX. More information at:
--	   * https://grsecurity.net/
--	   * https://pax.grsecurity.net/
--
--config STACKLEAK_TRACK_MIN_SIZE
--	int "Minimum stack frame size of functions tracked by STACKLEAK"
--	default 100
--	range 0 4096
--	depends on GCC_PLUGIN_STACKLEAK
--	help
--	  The STACKLEAK gcc plugin instruments the kernel code for tracking
--	  the lowest border of the kernel stack (and for some other purposes).
--	  It inserts the stackleak_track_stack() call for the functions with
--	  a stack frame size greater than or equal to this parameter.
--	  If unsure, leave the default value 100.
--
--config STACKLEAK_METRICS
--	bool "Show STACKLEAK metrics in the /proc file system"
--	depends on GCC_PLUGIN_STACKLEAK
--	depends on PROC_FS
--	help
--	  If this is set, STACKLEAK metrics for every task are available in
--	  the /proc file system. In particular, /proc/<pid>/stack_depth
--	  shows the maximum kernel stack consumption for the current and
--	  previous syscalls. Although this information is not precise, it
--	  can be useful for estimating the STACKLEAK performance impact for
--	  your workloads.
--
--config STACKLEAK_RUNTIME_DISABLE
--	bool "Allow runtime disabling of kernel stack erasing"
--	depends on GCC_PLUGIN_STACKLEAK
--	help
--	  This option provides 'stack_erasing' sysctl, which can be used in
--	  runtime to control kernel stack erasing for kernels built with
--	  CONFIG_GCC_PLUGIN_STACKLEAK.
--
- config GCC_PLUGIN_ARM_SSP_PER_TASK
- 	bool
- 	depends on GCC_PLUGINS && ARM
-diff --git a/security/Kconfig.hardening b/security/Kconfig.hardening
-index 8223a8ab1a12..9942d9869864 100644
---- a/security/Kconfig.hardening
-+++ b/security/Kconfig.hardening
-@@ -89,6 +89,63 @@ config GCC_PLUGIN_STRUCTLEAK_VERBOSE
- 	  initialized. Since not all existing initializers are detected
- 	  by the plugin, this can produce false positive warnings.
- 
-+config GCC_PLUGIN_STACKLEAK
-+	bool "Poison kernel stack before returning from syscalls"
-+	depends on GCC_PLUGINS
-+	depends on HAVE_ARCH_STACKLEAK
-+	help
-+	  This option makes the kernel erase the kernel stack before
-+	  returning from system calls. This has the effect of leaving
-+	  the stack initialized to the poison value, which both reduces
-+	  the lifetime of any sensitive stack contents and reduces
-+	  potential for uninitialized stack variable exploits or information
-+	  exposures (it does not cover functions reaching the same stack
-+	  depth as prior functions during the same syscall). This blocks
-+	  most uninitialized stack variable attacks, with the performance
-+	  impact being driven by the depth of the stack usage, rather than
-+	  the function calling complexity.
-+
-+	  The performance impact on a single CPU system kernel compilation
-+	  sees a 1% slowdown, other systems and workloads may vary and you
-+	  are advised to test this feature on your expected workload before
-+	  deploying it.
-+
-+	  This plugin was ported from grsecurity/PaX. More information at:
-+	   * https://grsecurity.net/
-+	   * https://pax.grsecurity.net/
-+
-+config STACKLEAK_TRACK_MIN_SIZE
-+	int "Minimum stack frame size of functions tracked by STACKLEAK"
-+	default 100
-+	range 0 4096
-+	depends on GCC_PLUGIN_STACKLEAK
-+	help
-+	  The STACKLEAK gcc plugin instruments the kernel code for tracking
-+	  the lowest border of the kernel stack (and for some other purposes).
-+	  It inserts the stackleak_track_stack() call for the functions with
-+	  a stack frame size greater than or equal to this parameter.
-+	  If unsure, leave the default value 100.
-+
-+config STACKLEAK_METRICS
-+	bool "Show STACKLEAK metrics in the /proc file system"
-+	depends on GCC_PLUGIN_STACKLEAK
-+	depends on PROC_FS
-+	help
-+	  If this is set, STACKLEAK metrics for every task are available in
-+	  the /proc file system. In particular, /proc/<pid>/stack_depth
-+	  shows the maximum kernel stack consumption for the current and
-+	  previous syscalls. Although this information is not precise, it
-+	  can be useful for estimating the STACKLEAK performance impact for
-+	  your workloads.
-+
-+config STACKLEAK_RUNTIME_DISABLE
-+	bool "Allow runtime disabling of kernel stack erasing"
-+	depends on GCC_PLUGIN_STACKLEAK
-+	help
-+	  This option provides 'stack_erasing' sysctl, which can be used in
-+	  runtime to control kernel stack erasing for kernels built with
-+	  CONFIG_GCC_PLUGIN_STACKLEAK.
-+
- endmenu
- 
- endmenu
--- 
-2.17.1
+But I could not figure out a good regex to reference if other such
+kernel preprocessor macros include or exclude the delimiter.  Are there
+reasons to include it?
+
+-- Joe
