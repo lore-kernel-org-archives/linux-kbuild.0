@@ -1,56 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua1-f68.google.com ([209.85.222.68]:36741 "EHLO
-        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726035AbfDIRHN (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Apr 2019 13:07:13 -0400
-Received: by mail-ua1-f68.google.com with SMTP id k32so1102238uae.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 09 Apr 2019 10:07:12 -0700 (PDT)
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com. [209.85.222.49])
-        by smtp.gmail.com with ESMTPSA id j8sm8991153vke.1.2019.04.09.10.07.09
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Apr 2019 10:07:09 -0700 (PDT)
-Received: by mail-ua1-f49.google.com with SMTP id b8so5755332uaq.7
-        for <linux-kbuild@vger.kernel.org>; Tue, 09 Apr 2019 10:07:09 -0700 (PDT)
+Received: from mail-eopbgr40096.outbound.protection.outlook.com ([40.107.4.96]:23810
+        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729367AbfDJJXU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 10 Apr 2019 05:23:20 -0400
+From: "Wiebe, Wladislav (Nokia - DE/Ulm)" <wladislav.wiebe@nokia.com>
+Subject: [PATCH v2] modpost: make KBUILD_MODPOST_WARN also configurable for
+Date: Wed, 10 Apr 2019 09:23:15 +0000
+Message-ID: <HE1PR0701MB2652D08633C7322BDEABDACBFA2E0@HE1PR0701MB2652.eurprd07.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190408170418.148554-1-glider@google.com> <20190408170418.148554-2-glider@google.com>
- <CAK7LNAS3+FKpgBvvxKDukD1xcHUZ1o3TsE1BjjVq5P13MrO7Fw@mail.gmail.com>
-In-Reply-To: <CAK7LNAS3+FKpgBvvxKDukD1xcHUZ1o3TsE1BjjVq5P13MrO7Fw@mail.gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 9 Apr 2019 10:06:57 -0700
-Message-ID: <CAGXu5j+yeKMFwziyKzKBg-5_EiE9qE28JUkoidCwkmHQOtedcg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] initmem: introduce CONFIG_INIT_ALL_MEMORY and CONFIG_INIT_ALL_STACK
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Alexander Potapenko <glider@google.com>, James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, "michal.lkml@markovi.net" <michal.lkml@markovi.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jonas Gorski <jonas.gorski@gmail.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Tue, Apr 9, 2019 at 1:38 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> > +config INIT_ALL_STACK
-> > +       bool "Initialize all stack"
-> > +       depends on INIT_ALL_MEMORY
-> > +       depends on CC_HAS_AUTO_VAR_INIT || (HAVE_GCC_PLUGINS && PLUGIN_HOSTCC != "")
-> > +       select GCC_PLUGINS if !CC_HAS_AUTO_VAR_INIT
-> > +       select GCC_PLUGIN_STRUCTLEAK if !CC_HAS_AUTO_VAR_INIT
-> > +       select GCC_PLUGIN_STRUCTLEAK_BYREF_ALL if !CC_HAS_AUTO_VAR_INIT
-> > +       default y
-> > +       help
-> > +         Initialize uninitialized stack data with a fixed pattern
-> > +         (0x00 in GCC, 0xAA in Clang).
-> > +
->
-> I am not sure about the benefit of these umbrella CONFIGs
-> since these make 'depends on' and 'select' complicated.
-> I will leave it to Kees, though.
+Commit ea837f1c0503 ("kbuild: make modpost processing configurable")
+was intended to give KBUILD_MODPOST_WARN flexibility to be configurable.
+Right now KBUILD_MODPOST_WARN gets just ignored when KBUILD_EXTMOD is
+set which happens per default when building modules out of the tree.
 
-Yeah, I think this could use some more cleanup to get a single config
-that represents that if gcc plugins are available (instead of having
-it split across two configs now). Additionally I think this needs
-refactoring against the current menu choices for
-GCC_PLUGIN_STRUCTLEAK. Let me send a proposed patch in a few hours...
+This change gives the opportunity to define module build behaving also
+in case of out of tree builds and default will become exit on error.
+Errors which can be detected by the build should be trapped out of the box
+there, unless somebody wants to notice broken stuff later at runtime.
 
--- 
-Kees Cook
+As this patch changes the default behaving from warning to error,
+users can consider to fix it for external module builds by:
+- providing module symbol table via KBUILD_EXTRA_SYMBOLS for
+  modules which are dependent
+- OR getting old behaving back by passing KBUILD_MODPOST_WARN to the build
+
+Signed-off-by: Wladislav Wiebe <wladislav.wiebe@nokia.com>
+---
+ scripts/Makefile.modpost | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 6b7f354f189a..fec6ec2ffa47 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -78,7 +78,7 @@ modpost =3D scripts/mod/modpost                    \
+  $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))=
+) \
+  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
+  $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
+- $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
++ $(if $(KBUILD_MODPOST_WARN),-w)
+=20
+ MODPOST_OPT=3D$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
+=20
+--=20
+2.19.2
