@@ -1,78 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:30309 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726073AbfDKOaz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Apr 2019 10:30:55 -0400
-Subject: Re: [PATCH v3 1/9] livepatch: Create and include UAPI headers
-References: <20190410155058.9437-1-joe.lawrence@redhat.com>
- <20190410155058.9437-2-joe.lawrence@redhat.com>
- <CAK7LNAQ_=bp0VTOze7ckfXSwFy0m_g6OYPxS5K-ac7jjoutB+A@mail.gmail.com>
-From: Joe Lawrence <joe.lawrence@redhat.com>
-Message-ID: <141bbc68-95a7-3444-08a5-3794b6dc84ce@redhat.com>
-Date: Thu, 11 Apr 2019 10:30:45 -0400
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQ_=bp0VTOze7ckfXSwFy0m_g6OYPxS5K-ac7jjoutB+A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: from aserp2130.oracle.com ([141.146.126.79]:44360 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726145AbfDKOdQ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 11 Apr 2019 10:33:16 -0400
+From: Steve Sistare <steven.sistare@oracle.com>
+Subject: [PATCH V1 2/3] kbuild: optimize modules_install target
+Date: Thu, 11 Apr 2019 07:20:14 -0700
+Message-Id: <1554992415-292288-3-git-send-email-steven.sistare@oracle.com>
+In-Reply-To: <1554992415-292288-1-git-send-email-steven.sistare@oracle.com>
+References: <1554992415-292288-1-git-send-email-steven.sistare@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, live-patching@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
+Cc: Steve Sistare <steven.sistare@oracle.com>
 
-On 4/10/19 8:32 PM, Masahiro Yamada wrote:
-> On Thu, Apr 11, 2019 at 12:52 AM Joe Lawrence <joe.lawrence@redhat.com> wrote:
->>
->> From: Josh Poimboeuf <jpoimboe@redhat.com>
->>
->> Define klp prefixes in include/uapi/linux/livepatch.h, and use them for
->> replacing hard-coded values in kernel/livepatch/core.c.
->>
->> [ ... snip ... ]
- >>
->> diff --git a/include/uapi/linux/livepatch.h b/include/uapi/linux/livepatch.h
->> new file mode 100644
->> index 000000000000..bb86243de805
->> --- /dev/null
->> +++ b/include/uapi/linux/livepatch.h
->> @@ -0,0 +1,17 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
-> 
-> 
-> In my understanding, UAPI headers should be licensed under:
-> 
-> /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> 
-> 
+Perform module install actions only if the object area module is newer than
+install area module, and only announce the updated modules.  This saves 10's
+of seconds for a single CPU make, saves a few seconds for a parallel make,
+and reduces output clutter for an incremental make.
 
-Good eye, that is an interesting licensing detail.  Easy enough to 
-update assuming Josh (original author) is fine with adding the modifier.
+Example:
+  % touch drivers/virtio/virtio_ring.c
+  % make modules modules_install
+  DESCEND  objtool
+  CALL    scripts/atomic/check-atomics.sh
+  CALL    scripts/checksyscalls.sh
+  CC [M]  drivers/virtio/virtio_ring.o
+  Building modules, stage 2.
+  MODPOST 2592 modules
+  LD [M]  drivers/virtio/virtio_ring.ko
+  INSTALL drivers/virtio/virtio_ring.ko
+  DEPMOD  5.1.0-rc3
 
->> +
->> +/*
->> + * livepatch.h - Kernel Live Patching Core
->> + *
->> + * Copyright (C) 2016 Josh Poimboeuf <jpoimboe@redhat.com>
->> + */
->> +
->> +#ifndef _UAPI_LIVEPATCH_H
->> +#define _UAPI_LIVEPATCH_H
->> +
->> +#include <linux/types.h>
-> 
-> 
-> Why is this include needed?
-> 
->> +#define KLP_RELA_PREFIX                ".klp.rela."
->> +#define KLP_SYM_PREFIX         ".klp.sym."
-> 
-> These do not depend on <linux/types.h>
-> 
+Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+---
+ Makefile                 |  1 -
+ scripts/Makefile.modinst | 30 +++++++++++++++++++++++-------
+ 2 files changed, 23 insertions(+), 8 deletions(-)
 
-Hmmm, types.h has been included since v1, but I just verified that 
-removing it results in a clean build, so you are correct that it is 
-(now) unnecessary.
-
-Thanks,
-
--- Joe
+diff --git a/Makefile b/Makefile
+index 4988dcc..8f58e27 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1286,7 +1286,6 @@ modules_install: _modinst_ _modinst_post
+ 
+ PHONY += _modinst_
+ _modinst_:
+-	@rm -rf $(MODLIB)/kernel
+ 	@rm -f $(MODLIB)/source
+ 	@mkdir -p $(MODLIB)/kernel
+ 	@ln -s $(abspath $(srctree)) $(MODLIB)/source
+diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+index 0dae402..062fdca6 100644
+--- a/scripts/Makefile.modinst
++++ b/scripts/Makefile.modinst
+@@ -10,6 +10,12 @@ include scripts/Kbuild.include
+ 
+ #
+ 
++ifeq ($(quiet),quiet_)
++  mod_announce_cmd := echo
++else
++  mod_announce_cmd := true
++endif
++
+ __modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
+ modules := $(patsubst %.o,%.ko,$(wildcard $(__modules:.ko=.o)))
+ 
+@@ -17,14 +23,24 @@ PHONY += $(modules)
+ __modinst: $(modules)
+ 	@:
+ 
+-# Don't stop modules_install if we can't sign external modules.
+-quiet_cmd_modules_install = INSTALL $@
++# Perform install actions only if the tree module is newer than the installed
++# module.  Create the latter with a final move command to avoid a broken
++# installed module if one of the intermediate commands fails.  Suppress
++# quiet_cmd so that only updated modules are announced.  Don't stop
++# modules_install if we can't sign external modules.
++
++quiet_cmd_modules_install =
+       cmd_modules_install = \
+-    mkdir -p $(2) ; \
+-    cp $@ $(2) ; \
+-    $(mod_strip_cmd) $(2)/$(notdir $@) ; \
+-    $(mod_sign_cmd) $(2)/$(notdir $@) $(patsubst %,|| true,$(KBUILD_EXTMOD)) ; \
+-    $(mod_compress_cmd) $(2)/$(notdir $@)
++    if [[ $@ -nt $(2)/$(notdir $@) ]]; then \
++	$(mod_announce_cmd) '  INSTALL' $@ ; \
++	mkdir -p $(2) ; \
++	tmpfile=$(2)/.$(notdir $@).tmp ; \
++	cp $@ $$tmpfile ; \
++	$(mod_strip_cmd) $$tmpfile ; \
++	$(mod_sign_cmd) $$tmpfile $(patsubst %,|| true,$(KBUILD_EXTMOD)) ; \
++	$(mod_compress_cmd) $$tmpfile ; \
++	mv $$tmpfile $(2)/$(notdir $@) ; \
++    fi
+ 
+ # Modules built outside the kernel source tree go into extra by default
+ INSTALL_MOD_DIR ?= extra
+-- 
+1.8.3.1
