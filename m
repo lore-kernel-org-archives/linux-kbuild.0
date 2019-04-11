@@ -1,75 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.emlix.com ([188.40.240.192]:33306 "EHLO mx1.emlix.com"
+Received: from mx1.redhat.com ([209.132.183.28]:36012 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725793AbfDKIwp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Apr 2019 04:52:45 -0400
-From: Rolf Eike Beer <eb@emlix.com>
-Subject: Re: [PATCH linux] objtool: fix pkg-config query in case of cross-compilation
-Date: Thu, 11 Apr 2019 10:52:39 +0200
-Message-ID: <4208204.4d101oJ1v5@devpool35>
-In-Reply-To: <20190411083940.3911-1-nicolas.dichtel@6wind.com>
-References: <20190411083940.3911-1-nicolas.dichtel@6wind.com>
+        id S1726139AbfDKJTD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 11 Apr 2019 05:19:03 -0400
+Date: Thu, 11 Apr 2019 11:18:59 +0200
+From: Artem Savkov <asavkov@redhat.com>
+Subject: Re: [PATCH v3 2/9] kbuild: Support for Symbols.list creation
+Message-ID: <20190411091859.GF4995@shodan.usersys.redhat.com>
+References: <20190410155058.9437-1-joe.lawrence@redhat.com>
+ <20190410155058.9437-3-joe.lawrence@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart2978754.nR1pzekyYs"; micalg="pgp-sha256"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190410155058.9437-3-joe.lawrence@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: tglx@linutronix.de, jpoimboe@redhat.com, yamada.masahiro@socionext.com, peterz@infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
---nextPart2978754.nR1pzekyYs
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
+On Wed, Apr 10, 2019 at 11:50:51AM -0400, Joe Lawrence wrote:
+> -clean: archclean vmlinuxclean
+> +klpclean:
+> +	$(Q) rm -f $(objtree)/Symbols.list
 
-Am Donnerstag, 11. April 2019, 10:39:40 CEST schrieb Nicolas Dichtel:
-> In case of cross-compilation, there may be two pkg-config tools, one for
-> the host and one for the target. Enable to override the default name.
->=20
-> Fixes: 056d28d135bc ("objtool: Query pkg-config for libelf location")
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+nit: $(SLIST) can be used here.
 
-If you do that, you have to fix a lot of other places, too. This starts in=
-=20
-scripts/kconfig/ and also includes e.g. tools/testing/.
+> +clean: archclean vmlinuxclean klpclean
+>  
+>  # mrproper - Delete all generated files, including .config
+>  #
+> diff --git a/samples/livepatch/Makefile b/samples/livepatch/Makefile
+> index 2472ce39a18d..8b9b42a258ad 100644
+> --- a/samples/livepatch/Makefile
+> +++ b/samples/livepatch/Makefile
+> @@ -1,3 +1,4 @@
+> +LIVEPATCH_livepatch-sample := y
+>  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-sample.o
+>  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-mod.o
+>  obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-fix1.o
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 76ca30cc4791..ca76bd2080f0 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -246,6 +246,11 @@ cmd_gen_ksymdeps = \
+>  	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
+>  endif
+>  
+> +ifdef CONFIG_LIVEPATCH
+> +cmd_livepatch = $(if $(LIVEPATCH_$(basetarget)),		\
+> +	$(shell touch $(MODVERDIR)/$(basetarget).livepatch))
+> +endif
+> +
+>  define rule_cc_o_c
+>  	$(call cmd,checksrc)
+>  	$(call cmd_and_fixdep,cc_o_c)
+> @@ -280,6 +285,7 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
+>  $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
+>  	$(call cmd,force_checksrc)
+>  	$(call if_changed_rule,cc_o_c)
+> +	$(call cmd_livepatch)
 
-Usually you have pkg-config for host and ${target_platform}-pkg-config for =
-the=20
-target, and the PKG_CONFIG variable for the target, usually initialized to $
-(CROSS_COMPILE)pkg-config. I have sent a bunch of patches to replace the us=
-age=20
-of plain pkg-config at several places with the cross-aware version, but sad=
-ly=20
-a lot of them have not been picked up. It break cross-building tests basica=
-lly=20
-all the time. One example is here:=20
+nit: maybe use "cmd,livepatch" to be consistent with the other call of
+this function.
 
-https://marc.info/?l=3Dlinux-acpi&m=3D153544231529066&w=3D2
+>  	@{ echo $(@:.o=.ko); echo $@; \
+>  	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+>  
+> @@ -456,6 +462,7 @@ cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(filter %.o,$^) $(cmd_secanalysis
+>  
+>  $(multi-used-m): FORCE
+>  	$(call if_changed,link_multi-m)
+> +	$(call cmd,livepatch)
+>  	@{ echo $(@:.o=.ko); echo $(filter %.o,$^); \
+>  	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+>  $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
+> -- 
+> 2.20.1
+> 
 
-=46or me it looks like you are trying to go into the wrong direction.
-
-Greetings,
-
-Eike
-=2D-=20
-Rolf Eike Beer, emlix GmbH, http://www.emlix.com
-=46on +49 551 30664-0, Fax +49 551 30664-11
-Gothaer Platz 3, 37083 G=C3=B6ttingen, Germany
-Sitz der Gesellschaft: G=C3=B6ttingen, Amtsgericht G=C3=B6ttingen HR B 3160
-Gesch=C3=A4ftsf=C3=BChrung: Heike Jordan, Dr. Uwe Kracke =E2=80=93 Ust-IdNr=
-=2E: DE 205 198 055
-
-emlix - smart embedded open source
---nextPart2978754.nR1pzekyYs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iLMEAAEIAB0WIQQ/Uctzh31xzAxFCLur5FH7Xu2t/AUCXK8AVwAKCRCr5FH7Xu2t
-/G6lA/45lcxPk+/3m0YJ8VVw6OLpcHgHlSur8IN9N0e5FhbqBm8IKPAZvhTmJP3z
-PZeZ8vPEVQT8o07ZFKxG3W5G1k06dUgfzUxP0ozURgXQ8ZZCKyiwATm/y24es/io
-urnEOZdqgaC8IqyKX888N266OmyWedJ01I/IEQ4k79jTYUoQ5A==
-=gC/P
------END PGP SIGNATURE-----
-
---nextPart2978754.nR1pzekyYs--
+-- 
+ Artem
