@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:46057 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726735AbfDKSB1 (ORCPT
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:37711 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726765AbfDKSB3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Apr 2019 14:01:27 -0400
-Received: by mail-pg1-f196.google.com with SMTP id y3so3857465pgk.12
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Apr 2019 11:01:27 -0700 (PDT)
+        Thu, 11 Apr 2019 14:01:29 -0400
+Received: by mail-pg1-f195.google.com with SMTP id e6so3881337pgc.4
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Apr 2019 11:01:28 -0700 (PDT)
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v2 3/3] security: Implement Clang's stack initialization
-Date: Thu, 11 Apr 2019 11:01:17 -0700
-Message-Id: <20190411180117.27704-4-keescook@chromium.org>
+Subject: [PATCH v2 2/3] security: Move stackleak config to Kconfig.hardening
+Date: Thu, 11 Apr 2019 11:01:16 -0700
+Message-Id: <20190411180117.27704-3-keescook@chromium.org>
 In-Reply-To: <20190411180117.27704-1-keescook@chromium.org>
 References: <20190411180117.27704-1-keescook@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,87 +17,144 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Alexander Potapenko <glider@google.com>
 Cc: Kees Cook <keescook@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, James Morris <jmorris@namei.org>, Alexander Popov <alex.popov@linux.com>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, "Serge E. Hallyn" <serge@hallyn.com>, kernel-hardening@lists.openwall.com, linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-CONFIG_INIT_STACK_ALL turns on stack initialization based on
--ftrivial-auto-var-init in Clang builds, which has greater coverage
-than CONFIG_GCC_PLUGINS_STRUCTLEAK_BYREF_ALL.
+This moves the stackleak plugin options to Kconfig.hardening's memory
+initialization menu.
 
--ftrivial-auto-var-init Clang option provides trivial initializers for
-uninitialized local variables, variable fields and padding.
-
-It has three possible values:
-  pattern - uninitialized locals are filled with a fixed pattern
-    (mostly 0xAA on 64-bit platforms, see https://reviews.llvm.org/D54604
-    for more details, but 0x000000AA for 32-bit pointers) likely to cause
-    crashes when uninitialized value is used;
-  zero (it's still debated whether this flag makes it to the official
-    Clang release) - uninitialized locals are filled with zeroes;
-  uninitialized (default) - uninitialized locals are left intact.
-
-This patch uses only the "pattern" mode when CONFIG_INIT_STACK_ALL is
-enabled.
-
-Developers have the possibility to opt-out of this feature on a
-per-variable basis by using __attribute__((uninitialized)), but such
-use should be well justified in comments.
-
-Co-developed-by: Alexander Potapenko <glider@google.com>
-Signed-off-by: Alexander Potapenko <glider@google.com>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- Makefile                   |  5 +++++
- security/Kconfig.hardening | 15 ++++++++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ scripts/gcc-plugins/Kconfig | 51 ---------------------------------
+ security/Kconfig.hardening  | 57 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+), 51 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index c0a34064c574..a7d9c6cd0267 100644
---- a/Makefile
-+++ b/Makefile
-@@ -745,6 +745,11 @@ KBUILD_CFLAGS	+= -fomit-frame-pointer
- endif
- endif
+diff --git a/scripts/gcc-plugins/Kconfig b/scripts/gcc-plugins/Kconfig
+index 84d471dea2b7..e4cb58d5a73f 100644
+--- a/scripts/gcc-plugins/Kconfig
++++ b/scripts/gcc-plugins/Kconfig
+@@ -109,57 +109,6 @@ config GCC_PLUGIN_RANDSTRUCT_PERFORMANCE
+ 	  in structures.  This reduces the performance hit of RANDSTRUCT
+ 	  at the cost of weakened randomization.
  
-+# Initialize all stack variables with a pattern, if desired.
-+ifdef CONFIG_INIT_STACK_ALL
-+KBUILD_CFLAGS	+= -ftrivial-auto-var-init=pattern
-+endif
-+
- DEBUG_CFLAGS	:= $(call cc-option, -fno-var-tracking-assignments)
- 
- ifdef CONFIG_DEBUG_INFO
+-config GCC_PLUGIN_STACKLEAK
+-	bool "Erase the kernel stack before returning from syscalls"
+-	depends on GCC_PLUGINS
+-	depends on HAVE_ARCH_STACKLEAK
+-	help
+-	  This option makes the kernel erase the kernel stack before
+-	  returning from system calls. That reduces the information which
+-	  kernel stack leak bugs can reveal and blocks some uninitialized
+-	  stack variable attacks.
+-
+-	  The tradeoff is the performance impact: on a single CPU system kernel
+-	  compilation sees a 1% slowdown, other systems and workloads may vary
+-	  and you are advised to test this feature on your expected workload
+-	  before deploying it.
+-
+-	  This plugin was ported from grsecurity/PaX. More information at:
+-	   * https://grsecurity.net/
+-	   * https://pax.grsecurity.net/
+-
+-config STACKLEAK_TRACK_MIN_SIZE
+-	int "Minimum stack frame size of functions tracked by STACKLEAK"
+-	default 100
+-	range 0 4096
+-	depends on GCC_PLUGIN_STACKLEAK
+-	help
+-	  The STACKLEAK gcc plugin instruments the kernel code for tracking
+-	  the lowest border of the kernel stack (and for some other purposes).
+-	  It inserts the stackleak_track_stack() call for the functions with
+-	  a stack frame size greater than or equal to this parameter.
+-	  If unsure, leave the default value 100.
+-
+-config STACKLEAK_METRICS
+-	bool "Show STACKLEAK metrics in the /proc file system"
+-	depends on GCC_PLUGIN_STACKLEAK
+-	depends on PROC_FS
+-	help
+-	  If this is set, STACKLEAK metrics for every task are available in
+-	  the /proc file system. In particular, /proc/<pid>/stack_depth
+-	  shows the maximum kernel stack consumption for the current and
+-	  previous syscalls. Although this information is not precise, it
+-	  can be useful for estimating the STACKLEAK performance impact for
+-	  your workloads.
+-
+-config STACKLEAK_RUNTIME_DISABLE
+-	bool "Allow runtime disabling of kernel stack erasing"
+-	depends on GCC_PLUGIN_STACKLEAK
+-	help
+-	  This option provides 'stack_erasing' sysctl, which can be used in
+-	  runtime to control kernel stack erasing for kernels built with
+-	  CONFIG_GCC_PLUGIN_STACKLEAK.
+-
+ config GCC_PLUGIN_ARM_SSP_PER_TASK
+ 	bool
+ 	depends on GCC_PLUGINS && ARM
 diff --git a/security/Kconfig.hardening b/security/Kconfig.hardening
-index 3dd7a28c3822..5dd61770d3f0 100644
+index 01a119437dfc..3dd7a28c3822 100644
 --- a/security/Kconfig.hardening
 +++ b/security/Kconfig.hardening
-@@ -18,9 +18,12 @@ config GCC_PLUGIN_STRUCTLEAK
+@@ -88,6 +88,63 @@ config GCC_PLUGIN_STRUCTLEAK_VERBOSE
+ 	  initialized. Since not all existing initializers are detected
+ 	  by the plugin, this can produce false positive warnings.
  
- menu "Memory initialization"
- 
-+config CC_HAS_AUTO_VAR_INIT
-+	def_bool $(cc-option,-ftrivial-auto-var-init=pattern)
++config GCC_PLUGIN_STACKLEAK
++	bool "Poison kernel stack before returning from syscalls"
++	depends on GCC_PLUGINS
++	depends on HAVE_ARCH_STACKLEAK
++	help
++	  This option makes the kernel erase the kernel stack before
++	  returning from system calls. This has the effect of leaving
++	  the stack initialized to the poison value, which both reduces
++	  the lifetime of any sensitive stack contents and reduces
++	  potential for uninitialized stack variable exploits or information
++	  exposures (it does not cover functions reaching the same stack
++	  depth as prior functions during the same syscall). This blocks
++	  most uninitialized stack variable attacks, with the performance
++	  impact being driven by the depth of the stack usage, rather than
++	  the function calling complexity.
 +
- choice
- 	prompt "Initialize kernel stack variables at function entry"
--	depends on GCC_PLUGINS
-+	depends on CC_HAS_AUTO_VAR_INIT || GCC_PLUGINS
- 	default INIT_STACK_NONE
- 	help
- 	  This option enables initialization of stack variables at
-@@ -76,6 +79,16 @@ choice
- 		  of uninitialized stack variable exploits and information
- 		  exposures.
- 
-+	config INIT_STACK_ALL
-+		bool "0xAA-init everything on the stack (strongest)"
-+		depends on CC_HAS_AUTO_VAR_INIT
-+		help
-+		  Initializes everything on the stack with a 0xAA
-+		  pattern. This is intended to eliminate all classes
-+		  of uninitialized stack variable exploits and information
-+		  exposures, even variables that were warned to have been
-+		  left uninitialized.
++	  The performance impact on a single CPU system kernel compilation
++	  sees a 1% slowdown, other systems and workloads may vary and you
++	  are advised to test this feature on your expected workload before
++	  deploying it.
 +
- endchoice
++	  This plugin was ported from grsecurity/PaX. More information at:
++	   * https://grsecurity.net/
++	   * https://pax.grsecurity.net/
++
++config STACKLEAK_TRACK_MIN_SIZE
++	int "Minimum stack frame size of functions tracked by STACKLEAK"
++	default 100
++	range 0 4096
++	depends on GCC_PLUGIN_STACKLEAK
++	help
++	  The STACKLEAK gcc plugin instruments the kernel code for tracking
++	  the lowest border of the kernel stack (and for some other purposes).
++	  It inserts the stackleak_track_stack() call for the functions with
++	  a stack frame size greater than or equal to this parameter.
++	  If unsure, leave the default value 100.
++
++config STACKLEAK_METRICS
++	bool "Show STACKLEAK metrics in the /proc file system"
++	depends on GCC_PLUGIN_STACKLEAK
++	depends on PROC_FS
++	help
++	  If this is set, STACKLEAK metrics for every task are available in
++	  the /proc file system. In particular, /proc/<pid>/stack_depth
++	  shows the maximum kernel stack consumption for the current and
++	  previous syscalls. Although this information is not precise, it
++	  can be useful for estimating the STACKLEAK performance impact for
++	  your workloads.
++
++config STACKLEAK_RUNTIME_DISABLE
++	bool "Allow runtime disabling of kernel stack erasing"
++	depends on GCC_PLUGIN_STACKLEAK
++	help
++	  This option provides 'stack_erasing' sysctl, which can be used in
++	  runtime to control kernel stack erasing for kernels built with
++	  CONFIG_GCC_PLUGIN_STACKLEAK.
++
+ endmenu
  
- config GCC_PLUGIN_STRUCTLEAK_VERBOSE
+ endmenu
 -- 
 2.17.1
