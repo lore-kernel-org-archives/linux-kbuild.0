@@ -1,56 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr50114.outbound.protection.outlook.com ([40.107.5.114]:43790
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725783AbfDKJ2v (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Apr 2019 05:28:51 -0400
-From: "Wiebe, Wladislav (Nokia - DE/Ulm)" <wladislav.wiebe@nokia.com>
-Subject: Re: [PATCH v2] modpost: make KBUILD_MODPOST_WARN also configurable
- for
-Date: Thu, 11 Apr 2019 09:28:47 +0000
-Message-ID: <fe53aa37-7570-8f5f-2114-337fd1d1eedc@nokia.com>
-References: <HE1PR0701MB2652D08633C7322BDEABDACBFA2E0@HE1PR0701MB2652.eurprd07.prod.outlook.com>
-In-Reply-To: <HE1PR0701MB2652D08633C7322BDEABDACBFA2E0@HE1PR0701MB2652.eurprd07.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4EF6FB3AB6FC264597264F565FCCFF4C@eurprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:38025 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727001AbfDKKsS (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 11 Apr 2019 06:48:18 -0400
+Received: by mail-qt1-f195.google.com with SMTP id d13so6477278qth.5
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Apr 2019 03:48:17 -0700 (PDT)
 MIME-Version: 1.0
+Reply-To: katiehuggin@gmail.com
+From: Katie Huggins <renato.vigna.italybank@gmail.com>
+Date: Thu, 11 Apr 2019 10:48:17 +0000
+Message-ID: <CAHJu5Bia4VMChVu36LQ1_Dsnd+EZ5RHqX033i2pikqh7UqWchg@mail.gmail.com>
+Subject: Hi dear,
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, "michal.lkml@markovi.net" <michal.lkml@markovi.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jonas Gorski <jonas.gorski@gmail.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-c2VlbXMgc3ViamVjdCBpcyBpbmNvbXBsZXRlIGluIHYyLCB2MyBwb3N0ZWQ6DQpodHRwczovL2xv
-cmUua2VybmVsLm9yZy9wYXRjaHdvcmsvcGF0Y2gvMTA2MDUwNS8NCg0KVGhhbmtzIQ0KDQotIFds
-YWRpc2xhdg0KDQpPbiAxMC4wNC4yMDE5IDExOjIzLCBXaWViZSwgV2xhZGlzbGF2IChOb2tpYSAt
-IERFL1VsbSkgd3JvdGU6DQo+IENvbW1pdCBlYTgzN2YxYzA1MDMgKCJrYnVpbGQ6IG1ha2UgbW9k
-cG9zdCBwcm9jZXNzaW5nIGNvbmZpZ3VyYWJsZSIpDQo+IHdhcyBpbnRlbmRlZCB0byBnaXZlIEtC
-VUlMRF9NT0RQT1NUX1dBUk4gZmxleGliaWxpdHkgdG8gYmUgY29uZmlndXJhYmxlLg0KPiBSaWdo
-dCBub3cgS0JVSUxEX01PRFBPU1RfV0FSTiBnZXRzIGp1c3QgaWdub3JlZCB3aGVuIEtCVUlMRF9F
-WFRNT0QgaXMNCj4gc2V0IHdoaWNoIGhhcHBlbnMgcGVyIGRlZmF1bHQgd2hlbiBidWlsZGluZyBt
-b2R1bGVzIG91dCBvZiB0aGUgdHJlZS4NCj4gDQo+IFRoaXMgY2hhbmdlIGdpdmVzIHRoZSBvcHBv
-cnR1bml0eSB0byBkZWZpbmUgbW9kdWxlIGJ1aWxkIGJlaGF2aW5nIGFsc28NCj4gaW4gY2FzZSBv
-ZiBvdXQgb2YgdHJlZSBidWlsZHMgYW5kIGRlZmF1bHQgd2lsbCBiZWNvbWUgZXhpdCBvbiBlcnJv
-ci4NCj4gRXJyb3JzIHdoaWNoIGNhbiBiZSBkZXRlY3RlZCBieSB0aGUgYnVpbGQgc2hvdWxkIGJl
-IHRyYXBwZWQgb3V0IG9mIHRoZSBib3gNCj4gdGhlcmUsIHVubGVzcyBzb21lYm9keSB3YW50cyB0
-byBub3RpY2UgYnJva2VuIHN0dWZmIGxhdGVyIGF0IHJ1bnRpbWUuDQo+IA0KPiBBcyB0aGlzIHBh
-dGNoIGNoYW5nZXMgdGhlIGRlZmF1bHQgYmVoYXZpbmcgZnJvbSB3YXJuaW5nIHRvIGVycm9yLA0K
-PiB1c2VycyBjYW4gY29uc2lkZXIgdG8gZml4IGl0IGZvciBleHRlcm5hbCBtb2R1bGUgYnVpbGRz
-IGJ5Og0KPiAtIHByb3ZpZGluZyBtb2R1bGUgc3ltYm9sIHRhYmxlIHZpYSBLQlVJTERfRVhUUkFf
-U1lNQk9MUyBmb3INCj4gICAgbW9kdWxlcyB3aGljaCBhcmUgZGVwZW5kZW50DQo+IC0gT1IgZ2V0
-dGluZyBvbGQgYmVoYXZpbmcgYmFjayBieSBwYXNzaW5nIEtCVUlMRF9NT0RQT1NUX1dBUk4gdG8g
-dGhlIGJ1aWxkDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBXbGFkaXNsYXYgV2llYmUgPHdsYWRpc2xh
-di53aWViZUBub2tpYS5jb20+DQo+IC0tLQ0KPiAgIHNjcmlwdHMvTWFrZWZpbGUubW9kcG9zdCB8
-IDIgKy0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkN
-Cj4gDQo+IGRpZmYgLS1naXQgYS9zY3JpcHRzL01ha2VmaWxlLm1vZHBvc3QgYi9zY3JpcHRzL01h
-a2VmaWxlLm1vZHBvc3QNCj4gaW5kZXggNmI3ZjM1NGYxODlhLi5mZWM2ZWMyZmZhNDcgMTAwNjQ0
-DQo+IC0tLSBhL3NjcmlwdHMvTWFrZWZpbGUubW9kcG9zdA0KPiArKysgYi9zY3JpcHRzL01ha2Vm
-aWxlLm1vZHBvc3QNCj4gQEAgLTc4LDcgKzc4LDcgQEAgbW9kcG9zdCA9IHNjcmlwdHMvbW9kL21v
-ZHBvc3QgICAgICAgICAgICAgICAgICAgIFwNCj4gICAgJChpZiAkKEtCVUlMRF9FWFRSQV9TWU1C
-T0xTKSwgJChwYXRzdWJzdCAlLCAtZSAlLCQoS0JVSUxEX0VYVFJBX1NZTUJPTFMpKSkgXA0KPiAg
-ICAkKGlmICQoS0JVSUxEX0VYVE1PRCksLW8gJChtb2R1bGVzeW1maWxlKSkgICAgICBcDQo+ICAg
-ICQoaWYgJChDT05GSUdfU0VDVElPTl9NSVNNQVRDSF9XQVJOX09OTFkpLCwtRSkgIFwNCj4gLSAk
-KGlmICQoS0JVSUxEX0VYVE1PRCkkKEtCVUlMRF9NT0RQT1NUX1dBUk4pLC13KQ0KPiArICQoaWYg
-JChLQlVJTERfTU9EUE9TVF9XQVJOKSwtdykNCj4gICANCj4gICBNT0RQT1NUX09QVD0kKHN1YnN0
-IC1pLC1uLCQoZmlsdGVyIC1pLCQoTUFLRUZMQUdTKSkpDQo+ICAgDQo+IA0K
+Hi dear,
+
+I am still waiting for your Email response, you did receive my first
+email to you????
+
+Respectfully Yours,
+
+Mrs Katie Huggins
