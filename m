@@ -1,53 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp2130.oracle.com ([141.146.126.79]:44361 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726646AbfDKOdQ (ORCPT
+Received: from userp2120.oracle.com ([156.151.31.85]:35824 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726655AbfDKOdQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 11 Apr 2019 10:33:16 -0400
 From: Steve Sistare <steven.sistare@oracle.com>
-Subject: [PATCH V1 0/3] kbuild: optimize modules_install
-Date: Thu, 11 Apr 2019 07:20:12 -0700
-Message-Id: <1554992415-292288-1-git-send-email-steven.sistare@oracle.com>
+Subject: [PATCH V1 3/3] kbuild: remove stale modules from install area
+Date: Thu, 11 Apr 2019 07:20:15 -0700
+Message-Id: <1554992415-292288-4-git-send-email-steven.sistare@oracle.com>
+In-Reply-To: <1554992415-292288-1-git-send-email-steven.sistare@oracle.com>
+References: <1554992415-292288-1-git-send-email-steven.sistare@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
 Cc: Steve Sistare <steven.sistare@oracle.com>
 
-Perform module install actions only if the object area module is newer than
-install area module, and only announce the updated modules.  To do this, the
-<moddir>/kernel directory must be preserved across invocations of make, so
-it must be checked for stale modules, which can occur after changing config
-options.  Hence, remove modules from this directory that are not present
-in modules.order.
+During install_modules, remove modules from the install/kernel area that are
+not present in modules.order.  This can occur after changing config options.
+Also remove any unrecognized files.
 
-These changes save 10's of seconds for a single CPU build, save a few
-seconds for a parallel build, and reduce output clutter for an incremental
-build.  Example:
+Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+---
+ Makefile | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-  % touch drivers/virtio/virtio_ring.c
-  % make modules modules_install
-  DESCEND  objtool
-  CALL    scripts/atomic/check-atomics.sh
-  CALL    scripts/checksyscalls.sh
-  CC [M]  drivers/virtio/virtio_ring.o
-  Building modules, stage 2.
-  MODPOST 2592 modules
-  LD [M]  drivers/virtio/virtio_ring.ko
-  INSTALL drivers/virtio/virtio_ring.ko
-  DEPMOD  5.1.0-rc3
-
-Patch 1 fixes a legacy race bug in parallel make.
-Patch 2 installs only modified modules.
-Patch 3 removes stale modules.
-
-Steve Sistare (3):
-  kbuild: serialize modules and modules_install
-  kbuild: optimize modules_install target
-  kbuild: remove stale modules from install area
-
- Makefile                 | 26 +++++++++++++++++++++-----
- scripts/Makefile.modinst | 30 +++++++++++++++++++++++-------
- 2 files changed, 44 insertions(+), 12 deletions(-)
-
+diff --git a/Makefile b/Makefile
+index 8f58e27..7d64cab 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1297,11 +1297,26 @@ _modinst_:
+ 	@cp -f $(objtree)/modules.builtin $(MODLIB)/
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
+ 
++# Remove any files in the install area which are not listed in modules.order.
++# This can occur after changing config options.
++
++PHONY += _modinst_remove
++_modinst_remove: _modinst_
++	@declare -A mods; \
++	while read buf ; do \
++		mods[$$buf]=1; \
++	done < $(objtree)/modules.order; \
++	cd $(MODLIB); \
++	find kernel -not -type d | \
++	while read x ; do \
++		[[ -z "$${mods[$$x]}" ]] && rm $$x; \
++	done || true
++
+ # This depmod is only for convenience to give the initial
+ # boot a modules.dep even before / is mounted read-write.  However the
+ # boot script depmod is the master version.
+ PHONY += _modinst_post
+-_modinst_post: _modinst_
++_modinst_post: _modinst_remove
+ 	$(call cmd,depmod)
+ 
+ ifeq ($(CONFIG_MODULE_SIG), y)
 -- 
 1.8.3.1
