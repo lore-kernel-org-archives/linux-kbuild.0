@@ -1,26 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp2130.oracle.com ([141.146.126.79]:44360 "EHLO
+Received: from aserp2130.oracle.com ([141.146.126.79]:44361 "EHLO
         aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726145AbfDKOdQ (ORCPT
+        with ESMTP id S1726646AbfDKOdQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 11 Apr 2019 10:33:16 -0400
 From: Steve Sistare <steven.sistare@oracle.com>
-Subject: [PATCH V1 2/3] kbuild: optimize modules_install target
-Date: Thu, 11 Apr 2019 07:20:14 -0700
-Message-Id: <1554992415-292288-3-git-send-email-steven.sistare@oracle.com>
-In-Reply-To: <1554992415-292288-1-git-send-email-steven.sistare@oracle.com>
-References: <1554992415-292288-1-git-send-email-steven.sistare@oracle.com>
+Subject: [PATCH V1 0/3] kbuild: optimize modules_install
+Date: Thu, 11 Apr 2019 07:20:12 -0700
+Message-Id: <1554992415-292288-1-git-send-email-steven.sistare@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
 Cc: Steve Sistare <steven.sistare@oracle.com>
 
 Perform module install actions only if the object area module is newer than
-install area module, and only announce the updated modules.  This saves 10's
-of seconds for a single CPU make, saves a few seconds for a parallel make,
-and reduces output clutter for an incremental make.
+install area module, and only announce the updated modules.  To do this, the
+<moddir>/kernel directory must be preserved across invocations of make, so
+it must be checked for stale modules, which can occur after changing config
+options.  Hence, remove modules from this directory that are not present
+in modules.order.
 
-Example:
+These changes save 10's of seconds for a single CPU build, save a few
+seconds for a parallel build, and reduce output clutter for an incremental
+build.  Example:
+
   % touch drivers/virtio/virtio_ring.c
   % make modules modules_install
   DESCEND  objtool
@@ -33,72 +36,18 @@ Example:
   INSTALL drivers/virtio/virtio_ring.ko
   DEPMOD  5.1.0-rc3
 
-Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
----
- Makefile                 |  1 -
- scripts/Makefile.modinst | 30 +++++++++++++++++++++++-------
- 2 files changed, 23 insertions(+), 8 deletions(-)
+Patch 1 fixes a legacy race bug in parallel make.
+Patch 2 installs only modified modules.
+Patch 3 removes stale modules.
 
-diff --git a/Makefile b/Makefile
-index 4988dcc..8f58e27 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1286,7 +1286,6 @@ modules_install: _modinst_ _modinst_post
- 
- PHONY += _modinst_
- _modinst_:
--	@rm -rf $(MODLIB)/kernel
- 	@rm -f $(MODLIB)/source
- 	@mkdir -p $(MODLIB)/kernel
- 	@ln -s $(abspath $(srctree)) $(MODLIB)/source
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index 0dae402..062fdca6 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -10,6 +10,12 @@ include scripts/Kbuild.include
- 
- #
- 
-+ifeq ($(quiet),quiet_)
-+  mod_announce_cmd := echo
-+else
-+  mod_announce_cmd := true
-+endif
-+
- __modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
- modules := $(patsubst %.o,%.ko,$(wildcard $(__modules:.ko=.o)))
- 
-@@ -17,14 +23,24 @@ PHONY += $(modules)
- __modinst: $(modules)
- 	@:
- 
--# Don't stop modules_install if we can't sign external modules.
--quiet_cmd_modules_install = INSTALL $@
-+# Perform install actions only if the tree module is newer than the installed
-+# module.  Create the latter with a final move command to avoid a broken
-+# installed module if one of the intermediate commands fails.  Suppress
-+# quiet_cmd so that only updated modules are announced.  Don't stop
-+# modules_install if we can't sign external modules.
-+
-+quiet_cmd_modules_install =
-       cmd_modules_install = \
--    mkdir -p $(2) ; \
--    cp $@ $(2) ; \
--    $(mod_strip_cmd) $(2)/$(notdir $@) ; \
--    $(mod_sign_cmd) $(2)/$(notdir $@) $(patsubst %,|| true,$(KBUILD_EXTMOD)) ; \
--    $(mod_compress_cmd) $(2)/$(notdir $@)
-+    if [[ $@ -nt $(2)/$(notdir $@) ]]; then \
-+	$(mod_announce_cmd) '  INSTALL' $@ ; \
-+	mkdir -p $(2) ; \
-+	tmpfile=$(2)/.$(notdir $@).tmp ; \
-+	cp $@ $$tmpfile ; \
-+	$(mod_strip_cmd) $$tmpfile ; \
-+	$(mod_sign_cmd) $$tmpfile $(patsubst %,|| true,$(KBUILD_EXTMOD)) ; \
-+	$(mod_compress_cmd) $$tmpfile ; \
-+	mv $$tmpfile $(2)/$(notdir $@) ; \
-+    fi
- 
- # Modules built outside the kernel source tree go into extra by default
- INSTALL_MOD_DIR ?= extra
+Steve Sistare (3):
+  kbuild: serialize modules and modules_install
+  kbuild: optimize modules_install target
+  kbuild: remove stale modules from install area
+
+ Makefile                 | 26 +++++++++++++++++++++-----
+ scripts/Makefile.modinst | 30 +++++++++++++++++++++++-------
+ 2 files changed, 44 insertions(+), 12 deletions(-)
+
 -- 
 1.8.3.1
