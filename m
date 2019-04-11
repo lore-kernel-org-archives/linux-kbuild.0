@@ -1,45 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50891 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726564AbfDKJ0P (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Apr 2019 05:26:15 -0400
-Received: by mail-wm1-f65.google.com with SMTP id z11so5820416wmi.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Apr 2019 02:26:14 -0700 (PDT)
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH linux] objtool: fix pkg-config query in case of
- cross-compilation
-References: <20190411083940.3911-1-nicolas.dichtel@6wind.com>
- <4208204.4d101oJ1v5@devpool35>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Message-ID: <cc009072-64d4-4be3-0bb2-20be4d5c357f@6wind.com>
-Date: Thu, 11 Apr 2019 11:26:12 +0200
+Received: from mail-eopbgr50114.outbound.protection.outlook.com ([40.107.5.114]:43790
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725783AbfDKJ2v (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 11 Apr 2019 05:28:51 -0400
+From: "Wiebe, Wladislav (Nokia - DE/Ulm)" <wladislav.wiebe@nokia.com>
+Subject: Re: [PATCH v2] modpost: make KBUILD_MODPOST_WARN also configurable
+ for
+Date: Thu, 11 Apr 2019 09:28:47 +0000
+Message-ID: <fe53aa37-7570-8f5f-2114-337fd1d1eedc@nokia.com>
+References: <HE1PR0701MB2652D08633C7322BDEABDACBFA2E0@HE1PR0701MB2652.eurprd07.prod.outlook.com>
+In-Reply-To: <HE1PR0701MB2652D08633C7322BDEABDACBFA2E0@HE1PR0701MB2652.eurprd07.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4EF6FB3AB6FC264597264F565FCCFF4C@eurprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <4208204.4d101oJ1v5@devpool35>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rolf Eike Beer <eb@emlix.com>
-Cc: tglx@linutronix.de, jpoimboe@redhat.com, yamada.masahiro@socionext.com, peterz@infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, "michal.lkml@markovi.net" <michal.lkml@markovi.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jonas Gorski <jonas.gorski@gmail.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Le 11/04/2019 à 10:52, Rolf Eike Beer a écrit :
-> Am Donnerstag, 11. April 2019, 10:39:40 CEST schrieb Nicolas Dichtel:
->> In case of cross-compilation, there may be two pkg-config tools, one for
->> the host and one for the target. Enable to override the default name.
->>
->> Fixes: 056d28d135bc ("objtool: Query pkg-config for libelf location")
->> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> 
-> If you do that, you have to fix a lot of other places, too. This starts in 
-> scripts/kconfig/ and also includes e.g. tools/testing/.
-> 
-> Usually you have pkg-config for host and ${target_platform}-pkg-config for the 
-My use case was for buildroot, which define pkg-config and host-pkgconf. In
-fact, I've just seen that a buildroot patch was accepted for this problem:
-https://patchwork.ozlabs.org/patch/1081379/
-
-
-Regards,
-Nicolas
+c2VlbXMgc3ViamVjdCBpcyBpbmNvbXBsZXRlIGluIHYyLCB2MyBwb3N0ZWQ6DQpodHRwczovL2xv
+cmUua2VybmVsLm9yZy9wYXRjaHdvcmsvcGF0Y2gvMTA2MDUwNS8NCg0KVGhhbmtzIQ0KDQotIFds
+YWRpc2xhdg0KDQpPbiAxMC4wNC4yMDE5IDExOjIzLCBXaWViZSwgV2xhZGlzbGF2IChOb2tpYSAt
+IERFL1VsbSkgd3JvdGU6DQo+IENvbW1pdCBlYTgzN2YxYzA1MDMgKCJrYnVpbGQ6IG1ha2UgbW9k
+cG9zdCBwcm9jZXNzaW5nIGNvbmZpZ3VyYWJsZSIpDQo+IHdhcyBpbnRlbmRlZCB0byBnaXZlIEtC
+VUlMRF9NT0RQT1NUX1dBUk4gZmxleGliaWxpdHkgdG8gYmUgY29uZmlndXJhYmxlLg0KPiBSaWdo
+dCBub3cgS0JVSUxEX01PRFBPU1RfV0FSTiBnZXRzIGp1c3QgaWdub3JlZCB3aGVuIEtCVUlMRF9F
+WFRNT0QgaXMNCj4gc2V0IHdoaWNoIGhhcHBlbnMgcGVyIGRlZmF1bHQgd2hlbiBidWlsZGluZyBt
+b2R1bGVzIG91dCBvZiB0aGUgdHJlZS4NCj4gDQo+IFRoaXMgY2hhbmdlIGdpdmVzIHRoZSBvcHBv
+cnR1bml0eSB0byBkZWZpbmUgbW9kdWxlIGJ1aWxkIGJlaGF2aW5nIGFsc28NCj4gaW4gY2FzZSBv
+ZiBvdXQgb2YgdHJlZSBidWlsZHMgYW5kIGRlZmF1bHQgd2lsbCBiZWNvbWUgZXhpdCBvbiBlcnJv
+ci4NCj4gRXJyb3JzIHdoaWNoIGNhbiBiZSBkZXRlY3RlZCBieSB0aGUgYnVpbGQgc2hvdWxkIGJl
+IHRyYXBwZWQgb3V0IG9mIHRoZSBib3gNCj4gdGhlcmUsIHVubGVzcyBzb21lYm9keSB3YW50cyB0
+byBub3RpY2UgYnJva2VuIHN0dWZmIGxhdGVyIGF0IHJ1bnRpbWUuDQo+IA0KPiBBcyB0aGlzIHBh
+dGNoIGNoYW5nZXMgdGhlIGRlZmF1bHQgYmVoYXZpbmcgZnJvbSB3YXJuaW5nIHRvIGVycm9yLA0K
+PiB1c2VycyBjYW4gY29uc2lkZXIgdG8gZml4IGl0IGZvciBleHRlcm5hbCBtb2R1bGUgYnVpbGRz
+IGJ5Og0KPiAtIHByb3ZpZGluZyBtb2R1bGUgc3ltYm9sIHRhYmxlIHZpYSBLQlVJTERfRVhUUkFf
+U1lNQk9MUyBmb3INCj4gICAgbW9kdWxlcyB3aGljaCBhcmUgZGVwZW5kZW50DQo+IC0gT1IgZ2V0
+dGluZyBvbGQgYmVoYXZpbmcgYmFjayBieSBwYXNzaW5nIEtCVUlMRF9NT0RQT1NUX1dBUk4gdG8g
+dGhlIGJ1aWxkDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBXbGFkaXNsYXYgV2llYmUgPHdsYWRpc2xh
+di53aWViZUBub2tpYS5jb20+DQo+IC0tLQ0KPiAgIHNjcmlwdHMvTWFrZWZpbGUubW9kcG9zdCB8
+IDIgKy0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkN
+Cj4gDQo+IGRpZmYgLS1naXQgYS9zY3JpcHRzL01ha2VmaWxlLm1vZHBvc3QgYi9zY3JpcHRzL01h
+a2VmaWxlLm1vZHBvc3QNCj4gaW5kZXggNmI3ZjM1NGYxODlhLi5mZWM2ZWMyZmZhNDcgMTAwNjQ0
+DQo+IC0tLSBhL3NjcmlwdHMvTWFrZWZpbGUubW9kcG9zdA0KPiArKysgYi9zY3JpcHRzL01ha2Vm
+aWxlLm1vZHBvc3QNCj4gQEAgLTc4LDcgKzc4LDcgQEAgbW9kcG9zdCA9IHNjcmlwdHMvbW9kL21v
+ZHBvc3QgICAgICAgICAgICAgICAgICAgIFwNCj4gICAgJChpZiAkKEtCVUlMRF9FWFRSQV9TWU1C
+T0xTKSwgJChwYXRzdWJzdCAlLCAtZSAlLCQoS0JVSUxEX0VYVFJBX1NZTUJPTFMpKSkgXA0KPiAg
+ICAkKGlmICQoS0JVSUxEX0VYVE1PRCksLW8gJChtb2R1bGVzeW1maWxlKSkgICAgICBcDQo+ICAg
+ICQoaWYgJChDT05GSUdfU0VDVElPTl9NSVNNQVRDSF9XQVJOX09OTFkpLCwtRSkgIFwNCj4gLSAk
+KGlmICQoS0JVSUxEX0VYVE1PRCkkKEtCVUlMRF9NT0RQT1NUX1dBUk4pLC13KQ0KPiArICQoaWYg
+JChLQlVJTERfTU9EUE9TVF9XQVJOKSwtdykNCj4gICANCj4gICBNT0RQT1NUX09QVD0kKHN1YnN0
+IC1pLC1uLCQoZmlsdGVyIC1pLCQoTUFLRUZMQUdTKSkpDQo+ICAgDQo+IA0K
