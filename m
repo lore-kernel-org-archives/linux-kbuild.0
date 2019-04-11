@@ -1,70 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:45882 "EHLO mail.kernel.org"
+Received: from mx1.emlix.com ([188.40.240.192]:35534 "EHLO mx1.emlix.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726145AbfDKNrx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Apr 2019 09:47:53 -0400
-Date: Thu, 11 Apr 2019 09:47:49 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: Re: syncconfig changes in 4.19.34 break builds
-Message-ID: <20190411134749.GH11568@sasha-vm>
-References: <CABWYdi1sSjZ8pw7tJpgvZyLfdJwT5judfjj7F3X5fLcAK3xvsw@mail.gmail.com>
- <CAK7LNARvfpkO8D=xJ+GQMWuxX5a3RVkUsBg8XUgFz+4m=knK3Q@mail.gmail.com>
- <CABWYdi1H9TnB32RCPL2axRvAf3sqf2K2BaoMs+0f-1CibfZ_Tg@mail.gmail.com>
- <CAK7LNASjMrSrL+LhTuSq4T3juUbYSZUUtevUz=hwS+qFQiDuTg@mail.gmail.com>
- <CAK7LNAQtbuWOw5yGiCeodg0Kf+JGaJj6s6FSyDysxCLxtMBLeg@mail.gmail.com>
- <20190409153933.GM4689@sasha-vm>
- <CAK7LNATvZ_baJDr2SeoaUc6Of2sLz=MHMB=MDzQ1eNMcgjUW=A@mail.gmail.com>
+        id S1726106AbfDKNuo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 11 Apr 2019 09:50:44 -0400
+From: Rolf Eike Beer <eb@emlix.com>
+Subject: Re: [PATCH linux] objtool: fix pkg-config query in case of cross-compilation
+Date: Thu, 11 Apr 2019 15:50:38 +0200
+Message-ID: <8596683.VRQu17hJsJ@devpool35>
+In-Reply-To: <cc009072-64d4-4be3-0bb2-20be4d5c357f@6wind.com>
+References: <20190411083940.3911-1-nicolas.dichtel@6wind.com> <4208204.4d101oJ1v5@devpool35> <cc009072-64d4-4be3-0bb2-20be4d5c357f@6wind.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATvZ_baJDr2SeoaUc6Of2sLz=MHMB=MDzQ1eNMcgjUW=A@mail.gmail.com>
+Content-Type: multipart/signed; boundary="nextPart25922085.1yZWV1yWd9"; micalg="pgp-sha256"; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Ivan Babrou <ivan@cloudflare.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>, stable <stable@vger.kernel.org>
+To: nicolas.dichtel@6wind.com
+Cc: tglx@linutronix.de, jpoimboe@redhat.com, yamada.masahiro@socionext.com, peterz@infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Apr 11, 2019 at 01:27:43PM +0900, Masahiro Yamada wrote:
->Hi Sasha,
->
->On Wed, Apr 10, 2019 at 12:39 AM Sasha Levin <sashal@kernel.org> wrote:
->>
->> On Tue, Apr 09, 2019 at 02:50:04PM +0900, Masahiro Yamada wrote:
->> >Greg, Sasha,
->> >
->> >
->> >Sorry, the commit ID was wrong.
->> >
->> >
->> >The following commit for 4.19.x:
->> >
->> >commit 02826a6ba301b72461c3706e1cc66d5571cd327e
->> >Author: Masahiro Yamada <yamada.masahiro@socionext.com>
->> >Date:   Mon Nov 5 16:52:34 2018 +0900
->> >
->> >    kbuild: deb-pkg: fix bindeb-pkg breakage when O= is used
->>
->> This commit claims it's fixing 80463f1b7bf9, which is not in 4.19. Was
->> that a mistake in the commit message?
->
->No.  The commit message is correct.
->The Fixes: tag points to the first bad commit in _upstream_.
->
->
->What I want to say is:
->638ecaf58369 [which was 9390dff66a5 in upstream]
->depends on 02826a6ba301b, which is missing in v4.19.x branch.
->
->638ecaf58369 was cherry-picked without correct patch
->dependency, so it got broken. That's all.
->
->
->There are two options to fix the breakage:
-> - backport 02826a6ba301b
->    OR
-> - revert 638ecaf58369.
+--nextPart25922085.1yZWV1yWd9
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
 
-Alrighty, I've picked 02826a6ba301b for 4.19, thanks.
+Am Donnerstag, 11. April 2019, 11:26:12 CEST schrieb Nicolas Dichtel:
+> Le 11/04/2019 =C3=A0 10:52, Rolf Eike Beer a =C3=A9crit :
+> > Am Donnerstag, 11. April 2019, 10:39:40 CEST schrieb Nicolas Dichtel:
+> >> In case of cross-compilation, there may be two pkg-config tools, one f=
+or
+> >> the host and one for the target. Enable to override the default name.
+> >>=20
+> >> Fixes: 056d28d135bc ("objtool: Query pkg-config for libelf location")
+> >> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> >=20
+> > If you do that, you have to fix a lot of other places, too. This starts=
+ in
+> > scripts/kconfig/ and also includes e.g. tools/testing/.
+> >=20
+> > Usually you have pkg-config for host and ${target_platform}-pkg-config =
+for
+> > the
+> My use case was for buildroot, which define pkg-config and host-pkgconf. =
+In
+> fact, I've just seen that a buildroot patch was accepted for this problem:
+> https://patchwork.ozlabs.org/patch/1081379/
 
---
-Thanks,
-Sasha
+I agree that it makes sense to have both host and target pkg-config=20
+configurable. But IMHO that must happen in a central place (i.e. ./Makefile=
+),=20
+and it has to be used everywhere. Currently PKG_CONFIG is defined at multip=
+le=20
+places, sometimes host, sometimes target, and often pkg-config is called=20
+directly, also mixing both usages.
+
+So, IMHO, if you want to fix this: fix it once and for all in the whole=20
+kernel, not just one place. What I have introduced was just the same as=20
+kconfig is using to find the dependencies for some of the *config variants,=
+ so=20
+this usecase would break for you anyway, although I don't think anyone in=20
+buildroot will notice this.
+
+Eike
+=2D-=20
+Rolf Eike Beer, emlix GmbH, http://www.emlix.com
+=46on +49 551 30664-0, Fax +49 551 30664-11
+Gothaer Platz 3, 37083 G=C3=B6ttingen, Germany
+Sitz der Gesellschaft: G=C3=B6ttingen, Amtsgericht G=C3=B6ttingen HR B 3160
+Gesch=C3=A4ftsf=C3=BChrung: Heike Jordan, Dr. Uwe Kracke =E2=80=93 Ust-IdNr=
+=2E: DE 205 198 055
+
+emlix - smart embedded open source
+--nextPart25922085.1yZWV1yWd9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iLMEAAEIAB0WIQQ/Uctzh31xzAxFCLur5FH7Xu2t/AUCXK9GLgAKCRCr5FH7Xu2t
+/IMzA/9KVFJHOFsFzEsPSePEIO0p72hbQiOatEVw4FNMH7nv39WZhSAHaJbCKm/G
+nWUazMsIdG4bnaAY4yYisROyKtxHwAvbntrJWZjBTNidxTylLpPbFEeB9tR70sHN
+I/wkPPJu6Qjd6Nho1i7wCkzH9h+UAvJcoLoO1eDDQ3v/8GWtcg==
+=d+N0
+-----END PGP SIGNATURE-----
+
+--nextPart25922085.1yZWV1yWd9--
