@@ -1,58 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:56237 "EHLO
-        proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726121AbfDKIqf (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:58321 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727022AbfDKIvE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Apr 2019 04:46:35 -0400
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH linux] objtool: fix pkg-config query in case of cross-compilation
-Date: Thu, 11 Apr 2019 10:39:40 +0200
-Message-Id: <20190411083940.3911-1-nicolas.dichtel@6wind.com>
+        Thu, 11 Apr 2019 04:51:04 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190410161612.18545-1-keescook@chromium.org> <20190410161612.18545-2-keescook@chromium.org>
+In-Reply-To: <20190410161612.18545-2-keescook@chromium.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 11 Apr 2019 17:50:10 +0900
+Message-ID: <CAK7LNASLdZKNNM-Gft5bfVxKOG=4Ak-LBMnjb2E-QR4q_5GmEQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] Kconfig: Create "kernel hardening" config area
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: tglx@linutronix.de, jpoimboe@redhat.com, eb@emlix.com, yamada.masahiro@socionext.com, peterz@infradead.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: Kees Cook <keescook@chromium.org>
+Cc: Alexander Potapenko <glider@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Alexander Popov <alpopov@ptsecurity.com>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-security-module@vger.kernel.org, Kernel Hardening <kernel-hardening@lists.openwall.com>
 
-In case of cross-compilation, there may be two pkg-config tools, one for
-the host and one for the target. Enable to override the default name.
+On Thu, Apr 11, 2019 at 1:16 AM Kees Cook <keescook@chromium.org> wrote:
+> diff --git a/scripts/gcc-plugins/Kconfig b/scripts/gcc-plugins/Kconfig
+> index 74271dba4f94..01874ef0f883 100644
+> --- a/scripts/gcc-plugins/Kconfig
+> +++ b/scripts/gcc-plugins/Kconfig
+> @@ -13,10 +13,11 @@ config HAVE_GCC_PLUGINS
+>           An arch should select this symbol if it supports building with
+>           GCC plugins.
+>
+> -menuconfig GCC_PLUGINS
+> -       bool "GCC plugins"
+> +config GCC_PLUGINS
+> +       bool
 
-Fixes: 056d28d135bc ("objtool: Query pkg-config for libelf location")
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
----
- Makefile               | 3 ++-
- tools/objtool/Makefile | 4 ++--
- 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 15c8251d4d5e..f12ca3598fc4 100644
---- a/Makefile
-+++ b/Makefile
-@@ -953,7 +953,8 @@ mod_sign_cmd = true
- endif
- export mod_sign_cmd
- 
--HOST_LIBELF_LIBS = $(shell pkg-config libelf --libs 2>/dev/null || echo -lelf)
-+export HOST_PKG_CONFIG ?= pkg-config
-+HOST_LIBELF_LIBS = $(shell $(HOST_PKG_CONFIG) libelf --libs 2>/dev/null || echo -lelf)
- 
- ifdef CONFIG_STACK_VALIDATION
-   has_libelf := $(call try-run,\
-diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
-index 53f8be0f4a1f..4e229e77aacf 100644
---- a/tools/objtool/Makefile
-+++ b/tools/objtool/Makefile
-@@ -25,8 +25,8 @@ LIBSUBCMD		= $(LIBSUBCMD_OUTPUT)libsubcmd.a
- OBJTOOL    := $(OUTPUT)objtool
- OBJTOOL_IN := $(OBJTOOL)-in.o
- 
--LIBELF_FLAGS := $(shell pkg-config libelf --cflags 2>/dev/null)
--LIBELF_LIBS  := $(shell pkg-config libelf --libs 2>/dev/null || echo -lelf)
-+LIBELF_FLAGS := $(shell $(HOST_PKG_CONFIG) libelf --cflags 2>/dev/null)
-+LIBELF_LIBS  := $(shell $(HOST_PKG_CONFIG) libelf --libs 2>/dev/null || echo -lelf)
- 
- all: $(OBJTOOL)
- 
+This will flatten the plugin config options.
+
+If you want to keep the current menu structure, you can do:
+
+menu "GCC plugins"
+...
+endmenu
+
+
+
+
+Another side-effect is Kbuild will descend into scripts/gcc-plugins/
+even when no plugin is selected.
+It is not a big build speed regression, though.
+
+
+
+> diff --git a/security/Kconfig.hardening b/security/Kconfig.hardening
+> new file mode 100644
+> index 000000000000..8223a8ab1a12
+> --- /dev/null
+> +++ b/security/Kconfig.hardening
+> @@ -0,0 +1,94 @@
+> +menu "Kernel hardening options"
+> +
+> +config GCC_PLUGIN_STRUCTLEAK
+> +       bool
+> +       depends on GCC_PLUGIN_STRUCTLEAK_USER || GCC_PLUGIN_STRUCTLEAK_BYREF || GCC_PLUGIN_STRUCTLEAK_BYREF_ALL
+
+
+I think this 'depends on' is unnecessary.
+
+
+> +menu "Memory initialization"
+> +
+> +choice
+> +       prompt "Initialize kernel stack variables at function entry"
+> +       depends on CC_HAS_AUTO_VAR_INIT || GCC_PLUGINS
+
+Nit:
+CC_HAS_AUTO_VAR_INIT does not exist at this point.
+I will be added by 3/3.
+
+
 -- 
-2.21.0
+Best Regards
+Masahiro Yamada
