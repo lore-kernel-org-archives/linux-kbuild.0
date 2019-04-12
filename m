@@ -1,44 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:45003 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727169AbfDLICB (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 12 Apr 2019 04:02:01 -0400
-Received: by mail-lj1-f193.google.com with SMTP id h16so7972228ljg.11
-        for <linux-kbuild@vger.kernel.org>; Fri, 12 Apr 2019 01:02:00 -0700 (PDT)
+Received: from mx2.suse.de ([195.135.220.15]:40666 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726987AbfDLJCl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 12 Apr 2019 05:02:41 -0400
+Date: Fri, 12 Apr 2019 11:02:37 +0200 (CEST)
+From: Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH v3 3/9] livepatch: Add klp-convert tool
+In-Reply-To: <20190410182220.GB13083@redhat.com>
+Message-ID: <alpine.LSU.2.21.1904121101220.773@pobox.suse.cz>
+References: <20190410155058.9437-1-joe.lawrence@redhat.com> <20190410155058.9437-4-joe.lawrence@redhat.com> <20190410182220.GB13083@redhat.com>
 MIME-Version: 1.0
-Reply-To: moneygram.payment@aol.com
-From: "MRS.ZARA KUMAR" <fredwilliam543210@gmail.com>
-Date: Fri, 12 Apr 2019 01:01:59 -0700
-Message-ID: <CAJ=SBYaxMobfGjozYA+d2mGzXDwYhNUoRrKavxuWRfXdO8e0rg@mail.gmail.com>
-Subject: ATTENTION:BENEFICIARY
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
-DEAR:
+On Wed, 10 Apr 2019, Joe Lawrence wrote:
 
-WE FINALLY CONCLUDED TO EFFECT YOUR PAYMENT OF (US$7,5M) VIA MONEY GRAM
-OFFICE THIS MORNING AS THE BEST AND EASIER WAY TO CASH YOUR FUNDS IN ANY OF
-YOUR NEAREST MONEY GRAM OFFICE IN YOUR CITY,
+> On Wed, Apr 10, 2019 at 11:50:52AM -0400, Joe Lawrence wrote:
+> >
+> > [ ... snip ... ]
+> >
+> > diff --git a/scripts/livepatch/klp-convert.c b/scripts/livepatch/klp-convert.c
+> > new file mode 100644
+> > index 000000000000..62bd26941081
+> > --- /dev/null
+> > +++ b/scripts/livepatch/klp-convert.c
+> > 
+> > [ ... snip ... ]
+> >
+> > +	if (argc != 4) {
+> > +		WARN("Usage: %s <Symbols.list> <input.ko> <out.ko>", argv[0]);
+>                                                ^^^^^^^^^^
+> nit: since we're using .klp.o prefix, should this be "input.klp.o"
 
-WELL BASED ON MY AGREEMENT WITH MONEY GRAM DIRECTOR, MR JOHN GRECH, YOUR
-TRANSFER WILL START IMMEDIATELY YOU CONTACT HIM WITH ALL YOUR INFORMATION
-AS FOLLOW
+I'd leave input.ko there. It is clear then that it is an ordinary kernel 
+module and nothing special, but it is up to you.
 
-YOUR NAME___________
-YOUR HOME ADDRESS_______
-YOUR COUNTY/CITY___________
-YOUR AGE/SEX_____________
-DIRECT PHONE NUMBER_______
-ID COPY_______
-OCCUPATION_______
+I would change out.ko to output.ko for consistency.
 
-MONEY GRAM OFFICE:
-CONTACT PERSON:MR.JOHN GRECH
-E-MAIL: moneygram.payment@aol.com
-PHONE NO +229 65439498
-
-YOUR FUNDS AMOUNT DEPOSITED IS US$7.5million
-BEST REGARDS,
-MRS.ZARA KUMAR
+Miroslav
