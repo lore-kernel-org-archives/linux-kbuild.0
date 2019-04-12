@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40666 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:48774 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726987AbfDLJCl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 12 Apr 2019 05:02:41 -0400
-Date: Fri, 12 Apr 2019 11:02:37 +0200 (CEST)
+        id S1725973AbfDLJOb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 12 Apr 2019 05:14:31 -0400
+Date: Fri, 12 Apr 2019 11:14:28 +0200 (CEST)
 From: Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH v3 3/9] livepatch: Add klp-convert tool
-In-Reply-To: <20190410182220.GB13083@redhat.com>
-Message-ID: <alpine.LSU.2.21.1904121101220.773@pobox.suse.cz>
-References: <20190410155058.9437-1-joe.lawrence@redhat.com> <20190410155058.9437-4-joe.lawrence@redhat.com> <20190410182220.GB13083@redhat.com>
+Subject: Re: [PATCH v3 4/9] livepatch: Add klp-convert annotation helpers
+In-Reply-To: <20190410181837.GA13083@redhat.com>
+Message-ID: <alpine.LSU.2.21.1904121112070.773@pobox.suse.cz>
+References: <20190410155058.9437-1-joe.lawrence@redhat.com> <20190410155058.9437-5-joe.lawrence@redhat.com> <20190410181837.GA13083@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,26 +18,54 @@ Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vg
 
 On Wed, 10 Apr 2019, Joe Lawrence wrote:
 
-> On Wed, Apr 10, 2019 at 11:50:52AM -0400, Joe Lawrence wrote:
-> >
-> > [ ... snip ... ]
-> >
-> > diff --git a/scripts/livepatch/klp-convert.c b/scripts/livepatch/klp-convert.c
-> > new file mode 100644
-> > index 000000000000..62bd26941081
-> > --- /dev/null
-> > +++ b/scripts/livepatch/klp-convert.c
+> On Wed, Apr 10, 2019 at 11:50:53AM -0400, Joe Lawrence wrote:
+> > From: Josh Poimboeuf <jpoimboe@redhat.com>
 > > 
-> > [ ... snip ... ]
-> >
-> > +	if (argc != 4) {
-> > +		WARN("Usage: %s <Symbols.list> <input.ko> <out.ko>", argv[0]);
->                                                ^^^^^^^^^^
-> nit: since we're using .klp.o prefix, should this be "input.klp.o"
+> > Define macros KLP_MODULE_RELOC and KLP_SYMPOS in
+> > include/linux/livepatch.h to improve user-friendliness of the
+> > livepatch annotation process.
+> > 
+> > Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
+> > Signed-off-by: Joao Moreira <jmoreira@suse.de>
+> > Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
+> > ---
+> >  include/linux/livepatch.h | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> > 
+> > diff --git a/include/linux/livepatch.h b/include/linux/livepatch.h
+> > index 16b48e8b29a2..947cfc2d1980 100644
+> > --- a/include/linux/livepatch.h
+> > +++ b/include/linux/livepatch.h
+> > @@ -236,6 +236,18 @@ void *klp_shadow_get_or_alloc(void *obj, unsigned long id,
+> >  void klp_shadow_free(void *obj, unsigned long id, klp_shadow_dtor_t dtor);
+> >  void klp_shadow_free_all(unsigned long id, klp_shadow_dtor_t dtor);
+> >  
+> > +/* Used to annotate symbol relocations in livepatches */
+> > +#define KLP_MODULE_RELOC(obj)						\
+> > +	struct klp_module_reloc						\
+> > +	__attribute__((__section__(".klp.module_relocs." #obj)))	\
+> > +	__attribute__((aligned (4)))
+> > +
+> > +#define KLP_SYMPOS(symbol, pos)						\
+> > +	{								\
+> > +		.sym = &symbol,						\
+> > +		.sympos = pos,						\
+> > +	},
+>         ^^
+> nit: if we dropped the trailing array comma delimiter from KLP_SYMPOS
+> macro, the invocations would look more intuitively like an array.  For
+> example:
+> 
+>   KLP_MODULE_RELOC(test_klp_convert_mod) test_klp_convert_mod_relocs_a[] = {
+>   	KLP_SYMPOS(driver_name, 0),
+>   	KLP_SYMPOS(homonym_string, 2),
+>   	KLP_SYMPOS(get_homonym_string, 2),
+>   };
+> 
+> But I could not figure out a good regex to reference if other such
+> kernel preprocessor macros include or exclude the delimiter.  Are there
+> reasons to include it?
 
-I'd leave input.ko there. It is clear then that it is an ordinary kernel 
-module and nothing special, but it is up to you.
-
-I would change out.ko to output.ko for consistency.
+No, I don't think so. We should change it. Good catch.
 
 Miroslav
