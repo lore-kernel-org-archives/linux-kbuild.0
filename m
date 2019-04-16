@@ -1,105 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57244 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:35854 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728608AbfDPI37 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Apr 2019 04:29:59 -0400
-Date: Tue, 16 Apr 2019 10:29:55 +0200 (CEST)
+        id S1726408AbfDPLhR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 16 Apr 2019 07:37:17 -0400
+Date: Tue, 16 Apr 2019 13:37:13 +0200 (CEST)
 From: Miroslav Benes <mbenes@suse.cz>
 Subject: Re: [PATCH v3 0/9] klp-convert livepatch build tooling
-In-Reply-To: <20190416052422.GA7482@350D>
-Message-ID: <alpine.LSU.2.21.1904161024220.15816@pobox.suse.cz>
-References: <20190410155058.9437-1-joe.lawrence@redhat.com> <20190416052422.GA7482@350D>
+In-Reply-To: <20190412212654.GA21627@redhat.com>
+Message-ID: <alpine.LSU.2.21.1904161323230.17836@pobox.suse.cz>
+References: <20190412212654.GA21627@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Balbir Singh <bsingharora@gmail.com>
-Cc: Joe Lawrence <joe.lawrence@redhat.com>, linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>, Jason Baron <jbaron@akamai.com>, Evgenii Shatokhin <eshatokhin@virtuozzo.com>
 
-On Tue, 16 Apr 2019, Balbir Singh wrote:
 
-> On Wed, Apr 10, 2019 at 11:50:49AM -0400, Joe Lawrence wrote:
-> > Hi folks,
-> > 
-> > This is the third installment of the klp-convert tool for generating and
-> > processing livepatch symbols for livepatch module builds.  For those
-> > following along at home, archive links to previous versions:
-> > 
-> > RFC:
-> >   https://lore.kernel.org/lkml/cover.1477578530.git.jpoimboe@redhat.com/
-> > v2:
-> >   https://lore.kernel.org/lkml/f52d29f7-7d1b-ad3d-050b-a9fa8878faf2@redhat.com/
-> > 
-> > (Note that I don't see v2 archived at lore, but that is a link to the
-> > most recent subthread that lore did catch.)
-> > 
-> > 
-> > Livepatches may use symbols which are not contained in its own scope,
-> > and, because of that, may end up compiled with relocations that will
-> > only be resolved during module load. Yet, when the referenced symbols are
-> > not exported, solving this relocation requires information on the object
-> > that holds the symbol (either vmlinux or modules) and its position inside
-> > the object, as an object may contain multiple symbols with the same name.
-> > Providing such information must be done accordingly to what is specified
-> > in Documentation/livepatch/module-elf-format.txt.
-> >
+[...]
+
+> Current behavior
+> ----------------
+> 
+> Not good.  The livepatch successfully builds but crashes on load:
+> 
+>   % insmod lib/livepatch/test_klp_static_keys_mod.ko
+>   % insmod lib/livepatch/test_klp_static_keys.ko
+> 
+>   BUG: unable to handle kernel NULL pointer dereference at 0000000000000010
+>   #PF error: [normal kernel read fault]
+>   PGD 0 P4D 0
+>   Oops: 0000 [#1] SMP PTI
+>   CPU: 3 PID: 9367 Comm: insmod Tainted: G            E K   5.1.0-rc4+ #4
+>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20180724_192412-buildhw-07.phx2.fedoraproject.org-1.fc29 04/01/2014
+>   RIP: 0010:jump_label_apply_nops+0x3b/0x60
+>   Code: 02 00 00 48 c1 e5 04 48 01 dd 48 39 eb 74 3a 72 0b eb 36 48 83 c3 10 48 39 dd 76 2d 48 8b 43 08 48 89 c2 83 e0 01 48 83 e2 fc <48> 8b 54 13 10 83 e2 01 38 c2 75 dd 48 89 df 31 f6 48 83 c3 10 e8
+>   RSP: 0018:ffffa8874068fcf8 EFLAGS: 00010206
+>   RAX: 0000000000000000 RBX: ffffffffc07fd000 RCX: 000000000000000d
+>   RDX: 000000003f803000 RSI: ffffffffa5077be0 RDI: ffffffffc07fe540
+>   RBP: ffffffffc07fd0a0 R08: ffffa88740f43878 R09: ffffa88740eed000
+>   R10: 0000000000055a4b R11: ffffa88740f43878 R12: ffffa88740f430b8
+>   R13: 0000000000000000 R14: ffffa88740f42df8 R15: 0000000000042b01
+>   FS:  00007f4f1dafb740(0000) GS:ffff9a81fbb80000(0000) knlGS:0000000000000000
+>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>   CR2: 0000000000000010 CR3: 00000000b5d8a000 CR4: 00000000000006e0
+>   Call Trace:
+>    module_finalize+0x184/0x1c0
+>    load_module+0x1400/0x1910
+>    ? kernel_read_file+0x18d/0x1c0
+>    ? __do_sys_finit_module+0xa8/0x110
+>    __do_sys_finit_module+0xa8/0x110
+>    do_syscall_64+0x55/0x1a0
+>    entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>   RIP: 0033:0x7f4f1cae82bd
 > 
 > 
-> Could we get some details with examples or a sample, sorry I might be dense
-> and missing simple information. The problem being solved is not clear to
-> me from the changelog.
-
-The patch set tries to solve the problem described in 
-Documentation/livepatch/module-elf-format.txt. Currently, there is no tool 
-in upstream to automatically generate the relocation records. kpatch-build 
-can do it and we'd like to have it as well. klp-convert should thus do the 
-job.
-
-The sample module is introduced in patch 7 and you can look at the 
-selftests in patch 9 too.
-
-Maybe we can describe the problem better in the cover letter, but on the 
-other hand patch changelogs are more important and they are good (well, in 
-my opinion of course).
-
-> > Currently, there is no trivial way to embed the required information as
-> > requested in the final livepatch elf object. klp-convert solves this
-> > problem in two different forms: (i) by relying on a symbol map, which is
-> > built during kernel compilation, to automatically infer the relocation
-> > targeted symbol, and, when such inference is not possible (ii) by using
-> > annotations in the elf object to convert the relocation accordingly to
-> > the specification, enabling it to be handled by the livepatch loader.
-> > 
-> > Given the above, add support for symbol mapping in the form of
-> > Symbols.list file; add klp-convert tool; integrate klp-convert tool into
-> > kbuild; make livepatch modules discernible during kernel compilation
-> > pipeline; add data-structure and macros to enable users to annotate
-> > livepatch source code; make modpost stage compatible with livepatches;
-> > update livepatch-sample and update documentation.
-> > 
-> > The patch was tested under three use-cases:
-> > 
-> > use-case 1: There is a relocation in the lp that can be automatically
-> > resolved by klp-convert.  For example. see the saved_command_line
-> > variable in lib/livepatch/test_klp_convert2.c.
-> > 
-> > use-case 2: There is a relocation in the lp that cannot be automatically
-> > resolved, as the name of the respective symbol appears in multiple
-> > objects. The livepatch contains an annotation to enable a correct
-> > relocation.  See the KLP_MODULE_RELOC / KLP_SYMPOS annotation sections
-> > in lib/livepatch/test_klp_convert{1,2}.c.
-> > 
-> > use-case 3: There is a relocation in the lp that cannot be automatically
-> > resolved similarly as 2, but no annotation was provided in the
-> > livepatch, triggering an error during compilation.  Reproducible by
-> > removing the KLP_MODULE_RELOC / KLP_SYMPOS annotation sections in
-> > lib/livepatch/test_klp_convert{1,2}.c.
-> >
+> Future work
+> -----------
 > 
+> At the very least, I think this call-chain ordering is wrong for
+> livepatch static key symbols:
 > 
-> Are these a part of the series?
+>   load_module
+> 
+>     apply_relocations
+> 
+>     post_relocation
+>       module_finalize
+>         jump_label_apply_nops                                         <<
+> 
+>     ...
+> 
+>     prepare_coming_module
+>       blocking_notifier_call_chain(&module_notify_list, MODULE_STATE_COMING, mod);
+>         jump_label_module_notify
+>           case MODULE_STATE_COMING
+>             jump_label_add_module                                     <<
+> 
+>     do_init_module
+> 
+>       do_one_initcall(mod->init)
+>         __init patch_init [kpatch-patch]
+>           klp_register_patch
+>             klp_init_patch
+>               klp_for_each_object(patch, obj)
+>                 klp_init_object
+>                   klp_init_object_loaded
+>                     klp_write_object_relocations                      <<
+> 
+>       blocking_notifier_call_chain(&module_notify_list, MODULE_STATE_LIVE, mod);
+>         jump_label_module_notify
+>           case MODULE_STATE_LIVE
+>             jump_label_invalidate_module_init
+> 
+> where klp_write_object_relocations() is called way *after*
+> jump_label_apply_nops() and jump_label_add_module().
 
-Yes, see 9/9.
+Quick look, but it seems quite similar to the problem we had with 
+apply_alternatives(). See arch/x86/kernel/livepatch.c and the commit which 
+introduced it.
 
-Regards,
+I think, we should do the same for jump labels. Add 
+jump_label_apply_nops() from module_finalize() to 
+arch_klp_init_object_loaded() and convert jump_table ELF section so its 
+processing is delayed.
+
+Which leads me another TODO... klp-convert does not convert even 
+.altinstructions and .parainstructions sections, so it has that problem as 
+well. If I remember, it was on Josh's TODO list when he first introduced 
+klp-convert. See cover.1477578530.git.jpoimboe@redhat.com.
+
+The selftest for the alternatives would be appreciated too. One day.
+
+And of course we should look at the other supported architectures and 
+their module_finalize() functions. I have it on my TODO list somewhere, 
+but you know how it works with those :/. I am sure there are more hidden 
+surprises there.
+
+ 
+> Detection
+> ---------
+> 
+> I have been tinkering with some prototype code to defer
+> jump_label_apply_nops() and jump_label_add_module(), but it has been
+> slow going.  I think the jist of it is that we're going to need to call
+> these dynamically when individual klp_objects are patched, not when the
+> livepatch module itself loads.  If anyone with static key expertise
+> wants to jump in here, let me know.
+> 
+> In the meantime, I cooked up a potential followup commit to detect
+> conversion of static key symbols and klp-convert failure.  It basically
+> runs through the output .ko's ELF symbols and verifies that none of the
+> converted ones can be found as a .rela__jump_table relocated symbol.  It
+> accurately catches the problematic references in test_klp_static_keys.ko
+> thus far.
+> 
+> This was based on a similar issue reported as a bug against
+> kpatch-build, in which Josh wrote code to detect this scenario:
+> 
+>   https://github.com/dynup/kpatch/issues/946
+>   https://github.com/jpoimboe/kpatch/commit/2cd2d27607566aee9590c367e615207ce1ce24c6
+> 
+> I can post ("livepatch/klp-convert: abort on static key conversion")
+> here as a follow commit if it looks reasonable and folks wish to review
+> it... or we can try and tackle static keys before merging klp-convert.
+
+Good idea. I'd rather fix it, but I think it could be a lot of work, so 
+something like this patch seems to be a good idea.
+
+Thanks
 Miroslav
