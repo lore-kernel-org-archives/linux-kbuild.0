@@ -1,57 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60364 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:27332 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728032AbfDPNhj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Apr 2019 09:37:39 -0400
+        id S1725796AbfDPNzF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 16 Apr 2019 09:55:05 -0400
 Subject: Re: [PATCH v3 0/9] klp-convert livepatch build tooling
 References: <20190410155058.9437-1-joe.lawrence@redhat.com>
- <20190416052422.GA7482@350D>
 From: Joe Lawrence <joe.lawrence@redhat.com>
-Message-ID: <57510765-be85-4f91-493b-f7213a7580f3@redhat.com>
-Date: Tue, 16 Apr 2019 09:37:36 -0400
+Message-ID: <452e0cc5-ea9b-1638-3557-17e12671e21e@redhat.com>
+Date: Tue, 16 Apr 2019 09:55:00 -0400
 MIME-Version: 1.0
-In-Reply-To: <20190416052422.GA7482@350D>
+In-Reply-To: <20190410155058.9437-1-joe.lawrence@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Balbir Singh <bsingharora@gmail.com>
-Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
+To: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
-On 4/16/19 1:24 AM, Balbir Singh wrote:
+On 4/10/19 11:50 AM, Joe Lawrence wrote:
+> Hi folks,
 > 
-> Could we get some details with examples or a sample, sorry I might be dense
-> and missing simple information. The problem being solved is not clear to
-> me from the changelog.
+> This is the third installment of the klp-convert tool for generating and
+> processing livepatch symbols for livepatch module builds.  For those
+> following along at home, archive links to previous versions:
 > 
+> RFC:
+>    https://lore.kernel.org/lkml/cover.1477578530.git.jpoimboe@redhat.com/
+> v2:
+>    https://lore.kernel.org/lkml/f52d29f7-7d1b-ad3d-050b-a9fa8878faf2@redhat.com/
+> 
+> (Note that I don't see v2 archived at lore, but that is a link to the
+> most recent subthread that lore did catch.)
+> 
+> 
+> Livepatches may use symbols which are not contained in its own scope,
+> and, because of that, may end up compiled with relocations that will
+> only be resolved during module load. Yet, when the referenced symbols are
+> not exported, solving this relocation requires information on the object
+> that holds the symbol (either vmlinux or modules) and its position inside
+> the object, as an object may contain multiple symbols with the same name.
+> Providing such information must be done accordingly to what is specified
+> in Documentation/livepatch/module-elf-format.txt.
 
-Hi Balbir,
+Hi Miroslav,
 
-I see that Miroslav has already pointed to documentation, samples and 
-self-tests for the patchset, but here is a summary in my own words:
+I noticed that some binutils programs like gdb, objdump, etc. don't like 
+the .ko kernel objects that we're generating from this patchset, 
+specifically those with the additional '.klp.rela.<obj>..text' livepatch 
+symbol relocation sections.
 
-kpatch-build constructs livepatch kernel modules by comparing a 
-reference build with a patched build, combing through ELF object 
-sections and extracting new and changed sections that include patched code.
+For reference, I opened a new bugzilla with more details here:
+https://sourceware.org/bugzilla/show_bug.cgi?id=24456
 
-An alternative approach is "source-based", in which a livepatch kernel 
-module is built (mostly entirely) using the kernel's build 
-infrastructure.  Sources for a livepatch are gathered ahead of time and 
-then built like an ordinary kernel module.
-
-In either approach, there lies the problem of symbol visibility: how can 
-a livepatch resolve symbols that a kernel module ordinarily can't.  For 
-example, file local or simply unexported symbols in across the kernel 
-and other modules.  Enter the concept of "livepatch symbols" described 
-in module-elf-format.txt.
-
-kpatch-build already creates such "livepatch symbols" (see its 
-create_klp_relasecs_and_syms()) and the livepatching core kernel code 
-already knows how resolve such symbols at klp_object patch time (see 
-klp_write_object_relocations()).
-
-The klp-convert tool and this supporting patchset would empower 
-source-based-constructed livepatch modules to do the same.
+And was about to ping the binutils mailing list about the assertion that 
+is tripping in bfd/elf.c.  The thought occurred to me that you guys 
+might already be carrying a patch to workaround this issue?
 
 -- Joe
