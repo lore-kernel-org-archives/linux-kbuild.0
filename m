@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60402 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:33002 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727136AbfDPTC7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Apr 2019 15:02:59 -0400
-Date: Tue, 16 Apr 2019 21:02:56 +0200 (CEST)
+        id S1727136AbfDPTJR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 16 Apr 2019 15:09:17 -0400
+Date: Tue, 16 Apr 2019 21:09:15 +0200 (CEST)
 From: Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH v3 2/9] kbuild: Support for Symbols.list creation
-In-Reply-To: <b2b5b57e-ae55-8e7b-f4f4-fa4f15194d77@redhat.com>
-Message-ID: <alpine.LSU.2.21.1904162101150.9731@pobox.suse.cz>
-References: <20190410155058.9437-1-joe.lawrence@redhat.com> <20190410155058.9437-3-joe.lawrence@redhat.com> <alpine.LSU.2.21.1904112100400.18787@pobox.suse.cz> <b2b5b57e-ae55-8e7b-f4f4-fa4f15194d77@redhat.com>
+Subject: Re: [PATCH v3 0/9] klp-convert livepatch build tooling
+In-Reply-To: <452e0cc5-ea9b-1638-3557-17e12671e21e@redhat.com>
+Message-ID: <alpine.LSU.2.21.1904162107110.9731@pobox.suse.cz>
+References: <20190410155058.9437-1-joe.lawrence@redhat.com> <452e0cc5-ea9b-1638-3557-17e12671e21e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,27 +18,50 @@ Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vg
 
 On Tue, 16 Apr 2019, Joe Lawrence wrote:
 
-> On 4/11/19 3:04 PM, Miroslav Benes wrote:
+> On 4/10/19 11:50 AM, Joe Lawrence wrote:
+> > Hi folks,
 > > 
-> >> diff --git a/samples/livepatch/Makefile b/samples/livepatch/Makefile
-> >> index 2472ce39a18d..8b9b42a258ad 100644
-> >> --- a/samples/livepatch/Makefile
-> >> +++ b/samples/livepatch/Makefile
-> >> @@ -1,3 +1,4 @@
-> >> +LIVEPATCH_livepatch-sample := y
-> >>   obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-sample.o
-> >>   obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-mod.o
-> >>   obj-$(CONFIG_SAMPLE_LIVEPATCH) += livepatch-shadow-fix1.o
+> > This is the third installment of the klp-convert tool for generating and
+> > processing livepatch symbols for livepatch module builds.  For those
+> > following along at home, archive links to previous versions:
 > > 
-> > We discussed this and I think there has been no conclusion yet. Shouldn't
-> > we do the same (add LIVEPATCH_) for the other samples here as well?
+> > RFC:
+> >    https://lore.kernel.org/lkml/cover.1477578530.git.jpoimboe@redhat.com/
+> > v2:
+> >    https://lore.kernel.org/lkml/f52d29f7-7d1b-ad3d-050b-a9fa8878faf2@redhat.com/
+> > 
+> > (Note that I don't see v2 archived at lore, but that is a link to the
+> > most recent subthread that lore did catch.)
+> > 
+> > 
+> > Livepatches may use symbols which are not contained in its own scope,
+> > and, because of that, may end up compiled with relocations that will
+> > only be resolved during module load. Yet, when the referenced symbols are
+> > not exported, solving this relocation requires information on the object
+> > that holds the symbol (either vmlinux or modules) and its position inside
+> > the object, as an object may contain multiple symbols with the same name.
+> > Providing such information must be done accordingly to what is specified
+> > in Documentation/livepatch/module-elf-format.txt.
 > 
-> In v2 review, I mentioned moving this hunk to ("modpost: Add modinfo flag to
-> livepatch modules") along with the same change to the other sample modules.  I
-> didn't apply that for v3, but can do so for the next spin if it makes the
-> commits easier to review.
+> Hi Miroslav,
+> 
+> I noticed that some binutils programs like gdb, objdump, etc. don't like the
+> .ko kernel objects that we're generating from this patchset, specifically
+> those with the additional '.klp.rela.<obj>..text' livepatch symbol relocation
+> sections.
+> 
+> For reference, I opened a new bugzilla with more details here:
+> https://sourceware.org/bugzilla/show_bug.cgi?id=24456
 
-I think it belongs here, but I may be missing something. Anyway, it is not 
-really important, so I'd leave it up to you.
+Another great catch.
+ 
+> And was about to ping the binutils mailing list about the assertion that is
+> tripping in bfd/elf.c.  The thought occurred to me that you guys might already
+> be carrying a patch to workaround this issue?
 
-Miroslav 
+No, unfortunately we don't. At least I don't know about anything and a 
+quick test on openSUSE Leap 15.0 confirms it (objdump -D gives "bad 
+value").
+
+Thanks
+Miroslav
