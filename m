@@ -1,93 +1,278 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua1-f65.google.com ([209.85.222.65]:36405 "EHLO
-        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726546AbfDPEDK (ORCPT
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:40634 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725802AbfDPFY2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Apr 2019 00:03:10 -0400
-Received: by mail-ua1-f65.google.com with SMTP id k32so6278242uae.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 15 Apr 2019 21:03:09 -0700 (PDT)
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com. [209.85.221.174])
-        by smtp.gmail.com with ESMTPSA id c192sm42903832vka.10.2019.04.15.21.03.05
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 15 Apr 2019 21:03:05 -0700 (PDT)
-Received: by mail-vk1-f174.google.com with SMTP id q189so4123780vkq.11
-        for <linux-kbuild@vger.kernel.org>; Mon, 15 Apr 2019 21:03:05 -0700 (PDT)
+        Tue, 16 Apr 2019 01:24:28 -0400
+Date: Tue, 16 Apr 2019 15:24:22 +1000
+From: Balbir Singh <bsingharora@gmail.com>
+Subject: Re: [PATCH v3 0/9] klp-convert livepatch build tooling
+Message-ID: <20190416052422.GA7482@350D>
+References: <20190410155058.9437-1-joe.lawrence@redhat.com>
 MIME-Version: 1.0
-References: <20190411180117.27704-1-keescook@chromium.org> <20190411180117.27704-2-keescook@chromium.org>
- <947dbe9a-3444-6fe4-9f79-f8f210da8960@linux.com>
-In-Reply-To: <947dbe9a-3444-6fe4-9f79-f8f210da8960@linux.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Mon, 15 Apr 2019 23:02:53 -0500
-Message-ID: <CAGXu5jJTM=pdAjsC63Z6T=HaztTqSqUQQ8=GN=tqv2n6CKc3nw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] security: Create "kernel hardening" config area
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190410155058.9437-1-joe.lawrence@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Popov <alex.popov@linux.com>
-Cc: Alexander Potapenko <glider@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, James Morris <jmorris@namei.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, "Serge E. Hallyn" <serge@hallyn.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-security-module <linux-security-module@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
-On Mon, Apr 15, 2019 at 11:44 AM Alexander Popov <alex.popov@linux.com> wrote:
+On Wed, Apr 10, 2019 at 11:50:49AM -0400, Joe Lawrence wrote:
+> Hi folks,
+> 
+> This is the third installment of the klp-convert tool for generating and
+> processing livepatch symbols for livepatch module builds.  For those
+> following along at home, archive links to previous versions:
+> 
+> RFC:
+>   https://lore.kernel.org/lkml/cover.1477578530.git.jpoimboe@redhat.com/
+> v2:
+>   https://lore.kernel.org/lkml/f52d29f7-7d1b-ad3d-050b-a9fa8878faf2@redhat.com/
+> 
+> (Note that I don't see v2 archived at lore, but that is a link to the
+> most recent subthread that lore did catch.)
+> 
+> 
+> Livepatches may use symbols which are not contained in its own scope,
+> and, because of that, may end up compiled with relocations that will
+> only be resolved during module load. Yet, when the referenced symbols are
+> not exported, solving this relocation requires information on the object
+> that holds the symbol (either vmlinux or modules) and its position inside
+> the object, as an object may contain multiple symbols with the same name.
+> Providing such information must be done accordingly to what is specified
+> in Documentation/livepatch/module-elf-format.txt.
 >
-> On 11.04.2019 21:01, Kees Cook wrote:
-> > Right now kernel hardening options are scattered around various Kconfig
-> > files. This can be a central place to collect these kinds of options
-> > going forward. This is initially populated with the memory initialization
-> > options from the gcc-plugins.
-> >
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
->
-> Hello Kees, hello everyone!
->
-> After applying this series the kernel config looks like that:
->
-> ...
-> ...
-> CONFIG_LSM="yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor"
->
-> #
-> # Kernel hardening options
-> #
->
-> #
-> # Memory initialization
-> #
-> CONFIG_INIT_STACK_NONE=y
-> # CONFIG_GCC_PLUGIN_STRUCTLEAK_USER is not set
-> # CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF is not set
-> # CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL is not set
-> # CONFIG_GCC_PLUGIN_STACKLEAK is not set
-> CONFIG_CRYPTO=y
->
-> #
-> # Crypto core or helper
-> #
-> CONFIG_CRYPTO_ALGAPI=y
-> ...
-> ...
->
-> What do you think about some separator between memory initialization options and
-> CONFIG_CRYPTO?
 
-This was true before too:
 
-...
-# CONFIG_DEFAULT_SECURITY_DAC is not set
-CONFIG_LSM="yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor"
-CONFIG_XOR_BLOCKS=y
-CONFIG_ASYNC_CORE=y
-CONFIG_ASYNC_MEMCPY=y
-CONFIG_ASYNC_XOR=y
-CONFIG_ASYNC_PQ=y
-CONFIG_ASYNC_RAID6_RECOV=y
-CONFIG_CRYPTO=y
-...
+Could we get some details with examples or a sample, sorry I might be dense
+and missing simple information. The problem being solved is not clear to
+me from the changelog.
+ 
+> Currently, there is no trivial way to embed the required information as
+> requested in the final livepatch elf object. klp-convert solves this
+> problem in two different forms: (i) by relying on a symbol map, which is
+> built during kernel compilation, to automatically infer the relocation
+> targeted symbol, and, when such inference is not possible (ii) by using
+> annotations in the elf object to convert the relocation accordingly to
+> the specification, enabling it to be handled by the livepatch loader.
+> 
+> Given the above, add support for symbol mapping in the form of
+> Symbols.list file; add klp-convert tool; integrate klp-convert tool into
+> kbuild; make livepatch modules discernible during kernel compilation
+> pipeline; add data-structure and macros to enable users to annotate
+> livepatch source code; make modpost stage compatible with livepatches;
+> update livepatch-sample and update documentation.
+> 
+> The patch was tested under three use-cases:
+> 
+> use-case 1: There is a relocation in the lp that can be automatically
+> resolved by klp-convert.  For example. see the saved_command_line
+> variable in lib/livepatch/test_klp_convert2.c.
+> 
+> use-case 2: There is a relocation in the lp that cannot be automatically
+> resolved, as the name of the respective symbol appears in multiple
+> objects. The livepatch contains an annotation to enable a correct
+> relocation.  See the KLP_MODULE_RELOC / KLP_SYMPOS annotation sections
+> in lib/livepatch/test_klp_convert{1,2}.c.
+> 
+> use-case 3: There is a relocation in the lp that cannot be automatically
+> resolved similarly as 2, but no annotation was provided in the
+> livepatch, triggering an error during compilation.  Reproducible by
+> removing the KLP_MODULE_RELOC / KLP_SYMPOS annotation sections in
+> lib/livepatch/test_klp_convert{1,2}.c.
+>
 
-Perhaps crypto/Kconfig's comment line could move to the top of the file?
 
-comment "Crypto core or helper"
+Are these a part of the series?
 
-is what generates the separator...
-
--- 
-Kees Cook
+Balbir Singh
+ 
+> 
+> Branches
+> --------
+> 
+> Since I spent some time tinkering with v2 and accumulated a bunch of
+> fixes, I collected them up and am posting this new version.  For review
+> purposes, I posted two branches up to github:
+> 
+>   1 - an expanded branch that with changes separate from the original
+>   https://github.com/joe-lawrence/linux/commits/klp-convert-v3-expanded
+> 
+>   2 - a squashed branch of (1) that comprises v3:
+>   https://github.com/joe-lawrence/linux/commits/klp-convert-v3
+> 
+> Non-trivial commits in the expanded branch have some extra commentary
+> and details for debugging in the commit message that were dropped when
+> squashing into their respective parent commits.
+> 
+> 
+> TODO
+> ----
+> 
+> There are a few outstanding items that I came across while reviewing v2,
+> but as changes started accumulating, it made sense to defer those to a
+> later version.  I'll reply to this thread individual topics to start
+> discussion sub-threads for those.
+> 
+> 
+> Changelogs
+> ----------
+> 
+> The commit changelogs were getting long, so I've moved them here for
+> posterity and review purposes:
+> 
+> livepatch: Create and include UAPI headers
+>   v2:
+>   - jmoreira: split up and changelog
+>   v3:
+>   - joe: convert to SPDX license tags
+> 
+> kbuild: Support for Symbols.list creation
+>   v3:
+>   - jmoreira: adjust for multiobject livepatch
+>   - joe: add klpclean to PHONY
+>   - joe: align KLP prefix
+> 
+> livepatch: Add klp-convert tool
+>   v2:
+>   - khlebnikov: use HOSTLOADLIBES_ instead of HOSTLDFLAGS: -lelf must be
+>     at the end
+>   - jmoreira: add support to automatic relocation conversion in
+>     klp-convert.c, changelog
+>   v3:
+>   - joe: convert to SPDX license tags
+>   - jmoreira: add rela symbol name to WARNs
+>   - jmoreira: ignore relocations to .TOC and symbols with index 0
+>   - joe: separate and fix valid_sympos() sympos=0 and sympos=1..n checks
+>   - joe: fix symbol use-after-frees
+>   - joe: fix remaining valgrind leak complaints (non-error paths only)
+>   - joe: checkpatch nits
+>   
+> livepatch: Add klp-convert annotation helpers
+>   v2:
+>   - jmoreira: split up: move KLP_MODULE_RELOC from previous patch to
+>     here, add KLP_SYMPOS, move macros from include/uapi/livepatch.h to
+>     include/linux/livepatch.h
+>   v3:
+>   - joe: suggested by jpoimboe, KLP_MODULE_RELOC macro should 4-byte
+>     align klp_module_reloc structures
+> 
+> modpost: Integrate klp-convert
+>   v2:
+>   - khlebnikov: save cmd_ld_ko_o into .module.cmd, if_changed_rule
+>     doesn't do that.f
+>   - khlebnikov: fix bashisms for debian where /bin/sh is a symlink to
+>     /bin/dash
+>   - khlebnikov: rename rule_link_module to rule_ld_ko_o, otherwise
+>     arg-check inside if_changed_rule compares cmd_link_module and
+>     cmd_ld_ko_o.
+>   - khlebnikov: check modinfo -F livepatch only if CONFIG_LIVEPATCH is
+>     true.
+>   - mbenes: remove modinfo call. LIVEPATCH_ in Makefile
+>   - jmoreira: split up: move the .livepatch file-based scheme for
+>     identifying livepatches to a previous patch, as it was required for
+>     correctly building Symbols.list there.
+>   v3:
+>   - joe: adjust rule_ld_ko_o to call echo-cmd
+>   - joe: rebase for v5.1
+>   - joe: align KLP prefix
+> 
+> modpost: Add modinfo flag to livepatch modules
+>   v2:
+>   - jmoreira: fix modpost.c (add_livepatch_flag) to update module
+>     structure with livepatch flag and prevent modpost from breaking due to
+>     unresolved symbols
+>   v3:
+>   - joe: adjust modpost.c::get_modinfo() call for v5.0 version
+> 
+> livepatch: Add sample livepatch module
+>   v3:
+>   - joe: update all in-tree livepatches with LIVEPATCH_* modinfo flag
+> 
+> documentation: Update on livepatch elf format
+>   v2:
+>   - jmoreira: update module to use KLP_SYMPOS
+>   - jmoreira: Comments on symbol resolution scheme
+>   - jmoreira: Update Makefile
+>   - jmoreira: Remove MODULE_INFO statement
+>   - jmoreira: Changelog
+>   v3:
+>   - joe: rebase for v5.1
+>   - joe: code shuffle to better match original source file
+> 
+> livepatch/selftests: add klp-convert
+>   v3:
+>   - joe: clarify sympos=0 and sympos=1..n
+> 
+> 
+> And now the usual git cover-letter boilerplate...
+> 
+> Joao Moreira (2):
+>   kbuild: Support for Symbols.list creation
+>   documentation: Update on livepatch elf format
+> 
+> Joe Lawrence (1):
+>   livepatch/selftests: add klp-convert
+> 
+> Josh Poimboeuf (5):
+>   livepatch: Create and include UAPI headers
+>   livepatch: Add klp-convert tool
+>   livepatch: Add klp-convert annotation helpers
+>   modpost: Integrate klp-convert
+>   livepatch: Add sample livepatch module
+> 
+> Miroslav Benes (1):
+>   modpost: Add modinfo flag to livepatch modules
+> 
+>  .gitignore                                    |   1 +
+>  Documentation/livepatch/livepatch.txt         |   3 +
+>  Documentation/livepatch/module-elf-format.txt |  50 +-
+>  MAINTAINERS                                   |   2 +
+>  Makefile                                      |  30 +-
+>  include/linux/livepatch.h                     |  13 +
+>  include/uapi/linux/livepatch.h                |  22 +
+>  kernel/livepatch/core.c                       |   4 +-
+>  lib/livepatch/Makefile                        |  15 +
+>  lib/livepatch/test_klp_atomic_replace.c       |   1 -
+>  lib/livepatch/test_klp_callbacks_demo.c       |   1 -
+>  lib/livepatch/test_klp_callbacks_demo2.c      |   1 -
+>  lib/livepatch/test_klp_convert1.c             | 106 +++
+>  lib/livepatch/test_klp_convert2.c             | 103 +++
+>  lib/livepatch/test_klp_convert_mod_a.c        |  25 +
+>  lib/livepatch/test_klp_convert_mod_b.c        |  13 +
+>  lib/livepatch/test_klp_livepatch.c            |   1 -
+>  samples/livepatch/Makefile                    |   7 +
+>  .../livepatch/livepatch-annotated-sample.c    | 102 +++
+>  samples/livepatch/livepatch-sample.c          |   1 -
+>  scripts/Kbuild.include                        |   4 +-
+>  scripts/Makefile                              |   1 +
+>  scripts/Makefile.build                        |   7 +
+>  scripts/Makefile.modpost                      |  24 +-
+>  scripts/livepatch/.gitignore                  |   1 +
+>  scripts/livepatch/Makefile                    |   7 +
+>  scripts/livepatch/elf.c                       | 753 ++++++++++++++++++
+>  scripts/livepatch/elf.h                       |  72 ++
+>  scripts/livepatch/klp-convert.c               | 692 ++++++++++++++++
+>  scripts/livepatch/klp-convert.h               |  39 +
+>  scripts/livepatch/list.h                      | 391 +++++++++
+>  scripts/mod/modpost.c                         |  82 +-
+>  scripts/mod/modpost.h                         |   1 +
+>  .../selftests/livepatch/test-livepatch.sh     |  64 ++
+>  34 files changed, 2616 insertions(+), 23 deletions(-)
+>  create mode 100644 include/uapi/linux/livepatch.h
+>  create mode 100644 lib/livepatch/test_klp_convert1.c
+>  create mode 100644 lib/livepatch/test_klp_convert2.c
+>  create mode 100644 lib/livepatch/test_klp_convert_mod_a.c
+>  create mode 100644 lib/livepatch/test_klp_convert_mod_b.c
+>  create mode 100644 samples/livepatch/livepatch-annotated-sample.c
+>  create mode 100644 scripts/livepatch/.gitignore
+>  create mode 100644 scripts/livepatch/Makefile
+>  create mode 100644 scripts/livepatch/elf.c
+>  create mode 100644 scripts/livepatch/elf.h
+>  create mode 100644 scripts/livepatch/klp-convert.c
+>  create mode 100644 scripts/livepatch/klp-convert.h
+>  create mode 100644 scripts/livepatch/list.h
+> 
+> -- 
+> 2.20.1
