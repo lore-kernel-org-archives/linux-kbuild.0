@@ -1,67 +1,228 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:33002 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727136AbfDPTJR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Apr 2019 15:09:17 -0400
-Date: Tue, 16 Apr 2019 21:09:15 +0200 (CEST)
-From: Miroslav Benes <mbenes@suse.cz>
+Received: from mx1.redhat.com ([209.132.183.28]:56386 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725848AbfDQUNU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 17 Apr 2019 16:13:20 -0400
+Date: Wed, 17 Apr 2019 16:13:16 -0400
+From: Joe Lawrence <joe.lawrence@redhat.com>
 Subject: Re: [PATCH v3 0/9] klp-convert livepatch build tooling
-In-Reply-To: <452e0cc5-ea9b-1638-3557-17e12671e21e@redhat.com>
-Message-ID: <alpine.LSU.2.21.1904162107110.9731@pobox.suse.cz>
-References: <20190410155058.9437-1-joe.lawrence@redhat.com> <452e0cc5-ea9b-1638-3557-17e12671e21e@redhat.com>
+Message-ID: <20190417201316.GA690@redhat.com>
+References: <20190410155058.9437-1-joe.lawrence@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190410155058.9437-1-joe.lawrence@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Lawrence <joe.lawrence@redhat.com>
-Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
+To: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
-On Tue, 16 Apr 2019, Joe Lawrence wrote:
+On Wed, Apr 10, 2019 at 11:50:49AM -0400, Joe Lawrence wrote:
+>
+> [ ... snip ... ]
+>
+> TODO
+> ----
+>
+> There are a few outstanding items that I came across while reviewing v2,
+> but as changes started accumulating, it made sense to defer those to a
+> later version.  I'll reply to this thread individual topics to start
+> discussion sub-threads for those.
 
-> On 4/10/19 11:50 AM, Joe Lawrence wrote:
-> > Hi folks,
-> > 
-> > This is the third installment of the klp-convert tool for generating and
-> > processing livepatch symbols for livepatch module builds.  For those
-> > following along at home, archive links to previous versions:
-> > 
-> > RFC:
-> >    https://lore.kernel.org/lkml/cover.1477578530.git.jpoimboe@redhat.com/
-> > v2:
-> >    https://lore.kernel.org/lkml/f52d29f7-7d1b-ad3d-050b-a9fa8878faf2@redhat.com/
-> > 
-> > (Note that I don't see v2 archived at lore, but that is a link to the
-> > most recent subthread that lore did catch.)
-> > 
-> > 
-> > Livepatches may use symbols which are not contained in its own scope,
-> > and, because of that, may end up compiled with relocations that will
-> > only be resolved during module load. Yet, when the referenced symbols are
-> > not exported, solving this relocation requires information on the object
-> > that holds the symbol (either vmlinux or modules) and its position inside
-> > the object, as an object may contain multiple symbols with the same name.
-> > Providing such information must be done accordingly to what is specified
-> > in Documentation/livepatch/module-elf-format.txt.
-> 
-> Hi Miroslav,
-> 
-> I noticed that some binutils programs like gdb, objdump, etc. don't like the
-> .ko kernel objects that we're generating from this patchset, specifically
-> those with the additional '.klp.rela.<obj>..text' livepatch symbol relocation
-> sections.
-> 
-> For reference, I opened a new bugzilla with more details here:
-> https://sourceware.org/bugzilla/show_bug.cgi?id=24456
+Multiple object files
+=====================
 
-Another great catch.
- 
-> And was about to ping the binutils mailing list about the assertion that is
-> tripping in bfd/elf.c.  The thought occurred to me that you guys might already
-> be carrying a patch to workaround this issue?
+For v3, we tweaked the build scripts so that we could successfully build
+a klp-converted livepatch module from multiple object files.
 
-No, unfortunately we don't. At least I don't know about anything and a 
-quick test on openSUSE Leap 15.0 confirms it (objdump -D gives "bad 
-value").
+One interesting use-case is supporting two livepatch symbols of the same
+name, but different object/position values.
 
-Thanks
-Miroslav
+An example target kernel module might be layed out like this:
+
+  test_klp_convert_mod.ko         << target module is comprised of
+                                     two object files, each defining
+    test_klp_convert_mod_a.o         their own local get_homonym_string()
+      get_homonym_string()           function and homonym_string[]
+      homonym_string[]               character arrays.
+
+    test_klp_convert_mod_b.o
+      get_homonym_string()
+      homonym_string[]
+
+
+A look at interesting parts of the the module's symbol table:
+
+  % eu-readelf --symbols lib/livepatch/test_klp_convert_mod.ko | \
+        grep -e 'homonym' -e test_klp_convert_mod_
+
+     29: 0000000000000000      0 FILE    LOCAL  DEFAULT      ABS test_klp_convert_mod_a.c
+     32: 0000000000000010      8 FUNC    LOCAL  DEFAULT        3 get_homonym_string
+     33: 0000000000000000     17 OBJECT  LOCAL  DEFAULT        5 homonym_string
+     37: 0000000000000000      0 FILE    LOCAL  DEFAULT      ABS test_klp_convert_mod_b.c
+     38: 0000000000000020      8 FUNC    LOCAL  DEFAULT        3 get_homonym_string
+     39: 0000000000000000     17 OBJECT  LOCAL  DEFAULT       11 homonym_string
+
+suggests that any livepatch module that wishes to resolve to
+test_klp_convert_mod_a.c :: get_homonym_string() should include an
+annotation like:
+
+  file_a.c:
+
+      KLP_MODULE_RELOC(test_klp_convert_mod) relocs_a[] = {
+            KLP_SYMPOS(get_homonym_string, 1),
+      };
+
+and to resolve test_klp_convert_mod_b.c :: get_homonym_string():
+
+  file_b.c:
+
+      KLP_MODULE_RELOC(test_klp_convert_mod) relocs_b[] = {
+            KLP_SYMPOS(get_homonym_string, 2),
+      };
+
+
+Unfortunately klp-convert v3 will fail to build such livepatch module,
+regardless of sympos values:
+
+  klp-convert: Conflicting KLP_SYMPOS definition: vmlinux.state_show,2 vs. vmlinux.state_show,1.
+  klp-convert: Unable to load user-provided sympos
+  make[1]: *** [scripts/Makefile.modpost:148: lib/livepatch/test_klp_convert_multi_objs.ko] Error 255
+
+
+This abort message can be traced to sympos_sanity_check() as it verifies
+that there no duplicate symbol names found in its list of user specified
+symbols (ie, those needing to be converted).
+
+
+Common sympos
+-------------
+
+New test case and related fixup can be found here:
+
+  https://github.com/joe-lawrence/linux/commits/klp-convert-v4-multiple-objs
+
+To better debug this issue, I added another selftest that demonstrates
+this configuration in isolation.  "show_state" is a popular kernel
+function name (my VM reported 5 instances in kallsyms) so I chose that
+symbol name.
+
+Initially I specified the *same* symbol position (1) in both .c file
+KLP_SYMPOS annotations.  At the very least, we can trivially patch
+klp-convert v3 to support annotations for the the same symbol <object,
+name, position> value across object files.
+
+Result: a small tweak to sympos_sanity_check() to relax its symbol
+uniqueness verification:  allow for duplicate <object, name, position>
+instances.  Now it will only complain when a supplied symbol references
+the same <object, name> but a different <position>.
+
+diff --git a/scripts/livepatch/klp-convert.c b/scripts/livepatch/klp-convert.c
+index 82c27d219372..713835dfc9ec 100644
+--- a/scripts/livepatch/klp-convert.c
++++ b/scripts/livepatch/klp-convert.c
+@@ -194,7 +194,10 @@ static void clear_sympos_annontations(struct elf *klp_elf)
+ 	}
+ }
+
+-/* Checks if two or more elements in usr_symbols have the same name */
++/*
++ * Checks if two or more elements in usr_symbols have the same
++ * object and name, but different symbol position
++ */
+ static bool sympos_sanity_check(void)
+ {
+ 	bool sane = true;
+@@ -203,7 +206,9 @@ static bool sympos_sanity_check(void)
+ 	list_for_each_entry(sp, &usr_symbols, list) {
+ 		aux = list_next_entry(sp, list);
+ 		list_for_each_entry_from(aux, &usr_symbols, list) {
+-			if (strcmp(sp->symbol_name, aux->symbol_name) == 0) {
++			if (sp->pos != aux->pos &&
++			    strcmp(sp->object_name, aux->object_name) == 0 &&
++			    strcmp(sp->symbol_name, aux->symbol_name) == 0)
+ 				WARN("Conflicting KLP_SYMPOS definition: %s.%s,%d vs. %s.%s,%d.",
+ 				sp->object_name, sp->symbol_name, sp->pos,
+ 				aux->object_name, aux->symbol_name, aux->pos);
+
+
+Unique sympos
+-------------
+
+But even with the above workaround, specifying unique symbol positions
+will (and should) result in a klp-convert complaint.
+
+When modifying the test module with unique symbol position annotation
+values (1 and 2 respectively):
+
+  test_klp_convert_multi_objs_a.c:
+
+    extern void *state_show;
+    ...
+    KLP_MODULE_RELOC(vmlinux) vmlinux_relocs_b[] = {
+            KLP_SYMPOS(state_show, 1)
+    };
+
+  test_klp_convert_multi_objs_b.c:
+
+    extern void *state_show;
+    ...
+    KLP_MODULE_RELOC(vmlinux) vmlinux_relocs_b[] = {
+            KLP_SYMPOS(state_show, 2)
+    };
+
+
+Each object file's symbol table contains a "state_show" instance:
+
+  % eu-readelf --symbols lib/livepatch/test_klp_convert_multi_objs_a.o | grep '\<state_show\>'
+     30: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+
+  % eu-readelf --symbols lib/livepatch/test_klp_convert_multi_objs_b.o | grep '\<state_show\>'
+     20: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+
+and the intermediate test_klp_convert_multi_objs.klp.o file contains a
+combined .klp.module_relocs.vmlinux relocation section with two
+KLP_SYMPOS structures, each with a unique <sympos> value:
+
+  % objcopy -O binary --only-section=.klp.module_relocs.vmlinux \
+      lib/livepatch/test_klp_convert_multi_objs.klp.o >(hexdump)
+
+  0000000 0000 0000 0000 0000 0001 0000 0000 0000
+  0000010 0000 0000 0002 0000
+
+but the symbol tables were merged, sorted and non-unique symbols
+removed, leaving a *single* unresolved "state_show" instance:
+
+  % eu-readelf --symbols lib/livepatch/test_klp_convert_multi_objs.klp.o | grep '\<state_show\>'
+     53: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+
+which means that even though we have separate relocations for each
+"state_show" instance:
+
+  Relocation section [ 6] '.rela.text.unlikely' for section [ 5] '.text.unlikely' at offset 0x44510 contains 11 entries:
+    Offset              Type            Value               Addend Name
+    0x0000000000000003  X86_64_32S      000000000000000000      +0 state_show
+    ...
+    0x0000000000000034  X86_64_32S      000000000000000000      +0 state_show
+    ...
+
+they share the same rela->sym and there is no way to distinguish which
+one correlates to which KLP_SYMPOS structure.
+
+
+Future Work
+-----------
+
+I don't see an easy way to support multiple homonym <object, name>
+symbols with unique <position> values in the current livepatch module
+Elf format.  The only solutions that come to mind right now include
+renaming homonym symbols somehow to retain the relocation->symbol
+relationship when separate object files are combined.  Perhaps an
+intermediate linker step could make annotated symbols unique in some way
+to achieve this.  /thinking out loud
+
+In the meantime, the unique symbol <position> case is already detected
+and with a little tweaking we could support multiple common symbol
+<position> values.
+
+-- Joe
