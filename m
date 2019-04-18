@@ -1,138 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua1-f68.google.com ([209.85.222.68]:42429 "EHLO
-        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729497AbfDRNC7 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Apr 2019 09:02:59 -0400
-Received: by mail-ua1-f68.google.com with SMTP id h4so721210uaj.9
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 Apr 2019 06:02:58 -0700 (PDT)
+Received: from mail.kernel.org ([198.145.29.99]:60700 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389103AbfDRNwo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 18 Apr 2019 09:52:44 -0400
+Date: Thu, 18 Apr 2019 15:52:38 +0200
+From: Jessica Yu <jeyu@kernel.org>
+Subject: Re: [PATCH v2] moduleparam: Save information about built-in modules
+ in separate file
+Message-ID: <20190418135238.GA5626@linux-8ccs>
+References: <20190406121447.GB4047@localhost.localdomain>
+ <CAK7LNATfo0K6kzwobkAZ_u2KnWL3XycJzbr3KPtPF=ePziCuDg@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190308132701.133598-1-glider@google.com> <20190308132701.133598-3-glider@google.com>
- <497b1201-b2ae-5e0c-d191-ff1830d92fc1@redhat.com>
-In-Reply-To: <497b1201-b2ae-5e0c-d191-ff1830d92fc1@redhat.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Thu, 18 Apr 2019 15:02:46 +0200
-Message-ID: <CAG_fn=WhBxSLkD3BdTP3Z72B7mGkegezwkjyMjmY7oVjb+kVWw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] initmem: introduce CONFIG_INIT_ALL_HEAP
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CAK7LNATfo0K6kzwobkAZ_u2KnWL3XycJzbr3KPtPF=ePziCuDg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitriy Vyukov <dvyukov@google.com>, Kees Cook <keescook@chromium.org>, Sandeep Patil <sspatil@android.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Alexey Gladkov <gladkov.alexey@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-api@vger.kernel.org, linux-modules@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Michal Marek <michal.lkml@markovi.net>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>, Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-On Mon, Apr 8, 2019 at 6:43 PM Laura Abbott <labbott@redhat.com> wrote:
++++ Masahiro Yamada [18/04/19 20:10 +0900]:
+>On Sat, Apr 6, 2019 at 9:15 PM Alexey Gladkov <gladkov.alexey@gmail.com> wrote:
+>>
+>> Problem:
+>>
+>> When a kernel module is compiled as a separate module, some important
+>> information about the kernel module is available via .modinfo section of
+>> the module.  In contrast, when the kernel module is compiled into the
+>> kernel, that information is not available.
+>>
+>> Information about built-in modules is necessary in the following cases:
+>>
+>> 1. When it is necessary to find out what additional parameters can be
+>> passed to the kernel at boot time.
+>>
+>> 2. When you need to know which module names and their aliases are in
+>> the kernel. This is very useful for creating an initrd image.
+>>
+>> Proposal:
+>>
+>> The proposed patch does not remove .modinfo section with module
+>> information from the vmlinux at the build time and saves it into a
+>> separate file after kernel linking. So, the kernel does not increase in
+>> size and no additional information remains in it. Information is stored
+>> in the same format as in the separate modules (null-terminated string
+>> array). Because the .modinfo section is already exported with a separate
+>> modules, we are not creating a new API.
+>>
+>> It can be easily read in the userspace:
+>>
+>> $ tr '\0' '\n' < kernel.builtin
+>> ext4.softdep=pre: crc32c
+>> ext4.license=GPL
+>> ext4.description=Fourth Extended Filesystem
+>> ext4.author=Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others
+>> ext4.alias=fs-ext4
+>> ext4.alias=ext3
+>> ext4.alias=fs-ext3
+>> ext4.alias=ext2
+>> ext4.alias=fs-ext2
+>> md_mod.alias=block-major-9-*
+>> md_mod.alias=md
+>> md_mod.description=MD RAID framework
+>> md_mod.license=GPL
+>> md_mod.parmtype=create_on_open:bool
+>> md_mod.parmtype=start_dirty_degraded:int
+>> ...
+>>
+>> v2:
+>>  * Extract modinfo from vmlinux.o as suggested by Masahiro Yamada;
+>>  * Rename output file to kernel.builtin;
 >
-> On 3/8/19 5:27 AM, Alexander Potapenko wrote:
-> > This config option enables CONFIG_SLUB_DEBUG and CONFIG_PAGE_POISONING
-> > without the need to pass any boot parameters.
-> >
-> > No performance optimizations are done at the moment to reduce double
-> > initialization of memory regions.
-> >
-> > Signed-off-by: Alexander Potapenko <glider@google.com>
-> > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > Cc: James Morris <jmorris@namei.org>
-> > Cc: "Serge E. Hallyn" <serge@hallyn.com>
-> > Cc: Nick Desaulniers <ndesaulniers@google.com>
-> > Cc: Kostya Serebryany <kcc@google.com>
-> > Cc: Dmitry Vyukov <dvyukov@google.com>
-> > Cc: Kees Cook <keescook@chromium.org>
-> > Cc: Sandeep Patil <sspatil@android.com>
-> > Cc: linux-security-module@vger.kernel.org
-> > Cc: linux-kbuild@vger.kernel.org
-> > Cc: kernel-hardening@lists.openwall.com
-> > ---
-> >   mm/page_poison.c         |  5 +++++
-> >   mm/slub.c                |  2 ++
-> >   security/Kconfig.initmem | 11 +++++++++++
-> >   3 files changed, 18 insertions(+)
-> >
-> > diff --git a/mm/page_poison.c b/mm/page_poison.c
-> > index 21d4f97cb49b..a1985f33f635 100644
-> > --- a/mm/page_poison.c
-> > +++ b/mm/page_poison.c
-> > @@ -12,9 +12,14 @@ static bool want_page_poisoning __read_mostly;
-> >
-> >   static int __init early_page_poison_param(char *buf)
-> >   {
-> > +#ifdef CONFIG_INIT_ALL_HEAP
-> > +     want_page_poisoning =3D true;
-> > +     return 0;
-> > +#else
-> >       if (!buf)
-> >               return -EINVAL;
-> >       return strtobool(buf, &want_page_poisoning);
-> > +#endif
-> >   }
-> >   early_param("page_poison", early_page_poison_param);
-> >
-> > diff --git a/mm/slub.c b/mm/slub.c
-> > index 1b08fbcb7e61..00e0197d3f35 100644
-> > --- a/mm/slub.c
-> > +++ b/mm/slub.c
-> > @@ -1287,6 +1287,8 @@ static int __init setup_slub_debug(char *str)
-> >       if (*str =3D=3D ',')
-> >               slub_debug_slabs =3D str + 1;
-> >   out:
-> > +     if (IS_ENABLED(CONFIG_INIT_ALL_HEAP))
-> > +             slub_debug |=3D SLAB_POISON;
-> >       return 1;
-> >   }
-> >
+>Sorry, I do not get why you renamed
+>"kernel.builtin.modinfo" to "kernel.builtin".
 >
-> I've looked at doing something similar in the past (failing to find
-> the thread this morning...) and while this will work, it has pretty
-> serious performance issues. It's not actually the poisoning which
-> is expensive but that turning on debugging removes the cpu slab
-> which has significant performance penalties.
+>If you drop "modinfo", we do not understand
+>what kind information is contained in it.
 >
-> I'd rather go back to the proposal of just poisoning the slab
-> at alloc/free without using SLAB_POISON.
-Hi Laura,
-
-May I wonder what were the performance numbers you were seeing?
-I've found this patch:
-https://www.openwall.com/lists/kernel-hardening/2016/01/26/1, but
-that's around 100% slowdown.
-> Thanks,
-> Laura
+>I think "kernel" and "builtin" have
+>a quite similar meaning here.
+>
+>How about "builtin.modinfo" for example?
 >
 >
-> > diff --git a/security/Kconfig.initmem b/security/Kconfig.initmem
-> > index 27aec394365e..5ce49663777a 100644
-> > --- a/security/Kconfig.initmem
-> > +++ b/security/Kconfig.initmem
-> > @@ -13,6 +13,17 @@ config INIT_ALL_MEMORY
-> >
-> >   if INIT_ALL_MEMORY
-> >
-> > +config INIT_ALL_HEAP
-> > +     bool "Initialize all heap"
-> > +     depends on INIT_ALL_MEMORY
-> > +     select CONFIG_PAGE_POISONING
-> > +     select CONFIG_PAGE_POISONING_NO_SANITY
-> > +     select CONFIG_PAGE_POISONING_ZERO
-> > +     select CONFIG_SLUB_DEBUG
-> > +     default y
-> > +     help
-> > +       Enable page poisoning and slub poisoning by default.
-> > +
-> >   config INIT_ALL_STACK
-> >       bool "Initialize all stack"
-> >       depends on INIT_ALL_MEMORY
-> >
->
+>It is shorter, and it is clear enough
+>that it contains module_info.
 
+I agree that the name kernel.builtin is unclear in what kind of
+information it contains. Apologies for not having clarified this in
+the previous review.
 
---=20
-Alexander Potapenko
-Software Engineer
+Since kbuild already produces "modules.order" and "modules.builtin"
+files, why not just name it "modules.builtin.modinfo" to keep the
+names consistent with what is already there? It clearly conveys that
+this file contains modinfo for builtin modules.
 
-Google Germany GmbH
-Erika-Mann-Stra=C3=9Fe, 33
-80636 M=C3=BCnchen
+I'll leave it up to Lucas to decide if the file format is OK for kmod.
+With the modinfo dump, kmod could then decide what to do with the
+information, append to modules.alias{,.bin}, etc.
 
-Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Halimah DeLaine Prado
-Registergericht und -nummer: Hamburg, HRB 86891
-Sitz der Gesellschaft: Hamburg
+Also, I think this file needs to be documented in Documentation/kbuild/kbuild.txt.
+
+Thanks,
+
+Jessica
