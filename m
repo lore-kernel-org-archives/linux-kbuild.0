@@ -1,77 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:39332 "EHLO
-        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388244AbfDRK0v (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:31371 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388369AbfDRKjw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Apr 2019 06:26:51 -0400
-Date: Thu, 18 Apr 2019 07:26:42 -0300
-From: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Subject: Re: [PATCH 18/57] docs: kbuild: convert it to ReST output
-Message-ID: <20190418072626.3727c56a@coco.lan>
-In-Reply-To: <CAK7LNAQUGkW=Mnz-EtUkm=7uBpGLZNgO+3MUTmkWOggo+_eHjw@mail.gmail.com>
-References: <cover.1555382110.git.mchehab+samsung@kernel.org>
-        <5cfeb21a8841c1e029e8396bdaa7cd55ac0b08a2.1555382110.git.mchehab+samsung@kernel.org>
-        <CAK7LNAQUGkW=Mnz-EtUkm=7uBpGLZNgO+3MUTmkWOggo+_eHjw@mail.gmail.com>
+        Thu, 18 Apr 2019 06:39:52 -0400
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id x3IAdf9d001844
+        for <linux-kbuild@vger.kernel.org>; Thu, 18 Apr 2019 19:39:41 +0900
+Received: by mail-ua1-f41.google.com with SMTP id c13so591454uao.12
+        for <linux-kbuild@vger.kernel.org>; Thu, 18 Apr 2019 03:39:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <1554992415-292288-1-git-send-email-steven.sistare@oracle.com> <1554992415-292288-2-git-send-email-steven.sistare@oracle.com>
+In-Reply-To: <1554992415-292288-2-git-send-email-steven.sistare@oracle.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 18 Apr 2019 19:39:04 +0900
+Message-ID: <CAK7LNARhDRVtKUhD3tru82fYSSak2t=4w0MyhdbJTY1Kv_Ddjw@mail.gmail.com>
+Subject: Re: [PATCH V1 1/3] kbuild: serialize modules and modules_install
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Steve Sistare <steven.sistare@oracle.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Em Thu, 18 Apr 2019 18:25:45 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> escreveu:
+On Thu, Apr 11, 2019 at 11:33 PM Steve Sistare
+<steven.sistare@oracle.com> wrote:
+>
+> "make -j 16 modules modules_install" allows both targets to run concurrently
+> and produces warnings and incorrect results in the install area.  Force
+> them to be run serially, the same way that "install modules_install" is
+> already seralized.
 
-> On Tue, Apr 16, 2019 at 12:01 PM Mauro Carvalho Chehab
-> <mchehab+samsung@kernel.org> wrote:
-> >
-> > The kbuild documentation clearly shows that the documents
-> > there are written at different times: some use markdown,
-> > some use their own peculiar logic to split sections.
-> >
-> > Convert everything to ReST without affecting too much
-> > the author's style and avoiding adding uneeded markups.  
-> 
-> Sorry for my ignorance, but shouldn't ReST use
-> the extension '.rst' instead of '.txt' ?
+Probably you know many projects are
+configured, compiled, and installed
+in the following 3 steps:
 
-Yes. I have a patch with the rename step, but the problem is that doing
-such renames on 57 different subdirs and then adding all of them to the
-existing index.rst files (in order to add into a bookset) would cause
-huge merge conflicts - and keeping them renamed without adding into
-an index would cause a *lot* new warnings when building them.
+$ ./configure
+$ make
+$ make install
 
-So, IMO, the best would be to have the fixup stuff merged first, and
-then do the renames/merges at once, after subsystem maintainers
-pick the patches from this rst fixup series.
 
-If you want to see the renaming patch, it is at:
-	https://git.linuxtv.org/mchehab/experimental.git/commit/?h=all_with_indexes-v3&id=9cfeb3eb6d48d1aeff9d2ddd84880ab1dc782b00
+I have never seen instruction like this:
 
-(I'll probably split it later into per-subdir renames)
+$ ./configure
+$ make -j8 all install
 
-The results of this patch, plus the rename one, is at:
 
-	https://www.infradead.org/~mchehab/rst_conversion/kbuild/index.html
+Compile and install are separate steps, one reason is
+"make install" is quite often run under the root privilege
+in order to copy files to /usr/ or /usr/local/.
 
-> 
-> 
-> 
-> > Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-> > ---
-> >  Documentation/kbuild/headers_install.txt      |   5 +-
-> >  Documentation/kbuild/kbuild.txt               | 119 ++--
-> >  Documentation/kbuild/kconfig-language.txt     | 232 ++++----
-> >  .../kbuild/kconfig-macro-language.txt         |  37 +-
-> >  Documentation/kbuild/kconfig.txt              | 136 +++--
-> >  Documentation/kbuild/makefiles.txt            | 518 +++++++++++-------
-> >  Documentation/kbuild/modules.txt              | 166 +++---
-> >  7 files changed, 720 insertions(+), 493 deletions(-)
-> >  
-> 
+
+Following the same logic, Kbuild does not support
+the simultaneous compile & installation.
+(Please note the default install location of modules is
+/lib/modules/$(uname -r)/, which needs root permission for write.)
+
+
+For the same reason, we do not support
+"make -j8 vmlinux install"
+ or
+"make -j8 dtbs dtbs_install".
 
 
 
-Thanks,
-Mauro
+
+> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+> ---
+>  Makefile | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 026fbc4..4988dcc 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -291,9 +291,11 @@ ifneq ($(filter $(clean-targets),$(MAKECMDGOALS)),)
+>          endif
+>  endif
+>
+> -# install and modules_install need also be processed one by one
+> -ifneq ($(filter install,$(MAKECMDGOALS)),)
+> -        ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
+> +# modules_install and {install or modules} need to be processed one by one
+> +ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
+> +        ifneq ($(filter install,$(MAKECMDGOALS)),)
+> +               mixed-targets := 1
+> +        else ifneq ($(filter modules,$(MAKECMDGOALS)),)
+>                 mixed-targets := 1
+>          endif
+>  endif
+> --
+> 1.8.3.1
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
