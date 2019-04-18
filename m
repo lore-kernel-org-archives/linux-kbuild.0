@@ -1,25 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:51919 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388907AbfDROgo (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:28274 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731317AbfDRP1a (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Apr 2019 10:36:44 -0400
+        Thu, 18 Apr 2019 11:27:30 -0400
 MIME-Version: 1.0
 References: <20190406121447.GB4047@localhost.localdomain> <CAK7LNATfo0K6kzwobkAZ_u2KnWL3XycJzbr3KPtPF=ePziCuDg@mail.gmail.com>
  <20190418135238.GA5626@linux-8ccs>
 In-Reply-To: <20190418135238.GA5626@linux-8ccs>
-From: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Date: Thu, 18 Apr 2019 07:36:25 -0700
-Message-ID: <CAKi4VALprR0+p-pk9h4Jt1+v2nxGqs_aO7p6bM_2oVsutsTsyQ@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 19 Apr 2019 00:26:33 +0900
+Message-ID: <CAK7LNARKHXLgniczKXY01JhxhBpL2p-X_hWg70AcsrXRaLyDSg@mail.gmail.com>
 Subject: Re: [PATCH v2] moduleparam: Save information about built-in modules
  in separate file
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jessica Yu <jeyu@kernel.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Alexey Gladkov <gladkov.alexey@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-api@vger.kernel.org, linux-modules <linux-modules@vger.kernel.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Michal Marek <michal.lkml@markovi.net>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>
+Cc: Alexey Gladkov <gladkov.alexey@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-api@vger.kernel.org, linux-modules@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Michal Marek <michal.lkml@markovi.net>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>, Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-On Thu, Apr 18, 2019 at 6:52 AM Jessica Yu <jeyu@kernel.org> wrote:
+On Thu, Apr 18, 2019 at 10:52 PM Jessica Yu <jeyu@kernel.org> wrote:
 >
 > +++ Masahiro Yamada [18/04/19 20:10 +0900]:
 > >On Sat, Apr 6, 2019 at 9:15 PM Alexey Gladkov <gladkov.alexey@gmail.com> wrote:
@@ -94,33 +94,44 @@ On Thu, Apr 18, 2019 at 6:52 AM Jessica Yu <jeyu@kernel.org> wrote:
 >
 > Since kbuild already produces "modules.order" and "modules.builtin"
 > files, why not just name it "modules.builtin.modinfo" to keep the
+> names consistent with what is already there?
 
-I agree with modules.builtin.modinfo
 
-> names consistent with what is already there? It clearly conveys that
+Is it consistent?
+
+If we had "modules.order" and "modules.builtin.order" there,
+I would agree with "modules.builtin.modinfo",
+and also "modules.alias" vs "modules.builtin.alias".
+
+
+We already have "modules.builtin", and probably impossible
+to rename it, so we cannot keep consistency in any way.
+
+
+"modules.builtin" is a weird name since
+it actually contains "order", but its extension
+does not express what kind of information is in it.
+Hence, I doubt "modules.builtin" is a good precedent.
+
+IMHO, "modules" and "builtin" are opposite
+to each other. "modules.builtin" sounds iffy to me.
+
+
+
+
+
+> It clearly conveys that
 > this file contains modinfo for builtin modules.
 >
 > I'll leave it up to Lucas to decide if the file format is OK for kmod.
 > With the modinfo dump, kmod could then decide what to do with the
 > information, append to modules.alias{,.bin}, etc.
-
-I think it's ok with the current format. It's simple enough. I would
-delay merging it until
-the userspace counterpart is implemented though. So to make sure we
-have everything we need.
-I can work on that in ~1 or 2 weeks.
-
-thanks
-Lucas De Marchi
-
 >
 > Also, I think this file needs to be documented in Documentation/kbuild/kbuild.txt.
 >
 > Thanks,
 >
 > Jessica
-
-
-
--- 
-Lucas De Marchi
+--
+Best Regards
+Masahiro Yamada
