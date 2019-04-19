@@ -1,34 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:33011 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726977AbfDSSeU (ORCPT
+Received: from mail-vs1-f67.google.com ([209.85.217.67]:43763 "EHLO
+        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726172AbfDSS5h (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Apr 2019 14:34:20 -0400
-Received: by mail-qt1-f196.google.com with SMTP id k14so6337277qtb.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 19 Apr 2019 11:34:20 -0700 (PDT)
+        Fri, 19 Apr 2019 14:57:37 -0400
+Received: by mail-vs1-f67.google.com with SMTP id t23so3274063vso.10
+        for <linux-kbuild@vger.kernel.org>; Fri, 19 Apr 2019 11:57:37 -0700 (PDT)
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com. [209.85.222.41])
+        by smtp.gmail.com with ESMTPSA id 110sm4059149uaq.7.2019.04.19.08.02.41
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Fri, 19 Apr 2019 08:02:42 -0700 (PDT)
+Received: by mail-ua1-f41.google.com with SMTP id n16so1821576uae.10
+        for <linux-kbuild@vger.kernel.org>; Fri, 19 Apr 2019 08:02:41 -0700 (PDT)
 MIME-Version: 1.0
-Reply-To: claiirebori@yahoo.com
-From: MARK CASADY <suyatiyati2000@gmail.com>
-Date: Fri, 19 Apr 2019 19:32:05 +0200
-Message-ID: <CALdqncmX2KnPQt_Q8kJL2f62t_T_i+W1JDYME-A2oh_4am72hw@mail.gmail.com>
-Subject: Dear
+References: <1555669773-9766-1-git-send-email-alex.popov@linux.com>
+In-Reply-To: <1555669773-9766-1-git-send-email-alex.popov@linux.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Fri, 19 Apr 2019 10:02:29 -0500
+Message-ID: <CAGXu5j+qUm_ad6XOU7eLbCEdV3bUjJeYoseZrWdpzXqe84-5Bw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] kconfig: Terminate menu blocks with a newline in the
+ generated config
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Alexander Popov <alex.popov@linux.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-Dear,
+On Fri, Apr 19, 2019 at 5:29 AM Alexander Popov <alex.popov@linux.com> wrote:
+>
+> Currently menu blocks start with a pretty header but end with nothing in
+> the generated config. So next config options stick together with the
+> options from the menu block.
+>
+> Let's terminate menu blocks with a newline in the generated config.
+>
+> Signed-off-by: Alexander Popov <alex.popov@linux.com>
 
-I am Mr.Marck Csady a solicitor at law, i need your assistance to
-represent my late client fund valued at $2.5 million dollars that his
-bank wants to comfiscate, You bear the same last name with my late
-client and he is also a national of your country.
+Seems fine to improve readability at a few bytes size increase.
 
-Please if you are interested to assist me then get back to me through
-my private email bellow.
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-i will make all necessary informations known to you,including the name
-of the bank and modes to the repartriation of this fund.
+-Kees
 
-PLEASE REPLY THROUGH MY PRIVATE EMAIL ADDRESS
-Thanks for your understanding
-Marck Csady Esq.
+> ---
+>  scripts/kconfig/confdata.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+> index 08ba146..1459153 100644
+> --- a/scripts/kconfig/confdata.c
+> +++ b/scripts/kconfig/confdata.c
+> @@ -888,6 +888,8 @@ int conf_write(const char *name)
+>                 if (menu->next)
+>                         menu = menu->next;
+>                 else while ((menu = menu->parent)) {
+> +                       if (!menu->sym && menu_is_visible(menu))
+> +                               fprintf(out, "\n");
+>                         if (menu->next) {
+>                                 menu = menu->next;
+>                                 break;
+> --
+> 2.7.4
+>
+
+
+-- 
+Kees Cook
