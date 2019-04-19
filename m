@@ -1,32 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ms.lwn.net ([45.79.88.28]:41090 "EHLO ms.lwn.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725820AbfDSWLB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Apr 2019 18:11:01 -0400
-Date: Fri, 19 Apr 2019 16:10:58 -0600
-From: Jonathan Corbet <corbet@lwn.net>
-Subject: Re: Avoiding merge conflicts while adding new docs - Was: Re:
- [PATCH 00/57] Convert files to ReST
-Message-ID: <20190419161058.3628a29b@lwn.net>
-In-Reply-To: <20190418091526.00e074d1@coco.lan>
-References: <cover.1555382110.git.mchehab+samsung@kernel.org>
-        <20190418091526.00e074d1@coco.lan>
+Received: from mail-it1-f194.google.com ([209.85.166.194]:35686 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726392AbfDSXYM (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Apr 2019 19:24:12 -0400
+Received: by mail-it1-f194.google.com with SMTP id w15so10421902itc.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 19 Apr 2019 16:24:11 -0700 (PDT)
+From: Shuah Khan <skhan@linuxfoundation.org>
+Subject: [PATCH] Makefile: add kselftest-build target
+Date: Fri, 19 Apr 2019 17:24:04 -0600
+Message-Id: <20190419232404.9746-1-skhan@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@infradead.org>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, linux-fbdev@vger.kernel.org, linux-s390@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-watchdog@vger.kernel.org, xdp-newbies@vger.kernel.org, linux-samsung-soc@vger.kernel.org, linux-acpi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, bpf@vger.kernel.org, linux-ide@vger.kernel.org, linux-pm@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-scsi@vger.kernel.org, linux-gpio@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, x86@kernel.org, dm-devel@redhat.com, target-devel@vger.kernel.org, netdev@vger.kernel.org, kexec@lists.infradead.org, linux-fpga@vger.kernel.org, linux-rdma@vger.kernel.org, linux-kbuild@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, linux-security-module@vger.kernel.org, linux-usb@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: Shuah Khan <skhan@linuxfoundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 18 Apr 2019 09:42:23 -0300
-Mauro Carvalho Chehab <mchehab+samsung@kernel.org> wrote:
+One of the use-cases is building kselftest and then installing.
+Adding a target to just build the tests from the main Makefile
+will help users and makes it easier.
 
-> After thinking a little bit and doing some tests, I think a good solution
-> would be to add ":orphan:" markup to the new .rst files that were not
-> added yet into the main body (e. g. something like the enclosed example).
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Interesting...I didn't know about that.  Yes, I think it makes sense to
-put that in...
-
-jon
+diff --git a/Makefile b/Makefile
+index 15c8251d4d5e..38a2ce3c343f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1195,6 +1195,9 @@ endif
+ # ---------------------------------------------------------------------------
+ # Kernel selftest
+ 
++PHONY += kselftest-build
++kselftest-build:
++	$(Q)$(MAKE) -C $(srctree)/tools/testing/selftests all
+ PHONY += kselftest
+ kselftest:
+ 	$(Q)$(MAKE) -C $(srctree)/tools/testing/selftests run_tests
+-- 
+2.17.1
