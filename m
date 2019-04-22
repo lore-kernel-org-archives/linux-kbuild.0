@@ -1,44 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it1-f194.google.com ([209.85.166.194]:35686 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726392AbfDSXYM (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Apr 2019 19:24:12 -0400
-Received: by mail-it1-f194.google.com with SMTP id w15so10421902itc.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 19 Apr 2019 16:24:11 -0700 (PDT)
-From: Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH] Makefile: add kselftest-build target
-Date: Fri, 19 Apr 2019 17:24:04 -0600
-Message-Id: <20190419232404.9746-1-skhan@linuxfoundation.org>
+Received: from mail.kernel.org ([198.145.29.99]:55014 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731226AbfDVTuy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 22 Apr 2019 15:50:54 -0400
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 3.18 15/15] kconfig/[mn]conf: handle backspace (^H) key
+Date: Mon, 22 Apr 2019 15:50:22 -0400
+Message-Id: <20190422195022.13760-15-sashal@kernel.org>
+In-Reply-To: <20190422195022.13760-1-sashal@kernel.org>
+References: <20190422195022.13760-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
-Cc: Shuah Khan <skhan@linuxfoundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Changbin Du <changbin.du@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
 
-One of the use-cases is building kselftest and then installing.
-Adding a target to just build the tests from the main Makefile
-will help users and makes it easier.
+From: Changbin Du <changbin.du@gmail.com>
 
-Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+[ Upstream commit 9c38f1f044080392603c497ecca4d7d09876ff99 ]
+
+Backspace is not working on some terminal emulators which do not send the
+key code defined by terminfo. Terminals either send '^H' (8) or '^?' (127).
+But currently only '^?' is handled. Let's also handle '^H' for those
+terminals.
+
+Signed-off-by: Changbin Du <changbin.du@gmail.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
 ---
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+ scripts/kconfig/lxdialog/inputbox.c | 3 ++-
+ scripts/kconfig/nconf.c             | 2 +-
+ scripts/kconfig/nconf.gui.c         | 3 ++-
+ 3 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 15c8251d4d5e..38a2ce3c343f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1195,6 +1195,9 @@ endif
- # ---------------------------------------------------------------------------
- # Kernel selftest
- 
-+PHONY += kselftest-build
-+kselftest-build:
-+	$(Q)$(MAKE) -C $(srctree)/tools/testing/selftests all
- PHONY += kselftest
- kselftest:
- 	$(Q)$(MAKE) -C $(srctree)/tools/testing/selftests run_tests
+diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
+index d58de1dc5360..510049a7bd1d 100644
+--- a/scripts/kconfig/lxdialog/inputbox.c
++++ b/scripts/kconfig/lxdialog/inputbox.c
+@@ -126,7 +126,8 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
+ 			case KEY_DOWN:
+ 				break;
+ 			case KEY_BACKSPACE:
+-			case 127:
++			case 8:   /* ^H */
++			case 127: /* ^? */
+ 				if (pos) {
+ 					wattrset(dialog, dlg.inputbox.atr);
+ 					if (input_x == 0) {
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index 984489ef2b46..e570f6c9b3ad 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -1046,7 +1046,7 @@ static int do_match(int key, struct match_state *state, int *ans)
+ 		state->match_direction = FIND_NEXT_MATCH_UP;
+ 		*ans = get_mext_match(state->pattern,
+ 				state->match_direction);
+-	} else if (key == KEY_BACKSPACE || key == 127) {
++	} else if (key == KEY_BACKSPACE || key == 8 || key == 127) {
+ 		state->pattern[strlen(state->pattern)-1] = '\0';
+ 		adj_match_dir(&state->match_direction);
+ 	} else
+diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
+index 4b2f44c20caf..9a65035cf787 100644
+--- a/scripts/kconfig/nconf.gui.c
++++ b/scripts/kconfig/nconf.gui.c
+@@ -439,7 +439,8 @@ int dialog_inputbox(WINDOW *main_window,
+ 		case KEY_F(F_EXIT):
+ 		case KEY_F(F_BACK):
+ 			break;
+-		case 127:
++		case 8:   /* ^H */
++		case 127: /* ^? */
+ 		case KEY_BACKSPACE:
+ 			if (cursor_position > 0) {
+ 				memmove(&result[cursor_position-1],
 -- 
-2.17.1
+2.19.1
