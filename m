@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55014 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:54346 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731226AbfDVTuy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 22 Apr 2019 15:50:54 -0400
+        id S1731062AbfDVTuW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 22 Apr 2019 15:50:22 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 3.18 15/15] kconfig/[mn]conf: handle backspace (^H) key
-Date: Mon, 22 Apr 2019 15:50:22 -0400
-Message-Id: <20190422195022.13760-15-sashal@kernel.org>
-In-Reply-To: <20190422195022.13760-1-sashal@kernel.org>
-References: <20190422195022.13760-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 21/21] kconfig/[mn]conf: handle backspace (^H) key
+Date: Mon, 22 Apr 2019 15:49:41 -0400
+Message-Id: <20190422194941.13433-21-sashal@kernel.org>
+In-Reply-To: <20190422194941.13433-1-sashal@kernel.org>
+References: <20190422194941.13433-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -49,7 +49,7 @@ index d58de1dc5360..510049a7bd1d 100644
  					wattrset(dialog, dlg.inputbox.atr);
  					if (input_x == 0) {
 diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 984489ef2b46..e570f6c9b3ad 100644
+index d42d534a66cd..f7049e288e93 100644
 --- a/scripts/kconfig/nconf.c
 +++ b/scripts/kconfig/nconf.c
 @@ -1046,7 +1046,7 @@ static int do_match(int key, struct match_state *state, int *ans)
