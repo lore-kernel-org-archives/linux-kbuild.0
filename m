@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53544 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:52162 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730906AbfDVTtk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 22 Apr 2019 15:49:40 -0400
+        id S1729769AbfDVTsn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 22 Apr 2019 15:48:43 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.9 28/29] kconfig/[mn]conf: handle backspace (^H) key
-Date: Mon, 22 Apr 2019 15:48:47 -0400
-Message-Id: <20190422194848.13049-28-sashal@kernel.org>
-In-Reply-To: <20190422194848.13049-1-sashal@kernel.org>
-References: <20190422194848.13049-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 40/43] kconfig/[mn]conf: handle backspace (^H) key
+Date: Mon, 22 Apr 2019 15:47:24 -0400
+Message-Id: <20190422194727.12495-40-sashal@kernel.org>
+In-Reply-To: <20190422194727.12495-1-sashal@kernel.org>
+References: <20190422194727.12495-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -49,10 +49,10 @@ index d58de1dc5360..510049a7bd1d 100644
  					wattrset(dialog, dlg.inputbox.atr);
  					if (input_x == 0) {
 diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index d42d534a66cd..f7049e288e93 100644
+index 003114779815..e8e1944fa09b 100644
 --- a/scripts/kconfig/nconf.c
 +++ b/scripts/kconfig/nconf.c
-@@ -1046,7 +1046,7 @@ static int do_match(int key, struct match_state *state, int *ans)
+@@ -1048,7 +1048,7 @@ static int do_match(int key, struct match_state *state, int *ans)
  		state->match_direction = FIND_NEXT_MATCH_UP;
  		*ans = get_mext_match(state->pattern,
  				state->match_direction);
@@ -62,7 +62,7 @@ index d42d534a66cd..f7049e288e93 100644
  		adj_match_dir(&state->match_direction);
  	} else
 diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-index 4b2f44c20caf..9a65035cf787 100644
+index a64b1c31253e..0b63357f1d33 100644
 --- a/scripts/kconfig/nconf.gui.c
 +++ b/scripts/kconfig/nconf.gui.c
 @@ -439,7 +439,8 @@ int dialog_inputbox(WINDOW *main_window,
