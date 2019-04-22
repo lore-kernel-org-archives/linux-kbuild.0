@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:46578 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:45570 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729604AbfDVTpG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 22 Apr 2019 15:45:06 -0400
+        id S1729461AbfDVTo1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 22 Apr 2019 15:44:27 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.0 93/98] kconfig/[mn]conf: handle backspace (^H) key
-Date: Mon, 22 Apr 2019 15:42:00 -0400
-Message-Id: <20190422194205.10404-93-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.0 75/98] kbuild: skip parsing pre sub-make code for recursion
+Date: Mon, 22 Apr 2019 15:41:42 -0400
+Message-Id: <20190422194205.10404-75-sashal@kernel.org>
 In-Reply-To: <20190422194205.10404-1-sashal@kernel.org>
 References: <20190422194205.10404-1-sashal@kernel.org>
 MIME-Version: 1.0
@@ -14,66 +14,69 @@ Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Changbin Du <changbin.du@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
 
-From: Changbin Du <changbin.du@gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-[ Upstream commit 9c38f1f044080392603c497ecca4d7d09876ff99 ]
+[ Upstream commit 221cc2d27ddc49b3e06d4637db02bf78e70c573c ]
 
-Backspace is not working on some terminal emulators which do not send the
-key code defined by terminfo. Terminals either send '^H' (8) or '^?' (127).
-But currently only '^?' is handled. Let's also handle '^H' for those
-terminals.
+When Make recurses to the top Makefile with sub-make-done unset,
+the code block surrounded by 'ifneq ($(sub-make-done),1) ... endif'
+is parsed multiple times. This happens for in-tree building of
+include/config/auto.conf, *-pkg, etc. with GNU Make 4.x.
 
-Signed-off-by: Changbin Du <changbin.du@gmail.com>
+This is a slight regression by commit 688931a5ad4e ("kbuild: skip
+sub-make for in-tree build with GNU Make 4.x") in terms of performance
+since that code block contains one $(shell ...) invocation.
+
+Fix it by exporting the variable irrespective of sub-make being run.
+I renamed it because GNU Make cannot properly export variables
+containing hyphens. This is probably a bug of GNU Make, and the issue
+in Kbuild had already been reported by commit 2bfbe7881ee0 ("kbuild:
+Do not use hyphen in exported variable name").
+
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
 ---
- scripts/kconfig/lxdialog/inputbox.c | 3 ++-
- scripts/kconfig/nconf.c             | 2 +-
- scripts/kconfig/nconf.gui.c         | 3 ++-
- 3 files changed, 5 insertions(+), 3 deletions(-)
+ Makefile | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
-index 611945611bf8..1dcfb288ee63 100644
---- a/scripts/kconfig/lxdialog/inputbox.c
-+++ b/scripts/kconfig/lxdialog/inputbox.c
-@@ -113,7 +113,8 @@ do_resize:
- 			case KEY_DOWN:
- 				break;
- 			case KEY_BACKSPACE:
--			case 127:
-+			case 8:   /* ^H */
-+			case 127: /* ^? */
- 				if (pos) {
- 					wattrset(dialog, dlg.inputbox.atr);
- 					if (input_x == 0) {
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index a4670f4e825a..ac92c0ded6c5 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -1048,7 +1048,7 @@ static int do_match(int key, struct match_state *state, int *ans)
- 		state->match_direction = FIND_NEXT_MATCH_UP;
- 		*ans = get_mext_match(state->pattern,
- 				state->match_direction);
--	} else if (key == KEY_BACKSPACE || key == 127) {
-+	} else if (key == KEY_BACKSPACE || key == 8 || key == 127) {
- 		state->pattern[strlen(state->pattern)-1] = '\0';
- 		adj_match_dir(&state->match_direction);
- 	} else
-diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-index 7be620a1fcdb..77f525a8617c 100644
---- a/scripts/kconfig/nconf.gui.c
-+++ b/scripts/kconfig/nconf.gui.c
-@@ -439,7 +439,8 @@ int dialog_inputbox(WINDOW *main_window,
- 		case KEY_F(F_EXIT):
- 		case KEY_F(F_BACK):
- 			break;
--		case 127:
-+		case 8:   /* ^H */
-+		case 127: /* ^? */
- 		case KEY_BACKSPACE:
- 			if (cursor_position > 0) {
- 				memmove(&result[cursor_position-1],
+diff --git a/Makefile b/Makefile
+index ef192ca04330..ed3ad29d2db7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -31,7 +31,7 @@ _all:
+ # descending is started. They are now explicitly listed as the
+ # prepare rule.
+ 
+-ifneq ($(sub-make-done),1)
++ifneq ($(sub_make_done),1)
+ 
+ # Do not use make's built-in rules and variables
+ # (this increases performance and avoids hard-to-debug behaviour)
+@@ -159,6 +159,8 @@ need-sub-make := 1
+ $(lastword $(MAKEFILE_LIST)): ;
+ endif
+ 
++export sub_make_done := 1
++
+ ifeq ($(need-sub-make),1)
+ 
+ PHONY += $(MAKECMDGOALS) sub-make
+@@ -168,12 +170,12 @@ $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
+ 
+ # Invoke a second make in the output directory, passing relevant variables
+ sub-make:
+-	$(Q)$(MAKE) sub-make-done=1 \
++	$(Q)$(MAKE) \
+ 	$(if $(KBUILD_OUTPUT),-C $(KBUILD_OUTPUT) KBUILD_SRC=$(CURDIR)) \
+ 	-f $(CURDIR)/Makefile $(filter-out _all sub-make,$(MAKECMDGOALS))
+ 
+ endif # need-sub-make
+-endif # sub-make-done
++endif # sub_make_done
+ 
+ # We process the rest of the Makefile if this is the final invocation of make
+ ifeq ($(need-sub-make),)
 -- 
 2.19.1
