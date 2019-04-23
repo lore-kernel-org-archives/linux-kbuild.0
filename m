@@ -1,82 +1,121 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:45570 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729461AbfDVTo1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 22 Apr 2019 15:44:27 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.0 75/98] kbuild: skip parsing pre sub-make code for recursion
-Date: Mon, 22 Apr 2019 15:41:42 -0400
-Message-Id: <20190422194205.10404-75-sashal@kernel.org>
-In-Reply-To: <20190422194205.10404-1-sashal@kernel.org>
-References: <20190422194205.10404-1-sashal@kernel.org>
+Received: from mail-vk1-f195.google.com ([209.85.221.195]:45436 "EHLO
+        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725945AbfDWTg5 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 23 Apr 2019 15:36:57 -0400
+Received: by mail-vk1-f195.google.com with SMTP id h127so3467366vkd.12
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Apr 2019 12:36:57 -0700 (PDT)
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com. [209.85.217.53])
+        by smtp.gmail.com with ESMTPSA id d20sm3222765vsq.2.2019.04.23.12.36.56
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 23 Apr 2019 12:36:56 -0700 (PDT)
+Received: by mail-vs1-f53.google.com with SMTP id w13so8987355vsc.4
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Apr 2019 12:36:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190411180117.27704-1-keescook@chromium.org> <20190411180117.27704-2-keescook@chromium.org>
+ <CAK7LNATvNJprA94Qypfub2rpbEEJkAeV3yqVyuk2aNEraDKZ6w@mail.gmail.com>
+In-Reply-To: <CAK7LNATvNJprA94Qypfub2rpbEEJkAeV3yqVyuk2aNEraDKZ6w@mail.gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Tue, 23 Apr 2019 12:36:43 -0700
+Message-ID: <CAGXu5jLNwFfG-x-_Q6nTdU21t5B9z7dCgBekRiJ+MnUE14J12A@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] security: Create "kernel hardening" config area
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Alexander Potapenko <glider@google.com>, James Morris <jmorris@namei.org>, Alexander Popov <alex.popov@linux.com>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, "Serge E. Hallyn" <serge@hallyn.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
+On Thu, Apr 11, 2019 at 6:39 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> On Fri, Apr 12, 2019 at 3:01 AM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > Right now kernel hardening options are scattered around various Kconfig
+> > files. This can be a central place to collect these kinds of options
+> > going forward. This is initially populated with the memory initialization
+> > options from the gcc-plugins.
+> >
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > ---
+> >  scripts/gcc-plugins/Kconfig | 74 +++--------------------------
+> >  security/Kconfig            |  2 +
+> >  security/Kconfig.hardening  | 93 +++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 102 insertions(+), 67 deletions(-)
+> >  create mode 100644 security/Kconfig.hardening
+> >
+> > diff --git a/scripts/gcc-plugins/Kconfig b/scripts/gcc-plugins/Kconfig
+> > index 74271dba4f94..84d471dea2b7 100644
+> > --- a/scripts/gcc-plugins/Kconfig
+> > +++ b/scripts/gcc-plugins/Kconfig
+> > @@ -13,10 +13,11 @@ config HAVE_GCC_PLUGINS
+> >           An arch should select this symbol if it supports building with
+> >           GCC plugins.
+> >
+> > -menuconfig GCC_PLUGINS
+> > -       bool "GCC plugins"
+> > +config GCC_PLUGINS
+> > +       bool
+> >         depends on HAVE_GCC_PLUGINS
+> >         depends on PLUGIN_HOSTCC != ""
+> > +       default y
+> >         help
+> >           GCC plugins are loadable modules that provide extra features to the
+> >           compiler. They are useful for runtime instrumentation and static analysis.
+> > @@ -25,6 +26,8 @@ menuconfig GCC_PLUGINS
+> >
+> >  if GCC_PLUGINS
+> >
+> > +menu "GCC plugins"
+> > +
+>
+>
+>
+> Just a tip to save "if" ... "endif" block.
+>
+>
+> If you like, you can write like follows:
+>
+>
+> menu "GCC plugins"
+>           depends on GCC_PLUGINS
+>
+>   <menu body>
+>
+> endmenu
 
-[ Upstream commit 221cc2d27ddc49b3e06d4637db02bf78e70c573c ]
+Ah yes, thanks! Adjusted.
 
-When Make recurses to the top Makefile with sub-make-done unset,
-the code block surrounded by 'ifneq ($(sub-make-done),1) ... endif'
-is parsed multiple times. This happens for in-tree building of
-include/config/auto.conf, *-pkg, etc. with GNU Make 4.x.
+> > +menu "Memory initialization"
+> > +
+> > +choice
+> > +       prompt "Initialize kernel stack variables at function entry"
+> > +       depends on GCC_PLUGINS
+>
+> On second thought,
+> this 'depends on' is unnecessary
+> because INIT_STACK_NONE should be always visible.
 
-This is a slight regression by commit 688931a5ad4e ("kbuild: skip
-sub-make for in-tree build with GNU Make 4.x") in terms of performance
-since that code block contains one $(shell ...) invocation.
+Oh yes, excellent point. Adjusted.
 
-Fix it by exporting the variable irrespective of sub-make being run.
-I renamed it because GNU Make cannot properly export variables
-containing hyphens. This is probably a bug of GNU Make, and the issue
-in Kbuild had already been reported by commit 2bfbe7881ee0 ("kbuild:
-Do not use hyphen in exported variable name").
+> Another behavior change is
+> GCC_PLUGIN_STRUCTLEAK was previously enabled by all{yes,mod}config,
+> and in the compile-test coverage.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
----
- Makefile | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+I could set the defaults based on CONFIG_COMPILE_TEST, though? I.e.:
 
-diff --git a/Makefile b/Makefile
-index ef192ca04330..ed3ad29d2db7 100644
---- a/Makefile
-+++ b/Makefile
-@@ -31,7 +31,7 @@ _all:
- # descending is started. They are now explicitly listed as the
- # prepare rule.
- 
--ifneq ($(sub-make-done),1)
-+ifneq ($(sub_make_done),1)
- 
- # Do not use make's built-in rules and variables
- # (this increases performance and avoids hard-to-debug behaviour)
-@@ -159,6 +159,8 @@ need-sub-make := 1
- $(lastword $(MAKEFILE_LIST)): ;
- endif
- 
-+export sub_make_done := 1
-+
- ifeq ($(need-sub-make),1)
- 
- PHONY += $(MAKECMDGOALS) sub-make
-@@ -168,12 +170,12 @@ $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
- 
- # Invoke a second make in the output directory, passing relevant variables
- sub-make:
--	$(Q)$(MAKE) sub-make-done=1 \
-+	$(Q)$(MAKE) \
- 	$(if $(KBUILD_OUTPUT),-C $(KBUILD_OUTPUT) KBUILD_SRC=$(CURDIR)) \
- 	-f $(CURDIR)/Makefile $(filter-out _all sub-make,$(MAKECMDGOALS))
- 
- endif # need-sub-make
--endif # sub-make-done
-+endif # sub_make_done
- 
- # We process the rest of the Makefile if this is the final invocation of make
- ifeq ($(need-sub-make),)
+        prompt "Initialize kernel stack variables at function entry"
+        default GCC_PLUGIN_STRUCTLEAK_BYREF_ALL if COMPILE_TEST && GCC_PLUGINS
+        default INIT_STACK_ALL if COMPILE_TEST && CC_HAS_AUTO_VAR_INIT
+        default INIT_STACK_NONE
+
+>
+> It will be disabled for all{yes,mod}config with this patch.
+>
+> This is up to you. Just FYI.
+
+Thanks for looking this over!
+
 -- 
-2.19.1
+Kees Cook
