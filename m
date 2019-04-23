@@ -1,176 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49270 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726029AbfDWUfe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Apr 2019 16:35:34 -0400
-Date: Tue, 23 Apr 2019 16:35:29 -0400
-From: Joe Lawrence <joe.lawrence@redhat.com>
-Subject: Re: [PATCH v3 3/9] livepatch: Add klp-convert tool
-Message-ID: <20190423203529.GA15743@redhat.com>
-References: <20190410155058.9437-1-joe.lawrence@redhat.com>
- <20190410155058.9437-4-joe.lawrence@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190410155058.9437-4-joe.lawrence@redhat.com>
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:56367 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727831AbfDWV1r (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 23 Apr 2019 17:27:47 -0400
+Received: by mail-pf1-f202.google.com with SMTP id l74so10402642pfb.23
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Apr 2019 14:27:47 -0700 (PDT)
+Date: Tue, 23 Apr 2019 14:27:41 -0700
+Message-Id: <20190423212741.12219-1-ndesaulniers@google.com>
+Mime-Version: 1.0
+Subject: [PATCH] kbuild: drop support for cc-ldoption
+From: Nick Desaulniers <ndesaulniers@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Miroslav Benes <mbenes@suse.cz>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, corbet@lwn.net
+Cc: Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Apr 10, 2019 at 11:50:52AM -0400, Joe Lawrence wrote:
-> 
-> [ ... snip ... ]
-> 
-> +static bool convert_rela(struct section *oldsec, struct rela *r,
-> +		struct sympos *sp, struct elf *klp_elf)
-> +{
-> +	struct section *sec;
-> +	struct rela *r1, *r2;
-> +
-> +	sec = get_or_create_klp_rela_section(oldsec, sp, klp_elf);
-> +	if (!sec) {
-> +		WARN("Can't create or access klp.rela section (%s.%s)\n",
-> +				sp->object_name, sp->symbol_name);
-> +		return false;
-> +	}
-> +
-> +	if (!convert_klp_symbol(r->sym, sp)) {
-> +		WARN("Unable to convert symbol name (%s.%s)\n", sec->name,
-> +				r->sym->name);
-> +		return false;
-> +	}
-> +
-> +	/* Move the converted rela to klp rela section */
-> +	list_for_each_entry_safe(r1, r2, &oldsec->relas, list) {
-> +		if (r1->sym->name == r->sym->name) {
-> +			list_del(&r1->list);
-> +			list_add(&r1->list, &sec->relas);
-> +		}
-> +	}
-> +	return true;
-> +}
+If you want to see if your linker supports a certain flag, then ask the
+linker directly with ld-option (not the compiler with cc-ldoption).
+Checking for linker flag support is an antipattern that complicates the
+usage of various linkers other than bfd via -fuse-ld={bfd|gold|lld}.
 
-This one took a while to find and debug, but I believe that
-convert_rela()'s list removal is not as safe as it thinks it is.
-
-Start with its calling context from main() below:
-
-> +	list_for_each_entry_safe(sec, aux, &klp_elf->sections, list) {
-> +		if (!is_rela_section(sec))
-> +			continue;
-> +
-> +		list_for_each_entry_safe(rela, tmprela, &sec->relas, list) {
-> +			if (!must_convert(rela->sym))
-> +				continue;
-> +
-> +			if (!find_missing_position(rela->sym, &sp)) {
-> +				WARN("Unable to find missing symbol: %s",
-> +						rela->sym->name);
-> +				return -1;
-> +			}
-> +			if (!convert_rela(sec, rela, &sp, klp_elf)) {
-> +				WARN("Unable to convert relocation: %s",
-> +						rela->sym->name);
-> +				return -1;
-> +			}
-> +		}
-> +	}
-
-AFAIK the *_safe list traversals, they cache the ->next value at the
-beginning of each iteration, so that one could blow the current element
-in position away.  The cached ->next value is then assigned when moving
-to the next iteration.
-
-But notice how convert_rela() looks through the entire list of
-relocations, moving each rela with a matching symbol?
-
-Consider a slight tweak to samples/livepatch-annotated.c:
+Cc: clang-built-linux@googlegroups.com
+Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+This should probably wait until all of the call sites have been cleaned
+up. Masahiro sent them for arm and arm64, while I sent cleanups for all
+the rest.
 
 
-  static int livepatch_cmdline_proc_show(struct seq_file *m, void *v)
-  {
-+         if (saved_command_line)
-+                 saved_command_line[0] = '\0';
-+
-          seq_printf(m, "%s livepatch=1\n", saved_command_line);
-          return 0;
-  }
+ Documentation/kbuild/makefiles.txt | 14 --------------
+ scripts/Kbuild.include             |  5 -----
+ 2 files changed, 19 deletions(-)
 
-
-On my system, this generates relocations like this:
-
-  % eu-readelf --relocs samples/livepatch/livepatch-annotated-sample.o
-  Relocation section [ 2] '.rela.text' for section [ 1] '.text' at offset 0x98 contains 9 entries:
-    Offset              Type            Value               Addend Name
-    0x0000000000000001  X86_64_PC32     000000000000000000      -4 __fentry__
-    0x0000000000000008  X86_64_PC32     000000000000000000      -4 saved_command_line
-    0x0000000000000017  X86_64_PC32     000000000000000000      -4 saved_command_line
-    0x000000000000001e  X86_64_32S      000000000000000000      +0 .rodata.str1.1
-    0x0000000000000023  X86_64_PC32     000000000000000000      -4 seq_printf
-    0x0000000000000031  X86_64_PC32     000000000000000000      -4 __fentry__
-    0x0000000000000038  X86_64_32S      000000000000000000      +0 .data
-    0x0000000000000051  X86_64_PC32     000000000000000000      -4 __fentry__
-    0x000000000000003d  X86_64_PC32     000000000000000000      -4 klp_enable_patch
-
-We now have back-to-back rela's with sym->name = "saved_command_line".
-When the first is converted, convert_rela() will move both of them to
-the klp rela section.  The linked list values may be consistent, but the
-cached ->next value will be bogus and the in-flight-traversal will run
-off the rails.
-
-
-I think we can work around it with a combination of 1) only moving a
-single rela symbol at a time in convert_rela and 2) processing the
-second (third, etc.) a little bit more so that they are moved
-individually.
-
-I hacked this together and it works against the livepatch-annotate.c
-test above so far...
-
--->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8--
-
-diff --git a/scripts/livepatch/klp-convert.c b/scripts/livepatch/klp-convert.c
-index 82c27d219372..126395f1c0cd 100644
---- a/scripts/livepatch/klp-convert.c
-+++ b/scripts/livepatch/klp-convert.c
-@@ -517,6 +517,7 @@ static bool convert_rela(struct section *oldsec, struct rela *r,
- 		if (r1->sym->name == r->sym->name) {
- 			list_del(&r1->list);
- 			list_add(&r1->list, &sec->relas);
-+			break;
- 		}
- 	}
- 	return true;
-@@ -549,8 +550,8 @@ static bool is_converted(char *sname)
- }
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 03c065855eaf..d65ad5746f94 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -437,20 +437,6 @@ more details, with real examples.
+ 	The second argument is optional, and if supplied will be used
+ 	if first argument is not supported.
  
- /*
-- * Checks if symbol must be converted (conditions):
-- * not resolved, not already converted or isn't an exported symbol
-+ * Checks if symbol must be or was already converted (conditions):
-+ * not resolved or isn't an exported symbol
-  */
- static bool must_convert(struct symbol *sym)
- {
-@@ -566,7 +567,7 @@ static bool must_convert(struct symbol *sym)
- 	if (strcmp(sym->name, ".TOC.") == 0)
- 		return false;
+-    cc-ldoption
+-	cc-ldoption is used to check if $(CC) when used to link object files
+-	supports the given option.  An optional second option may be
+-	specified if first option are not supported.
+-
+-	Example:
+-		#arch/x86/kernel/Makefile
+-		vsyscall-flags += $(call cc-ldoption, -Wl$(comma)--hash-style=sysv)
+-
+-	In the above example, vsyscall-flags will be assigned the option
+-	-Wl$(comma)--hash-style=sysv if it is supported by $(CC).
+-	The second argument is optional, and if supplied will be used
+-	if first argument is not supported.
+-
+     as-instr
+ 	as-instr checks if the assembler reports a specific instruction
+ 	and then outputs either option1 or option2
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 7484b9d8272f..fbfb37d1bcc8 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -138,11 +138,6 @@ cc-disable-warning = $(call try-run,\
+ # Usage:  EXTRA_CFLAGS += $(call cc-ifversion, -lt, 0402, -O1)
+ cc-ifversion = $(shell [ $(CONFIG_GCC_VERSION)0 $(1) $(2)000 ] && echo $(3) || echo $(4))
  
--	return (!(is_converted(sym->name) || is_exported(sym->name)));
-+	return (!is_exported(sym->name));
- }
- 
- /* Checks if a section is a klp rela section */
-@@ -640,7 +641,8 @@ int main(int argc, const char **argv)
- 			if (!must_convert(rela->sym))
- 				continue;
- 
--			if (!find_missing_position(rela->sym, &sp)) {
-+			if (!is_converted(rela->sym->name) &&
-+			    !find_missing_position(rela->sym, &sp)) {
- 				WARN("Unable to find missing symbol: %s",
- 						rela->sym->name);
- 				return -1;
+-# cc-ldoption
+-# Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
+-cc-ldoption = $(call try-run,\
+-	$(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+-
+ # ld-option
+ # Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
+ ld-option = $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2),$(3))
 -- 
-2.20.1
+2.21.0.593.g511ec345e18-goog
