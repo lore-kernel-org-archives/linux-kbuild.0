@@ -1,138 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:51408 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731658AbfDXSTK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Apr 2019 14:19:10 -0400
-Date: Wed, 24 Apr 2019 20:19:07 +0200 (CEST)
-From: Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH v3 0/9] klp-convert livepatch build tooling
-In-Reply-To: <20190417201316.GA690@redhat.com>
-Message-ID: <alpine.LSU.2.21.1904242013310.30239@pobox.suse.cz>
-References: <20190410155058.9437-1-joe.lawrence@redhat.com> <20190417201316.GA690@redhat.com>
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:33974 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727055AbfDXS6Z (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 24 Apr 2019 14:58:25 -0400
+Date: Wed, 24 Apr 2019 14:58:14 -0400
+From: Masayoshi Mizuma <msys.mizuma@gmail.com>
+Subject: Re: [PATCH v1 14/17] Documentation: kunit: add documentation for
+ KUnit
+Message-ID: <20190424185813.xabwr4lt6aunvpsd@gabell>
+References: <20190404220652.19765-1-brendanhiggins@google.com>
+ <20190404220652.19765-15-brendanhiggins@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190404220652.19765-15-brendanhiggins@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Lawrence <joe.lawrence@redhat.com>
-Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
+To: Brendan Higgins <brendanhiggins@google.com>
+Cc: corbet@lwn.net, frowand.list@gmail.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, shuah@kernel.org, yamada.masahiro@socionext.com, pmladek@suse.com, linux-doc@vger.kernel.org, amir73il@gmail.com, dri-devel@lists.freedesktop.org, Alexander.Levin@microsoft.com, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, khilman@baylibre.com, knut.omang@oracle.com, Felix Guo <felixguoxiuping@gmail.com>, wfg@linux.intel.com, joel@jms.id.au, jdike@addtoit.com, dan.carpenter@oracle.com, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org, Tim.Bird@sony.com, linux-um@lists.infradead.org, rostedt@goodmis.org, julia.lawall@lip6.fr, kunit-dev@googlegroups.com, richard@nod.at, gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, daniel@ffwll.ch, mpe@ellerman.id.au, linux-fsdevel@vger.kernel.org
 
-[...]
+Hi Brendan,
 
-> Result: a small tweak to sympos_sanity_check() to relax its symbol
-> uniqueness verification:  allow for duplicate <object, name, position>
-> instances.  Now it will only complain when a supplied symbol references
-> the same <object, name> but a different <position>.
-> 
-> diff --git a/scripts/livepatch/klp-convert.c b/scripts/livepatch/klp-convert.c
-> index 82c27d219372..713835dfc9ec 100644
-> --- a/scripts/livepatch/klp-convert.c
-> +++ b/scripts/livepatch/klp-convert.c
-> @@ -194,7 +194,10 @@ static void clear_sympos_annontations(struct elf *klp_elf)
->  	}
->  }
-> 
-> -/* Checks if two or more elements in usr_symbols have the same name */
-> +/*
-> + * Checks if two or more elements in usr_symbols have the same
-> + * object and name, but different symbol position
-> + */
->  static bool sympos_sanity_check(void)
->  {
->  	bool sane = true;
-> @@ -203,7 +206,9 @@ static bool sympos_sanity_check(void)
->  	list_for_each_entry(sp, &usr_symbols, list) {
->  		aux = list_next_entry(sp, list);
->  		list_for_each_entry_from(aux, &usr_symbols, list) {
-> -			if (strcmp(sp->symbol_name, aux->symbol_name) == 0) {
-> +			if (sp->pos != aux->pos &&
-> +			    strcmp(sp->object_name, aux->object_name) == 0 &&
-> +			    strcmp(sp->symbol_name, aux->symbol_name) == 0)
->  				WARN("Conflicting KLP_SYMPOS definition: %s.%s,%d vs. %s.%s,%d.",
->  				sp->object_name, sp->symbol_name, sp->pos,
->  				aux->object_name, aux->symbol_name, aux->pos);
+KUNIT_ASSERT_NOT_ERR_OR_NULL() should be replaced to
+KUNIT_EXPECT_NOT_ERR_OR_NULL(), right?
 
-Looks good and I'd definitely include it in v4.
+On Thu, Apr 04, 2019 at 03:06:49PM -0700, Brendan Higgins wrote:
+> Add documentation for KUnit, the Linux kernel unit testing framework.
+> - Add intro and usage guide for KUnit
+> - Add API reference
+> 
+> Signed-off-by: Felix Guo <felixguoxiuping@gmail.com>
+> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+> ---
 
-> Unique sympos
-> -------------
-> 
-> But even with the above workaround, specifying unique symbol positions
-> will (and should) result in a klp-convert complaint.
-> 
-> When modifying the test module with unique symbol position annotation
-> values (1 and 2 respectively):
-> 
->   test_klp_convert_multi_objs_a.c:
-> 
->     extern void *state_show;
->     ...
->     KLP_MODULE_RELOC(vmlinux) vmlinux_relocs_b[] = {
->             KLP_SYMPOS(state_show, 1)
->     };
-> 
->   test_klp_convert_multi_objs_b.c:
-> 
->     extern void *state_show;
->     ...
->     KLP_MODULE_RELOC(vmlinux) vmlinux_relocs_b[] = {
->             KLP_SYMPOS(state_show, 2)
->     };
-> 
-> 
-> Each object file's symbol table contains a "state_show" instance:
-> 
->   % eu-readelf --symbols lib/livepatch/test_klp_convert_multi_objs_a.o | grep '\<state_show\>'
->      30: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
-> 
->   % eu-readelf --symbols lib/livepatch/test_klp_convert_multi_objs_b.o | grep '\<state_show\>'
->      20: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
-> 
-> and the intermediate test_klp_convert_multi_objs.klp.o file contains a
-> combined .klp.module_relocs.vmlinux relocation section with two
-> KLP_SYMPOS structures, each with a unique <sympos> value:
-> 
->   % objcopy -O binary --only-section=.klp.module_relocs.vmlinux \
->       lib/livepatch/test_klp_convert_multi_objs.klp.o >(hexdump)
-> 
->   0000000 0000 0000 0000 0000 0001 0000 0000 0000
->   0000010 0000 0000 0002 0000
-> 
-> but the symbol tables were merged, sorted and non-unique symbols
-> removed, leaving a *single* unresolved "state_show" instance:
-> 
->   % eu-readelf --symbols lib/livepatch/test_klp_convert_multi_objs.klp.o | grep '\<state_show\>'
->      53: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
-> 
-> which means that even though we have separate relocations for each
-> "state_show" instance:
-> 
->   Relocation section [ 6] '.rela.text.unlikely' for section [ 5] '.text.unlikely' at offset 0x44510 contains 11 entries:
->     Offset              Type            Value               Addend Name
->     0x0000000000000003  X86_64_32S      000000000000000000      +0 state_show
->     ...
->     0x0000000000000034  X86_64_32S      000000000000000000      +0 state_show
->     ...
-> 
-> they share the same rela->sym and there is no way to distinguish which
-> one correlates to which KLP_SYMPOS structure.
-> 
-> 
-> Future Work
-> -----------
->
-> I don't see an easy way to support multiple homonym <object, name>
-> symbols with unique <position> values in the current livepatch module
-> Elf format.  The only solutions that come to mind right now include
-> renaming homonym symbols somehow to retain the relocation->symbol
-> relationship when separate object files are combined.  Perhaps an
-> intermediate linker step could make annotated symbols unique in some way
-> to achieve this.  /thinking out loud
+<snip>
 
-I'd set this aside for now and we can return to it later. I think it could 
-be quite rare in practice.
+> diff --git a/Documentation/kunit/start.rst b/Documentation/kunit/start.rst
+> new file mode 100644
+> index 0000000000000..5cdba5091905e
+> --- /dev/null
+> +++ b/Documentation/kunit/start.rst
 
-I was thinking about renaming the symbol too. We can extend the symbol 
-naming convention we have now and deal with it in klp_resolve_symbols(), 
-but maybe Josh will come up with something clever and cleaner.
- 
-Miroslav
+<snip>
+
+> +Assertions
+> +~~~~~~~~~~
+> +
+> +KUnit also has the concept of an *assertion*. An assertion is just like an
+> +expectation except the assertion immediately terminates the test case if it is
+> +not satisfied.
+> +
+> +For example:
+> +
+> +.. code-block:: c
+> +
+> +	static void mock_test_do_expect_default_return(struct kunit *test)
+> +	{
+> +		struct mock_test_context *ctx = test->priv;
+> +		struct mock *mock = ctx->mock;
+> +		int param0 = 5, param1 = -5;
+> +		const char *two_param_types[] = {"int", "int"};
+> +		const void *two_params[] = {&param0, &param1};
+> +		const void *ret;
+> +
+> +		ret = mock->do_expect(mock,
+> +				      "test_printk", test_printk,
+> +				      two_param_types, two_params,
+> +				      ARRAY_SIZE(two_params));
+
+> +		KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ret);
+
+		KUNIT_EXPECT_NOT_ERR_OR_NULL(test, ret);
+
+> +		KUNIT_EXPECT_EQ(test, -4, *((int *) ret));
+> +	}
+> +
+> +In this example, the method under test should return a pointer to a value, so
+> +if the pointer returned by the method is null or an errno, we don't want to
+> +bother continuing the test since the following expectation could crash the test
+
+> +case. `ASSERT_NOT_ERR_OR_NULL(...)` allows us to bail out of the test case if
+
+  +case. `KUNIT_EXPECT_NOT_ERR_OR_NULL(...)` allows us to bail out of the test case if
+
+Thanks!
+Masa
