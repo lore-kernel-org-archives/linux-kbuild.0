@@ -1,48 +1,138 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:12194 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733024AbfDXR4K (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Apr 2019 13:56:10 -0400
-From: Daniel Dadap <ddadap@nvidia.com>
-Subject: [PATCH] scripts: override locale from environment when running recordmcount.pl
-Date: Wed, 24 Apr 2019 13:55:50 -0400
-Message-ID: <20190424175550.142553-1-ddadap@nvidia.com>
+Received: from mx2.suse.de ([195.135.220.15]:51408 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731658AbfDXSTK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 24 Apr 2019 14:19:10 -0400
+Date: Wed, 24 Apr 2019 20:19:07 +0200 (CEST)
+From: Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH v3 0/9] klp-convert livepatch build tooling
+In-Reply-To: <20190417201316.GA690@redhat.com>
+Message-ID: <alpine.LSU.2.21.1904242013310.30239@pobox.suse.cz>
+References: <20190410155058.9437-1-joe.lawrence@redhat.com> <20190417201316.GA690@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Daniel Dadap <ddadap@nvidia.com>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
-recordmcount.pl uses a set of regular expressions to parse the output of
-objdump(1). However, if objdump(1) output is localized, it may not match
-the regular expressions, thereby preventing recordmcount.pl from parsing
-object files correctly.
+[...]
 
-In order to allow recordmcount.pl to function correctly regardless of the
-current locale settings, set LANG=C when running objdump(1). LC_ALL is
-already unset in the top-level Makefile, so it is not necessary to also
-override that environment variable.
+> Result: a small tweak to sympos_sanity_check() to relax its symbol
+> uniqueness verification:  allow for duplicate <object, name, position>
+> instances.  Now it will only complain when a supplied symbol references
+> the same <object, name> but a different <position>.
+> 
+> diff --git a/scripts/livepatch/klp-convert.c b/scripts/livepatch/klp-convert.c
+> index 82c27d219372..713835dfc9ec 100644
+> --- a/scripts/livepatch/klp-convert.c
+> +++ b/scripts/livepatch/klp-convert.c
+> @@ -194,7 +194,10 @@ static void clear_sympos_annontations(struct elf *klp_elf)
+>  	}
+>  }
+> 
+> -/* Checks if two or more elements in usr_symbols have the same name */
+> +/*
+> + * Checks if two or more elements in usr_symbols have the same
+> + * object and name, but different symbol position
+> + */
+>  static bool sympos_sanity_check(void)
+>  {
+>  	bool sane = true;
+> @@ -203,7 +206,9 @@ static bool sympos_sanity_check(void)
+>  	list_for_each_entry(sp, &usr_symbols, list) {
+>  		aux = list_next_entry(sp, list);
+>  		list_for_each_entry_from(aux, &usr_symbols, list) {
+> -			if (strcmp(sp->symbol_name, aux->symbol_name) == 0) {
+> +			if (sp->pos != aux->pos &&
+> +			    strcmp(sp->object_name, aux->object_name) == 0 &&
+> +			    strcmp(sp->symbol_name, aux->symbol_name) == 0)
+>  				WARN("Conflicting KLP_SYMPOS definition: %s.%s,%d vs. %s.%s,%d.",
+>  				sp->object_name, sp->symbol_name, sp->pos,
+>  				aux->object_name, aux->symbol_name, aux->pos);
 
-Signed-off-by: Daniel Dadap <ddadap@nvidia.com>
-Reviewed-by: Robert Morell <rmorell@nvidia.com>
----
- scripts/recordmcount.pl | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Looks good and I'd definitely include it in v4.
 
-diff --git a/scripts/recordmcount.pl b/scripts/recordmcount.pl
-index 68841d01162c..b7bcdc71e6e8 100755
---- a/scripts/recordmcount.pl
-+++ b/scripts/recordmcount.pl
-@@ -493,7 +493,7 @@ sub update_funcs
- #
- # Step 2: find the sections and mcount call sites
- #
--open(IN, "$objdump -hdr $inputfile|") || die "error running $objdump";
-+open(IN, "env LANG=C $objdump -hdr $inputfile|") || die "error running $objdump";
+> Unique sympos
+> -------------
+> 
+> But even with the above workaround, specifying unique symbol positions
+> will (and should) result in a klp-convert complaint.
+> 
+> When modifying the test module with unique symbol position annotation
+> values (1 and 2 respectively):
+> 
+>   test_klp_convert_multi_objs_a.c:
+> 
+>     extern void *state_show;
+>     ...
+>     KLP_MODULE_RELOC(vmlinux) vmlinux_relocs_b[] = {
+>             KLP_SYMPOS(state_show, 1)
+>     };
+> 
+>   test_klp_convert_multi_objs_b.c:
+> 
+>     extern void *state_show;
+>     ...
+>     KLP_MODULE_RELOC(vmlinux) vmlinux_relocs_b[] = {
+>             KLP_SYMPOS(state_show, 2)
+>     };
+> 
+> 
+> Each object file's symbol table contains a "state_show" instance:
+> 
+>   % eu-readelf --symbols lib/livepatch/test_klp_convert_multi_objs_a.o | grep '\<state_show\>'
+>      30: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+> 
+>   % eu-readelf --symbols lib/livepatch/test_klp_convert_multi_objs_b.o | grep '\<state_show\>'
+>      20: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+> 
+> and the intermediate test_klp_convert_multi_objs.klp.o file contains a
+> combined .klp.module_relocs.vmlinux relocation section with two
+> KLP_SYMPOS structures, each with a unique <sympos> value:
+> 
+>   % objcopy -O binary --only-section=.klp.module_relocs.vmlinux \
+>       lib/livepatch/test_klp_convert_multi_objs.klp.o >(hexdump)
+> 
+>   0000000 0000 0000 0000 0000 0001 0000 0000 0000
+>   0000010 0000 0000 0002 0000
+> 
+> but the symbol tables were merged, sorted and non-unique symbols
+> removed, leaving a *single* unresolved "state_show" instance:
+> 
+>   % eu-readelf --symbols lib/livepatch/test_klp_convert_multi_objs.klp.o | grep '\<state_show\>'
+>      53: 0000000000000000      0 NOTYPE  GLOBAL DEFAULT    UNDEF state_show
+> 
+> which means that even though we have separate relocations for each
+> "state_show" instance:
+> 
+>   Relocation section [ 6] '.rela.text.unlikely' for section [ 5] '.text.unlikely' at offset 0x44510 contains 11 entries:
+>     Offset              Type            Value               Addend Name
+>     0x0000000000000003  X86_64_32S      000000000000000000      +0 state_show
+>     ...
+>     0x0000000000000034  X86_64_32S      000000000000000000      +0 state_show
+>     ...
+> 
+> they share the same rela->sym and there is no way to distinguish which
+> one correlates to which KLP_SYMPOS structure.
+> 
+> 
+> Future Work
+> -----------
+>
+> I don't see an easy way to support multiple homonym <object, name>
+> symbols with unique <position> values in the current livepatch module
+> Elf format.  The only solutions that come to mind right now include
+> renaming homonym symbols somehow to retain the relocation->symbol
+> relationship when separate object files are combined.  Perhaps an
+> intermediate linker step could make annotated symbols unique in some way
+> to achieve this.  /thinking out loud
+
+I'd set this aside for now and we can return to it later. I think it could 
+be quite rare in practice.
+
+I was thinking about renaming the symbol too. We can extend the symbol 
+naming convention we have now and deal with it in klp_resolve_symbols(), 
+but maybe Josh will come up with something clever and cleaner.
  
- my $text;
- 
--- 
-2.18.1
+Miroslav
