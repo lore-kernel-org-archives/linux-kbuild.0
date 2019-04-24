@@ -1,100 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:17750 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726474AbfDXDvu (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:23762 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725440AbfDXEG2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Apr 2019 23:51:50 -0400
+        Wed, 24 Apr 2019 00:06:28 -0400
 MIME-Version: 1.0
-References: <20190423212741.12219-1-ndesaulniers@google.com>
-In-Reply-To: <20190423212741.12219-1-ndesaulniers@google.com>
+References: <20190411180117.27704-1-keescook@chromium.org> <20190411180117.27704-2-keescook@chromium.org>
+ <CAK7LNATvNJprA94Qypfub2rpbEEJkAeV3yqVyuk2aNEraDKZ6w@mail.gmail.com> <CAGXu5jLNwFfG-x-_Q6nTdU21t5B9z7dCgBekRiJ+MnUE14J12A@mail.gmail.com>
+In-Reply-To: <CAGXu5jLNwFfG-x-_Q6nTdU21t5B9z7dCgBekRiJ+MnUE14J12A@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 24 Apr 2019 12:51:03 +0900
-Message-ID: <CAK7LNAS9zy92MZQ7qj3xQtS+MeYr2cVsrekcBv8yVG6Qu0Fzkw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: drop support for cc-ldoption
+Date: Wed, 24 Apr 2019 13:05:44 +0900
+Message-ID: <CAK7LNASwf6Q_q-wtqxCuz7-HOYiBdQ-5QbhOCkhX8Ujh01oLNA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] security: Create "kernel hardening" config area
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, clang-built-linux@googlegroups.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Alexander Potapenko <glider@google.com>, James Morris <jmorris@namei.org>, Alexander Popov <alex.popov@linux.com>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, "Serge E. Hallyn" <serge@hallyn.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Apr 24, 2019 at 6:27 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
+On Wed, Apr 24, 2019 at 4:36 AM Kees Cook <keescook@chromium.org> wrote:
 >
-> If you want to see if your linker supports a certain flag, then ask the
-> linker directly with ld-option (not the compiler with cc-ldoption).
-> Checking for linker flag support is an antipattern that complicates the
-> usage of various linkers other than bfd via -fuse-ld={bfd|gold|lld}.
+> On Thu, Apr 11, 2019 at 6:39 PM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> >
+> > On Fri, Apr 12, 2019 at 3:01 AM Kees Cook <keescook@chromium.org> wrote:
+> > >
+> > > Right now kernel hardening options are scattered around various Kconfig
+> > > files. This can be a central place to collect these kinds of options
+> > > going forward. This is initially populated with the memory initialization
+> > > options from the gcc-plugins.
+> > >
+> > > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > > ---
+> > >  scripts/gcc-plugins/Kconfig | 74 +++--------------------------
+> > >  security/Kconfig            |  2 +
+> > >  security/Kconfig.hardening  | 93 +++++++++++++++++++++++++++++++++++++
+> > >  3 files changed, 102 insertions(+), 67 deletions(-)
+> > >  create mode 100644 security/Kconfig.hardening
+> > >
+> > > diff --git a/scripts/gcc-plugins/Kconfig b/scripts/gcc-plugins/Kconfig
+> > > index 74271dba4f94..84d471dea2b7 100644
+> > > --- a/scripts/gcc-plugins/Kconfig
+> > > +++ b/scripts/gcc-plugins/Kconfig
+> > > @@ -13,10 +13,11 @@ config HAVE_GCC_PLUGINS
+> > >           An arch should select this symbol if it supports building with
+> > >           GCC plugins.
+> > >
+> > > -menuconfig GCC_PLUGINS
+> > > -       bool "GCC plugins"
+> > > +config GCC_PLUGINS
+> > > +       bool
+> > >         depends on HAVE_GCC_PLUGINS
+> > >         depends on PLUGIN_HOSTCC != ""
+> > > +       default y
+> > >         help
+> > >           GCC plugins are loadable modules that provide extra features to the
+> > >           compiler. They are useful for runtime instrumentation and static analysis.
+> > > @@ -25,6 +26,8 @@ menuconfig GCC_PLUGINS
+> > >
+> > >  if GCC_PLUGINS
+> > >
+> > > +menu "GCC plugins"
+> > > +
+> >
+> >
+> >
+> > Just a tip to save "if" ... "endif" block.
+> >
+> >
+> > If you like, you can write like follows:
+> >
+> >
+> > menu "GCC plugins"
+> >           depends on GCC_PLUGINS
+> >
+> >   <menu body>
+> >
+> > endmenu
 >
-> Cc: clang-built-linux@googlegroups.com
-> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> ---
-> This should probably wait until all of the call sites have been cleaned
-> up.
-
-Indeed.
-Please remind me if I forget to apply this.
-
-
-> Masahiro sent them for arm and arm64, while I sent cleanups for all
-> the rest.
-
-Thanks. I did not even notice cc-ldoption were checking
-quite old flags.
-
-
-
-
+> Ah yes, thanks! Adjusted.
 >
+> > > +menu "Memory initialization"
+> > > +
+> > > +choice
+> > > +       prompt "Initialize kernel stack variables at function entry"
+> > > +       depends on GCC_PLUGINS
+> >
+> > On second thought,
+> > this 'depends on' is unnecessary
+> > because INIT_STACK_NONE should be always visible.
 >
->  Documentation/kbuild/makefiles.txt | 14 --------------
->  scripts/Kbuild.include             |  5 -----
->  2 files changed, 19 deletions(-)
+> Oh yes, excellent point. Adjusted.
 >
-> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-> index 03c065855eaf..d65ad5746f94 100644
-> --- a/Documentation/kbuild/makefiles.txt
-> +++ b/Documentation/kbuild/makefiles.txt
-> @@ -437,20 +437,6 @@ more details, with real examples.
->         The second argument is optional, and if supplied will be used
->         if first argument is not supported.
+> > Another behavior change is
+> > GCC_PLUGIN_STRUCTLEAK was previously enabled by all{yes,mod}config,
+> > and in the compile-test coverage.
 >
-> -    cc-ldoption
-> -       cc-ldoption is used to check if $(CC) when used to link object files
-> -       supports the given option.  An optional second option may be
-> -       specified if first option are not supported.
-> -
-> -       Example:
-> -               #arch/x86/kernel/Makefile
-> -               vsyscall-flags += $(call cc-ldoption, -Wl$(comma)--hash-style=sysv)
-> -
-> -       In the above example, vsyscall-flags will be assigned the option
-> -       -Wl$(comma)--hash-style=sysv if it is supported by $(CC).
-> -       The second argument is optional, and if supplied will be used
-> -       if first argument is not supported.
-> -
->      as-instr
->         as-instr checks if the assembler reports a specific instruction
->         and then outputs either option1 or option2
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index 7484b9d8272f..fbfb37d1bcc8 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -138,11 +138,6 @@ cc-disable-warning = $(call try-run,\
->  # Usage:  EXTRA_CFLAGS += $(call cc-ifversion, -lt, 0402, -O1)
->  cc-ifversion = $(shell [ $(CONFIG_GCC_VERSION)0 $(1) $(2)000 ] && echo $(3) || echo $(4))
+> I could set the defaults based on CONFIG_COMPILE_TEST, though? I.e.:
 >
-> -# cc-ldoption
-> -# Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
-> -cc-ldoption = $(call try-run,\
-> -       $(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
-> -
->  # ld-option
->  # Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
->  ld-option = $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2),$(3))
-> --
-> 2.21.0.593.g511ec345e18-goog
->
+>         prompt "Initialize kernel stack variables at function entry"
+>         default GCC_PLUGIN_STRUCTLEAK_BYREF_ALL if COMPILE_TEST && GCC_PLUGINS
+>         default INIT_STACK_ALL if COMPILE_TEST && CC_HAS_AUTO_VAR_INIT
+>         default INIT_STACK_NONE
+
+Looks a good idea to me.
+
+Thanks.
+
 
 
 -- 
