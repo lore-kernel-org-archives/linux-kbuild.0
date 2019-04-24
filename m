@@ -1,89 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56488 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728550AbfDXVAw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Apr 2019 17:00:52 -0400
-Subject: Re: [PATCH v3 3/9] livepatch: Add klp-convert tool
-References: <20190410155058.9437-1-joe.lawrence@redhat.com>
- <20190410155058.9437-4-joe.lawrence@redhat.com>
- <20190423203529.GA15743@redhat.com>
- <alpine.LSU.2.21.1904241941230.30239@pobox.suse.cz>
-From: Joe Lawrence <joe.lawrence@redhat.com>
-Message-ID: <4581c471-e6ac-16a8-1bee-bb03a4476bf6@redhat.com>
-Date: Wed, 24 Apr 2019 17:00:50 -0400
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:41727 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730957AbfDXVHT (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 24 Apr 2019 17:07:19 -0400
+Received: by mail-ua1-f67.google.com with SMTP id g23so926563uan.8
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Apr 2019 14:07:18 -0700 (PDT)
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com. [209.85.217.44])
+        by smtp.gmail.com with ESMTPSA id n13sm20989vsl.28.2019.04.24.14.07.17
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 24 Apr 2019 14:07:17 -0700 (PDT)
+Received: by mail-vs1-f44.google.com with SMTP id n17so2953274vsr.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Apr 2019 14:07:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <alpine.LSU.2.21.1904241941230.30239@pobox.suse.cz>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190423194925.32151-1-keescook@chromium.org> <20190423194925.32151-3-keescook@chromium.org>
+ <84ed0a4b-b1e5-ae86-56c1-40a212734667@linux.com>
+In-Reply-To: <84ed0a4b-b1e5-ae86-56c1-40a212734667@linux.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 24 Apr 2019 14:02:02 -0700
+Message-ID: <CAGXu5jKkv2EvxZEO_V_0djDhaW-+WToZ2D477_PRnnMfAFDpTA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] security: Move stackleak config to Kconfig.hardening
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miroslav Benes <mbenes@suse.cz>
-Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
+To: Alexander Popov <alex.popov@linux.com>
+Cc: Alexander Potapenko <glider@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, James Morris <jmorris@namei.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, "Serge E. Hallyn" <serge@hallyn.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 4/24/19 1:47 PM, Miroslav Benes wrote:
-> On Tue, 23 Apr 2019, Joe Lawrence wrote:
->> diff --git a/scripts/livepatch/klp-convert.c b/scripts/livepatch/klp-convert.c
->> index 82c27d219372..126395f1c0cd 100644
->> --- a/scripts/livepatch/klp-convert.c
->> +++ b/scripts/livepatch/klp-convert.c
->> @@ -517,6 +517,7 @@ static bool convert_rela(struct section *oldsec, struct rela *r,
->>   		if (r1->sym->name == r->sym->name) {
->>   			list_del(&r1->list);
->>   			list_add(&r1->list, &sec->relas);
->> +			break;
->>   		}
->>   	}
->>   	return true;
-> 
-> Couldn't we remove the loop all together instead of breaking it?
-> 
-> 	list_del(&r->list);
-> 	list_add(&r->list, &sec->relas);
-> 
-> could be sufficient.
+On Wed, Apr 24, 2019 at 8:25 AM Alexander Popov <alex.popov@linux.com> wrote:
+>
+> On 23.04.2019 22:49, Kees Cook wrote:
+> > This moves the stackleak plugin options to Kconfig.hardening's memory
+> > initialization menu.
+> >
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
+>
+> Hello Kees,
+>
+> I see the changes in STACKLEAK help, looks good to me.
+> For this patch -
+>   Reviewed-by: Alexander Popov <alex.popov@linux.com>
 
-Ah yea, good point.
+Thanks!
 
-> 
->> @@ -549,8 +550,8 @@ static bool is_converted(char *sname)
->>   }
->>   
->>   /*
->> - * Checks if symbol must be converted (conditions):
->> - * not resolved, not already converted or isn't an exported symbol
->> + * Checks if symbol must be or was already converted (conditions):
->> + * not resolved or isn't an exported symbol
->>    */
->>   static bool must_convert(struct symbol *sym)
->>   {
->> @@ -566,7 +567,7 @@ static bool must_convert(struct symbol *sym)
->>   	if (strcmp(sym->name, ".TOC.") == 0)
->>   		return false;
->>   
->> -	return (!(is_converted(sym->name) || is_exported(sym->name)));
->> +	return (!is_exported(sym->name));
->>   }
->>   
->>   /* Checks if a section is a klp rela section */
->> @@ -640,7 +641,8 @@ int main(int argc, const char **argv)
->>   			if (!must_convert(rela->sym))
->>   				continue;
->>   
->> -			if (!find_missing_position(rela->sym, &sp)) {
->> +			if (!is_converted(rela->sym->name) &&
->> +			    !find_missing_position(rela->sym, &sp)) {
->>   				WARN("Unable to find missing symbol: %s",
->>   						rela->sym->name);
->>   				return -1;
-> 
-> Looks good.
+> By the way, for your information, GCC_PLUGIN_STRUCTLEAK help is now unreachable
+> from 'make menuconfig'.
 
-There were a few additional spots I needed to update (like main's 
-section walk doesn't need to re-convert klp_rela_sections, and likewise, 
-convert_rela doesn't need to re-convert_klp_symbol), but I will include 
-with v4 for a real review.
+Good point. I'll see if I can find a sensible place to move this to.
+There isn't really a place for just the plugin details any more...
+hmm.
 
-Thanks,
-
--- Joe
+-- 
+Kees Cook
