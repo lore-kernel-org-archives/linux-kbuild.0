@@ -1,187 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43948 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2391156AbfDXRrb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Apr 2019 13:47:31 -0400
-Date: Wed, 24 Apr 2019 19:47:27 +0200 (CEST)
-From: Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH v3 3/9] livepatch: Add klp-convert tool
-In-Reply-To: <20190423203529.GA15743@redhat.com>
-Message-ID: <alpine.LSU.2.21.1904241941230.30239@pobox.suse.cz>
-References: <20190410155058.9437-1-joe.lawrence@redhat.com> <20190410155058.9437-4-joe.lawrence@redhat.com> <20190423203529.GA15743@redhat.com>
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:12194 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733024AbfDXR4K (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 24 Apr 2019 13:56:10 -0400
+From: Daniel Dadap <ddadap@nvidia.com>
+Subject: [PATCH] scripts: override locale from environment when running recordmcount.pl
+Date: Wed, 24 Apr 2019 13:55:50 -0400
+Message-ID: <20190424175550.142553-1-ddadap@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Lawrence <joe.lawrence@redhat.com>
-Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Daniel Dadap <ddadap@nvidia.com>
 
-On Tue, 23 Apr 2019, Joe Lawrence wrote:
+recordmcount.pl uses a set of regular expressions to parse the output of
+objdump(1). However, if objdump(1) output is localized, it may not match
+the regular expressions, thereby preventing recordmcount.pl from parsing
+object files correctly.
 
-> On Wed, Apr 10, 2019 at 11:50:52AM -0400, Joe Lawrence wrote:
-> > 
-> > [ ... snip ... ]
-> > 
-> > +static bool convert_rela(struct section *oldsec, struct rela *r,
-> > +		struct sympos *sp, struct elf *klp_elf)
-> > +{
-> > +	struct section *sec;
-> > +	struct rela *r1, *r2;
-> > +
-> > +	sec = get_or_create_klp_rela_section(oldsec, sp, klp_elf);
-> > +	if (!sec) {
-> > +		WARN("Can't create or access klp.rela section (%s.%s)\n",
-> > +				sp->object_name, sp->symbol_name);
-> > +		return false;
-> > +	}
-> > +
-> > +	if (!convert_klp_symbol(r->sym, sp)) {
-> > +		WARN("Unable to convert symbol name (%s.%s)\n", sec->name,
-> > +				r->sym->name);
-> > +		return false;
-> > +	}
-> > +
-> > +	/* Move the converted rela to klp rela section */
-> > +	list_for_each_entry_safe(r1, r2, &oldsec->relas, list) {
-> > +		if (r1->sym->name == r->sym->name) {
-> > +			list_del(&r1->list);
-> > +			list_add(&r1->list, &sec->relas);
-> > +		}
-> > +	}
-> > +	return true;
-> > +}
-> 
-> This one took a while to find and debug, but I believe that
-> convert_rela()'s list removal is not as safe as it thinks it is.
-> 
-> Start with its calling context from main() below:
-> 
-> > +	list_for_each_entry_safe(sec, aux, &klp_elf->sections, list) {
-> > +		if (!is_rela_section(sec))
-> > +			continue;
-> > +
-> > +		list_for_each_entry_safe(rela, tmprela, &sec->relas, list) {
-> > +			if (!must_convert(rela->sym))
-> > +				continue;
-> > +
-> > +			if (!find_missing_position(rela->sym, &sp)) {
-> > +				WARN("Unable to find missing symbol: %s",
-> > +						rela->sym->name);
-> > +				return -1;
-> > +			}
-> > +			if (!convert_rela(sec, rela, &sp, klp_elf)) {
-> > +				WARN("Unable to convert relocation: %s",
-> > +						rela->sym->name);
-> > +				return -1;
-> > +			}
-> > +		}
-> > +	}
-> 
-> AFAIK the *_safe list traversals, they cache the ->next value at the
-> beginning of each iteration, so that one could blow the current element
-> in position away.  The cached ->next value is then assigned when moving
-> to the next iteration.
-> 
-> But notice how convert_rela() looks through the entire list of
-> relocations, moving each rela with a matching symbol?
-> 
-> Consider a slight tweak to samples/livepatch-annotated.c:
-> 
-> 
->   static int livepatch_cmdline_proc_show(struct seq_file *m, void *v)
->   {
-> +         if (saved_command_line)
-> +                 saved_command_line[0] = '\0';
-> +
->           seq_printf(m, "%s livepatch=1\n", saved_command_line);
->           return 0;
->   }
-> 
-> 
-> On my system, this generates relocations like this:
-> 
->   % eu-readelf --relocs samples/livepatch/livepatch-annotated-sample.o
->   Relocation section [ 2] '.rela.text' for section [ 1] '.text' at offset 0x98 contains 9 entries:
->     Offset              Type            Value               Addend Name
->     0x0000000000000001  X86_64_PC32     000000000000000000      -4 __fentry__
->     0x0000000000000008  X86_64_PC32     000000000000000000      -4 saved_command_line
->     0x0000000000000017  X86_64_PC32     000000000000000000      -4 saved_command_line
->     0x000000000000001e  X86_64_32S      000000000000000000      +0 .rodata.str1.1
->     0x0000000000000023  X86_64_PC32     000000000000000000      -4 seq_printf
->     0x0000000000000031  X86_64_PC32     000000000000000000      -4 __fentry__
->     0x0000000000000038  X86_64_32S      000000000000000000      +0 .data
->     0x0000000000000051  X86_64_PC32     000000000000000000      -4 __fentry__
->     0x000000000000003d  X86_64_PC32     000000000000000000      -4 klp_enable_patch
-> 
-> We now have back-to-back rela's with sym->name = "saved_command_line".
-> When the first is converted, convert_rela() will move both of them to
-> the klp rela section.  The linked list values may be consistent, but the
-> cached ->next value will be bogus and the in-flight-traversal will run
-> off the rails.
+In order to allow recordmcount.pl to function correctly regardless of the
+current locale settings, set LANG=C when running objdump(1). LC_ALL is
+already unset in the top-level Makefile, so it is not necessary to also
+override that environment variable.
 
-Yep, valid, if I'm reading the code correctly.
+Signed-off-by: Daniel Dadap <ddadap@nvidia.com>
+Reviewed-by: Robert Morell <rmorell@nvidia.com>
+---
+ scripts/recordmcount.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> I think we can work around it with a combination of 1) only moving a
-> single rela symbol at a time in convert_rela and 2) processing the
-> second (third, etc.) a little bit more so that they are moved
-> individually.
-> 
-> I hacked this together and it works against the livepatch-annotate.c
-> test above so far...
-> 
-> -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8--
-> 
-> diff --git a/scripts/livepatch/klp-convert.c b/scripts/livepatch/klp-convert.c
-> index 82c27d219372..126395f1c0cd 100644
-> --- a/scripts/livepatch/klp-convert.c
-> +++ b/scripts/livepatch/klp-convert.c
-> @@ -517,6 +517,7 @@ static bool convert_rela(struct section *oldsec, struct rela *r,
->  		if (r1->sym->name == r->sym->name) {
->  			list_del(&r1->list);
->  			list_add(&r1->list, &sec->relas);
-> +			break;
->  		}
->  	}
->  	return true;
-
-Couldn't we remove the loop all together instead of breaking it?
-
-	list_del(&r->list);
-	list_add(&r->list, &sec->relas);
-
-could be sufficient.
-
-> @@ -549,8 +550,8 @@ static bool is_converted(char *sname)
->  }
->  
->  /*
-> - * Checks if symbol must be converted (conditions):
-> - * not resolved, not already converted or isn't an exported symbol
-> + * Checks if symbol must be or was already converted (conditions):
-> + * not resolved or isn't an exported symbol
->   */
->  static bool must_convert(struct symbol *sym)
->  {
-> @@ -566,7 +567,7 @@ static bool must_convert(struct symbol *sym)
->  	if (strcmp(sym->name, ".TOC.") == 0)
->  		return false;
->  
-> -	return (!(is_converted(sym->name) || is_exported(sym->name)));
-> +	return (!is_exported(sym->name));
->  }
->  
->  /* Checks if a section is a klp rela section */
-> @@ -640,7 +641,8 @@ int main(int argc, const char **argv)
->  			if (!must_convert(rela->sym))
->  				continue;
->  
-> -			if (!find_missing_position(rela->sym, &sp)) {
-> +			if (!is_converted(rela->sym->name) &&
-> +			    !find_missing_position(rela->sym, &sp)) {
->  				WARN("Unable to find missing symbol: %s",
->  						rela->sym->name);
->  				return -1;
-
-Looks good.
-
-Miroslav
+diff --git a/scripts/recordmcount.pl b/scripts/recordmcount.pl
+index 68841d01162c..b7bcdc71e6e8 100755
+--- a/scripts/recordmcount.pl
++++ b/scripts/recordmcount.pl
+@@ -493,7 +493,7 @@ sub update_funcs
+ #
+ # Step 2: find the sections and mcount call sites
+ #
+-open(IN, "$objdump -hdr $inputfile|") || die "error running $objdump";
++open(IN, "env LANG=C $objdump -hdr $inputfile|") || die "error running $objdump";
+ 
+ my $text;
+ 
+-- 
+2.18.1
