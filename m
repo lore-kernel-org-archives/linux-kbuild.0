@@ -1,180 +1,187 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:38272 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731065AbfDXPZz (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Apr 2019 11:25:55 -0400
-Reply-To: alex.popov@linux.com
-Subject: Re: [PATCH v3 2/3] security: Move stackleak config to
- Kconfig.hardening
-References: <20190423194925.32151-1-keescook@chromium.org>
- <20190423194925.32151-3-keescook@chromium.org>
-From: Alexander Popov <alex.popov@linux.com>
-Message-ID: <84ed0a4b-b1e5-ae86-56c1-40a212734667@linux.com>
-Date: Wed, 24 Apr 2019 18:25:45 +0300
+Received: from mx2.suse.de ([195.135.220.15]:43948 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2391156AbfDXRrb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 24 Apr 2019 13:47:31 -0400
+Date: Wed, 24 Apr 2019 19:47:27 +0200 (CEST)
+From: Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH v3 3/9] livepatch: Add klp-convert tool
+In-Reply-To: <20190423203529.GA15743@redhat.com>
+Message-ID: <alpine.LSU.2.21.1904241941230.30239@pobox.suse.cz>
+References: <20190410155058.9437-1-joe.lawrence@redhat.com> <20190410155058.9437-4-joe.lawrence@redhat.com> <20190423203529.GA15743@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190423194925.32151-3-keescook@chromium.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>, Alexander Potapenko <glider@google.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, James Morris <jmorris@namei.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, "Serge E. Hallyn" <serge@hallyn.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Joao Moreira <jmoreira@suse.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
 
-On 23.04.2019 22:49, Kees Cook wrote:
-> This moves the stackleak plugin options to Kconfig.hardening's memory
-> initialization menu.
+On Tue, 23 Apr 2019, Joe Lawrence wrote:
+
+> On Wed, Apr 10, 2019 at 11:50:52AM -0400, Joe Lawrence wrote:
+> > 
+> > [ ... snip ... ]
+> > 
+> > +static bool convert_rela(struct section *oldsec, struct rela *r,
+> > +		struct sympos *sp, struct elf *klp_elf)
+> > +{
+> > +	struct section *sec;
+> > +	struct rela *r1, *r2;
+> > +
+> > +	sec = get_or_create_klp_rela_section(oldsec, sp, klp_elf);
+> > +	if (!sec) {
+> > +		WARN("Can't create or access klp.rela section (%s.%s)\n",
+> > +				sp->object_name, sp->symbol_name);
+> > +		return false;
+> > +	}
+> > +
+> > +	if (!convert_klp_symbol(r->sym, sp)) {
+> > +		WARN("Unable to convert symbol name (%s.%s)\n", sec->name,
+> > +				r->sym->name);
+> > +		return false;
+> > +	}
+> > +
+> > +	/* Move the converted rela to klp rela section */
+> > +	list_for_each_entry_safe(r1, r2, &oldsec->relas, list) {
+> > +		if (r1->sym->name == r->sym->name) {
+> > +			list_del(&r1->list);
+> > +			list_add(&r1->list, &sec->relas);
+> > +		}
+> > +	}
+> > +	return true;
+> > +}
 > 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-
-Hello Kees,
-
-I see the changes in STACKLEAK help, looks good to me.
-For this patch -
-  Reviewed-by: Alexander Popov <alex.popov@linux.com>
-
-
-By the way, for your information, GCC_PLUGIN_STRUCTLEAK help is now unreachable
-from 'make menuconfig'.
-
-Best regards,
-Alexander
-
-
-> ---
->  scripts/gcc-plugins/Kconfig | 51 ---------------------------------
->  security/Kconfig.hardening  | 57 +++++++++++++++++++++++++++++++++++++
->  2 files changed, 57 insertions(+), 51 deletions(-)
+> This one took a while to find and debug, but I believe that
+> convert_rela()'s list removal is not as safe as it thinks it is.
 > 
-> diff --git a/scripts/gcc-plugins/Kconfig b/scripts/gcc-plugins/Kconfig
-> index 352f03878a1e..80220ed26a35 100644
-> --- a/scripts/gcc-plugins/Kconfig
-> +++ b/scripts/gcc-plugins/Kconfig
-> @@ -108,57 +108,6 @@ config GCC_PLUGIN_RANDSTRUCT_PERFORMANCE
->  	  in structures.  This reduces the performance hit of RANDSTRUCT
->  	  at the cost of weakened randomization.
->  
-> -config GCC_PLUGIN_STACKLEAK
-> -	bool "Erase the kernel stack before returning from syscalls"
-> -	depends on GCC_PLUGINS
-> -	depends on HAVE_ARCH_STACKLEAK
-> -	help
-> -	  This option makes the kernel erase the kernel stack before
-> -	  returning from system calls. That reduces the information which
-> -	  kernel stack leak bugs can reveal and blocks some uninitialized
-> -	  stack variable attacks.
-> -
-> -	  The tradeoff is the performance impact: on a single CPU system kernel
-> -	  compilation sees a 1% slowdown, other systems and workloads may vary
-> -	  and you are advised to test this feature on your expected workload
-> -	  before deploying it.
-> -
-> -	  This plugin was ported from grsecurity/PaX. More information at:
-> -	   * https://grsecurity.net/
-> -	   * https://pax.grsecurity.net/
-> -
-> -config STACKLEAK_TRACK_MIN_SIZE
-> -	int "Minimum stack frame size of functions tracked by STACKLEAK"
-> -	default 100
-> -	range 0 4096
-> -	depends on GCC_PLUGIN_STACKLEAK
-> -	help
-> -	  The STACKLEAK gcc plugin instruments the kernel code for tracking
-> -	  the lowest border of the kernel stack (and for some other purposes).
-> -	  It inserts the stackleak_track_stack() call for the functions with
-> -	  a stack frame size greater than or equal to this parameter.
-> -	  If unsure, leave the default value 100.
-> -
-> -config STACKLEAK_METRICS
-> -	bool "Show STACKLEAK metrics in the /proc file system"
-> -	depends on GCC_PLUGIN_STACKLEAK
-> -	depends on PROC_FS
-> -	help
-> -	  If this is set, STACKLEAK metrics for every task are available in
-> -	  the /proc file system. In particular, /proc/<pid>/stack_depth
-> -	  shows the maximum kernel stack consumption for the current and
-> -	  previous syscalls. Although this information is not precise, it
-> -	  can be useful for estimating the STACKLEAK performance impact for
-> -	  your workloads.
-> -
-> -config STACKLEAK_RUNTIME_DISABLE
-> -	bool "Allow runtime disabling of kernel stack erasing"
-> -	depends on GCC_PLUGIN_STACKLEAK
-> -	help
-> -	  This option provides 'stack_erasing' sysctl, which can be used in
-> -	  runtime to control kernel stack erasing for kernels built with
-> -	  CONFIG_GCC_PLUGIN_STACKLEAK.
-> -
->  config GCC_PLUGIN_ARM_SSP_PER_TASK
->  	bool
->  	depends on GCC_PLUGINS && ARM
-> diff --git a/security/Kconfig.hardening b/security/Kconfig.hardening
-> index 19881341f1c2..a96d4a43ca65 100644
-> --- a/security/Kconfig.hardening
-> +++ b/security/Kconfig.hardening
-> @@ -88,6 +88,63 @@ config GCC_PLUGIN_STRUCTLEAK_VERBOSE
->  	  initialized. Since not all existing initializers are detected
->  	  by the plugin, this can produce false positive warnings.
->  
-> +config GCC_PLUGIN_STACKLEAK
-> +	bool "Poison kernel stack before returning from syscalls"
-> +	depends on GCC_PLUGINS
-> +	depends on HAVE_ARCH_STACKLEAK
-> +	help
-> +	  This option makes the kernel erase the kernel stack before
-> +	  returning from system calls. This has the effect of leaving
-> +	  the stack initialized to the poison value, which both reduces
-> +	  the lifetime of any sensitive stack contents and reduces
-> +	  potential for uninitialized stack variable exploits or information
-> +	  exposures (it does not cover functions reaching the same stack
-> +	  depth as prior functions during the same syscall). This blocks
-> +	  most uninitialized stack variable attacks, with the performance
-> +	  impact being driven by the depth of the stack usage, rather than
-> +	  the function calling complexity.
-> +
-> +	  The performance impact on a single CPU system kernel compilation
-> +	  sees a 1% slowdown, other systems and workloads may vary and you
-> +	  are advised to test this feature on your expected workload before
-> +	  deploying it.
-> +
-> +	  This plugin was ported from grsecurity/PaX. More information at:
-> +	   * https://grsecurity.net/
-> +	   * https://pax.grsecurity.net/
-> +
-> +config STACKLEAK_TRACK_MIN_SIZE
-> +	int "Minimum stack frame size of functions tracked by STACKLEAK"
-> +	default 100
-> +	range 0 4096
-> +	depends on GCC_PLUGIN_STACKLEAK
-> +	help
-> +	  The STACKLEAK gcc plugin instruments the kernel code for tracking
-> +	  the lowest border of the kernel stack (and for some other purposes).
-> +	  It inserts the stackleak_track_stack() call for the functions with
-> +	  a stack frame size greater than or equal to this parameter.
-> +	  If unsure, leave the default value 100.
-> +
-> +config STACKLEAK_METRICS
-> +	bool "Show STACKLEAK metrics in the /proc file system"
-> +	depends on GCC_PLUGIN_STACKLEAK
-> +	depends on PROC_FS
-> +	help
-> +	  If this is set, STACKLEAK metrics for every task are available in
-> +	  the /proc file system. In particular, /proc/<pid>/stack_depth
-> +	  shows the maximum kernel stack consumption for the current and
-> +	  previous syscalls. Although this information is not precise, it
-> +	  can be useful for estimating the STACKLEAK performance impact for
-> +	  your workloads.
-> +
-> +config STACKLEAK_RUNTIME_DISABLE
-> +	bool "Allow runtime disabling of kernel stack erasing"
-> +	depends on GCC_PLUGIN_STACKLEAK
-> +	help
-> +	  This option provides 'stack_erasing' sysctl, which can be used in
-> +	  runtime to control kernel stack erasing for kernels built with
-> +	  CONFIG_GCC_PLUGIN_STACKLEAK.
-> +
->  endmenu
->  
->  endmenu
+> Start with its calling context from main() below:
 > 
+> > +	list_for_each_entry_safe(sec, aux, &klp_elf->sections, list) {
+> > +		if (!is_rela_section(sec))
+> > +			continue;
+> > +
+> > +		list_for_each_entry_safe(rela, tmprela, &sec->relas, list) {
+> > +			if (!must_convert(rela->sym))
+> > +				continue;
+> > +
+> > +			if (!find_missing_position(rela->sym, &sp)) {
+> > +				WARN("Unable to find missing symbol: %s",
+> > +						rela->sym->name);
+> > +				return -1;
+> > +			}
+> > +			if (!convert_rela(sec, rela, &sp, klp_elf)) {
+> > +				WARN("Unable to convert relocation: %s",
+> > +						rela->sym->name);
+> > +				return -1;
+> > +			}
+> > +		}
+> > +	}
+> 
+> AFAIK the *_safe list traversals, they cache the ->next value at the
+> beginning of each iteration, so that one could blow the current element
+> in position away.  The cached ->next value is then assigned when moving
+> to the next iteration.
+> 
+> But notice how convert_rela() looks through the entire list of
+> relocations, moving each rela with a matching symbol?
+> 
+> Consider a slight tweak to samples/livepatch-annotated.c:
+> 
+> 
+>   static int livepatch_cmdline_proc_show(struct seq_file *m, void *v)
+>   {
+> +         if (saved_command_line)
+> +                 saved_command_line[0] = '\0';
+> +
+>           seq_printf(m, "%s livepatch=1\n", saved_command_line);
+>           return 0;
+>   }
+> 
+> 
+> On my system, this generates relocations like this:
+> 
+>   % eu-readelf --relocs samples/livepatch/livepatch-annotated-sample.o
+>   Relocation section [ 2] '.rela.text' for section [ 1] '.text' at offset 0x98 contains 9 entries:
+>     Offset              Type            Value               Addend Name
+>     0x0000000000000001  X86_64_PC32     000000000000000000      -4 __fentry__
+>     0x0000000000000008  X86_64_PC32     000000000000000000      -4 saved_command_line
+>     0x0000000000000017  X86_64_PC32     000000000000000000      -4 saved_command_line
+>     0x000000000000001e  X86_64_32S      000000000000000000      +0 .rodata.str1.1
+>     0x0000000000000023  X86_64_PC32     000000000000000000      -4 seq_printf
+>     0x0000000000000031  X86_64_PC32     000000000000000000      -4 __fentry__
+>     0x0000000000000038  X86_64_32S      000000000000000000      +0 .data
+>     0x0000000000000051  X86_64_PC32     000000000000000000      -4 __fentry__
+>     0x000000000000003d  X86_64_PC32     000000000000000000      -4 klp_enable_patch
+> 
+> We now have back-to-back rela's with sym->name = "saved_command_line".
+> When the first is converted, convert_rela() will move both of them to
+> the klp rela section.  The linked list values may be consistent, but the
+> cached ->next value will be bogus and the in-flight-traversal will run
+> off the rails.
+
+Yep, valid, if I'm reading the code correctly.
+
+> I think we can work around it with a combination of 1) only moving a
+> single rela symbol at a time in convert_rela and 2) processing the
+> second (third, etc.) a little bit more so that they are moved
+> individually.
+> 
+> I hacked this together and it works against the livepatch-annotate.c
+> test above so far...
+> 
+> -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8--
+> 
+> diff --git a/scripts/livepatch/klp-convert.c b/scripts/livepatch/klp-convert.c
+> index 82c27d219372..126395f1c0cd 100644
+> --- a/scripts/livepatch/klp-convert.c
+> +++ b/scripts/livepatch/klp-convert.c
+> @@ -517,6 +517,7 @@ static bool convert_rela(struct section *oldsec, struct rela *r,
+>  		if (r1->sym->name == r->sym->name) {
+>  			list_del(&r1->list);
+>  			list_add(&r1->list, &sec->relas);
+> +			break;
+>  		}
+>  	}
+>  	return true;
+
+Couldn't we remove the loop all together instead of breaking it?
+
+	list_del(&r->list);
+	list_add(&r->list, &sec->relas);
+
+could be sufficient.
+
+> @@ -549,8 +550,8 @@ static bool is_converted(char *sname)
+>  }
+>  
+>  /*
+> - * Checks if symbol must be converted (conditions):
+> - * not resolved, not already converted or isn't an exported symbol
+> + * Checks if symbol must be or was already converted (conditions):
+> + * not resolved or isn't an exported symbol
+>   */
+>  static bool must_convert(struct symbol *sym)
+>  {
+> @@ -566,7 +567,7 @@ static bool must_convert(struct symbol *sym)
+>  	if (strcmp(sym->name, ".TOC.") == 0)
+>  		return false;
+>  
+> -	return (!(is_converted(sym->name) || is_exported(sym->name)));
+> +	return (!is_exported(sym->name));
+>  }
+>  
+>  /* Checks if a section is a klp rela section */
+> @@ -640,7 +641,8 @@ int main(int argc, const char **argv)
+>  			if (!must_convert(rela->sym))
+>  				continue;
+>  
+> -			if (!find_missing_position(rela->sym, &sp)) {
+> +			if (!is_converted(rela->sym->name) &&
+> +			    !find_missing_position(rela->sym, &sp)) {
+>  				WARN("Unable to find missing symbol: %s",
+>  						rela->sym->name);
+>  				return -1;
+
+Looks good.
+
+Miroslav
