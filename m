@@ -1,71 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45464 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727018AbfDXTbY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Apr 2019 15:31:24 -0400
-Subject: Re: [PATCH v3 0/9] klp-convert livepatch build tooling
-References: <20190410155058.9437-1-joe.lawrence@redhat.com>
- <20190417201316.GA690@redhat.com>
- <alpine.LSU.2.21.1904242013310.30239@pobox.suse.cz>
- <bcedf943-6c94-5d23-a637-4f29daf21eda@suse.de>
-From: Joe Lawrence <joe.lawrence@redhat.com>
-Message-ID: <97990f04-9c4c-17ad-901c-5285901d5a7f@redhat.com>
-Date: Wed, 24 Apr 2019 15:31:21 -0400
+Received: from mail-ua1-f65.google.com ([209.85.222.65]:39459 "EHLO
+        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731821AbfDXUrC (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 24 Apr 2019 16:47:02 -0400
+Received: by mail-ua1-f65.google.com with SMTP id d5so6516702uan.6
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Apr 2019 13:47:01 -0700 (PDT)
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com. [209.85.221.177])
+        by smtp.gmail.com with ESMTPSA id l15sm3409162vsq.22.2019.04.24.13.46.57
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 24 Apr 2019 13:46:57 -0700 (PDT)
+Received: by mail-vk1-f177.google.com with SMTP id h127so4346056vkd.12
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Apr 2019 13:46:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <bcedf943-6c94-5d23-a637-4f29daf21eda@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190423194925.32151-1-keescook@chromium.org> <CAK7LNARuX8XfO=YRX9dYpipyBTCtMbQqLJfuk6iMLfLdZe1-KQ@mail.gmail.com>
+In-Reply-To: <CAK7LNARuX8XfO=YRX9dYpipyBTCtMbQqLJfuk6iMLfLdZe1-KQ@mail.gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 24 Apr 2019 13:46:45 -0700
+Message-ID: <CAGXu5jJfYBTt836K7-SNdwZcHf9RhXKxRj+xefn_hhogt2UEnA@mail.gmail.com>
+Subject: Re: [PATCH v3 0/3] Refactor memory initialization hardening
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joao Moreira <jmoreira@suse.de>, Miroslav Benes <mbenes@suse.cz>
-Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Jiri Kosina <jikos@kernel.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Konstantin Khlebnikov <khlebnikov@yandex-team.ru>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michael Matz <matz@suse.de>, Nicolai Stange <nstange@suse.de>, Petr Mladek <pmladek@suse.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Alexander Potapenko <glider@google.com>, James Morris <jmorris@namei.org>, Alexander Popov <alex.popov@linux.com>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, "Serge E. Hallyn" <serge@hallyn.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 4/24/19 3:13 PM, Joao Moreira wrote:
->>> Future Work
->>> -----------
->>>
->>> I don't see an easy way to support multiple homonym <object, name>
->>> symbols with unique <position> values in the current livepatch module
->>> Elf format.  The only solutions that come to mind right now include
->>> renaming homonym symbols somehow to retain the relocation->symbol
->>> relationship when separate object files are combined.  Perhaps an
->>> intermediate linker step could make annotated symbols unique in some way
->>> to achieve this.  /thinking out loud
->> I'd set this aside for now and we can return to it later. I think it could
->> be quite rare in practice.
+On Tue, Apr 23, 2019 at 9:07 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> On Wed, Apr 24, 2019 at 4:49 AM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > This refactors the stack memory initialization configs in order to
+> > keep things together when adding Clang stack initialization, and in
+> > preparation for future heap memory initialization configs.
+> >
+> > I intend to carry this in the gcc-plugins tree, but I'd really like
+> > to get Acks from Masahiro (Kconfig changes, Makefile change), and
+> > from James (adding the new Kconfig.hardening to security/Kconfig).
+>
+> If needed,
+> Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-I agree, especially since we can detect this corner case and abort the 
-translation.
+Great; thanks! :)
 
->> I was thinking about renaming the symbol too. We can extend the symbol
->> naming convention we have now and deal with it in klp_resolve_symbols(),
->> but maybe Josh will come up with something clever and cleaner.
-> I think this could work well, but (sorry if I understood Joe's idea
-> wrongly) not as a linker step. Instead of modifying the linker, I think
-> we could create another tool and plug it into the kbuild pipeline prior
-> to the livepatch module linking. This way, we would parse the .o elf
-> files, check for homonyms and rename them based on a convention that is
-> later understood by klp-convert, as suggested.
-
-My knowledge of the build tools is limited, so there was a bunch of 
-hand-waving you couldn't see when I wrote that paragraph :) But yes, 
-that is basically the idea: plugging into the kbuild pipeline to give 
-these some kinda of .o-unique prefix that klp-convert would interpret 
-and strip accordingly.
-
-> If I am not missing something, this would fix the case where we have
-> homonyms pointing to the same or different positions, without additional
-> user intervention other then adding the SYMPOS annotations.
-> 
-> If you consider this to be useful I can start experiencing.
-> 
-
-It's not the highest priority, but even a prototype of how to insert a 
-script into the pipeline to achieve this would be massively time saving 
-for myself.  If renaming looks easy, we could try to work into the 
-initial klp-convert patchset... if not, save it for a follow up enhancement.
-
-Thanks,
-
--- Joe
+-- 
+Kees Cook
