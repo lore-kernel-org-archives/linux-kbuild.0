@@ -1,112 +1,180 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk1-f196.google.com ([209.85.221.196]:45616 "EHLO
-        mail-vk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730811AbfDXPDA (ORCPT
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:38272 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731065AbfDXPZz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Apr 2019 11:03:00 -0400
-Received: by mail-vk1-f196.google.com with SMTP id h127so4089527vkd.12
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Apr 2019 08:02:59 -0700 (PDT)
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com. [209.85.221.175])
-        by smtp.gmail.com with ESMTPSA id y1sm10794953uai.0.2019.04.24.08.02.57
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Apr 2019 08:02:57 -0700 (PDT)
-Received: by mail-vk1-f175.google.com with SMTP id x2so4094101vkx.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Apr 2019 08:02:57 -0700 (PDT)
+        Wed, 24 Apr 2019 11:25:55 -0400
+Reply-To: alex.popov@linux.com
+Subject: Re: [PATCH v3 2/3] security: Move stackleak config to
+ Kconfig.hardening
+References: <20190423194925.32151-1-keescook@chromium.org>
+ <20190423194925.32151-3-keescook@chromium.org>
+From: Alexander Popov <alex.popov@linux.com>
+Message-ID: <84ed0a4b-b1e5-ae86-56c1-40a212734667@linux.com>
+Date: Wed, 24 Apr 2019 18:25:45 +0300
 MIME-Version: 1.0
-References: <1556107369-7655-1-git-send-email-alex.popov@linux.com>
-In-Reply-To: <1556107369-7655-1-git-send-email-alex.popov@linux.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Wed, 24 Apr 2019 08:02:45 -0700
-Message-ID: <CAGXu5jLJeC4oAagPGSquKi_EVvA9+aZkjtASGwriGMeR_dxwnQ@mail.gmail.com>
-Subject: Re: [v2 1/1] kconfig: Terminate menu blocks with a comment in the
- generated config
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190423194925.32151-3-keescook@chromium.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Popov <alex.popov@linux.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Kees Cook <keescook@chromium.org>, Alexander Potapenko <glider@google.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, James Morris <jmorris@namei.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, "Serge E. Hallyn" <serge@hallyn.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Apr 24, 2019 at 5:03 AM Alexander Popov <alex.popov@linux.com> wrote:
->
-> Currently menu blocks start with a pretty header but end with nothing in
-> the generated config. So next config options stick together with the
-> options from the menu block.
->
-> Let's terminate menu blocks in the generated config with a comment and
-> a newline if needed. Example:
->
-> ...
-> CONFIG_BPF_STREAM_PARSER=y
-> CONFIG_NET_FLOW_LIMIT=y
->
-> #
-> # Network testing
-> #
-> CONFIG_NET_PKTGEN=y
-> CONFIG_NET_DROP_MONITOR=y
-> # end of Network testing
-> # end of Networking options
->
-> CONFIG_HAMRADIO=y
-> ...
->
-> Signed-off-by: Alexander Popov <alex.popov@linux.com>
+On 23.04.2019 22:49, Kees Cook wrote:
+> This moves the stackleak plugin options to Kconfig.hardening's memory
+> initialization menu.
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Hello Kees,
 
--Kees
+I see the changes in STACKLEAK help, looks good to me.
+For this patch -
+  Reviewed-by: Alexander Popov <alex.popov@linux.com>
+
+
+By the way, for your information, GCC_PLUGIN_STRUCTLEAK help is now unreachable
+from 'make menuconfig'.
+
+Best regards,
+Alexander
+
 
 > ---
->  scripts/kconfig/confdata.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index 08ba146..486b4c7 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -819,6 +819,7 @@ int conf_write(const char *name)
->         struct menu *menu;
->         const char *basename;
->         const char *str;
-> +       bool need_newline = false;
->         char dirname[PATH_MAX+1], tmpname[PATH_MAX+22], newname[PATH_MAX+8];
->         char *env;
->
-> @@ -871,12 +872,16 @@ int conf_write(const char *name)
->                                      "#\n"
->                                      "# %s\n"
->                                      "#\n", str);
-> +                       need_newline = false;
->                 } else if (!(sym->flags & SYMBOL_CHOICE)) {
->                         sym_calc_value(sym);
->                         if (!(sym->flags & SYMBOL_WRITE))
->                                 goto next;
-> +                       if (need_newline) {
-> +                               fprintf(out, "\n");
-> +                               need_newline = false;
-> +                       }
->                         sym->flags &= ~SYMBOL_WRITE;
+>  scripts/gcc-plugins/Kconfig | 51 ---------------------------------
+>  security/Kconfig.hardening  | 57 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 57 insertions(+), 51 deletions(-)
+> 
+> diff --git a/scripts/gcc-plugins/Kconfig b/scripts/gcc-plugins/Kconfig
+> index 352f03878a1e..80220ed26a35 100644
+> --- a/scripts/gcc-plugins/Kconfig
+> +++ b/scripts/gcc-plugins/Kconfig
+> @@ -108,57 +108,6 @@ config GCC_PLUGIN_RANDSTRUCT_PERFORMANCE
+>  	  in structures.  This reduces the performance hit of RANDSTRUCT
+>  	  at the cost of weakened randomization.
+>  
+> -config GCC_PLUGIN_STACKLEAK
+> -	bool "Erase the kernel stack before returning from syscalls"
+> -	depends on GCC_PLUGINS
+> -	depends on HAVE_ARCH_STACKLEAK
+> -	help
+> -	  This option makes the kernel erase the kernel stack before
+> -	  returning from system calls. That reduces the information which
+> -	  kernel stack leak bugs can reveal and blocks some uninitialized
+> -	  stack variable attacks.
 > -
->                         conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
->                 }
->
-> @@ -888,6 +893,11 @@ int conf_write(const char *name)
->                 if (menu->next)
->                         menu = menu->next;
->                 else while ((menu = menu->parent)) {
-> +                       if (!menu->sym && menu_is_visible(menu)) {
-> +                               str = menu_get_prompt(menu);
-> +                               fprintf(out, "# end of %s\n", str);
-> +                               need_newline = true;
-> +                       }
->                         if (menu->next) {
->                                 menu = menu->next;
->                                 break;
-> --
-> 2.7.4
->
-
-
--- 
-Kees Cook
+> -	  The tradeoff is the performance impact: on a single CPU system kernel
+> -	  compilation sees a 1% slowdown, other systems and workloads may vary
+> -	  and you are advised to test this feature on your expected workload
+> -	  before deploying it.
+> -
+> -	  This plugin was ported from grsecurity/PaX. More information at:
+> -	   * https://grsecurity.net/
+> -	   * https://pax.grsecurity.net/
+> -
+> -config STACKLEAK_TRACK_MIN_SIZE
+> -	int "Minimum stack frame size of functions tracked by STACKLEAK"
+> -	default 100
+> -	range 0 4096
+> -	depends on GCC_PLUGIN_STACKLEAK
+> -	help
+> -	  The STACKLEAK gcc plugin instruments the kernel code for tracking
+> -	  the lowest border of the kernel stack (and for some other purposes).
+> -	  It inserts the stackleak_track_stack() call for the functions with
+> -	  a stack frame size greater than or equal to this parameter.
+> -	  If unsure, leave the default value 100.
+> -
+> -config STACKLEAK_METRICS
+> -	bool "Show STACKLEAK metrics in the /proc file system"
+> -	depends on GCC_PLUGIN_STACKLEAK
+> -	depends on PROC_FS
+> -	help
+> -	  If this is set, STACKLEAK metrics for every task are available in
+> -	  the /proc file system. In particular, /proc/<pid>/stack_depth
+> -	  shows the maximum kernel stack consumption for the current and
+> -	  previous syscalls. Although this information is not precise, it
+> -	  can be useful for estimating the STACKLEAK performance impact for
+> -	  your workloads.
+> -
+> -config STACKLEAK_RUNTIME_DISABLE
+> -	bool "Allow runtime disabling of kernel stack erasing"
+> -	depends on GCC_PLUGIN_STACKLEAK
+> -	help
+> -	  This option provides 'stack_erasing' sysctl, which can be used in
+> -	  runtime to control kernel stack erasing for kernels built with
+> -	  CONFIG_GCC_PLUGIN_STACKLEAK.
+> -
+>  config GCC_PLUGIN_ARM_SSP_PER_TASK
+>  	bool
+>  	depends on GCC_PLUGINS && ARM
+> diff --git a/security/Kconfig.hardening b/security/Kconfig.hardening
+> index 19881341f1c2..a96d4a43ca65 100644
+> --- a/security/Kconfig.hardening
+> +++ b/security/Kconfig.hardening
+> @@ -88,6 +88,63 @@ config GCC_PLUGIN_STRUCTLEAK_VERBOSE
+>  	  initialized. Since not all existing initializers are detected
+>  	  by the plugin, this can produce false positive warnings.
+>  
+> +config GCC_PLUGIN_STACKLEAK
+> +	bool "Poison kernel stack before returning from syscalls"
+> +	depends on GCC_PLUGINS
+> +	depends on HAVE_ARCH_STACKLEAK
+> +	help
+> +	  This option makes the kernel erase the kernel stack before
+> +	  returning from system calls. This has the effect of leaving
+> +	  the stack initialized to the poison value, which both reduces
+> +	  the lifetime of any sensitive stack contents and reduces
+> +	  potential for uninitialized stack variable exploits or information
+> +	  exposures (it does not cover functions reaching the same stack
+> +	  depth as prior functions during the same syscall). This blocks
+> +	  most uninitialized stack variable attacks, with the performance
+> +	  impact being driven by the depth of the stack usage, rather than
+> +	  the function calling complexity.
+> +
+> +	  The performance impact on a single CPU system kernel compilation
+> +	  sees a 1% slowdown, other systems and workloads may vary and you
+> +	  are advised to test this feature on your expected workload before
+> +	  deploying it.
+> +
+> +	  This plugin was ported from grsecurity/PaX. More information at:
+> +	   * https://grsecurity.net/
+> +	   * https://pax.grsecurity.net/
+> +
+> +config STACKLEAK_TRACK_MIN_SIZE
+> +	int "Minimum stack frame size of functions tracked by STACKLEAK"
+> +	default 100
+> +	range 0 4096
+> +	depends on GCC_PLUGIN_STACKLEAK
+> +	help
+> +	  The STACKLEAK gcc plugin instruments the kernel code for tracking
+> +	  the lowest border of the kernel stack (and for some other purposes).
+> +	  It inserts the stackleak_track_stack() call for the functions with
+> +	  a stack frame size greater than or equal to this parameter.
+> +	  If unsure, leave the default value 100.
+> +
+> +config STACKLEAK_METRICS
+> +	bool "Show STACKLEAK metrics in the /proc file system"
+> +	depends on GCC_PLUGIN_STACKLEAK
+> +	depends on PROC_FS
+> +	help
+> +	  If this is set, STACKLEAK metrics for every task are available in
+> +	  the /proc file system. In particular, /proc/<pid>/stack_depth
+> +	  shows the maximum kernel stack consumption for the current and
+> +	  previous syscalls. Although this information is not precise, it
+> +	  can be useful for estimating the STACKLEAK performance impact for
+> +	  your workloads.
+> +
+> +config STACKLEAK_RUNTIME_DISABLE
+> +	bool "Allow runtime disabling of kernel stack erasing"
+> +	depends on GCC_PLUGIN_STACKLEAK
+> +	help
+> +	  This option provides 'stack_erasing' sysctl, which can be used in
+> +	  runtime to control kernel stack erasing for kernels built with
+> +	  CONFIG_GCC_PLUGIN_STACKLEAK.
+> +
+>  endmenu
+>  
+>  endmenu
+> 
