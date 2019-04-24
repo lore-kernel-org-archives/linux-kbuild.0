@@ -1,67 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:25669 "EHLO
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:40719 "EHLO
         conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbfDXEHx (ORCPT
+        with ESMTP id S1727568AbfDXKKK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Apr 2019 00:07:53 -0400
+        Wed, 24 Apr 2019 06:10:10 -0400
 MIME-Version: 1.0
-References: <20190423194925.32151-1-keescook@chromium.org>
-In-Reply-To: <20190423194925.32151-1-keescook@chromium.org>
+References: <1555669773-9766-1-git-send-email-alex.popov@linux.com>
+In-Reply-To: <1555669773-9766-1-git-send-email-alex.popov@linux.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 24 Apr 2019 13:06:49 +0900
-Message-ID: <CAK7LNARuX8XfO=YRX9dYpipyBTCtMbQqLJfuk6iMLfLdZe1-KQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/3] Refactor memory initialization hardening
+Date: Wed, 24 Apr 2019 19:09:26 +0900
+Message-ID: <CAK7LNAQP8ys181hL9EtGVoQppn_-aLn+Ufineebf396rDn-Ezw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] kconfig: Terminate menu blocks with a newline in the
+ generated config
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Alexander Potapenko <glider@google.com>, James Morris <jmorris@namei.org>, Alexander Popov <alex.popov@linux.com>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, "Serge E. Hallyn" <serge@hallyn.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Alexander Popov <alex.popov@linux.com>
+Cc: Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Apr 24, 2019 at 4:49 AM Kees Cook <keescook@chromium.org> wrote:
+On Sat, Apr 20, 2019 at 4:12 AM Alexander Popov <alex.popov@linux.com> wrote:
 >
-> This refactors the stack memory initialization configs in order to
-> keep things together when adding Clang stack initialization, and in
-> preparation for future heap memory initialization configs.
+> Currently menu blocks start with a pretty header but end with nothing in
+> the generated config. So next config options stick together with the
+> options from the menu block.
 >
-> I intend to carry this in the gcc-plugins tree, but I'd really like
-> to get Acks from Masahiro (Kconfig changes, Makefile change), and
-> from James (adding the new Kconfig.hardening to security/Kconfig).
-
-If needed,
-Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Let's terminate menu blocks with a newline in the generated config.
+>
+> Signed-off-by: Alexander Popov <alex.popov@linux.com>
 
 
-> Thanks!
->
-> -Kees
->
-> v3:
-> - clean up menu/if with a merged "depends on" (masahiro)
-> - add CONFIG_COMPILE_TEST defaults (masahiro)
->
-> v2:
-> - add plugin menu (masahiro)
-> - adjust patch subject prefixes (masahiro)
-> - drop redundent "depends" (masahiro)
-> - fixed early use of CC_HAS_AUTO_VAR_INIT (masahiro)
-> - dropped default-enabled for STACK_INIT_ALL (masahiro)
->
->
-> Kees Cook (3):
->   security: Create "kernel hardening" config area
->   security: Move stackleak config to Kconfig.hardening
->   security: Implement Clang's stack initialization
->
->  Makefile                    |   5 ++
->  scripts/gcc-plugins/Kconfig | 126 ++-------------------------
->  security/Kconfig            |   2 +
->  security/Kconfig.hardening  | 164 ++++++++++++++++++++++++++++++++++++
->  4 files changed, 177 insertions(+), 120 deletions(-)
->  create mode 100644 security/Kconfig.hardening
->
-> --
-> 2.17.1
->
+The .config file is a flat list of CONFIG options.
+It does not represent menu structures at all.
+
+I tested "make allyesconfig"
+and the resulted outcome looks cheesy.
+
+
+
+[1] Two blank lines in a row
+
+
+---------->8-----------------
+CONFIG_EFI_EARLYCON=y
+CONFIG_IMX_SCU=y
+CONFIG_IMX_SCU_PD=y
+
+#
+# Tegra firmware driver
+#
+
+
+CONFIG_HAVE_KVM=y
+CONFIG_HAVE_KVM_IRQCHIP=y
+CONFIG_HAVE_KVM_IRQFD=y
+--------->8------------------------
+
+
+[2] Some blank lines appended at the end of file
+
+----------->8-------------
+CONFIG_CPA_DEBUG=y
+CONFIG_OPTIMIZE_INLINING=y
+CONFIG_DEBUG_ENTRY=y
+CONFIG_DEBUG_NMI_SELFTEST=y
+CONFIG_X86_DEBUG_FPU=y
+CONFIG_PUNIT_ATOM_DEBUG=y
+CONFIG_UNWINDER_ORC=y
+# CONFIG_UNWINDER_FRAME_POINTER is not set
+
+
+---------->8-----------------
+
+
+
+The readability of the .config could be improved somehow,
+but this patch is not the right one.
+
 
 
 -- 
