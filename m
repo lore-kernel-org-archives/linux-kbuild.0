@@ -1,54 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua1-f67.google.com ([209.85.222.67]:41727 "EHLO
-        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730957AbfDXVHT (ORCPT
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:46193 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730078AbfDYVhX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Apr 2019 17:07:19 -0400
-Received: by mail-ua1-f67.google.com with SMTP id g23so926563uan.8
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Apr 2019 14:07:18 -0700 (PDT)
-Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com. [209.85.217.44])
-        by smtp.gmail.com with ESMTPSA id n13sm20989vsl.28.2019.04.24.14.07.17
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Apr 2019 14:07:17 -0700 (PDT)
-Received: by mail-vs1-f44.google.com with SMTP id n17so2953274vsr.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Apr 2019 14:07:17 -0700 (PDT)
+        Thu, 25 Apr 2019 17:37:23 -0400
+Received: by mail-oi1-f193.google.com with SMTP id l12so1259503oie.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 25 Apr 2019 14:37:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190423194925.32151-1-keescook@chromium.org> <20190423194925.32151-3-keescook@chromium.org>
- <84ed0a4b-b1e5-ae86-56c1-40a212734667@linux.com>
-In-Reply-To: <84ed0a4b-b1e5-ae86-56c1-40a212734667@linux.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Wed, 24 Apr 2019 14:02:02 -0700
-Message-ID: <CAGXu5jKkv2EvxZEO_V_0djDhaW-+WToZ2D477_PRnnMfAFDpTA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] security: Move stackleak config to Kconfig.hardening
+References: <20190404220652.19765-1-brendanhiggins@google.com>
+ <20190404220652.19765-15-brendanhiggins@google.com> <20190424185813.xabwr4lt6aunvpsd@gabell>
+In-Reply-To: <20190424185813.xabwr4lt6aunvpsd@gabell>
+From: Brendan Higgins <brendanhiggins@google.com>
+Date: Thu, 25 Apr 2019 14:37:11 -0700
+Message-ID: <CAFd5g45CD7=dMvvRgmLKomirXDWpO59hFSed9A=o0kdBxp7v-w@mail.gmail.com>
+Subject: Re: [PATCH v1 14/17] Documentation: kunit: add documentation for KUnit
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Popov <alex.popov@linux.com>
-Cc: Alexander Potapenko <glider@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, James Morris <jmorris@namei.org>, Nick Desaulniers <ndesaulniers@google.com>, Kostya Serebryany <kcc@google.com>, Dmitry Vyukov <dvyukov@google.com>, Sandeep Patil <sspatil@android.com>, Laura Abbott <labbott@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Emese Revfy <re.emese@gmail.com>, "Serge E. Hallyn" <serge@hallyn.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-security-module <linux-security-module@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masayoshi Mizuma <msys.mizuma@gmail.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Frank Rowand <frowand.list@gmail.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Rob Herring <robh@kernel.org>, shuah@kernel.org, yamada.masahiro@socionext.com, Petr Mladek <pmladek@suse.com>, linux-doc@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>, dri-devel <dri-devel@lists.freedesktop.org>, Sasha Levin <Alexander.Levin@microsoft.com>, linux-kselftest@vger.kernel.org, linux-nvdimm <linux-nvdimm@lists.01.org>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Felix Guo <felixguoxiuping@gmail.com>, wfg@linux.intel.com, Joel Stanley <joel@jms.id.au>, Jeff Dike <jdike@addtoit.com>, Dan Carpenter <dan.carpenter@oracle.com>, devicetree <devicetree@vger.kernel.org>, linux-kbuild@vger.kernel.org, "Bird, Timothy" <Tim.Bird@sony.com>, linux-um@lists.infradead.org, Steven Rostedt <rostedt@goodmis.org>, Julia Lawall <julia.lawall@lip6.fr>, kunit-dev@googlegroups.com, Richard Weinberger <richard@nod.at>, Greg KH <gregkh@linuxfoundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Daniel Vetter <daniel@ffwll.ch>, Michael Ellerman <mpe@ellerman.id.au>, linux-fsdevel@vger.kernel.org
 
-On Wed, Apr 24, 2019 at 8:25 AM Alexander Popov <alex.popov@linux.com> wrote:
+On Wed, Apr 24, 2019 at 11:58 AM Masayoshi Mizuma <msys.mizuma@gmail.com> wrote:
 >
-> On 23.04.2019 22:49, Kees Cook wrote:
-> > This moves the stackleak plugin options to Kconfig.hardening's memory
-> > initialization menu.
+> Hi Brendan,
+>
+> KUNIT_ASSERT_NOT_ERR_OR_NULL() should be replaced to
+> KUNIT_EXPECT_NOT_ERR_OR_NULL(), right?
+
+Generally speaking, no.
+
+There may be places that I have used it improperly, but I think it is
+generally okay to use.
+
+If you are refering to the discussion with Frank and Stephen in RFC
+v4, my take was that the resolution was that there were some things I
+needed to fix in its implementation, but it is conceptually okay, and
+that Frank doesn't want me to use it in drivers/of/unittest.c.
+Consequently, I fixed the implementation issues that Frank and Stephen
+pointed out, and I am holding off on drivers/of/unittest.c for this
+patchset. The usage in this file should be fine.
+
+>
+> On Thu, Apr 04, 2019 at 03:06:49PM -0700, Brendan Higgins wrote:
+> > Add documentation for KUnit, the Linux kernel unit testing framework.
+> > - Add intro and usage guide for KUnit
+> > - Add API reference
 > >
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > Signed-off-by: Felix Guo <felixguoxiuping@gmail.com>
+> > Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+> > ---
 >
-> Hello Kees,
->
-> I see the changes in STACKLEAK help, looks good to me.
-> For this patch -
->   Reviewed-by: Alexander Popov <alex.popov@linux.com>
+> <snip>
 
-Thanks!
+<snip>
 
-> By the way, for your information, GCC_PLUGIN_STRUCTLEAK help is now unreachable
-> from 'make menuconfig'.
-
-Good point. I'll see if I can find a sensible place to move this to.
-There isn't really a place for just the plugin details any more...
-hmm.
-
--- 
-Kees Cook
+Cheers
