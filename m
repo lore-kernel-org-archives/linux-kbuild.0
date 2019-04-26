@@ -1,95 +1,157 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:37390 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731345AbfDYVj1 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Apr 2019 17:39:27 -0400
-Received: by mail-oi1-f196.google.com with SMTP id k6so1316514oic.4
-        for <linux-kbuild@vger.kernel.org>; Thu, 25 Apr 2019 14:39:27 -0700 (PDT)
+Received: from monster.unsafe.ru ([5.9.28.80]:41248 "EHLO mail.unsafe.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726172AbfDZP3P (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 26 Apr 2019 11:29:15 -0400
+Date: Fri, 26 Apr 2019 17:29:04 +0200
+From: Alexey Gladkov <gladkov.alexey@gmail.com>
+Subject: Re: [PATCH v2] moduleparam: Save information about built-in modules
+ in separate file
+Message-ID: <20190426152904.GO9023@dhcp129-178.brq.redhat.com>
+References: <20190406121447.GB4047@localhost.localdomain>
+ <CAK7LNATfo0K6kzwobkAZ_u2KnWL3XycJzbr3KPtPF=ePziCuDg@mail.gmail.com>
+ <20190418135238.GA5626@linux-8ccs>
+ <CAK7LNARKHXLgniczKXY01JhxhBpL2p-X_hWg70AcsrXRaLyDSg@mail.gmail.com>
+ <20190418153611.GB5626@linux-8ccs>
+ <CAK7LNARxT7a5-C4-ZuKYWOWyuDdMVzkd-n8C8vdO1MEw10TsJA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190404220652.19765-1-brendanhiggins@google.com>
- <20190404220652.19765-12-brendanhiggins@google.com> <20190424190019.wvljyeo3y7gd24p5@gabell>
-In-Reply-To: <20190424190019.wvljyeo3y7gd24p5@gabell>
-From: Brendan Higgins <brendanhiggins@google.com>
-Date: Thu, 25 Apr 2019 14:39:15 -0700
-Message-ID: <CAFd5g45CaCFdQCxQqxgYfoQSGAF8RAV2YrOMs0oR4R-iCTZrig@mail.gmail.com>
-Subject: Re: [PATCH v1 11/17] kunit: test: add test managed resource tests
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNARxT7a5-C4-ZuKYWOWyuDdMVzkd-n8C8vdO1MEw10TsJA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masayoshi Mizuma <msys.mizuma@gmail.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Frank Rowand <frowand.list@gmail.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Rob Herring <robh@kernel.org>, shuah@kernel.org, yamada.masahiro@socionext.com, Petr Mladek <pmladek@suse.com>, linux-doc@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>, dri-devel <dri-devel@lists.freedesktop.org>, Sasha Levin <Alexander.Levin@microsoft.com>, linux-kselftest@vger.kernel.org, linux-nvdimm <linux-nvdimm@lists.01.org>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, wfg@linux.intel.com, Joel Stanley <joel@jms.id.au>, Jeff Dike <jdike@addtoit.com>, Dan Carpenter <dan.carpenter@oracle.com>, devicetree <devicetree@vger.kernel.org>, linux-kbuild@vger.kernel.org, "Bird, Timothy" <Tim.Bird@sony.com>, Avinash Kondareddy <akndr41@gmail.com>, linux-um@lists.infradead.org, Steven Rostedt <rostedt@goodmis.org>, Julia Lawall <julia.lawall@lip6.fr>, kunit-dev@googlegroups.com, Richard Weinberger <richard@nod.at>, Greg KH <gregkh@linuxfoundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Daniel Vetter <daniel@ffwll.ch>, Michael Ellerman <mpe@ellerman.id.au>, linux-fsdevel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Jessica Yu <jeyu@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-api@vger.kernel.org, linux-modules@vger.kernel.org, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Michal Marek <michal.lkml@markovi.net>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>, Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-On Wed, Apr 24, 2019 at 12:00 PM Masayoshi Mizuma <msys.mizuma@gmail.com> wrote:
->
-> On Thu, Apr 04, 2019 at 03:06:46PM -0700, Brendan Higgins wrote:
-> > From: Avinash Kondareddy <akndr41@gmail.com>
+On Fri, Apr 19, 2019 at 12:03:50PM +0900, Masahiro Yamada wrote:
+> On Fri, Apr 19, 2019 at 12:36 AM Jessica Yu <jeyu@kernel.org> wrote:
 > >
-> > Tests how tests interact with test managed resources in their lifetime.
+> > +++ Masahiro Yamada [19/04/19 00:26 +0900]:
+> > >On Thu, Apr 18, 2019 at 10:52 PM Jessica Yu <jeyu@kernel.org> wrote:
+> > >>
+> > >> +++ Masahiro Yamada [18/04/19 20:10 +0900]:
+> > >> >On Sat, Apr 6, 2019 at 9:15 PM Alexey Gladkov <gladkov.alexey@gmail.com> wrote:
+> > >> >>
+> > >> >> Problem:
+> > >> >>
+> > >> >> When a kernel module is compiled as a separate module, some important
+> > >> >> information about the kernel module is available via .modinfo section of
+> > >> >> the module.  In contrast, when the kernel module is compiled into the
+> > >> >> kernel, that information is not available.
+> > >> >>
+> > >> >> Information about built-in modules is necessary in the following cases:
+> > >> >>
+> > >> >> 1. When it is necessary to find out what additional parameters can be
+> > >> >> passed to the kernel at boot time.
+> > >> >>
+> > >> >> 2. When you need to know which module names and their aliases are in
+> > >> >> the kernel. This is very useful for creating an initrd image.
+> > >> >>
+> > >> >> Proposal:
+> > >> >>
+> > >> >> The proposed patch does not remove .modinfo section with module
+> > >> >> information from the vmlinux at the build time and saves it into a
+> > >> >> separate file after kernel linking. So, the kernel does not increase in
+> > >> >> size and no additional information remains in it. Information is stored
+> > >> >> in the same format as in the separate modules (null-terminated string
+> > >> >> array). Because the .modinfo section is already exported with a separate
+> > >> >> modules, we are not creating a new API.
+> > >> >>
+> > >> >> It can be easily read in the userspace:
+> > >> >>
+> > >> >> $ tr '\0' '\n' < kernel.builtin
+> > >> >> ext4.softdep=pre: crc32c
+> > >> >> ext4.license=GPL
+> > >> >> ext4.description=Fourth Extended Filesystem
+> > >> >> ext4.author=Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others
+> > >> >> ext4.alias=fs-ext4
+> > >> >> ext4.alias=ext3
+> > >> >> ext4.alias=fs-ext3
+> > >> >> ext4.alias=ext2
+> > >> >> ext4.alias=fs-ext2
+> > >> >> md_mod.alias=block-major-9-*
+> > >> >> md_mod.alias=md
+> > >> >> md_mod.description=MD RAID framework
+> > >> >> md_mod.license=GPL
+> > >> >> md_mod.parmtype=create_on_open:bool
+> > >> >> md_mod.parmtype=start_dirty_degraded:int
+> > >> >> ...
+> > >> >>
+> > >> >> v2:
+> > >> >>  * Extract modinfo from vmlinux.o as suggested by Masahiro Yamada;
+> > >> >>  * Rename output file to kernel.builtin;
+> > >> >
+> > >> >Sorry, I do not get why you renamed
+> > >> >"kernel.builtin.modinfo" to "kernel.builtin".
+> > >> >
+> > >> >If you drop "modinfo", we do not understand
+> > >> >what kind information is contained in it.
+> > >> >
+> > >> >I think "kernel" and "builtin" have
+> > >> >a quite similar meaning here.
+> > >> >
+> > >> >How about "builtin.modinfo" for example?
+> > >> >
+> > >> >
+> > >> >It is shorter, and it is clear enough
+> > >> >that it contains module_info.
+> > >>
+> > >> I agree that the name kernel.builtin is unclear in what kind of
+> > >> information it contains. Apologies for not having clarified this in
+> > >> the previous review.
+> > >>
+> > >> Since kbuild already produces "modules.order" and "modules.builtin"
+> > >> files, why not just name it "modules.builtin.modinfo" to keep the
+> > >> names consistent with what is already there?
+> > >
+> > >
+> > >Is it consistent?
+> > >
+> > >If we had "modules.order" and "modules.builtin.order" there,
+> > >I would agree with "modules.builtin.modinfo",
+> > >and also "modules.alias" vs "modules.builtin.alias".
+> > >
+> > >
+> > >We already have "modules.builtin", and probably impossible
+> > >to rename it, so we cannot keep consistency in any way.
+> > >
+> > >
+> > >"modules.builtin" is a weird name since
+> > >it actually contains "order", but its extension
+> > >does not express what kind of information is in it.
+> > >Hence, I doubt "modules.builtin" is a good precedent.
+> > >
+> > >IMHO, "modules" and "builtin" are opposite
+> > >to each other. "modules.builtin" sounds iffy to me.
 > >
-> > Signed-off-by: Avinash Kondareddy <akndr41@gmail.com>
-> > Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-> > ---
-> >  kunit/test-test.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 122 insertions(+)
-> >
-> > diff --git a/kunit/test-test.c b/kunit/test-test.c
-> > index 4bd7a34d0a6cb..54add8ca418a0 100644
-> > --- a/kunit/test-test.c
-> > +++ b/kunit/test-test.c
-> > @@ -135,3 +135,125 @@ static struct kunit_module kunit_try_catch_test_module = {
-> >       .test_cases = kunit_try_catch_test_cases,
-> >  };
-> >  module_test(kunit_try_catch_test_module);
-> > +
-> > +/*
-> > + * Context for testing test managed resources
-> > + * is_resource_initialized is used to test arbitrary resources
-> > + */
-> > +struct kunit_test_resource_context {
-> > +     struct kunit test;
-> > +     bool is_resource_initialized;
-> > +};
-> > +
-> > +static int fake_resource_init(struct kunit_resource *res, void *context)
-> > +{
-> > +     struct kunit_test_resource_context *ctx = context;
-> > +
-> > +     res->allocation = &ctx->is_resource_initialized;
-> > +     ctx->is_resource_initialized = true;
-> > +     return 0;
-> > +}
-> > +
-> > +static void fake_resource_free(struct kunit_resource *res)
-> > +{
-> > +     bool *is_resource_initialized = res->allocation;
-> > +
-> > +     *is_resource_initialized = false;
-> > +}
-> > +
-> > +static void kunit_resource_test_init_resources(struct kunit *test)
-> > +{
-> > +     struct kunit_test_resource_context *ctx = test->priv;
-> > +
-> > +     kunit_init_test(&ctx->test, "testing_test_init_test");
-> > +
-> > +     KUNIT_EXPECT_TRUE(test, list_empty(&ctx->test.resources));
-> > +}
-> > +
-> > +static void kunit_resource_test_alloc_resource(struct kunit *test)
-> > +{
-> > +     struct kunit_test_resource_context *ctx = test->priv;
-> > +     struct kunit_resource *res;
-> > +     kunit_resource_free_t free = fake_resource_free;
-> > +
-> > +     res = kunit_alloc_resource(&ctx->test,
-> > +                                fake_resource_init,
-> > +                                fake_resource_free,
-> > +                                ctx);
-> > +
->
-> > +     KUNIT_ASSERT_NOT_ERR_OR_NULL(test, res);
->
->         KUNIT_EXPECT_NOT_ERR_OR_NULL(test, res);
+> > I've always interpreted "modules.builtin" to mean "this is a list of
+> > modules that have been built-in into the kernel", no? So I thought the
+> > name made sense.
+> 
+> OK, I see.
+> 
+> > But you are the maintainer, so I do not have a strong
+> > opinion on this either way :-)
+> 
+> My idea was to use
+> 'modules.<file-type>'  vs  'builtin.<file-type>'
+> instead of
+> 'modules.<file-type>'  vs  'modules.builtin.<file-type>'
+> 
+> I am slightly in favor of the former
+> since it is shorter and
+> (I hope) still clear enough.
+> 
+> If this naming is not nice for external projects such as kmod,
+> please speak up.
+> 
+> 
+> (BTW, I am thinking of renaming 'modules.builtin' into 'builtin.order'
+> for kbuild internal. We cannot change that for the installation area, though.)
 
-See my reply to your email on the 14/17 patch.
+Since there were no other suggestions, how can I better name the file ?
+modules.builtin.modinfo or just builtin.modinfo ? I personally like the
+first one more.
+
+-- 
+Rgrds, legion
