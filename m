@@ -1,70 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:64303 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726030AbfD0GaW (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:63594 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726049AbfD0G4I (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Apr 2019 02:30:22 -0400
+        Sat, 27 Apr 2019 02:56:08 -0400
+Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id x3R6ttAD016728
+        for <linux-kbuild@vger.kernel.org>; Sat, 27 Apr 2019 15:55:56 +0900
+Received: by mail-ua1-f44.google.com with SMTP id f9so832442ual.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 26 Apr 2019 23:55:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190426222237.13209-1-colin.king@canonical.com>
-In-Reply-To: <20190426222237.13209-1-colin.king@canonical.com>
+References: <20190424175550.142553-1-ddadap@nvidia.com>
+In-Reply-To: <20190424175550.142553-1-ddadap@nvidia.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 27 Apr 2019 15:29:30 +0900
-Message-ID: <CAK7LNATC5b9yx79sF55hw1X9vZTJK8H+WsLRfy81_chZYRgTYw@mail.gmail.com>
-Subject: Re: [PATCH][next] unicode: fix dereference of a potentially null pointer
+Date: Sat, 27 Apr 2019 15:55:18 +0900
+Message-ID: <CAK7LNATXeak-PyUFQXq-DhUpC2zmKpCQovqwLFoY9JwkE5xxtQ@mail.gmail.com>
+Subject: Re: [PATCH] scripts: override locale from environment when running recordmcount.pl
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olaf Weber <olaf@sgi.com>, Gabriel Krisman Bertazi <krisman@collabora.co.uk>, Theodore Ts'o <tytso@mit.edu>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Colin King <colin.king@canonical.com>, kernel-janitors@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Daniel Dadap <ddadap@nvidia.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Forwarding because this file is not in my tree.
-
-
-
-
-
-On Sat, Apr 27, 2019 at 7:22 AM Colin King <colin.king@canonical.com> wrote:
+On Thu, Apr 25, 2019 at 2:56 AM Daniel Dadap <ddadap@nvidia.com> wrote:
 >
-> From: Colin Ian King <colin.king@canonical.com>
+> recordmcount.pl uses a set of regular expressions to parse the output of
+> objdump(1). However, if objdump(1) output is localized, it may not match
+> the regular expressions, thereby preventing recordmcount.pl from parsing
+> object files correctly.
 >
-> The pointer 'tree' is deferenced when assigning pointer 'trie', however
-> trie is being null checked a few lines later, so it could potentially
-> be null. Fix the potential null pointer dereference by only dereferencing
-> it after it has been null checked.
+> In order to allow recordmcount.pl to function correctly regardless of the
+> current locale settings, set LANG=C when running objdump(1). LC_ALL is
+> already unset in the top-level Makefile, so it is not necessary to also
+> override that environment variable.
 >
-> Addresses-Coverity: ("Dereference before null check")
-> Fixes: b08fcacaaaf4 ("unicode: introduce UTF-8 character database")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Signed-off-by: Daniel Dadap <ddadap@nvidia.com>
+> Reviewed-by: Robert Morell <rmorell@nvidia.com>
 > ---
->  scripts/mkutf8data.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  scripts/recordmcount.pl | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/scripts/mkutf8data.c b/scripts/mkutf8data.c
-> index 12ce94b43be6..0563ba679bbb 100644
-> --- a/scripts/mkutf8data.c
-> +++ b/scripts/mkutf8data.c
-> @@ -2706,7 +2706,7 @@ static utf8leaf_t *utf8hangul(const char *str, unsigned char *hangul)
->  static utf8leaf_t *utf8nlookup(struct tree *tree, unsigned char *hangul,
->                                const char *s, size_t len)
->  {
-> -       utf8trie_t      *trie = utf8data + tree->index;
-> +       utf8trie_t      *trie;
->         int             offlen;
->         int             offset;
->         int             mask;
-> @@ -2716,6 +2716,7 @@ static utf8leaf_t *utf8nlookup(struct tree *tree, unsigned char *hangul,
->                 return NULL;
->         if (len == 0)
->                 return NULL;
-> +       trie = utf8data + tree->index;
->         node = 1;
->         while (node) {
->                 offlen = (*trie & OFFLEN) >> OFFLEN_SHIFT;
+> diff --git a/scripts/recordmcount.pl b/scripts/recordmcount.pl
+> index 68841d01162c..b7bcdc71e6e8 100755
+> --- a/scripts/recordmcount.pl
+> +++ b/scripts/recordmcount.pl
+> @@ -493,7 +493,7 @@ sub update_funcs
+>  #
+>  # Step 2: find the sections and mcount call sites
+>  #
+> -open(IN, "$objdump -hdr $inputfile|") || die "error running $objdump";
+> +open(IN, "env LANG=C $objdump -hdr $inputfile|") || die "error running $objdump";
+
+
+Just to be consistent with the other places,
+is 'env' necessary?
+
+arch/powerpc/boot/wrapper:LANG=C elfformat="`${CROSS}objdump -p
+"$kernel" | grep 'file format' | awk '{print $4}'`"
+scripts/tags.sh:    LANG=C sed -i -e
+'/^\([a-zA-Z_][a-zA-Z0-9_]*\)\t.*\t\/\^struct \1;.*\$\/;"\tx$/d' $1
+tools/testing/selftests/rcutorture/bin/config2frag.sh:LANG=C sed -e
+'s/^# CONFIG_\([a-zA-Z0-9_]*\) is not set$/CONFIG_\1=n/'
+
+
+>  my $text;
+>
 > --
-> 2.20.1
+> 2.18.1
 >
 
 
---
+-- 
 Best Regards
 Masahiro Yamada
