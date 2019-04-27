@@ -1,80 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:24903 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725857AbfD0IpV (ORCPT
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:6014 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725983AbfD0PIE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Apr 2019 04:45:21 -0400
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id x3R8jD4m008838
-        for <linux-kbuild@vger.kernel.org>; Sat, 27 Apr 2019 17:45:14 +0900
-Received: by mail-vs1-f53.google.com with SMTP id d8so3319487vsp.2
-        for <linux-kbuild@vger.kernel.org>; Sat, 27 Apr 2019 01:45:13 -0700 (PDT)
+        Sat, 27 Apr 2019 11:08:04 -0400
+Subject: Re: [PATCH] scripts: override locale from environment when running
+ recordmcount.pl
+References: <20190424175550.142553-1-ddadap@nvidia.com>
+ <CAK7LNATXeak-PyUFQXq-DhUpC2zmKpCQovqwLFoY9JwkE5xxtQ@mail.gmail.com>
+From: Daniel Dadap <ddadap@nvidia.com>
+Message-ID: <497562b7-c07e-9067-5b7f-f96844bfc5bf@nvidia.com>
+Date: Sat, 27 Apr 2019 10:08:02 -0500
 MIME-Version: 1.0
-References: <95724704-6bc7-d8d7-7d6c-88d316be0e61@infradead.org>
-In-Reply-To: <95724704-6bc7-d8d7-7d6c-88d316be0e61@infradead.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 27 Apr 2019 17:44:36 +0900
-Message-ID: <CAK7LNATEb3XytOUjCQ_jy8qT6gb2iy0a1phrmNmdJRjCM-mVkQ@mail.gmail.com>
-Subject: Re: mini.config with defconfig
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNATXeak-PyUFQXq-DhUpC2zmKpCQovqwLFoY9JwkE5xxtQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Sat, Apr 27, 2019 at 12:46 PM Randy Dunlap <rdunlap@infradead.org> wrote:
+On 4/27/19 1:55 AM, Masahiro Yamada wrote:
+> On Thu, Apr 25, 2019 at 2:56 AM Daniel Dadap <ddadap@nvidia.com> wrote:
+>> recordmcount.pl uses a set of regular expressions to parse the output of
+>> objdump(1). However, if objdump(1) output is localized, it may not match
+>> the regular expressions, thereby preventing recordmcount.pl from parsing
+>> object files correctly.
+>>
+>> In order to allow recordmcount.pl to function correctly regardless of the
+>> current locale settings, set LANG=C when running objdump(1). LC_ALL is
+>> already unset in the top-level Makefile, so it is not necessary to also
+>> override that environment variable.
+>>
+>> Signed-off-by: Daniel Dadap <ddadap@nvidia.com>
+>> Reviewed-by: Robert Morell <rmorell@nvidia.com>
+>> ---
+>>   scripts/recordmcount.pl | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/recordmcount.pl b/scripts/recordmcount.pl
+>> index 68841d01162c..b7bcdc71e6e8 100755
+>> --- a/scripts/recordmcount.pl
+>> +++ b/scripts/recordmcount.pl
+>> @@ -493,7 +493,7 @@ sub update_funcs
+>>   #
+>>   # Step 2: find the sections and mcount call sites
+>>   #
+>> -open(IN, "$objdump -hdr $inputfile|") || die "error running $objdump";
+>> +open(IN, "env LANG=C $objdump -hdr $inputfile|") || die "error running $objdump";
 >
-> Hi,
+> Just to be consistent with the other places,
+> is 'env' necessary?
 >
-> Is the "defconfig" target supported when using a mini.config file?
-
-No.
-
-As you see line 584 of scripts/kconfig/conf.c,
-this is supported only for
- allnoconfig
- allyesconfig
- allmodconfig
- alldefconfig
- randconfig
+> arch/powerpc/boot/wrapper:LANG=C elfformat="`${CROSS}objdump -p
+> "$kernel" | grep 'file format' | awk '{print $4}'`"
+> scripts/tags.sh:    LANG=C sed -i -e
+> '/^\([a-zA-Z_][a-zA-Z0-9_]*\)\t.*\t\/\^struct \1;.*\$\/;"\tx$/d' $1
+> tools/testing/selftests/rcutorture/bin/config2frag.sh:LANG=C sed -e
+> 's/^# CONFIG_\([a-zA-Z0-9_]*\) is not set$/CONFIG_\1=n/'
 
 
-defconfig reads a config fragment
-from arch/*/configs/*_defconfig.
-
-So, we need to merge data
-from arch/*/configs/*_defconfig and mini.config
-
-Currently, this is not supported by the kconfig binary,
-but by scripts/kconfig/merge_config.sh
+It's probably not strictly necessary; the 'env' is there in case of a 
+shell that doesn't allow setting environment variables on the command 
+line like that, but if Kbuild already presumes a shell that does allow 
+it, I'm happy to send a v2 that omits the 'env'.
 
 
-Thanks.
-
-
-
-> I am trying to use this mini.config file with x86_64 defconfig:
 >
-> # CONFIG_UNWINDER_ORC is not set
-> CONFIG_UNWINDER_FRAME_POINTER=y
-> # CONFIG_UNWINDER_GUESS is not set
+>>   my $text;
+>>
+>> --
+>> 2.18.1
+>>
 >
->
-> but the generated .config file always has:
-> CONFIG_UNWINDER_ORC=y
-> # CONFIG_UNWINDER_FRAME_POINTER is not set
->
->
-> command:
-> make KCONFIG_ALLCONFIG=mini.config ARCH=x86_64 O=MINI defconfig
->
->
-> thanks.
-> --
-> ~Randy
-
-
-
--- 
-Best Regards
-Masahiro Yamada
