@@ -1,69 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:61237 "EHLO
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:64303 "EHLO
         conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725966AbfD0G1w (ORCPT
+        with ESMTP id S1726030AbfD0GaW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Apr 2019 02:27:52 -0400
+        Sat, 27 Apr 2019 02:30:22 -0400
 MIME-Version: 1.0
-References: <1556346241-10451-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1556346241-10451-1-git-send-email-yamada.masahiro@socionext.com>
+References: <20190426222237.13209-1-colin.king@canonical.com>
+In-Reply-To: <20190426222237.13209-1-colin.king@canonical.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 27 Apr 2019 15:27:00 +0900
-Message-ID: <CAK7LNAS2vTGF0dYJ67Ct2xDL=7qxYhhK-VoVHfkqDu0d8ULd+g@mail.gmail.com>
-Subject: Re: [PATCH] unicode: refactor the rule for regenerating utf8data.h
+Date: Sat, 27 Apr 2019 15:29:30 +0900
+Message-ID: <CAK7LNATC5b9yx79sF55hw1X9vZTJK8H+WsLRfy81_chZYRgTYw@mail.gmail.com>
+Subject: Re: [PATCH][next] unicode: fix dereference of a potentially null pointer
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Olaf Weber <olaf@sgi.com>, Gabriel Krisman Bertazi <krisman@collabora.co.uk>, Theodore Ts'o <tytso@mit.edu>
-Cc: Gabriel Krisman Bertazi <krisman@collabora.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-fsdevel@vger.kernel.org
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Colin King <colin.king@canonical.com>, kernel-janitors@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Sat, Apr 27, 2019 at 3:24 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> scripts/mkutf8data is used only when regenerating utf8data.h,
-> which never happens in the normal kernel build. However, it is
-> irrespectively built if CONFIG_UNICODE is enabled.
->
-> Moreover, there is no good reason for it to reside in the scripts/
-> directory since it is only used in fs/unicode/.
->
-> Hence, move it from scripts/ to fs/unicode/.
->
-> In some cases, we bypass build artifacts in the normal build. The
-> conventianl way to do so is to surround the code with ifdef REGENERATE_*.
-
-
-This is a typo.
-
-conventianl -> conventional
+Forwarding because this file is not in my tree.
 
 
 
-> For example,
+
+
+On Sat, Apr 27, 2019 at 7:22 AM Colin King <colin.king@canonical.com> wrote:
 >
->  - 7373f4f83c71 ("kbuild: add implicit rules for parser generation")
->  - 6aaf49b495b4 ("crypto: arm,arm64 - Fix random regeneration of S_shipped")
+> From: Colin Ian King <colin.king@canonical.com>
 >
-> I rewrote the rule in a more kbuild'ish style.
+> The pointer 'tree' is deferenced when assigning pointer 'trie', however
+> trie is being null checked a few lines later, so it could potentially
+> be null. Fix the potential null pointer dereference by only dereferencing
+> it after it has been null checked.
 >
-> It works like this:
->
-> $ make REGENERATE_UTF8DATA=1 fs/unicode/
->   [ snip ]
->   HOSTCC  fs/unicode/mkutf8data
->   GEN     fs/unicode/utf8data.h
->   CC      fs/unicode/utf8-norm.o
->   CC      fs/unicode/utf8-core.o
->   AR      fs/unicode/built-in.a
->
-> Also, I added utf8data.h to .gitignore and dontdiff.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Addresses-Coverity: ("Dereference before null check")
+> Fixes: b08fcacaaaf4 ("unicode: introduce UTF-8 character database")
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 > ---
+>  scripts/mkutf8data.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/mkutf8data.c b/scripts/mkutf8data.c
+> index 12ce94b43be6..0563ba679bbb 100644
+> --- a/scripts/mkutf8data.c
+> +++ b/scripts/mkutf8data.c
+> @@ -2706,7 +2706,7 @@ static utf8leaf_t *utf8hangul(const char *str, unsigned char *hangul)
+>  static utf8leaf_t *utf8nlookup(struct tree *tree, unsigned char *hangul,
+>                                const char *s, size_t len)
+>  {
+> -       utf8trie_t      *trie = utf8data + tree->index;
+> +       utf8trie_t      *trie;
+>         int             offlen;
+>         int             offset;
+>         int             mask;
+> @@ -2716,6 +2716,7 @@ static utf8leaf_t *utf8nlookup(struct tree *tree, unsigned char *hangul,
+>                 return NULL;
+>         if (len == 0)
+>                 return NULL;
+> +       trie = utf8data + tree->index;
+>         node = 1;
+>         while (node) {
+>                 offlen = (*trie & OFFLEN) >> OFFLEN_SHIFT;
+> --
+> 2.20.1
+>
 
 
-
-
--- 
+--
 Best Regards
 Masahiro Yamada
