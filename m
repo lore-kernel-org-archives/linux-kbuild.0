@@ -1,41 +1,167 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:42896 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727014AbfD0Dqw (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:60922 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725966AbfD0GYv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 26 Apr 2019 23:46:52 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: mini.config with defconfig
-Message-ID: <95724704-6bc7-d8d7-7d6c-88d316be0e61@infradead.org>
-Date: Fri, 26 Apr 2019 20:46:49 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Sat, 27 Apr 2019 02:24:51 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] unicode: refactor the rule for regenerating utf8data.h
+Date: Sat, 27 Apr 2019 15:24:01 +0900
+Message-Id: <1556346241-10451-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Olaf Weber <olaf@sgi.com>, Gabriel Krisman Bertazi <krisman@collabora.co.uk>, Theodore Ts'o <tytso@mit.edu>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Gabriel Krisman Bertazi <krisman@collabora.com>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-fsdevel@vger.kernel.org
 
-Hi,
+scripts/mkutf8data is used only when regenerating utf8data.h,
+which never happens in the normal kernel build. However, it is
+irrespectively built if CONFIG_UNICODE is enabled.
 
-Is the "defconfig" target supported when using a mini.config file?
+Moreover, there is no good reason for it to reside in the scripts/
+directory since it is only used in fs/unicode/.
 
-I am trying to use this mini.config file with x86_64 defconfig:
+Hence, move it from scripts/ to fs/unicode/.
 
-# CONFIG_UNWINDER_ORC is not set
-CONFIG_UNWINDER_FRAME_POINTER=y
-# CONFIG_UNWINDER_GUESS is not set
+In some cases, we bypass build artifacts in the normal build. The
+conventianl way to do so is to surround the code with ifdef REGENERATE_*.
 
+For example,
 
-but the generated .config file always has:
-CONFIG_UNWINDER_ORC=y
-# CONFIG_UNWINDER_FRAME_POINTER is not set
+ - 7373f4f83c71 ("kbuild: add implicit rules for parser generation")
+ - 6aaf49b495b4 ("crypto: arm,arm64 - Fix random regeneration of S_shipped")
 
+I rewrote the rule in a more kbuild'ish style.
 
-command:
-make KCONFIG_ALLCONFIG=mini.config ARCH=x86_64 O=MINI defconfig
+It works like this:
 
+$ make REGENERATE_UTF8DATA=1 fs/unicode/
+  [ snip ]
+  HOSTCC  fs/unicode/mkutf8data
+  GEN     fs/unicode/utf8data.h
+  CC      fs/unicode/utf8-norm.o
+  CC      fs/unicode/utf8-core.o
+  AR      fs/unicode/built-in.a
 
-thanks.
+Also, I added utf8data.h to .gitignore and dontdiff.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Documentation/dontdiff               |  1 +
+ fs/unicode/.gitignore                |  1 +
+ fs/unicode/Makefile                  | 37 +++++++++++++++++++++++++-----------
+ fs/unicode/README.utf8data           | 10 +++++-----
+ {scripts => fs/unicode}/mkutf8data.c |  0
+ scripts/Makefile                     |  1 -
+ 6 files changed, 33 insertions(+), 17 deletions(-)
+ create mode 100644 fs/unicode/.gitignore
+ rename {scripts => fs/unicode}/mkutf8data.c (100%)
+
+diff --git a/Documentation/dontdiff b/Documentation/dontdiff
+index ef25a06..bc353ad 100644
+--- a/Documentation/dontdiff
++++ b/Documentation/dontdiff
+@@ -176,6 +176,7 @@ mkprep
+ mkregtable
+ mktables
+ mktree
++mkutf8data
+ modpost
+ modules.builtin
+ modules.order
+diff --git a/fs/unicode/.gitignore b/fs/unicode/.gitignore
+new file mode 100644
+index 0000000..44811fc
+--- /dev/null
++++ b/fs/unicode/.gitignore
+@@ -0,0 +1 @@
++mkutf8data
+diff --git a/fs/unicode/Makefile b/fs/unicode/Makefile
+index 671d31f..1a109b7 100644
+--- a/fs/unicode/Makefile
++++ b/fs/unicode/Makefile
+@@ -5,15 +5,30 @@ obj-$(CONFIG_UNICODE_NORMALIZATION_SELFTEST) += utf8-selftest.o
+ 
+ unicode-y := utf8-norm.o utf8-core.o
+ 
+-# This rule is not invoked during the kernel compilation.  It is used to
+-# regenerate the utf8data.h header file.
+-utf8data.h.new: *.txt $(objdir)/scripts/mkutf8data
+-	$(objdir)/scripts/mkutf8data \
+-		-a DerivedAge.txt \
+-		-c DerivedCombiningClass.txt \
+-		-p DerivedCoreProperties.txt \
+-		-d UnicodeData.txt \
+-		-f CaseFolding.txt \
+-		-n NormalizationCorrections.txt \
+-		-t NormalizationTest.txt \
++
++# To regenerate utf8data.h, run the following in the top directory:
++#   $ make REGENERATE_UTF8DATA=1 fs/unicode/
++ifdef REGENERATE_UTF8DATA
++
++$(obj)/utf8-norm.o: $(obj)/utf8data.h
++
++quiet_cmd_utf8data = GEN     $@
++      cmd_utf8data = $(obj)/mkutf8data \
++		-a $(src)/DerivedAge.txt \
++		-c $(src)/DerivedCombiningClass.txt \
++		-p $(src)/DerivedCoreProperties.txt \
++		-d $(src)/UnicodeData.txt \
++		-f $(src)/CaseFolding.txt \
++		-n $(src)/NormalizationCorrections.txt \
++		-t $(src)/NormalizationTest.txt \
+ 		-o $@
++
++$(obj)/utf8data.h: $(filter %.txt, $(cmd_utf8data)) $(obj)/mkutf8data FORCE
++	$(call if_changed,utf8data)
++
++always += utf8data.h
++no-clean-files += utf8data.h
++
++endif
++
++hostprogs-y += mkutf8data
+diff --git a/fs/unicode/README.utf8data b/fs/unicode/README.utf8data
+index eeb7561..155d56e 100644
+--- a/fs/unicode/README.utf8data
++++ b/fs/unicode/README.utf8data
+@@ -41,15 +41,15 @@ released version of the UCD can be found here:
+ 
+   http://www.unicode.org/Public/UCD/latest/
+ 
+-To build the utf8data.h file, from a kernel tree that has been built,
+-cd to this directory (fs/unicode) and run this command:
++To regenerate utf8data.h in the build process, pass REGENERATE_UTF8DATA=1
++from the command line. The easiest command to update it is this:
+ 
+-	make C=../.. objdir=../.. utf8data.h.new
++	make REGENERATE_UTF8DATA=1 fs/unicode/
+ 
+-After sanity checking the newly generated utf8data.h.new file (the
++After sanity checking the newly generated utf8data.h file (the
+ version generated from the 12.1.0 UCD should be 4,109 lines long, and
+ have a total size of 324k) and/or comparing it with the older version
+-of utf8data.h, rename it to utf8data.h.
++of utf8data.h, check it in.
+ 
+ If you are a kernel developer updating to a newer version of the
+ Unicode Character Database, please update this README.utf8data file
+diff --git a/scripts/mkutf8data.c b/fs/unicode/mkutf8data.c
+similarity index 100%
+rename from scripts/mkutf8data.c
+rename to fs/unicode/mkutf8data.c
+diff --git a/scripts/Makefile b/scripts/Makefile
+index b87e3e0..9d442ee 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -20,7 +20,6 @@ hostprogs-$(CONFIG_ASN1)	 += asn1_compiler
+ hostprogs-$(CONFIG_MODULE_SIG)	 += sign-file
+ hostprogs-$(CONFIG_SYSTEM_TRUSTED_KEYRING) += extract-cert
+ hostprogs-$(CONFIG_SYSTEM_EXTRA_CERTIFICATE) += insert-sys-cert
+-hostprogs-$(CONFIG_UNICODE) += mkutf8data
+ 
+ HOSTCFLAGS_sortextable.o = -I$(srctree)/tools/include
+ HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
 -- 
-~Randy
+2.7.4
