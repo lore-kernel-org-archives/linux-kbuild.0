@@ -1,56 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f172.google.com ([209.85.208.172]:32794 "EHLO
-        mail-lj1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725971AbfEANBk (ORCPT
+Received: from mail-vk1-f202.google.com ([209.85.221.202]:51138 "EHLO
+        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726126AbfEAXCL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 May 2019 09:01:40 -0400
-Reply-To: alex.popov@linux.com
-Subject: Re: [v2 1/1] kconfig: Terminate menu blocks with a comment in the
- generated config
-References: <1556107369-7655-1-git-send-email-alex.popov@linux.com>
-From: Alexander Popov <alex.popov@linux.com>
-Message-ID: <ce9c3689-86f3-eda7-8c3d-4af834ee750d@linux.com>
-Date: Wed, 1 May 2019 16:01:34 +0300
-MIME-Version: 1.0
-In-Reply-To: <1556107369-7655-1-git-send-email-alex.popov@linux.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Wed, 1 May 2019 19:02:11 -0400
+Received: by mail-vk1-f202.google.com with SMTP id k78so242101vkk.17
+        for <linux-kbuild@vger.kernel.org>; Wed, 01 May 2019 16:02:10 -0700 (PDT)
+Date: Wed,  1 May 2019 16:01:09 -0700
+Message-Id: <20190501230126.229218-1-brendanhiggins@google.com>
+Mime-Version: 1.0
+Subject: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
+From: Brendan Higgins <brendanhiggins@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: frowand.list@gmail.com, gregkh@linuxfoundation.org, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
 
-On 24.04.2019 15:02, Alexander Popov wrote:
-> Currently menu blocks start with a pretty header but end with nothing in
-> the generated config. So next config options stick together with the
-> options from the menu block.
-> 
-> Let's terminate menu blocks in the generated config with a comment and
-> a newline if needed. Example:
-> 
-> ...
-> CONFIG_BPF_STREAM_PARSER=y
-> CONFIG_NET_FLOW_LIMIT=y
-> 
-> #
-> # Network testing
-> #
-> CONFIG_NET_PKTGEN=y
-> CONFIG_NET_DROP_MONITOR=y
-> # end of Network testing
-> # end of Networking options
-> 
-> CONFIG_HAMRADIO=y
-> ...
-> 
-> Signed-off-by: Alexander Popov <alex.popov@linux.com>
+## TLDR
 
-Hello!
+I rebased the last patchset on 5.1-rc7 in hopes that we can get this in
+5.2.
 
-Just a friendly ping.
+Shuah, I think you, Greg KH, and myself talked off thread, and we agreed
+we would merge through your tree when the time came? Am I remembering
+correctly?
 
-Would you like to take this patch?
-Can I improve anything?
+## Background
 
-Best regards,
-Alexander
+This patch set proposes KUnit, a lightweight unit testing and mocking
+framework for the Linux kernel.
+
+Unlike Autotest and kselftest, KUnit is a true unit testing framework;
+it does not require installing the kernel on a test machine or in a VM
+and does not require tests to be written in userspace running on a host
+kernel. Additionally, KUnit is fast: From invocation to completion KUnit
+can run several dozen tests in under a second. Currently, the entire
+KUnit test suite for KUnit runs in under a second from the initial
+invocation (build time excluded).
+
+KUnit is heavily inspired by JUnit, Python's unittest.mock, and
+Googletest/Googlemock for C++. KUnit provides facilities for defining
+unit test cases, grouping related test cases into test suites, providing
+common infrastructure for running tests, mocking, spying, and much more.
+
+## What's so special about unit testing?
+
+A unit test is supposed to test a single unit of code in isolation,
+hence the name. There should be no dependencies outside the control of
+the test; this means no external dependencies, which makes tests orders
+of magnitudes faster. Likewise, since there are no external dependencies,
+there are no hoops to jump through to run the tests. Additionally, this
+makes unit tests deterministic: a failing unit test always indicates a
+problem. Finally, because unit tests necessarily have finer granularity,
+they are able to test all code paths easily solving the classic problem
+of difficulty in exercising error handling code.
+
+## Is KUnit trying to replace other testing frameworks for the kernel?
+
+No. Most existing tests for the Linux kernel are end-to-end tests, which
+have their place. A well tested system has lots of unit tests, a
+reasonable number of integration tests, and some end-to-end tests. KUnit
+is just trying to address the unit test space which is currently not
+being addressed.
+
+## More information on KUnit
+
+There is a bunch of documentation near the end of this patch set that
+describes how to use KUnit and best practices for writing unit tests.
+For convenience I am hosting the compiled docs here:
+https://google.github.io/kunit-docs/third_party/kernel/docs/
+Additionally for convenience, I have applied these patches to a branch:
+https://kunit.googlesource.com/linux/+/kunit/rfc/v5.1-rc7/v1
+The repo may be cloned with:
+git clone https://kunit.googlesource.com/linux
+This patchset is on the kunit/rfc/v5.1-rc7/v1 branch.
+
+## Changes Since Last Version
+
+None. I just rebased the last patchset on v5.1-rc7.
+
+-- 
+2.21.0.593.g511ec345e18-goog
