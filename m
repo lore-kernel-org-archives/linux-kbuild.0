@@ -1,38 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:36864 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726756AbfEBU0H (ORCPT
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:44400 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726022AbfEBUaY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 May 2019 16:26:07 -0400
-Received: by mail-ot1-f65.google.com with SMTP id r20so3346940otg.4
-        for <linux-kbuild@vger.kernel.org>; Thu, 02 May 2019 13:26:07 -0700 (PDT)
+        Thu, 2 May 2019 16:30:24 -0400
+Received: by mail-ot1-f68.google.com with SMTP id d24so3322762otl.11
+        for <linux-kbuild@vger.kernel.org>; Thu, 02 May 2019 13:30:23 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190501230126.229218-1-brendanhiggins@google.com>
- <20190501230126.229218-5-brendanhiggins@google.com> <20190502110008.GC12416@kroah.com>
-In-Reply-To: <20190502110008.GC12416@kroah.com>
+ <20190501230126.229218-8-brendanhiggins@google.com> <20190502105849.GB12416@kroah.com>
+In-Reply-To: <20190502105849.GB12416@kroah.com>
 From: Brendan Higgins <brendanhiggins@google.com>
-Date: Thu, 2 May 2019 13:25:54 -0700
-Message-ID: <CAFd5g47ssM7RQZxQsUJ86UigcF-Uz+Kwv2yvKN_gZK-TtW89bA@mail.gmail.com>
-Subject: Re: [PATCH v2 04/17] kunit: test: add kunit_stream a std::stream like logger
+Date: Thu, 2 May 2019 13:30:12 -0700
+Message-ID: <CAFd5g44os8xEMMiROkmX_KM4-9yL=+y6kw4-JApxhdzJV5pwkg@mail.gmail.com>
+Subject: Re: [PATCH v2 07/17] kunit: test: add initial tests
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Greg KH <gregkh@linuxfoundation.org>
 Cc: Frank Rowand <frowand.list@gmail.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, shuah@kernel.org, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kselftest@vger.kernel.org, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-On Thu, May 2, 2019 at 4:00 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+On Thu, May 2, 2019 at 3:58 AM Greg KH <gregkh@linuxfoundation.org> wrote:
 >
-> On Wed, May 01, 2019 at 04:01:13PM -0700, Brendan Higgins wrote:
-> > A lot of the expectation and assertion infrastructure prints out fairly
-> > complicated test failure messages, so add a C++ style log library for
-> > for logging test results.
+> On Wed, May 01, 2019 at 04:01:16PM -0700, Brendan Higgins wrote:
+> > Add a test for string stream along with a simpler example.
+> >
+> > Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+> > ---
+> >  kunit/Kconfig              | 12 ++++++
+> >  kunit/Makefile             |  4 ++
+> >  kunit/example-test.c       | 88 ++++++++++++++++++++++++++++++++++++++
+> >  kunit/string-stream-test.c | 61 ++++++++++++++++++++++++++
+> >  4 files changed, 165 insertions(+)
+> >  create mode 100644 kunit/example-test.c
+> >  create mode 100644 kunit/string-stream-test.c
+> >
+> > diff --git a/kunit/Kconfig b/kunit/Kconfig
+> > index 64480092b2c24..5cb500355c873 100644
+> > --- a/kunit/Kconfig
+> > +++ b/kunit/Kconfig
+> > @@ -13,4 +13,16 @@ config KUNIT
+> >         special hardware. For more information, please see
+> >         Documentation/kunit/
+> >
+> > +config KUNIT_TEST
+> > +     bool "KUnit test for KUnit"
+> > +     depends on KUNIT
+> > +     help
+> > +       Enables KUnit test to test KUnit.
+> > +
+> > +config KUNIT_EXAMPLE_TEST
+> > +     bool "Example test for KUnit"
+> > +     depends on KUNIT
+> > +     help
+> > +       Enables example KUnit test to demo features of KUnit.
 >
-> Ideally we would always use a standard logging format, like the
-> kselftest tests all are aiming to do.  That way the output can be easily
-> parsed by tools to see if the tests succeed/fail easily.
->
-> Any chance of having this logging framework enforcing that format as
-> well?
+> Can't these tests be module?
 
-I agree with your comment on the later patch that we should handle
-this at the wrapper script layer (KUnit tool).
+At this time, no. KUnit doesn't support loading tests as kernel
+modules; it is something we could add in in the future, but I would
+rather not open that can of worms right now. There are some other
+things I would like to do that would probably be easier to do before
+adding support for tests as loadable modules.
+
+>
+> Or am I mis-reading the previous logic?
+>
+> Anyway, just a question, nothing objecting to this as-is for now.
+
+Cool
+
+Cheers!
