@@ -1,60 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vs1-f68.google.com ([209.85.217.68]:45653 "EHLO
-        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726406AbfEFRoI (ORCPT
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:35693 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726145AbfEFTK0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 May 2019 13:44:08 -0400
-Received: by mail-vs1-f68.google.com with SMTP id o10so8647895vsp.12
-        for <linux-kbuild@vger.kernel.org>; Mon, 06 May 2019 10:44:07 -0700 (PDT)
+        Mon, 6 May 2019 15:10:26 -0400
+Subject: Re: [PATCH] kconfig: fix 'Save As' menu of xconfig
+References: <1552234395-7699-1-git-send-email-yamada.masahiro@socionext.com>
+From: Robert Gadsdon <rhgadsdon@gmail.com>
+Message-ID: <84db9131-5498-d2d5-a984-11079e3c2a6e@gmail.com>
+Date: Mon, 6 May 2019 12:10:21 -0700
 MIME-Version: 1.0
-References: <20190501230126.229218-1-brendanhiggins@google.com>
- <20190501230126.229218-13-brendanhiggins@google.com> <20190502110220.GD12416@kroah.com>
- <CAFd5g47t=EdLKFCT=CnPkrM2z0nDVo24Gz4j0VxFOJbARP37Lg@mail.gmail.com>
- <a49c5088-a821-210c-66de-f422536f5b01@gmail.com> <CAFd5g44iWRchQKdJYtjRtPY6e-6e0eXpKXXsx5Ooi6sWE474KA@mail.gmail.com>
- <1a5f3c44-9fa9-d423-66bf-45255a90c468@gmail.com> <CAFd5g45RYm+zfdJXnyp2KZZH5ojfOzy++aq+4zBeE5VDu6WgEw@mail.gmail.com>
- <052fa196-4ea9-8384-79b7-fe6bacc0ee82@gmail.com> <CAFd5g47aY-CL+d7DfiyTidY4aAVY+eg1TM1UJ4nYqKSfHOi-0w@mail.gmail.com>
- <63f63c7c-6185-5e64-b338-6a5e7fb9e27c@gmail.com>
-In-Reply-To: <63f63c7c-6185-5e64-b338-6a5e7fb9e27c@gmail.com>
-From: Kees Cook <keescook@google.com>
-Date: Mon, 6 May 2019 10:43:55 -0700
-Message-ID: <CAGXu5jJpp2HyEWMtAde+VUt=9ni3HRu69NM4rUQJu4kBrnx9Kw@mail.gmail.com>
-Subject: Re: [PATCH v2 12/17] kunit: tool: add Python wrappers for running
- KUnit tests
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1552234395-7699-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frank Rowand <frowand.list@gmail.com>, Brendan Higgins <brendanhiggins@google.com>, Shuah Khan <shuah@kernel.org>
-Cc: Greg KH <gregkh@linuxfoundation.org>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com, Felix Guo <felixguoxiuping@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org
 
-On Sun, May 5, 2019 at 5:19 PM Frank Rowand <frowand.list@gmail.com> wrote:
-> You can see the full version 14 document in the submitter's repo:
->
->   $ git clone https://github.com/isaacs/testanything.github.io.git
->   $ cd testanything.github.io
->   $ git checkout tap14
->   $ ls tap-version-14-specification.md
->
-> My understanding is the the version 14 specification is not trying to
-> add new features, but instead capture what is already implemented in
-> the wild.
+On 03/10/2019 09:13 AM, Masahiro Yamada wrote:
+> The 'Save As' menu of xconfig is not working; it always saves the
+> kernel configuration into the default file irrespective of the file
+> chosen in the dialog box.
+> 
+> The 'Save' menu always writes into the default file, but it would
+> make more sense to write into the file previously chosen by 'Load'
+> or 'Save As'.
+> 
+> Signed-off-by: Masahiro Yamada<yamada.masahiro@socionext.com>
+> ---
 
-Oh! I didn't know about the work on TAP 14. I'll go read through this.
+The 'save as' may be used for out-of-tree kernel config saves, but the 
+default 'save' should always save to the in-tree .config file, as before 
+(and for the past 10+ years..)  If the kernel config was loaded from an 
+out-of-tree location, it now saves back to that out-of-tree location, 
+which is useless for the kernel compile..
 
-> > ## Here is what I propose for this patchset:
-> >
-> >  - Print out test number range at the beginning of each test suite.
-> >  - Print out log lines as soon as they happen as diagnostics.
-> >  - Print out the lines that state whether a test passes or fails as a
-> > ok/not ok line.
-> >
-> > This would be technically conforming with TAP13 and is consistent with
-> > what some kselftests have done.
+I have always kept my hardware/system-specific kernel configs 
+out-of-tree, and then applied them in-tree before compiling.
 
-This is what I fixed kselftest to actually do (it wasn't doing correct
-TAP13), and Shuah is testing the series now:
-https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/log/?h=ksft-tap-refactor
+Now, I have to use 'save as' and type in the entire in-tree path 
+(/usr/src/linux-5.1/.config) each time, in order to apply the specific 
+config to the kernel, ready for compilation.
 
-I'll go read TAP 14 now...
-
--- 
-Kees Cook
+Robert Gadsdon.
+rglinuxtech.com
