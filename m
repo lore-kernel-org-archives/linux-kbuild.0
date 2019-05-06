@@ -1,48 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:35693 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726145AbfEFTK0 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 May 2019 15:10:26 -0400
-Subject: Re: [PATCH] kconfig: fix 'Save As' menu of xconfig
-References: <1552234395-7699-1-git-send-email-yamada.masahiro@socionext.com>
-From: Robert Gadsdon <rhgadsdon@gmail.com>
-Message-ID: <84db9131-5498-d2d5-a984-11079e3c2a6e@gmail.com>
-Date: Mon, 6 May 2019 12:10:21 -0700
+Received: from muru.com ([72.249.23.125]:48076 "EHLO muru.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726118AbfEFVLZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 6 May 2019 17:11:25 -0400
+Date: Mon, 6 May 2019 14:11:20 -0700
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [PATCH] Remove MODULE_ALIAS() calls that take undefined macro
+Message-ID: <20190506211120.GR8007@atomide.com>
+References: <1557163697-17882-1-git-send-email-yamada.masahiro@socionext.com>
+ <6d8e2880-0cc0-a7d8-1d42-4401e15e3ac9@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1552234395-7699-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6d8e2880-0cc0-a7d8-1d42-4401e15e3ac9@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Ulf Magnusson <ulfalizer@gmail.com>, linux-kernel@vger.kernel.org
+To: Daniel Lezcano <daniel.lezcano@linaro.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Alexey Gladkov <gladkov.alexey@gmail.com>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Lee Jones <lee.jones@linaro.org>, Aaro Koskinen <aaro.koskinen@iki.fi>, linux-omap@vger.kernel.org, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
 
-On 03/10/2019 09:13 AM, Masahiro Yamada wrote:
-> The 'Save As' menu of xconfig is not working; it always saves the
-> kernel configuration into the default file irrespective of the file
-> chosen in the dialog box.
+* Daniel Lezcano <daniel.lezcano@linaro.org> [190506 17:40]:
+> On 06/05/2019 19:28, Masahiro Yamada wrote:
+> > These files do not define (USBHS_)DRIVER_NAME. Yet, they can be
+> > successfully compiled because they are never built as a module by
+> > anyone, i.e, the MODULE_ALIAS() calls are always no-op.
+> > 
+> > A problem showed up when a patch "moduleparam: Save information about
+> > built-in modules in separate file" is applied. With this new feature,
+> > MODULE_*() are populated even if the callers are built-in.
+> > 
+> > To avoid the build errors, the lines referencing to the undefined
+> > macro must be removed.
+> > 
+> > The complete fix is to remove all MODULE_* and #include <linux/module.h>
+> > like many "make ... explicitly non-modular" commits did.
+> > 
+> > For now, I am touching the offending lines.
+> > 
+> > Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > ---
 > 
-> The 'Save' menu always writes into the default file, but it would
-> make more sense to write into the file previously chosen by 'Load'
-> or 'Save As'.
-> 
-> Signed-off-by: Masahiro Yamada<yamada.masahiro@socionext.com>
-> ---
+> Acked-by: Daniel Lezcano <daniel.lezcano@linaro.org>
 
-The 'save as' may be used for out-of-tree kernel config saves, but the 
-default 'save' should always save to the in-tree .config file, as before 
-(and for the past 10+ years..)  If the kernel config was loaded from an 
-out-of-tree location, it now saves back to that out-of-tree location, 
-which is useless for the kernel compile..
+Thanks, please feel free to merge together with your series:
 
-I have always kept my hardware/system-specific kernel configs 
-out-of-tree, and then applied them in-tree before compiling.
+Acked-by: Tony Lindgren <tony@atomide.com>
 
-Now, I have to use 'save as' and type in the entire in-tree path 
-(/usr/src/linux-5.1/.config) each time, in order to apply the specific 
-config to the kernel, ready for compilation.
+Or if you want me to queue it separately, please let me know.
 
-Robert Gadsdon.
-rglinuxtech.com
+Regards,
+
+Tony
