@@ -1,73 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:46861 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726224AbfEGMaK (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:23556 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726159AbfEGMtA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 May 2019 08:30:10 -0400
-MIME-Version: 1.0
-References: <1556107369-7655-1-git-send-email-alex.popov@linux.com> <ce9c3689-86f3-eda7-8c3d-4af834ee750d@linux.com>
-In-Reply-To: <ce9c3689-86f3-eda7-8c3d-4af834ee750d@linux.com>
+        Tue, 7 May 2019 08:49:00 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 7 May 2019 21:29:26 +0900
-Message-ID: <CAK7LNAQUMZ4QHeYin16P-NJq77CgxuR96R46wgbf5jkpYhYP8Q@mail.gmail.com>
-Subject: Re: [v2 1/1] kconfig: Terminate menu blocks with a comment in the
- generated config
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] .gitignore: add more all*.config patterns
+Date: Tue,  7 May 2019 21:48:46 +0900
+Message-Id: <1557233326-13247-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Popov <alex.popov@linux.com>
-Cc: Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Wed, May 1, 2019 at 10:01 PM Alexander Popov <alex.popov@linux.com> wrote:
->
-> On 24.04.2019 15:02, Alexander Popov wrote:
-> > Currently menu blocks start with a pretty header but end with nothing in
-> > the generated config. So next config options stick together with the
-> > options from the menu block.
-> >
-> > Let's terminate menu blocks in the generated config with a comment and
-> > a newline if needed. Example:
-> >
-> > ...
-> > CONFIG_BPF_STREAM_PARSER=y
-> > CONFIG_NET_FLOW_LIMIT=y
-> >
-> > #
-> > # Network testing
-> > #
-> > CONFIG_NET_PKTGEN=y
-> > CONFIG_NET_DROP_MONITOR=y
-> > # end of Network testing
-> > # end of Networking options
-> >
-> > CONFIG_HAMRADIO=y
-> > ...
-> >
-> > Signed-off-by: Alexander Popov <alex.popov@linux.com>
->
-> Hello!
->
-> Just a friendly ping.
->
-> Would you like to take this patch?
-> Can I improve anything?
+For completeness, ignore all the allconfig variants.
 
+I added a leading slash because they are only searched in the
+top of the tree.
 
-This patch breaks "make testconfig".
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Please get rid of the "endof" for the rootmenu
-at the end of the .config file.
+ .gitignore | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Thanks.
-
-
-
-
-> Best regards,
-> Alexander
-
-
-
+diff --git a/.gitignore b/.gitignore
+index 2fb1765..d263ca9 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -130,7 +130,12 @@ signing_key.x509
+ x509.genkey
+ 
+ # Kconfig presets
+-all.config
++/all.config
++/alldef.config
++/allmod.config
++/allno.config
++/allrandom.config
++/allyes.config
+ 
+ # Kdevelop4
+ *.kdev4
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
