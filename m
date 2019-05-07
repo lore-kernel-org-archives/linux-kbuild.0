@@ -1,74 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f171.google.com ([209.85.160.171]:46431 "EHLO
-        mail-qt1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727845AbfEGF4I (ORCPT
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:46486 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726557AbfEGDOR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 May 2019 01:56:08 -0400
-Received: by mail-qt1-f171.google.com with SMTP id i31so17650777qti.13
-        for <linux-kbuild@vger.kernel.org>; Mon, 06 May 2019 22:56:07 -0700 (PDT)
+        Mon, 6 May 2019 23:14:17 -0400
+Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
+References: <20190501230126.229218-1-brendanhiggins@google.com>
+From: Frank Rowand <frowand.list@gmail.com>
+Message-ID: <54940124-50df-16ec-1a32-ad794ee05da7@gmail.com>
+Date: Mon, 6 May 2019 20:14:12 -0700
 MIME-Version: 1.0
-From: Joel Stanley <joel@jms.id.au>
-Date: Tue, 7 May 2019 05:55:55 +0000
-Message-ID: <CACPK8XemTPvV9KTuMDXew3vxzOw=A2Cj-ToVpe=ZSjrrYC-XRQ@mail.gmail.com>
-Subject: Error message when compiler not present
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190501230126.229218-1-brendanhiggins@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
-Cc: Christophe LEROY <christophe.leroy@c-s.fr>, Michael Ellerman <mpe@ellerman.id.au>
+To: Brendan Higgins <brendanhiggins@google.com>, gregkh@linuxfoundation.org, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
 
-Hello,
+On 5/1/19 4:01 PM, Brendan Higgins wrote:
+> ## TLDR
+> 
+> I rebased the last patchset on 5.1-rc7 in hopes that we can get this in
+> 5.2.
+> 
+> Shuah, I think you, Greg KH, and myself talked off thread, and we agreed
+> we would merge through your tree when the time came? Am I remembering
+> correctly?
+> 
+> ## Background
+> 
+> This patch set proposes KUnit, a lightweight unit testing and mocking
+> framework for the Linux kernel.
+> 
+> Unlike Autotest and kselftest, KUnit is a true unit testing framework;
+> it does not require installing the kernel on a test machine or in a VM
+> and does not require tests to be written in userspace running on a host
+> kernel. Additionally, KUnit is fast: From invocation to completion KUnit
+> can run several dozen tests in under a second. Currently, the entire
+> KUnit test suite for KUnit runs in under a second from the initial
+> invocation (build time excluded).
+> 
+> KUnit is heavily inspired by JUnit, Python's unittest.mock, and
+> Googletest/Googlemock for C++. KUnit provides facilities for defining
+> unit test cases, grouping related test cases into test suites, providing
+> common infrastructure for running tests, mocking, spying, and much more.
 
-The other day I was attempting a kernel build and stumbled across this:
+As a result of the emails replying to this patch thread, I am now
+starting to look at kselftest.  My level of understanding is based
+on some slide presentations, an LWN article, https://kselftest.wiki.kernel.org/
+and a _tiny_ bit of looking at kselftest code.
 
-$ CROSS_COMPILE=foo make
-/bin/sh: 1: foogcc: not found
-make: foogcc: Command not found
-/bin/sh: 1: foogcc: not found
-/bin/sh: 1: foogcc: not found
-scripts/kconfig/conf  --syncconfig Kconfig
-./scripts/gcc-version.sh: 17: ./scripts/gcc-version.sh: foogcc: not found
-./scripts/gcc-version.sh: 18: ./scripts/gcc-version.sh: foogcc: not found
-./scripts/gcc-version.sh: 19: ./scripts/gcc-version.sh: foogcc: not found
-./scripts/gcc-version.sh: 17: ./scripts/gcc-version.sh: foogcc: not found
-./scripts/gcc-version.sh: 18: ./scripts/gcc-version.sh: foogcc: not found
-./scripts/gcc-version.sh: 19: ./scripts/gcc-version.sh: foogcc: not found
-./scripts/clang-version.sh: 11: ./scripts/clang-version.sh: foogcc: not found
-./scripts/gcc-plugin.sh: 11: ./scripts/gcc-plugin.sh: foogcc: not found
-init/Kconfig:16:warning: 'GCC_VERSION': number is invalid
-/bin/sh: 1: foogcc: not found
-make: foogcc: Command not found
-Compiler lacks asm-goto support.
-make: *** [arch/x86/Makefile:302: checkbin] Error 1
+tl;dr; I don't really understand kselftest yet.
 
-I had something more sensible for CROSS_COMPILE, but the point is it
-did not exist in my $PATH.
 
-I tried the patch below but there's still something calling the
-$(CROSS_COMPILE)gcc before gcc-version:
+(1) why KUnit exists
 
-$ CROSS_COMPILE=foo  make
-/bin/sh: 1: foogcc: not found
-make: foogcc: Command not found
-Compiler lacks asm-goto support.
+> ## What's so special about unit testing?
+> 
+> A unit test is supposed to test a single unit of code in isolation,
+> hence the name. There should be no dependencies outside the control of
+> the test; this means no external dependencies, which makes tests orders
+> of magnitudes faster. Likewise, since there are no external dependencies,
+> there are no hoops to jump through to run the tests. Additionally, this
+> makes unit tests deterministic: a failing unit test always indicates a
+> problem. Finally, because unit tests necessarily have finer granularity,
+> they are able to test all code paths easily solving the classic problem
+> of difficulty in exercising error handling code.
 
-This isn't a big deal but if there's a simple fix it would be nice to clean up.
+(2) KUnit is not meant to replace kselftest
 
-Cheers,
+> ## Is KUnit trying to replace other testing frameworks for the kernel?
+> 
+> No. Most existing tests for the Linux kernel are end-to-end tests, which
+> have their place. A well tested system has lots of unit tests, a
+> reasonable number of integration tests, and some end-to-end tests. KUnit
+> is just trying to address the unit test space which is currently not
+> being addressed.
 
-Joel
+My understanding is that the intent of KUnit is to avoid booting a kernel on
+real hardware or in a virtual machine.  That seems to be a matter of semantics
+to me because isn't invoking a UML Linux just running the Linux kernel in
+a different form of virtualization?
 
---- a/scripts/gcc-version.sh
-+++ b/scripts/gcc-version.sh
-@@ -8,6 +8,11 @@
+So I do not understand why KUnit is an improvement over kselftest.
 
- compiler="$*"
+It seems to me that KUnit is just another piece of infrastructure that I
+am going to have to be familiar with as a kernel developer.  More overhead,
+more information to stuff into my tiny little brain.
 
-+if [ -x "command -v ${#compiler}" ]; then
-+       echo "Error: Compiler not found." >&2
-+       exit 1
-+fi
-+
- if [ ${#compiler} -eq 0 ]; then
-        echo "Error: No compiler specified." >&2
-        printf "Usage:\n\t$0 <gcc-command>\n" >&2
+I would guess that some developers will focus on just one of the two test
+environments (and some will focus on both), splitting the development
+resources instead of pooling them on a common infrastructure.
+
+What am I missing?
+
+-Frank
+
+
+> 
+> ## More information on KUnit
+> 
+> There is a bunch of documentation near the end of this patch set that
+> describes how to use KUnit and best practices for writing unit tests.
+> For convenience I am hosting the compiled docs here:
+> https://google.github.io/kunit-docs/third_party/kernel/docs/
+> Additionally for convenience, I have applied these patches to a branch:
+> https://kunit.googlesource.com/linux/+/kunit/rfc/v5.1-rc7/v1
+> The repo may be cloned with:
+> git clone https://kunit.googlesource.com/linux
+> This patchset is on the kunit/rfc/v5.1-rc7/v1 branch.
+> 
+> ## Changes Since Last Version
+> 
+> None. I just rebased the last patchset on v5.1-rc7.
+> 
