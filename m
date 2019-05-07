@@ -1,177 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr800095.outbound.protection.outlook.com ([40.107.80.95]:6422
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726276AbfEGTNv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 May 2019 15:13:51 -0400
-From: <Tim.Bird@sony.com>
-Subject: RE: [PATCH v2 12/17] kunit: tool: add Python wrappers for running
- KUnit tests
-Date: Tue, 7 May 2019 19:13:14 +0000
-Message-ID: <ECADFF3FD767C149AD96A924E7EA6EAF9770AE37@USCULXMSG01.am.sony.com>
+Received: from mail.kernel.org ([198.145.29.99]:54450 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726236AbfEGPXu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 7 May 2019 11:23:50 -0400
+Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
 References: <20190501230126.229218-1-brendanhiggins@google.com>
- <20190501230126.229218-13-brendanhiggins@google.com>
- <20190502110220.GD12416@kroah.com>
- <CAFd5g47t=EdLKFCT=CnPkrM2z0nDVo24Gz4j0VxFOJbARP37Lg@mail.gmail.com>
- <a49c5088-a821-210c-66de-f422536f5b01@gmail.com>
- <CAFd5g44iWRchQKdJYtjRtPY6e-6e0eXpKXXsx5Ooi6sWE474KA@mail.gmail.com>
- <1a5f3c44-9fa9-d423-66bf-45255a90c468@gmail.com>
- <CAFd5g45RYm+zfdJXnyp2KZZH5ojfOzy++aq+4zBeE5VDu6WgEw@mail.gmail.com>
- <052fa196-4ea9-8384-79b7-fe6bacc0ee82@gmail.com>
- <CAFd5g47aY-CL+d7DfiyTidY4aAVY+eg1TM1UJ4nYqKSfHOi-0w@mail.gmail.com>
- <63f63c7c-6185-5e64-b338-6a5e7fb9e27c@gmail.com>
- <CAFd5g46=ZU58uJ=Qhs3soBzJjzJKJFY0_uzZ7fe1CxPfJioNOA@mail.gmail.com>
-In-Reply-To: <CAFd5g46=ZU58uJ=Qhs3soBzJjzJKJFY0_uzZ7fe1CxPfJioNOA@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <54940124-50df-16ec-1a32-ad794ee05da7@gmail.com>
+ <20190507080119.GB28121@kroah.com>
+From: shuah <shuah@kernel.org>
+Message-ID: <1b1efa91-0523-21a9-e541-fdc3612bd117@kernel.org>
+Date: Tue, 7 May 2019 09:23:31 -0600
 MIME-Version: 1.0
+In-Reply-To: <20190507080119.GB28121@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: brendanhiggins@google.com, frowand.list@gmail.com
-Cc: gregkh@linuxfoundation.org, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, felixguoxiuping@gmail.com
+To: Greg KH <gregkh@linuxfoundation.org>, Frank Rowand <frowand.list@gmail.com>
+Cc: Brendan Higgins <brendanhiggins@google.com>, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, shuah <shuah@kernel.org>
 
-SGVyZSBpcyBhIGJpdCBvZiBpbmxpbmUgY29tbWVudGFyeSBvbiB0aGUgVEFQMTMvVEFQMTQgZGlz
-Y3Vzc2lvbi4NCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBCcmVuZGFu
-IEhpZ2dpbnMgDQo+IA0KPiA+IE9uIDUvMy8xOSA0OjE0IFBNLCBCcmVuZGFuIEhpZ2dpbnMgd3Jv
-dGU6DQo+ID4gPj4gT24gNS8yLzE5IDEwOjM2IFBNLCBCcmVuZGFuIEhpZ2dpbnMgd3JvdGU6DQo+
-ID4gPiBJbiBhbnkgY2FzZSwgaXQgc291bmRzIGxpa2UgeW91IGFuZCBHcmVnIGFyZSBpbiBhZ3Jl
-ZW1lbnQgb24gdGhlIGNvcmUNCj4gPiA+IGxpYnJhcmllcyBnZW5lcmF0aW5nIHRoZSBvdXRwdXQg
-aW4gVEFQMTMsIHNvIEkgd29uJ3QgYXJndWUgdGhhdCBwb2ludA0KPiA+ID4gZnVydGhlci4NCj4g
-PiA+DQo+ID4gPiAjIyBBbmFseXNpcyBvZiB1c2luZyBUQVAxMw0KPiA+DQo+ID4gSSBoYXZlIG5l
-dmVyIGxvb2tlZCBhdCBUQVAgdmVyc2lvbiAxMyBpbiBhbnkgZGVwdGggYXQgYWxsLCBzbyBkbyBu
-b3QgY29uc2lkZXINCj4gPiBtZSB0byBiZSBhbnkgc29ydCBvZiBleHBlcnQuDQo+ID4NCj4gPiBN
-eSBlbnRpcmUgVEFQIGtub3dsZWRnZSBpcyBiYXNlZCBvbjoNCj4gPg0KPiA+ICAgaHR0cHM6Ly90
-ZXN0YW55dGhpbmcub3JnL3RhcC12ZXJzaW9uLTEzLXNwZWNpZmljYXRpb24uaHRtbA0KPiA+DQo+
-ID4gYW5kIHRoZSBwdWxsIHJlcXVlc3QgdG8gY3JlYXRlIHRoZSBUQVAgdmVyc2lvbiAxNCBzcGVj
-aWZpY2F0aW9uOg0KPiA+DQo+ID4gICAgaHR0cHM6Ly9naXRodWIuY29tL1Rlc3RBbnl0aGluZy90
-ZXN0YW55dGhpbmcuZ2l0aHViLmlvL3B1bGwvMzYvZmlsZXMNCj4gPg0KPiA+IFlvdSBjYW4gc2Vl
-IHRoZSBmdWxsIHZlcnNpb24gMTQgZG9jdW1lbnQgaW4gdGhlIHN1Ym1pdHRlcidzIHJlcG86DQo+
-ID4NCj4gPiAgICQgZ2l0IGNsb25lIGh0dHBzOi8vZ2l0aHViLmNvbS9pc2FhY3MvdGVzdGFueXRo
-aW5nLmdpdGh1Yi5pby5naXQNCj4gPiAgICQgY2QgdGVzdGFueXRoaW5nLmdpdGh1Yi5pbw0KPiA+
-ICAgJCBnaXQgY2hlY2tvdXQgdGFwMTQNCj4gPiAgICQgbHMgdGFwLXZlcnNpb24tMTQtc3BlY2lm
-aWNhdGlvbi5tZA0KPiA+DQo+ID4gTXkgdW5kZXJzdGFuZGluZyBpcyB0aGUgdGhlIHZlcnNpb24g
-MTQgc3BlY2lmaWNhdGlvbiBpcyBub3QgdHJ5aW5nIHRvDQo+ID4gYWRkIG5ldyBmZWF0dXJlcywg
-YnV0IGluc3RlYWQgY2FwdHVyZSB3aGF0IGlzIGFscmVhZHkgaW1wbGVtZW50ZWQgaW4NCj4gPiB0
-aGUgd2lsZC4NCj4gPg0KPiA+DQo+ID4gPiBPbmUgb2YgbXkgZWFybGllciBjb25jZXJucyB3YXMg
-dGhhdCBUQVAxMyBpcyBhIGJpdCBvdmVyIGNvbnN0cmFpbmVkDQo+ID4gPiBmb3Igd2hhdCBJIHdv
-dWxkIGxpa2UgdG8gb3V0cHV0IGZyb20gdGhlIEtVbml0IGNvcmUuIEl0IG9ubHkgYWxsb3dzDQo+
-ID4gPiBkYXRhIHRvIGJlIG91dHB1dCBhcyBlaXRoZXI6DQo+ID4gPiAgLSB0ZXN0IG51bWJlcg0K
-PiA+ID4gIC0gb2svbm90IG9rIHdpdGggc2luZ2xlIGxpbmUgZGVzY3JpcHRpb24NCj4gPiA+ICAt
-IGRpcmVjdGl2ZQ0KPiA+ID4gIC0gZGlhZ25vc3RpY3MNCj4gPiA+ICAtIFlBTUwgYmxvY2sNCj4g
-PiA+DQo+ID4gPiBUaGUgdGVzdCBudW1iZXIgbXVzdCBiZWNvbWUgYmVmb3JlIGEgc2V0IG9mIG9r
-L25vdCBvayBsaW5lcywgYW5kIGRvZXMNCj4gPiA+IG5vdCBjb250YWluIGFueSBhZGRpdGlvbmFs
-IGluZm9ybWF0aW9uLiBPbmUgYW5ub3lpbmcgdGhpbmcgYWJvdXQgdGhpcw0KPiA+ID4gaXMgaXQg
-ZG9lc24ndCBwcm92aWRlIGFueSBraW5kIG9mIG5lc3Rpbmcgb3IgZ3JvdXBpbmcuDQo+ID4NCj4g
-PiBHcmVnJ3MgcmVzcG9uc2UgbWVudGlvbnMga3Rlc3QgKD8pIGFscmVhZHkgZG9lcyBuZXN0aW5n
-Lg0KPiANCj4gSSB0aGluayB3ZSBhcmUgdGFsa2luZyBhYm91dCBrc2VsZnRlc3QuDQo+IA0KPiA+
-IFZlcnNpb24gMTQgYWxsb3dzIG5lc3RpbmcgdGhyb3VnaCBzdWJ0ZXN0cy4gIEkgaGF2ZSBub3Qg
-bG9va2VkIGF0IHdoYXQNCj4gPiBrdGVzdCBkb2VzLCBzbyBJIGRvIG5vdCBrbm93IGlmIGl0IHVz
-ZXMgc3VidGVzdCwgb3Igc29tZXRoaW5nIGVsc2UuDQo+IA0KPiBPaCBuaWNlISBUaGF0IGlzIG5l
-dyBpbiB2ZXJzaW9uIDE0LiBJIGNhbiB1c2UgdGhhdC4NCg0KV2UgaGF2ZSBydW4gaW50byB0aGUg
-cHJvYmxlbSBvZiBzdWJ0ZXN0cyAob3IgbmVzdGVkIHRlc3RzLCBib3RoIHVzaW5nDQpUQVAxMykg
-aW4gRnVlZ28uICBJIHJlY2FsbCB0aGF0IHRoaXMgaXNzdWUgY2FtZSB1cCBpbiBrc2VsZnRlc3Qs
-IGFuZCBJIGJlbGlldmUNCndlIGRpc2N1c3NlZCBhIHNvbHV0aW9uLCBidXQgSSBkb24ndCByZWNh
-bGwgd2hhdCBpdCB3YXMuDQoNCkNhbiBzb21lb25lIHJlbWluZCBtZSB3aGF0IGtzZWxmdGVzdCBk
-b2VzIHRvIGhhbmRsZSBuZXN0ZWQgdGVzdHMNCihpbiB0ZXJtcyBvZiBUQVAxMyBvdXRwdXQpPw0K
-DQo+IA0KPiA+ID4gVGhlcmUgaXMgb25lIG9rL25vdCBvayBsaW5lIHBlciB0ZXN0IGFuZCBpdCBt
-YXkgaGF2ZSBhIHNob3J0DQo+ID4gPiBkZXNjcmlwdGlvbiBvZiB0aGUgdGVzdCBpbW1lZGlhdGVs
-eSBhZnRlciAnb2snIG9yICdub3Qgb2snOyB0aGlzIGlzDQo+ID4gPiBwcm9ibGVtYXRpYyBiZWNh
-dXNlIGl0IHdhbnRzIHRoZSBmaXJzdCB0aGluZyB5b3Ugc2F5IGFib3V0IGEgdGVzdCB0bw0KPiA+
-ID4gYmUgYWZ0ZXIgeW91IGtub3cgd2hldGhlciBpdCBwYXNzZXMgb3Igbm90Lg0KPiA+DQo+ID4g
-SSB0aGluayB5b3UgY291bGQgb3V0cHV0IGEgZGlhZ25vc3RpYyBsaW5lIHRoYXQgc2F5cyBhIHRl
-c3QgaXMgc3RhcnRpbmcuDQo+ID4gVGhpcyBpcyBpbXBvcnRhbnQgdG8gbWUgYmVjYXVzZSBwcmlu
-dGsoKSBlcnJvcnMgYW5kIHdhcm5pbmdzIHRoYXQgYXJlDQo+ID4gcmVsYXRlZCB0byBhIHRlc3Qg
-Y2FuIGJlIG91dHB1dCBieSBhIHN1YnN5c3RlbSBvdGhlciB0aGFuIHRoZSBzdWJzeXN0ZW0NCj4g
-PiB0aGF0IEkgYW0gdGVzdGluZy4gIElmIHRoZXJlIGlzIG5vIG1hcmtlciBhdCB0aGUgc3RhcnQg
-b2YgdGhlIHRlc3QNCj4gPiB0aGVuIHRoZXJlIGlzIG5vIHdheSB0byBhdHRyaWJ1dGUgdGhlIHBy
-aW50aygpcyB0byB0aGUgdGVzdC4NCj4gDQo+IEkgYWdyZWUuDQoNClRoaXMgaXMgYSBzaWduaWZp
-Y2FudCBwcm9ibGVtLiAgSW4gRnVlZ28gd2Ugb3V0cHV0IGVhY2ggbGluZSB3aXRoIGEgdGVzdCBp
-ZCBwcmVmaXgsDQp3aGljaCBnb2VzIGFnYWluc3QgdGhlIHNwZWMsIGJ1dCBoZWxwcyBzb2x2ZSB0
-aGlzLiAgVGVzdCBvdXRwdXQgc2hvdWxkIGJlDQprZXB0IHNlcGFyYXRlIGZyb20gc3lzdGVtIG91
-dHB1dCwgYnV0IGlmIEkgdW5kZXJzdGFuZCBjb3JyZWN0bHksIHRoZXJlIGFyZSBubw0KY2hhbm5l
-bHMgaW4gcHJpbmt0IHRvIHVzZSB0byBrZWVwIGRpZmZlcmVudCBkYXRhIHN0cmVhbXMgc2VwYXJh
-dGUuDQoNCkhvdyBkb2VzIGtzZWxmdGVzdCBkZWFsIHdpdGggdGhpcyBub3c/DQoNCj4gDQo+IFRl
-Y2huaWNhbGx5IGNvbmZvcm1zIHdpdGggdGhlIHNwZWMsIGFuZCBrc2VsZnRlc3QgZG9lcyB0aGF0
-LCBidXQgaXMNCj4gYWxzbyBub3QgcGFydCBvZiB0aGUgc3BlYy4gV2VsbCwgaXQgKmlzKiBzcGVj
-aWZpZWQgaWYgeW91IHVzZQ0KPiBzdWJ0ZXN0cy4gSSB0aGluayB0aGUgcmlnaHQgYXBwcm9hY2gg
-aXMgdG8gbWFrZSBlYWNoDQo+ICJrdW5pdF9tb2R1bGUvdGVzdCBzdWl0ZSIgYSB0ZXN0LCBhbmQg
-YWxsIHRoZSB0ZXN0IGNhc2VzIHdpbGwgYmUNCj4gc3VidGVzdHMuDQo+IA0KPiA+ID4gRGlyZWN0
-aXZlcyBhcmUganVzdCBhIHdheSB0byBzcGVjaWZ5IHNraXBwZWQgdGVzdHMgYW5kIFRPRE9zLg0K
-PiA+ID4NCj4gPiA+IERpYWdub3N0aWNzIHNlZW0gdXNlZnVsLCBpdCBsb29rcyBsaWtlIHlvdSBj
-YW4gcHV0IHdoYXRldmVyDQo+ID4gPiBpbmZvcm1hdGlvbiBpbiB0aGVtIGFuZCBwcmludCB0aGVt
-IG91dCBhdCBhbnl0aW1lLiBJdCBsb29rcyBsaWtlIGEgbG90DQo+ID4gPiBvZiBrc2VsZnRlc3Rz
-IGVtaXQgYSBsb3Qgb2YgZGF0YSB0aGlzIHdheS4NCj4gPiA+DQo+ID4gPiBUaGUgWUFNTCBibG9j
-ayBzZWVtcyB0byBiZSB0aGUgd2F5IHRoYXQgdGhleSBwcmVmZXIgdXNlcnMgdG8gZW1pdCBkYXRh
-DQo+ID4gPiBiZXlvbmQgbnVtYmVyIG9mIHRlc3RzIHJ1biBhbmQgd2hldGhlciBhIHRlc3QgcGFz
-c2VkIG9yIGZhaWxlZC4gSQ0KPiA+ID4gY291bGQgZXhwcmVzcyBtb3N0IHRoaW5ncyBJIHdhbnQg
-dG8gZXhwcmVzcyBpbiB0ZXJtcyBvZiBZQU1MLCBidXQgaXQNCj4gPiA+IGlzIG5vdCB0aGUgbmlj
-ZXN0IGZvcm1hdCBmb3IgZGlzcGxheWluZyBhIGxvdCBvZiBkYXRhIGxpa2UNCj4gPiA+IGV4cGVj
-dGF0aW9ucywgbWlzc2VkIGZ1bmN0aW9uIGNhbGxzLCBhbmQgb3RoZXIgdGhpbmdzIHdoaWNoIGhh
-dmUgYQ0KPiA+ID4gbmF0dXJhbCBjb25jaXNlIHJlcHJlc2VudGF0aW9uLiBOZXZlcnRoZWxlc3Ms
-IFlBTUwgcmVhZGFiaWxpdHkgaXMNCj4gPiA+IG1vc3RseSBhIHByb2JsZW0gd2hvIHdvbid0IGJl
-IHVzaW5nIHRoZSB3cmFwcGVyIHNjcmlwdHMuDQo+ID4NCj4gPiBUaGUgZXhhbXBsZXMgaW4gc3Bl
-Y2lmaWNhdGlvbiBWMTMgYW5kIFYxNCBsb29rIHZlcnkgc2ltcGxlIGFuZCB2ZXJ5DQo+ID4gcmVh
-ZGFibGUgdG8gbWUuICAoQW5kIEkgYW0gbm90IGEgZmFuIG9mIFlBTUwuKQ0KPiA+DQo+ID4NCj4g
-PiA+IE15IGJpZ2dlc3QNCj4gPiA+IHByb2JsZW0gd2l0aCB0aGUgWUFNTCBibG9jayBpcyB0aGF0
-IHlvdSBjYW4gb25seSBoYXZlIG9uZSwgYW5kIFRBUA0KPiA+ID4gc3BlY2lmaWVzIHRoYXQgaXQg
-bXVzdCBjb21lIGFmdGVyIHRoZSBjb3JyZXNwb25kaW5nIG9rL25vdCBvayBsaW5lLA0KPiA+ID4g
-d2hpY2ggYWdhaW4gaGFzIHRoZSBpc3N1ZSB0aGF0IHlvdSBoYXZlIHRvIGhvbGQgb24gdG8gYSBs
-b3Qgb2YNCj4gPiA+IGRpYWdub3N0aWMgZGF0YSBsb25nZXIgdGhhbiB5b3UgaWRlYWxseSB3b3Vs
-ZC4gQW5vdGhlciBkb3duc2lkZSBpcw0KPiA+ID4gdGhhdCBJIG5vdyBoYXZlIHRvIHdyaXRlIGEg
-WUFNTCBzZXJpYWxpemVyIGZvciB0aGUga2VybmVsLg0KPiA+DQo+ID4gSWYgYSB0ZXN0IGdlbmVy
-YXRlcyBkaWFnbm9zdGljIGRhdGEsIHRoZW4gSSB3b3VsZCBleHBlY3QgdGhhdCB0byBiZQ0KPiA+
-IHRoZSBkaXJlY3QgcmVzdWx0IG9mIGEgdGVzdCBmYWlsdXJlLiAgU28gdGhlIHRlc3QgY2FuIG91
-dHB1dCB0aGUNCj4gPiAibm90IG9rIiBsaW5lLCB0aGVuIGltbWVkaWF0ZWx5IG91dHB1dCB0aGUg
-WUFNTCBibG9jay4gIEkgZG8gbm90DQo+ID4gc2VlIGEgbmVlZCBmb3Igc3Rhc2hpbmcgWUFNTCBv
-dXRwdXQgYWhlYWQgb2YgdGltZS4NCj4gPg0KPiA+IElmIGRpYWdub3N0aWMgZGF0YSBpcyBnZW5l
-cmF0ZWQgYmVmb3JlIHRoZSB0ZXN0IGNhbiBkZXRlcm1pbmUNCj4gPiBzdWNjZXNzIG9yIGZhaWx1
-cmUsIHRoZW4gaXQgY2FuIGJlIG91dHB1dCBhcyBkaWFnbm9zdGljIGRhdGENCj4gPiBpbnN0ZWFk
-IG9mIHN0YXNoaW5nIGl0IGZvciBsYXRlci4NCj4gDQo+IENvb2wsIHRoYXQncyB3aGF0IEkgYW0g
-dGhpbmtpbmcgSSBhbSBnb2luZyB0byBkbyAtIEkganVzdCB3YW50ZWQgdG8NCj4gbWFrZSBzdXJl
-IHBlb3BsZSB3ZXJlIG9rYXkgd2l0aCB0aGlzIGFwcHJvYWNoLiBJIG1lYW4sIEkgdGhpbmsgdGhh
-dCBpcw0KPiB3aGF0IGtzZWxmdGVzdCBkb2VzLg0KDQpJTUhPIHRoZSBkaWFnbm9zdGljIGRhdGEg
-ZG9lcyBub3QgaGF2ZSB0byBiZSBpbiBZQU1MLiAgVGhhdCdzIG9ubHkNCmlmIHRoZXJlJ3MgYSB3
-ZWxsLWtub3duIHNjaGVtYSBmb3IgdGhlIGRpYWdub3N0aWMgZGF0YSwgdG8gbWFrZSB0aGUNCmRh
-dGEgbWFjaGluZS1yZWFkYWJsZS4gICBUQVAxMyBzcGVjaWZpY2FsbHkgYXZvaWRlZCBkZWZpbmlu
-ZyBzdWNoIGENCnNjaGVtYS4gIEkgbmVlZCB0byBsb29rIGF0IFRBUDE0IGFuZCBzZWUgaWYgdGhl
-eSBoYXZlIGRlZmluZWQgc29tZXRoaW5nLg0KKFRoYW5rcyBmb3IgYnJpbmdpbmcgdGhhdCB0byBt
-eSBhdHRlbnRpb24uKQ0KDQpUaGUgaW1wb3J0YW50IHBhcnQsIHNpbmNlIHRoZXJlIGFyZSBubyBz
-dGFydCBhbmQgZW5kIGRlbGltaXRlcnMgZm9yIGVhY2gNCnRlc3RjYXNlLCBpcyB0byBzdHJ1Y3R1
-cmUgb3V0cHV0IChpbmNsdWRpbmcgZnJvbSB1bnJlbGF0ZWQgc3ViLXN5c3RlbXMNCmFmZmVjdGVk
-IGJ5IHRoZSB0ZXN0KSB0byBlaXRoZXIgb2NjdXIgYWxsIGJlZm9yZSBvciBhbGwgYWZ0ZXIgdGhl
-IHRlc3QgbGluZS4NCk90aGVyd2lzZSBpdCdzIGltcG9zc2libGUgdG8gc2Vuc2libHkgcGFyc2Ug
-dGhlIGRpYWdub3N0aWMgZGF0YSBhbmQgYXNzb2NpYXRlIGl0DQp3aXRoIGEgdGVzdC4gIChUaGF0
-IGlzLCB0aGUgVEFQIGxpbmVzIGJlY29tZSB0aGUgZGVsaW1pdGVycyBiZXR3ZWVuIGVhY2ggdGVz
-dGNhc2Uncw0Kb3V0cHV0IGFuZCBkYXRhKS4gIFRoaXMgaXMgYSBwcmV0dHkgYmlnIHdlYWtuZXNz
-IG9mIFRBUDEzLiAgU2luY2UgdGhlIFRBUCBsaW5lDQpoYXMgdGhlIHRlc3QgcmVzdWx0LCBpdCB1
-c3VhbGx5IG1lYW5zIHRoYXQgdGhlIHN1YnN5c3RlbSBvdXRwdXQgZm9yIHRoZSB0ZXN0DQppcyBl
-bWl0dGVkICpiZWZvcmUqIHRoZSBUQVAgbGluZS4gIEl0J3MgcHJlZmVyYWJsZSwgaW4gb3JkZXIg
-dG8ga2VlcCB0aGUNCmRhdGEgdG9nZXRoZXIsIHRoYXQgdGhlIGRpYWdub3N0aWMgZGF0YSBhbHNv
-IGJlIGVtaXR0ZWQgYmVmb3JlIHRoZSBUQVANCmxpbmUuDQoNCj4gDQo+IFdlIGNhbiBob2xkIG9m
-ZiBvbiB0aGUgWUFNTCBzdHVmZiBmb3Igbm93IHRoZW4uDQo+IA0KPiA+ID4gIyMgSGVyZSBpcyB3
-aGF0IEkgcHJvcG9zZSBmb3IgdGhpcyBwYXRjaHNldDoNCj4gPiA+DQo+ID4gPiAgLSBQcmludCBv
-dXQgdGVzdCBudW1iZXIgcmFuZ2UgYXQgdGhlIGJlZ2lubmluZyBvZiBlYWNoIHRlc3Qgc3VpdGUu
-DQo+ID4gPiAgLSBQcmludCBvdXQgbG9nIGxpbmVzIGFzIHNvb24gYXMgdGhleSBoYXBwZW4gYXMg
-ZGlhZ25vc3RpY3MuDQo+ID4gPiAgLSBQcmludCBvdXQgdGhlIGxpbmVzIHRoYXQgc3RhdGUgd2hl
-dGhlciBhIHRlc3QgcGFzc2VzIG9yIGZhaWxzIGFzIGENCj4gPiA+IG9rL25vdCBvayBsaW5lLg0K
-PiA+ID4NCj4gPiA+IFRoaXMgd291bGQgYmUgdGVjaG5pY2FsbHkgY29uZm9ybWluZyB3aXRoIFRB
-UDEzIGFuZCBpcyBjb25zaXN0ZW50IHdpdGgNCj4gPiA+IHdoYXQgc29tZSBrc2VsZnRlc3RzIGhh
-dmUgZG9uZS4NCj4gPiA+DQo+ID4gPiAjIyBUbyBiZSBkb25lIGluIGEgZnV0dXJlIHBhdGNoc2V0
-Og0KPiA+ID4NCj4gPiA+IEFkZCBhIFlBTUwgc2VyaWFsaXplciBhbmQgcHJpbnQgb3V0IHNvbWUg
-bG9ncyBjb250YWluaW5nIHN0cnVjdHVyZWQNCj4gPiA+IGRhdGEgKGxpa2UgZXhwZWN0YXRpb24g
-ZmFpbHVyZXMsIHVuZXhwZWN0ZWQgZnVuY3Rpb24gY2FsbHMsIGV0YykgaW4NCj4gPiA+IFlBTUwg
-YmxvY2tzLg0KPiA+DQo+ID4gWUFNTCBzZXJpYWxpemVyIHNvdW5kcyBsaWtlIG5vdCBuZWVkZWQg
-Y29tcGxleGl0eS4NCkkgYWdyZWUsIGZvciBub3cuDQoNCkkgdGhpbmsgaWYgd2Ugc3RhcnQgdG8g
-c2VlIHNvbWUgcGF0dGVybnMgZm9yIHNvbWUgZGF0YSB0aGF0IG1hbnkgdGVzdHMNCm91dHB1dCwg
-d2UgbWlnaHQgd2FudCAoYXMgYSBrZXJuZWwgY29tbXVuaXR5KSB0byBkZWZpbmUgYSBZQU1MDQpz
-Y2hlbWEgZm9yIHRoZSBrc2VsZnRlc3Qgb3V0cHV0LiAgQnV0IEkgdGhpbmsgdGhhdCdzIGJpdGlu
-ZyBvZmYgdG9vIG11Y2gNCnJpZ2h0IG5vdy4gIElNSE8gd2Ugd291bGQgd2FudCBhbnkgWUFNTCBz
-Y2hlbWEgd2UgZGVmaW5lIHRvDQpjb3ZlciBtb3JlIHRoYW4ganVzdCB1bml0IHRlc3RzLCBzbyB0
-aGUgam9iIG9mIGRlZmluaW5nIHRoYXQgd291bGQgYmUNCnByZXR0eSBiaWcuDQoNClRoaXMgd291
-bGQgYmUgYSBnb29kIGRpc2N1c3Npb24gdG8gaGF2ZSBhdCBhIHRlc3RpbmcgbWljcm8tY29uZmVy
-ZW5jZQ0Kb3Igc3VtbWl0LiA6LSkNCg0KPiA+DQo+ID4gPg0KPiA+ID4gRG9lcyB0aGlzIHNvdW5k
-IHJlYXNvbmFibGU/IEkgd2lsbCBnbyBhaGVhZCBhbmQgc3RhcnQgd29ya2luZyBvbiB0aGlzLA0K
-PiA+ID4gYnV0IGZlZWwgZnJlZSB0byBnaXZlIG1lIGZlZWRiYWNrIG9uIHRoZSBvdmVyYWxsIGlk
-ZWEgaW4gdGhlIG1lYW50aW1lLg0KDQpTb3VuZHMgZ29vZC4gIFRoYW5rcyBmb3Igd29ya2luZyBv
-biB0aGlzLg0KIC0tIFRpbQ0KDQo=
+On 5/7/19 2:01 AM, Greg KH wrote:
+> On Mon, May 06, 2019 at 08:14:12PM -0700, Frank Rowand wrote:
+>> On 5/1/19 4:01 PM, Brendan Higgins wrote:
+>>> ## TLDR
+>>>
+>>> I rebased the last patchset on 5.1-rc7 in hopes that we can get this in
+>>> 5.2.
+>>>
+>>> Shuah, I think you, Greg KH, and myself talked off thread, and we agreed
+>>> we would merge through your tree when the time came? Am I remembering
+>>> correctly?
+>>>
+>>> ## Background
+>>>
+>>> This patch set proposes KUnit, a lightweight unit testing and mocking
+>>> framework for the Linux kernel.
+>>>
+>>> Unlike Autotest and kselftest, KUnit is a true unit testing framework;
+>>> it does not require installing the kernel on a test machine or in a VM
+>>> and does not require tests to be written in userspace running on a host
+>>> kernel. Additionally, KUnit is fast: From invocation to completion KUnit
+>>> can run several dozen tests in under a second. Currently, the entire
+>>> KUnit test suite for KUnit runs in under a second from the initial
+>>> invocation (build time excluded).
+>>>
+>>> KUnit is heavily inspired by JUnit, Python's unittest.mock, and
+>>> Googletest/Googlemock for C++. KUnit provides facilities for defining
+>>> unit test cases, grouping related test cases into test suites, providing
+>>> common infrastructure for running tests, mocking, spying, and much more.
+>>
+>> As a result of the emails replying to this patch thread, I am now
+>> starting to look at kselftest.  My level of understanding is based
+>> on some slide presentations, an LWN article, https://kselftest.wiki.kernel.org/
+>> and a _tiny_ bit of looking at kselftest code.
+>>
+>> tl;dr; I don't really understand kselftest yet.
+>>
+>>
+>> (1) why KUnit exists
+>>
+>>> ## What's so special about unit testing?
+>>>
+>>> A unit test is supposed to test a single unit of code in isolation,
+>>> hence the name. There should be no dependencies outside the control of
+>>> the test; this means no external dependencies, which makes tests orders
+>>> of magnitudes faster. Likewise, since there are no external dependencies,
+>>> there are no hoops to jump through to run the tests. Additionally, this
+>>> makes unit tests deterministic: a failing unit test always indicates a
+>>> problem. Finally, because unit tests necessarily have finer granularity,
+>>> they are able to test all code paths easily solving the classic problem
+>>> of difficulty in exercising error handling code.
+>>
+>> (2) KUnit is not meant to replace kselftest
+>>
+>>> ## Is KUnit trying to replace other testing frameworks for the kernel?
+>>>
+>>> No. Most existing tests for the Linux kernel are end-to-end tests, which
+>>> have their place. A well tested system has lots of unit tests, a
+>>> reasonable number of integration tests, and some end-to-end tests. KUnit
+>>> is just trying to address the unit test space which is currently not
+>>> being addressed.
+>>
+>> My understanding is that the intent of KUnit is to avoid booting a kernel on
+>> real hardware or in a virtual machine.  That seems to be a matter of semantics
+>> to me because isn't invoking a UML Linux just running the Linux kernel in
+>> a different form of virtualization?
+>>
+>> So I do not understand why KUnit is an improvement over kselftest.
+
+They are in two different categories. Kselftest falls into black box
+regression test suite which is a collection of user-space tests with a
+few kernel test modules back-ending the tests in some cases.
+
+Kselftest can be used by both kernel developers and users and provides
+a good way to regression test releases in test rings.
+
+KUnit is a white box category and is a better fit as unit test framework
+for development and provides a in-kernel testing. I wouldn't view them
+one replacing the other. They just provide coverage for different areas
+of testing.
+
+I wouldn't view KUnit as something that would be easily run in test 
+rings for example.
+
+Brendan, does that sound about right?
+
+>>
+>> It seems to me that KUnit is just another piece of infrastructure that I
+>> am going to have to be familiar with as a kernel developer.  More overhead,
+>> more information to stuff into my tiny little brain.
+>>
+>> I would guess that some developers will focus on just one of the two test
+>> environments (and some will focus on both), splitting the development
+>> resources instead of pooling them on a common infrastructure.
+
+>> What am I missing?
+> 
+> kselftest provides no in-kernel framework for testing kernel code
+> specifically.  That should be what kunit provides, an "easy" way to
+> write in-kernel tests for things.
+> 
+> Brendan, did I get it right?
+thanks,
+-- Shuah
