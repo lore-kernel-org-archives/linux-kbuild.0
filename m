@@ -1,327 +1,418 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36286 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:56034 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726187AbfEIOjI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 May 2019 10:39:08 -0400
+        id S1726899AbfEIOjS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 9 May 2019 10:39:18 -0400
 From: Joe Lawrence <joe.lawrence@redhat.com>
-Subject: [PATCH v4 00/10] klp-convert livepatch build tooling
-Date: Thu,  9 May 2019 10:38:49 -0400
-Message-Id: <20190509143859.9050-1-joe.lawrence@redhat.com>
+Subject: [PATCH v4 09/10] livepatch/selftests: add klp-convert
+Date: Thu,  9 May 2019 10:38:58 -0400
+Message-Id: <20190509143859.9050-10-joe.lawrence@redhat.com>
+In-Reply-To: <20190509143859.9050-1-joe.lawrence@redhat.com>
+References: <20190509143859.9050-1-joe.lawrence@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi all,
+Add a simple klp-convert livepatch selftest that exercises various
+symbol homonym sympos scenarios.
 
-Thanks for the feedback to v3, I've incorporated a few more bug fixes
-and style/spelling nitpicks for the series.  v4 is a bit of a resting
-place to collect loose ends before considering some heavier future work,
-namely arch-specific special section support.  See the TODO section
-below for more details.
-
-
-Previous versions
------------------
-
-RFC:
-  https://lore.kernel.org/lkml/cover.1477578530.git.jpoimboe@redhat.com/
-v2:
-  https://lore.kernel.org/lkml/f52d29f7-7d1b-ad3d-050b-a9fa8878faf2@redhat.com/
-v3:
-  https://lore.kernel.org/lkml/20190410155058.9437-1-joe.lawrence@redhat.com/
-
-
-Summary
--------
-
-Livepatches may use symbols which are not contained in its own scope,
-and, because of that, may end up compiled with relocations that will
-only be resolved during module load. Yet, when the referenced symbols are
-not exported, solving this relocation requires information on the object
-that holds the symbol (either vmlinux or modules) and its position inside
-the object, as an object may contain multiple symbols with the same name.
-Providing such information must be done accordingly to what is specified
-in Documentation/livepatch/module-elf-format.txt.
-
-Currently, there is no trivial way to embed the required information as
-requested in the final livepatch elf object. klp-convert solves this
-problem in two different forms: (i) by relying on a symbol map, which is
-built during kernel compilation, to automatically infer the relocation
-targeted symbol, and, when such inference is not possible (ii) by using
-annotations in the elf object to convert the relocation accordingly to
-the specification, enabling it to be handled by the livepatch loader.
-
-Given the above, add support for symbol mapping in the form of
-Symbols.list file; add klp-convert tool; integrate klp-convert tool into
-kbuild; make livepatch modules discernible during kernel compilation
-pipeline; add data-structure and macros to enable users to annotate
-livepatch source code; make modpost stage compatible with livepatches;
-update livepatch-sample and update documentation.
-
-The patch was tested under three use-cases:
-
-use-case 1: There is a relocation in the lp that can be automatically
-resolved by klp-convert.  For example. see the saved_command_line
-variable in lib/livepatch/test_klp_convert2.c.
-
-use-case 2: There is a relocation in the lp that cannot be automatically
-resolved, as the name of the respective symbol appears in multiple
-objects. The livepatch contains an annotation to enable a correct
-relocation.  See the KLP_MODULE_RELOC / KLP_SYMPOS annotation sections
-in lib/livepatch/test_klp_convert{1,2}.c.
-
-use-case 3: There is a relocation in the lp that cannot be automatically
-resolved similarly as 2, but no annotation was provided in the
-livepatch, triggering an error during compilation.  Reproducible by
-removing the KLP_MODULE_RELOC / KLP_SYMPOS annotation sections in
-lib/livepatch/test_klp_convert{1,2}.c.
-
-
-Branches
---------
-
-For review purposes, I posted two branches up to github:
-
-  1 - an expanded branch with changes separate from the original
-  https://github.com/joe-lawrence/linux/tree/klp-convert-v4-expanded
-
-  2 - a squashed branch of (1) that comprises v4:
-  https://github.com/joe-lawrence/linux/tree/klp-convert-v4
-
-Non-trivial commits in the expanded branch have some extra commentary
-and details for debugging in the commit message that were dropped when
-squashing into their respective parent commits.
-
-
-TODO
-----
-
-Summarized from the v3 thread, thanks to Miroslav, Joao and Josh for
-feedback and parsing my long braindumps.
-
-- Special (architecture specific) section support:
-
-  .altinstructions, .altinst_replacement
-  .parainstructions
-   __jump_table
-
-  We want to apply livepatch relocations *before* these sections are
-  processed.  Or more precisely, the special section data structures
-  entries which directly or indirectly involve livepatch relocations.
-  Those need to be extracted into "klp.arch" sections, a corresponding
-  rela section generated, and the kernel needs supporting code to handle
-  deferred processing.
-
-  Note that there is already x86-arch code present for handling
-  .altinstruction and .parainstructions sections in
-  arch/x86/kernel/livepatch.c.
-
-- Support for multiple homonym <object, name> symbols with unique
-  <position> values.  Consider a target module with symbol table that
-  looks like:
-
-     29: ... FILE    LOCAL  DEFAULT      ABS test_klp_convert_mod_a.c
-     32: ... FUNC    LOCAL  DEFAULT        3 get_homonym_string
-     33: ... OBJECT  LOCAL  DEFAULT        5 homonym_string
-     37: ... FILE    LOCAL  DEFAULT      ABS test_klp_convert_mod_b.c
-     38: ... FUNC    LOCAL  DEFAULT        3 get_homonym_string
-     39: ... OBJECT  LOCAL  DEFAULT       11 homonym_string
-
-- The BFD library is incapable of handling two rela sections with
-  identical sh_info values *as relocation sections*.  This affects
-  binutils and related programs like gdb, objdump, crash utility, etc.
-  which fail to process klp-converted .ko files.
-
-  https://sourceware.org/bugzilla/show_bug.cgi?id=24456
-  https://sourceware.org/ml/binutils/2019-04/msg00194.html
-
-
-Changelogs
-----------
-
-livepatch: Create and include UAPI headers
-  v2:
-  - jmoreira: split up and changelog
-  v3:
-  - joe: convert to SPDX license tags
-  v4:
-  - joe: from Masahiro, update UAPI headers with "GPL-2.0 WITH
-    Linux-syscall-note"
-  - joe: from Masahiro, types.h isn't needed by UAPI header
-
-kbuild: Support for Symbols.list creation
-  v3:
-  - jmoreira: adjust for multiobject livepatch
-  - joe: add klpclean to PHONY
-  - joe: align KLP prefix
-  - joe: update all in-tree livepatches with LIVEPATCH_* modinfo flag
-  v4:
-  - joe: from Miroslav, update the samples and self-test Makefiles with
-    the LIVEPATCH_ build prefix.
-  - joe: from Artem, use $(SLIST) in klpclean and $(call cmd,livepatch)
-    instead of $(call cmd_livepatch)
-
-livepatch: Add klp-convert tool
-  v2:
-  - khlebnikov: use HOSTLOADLIBES_ instead of HOSTLDFLAGS: -lelf must be
-    at the end
-  - jmoreira: add support to automatic relocation conversion in
-    klp-convert.c, changelog
-  v3:
-  - joe: convert to SPDX license tags
-  - jmoreira: add rela symbol name to WARNs
-  - jmoreira: ignore relocations to .TOC and symbols with index 0
-  - joe: separate and fix valid_sympos() sympos=0 and sympos=1..n checks
-  - joe: fix symbol use-after-frees
-  - joe: fix remaining valgrind leak complaints (non-error paths only)
-  - joe: checkpatch nits
-  v4:
-  - joe: spelling nits s/Insuficient/Insufficient and s/clasic/classic
-  - joe: from Miroslav, tweak klp-convert usage msg
-  - joe: don't move multiple list elements in convert_rela() 
-  - joe: relax duplicate user symbol check
-
-livepatch: Add klp-convert annotation helpers
-  v2:
-  - jmoreira: split up: move KLP_MODULE_RELOC from previous patch to
-    here, add KLP_SYMPOS, move macros from include/uapi/livepatch.h to
-    include/linux/livepatch.h
-  v3:
-  - joe: from Josh, KLP_MODULE_RELOC macro should 4-byte align
-    klp_module_reloc structures
-  v4:
-  - joe: remove the ',' struct array delimiter from KLP_SYMPOS
-
-modpost: Integrate klp-convert
-  v2:
-  - khlebnikov: save cmd_ld_ko_o into .module.cmd, if_changed_rule
-    doesn't do that.f
-  - khlebnikov: fix bashisms for debian where /bin/sh is a symlink to
-    /bin/dash
-  - khlebnikov: rename rule_link_module to rule_ld_ko_o, otherwise
-    arg-check inside if_changed_rule compares cmd_link_module and
-    cmd_ld_ko_o.
-  - khlebnikov: check modinfo -F livepatch only if CONFIG_LIVEPATCH is
-    true.
-  - mbenes: remove modinfo call. LIVEPATCH_ in Makefile
-  - jmoreira: split up: move the .livepatch file-based scheme for
-    identifying livepatches to a previous patch, as it was required for
-    correctly building Symbols.list there.
-  v3:
-  - joe: adjust rule_ld_ko_o to call echo-cmd
-  - joe: rebase for v5.1
-  - joe: align KLP prefix
-  v4:
-  - joe: rule_ld_ko_o should include $(Q) to honor build verbosity
-
-modpost: Add modinfo flag to livepatch modules
-  v2:
-  - jmoreira: fix modpost.c (add_livepatch_flag) to update module
-    structure with livepatch flag and prevent modpost from breaking due to
-    unresolved symbols
-  v3:
-  - joe: adjust modpost.c::get_modinfo() call for v5.0 version
-  - joe: from Miroslav: remove MODULE_INFO(livepatch, "Y") from samples
-
-livepatch: Add sample livepatch module
-  v2:
-  - jmoreira: update module to use KLP_SYMPOS
-  - jmoreira: Comments on symbol resolution scheme
-  - jmoreira: Update Makefile
-  - jmoreira: Remove MODULE_INFO statement
-  - jmoreira: Changelog
-  v3:
-  - joe: rebase for v5.1
-  - joe: code shuffle to better match original source file
-
-documentation: Update on livepatch elf format
-  v3:
-  - joe: clarify sympos=0 and sympos=1..n
-
-livepatch/selftests: add klp-convert
-  v3 (new)
-  v4:
-  - joe: Add a ',' struct array delimiter after KLP_SYMPOS
-
-livepatch/klp-convert: abort on special sections
-  v4 (new)
-
-
-Git boilerplate
----------------
-
-Joao Moreira (2):
-  kbuild: Support for Symbols.list creation
-  documentation: Update on livepatch elf format
-
-Joe Lawrence (2):
-  livepatch/selftests: add klp-convert
-  livepatch/klp-convert: abort on special sections
-
-Josh Poimboeuf (5):
-  livepatch: Create and include UAPI headers
-  livepatch: Add klp-convert tool
-  livepatch: Add klp-convert annotation helpers
-  modpost: Integrate klp-convert
-  livepatch: Add sample livepatch module
-
-Miroslav Benes (1):
-  modpost: Add modinfo flag to livepatch modules
-
- .gitignore                                    |   1 +
- Documentation/livepatch/livepatch.txt         |   3 +
- Documentation/livepatch/module-elf-format.txt |  50 +-
- MAINTAINERS                                   |   2 +
- Makefile                                      |  30 +-
- include/linux/livepatch.h                     |  13 +
- include/uapi/linux/livepatch.h                |  20 +
- kernel/livepatch/core.c                       |   4 +-
- lib/livepatch/Makefile                        |  15 +
- lib/livepatch/test_klp_atomic_replace.c       |   1 -
- lib/livepatch/test_klp_callbacks_demo.c       |   1 -
- lib/livepatch/test_klp_callbacks_demo2.c      |   1 -
- lib/livepatch/test_klp_convert1.c             | 106 +++
- lib/livepatch/test_klp_convert2.c             | 103 +++
- lib/livepatch/test_klp_convert_mod_a.c        |  25 +
- lib/livepatch/test_klp_convert_mod_b.c        |  13 +
- lib/livepatch/test_klp_livepatch.c            |   1 -
- samples/livepatch/Makefile                    |   6 +
- .../livepatch/livepatch-annotated-sample.c    | 102 +++
- samples/livepatch/livepatch-callbacks-demo.c  |   1 -
- samples/livepatch/livepatch-sample.c          |   1 -
- samples/livepatch/livepatch-shadow-fix1.c     |   1 -
- samples/livepatch/livepatch-shadow-fix2.c     |   1 -
- scripts/Kbuild.include                        |   4 +-
- scripts/Makefile                              |   1 +
- scripts/Makefile.build                        |   7 +
- scripts/Makefile.modpost                      |  24 +-
- scripts/livepatch/.gitignore                  |   1 +
- scripts/livepatch/Makefile                    |   7 +
- scripts/livepatch/elf.c                       | 753 ++++++++++++++++++
- scripts/livepatch/elf.h                       |  73 ++
- scripts/livepatch/klp-convert.c               | 731 +++++++++++++++++
- scripts/livepatch/klp-convert.h               |  39 +
- scripts/livepatch/list.h                      | 391 +++++++++
- scripts/mod/modpost.c                         |  82 +-
- scripts/mod/modpost.h                         |   1 +
- .../selftests/livepatch/test-livepatch.sh     |  64 ++
- 37 files changed, 2653 insertions(+), 26 deletions(-)
- create mode 100644 include/uapi/linux/livepatch.h
+Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
+---
+ lib/livepatch/Makefile                        |  10 ++
+ lib/livepatch/test_klp_convert1.c             | 106 ++++++++++++++++++
+ lib/livepatch/test_klp_convert2.c             | 103 +++++++++++++++++
+ lib/livepatch/test_klp_convert_mod_a.c        |  25 +++++
+ lib/livepatch/test_klp_convert_mod_b.c        |  13 +++
+ .../selftests/livepatch/test-livepatch.sh     |  64 +++++++++++
+ 6 files changed, 321 insertions(+)
  create mode 100644 lib/livepatch/test_klp_convert1.c
  create mode 100644 lib/livepatch/test_klp_convert2.c
  create mode 100644 lib/livepatch/test_klp_convert_mod_a.c
  create mode 100644 lib/livepatch/test_klp_convert_mod_b.c
- create mode 100644 samples/livepatch/livepatch-annotated-sample.c
- create mode 100644 scripts/livepatch/.gitignore
- create mode 100644 scripts/livepatch/Makefile
- create mode 100644 scripts/livepatch/elf.c
- create mode 100644 scripts/livepatch/elf.h
- create mode 100644 scripts/livepatch/klp-convert.c
- create mode 100644 scripts/livepatch/klp-convert.h
- create mode 100644 scripts/livepatch/list.h
 
+diff --git a/lib/livepatch/Makefile b/lib/livepatch/Makefile
+index 513d200b7942..b19253c72d72 100644
+--- a/lib/livepatch/Makefile
++++ b/lib/livepatch/Makefile
+@@ -5,6 +5,8 @@
+ LIVEPATCH_test_klp_atomic_replace := y
+ LIVEPATCH_test_klp_callbacks_demo := y
+ LIVEPATCH_test_klp_callbacks_demo2 := y
++LIVEPATCH_test_klp_convert1 := y
++LIVEPATCH_test_klp_convert2 := y
+ LIVEPATCH_test_klp_livepatch := y
+ 
+ obj-$(CONFIG_TEST_LIVEPATCH) += test_klp_atomic_replace.o \
+@@ -12,9 +14,17 @@ obj-$(CONFIG_TEST_LIVEPATCH) += test_klp_atomic_replace.o \
+ 				test_klp_callbacks_demo2.o \
+ 				test_klp_callbacks_busy.o \
+ 				test_klp_callbacks_mod.o \
++				test_klp_convert1.o \
++				test_klp_convert2.o \
++				test_klp_convert_mod.o \
+ 				test_klp_livepatch.o \
+ 				test_klp_shadow_vars.o
+ 
++test_klp_convert_mod-y := \
++	test_klp_convert_mod_a.o \
++	test_klp_convert_mod_b.o
++
+ # Target modules to be livepatched require CC_FLAGS_FTRACE
+ CFLAGS_test_klp_callbacks_busy.o	+= $(CC_FLAGS_FTRACE)
+ CFLAGS_test_klp_callbacks_mod.o		+= $(CC_FLAGS_FTRACE)
++CFLAGS_test_klp_convert_mod.o		+= $(CC_FLAGS_FTRACE)
+diff --git a/lib/livepatch/test_klp_convert1.c b/lib/livepatch/test_klp_convert1.c
+new file mode 100644
+index 000000000000..a359f69a8fdc
+--- /dev/null
++++ b/lib/livepatch/test_klp_convert1.c
+@@ -0,0 +1,106 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2019 Joe Lawrence <joe.lawrence@redhat.com>
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/livepatch.h>
++
++/* klp-convert symbols - vmlinux */
++extern char *saved_command_line;
++/* klp-convert symbols - test_klp_convert_mod.ko */
++extern char driver_name[];
++extern char homonym_string[];
++extern const char *get_homonym_string(void);
++extern const char *get_driver_name(void);
++
++void print_saved_command_line(void)
++{
++	pr_info("saved_command_line, 0: %s\n", saved_command_line);
++}
++
++void print_driver_name(void)
++{
++	pr_info("driver_name, 0: %s\n", driver_name);
++	pr_info("get_driver_name(), 0: %s\n", get_driver_name());
++}
++
++void print_homonym_string(void)
++{
++	pr_info("homonym_string, 1: %s\n", homonym_string);
++	pr_info("get_homonym_string(), 1: %s\n", get_homonym_string());
++}
++
++/*
++ * saved_command_line is a unique symbol, so the sympos annotation is
++ * optional.  Provide to test that sympos=0 works correctly.
++ */
++KLP_MODULE_RELOC(vmlinux) vmlinux_relocs[] = {
++	KLP_SYMPOS(saved_command_line, 0)
++};
++
++/*
++ * driver_name symbols can be found in vmlinux (multiple) and also
++ * test_klp_convert_mod, therefore the annotation is required to
++ * clarify that we want the one from test_klp_convert_mod.
++ *
++ * test_klp_convert_mod contains multiple homonym_string and
++ * get_homonym_string symbols, test resolving the first set here and
++ *  the others in test_klp_convert2.c
++ *
++ * get_driver_name is a uniquely named symbol, test that sympos=0
++ * work correctly.
++ */
++KLP_MODULE_RELOC(test_klp_convert_mod) test_klp_convert_mod_relocs_a[] = {
++	KLP_SYMPOS(driver_name, 0),
++	KLP_SYMPOS(homonym_string, 1),
++	KLP_SYMPOS(get_homonym_string, 1),
++	KLP_SYMPOS(get_driver_name, 0),
++};
++
++static struct klp_func funcs[] = {
++	{
++	}, { }
++};
++
++static struct klp_object objs[] = {
++	{
++		/* name being NULL means vmlinux */
++		.funcs = funcs,
++	},
++	{
++		.name = "test_klp_convert_mod",
++		.funcs = funcs,
++	}, { }
++};
++
++static struct klp_patch patch = {
++	.mod = THIS_MODULE,
++	.objs = objs,
++};
++
++static int test_klp_convert_init(void)
++{
++	int ret;
++
++	ret = klp_enable_patch(&patch);
++	if (ret)
++		return ret;
++
++	print_saved_command_line();
++	print_driver_name();
++	print_homonym_string();
++
++	return 0;
++}
++
++static void test_klp_convert_exit(void)
++{
++}
++
++module_init(test_klp_convert_init);
++module_exit(test_klp_convert_exit);
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Joe Lawrence <joe.lawrence@redhat.com>");
++MODULE_DESCRIPTION("Livepatch test: klp-convert1");
+diff --git a/lib/livepatch/test_klp_convert2.c b/lib/livepatch/test_klp_convert2.c
+new file mode 100644
+index 000000000000..7be9b2184fe1
+--- /dev/null
++++ b/lib/livepatch/test_klp_convert2.c
+@@ -0,0 +1,103 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2019 Joe Lawrence <joe.lawrence@redhat.com>
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/livepatch.h>
++
++/* klp-convert symbols - vmlinux */
++extern char *saved_command_line;
++/* klp-convert symbols - test_klp_convert_mod.ko */
++extern char driver_name[];
++extern char homonym_string[];
++extern const char *get_homonym_string(void);
++extern const char *get_driver_name(void);
++
++void print_saved_command_line(void)
++{
++	pr_info("saved_command_line (auto): %s\n", saved_command_line);
++}
++
++void print_driver_name(void)
++{
++	pr_info("driver_name, 0: %s\n", driver_name);
++	pr_info("get_driver_name(), (auto): %s\n", get_driver_name());
++}
++
++void print_homonym_string(void)
++{
++	pr_info("homonym_string, 2: %s\n", homonym_string);
++	pr_info("get_homonym_string(), 2: %s\n", get_homonym_string());
++}
++
++/*
++ * saved_command_line is a uniquely named symbol, so the sympos
++ * annotation is optional.  Skip it and test that klp-convert can
++ * resolve the symbol on its own.
++ */
++
++/*
++ * driver_name symbols can be found in vmlinux (multiple) and also
++ * test_klp_convert_mod, therefore the annotation is required to
++ * clarify that we want the one from test_klp_convert_mod.
++ *
++ * test_klp_convert_mod contains multiple homonym_string symbols,
++ * test_klp_convert1.c resolved to the first one, resolve to the
++ * second one here.
++ *
++ * get_driver_name is a uniquely named symbol, test klp-convert can
++ * resolve it automatically.
++ */
++KLP_MODULE_RELOC(test_klp_convert_mod) test_klp_convert_mod_relocs_a[] = {
++	KLP_SYMPOS(driver_name, 0),
++	KLP_SYMPOS(homonym_string, 2),
++	KLP_SYMPOS(get_homonym_string, 2),
++};
++
++static struct klp_func funcs[] = {
++	{
++	}, { }
++};
++
++static struct klp_object objs[] = {
++	{
++		/* name being NULL means vmlinux */
++		.funcs = funcs,
++	},
++	{
++		.name = "test_klp_convert_mod",
++		.funcs = funcs,
++	}, { }
++};
++
++static struct klp_patch patch = {
++	.mod = THIS_MODULE,
++	.objs = objs,
++};
++
++static int test_klp_convert_init(void)
++{
++	int ret;
++
++	ret = klp_enable_patch(&patch);
++	if (ret)
++		return ret;
++
++	print_saved_command_line();
++	print_driver_name();
++	print_homonym_string();
++
++	return 0;
++}
++
++static void test_klp_convert_exit(void)
++{
++}
++
++module_init(test_klp_convert_init);
++module_exit(test_klp_convert_exit);
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Joe Lawrence <joe.lawrence@redhat.com>");
++MODULE_DESCRIPTION("Livepatch test: klp-convert2");
+diff --git a/lib/livepatch/test_klp_convert_mod_a.c b/lib/livepatch/test_klp_convert_mod_a.c
+new file mode 100644
+index 000000000000..b2db9942fbd2
+--- /dev/null
++++ b/lib/livepatch/test_klp_convert_mod_a.c
+@@ -0,0 +1,25 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2019 Joe Lawrence <joe.lawrence@redhat.com>
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++
++/* Unique symbols that don't need sympos annotation */
++static const char driver_name[] = KBUILD_MODNAME;
++__used static const char *get_driver_name(void)
++{
++	return driver_name;
++}
++
++/* Common symbol names that need sympos */
++static const char homonym_string[] = "homonym string A";
++__used static const char *get_homonym_string(void)
++{
++	return homonym_string;
++}
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Joe Lawrence <joe.lawrence@redhat.com>");
++MODULE_DESCRIPTION("Livepatch test: klp-convert module");
+diff --git a/lib/livepatch/test_klp_convert_mod_b.c b/lib/livepatch/test_klp_convert_mod_b.c
+new file mode 100644
+index 000000000000..a3d529ff5f1f
+--- /dev/null
++++ b/lib/livepatch/test_klp_convert_mod_b.c
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2019 Joe Lawrence <joe.lawrence@redhat.com>
++
++/*
++ * A second compilation unit to provide another set of similarly named
++ * symbols, forcing a livepatch to use sympos annotations.
++ */
++
++static char homonym_string[] = "homonym string B";
++__used static char *get_homonym_string(void)
++{
++	return homonym_string;
++}
+diff --git a/tools/testing/selftests/livepatch/test-livepatch.sh b/tools/testing/selftests/livepatch/test-livepatch.sh
+index f05268aea859..9c3745e8ba1d 100755
+--- a/tools/testing/selftests/livepatch/test-livepatch.sh
++++ b/tools/testing/selftests/livepatch/test-livepatch.sh
+@@ -6,6 +6,9 @@
+ 
+ MOD_LIVEPATCH=test_klp_livepatch
+ MOD_REPLACE=test_klp_atomic_replace
++MOD_KLP_CONVERT_MOD=test_klp_convert_mod
++MOD_KLP_CONVERT1=test_klp_convert1
++MOD_KLP_CONVERT2=test_klp_convert2
+ 
+ set_dynamic_debug
+ 
+@@ -165,4 +168,65 @@ livepatch: '$MOD_REPLACE': unpatching complete
+ % rmmod $MOD_REPLACE"
+ 
+ 
++# TEST: klp-convert symbols
++# - load a livepatch that modifies the output from /proc/cmdline
++#   including a reference to vmlinux-local symbol that klp-convert
++#   will process
++# - verify correct behavior
++# - unload the livepatch and make sure the patch was removed
++
++echo -n "TEST: klp-convert symbols ... "
++dmesg -C
++
++saved_cmdline=$(cat /proc/cmdline)
++
++load_mod $MOD_KLP_CONVERT_MOD
++
++load_lp $MOD_KLP_CONVERT1
++disable_lp $MOD_KLP_CONVERT1
++unload_lp $MOD_KLP_CONVERT1
++
++load_lp $MOD_KLP_CONVERT2
++disable_lp $MOD_KLP_CONVERT2
++unload_lp $MOD_KLP_CONVERT2
++
++unload_mod $MOD_KLP_CONVERT_MOD
++
++check_result "% modprobe $MOD_KLP_CONVERT_MOD
++% modprobe $MOD_KLP_CONVERT1
++livepatch: enabling patch '$MOD_KLP_CONVERT1'
++livepatch: '$MOD_KLP_CONVERT1': initializing patching transition
++livepatch: '$MOD_KLP_CONVERT1': starting patching transition
++$MOD_KLP_CONVERT1: saved_command_line, 0: $saved_cmdline
++$MOD_KLP_CONVERT1: driver_name, 0: $MOD_KLP_CONVERT_MOD
++$MOD_KLP_CONVERT1: get_driver_name(), 0: $MOD_KLP_CONVERT_MOD
++$MOD_KLP_CONVERT1: homonym_string, 1: homonym string A
++$MOD_KLP_CONVERT1: get_homonym_string(), 1: homonym string A
++livepatch: '$MOD_KLP_CONVERT1': completing patching transition
++livepatch: '$MOD_KLP_CONVERT1': patching complete
++% echo 0 > /sys/kernel/livepatch/$MOD_KLP_CONVERT1/enabled
++livepatch: '$MOD_KLP_CONVERT1': initializing unpatching transition
++livepatch: '$MOD_KLP_CONVERT1': starting unpatching transition
++livepatch: '$MOD_KLP_CONVERT1': completing unpatching transition
++livepatch: '$MOD_KLP_CONVERT1': unpatching complete
++% rmmod $MOD_KLP_CONVERT1
++% modprobe $MOD_KLP_CONVERT2
++livepatch: enabling patch '$MOD_KLP_CONVERT2'
++livepatch: '$MOD_KLP_CONVERT2': initializing patching transition
++livepatch: '$MOD_KLP_CONVERT2': starting patching transition
++$MOD_KLP_CONVERT2: saved_command_line (auto): $saved_cmdline
++$MOD_KLP_CONVERT2: driver_name, 0: $MOD_KLP_CONVERT_MOD
++$MOD_KLP_CONVERT2: get_driver_name(), (auto): $MOD_KLP_CONVERT_MOD
++$MOD_KLP_CONVERT2: homonym_string, 2: homonym string B
++$MOD_KLP_CONVERT2: get_homonym_string(), 2: homonym string B
++livepatch: '$MOD_KLP_CONVERT2': completing patching transition
++livepatch: '$MOD_KLP_CONVERT2': patching complete
++% echo 0 > /sys/kernel/livepatch/$MOD_KLP_CONVERT2/enabled
++livepatch: '$MOD_KLP_CONVERT2': initializing unpatching transition
++livepatch: '$MOD_KLP_CONVERT2': starting unpatching transition
++livepatch: '$MOD_KLP_CONVERT2': completing unpatching transition
++livepatch: '$MOD_KLP_CONVERT2': unpatching complete
++% rmmod $MOD_KLP_CONVERT2
++% rmmod $MOD_KLP_CONVERT_MOD"
++
+ exit 0
 -- 
 2.20.1
