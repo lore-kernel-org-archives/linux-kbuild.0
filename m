@@ -1,98 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:55359 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726806AbfEIUTa (ORCPT
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:45284 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726219AbfEIVoQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 May 2019 16:19:30 -0400
-Received: by mail-pg1-f201.google.com with SMTP id a8so2351628pgq.22
-        for <linux-kbuild@vger.kernel.org>; Thu, 09 May 2019 13:19:30 -0700 (PDT)
-Date: Thu,  9 May 2019 13:19:21 -0700
-Message-Id: <20190509201925.189615-1-ndesaulniers@google.com>
-Mime-Version: 1.0
-Subject: [PATCH] kbuild: add script check for cross compilation utilities
-From: Nick Desaulniers <ndesaulniers@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 9 May 2019 17:44:16 -0400
+Date: Thu, 9 May 2019 17:42:33 -0400
+From: "Theodore Ts'o" <tytso@mit.edu>
+Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
+Message-ID: <20190509214233.GA20877@mit.edu>
+References: <54940124-50df-16ec-1a32-ad794ee05da7@gmail.com>
+ <20190507080119.GB28121@kroah.com>
+ <a09a7e0e-9894-8c1a-34eb-fc482b1759d0@gmail.com>
+ <20190509015856.GB7031@mit.edu>
+ <580e092f-fa4e-eedc-9e9a-a57dd085f0a6@gmail.com>
+ <20190509032017.GA29703@mit.edu>
+ <7fd35df81c06f6eb319223a22e7b93f29926edb9.camel@oracle.com>
+ <20190509133551.GD29703@mit.edu>
+ <ECADFF3FD767C149AD96A924E7EA6EAF9770D591@USCULXMSG01.am.sony.com>
+ <875c546d-9713-bb59-47e4-77a1d2c69a6d@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875c546d-9713-bb59-47e4-77a1d2c69a6d@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com
-Cc: clang-built-linux@googlegroups.com, Nick Desaulniers <ndesaulniers@google.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Frank Rowand <frowand.list@gmail.com>
+Cc: Tim.Bird@sony.com, knut.omang@oracle.com, gregkh@linuxfoundation.org, brendanhiggins@google.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
 
-When cross compiling via setting CROSS_COMPILE, if the prefixed tools
-are not found, then the host utilities are often instead invoked, and
-produce often difficult to understand errors.  This is most commonly the
-case for developers new to cross compiling the kernel that have yet to
-install the proper cross compilation toolchain. Rather than charge
-headlong into a build that will fail obscurely, check that the tools
-exist before starting to compile, and fail with a friendly error
-message.
+On Thu, May 09, 2019 at 11:12:12AM -0700, Frank Rowand wrote:
+> 
+>    "My understanding is that the intent of KUnit is to avoid booting a kernel on
+>    real hardware or in a virtual machine.  That seems to be a matter of semantics
+>    to me because isn't invoking a UML Linux just running the Linux kernel in
+>    a different form of virtualization?
+> 
+>    So I do not understand why KUnit is an improvement over kselftest.
+> 
+>    ...
+> 
+>    What am I missing?"
 
-Before:
-$ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make CC=clang
-...
-/usr/bin/as: unrecognized option '-EL'
-clang: error: assembler command failed with exit code 1 (use -v to see
-invocation)
-make[2]: *** [../scripts/Makefile.build:279: scripts/mod/empty.o] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [/linux/Makefile:1118:
-prepare0] Error 2
-make: *** [Makefile:179: sub-make] Error 2
+One major difference: kselftest requires a userspace environment; it
+starts systemd, requires a root file system from which you can load
+modules, etc.  Kunit doesn't require a root file system; doesn't
+require that you start systemd; doesn't allow you to run arbitrary
+perl, python, bash, etc. scripts.  As such, it's much lighter weight
+than kselftest, and will have much less overhead before you can start
+running tests.  So it's not really the same kind of virtualization.
 
-After:
-$ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make CC=clang
-$CROSS_COMPILE set to arm-linux-gnueabihf-, but unable to find
-arm-linux-gnueabihf-as.
-Makefile:522: recipe for target 'outputmakefile' failed
-make: *** [outputmakefile] Error 1
+Does this help?
 
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
----
-Note: this is probably more generally useful, but after a few minutes
-wrestling with Make errors related to "recipe commences before first
-target" and "missing separator," I came to understand my hatred of GNU
-Make. Open to sugguestions for where better to invoke this from the top
-level Makefile.
-
- Makefile                      |  1 +
- scripts/check_crosscompile.sh | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+)
- create mode 100755 scripts/check_crosscompile.sh
-
-diff --git a/Makefile b/Makefile
-index a61a95b6b38f..774339674b59 100644
---- a/Makefile
-+++ b/Makefile
-@@ -519,6 +519,7 @@ endif
- 
- ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
- ifneq ($(CROSS_COMPILE),)
-+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/check_crosscompile.sh
- CLANG_FLAGS	:= --target=$(notdir $(CROSS_COMPILE:%-=%))
- GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
- CLANG_FLAGS	+= --prefix=$(GCC_TOOLCHAIN_DIR)
-diff --git a/scripts/check_crosscompile.sh b/scripts/check_crosscompile.sh
-new file mode 100755
-index 000000000000..f4586fbfee18
---- /dev/null
-+++ b/scripts/check_crosscompile.sh
-@@ -0,0 +1,18 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# (c) 2019, Nick Desaulniers <ndesaulniers@google.com>
-+function check () {
-+  # Remove trailing commands, for example arch/arm/Makefile may add `-EL`.
-+  utility=$(echo ${1} | awk '{print $1;}')
-+  command -v "${utility}" &> /dev/null
-+  if [[ $? != 0 ]]; then
-+    echo "\$CROSS_COMPILE set to ${CROSS_COMPILE}," \
-+      "but unable to find ${utility}."
-+    exit 1
-+  fi
-+}
-+utilities=("${AS}" "${LD}" "${CC}" "${AR}" "${NM}" "${STRIP}" "${OBJCOPY}"
-+  "${OBJDUMP}")
-+for utility in "${utilities[@]}"; do
-+  check "${utility}"
-+done
--- 
-2.21.0.1020.gf2820cf01a-goog
+					- Ted
