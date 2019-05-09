@@ -1,75 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:38658 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725842AbfEICSf (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:56164 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725842AbfEICqw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 May 2019 22:18:35 -0400
-Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
- testing framework
-References: <20190501230126.229218-1-brendanhiggins@google.com>
- <54940124-50df-16ec-1a32-ad794ee05da7@gmail.com>
- <20190507080119.GB28121@kroah.com> <20190507172256.GB5900@mit.edu>
- <4d963cdc-1cbb-35a3-292c-552f865ed1f7@gmail.com>
- <20190509014407.GA7031@mit.edu>
-From: Frank Rowand <frowand.list@gmail.com>
-Message-ID: <458dcb03-8dee-a005-97e1-7296a9e5bbfd@gmail.com>
-Date: Wed, 8 May 2019 19:18:30 -0700
-MIME-Version: 1.0
-In-Reply-To: <20190509014407.GA7031@mit.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Wed, 8 May 2019 22:46:52 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kconfig: remove trailing whitespaces
+Date: Thu,  9 May 2019 11:46:31 +0900
+Message-Id: <20190509024631.14406-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>, Greg KH <gregkh@linuxfoundation.org>, Brendan Higgins <brendanhiggins@google.com>, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On 5/8/19 6:44 PM, Theodore Ts'o wrote:
-> On Wed, May 08, 2019 at 05:58:49PM -0700, Frank Rowand wrote:
->>
->> If KUnit is added to the kernel, and a subsystem that I am submitting
->> code for has chosen to use KUnit instead of kselftest, then yes, I do
->> *have* to use KUnit if my submission needs to contain a test for the
->> code unless I want to convince the maintainer that somehow my case
->> is special and I prefer to use kselftest instead of KUnittest.
-> 
-> That's going to be between you and the maintainer.  Today, if you want
-> to submit a substantive change to xfs or ext4, you're going to be
-> asked to create test for that new feature using xfstests.  It doesn't
-> matter that xfstests isn't in the kernel --- if that's what is
-> required by the maintainer.
+There are still some trailing whitespaces under scripts/kconfig/tests/,
+but they must be kept. Otherwise, "make testconfig" would break.
 
-Yes, that is exactly what I was saying.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Please do not cut the pertinent parts of context that I am replying to.
+ scripts/kconfig/gconf.c                  | 2 +-
+ scripts/kconfig/lxdialog/BIG.FAT.WARNING | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-
->>> supposed to be a simple way to run a large number of small tests that
->>> for specific small components in a system.
->>
->> kselftest also supports running a subset of tests.  That subset of tests
->> can also be a large number of small tests.  There is nothing inherent
->> in KUnit vs kselftest in this regard, as far as I am aware.
-
-
-> The big difference is that kselftests are driven by a C program that
-> runs in userspace.  Take a look at tools/testing/selftests/filesystem/dnotify_test.c
-> it has a main(int argc, char *argv) function.
-> 
-> In contrast, KUnit are fragments of C code which run in the kernel;
-> not in userspace.  This allows us to test internal functions inside
-> complex file system (such as the block allocator in ext4) directly.
-> This makes it *fundamentally* different from kselftest.
-
-No, totally incorrect.  kselftests also supports in kernel modules as
-I mention in another reply to this patch.
-
-This is talking past each other a little bit, because your next reply
-is a reply to my email about modules.
-
--Frank
-
-> 
-> Cheers,
-> 
-> 						- Ted
-> 
+diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
+index 5d4ecf309ee4..e36b342f1065 100644
+--- a/scripts/kconfig/gconf.c
++++ b/scripts/kconfig/gconf.c
+@@ -638,7 +638,7 @@ on_set_option_mode3_activate(GtkMenuItem *menuitem, gpointer user_data)
+ void on_introduction1_activate(GtkMenuItem * menuitem, gpointer user_data)
+ {
+ 	GtkWidget *dialog;
+-	const gchar *intro_text = 
++	const gchar *intro_text =
+ 	    "Welcome to gkc, the GTK+ graphical configuration tool\n"
+ 	    "For each option, a blank box indicates the feature is disabled, a\n"
+ 	    "check indicates it is enabled, and a dot indicates that it is to\n"
+diff --git a/scripts/kconfig/lxdialog/BIG.FAT.WARNING b/scripts/kconfig/lxdialog/BIG.FAT.WARNING
+index a8999d82bdb3..7cb5a7ec93d2 100644
+--- a/scripts/kconfig/lxdialog/BIG.FAT.WARNING
++++ b/scripts/kconfig/lxdialog/BIG.FAT.WARNING
+@@ -1,4 +1,4 @@
+ This is NOT the official version of dialog.  This version has been
+ significantly modified from the original.  It is for use by the Linux
+-kernel configuration script.  Please do not bother Savio Lam with 
++kernel configuration script.  Please do not bother Savio Lam with
+ questions about this program.
+-- 
+2.17.1
