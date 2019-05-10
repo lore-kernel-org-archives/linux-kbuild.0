@@ -1,138 +1,128 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp2130.oracle.com ([141.146.126.79]:48710 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726924AbfEJFun (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:49735 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726923AbfEJGNP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 May 2019 01:50:43 -0400
-Message-ID: <a1b88d5add15d43de0468c32d9a2427629337abb.camel@oracle.com>
-Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
- testing framework
-From: Knut Omang <knut.omang@oracle.com>
-Date: Fri, 10 May 2019 07:48:35 +0200
-In-Reply-To: <6d6e91ec-33d3-830b-4895-4d7a20ba7d45@gmail.com>
-References: <a09a7e0e-9894-8c1a-34eb-fc482b1759d0@gmail.com>
-         <20190509015856.GB7031@mit.edu>
-         <580e092f-fa4e-eedc-9e9a-a57dd085f0a6@gmail.com>
-         <20190509032017.GA29703@mit.edu>
-         <7fd35df81c06f6eb319223a22e7b93f29926edb9.camel@oracle.com>
-         <20190509133551.GD29703@mit.edu>
-         <ECADFF3FD767C149AD96A924E7EA6EAF9770D591@USCULXMSG01.am.sony.com>
-         <875c546d-9713-bb59-47e4-77a1d2c69a6d@gmail.com>
-         <20190509214233.GA20877@mit.edu>
-         <b09ba170-229b-fde4-3e9a-e50d6ab4c1b5@deltatee.com>
-         <20190509233043.GC20877@mit.edu>
-         <8914afef-1e66-e6e3-f891-5855768d3018@deltatee.com>
-         <6d6e91ec-33d3-830b-4895-4d7a20ba7d45@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Fri, 10 May 2019 02:13:15 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 2/2] kconfig: do not write .config if the content is the same
+Date: Fri, 10 May 2019 15:12:05 +0900
+Message-Id: <20190510061205.28753-2-yamada.masahiro@socionext.com>
+In-Reply-To: <20190510061205.28753-1-yamada.masahiro@socionext.com>
+References: <20190510061205.28753-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frank Rowand <frowand.list@gmail.com>, Logan Gunthorpe <logang@deltatee.com>, Theodore Ts'o <tytso@mit.edu>, Tim.Bird@sony.com, gregkh@linuxfoundation.org, brendanhiggins@google.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
+To: linux-kbuild@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Joel Fernandes <joel@joelfernandes.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Thu, 2019-05-09 at 22:18 -0700, Frank Rowand wrote:
-> On 5/9/19 4:40 PM, Logan Gunthorpe wrote:
-> > 
-> > 
-> > On 2019-05-09 5:30 p.m., Theodore Ts'o wrote:
-> >> On Thu, May 09, 2019 at 04:20:05PM -0600, Logan Gunthorpe wrote:
-> >>>
-> >>> The second item, arguably, does have significant overlap with kselftest.
-> >>> Whether you are running short tests in a light weight UML environment or
-> >>> higher level tests in an heavier VM the two could be using the same
-> >>> framework for writing or defining in-kernel tests. It *may* also be valuable
-> >>> for some people to be able to run all the UML tests in the heavy VM
-> >>> environment along side other higher level tests.
-> >>>
-> >>> Looking at the selftests tree in the repo, we already have similar items to
-> >>> what Kunit is adding as I described in point (2) above. kselftest_harness.h
-> >>> contains macros like EXPECT_* and ASSERT_* with very similar intentions to
-> >>> the new KUNIT_EXECPT_* and KUNIT_ASSERT_* macros.
-> >>>
-> >>> However, the number of users of this harness appears to be quite small. Most
-> >>> of the code in the selftests tree seems to be a random mismash of scripts
-> >>> and userspace code so it's not hard to see it as something completely
-> >>> different from the new Kunit:
-> >>>
-> >>> $ git grep --files-with-matches kselftest_harness.h *
-> >>
-> >> To the extent that we can unify how tests are written, I agree that
-> >> this would be a good thing.  However, you should note that
-> >> kselftest_harness.h is currently assums that it will be included in
-> >> userspace programs.  This is most obviously seen if you look closely
-> >> at the functions defined in the header files which makes calls to
-> >> fork(), abort() and fprintf().
-> > 
-> > Ah, yes. I obviously did not dig deep enough. Using kunit for
-> > in-kernel tests and kselftest_harness for userspace tests seems like
-> > a sensible line to draw to me. Trying to unify kernel and userspace
-> > here sounds like it could be difficult so it's probably not worth
-> > forcing the issue unless someone wants to do some really fancy work
-> > to get it done.
-> > 
-> > Based on some of the other commenters, I was under the impression
-> > that kselftests had in-kernel tests but I'm not sure where or if they
-> > exist.
-> 
-> YES, kselftest has in-kernel tests.  (Excuse the shouting...)
-> 
-> Here is a likely list of them in the kernel source tree:
-> 
-> $ grep module_init lib/test_*.c
-> lib/test_bitfield.c:module_init(test_bitfields)
-> lib/test_bitmap.c:module_init(test_bitmap_init);
-> lib/test_bpf.c:module_init(test_bpf_init);
-> lib/test_debug_virtual.c:module_init(test_debug_virtual_init);
-> lib/test_firmware.c:module_init(test_firmware_init);
-> lib/test_hash.c:module_init(test_hash_init);	/* Does everything */
-> lib/test_hexdump.c:module_init(test_hexdump_init);
-> lib/test_ida.c:module_init(ida_checks);
-> lib/test_kasan.c:module_init(kmalloc_tests_init);
-> lib/test_list_sort.c:module_init(list_sort_test);
-> lib/test_memcat_p.c:module_init(test_memcat_p_init);
-> lib/test_module.c:static int __init test_module_init(void)
-> lib/test_module.c:module_init(test_module_init);
-> lib/test_objagg.c:module_init(test_objagg_init);
-> lib/test_overflow.c:static int __init test_module_init(void)
-> lib/test_overflow.c:module_init(test_module_init);
-> lib/test_parman.c:module_init(test_parman_init);
-> lib/test_printf.c:module_init(test_printf_init);
-> lib/test_rhashtable.c:module_init(test_rht_init);
-> lib/test_siphash.c:module_init(siphash_test_init);
-> lib/test_sort.c:module_init(test_sort_init);
-> lib/test_stackinit.c:module_init(test_stackinit_init);
-> lib/test_static_key_base.c:module_init(test_static_key_base_init);
-> lib/test_static_keys.c:module_init(test_static_key_init);
-> lib/test_string.c:module_init(string_selftest_init);
-> lib/test_ubsan.c:module_init(test_ubsan_init);
-> lib/test_user_copy.c:module_init(test_user_copy_init);
-> lib/test_uuid.c:module_init(test_uuid_init);
-> lib/test_vmalloc.c:module_init(vmalloc_test_init)
-> lib/test_xarray.c:module_init(xarray_checks);
-> 
-> 
-> > If they do exists, it seems like it would make sense to
-> > convert those to kunit and have Kunit tests run-able in a VM or
-> > baremetal instance.
-> 
-> They already run in a VM.
-> 
-> They already run on bare metal.
-> 
-> They already run in UML.
-> 
-> This is not to say that KUnit does not make sense.  But I'm still trying
-> to get a better description of the KUnit features (and there are
-> some).
+Kconfig updates the .config when it exits even if its content is
+exactly the same as before. Since its timestamp becomes newer than
+that of other build artifacts, additional processing is invoked,
+which is annoying.
 
-FYI, I have a master student who looks at converting some of these to KTF, such as for
-instance the XArray tests, which lended themselves quite good to a semi-automated
-conversion. 
+- syncconfig is invoked to update include/config/auto.conf, etc.
 
-The result is also a somewhat more compact code as well as the flexibility 
-provided by the Googletest executor and the KTF frameworks, such as running selected
-tests, output formatting, debugging features etc.
+- kernel/config.o is recompiled if CONFIG_IKCONFIG is enabled,
+  then vmlinux is relinked as well.
 
-Knut
+If the .config is not changed at all, we do not have to even
+touch it. Just bail out showing "No change to .config".
 
-> -Frank
+  $ make allmodconfig
+  scripts/kconfig/conf  --allmodconfig Kconfig
+  #
+  # configuration written to .config
+  #
+  $ make allmodconfig
+  scripts/kconfig/conf  --allmodconfig Kconfig
+  #
+  # No change to .config
+  #
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ scripts/kconfig/confdata.c | 54 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
+
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 9fd6430c93d2..399973e35533 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -3,6 +3,7 @@
+  * Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>
+  */
+ 
++#include <sys/mman.h>
+ #include <sys/stat.h>
+ #include <ctype.h>
+ #include <errno.h>
+@@ -36,6 +37,52 @@ static bool is_dir(const char *path)
+ 	return S_ISDIR(st.st_mode);
+ }
+ 
++/* return true if the given two files are the same, false otherwise */
++static bool is_same(const char *file1, const char *file2)
++{
++	int fd1, fd2;
++	struct stat st1, st2;
++	void *map1, *map2;
++	bool ret = false;
++
++	fd1 = open(file1, O_RDONLY);
++	if (fd1 < 0)
++		return ret;
++
++	fd2 = open(file2, O_RDONLY);
++	if (fd2 < 0)
++		goto close1;
++
++	ret = fstat(fd1, &st1);
++	if (ret)
++		goto close2;
++	ret = fstat(fd2, &st2);
++	if (ret)
++		goto close2;
++
++	if (st1.st_size != st2.st_size)
++		goto close2;
++
++	map1 = mmap(NULL, st1.st_size, PROT_READ, MAP_PRIVATE, fd1, 0);
++	if (map1 == MAP_FAILED)
++		goto close2;
++
++	map2 = mmap(NULL, st2.st_size, PROT_READ, MAP_PRIVATE, fd2, 0);
++	if (map2 == MAP_FAILED)
++		goto close2;
++
++	if (bcmp(map1, map2, st1.st_size))
++		goto close2;
++
++	ret = true;
++close2:
++	close(fd2);
++close1:
++	close(fd1);
++
++	return ret;
++}
++
+ /*
+  * Create the parent directory of the given path.
+  *
+@@ -888,6 +935,13 @@ int conf_write(const char *name)
+ 	fclose(out);
+ 
+ 	if (*tmpname) {
++		if (is_same(name, tmpname)) {
++			conf_message("No change to %s", name);
++			unlink(tmpname);
++			sym_set_change_count(0);
++			return 0;
++		}
++
+ 		snprintf(oldname, sizeof(oldname), "%s.old", name);
+ 		rename(name, oldname);
+ 		if (rename(tmpname, name))
+-- 
+2.17.1
