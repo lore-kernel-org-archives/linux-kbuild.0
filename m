@@ -1,75 +1,131 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:37947 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727917AbfEJVDQ (ORCPT
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:42318 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727677AbfEJVFa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 May 2019 17:03:16 -0400
-Received: by mail-ot1-f67.google.com with SMTP id s19so6805309otq.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 10 May 2019 14:03:15 -0700 (PDT)
+        Fri, 10 May 2019 17:05:30 -0400
+Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
+References: <20190501230126.229218-1-brendanhiggins@google.com>
+ <54940124-50df-16ec-1a32-ad794ee05da7@gmail.com>
+ <20190507080119.GB28121@kroah.com>
+ <a09a7e0e-9894-8c1a-34eb-fc482b1759d0@gmail.com>
+ <20190509015856.GB7031@mit.edu>
+ <580e092f-fa4e-eedc-9e9a-a57dd085f0a6@gmail.com>
+ <78e4d46e-6212-9871-51d6-dd2126f39d45@gmail.com>
+ <20190510104338.GB6889@mit.edu>
+From: Frank Rowand <frowand.list@gmail.com>
+Message-ID: <86ea0fa1-8ce7-c299-3144-c57fc465c891@gmail.com>
+Date: Fri, 10 May 2019 14:05:26 -0700
 MIME-Version: 1.0
-References: <201905100945.V7PLp0za%lkp@intel.com>
-In-Reply-To: <201905100945.V7PLp0za%lkp@intel.com>
-From: Brendan Higgins <brendanhiggins@google.com>
-Date: Fri, 10 May 2019 14:03:04 -0700
-Message-ID: <CAFd5g46nZ0=Djo6d6iqdSQLaLP0Qq5bC+uzyjpqp5fXnty7YOg@mail.gmail.com>
-Subject: Re: [kbuild:kunit 14/17] htmldocs: include/kunit/kunit-stream.h:58:
- warning: Function parameter or member '2' not described in '__printf'
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190510104338.GB6889@mit.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Felix Guo <felixguoxiuping@gmail.com>
+To: Theodore Ts'o <tytso@mit.edu>, Greg KH <gregkh@linuxfoundation.org>, Brendan Higgins <brendanhiggins@google.com>, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
 
-On Thu, May 9, 2019 at 6:23 PM kbuild test robot <lkp@intel.com> wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kunit
-> head:   c505c0b2e6237c729634327c178f5b0094f1c958
-> commit: c69e87665049970d1c2d6fe2fa1ae7a7c8655420 [14/17] Documentation: kunit: add documentation for KUnit
-> reproduce: make htmldocs
->
-> If you fix the issue, kindly add following tag
-> Reported-by: kbuild test robot <lkp@intel.com>
->
-> All warnings (new ones prefixed by >>):
-< snip >
->    drivers/gpu/drm/i915/i915_vma.h:50: warning: cannot understand function prototype: 'struct i915_vma '
->    drivers/gpu/drm/i915/i915_vma.h:1: warning: no structured comments found
->    drivers/gpu/drm/i915/intel_guc_fwif.h:536: warning: cannot understand function prototype: 'struct guc_log_buffer_state '
->    drivers/gpu/drm/i915/i915_trace.h:1: warning: no structured comments found
->    drivers/gpu/drm/i915/i915_reg.h:156: warning: bad line:
->    include/linux/interconnect.h:1: warning: no structured comments found
-> >> include/kunit/kunit-stream.h:58: warning: Function parameter or member '2' not described in '__printf'
+On 5/10/19 3:43 AM, Theodore Ts'o wrote:
+> On Thu, May 09, 2019 at 10:11:01PM -0700, Frank Rowand wrote:
+>>>> You *can* run in-kernel test using modules; but there is no framework
+>>>> for the in-kernel code found in the test modules, which means each of
+>>>> the in-kernel code has to create their own in-kernel test
+>>>> infrastructure.
+>>
+>> The kselftest in-kernel tests follow a common pattern.  As such, there
+>> is a framework.
+> 
+> So we may have different definitions of "framework".  In my book, code
+> reuse by "cut and paste" does not make a framework.  Could they be
+> rewritten to *use* a framework, whether it be KTF or KUnit?  Sure!
+> But they are not using a framework *today*.
+> 
+>> This next two paragraphs you ignored entirely in your reply:
+>>
+>>> Why create an entire new subsystem (KUnit) when you can add a header
+>>> file (and .c code as appropriate) that outputs the proper TAP formatted
+>>> results from kselftest kernel test modules?
+> 
+> And you keep ignoring my main observation, which is that spinning up a
+> VM, letting systemd start, mounting a root file system, etc., is all
+> unnecessary overhead which takes time.  This is important to me,
+> because developer velocity is extremely important if you are doing
+> test driven development.
 
-This looks like a bug in the kernel-doc parser: __printf in this context is:
+No, I do not "keep ignoring my main observation".  You made that
+observation in an email of Thu, 9 May 2019 09:35:51 -0400.  In my
+reply to Tim's reply to your email, I wrote:
 
-> 8dcda743 Brendan Higgins 2019-05-01  56  void __printf(2, 3) kunit_stream_add(struct kunit_stream *this,
-> 8dcda743 Brendan Higgins 2019-05-01  57                                      const char *fmt, ...);
+   "< massive snip >
 
-which is an attribute to tell the compiler that this is a printf style
-function with a printf style format string; it doesn't make sense to
-describe it's parameters.
+   I'll reply in more detail to some other earlier messages in this thread
+   later.
 
->    include/kunit/kunit-stream.h:58: warning: Function parameter or member '3' not described in '__printf'
->    include/kunit/kunit-stream.h:58: warning: Excess function parameter 'this' description in '__printf'
->    include/kunit/kunit-stream.h:58: warning: Excess function parameter 'fmt' description in '__printf'
->    include/linux/skbuff.h:897: warning: Function parameter or member 'dev_scratch' not described in 'sk_buff'
-< snip >
->    fs/debugfs/file.c:439: WARNING: Inline literal start-string without end-string.
->
-> vim +58 include/kunit/kunit-stream.h
->
-> 8dcda743 Brendan Higgins 2019-05-01  48
-> 8dcda743 Brendan Higgins 2019-05-01  49  /**
-> 8dcda743 Brendan Higgins 2019-05-01  50   * kunit_stream_add(): adds the formatted input to the internal buffer.
-> 8dcda743 Brendan Higgins 2019-05-01  51   * @this: the stream being operated on.
-> 8dcda743 Brendan Higgins 2019-05-01  52   * @fmt: printf style format string to append to stream.
-> 8dcda743 Brendan Higgins 2019-05-01  53   *
-> 8dcda743 Brendan Higgins 2019-05-01  54   * Appends the formatted string, @fmt, to the internal buffer.
-> 8dcda743 Brendan Higgins 2019-05-01  55   */
-> 8dcda743 Brendan Higgins 2019-05-01  56  void __printf(2, 3) kunit_stream_add(struct kunit_stream *this,
-> 8dcda743 Brendan Higgins 2019-05-01  57                                      const char *fmt, ...);
-> 8dcda743 Brendan Higgins 2019-05-01 @58
->
-> :::::: The code at line 58 was first introduced by commit
-> :::::: 8dcda743c31c1ffc0ac13f3d23f3dd1b85b545f8 kunit: test: add kunit_stream a std::stream like logger
+   This reply is an attempt to return to the intent of my original reply to
+   patch 0 of this series."
 
-Thanks!
+
+I have not directly replied to any of your other emails that have made
+that observation (I may have replied to other emails that were replies
+to such an email of yours, but not in the context of the overhead).
+After this email, my next reply will be my delayed response to your
+original email about overhead.
+
+And the "mommy, he hit me first" argument does not contribute to a
+constructive conversation about a kernel patch submittal.
+
+
+> Yes, you can manually unload a module, recompile the module, somehow
+> get the module back into the VM (perhaps by using virtio-9p), and then
+> reloading the module with the in-kernel test code, and the restart the
+> test.  BUT: (a) even if it is faster, it requires a lot of manual
+> steps, and would be very hard to automate, and (b) if the test code
+> ever OOPS or triggers a lockdep warning, you will need to restart the
+> VM, and so this involves all of the VM restart overhead, plus trying
+> to automate determining when you actually do need to restart the VM
+> versus unloading and reloading the module.   It's clunky.
+
+I have mentioned before that the in-kernel kselftest tests can be
+run in UML.  You simply select the configure options to build them
+into the kernel instead of building them as modules.  Then build
+a UML kernel and execute ("boot") the UML kernel.
+
+This is exactly the same as for KUnit.  No more overhead.  No less
+overhead.  No more steps.  No fewer steps.
+
+
+> 
+> Being able to do the equivalent of "make && make check" is a really
+> big deal.  And "make check" needs to go fast.
+> 
+> You keep ignore this point, perhaps because you don't care about this
+> issue?  Which is fine, and why we may just need to agree to disagree.
+
+No, I agree that fast test execution is useful.
+
+
+> 
+> Cheers,
+> 
+> 						- Ted
+> 
+> P.S.  Running scripts is Turing-equivalent, so it's self-evident that
+> *anything* you can do with other test frameworks you can somehow do in
+> kselftests.  That argument doesn't impress me, and why I do consider
+> it quite flippant.  (Heck, /bin/vi is Turing equivalent so we could
+> use vi to as a kernel test framework.  Or we could use emacs.  Let's
+> not.  :-)
+
+I have not been talking about running scripts, other than to the extent
+that _one of the ways_ the in-kernel kselftests can be invoked is via
+a script that loads the test module.  The same exact in-kernel test can
+instead be built into a UML kernel, as mentioned above.
+
+
+> The question is whether it is the most best and most efficient way to
+> do that testing.  And developer velocity is a really big part of my
+> evaluation function when judging whether or a test framework is fit
+> for that purpose.
+> .
+> 
