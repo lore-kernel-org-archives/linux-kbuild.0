@@ -1,101 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:41815 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727823AbfEJRyY (ORCPT
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:46555 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727562AbfEJR5O (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 May 2019 13:54:24 -0400
-Received: by mail-pf1-f195.google.com with SMTP id l132so3604576pfc.8
-        for <linux-kbuild@vger.kernel.org>; Fri, 10 May 2019 10:54:23 -0700 (PDT)
+        Fri, 10 May 2019 13:57:14 -0400
+Received: by mail-pg1-f196.google.com with SMTP id t187so3347411pgb.13
+        for <linux-kbuild@vger.kernel.org>; Fri, 10 May 2019 10:57:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <1557497409-18037-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1557497409-18037-1-git-send-email-yamada.masahiro@socionext.com>
+References: <20190509064455.1173-1-yamada.masahiro@socionext.com>
+ <CA+icZUX_AgZdH5Z+1+k+oVdYSo7vqzeJsGPndb_Sa8VOSk_yOg@mail.gmail.com> <CAK7LNAS+FQqQZ0RfW8e6mxabUOq9YVk=eEEztmN-+BHnTmDa_w@mail.gmail.com>
+In-Reply-To: <CAK7LNAS+FQqQZ0RfW8e6mxabUOq9YVk=eEEztmN-+BHnTmDa_w@mail.gmail.com>
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Fri, 10 May 2019 10:54:11 -0700
-Message-ID: <CAKwvOdmaBopTduxoicj204pkr=+Xbapcqx2JMctNxd0MeHonog@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: add all Clang-specific flags unconditionally
+Date: Fri, 10 May 2019 10:57:01 -0700
+Message-ID: <CAKwvOdkt9eCFdy7pNer7+6ZNz4vFVX_55Fe_98W1RFFzwz3U5Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: add most of Clang-specific flags unconditionally
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Behan Webster <behanw@converseincode.com>
+Cc: Sedat Dilek <sedat.dilek@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Matthias Kaehlcke <mka@google.com>
 
-On Fri, May 10, 2019 at 7:10 AM Masahiro Yamada
+On Fri, May 10, 2019 at 6:54 AM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
-> We do not support old Clang versions. Upgrade your clang version
-> if any of these flags is unsupported.
+> On Thu, May 9, 2019 at 4:06 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> >
+> > On Thu, May 9, 2019 at 8:45 AM Masahiro Yamada
+> > <yamada.masahiro@socionext.com> wrote:
+> > >
+> > > We do not support old Clang versions. Upgrade your clang version
+> > > if any of these flags is unsupported.
+> > >
+> > > Let's add flags within ifdef CONFIG_CC_IS_CLANG unconditionally,
+> > > except -fcatch-undefined-behavior.
+> > >
+> > > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> >
+> > Looks good to me.
+> >
+> > Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
+> >
+> > Just as sidenote:
+> > I experimented with a snapshot version of clang-9 and lld-9 and could
+> > build, link and boot on bare-metal with '-mglobal-merge' on
+> > Debian/buster AMD64.
 >
-> Let's add all flags within ifdef CONFIG_CC_IS_CLANG unconditionally.
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
-> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> Tested-by: Nick Desaulniers <ndesaulniers@google.com>
-
-Ack
-
-> ---
->
-> Changes in v2:
->   - Rebase on top of Nathan's patch
->      https://patchwork.kernel.org/patch/10937055/
->
->  Makefile                   | 10 +++++-----
->  scripts/Makefile.extrawarn | 12 ++++++------
->  2 files changed, 11 insertions(+), 11 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 914a3ad..1152fc4 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -731,15 +731,15 @@ stackp-flags-$(CONFIG_STACKPROTECTOR_STRONG)      := -fstack-protector-strong
->  KBUILD_CFLAGS += $(stackp-flags-y)
->
->  ifdef CONFIG_CC_IS_CLANG
-> -KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
-> +KBUILD_CPPFLAGS += -Qunused-arguments
-> +KBUILD_CFLAGS += -Wno-format-invalid-specifier
-> +KBUILD_CFLAGS += -Wno-gnu
->  # Quiet clang warning: comparison of unsigned expression < 0 is always false
-> -KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
-> +KBUILD_CFLAGS += -Wno-tautological-compare
+> The comment says
 >  # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
->  # source of a reference will be _MergedGlobals and not on of the whitelisted names.
+>  # source of a reference will be _MergedGlobals and not on of the
+> whitelisted names.
 >  # See modpost pattern 2
-> -KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
-> +KBUILD_CFLAGS += -mno-global-merge
->  else
 >
->  # These warnings generated too much noise in a regular build.
-> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> index 768306a..523c4ca 100644
-> --- a/scripts/Makefile.extrawarn
-> +++ b/scripts/Makefile.extrawarn
-> @@ -66,11 +66,11 @@ KBUILD_CFLAGS += $(warning)
->  else
+> So, it seems it is just a matter of modpost,
+> but I am not sure enough.
 >
->  ifdef CONFIG_CC_IS_CLANG
-> -KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, format)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, sign-compare)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, format-zero-length)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, uninitialized)
-> +KBUILD_CFLAGS += -Wno-initializer-overrides
-> +KBUILD_CFLAGS += -Wno-unused-value
-> +KBUILD_CFLAGS += -Wno-format
-> +KBUILD_CFLAGS += -Wno-sign-compare
-> +KBUILD_CFLAGS += -Wno-format-zero-length
-> +KBUILD_CFLAGS += -Wno-uninitialized
->  endif
->  endif
-> --
-> 2.7.4
+> This flag has been here since the initial support.
+> (61163efae02040f66a95c8ed17f4407951ba58fa)
 >
+>
+> Perhaps, we should review clang flags one by one again?
 
+Yes, it's always good to re-evaluate if something is just cruft and
+can be removed.
 
++Behan
+
+I don't quite understand the comment about _MergedGlobals, Behan, do
+happen to have more context?
 -- 
 Thanks,
 ~Nick Desaulniers
