@@ -1,9 +1,9 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:33994 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727847AbfEJVMn (ORCPT
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:36301 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728205AbfEJVxE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 May 2019 17:12:43 -0400
+        Fri, 10 May 2019 17:53:04 -0400
 Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
  testing framework
 References: <54940124-50df-16ec-1a32-ad794ee05da7@gmail.com>
@@ -17,55 +17,125 @@ References: <54940124-50df-16ec-1a32-ad794ee05da7@gmail.com>
  <ECADFF3FD767C149AD96A924E7EA6EAF9770D591@USCULXMSG01.am.sony.com>
  <875c546d-9713-bb59-47e4-77a1d2c69a6d@gmail.com>
  <20190509214233.GA20877@mit.edu>
+ <b09ba170-229b-fde4-3e9a-e50d6ab4c1b5@deltatee.com>
 From: Frank Rowand <frowand.list@gmail.com>
-Message-ID: <80c72e64-2665-bd51-f78c-97f50f9a53ba@gmail.com>
-Date: Fri, 10 May 2019 14:12:40 -0700
+Message-ID: <2aed675e-0408-c812-3e1a-b90710c528f2@gmail.com>
+Date: Fri, 10 May 2019 14:52:59 -0700
 MIME-Version: 1.0
-In-Reply-To: <20190509214233.GA20877@mit.edu>
+In-Reply-To: <b09ba170-229b-fde4-3e9a-e50d6ab4c1b5@deltatee.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>, Tim.Bird@sony.com, knut.omang@oracle.com, gregkh@linuxfoundation.org, brendanhiggins@google.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
+To: Logan Gunthorpe <logang@deltatee.com>, Theodore Ts'o <tytso@mit.edu>, Tim.Bird@sony.com, knut.omang@oracle.com, gregkh@linuxfoundation.org, brendanhiggins@google.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
 
-On 5/9/19 2:42 PM, Theodore Ts'o wrote:
-> On Thu, May 09, 2019 at 11:12:12AM -0700, Frank Rowand wrote:
->>
->>    "My understanding is that the intent of KUnit is to avoid booting a kernel on
->>    real hardware or in a virtual machine.  That seems to be a matter of semantics
->>    to me because isn't invoking a UML Linux just running the Linux kernel in
->>    a different form of virtualization?
->>
->>    So I do not understand why KUnit is an improvement over kselftest.
->>
->>    ...
->>
->>    What am I missing?"
+On 5/9/19 3:20 PM, Logan Gunthorpe wrote:
 > 
-> One major difference: kselftest requires a userspace environment; it
-> starts systemd, requires a root file system from which you can load
-> modules, etc.  Kunit doesn't require a root file system; doesn't
-> require that you start systemd; doesn't allow you to run arbitrary
-> perl, python, bash, etc. scripts.  As such, it's much lighter weight
-> than kselftest, and will have much less overhead before you can start
-> running tests.  So it's not really the same kind of virtualization.
 > 
-> Does this help?
-> 
-> 					- Ted
-> 
+> On 2019-05-09 3:42 p.m., Theodore Ts'o wrote:
+>> On Thu, May 09, 2019 at 11:12:12AM -0700, Frank Rowand wrote:
+>>>
+>>>     "My understanding is that the intent of KUnit is to avoid booting a kernel on
+>>>     real hardware or in a virtual machine.  That seems to be a matter of semantics
+>>>     to me because isn't invoking a UML Linux just running the Linux kernel in
+>>>     a different form of virtualization?
+>>>
+>>>     So I do not understand why KUnit is an improvement over kselftest.
+>>>
+>>>     ...
+>>> 
+>>> What am I missing?"
+>> 
+>> One major difference: kselftest requires a userspace environment;
+>> it starts systemd, requires a root file system from which you can
+>> load modules, etc.  Kunit doesn't require a root file system;
+>> doesn't require that you start systemd; doesn't allow you to run
+>> arbitrary perl, python, bash, etc. scripts.  As such, it's much
+>> lighter weight than kselftest, and will have much less overhead
+>> before you can start running tests.  So it's not really the same
+>> kind of virtualization.
 
 I'm back to reply to this subthread, after a delay, as promised.
 
-That is the type of information that I was looking for, so
-thank you for the reply.
 
-However, the reply is incorrect.  Kselftest in-kernel tests (which
-is the context here) can be configured as built in instead of as
-a module, and built in a UML kernel.  The UML kernel can boot,
-running the in-kernel tests before UML attempts to invoke the
-init process.
+> I largely agree with everything Ted has said in this thread, but I
+> wonder if we are conflating two different ideas that is causing an
+> impasse. From what I see, Kunit actually provides two different
+> things:
 
-No userspace environment needed.  So exactly the same overhead
-as KUnit when invoked in that manner.
+> 1) An execution environment that can be run very quickly in userspace
+> on tests in the kernel source. This speeds up the tests and gives a
+> lot of benefit to developers using those tests because they can get
+> feedback on their code changes a *lot* quicker.
+
+kselftest in-kernel tests provide exactly the same when the tests are
+configured as "built-in" code instead of as modules.
+
+
+> 2) A framework to write unit tests that provides a lot of the same
+> facilities as other common unit testing frameworks from userspace
+> (ie. a runner that runs a list of tests and a bunch of helpers such
+> as KUNIT_EXPECT_* to simplify test passes and failures).
+
+> The first item from Kunit is novel and I see absolutely no overlap
+> with anything kselftest does. It's also the valuable thing I'd like
+> to see merged and grow.
+
+The first item exists in kselftest.
+
+
+> The second item, arguably, does have significant overlap with
+> kselftest. Whether you are running short tests in a light weight UML
+> environment or higher level tests in an heavier VM the two could be
+> using the same framework for writing or defining in-kernel tests. It
+> *may* also be valuable for some people to be able to run all the UML
+> tests in the heavy VM environment along side other higher level
+> tests.
+> 
+> Looking at the selftests tree in the repo, we already have similar
+> items to what Kunit is adding as I described in point (2) above.
+> kselftest_harness.h contains macros like EXPECT_* and ASSERT_* with
+> very similar intentions to the new KUNIT_EXECPT_* and KUNIT_ASSERT_*
+> macros.
+
+I might be wrong here because I have not dug deeply enough into the
+code!!!  Does this framework apply to the userspace tests, the
+in-kernel tests, or both?  My "not having dug enough GUESS" is that
+these are for the user space tests (although if so, they could be
+extended for in-kernel use also).
+
+So I think this one maybe does not have an overlap between KUnit
+and kselftest.
+
+
+> However, the number of users of this harness appears to be quite
+> small. Most of the code in the selftests tree seems to be a random
+> mismash of scripts and userspace code so it's not hard to see it as
+> something completely different from the new Kunit:
+> $ git grep --files-with-matches kselftest_harness.h *
+> Documentation/dev-tools/kselftest.rst
+> MAINTAINERS
+> tools/testing/selftests/kselftest_harness.h
+> tools/testing/selftests/net/tls.c
+> tools/testing/selftests/rtc/rtctest.c
+> tools/testing/selftests/seccomp/Makefile
+> tools/testing/selftests/seccomp/seccomp_bpf.c
+> tools/testing/selftests/uevent/Makefile
+> tools/testing/selftests/uevent/uevent_filtering.c
+
+
+> Thus, I can personally see a lot of value in integrating the kunit
+> test framework with this kselftest harness. There's only a small
+> number of users of the kselftest harness today, so one way or another
+> it seems like getting this integrated early would be a good idea.
+> Letting Kunit and Kselftests progress independently for a few years
+> will only make this worse and may become something we end up
+> regretting.
+
+Yes, this I agree with.
+
+-Frank
+
+> 
+> Logan
