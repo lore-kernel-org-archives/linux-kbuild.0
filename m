@@ -1,72 +1,145 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:19786 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727010AbfEJHmE (ORCPT
+Received: from mail-it1-f194.google.com ([209.85.166.194]:53394 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727001AbfEJIMZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 May 2019 03:42:04 -0400
+        Fri, 10 May 2019 04:12:25 -0400
+Received: by mail-it1-f194.google.com with SMTP id m141so6627051ita.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 10 May 2019 01:12:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190510061205.28753-1-yamada.masahiro@socionext.com>
- <20190510061205.28753-2-yamada.masahiro@socionext.com> <CAMuHMdVmgZjyGxz0F=Akz+3egFtGMppGg6TRAnRhd=KZv5ADdg@mail.gmail.com>
- <20190510070354.GA2193@ravnborg.org>
-In-Reply-To: <20190510070354.GA2193@ravnborg.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 10 May 2019 16:41:23 +0900
-Message-ID: <CAK7LNAS56NOTdmAmHdi9Kk23HjbQXDmEJEySSU0c=+eTQF5nEw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kconfig: do not write .config if the content is the same
+References: <a09a7e0e-9894-8c1a-34eb-fc482b1759d0@gmail.com>
+ <20190509015856.GB7031@mit.edu> <580e092f-fa4e-eedc-9e9a-a57dd085f0a6@gmail.com>
+ <20190509032017.GA29703@mit.edu> <7fd35df81c06f6eb319223a22e7b93f29926edb9.camel@oracle.com>
+ <20190509133551.GD29703@mit.edu> <ECADFF3FD767C149AD96A924E7EA6EAF9770D591@USCULXMSG01.am.sony.com>
+ <875c546d-9713-bb59-47e4-77a1d2c69a6d@gmail.com> <20190509214233.GA20877@mit.edu>
+ <b09ba170-229b-fde4-3e9a-e50d6ab4c1b5@deltatee.com> <20190509233043.GC20877@mit.edu>
+ <8914afef-1e66-e6e3-f891-5855768d3018@deltatee.com> <6d6e91ec-33d3-830b-4895-4d7a20ba7d45@gmail.com>
+ <a1b88d5add15d43de0468c32d9a2427629337abb.camel@oracle.com>
+In-Reply-To: <a1b88d5add15d43de0468c32d9a2427629337abb.camel@oracle.com>
+From: Daniel Vetter <daniel@ffwll.ch>
+Date: Fri, 10 May 2019 10:12:13 +0200
+Message-ID: <CAKMK7uFd1xUx8u3xWLwifVSq4OEnMO4S-m0hESe68UzONXnMFg@mail.gmail.com>
+Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, Ulf Magnusson <ulfalizer@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Joel Fernandes <joel@joelfernandes.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Knut Omang <knut.omang@oracle.com>
+Cc: Frank Rowand <frowand.list@gmail.com>, Logan Gunthorpe <logang@deltatee.com>, Theodore Ts'o <tytso@mit.edu>, Tim.Bird@sony.com, Greg KH <gregkh@linuxfoundation.org>, Brendan Higgins <brendanhiggins@google.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Rob Herring <robh@kernel.org>, sboyd@kernel.org, Shuah Khan <shuah@kernel.org>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, Linux Doc Mailing List <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Dan Williams <dan.j.williams@intel.com>, jdike@addtoit.com, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-Hi Sam, Geert,
-
-On Fri, May 10, 2019 at 4:04 PM Sam Ravnborg <sam@ravnborg.org> wrote:
+On Fri, May 10, 2019 at 7:49 AM Knut Omang <knut.omang@oracle.com> wrote:
 >
-> Hi Geert/Masahiro.
->
-> On Fri, May 10, 2019 at 08:46:35AM +0200, Geert Uytterhoeven wrote:
-> > Hi Yamada-san,
+> On Thu, 2019-05-09 at 22:18 -0700, Frank Rowand wrote:
+> > On 5/9/19 4:40 PM, Logan Gunthorpe wrote:
+> > >
+> > >
+> > > On 2019-05-09 5:30 p.m., Theodore Ts'o wrote:
+> > >> On Thu, May 09, 2019 at 04:20:05PM -0600, Logan Gunthorpe wrote:
+> > >>>
+> > >>> The second item, arguably, does have significant overlap with kselftest.
+> > >>> Whether you are running short tests in a light weight UML environment or
+> > >>> higher level tests in an heavier VM the two could be using the same
+> > >>> framework for writing or defining in-kernel tests. It *may* also be valuable
+> > >>> for some people to be able to run all the UML tests in the heavy VM
+> > >>> environment along side other higher level tests.
+> > >>>
+> > >>> Looking at the selftests tree in the repo, we already have similar items to
+> > >>> what Kunit is adding as I described in point (2) above. kselftest_harness.h
+> > >>> contains macros like EXPECT_* and ASSERT_* with very similar intentions to
+> > >>> the new KUNIT_EXECPT_* and KUNIT_ASSERT_* macros.
+> > >>>
+> > >>> However, the number of users of this harness appears to be quite small. Most
+> > >>> of the code in the selftests tree seems to be a random mismash of scripts
+> > >>> and userspace code so it's not hard to see it as something completely
+> > >>> different from the new Kunit:
+> > >>>
+> > >>> $ git grep --files-with-matches kselftest_harness.h *
+> > >>
+> > >> To the extent that we can unify how tests are written, I agree that
+> > >> this would be a good thing.  However, you should note that
+> > >> kselftest_harness.h is currently assums that it will be included in
+> > >> userspace programs.  This is most obviously seen if you look closely
+> > >> at the functions defined in the header files which makes calls to
+> > >> fork(), abort() and fprintf().
+> > >
+> > > Ah, yes. I obviously did not dig deep enough. Using kunit for
+> > > in-kernel tests and kselftest_harness for userspace tests seems like
+> > > a sensible line to draw to me. Trying to unify kernel and userspace
+> > > here sounds like it could be difficult so it's probably not worth
+> > > forcing the issue unless someone wants to do some really fancy work
+> > > to get it done.
+> > >
+> > > Based on some of the other commenters, I was under the impression
+> > > that kselftests had in-kernel tests but I'm not sure where or if they
+> > > exist.
 > >
-> > On Fri, May 10, 2019 at 8:14 AM Masahiro Yamada
-> > <yamada.masahiro@socionext.com> wrote:
-> > > Kconfig updates the .config when it exits even if its content is
-> > > exactly the same as before. Since its timestamp becomes newer than
-> > > that of other build artifacts, additional processing is invoked,
-> > > which is annoying.
-> > >
-> > > - syncconfig is invoked to update include/config/auto.conf, etc.
-> > >
-> > > - kernel/config.o is recompiled if CONFIG_IKCONFIG is enabled,
-> > >   then vmlinux is relinked as well.
-> > >
-> > > If the .config is not changed at all, we do not have to even
-> > > touch it. Just bail out showing "No change to .config".
-> It would be preferable that if nothing changed no output is generated.
-> Like we do not tell that we did not build a .o file because the .c file
-> had not changed.
-> Less noise for a kernel build where nothings happens.
+> > YES, kselftest has in-kernel tests.  (Excuse the shouting...)
+> >
+> > Here is a likely list of them in the kernel source tree:
+> >
+> > $ grep module_init lib/test_*.c
+> > lib/test_bitfield.c:module_init(test_bitfields)
+> > lib/test_bitmap.c:module_init(test_bitmap_init);
+> > lib/test_bpf.c:module_init(test_bpf_init);
+> > lib/test_debug_virtual.c:module_init(test_debug_virtual_init);
+> > lib/test_firmware.c:module_init(test_firmware_init);
+> > lib/test_hash.c:module_init(test_hash_init);  /* Does everything */
+> > lib/test_hexdump.c:module_init(test_hexdump_init);
+> > lib/test_ida.c:module_init(ida_checks);
+> > lib/test_kasan.c:module_init(kmalloc_tests_init);
+> > lib/test_list_sort.c:module_init(list_sort_test);
+> > lib/test_memcat_p.c:module_init(test_memcat_p_init);
+> > lib/test_module.c:static int __init test_module_init(void)
+> > lib/test_module.c:module_init(test_module_init);
+> > lib/test_objagg.c:module_init(test_objagg_init);
+> > lib/test_overflow.c:static int __init test_module_init(void)
+> > lib/test_overflow.c:module_init(test_module_init);
+> > lib/test_parman.c:module_init(test_parman_init);
+> > lib/test_printf.c:module_init(test_printf_init);
+> > lib/test_rhashtable.c:module_init(test_rht_init);
+> > lib/test_siphash.c:module_init(siphash_test_init);
+> > lib/test_sort.c:module_init(test_sort_init);
+> > lib/test_stackinit.c:module_init(test_stackinit_init);
+> > lib/test_static_key_base.c:module_init(test_static_key_base_init);
+> > lib/test_static_keys.c:module_init(test_static_key_init);
+> > lib/test_string.c:module_init(string_selftest_init);
+> > lib/test_ubsan.c:module_init(test_ubsan_init);
+> > lib/test_user_copy.c:module_init(test_user_copy_init);
+> > lib/test_uuid.c:module_init(test_uuid_init);
+> > lib/test_vmalloc.c:module_init(vmalloc_test_init)
+> > lib/test_xarray.c:module_init(xarray_checks);
+> >
+> >
+> > > If they do exists, it seems like it would make sense to
+> > > convert those to kunit and have Kunit tests run-able in a VM or
+> > > baremetal instance.
+> >
+> > They already run in a VM.
+> >
+> > They already run on bare metal.
+> >
+> > They already run in UML.
+> >
+> > This is not to say that KUnit does not make sense.  But I'm still trying
+> > to get a better description of the KUnit features (and there are
+> > some).
 >
-> > This causes a semantic change for the meaning of ".config.old", which is
-> > no longer updated if .config has not changed.
-> > Hence its contents may no longer correspond to the previous config, but to
-> > an arbitrary older version.
-> This semantic change is good.
-> So we now have a .config.old that correspond to the state before
-> the last change. Also after several kernel builds.
+> FYI, I have a master student who looks at converting some of these to KTF, such as for
+> instance the XArray tests, which lended themselves quite good to a semi-automated
+> conversion.
+>
+> The result is also a somewhat more compact code as well as the flexibility
+> provided by the Googletest executor and the KTF frameworks, such as running selected
+> tests, output formatting, debugging features etc.
 
-
-I agree.
-
-When there is no change in the configuration,
-Kconfig will not even attempt to output anything.
-
-Updating only .config.old is strange.
-
-Thanks.
-
-
-
---
-Best Regards
-Masahiro Yamada
+So is KTF already in upstream? Or is the plan to unify the KTF and
+Kunit in-kernel test harnesses? Because there's tons of these
+in-kernel unit tests already, and every merge we get more (Frank's
+list didn't even look into drivers or anywhere else, e.g. it's missing
+the locking self tests I worked on in the past), and a more structured
+approach would really be good.
+-Daniel
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
++41 (0) 79 365 57 48 - http://blog.ffwll.ch
