@@ -1,71 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:36628 "EHLO ale.deltatee.com"
+Received: from imcorp.com.vn ([118.69.230.116]:33701 "EHLO imc2.imcorp.com.vn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727271AbfEJQSg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 May 2019 12:18:36 -0400
-References: <a09a7e0e-9894-8c1a-34eb-fc482b1759d0@gmail.com>
- <20190509015856.GB7031@mit.edu>
- <580e092f-fa4e-eedc-9e9a-a57dd085f0a6@gmail.com>
- <20190509032017.GA29703@mit.edu>
- <7fd35df81c06f6eb319223a22e7b93f29926edb9.camel@oracle.com>
- <20190509133551.GD29703@mit.edu>
- <ECADFF3FD767C149AD96A924E7EA6EAF9770D591@USCULXMSG01.am.sony.com>
- <875c546d-9713-bb59-47e4-77a1d2c69a6d@gmail.com>
- <20190509214233.GA20877@mit.edu>
- <b09ba170-229b-fde4-3e9a-e50d6ab4c1b5@deltatee.com>
- <20190509233043.GC20877@mit.edu>
- <8914afef-1e66-e6e3-f891-5855768d3018@deltatee.com>
- <6d6e91ec-33d3-830b-4895-4d7a20ba7d45@gmail.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <3faa022b-0b70-0375-aa6d-12ea83a2671f@deltatee.com>
-Date: Fri, 10 May 2019 10:17:56 -0600
+        id S1727650AbfEJQwV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 10 May 2019 12:52:21 -0400
+Reply-To: <gordon992277@outlook.com>
+From: Gordon Chang <chlee@myamts.net>
+Subject: 8/05/2019
+Date: Sat, 11 May 2019 01:35:00 -0700
 MIME-Version: 1.0
-In-Reply-To: <6d6e91ec-33d3-830b-4895-4d7a20ba7d45@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
+Content-Type: text/plain; charset="Windows-1251"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
- testing framework
+Message-ID: <417375f6518845fa95266fca11769bad@MBX1.imcorp.com.vn>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frank Rowand <frowand.list@gmail.com>, Theodore Ts'o <tytso@mit.edu>, Tim.Bird@sony.com, knut.omang@oracle.com, gregkh@linuxfoundation.org, brendanhiggins@google.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
 
+Hello,
 
+I apologize if this email comes as a surprise to you. I have a business proposal that will be of great benefit to both of us.
+If you are willing to discuss further on this matter, I expect you reply promptly so that I will give you further details.
+Best Regards,
 
-On 2019-05-09 11:18 p.m., Frank Rowand wrote:
-
-> YES, kselftest has in-kernel tests.  (Excuse the shouting...)
-
-Cool. From my cursory look, in my opinion, these would be greatly
-improved by converting them to the framework Brendan is proposing for Kunit.
-
->> If they do exists, it seems like it would make sense to
->> convert those to kunit and have Kunit tests run-able in a VM or
->> baremetal instance.
-> 
-> They already run in a VM.
-> 
-> They already run on bare metal.
-> 
-> They already run in UML.
-
-Simply being able to run in UML is not the only thing here. Kunit
-provides the infrastructure to quickly build, run and report results for
-all the tests from userspace without needing to worry about the details
-of building and running a UML kernel, then parsing dmesg to figure out
-what tests were run or not.
-
-> This is not to say that KUnit does not make sense.  But I'm still trying
-> to get a better description of the KUnit features (and there are
-> some).
-
-So read the patches, or the documentation[1] or the LWN article[2]. It's
-pretty well described in a lot of places -- that's one of the big
-advantages of it. In contrast, few people seems to have any concept of
-what kselftests are or where they are or how to run them (I was
-surprised to find the in-kernel tests in the lib tree).
-
-Logan
-
-[1] https://google.github.io/kunit-docs/third_party/kernel/docs/
-[2] https://lwn.net/Articles/780985/
+Gordon
