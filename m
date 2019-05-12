@@ -1,161 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:23179 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726101AbfELCWV (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:45488 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726101AbfELDF3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 11 May 2019 22:22:21 -0400
+        Sat, 11 May 2019 23:05:29 -0400
 MIME-Version: 1.0
-References: <20190509201925.189615-1-ndesaulniers@google.com>
-In-Reply-To: <20190509201925.189615-1-ndesaulniers@google.com>
+References: <20190509201925.189615-1-ndesaulniers@google.com> <20190511022458.GA7376@archlinux-i9>
+In-Reply-To: <20190511022458.GA7376@archlinux-i9>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 12 May 2019 11:21:28 +0900
-Message-ID: <CAK7LNAQA7YdtnuTKzO2UZdUqXvn+zxcU-GUD5RBQkMHYs7ZY3Q@mail.gmail.com>
+Date: Sun, 12 May 2019 12:04:48 +0900
+Message-ID: <CAK7LNARB_ds9-dF9n1jHD==JRWsnPYNGoKxLqb+FwKvTTC0bLQ@mail.gmail.com>
 Subject: Re: [PATCH] kbuild: add script check for cross compilation utilities
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: clang-built-linux <clang-built-linux@googlegroups.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux <clang-built-linux@googlegroups.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi.
-
-On Fri, May 10, 2019 at 5:19 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
+On Sat, May 11, 2019 at 11:25 AM Nathan Chancellor
+<natechancellor@gmail.com> wrote:
 >
-> When cross compiling via setting CROSS_COMPILE, if the prefixed tools
-> are not found, then the host utilities are often instead invoked, and
-> produce often difficult to understand errors.  This is most commonly the
-> case for developers new to cross compiling the kernel that have yet to
-> install the proper cross compilation toolchain. Rather than charge
-> headlong into a build that will fail obscurely, check that the tools
-> exist before starting to compile, and fail with a friendly error
-> message.
-
-I see one drawback in adding the check script
-so early in the top Makefile.
-
-Make targets that do not require toolchain at all
-("make clean", "make headers_install", etc.)
-would fail too.
-
-
+> Few comments below but nothing major, this seems to work fine as is.
 >
-> Before:
-> $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make CC=clang
-> ...
-> /usr/bin/as: unrecognized option '-EL'
-> clang: error: assembler command failed with exit code 1 (use -v to see
-> invocation)
-> make[2]: *** [../scripts/Makefile.build:279: scripts/mod/empty.o] Error 1
-> make[2]: *** Waiting for unfinished jobs....
-> make[1]: *** [/linux/Makefile:1118:
-> prepare0] Error 2
-> make: *** [Makefile:179: sub-make] Error 2
-
-
-What a coincidence, I had sent this patch before:
-https://patchwork.kernel.org/patch/10936811/
-
-
-With my patch applied, the command above would be failed like this:
-
-
-$ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-  CC=clang defconfig all
-  HOSTCC  scripts/basic/fixdep
-  HOSTCC  scripts/kconfig/conf.o
-  HOSTCC  scripts/kconfig/confdata.o
-  HOSTCC  scripts/kconfig/expr.o
-  LEX     scripts/kconfig/lexer.lex.c
-  YACC    scripts/kconfig/parser.tab.h
-  HOSTCC  scripts/kconfig/lexer.lex.o
-  YACC    scripts/kconfig/parser.tab.c
-  HOSTCC  scripts/kconfig/parser.tab.o
-  HOSTCC  scripts/kconfig/preprocess.o
-  HOSTCC  scripts/kconfig/symbol.o
-  HOSTLD  scripts/kconfig/conf
-*** Default configuration is based on 'multi_v7_defconfig'
-scripts/Kconfig.include:35: linker 'arm-linux-gnueabihf-ld' not found
-make[2]: *** [scripts/kconfig/Makefile;82: defconfig] Error 1
-make[1]: *** [Makefile;557: defconfig] Error 2
-make: *** [Makefile;325: __build_one_by_one] Error 2
-
-
-
-
-The presence $(CC) and $(LD) are checked in the Kconfig stage.
-If it is not enough, it is OK to add $(AS) check.
-
-$(error-if,$(failure,command -v $(AS)),assembler '$(AS)' not found)
-
-
-But, I do not want to add all of $(AR), $(NM), ... etc.
-
-
-Thanks.
-
-
-
-> After:
-> $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make CC=clang
-> $CROSS_COMPILE set to arm-linux-gnueabihf-, but unable to find
-> arm-linux-gnueabihf-as.
-> Makefile:522: recipe for target 'outputmakefile' failed
-> make: *** [outputmakefile] Error 1
+> On Thu, May 09, 2019 at 01:19:21PM -0700, 'Nick Desaulniers' via Clang Built Linux wrote:
+> > When cross compiling via setting CROSS_COMPILE, if the prefixed tools
+> > are not found, then the host utilities are often instead invoked, and
+> > produce often difficult to understand errors.  This is most commonly the
+> > case for developers new to cross compiling the kernel that have yet to
+> > install the proper cross compilation toolchain. Rather than charge
+> > headlong into a build that will fail obscurely, check that the tools
+> > exist before starting to compile, and fail with a friendly error
+> > message.
 >
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> ---
-> Note: this is probably more generally useful, but after a few minutes
-> wrestling with Make errors related to "recipe commences before first
-> target" and "missing separator," I came to understand my hatred of GNU
-> Make. Open to sugguestions for where better to invoke this from the top
-> level Makefile.
+> This part of the commit message makes it sound like this is a generic
+> problem when it is actually specific to clang. make will fail on its
+> own when building with gcc if CROSS_COMPILE is not properly set (since
+> gcc won't be found).
 >
->  Makefile                      |  1 +
->  scripts/check_crosscompile.sh | 18 ++++++++++++++++++
->  2 files changed, 19 insertions(+)
->  create mode 100755 scripts/check_crosscompile.sh
->
-> diff --git a/Makefile b/Makefile
-> index a61a95b6b38f..774339674b59 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -519,6 +519,7 @@ endif
->
->  ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
->  ifneq ($(CROSS_COMPILE),)
-> +       $(Q)$(CONFIG_SHELL) $(srctree)/scripts/check_crosscompile.sh
->  CLANG_FLAGS    := --target=$(notdir $(CROSS_COMPILE:%-=%))
->  GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
->  CLANG_FLAGS    += --prefix=$(GCC_TOOLCHAIN_DIR)
-> diff --git a/scripts/check_crosscompile.sh b/scripts/check_crosscompile.sh
-> new file mode 100755
-> index 000000000000..f4586fbfee18
-> --- /dev/null
-> +++ b/scripts/check_crosscompile.sh
-> @@ -0,0 +1,18 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +# (c) 2019, Nick Desaulniers <ndesaulniers@google.com>
-> +function check () {
-> +  # Remove trailing commands, for example arch/arm/Makefile may add `-EL`.
-> +  utility=$(echo ${1} | awk '{print $1;}')
-> +  command -v "${utility}" &> /dev/null
-> +  if [[ $? != 0 ]]; then
-> +    echo "\$CROSS_COMPILE set to ${CROSS_COMPILE}," \
-> +      "but unable to find ${utility}."
-> +    exit 1
-> +  fi
-> +}
-> +utilities=("${AS}" "${LD}" "${CC}" "${AR}" "${NM}" "${STRIP}" "${OBJCOPY}"
-> +  "${OBJDUMP}")
-> +for utility in "${utilities[@]}"; do
-> +  check "${utility}"
-> +done
-> --
-> 2.21.0.1020.gf2820cf01a-goog
->
+> On a side note, seems kind of odd that clang falls back to the host
+> tools when a non-host --target argument is used... (how in the world is
+> that expected to work?)
 
 
---
+I agree.
+Failure is much better than falling back to host tools.
+
+
+-- 
 Best Regards
 Masahiro Yamada
